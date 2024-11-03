@@ -9,6 +9,93 @@
                     </div>
                     <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true"
                            v-if="currentStep === 'checkData'">
+                        <v-icon :icon="icons.filter" />
+                        <v-menu activator="parent" max-height="500">
+                            <v-list>
+                                <v-list-subheader :title="$t('Date Range')"/>
+                                <v-list-item :title="$t('All')"
+                                             :append-icon="filters.minDatetime === null || filters.maxDatetime === null ? icons.checked : null"
+                                             @click="filters.minDatetime = filters.maxDatetime = null"></v-list-item>
+                                <v-list-item :title="$t('Custom')"
+                                             :subtitle="displayFilterCustomDateRange"
+                                             :append-icon="filters.minDatetime !== null && filters.maxDatetime !== null ? icons.checked : null"
+                                             @click="showCustomDateRangeDialog = true"></v-list-item>
+                                <v-divider class="my-2"/>
+                                <v-list-subheader :title="$t('Type')"/>
+                                <v-list-item :title="$t('All')"
+                                             :append-icon="filters.transactionType === null ? icons.checked : null"
+                                             @click="filters.transactionType = null"></v-list-item>
+                                <v-list-item :title="$t('Income')"
+                                             :append-icon="filters.transactionType === allTransactionTypes.Income ? icons.checked : null"
+                                             @click="filters.transactionType = allTransactionTypes.Income"></v-list-item>
+                                <v-list-item :title="$t('Expense')"
+                                             :append-icon="filters.transactionType === allTransactionTypes.Expense ? icons.checked : null"
+                                             @click="filters.transactionType = allTransactionTypes.Expense"></v-list-item>
+                                <v-list-item :title="$t('Transfer')"
+                                             :append-icon="filters.transactionType === allTransactionTypes.Transfer ? icons.checked : null"
+                                             @click="filters.transactionType = allTransactionTypes.Transfer"></v-list-item>
+                                <v-divider class="my-2"/>
+                                <v-list-subheader :title="$t('Category')"/>
+                                <v-list-item :title="$t('All')"
+                                             :append-icon="filters.category === null ? icons.checked : null"
+                                             @click="filters.category = null"></v-list-item>
+                                <v-list-item :title="$t('Invalid Category')"
+                                             :append-icon="filters.category === undefined ? icons.checked : null"
+                                             @click="filters.category = undefined"></v-list-item>
+                                <v-list-item :title="$t('None')"
+                                             :append-icon="filters.category === '' ? icons.checked : null"
+                                             @click="filters.category = ''"></v-list-item>
+                                <v-list-item :title="name" :key="name"
+                                             :append-icon="filters.category === name ? icons.checked : null"
+                                             v-for="name in allUsedCategoryNames"
+                                             @click="filters.category = name"></v-list-item>
+                                <v-divider class="my-2"/>
+                                <v-list-subheader :title="$t('Account')"/>
+                                <v-list-item :title="$t('All')"
+                                             :append-icon="filters.account === null ? icons.checked : null"
+                                             @click="filters.account = null"></v-list-item>
+                                <v-list-item :title="$t('Invalid Account')"
+                                             :append-icon="filters.account === undefined ? icons.checked : null"
+                                             @click="filters.account = undefined"></v-list-item>
+                                <v-list-item :title="$t('None')"
+                                             :append-icon="filters.account === '' ? icons.checked : null"
+                                             @click="filters.account = ''"></v-list-item>
+                                <v-list-item :title="name" :key="name"
+                                             :append-icon="filters.account === name ? icons.checked : null"
+                                             v-for="name in allUsedAccountNames"
+                                             @click="filters.account = name"></v-list-item>
+                                <v-divider class="my-2"/>
+                                <v-list-subheader :title="$t('Tags')"/>
+                                <v-list-item :title="$t('All')"
+                                             :append-icon="filters.tag === null ? icons.checked : null"
+                                             @click="filters.tag = null"></v-list-item>
+                                <v-list-item :title="$t('Invalid Tag')"
+                                             :append-icon="filters.tag === undefined ? icons.checked : null"
+                                             @click="filters.tag = undefined"></v-list-item>
+                                <v-list-item :title="$t('None')"
+                                             :append-icon="filters.tag === '' ? icons.checked : null"
+                                             @click="filters.tag = ''"></v-list-item>
+                                <v-list-item :title="name" :key="name"
+                                             :append-icon="filters.tag === name ? icons.checked : null"
+                                             v-for="name in allUsedTagNames"
+                                             @click="filters.tag = name"></v-list-item>
+                                <v-divider class="my-2"/>
+                                <v-list-subheader :title="$t('Description')"/>
+                                <v-list-item :title="$t('All')"
+                                             :append-icon="filters.description === null ? icons.checked : null"
+                                             @click="filters.description = null"></v-list-item>
+                                <v-list-item :title="$t('None')"
+                                             :append-icon="filters.description === '' ? icons.checked : null"
+                                             @click="filters.description = ''"></v-list-item>
+                                <v-list-item :title="$t('Custom')"
+                                             :subtitle="filters.description"
+                                             :append-icon="filters.description !== null && filters.description !== '' ? icons.checked : null"
+                                             @click="currentDescriptionFilterValue = filters.description || ''; showCustomDescriptionDialog = true"></v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </v-btn>
+                    <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true"
+                           v-if="currentStep === 'checkData'">
                         <v-icon :icon="icons.more" />
                         <v-menu activator="parent">
                             <v-list>
@@ -125,6 +212,8 @@
                         :height="importTransactionsTableHeight"
                         :headers="importTransactionHeaders"
                         :items="importTransactions"
+                        :search="JSON.stringify(filters)"
+                        :custom-filter="importTransactionsFilter"
                         :no-data-text="$t('No data to import')"
                         v-model:items-per-page="countPerPage"
                         v-model:page="currentPage"
@@ -467,6 +556,36 @@
         </v-card>
     </v-dialog>
 
+    <v-dialog width="640" v-model="showCustomDescriptionDialog">
+        <v-card class="pa-2 pa-sm-4 pa-md-4">
+            <template #title>
+                <div class="d-flex align-center justify-center">
+                    <h4 class="text-h4">{{ $t('Filter Description') }}</h4>
+                </div>
+            </template>
+            <v-card-text class="mb-md-4 w-100 d-flex justify-center">
+                <v-text-field
+                    type="text"
+                    persistent-placeholder
+                    :label="$t('Description')"
+                    :placeholder="$t('Description')"
+                    v-model="currentDescriptionFilterValue"
+                />
+            </v-card-text>
+            <v-card-text class="overflow-y-visible">
+                <div class="w-100 d-flex justify-center gap-4">
+                    <v-btn :disabled="!currentDescriptionFilterValue" @click="showCustomDescriptionDialog = false; filters.description = currentDescriptionFilterValue">{{ $t('OK') }}</v-btn>
+                    <v-btn color="secondary" variant="tonal" @click="showCustomDescriptionDialog = false; currentDescriptionFilterValue = ''">{{ $t('Cancel') }}</v-btn>
+                </div>
+            </v-card-text>
+        </v-card>
+    </v-dialog>
+
+    <date-range-selection-dialog :title="$t('Custom Date Range')"
+                                 :min-time="filters.minDatetime"
+                                 :max-time="filters.maxDatetime"
+                                 v-model:show="showCustomDateRangeDialog"
+                                 @dateRange:change="changeCustomDateFilter" />
     <batch-replace-dialog ref="batchReplaceDialog" />
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
@@ -489,7 +608,12 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import categoryConstants from '@/consts/category.js';
 import transactionConstants from '@/consts/transaction.js';
-import { getNameByKeyValue } from '@/lib/common.js';
+import {
+    isString,
+    isNumber,
+    getNameByKeyValue,
+    objectFieldToArrayItem
+} from '@/lib/common.js';
 import { isFileExtensionSupported } from '@/lib/file.js';
 import { generateRandomUUID } from '@/lib/misc.js';
 import logger from '@/lib/logger.js';
@@ -506,12 +630,13 @@ import {
 } from '@/lib/category.js';
 
 import {
+    mdiFilterOutline,
+    mdiCheck,
     mdiDotsVertical,
     mdiHelpCircleOutline,
     mdiFindReplace,
     mdiClose,
     mdiArrowRight,
-    mdiCheck,
     mdiSelectAll,
     mdiSelect,
     mdiSelectInverse,
@@ -541,14 +666,28 @@ export default {
             importTransactions: null,
             editingTransaction: null,
             editingTags: [],
+            filters: {
+                minDatetime: null,
+                maxDatetime: null,
+                transactionType: null,
+                category: null,
+                account: null,
+                tag: null,
+                description: null
+            },
             currentPage: 1,
             countPerPage: 10,
             importedCount: null,
+            showCustomDateRangeDialog: false,
+            showCustomDescriptionDialog: false,
+            currentDescriptionFilterValue: null,
             loading: true,
             submitting: false,
             resolve: null,
             reject: null,
             icons: {
+                filter: mdiFilterOutline,
+                checked: mdiCheck,
                 more: mdiDotsVertical,
                 document: mdiHelpCircleOutline,
                 replace: mdiFindReplace,
@@ -766,7 +905,36 @@ export default {
                 return 1;
             }
 
-            return Math.ceil(this.importTransactions.length / this.countPerPage);
+            let count = 0;
+
+            for (let i = 0; i < this.importTransactions.length; i++) {
+                if (this.isTransactionDisplayed(this.importTransactions[i])) {
+                    count++;
+                }
+            }
+
+            return Math.ceil(count / this.countPerPage);
+        },
+        currentPageTransactions() {
+            const ret = [];
+            const previousCount = Math.max(0, (this.currentPage - 1) * this.countPerPage);
+            let count = 0;
+
+            for (let i = 0; i < this.importTransactions.length; i++) {
+                if (ret.length >= this.countPerPage) {
+                    break;
+                }
+
+                if (this.isTransactionDisplayed(this.importTransactions[i])) {
+                    if (count >= previousCount) {
+                        ret.push(this.importTransactions[i]);
+                    }
+
+                    count++;
+                }
+            }
+
+            return ret;
         },
         selectedImportTransactionCount() {
             let count = 0;
@@ -833,6 +1001,15 @@ export default {
                 return this.selectedImportTransactionCount === this.importTransactions.length;
             }
         },
+        allUsedCategoryNames() {
+            return this.getAllUsedCategoryNames();
+        },
+        allUsedAccountNames() {
+            return this.getAllUsedAccountNames();
+        },
+        allUsedTagNames() {
+            return this.getAllUsedTagNames();
+        },
         allInvalidExpenseCategoryNames() {
             return this.getCurrentInvalidCategoryNames(this.allTransactionTypes.Expense);
         },
@@ -847,6 +1024,16 @@ export default {
         },
         allInvalidTransactionTagNames() {
             return this.getCurrentInvalidTagNames();
+        },
+        displayFilterCustomDateRange() {
+            if (this.filters.minDatetime === null || this.filters.maxDatetime === null) {
+                return '';
+            }
+
+            const minDisplayTime = this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.filters.minDatetime);
+            const maxDisplayTime = this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.filters.maxDatetime);
+
+            return `${minDisplayTime} - ${maxDisplayTime}`
         }
     },
     watch: {
@@ -884,6 +1071,13 @@ export default {
             self.importTransactions = null;
             self.editingTransaction = null;
             self.editingTags = [];
+            self.filters.minDatetime = null;
+            self.filters.maxDatetime = null;
+            self.filters.transactionType = null;
+            self.filters.category = null;
+            self.filters.account = null;
+            self.filters.tag = null;
+            self.filters.description = null;
             self.currentPage = 1;
             self.countPerPage = 10;
             self.showState = true;
@@ -954,6 +1148,7 @@ export default {
                         transaction.valid = self.isTransactionValid(transaction);
                         transaction.actualCategoryName = transaction.originalCategoryName;
                         transaction.actualSourceAccountName = transaction.originalSourceAccountName;
+                        transaction.actualDestinationAccountName = transaction.originalDestinationAccountName;
                     }
                 }
 
@@ -1045,48 +1240,156 @@ export default {
 
             this.showState = false;
         },
+        changeCustomDateFilter(minTime, maxTime) {
+            this.filters.minDatetime = minTime;
+            this.filters.maxDatetime = maxTime;
+            this.showCustomDateRangeDialog = false;
+        },
+        importTransactionsFilter(value, query, item) {
+            if (!item || !item.raw) {
+                return false;
+            }
+
+            return this.isTransactionDisplayed(item.raw);
+        },
+        isTransactionDisplayed(transaction) {
+            if (isNumber(this.filters.minDatetime) && isNumber(this.filters.maxDatetime) && (transaction.time < this.filters.minDatetime || transaction.time > this.filters.maxDatetime)) {
+                return false;
+            }
+
+            if (isNumber(this.filters.transactionType) && transaction.type !== this.filters.transactionType) {
+                return false;
+            }
+
+            if (isString(this.filters.category)) {
+                if (this.filters.category === '' && transaction.actualCategoryName !== '') {
+                    return false;
+                } else if (this.filters.category !== '' && transaction.actualCategoryName !== this.filters.category) {
+                    return false;
+                }
+            } else if (this.filters.category === undefined) {
+                if (transaction.type !== this.allTransactionTypes.ModifyBalance && transaction.categoryId && transaction.categoryId !== '0') {
+                    return false;
+                }
+            }
+
+            if (isString(this.filters.account)) {
+                if (this.filters.account === '' && (transaction.actualSourceAccountName !== '' || transaction.actualDestinationAccountName !== '')) {
+                    return false;
+                } else if (this.filters.account !== '' && transaction.actualSourceAccountName !== this.filters.account && transaction.actualDestinationAccountName !== this.filters.account) {
+                    return false;
+                }
+            } else if (this.filters.account === undefined) {
+                if (transaction.type !== this.allTransactionTypes.Transfer && transaction.sourceAccountId && transaction.sourceAccountId !== '0') {
+                    return false;
+                } else if (transaction.type === this.allTransactionTypes.Transfer && transaction.sourceAccountId && transaction.sourceAccountId !== '0' && transaction.destinationAccountId && transaction.destinationAccountId !== '0') {
+                    return false;
+                }
+            }
+
+            if (isString(this.filters.tag)) {
+                if (this.filters.tag === '' && transaction.tagIds && transaction.tagIds.length) {
+                    return false;
+                } else if (this.filters.tag !== '') {
+                    let hasTagName = false;
+
+                    if (transaction.tagIds && transaction.tagIds.length) {
+                        for (let i = 0; i < transaction.tagIds.length; i++) {
+                            const tagId = transaction.tagIds[i];
+                            let tagName = transaction.originalTagNames ? transaction.originalTagNames[i] : "";
+
+                            if (tagId && tagId !== '0' && this.allTagsMap[tagId] && this.allTagsMap[tagId].name) {
+                                tagName = this.allTagsMap[tagId].name;
+                            }
+
+                            if (tagName === this.filters.tag) {
+                                hasTagName = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!hasTagName) {
+                        return false;
+                    }
+                }
+            } else if (this.filters.tag === undefined) {
+                if (transaction.tagIds && transaction.tagIds.length) {
+                    let hasInvalidTag = false;
+
+                    for (let i = 0; i < transaction.tagIds.length; i++) {
+                        if (!transaction.tagIds[i] || transaction.tagIds[i] === '0') {
+                            hasInvalidTag = true;
+                            break;
+                        }
+                    }
+
+                    if (!hasInvalidTag) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+
+            if (isString(this.filters.description)) {
+                if (this.filters.description === '' && transaction.comment !== '') {
+                    return false;
+                } else if (this.filters.description !== '' && transaction.comment.indexOf(this.filters.description) < 0) {
+                    return false;
+                }
+            }
+
+            return true;
+        },
         selectAllValid() {
             for (let i = 0; i < this.importTransactions.length; i++) {
-                if (this.importTransactions[i].valid) {
+                if (this.importTransactions[i].valid && this.isTransactionDisplayed(this.importTransactions[i])) {
                     this.importTransactions[i].selected = true;
                 }
             }
         },
         selectAllInvalid() {
             for (let i = 0; i < this.importTransactions.length; i++) {
-                if (!this.importTransactions[i].valid) {
+                if (!this.importTransactions[i].valid && this.isTransactionDisplayed(this.importTransactions[i])) {
                     this.importTransactions[i].selected = true;
                 }
             }
         },
         selectAll() {
             for (let i = 0; i < this.importTransactions.length; i++) {
-                this.importTransactions[i].selected = true;
+                if (this.isTransactionDisplayed(this.importTransactions[i])) {
+                    this.importTransactions[i].selected = true;
+                }
             }
         },
         selectNone() {
             for (let i = 0; i < this.importTransactions.length; i++) {
-                this.importTransactions[i].selected = false;
+                if (this.isTransactionDisplayed(this.importTransactions[i])) {
+                    this.importTransactions[i].selected = false;
+                }
             }
         },
         selectInvert() {
             for (let i = 0; i < this.importTransactions.length; i++) {
-                this.importTransactions[i].selected = !this.importTransactions[i].selected;
+                if (this.isTransactionDisplayed(this.importTransactions[i])) {
+                    this.importTransactions[i].selected = !this.importTransactions[i].selected;
+                }
             }
         },
         selectAllInThisPage() {
-            for (let i = Math.max(0, (this.currentPage - 1) * this.countPerPage); i < Math.min(this.importTransactions.length, this.currentPage * this.countPerPage); i++) {
-                this.importTransactions[i].selected = true;
+            for (let i = 0; i < this.currentPageTransactions.length; i++) {
+                this.currentPageTransactions[i].selected = true;
             }
         },
         selectNoneInThisPage() {
-            for (let i = Math.max(0, (this.currentPage - 1) * this.countPerPage); i < Math.min(this.importTransactions.length, this.currentPage * this.countPerPage); i++) {
-                this.importTransactions[i].selected = false;
+            for (let i = 0; i < this.currentPageTransactions.length; i++) {
+                this.currentPageTransactions[i].selected = false;
             }
         },
         selectInvertInThisPage() {
-            for (let i = Math.max(0, (this.currentPage - 1) * this.countPerPage); i < Math.min(this.importTransactions.length, this.currentPage * this.countPerPage); i++) {
-                this.importTransactions[i].selected = !this.importTransactions[i].selected;
+            for (let i = 0; i < this.currentPageTransactions.length; i++) {
+                this.currentPageTransactions[i].selected = !this.currentPageTransactions[i].selected;
             }
         },
         editTransaction(transaction) {
@@ -1112,6 +1415,10 @@ export default {
 
             if (transaction.sourceAccountId && this.allAccountsMap[transaction.sourceAccountId]) {
                 transaction.actualSourceAccountName = this.allAccountsMap[transaction.sourceAccountId].name;
+            }
+
+            if (transaction.destinationAccountId && this.allAccountsMap[transaction.destinationAccountId]) {
+                transaction.actualDestinationAccountName = this.allAccountsMap[transaction.destinationAccountId].name;
             }
         },
         showBatchReplaceDialog(type) {
@@ -1260,6 +1567,60 @@ export default {
                     });
                 }
             });
+        },
+        getAllUsedCategoryNames() {
+            const categoryNames = {};
+
+            for (let i = 0; i < this.importTransactions.length; i++) {
+                const transaction = this.importTransactions[i];
+
+                if (transaction.actualCategoryName && transaction.actualCategoryName !== '') {
+                    categoryNames[transaction.actualCategoryName] = true;
+                }
+            }
+
+            return objectFieldToArrayItem(categoryNames);
+        },
+        getAllUsedAccountNames() {
+            const accountNames = {};
+
+            for (let i = 0; i < this.importTransactions.length; i++) {
+                const transaction = this.importTransactions[i];
+
+                if (transaction.actualSourceAccountName && transaction.actualSourceAccountName !== '') {
+                    accountNames[transaction.actualSourceAccountName] = true;
+                }
+
+                if (transaction.actualDestinationAccountName && transaction.actualDestinationAccountName !== '') {
+                    accountNames[transaction.actualDestinationAccountName] = true;
+                }
+            }
+
+            return objectFieldToArrayItem(accountNames);
+        },
+        getAllUsedTagNames(){
+            const tagNames = {};
+
+            for (let i = 0; i < this.importTransactions.length; i++) {
+                const transaction = this.importTransactions[i];
+
+                if (!transaction.tagIds || !transaction.originalTagNames) {
+                    continue;
+                }
+
+                for (let j = 0; j < transaction.tagIds.length; j++) {
+                    const tagId = transaction.tagIds[j];
+                    const originalTagName = transaction.originalTagNames[j];
+
+                    if (tagId && tagId !== '0' && this.allTagsMap[tagId] && this.allTagsMap[tagId].name) {
+                        tagNames[this.allTagsMap[tagId].name] = true;
+                    } else if (originalTagName) {
+                        tagNames[originalTagName] = true;
+                    }
+                }
+            }
+
+            return objectFieldToArrayItem(tagNames);
         },
         getCurrentInvalidCategoryNames(transactionType) {
             const invalidCategoryNames = {};

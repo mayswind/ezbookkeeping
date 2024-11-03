@@ -1236,10 +1236,10 @@ export default {
                             transaction.destinationAccountId = result.targetItem;
                             updated = true;
                         }
-                    } else if (type === 'tag') {
+                    } else if (type === 'tag' && transaction.tagIds) {
                         for (let j = 0; j < transaction.tagIds.length; j++) {
                             const tagId = transaction.tagIds[j];
-                            const originalTagName = transaction.originalTagNames[j];
+                            const originalTagName = transaction.originalTagNames ? transaction.originalTagNames[j] : "";
 
                             if (originalTagName === result.sourceItem && (!tagId || tagId === '0' || !self.allTagsMap[tagId])) {
                                 transaction.tagIds[j] = result.targetItem;

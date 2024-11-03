@@ -22,6 +22,7 @@ require (
 	github.com/urfave/cli/v2 v2.27.3
 	github.com/wk8/go-ordered-map/v2 v2.1.8
 	golang.org/x/crypto v0.26.0
+	golang.org/x/net v0.26.0
 	golang.org/x/text v0.17.0
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/mail.v2 v2.3.1
@@ -78,7 +79,6 @@ require (
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8 // indirect
-	golang.org/x/net v0.26.0 // indirect
 	golang.org/x/sys v0.23.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect

@@ -1209,7 +1209,7 @@ function getAllTransactionDefaultCategories(categoryType, locale, translateFn) {
             const category = defaultCategories[j];
 
             const submitCategory = {
-                name: translateFn('category.' + category.name, locale),
+                name: translateFn('category.' + category.name, {}, { locale: locale }),
                 type: categoryType,
                 icon: category.categoryIconId,
                 color: category.color,
@@ -1219,7 +1219,7 @@ function getAllTransactionDefaultCategories(categoryType, locale, translateFn) {
             for (let k = 0; k < category.subCategories.length; k++) {
                 const subCategory = category.subCategories[k];
                 submitCategory.subCategories.push({
-                    name: translateFn('category.' + subCategory.name, locale),
+                    name: translateFn('category.' + subCategory.name, {}, { locale: locale }),
                     type: categoryType,
                     icon: subCategory.categoryIconId,
                     color: subCategory.color

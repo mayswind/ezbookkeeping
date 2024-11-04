@@ -239,7 +239,7 @@
         "name": "@vuepic/vue-datepicker",
         "copyright": "Copyright (c) 2021-present Vuepic",
         "url": "https://vue3datepicker.com/",
-        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v9.0.3/LICENSE"
+        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v10.0.0/LICENSE"
     },
     {
         "name": "axios",

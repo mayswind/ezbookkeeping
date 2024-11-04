@@ -349,8 +349,8 @@ export function getDateTimeFormatType(allFormatMap, allFormatArray, localeDefaul
 }
 
 export function getShiftedDateRange(minTime, maxTime, scale) {
-    const minDateTime = parseDateFromUnixTime(minTime).set({ second: 0, millisecond: 0 });
-    const maxDateTime = parseDateFromUnixTime(maxTime).set({ second: 59, millisecond: 999 });
+    const minDateTime = parseDateFromUnixTime(minTime).set({ millisecond: 0 });
+    const maxDateTime = parseDateFromUnixTime(maxTime).set({ millisecond: 999 });
 
     const firstDayOfMonth = minDateTime.clone().startOf('month');
     const lastDayOfMonth = maxDateTime.clone().endOf('month');
@@ -608,8 +608,8 @@ export function getCombinedDateAndTimeValues(date, timeValues, is24Hour, isMerid
 }
 
 export function isDateRangeMatchFullYears(minTime, maxTime) {
-    const minDateTime = parseDateFromUnixTime(minTime).set({ second: 0, millisecond: 0 });
-    const maxDateTime = parseDateFromUnixTime(maxTime).set({ second: 59, millisecond: 999 });
+    const minDateTime = parseDateFromUnixTime(minTime).set({ millisecond: 0 });
+    const maxDateTime = parseDateFromUnixTime(maxTime).set({ millisecond: 999 });
 
     const firstDayOfYear = minDateTime.clone().startOf('year');
     const lastDayOfYear = maxDateTime.clone().endOf('year');
@@ -618,8 +618,8 @@ export function isDateRangeMatchFullYears(minTime, maxTime) {
 }
 
 export function isDateRangeMatchFullMonths(minTime, maxTime) {
-    const minDateTime = parseDateFromUnixTime(minTime).set({ second: 0, millisecond: 0 });
-    const maxDateTime = parseDateFromUnixTime(maxTime).set({ second: 59, millisecond: 999 });
+    const minDateTime = parseDateFromUnixTime(minTime).set({ millisecond: 0 });
+    const maxDateTime = parseDateFromUnixTime(maxTime).set({ millisecond: 999 });
 
     const firstDayOfMonth = minDateTime.clone().startOf('month');
     const lastDayOfMonth = maxDateTime.clone().endOf('month');

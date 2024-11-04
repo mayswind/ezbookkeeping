@@ -355,10 +355,23 @@ export function getShiftedDateRange(minTime, maxTime, scale) {
     const firstDayOfMonth = minDateTime.clone().startOf('month');
     const lastDayOfMonth = maxDateTime.clone().endOf('month');
 
+    // check whether the date range matches full months
     if (firstDayOfMonth.unix() === minDateTime.unix() && lastDayOfMonth.unix() === maxDateTime.unix()) {
         const months = getYear(maxDateTime) * 12 + getMonth(maxDateTime) - getYear(minDateTime) * 12 - getMonth(minDateTime) + 1;
         const newMinDateTime = minDateTime.add(months * scale, 'months');
         const newMaxDateTime = newMinDateTime.clone().add(months, 'months').subtract(1, 'seconds');
+
+        return {
+            minTime: newMinDateTime.unix(),
+            maxTime: newMaxDateTime.unix()
+        };
+    }
+
+    // check whether the date range matches one full month
+    if (minDateTime.clone().add(1, 'months').subtract(1, 'seconds').unix() === maxDateTime.unix() ||
+        maxDateTime.clone().subtract(1, 'months').add(1, 'seconds').unix() === minDateTime.unix()) {
+        const newMinDateTime = minDateTime.add(1 * scale, 'months');
+        const newMaxDateTime = maxDateTime.add(1 * scale, 'months');
 
         return {
             minTime: newMinDateTime.unix(),

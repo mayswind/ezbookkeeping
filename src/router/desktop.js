@@ -121,7 +121,8 @@ const router = createRouter({
                         initEndTime: route.query.endTime,
                         initFilterAccountIds: route.query.filterAccountIds,
                         initFilterCategoryIds: route.query.filterCategoryIds,
-                        initSortingType: route.query.sortingType
+                        initSortingType: route.query.sortingType,
+                        initTrendDateAggregationType: route.query.trendDateAggregationType
                     })
                 },
                 {

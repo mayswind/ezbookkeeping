@@ -11,11 +11,17 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
 import colorConstants from '@/consts/color.js';
+import datetimeConstants from '@/consts/datetime.js';
 import statisticsConstants from '@/consts/statistics.js';
-import { isNumber } from '@/lib/common.js';
 import {
-    getYearMonthStringFromObject,
-    getAllYearMonthUnixTimesBetweenStartYearMonthAndEndYearMonth
+    isArray,
+    isNumber
+} from '@/lib/common.js';
+import {
+    getAllYearsStartAndEndUnixTimes,
+    getAllQuartersStartAndEndUnixTimes,
+    getAllMonthsStartAndEndUnixTimes,
+    getDateTypeByDateRange
 } from '@/lib/datetime.js';
 import {
     sortStatisticsItems
@@ -29,6 +35,7 @@ export default {
         'startYearMonth',
         'endYearMonth',
         'sortingType',
+        'dateAggregationType',
         'idField',
         'nameField',
         'valueField',
@@ -67,15 +74,21 @@ export default {
                     id = this.getItemName(item[this.nameField]);
                 }
 
-                map[id] = item;
+                map[id] = {
+                    [this.idField || 'id']: id,
+                    [this.nameField || 'name']: item[this.nameField],
+                    [this.hiddenField || 'hidden']: item[this.hiddenField],
+                    [this.displayOrdersField || 'displayOrders']: item[this.displayOrdersField]
+                };
             }
 
             return map;
         },
-        allYearMonthTimes: function () {
-            if (this.startYearMonth && this.endYearMonth) {
-                return getAllYearMonthUnixTimesBetweenStartYearMonthAndEndYearMonth(this.startYearMonth, this.endYearMonth);
-            } else if (this.items && this.items.length) {
+        allDateRanges: function () {
+            let startYearMonth = this.startYearMonth;
+            let endYearMonth = this.endYearMonth;
+
+            if ((!this.startYearMonth || !this.endYearMonth) && this.items && this.items.length) {
                 let minYear = Number.MAX_SAFE_INTEGER, minMonth = Number.MAX_SAFE_INTEGER, maxYear = 0, maxMonth = 0;
 
                 for (let i = 0; i < this.items.length; i++) {
@@ -96,20 +109,37 @@ export default {
                     }
                 }
 
-                return getAllYearMonthUnixTimesBetweenStartYearMonthAndEndYearMonth(`${minYear}-${minMonth}`, `${maxYear}-${maxMonth}`);
+                startYearMonth = `${minYear}-${minMonth}`;
+                endYearMonth = `${maxYear}-${maxMonth}`;
             }
 
-            return [];
+            if (!startYearMonth || !endYearMonth) {
+                return [];
+            }
+            if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Year.type) {
+                return getAllYearsStartAndEndUnixTimes(startYearMonth, endYearMonth);
+            } else if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Quarter.type) {
+                return getAllQuartersStartAndEndUnixTimes(startYearMonth, endYearMonth);
+            } else { // if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Month.type) {
+                return getAllMonthsStartAndEndUnixTimes(startYearMonth, endYearMonth);
+            }
         },
-        allDisplayMonths: function () {
-            const allDisplayMonths = [];
+        allDisplayDateRanges: function () {
+            const allDisplayDateRanges = [];
 
-            for (let i = 0; i < this.allYearMonthTimes.length; i++) {
-                const yearMonthTime = this.allYearMonthTimes[i];
-                allDisplayMonths.push(this.$locale.formatUnixTimeToShortYearMonth(this.userStore, yearMonthTime.minUnixTime));
+            for (let i = 0; i < this.allDateRanges.length; i++) {
+                const dateRange = this.allDateRanges[i];
+
+                if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Year.type) {
+                    allDisplayDateRanges.push(this.$locale.formatUnixTimeToShortYear(this.userStore, dateRange.minUnixTime));
+                } else if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Quarter.type) {
+                    allDisplayDateRanges.push(this.$locale.formatYearQuarter(dateRange.year, dateRange.quarter));
+                } else { // if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Month.type) {
+                    allDisplayDateRanges.push(this.$locale.formatUnixTimeToShortYearMonth(this.userStore, dateRange.minUnixTime));
+                }
             }
 
-            return allDisplayMonths;
+            return allDisplayDateRanges;
         },
         allSeries: function () {
             const allSeries = [];
@@ -122,20 +152,49 @@ export default {
                 }
 
                 const allAmounts = [];
-                const yearMonthDataMap = {};
+                const dateRangeAmountMap = {};
 
                 for (let j = 0; j < item.items.length; j++) {
                     const dataItem = item.items[j];
-                    yearMonthDataMap[`${dataItem.year}-${dataItem.month}`] = dataItem;
+                    let dateRangeKey = '';
+
+                    if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Year.type) {
+                        dateRangeKey = dataItem.year;
+                    } else if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Quarter.type) {
+                        dateRangeKey = `${dataItem.year}-${Math.floor((dataItem.month - 1) / 3) + 1}`;
+                    } else { // if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Month.type) {
+                        dateRangeKey = `${dataItem.year}-${dataItem.month}`;
+                    }
+
+                    const dataItems = dateRangeAmountMap[dateRangeKey] || [];
+                    dataItems.push(dataItem);
+
+                    dateRangeAmountMap[dateRangeKey] = dataItems;
                 }
 
-                for (let j = 0; j < this.allYearMonthTimes.length; j++) {
-                    const yearMonth = getYearMonthStringFromObject(this.allYearMonthTimes[j]);
-                    const dataItem = yearMonthDataMap[yearMonth];
-                    let amount = 0;
+                for (let j = 0; j < this.allDateRanges.length; j++) {
+                    const dateRange = this.allDateRanges[j];
+                    let dateRangeKey = '';
 
-                    if (dataItem && isNumber(dataItem[this.valueField])) {
-                        amount = dataItem[this.valueField];
+                    if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Year.type) {
+                        dateRangeKey = dateRange.year;
+                    } else if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Quarter.type) {
+                        dateRangeKey = `${dateRange.year}-${dateRange.quarter}`;
+                    } else { // if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Month.type) {
+                        dateRangeKey = `${dateRange.year}-${dateRange.month + 1}`;
+                    }
+
+                    let amount = 0;
+                    const dataItems = dateRangeAmountMap[dateRangeKey];
+
+                    if (isArray(dataItems)) {
+                        for (let i = 0; i < dataItems.length; i++) {
+                            const dataItem = dataItems[i];
+
+                            if (isNumber(dataItem[this.valueField])) {
+                                amount += dataItem[this.valueField];
+                            }
+                        }
                     }
 
                     allAmounts.push(amount);
@@ -293,7 +352,7 @@ export default {
                 xAxis: [
                     {
                         type: 'category',
-                        data: self.allDisplayMonths
+                        data: self.allDisplayDateRanges
                     }
                 ],
                 yAxis: [
@@ -332,11 +391,19 @@ export default {
 
             const id = e.seriesId;
             const item = this.itemsMap[id];
-            const yearMonthTime = this.allYearMonthTimes[e.dataIndex];
+            const itemId = this.idField ? item[this.idField] : '';
+            const dateRange = this.allDateRanges[e.dataIndex];
+            const minUnixTime = dateRange.minUnixTime;
+            const maxUnixTime = dateRange.maxUnixTime;
+            const dateRangeType = getDateTypeByDateRange(minUnixTime, maxUnixTime, this.userStore.currentUserFirstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
 
             this.$emit('click', {
-                yearMonth: getYearMonthStringFromObject(yearMonthTime),
-                item: item
+                itemId: itemId,
+                dateRange: {
+                    minTime: minUnixTime,
+                    maxTime: maxUnixTime,
+                    type: dateRangeType
+                }
             });
         },
         getColor: function (color) {

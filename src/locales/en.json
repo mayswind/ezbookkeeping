@@ -71,6 +71,12 @@
             "a_hh_mm": "A hh:mm",
             "hh_mm_a": "hh:mm A"
         },
+        "yearQuarter": {
+            "q1": "{year}Q1",
+            "q2": "{year}Q2",
+            "q3": "{year}Q3",
+            "q4": "{year}Q4"
+        },
         "misc": {
             "multiTextJoinSeparator": ", ",
             "hoursBehindDefaultTimezone": "{hours} hour(s) behind default timezone",
@@ -1632,6 +1638,9 @@
     "Sort by Amount": "Sort by Amount",
     "Sort by Display Order": "Sort by Display Order",
     "Sort by Name": "Sort by Name",
+    "Aggregate by Month": "Aggregate by Month",
+    "Aggregate by Quarter": "Aggregate by Quarter",
+    "Aggregate by Year": "Aggregate by Year",
     "Filter Accounts": "Filter Accounts",
     "Filter Transaction Categories": "Filter Transaction Categories",
     "Filter Transaction Tags": "Filter Transaction Tags",

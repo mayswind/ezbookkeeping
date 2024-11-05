@@ -87,6 +87,22 @@
                                                        @click="shiftDateRange(1)"/>
                                             </v-btn-group>
 
+                                            <v-menu location="bottom">
+                                                <template #activator="{ props }">
+                                                    <v-btn class="ml-3" color="default" variant="outlined"
+                                                           :prepend-icon="icons.dateAggregation" :disabled="loading"
+                                                           v-bind="props">{{ queryTrendDateAggregationTypeName }}</v-btn>
+                                                </template>
+                                                <v-list>
+                                                    <v-list-item class="cursor-pointer" :key="aggregationType.type" :value="aggregationType.type"
+                                                                 :append-icon="(trendDateAggregationType === aggregationType.type ? icons.check : null)"
+                                                                 :title="aggregationType.displayName"
+                                                                 v-for="aggregationType in allDateAggregationTypesArray"
+                                                                 @click="setTrendDateAggregationType(aggregationType.type)">
+                                                    </v-list-item>
+                                                </v-list>
+                                            </v-menu>
+
                                             <v-btn density="compact" color="default" variant="text" size="24"
                                                    class="ml-2" :icon="true" :loading="loading" @click="reload">
                                                 <template #loader>
@@ -193,13 +209,13 @@
                                                       v-for="(item, idx) in categoricalAnalysisData.items">
                                                 <v-list-item class="pl-0" v-if="!item.hidden">
                                                     <template #prepend>
-                                                        <router-link class="statistics-list-item" :to="getTransactionItemLinkUrl(item)">
+                                                        <router-link class="statistics-list-item" :to="getTransactionItemLinkUrl(item.id)">
                                                             <ItemIcon :icon-type="queryChartDataCategory" size="34px"
                                                                       :icon-id="item.icon"
                                                                       :color="item.color"></ItemIcon>
                                                         </router-link>
                                                     </template>
-                                                    <router-link class="statistics-list-item" :to="getTransactionItemLinkUrl(item)">
+                                                    <router-link class="statistics-list-item" :to="getTransactionItemLinkUrl(item.id)">
                                                         <div class="d-flex flex-column ml-2">
                                                             <div class="d-flex">
                                                                 <span>{{ item.name }}</span>
@@ -239,6 +255,7 @@
                                             :start-year-month="query.trendChartStartYearMonth"
                                             :end-year-month="query.trendChartEndYearMonth"
                                             :sorting-type="querySortingType"
+                                            :date-aggregation-type="trendDateAggregationType"
                                             :items="trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length ? trendsAnalysisData.items : []"
                                             :translate-name="translateNameInTrendsChart"
                                             :show-value="showAmountInChart"
@@ -303,6 +320,7 @@ import statisticsConstants from '@/consts/statistics.js';
 import {
     isDefined,
     limitText,
+    getNameByKeyValue,
     arrayItemToObjectField
 } from '@/lib/common.js'
 import { formatPercent } from '@/lib/numeral.js';
@@ -320,7 +338,7 @@ import {
     mdiCheck,
     mdiArrowLeft,
     mdiArrowRight,
-    mdiSort,
+    mdiCalendarRangeOutline,
     mdiRefresh,
     mdiSquareRounded,
     mdiMenu,
@@ -347,7 +365,8 @@ export default {
         'initEndTime',
         'initFilterAccountIds',
         'initFilterCategoryIds',
-        'initSortingType'
+        'initSortingType',
+        'initTrendDateAggregationType'
     ],
     data() {
         const { mdAndUp } = useDisplay();
@@ -359,6 +378,7 @@ export default {
             alwaysShowNav: mdAndUp.value,
             showNav: mdAndUp.value,
             analysisType: statisticsConstants.allAnalysisTypes.CategoricalAnalysis,
+            trendDateAggregationType: statisticsConstants.allDateAggregationTypes.Month.type,
             showCustomDateRangeDialog: false,
             showCustomMonthRangeDialog: false,
             showFilterAccountDialog: false,
@@ -367,7 +387,7 @@ export default {
                 check: mdiCheck,
                 left: mdiArrowLeft,
                 right: mdiArrowRight,
-                sort: mdiSort,
+                dateAggregation: mdiCalendarRangeOutline,
                 refresh: mdiRefresh,
                 square: mdiSquareRounded,
                 menu: mdiMenu,
@@ -442,6 +462,9 @@ export default {
                 return null;
             }
         },
+        queryTrendDateAggregationTypeName() {
+            return getNameByKeyValue(this.allDateAggregationTypesArray, this.trendDateAggregationType, 'type', 'displayName', '');
+        },
         queryStartTime() {
             if (this.queryAnalysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
                 return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.categoricalChartStartTime);
@@ -483,6 +506,9 @@ export default {
         },
         allSortingTypesArray() {
             return this.$locale.getAllStatisticsSortingTypes();
+        },
+        allDateAggregationTypesArray() {
+            return this.$locale.getAllStatisticsDateAggregationTypes();
         },
         allDateRanges() {
             return datetimeConstants.allDateRanges;
@@ -574,6 +600,7 @@ export default {
             filterAccountIds: this.initFilterAccountIds,
             filterCategoryIds: this.initFilterCategoryIds,
             sortingType: this.initSortingType,
+            trendDateAggregationType: this.initTrendDateAggregationType,
         });
     },
     setup() {
@@ -596,7 +623,8 @@ export default {
                 endTime: to.query.endTime,
                 filterAccountIds: to.query.filterAccountIds,
                 filterCategoryIds: to.query.filterCategoryIds,
-                sortingType: to.query.sortingType
+                sortingType: to.query.sortingType,
+                trendDateAggregationType: to.query.trendDateAggregationType
             });
         } else {
             this.init({});
@@ -651,6 +679,10 @@ export default {
                 if (query.analysisType !== self.queryAnalysisType.toString()) {
                     self.analysisType = statisticsConstants.allAnalysisTypes.TrendAnalysis;
                     needReload = true;
+                }
+
+                if (query.trendDateAggregationType) {
+                    self.trendDateAggregationType = parseInt(query.trendDateAggregationType);
                 }
             }
 
@@ -791,6 +823,14 @@ export default {
             const changed = this.statisticsStore.updateTransactionStatisticsFilter({
                 sortingType: sortingType
             });
+
+            if (changed) {
+                this.$router.push(this.getFilterLinkUrl());
+            }
+        },
+        setTrendDateAggregationType(aggregationType) {
+            const changed = this.trendDateAggregationType !== aggregationType;
+            this.trendDateAggregationType = aggregationType;
 
             if (changed) {
                 this.$router.push(this.getFilterLinkUrl());
@@ -962,18 +1002,10 @@ export default {
             }
         },
         clickPieChartItem(item) {
-            this.$router.push(this.getTransactionItemLinkUrl(item));
+            this.$router.push(this.getTransactionItemLinkUrl(item.id));
         },
         clickTrendChartItem(item) {
-            const minUnixTime = getYearMonthFirstUnixTime(item.yearMonth);
-            const maxUnixTime = getYearMonthLastUnixTime(item.yearMonth);
-            const dateRangeType = getDateTypeByDateRange(minUnixTime, maxUnixTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
-
-            this.$router.push(this.getTransactionItemLinkUrl(item.item, {
-                minTime: minUnixTime,
-                maxTime: maxUnixTime,
-                type: dateRangeType,
-            }));
+            this.$router.push(this.getTransactionItemLinkUrl(item.itemId, item.dateRange));
         },
         getDisplayAmount(amount, currency, textLimit) {
             amount = this.getDisplayCurrency(amount, currency);
@@ -998,10 +1030,10 @@ export default {
             return formatPercent(value, precision, lowPrecisionValue);
         },
         getFilterLinkUrl() {
-            return `/statistics/transaction?${this.statisticsStore.getTransactionStatisticsPageParams(this.queryAnalysisType)}`;
+            return `/statistics/transaction?${this.statisticsStore.getTransactionStatisticsPageParams(this.queryAnalysisType, this.trendDateAggregationType)}`;
         },
-        getTransactionItemLinkUrl(item, dateRange) {
-            return `/transaction/list?${this.statisticsStore.getTransactionListPageParams(this.queryAnalysisType, item, dateRange)}`;
+        getTransactionItemLinkUrl(itemId, dateRange) {
+            return `/transaction/list?${this.statisticsStore.getTransactionListPageParams(this.queryAnalysisType, itemId, dateRange)}`;
         }
     }
 }

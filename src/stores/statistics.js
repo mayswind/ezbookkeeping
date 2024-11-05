@@ -754,7 +754,7 @@ export const useStatisticsStore = defineStore('statistics', {
 
             return changed;
         },
-        getTransactionStatisticsPageParams(analysisType) {
+        getTransactionStatisticsPageParams(analysisType, trendDateAggregationType) {
             const querys = [];
 
             querys.push('analysisType=' + analysisType);
@@ -775,6 +775,10 @@ export const useStatisticsStore = defineStore('statistics', {
                 if (this.transactionStatisticsFilter.trendChartDateType === datetimeConstants.allDateRanges.Custom.type) {
                     querys.push('startTime=' + this.transactionStatisticsFilter.trendChartStartYearMonth);
                     querys.push('endTime=' + this.transactionStatisticsFilter.trendChartEndYearMonth);
+                }
+
+                if (trendDateAggregationType !== statisticsConstants.allDateAggregationTypes.Month.type) {
+                    querys.push('trendDateAggregationType=' + trendDateAggregationType);
                 }
             }
 
@@ -798,7 +802,7 @@ export const useStatisticsStore = defineStore('statistics', {
 
             return querys.join('&');
         },
-        getTransactionListPageParams(analysisType, item, dateRange) {
+        getTransactionListPageParams(analysisType, itemId, dateRange) {
             const accountsStore = useAccountsStore();
             const transactionCategoriesStore = useTransactionCategoriesStore();
             const querys = [];
@@ -819,7 +823,7 @@ export const useStatisticsStore = defineStore('statistics', {
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByAccount.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalAssets.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type) {
-                querys.push('accountIds=' + item.id);
+                querys.push('accountIds=' + itemId);
 
                 if (!isObjectEmpty(this.transactionStatisticsFilter.filterCategoryIds)) {
                     querys.push('categoryIds=' + getFinalCategoryIdsByFilteredCategoryIds(transactionCategoriesStore.allTransactionCategoriesMap, this.transactionStatisticsFilter.filterCategoryIds));
@@ -828,7 +832,7 @@ export const useStatisticsStore = defineStore('statistics', {
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByPrimaryCategory.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type) {
-                querys.push('categoryIds=' + item.id);
+                querys.push('categoryIds=' + itemId);
 
                 if (!isObjectEmpty(this.transactionStatisticsFilter.filterAccountIds)) {
                     querys.push('accountIds=' + getFinalAccountIdsByFilteredAccountIds(accountsStore.allAccountsMap, this.transactionStatisticsFilter.filterAccountIds));

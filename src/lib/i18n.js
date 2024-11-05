@@ -451,6 +451,17 @@ function getI18nShortTimeFormat(translateFn, formatTypeValue) {
     return getDateTimeFormat(translateFn, datetimeConstants.allShortTimeFormat, datetimeConstants.allShortTimeFormatArray, 'format.shortTime', defaultShortTimeFormatTypeName, datetimeConstants.defaultShortTimeFormat, formatTypeValue);
 }
 
+function formatYearQuarter(translateFn, year, quarter) {
+    if (1 <= quarter && quarter <= 4) {
+        return translateFn('format.yearQuarter.q' + quarter, {
+            year: year,
+            quarter: quarter
+        });
+    } else {
+        return '';
+    }
+}
+
 function isLongTime24HourFormat(translateFn, formatTypeValue) {
     const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
     const type = getDateTimeFormatType(datetimeConstants.allLongTimeFormat, datetimeConstants.allLongTimeFormatArray, defaultLongTimeFormatTypeName, datetimeConstants.defaultLongTimeFormat, formatTypeValue);
@@ -1142,6 +1153,25 @@ function getAllStatisticsSortingTypes(translateFn) {
     return allSortingTypes;
 }
 
+function getAllStatisticsDateAggregationTypes(translateFn) {
+    const aggregationTypes = [];
+
+    for (const aggregationTypeField in statisticsConstants.allDateAggregationTypes) {
+        if (!Object.prototype.hasOwnProperty.call(statisticsConstants.allDateAggregationTypes, aggregationTypeField)) {
+            continue;
+        }
+
+        const aggregationType = statisticsConstants.allDateAggregationTypes[aggregationTypeField];
+
+        aggregationTypes.push({
+            type: aggregationType.type,
+            displayName: translateFn(aggregationType.name)
+        });
+    }
+
+    return aggregationTypes;
+}
+
 function getAllTransactionEditScopeTypes(translateFn) {
     const allEditScopeTypes = [];
 
@@ -1632,6 +1662,7 @@ export function i18nFunctions(i18nGlobal) {
         formatUnixTimeToShortMonthDay: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortMonthDayFormat(i18nGlobal.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToLongTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongTimeFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToShortTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortTimeFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat), utcOffset, currentUtcOffset),
+        formatYearQuarter: (year, quarter) => formatYearQuarter(i18nGlobal.t, year, quarter),
         isLongDateMonthAfterYear: (userStore) => isLongDateMonthAfterYear(i18nGlobal.t, userStore.currentUserLongDateFormat),
         isShortDateMonthAfterYear: (userStore) => isShortDateMonthAfterYear(i18nGlobal.t, userStore.currentUserShortDateFormat),
         isLongTime24HourFormat: (userStore) => isLongTime24HourFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat),
@@ -1668,6 +1699,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllTrendChartTypes: () => getAllTrendChartTypes(i18nGlobal.t),
         getAllStatisticsChartDataTypes: (analysisType) => getAllStatisticsChartDataTypes(i18nGlobal.t, analysisType),
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),
+        getAllStatisticsDateAggregationTypes: () => getAllStatisticsDateAggregationTypes(i18nGlobal.t),
         getAllTransactionEditScopeTypes: () => getAllTransactionEditScopeTypes(i18nGlobal.t),
         getAllTransactionScheduledFrequencyTypes: () => getAllTransactionScheduledFrequencyTypes(i18nGlobal.t),
         getAllTransactionDefaultCategories: (categoryType, locale) => getAllTransactionDefaultCategories(categoryType, locale, i18nGlobal.t),

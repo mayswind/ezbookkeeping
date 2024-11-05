@@ -169,6 +169,29 @@ const allSortingTypesArray = [
 
 const defaultSortingType = allSortingTypes.Amount.type;
 
+const allDateAggregationTypes = {
+    Month: {
+        type: 0,
+        name: 'Aggregate by Month'
+    },
+    Quarter: {
+        type: 1,
+        name: 'Aggregate by Quarter'
+    },
+    Year: {
+        type: 2,
+        name: 'Aggregate by Year'
+    }
+};
+
+const allDateAggregationTypesArray = [
+    allDateAggregationTypes.Month,
+    allDateAggregationTypes.Quarter,
+    allDateAggregationTypes.Year
+]
+
+const defaultDateAggregationType = allDateAggregationTypes.Month.type;
+
 export default {
     allAnalysisTypes: allAnalysisTypes,
     allCategoricalChartTypes: allCategoricalChartTypes,
@@ -185,4 +208,7 @@ export default {
     allSortingTypes: allSortingTypes,
     allSortingTypesArray: allSortingTypesArray,
     defaultSortingType: defaultSortingType,
+    allDateAggregationTypes: allDateAggregationTypes,
+    allDateAggregationTypesArray: allDateAggregationTypesArray,
+    defaultDateAggregationType: defaultDateAggregationType,
 };

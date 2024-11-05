@@ -283,6 +283,22 @@ export function getSpecifiedDayFirstUnixTime(unixTime) {
     return moment.unix(unixTime).set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).unix();
 }
 
+export function getYearFirstUnixTime(year) {
+    return moment().set({ year: year, month: 0, date: 1, hour: 0, minute: 0, second: 0, millisecond: 0 }).unix();
+}
+
+export function getYearLastUnixTime(year) {
+    return moment.unix(getYearFirstUnixTime(year)).add(1, 'years').subtract(1, 'seconds').unix();
+}
+
+export function getQuarterFirstUnixTime(yearQuarter) {
+    return moment().set({ year: yearQuarter.year, month: (yearQuarter.quarter - 1) * 3, date: 1, hour: 0, minute: 0, second: 0, millisecond: 0 }).unix();
+}
+
+export function getQuarterLastUnixTime(yearQuarter) {
+    return moment.unix(getQuarterFirstUnixTime(yearQuarter)).add(3, 'months').subtract(1, 'seconds').unix();
+}
+
 export function getYearMonthFirstUnixTime(yearMonth) {
     if (isString(yearMonth)) {
         yearMonth = getYearMonthObjectFromString(yearMonth);
@@ -301,7 +317,69 @@ export function getYearMonthLastUnixTime(yearMonth) {
     return moment.unix(getYearMonthFirstUnixTime(yearMonth)).add(1, 'months').subtract(1, 'seconds').unix();
 }
 
-export function getAllYearMonthUnixTimesBetweenStartYearMonthAndEndYearMonth(startYearMonth, endYearMonth) {
+export function getAllYearsStartAndEndUnixTimes(startYearMonth, endYearMonth) {
+    if (isString(startYearMonth)) {
+        startYearMonth = getYearMonthObjectFromString(startYearMonth);
+    }
+
+    if (isString(endYearMonth)) {
+        endYearMonth = getYearMonthObjectFromString(endYearMonth);
+    }
+
+    const allYearTimes = [];
+
+    for (let year = startYearMonth.year; year <= endYearMonth.year; year++) {
+        const yearTime = {
+            year: year
+        };
+
+        yearTime.minUnixTime = getYearFirstUnixTime(year);
+        yearTime.maxUnixTime = getYearLastUnixTime(year);
+
+        allYearTimes.push(yearTime);
+    }
+
+    return allYearTimes;
+}
+
+export function getAllQuartersStartAndEndUnixTimes(startYearMonth, endYearMonth) {
+    if (isString(startYearMonth)) {
+        startYearMonth = getYearMonthObjectFromString(startYearMonth);
+    }
+
+    if (isString(endYearMonth)) {
+        endYearMonth = getYearMonthObjectFromString(endYearMonth);
+    }
+
+    const allYearQuarterTimes = [];
+
+    for (let year = startYearMonth.year, month = startYearMonth.month; year < endYearMonth.year || (year === endYearMonth.year && ((month / 3) <= (endYearMonth.month / 3))); ) {
+        const yearQuarterTime = {
+            year: year,
+            quarter: Math.floor((month / 3)) + 1
+        };
+
+        yearQuarterTime.minUnixTime = getQuarterFirstUnixTime(yearQuarterTime);
+        yearQuarterTime.maxUnixTime = getQuarterLastUnixTime(yearQuarterTime);
+
+        allYearQuarterTimes.push(yearQuarterTime);
+
+        if (year === endYearMonth.year && month >= endYearMonth.month) {
+            break;
+        }
+
+        if (month >= 9) {
+            year++;
+            month = 0;
+        } else {
+            month += 3;
+        }
+    }
+
+    return allYearQuarterTimes;
+}
+
+export function getAllMonthsStartAndEndUnixTimes(startYearMonth, endYearMonth) {
     if (isString(startYearMonth)) {
         startYearMonth = getYearMonthObjectFromString(startYearMonth);
     }

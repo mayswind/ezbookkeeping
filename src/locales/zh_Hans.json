@@ -71,6 +71,12 @@
             "a_hh_mm": "A hh:mm",
             "hh_mm_a": "hh:mm A"
         },
+        "yearQuarter": {
+            "q1": "{year}Q1",
+            "q2": "{year}Q2",
+            "q3": "{year}Q3",
+            "q4": "{year}Q4"
+        },
         "misc": {
             "multiTextJoinSeparator": "、",
             "hoursBehindDefaultTimezone": "比默认时区晚{hours}小时",
@@ -1632,6 +1638,9 @@
     "Sort by Amount": "按金额排序",
     "Sort by Display Order": "按显示顺序排序",
     "Sort by Name": "按名称排序",
+    "Aggregate by Month": "按月聚合",
+    "Aggregate by Quarter": "按季度聚合",
+    "Aggregate by Year": "按年聚合",
     "Filter Accounts": "过滤账户",
     "Filter Transaction Categories": "过滤交易类型",
     "Filter Transaction Tags": "过滤交易标签",

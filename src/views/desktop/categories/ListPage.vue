@@ -201,6 +201,10 @@ import { mapStores } from 'pinia';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 
 import categoryConstants from '@/consts/category.js';
+import {
+    isNoAvailableCategory,
+    getAvailableCategoryCount
+} from '@/lib/category.js';
 import { getNavSideBarOuterHeight } from '@/lib/ui.desktop.js';
 
 import {
@@ -278,27 +282,13 @@ export default {
             }
         },
         noAvailableCategory() {
-            for (let i = 0; i < this.categories.length; i++) {
-                if (this.showHidden || !this.categories[i].hidden) {
-                    return false;
-                }
-            }
-
-            return true;
+            return isNoAvailableCategory(this.categories, this.showHidden);
         },
         noCategory() {
             return this.categories.length < 1;
         },
         availableCategoryCount() {
-            let count = 0;
-
-            for (let i = 0; i < this.categories.length; i++) {
-                if (this.showHidden || !this.categories[i].hidden) {
-                    count++;
-                }
-            }
-
-            return count;
+            return getAvailableCategoryCount(this.categories, this.showHidden);
         }
     },
     created() {

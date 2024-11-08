@@ -90,6 +90,11 @@ import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 
 import templateConstants from '@/consts/template.js';
 import { isDefined } from '@/lib/common.js';
+import {
+    isNoAvailableTemplate,
+    getFirstShowingId,
+    getLastShowingId
+} from '@/lib/template.js';
 import { onSwipeoutDeleted } from '@/lib/ui.mobile.js';
 
 export default {
@@ -117,31 +122,13 @@ export default {
             return this.transactionTemplatesStore.allTransactionTemplates[this.templateType] || [];
         },
         firstShowingId() {
-            for (let i = 0; i < this.templates.length; i++) {
-                if (this.showHidden || !this.templates[i].hidden) {
-                    return this.templates[i].id;
-                }
-            }
-
-            return null;
+            return getFirstShowingId(this.templates, this.showHidden);
         },
         lastShowingId() {
-            for (let i = this.templates.length - 1; i >= 0; i--) {
-                if (this.showHidden || !this.templates[i].hidden) {
-                    return this.templates[i].id;
-                }
-            }
-
-            return null;
+            return getLastShowingId(this.templates, this.showHidden);
         },
         noAvailableTemplate() {
-            for (let i = 0; i < this.templates.length; i++) {
-                if (this.showHidden || !this.templates[i].hidden) {
-                    return false;
-                }
-            }
-
-            return true;
+            return isNoAvailableTemplate(this.templates, this.showHidden);
         },
         allTemplateTypes() {
             return templateConstants.allTemplateTypes;

@@ -279,6 +279,48 @@ export function getFirstAvailableSubCategoryId(categories, categoryId) {
     return '';
 }
 
+export function isNoAvailableCategory(categories, showHidden) {
+    for (let i = 0; i < categories.length; i++) {
+        if (showHidden || !categories[i].hidden) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export function getAvailableCategoryCount(categories, showHidden) {
+    let count = 0;
+
+    for (let i = 0; i < categories.length; i++) {
+        if (showHidden || !categories[i].hidden) {
+            count++;
+        }
+    }
+
+    return count;
+}
+
+export function getFirstShowingId(categories, showHidden) {
+    for (let i = 0; i < categories.length; i++) {
+        if (showHidden || !categories[i].hidden) {
+            return categories[i].id;
+        }
+    }
+
+    return null;
+}
+
+export function getLastShowingId(categories, showHidden) {
+    for (let i = categories.length - 1; i >= 0; i--) {
+        if (showHidden || !categories[i].hidden) {
+            return categories[i].id;
+        }
+    }
+
+    return null;
+}
+
 export function hasAnyAvailableCategory(allTransactionCategories, showHidden) {
     for (let type in allTransactionCategories) {
         if (!Object.prototype.hasOwnProperty.call(allTransactionCategories, type)) {

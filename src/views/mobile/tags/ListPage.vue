@@ -147,6 +147,11 @@
 import { mapStores } from 'pinia';
 import { useTransactionTagsStore } from '@/stores/transactionTag.js';
 
+import {
+    isNoAvailableTag,
+    getFirstShowingId,
+    getLastShowingId
+} from '@/lib/tag.js';
 import { onSwipeoutDeleted } from '@/lib/ui.mobile.js';
 
 export default {
@@ -179,31 +184,13 @@ export default {
             return this.transactionTagsStore.allTransactionTags;
         },
         firstShowingId() {
-            for (let i = 0; i < this.tags.length; i++) {
-                if (this.showHidden || !this.tags[i].hidden) {
-                    return this.tags[i].id;
-                }
-            }
-
-            return null;
+            return getFirstShowingId(this.tags, this.showHidden);
         },
         lastShowingId() {
-            for (let i = this.tags.length - 1; i >= 0; i--) {
-                if (this.showHidden || !this.tags[i].hidden) {
-                    return this.tags[i].id;
-                }
-            }
-
-            return null;
+            return getLastShowingId(this.tags, this.showHidden);
         },
         noAvailableTag() {
-            for (let i = 0; i < this.tags.length; i++) {
-                if (this.showHidden || !this.tags[i].hidden) {
-                    return false;
-                }
-            }
-
-            return true;
+            return isNoAvailableTag(this.tags, this.showHidden);
         },
         hasEditingTag() {
             return !!(this.newTag || (this.editingTag.id && this.editingTag.id !== ''));

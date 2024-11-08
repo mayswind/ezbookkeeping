@@ -152,6 +152,10 @@ import { mapStores } from 'pinia';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 
 import templateConstants from '@/consts/template.js';
+import {
+    isNoAvailableTemplate,
+    getAvailableTemplateCount
+} from '@/lib/template.js';
 
 import {
     mdiRefresh,
@@ -206,24 +210,10 @@ export default {
             return this.transactionTemplatesStore.allTransactionTemplates[this.templateType] || [];
         },
         noAvailableTemplate() {
-            for (let i = 0; i < this.templates.length; i++) {
-                if (this.showHidden || !this.templates[i].hidden) {
-                    return false;
-                }
-            }
-
-            return true;
+            return isNoAvailableTemplate(this.templates, this.showHidden);
         },
         availableTemplateCount() {
-            let count = 0;
-
-            for (let i = 0; i < this.templates.length; i++) {
-                if (this.showHidden || !this.templates[i].hidden) {
-                    count++;
-                }
-            }
-
-            return count;
+            return getAvailableTemplateCount(this.templates, this.showHidden);
         },
         allTemplateTypes() {
             return templateConstants.allTemplateTypes;

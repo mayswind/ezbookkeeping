@@ -91,6 +91,11 @@ import { mapStores } from 'pinia';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 
 import categoryConstants from '@/consts/category.js';
+import {
+    isNoAvailableCategory,
+    getFirstShowingId,
+    getLastShowingId
+} from '@/lib/category.js';
 import { onSwipeoutDeleted } from '@/lib/ui.mobile.js';
 
 export default {
@@ -163,31 +168,13 @@ export default {
             return title + ' Categories';
         },
         firstShowingId() {
-            for (let i = 0; i < this.categories.length; i++) {
-                if (this.showHidden || !this.categories[i].hidden) {
-                    return this.categories[i].id;
-                }
-            }
-
-            return null;
+            return getFirstShowingId(this.categories, this.showHidden);
         },
         lastShowingId() {
-            for (let i = this.categories.length - 1; i >= 0; i--) {
-                if (this.showHidden || !this.categories[i].hidden) {
-                    return this.categories[i].id;
-                }
-            }
-
-            return null;
+            return getLastShowingId(this.categories, this.showHidden);
         },
         noAvailableCategory() {
-            for (let i = 0; i < this.categories.length; i++) {
-                if (this.showHidden || !this.categories[i].hidden) {
-                    return false;
-                }
-            }
-
-            return true;
+            return isNoAvailableCategory(this.categories, this.showHidden);
         },
         noCategory() {
             return this.categories.length < 1;

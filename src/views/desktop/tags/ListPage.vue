@@ -227,6 +227,11 @@ import { mapStores } from 'pinia';
 import { useTransactionTagsStore } from '@/stores/transactionTag.js';
 
 import {
+    isNoAvailableTag,
+    getAvailableTagCount
+} from '@/lib/tag.js';
+
+import {
     mdiRefresh,
     mdiPlus,
     mdiPencilOutline,
@@ -276,24 +281,10 @@ export default {
             return this.transactionTagsStore.allTransactionTags;
         },
         noAvailableTag() {
-            for (let i = 0; i < this.tags.length; i++) {
-                if (this.showHidden || !this.tags[i].hidden) {
-                    return false;
-                }
-            }
-
-            return true;
+            return isNoAvailableTag(this.tags, this.showHidden);
         },
         availableTagCount() {
-            let count = 0;
-
-            for (let i = 0; i < this.tags.length; i++) {
-                if (this.showHidden || !this.tags[i].hidden) {
-                    count++;
-                }
-            }
-
-            return count;
+            return getAvailableTagCount(this.tags, this.showHidden);
         },
         hasEditingTag() {
             return !!(this.newTag || (this.editingTag.id && this.editingTag.id !== ''));

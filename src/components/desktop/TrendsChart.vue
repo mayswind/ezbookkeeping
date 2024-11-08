@@ -18,6 +18,8 @@ import {
     isNumber
 } from '@/lib/common.js';
 import {
+    getYearMonthFirstUnixTime,
+    getYearMonthLastUnixTime,
     getAllYearsStartAndEndUnixTimes,
     getAllQuartersStartAndEndUnixTimes,
     getAllMonthsStartAndEndUnixTimes,
@@ -393,8 +395,25 @@ export default {
             const item = this.itemsMap[id];
             const itemId = this.idField ? item[this.idField] : '';
             const dateRange = this.allDateRanges[e.dataIndex];
-            const minUnixTime = dateRange.minUnixTime;
-            const maxUnixTime = dateRange.maxUnixTime;
+            let minUnixTime = dateRange.minUnixTime;
+            let maxUnixTime = dateRange.maxUnixTime;
+
+            if (this.startYearMonth) {
+                const startMinUnixTime = getYearMonthFirstUnixTime(this.startYearMonth);
+
+                if (startMinUnixTime > minUnixTime) {
+                    minUnixTime = startMinUnixTime;
+                }
+            }
+
+            if (this.endYearMonth) {
+                const endMaxUnixTime = getYearMonthLastUnixTime(this.endYearMonth);
+
+                if (endMaxUnixTime < maxUnixTime) {
+                    maxUnixTime = endMaxUnixTime;
+                }
+            }
+
             const dateRangeType = getDateTypeByDateRange(minUnixTime, maxUnixTime, this.userStore.currentUserFirstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
 
             this.$emit('click', {

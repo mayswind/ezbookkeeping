@@ -474,12 +474,6 @@ export default {
         inputIsInvalid() {
             return !!this.inputInvalidProblemMessage;
         },
-        extendInputIsInvalid() {
-            return !!this.extendInputInvalidProblemMessage;
-        },
-        langAndRegionInputIsInvalid() {
-            return !!this.langAndRegionInputInvalidProblemMessage;
-        },
         inputIsNotChangedProblemMessage() {
             if (!this.newProfile.email && !this.newProfile.nickname) {
                 return 'Nothing has been modified';

@@ -608,7 +608,7 @@ export default {
             return formatPercent(value, precision, lowPrecisionValue);
         },
         getTransactionItemLinkUrl(item) {
-            return `/transaction/list?${this.statisticsStore.getTransactionListPageParams(statisticsConstants.allAnalysisTypes.CategoricalAnalysis, item)}`;
+            return `/transaction/list?${this.statisticsStore.getTransactionListPageParams(statisticsConstants.allAnalysisTypes.CategoricalAnalysis, item.id)}`;
         }
     }
 };

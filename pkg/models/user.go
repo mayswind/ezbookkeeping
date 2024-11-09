@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -80,6 +81,94 @@ func (s AmountColorType) String() string {
 	}
 }
 
+// UserFeatureRestrictions represents all the restrictions of user features
+type UserFeatureRestrictions int64
+
+// Add returns a new feature restrictions with the specified feature
+func (r UserFeatureRestrictions) Add(featureRestrictionType UserFeatureRestrictionType) UserFeatureRestrictions {
+	typeValue := int64(1 << (featureRestrictionType - 1))
+	return UserFeatureRestrictions(int64(r) | typeValue)
+}
+
+// Remove returns a new feature restrictions without the specified feature
+func (r UserFeatureRestrictions) Remove(featureRestrictionType UserFeatureRestrictionType) UserFeatureRestrictions {
+	typeValue := int64(1 << (featureRestrictionType - 1))
+	return UserFeatureRestrictions(int64(r) & (^typeValue))
+}
+
+// Contains returns whether contains the specified feature
+func (r UserFeatureRestrictions) Contains(featureRestrictionType UserFeatureRestrictionType) bool {
+	typeValue := int64(1 << (featureRestrictionType - 1))
+	return int64(r)&typeValue == typeValue
+}
+
+// String returns a textual representation of all the restrictions of user features
+func (r UserFeatureRestrictions) String() string {
+	builder := strings.Builder{}
+
+	for restrictionType := USER_FEATURE_RESTRICTION_TYPE_UPDATE_PASSWORD; restrictionType <= USER_FEATURE_RESTRICTION_TYPE_CLEAR_ALL_DATA; restrictionType++ {
+		if !r.Contains(restrictionType) {
+			continue
+		}
+
+		if builder.Len() > 0 {
+			builder.WriteRune(',')
+		}
+
+		builder.WriteString(restrictionType.String())
+	}
+
+	return builder.String()
+}
+
+// UserFeatureRestrictionType represents the restriction type of user features
+type UserFeatureRestrictionType int64
+
+// User Feature Restriction Type
+const (
+	USER_FEATURE_RESTRICTION_TYPE_UPDATE_PASSWORD           UserFeatureRestrictionType = 1
+	USER_FEATURE_RESTRICTION_TYPE_UPDATE_EMAIL              UserFeatureRestrictionType = 2
+	USER_FEATURE_RESTRICTION_TYPE_UPDATE_PROFILE_BASIC_INFO UserFeatureRestrictionType = 3
+	USER_FEATURE_RESTRICTION_TYPE_UPDATE_AVATAR             UserFeatureRestrictionType = 4
+	USER_FEATURE_RESTRICTION_TYPE_REVOKE_OTHER_SESSION      UserFeatureRestrictionType = 5
+	USER_FEATURE_RESTRICTION_TYPE_ENABLE_2FA                UserFeatureRestrictionType = 6
+	USER_FEATURE_RESTRICTION_TYPE_DISABLE_2FA               UserFeatureRestrictionType = 7
+	USER_FEATURE_RESTRICTION_TYPE_FORGET_PASSWORD           UserFeatureRestrictionType = 8
+	USER_FEATURE_RESTRICTION_TYPE_IMPORT_TRANSACTION        UserFeatureRestrictionType = 9
+	USER_FEATURE_RESTRICTION_TYPE_EXPORT_TRANSACTION        UserFeatureRestrictionType = 10
+	USER_FEATURE_RESTRICTION_TYPE_CLEAR_ALL_DATA            UserFeatureRestrictionType = 11
+)
+
+// String returns a textual representation of the restriction type of user features
+func (t UserFeatureRestrictionType) String() string {
+	switch t {
+	case USER_FEATURE_RESTRICTION_TYPE_UPDATE_PASSWORD:
+		return "Update Password"
+	case USER_FEATURE_RESTRICTION_TYPE_UPDATE_EMAIL:
+		return "Update Email"
+	case USER_FEATURE_RESTRICTION_TYPE_UPDATE_PROFILE_BASIC_INFO:
+		return "Update Profile Basic Info"
+	case USER_FEATURE_RESTRICTION_TYPE_UPDATE_AVATAR:
+		return "Update Avatar"
+	case USER_FEATURE_RESTRICTION_TYPE_REVOKE_OTHER_SESSION:
+		return "Logout Other Session"
+	case USER_FEATURE_RESTRICTION_TYPE_ENABLE_2FA:
+		return "Enable Two-Factor Authentication"
+	case USER_FEATURE_RESTRICTION_TYPE_DISABLE_2FA:
+		return "Disable Enable Two-Factor Authentication"
+	case USER_FEATURE_RESTRICTION_TYPE_FORGET_PASSWORD:
+		return "Forget Password"
+	case USER_FEATURE_RESTRICTION_TYPE_IMPORT_TRANSACTION:
+		return "Import Transactions"
+	case USER_FEATURE_RESTRICTION_TYPE_EXPORT_TRANSACTION:
+		return "Export Transactions"
+	case USER_FEATURE_RESTRICTION_TYPE_CLEAR_ALL_DATA:
+		return "Clear All Data"
+	default:
+		return fmt.Sprintf("Invalid(%d)", int(t))
+	}
+}
+
 // User represents user data stored in database
 type User struct {
 	Uid                  int64  `xorm:"PK"`
@@ -104,6 +193,7 @@ type User struct {
 	CurrencyDisplayType  core.CurrencyDisplayType `xorm:"TINYINT"`
 	ExpenseAmountColor   AmountColorType          `xorm:"TINYINT"`
 	IncomeAmountColor    AmountColorType          `xorm:"TINYINT"`
+	FeatureRestriction   UserFeatureRestrictions
 	Disabled             bool
 	Deleted              bool `xorm:"NOT NULL"`
 	EmailVerified        bool `xorm:"NOT NULL"`

@@ -56,6 +56,10 @@ func (a *ForgetPasswordsApi) UserForgetPasswordRequestHandler(c *core.WebContext
 		return nil, errs.ErrUserIsDisabled
 	}
 
+	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_FORGET_PASSWORD) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
 	if a.CurrentConfig().ForgetPasswordRequireVerifyEmail && !user.EmailVerified {
 		log.Warnf(c, "[forget_passwords.UserForgetPasswordRequestHandler] user \"uid:%d\" has not verified email", user.Uid)
 		return nil, errs.ErrEmailIsNotVerified
@@ -107,6 +111,10 @@ func (a *ForgetPasswordsApi) UserResetPasswordHandler(c *core.WebContext) (any, 
 	if user.Disabled {
 		log.Warnf(c, "[forget_passwords.UserResetPasswordHandler] user \"uid:%d\" is disabled", user.Uid)
 		return nil, errs.ErrUserIsDisabled
+	}
+
+	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_FORGET_PASSWORD) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 
 	if a.CurrentConfig().ForgetPasswordRequireVerifyEmail && !user.EmailVerified {

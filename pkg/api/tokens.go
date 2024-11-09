@@ -135,6 +135,22 @@ func (a *TokensApi) TokenRevokeHandler(c *core.WebContext) (any, *errs.Error) {
 		return nil, errs.ErrInvalidTokenId
 	}
 
+	if utils.Int64ToString(tokenRecord.UserTokenId) != c.GetTokenClaims().UserTokenId || tokenRecord.CreatedUnixTime != c.GetTokenClaims().IssuedAt {
+		user, err := a.users.GetUserById(c, uid)
+
+		if err != nil {
+			if !errs.IsCustomError(err) {
+				log.Errorf(c, "[token.TokenRevokeHandler] failed to get user, because %s", err.Error())
+			}
+
+			return nil, errs.ErrUserNotFound
+		}
+
+		if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_REVOKE_OTHER_SESSION) {
+			return nil, errs.ErrNotPermittedToPerformThisAction
+		}
+	}
+
 	err = a.tokens.DeleteToken(c, tokenRecord)
 
 	if err != nil {
@@ -169,6 +185,24 @@ func (a *TokensApi) TokenRevokeAllHandler(c *core.WebContext) (any, *errs.Error)
 	}
 
 	tokens = append(tokens[:currentTokenIndex], tokens[currentTokenIndex+1:]...)
+
+	if len(tokens) < 1 {
+		return nil, errs.ErrTokenRecordNotFound
+	}
+
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Errorf(c, "[token.TokenRevokeAllHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_REVOKE_OTHER_SESSION) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
 
 	err = a.tokens.DeleteTokens(c, uid, tokens)
 

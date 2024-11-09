@@ -1077,6 +1077,10 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 		return nil, errs.ErrUserNotFound
 	}
 
+	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_IMPORT_TRANSACTION) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
 	accounts, err := a.accounts.GetAllAccountsByUid(c, user.Uid)
 
 	if err != nil {
@@ -1199,6 +1203,10 @@ func (a *TransactionsApi) TransactionImportHandler(c *core.WebContext) (any, *er
 		}
 
 		return nil, errs.ErrUserNotFound
+	}
+
+	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_IMPORT_TRANSACTION) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 
 	newTransactions := make([]*models.Transaction, len(transactionImportReq.Transactions))

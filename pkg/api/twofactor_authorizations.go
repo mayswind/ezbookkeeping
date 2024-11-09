@@ -81,6 +81,10 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableRequestHandler(c *core.WebCo
 		return nil, errs.ErrUserNotFound
 	}
 
+	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_ENABLE_2FA) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
 	key, err := a.twoFactorAuthorizations.GenerateTwoFactorSecret(c, user)
 
 	if err != nil {
@@ -139,6 +143,10 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableConfirmHandler(c *core.WebCo
 		}
 
 		return nil, errs.ErrUserNotFound
+	}
+
+	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_ENABLE_2FA) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 
 	twoFactorSetting := &models.TwoFactor{
@@ -227,6 +235,10 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorDisableHandler(c *core.WebContext)
 		}
 
 		return nil, errs.ErrUserNotFound
+	}
+
+	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_DISABLE_2FA) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 
 	if !a.users.IsPasswordEqualsUserPassword(disableReq.Password, user) {

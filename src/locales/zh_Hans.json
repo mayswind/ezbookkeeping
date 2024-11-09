@@ -1023,6 +1023,7 @@
         "user avatar not set": "用户没有设置头像",
         "user avatar file extension invalid": "用户头像文件扩展名无效",
         "exceed the maximum size of user avatar file": "上传的用户头像超出了允许的最大文件大小",
+        "not permitted to perform this action": "您不能执行该操作",
         "unauthorized access": "未授权的登录",
         "current token is invalid": "当前认证令牌无效",
         "current token is expired": "当前认证令牌已过期",

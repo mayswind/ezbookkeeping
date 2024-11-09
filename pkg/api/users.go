@@ -251,6 +251,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 	userUpdateReq.Email = strings.TrimSpace(userUpdateReq.Email)
 	userUpdateReq.Nickname = strings.TrimSpace(userUpdateReq.Nickname)
 
+	modifyProfileBasicInfo := false
 	anythingUpdate := false
 	userNew := &models.User{
 		Uid:  user.Uid,
@@ -258,12 +259,20 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 	}
 
 	if userUpdateReq.Email != "" && userUpdateReq.Email != user.Email {
+		if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_UPDATE_EMAIL) {
+			return nil, errs.ErrNotPermittedToPerformThisAction
+		}
+
 		user.Email = userUpdateReq.Email
 		userNew.Email = userUpdateReq.Email
 		anythingUpdate = true
 	}
 
 	if userUpdateReq.Password != "" {
+		if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_UPDATE_PASSWORD) {
+			return nil, errs.ErrNotPermittedToPerformThisAction
+		}
+
 		if !a.users.IsPasswordEqualsUserPassword(userUpdateReq.OldPassword, user) {
 			return nil, errs.ErrUserPasswordWrong
 		}
@@ -277,6 +286,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 	if userUpdateReq.Nickname != "" && userUpdateReq.Nickname != user.Nickname {
 		user.Nickname = userUpdateReq.Nickname
 		userNew.Nickname = userUpdateReq.Nickname
+		modifyProfileBasicInfo = true
 		anythingUpdate = true
 	}
 
@@ -299,12 +309,14 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 
 		user.DefaultAccountId = userUpdateReq.DefaultAccountId
 		userNew.DefaultAccountId = userUpdateReq.DefaultAccountId
+		modifyProfileBasicInfo = true
 		anythingUpdate = true
 	}
 
 	if userUpdateReq.TransactionEditScope != nil && *userUpdateReq.TransactionEditScope != user.TransactionEditScope {
 		user.TransactionEditScope = *userUpdateReq.TransactionEditScope
 		userNew.TransactionEditScope = *userUpdateReq.TransactionEditScope
+		modifyProfileBasicInfo = true
 		anythingUpdate = true
 	} else {
 		userNew.TransactionEditScope = models.TRANSACTION_EDIT_SCOPE_INVALID
@@ -316,18 +328,21 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 		user.Language = userUpdateReq.Language
 		userNew.Language = userUpdateReq.Language
 		modifyUserLanguage = true
+		modifyProfileBasicInfo = true
 		anythingUpdate = true
 	}
 
 	if userUpdateReq.DefaultCurrency != "" && userUpdateReq.DefaultCurrency != user.DefaultCurrency {
 		user.DefaultCurrency = userUpdateReq.DefaultCurrency
 		userNew.DefaultCurrency = userUpdateReq.DefaultCurrency
+		modifyProfileBasicInfo = true
 		anythingUpdate = true
 	}
 
 	if userUpdateReq.FirstDayOfWeek != nil && *userUpdateReq.FirstDayOfWeek != user.FirstDayOfWeek {
 		user.FirstDayOfWeek = *userUpdateReq.FirstDayOfWeek
 		userNew.FirstDayOfWeek = *userUpdateReq.FirstDayOfWeek
+		modifyProfileBasicInfo = true
 		anythingUpdate = true
 	} else {
 		userNew.FirstDayOfWeek = core.WEEKDAY_INVALID
@@ -336,6 +351,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 	if userUpdateReq.LongDateFormat != nil && *userUpdateReq.LongDateFormat != user.LongDateFormat {
 		user.LongDateFormat = *userUpdateReq.LongDateFormat
 		userNew.LongDateFormat = *userUpdateReq.LongDateFormat
+		modifyProfileBasicInfo = true
 		anythingUpdate = true
 	} else {
 		userNew.LongDateFormat = core.LONG_DATE_FORMAT_INVALID
@@ -344,6 +360,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 	if userUpdateReq.ShortDateFormat != nil && *userUpdateReq.ShortDateFormat != user.ShortDateFormat {
 		user.ShortDateFormat = *userUpdateReq.ShortDateFormat
 		userNew.ShortDateFormat = *userUpdateReq.ShortDateFormat
+		modifyProfileBasicInfo = true
 		anythingUpdate = true
 	} else {
 		userNew.ShortDateFormat = core.SHORT_DATE_FORMAT_INVALID
@@ -352,6 +369,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 	if userUpdateReq.LongTimeFormat != nil && *userUpdateReq.LongTimeFormat != user.LongTimeFormat {
 		user.LongTimeFormat = *userUpdateReq.LongTimeFormat
 		userNew.LongTimeFormat = *userUpdateReq.LongTimeFormat
+		modifyProfileBasicInfo = true
 		anythingUpdate = true
 	} else {
 		userNew.LongTimeFormat = core.LONG_TIME_FORMAT_INVALID
@@ -360,6 +378,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 	if userUpdateReq.ShortTimeFormat != nil && *userUpdateReq.ShortTimeFormat != user.ShortTimeFormat {
 		user.ShortTimeFormat = *userUpdateReq.ShortTimeFormat
 		userNew.ShortTimeFormat = *userUpdateReq.ShortTimeFormat
+		modifyProfileBasicInfo = true
 		anythingUpdate = true
 	} else {
 		userNew.ShortTimeFormat = core.SHORT_TIME_FORMAT_INVALID
@@ -368,6 +387,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 	if userUpdateReq.DecimalSeparator != nil && *userUpdateReq.DecimalSeparator != user.DecimalSeparator {
 		user.DecimalSeparator = *userUpdateReq.DecimalSeparator
 		userNew.DecimalSeparator = *userUpdateReq.DecimalSeparator
+		modifyProfileBasicInfo = true
 		anythingUpdate = true
 	} else {
 		userNew.DecimalSeparator = core.DECIMAL_SEPARATOR_INVALID
@@ -376,6 +396,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 	if userUpdateReq.DigitGroupingSymbol != nil && *userUpdateReq.DigitGroupingSymbol != user.DigitGroupingSymbol {
 		user.DigitGroupingSymbol = *userUpdateReq.DigitGroupingSymbol
 		userNew.DigitGroupingSymbol = *userUpdateReq.DigitGroupingSymbol
+		modifyProfileBasicInfo = true
 		anythingUpdate = true
 	} else {
 		userNew.DigitGroupingSymbol = core.DIGIT_GROUPING_SYMBOL_INVALID
@@ -384,6 +405,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 	if userUpdateReq.DigitGrouping != nil && *userUpdateReq.DigitGrouping != user.DigitGrouping {
 		user.DigitGrouping = *userUpdateReq.DigitGrouping
 		userNew.DigitGrouping = *userUpdateReq.DigitGrouping
+		modifyProfileBasicInfo = true
 		anythingUpdate = true
 	} else {
 		userNew.DigitGrouping = core.DIGIT_GROUPING_TYPE_INVALID
@@ -392,6 +414,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 	if userUpdateReq.CurrencyDisplayType != nil && *userUpdateReq.CurrencyDisplayType != user.CurrencyDisplayType {
 		user.CurrencyDisplayType = *userUpdateReq.CurrencyDisplayType
 		userNew.CurrencyDisplayType = *userUpdateReq.CurrencyDisplayType
+		modifyProfileBasicInfo = true
 		anythingUpdate = true
 	} else {
 		userNew.CurrencyDisplayType = core.CURRENCY_DISPLAY_TYPE_INVALID
@@ -400,6 +423,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 	if userUpdateReq.ExpenseAmountColor != nil && *userUpdateReq.ExpenseAmountColor != user.ExpenseAmountColor {
 		user.ExpenseAmountColor = *userUpdateReq.ExpenseAmountColor
 		userNew.ExpenseAmountColor = *userUpdateReq.ExpenseAmountColor
+		modifyProfileBasicInfo = true
 		anythingUpdate = true
 	} else {
 		userNew.ExpenseAmountColor = models.AMOUNT_COLOR_TYPE_INVALID
@@ -408,9 +432,14 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 	if userUpdateReq.IncomeAmountColor != nil && *userUpdateReq.IncomeAmountColor != user.IncomeAmountColor {
 		user.IncomeAmountColor = *userUpdateReq.IncomeAmountColor
 		userNew.IncomeAmountColor = *userUpdateReq.IncomeAmountColor
+		modifyProfileBasicInfo = true
 		anythingUpdate = true
 	} else {
 		userNew.IncomeAmountColor = models.AMOUNT_COLOR_TYPE_INVALID
+	}
+
+	if modifyProfileBasicInfo && user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_UPDATE_PROFILE_BASIC_INFO) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 
 	if modifyUserLanguage || userNew.DecimalSeparator != core.DECIMAL_SEPARATOR_INVALID || userNew.DigitGroupingSymbol != core.DIGIT_GROUPING_SYMBOL_INVALID {
@@ -525,6 +554,10 @@ func (a *UsersApi) UserUpdateAvatarHandler(c *core.WebContext) (any, *errs.Error
 		return nil, errs.ErrUserNotFound
 	}
 
+	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_UPDATE_AVATAR) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
 	form, err := c.MultipartForm()
 
 	if err != nil {
@@ -586,6 +619,10 @@ func (a *UsersApi) UserRemoveAvatarHandler(c *core.WebContext) (any, *errs.Error
 		}
 
 		return nil, errs.ErrUserNotFound
+	}
+
+	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_UPDATE_AVATAR) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 
 	if user.CustomAvatarType == "" {

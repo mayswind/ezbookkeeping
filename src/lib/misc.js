@@ -99,6 +99,10 @@ export function generateRandomUUID() {
     return uuid;
 }
 
+export function isSessionUserAgentCreatedByCli(ua) {
+    return ua === 'ezbookkeeping Cli';
+}
+
 export function parseUserAgent(ua) {
     const uaParseRet = uaParser(ua);
 
@@ -119,13 +123,16 @@ export function parseUserAgent(ua) {
     };
 }
 
-export function parseDeviceInfo(ua) {
-    const uaInfo = parseUserAgent(ua);
+export function parseDeviceInfo(uaInfo) {
+    if (!uaInfo) {
+        return '';
+    }
+
     let result = '';
 
-    if (uaInfo.device.model) {
+    if (uaInfo.device && uaInfo.device.model) {
         result = uaInfo.device.model;
-    } else if (uaInfo.os.name) {
+    } else if (uaInfo.os && uaInfo.os.name) {
         result = uaInfo.os.name;
 
         if (uaInfo.os.version) {
@@ -133,7 +140,7 @@ export function parseDeviceInfo(ua) {
         }
     }
 
-    if (uaInfo.browser.name) {
+    if (uaInfo.browser && uaInfo.browser.name) {
         let browserInfo = uaInfo.browser.name;
 
         if (uaInfo.browser.version) {
@@ -152,6 +159,41 @@ export function parseDeviceInfo(ua) {
     }
 
     return result;
+}
+
+export function parseSessionInfo(token) {
+    const isCreatedByCli = isSessionUserAgentCreatedByCli(token.userAgent);
+    const uaInfo = parseUserAgent(token.userAgent);
+    let deviceType = '';
+
+    if (isCreatedByCli) {
+        deviceType = 'cli';
+    } else {
+        if (uaInfo && uaInfo.device) {
+            if (uaInfo.device.type === 'mobile') {
+                deviceType = 'phone';
+            } else if (uaInfo.device.type === 'wearable') {
+                deviceType = 'wearable';
+            } else if (uaInfo.device.type === 'tablet') {
+                deviceType = 'tablet';
+            } else if (uaInfo.device.type === 'smarttv') {
+                deviceType = 'tv';
+            } else {
+                deviceType = 'default';
+            }
+        } else {
+            deviceType = 'default';
+        }
+    }
+
+    return {
+        tokenId: token.tokenId,
+        isCurrent: token.isCurrent,
+        deviceType: deviceType,
+        deviceInfo: isCreatedByCli ? token.userAgent : parseDeviceInfo(uaInfo),
+        createdByCli: isCreatedByCli,
+        lastSeen: token.lastSeen
+    }
 }
 
 export function makeButtonCopyToClipboard({ text, el, successCallback, errorCallback }) {

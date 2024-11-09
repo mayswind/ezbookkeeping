@@ -106,10 +106,10 @@
                         v-for="session in sessions">
                         <td class="text-sm">
                             <v-icon start :icon="session.icon"/>
-                            {{ session.deviceType }}
+                            {{ $t(session.isCurrent ? 'Current' : 'Other Device') }}
                         </td>
                         <td class="text-sm">{{ session.deviceInfo }}</td>
-                        <td class="text-sm">{{ session.lastSeen }}</td>
+                        <td class="text-sm">{{ session.lastSeenDateTime }}</td>
                         <td class="text-sm text-right">
                             <v-btn density="comfortable" color="error" variant="tonal"
                                    :disabled="session.isCurrent || loadingSession"
@@ -136,7 +136,7 @@ import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
 
 import { isEquals } from '@/lib/common.js';
-import { parseDeviceInfo, parseUserAgent } from '@/lib/misc.js';
+import { parseSessionInfo } from '@/lib/misc.js';
 
 import {
     mdiRefresh,
@@ -144,6 +144,7 @@ import {
     mdiTablet,
     mdiWatch,
     mdiTelevision,
+    mdiConsole,
     mdiDevices
 } from '@mdi/js';
 
@@ -187,15 +188,10 @@ export default {
 
             for (let i = 0; i < this.tokens.length; i++) {
                 const token = this.tokens[i];
-
-                sessions.push({
-                    tokenId: token.tokenId,
-                    isCurrent: token.isCurrent,
-                    deviceType: this.$t(token.isCurrent ? 'Current' : 'Other Device'),
-                    deviceInfo: parseDeviceInfo(token.userAgent),
-                    icon: this.getTokenIcon(token),
-                    lastSeen: token.lastSeen ? this.$locale.formatUnixTimeToLongDateTime(this.userStore, token.lastSeen) : '-'
-                });
+                const sessionInfo = parseSessionInfo(token);
+                sessionInfo.icon = this.getTokenIcon(sessionInfo.deviceType);
+                sessionInfo.lastSeenDateTime = sessionInfo.lastSeen ? this.$locale.formatUnixTimeToLongDateTime(this.userStore, sessionInfo.lastSeen) : '-';
+                sessions.push(sessionInfo);
             }
 
             return sessions;
@@ -335,21 +331,17 @@ export default {
                 });
             });
         },
-        getTokenIcon(token) {
-            const ua = parseUserAgent(token.userAgent);
-
-            if (!ua || !ua.device) {
-                return mdiDevices;
-            }
-
-            if (ua.device.type === 'mobile') {
+        getTokenIcon(deviceType) {
+            if (deviceType === 'phone') {
                 return mdiCellphone;
-            } else if (ua.device.type === 'wearable') {
+            } else if (deviceType === 'wearable') {
                 return mdiWatch;
-            } else if (ua.device.type === 'tablet') {
+            } else if (deviceType === 'tablet') {
                 return mdiTablet;
-            } else if (ua.device.type === 'smarttv') {
+            } else if (deviceType === 'tv') {
                 return mdiTelevision;
+            } else if (deviceType === 'cli') {
+                return mdiConsole;
             } else {
                 return mdiDevices;
             }

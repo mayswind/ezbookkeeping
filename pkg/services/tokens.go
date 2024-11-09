@@ -78,34 +78,46 @@ func (s *TokenService) ParseTokenByCookie(c *core.WebContext, tokenCookieName st
 	return s.parseToken(c, utils.CookieExtractor{tokenCookieName})
 }
 
+// CreateTokenViaCli generates a new normal token and saves to database
+func (s *TokenService) CreateTokenViaCli(c *core.CliContext, user *models.User) (string, *models.TokenRecord, error) {
+	token, _, tokenRecord, err := s.createToken(c, user, core.USER_TOKEN_TYPE_NORMAL, "ezbookkeeping Cli", s.CurrentConfig().TokenExpiredTimeDuration)
+	return token, tokenRecord, err
+}
+
 // CreateToken generates a new normal token and saves to database
 func (s *TokenService) CreateToken(c *core.WebContext, user *models.User) (string, *core.UserTokenClaims, error) {
-	return s.createToken(c, user, core.USER_TOKEN_TYPE_NORMAL, s.getUserAgent(c), s.CurrentConfig().TokenExpiredTimeDuration)
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_NORMAL, s.getUserAgent(c), s.CurrentConfig().TokenExpiredTimeDuration)
+	return token, claims, err
 }
 
 // CreateRequire2FAToken generates a new token requiring user to verify 2fa passcode and saves to database
 func (s *TokenService) CreateRequire2FAToken(c *core.WebContext, user *models.User) (string, *core.UserTokenClaims, error) {
-	return s.createToken(c, user, core.USER_TOKEN_TYPE_REQUIRE_2FA, s.getUserAgent(c), s.CurrentConfig().TemporaryTokenExpiredTimeDuration)
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_REQUIRE_2FA, s.getUserAgent(c), s.CurrentConfig().TemporaryTokenExpiredTimeDuration)
+	return token, claims, err
 }
 
 // CreateEmailVerifyToken generates a new email verify token and saves to database
 func (s *TokenService) CreateEmailVerifyToken(c *core.WebContext, user *models.User) (string, *core.UserTokenClaims, error) {
-	return s.createToken(c, user, core.USER_TOKEN_TYPE_EMAIL_VERIFY, s.getUserAgent(c), s.CurrentConfig().EmailVerifyTokenExpiredTimeDuration)
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_EMAIL_VERIFY, s.getUserAgent(c), s.CurrentConfig().EmailVerifyTokenExpiredTimeDuration)
+	return token, claims, err
 }
 
 // CreateEmailVerifyTokenWithoutUserAgent generates a new email verify token and saves to database
 func (s *TokenService) CreateEmailVerifyTokenWithoutUserAgent(c core.Context, user *models.User) (string, *core.UserTokenClaims, error) {
-	return s.createToken(c, user, core.USER_TOKEN_TYPE_EMAIL_VERIFY, "", s.CurrentConfig().EmailVerifyTokenExpiredTimeDuration)
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_EMAIL_VERIFY, "", s.CurrentConfig().EmailVerifyTokenExpiredTimeDuration)
+	return token, claims, err
 }
 
 // CreatePasswordResetToken generates a new password reset token and saves to database
 func (s *TokenService) CreatePasswordResetToken(c *core.WebContext, user *models.User) (string, *core.UserTokenClaims, error) {
-	return s.createToken(c, user, core.USER_TOKEN_TYPE_PASSWORD_RESET, s.getUserAgent(c), s.CurrentConfig().PasswordResetTokenExpiredTimeDuration)
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_PASSWORD_RESET, s.getUserAgent(c), s.CurrentConfig().PasswordResetTokenExpiredTimeDuration)
+	return token, claims, err
 }
 
 // CreatePasswordResetTokenWithoutUserAgent generates a new password reset token and saves to database
 func (s *TokenService) CreatePasswordResetTokenWithoutUserAgent(c core.Context, user *models.User) (string, *core.UserTokenClaims, error) {
-	return s.createToken(c, user, core.USER_TOKEN_TYPE_PASSWORD_RESET, "", s.CurrentConfig().PasswordResetTokenExpiredTimeDuration)
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_PASSWORD_RESET, "", s.CurrentConfig().PasswordResetTokenExpiredTimeDuration)
+	return token, claims, err
 }
 
 // UpdateTokenLastSeen updates the last seen time of specified token
@@ -350,7 +362,7 @@ func (s *TokenService) parseToken(c *core.WebContext, extractor request.Extracto
 	return token, claims, err
 }
 
-func (s *TokenService) createToken(c core.Context, user *models.User, tokenType core.TokenType, userAgent string, expiryDate time.Duration) (string, *core.UserTokenClaims, error) {
+func (s *TokenService) createToken(c core.Context, user *models.User, tokenType core.TokenType, userAgent string, expiryDate time.Duration) (string, *core.UserTokenClaims, *models.TokenRecord, error) {
 	var err error
 	now := time.Now()
 
@@ -365,7 +377,7 @@ func (s *TokenService) createToken(c core.Context, user *models.User, tokenType 
 	}
 
 	if tokenRecord.Secret, err = utils.GetRandomString(10); err != nil {
-		return "", nil, err
+		return "", nil, nil, err
 	}
 
 	claims := &core.UserTokenClaims{
@@ -381,16 +393,16 @@ func (s *TokenService) createToken(c core.Context, user *models.User, tokenType 
 	tokenString, err := jwtToken.SignedString([]byte(tokenRecord.Secret))
 
 	if err != nil {
-		return "", nil, err
+		return "", nil, nil, err
 	}
 
 	err = s.createTokenRecord(c, tokenRecord)
 
 	if err != nil {
-		return "", nil, err
+		return "", nil, nil, err
 	}
 
-	return tokenString, claims, err
+	return tokenString, claims, tokenRecord, err
 }
 
 func (s *TokenService) getTokenRecord(c core.Context, uid int64, userTokenId int64, createUnixTime int64) (*models.TokenRecord, error) {

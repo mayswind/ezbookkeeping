@@ -24,7 +24,7 @@
         <f7-list strong inset dividers media-list class="margin-top" v-else-if="!loading">
             <f7-list-item class="list-item-media-valign-middle" swipeout
                           :id="session.domId"
-                          :title="session.deviceType"
+                          :title="$t(session.isCurrent ? 'Current' : 'Other Device')"
                           :text="session.deviceInfo"
                           :key="session.tokenId"
                           v-for="session in sessions">
@@ -32,7 +32,7 @@
                     <f7-icon :f7="session.icon"></f7-icon>
                 </template>
                 <template #after>
-                    <small>{{ session.lastSeen }}</small>
+                    <small>{{ session.lastSeenDateTime }}</small>
                 </template>
                 <f7-swipeout-actions right v-if="!session.isCurrent">
                     <f7-swipeout-button color="red" :text="$t('Log Out')" @click="revoke(session)"></f7-swipeout-button>
@@ -48,7 +48,7 @@ import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
 
 import { isEquals } from '@/lib/common.js';
-import { parseDeviceInfo, parseUserAgent } from '@/lib/misc.js';
+import { parseSessionInfo } from '@/lib/misc.js';
 
 import { onSwipeoutDeleted } from '@/lib/ui.mobile.js';
 
@@ -74,16 +74,11 @@ export default {
 
             for (let i = 0; i < this.tokens.length; i++) {
                 const token = this.tokens[i];
-
-                sessions.push({
-                    tokenId: token.tokenId,
-                    domId: this.getTokenDomId(token.tokenId),
-                    isCurrent: token.isCurrent,
-                    deviceType: this.$t(token.isCurrent ? 'Current' : 'Other Device'),
-                    deviceInfo: parseDeviceInfo(token.userAgent),
-                    icon: this.getTokenIcon(token),
-                    lastSeen: token.lastSeen ? this.$locale.formatUnixTimeToLongDateTime(this.userStore, token.lastSeen) : '-'
-                });
+                const sessionInfo = parseSessionInfo(token);
+                sessionInfo.domId = this.getTokenDomId(sessionInfo.tokenId);
+                sessionInfo.icon = this.getTokenIcon(sessionInfo.deviceType);
+                sessionInfo.lastSeenDateTime = sessionInfo.lastSeen ? this.$locale.formatUnixTimeToLongDateTime(this.userStore, sessionInfo.lastSeen) : '-';
+                sessions.push(sessionInfo);
             }
 
             return sessions;
@@ -191,21 +186,17 @@ export default {
                 });
             });
         },
-        getTokenIcon(token) {
-            const ua = parseUserAgent(token.userAgent);
-
-            if (!ua || !ua.device) {
-                return 'device_desktop';
-            }
-
-            if (ua.device.type === 'mobile') {
+        getTokenIcon(deviceType) {
+            if (deviceType === 'phone') {
                 return 'device_phone_portrait';
-            } else if (ua.device.type === 'wearable') {
+            } else if (deviceType === 'wearable') {
                 return 'device_phone_portrait';
-            } else if (ua.device.type === 'tablet') {
+            } else if (deviceType === 'tablet') {
                 return 'device_tablet_portrait';
-            } else if (ua.device.type === 'smarttv') {
+            } else if (deviceType === 'tv') {
                 return 'tv';
+            } else if (deviceType === 'cli') {
+                return 'chevron_left_slash_chevron_right';
             } else {
                 return 'device_desktop';
             }

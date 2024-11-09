@@ -193,6 +193,19 @@ var UserData = &cli.Command{
 			},
 		},
 		{
+			Name:   "user-session-new",
+			Usage:  "Create new session for user",
+			Action: bindAction(createNewUserToken),
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "username",
+					Aliases:  []string{"n"},
+					Required: true,
+					Usage:    "Specific user name",
+				},
+			},
+		},
+		{
 			Name:   "user-session-clear",
 			Usage:  "Clear user all sessions",
 			Action: bindAction(clearUserTokens),
@@ -545,6 +558,27 @@ func listUserTokens(c *core.CliContext) error {
 			fmt.Printf("---\n")
 		}
 	}
+
+	return nil
+}
+
+func createNewUserToken(c *core.CliContext) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	username := c.String("username")
+	token, tokenString, err := clis.UserData.CreateNewUserToken(c, username)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.createNewUserToken] error occurs when creating user token")
+		return err
+	}
+
+	printTokenInfo(token)
+	fmt.Printf("[NewToken] %s\n", tokenString)
 
 	return nil
 }

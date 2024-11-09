@@ -352,6 +352,30 @@ func (l *UserDataCli) ListUserTokens(c *core.CliContext, username string) ([]*mo
 	return tokens, nil
 }
 
+// CreateNewUserToken returns a new token for the specified user
+func (l *UserDataCli) CreateNewUserToken(c *core.CliContext, username string) (*models.TokenRecord, string, error) {
+	if username == "" {
+		log.CliErrorf(c, "[user_data.CreateNewUserToken] user name is empty")
+		return nil, "", errs.ErrUsernameIsEmpty
+	}
+
+	user, err := l.GetUserByUsername(c, username)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.CreateNewUserToken] error occurs when getting user by user name")
+		return nil, "", err
+	}
+
+	token, tokenRecord, err := l.tokens.CreateTokenViaCli(c, user)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.CreateNewUserToken] failed to create token for user \"%s\", because %s", username, err.Error())
+		return nil, "", err
+	}
+
+	return tokenRecord, token, nil
+}
+
 // ClearUserTokens clears all tokens of the specified user
 func (l *UserDataCli) ClearUserTokens(c *core.CliContext, username string) error {
 	if username == "" {

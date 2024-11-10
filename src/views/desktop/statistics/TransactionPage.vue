@@ -87,7 +87,7 @@
                                                        @click="shiftDateRange(1)"/>
                                             </v-btn-group>
 
-                                            <v-menu location="bottom">
+                                            <v-menu location="bottom" v-if="queryAnalysisType === allAnalysisTypes.TrendAnalysis">
                                                 <template #activator="{ props }">
                                                     <v-btn class="ml-3" color="default" variant="outlined"
                                                            :prepend-icon="icons.dateAggregation" :disabled="loading"

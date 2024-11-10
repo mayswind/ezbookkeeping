@@ -180,7 +180,7 @@
                                                                         :disabled="loading"
                                                                         v-model="activeSubAccount[element.id]"
                                                                     >
-                                                                        <v-btn :value="undefined">
+                                                                        <v-btn :value="''">
                                                                             <span>{{ $t('All') }}</span>
                                                                         </v-btn>
                                                                         <v-btn :key="subAccount.id" :value="subAccount.id"
@@ -330,6 +330,9 @@ export default {
         allAccountCategories() {
             return accountConstants.allCategories;
         },
+        allAccounts() {
+            return this.accountsStore.allAccounts;
+        },
         allCategorizedAccountsMap() {
             return this.accountsStore.allCategorizedAccountsMap;
         },
@@ -414,6 +417,16 @@ export default {
             }).then(() => {
                 self.loading = false;
                 self.displayOrderModified = false;
+
+                if (self.allAccounts) {
+                    for (let i = 0; i < self.allAccounts.length; i++) {
+                        const account = self.allAccounts[i];
+
+                        if (account.type === self.allAccountTypes.MultiSubAccounts && !self.activeSubAccount[account.id]) {
+                            self.activeSubAccount[account.id] = '';
+                        }
+                    }
+                }
 
                 if (force) {
                     self.$refs.snackbar.showMessage('Account list has been updated');

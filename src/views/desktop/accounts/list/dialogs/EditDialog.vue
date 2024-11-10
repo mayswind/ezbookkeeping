@@ -126,13 +126,22 @@
                                         </template>
                                     </v-autocomplete>
                                 </v-col>
-                                <v-col cols="12" md="12" v-if="account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0">
+                                <v-col cols="12" :md="!editAccountId && selectedAccount.balance ? 6 : 12"
+                                       v-if="account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0">
                                     <amount-input :disabled="loading || submitting || !!editAccountId"
                                                   :persistent-placeholder="true"
                                                   :currency="selectedAccount.currency"
                                                   :label="currentAccountIndex < 0 ? $t('Account Balance') : $t('Sub-account Balance')"
                                                   :placeholder="currentAccountIndex < 0 ? $t('Account Balance') : $t('Sub-account Balance')"
                                                   v-model="selectedAccount.balance"/>
+                                </v-col>
+                                <v-col cols="12" md="6" v-show="selectedAccount.balance"
+                                       v-if="!editAccountId && (account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0)">
+                                    <date-time-select
+                                        :disabled="loading || submitting"
+                                        :label="$t('Balance Time')"
+                                        v-model="selectedAccount.balanceTime"
+                                        @error="showDateTimeError" />
                                 </v-col>
                                 <v-col cols="12" md="12">
                                     <v-textarea
@@ -452,6 +461,9 @@ export default {
                     this.subAccounts.push(subAccount);
                 }
             }
+        },
+        showDateTimeError(error) {
+            this.$refs.snackbar.showError(error);
         }
     }
 }

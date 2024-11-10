@@ -10,6 +10,7 @@ import colorConstants from '@/consts/color.js';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
 import { isNumber, isEquals } from '@/lib/common.js';
+import { getCurrentUnixTime } from '@/lib/datetime.js';
 import { getCategorizedAccountsMap, getAllFilteredAccountsBalance } from '@/lib/account.js';
 
 function loadAccountList(state, accounts) {
@@ -254,6 +255,7 @@ export const useAccountsStore = defineStore('accounts', {
     actions: {
         generateNewAccountModel() {
             const userStore = useUserStore();
+            const now = getCurrentUnixTime();
 
             return {
                 category: 1,
@@ -263,12 +265,14 @@ export const useAccountsStore = defineStore('accounts', {
                 color: colorConstants.defaultAccountColor,
                 currency: userStore.currentUserDefaultCurrency,
                 balance: 0,
+                balanceTime: now,
                 comment: '',
                 visible: true
             };
         },
         generateNewSubAccountModel(parentAccount) {
             const userStore = useUserStore();
+            const now = getCurrentUnixTime();
 
             return {
                 category: null,
@@ -278,6 +282,7 @@ export const useAccountsStore = defineStore('accounts', {
                 color: parentAccount.color,
                 currency: userStore.currentUserDefaultCurrency,
                 balance: 0,
+                balanceTime: now,
                 comment: '',
                 visible: true
             };
@@ -758,6 +763,8 @@ export const useAccountsStore = defineStore('accounts', {
                     if (isEdit) {
                         submitAccount.id = subAccount.id;
                         submitAccount.hidden = !subAccount.visible;
+                    } else {
+                        submitAccount.balanceTime = subAccount.balanceTime;
                     }
 
                     submitSubAccounts.push(submitAccount);
@@ -783,6 +790,8 @@ export const useAccountsStore = defineStore('accounts', {
             if (isEdit) {
                 submitAccount.id = account.id;
                 submitAccount.hidden = !account.visible;
+            } else {
+                submitAccount.balanceTime = account.balanceTime;
             }
 
             const oldAccount = submitAccount.id ? self.allAccountsMap[submitAccount.id] : null;

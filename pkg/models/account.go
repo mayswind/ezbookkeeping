@@ -82,6 +82,7 @@ type AccountCreateRequest struct {
 	Color           string                  `json:"color" binding:"required,len=6,validHexRGBColor"`
 	Currency        string                  `json:"currency" binding:"required,len=3,validCurrency"`
 	Balance         int64                   `json:"balance"`
+	BalanceTime     int64                   `json:"balanceTime" binding:"required,min=1"`
 	Comment         string                  `json:"comment" binding:"max=255"`
 	SubAccounts     []*AccountCreateRequest `json:"subAccounts" binding:"omitempty"`
 	ClientSessionId string                  `json:"clientSessionId"`

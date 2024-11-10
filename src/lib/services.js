@@ -255,7 +255,7 @@ export default {
     getAccount: ({ id }) => {
         return axios.get('v1/accounts/get.json?id=' + id);
     },
-    addAccount: ({ category, type, name, icon, color, currency, balance, comment, subAccounts, clientSessionId }) => {
+    addAccount: ({ category, type, name, icon, color, currency, balance, balanceTime, comment, subAccounts, clientSessionId }) => {
         return axios.post('v1/accounts/add.json', {
             category,
             type,
@@ -264,6 +264,7 @@ export default {
             color,
             currency,
             balance,
+            balanceTime,
             comment,
             subAccounts,
             clientSessionId

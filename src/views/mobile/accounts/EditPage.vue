@@ -188,6 +188,26 @@
                 ></number-pad-sheet>
             </f7-list-item>
 
+            <f7-list-item
+                class="account-edit-balancetime list-item-with-header-and-title"
+                link="#" no-chevron
+                v-show="account.balance"
+                v-if="!editAccountId"
+            >
+                <template #header>
+                    <div class="account-edit-balancetime-header" @click="showDateTimeDialog(account, 'time')">{{ $t('Balance Time') }}</div>
+                </template>
+                <template #title>
+                    <div class="account-edit-balancetime-title">
+                        <div @click="showDateTimeDialog(account, 'date')">{{ getAccountBalanceDate(account.balanceTime) }}</div>&nbsp;<div class="account-edit-balancetime-time" @click="showDateTimeDialog(account, 'time')">{{ getAccountBalanceTime(account.balanceTime) }}</div>
+                    </div>
+                </template>
+                <date-time-selection-sheet :init-mode="account.balanceDateTimeSheetMode"
+                                           v-model:show="account.showBalanceDateTimeSheet"
+                                           v-model="account.balanceTime">
+                </date-time-selection-sheet>
+            </f7-list-item>
+
             <f7-list-item :title="$t('Visible')" v-if="editAccountId">
                 <f7-toggle :checked="account.visible" @toggle:change="account.visible = $event"></f7-toggle>
             </f7-list-item>
@@ -381,6 +401,26 @@
                     ></number-pad-sheet>
                 </f7-list-item>
 
+                <f7-list-item
+                    class="account-edit-balancetime list-item-with-header-and-title"
+                    link="#" no-chevron
+                    v-show="subAccount.balance"
+                    v-if="!editAccountId"
+                >
+                    <template #header>
+                        <div class="account-edit-balancetime-header" @click="showDateTimeDialog(subAccount, 'time')">{{ $t('Sub-account Balance Time') }}</div>
+                    </template>
+                    <template #title>
+                        <div class="account-edit-balancetime-title">
+                            <div @click="showDateTimeDialog(subAccount, 'date')">{{ getAccountBalanceDate(subAccount.balanceTime) }}</div>&nbsp;<div class="account-edit-balancetime-time" @click="showDateTimeDialog(subAccount, 'time')">{{ getAccountBalanceTime(subAccount.balanceTime) }}</div>
+                        </div>
+                    </template>
+                    <date-time-selection-sheet :init-mode="subAccount.balanceDateTimeSheetMode"
+                                               v-model:show="subAccount.showBalanceDateTimeSheet"
+                                               v-model="subAccount.balanceTime">
+                    </date-time-selection-sheet>
+                </f7-list-item>
+
                 <f7-list-item :title="$t('Visible')" v-if="editAccountId">
                     <f7-toggle :checked="subAccount.visible" @toggle:change="subAccount.visible = $event"></f7-toggle>
                 </f7-list-item>
@@ -433,6 +473,11 @@ import {
     setAccountModelByAnotherAccount,
     setAccountSuitableIcon
 } from '@/lib/account.js';
+import {
+    getTimezoneOffsetMinutes,
+    getBrowserTimezoneOffsetMinutes,
+    getActualUnixTimeForStore
+} from '@/lib/datetime.js';
 
 export default {
     props: [
@@ -445,6 +490,8 @@ export default {
         newAccount.showIconSelectionSheet = false;
         newAccount.showColorSelectionSheet = false;
         newAccount.showBalanceSheet = false;
+        newAccount.showBalanceDateTimeSheet = false;
+        newAccount.balanceDateTimeSheetMode = 'time';
 
         return {
             editAccountId: null,
@@ -534,6 +581,8 @@ export default {
                         subAccount.showIconSelectionSheet = false;
                         subAccount.showColorSelectionSheet = false;
                         subAccount.showBalanceSheet = false;
+                        subAccount.showBalanceDateTimeSheet = false;
+                        subAccount.balanceDateTimeSheetMode = 'time';
 
                         self.subAccounts.push(subAccount);
                     }
@@ -566,6 +615,8 @@ export default {
             subAccount.showIconSelectionSheet = false;
             subAccount.showColorSelectionSheet = false;
             subAccount.showBalanceSheet = false;
+            subAccount.showBalanceDateTimeSheet = false;
+            subAccount.balanceDateTimeSheetMode = 'time';
 
             this.subAccounts.push(subAccount);
         },
@@ -639,6 +690,10 @@ export default {
                 }
             });
         },
+        showDateTimeDialog(account, sheetMode) {
+            account.balanceDateTimeSheetMode = sheetMode;
+            account.showBalanceDateTimeSheet = true;
+        },
         getCurrencyName(currencyCode) {
             return this.$locale.getCurrencyName(currencyCode);
         },
@@ -650,6 +705,12 @@ export default {
         },
         getAccountBalance(account) {
             return this.getDisplayCurrency(account.balance, account.currency);
+        },
+        getAccountBalanceDate(balanceTime) {
+            return this.$locale.formatUnixTimeToLongDate(this.userStore, getActualUnixTimeForStore(balanceTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+        },
+        getAccountBalanceTime(balanceTime) {
+            return this.$locale.formatUnixTimeToLongTime(this.userStore, getActualUnixTimeForStore(balanceTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
         },
         getDisplayCurrency(value, currencyCode) {
             return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, currencyCode);
@@ -694,6 +755,27 @@ export default {
 </script>
 
 <style>
+
+.account-edit-balancetime .item-title {
+    width: 100%;
+}
+
+.account-edit-balancetime .item-title > .item-header > .account-edit-balancetime-header {
+    display: block;
+    width: 100%;
+}
+
+.account-edit-balancetime .item-title > .account-edit-balancetime-title {
+    display: flex;
+    width: 100%;
+}
+
+.account-edit-balancetime .item-title > .account-edit-balancetime-title > .account-edit-balancetime-time {
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .subaccount-edit-list {
     --f7-list-group-title-height: 40px;
 }

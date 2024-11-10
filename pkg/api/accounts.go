@@ -217,7 +217,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 	}
 
 	mainAccount := a.createNewAccountModel(uid, &accountCreateReq, maxOrderId+1)
-	childrenAccounts := a.createSubAccountModels(uid, &accountCreateReq)
+	childrenAccounts, childrenAccountBalanceTimes := a.createSubAccountModels(uid, &accountCreateReq)
 
 	if a.CurrentConfig().EnableDuplicateSubmissionsCheck && accountCreateReq.ClientSessionId != "" {
 		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_ACCOUNT, uid, accountCreateReq.ClientSessionId)
@@ -255,7 +255,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 		}
 	}
 
-	err = a.accounts.CreateAccounts(c, mainAccount, childrenAccounts, utcOffset)
+	err = a.accounts.CreateAccounts(c, mainAccount, accountCreateReq.BalanceTime, childrenAccounts, childrenAccountBalanceTimes, utcOffset)
 
 	if err != nil {
 		log.Errorf(c, "[accounts.AccountCreateHandler] failed to create account \"id:%d\" for user \"uid:%d\", because %s", mainAccount.AccountId, uid, err.Error())
@@ -483,18 +483,20 @@ func (a *AccountsApi) createNewAccountModel(uid int64, accountCreateReq *models.
 	}
 }
 
-func (a *AccountsApi) createSubAccountModels(uid int64, accountCreateReq *models.AccountCreateRequest) []*models.Account {
+func (a *AccountsApi) createSubAccountModels(uid int64, accountCreateReq *models.AccountCreateRequest) ([]*models.Account, []int64) {
 	if len(accountCreateReq.SubAccounts) <= 0 {
-		return nil
+		return nil, nil
 	}
 
 	childrenAccounts := make([]*models.Account, len(accountCreateReq.SubAccounts))
+	childrenAccountBalanceTimes := make([]int64, len(accountCreateReq.SubAccounts))
 
 	for i := int32(0); i < int32(len(accountCreateReq.SubAccounts)); i++ {
 		childrenAccounts[i] = a.createNewAccountModel(uid, accountCreateReq.SubAccounts[i], i+1)
+		childrenAccountBalanceTimes[i] = accountCreateReq.SubAccounts[i].BalanceTime
 	}
 
-	return childrenAccounts
+	return childrenAccounts, childrenAccountBalanceTimes
 }
 
 func (a *AccountsApi) getToUpdateAccount(uid int64, accountModifyReq *models.AccountModifyRequest, oldAccount *models.Account) *models.Account {

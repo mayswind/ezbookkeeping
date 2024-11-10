@@ -195,7 +195,7 @@ func (s *AccountService) GetMaxSubAccountDisplayOrder(c core.Context, uid int64,
 }
 
 // CreateAccounts saves a new account model to database
-func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Account, childrenAccounts []*models.Account, utcOffset int16) error {
+func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Account, mainAccountBalanceTime int64, childrenAccounts []*models.Account, childrenAccountBalanceTimes []int64, utcOffset int16) error {
 	if mainAccount.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -230,8 +230,6 @@ func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Acco
 		}
 	}
 
-	transactionTime := utils.GetMinTransactionTimeFromUnixTime(now)
-
 	for i := 0; i < len(allAccounts); i++ {
 		allAccounts[i].Deleted = false
 		allAccounts[i].CreatedUnixTime = now
@@ -242,6 +240,14 @@ func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Acco
 
 			if transactionId < 1 {
 				return errs.ErrSystemIsBusy
+			}
+
+			transactionTime := utils.GetMinTransactionTimeFromUnixTime(now)
+
+			if i == 0 && mainAccountBalanceTime > 0 {
+				transactionTime = utils.GetMinTransactionTimeFromUnixTime(mainAccountBalanceTime)
+			} else if i > 0 && len(childrenAccountBalanceTimes) > i-1 && childrenAccountBalanceTimes[i-1] > 0 {
+				transactionTime = utils.GetMinTransactionTimeFromUnixTime(childrenAccountBalanceTimes[i-1])
 			}
 
 			newTransaction := &models.Transaction{

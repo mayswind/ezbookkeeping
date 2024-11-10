@@ -471,6 +471,75 @@ func (s *UserService) DisableUser(c core.Context, username string) error {
 	return nil
 }
 
+// UpdateUserFeatureRestriction sets user user feature restrictions
+func (s *UserService) UpdateUserFeatureRestriction(c core.Context, username string, featureRestriction core.UserFeatureRestrictions) error {
+	if username == "" {
+		return errs.ErrUsernameIsEmpty
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.User{
+		FeatureRestriction: featureRestriction,
+		UpdatedUnixTime:    now,
+	}
+
+	updatedRows, err := s.UserDB().NewSession(c).Cols("feature_restriction", "updated_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
+
+	if err != nil {
+		return err
+	} else if updatedRows < 1 {
+		return errs.ErrUserNotFound
+	}
+	return nil
+}
+
+// AddUserFeatureRestriction adds user user feature restrictions
+func (s *UserService) AddUserFeatureRestriction(c core.Context, username string, featureRestriction core.UserFeatureRestrictions) error {
+	if username == "" {
+		return errs.ErrUsernameIsEmpty
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.User{
+		FeatureRestriction: featureRestriction,
+		UpdatedUnixTime:    now,
+	}
+
+	updatedRows, err := s.UserDB().NewSession(c).SetExpr("feature_restriction", fmt.Sprintf("feature_restriction|(%d)", updateModel.FeatureRestriction)).Cols("updated_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
+
+	if err != nil {
+		return err
+	} else if updatedRows < 1 {
+		return errs.ErrUserNotFound
+	}
+	return nil
+}
+
+// RemoveUserFeatureRestriction removes user user feature restrictions
+func (s *UserService) RemoveUserFeatureRestriction(c core.Context, username string, featureRestriction core.UserFeatureRestrictions) error {
+	if username == "" {
+		return errs.ErrUsernameIsEmpty
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.User{
+		FeatureRestriction: ^featureRestriction,
+		UpdatedUnixTime:    now,
+	}
+
+	updatedRows, err := s.UserDB().NewSession(c).SetExpr("feature_restriction", fmt.Sprintf("feature_restriction&(%d)", updateModel.FeatureRestriction)).Cols("updated_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
+
+	if err != nil {
+		return err
+	} else if updatedRows < 1 {
+		return errs.ErrUserNotFound
+	}
+	return nil
+}
+
 // SetUserEmailVerified sets user email address verified
 func (s *UserService) SetUserEmailVerified(c core.Context, username string) error {
 	if username == "" {

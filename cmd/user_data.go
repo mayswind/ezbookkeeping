@@ -115,6 +115,63 @@ var UserData = &cli.Command{
 			},
 		},
 		{
+			Name:   "user-set-restrict-features",
+			Usage:  "Set restrictions of user features",
+			Action: bindAction(setUserFeatureRestriction),
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "username",
+					Aliases:  []string{"n"},
+					Required: true,
+					Usage:    "Specific user name",
+				},
+				&cli.StringFlag{
+					Name:     "features",
+					Aliases:  []string{"t"},
+					Required: true,
+					Usage:    "Specific feature types (feature types separated by commas)",
+				},
+			},
+		},
+		{
+			Name:   "user-add-restrict-features",
+			Usage:  "Add restrictions of user features",
+			Action: bindAction(addUserFeatureRestriction),
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "username",
+					Aliases:  []string{"n"},
+					Required: true,
+					Usage:    "Specific user name",
+				},
+				&cli.StringFlag{
+					Name:     "features",
+					Aliases:  []string{"t"},
+					Required: true,
+					Usage:    "Specific feature types (feature types separated by commas)",
+				},
+			},
+		},
+		{
+			Name:   "user-remove-restrict-features",
+			Usage:  "Remove restrictions of user features",
+			Action: bindAction(removeUserFeatureRestriction),
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "username",
+					Aliases:  []string{"n"},
+					Required: true,
+					Usage:    "Specific user name",
+				},
+				&cli.StringFlag{
+					Name:     "features",
+					Aliases:  []string{"t"},
+					Required: true,
+					Usage:    "Specific feature types (feature types separated by commas)",
+				},
+			},
+		},
+		{
 			Name:   "user-resend-verify-email",
 			Usage:  "Resend user verify email",
 			Action: bindAction(resendUserVerifyEmail),
@@ -432,6 +489,81 @@ func disableUser(c *core.CliContext) error {
 	}
 
 	log.CliInfof(c, "[user_data.disableUser] user \"%s\" has been set disabled", username)
+
+	return nil
+}
+
+func setUserFeatureRestriction(c *core.CliContext) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	username := c.String("username")
+	featureRestriction := core.ParseUserFeatureRestrictions(c.String("features"))
+	err = clis.UserData.SetUserFeatureRestrictions(c, username, featureRestriction)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.setUserFeatureRestriction] error occurs when setting user feature restriction")
+		return err
+	}
+
+	log.CliInfof(c, "[user_data.setUserFeatureRestriction] user \"%s\" has been set new feature restriction", username)
+
+	return nil
+}
+
+func addUserFeatureRestriction(c *core.CliContext) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	username := c.String("username")
+	featureRestriction := core.ParseUserFeatureRestrictions(c.String("features"))
+
+	if featureRestriction < 1 {
+		log.CliErrorf(c, "[user_data.addUserFeatureRestriction] nothing has been modified")
+		return nil
+	}
+
+	err = clis.UserData.AddUserFeatureRestrictions(c, username, featureRestriction)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.addUserFeatureRestriction] error occurs when adding user feature restriction")
+		return err
+	}
+
+	log.CliInfof(c, "[user_data.addUserFeatureRestriction] user \"%s\" has been add new feature restriction", username)
+
+	return nil
+}
+
+func removeUserFeatureRestriction(c *core.CliContext) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	username := c.String("username")
+	featureRestriction := core.ParseUserFeatureRestrictions(c.String("features"))
+
+	if featureRestriction < 1 {
+		log.CliErrorf(c, "[user_data.removeUserFeatureRestriction] nothing has been modified")
+		return nil
+	}
+
+	err = clis.UserData.RemoveUserFeatureRestrictions(c, username, featureRestriction)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.removeUserFeatureRestriction] error occurs when removing user feature restriction")
+		return err
+	}
+
+	log.CliInfof(c, "[user_data.removeUserFeatureRestriction] user \"%s\" has been removed new feature restriction", username)
 
 	return nil
 }

@@ -238,6 +238,57 @@ func (l *UserDataCli) DisableUser(c *core.CliContext, username string) error {
 	return nil
 }
 
+// SetUserFeatureRestrictions sets user feature restrictions according to the specified user name
+func (l *UserDataCli) SetUserFeatureRestrictions(c *core.CliContext, username string, featureRestriction core.UserFeatureRestrictions) error {
+	if username == "" {
+		log.CliErrorf(c, "[user_data.SetUserFeatureRestrictions] user name is empty")
+		return errs.ErrUsernameIsEmpty
+	}
+
+	err := l.users.UpdateUserFeatureRestriction(c, username, featureRestriction)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.SetUserFeatureRestrictions] failed to set user feature restrictions by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	return nil
+}
+
+// AddUserFeatureRestrictions adds user feature restrictions according to the specified user name
+func (l *UserDataCli) AddUserFeatureRestrictions(c *core.CliContext, username string, featureRestriction core.UserFeatureRestrictions) error {
+	if username == "" {
+		log.CliErrorf(c, "[user_data.AddUserFeatureRestrictions] user name is empty")
+		return errs.ErrUsernameIsEmpty
+	}
+
+	err := l.users.AddUserFeatureRestriction(c, username, featureRestriction)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.AddUserFeatureRestrictions] failed to add user feature restrictions by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	return nil
+}
+
+// RemoveUserFeatureRestrictions removes user feature restrictions according to the specified user name
+func (l *UserDataCli) RemoveUserFeatureRestrictions(c *core.CliContext, username string, featureRestriction core.UserFeatureRestrictions) error {
+	if username == "" {
+		log.CliErrorf(c, "[user_data.RemoveUserFeatureRestrictions] user name is empty")
+		return errs.ErrUsernameIsEmpty
+	}
+
+	err := l.users.RemoveUserFeatureRestriction(c, username, featureRestriction)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.RemoveUserFeatureRestrictions] failed to remove user feature restrictions by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	return nil
+}
+
 // ResendVerifyEmail resends an email with account activation link
 func (l *UserDataCli) ResendVerifyEmail(c *core.CliContext, username string) error {
 	if !l.CurrentConfig().EnableUserVerifyEmail {

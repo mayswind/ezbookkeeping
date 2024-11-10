@@ -7,6 +7,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestTransactionTemplateGetTagIds(t *testing.T) {
+	template := &TransactionTemplate{
+		TagIds: "1,2,3",
+	}
+
+	expectedValue := []int64{1, 2, 3}
+	assert.EqualValues(t, expectedValue, template.GetTagIds())
+}
+
 func TestTransactionTemplateInfoResponseSliceLess(t *testing.T) {
 	var transactionTemplateRespSlice TransactionTemplateInfoResponseSlice
 	transactionTemplateRespSlice = append(transactionTemplateRespSlice, &TransactionTemplateInfoResponse{

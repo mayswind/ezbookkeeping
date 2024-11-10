@@ -5,7 +5,95 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
+
+func TestTransactionAmountsRequestGetTransactionAmountsRequestItems(t *testing.T) {
+	transactionAmountsRequest := &TransactionAmountsRequest{
+		Query: "name1_1234567890_1234567891|name2_1234567900_1234567901",
+	}
+
+	var expectedValue []*TransactionAmountsRequestItem
+	expectedValue = append(expectedValue, &TransactionAmountsRequestItem{
+		Name:      "name1",
+		StartTime: 1234567890,
+		EndTime:   1234567891,
+	})
+	expectedValue = append(expectedValue, &TransactionAmountsRequestItem{
+		Name:      "name2",
+		StartTime: 1234567900,
+		EndTime:   1234567901,
+	})
+
+	actualValue, err := transactionAmountsRequest.GetTransactionAmountsRequestItems()
+
+	assert.Nil(t, err)
+	assert.EqualValues(t, expectedValue, actualValue)
+}
+
+func TestTransactionAmountsRequestGetTransactionAmountsRequestItems_InvalidValue(t *testing.T) {
+	transactionAmountsRequest := &TransactionAmountsRequest{
+		Query: "name1_1234567890",
+	}
+
+	_, err := transactionAmountsRequest.GetTransactionAmountsRequestItems()
+	assert.NotNil(t, err)
+	assert.EqualError(t, err, errs.ErrQueryItemsInvalid.Message)
+
+	transactionAmountsRequest2 := &TransactionAmountsRequest{
+		Query: "name1_123456789f_1234567891",
+	}
+
+	_, err = transactionAmountsRequest2.GetTransactionAmountsRequestItems()
+	assert.NotNil(t, err)
+
+	transactionAmountsRequest3 := &TransactionAmountsRequest{
+		Query: "name1_1234567890_123456789f",
+	}
+
+	_, err = transactionAmountsRequest3.GetTransactionAmountsRequestItems()
+	assert.NotNil(t, err)
+}
+
+func TestYearMonthRangeRequestGetNumericYearMonthRange(t *testing.T) {
+	yearMonthRangeRequest := &YearMonthRangeRequest{
+		StartYearMonth: "2023-4",
+		EndYearMonth:   "2024-05",
+	}
+
+	startYear, startMonth, endYear, endMonth, err := yearMonthRangeRequest.GetNumericYearMonthRange()
+
+	assert.Nil(t, err)
+	assert.Equal(t, int32(2023), startYear)
+	assert.Equal(t, int32(4), startMonth)
+	assert.Equal(t, int32(2024), endYear)
+	assert.Equal(t, int32(5), endMonth)
+}
+
+func TestYearMonthRangeRequestGetNumericYearMonthRange_InvalidValues(t *testing.T) {
+	yearMonthRangeRequest := &YearMonthRangeRequest{
+		StartYearMonth: "2023/4",
+		EndYearMonth:   "2024/05",
+	}
+
+	_, _, _, _, err := yearMonthRangeRequest.GetNumericYearMonthRange()
+	assert.NotNil(t, err)
+
+	yearMonthRangeRequest2 := &YearMonthRangeRequest{
+		StartYearMonth: "2023-April",
+	}
+
+	_, _, _, _, err = yearMonthRangeRequest2.GetNumericYearMonthRange()
+	assert.NotNil(t, err)
+
+	yearMonthRangeRequest3 := &YearMonthRangeRequest{
+		EndYearMonth: "2024-May",
+	}
+
+	_, _, _, _, err = yearMonthRangeRequest3.GetNumericYearMonthRange()
+	assert.NotNil(t, err)
+}
 
 func TestTransactionInfoResponseSliceLess(t *testing.T) {
 	var transactionRespSlice TransactionInfoResponseSlice

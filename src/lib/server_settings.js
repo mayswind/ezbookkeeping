@@ -33,6 +33,10 @@ export function isDataImportingEnabled() {
     return getServerSetting('i') === 1;
 }
 
+export function getLoginPageTips() {
+    return getServerSetting('lpt');
+}
+
 export function getMapProvider() {
     return getServerSetting('m');
 }

@@ -5,6 +5,10 @@
             <f7-block class="login-page-tile margin-vertical-half">{{ $t('global.app.title') }}</f7-block>
         </f7-login-screen-title>
 
+        <f7-list inset v-if="tips">
+            <f7-block-footer>{{ tips }}</f7-block-footer>
+        </f7-list>
+
         <f7-list form dividers class="margin-bottom-half">
             <f7-list-input
                 type="text"
@@ -188,7 +192,8 @@ import apiConstants from '@/consts/api.js';
 import {
     isUserRegistrationEnabled,
     isUserForgetPasswordEnabled,
-    isUserVerifyEmailEnabled
+    isUserVerifyEmailEnabled,
+    getLoginPageTips
 } from '@/lib/server_settings.js';
 import { getDesktopVersionPath } from '@/lib/version.js';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
@@ -238,6 +243,9 @@ export default {
         },
         isUserForgetPasswordEnabled() {
             return isUserForgetPasswordEnabled();
+        },
+        tips() {
+            return this.$locale.getServerTipContent(getLoginPageTips());
         },
         inputIsEmpty() {
             return !this.username || !this.password;

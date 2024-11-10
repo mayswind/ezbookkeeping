@@ -41,6 +41,11 @@ func (a *ServerSettingsApi) ServerSettingsJavascriptHandler(c *core.WebContext) 
 	a.appendBooleanSetting(builder, "s", config.EnableScheduledTransaction)
 	a.appendBooleanSetting(builder, "e", config.EnableDataExport)
 	a.appendBooleanSetting(builder, "i", config.EnableDataImport)
+
+	if config.LoginPageTips.Enabled {
+		a.appendMultiLanguageTipSetting(builder, "lpt", config.LoginPageTips)
+	}
+
 	a.appendStringSetting(builder, "m", config.MapProvider)
 
 	if config.EnableMapDataFetchProxy &&
@@ -116,6 +121,26 @@ func (a *ServerSettingsApi) appendStringSetting(builder *strings.Builder, key st
 	a.appendEncodedString(builder, value)
 
 	builder.WriteString(";\n")
+}
+
+func (a *ServerSettingsApi) appendMultiLanguageTipSetting(builder *strings.Builder, key string, value settings.TipConfig) {
+	builder.WriteString(ezbookkeepingServerSettingsGlobalVariableFullName)
+	builder.WriteString("[")
+	a.appendEncodedString(builder, key)
+	builder.WriteString("]={\n")
+
+	builder.WriteString("'default'")
+	builder.WriteRune(':')
+	a.appendEncodedString(builder, value.DefaultContent)
+
+	for languageTag, content := range value.MultiLanguageContent {
+		builder.WriteString(",\n")
+		a.appendEncodedString(builder, languageTag)
+		builder.WriteRune(':')
+		a.appendEncodedString(builder, content)
+	}
+
+	builder.WriteString("\n};\n")
 }
 
 func (a *ServerSettingsApi) appendBooleanSetting(builder *strings.Builder, key string, value bool) {

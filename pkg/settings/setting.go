@@ -181,6 +181,13 @@ type MinIOConfig struct {
 	RootPath        string
 }
 
+// TipConfig represents a tip setting config
+type TipConfig struct {
+	Enabled              bool
+	DefaultContent       string
+	MultiLanguageContent map[string]string
+}
+
 // NotificationConfig represents a notification setting config
 type NotificationConfig struct {
 	Enabled              bool
@@ -288,6 +295,9 @@ type Config struct {
 	EnableDataExport  bool
 	EnableDataImport  bool
 	MaxImportFileSize uint32
+
+	// Tip
+	LoginPageTips TipConfig
 
 	// Notification
 	AfterRegisterNotification NotificationConfig
@@ -403,6 +413,12 @@ func LoadConfiguration(configFilePath string) (*Config, error) {
 	}
 
 	err = loadDataConfiguration(config, cfgFile, "data")
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = loadTipConfiguration(config, cfgFile, "tip")
 
 	if err != nil {
 		return nil, err
@@ -780,6 +796,12 @@ func loadDataConfiguration(config *Config, configFile *ini.File, sectionName str
 	return nil
 }
 
+func loadTipConfiguration(config *Config, configFile *ini.File, sectionName string) error {
+	config.LoginPageTips = getTipConfiguration(configFile, sectionName, "enable_tips_in_login_page", "login_page_tips_content")
+
+	return nil
+}
+
 func loadNotificationConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	config.AfterRegisterNotification = getNotificationConfiguration(configFile, sectionName, "enable_notification_after_register", "after_register_notification_content")
 	config.AfterLoginNotification = getNotificationConfiguration(configFile, sectionName, "enable_notification_after_login", "after_login_notification_content")
@@ -906,6 +928,27 @@ func getFinalPath(workingPath, p string) (string, error) {
 	}
 
 	return p, err
+}
+
+func getTipConfiguration(configFile *ini.File, sectionName string, enableKey string, contentKey string) TipConfig {
+	config := TipConfig{
+		Enabled:              getConfigItemBoolValue(configFile, sectionName, enableKey, false),
+		DefaultContent:       getConfigItemStringValue(configFile, sectionName, contentKey, ""),
+		MultiLanguageContent: make(map[string]string),
+	}
+
+	for languageTag := range locales.AllLanguages {
+		multiLanguageContentKey := strings.ToLower(languageTag)
+		multiLanguageContentKey = strings.Replace(multiLanguageContentKey, "-", "_", -1)
+		multiLanguageContentKey = contentKey + "_" + multiLanguageContentKey
+		content := getConfigItemStringValue(configFile, sectionName, multiLanguageContentKey, "")
+
+		if content != "" {
+			config.MultiLanguageContent[languageTag] = content
+		}
+	}
+
+	return config
 }
 
 func getNotificationConfiguration(configFile *ini.File, sectionName string, enableKey string, contentKey string) NotificationConfig {

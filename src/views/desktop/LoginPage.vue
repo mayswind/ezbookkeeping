@@ -24,6 +24,7 @@
                         <v-card-text>
                             <h4 class="text-h4 mb-2">{{ $t('Welcome to ezBookkeeping') }}</h4>
                             <p class="mb-0">{{ $t('Please log in with your ezBookkeeping account') }}</p>
+                            <p class="mt-1 mb-0" v-if="tips">{{ tips }}</p>
                         </v-card-text>
 
                         <v-card-text class="pb-0 mb-6">
@@ -179,7 +180,8 @@ import apiConstants from '@/consts/api.js';
 import {
     isUserRegistrationEnabled,
     isUserForgetPasswordEnabled,
-    isUserVerifyEmailEnabled
+    isUserVerifyEmailEnabled,
+    getLoginPageTips
 } from '@/lib/server_settings.js';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 
@@ -223,6 +225,9 @@ export default {
         },
         isUserForgetPasswordEnabled() {
             return isUserForgetPasswordEnabled();
+        },
+        tips() {
+            return this.$locale.getServerTipContent(getLoginPageTips());
         },
         inputIsEmpty() {
             return !this.username || !this.password;

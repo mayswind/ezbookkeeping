@@ -1435,6 +1435,20 @@ function getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccoun
     return ret;
 }
 
+function getServerTipContent(tipConfig, i18nGlobal) {
+    if (!tipConfig) {
+        return '';
+    }
+
+    const currentLanguage = getCurrentLanguageTag(i18nGlobal);
+
+    if (tipConfig[currentLanguage]) {
+        return tipConfig[currentLanguage];
+    }
+
+    return tipConfig.default || '';
+}
+
 function joinMultiText(textArray, translateFn) {
     if (!textArray || !textArray.length) {
         return '';
@@ -1707,6 +1721,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllSupportedImportFileTypes: () => getAllSupportedImportFileTypes(i18nGlobal, i18nGlobal.t),
         getEnableDisableOptions: () => getEnableDisableOptions(i18nGlobal.t),
         getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t),
+        getServerTipContent: (tipConfig) => getServerTipContent(tipConfig, i18nGlobal),
         joinMultiText: (textArray) => joinMultiText(textArray, i18nGlobal.t),
         setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),
         setTimeZone: (timezone) => setTimeZone(timezone),

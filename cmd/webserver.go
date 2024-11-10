@@ -103,6 +103,8 @@ func startWebServer(c *core.CliContext) error {
 	router.NoRoute(bindApi(api.Default.ApiNotFound))
 	router.NoMethod(bindApi(api.Default.MethodNotAllowed))
 
+	serverSettingsCacheStore := persistence.NewInMemoryStore(time.Minute)
+
 	router.StaticFile("/", filepath.Join(config.StaticRootPath, "index.html"))
 	router.Static("/js", filepath.Join(config.StaticRootPath, "js"))
 	router.Static("/css", filepath.Join(config.StaticRootPath, "css"))
@@ -114,12 +116,9 @@ func startWebServer(c *core.CliContext) error {
 	router.StaticFile("favicon.png", filepath.Join(config.StaticRootPath, "favicon.png"))
 	router.StaticFile("touchicon.png", filepath.Join(config.StaticRootPath, "touchicon.png"))
 	router.StaticFile("manifest.json", filepath.Join(config.StaticRootPath, "manifest.json"))
+	router.GET("/server_settings.js", bindCachedJs(api.ServerSettings.ServerSettingsJavascriptHandler, serverSettingsCacheStore))
 
-	mobileEntryRoute := router.Group("/mobile")
-	mobileEntryRoute.Use(bindMiddleware(middlewares.ServerSettingsCookie(config)))
-	{
-		mobileEntryRoute.StaticFile("/", filepath.Join(config.StaticRootPath, "mobile.html"))
-	}
+	router.StaticFile("/mobile", filepath.Join(config.StaticRootPath, "mobile.html"))
 	router.Static("/mobile/js", filepath.Join(config.StaticRootPath, "js"))
 	router.Static("/mobile/css", filepath.Join(config.StaticRootPath, "css"))
 	router.Static("/mobile/img", filepath.Join(config.StaticRootPath, "img"))
@@ -129,16 +128,13 @@ func startWebServer(c *core.CliContext) error {
 	router.StaticFile("/mobile/touchicon.png", filepath.Join(config.StaticRootPath, "touchicon.png"))
 	router.StaticFile("/mobile/manifest.json", filepath.Join(config.StaticRootPath, "manifest.json"))
 	router.StaticFile("/mobile/sw.js", filepath.Join(config.StaticRootPath, "sw.js"))
+	router.GET("/mobile/server_settings.js", bindCachedJs(api.ServerSettings.ServerSettingsJavascriptHandler, serverSettingsCacheStore))
 
 	for i := 0; i < len(workboxFileNames); i++ {
 		router.StaticFile("/mobile/"+workboxFileNames[i], filepath.Join(config.StaticRootPath, workboxFileNames[i]))
 	}
 
-	desktopEntryRoute := router.Group("/desktop")
-	desktopEntryRoute.Use(bindMiddleware(middlewares.ServerSettingsCookie(config)))
-	{
-		desktopEntryRoute.StaticFile("/", filepath.Join(config.StaticRootPath, "desktop.html"))
-	}
+	router.StaticFile("/desktop", filepath.Join(config.StaticRootPath, "desktop.html"))
 	router.Static("/desktop/js", filepath.Join(config.StaticRootPath, "js"))
 	router.Static("/desktop/css", filepath.Join(config.StaticRootPath, "css"))
 	router.Static("/desktop/img", filepath.Join(config.StaticRootPath, "img"))
@@ -148,6 +144,7 @@ func startWebServer(c *core.CliContext) error {
 	router.StaticFile("/desktop/touchicon.png", filepath.Join(config.StaticRootPath, "touchicon.png"))
 	router.StaticFile("/desktop/manifest.json", filepath.Join(config.StaticRootPath, "manifest.json"))
 	router.StaticFile("/desktop/sw.js", filepath.Join(config.StaticRootPath, "sw.js"))
+	router.GET("/desktop/server_settings.js", bindCachedJs(api.ServerSettings.ServerSettingsJavascriptHandler, serverSettingsCacheStore))
 
 	for i := 0; i < len(workboxFileNames); i++ {
 		router.StaticFile("/desktop/"+workboxFileNames[i], filepath.Join(config.StaticRootPath, workboxFileNames[i]))
@@ -170,11 +167,6 @@ func startWebServer(c *core.CliContext) error {
 	}
 
 	router.GET("/healthz.json", bindApi(api.Healths.HealthStatusHandler))
-
-	if config.Mode == settings.MODE_DEVELOPMENT {
-		devRoute := router.Group("/dev")
-		devRoute.GET("/cookies", bindMiddleware(middlewares.ServerSettingsCookie(config)))
-	}
 
 	proxyRoute := router.Group("/proxy")
 	proxyRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByQueryString))
@@ -418,6 +410,19 @@ func bindApiWithTokenUpdate(fn core.ApiHandlerFunc, config *settings.Config) gin
 			utils.PrintJsonSuccessResult(c, result)
 		}
 	}
+}
+
+func bindCachedJs(fn core.DataHandlerFunc, store persistence.CacheStore) gin.HandlerFunc {
+	return cache.CachePage(store, time.Minute, func(ginCtx *gin.Context) {
+		c := core.WrapWebContext(ginCtx)
+		result, _, err := fn(c)
+
+		if err != nil {
+			utils.PrintDataErrorResult(c, "text/javascript", err)
+		} else {
+			utils.PrintDataSuccessResult(c, "text/javascript", "", result)
+		}
+	})
 }
 
 func bindCsv(fn core.DataHandlerFunc) gin.HandlerFunc {

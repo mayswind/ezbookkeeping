@@ -290,12 +290,6 @@
         "licenseUrl": "https://github.com/zenorocha/clipboard.js/blob/v2.0.11/LICENSE"
     },
     {
-        "name": "js-cookie",
-        "copyright": "Copyright (c) 2018 Copyright 2018 Klaus Hartl, Fagner Brack, GitHub Contributors",
-        "url": "https://github.com/js-cookie/js-cookie",
-        "licenseUrl": "https://github.com/js-cookie/js-cookie/blob/v3.0.5/LICENSE"
-    },
-    {
         "name": "UAParser.js",
         "copyright": "Copyright (c) 2012-2024 Faisal Salman <f@faisalman.com>",
         "url": "https://github.com/faisalman/ua-parser-js",

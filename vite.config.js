@@ -191,7 +191,15 @@ export default defineConfig(async () => {
             port: 8081,
             strictPort: true,
             proxy: {
-                '/dev': {
+                '/server_settings.js': {
+                    target: 'http://127.0.0.1:8080/',
+                    changeOrigin: true
+                },
+                '/mobile/server_settings.js': {
+                    target: 'http://127.0.0.1:8080/',
+                    changeOrigin: true
+                },
+                '/desktop/server_settings.js': {
                     target: 'http://127.0.0.1:8080/',
                     changeOrigin: true
                 },

@@ -1,60 +1,36 @@
-import Cookies from 'js-cookie';
-
-import { base64decode } from './common.js';
-
-const serverSettingsCookieKey = 'ebk_server_settings';
+const serverSettingsGlobalVariableName = 'EZBOOKKEEPING_SERVER_SETTINGS';
 
 function getServerSetting(key) {
-    const settings = Cookies.get(serverSettingsCookieKey) || '';
-    const settingsArr = settings.split('_');
-
-    for (let i = 0; i < settingsArr.length; i++) {
-        const pairs = settingsArr[i].split('.');
-
-        if (pairs[0] === key) {
-            return pairs[1];
-        }
-    }
-
-    return undefined;
-}
-
-function getServerDecodedSetting(key) {
-    const value = getServerSetting(key);
-
-    if (!value) {
-        return value;
-    }
-
-    return decodeURIComponent(base64decode(value));
+    const settings = window[serverSettingsGlobalVariableName] || {};
+    return settings[key];
 }
 
 export function isUserRegistrationEnabled() {
-    return getServerSetting('r') === '1';
+    return getServerSetting('r') === 1;
 }
 
 export function isUserForgetPasswordEnabled() {
-    return getServerSetting('f') === '1';
+    return getServerSetting('f') === 1;
 }
 
 export function isUserVerifyEmailEnabled() {
-    return getServerSetting('v') === '1';
+    return getServerSetting('v') === 1;
 }
 
 export function isTransactionPicturesEnabled() {
-    return getServerSetting('p') === '1';
+    return getServerSetting('p') === 1;
 }
 
 export function isUserScheduledTransactionEnabled() {
-    return getServerSetting('s') === '1';
+    return getServerSetting('s') === 1;
 }
 
 export function isDataExportingEnabled() {
-    return getServerSetting('e') === '1';
+    return getServerSetting('e') === 1;
 }
 
 export function isDataImportingEnabled() {
-    return getServerSetting('i') === '1';
+    return getServerSetting('i') === 1;
 }
 
 export function getMapProvider() {
@@ -62,19 +38,19 @@ export function getMapProvider() {
 }
 
 export function isMapDataFetchProxyEnabled() {
-    return getServerSetting('mp') === '1';
+    return getServerSetting('mp') === 1;
 }
 
 export function getCustomMapTileLayerUrl() {
-    return getServerDecodedSetting('cmsu');
+    return getServerSetting('cmsu');
 }
 
 export function getCustomMapAnnotationLayerUrl() {
-    return getServerDecodedSetting('cmau');
+    return getServerSetting('cmau');
 }
 
 export function isCustomMapAnnotationLayerDataFetchProxyEnabled() {
-    return getServerSetting('cmap') === '1';
+    return getServerSetting('cmap') === 1;
 }
 
 export function getCustomMapMinZoomLevel() {
@@ -93,23 +69,23 @@ export function getCustomMapDefaultZoomLevel() {
 }
 
 export function getTomTomMapAPIKey() {
-    return getServerDecodedSetting('tmak');
+    return getServerSetting('tmak');
 }
 
 export function getTianDiTuMapAPIKey() {
-    return getServerDecodedSetting('tdak');
+    return getServerSetting('tdak');
 }
 
 export function getGoogleMapAPIKey() {
-    return getServerDecodedSetting('gmak');
+    return getServerSetting('gmak');
 }
 
 export function getBaiduMapAK() {
-    return getServerDecodedSetting('bmak');
+    return getServerSetting('bmak');
 }
 
 export function getAmapApplicationKey() {
-    return getServerDecodedSetting('amak');
+    return getServerSetting('amak');
 }
 
 export function getAmapSecurityVerificationMethod() {
@@ -117,9 +93,9 @@ export function getAmapSecurityVerificationMethod() {
 }
 
 export function getAmapApiExternalProxyUrl() {
-    return getServerDecodedSetting('amep');
+    return getServerSetting('amep');
 }
 
 export function getAmapApplicationSecret() {
-    return getServerDecodedSetting('amas');
+    return getServerSetting('amas');
 }

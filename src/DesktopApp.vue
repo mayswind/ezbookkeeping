@@ -1,5 +1,4 @@
 <template>
-    <img style="display: none;" :src="devCookiePath" v-if="!isProduction" />
     <v-app>
         <router-view />
     </v-app>
@@ -35,8 +34,6 @@ import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 export default {
     data() {
         return {
-            isProduction: isProduction(),
-            devCookiePath: isProduction() ? '' : '/dev/cookies',
             showNotification: false
         }
     },

@@ -282,6 +282,7 @@ type Config struct {
 	EnableScheduledTransaction       bool
 	AvatarProvider                   core.UserAvatarProviderType
 	MaxAvatarFileSize                uint32
+	DefaultFeatureRestrictions       core.UserFeatureRestrictions
 
 	// Data
 	EnableDataExport  bool
@@ -766,6 +767,7 @@ func loadUserConfiguration(config *Config, configFile *ini.File, sectionName str
 	}
 
 	config.MaxAvatarFileSize = getConfigItemUint32Value(configFile, sectionName, "max_user_avatar_size", defaultUserAvatarFileMaxSize)
+	config.DefaultFeatureRestrictions = core.ParseUserFeatureRestrictions(getConfigItemStringValue(configFile, sectionName, "default_feature_restrictions", ""))
 
 	return nil
 }

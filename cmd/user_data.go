@@ -769,6 +769,7 @@ func printUserInfo(user *models.User) {
 	fmt.Printf("[CurrencyDisplayType] %s (%d)\n", user.CurrencyDisplayType, user.CurrencyDisplayType)
 	fmt.Printf("[ExpenseAmountColor] %s (%d)\n", user.ExpenseAmountColor, user.ExpenseAmountColor)
 	fmt.Printf("[IncomeAmountColor] %s (%d)\n", user.IncomeAmountColor, user.IncomeAmountColor)
+	fmt.Printf("[FeatureRestriction] %s (%d)\n", user.FeatureRestriction, user.FeatureRestriction)
 	fmt.Printf("[Deleted] %t\n", user.Deleted)
 	fmt.Printf("[EmailVerified] %t\n", user.EmailVerified)
 	fmt.Printf("[CreatedAt] %s (%d)\n", utils.FormatUnixTimeToLongDateTimeInServerTimezone(user.CreatedUnixTime), user.CreatedUnixTime)

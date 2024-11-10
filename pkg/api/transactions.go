@@ -1077,7 +1077,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 		return nil, errs.ErrUserNotFound
 	}
 
-	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_IMPORT_TRANSACTION) {
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_IMPORT_TRANSACTION) {
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 
@@ -1205,7 +1205,7 @@ func (a *TransactionsApi) TransactionImportHandler(c *core.WebContext) (any, *er
 		return nil, errs.ErrUserNotFound
 	}
 
-	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_IMPORT_TRANSACTION) {
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_IMPORT_TRANSACTION) {
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 

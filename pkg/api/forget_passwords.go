@@ -56,7 +56,7 @@ func (a *ForgetPasswordsApi) UserForgetPasswordRequestHandler(c *core.WebContext
 		return nil, errs.ErrUserIsDisabled
 	}
 
-	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_FORGET_PASSWORD) {
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_FORGET_PASSWORD) {
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 
@@ -113,7 +113,7 @@ func (a *ForgetPasswordsApi) UserResetPasswordHandler(c *core.WebContext) (any, 
 		return nil, errs.ErrUserIsDisabled
 	}
 
-	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_FORGET_PASSWORD) {
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_FORGET_PASSWORD) {
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 

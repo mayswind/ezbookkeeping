@@ -79,6 +79,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.WebContext) (any, *errs.Error) {
 		DefaultCurrency:      userRegisterReq.DefaultCurrency,
 		FirstDayOfWeek:       userRegisterReq.FirstDayOfWeek,
 		TransactionEditScope: models.TRANSACTION_EDIT_SCOPE_ALL,
+		FeatureRestriction:   a.CurrentConfig().DefaultFeatureRestrictions,
 	}
 
 	err = a.users.CreateUser(c, user)
@@ -259,7 +260,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 	}
 
 	if userUpdateReq.Email != "" && userUpdateReq.Email != user.Email {
-		if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_UPDATE_EMAIL) {
+		if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_UPDATE_EMAIL) {
 			return nil, errs.ErrNotPermittedToPerformThisAction
 		}
 
@@ -269,7 +270,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 	}
 
 	if userUpdateReq.Password != "" {
-		if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_UPDATE_PASSWORD) {
+		if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_UPDATE_PASSWORD) {
 			return nil, errs.ErrNotPermittedToPerformThisAction
 		}
 
@@ -438,7 +439,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 		userNew.IncomeAmountColor = models.AMOUNT_COLOR_TYPE_INVALID
 	}
 
-	if modifyProfileBasicInfo && user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_UPDATE_PROFILE_BASIC_INFO) {
+	if modifyProfileBasicInfo && user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_UPDATE_PROFILE_BASIC_INFO) {
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 
@@ -554,7 +555,7 @@ func (a *UsersApi) UserUpdateAvatarHandler(c *core.WebContext) (any, *errs.Error
 		return nil, errs.ErrUserNotFound
 	}
 
-	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_UPDATE_AVATAR) {
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_UPDATE_AVATAR) {
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 
@@ -621,7 +622,7 @@ func (a *UsersApi) UserRemoveAvatarHandler(c *core.WebContext) (any, *errs.Error
 		return nil, errs.ErrUserNotFound
 	}
 
-	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_UPDATE_AVATAR) {
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_UPDATE_AVATAR) {
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 

@@ -88,6 +88,7 @@ func (l *UserDataCli) AddNewUser(c *core.CliContext, username string, email stri
 		DefaultCurrency:      defaultCurrency,
 		FirstDayOfWeek:       core.WEEKDAY_SUNDAY,
 		TransactionEditScope: models.TRANSACTION_EDIT_SCOPE_ALL,
+		FeatureRestriction:   l.CurrentConfig().DefaultFeatureRestrictions,
 	}
 
 	err := l.users.CreateUser(c, user)

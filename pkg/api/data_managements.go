@@ -147,7 +147,7 @@ func (a *DataManagementsApi) ClearDataHandler(c *core.WebContext) (any, *errs.Er
 		return nil, errs.ErrUserPasswordWrong
 	}
 
-	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_CLEAR_ALL_DATA) {
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_CLEAR_ALL_DATA) {
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 
@@ -208,7 +208,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 		return nil, "", errs.ErrUserNotFound
 	}
 
-	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_EXPORT_TRANSACTION) {
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_EXPORT_TRANSACTION) {
 		return nil, "", errs.ErrNotPermittedToPerformThisAction
 	}
 

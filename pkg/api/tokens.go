@@ -146,7 +146,7 @@ func (a *TokensApi) TokenRevokeHandler(c *core.WebContext) (any, *errs.Error) {
 			return nil, errs.ErrUserNotFound
 		}
 
-		if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_REVOKE_OTHER_SESSION) {
+		if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_REVOKE_OTHER_SESSION) {
 			return nil, errs.ErrNotPermittedToPerformThisAction
 		}
 	}
@@ -200,7 +200,7 @@ func (a *TokensApi) TokenRevokeAllHandler(c *core.WebContext) (any, *errs.Error)
 		return nil, errs.ErrUserNotFound
 	}
 
-	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_REVOKE_OTHER_SESSION) {
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_REVOKE_OTHER_SESSION) {
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 

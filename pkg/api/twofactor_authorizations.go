@@ -81,7 +81,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableRequestHandler(c *core.WebCo
 		return nil, errs.ErrUserNotFound
 	}
 
-	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_ENABLE_2FA) {
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_ENABLE_2FA) {
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 
@@ -145,7 +145,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableConfirmHandler(c *core.WebCo
 		return nil, errs.ErrUserNotFound
 	}
 
-	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_ENABLE_2FA) {
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_ENABLE_2FA) {
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 
@@ -237,7 +237,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorDisableHandler(c *core.WebContext)
 		return nil, errs.ErrUserNotFound
 	}
 
-	if user.FeatureRestriction.Contains(models.USER_FEATURE_RESTRICTION_TYPE_DISABLE_2FA) {
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_DISABLE_2FA) {
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 

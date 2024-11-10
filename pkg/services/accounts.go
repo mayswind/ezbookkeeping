@@ -276,10 +276,31 @@ func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Acco
 
 		for i := 0; i < len(allInitTransactions); i++ {
 			transaction := allInitTransactions[i]
-			_, err := sess.Insert(transaction)
+			createdRows, err := sess.Insert(transaction)
 
-			if err != nil {
-				return err
+			if err != nil || createdRows < 1 { // maybe another transaction has same time
+				sameSecondLatestTransaction := &models.Transaction{}
+				minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
+				maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
+
+				has, err := sess.Where("uid=? AND transaction_time>=? AND transaction_time<=?", transaction.Uid, minTransactionTime, maxTransactionTime).OrderBy("transaction_time desc").Limit(1).Get(sameSecondLatestTransaction)
+
+				if err != nil {
+					return err
+				} else if !has {
+					return errs.ErrDatabaseOperationFailed
+				} else if sameSecondLatestTransaction.TransactionTime == maxTransactionTime-1 {
+					return errs.ErrTooMuchTransactionInOneSecond
+				}
+
+				transaction.TransactionTime = sameSecondLatestTransaction.TransactionTime + 1
+				createdRows, err := sess.Insert(transaction)
+
+				if err != nil {
+					return err
+				} else if createdRows < 1 {
+					return errs.ErrDatabaseOperationFailed
+				}
 			}
 		}
 

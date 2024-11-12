@@ -25,14 +25,14 @@ type BankOfIsraelDataSource struct {
 	ExchangeRatesDataSource
 }
 
-// bankOfIsraelExchangeRateData represents the whole data from bank of Israel
-type bankOfIsraelExchangeRateData struct {
+// BankOfIsraelExchangeRateData represents the whole data from bank of Israel
+type BankOfIsraelExchangeRateData struct {
 	XMLName          xml.Name                    `xml:"ExchangeRatesResponseCollectioDTO"`
-	AllExchangeRates []*bankOfIsraelExchangeRate `xml:"ExchangeRates>ExchangeRateResponseDTO"`
+	AllExchangeRates []*BankOfIsraelExchangeRate `xml:"ExchangeRates>ExchangeRateResponseDTO"`
 }
 
-// bankOfIsraelExchangeRate represents the exchange rate data from bank of Israel
-type bankOfIsraelExchangeRate struct {
+// BankOfIsraelExchangeRate represents the exchange rate data from bank of Israel
+type BankOfIsraelExchangeRate struct {
 	Currency   string `xml:"Key"`
 	Rate       string `xml:"CurrentExchangeRate"`
 	LastUpdate string `xml:"LastUpdate"`
@@ -40,7 +40,7 @@ type bankOfIsraelExchangeRate struct {
 }
 
 // ToLatestExchangeRateResponse returns a view-object according to original data from bank of Israel
-func (e *bankOfIsraelExchangeRateData) ToLatestExchangeRateResponse(c core.Context) *models.LatestExchangeRateResponse {
+func (e *BankOfIsraelExchangeRateData) ToLatestExchangeRateResponse(c core.Context) *models.LatestExchangeRateResponse {
 	if len(e.AllExchangeRates) < 1 {
 		log.Errorf(c, "[bank_of_israel_datasource.ToLatestExchangeRateResponse] all exchange rates is empty")
 		return nil
@@ -60,35 +60,13 @@ func (e *bankOfIsraelExchangeRateData) ToLatestExchangeRateResponse(c core.Conte
 			continue
 		}
 
-		rate, err := utils.StringToFloat64(exchangeRate.Rate)
+		finalExchangeRate := exchangeRate.ToLatestExchangeRate(c)
 
-		if err != nil {
-			log.Warnf(c, "[bank_of_israel_datasource.ToLatestExchangeRateResponse] failed to parse rate, rate is %s", exchangeRate.Rate)
+		if finalExchangeRate == nil {
 			continue
 		}
 
-		if rate <= 0 {
-			log.Warnf(c, "[bank_of_israel_datasource.ToLatestExchangeRateResponse] rate is invalid, rate is %s", exchangeRate.Rate)
-			continue
-		}
-
-		unit, err := utils.StringToFloat64(exchangeRate.Unit)
-
-		if err != nil {
-			log.Warnf(c, "[bank_of_israel_datasource.ToLatestExchangeRateResponse] failed to parse unit, unit is %s", exchangeRate.Unit)
-			continue
-		}
-
-		finalRate := unit / rate
-
-		if math.IsInf(finalRate, 0) {
-			continue
-		}
-
-		exchangeRates = append(exchangeRates, &models.LatestExchangeRate{
-			Currency: exchangeRate.Currency,
-			Rate:     utils.Float64ToString(finalRate),
-		})
+		exchangeRates = append(exchangeRates, finalExchangeRate)
 	}
 
 	updateTime, err := time.Parse(bankOfIsraelDataUpdateDateFormat, latestUpdateDate)
@@ -110,10 +88,35 @@ func (e *bankOfIsraelExchangeRateData) ToLatestExchangeRateResponse(c core.Conte
 }
 
 // ToLatestExchangeRate returns a data pair according to original data from bank of Israel
-func (e *bankOfIsraelExchangeRate) ToLatestExchangeRate() *models.LatestExchangeRate {
+func (e *BankOfIsraelExchangeRate) ToLatestExchangeRate(c core.Context) *models.LatestExchangeRate {
+	rate, err := utils.StringToFloat64(e.Rate)
+
+	if err != nil {
+		log.Warnf(c, "[bank_of_israel_datasource.ToLatestExchangeRate] failed to parse rate, currency is %s, rate is %s", e.Currency, e.Rate)
+		return nil
+	}
+
+	if rate <= 0 {
+		log.Warnf(c, "[bank_of_israel_datasource.ToLatestExchangeRate] rate is invalid, currency is %s, rate is %s", e.Currency, e.Rate)
+		return nil
+	}
+
+	unit, err := utils.StringToFloat64(e.Unit)
+
+	if err != nil {
+		log.Warnf(c, "[bank_of_israel_datasource.ToLatestExchangeRate] failed to parse unit, currency is %s, unit is %s", e.Currency, e.Unit)
+		return nil
+	}
+
+	finalRate := unit / rate
+
+	if math.IsInf(finalRate, 0) {
+		return nil
+	}
+
 	return &models.LatestExchangeRate{
 		Currency: e.Currency,
-		Rate:     e.Rate,
+		Rate:     utils.Float64ToString(finalRate),
 	}
 }
 
@@ -124,7 +127,7 @@ func (e *BankOfIsraelDataSource) GetRequestUrls() []string {
 
 // Parse returns the common response entity according to the bank of Israel data source raw response
 func (e *BankOfIsraelDataSource) Parse(c core.Context, content []byte) (*models.LatestExchangeRateResponse, error) {
-	bankOfIsraelData := &bankOfIsraelExchangeRateData{}
+	bankOfIsraelData := &BankOfIsraelExchangeRateData{}
 	err := xml.Unmarshal(content, bankOfIsraelData)
 
 	if err != nil {

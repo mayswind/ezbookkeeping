@@ -26,6 +26,15 @@ func TestInternationalMonetaryFundDataSource_StandardDataExtractBaseCurrency(t *
 	assert.Equal(t, "USD", actualLatestExchangeRateResponse.BaseCurrency)
 }
 
+func TestInternationalMonetaryFundDataSource_StandardDataExtractUpdateTime(t *testing.T) {
+	dataSource := &InternationalMonetaryFundDataSource{}
+	context := core.NewNullContext()
+
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(internationalMonetaryFundMinimumRequiredContent))
+	assert.Equal(t, nil, err)
+	assert.Equal(t, int64(1724857200), actualLatestExchangeRateResponse.UpdateTime)
+}
+
 func TestInternationalMonetaryFundDataSource_StandardDataExtractExchangeRates(t *testing.T) {
 	dataSource := &InternationalMonetaryFundDataSource{}
 	context := core.NewNullContext()

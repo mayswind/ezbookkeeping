@@ -23,6 +23,15 @@ func TestCzechNationalBankDataSource_StandardDataExtractBaseCurrency(t *testing.
 	assert.Equal(t, "CZK", actualLatestExchangeRateResponse.BaseCurrency)
 }
 
+func TestCzechNationalBankDataSource_StandardDataExtractUpdateTime(t *testing.T) {
+	dataSource := &CzechNationalBankDataSource{}
+	context := core.NewNullContext()
+
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(czechNationalBankMinimumRequiredContent))
+	assert.Equal(t, nil, err)
+	assert.Equal(t, int64(1617280200), actualLatestExchangeRateResponse.UpdateTime)
+}
+
 func TestCzechNationalBankDataSource_StandardDataExtractExchangeRates(t *testing.T) {
 	dataSource := &CzechNationalBankDataSource{}
 	context := core.NewNullContext()

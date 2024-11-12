@@ -38,6 +38,15 @@ func TestBankOfCanadaDataSource_StandardDataExtractBaseCurrency(t *testing.T) {
 	assert.Equal(t, "CAD", actualLatestExchangeRateResponse.BaseCurrency)
 }
 
+func TestBankOfCanadaDataSource_StandardDataExtractUpdateTime(t *testing.T) {
+	dataSource := &BankOfCanadaDataSource{}
+	context := core.NewNullContext()
+
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(bankOfCanadaMinimumRequiredContent))
+	assert.Equal(t, nil, err)
+	assert.Equal(t, int64(1617309000), actualLatestExchangeRateResponse.UpdateTime)
+}
+
 func TestBankOfCanadaDataSource_StandardDataExtractExchangeRates(t *testing.T) {
 	dataSource := &BankOfCanadaDataSource{}
 	context := core.NewNullContext()

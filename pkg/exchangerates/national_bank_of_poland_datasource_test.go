@@ -35,6 +35,15 @@ func TestNationalBankOfPolandDataSource_StandardDataExtractBaseCurrency(t *testi
 	assert.Equal(t, "PLN", actualLatestExchangeRateResponse.BaseCurrency)
 }
 
+func TestNationalBankOfPolandDataSource_StandardDataExtractUpdateTime(t *testing.T) {
+	dataSource := &NationalBankOfPolandDataSource{}
+	context := core.NewNullContext()
+
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(nationalBankOfPolandMinimumRequiredContent))
+	assert.Equal(t, nil, err)
+	assert.Equal(t, int64(1709118900), actualLatestExchangeRateResponse.UpdateTime)
+}
+
 func TestNationalBankOfPolandDataSource_StandardDataExtractExchangeRates(t *testing.T) {
 	dataSource := &NationalBankOfPolandDataSource{}
 	context := core.NewNullContext()

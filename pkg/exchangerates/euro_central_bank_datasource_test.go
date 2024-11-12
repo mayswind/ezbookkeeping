@@ -28,6 +28,15 @@ func TestEuroCentralBankDataSource_StandardDataExtractBaseCurrency(t *testing.T)
 	assert.Equal(t, "EUR", actualLatestExchangeRateResponse.BaseCurrency)
 }
 
+func TestEuroCentralBankDataSource_StandardDataExtractUpdateTime(t *testing.T) {
+	dataSource := &EuroCentralBankDataSource{}
+	context := core.NewNullContext()
+
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(euroCentralBankMinimumRequiredContent))
+	assert.Equal(t, nil, err)
+	assert.Equal(t, int64(1617285600), actualLatestExchangeRateResponse.UpdateTime)
+}
+
 func TestEuroCentralBankDataSource_StandardDataExtractExchangeRates(t *testing.T) {
 	dataSource := &EuroCentralBankDataSource{}
 	context := core.NewNullContext()

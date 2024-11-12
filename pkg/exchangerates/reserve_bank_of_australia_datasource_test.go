@@ -49,6 +49,15 @@ func TestReserveBankOfAustraliaDataSource_StandardDataExtractBaseCurrency(t *tes
 	assert.Equal(t, "AUD", actualLatestExchangeRateResponse.BaseCurrency)
 }
 
+func TestReserveBankOfAustraliaDataSource_StandardDataExtractUpdateTime(t *testing.T) {
+	dataSource := &ReserveBankOfAustraliaDataSource{}
+	context := core.NewNullContext()
+
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(reserveBankOfAustraliaMinimumRequiredContent))
+	assert.Equal(t, nil, err)
+	assert.Equal(t, int64(1617255900), actualLatestExchangeRateResponse.UpdateTime)
+}
+
 func TestReserveBankOfAustraliaDataSource_StandardDataExtractExchangeRates(t *testing.T) {
 	dataSource := &ReserveBankOfAustraliaDataSource{}
 	context := core.NewNullContext()

@@ -36,6 +36,15 @@ func TestBankOfIsraelDataSource_StandardDataExtractBaseCurrency(t *testing.T) {
 	assert.Equal(t, "ILS", actualLatestExchangeRateResponse.BaseCurrency)
 }
 
+func TestBankOfIsraelDataSource_StandardDataExtractUpdateTime(t *testing.T) {
+	dataSource := &BankOfIsraelDataSource{}
+	context := core.NewNullContext()
+
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(bankOfIsraelMinimumRequiredContent))
+	assert.Equal(t, nil, err)
+	assert.Equal(t, int64(1731331565), actualLatestExchangeRateResponse.UpdateTime)
+}
+
 func TestBankOfIsraelDataSource_StandardDataExtractExchangeRates(t *testing.T) {
 	dataSource := &BankOfIsraelDataSource{}
 	context := core.NewNullContext()

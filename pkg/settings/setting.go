@@ -106,6 +106,7 @@ const (
 	CzechNationalBankDataSource         string = "czech_national_bank"
 	NationalBankOfPolandDataSource      string = "national_bank_of_poland"
 	BankOfIsraelDataSource              string = "bank_of_israel"
+	SwissNationalBankDataSource         string = "swiss_national_bank"
 	InternationalMonetaryFundDataSource string = "international_monetary_fund"
 )
 
@@ -890,6 +891,8 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 		config.ExchangeRatesDataSource = NationalBankOfPolandDataSource
 	} else if dataSource == BankOfIsraelDataSource {
 		config.ExchangeRatesDataSource = BankOfIsraelDataSource
+	} else if dataSource == SwissNationalBankDataSource {
+		config.ExchangeRatesDataSource = SwissNationalBankDataSource
 	} else if dataSource == InternationalMonetaryFundDataSource {
 		config.ExchangeRatesDataSource = InternationalMonetaryFundDataSource
 	} else {

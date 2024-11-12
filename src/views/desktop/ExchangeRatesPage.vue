@@ -56,7 +56,7 @@
                     <v-main>
                         <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
                             <v-window-item value="exchangeRatesPage">
-                                <v-card variant="flat">
+                                <v-card variant="flat" min-height="680">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
                                             <v-btn class="mr-3 d-md-none" density="compact" color="default" variant="plain"

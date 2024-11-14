@@ -194,22 +194,22 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 			subAccount := accountCreateReq.SubAccounts[i]
 
 			if subAccount.Category != accountCreateReq.Category {
-				log.Warnf(c, "[accounts.AccountCreateHandler] category of sub-account not equals to parent")
+				log.Warnf(c, "[accounts.AccountCreateHandler] category of sub-account#%d not equals to parent", i)
 				return nil, errs.ErrSubAccountCategoryNotEqualsToParent
 			}
 
 			if subAccount.Type != models.ACCOUNT_TYPE_SINGLE_ACCOUNT {
-				log.Warnf(c, "[accounts.AccountCreateHandler] sub-account type invalid")
+				log.Warnf(c, "[accounts.AccountCreateHandler] sub-account#%d type invalid", i)
 				return nil, errs.ErrSubAccountTypeInvalid
 			}
 
 			if subAccount.Currency == validators.ParentAccountCurrencyPlaceholder {
-				log.Warnf(c, "[accounts.AccountCreateHandler] sub-account cannot set currency placeholder")
+				log.Warnf(c, "[accounts.AccountCreateHandler] sub-account#%d cannot set currency placeholder", i)
 				return nil, errs.ErrAccountCurrencyInvalid
 			}
 
 			if subAccount.Balance != 0 && subAccount.BalanceTime <= 0 {
-				log.Warnf(c, "[accounts.AccountCreateHandler] sub-account balance time is not set")
+				log.Warnf(c, "[accounts.AccountCreateHandler] sub-account#%d balance time is not set", i)
 				return nil, errs.ErrAccountBalanceTimeNotSet
 			}
 		}

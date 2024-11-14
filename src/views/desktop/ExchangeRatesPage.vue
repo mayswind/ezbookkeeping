@@ -176,7 +176,7 @@ export default {
             return exchangeRatesLastUpdateTime ? this.$locale.formatUnixTimeToLongDate(this.userStore, exchangeRatesLastUpdateTime) : '';
         },
         availableExchangeRates() {
-            return this.$locale.getAllDisplayExchangeRates(this.exchangeRatesData);
+            return this.$locale.getAllDisplayExchangeRates(this.settingsStore, this.exchangeRatesData);
         }
     },
     created() {

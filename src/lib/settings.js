@@ -1,4 +1,5 @@
 import timezoneConstants from '@/consts/timezone.js';
+import currencyConstants from '@/consts/currency.js';
 import statisticsConstants from '@/consts/statistics.js';
 
 const settingsLocalStorageKey = 'ebk_app_settings';
@@ -19,6 +20,7 @@ const defaultSettings = {
     showTotalAmountInTransactionListPage: true,
     showTagInTransactionListPage: true,
     showAccountBalance: true,
+    currencySortByInExchangeRatesPage: currencyConstants.defaultCurrencySortingType,
     statistics: {
         defaultChartDataType: statisticsConstants.defaultChartDataType,
         defaultTimezoneType: timezoneConstants.defaultTimezoneTypesUsedForStatistics,
@@ -220,6 +222,14 @@ export function isShowAccountBalance() {
 
 export function setShowAccountBalance(value) {
     setOption('showAccountBalance', value);
+}
+
+export function getCurrencySortByInExchangeRatesPage() {
+    return getOption('currencySortByInExchangeRatesPage');
+}
+
+export function setCurrencySortByInExchangeRatesPage(value) {
+    setOption('currencySortByInExchangeRatesPage', value);
 }
 
 export function getStatisticsDefaultChartDataType() {

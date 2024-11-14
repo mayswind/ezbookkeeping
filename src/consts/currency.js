@@ -1250,6 +1250,29 @@ const defaultCurrency = allCurrencies.USD.code;
 const defaultCurrencyDisplayType = allCurrencyDisplayType.SymbolBeforeAmount;
 const defaultCurrencyDisplayTypeValue = 0;
 
+const allCurrencySortingTypes = {
+    Name: {
+        type: 0,
+        name: 'Currency Name'
+    },
+    CurrencyCode: {
+        type: 1,
+        name: 'Currency Code'
+    },
+    ExchangeRate: {
+        type: 2,
+        name: 'Exchange Rate'
+    }
+};
+
+const allCurrencySortingTypesArray = [
+    allCurrencySortingTypes.Name,
+    allCurrencySortingTypes.CurrencyCode,
+    allCurrencySortingTypes.ExchangeRate
+]
+
+const defaultCurrencySortingType = allCurrencySortingTypes.Name.type;
+
 export default {
     parentAccountCurrencyPlaceholder: parentAccountCurrencyPlaceholder,
     defaultCurrencySymbol: defaultCurrencySymbol,
@@ -1261,5 +1284,8 @@ export default {
     allCurrencyDisplayTypeArray: allCurrencyDisplayTypeArray,
     allCurrencyDisplayTypeMap: allCurrencyDisplayTypeMap,
     defaultCurrencyDisplayType: defaultCurrencyDisplayType,
-    defaultCurrencyDisplayTypeValue: defaultCurrencyDisplayTypeValue
+    defaultCurrencyDisplayTypeValue: defaultCurrencyDisplayTypeValue,
+    allCurrencySortingTypes: allCurrencySortingTypes,
+    allCurrencySortingTypesArray: allCurrencySortingTypesArray,
+    defaultCurrencySortingType: defaultCurrencySortingType
 };

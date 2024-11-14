@@ -48,6 +48,19 @@
                 <f7-toggle :checked="isAutoGetCurrentGeoLocation" @toggle:change="isAutoGetCurrentGeoLocation = $event"></f7-toggle>
             </f7-list-item>
         </f7-list>
+
+        <f7-block-title>{{ $t('Exchange Rates Data Page') }}</f7-block-title>
+        <f7-list strong inset dividers>
+            <f7-list-item
+                :title="$t('Sort by')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Sort by'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                <select v-model="currencySortByInExchangeRatesPage">
+                    <option :value="sortingType.type"
+                            :key="sortingType.type"
+                            v-for="sortingType in allCurrencySortingTypes">{{ sortingType.displayName }}</option>
+                </select>
+            </f7-list-item>
+        </f7-list>
     </f7-page>
 </template>
 
@@ -62,6 +75,9 @@ export default {
         ...mapStores(useSettingsStore, useTransactionsStore, useOverviewStore),
         allTimezoneTypesUsedForStatistics() {
             return this.$locale.getAllTimezoneTypesUsedForStatistics();
+        },
+        allCurrencySortingTypes() {
+            return this.$locale.getAllCurrencySortingTypes();
         },
         showAmountInHomePage: {
             get: function () {
@@ -114,6 +130,14 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setAutoGetCurrentGeoLocation(value);
+            }
+        },
+        currencySortByInExchangeRatesPage: {
+            get: function () {
+                return this.settingsStore.appSettings.currencySortByInExchangeRatesPage;
+            },
+            set: function (value) {
+                this.settingsStore.setCurrencySortByInExchangeRatesPage(value);
             }
         }
     }

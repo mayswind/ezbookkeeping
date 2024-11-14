@@ -177,6 +177,28 @@
                 </v-form>
             </v-card>
         </v-col>
+
+        <v-col cols="12">
+            <v-card :title="$t('Exchange Rates Data Page')">
+                <v-form>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :label="$t('Sort by')"
+                                    :placeholder="$t('Sort by')"
+                                    :items="allCurrencySortingTypes"
+                                    v-model="currencySortByInExchangeRatesPage"
+                                />
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-form>
+            </v-card>
+        </v-col>
     </v-row>
 </template>
 
@@ -205,6 +227,9 @@ export default {
         },
         allTimezoneTypesUsedForStatistics() {
             return this.$locale.getAllTimezoneTypesUsedForStatistics(this.timeZone);
+        },
+        allCurrencySortingTypes() {
+            return this.$locale.getAllCurrencySortingTypes();
         },
         theme: {
             get: function () {
@@ -309,6 +334,14 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setAutoGetCurrentGeoLocation(value);
+            }
+        },
+        currencySortByInExchangeRatesPage: {
+            get: function () {
+                return this.settingsStore.appSettings.currencySortByInExchangeRatesPage;
+            },
+            set: function (value) {
+                this.settingsStore.setCurrencySortByInExchangeRatesPage(value);
             }
         }
     },

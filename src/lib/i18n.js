@@ -872,6 +872,25 @@ function getAllCurrencyDisplayTypes(userStore, settingsStore, translateFn) {
     return ret;
 }
 
+function getAllCurrencySortingTypes(translateFn) {
+    const allCurrencySortingTypes = [];
+
+    for (const sortingTypeField in currencyConstants.allCurrencySortingTypes) {
+        if (!Object.prototype.hasOwnProperty.call(currencyConstants.allCurrencySortingTypes, sortingTypeField)) {
+            continue;
+        }
+
+        const sortingType = currencyConstants.allCurrencySortingTypes[sortingTypeField];
+
+        allCurrencySortingTypes.push({
+            type: sortingType.type,
+            displayName: translateFn(sortingType.name)
+        });
+    }
+
+    return allCurrencySortingTypes;
+}
+
 function getCurrentDecimalSeparator(translateFn, decimalSeparator) {
     let decimalSeparatorType = numeralConstants.allDecimalSeparatorMap[decimalSeparator];
 
@@ -1265,7 +1284,7 @@ function getAllTransactionDefaultCategories(categoryType, locale, translateFn) {
     return allCategories;
 }
 
-function getAllDisplayExchangeRates(exchangeRatesData, translateFn) {
+function getAllDisplayExchangeRates(settingsStore, exchangeRatesData, translateFn) {
     if (!exchangeRatesData || !exchangeRatesData.exchangeRates) {
         return [];
     }
@@ -1282,9 +1301,28 @@ function getAllDisplayExchangeRates(exchangeRatesData, translateFn) {
         });
     }
 
-    availableExchangeRates.sort(function(c1, c2) {
-        return c1.currencyDisplayName.localeCompare(c2.currencyDisplayName);
-    })
+    if (settingsStore.appSettings.currencySortByInExchangeRatesPage === currencyConstants.allCurrencySortingTypes.Name.type) {
+        availableExchangeRates.sort(function(c1, c2) {
+            return c1.currencyDisplayName.localeCompare(c2.currencyDisplayName);
+        });
+    } else if (settingsStore.appSettings.currencySortByInExchangeRatesPage === currencyConstants.allCurrencySortingTypes.CurrencyCode.type) {
+        availableExchangeRates.sort(function(c1, c2) {
+            return c1.currencyCode.localeCompare(c2.currencyCode);
+        });
+    } else if (settingsStore.appSettings.currencySortByInExchangeRatesPage === currencyConstants.allCurrencySortingTypes.ExchangeRate.type) {
+        availableExchangeRates.sort(function(c1, c2) {
+            const rate1 = parseFloat(c1.rate);
+            const rate2 = parseFloat(c2.rate);
+
+            if (rate1 > rate2) {
+                return 1;
+            } else if (rate1 < rate2) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+    }
 
     return availableExchangeRates;
 }
@@ -1695,6 +1733,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllDigitGroupingSymbols: () => getAllDigitGroupingSymbols(i18nGlobal.t),
         getAllDigitGroupingTypes: () => getAllDigitGroupingTypes(i18nGlobal.t),
         getAllCurrencyDisplayTypes: (settingsStore, userStore) => getAllCurrencyDisplayTypes(userStore, settingsStore, i18nGlobal.t),
+        getAllCurrencySortingTypes: () => getAllCurrencySortingTypes(i18nGlobal.t),
         getCurrentDecimalSeparator: (userStore) => getCurrentDecimalSeparator(i18nGlobal.t, userStore.currentUserDecimalSeparator),
         getCurrentDigitGroupingSymbol: (userStore) => getCurrentDigitGroupingSymbol(i18nGlobal.t, userStore.currentUserDigitGroupingSymbol),
         getCurrentDigitGroupingType: (userStore) => getCurrentDigitGroupingType(i18nGlobal.t, userStore.currentUserDigitGrouping),
@@ -1717,7 +1756,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllTransactionEditScopeTypes: () => getAllTransactionEditScopeTypes(i18nGlobal.t),
         getAllTransactionScheduledFrequencyTypes: () => getAllTransactionScheduledFrequencyTypes(i18nGlobal.t),
         getAllTransactionDefaultCategories: (categoryType, locale) => getAllTransactionDefaultCategories(categoryType, locale, i18nGlobal.t),
-        getAllDisplayExchangeRates: (exchangeRatesData) => getAllDisplayExchangeRates(exchangeRatesData, i18nGlobal.t),
+        getAllDisplayExchangeRates: (settingsStore, exchangeRatesData) => getAllDisplayExchangeRates(settingsStore, exchangeRatesData, i18nGlobal.t),
         getAllSupportedImportFileTypes: () => getAllSupportedImportFileTypes(i18nGlobal, i18nGlobal.t),
         getEnableDisableOptions: () => getEnableDisableOptions(i18nGlobal.t),
         getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t),

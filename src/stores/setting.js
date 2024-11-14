@@ -21,6 +21,7 @@ export const useSettingsStore = defineStore('settings', {
             showTotalAmountInTransactionListPage: settings.isShowTotalAmountInTransactionListPage(),
             showTagInTransactionListPage: settings.isShowTagInTransactionListPage(),
             showAccountBalance: settings.isShowAccountBalance(),
+            currencySortByInExchangeRatesPage: settings.getCurrencySortByInExchangeRatesPage(),
             statistics: {
                 defaultChartDataType: settings.getStatisticsDefaultChartDataType(),
                 defaultTimezoneType: settings.getStatisticsDefaultTimezoneType(),
@@ -95,6 +96,10 @@ export const useSettingsStore = defineStore('settings', {
         setShowAccountBalance(value) {
             settings.setShowAccountBalance(value);
             this.appSettings.showAccountBalance = value;
+        },
+        setCurrencySortByInExchangeRatesPage(value) {
+            settings.setCurrencySortByInExchangeRatesPage(value);
+            this.appSettings.currencySortByInExchangeRatesPage = value;
         },
         setStatisticsDefaultChartDataType(value) {
             settings.setStatisticsDefaultChartDataType(value);

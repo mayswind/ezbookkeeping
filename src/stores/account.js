@@ -791,7 +791,9 @@ export const useAccountsStore = defineStore('accounts', {
                 submitAccount.id = account.id;
                 submitAccount.hidden = !account.visible;
             } else {
-                submitAccount.balanceTime = account.balanceTime;
+                if (account.type === accountConstants.allAccountTypes.SingleAccount) {
+                    submitAccount.balanceTime = account.balanceTime;
+                }
             }
 
             const oldAccount = submitAccount.id ? self.allAccountsMap[submitAccount.id] : null;

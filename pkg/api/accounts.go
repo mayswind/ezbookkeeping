@@ -169,6 +169,11 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 			log.Warnf(c, "[accounts.AccountCreateHandler] account cannot set currency placeholder")
 			return nil, errs.ErrAccountCurrencyInvalid
 		}
+
+		if accountCreateReq.Balance != 0 && accountCreateReq.BalanceTime <= 0 {
+			log.Warnf(c, "[accounts.AccountCreateHandler] account balance time is not set")
+			return nil, errs.ErrAccountBalanceTimeNotSet
+		}
 	} else if accountCreateReq.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
 		if len(accountCreateReq.SubAccounts) < 1 {
 			log.Warnf(c, "[accounts.AccountCreateHandler] account does not have any sub-accounts")
@@ -201,6 +206,11 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 			if subAccount.Currency == validators.ParentAccountCurrencyPlaceholder {
 				log.Warnf(c, "[accounts.AccountCreateHandler] sub-account cannot set currency placeholder")
 				return nil, errs.ErrAccountCurrencyInvalid
+			}
+
+			if subAccount.Balance != 0 && subAccount.BalanceTime <= 0 {
+				log.Warnf(c, "[accounts.AccountCreateHandler] sub-account balance time is not set")
+				return nil, errs.ErrAccountBalanceTimeNotSet
 			}
 		}
 	} else {

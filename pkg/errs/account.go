@@ -19,4 +19,5 @@ var (
 	ErrDestinationAccountNotFound             = NewNormalError(NormalSubcategoryAccount, 12, http.StatusBadRequest, "destination account not found")
 	ErrAccountInUseCannotBeDeleted            = NewNormalError(NormalSubcategoryAccount, 13, http.StatusBadRequest, "account is in use and cannot be deleted")
 	ErrAccountCategoryInvalid                 = NewNormalError(NormalSubcategoryAccount, 14, http.StatusBadRequest, "account category is invalid")
+	ErrAccountBalanceTimeNotSet               = NewNormalError(NormalSubcategoryAccount, 15, http.StatusBadRequest, "account balance time is not set")
 )

@@ -100,16 +100,16 @@ const (
 
 // Exchange rates data source types
 const (
-	EuroCentralBankDataSource           string = "euro_central_bank"
-	BankOfCanadaDataSource              string = "bank_of_canada"
 	ReserveBankOfAustraliaDataSource    string = "reserve_bank_of_australia"
+	BankOfCanadaDataSource              string = "bank_of_canada"
 	CzechNationalBankDataSource         string = "czech_national_bank"
-	NationalBankOfPolandDataSource      string = "national_bank_of_poland"
-	BankOfIsraelDataSource              string = "bank_of_israel"
-	SwissNationalBankDataSource         string = "swiss_national_bank"
 	DanmarksNationalbankDataSource      string = "danmarks_national_bank"
-	NationalBankOfRomaniaDataSource     string = "national_bank_of_romania"
+	EuroCentralBankDataSource           string = "euro_central_bank"
 	NationalBankOfGeorgiaDataSource     string = "national_bank_of_georgia"
+	BankOfIsraelDataSource              string = "bank_of_israel"
+	NationalBankOfPolandDataSource      string = "national_bank_of_poland"
+	NationalBankOfRomaniaDataSource     string = "national_bank_of_romania"
+	SwissNationalBankDataSource         string = "swiss_national_bank"
 	InternationalMonetaryFundDataSource string = "international_monetary_fund"
 )
 
@@ -883,28 +883,18 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	dataSource := getConfigItemStringValue(configFile, sectionName, "data_source")
 
-	if dataSource == EuroCentralBankDataSource {
-		config.ExchangeRatesDataSource = EuroCentralBankDataSource
-	} else if dataSource == BankOfCanadaDataSource {
-		config.ExchangeRatesDataSource = BankOfCanadaDataSource
-	} else if dataSource == ReserveBankOfAustraliaDataSource {
-		config.ExchangeRatesDataSource = ReserveBankOfAustraliaDataSource
-	} else if dataSource == CzechNationalBankDataSource {
-		config.ExchangeRatesDataSource = CzechNationalBankDataSource
-	} else if dataSource == NationalBankOfPolandDataSource {
-		config.ExchangeRatesDataSource = NationalBankOfPolandDataSource
-	} else if dataSource == BankOfIsraelDataSource {
-		config.ExchangeRatesDataSource = BankOfIsraelDataSource
-	} else if dataSource == SwissNationalBankDataSource {
-		config.ExchangeRatesDataSource = SwissNationalBankDataSource
-	} else if dataSource == DanmarksNationalbankDataSource {
-		config.ExchangeRatesDataSource = DanmarksNationalbankDataSource
-	} else if dataSource == NationalBankOfRomaniaDataSource {
-		config.ExchangeRatesDataSource = NationalBankOfRomaniaDataSource
-	} else if dataSource == NationalBankOfGeorgiaDataSource {
-		config.ExchangeRatesDataSource = NationalBankOfGeorgiaDataSource
-	} else if dataSource == InternationalMonetaryFundDataSource {
-		config.ExchangeRatesDataSource = InternationalMonetaryFundDataSource
+	if dataSource == ReserveBankOfAustraliaDataSource ||
+		dataSource == BankOfCanadaDataSource ||
+		dataSource == CzechNationalBankDataSource ||
+		dataSource == DanmarksNationalbankDataSource ||
+		dataSource == EuroCentralBankDataSource ||
+		dataSource == NationalBankOfGeorgiaDataSource ||
+		dataSource == BankOfIsraelDataSource ||
+		dataSource == NationalBankOfPolandDataSource ||
+		dataSource == NationalBankOfRomaniaDataSource ||
+		dataSource == SwissNationalBankDataSource ||
+		dataSource == InternationalMonetaryFundDataSource {
+		config.ExchangeRatesDataSource = dataSource
 	} else {
 		return errs.ErrInvalidExchangeRatesDataSource
 	}

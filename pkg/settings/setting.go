@@ -107,6 +107,7 @@ const (
 	EuroCentralBankDataSource           string = "euro_central_bank"
 	NationalBankOfGeorgiaDataSource     string = "national_bank_of_georgia"
 	BankOfIsraelDataSource              string = "bank_of_israel"
+	NorgesBankDataSource                string = "norges_bank"
 	NationalBankOfPolandDataSource      string = "national_bank_of_poland"
 	NationalBankOfRomaniaDataSource     string = "national_bank_of_romania"
 	SwissNationalBankDataSource         string = "swiss_national_bank"
@@ -890,6 +891,7 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 		dataSource == EuroCentralBankDataSource ||
 		dataSource == NationalBankOfGeorgiaDataSource ||
 		dataSource == BankOfIsraelDataSource ||
+		dataSource == NorgesBankDataSource ||
 		dataSource == NationalBankOfPolandDataSource ||
 		dataSource == NationalBankOfRomaniaDataSource ||
 		dataSource == SwissNationalBankDataSource ||

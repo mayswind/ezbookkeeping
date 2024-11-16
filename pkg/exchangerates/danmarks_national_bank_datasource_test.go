@@ -10,10 +10,10 @@ import (
 )
 
 const danmarksNationalbankMinimumRequiredContent = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-	"<exchangerates type=\"Exchange rates\" author=\"Danmarks Nationalbank\" refcur=\"DKK\" refamt=\"1\">\n" +
+	"<exchangerates refcur=\"DKK\">\n" +
 	"  <dailyrates id=\"2024-11-14\">\n" +
-	"    <currency code=\"CNY\" desc=\"Chinese yuan renminbi\" rate=\"97.81\" />\n" +
-	"    <currency code=\"USD\" desc=\"US dollars\" rate=\"708.18\" />\n" +
+	"    <currency code=\"CNY\" rate=\"97.81\" />\n" +
+	"    <currency code=\"USD\" rate=\"708.18\" />\n" +
 	"  </dailyrates>\n" +
 	"</exchangerates>"
 
@@ -72,7 +72,7 @@ func TestDanmarksNationalbankDataSource_EmptyExchangeRatesContent(t *testing.T) 
 	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>"+
-		"<exchangerates type=\"Exchange rates\" author=\"Danmarks Nationalbank\" refcur=\"DKK\" refamt=\"1\">"+
+		"<exchangerates refcur=\"DKK\">"+
 		"</exchangerates>"))
 	assert.NotEqual(t, nil, err)
 }
@@ -82,7 +82,7 @@ func TestDanmarksNationalbankDataSource_EmptyDailyRatesContent(t *testing.T) {
 	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>"+
-		"<exchangerates type=\"Exchange rates\" author=\"Danmarks Nationalbank\" refcur=\"DKK\" refamt=\"1\">"+
+		"<exchangerates refcur=\"DKK\">"+
 		"<dailyrates id=\"2024-11-14\">"+
 		"</dailyrates>"+
 		"</exchangerates>"))
@@ -94,7 +94,7 @@ func TestDanmarksNationalbankDataSource_InvalidCurrency(t *testing.T) {
 	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>"+
-		"<exchangerates type=\"Exchange rates\" author=\"Danmarks Nationalbank\" refcur=\"DKK\" refamt=\"1\">"+
+		"<exchangerates refcur=\"DKK\">"+
 		"  <dailyrates id=\"2024-11-14\">\n"+
 		"    <currency code=\"XXX\" desc=\"XXX\" rate=\"1\" />\n"+
 		"  </dailyrates>\n"+
@@ -108,9 +108,9 @@ func TestDanmarksNationalbankDataSource_EmptyRate(t *testing.T) {
 	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>"+
-		"<exchangerates type=\"Exchange rates\" author=\"Danmarks Nationalbank\" refcur=\"DKK\" refamt=\"1\">"+
+		"<exchangerates refcur=\"DKK\">"+
 		"  <dailyrates id=\"2024-11-14\">\n"+
-		"    <currency code=\"USD\" desc=\"US dollars\" rate=\"\" />\n"+
+		"    <currency code=\"USD\" rate=\"\" />\n"+
 		"  </dailyrates>\n"+
 		"</exchangerates>"))
 	assert.Equal(t, nil, err)
@@ -122,18 +122,18 @@ func TestDanmarksNationalbankDataSource_InvalidRate(t *testing.T) {
 	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>"+
-		"<exchangerates type=\"Exchange rates\" author=\"Danmarks Nationalbank\" refcur=\"DKK\" refamt=\"1\">"+
+		"<exchangerates refcur=\"DKK\">"+
 		"  <dailyrates id=\"2024-11-14\">\n"+
-		"    <currency code=\"USD\" desc=\"US dollars\" rate=\"null\" />\n"+
+		"    <currency code=\"USD\" rate=\"null\" />\n"+
 		"  </dailyrates>\n"+
 		"</exchangerates>"))
 	assert.Equal(t, nil, err)
 	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
 
 	actualLatestExchangeRateResponse, err = dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>"+
-		"<exchangerates type=\"Exchange rates\" author=\"Danmarks Nationalbank\" refcur=\"DKK\" refamt=\"1\">"+
+		"<exchangerates refcur=\"DKK\">"+
 		"  <dailyrates id=\"2024-11-14\">\n"+
-		"    <currency code=\"USD\" desc=\"US dollars\" rate=\"0\" />\n"+
+		"    <currency code=\"USD\" rate=\"0\" />\n"+
 		"  </dailyrates>\n"+
 		"</exchangerates>"))
 	assert.Equal(t, nil, err)

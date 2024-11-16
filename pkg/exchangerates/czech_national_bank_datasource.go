@@ -140,6 +140,11 @@ func (e *CzechNationalBankDataSource) parseExchangeRate(c core.Context, line str
 		return nil
 	}
 
+	if amount <= 0 {
+		log.Warnf(c, "[czech_national_bank_datasource.parseExchangeRate] amount is invalid, line is %s", line)
+		return nil
+	}
+
 	rate, err := utils.StringToFloat64(items[rateColumnIndex])
 
 	if err != nil {

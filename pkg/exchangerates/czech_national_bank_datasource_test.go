@@ -73,6 +73,16 @@ func TestCzechNationalBankDataSource_OnlyHeaderAndTitle(t *testing.T) {
 	assert.NotEqual(t, nil, err)
 }
 
+func TestCzechNationalBankDataSource_MissingHeader(t *testing.T) {
+	dataSource := &CzechNationalBankDataSource{}
+	context := core.NewNullContext()
+
+	_, err := dataSource.Parse(context, []byte("Country|Currency|Amount|Code|Rate\n"+
+		"China|renminbi|1|CNY|3.379\n"+
+		"USA|dollar|1|USD|22.206\n"))
+	assert.NotEqual(t, nil, err)
+}
+
 func TestCzechNationalBankDataSource_TitleMissingCode(t *testing.T) {
 	dataSource := &CzechNationalBankDataSource{}
 	context := core.NewNullContext()
@@ -81,6 +91,17 @@ func TestCzechNationalBankDataSource_TitleMissingCode(t *testing.T) {
 		"Country|Currency|Amount|Rate\n"+
 		"China|renminbi|1|3.379\n"+
 		"USA|dollar|1|22.206\n"))
+	assert.NotEqual(t, nil, err)
+}
+
+func TestCzechNationalBankDataSource_TitleMissingAmount(t *testing.T) {
+	dataSource := &CzechNationalBankDataSource{}
+	context := core.NewNullContext()
+
+	_, err := dataSource.Parse(context, []byte("01 Apr 2021 #64\n"+
+		"Country|Currency|Code|Rate\n"+
+		"China|renminbi|CNY|3.379\n"+
+		"USA|dollar|USD|22.206\n"))
 	assert.NotEqual(t, nil, err)
 }
 
@@ -95,6 +116,17 @@ func TestCzechNationalBankDataSource_TitleMissingRate(t *testing.T) {
 	assert.NotEqual(t, nil, err)
 }
 
+func TestCzechNationalBankDataSource_MissingDataItem(t *testing.T) {
+	dataSource := &CzechNationalBankDataSource{}
+	context := core.NewNullContext()
+
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("01 Apr 2021 #64\n"+
+		"Country|Currency|Amount|Code|Rate\n"+
+		"USA|dollar|1|USD\n"))
+	assert.Equal(t, nil, err)
+	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
+}
+
 func TestCzechNationalBankDataSource_InvalidCurrency(t *testing.T) {
 	dataSource := &CzechNationalBankDataSource{}
 	context := core.NewNullContext()
@@ -102,6 +134,23 @@ func TestCzechNationalBankDataSource_InvalidCurrency(t *testing.T) {
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("01 Apr 2021 #64\n"+
 		"Country|Currency|Amount|Code|Rate\n"+
 		"XXX|xxx|1|XXX|1\n"))
+	assert.Equal(t, nil, err)
+	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
+}
+
+func TestCzechNationalBankDataSource_InvalidAmount(t *testing.T) {
+	dataSource := &CzechNationalBankDataSource{}
+	context := core.NewNullContext()
+
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("01 Apr 2021 #64\n"+
+		"Country|Currency|Amount|Code|Rate\n"+
+		"USA|dollar|null|USD|22.206\n"))
+	assert.Equal(t, nil, err)
+	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
+
+	actualLatestExchangeRateResponse, err = dataSource.Parse(context, []byte("01 Apr 2021 #64\n"+
+		"Country|Currency|Amount|Code|Rate\n"+
+		"USA|dollar|0|USD|22.206\n"))
 	assert.Equal(t, nil, err)
 	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
 }
@@ -124,6 +173,12 @@ func TestCzechNationalBankDataSource_InvalidRate(t *testing.T) {
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("01 Apr 2021 #64\n"+
 		"Country|Currency|Amount|Code|Rate\n"+
 		"USA|dollar|1|USD|null\n"))
+	assert.Equal(t, nil, err)
+	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
+
+	actualLatestExchangeRateResponse, err = dataSource.Parse(context, []byte("01 Apr 2021 #64\n"+
+		"Country|Currency|Amount|Code|Rate\n"+
+		"USA|dollar|1|USD|0\n"))
 	assert.Equal(t, nil, err)
 	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
 }

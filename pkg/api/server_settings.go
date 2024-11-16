@@ -7,6 +7,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 const ezbookkeepingServerSettingsGlobalVariableName = "EZBOOKKEEPING_SERVER_SETTINGS"
@@ -109,6 +110,10 @@ func (a *ServerSettingsApi) ServerSettingsJavascriptHandler(c *core.WebContext) 
 		}
 	}
 
+	if config.ExchangeRatesRequestTimeoutExceedDefaultValue {
+		a.appendIntegerSetting(builder, "errt", int(config.ExchangeRatesRequestTimeout))
+	}
+
 	return []byte(builder.String()), "", nil
 }
 
@@ -155,6 +160,15 @@ func (a *ServerSettingsApi) appendBooleanSetting(builder *strings.Builder, key s
 		builder.WriteRune('0')
 	}
 
+	builder.WriteString(";\n")
+}
+
+func (a *ServerSettingsApi) appendIntegerSetting(builder *strings.Builder, key string, value int) {
+	builder.WriteString(ezbookkeepingServerSettingsGlobalVariableFullName)
+	builder.WriteString("[")
+	a.appendEncodedString(builder, key)
+	builder.WriteString("]=")
+	builder.WriteString(utils.IntToString(value))
 	builder.WriteString(";\n")
 }
 

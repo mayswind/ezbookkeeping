@@ -103,3 +103,7 @@ export function getAmapApiExternalProxyUrl() {
 export function getAmapApplicationSecret() {
     return getServerSetting('amas');
 }
+
+export function getExchangeRatesRequestTimeout() {
+    return getServerSetting('errt');
+}

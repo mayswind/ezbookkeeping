@@ -328,10 +328,11 @@ type Config struct {
 	CustomMapTileServerDefaultZoomLevel   uint8
 
 	// Exchange Rates
-	ExchangeRatesDataSource     string
-	ExchangeRatesRequestTimeout uint32
-	ExchangeRatesProxy          string
-	ExchangeRatesSkipTLSVerify  bool
+	ExchangeRatesDataSource                       string
+	ExchangeRatesRequestTimeout                   uint32
+	ExchangeRatesRequestTimeoutExceedDefaultValue bool
+	ExchangeRatesProxy                            string
+	ExchangeRatesSkipTLSVerify                    bool
 }
 
 // LoadConfiguration loads setting config from given config file path
@@ -910,6 +911,11 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 
 	config.ExchangeRatesProxy = getConfigItemStringValue(configFile, sectionName, "proxy", "system")
 	config.ExchangeRatesRequestTimeout = getConfigItemUint32Value(configFile, sectionName, "request_timeout", defaultExchangeRatesDataRequestTimeout)
+
+	if config.ExchangeRatesRequestTimeout > defaultExchangeRatesDataRequestTimeout {
+		config.ExchangeRatesRequestTimeoutExceedDefaultValue = true
+	}
+
 	config.ExchangeRatesSkipTLSVerify = getConfigItemBoolValue(configFile, sectionName, "skip_tls_verify", false)
 
 	return nil

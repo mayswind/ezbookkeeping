@@ -9,7 +9,8 @@ import {
 import {
     getGoogleMapAPIKey,
     getBaiduMapAK,
-    getAmapApplicationKey
+    getAmapApplicationKey,
+    getExchangeRatesRequestTimeout
 } from './server_settings.js';
 import { getTimezoneOffsetMinutes } from './datetime.js';
 import { generateRandomUUID } from './misc.js';
@@ -619,7 +620,8 @@ export default {
     },
     getLatestExchangeRates: ({ ignoreError }) => {
         return axios.get('v1/exchange_rates/latest.json', {
-            ignoreError: !!ignoreError
+            ignoreError: !!ignoreError,
+            timeout: getExchangeRatesRequestTimeout() || apiConstants.defaultTimeout
         });
     },
     generateQrCodeUrl: (qrCodeName) => {

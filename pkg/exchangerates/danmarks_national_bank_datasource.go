@@ -18,7 +18,7 @@ const danmarksNationalbankExchangeRateReferenceUrl = "https://www.nationalbanken
 const danmarksNationalbankDataSource = "Danmarks Nationalbank"
 
 const danmarksNationalbankDataUpdateDateFormat = "2006-01-02 15"
-const danmarksNationalbankDataUpdateDateTimezone = "Europe/Berlin"
+const danmarksNationalbankDataUpdateDateTimezone = "Europe/Copenhagen"
 
 // DanmarksNationalbankDataSource defines the structure of exchange rates data source of Danmarks Nationalbank
 type DanmarksNationalbankDataSource struct {

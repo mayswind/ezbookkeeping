@@ -171,4 +171,19 @@ func TestNationalBankOfPolandDataSource_InvalidRate(t *testing.T) {
 		"</ArrayOfExchangeRatesTable>"))
 	assert.Equal(t, nil, err)
 	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
+
+	actualLatestExchangeRateResponse, err = dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+
+		"<ArrayOfExchangeRatesTable xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"+
+		"  <ExchangeRatesTable>\n"+
+		"    <EffectiveDate>2024-02-28</EffectiveDate>\n"+
+		"    <Rates>\n"+
+		"      <Rate>\n"+
+		"        <Code>USD</Code>\n"+
+		"        <Mid>0</Mid>\n"+
+		"      </Rate>\n"+
+		"    </Rates>\n"+
+		"  </ExchangeRatesTable>\n"+
+		"</ArrayOfExchangeRatesTable>"))
+	assert.Equal(t, nil, err)
+	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
 }

@@ -181,4 +181,17 @@ func TestBankOfCanadaDataSource_InvalidRate(t *testing.T) {
 		"}"))
 	assert.Equal(t, nil, err)
 	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
+
+	actualLatestExchangeRateResponse, err = dataSource.Parse(context, []byte("{"+
+		"    \"observations\": [\n"+
+		"        {\n"+
+		"            \"d\": \"2021-04-01\",\n"+
+		"            \"FXUSDCAD\": {\n"+
+		"                \"v\": \"0\"\n"+
+		"            }\n"+
+		"        }\n"+
+		"    ]\n"+
+		"}"))
+	assert.Equal(t, nil, err)
+	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
 }

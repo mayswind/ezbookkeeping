@@ -104,6 +104,20 @@ func TestInternationalMonetaryFundDataSource_MissingDefaultCurrencyData(t *testi
 	assert.NotEqual(t, nil, err)
 }
 
+func TestInternationalMonetaryFundDataSource_DefaultCurrencyDataInvalid(t *testing.T) {
+	dataSource := &InternationalMonetaryFundDataSource{}
+	context := core.NewNullContext()
+
+	_, err := dataSource.Parse(context, []byte("SDRs per Currency unit and Currency units per SDR (1)\n"+
+		"last five days\n"+
+		"SDRs per Currency unit (2)\n"+
+		"\n"+
+		"Currency\tAugust 28, 2024\tAugust 27, 2024\tAugust 26, 2024\tAugust 23, 2024\tAugust 22, 2024\n"+
+		"Chinese yuan\t0.1040520000\t0.1039250000\t0.1040370000\t0.1040850000\t0.1040570000\n"+
+		"U.S. dollar\t0\t0\t0\t0\t0\n"))
+	assert.NotEqual(t, nil, err)
+}
+
 func TestInternationalMonetaryFundDataSource_InvalidCurrency(t *testing.T) {
 	dataSource := &InternationalMonetaryFundDataSource{}
 	context := core.NewNullContext()
@@ -114,6 +128,41 @@ func TestInternationalMonetaryFundDataSource_InvalidCurrency(t *testing.T) {
 		"\n"+
 		"Currency\tAugust 28, 2024\tAugust 27, 2024\tAugust 26, 2024\tAugust 23, 2024\tAugust 22, 2024\n"+
 		"Foo bar\t0.1040520000\t0.1039250000\t0.1040370000\t0.1040850000\t0.1040570000\n"+
+		"U.S. dollar\t0.7417320000\t0.7410250000\t0.7408270000\t0.7429280000\t0.7423020000\n"))
+	assert.Equal(t, nil, err)
+	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 1)
+}
+
+func TestInternationalMonetaryFundDataSource_InvalidRate(t *testing.T) {
+	dataSource := &InternationalMonetaryFundDataSource{}
+	context := core.NewNullContext()
+
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("SDRs per Currency unit and Currency units per SDR (1)\n"+
+		"last five days\n"+
+		"SDRs per Currency unit (2)\n"+
+		"\n"+
+		"Currency\tAugust 28, 2024\tAugust 27, 2024\tAugust 26, 2024\tAugust 23, 2024\tAugust 22, 2024\n"+
+		"Chinese yuan\tnull\tnull\tnull\tnull\tnull\n"+
+		"U.S. dollar\t0.7417320000\t0.7410250000\t0.7408270000\t0.7429280000\t0.7423020000\n"))
+	assert.Equal(t, nil, err)
+	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 1)
+
+	actualLatestExchangeRateResponse, err = dataSource.Parse(context, []byte("SDRs per Currency unit and Currency units per SDR (1)\n"+
+		"last five days\n"+
+		"SDRs per Currency unit (2)\n"+
+		"\n"+
+		"Currency\tAugust 28, 2024\tAugust 27, 2024\tAugust 26, 2024\tAugust 23, 2024\tAugust 22, 2024\n"+
+		"Chinese yuan\t0\t0\t0\t0\t0\n"+
+		"U.S. dollar\t0.7417320000\t0.7410250000\t0.7408270000\t0.7429280000\t0.7423020000\n"))
+	assert.Equal(t, nil, err)
+	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 1)
+
+	actualLatestExchangeRateResponse, err = dataSource.Parse(context, []byte("SDRs per Currency unit and Currency units per SDR (1)\n"+
+		"last five days\n"+
+		"SDRs per Currency unit (2)\n"+
+		"\n"+
+		"Currency\tAugust 28, 2024\tAugust 27, 2024\tAugust 26, 2024\tAugust 23, 2024\tAugust 22, 2024\n"+
+		"Chinese yuan\t\t\t\t\t\n"+
 		"U.S. dollar\t0.7417320000\t0.7410250000\t0.7408270000\t0.7429280000\t0.7423020000\n"))
 	assert.Equal(t, nil, err)
 	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 1)

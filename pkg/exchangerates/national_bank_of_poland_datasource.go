@@ -127,11 +127,11 @@ func (e *NationalBankOfPolandDataSource) GetRequestUrls() []string {
 
 // Parse returns the common response entity according to the National Bank of Poland data source raw response
 func (e *NationalBankOfPolandDataSource) Parse(c core.Context, content []byte) (*models.LatestExchangeRateResponse, error) {
-	nationalBankOfPolandData := &NationalBankOfPolandExchangeRateData{}
-
 	xmlDecoder := xml.NewDecoder(bytes.NewReader(content))
 	xmlDecoder.CharsetReader = charset.NewReaderLabel
-	err := xmlDecoder.Decode(&nationalBankOfPolandData)
+	
+	nationalBankOfPolandData := &NationalBankOfPolandExchangeRateData{}
+	err := xmlDecoder.Decode(nationalBankOfPolandData)
 
 	if err != nil {
 		log.Errorf(c, "[national_bank_of_poland_datasource.Parse] failed to parse xml data, content is %s, because %s", string(content), err.Error())

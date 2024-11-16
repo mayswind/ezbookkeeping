@@ -1,8 +1,11 @@
 package exchangerates
 
 import (
+	"bytes"
 	"encoding/xml"
 	"time"
+
+	"golang.org/x/net/html/charset"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -114,8 +117,11 @@ func (e *EuroCentralBankDataSource) GetRequestUrls() []string {
 
 // Parse returns the common response entity according to the euro central bank data source raw response
 func (e *EuroCentralBankDataSource) Parse(c core.Context, content []byte) (*models.LatestExchangeRateResponse, error) {
+	xmlDecoder := xml.NewDecoder(bytes.NewReader(content))
+	xmlDecoder.CharsetReader = charset.NewReaderLabel
+
 	euroCentralBankData := &EuroCentralBankExchangeRateData{}
-	err := xml.Unmarshal(content, euroCentralBankData)
+	err := xmlDecoder.Decode(euroCentralBankData)
 
 	if err != nil {
 		log.Errorf(c, "[euro_central_bank_datasource.Parse] failed to parse xml data, content is %s, because %s", string(content), err.Error())

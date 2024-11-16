@@ -1,8 +1,11 @@
 package exchangerates
 
 import (
+	"bytes"
 	"encoding/xml"
 	"time"
+
+	"golang.org/x/net/html/charset"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -129,8 +132,11 @@ func (e *ReserveBankOfAustraliaDataSource) GetRequestUrls() []string {
 
 // Parse returns the common response entity according to the the reserve bank of Australia data source raw response
 func (e *ReserveBankOfAustraliaDataSource) Parse(c core.Context, content []byte) (*models.LatestExchangeRateResponse, error) {
+	xmlDecoder := xml.NewDecoder(bytes.NewReader(content))
+	xmlDecoder.CharsetReader = charset.NewReaderLabel
+
 	reserveBankOfAustraliaData := &ReserveBankOfAustraliaData{}
-	err := xml.Unmarshal(content, reserveBankOfAustraliaData)
+	err := xmlDecoder.Decode(reserveBankOfAustraliaData)
 
 	if err != nil {
 		log.Errorf(c, "[reserve_bank_of_australia_datasource.Parse] failed to parse xml data, content is %s, because %s", string(content), err.Error())

@@ -193,6 +193,23 @@ func TestExchangeRatesApiLatestExchangeRateHandler_NationalBankOfRomaniaDataSour
 	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
 }
 
+func TestExchangeRatesApiLatestExchangeRateHandler_BankOfRussiaDataSource(t *testing.T) {
+	exchangeRateResponse := executeLatestExchangeRateHandler(t, settings.BankOfRussiaDataSource)
+
+	if exchangeRateResponse == nil {
+		return
+	}
+
+	assert.Equal(t, "RUB", exchangeRateResponse.BaseCurrency)
+
+	supportedCurrencyCodes := []string{"AED", "AMD", "AUD", "AZN", "BGN", "BRL", "BYN", "CAD", "CHF", "CNY", "CZK",
+		"DKK", "EGP", "EUR", "GBP", "GEL", "HKD", "HUF", "IDR", "INR", "JPY", "KGS", "KRW", "KZT", "MDL",
+		"NOK", "NZD", "PLN", "QAR", "RON", "RSD", "SEK", "SGD", "THB", "TJS", "TMT", "TRY",
+		"UAH", "USD", "UZS", "VND", "ZAR"}
+
+	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
+}
+
 func TestExchangeRatesApiLatestExchangeRateHandler_SwissNationalBankDataSource(t *testing.T) {
 	exchangeRateResponse := executeLatestExchangeRateHandler(t, settings.SwissNationalBankDataSource)
 

@@ -110,6 +110,7 @@ const (
 	NorgesBankDataSource                string = "norges_bank"
 	NationalBankOfPolandDataSource      string = "national_bank_of_poland"
 	NationalBankOfRomaniaDataSource     string = "national_bank_of_romania"
+	BankOfRussiaDataSource              string = "bank_of_russia"
 	SwissNationalBankDataSource         string = "swiss_national_bank"
 	InternationalMonetaryFundDataSource string = "international_monetary_fund"
 )
@@ -894,6 +895,7 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 		dataSource == NorgesBankDataSource ||
 		dataSource == NationalBankOfPolandDataSource ||
 		dataSource == NationalBankOfRomaniaDataSource ||
+		dataSource == BankOfRussiaDataSource ||
 		dataSource == SwissNationalBankDataSource ||
 		dataSource == InternationalMonetaryFundDataSource {
 		config.ExchangeRatesDataSource = dataSource

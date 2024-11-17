@@ -3,6 +3,7 @@ package exchangerates
 import (
 	"bytes"
 	"encoding/xml"
+	"net/http"
 	"time"
 
 	"golang.org/x/net/html/charset"
@@ -125,9 +126,15 @@ func (e *ReserveBankOfAustraliaExchangeRate) ToLatestExchangeRate() *models.Late
 	}
 }
 
-// GetRequestUrls returns the the reserve bank of Australia data source urls
-func (e *ReserveBankOfAustraliaDataSource) GetRequestUrls() []string {
-	return []string{reserveBankOfAustraliaExchangeRateUrl}
+// BuildRequests returns the reserve bank of Australia exchange rates http requests
+func (e *ReserveBankOfAustraliaDataSource) BuildRequests() ([]*http.Request, error) {
+	req, err := http.NewRequest("GET", reserveBankOfAustraliaExchangeRateUrl, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return []*http.Request{req}, nil
 }
 
 // Parse returns the common response entity according to the the reserve bank of Australia data source raw response

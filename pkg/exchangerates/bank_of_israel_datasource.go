@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"math"
+	"net/http"
 	"time"
 
 	"golang.org/x/net/html/charset"
@@ -123,9 +124,15 @@ func (e *BankOfIsraelExchangeRate) ToLatestExchangeRate(c core.Context) *models.
 	}
 }
 
-// GetRequestUrls returns the bank of Israel data source urls
-func (e *BankOfIsraelDataSource) GetRequestUrls() []string {
-	return []string{bankOfIsraelExchangeRateUrl}
+// BuildRequests returns the bank of Israel exchange rates http requests
+func (e *BankOfIsraelDataSource) BuildRequests() ([]*http.Request, error) {
+	req, err := http.NewRequest("GET", bankOfIsraelExchangeRateUrl, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return []*http.Request{req}, nil
 }
 
 // Parse returns the common response entity according to the bank of Israel data source raw response

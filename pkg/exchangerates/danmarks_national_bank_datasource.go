@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"math"
+	"net/http"
 	"time"
 
 	"golang.org/x/net/html/charset"
@@ -131,9 +132,15 @@ func (e *DanmarksNationalbankExchangeRate) ToLatestExchangeRate(c core.Context) 
 	}
 }
 
-// GetRequestUrls returns the Danmarks Nationalbank data source urls
-func (e *DanmarksNationalbankDataSource) GetRequestUrls() []string {
-	return []string{danmarksNationalbankExchangeRateUrl}
+// BuildRequests returns the Danmarks Nationalbank exchange rates http requests
+func (e *DanmarksNationalbankDataSource) BuildRequests() ([]*http.Request, error) {
+	req, err := http.NewRequest("GET", danmarksNationalbankExchangeRateUrl, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return []*http.Request{req}, nil
 }
 
 // Parse returns the common response entity according to the Danmarks Nationalbank data source raw response

@@ -3,6 +3,7 @@ package exchangerates
 import (
 	"bytes"
 	"encoding/xml"
+	"net/http"
 	"time"
 
 	"golang.org/x/net/html/charset"
@@ -110,9 +111,15 @@ func (e *EuroCentralBankExchangeRate) ToLatestExchangeRate() *models.LatestExcha
 	}
 }
 
-// GetRequestUrls returns the euro central bank data source urls
-func (e *EuroCentralBankDataSource) GetRequestUrls() []string {
-	return []string{euroCentralBankExchangeRateUrl}
+// BuildRequests returns the euro central bank exchange rates http requests
+func (e *EuroCentralBankDataSource) BuildRequests() ([]*http.Request, error) {
+	req, err := http.NewRequest("GET", euroCentralBankExchangeRateUrl, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return []*http.Request{req}, nil
 }
 
 // Parse returns the common response entity according to the euro central bank data source raw response

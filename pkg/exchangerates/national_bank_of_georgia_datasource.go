@@ -3,6 +3,7 @@ package exchangerates
 import (
 	"encoding/json"
 	"math"
+	"net/http"
 	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -111,9 +112,15 @@ func (e *NationalBankOfGeorgiaExchangeRate) ToLatestExchangeRate(c core.Context)
 	}
 }
 
-// GetRequestUrls returns the national bank of Georgia data source urls
-func (e *NationalBankOfGeorgiaDataSource) GetRequestUrls() []string {
-	return []string{nationalBankOfGeorgiaExchangeRateUrl}
+// BuildRequests returns the national bank of Georgia exchange rates http requests
+func (e *NationalBankOfGeorgiaDataSource) BuildRequests() ([]*http.Request, error) {
+	req, err := http.NewRequest("GET", nationalBankOfGeorgiaExchangeRateUrl, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return []*http.Request{req}, nil
 }
 
 // Parse returns the common response entity according to the national bank of Georgia data source raw response

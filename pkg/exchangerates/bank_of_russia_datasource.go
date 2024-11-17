@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"math"
+	"net/http"
 	"strings"
 	"time"
 
@@ -120,9 +121,15 @@ func (e *BankOfRussiaExchangeRate) ToLatestExchangeRate(c core.Context) *models.
 	}
 }
 
-// GetRequestUrls returns the bank of Russia data source urls
-func (e *BankOfRussiaDataSource) GetRequestUrls() []string {
-	return []string{bankOfRussiaExchangeRateUrl}
+// BuildRequests returns the bank of Russia exchange rates http requests
+func (e *BankOfRussiaDataSource) BuildRequests() ([]*http.Request, error) {
+	req, err := http.NewRequest("GET", bankOfRussiaExchangeRateUrl, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return []*http.Request{req}, nil
 }
 
 // Parse returns the common response entity according to the bank of Russia data source raw response

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"math"
+	"net/http"
 	"time"
 
 	"golang.org/x/net/html/charset"
@@ -185,9 +186,15 @@ func (e *SwissNationalBankExchangeRate) ToLatestExchangeRate(c core.Context) *mo
 	}
 }
 
-// GetRequestUrls returns the the reserve Swiss National Bank data source urls
-func (e *SwissNationalBankDataSource) GetRequestUrls() []string {
-	return []string{swissNationalBankExchangeRateUrl}
+// BuildRequests returns the Swiss National Bank exchange rates http requests
+func (e *SwissNationalBankDataSource) BuildRequests() ([]*http.Request, error) {
+	req, err := http.NewRequest("GET", swissNationalBankExchangeRateUrl, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return []*http.Request{req}, nil
 }
 
 // Parse returns the common response entity according to the the reserve Swiss National Bank data source raw response

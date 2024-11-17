@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"math"
+	"net/http"
 	"time"
 
 	"golang.org/x/net/html/charset"
@@ -159,9 +160,15 @@ func (e *NationalBankOfRomaniaExchangeRate) ToLatestExchangeRate(c core.Context)
 	}
 }
 
-// GetRequestUrls returns the national bank of Romania data source urls
-func (e *NationalBankOfRomaniaDataSource) GetRequestUrls() []string {
-	return []string{nationalBankOfRomaniaExchangeRateUrl}
+// BuildRequests returns the national bank of Romania exchange rates http requests
+func (e *NationalBankOfRomaniaDataSource) BuildRequests() ([]*http.Request, error) {
+	req, err := http.NewRequest("GET", nationalBankOfRomaniaExchangeRateUrl, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return []*http.Request{req}, nil
 }
 
 // Parse returns the common response entity according to the national bank of Romania data source raw response

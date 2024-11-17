@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"math"
+	"net/http"
 	"time"
 
 	"golang.org/x/net/html/charset"
@@ -125,11 +126,28 @@ func (e *NationalBankOfPolandDataSource) GetRequestUrls() []string {
 	return []string{nationalBankOfPolandInconvertibleCurrencyExchangeRateUrl, nationalBankOfPolandDailyExchangeRateUrl}
 }
 
+// BuildRequests returns the national bank of Poland exchange rates http requests
+func (e *NationalBankOfPolandDataSource) BuildRequests() ([]*http.Request, error) {
+	inconvertibleCurrencyReq, err := http.NewRequest("GET", nationalBankOfPolandInconvertibleCurrencyExchangeRateUrl, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	dailyReq, err := http.NewRequest("GET", nationalBankOfPolandDailyExchangeRateUrl, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return []*http.Request{inconvertibleCurrencyReq, dailyReq}, nil
+}
+
 // Parse returns the common response entity according to the National Bank of Poland data source raw response
 func (e *NationalBankOfPolandDataSource) Parse(c core.Context, content []byte) (*models.LatestExchangeRateResponse, error) {
 	xmlDecoder := xml.NewDecoder(bytes.NewReader(content))
 	xmlDecoder.CharsetReader = charset.NewReaderLabel
-	
+
 	nationalBankOfPolandData := &NationalBankOfPolandExchangeRateData{}
 	err := xmlDecoder.Decode(nationalBankOfPolandData)
 

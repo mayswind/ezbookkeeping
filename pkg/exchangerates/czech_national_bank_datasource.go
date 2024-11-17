@@ -2,6 +2,7 @@ package exchangerates
 
 import (
 	"math"
+	"net/http"
 	"strings"
 	"time"
 
@@ -27,9 +28,21 @@ type CzechNationalBankDataSource struct {
 	ExchangeRatesDataSource
 }
 
-// GetRequestUrls returns the czech nation bank data source urls
-func (e *CzechNationalBankDataSource) GetRequestUrls() []string {
-	return []string{czechNationalBankMonthlyOtherExchangeRateUrl, czechNationalBankDailyExchangeRateUrl}
+// BuildRequests returns the Czech National Bank exchange rates http requests
+func (e *CzechNationalBankDataSource) BuildRequests() ([]*http.Request, error) {
+	monthlyReq, err := http.NewRequest("GET", czechNationalBankMonthlyOtherExchangeRateUrl, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	dailyReq, err := http.NewRequest("GET", czechNationalBankDailyExchangeRateUrl, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return []*http.Request{monthlyReq, dailyReq}, nil
 }
 
 // Parse returns the common response entity according to the czech nation bank data source raw response

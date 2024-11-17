@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"math"
+	"net/http"
 	"time"
 
 	"golang.org/x/net/html/charset"
@@ -155,9 +156,15 @@ func (e *NorgesBankExchangeRate) ToLatestExchangeRate(c core.Context, exchangeRa
 	}
 }
 
-// GetRequestUrls returns the Norges Bank data source urls
-func (e *NorgesBankDataSource) GetRequestUrls() []string {
-	return []string{norgesBankExchangeRateUrl}
+// BuildRequests returns the Norges Bank exchange rates http requests
+func (e *NorgesBankDataSource) BuildRequests() ([]*http.Request, error) {
+	req, err := http.NewRequest("GET", norgesBankExchangeRateUrl, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return []*http.Request{req}, nil
 }
 
 // Parse returns the common response entity according to the Norges Bank data source raw response

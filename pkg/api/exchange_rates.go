@@ -55,11 +55,17 @@ func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.WebContext) (any, *
 		Timeout:   time.Duration(a.CurrentConfig().ExchangeRatesRequestTimeout) * time.Millisecond,
 	}
 
-	urls := dataSource.GetRequestUrls()
-	exchangeRateResps := make([]*models.LatestExchangeRateResponse, 0, len(urls))
+	requests, err := dataSource.BuildRequests()
 
-	for i := 0; i < len(urls); i++ {
-		req, _ := http.NewRequest("GET", urls[i], nil)
+	if err != nil {
+		log.Errorf(c, "[exchange_rates.LatestExchangeRateHandler] failed to build requests for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrFailedToRequestRemoteApi
+	}
+
+	exchangeRateResps := make([]*models.LatestExchangeRateResponse, 0, len(requests))
+
+	for i := 0; i < len(requests); i++ {
+		req := requests[i]
 		req.Header.Set("User-Agent", fmt.Sprintf("ezBookkeeping/%s ", settings.Version))
 
 		resp, err := client.Do(req)

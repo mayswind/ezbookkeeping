@@ -1,6 +1,7 @@
 package exchangerates
 
 import (
+	"net/http"
 	"strings"
 	"time"
 
@@ -71,9 +72,15 @@ func init() {
 	internationalMonetaryFundCurrencyNameCodeMap["Uruguayan peso"] = "UYU"
 }
 
-// GetRequestUrls returns the international monetary fund data source urls
-func (e *InternationalMonetaryFundDataSource) GetRequestUrls() []string {
-	return []string{internationalMonetaryFundExchangeRateUrl}
+// BuildRequests returns the international monetary fund exchange rates http requests
+func (e *InternationalMonetaryFundDataSource) BuildRequests() ([]*http.Request, error) {
+	req, err := http.NewRequest("GET", internationalMonetaryFundExchangeRateUrl, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return []*http.Request{req}, nil
 }
 
 // Parse returns the common response entity according to the international monetary fund data source raw response

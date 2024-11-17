@@ -3,6 +3,7 @@ package exchangerates
 import (
 	"encoding/json"
 	"math"
+	"net/http"
 	"strings"
 	"time"
 
@@ -129,9 +130,15 @@ func (e *BankOfCanadaExchangeRateData) ToLatestExchangeRateResponse(c core.Conte
 	return latestExchangeRateResp
 }
 
-// GetRequestUrls returns the bank of Canada data source urls
-func (e *BankOfCanadaDataSource) GetRequestUrls() []string {
-	return []string{bankOfCanadaExchangeRateUrl}
+// BuildRequests returns the bank of Canada exchange rates http requests
+func (e *BankOfCanadaDataSource) BuildRequests() ([]*http.Request, error) {
+	req, err := http.NewRequest("GET", bankOfCanadaExchangeRateUrl, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return []*http.Request{req}, nil
 }
 
 // Parse returns the common response entity according to the bank of Canada data source raw response

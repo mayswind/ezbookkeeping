@@ -256,6 +256,26 @@ func TestExchangeRatesApiLatestExchangeRateHandler_SwissNationalBankDataSource(t
 	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
 }
 
+func TestExchangeRatesApiLatestExchangeRateHandler_CentralBankOfUzbekistanDataSource(t *testing.T) {
+	exchangeRateResponse := executeLatestExchangeRateHandler(t, settings.CentralBankOfUzbekistanDataSource)
+
+	if exchangeRateResponse == nil {
+		return
+	}
+
+	assert.Equal(t, "UZS", exchangeRateResponse.BaseCurrency)
+
+	supportedCurrencyCodes := []string{"AED", "AFN", "AMD", "ARS", "AUD", "AZN",
+		"BDT", "BGN", "BHD", "BND", "BRL", "BYN", "CAD", "CHF", "CNY", "CUP", "CZK",
+		"DKK", "DZD", "EGP", "EUR", "GBP", "GEL", "HKD", "HUF", "IDR", "ILS", "INR", "IQD", "IRR", "ISK",
+		"JOD", "JPY", "KGS", "KHR", "KRW", "KWD", "KZT", "LAK", "LBP", "LYD",
+		"MAD", "MDL", "MMK", "MNT", "MXN", "MYR", "NOK", "NZD", "OMR", "PHP", "PKR", "PLN",
+		"QAR", "RON", "RSD", "RUB", "SAR", "SDG", "SEK", "SGD", "SYP",
+		"THB", "TJS", "TMT", "TND", "TRY", "UAH", "USD", "UYU", "VES", "VND", "YER", "ZAR"}
+
+	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
+}
+
 func TestExchangeRatesApiLatestExchangeRateHandler_InternationalMonetaryFundDataSource(t *testing.T) {
 	exchangeRateResponse := executeLatestExchangeRateHandler(t, settings.InternationalMonetaryFundDataSource)
 

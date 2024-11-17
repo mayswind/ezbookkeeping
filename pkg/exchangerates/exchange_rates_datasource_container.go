@@ -41,6 +41,9 @@ func InitializeExchangeRatesDataSource(config *settings.Config) error {
 	} else if config.ExchangeRatesDataSource == settings.BankOfIsraelDataSource {
 		Container.Current = &BankOfIsraelDataSource{}
 		return nil
+	} else if config.ExchangeRatesDataSource == settings.CentralBankOfMyanmarDataSource {
+		Container.Current = &CentralBankOfMyanmarDataSource{}
+		return nil
 	} else if config.ExchangeRatesDataSource == settings.NorgesBankDataSource {
 		Container.Current = &NorgesBankDataSource{}
 		return nil

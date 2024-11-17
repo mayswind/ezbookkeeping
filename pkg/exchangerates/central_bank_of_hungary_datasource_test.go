@@ -236,7 +236,7 @@ func TestCentralBankOfHungaryDataSource_InvalidUnit(t *testing.T) {
 		"<GetCurrentExchangeRatesResult>"+
 		"&lt;MNBCurrentExchangeRates&gt;"+
 		"&lt;Day date=\"2024-11-15\"&gt;"+
-		"&lt;Rate unit=\"\" curr=\"USD\"&gt;384,48&lt;/Rate&gt;"+
+		"&lt;Rate unit=\"0\" curr=\"USD\"&gt;384,48&lt;/Rate&gt;"+
 		"&lt;/Day&gt;"+
 		"&lt;/MNBCurrentExchangeRates&gt;"+
 		"</GetCurrentExchangeRatesResult>"+

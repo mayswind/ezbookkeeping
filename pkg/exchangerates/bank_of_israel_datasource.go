@@ -112,6 +112,11 @@ func (e *BankOfIsraelExchangeRate) ToLatestExchangeRate(c core.Context) *models.
 		return nil
 	}
 
+	if unit <= 0 {
+		log.Warnf(c, "[bank_of_israel_datasource.ToLatestExchangeRate] unit is less or equal zero, currency is %s, unit is %s", e.Currency, e.Unit)
+		return nil
+	}
+
 	finalRate := unit / rate
 
 	if math.IsInf(finalRate, 0) {

@@ -208,4 +208,15 @@ func TestNorgesBankDataSource_InvalidUnit(t *testing.T) {
 		"</message:StructureSpecificData>"))
 	assert.Equal(t, nil, err)
 	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
+
+	actualLatestExchangeRateResponse, err = dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>"+
+		"<message:StructureSpecificData xmlns:ss=\"http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/structurespecific\" xmlns:footer=\"http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message/footer\" xmlns:ns1=\"urn:sdmx:org.sdmx.infomodel.datastructure.Dataflow=NB:EXR(1.0):ObsLevelDim:TIME_PERIOD\" xmlns:message=\"http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message\" xmlns:common=\"http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xml=\"http://www.w3.org/XML/1998/namespace\" xsi:schemaLocation=\"http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message https://registry.sdmx.org/schemas/v2_1/SDMXMessage.xsd urn:sdmx:org.sdmx.infomodel.datastructure.Dataflow=NB:EXR(1.0):ObsLevelDim:TIME_PERIOD https://data.norges-bank.no/api/schema/dataflow/NB/EXR/1.0?format=sdmx-2.1\">"+
+		"  <message:DataSet>\n"+
+		"    <Series BASE_CUR=\"USD\" QUOTE_CUR=\"NOK\" UNIT_MULT=\"-1\">\n"+
+		"      <Obs TIME_PERIOD=\"2024-11-15\" OBS_VALUE=\"11.0545\" />\n"+
+		"    </Series>\n"+
+		"  </message:DataSet>\n"+
+		"</message:StructureSpecificData>"))
+	assert.Equal(t, nil, err)
+	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
 }

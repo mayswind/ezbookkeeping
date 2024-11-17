@@ -174,6 +174,9 @@ func (e *SwissNationalBankExchangeRate) ToLatestExchangeRate(c core.Context) *mo
 		finalRate = finalRate / math.Pow10(unitExponent-1)
 	} else if unitExponent < 0 {
 		finalRate = finalRate * math.Pow10(-unitExponent)
+	} else if unitExponent == 0 {
+		log.Warnf(c, "[swiss_national_bank_datasource.ToLatestExchangeRate] unit exponent is zero, currency is %s", e.TargetCurrency)
+		return nil
 	}
 
 	if math.IsInf(finalRate, 0) {

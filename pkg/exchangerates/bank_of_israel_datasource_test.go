@@ -177,4 +177,17 @@ func TestBankOfIsraelDataSource_InvalidUnit(t *testing.T) {
 		"</ExchangeRatesResponseCollectioDTO>"))
 	assert.Equal(t, nil, err)
 	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
+
+	actualLatestExchangeRateResponse, err = dataSource.Parse(context, []byte("<ExchangeRatesResponseCollectioDTO xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://schemas.datacontract.org/2004/07/BOI.Core.Models.HotData\">\n"+
+		"  <ExchangeRates>\n"+
+		"    <ExchangeRateResponseDTO>\n"+
+		"      <CurrentExchangeRate>1</CurrentExchangeRate>\n"+
+		"      <Key>USD</Key>\n"+
+		"      <LastUpdate>2024-11-11T13:26:05.6590204Z</LastUpdate>\n"+
+		"      <Unit>0</Unit>\n"+
+		"    </ExchangeRateResponseDTO>\n"+
+		"  </ExchangeRates>\n"+
+		"</ExchangeRatesResponseCollectioDTO>"))
+	assert.Equal(t, nil, err)
+	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
 }

@@ -385,4 +385,29 @@ func TestSwissNationalBankDataSource_InvalidUnit(t *testing.T) {
 		"</rss>"))
 	assert.Equal(t, nil, err)
 	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
+
+	actualLatestExchangeRateResponse, err = dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+		"<rss xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:cb=\"http://www.cbwiki.net/wiki/index.php/Specification_1.2/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" version=\"2.0\">\n"+
+		"  <channel>\n"+
+		"    <pubDate>Tue, 12 Nov 2024 11:00:50 GMT</pubDate>\n"+
+		"    <item>\n"+
+		"      <cb:statistics rdf:parseType=\"Resource\">\n"+
+		"        <cb:exchangeRate rdf:parseType=\"Resource\">\n"+
+		"          <cb:observation rdf:parseType=\"Resource\">\n"+
+		"            <cb:value>0.9378</cb:value>\n"+
+		"            <cb:unit>CHF</cb:unit>\n"+
+		"            <cb:unit_mult>0</cb:unit_mult>\n"+
+		"          </cb:observation>\n"+
+		"          <cb:baseCurrency>CHF</cb:baseCurrency>\n"+
+		"          <cb:targetCurrency>EUR</cb:targetCurrency>\n"+
+		"          <cb:observationPeriod rdf:parseType=\"Resource\">\n"+
+		"            <cb:period>2024-11-12</cb:period>\n"+
+		"          </cb:observationPeriod>\n"+
+		"        </cb:exchangeRate>\n"+
+		"      </cb:statistics>\n"+
+		"    </item>\n"+
+		"  </channel>\n"+
+		"</rss>"))
+	assert.Equal(t, nil, err)
+	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
 }

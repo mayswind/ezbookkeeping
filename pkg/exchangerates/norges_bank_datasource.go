@@ -144,6 +144,9 @@ func (e *NorgesBankExchangeRate) ToLatestExchangeRate(c core.Context, exchangeRa
 
 	if unitExponent > 0 {
 		finalRate = finalRate / math.Pow10(-unitExponent)
+	} else if unitExponent < 0 {
+		log.Warnf(c, "[norges_bank_datasource.ToLatestExchangeRate] unit exponent is less than zero, currency is %s, unit is %s", e.BaseCurrency, e.UnitExponent)
+		return nil
 	}
 
 	if math.IsInf(finalRate, 0) {

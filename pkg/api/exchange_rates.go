@@ -82,6 +82,9 @@ func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.WebContext) (any, *
 
 		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
+
+		log.Debugf(c, "[exchange_rates.LatestExchangeRateHandler] response#%d is %s", i, body)
+
 		exchangeRateResp, err := dataSource.Parse(c, body)
 
 		if err != nil {

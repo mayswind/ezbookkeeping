@@ -19,7 +19,7 @@ import (
 
 const nationalBankOfRomaniaExchangeRateUrl = "https://www.bnr.ro/nbrfxrates.xml"
 const nationalBankOfRomaniaExchangeRateReferenceUrl = "https://www.bnr.ro/Exchange-rates-1224.aspx"
-const nationalBankOfRomaniaDataSource = "National Bank of Romania"
+const nationalBankOfRomaniaDataSource = "Banca Naţională a României"
 
 const nationalBankOfRomaniaUpdateDateFormat = "2006-01-02 15"
 const nationalBankOfRomaniaUpdateDateTimezone = "Europe/Bucharest"

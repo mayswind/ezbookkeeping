@@ -19,7 +19,7 @@ import (
 
 const swissNationalBankExchangeRateUrl = "https://www.snb.ch/public/en/rss/exchangeRates"
 const swissNationalBankExchangeRateReferenceUrl = "https://www.snb.ch/en/the-snb/mandates-goals/statistics/statistics-pub/current_interest_exchange_rates"
-const swissNationalBankDataSource = "Swiss National Bank"
+const swissNationalBankDataSource = "Schweizerische Nationalbank"
 const swissNationalBankBaseCurrency = "CHF"
 
 const swissNationalBankDataUpdateDateFormat = "Mon, 02 Jan 2006 15:04:05 MST"

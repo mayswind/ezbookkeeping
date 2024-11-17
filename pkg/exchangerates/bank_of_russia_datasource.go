@@ -20,7 +20,7 @@ import (
 
 const bankOfRussiaExchangeRateUrl = "https://cbr.ru/scripts/XML_daily_eng.asp"
 const bankOfRussiaExchangeRateReferenceUrl = "https://www.cbr.ru/eng/currency_base/daily/"
-const bankOfRussiaDataSource = "Bank of Russia"
+const bankOfRussiaDataSource = "Банк России"
 const bankOfRussiaBaseCurrency = "RUB"
 
 const bankOfRussiaUpdateDateFormat = "02.01.2006 15:04"

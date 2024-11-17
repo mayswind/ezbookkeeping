@@ -19,7 +19,7 @@ import (
 
 const bankOfIsraelExchangeRateUrl = "https://boi.org.il/PublicApi/GetExchangeRates?asXml=true"
 const bankOfIsraelExchangeRateReferenceUrl = "https://www.boi.org.il/en/economic-roles/financial-markets/exchange-rates/"
-const bankOfIsraelDataSource = "Bank of Israel"
+const bankOfIsraelDataSource = "בנק ישראל"
 const bankOfIsraelBaseCurrency = "ILS"
 
 const bankOfIsraelDataUpdateDateFormat = "2006-01-02T15:04:05.9999999Z"

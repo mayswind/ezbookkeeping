@@ -16,7 +16,7 @@ import (
 
 const nationalBankOfGeorgiaExchangeRateUrl = "https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/en/json"
 const nationalBankOfGeorgiaExchangeRateReferenceUrl = "https://nbg.gov.ge/en/monetary-policy/currency"
-const nationalBankOfGeorgiaDataSource = "National Bank of Georgia"
+const nationalBankOfGeorgiaDataSource = "საქართველოს ეროვნული ბანკი"
 const nationalBankOfGeorgiaBaseCurrency = "GEL"
 
 const nationalBankOfGeorgiaUpdateDateFormat = "2006-01-02T15:04:05.999Z"

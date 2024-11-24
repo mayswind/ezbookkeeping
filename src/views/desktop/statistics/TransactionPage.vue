@@ -784,6 +784,10 @@ export default {
                 });
             }
 
+            if (this.analysisType !== statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                this.trendDateAggregationType = statisticsConstants.allDateAggregationTypes.Month.type;
+            }
+
             this.analysisType = analysisType;
             this.loading = true;
             this.statisticsStore.updateTransactionStatisticsInvalidState(true);

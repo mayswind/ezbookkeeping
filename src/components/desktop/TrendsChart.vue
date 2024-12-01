@@ -20,13 +20,11 @@ import {
 import {
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
-    getAllYearsStartAndEndUnixTimes,
-    getAllQuartersStartAndEndUnixTimes,
-    getAllMonthsStartAndEndUnixTimes,
     getDateTypeByDateRange
 } from '@/lib/datetime.js';
 import {
-    sortStatisticsItems
+    sortStatisticsItems,
+    getAllDateRanges
 } from '@/lib/statistics.js';
 
 export default {
@@ -87,44 +85,7 @@ export default {
             return map;
         },
         allDateRanges: function () {
-            let startYearMonth = this.startYearMonth;
-            let endYearMonth = this.endYearMonth;
-
-            if ((!this.startYearMonth || !this.endYearMonth) && this.items && this.items.length) {
-                let minYear = Number.MAX_SAFE_INTEGER, minMonth = Number.MAX_SAFE_INTEGER, maxYear = 0, maxMonth = 0;
-
-                for (let i = 0; i < this.items.length; i++) {
-                    const item = this.items[i];
-
-                    for (let j = 0; j < item.items.length; j++) {
-                        const dataItem = item.items[j];
-
-                        if (dataItem.year < minYear || (dataItem.year === minYear && dataItem.month < minMonth)) {
-                            minYear = dataItem.year;
-                            minMonth = dataItem.month;
-                        }
-
-                        if (dataItem.year > maxYear || (dataItem.year === maxYear && dataItem.month > maxMonth)) {
-                            maxYear = dataItem.year;
-                            maxMonth = dataItem.month;
-                        }
-                    }
-                }
-
-                startYearMonth = `${minYear}-${minMonth}`;
-                endYearMonth = `${maxYear}-${maxMonth}`;
-            }
-
-            if (!startYearMonth || !endYearMonth) {
-                return [];
-            }
-            if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Year.type) {
-                return getAllYearsStartAndEndUnixTimes(startYearMonth, endYearMonth);
-            } else if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Quarter.type) {
-                return getAllQuartersStartAndEndUnixTimes(startYearMonth, endYearMonth);
-            } else { // if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Month.type) {
-                return getAllMonthsStartAndEndUnixTimes(startYearMonth, endYearMonth);
-            }
+            return getAllDateRanges(this.items, this.startYearMonth, this.endYearMonth, this.dateAggregationType);
         },
         allDisplayDateRanges: function () {
             const allDisplayDateRanges = [];
@@ -301,14 +262,14 @@ export default {
                             displayItems.push({
                                 name: name,
                                 color: color,
-                                displayOrders:displayOrders,
+                                displayOrders: displayOrders,
                                 totalAmount: amount
                             });
 
                             totalAmount += amount;
                         }
 
-                        sortStatisticsItems(displayItems, self.sortingType)
+                        sortStatisticsItems(displayItems, self.sortingType);
 
                         for (let i = 0; i < displayItems.length; i++) {
                             const item = displayItems[i];

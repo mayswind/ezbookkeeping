@@ -378,7 +378,7 @@ export default {
             alwaysShowNav: mdAndUp.value,
             showNav: mdAndUp.value,
             analysisType: statisticsConstants.allAnalysisTypes.CategoricalAnalysis,
-            trendDateAggregationType: statisticsConstants.allDateAggregationTypes.Month.type,
+            trendDateAggregationType: statisticsConstants.defaultDateAggregationType,
             showCustomDateRangeDialog: false,
             showCustomMonthRangeDialog: false,
             showFilterAccountDialog: false,

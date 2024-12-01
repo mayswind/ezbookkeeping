@@ -609,3 +609,47 @@ i.icon.la, i.icon.las, i.icon.lab {
 .dp__main .dp__calendar .dp__calendar_item > .dp__cell_inner {
     width: 100%;
 }
+
+/* statistics-list */
+.statistics-list-item-overview-amount {
+    margin-top: 2px;
+    font-size: 1.5em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 6px;
+}
+
+.statistics-list-item-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.statistics-list-item .item-content {
+    margin-top: 8px;
+    margin-bottom: 12px;
+}
+
+.statistics-icon {
+    margin-bottom: -2px;
+}
+
+.statistics-percent {
+    font-size: 0.7em;
+    opacity: 0.6;
+    margin-left: 6px;
+}
+
+.statistics-item-end {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+.statistics-percent-line {
+    margin-right: calc(var(--f7-list-chevron-icon-area) + var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-right));
+}
+
+.statistics-percent-line .progressbar {
+    height: 4px;
+    --f7-progressbar-bg-color: #f8f8f8;
+}

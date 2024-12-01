@@ -100,11 +100,13 @@ import MapView from '@/components/common/MapView.vue';
 
 import ItemIcon from '@/components/mobile/ItemIcon.vue';
 import PieChart from '@/components/mobile/PieChart.vue';
+import TrendsBarChart from '@/components/mobile/TrendsBarChart.vue';
 import PinCodeInputSheet from '@/components/mobile/PinCodeInputSheet.vue';
 import PasswordInputSheet from '@/components/mobile/PasswordInputSheet.vue';
 import PasscodeInputSheet from '@/components/mobile/PasscodeInputSheet.vue';
 import DateTimeSelectionSheet from '@/components/mobile/DateTimeSelectionSheet.vue';
 import DateRangeSelectionSheet from '@/components/mobile/DateRangeSelectionSheet.vue';
+import MonthRangeSelectionSheet from '@/components/mobile/MonthRangeSelectionSheet.vue';
 import ListItemSelectionSheet from '@/components/mobile/ListItemSelectionSheet.vue';
 import TwoColumnListItemSelectionSheet from '@/components/mobile/TwoColumnListItemSelectionSheet.vue';
 import TreeViewSelectionSheet from '@/components/mobile/TreeViewSelectionSheet.vue';
@@ -181,11 +183,13 @@ app.component('MapView', MapView);
 
 app.component('ItemIcon', ItemIcon);
 app.component('PieChart', PieChart);
+app.component('TrendsBarChart', TrendsBarChart);
 app.component('PinCodeInputSheet', PinCodeInputSheet);
 app.component('PasswordInputSheet', PasswordInputSheet);
 app.component('PasscodeInputSheet', PasscodeInputSheet);
 app.component('DateTimeSelectionSheet', DateTimeSelectionSheet);
 app.component('DateRangeSelectionSheet', DateRangeSelectionSheet);
+app.component('MonthRangeSelectionSheet', MonthRangeSelectionSheet);
 app.component('ListItemSelectionSheet', ListItemSelectionSheet);
 app.component('TwoColumnListItemSelectionSheet', TwoColumnListItemSelectionSheet);
 app.component('TreeViewSelectionSheet', TreeViewSelectionSheet);

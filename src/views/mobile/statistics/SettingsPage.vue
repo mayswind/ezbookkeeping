@@ -62,8 +62,8 @@
             </f7-list-item>
         </f7-list>
 
-<!--        <f7-block-title>{{ $t('Trend Analysis Settings') }}</f7-block-title>-->
-<!--        <f7-list strong inset dividers>-->
+        <f7-block-title>{{ $t('Trend Analysis Settings') }}</f7-block-title>
+        <f7-list strong inset dividers>
 <!--            <f7-list-item-->
 <!--                :title="$t('Default Chart Type')"-->
 <!--                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Chart Type'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">-->
@@ -74,16 +74,16 @@
 <!--                </select>-->
 <!--            </f7-list-item>-->
 
-<!--            <f7-list-item-->
-<!--                :title="$t('Default Date Range')"-->
-<!--                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date Range'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">-->
-<!--                <select v-model="defaultTrendChartDateRange">-->
-<!--                    <option :value="dateRange.type"-->
-<!--                            :key="dateRange.type"-->
-<!--                            v-for="dateRange in allTrendChartDateRanges">{{ dateRange.displayName }}</option>-->
-<!--                </select>-->
-<!--            </f7-list-item>-->
-<!--        </f7-list>-->
+            <f7-list-item
+                :title="$t('Default Date Range')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date Range'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                <select v-model="defaultTrendChartDateRange">
+                    <option :value="dateRange.type"
+                            :key="dateRange.type"
+                            v-for="dateRange in allTrendChartDateRanges">{{ dateRange.displayName }}</option>
+                </select>
+            </f7-list-item>
+        </f7-list>
     </f7-page>
 </template>
 

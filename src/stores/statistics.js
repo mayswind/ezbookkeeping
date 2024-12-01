@@ -819,20 +819,28 @@ export const useStatisticsStore = defineStore('statistics', {
                 querys.push('type=3');
             }
 
-            if (this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type
+            if (itemId && (this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByAccount.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalAssets.type
-                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type) {
+                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type)) {
                 querys.push('accountIds=' + itemId);
 
                 if (!isObjectEmpty(this.transactionStatisticsFilter.filterCategoryIds)) {
                     querys.push('categoryIds=' + getFinalCategoryIdsByFilteredCategoryIds(transactionCategoriesStore.allTransactionCategoriesMap, this.transactionStatisticsFilter.filterCategoryIds));
                 }
-            } else if (this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByPrimaryCategory.type
+            } else if (itemId && (this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByPrimaryCategory.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByPrimaryCategory.type
-                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type) {
+                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type)) {
                 querys.push('categoryIds=' + itemId);
+
+                if (!isObjectEmpty(this.transactionStatisticsFilter.filterAccountIds)) {
+                    querys.push('accountIds=' + getFinalAccountIdsByFilteredAccountIds(accountsStore.allAccountsMap, this.transactionStatisticsFilter.filterAccountIds));
+                }
+            } else if (!itemId) {
+                if (!isObjectEmpty(this.transactionStatisticsFilter.filterCategoryIds)) {
+                    querys.push('categoryIds=' + getFinalCategoryIdsByFilteredCategoryIds(transactionCategoriesStore.allTransactionCategoriesMap, this.transactionStatisticsFilter.filterCategoryIds));
+                }
 
                 if (!isObjectEmpty(this.transactionStatisticsFilter.filterAccountIds)) {
                     querys.push('accountIds=' + getFinalAccountIdsByFilteredAccountIds(accountsStore.allAccountsMap, this.transactionStatisticsFilter.filterAccountIds));

@@ -14,22 +14,39 @@
         </f7-navbar>
 
         <f7-popover class="chart-data-type-popover-menu"
-                    v-model:opened="showChartDataTypePopover">
+                    v-model:opened="showChartDataTypePopover"
+                    @popover:open="scrollPopoverToSelectedItem">
             <f7-list dividers>
-                <f7-list-item group-title :title="$t('Categorical Analysis')" />
-                <f7-list-item :title="$t(dataType.name)"
-                              :key="dataType.type"
-                              v-for="dataType in allChartDataTypes"
-                              v-show="dataType.availableAnalysisTypes[analysisType]"
-                              @click="setChartDataType(dataType.type)">
-                    <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.chartDataType === dataType.type"></f7-icon>
-                    </template>
-                </f7-list-item>
+                <f7-list-group>
+                    <f7-list-item group-title :title="$t('Categorical Analysis')" />
+                    <f7-list-item :title="$t(dataType.name)"
+                                  :class="{ 'list-item-selected': analysisType === allAnalysisTypes.CategoricalAnalysis && query.chartDataType === dataType.type }"
+                                  :key="dataType.type"
+                                  v-for="dataType in allChartDataTypes"
+                                  v-show="dataType.availableAnalysisTypes[allAnalysisTypes.CategoricalAnalysis]"
+                                  @click="setChartDataType(allAnalysisTypes.CategoricalAnalysis, dataType.type)">
+                        <template #after>
+                            <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="analysisType === allAnalysisTypes.CategoricalAnalysis && query.chartDataType === dataType.type"></f7-icon>
+                        </template>
+                    </f7-list-item>
+                </f7-list-group>
+                <f7-list-group>
+                    <f7-list-item group-title :title="$t('Trend Analysis')" />
+                    <f7-list-item :title="$t(dataType.name)"
+                                  :class="{ 'list-item-selected': analysisType === allAnalysisTypes.TrendAnalysis && query.chartDataType === dataType.type }"
+                                  :key="dataType.type"
+                                  v-for="dataType in allChartDataTypes"
+                                  v-show="dataType.availableAnalysisTypes[allAnalysisTypes.TrendAnalysis]"
+                                  @click="setChartDataType(allAnalysisTypes.TrendAnalysis, dataType.type)">
+                        <template #after>
+                            <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="analysisType === allAnalysisTypes.TrendAnalysis && query.chartDataType === dataType.type"></f7-icon>
+                        </template>
+                    </f7-list-item>
+                </f7-list-group>
             </f7-list>
         </f7-popover>
 
-        <f7-card v-if="query.categoricalChartType === allCategoricalChartTypes.Pie">
+        <f7-card v-if="analysisType === allAnalysisTypes.CategoricalAnalysis && query.categoricalChartType === allCategoricalChartTypes.Pie">
             <f7-card-header class="no-border display-block">
                 <div class="statistics-chart-header full-line text-align-right">
                     <span style="margin-right: 4px;">{{ $t('Sort by') }}</span>
@@ -77,7 +94,7 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-card v-else-if="query.categoricalChartType === allCategoricalChartTypes.Bar">
+        <f7-card v-else-if="analysisType === allAnalysisTypes.CategoricalAnalysis && query.categoricalChartType === allCategoricalChartTypes.Bar">
             <f7-card-header class="no-border display-block">
                 <div class="statistics-chart-header display-flex full-line justify-content-space-between">
                     <div>
@@ -134,7 +151,7 @@
 
                 <f7-list v-else-if="!loading && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length">
                     <f7-list-item class="statistics-list-item"
-                                  :link="getTransactionItemLinkUrl(item)"
+                                  :link="getTransactionItemLinkUrl(item.id)"
                                   :key="idx"
                                   v-for="(item, idx) in categoricalAnalysisData.items"
                                   v-show="!item.hidden"
@@ -171,6 +188,38 @@
             </f7-card-content>
         </f7-card>
 
+        <f7-card v-else-if="analysisType === allAnalysisTypes.TrendAnalysis">
+            <f7-card-header class="no-border display-block">
+                <div class="statistics-chart-header display-flex full-line justify-content-space-between">
+                    <div>
+
+                    </div>
+                    <div class="align-self-flex-end">
+                        <span style="margin-right: 4px;">{{ $t('Sort by') }}</span>
+                        <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ querySortingTypeName }}</f7-link>
+                    </div>
+                </div>
+            </f7-card-header>
+            <f7-card-content style="margin-top: -14px" :padding="false">
+                <trends-bar-chart
+                    :loading="loading || reloading"
+                    :start-year-month="query.trendChartStartYearMonth"
+                    :end-year-month="query.trendChartEndYearMonth"
+                    :sorting-type="query.sortingType"
+                    :date-aggregation-type="trendDateAggregationType"
+                    :items="trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length ? trendsAnalysisData.items : []"
+                    :translate-name="translateNameInTrendsChart"
+                    :default-currency="defaultCurrency"
+                    id-field="id"
+                    name-field="name"
+                    value-field="totalAmount"
+                    hidden-field="hidden"
+                    display-orders-field="displayOrders"
+                    @click="clickTrendChartItem"
+                />
+            </f7-card-content>
+        </f7-card>
+
         <f7-popover class="sorting-type-popover-menu"
                     v-model:opened="showSortingTypePopover">
             <f7-list dividers>
@@ -187,18 +236,22 @@
         </f7-popover>
 
         <f7-toolbar tabbar bottom class="toolbar-item-auto-size">
-            <f7-link :class="{ 'disabled': reloading || query.categoricalChartDateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(-1)">
+            <f7-link :class="{ 'disabled': reloading || !canShiftDateRange(query) }" @click="shiftDateRange(query, -1)">
                 <f7-icon f7="arrow_left_square"></f7-icon>
             </f7-link>
             <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': reloading || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" popover-open=".date-popover-menu">
-                <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ dateRangeName() }}</span>
+                <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ dateRangeName(query) }}</span>
             </f7-link>
-            <f7-link :class="{ 'disabled': reloading || query.categoricalChartDateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(1)">
+            <f7-link :class="{ 'disabled': reloading || !canShiftDateRange(query) }" @click="shiftDateRange(query, 1)">
                 <f7-icon f7="arrow_right_square"></f7-icon>
+            </f7-link>
+            <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': reloading }" popover-open=".date-aggregation-popover-menu"
+                     v-if="analysisType === allAnalysisTypes.TrendAnalysis">
+                <span :class="{ 'tabbar-item-changed': trendDateAggregationType !== defaultTrendDateAggregationType }">{{ queryTrendDateAggregationTypeName }}</span>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" :key="chartType.type"
                      v-for="chartType in allChartTypes" @click="setChartType(chartType.type)">
-                <span :class="{ 'tabbar-item-changed': query.categoricalChartType === chartType.type }">{{ chartType.displayName }}</span>
+                <span :class="{ 'tabbar-item-changed': queryChartType === chartType.type }">{{ chartType.displayName }}</span>
             </f7-link>
         </f7-toolbar>
 
@@ -207,20 +260,36 @@
                     @popover:open="scrollPopoverToSelectedItem">
             <f7-list dividers>
                 <f7-list-item :title="dateRange.displayName"
-                              :class="{ 'list-item-selected': query.categoricalChartDateType === dateRange.type }"
+                              :class="{ 'list-item-selected': queryDateType === dateRange.type }"
                               :key="dateRange.type"
                               v-for="dateRange in allDateRangesArray"
                               @click="setDateFilter(dateRange.type)">
                     <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoricalChartDateType === dateRange.type"></f7-icon>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="queryDateType === dateRange.type"></f7-icon>
                     </template>
                     <template #footer>
-                        <div v-if="dateRange.type === allDateRanges.Custom.type && query.categoricalChartDateType === allDateRanges.Custom.type && query.categoricalChartStartTime && query.categoricalChartEndTime">
+                        <div v-if="dateRange.type === allDateRanges.Custom.type && showCustomDateRange()">
                             <span>{{ queryStartTime }}</span>
                             <span>&nbsp;-&nbsp;</span>
                             <br/>
                             <span>{{ queryEndTime }}</span>
                         </div>
+                    </template>
+                </f7-list-item>
+            </f7-list>
+        </f7-popover>
+
+        <f7-popover class="date-aggregation-popover-menu"
+                    v-model:opened="showDateAggregationPopover"
+                    @popover:open="scrollPopoverToSelectedItem">
+            <f7-list dividers>
+                <f7-list-item :title="aggregationType.displayName"
+                              :class="{ 'list-item-selected': trendDateAggregationType === aggregationType.type }"
+                              :key="aggregationType.type"
+                              v-for="aggregationType in allDateAggregationTypesArray"
+                              @click="setTrendDateAggregationType(aggregationType.type)">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="trendDateAggregationType === aggregationType.type"></f7-icon>
                     </template>
                 </f7-list-item>
             </f7-list>
@@ -232,6 +301,13 @@
                                     v-model:show="showCustomDateRangeSheet"
                                     @dateRange:change="setCustomDateFilter">
         </date-range-selection-sheet>
+
+        <month-range-selection-sheet :title="$t('Custom Date Range')"
+                                     :min-time="query.trendChartStartYearMonth"
+                                     :max-time="query.trendChartEndYearMonth"
+                                     v-model:show="showCustomMonthRangeSheet"
+                                     @dateRange:change="setCustomDateFilter">
+        </month-range-selection-sheet>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
@@ -261,10 +337,14 @@ import statisticsConstants from '@/consts/statistics.js';
 import { getNameByKeyValue, limitText } from '@/lib/common.js';
 import { formatPercent } from '@/lib/numeral.js';
 import {
+    getYearAndMonthFromUnixTime,
+    getYearMonthFirstUnixTime,
+    getYearMonthLastUnixTime,
     getShiftedDateRangeAndDateType,
     getDateTypeByDateRange,
     getDateRangeByDateType
 } from '@/lib/datetime.js';
+import { isChartDataTypeAvailableForAnalysisType } from '@/lib/statistics.js';
 import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
 
 export default {
@@ -277,10 +357,13 @@ export default {
             loadingError: null,
             reloading: false,
             analysisType: statisticsConstants.allAnalysisTypes.CategoricalAnalysis,
+            trendDateAggregationType: statisticsConstants.defaultDateAggregationType,
             showChartDataTypePopover: false,
             showSortingTypePopover: false,
             showDatePopover: false,
+            showDateAggregationPopover: false,
             showCustomDateRangeSheet: false,
+            showCustomMonthRangeSheet: false,
             showMoreActionSheet: false
         };
     },
@@ -288,6 +371,9 @@ export default {
         ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useStatisticsStore),
         defaultCurrency() {
             return this.userStore.currentUserDefaultCurrency;
+        },
+        defaultTrendDateAggregationType() {
+            return statisticsConstants.defaultDateAggregationType;
         },
         firstDayOfWeek() {
             return this.userStore.currentUserFirstDayOfWeek;
@@ -298,6 +384,20 @@ export default {
         queryChartDataCategory() {
             return this.statisticsStore.categoricalAnalysisChartDataCategory;
         },
+        queryChartType: {
+            get: function () {
+                if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                    return this.query.categoricalChartType;
+                } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                    return this.query.trendChartType;
+                } else {
+                    return null;
+                }
+            },
+            set: function(value) {
+                this.setChartType(value);
+            }
+        },
         queryChartDataTypeName() {
             const queryChartDataTypeName = getNameByKeyValue(this.allChartDataTypes, this.query.chartDataType, 'type', 'name', 'Statistics');
             return this.$t(queryChartDataTypeName);
@@ -306,9 +406,23 @@ export default {
             const querySortingTypeName = getNameByKeyValue(this.allSortingTypes, this.query.sortingType, 'type', 'name', 'System Default');
             return this.$t(querySortingTypeName);
         },
+        queryDateType() {
+            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                return this.query.categoricalChartDateType;
+            } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                return this.query.trendChartDateType;
+            } else {
+                return null;
+            }
+        },
+        queryTrendDateAggregationTypeName() {
+            return getNameByKeyValue(this.allDateAggregationTypesArray, this.trendDateAggregationType, 'type', 'displayName', '');
+        },
         queryStartTime() {
             if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
                 return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.categoricalChartStartTime);
+            } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                return this.$locale.formatUnixTimeToLongYearMonth(this.userStore, getYearMonthFirstUnixTime(this.query.trendChartStartYearMonth));
             } else {
                 return '';
             }
@@ -316,9 +430,14 @@ export default {
         queryEndTime() {
             if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
                 return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.categoricalChartEndTime);
+            } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                return this.$locale.formatUnixTimeToLongYearMonth(this.userStore, getYearMonthLastUnixTime(this.query.trendChartEndYearMonth));
             } else {
                 return '';
             }
+        },
+        allAnalysisTypes() {
+            return statisticsConstants.allAnalysisTypes;
         },
         allChartTypes() {
             if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
@@ -336,12 +455,17 @@ export default {
         allSortingTypes() {
             return statisticsConstants.allSortingTypes;
         },
+        allDateAggregationTypesArray() {
+            return this.$locale.getAllStatisticsDateAggregationTypes();
+        },
         allDateRanges() {
             return datetimeConstants.allDateRanges;
         },
         allDateRangesArray() {
             if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
                 return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.Normal, true);
+            } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.TrendAnalysis, true);
             } else {
                 return [];
             }
@@ -369,6 +493,14 @@ export default {
         categoricalAnalysisData() {
             return this.statisticsStore.categoricalAnalysisData;
         },
+        trendsAnalysisData() {
+            return this.statisticsStore.trendsAnalysisData;
+        },
+        translateNameInTrendsChart() {
+            return this.query.chartDataType === this.allChartDataTypes.TotalExpense.type ||
+                this.query.chartDataType === this.allChartDataTypes.TotalIncome.type ||
+                this.query.chartDataType === this.allChartDataTypes.TotalBalance.type;
+        },
         showAmountInChart() {
             if (!this.showAccountBalance
                 && (this.query.chartDataType === this.allChartDataTypes.AccountTotalAssets.type || this.query.chartDataType === this.allChartDataTypes.AccountTotalLiabilities.type)) {
@@ -387,9 +519,15 @@ export default {
             self.accountsStore.loadAllAccounts({ force: false }),
             self.transactionCategoriesStore.loadAllCategories({ force: false })
         ]).then(() => {
-            return self.statisticsStore.loadCategoricalAnalysis({
-                force: false
-            });
+            if (self.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                return self.statisticsStore.loadCategoricalAnalysis({
+                    force: false
+                });
+            } else if (self.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                return self.statisticsStore.loadTrendAnalysis({
+                    force: false
+                });
+            }
         }).then(() => {
             self.loading = false;
         }).catch(error => {
@@ -421,10 +559,19 @@ export default {
                 self.query.chartDataType === self.allChartDataTypes.ExpenseBySecondaryCategory.type ||
                 self.query.chartDataType === self.allChartDataTypes.IncomeByAccount.type ||
                 self.query.chartDataType === self.allChartDataTypes.IncomeByPrimaryCategory.type ||
-                self.query.chartDataType === self.allChartDataTypes.IncomeBySecondaryCategory.type) {
-                dispatchPromise = self.statisticsStore.loadCategoricalAnalysis({
-                    force: force
-                });
+                self.query.chartDataType === self.allChartDataTypes.IncomeBySecondaryCategory.type ||
+                self.query.chartDataType === self.allChartDataTypes.TotalExpense.type ||
+                self.query.chartDataType === self.allChartDataTypes.TotalIncome.type ||
+                self.query.chartDataType === self.allChartDataTypes.TotalBalance.type) {
+                if (self.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                    dispatchPromise = self.statisticsStore.loadCategoricalAnalysis({
+                        force: force
+                    });
+                } else if (self.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                    dispatchPromise = self.statisticsStore.loadTrendAnalysis({
+                        force: force
+                    });
+                }
             } else if (self.query.chartDataType === self.allChartDataTypes.AccountTotalAssets.type ||
                 self.query.chartDataType === self.allChartDataTypes.AccountTotalLiabilities.type) {
                 dispatchPromise = self.accountsStore.loadAllAccounts({
@@ -459,15 +606,40 @@ export default {
             }
         },
         setChartType(chartType) {
-            this.statisticsStore.updateTransactionStatisticsFilter({
-                categoricalChartType: chartType
-            });
+            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                this.statisticsStore.updateTransactionStatisticsFilter({
+                    categoricalChartType: chartType
+                });
+            } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                this.statisticsStore.updateTransactionStatisticsFilter({
+                    trendChartType: chartType
+                });
+            }
         },
-        setChartDataType(chartDataType) {
+        setChartDataType(analysisType, chartDataType) {
+            let analysisTypeChanged = false;
+
+            if (this.analysisType !== analysisType) {
+                if (!isChartDataTypeAvailableForAnalysisType(this.queryChartDataType, analysisType)) {
+                    this.statisticsStore.updateTransactionStatisticsFilter({
+                        chartDataType: statisticsConstants.defaultChartDataType
+                    });
+                }
+
+                this.analysisType = analysisType;
+                this.statisticsStore.updateTransactionStatisticsInvalidState(true);
+                analysisTypeChanged = true;
+            }
+
             this.statisticsStore.updateTransactionStatisticsFilter({
                 chartDataType: chartDataType
             });
+
             this.showChartDataTypePopover = false;
+
+            if (analysisTypeChanged) {
+                this.reload(null);
+            }
         },
         setSortingType(sortingType) {
             if (sortingType < this.allSortingTypes.Amount.type || sortingType > this.allSortingTypes.Name.type) {
@@ -481,6 +653,10 @@ export default {
 
             this.showSortingTypePopover = false;
         },
+        setTrendDateAggregationType(aggregationType) {
+            this.trendDateAggregationType = aggregationType;
+            this.showDateAggregationPopover = false;
+        },
         setDateFilter(dateType) {
             if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
                 if (dateType === this.allDateRanges.Custom.type) { // Custom
@@ -488,6 +664,14 @@ export default {
                     this.showDatePopover = false;
                     return;
                 } else if (this.query.categoricalChartDateType === dateType) {
+                    return;
+                }
+            } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                if (dateType === this.allDateRanges.Custom.type) { // Custom
+                    this.showCustomMonthRangeSheet = true;
+                    this.showDatePopover = false;
+                    return;
+                } else if (this.query.trendChartDateType === dateType) {
                     return;
                 }
             }
@@ -505,6 +689,12 @@ export default {
                     categoricalChartDateType: dateRange.dateType,
                     categoricalChartStartTime: dateRange.minTime,
                     categoricalChartEndTime: dateRange.maxTime
+                });
+            } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                changed = this.statisticsStore.updateTransactionStatisticsFilter({
+                    trendChartDateType: dateRange.dateType,
+                    trendChartStartYearMonth: getYearAndMonthFromUnixTime(dateRange.minTime),
+                    trendChartEndYearMonth: getYearAndMonthFromUnixTime(dateRange.maxTime)
                 });
             }
 
@@ -531,13 +721,45 @@ export default {
                 });
 
                 this.showCustomDateRangeSheet = false;
+            } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                const chartDateType = getDateTypeByDateRange(getYearMonthFirstUnixTime(startTime), getYearMonthLastUnixTime(endTime), this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.TrendAnalysis);
+
+                this.statisticsStore.updateTransactionStatisticsFilter({
+                    trendChartDateType: chartDateType,
+                    trendChartStartYearMonth: startTime,
+                    trendChartEndYearMonth: endTime
+                });
+
+                this.showCustomMonthRangeSheet = false;
             }
 
             if (changed) {
                 this.reload(null);
             }
         },
-        shiftDateRange(scale) {
+        showCustomDateRange() {
+            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                return this.query.categoricalChartDateType === this.allDateRanges.Custom.type && this.query.categoricalChartStartTime && this.query.categoricalChartEndTime;
+            } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                return this.query.trendChartDateType === this.allDateRanges.Custom.type && this.query.trendChartStartYearMonth && this.query.trendChartEndYearMonth;
+            } else {
+                return false;
+            }
+        },
+        canShiftDateRange(query) {
+            if (query.chartDataType === this.allChartDataTypes.AccountTotalAssets.type || query.chartDataType === this.allChartDataTypes.AccountTotalLiabilities.type) {
+                return false;
+            }
+
+            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                return query.categoricalChartDateType !== this.allDateRanges.All.type;
+            } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                return query.trendChartDateType !== this.allDateRanges.All.type;
+            } else {
+                return false;
+            }
+        },
+        shiftDateRange(query, scale) {
             if (this.query.categoricalChartDateType === this.allDateRanges.All.type) {
                 return;
             }
@@ -545,12 +767,20 @@ export default {
             let changed = false;
 
             if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
-                const newDateRange = getShiftedDateRangeAndDateType(this.query.categoricalChartStartTime, this.query.categoricalChartEndTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+                const newDateRange = getShiftedDateRangeAndDateType(query.categoricalChartStartTime, query.categoricalChartEndTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
 
                 changed = this.statisticsStore.updateTransactionStatisticsFilter({
                     categoricalChartDateType: newDateRange.dateType,
                     categoricalChartStartTime: newDateRange.minTime,
                     categoricalChartEndTime: newDateRange.maxTime
+                });
+            } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                const newDateRange = getShiftedDateRangeAndDateType(getYearMonthFirstUnixTime(query.trendChartStartYearMonth), getYearMonthLastUnixTime(query.trendChartEndYearMonth), scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.TrendAnalysis);
+
+                changed = this.statisticsStore.updateTransactionStatisticsFilter({
+                    trendChartDateType: newDateRange.dateType,
+                    trendChartStartYearMonth: getYearAndMonthFromUnixTime(newDateRange.minTime),
+                    trendChartEndYearMonth: getYearAndMonthFromUnixTime(newDateRange.maxTime)
                 });
             }
 
@@ -558,20 +788,25 @@ export default {
                 this.reload(null);
             }
         },
-        dateRangeName() {
+        dateRangeName(query) {
             if (this.query.chartDataType === this.allChartDataTypes.AccountTotalAssets.type ||
                 this.query.chartDataType === this.allChartDataTypes.AccountTotalLiabilities.type) {
                 return this.$t(this.allDateRanges.All.name);
             }
 
             if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
-                return this.$locale.getDateRangeDisplayName(this.userStore, this.query.categoricalChartDateType, this.query.categoricalChartStartTime, this.query.categoricalChartEndTime);
+                return this.$locale.getDateRangeDisplayName(this.userStore, query.categoricalChartDateType, query.categoricalChartStartTime, query.categoricalChartEndTime);
+            } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                return this.$locale.getDateRangeDisplayName(this.userStore, query.trendChartDateType, getYearMonthFirstUnixTime(query.trendChartStartYearMonth), getYearMonthLastUnixTime(query.trendChartEndYearMonth));
             } else {
                 return '';
             }
         },
         clickPieChartItem(item) {
-            this.f7router.navigate(this.getTransactionItemLinkUrl(item));
+            this.f7router.navigate(this.getTransactionItemLinkUrl(item.id));
+        },
+        clickTrendChartItem(item) {
+            this.f7router.navigate(this.getTransactionItemLinkUrl(item.itemId, item.dateRange));
         },
         filterAccounts() {
             this.f7router.navigate('/settings/filter/account?type=statisticsCurrent');
@@ -607,8 +842,8 @@ export default {
         getDisplayPercent(value, precision, lowPrecisionValue) {
             return formatPercent(value, precision, lowPrecisionValue);
         },
-        getTransactionItemLinkUrl(item) {
-            return `/transaction/list?${this.statisticsStore.getTransactionListPageParams(statisticsConstants.allAnalysisTypes.CategoricalAnalysis, item.id)}`;
+        getTransactionItemLinkUrl(itemId, dateRange) {
+            return `/transaction/list?${this.statisticsStore.getTransactionListPageParams(this.analysisType, itemId, dateRange)}`;
         }
     }
 };
@@ -649,50 +884,12 @@ export default {
     transform: translateY(1.5em);
 }
 
-.statistics-list-item-overview-amount {
-    margin-top: 2px;
-    font-size: 1.5em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 6px;
-}
-
-.statistics-list-item-text {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.statistics-list-item .item-content {
-    margin-top: 8px;
-    margin-bottom: 12px;
-}
-
-.statistics-icon {
-    margin-bottom: -2px;
-}
-
-.statistics-percent {
-    font-size: 0.7em;
-    opacity: 0.6;
-    margin-left: 6px;
-}
-
-.statistics-item-end {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-}
-
-.statistics-percent-line {
-    margin-right: calc(var(--f7-list-chevron-icon-area) + var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-right));
-}
-
-.statistics-percent-line .progressbar {
-    height: 4px;
-    --f7-progressbar-bg-color: #f8f8f8;
-}
-
 .dark .statistics-percent-line .progressbar {
     --f7-progressbar-bg-color: #161616;
+}
+
+.chart-data-type-popover-menu .popover-inner{
+    max-height: 400px;
+    overflow-y: auto;
 }
 </style>

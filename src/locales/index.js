@@ -1,4 +1,5 @@
 import en from './en.json'
+import vi from './vi.json'
 import zhHans from './zh_Hans.json'
 
 export const defaultLanguage = 'en';
@@ -17,5 +18,12 @@ export const allLanguages = {
         alternativeLanguageTag: 'zh-CN',
         aliases: ['zh-CHS', 'zh-CN', 'zh-SG'],
         content: zhHans
+    },
+    'vi': {
+        name: 'Vietnamese',
+        displayName: 'Tiếng Việt',
+        alternativeLanguageTag: 'vi-VN',
+        aliases: ['vi-VN', 'vi'],
+        content: vi
     }
 };

@@ -889,7 +889,7 @@ export default {
 }
 
 .chart-data-type-popover-menu .popover-inner{
-    max-height: 400px;
+    max-height: 440px;
     overflow-y: auto;
 }
 </style>

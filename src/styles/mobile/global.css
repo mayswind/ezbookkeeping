@@ -653,3 +653,17 @@ i.icon.la, i.icon.las, i.icon.lab {
     height: 4px;
     --f7-progressbar-bg-color: #f8f8f8;
 }
+
+.statistics-multi-percent-line > div > .progressbar {
+    border-radius: unset;
+}
+
+.statistics-multi-percent-line > div:first-child > .progressbar {
+    border-top-left-radius: var(--f7-progressbar-border-radius);
+    border-bottom-left-radius: var(--f7-progressbar-border-radius);
+}
+
+.statistics-multi-percent-line > div:last-child > .progressbar {
+    border-top-right-radius: var(--f7-progressbar-border-radius);
+    border-bottom-right-radius: var(--f7-progressbar-border-radius);
+}

@@ -26,15 +26,25 @@
         </f7-list-item>
     </f7-list>
 
-    <f7-list v-else-if="!loading && (!allDisplayDataItems || !allDisplayDataItems.length)">
+    <f7-list v-else-if="!loading && (!allDisplayDataItems || !allDisplayDataItems.data || !allDisplayDataItems.data.length)">
         <f7-list-item :title="$t('No transaction data')"></f7-list-item>
     </f7-list>
 
-    <f7-list v-else-if="!loading && allDisplayDataItems && allDisplayDataItems.length">
+    <f7-list v-else-if="!loading && allDisplayDataItems && allDisplayDataItems.data && allDisplayDataItems.data.length">
+        <f7-list-item v-if="allDisplayDataItems.legends && allDisplayDataItems.legends.length > 1">
+            <div class="display-flex" style="flex-wrap: wrap">
+                <div class="display-flex align-items-center" style="margin-right: 4px"
+                     :key="idx"
+                     v-for="(legend, idx) in allDisplayDataItems.legends">
+                    <f7-icon f7="app_fill" class="trends-bar-chart-legend-icon" :style="{ 'color': legend.color }"></f7-icon>
+                    <span class="trends-bar-chart-legend-text">{{ legend.name }}</span>
+                </div>
+            </div>
+        </f7-list-item>
         <f7-list-item class="statistics-list-item"
                       link="#"
                       :key="idx"
-                      v-for="(item, idx) in allDisplayDataItems"
+                      v-for="(item, idx) in allDisplayDataItems.data"
                       v-show="!item.hidden"
                       @click="clickItem(item)"
         >
@@ -58,8 +68,17 @@
 
             <template #inner-end>
                 <div class="statistics-item-end">
-                    <div class="statistics-percent-line">
-                        <f7-progressbar :progress="0" :style="{ '--f7-progressbar-progress-color': (item.color ? '#' + item.color : '') } "></f7-progressbar>
+                    <div class="statistics-percent-line statistics-multi-percent-line display-flex">
+                        <div class="display-inline-flex" :style="{ 'width': (item.percent * data.totalAmount / item.totalAmount) + '%' }"
+                             :key="dataIdx"
+                             v-for="(data, dataIdx) in item.items"
+                             v-show="data.totalAmount > 0">
+                            <f7-progressbar :progress="100" :style="{ '--f7-progressbar-progress-color': (data.color ? data.color : '') } "></f7-progressbar>
+                        </div>
+                        <div class="display-inline-flex" :style="{ 'width': (100.0 - item.percent) + '%' }"
+                             v-if="item.percent < 100.0">
+                            <f7-progressbar :progress="0"></f7-progressbar>
+                        </div>
                     </div>
                 </div>
             </template>
@@ -114,6 +133,7 @@ export default {
         },
         allDisplayDataItems: function () {
             const dateRangeItemsMap = {};
+            const legends = [];
 
             for (let i = 0; i < this.items.length; i++) {
                 const item = this.items[i];
@@ -121,6 +141,14 @@ export default {
                 if (!this.hiddenField || item[this.hiddenField]) {
                     continue;
                 }
+
+                const id = (this.idField && item[this.idField]) ? item[this.idField] : this.getItemName(item[this.nameField]);
+                const legend = {
+                    id: id,
+                    name: (this.nameField && item[this.nameField]) ? this.getItemName(item[this.nameField]) : id,
+                    color: this.getColor(item[this.colorField] ? item[this.colorField] : colorConstants.defaultChartColors[i % colorConstants.defaultChartColors.length]),
+                    displayOrders: (this.displayOrdersField && item[this.displayOrdersField]) ? item[this.displayOrdersField] : [0]
+                };
 
                 for (let j = 0; j < item.items.length; j++) {
                     const dataItem = item.items[j];
@@ -135,21 +163,19 @@ export default {
                     }
 
                     const dataItems = dateRangeItemsMap[dateRangeKey] || [];
-                    const id = (this.idField && item[this.idField]) ? item[this.idField] : this.getItemName(item[this.nameField]);
 
-                    dataItems.push({
-                        id: id,
-                        name: (this.nameField && item[this.nameField]) ? this.getItemName(item[this.nameField]) : id,
-                        color: this.getColor(item[this.colorField] ? item[this.colorField] : colorConstants.defaultChartColors[i % colorConstants.defaultChartColors.length]),
-                        displayOrders: (this.displayOrdersField && item[this.displayOrdersField]) ? item[this.displayOrdersField] : [0],
+                    dataItems.push(Object.assign({}, legend, {
                         totalAmount: (this.valueField && isNumber(dataItem[this.valueField])) ? dataItem[this.valueField] : 0
-                    });
+                    }));
 
                     dateRangeItemsMap[dateRangeKey] = dataItems;
                 }
+
+                legends.push(legend);
             }
 
             const finalDataItems = [];
+            let maxTotalAmount = 0;
 
             for (let i = 0; i < this.allDateRanges.length; i++) {
                 const dateRange = this.allDateRanges[i];
@@ -179,7 +205,13 @@ export default {
                 sortStatisticsItems(dataItems, this.sortingType);
 
                 for (let j = 0; j < dataItems.length; j++) {
-                    totalAmount += dataItems[j].totalAmount;
+                    if (dataItems[j].totalAmount > 0) {
+                        totalAmount += dataItems[j].totalAmount;
+                    }
+                }
+
+                if (totalAmount > maxTotalAmount) {
+                    maxTotalAmount = totalAmount;
                 }
 
                 finalDataItems.push({
@@ -190,7 +222,18 @@ export default {
                 });
             }
 
-            return finalDataItems;
+            for (let i = 0; i < finalDataItems.length; i++) {
+                if (maxTotalAmount > 0) {
+                    finalDataItems[i].percent = 100.0 * finalDataItems[i].totalAmount / maxTotalAmount;
+                } else {
+                    finalDataItems[i].percent = 100.0;
+                }
+            }
+
+            return {
+                data: finalDataItems,
+                legends: legends
+            };
         }
     },
     methods: {
@@ -241,3 +284,13 @@ export default {
     }
 }
 </script>
+
+<style>
+.trends-bar-chart-legend-icon.f7-icons {
+    font-size: var(--ebk-trends-bar-chart-legend-icon-font-size);
+}
+
+.trends-bar-chart-legend-text {
+    font-size: var(--ebk-trends-bar-chart-legend-text-font-size);
+}
+</style>

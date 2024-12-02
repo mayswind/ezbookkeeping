@@ -847,7 +847,7 @@ function getAllCurrencyDisplayTypes(userStore, settingsStore, translateFn) {
     const defaultCurrency = userStore.currentUserDefaultCurrency;
 
     const ret = [];
-    const defaultSampleValue = getFormatedAmountWithCurrency(12345, defaultCurrency, translateFn, userStore, settingsStore, false, defaultCurrencyDisplayType);
+    const defaultSampleValue = getFormattedAmountWithCurrency(12345, defaultCurrency, translateFn, userStore, settingsStore, false, defaultCurrencyDisplayType);
 
     ret.push({
         type: currencyConstants.defaultCurrencyDisplayTypeValue,
@@ -859,7 +859,7 @@ function getAllCurrencyDisplayTypes(userStore, settingsStore, translateFn) {
         let displayName = translateFn(type.name);
 
         if (type.symbol !== currencyConstants.allCurrencyDisplaySymbol.None) {
-            const sampleValue = getFormatedAmountWithCurrency(12345, defaultCurrency, translateFn, userStore, settingsStore, false, type);
+            const sampleValue = getFormattedAmountWithCurrency(12345, defaultCurrency, translateFn, userStore, settingsStore, false, type);
             displayName = `${displayName} (${sampleValue})`
         }
 
@@ -954,7 +954,7 @@ function getParsedAmountNumber(value, translateFn, userStore) {
     return parseAmount(value, numberFormatOptions);
 }
 
-function getFormatedAmount(value, translateFn, userStore) {
+function getFormattedAmount(value, translateFn, userStore) {
     const numberFormatOptions = getNumberFormatOptions(translateFn, userStore);
     return formatAmount(value, numberFormatOptions);
 }
@@ -974,7 +974,7 @@ function getCurrentCurrencyDisplayType(translateFn, userStore) {
     return currencyDisplayType;
 }
 
-function getFormatedAmountWithCurrency(value, currencyCode, translateFn, userStore, settingsStore, notConvertValue, currencyDisplayType) {
+function getFormattedAmountWithCurrency(value, currencyCode, translateFn, userStore, settingsStore, notConvertValue, currencyDisplayType) {
     if (!isNumber(value) && !isString(value)) {
         return value;
     }
@@ -1019,7 +1019,7 @@ function getFormatedAmountWithCurrency(value, currencyCode, translateFn, userSto
     return appendCurrencySymbol(value, currencyDisplayType, currencyCode, currencyUnit, currencyName, isPlural);
 }
 
-function getFormatedExchangeRateAmount(value, translateFn, userStore) {
+function getFormattedExchangeRateAmount(value, translateFn, userStore) {
     const numberFormatOptions = getNumberFormatOptions(translateFn, userStore);
     return formatExchangeRateAmount(value, numberFormatOptions);
 }
@@ -1421,9 +1421,9 @@ function getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccoun
                 const account = accountCategory.accounts[i];
 
                 if (showAccountBalance && account.isAsset) {
-                    account.displayBalance = getFormatedAmountWithCurrency(account.balance, account.currency, translateFn, userStore, settingsStore);
+                    account.displayBalance = getFormattedAmountWithCurrency(account.balance, account.currency, translateFn, userStore, settingsStore);
                 } else if (showAccountBalance && account.isLiability) {
-                    account.displayBalance = getFormatedAmountWithCurrency(-account.balance, account.currency, translateFn, userStore, settingsStore);
+                    account.displayBalance = getFormattedAmountWithCurrency(-account.balance, account.currency, translateFn, userStore, settingsStore);
                 } else {
                     account.displayBalance = '***';
                 }
@@ -1462,7 +1462,7 @@ function getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccoun
                 totalBalance = totalBalance + '+';
             }
 
-            accountCategory.displayBalance = getFormatedAmountWithCurrency(totalBalance, defaultCurrency, translateFn, userStore, settingsStore);
+            accountCategory.displayBalance = getFormattedAmountWithCurrency(totalBalance, defaultCurrency, translateFn, userStore, settingsStore);
         } else {
             accountCategory.displayBalance = '***';
         }
@@ -1739,9 +1739,9 @@ export function i18nFunctions(i18nGlobal) {
         getCurrentDigitGroupingType: (userStore) => getCurrentDigitGroupingType(i18nGlobal.t, userStore.currentUserDigitGrouping),
         appendDigitGroupingSymbol: (userStore, value) => getNumberWithDigitGroupingSymbol(value, i18nGlobal.t, userStore),
         parseAmount: (userStore, value) => getParsedAmountNumber(value, i18nGlobal.t, userStore),
-        formatAmount: (userStore, value) => getFormatedAmount(value, i18nGlobal.t, userStore),
-        formatAmountWithCurrency: (settingsStore, userStore, value, currencyCode) => getFormatedAmountWithCurrency(value, currencyCode, i18nGlobal.t, userStore, settingsStore),
-        formatExchangeRateAmount: (userStore, value) => getFormatedExchangeRateAmount(value, i18nGlobal.t, userStore),
+        formatAmount: (userStore, value) => getFormattedAmount(value, i18nGlobal.t, userStore),
+        formatAmountWithCurrency: (settingsStore, userStore, value, currencyCode) => getFormattedAmountWithCurrency(value, currencyCode, i18nGlobal.t, userStore, settingsStore),
+        formatExchangeRateAmount: (userStore, value) => getFormattedExchangeRateAmount(value, i18nGlobal.t, userStore),
         getAdaptiveAmountRate: (userStore, amount1, amount2, fromExchangeRate, toExchangeRate) => getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, i18nGlobal.t, userStore),
         getAmountPrependAndAppendText: (settingsStore, userStore, currencyCode, isPlural) => getAmountPrependAndAppendText(currencyCode, userStore, settingsStore, isPlural, i18nGlobal.t),
         getAllExpenseAmountColors: () => getAllExpenseIncomeAmountColors(i18nGlobal.t, 1),

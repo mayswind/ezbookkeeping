@@ -10,10 +10,10 @@
         "Vietnamese": "Tiếng Việt"
     },
     "default": {
-        "currency": "USD",
-        "firstDayOfWeek": "Sunday",
-        "longDateFormat": "MMDDYYYY",
-        "shortDateFormat": "MMDDYYYY",
+        "currency": "VND",
+        "firstDayOfWeek": "Monday",
+        "longDateFormat": "DDMMYYYY",
+        "shortDateFormat": "DDMMYYYY",
         "longTimeFormat": "HHMMSSA",
         "shortTimeFormat": "HHMMA",
         "decimalSeparator": "Dot",
@@ -531,7 +531,7 @@
             "UZS": "Uzbekistani Sum",
             "VED": "Venezuelan Bolívar Digital",
             "VES": "Venezuelan Bolívar Soberano",
-            "VND": "Vietnamese Dong",
+            "VND": "Việt Nam Đồng",
             "VUV": "Vanuatu Vatu",
             "WST": "Samoan Tala",
             "XAF": "Central African CFA Franc",

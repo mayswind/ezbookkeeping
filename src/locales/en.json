@@ -6,7 +6,8 @@
     },
     "language": {
         "English": "English",
-        "Simplified Chinese": "Simplified Chinese"
+        "Simplified Chinese": "Simplified Chinese",
+        "Vietnamese": "Vietnamese"
     },
     "default": {
         "currency": "USD",

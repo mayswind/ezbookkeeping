@@ -1,4 +1,4 @@
-// Reference: https://github.com/nodatime/nodatime/blob/master/data/cldr/windowsZones-38-1.xml
+// Reference: https://github.com/nodatime/nodatime/blob/main/data/cldr/windowsZones-45.xml
 const allAvailableTimezones = [
     // UTC-12:00
     {
@@ -279,6 +279,10 @@ const allAvailableTimezones = [
         timezoneName: 'Asia/Jerusalem'
     },
     {
+        displayName: 'Juba',
+        timezoneName: 'Asia/Juba'
+    },
+    {
         displayName: 'Kaliningrad',
         timezoneName: 'Europe/Kaliningrad'
     },
@@ -351,10 +355,6 @@ const allAvailableTimezones = [
     {
         displayName: 'Tbilisi',
         timezoneName: 'Asia/Tbilisi'
-    },
-    {
-        displayName: 'Volgograd',
-        timezoneName: 'Europe/Volgograd'
     },
     {
         displayName: 'Yerevan',

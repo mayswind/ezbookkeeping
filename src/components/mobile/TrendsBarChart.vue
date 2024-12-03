@@ -71,7 +71,7 @@
             <template #inner-end>
                 <div class="statistics-item-end">
                     <div class="statistics-percent-line statistics-multi-percent-line display-flex">
-                        <div class="display-inline-flex" :style="{ 'width': (item.percent * data.totalAmount / item.totalAmount) + '%' }"
+                        <div class="display-inline-flex" :style="{ 'width': (item.percent * data.totalAmount / item.totalPositiveAmount) + '%' }"
                              :key="dataIdx"
                              v-for="(data, dataIdx) in item.items"
                              v-show="data.totalAmount > 0">
@@ -139,7 +139,7 @@ export default {
             return getAllDateRanges(this.items, this.startYearMonth, this.endYearMonth, this.dateAggregationType);
         },
         allDisplayDataItems: function () {
-            const dateRangeItemsMap = {};
+            const allDateRangeItemsMap = {};
             const legends = [];
 
             for (let i = 0; i < this.items.length; i++) {
@@ -164,6 +164,8 @@ export default {
                     continue;
                 }
 
+                const dateRangeItemMap = {};
+
                 for (let j = 0; j < item.items.length; j++) {
                     const dataItem = item.items[j];
                     let dateRangeKey = '';
@@ -176,13 +178,18 @@ export default {
                         dateRangeKey = `${dataItem.year}-${dataItem.month}`;
                     }
 
-                    const dataItems = dateRangeItemsMap[dateRangeKey] || [];
+                    if (dateRangeItemMap[dateRangeKey]) {
+                        dateRangeItemMap[dateRangeKey].totalAmount += (this.valueField && isNumber(dataItem[this.valueField])) ? dataItem[this.valueField] : 0;
+                    } else {
+                        const allDataItems = allDateRangeItemsMap[dateRangeKey] || [];
+                        const finalDataItem = Object.assign({}, legend, {
+                            totalAmount: (this.valueField && isNumber(dataItem[this.valueField])) ? dataItem[this.valueField] : 0
+                        });
 
-                    dataItems.push(Object.assign({}, legend, {
-                        totalAmount: (this.valueField && isNumber(dataItem[this.valueField])) ? dataItem[this.valueField] : 0
-                    }));
-
-                    dateRangeItemsMap[dateRangeKey] = dataItems;
+                        allDataItems.push(finalDataItem);
+                        dateRangeItemMap[dateRangeKey] = finalDataItem;
+                        allDateRangeItemsMap[dateRangeKey] = allDataItems;
+                    }
                 }
             }
 
@@ -211,15 +218,18 @@ export default {
                     displayDateRange = this.$locale.formatUnixTimeToShortYearMonth(this.userStore, dateRange.minUnixTime);
                 }
 
-                const dataItems = dateRangeItemsMap[dateRangeKey] || [];
+                const dataItems = allDateRangeItemsMap[dateRangeKey] || [];
                 let totalAmount = 0;
+                let totalPositiveAmount = 0;
 
                 sortStatisticsItems(dataItems, this.sortingType);
 
                 for (let j = 0; j < dataItems.length; j++) {
                     if (dataItems[j].totalAmount > 0) {
-                        totalAmount += dataItems[j].totalAmount;
+                        totalPositiveAmount += dataItems[j].totalAmount;
                     }
+
+                    totalAmount += dataItems[j].totalAmount;
                 }
 
                 if (totalAmount > maxTotalAmount) {
@@ -230,7 +240,8 @@ export default {
                     dateRange: dateRange,
                     displayDateRange: displayDateRange,
                     items: dataItems,
-                    totalAmount: totalAmount
+                    totalAmount: totalAmount,
+                    totalPositiveAmount: totalPositiveAmount
                 });
             }
 

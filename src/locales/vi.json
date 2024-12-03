@@ -16,8 +16,8 @@
         "shortDateFormat": "DDMMYYYY",
         "longTimeFormat": "HHMMSSA",
         "shortTimeFormat": "HHMMA",
-        "decimalSeparator": "Dot",
-        "digitGroupingSymbol": "Comma",
+        "decimalSeparator": "Comma",
+        "digitGroupingSymbol": "Dot",
         "digitGrouping": "ThousandsSeparator",
         "currencyDisplayType": "SymbolBeforeAmount"
     },

@@ -33,10 +33,12 @@
     <f7-list v-else-if="!loading && allDisplayDataItems && allDisplayDataItems.data && allDisplayDataItems.data.length">
         <f7-list-item v-if="allDisplayDataItems.legends && allDisplayDataItems.legends.length > 1">
             <div class="display-flex" style="flex-wrap: wrap">
-                <div class="display-flex align-items-center" style="margin-right: 4px"
+                <div class="trends-bar-chart-legend display-flex align-items-center"
+                     :class="{ 'trends-bar-chart-legend-unselected': !!unselectedLegends[legend.id] }"
                      :key="idx"
-                     v-for="(legend, idx) in allDisplayDataItems.legends">
-                    <f7-icon f7="app_fill" class="trends-bar-chart-legend-icon" :style="{ 'color': legend.color }"></f7-icon>
+                     v-for="(legend, idx) in allDisplayDataItems.legends"
+                     @click="toggleLegend(legend)">
+                    <f7-icon f7="app_fill" class="trends-bar-chart-legend-icon" :style="{ 'color': unselectedLegends[legend.id] ? '' : legend.color }"></f7-icon>
                     <span class="trends-bar-chart-legend-text">{{ legend.name }}</span>
                 </div>
             </div>
@@ -126,6 +128,11 @@ export default {
     emits: [
         'click'
     ],
+    data() {
+        return {
+            unselectedLegends: {}
+        };
+    },
     computed: {
         ...mapStores(useSettingsStore, useUserStore),
         allDateRanges: function () {
@@ -143,12 +150,19 @@ export default {
                 }
 
                 const id = (this.idField && item[this.idField]) ? item[this.idField] : this.getItemName(item[this.nameField]);
+
                 const legend = {
                     id: id,
                     name: (this.nameField && item[this.nameField]) ? this.getItemName(item[this.nameField]) : id,
                     color: this.getColor(item[this.colorField] ? item[this.colorField] : colorConstants.defaultChartColors[i % colorConstants.defaultChartColors.length]),
                     displayOrders: (this.displayOrdersField && item[this.displayOrdersField]) ? item[this.displayOrdersField] : [0]
                 };
+
+                legends.push(legend);
+
+                if (this.unselectedLegends[id]) {
+                    continue;
+                }
 
                 for (let j = 0; j < item.items.length; j++) {
                     const dataItem = item.items[j];
@@ -170,8 +184,6 @@ export default {
 
                     dateRangeItemsMap[dateRangeKey] = dataItems;
                 }
-
-                legends.push(legend);
             }
 
             const finalDataItems = [];
@@ -268,6 +280,13 @@ export default {
                 }
             });
         },
+        toggleLegend(legend) {
+            if (this.unselectedLegends[legend.id]) {
+                delete this.unselectedLegends[legend.id];
+            } else {
+                this.unselectedLegends[legend.id] = true;
+            }
+        },
         getColor: function (color) {
             if (color && color !== colorConstants.defaultColor) {
                 color = '#' + color;
@@ -286,11 +305,25 @@ export default {
 </script>
 
 <style>
+.trends-bar-chart-legend {
+    margin-right: 4px;
+    cursor: pointer;
+}
+
 .trends-bar-chart-legend-icon.f7-icons {
     font-size: var(--ebk-trends-bar-chart-legend-icon-font-size);
+    margin-right: 2px;
+}
+
+.trends-bar-chart-legend-unselected .trends-bar-chart-legend-icon.f7-icons {
+    color: #cccccc;
 }
 
 .trends-bar-chart-legend-text {
     font-size: var(--ebk-trends-bar-chart-legend-text-font-size);
+}
+
+.trends-bar-chart-legend-unselected .trends-bar-chart-legend-text {
+    color: #cccccc;
 }
 </style>

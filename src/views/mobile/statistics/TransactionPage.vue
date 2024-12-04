@@ -191,6 +191,7 @@
         <f7-card v-else-if="analysisType === allAnalysisTypes.TrendAnalysis">
             <f7-card-header class="no-border display-block">
                 <div class="statistics-chart-header display-flex full-line justify-content-space-between">
+                    <div></div>
                     <div class="align-self-flex-end">
                         <span style="margin-right: 4px;">{{ $t('Sort by') }}</span>
                         <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ querySortingTypeName }}</f7-link>

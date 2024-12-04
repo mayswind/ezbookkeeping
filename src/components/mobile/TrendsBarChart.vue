@@ -246,10 +246,10 @@ export default {
             }
 
             for (let i = 0; i < finalDataItems.length; i++) {
-                if (maxTotalAmount > 0) {
+                if (maxTotalAmount > 0 && finalDataItems[i].totalAmount > 0) {
                     finalDataItems[i].percent = 100.0 * finalDataItems[i].totalAmount / maxTotalAmount;
                 } else {
-                    finalDataItems[i].percent = 100.0;
+                    finalDataItems[i].percent = 0.0;
                 }
             }
 

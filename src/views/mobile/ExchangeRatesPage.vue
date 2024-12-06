@@ -36,6 +36,7 @@
             >
                 <number-pad-sheet :min-value="allowedMinAmount"
                                   :max-value="allowedMaxAmount"
+                                  :currency="baseCurrency"
                                   v-model:show="showBaseAmountSheet"
                                   v-model="baseAmount"
                 ></number-pad-sheet>
@@ -123,7 +124,7 @@ export default {
             return this.$locale.getAllDisplayExchangeRates(this.settingsStore, this.exchangeRatesData);
         },
         displayBaseAmount() {
-            return this.$locale.formatAmount(this.userStore, this.baseAmount);
+            return this.$locale.formatAmount(this.userStore, this.baseAmount, this.baseCurrency);
         },
         baseAmountFontSizeClass() {
             if (this.baseAmount >= 100000000 || this.baseAmount <= -100000000) {

@@ -85,6 +85,7 @@
                                 <v-col cols="12" :md="transaction.type === allTransactionTypes.Transfer ? 6 : 12">
                                     <amount-input class="transaction-edit-amount font-weight-bold"
                                                   :color="sourceAmountColor"
+                                                  :currency="sourceAccountCurrency"
                                                   :readonly="mode === 'view'"
                                                   :disabled="loading || submitting"
                                                   :persistent-placeholder="true"
@@ -95,6 +96,7 @@
                                 </v-col>
                                 <v-col cols="12" :md="6" v-if="transaction.type === allTransactionTypes.Transfer">
                                     <amount-input class="transaction-edit-amount font-weight-bold" color="primary"
+                                                  :currency="destinationAccountCurrency"
                                                   :readonly="mode === 'view'"
                                                   :disabled="loading || submitting"
                                                   :persistent-placeholder="true"
@@ -637,6 +639,24 @@ export default {
                 return this.$t('None');
             }
         },
+        sourceAccountCurrency() {
+            const sourceAccount = this.allAccountsMap[this.transaction.sourceAccountId];
+
+            if (sourceAccount) {
+                return sourceAccount.currency;
+            }
+
+            return this.defaultCurrency;
+        },
+        destinationAccountCurrency() {
+            const destinationAccount = this.allAccountsMap[this.transaction.destinationAccountId];
+
+            if (destinationAccount) {
+                return destinationAccount.currency;
+            }
+
+            return this.defaultCurrency;
+        },
         transactionDisplayTimezone() {
             return `UTC${getUtcOffsetByUtcOffsetMinutes(this.transaction.utcOffset)}`;
         },
@@ -737,7 +757,7 @@ export default {
                 return;
             }
 
-            this.transactionsStore.setTransactionSuitableDestinationAmount(this.transaction, oldValue, newValue);
+            this.transactionsStore.setTransactionSuitableDestinationAmount(this.transaction, oldValue, newValue, this.destinationAccountCurrency);
         },
         'transaction.destinationAmount': function (newValue) {
             if (this.mode === 'view' || this.loading) {

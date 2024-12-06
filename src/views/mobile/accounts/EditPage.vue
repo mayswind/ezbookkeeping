@@ -183,6 +183,7 @@
             >
                 <number-pad-sheet :min-value="allowedMinAmount"
                                   :max-value="allowedMaxAmount"
+                                  :currency="account.currency"
                                   v-model:show="account.showBalanceSheet"
                                   v-model="account.balance"
                 ></number-pad-sheet>
@@ -396,6 +397,7 @@
                 >
                     <number-pad-sheet :min-value="allowedMinAmount"
                                       :max-value="allowedMaxAmount"
+                                      :currency="subAccount.currency"
                                       v-model:show="subAccount.showBalanceSheet"
                                       v-model="subAccount.balance"
                     ></number-pad-sheet>

@@ -2,6 +2,16 @@ import currencyConstants from '@/consts/currency.js';
 
 import { isString, isNumber } from './common.js';
 
+export function getCurrencyFraction(currencyCode) {
+    const currencyInfo = currencyConstants.all[currencyCode];
+
+    if (currencyInfo) {
+        return currencyInfo.fraction;
+    }
+
+    return null;
+}
+
 export function appendCurrencySymbol(value, currencyDisplayType, currencyCode, currencyUnit, currencyName, isPlural) {
     if (isNumber(value)) {
         value = value.toString();

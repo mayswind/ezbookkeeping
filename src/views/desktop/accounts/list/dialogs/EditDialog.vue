@@ -131,6 +131,7 @@
                                     <amount-input :disabled="loading || submitting || !!editAccountId"
                                                   :persistent-placeholder="true"
                                                   :currency="selectedAccount.currency"
+                                                  :show-currency="true"
                                                   :label="currentAccountIndex < 0 ? $t('Account Balance') : $t('Sub-account Balance')"
                                                   :placeholder="currentAccountIndex < 0 ? $t('Account Balance') : $t('Sub-account Balance')"
                                                   v-model="selectedAccount.balance"/>

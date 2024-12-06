@@ -32,6 +32,8 @@ import {
     getDay,
     getDayOfWeekName
 } from '@/lib/datetime.js';
+import { getAmountWithDecimalNumberCount } from '@/lib/numeral.js';
+import { getCurrencyFraction } from '@/lib/currency.js';
 import { getFirstAvailableCategoryId } from '@/lib/category.js';
 
 const emptyTransactionResult = {
@@ -624,7 +626,7 @@ export const useTransactionsStore = defineStore('transactions', {
                 geoLocation: null
             };
         },
-        setTransactionSuitableDestinationAmount(transaction, oldValue, newValue) {
+        setTransactionSuitableDestinationAmount(transaction, oldValue, newValue, destinationAccountCurrency) {
             const accountsStore = useAccountsStore();
             const exchangeRatesStore = useExchangeRatesStore();
 
@@ -635,15 +637,18 @@ export const useTransactionsStore = defineStore('transactions', {
                 const destinationAccount = accountsStore.allAccountsMap[transaction.destinationAccountId];
 
                 if (sourceAccount && destinationAccount && sourceAccount.currency !== destinationAccount.currency) {
+                    const decimalNumberCount = getCurrencyFraction(destinationAccountCurrency);
                     const exchangedOldValue = exchangeRatesStore.getExchangedAmount(oldValue, sourceAccount.currency, destinationAccount.currency);
                     const exchangedNewValue = exchangeRatesStore.getExchangedAmount(newValue, sourceAccount.currency, destinationAccount.currency);
 
                     if (isNumber(exchangedOldValue)) {
                         oldValue = Math.floor(exchangedOldValue);
+                        oldValue = getAmountWithDecimalNumberCount(oldValue, decimalNumberCount);
                     }
 
                     if (isNumber(exchangedNewValue)) {
                         newValue = Math.floor(exchangedNewValue);
+                        newValue = getAmountWithDecimalNumberCount(newValue, decimalNumberCount);
                     }
                 }
 

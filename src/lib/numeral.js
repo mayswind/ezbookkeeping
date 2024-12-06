@@ -146,6 +146,11 @@ export function formatAmount(value, options) {
     }
 
     const decimalSeparator = options.decimalSeparator || numeralConstants.defaultDecimalSeparator.symbol;
+    let decimalNumberCount = options.decimalNumberCount;
+
+    if (!isNumber(decimalNumberCount) || decimalNumberCount > numeralConstants.maxSupportedDecimalNumberCount) {
+        decimalNumberCount = numeralConstants.defaultDecimalNumberCount;
+    }
 
     let integer = '0';
     let decimals = '00';
@@ -157,6 +162,18 @@ export function formatAmount(value, options) {
         decimals = value;
     } else if (value.length === 1) {
         decimals = '0' + value;
+    }
+
+    if (decimalNumberCount === 0) {
+        if (decimals === '00') {
+            decimals = '';
+        } else if (decimals.charAt(1) === '0') {
+            decimals = decimals.charAt(0);
+        }
+    } else if (decimalNumberCount === 1) {
+        if (decimals.charAt(1) === '0') {
+            decimals = decimals.charAt(0);
+        }
     }
 
     if (options.trimTailZero) {
@@ -192,6 +209,16 @@ export function formatPercent(value, precision, lowPrecisionValue) {
 
     const result = normalizedValue / ratio;
     return result + '%';
+}
+
+export function getAmountWithDecimalNumberCount(amount, decimalNumberCount) {
+    if (decimalNumberCount === 0) {
+        return Math.floor(amount / 100) * 100;
+    } else if (decimalNumberCount === 1) {
+        return Math.floor(amount / 10) * 10;
+    }
+
+    return amount;
 }
 
 export function formatExchangeRateAmount(exchangeRateAmount, options) {

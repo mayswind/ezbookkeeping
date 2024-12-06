@@ -43,8 +43,11 @@
                 <f7-button class="numpad-button numpad-button-function no-right-border" @click="setSymbol('+')">
                     <span class="numpad-button-text numpad-button-text-normal">&plus;</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num" @click="inputDecimalSeparator()">
+                <f7-button class="numpad-button numpad-button-num" v-if="supportDecimalSeparator" @click="inputDecimalSeparator()">
                     <span class="numpad-button-text numpad-button-text-normal">{{ decimalSeparator }}</span>
+                </f7-button>
+                <f7-button class="numpad-button numpad-button-num" v-if="!supportDecimalSeparator" @click="inputDoubleNum(0)">
+                    <span class="numpad-button-text numpad-button-text-normal">00</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-num" @click="inputNum(0)">
                     <span class="numpad-button-text numpad-button-text-normal">0</span>
@@ -66,6 +69,7 @@
 import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.js';
 
+import currencyConstants from '@/consts/currency.js';
 import { isString, isNumber, removeAll } from '@/lib/common.js';
 
 export default {
@@ -73,6 +77,7 @@ export default {
         'modelValue',
         'minValue',
         'maxValue',
+        'currency',
         'show'
     ],
     emits: [
@@ -93,6 +98,13 @@ export default {
         ...mapStores(useUserStore),
         decimalSeparator() {
             return this.$locale.getCurrentDecimalSeparator(this.userStore);
+        },
+        supportDecimalSeparator() {
+            if (!this.currency || !currencyConstants.all[this.currency] || !isNumber(currencyConstants.all[this.currency].fraction)) {
+                return true;
+            }
+
+            return currencyConstants.all[this.currency].fraction > 0;
         },
         currentDisplay() {
             const previousValue = this.$locale.appendDigitGroupingSymbol(this.userStore, this.previousValue);
@@ -129,7 +141,7 @@ export default {
                 return '';
             }
 
-            let str = this.$locale.formatAmount(userStore, value);
+            let str = this.$locale.formatAmount(userStore, value, this.currency);
 
             const digitGroupingSymbol = this.$locale.getCurrentDigitGroupingSymbol(userStore);
 
@@ -207,6 +219,10 @@ export default {
             }
 
             this.currentValue = newValue;
+        },
+        inputDoubleNum(num) {
+            this.inputNum(num);
+            this.inputNum(num);
         },
         inputDecimalSeparator() {
             if (this.currentValue.indexOf(this.decimalSeparator) >= 0) {

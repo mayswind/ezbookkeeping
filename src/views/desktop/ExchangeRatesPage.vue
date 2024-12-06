@@ -26,6 +26,7 @@
                         <div class="mx-6 mt-4">
                             <span class="text-subtitle-2">{{ $t('Base Amount') }}</span>
                             <amount-input class="mt-2" density="compact"
+                                          :currency="baseCurrency"
                                           :disabled="loading || !exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length"
                                           v-model="baseAmount"/>
                         </div>

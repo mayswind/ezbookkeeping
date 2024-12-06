@@ -65,11 +65,12 @@
                 link="#" no-chevron
                 :class="sourceAmountClass"
                 :header="$t(sourceAmountName)"
-                :title="getDisplayAmount(transaction.sourceAmount, transaction.hideAmount)"
+                :title="getDisplayAmount(transaction.sourceAmount, transaction.hideAmount, sourceAccountCurrency)"
                 @click="showSourceAmountSheet = true"
             >
                 <number-pad-sheet :min-value="allowedMinAmount"
                                   :max-value="allowedMaxAmount"
+                                  :currency="sourceAccountCurrency"
                                   v-model:show="showSourceAmountSheet"
                                   v-model="transaction.sourceAmount"
                 ></number-pad-sheet>
@@ -80,12 +81,13 @@
                 link="#" no-chevron
                 :class="destinationAmountClass"
                 :header="transferInAmountTitle"
-                :title="getDisplayAmount(transaction.destinationAmount, transaction.hideAmount)"
+                :title="getDisplayAmount(transaction.destinationAmount, transaction.hideAmount, destinationAccountCurrency)"
                 @click="showDestinationAmountSheet = true"
                 v-if="transaction.type === allTransactionTypes.Transfer"
             >
                 <number-pad-sheet :min-value="allowedMinAmount"
                                   :max-value="allowedMaxAmount"
+                                  :currency="destinationAccountCurrency"
                                   v-model:show="showDestinationAmountSheet"
                                   v-model="transaction.destinationAmount"
                 ></number-pad-sheet>
@@ -672,6 +674,24 @@ export default {
                 return this.$t('None');
             }
         },
+        sourceAccountCurrency() {
+            const sourceAccount = this.allAccountsMap[this.transaction.sourceAccountId];
+
+            if (sourceAccount) {
+                return sourceAccount.currency;
+            }
+
+            return this.defaultCurrency;
+        },
+        destinationAccountCurrency() {
+            const destinationAccount = this.allAccountsMap[this.transaction.destinationAccountId];
+
+            if (destinationAccount) {
+                return destinationAccount.currency;
+            }
+
+            return this.defaultCurrency;
+        },
         transactionDisplayDate() {
             if (this.mode !== 'view' || !this.showTimeInDefaultTimezone) {
                 return this.$locale.formatUnixTimeToLongDate(this.userStore, getActualUnixTimeForStore(this.transaction.time, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
@@ -862,7 +882,7 @@ export default {
                 return;
             }
 
-            this.transactionsStore.setTransactionSuitableDestinationAmount(this.transaction, oldValue, newValue);
+            this.transactionsStore.setTransactionSuitableDestinationAmount(this.transaction, oldValue, newValue, this.destinationAccountCurrency);
         },
         'transaction.destinationAmount': function (newValue) {
             if (this.mode === 'view' || this.loading) {
@@ -1333,15 +1353,15 @@ export default {
                 return 'ebk-large-amount';
             }
         },
-        getDisplayAmount(amount, hideAmount) {
+        getDisplayAmount(amount, hideAmount, currencyCode) {
             if (hideAmount) {
-                return this.getDisplayCurrency('***');
+                return this.getDisplayCurrency('***', currencyCode);
             }
 
-            return this.getDisplayCurrency(amount);
+            return this.getDisplayCurrency(amount, currencyCode);
         },
-        getDisplayCurrency(value) {
-            return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, false);
+        getDisplayCurrency(value, currencyCode) {
+            return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, currencyCode);
         },
         getPrimaryCategoryName(categoryId, allCategories) {
             return getTransactionPrimaryCategoryName(categoryId, allCategories);

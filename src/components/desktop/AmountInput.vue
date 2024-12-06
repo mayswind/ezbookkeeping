@@ -44,6 +44,7 @@ export default {
         'color',
         'density',
         'currency',
+        'showCurrency',
         'label',
         'placeholder',
         'persistentPlaceholder',
@@ -100,7 +101,7 @@ export default {
             return finalClass;
         },
         prependText() {
-            if (!this.currency) {
+            if (!this.currency || !this.showCurrency) {
                 return '';
             }
 
@@ -113,7 +114,7 @@ export default {
             return texts.prependText;
         },
         appendText() {
-            if (!this.currency) {
+            if (!this.currency || !this.showCurrency) {
                 return '';
             }
 
@@ -127,6 +128,13 @@ export default {
         }
     },
     watch: {
+        'currency': function () {
+            const newStringValue = this.getFormattedValue(this.userStore, this.modelValue);
+
+            if (!(newStringValue === '0' && this.currentValue === '')) {
+                this.currentValue = newStringValue;
+            }
+        },
         'modelValue': function (newValue) {
             const numericCurrentValue = this.$locale.parseAmount(this.userStore, this.currentValue);
 
@@ -300,7 +308,7 @@ export default {
         getFormattedValue(userStore, value) {
             if (!Number.isNaN(value) && Number.isFinite(value)) {
                 const digitGroupingSymbol = this.$locale.getCurrentDigitGroupingSymbol(userStore);
-                return removeAll(this.$locale.formatAmount(userStore, value), digitGroupingSymbol);
+                return removeAll(this.$locale.formatAmount(userStore, value, this.currency), digitGroupingSymbol);
             }
 
             return '0';

@@ -50,6 +50,7 @@ import {
 } from './numeral.js';
 
 import {
+    getCurrencyFraction,
     appendCurrencySymbol,
     getAmountPrependAndAppendCurrencySymbol
 } from './currency.js';
@@ -936,9 +937,10 @@ function getCurrentDigitGroupingType(translateFn, digitGrouping) {
     return digitGroupingType.type;
 }
 
-function getNumberFormatOptions(translateFn, userStore) {
+function getNumberFormatOptions(translateFn, userStore, currencyCode) {
     return {
         decimalSeparator: getCurrentDecimalSeparator(translateFn, userStore.currentUserDecimalSeparator),
+        decimalNumberCount: getCurrencyFraction(currencyCode),
         digitGroupingSymbol: getCurrentDigitGroupingSymbol(translateFn, userStore.currentUserDigitGroupingSymbol),
         digitGrouping: getCurrentDigitGroupingType(translateFn, userStore.currentUserDigitGrouping),
     };
@@ -954,8 +956,8 @@ function getParsedAmountNumber(value, translateFn, userStore) {
     return parseAmount(value, numberFormatOptions);
 }
 
-function getFormattedAmount(value, translateFn, userStore) {
-    const numberFormatOptions = getNumberFormatOptions(translateFn, userStore);
+function getFormattedAmount(value, translateFn, userStore, currencyCode) {
+    const numberFormatOptions = getNumberFormatOptions(translateFn, userStore, currencyCode);
     return formatAmount(value, numberFormatOptions);
 }
 
@@ -986,7 +988,7 @@ function getFormattedAmountWithCurrency(value, currencyCode, translateFn, userSt
     const isPlural = value !== '100' && value !== '-100';
 
     if (!notConvertValue) {
-        const numberFormatOptions = getNumberFormatOptions(translateFn, userStore);
+        const numberFormatOptions = getNumberFormatOptions(translateFn, userStore, currencyCode);
         const hasIncompleteFlag = isString(value) && value.charAt(value.length - 1) === '+';
 
         if (hasIncompleteFlag) {
@@ -1739,7 +1741,7 @@ export function i18nFunctions(i18nGlobal) {
         getCurrentDigitGroupingType: (userStore) => getCurrentDigitGroupingType(i18nGlobal.t, userStore.currentUserDigitGrouping),
         appendDigitGroupingSymbol: (userStore, value) => getNumberWithDigitGroupingSymbol(value, i18nGlobal.t, userStore),
         parseAmount: (userStore, value) => getParsedAmountNumber(value, i18nGlobal.t, userStore),
-        formatAmount: (userStore, value) => getFormattedAmount(value, i18nGlobal.t, userStore),
+        formatAmount: (userStore, value, currencyCode) => getFormattedAmount(value, i18nGlobal.t, userStore, currencyCode),
         formatAmountWithCurrency: (settingsStore, userStore, value, currencyCode) => getFormattedAmountWithCurrency(value, currencyCode, i18nGlobal.t, userStore, settingsStore),
         formatExchangeRateAmount: (userStore, value) => getFormattedExchangeRateAmount(value, i18nGlobal.t, userStore),
         getAdaptiveAmountRate: (userStore, amount1, amount2, fromExchangeRate, toExchangeRate) => getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, i18nGlobal.t, userStore),

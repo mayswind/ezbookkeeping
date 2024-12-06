@@ -6,6 +6,7 @@ const defaultCurrencySymbol = '¤';
 const allCurrencies = {
     'AED': { // UAE Dirham
         code: 'AED',
+        fraction: 2,
         symbol: {
             normal: 'Dh',
             plural: 'Dhs'
@@ -14,6 +15,7 @@ const allCurrencies = {
     },
     'AFN': { // Afghani
         code: 'AFN',
+        fraction: 2,
         symbol: {
             normal: 'Af.',
             plural: 'Afs.'
@@ -22,6 +24,7 @@ const allCurrencies = {
     },
     'ALL': { // Lek
         code: 'ALL',
+        fraction: 2,
         symbol: {
             normal: 'L'
         },
@@ -29,6 +32,7 @@ const allCurrencies = {
     },
     'AMD': { // Armenian Dram
         code: 'AMD',
+        fraction: 2,
         symbol: {
             normal: '֏'
         },
@@ -36,6 +40,7 @@ const allCurrencies = {
     },
     'ANG': { // Netherlands Antillean Guilder
         code: 'ANG',
+        fraction: 2,
         symbol: {
             normal: 'ƒ'
         },
@@ -43,6 +48,7 @@ const allCurrencies = {
     },
     'AOA': { // Kwanza
         code: 'AOA',
+        fraction: 2,
         symbol: {
             normal: 'Kz'
         },
@@ -50,6 +56,7 @@ const allCurrencies = {
     },
     'ARS': { // Argentine Peso
         code: 'ARS',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -57,6 +64,7 @@ const allCurrencies = {
     },
     'AUD': { // Australian Dollar
         code: 'AUD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -64,6 +72,7 @@ const allCurrencies = {
     },
     'AWG': { // Aruban Florin
         code: 'AWG',
+        fraction: 2,
         symbol: {
             normal: 'Afl.'
         },
@@ -71,6 +80,7 @@ const allCurrencies = {
     },
     'AZN': { // Azerbaijan Manat
         code: 'AZN',
+        fraction: 2,
         symbol: {
             normal: '₼'
         },
@@ -78,6 +88,7 @@ const allCurrencies = {
     },
     'BAM': { // Convertible Mark
         code: 'BAM',
+        fraction: 2,
         symbol: {
             normal: 'KM'
         },
@@ -85,6 +96,7 @@ const allCurrencies = {
     },
     'BBD': { // Barbados Dollar
         code: 'BBD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -92,6 +104,7 @@ const allCurrencies = {
     },
     'BDT': { // Taka
         code: 'BDT',
+        fraction: 2,
         symbol: {
             normal: '৳'
         },
@@ -99,6 +112,7 @@ const allCurrencies = {
     },
     'BGN': { // Bulgarian Lev
         code: 'BGN',
+        fraction: 2,
         symbol: {
             normal: 'лв'
         },
@@ -106,6 +120,7 @@ const allCurrencies = {
     },
     'BHD': { // Bahraini Dinar
         code: 'BHD',
+        fraction: 3,
         symbol: {
             normal: 'BD'
         },
@@ -113,6 +128,7 @@ const allCurrencies = {
     },
     'BIF': { // Burundi Franc
         code: 'BIF',
+        fraction: 0,
         symbol: {
             normal: 'FBu'
         },
@@ -120,6 +136,7 @@ const allCurrencies = {
     },
     'BMD': { // Bermudian Dollar
         code: 'BMD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -127,6 +144,7 @@ const allCurrencies = {
     },
     'BND': { // Brunei Dollar
         code: 'BND',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -134,6 +152,7 @@ const allCurrencies = {
     },
     'BOB': { // Boliviano
         code: 'BOB',
+        fraction: 2,
         symbol: {
             normal: 'Bs'
         },
@@ -141,6 +160,7 @@ const allCurrencies = {
     },
     'BRL': { // Brazilian Real
         code: 'BRL',
+        fraction: 2,
         symbol: {
             normal: 'R$'
         },
@@ -148,6 +168,7 @@ const allCurrencies = {
     },
     'BSD': { // Bahamian Dollar
         code: 'BSD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -155,6 +176,7 @@ const allCurrencies = {
     },
     'BTN': { // Ngultrum
         code: 'BTN',
+        fraction: 2,
         symbol: {
             normal: 'Nu.'
         },
@@ -162,6 +184,7 @@ const allCurrencies = {
     },
     'BWP': { // Pula
         code: 'BWP',
+        fraction: 2,
         symbol: {
             normal: 'P'
         },
@@ -169,6 +192,7 @@ const allCurrencies = {
     },
     'BYN': { // Belarusian Ruble
         code: 'BYN',
+        fraction: 2,
         symbol: {
             normal: 'Rbl',
             plural: 'Rbls'
@@ -177,6 +201,7 @@ const allCurrencies = {
     },
     'BZD': { // Belize Dollar
         code: 'BZD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -184,6 +209,7 @@ const allCurrencies = {
     },
     'CAD': { // Canadian Dollar
         code: 'CAD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -191,6 +217,7 @@ const allCurrencies = {
     },
     'CDF': { // Congolese Franc
         code: 'CDF',
+        fraction: 2,
         symbol: {
             normal: 'FC'
         },
@@ -198,6 +225,7 @@ const allCurrencies = {
     },
     'CHF': { // Swiss Franc
         code: 'CHF',
+        fraction: 2,
         symbol: {
             normal: 'CHF'
         },
@@ -205,6 +233,7 @@ const allCurrencies = {
     },
     'CLP': { // Chilean Peso
         code: 'CLP',
+        fraction: 0,
         symbol: {
             normal: '$'
         },
@@ -212,6 +241,7 @@ const allCurrencies = {
     },
     'CNY': { // Yuan Renminbi
         code: 'CNY',
+        fraction: 2,
         symbol: {
             normal: '¥'
         },
@@ -219,6 +249,7 @@ const allCurrencies = {
     },
     'COP': { // Colombian Peso
         code: 'COP',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -226,6 +257,7 @@ const allCurrencies = {
     },
     'CRC': { // Costa Rican Colon
         code: 'CRC',
+        fraction: 2,
         symbol: {
             normal: '₡'
         },
@@ -233,6 +265,7 @@ const allCurrencies = {
     },
     'CUC': { // Peso Convertible
         code: 'CUC',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -240,6 +273,7 @@ const allCurrencies = {
     },
     'CUP': { // Cuban Peso
         code: 'CUP',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -247,6 +281,7 @@ const allCurrencies = {
     },
     'CVE': { // Cabo Verde Escudo
         code: 'CVE',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -254,6 +289,7 @@ const allCurrencies = {
     },
     'CZK': { // Czech Koruna
         code: 'CZK',
+        fraction: 2,
         symbol: {
             normal: 'Kč'
         },
@@ -261,6 +297,7 @@ const allCurrencies = {
     },
     'DJF': { // Djibouti Franc
         code: 'DJF',
+        fraction: 0,
         symbol: {
             normal: 'Fdj'
         },
@@ -268,6 +305,7 @@ const allCurrencies = {
     },
     'DKK': { // Danish Krone
         code: 'DKK',
+        fraction: 2,
         symbol: {
             normal: 'kr.'
         },
@@ -275,6 +313,7 @@ const allCurrencies = {
     },
     'DOP': { // Dominican Peso
         code: 'DOP',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -282,6 +321,7 @@ const allCurrencies = {
     },
     'DZD': { // Algerian Dinar
         code: 'DZD',
+        fraction: 2,
         symbol: {
             normal: 'DA'
         },
@@ -289,6 +329,7 @@ const allCurrencies = {
     },
     'EGP': { // Egyptian Pound
         code: 'EGP',
+        fraction: 2,
         symbol: {
             normal: '£'
         },
@@ -296,6 +337,7 @@ const allCurrencies = {
     },
     'ERN': { // Nakfa
         code: 'ERN',
+        fraction: 2,
         symbol: {
             normal: 'Nkf'
         },
@@ -303,6 +345,7 @@ const allCurrencies = {
     },
     'ETB': { // Ethiopian Birr
         code: 'ETB',
+        fraction: 2,
         symbol: {
             normal: 'Br'
         },
@@ -310,6 +353,7 @@ const allCurrencies = {
     },
     'EUR': { // Euro
         code: 'EUR',
+        fraction: 2,
         symbol: {
             normal: '€'
         },
@@ -317,6 +361,7 @@ const allCurrencies = {
     },
     'FJD': { // Fiji Dollar
         code: 'FJD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -324,6 +369,7 @@ const allCurrencies = {
     },
     'FKP': { // Falkland Islands Pound
         code: 'FKP',
+        fraction: 2,
         symbol: {
             normal: '£'
         },
@@ -331,6 +377,7 @@ const allCurrencies = {
     },
     'GBP': { // Pound Sterling
         code: 'GBP',
+        fraction: 2,
         symbol: {
             normal: '£'
         },
@@ -338,6 +385,7 @@ const allCurrencies = {
     },
     'GEL': { // Lari
         code: 'GEL',
+        fraction: 2,
         symbol: {
             normal: 'ლ'
         },
@@ -345,6 +393,7 @@ const allCurrencies = {
     },
     'GHS': { // Ghana Cedi
         code: 'GHS',
+        fraction: 2,
         symbol: {
             normal: 'GH₵'
         },
@@ -352,6 +401,7 @@ const allCurrencies = {
     },
     'GIP': { // Gibraltar Pound
         code: 'GIP',
+        fraction: 2,
         symbol: {
             normal: '£'
         },
@@ -359,6 +409,7 @@ const allCurrencies = {
     },
     'GMD': { // Dalasi
         code: 'GMD',
+        fraction: 2,
         symbol: {
             normal: 'D'
         },
@@ -366,6 +417,7 @@ const allCurrencies = {
     },
     'GNF': { // Guinean Franc
         code: 'GNF',
+        fraction: 0,
         symbol: {
             normal: 'FG'
         },
@@ -373,6 +425,7 @@ const allCurrencies = {
     },
     'GTQ': { // Quetzal
         code: 'GTQ',
+        fraction: 2,
         symbol: {
             normal: 'Q'
         },
@@ -380,6 +433,7 @@ const allCurrencies = {
     },
     'GYD': { // Guyana Dollar
         code: 'GYD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -387,6 +441,7 @@ const allCurrencies = {
     },
     'HKD': { // Hong Kong Dollar
         code: 'HKD',
+        fraction: 2,
         symbol: {
             normal: 'HK$'
         },
@@ -394,6 +449,7 @@ const allCurrencies = {
     },
     'HNL': { // Lempira
         code: 'HNL',
+        fraction: 2,
         symbol: {
             normal: 'L'
         },
@@ -401,6 +457,7 @@ const allCurrencies = {
     },
     'HTG': { // Gourde
         code: 'HTG',
+        fraction: 2,
         symbol: {
             normal: 'G'
         },
@@ -408,6 +465,7 @@ const allCurrencies = {
     },
     'HUF': { // Forint
         code: 'HUF',
+        fraction: 2,
         symbol: {
             normal: 'Ft'
         },
@@ -415,6 +473,7 @@ const allCurrencies = {
     },
     'IDR': { // Rupiah
         code: 'IDR',
+        fraction: 2,
         symbol: {
             normal: 'Rp'
         },
@@ -422,6 +481,7 @@ const allCurrencies = {
     },
     'ILS': { // New Israeli Sheqel
         code: 'ILS',
+        fraction: 2,
         symbol: {
             normal: '₪'
         },
@@ -429,6 +489,7 @@ const allCurrencies = {
     },
     'INR': { // Indian Rupee
         code: 'INR',
+        fraction: 2,
         symbol: {
             normal: '₹'
         },
@@ -436,6 +497,7 @@ const allCurrencies = {
     },
     'IQD': { // Iraqi Dinar
         code: 'IQD',
+        fraction: 3,
         symbol: {
             normal: 'ID'
         },
@@ -443,6 +505,7 @@ const allCurrencies = {
     },
     'IRR': { // Iranian Rial
         code: 'IRR',
+        fraction: 2,
         symbol: {
             normal: 'Rl',
             plural: 'Rls'
@@ -451,6 +514,7 @@ const allCurrencies = {
     },
     'ISK': { // Iceland Krona
         code: 'ISK',
+        fraction: 0,
         symbol: {
             normal: 'kr'
         },
@@ -458,6 +522,7 @@ const allCurrencies = {
     },
     'JMD': { // Jamaican Dollar
         code: 'JMD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -465,6 +530,7 @@ const allCurrencies = {
     },
     'JOD': { // Jordanian Dinar
         code: 'JOD',
+        fraction: 3,
         symbol: {
             normal: 'د.أ'
         },
@@ -472,6 +538,7 @@ const allCurrencies = {
     },
     'JPY': { // Yen
         code: 'JPY',
+        fraction: 0,
         symbol: {
             normal: '¥'
         },
@@ -479,6 +546,7 @@ const allCurrencies = {
     },
     'KES': { // Kenyan Shilling
         code: 'KES',
+        fraction: 2,
         symbol: {
             normal: '/='
         },
@@ -486,6 +554,7 @@ const allCurrencies = {
     },
     'KGS': { // Som
         code: 'KGS',
+        fraction: 2,
         symbol: {
             normal: '⃀'
         },
@@ -493,6 +562,7 @@ const allCurrencies = {
     },
     'KHR': { // Riel
         code: 'KHR',
+        fraction: 2,
         symbol: {
             normal: '៛'
         },
@@ -500,6 +570,7 @@ const allCurrencies = {
     },
     'KMF': { // Comorian Franc
         code: 'KMF',
+        fraction: 0,
         symbol: {
             normal: 'CF'
         },
@@ -507,6 +578,7 @@ const allCurrencies = {
     },
     'KPW': { // North Korean Won
         code: 'KPW',
+        fraction: 2,
         symbol: {
             normal: '₩'
         },
@@ -514,6 +586,7 @@ const allCurrencies = {
     },
     'KRW': { // Won
         code: 'KRW',
+        fraction: 0,
         symbol: {
             normal: '₩'
         },
@@ -521,6 +594,7 @@ const allCurrencies = {
     },
     'KWD': { // Kuwaiti Dinar
         code: 'KWD',
+        fraction: 3,
         symbol: {
             normal: 'KD'
         },
@@ -528,6 +602,7 @@ const allCurrencies = {
     },
     'KYD': { // Cayman Islands Dollar
         code: 'KYD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -535,6 +610,7 @@ const allCurrencies = {
     },
     'KZT': { // Tenge
         code: 'KZT',
+        fraction: 2,
         symbol: {
             normal: '₸'
         },
@@ -542,6 +618,7 @@ const allCurrencies = {
     },
     'LAK': { // Lao Kip
         code: 'LAK',
+        fraction: 2,
         symbol: {
             normal: '₭'
         },
@@ -549,6 +626,7 @@ const allCurrencies = {
     },
     'LBP': { // Lebanese Pound
         code: 'LBP',
+        fraction: 2,
         symbol: {
             normal: 'LL'
         },
@@ -556,6 +634,7 @@ const allCurrencies = {
     },
     'LKR': { // Sri Lanka Rupee
         code: 'LKR',
+        fraction: 2,
         symbol: {
             normal: 'රු'
         },
@@ -563,6 +642,7 @@ const allCurrencies = {
     },
     'LRD': { // Liberian Dollar
         code: 'LRD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -570,6 +650,7 @@ const allCurrencies = {
     },
     'LSL': { // Loti
         code: 'LSL',
+        fraction: 2,
         symbol: {
             normal: 'L',
             plural: 'M'
@@ -578,6 +659,7 @@ const allCurrencies = {
     },
     'LYD': { // Libyan Dinar
         code: 'LYD',
+        fraction: 3,
         symbol: {
             normal: 'LD'
         },
@@ -585,6 +667,7 @@ const allCurrencies = {
     },
     'MAD': { // Moroccan Dirham
         code: 'MAD',
+        fraction: 2,
         symbol: {
             normal: 'DH'
         },
@@ -592,6 +675,7 @@ const allCurrencies = {
     },
     'MDL': { // Moldovan Leu
         code: 'MDL',
+        fraction: 2,
         symbol: {
             normal: 'L'
         },
@@ -599,6 +683,7 @@ const allCurrencies = {
     },
     'MGA': { // Malagasy Ariary
         code: 'MGA',
+        fraction: 2,
         symbol: {
             normal: 'Ar'
         },
@@ -606,6 +691,7 @@ const allCurrencies = {
     },
     'MKD': { // Denar
         code: 'MKD',
+        fraction: 2,
         symbol: {
             normal: 'DEN'
         },
@@ -613,6 +699,7 @@ const allCurrencies = {
     },
     'MMK': { // Kyat
         code: 'MMK',
+        fraction: 2,
         symbol: {
             normal: 'K',
             plural: 'Ks.'
@@ -621,6 +708,7 @@ const allCurrencies = {
     },
     'MNT': { // Tugrik
         code: 'MNT',
+        fraction: 2,
         symbol: {
             normal: '₮'
         },
@@ -628,6 +716,7 @@ const allCurrencies = {
     },
     'MOP': { // Pataca
         code: 'MOP',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -635,6 +724,7 @@ const allCurrencies = {
     },
     'MRU': { // Ouguiya
         code: 'MRU',
+        fraction: 2,
         symbol: {
             normal: 'UM'
         },
@@ -642,6 +732,7 @@ const allCurrencies = {
     },
     'MUR': { // Mauritius Rupee
         code: 'MUR',
+        fraction: 2,
         symbol: {
             normal: 'Re.',
             plural: 'Rs.'
@@ -650,6 +741,7 @@ const allCurrencies = {
     },
     'MVR': { // Rufiyaa
         code: 'MVR',
+        fraction: 2,
         symbol: {
             normal: 'Rf.'
         },
@@ -657,6 +749,7 @@ const allCurrencies = {
     },
     'MWK': { // Malawi Kwacha
         code: 'MWK',
+        fraction: 2,
         symbol: {
             normal: 'K'
         },
@@ -664,6 +757,7 @@ const allCurrencies = {
     },
     'MXN': { // Mexican Peso
         code: 'MXN',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -671,6 +765,7 @@ const allCurrencies = {
     },
     'MYR': { // Malaysian Ringgit
         code: 'MYR',
+        fraction: 2,
         symbol: {
             normal: 'RM'
         },
@@ -678,6 +773,7 @@ const allCurrencies = {
     },
     'MZN': { // Mozambique Metical
         code: 'MZN',
+        fraction: 2,
         symbol: {
             normal: 'MT'
         },
@@ -685,6 +781,7 @@ const allCurrencies = {
     },
     'NAD': { // Namibia Dollar
         code: 'NAD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -692,6 +789,7 @@ const allCurrencies = {
     },
     'NGN': { // Naira
         code: 'NGN',
+        fraction: 2,
         symbol: {
             normal: '₦'
         },
@@ -699,6 +797,7 @@ const allCurrencies = {
     },
     'NIO': { // Cordoba Oro
         code: 'NIO',
+        fraction: 2,
         symbol: {
             normal: 'C$'
         },
@@ -706,6 +805,7 @@ const allCurrencies = {
     },
     'NOK': { // Norwegian Krone
         code: 'NOK',
+        fraction: 2,
         symbol: {
             normal: 'kr'
         },
@@ -713,6 +813,7 @@ const allCurrencies = {
     },
     'NPR': { // Nepalese Rupee
         code: 'NPR',
+        fraction: 2,
         symbol: {
             normal: 'रु'
         },
@@ -720,6 +821,7 @@ const allCurrencies = {
     },
     'NZD': { // New Zealand Dollar
         code: 'NZD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -727,6 +829,7 @@ const allCurrencies = {
     },
     'OMR': { // Rial Omani
         code: 'OMR',
+        fraction: 3,
         symbol: {
             normal: 'R.O'
         },
@@ -734,6 +837,7 @@ const allCurrencies = {
     },
     'PAB': { // Balboa
         code: 'PAB',
+        fraction: 2,
         symbol: {
             normal: 'B/.'
         },
@@ -741,6 +845,7 @@ const allCurrencies = {
     },
     'PEN': { // Sol
         code: 'PEN',
+        fraction: 2,
         symbol: {
             normal: 'S/'
         },
@@ -748,6 +853,7 @@ const allCurrencies = {
     },
     'PGK': { // Kina
         code: 'PGK',
+        fraction: 2,
         symbol: {
             normal: 'K'
         },
@@ -755,6 +861,7 @@ const allCurrencies = {
     },
     'PHP': { // Philippine Peso
         code: 'PHP',
+        fraction: 2,
         symbol: {
             normal: '₱'
         },
@@ -762,6 +869,7 @@ const allCurrencies = {
     },
     'PKR': { // Pakistan Rupee
         code: 'PKR',
+        fraction: 2,
         symbol: {
             normal: 'Re.',
             plural: 'Rs.'
@@ -770,6 +878,7 @@ const allCurrencies = {
     },
     'PLN': { // Zloty
         code: 'PLN',
+        fraction: 2,
         symbol: {
             normal: 'zł'
         },
@@ -777,6 +886,7 @@ const allCurrencies = {
     },
     'PYG': { // Guarani
         code: 'PYG',
+        fraction: 0,
         symbol: {
             normal: '₲'
         },
@@ -784,6 +894,7 @@ const allCurrencies = {
     },
     'QAR': { // Qatari Rial
         code: 'QAR',
+        fraction: 2,
         symbol: {
             normal: 'QR'
         },
@@ -791,6 +902,7 @@ const allCurrencies = {
     },
     'RON': { // Romanian Leu
         code: 'RON',
+        fraction: 2,
         symbol: {
             normal: 'L'
         },
@@ -798,6 +910,7 @@ const allCurrencies = {
     },
     'RSD': { // Serbian Dinar
         code: 'RSD',
+        fraction: 2,
         symbol: {
             normal: 'din.'
         },
@@ -805,6 +918,7 @@ const allCurrencies = {
     },
     'RUB': { // Russian Ruble
         code: 'RUB',
+        fraction: 2,
         symbol: {
             normal: '₽'
         },
@@ -812,6 +926,7 @@ const allCurrencies = {
     },
     'RWF': { // Rwanda Franc
         code: 'RWF',
+        fraction: 0,
         symbol: {
             normal: 'FRw'
         },
@@ -819,6 +934,7 @@ const allCurrencies = {
     },
     'SAR': { // Saudi Riyal
         code: 'SAR',
+        fraction: 2,
         symbol: {
             normal: 'SAR'
         },
@@ -826,6 +942,7 @@ const allCurrencies = {
     },
     'SBD': { // Solomon Islands Dollar
         code: 'SBD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -833,6 +950,7 @@ const allCurrencies = {
     },
     'SCR': { // Seychelles Rupee
         code: 'SCR',
+        fraction: 2,
         symbol: {
             normal: 'Re.',
             plural: 'Rs.'
@@ -841,6 +959,7 @@ const allCurrencies = {
     },
     'SDG': { // Sudanese Pound
         code: 'SDG',
+        fraction: 2,
         symbol: {
             normal: 'LS'
         },
@@ -848,6 +967,7 @@ const allCurrencies = {
     },
     'SEK': { // Swedish Krona
         code: 'SEK',
+        fraction: 2,
         symbol: {
             normal: 'kr'
         },
@@ -855,6 +975,7 @@ const allCurrencies = {
     },
     'SGD': { // Singapore Dollar
         code: 'SGD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -862,6 +983,7 @@ const allCurrencies = {
     },
     'SHP': { // Saint Helena Pound
         code: 'SHP',
+        fraction: 2,
         symbol: {
             normal: '£'
         },
@@ -869,6 +991,7 @@ const allCurrencies = {
     },
     'SLE': { // Leone
         code: 'SLE',
+        fraction: 2,
         symbol: {
             normal: 'Le'
         },
@@ -876,6 +999,7 @@ const allCurrencies = {
     },
     'SOS': { // Somali Shilling
         code: 'SOS',
+        fraction: 2,
         symbol: {
             normal: 'Sh.So.'
         },
@@ -883,6 +1007,7 @@ const allCurrencies = {
     },
     'SRD': { // Surinam Dollar
         code: 'SRD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -890,6 +1015,7 @@ const allCurrencies = {
     },
     'SSP': { // South Sudanese Pound
         code: 'SSP',
+        fraction: 2,
         symbol: {
             normal: 'SS£'
         },
@@ -897,6 +1023,7 @@ const allCurrencies = {
     },
     'STN': { // Dobra
         code: 'STN',
+        fraction: 2,
         symbol: {
             normal: 'Db'
         },
@@ -904,6 +1031,7 @@ const allCurrencies = {
     },
     'SVC': { // El Salvador Colon
         code: 'SVC',
+        fraction: 2,
         symbol: {
             normal: '₡'
         },
@@ -911,6 +1039,7 @@ const allCurrencies = {
     },
     'SYP': { // Syrian Pound
         code: 'SYP',
+        fraction: 2,
         symbol: {
             normal: 'LS'
         },
@@ -918,6 +1047,7 @@ const allCurrencies = {
     },
     'SZL': { // Lilangeni
         code: 'SZL',
+        fraction: 2,
         symbol: {
             normal: 'E'
         },
@@ -925,6 +1055,7 @@ const allCurrencies = {
     },
     'THB': { // Baht
         code: 'THB',
+        fraction: 2,
         symbol: {
             normal: '฿'
         },
@@ -932,6 +1063,7 @@ const allCurrencies = {
     },
     'TJS': { // Somoni
         code: 'TJS',
+        fraction: 2,
         symbol: {
             normal: 'SM'
         },
@@ -939,6 +1071,7 @@ const allCurrencies = {
     },
     'TMT': { // Turkmenistan New Manat
         code: 'TMT',
+        fraction: 2,
         symbol: {
             normal: 'm'
         },
@@ -946,6 +1079,7 @@ const allCurrencies = {
     },
     'TND': { // Tunisian Dinar
         code: 'TND',
+        fraction: 3,
         symbol: {
             normal: 'DT'
         },
@@ -953,6 +1087,7 @@ const allCurrencies = {
     },
     'TOP': { // Pa’anga
         code: 'TOP',
+        fraction: 2,
         symbol: {
             normal: 'T$'
         },
@@ -960,6 +1095,7 @@ const allCurrencies = {
     },
     'TRY': { // Turkish Lira
         code: 'TRY',
+        fraction: 2,
         symbol: {
             normal: '₺'
         },
@@ -967,6 +1103,7 @@ const allCurrencies = {
     },
     'TTD': { // Trinidad and Tobago Dollar
         code: 'TTD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -974,6 +1111,7 @@ const allCurrencies = {
     },
     'TWD': { // New Taiwan Dollar
         code: 'TWD',
+        fraction: 2,
         symbol: {
             normal: 'NT$'
         },
@@ -981,6 +1119,7 @@ const allCurrencies = {
     },
     'TZS': { // Tanzanian Shilling
         code: 'TZS',
+        fraction: 2,
         symbol: {
             normal: '/='
         },
@@ -988,6 +1127,7 @@ const allCurrencies = {
     },
     'UAH': { // Hryvnia
         code: 'UAH',
+        fraction: 2,
         symbol: {
             normal: '₴'
         },
@@ -995,6 +1135,7 @@ const allCurrencies = {
     },
     'UGX': { // Uganda Shilling
         code: 'UGX',
+        fraction: 0,
         symbol: {
             normal: '/='
         },
@@ -1002,6 +1143,7 @@ const allCurrencies = {
     },
     'USD': { // US Dollar
         code: 'USD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -1009,6 +1151,7 @@ const allCurrencies = {
     },
     'UYU': { // Peso Uruguayo
         code: 'UYU',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -1016,10 +1159,12 @@ const allCurrencies = {
     },
     'UZS': { // Uzbekistan Sum
         code: 'UZS',
+        fraction: 2,
         unit: 'Sum'
     },
     'VED': { // Bolívar Soberano
         code: 'VED',
+        fraction: 2,
         symbol: {
             normal: 'Bs.D'
         },
@@ -1027,6 +1172,7 @@ const allCurrencies = {
     },
     'VES': { // Bolívar Soberano
         code: 'VES',
+        fraction: 2,
         symbol: {
             normal: 'Bs.S'
         },
@@ -1034,6 +1180,7 @@ const allCurrencies = {
     },
     'VND': { // Dong
         code: 'VND',
+        fraction: 0,
         symbol: {
             normal: '₫'
         },
@@ -1041,6 +1188,7 @@ const allCurrencies = {
     },
     'VUV': { // Vatu
         code: 'VUV',
+        fraction: 0,
         symbol: {
             normal: 'VT'
         },
@@ -1048,6 +1196,7 @@ const allCurrencies = {
     },
     'WST': { // Tala
         code: 'WST',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -1055,6 +1204,7 @@ const allCurrencies = {
     },
     'XAF': { // CFA Franc BEAC
         code: 'XAF',
+        fraction: 0,
         symbol: {
             normal: 'F.CFA'
         },
@@ -1062,6 +1212,7 @@ const allCurrencies = {
     },
     'XCD': { // East Caribbean Dollar
         code: 'XCD',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -1069,6 +1220,7 @@ const allCurrencies = {
     },
     'XOF': { // CFA Franc BCEAO
         code: 'XOF',
+        fraction: 0,
         symbol: {
             normal: 'F.CFA'
         },
@@ -1076,6 +1228,7 @@ const allCurrencies = {
     },
     'XPF': { // CFP Franc
         code: 'XPF',
+        fraction: 0,
         symbol: {
             normal: 'F'
         },
@@ -1090,6 +1243,7 @@ const allCurrencies = {
     },
     'YER': { // Yemeni Rial
         code: 'YER',
+        fraction: 2,
         symbol: {
             normal: 'YRl',
             plural: 'YRls'
@@ -1098,6 +1252,7 @@ const allCurrencies = {
     },
     'ZAR': { // Rand
         code: 'ZAR',
+        fraction: 2,
         symbol: {
             normal: 'R'
         },
@@ -1105,6 +1260,7 @@ const allCurrencies = {
     },
     'ZMW': { // Zambian Kwacha
         code: 'ZMW',
+        fraction: 2,
         symbol: {
             normal: 'K'
         },
@@ -1112,6 +1268,7 @@ const allCurrencies = {
     },
     'ZWG': { // Zimbabwe Gold
         code: 'ZWG',
+        fraction: 2,
         symbol: {
             normal: 'ZiG'
         },
@@ -1119,6 +1276,7 @@ const allCurrencies = {
     },
     'ZWL': { // Zimbabwe Dollar
         code: 'ZWL',
+        fraction: 2,
         symbol: {
             normal: '$'
         },
@@ -1143,12 +1301,14 @@ const allCurrencyDisplayType = {
     None: {
         type: 1,
         name: 'None',
+        fraction: 2,
         symbol: allCurrencyDisplaySymbol.None,
         separator: ''
     },
     SymbolBeforeAmount: {
         type: 2,
         name: 'Currency Symbol',
+        fraction: 2,
         symbol: allCurrencyDisplaySymbol.Symbol,
         location: allCurrencyDisplayLocation.BeforeAmount,
         separator: ' '
@@ -1156,6 +1316,7 @@ const allCurrencyDisplayType = {
     SymbolAfterAmount: {
         type: 3,
         name: 'Currency Symbol',
+        fraction: 2,
         symbol: allCurrencyDisplaySymbol.Symbol,
         location: allCurrencyDisplayLocation.AfterAmount,
         separator: ' '
@@ -1163,6 +1324,7 @@ const allCurrencyDisplayType = {
     SymbolBeforeAmountWithoutSpace: {
         type: 4,
         name: 'Currency Symbol',
+        fraction: 2,
         symbol: allCurrencyDisplaySymbol.Symbol,
         location: allCurrencyDisplayLocation.BeforeAmount,
         separator: ''
@@ -1170,6 +1332,7 @@ const allCurrencyDisplayType = {
     SymbolAfterAmountWithoutSpace: {
         type: 5,
         name: 'Currency Symbol',
+        fraction: 2,
         symbol: allCurrencyDisplaySymbol.Symbol,
         location: allCurrencyDisplayLocation.AfterAmount,
         separator: ''
@@ -1177,6 +1340,7 @@ const allCurrencyDisplayType = {
     CodeBeforeAmount: {
         type: 6,
         name: 'Currency Code',
+        fraction: 2,
         symbol: allCurrencyDisplaySymbol.Code,
         location: allCurrencyDisplayLocation.BeforeAmount,
         separator: ' '
@@ -1184,6 +1348,7 @@ const allCurrencyDisplayType = {
     CodeAfterAmount: {
         type: 7,
         name: 'Currency Code',
+        fraction: 2,
         symbol: allCurrencyDisplaySymbol.Code,
         location: allCurrencyDisplayLocation.AfterAmount,
         separator: ' '
@@ -1191,6 +1356,7 @@ const allCurrencyDisplayType = {
     UnitBeforeAmount: {
         type: 8,
         name: 'Currency Unit',
+        fraction: 2,
         symbol: allCurrencyDisplaySymbol.Unit,
         location: allCurrencyDisplayLocation.BeforeAmount,
         separator: ' '
@@ -1198,6 +1364,7 @@ const allCurrencyDisplayType = {
     UnitAfterAmount: {
         type: 9,
         name: 'Currency Unit',
+        fraction: 2,
         symbol: allCurrencyDisplaySymbol.Unit,
         location: allCurrencyDisplayLocation.AfterAmount,
         separator: ' '
@@ -1205,6 +1372,7 @@ const allCurrencyDisplayType = {
     NameBeforeAmount: {
         type: 10,
         name: 'Currency Name',
+        fraction: 2,
         symbol: allCurrencyDisplaySymbol.Name,
         location: allCurrencyDisplayLocation.BeforeAmount,
         separator: ' '
@@ -1212,6 +1380,7 @@ const allCurrencyDisplayType = {
     NameAfterAmount: {
         type: 11,
         name: 'Currency Name',
+        fraction: 2,
         symbol: allCurrencyDisplaySymbol.Name,
         location: allCurrencyDisplayLocation.AfterAmount,
         separator: ' '

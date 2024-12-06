@@ -256,10 +256,14 @@
                                                                     <div class="d-flex align-center">
                                                                         <span class="text-sm ml-3">{{ $t(filterType.name) }}</span>
                                                                         <span class="text-sm ml-4" v-if="query.amountFilter && query.amountFilter.startsWith(`${filterType.type}:`) && currentAmountFilterType !== filterType.type">{{ queryAmount }}</span>
-                                                                        <amount-input class="transaction-amount-filter-value ml-4" density="compact" v-model="currentAmountFilterValue1"
+                                                                        <amount-input class="transaction-amount-filter-value ml-4" density="compact"
+                                                                                      :currency="defaultCurrency"
+                                                                                      v-model="currentAmountFilterValue1"
                                                                                       v-if="currentAmountFilterType === filterType.type"/>
                                                                         <span class="ml-2 mr-2" v-if="currentAmountFilterType === filterType.type && filterType.paramCount === 2">~</span>
-                                                                        <amount-input class="transaction-amount-filter-value" density="compact" v-model="currentAmountFilterValue2"
+                                                                        <amount-input class="transaction-amount-filter-value" density="compact"
+                                                                                      :currency="defaultCurrency"
+                                                                                      v-model="currentAmountFilterValue2"
                                                                                       v-if="currentAmountFilterType === filterType.type && filterType.paramCount === 2"/>
                                                                         <v-btn class="ml-2" density="compact" color="primary" variant="tonal"
                                                                                @click="changeAmountFilter(filterType.type)"

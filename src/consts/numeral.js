@@ -140,6 +140,8 @@ const allAmountFilterTypeMap = {
 };
 
 const defaultDecimalSeparator = allDecimalSeparator.Dot;
+const defaultDecimalNumberCount = 2;
+const maxSupportedDecimalNumberCount = 2;
 const defaultDigitGroupingSymbol = allDigitGroupingSymbol.Comma;
 const defaultDigitGroupingType = allDigitGroupingType.ThousandsSeparator;
 const defaultValue = 0;
@@ -158,6 +160,8 @@ export default {
     allAmountFilterTypeArray: allAmountFilterTypeArray,
     allAmountFilterTypeMap: allAmountFilterTypeMap,
     defaultDecimalSeparator: defaultDecimalSeparator,
+    defaultDecimalNumberCount: defaultDecimalNumberCount,
+    maxSupportedDecimalNumberCount: maxSupportedDecimalNumberCount,
     defaultDigitGroupingSymbol: defaultDigitGroupingSymbol,
     defaultDigitGroupingType: defaultDigitGroupingType,
     defaultValue: defaultValue,

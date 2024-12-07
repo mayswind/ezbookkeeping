@@ -107,6 +107,10 @@ export const useExchangeRatesStore = defineStore('exchangeRates', {
             });
         },
         getExchangedAmount(amount, fromCurrency, toCurrency) {
+            if (amount === 0) {
+                return 0;
+            }
+
             if (!this.latestExchangeRates || !this.latestExchangeRates.data || !this.latestExchangeRates.data.exchangeRates) {
                 return null;
             }

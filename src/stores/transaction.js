@@ -649,6 +649,8 @@ export const useTransactionsStore = defineStore('transactions', {
                     if (isNumber(exchangedNewValue)) {
                         newValue = Math.floor(exchangedNewValue);
                         newValue = getAmountWithDecimalNumberCount(newValue, decimalNumberCount);
+                    } else {
+                        return;
                     }
                 }
 

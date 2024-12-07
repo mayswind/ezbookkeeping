@@ -66,6 +66,17 @@ func (s TransactionDbType) ToTransactionType() (TransactionType, error) {
 	}
 }
 
+// TransactionTagFilterType represents transaction tag filter type
+type TransactionTagFilterType byte
+
+// Transaction tag filter types
+const (
+	TRANSACTION_TAG_FILTER_HAS_ANY     TransactionTagFilterType = 0
+	TRANSACTION_TAG_FILTER_HAS_ALL     TransactionTagFilterType = 1
+	TRANSACTION_TAG_FILTER_NOT_HAS_ANY TransactionTagFilterType = 2
+	TRANSACTION_TAG_FILTER_NOT_HAS_ALL TransactionTagFilterType = 3
+)
+
 // Transaction represents transaction data stored in database
 type Transaction struct {
 	TransactionId        int64             `xorm:"PK"`
@@ -140,49 +151,52 @@ type TransactionImportRequest struct {
 
 // TransactionCountRequest represents transaction count request
 type TransactionCountRequest struct {
-	Type         TransactionDbType `form:"type" binding:"min=0,max=4"`
-	CategoryIds  string            `form:"category_ids"`
-	AccountIds   string            `form:"account_ids"`
-	TagIds       string            `form:"tag_ids"`
-	AmountFilter string            `form:"amount_filter" binding:"validAmountFilter"`
-	Keyword      string            `form:"keyword"`
-	MaxTime      int64             `form:"max_time" binding:"min=0"`
-	MinTime      int64             `form:"min_time" binding:"min=0"`
+	Type          TransactionDbType        `form:"type" binding:"min=0,max=4"`
+	CategoryIds   string                   `form:"category_ids"`
+	AccountIds    string                   `form:"account_ids"`
+	TagIds        string                   `form:"tag_ids"`
+	TagFilterType TransactionTagFilterType `form:"tag_filter_type" binding:"min=0,max=3"`
+	AmountFilter  string                   `form:"amount_filter" binding:"validAmountFilter"`
+	Keyword       string                   `form:"keyword"`
+	MaxTime       int64                    `form:"max_time" binding:"min=0"`
+	MinTime       int64                    `form:"min_time" binding:"min=0"`
 }
 
 // TransactionListByMaxTimeRequest represents all parameters of transaction listing by max time request
 type TransactionListByMaxTimeRequest struct {
-	Type         TransactionDbType `form:"type" binding:"min=0,max=4"`
-	CategoryIds  string            `form:"category_ids"`
-	AccountIds   string            `form:"account_ids"`
-	TagIds       string            `form:"tag_ids"`
-	AmountFilter string            `form:"amount_filter" binding:"validAmountFilter"`
-	Keyword      string            `form:"keyword"`
-	MaxTime      int64             `form:"max_time" binding:"min=0"`
-	MinTime      int64             `form:"min_time" binding:"min=0"`
-	Page         int32             `form:"page" binding:"min=0"`
-	Count        int32             `form:"count" binding:"required,min=1,max=50"`
-	WithCount    bool              `form:"with_count"`
-	WithPictures bool              `form:"with_pictures"`
-	TrimAccount  bool              `form:"trim_account"`
-	TrimCategory bool              `form:"trim_category"`
-	TrimTag      bool              `form:"trim_tag"`
+	Type          TransactionDbType        `form:"type" binding:"min=0,max=4"`
+	CategoryIds   string                   `form:"category_ids"`
+	AccountIds    string                   `form:"account_ids"`
+	TagIds        string                   `form:"tag_ids"`
+	TagFilterType TransactionTagFilterType `form:"tag_filter_type" binding:"min=0,max=3"`
+	AmountFilter  string                   `form:"amount_filter" binding:"validAmountFilter"`
+	Keyword       string                   `form:"keyword"`
+	MaxTime       int64                    `form:"max_time" binding:"min=0"`
+	MinTime       int64                    `form:"min_time" binding:"min=0"`
+	Page          int32                    `form:"page" binding:"min=0"`
+	Count         int32                    `form:"count" binding:"required,min=1,max=50"`
+	WithCount     bool                     `form:"with_count"`
+	WithPictures  bool                     `form:"with_pictures"`
+	TrimAccount   bool                     `form:"trim_account"`
+	TrimCategory  bool                     `form:"trim_category"`
+	TrimTag       bool                     `form:"trim_tag"`
 }
 
 // TransactionListInMonthByPageRequest represents all parameters of transaction listing by month request
 type TransactionListInMonthByPageRequest struct {
-	Year         int32             `form:"year" binding:"required,min=1"`
-	Month        int32             `form:"month" binding:"required,min=1"`
-	Type         TransactionDbType `form:"type" binding:"min=0,max=4"`
-	CategoryIds  string            `form:"category_ids"`
-	AccountIds   string            `form:"account_ids"`
-	TagIds       string            `form:"tag_ids"`
-	AmountFilter string            `form:"amount_filter" binding:"validAmountFilter"`
-	Keyword      string            `form:"keyword"`
-	WithPictures bool              `form:"with_pictures"`
-	TrimAccount  bool              `form:"trim_account"`
-	TrimCategory bool              `form:"trim_category"`
-	TrimTag      bool              `form:"trim_tag"`
+	Year          int32                    `form:"year" binding:"required,min=1"`
+	Month         int32                    `form:"month" binding:"required,min=1"`
+	Type          TransactionDbType        `form:"type" binding:"min=0,max=4"`
+	CategoryIds   string                   `form:"category_ids"`
+	AccountIds    string                   `form:"account_ids"`
+	TagIds        string                   `form:"tag_ids"`
+	TagFilterType TransactionTagFilterType `form:"tag_filter_type" binding:"min=0,max=3"`
+	AmountFilter  string                   `form:"amount_filter" binding:"validAmountFilter"`
+	Keyword       string                   `form:"keyword"`
+	WithPictures  bool                     `form:"with_pictures"`
+	TrimAccount   bool                     `form:"trim_account"`
+	TrimCategory  bool                     `form:"trim_category"`
+	TrimTag       bool                     `form:"trim_tag"`
 }
 
 // TransactionStatisticRequest represents all parameters of transaction statistic request

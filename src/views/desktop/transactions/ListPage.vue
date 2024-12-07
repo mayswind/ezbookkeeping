@@ -376,6 +376,25 @@
                                                                 </div>
                                                             </v-list-item-title>
                                                         </v-list-item>
+
+                                                        <v-divider v-if="query.tagIds && query.tagIds !== 'none'" />
+
+                                                        <template :key="filterType.type"
+                                                                  v-for="filterType in allTransactionTagFilterTypes"
+                                                                  v-if="query.tagIds && query.tagIds !== 'none'">
+                                                            <v-list-item class="text-sm" density="compact"
+                                                                         :value="filterType.type"
+                                                                         :append-icon="(query.tagFilterType === filterType.type ? icons.check : null)">
+                                                                <v-list-item-title class="cursor-pointer"
+                                                                                   @click="changeTagFilterType(filterType.type)">
+                                                                    <div class="d-flex align-center">
+                                                                        <v-icon size="24" :icon="filterType.icon"/>
+                                                                        <span class="text-sm ml-3">{{ filterType.displayName }}</span>
+                                                                    </div>
+                                                                </v-list-item-title>
+                                                            </v-list-item>
+                                                        </template>
+
                                                         <template :key="transactionTag.id"
                                                                   v-for="transactionTag in allTransactionTags">
                                                             <v-divider v-if="!transactionTag.hidden || query.tagIds === transactionTag.id" />
@@ -588,6 +607,10 @@ import {
     mdiPencilBoxOutline,
     mdiArrowLeft,
     mdiArrowRight,
+    mdiPlusBoxMultipleOutline,
+    mdiCheckboxMultipleOutline,
+    mdiMinusBoxMultipleOutline,
+    mdiCloseBoxMultipleOutline,
     mdiPound,
     mdiTextBoxOutline,
     mdiDotsVertical
@@ -609,6 +632,7 @@ export default {
         'initCategoryIds',
         'initAccountIds',
         'initTagIds',
+        'initTagFilterType',
         'initAmountFilter',
         'initKeyword'
     ],
@@ -649,6 +673,10 @@ export default {
                 modifyBalance: mdiPencilBoxOutline,
                 arrowLeft: mdiArrowLeft,
                 arrowRight: mdiArrowRight,
+                withAnyTags: mdiPlusBoxMultipleOutline,
+                withAllTags: mdiCheckboxMultipleOutline,
+                withoutAnyTags: mdiMinusBoxMultipleOutline,
+                withoutAllTags: mdiCloseBoxMultipleOutline,
                 tag: mdiPound,
                 templates: mdiTextBoxOutline,
                 more: mdiDotsVertical
@@ -911,6 +939,26 @@ export default {
         allTransactionTypes() {
             return transactionConstants.allTransactionTypes;
         },
+        allTransactionTagFilterTypes() {
+            const allTagFilterTypes = this.$locale.getAllTransactionTagFilterTypes();
+            const allTagFilterTypesWithIcon = [];
+            const tagFilterIconMap = {
+                [transactionConstants.allTransactionTagFilterTypes.HasAny.type]: this.icons.withAnyTags,
+                [transactionConstants.allTransactionTagFilterTypes.HasAll.type]: this.icons.withAllTags,
+                [transactionConstants.allTransactionTagFilterTypes.NotHasAny.type]: this.icons.withoutAnyTags,
+                [transactionConstants.allTransactionTagFilterTypes.NotHasAll.type]: this.icons.withoutAllTags
+            };
+
+            for (let i = 0; i < allTagFilterTypes.length; i++) {
+                allTagFilterTypesWithIcon.push({
+                   type: allTagFilterTypes[i].type,
+                   displayName: allTagFilterTypes[i].displayName,
+                   icon: tagFilterIconMap[allTagFilterTypes[i].type]
+                });
+            }
+
+            return allTagFilterTypesWithIcon;
+        },
         allAccounts() {
             return this.accountsStore.allAccountsMap;
         },
@@ -985,6 +1033,7 @@ export default {
             categoryIds: this.initCategoryIds,
             accountIds: this.initAccountIds,
             tagIds: this.initTagIds,
+            tagFilterType: this.initTagFilterType,
             amountFilter: this.initAmountFilter,
             keyword: this.initKeyword
         });
@@ -1015,6 +1064,7 @@ export default {
                 categoryIds: to.query.categoryIds,
                 accountIds: to.query.accountIds,
                 tagIds: to.query.tagIds,
+                tagFilterType: to.query.tagFilterType,
                 amountFilter: to.query.amountFilter,
                 keyword: to.query.keyword
             });
@@ -1042,6 +1092,7 @@ export default {
                 categoryIds: query.categoryIds,
                 accountIds: query.accountIds,
                 tagIds: query.tagIds,
+                tagFilterType: parseInt(query.tagFilterType) >= 0 ? parseInt(query.tagFilterType) : undefined,
                 amountFilter: query.amountFilter || '',
                 keyword: query.keyword || ''
             });
@@ -1248,6 +1299,22 @@ export default {
         changeMultipleCategoriesFilter(changed) {
             this.categoryMenuState = false;
             this.showFilterCategoryDialog = false;
+
+            if (changed) {
+                this.loading = true;
+                this.currentPageTransactions = [];
+                this.transactionsStore.clearTransactions();
+                this.$router.push(this.getFilterLinkUrl());
+            }
+        },
+        changeTagFilterType(filterType) {
+            if (this.query.tagFilterType === filterType) {
+                return;
+            }
+
+            const changed = this.transactionsStore.updateTransactionListFilter({
+                tagFilterType: filterType
+            });
 
             if (changed) {
                 this.loading = true;

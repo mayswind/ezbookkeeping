@@ -1212,6 +1212,25 @@ function getAllTransactionEditScopeTypes(translateFn) {
     return allEditScopeTypes;
 }
 
+function getAllTransactionTagFilterTypes(translateFn) {
+    const allTagFilterTypes = [];
+
+    for (const typeName in transactionConstants.allTransactionTagFilterTypes) {
+        if (!Object.prototype.hasOwnProperty.call(transactionConstants.allTransactionTagFilterTypes, typeName)) {
+            continue;
+        }
+
+        const tagFilterType = transactionConstants.allTransactionTagFilterTypes[typeName];
+
+        allTagFilterTypes.push({
+            type: tagFilterType.type,
+            displayName: translateFn(tagFilterType.name)
+        });
+    }
+
+    return allTagFilterTypes;
+}
+
 function getAllTransactionScheduledFrequencyTypes(translateFn) {
     const allScheduledFrequencyTypes = [];
 
@@ -1756,6 +1775,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),
         getAllStatisticsDateAggregationTypes: () => getAllStatisticsDateAggregationTypes(i18nGlobal.t),
         getAllTransactionEditScopeTypes: () => getAllTransactionEditScopeTypes(i18nGlobal.t),
+        getAllTransactionTagFilterTypes: () => getAllTransactionTagFilterTypes(i18nGlobal.t),
         getAllTransactionScheduledFrequencyTypes: () => getAllTransactionScheduledFrequencyTypes(i18nGlobal.t),
         getAllTransactionDefaultCategories: (categoryType, locale) => getAllTransactionDefaultCategories(categoryType, locale, i18nGlobal.t),
         getAllDisplayExchangeRates: (settingsStore, exchangeRatesData) => getAllDisplayExchangeRates(settingsStore, exchangeRatesData, i18nGlobal.t),

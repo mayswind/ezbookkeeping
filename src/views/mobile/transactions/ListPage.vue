@@ -470,6 +470,21 @@
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.tagIds && queryAllFilterTagIdsCount > 1"></f7-icon>
                     </template>
                 </f7-list-item>
+
+                <f7-list-item :title="filterType.displayName"
+                              :key="filterType.type"
+                              v-for="filterType in allTransactionTagFilterTypes"
+                              v-if="query.tagIds && query.tagIds !== 'none'"
+                              @click="changeTagFilterType(filterType.type)"
+                >
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon"
+                                 f7="checkmark_alt"
+                                 v-if="query.tagFilterType === filterType.type">
+                        </f7-icon>
+                    </template>
+                </f7-list-item>
+
                 <f7-list-item :title="transactionTag.name"
                               :class="{ 'list-item-selected': query.tagIds === transactionTag.id, 'item-in-multiple-selection': queryAllFilterTagIdsCount > 1 && queryAllFilterTagIds[transactionTag.id] }"
                               :key="transactionTag.id"
@@ -661,6 +676,9 @@ export default {
         },
         allTransactionTypes() {
             return transactionConstants.allTransactionTypes;
+        },
+        allTransactionTagFilterTypes() {
+            return this.$locale.getAllTransactionTagFilterTypes();
         },
         allAccounts() {
             return this.accountsStore.allAccountsMap;
@@ -971,6 +989,21 @@ export default {
 
             const changed = this.transactionsStore.updateTransactionListFilter({
                 tagIds: tagIds
+            });
+
+            this.showMorePopover = false;
+
+            if (changed) {
+                this.reload(null);
+            }
+        },
+        changeTagFilterType(filterType) {
+            if (this.query.tagFilterType === filterType) {
+                return;
+            }
+
+            const changed = this.transactionsStore.updateTransactionListFilter({
+                tagFilterType: filterType
             });
 
             this.showMorePopover = false;

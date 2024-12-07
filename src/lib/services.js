@@ -299,15 +299,15 @@ export default {
             id
         });
     },
-    getTransactions: ({ maxTime, minTime, count, page, withCount, type, categoryIds, accountIds, tagIds, amountFilter, keyword }) => {
+    getTransactions: ({ maxTime, minTime, count, page, withCount, type, categoryIds, accountIds, tagIds, tagFilterType, amountFilter, keyword }) => {
         amountFilter = encodeURIComponent(amountFilter);
         keyword = encodeURIComponent(keyword);
-        return axios.get(`v1/transactions/list.json?max_time=${maxTime}&min_time=${minTime}&type=${type}&category_ids=${categoryIds}&account_ids=${accountIds}&tag_ids=${tagIds}&amount_filter=${amountFilter}&keyword=${keyword}&count=${count}&page=${page}&with_count=${withCount}&trim_account=true&trim_category=true&trim_tag=true`);
+        return axios.get(`v1/transactions/list.json?max_time=${maxTime}&min_time=${minTime}&type=${type}&category_ids=${categoryIds}&account_ids=${accountIds}&tag_ids=${tagIds}&tag_filter_type=${tagFilterType}&amount_filter=${amountFilter}&keyword=${keyword}&count=${count}&page=${page}&with_count=${withCount}&trim_account=true&trim_category=true&trim_tag=true`);
     },
-    getAllTransactionsByMonth: ({ year, month, type, categoryIds, accountIds, tagIds, amountFilter, keyword }) => {
+    getAllTransactionsByMonth: ({ year, month, type, categoryIds, accountIds, tagIds, tagFilterType, amountFilter, keyword }) => {
         amountFilter = encodeURIComponent(amountFilter);
         keyword = encodeURIComponent(keyword);
-        return axios.get(`v1/transactions/list/by_month.json?year=${year}&month=${month}&type=${type}&category_ids=${categoryIds}&account_ids=${accountIds}&tag_ids=${tagIds}&amount_filter=${amountFilter}&keyword=${keyword}&trim_account=true&trim_category=true&trim_tag=true`);
+        return axios.get(`v1/transactions/list/by_month.json?year=${year}&month=${month}&type=${type}&category_ids=${categoryIds}&account_ids=${accountIds}&tag_ids=${tagIds}&tag_filter_type=${tagFilterType}&amount_filter=${amountFilter}&keyword=${keyword}&trim_account=true&trim_category=true&trim_tag=true`);
     },
     getTransactionStatistics: ({ startTime, endTime, useTransactionTimezone }) => {
         const queryParams = [];

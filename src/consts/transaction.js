@@ -36,6 +36,27 @@ const allTransactionEditScopeTypes = {
     }
 };
 
+const allTransactionTagFilterTypes = {
+    HasAny: {
+        type: 0,
+        name: 'With Any Selected Tags'
+    },
+    HasAll: {
+        type: 1,
+        name: 'With All Selected Tags'
+    },
+    NotHasAny: {
+        type: 2,
+        name: 'Without Any Selected Tags'
+    },
+    NotHasAll: {
+        type: 3,
+        name: 'Without All Selected Tags'
+    }
+};
+
+const defaultTransactionTagFilterType = allTransactionTagFilterTypes.HasAny;
+
 const minAmountNumber = -99999999999; // -999999999.99
 const maxAmountNumber = 99999999999; //  999999999.99
 const maxPictureCount = 10;
@@ -43,6 +64,8 @@ const maxPictureCount = 10;
 export default {
     allTransactionTypes: allTransactionTypes,
     allTransactionEditScopeTypes: allTransactionEditScopeTypes,
+    allTransactionTagFilterTypes: allTransactionTagFilterTypes,
+    defaultTransactionTagFilterType: defaultTransactionTagFilterType,
     minAmountNumber: minAmountNumber,
     maxAmountNumber: maxAmountNumber,
     maxPictureCount: maxPictureCount,

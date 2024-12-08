@@ -1,7 +1,9 @@
 # Build backend binary file
 FROM golang:1.22.8-alpine3.20 AS be-builder
 ARG RELEASE_BUILD
+ARG SKIP_TESTS
 ENV RELEASE_BUILD=$RELEASE_BUILD
+ENV SKIP_TESTS=$SKIP_TESTS
 WORKDIR /go/src/github.com/mayswind/ezbookkeeping
 COPY . .
 RUN docker/backend-build-pre-setup.sh

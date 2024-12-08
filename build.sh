@@ -3,6 +3,7 @@
 TYPE=""
 NO_LINT="0"
 NO_TEST="0"
+SKIP_TESTS="${SKIP_TESTS}"
 RELEASE=${RELEASE_BUILD:-"0"}
 RELEASE_TYPE="unknown"
 VERSION=""
@@ -43,7 +44,7 @@ Options:
     -o, --output <filename> Package file name (For "package" type only)
     -t, --tag               Docker tag (For "docker" type only)
     --no-lint               Do not execute lint check before building
-    --no-test               Do not execute unit testing before building
+    --no-test               Do not execute unit testing before building (You can use environment variable "SKIP_TESTS" to skip specified tests)
     -h, --help              Show help
 EOF
 }
@@ -137,7 +138,13 @@ build_backend() {
     if [ "$NO_TEST" = "0" ]; then
         echo "Executing backend unit testing..."
         go clean -cache
-        go test ./... -v
+
+        if [ -z "$SKIP_TESTS" ]; then
+            go test ./... -v
+        else
+            echo "(Skip unit test \"$SKIP_TESTS\")"
+            go test ./... -v -skip "$SKIP_TESTS"
+        fi
 
         if [ "$?" != "0" ]; then
             echo_red "Error: Failed to pass unit testing"

@@ -3,6 +3,7 @@
 set "TYPE="
 set "NO_LINT=0"
 set "NO_TEST=0"
+set "SKIP_TESTS=%SKIP_TESTS%"
 set "RELEASE=%RELEASE_BUILD%"
 set "RELEASE_TYPE=unknown"
 set "VERSION="
@@ -56,7 +57,7 @@ goto :pre_parse_args
     echo     /r, --release           Build release (The script will use environment variable "RELEASE_BUILD" to detect whether this is release building by default)
     echo     /o, --output ^<filename^> Package file name (For "package" type only)
     echo     --no-lint               Do not execute lint check before building
-    echo     --no-test               Do not execute unit testing before building
+    echo     --no-test               Do not execute unit testing before building (You can use environment variable "SKIP_TESTS" to skip specified tests)
     echo     /h, --help              Show help
     goto :eof
 
@@ -139,7 +140,13 @@ goto :pre_parse_args
     if "%NO_TEST%"=="0" (
         echo Executing backend unit testing...
         call go clean -cache
-        call go test .\... -v
+
+        if "%SKIP_TESTS%"=="" (
+            call go test .\... -v
+        ) else (
+            echo (Skip unit test "%SKIP_TESTS%")
+            call go test .\... -v -skip "%SKIP_TESTS%"
+        )
 
         if !errorlevel! neq 0 (
             call :echo_red "Error: Failed to pass unit testing"

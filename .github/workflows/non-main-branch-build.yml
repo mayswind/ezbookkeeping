@@ -26,3 +26,5 @@ jobs:
           context: .
           platforms: linux/amd64
           push: false
+          build-args: |
+              SKIP_TESTS=${{ vars.SKIP_TESTS }}

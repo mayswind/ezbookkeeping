@@ -50,5 +50,7 @@ jobs:
           context: .
           platforms: ${{ vars.BUILD_SNAPSHOT_PLATFORMS }}
           push: true
+          build-args: |
+              SKIP_TESTS=${{ vars.SKIP_TESTS }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

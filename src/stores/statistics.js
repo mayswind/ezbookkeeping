@@ -7,6 +7,7 @@ import { useTransactionCategoriesStore } from './transactionCategory.js';
 import { useExchangeRatesStore } from './exchangeRates.js';
 
 import datetimeConstants from '@/consts/datetime.js';
+import transactionConstants from '@/consts/transaction.js';
 import statisticsConstants from '@/consts/statistics.js';
 import categoryConstants from '@/consts/category.js';
 import iconConstants from '@/consts/icon.js';
@@ -16,6 +17,7 @@ import logger from '@/lib/logger.js';
 import {
     isEquals,
     isNumber,
+    isString,
     isObject,
     isInteger,
     isYearMonth,
@@ -283,7 +285,9 @@ export const useStatisticsStore = defineStore('statistics', {
             trendChartStartYearMonth: '',
             trendChartEndYearMonth: '',
             filterAccountIds: {},
-            filterCategoryIds: {}
+            filterCategoryIds: {},
+            tagIds: '',
+            tagFilterType: transactionConstants.defaultTransactionTagFilterType.type
         },
         transactionCategoryStatisticsData: {},
         transactionCategoryTrendsData: {},
@@ -560,6 +564,8 @@ export const useStatisticsStore = defineStore('statistics', {
             this.transactionStatisticsFilter.trendChartEndYearMonth = '';
             this.transactionStatisticsFilter.filterAccountIds = {};
             this.transactionStatisticsFilter.filterCategoryIds = {};
+            this.transactionStatisticsFilter.tagIds = '';
+            this.transactionStatisticsFilter.tagFilterType = transactionConstants.defaultTransactionTagFilterType.type;
             this.transactionCategoryStatisticsData = {};
             this.transactionCategoryTrendsData = {};
             this.transactionStatisticsStateInvalid = true;
@@ -679,6 +685,18 @@ export const useStatisticsStore = defineStore('statistics', {
                 this.transactionStatisticsFilter.filterCategoryIds = settingsStore.appSettings.statistics.defaultTransactionCategoryFilter || {};
             }
 
+            if (filter && isString(filter.tagIds)) {
+                this.transactionStatisticsFilter.tagIds = filter.tagIds;
+            } else {
+                this.transactionStatisticsFilter.tagIds = '';
+            }
+
+            if (filter && isInteger(filter.tagFilterType)) {
+                this.transactionStatisticsFilter.tagFilterType = filter.tagFilterType;
+            } else {
+                this.transactionStatisticsFilter.tagFilterType = transactionConstants.defaultTransactionTagFilterType.type;
+            }
+
             if (filter && isInteger(filter.sortingType)) {
                 this.transactionStatisticsFilter.sortingType = filter.sortingType;
             } else {
@@ -747,6 +765,16 @@ export const useStatisticsStore = defineStore('statistics', {
                 changed = true;
             }
 
+            if (filter && isString(filter.tagIds) && this.transactionStatisticsFilter.tagIds !== filter.tagIds) {
+                this.transactionStatisticsFilter.tagIds = filter.tagIds;
+                changed = true;
+            }
+
+            if (filter && isInteger(filter.tagFilterType) && this.transactionStatisticsFilter.tagFilterType !== filter.tagFilterType) {
+                this.transactionStatisticsFilter.tagFilterType = filter.tagFilterType;
+                changed = true;
+            }
+
             if (filter && isInteger(filter.sortingType) && this.transactionStatisticsFilter.sortingType !== filter.sortingType) {
                 this.transactionStatisticsFilter.sortingType = filter.sortingType;
                 changed = true;
@@ -798,6 +826,14 @@ export const useStatisticsStore = defineStore('statistics', {
                 }
             }
 
+            if (this.transactionStatisticsFilter.tagIds) {
+                querys.push('tagIds=' + this.transactionStatisticsFilter.tagIds);
+            }
+
+            if (this.transactionStatisticsFilter.tagFilterType) {
+                querys.push('tagFilterType=' + this.transactionStatisticsFilter.tagFilterType);
+            }
+
             querys.push('sortingType=' + this.transactionStatisticsFilter.sortingType);
 
             return querys.join('&');
@@ -847,6 +883,14 @@ export const useStatisticsStore = defineStore('statistics', {
                 }
             }
 
+            if (this.transactionStatisticsFilter.tagIds) {
+                querys.push('tagIds=' + this.transactionStatisticsFilter.tagIds);
+            }
+
+            if (this.transactionStatisticsFilter.tagFilterType) {
+                querys.push('tagFilterType=' + this.transactionStatisticsFilter.tagFilterType);
+            }
+
             if (analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis
                 && this.transactionStatisticsFilter.chartDataType !== statisticsConstants.allChartDataTypes.AccountTotalAssets.type
                 && this.transactionStatisticsFilter.chartDataType !== statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type) {
@@ -872,6 +916,8 @@ export const useStatisticsStore = defineStore('statistics', {
                 services.getTransactionStatistics({
                     startTime: self.transactionStatisticsFilter.categoricalChartStartTime,
                     endTime: self.transactionStatisticsFilter.categoricalChartEndTime,
+                    tagIds: self.transactionStatisticsFilter.tagIds,
+                    tagFilterType: self.transactionStatisticsFilter.tagFilterType,
                     useTransactionTimezone: settingsStore.appSettings.statistics.defaultTimezoneType
                 }).then(response => {
                     const data = response.data;
@@ -914,6 +960,8 @@ export const useStatisticsStore = defineStore('statistics', {
                 services.getTransactionStatisticsTrends({
                     startYearMonth: self.transactionStatisticsFilter.trendChartStartYearMonth,
                     endYearMonth: self.transactionStatisticsFilter.trendChartEndYearMonth,
+                    tagIds: self.transactionStatisticsFilter.tagIds,
+                    tagFilterType: self.transactionStatisticsFilter.tagFilterType,
                     useTransactionTimezone: settingsStore.appSettings.statistics.defaultTimezoneType
                 }).then(response => {
                     const data = response.data;

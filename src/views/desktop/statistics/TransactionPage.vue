@@ -123,6 +123,9 @@
                                                         <v-list-item :prepend-icon="icons.filter"
                                                                      :title="$t('Filter Transaction Categories')"
                                                                      @click="showFilterCategoryDialog = true"></v-list-item>
+                                                        <v-list-item :prepend-icon="icons.filter"
+                                                                     :title="$t('Filter Transaction Tags')"
+                                                                     @click="showFilterTagDialog = true"></v-list-item>
                                                         <v-divider class="my-2"/>
                                                         <v-list-item to="/app/settings?tab=statisticsSetting"
                                                                      :prepend-icon="icons.filterSettings"
@@ -302,6 +305,11 @@
             @settings:change="setCategoryFilter" />
     </v-dialog>
 
+    <v-dialog width="800" v-model="showFilterTagDialog">
+        <transaction-tag-filter-settings-card type="statisticsCurrent" :dialog-mode="true"
+                                              @settings:change="setTagFilter" />
+    </v-dialog>
+
     <snack-bar ref="snackbar" />
 </template>
 
@@ -350,11 +358,13 @@ import {
 
 import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
 import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
+import TransactionTagFilterSettingsCard from '@/views/desktop/common/cards/TransactionTagFilterSettingsCard.vue';
 
 export default {
     components: {
         AccountFilterSettingsCard,
-        CategoryFilterSettingsCard
+        CategoryFilterSettingsCard,
+        TransactionTagFilterSettingsCard
     },
     props: [
         'initAnalysisType',
@@ -365,6 +375,8 @@ export default {
         'initEndTime',
         'initFilterAccountIds',
         'initFilterCategoryIds',
+        'initTagIds',
+        'initTagFilterType',
         'initSortingType',
         'initTrendDateAggregationType'
     ],
@@ -383,6 +395,7 @@ export default {
             showCustomMonthRangeDialog: false,
             showFilterAccountDialog: false,
             showFilterCategoryDialog: false,
+            showFilterTagDialog: false,
             icons: {
                 check: mdiCheck,
                 left: mdiArrowLeft,
@@ -599,6 +612,8 @@ export default {
             endTime: this.initEndTime,
             filterAccountIds: this.initFilterAccountIds,
             filterCategoryIds: this.initFilterCategoryIds,
+            tagIds: this.initTagIds,
+            tagFilterType: this.initTagFilterType,
             sortingType: this.initSortingType,
             trendDateAggregationType: this.initTrendDateAggregationType,
         });
@@ -623,6 +638,8 @@ export default {
                 endTime: to.query.endTime,
                 filterAccountIds: to.query.filterAccountIds,
                 filterCategoryIds: to.query.filterCategoryIds,
+                tagIds: to.query.tagIds,
+                tagFilterType: to.query.tagFilterType,
                 sortingType: to.query.sortingType,
                 trendDateAggregationType: to.query.trendDateAggregationType
             });
@@ -639,6 +656,8 @@ export default {
                 chartDataType: query.chartDataType ? parseInt(query.chartDataType) : undefined,
                 filterAccountIds: query.filterAccountIds ? arrayItemToObjectField(query.filterAccountIds.split(','), true) : {},
                 filterCategoryIds: query.filterCategoryIds ? arrayItemToObjectField(query.filterCategoryIds.split(','), true) : {},
+                tagIds: query.tagIds,
+                tagFilterType: query.tagFilterType && parseInt(query.tagFilterType) >= 0 ? parseInt(query.tagFilterType) : undefined,
                 sortingType: query.sortingType ? parseInt(query.sortingType) : undefined
             };
 
@@ -998,6 +1017,15 @@ export default {
         },
         setCategoryFilter(changed) {
             this.showFilterCategoryDialog = false;
+
+            if (changed) {
+                this.loading = true;
+                this.statisticsStore.updateTransactionStatisticsInvalidState(true);
+                this.$router.push(this.getFilterLinkUrl());
+            }
+        },
+        setTagFilter(changed) {
+            this.showFilterTagDialog = false;
 
             if (changed) {
                 this.loading = true;

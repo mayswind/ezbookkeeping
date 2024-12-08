@@ -309,7 +309,7 @@ export default {
         keyword = encodeURIComponent(keyword);
         return axios.get(`v1/transactions/list/by_month.json?year=${year}&month=${month}&type=${type}&category_ids=${categoryIds}&account_ids=${accountIds}&tag_ids=${tagIds}&tag_filter_type=${tagFilterType}&amount_filter=${amountFilter}&keyword=${keyword}&trim_account=true&trim_category=true&trim_tag=true`);
     },
-    getTransactionStatistics: ({ startTime, endTime, useTransactionTimezone }) => {
+    getTransactionStatistics: ({ startTime, endTime, useTransactionTimezone, tagIds, tagFilterType }) => {
         const queryParams = [];
 
         if (startTime) {
@@ -320,9 +320,17 @@ export default {
             queryParams.push(`end_time=${endTime}`);
         }
 
+        if (tagIds) {
+            queryParams.push(`tag_ids=${tagIds}`);
+        }
+
+        if (tagFilterType) {
+            queryParams.push(`tag_filter_type=${tagFilterType}`);
+        }
+
         return axios.get(`v1/transactions/statistics.json?use_transaction_timezone=${useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));
     },
-    getTransactionStatisticsTrends: ({ startYearMonth, endYearMonth, useTransactionTimezone }) => {
+    getTransactionStatisticsTrends: ({ startYearMonth, endYearMonth, useTransactionTimezone, tagIds, tagFilterType }) => {
         const queryParams = [];
 
         if (startYearMonth) {
@@ -331,6 +339,14 @@ export default {
 
         if (endYearMonth) {
             queryParams.push(`end_year_month=${endYearMonth}`);
+        }
+
+        if (tagIds) {
+            queryParams.push(`tag_ids=${tagIds}`);
+        }
+
+        if (tagFilterType) {
+            queryParams.push(`tag_filter_type=${tagFilterType}`);
         }
 
         return axios.get(`v1/transactions/statistics/trends.json?use_transaction_timezone=${useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));

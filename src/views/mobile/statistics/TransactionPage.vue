@@ -311,6 +311,7 @@
             <f7-actions-group>
                 <f7-actions-button @click="filterAccounts">{{ $t('Filter Accounts') }}</f7-actions-button>
                 <f7-actions-button @click="filterCategories">{{ $t('Filter Transaction Categories') }}</f7-actions-button>
+                <f7-actions-button @click="filterTags">{{ $t('Filter Transaction Tags') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button @click="settings">{{ $t('Settings') }}</f7-actions-button>
@@ -811,6 +812,9 @@ export default {
         },
         filterCategories() {
             this.f7router.navigate('/settings/filter/category?type=statisticsCurrent');
+        },
+        filterTags() {
+            this.f7router.navigate('/settings/filter/tag?type=statisticsCurrent');
         },
         settings() {
             this.f7router.navigate('/statistic/settings');

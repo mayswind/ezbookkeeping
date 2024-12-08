@@ -201,15 +201,19 @@ type TransactionListInMonthByPageRequest struct {
 
 // TransactionStatisticRequest represents all parameters of transaction statistic request
 type TransactionStatisticRequest struct {
-	StartTime              int64 `form:"start_time" binding:"min=0"`
-	EndTime                int64 `form:"end_time" binding:"min=0"`
-	UseTransactionTimezone bool  `form:"use_transaction_timezone"`
+	StartTime              int64                    `form:"start_time" binding:"min=0"`
+	EndTime                int64                    `form:"end_time" binding:"min=0"`
+	TagIds                 string                   `form:"tag_ids"`
+	TagFilterType          TransactionTagFilterType `form:"tag_filter_type" binding:"min=0,max=3"`
+	UseTransactionTimezone bool                     `form:"use_transaction_timezone"`
 }
 
 // TransactionStatisticTrendsRequest represents all parameters of transaction statistic trends request
 type TransactionStatisticTrendsRequest struct {
 	YearMonthRangeRequest
-	UseTransactionTimezone bool `form:"use_transaction_timezone"`
+	TagIds                 string                   `form:"tag_ids"`
+	TagFilterType          TransactionTagFilterType `form:"tag_filter_type" binding:"min=0,max=3"`
+	UseTransactionTimezone bool                     `form:"use_transaction_timezone"`
 }
 
 // TransactionAmountsRequest represents all parameters of transaction amounts request

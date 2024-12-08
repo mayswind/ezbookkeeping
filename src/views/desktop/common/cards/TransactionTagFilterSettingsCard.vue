@@ -76,6 +76,17 @@
         </v-card-text>
 
         <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-else-if="!loading && hasAnyVisibleTag">
+            <div class="tag-filter-types d-flex flex-column mb-4" v-if="type === 'statisticsCurrent'">
+                <v-btn border class="justify-start" :key="filterType.type"
+                       :color="tagFilterType === filterType.type ? 'primary' : 'default'"
+                       :variant="tagFilterType === filterType.type ? 'tonal' : 'outlined'"
+                       :append-icon="(tagFilterType === filterType.type ? icons.check : null)"
+                       v-for="filterType in allTagFilterTypes"
+                       @click="tagFilterType = filterType.type">
+                    {{ filterType.displayName }}
+                </v-btn>
+            </div>
+
             <v-expansion-panels class="tag-categories" multiple v-model="expandTagCategories">
                 <v-expansion-panel class="border" key="default" value="default">
                     <v-expansion-panel-title class="expand-panel-title-with-bg py-0">
@@ -123,6 +134,9 @@
 import { mapStores } from 'pinia';
 import { useTransactionTagsStore } from '@/stores/transactionTag.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
+import { useStatisticsStore } from '@/stores/statistics.js';
+
+import transactionConstants from '@/consts/transaction.js';
 
 import {
     selectAll,
@@ -137,6 +151,7 @@ import {
     mdiEyeOutline,
     mdiEyeOffOutline,
     mdiDotsVertical,
+    mdiCheck,
     mdiPound
 } from '@mdi/js';
 
@@ -154,6 +169,7 @@ export default {
             loading: true,
             expandTagCategories: [ 'default' ],
             filterTagIds: {},
+            tagFilterType: transactionConstants.defaultTransactionTagFilterType.type,
             showHidden: false,
             icons: {
                 selectAll: mdiSelectAll,
@@ -162,12 +178,13 @@ export default {
                 show: mdiEyeOutline,
                 hide: mdiEyeOffOutline,
                 more: mdiDotsVertical,
+                check: mdiCheck,
                 tag: mdiPound
             }
         }
     },
     computed: {
-        ...mapStores(useTransactionTagsStore, useTransactionsStore),
+        ...mapStores(useTransactionTagsStore, useTransactionsStore, useStatisticsStore),
         title() {
             return 'Filter Transaction Tags';
         },
@@ -176,6 +193,9 @@ export default {
         },
         allTags() {
             return this.transactionTagsStore.allTransactionTags;
+        },
+        allTagFilterTypes() {
+            return this.$locale.getAllTransactionTagFilterTypes();
         },
         hasAnyAvailableTag() {
             return this.transactionTagsStore.allAvailableTagsCount > 0;
@@ -207,7 +227,20 @@ export default {
                 allTransactionTagIds[transactionTag.id] = true;
             }
 
-            if (self.type === 'transactionListCurrent') {
+            if (self.type === 'statisticsCurrent') {
+                let transactionTagIds = self.statisticsStore.transactionStatisticsFilter.tagIds ? self.statisticsStore.transactionStatisticsFilter.tagIds.split(',') : [];
+
+                for (let i = 0; i < transactionTagIds.length; i++) {
+                    const transactionTagId = transactionTagIds[i];
+                    const transactionTag = self.transactionTagsStore.allTransactionTagsMap[transactionTagId];
+
+                    if (transactionTag) {
+                        allTransactionTagIds[transactionTag.id] = false;
+                    }
+                }
+                self.filterTagIds = allTransactionTagIds;
+                self.tagFilterType = self.statisticsStore.transactionStatisticsFilter.tagFilterType;
+            } else if (self.type === 'transactionListCurrent') {
                 for (let transactionTagId in self.transactionsStore.allFilterTagIds) {
                     if (!Object.prototype.hasOwnProperty.call(self.transactionsStore.allFilterTagIds, transactionTagId)) {
                         continue;
@@ -257,7 +290,16 @@ export default {
                 }
             }
 
-            if (this.type === 'transactionListCurrent') {
+            if (this.type === 'statisticsCurrent') {
+                changed = self.statisticsStore.updateTransactionStatisticsFilter({
+                    tagIds: finalTagIds,
+                    tagFilterType: self.tagFilterType
+                });
+
+                if (changed) {
+                    self.statisticsStore.updateTransactionStatisticsInvalidState(true);
+                }
+            } else if (this.type === 'transactionListCurrent') {
                 changed = self.transactionsStore.updateTransactionListFilter({
                     tagIds: finalTagIds
                 });
@@ -305,6 +347,17 @@ export default {
 </script>
 
 <style>
+.tag-filter-types .v-btn:not(:first-child) {
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+}
+
+.tag-filter-types .v-btn:not(:last-child) {
+    border-bottom: 0;
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
+}
+
 .tag-categories .v-expansion-panel-text__wrapper {
     padding: 0 0 0 20px;
 }

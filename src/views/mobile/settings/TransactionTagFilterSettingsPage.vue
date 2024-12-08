@@ -42,6 +42,17 @@
         </f7-list>
 
         <f7-block class="combination-list-wrapper margin-vertical" key="default" v-show="!loading && hasAnyVisibleTag">
+            <f7-list class="margin-top-half margin-bottom" strong inset dividers v-if="type === 'statisticsCurrent'">
+                <f7-list-item radio
+                              :title="filterType.displayName"
+                              :value="filterType.type"
+                              :checked="tagFilterType === filterType.type"
+                              :key="filterType.type"
+                              v-for="filterType in allTagFilterTypes"
+                              @change="tagFilterType = filterType.type">
+                </f7-list-item>
+            </f7-list>
+
             <f7-accordion-item :opened="collapseStates['default'].opened"
                                @accordion:open="collapseStates['default'].opened = true"
                                @accordion:close="collapseStates['default'].opened = false">
@@ -103,6 +114,9 @@
 import { mapStores } from 'pinia';
 import { useTransactionTagsStore } from '@/stores/transactionTag.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
+import { useStatisticsStore } from '@/stores/statistics.js';
+
+import transactionConstants from '@/consts/transaction.js';
 
 import {
     selectAll,
@@ -121,6 +135,7 @@ export default {
             loadingError: null,
             type: null,
             filterTagIds: {},
+            tagFilterType: transactionConstants.defaultTransactionTagFilterType.type,
             showHidden: false,
             collapseStates: {
                 'default': {
@@ -131,7 +146,7 @@ export default {
         }
     },
     computed: {
-        ...mapStores(useTransactionTagsStore, useTransactionsStore),
+        ...mapStores(useTransactionTagsStore, useTransactionsStore, useStatisticsStore),
         title() {
             return 'Filter Transaction Tags';
         },
@@ -140,6 +155,9 @@ export default {
         },
         allTags() {
             return this.transactionTagsStore.allTransactionTags;
+        },
+        allTagFilterTypes() {
+            return this.$locale.getAllTransactionTagFilterTypes();
         },
         hasAnyAvailableTag() {
             return this.transactionTagsStore.allAvailableTagsCount > 0;
@@ -174,7 +192,20 @@ export default {
                 allTransactionTagIds[transactionTag.id] = true;
             }
 
-            if (self.type === 'transactionListCurrent') {
+            if (self.type === 'statisticsCurrent') {
+                let transactionTagIds = self.statisticsStore.transactionStatisticsFilter.tagIds ? self.statisticsStore.transactionStatisticsFilter.tagIds.split(',') : [];
+
+                for (let i = 0; i < transactionTagIds.length; i++) {
+                    const transactionTagId = transactionTagIds[i];
+                    const transactionTag = self.transactionTagsStore.allTransactionTagsMap[transactionTagId];
+
+                    if (transactionTag) {
+                        allTransactionTagIds[transactionTag.id] = false;
+                    }
+                }
+                self.filterTagIds = allTransactionTagIds;
+                self.tagFilterType = self.statisticsStore.transactionStatisticsFilter.tagFilterType;
+            } else if (self.type === 'transactionListCurrent') {
                 for (let transactionTagId in self.transactionsStore.allFilterTagIds) {
                     if (!Object.prototype.hasOwnProperty.call(self.transactionsStore.allFilterTagIds, transactionTagId)) {
                         continue;
@@ -210,6 +241,7 @@ export default {
 
             const filteredTagIds = {};
             let finalTagIds = '';
+            let changed = true;
 
             for (let transactionTagId in self.filterTagIds) {
                 if (!Object.prototype.hasOwnProperty.call(self.filterTagIds, transactionTagId)) {
@@ -229,8 +261,17 @@ export default {
                 }
             }
 
-            if (this.type === 'transactionListCurrent') {
-                const changed = self.transactionsStore.updateTransactionListFilter({
+            if (this.type === 'statisticsCurrent') {
+                changed = self.statisticsStore.updateTransactionStatisticsFilter({
+                    tagIds: finalTagIds,
+                    tagFilterType: self.tagFilterType
+                });
+
+                if (changed) {
+                    self.statisticsStore.updateTransactionStatisticsInvalidState(true);
+                }
+            } else if (this.type === 'transactionListCurrent') {
+                changed = self.transactionsStore.updateTransactionListFilter({
                     tagIds: finalTagIds
                 });
 

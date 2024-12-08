@@ -767,7 +767,8 @@ export default {
             type: parseInt(query.type) > 0 ? parseInt(query.type) : undefined,
             categoryIds: query.categoryIds,
             accountIds: query.accountIds,
-            tagIds: query.tagIds
+            tagIds: query.tagIds,
+            tagFilterType: query.tagFilterType && parseInt(query.tagFilterType) >= 0 ? parseInt(query.tagFilterType) : undefined
         });
 
         this.reload(null);

@@ -1092,7 +1092,7 @@ export default {
                 categoryIds: query.categoryIds,
                 accountIds: query.accountIds,
                 tagIds: query.tagIds,
-                tagFilterType: parseInt(query.tagFilterType) >= 0 ? parseInt(query.tagFilterType) : undefined,
+                tagFilterType: query.tagFilterType && parseInt(query.tagFilterType) >= 0 ? parseInt(query.tagFilterType) : undefined,
                 amountFilter: query.amountFilter || '',
                 keyword: query.keyword || ''
             });

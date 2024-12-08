@@ -245,7 +245,7 @@
                                         </template>
 
                                         <template #no-data>
-                                            <v-list>
+                                            <v-list class="py-0">
                                                 <v-list-item v-if="mode !== 'view'" @click="updateGeoLocation(true)">{{ $t('Update Geographic Location') }}</v-list-item>
                                                 <v-list-item v-if="mode !== 'view'" @click="clearGeoLocation">{{ $t('Clear Geographic Location') }}</v-list-item>
                                             </v-list>

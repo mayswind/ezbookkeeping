@@ -141,6 +141,8 @@
             </div>
         </v-card-text>
     </v-card>
+
+    <snack-bar ref="snackbar" />
 </template>
 
 <script>

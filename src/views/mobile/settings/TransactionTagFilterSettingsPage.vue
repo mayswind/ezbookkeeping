@@ -171,12 +171,7 @@ export default {
                 }
 
                 const transactionTag = self.transactionTagsStore.allTransactionTagsMap[transactionTagId];
-
-                if (self.type === 'transactionListCurrent' && self.transactionsStore.allFilterTagIdsCount > 0) {
-                    allTransactionTagIds[transactionTag.id] = true;
-                } else {
-                    allTransactionTagIds[transactionTag.id] = false;
-                }
+                allTransactionTagIds[transactionTag.id] = true;
             }
 
             if (self.type === 'transactionListCurrent') {

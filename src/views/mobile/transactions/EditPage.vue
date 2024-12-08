@@ -313,7 +313,7 @@
                 :header="$t('Tags')"
                 @click="showTransactionTagSheet = true"
             >
-                <transaction-tag-selection-sheet :items="allTags"
+                <transaction-tag-selection-sheet :allow-add-new-tag="true"
                                                  v-model:show="showTransactionTagSheet"
                                                  v-model="transaction.tagIds">
                 </transaction-tag-selection-sheet>

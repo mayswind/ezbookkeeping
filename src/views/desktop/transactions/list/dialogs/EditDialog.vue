@@ -266,8 +266,8 @@
                                         :label="$t('Tags')"
                                         :placeholder="$t('None')"
                                         :items="allTags"
-                                        :no-data-text="$t('No available tag')"
                                         v-model="transaction.tagIds"
+                                        v-model:search="tagSearchContent"
                                     >
                                         <template #chip="{ props, item }">
                                             <v-chip :prepend-icon="icons.tag" :text="item.title" v-bind="props"/>
@@ -284,6 +284,13 @@
                                                     </v-list-item-title>
                                                 </template>
                                             </v-list-item>
+                                        </template>
+
+                                        <template #no-data>
+                                            <v-list class="py-0">
+                                                <v-list-item v-if="tagSearchContent" @click="saveNewTag(tagSearchContent)">{{ $t('format.misc.addNewTag', { tag: tagSearchContent }) }}</v-list-item>
+                                                <v-list-item v-else-if="!tagSearchContent">{{ $t('No available tag') }}</v-list-item>
+                                            </v-list>
                                         </template>
                                     </v-autocomplete>
                                 </v-col>
@@ -458,6 +465,7 @@ export default {
             transaction: newTransaction,
             geoLocationStatus: null,
             geoMenuState: false,
+            tagSearchContent: '',
             submitting: false,
             uploadingPicture: false,
             removingPictureId: '',
@@ -1165,6 +1173,29 @@ export default {
             this.geoMenuState = false;
             this.geoLocationStatus = null;
             this.transaction.geoLocation = null;
+        },
+        saveNewTag(tagName) {
+            const self = this;
+
+            self.submitting = true;
+
+            self.transactionTagsStore.saveTag({
+                tag: {
+                    name: tagName
+                }
+            }).then(tag => {
+                self.submitting = false;
+
+                if (tag && tag.id) {
+                    self.transaction.tagIds.push(tag.id);
+                }
+            }).catch(error => {
+                self.submitting = false;
+
+                if (!error.processed) {
+                    self.$refs.snackbar.showError(error);
+                }
+            });
         },
         swapTransactionData(swapAccount, swapAmount) {
             if (swapAccount) {

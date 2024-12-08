@@ -194,6 +194,10 @@ export default {
     max-height: inherit !important;
 }
 
+.schedule-frequency-select-menu > .v-list {
+    padding: 0;
+}
+
 .schedule-frequency-select-menu .schedule-frequency-container {
     width: 100%;
     display: flex;

@@ -627,7 +627,7 @@ export const useTransactionsStore = defineStore('transactions', {
                 geoLocation: null
             };
         },
-        setTransactionSuitableDestinationAmount(transaction, oldValue, newValue, destinationAccountCurrency) {
+        setTransactionSuitableDestinationAmount(transaction, oldValue, newValue) {
             const accountsStore = useAccountsStore();
             const exchangeRatesStore = useExchangeRatesStore();
 
@@ -638,7 +638,7 @@ export const useTransactionsStore = defineStore('transactions', {
                 const destinationAccount = accountsStore.allAccountsMap[transaction.destinationAccountId];
 
                 if (sourceAccount && destinationAccount && sourceAccount.currency !== destinationAccount.currency) {
-                    const decimalNumberCount = getCurrencyFraction(destinationAccountCurrency);
+                    const decimalNumberCount = getCurrencyFraction(destinationAccount.currency);
                     const exchangedOldValue = exchangeRatesStore.getExchangedAmount(oldValue, sourceAccount.currency, destinationAccount.currency);
                     const exchangedNewValue = exchangeRatesStore.getExchangedAmount(newValue, sourceAccount.currency, destinationAccount.currency);
 

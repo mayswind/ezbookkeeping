@@ -757,7 +757,7 @@ export default {
                 return;
             }
 
-            this.transactionsStore.setTransactionSuitableDestinationAmount(this.transaction, oldValue, newValue, this.destinationAccountCurrency);
+            this.transactionsStore.setTransactionSuitableDestinationAmount(this.transaction, oldValue, newValue);
         },
         'transaction.destinationAmount': function (newValue) {
             if (this.mode === 'view' || this.loading) {

@@ -8,14 +8,16 @@
                 <f7-link sheet-close :text="$t('Cancel')"></f7-link>
             </div>
             <div class="right">
-                <f7-link :text="$t('Done')" @click="save"></f7-link>
+                <f7-link :text="$t('Done')" v-if="allTags && allTags.length && !noAvailableTag" @click="save"></f7-link>
+                <f7-link :class="{'disabled': newTag}"
+                         :text="$t('Add')" v-if="!allTags || !allTags.length || noAvailableTag" @click="addNewTag"></f7-link>
             </div>
         </f7-toolbar>
         <f7-page-content>
-            <f7-list class="no-margin-top no-margin-bottom" v-if="!allTags || !allTags.length || noAvailableTag">
+            <f7-list class="no-margin-top no-margin-bottom" v-if="(!allTags || !allTags.length || noAvailableTag) && !newTag">
                 <f7-list-item :title="$t('No available tag')"></f7-list-item>
             </f7-list>
-            <f7-list dividers class="no-margin-top no-margin-bottom tag-selection-list" v-else-if="allTags && allTags.length && !noAvailableTag">
+            <f7-list dividers class="no-margin-top no-margin-bottom tag-selection-list" v-else-if="(allTags && allTags.length && !noAvailableTag) || newTag">
                 <f7-list-item checkbox
                               :class="isChecked(tag.id) ? 'list-item-selected' : ''"
                               :value="tag.id"

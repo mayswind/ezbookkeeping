@@ -256,7 +256,7 @@ export default {
     getAccount: ({ id }) => {
         return axios.get('v1/accounts/get.json?id=' + id);
     },
-    addAccount: ({ category, type, name, icon, color, currency, balance, balanceTime, comment, subAccounts, clientSessionId }) => {
+    addAccount: ({ category, type, name, icon, color, currency, balance, balanceTime, comment, creditCardStatementDate, subAccounts, clientSessionId }) => {
         return axios.post('v1/accounts/add.json', {
             category,
             type,
@@ -267,11 +267,12 @@ export default {
             balance,
             balanceTime,
             comment,
+            creditCardStatementDate,
             subAccounts,
             clientSessionId
         });
     },
-    modifyAccount: ({ id, category, name, icon, color, comment, hidden, subAccounts }) => {
+    modifyAccount: ({ id, category, name, icon, color, comment, creditCardStatementDate, hidden, subAccounts }) => {
         return axios.post('v1/accounts/modify.json', {
             id,
             category,
@@ -279,6 +280,7 @@ export default {
             icon,
             color,
             comment,
+            creditCardStatementDate,
             hidden,
             subAccounts
         });

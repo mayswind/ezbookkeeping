@@ -12,6 +12,7 @@ export function setAccountModelByAnotherAccount(account, account2) {
     account.balance = account2.balance;
     account.balanceTime = account2.balanceTime;
     account.comment = account2.comment;
+    account.creditCardStatementDate = account2.creditCardStatementDate;
     account.visible = !account2.hidden;
 }
 

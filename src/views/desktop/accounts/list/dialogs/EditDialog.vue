@@ -108,7 +108,7 @@
                                                   :disabled="loading || submitting"
                                                   v-model="selectedAccount.color" />
                                 </v-col>
-                                <v-col cols="12" md="12" v-if="account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0">
+                                <v-col cols="12" :md="isAccountSupportCreditCardStatementDate() ? 6 : 12" v-if="account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0">
                                     <v-autocomplete
                                         item-title="displayName"
                                         item-value="currencyCode"
@@ -125,6 +125,20 @@
                                             <small class="text-field-append-text smaller">{{ selectedAccount.currency }}</small>
                                         </template>
                                     </v-autocomplete>
+                                </v-col>
+                                <v-col cols="12" :md="account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0 ? 6 : 12" v-if="isAccountSupportCreditCardStatementDate()">
+                                    <v-autocomplete
+                                        item-title="displayName"
+                                        item-value="day"
+                                        auto-select-first
+                                        persistent-placeholder
+                                        :disabled="loading || submitting"
+                                        :label="$t('Statement Date')"
+                                        :placeholder="$t('Statement Date')"
+                                        :items="allAvailableMonthDays"
+                                        :no-data-text="$t('No results')"
+                                        v-model="selectedAccount.creditCardStatementDate"
+                                    ></v-autocomplete>
                                 </v-col>
                                 <v-col cols="12" :md="!editAccountId && selectedAccount.balance ? 6 : 12"
                                        v-if="account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0">
@@ -266,6 +280,23 @@ export default {
         },
         allCurrencies() {
             return this.$locale.getAllCurrencies();
+        },
+        allAvailableMonthDays() {
+            const allAvailableDays = [];
+
+            allAvailableDays.push({
+                day: 0,
+                displayName: this.$t('Not set'),
+            });
+
+            for (let i = 1; i <= 28; i++) {
+                allAvailableDays.push({
+                    day: i,
+                    displayName: this.$locale.getMonthdayShortName(i),
+                });
+            }
+
+            return allAvailableDays;
         },
         selectedAccount() {
             if (this.currentAccountIndex < 0) {
@@ -414,6 +445,9 @@ export default {
             }
 
             this.showState = false;
+        },
+        isAccountSupportCreditCardStatementDate() {
+            return this.account && this.account.category === accountConstants.creditCardCategoryType;
         },
         chooseSuitableIcon(oldCategory, newCategory) {
             setAccountSuitableIcon(this.account, oldCategory, newCategory);

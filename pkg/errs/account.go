@@ -20,4 +20,5 @@ var (
 	ErrAccountInUseCannotBeDeleted            = NewNormalError(NormalSubcategoryAccount, 13, http.StatusBadRequest, "account is in use and cannot be deleted")
 	ErrAccountCategoryInvalid                 = NewNormalError(NormalSubcategoryAccount, 14, http.StatusBadRequest, "account category is invalid")
 	ErrAccountBalanceTimeNotSet               = NewNormalError(NormalSubcategoryAccount, 15, http.StatusBadRequest, "account balance time is not set")
+	ErrCannotSetStatementDateForNonCreditCard = NewNormalError(NormalSubcategoryAccount, 16, http.StatusBadRequest, "cannot set statement date for non credit card account")
 )

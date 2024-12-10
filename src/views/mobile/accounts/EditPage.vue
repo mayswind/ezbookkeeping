@@ -174,6 +174,20 @@
             </f7-list-item>
 
             <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('Statement Date')"
+                :title="getAccountCreditCardStatementDate(account.creditCardStatementDate)"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Statement Date'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Statement Date'), popupCloseLinkText: $t('Done') }"
+                v-if="isAccountSupportCreditCardStatementDate()"
+            >
+                <select v-model="account.creditCardStatementDate">
+                    <option :value="monthDay.day"
+                            :key="monthDay.day"
+                            v-for="monthDay in allAvailableMonthDays">{{ monthDay.displayName }}</option>
+                </select>
+            </f7-list-item>
+
+            <f7-list-item
                 link="#" no-chevron
                 class="list-item-with-header-and-title"
                 :class="{ 'disabled': editAccountId }"
@@ -282,6 +296,20 @@
                 </template>
             </f7-list-item>
 
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('Statement Date')"
+                :title="getAccountCreditCardStatementDate(account.creditCardStatementDate)"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Statement Date'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Statement Date'), popupCloseLinkText: $t('Done') }"
+                v-if="isAccountSupportCreditCardStatementDate()"
+            >
+                <select v-model="account.creditCardStatementDate">
+                    <option :value="monthDay.day"
+                            :key="monthDay.day"
+                            v-for="monthDay in allAvailableMonthDays">{{ monthDay.displayName }}</option>
+                </select>
+            </f7-list-item>
+
             <f7-list-item :title="$t('Visible')" v-if="editAccountId">
                 <f7-toggle :checked="account.visible" @toggle:change="account.visible = $event"></f7-toggle>
             </f7-list-item>
@@ -384,6 +412,20 @@
                         <option :value="currency.currencyCode"
                                 :key="currency.currencyCode"
                                 v-for="currency in allCurrencies">{{ currency.displayName }}</option>
+                    </select>
+                </f7-list-item>
+
+                <f7-list-item
+                    class="list-item-with-header-and-title list-item-no-item-after"
+                    :header="$t('Statement Date')"
+                    :title="getAccountCreditCardStatementDate(subAccount.creditCardStatementDate)"
+                    smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Statement Date'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Statement Date'), popupCloseLinkText: $t('Done') }"
+                    v-if="isAccountSupportCreditCardStatementDate()"
+                >
+                    <select v-model="subAccount.creditCardStatementDate">
+                        <option :value="monthDay.day"
+                                :key="monthDay.day"
+                                v-for="monthDay in allAvailableMonthDays">{{ monthDay.displayName }}</option>
                     </select>
                 </f7-list-item>
 
@@ -543,6 +585,23 @@ export default {
         },
         allCurrencies() {
             return this.$locale.getAllCurrencies();
+        },
+        allAvailableMonthDays() {
+            const allAvailableDays = [];
+
+            allAvailableDays.push({
+                day: 0,
+                displayName: this.$t('Not set'),
+            });
+
+            for (let i = 1; i <= 28; i++) {
+                allAvailableDays.push({
+                    day: i,
+                    displayName: this.$locale.getMonthdayShortName(i),
+                });
+            }
+
+            return allAvailableDays;
         },
         allowedMinAmount() {
             return transactionConstants.minAmountNumber;
@@ -705,6 +764,9 @@ export default {
         getAccountCategoryName(accountCategory) {
             return getNameByKeyValue(this.allAccountCategories, accountCategory, 'id', 'displayName');
         },
+        getAccountCreditCardStatementDate(statementDate) {
+            return getNameByKeyValue(this.allAvailableMonthDays, statementDate, 'day', 'displayName');
+        },
         getAccountBalance(account) {
             return this.getDisplayCurrency(account.balance, account.currency);
         },
@@ -716,6 +778,9 @@ export default {
         },
         getDisplayCurrency(value, currencyCode) {
             return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, currencyCode);
+        },
+        isAccountSupportCreditCardStatementDate() {
+            return this.account && this.account.category === accountConstants.creditCardCategoryType;
         },
         chooseSuitableIcon(oldCategory, newCategory) {
             setAccountSuitableIcon(this.account, oldCategory, newCategory);

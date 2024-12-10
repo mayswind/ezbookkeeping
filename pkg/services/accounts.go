@@ -329,7 +329,7 @@ func (s *AccountService) ModifyAccounts(c core.Context, uid int64, accounts []*m
 	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		for i := 0; i < len(accounts); i++ {
 			account := accounts[i]
-			updatedRows, err := sess.ID(account.AccountId).Cols("name", "category", "icon", "color", "comment", "hidden", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(account)
+			updatedRows, err := sess.ID(account.AccountId).Cols("name", "category", "icon", "color", "comment", "extend", "hidden", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(account)
 
 			if err != nil {
 				return err

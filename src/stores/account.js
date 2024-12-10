@@ -258,7 +258,7 @@ export const useAccountsStore = defineStore('accounts', {
             const now = getCurrentUnixTime();
 
             return {
-                category: 1,
+                category: accountConstants.cashCategoryType,
                 type: accountConstants.allAccountTypes.SingleAccount,
                 name: '',
                 icon: iconConstants.defaultAccountIconId,
@@ -267,6 +267,7 @@ export const useAccountsStore = defineStore('accounts', {
                 balance: 0,
                 balanceTime: now,
                 comment: '',
+                creditCardStatementDate: 0,
                 visible: true
             };
         },
@@ -284,6 +285,7 @@ export const useAccountsStore = defineStore('accounts', {
                 balance: 0,
                 balanceTime: now,
                 comment: '',
+                creditCardStatementDate: parentAccount.creditCardStatementDate,
                 visible: true
             };
         },
@@ -760,6 +762,10 @@ export const useAccountsStore = defineStore('accounts', {
                         comment: subAccount.comment
                     };
 
+                    if (account.category === accountConstants.creditCardCategoryType) {
+                        submitAccount.creditCardStatementDate = subAccount.creditCardStatementDate;
+                    }
+
                     if (isEdit) {
                         submitAccount.id = subAccount.id;
                         submitAccount.hidden = !subAccount.visible;
@@ -782,6 +788,10 @@ export const useAccountsStore = defineStore('accounts', {
                 comment: account.comment,
                 subAccounts: account.type === accountConstants.allAccountTypes.SingleAccount ? null : submitSubAccounts,
             };
+
+            if (account.category === accountConstants.creditCardCategoryType) {
+                submitAccount.creditCardStatementDate = account.creditCardStatementDate;
+            }
 
             if (clientSessionId) {
                 submitAccount.clientSessionId = clientSessionId;

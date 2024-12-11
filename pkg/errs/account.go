@@ -21,4 +21,5 @@ var (
 	ErrAccountCategoryInvalid                 = NewNormalError(NormalSubcategoryAccount, 14, http.StatusBadRequest, "account category is invalid")
 	ErrAccountBalanceTimeNotSet               = NewNormalError(NormalSubcategoryAccount, 15, http.StatusBadRequest, "account balance time is not set")
 	ErrCannotSetStatementDateForNonCreditCard = NewNormalError(NormalSubcategoryAccount, 16, http.StatusBadRequest, "cannot set statement date for non credit card account")
+	ErrCannotSetStatementDateForSubAccount    = NewNormalError(NormalSubcategoryAccount, 17, http.StatusBadRequest, "cannot set statement date for sub account")
 )

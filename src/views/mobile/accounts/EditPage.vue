@@ -416,20 +416,6 @@
                 </f7-list-item>
 
                 <f7-list-item
-                    class="list-item-with-header-and-title list-item-no-item-after"
-                    :header="$t('Statement Date')"
-                    :title="getAccountCreditCardStatementDate(subAccount.creditCardStatementDate)"
-                    smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Statement Date'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Statement Date'), popupCloseLinkText: $t('Done') }"
-                    v-if="isAccountSupportCreditCardStatementDate()"
-                >
-                    <select v-model="subAccount.creditCardStatementDate">
-                        <option :value="monthDay.day"
-                                :key="monthDay.day"
-                                v-for="monthDay in allAvailableMonthDays">{{ monthDay.displayName }}</option>
-                    </select>
-                </f7-list-item>
-
-                <f7-list-item
                     link="#" no-chevron
                     class="list-item-with-header-and-title"
                     :class="{ 'disabled': editAccountId }"

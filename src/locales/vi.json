@@ -1062,6 +1062,7 @@
         "account category is invalid": "Danh mục tài khoản không hợp lệ",
         "account balance time is not set": "Thời gian số dư tài khoản chưa được đặt",
         "cannot set statement date for non credit card account": "Cannot set statement date for non credit card account",
+        "cannot set statement date for sub account": "Cannot set statement date for sub-account",
         "transaction id is invalid": "ID giao dịch không hợp lệ",
         "transaction not found": "Không tìm thấy giao dịch",
         "transaction type is invalid": "Loại giao dịch không hợp lệ",

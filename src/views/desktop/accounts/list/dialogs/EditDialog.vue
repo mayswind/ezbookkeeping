@@ -108,7 +108,7 @@
                                                   :disabled="loading || submitting"
                                                   v-model="selectedAccount.color" />
                                 </v-col>
-                                <v-col cols="12" :md="isAccountSupportCreditCardStatementDate() ? 6 : 12" v-if="account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0">
+                                <v-col cols="12" :md="currentAccountIndex < 0 && isAccountSupportCreditCardStatementDate() ? 6 : 12" v-if="account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0">
                                     <v-autocomplete
                                         item-title="displayName"
                                         item-value="currencyCode"
@@ -126,7 +126,7 @@
                                         </template>
                                     </v-autocomplete>
                                 </v-col>
-                                <v-col cols="12" :md="account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0 ? 6 : 12" v-if="isAccountSupportCreditCardStatementDate()">
+                                <v-col cols="12" :md="account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0 ? 6 : 12" v-if="currentAccountIndex < 0 && isAccountSupportCreditCardStatementDate()">
                                     <v-autocomplete
                                         item-title="displayName"
                                         item-value="day"
@@ -137,7 +137,7 @@
                                         :placeholder="$t('Statement Date')"
                                         :items="allAvailableMonthDays"
                                         :no-data-text="$t('No results')"
-                                        v-model="selectedAccount.creditCardStatementDate"
+                                        v-model="account.creditCardStatementDate"
                                     ></v-autocomplete>
                                 </v-col>
                                 <v-col cols="12" :md="!editAccountId && selectedAccount.balance ? 6 : 12"

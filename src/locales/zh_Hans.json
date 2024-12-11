@@ -1062,6 +1062,7 @@
         "account category is invalid": "账户分类无效",
         "account balance time is not set": "账户余额时间没有设置",
         "cannot set statement date for non credit card account": "非信用卡账户不能设置账单日期",
+        "cannot set statement date for sub account": "子账户不能设置账单日期",
         "transaction id is invalid": "交易ID无效",
         "transaction not found": "交易不存在",
         "transaction type is invalid": "交易类型无效",

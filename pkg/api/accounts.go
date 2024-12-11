@@ -159,6 +159,11 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 		return nil, errs.ErrAccountCategoryInvalid
 	}
 
+	if accountCreateReq.Category != models.ACCOUNT_CATEGORY_CREDIT_CARD && accountCreateReq.CreditCardStatementDate != 0 {
+		log.Warnf(c, "[accounts.AccountCreateHandler] cannot set statement date with category \"%d\"", accountCreateReq.Category)
+		return nil, errs.ErrCannotSetStatementDateForNonCreditCard
+	}
+
 	if accountCreateReq.Type == models.ACCOUNT_TYPE_SINGLE_ACCOUNT {
 		if len(accountCreateReq.SubAccounts) > 0 {
 			log.Warnf(c, "[accounts.AccountCreateHandler] account cannot have any sub-accounts")
@@ -173,11 +178,6 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 		if accountCreateReq.Balance != 0 && accountCreateReq.BalanceTime <= 0 {
 			log.Warnf(c, "[accounts.AccountCreateHandler] account balance time is not set")
 			return nil, errs.ErrAccountBalanceTimeNotSet
-		}
-
-		if accountCreateReq.Category != models.ACCOUNT_CATEGORY_CREDIT_CARD && accountCreateReq.CreditCardStatementDate != 0 {
-			log.Warnf(c, "[accounts.AccountCreateHandler] cannot set statement date with category \"%d\"", accountCreateReq.Category)
-			return nil, errs.ErrCannotSetStatementDateForNonCreditCard
 		}
 	} else if accountCreateReq.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
 		if len(accountCreateReq.SubAccounts) < 1 {
@@ -218,9 +218,9 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 				return nil, errs.ErrAccountBalanceTimeNotSet
 			}
 
-			if subAccount.Category != models.ACCOUNT_CATEGORY_CREDIT_CARD && subAccount.CreditCardStatementDate != 0 {
-				log.Warnf(c, "[accounts.AccountCreateHandler] sub-account#%d cannot set statement date with category \"%d\"", i, subAccount.Category)
-				return nil, errs.ErrCannotSetStatementDateForNonCreditCard
+			if subAccount.CreditCardStatementDate != 0 {
+				log.Warnf(c, "[accounts.AccountCreateHandler] sub-account#%d cannot set statement date", i)
+				return nil, errs.ErrCannotSetStatementDateForSubAccount
 			}
 		}
 	} else {
@@ -236,7 +236,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	mainAccount := a.createNewAccountModel(uid, &accountCreateReq, maxOrderId+1)
+	mainAccount := a.createNewAccountModel(uid, &accountCreateReq, false, maxOrderId+1)
 	childrenAccounts, childrenAccountBalanceTimes := a.createSubAccountModels(uid, &accountCreateReq)
 
 	if a.CurrentConfig().EnableDuplicateSubmissionsCheck && accountCreateReq.ClientSessionId != "" {
@@ -332,18 +332,18 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 		return nil, errs.ErrCannotAddOrDeleteSubAccountsWhenModify
 	}
 
-	if mainAccount.Type == models.ACCOUNT_TYPE_SINGLE_ACCOUNT {
-		if accountModifyReq.Category != models.ACCOUNT_CATEGORY_CREDIT_CARD && accountModifyReq.CreditCardStatementDate != 0 {
-			log.Warnf(c, "[accounts.AccountModifyHandler] cannot set statement date with category \"%d\"", accountModifyReq.Category)
-			return nil, errs.ErrCannotSetStatementDateForNonCreditCard
-		}
-	} else if mainAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
+	if accountModifyReq.Category != models.ACCOUNT_CATEGORY_CREDIT_CARD && accountModifyReq.CreditCardStatementDate != 0 {
+		log.Warnf(c, "[accounts.AccountModifyHandler] cannot set statement date with category \"%d\"", accountModifyReq.Category)
+		return nil, errs.ErrCannotSetStatementDateForNonCreditCard
+	}
+
+	if mainAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
 		for i := 0; i < len(accountModifyReq.SubAccounts); i++ {
 			subAccount := accountModifyReq.SubAccounts[i]
 
-			if subAccount.Category != models.ACCOUNT_CATEGORY_CREDIT_CARD && subAccount.CreditCardStatementDate != 0 {
-				log.Warnf(c, "[accounts.AccountModifyHandler] sub-account#%d cannot set statement date with category \"%d\"", i, subAccount.Category)
-				return nil, errs.ErrCannotSetStatementDateForNonCreditCard
+			if subAccount.CreditCardStatementDate != 0 {
+				log.Warnf(c, "[accounts.AccountModifyHandler] sub-account#%d cannot set statement date", i)
+				return nil, errs.ErrCannotSetStatementDateForSubAccount
 			}
 		}
 	}
@@ -351,7 +351,7 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 	anythingUpdate := false
 	var toUpdateAccounts []*models.Account
 
-	toUpdateAccount := a.getToUpdateAccount(uid, &accountModifyReq, mainAccount)
+	toUpdateAccount := a.getToUpdateAccount(uid, &accountModifyReq, mainAccount, false)
 
 	if toUpdateAccount != nil {
 		anythingUpdate = true
@@ -365,7 +365,7 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 			return nil, errs.ErrAccountNotFound
 		}
 
-		toUpdateSubAccount := a.getToUpdateAccount(uid, subAccountReq, accountMap[subAccountReq.Id])
+		toUpdateSubAccount := a.getToUpdateAccount(uid, subAccountReq, accountMap[subAccountReq.Id], true)
 
 		if toUpdateSubAccount != nil {
 			anythingUpdate = true
@@ -505,10 +505,10 @@ func (a *AccountsApi) AccountDeleteHandler(c *core.WebContext) (any, *errs.Error
 	return true, nil
 }
 
-func (a *AccountsApi) createNewAccountModel(uid int64, accountCreateReq *models.AccountCreateRequest, order int32) *models.Account {
+func (a *AccountsApi) createNewAccountModel(uid int64, accountCreateReq *models.AccountCreateRequest, isSubAccount bool, order int32) *models.Account {
 	accountExtend := &models.AccountExtend{}
 
-	if accountCreateReq.Category == models.ACCOUNT_CATEGORY_CREDIT_CARD {
+	if !isSubAccount && accountCreateReq.Category == models.ACCOUNT_CATEGORY_CREDIT_CARD {
 		accountExtend.CreditCardStatementDate = &accountCreateReq.CreditCardStatementDate
 	}
 
@@ -536,17 +536,17 @@ func (a *AccountsApi) createSubAccountModels(uid int64, accountCreateReq *models
 	childrenAccountBalanceTimes := make([]int64, len(accountCreateReq.SubAccounts))
 
 	for i := int32(0); i < int32(len(accountCreateReq.SubAccounts)); i++ {
-		childrenAccounts[i] = a.createNewAccountModel(uid, accountCreateReq.SubAccounts[i], i+1)
+		childrenAccounts[i] = a.createNewAccountModel(uid, accountCreateReq.SubAccounts[i], true, i+1)
 		childrenAccountBalanceTimes[i] = accountCreateReq.SubAccounts[i].BalanceTime
 	}
 
 	return childrenAccounts, childrenAccountBalanceTimes
 }
 
-func (a *AccountsApi) getToUpdateAccount(uid int64, accountModifyReq *models.AccountModifyRequest, oldAccount *models.Account) *models.Account {
+func (a *AccountsApi) getToUpdateAccount(uid int64, accountModifyReq *models.AccountModifyRequest, oldAccount *models.Account, isSubAccount bool) *models.Account {
 	newAccountExtend := &models.AccountExtend{}
 
-	if accountModifyReq.Category == models.ACCOUNT_CATEGORY_CREDIT_CARD {
+	if !isSubAccount && accountModifyReq.Category == models.ACCOUNT_CATEGORY_CREDIT_CARD {
 		newAccountExtend.CreditCardStatementDate = &accountModifyReq.CreditCardStatementDate
 	}
 

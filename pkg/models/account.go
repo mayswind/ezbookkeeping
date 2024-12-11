@@ -168,7 +168,7 @@ type AccountInfoResponse struct {
 func (a *Account) ToAccountInfoResponse() *AccountInfoResponse {
 	var creditCardStatementDate *int
 
-	if a.Category == ACCOUNT_CATEGORY_CREDIT_CARD {
+	if a.ParentAccountId == LevelOneAccountParentId && a.Category == ACCOUNT_CATEGORY_CREDIT_CARD {
 		if a.Extend != nil {
 			creditCardStatementDate = a.Extend.CreditCardStatementDate
 		} else {

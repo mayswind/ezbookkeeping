@@ -285,7 +285,6 @@ export const useAccountsStore = defineStore('accounts', {
                 balance: 0,
                 balanceTime: now,
                 comment: '',
-                creditCardStatementDate: parentAccount.creditCardStatementDate,
                 visible: true
             };
         },
@@ -761,10 +760,6 @@ export const useAccountsStore = defineStore('accounts', {
                         balance: subAccount.balance,
                         comment: subAccount.comment
                     };
-
-                    if (account.category === accountConstants.creditCardCategoryType) {
-                        submitAccount.creditCardStatementDate = subAccount.creditCardStatementDate;
-                    }
 
                     if (isEdit) {
                         submitAccount.id = subAccount.id;

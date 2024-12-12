@@ -188,9 +188,11 @@ export const useAccountsStore = defineStore('accounts', {
                 if (account.type === accountConstants.allAccountTypes.SingleAccount) {
                     allAccounts.push(account);
                 } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
-                    for (let j = 0; j < account.subAccounts.length; j++) {
-                        const subAccount = account.subAccounts[j];
-                        allAccounts.push(subAccount);
+                    if (account.subAccounts) {
+                        for (let j = 0; j < account.subAccounts.length; j++) {
+                            const subAccount = account.subAccounts[j];
+                            allAccounts.push(subAccount);
+                        }
                     }
                 }
             }
@@ -210,9 +212,11 @@ export const useAccountsStore = defineStore('accounts', {
                 if (account.type === accountConstants.allAccountTypes.SingleAccount) {
                     allVisibleAccounts.push(account);
                 } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
-                    for (let j = 0; j < account.subAccounts.length; j++) {
-                        const subAccount = account.subAccounts[j];
-                        allVisibleAccounts.push(subAccount);
+                    if (account.subAccounts) {
+                        for (let j = 0; j < account.subAccounts.length; j++) {
+                            const subAccount = account.subAccounts[j];
+                            allVisibleAccounts.push(subAccount);
+                        }
                     }
                 }
             }

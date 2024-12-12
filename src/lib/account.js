@@ -243,7 +243,7 @@ export function getAllFilteredAccountsBalance(categorizedAccounts, accountFilter
                     isLiability: account.isLiability,
                     currency: account.currency
                 });
-            } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
+            } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts && account.subAccounts) {
                 for (let subAccountIdx = 0; subAccountIdx < account.subAccounts.length; subAccountIdx++) {
                     const subAccount = account.subAccounts[subAccountIdx];
 

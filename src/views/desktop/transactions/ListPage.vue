@@ -122,7 +122,41 @@
                                     <v-table class="transaction-table" :hover="!loading">
                                         <thead>
                                         <tr>
-                                            <th class="transaction-table-column-time text-no-wrap">{{ $t('Time') }}</th>
+                                            <th class="transaction-table-column-time text-no-wrap">
+                                                <v-menu ref="timeFilterMenu" class="transaction-time-menu"
+                                                        eager location="bottom" max-height="500"
+                                                        @update:model-value="scrollTimeMenuToSelectedItem">
+                                                    <template #activator="{ props }">
+                                                        <div class="d-flex align-center cursor-pointer"
+                                                             :class="{ 'readonly': loading, 'text-primary': query.dateType !== allDateRanges.ThisMonth.type }" v-bind="props">
+                                                            <span>{{ $t('Time') }}</span>
+                                                            <v-icon :icon="icons.dropdownMenu" />
+                                                        </div>
+                                                    </template>
+                                                    <v-list :selected="[query.dateType]">
+                                                        <template :key="dateRange.type"
+                                                                  v-for="dateRange in allDateRangesArray">
+                                                            <v-list-item class="text-sm" density="compact"
+                                                                         :value="dateRange.type"
+                                                                         :class="{ 'list-item-selected': query.dateType === dateRange.type }"
+                                                                         :append-icon="(query.dateType === dateRange.type ? icons.check : null)">
+                                                                <v-list-item-title class="cursor-pointer"
+                                                                                   @click="changeDateFilter(dateRange.type)">
+                                                                    <div class="d-flex align-center">
+                                                                        <span class="text-sm ml-3">{{ dateRange.displayName }}</span>
+                                                                    </div>
+                                                                </v-list-item-title>
+                                                                <div class="ml-3 smaller" v-if="dateRange.type === allDateRanges.Custom.type && query.dateType === allDateRanges.Custom.type && query.minTime && query.maxTime">
+                                                                    <span>{{ queryMinTime }}</span>
+                                                                    <span>&nbsp;-&nbsp;</span>
+                                                                    <br/>
+                                                                    <span>{{ queryMaxTime }}</span>
+                                                                </div>
+                                                            </v-list-item>
+                                                        </template>
+                                                    </v-list>
+                                                </v-menu>
+                                            </th>
                                             <th class="transaction-table-column-category text-no-wrap">
                                                 <v-menu ref="categoryFilterMenu" class="transaction-category-menu"
                                                         eager location="bottom" max-height="500"
@@ -566,7 +600,7 @@ import datetimeConstants from '@/consts/datetime.js';
 import accountConstants from '@/consts/account.js';
 import transactionConstants from '@/consts/transaction.js';
 import templateConstants from '@/consts/template.js';
-import { isString, getNameByKeyValue } from '@/lib/common.js';
+import { isString, isNumber, getNameByKeyValue } from '@/lib/common.js';
 import logger from '@/lib/logger.js';
 import {
     getCurrentUnixTime,
@@ -707,6 +741,12 @@ export default {
         },
         firstDayOfWeek() {
             return this.userStore.currentUserFirstDayOfWeek;
+        },
+        allDateRangesArray() {
+            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.Normal, true);
+        },
+        allDateRanges() {
+            return datetimeConstants.allDateRanges;
         },
         recentDateRangeType: {
             get: function () {
@@ -1184,9 +1224,13 @@ export default {
                 this.$router.push(this.getFilterLinkUrl());
             }
         },
-        changeDateFilter(recentDateRange) {
-            if (recentDateRange.dateType === datetimeConstants.allDateRanges.Custom.type &&
-                !recentDateRange.minTime && !recentDateRange.maxTime) { // Custom
+        changeDateFilter(dateRange) {
+            if (isNumber(dateRange)) {
+                dateRange = getDateRangeByDateType(dateRange, this.firstDayOfWeek);
+            }
+
+            if (dateRange.dateType === datetimeConstants.allDateRanges.Custom.type &&
+                !dateRange.minTime && !dateRange.maxTime) { // Custom
                 if (!this.query.minTime || !this.query.maxTime) {
                     this.customMaxDatetime = getActualUnixTimeForStore(getCurrentUnixTime(), this.currentTimezoneOffsetMinutes, getBrowserTimezoneOffsetMinutes());
                     this.customMinDatetime = getSpecifiedDayFirstUnixTime(this.customMaxDatetime);
@@ -1199,14 +1243,14 @@ export default {
                 return;
             }
 
-            if (this.query.dateType === recentDateRange.dateType && this.query.maxTime === recentDateRange.maxTime && this.query.minTime === recentDateRange.minTime) {
+            if (this.query.dateType === dateRange.dateType && this.query.maxTime === dateRange.maxTime && this.query.minTime === dateRange.minTime) {
                 return;
             }
 
             const changed = this.transactionsStore.updateTransactionListFilter({
-                dateType: recentDateRange.dateType,
-                maxTime: recentDateRange.maxTime,
-                minTime: recentDateRange.minTime
+                dateType: dateRange.dateType,
+                maxTime: dateRange.maxTime,
+                minTime: dateRange.minTime
             });
 
             if (changed) {
@@ -1496,6 +1540,11 @@ export default {
                 }
             });
         },
+        scrollTimeMenuToSelectedItem(opened) {
+            if (opened) {
+                this.scrollMenuToSelectedItem(this.$refs.timeFilterMenu);
+            }
+        },
         scrollCategoryMenuToSelectedItem(opened) {
             if (opened) {
                 this.scrollMenuToSelectedItem(this.$refs.categoryFilterMenu);
@@ -1693,6 +1742,7 @@ export default {
     text-overflow: ellipsis;
 }
 
+.transaction-time-menu .item-icon,
 .transaction-category-menu .item-icon,
 .transaction-amount-menu .item-icon,
 .transaction-account-menu .item-icon,

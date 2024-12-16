@@ -381,6 +381,47 @@ export const useAccountsStore = defineStore('accounts', {
 
             return ret;
         },
+        getAccountStatementDate(accountId) {
+            if (!accountId) {
+                return null;
+            }
+
+            const accountIds = accountId.split(',');
+            let mainAccount = null;
+
+            for (let i = 0; i < accountIds.length; i++) {
+                const id = accountIds[i];
+                let account = this.allAccountsMap[id];
+
+                if (!account) {
+                    return null;
+                }
+
+                if (account.parentId !== '0') {
+                    account = this.allAccountsMap[account.parentId];
+                }
+
+                if (mainAccount !== null) {
+                    if (mainAccount.id !== account.id) {
+                        return null;
+                    } else {
+                        continue;
+                    }
+                }
+
+                mainAccount = account;
+            }
+
+            if (!mainAccount) {
+                return null;
+            }
+
+            if (mainAccount.category === accountConstants.creditCardCategoryType) {
+                return mainAccount.creditCardStatementDate;
+            }
+
+            return null;
+        },
         getNetAssets(showAccountBalance) {
             if (!showAccountBalance) {
                 return '***';

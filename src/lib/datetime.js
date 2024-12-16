@@ -136,6 +136,10 @@ export function getCurrentYear() {
     return moment().year();
 }
 
+export function getCurrentDay() {
+    return moment().date();
+}
+
 export function parseDateFromUnixTime(unixTime, utcOffset, currentUtcOffset) {
     if (isNumber(utcOffset)) {
         if (!isNumber(currentUtcOffset)) {
@@ -268,6 +272,14 @@ export function getThisMonthFirstUnixTime() {
 
 export function getThisMonthLastUnixTime() {
     return moment.unix(getThisMonthFirstUnixTime()).add(1, 'months').subtract(1, 'seconds').unix();
+}
+
+export function getThisMonthSpecifiedDayFirstUnixTime(date) {
+    return moment().set({ date: date, hour: 0, minute: 0, second: 0, millisecond: 0 }).unix();
+}
+
+export function getThisMonthSpecifiedDayLastUnixTime(date) {
+    return moment.unix(getThisMonthSpecifiedDayFirstUnixTime(date)).add(1, 'days').subtract(1, 'seconds').unix();
 }
 
 export function getThisYearFirstUnixTime() {
@@ -476,6 +488,16 @@ export function getShiftedDateRangeAndDateType(minTime, maxTime, scale, firstDay
     };
 }
 
+export function getShiftedDateRangeAndDateTypeForBillingCycle(dateType, scale, firstDayOfWeek, statementDate) {
+    if (dateType === dateTimeConstants.allDateRanges.PreviousBillingCycle.type && scale === 1) {
+        return getDateRangeByBillingCycleDateType(dateTimeConstants.allDateRanges.CurrentBillingCycle.type, firstDayOfWeek, statementDate);
+    } else if (dateType === dateTimeConstants.allDateRanges.CurrentBillingCycle.type && scale === -1) {
+        return getDateRangeByBillingCycleDateType(dateTimeConstants.allDateRanges.PreviousBillingCycle.type, firstDayOfWeek, statementDate);
+    }
+
+    return null;
+}
+
 export function getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek, scene) {
     let newDateType = dateTimeConstants.allDateRanges.Custom.type;
 
@@ -556,6 +578,49 @@ export function getDateRangeByDateType(dateType, firstDayOfWeek) {
     } else if (dateType === dateTimeConstants.allDateRanges.RecentFiveYears.type) { // Recent 5 years
         maxTime = getThisYearLastUnixTime();
         minTime = getUnixTimeBeforeUnixTime(getThisYearFirstUnixTime(), 4, 'years');
+    } else {
+        return null;
+    }
+
+    return {
+        dateType: dateType,
+        maxTime: maxTime,
+        minTime: minTime
+    };
+}
+
+export function getDateRangeByBillingCycleDateType(dateType, firstDayOfWeek, statementDate) {
+    let maxTime = 0;
+    let minTime = 0;
+
+    if (dateType === dateTimeConstants.allDateRanges.PreviousBillingCycle.type || dateType === dateTimeConstants.allDateRanges.CurrentBillingCycle.type) { // Previous Billing Cycle | Current Billing Cycle
+        if (statementDate) {
+            if (getCurrentDay() <= statementDate) {
+                maxTime = getThisMonthSpecifiedDayLastUnixTime(statementDate);
+                minTime = getUnixTimeBeforeUnixTime(getUnixTimeAfterUnixTime(getThisMonthSpecifiedDayFirstUnixTime(statementDate), 1, 'days'), 1, 'months');
+            } else {
+                maxTime = getUnixTimeAfterUnixTime(getThisMonthSpecifiedDayLastUnixTime(statementDate), 1, 'months');
+                minTime = getUnixTimeAfterUnixTime(getThisMonthSpecifiedDayFirstUnixTime(statementDate), 1, 'days');
+            }
+
+            if (dateType === dateTimeConstants.allDateRanges.PreviousBillingCycle.type) {
+                maxTime = getUnixTimeBeforeUnixTime(maxTime, 1, 'months');
+                minTime = getUnixTimeBeforeUnixTime(minTime, 1, 'months');
+            }
+        } else {
+            let fallbackDateRange = null;
+
+            if (dateType === dateTimeConstants.allDateRanges.CurrentBillingCycle.type) { // same as This Month
+                fallbackDateRange = getDateRangeByDateType(dateTimeConstants.allDateRanges.ThisMonth.type, firstDayOfWeek);
+            } else if (dateType === dateTimeConstants.allDateRanges.PreviousBillingCycle.type) { // same as Last Month
+                fallbackDateRange = getDateRangeByDateType(dateTimeConstants.allDateRanges.LastMonth.type, firstDayOfWeek);
+            }
+
+            if (fallbackDateRange) {
+                maxTime = fallbackDateRange.maxTime;
+                minTime = fallbackDateRange.minTime;
+            }
+        }
     } else {
         return null;
     }

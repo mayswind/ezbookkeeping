@@ -270,7 +270,7 @@
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
                     </template>
                     <template #footer>
-                        <div v-if="dateRange.type === allDateRanges.Custom.type && query.dateType === allDateRanges.Custom.type && query.minTime && query.maxTime">
+                        <div v-if="((dateRange.isBillingCycle || dateRange.type === allDateRanges.Custom.type) && query.dateType === dateRange.type) && query.minTime && query.maxTime">
                             <span>{{ queryMinTime }}</span>
                             <span>&nbsp;-&nbsp;</span>
                             <br/>
@@ -540,8 +540,10 @@ import {
     getActualUnixTimeForStore,
     getYearMonthFirstUnixTime,
     getShiftedDateRangeAndDateType,
+    getShiftedDateRangeAndDateTypeForBillingCycle,
     getDateTypeByDateRange,
-    getDateRangeByDateType
+    getDateRangeByDateType,
+    getDateRangeByBillingCycleDateType
 } from '@/lib/datetime.js';
 import { categoryTypeToTransactionType, transactionTypeToCategoryType } from '@/lib/category.js';
 import { getUnifiedSelectedAccountsCurrencyOrDefaultCurrency } from '@/lib/account.js';
@@ -735,7 +737,7 @@ export default {
             return datetimeConstants.allDateRanges;
         },
         allDateRangesArray() {
-            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.Normal, true);
+            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.Normal, true, !!this.accountsStore.getAccountStatementDate(this.query.accountIds));
         },
         showTotalAmountInTransactionListPage() {
             return this.settingsStore.appSettings.showTotalAmountInTransactionListPage;
@@ -751,7 +753,7 @@ export default {
         let dateRange = getDateRangeByDateType(query.dateType ? parseInt(query.dateType) : undefined, self.firstDayOfWeek);
 
         if (!dateRange &&
-            query.dateType === self.allDateRanges.Custom.type.toString() &&
+            (datetimeConstants.allBillingCycleDateRangesMap[query.dateType] || query.dateType === datetimeConstants.allDateRanges.Custom.type.toString()) &&
             parseInt(query.maxTime) > 0 && parseInt(query.minTime) > 0) {
             dateRange = {
                 dateType: parseInt(query.dateType),
@@ -878,7 +880,13 @@ export default {
                 return;
             }
 
-            const dateRange = getDateRangeByDateType(dateType, this.firstDayOfWeek);
+            let dateRange = null;
+
+            if (datetimeConstants.allBillingCycleDateRangesMap[dateType]) {
+                dateRange = getDateRangeByBillingCycleDateType(dateType, this.firstDayOfWeek, this.accountsStore.getAccountStatementDate(this.query.accountIds));
+            } else {
+                dateRange = getDateRangeByDateType(dateType, this.firstDayOfWeek);
+            }
 
             if (!dateRange) {
                 return;
@@ -973,9 +981,15 @@ export default {
                 return;
             }
 
-            const changed = this.transactionsStore.updateTransactionListFilter({
+            const filter = {
                 accountIds: accountIds
-            });
+            };
+
+            if (datetimeConstants.allBillingCycleDateRangesMap[this.query.dateType] && !this.accountsStore.getAccountStatementDate(accountIds)) {
+                filter.dateType = datetimeConstants.allDateRanges.Custom.type;
+            }
+
+            const changed = this.transactionsStore.updateTransactionListFilter(filter);
 
             this.showAccountPopover = false;
 
@@ -1107,7 +1121,15 @@ export default {
                 return;
             }
 
-            const newDateRange = getShiftedDateRangeAndDateType(minTime, maxTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+            let newDateRange = null;
+
+            if (datetimeConstants.allBillingCycleDateRangesMap[this.query.dateType]) {
+                newDateRange = getShiftedDateRangeAndDateTypeForBillingCycle(this.query.dateType, scale, this.firstDayOfWeek, this.accountsStore.getAccountStatementDate(this.query.accountIds));
+            }
+
+            if (!newDateRange) {
+                newDateRange = getShiftedDateRangeAndDateType(minTime, maxTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+            }
 
             const changed = this.transactionsStore.updateTransactionListFilter({
                 dateType: newDateRange.dateType,

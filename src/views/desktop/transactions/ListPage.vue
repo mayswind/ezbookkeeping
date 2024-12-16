@@ -146,7 +146,7 @@
                                                                         <span class="text-sm ml-3">{{ dateRange.displayName }}</span>
                                                                     </div>
                                                                 </v-list-item-title>
-                                                                <div class="ml-3 smaller" v-if="dateRange.type === allDateRanges.Custom.type && query.dateType === allDateRanges.Custom.type && query.minTime && query.maxTime">
+                                                                <div class="ml-3 smaller" v-if="((dateRange.isBillingCycle || dateRange.type === allDateRanges.Custom.type) && query.dateType === dateRange.type) && query.minTime && query.maxTime">
                                                                     <span>{{ queryMinTime }}</span>
                                                                     <span>&nbsp;-&nbsp;</span>
                                                                     <br/>
@@ -615,7 +615,9 @@ import {
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
     getShiftedDateRangeAndDateType,
+    getShiftedDateRangeAndDateTypeForBillingCycle,
     getDateTypeByDateRange,
+    getDateRangeByBillingCycleDateType,
     getDateRangeByDateType,
     getRecentDateRangeType,
     isDateRangeMatchOneMonth
@@ -743,7 +745,7 @@ export default {
             return this.userStore.currentUserFirstDayOfWeek;
         },
         allDateRangesArray() {
-            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.Normal, true);
+            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.Normal, true, !!this.accountsStore.getAccountStatementDate(this.query.accountIds));
         },
         allDateRanges() {
             return datetimeConstants.allDateRanges;
@@ -1115,7 +1117,7 @@ export default {
             let dateRange = getDateRangeByDateType(query.dateType ? parseInt(query.dateType) : undefined, this.firstDayOfWeek);
 
             if (!dateRange &&
-                query.dateType === datetimeConstants.allDateRanges.Custom.type.toString() &&
+                (datetimeConstants.allBillingCycleDateRangesMap[query.dateType] || query.dateType === datetimeConstants.allDateRanges.Custom.type.toString()) &&
                 parseInt(query.maxTime) > 0 && parseInt(query.minTime) > 0) {
                 dateRange = {
                     dateType: parseInt(query.dateType),
@@ -1209,7 +1211,15 @@ export default {
                 return;
             }
 
-            const newDateRange = getShiftedDateRangeAndDateType(startTime, endTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+            let newDateRange = null;
+
+            if (datetimeConstants.allBillingCycleDateRangesMap[this.query.dateType]) {
+                newDateRange = getShiftedDateRangeAndDateTypeForBillingCycle(this.query.dateType, scale, this.firstDayOfWeek, this.accountsStore.getAccountStatementDate(this.query.accountIds));
+            }
+
+            if (!newDateRange) {
+                newDateRange = getShiftedDateRangeAndDateType(startTime, endTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+            }
 
             const changed = this.transactionsStore.updateTransactionListFilter({
                 dateType: newDateRange.dateType,
@@ -1226,7 +1236,11 @@ export default {
         },
         changeDateFilter(dateRange) {
             if (isNumber(dateRange)) {
-                dateRange = getDateRangeByDateType(dateRange, this.firstDayOfWeek);
+                if (datetimeConstants.allBillingCycleDateRangesMap[dateRange]) {
+                    dateRange = getDateRangeByBillingCycleDateType(dateRange, this.firstDayOfWeek, this.accountsStore.getAccountStatementDate(this.query.accountIds));
+                } else {
+                    dateRange = getDateRangeByDateType(dateRange, this.firstDayOfWeek);
+                }
             }
 
             if (dateRange.dateType === datetimeConstants.allDateRanges.Custom.type &&
@@ -1418,9 +1432,15 @@ export default {
                 return;
             }
 
-            const changed = this.transactionsStore.updateTransactionListFilter({
+            const filter = {
                 accountIds: accountIds
-            });
+            };
+
+            if (datetimeConstants.allBillingCycleDateRangesMap[this.query.dateType] && !this.accountsStore.getAccountStatementDate(accountIds)) {
+                filter.dateType = datetimeConstants.allDateRanges.Custom.type;
+            }
+
+            const changed = this.transactionsStore.updateTransactionListFilter(filter);
 
             if (changed) {
                 this.loading = true;

@@ -252,6 +252,22 @@ const allDateRanges = {
             [allDateRangeScenes.TrendAnalysis]: true
         }
     },
+    PreviousBillingCycle: {
+        type: 51,
+        name: 'Previous Billing Cycle',
+        isBillingCycle: true,
+        availableScenes: {
+            [allDateRangeScenes.Normal]: true
+        }
+    },
+    CurrentBillingCycle: {
+        type: 52,
+        name: 'Current Billing Cycle',
+        isBillingCycle: true,
+        availableScenes: {
+            [allDateRangeScenes.Normal]: true
+        }
+    },
     RecentTwelveMonths: {
         type: 101,
         name: 'Recent 12 months',
@@ -316,13 +332,19 @@ const allDateRangesMap = {
     [allDateRanges.LastMonth.type]: allDateRanges.LastMonth,
     [allDateRanges.ThisYear.type]: allDateRanges.ThisYear,
     [allDateRanges.LastYear.type]: allDateRanges.LastYear,
-    [allDateRanges.RecentTwelveMonths.type]: allDateRanges.RecentTwelveMonths,
+    [allDateRanges.PreviousBillingCycle.type]: allDateRanges.PreviousBillingCycle,
+    [allDateRanges.CurrentBillingCycle.type]: allDateRanges.CurrentBillingCycle,
     [allDateRanges.RecentTwentyFourMonths.type]: allDateRanges.RecentTwentyFourMonths,
     [allDateRanges.RecentThirtySixMonths.type]: allDateRanges.RecentThirtySixMonths,
     [allDateRanges.RecentTwoYears.type]: allDateRanges.RecentTwoYears,
     [allDateRanges.RecentThreeYears.type]: allDateRanges.RecentThreeYears,
     [allDateRanges.RecentFiveYears.type]: allDateRanges.RecentFiveYears,
     [allDateRanges.Custom.type]: allDateRanges.Custom
+};
+
+const allBillingCycleDateRangesMap = {
+    [allDateRanges.PreviousBillingCycle.type]: allDateRanges.PreviousBillingCycle,
+    [allDateRanges.CurrentBillingCycle.type]: allDateRanges.CurrentBillingCycle
 };
 
 const defaultFirstDayOfWeek = allWeekDays.Sunday.type;
@@ -349,6 +371,7 @@ export default {
     allDateRangeScenes: allDateRangeScenes,
     allDateRanges: allDateRanges,
     allDateRangesMap: allDateRangesMap,
+    allBillingCycleDateRangesMap: allBillingCycleDateRangesMap,
     defaultFirstDayOfWeek: defaultFirstDayOfWeek,
     defaultLongDateFormat: defaultLongDateFormat,
     defaultShortDateFormat: defaultShortDateFormat,

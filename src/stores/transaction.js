@@ -825,7 +825,7 @@ export const useTransactionsStore = defineStore('transactions', {
 
             querys.push('dateType=' + this.transactionsFilter.dateType);
 
-            if (this.transactionsFilter.dateType === datetimeConstants.allDateRanges.Custom.type) {
+            if (datetimeConstants.allBillingCycleDateRangesMap[this.transactionsFilter.dateType] || this.transactionsFilter.dateType === datetimeConstants.allDateRanges.Custom.type) {
                 querys.push('maxTime=' + this.transactionsFilter.maxTime);
                 querys.push('minTime=' + this.transactionsFilter.minTime);
             }

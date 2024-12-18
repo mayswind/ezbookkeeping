@@ -152,7 +152,6 @@ import { useAccountsStore } from '@/stores/account.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 
-import datetimeConstants from '@/consts/datetime.js';
 import accountConstants from '@/consts/account.js';
 import { copyObjectTo } from '@/lib/common.js';
 import {
@@ -323,15 +322,9 @@ export default {
                     self.statisticsStore.updateTransactionStatisticsInvalidState(true);
                 }
             } else if (this.type === 'transactionListCurrent') {
-                const filter = {
+                changed = self.transactionsStore.updateTransactionListFilter({
                     accountIds: isAllSelected ? '' : finalAccountIds
-                };
-
-                if (datetimeConstants.allBillingCycleDateRangesMap[self.transactionsStore.transactionsFilter.dateType] && !self.accountsStore.getAccountStatementDate(filter.accountIds)) {
-                    filter.dateType = datetimeConstants.allDateRanges.Custom.type;
-                }
-
-                changed = self.transactionsStore.updateTransactionListFilter(filter);
+                });
 
                 if (changed) {
                     self.transactionsStore.updateTransactionListInvalidState(true);

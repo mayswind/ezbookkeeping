@@ -981,15 +981,9 @@ export default {
                 return;
             }
 
-            const filter = {
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 accountIds: accountIds
-            };
-
-            if (datetimeConstants.allBillingCycleDateRangesMap[this.query.dateType] && !this.accountsStore.getAccountStatementDate(accountIds)) {
-                filter.dateType = datetimeConstants.allDateRanges.Custom.type;
-            }
-
-            const changed = this.transactionsStore.updateTransactionListFilter(filter);
+            });
 
             this.showAccountPopover = false;
 

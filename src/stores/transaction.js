@@ -746,6 +746,7 @@ export const useTransactionsStore = defineStore('transactions', {
             }
         },
         updateTransactionListFilter(filter) {
+            const accountsStore = useAccountsStore();
             let changed = false;
 
             if (filter && isNumber(filter.dateType) && this.transactionsFilter.dateType !== filter.dateType) {
@@ -775,6 +776,11 @@ export const useTransactionsStore = defineStore('transactions', {
 
             if (filter && isString(filter.accountIds) && this.transactionsFilter.accountIds !== filter.accountIds) {
                 this.transactionsFilter.accountIds = filter.accountIds;
+
+                if (datetimeConstants.allBillingCycleDateRangesMap[this.transactionsFilter.dateType] && !accountsStore.getAccountStatementDate(this.transactionsFilter.accountIds)) {
+                    this.transactionsFilter.dateType = datetimeConstants.allDateRanges.Custom.type;
+                }
+
                 changed = true;
             }
 

@@ -23,7 +23,6 @@ export const allLanguages = {
         name: 'Vietnamese',
         displayName: 'Tiếng Việt',
         alternativeLanguageTag: 'vi-VN',
-        aliases: ['vi-VN', 'vi'],
         content: vi
     }
 };

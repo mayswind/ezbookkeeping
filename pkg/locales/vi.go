@@ -6,7 +6,7 @@ import (
 
 var vi = &LocaleTextItems{
 	DefaultTypes: &DefaultTypes{
-		DecimalSeparator:    core.DECIMAL_SEPARATOR_COMMA, 
+		DecimalSeparator:    core.DECIMAL_SEPARATOR_COMMA,
 		DigitGroupingSymbol: core.DIGIT_GROUPING_SYMBOL_DOT,
 	},
 	DataConverterTextItems: &DataConverterTextItems{

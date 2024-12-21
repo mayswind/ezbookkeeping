@@ -488,11 +488,22 @@ export function getShiftedDateRangeAndDateType(minTime, maxTime, scale, firstDay
     };
 }
 
-export function getShiftedDateRangeAndDateTypeForBillingCycle(dateType, scale, firstDayOfWeek, statementDate) {
-    if (dateType === dateTimeConstants.allDateRanges.PreviousBillingCycle.type && scale === 1) {
-        return getDateRangeByBillingCycleDateType(dateTimeConstants.allDateRanges.CurrentBillingCycle.type, firstDayOfWeek, statementDate);
-    } else if (dateType === dateTimeConstants.allDateRanges.CurrentBillingCycle.type && scale === -1) {
-        return getDateRangeByBillingCycleDateType(dateTimeConstants.allDateRanges.PreviousBillingCycle.type, firstDayOfWeek, statementDate);
+export function getShiftedDateRangeAndDateTypeForBillingCycle(minTime, maxTime, scale, firstDayOfWeek, scene, statementDate) {
+    if (!dateTimeConstants.allDateRanges.PreviousBillingCycle.availableScenes[scene] || !dateTimeConstants.allDateRanges.CurrentBillingCycle.availableScenes[scene]) {
+        return;
+    }
+
+    const previousBillingCycleRange = getDateRangeByBillingCycleDateType(dateTimeConstants.allDateRanges.PreviousBillingCycle.type, firstDayOfWeek, statementDate);
+    const currentBillingCycleRange = getDateRangeByBillingCycleDateType(dateTimeConstants.allDateRanges.CurrentBillingCycle.type, firstDayOfWeek, statementDate);
+
+    if (previousBillingCycleRange && getUnixTimeBeforeUnixTime(previousBillingCycleRange.maxTime, 1, 'months') === maxTime && getUnixTimeBeforeUnixTime(previousBillingCycleRange.minTime, 1, 'months') === minTime && scale === 1) {
+        return previousBillingCycleRange;
+    } else if (previousBillingCycleRange && previousBillingCycleRange.maxTime === maxTime && previousBillingCycleRange.minTime === minTime && scale === 1) {
+        return currentBillingCycleRange;
+    } else if (currentBillingCycleRange && currentBillingCycleRange.maxTime === maxTime && currentBillingCycleRange.minTime === minTime && scale === -1) {
+        return previousBillingCycleRange;
+    } else if (currentBillingCycleRange && getUnixTimeAfterUnixTime(currentBillingCycleRange.maxTime, 1, 'months') === maxTime && getUnixTimeAfterUnixTime(currentBillingCycleRange.minTime, 1, 'months') === minTime && scale === -1) {
+        return currentBillingCycleRange;
     }
 
     return null;
@@ -521,6 +532,23 @@ export function getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek, scene) 
     }
 
     return newDateType;
+}
+
+export function getDateTypeByBillingCycleDateRange(minTime, maxTime, firstDayOfWeek, scene, statementDate) {
+    if (!dateTimeConstants.allDateRanges.PreviousBillingCycle.availableScenes[scene] || !dateTimeConstants.allDateRanges.CurrentBillingCycle.availableScenes[scene]) {
+        return;
+    }
+
+    const previousBillingCycleRange = getDateRangeByBillingCycleDateType(dateTimeConstants.allDateRanges.PreviousBillingCycle.type, firstDayOfWeek, statementDate);
+    const currentBillingCycleRange = getDateRangeByBillingCycleDateType(dateTimeConstants.allDateRanges.CurrentBillingCycle.type, firstDayOfWeek, statementDate);
+
+    if (previousBillingCycleRange && previousBillingCycleRange.maxTime === maxTime && previousBillingCycleRange.minTime === minTime) {
+        return previousBillingCycleRange.dateType;
+    } else if (currentBillingCycleRange && currentBillingCycleRange.maxTime === maxTime && currentBillingCycleRange.minTime === minTime) {
+        return currentBillingCycleRange.dateType;
+    }
+
+    return null;
 }
 
 export function getDateRangeByDateType(dateType, firstDayOfWeek) {

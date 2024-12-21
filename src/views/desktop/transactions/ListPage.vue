@@ -617,8 +617,9 @@ import {
     getShiftedDateRangeAndDateType,
     getShiftedDateRangeAndDateTypeForBillingCycle,
     getDateTypeByDateRange,
-    getDateRangeByBillingCycleDateType,
+    getDateTypeByBillingCycleDateRange,
     getDateRangeByDateType,
+    getDateRangeByBillingCycleDateType,
     getRecentDateRangeType,
     isDateRangeMatchOneMonth
 } from '@/lib/datetime.js';
@@ -1213,8 +1214,8 @@ export default {
 
             let newDateRange = null;
 
-            if (datetimeConstants.allBillingCycleDateRangesMap[this.query.dateType]) {
-                newDateRange = getShiftedDateRangeAndDateTypeForBillingCycle(this.query.dateType, scale, this.firstDayOfWeek, this.accountsStore.getAccountStatementDate(this.query.accountIds));
+            if (datetimeConstants.allBillingCycleDateRangesMap[this.query.dateType] || this.query.dateType === this.allDateRanges.Custom.type) {
+                newDateRange = getShiftedDateRangeAndDateTypeForBillingCycle(startTime, endTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal, this.accountsStore.getAccountStatementDate(this.query.accountIds));
             }
 
             if (!newDateRange) {
@@ -1279,7 +1280,11 @@ export default {
                 return;
             }
 
-            const dateType = getDateTypeByDateRange(minTime, maxTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+            let dateType = getDateTypeByBillingCycleDateRange(minTime, maxTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal, this.accountsStore.getAccountStatementDate(this.query.accountIds));
+
+            if (!dateType) {
+                dateType = getDateTypeByDateRange(minTime, maxTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+            }
 
             if (this.query.dateType === dateType && this.query.maxTime === maxTime && this.query.minTime === minTime) {
                 this.showCustomDateRangeDialog = false;

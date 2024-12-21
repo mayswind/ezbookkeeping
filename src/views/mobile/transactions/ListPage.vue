@@ -542,6 +542,7 @@ import {
     getShiftedDateRangeAndDateType,
     getShiftedDateRangeAndDateTypeForBillingCycle,
     getDateTypeByDateRange,
+    getDateTypeByBillingCycleDateRange,
     getDateRangeByDateType,
     getDateRangeByBillingCycleDateType
 } from '@/lib/datetime.js';
@@ -909,7 +910,11 @@ export default {
                 return;
             }
 
-            const dateType = getDateTypeByDateRange(minTime, maxTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+            let dateType = getDateTypeByBillingCycleDateRange(minTime, maxTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal, this.accountsStore.getAccountStatementDate(this.query.accountIds));
+
+            if (!dateType) {
+                dateType = getDateTypeByDateRange(minTime, maxTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+            }
 
             const changed = this.transactionsStore.updateTransactionListFilter({
                 dateType: dateType,
@@ -1117,8 +1122,8 @@ export default {
 
             let newDateRange = null;
 
-            if (datetimeConstants.allBillingCycleDateRangesMap[this.query.dateType]) {
-                newDateRange = getShiftedDateRangeAndDateTypeForBillingCycle(this.query.dateType, scale, this.firstDayOfWeek, this.accountsStore.getAccountStatementDate(this.query.accountIds));
+            if (datetimeConstants.allBillingCycleDateRangesMap[this.query.dateType] || this.query.dateType === this.allDateRanges.Custom.type) {
+                newDateRange = getShiftedDateRangeAndDateTypeForBillingCycle(minTime, maxTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal, this.accountsStore.getAccountStatementDate(this.query.accountIds));
             }
 
             if (!newDateRange) {

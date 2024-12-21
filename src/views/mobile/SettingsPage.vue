@@ -63,7 +63,7 @@
                 <f7-toggle :checked="isEnableAnimate" @toggle:change="isEnableAnimate = $event"></f7-toggle>
             </f7-list-item>
 
-            <f7-list-item external :title="$t('Switch to Desktop Version')" :link="desktopVersionPath"></f7-list-item>
+            <f7-list-item :title="$t('Switch to Desktop Version')" @click="switchToDesktopVersion"></f7-list-item>
 
             <f7-list-item :title="$t('About')" link="/about" :after="version"></f7-list-item>
         </f7-list>
@@ -100,9 +100,6 @@ export default {
         ...mapStores(useRootStore, useSettingsStore, useUserStore, useTransactionsStore, useOverviewStore, useStatisticsStore, useExchangeRatesStore),
         version() {
             return 'v' + this.$version;
-        },
-        desktopVersionPath() {
-            return getDesktopVersionPath();
         },
         allTimezones() {
             return this.$locale.getAllTimezones(true);
@@ -203,6 +200,11 @@ export default {
                         self.$toast(error.message || error);
                     }
                 });
+            });
+        },
+        switchToDesktopVersion() {
+            this.$confirm('Are you sure you want to switch to desktop version?', () => {
+                window.location.replace(getDesktopVersionPath());
             });
         }
     }

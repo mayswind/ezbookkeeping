@@ -775,11 +775,12 @@ export const useTransactionsStore = defineStore('transactions', {
             }
 
             if (filter && isString(filter.accountIds) && this.transactionsFilter.accountIds !== filter.accountIds) {
-                this.transactionsFilter.accountIds = filter.accountIds;
-
-                if (datetimeConstants.allBillingCycleDateRangesMap[this.transactionsFilter.dateType] && !accountsStore.getAccountStatementDate(this.transactionsFilter.accountIds)) {
+                if (datetimeConstants.allBillingCycleDateRangesMap[this.transactionsFilter.dateType] &&
+                    (!accountsStore.getAccountStatementDate(filter.accountIds) || accountsStore.getAccountStatementDate(filter.accountIds) !== accountsStore.getAccountStatementDate(this.transactionsFilter.accountIds))) {
                     this.transactionsFilter.dateType = datetimeConstants.allDateRanges.Custom.type;
                 }
+
+                this.transactionsFilter.accountIds = filter.accountIds;
 
                 changed = true;
             }

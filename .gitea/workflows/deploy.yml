@@ -1,0 +1,17 @@
+name: Deploy Docker Image
+
+on:
+  workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute custom script
+        run: |
+          cat >> deploy.sh <<EOF
+          #!/bin/sh
+          ${{ vars.CUSTOM_DEPLOY_SCRIPTS }}
+          EOF
+          chmod +x deploy.sh
+          ./deploy.sh

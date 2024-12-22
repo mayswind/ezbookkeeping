@@ -149,31 +149,31 @@
         "name": "vuejs/core",
         "copyright": "Copyright (c) 2018-present, Yuxi (Evan) You and Vue contributors",
         "url": "https://github.com/vuejs/core",
-        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.12/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.13/LICENSE"
     },
     {
         "name": "Pinia",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/pinia",
-        "licenseUrl": "https://github.com/vuejs/pinia/blob/pinia%402.2.5/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/pinia/blob/pinia%402.3.0/LICENSE"
     },
     {
         "name": "vue-router",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/router",
-        "licenseUrl": "https://github.com/vuejs/router/blob/v4.4.5/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/router/blob/v4.5.0/LICENSE"
     },
     {
         "name": "vue-i18n",
         "copyright": "Copyright (c) 2016 kazuya kawaguchi",
         "url": "https://github.com/intlify/vue-i18n-next",
-        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v10.0.4/LICENSE"
+        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v10.0.5/LICENSE"
     },
     {
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-2023 John Jeremy Leider",
         "url": "https://vuetifyjs.com",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.7.3/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.7.6/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -245,7 +245,7 @@
         "name": "axios",
         "copyright": "Copyright (c) 2014-present Matt Zabriskie & Collaborators",
         "url": "https://axios-http.com",
-        "licenseUrl": "https://github.com/axios/axios/blob/v1.7.7/LICENSE"
+        "licenseUrl": "https://github.com/axios/axios/blob/v1.7.9/LICENSE"
     },
     {
         "name": "Moment.js",

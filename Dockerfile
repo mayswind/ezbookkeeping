@@ -11,7 +11,7 @@ RUN apk add git gcc g++ libc-dev
 RUN ./build.sh backend
 
 # Build frontend files
-FROM --platform=$BUILDPLATFORM node:20.18.1-alpine3.21 AS fe-builder
+FROM --platform=$BUILDPLATFORM node:22.12.0-alpine3.21 AS fe-builder
 ARG RELEASE_BUILD
 ENV RELEASE_BUILD=$RELEASE_BUILD
 WORKDIR /go/src/github.com/mayswind/ezbookkeeping

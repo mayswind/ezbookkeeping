@@ -869,12 +869,8 @@ function getAllCurrencyDisplayTypes(userStore, settingsStore, translateFn) {
 
     for (let i = 0; i < currencyConstants.allCurrencyDisplayTypeArray.length; i++) {
         const type = currencyConstants.allCurrencyDisplayTypeArray[i];
-        let displayName = translateFn(type.name);
-
-        if (type.symbol !== currencyConstants.allCurrencyDisplaySymbol.None) {
-            const sampleValue = getFormattedAmountWithCurrency(12345, defaultCurrency, translateFn, userStore, settingsStore, false, type);
-            displayName = `${displayName} (${sampleValue})`
-        }
+        const sampleValue = getFormattedAmountWithCurrency(12345, defaultCurrency, translateFn, userStore, settingsStore, false, type);
+        const displayName = `${translateFn(type.name)} (${sampleValue})`
 
         ret.push({
             type: type.type,

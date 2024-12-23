@@ -489,8 +489,8 @@ export function getShiftedDateRangeAndDateType(minTime, maxTime, scale, firstDay
 }
 
 export function getShiftedDateRangeAndDateTypeForBillingCycle(minTime, maxTime, scale, firstDayOfWeek, scene, statementDate) {
-    if (!dateTimeConstants.allDateRanges.PreviousBillingCycle.availableScenes[scene] || !dateTimeConstants.allDateRanges.CurrentBillingCycle.availableScenes[scene]) {
-        return;
+    if (!statementDate || !dateTimeConstants.allDateRanges.PreviousBillingCycle.availableScenes[scene] || !dateTimeConstants.allDateRanges.CurrentBillingCycle.availableScenes[scene]) {
+        return null;
     }
 
     const previousBillingCycleRange = getDateRangeByBillingCycleDateType(dateTimeConstants.allDateRanges.PreviousBillingCycle.type, firstDayOfWeek, statementDate);
@@ -535,8 +535,8 @@ export function getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek, scene) 
 }
 
 export function getDateTypeByBillingCycleDateRange(minTime, maxTime, firstDayOfWeek, scene, statementDate) {
-    if (!dateTimeConstants.allDateRanges.PreviousBillingCycle.availableScenes[scene] || !dateTimeConstants.allDateRanges.CurrentBillingCycle.availableScenes[scene]) {
-        return;
+    if (!statementDate || !dateTimeConstants.allDateRanges.PreviousBillingCycle.availableScenes[scene] || !dateTimeConstants.allDateRanges.CurrentBillingCycle.availableScenes[scene]) {
+        return null;
     }
 
     const previousBillingCycleRange = getDateRangeByBillingCycleDateType(dateTimeConstants.allDateRanges.PreviousBillingCycle.type, firstDayOfWeek, statementDate);

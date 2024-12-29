@@ -146,7 +146,7 @@
                                                 </v-avatar>
                                             </v-list-item-action>
                                         </template>
-                                        <v-list-item-title class="font-weight-semibold">
+                                        <v-list-item-title class="ml-2 font-weight-semibold">
                                             {{ currentNickName }}
                                         </v-list-item-title>
                                     </v-list-item>

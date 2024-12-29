@@ -26,10 +26,11 @@ import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import assetConstants from '@/consts/asset.js';
-import { isProduction } from '@/lib/version.js';
+import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
+import { ThemeType } from '@/core/theme.ts';
+import { isProduction } from '@/lib/version.ts';
 import { loadMapAssets } from '@/lib/map/index.js';
-import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
+import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 export default {
     data() {
@@ -40,7 +41,7 @@ export default {
     computed: {
         ...mapStores(useRootStore, useSettingsStore, useUserStore, useTokensStore, useExchangeRatesStore),
         ezBookkeepingLogoPath() {
-            return assetConstants.ezBookkeepingLogoPath;
+            return APPLICATION_LOGO_PATH;
         },
         currentNotificationContent() {
             return this.rootStore.currentNotification;
@@ -55,10 +56,10 @@ export default {
         const self = this;
         const theme = useTheme();
 
-        if (self.settingsStore.appSettings.theme === 'light') {
-            theme.global.name.value = 'light';
-        } else if (self.settingsStore.appSettings.theme === 'dark') {
-            theme.global.name.value = 'dark';
+        if (self.settingsStore.appSettings.theme === ThemeType.Light) {
+            theme.global.name.value = ThemeType.Light;
+        } else if (self.settingsStore.appSettings.theme === ThemeType.Dark) {
+            theme.global.name.value = ThemeType.Dark;
         } else {
             theme.global.name.value = getSystemTheme();
         }
@@ -66,9 +67,9 @@ export default {
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
             if (self.settingsStore.appSettings.theme === 'auto') {
                 if (e.matches) {
-                    theme.global.name.value = 'dark';
+                    theme.global.name.value = ThemeType.Dark;
                 } else {
-                    theme.global.name.value = 'light';
+                    theme.global.name.value = ThemeType.Light;
                 }
             }
         });

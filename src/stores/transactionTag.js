@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import { isEquals } from '@/lib/common.js';
+import { isEquals } from '@/lib/common.ts';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
 

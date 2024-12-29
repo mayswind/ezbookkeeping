@@ -9,34 +9,36 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-block class="combination-list-wrapper margin-vertical skeleton-text"
-                  :key="blockIdx" v-for="blockIdx in [ 1, 2, 3 ]" v-if="loading">
-            <f7-accordion-item>
-                <f7-block-title>
-                    <f7-accordion-toggle>
-                        <f7-list strong inset dividers media-list
-                                 class="combination-list-header combination-list-opened">
-                            <f7-list-item>
-                                <template #title>
-                                    <span>Account Category</span>
-                                    <f7-icon class="combination-list-chevron-icon" f7="chevron_up"></f7-icon>
+        <div class="skeleton-text" v-if="loading">
+            <f7-block class="combination-list-wrapper margin-vertical"
+                      :key="blockIdx" v-for="blockIdx in [ 1, 2, 3 ]">
+                <f7-accordion-item>
+                    <f7-block-title>
+                        <f7-accordion-toggle>
+                            <f7-list strong inset dividers media-list
+                                     class="combination-list-header combination-list-opened">
+                                <f7-list-item>
+                                    <template #title>
+                                        <span>Account Category</span>
+                                        <f7-icon class="combination-list-chevron-icon" f7="chevron_up"></f7-icon>
+                                    </template>
+                                </f7-list-item>
+                            </f7-list>
+                        </f7-accordion-toggle>
+                    </f7-block-title>
+                    <f7-accordion-content style="height: auto">
+                        <f7-list strong inset dividers accordion-list class="combination-list-content">
+                            <f7-list-item checkbox class="disabled" title="Account Name"
+                                          :key="itemIdx" v-for="itemIdx in (blockIdx === 1 ? [ 1 ] : [ 1, 2 ])">
+                                <template #media>
+                                    <f7-icon f7="app_fill"></f7-icon>
                                 </template>
                             </f7-list-item>
                         </f7-list>
-                    </f7-accordion-toggle>
-                </f7-block-title>
-                <f7-accordion-content style="height: auto">
-                    <f7-list strong inset dividers accordion-list class="combination-list-content">
-                        <f7-list-item checkbox class="disabled" title="Account Name"
-                                      :key="itemIdx" v-for="itemIdx in (blockIdx === 1 ? [ 1 ] : [ 1, 2 ])">
-                            <template #media>
-                                <f7-icon f7="app_fill"></f7-icon>
-                            </template>
-                        </f7-list-item>
-                    </f7-list>
-                </f7-accordion-content>
-            </f7-accordion-item>
-        </f7-block>
+                    </f7-accordion-content>
+                </f7-accordion-item>
+            </f7-block>
+        </div>
 
         <f7-list strong inset dividers accordion-list class="margin-top" v-if="!loading && !hasAnyVisibleAccount">
             <f7-list-item :title="$t('No available account')"></f7-list-item>
@@ -67,7 +69,7 @@
                     <f7-accordion-content :style="{ height: collapseStates[accountCategory.category].opened ? 'auto' : '' }">
                         <f7-list strong inset dividers accordion-list class="combination-list-content">
                             <f7-list-item checkbox
-                                          :class="{ 'has-child-list-item': account.type === allAccountTypes.MultiSubAccounts && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id]) }"
+                                          :class="{ 'has-child-list-item': account.type === allAccountTypes.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id]) }"
                                           :title="account.name"
                                           :value="account.id"
                                           :checked="isAccountOrSubAccountsAllChecked(account, filterAccountIds)"
@@ -86,7 +88,7 @@
 
                                 <template #root>
                                     <ul class="padding-left"
-                                        v-if="account.type === allAccountTypes.MultiSubAccounts && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])">
+                                        v-if="account.type === allAccountTypes.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])">
                                         <f7-list-item checkbox
                                                       :title="subAccount.name"
                                                       :value="subAccount.id"
@@ -136,8 +138,8 @@ import { useAccountsStore } from '@/stores/account.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 
-import accountConstants from '@/consts/account.js';
-import { copyObjectTo } from '@/lib/common.js';
+import { AccountType, AccountCategory } from '@/core/account.ts';
+import { copyObjectTo } from '@/lib/common.ts';
 import {
     getCategorizedAccountsWithVisibleCount,
     selectAccountOrSubAccounts,
@@ -183,7 +185,7 @@ export default {
             }
         },
         allAccountTypes() {
-            return accountConstants.allAccountTypes;
+            return AccountType.all();
         },
         allCategorizedAccounts() {
             return getCategorizedAccountsWithVisibleCount(this.accountsStore.allCategorizedAccountsMap);
@@ -212,7 +214,7 @@ export default {
 
             const allAccountIds = {};
 
-            for (let accountId in self.accountsStore.allAccountsMap) {
+            for (const accountId in self.accountsStore.allAccountsMap) {
                 if (!Object.prototype.hasOwnProperty.call(self.accountsStore.allAccountsMap, accountId)) {
                     continue;
                 }
@@ -231,7 +233,7 @@ export default {
             } else if (self.type === 'statisticsCurrent') {
                 self.filterAccountIds = copyObjectTo(self.statisticsStore.transactionStatisticsFilter.filterAccountIds, allAccountIds);
             } else if (self.type === 'transactionListCurrent') {
-                for (let accountId in self.transactionsStore.allFilterAccountIds) {
+                for (const accountId in self.transactionsStore.allFilterAccountIds) {
                     if (!Object.prototype.hasOwnProperty.call(self.transactionsStore.allFilterAccountIds, accountId)) {
                         continue;
                     }
@@ -268,7 +270,7 @@ export default {
             let isAllSelected = true;
             let finalAccountIds = '';
 
-            for (let accountId in self.filterAccountIds) {
+            for (const accountId in self.filterAccountIds) {
                 if (!Object.prototype.hasOwnProperty.call(self.filterAccountIds, accountId)) {
                     continue;
                 }
@@ -345,15 +347,12 @@ export default {
         },
         getCollapseStates() {
             const collapseStates = {};
+            const allCategories = AccountCategory.values();
 
-            for (let categoryType in accountConstants.allCategories) {
-                if (!Object.prototype.hasOwnProperty.call(accountConstants.allCategories, categoryType)) {
-                    continue;
-                }
+            for (let i = 0; i < allCategories.length; i++) {
+                const accountCategory = allCategories[i];
 
-                const accountCategory = accountConstants.allCategories[categoryType];
-
-                collapseStates[accountCategory.id] = {
+                collapseStates[accountCategory.type] = {
                     opened: true
                 };
             }

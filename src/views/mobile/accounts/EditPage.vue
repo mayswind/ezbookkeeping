@@ -4,7 +4,7 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t(title)"></f7-nav-title>
             <f7-nav-right>
-                <f7-link icon-f7="ellipsis" :class="{ 'disabled': editAccountId || account.type !== allAccountTypes.MultiSubAccounts }" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link icon-f7="ellipsis" :class="{ 'disabled': editAccountId || account.type !== allAccountTypes.MultiSubAccounts.type }" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link :class="{ 'disabled': isInputEmpty() || submitting }" :text="$t(saveButtonTitle)" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
@@ -23,7 +23,7 @@
                 @click="showAccountCategorySheet = true"
             >
                 <list-item-selection-sheet value-type="item"
-                                           key-field="id" value-field="id" title-field="displayName"
+                                           key-field="type" value-field="type" title-field="displayName"
                                            icon-field="defaultAccountIconId" icon-type="account"
                                            :items="allAccountCategories"
                                            v-model:show="showAccountCategorySheet"
@@ -40,7 +40,7 @@
                 @click="showAccountTypeSheet = true"
             >
                 <list-item-selection-sheet value-type="item"
-                                           key-field="id" value-field="id" title-field="displayName"
+                                           key-field="type" value-field="type" title-field="displayName"
                                            :items="allAccountTypesArray"
                                            v-model:show="showAccountTypeSheet"
                                            v-model="account.type">
@@ -94,7 +94,7 @@
             <f7-list-input label="Description" type="textarea" placeholder="Your account description (optional)"></f7-list-input>
         </f7-list>
 
-        <f7-list form strong inset dividers class="margin-vertical" v-else-if="!loading && account.type === allAccountTypes.SingleAccount">
+        <f7-list form strong inset dividers class="margin-vertical" v-else-if="!loading && account.type === allAccountTypes.SingleAccount.type">
             <f7-list-input
                 type="text"
                 clear-button
@@ -237,7 +237,7 @@
             ></f7-list-input>
         </f7-list>
 
-        <f7-list form strong inset dividers class="margin-vertical" v-else-if="!loading && account.type === allAccountTypes.MultiSubAccounts">
+        <f7-list form strong inset dividers class="margin-vertical" v-else-if="!loading && account.type === allAccountTypes.MultiSubAccounts.type">
             <f7-list-input
                 type="text"
                 clear-button
@@ -324,7 +324,7 @@
             ></f7-list-input>
         </f7-list>
 
-        <f7-block class="no-padding no-margin" v-if="!loading && account.type === allAccountTypes.MultiSubAccounts">
+        <f7-block class="no-padding no-margin" v-if="!loading && account.type === allAccountTypes.MultiSubAccounts.type">
             <f7-list strong inset dividers class="subaccount-edit-list margin-vertical"
                      :key="idx"
                      v-for="(subAccount, idx) in subAccounts">
@@ -493,12 +493,12 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 
-import accountConstants from '@/consts/account.js';
-import iconConstants from '@/consts/icon.js';
-import colorConstants from '@/consts/color.js';
-import transactionConstants from '@/consts/transaction.js';
-import { getNameByKeyValue } from '@/lib/common.js';
-import { generateRandomUUID } from '@/lib/misc.js';
+import { AccountType, AccountCategory } from '@/core/account.ts';
+import { ALL_ACCOUNT_ICONS } from '@/consts/icon.ts';
+import { ALL_ACCOUNT_COLORS } from '@/consts/color.ts';
+import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
+import { getNameByKeyValue } from '@/lib/common.ts';
+import { generateRandomUUID } from '@/lib/misc.ts';
 import {
     setAccountModelByAnotherAccount,
     setAccountSuitableIcon
@@ -555,7 +555,7 @@ export default {
             }
         },
         allAccountTypes() {
-            return accountConstants.allAccountTypes;
+            return AccountType.all();
         },
         allAccountCategories() {
             return this.$locale.getAllAccountCategories();
@@ -564,10 +564,10 @@ export default {
             return this.$locale.getAllAccountTypes();
         },
         allAccountIcons() {
-            return iconConstants.allAccountIcons;
+            return ALL_ACCOUNT_ICONS;
         },
         allAccountColors() {
-            return colorConstants.allAccountColors;
+            return ALL_ACCOUNT_COLORS;
         },
         allCurrencies() {
             return this.$locale.getAllCurrencies();
@@ -590,10 +590,10 @@ export default {
             return allAvailableDays;
         },
         allowedMinAmount() {
-            return transactionConstants.minAmountNumber;
+            return TRANSACTION_MIN_AMOUNT;
         },
         allowedMaxAmount() {
-            return transactionConstants.maxAmountNumber;
+            return TRANSACTION_MAX_AMOUNT;
         }
     },
     watch: {
@@ -654,7 +654,7 @@ export default {
             this.$routeBackOnError(this.f7router, 'loadingError');
         },
         addSubAccount() {
-            if (this.account.type !== this.allAccountTypes.MultiSubAccounts) {
+            if (this.account.type !== this.allAccountTypes.MultiSubAccounts.type) {
                 return;
             }
 
@@ -694,7 +694,7 @@ export default {
 
             let problemMessage = self.getInputEmptyProblemMessage(self.account, false);
 
-            if (!problemMessage && self.account.type === self.allAccountTypes.MultiSubAccounts) {
+            if (!problemMessage && self.account.type === self.allAccountTypes.MultiSubAccounts.type) {
                 for (let i = 0; i < self.subAccounts.length; i++) {
                     problemMessage = self.getInputEmptyProblemMessage(self.subAccounts[i], true);
 
@@ -745,10 +745,10 @@ export default {
             return this.$locale.getCurrencyName(currencyCode);
         },
         getAccountTypeName(accountType) {
-            return getNameByKeyValue(this.allAccountTypesArray, accountType, 'id', 'displayName');
+            return getNameByKeyValue(this.allAccountTypesArray, accountType, 'type', 'displayName');
         },
         getAccountCategoryName(accountCategory) {
-            return getNameByKeyValue(this.allAccountCategories, accountCategory, 'id', 'displayName');
+            return getNameByKeyValue(this.allAccountCategories, accountCategory, 'type', 'displayName');
         },
         getAccountCreditCardStatementDate(statementDate) {
             return getNameByKeyValue(this.allAvailableMonthDays, statementDate, 'day', 'displayName');
@@ -766,7 +766,7 @@ export default {
             return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, currencyCode);
         },
         isAccountSupportCreditCardStatementDate() {
-            return this.account && this.account.category === accountConstants.creditCardCategoryType;
+            return this.account && this.account.category === AccountCategory.CreditCard.type;
         },
         chooseSuitableIcon(oldCategory, newCategory) {
             setAccountSuitableIcon(this.account, oldCategory, newCategory);
@@ -778,7 +778,7 @@ export default {
                 return true;
             }
 
-            if (this.account.type === this.allAccountTypes.MultiSubAccounts) {
+            if (this.account.type === this.allAccountTypes.MultiSubAccounts.type) {
                 for (let i = 0; i < this.subAccounts.length; i++) {
                     const isSubAccountEmpty = !!this.getInputEmptyProblemMessage(this.subAccounts[i], true);
 
@@ -797,7 +797,7 @@ export default {
                 return 'Account type cannot be blank';
             } else if (!account.name) {
                 return 'Account name cannot be blank';
-            } else if (account.type === this.allAccountTypes.SingleAccount && !account.currency) {
+            } else if (account.type === this.allAccountTypes.SingleAccount.type && !account.currency) {
                 return 'Account currency cannot be blank';
             } else {
                 return null;

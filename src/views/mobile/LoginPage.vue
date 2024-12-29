@@ -187,17 +187,17 @@ import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import assetConstants from '@/consts/asset.js';
-import apiConstants from '@/consts/api.js';
+import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
+import { KnownErrorCode } from '@/consts/api.ts';
 import {
     isUserRegistrationEnabled,
     isUserForgetPasswordEnabled,
     isUserVerifyEmailEnabled,
     getLoginPageTips
-} from '@/lib/server_settings.js';
-import { getDesktopVersionPath } from '@/lib/version.js';
-import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
-import { isModalShowing } from '@/lib/ui.mobile.js';
+} from '@/lib/server_settings.ts';
+import { getDesktopVersionPath } from '@/lib/version.ts';
+import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
+import { isModalShowing } from '@/lib/ui/mobile.js';
 
 export default {
     props: [
@@ -227,7 +227,7 @@ export default {
     computed: {
         ...mapStores(useRootStore, useSettingsStore, useExchangeRatesStore),
         ezBookkeepingLogoPath() {
-            return assetConstants.ezBookkeepingLogoPath;
+            return APPLICATION_LOGO_PATH;
         },
         version() {
             return 'v' + this.$version;
@@ -333,7 +333,7 @@ export default {
                 self.logining = false;
                 self.$hideLoading();
 
-                if (self.isUserVerifyEmailEnabled && error.error && error.error.errorCode === apiConstants.userEmailNotVerifiedErrorCode && error.error.context && error.error.context.email) {
+                if (self.isUserVerifyEmailEnabled && error.error && error.error.errorCode === KnownErrorCode.UserEmailNotVerified && error.error.context && error.error.context.email) {
                     self.resendVerifyEmail = error.error.context.email;
                     self.hasValidEmailVerifyToken = error.error.context.hasValidEmailVerifyToken || false;
                     self.currentPasswordForResendVerifyEmail = '';

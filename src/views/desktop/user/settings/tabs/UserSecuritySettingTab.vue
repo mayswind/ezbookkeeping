@@ -135,8 +135,8 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
 
-import { isEquals } from '@/lib/common.js';
-import { parseSessionInfo } from '@/lib/misc.js';
+import { isEquals } from '@/lib/common.ts';
+import { parseSessionInfo } from '@/lib/session.ts';
 
 import {
     mdiRefresh,

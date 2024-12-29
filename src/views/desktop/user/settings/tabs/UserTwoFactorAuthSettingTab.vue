@@ -106,7 +106,7 @@
 import { mapStores } from 'pinia';
 import { useTwoFactorAuthStore } from '@/stores/twoFactorAuth.js';
 
-import { makeButtonCopyToClipboard, changeClipboardObjectText } from '@/lib/misc.js';
+import { ClipboardHolder } from '@/lib/clipboard.ts';
 
 import {
     mdiContentCopy
@@ -157,7 +157,7 @@ export default {
     watch: {
         'currentBackupCode': function (newValue) {
             if (this.clipboardHolder) {
-                changeClipboardObjectText(this.clipboardHolder, newValue);
+                this.clipboardHolder.setClipboardText(newValue);
             }
         }
     },
@@ -319,7 +319,7 @@ export default {
             }
 
             if (self.$refs.copyToClipboardIcon) {
-                self.clipboardHolder = makeButtonCopyToClipboard({
+                self.clipboardHolder = ClipboardHolder.create({
                     el: '#copy-to-clipboard-icon',
                     text: self.currentBackupCode,
                     successCallback: function () {

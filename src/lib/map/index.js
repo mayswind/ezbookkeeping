@@ -1,7 +1,7 @@
-import mapConstants from '@/consts/map.js';
+import { LEAFLET_TILE_SOURCES } from '@/consts/map.ts';
 import {
     getMapProvider
-} from '@/lib/server_settings.js';
+} from '@/lib/server_settings.ts';
 
 import {
     loadLeafletMapAssets,
@@ -45,8 +45,8 @@ import {
 export function getMapWebsite() {
     if (getMapProvider() === 'custom') {
         return '';
-    } else if (mapConstants.leafletTileSources[getMapProvider()]) {
-        return mapConstants.leafletTileSources[getMapProvider()].website;
+    } else if (LEAFLET_TILE_SOURCES[getMapProvider()]) {
+        return LEAFLET_TILE_SOURCES[getMapProvider()].website;
     } else if (getMapProvider() === 'googlemap') {
         return getGoogleMapWebsite();
     } else if (getMapProvider() === 'baidumap') {
@@ -57,7 +57,7 @@ export function getMapWebsite() {
 }
 
 export function loadMapAssets(language) {
-    if (mapConstants.leafletTileSources[getMapProvider()] || getMapProvider() === 'custom') {
+    if (LEAFLET_TILE_SOURCES[getMapProvider()] || getMapProvider() === 'custom') {
         return loadLeafletMapAssets(language);
     } else if (getMapProvider() === 'googlemap') {
         return loadGoogleMapAssets(language);
@@ -69,7 +69,7 @@ export function loadMapAssets(language) {
 }
 
 export function createMapHolder() {
-    if (mapConstants.leafletTileSources[getMapProvider()] || getMapProvider() === 'custom') {
+    if (LEAFLET_TILE_SOURCES[getMapProvider()] || getMapProvider() === 'custom') {
         return createLeafletMapHolder(getMapProvider());
     } else if (getMapProvider() === 'googlemap') {
         return createGoogleMapHolder(getMapProvider());
@@ -87,7 +87,7 @@ export function initMapInstance(mapHolder, mapContainer, options) {
         return;
     }
 
-    if (mapConstants.leafletTileSources[getMapProvider()] || getMapProvider() === 'custom') {
+    if (LEAFLET_TILE_SOURCES[getMapProvider()] || getMapProvider() === 'custom') {
         createLeafletMapInstance(mapHolder, mapContainer, options);
     } else if (mapHolder.mapProvider === 'googlemap') {
         createGoogleMapInstance(mapHolder, mapContainer, options);
@@ -103,7 +103,7 @@ export function setMapCenterTo(mapHolder, center, zoomLevel) {
         return;
     }
 
-    if (mapConstants.leafletTileSources[getMapProvider()] || getMapProvider() === 'custom') {
+    if (LEAFLET_TILE_SOURCES[getMapProvider()] || getMapProvider() === 'custom') {
         setLeafletMapCenterTo(mapHolder, center, zoomLevel);
     } else if (mapHolder.mapProvider === 'googlemap') {
         setGoogleMapCenterTo(mapHolder, center, zoomLevel);
@@ -119,7 +119,7 @@ export function setMapCenterMarker(mapHolder, position) {
         return;
     }
 
-    if (mapConstants.leafletTileSources[getMapProvider()] || getMapProvider() === 'custom') {
+    if (LEAFLET_TILE_SOURCES[getMapProvider()] || getMapProvider() === 'custom') {
         setLeafletMapCenterMaker(mapHolder, position);
     } else if (mapHolder.mapProvider === 'googlemap') {
         setGoogleMapCenterMaker(mapHolder, position);
@@ -135,7 +135,7 @@ export function removeMapCenterMarker(mapHolder) {
         return;
     }
 
-    if (mapConstants.leafletTileSources[getMapProvider()] || getMapProvider() === 'custom') {
+    if (LEAFLET_TILE_SOURCES[getMapProvider()] || getMapProvider() === 'custom') {
         removeLeafletMapCenterMaker(mapHolder);
     } else if (mapHolder.mapProvider === 'googlemap') {
         removeGoogleMapCenterMaker(mapHolder);

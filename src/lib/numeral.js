@@ -1,6 +1,6 @@
 import numeralConstants from '@/consts/numeral.js';
 
-import { isString, isNumber, removeAll } from './common.js';
+import { isString, isNumber, removeAll } from './common.ts';
 
 export function appendDigitGroupingSymbol(value, options) {
     if (isNumber(value)) {

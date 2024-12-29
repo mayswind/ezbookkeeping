@@ -9,44 +9,46 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-block class="combination-list-wrapper margin-vertical skeleton-text"
-                  :key="blockIdx" v-for="blockIdx in [ 1, 2 ]" v-if="loading">
-            <f7-accordion-item>
-                <f7-block-title>
-                    <f7-accordion-toggle>
-                        <f7-list strong inset dividers media-list
-                                 class="combination-list-header combination-list-opened">
-                            <f7-list-item>
-                                <template #title>
-                                    <span>Transaction Category</span>
-                                    <f7-icon class="combination-list-chevron-icon" f7="chevron_up"></f7-icon>
+        <div class="skeleton-text" v-if="loading">
+            <f7-block class="combination-list-wrapper margin-vertical"
+                      :key="blockIdx" v-for="blockIdx in [ 1, 2 ]">
+                <f7-accordion-item>
+                    <f7-block-title>
+                        <f7-accordion-toggle>
+                            <f7-list strong inset dividers media-list
+                                     class="combination-list-header combination-list-opened">
+                                <f7-list-item>
+                                    <template #title>
+                                        <span>Transaction Category</span>
+                                        <f7-icon class="combination-list-chevron-icon" f7="chevron_up"></f7-icon>
+                                    </template>
+                                </f7-list-item>
+                            </f7-list>
+                        </f7-accordion-toggle>
+                    </f7-block-title>
+                    <f7-accordion-content style="height: auto">
+                        <f7-list strong inset dividers accordion-list class="combination-list-content">
+                            <f7-list-item checkbox class="disabled" title="Category Name"
+                                          :key="itemIdx" v-for="itemIdx in [ 1, 2 ]">
+                                <template #media>
+                                    <f7-icon f7="app_fill"></f7-icon>
+                                </template>
+                                <template #root>
+                                    <ul class="padding-left">
+                                        <f7-list-item checkbox class="disabled" title="Sub Category Name"
+                                                      :key="subItemIdx" v-for="subItemIdx in [ 1, 2, 3 ]">
+                                            <template #media>
+                                                <f7-icon f7="app_fill"></f7-icon>
+                                            </template>
+                                        </f7-list-item>
+                                    </ul>
                                 </template>
                             </f7-list-item>
                         </f7-list>
-                    </f7-accordion-toggle>
-                </f7-block-title>
-                <f7-accordion-content style="height: auto">
-                    <f7-list strong inset dividers accordion-list class="combination-list-content">
-                        <f7-list-item checkbox class="disabled" title="Category Name"
-                                      :key="itemIdx" v-for="itemIdx in [ 1, 2 ]">
-                            <template #media>
-                                <f7-icon f7="app_fill"></f7-icon>
-                            </template>
-                            <template #root>
-                                <ul class="padding-left">
-                                    <f7-list-item checkbox class="disabled" title="Sub Category Name"
-                                                  :key="subItemIdx" v-for="subItemIdx in [ 1, 2, 3 ]">
-                                        <template #media>
-                                            <f7-icon f7="app_fill"></f7-icon>
-                                        </template>
-                                    </f7-list-item>
-                                </ul>
-                            </template>
-                        </f7-list-item>
-                    </f7-list>
-                </f7-accordion-content>
-            </f7-accordion-item>
-        </f7-block>
+                    </f7-accordion-content>
+                </f7-accordion-item>
+            </f7-block>
+        </div>
 
         <f7-block class="combination-list-wrapper margin-vertical"
                   :key="transactionType.type"
@@ -143,8 +145,8 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 
-import categoryConstants from '@/consts/category.js';
-import { copyObjectTo, arrayItemToObjectField } from '@/lib/common.js';
+import { CategoryType } from '@/core/category.ts';
+import { copyObjectTo, arrayItemToObjectField } from '@/lib/common.ts';
 import {
     allTransactionCategoriesWithVisibleCount,
     hasAnyAvailableCategory,
@@ -220,7 +222,7 @@ export default {
 
             const allCategoryIds = {};
 
-            for (let categoryId in self.transactionCategoriesStore.allTransactionCategoriesMap) {
+            for (const categoryId in self.transactionCategoriesStore.allTransactionCategoriesMap) {
                 if (!Object.prototype.hasOwnProperty.call(self.transactionCategoriesStore.allTransactionCategoriesMap, categoryId)) {
                     continue;
                 }
@@ -243,7 +245,7 @@ export default {
             } else if (self.type === 'statisticsCurrent') {
                 self.filterCategoryIds = copyObjectTo(self.statisticsStore.transactionStatisticsFilter.filterCategoryIds, allCategoryIds);
             } else if (self.type === 'transactionListCurrent') {
-                for (let categoryId in self.transactionsStore.allFilterCategoryIds) {
+                for (const categoryId in self.transactionsStore.allFilterCategoryIds) {
                     if (!Object.prototype.hasOwnProperty.call(self.transactionsStore.allFilterCategoryIds, categoryId)) {
                         continue;
                     }
@@ -283,7 +285,7 @@ export default {
             let isAllSelected = true;
             let finalCategoryIds = '';
 
-            for (let categoryId in self.filterCategoryIds) {
+            for (const categoryId in self.filterCategoryIds) {
                 if (!Object.prototype.hasOwnProperty.call(self.filterCategoryIds, categoryId)) {
                     continue;
                 }
@@ -347,11 +349,11 @@ export default {
         },
         getCategoryTypeName(categoryType) {
             switch (categoryType) {
-                case categoryConstants.allCategoryTypes.Income.toString():
+                case CategoryType.Income.toString():
                     return this.$t('Income Categories');
-                case categoryConstants.allCategoryTypes.Expense.toString():
+                case CategoryType.Expense.toString():
                     return this.$t('Expense Categories');
-                case categoryConstants.allCategoryTypes.Transfer.toString():
+                case CategoryType.Transfer.toString():
                     return this.$t('Transfer Categories');
                 default:
                     return this.$t('Transaction Categories');
@@ -369,12 +371,12 @@ export default {
         getCollapseStates() {
             const collapseStates = {};
 
-            for (let categoryTypeField in categoryConstants.allCategoryTypes) {
-                if (!Object.prototype.hasOwnProperty.call(categoryConstants.allCategoryTypes, categoryTypeField)) {
+            for (const categoryTypeField in CategoryType) {
+                if (!Object.prototype.hasOwnProperty.call(CategoryType, categoryTypeField)) {
                     continue;
                 }
 
-                const categoryType = categoryConstants.allCategoryTypes[categoryTypeField];
+                const categoryType = CategoryType[categoryTypeField];
 
                 collapseStates[categoryType] = {
                     opened: true

@@ -2,7 +2,7 @@
     <f7-page :ptr="!sortable" @ptr:refresh="reload" @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
-            <f7-nav-title :title="templateType === allTemplateTypes.Schedule ? $t('Scheduled Transactions') : $t('Transaction Templates')"></f7-nav-title>
+            <f7-nav-title :title="templateType === allTemplateTypes.Schedule.type ? $t('Scheduled Transactions') : $t('Transaction Templates')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': !templates.length }" v-if="!sortable" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link :href="'/template/add?templateType=' + templateType" icon-f7="plus" v-if="!sortable"></f7-link>
@@ -22,8 +22,8 @@
         <f7-list strong inset dividers class="margin-top" v-if="!loading && noAvailableTemplate">
             <f7-list-item :title="$t('No available template')"
                           :footer="$t('Once you add templates, you can long press the Add button on the home page to quickly add a new transaction')"
-                          v-if="templateType === allTemplateTypes.Normal"></f7-list-item>
-            <f7-list-item :title="$t('No available scheduled transactions')" v-else-if="templateType === allTemplateTypes.Schedule"></f7-list-item>
+                          v-if="templateType === allTemplateTypes.Normal.type"></f7-list-item>
+            <f7-list-item :title="$t('No available scheduled transactions')" v-else-if="templateType === allTemplateTypes.Schedule.type"></f7-list-item>
             <f7-list-item :title="$t('No available template')" v-else></f7-list-item>
         </f7-list>
 
@@ -40,7 +40,7 @@
                           v-show="showHidden || !template.hidden"
                           @taphold="setSortable()">
                 <template #media>
-                    <f7-icon :f7="templateType === allTemplateTypes.Schedule ? 'clock' : 'doc_plaintext'">
+                    <f7-icon :f7="templateType === allTemplateTypes.Schedule.type ? 'clock' : 'doc_plaintext'">
                         <f7-badge color="gray" class="right-bottom-icon" v-if="template.hidden">
                             <f7-icon f7="eye_slash_fill"></f7-icon>
                         </f7-badge>
@@ -88,14 +88,14 @@
 import { mapStores } from 'pinia';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 
-import templateConstants from '@/consts/template.js';
-import { isDefined } from '@/lib/common.js';
+import { TemplateType } from '@/core/template.ts';
+import { isDefined } from '@/lib/common.ts';
 import {
     isNoAvailableTemplate,
     getFirstShowingId,
     getLastShowingId
 } from '@/lib/template.js';
-import { onSwipeoutDeleted } from '@/lib/ui.mobile.js';
+import { onSwipeoutDeleted } from '@/lib/ui/mobile.js';
 
 export default {
     props: [
@@ -104,7 +104,7 @@ export default {
     ],
     data() {
         return {
-            templateType: templateConstants.allTemplateTypes.Normal,
+            templateType: TemplateType.Normal.type,
             loading: true,
             loadingError: null,
             showHidden: false,
@@ -131,16 +131,16 @@ export default {
             return isNoAvailableTemplate(this.templates, this.showHidden);
         },
         allTemplateTypes() {
-            return templateConstants.allTemplateTypes;
+            return TemplateType.all();
         }
     },
     created() {
         const self = this;
 
         if (self.f7route.path === '/template/list') {
-            self.templateType = templateConstants.allTemplateTypes.Normal;
+            self.templateType = TemplateType.Normal.type;
         } else if (self.f7route.path === '/schedule/list') {
-            self.templateType = templateConstants.allTemplateTypes.Schedule;
+            self.templateType = TemplateType.Schedule.type;
         }
 
         self.loading = true;

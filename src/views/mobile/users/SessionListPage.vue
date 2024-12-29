@@ -47,10 +47,10 @@ import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
 
-import { isEquals } from '@/lib/common.js';
-import { parseSessionInfo } from '@/lib/misc.js';
+import { isEquals } from '@/lib/common.ts';
+import { parseSessionInfo } from '@/lib/session.ts';
 
-import { onSwipeoutDeleted } from '@/lib/ui.mobile.js';
+import { onSwipeoutDeleted } from '@/lib/ui/mobile.js';
 
 export default {
     props: [

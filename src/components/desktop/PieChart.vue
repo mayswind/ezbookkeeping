@@ -10,7 +10,8 @@ import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
-import colorConstants from '@/consts/color.js';
+import { DEFAULT_ICON_COLOR, DEFAULT_CHART_COLORS } from '@/consts/color.ts';
+import { ThemeType } from '@/core/theme.ts';
 import { formatPercent } from '@/lib/numeral.js';
 
 export default {
@@ -40,7 +41,7 @@ export default {
     computed: {
         ...mapStores(useSettingsStore, useUserStore),
         isDarkMode() {
-            return this.globalTheme.global.name.value === 'dark';
+            return this.globalTheme.global.name.value === ThemeType.Dark;
         },
         itemsMap: function () {
             const map = {};
@@ -87,7 +88,7 @@ export default {
                         percent: (item[this.percentField] > 0 || item[this.percentField] === 0 || item[this.percentField] === '0') ? item[this.percentField] : (item[this.valueField] / totalValidValue * 100),
                         actualPercent: item[this.valueField] / totalValidValue,
                         itemStyle: {
-                            color: this.getColor(item[this.colorField] ? item[this.colorField] : colorConstants.defaultChartColors[validItems.length % colorConstants.defaultChartColors.length]),
+                            color: this.getColor(item[this.colorField] ? item[this.colorField] : DEFAULT_CHART_COLORS[validItems.length % DEFAULT_CHART_COLORS.length]),
                         },
                         selected: true,
                         sourceItem: item
@@ -283,7 +284,7 @@ export default {
             }
         },
         getColor: function (color) {
-            if (color && color !== colorConstants.defaultColor) {
+            if (color && color !== DEFAULT_ICON_COLOR) {
                 color = '#' + color;
             }
 

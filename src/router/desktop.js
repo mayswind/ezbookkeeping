@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 
-import templateConstants from '@/consts/template.js';
+import { TemplateType } from '@/core/template.ts';
 import userState from '@/lib/userstate.js';
 
 import MainLayout from '@/views/desktop/MainLayout.vue';
@@ -148,7 +148,7 @@ const router = createRouter({
                     component: TransactionTemplateListPage,
                     beforeEnter: checkLogin,
                     props: {
-                        initType: templateConstants.allTemplateTypes.Normal
+                        initType: TemplateType.Normal.type
                     }
                 },
                 {
@@ -156,7 +156,7 @@ const router = createRouter({
                     component: TransactionTemplateListPage,
                     beforeEnter: checkLogin,
                     props: {
-                        initType: templateConstants.allTemplateTypes.Schedule
+                        initType: TemplateType.Schedule.type
                     }
                 },
                 {

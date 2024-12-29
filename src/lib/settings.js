@@ -1,5 +1,5 @@
-import timezoneConstants from '@/consts/timezone.js';
-import currencyConstants from '@/consts/currency.js';
+import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
+import { CurrencySortingType } from '@/core/currency.ts';
 import statisticsConstants from '@/consts/statistics.js';
 
 const settingsLocalStorageKey = 'ebk_app_settings';
@@ -15,15 +15,15 @@ const defaultSettings = {
     autoSaveTransactionDraft: 'disabled',
     autoGetCurrentGeoLocation: false,
     showAmountInHomePage: true,
-    timezoneUsedForStatisticsInHomePage: timezoneConstants.defaultTimezoneTypesUsedForStatistics,
+    timezoneUsedForStatisticsInHomePage: TimezoneTypeForStatistics.Default.type,
     itemsCountInTransactionListPage: 15,
     showTotalAmountInTransactionListPage: true,
     showTagInTransactionListPage: true,
     showAccountBalance: true,
-    currencySortByInExchangeRatesPage: currencyConstants.defaultCurrencySortingType,
+    currencySortByInExchangeRatesPage: CurrencySortingType.Default.type,
     statistics: {
         defaultChartDataType: statisticsConstants.defaultChartDataType,
-        defaultTimezoneType: timezoneConstants.defaultTimezoneTypesUsedForStatistics,
+        defaultTimezoneType: TimezoneTypeForStatistics.Default.type,
         defaultAccountFilter: {},
         defaultTransactionCategoryFilter: {},
         defaultSortingType: statisticsConstants.defaultSortingType,

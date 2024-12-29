@@ -1,4 +1,4 @@
-import mapConstants from '@/consts/map.js';
+import { LEAFLET_TILE_SOURCES } from '@/consts/map.ts';
 import {
     isMapDataFetchProxyEnabled,
     getCustomMapTileLayerUrl,
@@ -9,7 +9,7 @@ import {
     getCustomMapDefaultZoomLevel,
     getTomTomMapAPIKey,
     getTianDiTuMapAPIKey
-} from '@/lib/server_settings.js';
+} from '@/lib/server_settings.ts';
 import services from '@/lib/services.js';
 
 const leafletHolder = {
@@ -24,7 +24,7 @@ export function loadLeafletMapAssets() {
 }
 
 export function createLeafletMapHolder(mapProvider) {
-    const mapTileSource = mapConstants.leafletTileSources[mapProvider];
+    const mapTileSource = LEAFLET_TILE_SOURCES[mapProvider];
 
     if (mapProvider !== 'custom' && !mapTileSource) {
         return null;
@@ -60,7 +60,7 @@ export function createLeafletMapInstance(mapHolder, mapContainer, options) {
     let mapTileSource = null;
 
     if (mapHolder.mapProvider !== 'custom') {
-        mapTileSource = Object.assign({}, mapConstants.leafletTileSources[mapHolder.mapProvider]);
+        mapTileSource = Object.assign({}, LEAFLET_TILE_SOURCES[mapHolder.mapProvider]);
     } else {
         mapTileSource = createCustomMapSource();
     }

@@ -29,9 +29,9 @@
 </template>
 
 <script>
-import { arrayContainsFieldValue } from '@/lib/common.js';
-import { getColorsInRows } from '@/lib/color.js';
-import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
+import { arrayContainsFieldValue } from '@/lib/common.ts';
+import { getColorsInRows } from '@/lib/color.ts';
+import { scrollToSelectedItem } from '@/lib/ui/mobile.js';
 
 export default {
     props: [

@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia';
 
-import categoryConstants from '@/consts/category.js';
-import iconConstants from '@/consts/icon.js';
-import colorConstants from '@/consts/color.js';
-import { isEquals } from '@/lib/common.js';
+import { CategoryType } from '@/core/category.ts';
+import { DEFAULT_CATEGORY_ICON_ID } from '@/consts/icon.ts';
+import { DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
+import { isEquals } from '@/lib/common.ts';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
 
@@ -139,11 +139,11 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
     actions: {
         generateNewTransactionCategoryModel(type, parentId) {
             return {
-                type: type || categoryConstants.allCategoryTypes.Income,
+                type: type || CategoryType.Income,
                 name: '',
                 parentId: parentId || '0',
-                icon: iconConstants.defaultCategoryIconId,
-                color: colorConstants.defaultCategoryColor,
+                icon: DEFAULT_CATEGORY_ICON_ID,
+                color: DEFAULT_CATEGORY_COLOR,
                 comment: '',
                 visible: true
             };
@@ -174,16 +174,16 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                         return;
                     }
 
-                    if (!data.result[categoryConstants.allCategoryTypes.Income]) {
-                        data.result[categoryConstants.allCategoryTypes.Income] = [];
+                    if (!data.result[CategoryType.Income]) {
+                        data.result[CategoryType.Income] = [];
                     }
 
-                    if (!data.result[categoryConstants.allCategoryTypes.Expense]) {
-                        data.result[categoryConstants.allCategoryTypes.Expense] = [];
+                    if (!data.result[CategoryType.Expense]) {
+                        data.result[CategoryType.Expense] = [];
                     }
 
-                    if (!data.result[categoryConstants.allCategoryTypes.Transfer]) {
-                        data.result[categoryConstants.allCategoryTypes.Transfer] = [];
+                    if (!data.result[CategoryType.Transfer]) {
+                        data.result[CategoryType.Transfer] = [];
                     }
 
                     for (let categoryType in data.result) {

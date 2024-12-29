@@ -93,10 +93,10 @@ import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
-import colorConstants from '@/consts/color.js';
+import { DEFAULT_ICON_COLOR, DEFAULT_CHART_COLORS } from '@/consts/color.ts';
 import datetimeConstants from '@/consts/datetime.js';
 import statisticsConstants from '@/consts/statistics.js';
-import { isNumber } from '@/lib/common.js';
+import { isNumber } from '@/lib/common.ts';
 import {
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
@@ -154,7 +154,7 @@ export default {
                 const legend = {
                     id: id,
                     name: (this.nameField && item[this.nameField]) ? this.getItemName(item[this.nameField]) : id,
-                    color: this.getColor(item[this.colorField] ? item[this.colorField] : colorConstants.defaultChartColors[i % colorConstants.defaultChartColors.length]),
+                    color: this.getColor(item[this.colorField] ? item[this.colorField] : DEFAULT_CHART_COLORS[i % DEFAULT_CHART_COLORS.length]),
                     displayOrders: (this.displayOrdersField && item[this.displayOrdersField]) ? item[this.displayOrdersField] : [0]
                 };
 
@@ -322,7 +322,7 @@ export default {
             }
         },
         getColor: function (color) {
-            if (color && color !== colorConstants.defaultColor) {
+            if (color && color !== DEFAULT_ICON_COLOR) {
                 color = '#' + color;
             }
 

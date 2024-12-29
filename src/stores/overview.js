@@ -4,7 +4,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from './user.js';
 import { useExchangeRatesStore } from './exchangeRates.js';
 
-import { isNumber, isEquals } from '@/lib/common.js';
+import { isNumber, isEquals } from '@/lib/common.ts';
 import {
     getUnixTimeBeforeUnixTime,
     getTodayFirstUnixTime,

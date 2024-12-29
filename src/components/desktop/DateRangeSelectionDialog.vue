@@ -60,7 +60,8 @@ import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.js';
 
 import datetimeConstants from '@/consts/datetime.js';
-import { arrangeArrayWithNewStartIndex } from '@/lib/common.js';
+import { ThemeType } from '@/core/theme.ts';
+import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
     getCurrentYear,
@@ -122,7 +123,7 @@ export default {
             }
         },
         isDarkMode() {
-            return this.globalTheme.global.name.value === 'dark';
+            return this.globalTheme.global.name.value === ThemeType.Dark;
         },
         firstDayOfWeek() {
             return this.userStore.currentUserFirstDayOfWeek;

@@ -124,9 +124,9 @@ import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import { getMapProvider } from '@/lib/server_settings.js';
+import { getMapProvider } from '@/lib/server_settings.ts';
 import { getMapWebsite } from '@/lib/map/index.js';
-import licenses from '@/lib/licenses.js';
+import { getLicense, getThirdPartyLicenses } from '@/lib/licenses.ts';
 
 export default {
     computed: {
@@ -152,10 +152,10 @@ export default {
             return getMapWebsite();
         },
         licenseLines() {
-            return licenses.getLicense().replaceAll(/\r/g, '').split('\n');
+            return getLicense().replaceAll(/\r/g, '').split('\n');
         },
         thirdPartyLicenses() {
-            return licenses.getThirdPartyLicenses();
+            return getThirdPartyLicenses();
         }
     }
 }

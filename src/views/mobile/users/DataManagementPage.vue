@@ -79,7 +79,7 @@ import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
-import { isDataExportingEnabled } from '@/lib/server_settings.js';
+import { isDataExportingEnabled } from '@/lib/server_settings.ts';
 
 export default {
     props: [

@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 
-import transactionConstants from '@/consts/transaction.js';
-import templateConstants from '@/consts/template.js';
-import { isDefined, isObject, isArray, isEquals } from '@/lib/common.js';
+import { TransactionType } from '@/core/transaction.ts';
+import { TemplateType } from '@/core/template.ts';
+import { isDefined, isObject, isArray, isEquals } from '@/lib/common.ts';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
 
@@ -231,17 +231,17 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
                 submitTemplate.clientSessionId = clientSessionId;
             }
 
-            if (template.templateType === templateConstants.allTemplateTypes.Schedule) {
+            if (template.templateType === TemplateType.Schedule.type) {
                 submitTemplate.scheduledFrequencyType = template.scheduledFrequencyType;
                 submitTemplate.scheduledFrequency = template.scheduledFrequency;
                 submitTemplate.utcOffset = template.utcOffset;
             }
 
-            if (template.type === transactionConstants.allTransactionTypes.Expense) {
+            if (template.type === TransactionType.Expense) {
                 submitTemplate.categoryId = template.expenseCategory;
-            } else if (template.type === transactionConstants.allTransactionTypes.Income) {
+            } else if (template.type === TransactionType.Income) {
                 submitTemplate.categoryId = template.incomeCategory;
-            } else if (template.type === transactionConstants.allTransactionTypes.Transfer) {
+            } else if (template.type === TransactionType.Transfer) {
                 submitTemplate.categoryId = template.transferCategory;
                 submitTemplate.destinationAccountId = template.destinationAccountId;
                 submitTemplate.destinationAmount = template.destinationAmount;

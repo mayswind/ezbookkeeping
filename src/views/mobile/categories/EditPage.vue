@@ -149,11 +149,11 @@
 import { mapStores } from 'pinia';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 
-import categoryConstants from '@/consts/category.js';
-import iconConstants from '@/consts/icon.js';
-import colorConstants from '@/consts/color.js';
-import { getNameByKeyValue } from '@/lib/common.js';
-import { generateRandomUUID } from '@/lib/misc.js';
+import { CategoryType } from '@/core/category.ts';
+import { ALL_CATEGORY_ICONS } from '@/consts/icon.ts';
+import { ALL_CATEGORY_COLORS } from '@/consts/color.ts';
+import { getNameByKeyValue } from '@/lib/common.ts';
+import { generateRandomUUID } from '@/lib/misc.ts';
 import {
     setCategoryModelByAnotherCategory,
     allVisiblePrimaryTransactionCategoriesByType
@@ -205,10 +205,10 @@ export default {
             }
         },
         allCategoryIcons() {
-            return iconConstants.allCategoryIcons;
+            return ALL_CATEGORY_ICONS;
         },
         allCategoryColors() {
-            return colorConstants.allCategoryColors;
+            return ALL_CATEGORY_COLORS;
         },
         inputIsEmpty() {
             return !!this.inputEmptyProblemMessage;
@@ -251,9 +251,9 @@ export default {
         } else if (query.parentId) {
             const categoryType = parseInt(query.type);
 
-            if (categoryType !== categoryConstants.allCategoryTypes.Income &&
-                categoryType !== categoryConstants.allCategoryTypes.Expense &&
-                categoryType !== categoryConstants.allCategoryTypes.Transfer) {
+            if (categoryType !== CategoryType.Income &&
+                categoryType !== CategoryType.Expense &&
+                categoryType !== CategoryType.Transfer) {
                 self.$toast('Parameter Invalid');
                 self.loadingError = 'Parameter Invalid';
                 return;

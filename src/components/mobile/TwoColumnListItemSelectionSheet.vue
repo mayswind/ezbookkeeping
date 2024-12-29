@@ -65,8 +65,8 @@
 import {
     getItemByKeyValue,
     getPrimaryValueBySecondaryValue
-} from '@/lib/common.js';
-import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
+} from '@/lib/common.ts';
+import { scrollToSelectedItem } from '@/lib/ui/mobile.js';
 
 export default {
     props: [

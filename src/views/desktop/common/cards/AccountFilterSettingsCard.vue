@@ -105,10 +105,10 @@
                                     </template>
                                 </v-list-item>
 
-                                <v-divider v-if="(showHidden || !account.hidden) && account.type === allAccountTypes.MultiSubAccounts && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])"/>
+                                <v-divider v-if="(showHidden || !account.hidden) && account.type === allAccountTypes.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])"/>
 
                                 <v-list rounded density="comfortable" class="pa-0 ml-4"
-                                        v-if="(showHidden || !account.hidden) && account.type === allAccountTypes.MultiSubAccounts && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])">
+                                        v-if="(showHidden || !account.hidden) && account.type === allAccountTypes.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])">
                                     <template :key="subAccount.id"
                                               v-for="(subAccount, subIdx) in accountCategory.allSubAccounts[account.id]">
                                         <v-divider v-if="showHidden ? subIdx > 0 : (!subAccount.hidden ? subIdx > accountCategory.allFirstVisibleSubAccountIndexes[account.id] : false)"/>
@@ -152,8 +152,8 @@ import { useAccountsStore } from '@/stores/account.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 
-import accountConstants from '@/consts/account.js';
-import { copyObjectTo } from '@/lib/common.js';
+import { AccountType, AccountCategory } from '@/core/account.ts';
+import { copyObjectTo } from '@/lib/common.ts';
 import {
     getCategorizedAccountsWithVisibleCount,
     selectAccountOrSubAccounts,
@@ -185,7 +185,7 @@ export default {
     data: function () {
         return {
             loading: true,
-            expandAccountCategories: accountConstants.allCategories.map(category => category.id),
+            expandAccountCategories: AccountCategory.values().map(category => category.type),
             filterAccountIds: {},
             showHidden: false,
             icons: {
@@ -215,7 +215,7 @@ export default {
             }
         },
         allAccountTypes() {
-            return accountConstants.allAccountTypes;
+            return AccountType.all();
         },
         allCategorizedAccounts() {
             return getCategorizedAccountsWithVisibleCount(this.accountsStore.allCategorizedAccountsMap);
@@ -241,7 +241,7 @@ export default {
 
             const allAccountIds = {};
 
-            for (let accountId in self.accountsStore.allAccountsMap) {
+            for (const accountId in self.accountsStore.allAccountsMap) {
                 if (!Object.prototype.hasOwnProperty.call(self.accountsStore.allAccountsMap, accountId)) {
                     continue;
                 }
@@ -260,7 +260,7 @@ export default {
             } else if (self.type === 'statisticsCurrent') {
                 self.filterAccountIds = copyObjectTo(self.statisticsStore.transactionStatisticsFilter.filterAccountIds, allAccountIds);
             } else if (self.type === 'transactionListCurrent') {
-                for (let accountId in self.transactionsStore.allFilterAccountIds) {
+                for (const accountId in self.transactionsStore.allFilterAccountIds) {
                     if (!Object.prototype.hasOwnProperty.call(self.transactionsStore.allFilterAccountIds, accountId)) {
                         continue;
                     }
@@ -292,7 +292,7 @@ export default {
             let finalAccountIds = '';
             let changed = true;
 
-            for (let accountId in self.filterAccountIds) {
+            for (const accountId in self.filterAccountIds) {
                 if (!Object.prototype.hasOwnProperty.call(self.filterAccountIds, accountId)) {
                     continue;
                 }

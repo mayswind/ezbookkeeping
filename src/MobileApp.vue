@@ -15,21 +15,22 @@ import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import assetConstants from '@/consts/asset.js';
-import { isProduction } from '@/lib/version.js';
+import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
+import { ThemeType } from '@/core/theme.ts';
+import { isProduction } from '@/lib/version.ts';
 import { getTheme, isEnableAnimate } from '@/lib/settings.js';
 import { loadMapAssets } from '@/lib/map/index.js';
-import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
-import { isModalShowing, setAppFontSize } from '@/lib/ui.mobile.js';
+import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
+import { isModalShowing, setAppFontSize } from '@/lib/ui/mobile.js';
 
 export default {
     data() {
         const self = this;
         let darkMode = 'auto';
 
-        if (getTheme() === 'light') {
+        if (getTheme() === ThemeType.Light) {
             darkMode = false;
-        } else if (getTheme() === 'dark') {
+        } else if (getTheme() === ThemeType.Dark) {
             darkMode = true;
         }
 
@@ -112,7 +113,7 @@ export default {
             if (newValue) {
                 f7ready((f7) => {
                     self.notification = f7.notification.create({
-                        icon: `<img alt="logo" src="${assetConstants.ezBookkeepingLogoPath}" />`,
+                        icon: `<img alt="logo" src="${APPLICATION_LOGO_PATH}" />`,
                         title: self.$t('global.app.title'),
                         text: newValue,
                         closeOnClick: true,

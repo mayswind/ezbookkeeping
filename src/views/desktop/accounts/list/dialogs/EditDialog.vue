@@ -1,5 +1,5 @@
 <template>
-    <v-dialog :width="account.type === allAccountTypes.MultiSubAccounts ? 1000 : 800" :persistent="!!persistent" v-model="showState">
+    <v-dialog :width="account.type === allAccountTypes.MultiSubAccounts.type ? 1000 : 800" :persistent="!!persistent" v-model="showState">
         <v-card class="pa-2 pa-sm-4 pa-md-8">
             <template #title>
                 <div class="d-flex align-center justify-center">
@@ -8,7 +8,7 @@
                         <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
                     </div>
                     <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true"
-                           :disabled="loading || submitting || !!editAccountId || account.type !== allAccountTypes.MultiSubAccounts">
+                           :disabled="loading || submitting || !!editAccountId || account.type !== allAccountTypes.MultiSubAccounts.type">
                         <v-icon :icon="icons.more" />
                         <v-menu activator="parent">
                             <v-list>
@@ -21,12 +21,12 @@
                 </div>
             </template>
             <v-card-text class="d-flex flex-column flex-md-row mt-md-4 pt-0">
-                <div class="mb-4" v-if="account.type === allAccountTypes.MultiSubAccounts">
+                <div class="mb-4" v-if="account.type === allAccountTypes.MultiSubAccounts.type">
                     <v-tabs direction="vertical" :disabled="loading || submitting" v-model="currentAccountIndex">
                         <v-tab :value="-1">
                             <span>{{ $t('Main Account') }}</span>
                         </v-tab>
-                        <template v-if="account.type === allAccountTypes.MultiSubAccounts">
+                        <template v-if="account.type === allAccountTypes.MultiSubAccounts.type">
                             <v-tab :key="idx" :value="idx" v-for="(subAccount, idx) in subAccounts">
                                 <span>{{ $t('Sub Account') + ' #' + (idx + 1) }}</span>
                                 <v-btn class="ml-2" color="error" size="24" variant="text"
@@ -38,15 +38,15 @@
                 </div>
 
                 <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container"
-                          :class="{ 'ml-md-5': account.type === allAccountTypes.MultiSubAccounts }"
+                          :class="{ 'ml-md-5': account.type === allAccountTypes.MultiSubAccounts.type }"
                           v-model="activeTab">
                     <v-window-item value="account">
                         <v-form class="mt-2">
                             <v-row>
-                                <v-col cols="12" md="12" v-if="account.type === allAccountTypes.SingleAccount || currentAccountIndex < 0">
+                                <v-col cols="12" md="12" v-if="account.type === allAccountTypes.SingleAccount.type || currentAccountIndex < 0">
                                     <v-select
                                         item-title="displayName"
-                                        item-value="id"
+                                        item-value="type"
                                         persistent-placeholder
                                         :disabled="loading || submitting"
                                         :label="$t('Account Category')"
@@ -71,10 +71,10 @@
                                         </template>
                                     </v-select>
                                 </v-col>
-                                <v-col cols="12" md="12" v-if="account.type === allAccountTypes.SingleAccount || currentAccountIndex < 0">
+                                <v-col cols="12" md="12" v-if="account.type === allAccountTypes.SingleAccount.type || currentAccountIndex < 0">
                                     <v-select
                                         item-title="displayName"
-                                        item-value="id"
+                                        item-value="type"
                                         persistent-placeholder
                                         :disabled="loading || submitting || !!editAccountId"
                                         :label="$t('Account Type')"
@@ -108,7 +108,7 @@
                                                   :disabled="loading || submitting"
                                                   v-model="selectedAccount.color" />
                                 </v-col>
-                                <v-col cols="12" :md="currentAccountIndex < 0 && isAccountSupportCreditCardStatementDate() ? 6 : 12" v-if="account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0">
+                                <v-col cols="12" :md="currentAccountIndex < 0 && isAccountSupportCreditCardStatementDate() ? 6 : 12" v-if="account.type === allAccountTypes.SingleAccount.type || currentAccountIndex >= 0">
                                     <v-autocomplete
                                         item-title="displayName"
                                         item-value="currencyCode"
@@ -126,7 +126,7 @@
                                         </template>
                                     </v-autocomplete>
                                 </v-col>
-                                <v-col cols="12" :md="account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0 ? 6 : 12" v-if="currentAccountIndex < 0 && isAccountSupportCreditCardStatementDate()">
+                                <v-col cols="12" :md="account.type === allAccountTypes.SingleAccount.type || currentAccountIndex >= 0 ? 6 : 12" v-if="currentAccountIndex < 0 && isAccountSupportCreditCardStatementDate()">
                                     <v-autocomplete
                                         item-title="displayName"
                                         item-value="day"
@@ -141,7 +141,7 @@
                                     ></v-autocomplete>
                                 </v-col>
                                 <v-col cols="12" :md="!editAccountId && selectedAccount.balance ? 6 : 12"
-                                       v-if="account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0">
+                                       v-if="account.type === allAccountTypes.SingleAccount.type || currentAccountIndex >= 0">
                                     <amount-input :disabled="loading || submitting || !!editAccountId"
                                                   :persistent-placeholder="true"
                                                   :currency="selectedAccount.currency"
@@ -151,7 +151,7 @@
                                                   v-model="selectedAccount.balance"/>
                                 </v-col>
                                 <v-col cols="12" md="6" v-show="selectedAccount.balance"
-                                       v-if="!editAccountId && (account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0)">
+                                       v-if="!editAccountId && (account.type === allAccountTypes.SingleAccount.type || currentAccountIndex >= 0)">
                                     <date-time-select
                                         :disabled="loading || submitting"
                                         :label="$t('Balance Time')"
@@ -200,11 +200,11 @@ import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useAccountsStore } from '@/stores/account.js';
 
-import accountConstants from '@/consts/account.js';
-import iconConstants from '@/consts/icon.js';
-import colorConstants from '@/consts/color.js';
-import { isNumber } from '@/lib/common.js';
-import { generateRandomUUID } from '@/lib/misc.js';
+import { AccountType, AccountCategory } from '@/core/account.ts';
+import { ALL_ACCOUNT_ICONS } from '@/consts/icon.ts';
+import { ALL_ACCOUNT_COLORS } from '@/consts/color.ts';
+import { isNumber } from '@/lib/common.ts';
+import { generateRandomUUID } from '@/lib/misc.ts';
 import {
     setAccountModelByAnotherAccount,
     setAccountSuitableIcon
@@ -264,7 +264,7 @@ export default {
             }
         },
         allAccountTypes() {
-            return accountConstants.allAccountTypes;
+            return AccountType.all();
         },
         allAccountCategories() {
             return this.$locale.getAllAccountCategories();
@@ -273,10 +273,10 @@ export default {
             return this.$locale.getAllAccountTypes();
         },
         allAccountIcons() {
-            return iconConstants.allAccountIcons;
+            return ALL_ACCOUNT_ICONS;
         },
         allAccountColors() {
-            return colorConstants.allAccountColors;
+            return ALL_ACCOUNT_COLORS;
         },
         allCurrencies() {
             return this.$locale.getAllCurrencies();
@@ -366,7 +366,7 @@ export default {
             });
         },
         addSubAccount() {
-            if (this.account.type !== this.allAccountTypes.MultiSubAccounts) {
+            if (this.account.type !== this.allAccountTypes.MultiSubAccounts.type) {
                 return;
             }
 
@@ -393,7 +393,7 @@ export default {
 
             let problemMessage = self.getInputEmptyProblemMessage(self.account, false);
 
-            if (!problemMessage && self.account.type === self.allAccountTypes.MultiSubAccounts) {
+            if (!problemMessage && self.account.type === self.allAccountTypes.MultiSubAccounts.type) {
                 for (let i = 0; i < self.subAccounts.length; i++) {
                     problemMessage = self.getInputEmptyProblemMessage(self.subAccounts[i], true);
 
@@ -447,7 +447,7 @@ export default {
             this.showState = false;
         },
         isAccountSupportCreditCardStatementDate() {
-            return this.account && this.account.category === accountConstants.creditCardCategoryType;
+            return this.account && this.account.category === AccountCategory.CreditCard.type;
         },
         chooseSuitableIcon(oldCategory, newCategory) {
             setAccountSuitableIcon(this.account, oldCategory, newCategory);
@@ -459,7 +459,7 @@ export default {
                 return true;
             }
 
-            if (this.account.type === this.allAccountTypes.MultiSubAccounts) {
+            if (this.account.type === this.allAccountTypes.MultiSubAccounts.type) {
                 for (let i = 0; i < this.subAccounts.length; i++) {
                     const isSubAccountEmpty = !!this.getInputEmptyProblemMessage(this.subAccounts[i], true);
 
@@ -478,7 +478,7 @@ export default {
                 return 'Account type cannot be blank';
             } else if (!account.name) {
                 return 'Account name cannot be blank';
-            } else if (account.type === this.allAccountTypes.SingleAccount && !account.currency) {
+            } else if (account.type === this.allAccountTypes.SingleAccount.type && !account.currency) {
                 return 'Account currency cannot be blank';
             } else {
                 return null;

@@ -201,9 +201,10 @@ import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
-import assetConstants from '@/consts/asset.js';
-import { isUserScheduledTransactionEnabled } from '@/lib/server_settings.js';
-import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
+import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
+import { ThemeType } from '@/core/theme.ts';
+import { isUserScheduledTransactionEnabled } from '@/lib/server_settings.ts';
+import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 import {
     mdiMenu,
@@ -263,7 +264,7 @@ export default {
     computed: {
         ...mapStores(useRootStore, useSettingsStore, useUserStore),
         ezBookkeepingLogoPath() {
-            return assetConstants.ezBookkeepingLogoPath;
+            return APPLICATION_LOGO_PATH;
         },
         mdAndDown() {
             return this.display.mdAndDown.value;
@@ -286,7 +287,7 @@ export default {
                 if (value !== this.settingsStore.appSettings.theme) {
                     this.settingsStore.setTheme(value);
 
-                    if (value === 'light' || value === 'dark') {
+                    if (value === ThemeType.Light || value === ThemeType.Dark) {
                         this.globalTheme.global.name.value = value;
                     } else {
                         this.globalTheme.global.name.value = getSystemTheme();

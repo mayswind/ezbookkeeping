@@ -58,9 +58,9 @@
 import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.js';
 
-import templateConstants from '@/consts/template.js';
-import { sortNumbersArray } from '@/lib/common.js';
-import { scrollToSelectedItem } from '@/lib/ui.desktop.js';
+import { ScheduledTemplateFrequencyType } from '@/core/template.ts';
+import { sortNumbersArray } from '@/lib/common.ts';
+import { scrollToSelectedItem } from '@/lib/ui/desktop.js';
 
 export default {
     props: [
@@ -85,7 +85,7 @@ export default {
             return this.$locale.getAllTransactionScheduledFrequencyTypes();
         },
         allTemplateScheduledFrequencyTypes() {
-            return templateConstants.allTemplateScheduledFrequencyTypes;
+            return ScheduledTemplateFrequencyType.all();
         },
         allWeekDays() {
             return this.$locale.getAllWeekDays(this.firstDayOfWeek);
@@ -113,9 +113,9 @@ export default {
                 if (this.type !== value) {
                     this.$emit('update:type', value);
 
-                    if (value === templateConstants.allTemplateScheduledFrequencyTypes.Weekly.type) {
+                    if (value === ScheduledTemplateFrequencyType.Weekly.type) {
                         this.frequencyValue = [this.firstDayOfWeek];
-                    } else if (value === templateConstants.allTemplateScheduledFrequencyTypes.Monthly.type) {
+                    } else if (value === ScheduledTemplateFrequencyType.Monthly.type) {
                         this.frequencyValue = [1];
                     } else {
                         this.frequencyValue = [];
@@ -141,9 +141,9 @@ export default {
             }
         },
         displayFrequency() {
-            if (this.type === templateConstants.allTemplateScheduledFrequencyTypes.Disabled.type) {
+            if (this.type === ScheduledTemplateFrequencyType.Disabled.type) {
                 return this.$t('Disabled');
-            } else if (this.type === templateConstants.allTemplateScheduledFrequencyTypes.Weekly.type) {
+            } else if (this.type === ScheduledTemplateFrequencyType.Weekly.type) {
                 if (this.frequencyValue.length) {
                     return this.$t('format.misc.everyMultiDaysOfWeek', {
                         days: this.$locale.getMultiWeekdayLongNames(this.frequencyValue, this.firstDayOfWeek)
@@ -151,7 +151,7 @@ export default {
                 } else {
                     return this.$t('Weekly');
                 }
-            } else if (this.type === templateConstants.allTemplateScheduledFrequencyTypes.Monthly.type) {
+            } else if (this.type === ScheduledTemplateFrequencyType.Monthly.type) {
                 if (this.frequencyValue.length) {
                     return this.$t('format.misc.everyMultiDaysOfMonth', {
                         days: this.$locale.getMultiMonthdayShortNames(this.frequencyValue)

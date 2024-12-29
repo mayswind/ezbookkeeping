@@ -80,9 +80,9 @@ import { useOverviewStore } from '@/stores/overview.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import { getDesktopVersionPath } from '@/lib/version.js';
-import { isUserScheduledTransactionEnabled } from '@/lib/server_settings.js';
-import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
+import { getDesktopVersionPath } from '@/lib/version.ts';
+import { isUserScheduledTransactionEnabled } from '@/lib/server_settings.ts';
+import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 export default {
     props: [

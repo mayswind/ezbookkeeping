@@ -8,7 +8,7 @@ import logger from '@/lib/logger.js';
 import {
     isObject,
     isNumber
-} from '@/lib/common.js';
+} from '@/lib/common.ts';
 
 export const useUserStore = defineStore('user', {
     state: () => ({

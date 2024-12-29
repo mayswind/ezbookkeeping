@@ -339,10 +339,10 @@ import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 import { useOverviewStore } from '@/stores/overview.js';
 
-import { getNameByKeyValue } from '@/lib/common.js';
+import { getNameByKeyValue } from '@/lib/common.ts';
 import { getCategorizedAccounts } from '@/lib/account.js';
-import { isUserVerifyEmailEnabled } from '@/lib/server_settings.js';
-import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
+import { isUserVerifyEmailEnabled } from '@/lib/server_settings.ts';
+import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 export default {
     props: [
@@ -568,7 +568,7 @@ export default {
 
             self.showInputPasswordSheet = false;
 
-            let problemMessage = self.inputIsNotChangedProblemMessage || self.inputInvalidProblemMessage || self.extendInputInvalidProblemMessage || self.langAndRegionInputInvalidProblemMessage;
+            const problemMessage = self.inputIsNotChangedProblemMessage || self.inputInvalidProblemMessage || self.extendInputInvalidProblemMessage || self.langAndRegionInputInvalidProblemMessage;
 
             if (problemMessage) {
                 self.$alert(problemMessage);

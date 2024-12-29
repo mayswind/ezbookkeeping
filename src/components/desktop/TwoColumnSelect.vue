@@ -79,8 +79,8 @@ import {
     getItemByKeyValue,
     getNameByKeyValue,
     getPrimaryValueBySecondaryValue
-} from '@/lib/common.js';
-import { scrollToSelectedItem } from '@/lib/ui.desktop.js';
+} from '@/lib/common.ts';
+import { scrollToSelectedItem } from '@/lib/ui/desktop.js';
 
 import {
     mdiChevronRight

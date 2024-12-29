@@ -30,7 +30,7 @@
 
 <script>
 import { getMobileUrlQrCodePath } from '@/lib/qrcode.js';
-import { getMobileVersionPath } from '@/lib/version.js';
+import { getMobileVersionPath } from '@/lib/version.ts';
 
 export default {
     props: [

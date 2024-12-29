@@ -3,13 +3,13 @@ import { defineStore } from 'pinia';
 import { useUserStore } from './user.js';
 import { useExchangeRatesStore } from './exchangeRates.js';
 
-import accountConstants from '@/consts/account.js';
-import currencyConstants from '@/consts/currency.js';
-import iconConstants from '@/consts/icon.js';
-import colorConstants from '@/consts/color.js';
+import { AccountType, AccountCategory } from '@/core/account.ts';
+import { PARENT_ACCOUNT_CURRENCY_PLACEHOLDER } from '@/consts/currency.ts';
+import { DEFAULT_ACCOUNT_ICON_ID } from '@/consts/icon.ts';
+import { DEFAULT_ACCOUNT_COLOR } from '@/consts/color.ts';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
-import { isNumber, isEquals } from '@/lib/common.js';
+import { isNumber, isEquals } from '@/lib/common.ts';
 import { getCurrentUnixTime } from '@/lib/datetime.js';
 import { getCategorizedAccountsMap, getAllFilteredAccountsBalance } from '@/lib/account.js';
 
@@ -185,9 +185,9 @@ export const useAccountsStore = defineStore('accounts', {
             for (let i = 0; i < state.allAccounts.length; i++) {
                 const account = state.allAccounts[i];
 
-                if (account.type === accountConstants.allAccountTypes.SingleAccount) {
+                if (account.type === AccountType.SingleAccount.type) {
                     allAccounts.push(account);
-                } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
+                } else if (account.type === AccountType.MultiSubAccounts.type) {
                     if (account.subAccounts) {
                         for (let j = 0; j < account.subAccounts.length; j++) {
                             const subAccount = account.subAccounts[j];
@@ -209,9 +209,9 @@ export const useAccountsStore = defineStore('accounts', {
                     continue;
                 }
 
-                if (account.type === accountConstants.allAccountTypes.SingleAccount) {
+                if (account.type === AccountType.SingleAccount.type) {
                     allVisibleAccounts.push(account);
-                } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
+                } else if (account.type === AccountType.MultiSubAccounts.type) {
                     if (account.subAccounts) {
                         for (let j = 0; j < account.subAccounts.length; j++) {
                             const subAccount = account.subAccounts[j];
@@ -262,11 +262,11 @@ export const useAccountsStore = defineStore('accounts', {
             const now = getCurrentUnixTime();
 
             return {
-                category: accountConstants.cashCategoryType,
-                type: accountConstants.allAccountTypes.SingleAccount,
+                category: AccountCategory.Cash.type,
+                type: AccountType.SingleAccount.type,
                 name: '',
-                icon: iconConstants.defaultAccountIconId,
-                color: colorConstants.defaultAccountColor,
+                icon: DEFAULT_ACCOUNT_ICON_ID,
+                color: DEFAULT_ACCOUNT_COLOR,
                 currency: userStore.currentUserDefaultCurrency,
                 balance: 0,
                 balanceTime: now,
@@ -321,7 +321,7 @@ export const useAccountsStore = defineStore('accounts', {
                 for (let i = 0; i < accounts.length; i++) {
                     const account = accounts[i];
 
-                    if (account.type === accountConstants.allAccountTypes.MultiSubAccounts && account.subAccounts) {
+                    if (account.type === AccountType.MultiSubAccounts.type && account.subAccounts) {
                         for (let j = 0; j < account.subAccounts.length; j++) {
                             const subAccount = account.subAccounts[j];
 
@@ -361,7 +361,7 @@ export const useAccountsStore = defineStore('accounts', {
                 for (let i = accounts.length - 1; i >= 0; i--) {
                     const account = accounts[i];
 
-                    if (account.type === accountConstants.allAccountTypes.MultiSubAccounts && account.subAccounts) {
+                    if (account.type === AccountType.MultiSubAccounts.type && account.subAccounts) {
                         for (let j = account.subAccounts.length - 1; j >= 0; j--) {
                             const subAccount = account.subAccounts[j];
 
@@ -416,7 +416,7 @@ export const useAccountsStore = defineStore('accounts', {
                 return null;
             }
 
-            if (mainAccount.category === accountConstants.creditCardCategoryType) {
+            if (mainAccount.category === AccountCategory.CreditCard.type) {
                 return mainAccount.creditCardStatementDate;
             }
 
@@ -525,7 +525,7 @@ export const useAccountsStore = defineStore('accounts', {
 
             const userStore = useUserStore();
             const exchangeRatesStore = useExchangeRatesStore();
-            const accountsBalance = getAllFilteredAccountsBalance(this.allCategorizedAccountsMap, account => account.category === accountCategory.id);
+            const accountsBalance = getAllFilteredAccountsBalance(this.allCategorizedAccountsMap, account => account.category === accountCategory.type);
             let totalBalance = 0;
             let hasUnCalculatedAmount = false;
 
@@ -563,7 +563,7 @@ export const useAccountsStore = defineStore('accounts', {
             }
         },
         getAccountBalance(showAccountBalance, account) {
-            if (account.type !== accountConstants.allAccountTypes.SingleAccount) {
+            if (account.type !== AccountType.SingleAccount.type) {
                 return null;
             }
 
@@ -580,7 +580,7 @@ export const useAccountsStore = defineStore('accounts', {
             }
         },
         getAccountSubAccountBalance(showAccountBalance, showHidden, account, subAccountId) {
-            if (account.type !== accountConstants.allAccountTypes.MultiSubAccounts) {
+            if (account.type !== AccountType.MultiSubAccounts.type) {
                 return null;
             }
 
@@ -681,16 +681,16 @@ export const useAccountsStore = defineStore('accounts', {
             };
         },
         hasAccount(accountCategory, visibleOnly) {
-            if (!this.allCategorizedAccountsMap[accountCategory.id] ||
-                !this.allCategorizedAccountsMap[accountCategory.id].accounts ||
-                !this.allCategorizedAccountsMap[accountCategory.id].accounts.length) {
+            if (!this.allCategorizedAccountsMap[accountCategory.type] ||
+                !this.allCategorizedAccountsMap[accountCategory.type].accounts ||
+                !this.allCategorizedAccountsMap[accountCategory.type].accounts.length) {
                 return false;
             }
 
             let shownCount = 0;
 
-            for (let i = 0; i < this.allCategorizedAccountsMap[accountCategory.id].accounts.length; i++) {
-                const account = this.allCategorizedAccountsMap[accountCategory.id].accounts[i];
+            for (let i = 0; i < this.allCategorizedAccountsMap[accountCategory.type].accounts.length; i++) {
+                const account = this.allCategorizedAccountsMap[accountCategory.type].accounts[i];
 
                 if (!visibleOnly || !account.hidden) {
                     shownCount++;
@@ -700,7 +700,7 @@ export const useAccountsStore = defineStore('accounts', {
             return shownCount > 0;
         },
         hasVisibleSubAccount(showHidden, account) {
-            if (!account || account.type !== accountConstants.allAccountTypes.MultiSubAccounts || !account.subAccounts) {
+            if (!account || account.type !== AccountType.MultiSubAccounts.type || !account.subAccounts) {
                 return false;
             }
 
@@ -792,12 +792,12 @@ export const useAccountsStore = defineStore('accounts', {
 
             const submitSubAccounts = [];
 
-            if (account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
+            if (account.type === AccountType.MultiSubAccounts.type) {
                 for (let i = 0; i < subAccounts.length; i++) {
                     const subAccount = subAccounts[i];
                     const submitAccount = {
                         category: account.category,
-                        type: accountConstants.allAccountTypes.SingleAccount,
+                        type: AccountType.SingleAccount.type,
                         name: subAccount.name,
                         icon: subAccount.icon,
                         color: subAccount.color,
@@ -823,13 +823,13 @@ export const useAccountsStore = defineStore('accounts', {
                 name: account.name,
                 icon: account.icon,
                 color: account.color,
-                currency: account.type === accountConstants.allAccountTypes.SingleAccount ? account.currency : currencyConstants.parentAccountCurrencyPlaceholder,
-                balance: account.type === accountConstants.allAccountTypes.SingleAccount ? account.balance : 0,
+                currency: account.type === AccountType.SingleAccount.type ? account.currency : PARENT_ACCOUNT_CURRENCY_PLACEHOLDER,
+                balance: account.type === AccountType.SingleAccount.type ? account.balance : 0,
                 comment: account.comment,
-                subAccounts: account.type === accountConstants.allAccountTypes.SingleAccount ? null : submitSubAccounts,
+                subAccounts: account.type === AccountType.SingleAccount.type ? null : submitSubAccounts,
             };
 
-            if (account.category === accountConstants.creditCardCategoryType) {
+            if (account.category === AccountCategory.CreditCard.type) {
                 submitAccount.creditCardStatementDate = account.creditCardStatementDate;
             }
 
@@ -841,7 +841,7 @@ export const useAccountsStore = defineStore('accounts', {
                 submitAccount.id = account.id;
                 submitAccount.hidden = !account.visible;
             } else {
-                if (account.type === accountConstants.allAccountTypes.SingleAccount) {
+                if (account.type === AccountType.SingleAccount.type) {
                     submitAccount.balanceTime = account.balanceTime;
                 }
             }

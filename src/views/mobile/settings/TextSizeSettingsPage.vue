@@ -116,9 +116,9 @@ import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
-import fontConstants from '@/consts/font.js';
+import { FontSize } from '@/core/font.ts';
 import { getCurrentUnixTime, getDay, getDayOfWeekName } from '@/lib/datetime.js';
-import { setAppFontSize, getFontSizePreviewClassName } from '@/lib/ui.mobile.js';
+import { setAppFontSize, getFontSizePreviewClassName } from '@/lib/ui/mobile.js';
 
 export default {
     props: [
@@ -135,10 +135,10 @@ export default {
     computed: {
         ...mapStores(useSettingsStore, useUserStore),
         minFontSizeType() {
-            return 0;
+            return FontSize.MinimumFontSize.type;
         },
         maxFontSizeType() {
-            return fontConstants.allFontSizeArray.length - 1;
+            return FontSize.MaximumFontSize.type;
         },
         fontSizePreviewClassName() {
             return getFontSizePreviewClassName(this.fontSize);

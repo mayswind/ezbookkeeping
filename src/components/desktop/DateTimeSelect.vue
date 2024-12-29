@@ -43,7 +43,8 @@ import { useTheme } from 'vuetify';
 import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.js';
 
-import { arrangeArrayWithNewStartIndex } from '@/lib/common.js';
+import { ThemeType } from '@/core/theme.ts';
+import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
 import {
     getCurrentYear,
     getTimezoneOffsetMinutes,
@@ -90,7 +91,7 @@ export default {
             }
         },
         isDarkMode() {
-            return this.globalTheme.global.name.value === 'dark';
+            return this.globalTheme.global.name.value === ThemeType.Dark;
         },
         firstDayOfWeek() {
             return this.userStore.currentUserFirstDayOfWeek;

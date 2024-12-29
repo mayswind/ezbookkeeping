@@ -1,5 +1,5 @@
-import categoryConstants from '@/consts/category.js';
-import transactionConstants from '@/consts/transaction.js';
+import { CategoryType } from '@/core/category.ts';
+import { TransactionType } from '@/core/transaction.ts';
 
 export function setCategoryModelByAnotherCategory(category, category2) {
     category.id = category2.id;
@@ -13,24 +13,24 @@ export function setCategoryModelByAnotherCategory(category, category2) {
 }
 
 export function transactionTypeToCategoryType(transactionType) {
-    if (transactionType === transactionConstants.allTransactionTypes.Income) {
-        return categoryConstants.allCategoryTypes.Income;
-    } else if (transactionType === transactionConstants.allTransactionTypes.Expense) {
-        return categoryConstants.allCategoryTypes.Expense;
-    } else if (transactionType === transactionConstants.allTransactionTypes.Transfer) {
-        return categoryConstants.allCategoryTypes.Transfer;
+    if (transactionType === TransactionType.Income) {
+        return CategoryType.Income;
+    } else if (transactionType === TransactionType.Expense) {
+        return CategoryType.Expense;
+    } else if (transactionType === TransactionType.Transfer) {
+        return CategoryType.Transfer;
     } else {
         return null;
     }
 }
 
 export function categoryTypeToTransactionType(categoryType) {
-    if (categoryType === categoryConstants.allCategoryTypes.Income) {
-        return transactionConstants.allTransactionTypes.Income;
-    } else if (categoryType === categoryConstants.allCategoryTypes.Expense) {
-        return transactionConstants.allTransactionTypes.Expense;
-    } else if (categoryType === categoryConstants.allCategoryTypes.Transfer) {
-        return transactionConstants.allTransactionTypes.Transfer;
+    if (categoryType === CategoryType.Income) {
+        return TransactionType.Income;
+    } else if (categoryType === CategoryType.Expense) {
+        return TransactionType.Expense;
+    } else if (categoryType === CategoryType.Transfer) {
+        return TransactionType.Transfer;
     } else {
         return null;
     }
@@ -73,16 +73,16 @@ export function getTransactionSecondaryCategoryName(categoryId, allCategories) {
 export function allTransactionCategoriesWithVisibleCount(allTransactionCategories, allowCategoryTypes) {
     const ret = {};
     const hasAllowCategoryTypes = allowCategoryTypes
-        && (allowCategoryTypes[categoryConstants.allCategoryTypes.Income.toString()]
-            || allowCategoryTypes[categoryConstants.allCategoryTypes.Expense.toString()]
-            || allowCategoryTypes[categoryConstants.allCategoryTypes.Transfer.toString()]);
+        && (allowCategoryTypes[CategoryType.Income.toString()]
+            || allowCategoryTypes[CategoryType.Expense.toString()]
+            || allowCategoryTypes[CategoryType.Transfer.toString()]);
 
-    for (let key in categoryConstants.allCategoryTypes) {
-        if (!Object.prototype.hasOwnProperty.call(categoryConstants.allCategoryTypes, key)) {
+    for (let key in CategoryType) {
+        if (!Object.prototype.hasOwnProperty.call(CategoryType, key)) {
             continue;
         }
 
-        const categoryType = categoryConstants.allCategoryTypes[key];
+        const categoryType = CategoryType[key];
 
         if (!allTransactionCategories[categoryType]) {
             continue;

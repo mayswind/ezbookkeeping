@@ -179,10 +179,10 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useTransactionTagsStore } from '@/stores/transactionTag.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import categoryConstants from '@/consts/category.js';
+import { CategoryType } from '@/core/category.ts';
 import {
     getNameByKeyValue
-} from '@/lib/common.js';
+} from '@/lib/common.ts';
 import {
     getTransactionPrimaryCategoryName,
     getTransactionSecondaryCategoryName,
@@ -219,7 +219,7 @@ export default {
             return this.userStore.currentUserDefaultCurrency;
         },
         allCategoryTypes() {
-            return categoryConstants.allCategoryTypes;
+            return CategoryType;
         },
         allAccounts() {
             return this.accountsStore.allPlainAccounts;

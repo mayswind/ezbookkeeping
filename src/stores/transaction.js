@@ -8,9 +8,10 @@ import { useOverviewStore } from './overview.js';
 import { useStatisticsStore } from './statistics.js';
 import { useExchangeRatesStore } from './exchangeRates.js';
 
+import { CategoryType } from '@/core/category.ts';
+import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts';
+import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import datetimeConstants from '@/consts/datetime.js';
-import categoryConstants from '@/consts/category.js';
-import transactionConstants from '@/consts/transaction.js';
 import userState from '@/lib/userstate.js';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
@@ -18,7 +19,7 @@ import {
     isDefined,
     isNumber,
     isString
-} from '@/lib/common.js';
+} from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
     getTimezoneOffsetMinutes,
@@ -33,7 +34,7 @@ import {
     getDayOfWeekName
 } from '@/lib/datetime.js';
 import { getAmountWithDecimalNumberCount } from '@/lib/numeral.js';
-import { getCurrencyFraction } from '@/lib/currency.js';
+import { getCurrencyFraction } from '@/lib/currency.ts';
 import { getFirstAvailableCategoryId } from '@/lib/category.js';
 
 const emptyTransactionResult = {
@@ -233,9 +234,9 @@ function calculateMonthTotalAmount(exchangeRatesStore, transactionMonthList, def
             const balance = exchangeRatesStore.getExchangedAmount(amount, account.currency, defaultCurrency);
 
             if (!isNumber(balance)) {
-                if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
+                if (transaction.type === TransactionType.Expense) {
                     hasUnCalculatedTotalExpense = true;
-                } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
+                } else if (transaction.type === TransactionType.Income) {
                     hasUnCalculatedTotalIncome = true;
                 }
 
@@ -245,11 +246,11 @@ function calculateMonthTotalAmount(exchangeRatesStore, transactionMonthList, def
             amount = balance;
         }
 
-        if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
+        if (transaction.type === TransactionType.Expense) {
             totalExpense += amount;
-        } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
+        } else if (transaction.type === TransactionType.Income) {
             totalIncome += amount;
-        } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer && totalAccountIdsCount > 0) {
+        } else if (transaction.type === TransactionType.Transfer && totalAccountIdsCount > 0) {
             if (allAccountIdsMap[transaction.sourceAccountId] && allAccountIdsMap[transaction.destinationAccountId]) {
                 // Do Nothing
             } else if (transaction.sourceAccount && transaction.destinationAccount && allAccountIdsMap[transaction.sourceAccount.parentId] && allAccountIdsMap[transaction.destinationAccount.parentId]) {
@@ -317,7 +318,7 @@ function buildBasicSubmitTransaction(transaction, dummyTime) {
         utcOffset: transaction.utcOffset
     };
 
-    if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
+    if (transaction.type === TransactionType.Transfer) {
         submitTransaction.destinationAccountId = transaction.destinationAccountId;
         submitTransaction.destinationAmount = transaction.destinationAmount;
     }
@@ -332,11 +333,11 @@ function buildTransactionDraft(transaction) {
 
     let categoryId = '';
 
-    if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
+    if (transaction.type === TransactionType.Expense) {
         categoryId = transaction.expenseCategory;
-    } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
+    } else if (transaction.type === TransactionType.Income) {
         categoryId = transaction.incomeCategory;
-    } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
+    } else if (transaction.type === TransactionType.Transfer) {
         categoryId = transaction.transferCategory;
     } else {
         return null;
@@ -355,7 +356,7 @@ function buildTransactionDraft(transaction) {
         comment: transaction.comment,
     };
 
-    if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
+    if (transaction.type === TransactionType.Transfer) {
         transactionDraft.destinationAccountId = transaction.destinationAccountId;
         transactionDraft.destinationAmount = transaction.destinationAmount;
     }
@@ -374,7 +375,7 @@ export const useTransactionsStore = defineStore('transactions', {
             categoryIds: '',
             accountIds: '',
             tagIds: '',
-            tagFilterType: transactionConstants.defaultTransactionTagFilterType.type,
+            tagFilterType: TransactionTagFilterType.Default.type,
             amountFilter: '',
             keyword: ''
         },
@@ -518,7 +519,7 @@ export const useTransactionsStore = defineStore('transactions', {
                 return true;
             }
 
-            if (transaction.type === transactionConstants.allTransactionTypes.Transfer && transaction.destinationAmount !== 0) {
+            if (transaction.type === TransactionType.Transfer && transaction.destinationAmount !== 0) {
                 return true;
             }
 
@@ -526,27 +527,27 @@ export const useTransactionsStore = defineStore('transactions', {
                 return true;
             }
 
-            if (transaction.type === transactionConstants.allTransactionTypes.Transfer && transaction.destinationAccountId && transaction.destinationAccountId !== '0' && transaction.destinationAccountId !== userStore.currentUserDefaultAccountId) {
+            if (transaction.type === TransactionType.Transfer && transaction.destinationAccountId && transaction.destinationAccountId !== '0' && transaction.destinationAccountId !== userStore.currentUserDefaultAccountId) {
                 return true;
             }
 
             const allCategories = transactionCategoriesStore.allTransactionCategories;
 
             if (allCategories) {
-                if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
-                    const defaultCategoryId = getFirstAvailableCategoryId(allCategories[categoryConstants.allCategoryTypes.Expense]);
+                if (transaction.type === TransactionType.Expense) {
+                    const defaultCategoryId = getFirstAvailableCategoryId(allCategories[CategoryType.Expense]);
 
                     if (transaction.expenseCategory && transaction.expenseCategory !== '0' && transaction.expenseCategory !== defaultCategoryId) {
                         return true;
                     }
-                } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
-                    const defaultCategoryId = getFirstAvailableCategoryId(allCategories[categoryConstants.allCategoryTypes.Income]);
+                } else if (transaction.type === TransactionType.Income) {
+                    const defaultCategoryId = getFirstAvailableCategoryId(allCategories[CategoryType.Income]);
 
                     if (transaction.incomeCategory && transaction.incomeCategory !== '0' && transaction.incomeCategory !== defaultCategoryId) {
                         return true;
                     }
-                } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
-                    const defaultCategoryId = getFirstAvailableCategoryId(allCategories[categoryConstants.allCategoryTypes.Transfer]);
+                } else if (transaction.type === TransactionType.Transfer) {
+                    const defaultCategoryId = getFirstAvailableCategoryId(allCategories[CategoryType.Transfer]);
 
                     if (transaction.transferCategory && transaction.transferCategory !== '0' && transaction.transferCategory !== defaultCategoryId) {
                         return true;
@@ -600,12 +601,12 @@ export const useTransactionsStore = defineStore('transactions', {
             const now = getCurrentUnixTime();
             const currentTimezone = settingsStore.appSettings.timeZone;
 
-            let defaultType = transactionConstants.allTransactionTypes.Expense;
+            let defaultType = TransactionType.Expense;
 
-            if (type === transactionConstants.allTransactionTypes.Income.toString()) {
-                defaultType = transactionConstants.allTransactionTypes.Income;
-            } else if (type === transactionConstants.allTransactionTypes.Transfer.toString()) {
-                defaultType = transactionConstants.allTransactionTypes.Transfer;
+            if (type === TransactionType.Income.toString()) {
+                defaultType = TransactionType.Income;
+            } else if (type === TransactionType.Transfer.toString()) {
+                defaultType = TransactionType.Transfer;
             }
 
             return {
@@ -631,9 +632,9 @@ export const useTransactionsStore = defineStore('transactions', {
             const accountsStore = useAccountsStore();
             const exchangeRatesStore = useExchangeRatesStore();
 
-            if (transaction.type === transactionConstants.allTransactionTypes.Expense || transaction.type === transactionConstants.allTransactionTypes.Income) {
+            if (transaction.type === TransactionType.Expense || transaction.type === TransactionType.Income) {
                 transaction.destinationAmount = newValue;
-            } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
+            } else if (transaction.type === TransactionType.Transfer) {
                 const sourceAccount = accountsStore.allAccountsMap[transaction.sourceAccountId];
                 const destinationAccount = accountsStore.allAccountsMap[transaction.destinationAccountId];
 
@@ -656,7 +657,7 @@ export const useTransactionsStore = defineStore('transactions', {
                 }
 
                 if ((!sourceAccount || !destinationAccount || transaction.destinationAmount === oldValue || transaction.destinationAmount === 0) &&
-                    (transactionConstants.minAmountNumber <= newValue && newValue <= transactionConstants.maxAmountNumber)) {
+                    (TRANSACTION_MIN_AMOUNT <= newValue && newValue <= TRANSACTION_MAX_AMOUNT)) {
                     transaction.destinationAmount = newValue;
                 }
             }
@@ -672,7 +673,7 @@ export const useTransactionsStore = defineStore('transactions', {
             this.transactionsFilter.categoryIds = '';
             this.transactionsFilter.accountIds = '';
             this.transactionsFilter.tagIds = '';
-            this.transactionsFilter.tagFilterType = transactionConstants.defaultTransactionTagFilterType.type;
+            this.transactionsFilter.tagFilterType = TransactionTagFilterType.Default.type;
             this.transactionsFilter.amountFilter = '';
             this.transactionsFilter.keyword = '';
             this.transactions = [];
@@ -730,7 +731,7 @@ export const useTransactionsStore = defineStore('transactions', {
             if (filter && isNumber(filter.tagFilterType)) {
                 this.transactionsFilter.tagFilterType = filter.tagFilterType;
             } else {
-                this.transactionsFilter.tagFilterType = transactionConstants.defaultTransactionTagFilterType.type;
+                this.transactionsFilter.tagFilterType = TransactionTagFilterType.Default.type;
             }
 
             if (filter && isString(filter.amountFilter)) {
@@ -1043,11 +1044,11 @@ export const useTransactionsStore = defineStore('transactions', {
 
             const submitTransaction = buildBasicSubmitTransaction(transaction, true);
 
-            if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
+            if (transaction.type === TransactionType.Expense) {
                 submitTransaction.categoryId = transaction.expenseCategory;
-            } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
+            } else if (transaction.type === TransactionType.Income) {
                 submitTransaction.categoryId = transaction.incomeCategory;
-            } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
+            } else if (transaction.type === TransactionType.Transfer) {
                 submitTransaction.categoryId = transaction.transferCategory;
             } else {
                 return Promise.reject('An error occurred');

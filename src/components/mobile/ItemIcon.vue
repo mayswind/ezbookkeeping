@@ -5,9 +5,9 @@
 </template>
 
 <script>
-import iconConstants from '@/consts/icon.js';
-import colorConstants from '@/consts/color.js';
-import { isNumber } from '@/lib/common.js';
+import { ALL_ACCOUNT_ICONS, DEFAULT_ACCOUNT_ICON, ALL_CATEGORY_ICONS, DEFAULT_CATEGORY_ICON } from '@/consts/icon.ts';
+import { DEFAULT_ICON_COLOR, DEFAULT_ACCOUNT_COLOR, DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
+import { isNumber } from '@/lib/common.ts';
 
 export default {
     props: [
@@ -58,25 +58,25 @@ export default {
                 iconId = iconId.toString();
             }
 
-            if (!iconConstants.allAccountIcons[iconId]) {
-                return iconConstants.defaultAccountIcon.icon;
+            if (!ALL_ACCOUNT_ICONS[iconId]) {
+                return DEFAULT_ACCOUNT_ICON.icon;
             }
 
-            return iconConstants.allAccountIcons[iconId].icon;
+            return ALL_ACCOUNT_ICONS[iconId].icon;
         },
         getCategoryIcon(iconId) {
             if (isNumber(iconId)) {
                 iconId = iconId.toString();
             }
 
-            if (!iconConstants.allCategoryIcons[iconId]) {
-                return iconConstants.defaultCategoryIcon.icon;
+            if (!ALL_CATEGORY_ICONS[iconId]) {
+                return DEFAULT_CATEGORY_ICON.icon;
             }
 
-            return iconConstants.allCategoryIcons[iconId].icon;
+            return ALL_CATEGORY_ICONS[iconId].icon;
         },
         getAccountIconStyle(color, defaultColor, additionalColorAttr) {
-            if (color && color !== colorConstants.defaultAccountColor) {
+            if (color && color !== DEFAULT_ACCOUNT_COLOR) {
                 color = '#' + color;
             } else {
                 color = defaultColor;
@@ -93,7 +93,7 @@ export default {
             return ret;
         },
         getCategoryIconStyle(color, defaultColor, additionalColorAttr) {
-            if (color && color !== colorConstants.defaultCategoryColor) {
+            if (color && color !== DEFAULT_CATEGORY_COLOR) {
                 color = '#' + color;
             } else {
                 color = defaultColor;
@@ -110,7 +110,7 @@ export default {
             return ret;
         },
         getDefaultIconStyle(color, defaultColor, additionalColorAttr) {
-            if (color && color !== colorConstants.defaultColor) {
+            if (color && color !== DEFAULT_ICON_COLOR) {
                 color = '#' + color;
             } else {
                 color = defaultColor;

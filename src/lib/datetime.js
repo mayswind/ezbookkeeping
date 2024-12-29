@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import dateTimeConstants from '@/consts/datetime.js';
-import { isObject, isString, isNumber } from './common.js';
+import { isObject, isString, isNumber } from './common.ts';
 
 export function isYearMonthValid(year, month) {
     if (!isNumber(year) || !isNumber(month)) {

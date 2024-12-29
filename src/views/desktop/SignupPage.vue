@@ -244,10 +244,11 @@ import { useUserStore } from '@/stores/user.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import assetConstants from '@/consts/asset.js';
-import categoryConstants from '@/consts/category.js';
-import { categorizedArrayToPlainArray } from '@/lib/common.js';
-import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
+import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
+import { CategoryType } from '@/core/category.ts';
+import { ThemeType } from '@/core/theme.ts';
+import { categorizedArrayToPlainArray } from '@/lib/common.ts';
+import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 import {
     mdiArrowLeft,
@@ -277,7 +278,7 @@ export default {
     computed: {
         ...mapStores(useRootStore, useSettingsStore, useTransactionCategoriesStore, useExchangeRatesStore),
         ezBookkeepingLogoPath() {
-            return assetConstants.ezBookkeepingLogoPath;
+            return APPLICATION_LOGO_PATH;
         },
         allLanguages() {
             return this.$locale.getAllLanguageInfoArray(false);
@@ -314,7 +315,7 @@ export default {
             }
         },
         isDarkMode() {
-            return this.globalTheme.global.name.value === 'dark';
+            return this.globalTheme.global.name.value === ThemeType.Dark;
         },
         currentLanguageName() {
             const languageInfo = this.$locale.getLanguageInfo(this.currentLocale);
@@ -495,11 +496,11 @@ export default {
         },
         getCategoryTypeName(categoryType) {
             switch (categoryType) {
-                case categoryConstants.allCategoryTypes.Income.toString():
+                case CategoryType.Income.toString():
                     return this.$t('Income Categories');
-                case categoryConstants.allCategoryTypes.Expense.toString():
+                case CategoryType.Expense.toString():
                     return this.$t('Expense Categories');
-                case categoryConstants.allCategoryTypes.Transfer.toString():
+                case CategoryType.Transfer.toString():
                     return this.$t('Transfer Categories');
                 default:
                     return this.$t('Transaction Categories');

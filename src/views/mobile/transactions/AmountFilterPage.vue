@@ -58,8 +58,8 @@ import { useUserStore } from '@/stores/user.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 
 import numeralConstants from '@/consts/numeral.js';
-import transactionConstants from '@/consts/transaction.js';
-import { isString } from '@/lib/common.js';
+import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
+import { isString } from '@/lib/common.ts';
 import logger from '@/lib/logger.js';
 
 export default {
@@ -82,10 +82,10 @@ export default {
             return numeralConstants.allAmountFilterTypeArray;
         },
         allowedMinAmount() {
-            return transactionConstants.minAmountNumber;
+            return TRANSACTION_MIN_AMOUNT;
         },
         allowedMaxAmount() {
-            return transactionConstants.maxAmountNumber;
+            return TRANSACTION_MAX_AMOUNT;
         },
         amountCount() {
             return this.getAmountFilterParameterCount(this.type);

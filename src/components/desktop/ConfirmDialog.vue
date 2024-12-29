@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { isString } from '@/lib/common.js';
+import { isString } from '@/lib/common.ts';
 
 export default {
     props: [

@@ -162,9 +162,9 @@ import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
-import { isEquals } from '@/lib/common.js';
-import { isDataExportingEnabled } from '@/lib/server_settings.js';
-import { startDownloadFile } from '@/lib/ui.js';
+import { isEquals } from '@/lib/common.ts';
+import { isDataExportingEnabled } from '@/lib/server_settings.ts';
+import { startDownloadFile } from '@/lib/ui/common.ts';
 
 import {
     mdiRefresh,

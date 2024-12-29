@@ -6,10 +6,10 @@ import {
     arrayBufferToString,
     base64encode,
     base64decode
-} from './common.js';
+} from './common.ts';
 import {
     generateRandomString
-} from './misc.js';
+} from './misc.ts';
 
 const publicKeyCredentialCreationOptionsBaseTemplate = {
     attestation: "none",

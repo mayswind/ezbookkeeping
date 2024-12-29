@@ -11,7 +11,7 @@
 <script>
 import {
     copyObjectTo
-} from '@/lib/common.js';
+} from '@/lib/common.ts';
 import {
     createMapHolder,
     initMapInstance,

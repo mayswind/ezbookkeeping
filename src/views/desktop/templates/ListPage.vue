@@ -4,7 +4,7 @@
             <v-card>
                 <template #title>
                     <div class="title-and-toolbar d-flex align-center">
-                        <span>{{ templateType === allTemplateTypes.Schedule ? $t('Scheduled Transactions') : $t('Transaction Templates') }}</span>
+                        <span>{{ templateType === allTemplateTypes.Schedule.type ? $t('Scheduled Transactions') : $t('Transaction Templates') }}</span>
                         <v-btn class="ml-3" color="default" variant="outlined"
                                :disabled="loading || updating" @click="add">{{ $t('Add') }}</v-btn>
                         <v-btn class="ml-3" color="primary" variant="tonal"
@@ -60,8 +60,8 @@
 
                     <tbody v-if="!loading && noAvailableTemplate">
                     <tr>
-                        <td v-if="templateType === allTemplateTypes.Normal">{{ $t('No available template. Once you add templates, you can quickly add a new transaction using the dropdown menu of the Add button on the transaction list page') }}</td>
-                        <td v-else-if="templateType === allTemplateTypes.Schedule">{{ $t('No available scheduled transactions') }}</td>
+                        <td v-if="templateType === allTemplateTypes.Normal.type">{{ $t('No available template. Once you add templates, you can quickly add a new transaction using the dropdown menu of the Add button on the transaction list page') }}</td>
+                        <td v-else-if="templateType === allTemplateTypes.Schedule.type">{{ $t('No available scheduled transactions') }}</td>
                         <td v-else>{{ $t('No available template') }}</td>
                     </tr>
                     </tbody>
@@ -81,9 +81,9 @@
                                             <v-badge class="right-bottom-icon" color="secondary"
                                                      location="bottom right" offset-x="8" :icon="icons.hide"
                                                      v-if="element.hidden">
-                                                <v-icon size="20" start :icon="templateType === allTemplateTypes.Schedule ? icons.clock : icons.text"/>
+                                                <v-icon size="20" start :icon="templateType === allTemplateTypes.Schedule.type ? icons.clock : icons.text"/>
                                             </v-badge>
-                                            <v-icon size="20" start :icon="templateType === allTemplateTypes.Schedule ? icons.clock : icons.text" v-else-if="!element.hidden"/>
+                                            <v-icon size="20" start :icon="templateType === allTemplateTypes.Schedule.type ? icons.clock : icons.text" v-else-if="!element.hidden"/>
                                             <span class="transaction-template-name">{{ element.name }}</span>
                                         </div>
 
@@ -151,7 +151,7 @@ import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue
 import { mapStores } from 'pinia';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 
-import templateConstants from '@/consts/template.js';
+import { TemplateType } from '@/core/template.ts';
 import {
     isNoAvailableTemplate,
     getAvailableTemplateCount
@@ -181,7 +181,7 @@ export default {
     ],
     data() {
         return {
-            templateType: templateConstants.allTemplateTypes.Normal,
+            templateType: TemplateType.Normal.type,
             loading: true,
             updating: false,
             templateHiding: {},
@@ -216,7 +216,7 @@ export default {
             return getAvailableTemplateCount(this.templates, this.showHidden);
         },
         allTemplateTypes() {
-            return templateConstants.allTemplateTypes;
+            return TemplateType.all();
         }
     },
     created() {

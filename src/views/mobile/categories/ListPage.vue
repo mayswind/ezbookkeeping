@@ -90,13 +90,13 @@
 import { mapStores } from 'pinia';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 
-import categoryConstants from '@/consts/category.js';
+import { CategoryType } from '@/core/category.ts';
 import {
     isNoAvailableCategory,
     getFirstShowingId,
     getLastShowingId
 } from '@/lib/category.js';
-import { onSwipeoutDeleted } from '@/lib/ui.mobile.js';
+import { onSwipeoutDeleted } from '@/lib/ui/mobile.js';
 
 export default {
     props: [
@@ -142,13 +142,13 @@ export default {
             let title = '';
 
             switch (this.categoryType) {
-                case categoryConstants.allCategoryTypes.Income:
+                case CategoryType.Income:
                     title = 'Income';
                     break;
-                case categoryConstants.allCategoryTypes.Expense:
+                case CategoryType.Expense:
                     title = 'Expense';
                     break;
-                case categoryConstants.allCategoryTypes.Transfer:
+                case CategoryType.Transfer:
                     title = 'Transfer';
                     break;
                 default:
@@ -186,9 +186,9 @@ export default {
 
         self.categoryType = parseInt(query.type);
 
-        if (self.categoryType !== categoryConstants.allCategoryTypes.Income &&
-            self.categoryType !== categoryConstants.allCategoryTypes.Expense &&
-            self.categoryType !== categoryConstants.allCategoryTypes.Transfer) {
+        if (self.categoryType !== CategoryType.Income &&
+            self.categoryType !== CategoryType.Expense &&
+            self.categoryType !== CategoryType.Transfer) {
             self.$toast('Parameter Invalid');
             self.loadingError = 'Parameter Invalid';
             return;

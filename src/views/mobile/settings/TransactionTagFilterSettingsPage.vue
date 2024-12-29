@@ -116,13 +116,13 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 
-import transactionConstants from '@/consts/transaction.js';
+import { TransactionTagFilterType } from '@/core/transaction.ts';
 
 import {
     selectAll,
     selectNone,
     selectInvert
-} from '@/lib/common.js';
+} from '@/lib/common.ts';
 
 export default {
     props: [
@@ -135,7 +135,7 @@ export default {
             loadingError: null,
             type: null,
             filterTagIds: {},
-            tagFilterType: transactionConstants.defaultTransactionTagFilterType.type,
+            tagFilterType: TransactionTagFilterType.Default.type,
             showHidden: false,
             collapseStates: {
                 'default': {
@@ -183,7 +183,7 @@ export default {
 
             const allTransactionTagIds = {};
 
-            for (let transactionTagId in self.transactionTagsStore.allTransactionTagsMap) {
+            for (const transactionTagId in self.transactionTagsStore.allTransactionTagsMap) {
                 if (!Object.prototype.hasOwnProperty.call(self.transactionTagsStore.allTransactionTagsMap, transactionTagId)) {
                     continue;
                 }
@@ -193,7 +193,7 @@ export default {
             }
 
             if (self.type === 'statisticsCurrent') {
-                let transactionTagIds = self.statisticsStore.transactionStatisticsFilter.tagIds ? self.statisticsStore.transactionStatisticsFilter.tagIds.split(',') : [];
+                const transactionTagIds = self.statisticsStore.transactionStatisticsFilter.tagIds ? self.statisticsStore.transactionStatisticsFilter.tagIds.split(',') : [];
 
                 for (let i = 0; i < transactionTagIds.length; i++) {
                     const transactionTagId = transactionTagIds[i];
@@ -206,7 +206,7 @@ export default {
                 self.filterTagIds = allTransactionTagIds;
                 self.tagFilterType = self.statisticsStore.transactionStatisticsFilter.tagFilterType;
             } else if (self.type === 'transactionListCurrent') {
-                for (let transactionTagId in self.transactionsStore.allFilterTagIds) {
+                for (const transactionTagId in self.transactionsStore.allFilterTagIds) {
                     if (!Object.prototype.hasOwnProperty.call(self.transactionsStore.allFilterTagIds, transactionTagId)) {
                         continue;
                     }
@@ -243,7 +243,7 @@ export default {
             let finalTagIds = '';
             let changed = true;
 
-            for (let transactionTagId in self.filterTagIds) {
+            for (const transactionTagId in self.filterTagIds) {
                 if (!Object.prototype.hasOwnProperty.call(self.filterTagIds, transactionTagId)) {
                     continue;
                 }

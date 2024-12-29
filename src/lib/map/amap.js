@@ -1,10 +1,10 @@
-import { asyncLoadAssets } from '@/lib/misc.js';
+import { asyncLoadAssets } from '@/lib/misc.ts';
 import services from '@/lib/services.js';
 import {
     getAmapSecurityVerificationMethod,
     getAmapApiExternalProxyUrl,
     getAmapApplicationSecret
-} from '@/lib/server_settings.js';
+} from '@/lib/server_settings.ts';
 import logger from '@/lib/logger.js';
 
 const amapHolder = {

@@ -53,7 +53,7 @@ import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.js';
 
 import datetimeConstants from '@/consts/datetime.js';
-import { arrangeArrayWithNewStartIndex } from '@/lib/common.js';
+import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
     getCurrentYear,
@@ -65,7 +65,7 @@ import {
     getTimeValues,
     getCombinedDateAndTimeValues
 } from '@/lib/datetime.js';
-import { createInlinePicker } from '@/lib/ui.mobile.js';
+import { createInlinePicker } from '@/lib/ui/mobile.js';
 
 export default {
     props: [

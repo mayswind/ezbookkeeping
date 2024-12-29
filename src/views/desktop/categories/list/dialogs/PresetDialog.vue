@@ -70,8 +70,8 @@
 import { mapStores } from 'pinia';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 
-import categoryConstants from '@/consts/category.js';
-import { categorizedArrayToPlainArray } from '@/lib/common.js';
+import { CategoryType } from '@/core/category.ts';
+import { categorizedArrayToPlainArray } from '@/lib/common.ts';
 
 import {
     mdiDotsVertical
@@ -152,11 +152,11 @@ export default {
         },
         getCategoryTypeName(categoryType) {
             switch (categoryType) {
-                case categoryConstants.allCategoryTypes.Income.toString():
+                case CategoryType.Income.toString():
                     return this.$t('Income Categories');
-                case categoryConstants.allCategoryTypes.Expense.toString():
+                case CategoryType.Expense.toString():
                     return this.$t('Expense Categories');
-                case categoryConstants.allCategoryTypes.Transfer.toString():
+                case CategoryType.Transfer.toString():
                     return this.$t('Transfer Categories');
                 default:
                     return this.$t('Transaction Categories');

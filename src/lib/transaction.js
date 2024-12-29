@@ -1,8 +1,8 @@
-import categoryConstants from '@/consts/category.js';
-import transactionConstants from '@/consts/transaction.js';
+import { CategoryType } from '@/core/category.ts';
+import { TransactionType } from '@/core/transaction.ts';
 import {
     isNumber
-} from './common.js';
+} from './common.ts';
 import {
     getBrowserTimezoneOffsetMinutes,
     getDummyUnixTimeForLocalUsage
@@ -32,48 +32,48 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
         }
     }
 
-    if (allCategories[categoryConstants.allCategoryTypes.Expense] &&
-        allCategories[categoryConstants.allCategoryTypes.Expense].length) {
+    if (allCategories[CategoryType.Expense] &&
+        allCategories[CategoryType.Expense].length) {
         if (options.categoryId && options.categoryId !== '0') {
-            if (isSubCategoryIdAvailable(allCategories[categoryConstants.allCategoryTypes.Expense], options.categoryId)) {
+            if (isSubCategoryIdAvailable(allCategories[CategoryType.Expense], options.categoryId)) {
                 transaction.expenseCategory = options.categoryId;
             } else {
-                transaction.expenseCategory = getFirstAvailableSubCategoryId(allCategories[categoryConstants.allCategoryTypes.Expense], options.categoryId);
+                transaction.expenseCategory = getFirstAvailableSubCategoryId(allCategories[CategoryType.Expense], options.categoryId);
             }
         }
 
         if (!transaction.expenseCategory) {
-            transaction.expenseCategory = getFirstAvailableCategoryId(allCategories[categoryConstants.allCategoryTypes.Expense]);
+            transaction.expenseCategory = getFirstAvailableCategoryId(allCategories[CategoryType.Expense]);
         }
     }
 
-    if (allCategories[categoryConstants.allCategoryTypes.Income] &&
-        allCategories[categoryConstants.allCategoryTypes.Income].length) {
+    if (allCategories[CategoryType.Income] &&
+        allCategories[CategoryType.Income].length) {
         if (options.categoryId && options.categoryId !== '0') {
-            if (isSubCategoryIdAvailable(allCategories[categoryConstants.allCategoryTypes.Income], options.categoryId)) {
+            if (isSubCategoryIdAvailable(allCategories[CategoryType.Income], options.categoryId)) {
                 transaction.incomeCategory = options.categoryId;
             } else {
-                transaction.incomeCategory = getFirstAvailableSubCategoryId(allCategories[categoryConstants.allCategoryTypes.Income], options.categoryId);
+                transaction.incomeCategory = getFirstAvailableSubCategoryId(allCategories[CategoryType.Income], options.categoryId);
             }
         }
 
         if (!transaction.incomeCategory) {
-            transaction.incomeCategory = getFirstAvailableCategoryId(allCategories[categoryConstants.allCategoryTypes.Income]);
+            transaction.incomeCategory = getFirstAvailableCategoryId(allCategories[CategoryType.Income]);
         }
     }
 
-    if (allCategories[categoryConstants.allCategoryTypes.Transfer] &&
-        allCategories[categoryConstants.allCategoryTypes.Transfer].length) {
+    if (allCategories[CategoryType.Transfer] &&
+        allCategories[CategoryType.Transfer].length) {
         if (options.categoryId && options.categoryId !== '0') {
-            if (isSubCategoryIdAvailable(allCategories[categoryConstants.allCategoryTypes.Transfer], options.categoryId)) {
+            if (isSubCategoryIdAvailable(allCategories[CategoryType.Transfer], options.categoryId)) {
                 transaction.transferCategory = options.categoryId;
             } else {
-                transaction.transferCategory = getFirstAvailableSubCategoryId(allCategories[categoryConstants.allCategoryTypes.Transfer], options.categoryId);
+                transaction.transferCategory = getFirstAvailableSubCategoryId(allCategories[CategoryType.Transfer], options.categoryId);
             }
         }
 
         if (!transaction.transferCategory) {
-            transaction.transferCategory = getFirstAvailableCategoryId(allCategories[categoryConstants.allCategoryTypes.Transfer]);
+            transaction.transferCategory = getFirstAvailableCategoryId(allCategories[CategoryType.Transfer]);
         }
     }
 
@@ -128,11 +128,11 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
 
         transaction.type = transaction2.type;
 
-        if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
+        if (transaction.type === TransactionType.Expense) {
             transaction.expenseCategory = transaction2.categoryId || '';
-        } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
+        } else if (transaction.type === TransactionType.Income) {
             transaction.incomeCategory = transaction2.categoryId || '';
-        } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
+        } else if (transaction.type === TransactionType.Transfer) {
             transaction.transferCategory = transaction2.categoryId || '';
         }
 

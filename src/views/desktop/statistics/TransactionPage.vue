@@ -325,12 +325,13 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 
 import datetimeConstants from '@/consts/datetime.js';
 import statisticsConstants from '@/consts/statistics.js';
+import { ThemeType } from '@/core/theme.ts';
 import {
     isDefined,
     limitText,
     getNameByKeyValue,
     arrayItemToObjectField
-} from '@/lib/common.js'
+} from '@/lib/common.ts'
 import { formatPercent } from '@/lib/numeral.js';
 import {
     getYearAndMonthFromUnixTime,
@@ -414,7 +415,7 @@ export default {
     computed: {
         ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useStatisticsStore),
         isDarkMode() {
-            return this.globalTheme.global.name.value === 'dark';
+            return this.globalTheme.global.name.value === ThemeType.Dark;
         },
         defaultCurrency() {
             return this.userStore.currentUserDefaultCurrency;

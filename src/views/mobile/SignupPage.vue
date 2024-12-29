@@ -182,9 +182,9 @@ import { useUserStore } from '@/stores/user.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import categoryConstants from '@/consts/category.js';
-import { getNameByKeyValue, categorizedArrayToPlainArray } from '@/lib/common.js';
-import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
+import { CategoryType } from '@/core/category.ts';
+import { getNameByKeyValue, categorizedArrayToPlainArray } from '@/lib/common.ts';
+import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 export default {
     props: [
@@ -287,7 +287,7 @@ export default {
             const self = this;
             const router = self.f7router;
 
-            let problemMessage = self.inputEmptyProblemMessage || self.inputInvalidProblemMessage;
+            const problemMessage = self.inputEmptyProblemMessage || self.inputInvalidProblemMessage;
 
             if (problemMessage) {
                 self.$alert(problemMessage);
@@ -362,11 +362,11 @@ export default {
         },
         getCategoryTypeName(categoryType) {
             switch (categoryType) {
-                case categoryConstants.allCategoryTypes.Income.toString():
+                case CategoryType.Income.toString():
                     return this.$t('Income Categories');
-                case categoryConstants.allCategoryTypes.Expense.toString():
+                case CategoryType.Expense.toString():
                     return this.$t('Expense Categories');
-                case categoryConstants.allCategoryTypes.Transfer.toString():
+                case CategoryType.Transfer.toString():
                     return this.$t('Transfer Categories');
                 default:
                     return this.$t('Transaction Categories');

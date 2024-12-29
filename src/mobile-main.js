@@ -79,7 +79,7 @@ import 'line-awesome/dist/line-awesome/css/line-awesome.css';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
-import { getVersion, getBuildTime } from '@/lib/version.js';
+import { getVersion, getBuildTime } from '@/lib/version.ts';
 import userstate from '@/lib/userstate.js';
 import {
     getI18nOptions,
@@ -93,7 +93,7 @@ import {
     showLoading,
     hideLoading,
     routeBackOnError
-} from '@/lib/ui.mobile.js';
+} from '@/lib/ui/mobile.js';
 
 import PinCodeInput from '@/components/common/PinCodeInput.vue';
 import MapView from '@/components/common/MapView.vue';

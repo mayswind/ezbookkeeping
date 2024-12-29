@@ -81,7 +81,7 @@ import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
-import colorConstants from '@/consts/color.js';
+import { DEFAULT_ICON_COLOR, DEFAULT_CHART_COLORS } from '@/consts/color.ts';
 import { formatPercent } from '@/lib/numeral.js';
 
 export default {
@@ -139,7 +139,7 @@ export default {
                         value: item[this.valueField],
                         percent: (item[this.percentField] > 0 || item[this.percentField] === 0 || item[this.percentField] === '0') ? item[this.percentField] : (item[this.valueField] / totalValidValue * 100),
                         actualPercent: item[this.valueField] / totalValidValue,
-                        color: item[this.colorField] ? item[this.colorField] : colorConstants.defaultChartColors[validItems.length % colorConstants.defaultChartColors.length],
+                        color: item[this.colorField] ? item[this.colorField] : DEFAULT_CHART_COLORS[validItems.length % DEFAULT_CHART_COLORS.length],
                         sourceItem: item
                     };
 
@@ -223,7 +223,7 @@ export default {
             }
         },
         getColor: function (color) {
-            if (color && color !== colorConstants.defaultColor) {
+            if (color && color !== DEFAULT_ICON_COLOR) {
                 color = '#' + color;
             } else {
                 color = 'var(--default-icon-color)';

@@ -1,4 +1,4 @@
-import { asyncLoadAssets } from '@/lib/misc.js';
+import { asyncLoadAssets } from '@/lib/misc.ts';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
 

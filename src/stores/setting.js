@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import currencyConstants from '@/consts/currency.js';
+import { DEFAULT_CURRENCY_CODE } from '@/consts/currency.ts';
 import datetimeConstants from '@/consts/datetime.js';
 import * as settings from '@/lib/settings.js';
 
@@ -36,7 +36,7 @@ export const useSettingsStore = defineStore('settings', {
             animate: settings.isEnableAnimate()
         },
         localeDefaultSettings: {
-            currency: currencyConstants.defaultCurrency,
+            currency: DEFAULT_CURRENCY_CODE,
             firstDayOfWeek: datetimeConstants.defaultFirstDayOfWeek
         }
     }),

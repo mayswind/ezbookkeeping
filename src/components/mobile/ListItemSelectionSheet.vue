@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
+import { scrollToSelectedItem } from '@/lib/ui/mobile.js';
 
 export default {
     props: [

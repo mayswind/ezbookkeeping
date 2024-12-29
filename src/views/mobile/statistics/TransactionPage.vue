@@ -333,7 +333,7 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 
 import datetimeConstants from '@/consts/datetime.js';
 import statisticsConstants from '@/consts/statistics.js';
-import { getNameByKeyValue, limitText } from '@/lib/common.js';
+import { getNameByKeyValue, limitText } from '@/lib/common.ts';
 import { formatPercent } from '@/lib/numeral.js';
 import {
     getYearAndMonthFromUnixTime,
@@ -344,7 +344,7 @@ import {
     getDateRangeByDateType
 } from '@/lib/datetime.js';
 import { isChartDataTypeAvailableForAnalysisType } from '@/lib/statistics.js';
-import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
+import { scrollToSelectedItem } from '@/lib/ui/mobile.js';
 
 export default {
     props: [

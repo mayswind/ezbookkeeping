@@ -200,12 +200,12 @@ import { useDisplay } from 'vuetify';
 import { mapStores } from 'pinia';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 
-import categoryConstants from '@/consts/category.js';
+import { CategoryType } from '@/core/category.ts';
 import {
     isNoAvailableCategory,
     getAvailableCategoryCount
 } from '@/lib/category.js';
-import { getNavSideBarOuterHeight } from '@/lib/ui.desktop.js';
+import { getNavSideBarOuterHeight } from '@/lib/ui/desktop.js';
 
 import {
     mdiRefresh,
@@ -227,7 +227,7 @@ export default {
         const { mdAndUp } = useDisplay();
 
         return {
-            activeCategoryType: categoryConstants.allCategoryTypes.Expense,
+            activeCategoryType: CategoryType.Expense,
             activeTab: 'categoryPage',
             primaryCategoryId: '0',
             loading: true,
@@ -255,7 +255,7 @@ export default {
     computed: {
         ...mapStores(useTransactionCategoriesStore),
         allCategoryTypes() {
-            return categoryConstants.allCategoryTypes;
+            return CategoryType;
         },
         primaryCategories() {
             if (!this.transactionCategoriesStore.allTransactionCategories || !this.transactionCategoriesStore.allTransactionCategories[this.activeCategoryType]) {
@@ -501,7 +501,7 @@ export default {
 
             self.$nextTick(() => {
                 if (self.$refs.navbar && self.$refs.navbar.$el && self.$refs.navbar.$el.nextElementSibling) {
-                    let navbarHeight = getNavSideBarOuterHeight(self.$refs.navbar.$el.nextElementSibling);
+                    const navbarHeight = getNavSideBarOuterHeight(self.$refs.navbar.$el.nextElementSibling);
                     self.cardMinHeight = Math.max(navbarHeight, 680);
                 }
             });

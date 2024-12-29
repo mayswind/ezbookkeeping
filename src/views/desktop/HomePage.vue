@@ -197,6 +197,7 @@ import { useAccountsStore } from '@/stores/account.js';
 import { useOverviewStore } from '@/stores/overview.js';
 
 import datetimeConstants from '@/consts/datetime.js';
+import { ThemeType } from '@/core/theme.ts';
 import {
     formatUnixTime,
     getUnixTimeBeforeUnixTime,
@@ -245,7 +246,7 @@ export default {
     computed: {
         ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useOverviewStore),
         isDarkMode() {
-            return this.globalTheme.global.name.value === 'dark';
+            return this.globalTheme.global.name.value === ThemeType.Dark;
         },
         showAmountInHomePage: {
             get: function() {

@@ -69,8 +69,8 @@
 import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.js';
 
-import currencyConstants from '@/consts/currency.js';
-import { isString, isNumber, removeAll } from '@/lib/common.js';
+import { ALL_CURRENCIES } from '@/consts/currency.ts';
+import { isString, isNumber, removeAll } from '@/lib/common.ts';
 
 export default {
     props: [
@@ -100,11 +100,11 @@ export default {
             return this.$locale.getCurrentDecimalSeparator(this.userStore);
         },
         supportDecimalSeparator() {
-            if (!this.currency || !currencyConstants.all[this.currency] || !isNumber(currencyConstants.all[this.currency].fraction)) {
+            if (!this.currency || !ALL_CURRENCIES[this.currency] || !isNumber(ALL_CURRENCIES[this.currency].fraction)) {
                 return true;
             }
 
-            return currencyConstants.all[this.currency].fraction > 0;
+            return ALL_CURRENCIES[this.currency].fraction > 0;
         },
         currentDisplay() {
             const previousValue = this.$locale.appendDigitGroupingSymbol(this.userStore, this.previousValue);
@@ -160,8 +160,8 @@ export default {
                 return str;
             }
 
-            let integer = str.substring(0, decimalSeparatorPos);
-            let decimals = str.substring(decimalSeparatorPos + 1, str.length);
+            const integer = str.substring(0, decimalSeparatorPos);
+            const decimals = str.substring(decimalSeparatorPos + 1, str.length);
             let newDecimals = '';
 
             for (let i = decimals.length - 1; i >= 0; i--) {

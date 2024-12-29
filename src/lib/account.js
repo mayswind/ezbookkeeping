@@ -1,5 +1,5 @@
-import currencyConstants from '@/consts/currency.js';
-import accountConstants from '@/consts/account.js';
+import { AccountType, AccountCategory } from '@/core/account.ts';
+import { PARENT_ACCOUNT_CURRENCY_PLACEHOLDER } from '@/consts/currency.ts';
 
 export function setAccountModelByAnotherAccount(account, account2) {
     account.id = account2.id;
@@ -16,22 +16,12 @@ export function setAccountModelByAnotherAccount(account, account2) {
     account.visible = !account2.hidden;
 }
 
-export function getAccountCategoryInfo(categoryId) {
-    for (let i = 0; i < accountConstants.allCategories.length; i++) {
-        if (accountConstants.allCategories[i].id === categoryId) {
-            return accountConstants.allCategories[i];
-        }
-    }
-
-    return null;
-}
-
 export function getAccountOrSubAccountId(account, subAccountId) {
-    if (account.type === accountConstants.allAccountTypes.SingleAccount) {
+    if (account.type === AccountType.SingleAccount.type) {
         return account.id;
-    } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts && !subAccountId) {
+    } else if (account.type === AccountType.MultiSubAccounts.type && !subAccountId) {
         return account.id;
-    } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts && subAccountId) {
+    } else if (account.type === AccountType.MultiSubAccounts.type && subAccountId) {
         if (!account.subAccounts || !account.subAccounts.length) {
             return null;
         }
@@ -51,11 +41,11 @@ export function getAccountOrSubAccountId(account, subAccountId) {
 }
 
 export function getAccountOrSubAccountComment(account, subAccountId) {
-    if (account.type === accountConstants.allAccountTypes.SingleAccount) {
+    if (account.type === AccountType.SingleAccount.type) {
         return account.comment;
-    } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts && !subAccountId) {
+    } else if (account.type === AccountType.MultiSubAccounts.type && !subAccountId) {
         return account.comment;
-    } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts && subAccountId) {
+    } else if (account.type === AccountType.MultiSubAccounts.type && subAccountId) {
         if (!account.subAccounts || !account.subAccounts.length) {
             return null;
         }
@@ -109,7 +99,7 @@ export function getCategorizedAccountsMap(allAccounts) {
         const account = allAccounts[i];
 
         if (!ret[account.category]) {
-            const categoryInfo = getAccountCategoryInfo(account.category);
+            const categoryInfo = AccountCategory.valueOf(account.category);
 
             if (categoryInfo) {
                 ret[account.category] = {
@@ -132,16 +122,17 @@ export function getCategorizedAccountsMap(allAccounts) {
 
 export function getCategorizedAccounts(allAccounts) {
     const ret = [];
+    const allCategories = AccountCategory.values();
     const categorizedAccounts = getCategorizedAccountsMap(allAccounts);
 
-    for (let i = 0; i < accountConstants.allCategories.length; i++) {
-        const category = accountConstants.allCategories[i];
+    for (let i = 0; i < allCategories.length; i++) {
+        const category = allCategories[i];
 
-        if (!categorizedAccounts[category.id]) {
+        if (!categorizedAccounts[category.type]) {
             continue;
         }
 
-        const accountCategory = categorizedAccounts[category.id];
+        const accountCategory = categorizedAccounts[category.type];
         ret.push(accountCategory);
     }
 
@@ -150,15 +141,16 @@ export function getCategorizedAccounts(allAccounts) {
 
 export function getCategorizedAccountsWithVisibleCount(categorizedAccountsMap) {
     const ret = [];
+    const allCategories = AccountCategory.values();
 
-    for (let i = 0; i < accountConstants.allCategories.length; i++) {
-        const accountCategory = accountConstants.allCategories[i];
+    for (let i = 0; i < allCategories.length; i++) {
+        const accountCategory = allCategories[i];
 
-        if (!categorizedAccountsMap[accountCategory.id] || !categorizedAccountsMap[accountCategory.id].accounts) {
+        if (!categorizedAccountsMap[accountCategory.type] || !categorizedAccountsMap[accountCategory.type].accounts) {
             continue;
         }
 
-        const allAccounts = categorizedAccountsMap[accountCategory.id].accounts;
+        const allAccounts = categorizedAccountsMap[accountCategory.type].accounts;
         const allSubAccounts = {};
         const allVisibleSubAccountCounts = {};
         const allFirstVisibleSubAccountIndexes = {};
@@ -176,7 +168,7 @@ export function getCategorizedAccountsWithVisibleCount(categorizedAccountsMap) {
                 }
             }
 
-            if (account.type === accountConstants.allAccountTypes.MultiSubAccounts && account.subAccounts) {
+            if (account.type === AccountType.MultiSubAccounts.type && account.subAccounts) {
                 let visibleSubAccountCount = 0;
                 let firstVisibleSubAccountIndex = -1;
 
@@ -202,7 +194,7 @@ export function getCategorizedAccountsWithVisibleCount(categorizedAccountsMap) {
 
         if (allAccounts.length > 0) {
             ret.push({
-                category: accountCategory.id,
+                category: accountCategory.type,
                 name: accountCategory.name,
                 icon: accountCategory.defaultAccountIconId,
                 allAccounts: allAccounts,
@@ -219,31 +211,31 @@ export function getCategorizedAccountsWithVisibleCount(categorizedAccountsMap) {
 }
 
 export function getAllFilteredAccountsBalance(categorizedAccounts, accountFilter) {
-    const allAccountCategories = accountConstants.allCategories;
+    const allAccountCategories = AccountCategory.values();
     const ret = [];
 
     for (let categoryIdx = 0; categoryIdx < allAccountCategories.length; categoryIdx++) {
         const accountCategory = allAccountCategories[categoryIdx];
 
-        if (!categorizedAccounts[accountCategory.id] || !categorizedAccounts[accountCategory.id].accounts) {
+        if (!categorizedAccounts[accountCategory.type] || !categorizedAccounts[accountCategory.type].accounts) {
             continue;
         }
 
-        for (let accountIdx = 0; accountIdx < categorizedAccounts[accountCategory.id].accounts.length; accountIdx++) {
-            const account = categorizedAccounts[accountCategory.id].accounts[accountIdx];
+        for (let accountIdx = 0; accountIdx < categorizedAccounts[accountCategory.type].accounts.length; accountIdx++) {
+            const account = categorizedAccounts[accountCategory.type].accounts[accountIdx];
 
             if (account.hidden || !accountFilter(account)) {
                 continue;
             }
 
-            if (account.type === accountConstants.allAccountTypes.SingleAccount) {
+            if (account.type === AccountType.SingleAccount.type) {
                 ret.push({
                     balance: account.balance,
                     isAsset: account.isAsset,
                     isLiability: account.isLiability,
                     currency: account.currency
                 });
-            } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts && account.subAccounts) {
+            } else if (account.type === AccountType.MultiSubAccounts.type && account.subAccounts) {
                 for (let subAccountIdx = 0; subAccountIdx < account.subAccounts.length; subAccountIdx++) {
                     const subAccount = account.subAccounts[subAccountIdx];
 
@@ -307,7 +299,7 @@ export function getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(allAccounts,
 
         const account = allAccounts[accountId];
 
-        if (account.currency === currencyConstants.parentAccountCurrencyPlaceholder) {
+        if (account.currency === PARENT_ACCOUNT_CURRENCY_PLACEHOLDER) {
             continue;
         }
 
@@ -326,9 +318,9 @@ export function getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(allAccounts,
 }
 
 export function selectAccountOrSubAccounts(filterAccountIds, account, value) {
-    if (account.type === accountConstants.allAccountTypes.SingleAccount) {
+    if (account.type === AccountType.SingleAccount.type) {
         filterAccountIds[account.id] = value;
-    } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
+    } else if (account.type === AccountType.MultiSubAccounts.type) {
         if (!account.subAccounts || !account.subAccounts.length) {
             return;
         }
@@ -348,7 +340,7 @@ export function selectAll(filterAccountIds, allAccountsMap) {
 
         const account = allAccountsMap[accountId];
 
-        if (account && account.type === accountConstants.allAccountTypes.SingleAccount) {
+        if (account && account.type === AccountType.SingleAccount.type) {
             filterAccountIds[account.id] = false;
         }
     }
@@ -362,7 +354,7 @@ export function selectNone(filterAccountIds, allAccountsMap) {
 
         const account = allAccountsMap[accountId];
 
-        if (account && account.type === accountConstants.allAccountTypes.SingleAccount) {
+        if (account && account.type === AccountType.SingleAccount.type) {
             filterAccountIds[account.id] = true;
         }
     }
@@ -376,7 +368,7 @@ export function selectInvert(filterAccountIds, allAccountsMap) {
 
         const account = allAccountsMap[accountId];
 
-        if (account && account.type === accountConstants.allAccountTypes.SingleAccount) {
+        if (account && account.type === AccountType.SingleAccount.type) {
             filterAccountIds[account.id] = !filterAccountIds[account.id];
         }
     }
@@ -415,9 +407,11 @@ export function isAccountOrSubAccountsHasButNotAllChecked(account, filterAccount
 }
 
 export function setAccountSuitableIcon(account, oldCategory, newCategory) {
-    for (let i = 0; i < accountConstants.allCategories.length; i++) {
-        if (accountConstants.allCategories[i].id === oldCategory) {
-            if (account.icon !== accountConstants.allCategories[i].defaultAccountIconId) {
+    const allCategories = AccountCategory.values();
+
+    for (let i = 0; i < allCategories.length; i++) {
+        if (allCategories[i].type === oldCategory) {
+            if (account.icon !== allCategories[i].defaultAccountIconId) {
                 return;
             } else {
                 break;
@@ -425,9 +419,9 @@ export function setAccountSuitableIcon(account, oldCategory, newCategory) {
         }
     }
 
-    for (let i = 0; i < accountConstants.allCategories.length; i++) {
-        if (accountConstants.allCategories[i].id === newCategory) {
-            account.icon = accountConstants.allCategories[i].defaultAccountIconId;
+    for (let i = 0; i < allCategories.length; i++) {
+        if (allCategories[i].type === newCategory) {
+            account.icon = allCategories[i].defaultAccountIconId;
         }
     }
 }

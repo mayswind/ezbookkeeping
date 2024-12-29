@@ -29,9 +29,9 @@
 </template>
 
 <script>
-import { arrayContainsFieldValue } from '@/lib/common.js';
-import { getIconsInRows } from '@/lib/icon.js';
-import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
+import { arrayContainsFieldValue } from '@/lib/common.ts';
+import { getIconsInRows } from '@/lib/icon.ts';
+import { scrollToSelectedItem } from '@/lib/ui/mobile.js';
 
 export default {
     props: [

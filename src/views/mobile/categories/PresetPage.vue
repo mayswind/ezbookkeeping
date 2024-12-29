@@ -59,8 +59,8 @@
 import { mapStores } from 'pinia';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 
-import categoryConstants from '@/consts/category.js';
-import { getObjectOwnFieldCount, categorizedArrayToPlainArray } from '@/lib/common.js';
+import { CategoryType } from '@/core/category.ts';
+import { getObjectOwnFieldCount, categorizedArrayToPlainArray } from '@/lib/common.ts';
 
 export default {
     props: [
@@ -98,9 +98,9 @@ export default {
         self.categoryType = parseInt(query.type);
 
         if (self.categoryType !== 0 &&
-            self.categoryType !== categoryConstants.allCategoryTypes.Income &&
-            self.categoryType !== categoryConstants.allCategoryTypes.Expense &&
-            self.categoryType !== categoryConstants.allCategoryTypes.Transfer) {
+            self.categoryType !== CategoryType.Income &&
+            self.categoryType !== CategoryType.Expense &&
+            self.categoryType !== CategoryType.Transfer) {
             self.$toast('Parameter Invalid');
             self.loadingError = 'Parameter Invalid';
         }
@@ -137,11 +137,11 @@ export default {
         },
         getCategoryTypeName(categoryType) {
             switch (categoryType) {
-                case categoryConstants.allCategoryTypes.Income.toString():
+                case CategoryType.Income.toString():
                     return this.$t('Income Categories');
-                case categoryConstants.allCategoryTypes.Expense.toString():
+                case CategoryType.Expense.toString():
                     return this.$t('Expense Categories');
-                case categoryConstants.allCategoryTypes.Transfer.toString():
+                case CategoryType.Transfer.toString():
                     return this.$t('Transfer Categories');
                 default:
                     return this.$t('Transaction Categories');

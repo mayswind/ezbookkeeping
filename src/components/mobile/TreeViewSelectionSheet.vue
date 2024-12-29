@@ -41,8 +41,8 @@
 </template>
 
 <script>
-import { isArray } from '@/lib/common.js';
-import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
+import { isArray } from '@/lib/common.ts';
+import { scrollToSelectedItem } from '@/lib/ui/mobile.js';
 
 export default {
     props: [
@@ -85,7 +85,7 @@ export default {
             if (isArray(this.items)) {
                 count = this.items.length;
             } else {
-                for (let field in this.items) {
+                for (const field in this.items) {
                     if (!Object.prototype.hasOwnProperty.call(this.items, field)) {
                         continue;
                     }

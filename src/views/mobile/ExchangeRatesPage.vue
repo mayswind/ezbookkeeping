@@ -96,7 +96,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import transactionConstants from '@/consts/transaction.js';
+import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import { getConvertedAmount } from '@/lib/numeral.js';
 
 export default {
@@ -136,10 +136,10 @@ export default {
             }
         },
         allowedMinAmount() {
-            return transactionConstants.minAmountNumber;
+            return TRANSACTION_MIN_AMOUNT;
         },
         allowedMaxAmount() {
-            return transactionConstants.maxAmountNumber;
+            return TRANSACTION_MAX_AMOUNT;
         }
     },
     created() {

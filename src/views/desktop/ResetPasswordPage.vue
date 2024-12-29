@@ -137,7 +137,8 @@ import { mapStores } from 'pinia';
 import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
 
-import assetConstants from '@/consts/asset.js';
+import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
+import { ThemeType } from '@/core/theme.ts';
 
 import {
     mdiChevronLeft
@@ -177,7 +178,7 @@ export default {
             }
         },
         ezBookkeepingLogoPath() {
-            return assetConstants.ezBookkeepingLogoPath;
+            return APPLICATION_LOGO_PATH;
         },
         version() {
             return 'v' + this.$version;
@@ -186,7 +187,7 @@ export default {
             return this.$locale.getAllLanguageInfoArray(false);
         },
         isDarkMode() {
-            return this.globalTheme.global.name.value === 'dark';
+            return this.globalTheme.global.name.value === ThemeType.Dark;
         },
         currentLanguageName() {
             return this.$locale.getCurrentLanguageDisplayName();

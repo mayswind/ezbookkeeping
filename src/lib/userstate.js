@@ -1,6 +1,6 @@
 import CryptoJS from 'crypto-js';
 
-import { isString, isObject } from './common.js';
+import { isString, isObject } from './common.ts';
 import { isEnableApplicationLock } from './settings.js';
 import logger from './logger.js';
 

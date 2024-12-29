@@ -175,15 +175,16 @@ import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import assetConstants from '@/consts/asset.js';
-import apiConstants from '@/consts/api.js';
+import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
+import { KnownErrorCode } from '@/consts/api.ts';
+import { ThemeType } from '@/core/theme.ts';
 import {
     isUserRegistrationEnabled,
     isUserForgetPasswordEnabled,
     isUserVerifyEmailEnabled,
     getLoginPageTips
-} from '@/lib/server_settings.js';
-import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
+} from '@/lib/server_settings.ts';
+import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 import {
     mdiOnepassword,
@@ -212,7 +213,7 @@ export default {
     computed: {
         ...mapStores(useRootStore, useSettingsStore, useExchangeRatesStore),
         ezBookkeepingLogoPath() {
-            return assetConstants.ezBookkeepingLogoPath;
+            return APPLICATION_LOGO_PATH;
         },
         version() {
             return 'v' + this.$version;
@@ -240,7 +241,7 @@ export default {
             }
         },
         isDarkMode() {
-            return this.globalTheme.global.name.value === 'dark';
+            return this.globalTheme.global.name.value === ThemeType.Dark;
         },
         currentLanguageName() {
             return this.$locale.getCurrentLanguageDisplayName();
@@ -320,7 +321,7 @@ export default {
             }).catch(error => {
                 self.logining = false;
 
-                if (self.isUserVerifyEmailEnabled && error.error && error.error.errorCode === apiConstants.userEmailNotVerifiedErrorCode && error.error.context && error.error.context.email) {
+                if (self.isUserVerifyEmailEnabled && error.error && error.error.errorCode === KnownErrorCode.UserEmailNotVerified && error.error.context && error.error.context.email) {
                     self.$router.push(`/verify_email?email=${encodeURIComponent(error.error.context.email)}&emailSent=${error.error.context.hasValidEmailVerifyToken || false}`);
                     return;
                 }

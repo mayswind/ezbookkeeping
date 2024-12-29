@@ -149,8 +149,8 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 
-import categoryConstants from '@/consts/category.js';
-import { copyObjectTo, arrayItemToObjectField } from '@/lib/common.js';
+import { CategoryType } from '@/core/category.ts';
+import { copyObjectTo, arrayItemToObjectField } from '@/lib/common.ts';
 import {
     allTransactionCategoriesWithVisibleCount,
     hasAnyAvailableCategory,
@@ -187,9 +187,9 @@ export default {
         return {
             loading: true,
             expandCategoryTypes: [
-                categoryConstants.allCategoryTypes.Income.toString(),
-                categoryConstants.allCategoryTypes.Expense.toString(),
-                categoryConstants.allCategoryTypes.Transfer.toString()
+                CategoryType.Income.toString(),
+                CategoryType.Expense.toString(),
+                CategoryType.Transfer.toString()
             ],
             filterCategoryIds: {},
             showHidden: false,
@@ -245,7 +245,7 @@ export default {
 
             const allCategoryIds = {};
 
-            for (let categoryId in self.transactionCategoriesStore.allTransactionCategoriesMap) {
+            for (const categoryId in self.transactionCategoriesStore.allTransactionCategoriesMap) {
                 if (!Object.prototype.hasOwnProperty.call(self.transactionCategoriesStore.allTransactionCategoriesMap, categoryId)) {
                     continue;
                 }
@@ -268,7 +268,7 @@ export default {
             } else if (self.type === 'statisticsCurrent') {
                 self.filterCategoryIds = copyObjectTo(self.statisticsStore.transactionStatisticsFilter.filterCategoryIds, allCategoryIds);
             } else if (self.type === 'transactionListCurrent') {
-                for (let categoryId in self.transactionsStore.allFilterCategoryIds) {
+                for (const categoryId in self.transactionsStore.allFilterCategoryIds) {
                     if (!Object.prototype.hasOwnProperty.call(self.transactionsStore.allFilterCategoryIds, categoryId)) {
                         continue;
                     }
@@ -303,7 +303,7 @@ export default {
             let finalCategoryIds = '';
             let changed = true;
 
-            for (let categoryId in self.filterCategoryIds) {
+            for (const categoryId in self.filterCategoryIds) {
                 if (!Object.prototype.hasOwnProperty.call(self.filterCategoryIds, categoryId)) {
                     continue;
                 }
@@ -388,11 +388,11 @@ export default {
         },
         getCategoryTypeName(categoryType) {
             switch (categoryType) {
-                case categoryConstants.allCategoryTypes.Income.toString():
+                case CategoryType.Income.toString():
                     return this.$t('Income Categories');
-                case categoryConstants.allCategoryTypes.Expense.toString():
+                case CategoryType.Expense.toString():
                     return this.$t('Expense Categories');
-                case categoryConstants.allCategoryTypes.Transfer.toString():
+                case CategoryType.Transfer.toString():
                     return this.$t('Transfer Categories');
                 default:
                     return this.$t('Transaction Categories');

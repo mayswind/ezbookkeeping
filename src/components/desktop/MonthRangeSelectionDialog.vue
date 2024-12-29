@@ -69,6 +69,7 @@ import { useTheme } from 'vuetify';
 import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.js';
 
+import { ThemeType } from '@/core/theme.ts';
 import {
     getYearMonthObjectFromString,
     getYearMonthStringFromObject,
@@ -125,7 +126,7 @@ export default {
             }
         },
         isDarkMode() {
-            return this.globalTheme.global.name.value === 'dark';
+            return this.globalTheme.global.name.value === ThemeType.Dark;
         },
         isYearFirst() {
             return this.$locale.isLongDateMonthAfterYear(this.userStore);

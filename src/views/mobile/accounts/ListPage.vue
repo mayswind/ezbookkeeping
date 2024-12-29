@@ -38,8 +38,9 @@
             </f7-card-header>
         </f7-card>
 
-        <div class="skeleton-text" :key="listIdx" v-for="listIdx in [ 1, 2, 3 ]" v-if="loading">
-            <f7-list strong inset dividers sortable class="list-has-group-title account-list margin-vertical">
+        <div class="skeleton-text" v-if="loading">
+            <f7-list strong inset dividers sortable class="list-has-group-title account-list margin-vertical"
+                     :key="listIdx" v-for="listIdx in [ 1, 2, 3 ]">
                 <f7-list-item group-title :sortable="false">
                     <small>
                         <span>Account Category</span>
@@ -66,12 +67,12 @@
             <f7-list-item :title="$t('No available account')"></f7-list-item>
         </f7-list>
 
-        <div :key="accountCategory.id"
+        <div :key="accountCategory.type"
              v-for="accountCategory in allAccountCategories"
              v-show="(showHidden && hasAccount(accountCategory, false)) || hasAccount(accountCategory, true)">
             <f7-list strong inset dividers sortable class="list-has-group-title account-list margin-vertical"
                      :sortable-enabled="sortable"
-                     v-if="allCategorizedAccountsMap[accountCategory.id]"
+                     v-if="allCategorizedAccountsMap[accountCategory.type]"
                      @sortable:sort="onSort">
                 <f7-list-item group-title :sortable="false">
                     <small>
@@ -82,15 +83,15 @@
                 <f7-list-item swipeout
                               class="nested-list-item"
                               :id="getAccountDomId(account)"
-                              :class="{ 'has-child-list-item': account.type === allAccountTypes.MultiSubAccounts && hasVisibleSubAccount(account), 'actual-first-child': account.id === firstShowingIds.accounts[accountCategory.id], 'actual-last-child': account.id === lastShowingIds.accounts[accountCategory.id] }"
+                              :class="{ 'has-child-list-item': account.type === allAccountTypes.MultiSubAccounts.type && hasVisibleSubAccount(account), 'actual-first-child': account.id === firstShowingIds.accounts[accountCategory.type], 'actual-last-child': account.id === lastShowingIds.accounts[accountCategory.type] }"
                               :after="accountBalance(account)"
                               :link="!sortable ? '/transaction/list?accountIds=' + account.id : null"
                               :key="account.id"
-                              v-for="account in allCategorizedAccountsMap[accountCategory.id].accounts"
+                              v-for="account in allCategorizedAccountsMap[accountCategory.type].accounts"
                               v-show="showHidden || !account.hidden"
                               @taphold="setSortable()"
                 >
-                    <template #media v-if="account.type !== allAccountTypes.MultiSubAccounts || !hasVisibleSubAccount(account)">
+                    <template #media v-if="account.type !== allAccountTypes.MultiSubAccounts.type || !hasVisibleSubAccount(account)">
                         <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color">
                             <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
                                 <f7-icon f7="eye_slash_fill"></f7-icon>
@@ -101,7 +102,7 @@
                     <template #title>
                         <div class="display-flex padding-top-half padding-bottom-half">
                             <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color"
-                                      v-if="account.type === allAccountTypes.MultiSubAccounts && hasVisibleSubAccount(account)">
+                                      v-if="account.type === allAccountTypes.MultiSubAccounts.type && hasVisibleSubAccount(account)">
                                 <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
                                     <f7-icon f7="eye_slash_fill"></f7-icon>
                                 </f7-badge>
@@ -111,7 +112,7 @@
                                 <div class="item-footer" v-if="account.comment">{{ account.comment }}</div>
                             </div>
                         </div>
-                        <li v-if="account.type === allAccountTypes.MultiSubAccounts">
+                        <li v-if="account.type === allAccountTypes.MultiSubAccounts.type">
                             <ul class="no-padding">
                                 <f7-list-item class="no-sortable nested-list-item-child"
                                               :class="{ 'actual-first-child': subAccount.id === firstShowingIds.subAccounts[account.id], 'actual-last-child': subAccount.id === lastShowingIds.subAccounts[account.id] }"
@@ -179,8 +180,8 @@ import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import accountConstants from '@/consts/account.js';
-import { onSwipeoutDeleted } from '@/lib/ui.mobile.js';
+import { AccountType, AccountCategory } from '@/core/account.ts';
+import { onSwipeoutDeleted } from '@/lib/ui/mobile.js';
 
 export default {
     props: [
@@ -205,10 +206,10 @@ export default {
             return this.userStore.currentUserDefaultCurrency;
         },
         allAccountTypes() {
-            return accountConstants.allAccountTypes;
+            return AccountType.all();
         },
         allAccountCategories() {
-            return accountConstants.allCategories;
+            return AccountCategory.values();
         },
         allCategorizedAccountsMap() {
             return this.accountsStore.allCategorizedAccountsMap;

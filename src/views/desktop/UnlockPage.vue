@@ -117,10 +117,11 @@ import { useTokensStore } from '@/stores/token.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import assetConstants from '@/consts/asset.js';
+import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
+import { ThemeType } from '@/core/theme.ts';
 import logger from '@/lib/logger.js';
 import webauthn from '@/lib/webauthn.js';
-import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
+import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 export default {
     data() {
@@ -132,7 +133,7 @@ export default {
     computed: {
         ...mapStores(useRootStore, useSettingsStore, useUserStore, useTokensStore, useTransactionsStore, useExchangeRatesStore),
         ezBookkeepingLogoPath() {
-            return assetConstants.ezBookkeepingLogoPath;
+            return APPLICATION_LOGO_PATH;
         },
         version() {
             return 'v' + this.$version;
@@ -146,7 +147,7 @@ export default {
                 && webauthn.isSupported();
         },
         isDarkMode() {
-            return this.globalTheme.global.name.value === 'dark';
+            return this.globalTheme.global.name.value === ThemeType.Dark;
         },
         currentLanguageName() {
             return this.$locale.getCurrentLanguageDisplayName();

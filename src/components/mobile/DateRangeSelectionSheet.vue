@@ -57,7 +57,7 @@ import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.js';
 
 import datetimeConstants from '@/consts/datetime.js';
-import { arrangeArrayWithNewStartIndex } from '@/lib/common.js';
+import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
     getCurrentYear,

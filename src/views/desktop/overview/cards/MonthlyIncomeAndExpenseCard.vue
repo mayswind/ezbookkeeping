@@ -31,12 +31,12 @@ import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
-import transactionConstants from '@/consts/transaction.js';
+import { TransactionType } from '@/core/transaction.ts';
 import {
     parseDateFromUnixTime,
     getMonthName
 } from '@/lib/datetime.js';
-import { getExpenseAndIncomeAmountColor } from '@/lib/ui.js';
+import { getExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 export default {
     props: [
@@ -109,7 +109,7 @@ export default {
                 }
             }
 
-            let amountGap = maxAmount - minAmount;
+            const amountGap = maxAmount - minAmount;
 
             return {
                 tooltip: {
@@ -274,12 +274,12 @@ export default {
 
             if (clickData && e.seriesId === 'seriesIncome') {
                 this.$emit('click', {
-                    transactionType: transactionConstants.allTransactionTypes.Income,
+                    transactionType: TransactionType.Income,
                     monthStartTime: clickData.monthStartTime
                 });
             } else if (clickData && e.seriesId === 'seriesExpense') {
                 this.$emit('click', {
-                    transactionType: transactionConstants.allTransactionTypes.Expense,
+                    transactionType: TransactionType.Expense,
                     monthStartTime: clickData.monthStartTime
                 });
             }

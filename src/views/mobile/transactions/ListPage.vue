@@ -46,76 +46,77 @@
             </f7-link>
         </f7-toolbar>
 
-        <f7-block class="combination-list-wrapper margin-vertical skeleton-text"
-                  :key="blockIdx" v-for="blockIdx in [ 1, 2 ]" v-if="loading">
-            <f7-accordion-item>
-                <f7-block-title>
-                    <f7-accordion-toggle>
-                        <f7-list strong inset dividers media-list
-                                 class="transaction-amount-list combination-list-header combination-list-opened">
-                            <f7-list-item>
-                                <template #title>
-                                    <small>YYYY-MM</small>
-                                    <small class="transaction-amount-statistics" v-if="showTotalAmountInTransactionListPage">
-                                        <span>0.00 USD</span>
-                                        <span>0.00 USD</span>
-                                    </small>
-                                    <f7-icon class="combination-list-chevron-icon" f7="chevron_up"></f7-icon>
+        <div class="skeleton-text" v-if="loading">
+            <f7-block class="combination-list-wrapper margin-vertical" :key="blockIdx" v-for="blockIdx in [ 1, 2 ]">
+                <f7-accordion-item>
+                    <f7-block-title>
+                        <f7-accordion-toggle>
+                            <f7-list strong inset dividers media-list
+                                     class="transaction-amount-list combination-list-header combination-list-opened">
+                                <f7-list-item>
+                                    <template #title>
+                                        <small>YYYY-MM</small>
+                                        <small class="transaction-amount-statistics" v-if="showTotalAmountInTransactionListPage">
+                                            <span>0.00 USD</span>
+                                            <span>0.00 USD</span>
+                                        </small>
+                                        <f7-icon class="combination-list-chevron-icon" f7="chevron_up"></f7-icon>
+                                    </template>
+                                </f7-list-item>
+                            </f7-list>
+                        </f7-accordion-toggle>
+                    </f7-block-title>
+                    <f7-accordion-content style="height: auto">
+                        <f7-list strong inset dividers media-list accordion-list class="transaction-info-list combination-list-content">
+                            <f7-list-item link="#" chevron-center class="transaction-info"
+                                          :key="itemIdx" v-for="itemIdx in (blockIdx === 1 ? [ 1, 2, 3, 4, 5, 6, 7 ] : [ 1, 2, 3 ])">
+                                <template #media>
+                                    <div class="display-flex flex-direction-column transaction-date">
+                                        <span class="transaction-day full-line flex-direction-column">DD</span>
+                                        <span class="transaction-day-of-week full-line flex-direction-column">Sun</span>
+                                    </div>
+                                </template>
+                                <template #inner>
+                                    <div class="display-flex no-padding-horizontal">
+                                        <div class="item-media">
+                                            <div class="transaction-icon display-flex align-items-center">
+                                                <f7-icon f7="app_fill"></f7-icon>
+                                            </div>
+                                        </div>
+                                        <div class="actual-item-inner">
+                                            <div class="item-title-row">
+                                                <div class="item-title">
+                                                    <div class="transaction-category-name no-padding">
+                                                        <span>Category</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item-after">
+                                                    <div class="transaction-amount">
+                                                        <span>0.00 USD</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="item-text">
+                                                <div class="transaction-description">
+                                                    <span>Transaction Description</span>
+                                                </div>
+                                            </div>
+                                            <div class="item-footer">
+                                                <div class="transaction-footer">
+                                                    <span>HH:mm</span>
+                                                    <span>·</span>
+                                                    <span>Source Account</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </template>
                             </f7-list-item>
                         </f7-list>
-                    </f7-accordion-toggle>
-                </f7-block-title>
-                <f7-accordion-content style="height: auto">
-                    <f7-list strong inset dividers media-list accordion-list class="transaction-info-list combination-list-content">
-                        <f7-list-item link="#" chevron-center class="transaction-info"
-                                      :key="itemIdx" v-for="itemIdx in (blockIdx === 1 ? [ 1, 2, 3, 4, 5, 6, 7 ] : [ 1, 2, 3 ])">
-                            <template #media>
-                                <div class="display-flex flex-direction-column transaction-date">
-                                    <span class="transaction-day full-line flex-direction-column">DD</span>
-                                    <span class="transaction-day-of-week full-line flex-direction-column">Sun</span>
-                                </div>
-                            </template>
-                            <template #inner>
-                                <div class="display-flex no-padding-horizontal">
-                                    <div class="item-media">
-                                        <div class="transaction-icon display-flex align-items-center">
-                                            <f7-icon f7="app_fill"></f7-icon>
-                                        </div>
-                                    </div>
-                                    <div class="actual-item-inner">
-                                        <div class="item-title-row">
-                                            <div class="item-title">
-                                                <div class="transaction-category-name no-padding">
-                                                    <span>Category</span>
-                                                </div>
-                                            </div>
-                                            <div class="item-after">
-                                                <div class="transaction-amount">
-                                                    <span>0.00 USD</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="item-text">
-                                            <div class="transaction-description">
-                                                <span>Transaction Description</span>
-                                            </div>
-                                        </div>
-                                        <div class="item-footer">
-                                            <div class="transaction-footer">
-                                                <span>HH:mm</span>
-                                                <span>·</span>
-                                                <span>Source Account</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
-                        </f7-list-item>
-                    </f7-list>
-                </f7-accordion-content>
-            </f7-accordion-item>
-        </f7-block>
+                    </f7-accordion-content>
+                </f7-accordion-item>
+            </f7-block>
+        </div>
 
         <f7-list strong inset dividers class="margin-vertical" v-if="!loading && noTransaction">
             <f7-list-item :title="$t('No transaction data')"></f7-list-item>
@@ -471,19 +472,20 @@
                     </template>
                 </f7-list-item>
 
-                <f7-list-item :title="filterType.displayName"
-                              :key="filterType.type"
-                              v-for="filterType in allTransactionTagFilterTypes"
-                              v-if="query.tagIds && query.tagIds !== 'none'"
-                              @click="changeTagFilterType(filterType.type)"
-                >
-                    <template #after>
-                        <f7-icon class="list-item-checked-icon"
-                                 f7="checkmark_alt"
-                                 v-if="query.tagFilterType === filterType.type">
-                        </f7-icon>
-                    </template>
-                </f7-list-item>
+                <template v-if="query.tagIds && query.tagIds !== 'none'">
+                    <f7-list-item :title="filterType.displayName"
+                                  :key="filterType.type"
+                                  v-for="filterType in allTransactionTagFilterTypes"
+                                  @click="changeTagFilterType(filterType.type)"
+                    >
+                        <template #after>
+                            <f7-icon class="list-item-checked-icon"
+                                     f7="checkmark_alt"
+                                     v-if="query.tagFilterType === filterType.type">
+                            </f7-icon>
+                        </template>
+                    </f7-list-item>
+                </template>
 
                 <f7-list-item :title="transactionTag.name"
                               :class="{ 'list-item-selected': query.tagIds === transactionTag.id, 'item-in-multiple-selection': queryAllFilterTagIdsCount > 1 && queryAllFilterTagIds[transactionTag.id] }"
@@ -526,11 +528,11 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useTransactionTagsStore } from '@/stores/transactionTag.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 
+import { AccountType } from '@/core/account.ts';
+import { TransactionType } from '@/core/transaction.ts';
 import numeralConstants from '@/consts/numeral.js';
 import datetimeConstants from '@/consts/datetime.js';
-import accountConstants from '@/consts/account.js';
-import transactionConstants from '@/consts/transaction.js';
-import { getNameByKeyValue } from '@/lib/common.js';
+import { getNameByKeyValue } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
     getSpecifiedDayFirstUnixTime,
@@ -549,7 +551,7 @@ import {
 import { categoryTypeToTransactionType, transactionTypeToCategoryType } from '@/lib/category.js';
 import { getUnifiedSelectedAccountsCurrencyOrDefaultCurrency } from '@/lib/account.js';
 import { getTransactionDisplayAmount } from '@/lib/transaction.js';
-import { onSwipeoutDeleted, scrollToSelectedItem } from '@/lib/ui.mobile.js';
+import { onSwipeoutDeleted, scrollToSelectedItem } from '@/lib/ui/mobile.js';
 
 export default {
     props: [
@@ -581,7 +583,7 @@ export default {
             if (this.query.accountIds && this.queryAllFilterAccountIdsCount === 1) {
                 const account = this.allAccounts[this.query.accountIds];
 
-                if (account && account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
+                if (account && account.type === AccountType.MultiSubAccounts.type) {
                     return false;
                 }
             }
@@ -678,7 +680,7 @@ export default {
             return numeralConstants.allAmountFilterTypeArray;
         },
         allTransactionTypes() {
-            return transactionConstants.allTransactionTypes;
+            return TransactionType;
         },
         allTransactionTagFilterTypes() {
             return this.$locale.getAllTransactionTagFilterTypes();
@@ -938,7 +940,7 @@ export default {
             if (type && this.query.categoryIds) {
                 newCategoryFilter = '';
 
-                for (let categoryId in this.queryAllFilterCategoryIds) {
+                for (const categoryId in this.queryAllFilterCategoryIds) {
                     if (!Object.prototype.hasOwnProperty.call(this.queryAllFilterCategoryIds, categoryId)) {
                         continue;
                     }

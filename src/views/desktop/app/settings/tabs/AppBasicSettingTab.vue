@@ -214,7 +214,8 @@ import { useOverviewStore } from '@/stores/overview.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import { getSystemTheme } from '@/lib/ui.js';
+import { ThemeType } from '@/core/theme.ts';
+import { getSystemTheme } from '@/lib/ui/common.ts';
 
 export default {
     computed: {
@@ -239,7 +240,7 @@ export default {
                 if (value !== this.settingsStore.appSettings.theme) {
                     this.settingsStore.setTheme(value);
 
-                    if (value === 'light' || value === 'dark') {
+                    if (value === ThemeType.Light || value === ThemeType.Dark) {
                         this.globalTheme.global.name.value = value;
                     } else {
                         this.globalTheme.global.name.value = getSystemTheme();

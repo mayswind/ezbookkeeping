@@ -606,16 +606,16 @@ import { useOverviewStore } from '@/stores/overview.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import categoryConstants from '@/consts/category.js';
-import transactionConstants from '@/consts/transaction.js';
+import { CategoryType } from '@/core/category.ts';
+import { TransactionType } from '@/core/transaction.ts';
 import {
     isString,
     isNumber,
     getNameByKeyValue,
     objectFieldToArrayItem
-} from '@/lib/common.js';
-import { isFileExtensionSupported } from '@/lib/file.js';
-import { generateRandomUUID } from '@/lib/misc.js';
+} from '@/lib/common.ts';
+import { isFileExtensionSupported } from '@/lib/file.ts';
+import { generateRandomUUID } from '@/lib/misc.ts';
 import logger from '@/lib/logger.js';
 import {
     parseDateFromUnixTime,
@@ -736,10 +736,10 @@ export default {
             return getNameByKeyValue(this.allSupportedImportFileTypes, this.fileType, 'type', 'subTypes');
         },
         allTransactionTypes() {
-            return transactionConstants.allTransactionTypes;
+            return TransactionType;
         },
         allCategoryTypes() {
-            return categoryConstants.allCategoryTypes;
+            return CategoryType;
         },
         allAccounts() {
             return this.accountsStore.allPlainAccounts;
@@ -1635,7 +1635,7 @@ export default {
                 }
             }
 
-            for (let name in invalidCategoryNames) {
+            for (const name in invalidCategoryNames) {
                 if (!Object.prototype.hasOwnProperty.call(invalidCategoryNames, name)) {
                     continue;
                 }
@@ -1666,7 +1666,7 @@ export default {
                 }
             }
 
-            for (let name in invalidAccountNames) {
+            for (const name in invalidAccountNames) {
                 if (!Object.prototype.hasOwnProperty.call(invalidAccountNames, name)) {
                     continue;
                 }
@@ -1700,7 +1700,7 @@ export default {
                 }
             }
 
-            for (let name in invalidTagNames) {
+            for (const name in invalidTagNames) {
                 if (!Object.prototype.hasOwnProperty.call(invalidTagNames, name)) {
                     continue;
                 }

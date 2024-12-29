@@ -34,8 +34,8 @@ import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
-import transactionConstants from '@/consts/transaction.js';
-import { removeAll } from '@/lib/common.js';
+import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
+import { removeAll } from '@/lib/common.ts';
 import logger from '@/lib/logger.js';
 
 export default {
@@ -76,7 +76,7 @@ export default {
                             return self.$t('Amount value is not number');
                         }
 
-                        return (val >= transactionConstants.minAmountNumber && val <= transactionConstants.maxAmountNumber) || self.$t('Amount value exceeds limitation');
+                        return (val >= TRANSACTION_MIN_AMOUNT && val <= TRANSACTION_MAX_AMOUNT) || self.$t('Amount value exceeds limitation');
                     } catch (ex) {
                         logger.warn('cannot parse amount in amount input, original value is ' + v, ex);
                         return self.$t('Amount value is not number');
@@ -222,7 +222,7 @@ export default {
             }
 
             let decimalLength = 0;
-            let decimalIndex = str.indexOf(decimalSeparator);
+            const decimalIndex = str.indexOf(decimalSeparator);
 
             if (decimalIndex >= 0) {
                 decimalLength = str.length - str.indexOf(decimalSeparator) - 1;
@@ -285,16 +285,16 @@ export default {
             e.preventDefault();
         },
         getValidFormattedValue(value, textualValue, hasDecimalSeparator) {
-            let maxLength = transactionConstants.maxAmountNumber.toString().length;
+            let maxLength = TRANSACTION_MAX_AMOUNT.toString().length;
 
             if (value < 0) {
-                maxLength = transactionConstants.minAmountNumber.toString().length;
+                maxLength = TRANSACTION_MIN_AMOUNT.toString().length;
             }
 
-            if (value < transactionConstants.minAmountNumber) {
-                return this.getFormattedValue(this.userStore, transactionConstants.minAmountNumber);
-            } else if (value > transactionConstants.maxAmountNumber) {
-                return this.getFormattedValue(this.userStore, transactionConstants.maxAmountNumber);
+            if (value < TRANSACTION_MIN_AMOUNT) {
+                return this.getFormattedValue(this.userStore, TRANSACTION_MIN_AMOUNT);
+            } else if (value > TRANSACTION_MAX_AMOUNT) {
+                return this.getFormattedValue(this.userStore, TRANSACTION_MAX_AMOUNT);
             }
 
             if (!hasDecimalSeparator && textualValue.length > maxLength) {

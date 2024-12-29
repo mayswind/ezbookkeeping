@@ -1,25 +1,36 @@
 import axios from 'axios';
 
-import apiConstants from '@/consts/api.js';
+import {
+    BASE_API_URL_PATH,
+    BASE_QRCODE_PATH,
+    BASE_PROXY_URL_PATH,
+    BASE_AMAP_API_PROXY_URL_PATH,
+    DEFAULT_API_TIMEOUT,
+    DEFAULT_UPLOAD_API_TIMEOUT,
+    DEFAULT_IMPORT_API_TIMEOUT,
+    GOOGLE_MAP_JAVASCRIPT_URL,
+    BAIDU_MAP_JAVASCRIPT_URL,
+    AMAP_JAVASCRIPT_URL
+} from '@/consts/api.ts';
 import userState from './userstate.js';
 import {
     isDefined,
     isBoolean
-} from './common.js';
+} from './common.ts';
 import {
     getGoogleMapAPIKey,
     getBaiduMapAK,
     getAmapApplicationKey,
     getExchangeRatesRequestTimeout
-} from './server_settings.js';
+} from './server_settings.ts';
 import { getTimezoneOffsetMinutes } from './datetime.js';
-import { generateRandomUUID } from './misc.js';
+import { generateRandomUUID } from './misc.ts';
 
 let needBlockRequest = false;
 let blockedRequests = [];
 
-axios.defaults.baseURL = apiConstants.baseApiUrlPath;
-axios.defaults.timeout = apiConstants.defaultTimeout;
+axios.defaults.baseURL = BASE_API_URL_PATH;
+axios.defaults.timeout = DEFAULT_API_TIMEOUT;
 axios.interceptors.request.use(config => {
     const token = userState.getToken();
 
@@ -202,7 +213,7 @@ export default {
         return axios.postForm('v1/users/avatar/update.json', {
             avatar: avatarFile
         }, {
-            timeout: apiConstants.uploadTimeout
+            timeout: DEFAULT_UPLOAD_API_TIMEOUT
         });
     },
     removeAvatar: () => {
@@ -471,7 +482,7 @@ export default {
             fileType: fileType,
             file: importFile
         }, {
-            timeout: apiConstants.uploadTimeout
+            timeout: DEFAULT_UPLOAD_API_TIMEOUT
         });
     },
     importTransactions: ({ transactions, clientSessionId }) => {
@@ -479,7 +490,7 @@ export default {
             transactions: transactions,
             clientSessionId: clientSessionId
         }, {
-            timeout: apiConstants.importTimeout
+            timeout: DEFAULT_IMPORT_API_TIMEOUT
         });
     },
     uploadTransactionPicture: ({ pictureFile, clientSessionId }) => {
@@ -487,7 +498,7 @@ export default {
             picture: pictureFile,
             clientSessionId: clientSessionId
         }, {
-            timeout: apiConstants.uploadTimeout
+            timeout: DEFAULT_UPLOAD_API_TIMEOUT
         });
     },
     removeUnusedTransactionPicture: ({ id }) => {
@@ -639,15 +650,15 @@ export default {
     getLatestExchangeRates: ({ ignoreError }) => {
         return axios.get('v1/exchange_rates/latest.json', {
             ignoreError: !!ignoreError,
-            timeout: getExchangeRatesRequestTimeout() || apiConstants.defaultTimeout
+            timeout: getExchangeRatesRequestTimeout() || DEFAULT_API_TIMEOUT
         });
     },
     generateQrCodeUrl: (qrCodeName) => {
-        return `${apiConstants.baseQrcodePath}/${qrCodeName}.png`;
+        return `${BASE_QRCODE_PATH}/${qrCodeName}.png`;
     },
     generateMapProxyTileImageUrl: (mapProvider, language) => {
         const token = userState.getToken();
-        let url = `${apiConstants.baseProxyUrlPath}/map/tile/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
+        let url = `${BASE_PROXY_URL_PATH}/map/tile/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
 
         if (language) {
             url = url + `&language=${language}`;
@@ -657,7 +668,7 @@ export default {
     },
     generateMapProxyAnnotationImageUrl: (mapProvider, language) => {
         const token = userState.getToken();
-        let url = `${apiConstants.baseProxyUrlPath}/map/annotation/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
+        let url = `${BASE_PROXY_URL_PATH}/map/annotation/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
 
         if (language) {
             url = url + `&language=${language}`;
@@ -666,7 +677,7 @@ export default {
         return url;
     },
     generateGoogleMapJavascriptUrl: (language, callbackFnName) => {
-        let url = `${apiConstants.googleMapJavascriptUrl}?key=${getGoogleMapAPIKey()}&libraries=core,marker&callback=${callbackFnName}`;
+        let url = `${GOOGLE_MAP_JAVASCRIPT_URL}?key=${getGoogleMapAPIKey()}&libraries=core,marker&callback=${callbackFnName}`;
 
         if (language) {
             url = url + `&language=${language}`;
@@ -675,13 +686,13 @@ export default {
         return url;
     },
     generateBaiduMapJavascriptUrl: (callbackFnName) => {
-        return `${apiConstants.baiduMapJavascriptUrl}&ak=${getBaiduMapAK()}&callback=${callbackFnName}`;
+        return `${BAIDU_MAP_JAVASCRIPT_URL}&ak=${getBaiduMapAK()}&callback=${callbackFnName}`;
     },
     generateAmapJavascriptUrl: (callbackFnName) => {
-        return `${apiConstants.amapJavascriptUrl}&key=${getAmapApplicationKey()}&plugin=AMap.ToolBar&callback=${callbackFnName}`;
+        return `${AMAP_JAVASCRIPT_URL}&key=${getAmapApplicationKey()}&plugin=AMap.ToolBar&callback=${callbackFnName}`;
     },
     generateAmapApiInternalProxyUrl: () => {
-        return `${window.location.origin}${apiConstants.baseAmapApiProxyUrlPath}`;
+        return `${window.location.origin}${BASE_AMAP_API_PROXY_URL_PATH}`;
     },
     getInternalAvatarUrlWithToken(avatarUrl, disableBrowserCache) {
         if (!avatarUrl) {

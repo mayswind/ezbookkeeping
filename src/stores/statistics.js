@@ -6,12 +6,12 @@ import { useAccountsStore } from './account.js';
 import { useTransactionCategoriesStore } from './transactionCategory.js';
 import { useExchangeRatesStore } from './exchangeRates.js';
 
+import { CategoryType } from '@/core/category.ts';
+import { TransactionTagFilterType } from '@/core/transaction.ts';
 import datetimeConstants from '@/consts/datetime.js';
-import transactionConstants from '@/consts/transaction.js';
 import statisticsConstants from '@/consts/statistics.js';
-import categoryConstants from '@/consts/category.js';
-import iconConstants from '@/consts/icon.js';
-import colorConstants from '@/consts/color.js';
+import { DEFAULT_ACCOUNT_ICON, DEFAULT_CATEGORY_ICON } from '@/consts/icon.ts';
+import { DEFAULT_ACCOUNT_COLOR, DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
 import {
@@ -24,7 +24,7 @@ import {
     isYearMonthEquals,
     isObjectEmpty,
     objectFieldToArrayItem
-} from '@/lib/common.js';
+} from '@/lib/common.ts';
 import {
     getYearAndMonthFromUnixTime,
     getDateRangeByDateType
@@ -105,14 +105,14 @@ function getCategoryTotalAmountItems(items, transactionStatisticsFilter) {
             transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByPrimaryCategory.type ||
             transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type ||
             transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.TotalExpense.type) {
-            if (item.category.type !== categoryConstants.allCategoryTypes.Expense) {
+            if (item.category.type !== CategoryType.Expense) {
                 continue;
             }
         } else if (transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type ||
             transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByPrimaryCategory.type ||
             transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type ||
             transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.TotalIncome.type) {
-            if (item.category.type !== categoryConstants.allCategoryTypes.Income) {
+            if (item.category.type !== CategoryType.Income) {
                 continue;
             }
         } else if (transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.TotalBalance.type) {
@@ -141,8 +141,8 @@ function getCategoryTotalAmountItems(items, transactionStatisticsFilter) {
                         name: item.account.name,
                         type: 'account',
                         id: item.account.id,
-                        icon: item.account.icon || iconConstants.defaultAccountIcon.icon,
-                        color: item.account.color || colorConstants.defaultAccountColor,
+                        icon: item.account.icon || DEFAULT_ACCOUNT_ICON.icon,
+                        color: item.account.color || DEFAULT_ACCOUNT_COLOR,
                         hidden: item.primaryAccount.hidden || item.account.hidden,
                         displayOrders: [item.primaryAccount.category, item.primaryAccount.displayOrder, item.account.displayOrder],
                         totalAmount: item.amountInDefaultCurrency
@@ -169,8 +169,8 @@ function getCategoryTotalAmountItems(items, transactionStatisticsFilter) {
                         name: item.primaryCategory.name,
                         type: 'category',
                         id: item.primaryCategory.id,
-                        icon: item.primaryCategory.icon || iconConstants.defaultCategoryIcon.icon,
-                        color: item.primaryCategory.color || colorConstants.defaultCategoryColor,
+                        icon: item.primaryCategory.icon || DEFAULT_CATEGORY_ICON.icon,
+                        color: item.primaryCategory.color || DEFAULT_CATEGORY_COLOR,
                         hidden: item.primaryCategory.hidden,
                         displayOrders: [item.primaryCategory.type, item.primaryCategory.displayOrder],
                         totalAmount: item.amountInDefaultCurrency
@@ -197,8 +197,8 @@ function getCategoryTotalAmountItems(items, transactionStatisticsFilter) {
                         name: item.category.name,
                         type: 'category',
                         id: item.category.id,
-                        icon: item.category.icon || iconConstants.defaultCategoryIcon.icon,
-                        color: item.category.color || colorConstants.defaultCategoryColor,
+                        icon: item.category.icon || DEFAULT_CATEGORY_ICON.icon,
+                        color: item.category.color || DEFAULT_CATEGORY_COLOR,
                         hidden: item.primaryCategory.hidden || item.category.hidden,
                         displayOrders: [item.primaryCategory.type, item.primaryCategory.displayOrder, item.category.displayOrder],
                         totalAmount: item.amountInDefaultCurrency
@@ -221,7 +221,7 @@ function getCategoryTotalAmountItems(items, transactionStatisticsFilter) {
                 let amount = item.amountInDefaultCurrency;
 
                 if (transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.TotalBalance.type &&
-                    item.category.type === categoryConstants.allCategoryTypes.Expense) {
+                    item.category.type === CategoryType.Expense) {
                     amount = -amount;
                 }
 
@@ -287,7 +287,7 @@ export const useStatisticsStore = defineStore('statistics', {
             filterAccountIds: {},
             filterCategoryIds: {},
             tagIds: '',
-            tagFilterType: transactionConstants.defaultTransactionTagFilterType.type
+            tagFilterType: TransactionTagFilterType.Default.type
         },
         transactionCategoryStatisticsData: {},
         transactionCategoryTrendsData: {},
@@ -389,8 +389,8 @@ export const useStatisticsStore = defineStore('statistics', {
                     name: account.name,
                     type: 'account',
                     id: account.id,
-                    icon: account.icon || iconConstants.defaultAccountIcon.icon,
-                    color: account.color || colorConstants.defaultAccountColor,
+                    icon: account.icon || DEFAULT_ACCOUNT_ICON.icon,
+                    color: account.color || DEFAULT_ACCOUNT_COLOR,
                     hidden: primaryAccount.hidden || account.hidden,
                     displayOrders: [primaryAccount.category, primaryAccount.displayOrder, account.displayOrder],
                     totalAmount: amount
@@ -565,7 +565,7 @@ export const useStatisticsStore = defineStore('statistics', {
             this.transactionStatisticsFilter.filterAccountIds = {};
             this.transactionStatisticsFilter.filterCategoryIds = {};
             this.transactionStatisticsFilter.tagIds = '';
-            this.transactionStatisticsFilter.tagFilterType = transactionConstants.defaultTransactionTagFilterType.type;
+            this.transactionStatisticsFilter.tagFilterType = TransactionTagFilterType.Default.type;
             this.transactionCategoryStatisticsData = {};
             this.transactionCategoryTrendsData = {};
             this.transactionStatisticsStateInvalid = true;
@@ -694,7 +694,7 @@ export const useStatisticsStore = defineStore('statistics', {
             if (filter && isInteger(filter.tagFilterType)) {
                 this.transactionStatisticsFilter.tagFilterType = filter.tagFilterType;
             } else {
-                this.transactionStatisticsFilter.tagFilterType = transactionConstants.defaultTransactionTagFilterType.type;
+                this.transactionStatisticsFilter.tagFilterType = TransactionTagFilterType.Default.type;
             }
 
             if (filter && isInteger(filter.sortingType)) {

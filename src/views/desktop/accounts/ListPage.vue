@@ -29,8 +29,8 @@
                         </div>
                         <v-divider />
                         <v-tabs show-arrows class="account-category-tabs my-4" direction="vertical"
-                                :disabled="loading" v-model="activeAccountCategoryId">
-                            <v-tab class="tab-text-truncate" :key="accountCategory.id" :value="accountCategory.id"
+                                :disabled="loading" v-model="activeAccountCategoryType">
+                            <v-tab class="tab-text-truncate" :key="accountCategory.type" :value="accountCategory.type"
                                    v-for="accountCategory in allAccountCategories">
                                 <ItemIcon icon-type="account" :icon-id="accountCategory.defaultAccountIconId" />
                                 <div class="d-flex flex-column text-truncate ml-2">
@@ -146,8 +146,8 @@
                                                 handle=".drag-handle"
                                                 ghost-class="dragging-item"
                                                 :disabled="activeAccountCategoryVisibleAccountCount <= 1"
-                                                :list="allCategorizedAccountsMap[activeAccountCategory.id].accounts"
-                                                v-if="allCategorizedAccountsMap[activeAccountCategory.id] && allCategorizedAccountsMap[activeAccountCategory.id].accounts && allCategorizedAccountsMap[activeAccountCategory.id].accounts.length"
+                                                :list="allCategorizedAccountsMap[activeAccountCategory.type].accounts"
+                                                v-if="allCategorizedAccountsMap[activeAccountCategory.type] && allCategorizedAccountsMap[activeAccountCategory.type].accounts && allCategorizedAccountsMap[activeAccountCategory.type].accounts.length"
                                                 @change="onMove"
                                             >
                                                 <template #item="{ element }">
@@ -169,7 +169,7 @@
                                                                     </span>
                                                                 </div>
 
-                                                                <div class="mt-4" v-if="element.type === allAccountTypes.MultiSubAccounts">
+                                                                <div class="mt-4" v-if="element.type === allAccountTypes.MultiSubAccounts.type">
                                                                     <v-btn-toggle
                                                                         class="account-subaccounts"
                                                                         variant="outlined"
@@ -265,10 +265,9 @@ import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import accountConstants from '@/consts/account.js';
-import { isObject } from '@/lib/common.js';
+import { AccountType, AccountCategory } from '@/core/account.ts';
+import { isObject } from '@/lib/common.ts';
 import {
-    getAccountCategoryInfo,
     getSubAccountCurrencies,
     getAccountOrSubAccountId,
     getAccountOrSubAccountComment
@@ -295,7 +294,7 @@ export default {
         const { mdAndUp } = useDisplay();
 
         return {
-            activeAccountCategoryId: accountConstants.allCategories[0].id,
+            activeAccountCategoryType: AccountCategory.Default.type,
             activeTab: 'accountPage',
             activeSubAccount: {},
             loading: true,
@@ -325,10 +324,10 @@ export default {
             return this.userStore.currentUserDefaultCurrency;
         },
         allAccountTypes() {
-            return accountConstants.allAccountTypes;
+            return AccountType.all();
         },
         allAccountCategories() {
-            return accountConstants.allCategories;
+            return AccountCategory.values();
         },
         allAccounts() {
             return this.accountsStore.allAccounts;
@@ -352,17 +351,17 @@ export default {
             return this.getDisplayCurrency(totalLiabilities, this.defaultCurrency);
         },
         activeAccountCategory() {
-            return getAccountCategoryInfo(this.activeAccountCategoryId);
+            return AccountCategory.valueOf(this.activeAccountCategoryType);
         },
         activeAccountCategoryTotalBalance() {
             return this.accountCategoryTotalBalance(this.activeAccountCategory);
         },
         activeAccountCategoryVisibleAccountCount() {
-            if (!this.allCategorizedAccountsMap[this.activeAccountCategory.id] || !this.allCategorizedAccountsMap[this.activeAccountCategory.id].accounts) {
+            if (!this.allCategorizedAccountsMap[this.activeAccountCategory.type] || !this.allCategorizedAccountsMap[this.activeAccountCategory.type].accounts) {
                 return 0;
             }
 
-            const accounts = this.allCategorizedAccountsMap[this.activeAccountCategory.id].accounts;
+            const accounts = this.allCategorizedAccountsMap[this.activeAccountCategory.type].accounts;
 
             if (this.showHidden) {
                 return accounts.length;
@@ -422,7 +421,7 @@ export default {
                     for (let i = 0; i < self.allAccounts.length; i++) {
                         const account = self.allAccounts[i];
 
-                        if (account.type === self.allAccountTypes.MultiSubAccounts && !self.activeSubAccount[account.id]) {
+                        if (account.type === self.allAccountTypes.MultiSubAccounts.type && !self.activeSubAccount[account.id]) {
                             self.activeSubAccount[account.id] = '';
                         }
                     }
@@ -459,9 +458,9 @@ export default {
         accountCurrency(account) {
             const self = this;
 
-            if (account.type === self.allAccountTypes.SingleAccount) {
+            if (account.type === self.allAccountTypes.SingleAccount.type) {
                 return self.$locale.getCurrencyName(account.currency);
-            } else if (account.type === self.allAccountTypes.MultiSubAccounts) {
+            } else if (account.type === self.allAccountTypes.MultiSubAccounts.type) {
                 const subAccountCurrencies = getSubAccountCurrencies(account, self.showHidden, self.activeSubAccount[account.id])
                     .map(currencyCode => self.$locale.getCurrencyName(currencyCode));
                 return self.$locale.joinMultiText(subAccountCurrencies);
@@ -470,10 +469,10 @@ export default {
             }
         },
         accountBalance(account) {
-            if (account.type === this.allAccountTypes.SingleAccount) {
+            if (account.type === this.allAccountTypes.SingleAccount.type) {
                 const balance = this.accountsStore.getAccountBalance(this.showAccountBalance, account);
                 return this.getDisplayCurrency(balance, account.currency);
-            } else if (account.type === this.allAccountTypes.MultiSubAccounts) {
+            } else if (account.type === this.allAccountTypes.MultiSubAccounts.type) {
                 const balanceResult = this.accountsStore.getAccountSubAccountBalance(this.showAccountBalance, this.showHidden, account, this.activeSubAccount[account.id]);
 
                 if (!isObject(balanceResult)) {
@@ -538,7 +537,7 @@ export default {
             const self = this;
 
             self.$refs.editDialog.open({
-                category: self.activeAccountCategoryId
+                category: self.activeAccountCategoryType
             }).then(result => {
                 if (result && result.message) {
                     self.$refs.snackbar.showMessage(result.message);

@@ -70,7 +70,7 @@ import draggable from 'vuedraggable';
 
 import router from '@/router/desktop.js';
 
-import { getVersion, getBuildTime } from '@/lib/version.js';
+import { getVersion, getBuildTime } from '@/lib/version.ts';
 import userstate from '@/lib/userstate.js';
 import {
     getI18nOptions,

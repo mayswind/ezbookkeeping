@@ -68,9 +68,9 @@
 import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.js';
 
-import templateConstants from '@/consts/template.js';
-import { sortNumbersArray } from '@/lib/common.js';
-import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
+import { ScheduledTemplateFrequencyType } from '@/core/template.ts';
+import { sortNumbersArray } from '@/lib/common.ts';
+import { scrollToSelectedItem } from '@/lib/ui/mobile.js';
 
 export default {
     props: [
@@ -100,7 +100,7 @@ export default {
             return this.$locale.getAllTransactionScheduledFrequencyTypes();
         },
         allTemplateScheduledFrequencyTypes() {
-            return templateConstants.allTemplateScheduledFrequencyTypes;
+            return ScheduledTemplateFrequencyType.all();
         },
         allWeekDays() {
             return this.$locale.getAllWeekDays(this.firstDayOfWeek);
@@ -134,9 +134,9 @@ export default {
             if (this.currentFrequencyType !== value) {
                 this.currentFrequencyType = value;
 
-                if (value === templateConstants.allTemplateScheduledFrequencyTypes.Weekly.type) {
+                if (value === ScheduledTemplateFrequencyType.Weekly.type) {
                     this.currentFrequencyValue = [this.firstDayOfWeek];
-                } else if (value === templateConstants.allTemplateScheduledFrequencyTypes.Monthly.type) {
+                } else if (value === ScheduledTemplateFrequencyType.Monthly.type) {
                     this.currentFrequencyValue = [1];
                 } else {
                     this.currentFrequencyValue = [];

@@ -200,7 +200,7 @@
                                         v-model="transaction.time"
                                         @error="showDateTimeError" />
                                 </v-col>
-                                <v-col cols="12" md="6" v-if="type === 'template' && transaction.templateType === allTemplateTypes.Schedule">
+                                <v-col cols="12" md="6" v-if="type === 'template' && transaction.templateType === allTemplateTypes.Schedule.type">
                                     <schedule-frequency-select
                                         :readonly="mode === 'view'"
                                         :disabled="loading || submitting"
@@ -208,7 +208,7 @@
                                         v-model:type="transaction.scheduledFrequencyType"
                                         v-model="transaction.scheduledFrequency" />
                                 </v-col>
-                                <v-col cols="12" md="6" v-if="type === 'transaction' || (type === 'template' && transaction.templateType === allTemplateTypes.Schedule)">
+                                <v-col cols="12" md="6" v-if="type === 'transaction' || (type === 'template' && transaction.templateType === allTemplateTypes.Schedule.type)">
                                     <v-autocomplete
                                         class="transaction-edit-timezone"
                                         item-title="displayNameWithUtcOffset"
@@ -400,22 +400,23 @@ import { useTransactionsStore } from '@/stores/transaction.js';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import fileConstants from '@/consts/file.js';
-import categoryConstants from '@/consts/category.js';
-import transactionConstants from '@/consts/transaction.js';
-import templateConstants from '@/consts/template.js';
-import apiConstants from '@/consts/api.js';
+import { CategoryType } from '@/core/category.ts';
+import { TransactionType, TransactionEditScopeType } from '@/core/transaction.ts';
+import { TemplateType, ScheduledTemplateFrequencyType } from '@/core/template.ts';
+import { TRANSACTION_MAX_PICTURE_COUNT } from '@/consts/transaction.ts';
+import { KnownErrorCode } from '@/consts/api.ts';
+import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
 import logger from '@/lib/logger.js';
 import {
     isArray,
     getNameByKeyValue
-} from '@/lib/common.js';
+} from '@/lib/common.ts';
 import {
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffsetMinutes,
     getCurrentUnixTime
 } from '@/lib/datetime.js';
-import { generateRandomUUID } from '@/lib/misc.js';
+import { generateRandomUUID } from '@/lib/misc.ts';
 import {
     getTransactionPrimaryCategoryName,
     getTransactionSecondaryCategoryName,
@@ -425,7 +426,7 @@ import { setTransactionModelByTransaction } from '@/lib/transaction.js';
 import {
     isTransactionPicturesEnabled,
     getMapProvider
-} from '@/lib/server_settings.js';
+} from '@/lib/server_settings.ts';
 
 import {
     mdiDotsVertical,
@@ -496,13 +497,13 @@ export default {
                 } else {
                     return 'Transaction Detail';
                 }
-            } else if (this.type === 'template' && this.transaction.templateType === templateConstants.allTemplateTypes.Normal) {
+            } else if (this.type === 'template' && this.transaction.templateType === TemplateType.Normal.type) {
                 if (this.mode === 'add') {
                     return 'Add Transaction Template';
                 } else if (this.mode === 'edit') {
                     return 'Edit Transaction Template';
                 }
-            } else if (this.type === 'template' && this.transaction.templateType === templateConstants.allTemplateTypes.Schedule) {
+            } else if (this.type === 'template' && this.transaction.templateType === TemplateType.Schedule.type) {
                 if (this.mode === 'add') {
                     return 'Add Scheduled Transaction';
                 } else if (this.mode === 'edit') {
@@ -571,13 +572,13 @@ export default {
             return this.userStore.currentUserDefaultAccountId;
         },
         allTransactionTypes() {
-            return transactionConstants.allTransactionTypes;
+            return TransactionType;
         },
         allCategoryTypes() {
-            return categoryConstants.allCategoryTypes;
+            return CategoryType;
         },
         allTemplateTypes() {
-            return templateConstants.allTemplateTypes;
+            return TemplateType.all();
         },
         allTimezones() {
             return this.$locale.getAllTimezones(true);
@@ -607,7 +608,7 @@ export default {
             return this.transactionTagsStore.allTransactionTagsMap;
         },
         supportedImageExtensions() {
-            return fileConstants.supportedImageExtensions;
+            return SUPPORTED_IMAGE_EXTENSIONS;
         },
         hasAvailableExpenseCategories() {
             if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Expense] || !this.allCategories[this.allCategoryTypes.Expense].length) {
@@ -702,7 +703,7 @@ export default {
                 return false;
             }
 
-            return !isArray(this.transaction.pictures) || this.transaction.pictures.length < transactionConstants.maxPictureCount;
+            return !isArray(this.transaction.pictures) || this.transaction.pictures.length < TRANSACTION_MAX_PICTURE_COUNT;
         },
         mapProvider() {
             return getMapProvider();
@@ -839,8 +840,8 @@ export default {
                     self.transaction.templateType = options.templateType;
                 }
 
-                if (self.transaction.templateType === templateConstants.allTemplateTypes.Schedule) {
-                    self.transaction.scheduledFrequencyType = templateConstants.allTemplateScheduledFrequencyTypes.Disabled.type;
+                if (self.transaction.templateType === TemplateType.Schedule.type) {
+                    self.transaction.scheduledFrequencyType = ScheduledTemplateFrequencyType.Disabled.type;
                     self.transaction.scheduledFrequency = '';
                 }
 
@@ -850,7 +851,7 @@ export default {
                         self.transaction.templateType = options.currentTemplate.templateType;
                         self.transaction.name = options.currentTemplate.name;
 
-                        if (self.transaction.templateType === templateConstants.allTemplateTypes.Schedule) {
+                        if (self.transaction.templateType === TemplateType.Schedule.type) {
                             self.transaction.scheduledFrequencyType = options.currentTemplate.scheduledFrequencyType;
                             self.transaction.scheduledFrequency = options.currentTemplate.scheduledFrequency;
                             self.transaction.utcOffset = options.currentTemplate.utcOffset;
@@ -903,7 +904,7 @@ export default {
                     self.transaction.templateType = template.templateType;
                     self.transaction.name = template.name;
 
-                    if (self.transaction.templateType === templateConstants.allTemplateTypes.Schedule) {
+                    if (self.transaction.templateType === TemplateType.Schedule.type) {
                         self.transaction.scheduledFrequencyType = template.scheduledFrequencyType;
                         self.transaction.scheduledFrequency = template.scheduledFrequency;
                         self.transaction.utcOffset = template.utcOffset;
@@ -974,12 +975,12 @@ export default {
                     }).catch(error => {
                         self.submitting = false;
 
-                        if (error.error && (error.error.errorCode === apiConstants.transactionCannotCreateInThisTimeErrorCode || error.error.errorCode === apiConstants.transactionCannotModifyInThisTimeErrorCode)) {
+                        if (error.error && (error.error.errorCode === KnownErrorCode.TransactionCannotCreateInThisTime || error.error.errorCode === KnownErrorCode.TransactionCannotModifyInThisTime)) {
                             self.$refs.confirmDialog.open('You have set this time range to prevent editing transactions. Would you like to change the editable transaction range to All?').then(() => {
                                 self.submitting = true;
 
                                 self.userStore.updateUserTransactionEditScope({
-                                    transactionEditScope: transactionConstants.allTransactionEditScopeTypes.All.type
+                                    transactionEditScope: TransactionEditScopeType.All.type
                                 }).then(() => {
                                     self.submitting = false;
 
@@ -1272,7 +1273,7 @@ export default {
                     self.removingPictureId = '';
                     self.submitting = false;
                 }).catch(error => {
-                    if (error.error && error.error.errorCode === apiConstants.transactionPictureNotFoundErrorCode) {
+                    if (error.error && error.error.errorCode === KnownErrorCode.TransactionPictureNotFound) {
                         for (let i = 0; i < self.transaction.pictures.length; i++) {
                             if (self.transaction.pictures[i].pictureId === pictureInfo.pictureId) {
                                 self.transaction.pictures.splice(i, 1);

@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import userState from '@/lib/userstate.js';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
-import { isBoolean } from '@/lib/common.js';
+import { isBoolean } from '@/lib/common.ts';
 
 export const useTwoFactorAuthStore = defineStore('twoFactorAuth', {
     actions: {

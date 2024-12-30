@@ -77,12 +77,10 @@ export function allTransactionCategoriesWithVisibleCount(allTransactionCategorie
             || allowCategoryTypes[CategoryType.Expense.toString()]
             || allowCategoryTypes[CategoryType.Transfer.toString()]);
 
-    for (let key in CategoryType) {
-        if (!Object.prototype.hasOwnProperty.call(CategoryType, key)) {
-            continue;
-        }
+    const allCategoryTypes = [ CategoryType.Income, CategoryType.Expense, CategoryType.Transfer ];
 
-        const categoryType = CategoryType[key];
+    for (let i = 0; i < allCategoryTypes.length; i++) {
+        const categoryType = allCategoryTypes[i];
 
         if (!allTransactionCategories[categoryType]) {
             continue;

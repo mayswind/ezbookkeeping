@@ -206,11 +206,11 @@ function getCurrentLanguageDisplayName(i18nGlobal) {
     return currentLanguageInfo.displayName;
 }
 
-function getLocalizedDisplayNameAndType(nameAndTypes, translateFn) {
+function getLocalizedDisplayNameAndType(typeAndNames, translateFn) {
     const ret = [];
 
-    for (let i = 0; i < nameAndTypes.length; i++) {
-        const nameAndType = nameAndTypes[i];
+    for (let i = 0; i < typeAndNames.length; i++) {
+        const nameAndType = typeAndNames[i];
 
         ret.push({
             type: nameAndType.type,

@@ -1,4 +1,4 @@
-export const CliUserAgent: string = 'ezbookkeeping Cli';
+export const TOKEN_CLI_USER_AGENT: string = 'ezbookkeeping Cli';
 
 export interface TokenInfoResponse {
     readonly tokenId: string;

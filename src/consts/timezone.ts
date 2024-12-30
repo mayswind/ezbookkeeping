@@ -205,10 +205,7 @@ export const ALL_TIMEZONES: TimezoneInfo[] = [
         timezoneName: 'Atlantic/Cape_Verde'
     },
     // UTC
-    {
-        displayName: 'Coordinated Universal Time',
-        timezoneName: 'Etc/GMT'
-    },
+    UTC_TIMEZONE,
     // UTC+00:00
     {
         displayName: 'Dublin, Edinburgh, Lisbon, London',

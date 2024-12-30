@@ -1,6 +1,6 @@
 import uaParser from 'ua-parser-js';
 
-import { CliUserAgent, type TokenInfoResponse, SessionInfo } from '@/models/token.ts';
+import { TOKEN_CLI_USER_AGENT, type TokenInfoResponse, SessionInfo } from '@/models/token.ts';
 
 interface UserAgentInfo {
     device: {
@@ -39,7 +39,7 @@ function parseUserAgent(ua: string): UserAgentInfo {
 }
 
 function isSessionUserAgentCreatedByCli(ua: string): boolean {
-    return ua === CliUserAgent;
+    return ua === TOKEN_CLI_USER_AGENT;
 }
 
 function parseDeviceInfo(uaInfo: UserAgentInfo): string {

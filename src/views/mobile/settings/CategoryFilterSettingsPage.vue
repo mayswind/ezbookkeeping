@@ -166,8 +166,6 @@ export default {
         'f7router'
     ],
     data: function () {
-        const self = this;
-
         return {
             loading: true,
             loadingError: null,
@@ -175,7 +173,17 @@ export default {
             allowCategoryTypes: null,
             filterCategoryIds: {},
             showHidden: false,
-            collapseStates: self.getCollapseStates(),
+            collapseStates: {
+                [CategoryType.Income]: {
+                    opened: true
+                },
+                [CategoryType.Expense]: {
+                    opened: true
+                },
+                [CategoryType.Transfer]: {
+                    opened: true
+                }
+            },
             showMoreActionSheet: false
         }
     },
@@ -367,23 +375,6 @@ export default {
         },
         isSubCategoriesHasButNotAllChecked(category, filterCategoryIds) {
             return isSubCategoriesHasButNotAllChecked(category, filterCategoryIds);
-        },
-        getCollapseStates() {
-            const collapseStates = {};
-
-            for (const categoryTypeField in CategoryType) {
-                if (!Object.prototype.hasOwnProperty.call(CategoryType, categoryTypeField)) {
-                    continue;
-                }
-
-                const categoryType = CategoryType[categoryTypeField];
-
-                collapseStates[categoryType] = {
-                    opened: true
-                };
-            }
-
-            return collapseStates;
         }
     }
 }

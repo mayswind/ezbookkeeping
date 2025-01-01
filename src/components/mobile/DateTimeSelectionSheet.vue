@@ -52,7 +52,6 @@
 import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.js';
 
-import datetimeConstants from '@/consts/datetime.js';
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
@@ -202,19 +201,15 @@ export default {
             return getTimeValues(datetime, this.is24Hour, this.isMeridiemIndicatorFirst);
         },
         getTimePickerColumns() {
-            const self = this;
             const ret = [];
 
-            if (!self.is24Hour && this.isMeridiemIndicatorFirst) {
-                ret.push({
-                    values: datetimeConstants.allMeridiemIndicatorsArray,
-                    displayValues: self.$locale.getAllMeridiemIndicatorNames()
-                });
+            if (!this.is24Hour && this.isMeridiemIndicatorFirst) {
+                ret.push(this.$locale.getAllMeridiemIndicators());
             }
 
             // Hours
             ret.push({
-                values: self.generateAllHours()
+                values: this.generateAllHours()
             });
             // Divider
             ret.push({
@@ -223,7 +218,7 @@ export default {
             });
             // Minutes
             ret.push({
-                values: self.generateAllMinutesOrSeconds()
+                values: this.generateAllMinutesOrSeconds()
             });
             // Divider
             ret.push({
@@ -232,14 +227,11 @@ export default {
             });
             // Seconds
             ret.push({
-                values: self.generateAllMinutesOrSeconds()
+                values: this.generateAllMinutesOrSeconds()
             });
 
-            if (!self.is24Hour && !this.isMeridiemIndicatorFirst) {
-                ret.push({
-                    values: datetimeConstants.allMeridiemIndicatorsArray,
-                    displayValues: self.$locale.getAllMeridiemIndicatorNames()
-                });
+            if (!this.is24Hour && !this.isMeridiemIndicatorFirst) {
+                ret.push(this.$locale.getAllMeridiemIndicators());
             }
 
             return ret;

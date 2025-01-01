@@ -337,7 +337,7 @@ import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 import { useOverviewStore } from '@/stores/overview.js';
 
-import datetimeConstants from '@/consts/datetime.js';
+import { WeekDay } from '@/core/datetime.ts';
 import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
 import { getNameByKeyValue } from '@/lib/common.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
@@ -354,7 +354,7 @@ export default {
     data() {
         const self = this;
         const defaultFirstDayOfWeekName = self.$locale.getDefaultFirstDayOfWeek();
-        const defaultFirstDayOfWeek = datetimeConstants.allWeekDays[defaultFirstDayOfWeekName] ? datetimeConstants.allWeekDays[defaultFirstDayOfWeekName].type : datetimeConstants.defaultFirstDayOfWeek;
+        const defaultFirstDayOfWeek = WeekDay.parse(defaultFirstDayOfWeekName) ? WeekDay.parse(defaultFirstDayOfWeekName).type : WeekDay.DefaultFirstDay.type;
 
         return {
             newProfile: {

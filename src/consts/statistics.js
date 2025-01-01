@@ -1,4 +1,4 @@
-import datetime from './datetime.js';
+import { DateRange } from '@/core/datetime.ts';
 
 const allAnalysisTypes = {
     CategoricalAnalysis: 0,
@@ -203,8 +203,8 @@ export default {
     allChartDataTypes: allChartDataTypes,
     allChartDataTypesMap: allChartDataTypesMap,
     defaultChartDataType: defaultChartDataType,
-    defaultCategoricalChartDataRangeType: datetime.allDateRanges.ThisMonth.type,
-    defaultTrendChartDataRangeType: datetime.allDateRanges.ThisYear.type,
+    defaultCategoricalChartDataRangeType: DateRange.ThisMonth.type,
+    defaultTrendChartDataRangeType: DateRange.ThisYear.type,
     allSortingTypes: allSortingTypes,
     allSortingTypesArray: allSortingTypesArray,
     defaultSortingType: defaultSortingType,

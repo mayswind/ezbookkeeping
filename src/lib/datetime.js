@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import dateTimeConstants from '@/consts/datetime.js';
+import { Month, WeekDay, MeridiemIndicator, DateRangeScene, DateRange, LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE } from '@/core/datetime.ts';
 import { isObject, isString, isNumber } from './common.ts';
 
 export function isYearMonthValid(year, month) {
@@ -198,16 +198,16 @@ export function getDay(date) {
 
 export function getDayOfWeekName(date) {
     const dayOfWeek = moment(date).days();
-    return dateTimeConstants.allWeekDaysArray[dayOfWeek].name;
+    return WeekDay.valueOf(dayOfWeek).name;
 }
 
 export function getMonthName(date) {
-    const dayOfWeek = moment(date).month();
-    return dateTimeConstants.allMonthsArray[dayOfWeek];
+    const month = moment(date).month();
+    return Month.valueOf(month + 1).name;
 }
 
 export function getAMOrPM(hour) {
-    return isPM(hour) ? dateTimeConstants.allMeridiemIndicators.PM : dateTimeConstants.allMeridiemIndicators.AM;
+    return isPM(hour) ? MeridiemIndicator.PM.name : MeridiemIndicator.AM.name;
 }
 
 export function getUnixTimeBeforeUnixTime(unixTime, amount, unit) {
@@ -429,9 +429,9 @@ export function getAllMonthsStartAndEndUnixTimes(startYearMonth, endYearMonth) {
 }
 
 export function getDateTimeFormatType(allFormatMap, allFormatArray, localeDefaultFormatTypeName, systemDefaultFormatType, formatTypeValue) {
-    if (formatTypeValue > dateTimeConstants.defaultDateTimeFormatValue && allFormatArray[formatTypeValue - 1] && allFormatArray[formatTypeValue - 1].key) {
+    if (formatTypeValue > LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE && allFormatArray[formatTypeValue - 1] && allFormatArray[formatTypeValue - 1].key) {
         return allFormatArray[formatTypeValue - 1];
-    } else if (formatTypeValue === dateTimeConstants.defaultDateTimeFormatValue && allFormatMap[localeDefaultFormatTypeName] && allFormatMap[localeDefaultFormatTypeName].key) {
+    } else if (formatTypeValue === LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE && allFormatMap[localeDefaultFormatTypeName] && allFormatMap[localeDefaultFormatTypeName].key) {
         return allFormatMap[localeDefaultFormatTypeName];
     } else {
         return systemDefaultFormatType;
@@ -489,12 +489,12 @@ export function getShiftedDateRangeAndDateType(minTime, maxTime, scale, firstDay
 }
 
 export function getShiftedDateRangeAndDateTypeForBillingCycle(minTime, maxTime, scale, firstDayOfWeek, scene, statementDate) {
-    if (!statementDate || !dateTimeConstants.allDateRanges.PreviousBillingCycle.availableScenes[scene] || !dateTimeConstants.allDateRanges.CurrentBillingCycle.availableScenes[scene]) {
+    if (!statementDate || !DateRange.PreviousBillingCycle.isAvailableForScene(scene) || !DateRange.CurrentBillingCycle.isAvailableForScene(scene)) {
         return null;
     }
 
-    const previousBillingCycleRange = getDateRangeByBillingCycleDateType(dateTimeConstants.allDateRanges.PreviousBillingCycle.type, firstDayOfWeek, statementDate);
-    const currentBillingCycleRange = getDateRangeByBillingCycleDateType(dateTimeConstants.allDateRanges.CurrentBillingCycle.type, firstDayOfWeek, statementDate);
+    const previousBillingCycleRange = getDateRangeByBillingCycleDateType(DateRange.PreviousBillingCycle.type, firstDayOfWeek, statementDate);
+    const currentBillingCycleRange = getDateRangeByBillingCycleDateType(DateRange.CurrentBillingCycle.type, firstDayOfWeek, statementDate);
 
     if (previousBillingCycleRange && getUnixTimeBeforeUnixTime(previousBillingCycleRange.maxTime, 1, 'months') === maxTime && getUnixTimeBeforeUnixTime(previousBillingCycleRange.minTime, 1, 'months') === minTime && scale === 1) {
         return previousBillingCycleRange;
@@ -510,23 +510,20 @@ export function getShiftedDateRangeAndDateTypeForBillingCycle(minTime, maxTime, 
 }
 
 export function getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek, scene) {
-    let newDateType = dateTimeConstants.allDateRanges.Custom.type;
+    const allDateRanges = DateRange.values();
+    let newDateType = DateRange.Custom.type;
 
-    for (let dateRangeField in dateTimeConstants.allDateRanges) {
-        if (!Object.prototype.hasOwnProperty.call(dateTimeConstants.allDateRanges, dateRangeField)) {
+    for (let i = 0; i < allDateRanges.length; i++) {
+        const dateRange = allDateRanges[i];
+
+        if (!dateRange.isAvailableForScene(scene)) {
             continue;
         }
 
-        const dateRangeType = dateTimeConstants.allDateRanges[dateRangeField];
+        const range = getDateRangeByDateType(dateRange.type, firstDayOfWeek);
 
-        if (!dateRangeType.availableScenes[scene]) {
-            continue;
-        }
-
-        const dateRange = getDateRangeByDateType(dateRangeType.type, firstDayOfWeek);
-
-        if (dateRange && dateRange.minTime === minTime && dateRange.maxTime === maxTime) {
-            newDateType = dateRangeType.type;
+        if (range && range.minTime === minTime && range.maxTime === maxTime) {
+            newDateType = dateRange.type;
             break;
         }
     }
@@ -535,12 +532,12 @@ export function getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek, scene) 
 }
 
 export function getDateTypeByBillingCycleDateRange(minTime, maxTime, firstDayOfWeek, scene, statementDate) {
-    if (!statementDate || !dateTimeConstants.allDateRanges.PreviousBillingCycle.availableScenes[scene] || !dateTimeConstants.allDateRanges.CurrentBillingCycle.availableScenes[scene]) {
+    if (!statementDate || !DateRange.PreviousBillingCycle.isAvailableForScene(scene) || !DateRange.CurrentBillingCycle.isAvailableForScene(scene)) {
         return null;
     }
 
-    const previousBillingCycleRange = getDateRangeByBillingCycleDateType(dateTimeConstants.allDateRanges.PreviousBillingCycle.type, firstDayOfWeek, statementDate);
-    const currentBillingCycleRange = getDateRangeByBillingCycleDateType(dateTimeConstants.allDateRanges.CurrentBillingCycle.type, firstDayOfWeek, statementDate);
+    const previousBillingCycleRange = getDateRangeByBillingCycleDateType(DateRange.PreviousBillingCycle.type, firstDayOfWeek, statementDate);
+    const currentBillingCycleRange = getDateRangeByBillingCycleDateType(DateRange.CurrentBillingCycle.type, firstDayOfWeek, statementDate);
 
     if (previousBillingCycleRange && previousBillingCycleRange.maxTime === maxTime && previousBillingCycleRange.minTime === minTime) {
         return previousBillingCycleRange.dateType;
@@ -555,55 +552,55 @@ export function getDateRangeByDateType(dateType, firstDayOfWeek) {
     let maxTime = 0;
     let minTime = 0;
 
-    if (dateType === dateTimeConstants.allDateRanges.All.type) { // All
+    if (dateType === DateRange.All.type) { // All
         maxTime = 0;
         minTime = 0;
-    } else if (dateType === dateTimeConstants.allDateRanges.Today.type) { // Today
+    } else if (dateType === DateRange.Today.type) { // Today
         maxTime = getTodayLastUnixTime();
         minTime = getTodayFirstUnixTime();
-    } else if (dateType === dateTimeConstants.allDateRanges.Yesterday.type) { // Yesterday
+    } else if (dateType === DateRange.Yesterday.type) { // Yesterday
         maxTime = getUnixTimeBeforeUnixTime(getTodayLastUnixTime(), 1, 'days');
         minTime = getUnixTimeBeforeUnixTime(getTodayFirstUnixTime(), 1, 'days');
-    } else if (dateType === dateTimeConstants.allDateRanges.LastSevenDays.type) { // Last 7 days
+    } else if (dateType === DateRange.LastSevenDays.type) { // Last 7 days
         maxTime = getTodayLastUnixTime();
         minTime = getUnixTimeBeforeUnixTime(getTodayFirstUnixTime(), 6, 'days');
-    } else if (dateType === dateTimeConstants.allDateRanges.LastThirtyDays.type) { // Last 30 days
+    } else if (dateType === DateRange.LastThirtyDays.type) { // Last 30 days
         maxTime = getTodayLastUnixTime();
         minTime = getUnixTimeBeforeUnixTime(getTodayFirstUnixTime(), 29, 'days');
-    } else if (dateType === dateTimeConstants.allDateRanges.ThisWeek.type) { // This week
+    } else if (dateType === DateRange.ThisWeek.type) { // This week
         maxTime = getThisWeekLastUnixTime(firstDayOfWeek);
         minTime = getThisWeekFirstUnixTime(firstDayOfWeek);
-    } else if (dateType === dateTimeConstants.allDateRanges.LastWeek.type) { // Last week
+    } else if (dateType === DateRange.LastWeek.type) { // Last week
         maxTime = getUnixTimeBeforeUnixTime(getThisWeekLastUnixTime(firstDayOfWeek), 7, 'days');
         minTime = getUnixTimeBeforeUnixTime(getThisWeekFirstUnixTime(firstDayOfWeek), 7, 'days');
-    } else if (dateType === dateTimeConstants.allDateRanges.ThisMonth.type) { // This month
+    } else if (dateType === DateRange.ThisMonth.type) { // This month
         maxTime = getThisMonthLastUnixTime();
         minTime = getThisMonthFirstUnixTime();
-    } else if (dateType === dateTimeConstants.allDateRanges.LastMonth.type) { // Last month
+    } else if (dateType === DateRange.LastMonth.type) { // Last month
         maxTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 1, 'seconds');
         minTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 1, 'months');
-    } else if (dateType === dateTimeConstants.allDateRanges.ThisYear.type) { // This year
+    } else if (dateType === DateRange.ThisYear.type) { // This year
         maxTime = getThisYearLastUnixTime();
         minTime = getThisYearFirstUnixTime();
-    } else if (dateType === dateTimeConstants.allDateRanges.LastYear.type) { // Last year
+    } else if (dateType === DateRange.LastYear.type) { // Last year
         maxTime = getUnixTimeBeforeUnixTime(getThisYearLastUnixTime(), 1, 'years');
         minTime = getUnixTimeBeforeUnixTime(getThisYearFirstUnixTime(), 1, 'years');
-    } else if (dateType === dateTimeConstants.allDateRanges.RecentTwelveMonths.type) { // Recent 12 months
+    } else if (dateType === DateRange.RecentTwelveMonths.type) { // Recent 12 months
         maxTime = getThisMonthLastUnixTime();
         minTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 11, 'months');
-    } else if (dateType === dateTimeConstants.allDateRanges.RecentTwentyFourMonths.type) { // Recent 24 months
+    } else if (dateType === DateRange.RecentTwentyFourMonths.type) { // Recent 24 months
         maxTime = getThisMonthLastUnixTime();
         minTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 23, 'months');
-    } else if (dateType === dateTimeConstants.allDateRanges.RecentThirtySixMonths.type) { // Recent 36 months
+    } else if (dateType === DateRange.RecentThirtySixMonths.type) { // Recent 36 months
         maxTime = getThisMonthLastUnixTime();
         minTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 35, 'months');
-    } else if (dateType === dateTimeConstants.allDateRanges.RecentTwoYears.type) { // Recent 2 years
+    } else if (dateType === DateRange.RecentTwoYears.type) { // Recent 2 years
         maxTime = getThisYearLastUnixTime();
         minTime = getUnixTimeBeforeUnixTime(getThisYearFirstUnixTime(), 1, 'years');
-    } else if (dateType === dateTimeConstants.allDateRanges.RecentThreeYears.type) { // Recent 3 years
+    } else if (dateType === DateRange.RecentThreeYears.type) { // Recent 3 years
         maxTime = getThisYearLastUnixTime();
         minTime = getUnixTimeBeforeUnixTime(getThisYearFirstUnixTime(), 2, 'years');
-    } else if (dateType === dateTimeConstants.allDateRanges.RecentFiveYears.type) { // Recent 5 years
+    } else if (dateType === DateRange.RecentFiveYears.type) { // Recent 5 years
         maxTime = getThisYearLastUnixTime();
         minTime = getUnixTimeBeforeUnixTime(getThisYearFirstUnixTime(), 4, 'years');
     } else {
@@ -621,7 +618,7 @@ export function getDateRangeByBillingCycleDateType(dateType, firstDayOfWeek, sta
     let maxTime = 0;
     let minTime = 0;
 
-    if (dateType === dateTimeConstants.allDateRanges.PreviousBillingCycle.type || dateType === dateTimeConstants.allDateRanges.CurrentBillingCycle.type) { // Previous Billing Cycle | Current Billing Cycle
+    if (dateType === DateRange.PreviousBillingCycle.type || dateType === DateRange.CurrentBillingCycle.type) { // Previous Billing Cycle | Current Billing Cycle
         if (statementDate) {
             if (getCurrentDay() <= statementDate) {
                 maxTime = getThisMonthSpecifiedDayLastUnixTime(statementDate);
@@ -631,17 +628,17 @@ export function getDateRangeByBillingCycleDateType(dateType, firstDayOfWeek, sta
                 minTime = getUnixTimeAfterUnixTime(getThisMonthSpecifiedDayFirstUnixTime(statementDate), 1, 'days');
             }
 
-            if (dateType === dateTimeConstants.allDateRanges.PreviousBillingCycle.type) {
+            if (dateType === DateRange.PreviousBillingCycle.type) {
                 maxTime = getUnixTimeBeforeUnixTime(maxTime, 1, 'months');
                 minTime = getUnixTimeBeforeUnixTime(minTime, 1, 'months');
             }
         } else {
             let fallbackDateRange = null;
 
-            if (dateType === dateTimeConstants.allDateRanges.CurrentBillingCycle.type) { // same as This Month
-                fallbackDateRange = getDateRangeByDateType(dateTimeConstants.allDateRanges.ThisMonth.type, firstDayOfWeek);
-            } else if (dateType === dateTimeConstants.allDateRanges.PreviousBillingCycle.type) { // same as Last Month
-                fallbackDateRange = getDateRangeByDateType(dateTimeConstants.allDateRanges.LastMonth.type, firstDayOfWeek);
+            if (dateType === DateRange.CurrentBillingCycle.type) { // same as This Month
+                fallbackDateRange = getDateRangeByDateType(DateRange.ThisMonth.type, firstDayOfWeek);
+            } else if (dateType === DateRange.PreviousBillingCycle.type) { // same as Last Month
+                fallbackDateRange = getDateRangeByDateType(DateRange.LastMonth.type, firstDayOfWeek);
             }
 
             if (fallbackDateRange) {
@@ -672,14 +669,14 @@ export function getRecentMonthDateRanges(monthCount) {
         }
 
         let maxTime = getUnixTimeBeforeUnixTime(getUnixTimeAfterUnixTime(minTime, 1, 'months'), 1, 'seconds');
-        let dateType = dateTimeConstants.allDateRanges.Custom.type;
+        let dateType = DateRange.Custom.type;
         let year = getYear(parseDateFromUnixTime(minTime));
         let month = getMonth(parseDateFromUnixTime(minTime));
 
         if (i === 0) {
-            dateType = dateTimeConstants.allDateRanges.ThisMonth.type;
+            dateType = DateRange.ThisMonth.type;
         } else if (i === 1) {
-            dateType = dateTimeConstants.allDateRanges.LastMonth.type;
+            dateType = DateRange.LastMonth.type;
         }
 
         recentDateRanges.push({
@@ -707,17 +704,17 @@ export function getRecentDateRangeTypeByDateType(allRecentMonthDateRanges, dateT
 export function getRecentDateRangeType(allRecentMonthDateRanges, dateType, minTime, maxTime, firstDayOfWeek) {
     let dateRange = getDateRangeByDateType(dateType, firstDayOfWeek);
 
-    if (dateRange && dateRange.dateType === dateTimeConstants.allDateRanges.All.type) {
-        return getRecentDateRangeTypeByDateType(allRecentMonthDateRanges, dateTimeConstants.allDateRanges.All.type);
+    if (dateRange && dateRange.dateType === DateRange.All.type) {
+        return getRecentDateRangeTypeByDateType(allRecentMonthDateRanges, DateRange.All.type);
     }
 
     if (!dateRange && (!maxTime || !minTime)) {
-        return getRecentDateRangeTypeByDateType(allRecentMonthDateRanges, dateTimeConstants.allDateRanges.Custom.type);
+        return getRecentDateRangeTypeByDateType(allRecentMonthDateRanges, DateRange.Custom.type);
     }
 
     if (!dateRange) {
         dateRange = {
-            dateType: dateTimeConstants.allDateRanges.Custom.type,
+            dateType: DateRange.Custom.type,
             maxTime: maxTime,
             minTime: minTime
         };
@@ -731,7 +728,7 @@ export function getRecentDateRangeType(allRecentMonthDateRanges, dateType, minTi
         }
     }
 
-    return getRecentDateRangeTypeByDateType(allRecentMonthDateRanges, dateTimeConstants.allDateRanges.Custom.type);
+    return getRecentDateRangeTypeByDateType(allRecentMonthDateRanges, DateRange.Custom.type);
 }
 
 export function getTimeValues(date, is24Hour, isMeridiemIndicatorFirst) {
@@ -779,7 +776,7 @@ export function getCombinedDateAndTimeValues(date, timeValues, is24Hour, isMerid
             hours = 0;
         }
 
-        if (meridiemIndicator === dateTimeConstants.allMeridiemIndicators.PM) {
+        if (meridiemIndicator === MeridiemIndicator.PM.name) {
             hours += 12;
         }
     }

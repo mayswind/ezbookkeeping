@@ -595,11 +595,11 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 
+import { DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts';
 import { TemplateType }  from '@/core/template.ts';
 import numeralConstants from '@/consts/numeral.js';
-import datetimeConstants from '@/consts/datetime.js';
 import { isString, isNumber, getNameByKeyValue } from '@/lib/common.ts';
 import logger from '@/lib/logger.js';
 import {
@@ -746,10 +746,10 @@ export default {
             return this.userStore.currentUserFirstDayOfWeek;
         },
         allDateRangesArray() {
-            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.Normal, true, !!this.accountsStore.getAccountStatementDate(this.query.accountIds));
+            return this.$locale.getAllDateRanges(DateRangeScene.Normal, true, !!this.accountsStore.getAccountStatementDate(this.query.accountIds));
         },
         allDateRanges() {
-            return datetimeConstants.allDateRanges;
+            return DateRange.all();
         },
         recentDateRangeType: {
             get: function () {
@@ -1118,7 +1118,7 @@ export default {
             let dateRange = getDateRangeByDateType(query.dateType ? parseInt(query.dateType) : undefined, this.firstDayOfWeek);
 
             if (!dateRange &&
-                (datetimeConstants.allBillingCycleDateRangesMap[query.dateType] || query.dateType === datetimeConstants.allDateRanges.Custom.type.toString()) &&
+                (DateRange.isBillingCycle(query.dateType) || query.dateType === DateRange.Custom.type.toString()) &&
                 parseInt(query.maxTime) > 0 && parseInt(query.minTime) > 0) {
                 dateRange = {
                     dateType: parseInt(query.dateType),
@@ -1208,18 +1208,18 @@ export default {
             });
         },
         shiftDateRange(startTime, endTime, scale) {
-            if (this.recentDateRangeType === datetimeConstants.allDateRanges.All.type) {
+            if (this.recentDateRangeType === DateRange.All.type) {
                 return;
             }
 
             let newDateRange = null;
 
-            if (datetimeConstants.allBillingCycleDateRangesMap[this.query.dateType] || this.query.dateType === this.allDateRanges.Custom.type) {
-                newDateRange = getShiftedDateRangeAndDateTypeForBillingCycle(startTime, endTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal, this.accountsStore.getAccountStatementDate(this.query.accountIds));
+            if (DateRange.isBillingCycle(this.query.dateType) || this.query.dateType === this.allDateRanges.Custom.type) {
+                newDateRange = getShiftedDateRangeAndDateTypeForBillingCycle(startTime, endTime, scale, this.firstDayOfWeek, DateRangeScene.Normal, this.accountsStore.getAccountStatementDate(this.query.accountIds));
             }
 
             if (!newDateRange) {
-                newDateRange = getShiftedDateRangeAndDateType(startTime, endTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+                newDateRange = getShiftedDateRangeAndDateType(startTime, endTime, scale, this.firstDayOfWeek, DateRangeScene.Normal);
             }
 
             const changed = this.transactionsStore.updateTransactionListFilter({
@@ -1237,14 +1237,14 @@ export default {
         },
         changeDateFilter(dateRange) {
             if (isNumber(dateRange)) {
-                if (datetimeConstants.allBillingCycleDateRangesMap[dateRange]) {
+                if (DateRange.isBillingCycle(dateRange)) {
                     dateRange = getDateRangeByBillingCycleDateType(dateRange, this.firstDayOfWeek, this.accountsStore.getAccountStatementDate(this.query.accountIds));
                 } else {
                     dateRange = getDateRangeByDateType(dateRange, this.firstDayOfWeek);
                 }
             }
 
-            if (dateRange.dateType === datetimeConstants.allDateRanges.Custom.type &&
+            if (dateRange.dateType === DateRange.Custom.type &&
                 !dateRange.minTime && !dateRange.maxTime) { // Custom
                 if (!this.query.minTime || !this.query.maxTime) {
                     this.customMaxDatetime = getActualUnixTimeForStore(getCurrentUnixTime(), this.currentTimezoneOffsetMinutes, getBrowserTimezoneOffsetMinutes());
@@ -1280,10 +1280,10 @@ export default {
                 return;
             }
 
-            let dateType = getDateTypeByBillingCycleDateRange(minTime, maxTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal, this.accountsStore.getAccountStatementDate(this.query.accountIds));
+            let dateType = getDateTypeByBillingCycleDateRange(minTime, maxTime, this.firstDayOfWeek, DateRangeScene.Normal, this.accountsStore.getAccountStatementDate(this.query.accountIds));
 
             if (!dateType) {
-                dateType = getDateTypeByDateRange(minTime, maxTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+                dateType = getDateTypeByDateRange(minTime, maxTime, this.firstDayOfWeek, DateRangeScene.Normal);
             }
 
             if (this.query.dateType === dateType && this.query.maxTime === maxTime && this.query.minTime === minTime) {

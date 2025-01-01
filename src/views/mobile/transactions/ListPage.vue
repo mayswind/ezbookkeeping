@@ -528,10 +528,10 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useTransactionTagsStore } from '@/stores/transactionTag.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 
+import { DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import numeralConstants from '@/consts/numeral.js';
-import datetimeConstants from '@/consts/datetime.js';
 import { getNameByKeyValue } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
@@ -737,10 +737,10 @@ export default {
             return this.transactionTagsStore.allAvailableTagsCount;
         },
         allDateRanges() {
-            return datetimeConstants.allDateRanges;
+            return DateRange.all();
         },
         allDateRangesArray() {
-            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.Normal, true, !!this.accountsStore.getAccountStatementDate(this.query.accountIds));
+            return this.$locale.getAllDateRanges(DateRangeScene.Normal, true, !!this.accountsStore.getAccountStatementDate(this.query.accountIds));
         },
         showTotalAmountInTransactionListPage() {
             return this.settingsStore.appSettings.showTotalAmountInTransactionListPage;
@@ -756,7 +756,7 @@ export default {
         let dateRange = getDateRangeByDateType(query.dateType ? parseInt(query.dateType) : undefined, self.firstDayOfWeek);
 
         if (!dateRange &&
-            (datetimeConstants.allBillingCycleDateRangesMap[query.dateType] || query.dateType === datetimeConstants.allDateRanges.Custom.type.toString()) &&
+            (DateRange.isBillingCycle(query.dateType) || query.dateType === DateRange.Custom.type.toString()) &&
             parseInt(query.maxTime) > 0 && parseInt(query.minTime) > 0) {
             dateRange = {
                 dateType: parseInt(query.dateType),
@@ -885,7 +885,7 @@ export default {
 
             let dateRange = null;
 
-            if (datetimeConstants.allBillingCycleDateRangesMap[dateType]) {
+            if (DateRange.isBillingCycle(dateType)) {
                 dateRange = getDateRangeByBillingCycleDateType(dateType, this.firstDayOfWeek, this.accountsStore.getAccountStatementDate(this.query.accountIds));
             } else {
                 dateRange = getDateRangeByDateType(dateType, this.firstDayOfWeek);
@@ -912,10 +912,10 @@ export default {
                 return;
             }
 
-            let dateType = getDateTypeByBillingCycleDateRange(minTime, maxTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal, this.accountsStore.getAccountStatementDate(this.query.accountIds));
+            let dateType = getDateTypeByBillingCycleDateRange(minTime, maxTime, this.firstDayOfWeek, DateRangeScene.Normal, this.accountsStore.getAccountStatementDate(this.query.accountIds));
 
             if (!dateType) {
-                dateType = getDateTypeByDateRange(minTime, maxTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+                dateType = getDateTypeByDateRange(minTime, maxTime, this.firstDayOfWeek, DateRangeScene.Normal);
             }
 
             const changed = this.transactionsStore.updateTransactionListFilter({
@@ -1124,12 +1124,12 @@ export default {
 
             let newDateRange = null;
 
-            if (datetimeConstants.allBillingCycleDateRangesMap[this.query.dateType] || this.query.dateType === this.allDateRanges.Custom.type) {
-                newDateRange = getShiftedDateRangeAndDateTypeForBillingCycle(minTime, maxTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal, this.accountsStore.getAccountStatementDate(this.query.accountIds));
+            if (DateRange.isBillingCycle(this.query.dateType) || this.query.dateType === this.allDateRanges.Custom.type) {
+                newDateRange = getShiftedDateRangeAndDateTypeForBillingCycle(minTime, maxTime, scale, this.firstDayOfWeek, DateRangeScene.Normal, this.accountsStore.getAccountStatementDate(this.query.accountIds));
             }
 
             if (!newDateRange) {
-                newDateRange = getShiftedDateRangeAndDateType(minTime, maxTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+                newDateRange = getShiftedDateRangeAndDateType(minTime, maxTime, scale, this.firstDayOfWeek, DateRangeScene.Normal);
             }
 
             const changed = this.transactionsStore.updateTransactionListFilter({

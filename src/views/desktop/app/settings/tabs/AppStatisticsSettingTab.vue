@@ -128,7 +128,7 @@
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 
-import datetimeConstants from '@/consts/datetime.js';
+import { DateRangeScene } from '@/core/datetime.ts';
 import statisticsConstants from '@/consts/statistics.js';
 
 import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
@@ -154,13 +154,13 @@ export default {
             return this.$locale.getAllCategoricalChartTypes();
         },
         allCategoricalChartDateRanges() {
-            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.Normal, false);
+            return this.$locale.getAllDateRanges(DateRangeScene.Normal, false);
         },
         allTrendChartTypes() {
             return this.$locale.getAllTrendChartTypes();
         },
         allTrendChartDateRanges() {
-            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.TrendAnalysis, false);
+            return this.$locale.getAllDateRanges(DateRangeScene.TrendAnalysis, false);
         },
         defaultChartDataType: {
             get: function () {

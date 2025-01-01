@@ -8,10 +8,10 @@ import { useOverviewStore } from './overview.js';
 import { useStatisticsStore } from './statistics.js';
 import { useExchangeRatesStore } from './exchangeRates.js';
 
+import { DateRange } from '@/core/datetime.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
-import datetimeConstants from '@/consts/datetime.js';
 import userState from '@/lib/userstate.js';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
@@ -368,7 +368,7 @@ export const useTransactionsStore = defineStore('transactions', {
     state: () => ({
         transactionDraft: userState.getUserTransactionDraft(),
         transactionsFilter: {
-            dateType: datetimeConstants.allDateRanges.All.type,
+            dateType: DateRange.All.type,
             maxTime: 0,
             minTime: 0,
             type: 0,
@@ -666,7 +666,7 @@ export const useTransactionsStore = defineStore('transactions', {
             this.transactionListStateInvalid = invalidState;
         },
         resetTransactions() {
-            this.transactionsFilter.dateType = datetimeConstants.allDateRanges.All.type;
+            this.transactionsFilter.dateType = DateRange.All.type;
             this.transactionsFilter.maxTime = 0;
             this.transactionsFilter.minTime = 0;
             this.transactionsFilter.type = 0;
@@ -689,7 +689,7 @@ export const useTransactionsStore = defineStore('transactions', {
             if (filter && isNumber(filter.dateType)) {
                 this.transactionsFilter.dateType = filter.dateType;
             } else {
-                this.transactionsFilter.dateType = datetimeConstants.allDateRanges.All.type;
+                this.transactionsFilter.dateType = DateRange.All.type;
             }
 
             if (filter && isNumber(filter.maxTime)) {
@@ -776,9 +776,9 @@ export const useTransactionsStore = defineStore('transactions', {
             }
 
             if (filter && isString(filter.accountIds) && this.transactionsFilter.accountIds !== filter.accountIds) {
-                if (datetimeConstants.allBillingCycleDateRangesMap[this.transactionsFilter.dateType] &&
+                if (DateRange.isBillingCycle(this.transactionsFilter.dateType) &&
                     (!accountsStore.getAccountStatementDate(filter.accountIds) || accountsStore.getAccountStatementDate(filter.accountIds) !== accountsStore.getAccountStatementDate(this.transactionsFilter.accountIds))) {
-                    this.transactionsFilter.dateType = datetimeConstants.allDateRanges.Custom.type;
+                    this.transactionsFilter.dateType = DateRange.Custom.type;
                 }
 
                 this.transactionsFilter.accountIds = filter.accountIds;
@@ -833,7 +833,7 @@ export const useTransactionsStore = defineStore('transactions', {
 
             querys.push('dateType=' + this.transactionsFilter.dateType);
 
-            if (datetimeConstants.allBillingCycleDateRangesMap[this.transactionsFilter.dateType] || this.transactionsFilter.dateType === datetimeConstants.allDateRanges.Custom.type) {
+            if (DateRange.isBillingCycle(this.transactionsFilter.dateType) || this.transactionsFilter.dateType === DateRange.Custom.type) {
                 querys.push('maxTime=' + this.transactionsFilter.maxTime);
                 querys.push('minTime=' + this.transactionsFilter.minTime);
             }

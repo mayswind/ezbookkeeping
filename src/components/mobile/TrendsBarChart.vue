@@ -93,8 +93,8 @@ import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
+import { DateRangeScene } from '@/core/datetime.ts';
 import { DEFAULT_ICON_COLOR, DEFAULT_CHART_COLORS } from '@/consts/color.ts';
-import datetimeConstants from '@/consts/datetime.js';
 import statisticsConstants from '@/consts/statistics.js';
 import { isNumber } from '@/lib/common.ts';
 import {
@@ -303,7 +303,7 @@ export default {
                 }
             }
 
-            const dateRangeType = getDateTypeByDateRange(minUnixTime, maxUnixTime, this.userStore.currentUserFirstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+            const dateRangeType = getDateTypeByDateRange(minUnixTime, maxUnixTime, this.userStore.currentUserFirstDayOfWeek, DateRangeScene.Normal);
 
             this.$emit('click', {
                 itemId: itemId,

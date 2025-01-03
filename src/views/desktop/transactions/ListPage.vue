@@ -1236,16 +1236,7 @@ export default {
             }
         },
         changeDateFilter(dateRange) {
-            if (isNumber(dateRange)) {
-                if (DateRange.isBillingCycle(dateRange)) {
-                    dateRange = getDateRangeByBillingCycleDateType(dateRange, this.firstDayOfWeek, this.accountsStore.getAccountStatementDate(this.query.accountIds));
-                } else {
-                    dateRange = getDateRangeByDateType(dateRange, this.firstDayOfWeek);
-                }
-            }
-
-            if (dateRange.dateType === DateRange.Custom.type &&
-                !dateRange.minTime && !dateRange.maxTime) { // Custom
+            if (dateRange === DateRange.Custom.type || (dateRange.dateType === DateRange.Custom.type && !dateRange.minTime && !dateRange.maxTime)) { // Custom
                 if (!this.query.minTime || !this.query.maxTime) {
                     this.customMaxDatetime = getActualUnixTimeForStore(getCurrentUnixTime(), this.currentTimezoneOffsetMinutes, getBrowserTimezoneOffsetMinutes());
                     this.customMinDatetime = getSpecifiedDayFirstUnixTime(this.customMaxDatetime);
@@ -1256,6 +1247,14 @@ export default {
 
                 this.showCustomDateRangeDialog = true;
                 return;
+            }
+
+            if (isNumber(dateRange)) {
+                if (DateRange.isBillingCycle(dateRange)) {
+                    dateRange = getDateRangeByBillingCycleDateType(dateRange, this.firstDayOfWeek, this.accountsStore.getAccountStatementDate(this.query.accountIds));
+                } else {
+                    dateRange = getDateRangeByDateType(dateRange, this.firstDayOfWeek);
+                }
             }
 
             if (this.query.dateType === dateRange.dateType && this.query.maxTime === dateRange.maxTime && this.query.minTime === dateRange.minTime) {

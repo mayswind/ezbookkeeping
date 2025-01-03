@@ -32,7 +32,7 @@ import {
     getYearAndMonth,
     getDay,
     getDayOfWeekName
-} from '@/lib/datetime.js';
+} from '@/lib/datetime.ts';
 import { getAmountWithDecimalNumberCount } from '@/lib/numeral.js';
 import { getCurrencyFraction } from '@/lib/currency.ts';
 import { getFirstAvailableCategoryId } from '@/lib/category.js';

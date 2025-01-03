@@ -43,7 +43,7 @@ import {
     getRecentMonthDateRanges,
     isDateRangeMatchFullYears,
     isDateRangeMatchFullMonths
-} from './datetime.js';
+} from './datetime.ts';
 
 import {
     appendDigitGroupingSymbol,
@@ -489,25 +489,25 @@ function formatYearQuarter(translateFn, year, quarter) {
 
 function isLongTime24HourFormat(translateFn, formatTypeValue) {
     const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
-    const type = getDateTimeFormatType(LongTimeFormat.values(), LongTimeFormat.values(), defaultLongTimeFormatTypeName, LongTimeFormat.Default, formatTypeValue);
+    const type = getDateTimeFormatType(LongTimeFormat.all(), LongTimeFormat.values(), defaultLongTimeFormatTypeName, LongTimeFormat.Default, formatTypeValue);
     return type.is24HourFormat;
 }
 
 function isLongTimeMeridiemIndicatorFirst(translateFn, formatTypeValue) {
     const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
-    const type = getDateTimeFormatType(LongTimeFormat.values(), LongTimeFormat.values(), defaultLongTimeFormatTypeName, LongTimeFormat.Default, formatTypeValue);
+    const type = getDateTimeFormatType(LongTimeFormat.all(), LongTimeFormat.values(), defaultLongTimeFormatTypeName, LongTimeFormat.Default, formatTypeValue);
     return type.isMeridiemIndicatorFirst;
 }
 
 function isShortTime24HourFormat(translateFn, formatTypeValue) {
     const defaultShortTimeFormatTypeName = translateFn('default.shortTimeFormat');
-    const type = getDateTimeFormatType(ShortTimeFormat.values(), ShortTimeFormat.values(), defaultShortTimeFormatTypeName, ShortTimeFormat.Default, formatTypeValue);
+    const type = getDateTimeFormatType(ShortTimeFormat.all(), ShortTimeFormat.values(), defaultShortTimeFormatTypeName, ShortTimeFormat.Default, formatTypeValue);
     return type.is24HourFormat;
 }
 
 function isShortTimeMeridiemIndicatorFirst(translateFn, formatTypeValue) {
     const defaultShortTimeFormatTypeName = translateFn('default.shortTimeFormat');
-    const type = getDateTimeFormatType(ShortTimeFormat.values(), ShortTimeFormat.values(), defaultShortTimeFormatTypeName, ShortTimeFormat.Default, formatTypeValue);
+    const type = getDateTimeFormatType(ShortTimeFormat.all(), ShortTimeFormat.values(), defaultShortTimeFormatTypeName, ShortTimeFormat.Default, formatTypeValue);
     return type.isMeridiemIndicatorFirst;
 }
 

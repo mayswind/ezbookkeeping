@@ -507,7 +507,7 @@ import {
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore
-} from '@/lib/datetime.js';
+} from '@/lib/datetime.ts';
 
 export default {
     props: [

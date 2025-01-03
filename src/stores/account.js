@@ -10,7 +10,7 @@ import { DEFAULT_ACCOUNT_COLOR } from '@/consts/color.ts';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
 import { isNumber, isEquals } from '@/lib/common.ts';
-import { getCurrentUnixTime } from '@/lib/datetime.js';
+import { getCurrentUnixTime } from '@/lib/datetime.ts';
 import { getCategorizedAccountsMap, getAllFilteredAccountsBalance } from '@/lib/account.js';
 
 function loadAccountList(state, accounts) {

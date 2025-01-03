@@ -52,7 +52,7 @@ import {
     getLocalDatetimeFromUnixTime,
     getActualUnixTimeForStore,
     getUnixTime
-} from '@/lib/datetime.js';
+} from '@/lib/datetime.ts';
 
 export default {
     props: [

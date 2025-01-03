@@ -35,7 +35,7 @@ import { TransactionType } from '@/core/transaction.ts';
 import {
     parseDateFromUnixTime,
     getMonthName
-} from '@/lib/datetime.js';
+} from '@/lib/datetime.ts';
 import { getExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 export default {

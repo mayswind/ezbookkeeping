@@ -4,7 +4,7 @@ import {
     getAllMonthsStartAndEndUnixTimes,
     getAllQuartersStartAndEndUnixTimes,
     getAllYearsStartAndEndUnixTimes
-} from '@/lib/datetime.js';
+} from '@/lib/datetime.ts';
 
 export function isChartDataTypeAvailableForAnalysisType(chartDataType, analysisType) {
     for (const dataTypeField in statisticsConstants.allChartDataTypes) {

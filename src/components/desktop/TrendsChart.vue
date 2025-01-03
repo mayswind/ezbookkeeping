@@ -22,7 +22,7 @@ import {
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
     getDateTypeByDateRange
-} from '@/lib/datetime.js';
+} from '@/lib/datetime.ts';
 import {
     sortStatisticsItems,
     getAllDateRanges

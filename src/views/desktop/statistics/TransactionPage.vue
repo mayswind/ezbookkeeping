@@ -340,7 +340,7 @@ import {
     getShiftedDateRangeAndDateType,
     getDateTypeByDateRange,
     getDateRangeByDateType
-} from '@/lib/datetime.js';
+} from '@/lib/datetime.ts';
 import { isChartDataTypeAvailableForAnalysisType } from '@/lib/statistics.js';
 
 import {

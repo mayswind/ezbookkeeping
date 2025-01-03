@@ -622,7 +622,7 @@ import {
     getUnixTime,
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffsetMinutes
-} from '@/lib/datetime.js';
+} from '@/lib/datetime.ts';
 import {
     getTransactionPrimaryCategoryName,
     getTransactionSecondaryCategoryName,

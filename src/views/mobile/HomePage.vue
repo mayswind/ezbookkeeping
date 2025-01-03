@@ -209,7 +209,7 @@ import { useOverviewStore } from '@/stores/overview.js';
 
 import { DateRange } from '@/core/datetime.ts';
 import { TemplateType } from '@/core/template.ts';
-import { formatUnixTime } from '@/lib/datetime.js';
+import { formatUnixTime } from '@/lib/datetime.ts';
 
 export default {
     props: [

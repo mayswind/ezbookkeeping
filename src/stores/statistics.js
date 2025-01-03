@@ -28,7 +28,7 @@ import {
 import {
     getYearAndMonthFromUnixTime,
     getDateRangeByDateType
-} from '@/lib/datetime.js';
+} from '@/lib/datetime.ts';
 import {
     getFinalAccountIdsByFilteredAccountIds
 } from '@/lib/account.js';

@@ -6,7 +6,7 @@ import {
 import {
     getBrowserTimezoneOffsetMinutes,
     getDummyUnixTimeForLocalUsage
-} from './datetime.js';
+} from './datetime.ts';
 import {
     categoryTypeToTransactionType,
     isSubCategoryIdAvailable,

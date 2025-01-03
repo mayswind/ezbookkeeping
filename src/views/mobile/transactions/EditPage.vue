@@ -456,7 +456,7 @@ import {
     getBrowserTimezoneOffsetMinutes,
     getUtcOffsetByUtcOffsetMinutes,
     getActualUnixTimeForStore
-} from '@/lib/datetime.js';
+} from '@/lib/datetime.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import {
     getTransactionPrimaryCategoryName,

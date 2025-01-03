@@ -63,7 +63,7 @@ import {
     getTimezoneOffsetMinutes,
     getTimeValues,
     getCombinedDateAndTimeValues
-} from '@/lib/datetime.js';
+} from '@/lib/datetime.ts';
 import { createInlinePicker } from '@/lib/ui/mobile.js';
 
 export default {

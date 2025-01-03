@@ -202,7 +202,7 @@ import {
     formatUnixTime,
     getUnixTimeBeforeUnixTime,
     getUnixTimeAfterUnixTime
-} from '@/lib/datetime.js';
+} from '@/lib/datetime.ts';
 
 import {
     mdiRefresh,

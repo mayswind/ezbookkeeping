@@ -73,7 +73,7 @@ import {
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
     getDateRangeByDateType
-} from '@/lib/datetime.js';
+} from '@/lib/datetime.ts';
 
 export default {
     props: [

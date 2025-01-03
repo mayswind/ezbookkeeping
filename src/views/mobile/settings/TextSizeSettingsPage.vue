@@ -117,7 +117,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
 import { FontSize } from '@/core/font.ts';
-import { getCurrentUnixTime, getDay, getDayOfWeekName } from '@/lib/datetime.js';
+import { getCurrentUnixTime, getDay, getDayOfWeekName } from '@/lib/datetime.ts';
 import { setAppFontSize, getFontSizePreviewClassName } from '@/lib/ui/mobile.js';
 
 export default {

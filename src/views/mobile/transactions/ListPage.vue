@@ -547,7 +547,7 @@ import {
     getDateTypeByBillingCycleDateRange,
     getDateRangeByDateType,
     getDateRangeByBillingCycleDateType
-} from '@/lib/datetime.js';
+} from '@/lib/datetime.ts';
 import { categoryTypeToTransactionType, transactionTypeToCategoryType } from '@/lib/category.js';
 import { getUnifiedSelectedAccountsCurrencyOrDefaultCurrency } from '@/lib/account.js';
 import { getTransactionDisplayAmount } from '@/lib/transaction.js';

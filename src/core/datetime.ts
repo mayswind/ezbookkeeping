@@ -1,5 +1,109 @@
 import type { TypeAndName } from '@/core/base.ts';
 
+export interface YearQuarter {
+    readonly year: number;
+    readonly quarter: number;
+}
+
+export interface YearMonth {
+    readonly year: number;
+    readonly month: number;
+}
+
+export interface YearMonthRange {
+    readonly startYearMonth: YearMonth;
+    readonly endYearMonth: YearMonth;
+}
+
+export interface TimeRange {
+    readonly minTime: number;
+    readonly maxTime: number;
+}
+
+export interface UnixTimeRange {
+    readonly minUnixTime: number;
+    readonly maxUnixTime: number;
+}
+
+export interface TimeRangeAndDateType extends TimeRange {
+    readonly dateType: number;
+}
+
+export interface TimeDifference {
+    readonly offsetHours: number;
+    readonly offsetMinutes: number;
+}
+
+export interface RecentMonthDateRange {
+    readonly dateType: number;
+    readonly minTime: number;
+    readonly maxTime: number;
+    readonly year: number;
+    readonly month: number;
+}
+
+export interface LocalizedRecentMonthDateRange {
+    readonly dateType: number;
+    readonly minTime: number;
+    readonly maxTime: number;
+    readonly year?: number;
+    readonly month?: number;
+    readonly isPreset?: boolean;
+    readonly displayName: string;
+}
+
+export class YearUnixTime implements UnixTimeRange {
+    public readonly year: number;
+    public readonly minUnixTime: number;
+    public readonly maxUnixTime: number;
+
+    private constructor(year: number, minUnixTime: number, maxUnixTime: number) {
+        this.year = year;
+        this.minUnixTime = minUnixTime;
+        this.maxUnixTime = maxUnixTime;
+    }
+
+    public static of(year: number, minUnixTime: number, maxUnixTime: number): YearUnixTime {
+        return new YearUnixTime(year, minUnixTime, maxUnixTime);
+    }
+}
+
+export class YearQuarterUnixTime implements YearQuarter, UnixTimeRange {
+    public readonly year: number;
+    public readonly quarter: number;
+    public readonly minUnixTime: number;
+    public readonly maxUnixTime: number;
+
+    private constructor(year: number, quarter: number, minUnixTime: number, maxUnixTime: number) {
+        this.year = year;
+        this.quarter = quarter;
+        this.minUnixTime = minUnixTime;
+        this.maxUnixTime = maxUnixTime;
+    }
+
+    public static of(yearQuarter: YearQuarter, minUnixTime: number, maxUnixTime: number): YearQuarterUnixTime {
+        return new YearQuarterUnixTime(yearQuarter.year, yearQuarter.quarter, minUnixTime, maxUnixTime);
+    }
+}
+
+export class YearMonthUnixTime implements YearMonth, UnixTimeRange {
+    public readonly year: number;
+    public readonly month: number;
+    public readonly minUnixTime: number;
+    public readonly maxUnixTime: number;
+
+    private constructor(year: number, month: number, minUnixTime: number, maxUnixTime: number) {
+        this.year = year;
+        this.month = month;
+        this.minUnixTime = minUnixTime;
+        this.maxUnixTime = maxUnixTime;
+    }
+
+    public static of(yearMonth: YearMonth, minUnixTime: number, maxUnixTime: number): YearMonthUnixTime {
+        return new YearMonthUnixTime(yearMonth.year, yearMonth.month, minUnixTime, maxUnixTime);
+    }
+}
+
 export class Month {
     private static readonly allInstances: Month[] = [];
 
@@ -380,3 +484,7 @@ export class DateRange implements TypeAndName {
         return dateRange?.isBillingCycle || false;
     }
 }
+
+export type AllDateTimeFormatMap = Record<string, LongDateFormat> | Record<string, ShortDateFormat> | Record<string, LongTimeFormat> | Record<string, ShortTimeFormat>;
+export type AllDateTimeFormatArray = LongDateFormat[] | ShortDateFormat[] | LongTimeFormat[] | ShortTimeFormat[];
+export type AllDateTimeFormatType = LongDateFormat | ShortDateFormat | LongTimeFormat | ShortTimeFormat;

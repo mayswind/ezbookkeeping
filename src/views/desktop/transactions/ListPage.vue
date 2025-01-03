@@ -622,7 +622,7 @@ import {
     getDateRangeByBillingCycleDateType,
     getRecentDateRangeType,
     isDateRangeMatchOneMonth
-} from '@/lib/datetime.js';
+} from '@/lib/datetime.ts';
 import {
     categoryTypeToTransactionType,
     transactionTypeToCategoryType

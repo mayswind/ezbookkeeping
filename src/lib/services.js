@@ -23,7 +23,7 @@ import {
     getAmapApplicationKey,
     getExchangeRatesRequestTimeout
 } from './server_settings.ts';
-import { getTimezoneOffsetMinutes } from './datetime.js';
+import { getTimezoneOffsetMinutes } from './datetime.ts';
 import { generateRandomUUID } from './misc.ts';
 
 let needBlockRequest = false;

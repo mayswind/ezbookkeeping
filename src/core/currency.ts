@@ -23,7 +23,7 @@ export class CurrencyDisplayType implements TypeAndName {
     private static readonly allInstancesByType: Record<number, CurrencyDisplayType> = {};
     private static readonly allInstancesByTypeName: Record<string, CurrencyDisplayType> = {};
 
-    public static readonly LanguageDefaultType = 0;
+    public static readonly LanguageDefaultType: number = 0;
     public static readonly None = new CurrencyDisplayType(1, 'None', 'None', 2, CurrencyDisplaySymbol.None, undefined, '');
     public static readonly SymbolBeforeAmount = new CurrencyDisplayType(2, 'SymbolBeforeAmount', 'Currency Symbol', 2, CurrencyDisplaySymbol.Symbol, CurrencyDisplayLocation.BeforeAmount, ' ');
     public static readonly SymbolAfterAmount = new CurrencyDisplayType(3, 'SymbolAfterAmount', 'Currency Symbol', 2, CurrencyDisplaySymbol.Symbol, CurrencyDisplayLocation.AfterAmount, ' ');

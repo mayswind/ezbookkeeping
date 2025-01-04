@@ -12,7 +12,7 @@
                 </template>
             </f7-list-item>
             <f7-list-item class="list-item-pincode-input padding-horizontal margin-horizontal">
-                <pin-code-input :secure="true" :length="6" v-model="pinCode" @pincode:confirm="unlockByPin" />
+                <pin-code-input :secure="true" :length="6" :auto-confirm="true" v-model="pinCode" @pincode:confirm="unlockByPin" />
             </f7-list-item>
         </f7-list>
 

@@ -10,7 +10,7 @@
                 <p class="no-margin">{{ hint }}</p>
                 <f7-list class="no-margin">
                     <f7-list-item class="list-item-pincode-input padding-vertical-half">
-                        <pin-code-input :secure="true" :length="6" v-model="currentPinCode"/>
+                        <pin-code-input :secure="true" :length="6" v-model="currentPinCode" @pincode:confirm="confirm"/>
                     </f7-list-item>
                 </f7-list>
                 <f7-button large fill

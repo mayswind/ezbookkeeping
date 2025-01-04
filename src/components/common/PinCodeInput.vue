@@ -33,6 +33,7 @@ const props = defineProps<{
     length: number;
     disabled?: boolean;
     autofocus?: boolean;
+    autoConfirm?: boolean;
     secure?: boolean;
 }>();
 
@@ -151,6 +152,14 @@ function onKeydown(index: number, event: KeyboardEvent): void {
         return;
     }
 
+    if (index <= 0 && (event.shiftKey && event.key === 'Tab')) {
+        return;
+    }
+
+    if (index >= props.length - 1 && (!event.shiftKey && event.key === 'Tab')) {
+        return;
+    }
+
     if (event.key === 'Enter' && finalPinCode.value.length === props.length) {
         emit('pincode:confirm', finalPinCode.value);
         event.preventDefault();
@@ -204,7 +213,7 @@ function onKeydown(index: number, event: KeyboardEvent): void {
         setInputType(index);
         setNextFocus(index);
 
-        if (finalPinCode.value.length === props.length) {
+        if (props.autoConfirm && finalPinCode.value.length === props.length) {
             emit('pincode:confirm', finalPinCode.value);
         }
     }

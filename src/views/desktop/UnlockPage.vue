@@ -32,7 +32,7 @@
                                 <v-row>
                                     <v-col cols="12">
                                         <pin-code-input :disabled="verifyingByWebAuthn" :autofocus="true"
-                                                        :secure="true" :length="6"
+                                                        :secure="true" :length="6" :auto-confirm="true"
                                                         v-model="pinCode" @pincode:confirm="unlockByPin" />
                                     </v-col>
 

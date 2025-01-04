@@ -33,7 +33,7 @@
                     <v-row class="mb-3">
                         <v-col cols="12" md="12">
                             <div style="max-width: 428px">
-                                <pin-code-input :secure="true" :length="6" v-model="pinCode" />
+                                <pin-code-input :secure="true" :length="6" v-model="pinCode" @pincode:confirm="confirm" />
                             </div>
                         </v-col>
                     </v-row>
@@ -147,6 +147,13 @@ export default {
         });
     },
     methods: {
+        confirm() {
+            if (this.isEnableApplicationLock) {
+                this.disable();
+            } else {
+                this.enable();
+            }
+        },
         enable() {
             if (this.settingsStore.appSettings.applicationLock) {
                 this.$refs.snackbar.showMessage('Application lock has been enabled');

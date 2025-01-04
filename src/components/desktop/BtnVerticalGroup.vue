@@ -14,8 +14,8 @@
 import { computed } from 'vue';
 
 interface Button {
-    name: string,
-    value: unknown
+    name: string;
+    value: unknown;
 }
 
 const props = defineProps<{

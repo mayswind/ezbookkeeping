@@ -5,7 +5,7 @@ import {
     getAmapApiExternalProxyUrl,
     getAmapApplicationSecret
 } from '@/lib/server_settings.ts';
-import logger from '@/lib/logger.js';
+import logger from '@/lib/logger.ts';
 
 const amapHolder = {
     AMap: null

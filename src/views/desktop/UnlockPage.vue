@@ -119,7 +119,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
-import logger from '@/lib/logger.js';
+import logger from '@/lib/logger.ts';
 import webauthn from '@/lib/webauthn.js';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 

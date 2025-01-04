@@ -14,7 +14,7 @@ import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import userState from '@/lib/userstate.js';
 import services from '@/lib/services.js';
-import logger from '@/lib/logger.js';
+import logger from '@/lib/logger.ts';
 import {
     isDefined,
     isNumber,

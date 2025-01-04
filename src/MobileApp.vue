@@ -18,7 +18,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { isProduction } from '@/lib/version.ts';
-import { getTheme, isEnableAnimate } from '@/lib/settings.js';
+import { getTheme, isEnableAnimate } from '@/lib/settings.ts';
 import { loadMapAssets } from '@/lib/map/index.js';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 import { isModalShowing, setAppFontSize } from '@/lib/ui/mobile.js';

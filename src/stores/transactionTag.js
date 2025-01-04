@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 
 import { isEquals } from '@/lib/common.ts';
 import services from '@/lib/services.js';
-import logger from '@/lib/logger.js';
+import logger from '@/lib/logger.ts';
 
 function loadTransactionTagList(state, tags) {
     state.allTransactionTags = tags;

@@ -616,7 +616,7 @@ import {
 } from '@/lib/common.ts';
 import { isFileExtensionSupported } from '@/lib/file.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
-import logger from '@/lib/logger.js';
+import logger from '@/lib/logger.ts';
 import {
     parseDateFromUnixTime,
     getUnixTime,

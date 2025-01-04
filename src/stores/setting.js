@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 
 import { WeekDay } from '@/core/datetime.ts';
 import { DEFAULT_CURRENCY_CODE } from '@/consts/currency.ts';
-import * as settings from '@/lib/settings.js';
+import * as settings from '@/lib/settings.ts';
 
 export const useSettingsStore = defineStore('settings', {
     state: () => ({

@@ -601,7 +601,7 @@ import { AccountType } from '@/core/account.ts';
 import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts';
 import { TemplateType }  from '@/core/template.ts';
 import { isString, isNumber, getNameByKeyValue } from '@/lib/common.ts';
-import logger from '@/lib/logger.js';
+import logger from '@/lib/logger.ts';
 import {
     getCurrentUnixTime,
     parseDateFromUnixTime,

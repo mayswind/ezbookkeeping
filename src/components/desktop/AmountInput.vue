@@ -36,7 +36,7 @@ import { useUserStore } from '@/stores/user.js';
 
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import { removeAll } from '@/lib/common.ts';
-import logger from '@/lib/logger.js';
+import logger from '@/lib/logger.ts';
 
 export default {
     props: [

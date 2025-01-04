@@ -13,7 +13,7 @@ import { useExchangeRatesStore } from './exchangeRates.js';
 
 import userState from '@/lib/userstate.js';
 import services from '@/lib/services.js';
-import logger from '@/lib/logger.js';
+import logger from '@/lib/logger.ts';
 import { isObject, isString } from '@/lib/common.ts';
 
 export const useRootStore = defineStore('root', {

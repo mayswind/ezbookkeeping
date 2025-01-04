@@ -64,7 +64,7 @@ import {
     getAllFilteredAccountsBalance
 } from './account.js';
 
-import logger from './logger.js';
+import logger from './logger.ts';
 import services from './services.js';
 
 function getLanguageDisplayName(translateFn, languageName) {

@@ -1,6 +1,6 @@
 import { asyncLoadAssets } from '@/lib/misc.ts';
 import services from '@/lib/services.js';
-import logger from '@/lib/logger.js';
+import logger from '@/lib/logger.ts';
 
 const baiduMapHolder = {
     BMap: null,

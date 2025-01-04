@@ -1,8 +1,8 @@
 import CryptoJS from 'crypto-js';
 
 import { isString, isObject } from './common.ts';
-import { isEnableApplicationLock } from './settings.js';
-import logger from './logger.js';
+import { isEnableApplicationLock } from './settings.ts';
+import logger from './logger.ts';
 
 const appLockSecretBaseStringPrefix = 'EBK_LOCK_SECRET_';
 

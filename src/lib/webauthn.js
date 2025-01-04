@@ -1,5 +1,5 @@
 import CBOR from 'cbor-js';
-import logger from './logger.js';
+import logger from './logger.ts';
 import {
     isFunction,
     stringToArrayBuffer,

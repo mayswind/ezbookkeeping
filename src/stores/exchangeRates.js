@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 
 import services from '@/lib/services.js';
-import logger from '@/lib/logger.js';
+import logger from '@/lib/logger.ts';
 import { isEquals } from '@/lib/common.ts';
 import { getCurrentUnixTime, formatUnixTime } from '@/lib/datetime.ts';
 import { getExchangedAmount } from '@/lib/numeral.ts';

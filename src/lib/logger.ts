@@ -1,6 +1,6 @@
-import { isEnableDebug } from './settings.js';
+import { isEnableDebug } from './settings.ts';
 
-function logDebug(msg, obj) {
+function logDebug(msg: string, obj?: unknown): void {
     if (isEnableDebug()) {
         if (obj) {
             console.debug('[ezBookkeeping Debug] ' + msg, obj);
@@ -10,7 +10,7 @@ function logDebug(msg, obj) {
     }
 }
 
-function logInfo(msg, obj) {
+function logInfo(msg: string, obj?: unknown): void {
     if (obj) {
         console.info('[ezBookkeeping Info] ' + msg, obj);
     } else {
@@ -18,7 +18,7 @@ function logInfo(msg, obj) {
     }
 }
 
-function logWarn(msg, obj) {
+function logWarn(msg: string, obj?: unknown): void {
     if (obj) {
         console.warn('[ezBookkeeping Warn] ' + msg, obj);
     } else {
@@ -26,7 +26,7 @@ function logWarn(msg, obj) {
     }
 }
 
-function logError(msg, obj) {
+function logError(msg: string, obj?: unknown): void {
     if (obj) {
         console.error('[ezBookkeeping Error] ' + msg, obj);
     } else {

@@ -17,7 +17,7 @@ import {
     getThisYearLastUnixTime
 } from '@/lib/datetime.ts';
 import services from '@/lib/services.js';
-import logger from '@/lib/logger.js';
+import logger from '@/lib/logger.ts';
 
 function updateTransactionDateRange(state) {
     const userStore = useUserStore();

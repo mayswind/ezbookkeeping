@@ -60,7 +60,7 @@ import { useTransactionsStore } from '@/stores/transaction.js';
 import { AmountFilterType } from '@/core/numeral.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import { isString } from '@/lib/common.ts';
-import logger from '@/lib/logger.js';
+import logger from '@/lib/logger.ts';
 
 export default {
     props: [

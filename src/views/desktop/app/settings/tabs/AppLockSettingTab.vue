@@ -66,7 +66,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 
-import logger from '@/lib/logger.js';
+import logger from '@/lib/logger.ts';
 import webauthn from '@/lib/webauthn.js';
 
 export default {

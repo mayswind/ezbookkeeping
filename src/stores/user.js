@@ -4,7 +4,7 @@ import { useSettingsStore } from './setting.js';
 
 import userState from '@/lib/userstate.js';
 import services from '@/lib/services.js';
-import logger from '@/lib/logger.js';
+import logger from '@/lib/logger.ts';
 import {
     isObject,
     isNumber

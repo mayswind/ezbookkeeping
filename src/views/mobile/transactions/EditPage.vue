@@ -445,7 +445,7 @@ import { TemplateType, ScheduledTemplateFrequencyType } from '@/core/template.ts
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT, TRANSACTION_MAX_PICTURE_COUNT } from '@/consts/transaction.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
 import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
-import logger from '@/lib/logger.js';
+import logger from '@/lib/logger.ts';
 import {
     isArray,
     getNameByKeyValue

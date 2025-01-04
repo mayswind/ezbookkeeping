@@ -60,7 +60,7 @@ import { useUserStore } from '@/stores/user.js';
 
 import { ScheduledTemplateFrequencyType } from '@/core/template.ts';
 import { sortNumbersArray } from '@/lib/common.ts';
-import { scrollToSelectedItem } from '@/lib/ui/desktop.js';
+import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';
 
 export default {
     props: [

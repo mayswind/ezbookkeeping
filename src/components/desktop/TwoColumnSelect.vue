@@ -80,7 +80,7 @@ import {
     getNameByKeyValue,
     getPrimaryValueBySecondaryValue
 } from '@/lib/common.ts';
-import { scrollToSelectedItem } from '@/lib/ui/desktop.js';
+import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';
 
 import {
     mdiChevronRight

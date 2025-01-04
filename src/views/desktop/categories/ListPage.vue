@@ -205,7 +205,7 @@ import {
     isNoAvailableCategory,
     getAvailableCategoryCount
 } from '@/lib/category.js';
-import { getNavSideBarOuterHeight } from '@/lib/ui/desktop.js';
+import { getNavSideBarOuterHeight } from '@/lib/ui/desktop.ts';
 
 import {
     mdiRefresh,

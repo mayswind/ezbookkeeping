@@ -39,7 +39,7 @@
 <script>
 import { arrayContainsFieldValue } from '@/lib/common.ts';
 import { getIconsInRows } from '@/lib/icon.ts';
-import { scrollToSelectedItem } from '@/lib/ui/desktop.js';
+import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';
 
 import {
     mdiCheck

@@ -630,7 +630,7 @@ import {
 import { getUnifiedSelectedAccountsCurrencyOrDefaultCurrency } from '@/lib/account.js';
 import { getTransactionDisplayAmount } from '@/lib/transaction.js';
 import { isDataImportingEnabled } from '@/lib/server_settings.ts';
-import { scrollToSelectedItem } from '@/lib/ui/desktop.js';
+import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';
 
 import {
     mdiMagnify,

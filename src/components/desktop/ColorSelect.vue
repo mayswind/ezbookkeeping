@@ -42,7 +42,7 @@
 import { DEFAULT_ICON_COLOR } from '@/consts/color.ts';
 import { arrayContainsFieldValue } from '@/lib/common.ts';
 import { getColorsInRows } from '@/lib/color.ts';
-import { scrollToSelectedItem } from '@/lib/ui/desktop.js';
+import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';
 
 import {
     mdiSquareRounded,

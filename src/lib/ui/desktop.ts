@@ -1,4 +1,4 @@
-export function getOuterHeight(element) {
+export function getOuterHeight(element: HTMLElement | null): number {
     if (!element) {
         return 0;
     }
@@ -10,7 +10,7 @@ export function getOuterHeight(element) {
         .reduce((prev, cur) => prev + cur);
 }
 
-export function getNavSideBarOuterHeight(element) {
+export function getNavSideBarOuterHeight(element: HTMLElement | null): number {
     if (!element) {
         return 0;
     }
@@ -30,22 +30,22 @@ export function getNavSideBarOuterHeight(element) {
     let totalHeight = 0;
 
     for (let i = 0; i < children.length; i++) {
-        totalHeight += getOuterHeight(children[i]);
+        totalHeight += getOuterHeight(children[i] as HTMLElement);
     }
 
     return totalHeight;
 }
 
-export function getCssValue(element, name) {
+export function getCssValue(element: HTMLElement | null, name: string): string {
     if (!element) {
-        return 0;
+        return '0';
     }
 
     const computedStyle = window.getComputedStyle(element);
     return computedStyle.getPropertyValue(name);
 }
 
-export function scrollToSelectedItem(parentEl, containerSelector, selectedItemSelector) {
+export function scrollToSelectedItem(parentEl: HTMLElement | null, containerSelector: string, selectedItemSelector: string): void {
     if (!parentEl) {
         return;
     }
@@ -59,7 +59,7 @@ export function scrollToSelectedItem(parentEl, containerSelector, selectedItemSe
             return;
         }
 
-        container = lists[0];
+        container = lists[0] as HTMLElement;
     }
 
     const selectedItems = container.querySelectorAll(selectedItemSelector);
@@ -68,7 +68,7 @@ export function scrollToSelectedItem(parentEl, containerSelector, selectedItemSe
         return;
     }
 
-    const selectedItem = selectedItems[0];
+    const selectedItem = selectedItems[0] as HTMLElement;
     const containerOuterHeight = getOuterHeight(container);
     const selectedItemOuterHeight = getOuterHeight(selectedItem);
 
@@ -77,12 +77,12 @@ export function scrollToSelectedItem(parentEl, containerSelector, selectedItemSe
 
     if (selectedItems.length > 1) {
 
-        let firstSelectedItem = selectedItems[0];
-        let lastSelectedItem = selectedItems[selectedItems.length - 1];
+        const firstSelectedItem = selectedItems[0] as HTMLElement;
+        const lastSelectedItem = selectedItems[selectedItems.length - 1] as HTMLElement;
 
-        let firstSelectedItemInTop = firstSelectedItem.offsetTop - container.offsetTop - parseInt(getCssValue(container, 'padding-top'), 10);
-        let lastSelectedItemInTop = lastSelectedItem.offsetTop - container.offsetTop - parseInt(getCssValue(container, 'padding-top'), 10);
-        let lastSelectedItemInBottom = lastSelectedItem.offsetTop - container.offsetTop - parseInt(getCssValue(container, 'padding-top'), 10)
+        const firstSelectedItemInTop = firstSelectedItem.offsetTop - container.offsetTop - parseInt(getCssValue(container, 'padding-top'), 10);
+        const lastSelectedItemInTop = lastSelectedItem.offsetTop - container.offsetTop - parseInt(getCssValue(container, 'padding-top'), 10);
+        const lastSelectedItemInBottom = lastSelectedItem.offsetTop - container.offsetTop - parseInt(getCssValue(container, 'padding-top'), 10)
             - (containerOuterHeight - selectedItemOuterHeight);
 
         targetPos = (firstSelectedItemInTop + lastSelectedItemInBottom) / 2;

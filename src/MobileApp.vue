@@ -19,7 +19,7 @@ import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { isProduction } from '@/lib/version.ts';
 import { getTheme, isEnableAnimate } from '@/lib/settings.ts';
-import { loadMapAssets } from '@/lib/map/index.js';
+import { initMapProvider } from '@/lib/map/index.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 import { isModalShowing, setAppFontSize } from '@/lib/ui/mobile.js';
 
@@ -194,7 +194,7 @@ export default {
 
         document.addEventListener('DOMContentLoaded', () => {
             const languageInfo = this.$locale.getCurrentLanguageInfo();
-            loadMapAssets(languageInfo ? languageInfo.alternativeLanguageTag : null);
+            initMapProvider(languageInfo ? languageInfo.alternativeLanguageTag : null);
         });
     },
     methods: {

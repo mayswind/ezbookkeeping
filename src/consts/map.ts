@@ -1,23 +1,23 @@
-export interface PresetLeafletTileSource {
+export interface LeafletTileSource {
     readonly tileUrlFormat: string;
     readonly tileUrlSubDomains: string;
-    readonly tileUrlExtraParams?: PresetLeafletTileSourceExtraParam[];
+    readonly tileUrlExtraParams?: LeafletTileSourceExtraParam[];
     readonly annotationUrlFormat?: string;
     readonly annotationUrlSubDomains?: string;
-    readonly annotationUrlExtraParams?: PresetLeafletTileSourceExtraParam[];
+    readonly annotationUrlExtraParams?: LeafletTileSourceExtraParam[];
     readonly minZoom: number;
     readonly maxZoom: number;
     readonly defaultZoomLevel: number;
-    readonly website: string;
-    readonly attribution: string;
+    readonly website?: string;
+    readonly attribution?: string;
 }
 
-export interface PresetLeafletTileSourceExtraParam {
+export interface LeafletTileSourceExtraParam {
     readonly paramName: string;
     readonly paramValueType: string;
 }
 
-export const LEAFLET_TILE_SOURCES: Record<string, PresetLeafletTileSource> = {
+export const LEAFLET_TILE_SOURCES: Record<string, LeafletTileSource> = {
     'openstreetmap': {
         tileUrlFormat: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         tileUrlSubDomains: 'abc',

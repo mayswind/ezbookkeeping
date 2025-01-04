@@ -8,112 +8,110 @@
           v-if="!mapSupported || !mapDependencyLoaded"></slot>
 </template>
 
-<script>
-import {
-    copyObjectTo
-} from '@/lib/common.ts';
-import {
-    createMapHolder,
-    initMapInstance,
-    setMapCenterTo,
-    setMapCenterMarker,
-    removeMapCenterMarker
-} from '@/lib/map/index.js';
+<script setup lang="ts">
+import { type Ref, ref, computed, useTemplateRef } from 'vue';
 
-export default {
-    props: [
-        'height',
-        'mapClass',
-        'mapStyle',
-        'geoLocation'
-    ],
-    expose: [
-        'init'
-    ],
-    data() {
-        this.mapHolder = createMapHolder();
+import { useI18n } from '@/lib/i18n.js';
 
-        return {
-            mapSupported: !!this.mapHolder,
-            mapDependencyLoaded: this.mapHolder && this.mapHolder.dependencyLoaded,
-            mapInited: false,
-            initCenter: {
-                latitude: 0,
-                longitude: 0,
-            },
-            zoomLevel: 1
+import { copyObjectTo } from '@/lib/common.ts';
+import type { MapInstance, MapPosition } from '@/lib/map/base.ts';
+import { createMapInstance } from '@/lib/map/index.ts';
+
+const props = defineProps<{
+    height?: string;
+    mapClass?: string;
+    mapStyle?: Record<string, string>;
+    geoLocation?: MapPosition;
+}>();
+
+const { tt, getCurrentLanguageInfo } = useI18n();
+
+const mapContainer: Ref<HTMLElement> = useTemplateRef('mapContainer');
+const mapInstance: Ref<MapInstance> = ref(createMapInstance());
+const initCenter: Ref<MapPosition> = ref({
+    latitude: 0,
+    longitude: 0
+});
+const zoomLevel: Ref<number> = ref(1);
+
+const mapSupported = computed<boolean>(() => {
+    return !!mapInstance.value;
+});
+
+const mapDependencyLoaded = computed<boolean>(() => {
+    return mapInstance.value && mapInstance.value.dependencyLoaded;
+});
+
+const finalMapStyle = computed<Record<string, string>>(() => {
+    const styles = copyObjectTo(props.mapStyle, {});
+
+    if (props.height) {
+        styles.height = props.height;
+    }
+
+    if (!mapSupported.value || !mapDependencyLoaded.value) {
+        styles.height = '0';
+    }
+
+    return styles;
+});
+
+function init() {
+    let isFirstInit = false;
+    let centerChanged = false;
+
+    if (!mapSupported.value || !mapDependencyLoaded.value) {
+        return;
+    }
+
+    if (props.geoLocation && (props.geoLocation.longitude || props.geoLocation.latitude)) {
+        if (initCenter.value.latitude !== props.geoLocation.latitude || initCenter.value.longitude !== props.geoLocation.longitude) {
+            initCenter.value.latitude = props.geoLocation.latitude;
+            initCenter.value.longitude = props.geoLocation.longitude;
+            zoomLevel.value = mapInstance.value.defaultZoomLevel;
+
+            centerChanged = true;
         }
-    },
-    computed: {
-        finalMapStyle() {
-            const styles = copyObjectTo(this.mapStyle, {});
+    } else if (!props.geoLocation || (!props.geoLocation.longitude && !props.geoLocation.latitude)) {
+        if (initCenter.value.latitude || initCenter.value.longitude) {
+            initCenter.value.latitude = 0;
+            initCenter.value.longitude = 0;
+            zoomLevel.value = mapInstance.value.minZoomLevel;
 
-            if (this.height) {
-                styles.height = this.height;
-            }
-
-            if (!this.mapSupported || !this.mapDependencyLoaded) {
-                styles.height = '0';
-            }
-
-            return styles;
-        }
-    },
-    methods: {
-        init() {
-            let isFirstInit = false;
-            let centerChanged = false;
-
-            if (!this.mapSupported || !this.mapDependencyLoaded) {
-                return;
-            }
-
-            if (this.geoLocation && (this.geoLocation.longitude || this.geoLocation.latitude)) {
-                if (this.initCenter.latitude !== this.geoLocation.latitude || this.initCenter.longitude !== this.geoLocation.longitude) {
-                    this.initCenter.latitude = this.geoLocation.latitude;
-                    this.initCenter.longitude = this.geoLocation.longitude;
-                    this.zoomLevel = this.mapHolder.defaultZoomLevel;
-
-                    centerChanged = true;
-                }
-            } else if (!this.geoLocation || (!this.geoLocation.longitude && !this.geoLocation.latitude)) {
-                if (this.initCenter.latitude || this.initCenter.longitude) {
-                    this.initCenter.latitude = 0;
-                    this.initCenter.longitude = 0;
-                    this.zoomLevel = this.mapHolder.minZoomLevel;
-
-                    centerChanged = true;
-                }
-            }
-
-            if (!this.mapHolder.inited) {
-                const languageInfo = this.$locale.getCurrentLanguageInfo();
-
-                initMapInstance(this.mapHolder, this.$refs.mapContainer, {
-                    language: languageInfo ? languageInfo.alternativeLanguageTag : null,
-                    initCenter: this.initCenter,
-                    zoomLevel: this.zoomLevel,
-                    text: {
-                        zoomIn: this.$t('Zoom in'),
-                        zoomOut: this.$t('Zoom out'),
-                    }
-                });
-
-                if (this.mapHolder.inited) {
-                    isFirstInit = true;
-                }
-            }
-
-            if (isFirstInit || centerChanged) {
-                setMapCenterTo(this.mapHolder, this.initCenter, this.zoomLevel);
-            }
-
-            if (centerChanged && this.zoomLevel > this.mapHolder.minZoomLevel) {
-                setMapCenterMarker(this.mapHolder, this.initCenter);
-            } else if (centerChanged && this.zoomLevel <= this.mapHolder.minZoomLevel) {
-                removeMapCenterMarker(this.mapHolder);
-            }
+            centerChanged = true;
         }
     }
+
+    if (!mapInstance.value.inited) {
+        const languageInfo = getCurrentLanguageInfo();
+
+        mapInstance.value.initMapInstance(mapContainer.value, {
+            language: languageInfo?.alternativeLanguageTag,
+            initCenter: initCenter.value,
+            zoomLevel: zoomLevel.value,
+            text: {
+                zoomIn: tt('Zoom in'),
+                zoomOut: tt('Zoom out'),
+            }
+        });
+
+        if (mapInstance.value.inited) {
+            isFirstInit = true;
+        }
+    }
+
+    if (isFirstInit || centerChanged) {
+        mapInstance.value.setMapCenterTo(initCenter.value, zoomLevel.value);
+    }
+
+    if (centerChanged && zoomLevel.value > mapInstance.value.minZoomLevel) {
+        mapInstance.value.setMapCenterMarker(initCenter.value);
+    } else if (centerChanged && zoomLevel.value <= mapInstance.value.minZoomLevel) {
+        mapInstance.value.removeMapCenterMarker();
+    }
 }
+
+defineExpose({
+    init
+});
 </script>

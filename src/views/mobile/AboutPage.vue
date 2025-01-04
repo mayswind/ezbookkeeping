@@ -63,7 +63,7 @@ import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import { getMapProvider } from '@/lib/server_settings.ts';
-import { getMapWebsite } from '@/lib/map/index.js';
+import { getMapWebsite } from '@/lib/map/index.ts';
 import { getLicense, getThirdPartyLicenses } from '@/lib/licenses.ts';
 
 export default {

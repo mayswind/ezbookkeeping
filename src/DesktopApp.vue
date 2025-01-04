@@ -29,7 +29,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { isProduction } from '@/lib/version.ts';
-import { loadMapAssets } from '@/lib/map/index.js';
+import { initMapProvider } from '@/lib/map/index.ts';
 import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 export default {
@@ -113,7 +113,7 @@ export default {
     mounted() {
         document.addEventListener('DOMContentLoaded', () => {
             const languageInfo = this.$locale.getCurrentLanguageInfo();
-            loadMapAssets(languageInfo ? languageInfo.alternativeLanguageTag : null);
+            initMapProvider(languageInfo ? languageInfo.alternativeLanguageTag : null);
         });
     }
 }

@@ -17,74 +17,71 @@
                 </p>
                 <textarea class="information-content full-line" readonly="readonly" :rows="rowCount" :value="information"></textarea>
                 <div class="margin-top text-align-center">
-                    <f7-link @click="cancel" :text="$t('Close')"></f7-link>
+                    <f7-link @click="close" :text="$t('Close')"></f7-link>
                 </div>
             </div>
         </f7-page-content>
     </f7-sheet>
 </template>
 
-<script>
+<script setup lang="ts">
+import { useTemplateRef, watch, onMounted, onUpdated } from 'vue';
+
 import { ClipboardHolder } from '@/lib/clipboard.ts';
 
-export default {
-    props: [
-        'title',
-        'hint',
-        'information',
-        'rowCount',
-        'enableCopy',
-        'show'
-    ],
-    emits: [
-        'update:show',
-        'info:copied'
-    ],
-    data() {
-        return {
-            clipboardHolder: null
-        }
-    },
-    mounted() {
-        this.makeCopyToClipboardClickable();
-    },
-    updated() {
-        this.makeCopyToClipboardClickable();
-    },
-    watch: {
-        'information': function (newValue) {
-            if (this.clipboardHolder) {
-                this.clipboardHolder.setClipboardText(newValue);
-            }
-        }
-    },
-    methods: {
-        onSheetClosed() {
-            this.close();
-        },
-        cancel() {
-            this.close();
-        },
-        makeCopyToClipboardClickable() {
-            const self = this;
+const props = defineProps<{
+    title?: string
+    hint?: string
+    information: string
+    rowCount: number
+    enableCopy?: boolean
+    show: boolean
+}>();
 
-            if (self.clipboardHolder) {
-                return;
-            }
+const emit = defineEmits<{
+    (e: 'update:show', value: boolean): void
+    (e: 'info:copied'): void
+}>();
 
-            if (self.$refs.copyToClipboardIcon) {
-                self.clipboardHolder = ClipboardHolder.create({
-                    el: '#copy-to-clipboard-icon',
-                    text: self.information,
-                    successCallback: function () {
-                        self.$emit('info:copied');
-                    }
-                });
+const iconCopyToClipboard = useTemplateRef('copyToClipboardIcon');
+
+let clipboardHolder: ClipboardHolder = null;
+
+function makeCopyToClipboardClickable() {
+    if (clipboardHolder) {
+        return;
+    }
+
+    if (iconCopyToClipboard.value) {
+        clipboardHolder = ClipboardHolder.create({
+            el: '#copy-to-clipboard-icon',
+            text: props.information,
+            successCallback: function () {
+                emit('info:copied');
             }
-        },
-        close() {
-            this.$emit('update:show', false);
-        }
+        });
     }
 }
+
+function close() {
+    emit('update:show', false);
+}
+
+function onSheetClosed() {
+    close();
+}
+
+onMounted(() => {
+    makeCopyToClipboardClickable();
+});
+
+onUpdated(() => {
+    makeCopyToClipboardClickable();
+});
+
+watch(() => props.information, (newValue) => {
+    if (clipboardHolder) {
+        clipboardHolder.setClipboardText(newValue);
+    }
+});
 </script>

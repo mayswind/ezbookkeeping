@@ -37,48 +37,49 @@
     </f7-sheet>
 </template>
 
-<script>
-export default {
-    props: [
-        'modelValue',
-        'title',
-        'hint',
-        'color',
-        'confirmDisabled',
-        'cancelDisabled',
-        'show'
-    ],
-    emits: [
-        'update:modelValue',
-        'update:show',
-        'password:confirm'
-    ],
-    data() {
-        return {
-            currentPassword: ''
-        }
-    },
-    methods: {
-        onSheetOpen() {
-            this.currentPassword = '';
-        },
-        onSheetClosed() {
-            this.close();
-        },
-        confirm() {
-            if (!this.currentPassword || this.confirmDisabled) {
-                return;
-            }
+<script setup lang="ts">
+import { type Ref, ref } from 'vue';
 
-            this.$emit('update:modelValue', this.currentPassword);
-            this.$emit('password:confirm', this.currentPassword);
-        },
-        cancel() {
-            this.close();
-        },
-        close() {
-            this.$emit('update:show', false);
-        }
+const props = defineProps<{
+    modelValue: string
+    title?: string
+    hint?: string
+    color?: string
+    confirmDisabled?: boolean
+    cancelDisabled?: boolean
+    show: boolean
+}>();
+
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: string): void
+    (e: 'update:show', value: boolean): void
+    (e: 'password:confirm', value: string): void
+}>();
+
+const currentPassword: Ref<string> = ref('');
+
+function confirm() {
+    if (!currentPassword.value || props.confirmDisabled) {
+        return;
     }
+
+    emit('update:modelValue', currentPassword.value);
+    emit('password:confirm', currentPassword.value);
+}
+
+function cancel() {
+    close();
+}
+
+function close() {
+    emit('update:show', false);
+}
+
+function onSheetOpen() {
+    currentPassword.value = '';
+}
+
+function onSheetClosed() {
+    close();
 }
 </script>

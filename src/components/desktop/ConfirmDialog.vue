@@ -14,77 +14,78 @@
     </v-dialog>
 </template>
 
-<script>
+<script setup lang="ts">
+import { type Ref, ref, watch } from 'vue';
+
+import { useI18n } from '@/lib/i18n.js';
 import { isString } from '@/lib/common.ts';
 
-export default {
-    props: [
-        'show',
-        'color',
-        'title',
-        'text'
-    ],
-    emits: [
-        'update:show'
-    ],
-    expose: [
-        'open'
-    ],
-    data() {
-        const self = this;
+const props = defineProps<{
+    show?: boolean
+    color?: string
+    title?: string
+    text?: string
+}>();
 
-        return {
-            showState: self.show,
-            titleContent: self.title || self.$t('global.app.title'),
-            textContent: self.text || '',
-            finalColor: self.color || 'primary',
-            resolve: null,
-            reject: null
-        }
-    },
-    watch: {
-        'showState': function (newValue) {
-            this.$emit('update:show', newValue);
-        }
-    },
-    methods: {
-        open(title, text, options) {
-            this.showState = true;
+const emit = defineEmits<{
+    (e: 'update:show', value: boolean): void
+}>();
 
-            if (isString(text)) {
-                this.titleContent = this.$t(title, options);
-                this.textContent = this.$t(text, options);
-            } else {
-                options = text;
-                this.titleContent = this.$t('global.app.title');
-                this.textContent = this.$t(title, options);
-            }
+const { tt } = useI18n();
 
-            if (options && options.color) {
-                this.finalColor = options.color || 'primary';
-            }
+const showState: Ref<boolean> = ref(false);
+const titleContent: Ref<string> = ref(props.title || tt('global.app.title'));
+const textContent: Ref<string> = ref(props.text || '');
+const finalColor: Ref<string> = ref(props.color || 'primary');
 
-            return new Promise((resolve, reject) => {
-                this.resolve = resolve;
-                this.reject = reject;
-            });
-        },
-        confirm() {
-            if (this.resolve) {
-                this.resolve();
-            }
+let resolveFunc: (value: T | PromiseLike<T>) => void = null;
+let rejectFunc: (reason?: unknown) => void = null;
 
-            this.showState = false;
-            this.$emit('update:show', false);
-        },
-        cancel() {
-            if (this.reject) {
-                this.reject();
-            }
+function open(title: string, text: string, options: Record<string, unknown>) {
+    showState.value = true;
 
-            this.showState = false;
-            this.$emit('update:show', false);
-        }
+    if (isString(text)) {
+        titleContent.value = tt(title, options);
+        textContent.value = tt(text, options);
+    } else {
+        options = text;
+        titleContent.value = tt('global.app.title');
+        textContent.value = tt(title, options);
     }
+
+    if (options && options.color) {
+        finalColor.value = options.color || 'primary';
+    }
+
+    return new Promise((resolve, reject) => {
+        resolveFunc = resolve;
+        rejectFunc = reject;
+    });
 }
+
+function confirm(): void {
+    if (resolveFunc) {
+        resolveFunc();
+    }
+
+    showState.value = false;
+    emit('update:show', false);
+}
+
+function cancel(): void {
+    if (rejectFunc) {
+        rejectFunc();
+    }
+
+    showState.value = false;
+    emit('update:show', false);
+}
+
+watch(() => showState, (newValue) => {
+    emit('update:show', newValue);
+});
+
+defineExpose({
+    open
+});
 </script>

@@ -332,7 +332,7 @@ import {
     getNameByKeyValue,
     arrayItemToObjectField
 } from '@/lib/common.ts'
-import { formatPercent } from '@/lib/numeral.js';
+import { formatPercent } from '@/lib/numeral.ts';
 import {
     getYearAndMonthFromUnixTime,
     getYearMonthFirstUnixTime,

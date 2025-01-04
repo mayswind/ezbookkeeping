@@ -142,7 +142,7 @@ import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import logger from '@/lib/logger.js';
-import { getConvertedAmount } from '@/lib/numeral.js';
+import { getConvertedAmount } from '@/lib/numeral.ts';
 
 import {
     mdiRefresh,

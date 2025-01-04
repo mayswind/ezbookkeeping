@@ -4,6 +4,7 @@ import { defaultLanguage, allLanguages } from '@/locales/index.ts';
 
 import { Month, WeekDay, MeridiemIndicator, LongDateFormat, ShortDateFormat, LongTimeFormat, ShortTimeFormat, DateRangeScene, DateRange, LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
+import { DecimalSeparator, DigitGroupingSymbol, DigitGroupingType } from '@/core/numeral.ts';
 import { CurrencyDisplayType, CurrencySortingType } from '@/core/currency.ts';
 import { PresetAmountColor } from '@/core/color.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
@@ -11,7 +12,6 @@ import { CategoryType } from '@/core/category.ts';
 import { TransactionEditScopeType, TransactionTagFilterType } from '@/core/transaction.ts';
 import { ScheduledTemplateFrequencyType } from '@/core/template.ts';
 
-import numeralConstants from '@/consts/numeral.js';
 import { UTC_TIMEZONE, ALL_TIMEZONES } from '@/consts/timezone.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { SUPPORTED_IMPORT_FILE_TYPES } from '@/consts/file.ts';
@@ -51,7 +51,7 @@ import {
     formatAmount,
     formatExchangeRateAmount,
     getAdaptiveDisplayAmountRate
-} from './numeral.js';
+} from './numeral.ts';
 
 import {
     getCurrencyFraction,
@@ -802,16 +802,16 @@ function getAllTimezoneTypesUsedForStatistics(currentTimezone, translateFn) {
 
 function getAllDecimalSeparators(translateFn) {
     const defaultDecimalSeparatorTypeName = translateFn('default.decimalSeparator');
-    return getNumeralSeparatorFormats(translateFn, numeralConstants.allDecimalSeparator, numeralConstants.allDecimalSeparatorArray, defaultDecimalSeparatorTypeName, numeralConstants.defaultDecimalSeparator);
+    return getNumeralSeparatorFormats(translateFn, DecimalSeparator.values(), DecimalSeparator.parse(defaultDecimalSeparatorTypeName), DecimalSeparator.Default, DecimalSeparator.LanguageDefaultType);
 }
 
 function getAllDigitGroupingSymbols(translateFn) {
     const defaultDigitGroupingSymbolTypeName = translateFn('default.digitGroupingSymbol');
-    return getNumeralSeparatorFormats(translateFn, numeralConstants.allDigitGroupingSymbol, numeralConstants.allDigitGroupingSymbolArray, defaultDigitGroupingSymbolTypeName, numeralConstants.defaultDigitGroupingSymbol);
+    return getNumeralSeparatorFormats(translateFn, DigitGroupingSymbol.values(), DigitGroupingSymbol.parse(defaultDigitGroupingSymbolTypeName), DigitGroupingSymbol.Default, DigitGroupingSymbol.LanguageDefaultType);
 }
 
-function getNumeralSeparatorFormats(translateFn, allSeparatorMap, allSeparatorArray, localeDefaultTypeName, systemDefaultType) {
-    let defaultSeparatorType = allSeparatorMap[localeDefaultTypeName];
+function getNumeralSeparatorFormats(translateFn, allSeparatorArray, localeDefaultType, systemDefaultType, languageDefaultValue) {
+    let defaultSeparatorType = localeDefaultType;
 
     if (!defaultSeparatorType) {
         defaultSeparatorType = systemDefaultType;
@@ -820,7 +820,7 @@ function getNumeralSeparatorFormats(translateFn, allSeparatorMap, allSeparatorAr
     const ret = [];
 
     ret.push({
-        type: numeralConstants.defaultValue,
+        type: languageDefaultValue,
         symbol: defaultSeparatorType.symbol,
         displayName: `${translateFn('Language Default')} (${defaultSeparatorType.symbol})`
     });
@@ -840,22 +840,24 @@ function getNumeralSeparatorFormats(translateFn, allSeparatorMap, allSeparatorAr
 
 function getAllDigitGroupingTypes(translateFn) {
     const defaultDigitGroupingTypeName = translateFn('default.digitGrouping');
-    let defaultDigitGroupingType = numeralConstants.allDigitGroupingType[defaultDigitGroupingTypeName];
+    let defaultDigitGroupingType = DigitGroupingType.parse(defaultDigitGroupingTypeName);
 
     if (!defaultDigitGroupingType) {
-        defaultDigitGroupingType = numeralConstants.defaultDigitGroupingType;
+        defaultDigitGroupingType = DigitGroupingType.Default;
     }
 
     const ret = [];
 
     ret.push({
-        type: numeralConstants.defaultValue,
+        type: DigitGroupingType.LanguageDefaultType,
         enabled: defaultDigitGroupingType.enabled,
         displayName: `${translateFn('Language Default')} (${translateFn('numeral.' + defaultDigitGroupingType.name)})`
     });
 
-    for (let i = 0; i < numeralConstants.allDigitGroupingTypeArray.length; i++) {
-        const type = numeralConstants.allDigitGroupingTypeArray[i];
+    const allDigitGroupingTypes = DigitGroupingType.values();
+
+    for (let i = 0; i < allDigitGroupingTypes.length; i++) {
+        const type = allDigitGroupingTypes[i];
 
         ret.push({
             type: type.type,
@@ -906,14 +908,14 @@ function getAllCurrencySortingTypes(translateFn) {
 }
 
 function getCurrentDecimalSeparator(translateFn, decimalSeparator) {
-    let decimalSeparatorType = numeralConstants.allDecimalSeparatorMap[decimalSeparator];
+    let decimalSeparatorType = DecimalSeparator.valueOf(decimalSeparator);
 
     if (!decimalSeparatorType) {
         const defaultDecimalSeparatorTypeName = translateFn('default.decimalSeparator');
-        decimalSeparatorType = numeralConstants.allDecimalSeparator[defaultDecimalSeparatorTypeName];
+        decimalSeparatorType = DecimalSeparator.parse(defaultDecimalSeparatorTypeName);
 
         if (!decimalSeparatorType) {
-            decimalSeparatorType = numeralConstants.defaultDecimalSeparator;
+            decimalSeparatorType = DecimalSeparator.Default;
         }
     }
 
@@ -921,14 +923,14 @@ function getCurrentDecimalSeparator(translateFn, decimalSeparator) {
 }
 
 function getCurrentDigitGroupingSymbol(translateFn, digitGroupingSymbol) {
-    let digitGroupingSymbolType = numeralConstants.allDigitGroupingSymbolMap[digitGroupingSymbol];
+    let digitGroupingSymbolType = DigitGroupingSymbol.valueOf(digitGroupingSymbol);
 
     if (!digitGroupingSymbolType) {
         const defaultDigitGroupingSymbolTypeName = translateFn('default.digitGroupingSymbol');
-        digitGroupingSymbolType = numeralConstants.allDigitGroupingSymbol[defaultDigitGroupingSymbolTypeName];
+        digitGroupingSymbolType = DigitGroupingSymbol.parse(defaultDigitGroupingSymbolTypeName);
 
         if (!digitGroupingSymbolType) {
-            digitGroupingSymbolType = numeralConstants.defaultDigitGroupingSymbol;
+            digitGroupingSymbolType = DigitGroupingSymbol.Default;
         }
     }
 
@@ -936,14 +938,14 @@ function getCurrentDigitGroupingSymbol(translateFn, digitGroupingSymbol) {
 }
 
 function getCurrentDigitGroupingType(translateFn, digitGrouping) {
-    let digitGroupingType = numeralConstants.allDigitGroupingTypeMap[digitGrouping];
+    let digitGroupingType = DigitGroupingType.valueOf(digitGrouping);
 
     if (!digitGroupingType) {
         const defaultDigitGroupingTypeName = translateFn('default.digitGrouping');
-        digitGroupingType = numeralConstants.allDigitGroupingType[defaultDigitGroupingTypeName];
+        digitGroupingType = DigitGroupingType.parse(defaultDigitGroupingTypeName);
 
         if (!digitGroupingType) {
-            digitGroupingType = numeralConstants.defaultDigitGroupingType;
+            digitGroupingType = DigitGroupingType.Default;
         }
     }
 

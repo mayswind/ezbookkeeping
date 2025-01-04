@@ -97,7 +97,7 @@ import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
-import { getConvertedAmount } from '@/lib/numeral.js';
+import { getConvertedAmount } from '@/lib/numeral.ts';
 
 export default {
     data() {

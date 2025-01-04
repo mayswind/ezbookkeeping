@@ -4,7 +4,7 @@ import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
 import { isEquals } from '@/lib/common.ts';
 import { getCurrentUnixTime, formatUnixTime } from '@/lib/datetime.ts';
-import { getExchangedAmount } from '@/lib/numeral.js';
+import { getExchangedAmount } from '@/lib/numeral.ts';
 
 const exchangeRatesLocalStorageKey = 'ebk_app_exchange_rates';
 

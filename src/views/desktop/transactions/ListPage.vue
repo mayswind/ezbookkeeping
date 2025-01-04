@@ -596,10 +596,10 @@ import { useTransactionsStore } from '@/stores/transaction.js';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 
 import { DateRangeScene, DateRange } from '@/core/datetime.ts';
+import { AmountFilterType } from '@/core/numeral.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts';
 import { TemplateType }  from '@/core/template.ts';
-import numeralConstants from '@/consts/numeral.js';
 import { isString, isNumber, getNameByKeyValue } from '@/lib/common.ts';
 import logger from '@/lib/logger.js';
 import {
@@ -977,7 +977,7 @@ export default {
             }
         },
         allAmountFilterTypes() {
-            return numeralConstants.allAmountFilterTypeArray;
+            return AmountFilterType.values();
         },
         allTransactionTypes() {
             return TransactionType;
@@ -1674,7 +1674,7 @@ export default {
             return [];
         },
         getAmountFilterParameterCount(filterType) {
-            const amountFilterType = numeralConstants.allAmountFilterTypeMap[filterType];
+            const amountFilterType = AmountFilterType.valueOf(filterType);
             return amountFilterType ? amountFilterType.paramCount : 0;
         },
         getFilterLinkUrl() {

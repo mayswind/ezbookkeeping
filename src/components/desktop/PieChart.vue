@@ -12,7 +12,7 @@ import { useUserStore } from '@/stores/user.js';
 
 import { DEFAULT_ICON_COLOR, DEFAULT_CHART_COLORS } from '@/consts/color.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { formatPercent } from '@/lib/numeral.js';
+import { formatPercent } from '@/lib/numeral.ts';
 
 export default {
     props: [

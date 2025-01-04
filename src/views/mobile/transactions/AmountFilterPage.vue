@@ -57,7 +57,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 
-import numeralConstants from '@/consts/numeral.js';
+import { AmountFilterType } from '@/core/numeral.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import { isString } from '@/lib/common.ts';
 import logger from '@/lib/logger.js';
@@ -79,7 +79,7 @@ export default {
     computed: {
         ...mapStores(useSettingsStore, useUserStore, useTransactionsStore),
         allAmountFilterTypes() {
-            return numeralConstants.allAmountFilterTypeArray;
+            return AmountFilterType.values();
         },
         allowedMinAmount() {
             return TRANSACTION_MIN_AMOUNT;
@@ -91,24 +91,24 @@ export default {
             return this.getAmountFilterParameterCount(this.type);
         },
         title() {
-            const amountFilterType = numeralConstants.allAmountFilterTypeMap[this.type];
+            const amountFilterType = AmountFilterType.valueOf(this.type);
             return amountFilterType ? this.$t(amountFilterType.name) : this.$t('Amount');
         },
         amount1Header() {
-            if (this.type === numeralConstants.allAmountFilterType.GreaterThan.type
-                || this.type === numeralConstants.allAmountFilterType.Between.type
-                || this.type === numeralConstants.allAmountFilterType.NotBetween.type) {
+            if (this.type === AmountFilterType.GreaterThan.type
+                || this.type === AmountFilterType.Between.type
+                || this.type === AmountFilterType.NotBetween.type) {
                 return this.$t('Minimum Amount');
-            } else if (this.type === numeralConstants.allAmountFilterType.LessThan.type) {
+            } else if (this.type === AmountFilterType.LessThan.type) {
                 return this.$t('Maximum Amount');
             } else {
                 return this.$t('Amount');
             }
         },
         amount2Header() {
-            if (this.type === numeralConstants.allAmountFilterType.Between.type) {
+            if (this.type === AmountFilterType.Between.type) {
                 return this.$t('Maximum Amount');
-            } else if (this.type === numeralConstants.allAmountFilterType.NotBetween.type) {
+            } else if (this.type === AmountFilterType.NotBetween.type) {
                 return this.$t('Maximum Amount');
             } else {
                 return this.$t('Amount');
@@ -176,7 +176,7 @@ export default {
             return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, false);
         },
         getAmountFilterParameterCount(filterType) {
-            const amountFilterType = numeralConstants.allAmountFilterTypeMap[filterType];
+            const amountFilterType = AmountFilterType.valueOf(filterType);
             return amountFilterType ? amountFilterType.paramCount : 0;
         }
     }

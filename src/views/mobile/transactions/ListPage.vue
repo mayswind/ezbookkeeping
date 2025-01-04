@@ -529,9 +529,9 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 
 import { DateRangeScene, DateRange } from '@/core/datetime.ts';
+import { AmountFilterType } from '@/core/numeral.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
-import numeralConstants from '@/consts/numeral.js';
 import { getNameByKeyValue } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
@@ -677,7 +677,7 @@ export default {
             return this.transactionsStore.hasMoreTransaction;
         },
         allAmountFilterTypes() {
-            return numeralConstants.allAmountFilterTypeArray;
+            return AmountFilterType.values();
         },
         allTransactionTypes() {
             return TransactionType;

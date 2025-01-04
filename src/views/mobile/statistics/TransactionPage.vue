@@ -334,7 +334,7 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 import { DateRangeScene, DateRange } from '@/core/datetime.ts';
 import statisticsConstants from '@/consts/statistics.js';
 import { getNameByKeyValue, limitText } from '@/lib/common.ts';
-import { formatPercent } from '@/lib/numeral.js';
+import { formatPercent } from '@/lib/numeral.ts';
 import {
     getYearAndMonthFromUnixTime,
     getYearMonthFirstUnixTime,

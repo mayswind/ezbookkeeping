@@ -1,56 +1,61 @@
-import numeralConstants from '@/consts/numeral.js';
+import { type NumberFormatOptions, DecimalSeparator, DigitGroupingSymbol, DigitGroupingType} from '@/core/numeral.ts';
+import { DEFAULT_DECIMAL_NUMBER_COUNT, MAX_SUPPORTED_DECIMAL_NUMBER_COUNT } from '@/consts/numeral.ts';
 
 import { isString, isNumber, removeAll } from './common.ts';
 
-export function appendDigitGroupingSymbol(value, options) {
+export function appendDigitGroupingSymbol(value: number | string, options: NumberFormatOptions): string {
+    let textualValue = '';
+
     if (isNumber(value)) {
-        value = value.toString();
+        textualValue = value.toString();
+    } else {
+        textualValue = value as string;
     }
 
-    if (!isString(value)) {
-        return value;
+    if (!textualValue) {
+        return textualValue;
     }
 
     if (!options) {
         options = {};
     }
 
-    if (!isNumber(options.digitGrouping) || options.digitGrouping === numeralConstants.allDigitGroupingType.None.type) {
-        return value;
+    if (!isNumber(options.digitGrouping) || options.digitGrouping === DigitGroupingType.None.type) {
+        return textualValue;
     }
 
-    if (value.length <= 3) {
-        return value;
+    if (textualValue.length <= 3) {
+        return textualValue;
     }
 
-    const negative = value.charAt(0) === '-';
+    const negative = textualValue.charAt(0) === '-';
 
     if (negative) {
-        value = value.substring(1);
+        textualValue = textualValue.substring(1);
     }
 
-    const digitGroupingSymbol = options.digitGroupingSymbol || numeralConstants.defaultDigitGroupingSymbol.symbol;
-    const decimalSeparator = options.decimalSeparator || numeralConstants.defaultDecimalSeparator.symbol;
+    const digitGroupingSymbol = options.digitGroupingSymbol || DigitGroupingSymbol.Default.symbol;
+    const decimalSeparator = options.decimalSeparator || DecimalSeparator.Default.symbol;
 
     let integerChars = [];
     let currentDecimalSeparator = '';
     let decimals = '';
 
-    for (let i = 0; i < value.length; i++) {
-        const ch = value.charAt(i);
+    for (let i = 0; i < textualValue.length; i++) {
+        const ch = textualValue.charAt(i);
 
         if ('0' <= ch && ch <= '9') {
             integerChars.push(ch);
         } else {
             currentDecimalSeparator = ch;
-            decimals = value.substring(i + 1);
+            decimals = textualValue.substring(i + 1);
             break;
         }
     }
 
     let newInteger = '';
 
-    if (options.digitGrouping === numeralConstants.allDigitGroupingType.ThousandsSeparator.type) {
+    if (options.digitGrouping === DigitGroupingType.ThousandsSeparator.type) {
         for (let i = integerChars.length - 1, j = 0; i >= 0; i--, j++) {
             if (j % 3 === 0 && j > 0) {
                 newInteger = digitGroupingSymbol + newInteger;
@@ -71,9 +76,9 @@ export function appendDigitGroupingSymbol(value, options) {
     }
 }
 
-export function parseAmount(str, options) {
+export function parseAmount(str: string, options: NumberFormatOptions): number {
     if (!isString(str)) {
-        return str;
+        return 0;
     }
 
     if (!options) {
@@ -96,8 +101,8 @@ export function parseAmount(str, options) {
 
     const sign = negative ? -1 : 1;
 
-    const decimalSeparator = options.decimalSeparator || numeralConstants.defaultDecimalSeparator.symbol;
-    const digitGroupingSymbol = options.digitGroupingSymbol || numeralConstants.defaultDigitGroupingSymbol.symbol;
+    const decimalSeparator = options.decimalSeparator || DecimalSeparator.Default.symbol;
+    const digitGroupingSymbol = options.digitGroupingSymbol || DigitGroupingSymbol.Default.symbol;
 
     if (str.indexOf(digitGroupingSymbol) >= 0) {
         str = removeAll(str, digitGroupingSymbol);
@@ -126,42 +131,46 @@ export function parseAmount(str, options) {
     }
 }
 
-export function formatAmount(value, options) {
+export function formatAmount(value: number | string, options: NumberFormatOptions): string {
+    let textualValue = '';
+
     if (isNumber(value)) {
-        value = value.toString();
+        textualValue = value.toString();
+    } else {
+        textualValue = value as string;
     }
 
-    if (!isString(value)) {
-        return value;
+    if (!textualValue) {
+        return textualValue;
     }
 
     if (!options) {
         options = {};
     }
 
-    const negative = value.charAt(0) === '-';
+    const negative = textualValue.charAt(0) === '-';
 
     if (negative) {
-        value = value.substring(1);
+        textualValue = textualValue.substring(1);
     }
 
-    const decimalSeparator = options.decimalSeparator || numeralConstants.defaultDecimalSeparator.symbol;
+    const decimalSeparator = options.decimalSeparator || DecimalSeparator.Default.symbol;
     let decimalNumberCount = options.decimalNumberCount;
 
-    if (!isNumber(decimalNumberCount) || decimalNumberCount > numeralConstants.maxSupportedDecimalNumberCount) {
-        decimalNumberCount = numeralConstants.defaultDecimalNumberCount;
+    if (!isNumber(decimalNumberCount) || (decimalNumberCount as number) > MAX_SUPPORTED_DECIMAL_NUMBER_COUNT) {
+        decimalNumberCount = DEFAULT_DECIMAL_NUMBER_COUNT;
     }
 
     let integer = '0';
     let decimals = '00';
 
-    if (value.length > 2) {
-        integer = value.substring(0, value.length - 2);
-        decimals = value.substring(value.length - 2);
-    } else if (value.length === 2) {
-        decimals = value;
-    } else if (value.length === 1) {
-        decimals = '0' + value;
+    if (textualValue.length > 2) {
+        integer = textualValue.substring(0, textualValue.length - 2);
+        decimals = textualValue.substring(textualValue.length - 2);
+    } else if (textualValue.length === 2) {
+        decimals = textualValue;
+    } else if (textualValue.length === 1) {
+        decimals = '0' + textualValue;
     }
 
     if (decimalNumberCount === 0) {
@@ -187,19 +196,19 @@ export function formatAmount(value, options) {
     integer = appendDigitGroupingSymbol(integer, options);
 
     if (decimals !== '') {
-        value = `${integer}${decimalSeparator}${decimals}`;
+        textualValue = `${integer}${decimalSeparator}${decimals}`;
     } else {
-        value = integer;
+        textualValue = integer;
     }
 
     if (negative) {
-        value = `-${value}`;
+        textualValue = `-${textualValue}`;
     }
 
-    return value;
+    return textualValue;
 }
 
-export function formatPercent(value, precision, lowPrecisionValue) {
+export function formatPercent(value: number, precision: number, lowPrecisionValue: string): string {
     const ratio = Math.pow(10, precision);
     const normalizedValue = Math.floor(value * ratio);
 
@@ -211,7 +220,7 @@ export function formatPercent(value, precision, lowPrecisionValue) {
     return result + '%';
 }
 
-export function getAmountWithDecimalNumberCount(amount, decimalNumberCount) {
+export function getAmountWithDecimalNumberCount(amount: number, decimalNumberCount: number): number {
     if (decimalNumberCount === 0) {
         return Math.floor(amount / 100) * 100;
     } else if (decimalNumberCount === 1) {
@@ -221,13 +230,13 @@ export function getAmountWithDecimalNumberCount(amount, decimalNumberCount) {
     return amount;
 }
 
-export function formatExchangeRateAmount(exchangeRateAmount, options) {
+export function formatExchangeRateAmount(exchangeRateAmount: number | string, options: NumberFormatOptions): string {
     if (!options) {
         options = {};
     }
 
     const rateStr = exchangeRateAmount.toString();
-    const decimalSeparator = numeralConstants.allDecimalSeparator.Dot.symbol;
+    const decimalSeparator = DecimalSeparator.Dot.symbol;
 
     if (rateStr.indexOf(decimalSeparator) < 0) {
         return appendDigitGroupingSymbol(rateStr, options);
@@ -246,18 +255,15 @@ export function formatExchangeRateAmount(exchangeRateAmount, options) {
     }
 }
 
-export function getAdaptiveDisplayAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, options) {
+export function getAdaptiveDisplayAmountRate(amount1: number, amount2: number, fromExchangeRate: { rate: string }, toExchangeRate: { rate: string }, options: NumberFormatOptions): string | null {
     if (!amount1 || !amount2 || amount1 === amount2) {
         if (!fromExchangeRate || !fromExchangeRate.rate || !toExchangeRate || !toExchangeRate.rate) {
             return null;
         }
 
-        amount1 = fromExchangeRate.rate;
-        amount2 = toExchangeRate.rate;
+        amount1 = parseFloat(fromExchangeRate.rate);
+        amount2 = parseFloat(toExchangeRate.rate);
     }
-
-    amount1 = parseFloat(amount1);
-    amount2 = parseFloat(amount2);
 
     if (amount1 > amount2) {
         const rateStr = (amount1 / amount2).toString();
@@ -270,7 +276,7 @@ export function getAdaptiveDisplayAmountRate(amount1, amount2, fromExchangeRate,
     }
 }
 
-export function getExchangedAmount(amount, fromRate, toRate) {
+export function getExchangedAmount(amount: number, fromRate: string, toRate: string): number | null {
     const exchangeRate = parseFloat(toRate) / parseFloat(fromRate);
 
     if (!isNumber(exchangeRate)) {
@@ -280,7 +286,7 @@ export function getExchangedAmount(amount, fromRate, toRate) {
     return amount * exchangeRate;
 }
 
-export function getConvertedAmount(baseAmount, fromExchangeRate, toExchangeRate) {
+export function getConvertedAmount(baseAmount: number | '', fromExchangeRate: { rate: string }, toExchangeRate: { rate: string }): number | '' | null {
     if (!fromExchangeRate || !toExchangeRate) {
         return '';
     }
@@ -289,5 +295,5 @@ export function getConvertedAmount(baseAmount, fromExchangeRate, toExchangeRate)
         return 0;
     }
 
-    return getExchangedAmount(baseAmount, fromExchangeRate.rate, toExchangeRate.rate);
+    return getExchangedAmount(baseAmount as number, fromExchangeRate.rate, toExchangeRate.rate);
 }

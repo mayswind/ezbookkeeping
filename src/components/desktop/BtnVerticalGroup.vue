@@ -10,31 +10,36 @@
     </div>
 </template>
 
-<script>
-export default {
-    props: [
-        'disabled',
-        'buttons',
-        'modelValue'
-    ],
-    emits: [
-        'update:modelValue'
-    ],
-    computed: {
-        value: {
-            get: function () {
-                return this.modelValue;
-            },
-            set: function (value) {
-                if (value === this.modelValue) {
-                    return;
-                }
+<script setup lang="ts">
+import { computed } from 'vue';
 
-                this.$emit('update:modelValue', value);
-            }
-        }
-    }
+interface Button {
+    name: string,
+    value: unknown
 }
+
+const props = defineProps<{
+    modelValue: unknown;
+    buttons: Button[];
+    disabled?: boolean;
+}>();
+
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: unknown): void
+}>();
+
+const value = computed<unknown>({
+    get: () => {
+        return props.modelValue;
+    },
+    set: value => {
+        if (value === props.modelValue) {
+            return;
+        }
+
+        emit('update:modelValue', value);
+    }
+});
 </script>
 
 <style>

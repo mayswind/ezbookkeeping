@@ -8,43 +8,36 @@
     </v-snackbar>
 </template>
 
-<script>
-export default {
-    props: [
-        'show',
-        'message'
-    ],
-    emits: [
-        'update:show'
-    ],
-    expose: [
-        'showMessage',
-        'showError'
-    ],
-    data() {
-        const self = this;
+<script setup lang="ts">
+import { type Ref, ref, watch } from 'vue';
 
-        return {
-            showState: self.show,
-            messageContent: self.message,
-            resolve: null,
-            reject: null
-        }
-    },
-    watch: {
-        'showState': function (newValue) {
-            this.$emit('update:show', newValue);
-        }
-    },
-    methods: {
-        showMessage(message, options) {
-            this.showState = true;
-            this.messageContent = this.$t(message, options);
-        },
-        showError(error) {
-            this.showState = true;
-            this.messageContent = this.$tError(error.message || error);
-        }
-    }
+import { useI18n } from '@/lib/i18n.js';
+
+const emit = defineEmits<{
+    (e: 'update:show', value: boolean): void
+}>();
+
+const { tt, te } = useI18n();
+
+const showState: Ref<boolean> = ref(false);
+const messageContent: Ref<string> = ref('');
+
+function showMessage(message: string, options: Record<string, unknown>): void {
+    showState.value = true;
+    messageContent.value = tt(message, options);
 }
+
+function showError(error: string | { message: string }): void {
+    showState.value = true;
+    messageContent.value = te(error.message || error);
+}
+
+watch(showState, (newValue) => {
+    emit('update:show', newValue);
+});
+
+defineExpose({
+    showMessage,
+    showError
+});
 </script>

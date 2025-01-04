@@ -1,8 +1,9 @@
+import { useI18n as useVueI18n } from 'vue-i18n';
 import moment from 'moment-timezone';
 
 import { defaultLanguage, allLanguages } from '@/locales/index.ts';
 
-import { Month, WeekDay, MeridiemIndicator, LongDateFormat, ShortDateFormat, LongTimeFormat, ShortTimeFormat, DateRangeScene, DateRange, LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE } from '@/core/datetime.ts';
+import { Month, WeekDay, MeridiemIndicator, LongDateFormat, ShortDateFormat, LongTimeFormat, ShortTimeFormat, DateRange, LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { DecimalSeparator, DigitGroupingSymbol, DigitGroupingType } from '@/core/numeral.ts';
 import { CurrencyDisplayType, CurrencySortingType } from '@/core/currency.ts';
@@ -1747,8 +1748,16 @@ export function i18nFunctions(i18nGlobal) {
         getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t),
         getServerTipContent: (tipConfig) => getServerTipContent(tipConfig, i18nGlobal),
         joinMultiText: (textArray) => joinMultiText(textArray, i18nGlobal.t),
+        tt: (...args) => i18nGlobal.t(...args),
+        ti: (text, isTranslate) => translateIf(text, isTranslate, i18nGlobal.t),
+        te: (message) => translateError(message, i18nGlobal.t),
         setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),
         setTimeZone: (timezone) => setTimeZone(timezone),
         initLocale: (lastUserLanguage, timezone) => initLocale(i18nGlobal, lastUserLanguage, timezone)
     };
+}
+
+export function useI18n() {
+    const i18nGlobal = useVueI18n();
+    return i18nFunctions(i18nGlobal);
 }

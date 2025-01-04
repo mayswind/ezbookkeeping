@@ -37,7 +37,7 @@ export function appendDigitGroupingSymbol(value: number | string, options: Numbe
     const digitGroupingSymbol = options.digitGroupingSymbol || DigitGroupingSymbol.Default.symbol;
     const decimalSeparator = options.decimalSeparator || DecimalSeparator.Default.symbol;
 
-    let integerChars = [];
+    const integerChars = [];
     let currentDecimalSeparator = '';
     let decimals = '';
 

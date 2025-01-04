@@ -3,8 +3,7 @@
         <div class="pin-code-input pin-code-input-outline"
              :class="{ 'pin-code-input-focued': codes[index].focused }" :key="index"
              v-for="(code, index) in codes">
-            <input min="0" maxlength="1" pattern="[0-9]*"
-                   :ref="`pin-code-input-${index}`"
+            <input ref="pin-code-input" min="0" maxlength="1" pattern="[0-9]*"
                    :value="codes[index].value"
                    :type="codes[index].inputType"
                    :disabled="disabled ? 'disabled' : undefined"
@@ -19,243 +18,248 @@
     </div>
 </template>
 
-<script>
-export default {
-    props: [
-        'modelValue',
-        'disabled',
-        'autofocus',
-        'secure',
-        'length'
-    ],
-    emits: [
-        'update:modelValue',
-        'pincode:confirm'
-    ],
-    data() {
-        return {
-            codes: []
-        }
-    },
-    computed: {
-        finalPinCode() {
-            let finalPinCode = '';
+<script setup lang="ts">
+import { type Ref, ref, computed, watch, useTemplateRef } from 'vue';
 
-            for (let i = 0; i < this.codes.length; i++) {
-                if (this.codes[i].value) {
-                    finalPinCode += this.codes[i].value;
-                } else {
-                    break;
-                }
-            }
+interface PinCode {
+    value: string;
+    inputType: string;
+    inputTimer: number | null;
+    focused: boolean;
+}
 
-            return finalPinCode;
-        }
-    },
-    watch: {
-        'length': function (newValue) {
-            this.init(newValue, this.modelValue);
-        },
-        'modelValue': function (newValue) {
-            if (newValue === this.finalPinCode) {
-                return;
-            }
+const props = defineProps<{
+    modelValue: string;
+    length: number;
+    disabled?: boolean;
+    autofocus?: boolean;
+    secure?: boolean;
+}>();
 
-            this.init(this.length, newValue);
-        },
-        'codes': {
-            handler() {
-                this.$emit('update:modelValue', this.finalPinCode);
-            },
-            deep: true
-        }
-    },
-    created() {
-        this.init(this.length, this.modelValue);
-    },
-    methods: {
-        init(length, value) {
-            this.codes.length = 0;
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: string): void
+    (e: 'pincode:confirm', value: string): void
+}>();
 
-            for (let i = 0; i < length; i++) {
-                const code = {
-                    value: '',
-                    inputType: 'tel',
-                    inputTimer: null,
-                    focused: false
-                };
+const codes: Ref<PinCode[]> = ref([]);
+const pinCodeInputs: Ref<HTMLInputElement[]> = useTemplateRef('pin-code-input');
 
-                if (value && value[i]) {
-                    code.value = value[i];
+const finalPinCode = computed<string>(() => {
+    let ret = '';
 
-                    if (this.secure) {
-                        code.inputType = 'password';
-                    }
-                }
-
-                this.codes.push(code);
-            }
-        },
-        autoFillText(index, text) {
-            let lastIndex = index;
-
-            for (let i = index, j = 0; i < this.codes.length && j < text.length; i++, j++) {
-                if (text[j] < '0' || text[j] > '9') {
-                    this.codes[i].value = '';
-                    this.$forceUpdate();
-                    break;
-                }
-
-                this.codes[i].value = text[j];
-                this.setInputType(i);
-                lastIndex = i;
-            }
-
-            this.setFocus(lastIndex);
-
-            if (this.finalPinCode.length === this.length) {
-                this.$emit('pincode:confirm', this.finalPinCode);
-            }
-        },
-        setInputType(index) {
-            const self = this;
-
-            if (!self.secure) {
-                return;
-            }
-
-            if (!self.codes[index].value) {
-                self.codes[index].inputType = 'tel';
-                return;
-            }
-
-            if (self.codes[index].inputTimer) {
-                return;
-            }
-
-            self.codes[index].inputTimer = setTimeout(() => {
-                if (self.codes[index].value) {
-                    self.codes[index].inputType = 'password';
-                } else {
-                    self.codes[index].inputType = 'tel';
-                }
-
-                self.codes[index].inputTimer = null;
-            }, 300);
-        },
-        setFocus(index) {
-            const refId = `pin-code-input-${index}`;
-            const ref = this.$refs[refId];
-
-            if (ref && ref[0]) {
-                ref[0].focus();
-                ref[0].select();
-            }
-        },
-        setPreviousFocus(index) {
-            if (index > 0) {
-                this.setFocus(index - 1);
-            }
-        },
-        setNextFocus(index) {
-            if (index < this.length - 1) {
-                this.setFocus(index + 1);
-            }
-        },
-        onKeydown(index, event) {
-            if (event.altKey || (event.key.indexOf('F') === 0 && (event.key.length === 2 || event.key.length === 3))) {
-                return;
-            }
-
-            if (event.key === 'Enter' && this.finalPinCode.length === this.length) {
-                this.$emit('pincode:confirm', this.finalPinCode);
-                event.preventDefault();
-                return;
-            }
-
-            if (event.key === 'ArrowLeft' || (event.shiftKey && event.key === 'Tab')) {
-                this.setPreviousFocus(index);
-                event.preventDefault();
-                return;
-            }
-
-            if (event.key === 'ArrowRight' || (!event.shiftKey && event.key === 'Tab')) {
-                this.setNextFocus(index);
-                event.preventDefault();
-                return;
-            }
-
-            if (event.key === 'Home') {
-                this.setFocus(0);
-                event.preventDefault();
-                return;
-            }
-
-            if (event.key === 'End') {
-                this.setFocus(this.length - 1);
-                event.preventDefault();
-                return;
-            }
-
-            if (((event.ctrlKey || event.metaKey) && event.key === 'v') || event.key === 'Paste') {
-                return;
-            }
-
-            if (event.key === 'Backspace' || event.key === 'Delete' || event.key === 'Del') {
-                for (let i = index; i < this.codes.length; i++) {
-                    this.codes[i].value = '';
-                    this.setInputType(i);
-                }
-
-                if (event.code === 'Backspace') {
-                    this.setPreviousFocus(index);
-                }
-
-                event.preventDefault();
-                return;
-            }
-
-            if (event.key.length === 1 && '0' <= event.key && event.key <= '9') {
-                this.codes[index].value = event.key;
-                this.setInputType(index);
-                this.setNextFocus(index);
-
-                if (this.finalPinCode.length === this.length) {
-                    this.$emit('pincode:confirm', this.finalPinCode);
-                }
-            }
-
-            event.preventDefault();
-        },
-        onPaste(index, event) {
-            if (!event.clipboardData) {
-                event.preventDefault();
-                return;
-            }
-
-            const text = event.clipboardData.getData('Text');
-
-            if (!text) {
-                event.preventDefault();
-                return;
-            }
-
-            this.autoFillText(index, text);
-
-            event.preventDefault();
-        },
-        onInput(index, event) {
-            if (!event.target.value) {
-                event.preventDefault();
-                return;
-            }
-
-            this.autoFillText(index, event.target.value);
-
-            event.preventDefault();
+    for (let i = 0; i < codes.value.length; i++) {
+        if (codes.value[i].value) {
+            ret += codes.value[i].value;
+        } else {
+            break;
         }
     }
+
+    return ret;
+});
+
+function init(length: number, value: string): void {
+    codes.value.length = 0;
+
+    for (let i = 0; i < length; i++) {
+        const code: PinCode = {
+            value: '',
+            inputType: 'tel',
+            inputTimer: null,
+            focused: false
+        };
+
+        if (value && value[i]) {
+            code.value = value[i];
+
+            if (props.secure) {
+                code.inputType = 'password';
+            }
+        }
+
+        codes.value.push(code);
+    }
 }
+
+function autoFillText(index: number, text: string): void {
+    let lastIndex = index;
+
+    for (let i = index, j = 0; i < codes.value.length && j < text.length; i++, j++) {
+        if (text[j] < '0' || text[j] > '9') {
+            codes.value[i].value = '';
+            break;
+        }
+
+        codes.value[i].value = text[j];
+        setInputType(i);
+        lastIndex = i;
+    }
+
+    setFocus(lastIndex);
+
+    if (finalPinCode.value.length === length) {
+        emit('pincode:confirm', finalPinCode.value);
+    }
+}
+
+function setInputType(index: number): void {
+    if (!props.secure) {
+        return;
+    }
+
+    if (!codes.value[index].value) {
+        codes.value[index].inputType = 'tel';
+        return;
+    }
+
+    if (codes.value[index].inputTimer) {
+        return;
+    }
+
+    codes.value[index].inputTimer = setTimeout(() => {
+        if (codes.value[index].value) {
+            codes.value[index].inputType = 'password';
+        } else {
+            codes.value[index].inputType = 'tel';
+        }
+
+        codes.value[index].inputTimer = null;
+    }, 300);
+}
+
+function setFocus(index: number): void {
+    if (pinCodeInputs.value[index]) {
+        pinCodeInputs.value[index].focus();
+        pinCodeInputs.value[index].select();
+    }
+}
+
+function setPreviousFocus(index: number): void {
+    if (index > 0) {
+        setFocus(index - 1);
+    }
+}
+
+function setNextFocus(index: number): void {
+    if (index < props.length - 1) {
+        setFocus(index + 1);
+    }
+}
+
+function onKeydown(index: number, event: KeyboardEvent): void {
+    if (event.altKey || (event.key.indexOf('F') === 0 && (event.key.length === 2 || event.key.length === 3))) {
+        return;
+    }
+
+    if (event.key === 'Enter' && finalPinCode.value.length === props.length) {
+        emit('pincode:confirm', finalPinCode.value);
+        event.preventDefault();
+        return;
+    }
+
+    if (event.key === 'ArrowLeft' || (event.shiftKey && event.key === 'Tab')) {
+        setPreviousFocus(index);
+        event.preventDefault();
+        return;
+    }
+
+    if (event.key === 'ArrowRight' || (!event.shiftKey && event.key === 'Tab')) {
+        setNextFocus(index);
+        event.preventDefault();
+        return;
+    }
+
+    if (event.key === 'Home') {
+        setFocus(0);
+        event.preventDefault();
+        return;
+    }
+
+    if (event.key === 'End') {
+        setFocus(props.length - 1);
+        event.preventDefault();
+        return;
+    }
+
+    if (((event.ctrlKey || event.metaKey) && event.key === 'v') || event.key === 'Paste') {
+        return;
+    }
+
+    if (event.key === 'Backspace' || event.key === 'Delete' || event.key === 'Del') {
+        for (let i = index; i < codes.value.length; i++) {
+            codes.value[i].value = '';
+            setInputType(i);
+        }
+
+        if (event.code === 'Backspace') {
+            setPreviousFocus(index);
+        }
+
+        event.preventDefault();
+        return;
+    }
+
+    if (event.key.length === 1 && '0' <= event.key && event.key <= '9') {
+        codes.value[index].value = event.key;
+        setInputType(index);
+        setNextFocus(index);
+
+        if (finalPinCode.value.length === props.length) {
+            emit('pincode:confirm', finalPinCode.value);
+        }
+    }
+
+    event.preventDefault();
+}
+
+function onPaste(index: number, event: ClipboardEvent): void {
+    if (!event.clipboardData) {
+        event.preventDefault();
+        return;
+    }
+
+    const text = event.clipboardData.getData('Text');
+
+    if (!text) {
+        event.preventDefault();
+        return;
+    }
+
+    autoFillText(index, text);
+
+    event.preventDefault();
+}
+
+function onInput(index: number, event: InputEvent): void {
+    if (!event.target.value) {
+        event.preventDefault();
+        return;
+    }
+
+    autoFillText(index, event.target.value);
+
+    event.preventDefault();
+}
+
+watch(() => props.length, newValue => {
+    init(newValue, props.modelValue);
+});
+
+watch(() => props.modelValue, newValue => {
+    if (newValue === finalPinCode.value) {
+        return;
+    }
+
+    init(props.length, newValue);
+});
+
+watch(codes, () => {
+    emit('update:modelValue', finalPinCode.value);
+}, {
+    deep: true
+});
+
+init(props.length, props.modelValue);
 </script>
 
 <style>

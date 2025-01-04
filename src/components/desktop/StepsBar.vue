@@ -43,41 +43,48 @@
     </v-slide-group>
 </template>
 
-<script>
-export default {
-    props: [
-        'steps',
-        'currentStep',
-        'clickable',
-        'minWidth'
-    ],
-    emits: [
-        'step:change'
-    ],
-    computed: {
-        isClickable() {
-            return this.clickable !== 'false' && this.clickable !== false;
-        }
-    },
-    methods: {
-        changeStep(step) {
-            if (this.isClickable) {
-                this.$emit('step:change', step.name);
-            }
-        },
-        isStepActive(step) {
-            return this.currentStep === step.name;
-        },
-        isStepCompleted(stepIndex) {
-            for (let i = 0; i < this.steps.length; i++) {
-                if (this.steps[i].name === this.currentStep) {
-                    return stepIndex < i;
-                }
-            }
+<script setup lang="ts">
+import { computed } from 'vue';
 
-            return false;
+interface StepBarItem {
+    name: string;
+    title: string;
+    subTitle: string;
+}
+
+const props = defineProps<{
+    steps: StepBarItem[]
+    currentStep: string
+    clickable?: string | boolean
+    minWidth: string | number
+}>();
+
+const emit = defineEmits<{
+    (e: 'step:change', stepName: string): void
+}>();
+
+const isClickable = computed<boolean>(() => {
+    return props.clickable !== 'false' && props.clickable !== false;
+});
+
+function changeStep(step: StepBarItem): void {
+    if (isClickable.value) {
+        emit('step:change', step.name);
+    }
+}
+
+function isStepActive(step: StepBarItem): boolean {
+    return props.currentStep === step.name;
+}
+
+function isStepCompleted(stepIndex: number): boolean {
+    for (let i = 0; i < props.steps.length; i++) {
+        if (props.steps[i].name === props.currentStep) {
+            return stepIndex < i;
         }
     }
+
+    return false;
 }
 </script>
 

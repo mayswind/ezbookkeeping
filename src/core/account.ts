@@ -70,10 +70,6 @@ export class AccountCategory implements TypeAndName {
         return AccountCategory.allInstances;
     }
 
-    public static all(): Record<AccountCategoryTypeName, AccountCategory> {
-        return AccountCategory.allInstancesByTypeName;
-    }
-
     public static valueOf(type: number): AccountCategory {
         return AccountCategory.allInstancesByType[type];
     }

@@ -347,8 +347,8 @@ export function getYearMonthFirstUnixTime(yearMonth: YearMonth | string): number
 
     if (isString(yearMonth)) {
         yearMonthObj = getYearMonthObjectFromString(yearMonth as string);
-    } else if (isObject(yearMonth) && !isYearMonthValid((yearMonth as YearMonth).year, (yearMonth as YearMonth).month)) {
-        yearMonthObj = null;
+    } else if (isObject(yearMonth) && isYearMonthValid((yearMonth as YearMonth).year, (yearMonth as YearMonth).month)) {
+        yearMonthObj = yearMonth as YearMonth;
     }
 
     if (!yearMonthObj) {

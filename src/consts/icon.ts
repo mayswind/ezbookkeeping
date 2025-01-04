@@ -165,7 +165,7 @@ export const DEFAULT_ACCOUNT_ICON = ALL_ACCOUNT_ICONS[DEFAULT_ACCOUNT_ICON_ID];
 
 export const DEFAULT_CATEGORY_ICON_ID = '1';
 
-export const ALL_CATEGORY_ICONS = {
+export const ALL_CATEGORY_ICONS: Record<string, IconInfo> = {
     // 1 - 99 : Expense - Food & Drink
     '1': {
         icon: 'las la-utensils'

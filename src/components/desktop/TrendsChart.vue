@@ -12,8 +12,8 @@ import { useUserStore } from '@/stores/user.js';
 
 import { DateRangeScene } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
+import { TrendChartType, ChartDateAggregationType } from '@/core/statistics.ts';
 import { DEFAULT_ICON_COLOR, DEFAULT_CHART_COLORS } from '@/consts/color.ts';
-import statisticsConstants from '@/consts/statistics.js';
 import {
     isArray,
     isNumber
@@ -26,7 +26,7 @@ import {
 import {
     sortStatisticsItems,
     getAllDateRanges
-} from '@/lib/statistics.js';
+} from '@/lib/statistics.ts';
 
 export default {
     props: [
@@ -94,11 +94,11 @@ export default {
             for (let i = 0; i < this.allDateRanges.length; i++) {
                 const dateRange = this.allDateRanges[i];
 
-                if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Year.type) {
+                if (this.dateAggregationType === ChartDateAggregationType.Year.type) {
                     allDisplayDateRanges.push(this.$locale.formatUnixTimeToShortYear(this.userStore, dateRange.minUnixTime));
-                } else if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Quarter.type) {
+                } else if (this.dateAggregationType === ChartDateAggregationType.Quarter.type) {
                     allDisplayDateRanges.push(this.$locale.formatYearQuarter(dateRange.year, dateRange.quarter));
-                } else { // if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Month.type) {
+                } else { // if (this.dateAggregationType === ChartDateAggregationType.Month.type) {
                     allDisplayDateRanges.push(this.$locale.formatUnixTimeToShortYearMonth(this.userStore, dateRange.minUnixTime));
                 }
             }
@@ -122,11 +122,11 @@ export default {
                     const dataItem = item.items[j];
                     let dateRangeKey = '';
 
-                    if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Year.type) {
+                    if (this.dateAggregationType === ChartDateAggregationType.Year.type) {
                         dateRangeKey = dataItem.year;
-                    } else if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Quarter.type) {
+                    } else if (this.dateAggregationType === ChartDateAggregationType.Quarter.type) {
                         dateRangeKey = `${dataItem.year}-${Math.floor((dataItem.month - 1) / 3) + 1}`;
-                    } else { // if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Month.type) {
+                    } else { // if (this.dateAggregationType === ChartDateAggregationType.Month.type) {
                         dateRangeKey = `${dataItem.year}-${dataItem.month}`;
                     }
 
@@ -140,11 +140,11 @@ export default {
                     const dateRange = this.allDateRanges[j];
                     let dateRangeKey = '';
 
-                    if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Year.type) {
+                    if (this.dateAggregationType === ChartDateAggregationType.Year.type) {
                         dateRangeKey = dateRange.year;
-                    } else if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Quarter.type) {
+                    } else if (this.dateAggregationType === ChartDateAggregationType.Quarter.type) {
                         dateRangeKey = `${dateRange.year}-${dateRange.quarter}`;
-                    } else { // if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Month.type) {
+                    } else { // if (this.dateAggregationType === ChartDateAggregationType.Month.type) {
                         dateRangeKey = `${dateRange.year}-${dateRange.month + 1}`;
                     }
 
@@ -177,9 +177,9 @@ export default {
                     data: allAmounts
                 };
 
-                if (this.type === statisticsConstants.allTrendChartTypes.Area) {
+                if (this.type === TrendChartType.Area.type) {
                     finalItem.areaStyle = {};
-                } else if (this.type === statisticsConstants.allTrendChartTypes.Column) {
+                } else if (this.type === TrendChartType.Column.type) {
                     finalItem.type = 'bar';
                 }
 

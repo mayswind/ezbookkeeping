@@ -1,6 +1,13 @@
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { CurrencySortingType } from '@/core/currency.ts';
-import statisticsConstants from '@/consts/statistics.js';
+import {
+    CategoricalChartType,
+    TrendChartType,
+    ChartDataType,
+    ChartSortingType,
+    DEFAULT_CATEGORICAL_CHART_DATA_RANGE,
+    DEFAULT_TREND_CHART_DATA_RANGE
+} from '@/core/statistics.ts';
 
 const settingsLocalStorageKey = 'ebk_app_settings';
 
@@ -22,15 +29,15 @@ const defaultSettings = {
     showAccountBalance: true,
     currencySortByInExchangeRatesPage: CurrencySortingType.Default.type,
     statistics: {
-        defaultChartDataType: statisticsConstants.defaultChartDataType,
+        defaultChartDataType: ChartDataType.Default.type,
         defaultTimezoneType: TimezoneTypeForStatistics.Default.type,
         defaultAccountFilter: {},
         defaultTransactionCategoryFilter: {},
-        defaultSortingType: statisticsConstants.defaultSortingType,
-        defaultCategoricalChartType: statisticsConstants.defaultCategoricalChartType,
-        defaultCategoricalChartDataRangeType: statisticsConstants.defaultCategoricalChartDataRangeType,
-        defaultTrendChartType: statisticsConstants.defaultTrendChartType,
-        defaultTrendChartDataRangeType: statisticsConstants.defaultTrendChartDataRangeType,
+        defaultSortingType: ChartSortingType.Default.type,
+        defaultCategoricalChartType: CategoricalChartType.Default.type,
+        defaultCategoricalChartDataRangeType: DEFAULT_CATEGORICAL_CHART_DATA_RANGE.type,
+        defaultTrendChartType: TrendChartType.Default.type,
+        defaultTrendChartDataRangeType: DEFAULT_TREND_CHART_DATA_RANGE,
     },
     animate: true
 };

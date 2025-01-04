@@ -12,16 +12,15 @@ import { AccountType, AccountCategory } from '@/core/account.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionEditScopeType, TransactionTagFilterType } from '@/core/transaction.ts';
 import { ScheduledTemplateFrequencyType } from '@/core/template.ts';
+import { CategoricalChartType, TrendChartType, ChartDataType, ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
 
 import { UTC_TIMEZONE, ALL_TIMEZONES } from '@/consts/timezone.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { SUPPORTED_IMPORT_FILE_TYPES } from '@/consts/file.ts';
 import { DEFAULT_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES, DEFAULT_TRANSFER_CATEGORIES } from '@/consts/category.ts';
-import statisticsConstants from '@/consts/statistics.js';
 import { KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS } from '@/consts/api.ts';
 
 import {
-    isDefined,
     isString,
     isNumber,
     isBoolean,
@@ -1109,96 +1108,23 @@ function getAllAccountTypes(translateFn) {
 }
 
 function getAllCategoricalChartTypes(translateFn) {
-    const allChartTypes = [];
-
-    for (let i = 0; i < statisticsConstants.allCategoricalChartTypesArray.length; i++) {
-        const chartType = statisticsConstants.allCategoricalChartTypesArray[i];
-
-        allChartTypes.push({
-            type: chartType.type,
-            displayName: translateFn(chartType.name)
-        });
-    }
-
-    return allChartTypes;
+    return getLocalizedDisplayNameAndType(CategoricalChartType.values(), translateFn);
 }
 
 function getAllTrendChartTypes(translateFn) {
-    const allChartTypes = [];
-
-    for (let i = 0; i < statisticsConstants.allTrendChartTypesArray.length; i++) {
-        const chartType = statisticsConstants.allTrendChartTypesArray[i];
-
-        allChartTypes.push({
-            type: chartType.type,
-            displayName: translateFn(chartType.name)
-        });
-    }
-
-    return allChartTypes;
+    return getLocalizedDisplayNameAndType(TrendChartType.values(), translateFn);
 }
 
 function getAllStatisticsChartDataTypes(translateFn, analysisType) {
-    const allChartDataTypes = [];
-
-    for (const dataTypeField in statisticsConstants.allChartDataTypes) {
-        if (!Object.prototype.hasOwnProperty.call(statisticsConstants.allChartDataTypes, dataTypeField)) {
-            continue;
-        }
-
-        const chartDataType = statisticsConstants.allChartDataTypes[dataTypeField];
-
-        if (isDefined(analysisType) && !chartDataType.availableAnalysisTypes[analysisType]) {
-            continue;
-        }
-
-        allChartDataTypes.push({
-            type: chartDataType.type,
-            displayName: translateFn(chartDataType.name),
-            availableAnalysisTypes: chartDataType.availableAnalysisTypes
-        });
-    }
-
-    return allChartDataTypes;
+    return getLocalizedDisplayNameAndType(ChartDataType.values(analysisType), translateFn);
 }
 
 function getAllStatisticsSortingTypes(translateFn) {
-    const allSortingTypes = [];
-
-    for (const sortingTypeField in statisticsConstants.allSortingTypes) {
-        if (!Object.prototype.hasOwnProperty.call(statisticsConstants.allSortingTypes, sortingTypeField)) {
-            continue;
-        }
-
-        const sortingType = statisticsConstants.allSortingTypes[sortingTypeField];
-
-        allSortingTypes.push({
-            type: sortingType.type,
-            displayName: translateFn(sortingType.name),
-            displayFullName: translateFn(sortingType.fullName)
-        });
-    }
-
-    return allSortingTypes;
+    return getLocalizedDisplayNameAndType(ChartSortingType.values(), translateFn);
 }
 
 function getAllStatisticsDateAggregationTypes(translateFn) {
-    const aggregationTypes = [];
-
-    for (const aggregationTypeField in statisticsConstants.allDateAggregationTypes) {
-        if (!Object.prototype.hasOwnProperty.call(statisticsConstants.allDateAggregationTypes, aggregationTypeField)) {
-            continue;
-        }
-
-        const aggregationType = statisticsConstants.allDateAggregationTypes[aggregationTypeField];
-
-        aggregationTypes.push({
-            type: aggregationType.type,
-            displayName: translateFn(aggregationType.name)
-        });
-    }
-
-    return aggregationTypes;
+    return getLocalizedDisplayNameAndType(ChartDateAggregationType.values(), translateFn);
 }
 
 function getAllTransactionEditScopeTypes(translateFn) {

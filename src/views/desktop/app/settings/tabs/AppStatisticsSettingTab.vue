@@ -129,7 +129,7 @@ import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 
 import { DateRangeScene } from '@/core/datetime.ts';
-import statisticsConstants from '@/consts/statistics.js';
+import { StatisticsAnalysisType } from '@/core/statistics.ts';
 
 import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
 import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
@@ -142,7 +142,7 @@ export default {
     computed: {
         ...mapStores(useSettingsStore),
         allChartDataTypes() {
-            return this.$locale.getAllStatisticsChartDataTypes(statisticsConstants.allAnalysisTypes.CategoricalAnalysis);
+            return this.$locale.getAllStatisticsChartDataTypes(StatisticsAnalysisType.CategoricalAnalysis);
         },
         allTimezoneTypesUsedForStatistics() {
             return this.$locale.getAllTimezoneTypesUsedForStatistics();

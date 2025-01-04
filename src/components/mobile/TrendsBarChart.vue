@@ -94,8 +94,8 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
 import { DateRangeScene } from '@/core/datetime.ts';
+import { ChartDateAggregationType } from '@/core/statistics.ts';
 import { DEFAULT_ICON_COLOR, DEFAULT_CHART_COLORS } from '@/consts/color.ts';
-import statisticsConstants from '@/consts/statistics.js';
 import { isNumber } from '@/lib/common.ts';
 import {
     getYearMonthFirstUnixTime,
@@ -105,7 +105,7 @@ import {
 import {
     sortStatisticsItems,
     getAllDateRanges
-} from '@/lib/statistics.js';
+} from '@/lib/statistics.ts';
 
 export default {
     props: [
@@ -170,11 +170,11 @@ export default {
                     const dataItem = item.items[j];
                     let dateRangeKey = '';
 
-                    if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Year.type) {
+                    if (this.dateAggregationType === ChartDateAggregationType.Year.type) {
                         dateRangeKey = dataItem.year;
-                    } else if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Quarter.type) {
+                    } else if (this.dateAggregationType === ChartDateAggregationType.Quarter.type) {
                         dateRangeKey = `${dataItem.year}-${Math.floor((dataItem.month - 1) / 3) + 1}`;
-                    } else { // if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Month.type) {
+                    } else { // if (this.dateAggregationType === ChartDateAggregationType.Month.type) {
                         dateRangeKey = `${dataItem.year}-${dataItem.month}`;
                     }
 
@@ -200,21 +200,21 @@ export default {
                 const dateRange = this.allDateRanges[i];
                 let dateRangeKey = '';
 
-                if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Year.type) {
+                if (this.dateAggregationType === ChartDateAggregationType.Year.type) {
                     dateRangeKey = dateRange.year;
-                } else if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Quarter.type) {
+                } else if (this.dateAggregationType === ChartDateAggregationType.Quarter.type) {
                     dateRangeKey = `${dateRange.year}-${dateRange.quarter}`;
-                } else { // if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Month.type) {
+                } else { // if (this.dateAggregationType === ChartDateAggregationType.Month.type) {
                     dateRangeKey = `${dateRange.year}-${dateRange.month + 1}`;
                 }
 
                 let displayDateRange = '';
 
-                if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Year.type) {
+                if (this.dateAggregationType === ChartDateAggregationType.Year.type) {
                     displayDateRange = this.$locale.formatUnixTimeToShortYear(this.userStore, dateRange.minUnixTime);
-                } else if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Quarter.type) {
+                } else if (this.dateAggregationType === ChartDateAggregationType.Quarter.type) {
                     displayDateRange = this.$locale.formatYearQuarter(dateRange.year, dateRange.quarter);
-                } else { // if (this.dateAggregationType === statisticsConstants.allDateAggregationTypes.Month.type) {
+                } else { // if (this.dateAggregationType === ChartDateAggregationType.Month.type) {
                     displayDateRange = this.$locale.formatUnixTimeToShortYearMonth(this.userStore, dateRange.minUnixTime);
                 }
 

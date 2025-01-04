@@ -64,16 +64,6 @@
 
         <f7-block-title>{{ $t('Trend Analysis Settings') }}</f7-block-title>
         <f7-list strong inset dividers>
-<!--            <f7-list-item-->
-<!--                :title="$t('Default Chart Type')"-->
-<!--                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Chart Type'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">-->
-<!--                <select v-model="defaultTrendChartType">-->
-<!--                    <option :value="chartType.type"-->
-<!--                            :key="chartType.type"-->
-<!--                            v-for="chartType in allTrendChartTypes">{{ chartType.displayName }}</option>-->
-<!--                </select>-->
-<!--            </f7-list-item>-->
-
             <f7-list-item
                 :title="$t('Default Date Range')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date Range'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
@@ -92,13 +82,13 @@ import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 
 import { DateRangeScene } from '@/core/datetime.ts';
-import statisticsConstants from '@/consts/statistics.js';
+import { StatisticsAnalysisType } from '@/core/statistics.ts';
 
 export default {
     computed: {
         ...mapStores(useSettingsStore),
         allChartDataTypes() {
-            return this.$locale.getAllStatisticsChartDataTypes(statisticsConstants.allAnalysisTypes.CategoricalAnalysis);
+            return this.$locale.getAllStatisticsChartDataTypes(StatisticsAnalysisType.CategoricalAnalysis);
         },
         allTimezoneTypesUsedForStatistics() {
             return this.$locale.getAllTimezoneTypesUsedForStatistics();
@@ -111,9 +101,6 @@ export default {
         },
         allCategoricalChartDateRanges() {
             return this.$locale.getAllDateRanges(DateRangeScene.Normal, false);
-        },
-        allTrendChartTypes() {
-            return this.$locale.getAllTrendChartTypes();
         },
         allTrendChartDateRanges() {
             return this.$locale.getAllDateRanges(DateRangeScene.TrendAnalysis, false);

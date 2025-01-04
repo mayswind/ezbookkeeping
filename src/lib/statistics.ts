@@ -1,4 +1,5 @@
-import statisticsConstants from '@/consts/statistics.js';
+import type { YearMonth, YearUnixTime, YearQuarterUnixTime, YearMonthUnixTime } from '@/core/datetime.ts';
+import { ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
 
 import {
     getAllMonthsStartAndEndUnixTimes,
@@ -6,26 +7,8 @@ import {
     getAllYearsStartAndEndUnixTimes
 } from '@/lib/datetime.ts';
 
-export function isChartDataTypeAvailableForAnalysisType(chartDataType, analysisType) {
-    for (const dataTypeField in statisticsConstants.allChartDataTypes) {
-        if (!Object.prototype.hasOwnProperty.call(statisticsConstants.allChartDataTypes, dataTypeField)) {
-            continue;
-        }
-
-        const dataTypeItem = statisticsConstants.allChartDataTypes[dataTypeField];
-
-        if (dataTypeItem.type !== chartDataType) {
-            continue;
-        }
-
-        return !!dataTypeItem.availableAnalysisTypes[analysisType];
-    }
-
-    return false;
-}
-
-export function sortStatisticsItems(items, sortingType) {
-    if (sortingType === statisticsConstants.allSortingTypes.DisplayOrder.type) {
+export function sortStatisticsItems(items: { name: string, totalAmount: number, displayOrders: number[] }[], sortingType: number): void {
+    if (sortingType === ChartSortingType.DisplayOrder.type) {
         items.sort(function (data1, data2) {
             for (let i = 0; i < Math.min(data1.displayOrders.length, data2.displayOrders.length); i++) {
                 if (data1.displayOrders[i] !== data2.displayOrders[i]) {
@@ -38,7 +21,7 @@ export function sortStatisticsItems(items, sortingType) {
                 sensitivity: 'base'
             });
         });
-    } else if (sortingType === statisticsConstants.allSortingTypes.Name.type) {
+    } else if (sortingType === ChartSortingType.Name.type) {
         items.sort(function (data1, data2) {
             return data1.name.localeCompare(data2.name, undefined, { // asc
                 numeric: true,
@@ -59,7 +42,7 @@ export function sortStatisticsItems(items, sortingType) {
     }
 }
 
-export function getAllDateRanges(items, startYearMonth, endYearMonth, dateAggregationType) {
+export function getAllDateRanges(items: { items: YearMonth[] }[], startYearMonth: YearMonth | string, endYearMonth: YearMonth | string, dateAggregationType: number): YearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] {
     if ((!startYearMonth || !endYearMonth) && items && items.length) {
         let minYear = Number.MAX_SAFE_INTEGER, minMonth = Number.MAX_SAFE_INTEGER, maxYear = 0, maxMonth = 0;
 
@@ -88,11 +71,12 @@ export function getAllDateRanges(items, startYearMonth, endYearMonth, dateAggreg
     if (!startYearMonth || !endYearMonth) {
         return [];
     }
-    if (dateAggregationType === statisticsConstants.allDateAggregationTypes.Year.type) {
+
+    if (dateAggregationType === ChartDateAggregationType.Year.type) {
         return getAllYearsStartAndEndUnixTimes(startYearMonth, endYearMonth);
-    } else if (dateAggregationType === statisticsConstants.allDateAggregationTypes.Quarter.type) {
+    } else if (dateAggregationType === ChartDateAggregationType.Quarter.type) {
         return getAllQuartersStartAndEndUnixTimes(startYearMonth, endYearMonth);
-    } else { // if (dateAggregationType === statisticsConstants.allDateAggregationTypes.Month.type) {
+    } else { // if (dateAggregationType === ChartDateAggregationType.Month.type) {
         return getAllMonthsStartAndEndUnixTimes(startYearMonth, endYearMonth);
     }
 }

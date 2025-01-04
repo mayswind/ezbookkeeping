@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { useTemplateRef, watch, onMounted, onUpdated } from 'vue';
+import {useTemplateRef, watch, onMounted, onUpdated, type Ref} from 'vue';
 
 import { ClipboardHolder } from '@/lib/clipboard.ts';
 
@@ -43,7 +43,7 @@ const emit = defineEmits<{
     (e: 'info:copied'): void
 }>();
 
-const iconCopyToClipboard = useTemplateRef('copyToClipboardIcon');
+const iconCopyToClipboard: Ref<HTMLElement> = useTemplateRef('copyToClipboardIcon');
 
 let clipboardHolder: ClipboardHolder = null;
 

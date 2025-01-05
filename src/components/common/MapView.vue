@@ -26,8 +26,8 @@ const props = defineProps<{
 
 const { tt, getCurrentLanguageInfo } = useI18n();
 
-const mapContainer: Ref<HTMLElement> = useTemplateRef('mapContainer');
-const mapInstance: Ref<MapInstance> = ref(createMapInstance());
+const mapContainer: Ref<HTMLElement | null> = useTemplateRef('mapContainer');
+const mapInstance: Ref<MapInstance | null> = ref(createMapInstance());
 const initCenter: Ref<MapPosition> = ref({
     latitude: 0,
     longitude: 0
@@ -39,11 +39,11 @@ const mapSupported = computed<boolean>(() => {
 });
 
 const mapDependencyLoaded = computed<boolean>(() => {
-    return mapInstance.value && mapInstance.value.dependencyLoaded;
+    return mapInstance.value?.dependencyLoaded || false;
 });
 
-const finalMapStyle = computed<Record<string, string>>(() => {
-    const styles = copyObjectTo(props.mapStyle, {});
+const finalMapStyle = computed<Record<string, unknown>>(() => {
+    const styles: Record<string, unknown> = copyObjectTo(props.mapStyle, {});
 
     if (props.height) {
         styles.height = props.height;
@@ -60,7 +60,7 @@ function init() {
     let isFirstInit = false;
     let centerChanged = false;
 
-    if (!mapSupported.value || !mapDependencyLoaded.value) {
+    if (!mapSupported.value || !mapDependencyLoaded.value || !mapInstance.value) {
         return;
     }
 
@@ -85,7 +85,7 @@ function init() {
     if (!mapInstance.value.inited) {
         const languageInfo = getCurrentLanguageInfo();
 
-        mapInstance.value.initMapInstance(mapContainer.value, {
+        mapInstance.value.initMapInstance(mapContainer.value as HTMLElement, {
             language: languageInfo?.alternativeLanguageTag,
             initCenter: initCenter.value,
             zoomLevel: zoomLevel.value,

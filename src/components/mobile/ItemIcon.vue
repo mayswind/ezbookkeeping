@@ -13,7 +13,7 @@ const { style, getAccountIcon, getCategoryIcon } = useItemIcon(props);
 
 const f7IconValue = computed<string>(() => {
     if (props.iconType === 'fixed-f7') {
-        return props.iconId;
+        return props.iconId.toString();
     } else {
         return '';
     }
@@ -25,7 +25,7 @@ const icon = computed<string>(() => {
     } else if (props.iconType === 'category') {
         return getCategoryIcon(props.iconId);
     } else if (props.iconType === 'fixed') {
-        return props.iconId;
+        return props.iconId.toString();
     } else {
         return '';
     }

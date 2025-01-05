@@ -43,9 +43,9 @@ const emit = defineEmits<{
     (e: 'info:copied'): void
 }>();
 
-const iconCopyToClipboard: Ref<HTMLElement> = useTemplateRef('copyToClipboardIcon');
+const iconCopyToClipboard: Ref<unknown> = useTemplateRef('copyToClipboardIcon');
 
-let clipboardHolder: ClipboardHolder = null;
+let clipboardHolder: ClipboardHolder | null = null;
 
 function makeCopyToClipboardClickable() {
     if (clipboardHolder) {

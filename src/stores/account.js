@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 
 import { useUserStore } from './user.ts';
-import { useExchangeRatesStore } from './exchangeRates.js';
+import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import { PARENT_ACCOUNT_CURRENCY_PLACEHOLDER } from '@/consts/currency.ts';

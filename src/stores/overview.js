@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from './user.ts';
-import { useExchangeRatesStore } from './exchangeRates.js';
+import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { isNumber, isEquals } from '@/lib/common.ts';
 import {

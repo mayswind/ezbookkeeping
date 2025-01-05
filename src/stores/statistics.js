@@ -4,7 +4,7 @@ import { useSettingsStore } from './setting.ts';
 import { useUserStore } from './user.ts';
 import { useAccountsStore } from './account.js';
 import { useTransactionCategoriesStore } from './transactionCategory.js';
-import { useExchangeRatesStore } from './exchangeRates.js';
+import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { DateRangeScene, DateRange } from '@/core/datetime';
 import { CategoryType } from '@/core/category.ts';

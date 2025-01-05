@@ -9,7 +9,7 @@ import { useTransactionTemplatesStore } from './transactionTemplate.js';
 import { useTransactionsStore } from './transaction.js';
 import { useOverviewStore } from './overview.js';
 import { useStatisticsStore } from './statistics.js';
-import { useExchangeRatesStore } from './exchangeRates.js';
+import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import {
     hasUserAppLockState,

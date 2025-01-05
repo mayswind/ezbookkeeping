@@ -122,7 +122,7 @@
 <script>
 import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.ts';
-import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { getMapProvider } from '@/lib/server_settings.ts';
 import { getMapWebsite } from '@/lib/map/index.ts';

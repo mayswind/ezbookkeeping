@@ -78,7 +78,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { useTransactionsStore } from '@/stores/transaction.js';
 import { useOverviewStore } from '@/stores/overview.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
-import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { getDesktopVersionPath } from '@/lib/version.ts';
 import { isUserScheduledTransactionEnabled } from '@/lib/server_settings.ts';

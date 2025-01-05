@@ -180,7 +180,7 @@ import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
-import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { CategoryType } from '@/core/category.ts';
 import { getNameByKeyValue, categorizedArrayToPlainArray } from '@/lib/common.ts';

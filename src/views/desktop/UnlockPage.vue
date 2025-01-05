@@ -115,7 +115,7 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useTokensStore } from '@/stores/token.ts';
 import { useTransactionsStore } from '@/stores/transaction.js';
-import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';

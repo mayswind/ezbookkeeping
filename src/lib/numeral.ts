@@ -276,7 +276,7 @@ export function getAdaptiveDisplayAmountRate(amount1: number, amount2: number, f
     }
 }
 
-export function getExchangedAmount(amount: number, fromRate: string, toRate: string): number | null {
+export function getExchangedAmountByRate(amount: number, fromRate: string, toRate: string): number | null {
     const exchangeRate = parseFloat(toRate) / parseFloat(fromRate);
 
     if (!isNumber(exchangeRate)) {
@@ -295,5 +295,5 @@ export function getConvertedAmount(baseAmount: number | '', fromExchangeRate: { 
         return 0;
     }
 
-    return getExchangedAmount(baseAmount as number, fromExchangeRate.rate, toExchangeRate.rate);
+    return getExchangedAmountByRate(baseAmount as number, fromExchangeRate.rate, toExchangeRate.rate);
 }

@@ -6,7 +6,7 @@ import { useAccountsStore } from './account.js';
 import { useTransactionCategoriesStore } from './transactionCategory.js';
 import { useOverviewStore } from './overview.js';
 import { useStatisticsStore } from './statistics.js';
-import { useExchangeRatesStore } from './exchangeRates.js';
+import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { DateRange } from '@/core/datetime.ts';
 import { CategoryType } from '@/core/category.ts';

@@ -490,7 +490,7 @@
 <script>
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.ts';
-import { useUserStore } from '@/stores/user.js';
+import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.js';
 
 import { AccountType, AccountCategory } from '@/core/account.ts';

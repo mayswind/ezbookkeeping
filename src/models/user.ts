@@ -1,4 +1,31 @@
+import { LongDateFormat, ShortDateFormat, LongTimeFormat, ShortTimeFormat } from '@/core/datetime.ts';
+import { DecimalSeparator, DigitGroupingSymbol, DigitGroupingType } from '@/core/numeral.ts';
+import { CurrencyDisplayType } from '@/core/currency.ts';
+import { PresetAmountColor } from '@/core/color.ts';
+import { TransactionEditScopeType } from '@/core/transaction.ts';
+
 import type { TransactionCategoryCreateBatchRequest } from './transaction_category.ts';
+
+export class User {
+    username: string = '';
+    password: string = '';
+    confirmPassword: string = '';
+    email: string = '';
+    nickname: string = '';
+    language: string;
+    defaultCurrency: string;
+    firstDayOfWeek: number;
+
+    private constructor(language: string, defaultCurrency: string, firstDayOfWeek: number) {
+        this.language = language;
+        this.defaultCurrency = defaultCurrency;
+        this.firstDayOfWeek = firstDayOfWeek;
+    }
+
+    public static createNewUser(language: string, defaultCurrency: string, firstDayOfWeek: number): User {
+        return new User(language, defaultCurrency, firstDayOfWeek);
+    }
+}
 
 export interface UserBasicInfo {
     readonly username: string;
@@ -80,4 +107,28 @@ export interface UserProfileUpdateResponse {
 
 export interface UserProfileResponse extends UserBasicInfo {
     readonly lastLoginAt: number;
+}
+
+export const EMPTY_USER_BASIC_INFO: UserBasicInfo = {
+    username: '',
+    email: '',
+    nickname: '',
+    avatar: '',
+    avatarProvider: undefined,
+    defaultAccountId: '',
+    transactionEditScope: TransactionEditScopeType.All.type,
+    language: '',
+    defaultCurrency: '',
+    firstDayOfWeek: -1,
+    longDateFormat: LongDateFormat.Default.type,
+    shortDateFormat: ShortDateFormat.Default.type,
+    longTimeFormat: LongTimeFormat.Default.type,
+    shortTimeFormat: ShortTimeFormat.Default.type,
+    decimalSeparator: DecimalSeparator.LanguageDefaultType,
+    digitGroupingSymbol: DigitGroupingSymbol.LanguageDefaultType,
+    digitGrouping: DigitGroupingType.LanguageDefaultType,
+    currencyDisplayType: CurrencyDisplayType.Default.type,
+    expenseAmountColor: PresetAmountColor.DefaultExpenseColor.type,
+    incomeAmountColor: PresetAmountColor.DefaultIncomeColor.type,
+    emailVerified: false
 }

@@ -597,7 +597,7 @@ import BatchReplaceDialog from './BatchReplaceDialog.vue';
 
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.ts';
-import { useUserStore } from '@/stores/user.js';
+import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useTransactionTagsStore } from '@/stores/transactionTag.js';

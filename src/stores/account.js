@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import { useUserStore } from './user.js';
+import { useUserStore } from './user.ts';
 import { useExchangeRatesStore } from './exchangeRates.js';
 
 import { AccountType, AccountCategory } from '@/core/account.ts';

@@ -8,7 +8,7 @@ import { useTheme } from 'vuetify';
 
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.ts';
-import { useUserStore } from '@/stores/user.js';
+import { useUserStore } from '@/stores/user.ts';
 
 import { DateRangeScene } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';

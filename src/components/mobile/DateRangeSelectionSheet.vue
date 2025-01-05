@@ -54,7 +54,7 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useUserStore } from '@/stores/user.js';
+import { useUserStore } from '@/stores/user.ts';
 
 import { DateRange } from '@/core/datetime.ts';
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';

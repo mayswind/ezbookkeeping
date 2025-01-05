@@ -41,7 +41,7 @@
 import { useTheme } from 'vuetify';
 
 import { mapStores } from 'pinia';
-import { useUserStore } from '@/stores/user.js';
+import { useUserStore } from '@/stores/user.ts';
 
 import { ThemeType } from '@/core/theme.ts';
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';

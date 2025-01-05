@@ -44,7 +44,7 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useUserStore } from '@/stores/user.js';
+import { useUserStore } from '@/stores/user.ts';
 import { useTokensStore } from '@/stores/token.js';
 
 import { isEquals } from '@/lib/common.ts';

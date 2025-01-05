@@ -272,11 +272,11 @@ export default {
     getTokens: (): ApiResponsePromise<TokenInfoResponse[]> => {
         return axios.get<ApiResponse<TokenInfoResponse[]>>('v1/tokens/list.json');
     },
-    revokeToken: (req: { tokenId: string, ignoreError: boolean }): ApiResponsePromise<boolean> => {
+    revokeToken: (req: { tokenId: string, ignoreError?: boolean }): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/tokens/revoke.json', {
             tokenId: req.tokenId
         }, {
-            ignoreError: req.ignoreError
+            ignoreError: !!req.ignoreError
         } as ApiRequestConfig);
     },
     revokeAllTokens: (): ApiResponsePromise<boolean> => {
@@ -319,11 +319,11 @@ export default {
     getUserDataStatistics: (): ApiResponsePromise<DataStatisticsResponse> => {
         return axios.get<ApiResponse<DataStatisticsResponse>>('v1/data/statistics.json');
     },
-    getExportedUserData: (fileType: string): Promise<AxiosResponse<unknown>> => {
+    getExportedUserData: (fileType: string): Promise<AxiosResponse<BlobPart>> => {
         if (fileType === 'csv') {
-            return axios.get<unknown>('v1/data/export.csv');
+            return axios.get<BlobPart>('v1/data/export.csv');
         } else if (fileType === 'tsv') {
-            return axios.get<unknown>('v1/data/export.tsv');
+            return axios.get<BlobPart>('v1/data/export.tsv');
         } else {
             return Promise.reject('Parameter Invalid');
         }
@@ -514,9 +514,9 @@ export default {
     deleteTransactionTemplate: (req: TransactionTemplateDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transaction/templates/delete.json', req);
     },
-    getLatestExchangeRates: (param: { ignoreError: boolean }): ApiResponsePromise<LatestExchangeRateResponse> => {
+    getLatestExchangeRates: (param: { ignoreError?: boolean }): ApiResponsePromise<LatestExchangeRateResponse> => {
         return axios.get<ApiResponse<LatestExchangeRateResponse>>('v1/exchange_rates/latest.json', {
-            ignoreError: param.ignoreError,
+            ignoreError: !!param.ignoreError,
             timeout: getExchangeRatesRequestTimeout() || DEFAULT_API_TIMEOUT
         } as ApiRequestConfig);
     },

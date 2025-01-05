@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import { useUserStore } from './user.js';
+import { useUserStore } from './user.ts';
 
 import { updateCurrentToken } from '@/lib/userstate.ts';
 import services from '@/lib/services.ts';

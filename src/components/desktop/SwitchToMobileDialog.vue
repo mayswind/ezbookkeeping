@@ -28,34 +28,31 @@
     </v-dialog>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed } from 'vue';
+
 import { getMobileUrlQrCodePath } from '@/lib/qrcode.ts';
 import { getMobileVersionPath } from '@/lib/version.ts';
 
-export default {
-    props: [
-        'show'
-    ],
-    emits: [
-        'update:show'
-    ],
-    data() {
-        return {
-            mobileUrlQrCodePath: getMobileUrlQrCodePath(),
-            mobileVersionPath: getMobileVersionPath(),
-        }
+const props = defineProps<{
+    show: boolean;
+}>();
+
+const emit = defineEmits<{
+    (e: 'update:show', value: boolean): void
+}>();
+
+const mobileUrlQrCodePath = getMobileUrlQrCodePath();
+const mobileVersionPath = getMobileVersionPath();
+
+const showState = computed<boolean>({
+    get: () => {
+        return props.show;
     },
-    computed: {
-        showState: {
-            get: function () {
-                return this.show;
-            },
-            set: function (value) {
-                this.$emit('update:show', value);
-            }
-        }
+    set: value => {
+        emit('update:show', value);
     }
-}
+});
 </script>
 
 <style>

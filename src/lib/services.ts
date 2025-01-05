@@ -109,7 +109,10 @@ import type {
     UserProfileUpdateResponse
 } from '@/models/user.ts';
 
-import userState from './userstate.ts';
+import {
+    getCurrentToken,
+    clearCurrentTokenAndUserInfo
+} from './userstate.ts';
 
 import {
     isDefined,
@@ -145,7 +148,7 @@ const blockedRequests: ((token: string | undefined) => void)[] = [];
 axios.defaults.baseURL = BASE_API_URL_PATH;
 axios.defaults.timeout = DEFAULT_API_TIMEOUT;
 axios.interceptors.request.use((config: ApiRequestConfig) => {
-    const token = userState.getToken();
+    const token = getCurrentToken();
 
     if (token && !config.noAuth) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -184,7 +187,7 @@ axios.interceptors.response.use(response => {
             || errorCode === 202006 // current token does not require two-factor authorization
             || errorCode === 202012 // token is empty
         ) {
-            userState.clearTokenAndUserInfo(false);
+            clearCurrentTokenAndUserInfo(false);
             location.reload();
             return Promise.reject({ processed: true });
         }
@@ -521,7 +524,7 @@ export default {
         return `${BASE_QRCODE_PATH}/${qrCodeName}.png`;
     },
     generateMapProxyTileImageUrl: (mapProvider: string, language: string): string => {
-        const token = userState.getToken();
+        const token = getCurrentToken();
         let url = `${BASE_PROXY_URL_PATH}/map/tile/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
 
         if (language) {
@@ -531,7 +534,7 @@ export default {
         return url;
     },
     generateMapProxyAnnotationImageUrl: (mapProvider: string, language: string): string => {
-        const token = userState.getToken();
+        const token = getCurrentToken();
         let url = `${BASE_PROXY_URL_PATH}/map/annotation/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
 
         if (language) {
@@ -564,7 +567,7 @@ export default {
         }
 
         const params = [];
-        params.push('token=' + userState.getToken());
+        params.push('token=' + getCurrentToken());
 
         if (disableBrowserCache) {
             if (isBoolean(disableBrowserCache)) {
@@ -586,7 +589,7 @@ export default {
         }
 
         const params = [];
-        params.push('token=' + userState.getToken());
+        params.push('token=' + getCurrentToken());
 
         if (disableBrowserCache) {
             if (isBoolean(disableBrowserCache)) {

@@ -203,6 +203,7 @@ import {
     getUnixTimeBeforeUnixTime,
     getUnixTimeAfterUnixTime
 } from '@/lib/datetime.ts';
+import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 
 import {
     mdiRefresh,
@@ -348,7 +349,7 @@ export default {
         }
     },
     created() {
-        if (this.$user.isUserLogined() && this.$user.isUserUnlocked()) {
+        if (isUserLogined() && isUserUnlocked()) {
             this.reload(false);
         }
     },

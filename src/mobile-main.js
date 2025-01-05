@@ -80,7 +80,6 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
 import { getVersion, getBuildTime } from '@/lib/version.ts';
-import userstate from '@/lib/userstate.ts';
 import {
     getI18nOptions,
     translateIf,
@@ -215,7 +214,5 @@ app.config.globalProperties.$toast = (message, timeout) => showToast(message, ti
 app.config.globalProperties.$showLoading = showLoading;
 app.config.globalProperties.$hideLoading = hideLoading;
 app.config.globalProperties.$routeBackOnError = routeBackOnError;
-
-app.config.globalProperties.$user = userstate;
 
 app.mount('#app');

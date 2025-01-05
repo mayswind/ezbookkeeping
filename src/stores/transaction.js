@@ -12,7 +12,11 @@ import { DateRange } from '@/core/datetime.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
-import userState from '@/lib/userstate.ts';
+import {
+    getUserTransactionDraft,
+    updateUserTransactionDraft,
+    clearUserTransactionDraft
+} from '@/lib/userstate.ts';
 import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 import {
@@ -366,7 +370,7 @@ function buildTransactionDraft(transaction) {
 
 export const useTransactionsStore = defineStore('transactions', {
     state: () => ({
-        transactionDraft: userState.getUserTransactionDraft(),
+        transactionDraft: getUserTransactionDraft(),
         transactionsFilter: {
             dateType: DateRange.All.type,
             maxTime: 0,
@@ -502,7 +506,7 @@ export const useTransactionsStore = defineStore('transactions', {
             const settingsStore = useSettingsStore();
 
             if (settingsStore.appSettings.autoSaveTransactionDraft === 'enabled' || settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') {
-                this.transactionDraft = userState.getUserTransactionDraft();
+                this.transactionDraft = getUserTransactionDraft();
             } else {
                 this.transactionDraft = null;
             }
@@ -590,11 +594,11 @@ export const useTransactionsStore = defineStore('transactions', {
                 this.transactionDraft = buildTransactionDraft(transaction);
             }
 
-            userState.updateUserTransactionDraft(this.transactionDraft);
+            updateUserTransactionDraft(this.transactionDraft);
         },
         clearTransactionDraft() {
             this.transactionDraft = null;
-            userState.clearUserTransactionDraft();
+            clearUserTransactionDraft();
         },
         generateNewTransactionModel(type) {
             const settingsStore = useSettingsStore();

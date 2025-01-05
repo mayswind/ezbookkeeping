@@ -1,4 +1,4 @@
-import userState from '@/lib/userstate.ts';
+import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 
 import HomePage from '@/views/mobile/HomePage.vue';
 import LoginPage from '@/views/mobile/LoginPage.vue';
@@ -49,7 +49,7 @@ function asyncResolve(component) {
 }
 
 function checkLogin({ router, resolve, reject }) {
-    if (!userState.isUserLogined()) {
+    if (!isUserLogined()) {
         reject();
         router.navigate('/login', {
             clearPreviousHistory: true,
@@ -58,7 +58,7 @@ function checkLogin({ router, resolve, reject }) {
         return;
     }
 
-    if (!userState.isUserUnlocked()) {
+    if (!isUserUnlocked()) {
         reject();
         router.navigate('/unlock', {
             clearPreviousHistory: true,
@@ -71,7 +71,7 @@ function checkLogin({ router, resolve, reject }) {
 }
 
 function checkLocked({ router, resolve, reject }) {
-    if (!userState.isUserLogined()) {
+    if (!isUserLogined()) {
         reject();
         router.navigate('/login', {
             clearPreviousHistory: true,
@@ -80,7 +80,7 @@ function checkLocked({ router, resolve, reject }) {
         return;
     }
 
-    if (userState.isUserUnlocked()) {
+    if (isUserUnlocked()) {
         reject();
         router.navigate('/', {
             clearPreviousHistory: true,
@@ -93,7 +93,7 @@ function checkLocked({ router, resolve, reject }) {
 }
 
 function checkNotLogin({ router, resolve, reject }) {
-    if (userState.isUserLogined() && !userState.isUserUnlocked()) {
+    if (isUserLogined() && !isUserUnlocked()) {
         reject();
         router.navigate('/unlock', {
             clearPreviousHistory: true,
@@ -102,7 +102,7 @@ function checkNotLogin({ router, resolve, reject }) {
         return;
     }
 
-    if (userState.isUserLogined()) {
+    if (isUserLogined()) {
         reject();
         router.navigate('/', {
             clearPreviousHistory: true,

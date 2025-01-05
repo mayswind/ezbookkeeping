@@ -20,6 +20,7 @@ import { ThemeType } from '@/core/theme.ts';
 import { isProduction } from '@/lib/version.ts';
 import { getTheme, isEnableAnimate } from '@/lib/settings.ts';
 import { initMapProvider } from '@/lib/map/index.ts';
+import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 import { isModalShowing, setAppFontSize } from '@/lib/ui/mobile.js';
 
@@ -135,8 +136,8 @@ export default {
 
         setExpenseAndIncomeAmountColor(self.userStore.currentUserExpenseAmountColor, self.userStore.currentUserIncomeAmountColor);
 
-        if (self.$user.isUserLogined()) {
-            if (!self.settingsStore.appSettings.applicationLock || self.$user.isUserUnlocked()) {
+        if (isUserLogined()) {
+            if (!self.settingsStore.appSettings.applicationLock || isUserUnlocked()) {
                 // refresh token if user is logined
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
                     if (response.user) {

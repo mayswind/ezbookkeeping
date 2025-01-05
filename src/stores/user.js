@@ -2,7 +2,11 @@ import { defineStore } from 'pinia';
 
 import { useSettingsStore } from './setting.ts';
 
-import userState from '@/lib/userstate.ts';
+import {
+    getCurrentUserInfo,
+    updateCurrentUserInfo,
+    clearCurrentUserInfo
+} from '@/lib/userstate.ts';
 import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 import {
@@ -12,7 +16,7 @@ import {
 
 export const useUserStore = defineStore('user', {
     state: () => ({
-        currentUserBasicInfo: userState.getUserInfo()
+        currentUserBasicInfo: getCurrentUserInfo()
     }),
     getters: {
         currentUserNickname(state) {
@@ -99,11 +103,11 @@ export const useUserStore = defineStore('user', {
         },
         storeUserBasicInfo(userInfo) {
             this.currentUserBasicInfo = userInfo;
-            userState.updateUserInfo(userInfo);
+            updateCurrentUserInfo(userInfo);
         },
         resetUserBasicInfo() {
             this.currentUserBasicInfo = null;
-            userState.clearUserInfo();
+            clearCurrentUserInfo();
         },
         getCurrentUserProfile() {
             return new Promise((resolve, reject) => {

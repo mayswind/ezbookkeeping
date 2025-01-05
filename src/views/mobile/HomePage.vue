@@ -210,6 +210,7 @@ import { useOverviewStore } from '@/stores/overview.js';
 import { DateRange } from '@/core/datetime.ts';
 import { TemplateType } from '@/core/template.ts';
 import { formatUnixTime } from '@/lib/datetime.ts';
+import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 
 export default {
     props: [
@@ -269,7 +270,7 @@ export default {
     created() {
         const self = this;
 
-        if (self.$user.isUserLogined() && self.$user.isUserUnlocked()) {
+        if (isUserLogined() && isUserUnlocked()) {
             self.loading = true;
 
             self.overviewStore.loadTransactionOverview({

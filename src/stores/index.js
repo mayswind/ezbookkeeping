@@ -11,7 +11,14 @@ import { useOverviewStore } from './overview.js';
 import { useStatisticsStore } from './statistics.js';
 import { useExchangeRatesStore } from './exchangeRates.js';
 
-import userState from '@/lib/userstate.ts';
+import {
+    hasUserAppLockState,
+    getUserAppLockState,
+    updateCurrentToken,
+    clearWebAuthnConfig,
+    clearCurrentSessionToken,
+    clearCurrentTokenAndUserInfo
+} from '@/lib/userstate.ts';
 import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 import { isObject, isString } from '@/lib/common.ts';
@@ -75,18 +82,18 @@ export const useRootStore = defineStore('root', {
                         return;
                     }
 
-                    if (settingsStore.appSettings.applicationLock || userState.getUserAppLockState()) {
-                        const appLockState = userState.getUserAppLockState();
+                    if (settingsStore.appSettings.applicationLock || hasUserAppLockState()) {
+                        const appLockState = getUserAppLockState();
 
                         if (!appLockState || appLockState.username !== data.result.user.username) {
-                            userState.clearTokenAndUserInfo(true);
+                            clearCurrentTokenAndUserInfo(true);
                             settingsStore.setEnableApplicationLock(false);
                             settingsStore.setEnableApplicationLockWebAuthn(false);
-                            userState.clearWebAuthnConfig();
+                            clearWebAuthnConfig();
                         }
                     }
 
-                    userState.updateToken(data.result.token);
+                    updateCurrentToken(data.result.token);
 
                     if (data.result.user && isObject(data.result.user)) {
                         const userStore = useUserStore();
@@ -136,18 +143,18 @@ export const useRootStore = defineStore('root', {
                         return;
                     }
 
-                    if (settingsStore.appSettings.applicationLock || userState.getUserAppLockState()) {
-                        const appLockState = userState.getUserAppLockState();
+                    if (settingsStore.appSettings.applicationLock || hasUserAppLockState()) {
+                        const appLockState = getUserAppLockState();
 
                         if (!appLockState || appLockState.username !== data.result.user.username) {
-                            userState.clearTokenAndUserInfo(true);
+                            clearCurrentTokenAndUserInfo(true);
                             settingsStore.setEnableApplicationLock(false);
                             settingsStore.setEnableApplicationLockWebAuthn(false);
-                            userState.clearWebAuthnConfig();
+                            clearWebAuthnConfig();
                         }
                     }
 
-                    userState.updateToken(data.result.token);
+                    updateCurrentToken(data.result.token);
 
                     if (data.result.user && isObject(data.result.user)) {
                         const userStore = useUserStore();
@@ -192,11 +199,11 @@ export const useRootStore = defineStore('root', {
                     if (settingsStore.appSettings.applicationLock) {
                         settingsStore.setEnableApplicationLock(false);
                         settingsStore.setEnableApplicationLockWebAuthn(false);
-                        userState.clearWebAuthnConfig();
+                        clearWebAuthnConfig();
                     }
 
                     if (data.result.token && isString(data.result.token)) {
-                        userState.updateToken(data.result.token);
+                        updateCurrentToken(data.result.token);
                     }
 
                     if (data.result.user && isObject(data.result.user)) {
@@ -219,7 +226,7 @@ export const useRootStore = defineStore('root', {
             });
         },
         lock() {
-            userState.clearSessionToken();
+            clearCurrentSessionToken();
             this.resetAllStates(false);
         },
         logout() {
@@ -234,8 +241,8 @@ export const useRootStore = defineStore('root', {
                         return;
                     }
 
-                    userState.clearTokenAndUserInfo(true);
-                    userState.clearWebAuthnConfig();
+                    clearCurrentTokenAndUserInfo(true);
+                    clearWebAuthnConfig();
                     self.resetAllStates(true);
 
                     resolve(data.result);
@@ -253,8 +260,8 @@ export const useRootStore = defineStore('root', {
             });
         },
         forceLogout() {
-            userState.clearTokenAndUserInfo(true);
-            userState.clearWebAuthnConfig();
+            clearCurrentTokenAndUserInfo(true);
+            clearWebAuthnConfig();
             this.resetAllStates(true);
         },
         verifyEmail({ token, requestNewToken }) {
@@ -271,7 +278,7 @@ export const useRootStore = defineStore('root', {
                     }
 
                     if (data.result.newToken && isString(data.result.newToken)) {
-                        userState.updateToken(data.result.newToken);
+                        updateCurrentToken(data.result.newToken);
                     }
 
                     if (data.result.user && isObject(data.result.user)) {
@@ -405,7 +412,7 @@ export const useRootStore = defineStore('root', {
                     }
 
                     if (data.result.newToken && isString(data.result.newToken)) {
-                        userState.updateToken(data.result.newToken);
+                        updateCurrentToken(data.result.newToken);
                     }
 
                     if (data.result.user && isObject(data.result.user)) {

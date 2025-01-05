@@ -184,6 +184,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import { CategoryType } from '@/core/category.ts';
 import { getNameByKeyValue, categorizedArrayToPlainArray } from '@/lib/common.ts';
+import { isUserLogined } from '@/lib/userstate.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 export default {
@@ -307,7 +308,7 @@ export default {
                 user: self.user,
                 presetCategories: presetCategories
             }).then(response => {
-                if (!self.$user.isUserLogined()) {
+                if (!isUserLogined()) {
                     self.submitting = false;
                     self.$hideLoading();
 

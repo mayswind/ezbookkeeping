@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import userState from '@/lib/userstate.ts';
+import { updateCurrentToken } from '@/lib/userstate.ts';
 import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 import { isBoolean } from '@/lib/common.ts';
@@ -69,7 +69,7 @@ export const useTwoFactorAuthStore = defineStore('twoFactorAuth', {
                     }
 
                     if (data.result.token) {
-                        userState.updateToken(data.result.token);
+                        updateCurrentToken(data.result.token);
                     }
 
                     resolve(data.result);

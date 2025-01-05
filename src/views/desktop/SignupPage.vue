@@ -248,6 +248,7 @@ import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { CategoryType } from '@/core/category.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { categorizedArrayToPlainArray } from '@/lib/common.ts';
+import { isUserLogined } from '@/lib/userstate.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 import {
@@ -436,7 +437,7 @@ export default {
                 user: self.user,
                 presetCategories: presetCategories
             }).then(response => {
-                if (!self.$user.isUserLogined()) {
+                if (!isUserLogined()) {
                     self.submitting = false;
 
                     if (self.usePresetCategories && !response.presetCategoriesSaved) {

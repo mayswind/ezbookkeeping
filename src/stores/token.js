@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 
 import { useUserStore } from './user.js';
 
-import userState from '@/lib/userstate.ts';
+import { updateCurrentToken } from '@/lib/userstate.ts';
 import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 import { isObject } from '@/lib/common.ts';
@@ -46,7 +46,7 @@ export const useTokensStore = defineStore('tokens', {
                     }
 
                     if (data && data.success && data.result && data.result.newToken) {
-                        userState.updateToken(data.result.newToken);
+                        updateCurrentToken(data.result.newToken);
 
                         if (data.result.oldTokenId) {
                             self.revokeToken({

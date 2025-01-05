@@ -43,6 +43,14 @@ import { useTransactionsStore } from '@/stores/transaction.js';
 
 import logger from '@/lib/logger.ts';
 import webauthn from '@/lib/webauthn.js';
+import {
+    getUserAppLockState,
+    encryptToken,
+    decryptToken,
+    isCorrectPinCode,
+    saveWebAuthnConfig,
+    clearWebAuthnConfig
+} from '@/lib/userstate.ts';
 
 export default {
     data() {
@@ -81,12 +89,12 @@ export default {
                 self.$showLoading();
 
                 webauthn.registerCredential(
-                    self.$user.getUserAppLockState(),
+                    getUserAppLockState(),
                     self.userStore.currentUserBasicInfo,
                 ).then(({ id }) => {
                     self.$hideLoading();
 
-                    self.$user.saveWebAuthnConfig(id);
+                    saveWebAuthnConfig(id);
                     self.settingsStore.setEnableApplicationLockWebAuthn(true);
                     self.$toast('You have enabled WebAuthn successfully');
                 }).catch(error => {
@@ -106,11 +114,11 @@ export default {
 
                     self.isEnableApplicationLockWebAuthn = false;
                     self.settingsStore.setEnableApplicationLockWebAuthn(false);
-                    self.$user.clearWebAuthnConfig();
+                    clearWebAuthnConfig();
                 });
             } else {
                 self.settingsStore.setEnableApplicationLockWebAuthn(false);
-                self.$user.clearWebAuthnConfig();
+                clearWebAuthnConfig();
             }
         }
     },
@@ -144,12 +152,12 @@ export default {
                 return;
             }
 
-            this.$user.encryptToken(user.username, pinCode);
+            encryptToken(user.username, pinCode);
             this.settingsStore.setEnableApplicationLock(true);
             this.transactionsStore.saveTransactionDraft();
 
             this.settingsStore.setEnableApplicationLockWebAuthn(false);
-            this.$user.clearWebAuthnConfig();
+            clearWebAuthnConfig();
 
             this.showInputPinCodeSheetForEnable = false;
         },
@@ -164,17 +172,17 @@ export default {
                 return;
             }
 
-            if (!this.$user.isCorrectPinCode(pinCode)) {
+            if (!isCorrectPinCode(pinCode)) {
                 this.$alert('Incorrect PIN code');
                 return;
             }
 
-            this.$user.decryptToken();
+            decryptToken();
             this.settingsStore.setEnableApplicationLock(false);
             this.transactionsStore.saveTransactionDraft();
 
             this.settingsStore.setEnableApplicationLockWebAuthn(false);
-            this.$user.clearWebAuthnConfig();
+            clearWebAuthnConfig();
 
             this.showInputPinCodeSheetForDisable = false;
         }

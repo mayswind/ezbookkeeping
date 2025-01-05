@@ -121,6 +121,12 @@ import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
 import logger from '@/lib/logger.ts';
 import webauthn from '@/lib/webauthn.js';
+import {
+    unlockTokenByWebAuthn,
+    unlockTokenByPinCode,
+    hasWebAuthnConfig,
+    getWebAuthnCredentialId
+} from '@/lib/userstate.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 export default {
@@ -143,7 +149,7 @@ export default {
         },
         isWebAuthnAvailable() {
             return this.settingsStore.appSettings.applicationLockWebAuthn
-                && this.$user.getWebAuthnCredentialId()
+                && hasWebAuthnConfig()
                 && webauthn.isSupported();
         },
         isDarkMode() {
@@ -164,7 +170,7 @@ export default {
         unlockByWebAuthn() {
             const self = this;
 
-            if (!self.settingsStore.appSettings.applicationLockWebAuthn || !self.$user.getWebAuthnCredentialId()) {
+            if (!self.settingsStore.appSettings.applicationLockWebAuthn || !hasWebAuthnConfig()) {
                 self.$refs.snackbar.showMessage('WebAuthn is not enabled');
                 return;
             }
@@ -178,11 +184,11 @@ export default {
 
             webauthn.verifyCredential(
                 self.userStore.currentUserBasicInfo,
-                self.$user.getWebAuthnCredentialId()
+                getWebAuthnCredentialId()
             ).then(({ id, userName, userSecret }) => {
                 self.verifyingByWebAuthn = false;
 
-                self.$user.unlockTokenByWebAuthn(id, userName, userSecret);
+                unlockTokenByWebAuthn(id, userName, userSecret);
                 self.transactionsStore.initTransactionDraft();
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
                     if (response.user) {
@@ -232,7 +238,7 @@ export default {
             }
 
             try {
-                self.$user.unlockTokenByPinCode(user.username, pinCode);
+                unlockTokenByPinCode(user.username, pinCode);
                 self.transactionsStore.initTransactionDraft();
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
                     if (response.user) {

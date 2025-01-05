@@ -71,7 +71,6 @@ import draggable from 'vuedraggable';
 import router from '@/router/desktop.js';
 
 import { getVersion, getBuildTime } from '@/lib/version.ts';
-import userstate from '@/lib/userstate.ts';
 import {
     getI18nOptions,
     translateIf,
@@ -476,7 +475,5 @@ app.config.globalProperties.$buildTime = getBuildTime();
 app.config.globalProperties.$locale = i18nFunctions(i18n.global);
 app.config.globalProperties.$tIf = (text, isTranslate) => translateIf(text, isTranslate, i18n.global.t);
 app.config.globalProperties.$tError = (message) => translateError(message, i18n.global.t);
-
-app.config.globalProperties.$user = userstate;
 
 app.mount('#app');

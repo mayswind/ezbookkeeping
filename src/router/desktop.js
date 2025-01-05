@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 
 import { TemplateType } from '@/core/template.ts';
-import userState from '@/lib/userstate.ts';
+import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 
 import MainLayout from '@/views/desktop/MainLayout.vue';
 import LoginPage from '@/views/desktop/LoginPage.vue';
@@ -32,14 +32,14 @@ import ExchangeRatesPage from '@/views/desktop/ExchangeRatesPage.vue';
 import AboutPage from '@/views/desktop/AboutPage.vue';
 
 function checkLogin() {
-    if (!userState.isUserLogined()) {
+    if (!isUserLogined()) {
         return {
             path: '/login',
             replace: true
         };
     }
 
-    if (!userState.isUserUnlocked()) {
+    if (!isUserUnlocked()) {
         return {
             path: '/unlock',
             replace: true
@@ -48,14 +48,14 @@ function checkLogin() {
 }
 
 function checkLocked() {
-    if (!userState.isUserLogined()) {
+    if (!isUserLogined()) {
         return {
             path: '/login',
             replace: true
         };
     }
 
-    if (userState.isUserUnlocked()) {
+    if (isUserUnlocked()) {
         return {
             path: '/',
             replace: true
@@ -64,14 +64,14 @@ function checkLocked() {
 }
 
 function checkNotLogin() {
-    if (userState.isUserLogined() && !userState.isUserUnlocked()) {
+    if (isUserLogined() && !isUserUnlocked()) {
         return {
             path: '/unlock',
             replace: true
         };
     }
 
-    if (userState.isUserLogined()) {
+    if (isUserLogined()) {
         return {
             path: '/',
             replace: true

@@ -30,6 +30,7 @@ import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { isProduction } from '@/lib/version.ts';
 import { initMapProvider } from '@/lib/map/index.ts';
+import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 export default {
@@ -79,8 +80,8 @@ export default {
 
         setExpenseAndIncomeAmountColor(self.userStore.currentUserExpenseAmountColor, self.userStore.currentUserIncomeAmountColor);
 
-        if (self.$user.isUserLogined()) {
-            if (!self.settingsStore.appSettings.applicationLock || self.$user.isUserUnlocked()) {
+        if (isUserLogined()) {
+            if (!self.settingsStore.appSettings.applicationLock || isUserUnlocked()) {
                 // refresh token if user is logined
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
                     if (response.user) {

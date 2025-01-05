@@ -55,6 +55,15 @@ export interface LocaleDefaultSettings {
     firstDayOfWeek: number;
 }
 
+export interface ApplicationLockState {
+    readonly username: string;
+    readonly secret: string;
+}
+
+export interface WebAuthnConfig {
+    readonly credentialId: string;
+}
+
 export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     theme: 'auto',
     fontSize: 1,

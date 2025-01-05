@@ -1,5 +1,6 @@
 import CryptoJS from 'crypto-js';
 
+import type { ApplicationLockState, WebAuthnConfig } from '@/core/setting.ts';
 import type { UserBasicInfo } from '@/models/user.ts';
 
 import { isString, isObject } from './common.ts';
@@ -16,15 +17,6 @@ const transactionDraftLocalStorageKey: string = 'ebk_user_draft_transaction';
 const tokenSessionStorageKey: string = 'ebk_user_session_token';
 const encryptedTokenSessionStorageKey: string = 'ebk_user_session_encrypted_token';
 const appLockStateSessionStorageKey: string = 'ebk_user_app_lock_state'; // { 'username': '', secret: '' }
-
-export interface ApplicationLockState {
-    readonly username: string;
-    readonly secret: string;
-}
-
-export interface WebAuthnConfig {
-    readonly credentialId: string;
-}
 
 function getAppLockSecret(pinCode: string): string {
     const hashedPinCode = CryptoJS.SHA256(appLockSecretBaseStringPrefix + pinCode).toString();

@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import {useTemplateRef, watch, onMounted, onUpdated, type Ref} from 'vue';
+import { useTemplateRef, watch, onMounted, onUpdated } from 'vue';
 
 import { ClipboardHolder } from '@/lib/clipboard.ts';
 

@@ -38,23 +38,23 @@ const titleContent: Ref<string> = ref(props.title || tt('global.app.title'));
 const textContent: Ref<string> = ref(props.text || '');
 const finalColor: Ref<string> = ref(props.color || 'primary');
 
-let resolveFunc: (value: T | PromiseLike<T>) => void = null;
-let rejectFunc: (reason?: unknown) => void = null;
+let resolveFunc: ((value?: unknown) => void) | null = null;
+let rejectFunc: ((reason?: unknown) => void) | null = null;
 
-function open(title: string, text: string, options: Record<string, unknown>) {
+function open(titleOrText: string, textOrOptions: string | Record<string, unknown>, options: Record<string, unknown>) {
     showState.value = true;
 
-    if (isString(text)) {
-        titleContent.value = tt(title, options);
-        textContent.value = tt(text, options);
-    } else {
-        options = text;
+    if (isString(textOrOptions)) { // second parameter is text
+        titleContent.value = tt(titleOrText, options);
+        textContent.value = tt(textOrOptions, options);
+    } else { // second parameter is options
+        const actualOptions = textOrOptions as Record<string, unknown>;
         titleContent.value = tt('global.app.title');
-        textContent.value = tt(title, options);
+        textContent.value = tt(titleOrText, actualOptions);
     }
 
-    if (options && options.color) {
-        finalColor.value = options.color || 'primary';
+    if (options && isString(options.color)) {
+        finalColor.value = (options.color as string) || 'primary';
     }
 
     return new Promise((resolve, reject) => {
@@ -81,7 +81,7 @@ function cancel(): void {
     emit('update:show', false);
 }
 
-watch(() => showState, (newValue) => {
+watch(showState, newValue => {
     emit('update:show', newValue);
 });
 

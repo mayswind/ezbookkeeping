@@ -11,6 +11,7 @@
 <script setup lang="ts">
 import { type Ref, ref, watch } from 'vue';
 
+import { isObject } from '@/lib/common.ts';
 import { useI18n } from '@/lib/i18n.js';
 
 const emit = defineEmits<{
@@ -29,7 +30,12 @@ function showMessage(message: string, options: Record<string, unknown>): void {
 
 function showError(error: string | { message: string }): void {
     showState.value = true;
-    messageContent.value = te(error.message || error);
+
+    if (isObject(error) && (error as { message: string }).message) {
+        messageContent.value = te((error as { message: string }).message);
+    } else {
+        messageContent.value = te(error);
+    }
 }
 
 watch(showState, (newValue) => {

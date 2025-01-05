@@ -32,9 +32,11 @@
 
 <script setup lang="ts">
 import { computed, useTemplateRef } from 'vue';
-import type MapView from '@/components/common/MapView.vue';
+import MapView from '@/components/common/MapView.vue';
 
 import type { MapPosition } from '@/lib/map/base.ts';
+
+type MapViewType = InstanceType<typeof MapView>;
 
 const props = defineProps<{
     modelValue?: MapPosition;
@@ -46,7 +48,7 @@ const emit = defineEmits<{
     (e: 'update:show', value: boolean): void
 }>();
 
-const map = useTemplateRef<MapView>('map');
+const map = useTemplateRef<MapViewType>('map');
 
 const geoLocation = computed<MapPosition | undefined>({
     get: () => {

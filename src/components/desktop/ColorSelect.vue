@@ -38,7 +38,10 @@
     </v-select>
 </template>
 
-<script>
+<script setup lang="ts">
+import { type Ref, ref, computed, useTemplateRef, nextTick } from 'vue';
+
+import type { ColorValue, ColorInfo } from '@/core/color.ts';
 import { DEFAULT_ICON_COLOR } from '@/consts/color.ts';
 import { arrayContainsFieldValue } from '@/lib/common.ts';
 import { getColorsInRows } from '@/lib/color.ts';
@@ -49,63 +52,54 @@ import {
     mdiCheck
 } from '@mdi/js';
 
-export default {
-    props: [
-        'modelValue',
-        'disabled',
-        'label',
-        'columnCount',
-        'allColorInfos'
-    ],
-    emits: [
-        'update:modelValue',
-    ],
-    data() {
-        const self = this;
+const props = defineProps<{
+    modelValue: ColorValue;
+    disabled?: boolean;
+    label?: string;
+    columnCount?: number;
+    allColorInfos: ColorValue[];
+}>();
 
-        return {
-            itemPerRow: self.columnCount || 7,
-            icons: {
-                square: mdiSquareRounded,
-                checked: mdiCheck
-            }
-        }
-    },
-    computed: {
-        allColorRows() {
-            return getColorsInRows(this.allColorInfos, this.itemPerRow);
-        },
-        color: {
-            get: function () {
-                return this.modelValue;
-            },
-            set: function (value) {
-                this.$emit('update:modelValue', value);
-            }
-        }
-    },
-    methods: {
-        hasSelectedIcon(row) {
-            return arrayContainsFieldValue(row, 'id', this.modelValue);
-        },
-        getFinalColor(color) {
-            if (color && color !== DEFAULT_ICON_COLOR) {
-                return '#' + color;
-            } else {
-                return 'var(--default-icon-color)';
-            }
-        },
-        onMenuStateChanged(state) {
-            const self = this;
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: ColorValue): void
+}>();
 
-            if (state) {
-                self.$nextTick(() => {
-                    if (self.$refs.dropdownMenu && self.$refs.dropdownMenu.parentElement) {
-                        scrollToSelectedItem(self.$refs.dropdownMenu.parentElement, null, '.row-has-selected-item');
-                    }
-                });
+const icons = {
+    square: mdiSquareRounded,
+    checked: mdiCheck
+};
+
+const dropdownMenu: Ref<HTMLElement | null> = useTemplateRef('dropdownMenu');
+const itemPerRow: Ref<number> = ref(props.columnCount || 7);
+
+const allColorRows = computed<ColorInfo[][]>(() => {
+    return getColorsInRows(props.allColorInfos, itemPerRow.value);
+});
+
+const color = computed<ColorValue>({
+    get: () => props.modelValue,
+    set: (value: ColorValue) => emit('update:modelValue', value)
+});
+
+function hasSelectedIcon(row: ColorInfo[]): boolean {
+    return arrayContainsFieldValue(row, 'id', props.modelValue);
+}
+
+function getFinalColor(color: ColorValue): string {
+    if (color && color !== DEFAULT_ICON_COLOR) {
+        return '#' + color;
+    } else {
+        return 'var(--default-icon-color)';
+    }
+}
+
+function onMenuStateChanged(state: boolean): void {
+    if (state) {
+        nextTick(() => {
+            if (dropdownMenu.value && dropdownMenu.value.parentElement) {
+                scrollToSelectedItem(dropdownMenu.value.parentElement, null, '.row-has-selected-item');
             }
-        }
+        });
     }
 }
 </script>

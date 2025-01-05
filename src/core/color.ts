@@ -2,7 +2,7 @@ import type { TypeAndName } from './base.ts';
 
 export type ColorValue = string;
 
-export interface ColorInfo {
+export interface ColorInfo extends Record<string, unknown> {
     readonly color: ColorValue;
 }
 

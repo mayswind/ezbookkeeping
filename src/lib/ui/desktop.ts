@@ -45,7 +45,7 @@ export function getCssValue(element: HTMLElement | null, name: string): string {
     return computedStyle.getPropertyValue(name);
 }
 
-export function scrollToSelectedItem(parentEl: HTMLElement | null, containerSelector: string, selectedItemSelector: string): void {
+export function scrollToSelectedItem(parentEl: HTMLElement | null, containerSelector: string | null, selectedItemSelector: string): void {
     if (!parentEl) {
         return;
     }

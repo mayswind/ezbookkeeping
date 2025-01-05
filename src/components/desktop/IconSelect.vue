@@ -36,7 +36,11 @@
     </v-select>
 </template>
 
-<script>
+<script setup lang="ts">
+import { type Ref, ref, computed, useTemplateRef, nextTick } from 'vue';
+
+import type { ColorValue } from '@/core/color.ts';
+import type {IconInfo, IconInfoWithId} from '@/core/icon.ts';
 import { arrayContainsFieldValue } from '@/lib/common.ts';
 import { getIconsInRows } from '@/lib/icon.ts';
 import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';
@@ -45,57 +49,47 @@ import {
     mdiCheck
 } from '@mdi/js';
 
-export default {
-    props: [
-        'modelValue',
-        'disabled',
-        'label',
-        'iconType',
-        'color',
-        'columnCount',
-        'allIconInfos'
-    ],
-    emits: [
-        'update:modelValue',
-    ],
-    data() {
-        const self = this;
+const props = defineProps<{
+    modelValue: string;
+    disabled?: boolean;
+    label?: string;
+    iconType: string;
+    color: ColorValue;
+    columnCount?: number;
+    allIconInfos: Record<string, IconInfo>;
+}>();
 
-        return {
-            itemPerRow: self.columnCount || 7,
-            icons: {
-                checked: mdiCheck
-            }
-        }
-    },
-    computed: {
-        allIconRows() {
-            return getIconsInRows(this.allIconInfos, this.itemPerRow);
-        },
-        icon: {
-            get: function () {
-                return this.modelValue;
-            },
-            set: function (value) {
-                this.$emit('update:modelValue', value);
-            }
-        }
-    },
-    methods: {
-        hasSelectedIcon(row) {
-            return arrayContainsFieldValue(row, 'id', this.modelValue);
-        },
-        onMenuStateChanged(state) {
-            const self = this;
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: string): void
+}>();
 
-            if (state) {
-                self.$nextTick(() => {
-                    if (self.$refs.dropdownMenu && self.$refs.dropdownMenu.parentElement) {
-                        scrollToSelectedItem(self.$refs.dropdownMenu.parentElement, null, '.row-has-selected-item');
-                    }
-                });
+const icons = {
+    checked: mdiCheck
+};
+
+const dropdownMenu: Ref<HTMLElement | null> = useTemplateRef('dropdownMenu');
+const itemPerRow: Ref<number> = ref(props.columnCount || 7);
+
+const allIconRows = computed<IconInfoWithId[][]>(() => {
+    return getIconsInRows(props.allIconInfos, itemPerRow.value);
+});
+
+const icon = computed({
+    get: () => props.modelValue,
+    set: (value: string) => emit('update:modelValue', value)
+});
+
+function hasSelectedIcon(row: IconInfoWithId[]): boolean {
+    return arrayContainsFieldValue(row, 'id', props.modelValue);
+}
+
+function onMenuStateChanged(state: boolean): void {
+    if (state) {
+        nextTick(() => {
+            if (dropdownMenu.value && dropdownMenu.value.parentElement) {
+                scrollToSelectedItem(dropdownMenu.value.parentElement, null, '.row-has-selected-item');
             }
-        }
+        });
     }
 }
 </script>

@@ -1,6 +1,6 @@
 import type { IconInfo, IconInfoWithId } from '@/core/icon.ts';
 
-export function getIconsInRows(allIconInfos: IconInfo[], itemPerRow: number): IconInfoWithId[][] {
+export function getIconsInRows(allIconInfos: Record<string, IconInfo>, itemPerRow: number): IconInfoWithId[][] {
     const ret: IconInfoWithId[][] = [];
     let rowCount = 0;
 

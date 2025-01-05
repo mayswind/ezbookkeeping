@@ -26,7 +26,7 @@ const props = defineProps<{
 
 const { tt, getCurrentLanguageInfo } = useI18n();
 
-const mapContainer: Ref<HTMLElement | null> = useTemplateRef('mapContainer');
+const mapContainer = useTemplateRef<HTMLElement>('mapContainer');
 const mapInstance: Ref<MapInstance | null> = ref(createMapInstance());
 const initCenter: Ref<MapPosition> = ref({
     latitude: 0,

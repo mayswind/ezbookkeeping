@@ -43,7 +43,7 @@ const emit = defineEmits<{
 }>();
 
 const codes: Ref<PinCode[]> = ref([]);
-const pinCodeInputs: Ref<HTMLInputElement[]> = useTemplateRef('pin-code-input');
+const pinCodeInputs = useTemplateRef<HTMLInputElement[]>('pin-code-input');
 
 const finalPinCode = computed<string>(() => {
     let ret = '';

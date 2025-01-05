@@ -67,7 +67,7 @@ const icons = {
     checked: mdiCheck
 };
 
-const dropdownMenu: Ref<HTMLElement | null> = useTemplateRef('dropdownMenu');
+const dropdownMenu = useTemplateRef<HTMLElement>('dropdownMenu');
 const itemPerRow: Ref<number> = ref(props.columnCount || 7);
 
 const allIconRows = computed<IconInfoWithId[][]>(() => {

@@ -58,7 +58,7 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useTwoFactorAuthStore } from '@/stores/twoFactorAuth.js';
+import { useTwoFactorAuthStore } from '@/stores/twoFactorAuth.ts';
 
 export default {
     props: [

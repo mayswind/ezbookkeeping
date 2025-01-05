@@ -26,50 +26,49 @@
     </f7-sheet>
 </template>
 
-<script>
-export default {
-    props: [
-        'modelValue',
-        'title',
-        'hint',
-        'confirmDisabled',
-        'cancelDisabled',
-        'show'
-    ],
-    emits: [
-        'update:modelValue',
-        'update:show',
-        'pincode:confirm'
-    ],
-    data() {
-        return {
-            currentPinCode: ''
-        }
-    },
-    computed: {
-        currentPinCodeValid() {
-            return this.currentPinCode && this.currentPinCode.length === 6;
-        },
-    },
-    methods: {
-        onSheetOpen() {
-            this.currentPinCode = '';
-        },
-        onSheetClosed() {
-            this.$emit('update:show', false);
-        },
-        confirm() {
-            if (!this.currentPinCodeValid || this.confirmDisabled) {
-                return;
-            }
+<script setup lang="ts">
+import { type Ref, ref, computed } from 'vue';
 
-            this.$emit('update:modelValue', this.currentPinCode);
-            this.$emit('pincode:confirm', this.currentPinCode);
-        },
-        cancel() {
-            this.$emit('update:show', false);
-        }
+const props = defineProps<{
+    modelValue: string
+    title?: string
+    hint?: string
+    confirmDisabled?: boolean
+    cancelDisabled?: boolean
+    show: boolean
+}>();
+
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: string): void
+    (e: 'update:show', value: boolean): void
+    (e: 'pincode:confirm', value: string): void
+}>();
+
+const currentPinCode: Ref<string> = ref('');
+
+const currentPinCodeValid = computed<boolean>(() => {
+    return currentPinCode.value?.length === 6 || false;
+});
+
+function confirm() {
+    if (!currentPinCodeValid.value || props.confirmDisabled) {
+        return;
     }
+
+    emit('update:modelValue', currentPinCode.value);
+    emit('pincode:confirm', currentPinCode.value);
+}
+
+function cancel() {
+    emit('update:show', false);
+}
+
+function onSheetOpen() {
+    currentPinCode.value = '';
+}
+
+function onSheetClosed() {
+    cancel();
 }
 </script>
 

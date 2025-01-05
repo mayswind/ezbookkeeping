@@ -12,7 +12,7 @@ import { mapStores } from 'pinia';
 import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
-import { useTokensStore } from '@/stores/token.js';
+import { useTokensStore } from '@/stores/token.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';

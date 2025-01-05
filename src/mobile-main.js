@@ -80,7 +80,7 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
 import { getVersion, getBuildTime } from '@/lib/version.ts';
-import userstate from '@/lib/userstate.js';
+import userstate from '@/lib/userstate.ts';
 import {
     getI18nOptions,
     translateIf,

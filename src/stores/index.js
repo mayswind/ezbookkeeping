@@ -11,7 +11,7 @@ import { useOverviewStore } from './overview.js';
 import { useStatisticsStore } from './statistics.js';
 import { useExchangeRatesStore } from './exchangeRates.js';
 
-import userState from '@/lib/userstate.js';
+import userState from '@/lib/userstate.ts';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.ts';
 import { isObject, isString } from '@/lib/common.ts';

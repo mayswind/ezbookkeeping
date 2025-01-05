@@ -71,7 +71,7 @@ import draggable from 'vuedraggable';
 import router from '@/router/desktop.js';
 
 import { getVersion, getBuildTime } from '@/lib/version.ts';
-import userstate from '@/lib/userstate.js';
+import userstate from '@/lib/userstate.ts';
 import {
     getI18nOptions,
     translateIf,

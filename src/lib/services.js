@@ -12,7 +12,7 @@ import {
     BAIDU_MAP_JAVASCRIPT_URL,
     AMAP_JAVASCRIPT_URL
 } from '@/consts/api.ts';
-import userState from './userstate.js';
+import userState from './userstate.ts';
 import {
     isDefined,
     isBoolean

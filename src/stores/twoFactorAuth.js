@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import userState from '@/lib/userstate.js';
+import userState from '@/lib/userstate.ts';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.ts';
 import { isBoolean } from '@/lib/common.ts';

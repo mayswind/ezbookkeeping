@@ -1,4 +1,4 @@
-import userState from '@/lib/userstate.js';
+import userState from '@/lib/userstate.ts';
 
 import HomePage from '@/views/mobile/HomePage.vue';
 import LoginPage from '@/views/mobile/LoginPage.vue';

@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 
 import { useUserStore } from './user.js';
 
-import userState from '@/lib/userstate.js';
+import userState from '@/lib/userstate.ts';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.ts';
 import { isObject } from '@/lib/common.ts';

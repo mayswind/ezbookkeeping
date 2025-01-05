@@ -1,40 +1,55 @@
 import CryptoJS from 'crypto-js';
 
+import type { UserBasicInfo } from '@/models/user.ts';
+
 import { isString, isObject } from './common.ts';
 import { isEnableApplicationLock } from './settings.ts';
 import logger from './logger.ts';
 
-const appLockSecretBaseStringPrefix = 'EBK_LOCK_SECRET_';
+const appLockSecretBaseStringPrefix: string = 'EBK_LOCK_SECRET_';
 
-const tokenLocalStorageKey = 'ebk_user_token';
-const webauthnConfigLocalStorageKey = 'ebk_user_webauthn_config';
-const userInfoLocalStorageKey = 'ebk_user_info';
-const transactionDraftLocalStorageKey = 'ebk_user_draft_transaction';
+const tokenLocalStorageKey: string = 'ebk_user_token';
+const webauthnConfigLocalStorageKey: string = 'ebk_user_webauthn_config';
+const userInfoLocalStorageKey: string = 'ebk_user_info';
+const transactionDraftLocalStorageKey: string = 'ebk_user_draft_transaction';
 
-const tokenSessionStorageKey = 'ebk_user_session_token';
-const encryptedTokenSessionStorageKey = 'ebk_user_session_encrypted_token';
-const appLockStateSessionStorageKey = 'ebk_user_app_lock_state'; // { 'username': '', secret: '' }
+const tokenSessionStorageKey: string = 'ebk_user_session_token';
+const encryptedTokenSessionStorageKey: string = 'ebk_user_session_encrypted_token';
+const appLockStateSessionStorageKey: string = 'ebk_user_app_lock_state'; // { 'username': '', secret: '' }
 
-function getAppLockSecret(pinCode) {
+export interface ApplicationLockState {
+    readonly username: string;
+    readonly secret: string;
+}
+
+export interface WebAuthnConfig {
+    readonly credentialId: string;
+}
+
+function getAppLockSecret(pinCode: string): string {
     const hashedPinCode = CryptoJS.SHA256(appLockSecretBaseStringPrefix + pinCode).toString();
     return hashedPinCode.substring(0, 24); // put secret into user id of webauthn (user id total length must less 64 bytes)
 }
 
-function getEncryptedToken(token, appLockState) {
+function getEncryptedToken(token: string, appLockState: ApplicationLockState): string {
     const key = CryptoJS.SHA256(`${appLockSecretBaseStringPrefix}|${appLockState.username}|${appLockState.secret}`).toString();
     return CryptoJS.AES.encrypt(token, key).toString();
 }
 
-function getDecryptedToken(encryptedToken, appLockState) {
+function getDecryptedToken(encryptedToken: string, appLockState: ApplicationLockState): string {
     const key = CryptoJS.SHA256(`${appLockSecretBaseStringPrefix}|${appLockState.username}|${appLockState.secret}`).toString();
     const bytes = CryptoJS.AES.decrypt(encryptedToken, key);
     return bytes.toString(CryptoJS.enc.Utf8);
 }
 
-function getToken() {
+function getToken(): string | null {
     if (isEnableApplicationLock()) {
         const usedEncryptedToken = sessionStorage.getItem(encryptedTokenSessionStorageKey);
         const currentEncryptedToken = localStorage.getItem(tokenLocalStorageKey);
+
+        if (!usedEncryptedToken || !currentEncryptedToken) {
+            return null;
+        }
 
         if (usedEncryptedToken === currentEncryptedToken) {
             return sessionStorage.getItem(tokenSessionStorageKey);
@@ -55,12 +70,17 @@ function getToken() {
     }
 }
 
-function getUserInfo() {
+function getUserInfo(): UserBasicInfo | null {
     const data = localStorage.getItem(userInfoLocalStorageKey);
-    return JSON.parse(data);
+
+    if (!data) {
+        return null;
+    }
+
+    return JSON.parse(data) as UserBasicInfo;
 }
 
-function getUserTransactionDraft() {
+function getUserTransactionDraft(): unknown | null {
     let data = localStorage.getItem(transactionDraftLocalStorageKey);
 
     if (!data) {
@@ -75,16 +95,27 @@ function getUserTransactionDraft() {
     return JSON.parse(data);
 }
 
-function getUserAppLockState() {
+function getUserAppLockState(): ApplicationLockState {
     const data = sessionStorage.getItem(appLockStateSessionStorageKey);
-    return JSON.parse(data);
+
+    if (!data) {
+        throw new Error('No app lock state in session storage');
+    }
+
+    const appLockState = JSON.parse(data);
+
+    if (!appLockState || !appLockState.username || !appLockState.secret) {
+        throw new Error('App lock state is invalid');
+    }
+
+    return appLockState as ApplicationLockState;
 }
 
-function isUserLogined() {
+function isUserLogined(): boolean {
     return !!localStorage.getItem(tokenLocalStorageKey);
 }
 
-function isUserUnlocked() {
+function isUserUnlocked(): boolean {
     if (!isUserLogined()) {
         return false;
     }
@@ -96,35 +127,50 @@ function isUserUnlocked() {
     return !!sessionStorage.getItem(appLockStateSessionStorageKey) && !!sessionStorage.getItem(tokenSessionStorageKey);
 }
 
-function getWebAuthnCredentialId() {
+function getWebAuthnCredentialId(): string | undefined {
     const webauthnConfigData = localStorage.getItem(webauthnConfigLocalStorageKey);
-    const webauthnConfig = JSON.parse(webauthnConfigData);
+
+    if (!webauthnConfigData) {
+        return undefined;
+    }
+
+    const webauthnConfig = JSON.parse(webauthnConfigData) as WebAuthnConfig;
 
     return webauthnConfig.credentialId;
 }
 
-function saveWebAuthnConfig(credentialId) {
-    const webAuthnConfig = {
+function saveWebAuthnConfig(credentialId: string): void {
+    const webAuthnConfig: WebAuthnConfig = {
         credentialId: credentialId
     };
 
     localStorage.setItem(webauthnConfigLocalStorageKey, JSON.stringify(webAuthnConfig));
 }
 
-function clearWebAuthnConfig() {
+function clearWebAuthnConfig(): void {
     localStorage.removeItem(webauthnConfigLocalStorageKey);
 }
 
-function unlockTokenByWebAuthn(credentialId, userName, userSecret) {
+function unlockTokenByWebAuthn(credentialId: string, userName: string, userSecret: string): void {
     const webauthnConfigData = localStorage.getItem(webauthnConfigLocalStorageKey);
-    const webauthnConfig = JSON.parse(webauthnConfigData);
+
+    if (!webauthnConfigData) {
+        throw new Error('WebAuthn credential is not set');
+    }
+
+    const webauthnConfig = JSON.parse(webauthnConfigData) as WebAuthnConfig;
 
     if (webauthnConfig.credentialId !== credentialId) {
-        return false;
+        throw new Error('WebAuthn credential is invalid');
     }
 
     const encryptedToken = localStorage.getItem(tokenLocalStorageKey);
-    const appLockState = {
+
+    if (!encryptedToken) {
+        throw new Error('No token in local storage');
+    }
+
+    const appLockState: ApplicationLockState = {
         username: userName,
         secret: userSecret
     };
@@ -135,9 +181,14 @@ function unlockTokenByWebAuthn(credentialId, userName, userSecret) {
     sessionStorage.setItem(tokenSessionStorageKey, token);
 }
 
-function unlockTokenByPinCode(userName, pinCode) {
+function unlockTokenByPinCode(userName: string, pinCode: string): void {
     const encryptedToken = localStorage.getItem(tokenLocalStorageKey);
-    const appLockState = {
+
+    if (!encryptedToken) {
+        throw new Error('No token in local storage');
+    }
+
+    const appLockState: ApplicationLockState = {
         username: userName,
         secret: getAppLockSecret(pinCode)
     };
@@ -148,9 +199,14 @@ function unlockTokenByPinCode(userName, pinCode) {
     sessionStorage.setItem(tokenSessionStorageKey, token);
 }
 
-function encryptToken(userName, pinCode) {
+function encryptToken(userName: string, pinCode: string): void {
     const token = localStorage.getItem(tokenLocalStorageKey);
-    const appLockState = {
+
+    if (!token) {
+        throw new Error('No token in local storage');
+    }
+
+    const appLockState: ApplicationLockState = {
         username: userName,
         secret: getAppLockSecret(pinCode)
     };
@@ -162,8 +218,12 @@ function encryptToken(userName, pinCode) {
     localStorage.setItem(tokenLocalStorageKey, encryptedToken);
 }
 
-function decryptToken() {
+function decryptToken(): void {
     const token = sessionStorage.getItem(tokenSessionStorageKey);
+
+    if (!token) {
+        throw new Error('No token in session storage');
+    }
 
     localStorage.setItem(tokenLocalStorageKey, token);
     sessionStorage.removeItem(tokenSessionStorageKey);
@@ -171,14 +231,14 @@ function decryptToken() {
     sessionStorage.removeItem(appLockStateSessionStorageKey);
 }
 
-function isCorrectPinCode(pinCode) {
+function isCorrectPinCode(pinCode: string): boolean {
     const secret = getAppLockSecret(pinCode);
     const appLockState = getUserAppLockState();
 
     return appLockState && secret === appLockState.secret;
 }
 
-function updateToken(token) {
+function updateToken(token: string): void {
     if (isString(token)) {
         if (isEnableApplicationLock()) {
             const appLockState = getUserAppLockState();
@@ -193,13 +253,13 @@ function updateToken(token) {
     }
 }
 
-function updateUserInfo(user) {
+function updateUserInfo(user: UserBasicInfo): void {
     if (isObject(user)) {
         localStorage.setItem(userInfoLocalStorageKey, JSON.stringify(user));
     }
 }
 
-function updateUserTransactionDraft(transaction) {
+function updateUserTransactionDraft(transaction: unknown): void {
     if (!isObject(transaction)) {
         return;
     }
@@ -214,21 +274,21 @@ function updateUserTransactionDraft(transaction) {
     localStorage.setItem(transactionDraftLocalStorageKey, data);
 }
 
-function clearUserInfo() {
+function clearUserInfo(): void {
     localStorage.removeItem(userInfoLocalStorageKey);
 }
 
-function clearUserTransactionDraft() {
+function clearUserTransactionDraft(): void {
     localStorage.removeItem(transactionDraftLocalStorageKey);
 }
 
-function clearSessionToken() {
+function clearSessionToken(): void {
     sessionStorage.removeItem(tokenSessionStorageKey);
     sessionStorage.removeItem(encryptedTokenSessionStorageKey);
     sessionStorage.removeItem(appLockStateSessionStorageKey);
 }
 
-function clearTokenAndUserInfo(clearAppLockState) {
+function clearTokenAndUserInfo(clearAppLockState: boolean): void {
     if (clearAppLockState) {
         sessionStorage.removeItem(appLockStateSessionStorageKey);
     }

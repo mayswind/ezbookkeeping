@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 
 import { TemplateType } from '@/core/template.ts';
-import userState from '@/lib/userstate.js';
+import userState from '@/lib/userstate.ts';
 
 import MainLayout from '@/views/desktop/MainLayout.vue';
 import LoginPage from '@/views/desktop/LoginPage.vue';

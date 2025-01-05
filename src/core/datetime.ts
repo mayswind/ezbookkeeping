@@ -20,6 +20,11 @@ export interface TimeRange {
     readonly maxTime: number;
 }
 
+export interface StartEndTime {
+    readonly startTime: number;
+    readonly endTime: number;
+}
+
 export interface UnixTimeRange {
     readonly minUnixTime: number;
     readonly maxUnixTime: number;

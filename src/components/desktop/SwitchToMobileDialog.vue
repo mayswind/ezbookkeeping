@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { getMobileUrlQrCodePath } from '@/lib/qrcode.js';
+import { getMobileUrlQrCodePath } from '@/lib/qrcode.ts';
 import { getMobileVersionPath } from '@/lib/version.ts';
 
 export default {

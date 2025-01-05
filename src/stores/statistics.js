@@ -21,7 +21,7 @@ import {
 } from '@/core/statistics.ts';
 import { DEFAULT_ACCOUNT_ICON, DEFAULT_CATEGORY_ICON } from '@/consts/icon.ts';
 import { DEFAULT_ACCOUNT_COLOR, DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
-import services from '@/lib/services.js';
+import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 import {
     isEquals,

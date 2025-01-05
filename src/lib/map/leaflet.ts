@@ -15,7 +15,7 @@ import {
     getTomTomMapAPIKey,
     getTianDiTuMapAPIKey
 } from '@/lib/server_settings.ts';
-import services from '@/lib/services.js';
+import services from '@/lib/services.ts';
 
 export class LeafletMapProvider implements MapProvider {
     public static Leaflet: unknown = null;

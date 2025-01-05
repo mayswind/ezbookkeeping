@@ -7,7 +7,7 @@ import { AccountType, AccountCategory } from '@/core/account.ts';
 import { PARENT_ACCOUNT_CURRENCY_PLACEHOLDER } from '@/consts/currency.ts';
 import { DEFAULT_ACCOUNT_ICON_ID } from '@/consts/icon.ts';
 import { DEFAULT_ACCOUNT_COLOR } from '@/consts/color.ts';
-import services from '@/lib/services.js';
+import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 import { isNumber, isEquals } from '@/lib/common.ts';
 import { getCurrentUnixTime } from '@/lib/datetime.ts';

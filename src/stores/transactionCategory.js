@@ -4,7 +4,7 @@ import { CategoryType } from '@/core/category.ts';
 import { DEFAULT_CATEGORY_ICON_ID } from '@/consts/icon.ts';
 import { DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
 import { isEquals } from '@/lib/common.ts';
-import services from '@/lib/services.js';
+import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 
 function loadTransactionCategoryList(state, allCategories) {

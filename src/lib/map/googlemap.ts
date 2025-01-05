@@ -3,7 +3,7 @@
 import type { MapProvider, MapInstance, MapInstanceInitOptions, MapPosition } from './base.ts';
 
 import { asyncLoadAssets } from '@/lib/misc.ts';
-import services from '@/lib/services.js';
+import services from '@/lib/services.ts';
 
 export class GoogleMapProvider implements MapProvider {
     public static GoogleMap: unknown = null;

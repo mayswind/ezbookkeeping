@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { TransactionType } from '@/core/transaction.ts';
 import { TemplateType } from '@/core/template.ts';
 import { isDefined, isObject, isArray, isEquals } from '@/lib/common.ts';
-import services from '@/lib/services.js';
+import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 
 function loadTransactionTemplateList(state, templateType, templates) {

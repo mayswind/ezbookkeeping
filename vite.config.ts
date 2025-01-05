@@ -180,7 +180,7 @@ export default defineConfig(() => {
                             return 'common';
                         } else if (/[\\/]src[\\/]lib[\\/](map[\\/]|ui[\\/]common|[a-zA-Z0-9-_]+\.(js|ts))/i.test(id)) {
                             return 'common';
-                        } else if (/[\\/]src[\\/]components[\\/]common[\\/]/i.test(id)) {
+                        } else if (/[\\/]src[\\/]components[\\/](base|common)[\\/]/i.test(id)) {
                             return 'common';
                         } else {
                             return null;

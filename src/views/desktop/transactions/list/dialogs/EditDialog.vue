@@ -756,7 +756,7 @@ export default {
             if (newValue === 'map') {
                 this.$nextTick(() => {
                     if (this.$refs.map) {
-                        this.$refs.map.init();
+                        this.$refs.map.initMapView();
                     }
                 });
             }

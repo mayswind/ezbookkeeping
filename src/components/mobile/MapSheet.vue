@@ -30,39 +30,48 @@
     </f7-sheet>
 </template>
 
-<script>
-export default {
-    props: [
-        'modelValue',
-        'show'
-    ],
-    emits: [
-        'update:modelValue',
-        'update:show'
-    ],
-    computed: {
-        geoLocation: {
-            get: function () {
-                return this.modelValue;
-            },
-            set: function (value) {
-                this.$emit('update:modelValue', value);
-            }
-        }
+<script setup lang="ts">
+import { computed, useTemplateRef } from 'vue';
+import type MapView from '@/components/common/MapView.vue';
+
+import type { MapPosition } from '@/lib/map/base.ts';
+
+const props = defineProps<{
+    modelValue?: MapPosition;
+    show: boolean;
+}>();
+
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: MapPosition | undefined): void,
+    (e: 'update:show', value: boolean): void
+}>();
+
+const map = useTemplateRef<MapView>('map');
+
+const geoLocation = computed<MapPosition | undefined>({
+    get: () => {
+        return props.modelValue;
     },
-    methods: {
-        save() {
-            this.$emit('update:show', false);
-        },
-        onSheetOpen() {
-            this.$refs.map.init();
-        },
-        onSheetClosed() {
-            this.close();
-        },
-        close() {
-            this.$emit('update:show', false);
-        }
+    set: value => {
+        emit('update:modelValue', value);
     }
+});
+
+function save() {
+    emit('update:show', false);
+}
+
+function close() {
+    emit('update:show', false);
+}
+
+function onSheetOpen() {
+    if (map.value) {
+        map.value.initMapView();
+    }
+}
+
+function onSheetClosed() {
+    close();
 }
 </script>

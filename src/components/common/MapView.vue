@@ -56,7 +56,7 @@ const finalMapStyle = computed<Record<string, unknown>>(() => {
     return styles;
 });
 
-function init() {
+function initMapView() {
     let isFirstInit = false;
     let centerChanged = false;
 
@@ -112,6 +112,6 @@ function init() {
 }
 
 defineExpose({
-    init
+    initMapView
 });
 </script>

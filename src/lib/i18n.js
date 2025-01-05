@@ -1508,8 +1508,8 @@ function setLanguage(i18nGlobal, locale, force) {
     }
 
     return {
-        defaultCurrency: defaultCurrency,
-        defaultFirstDayOfWeek: defaultFirstDayOfWeek
+        currency: defaultCurrency,
+        firstDayOfWeek: defaultFirstDayOfWeek
     };
 }
 

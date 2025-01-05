@@ -332,7 +332,7 @@
 <script>
 import { mapStores } from 'pinia';
 import { useRootStore } from '@/stores/index.js';
-import { useSettingsStore } from '@/stores/setting.js';
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 import { useOverviewStore } from '@/stores/overview.js';

@@ -114,7 +114,7 @@ import { useTheme } from 'vuetify';
 
 import { mapStores } from 'pinia';
 import { useRootStore } from '@/stores/index.js';
-import { useSettingsStore } from '@/stores/setting.js';
+import { useSettingsStore } from '@/stores/setting.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';

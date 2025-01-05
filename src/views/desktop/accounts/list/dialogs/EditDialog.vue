@@ -197,7 +197,7 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.js';
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.js';
 
 import { AccountType, AccountCategory } from '@/core/account.ts';

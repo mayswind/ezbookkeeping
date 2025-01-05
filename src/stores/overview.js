@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import { useSettingsStore } from '@/stores/setting.js';
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from './user.js';
 import { useExchangeRatesStore } from './exchangeRates.js';
 

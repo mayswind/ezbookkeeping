@@ -140,7 +140,7 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.js';
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 import { useStatisticsStore } from '@/stores/statistics.js';

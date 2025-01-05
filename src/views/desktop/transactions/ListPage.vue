@@ -587,7 +587,7 @@ import TransactionTagFilterSettingsCard from '@/views/desktop/common/cards/Trans
 import { useDisplay } from 'vuetify';
 
 import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.js';
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';

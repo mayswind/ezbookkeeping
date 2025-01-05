@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import { useSettingsStore } from './setting.js';
+import { useSettingsStore } from './setting.ts';
 import { useUserStore } from './user.js';
 import { useAccountsStore } from './account.js';
 import { useTransactionCategoriesStore } from './transactionCategory.js';

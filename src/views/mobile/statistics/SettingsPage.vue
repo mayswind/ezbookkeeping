@@ -79,7 +79,7 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.js';
+import { useSettingsStore } from '@/stores/setting.ts';
 
 import { DateRangeScene } from '@/core/datetime.ts';
 import { StatisticsAnalysisType } from '@/core/statistics.ts';

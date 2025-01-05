@@ -137,7 +137,7 @@
 import { useDisplay } from 'vuetify';
 
 import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.js';
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 

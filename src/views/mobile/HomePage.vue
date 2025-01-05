@@ -202,7 +202,7 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.js';
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.js';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 import { useOverviewStore } from '@/stores/overview.js';

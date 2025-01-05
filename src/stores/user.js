@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import { useSettingsStore } from './setting.js';
+import { useSettingsStore } from './setting.ts';
 
 import userState from '@/lib/userstate.ts';
 import services from '@/lib/services.ts';

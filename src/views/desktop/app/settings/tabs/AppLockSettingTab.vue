@@ -62,7 +62,7 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.js';
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 

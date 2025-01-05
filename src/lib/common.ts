@@ -243,9 +243,9 @@ export function stringToArrayBuffer(str: string): ArrayBuffer {
     return Uint8Array.from(str, c => c.charCodeAt(0)).buffer;
 }
 
-export function getFirstVisibleItem(items: Record<string, unknown>[] | Record<string, Record<string, unknown>>, hiddenField: string): unknown {
-    if (isArray(items) && (items as Record<string, unknown>[]).length > 0) {
-        const arr = items as Record<string, unknown>[];
+export function getFirstVisibleItem<T>(items: Record<string, T>[] | Record<string, Record<string, T>>, hiddenField: string): Record<string, T> | null {
+    if (isArray(items) && (items as Record<string, T>[]).length > 0) {
+        const arr = items as Record<string, T>[];
 
         for (let i = 0; i < arr.length; i++) {
             if (hiddenField && arr[i][hiddenField]) {
@@ -255,7 +255,7 @@ export function getFirstVisibleItem(items: Record<string, unknown>[] | Record<st
             return arr[i];
         }
     } else if (isObject(items)) {
-        const obj = items as Record<string, Record<string, unknown>>;
+        const obj = items as Record<string, Record<string, T>>;
 
         for (const field in obj) {
             if (!Object.prototype.hasOwnProperty.call(obj, field)) {
@@ -273,9 +273,9 @@ export function getFirstVisibleItem(items: Record<string, unknown>[] | Record<st
     return null;
 }
 
-export function getItemByKeyValue(src: Record<string, unknown>[] | Record<string, Record<string, unknown>>, value: unknown, keyField: string) {
+export function getItemByKeyValue <T>(src: Record<string, T>[] | Record<string, Record<string, T>>, value: T, keyField: string): Record<string, T> | null {
     if (isArray(src)) {
-        const arr = src as Record<string, unknown>[];
+        const arr = src as Record<string, T>[];
 
         for (let i = 0; i < arr.length; i++) {
             const item = arr[i];
@@ -285,7 +285,7 @@ export function getItemByKeyValue(src: Record<string, unknown>[] | Record<string
             }
         }
     } else if (isObject(src)) {
-        const obj = src as Record<string, Record<string, unknown>>;
+        const obj = src as Record<string, Record<string, T>>;
 
         for (const field in obj) {
             if (!Object.prototype.hasOwnProperty.call(src, field)) {
@@ -303,9 +303,9 @@ export function getItemByKeyValue(src: Record<string, unknown>[] | Record<string
     return null;
 }
 
-export function getNameByKeyValue(src: Record<string, unknown>[] | Record<string, Record<string, unknown>>, value: unknown, keyField: string, nameField: string, defaultName: string): unknown {
+export function getNameByKeyValue<T>(src: Record<string, T>[] | Record<string, Record<string, T>>, value: T, keyField: string, nameField: string, defaultName: T): T {
     if (isArray(src)) {
-        const arr = src as Record<string, unknown>[];
+        const arr = src as Record<string, T>[];
 
         if (keyField) {
             for (let i = 0; i < arr.length; i++) {
@@ -325,7 +325,7 @@ export function getNameByKeyValue(src: Record<string, unknown>[] | Record<string
             }
         }
     } else if (isObject(src)) {
-        const obj = src as Record<string, Record<string, unknown>>;
+        const obj = src as Record<string, Record<string, T>>;
 
         if (keyField) {
             for (const key in obj) {
@@ -353,9 +353,9 @@ export function getNameByKeyValue(src: Record<string, unknown>[] | Record<string
     return defaultName;
 }
 
-export function copyObjectTo(fromObject: Record<string, unknown>, toObject: Record<string, unknown>): object {
+export function copyObjectTo(fromObject: Record<string, unknown> | undefined, toObject: Record<string, unknown> | undefined): Record<string, unknown> {
     if (!isObject(fromObject)) {
-        return toObject;
+        return toObject as Record<string, unknown>;
     }
 
     if (!isObject(toObject)) {
@@ -368,23 +368,23 @@ export function copyObjectTo(fromObject: Record<string, unknown>, toObject: Reco
         }
 
         const fromValue = fromObject[key];
-        const toValue = toObject[key];
+        const toValue = (toObject as Record<string, unknown>)[key];
 
         if (isArray(fromValue)) {
-            toObject[key] = copyArrayTo(fromValue as unknown[], toValue as unknown[]);
+            (toObject as Record<string, unknown>)[key] = copyArrayTo(fromValue as unknown[], toValue as unknown[]);
         } else if (isObject(fromValue)) {
-            toObject[key] = copyObjectTo(fromValue as Record<string, unknown>, toValue as Record<string, unknown>);
+            (toObject as Record<string, unknown>)[key] = copyObjectTo(fromValue as Record<string, unknown>, toValue as Record<string, unknown>);
         } else {
             if (fromValue !== toValue) {
-                toObject[key] = fromValue;
+                (toObject as Record<string, unknown>)[key] = fromValue;
             }
         }
     }
 
-    return toObject;
+    return (toObject as Record<string, unknown>);
 }
 
-export function copyArrayTo(fromArray: unknown[], toArray: unknown[]) {
+export function copyArrayTo(fromArray: unknown[], toArray: unknown[]): unknown[] {
     if (!isArray(fromArray)) {
         return toArray;
     }
@@ -422,7 +422,7 @@ export function copyArrayTo(fromArray: unknown[], toArray: unknown[]) {
     return toArray;
 }
 
-export function arrayContainsFieldValue(array: Record<string, unknown>[], fieldName: string, value: unknown): boolean {
+export function arrayContainsFieldValue<T>(array: Record<string, T>[], fieldName: string, value: T): boolean {
     if (!value || !array || !array.length) {
         return false;
     }
@@ -450,8 +450,8 @@ export function objectFieldToArrayItem(object: object): string[] {
     return ret;
 }
 
-export function arrayItemToObjectField(array: string[], value: unknown): Record<string, unknown> {
-    const ret: Record<string, unknown> = {};
+export function arrayItemToObjectField<T>(array: string[], value: T): Record<string, T> {
+    const ret: Record<string, T> = {};
 
     for (let i = 0; i < array.length; i++) {
         ret[array[i]] = value;
@@ -460,8 +460,8 @@ export function arrayItemToObjectField(array: string[], value: unknown): Record<
     return ret;
 }
 
-export function categorizedArrayToPlainArray(object: Record<string, unknown[]>): unknown[] {
-    const ret: unknown[] = [];
+export function categorizedArrayToPlainArray<T>(object: Record<string, T[]>): T[] {
+    const ret: T[] = [];
 
     for (const field in object) {
         if (!Object.prototype.hasOwnProperty.call(object, field)) {
@@ -538,10 +538,10 @@ export function isPrimaryItemHasSecondaryValue(primaryItem: Record<string, Recor
     return false;
 }
 
-export function getPrimaryValueBySecondaryValue(items: Record<string, Record<string, unknown>[]>[] | Record<string, Record<string, Record<string, unknown>[]>>, primarySubItemsField: string, primaryValueField: string, primaryHiddenField: string, secondaryValueField: string, secondaryHiddenField: string, secondaryValue: unknown): unknown {
+export function getPrimaryValueBySecondaryValue<T>(items: Record<string, Record<string, T>[]>[] | Record<string, Record<string, Record<string, T>[]>>, primarySubItemsField: string, primaryValueField: string, primaryHiddenField: string, secondaryValueField: string, secondaryHiddenField: string, secondaryValue: T): Record<string, T>[] | Record<string, Record<string, T>[]> | null {
     if (primarySubItemsField) {
         if (isArray(items)) {
-            const arr = items as Record<string, Record<string, unknown>[]>[];
+            const arr = items as Record<string, Record<string, T>[]>[];
 
             for (let i = 0; i < arr.length; i++) {
                 const primaryItem = arr[i];
@@ -559,7 +559,7 @@ export function getPrimaryValueBySecondaryValue(items: Record<string, Record<str
                 }
             }
         } else {
-            const obj = items as Record<string, Record<string, Record<string, unknown>[]>>;
+            const obj = items as Record<string, Record<string, Record<string, T>[]>>;
 
             for (const field in obj) {
                 if (!Object.prototype.hasOwnProperty.call(obj, field)) {
@@ -586,12 +586,12 @@ export function getPrimaryValueBySecondaryValue(items: Record<string, Record<str
     return null;
 }
 
-export function arrangeArrayWithNewStartIndex(array: unknown[], startIndex: number): unknown[] {
+export function arrangeArrayWithNewStartIndex<T>(array: T[], startIndex: number): T[] {
     if (startIndex <= 0 || startIndex >= array.length) {
         return array;
     }
 
-    const newArray = [];
+    const newArray: T[] = [];
 
     for (let i = startIndex; i < array.length; i++) {
         newArray.push(array[i]);

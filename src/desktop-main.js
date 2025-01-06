@@ -76,7 +76,7 @@ import {
     translateIf,
     translateError,
     i18nFunctions
-} from '@/lib/i18n.js';
+} from '@/locales/helper.js';
 
 import PinCodeInput from '@/components/common/PinCodeInput.vue';
 import MapView from '@/components/common/MapView.vue';

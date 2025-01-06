@@ -12,7 +12,7 @@
 import { type Ref, ref, watch } from 'vue';
 
 import { isObject } from '@/lib/common.ts';
-import { useI18n } from '@/lib/i18n.js';
+import { useI18n } from '@/locales/helper.js';
 
 const emit = defineEmits<{
     (e: 'update:show', value: boolean): void

@@ -84,7 +84,7 @@ import {
     getI18nOptions,
     translateIf,
     i18nFunctions
-} from '@/lib/i18n.js';
+} from '@/locales/helper.js';
 import {
     showAlert,
     showConfirm,

@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { type Ref, ref, watch } from 'vue';
 
-import { useI18n } from '@/lib/i18n.js';
+import { useI18n } from '@/locales/helper.js';
 import { isString } from '@/lib/common.ts';
 
 const props = defineProps<{

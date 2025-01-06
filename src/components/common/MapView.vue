@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import { type Ref, ref, computed, useTemplateRef } from 'vue';
 
-import { useI18n } from '@/lib/i18n.js';
+import { useI18n } from '@/locales/helper.js';
 
 import { copyObjectTo } from '@/lib/common.ts';
 import type { MapInstance, MapPosition } from '@/lib/map/base.ts';

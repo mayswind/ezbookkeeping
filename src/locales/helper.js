@@ -26,7 +26,7 @@ import {
     isBoolean,
     copyObjectTo,
     copyArrayTo
-} from './common.ts';
+} from '@/lib/common.ts';
 
 import {
     isPM,
@@ -43,7 +43,7 @@ import {
     getRecentMonthDateRanges,
     isDateRangeMatchFullYears,
     isDateRangeMatchFullMonths
-} from './datetime.ts';
+} from '@/lib/datetime.ts';
 
 import {
     appendDigitGroupingSymbol,
@@ -51,21 +51,21 @@ import {
     formatAmount,
     formatExchangeRateAmount,
     getAdaptiveDisplayAmountRate
-} from './numeral.ts';
+} from '@/lib/numeral.ts';
 
 import {
     getCurrencyFraction,
     appendCurrencySymbol,
     getAmountPrependAndAppendCurrencySymbol
-} from './currency.ts';
+} from '@/lib/currency.ts';
 
 import {
     getCategorizedAccountsMap,
     getAllFilteredAccountsBalance
-} from './account.js';
+} from '@/lib/account.js';
 
-import logger from './logger.ts';
-import services from './services.ts';
+import logger from '@/lib/logger.ts';
+import services from '@/lib/services.ts';
 
 function getLanguageDisplayName(translateFn, languageName) {
     return translateFn(`language.${languageName}`);

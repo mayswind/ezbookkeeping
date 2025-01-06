@@ -68,7 +68,7 @@
 <script setup lang="ts">
 import { type Ref, ref, computed } from 'vue';
 
-import { useI18n } from '@/lib/i18n.js';
+import { useI18n } from '@/locales/helper.js';
 import { useI18nUIComponents } from '@/lib/ui/mobile.js';
 import { useUserStore } from '@/stores/user.ts';
 

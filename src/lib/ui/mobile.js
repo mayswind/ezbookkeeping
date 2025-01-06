@@ -2,8 +2,9 @@ import { useI18n as useVueI18n } from 'vue-i18n';
 import { f7, f7ready } from 'framework7-vue';
 
 import { FontSize, FONT_SIZE_PREVIEW_CLASSNAME_PREFIX } from '@/core/font.ts';
+import { translateError } from '@/locales/helper';
+
 import { isEnableAnimate } from '../settings.ts';
-import { translateError } from '../i18n.js';
 
 export function showAlert(message, confirmCallback, translateFn) {
     f7ready((f7) => {

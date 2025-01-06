@@ -65,281 +65,295 @@
     </f7-sheet>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
+<script setup lang="ts">
+import { type Ref, ref, computed } from 'vue';
+
+import { useI18n } from '@/lib/i18n.js';
+import { useI18nUIComponents } from '@/lib/ui/mobile.js';
 import { useUserStore } from '@/stores/user.ts';
 
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { isString, isNumber, removeAll } from '@/lib/common.ts';
 
-export default {
-    props: [
-        'modelValue',
-        'minValue',
-        'maxValue',
-        'currency',
-        'show'
-    ],
-    emits: [
-        'update:modelValue',
-        'update:show'
-    ],
-    data() {
-        const self = this;
-        const userStore = useUserStore();
+const {
+    tt,
+    getCurrentDecimalSeparator,
+    getCurrentDigitGroupingSymbol,
+    appendDigitGroupingSymbol,
+    parseAmount,
+    formatAmount
+} = useI18n();
+const { showToast } = useI18nUIComponents();
+const userStore = useUserStore();
 
-        return {
-            previousValue: '',
-            currentSymbol: '',
-            currentValue: self.getStringValue(userStore, self.modelValue)
+const props = defineProps<{
+    modelValue: number | string;
+    minValue?: number;
+    maxValue?: number;
+    currency?: string;
+    show: boolean;
+}>();
+
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: number): void,
+    (e: 'update:show', value: boolean): void
+}>();
+
+const previousValue: Ref<string> = ref('');
+const currentSymbol: Ref<string> = ref('');
+const currentValue: Ref<string> = ref(getStringValue(props.modelValue));
+
+const decimalSeparator = computed<string>(() => getCurrentDecimalSeparator(userStore));
+
+const supportDecimalSeparator = computed<boolean>(() => {
+    if (!props.currency || !ALL_CURRENCIES[props.currency] || !isNumber(ALL_CURRENCIES[props.currency].fraction)) {
+        return true;
+    }
+
+    return (ALL_CURRENCIES[props.currency].fraction as number) > 0;
+});
+
+const currentDisplay = computed<string>(() => {
+    const finalPreviousValue = appendDigitGroupingSymbol(userStore, previousValue.value);
+    const finalCurrentValue = appendDigitGroupingSymbol(userStore, currentValue.value);
+
+    if (currentSymbol.value) {
+        return `${finalPreviousValue} ${currentSymbol.value} ${finalCurrentValue}`;
+    } else {
+        return finalCurrentValue;
+    }
+});
+
+const currentDisplayNumClass = computed<string>(() => {
+    if (currentDisplay.value && currentDisplay.value.length >= 24) {
+        return 'numpad-value-small';
+    } else if (currentDisplay.value && currentDisplay.value.length >= 16) {
+        return 'numpad-value-normal';
+    } else {
+        return 'numpad-value-large';
+    }
+});
+
+const confirmText = computed<string>(() => {
+    if (currentSymbol.value) {
+        return '=';
+    } else {
+        return tt('OK');
+    }
+});
+
+function getStringValue(value: number | string): string {
+    if (!isNumber(value) && !isString(value)) {
+        return '';
+    }
+
+    let str = formatAmount(userStore, value, props.currency);
+
+    const digitGroupingSymbol = getCurrentDigitGroupingSymbol(userStore);
+
+    if (str.indexOf(digitGroupingSymbol) >= 0) {
+        str = removeAll(str, digitGroupingSymbol);
+    }
+
+    const decimalSeparator = getCurrentDecimalSeparator(userStore);
+    const decimalSeparatorPos = str.indexOf(decimalSeparator);
+
+    if (decimalSeparatorPos < 0) {
+        if (str === '0') {
+            return '';
         }
-    },
-    computed: {
-        ...mapStores(useUserStore),
-        decimalSeparator() {
-            return this.$locale.getCurrentDecimalSeparator(this.userStore);
-        },
-        supportDecimalSeparator() {
-            if (!this.currency || !ALL_CURRENCIES[this.currency] || !isNumber(ALL_CURRENCIES[this.currency].fraction)) {
-                return true;
-            }
 
-            return ALL_CURRENCIES[this.currency].fraction > 0;
-        },
-        currentDisplay() {
-            const previousValue = this.$locale.appendDigitGroupingSymbol(this.userStore, this.previousValue);
-            const currentValue = this.$locale.appendDigitGroupingSymbol(this.userStore, this.currentValue);
+        return str;
+    }
 
-            if (this.currentSymbol) {
-                return `${previousValue} ${this.currentSymbol} ${currentValue}`;
-            } else {
-                return currentValue;
-            }
-        },
-        currentDisplayNumClass() {
-            const currentDisplay = this.currentDisplay || '';
+    const integer = str.substring(0, decimalSeparatorPos);
+    const decimals = str.substring(decimalSeparatorPos + 1, str.length);
+    let newDecimals = '';
 
-            if (currentDisplay.length >= 24) {
-                return 'numpad-value-small';
-            } else if (currentDisplay.length >= 16) {
-                return 'numpad-value-normal';
-            } else {
-                return 'numpad-value-large';
-            }
-        },
-        confirmText() {
-            if (this.currentSymbol) {
-                return '=';
-            } else {
-                return this.$t('OK');
-            }
-        }
-    },
-    methods: {
-        getStringValue(userStore, value) {
-            if (!isNumber(value) && !isString(value)) {
-                return '';
-            }
-
-            let str = this.$locale.formatAmount(userStore, value, this.currency);
-
-            const digitGroupingSymbol = this.$locale.getCurrentDigitGroupingSymbol(userStore);
-
-            if (str.indexOf(digitGroupingSymbol) >= 0) {
-                str = removeAll(str, digitGroupingSymbol);
-            }
-
-            const decimalSeparator = this.$locale.getCurrentDecimalSeparator(userStore);
-            const decimalSeparatorPos = str.indexOf(decimalSeparator);
-
-            if (decimalSeparatorPos < 0) {
-                if (str === '0') {
-                    return '';
-                }
-
-                return str;
-            }
-
-            const integer = str.substring(0, decimalSeparatorPos);
-            const decimals = str.substring(decimalSeparatorPos + 1, str.length);
-            let newDecimals = '';
-
-            for (let i = decimals.length - 1; i >= 0; i--) {
-                if (decimals[i] !== '0' || newDecimals.length > 0) {
-                    newDecimals = decimals[i] + newDecimals;
-                }
-            }
-
-            if (newDecimals.length < 1) {
-                if (integer === '0') {
-                    return '';
-                }
-
-                return integer;
-            }
-
-            return `${integer}${decimalSeparator}${newDecimals}`;
-        },
-        inputNum(num) {
-            if (!this.previousValue && this.currentSymbol === '−') {
-                this.currentValue = '-' + this.currentValue;
-                this.currentSymbol = '';
-            }
-
-            if (this.currentValue === '0') {
-                this.currentValue = num.toString();
-                return;
-            } else if (this.currentValue === '-0') {
-                this.currentValue = '-' + num.toString();
-                return;
-            }
-
-            const decimalSeparatorPos = this.currentValue.indexOf(this.decimalSeparator);
-
-            if (decimalSeparatorPos >= 0 && this.currentValue.substring(decimalSeparatorPos + 1, this.currentValue.length).length >= 2) {
-                return;
-            }
-
-            const newValue = this.currentValue + num.toString();
-
-            if (isNumber(this.minValue)) {
-                const current = this.$locale.parseAmount(this.userStore, newValue);
-
-                if (current < this.minValue) {
-                    return;
-                }
-            }
-
-            if (isNumber(this.maxValue)) {
-                const current = this.$locale.parseAmount(this.userStore, newValue);
-
-                if (current > this.maxValue) {
-                    return;
-                }
-            }
-
-            this.currentValue = newValue;
-        },
-        inputDoubleNum(num) {
-            this.inputNum(num);
-            this.inputNum(num);
-        },
-        inputDecimalSeparator() {
-            if (this.currentValue.indexOf(this.decimalSeparator) >= 0) {
-                return;
-            }
-
-            if (!this.previousValue && this.currentSymbol === '−') {
-                this.currentValue = '-' + this.currentValue;
-                this.currentSymbol = '';
-            }
-
-            if (this.currentValue.length < 1) {
-                this.currentValue = '0';
-            } else if (this.currentValue === '-') {
-                this.currentValue = '-0';
-            }
-
-            this.currentValue = this.currentValue + this.decimalSeparator;
-        },
-        setSymbol(symbol) {
-            if (this.currentValue) {
-                if (this.currentSymbol) {
-                    const lastFormulaCalcResult = this.confirm();
-
-                    if (!lastFormulaCalcResult) {
-                        return;
-                    }
-                }
-
-                this.previousValue = this.currentValue;
-                this.currentValue = '';
-            }
-
-            this.currentSymbol = symbol;
-        },
-        backspace() {
-            if (!this.currentValue || this.currentValue.length < 1) {
-                if (this.currentSymbol) {
-                    this.currentValue = this.previousValue;
-                    this.previousValue = '';
-                    this.currentSymbol = '';
-                }
-
-                return;
-            }
-
-            this.currentValue = this.currentValue.substring(0, this.currentValue.length - 1);
-        },
-        clear() {
-            this.currentValue = '';
-            this.previousValue = '';
-            this.currentSymbol = '';
-        },
-        confirm() {
-            if (this.currentSymbol && this.currentValue.length >= 1) {
-                const previousValue = this.$locale.parseAmount(this.userStore, this.previousValue);
-                const currentValue = this.$locale.parseAmount(this.userStore, this.currentValue);
-                let finalValue = 0;
-
-                switch (this.currentSymbol) {
-                    case '+':
-                        finalValue = previousValue + currentValue;
-                        break;
-                    case '−':
-                        finalValue = previousValue - currentValue;
-                        break;
-                    case '×':
-                        finalValue = Math.round(previousValue * currentValue / 100);
-                        break;
-                    default:
-                        finalValue = previousValue;
-                }
-
-                if (isNumber(this.minValue)) {
-                    if (finalValue < this.minValue) {
-                        this.$toast('Numeric Overflow');
-                        return false;
-                    }
-                }
-
-                if (isNumber(this.maxValue)) {
-                    if (finalValue > this.maxValue) {
-                        this.$toast('Numeric Overflow');
-                        return false;
-                    }
-                }
-
-                this.currentValue = this.getStringValue(this.userStore, finalValue);
-                this.previousValue = '';
-                this.currentSymbol = '';
-
-                return true;
-            } else if (this.currentSymbol && this.currentValue.length < 1) {
-                this.currentValue = this.previousValue;
-                this.previousValue = '';
-                this.currentSymbol = '';
-
-                return true;
-            } else {
-                const value = this.$locale.parseAmount(this.userStore, this.currentValue);
-
-                this.$emit('update:modelValue', value);
-                this.close();
-
-                return true;
-            }
-        },
-        close() {
-            this.$emit('update:show', false);
-        },
-        onSheetOpen() {
-            this.currentValue = this.getStringValue(this.userStore, this.modelValue);
-        },
-        onSheetClosed() {
-            this.close();
+    for (let i = decimals.length - 1; i >= 0; i--) {
+        if (decimals[i] !== '0' || newDecimals.length > 0) {
+            newDecimals = decimals[i] + newDecimals;
         }
     }
+
+    if (newDecimals.length < 1) {
+        if (integer === '0') {
+            return '';
+        }
+
+        return integer;
+    }
+
+    return `${integer}${decimalSeparator}${newDecimals}`;
+}
+
+function inputNum(num: number): void {
+    if (!previousValue.value && currentSymbol.value === '−') {
+        currentValue.value = '-' + currentValue.value;
+        currentSymbol.value = '';
+    }
+
+    if (currentValue.value === '0') {
+        currentValue.value = num.toString();
+        return;
+    } else if (currentValue.value === '-0') {
+        currentValue.value = '-' + num.toString();
+        return;
+    }
+
+    const decimalSeparatorPos = currentValue.value.indexOf(decimalSeparator.value);
+
+    if (decimalSeparatorPos >= 0 && currentValue.value.substring(decimalSeparatorPos + 1, currentValue.value.length).length >= 2) {
+        return;
+    }
+
+    const newValue = currentValue.value + num.toString();
+
+    if (isNumber(props.minValue)) {
+        const current = parseAmount(userStore, newValue);
+
+        if (current < (props.minValue as number)) {
+            return;
+        }
+    }
+
+    if (isNumber(props.maxValue)) {
+        const current = parseAmount(userStore, newValue);
+
+        if (current > (props.maxValue as number)) {
+            return;
+        }
+    }
+
+    currentValue.value = newValue;
+}
+
+function inputDoubleNum(num: number): void {
+    inputNum(num);
+    inputNum(num);
+}
+
+function inputDecimalSeparator(): void {
+    if (currentValue.value.indexOf(decimalSeparator.value) >= 0) {
+        return;
+    }
+
+    if (!previousValue.value && currentSymbol.value === '−') {
+        currentValue.value = '-' + currentValue.value;
+        currentSymbol.value = '';
+    }
+
+    if (currentValue.value.length < 1) {
+        currentValue.value = '0';
+    } else if (currentValue.value === '-') {
+        currentValue.value = '-0';
+    }
+
+    currentValue.value = currentValue.value + decimalSeparator.value;
+}
+
+function setSymbol(symbol: string): void {
+    if (currentValue.value) {
+        if (currentSymbol.value) {
+            const lastFormulaCalcResult = confirm();
+
+            if (!lastFormulaCalcResult) {
+                return;
+            }
+        }
+
+        previousValue.value = currentValue.value;
+        currentValue.value = '';
+    }
+
+    currentSymbol.value = symbol;
+}
+
+function backspace(): void {
+    if (!currentValue.value || currentValue.value.length < 1) {
+        if (currentSymbol.value) {
+            currentValue.value = previousValue.value;
+            previousValue.value = '';
+            currentSymbol.value = '';
+        }
+
+        return;
+    }
+
+    currentValue.value = currentValue.value.substring(0, currentValue.value.length - 1);
+}
+
+function clear(): void {
+    currentValue.value = '';
+    previousValue.value = '';
+    currentSymbol.value = '';
+}
+
+function confirm(): boolean {
+    if (currentSymbol.value && currentValue.value.length >= 1) {
+        const previous = parseAmount(userStore, previousValue.value);
+        const current = parseAmount(userStore, currentValue.value);
+        let finalValue = 0;
+
+        switch (currentSymbol.value) {
+            case '+':
+                finalValue = previous + current;
+                break;
+            case '−':
+                finalValue = previous - current;
+                break;
+            case '×':
+                finalValue = Math.round(previous * current / 100);
+                break;
+            default:
+                finalValue = previous;
+        }
+
+        if (isNumber(props.minValue)) {
+            if (finalValue < (props.minValue as number)) {
+                showToast('Numeric Overflow');
+                return false;
+            }
+        }
+
+        if (isNumber(props.maxValue)) {
+            if (finalValue > (props.maxValue as number)) {
+                showToast('Numeric Overflow');
+                return false;
+            }
+        }
+
+        currentValue.value = getStringValue(finalValue);
+        previousValue.value = '';
+        currentSymbol.value = '';
+
+        return true;
+    } else if (currentSymbol.value && currentValue.value.length < 1) {
+        currentValue.value = previousValue.value;
+        previousValue.value = '';
+        currentSymbol.value = '';
+
+        return true;
+    } else {
+        const value = parseAmount(userStore, currentValue.value);
+
+        emit('update:modelValue', value);
+        close();
+
+        return true;
+    }
+}
+
+function close(): void {
+    emit('update:show', false);
+}
+
+function onSheetOpen(): void {
+    currentValue.value = getStringValue(props.modelValue);
+}
+
+function onSheetClosed(): void {
+    close();
 }
 </script>
 

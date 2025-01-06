@@ -273,7 +273,7 @@ export function getFirstVisibleItem<T>(items: Record<string, T>[] | Record<strin
     return null;
 }
 
-export function getItemByKeyValue <T>(src: Record<string, T>[] | Record<string, Record<string, T>>, value: T, keyField: string): Record<string, T> | null {
+export function getItemByKeyValue<T>(src: Record<string, T>[] | Record<string, Record<string, T>>, value: T, keyField: string): Record<string, T> | null {
     if (isArray(src)) {
         const arr = src as Record<string, T>[];
 

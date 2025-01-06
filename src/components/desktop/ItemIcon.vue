@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { type CommonIconProps, useItemIcon } from '@/components/base/itemIcon.ts';
+import { type CommonIconProps, useItemIcon } from '@/components/base/ItemIcon.ts';
 
 import {
     mdiEyeOffOutline

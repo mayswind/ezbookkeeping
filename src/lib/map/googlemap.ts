@@ -47,7 +47,7 @@ export class GoogleMapInstance implements MapInstance {
     private googleMapInstance: unknown = null;
     private googleMapCenterMarker: unknown | null;
 
-    constructor() {
+    public constructor() {
         this.dependencyLoaded = !!GoogleMapProvider.GoogleMap;
     }
 

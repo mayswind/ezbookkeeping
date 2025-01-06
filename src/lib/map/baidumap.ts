@@ -54,7 +54,7 @@ export class BaiduMapInstance implements MapInstance {
     private baiduMapCenterPosition: unknown = null;
     private baiduMapCenterMarker: unknown | null;
 
-    constructor() {
+    public constructor() {
         this.dependencyLoaded = !!BaiduMapProvider.BMap;
     }
 

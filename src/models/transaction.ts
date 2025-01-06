@@ -149,7 +149,7 @@ export class TransactionAmountsRequest {
     public readonly useTransactionTimezone: boolean;
     public readonly query: string;
 
-    constructor(useTransactionTimezone: boolean, query: string) {
+    public constructor(useTransactionTimezone: boolean, query: string) {
         this.useTransactionTimezone = useTransactionTimezone;
         this.query = query;
     }

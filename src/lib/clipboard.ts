@@ -15,7 +15,7 @@ export interface ClipboardEvent {
 export class ClipboardTextHolder {
     private text: string;
 
-    constructor(text: string) {
+    public constructor(text: string) {
         this.text = text;
     }
 

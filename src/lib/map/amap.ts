@@ -64,7 +64,7 @@ export class AmapMapInstance implements MapInstance {
     private amapCenterPosition: unknown = null;
     private amapCenterMarker: unknown | null;
 
-    constructor() {
+    public constructor() {
         this.dependencyLoaded = !!AmapMapProvider.AMap;
     }
 

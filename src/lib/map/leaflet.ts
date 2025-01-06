@@ -71,7 +71,7 @@ export class LeafletMapInstance implements MapInstance {
     private leafletAttribution: unknown | null;
     private leafletCenterMarker: unknown | null;
 
-    constructor(mapProvider: string, mapTileSource: LeafletTileSource) {
+    public constructor(mapProvider: string, mapTileSource: LeafletTileSource) {
         this.dependencyLoaded = !!LeafletMapProvider.Leaflet;
 
         this.mapProvider = mapProvider;

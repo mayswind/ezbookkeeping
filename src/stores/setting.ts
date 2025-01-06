@@ -154,8 +154,10 @@ export const useSettingsStore = defineStore('settings', () => {
     }
 
     return {
+        // states
         appSettings,
         localeDefaultSettings,
+        // functions
         setTheme,
         setFontSize,
         setTimeZone,

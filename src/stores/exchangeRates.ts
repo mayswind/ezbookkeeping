@@ -142,9 +142,9 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
     }
 
     return {
-        // state
+        // states
         latestExchangeRates,
-        // computed state
+        // computed states
         exchangeRatesLastUpdateTime,
         latestExchangeRateMap,
         // functions

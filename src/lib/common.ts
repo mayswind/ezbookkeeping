@@ -303,7 +303,7 @@ export function getItemByKeyValue<T>(src: Record<string, T>[] | Record<string, R
     return null;
 }
 
-export function getNameByKeyValue<T>(src: Record<string, T>[] | Record<string, Record<string, T>>, value: T, keyField: string, nameField: string, defaultName: T): T {
+export function getNameByKeyValue<T>(src: Record<string, T>[] | Record<string, Record<string, T>>, value: T, keyField: string | null, nameField: string, defaultName: T): T {
     if (isArray(src)) {
         const arr = src as Record<string, T>[];
 
@@ -339,11 +339,11 @@ export function getNameByKeyValue<T>(src: Record<string, T>[] | Record<string, R
                     return option[nameField];
                 }
             }
-        } else if (isNumber(value)) {
-            const index = value as number;
+        } else if (isString(value)) {
+            const key = value as string;
 
-            if (obj[index]) {
-                const option = obj[index];
+            if (obj[key]) {
+                const option = obj[key];
 
                 return option[nameField];
             }

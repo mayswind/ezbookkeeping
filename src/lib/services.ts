@@ -1,5 +1,7 @@
 import axios, { type AxiosRequestConfig, type AxiosRequestHeaders, type AxiosResponse } from 'axios';
 
+import type { ApiResponse } from '@/core/api.ts';
+
 import {
     BASE_API_URL_PATH,
     BASE_QRCODE_PATH,
@@ -133,11 +135,6 @@ interface ApiRequestConfig extends AxiosRequestConfig {
     ignoreBlocked?: boolean;
     ignoreError?: boolean;
     timeout?: number;
-}
-
-interface ApiResponse<T> {
-    readonly success: boolean;
-    readonly result: T;
 }
 
 type ApiResponsePromise<T> = Promise<AxiosResponse<ApiResponse<T>>>;

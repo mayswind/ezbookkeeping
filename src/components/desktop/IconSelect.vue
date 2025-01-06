@@ -40,7 +40,7 @@
 import { type Ref, ref, computed, useTemplateRef, nextTick } from 'vue';
 
 import type { ColorValue } from '@/core/color.ts';
-import type {IconInfo, IconInfoWithId} from '@/core/icon.ts';
+import type { IconInfo, IconInfoWithId } from '@/core/icon.ts';
 import { arrayContainsFieldValue } from '@/lib/common.ts';
 import { getIconsInRows } from '@/lib/icon.ts';
 import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';

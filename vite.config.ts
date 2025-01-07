@@ -174,14 +174,16 @@ export default defineConfig(() => {
                             return 'vendor-desktop';
                         } else if (/[\\/]node_modules[\\/]/i.test(id)) {
                             return 'vendor-common';
-                        } else if (/[\\/]src[\\/]locales[\\/]/i.test(id)) {
-                            return 'locales';
                         } else if (/[\\/]src[\\/](core|consts|models|stores)[\\/]/i.test(id)) {
                             return 'common';
                         } else if (/[\\/]src[\\/]lib[\\/](map[\\/]|ui[\\/]common|[a-zA-Z0-9-_]+\.(js|ts))/i.test(id)) {
                             return 'common';
                         } else if (/[\\/]src[\\/]components[\\/](base|common)[\\/]/i.test(id)) {
                             return 'common';
+                        } else if (/[\\/]src[\\/]locales[\\/]helper\.(js|ts)/i.test(id)) {
+                            return 'common';
+                        } else if (/[\\/]src[\\/]locales[\\/]/i.test(id)) {
+                            return 'locales';
                         } else {
                             return null;
                         }

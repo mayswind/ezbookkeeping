@@ -28,61 +28,59 @@
     </f7-sheet>
 </template>
 
-<script>
+<script setup lang="ts">
+import { type Ref, ref, computed } from 'vue';
+
+import type { IconInfo, IconInfoWithId } from '@/core/icon.ts';
 import { arrayContainsFieldValue } from '@/lib/common.ts';
 import { getIconsInRows } from '@/lib/icon.ts';
 import { scrollToSelectedItem } from '@/lib/ui/mobile.js';
 
-export default {
-    props: [
-        'modelValue',
-        'color',
-        'columnCount',
-        'show',
-        'allIconInfos'
-    ],
-    emits: [
-        'update:modelValue',
-        'update:show'
-    ],
-    data() {
-        const self = this;
+const props = defineProps<{
+    modelValue: string;
+    show: boolean;
+    columnCount?: number;
+    color: string;
+    allIconInfos: Record<string, IconInfo>;
+}>();
 
-        return {
-            currentValue: self.modelValue,
-            itemPerRow: self.columnCount || 7
-        }
-    },
-    computed: {
-        allIconRows() {
-            return getIconsInRows(this.allIconInfos, this.itemPerRow);
-        },
-        heightClass() {
-            if (this.allIconRows.length > 10) {
-                return 'icon-selection-huge-sheet';
-            } else if (this.allIconRows.length > 6) {
-                return 'icon-selection-large-sheet';
-            } else {
-                return '';
-            }
-        }
-    },
-    methods: {
-        onIconClicked(iconInfo) {
-            this.currentValue = iconInfo.id;
-            this.$emit('update:modelValue', this.currentValue);
-        },
-        onSheetOpen(event) {
-            this.currentValue = this.modelValue;
-            scrollToSelectedItem(event.$el, '.page-content', '.row-has-selected-item');
-        },
-        onSheetClosed() {
-            this.$emit('update:show', false);
-        },
-        hasSelectedIcon(row) {
-            return arrayContainsFieldValue(row, 'id', this.currentValue);
-        }
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: string): void
+    (e: 'update:show', value: boolean): void
+}>();
+
+const currentValue: Ref<string> = ref(props.modelValue);
+const itemPerRow: Ref<number> = ref(props.columnCount || 7);
+
+const allIconRows = computed<IconInfoWithId[][]>(() => {
+    return getIconsInRows(props.allIconInfos, itemPerRow.value);
+});
+
+const heightClass = computed<string>(() => {
+    if (allIconRows.value.length > 10) {
+        return 'icon-selection-huge-sheet';
+    } else if (allIconRows.value.length > 6) {
+        return 'icon-selection-large-sheet';
+    } else {
+        return '';
     }
+});
+
+function onIconClicked(iconInfo: IconInfoWithId) {
+    currentValue.value = iconInfo.id;
+    emit('update:modelValue', currentValue.value);
+}
+
+function hasSelectedIcon(row: IconInfoWithId[]) {
+    return arrayContainsFieldValue(row, 'id', currentValue.value);
+}
+
+function onSheetOpen(event: { $el: HTMLElement }) {
+    scrollToSelectedItem(event.$el, '.page-content', '.row-has-selected-item');
+}
+
+function onSheetClosed() {
+    emit('update:show', false);
 }
 </script>
 

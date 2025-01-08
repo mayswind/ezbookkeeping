@@ -28,50 +28,48 @@
     </f7-sheet>
 </template>
 
-<script>
+<script setup lang="ts">
+import { type Ref, ref, computed } from 'vue';
+
+import type { ColorValue, ColorInfo } from '@/core/color.ts';
 import { arrayContainsFieldValue } from '@/lib/common.ts';
 import { getColorsInRows } from '@/lib/color.ts';
 import { scrollToSelectedItem } from '@/lib/ui/mobile.js';
 
-export default {
-    props: [
-        'modelValue',
-        'columnCount',
-        'show',
-        'allColorInfos'
-    ],
-    emits: [
-        'update:modelValue',
-        'update:show'
-    ],
-    data() {
-        const self = this;
+const props = defineProps<{
+    modelValue: ColorValue;
+    show: boolean;
+    columnCount?: number;
+    allColorInfos: ColorValue[];
+}>();
 
-        return {
-            currentValue: self.modelValue,
-            itemPerRow: self.columnCount || 7
-        }
-    },
-    computed: {
-        allColorRows() {
-            return getColorsInRows(this.allColorInfos, this.itemPerRow);
-        }
-    },
-    methods: {
-        onColorClicked(colorInfo) {
-            this.currentValue = colorInfo.color;
-            this.$emit('update:modelValue', this.currentValue);
-        },
-        onSheetOpen(event) {
-            this.currentValue = this.modelValue;
-            scrollToSelectedItem(event.$el, '.page-content', '.row-has-selected-item');
-        },
-        onSheetClosed() {
-            this.$emit('update:show', false);
-        },
-        hasSelectedIcon(row) {
-            return arrayContainsFieldValue(row, 'id', this.currentValue);
-        }
-    }
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: ColorValue): void
+    (e: 'update:show', value: boolean): void
+}>();
+
+const currentValue: Ref<ColorValue> = ref(props.modelValue);
+const itemPerRow: Ref<number> = ref(props.columnCount || 7);
+
+const allColorRows = computed<ColorInfo[][]>(() => {
+    return getColorsInRows(props.allColorInfos, itemPerRow.value);
+});
+
+function onColorClicked(colorInfo: ColorInfo) {
+    currentValue.value = colorInfo.color;
+    emit('update:modelValue', currentValue.value);
+}
+
+function hasSelectedIcon(row: ColorInfo[]) {
+    return arrayContainsFieldValue(row, 'id', currentValue.value);
+}
+
+function onSheetOpen(event: { $el: HTMLElement }) {
+    currentValue.value = props.modelValue;
+    scrollToSelectedItem(event.$el, '.page-content', '.row-has-selected-item');
+}
+
+function onSheetClosed() {
+    emit('update:show', false);
 }
 </script>

@@ -1,6 +1,6 @@
 import uaParser from 'ua-parser-js';
 
-function isMobileDevice() {
+function isMobileDevice(): boolean {
     if (!navigator.userAgent) {
         return false;
     }
@@ -20,8 +20,8 @@ function isMobileDevice() {
     return false;
 }
 
-function navigate(type) {
-    if (process.env.NODE_ENV === 'production') {
+function navigate(type: string): void {
+    if (__EZBOOKKEEPING_IS_PRODUCTION__) {
         window.location.replace(`${type}/`);
     } else {
         window.location.replace(`${type}.html`);

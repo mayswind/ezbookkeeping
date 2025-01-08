@@ -7,7 +7,7 @@ import { useTransactionCategoriesStore } from './transactionCategory.js';
 import { useTransactionTagsStore } from './transactionTag.js';
 import { useTransactionTemplatesStore } from './transactionTemplate.js';
 import { useTransactionsStore } from './transaction.js';
-import { useOverviewStore } from './overview.js';
+import { useOverviewStore } from './overview.ts';
 import { useStatisticsStore } from './statistics.js';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 

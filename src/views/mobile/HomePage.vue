@@ -205,7 +205,7 @@ import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
-import { useOverviewStore } from '@/stores/overview.js';
+import { useOverviewStore } from '@/stores/overview.ts';
 
 import { DateRange } from '@/core/datetime.ts';
 import { TemplateType } from '@/core/template.ts';

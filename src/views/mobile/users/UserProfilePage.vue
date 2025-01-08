@@ -337,7 +337,7 @@ import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.js';
-import { useOverviewStore } from '@/stores/overview.js';
+import { useOverviewStore } from '@/stores/overview.ts';
 
 import { getNameByKeyValue } from '@/lib/common.ts';
 import { getCategorizedAccounts } from '@/lib/account.js';

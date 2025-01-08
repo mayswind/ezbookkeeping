@@ -25,6 +25,11 @@ export interface StartEndTime {
     readonly endTime: number;
 }
 
+export interface WritableStartEndTime extends StartEndTime {
+    startTime: number;
+    endTime: number;
+}
+
 export interface UnixTimeRange {
     readonly minUnixTime: number;
     readonly maxUnixTime: number;

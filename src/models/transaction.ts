@@ -1,3 +1,4 @@
+import type { PartialRecord } from '@/core/base.ts';
 import type { StartEndTime } from '@/core/datetime.ts';
 
 import type { AccountInfoResponse } from './account.ts';
@@ -126,23 +127,32 @@ export interface TransactionStatisticTrendsRequest extends YearMonthRangeRequest
     readonly useTransactionTimezone: boolean;
 }
 
-export interface TransactionAmountsRequestParams {
+export const ALL_TRANSACTION_AMOUNTS_REQUEST_TYPE = [
+    'today', 'thisWeek', 'thisMonth', 'thisYear', 'lastMonth',
+    'monthBeforeLastMonth', 'monthBeforeLast2Months', 'monthBeforeLast3Months',
+    'monthBeforeLast4Months', 'monthBeforeLast5Months', 'monthBeforeLast6Months',
+    'monthBeforeLast7Months', 'monthBeforeLast8Months', 'monthBeforeLast9Months', 'monthBeforeLast10Months'
+] as const;
+
+export type TransactionAmountsRequestType = typeof ALL_TRANSACTION_AMOUNTS_REQUEST_TYPE[number];
+
+export interface TransactionAmountsRequestParams extends PartialRecord<TransactionAmountsRequestType, StartEndTime> {
     readonly useTransactionTimezone: boolean;
-    readonly today: StartEndTime;
-    readonly thisWeek: StartEndTime;
-    readonly thisMonth: StartEndTime;
-    readonly thisYear: StartEndTime;
-    readonly lastMonth: StartEndTime;
-    readonly monthBeforeLastMonth: StartEndTime;
-    readonly monthBeforeLast2Months: StartEndTime;
-    readonly monthBeforeLast3Months: StartEndTime;
-    readonly monthBeforeLast4Months: StartEndTime;
-    readonly monthBeforeLast5Months: StartEndTime;
-    readonly monthBeforeLast6Months: StartEndTime;
-    readonly monthBeforeLast7Months: StartEndTime;
-    readonly monthBeforeLast8Months: StartEndTime;
-    readonly monthBeforeLast9Months: StartEndTime;
-    readonly monthBeforeLast10Months: StartEndTime;
+    today?: StartEndTime;
+    thisWeek?: StartEndTime;
+    thisMonth?: StartEndTime;
+    thisYear?: StartEndTime;
+    lastMonth?: StartEndTime;
+    monthBeforeLastMonth?: StartEndTime;
+    monthBeforeLast2Months?: StartEndTime;
+    monthBeforeLast3Months?: StartEndTime;
+    monthBeforeLast4Months?: StartEndTime;
+    monthBeforeLast5Months?: StartEndTime;
+    monthBeforeLast6Months?: StartEndTime;
+    monthBeforeLast7Months?: StartEndTime;
+    monthBeforeLast8Months?: StartEndTime;
+    monthBeforeLast9Months?: StartEndTime;
+    monthBeforeLast10Months?: StartEndTime;
 }
 
 export class TransactionAmountsRequest {
@@ -159,67 +169,13 @@ export class TransactionAmountsRequest {
     }
 
     public static of(params: TransactionAmountsRequestParams): TransactionAmountsRequest {
-        const queryParams = [];
+        const queryParams: string[] = [];
 
-        if (params.today) {
-            queryParams.push(`today_${params.today.startTime}_${params.today.endTime}`);
-        }
-
-        if (params.thisWeek) {
-            queryParams.push(`thisWeek_${params.thisWeek.startTime}_${params.thisWeek.endTime}`);
-        }
-
-        if (params.thisMonth) {
-            queryParams.push(`thisMonth_${params.thisMonth.startTime}_${params.thisMonth.endTime}`);
-        }
-
-        if (params.thisYear) {
-            queryParams.push(`thisYear_${params.thisYear.startTime}_${params.thisYear.endTime}`);
-        }
-
-        if (params.lastMonth) {
-            queryParams.push(`lastMonth_${params.lastMonth.startTime}_${params.lastMonth.endTime}`);
-        }
-
-        if (params.monthBeforeLastMonth) {
-            queryParams.push(`monthBeforeLastMonth_${params.monthBeforeLastMonth.startTime}_${params.monthBeforeLastMonth.endTime}`);
-        }
-
-        if (params.monthBeforeLast2Months) {
-            queryParams.push(`monthBeforeLast2Months_${params.monthBeforeLast2Months.startTime}_${params.monthBeforeLast2Months.endTime}`);
-        }
-
-        if (params.monthBeforeLast3Months) {
-            queryParams.push(`monthBeforeLast3Months_${params.monthBeforeLast3Months.startTime}_${params.monthBeforeLast3Months.endTime}`);
-        }
-
-        if (params.monthBeforeLast4Months) {
-            queryParams.push(`monthBeforeLast4Months_${params.monthBeforeLast4Months.startTime}_${params.monthBeforeLast4Months.endTime}`);
-        }
-
-        if (params.monthBeforeLast5Months) {
-            queryParams.push(`monthBeforeLast5Months_${params.monthBeforeLast5Months.startTime}_${params.monthBeforeLast5Months.endTime}`);
-        }
-
-        if (params.monthBeforeLast6Months) {
-            queryParams.push(`monthBeforeLast6Months_${params.monthBeforeLast6Months.startTime}_${params.monthBeforeLast6Months.endTime}`);
-        }
-
-        if (params.monthBeforeLast7Months) {
-            queryParams.push(`monthBeforeLast7Months_${params.monthBeforeLast7Months.startTime}_${params.monthBeforeLast7Months.endTime}`);
-        }
-
-        if (params.monthBeforeLast8Months) {
-            queryParams.push(`monthBeforeLast8Months_${params.monthBeforeLast8Months.startTime}_${params.monthBeforeLast8Months.endTime}`);
-        }
-
-        if (params.monthBeforeLast9Months) {
-            queryParams.push(`monthBeforeLast9Months_${params.monthBeforeLast9Months.startTime}_${params.monthBeforeLast9Months.endTime}`);
-        }
-
-        if (params.monthBeforeLast10Months) {
-            queryParams.push(`monthBeforeLast10Months_${params.monthBeforeLast10Months.startTime}_${params.monthBeforeLast10Months.endTime}`);
-        }
+        ALL_TRANSACTION_AMOUNTS_REQUEST_TYPE.forEach((type) => {
+            if (params[type]) {
+                queryParams.push(`${type}_${params[type].startTime}_${params[type].endTime}`);
+            }
+        });
 
         return new TransactionAmountsRequest(params.useTransactionTimezone, (queryParams.length ? queryParams.join('|') : ''));
     }
@@ -254,6 +210,8 @@ export interface TransactionStatisticTrendsItem {
     readonly items: TransactionStatisticResponseItem[];
 }
 
+export type TransactionAmountsResponse = PartialRecord<TransactionAmountsRequestType, TransactionAmountsResponseItem>;
+
 export interface TransactionAmountsResponseItem {
     readonly startTime: number;
     readonly endTime: number;
@@ -264,4 +222,15 @@ export interface TransactionAmountsResponseItemAmountInfo {
     readonly currency: string;
     readonly incomeAmount: number;
     readonly expenseAmount: number;
+}
+
+export type TransactionOverviewResponse = PartialRecord<TransactionAmountsRequestType, TransactionOverviewResponseItem>;
+
+export interface TransactionOverviewResponseItem {
+    valid: boolean;
+    incomeAmount: number;
+    expenseAmount: number;
+    incompleteIncomeAmount: boolean;
+    incompleteExpenseAmount: boolean;
+    amounts?: TransactionAmountsResponseItemAmountInfo[];
 }

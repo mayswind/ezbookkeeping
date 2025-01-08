@@ -68,7 +68,7 @@
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useTransactionsStore } from '@/stores/transaction.js';
-import { useOverviewStore } from '@/stores/overview.js';
+import { useOverviewStore } from '@/stores/overview.ts';
 
 export default {
     computed: {

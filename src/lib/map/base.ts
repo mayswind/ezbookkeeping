@@ -1,6 +1,6 @@
 export interface MapProvider {
     getWebsite(): string;
-    asyncLoadAssets(language: string): Promise<unknown>;
+    asyncLoadAssets(language?: string): Promise<unknown>;
     createMapInstance(): MapInstance | null;
 }
 

@@ -18,7 +18,7 @@ export class BaiduMapProvider implements MapProvider {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    public asyncLoadAssets(language: string): Promise<unknown> {
+    public asyncLoadAssets(language?: string): Promise<unknown> {
         if (BaiduMapProvider.BMap) {
             return Promise.resolve();
         }

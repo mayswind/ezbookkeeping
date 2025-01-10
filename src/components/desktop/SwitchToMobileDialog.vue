@@ -3,11 +3,11 @@
         <v-card class="pa-2 pa-sm-4 pa-md-4">
             <template #title>
                 <div class="d-flex align-center justify-center">
-                    <h4 class="text-h4">{{ $t('Use on Mobile Device') }}</h4>
+                    <h4 class="text-h4">{{ tt('Use on Mobile Device') }}</h4>
                 </div>
             </template>
             <template #subtitle>
-                <div class="text-body-1 text-center text-wrap mt-4">{{ $t('You can scan the QR code below on your mobile device.') }}</div>
+                <div class="text-body-1 text-center text-wrap mt-4">{{ tt('You can scan the QR code below on your mobile device.') }}</div>
             </template>
             <v-card-text class="mb-md-4">
                 <v-row>
@@ -20,8 +20,8 @@
             </v-card-text>
             <v-card-text class="overflow-y-visible">
                 <div class="w-100 d-flex justify-center gap-4">
-                    <v-btn :href="mobileVersionPath">{{$t('Switch to Mobile Version') }}</v-btn>
-                    <v-btn color="secondary" variant="tonal" @click="showState = false">{{ $t('Close') }}</v-btn>
+                    <v-btn :href="mobileVersionPath">{{ tt('Switch to Mobile Version') }}</v-btn>
+                    <v-btn color="secondary" variant="tonal" @click="showState = false">{{ tt('Close') }}</v-btn>
                 </div>
             </v-card-text>
         </v-card>
@@ -30,6 +30,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
 
 import { getMobileUrlQrCodePath } from '@/lib/qrcode.ts';
 import { getMobileVersionPath } from '@/lib/version.ts';
@@ -41,6 +43,8 @@ const props = defineProps<{
 const emit = defineEmits<{
     (e: 'update:show', value: boolean): void
 }>();
+
+const { tt } = useI18n();
 
 const mobileUrlQrCodePath = getMobileUrlQrCodePath();
 const mobileVersionPath = getMobileVersionPath();

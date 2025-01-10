@@ -1,7 +1,7 @@
 import { useI18n as useVueI18n } from 'vue-i18n';
 import moment from 'moment-timezone';
 
-import { defaultLanguage, allLanguages } from '@/locales/index.ts';
+import { DEFAULT_LANGUAGE, allLanguages } from '@/locales/index.ts';
 
 import { Month, WeekDay, MeridiemIndicator, LongDateFormat, ShortDateFormat, LongTimeFormat, ShortTimeFormat, DateRange, LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
@@ -113,13 +113,13 @@ function getLanguageInfo(locale) {
 
 function getDefaultLanguage() {
     if (!window || !window.navigator) {
-        return defaultLanguage;
+        return DEFAULT_LANGUAGE;
     }
 
     let browserLocale = window.navigator.browserLanguage || window.navigator.language;
 
     if (!browserLocale) {
-        return defaultLanguage;
+        return DEFAULT_LANGUAGE;
     }
 
     if (!allLanguages[browserLocale]) {
@@ -153,7 +153,7 @@ function getDefaultLanguage() {
     }
 
     if (!allLanguages[browserLocale]) {
-        return defaultLanguage;
+        return DEFAULT_LANGUAGE;
     }
 
     return browserLocale;
@@ -1270,7 +1270,7 @@ function getAllSupportedImportFileTypes(i18nGlobal, translateFn) {
                 document.anchor = document.anchor.toLowerCase().replace(/ /g, '-');
             }
 
-            if (document.language === defaultLanguage) {
+            if (document.language === DEFAULT_LANGUAGE) {
                 document.language = '';
             }
         } else {
@@ -1541,29 +1541,6 @@ function initLocale(i18nGlobal, lastUserLanguage, timezone) {
     return localeDefaultSettings;
 }
 
-export function getI18nOptions() {
-    return {
-        legacy: true,
-        locale: defaultLanguage,
-        fallbackLocale: defaultLanguage,
-        formatFallbackMessages: true,
-        messages: (function () {
-            const messages = {};
-
-            for (let locale in allLanguages) {
-                if (!Object.prototype.hasOwnProperty.call(allLanguages, locale)) {
-                    continue;
-                }
-
-                const lang = allLanguages[locale];
-                messages[locale] = lang.content;
-            }
-
-            return messages;
-        })()
-    };
-}
-
 export function translateIf(text, isTranslate, translateFn) {
     if (isTranslate) {
         return translateFn(text);
@@ -1588,7 +1565,6 @@ export function i18nFunctions(i18nGlobal) {
     return {
         getAllLanguageInfoArray: (includeSystemDefault) => getAllLanguageInfoArray(i18nGlobal.t, includeSystemDefault),
         getLanguageInfo: getLanguageInfo,
-        getDefaultLanguage: getDefaultLanguage,
         getCurrentLanguageTag: () => getCurrentLanguageTag(i18nGlobal),
         getCurrentLanguageInfo: () => getCurrentLanguageInfo(i18nGlobal),
         getCurrentLanguageDisplayName: () => getCurrentLanguageDisplayName(i18nGlobal),

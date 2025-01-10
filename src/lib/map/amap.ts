@@ -19,7 +19,7 @@ export class AmapMapProvider implements MapProvider {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    public asyncLoadAssets(language: string): Promise<unknown> {
+    public asyncLoadAssets(language?: string): Promise<unknown> {
         if (AmapMapProvider.AMap) {
             return Promise.resolve();
         }

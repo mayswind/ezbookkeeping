@@ -5,23 +5,23 @@
             <div class="swipe-handler"></div>
             <div class="left"></div>
             <div class="right">
-                <f7-link :text="$t('Done')" @click="save"></f7-link>
+                <f7-link :text="tt('Done')" @click="save"></f7-link>
             </div>
         </f7-toolbar>
         <f7-page-content class="no-margin-vertical no-padding-vertical">
             <map-view ref="map" height="400px" :geo-location="geoLocation">
                 <template #error-title="{ mapSupported, mapDependencyLoaded }">
                     <div class="display-flex padding justify-content-space-between align-items-center">
-                        <div class="ebk-sheet-title" v-if="!mapSupported"><b>{{ $t('Unsupported Map Provider') }}</b></div>
-                        <div class="ebk-sheet-title" v-else-if="!mapDependencyLoaded"><b>{{ $t('Cannot Initialize Map') }}</b></div>
+                        <div class="ebk-sheet-title" v-if="!mapSupported"><b>{{ tt('Unsupported Map Provider') }}</b></div>
+                        <div class="ebk-sheet-title" v-else-if="!mapDependencyLoaded"><b>{{ tt('Cannot Initialize Map') }}</b></div>
                         <div class="ebk-sheet-title" v-else></div>
                     </div>
                 </template>
                 <template #error-content>
                     <div class="padding-horizontal padding-bottom">
-                        <p class="no-margin">{{ $t('Please refresh the page and try again. If the error persists, ensure that the server\'s map settings are correctly configured.') }}</p>
+                        <p class="no-margin">{{ tt('Please refresh the page and try again. If the error persists, ensure that the server\'s map settings are correctly configured.') }}</p>
                         <div class="margin-top text-align-center">
-                            <f7-link @click="close" :text="$t('Close')"></f7-link>
+                            <f7-link @click="close" :text="tt('Close')"></f7-link>
                         </div>
                     </div>
                 </template>
@@ -33,6 +33,8 @@
 <script setup lang="ts">
 import { computed, useTemplateRef } from 'vue';
 import MapView from '@/components/common/MapView.vue';
+
+import { useI18n } from '@/locales/helpers.ts';
 
 import type { MapPosition } from '@/lib/map/base.ts';
 
@@ -47,6 +49,8 @@ const emit = defineEmits<{
     (e: 'update:modelValue', value: MapPosition | undefined): void,
     (e: 'update:show', value: boolean): void
 }>();
+
+const { tt } = useI18n();
 
 const map = useTemplateRef<MapViewType>('map');
 

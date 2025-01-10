@@ -17,7 +17,7 @@
                 </p>
                 <textarea class="information-content full-line" readonly="readonly" :rows="rowCount" :value="information"></textarea>
                 <div class="margin-top text-align-center">
-                    <f7-link @click="close" :text="$t('Close')"></f7-link>
+                    <f7-link @click="close" :text="tt('Close')"></f7-link>
                 </div>
             </div>
         </f7-page-content>
@@ -26,6 +26,8 @@
 
 <script setup lang="ts">
 import { useTemplateRef, watch, onMounted, onUpdated } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
 
 import { ClipboardHolder } from '@/lib/clipboard.ts';
 
@@ -42,6 +44,8 @@ const emit = defineEmits<{
     (e: 'update:show', value: boolean): void
     (e: 'info:copied'): void
 }>();
+
+const { tt } = useI18n();
 
 const iconCopyToClipboard = useTemplateRef('copyToClipboardIcon');
 

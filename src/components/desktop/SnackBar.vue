@@ -3,7 +3,7 @@
         {{ messageContent }}
 
         <template #actions>
-            <v-btn color="primary" variant="text" @click="showState = false">{{ $t('Close') }}</v-btn>
+            <v-btn color="primary" variant="text" @click="showState = false">{{ tt('Close') }}</v-btn>
         </template>
     </v-snackbar>
 </template>
@@ -11,8 +11,9 @@
 <script setup lang="ts">
 import { type Ref, ref, watch } from 'vue';
 
+import { useI18n } from '@/locales/helpers.ts';
+
 import { isObject } from '@/lib/common.ts';
-import { useI18n } from '@/locales/helper.js';
 
 const emit = defineEmits<{
     (e: 'update:show', value: boolean): void

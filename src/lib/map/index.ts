@@ -9,7 +9,7 @@ import { AmapMapProvider } from './amap.ts';
 
 let mapProvider: MapProvider | null = null;
 
-export function initMapProvider(language: string): void {
+export function initMapProvider(language?: string): void {
     const mapProviderType = getMapProvider();
 
     if (LEAFLET_TILE_SOURCES[mapProviderType] || mapProviderType === 'custom') {

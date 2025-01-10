@@ -540,7 +540,7 @@ export default {
 
         return url;
     },
-    generateGoogleMapJavascriptUrl: (language: string, callbackFnName: string): string => {
+    generateGoogleMapJavascriptUrl: (language: string | undefined, callbackFnName: string): string => {
         let url = `${GOOGLE_MAP_JAVASCRIPT_URL}?key=${getGoogleMapAPIKey()}&libraries=core,marker&callback=${callbackFnName}`;
 
         if (language) {

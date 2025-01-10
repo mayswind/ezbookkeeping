@@ -6,7 +6,7 @@
             <div class="swipe-handler"></div>
             <div class="left"></div>
             <div class="right">
-                <f7-link sheet-close :text="$t('Done')"></f7-link>
+                <f7-link sheet-close :text="tt('Done')"></f7-link>
             </div>
         </f7-toolbar>
         <f7-page-content>
@@ -31,6 +31,8 @@
 <script setup lang="ts">
 import { type Ref, ref, computed } from 'vue';
 
+import { useI18n } from '@/locales/helpers.ts';
+
 import type { IconInfo, IconInfoWithId } from '@/core/icon.ts';
 import { arrayContainsFieldValue } from '@/lib/common.ts';
 import { getIconsInRows } from '@/lib/icon.ts';
@@ -48,6 +50,8 @@ const emit = defineEmits<{
     (e: 'update:modelValue', value: string): void
     (e: 'update:show', value: boolean): void
 }>();
+
+const { tt } = useI18n();
 
 const currentValue: Ref<string> = ref(props.modelValue);
 const itemPerRow: Ref<number> = ref(props.columnCount || 7);

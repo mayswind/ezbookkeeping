@@ -80,8 +80,8 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
 import { getVersion, getBuildTime } from '@/lib/version.ts';
+import { getI18nOptions } from '@/locales/helpers.ts';
 import {
-    getI18nOptions,
     translateIf,
     i18nFunctions
 } from '@/locales/helper.js';

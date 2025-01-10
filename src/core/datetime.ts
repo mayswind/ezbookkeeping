@@ -62,6 +62,11 @@ export interface LocalizedRecentMonthDateRange {
     readonly displayName: string;
 }
 
+export interface LocalizedMeridiemIndicator {
+    readonly values: string[];
+    readonly displayValues: string[];
+}
+
 export class YearUnixTime implements UnixTimeRange {
     public readonly year: number;
     public readonly minUnixTime: number;

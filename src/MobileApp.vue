@@ -4,11 +4,16 @@
     </f7-app>
 </template>
 
-<script>
+<script setup lang="ts">
+import { type Ref, ref, computed, watch, onMounted } from 'vue';
+
+import type { Notification } from 'framework7/components/notification';
+import type { Actions, Dialog, Popover, Popup, Sheet } from 'framework7/types';
 import { f7ready } from 'framework7-vue';
 import routes from './router/mobile.js';
 
-import { mapStores } from 'pinia';
+import { useI18n } from '@/locales/helpers.ts';
+
 import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
@@ -24,10 +29,23 @@ import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 import { isModalShowing, setAppFontSize } from '@/lib/ui/mobile.js';
 
-export default {
-    data() {
-        const self = this;
-        let darkMode = 'auto';
+const { tt, getCurrentLanguageInfo, setLanguage, initLocale } = useI18n();
+
+const rootStore = useRootStore();
+const settingsStore = useSettingsStore();
+const userStore = useUserStore();
+const tokensStore = useTokensStore();
+const exchangeRatesStore = useExchangeRatesStore();
+
+const f7params: Ref<object> = ref({
+    name: 'ezBookkeeping',
+    theme: 'ios',
+    colors: {
+        primary: '#c67e48'
+    },
+    routes: routes,
+    darkMode: (() => {
+        let darkMode: boolean | string = 'auto';
 
         if (getTheme() === ThemeType.Light) {
             darkMode = false;
@@ -35,207 +53,190 @@ export default {
             darkMode = true;
         }
 
-        return {
-            notification: null,
-            f7params: {
-                name: 'ezBookkeeping',
-                theme: 'ios',
-                colors: {
-                    primary: '#c67e48'
-                },
-                routes: routes,
-                darkMode: darkMode,
-                touch: {
-                    disableContextMenu: true,
-                    tapHold: true
-                },
-                serviceWorker: {
-                    path: isProduction() ? './sw.js' : undefined,
-                    scope: './',
-                },
-                actions: {
-                    animate: isEnableAnimate(),
-                    backdrop: true,
-                    closeOnEscape: true
-                },
-                dialog: {
-                    animate: isEnableAnimate(),
-                    backdrop: true
-                },
-                popover: {
-                    animate: isEnableAnimate(),
-                    backdrop: true,
-                    closeOnEscape: true
-                },
-                popup: {
-                    animate: isEnableAnimate(),
-                    backdrop: true,
-                    closeOnEscape: true,
-                    swipeToClose: true
-                },
-                sheet: {
-                    animate: isEnableAnimate(),
-                    backdrop: true,
-                    closeOnEscape: true
-                },
-                smartSelect: {
-                    routableModals: false
-                },
-                view: {
-                    animate: isEnableAnimate(),
-                    browserHistory: !self.isiOSHomeScreenMode(),
-                    browserHistoryInitialMatch: true,
-                    browserHistoryAnimate: false,
-                    iosSwipeBackAnimateShadow: false,
-                    mdSwipeBackAnimateShadow: false
-                }
-            },
-            isDarkMode: undefined,
-            hasPushPopupBackdrop: undefined,
-            hasBackdrop: undefined
-        }
+        return darkMode;
+    })(),
+    touch: {
+        disableContextMenu: true,
+        tapHold: true
     },
-    computed: {
-        ...mapStores(useRootStore, useSettingsStore, useUserStore, useTokensStore, useExchangeRatesStore),
-        currentNotificationContent() {
-            return this.rootStore.currentNotification;
-        }
+    serviceWorker: {
+        path: isProduction() ? './sw.js' : undefined,
+        scope: './',
     },
-    watch: {
-        currentNotificationContent: function (newValue) {
-            const self = this;
+    actions: {
+        animate: isEnableAnimate(),
+        backdrop: true,
+        closeOnEscape: true
+    },
+    dialog: {
+        animate: isEnableAnimate(),
+        backdrop: true
+    },
+    popover: {
+        animate: isEnableAnimate(),
+        backdrop: true,
+        closeOnEscape: true
+    },
+    popup: {
+        animate: isEnableAnimate(),
+        backdrop: true,
+        closeOnEscape: true,
+        swipeToClose: true
+    },
+    sheet: {
+        animate: isEnableAnimate(),
+        backdrop: true,
+        closeOnEscape: true
+    },
+    smartSelect: {
+        routableModals: false
+    },
+    view: {
+        animate: isEnableAnimate(),
+        browserHistory: !isiOSHomeScreenMode(),
+        browserHistoryInitialMatch: true,
+        browserHistoryAnimate: false,
+        iosSwipeBackAnimateShadow: false,
+        mdSwipeBackAnimateShadow: false
+    }
+});
 
-            if (self.notification) {
-                self.notification.close();
-                self.notification.destroy();
-                self.notification = null;
+const notification: Ref<Notification.Notification | null> = ref(null);
+
+const isDarkMode: Ref<boolean | undefined> = ref(undefined);
+const hasPushPopupBackdrop: Ref<boolean | undefined> = ref(undefined);
+const hasBackdrop: Ref<boolean | undefined> = ref(undefined);
+const currentNotificationContent = computed<string | null>(() => rootStore.currentNotification);
+
+function isiOSHomeScreenMode(): boolean {
+    if ((/iphone|ipod|ipad/gi).test(navigator.platform) && (/Safari/i).test(navigator.appVersion) &&
+        window.matchMedia && window.matchMedia('(display-mode: standalone)').matches
+    ) {
+        return true;
+    }
+
+    return false;
+}
+
+function setThemeColorMeta(darkMode: boolean | undefined): void {
+    if (hasPushPopupBackdrop.value) {
+        document.querySelector('meta[name=theme-color]')?.setAttribute('content', '#000');
+        return;
+    }
+
+    if (darkMode) {
+        if (hasBackdrop.value) {
+            document.querySelector('meta[name=theme-color]')?.setAttribute('content', '#0b0b0b');
+        } else {
+            document.querySelector('meta[name=theme-color]')?.setAttribute('content', '#121212');
+        }
+    } else {
+        if (hasBackdrop.value) {
+            document.querySelector('meta[name=theme-color]')?.setAttribute('content', '#949495');
+        } else {
+            document.querySelector('meta[name=theme-color]')?.setAttribute('content', '#f6f6f8');
+        }
+    }
+}
+
+function onBackdropChanged(element: { push?: boolean, opened?: boolean }): void {
+    if (element.push) {
+        hasPushPopupBackdrop.value = element.opened;
+    } else {
+        hasBackdrop.value = element.opened;
+    }
+
+    setThemeColorMeta(isDarkMode.value);
+}
+
+onMounted(() => {
+    setAppFontSize(settingsStore.appSettings.fontSize);
+
+    f7ready((f7) => {
+        isDarkMode.value = f7.darkMode;
+        setThemeColorMeta(f7.darkMode);
+
+        f7.on('actionsOpen', (actions: Actions.Actions) => onBackdropChanged(actions));
+        f7.on('actionsClose', (actions: Actions.Actions) => onBackdropChanged(actions));
+        f7.on('dialogOpen', (dialog: Dialog.Dialog) => onBackdropChanged(dialog));
+        f7.on('dialogClose', (dialog: Dialog.Dialog) => onBackdropChanged(dialog));
+        f7.on('popoverOpen', (popover: Popover.Popover) => onBackdropChanged(popover));
+        f7.on('popoverClose', (popover: Popover.Popover) => onBackdropChanged(popover));
+        f7.on('popupOpen', (popup: Popup.Popup) => onBackdropChanged(popup));
+        f7.on('popupClose', (popup: Popup.Popup) => onBackdropChanged(popup));
+        f7.on('sheetOpen', (sheet: Sheet.Sheet) => onBackdropChanged(sheet));
+        f7.on('sheetClose', (sheet: Sheet.Sheet) => onBackdropChanged(sheet));
+
+        f7.on('pageBeforeOut',  () => {
+            if (isModalShowing()) {
+                f7.actions.close('.actions-modal.modal-in', false);
+                f7.dialog.close('.dialog.modal-in', false);
+                f7.popover.close('.popover.modal-in', false);
+                f7.popup.close('.popup.modal-in', false);
+                f7.sheet.close('.sheet-modal.modal-in', false);
             }
+        });
 
-            if (newValue) {
-                f7ready((f7) => {
-                    self.notification = f7.notification.create({
-                        icon: `<img alt="logo" src="${APPLICATION_LOGO_PATH}" />`,
-                        title: self.$t('global.app.title'),
-                        text: newValue,
-                        closeOnClick: true,
-                        on: {
-                            close() {
-                                self.rootStore.setNotificationContent(null);
-                            }
-                        }
-                    }).open();
-                });
-            }
-        }
-    },
-    created() {
-        const self = this;
+        f7.on('darkModeChange', (darkMode) => {
+            isDarkMode.value = darkMode;
+            setThemeColorMeta(darkMode);
+        });
+    });
 
-        let localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage, self.settingsStore.appSettings.timeZone);
-        self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+    document.addEventListener('DOMContentLoaded', () => {
+        const languageInfo = getCurrentLanguageInfo();
+        initMapProvider(languageInfo?.alternativeLanguageTag);
+    });
+});
 
-        setExpenseAndIncomeAmountColor(self.userStore.currentUserExpenseAmountColor, self.userStore.currentUserIncomeAmountColor);
+watch(currentNotificationContent, (newValue) => {
+    if (notification.value) {
+        notification.value.close();
+        notification.value.destroy();
+        notification.value = null;
+    }
 
-        if (isUserLogined()) {
-            if (!self.settingsStore.appSettings.applicationLock || isUserUnlocked()) {
-                // refresh token if user is logined
-                self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
-                    if (response.user) {
-                        localeDefaultSettings = self.$locale.setLanguage(response.user.language);
-                        self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-
-                        setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
-
-                        if (response.notificationContent) {
-                            self.rootStore.setNotificationContent(response.notificationContent);
-                        }
-                    }
-                });
-
-                // auto refresh exchange rates data
-                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
-                    self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
-                }
-            }
-        }
-    },
-    mounted() {
-        setAppFontSize(this.settingsStore.appSettings.fontSize);
-
+    if (newValue) {
         f7ready((f7) => {
-            this.isDarkMode = f7.darkMode;
-            this.setThemeColorMeta(f7.darkMode);
-
-            f7.on('actionsOpen', (event) => this.onBackdropChanged(event));
-            f7.on('actionsClose', (event) => this.onBackdropChanged(event));
-            f7.on('dialogOpen', (event) => this.onBackdropChanged(event));
-            f7.on('dialogClose', (event) => this.onBackdropChanged(event));
-            f7.on('popoverOpen', (event) => this.onBackdropChanged(event));
-            f7.on('popoverClose', (event) => this.onBackdropChanged(event));
-            f7.on('popupOpen', (event) => this.onBackdropChanged(event));
-            f7.on('popupClose', (event) => this.onBackdropChanged(event));
-            f7.on('sheetOpen', (event) => this.onBackdropChanged(event));
-            f7.on('sheetClose', (event) => this.onBackdropChanged(event));
-
-            f7.on('pageBeforeOut',  () => {
-                if (isModalShowing()) {
-                    f7.actions.close('.actions-modal.modal-in', false);
-                    f7.dialog.close('.dialog.modal-in', false);
-                    f7.popover.close('.popover.modal-in', false);
-                    f7.popup.close('.popup.modal-in', false);
-                    f7.sheet.close('.sheet-modal.modal-in', false);
+            notification.value = f7.notification.create({
+                icon: `<img alt="logo" src="${APPLICATION_LOGO_PATH}" />`,
+                title: tt('global.app.title'),
+                text: newValue,
+                closeOnClick: true,
+                on: {
+                    close() {
+                        rootStore.setNotificationContent(null);
+                    }
                 }
-            });
+            }).open();
+        });
+    }
+});
 
-            f7.on('darkModeChange', (isDarkMode) => {
-                this.isDarkMode = isDarkMode;
-                this.setThemeColorMeta(isDarkMode);
-            });
+let localeDefaultSettings = initLocale(userStore.currentUserLanguage, settingsStore.appSettings.timeZone);
+settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+
+setExpenseAndIncomeAmountColor(userStore.currentUserExpenseAmountColor, userStore.currentUserIncomeAmountColor);
+
+if (isUserLogined()) {
+    if (!settingsStore.appSettings.applicationLock || isUserUnlocked()) {
+        // refresh token if user is logined
+        tokensStore.refreshTokenAndRevokeOldToken().then(response => {
+            if (response.user) {
+                localeDefaultSettings = setLanguage(response.user.language);
+                settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+
+                setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
+
+                if (response.notificationContent) {
+                    rootStore.setNotificationContent(response.notificationContent);
+                }
+            }
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const languageInfo = this.$locale.getCurrentLanguageInfo();
-            initMapProvider(languageInfo ? languageInfo.alternativeLanguageTag : null);
-        });
-    },
-    methods: {
-        isiOSHomeScreenMode() {
-            if ((/iphone|ipod|ipad/gi).test(navigator.platform) && (/Safari/i).test(navigator.appVersion) &&
-                window.matchMedia && window.matchMedia('(display-mode: standalone)').matches
-            ) {
-                return true;
-            }
-
-            return false;
-        },
-        onBackdropChanged(event) {
-            if (event.push) {
-                this.hasPushPopupBackdrop = event.opened;
-            } else {
-                this.hasBackdrop = event.opened;
-            }
-
-            this.setThemeColorMeta(this.isDarkMode);
-        },
-        setThemeColorMeta(isDarkMode) {
-            if (this.hasPushPopupBackdrop) {
-                document.querySelector('meta[name=theme-color]').setAttribute('content', '#000');
-                return;
-            }
-
-            if (isDarkMode) {
-                if (this.hasBackdrop) {
-                    document.querySelector('meta[name=theme-color]').setAttribute('content', '#0b0b0b');
-                } else {
-                    document.querySelector('meta[name=theme-color]').setAttribute('content', '#121212');
-                }
-            } else {
-                if (this.hasBackdrop) {
-                    document.querySelector('meta[name=theme-color]').setAttribute('content', '#949495');
-                } else {
-                    document.querySelector('meta[name=theme-color]').setAttribute('content', '#f6f6f8');
-                }
-            }
+        // auto refresh exchange rates data
+        if (settingsStore.appSettings.autoUpdateExchangeRatesData) {
+            exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
         }
     }
 }

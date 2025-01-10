@@ -17,8 +17,8 @@
                         clear-button
                         class="no-margin no-padding-bottom"
                         :class="color ? 'color-' + color : ''"
-                        :label="$t('Current Password')"
-                        :placeholder="$t('Current Password')"
+                        :label="tt('Current Password')"
+                        :placeholder="tt('Current Password')"
                         v-model:value="currentPassword"
                         @keyup.enter="confirm()"
                     ></f7-list-input>
@@ -26,11 +26,11 @@
                 <f7-button large fill
                            :class="{ 'disabled': !currentPassword || confirmDisabled }"
                            :color="color || 'primary'"
-                           :text="$t('Continue')"
+                           :text="tt('Continue')"
                            @click="confirm">
                 </f7-button>
                 <div class="margin-top text-align-center">
-                    <f7-link :class="{ 'disabled': cancelDisabled }" @click="cancel" :text="$t('Cancel')"></f7-link>
+                    <f7-link :class="{ 'disabled': cancelDisabled }" @click="cancel" :text="tt('Cancel')"></f7-link>
                 </div>
             </div>
         </f7-page-content>
@@ -39,6 +39,8 @@
 
 <script setup lang="ts">
 import { type Ref, ref } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
 
 const props = defineProps<{
     modelValue: string
@@ -55,6 +57,8 @@ const emit = defineEmits<{
     (e: 'update:show', value: boolean): void
     (e: 'password:confirm', value: string): void
 }>();
+
+const { tt } = useI18n();
 
 const currentPassword: Ref<string> = ref('');
 

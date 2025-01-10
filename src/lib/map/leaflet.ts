@@ -36,7 +36,7 @@ export class LeafletMapProvider implements MapProvider {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    public asyncLoadAssets(language: string): Promise<unknown> {
+    public asyncLoadAssets(language?: string): Promise<unknown> {
         return Promise.all([
             import('leaflet/dist/leaflet.css'),
             import('leaflet/dist/leaflet-src.esm.js').then(leaflet => LeafletMapProvider.Leaflet = leaflet)

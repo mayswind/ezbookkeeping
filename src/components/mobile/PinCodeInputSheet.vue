@@ -15,11 +15,11 @@
                 </f7-list>
                 <f7-button large fill
                            :class="{ 'disabled': !currentPinCodeValid || confirmDisabled }"
-                           :text="$t('Continue')"
+                           :text="tt('Continue')"
                            @click="confirm">
                 </f7-button>
                 <div class="margin-top text-align-center">
-                    <f7-link @click="cancel" :text="$t('Cancel')"></f7-link>
+                    <f7-link @click="cancel" :text="tt('Cancel')"></f7-link>
                 </div>
             </div>
         </f7-page-content>
@@ -28,6 +28,8 @@
 
 <script setup lang="ts">
 import { type Ref, ref, computed } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
 
 const props = defineProps<{
     modelValue: string
@@ -43,6 +45,8 @@ const emit = defineEmits<{
     (e: 'update:show', value: boolean): void
     (e: 'pincode:confirm', value: string): void
 }>();
+
+const { tt } = useI18n();
 
 const currentPinCode: Ref<string> = ref('');
 

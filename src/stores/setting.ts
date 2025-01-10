@@ -144,7 +144,7 @@ export const useSettingsStore = defineStore('settings', () => {
         appSettings.value = getApplicationSettings();
     }
 
-    function updateLocalizedDefaultSettings(newLocaleDefaultSettings: LocaleDefaultSettings) {
+    function updateLocalizedDefaultSettings(newLocaleDefaultSettings: LocaleDefaultSettings | null) {
         if (!newLocaleDefaultSettings) {
             return;
         }

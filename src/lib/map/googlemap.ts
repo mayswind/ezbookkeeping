@@ -15,7 +15,7 @@ export class GoogleMapProvider implements MapProvider {
         return 'https://maps.google.com';
     }
 
-    public asyncLoadAssets(language: string): Promise<unknown> {
+    public asyncLoadAssets(language?: string): Promise<unknown> {
         if (GoogleMapProvider.GoogleMap) {
             return Promise.resolve();
         }

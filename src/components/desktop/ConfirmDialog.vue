@@ -7,8 +7,8 @@
             <v-card-text v-if="textContent" class="pa-4 pb-6">{{ textContent }}</v-card-text>
             <v-card-actions class="px-4 pb-4">
                 <v-spacer></v-spacer>
-                <v-btn color="gray" @click="cancel">{{ $t('Cancel') }}</v-btn>
-                <v-btn :color="finalColor" @click="confirm">{{ $t('OK') }}</v-btn>
+                <v-btn color="gray" @click="cancel">{{ tt('Cancel') }}</v-btn>
+                <v-btn :color="finalColor" @click="confirm">{{ tt('OK') }}</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -17,7 +17,8 @@
 <script setup lang="ts">
 import { type Ref, ref, watch } from 'vue';
 
-import { useI18n } from '@/locales/helper.js';
+import { useI18n } from '@/locales/helpers.ts';
+
 import { isString } from '@/lib/common.ts';
 
 const props = defineProps<{
@@ -46,7 +47,7 @@ function open(titleOrText: string, textOrOptions: string | Record<string, unknow
 
     if (isString(textOrOptions)) { // second parameter is text
         titleContent.value = tt(titleOrText, options);
-        textContent.value = tt(textOrOptions, options);
+        textContent.value = tt(textOrOptions as string, options);
     } else { // second parameter is options
         const actualOptions = textOrOptions as Record<string, unknown>;
         titleContent.value = tt('global.app.title');

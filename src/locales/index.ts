@@ -2,7 +2,7 @@ import en from './en.json';
 import vi from './vi.json';
 import zhHans from './zh_Hans.json';
 
-interface LanguageInfo {
+export interface LanguageInfo {
     name: string;
     displayName: string;
     alternativeLanguageTag: string;
@@ -10,7 +10,7 @@ interface LanguageInfo {
     content: object;
 }
 
-export const defaultLanguage: string = 'en';
+export const DEFAULT_LANGUAGE: string = 'en';
 
 // To add new languages, please refer to https://ezbookkeeping.mayswind.net/translating
 export const allLanguages: Record<string, LanguageInfo> = {

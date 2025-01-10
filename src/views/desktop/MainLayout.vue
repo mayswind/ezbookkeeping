@@ -5,9 +5,9 @@
             <div class="nav-header">
                 <router-link to="/" class="app-logo d-flex align-center gap-x-3 app-title-wrapper">
                     <div class="d-flex">
-                        <img alt="logo" class="main-logo" :src="ezBookkeepingLogoPath" />
+                        <img alt="logo" class="main-logo" :src="APPLICATION_LOGO_PATH" />
                     </div>
-                    <h1 class="font-weight-medium text-xl">{{ $t('global.app.title') }}</h1>
+                    <h1 class="font-weight-medium text-xl">{{ tt('global.app.title') }}</h1>
                 </router-link>
             </div>
             <perfect-scrollbar
@@ -18,82 +18,82 @@
                 <li class="nav-link home-link">
                     <router-link to="/">
                         <v-icon class="nav-item-icon" :icon="icons.overview"/>
-                        <span class="nav-item-title">{{ $t('Overview') }}</span>
+                        <span class="nav-item-title">{{ tt('Overview') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-section-title">
                     <div class="title-wrapper">
-                        <span class="title-text">{{ $t('Transaction Data') }}</span>
+                        <span class="title-text">{{ tt('Transaction Data') }}</span>
                     </div>
                 </li>
                 <li class="nav-link">
                     <router-link to="/transaction/list?dateType=7">
                         <v-icon class="nav-item-icon" :icon="icons.transactions"/>
-                        <span class="nav-item-title">{{ $t('Transaction Details') }}</span>
+                        <span class="nav-item-title">{{ tt('Transaction Details') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-link">
                     <router-link to="/statistics/transaction">
                         <v-icon class="nav-item-icon" :icon="icons.statistics"/>
-                        <span class="nav-item-title">{{ $t('Statistics & Analysis') }}</span>
+                        <span class="nav-item-title">{{ tt('Statistics & Analysis') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-section-title">
                     <div class="title-wrapper">
-                        <span class="title-text">{{ $t('Basis Data') }}</span>
+                        <span class="title-text">{{ tt('Basis Data') }}</span>
                     </div>
                 </li>
                 <li class="nav-link">
                     <router-link to="/account/list">
                         <v-icon class="nav-item-icon" :icon="icons.accounts"/>
-                        <span class="nav-item-title">{{ $t('Accounts') }}</span>
+                        <span class="nav-item-title">{{ tt('Accounts') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-link">
                     <router-link to="/category/list">
                         <v-icon class="nav-item-icon" :icon="icons.categories"/>
-                        <span class="nav-item-title">{{ $t('Transaction Categories') }}</span>
+                        <span class="nav-item-title">{{ tt('Transaction Categories') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-link">
                     <router-link to="/tag/list">
                         <v-icon class="nav-item-icon" :icon="icons.tags"/>
-                        <span class="nav-item-title">{{ $t('Transaction Tags') }}</span>
+                        <span class="nav-item-title">{{ tt('Transaction Tags') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-link">
                     <router-link to="/template/list">
                         <v-icon class="nav-item-icon" :icon="icons.templates"/>
-                        <span class="nav-item-title">{{ $t('Transaction Templates') }}</span>
+                        <span class="nav-item-title">{{ tt('Transaction Templates') }}</span>
                     </router-link>
                 </li>
-                <li class="nav-link" v-if="isUserScheduledTransactionEnabled">
+                <li class="nav-link" v-if="isUserScheduledTransactionEnabled()">
                     <router-link to="/schedule/list">
                         <v-icon class="nav-item-icon" :icon="icons.scheduledTransactions"/>
-                        <span class="nav-item-title">{{ $t('Scheduled Transactions') }}</span>
+                        <span class="nav-item-title">{{ tt('Scheduled Transactions') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-section-title">
                     <div class="title-wrapper">
-                        <span class="title-text">{{ $t('Miscellaneous') }}</span>
+                        <span class="title-text">{{ tt('Miscellaneous') }}</span>
                     </div>
                 </li>
                 <li class="nav-link">
                     <router-link to="/exchange_rates">
                         <v-icon class="nav-item-icon" :icon="icons.exchangeRates"/>
-                        <span class="nav-item-title">{{ $t('Exchange Rates Data') }}</span>
+                        <span class="nav-item-title">{{ tt('Exchange Rates Data') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-link">
                     <a href="javascript:void(0);" @click="showMobileQrCode = true">
                         <v-icon class="nav-item-icon" :icon="icons.mobile"/>
-                        <span class="nav-item-title">{{ $t('Use on Mobile Device') }}</span>
+                        <span class="nav-item-title">{{ tt('Use on Mobile Device') }}</span>
                     </a>
                 </li>
                 <li class="nav-link">
                     <router-link to="/about">
                         <v-icon class="nav-item-icon" :icon="icons.about"/>
-                        <span class="nav-item-title">{{ $t('About') }}</span>
+                        <span class="nav-item-title">{{ tt('About') }}</span>
                     </router-link>
                 </li>
             </perfect-scrollbar>
@@ -109,14 +109,14 @@
                         </v-btn>
                         <div class="app-logo d-flex align-center gap-x-3 app-title-wrapper" v-if="mdAndDown">
                             <div class="d-flex">
-                                <img alt="logo" class="main-logo" :src="ezBookkeepingLogoPath" />
+                                <img alt="logo" class="main-logo" :src="APPLICATION_LOGO_PATH" />
                             </div>
-                            <h1 class="font-weight-medium text-xl">{{ $t('global.app.title') }}</h1>
+                            <h1 class="font-weight-medium text-xl">{{ tt('global.app.title') }}</h1>
                         </div>
                         <v-spacer />
                         <v-btn color="primary" variant="text" class="me-2"
-                               :icon="true" @click="(theme === 'light' ? theme = 'dark' : (theme === 'dark' ? theme = 'auto' : theme = 'light'))">
-                            <v-icon :icon="(theme === 'light' ? icons.themeLight : (theme === 'dark' ? icons.themeDark : icons.themeAuto))" size="24" />
+                               :icon="true" @click="(currentTheme === 'light' ? currentTheme = 'dark' : (currentTheme === 'dark' ? currentTheme = 'auto' : currentTheme = 'light'))">
+                            <v-icon :icon="(currentTheme === 'light' ? icons.themeLight : (currentTheme === 'dark' ? icons.themeDark : icons.themeAuto))" size="24" />
                         </v-btn>
                         <v-avatar class="cursor-pointer" variant="tonal"
                                   :color="currentUserAvatar ? 'rgba(0,0,0,0)' : 'primary'">
@@ -152,19 +152,19 @@
                                     </v-list-item>
                                     <v-divider class="my-2"/>
                                     <v-list-item :prepend-icon="icons.profile"
-                                                 :title="$t('User Settings')"
+                                                 :title="tt('User Settings')"
                                                  to="/user/settings"></v-list-item>
                                     <v-list-item :prepend-icon="icons.settings"
-                                                 :title="$t('Application Settings')"
+                                                 :title="tt('Application Settings')"
                                                  to="/app/settings"></v-list-item>
                                     <v-divider class="my-2"/>
                                     <v-list-item :prepend-icon="icons.lock"
-                                                 :title="$t('Lock Application')"
+                                                 :title="tt('Lock Application')"
                                                  v-if="isEnableApplicationLock"
                                                  @click="lock"></v-list-item>
                                     <v-list-item :disabled="logouting"
                                                  :prepend-icon="icons.logout"
-                                                 :title="$t('Log Out')"
+                                                 :title="tt('Log Out')"
                                                  @click="logout"></v-list-item>
                                 </v-list>
                             </v-menu>
@@ -191,12 +191,17 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { type Ref, ref, computed, useTemplateRef } from 'vue';
+
 import { useDisplay } from 'vuetify';
 import { useTheme } from 'vuetify';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
-import { mapStores } from 'pinia';
+import { useI18n } from '@/locales/helpers.ts';
+
 import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
@@ -205,6 +210,8 @@ import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { isUserScheduledTransactionEnabled } from '@/lib/server_settings.ts';
 import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
+
+type SnackBarType = InstanceType<typeof SnackBar>;
 
 import {
     mdiMenu,
@@ -229,124 +236,118 @@ import {
     mdiLogout
 } from '@mdi/js';
 
-export default {
-    data() {
-        return {
-            logouting: false,
-            isVerticalNavScrolled: false,
-            showVerticalOverlayMenu: false,
-            showLoading: false,
-            showMobileQrCode: false,
-            icons: {
-                menu: mdiMenu,
-                overview: mdiHomeOutline,
-                transactions: mdiListBoxOutline,
-                accounts: mdiCreditCardOutline,
-                categories: mdiViewDashboardOutline,
-                tags: mdiTagOutline,
-                templates: mdiClipboardTextOutline,
-                scheduledTransactions: mdiClipboardTextClockOutline,
-                statistics: mdiChartPieOutline,
-                exchangeRates: mdiSwapHorizontal,
-                settings: mdiCogOutline,
-                mobile: mdiCellphone,
-                about: mdiInformationOutline,
-                themeAuto: mdiThemeLightDark,
-                themeLight: mdiWeatherSunny,
-                themeDark: mdiWeatherNight,
-                user: mdiAccount,
-                profile: mdiAccountCogOutline,
-                lock: mdiLockOutline,
-                logout: mdiLogout
+const display = useDisplay();
+const theme = useTheme();
+const route = useRoute();
+const router = useRouter();
+
+const { tt, initLocale } = useI18n();
+
+const rootStore = useRootStore();
+const settingsStore = useSettingsStore();
+const userStore = useUserStore();
+
+const icons = {
+    menu: mdiMenu,
+    overview: mdiHomeOutline,
+    transactions: mdiListBoxOutline,
+    accounts: mdiCreditCardOutline,
+    categories: mdiViewDashboardOutline,
+    tags: mdiTagOutline,
+    templates: mdiClipboardTextOutline,
+    scheduledTransactions: mdiClipboardTextClockOutline,
+    statistics: mdiChartPieOutline,
+    exchangeRates: mdiSwapHorizontal,
+    settings: mdiCogOutline,
+    mobile: mdiCellphone,
+    about: mdiInformationOutline,
+    themeAuto: mdiThemeLightDark,
+    themeLight: mdiWeatherSunny,
+    themeDark: mdiWeatherNight,
+    user: mdiAccount,
+    profile: mdiAccountCogOutline,
+    lock: mdiLockOutline,
+    logout: mdiLogout
+};
+
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+
+const logouting: Ref<boolean> = ref(false);
+const isVerticalNavScrolled: Ref<boolean> = ref(false);
+const showVerticalOverlayMenu: Ref<boolean> = ref(false);
+const showLoading: Ref<boolean> = ref(false);
+const showMobileQrCode: Ref<boolean> = ref(false);
+
+const mdAndDown = computed<boolean>(() => {
+    return display.mdAndDown.value;
+});
+
+const currentRoutePath = computed<string>(() => {
+    return route.path;
+});
+
+const currentNickName = computed<string>(() => {
+    return userStore.currentUserNickname || tt('User');
+});
+
+const currentUserAvatar = computed<string | null>(() => {
+    return userStore.getUserAvatarUrl(userStore.currentUserBasicInfo, true);
+});
+
+const currentTheme = computed<string>({
+    get: () => {
+        return settingsStore.appSettings.theme;
+    },
+    set: (value: string) => {
+        if (value !== settingsStore.appSettings.theme) {
+            settingsStore.setTheme(value);
+
+            if (value === ThemeType.Light || value === ThemeType.Dark) {
+                theme.global.name.value = value;
+            } else {
+                theme.global.name.value = getSystemTheme();
             }
-        }
-    },
-    computed: {
-        ...mapStores(useRootStore, useSettingsStore, useUserStore),
-        ezBookkeepingLogoPath() {
-            return APPLICATION_LOGO_PATH;
-        },
-        mdAndDown() {
-            return this.display.mdAndDown.value;
-        },
-        currentRoutePath() {
-            const route = useRoute();
-            return route.path;
-        },
-        currentNickName() {
-            return this.userStore.currentUserNickname || this.$t('User');
-        },
-        currentUserAvatar() {
-            return this.userStore.getUserAvatarUrl(this.userStore.currentUserBasicInfo, true);
-        },
-        theme: {
-            get: function () {
-                return this.settingsStore.appSettings.theme;
-            },
-            set: function (value) {
-                if (value !== this.settingsStore.appSettings.theme) {
-                    this.settingsStore.setTheme(value);
-
-                    if (value === ThemeType.Light || value === ThemeType.Dark) {
-                        this.globalTheme.global.name.value = value;
-                    } else {
-                        this.globalTheme.global.name.value = getSystemTheme();
-                    }
-                }
-            }
-        },
-        isUserScheduledTransactionEnabled() {
-            return isUserScheduledTransactionEnabled();
-        },
-        isEnableApplicationLock() {
-            return this.settingsStore.appSettings.applicationLock;
-        }
-    },
-    setup() {
-        const display = useDisplay();
-        const theme = useTheme();
-
-        return {
-            display: display,
-            globalTheme: theme
-        };
-    },
-    methods: {
-        handleNavScroll(e) {
-            this.isVerticalNavScrolled = e.target.scrollTop > 0;
-        },
-        lock() {
-            this.rootStore.lock();
-            this.$router.replace('/unlock');
-        },
-        logout() {
-            const self = this;
-
-            self.logouting = true;
-            self.showLoading = true;
-
-            self.rootStore.logout().then(() => {
-                self.logouting = false;
-                self.showLoading = false;
-
-                self.settingsStore.clearAppSettings();
-
-                const localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage, self.settingsStore.appSettings.timeZone);
-                self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-
-                setExpenseAndIncomeAmountColor(self.userStore.currentUserExpenseAmountColor, self.userStore.currentUserIncomeAmountColor);
-
-                this.$router.replace('/login');
-            }).catch(error => {
-                self.logouting = false;
-                self.showLoading = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
         }
     }
+});
+
+const isEnableApplicationLock = computed<boolean>(() => {
+    return settingsStore.appSettings.applicationLock;
+});
+
+function handleNavScroll(e: Event) {
+    isVerticalNavScrolled.value = (e.target as HTMLElement).scrollTop > 0;
+}
+
+function lock() {
+    rootStore.lock();
+    router.replace('/unlock');
+}
+
+function logout() {
+    logouting.value = true;
+    showLoading.value = true;
+
+    rootStore.logout().then(() => {
+        logouting.value = false;
+        showLoading.value = false;
+
+        settingsStore.clearAppSettings();
+
+        const localeDefaultSettings = initLocale(userStore.currentUserLanguage, settingsStore.appSettings.timeZone);
+        settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+
+        setExpenseAndIncomeAmountColor(userStore.currentUserExpenseAmountColor, userStore.currentUserIncomeAmountColor);
+
+        router.replace('/login');
+    }).catch(error => {
+        logouting.value = false;
+        showLoading.value = false;
+
+        if (!error.processed && snackbar.value) {
+            snackbar.value.showError(error);
+        }
+    });
 }
 </script>
 

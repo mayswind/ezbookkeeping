@@ -56,7 +56,7 @@ export function showConfirm(message: string, confirmCallback: (dialog: Dialog.Di
     });
 }
 
-export function showToast(message: string, timeout: number, translateFn: TranslateFunction):void {
+export function showToast(message: string, timeout: number | undefined, translateFn: TranslateFunction):void {
     f7ready((f7) => {
         f7.toast.create({
             text: translateError(message, translateFn),
@@ -214,6 +214,6 @@ export function useI18nUIComponents() {
     return {
         showAlert: (message: string, confirmCallback: (dialog: Dialog.Dialog, e: Event) => void) => showAlert(message, confirmCallback, i18nGlobal.t),
         showConfirm: (message: string, confirmCallback: (dialog: Dialog.Dialog, e: Event) => void, cancelCallback: (dialog: Dialog.Dialog, e: Event) => void): void => showConfirm(message, confirmCallback, cancelCallback, i18nGlobal.t),
-        showToast: (message: string, timeout: number): void => showToast(message, timeout, i18nGlobal.t)
+        showToast: (message: string, timeout?: number): void => showToast(message, timeout, i18nGlobal.t)
     }
 }

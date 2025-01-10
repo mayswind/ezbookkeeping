@@ -3,7 +3,14 @@ declare const __EZBOOKKEEPING_VERSION__: string;
 declare const __EZBOOKKEEPING_BUILD_UNIX_TIME__: string;
 declare const __EZBOOKKEEPING_BUILD_COMMIT_HASH__: string;
 declare const __EZBOOKKEEPING_LICENSE__: string;
-declare const __EZBOOKKEEPING_THIRD_PARTY_LICENSES__: string[];
+declare const __EZBOOKKEEPING_THIRD_PARTY_LICENSES__: LicenseInfo[];
+
+declare interface LicenseInfo {
+    name: string;
+    copyright?: string;
+    url?: string;
+    licenseUrl?: string;
+}
 
 interface Window {
     EZBOOKKEEPING_SERVER_SETTINGS?: {

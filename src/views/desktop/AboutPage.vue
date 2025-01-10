@@ -1,11 +1,11 @@
 <template>
     <v-row class="match-height">
         <v-col cols="12">
-            <v-card :title="$t('global.app.title')">
+            <v-card :title="tt('global.app.title')">
                 <v-card-text>
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
-                            <span class="text-body-1">{{ $t('Version') }}</span>
+                            <span class="text-body-1">{{ tt('Version') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
                             <span class="text-body-1">{{ version }}</span>
@@ -13,7 +13,7 @@
                     </v-row>
                     <v-row no-gutters v-if="buildTime">
                         <v-col cols="12" md="2">
-                            <span class="text-body-1">{{ $t('Build Time') }}</span>
+                            <span class="text-body-1">{{ tt('Build Time') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
                             <span class="text-body-1">{{ buildTime }}</span>
@@ -21,7 +21,7 @@
                     </v-row>
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
-                            <span class="text-body-1">{{ $t('Official Website') }}</span>
+                            <span class="text-body-1">{{ tt('Official Website') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
                             <a class="text-body-1" href="https://github.com/mayswind/ezbookkeeping" target="_blank">
@@ -31,7 +31,7 @@
                     </v-row>
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
-                            <span class="text-body-1">{{ $t('Report Issue') }}</span>
+                            <span class="text-body-1">{{ tt('Report Issue') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
                             <a class="text-body-1" href="https://github.com/mayswind/ezbookkeeping/issues" target="_blank">
@@ -41,7 +41,7 @@
                     </v-row>
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
-                            <span class="text-body-1">{{ $t('Documents') }}</span>
+                            <span class="text-body-1">{{ tt('Documents') }}</span>
                         </v-col>
                         <v-col cols="12" md="10">
                             <a class="text-body-1" href="https://ezbookkeeping.mayswind.net" target="_blank">
@@ -54,11 +54,11 @@
         </v-col>
 
         <v-col cols="12" v-if="exchangeRatesData">
-            <v-card :title="$t('Exchange Rates Data')">
+            <v-card :title="tt('Exchange Rates Data')">
                 <v-card-text>
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
-                            <span class="text-body-1">{{ $t('Provider') }}</span>
+                            <span class="text-body-1">{{ tt('Provider') }}</span>
                         </v-col>
                         <v-col cols="12" md="10">
                             <a class="text-body-1" :href="exchangeRatesData.referenceUrl" target="_blank"
@@ -71,11 +71,11 @@
         </v-col>
 
         <v-col cols="12" v-if="mapProviderName">
-            <v-card :title="$t('Map')">
+            <v-card :title="tt('Map')">
                 <v-card-text>
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
-                            <span class="text-body-1">{{ $t('Provider') }}</span>
+                            <span class="text-body-1">{{ tt('Provider') }}</span>
                         </v-col>
                         <v-col cols="12" md="10">
                             <a class="text-body-1" :href="mapProviderWebsite" target="_blank"
@@ -88,7 +88,7 @@
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="$t('License')">
+            <v-card :title="tt('License')">
                 <v-card-text>
                     <v-row no-gutters>
                         <v-col cols="12">
@@ -119,44 +119,10 @@
     </v-row>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
-import { useUserStore } from '@/stores/user.ts';
-import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
+<script setup lang="ts">
+import { useI18n } from '@/locales/helpers.ts';
+import { useAboutPage } from '@/views/base/AboutPage.ts';
 
-import { getMapProvider } from '@/lib/server_settings.ts';
-import { getMapWebsite } from '@/lib/map/index.ts';
-import { getLicense, getThirdPartyLicenses } from '@/lib/licenses.ts';
-
-export default {
-    computed: {
-        ...mapStores(useUserStore, useExchangeRatesStore),
-        version() {
-            return 'v' + this.$version;
-        },
-        buildTime() {
-            if (!this.$buildTime) {
-                return this.$buildTime;
-            }
-
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.$buildTime);
-        },
-        exchangeRatesData() {
-            return this.exchangeRatesStore.latestExchangeRates.data;
-        },
-        mapProviderName() {
-            const provider = getMapProvider();
-            return provider ? this.$t(`mapprovider.${provider}`) : '';
-        },
-        mapProviderWebsite() {
-            return getMapWebsite();
-        },
-        licenseLines() {
-            return getLicense().replaceAll(/\r/g, '').split('\n');
-        },
-        thirdPartyLicenses() {
-            return getThirdPartyLicenses();
-        }
-    }
-}
+const { tt } = useI18n();
+const { version, buildTime, exchangeRatesData, mapProviderName, mapProviderWebsite, licenseLines, thirdPartyLicenses } = useAboutPage();
 </script>

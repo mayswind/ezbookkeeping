@@ -1,36 +1,36 @@
 <template>
     <f7-page>
-        <f7-navbar :title="$t('About')" :back-link="$t('Back')"></f7-navbar>
+        <f7-navbar :title="tt('About')" :back-link="tt('Back')"></f7-navbar>
 
-        <f7-block-title class="margin-top">{{ $t('global.app.title') }}</f7-block-title>
+        <f7-block-title class="margin-top">{{ tt('global.app.title') }}</f7-block-title>
         <f7-list strong inset dividers>
-            <f7-list-item :title="$t('Version')" :after="version"></f7-list-item>
-            <f7-list-item :title="$t('Build Time')" :after="buildTime" v-if="buildTime"></f7-list-item>
-            <f7-list-item external :title="$t('Official Website')" link="https://github.com/mayswind/ezbookkeeping" target="_blank"></f7-list-item>
-            <f7-list-item external :title="$t('Report Issue')" link="https://github.com/mayswind/ezbookkeeping/issues" target="_blank"></f7-list-item>
-            <f7-list-item external :title="$t('Documents')" link="https://ezbookkeeping.mayswind.net" target="_blank"></f7-list-item>
-            <f7-list-item :title="$t('License')" link="#" popup-open=".license-popup"></f7-list-item>
+            <f7-list-item :title="tt('Version')" :after="version"></f7-list-item>
+            <f7-list-item :title="tt('Build Time')" :after="buildTime" v-if="buildTime"></f7-list-item>
+            <f7-list-item external :title="tt('Official Website')" link="https://github.com/mayswind/ezbookkeeping" target="_blank"></f7-list-item>
+            <f7-list-item external :title="tt('Report Issue')" link="https://github.com/mayswind/ezbookkeeping/issues" target="_blank"></f7-list-item>
+            <f7-list-item external :title="tt('Documents')" link="https://ezbookkeeping.mayswind.net" target="_blank"></f7-list-item>
+            <f7-list-item :title="tt('License')" link="#" popup-open=".license-popup"></f7-list-item>
         </f7-list>
 
-        <f7-block-title class="margin-top" v-if="exchangeRatesData">{{ $t('Exchange Rates Data') }}</f7-block-title>
+        <f7-block-title class="margin-top" v-if="exchangeRatesData">{{ tt('Exchange Rates Data') }}</f7-block-title>
         <f7-list strong inset dividers v-if="exchangeRatesData">
-            <f7-list-item external :title="$t('Provider')" :after="exchangeRatesData.dataSource"
+            <f7-list-item external :title="tt('Provider')" :after="exchangeRatesData.dataSource"
                           :link="exchangeRatesData.referenceUrl" target="_blank" v-if="exchangeRatesData.referenceUrl"></f7-list-item>
-            <f7-list-item :title="$t('Provider')" :after="exchangeRatesData.dataSource" v-if="!exchangeRatesData.referenceUrl"></f7-list-item>
+            <f7-list-item :title="tt('Provider')" :after="exchangeRatesData.dataSource" v-if="!exchangeRatesData.referenceUrl"></f7-list-item>
         </f7-list>
 
-        <f7-block-title class="margin-top" v-if="mapProviderName">{{ $t('Map') }}</f7-block-title>
+        <f7-block-title class="margin-top" v-if="mapProviderName">{{ tt('Map') }}</f7-block-title>
         <f7-list strong inset dividers v-if="mapProviderName">
-            <f7-list-item external :title="$t('Provider')" :after="mapProviderName"
+            <f7-list-item external :title="tt('Provider')" :after="mapProviderName"
                           :link="mapProviderWebsite" target="_blank" v-if="mapProviderWebsite"></f7-list-item>
-            <f7-list-item :title="$t('Provider')" :after="mapProviderName" v-if="!mapProviderWebsite"></f7-list-item>
+            <f7-list-item :title="tt('Provider')" :after="mapProviderName" v-if="!mapProviderWebsite"></f7-list-item>
         </f7-list>
 
         <f7-popup push with-subnavbar swipe-to-close swipe-handler=".swipe-handler" class="license-popup">
             <f7-page>
                 <f7-navbar>
                     <div class="swipe-handler" style="z-index: 10"></div>
-                    <f7-subnavbar :title="$t('License') "></f7-subnavbar>
+                    <f7-subnavbar :title="tt('License') "></f7-subnavbar>
                 </f7-navbar>
                 <f7-block strong outline class="license-content">
                     <p>
@@ -57,46 +57,12 @@
     </f7-page>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
-import { useUserStore } from '@/stores/user.ts';
-import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
+<script setup lang="ts">
+import { useI18n } from '@/locales/helpers.ts';
+import { useAboutPage } from '@/views/base/AboutPage.ts';
 
-import { getMapProvider } from '@/lib/server_settings.ts';
-import { getMapWebsite } from '@/lib/map/index.ts';
-import { getLicense, getThirdPartyLicenses } from '@/lib/licenses.ts';
-
-export default {
-    computed: {
-        ...mapStores(useUserStore, useExchangeRatesStore),
-        version() {
-            return 'v' + this.$version;
-        },
-        buildTime() {
-            if (!this.$buildTime) {
-                return this.$buildTime;
-            }
-
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.$buildTime);
-        },
-        exchangeRatesData() {
-            return this.exchangeRatesStore.latestExchangeRates.data;
-        },
-        mapProviderName() {
-            const provider = getMapProvider();
-            return provider ? this.$t(`mapprovider.${provider}`) : '';
-        },
-        mapProviderWebsite() {
-            return getMapWebsite();
-        },
-        licenseLines() {
-            return getLicense().replaceAll(/\r/g, '').split('\n');
-        },
-        thirdPartyLicenses() {
-            return getThirdPartyLicenses();
-        }
-    }
-}
+const { tt } = useI18n();
+const { version, buildTime, exchangeRatesData, mapProviderName, mapProviderWebsite, licenseLines, thirdPartyLicenses } = useAboutPage();
 </script>
 
 <style>

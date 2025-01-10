@@ -5,9 +5,15 @@ import { type LanguageInfo, allLanguages, DEFAULT_LANGUAGE } from '@/locales/ind
 
 import {
     type LocalizedMeridiemIndicator,
+    type DateFormat,
+    type TimeFormat,
     Month,
     WeekDay,
-    MeridiemIndicator
+    MeridiemIndicator,
+    LongDateFormat,
+    ShortDateFormat,
+    LongTimeFormat,
+    ShortTimeFormat
 } from '@/core/datetime.ts';
 
 import type { LocaleDefaultSettings } from '@/core/setting.ts';
@@ -22,11 +28,15 @@ import {
 
 import {
     isPM,
-    getTimezoneOffset
+    formatUnixTime,
+    getTimezoneOffset,
+    getDateTimeFormatType
 } from '@/lib/datetime.ts';
 
 import logger from '@/lib/logger.ts';
 import services from '@/lib/services.ts';
+
+import { useUserStore } from '@/stores/user.ts';
 
 export interface LocalizedErrorParameter {
     key: string;
@@ -64,6 +74,8 @@ export function getI18nOptions(): object {
 
 export function useI18n() {
     const { t, locale } = useVueI18n();
+
+    const userStore = useUserStore();
 
     // private functions
     function getLanguageInfo(languageKey: string): LanguageInfo | undefined {
@@ -223,6 +235,51 @@ export function useI18n() {
         return ret;
     }
 
+    function getLocalizedDateTimeFormat<T extends DateFormat | TimeFormat>(type: string, allFormatMap: Record<string, T>, allFormatArray: T[], formatTypeValue: number, languageDefaultTypeNameKey: string, systemDefaultFormatType: T): string {
+        const formatType = getDateTimeFormatType(allFormatMap, allFormatArray, formatTypeValue, t(`default.${languageDefaultTypeNameKey}`), systemDefaultFormatType);
+        return t(`format.${type}.${formatType.key}`);
+    }
+
+    function getLocalizedLongDateFormat(): string {
+        return getLocalizedDateTimeFormat<LongDateFormat>('longDate', LongDateFormat.all(), LongDateFormat.values(), userStore.currentUserLongDateFormat, 'longDateFormat', LongDateFormat.Default);
+    }
+
+    function getLocalizedShortDateFormat(): string {
+        return getLocalizedDateTimeFormat<ShortDateFormat>('shortDate', ShortDateFormat.all(), ShortDateFormat.values(), userStore.currentUserShortDateFormat, 'shortDateFormat', ShortDateFormat.Default);
+    }
+
+    function getLocalizedLongYearFormat(): string {
+        return getLocalizedDateTimeFormat<LongDateFormat>('longYear', LongDateFormat.all(), LongDateFormat.values(), userStore.currentUserLongDateFormat, 'longDateFormat', LongDateFormat.Default);
+    }
+
+    function getLocalizedShortYearFormat(): string {
+        return getLocalizedDateTimeFormat<ShortDateFormat>('shortYear', ShortDateFormat.all(), ShortDateFormat.values(), userStore.currentUserShortDateFormat, 'shortDateFormat', ShortDateFormat.Default);
+    }
+
+    function getLocalizedLongYearMonthFormat(): string {
+        return getLocalizedDateTimeFormat<LongDateFormat>('longYearMonth', LongDateFormat.all(), LongDateFormat.values(), userStore.currentUserLongDateFormat, 'longDateFormat', LongDateFormat.Default);
+    }
+
+    function getLocalizedShortYearMonthFormat(): string {
+        return getLocalizedDateTimeFormat<ShortDateFormat>('shortYearMonth', ShortDateFormat.all(), ShortDateFormat.values(), userStore.currentUserShortDateFormat, 'shortDateFormat', ShortDateFormat.Default);
+    }
+
+    function getLocalizedLongMonthDayFormat(): string {
+        return getLocalizedDateTimeFormat<LongDateFormat>('longMonthDay', LongDateFormat.all(), LongDateFormat.values(), userStore.currentUserLongDateFormat, 'longDateFormat', LongDateFormat.Default);
+    }
+
+    function getLocalizedShortMonthDayFormat(): string {
+        return getLocalizedDateTimeFormat<ShortDateFormat>('shortMonthDay', ShortDateFormat.all(), ShortDateFormat.values(), userStore.currentUserShortDateFormat, 'shortDateFormat', ShortDateFormat.Default);
+    }
+
+    function getLocalizedLongTimeFormat(): string {
+        return getLocalizedDateTimeFormat<LongTimeFormat>('longTime', LongTimeFormat.all(), LongTimeFormat.values(), userStore.currentUserLongTimeFormat, 'longTimeFormat', LongTimeFormat.Default);
+    }
+
+    function getLocalizedShortTimeFormat(): string {
+        return getLocalizedDateTimeFormat<ShortTimeFormat>('shortTime', ShortTimeFormat.all(), ShortTimeFormat.values(), userStore.currentUserShortTimeFormat, 'shortTimeFormat', ShortTimeFormat.Default);
+    }
+
     // public functions
     function translateIf(text: string, isTranslate: boolean): string {
         if (isTranslate) {
@@ -316,6 +373,17 @@ export function useI18n() {
 
     function getAllMinWeekdayNames(): string[] {
         return getAllWeekdayNames('min');
+    }
+
+    function formatYearQuarter(year: number, quarter: number): string {
+        if (1 <= quarter && quarter <= 4) {
+            return t('format.yearQuarter.q' + quarter, {
+                year: year,
+                quarter: quarter
+            });
+        } else {
+            return '';
+        }
     }
 
     function setLanguage(languageKey: string | null, force?: boolean): LocaleDefaultSettings | null {
@@ -413,6 +481,19 @@ export function useI18n() {
         getAllLongWeekdayNames,
         getAllShortWeekdayNames,
         getAllMinWeekdayNames,
+        formatUnixTimeToLongDateTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongDateFormat() + ' ' + getLocalizedLongTimeFormat(), utcOffset, currentUtcOffset),
+        formatUnixTimeToShortDateTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDateFormat() + ' ' + getLocalizedShortTimeFormat(), utcOffset, currentUtcOffset),
+        formatUnixTimeToLongDate: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongDateFormat(), utcOffset, currentUtcOffset),
+        formatUnixTimeToShortDate: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDateFormat(), utcOffset, currentUtcOffset),
+        formatUnixTimeToLongYear: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongYearFormat(), utcOffset, currentUtcOffset),
+        formatUnixTimeToShortYear: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortYearFormat(), utcOffset, currentUtcOffset),
+        formatUnixTimeToLongYearMonth: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongYearMonthFormat(), utcOffset, currentUtcOffset),
+        formatUnixTimeToShortYearMonth: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortYearMonthFormat(), utcOffset, currentUtcOffset),
+        formatUnixTimeToLongMonthDay: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongMonthDayFormat(), utcOffset, currentUtcOffset),
+        formatUnixTimeToShortMonthDay: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortMonthDayFormat(), utcOffset, currentUtcOffset),
+        formatUnixTimeToLongTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongTimeFormat(), utcOffset, currentUtcOffset),
+        formatUnixTimeToShortTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortTimeFormat(), utcOffset, currentUtcOffset),
+        formatYearQuarter,
         setLanguage,
         setTimeZone,
         initLocale

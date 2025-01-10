@@ -499,7 +499,3 @@ export class DateRange implements TypeAndName {
         return dateRange?.isBillingCycle || false;
     }
 }
-
-export type AllDateTimeFormatMap = Record<string, LongDateFormat> | Record<string, ShortDateFormat> | Record<string, LongTimeFormat> | Record<string, ShortTimeFormat>;
-export type AllDateTimeFormatArray = LongDateFormat[] | ShortDateFormat[] | LongTimeFormat[] | ShortTimeFormat[];
-export type AllDateTimeFormatType = LongDateFormat | ShortDateFormat | LongTimeFormat | ShortTimeFormat;

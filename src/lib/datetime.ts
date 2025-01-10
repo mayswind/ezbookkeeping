@@ -11,9 +11,8 @@ import {
     type TimeDifference,
     type RecentMonthDateRange,
     type LocalizedRecentMonthDateRange,
-    type AllDateTimeFormatMap,
-    type AllDateTimeFormatArray,
-    type AllDateTimeFormatType,
+    type DateFormat,
+    type TimeFormat,
     YearQuarterUnixTime,
     YearMonthUnixTime,
     Month,
@@ -477,11 +476,11 @@ export function getAllMonthsStartAndEndUnixTimes(startYearMonth: YearMonth | str
     return allYearMonthTimes;
 }
 
-export function getDateTimeFormatType(allFormatMap: AllDateTimeFormatMap, allFormatArray: AllDateTimeFormatArray, localeDefaultFormatTypeName: string, systemDefaultFormatType: AllDateTimeFormatType, formatTypeValue: number): AllDateTimeFormatType {
+export function getDateTimeFormatType<T extends DateFormat | TimeFormat>(allFormatMap: Record<string, T>, allFormatArray: T[], formatTypeValue: number, languageDefaultTypeName: string, systemDefaultFormatType: T): T {
     if (formatTypeValue > LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE && allFormatArray[formatTypeValue - 1] && allFormatArray[formatTypeValue - 1].key) {
         return allFormatArray[formatTypeValue - 1];
-    } else if (formatTypeValue === LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE && allFormatMap[localeDefaultFormatTypeName] && allFormatMap[localeDefaultFormatTypeName].key) {
-        return allFormatMap[localeDefaultFormatTypeName];
+    } else if (formatTypeValue === LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE && allFormatMap[languageDefaultTypeName] && allFormatMap[languageDefaultTypeName].key) {
+        return allFormatMap[languageDefaultTypeName];
     } else {
         return systemDefaultFormatType;
     }

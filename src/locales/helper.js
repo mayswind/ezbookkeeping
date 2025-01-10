@@ -456,13 +456,13 @@ function getI18nShortMonthDayFormat(translateFn, formatTypeValue) {
 
 function isLongDateMonthAfterYear(translateFn, formatTypeValue) {
     const defaultLongDateFormatTypeName = translateFn('default.longDateFormat');
-    const type = getDateTimeFormatType(LongDateFormat.all(), LongDateFormat.values(), defaultLongDateFormatTypeName, LongDateFormat.Default, formatTypeValue);
+    const type = getDateTimeFormatType(LongDateFormat.all(), LongDateFormat.values(), formatTypeValue, defaultLongDateFormatTypeName, LongDateFormat.Default);
     return type.isMonthAfterYear;
 }
 
 function isShortDateMonthAfterYear(translateFn, formatTypeValue) {
     const defaultShortDateFormatTypeName = translateFn('default.shortDateFormat');
-    const type = getDateTimeFormatType(ShortDateFormat.all(), ShortDateFormat.values(), defaultShortDateFormatTypeName, ShortDateFormat.Default, formatTypeValue);
+    const type = getDateTimeFormatType(ShortDateFormat.all(), ShortDateFormat.values(), formatTypeValue, defaultShortDateFormatTypeName, ShortDateFormat.Default);
     return type.isMonthAfterYear;
 }
 
@@ -489,25 +489,25 @@ function formatYearQuarter(translateFn, year, quarter) {
 
 function isLongTime24HourFormat(translateFn, formatTypeValue) {
     const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
-    const type = getDateTimeFormatType(LongTimeFormat.all(), LongTimeFormat.values(), defaultLongTimeFormatTypeName, LongTimeFormat.Default, formatTypeValue);
+    const type = getDateTimeFormatType(LongTimeFormat.all(), LongTimeFormat.values(), formatTypeValue, defaultLongTimeFormatTypeName, LongTimeFormat.Default);
     return type.is24HourFormat;
 }
 
 function isLongTimeMeridiemIndicatorFirst(translateFn, formatTypeValue) {
     const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
-    const type = getDateTimeFormatType(LongTimeFormat.all(), LongTimeFormat.values(), defaultLongTimeFormatTypeName, LongTimeFormat.Default, formatTypeValue);
+    const type = getDateTimeFormatType(LongTimeFormat.all(), LongTimeFormat.values(), formatTypeValue, defaultLongTimeFormatTypeName, LongTimeFormat.Default);
     return type.isMeridiemIndicatorFirst;
 }
 
 function isShortTime24HourFormat(translateFn, formatTypeValue) {
     const defaultShortTimeFormatTypeName = translateFn('default.shortTimeFormat');
-    const type = getDateTimeFormatType(ShortTimeFormat.all(), ShortTimeFormat.values(), defaultShortTimeFormatTypeName, ShortTimeFormat.Default, formatTypeValue);
+    const type = getDateTimeFormatType(ShortTimeFormat.all(), ShortTimeFormat.values(), formatTypeValue, defaultShortTimeFormatTypeName, ShortTimeFormat.Default);
     return type.is24HourFormat;
 }
 
 function isShortTimeMeridiemIndicatorFirst(translateFn, formatTypeValue) {
     const defaultShortTimeFormatTypeName = translateFn('default.shortTimeFormat');
-    const type = getDateTimeFormatType(ShortTimeFormat.all(), ShortTimeFormat.values(), defaultShortTimeFormatTypeName, ShortTimeFormat.Default, formatTypeValue);
+    const type = getDateTimeFormatType(ShortTimeFormat.all(), ShortTimeFormat.values(), formatTypeValue, defaultShortTimeFormatTypeName, ShortTimeFormat.Default);
     return type.isMeridiemIndicatorFirst;
 }
 
@@ -537,8 +537,7 @@ function getDateTimeFormats(translateFn, allFormatMap, allFormatArray, localeFor
 }
 
 function getDateTimeFormat(translateFn, allFormatMap, allFormatArray, localeFormatPathPrefix, localeDefaultFormatTypeName, systemDefaultFormatType, formatTypeValue) {
-    const type = getDateTimeFormatType(allFormatMap, allFormatArray,
-        localeDefaultFormatTypeName, systemDefaultFormatType, formatTypeValue);
+    const type = getDateTimeFormatType(allFormatMap, allFormatArray, formatTypeValue, localeDefaultFormatTypeName, systemDefaultFormatType);
     return translateFn(`${localeFormatPathPrefix}.${type.key}`);
 }
 

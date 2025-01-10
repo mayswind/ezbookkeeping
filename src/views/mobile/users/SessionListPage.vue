@@ -50,7 +50,7 @@ import { useTokensStore } from '@/stores/token.ts';
 import { isEquals } from '@/lib/common.ts';
 import { parseSessionInfo } from '@/lib/session.ts';
 
-import { onSwipeoutDeleted } from '@/lib/ui/mobile.js';
+import { onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
 
 export default {
     props: [

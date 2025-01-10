@@ -96,7 +96,7 @@ import {
     getFirstShowingId,
     getLastShowingId
 } from '@/lib/category.js';
-import { onSwipeoutDeleted } from '@/lib/ui/mobile.js';
+import { onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
 
 export default {
     props: [

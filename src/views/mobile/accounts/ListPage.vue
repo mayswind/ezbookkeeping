@@ -181,7 +181,7 @@ import { useAccountsStore } from '@/stores/account.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { AccountType, AccountCategory } from '@/core/account.ts';
-import { onSwipeoutDeleted } from '@/lib/ui/mobile.js';
+import { onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
 
 export default {
     props: [

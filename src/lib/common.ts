@@ -133,6 +133,16 @@ export function isObjectEmpty(obj: object): boolean {
     return true;
 }
 
+export function getNumberValue(value: unknown, defaultValue: number): number {
+    if (isString(value)) {
+        return parseInt(value as string, 10);
+    } else if (isNumber(value)) {
+        return value as number;
+    } else {
+        return defaultValue;
+    }
+}
+
 export function sortNumbersArray(array: number[]): number[] {
     return array.sort(function (num1, num2) {
         return num1 - num2;

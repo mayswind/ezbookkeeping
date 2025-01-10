@@ -42,7 +42,7 @@
 
 <script>
 import { isArray } from '@/lib/common.ts';
-import { scrollToSelectedItem } from '@/lib/ui/mobile.js';
+import { scrollToSelectedItem } from '@/lib/ui/mobile.ts';
 
 export default {
     props: [

@@ -69,7 +69,7 @@
 import { type Ref, ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helper.js';
-import { useI18nUIComponents } from '@/lib/ui/mobile.js';
+import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 import { ALL_CURRENCIES } from '@/consts/currency.ts';

@@ -197,7 +197,7 @@ import {
 } from '@/lib/server_settings.ts';
 import { getDesktopVersionPath } from '@/lib/version.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
-import { isModalShowing } from '@/lib/ui/mobile.js';
+import { isModalShowing } from '@/lib/ui/mobile.ts';
 
 export default {
     props: [

@@ -64,7 +64,7 @@ import {
     getTimeValues,
     getCombinedDateAndTimeValues
 } from '@/lib/datetime.ts';
-import { createInlinePicker } from '@/lib/ui/mobile.js';
+import { createInlinePicker } from '@/lib/ui/mobile.ts';
 
 export default {
     props: [

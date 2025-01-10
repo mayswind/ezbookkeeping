@@ -152,7 +152,7 @@ import {
     getFirstShowingId,
     getLastShowingId
 } from '@/lib/tag.js';
-import { onSwipeoutDeleted } from '@/lib/ui/mobile.js';
+import { onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
 
 export default {
     props: [

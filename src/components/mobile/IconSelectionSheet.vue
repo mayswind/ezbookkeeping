@@ -36,7 +36,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import type { IconInfo, IconInfoWithId } from '@/core/icon.ts';
 import { arrayContainsFieldValue } from '@/lib/common.ts';
 import { getIconsInRows } from '@/lib/icon.ts';
-import { scrollToSelectedItem } from '@/lib/ui/mobile.js';
+import { scrollToSelectedItem } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{
     modelValue: string;

@@ -92,7 +92,7 @@ import {
     showLoading,
     hideLoading,
     routeBackOnError
-} from '@/lib/ui/mobile.js';
+} from '@/lib/ui/mobile.ts';
 
 import PinCodeInput from '@/components/common/PinCodeInput.vue';
 import MapView from '@/components/common/MapView.vue';
@@ -117,7 +117,7 @@ import MapSheet from '@/components/mobile/MapSheet.vue';
 import TransactionTagSelectionSheet from '@/components/mobile/TransactionTagSelectionSheet.vue';
 import ScheduleFrequencySheet from '@/components/mobile/ScheduleFrequencySheet.vue';
 
-import TextareaAutoSize from '@/directives/mobile/textareaAutoSize.js';
+import TextareaAutoSize from '@/directives/mobile/textareaAutoSize.ts';
 
 import '@/styles/mobile/global.css';
 import '@/styles/mobile/font-size-default.css';

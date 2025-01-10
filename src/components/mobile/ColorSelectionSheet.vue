@@ -36,7 +36,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import type { ColorValue, ColorInfo } from '@/core/color.ts';
 import { arrayContainsFieldValue } from '@/lib/common.ts';
 import { getColorsInRows } from '@/lib/color.ts';
-import { scrollToSelectedItem } from '@/lib/ui/mobile.js';
+import { scrollToSelectedItem } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{
     modelValue: ColorValue;

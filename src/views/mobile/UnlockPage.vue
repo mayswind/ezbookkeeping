@@ -83,7 +83,7 @@ import {
     getWebAuthnCredentialId
 } from '@/lib/userstate.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
-import { isModalShowing } from '@/lib/ui/mobile.js';
+import { isModalShowing } from '@/lib/ui/mobile.ts';
 
 export default {
     props: [

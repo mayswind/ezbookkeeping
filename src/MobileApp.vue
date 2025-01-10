@@ -27,7 +27,7 @@ import { getTheme, isEnableAnimate } from '@/lib/settings.ts';
 import { initMapProvider } from '@/lib/map/index.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
-import { isModalShowing, setAppFontSize } from '@/lib/ui/mobile.js';
+import { isModalShowing, setAppFontSize } from '@/lib/ui/mobile.ts';
 
 const { tt, getCurrentLanguageInfo, setLanguage, initLocale } = useI18n();
 

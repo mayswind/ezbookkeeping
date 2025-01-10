@@ -1,12 +1,26 @@
 import { useI18n as useVueI18n } from 'vue-i18n';
 import { f7, f7ready } from 'framework7-vue';
+import type { Dialog, Picker, Router } from 'framework7/types';
 
 import { FontSize, FONT_SIZE_PREVIEW_CLASSNAME_PREFIX } from '@/core/font.ts';
-import { translateError } from '@/locales/helper';
-
+import { getNumberValue } from '../common.ts';
 import { isEnableAnimate } from '../settings.ts';
+// @ts-expect-error the above file is migrating to ts
+import { translateError } from '@/locales/helper.js';
 
-export function showAlert(message, confirmCallback, translateFn) {
+interface Framework7Dom {
+    length: number;
+    [index: number]: Element;
+    find: (selector?: string) => Framework7Dom;
+    offset(): { top: number; left: number };
+    scrollTop(position: number, duration?: number, callback?: () => void): Framework7Dom;
+    outerHeight(includeMargin?: boolean): number;
+    css(property: string): string | number;
+}
+
+type TranslateFunction = (message: string) => string;
+
+export function showAlert(message: string, confirmCallback: (dialog: Dialog.Dialog, e: Event) => void, translateFn: TranslateFunction): void {
     f7ready((f7) => {
         f7.dialog.create({
             title: translateFn('global.app.title'),
@@ -22,7 +36,7 @@ export function showAlert(message, confirmCallback, translateFn) {
     });
 }
 
-export function showConfirm(message, confirmCallback, cancelCallback, translateFn) {
+export function showConfirm(message: string, confirmCallback: (dialog: Dialog.Dialog, e: Event) => void, cancelCallback: (dialog: Dialog.Dialog, e: Event) => void, translateFn: TranslateFunction): void {
     f7ready((f7) => {
         f7.dialog.create({
             title: translateFn('global.app.title'),
@@ -42,7 +56,7 @@ export function showConfirm(message, confirmCallback, cancelCallback, translateF
     });
 }
 
-export function showToast(message, timeout, translateFn) {
+export function showToast(message: string, timeout: number, translateFn: TranslateFunction):void {
     f7ready((f7) => {
         f7.toast.create({
             text: translateError(message, translateFn),
@@ -52,7 +66,7 @@ export function showToast(message, timeout, translateFn) {
     });
 }
 
-export function showLoading(delayConditionFunc, delayMills) {
+export function showLoading(delayConditionFunc: () => boolean, delayMills: number): void {
     if (!delayConditionFunc) {
         f7ready((f7) => {
             return f7.preloader.show();
@@ -75,7 +89,7 @@ export function hideLoading() {
     });
 }
 
-export function createInlinePicker(containerEl, inputEl, cols, value, events) {
+export function createInlinePicker(containerEl: HTMLElement, inputEl: HTMLElement, cols: Picker.ColumnParameters[], value: unknown[], events?: { change: (picker: Picker.Picker, value: unknown, displayValue: unknown) => void }): Picker.Picker {
     return f7.picker.create({
         containerEl: containerEl,
         inputEl: inputEl,
@@ -87,7 +101,8 @@ export function createInlinePicker(containerEl, inputEl, cols, value, events) {
     });
 }
 
-export function routeBackOnError(f7router, errorPropertyName) {
+export function routeBackOnError(f7router: Router.Router, errorPropertyName: string): void {
+    // @ts-expect-error vue SFC would be migrated to composition API and this function would be removed in the future
     const self = this;
     const router = f7router;
 
@@ -106,28 +121,24 @@ export function routeBackOnError(f7router, errorPropertyName) {
     });
 }
 
-export function elements(selector) {
-    return f7.$(selector);
-}
-
-export function isModalShowing() {
+export function isModalShowing(): number {
     return f7.$('.modal-in').length;
 }
 
-export function onSwipeoutDeleted(domId, callback) {
+export function onSwipeoutDeleted(domId: string, callback: () => void): void {
     f7.swipeout.delete(f7.$('#' + domId), callback);
 }
 
-export function autoChangeTextareaSize(el) {
-    f7.$(el).find('textarea').each(el => {
-        el.scrollTop = 0;
-        el.style.height = '';
-        el.style.height = el.scrollHeight + 'px';
+export function autoChangeTextareaSize(el: HTMLElement): void {
+    f7.$(el).find('textarea').each((child: HTMLElement) => {
+        child.scrollTop = 0;
+        child.style.height = '';
+        child.style.height = child.scrollHeight + 'px';
     });
 }
 
-export function setAppFontSize(type) {
-    const htmlElement = elements('html');
+export function setAppFontSize(type: number): void {
+    const htmlElement = f7.$('html');
     const allFontSizes = FontSize.values();
 
     for (let i = 0; i < allFontSizes.length; i++) {
@@ -143,7 +154,7 @@ export function setAppFontSize(type) {
     }
 }
 
-export function getFontSizePreviewClassName(type) {
+export function getFontSizePreviewClassName(type: number): string {
     const allFontSizes = FontSize.values();
 
     for (let i = 0; i < allFontSizes.length; i++) {
@@ -157,7 +168,7 @@ export function getFontSizePreviewClassName(type) {
     return FONT_SIZE_PREVIEW_CLASSNAME_PREFIX + FontSize.Default.className;
 }
 
-export function scrollToSelectedItem(parentEl, containerSelector, selectedItemSelector) {
+export function scrollToSelectedItem(parentEl: Framework7Dom, containerSelector: string, selectedItemSelector: string): void {
     if (!parentEl || !parentEl.length) {
         return;
     }
@@ -169,16 +180,18 @@ export function scrollToSelectedItem(parentEl, containerSelector, selectedItemSe
         return;
     }
 
-    let targetPos = selectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
+    const containerPaddingTop = getNumberValue(container.css('padding-top'), 0);
+
+    let targetPos = selectedItem.offset().top - container.offset().top - containerPaddingTop
         - (container.outerHeight() - selectedItem.outerHeight()) / 2;
 
     if (selectedItem.length > 1) {
-        let firstSelectedItem = elements(selectedItem[0]);
-        let lastSelectedItem = elements(selectedItem[selectedItem.length - 1]);
+        const firstSelectedItem = f7.$(selectedItem[0]);
+        const lastSelectedItem = f7.$(selectedItem[selectedItem.length - 1]);
 
-        let firstSelectedItemInTop = firstSelectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10);
-        let lastSelectedItemInTop = lastSelectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10);
-        let lastSelectedItemInBottom = lastSelectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
+        const firstSelectedItemInTop = firstSelectedItem.offset().top - container.offset().top - containerPaddingTop;
+        const lastSelectedItemInTop = lastSelectedItem.offset().top - container.offset().top - containerPaddingTop;
+        const lastSelectedItemInBottom = lastSelectedItem.offset().top - container.offset().top - containerPaddingTop
             - (container.outerHeight() - firstSelectedItem.outerHeight());
 
         targetPos = (firstSelectedItemInTop + lastSelectedItemInBottom) / 2;
@@ -199,8 +212,8 @@ export function useI18nUIComponents() {
     const i18nGlobal = useVueI18n();
 
     return {
-        showAlert: (message, confirmCallback) => showAlert(message, confirmCallback, i18nGlobal.t),
-        showConfirm: (message, confirmCallback, cancelCallback) => showConfirm(message, confirmCallback, cancelCallback, i18nGlobal.t),
-        showToast: (message, timeout) => showToast(message, timeout, i18nGlobal.t)
-    };
+        showAlert: (message: string, confirmCallback: (dialog: Dialog.Dialog, e: Event) => void) => showAlert(message, confirmCallback, i18nGlobal.t),
+        showConfirm: (message: string, confirmCallback: (dialog: Dialog.Dialog, e: Event) => void, cancelCallback: (dialog: Dialog.Dialog, e: Event) => void): void => showConfirm(message, confirmCallback, cancelCallback, i18nGlobal.t),
+        showToast: (message: string, timeout: number): void => showToast(message, timeout, i18nGlobal.t)
+    }
 }

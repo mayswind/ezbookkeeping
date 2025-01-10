@@ -551,7 +551,7 @@ import {
 import { categoryTypeToTransactionType, transactionTypeToCategoryType } from '@/lib/category.js';
 import { getUnifiedSelectedAccountsCurrencyOrDefaultCurrency } from '@/lib/account.js';
 import { getTransactionDisplayAmount } from '@/lib/transaction.js';
-import { onSwipeoutDeleted, scrollToSelectedItem } from '@/lib/ui/mobile.js';
+import { onSwipeoutDeleted, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
 
 export default {
     props: [

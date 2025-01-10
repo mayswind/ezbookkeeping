@@ -349,7 +349,7 @@ import {
     getDateTypeByDateRange,
     getDateRangeByDateType
 } from '@/lib/datetime.ts';
-import { scrollToSelectedItem } from '@/lib/ui/mobile.js';
+import { scrollToSelectedItem } from '@/lib/ui/mobile.ts';
 
 export default {
     props: [

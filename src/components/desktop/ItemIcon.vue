@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { type CommonIconProps, useItemIcon } from '@/components/base/ItemIcon.ts';
+import { type CommonIconProps, useItemIconBase } from '@/components/base/ItemIconBase.ts';
 
 import {
     mdiEyeOffOutline
@@ -25,7 +25,7 @@ interface DesktopItemIconProps extends CommonIconProps {
 }
 
 const props = defineProps<DesktopItemIconProps>();
-const { style, getAccountIcon, getCategoryIcon } = useItemIcon(props);
+const { style, getAccountIcon, getCategoryIcon } = useItemIconBase(props);
 
 const icons = {
     hide: mdiEyeOffOutline

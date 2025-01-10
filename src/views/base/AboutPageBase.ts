@@ -11,7 +11,7 @@ import { getMapWebsite } from '@/lib/map/index.ts';
 import { getLicense, getThirdPartyLicenses } from '@/lib/licenses.ts';
 import { getVersion, getBuildTime } from '@/lib/version.ts';
 
-export function useAboutPage() {
+export function useAboutPageBase() {
     const { tt, formatUnixTimeToLongDateTime } = useI18n();
 
     const exchangeRatesStore = useExchangeRatesStore();

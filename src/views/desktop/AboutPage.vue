@@ -121,8 +121,8 @@
 
 <script setup lang="ts">
 import { useI18n } from '@/locales/helpers.ts';
-import { useAboutPage } from '@/views/base/AboutPage.ts';
+import { useAboutPageBase } from '@/views/base/AboutPageBase.ts';
 
 const { tt } = useI18n();
-const { version, buildTime, exchangeRatesData, mapProviderName, mapProviderWebsite, licenseLines, thirdPartyLicenses } = useAboutPage();
+const { version, buildTime, exchangeRatesData, mapProviderName, mapProviderWebsite, licenseLines, thirdPartyLicenses } = useAboutPageBase();
 </script>

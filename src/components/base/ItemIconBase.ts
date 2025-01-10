@@ -19,7 +19,7 @@ export interface CommonIconProps {
     size?: string | number;
 }
 
-export function useItemIcon(props: CommonIconProps) {
+export function useItemIconBase(props: CommonIconProps) {
     const style = computed<Record<IconItemStyleName, IconItemStyleValue>>(() => {
         let defaultColor = 'var(--default-icon-color)';
 

@@ -6,10 +6,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { type CommonIconProps, useItemIcon } from '@/components/base/ItemIcon.ts';
+import { type CommonIconProps, useItemIconBase } from '@/components/base/ItemIconBase.ts';
 
 const props = defineProps<CommonIconProps>();
-const { style, getAccountIcon, getCategoryIcon } = useItemIcon(props);
+const { style, getAccountIcon, getCategoryIcon } = useItemIconBase(props);
 
 const f7IconValue = computed<string>(() => {
     if (props.iconType === 'fixed-f7') {

@@ -21,11 +21,3 @@ interface Window {
 interface Navigator {
     browserLanguage?: string;
 }
-
-declare module "framework7/components/notification" {
-    export namespace Notification {
-        export interface Notification {
-            destroy(): void;
-        }
-    }
-}

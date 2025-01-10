@@ -7,8 +7,7 @@
 <script setup lang="ts">
 import { type Ref, ref, computed, watch, onMounted } from 'vue';
 
-import type { Notification } from 'framework7/components/notification';
-import type { Actions, Dialog, Popover, Popup, Sheet } from 'framework7/types';
+import type { Notification, Actions, Dialog, Popover, Popup, Sheet } from 'framework7/types';
 import { f7ready } from 'framework7-vue';
 import routes from './router/mobile.js';
 
@@ -192,6 +191,8 @@ onMounted(() => {
 watch(currentNotificationContent, (newValue) => {
     if (notification.value) {
         notification.value.close();
+        // @ts-expect-error there is an "destroy" function in the Notification component, but it is not defined in the type definition file
+        // see https://framework7.io/docs/notification
         notification.value.destroy();
         notification.value = null;
     }

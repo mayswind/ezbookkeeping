@@ -246,24 +246,6 @@ function getCurrencyUnitName(currencyCode, isPlural, translateFn) {
     return '';
 }
 
-function getAllMeridiemIndicators(translateFn) {
-    const allMeridiemIndicators = MeridiemIndicator.values();
-    const meridiemIndicatorNames = [];
-    const localizedMeridiemIndicatorNames = [];
-
-    for (let i = 0; i < allMeridiemIndicators.length; i++) {
-        const indicator = allMeridiemIndicators[i];
-
-        meridiemIndicatorNames.push(indicator.name);
-        localizedMeridiemIndicatorNames.push(translateFn(`datetime.${indicator.name}.content`));
-    }
-
-    return {
-        values: meridiemIndicatorNames,
-        displayValues: localizedMeridiemIndicatorNames
-    };
-}
-
 function getAllLongMonthNames(translateFn) {
     const ret = [];
     const allMonths = Month.values();
@@ -454,18 +436,6 @@ function getI18nShortMonthDayFormat(translateFn, formatTypeValue) {
     return getDateTimeFormat(translateFn, ShortDateFormat.all(), ShortDateFormat.values(), 'format.shortMonthDay', defaultShortDateFormatTypeName, ShortDateFormat.Default, formatTypeValue);
 }
 
-function isLongDateMonthAfterYear(translateFn, formatTypeValue) {
-    const defaultLongDateFormatTypeName = translateFn('default.longDateFormat');
-    const type = getDateTimeFormatType(LongDateFormat.all(), LongDateFormat.values(), formatTypeValue, defaultLongDateFormatTypeName, LongDateFormat.Default);
-    return type.isMonthAfterYear;
-}
-
-function isShortDateMonthAfterYear(translateFn, formatTypeValue) {
-    const defaultShortDateFormatTypeName = translateFn('default.shortDateFormat');
-    const type = getDateTimeFormatType(ShortDateFormat.all(), ShortDateFormat.values(), formatTypeValue, defaultShortDateFormatTypeName, ShortDateFormat.Default);
-    return type.isMonthAfterYear;
-}
-
 function getI18nLongTimeFormat(translateFn, formatTypeValue) {
     const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
     return getDateTimeFormat(translateFn, LongTimeFormat.values(), LongTimeFormat.values(), 'format.longTime', defaultLongTimeFormatTypeName, LongTimeFormat.Default, formatTypeValue);
@@ -485,30 +455,6 @@ function formatYearQuarter(translateFn, year, quarter) {
     } else {
         return '';
     }
-}
-
-function isLongTime24HourFormat(translateFn, formatTypeValue) {
-    const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
-    const type = getDateTimeFormatType(LongTimeFormat.all(), LongTimeFormat.values(), formatTypeValue, defaultLongTimeFormatTypeName, LongTimeFormat.Default);
-    return type.is24HourFormat;
-}
-
-function isLongTimeMeridiemIndicatorFirst(translateFn, formatTypeValue) {
-    const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
-    const type = getDateTimeFormatType(LongTimeFormat.all(), LongTimeFormat.values(), formatTypeValue, defaultLongTimeFormatTypeName, LongTimeFormat.Default);
-    return type.isMeridiemIndicatorFirst;
-}
-
-function isShortTime24HourFormat(translateFn, formatTypeValue) {
-    const defaultShortTimeFormatTypeName = translateFn('default.shortTimeFormat');
-    const type = getDateTimeFormatType(ShortTimeFormat.all(), ShortTimeFormat.values(), formatTypeValue, defaultShortTimeFormatTypeName, ShortTimeFormat.Default);
-    return type.is24HourFormat;
-}
-
-function isShortTimeMeridiemIndicatorFirst(translateFn, formatTypeValue) {
-    const defaultShortTimeFormatTypeName = translateFn('default.shortTimeFormat');
-    const type = getDateTimeFormatType(ShortTimeFormat.all(), ShortTimeFormat.values(), formatTypeValue, defaultShortTimeFormatTypeName, ShortTimeFormat.Default);
-    return type.isMeridiemIndicatorFirst;
 }
 
 function getDateTimeFormats(translateFn, allFormatMap, allFormatArray, localeFormatPathPrefix, localeDefaultFormatTypeName, systemDefaultFormatType) {
@@ -1570,7 +1516,6 @@ export function i18nFunctions(i18nGlobal) {
         getDefaultCurrency: () => getDefaultCurrency(i18nGlobal.t),
         getDefaultFirstDayOfWeek: () => getDefaultFirstDayOfWeek(i18nGlobal.t),
         getCurrencyName: (currencyCode) => getCurrencyName(currencyCode, i18nGlobal.t),
-        getAllMeridiemIndicators: () => getAllMeridiemIndicators(i18nGlobal.t),
         getAllLongMonthNames: () => getAllLongMonthNames(i18nGlobal.t),
         getAllShortMonthNames: () => getAllShortMonthNames(i18nGlobal.t),
         getAllLongWeekdayNames: () => getAllLongWeekdayNames(i18nGlobal.t),
@@ -1601,12 +1546,6 @@ export function i18nFunctions(i18nGlobal) {
         formatUnixTimeToLongTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongTimeFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToShortTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortTimeFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat), utcOffset, currentUtcOffset),
         formatYearQuarter: (year, quarter) => formatYearQuarter(i18nGlobal.t, year, quarter),
-        isLongDateMonthAfterYear: (userStore) => isLongDateMonthAfterYear(i18nGlobal.t, userStore.currentUserLongDateFormat),
-        isShortDateMonthAfterYear: (userStore) => isShortDateMonthAfterYear(i18nGlobal.t, userStore.currentUserShortDateFormat),
-        isLongTime24HourFormat: (userStore) => isLongTime24HourFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat),
-        isLongTimeMeridiemIndicatorFirst: (userStore) => isLongTimeMeridiemIndicatorFirst(i18nGlobal.t, userStore.currentUserLongTimeFormat),
-        isShortTime24HourFormat: (userStore) => isShortTime24HourFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat),
-        isShortTimeMeridiemIndicatorFirst: (userStore) => isShortTimeMeridiemIndicatorFirst(i18nGlobal.t, userStore.currentUserShortTimeFormat),
         getAllTimezones: (includeSystemDefault) => getAllTimezones(includeSystemDefault, i18nGlobal.t),
         getTimezoneDifferenceDisplayText: (utcOffset) => getTimezoneDifferenceDisplayText(utcOffset, i18nGlobal.t),
         getAllCurrencies: () => getAllCurrencies(i18nGlobal.t),

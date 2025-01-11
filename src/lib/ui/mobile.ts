@@ -89,7 +89,7 @@ export function hideLoading() {
     });
 }
 
-export function createInlinePicker(containerEl: HTMLElement, inputEl: HTMLElement, cols: Picker.ColumnParameters[], value: unknown[], events?: { change: (picker: Picker.Picker, value: unknown, displayValue: unknown) => void }): Picker.Picker {
+export function createInlinePicker(containerEl: string, inputEl: string, cols: Picker.ColumnParameters[], value: string[], events?: { change: (picker: Picker.Picker, value: unknown, displayValue: unknown) => void }): Picker.Picker {
     return f7.picker.create({
         containerEl: containerEl,
         inputEl: inputEl,

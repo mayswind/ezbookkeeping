@@ -728,7 +728,7 @@ export default {
             } else if (this.analysisType === StatisticsAnalysisType.TrendAnalysis) {
                 const chartDateType = getDateTypeByDateRange(getYearMonthFirstUnixTime(startTime), getYearMonthLastUnixTime(endTime), this.firstDayOfWeek, DateRangeScene.TrendAnalysis);
 
-                this.statisticsStore.updateTransactionStatisticsFilter({
+                changed = this.statisticsStore.updateTransactionStatisticsFilter({
                     trendChartDateType: chartDateType,
                     trendChartStartYearMonth: startTime,
                     trendChartEndYearMonth: endTime

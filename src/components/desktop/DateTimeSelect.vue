@@ -30,17 +30,19 @@
                     {{ getMonthShortName(text) }}
                 </template>
                 <template #am-pm-button="{ toggle, value }">
-                    <button class="dp__pm_am_button" tabindex="0" @click="toggle">{{ $t(`datetime.${value}.content`) }}</button>
+                    <button class="dp__pm_am_button" tabindex="0" @click="toggle">{{ tt(`datetime.${value}.content`) }}</button>
                 </template>
             </vue-date-picker>
         </template>
     </v-select>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, computed } from 'vue';
 import { useTheme } from 'vuetify';
 
-import { mapStores } from 'pinia';
+import { useI18n } from '@/locales/helpers.ts';
+
 import { useUserStore } from '@/stores/user.ts';
 
 import { ThemeType } from '@/core/theme.ts';
@@ -54,74 +56,52 @@ import {
     getUnixTime
 } from '@/lib/datetime.ts';
 
-export default {
-    props: [
-        'modelValue',
-        'disabled',
-        'readonly',
-        'label'
-    ],
-    emits: [
-        'update:modelValue',
-        'error'
-    ],
-    data() {
-        return {
-            yearRange: [
-                2000,
-                getCurrentYear() + 1
-            ]
-        }
-    },
-    computed: {
-        ...mapStores(useUserStore),
-        dateTime: {
-            get: function () {
-                return getLocalDatetimeFromUnixTime(this.modelValue);
-            },
-            set: function (value) {
-                const unixTime = getUnixTime(value);
+const props = defineProps<{
+    modelValue: number;
+    disabled?: boolean;
+    readonly?: boolean;
+    label?: string;
+}>();
 
-                if (unixTime < 0) {
-                    this.$emit('error', 'Date is too early');
-                    return;
-                }
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: number): void;
+    (e: 'error', message: string): void;
+}>();
 
-                this.$emit('update:modelValue', unixTime);
-            }
-        },
-        isDarkMode() {
-            return this.globalTheme.global.name.value === ThemeType.Dark;
-        },
-        firstDayOfWeek() {
-            return this.userStore.currentUserFirstDayOfWeek;
-        },
-        dayNames() {
-            return arrangeArrayWithNewStartIndex(this.$locale.getAllMinWeekdayNames(), this.firstDayOfWeek);
-        },
-        isYearFirst() {
-            return this.$locale.isLongDateMonthAfterYear(this.userStore);
-        },
-        is24Hour() {
-            return this.$locale.isLongTime24HourFormat(this.userStore);
-        },
-        displayTime() {
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, getActualUnixTimeForStore(this.modelValue, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()))
-        }
-    },
-    setup() {
-        const theme = useTheme();
+const theme = useTheme();
+const { tt, getAllMinWeekdayNames, getMonthShortName, formatUnixTimeToLongDateTime, isLongDateMonthAfterYear, isLongTime24HourFormat } = useI18n();
 
-        return {
-            globalTheme: theme
-        };
+const userStore = useUserStore();
+
+const yearRange = ref<number[]>([
+    2000,
+    getCurrentYear() + 1
+]);
+
+const dateTime = computed<Date>({
+    get: () => {
+        return getLocalDatetimeFromUnixTime(props.modelValue);
     },
-    methods: {
-        getMonthShortName(month) {
-            return this.$locale.getMonthShortName(month);
+    set: (value: Date) => {
+        const unixTime = getUnixTime(value);
+
+        if (unixTime < 0) {
+            emit('error', 'Date is too early');
+            return;
         }
+
+        emit('update:modelValue', unixTime);
     }
-}
+});
+
+const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
+const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllMinWeekdayNames(), firstDayOfWeek.value));
+const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
+const is24Hour = computed<boolean>(() => isLongTime24HourFormat());
+const displayTime = computed<string>(() => {
+    return formatUnixTimeToLongDateTime(getActualUnixTimeForStore(getUnixTime(dateTime.value), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+});
 </script>
 
 <style>

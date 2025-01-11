@@ -77,7 +77,9 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useTransactionTagsStore } from '@/stores/transactionTag.js';
+import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
+
+import { TransactionTag } from '@/models/transaction_tag.ts';
 
 import { copyArrayTo } from '@/lib/common.ts';
 import { scrollToSelectedItem } from '@/lib/ui/mobile.ts';
@@ -152,9 +154,7 @@ export default {
             }
         },
         addNewTag() {
-            this.newTag = {
-                name: ''
-            };
+            this.newTag = TransactionTag.createNewTag();
         },
         saveNewTag() {
             const self = this;

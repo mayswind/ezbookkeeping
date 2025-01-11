@@ -137,7 +137,7 @@ interface ApiRequestConfig extends AxiosRequestConfig {
     timeout?: number;
 }
 
-type ApiResponsePromise<T> = Promise<AxiosResponse<ApiResponse<T>>>;
+export type ApiResponsePromise<T> = Promise<AxiosResponse<ApiResponse<T>>>;
 
 let needBlockRequest = false;
 const blockedRequests: ((token: string | undefined) => void)[] = [];

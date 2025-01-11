@@ -4,7 +4,7 @@ import { useSettingsStore } from './setting.ts';
 import { useUserStore } from './user.ts';
 import { useAccountsStore } from './account.js';
 import { useTransactionCategoriesStore } from './transactionCategory.js';
-import { useTransactionTagsStore } from './transactionTag.js';
+import { useTransactionTagsStore } from './transactionTag.ts';
 import { useTransactionTemplatesStore } from './transactionTemplate.js';
 import { useTransactionsStore } from './transaction.js';
 import { useOverviewStore } from './overview.ts';

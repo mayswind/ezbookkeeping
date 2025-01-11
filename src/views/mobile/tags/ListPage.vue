@@ -145,7 +145,9 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useTransactionTagsStore } from '@/stores/transactionTag.js';
+import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
+
+import { TransactionTag } from '@/models/transaction_tag.ts';
 
 import {
     isNoAvailableTag,
@@ -159,12 +161,9 @@ export default {
         'f7router'
     ],
     data() {
-        const transactionTagsStore = useTransactionTagsStore();
-        const newTransactionTag = transactionTagsStore.generateNewTransactionTagModel();
-
         return {
             newTag: null,
-            editingTag: newTransactionTag,
+            editingTag: TransactionTag.createNewTag(),
             loading: true,
             loadingError: null,
             showHidden: false,
@@ -179,7 +178,6 @@ export default {
     },
     computed: {
         ...mapStores(useTransactionTagsStore),
-
         tags() {
             return this.transactionTagsStore.allTransactionTags;
         },
@@ -310,9 +308,7 @@ export default {
             });
         },
         add() {
-            this.newTag = {
-                name: ''
-            };
+            this.newTag = TransactionTag.createNewTag();
         },
         edit(tag) {
             this.editingTag.id = tag.id;

@@ -12,3 +12,5 @@ export interface TypeAndDisplayName {
     readonly type: number;
     readonly displayName: string;
 }
+
+export type BeforeResolveFunction = (callback: () => void) => void;

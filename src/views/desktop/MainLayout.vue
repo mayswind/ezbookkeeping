@@ -344,8 +344,8 @@ function logout(): void {
         logouting.value = false;
         showLoading.value = false;
 
-        if (!error.processed && snackbar.value) {
-            snackbar.value.showError(error);
+        if (!error.processed) {
+            snackbar.value?.showError(error);
         }
     });
 }

@@ -19,7 +19,7 @@ import { ref, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-import { isString } from '@/lib/common.ts';
+import { isString, isObject } from '@/lib/common.ts';
 
 const props = defineProps<{
     show?: boolean
@@ -42,16 +42,26 @@ const finalColor = ref<string>(props.color || 'primary');
 let resolveFunc: ((value?: unknown) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
-function open(titleOrText: string, textOrOptions: string | Record<string, unknown>, options: Record<string, unknown>): Promise<unknown> {
+function open(titleOrText: string, textOrOptions?: string | Record<string, unknown>, options?: Record<string, unknown>): Promise<unknown> {
     showState.value = true;
 
-    if (isString(textOrOptions)) { // second parameter is text
-        titleContent.value = tt(titleOrText, options);
-        textContent.value = tt(textOrOptions as string, options);
-    } else { // second parameter is options
-        const actualOptions = textOrOptions as Record<string, unknown>;
+    if (!textOrOptions || isObject(textOrOptions)) { // only one parameter or second parameter is options
         titleContent.value = tt('global.app.title');
-        textContent.value = tt(titleOrText, actualOptions);
+
+        if (!textOrOptions) {
+            textContent.value = tt(titleOrText);
+        } else {
+            const actualOptions = textOrOptions as Record<string, unknown>;
+            textContent.value = tt(titleOrText, actualOptions);
+        }
+    } else if (isString(textOrOptions)) { // second parameter is text
+        if (!options) {
+            titleContent.value = tt(titleOrText);
+            textContent.value = tt(textOrOptions as string);
+        } else {
+            titleContent.value = tt(titleOrText, options);
+            textContent.value = tt(textOrOptions as string, options);
+        }
     }
 
     if (options && isString(options.color)) {

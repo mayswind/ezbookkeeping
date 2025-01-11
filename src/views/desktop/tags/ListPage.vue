@@ -4,12 +4,12 @@
             <v-card>
                 <template #title>
                     <div class="title-and-toolbar d-flex align-center">
-                        <span>{{ $t('Transaction Tags') }}</span>
+                        <span>{{ tt('Transaction Tags') }}</span>
                         <v-btn class="ml-3" color="default" variant="outlined"
-                               :disabled="loading || updating || hasEditingTag" @click="add">{{ $t('Add') }}</v-btn>
+                               :disabled="loading || updating || hasEditingTag" @click="add">{{ tt('Add') }}</v-btn>
                         <v-btn class="ml-3" color="primary" variant="tonal"
                                :disabled="loading || updating || hasEditingTag" @click="saveSortResult"
-                               v-if="displayOrderModified">{{ $t('Save Display Order') }}</v-btn>
+                               v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
                         <v-btn density="compact" color="default" variant="text" size="24"
                                class="ml-2" :icon="true" :disabled="loading || updating || hasEditingTag"
                                :loading="loading" @click="reload">
@@ -17,7 +17,7 @@
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
                             <v-icon :icon="icons.refresh" size="24" />
-                            <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
+                            <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                         </v-btn>
                         <v-spacer/>
                         <v-btn density="comfortable" color="default" variant="text" class="ml-2"
@@ -26,10 +26,10 @@
                             <v-menu activator="parent">
                                 <v-list>
                                     <v-list-item :prepend-icon="icons.show"
-                                                 :title="$t('Show Hidden Transaction Tags')"
+                                                 :title="tt('Show Hidden Transaction Tags')"
                                                  v-if="!showHidden" @click="showHidden = true"></v-list-item>
                                     <v-list-item :prepend-icon="icons.hide"
-                                                 :title="$t('Hide Hidden Transaction Tags')"
+                                                 :title="tt('Hide Hidden Transaction Tags')"
                                                  v-if="showHidden" @click="showHidden = false"></v-list-item>
                                 </v-list>
                             </v-menu>
@@ -42,9 +42,9 @@
                     <tr>
                         <th>
                             <div class="d-flex align-center">
-                                <span>{{ $t('Tag Title') }}</span>
+                                <span>{{ tt('Tag Title') }}</span>
                                 <v-spacer/>
-                                <span>{{ $t('Operation') }}</span>
+                                <span>{{ tt('Operation') }}</span>
                             </div>
                         </th>
                     </tr>
@@ -60,7 +60,7 @@
 
                     <tbody v-if="!loading && noAvailableTag && !newTag">
                     <tr>
-                        <td>{{ $t('No available tag') }}</td>
+                        <td>{{ tt('No available tag') }}</td>
                     </tr>
                     </tbody>
 
@@ -89,7 +89,7 @@
                                         <v-text-field class="w-100 mr-2" type="text"
                                             density="compact" variant="underlined"
                                             :disabled="loading || updating"
-                                            :placeholder="$t('Tag Title')"
+                                            :placeholder="tt('Tag Title')"
                                             v-model="editingTag.name"
                                             v-else-if="editingTag.id === element.id"
                                             @keyup.enter="save(editingTag)"
@@ -117,7 +117,7 @@
                                             <template #loader>
                                                 <v-progress-circular indeterminate size="20" width="2"/>
                                             </template>
-                                            {{ element.hidden ? $t('Show') : $t('Hide') }}
+                                            {{ element.hidden ? tt('Show') : tt('Hide') }}
                                         </v-btn>
                                         <v-btn class="px-2" color="default"
                                                density="comfortable" variant="text"
@@ -130,7 +130,7 @@
                                             <template #loader>
                                                 <v-progress-circular indeterminate size="20" width="2"/>
                                             </template>
-                                            {{ $t('Edit') }}
+                                            {{ tt('Edit') }}
                                         </v-btn>
                                         <v-btn class="px-2" color="default"
                                                density="comfortable" variant="text"
@@ -143,7 +143,7 @@
                                             <template #loader>
                                                 <v-progress-circular indeterminate size="20" width="2"/>
                                             </template>
-                                            {{ $t('Delete') }}
+                                            {{ tt('Delete') }}
                                         </v-btn>
                                         <v-btn class="px-2"
                                                density="comfortable" variant="text"
@@ -154,19 +154,19 @@
                                             <template #loader>
                                                 <v-progress-circular indeterminate size="20" width="2"/>
                                             </template>
-                                            {{ $t('Save') }}
+                                            {{ tt('Save') }}
                                         </v-btn>
                                         <v-btn class="px-2" color="default"
                                                density="comfortable" variant="text"
                                                :prepend-icon="icons.cancel"
                                                :disabled="loading || updating"
                                                v-if="editingTag.id === element.id" @click="cancelSave(editingTag)">
-                                            {{ $t('Cancel') }}
+                                            {{ tt('Cancel') }}
                                         </v-btn>
                                         <span class="ml-2">
-                                            <v-icon :class="!loading && !updating && availableTagCount > 1 ? 'drag-handle' : 'disabled'"
+                                            <v-icon :class="!loading && !updating && !hasEditingTag && availableTagCount > 1 ? 'drag-handle' : 'disabled'"
                                                     :icon="icons.drag"/>
-                                            <v-tooltip activator="parent" v-if="!loading && !updating && availableTagCount > 1">{{ $t('Drag to Reorder') }}</v-tooltip>
+                                            <v-tooltip activator="parent" v-if="!loading && !updating && !hasEditingTag && availableTagCount > 1">{{ tt('Drag to Reorder') }}</v-tooltip>
                                         </span>
                                     </div>
                                 </td>
@@ -175,12 +175,12 @@
                     </draggable-list>
 
                     <tbody v-if="newTag">
-                    <tr class="text-sm" :class="{ 'even-row': availableTagCount & 1 === 1}">
+                    <tr class="text-sm" :class="{ 'even-row': (availableTagCount & 1) === 1}">
                         <td>
                             <div class="d-flex align-center">
                                 <v-text-field class="w-100 mr-2" type="text" color="primary"
                                               density="compact" variant="underlined"
-                                              :disabled="loading || updating" :placeholder="$t('Tag Title')"
+                                              :disabled="loading || updating" :placeholder="tt('Tag Title')"
                                               v-model="newTag.name" @keyup.enter="save(newTag)">
                                     <template #prepend>
                                         <v-icon size="20" start :icon="icons.tag"/>
@@ -191,20 +191,20 @@
 
                                 <v-btn class="px-2" density="comfortable" variant="text"
                                        :prepend-icon="icons.confirm"
-                                       :loading="tagUpdating[null]"
+                                       :loading="tagUpdating['']"
                                        :disabled="loading || updating || !isTagModified(newTag)"
                                        @click="save(newTag)">
                                     <template #loader>
                                         <v-progress-circular indeterminate size="20" width="2"/>
                                     </template>
-                                    {{ $t('Save') }}
+                                    {{ tt('Save') }}
                                 </v-btn>
                                 <v-btn class="px-2" color="default"
                                        density="comfortable" variant="text"
                                        :prepend-icon="icons.cancel"
                                        :disabled="loading || updating"
                                        @click="cancelSave(newTag)">
-                                    {{ $t('Cancel') }}
+                                    {{ tt('Cancel') }}
                                 </v-btn>
                                 <span class="ml-2">
                                     <v-icon class="disabled" :icon="icons.drag"/>
@@ -222,8 +222,14 @@
     <snack-bar ref="snackbar" />
 </template>
 
-<script>
-import { mapStores } from 'pinia';
+<script setup lang="ts">
+import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { ref, computed, useTemplateRef } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
 import { TransactionTag } from '@/models/transaction_tag.ts';
@@ -231,7 +237,7 @@ import { TransactionTag } from '@/models/transaction_tag.ts';
 import {
     isNoAvailableTag,
     getAvailableTagCount
-} from '@/lib/tag.js';
+} from '@/lib/tag.ts';
 
 import {
     mdiRefresh,
@@ -247,226 +253,214 @@ import {
     mdiPound
 } from '@mdi/js';
 
-export default {
-    data() {
-        return {
-            newTag: null,
-            editingTag: TransactionTag.createNewTag(),
-            loading: true,
-            updating: false,
-            tagUpdating: {},
-            tagHiding: {},
-            tagRemoving: {},
-            displayOrderModified: false,
-            showHidden: false,
-            icons: {
-                refresh: mdiRefresh,
-                add: mdiPlus,
-                edit: mdiPencilOutline,
-                confirm: mdiCheck,
-                cancel: mdiClose,
-                show: mdiEyeOutline,
-                hide: mdiEyeOffOutline,
-                remove: mdiDeleteOutline,
-                drag: mdiDrag,
-                more: mdiDotsVertical,
-                tag: mdiPound
-            }
-        };
-    },
-    computed: {
-        ...mapStores(useTransactionTagsStore),
-        tags() {
-            return this.transactionTagsStore.allTransactionTags;
-        },
-        noAvailableTag() {
-            return isNoAvailableTag(this.tags, this.showHidden);
-        },
-        availableTagCount() {
-            return getAvailableTagCount(this.tags, this.showHidden);
-        },
-        hasEditingTag() {
-            return !!(this.newTag || (this.editingTag.id && this.editingTag.id !== ''));
-        }
-    },
-    created() {
-        const self = this;
+type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
+type SnackBarType = InstanceType<typeof SnackBar>;
 
-        self.loading = true;
+const icons = {
+    refresh: mdiRefresh,
+    add: mdiPlus,
+    edit: mdiPencilOutline,
+    confirm: mdiCheck,
+    cancel: mdiClose,
+    show: mdiEyeOutline,
+    hide: mdiEyeOffOutline,
+    remove: mdiDeleteOutline,
+    drag: mdiDrag,
+    more: mdiDotsVertical,
+    tag: mdiPound
+};
 
-        self.transactionTagsStore.loadAllTags({
-            force: false
-        }).then(() => {
-            self.loading = false;
-        }).catch(error => {
-            self.loading = false;
+const newTag = ref<TransactionTag | null>(null);
+const editingTag = ref<TransactionTag>(TransactionTag.createNewTag());
+const loading = ref<boolean>(true);
+const updating = ref<boolean>(false);
+const tagUpdating = ref<Record<string, boolean>>({});
+const tagHiding = ref<Record<string, boolean>>({});
+const tagRemoving = ref<Record<string, boolean>>({});
+const displayOrderModified = ref<boolean>(false);
+const showHidden = ref<boolean>(false);
 
-            if (!error.processed) {
-                self.$refs.snackbar.showError(error);
-            }
-        });
-    },
-    methods: {
-        reload() {
-            if (this.hasEditingTag) {
-                return;
-            }
+const { tt } = useI18n();
 
-            const self = this;
-            self.loading = true;
+const transactionTagsStore = useTransactionTagsStore();
 
-            self.transactionTagsStore.loadAllTags({
-                force: true
-            }).then(() => {
-                self.loading = false;
-                self.displayOrderModified = false;
+const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
-                self.$refs.snackbar.showMessage('Tag list has been updated');
-            }).catch(error => {
-                self.loading = false;
+const tags = computed(() => transactionTagsStore.allTransactionTags);
+const noAvailableTag = computed(() => isNoAvailableTag(tags.value, showHidden.value));
+const availableTagCount = computed(() => getAvailableTagCount(tags.value, showHidden.value));
+const hasEditingTag = computed(() => !!(newTag.value || (editingTag.value.id && editingTag.value.id !== '')));
 
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        onMove(event) {
-            if (!event || !event.moved) {
-                return;
-            }
-
-            const self = this;
-            const moveEvent = event.moved;
-
-            if (!moveEvent.element || !moveEvent.element.id) {
-                self.$refs.snackbar.showMessage('Unable to move tag');
-                return;
-            }
-
-            self.transactionTagsStore.changeTagDisplayOrder({
-                tagId: moveEvent.element.id,
-                from: moveEvent.oldIndex,
-                to: moveEvent.newIndex
-            }).then(() => {
-                self.displayOrderModified = true;
-            }).catch(error => {
-                self.$refs.snackbar.showError(error);
-            });
-        },
-        saveSortResult() {
-            const self = this;
-
-            if (!self.displayOrderModified) {
-                return;
-            }
-
-            self.loading = true;
-
-            self.transactionTagsStore.updateTagDisplayOrders().then(() => {
-                self.loading = false;
-                self.displayOrderModified = false;
-            }).catch(error => {
-                self.loading = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        add() {
-            this.newTag = TransactionTag.createNewTag();
-        },
-        edit(tag) {
-            this.editingTag.id = tag.id;
-            this.editingTag.name = tag.name;
-        },
-        save(tag) {
-            const self = this;
-
-            self.updating = true;
-            self.tagUpdating[tag.id || null] = true;
-
-            self.transactionTagsStore.saveTag({
-                tag: tag
-            }).then(() => {
-                self.updating = false;
-                self.tagUpdating[tag.id || null] = false;
-
-                if (tag.id) {
-                    self.editingTag.id = '';
-                    self.editingTag.name = '';
-                } else {
-                    self.newTag = null;
-                }
-            }).catch(error => {
-                self.updating = false;
-                self.tagUpdating[tag.id || null] = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        cancelSave(tag) {
-            if (tag.id) {
-                this.editingTag.id = '';
-                this.editingTag.name = '';
-            } else {
-                this.newTag = null;
-            }
-        },
-        isTagModified(tag) {
-            if (tag.id) {
-                return this.editingTag.name !== '' && this.editingTag.name !== tag.name;
-            } else {
-                return tag.name !== '';
-            }
-        },
-        hide(tag, hidden) {
-            const self = this;
-
-            self.updating = true;
-            self.tagHiding[tag.id] = true;
-
-            self.transactionTagsStore.hideTag({
-                tag: tag,
-                hidden: hidden
-            }).then(() => {
-                self.updating = false;
-                self.tagHiding[tag.id] = false;
-            }).catch(error => {
-                self.updating = false;
-                self.tagHiding[tag.id] = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        remove(tag) {
-            const self = this;
-
-            self.$refs.confirmDialog.open('Are you sure you want to delete this tag?').then(() => {
-                self.updating = true;
-                self.tagRemoving[tag.id] = true;
-
-                self.transactionTagsStore.deleteTag({
-                    tag: tag
-                }).then(() => {
-                    self.updating = false;
-                    self.tagRemoving[tag.id] = false;
-                }).catch(error => {
-                    self.updating = false;
-                    self.tagRemoving[tag.id] = false;
-
-                    if (!error.processed) {
-                        self.$refs.snackbar.showError(error);
-                    }
-                });
-            });
-        }
+function isTagModified(tag: TransactionTag): boolean {
+    if (tag.id) {
+        return editingTag.value.name !== '' && editingTag.value.name !== tag.name;
+    } else {
+        return tag.name !== '';
     }
 }
+
+function reload(): void {
+    if (hasEditingTag.value) {
+        return;
+    }
+
+    loading.value = true;
+
+    transactionTagsStore.loadAllTags({
+        force: true
+    }).then(() => {
+        loading.value = false;
+        displayOrderModified.value = false;
+
+        snackbar.value?.showMessage('Tag list has been updated');
+    }).catch(error => {
+        loading.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function add(): void {
+    newTag.value = TransactionTag.createNewTag();
+}
+
+function edit(tag: TransactionTag): void {
+    editingTag.value.id = tag.id;
+    editingTag.value.name = tag.name;
+}
+
+function save(tag: TransactionTag): void {
+    updating.value = true;
+    tagUpdating.value[tag.id || ''] = true;
+
+    transactionTagsStore.saveTag({
+        tag: tag
+    }).then(() => {
+        updating.value = false;
+        tagUpdating.value[tag.id || ''] = false;
+
+        if (tag.id) {
+            editingTag.value.id = '';
+            editingTag.value.name = '';
+        } else {
+            newTag.value = null;
+        }
+    }).catch(error => {
+        updating.value = false;
+        tagUpdating.value[tag.id || ''] = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function cancelSave(tag: TransactionTag): void {
+    if (tag.id) {
+        editingTag.value.id = '';
+        editingTag.value.name = '';
+    } else {
+        newTag.value = null;
+    }
+}
+
+function saveSortResult(): void {
+    if (!displayOrderModified.value) {
+        return;
+    }
+
+    loading.value = true;
+
+    transactionTagsStore.updateTagDisplayOrders().then(() => {
+        loading.value = false;
+        displayOrderModified.value = false;
+    }).catch(error => {
+        loading.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function hide(tag: TransactionTag, hidden: boolean): void {
+    updating.value = true;
+    tagHiding.value[tag.id] = true;
+
+    transactionTagsStore.hideTag({
+        tag: tag,
+        hidden: hidden
+    }).then(() => {
+        updating.value = false;
+        tagHiding.value[tag.id] = false;
+    }).catch(error => {
+        updating.value = false;
+        tagHiding.value[tag.id] = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function remove(tag: TransactionTag): void {
+    confirmDialog.value?.open('Are you sure you want to delete this tag?').then(() => {
+        updating.value = true;
+        tagRemoving.value[tag.id] = true;
+
+        transactionTagsStore.deleteTag({
+            tag: tag
+        }).then(() => {
+            updating.value = false;
+            tagRemoving.value[tag.id] = false;
+        }).catch(error => {
+            updating.value = false;
+            tagRemoving.value[tag.id] = false;
+
+            if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+        });
+    });
+}
+
+function onMove(event: { moved: { element: { id: string }; oldIndex: number; newIndex: number } }): void {
+    if (!event || !event.moved) {
+        return;
+    }
+
+    const moveEvent = event.moved;
+
+    if (!moveEvent.element || !moveEvent.element.id) {
+        snackbar.value?.showMessage('Unable to move tag');
+        return;
+    }
+
+    transactionTagsStore.changeTagDisplayOrder({
+        tagId: moveEvent.element.id,
+        from: moveEvent.oldIndex,
+        to: moveEvent.newIndex
+    }).then(() => {
+        displayOrderModified.value = true;
+    }).catch(error => {
+        snackbar.value?.showError(error);
+    });
+}
+
+transactionTagsStore.loadAllTags({
+    force: false
+}).then(() => {
+    loading.value = false;
+}).catch(error => {
+    loading.value = false;
+
+    if (!error.processed) {
+        snackbar.value?.showError(error);
+    }
+});
 </script>
 
 <style>

@@ -1,4 +1,6 @@
-export function isNoAvailableTag(tags, showHidden) {
+import { TransactionTag } from '@/models/transaction_tag.ts';
+
+export function isNoAvailableTag(tags: TransactionTag[], showHidden: boolean): boolean {
     for (let i = 0; i < tags.length; i++) {
         if (showHidden || !tags[i].hidden) {
             return false;
@@ -8,7 +10,7 @@ export function isNoAvailableTag(tags, showHidden) {
     return true;
 }
 
-export function getAvailableTagCount(tags, showHidden) {
+export function getAvailableTagCount(tags: TransactionTag[], showHidden: boolean): number {
     let count = 0;
 
     for (let i = 0; i < tags.length; i++) {
@@ -20,7 +22,7 @@ export function getAvailableTagCount(tags, showHidden) {
     return count;
 }
 
-export function getFirstShowingId(tags, showHidden) {
+export function getFirstShowingId(tags: TransactionTag[], showHidden: boolean): string | null {
     for (let i = 0; i < tags.length; i++) {
         if (showHidden || !tags[i].hidden) {
             return tags[i].id;
@@ -30,7 +32,7 @@ export function getFirstShowingId(tags, showHidden) {
     return null;
 }
 
-export function getLastShowingId(tags, showHidden) {
+export function getLastShowingId(tags: TransactionTag[], showHidden: boolean): string | null {
     for (let i = tags.length - 1; i >= 0; i--) {
         if (showHidden || !tags[i].hidden) {
             return tags[i].id;

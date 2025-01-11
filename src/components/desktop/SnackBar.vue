@@ -24,9 +24,14 @@ const { tt, te } = useI18n();
 const showState= ref<boolean>(false);
 const messageContent = ref<string>('');
 
-function showMessage(message: string, options: Record<string, unknown>): void {
+function showMessage(message: string, options?: Record<string, unknown>): void {
     showState.value = true;
-    messageContent.value = tt(message, options);
+
+    if (options) {
+        messageContent.value = tt(message, options);
+    } else {
+        messageContent.value = tt(message);
+    }
 }
 
 function showError(error: string | { message: string }): void {

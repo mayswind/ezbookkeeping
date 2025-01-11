@@ -1,3 +1,4 @@
+import { type Ref, watch } from 'vue';
 import { useI18n as useVueI18n } from 'vue-i18n';
 import { f7, f7ready } from 'framework7-vue';
 import type { Dialog, Picker, Router } from 'framework7/types';
@@ -211,9 +212,26 @@ export function scrollToSelectedItem(parentEl: Framework7Dom, containerSelector:
 export function useI18nUIComponents() {
     const i18nGlobal = useVueI18n();
 
+    function routeBackOnError<T>(f7router: Router.Router, errorRef: Ref<T>): void {
+        const unwatch = watch(errorRef, (newValue) => {
+            if (newValue) {
+                setTimeout(() => {
+                    if (unwatch) {
+                        unwatch();
+                    }
+
+                    f7router.back();
+                }, 200);
+            }
+        }, {
+            immediate: true
+        });
+    }
+
     return {
         showAlert: (message: string, confirmCallback: (dialog: Dialog.Dialog, e: Event) => void) => showAlert(message, confirmCallback, i18nGlobal.t),
         showConfirm: (message: string, confirmCallback: (dialog: Dialog.Dialog, e: Event) => void, cancelCallback: (dialog: Dialog.Dialog, e: Event) => void): void => showConfirm(message, confirmCallback, cancelCallback, i18nGlobal.t),
-        showToast: (message: string, timeout?: number): void => showToast(message, timeout, i18nGlobal.t)
+        showToast: (message: string, timeout?: number): void => showToast(message, timeout, i18nGlobal.t),
+        routeBackOnError
     }
 }

@@ -46,8 +46,8 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: MapPosition | undefined): void,
-    (e: 'update:show', value: boolean): void
+    (e: 'update:modelValue', value: MapPosition | undefined): void;
+    (e: 'update:show', value: boolean): void;
 }>();
 
 const { tt } = useI18n();
@@ -63,21 +63,21 @@ const geoLocation = computed<MapPosition | undefined>({
     }
 });
 
-function save() {
+function save(): void {
     emit('update:show', false);
 }
 
-function close() {
+function close(): void {
     emit('update:show', false);
 }
 
-function onSheetOpen() {
+function onSheetOpen(): void {
     if (map.value) {
         map.value.initMapView();
     }
 }
 
-function onSheetClosed() {
+function onSheetClosed(): void {
     close();
 }
 </script>

@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 
 import type { Notification, Actions, Dialog, Popover, Popup, Sheet } from 'framework7/types';
 import { f7ready } from 'framework7-vue';
@@ -36,7 +36,7 @@ const userStore = useUserStore();
 const tokensStore = useTokensStore();
 const exchangeRatesStore = useExchangeRatesStore();
 
-const f7params: Ref<object> = ref({
+const f7params = ref<object>({
     name: 'ezBookkeeping',
     theme: 'ios',
     colors: {
@@ -100,11 +100,11 @@ const f7params: Ref<object> = ref({
     }
 });
 
-const notification: Ref<Notification.Notification | null> = ref(null);
+const notification = ref<Notification.Notification | null>(null);
 
-const isDarkMode: Ref<boolean | undefined> = ref(undefined);
-const hasPushPopupBackdrop: Ref<boolean | undefined> = ref(undefined);
-const hasBackdrop: Ref<boolean | undefined> = ref(undefined);
+const isDarkMode = ref<boolean | undefined>(undefined);
+const hasPushPopupBackdrop = ref<boolean | undefined>(undefined);
+const hasBackdrop = ref<boolean | undefined>(undefined);
 const currentNotificationContent = computed<string | null>(() => rootStore.currentNotification);
 
 function isiOSHomeScreenMode(): boolean {

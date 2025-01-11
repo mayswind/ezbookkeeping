@@ -1,4 +1,4 @@
-import { type Ref, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 
 import type { LatestExchangeRate, LatestExchangeRateResponse } from '@/models/exchange_rate.ts';
@@ -32,7 +32,7 @@ function clearExchangeRatesFromLocalStorage(): void {
 }
 
 export const useExchangeRatesStore = defineStore('exchangeRates', () => {
-    const latestExchangeRates: Ref<LatestExchangeRates> = ref(getExchangeRatesFromLocalStorage());
+    const latestExchangeRates = ref<LatestExchangeRates>(getExchangeRatesFromLocalStorage());
 
     const exchangeRatesLastUpdateTime = computed<number | null>(() => {
         const exchangeRates = latestExchangeRates.value || {};

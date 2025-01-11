@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, ref, computed, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -27,12 +27,12 @@ const props = defineProps<{
 const { tt, getCurrentLanguageInfo } = useI18n();
 
 const mapContainer = useTemplateRef<HTMLElement>('mapContainer');
-const mapInstance: Ref<MapInstance | null> = ref(createMapInstance());
-const initCenter: Ref<MapPosition> = ref({
+const mapInstance = ref<MapInstance | null>(createMapInstance());
+const initCenter = ref<MapPosition>({
     latitude: 0,
     longitude: 0
 });
-const zoomLevel: Ref<number> = ref(1);
+const zoomLevel = ref<number>(1);
 
 const mapSupported = computed<boolean>(() => {
     return !!mapInstance.value;
@@ -56,7 +56,7 @@ const finalMapStyle = computed<Record<string, unknown>>(() => {
     return styles;
 });
 
-function initMapView() {
+function initMapView(): void {
     let isFirstInit = false;
     let centerChanged = false;
 

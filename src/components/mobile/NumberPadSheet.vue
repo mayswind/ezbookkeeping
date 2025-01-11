@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helper.js';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
@@ -95,13 +95,13 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: number): void,
-    (e: 'update:show', value: boolean): void
+    (e: 'update:modelValue', value: number): void;
+    (e: 'update:show', value: boolean): void;
 }>();
 
-const previousValue: Ref<string> = ref('');
-const currentSymbol: Ref<string> = ref('');
-const currentValue: Ref<string> = ref(getStringValue(props.modelValue));
+const previousValue = ref<string>('');
+const currentSymbol = ref<string>('');
+const currentValue = ref<string>(getStringValue(props.modelValue));
 
 const decimalSeparator = computed<string>(() => getCurrentDecimalSeparator(userStore));
 

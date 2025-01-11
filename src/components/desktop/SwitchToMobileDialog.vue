@@ -41,7 +41,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:show', value: boolean): void
+    (e: 'update:show', value: boolean): void;
 }>();
 
 const { tt } = useI18n();

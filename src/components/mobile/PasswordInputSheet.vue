@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, ref } from 'vue';
+import { ref } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -53,16 +53,16 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: string): void
-    (e: 'update:show', value: boolean): void
-    (e: 'password:confirm', value: string): void
+    (e: 'update:modelValue', value: string): void;
+    (e: 'update:show', value: boolean): void;
+    (e: 'password:confirm', value: string): void;
 }>();
 
 const { tt } = useI18n();
 
-const currentPassword: Ref<string> = ref('');
+const currentPassword = ref<string>('');
 
-function confirm() {
+function confirm(): void {
     if (!currentPassword.value || props.confirmDisabled) {
         return;
     }
@@ -71,19 +71,19 @@ function confirm() {
     emit('password:confirm', currentPassword.value);
 }
 
-function cancel() {
+function cancel(): void {
     close();
 }
 
-function close() {
+function close(): void {
     emit('update:show', false);
 }
 
-function onSheetOpen() {
+function onSheetOpen(): void {
     currentPassword.value = '';
 }
 
-function onSheetClosed() {
+function onSheetClosed(): void {
     close();
 }
 </script>

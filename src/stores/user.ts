@@ -1,4 +1,4 @@
-import { type Ref, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 
 import { useSettingsStore } from './setting.ts';
@@ -33,7 +33,7 @@ import services from '@/lib/services.ts';
 
 export const useUserStore = defineStore('user', () => {
     const settingsStore = useSettingsStore();
-    const currentUserBasicInfo: Ref<UserBasicInfo | null> = ref(getCurrentUserInfo());
+    const currentUserBasicInfo = ref<UserBasicInfo | null>(getCurrentUserInfo());
 
     const currentUserNickname = computed<string | null>(() => {
         const userInfo = currentUserBasicInfo.value || EMPTY_USER_BASIC_INFO;

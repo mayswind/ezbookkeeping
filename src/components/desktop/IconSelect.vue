@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, ref, computed, useTemplateRef, nextTick } from 'vue';
+import { ref, computed, useTemplateRef, nextTick } from 'vue';
 
 import type { ColorValue } from '@/core/color.ts';
 import type { IconInfo, IconInfoWithId } from '@/core/icon.ts';
@@ -60,7 +60,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: string): void
+    (e: 'update:modelValue', value: string): void;
 }>();
 
 const icons = {
@@ -68,13 +68,13 @@ const icons = {
 };
 
 const dropdownMenu = useTemplateRef<HTMLElement>('dropdownMenu');
-const itemPerRow: Ref<number> = ref(props.columnCount || 7);
+const itemPerRow = ref<number>(props.columnCount || 7);
 
 const allIconRows = computed<IconInfoWithId[][]>(() => {
     return getIconsInRows(props.allIconInfos, itemPerRow.value);
 });
 
-const icon = computed({
+const icon = computed<string>({
     get: () => props.modelValue,
     set: (value: string) => emit('update:modelValue', value)
 });

@@ -60,7 +60,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'step:change', stepName: string): void
+    (e: 'step:change', stepName: string): void;
 }>();
 
 const isClickable = computed<boolean>(() => {

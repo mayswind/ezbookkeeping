@@ -1,4 +1,4 @@
-import { type Ref, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 
 import { useSettingsStore } from './setting.ts';
@@ -101,7 +101,7 @@ export const useOverviewStore = defineStore('overview', () => {
     const userStore = useUserStore();
     const exchangeRatesStore = useExchangeRatesStore();
 
-    const transactionDataRange: Ref<TransactionDataRange> = ref({
+    const transactionDataRange = ref<TransactionDataRange>({
         today: {
             startTime: getTodayFirstUnixTime(),
             endTime: getTodayLastUnixTime()
@@ -164,12 +164,12 @@ export const useOverviewStore = defineStore('overview', () => {
         }
     });
 
-    const transactionOverviewOptions: Ref<TransactionOverviewOptions> = ref({
+    const transactionOverviewOptions = ref<TransactionOverviewOptions>({
         loadLast11Months: false
     });
 
-    const transactionOverviewData: Ref<TransactionAmountsResponse> = ref({});
-    const transactionOverviewStateInvalid: Ref<boolean> = ref(true);
+    const transactionOverviewData = ref<TransactionAmountsResponse>({});
+    const transactionOverviewStateInvalid = ref<boolean>(true);
 
     const transactionOverview = computed<TransactionOverviewResponse>(() => {
         const overviewData = transactionOverviewData.value;

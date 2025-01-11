@@ -29,14 +29,14 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import type { ColorValue, ColorInfo } from '@/core/color.ts';
 import { arrayContainsFieldValue } from '@/lib/common.ts';
 import { getColorsInRows } from '@/lib/color.ts';
-import { scrollToSelectedItem } from '@/lib/ui/mobile.ts';
+import { type Framework7Dom, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{
     modelValue: ColorValue;
@@ -46,34 +46,34 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: ColorValue): void
-    (e: 'update:show', value: boolean): void
+    (e: 'update:modelValue', value: ColorValue): void;
+    (e: 'update:show', value: boolean): void;
 }>();
 
 const { tt } = useI18n();
 
-const currentValue: Ref<ColorValue> = ref(props.modelValue);
-const itemPerRow: Ref<number> = ref(props.columnCount || 7);
+const currentValue = ref<ColorValue>(props.modelValue);
+const itemPerRow = ref<number>(props.columnCount || 7);
 
 const allColorRows = computed<ColorInfo[][]>(() => {
     return getColorsInRows(props.allColorInfos, itemPerRow.value);
 });
 
-function onColorClicked(colorInfo: ColorInfo) {
+function onColorClicked(colorInfo: ColorInfo): void {
     currentValue.value = colorInfo.color;
     emit('update:modelValue', currentValue.value);
 }
 
-function hasSelectedIcon(row: ColorInfo[]) {
+function hasSelectedIcon(row: ColorInfo[]): boolean {
     return arrayContainsFieldValue(row, 'id', currentValue.value);
 }
 
-function onSheetOpen(event: { $el: HTMLElement }) {
+function onSheetOpen(event: { $el: Framework7Dom }): void {
     currentValue.value = props.modelValue;
     scrollToSelectedItem(event.$el, '.page-content', '.row-has-selected-item');
 }
 
-function onSheetClosed() {
+function onSheetClosed(): void {
     emit('update:show', false);
 }
 </script>

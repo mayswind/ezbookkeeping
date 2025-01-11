@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, ref, computed, useTemplateRef, nextTick } from 'vue';
+import { ref, computed, useTemplateRef, nextTick } from 'vue';
 
 import type { ColorValue, ColorInfo } from '@/core/color.ts';
 import { DEFAULT_ICON_COLOR } from '@/consts/color.ts';
@@ -61,7 +61,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: ColorValue): void
+    (e: 'update:modelValue', value: ColorValue): void;
 }>();
 
 const icons = {
@@ -70,7 +70,7 @@ const icons = {
 };
 
 const dropdownMenu = useTemplateRef<HTMLElement>('dropdownMenu');
-const itemPerRow: Ref<number> = ref(props.columnCount || 7);
+const itemPerRow = ref<number>(props.columnCount || 7);
 
 const allColorRows = computed<ColorInfo[][]>(() => {
     return getColorsInRows(props.allColorInfos, itemPerRow.value);

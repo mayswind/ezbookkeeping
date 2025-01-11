@@ -1,4 +1,4 @@
-import { type Ref, ref } from 'vue';
+import { ref } from 'vue';
 import { defineStore } from 'pinia';
 
 import type { ApplicationSettings, LocaleDefaultSettings } from '@/core/setting.ts';
@@ -11,8 +11,8 @@ import {
 } from '@/lib/settings.ts';
 
 export const useSettingsStore = defineStore('settings', () => {
-    const appSettings: Ref<ApplicationSettings> = ref(getApplicationSettings());
-    const localeDefaultSettings: Ref<LocaleDefaultSettings> = ref(getLocaleDefaultSettings());
+    const appSettings = ref<ApplicationSettings>(getApplicationSettings());
+    const localeDefaultSettings = ref<LocaleDefaultSettings>(getLocaleDefaultSettings());
 
     function setTheme(value: string): void {
         updateApplicationSettingsValue('theme', value);

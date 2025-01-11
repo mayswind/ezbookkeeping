@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 
 import { useTheme } from 'vuetify';
 import { register } from 'register-service-worker';
@@ -46,7 +46,7 @@ const userStore = useUserStore();
 const tokensStore = useTokensStore();
 const exchangeRatesStore = useExchangeRatesStore();
 
-const showNotification: Ref<boolean> = ref(false);
+const showNotification = ref<boolean>(false);
 
 const currentNotificationContent = computed<string | null>(() => rootStore.currentNotification);
 

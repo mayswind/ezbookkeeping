@@ -29,14 +29,14 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import type { IconInfo, IconInfoWithId } from '@/core/icon.ts';
 import { arrayContainsFieldValue } from '@/lib/common.ts';
 import { getIconsInRows } from '@/lib/icon.ts';
-import { scrollToSelectedItem } from '@/lib/ui/mobile.ts';
+import { type Framework7Dom, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{
     modelValue: string;
@@ -47,14 +47,14 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: string): void
-    (e: 'update:show', value: boolean): void
+    (e: 'update:modelValue', value: string): void;
+    (e: 'update:show', value: boolean): void;
 }>();
 
 const { tt } = useI18n();
 
-const currentValue: Ref<string> = ref(props.modelValue);
-const itemPerRow: Ref<number> = ref(props.columnCount || 7);
+const currentValue = ref<string>(props.modelValue);
+const itemPerRow = ref<number>(props.columnCount || 7);
 
 const allIconRows = computed<IconInfoWithId[][]>(() => {
     return getIconsInRows(props.allIconInfos, itemPerRow.value);
@@ -70,20 +70,20 @@ const heightClass = computed<string>(() => {
     }
 });
 
-function onIconClicked(iconInfo: IconInfoWithId) {
+function onIconClicked(iconInfo: IconInfoWithId): void {
     currentValue.value = iconInfo.id;
     emit('update:modelValue', currentValue.value);
 }
 
-function hasSelectedIcon(row: IconInfoWithId[]) {
+function hasSelectedIcon(row: IconInfoWithId[]): boolean {
     return arrayContainsFieldValue(row, 'id', currentValue.value);
 }
 
-function onSheetOpen(event: { $el: HTMLElement }) {
+function onSheetOpen(event: { $el: Framework7Dom }): void {
     scrollToSelectedItem(event.$el, '.page-content', '.row-has-selected-item');
 }
 
-function onSheetClosed() {
+function onSheetClosed(): void {
     emit('update:show', false);
 }
 </script>

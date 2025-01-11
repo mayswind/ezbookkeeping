@@ -41,17 +41,17 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:show', value: boolean): void
-    (e: 'info:copied'): void
+    (e: 'update:show', value: boolean): void;
+    (e: 'info:copied'): void;
 }>();
 
 const { tt } = useI18n();
 
-const iconCopyToClipboard = useTemplateRef('copyToClipboardIcon');
+const iconCopyToClipboard = useTemplateRef<unknown>('copyToClipboardIcon');
 
 let clipboardHolder: ClipboardHolder | null = null;
 
-function makeCopyToClipboardClickable() {
+function makeCopyToClipboardClickable(): void {
     if (clipboardHolder) {
         return;
     }
@@ -67,11 +67,11 @@ function makeCopyToClipboardClickable() {
     }
 }
 
-function close() {
+function close(): void {
     emit('update:show', false);
 }
 
-function onSheetClosed() {
+function onSheetClosed(): void {
     close();
 }
 

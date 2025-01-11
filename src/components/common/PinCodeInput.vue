@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, ref, computed, watch, useTemplateRef } from 'vue';
+import { ref, computed, watch, useTemplateRef } from 'vue';
 
 interface PinCode {
     value: string;
@@ -38,11 +38,11 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: string): void
-    (e: 'pincode:confirm', value: string): void
+    (e: 'update:modelValue', value: string): void;
+    (e: 'pincode:confirm', value: string): void;
 }>();
 
-const codes: Ref<PinCode[]> = ref([]);
+const codes = ref<PinCode[]>([]);
 const pinCodeInputs = useTemplateRef<HTMLInputElement[]>('pin-code-input');
 
 const finalPinCode = computed<string>(() => {

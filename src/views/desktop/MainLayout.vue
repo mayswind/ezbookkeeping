@@ -194,7 +194,7 @@
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { type Ref, ref, computed, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef } from 'vue';
 
 import { useDisplay } from 'vuetify';
 import { useTheme } from 'vuetify';
@@ -272,11 +272,11 @@ const icons = {
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
-const logouting: Ref<boolean> = ref(false);
-const isVerticalNavScrolled: Ref<boolean> = ref(false);
-const showVerticalOverlayMenu: Ref<boolean> = ref(false);
-const showLoading: Ref<boolean> = ref(false);
-const showMobileQrCode: Ref<boolean> = ref(false);
+const logouting = ref<boolean>(false);
+const isVerticalNavScrolled = ref<boolean>(false);
+const showVerticalOverlayMenu = ref<boolean>(false);
+const showLoading = ref<boolean>(false);
+const showMobileQrCode = ref<boolean>(false);
 
 const mdAndDown = computed<boolean>(() => {
     return display.mdAndDown.value;
@@ -315,16 +315,16 @@ const isEnableApplicationLock = computed<boolean>(() => {
     return settingsStore.appSettings.applicationLock;
 });
 
-function handleNavScroll(e: Event) {
+function handleNavScroll(e: Event): void {
     isVerticalNavScrolled.value = (e.target as HTMLElement).scrollTop > 0;
 }
 
-function lock() {
+function lock(): void {
     rootStore.lock();
     router.replace('/unlock');
 }
 
-function logout() {
+function logout(): void {
     logouting.value = true;
     showLoading.value = true;
 

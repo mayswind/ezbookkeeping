@@ -8,7 +8,7 @@ import { isEnableAnimate } from '../settings.ts';
 // @ts-expect-error the above file is migrating to ts
 import { translateError } from '@/locales/helper.js';
 
-interface Framework7Dom {
+export interface Framework7Dom {
     length: number;
     [index: number]: Element;
     find: (selector?: string) => Framework7Dom;

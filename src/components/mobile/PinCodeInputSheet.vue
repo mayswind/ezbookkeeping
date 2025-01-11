@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -41,20 +41,20 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: string): void
-    (e: 'update:show', value: boolean): void
-    (e: 'pincode:confirm', value: string): void
+    (e: 'update:modelValue', value: string): void;
+    (e: 'update:show', value: boolean): void;
+    (e: 'pincode:confirm', value: string): void;
 }>();
 
 const { tt } = useI18n();
 
-const currentPinCode: Ref<string> = ref('');
+const currentPinCode = ref<string>('');
 
 const currentPinCodeValid = computed<boolean>(() => {
     return currentPinCode.value?.length === 6 || false;
 });
 
-function confirm() {
+function confirm(): void {
     if (!currentPinCodeValid.value || props.confirmDisabled) {
         return;
     }
@@ -63,15 +63,15 @@ function confirm() {
     emit('pincode:confirm', currentPinCode.value);
 }
 
-function cancel() {
+function cancel(): void {
     emit('update:show', false);
 }
 
-function onSheetOpen() {
+function onSheetOpen(): void {
     currentPinCode.value = '';
 }
 
-function onSheetClosed() {
+function onSheetClosed(): void {
     cancel();
 }
 </script>

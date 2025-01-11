@@ -66,7 +66,7 @@ export function showToast(message: string, timeout: number | undefined, translat
     });
 }
 
-export function showLoading(delayConditionFunc: () => boolean, delayMills: number): void {
+export function showLoading(delayConditionFunc?: () => boolean, delayMills?: number): void {
     if (!delayConditionFunc) {
         f7ready((f7) => {
             return f7.preloader.show();

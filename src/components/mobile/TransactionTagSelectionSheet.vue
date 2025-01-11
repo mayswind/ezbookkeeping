@@ -5,17 +5,17 @@
         <f7-toolbar>
             <div class="swipe-handler"></div>
             <div class="left">
-                <f7-link sheet-close :text="$t('Cancel')"></f7-link>
+                <f7-link sheet-close :text="tt('Cancel')"></f7-link>
             </div>
             <div class="right">
-                <f7-link :text="$t('Done')" v-if="allTags && allTags.length && !noAvailableTag" @click="save"></f7-link>
+                <f7-link :text="tt('Done')" v-if="allTags && allTags.length && !noAvailableTag" @click="save"></f7-link>
                 <f7-link :class="{'disabled': newTag}"
-                         :text="$t('Add')" v-if="!allTags || !allTags.length || noAvailableTag" @click="addNewTag"></f7-link>
+                         :text="tt('Add')" v-if="!allTags || !allTags.length || noAvailableTag" @click="addNewTag"></f7-link>
             </div>
         </f7-toolbar>
         <f7-page-content>
             <f7-list class="no-margin-top no-margin-bottom" v-if="(!allTags || !allTags.length || noAvailableTag) && !newTag">
-                <f7-list-item :title="$t('No available tag')"></f7-list-item>
+                <f7-list-item :title="tt('No available tag')"></f7-list-item>
             </f7-list>
             <f7-list dividers class="no-margin-top no-margin-bottom tag-selection-list" v-else-if="(allTags && allTags.length && !noAvailableTag) || newTag">
                 <f7-list-item checkbox
@@ -37,7 +37,7 @@
                         </f7-block>
                     </template>
                 </f7-list-item>
-                <f7-list-item :title="$t('Add new tag')"
+                <f7-list-item :title="tt('Add new tag')"
                               v-if="allowAddNewTag && !newTag"
                               @click="addNewTag()">
                 </f7-list-item>
@@ -49,7 +49,7 @@
                         <div class="display-flex">
                             <f7-input class="list-title-input padding-left-half"
                                       type="text"
-                                      :placeholder="$t('Tag Title')"
+                                      :placeholder="tt('Tag Title')"
                                       v-model:value="newTag.name"
                                       @keyup.enter="saveNewTag()">
                             </f7-input>
@@ -75,131 +75,126 @@
     </f7-sheet>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
-import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
 
 import { TransactionTag } from '@/models/transaction_tag.ts';
+import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
 import { copyArrayTo } from '@/lib/common.ts';
-import { scrollToSelectedItem } from '@/lib/ui/mobile.ts';
+import { type Framework7Dom, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
 
-export default {
-    props: [
-        'modelValue',
-        'allowAddNewTag',
-        'show'
-    ],
-    emits: [
-        'update:modelValue',
-        'update:show'
-    ],
-    data() {
-        const self = this;
-        const transactionTagsStore = useTransactionTagsStore();
+const props = defineProps<{
+    modelValue: string[];
+    allowAddNewTag?: boolean;
+    show: boolean;
+}>();
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: string[]): void;
+    (e: 'update:show', value: boolean): void;
+}>();
 
-        return {
-            heightClass: self.getHeightClass(transactionTagsStore.allTransactionTags),
-            selectedItemIds: copyArrayTo(self.modelValue, []),
-            newTag: null
-        }
-    },
-    computed: {
-        ...mapStores(useTransactionTagsStore),
-        allTags() {
-            return this.transactionTagsStore.allTransactionTags;
-        },
-        noAvailableTag() {
-            for (let i = 0; i < this.allTags.length; i++) {
-                if (!this.allTags[i].hidden) {
-                    return false;
-                }
-            }
+const { tt } = useI18n();
+const { showToast } = useI18nUIComponents();
 
-            return true;
-        }
-    },
-    methods: {
-        save() {
-            this.$emit('update:modelValue', this.selectedItemIds);
-            this.$emit('update:show', false);
-        },
-        onSheetOpen(event) {
-            this.selectedItemIds = copyArrayTo(this.modelValue, []);
-            this.newTag = null;
-            scrollToSelectedItem(event.$el, '.page-content', 'li.list-item-selected');
-        },
-        onSheetClosed() {
-            this.$emit('update:show', false);
-            this.heightClass = this.getHeightClass(this.allTags);
-        },
-        changeTagSelection(e) {
-            const tagId = e.target.value;
+const transactionTagsStore = useTransactionTagsStore();
 
-            if (e.target.checked) {
-                for (let i = 0; i < this.selectedItemIds.length; i++) {
-                    if (this.selectedItemIds[i] === tagId) {
-                        return;
-                    }
-                }
+const selectedItemIds = ref<string[]>(copyArrayTo(props.modelValue, []));
+const newTag = ref<TransactionTag | null>(null);
 
-                this.selectedItemIds.push(tagId);
-            } else {
-                for (let i = 0; i < this.selectedItemIds.length; i++) {
-                    if (this.selectedItemIds[i] === tagId) {
-                        this.selectedItemIds.splice(i, 1);
-                        break;
-                    }
-                }
-            }
-        },
-        addNewTag() {
-            this.newTag = TransactionTag.createNewTag();
-        },
-        saveNewTag() {
-            const self = this;
+const allTags = computed(() => transactionTagsStore.allTransactionTags);
 
-            self.$showLoading();
-
-            self.transactionTagsStore.saveTag({
-                tag: self.newTag
-            }).then(tag => {
-                self.$hideLoading();
-                self.newTag = null;
-
-                if (tag && tag.id) {
-                    self.selectedItemIds.push(tag.id);
-                }
-            }).catch(error => {
-                self.$hideLoading();
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        cancelSaveNewTag() {
-            this.newTag = null;
-        },
-        isChecked(itemId) {
-            for (let i = 0; i < this.selectedItemIds.length; i++) {
-                if (this.selectedItemIds[i] === itemId) {
-                    return true;
-                }
-            }
-
-            return false;
-        },
-        getHeightClass(allTags) {
-            if (allTags && allTags.length > 10) {
-                return 'tag-selection-huge-sheet';
-            } else if (allTags && allTags.length > 6) {
-                return 'tag-selection-large-sheet';
-            } else {
-                return '';
+const noAvailableTag = computed<boolean>(() => {
+    if (transactionTagsStore.allTransactionTags) {
+        for (let i = 0; i < transactionTagsStore.allTransactionTags.length; i++) {
+            if (!transactionTagsStore.allTransactionTags[i].hidden) {
+                return false;
             }
         }
     }
+
+    return true;
+});
+
+const heightClass = computed<string>(() => {
+    if (transactionTagsStore.allTransactionTags && transactionTagsStore.allTransactionTags.length > 10) {
+        return 'tag-selection-huge-sheet';
+    } else if (transactionTagsStore.allTransactionTags && transactionTagsStore.allTransactionTags.length > 6) {
+        return 'tag-selection-large-sheet';
+    } else {
+        return '';
+    }
+});
+
+function isChecked(itemId: string): boolean {
+    return selectedItemIds.value.indexOf(itemId) >= 0;
+}
+
+function changeTagSelection(e: Event): void {
+    const target = e.target as HTMLInputElement;
+    const tagId = target.value;
+    const index = selectedItemIds.value.indexOf(tagId);
+
+    if (target.checked) {
+        if (index < 0) {
+            selectedItemIds.value.push(tagId);
+        }
+    } else {
+        if (index >= 0) {
+            selectedItemIds.value.splice(index, 1);
+        }
+    }
+}
+
+function save(): void {
+    emit('update:modelValue', selectedItemIds.value);
+    emit('update:show', false);
+}
+
+function addNewTag(): void {
+    newTag.value = TransactionTag.createNewTag();
+}
+
+function saveNewTag(): void {
+    if (!newTag.value) {
+        return;
+    }
+
+    showLoading();
+
+    transactionTagsStore.saveTag({
+        tag: newTag.value
+    }).then(tag => {
+        hideLoading();
+        newTag.value = null;
+
+        if (tag && tag.id) {
+            selectedItemIds.value.push(tag.id);
+        }
+    }).catch(error => {
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function cancelSaveNewTag(): void {
+    newTag.value = null;
+}
+
+function onSheetOpen(event: { $el: Framework7Dom }): void {
+    selectedItemIds.value = copyArrayTo(props.modelValue, []);
+    newTag.value = null;
+    scrollToSelectedItem(event.$el, '.page-content', 'li.list-item-selected');
+}
+
+function onSheetClosed(): void {
+    emit('update:show', false);
 }
 </script>
 

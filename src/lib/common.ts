@@ -394,7 +394,7 @@ export function copyObjectTo(fromObject: Record<string, unknown> | undefined, to
     return (toObject as Record<string, unknown>);
 }
 
-export function copyArrayTo(fromArray: unknown[], toArray: unknown[]): unknown[] {
+export function copyArrayTo<T>(fromArray: T[], toArray: T[]): T[] {
     if (!isArray(fromArray)) {
         return toArray;
     }
@@ -410,9 +410,9 @@ export function copyArrayTo(fromArray: unknown[], toArray: unknown[]): unknown[]
             const toValue = toArray[i];
 
             if (isArray(fromValue)) {
-                toArray[i] = copyArrayTo(fromValue as unknown[], toValue as unknown[]);
+                toArray[i] = copyArrayTo(fromValue as unknown[], toValue as unknown[]) as T;
             } else if (isObject(fromValue)) {
-                toArray[i] = copyObjectTo(fromValue as Record<string, unknown>, toValue as Record<string, unknown>);
+                toArray[i] = copyObjectTo(fromValue as Record<string, unknown>, toValue as Record<string, unknown>) as T;
             } else {
                 if (fromValue !== toValue) {
                     toArray[i] = fromValue;
@@ -420,9 +420,9 @@ export function copyArrayTo(fromArray: unknown[], toArray: unknown[]): unknown[]
             }
         } else {
             if (isArray(fromValue)) {
-                toArray.push(copyArrayTo(fromValue as unknown[], []));
+                toArray.push(copyArrayTo(fromValue as unknown[], []) as T);
             } else if (isObject(fromValue)) {
-                toArray.push(copyObjectTo(fromValue as Record<string, unknown>, {}));
+                toArray.push(copyObjectTo(fromValue as Record<string, unknown>, {}) as T);
             } else {
                 toArray.push(fromValue);
             }

@@ -1,7 +1,7 @@
 import { useI18n as useVueI18n } from 'vue-i18n';
 import moment from 'moment-timezone';
 
-import type { TypeAndDisplayName } from '@/core/base.ts';
+import type { TypeAndName, TypeAndDisplayName } from '@/core/base.ts';
 
 import { type LanguageInfo, allLanguages, DEFAULT_LANGUAGE } from '@/locales/index.ts';
 
@@ -17,6 +17,10 @@ import {
     LongTimeFormat,
     ShortTimeFormat
 } from '@/core/datetime.ts';
+import { type LocalizedAccountCategory, AccountType, AccountCategory } from '@/core/account.ts';
+import { TransactionEditScopeType, TransactionTagFilterType } from '@/core/transaction.ts';
+import { ScheduledTemplateFrequencyType } from '@/core/template.ts';
+import { StatisticsAnalysisType, CategoricalChartType, TrendChartType, ChartDataType, ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
 
 import type { LocaleDefaultSettings } from '@/core/setting.ts';
 import type { ErrorResponse } from '@/core/api.ts';
@@ -212,6 +216,21 @@ export function useI18n() {
         }
 
         return localizedParameters;
+    }
+
+    function getLocalizedDisplayNameAndType(typeAndNames: TypeAndName[]): TypeAndDisplayName[] {
+        const ret: TypeAndDisplayName[] = [];
+
+        for (let i = 0; i < typeAndNames.length; i++) {
+            const nameAndType = typeAndNames[i];
+
+            ret.push({
+                type: nameAndType.type,
+                displayName: t(nameAndType.name)
+            });
+        }
+
+        return ret;
     }
 
     function getAllMonthNames(type: string): string[] {
@@ -421,6 +440,23 @@ export function useI18n() {
         return ret;
     }
 
+    function getAllAccountCategories(): LocalizedAccountCategory[] {
+        const ret: LocalizedAccountCategory[] = [];
+        const allCategories = AccountCategory.values();
+
+        for (let i = 0; i < allCategories.length; i++) {
+            const accountCategory = allCategories[i];
+
+            ret.push({
+                type: accountCategory.type,
+                displayName: t(accountCategory.name),
+                defaultAccountIconId: accountCategory.defaultAccountIconId
+            });
+        }
+
+        return ret;
+    }
+
     function getMonthShortName(monthName: string): string {
         return t(`datetime.${monthName}.short`);
     }
@@ -623,6 +659,16 @@ export function useI18n() {
         getAllShortWeekdayNames,
         getAllMinWeekdayNames,
         getAllWeekDays,
+        getAllAccountCategories: () => getAllAccountCategories(),
+        getAllAccountTypes: () => getLocalizedDisplayNameAndType(AccountType.values()),
+        getAllCategoricalChartTypes: () => getLocalizedDisplayNameAndType(CategoricalChartType.values()),
+        getAllTrendChartTypes: () => getLocalizedDisplayNameAndType(TrendChartType.values()),
+        getAllStatisticsChartDataTypes: (analysisType: StatisticsAnalysisType) => getLocalizedDisplayNameAndType(ChartDataType.values(analysisType)),
+        getAllStatisticsSortingTypes: () => getLocalizedDisplayNameAndType(ChartSortingType.values()),
+        getAllStatisticsDateAggregationTypes: () => getLocalizedDisplayNameAndType(ChartDateAggregationType.values()),
+        getAllTransactionEditScopeTypes: () => getLocalizedDisplayNameAndType(TransactionEditScopeType.values()),
+        getAllTransactionTagFilterTypes: () => getLocalizedDisplayNameAndType(TransactionTagFilterType.values()),
+        getAllTransactionScheduledFrequencyTypes: () => getLocalizedDisplayNameAndType(ScheduledTemplateFrequencyType.values()),
         getMonthShortName,
         getMonthLongName,
         getMonthdayOrdinal,

@@ -1,4 +1,4 @@
-import type { TypeAndName } from './base.ts';
+import type { TypeAndName, TypeAndDisplayName } from './base.ts';
 
 type AccountTypeName = 'SingleAccount' | 'MultiSubAccounts';
 
@@ -73,4 +73,10 @@ export class AccountCategory implements TypeAndName {
     public static valueOf(type: number): AccountCategory {
         return AccountCategory.allInstancesByType[type];
     }
+}
+
+export interface LocalizedAccountCategory extends TypeAndDisplayName {
+    readonly type: number;
+    readonly displayName: string;
+    readonly defaultAccountIconId: string;
 }

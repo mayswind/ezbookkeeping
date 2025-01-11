@@ -4,10 +4,10 @@
         <f7-toolbar>
             <div class="swipe-handler"></div>
             <div class="left">
-                <f7-link sheet-close :text="$t('Cancel')"></f7-link>
+                <f7-link sheet-close :text="tt('Cancel')"></f7-link>
             </div>
             <div class="right">
-                <f7-link :text="$t('Done')" @click="save"></f7-link>
+                <f7-link :text="tt('Done')" @click="save"></f7-link>
             </div>
         </f7-toolbar>
         <f7-page-content>
@@ -30,11 +30,11 @@
                 <div>
                     <div class="schedule-frequency-value-container">
                         <f7-list dividers class="schedule-frequency-value-list no-margin-vertical"
-                                 v-if="currentFrequencyType === allTemplateScheduledFrequencyTypes.Disabled.type">
-                            <f7-list-item :title="$t('None')"></f7-list-item>
+                                 v-if="currentFrequencyType === ScheduledTemplateFrequencyType.Disabled.type">
+                            <f7-list-item :title="tt('None')"></f7-list-item>
                         </f7-list>
                         <f7-list dividers class="schedule-frequency-value-list no-margin-vertical"
-                                 v-if="currentFrequencyType === allTemplateScheduledFrequencyTypes.Weekly.type">
+                                 v-if="currentFrequencyType === ScheduledTemplateFrequencyType.Weekly.type">
                             <f7-list-item checkbox
                                           :class="isChecked(weekDay.type) ? 'list-item-selected' : ''"
                                           :key="weekDay.type"
@@ -46,7 +46,7 @@
                             </f7-list-item>
                         </f7-list>
                         <f7-list dividers class="schedule-frequency-value-list no-margin-vertical"
-                                 v-if="currentFrequencyType === allTemplateScheduledFrequencyTypes.Monthly.type">
+                                 v-if="currentFrequencyType === ScheduledTemplateFrequencyType.Monthly.type">
                             <f7-list-item checkbox
                                           :class="isChecked(monthDay.day) ? 'list-item-selected' : ''"
                                           :key="monthDay.day"
@@ -64,135 +64,98 @@
     </f7-sheet>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+
+import { type CommonScheduleFrequencySelectionProps, useScheduleFrequencySelectionBase } from '@/components/base/ScheduleFrequencySelectionBase.ts';
+
+import { useI18n } from '@/locales/helpers.ts';
+
 import { useUserStore } from '@/stores/user.ts';
 
 import { ScheduledTemplateFrequencyType } from '@/core/template.ts';
 import { sortNumbersArray } from '@/lib/common.ts';
-import { scrollToSelectedItem } from '@/lib/ui/mobile.ts';
+import { type Framework7Dom, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
 
-export default {
-    props: [
-        'type',
-        'modelValue',
-        'disabled',
-        'readonly',
-        'label',
-        'show'
-    ],
-    emits: [
-        'update:type',
-        'update:modelValue',
-        'update:show'
-    ],
-    data() {
-        const self = this;
+interface MobileScheduleFrequencySelectionProps extends CommonScheduleFrequencySelectionProps {
+    show: boolean;
+}
 
-        return {
-            currentFrequencyType: self.type,
-            currentFrequencyValue: self.getFrequencyValues(self.modelValue)
-        }
-    },
-    computed: {
-        ...mapStores(useUserStore),
-        allTransactionScheduledFrequencyTypes() {
-            return this.$locale.getAllTransactionScheduledFrequencyTypes();
-        },
-        allTemplateScheduledFrequencyTypes() {
-            return ScheduledTemplateFrequencyType.all();
-        },
-        allWeekDays() {
-            return this.$locale.getAllWeekDays(this.firstDayOfWeek);
-        },
-        allAvailableMonthDays() {
-            const allAvailableDays = [];
+const props = defineProps<MobileScheduleFrequencySelectionProps>();
+const emit = defineEmits<{
+    (e: 'update:type', value: number): void;
+    (e: 'update:modelValue', value: string): void;
+    (e: 'update:show', value: boolean): void;
+}>();
 
-            for (let i = 1; i <= 28; i++) {
-                allAvailableDays.push({
-                    day: i,
-                    displayName: this.$locale.getMonthdayShortName(i),
-                });
-            }
+const { tt } = useI18n();
 
-            return allAvailableDays;
-        },
-        firstDayOfWeek() {
-            return this.userStore.currentUserFirstDayOfWeek;
-        }
-    },
-    methods: {
-        onSheetOpen(event) {
-            this.currentFrequencyType = this.type;
-            this.currentFrequencyValue = this.getFrequencyValues(this.modelValue);
-            scrollToSelectedItem(event.$el, '.schedule-frequency-value-container', 'li.list-item-selected');
-        },
-        onSheetClosed() {
-            this.close();
-        },
-        changeFrequencyType(value) {
-            if (this.currentFrequencyType !== value) {
-                this.currentFrequencyType = value;
+const userStore = useUserStore();
 
-                if (value === ScheduledTemplateFrequencyType.Weekly.type) {
-                    this.currentFrequencyValue = [this.firstDayOfWeek];
-                } else if (value === ScheduledTemplateFrequencyType.Monthly.type) {
-                    this.currentFrequencyValue = [1];
-                } else {
-                    this.currentFrequencyValue = [];
-                }
-            }
-        },
-        changeFrequencyValue(e) {
-            const value = parseInt(e.target.value);
+const { allTransactionScheduledFrequencyTypes, allWeekDays, allAvailableMonthDays, getFrequencyValues } = useScheduleFrequencySelectionBase();
 
-            if (e.target.checked) {
-                for (let i = 0; i < this.currentFrequencyValue.length; i++) {
-                    if (this.currentFrequencyValue[i] === value) {
-                        return;
-                    }
-                }
+const currentFrequencyType = ref<number>(props.type);
+const currentFrequencyValue = ref<number[]>(getFrequencyValues(props.modelValue));
 
-                this.currentFrequencyValue.push(value);
-            } else {
-                for (let i = 0; i < this.currentFrequencyValue.length; i++) {
-                    if (this.currentFrequencyValue[i] === value) {
-                        this.currentFrequencyValue.splice(i, 1);
-                        break;
-                    }
-                }
-            }
-        },
-        save() {
-            this.$emit('update:type', this.currentFrequencyType);
-            this.$emit('update:modelValue', sortNumbersArray(this.currentFrequencyValue).join(','));
-            this.$emit('update:show', false);
-        },
-        close() {
-            this.$emit('update:show', false);
-        },
-        isChecked(value) {
-            for (let i = 0; i < this.currentFrequencyValue.length; i++) {
-                if (this.currentFrequencyValue[i] === value) {
-                    return true;
-                }
-            }
+const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
 
-            return false;
-        },
-        getFrequencyValues(value) {
-            const values = value.split(',');
-            const ret = [];
+function isChecked(value: number): boolean {
+    return currentFrequencyValue.value.indexOf(value) >= 0;
+}
 
-            for (let i = 0; i < values.length; i++) {
-                if (values[i]) {
-                    ret.push(parseInt(values[i]));
-                }
-            }
+function changeFrequencyType(value: number): void {
+    if (currentFrequencyType.value !== value) {
+        currentFrequencyType.value = value;
 
-            return sortNumbersArray(ret);
+        if (value === ScheduledTemplateFrequencyType.Weekly.type) {
+            currentFrequencyValue.value = [firstDayOfWeek.value];
+        } else if (value === ScheduledTemplateFrequencyType.Monthly.type) {
+            currentFrequencyValue.value = [1];
+        } else {
+            currentFrequencyValue.value = [];
         }
     }
+}
+
+function changeFrequencyValue(e: Event): void {
+    const value = parseInt((e.target as HTMLInputElement).value);
+
+    if ((e.target as HTMLInputElement).checked) {
+        for (let i = 0; i < currentFrequencyValue.value.length; i++) {
+            if (currentFrequencyValue.value[i] === value) {
+                return;
+            }
+        }
+
+        currentFrequencyValue.value.push(value);
+    } else {
+        for (let i = 0; i < currentFrequencyValue.value.length; i++) {
+            if (currentFrequencyValue.value[i] === value) {
+                currentFrequencyValue.value.splice(i, 1);
+                break;
+            }
+        }
+    }
+}
+
+function save() {
+    emit('update:type', currentFrequencyType.value);
+    emit('update:modelValue', sortNumbersArray(currentFrequencyValue.value).join(','));
+    emit('update:show', false);
+}
+
+function close() {
+    emit('update:show', false);
+}
+
+function onSheetOpen(event: { $el: Framework7Dom }): void {
+    currentFrequencyType.value = props.type;
+    currentFrequencyValue.value = getFrequencyValues(props.modelValue);
+    scrollToSelectedItem(event.$el, '.schedule-frequency-value-container', 'li.list-item-selected');
+}
+
+function onSheetClosed() {
+    close();
 }
 </script>
 

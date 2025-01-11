@@ -105,7 +105,7 @@ const transactionTagsStore = useTransactionTagsStore();
 const selectedItemIds = ref<string[]>(copyArrayTo(props.modelValue, []));
 const newTag = ref<TransactionTag | null>(null);
 
-const allTags = computed(() => transactionTagsStore.allTransactionTags);
+const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
 
 const noAvailableTag = computed<boolean>(() => {
     if (transactionTagsStore.allTransactionTags) {

@@ -287,10 +287,10 @@ const transactionTagsStore = useTransactionTagsStore();
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
-const tags = computed(() => transactionTagsStore.allTransactionTags);
-const noAvailableTag = computed(() => isNoAvailableTag(tags.value, showHidden.value));
-const availableTagCount = computed(() => getAvailableTagCount(tags.value, showHidden.value));
-const hasEditingTag = computed(() => !!(newTag.value || (editingTag.value.id && editingTag.value.id !== '')));
+const tags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
+const noAvailableTag = computed<boolean>(() => isNoAvailableTag(tags.value, showHidden.value));
+const availableTagCount = computed<number>(() => getAvailableTagCount(tags.value, showHidden.value));
+const hasEditingTag = computed<boolean>(() => !!(newTag.value || (editingTag.value.id && editingTag.value.id !== '')));
 
 function isTagModified(tag: TransactionTag): boolean {
     if (tag.id) {

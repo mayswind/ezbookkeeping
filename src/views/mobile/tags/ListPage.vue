@@ -181,11 +181,11 @@ const { showToast, routeBackOnError } = useI18nUIComponents();
 
 const transactionTagsStore = useTransactionTagsStore();
 
-const tags = computed(() => transactionTagsStore.allTransactionTags);
-const firstShowingId = computed(() => getFirstShowingId(tags.value, showHidden.value));
-const lastShowingId = computed(() => getLastShowingId(tags.value, showHidden.value));
-const noAvailableTag = computed(() => isNoAvailableTag(tags.value, showHidden.value));
-const hasEditingTag = computed(() => !!(newTag.value || (editingTag.value.id && editingTag.value.id !== '')));
+const tags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
+const firstShowingId = computed<string | null>(() => getFirstShowingId(tags.value, showHidden.value));
+const lastShowingId = computed<string | null>(() => getLastShowingId(tags.value, showHidden.value));
+const noAvailableTag = computed<boolean>(() => isNoAvailableTag(tags.value, showHidden.value));
+const hasEditingTag = computed<boolean>(() => !!(newTag.value || (editingTag.value.id && editingTag.value.id !== '')));
 
 function isTagModified(tag: TransactionTag): boolean {
     if (tag.id) {

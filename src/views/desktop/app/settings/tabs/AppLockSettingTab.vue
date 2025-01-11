@@ -66,8 +66,10 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useTransactionsStore } from '@/stores/transaction.js';
 
-import logger from '@/lib/logger.ts';
-import webauthn from '@/lib/webauthn.js';
+import {
+    isWebAuthnCompletelySupported,
+    registerWebAuthnCredential
+} from '@/lib/webauthn.ts';
 import {
     getUserAppLockState,
     encryptToken,
@@ -76,6 +78,7 @@ import {
     saveWebAuthnConfig,
     clearWebAuthnConfig
 } from '@/lib/userstate.ts';
+import logger from '@/lib/logger.ts';
 
 export default {
     data() {
@@ -114,7 +117,7 @@ export default {
             if (newValue) {
                 self.enablingWebAuthn = true;
 
-                webauthn.registerCredential(
+                registerWebAuthnCredential(
                     getUserAppLockState(),
                     self.userStore.currentUserBasicInfo,
                 ).then(({ id }) => {
@@ -150,7 +153,7 @@ export default {
     },
     created() {
         const self = this;
-        webauthn.isCompletelySupported().then(result => {
+        isWebAuthnCompletelySupported().then(result => {
             self.isSupportedWebAuthn = result;
         });
     },

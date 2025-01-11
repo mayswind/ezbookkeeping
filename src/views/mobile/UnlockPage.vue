@@ -74,8 +74,10 @@ import { useTransactionsStore } from '@/stores/transaction.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
-import logger from '@/lib/logger.ts';
-import webauthn from '@/lib/webauthn.js';
+import {
+    isWebAuthnSupported,
+    verifyWebAuthnCredential
+} from '@/lib/webauthn.ts';
 import {
     unlockTokenByWebAuthn,
     unlockTokenByPinCode,
@@ -84,6 +86,7 @@ import {
 } from '@/lib/userstate.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 import { isModalShowing } from '@/lib/ui/mobile.ts';
+import logger from '@/lib/logger.ts';
 
 export default {
     props: [
@@ -108,7 +111,7 @@ export default {
         isWebAuthnAvailable() {
             return this.settingsStore.appSettings.applicationLockWebAuthn
                 && hasWebAuthnConfig()
-                && webauthn.isSupported();
+                && isWebAuthnSupported();
         },
         currentLanguageCode() {
             return this.$locale.getCurrentLanguageTag();
@@ -127,14 +130,14 @@ export default {
                 return;
             }
 
-            if (!webauthn.isSupported()) {
+            if (!isWebAuthnSupported()) {
                 self.$toast('WebAuth is not supported on this device');
                 return;
             }
 
             self.$showLoading();
 
-            webauthn.verifyCredential(
+            verifyWebAuthnCredential(
                 self.userStore.currentUserBasicInfo,
                 getWebAuthnCredentialId()
             ).then(({ id, userName, userSecret }) => {

@@ -21,3 +21,12 @@ interface Window {
 interface Navigator {
     browserLanguage?: string;
 }
+
+interface Credential {
+    rawId: ArrayBuffer;
+    response: {
+        clientDataJSON: ArrayBuffer;
+        attestationObject: ArrayBuffer;
+        userHandle: ArrayBuffer;
+    };
+}

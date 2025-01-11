@@ -237,7 +237,7 @@ export function base64encode(arrayBuffer: ArrayBuffer): string | null {
     return btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(arrayBuffer))));
 }
 
-export function base64decode(str: string): string | null {
+export function base64decode(str: string): string {
     if (!str) {
         return '';
     }

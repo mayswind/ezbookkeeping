@@ -585,7 +585,8 @@
                                  :min-time="filters.minDatetime"
                                  :max-time="filters.maxDatetime"
                                  v-model:show="showCustomDateRangeDialog"
-                                 @dateRange:change="changeCustomDateFilter" />
+                                 @dateRange:change="changeCustomDateFilter"
+                                 @error="showError" />
     <batch-replace-dialog ref="batchReplaceDialog" />
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
@@ -1567,6 +1568,9 @@ export default {
                     });
                 }
             });
+        },
+        showError(message) {
+            this.$refs.snackbar.showError(message);
         },
         getAllUsedCategoryNames() {
             const categoryNames = {};

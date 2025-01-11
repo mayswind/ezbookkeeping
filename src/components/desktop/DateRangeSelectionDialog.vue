@@ -19,7 +19,6 @@
             </template>
             <v-card-text class="mb-md-4 w-100 d-flex justify-center">
                 <vue-date-picker inline enable-seconds auto-apply
-                                 ref="datetimepicker"
                                  month-name-format="long"
                                  six-weeks="center"
                                  :clearable="false"
@@ -39,186 +38,94 @@
                         {{ getMonthShortName(text) }}
                     </template>
                     <template #am-pm-button="{ toggle, value }">
-                        <button class="dp__pm_am_button" tabindex="0" @click="toggle">{{ $t(`datetime.${value}.content`) }}</button>
+                        <button class="dp__pm_am_button" tabindex="0" @click="toggle">{{ tt(`datetime.${value}.content`) }}</button>
                     </template>
                 </vue-date-picker>
             </v-card-text>
             <v-card-text class="overflow-y-visible">
                 <div class="w-100 d-flex justify-center gap-4">
-                    <v-btn :disabled="!dateRange[0] || !dateRange[1]" @click="confirm">{{ $t('OK') }}</v-btn>
-                    <v-btn color="secondary" variant="tonal" @click="cancel">{{ $t('Cancel') }}</v-btn>
+                    <v-btn :disabled="!dateRange[0] || !dateRange[1]" @click="confirm">{{ tt('OK') }}</v-btn>
+                    <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
                 </div>
             </v-card-text>
         </v-card>
     </v-dialog>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed, watch } from 'vue';
 import { useTheme } from 'vuetify';
 
-import { mapStores } from 'pinia';
+import { type CommonDateRangeSelectionProps, useDateRangeSelectionBase } from '@/components/base/DateRangeSelectionBase.ts';
+
+import { useI18n } from '@/locales/helpers.ts';
 import { useUserStore } from '@/stores/user.ts';
 
-import { DateRange } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
+
 import {
-    getCurrentUnixTime,
-    getCurrentYear,
-    getUnixTime,
     getLocalDatetimeFromUnixTime,
-    getTodayFirstUnixTime,
     getDummyUnixTimeForLocalUsage,
-    getActualUnixTimeForStore,
     getTimezoneOffsetMinutes,
-    getBrowserTimezoneOffsetMinutes,
-    getDateRangeByDateType
+    getBrowserTimezoneOffsetMinutes
 } from '@/lib/datetime.ts';
 
-export default {
-    props: [
-        'minTime',
-        'maxTime',
-        'title',
-        'hint',
-        'persistent',
-        'show'
-    ],
-    emits: [
-        'update:show',
-        'dateRange:change'
-    ],
-    data() {
-        const self = this;
-        let minDate = getTodayFirstUnixTime();
-        let maxDate = getCurrentUnixTime();
+interface DesktopDateRangeSelectionProps extends CommonDateRangeSelectionProps {
+    persistent?: boolean;
+}
 
-        if (self.minTime) {
-            minDate = self.minTime;
+const props = defineProps<DesktopDateRangeSelectionProps>();
+const emit = defineEmits<{
+    (e: 'update:show', value: boolean): void;
+    (e: 'dateRange:change', minUnixTime: number, maxUnixTime: number): void;
+    (e: 'error', message: string): void;
+}>();
+
+const theme = useTheme();
+const { tt, getMonthShortName } = useI18n();
+
+const userStore = useUserStore();
+
+const { yearRange, dateRange, dayNames, isYearFirst, is24Hour, beginDateTime, endDateTime, presetRanges, getFinalDateRange } = useDateRangeSelectionBase(props);
+
+const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
+const showState = computed<boolean>({
+    get: () => props.show || false,
+    set: (value) => emit('update:show', value)
+});
+
+function confirm(): void {
+    try {
+        const finalDateRange = getFinalDateRange();
+
+        if (!finalDateRange) {
+            return;
         }
 
-        if (self.maxTime) {
-            maxDate = self.maxTime;
-        }
-
-        return {
-            yearRange: [
-                2000,
-                getCurrentYear() + 1
-            ],
-            dateRange: [
-                getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(minDate, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())),
-                getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(maxDate, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()))
-            ]
-        }
-    },
-    computed: {
-        ...mapStores(useUserStore),
-        showState: {
-            get: function () {
-                return this.show;
-            },
-            set: function (value) {
-                this.$emit('update:show', value);
-            }
-        },
-        isDarkMode() {
-            return this.globalTheme.global.name.value === ThemeType.Dark;
-        },
-        firstDayOfWeek() {
-            return this.userStore.currentUserFirstDayOfWeek;
-        },
-        dayNames() {
-            return arrangeArrayWithNewStartIndex(this.$locale.getAllMinWeekdayNames(), this.firstDayOfWeek);
-        },
-        isYearFirst() {
-            return this.$locale.isLongDateMonthAfterYear(this.userStore);
-        },
-        is24Hour() {
-            return this.$locale.isLongTime24HourFormat(this.userStore);
-        },
-        beginDateTime() {
-            const actualBeginUnixTime = getActualUnixTimeForStore(getUnixTime(this.dateRange[0]), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, actualBeginUnixTime);
-        },
-        endDateTime() {
-            const actualEndUnixTime = getActualUnixTimeForStore(getUnixTime(this.dateRange[1]), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, actualEndUnixTime);
-        },
-        presetRanges() {
-            const presetRanges = [];
-
-            [
-                DateRange.Today,
-                DateRange.LastSevenDays,
-                DateRange.LastThirtyDays,
-                DateRange.ThisWeek,
-                DateRange.ThisMonth,
-                DateRange.ThisYear
-            ].forEach(dateRangeType => {
-                const dateRange = getDateRangeByDateType(dateRangeType.type, this.firstDayOfWeek);
-
-                presetRanges.push({
-                    label: this.$t(dateRangeType.name),
-                    value: [
-                        getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(dateRange.minTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())),
-                        getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(dateRange.maxTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()))
-                    ]
-                });
-            });
-
-            return presetRanges;
-        }
-    },
-    watch: {
-        'minTime': function (newValue) {
-            if (newValue) {
-                this.dateRange[0] = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(newValue, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
-            }
-        },
-        'maxTime': function (newValue) {
-            if (newValue) {
-                this.dateRange[1] = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(newValue, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
-            }
-        }
-    },
-    setup() {
-        const theme = useTheme();
-
-        return {
-            globalTheme: theme
-        };
-    },
-    methods: {
-        confirm() {
-            if (!this.dateRange[0] || !this.dateRange[1]) {
-                return;
-            }
-
-            const currentMinDate = this.dateRange[0];
-            const currentMaxDate = this.dateRange[1];
-
-            let minUnixTime = getUnixTime(currentMinDate);
-            let maxUnixTime = getUnixTime(currentMaxDate);
-
-            if (minUnixTime < 0 || maxUnixTime < 0) {
-                this.$toast('Date is too early');
-                return;
-            }
-
-            minUnixTime = getActualUnixTimeForStore(minUnixTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
-            maxUnixTime = getActualUnixTimeForStore(maxUnixTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
-
-            this.$emit('dateRange:change', minUnixTime, maxUnixTime);
-        },
-        cancel() {
-            this.$emit('update:show', false);
-        },
-        getMonthShortName(month) {
-            return this.$locale.getMonthShortName(month);
+        emit('dateRange:change', finalDateRange.minUnixTime, finalDateRange.maxUnixTime);
+    } catch (ex: unknown) {
+        if (ex instanceof Error) {
+            emit('error', ex.message);
         }
     }
 }
+
+function cancel(): void {
+    emit('update:show', false);
+}
+
+watch(() => props.minTime, (newValue) => {
+    if (newValue) {
+        dateRange.value[0] = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(newValue, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+    }
+});
+
+watch(() => props.maxTime, (newValue) => {
+    if (newValue) {
+        dateRange.value[1] = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(newValue, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+    }
+});
 </script>
 
 <style>

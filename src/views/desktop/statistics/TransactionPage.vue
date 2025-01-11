@@ -287,7 +287,8 @@
                                   :min-time="query.categoricalChartStartTime"
                                   :max-time="query.categoricalChartEndTime"
                                   v-model:show="showCustomDateRangeDialog"
-                                  @dateRange:change="setCustomDateFilter" />
+                                  @dateRange:change="setCustomDateFilter"
+                                  @error="showError" />
 
     <month-range-selection-dialog :title="$t('Custom Date Range')"
                                   :min-time="query.trendChartStartYearMonth"
@@ -1041,6 +1042,9 @@ export default {
         },
         clickTrendChartItem(item) {
             this.$router.push(this.getTransactionItemLinkUrl(item.itemId, item.dateRange));
+        },
+        showError(message) {
+            this.$refs.snackbar.showError(message);
         },
         getDisplayAmount(amount, currency, textLimit) {
             amount = this.getDisplayCurrency(amount, currency);

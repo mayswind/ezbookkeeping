@@ -554,7 +554,8 @@
                                  :min-time="customMinDatetime"
                                  :max-time="customMaxDatetime"
                                  v-model:show="showCustomDateRangeDialog"
-                                 @dateRange:change="changeCustomDateFilter" />
+                                 @dateRange:change="changeCustomDateFilter"
+                                 @error="showError" />
     <edit-dialog ref="editDialog" type="transaction" :persistent="true" />
     <import-dialog ref="importDialog" :persistent="true" />
 
@@ -1610,6 +1611,9 @@ export default {
             this.$nextTick(() => {
                 scrollToSelectedItem(menu.contentEl, 'div.v-list', 'div.v-list-item.list-item-selected');
             });
+        },
+        showError(message) {
+            this.$refs.snackbar.showError(message);
         },
         getDisplayTime(transaction) {
             return this.$locale.formatUnixTimeToShortTime(this.userStore, transaction.time, transaction.utcOffset, this.currentTimezoneOffsetMinutes);

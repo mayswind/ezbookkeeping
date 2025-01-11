@@ -15,6 +15,7 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.ts';
+import { useEnvironmentsStore } from '@/stores/environment.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useTokensStore } from '@/stores/token.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
@@ -32,6 +33,7 @@ const { tt, getCurrentLanguageInfo, setLanguage, initLocale } = useI18n();
 
 const rootStore = useRootStore();
 const settingsStore = useSettingsStore();
+const environmentsStore = useEnvironmentsStore();
 const userStore = useUserStore();
 const tokensStore = useTokensStore();
 const exchangeRatesStore = useExchangeRatesStore();
@@ -102,7 +104,6 @@ const f7params = ref<object>({
 
 const notification = ref<Notification.Notification | null>(null);
 
-const isDarkMode = ref<boolean | undefined>(undefined);
 const hasPushPopupBackdrop = ref<boolean | undefined>(undefined);
 const hasBackdrop = ref<boolean | undefined>(undefined);
 const currentNotificationContent = computed<string | null>(() => rootStore.currentNotification);
@@ -145,14 +146,14 @@ function onBackdropChanged(element: { push?: boolean, opened?: boolean }): void 
         hasBackdrop.value = element.opened;
     }
 
-    setThemeColorMeta(isDarkMode.value);
+    setThemeColorMeta(environmentsStore.framework7DarkMode);
 }
 
 onMounted(() => {
     setAppFontSize(settingsStore.appSettings.fontSize);
 
     f7ready((f7) => {
-        isDarkMode.value = f7.darkMode;
+        environmentsStore.framework7DarkMode = f7.darkMode;
         setThemeColorMeta(f7.darkMode);
 
         f7.on('actionsOpen', (actions: Actions.Actions) => onBackdropChanged(actions));
@@ -177,7 +178,7 @@ onMounted(() => {
         });
 
         f7.on('darkModeChange', (darkMode) => {
-            isDarkMode.value = darkMode;
+            environmentsStore.framework7DarkMode = darkMode;
             setThemeColorMeta(darkMode);
         });
     });

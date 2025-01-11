@@ -52,6 +52,11 @@ export interface RecentMonthDateRange {
     readonly month: number;
 }
 
+export interface PresetDateRange {
+    readonly label: string;
+    readonly value: Date[];
+}
+
 export interface LocalizedRecentMonthDateRange {
     readonly dateType: number;
     readonly minTime: number;

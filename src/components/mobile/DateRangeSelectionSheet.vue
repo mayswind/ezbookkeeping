@@ -36,170 +36,97 @@
                         {{ getMonthShortName(text) }}
                     </template>
                     <template #am-pm-button="{ toggle, value }">
-                        <button class="dp__pm_am_button" tabindex="0" @click="toggle">{{ $t(`datetime.${value}.content`) }}</button>
+                        <button class="dp__pm_am_button" tabindex="0" @click="toggle">{{ tt(`datetime.${value}.content`) }}</button>
                     </template>
                 </vue-date-picker>
                 <f7-button large fill
                            :class="{ 'disabled': !dateRange[0] || !dateRange[1] }"
-                           :text="$t('Continue')"
+                           :text="tt('Continue')"
                            @click="confirm">
                 </f7-button>
                 <div class="margin-top text-align-center">
-                    <f7-link @click="cancel" :text="$t('Cancel')"></f7-link>
+                    <f7-link @click="cancel" :text="tt('Cancel')"></f7-link>
                 </div>
             </div>
         </f7-page-content>
     </f7-sheet>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
+<script setup lang="ts">
+import { computed, useTemplateRef } from 'vue';
+import VueDatePicker from '@vuepic/vue-datepicker';
+
+import { type CommonDateRangeSelectionProps, useDateRangeSelectionBase } from '@/components/base/DateRangeSelectionBase.ts';
+
+import { useI18n } from '@/locales/helpers.ts';
+import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
+import { useEnvironmentsStore } from '@/stores/environment.ts';
 import { useUserStore } from '@/stores/user.ts';
 
-import { DateRange } from '@/core/datetime.ts';
-import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
 import {
-    getCurrentUnixTime,
-    getCurrentYear,
-    getUnixTime,
     getLocalDatetimeFromUnixTime,
-    getTodayFirstUnixTime,
     getDummyUnixTimeForLocalUsage,
-    getActualUnixTimeForStore,
     getTimezoneOffsetMinutes,
-    getBrowserTimezoneOffsetMinutes,
-    getDateRangeByDateType
+    getBrowserTimezoneOffsetMinutes
 } from '@/lib/datetime.ts';
 
-export default {
-    props: [
-        'minTime',
-        'maxTime',
-        'title',
-        'hint',
-        'show'
-    ],
-    emits: [
-        'update:show',
-        'dateRange:change'
-    ],
-    data() {
-        const self = this;
-        let minDate = getTodayFirstUnixTime();
-        let maxDate = getCurrentUnixTime();
+type VueDatePickerType = InstanceType<typeof VueDatePicker>;
 
-        if (self.minTime) {
-            minDate = self.minTime;
+const props = defineProps<CommonDateRangeSelectionProps>();
+const emit = defineEmits<{
+    (e: 'update:show', value: boolean): void;
+    (e: 'dateRange:change', minUnixTime: number, maxUnixTime: number): void;
+}>();
+
+const { tt, getMonthShortName } = useI18n();
+const { showToast } = useI18nUIComponents();
+
+const environmentsStore = useEnvironmentsStore();
+const userStore = useUserStore();
+
+const { yearRange, dateRange, dayNames, isYearFirst, is24Hour, beginDateTime, endDateTime, presetRanges, getFinalDateRange } = useDateRangeSelectionBase(props);
+
+const datetimepicker = useTemplateRef<VueDatePickerType>('datetimepicker');
+const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
+const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
+
+function confirm(): void {
+    try {
+        const finalDateRange = getFinalDateRange();
+
+        if (!finalDateRange) {
+            return;
         }
 
-        if (self.maxTime) {
-            maxDate = self.maxTime;
-        }
-
-        return {
-            yearRange: [
-                2000,
-                getCurrentYear() + 1
-            ],
-            dateRange: [
-                getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(minDate, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())),
-                getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(maxDate, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()))
-            ]
-        }
-    },
-    computed: {
-        ...mapStores(useUserStore),
-        isDarkMode() {
-            return this.$root.isDarkMode;
-        },
-        firstDayOfWeek() {
-            return this.userStore.currentUserFirstDayOfWeek;
-        },
-        dayNames() {
-            return arrangeArrayWithNewStartIndex(this.$locale.getAllMinWeekdayNames(), this.firstDayOfWeek);
-        },
-        isYearFirst() {
-            return this.$locale.isLongDateMonthAfterYear(this.userStore);
-        },
-        is24Hour() {
-            return this.$locale.isLongTime24HourFormat(this.userStore);
-        },
-        beginDateTime() {
-            const actualBeginUnixTime = getActualUnixTimeForStore(getUnixTime(this.dateRange[0]), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, actualBeginUnixTime);
-        },
-        endDateTime() {
-            const actualEndUnixTime = getActualUnixTimeForStore(getUnixTime(this.dateRange[1]), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, actualEndUnixTime);
-        },
-        presetRanges() {
-            const presetRanges = [];
-
-            [
-                DateRange.Today,
-                DateRange.LastSevenDays,
-                DateRange.LastThirtyDays,
-                DateRange.ThisWeek,
-                DateRange.ThisMonth,
-                DateRange.ThisYear
-            ].forEach(dateRangeType => {
-                const dateRange = getDateRangeByDateType(dateRangeType.type, this.firstDayOfWeek);
-
-                presetRanges.push({
-                    label: this.$t(dateRangeType.name),
-                    value: [
-                        getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(dateRange.minTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())),
-                        getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(dateRange.maxTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()))
-                    ]
-                });
-            });
-
-            return presetRanges;
-        }
-    },
-    methods: {
-        onSheetOpen() {
-            if (this.minTime) {
-                this.dateRange[0] = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(this.minTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
-            }
-
-            if (this.maxTime) {
-                this.dateRange[1] = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(this.maxTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
-            }
-
-            window.dispatchEvent(new Event('resize')); // fix vue-datepicker preset max-width
-            this.$refs.datetimepicker.switchView('calendar');
-        },
-        onSheetClosed() {
-            this.$emit('update:show', false);
-        },
-        confirm() {
-            if (!this.dateRange[0] || !this.dateRange[1]) {
-                return;
-            }
-
-            const currentMinDate = this.dateRange[0];
-            const currentMaxDate = this.dateRange[1];
-
-            let minUnixTime = getUnixTime(currentMinDate);
-            let maxUnixTime = getUnixTime(currentMaxDate);
-
-            if (minUnixTime < 0 || maxUnixTime < 0) {
-                this.$toast('Date is too early');
-                return;
-            }
-
-            minUnixTime = getActualUnixTimeForStore(minUnixTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
-            maxUnixTime = getActualUnixTimeForStore(maxUnixTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
-
-            this.$emit('dateRange:change', minUnixTime, maxUnixTime);
-        },
-        cancel() {
-            this.$emit('update:show', false);
-        },
-        getMonthShortName(month) {
-            return this.$locale.getMonthShortName(month);
+        emit('dateRange:change', finalDateRange.minUnixTime, finalDateRange.maxUnixTime);
+    } catch (ex: unknown) {
+        if (ex instanceof Error) {
+            showToast(ex.message);
         }
     }
+}
+
+function cancel(): void {
+    emit('update:show', false);
+}
+
+function onSheetOpen(): void {
+    if (props.minTime) {
+        dateRange.value[0] = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(props.minTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+    }
+
+    if (props.maxTime) {
+        dateRange.value[1] = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(props.maxTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+    }
+
+    window.dispatchEvent(new Event('resize')); // fix vue-datepicker preset max-width
+
+    if (datetimepicker.value) {
+        datetimepicker.value.switchView('calendar');
+    }
+}
+
+function onSheetClosed(): void {
+    emit('update:show', false);
 }
 </script>

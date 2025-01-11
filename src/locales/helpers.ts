@@ -17,20 +17,54 @@ import {
     LongTimeFormat,
     ShortTimeFormat
 } from '@/core/datetime.ts';
-import { type LocalizedAccountCategory, AccountType, AccountCategory } from '@/core/account.ts';
-import { TransactionEditScopeType, TransactionTagFilterType } from '@/core/transaction.ts';
-import { ScheduledTemplateFrequencyType } from '@/core/template.ts';
-import { StatisticsAnalysisType, CategoricalChartType, TrendChartType, ChartDataType, ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
+
+import {
+    type NumberFormatOptions,
+    DecimalSeparator,
+    DigitGroupingSymbol,
+    DigitGroupingType
+} from '@/core/numeral.ts';
+
+import {
+    type CurrencyPrependAndAppendText,
+    CurrencyDisplayType
+} from '@/core/currency.ts';
+
+import {
+    type LocalizedAccountCategory,
+    AccountType,
+    AccountCategory
+} from '@/core/account.ts';
+
+import {
+    TransactionEditScopeType,
+    TransactionTagFilterType
+} from '@/core/transaction.ts';
+
+import {
+    ScheduledTemplateFrequencyType
+} from '@/core/template.ts';
+
+import {
+    StatisticsAnalysisType,
+    CategoricalChartType,
+    TrendChartType,
+    ChartDataType,
+    ChartSortingType,
+    ChartDateAggregationType
+} from '@/core/statistics.ts';
 
 import type { LocaleDefaultSettings } from '@/core/setting.ts';
 import type { ErrorResponse } from '@/core/api.ts';
 
+import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS } from '@/consts/api.ts';
 
 import {
+    isObject,
     isString,
     isNumber,
-    isObject
+    isBoolean
 } from '@/lib/common.ts';
 
 import {
@@ -40,8 +74,21 @@ import {
     getDateTimeFormatType
 } from '@/lib/datetime.ts';
 
-import logger from '@/lib/logger.ts';
+import {
+    appendDigitGroupingSymbol,
+    parseAmount,
+    formatAmount,
+    formatExchangeRateAmount,
+    getAdaptiveDisplayAmountRate
+} from '@/lib/numeral.ts';
+
+import {
+    getCurrencyFraction,
+    getAmountPrependAndAppendCurrencySymbol, appendCurrencySymbol
+} from '@/lib/currency.ts';
+
 import services from '@/lib/services.ts';
+import logger from '@/lib/logger.ts';
 
 import { useUserStore } from '@/stores/user.ts';
 
@@ -306,6 +353,30 @@ export function useI18n() {
         return getLocalizedDateTimeFormat<ShortTimeFormat>('shortTime', ShortTimeFormat.all(), ShortTimeFormat.values(), userStore.currentUserShortTimeFormat, 'shortTimeFormat', ShortTimeFormat.Default);
     }
 
+    function getNumberFormatOptions(currencyCode?: string): NumberFormatOptions {
+        return {
+            decimalSeparator: getCurrentDecimalSeparator(userStore.currentUserDecimalSeparator),
+            decimalNumberCount: getCurrencyFraction(currencyCode),
+            digitGroupingSymbol: getCurrentDigitGroupingSymbol(userStore.currentUserDigitGroupingSymbol),
+            digitGrouping: getCurrentDigitGroupingType(userStore.currentUserDigitGrouping),
+        };
+    }
+
+    function getCurrentCurrencyDisplayType(): CurrencyDisplayType {
+        let currencyDisplayType = CurrencyDisplayType.valueOf(userStore.currentUserCurrencyDisplayType);
+
+        if (!currencyDisplayType) {
+            const defaultCurrencyDisplayTypeName = t('default.currencyDisplayType');
+            currencyDisplayType = CurrencyDisplayType.parse(defaultCurrencyDisplayTypeName);
+        }
+
+        if (!currencyDisplayType) {
+            currencyDisplayType = CurrencyDisplayType.Default;
+        }
+
+        return currencyDisplayType;
+    }
+
     // public functions
     function translateIf(text: string, isTranslate: boolean): string {
         if (isTranslate) {
@@ -371,6 +442,20 @@ export function useI18n() {
 
     function getCurrencyName(currencyCode: string): string {
         return t(`currency.name.${currencyCode}`);
+    }
+
+    function getCurrencyUnitName(currencyCode: string, isPlural: boolean): string {
+        const currencyInfo = ALL_CURRENCIES[currencyCode];
+
+        if (currencyInfo && currencyInfo.unit) {
+            if (isPlural) {
+                return t(`currency.unit.${currencyInfo.unit}.plural`);
+            } else {
+                return t(`currency.unit.${currencyInfo.unit}.normal`);
+            }
+        }
+
+        return '';
     }
 
     function getAllMeridiemIndicators(): LocalizedMeridiemIndicator {
@@ -527,6 +612,51 @@ export function useI18n() {
         return joinMultiText(finalWeekdayNames);
     }
 
+    function getCurrentDecimalSeparator(decimalSeparator: number): string {
+        let decimalSeparatorType = DecimalSeparator.valueOf(decimalSeparator);
+
+        if (!decimalSeparatorType) {
+            const defaultDecimalSeparatorTypeName = t('default.decimalSeparator');
+            decimalSeparatorType = DecimalSeparator.parse(defaultDecimalSeparatorTypeName);
+
+            if (!decimalSeparatorType) {
+                decimalSeparatorType = DecimalSeparator.Default;
+            }
+        }
+
+        return decimalSeparatorType.symbol;
+    }
+
+    function getCurrentDigitGroupingSymbol(digitGroupingSymbol: number): string {
+        let digitGroupingSymbolType = DigitGroupingSymbol.valueOf(digitGroupingSymbol);
+
+        if (!digitGroupingSymbolType) {
+            const defaultDigitGroupingSymbolTypeName = t('default.digitGroupingSymbol');
+            digitGroupingSymbolType = DigitGroupingSymbol.parse(defaultDigitGroupingSymbolTypeName);
+
+            if (!digitGroupingSymbolType) {
+                digitGroupingSymbolType = DigitGroupingSymbol.Default;
+            }
+        }
+
+        return digitGroupingSymbolType.symbol;
+    }
+
+    function getCurrentDigitGroupingType(digitGrouping: number): number {
+        let digitGroupingType = DigitGroupingType.valueOf(digitGrouping);
+
+        if (!digitGroupingType) {
+            const defaultDigitGroupingTypeName = t('default.digitGrouping');
+            digitGroupingType = DigitGroupingType.parse(defaultDigitGroupingTypeName);
+
+            if (!digitGroupingType) {
+                digitGroupingType = DigitGroupingType.Default;
+            }
+        }
+
+        return digitGroupingType.type;
+    }
+
     function isLongDateMonthAfterYear() {
         return getLocalizedDateTimeType(LongDateFormat.all(), LongDateFormat.values(), userStore.currentUserLongDateFormat, 'longDateFormat', LongDateFormat.Default).isMonthAfterYear;
     }
@@ -560,6 +690,84 @@ export function useI18n() {
         } else {
             return '';
         }
+    }
+
+    function getNumberWithDigitGroupingSymbol(value: number | string): string {
+        const numberFormatOptions = getNumberFormatOptions();
+        return appendDigitGroupingSymbol(value, numberFormatOptions);
+    }
+
+    function getParsedAmountNumber(value: string): number {
+        const numberFormatOptions = getNumberFormatOptions();
+        return parseAmount(value, numberFormatOptions);
+    }
+
+    function getFormattedAmount(value: number | string, currencyCode: string): string {
+        const numberFormatOptions = getNumberFormatOptions(currencyCode);
+        return formatAmount(value, numberFormatOptions);
+    }
+
+    function getFormattedAmountWithCurrency(value: number | string, currencyCode?: string, notConvertValue?: boolean, currencyDisplayType?: CurrencyDisplayType): string | null {
+        if (!isNumber(value) && !isString(value)) {
+            return null;
+        }
+
+        if (isNumber(value)) {
+            value = value.toString();
+        }
+
+        let textualValue = value as string;
+        const isPlural: boolean = textualValue !== '100' && textualValue !== '-100';
+
+        if (!notConvertValue) {
+            const numberFormatOptions = getNumberFormatOptions();
+            const hasIncompleteFlag = isString(textualValue) && textualValue.charAt(textualValue.length - 1) === '+';
+
+            if (hasIncompleteFlag) {
+                textualValue = textualValue.substring(0, textualValue.length - 1);
+            }
+
+            textualValue = formatAmount(textualValue, numberFormatOptions);
+
+            if (hasIncompleteFlag) {
+                textualValue = textualValue + '+';
+            }
+        }
+
+        if (!isBoolean(currencyCode) && !currencyCode) {
+            currencyCode = userStore.currentUserDefaultCurrency;
+        } else if (isBoolean(currencyCode) && !currencyCode) {
+            currencyCode = '';
+        }
+
+        if (!currencyCode) {
+            return textualValue;
+        }
+
+        if (!currencyDisplayType) {
+            currencyDisplayType = getCurrentCurrencyDisplayType();
+        }
+
+        const currencyUnit = getCurrencyUnitName(currencyCode, isPlural);
+        const currencyName = getCurrencyName(currencyCode);
+        return appendCurrencySymbol(textualValue, currencyDisplayType, currencyCode, currencyUnit, currencyName, isPlural);
+    }
+
+    function getFormattedExchangeRateAmount(value: number | string): string {
+        const numberFormatOptions = getNumberFormatOptions();
+        return formatExchangeRateAmount(value, numberFormatOptions);
+    }
+
+    function getAdaptiveAmountRate(amount1: number, amount2: number, fromExchangeRate: { rate: string }, toExchangeRate: { rate: string }): string | null {
+        const numberFormatOptions = getNumberFormatOptions();
+        return getAdaptiveDisplayAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, numberFormatOptions);
+    }
+
+    function getAmountPrependAndAppendText(currencyCode: string, isPlural: boolean): CurrencyPrependAndAppendText | null {
+        const currencyDisplayType = getCurrentCurrencyDisplayType();
+        const currencyUnit = getCurrencyUnitName(currencyCode, isPlural);
+        const currencyName = getCurrencyName(currencyCode);
+        return getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyUnit, currencyName, isPlural);
     }
 
     function setLanguage(languageKey: string | null, force?: boolean): LocaleDefaultSettings | null {
@@ -677,6 +885,9 @@ export function useI18n() {
         getWeekdayLongName,
         getMultiMonthdayShortNames,
         getMultiWeekdayLongNames,
+        getCurrentDecimalSeparator,
+        getCurrentDigitGroupingSymbol,
+        getCurrentDigitGroupingType,
         isLongDateMonthAfterYear,
         isShortDateMonthAfterYear,
         isLongTime24HourFormat,
@@ -696,6 +907,13 @@ export function useI18n() {
         formatUnixTimeToLongTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongTimeFormat(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortTimeFormat(), utcOffset, currentUtcOffset),
         formatYearQuarter,
+        appendDigitGroupingSymbol: getNumberWithDigitGroupingSymbol,
+        parseAmount: getParsedAmountNumber,
+        formatAmount: getFormattedAmount,
+        formatAmountWithCurrency: getFormattedAmountWithCurrency,
+        formatExchangeRateAmount: getFormattedExchangeRateAmount,
+        getAdaptiveAmountRate,
+        getAmountPrependAndAppendText,
         setLanguage,
         setTimeZone,
         initLocale

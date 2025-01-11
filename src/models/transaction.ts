@@ -234,3 +234,11 @@ export interface TransactionOverviewResponseItem {
     incompleteExpenseAmount: boolean;
     amounts?: TransactionAmountsResponseItemAmountInfo[];
 }
+
+export interface TransactionMonthlyIncomeAndExpenseData {
+    monthStartTime: number;
+    incomeAmount: number;
+    expenseAmount: number;
+    incompleteIncomeAmount: boolean;
+    incompleteExpenseAmount: boolean;
+}

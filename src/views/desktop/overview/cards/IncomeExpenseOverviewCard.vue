@@ -20,7 +20,7 @@
             <v-skeleton-loader class="skeleton-no-margin mt-4 mb-8" type="text" width="120px" :loading="true" v-else-if="loading && !incomeAmount"></v-skeleton-loader>
             <div class="text-truncate text-h5 text-expense" v-if="!loading || expenseAmount">{{ expenseAmount }}</div>
             <v-skeleton-loader class="skeleton-no-margin mb-1" style="padding-bottom: 2px" type="text" width="120px" :loading="true" v-else-if="loading && !expenseAmount"></v-skeleton-loader>
-            <div class="text-truncate text-h5 mt-2 mb-7" style="padding-bottom: 2px" v-if="!loading && !incomeAmount && !expenseAmount">{{ $t('No data') }}</div>
+            <div class="text-truncate text-h5 mt-2 mb-7" style="padding-bottom: 2px" v-if="!loading && !incomeAmount && !expenseAmount">{{ tt('No data') }}</div>
         </v-card-text>
         <v-card-text class="mt-6">
             <span class="text-caption">{{ datetime }}</span>
@@ -28,27 +28,26 @@
     </v-card>
 </template>
 
-<script>
+<script setup lang="ts">
+import { useI18n } from '@/locales/helpers.ts';
+
 import {
     mdiDotsVertical
 } from '@mdi/js';
 
-export default {
-    props: [
-        'loading',
-        'disabled',
-        'icon',
-        'title',
-        'expenseAmount',
-        'incomeAmount',
-        'datetime'
-    ],
-    data() {
-        return {
-            icons: {
-                more: mdiDotsVertical
-            }
-        };
-    }
-}
+defineProps<{
+    loading: boolean;
+    disabled: boolean;
+    icon: string;
+    title: string;
+    expenseAmount: string;
+    incomeAmount: string;
+    datetime: string;
+}>();
+
+const { tt } = useI18n();
+
+const icons = {
+    more: mdiDotsVertical
+};
 </script>

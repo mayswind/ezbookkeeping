@@ -10,7 +10,7 @@ export function getSystemTheme(): ThemeType {
     }
 }
 
-export function getExpenseAndIncomeAmountColor(expenseAmountColorType: number, incomeAmountColorType: number, isDarkMode: boolean): AmountColor {
+export function getExpenseAndIncomeAmountColor(expenseAmountColorType: number, incomeAmountColorType: number, isDarkMode?: boolean): AmountColor {
     let expenseAmountColor = expenseAmountColorType ? PresetAmountColor.valueOf(expenseAmountColorType) : null;
     let incomeAmountColor = incomeAmountColorType ? PresetAmountColor.valueOf(incomeAmountColorType) : null;
 

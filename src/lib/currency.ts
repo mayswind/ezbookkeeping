@@ -3,7 +3,11 @@ import { ALL_CURRENCIES, DEFAULT_CURRENCY_SYMBOL } from '@/consts/currency.ts';
 
 import { isString, isNumber } from './common.ts';
 
-export function getCurrencyFraction(currencyCode: string): number | undefined {
+export function getCurrencyFraction(currencyCode?: string): number | undefined {
+    if (!currencyCode) {
+        return undefined;
+    }
+
     const currencyInfo = ALL_CURRENCIES[currencyCode];
     return currencyInfo?.fraction;
 }

@@ -1,7 +1,7 @@
 <template>
     <v-card :class="{ 'disabled': disabled }">
         <template #title>
-            <span>{{ $t('Income and Expense Trends') }}</span>
+            <span>{{ tt('Income and Expense Trends') }}</span>
         </template>
 
         <v-card-text class="overview-monthly-chart-container overview-monthly-chart-overlay" v-if="loading && !hasAnyData">
@@ -15,7 +15,7 @@
 
         <v-card-text class="overview-monthly-chart-container overview-monthly-chart-overlay" v-else-if="!loading && !hasAnyData">
             <div class="d-flex flex-column align-center justify-center w-100 h-100">
-                <h2 style="margin-top: -40px">{{ $t('No data') }}</h2>
+                <h2 style="margin-top: -40px">{{ tt('No data') }}</h2>
             </div>
         </v-card-text>
 
@@ -24,282 +24,290 @@
     </v-card>
 </template>
 
-<script>
-import { useTheme } from 'vuetify';
+<script setup lang="ts">
+import { computed } from 'vue';
+import type { ECElementEvent } from 'echarts/core';
+import type { CallbackDataParams } from 'echarts/types/dist/shared';
 
-import { mapStores } from 'pinia';
+import { useI18n } from '@/locales/helpers.ts';
+
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 import { TransactionType } from '@/core/transaction.ts';
+import { type TransactionMonthlyIncomeAndExpenseData } from '@/models/transaction.ts';
 import {
     parseDateFromUnixTime,
     getMonthName
 } from '@/lib/datetime.ts';
 import { getExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
-export default {
-    props: [
-        'loading',
-        'data',
-        'disabled',
-        'isDarkMode',
-        'enableClickItem'
-    ],
-    emits: [
-        'click'
-    ],
-    computed: {
-        ...mapStores(useSettingsStore, useUserStore),
-        showAmountInHomePage() {
-            return this.settingsStore.appSettings.showAmountInHomePage;
-        },
-        defaultCurrency() {
-            return this.userStore.currentUserDefaultCurrency;
-        },
-        hasAnyData() {
-            if (!this.data || !this.data.length || this.data.length < 1) {
-                return false;
+interface MonthlyIncomeAndExpenseCardClickEvent {
+    transactionType: TransactionType;
+    monthStartTime: number;
+}
+
+const props = defineProps<{
+    loading: boolean;
+    data: TransactionMonthlyIncomeAndExpenseData[];
+    disabled: boolean;
+    isDarkMode?: boolean;
+    enableClickItem?: boolean;
+}>();
+const emit = defineEmits<{
+    (e: 'click', event: MonthlyIncomeAndExpenseCardClickEvent): void;
+}>();
+
+const { tt, getMonthShortName, formatAmountWithCurrency } = useI18n();
+
+const settingsStore = useSettingsStore();
+const userStore = useUserStore();
+
+const showAmountInHomePage = computed<boolean>(() => settingsStore.appSettings.showAmountInHomePage);
+const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
+const hasAnyData = computed<boolean>(() => {
+    if (!props.data || !props.data.length || props.data.length < 1) {
+        return false;
+    }
+
+    for (let i = 0; i < props.data.length; i++) {
+        const item = props.data[i];
+
+        if (item.incomeAmount > 0 || item.incomeAmount < 0 || item.expenseAmount > 0 || item.expenseAmount < 0) {
+            return true;
+        }
+    }
+
+    return false;
+});
+
+const chartOptions = computed<object>(() => {
+    const monthNames: string[] = [];
+    const incomeAmounts: number[] = [];
+    const expenseAmounts: number[] = [];
+    let minAmount = 0;
+    let maxAmount = 0;
+
+    const expenseIncomeAmountColor = getExpenseAndIncomeAmountColor(userStore.currentUserExpenseAmountColor, userStore.currentUserIncomeAmountColor, props.isDarkMode);
+
+    if (props.data) {
+        for (let i = 0; i < props.data.length; i++) {
+            const item = props.data[i];
+            const month = getMonthName(parseDateFromUnixTime(item.monthStartTime));
+
+            monthNames.push(getMonthShortName(month));
+            incomeAmounts.push(item.incomeAmount);
+            expenseAmounts.push(-item.expenseAmount);
+
+            if (item.incomeAmount > maxAmount) {
+                maxAmount = item.incomeAmount;
             }
 
-            for (let i = 0; i < this.data.length; i++) {
-                const item = this.data[i];
+            if (-item.expenseAmount > maxAmount) {
+                maxAmount = -item.expenseAmount;
+            }
 
-                if (item.incomeAmount > 0 || item.incomeAmount < 0 || item.expenseAmount > 0 || item.expenseAmount < 0) {
-                    return true;
+            if (item.incomeAmount < minAmount) {
+                minAmount = item.incomeAmount;
+            }
+
+            if (-item.expenseAmount < minAmount) {
+                minAmount = -item.expenseAmount;
+            }
+        }
+    }
+
+    const amountGap = maxAmount - minAmount;
+
+    return {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'shadow'
+            },
+            backgroundColor: props.isDarkMode ? '#333' : '#fff',
+            borderColor: props.isDarkMode ? '#333' : '#fff',
+            textStyle: {
+                color: props.isDarkMode ? '#eee' : '#333'
+            },
+            formatter: (params: CallbackDataParams[]) => {
+                let incomeAmount: string | null = null;
+                let expenseAmount: string | null = null;
+
+                for (let i = 0; i < params.length; i++) {
+                    const param = params[i];
+                    const dataIndex = param.dataIndex;
+                    const data = props.data[dataIndex];
+
+                    if (param.seriesId === 'seriesIncome') {
+                        incomeAmount = getDisplayIncomeAmount(data);
+                    } else if (param.seriesId === 'seriesExpense') {
+                        expenseAmount = getDisplayExpenseAmount(data);
+                    }
+                }
+
+                return `<table>` +
+                    `<thead>` +
+                    `<tr>` +
+                    `<td colspan="2" class="text-left">${params[0].name}</td>` +
+                    `</tr>` +
+                    `</thead>` +
+                    `<tbody>` +
+                    (
+                        incomeAmount !== null ?
+                        `<tr>` +
+                        `<td><span class="overview-monthly-chart-tooltip-indicator bg-income mr-1"></span><span class="mr-4">${tt('Income')}</span></td>` +
+                        `<td><strong>${incomeAmount}</strong></td>` +
+                        `</tr>` : ''
+                    )+
+                    (
+                        expenseAmount !== null ?
+                        `<tr>` +
+                        `<td><span class="overview-monthly-chart-tooltip-indicator bg-expense mr-1"></span><span class="mr-4">${tt('Expense')}</span></td>` +
+                        `<td><strong>${expenseAmount}</strong></td>` +
+                        `</tr>` : ''
+                    ) +
+                    `</tbody>` +
+                    `</table>`;
+            }
+        },
+        legend: {
+            bottom: 20,
+            itemWidth: 14,
+            itemHeight: 14,
+            textStyle: {
+                color: props.isDarkMode ? '#eee' : '#333'
+            },
+            icon: 'circle',
+            data: [ tt('Income'), tt('Expense') ]
+        },
+        grid: {
+            left: '20px',
+            right: '20px',
+            top: '10px',
+            bottom: '100px'
+        },
+        xAxis: [
+            {
+                type: 'category',
+                data: monthNames,
+                axisLine: {
+                    show: false
+                },
+                axisTick: {
+                    show: false
+                },
+                axisLabel: {
+                    padding: [ 20, 0, 0, 0 ]
                 }
             }
-
-            return false;
-        },
-        chartOptions() {
-            const self = this;
-            const monthNames = [];
-            const incomeAmounts = [];
-            const expenseAmounts = [];
-            let minAmount = 0;
-            let maxAmount = 0;
-
-            const expenseIncomeAmountColor = getExpenseAndIncomeAmountColor(this.userStore.currentUserExpenseAmountColor, this.userStore.currentUserIncomeAmountColor, this.isDarkMode);
-
-            if (self.data) {
-                for (let i = 0; i < self.data.length; i++) {
-                    const item = self.data[i];
-                    const month = getMonthName(parseDateFromUnixTime(item.monthStartTime));
-
-                    monthNames.push(self.$locale.getMonthShortName(month));
-                    incomeAmounts.push(item.incomeAmount);
-                    expenseAmounts.push(-item.expenseAmount);
-
-                    if (item.incomeAmount > maxAmount) {
-                        maxAmount = item.incomeAmount;
-                    }
-
-                    if (-item.expenseAmount > maxAmount) {
-                        maxAmount = -item.expenseAmount;
-                    }
-
-                    if (item.incomeAmount < minAmount) {
-                        minAmount = item.incomeAmount;
-                    }
-
-                    if (-item.expenseAmount < minAmount) {
-                        minAmount = -item.expenseAmount;
-                    }
+        ],
+        yAxis: [
+            {
+                type: 'value',
+                min: minAmount - amountGap / 20,
+                max: maxAmount,
+                splitNumber: 10,
+                axisLabel: {
+                    show: false
+                },
+                splitLine: {
+                    show: false
+                }
+            },
+            {
+                type: 'value',
+                min: minAmount,
+                max: maxAmount + amountGap / 20,
+                splitNumber: 10,
+                axisLabel: {
+                    show: false
+                },
+                splitLine: {
+                    show: false
                 }
             }
-
-            const amountGap = maxAmount - minAmount;
-
-            return {
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'shadow'
-                    },
-                    backgroundColor: self.isDarkMode ? '#333' : '#fff',
-                    borderColor: self.isDarkMode ? '#333' : '#fff',
-                    textStyle: {
-                        color: self.isDarkMode ? '#eee' : '#333'
-                    },
-                    formatter: params => {
-                        let incomeAmount = 0;
-                        let expenseAmount = 0;
-
-                        for (let i = 0; i < params.length; i++) {
-                            const param = params[i];
-                            const dataIndex = param.dataIndex;
-                            const data = self.data[dataIndex];
-
-                            if (param.seriesId === 'seriesIncome') {
-                                incomeAmount = self.getDisplayIncomeAmount(data);
-                            } else if (param.seriesId === 'seriesExpense') {
-                                expenseAmount = self.getDisplayExpenseAmount(data);
-                            }
-                        }
-
-                        return `<table>` +
-                            `<thead>` +
-                                `<tr>` +
-                                    `<td colspan="2" class="text-left">${params[0].name}</td>` +
-                                `</tr>` +
-                            `</thead>` +
-                            `<tbody>` +
-                                `<tr>` +
-                                    `<td><span class="overview-monthly-chart-tooltip-indicator bg-income mr-1"></span><span class="mr-4">${self.$t('Income')}</span></td>` +
-                                    `<td><strong>${incomeAmount}</strong></td>` +
-                                `</tr>` +
-                                `<tr>` +
-                                    `<td><span class="overview-monthly-chart-tooltip-indicator bg-expense mr-1"></span><span class="mr-4">${self.$t('Expense')}</span></td>` +
-                                    `<td><strong>${expenseAmount}</strong></td>` +
-                                `</tr>` +
-                            `</tbody>` +
-                            `</table>`;
+        ],
+        series: [
+            {
+                type: 'bar',
+                id: 'seriesIncome',
+                name: tt('Income'),
+                yAxisIndex: 0,
+                stack: 'Total',
+                itemStyle: {
+                    color: expenseIncomeAmountColor.incomeAmountColor,
+                    borderRadius: 16
+                },
+                emphasis: {
+                    focus: 'series',
+                    labelLine: {
+                        show: false
                     }
                 },
-                legend: {
-                    bottom: 20,
-                    itemWidth: 14,
-                    itemHeight: 14,
-                    textStyle: {
-                        color: self.isDarkMode ? '#eee' : '#333'
-                    },
-                    icon: 'circle',
-                    data: [ self.$t('Income'), self.$t('Expense') ]
+                barMaxWidth: 16,
+                data: incomeAmounts
+            },
+            {
+                type: 'bar',
+                id: 'seriesExpense',
+                name: tt('Expense'),
+                yAxisIndex: 1,
+                stack: 'Total',
+                itemStyle: {
+                    color: expenseIncomeAmountColor.expenseAmountColor,
+                    borderRadius: 16
                 },
-                grid: {
-                    left: '20px',
-                    right: '20px',
-                    top: '10px',
-                    bottom: '100px'
+                emphasis: {
+                    focus: 'series',
+                    labelLine: {
+                        show: false
+                    }
                 },
-                xAxis: [
-                    {
-                        type: 'category',
-                        data: monthNames,
-                        axisLine: {
-                            show: false
-                        },
-                        axisTick: {
-                            show: false
-                        },
-                        axisLabel: {
-                            padding: [ 20, 0, 0, 0 ]
-                        }
-                    }
-                ],
-                yAxis: [
-                    {
-                        type: 'value',
-                        min: minAmount - amountGap / 20,
-                        max: maxAmount,
-                        splitNumber: 10,
-                        axisLabel: {
-                            show: false
-                        },
-                        splitLine: {
-                            show: false
-                        }
-                    },
-                    {
-                        type: 'value',
-                        min: minAmount,
-                        max: maxAmount + amountGap / 20,
-                        splitNumber: 10,
-                        axisLabel: {
-                            show: false
-                        },
-                        splitLine: {
-                            show: false
-                        }
-                    }
-                ],
-                series: [
-                    {
-                        type: 'bar',
-                        id: 'seriesIncome',
-                        name: self.$t('Income'),
-                        yAxisIndex: 0,
-                        stack: 'Total',
-                        itemStyle: {
-                            color: expenseIncomeAmountColor.incomeAmountColor,
-                            borderRadius: 16
-                        },
-                        emphasis: {
-                            focus: 'series',
-                            labelLine: {
-                                show: false
-                            }
-                        },
-                        barMaxWidth: 16,
-                        data: incomeAmounts
-                    },
-                    {
-                        type: 'bar',
-                        id: 'seriesExpense',
-                        name: self.$t('Expense'),
-                        yAxisIndex: 1,
-                        stack: 'Total',
-                        itemStyle: {
-                            color: expenseIncomeAmountColor.expenseAmountColor,
-                            borderRadius: 16
-                        },
-                        emphasis: {
-                            focus: 'series',
-                            labelLine: {
-                                show: false
-                            }
-                        },
-                        barMaxWidth: 16,
-                        data: expenseAmounts
-                    }
-                ]
-            };
-        }
-    },
-    setup() {
-        const theme = useTheme();
-
-        return {
-            globalTheme: theme
-        };
-    },
-    methods: {
-        clickItem: function (e) {
-            if (!this.enableClickItem  || !this.data || e.componentType !== 'series') {
-                return;
+                barMaxWidth: 16,
+                data: expenseAmounts
             }
+        ]
+    };
+});
 
-            const clickData = this.data[e.dataIndex];
+function getDisplayCurrency(value: number | string, currencyCode: string): string {
+    return formatAmountWithCurrency(value, currencyCode) || '0';
+}
 
-            if (clickData && e.seriesId === 'seriesIncome') {
-                this.$emit('click', {
-                    transactionType: TransactionType.Income,
-                    monthStartTime: clickData.monthStartTime
-                });
-            } else if (clickData && e.seriesId === 'seriesExpense') {
-                this.$emit('click', {
-                    transactionType: TransactionType.Expense,
-                    monthStartTime: clickData.monthStartTime
-                });
-            }
-        },
-        getDisplayCurrency(value, currencyCode) {
-            return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, currencyCode);
-        },
-        getDisplayAmount(amount, incomplete) {
-            if (!this.showAmountInHomePage) {
-                return this.getDisplayCurrency('***', this.defaultCurrency);
-            }
+function getDisplayAmount(amount: number, incomplete: boolean): string {
+    if (!showAmountInHomePage.value) {
+        return getDisplayCurrency('***', defaultCurrency.value);
+    }
 
-            return this.getDisplayCurrency(amount, this.defaultCurrency) + (incomplete ? '+' : '');
-        },
-        getDisplayIncomeAmount(category) {
-            return this.getDisplayAmount(category.incomeAmount, category.incompleteIncomeAmount);
-        },
-        getDisplayExpenseAmount(category) {
-            return this.getDisplayAmount(category.expenseAmount, category.incompleteExpenseAmount);
-        }
+    return getDisplayCurrency(amount, defaultCurrency.value) + (incomplete ? '+' : '');
+}
+
+function getDisplayIncomeAmount(data: TransactionMonthlyIncomeAndExpenseData): string {
+    return getDisplayAmount(data.incomeAmount, data.incompleteIncomeAmount);
+}
+
+function getDisplayExpenseAmount(data: TransactionMonthlyIncomeAndExpenseData): string {
+    return getDisplayAmount(data.expenseAmount, data.incompleteExpenseAmount);
+}
+
+function clickItem(e: ECElementEvent): void {
+    if (!props.enableClickItem || !props.data || e.componentType !== 'series') {
+        return;
+    }
+
+    const clickData = props.data[e.dataIndex];
+
+    if (clickData && e.seriesId === 'seriesIncome') {
+        emit('click', {
+            transactionType: TransactionType.Income,
+            monthStartTime: clickData.monthStartTime
+        });
+    } else if (clickData && e.seriesId === 'seriesExpense') {
+        emit('click', {
+            transactionType: TransactionType.Expense,
+            monthStartTime: clickData.monthStartTime
+        });
     }
 }
 </script>

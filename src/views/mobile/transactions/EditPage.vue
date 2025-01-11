@@ -431,6 +431,7 @@
 <script>
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.ts';
+import { useEnvironmentsStore } from '@/stores/environment.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
@@ -512,9 +513,9 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore, useTransactionTemplatesStore, useExchangeRatesStore),
+        ...mapStores(useSettingsStore, useEnvironmentsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore, useTransactionTemplatesStore, useExchangeRatesStore),
         isDarkMode() {
-            return this.$root.isDarkMode;
+            return this.environmentsStore.framework7DarkMode;
         },
         title() {
             if (this.type === 'transaction') {

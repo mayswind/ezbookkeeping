@@ -26,7 +26,7 @@
                                          :dark="isDarkMode"
                                          :year-range="yearRange"
                                          :year-first="isYearFirst"
-                                         v-model="startTime">
+                                         v-model="dateRange[0]">
                             <template #month="{ text }">
                                 {{ getMonthShortName(text) }}
                             </template>
@@ -42,7 +42,7 @@
                                          :dark="isDarkMode"
                                          :year-range="yearRange"
                                          :year-first="isYearFirst"
-                                         v-model="endTime">
+                                         v-model="dateRange[1]">
                             <template #month="{ text }">
                                 {{ getMonthShortName(text) }}
                             </template>
@@ -55,132 +55,86 @@
             </v-card-text>
             <v-card-text class="overflow-y-visible">
                 <div class="w-100 d-flex justify-center gap-4">
-                    <v-btn :disabled="!startTime || !endTime" @click="confirm">{{ $t('OK') }}</v-btn>
-                    <v-btn color="secondary" variant="tonal" @click="cancel">{{ $t('Cancel') }}</v-btn>
+                    <v-btn :disabled="!dateRange[0] || !dateRange[1]" @click="confirm">{{ tt('OK') }}</v-btn>
+                    <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
                 </div>
             </v-card-text>
         </v-card>
     </v-dialog>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed, watch } from 'vue';
 import { useTheme } from 'vuetify';
 
-import { mapStores } from 'pinia';
-import { useUserStore } from '@/stores/user.ts';
+import { type CommonMonthRangeSelectionProps, useMonthRangeSelectionBase } from '@/components/base/MonthRangeSelectionBase.ts';
+
+import { useI18n } from '@/locales/helpers.ts';
 
 import { ThemeType } from '@/core/theme.ts';
-import {
-    getYearMonthObjectFromString,
-    getYearMonthStringFromObject,
-    getCurrentUnixTime,
-    getCurrentYear,
-    getThisYearFirstUnixTime,
-    getYearMonthFirstUnixTime,
-    getYearMonthLastUnixTime
-} from '@/lib/datetime.ts';
+import { getYearMonthObjectFromString } from '@/lib/datetime.ts';
 
-export default {
-    props: [
-        'minTime',
-        'maxTime',
-        'title',
-        'hint',
-        'persistent',
-        'show'
-    ],
-    emits: [
-        'update:show',
-        'dateRange:change'
-    ],
-    data() {
-        const self = this;
-        let minDate = getThisYearFirstUnixTime();
-        let maxDate = getCurrentUnixTime();
+interface DesktopMonthRangeSelectionProps extends CommonMonthRangeSelectionProps {
+    persistent?: boolean;
+}
 
-        if (self.minTime) {
-            minDate = getYearMonthObjectFromString(self.minTime);
+const props = defineProps<DesktopMonthRangeSelectionProps>();
+const emit = defineEmits<{
+    (e: 'update:show', value: boolean): void;
+    (e: 'dateRange:change', minYearMonth: string, maxYearMonth: string): void;
+    (e: 'error', message: string): void;
+}>();
+
+const theme = useTheme();
+const { tt, getMonthShortName } = useI18n();
+
+const { yearRange, dateRange, isYearFirst, beginDateTime, endDateTime, getFinalMonthRange } = useMonthRangeSelectionBase(props);
+
+const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const showState = computed<boolean>({
+    get: () => props.show || false,
+    set: (value) => emit('update:show', value)
+});
+
+function confirm(): void {
+    try {
+        const finalMonthRange = getFinalMonthRange();
+
+        if (!finalMonthRange) {
+            return;
         }
 
-        if (self.maxTime) {
-            maxDate = getYearMonthObjectFromString(self.maxTime);
-        }
-
-        return {
-            yearRange: [
-                2000,
-                getCurrentYear() + 1
-            ],
-            startTime: minDate,
-            endTime: maxDate
-        }
-    },
-    computed: {
-        ...mapStores(useUserStore),
-        showState: {
-            get: function () {
-                return this.show;
-            },
-            set: function (value) {
-                this.$emit('update:show', value);
-            }
-        },
-        isDarkMode() {
-            return this.globalTheme.global.name.value === ThemeType.Dark;
-        },
-        isYearFirst() {
-            return this.$locale.isLongDateMonthAfterYear(this.userStore);
-        },
-        beginDateTime() {
-            return this.$locale.formatUnixTimeToLongYearMonth(this.userStore, getYearMonthFirstUnixTime(this.startTime));
-        },
-        endDateTime() {
-            return this.$locale.formatUnixTimeToLongYearMonth(this.userStore, getYearMonthLastUnixTime(this.endTime));
-        }
-    },
-    watch: {
-        'minTime': function (newValue) {
-            if (newValue) {
-                this.startTime = getYearMonthObjectFromString(newValue);
-            }
-        },
-        'maxTime': function (newValue) {
-            if (newValue) {
-                this.endTime = getYearMonthObjectFromString(newValue);
-            }
-        }
-    },
-    setup() {
-        const theme = useTheme();
-
-        return {
-            globalTheme: theme
-        };
-    },
-    methods: {
-        confirm() {
-            if (!this.startTime || !this.endTime) {
-                return;
-            }
-
-            if (this.startTime.year <= 0 || this.startTime.month < 0 || this.endTime.year <= 0 || this.endTime.month < 0) {
-                this.$toast('Date is too early');
-                return;
-            }
-
-            const minYearMonth = getYearMonthStringFromObject(this.startTime);
-            const maxYearMonth = getYearMonthStringFromObject(this.endTime);
-
-            this.$emit('dateRange:change', minYearMonth, maxYearMonth);
-        },
-        cancel() {
-            this.$emit('update:show', false);
-        },
-        getMonthShortName(month) {
-            return this.$locale.getMonthShortName(month);
+        emit('dateRange:change', finalMonthRange.minYearMonth, finalMonthRange.maxYearMonth);
+    } catch (ex: unknown) {
+        if (ex instanceof Error) {
+            emit('error', ex.message);
         }
     }
 }
+
+function cancel(): void {
+    emit('update:show', false);
+}
+
+watch(() => props.minTime, (newValue) => {
+    if (newValue) {
+        const yearMonth = getYearMonthObjectFromString(newValue);
+
+        if (yearMonth) {
+            dateRange.value[0] = yearMonth;
+        }
+    }
+});
+
+watch(() => props.maxTime, (newValue) => {
+    if (newValue) {
+        const yearMonth = getYearMonthObjectFromString(newValue);
+
+        if (yearMonth) {
+            dateRange.value[1] = yearMonth;
+        }
+    }
+});
 </script>
 
 <style>

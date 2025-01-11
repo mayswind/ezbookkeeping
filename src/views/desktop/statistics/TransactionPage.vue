@@ -294,7 +294,8 @@
                                   :min-time="query.trendChartStartYearMonth"
                                   :max-time="query.trendChartEndYearMonth"
                                   v-model:show="showCustomMonthRangeDialog"
-                                  @dateRange:change="setCustomDateFilter" />
+                                  @dateRange:change="setCustomDateFilter"
+                                  @error="showError" />
 
     <v-dialog width="800" v-model="showFilterAccountDialog">
         <account-filter-settings-card type="statisticsCurrent" :dialog-mode="true"

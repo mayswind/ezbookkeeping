@@ -32,123 +32,83 @@
                 </vue-date-picker>
                 <f7-button large fill
                            :class="{ 'disabled': !dateRange[0] || !dateRange[1] }"
-                           :text="$t('Continue')"
+                           :text="tt('Continue')"
                            @click="confirm">
                 </f7-button>
                 <div class="margin-top text-align-center">
-                    <f7-link @click="cancel" :text="$t('Cancel')"></f7-link>
+                    <f7-link @click="cancel" :text="tt('Cancel')"></f7-link>
                 </div>
             </div>
         </f7-page-content>
     </f7-sheet>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
-import { useUserStore } from '@/stores/user.ts';
+<script setup lang="ts">
+import { computed } from 'vue';
 
-import {
-    getYearMonthObjectFromString,
-    getYearMonthStringFromObject,
-    getCurrentUnixTime,
-    getCurrentYear,
-    getThisYearFirstUnixTime,
-    getYearMonthFirstUnixTime,
-    getYearMonthLastUnixTime
-} from '@/lib/datetime.ts';
+import { type CommonMonthRangeSelectionProps, useMonthRangeSelectionBase } from '@/components/base/MonthRangeSelectionBase.ts';
 
-export default {
-    props: [
-        'minTime',
-        'maxTime',
-        'title',
-        'hint',
-        'show'
-    ],
-    emits: [
-        'update:show',
-        'dateRange:change'
-    ],
-    data() {
-        const self = this;
-        let minDate = getThisYearFirstUnixTime();
-        let maxDate = getCurrentUnixTime();
+import { useI18n } from '@/locales/helpers.ts';
+import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
+import { useEnvironmentsStore } from '@/stores/environment.ts';
 
-        if (self.minTime) {
-            minDate = getYearMonthObjectFromString(self.minTime);
+import { getYearMonthObjectFromString } from '@/lib/datetime.ts';
+
+const props = defineProps<CommonMonthRangeSelectionProps>();
+const emit = defineEmits<{
+    (e: 'update:show', value: boolean): void;
+    (e: 'dateRange:change', minYearMonth: string, maxYearMonth: string): void;
+}>();
+
+const { tt, getMonthShortName } = useI18n();
+const { showToast } = useI18nUIComponents();
+
+const environmentsStore = useEnvironmentsStore();
+
+const { yearRange, dateRange, isYearFirst, beginDateTime, endDateTime, getFinalMonthRange } = useMonthRangeSelectionBase(props);
+
+const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
+
+function confirm(): void {
+    try {
+        const finalMonthRange = getFinalMonthRange();
+
+        if (!finalMonthRange) {
+            return;
         }
 
-        if (self.maxTime) {
-            maxDate = getYearMonthObjectFromString(self.maxTime);
-        }
-
-        return {
-            yearRange: [
-                2000,
-                getCurrentYear() + 1
-            ],
-            dateRange: [
-                minDate,
-                maxDate
-            ]
-        }
-    },
-    computed: {
-        ...mapStores(useUserStore),
-        isDarkMode() {
-            return this.$root.isDarkMode;
-        },
-        firstDayOfWeek() {
-            return this.userStore.currentUserFirstDayOfWeek;
-        },
-        isYearFirst() {
-            return this.$locale.isLongDateMonthAfterYear(this.userStore);
-        },
-        is24Hour() {
-            return this.$locale.isLongTime24HourFormat(this.userStore);
-        },
-        beginDateTime() {
-            return this.$locale.formatUnixTimeToLongYearMonth(this.userStore, getYearMonthFirstUnixTime(this.dateRange[0]));
-        },
-        endDateTime() {
-            return this.$locale.formatUnixTimeToLongYearMonth(this.userStore, getYearMonthLastUnixTime(this.dateRange[1]));
-        }
-    },
-    methods: {
-        onSheetOpen() {
-            if (this.minTime) {
-                this.dateRange[0] = getYearMonthObjectFromString(this.minTime);
-            }
-
-            if (this.maxTime) {
-                this.dateRange[1] = getYearMonthObjectFromString(this.maxTime);
-            }
-        },
-        onSheetClosed() {
-            this.$emit('update:show', false);
-        },
-        confirm() {
-            if (!this.dateRange[0] || !this.dateRange[1]) {
-                return;
-            }
-
-            if (this.dateRange[0].year <= 0 || this.dateRange[0].month < 0 || this.dateRange[1].year <= 0 || this.dateRange[1].month < 0) {
-                this.$toast('Date is too early');
-                return;
-            }
-
-            const minYearMonth = getYearMonthStringFromObject(this.dateRange[0]);
-            const maxYearMonth = getYearMonthStringFromObject(this.dateRange[1]);
-
-            this.$emit('dateRange:change', minYearMonth, maxYearMonth);
-        },
-        cancel() {
-            this.$emit('update:show', false);
-        },
-        getMonthShortName(month) {
-            return this.$locale.getMonthShortName(month);
+        emit('dateRange:change', finalMonthRange.minYearMonth, finalMonthRange.maxYearMonth);
+    } catch (ex: unknown) {
+        if (ex instanceof Error) {
+            showToast(ex.message);
         }
     }
+}
+
+function cancel(): void {
+    emit('update:show', false);
+}
+
+function onSheetOpen(): void {
+    if (props.minTime) {
+        const yearMonth = getYearMonthObjectFromString(props.minTime);
+
+        if (yearMonth) {
+            dateRange.value[0] = yearMonth;
+        }
+    }
+
+    if (props.maxTime) {
+        const yearMonth = getYearMonthObjectFromString(props.maxTime);
+
+        if (yearMonth) {
+            dateRange.value[1] = yearMonth;
+        }
+    }
+}
+
+function onSheetClosed(): void {
+    emit('update:show', false);
 }
 </script>
 

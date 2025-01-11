@@ -38,6 +38,15 @@ export function isYearMonthValid(year: number, month: number): boolean {
     return year > 0 && month >= 0 && month <= 11;
 }
 
+export function getYearMonthObjectFromUnixTime(unixTime: number): YearMonth {
+    const datetime = moment.unix(unixTime);
+
+    return {
+        year: datetime.year(),
+        month: datetime.month()
+    };
+}
+
 export function getYearMonthObjectFromString(yearMonth: string): YearMonth | null {
     if (!isString(yearMonth)) {
         return null;

@@ -270,6 +270,13 @@ const icons = {
     tag: mdiPound
 };
 
+const { tt } = useI18n();
+
+const transactionTagsStore = useTransactionTagsStore();
+
+const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+
 const newTag = ref<TransactionTag | null>(null);
 const editingTag = ref<TransactionTag>(TransactionTag.createNewTag());
 const loading = ref<boolean>(true);
@@ -279,13 +286,6 @@ const tagHiding = ref<Record<string, boolean>>({});
 const tagRemoving = ref<Record<string, boolean>>({});
 const displayOrderModified = ref<boolean>(false);
 const showHidden = ref<boolean>(false);
-
-const { tt } = useI18n();
-
-const transactionTagsStore = useTransactionTagsStore();
-
-const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const tags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
 const noAvailableTag = computed<boolean>(() => isNoAvailableTag(tags.value, showHidden.value));

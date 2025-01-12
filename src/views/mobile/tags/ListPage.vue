@@ -164,6 +164,11 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
+const { tt } = useI18n();
+const { showToast, routeBackOnError } = useI18nUIComponents();
+
+const transactionTagsStore = useTransactionTagsStore();
+
 const newTag = ref<TransactionTag | null>(null);
 const editingTag = ref<TransactionTag>(TransactionTag.createNewTag());
 const loading = ref<boolean>(true);
@@ -175,11 +180,6 @@ const showMoreActionSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
 const displayOrderModified = ref<boolean>(false);
 const displayOrderSaving = ref<boolean>(false);
-
-const { tt } = useI18n();
-const { showToast, routeBackOnError } = useI18nUIComponents();
-
-const transactionTagsStore = useTransactionTagsStore();
 
 const tags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
 const firstShowingId = computed<string | null>(() => getFirstShowingId(tags.value, showHidden.value));

@@ -285,15 +285,3 @@ export function getExchangedAmountByRate(amount: number, fromRate: string, toRat
 
     return amount * exchangeRate;
 }
-
-export function getConvertedAmount(baseAmount: number | '', fromExchangeRate: { rate: string }, toExchangeRate: { rate: string }): number | '' | null {
-    if (!fromExchangeRate || !toExchangeRate) {
-        return '';
-    }
-
-    if (baseAmount === '') {
-        return 0;
-    }
-
-    return getExchangedAmountByRate(baseAmount as number, fromExchangeRate.rate, toExchangeRate.rate);
-}

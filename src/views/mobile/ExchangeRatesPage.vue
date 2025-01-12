@@ -1,8 +1,8 @@
 <template>
     <f7-page ptr @ptr:refresh="update">
         <f7-navbar>
-            <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
-            <f7-nav-title :title="$t('Exchange Rates Data')"></f7-nav-title>
+            <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-title :title="tt('Exchange Rates Data')"></f7-nav-title>
             <f7-nav-right>
                 <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
             </f7-nav-right>
@@ -11,8 +11,8 @@
         <f7-list strong inset dividers class="margin-vertical" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Base Currency')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Base Currency'), popupCloseLinkText: $t('Done') }"
+                :header="tt('Base Currency')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Currency Name'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Base Currency'), popupCloseLinkText: tt('Done') }"
             >
                 <template #title>
                     <div class="no-padding no-margin">
@@ -30,12 +30,12 @@
                 class="currency-base-amount"
                 link="#" no-chevron
                 :class="baseAmountFontSizeClass"
-                :header="$t('Base Amount')"
+                :header="tt('Base Amount')"
                 :title="displayBaseAmount"
                 @click="showBaseAmountSheet = true"
             >
-                <number-pad-sheet :min-value="allowedMinAmount"
-                                  :max-value="allowedMaxAmount"
+                <number-pad-sheet :min-value="TRANSACTION_MIN_AMOUNT"
+                                  :max-value="TRANSACTION_MAX_AMOUNT"
                                   :currency="baseCurrency"
                                   v-model:show="showBaseAmountSheet"
                                   v-model="baseAmount"
@@ -44,12 +44,12 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" v-if="!exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length">
-            <f7-list-item :title="$t('No exchange rates data')"></f7-list-item>
+            <f7-list-item :title="tt('No exchange rates data')"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
             <f7-list-item swipeout
-                          :after="getConvertedAmount(exchangeRate)"
+                          :after="getFinalConvertedAmount(exchangeRate)"
                           :key="exchangeRate.currencyCode" v-for="exchangeRate in availableExchangeRates">
                 <template #title>
                     <div class="no-padding no-margin">
@@ -58,18 +58,18 @@
                     </div>
                 </template>
                 <f7-swipeout-actions right v-if="exchangeRate.currencyCode !== baseCurrency">
-                    <f7-swipeout-button color="primary" close :text="$t('Set as Base')" @click="setAsBaseline(exchangeRate.currencyCode, getConvertedAmount(exchangeRate))"></f7-swipeout-button>
+                    <f7-swipeout-button color="primary" close :text="tt('Set as Base')" @click="setAsBaseline(exchangeRate.currencyCode, getFinalConvertedAmount(exchangeRate))"></f7-swipeout-button>
                 </f7-swipeout-actions>
             </f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
             <f7-list-item v-if="exchangeRatesDataUpdateTime">
-                <small>{{ $t('Last Updated') }}</small>
+                <small>{{ tt('Last Updated') }}</small>
                 <small>{{ exchangeRatesDataUpdateTime }}</small>
             </f7-list-item>
             <f7-list-item>
-                <small>{{ $t('Data source') }}</small>
+                <small>{{ tt('Data source') }}</small>
                 <small>
                     <f7-link external target="_blank" :href="exchangeRatesData.referenceUrl" v-if="exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</f7-link>
                     <span v-else-if="!exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
@@ -79,138 +79,110 @@
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
-                <f7-actions-button :class="{ 'disabled': updating }" @click="update(null)">
-                    <span>{{ $t('Update') }}</span>
+                <f7-actions-button :class="{ 'disabled': updating }" @click="update(undefined)">
+                    <span>{{ tt('Update') }}</span>
                 </f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
-                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+                <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
             </f7-actions-group>
         </f7-actions>
     </f7-page>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.ts';
-import { useUserStore } from '@/stores/user.ts';
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
+import { useExchangeRatesPageBase } from '@/views/base/ExchangeRatesPageBase.ts';
+
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
-import { getConvertedAmount } from '@/lib/numeral.ts';
 
-export default {
-    data() {
-        const userStore = useUserStore();
+import type { LocalizedLatestExchangeRate } from '@/models/exchange_rate.ts';
 
-        return {
-            baseCurrency: userStore.currentUserDefaultCurrency,
-            baseAmount: 100,
-            updating: false,
-            showMoreActionSheet: false,
-            showBaseAmountSheet: false
-        };
-    },
-    computed: {
-        ...mapStores(useSettingsStore, useUserStore, useExchangeRatesStore),
-        exchangeRatesData() {
-            return this.exchangeRatesStore.latestExchangeRates.data;
-        },
-        exchangeRatesDataUpdateTime() {
-            const exchangeRatesLastUpdateTime = this.exchangeRatesStore.exchangeRatesLastUpdateTime;
-            return exchangeRatesLastUpdateTime ? this.$locale.formatUnixTimeToLongDate(this.userStore, exchangeRatesLastUpdateTime) : '';
-        },
-        availableExchangeRates() {
-            return this.$locale.getAllDisplayExchangeRates(this.settingsStore, this.exchangeRatesData);
-        },
-        displayBaseAmount() {
-            return this.$locale.formatAmount(this.userStore, this.baseAmount, this.baseCurrency);
-        },
-        baseAmountFontSizeClass() {
-            if (this.baseAmount >= 100000000 || this.baseAmount <= -100000000) {
-                return 'ebk-small-amount';
-            } else if (this.baseAmount >= 1000000 || this.baseAmount <= -1000000) {
-                return 'ebk-normal-amount';
-            } else {
-                return 'ebk-large-amount';
-            }
-        },
-        allowedMinAmount() {
-            return TRANSACTION_MIN_AMOUNT;
-        },
-        allowedMaxAmount() {
-            return TRANSACTION_MAX_AMOUNT;
+const { tt, getCurrencyName, formatAmount, formatExchangeRateAmount } = useI18n();
+const { showToast } = useI18nUIComponents();
+const { baseCurrency, baseAmount, exchangeRatesData, exchangeRatesDataUpdateTime, availableExchangeRates, getConvertedAmount, setAsBaseline } = useExchangeRatesPageBase();
+
+const exchangeRatesStore = useExchangeRatesStore();
+
+const updating = ref<boolean>(false);
+const showMoreActionSheet = ref<boolean>(false);
+const showBaseAmountSheet = ref<boolean>(false);
+
+const displayBaseAmount = computed<string>(() => formatAmount(baseAmount.value, baseCurrency.value));
+const baseAmountFontSizeClass = computed<string>(() => {
+    if (baseAmount.value >= 100000000 || baseAmount.value <= -100000000) {
+        return 'ebk-small-amount';
+    } else if (baseAmount.value >= 1000000 || baseAmount.value <= -1000000) {
+        return 'ebk-normal-amount';
+    } else {
+        return 'ebk-large-amount';
+    }
+});
+
+function update(done?: () => void): void {
+    if (updating.value) {
+        done?.();
+        return;
+    }
+
+    updating.value = true;
+
+    if (!done) {
+        showLoading();
+    }
+
+    exchangeRatesStore.getLatestExchangeRates({
+        silent: false,
+        force: true
+    }).then(() => {
+        done?.();
+
+        updating.value = false;
+        hideLoading();
+
+        showToast('Exchange rates data has been updated');
+    }).catch(error => {
+        done?.();
+
+        updating.value = false;
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
         }
-    },
-    created() {
-        if (!this.exchangeRatesData || !this.exchangeRatesData.exchangeRates) {
-            return;
+    });
+}
+
+function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate): string {
+    const fromExchangeRate = exchangeRatesStore.latestExchangeRateMap[baseCurrency.value];
+    const exchangeRateAmount = getConvertedAmount(baseAmount.value / 100, fromExchangeRate, toExchangeRate);
+
+    if (!exchangeRateAmount) {
+        return '0';
+    }
+
+    return formatExchangeRateAmount(exchangeRateAmount);
+}
+
+if (exchangeRatesData.value && exchangeRatesData.value.exchangeRates) {
+    const exchangeRates = exchangeRatesData.value.exchangeRates;
+    let hasBaseCurrency = false;
+
+    for (let i = 0; i < exchangeRates.length; i++) {
+        const exchangeRate = exchangeRates[i];
+        if (exchangeRate.currency === baseCurrency.value) {
+            hasBaseCurrency = true;
+            break;
         }
+    }
 
-        for (let i = 0; i < this.exchangeRatesData.exchangeRates.length; i++) {
-            const exchangeRate = this.exchangeRatesData.exchangeRates[i];
-            if (exchangeRate.currency === this.baseCurrency) {
-                return;
-            }
-        }
-
-        this.$toast('There is no exchange rates data for your default currency');
-    },
-    methods: {
-        update(done) {
-            const self = this;
-
-            if (self.updating) {
-                if (done) {
-                    done();
-                }
-
-                return;
-            }
-
-            self.updating = true;
-
-            if (!done) {
-                self.$showLoading();
-            }
-
-            self.exchangeRatesStore.getLatestExchangeRates({
-                silent: false,
-                force: true
-            }).then(() => {
-                if (done) {
-                    done();
-                }
-
-                self.updating = false;
-                self.$hideLoading();
-
-                self.$toast('Exchange rates data has been updated');
-            }).catch(error => {
-                if (done) {
-                    done();
-                }
-
-                self.updating = false;
-                self.$hideLoading();
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        getCurrencyName(currencyCode) {
-            return this.$locale.getCurrencyName(currencyCode);
-        },
-        getConvertedAmount(toExchangeRate) {
-            const fromExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[this.baseCurrency];
-            const exchangeRateAmount = getConvertedAmount(this.baseAmount / 100, fromExchangeRate, toExchangeRate);
-            return this.$locale.formatExchangeRateAmount(this.userStore, exchangeRateAmount);
-        },
-        setAsBaseline(currency, amount) {
-            this.baseCurrency = currency;
-            this.baseAmount = this.$locale.parseAmount(this.userStore, amount);
-        }
+    if (!hasBaseCurrency) {
+        showToast('There is no exchange rates data for your default currency');
     }
 }
 </script>

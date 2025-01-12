@@ -72,6 +72,8 @@ import type { ErrorResponse } from '@/core/api.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS } from '@/consts/api.ts';
 
+import type { LatestExchangeRateResponse, LocalizedLatestExchangeRate } from '@/models/exchange_rate.ts';
+
 import {
     isObject,
     isString,
@@ -104,6 +106,7 @@ import {
 import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 export interface LocalizedErrorParameter {
@@ -143,6 +146,7 @@ export function getI18nOptions(): object {
 export function useI18n() {
     const { t, locale } = useVueI18n();
 
+    const settingsStore = useSettingsStore();
     const userStore = useUserStore();
 
     // private functions
@@ -733,6 +737,49 @@ export function useI18n() {
         return ret;
     }
 
+    function getAllDisplayExchangeRates(exchangeRatesData?: LatestExchangeRateResponse): LocalizedLatestExchangeRate[] {
+        const availableExchangeRates: LocalizedLatestExchangeRate[] = [];
+
+        if (!exchangeRatesData || !exchangeRatesData.exchangeRates) {
+            return availableExchangeRates;
+        }
+
+        for (let i = 0; i < exchangeRatesData.exchangeRates.length; i++) {
+            const exchangeRate = exchangeRatesData.exchangeRates[i];
+
+            availableExchangeRates.push({
+                currencyCode: exchangeRate.currency,
+                currencyDisplayName: getCurrencyName(exchangeRate.currency),
+                rate: exchangeRate.rate
+            });
+        }
+
+        if (settingsStore.appSettings.currencySortByInExchangeRatesPage === CurrencySortingType.Name.type) {
+            availableExchangeRates.sort(function(c1, c2) {
+                return c1.currencyDisplayName.localeCompare(c2.currencyDisplayName);
+            });
+        } else if (settingsStore.appSettings.currencySortByInExchangeRatesPage === CurrencySortingType.CurrencyCode.type) {
+            availableExchangeRates.sort(function(c1, c2) {
+                return c1.currencyCode.localeCompare(c2.currencyCode);
+            });
+        } else if (settingsStore.appSettings.currencySortByInExchangeRatesPage === CurrencySortingType.ExchangeRate.type) {
+            availableExchangeRates.sort(function(c1, c2) {
+                const rate1 = parseFloat(c1.rate);
+                const rate2 = parseFloat(c2.rate);
+
+                if (rate1 > rate2) {
+                    return 1;
+                } else if (rate1 < rate2) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            });
+        }
+
+        return availableExchangeRates;
+    }
+
     function getMonthShortName(monthName: string): string {
         return t(`datetime.${monthName}.short`);
     }
@@ -1083,6 +1130,7 @@ export function useI18n() {
         getAllTransactionEditScopeTypes: () => getLocalizedDisplayNameAndType(TransactionEditScopeType.values()),
         getAllTransactionTagFilterTypes: () => getLocalizedDisplayNameAndType(TransactionTagFilterType.values()),
         getAllTransactionScheduledFrequencyTypes: () => getLocalizedDisplayNameAndType(ScheduledTemplateFrequencyType.values()),
+        getAllDisplayExchangeRates,
         // get localized info
         getMonthShortName,
         getMonthLongName,

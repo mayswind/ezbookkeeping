@@ -10,3 +10,9 @@ export interface LatestExchangeRateResponse {
     readonly baseCurrency: string;
     readonly exchangeRates: LatestExchangeRate[];
 }
+
+export interface LocalizedLatestExchangeRate {
+    readonly currencyCode: string;
+    readonly currencyDisplayName: string;
+    readonly rate: string;
+}

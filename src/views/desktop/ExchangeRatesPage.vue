@@ -5,16 +5,16 @@
                 <v-layout>
                     <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
                         <div class="mx-6 my-4">
-                            <span class="text-subtitle-2">{{ $t('Data source') }}</span>
+                            <span class="text-subtitle-2">{{ tt('Data source') }}</span>
                             <p class="text-body-1 mt-1 mb-3">
                                 <a tabindex="-1" target="_blank" :href="exchangeRatesData.referenceUrl" v-if="!loading && exchangeRatesData && exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</a>
                                 <span v-else-if="!loading && exchangeRatesData && !exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
-                                <span v-else-if="!loading && !exchangeRatesData">{{ $t('None') }}</span>
+                                <span v-else-if="!loading && !exchangeRatesData">{{ tt('None') }}</span>
                                 <span v-else-if="loading">
                                     <v-skeleton-loader class="skeleton-no-margin mt-3 mb-4" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
-                            <span class="text-subtitle-2" v-if="exchangeRatesDataUpdateTime || loading">{{ $t('Last Updated') }}</span>
+                            <span class="text-subtitle-2" v-if="exchangeRatesDataUpdateTime || loading">{{ tt('Last Updated') }}</span>
                             <p class="text-body-1 mt-1" v-if="exchangeRatesDataUpdateTime || loading">
                                 <span v-if="!loading">{{ exchangeRatesDataUpdateTime }}</span>
                                 <span v-if="loading">
@@ -24,14 +24,14 @@
                         </div>
                         <v-divider />
                         <div class="mx-6 mt-4">
-                            <span class="text-subtitle-2">{{ $t('Base Amount') }}</span>
+                            <span class="text-subtitle-2">{{ tt('Base Amount') }}</span>
                             <amount-input class="mt-2" density="compact"
                                           :currency="baseCurrency"
                                           :disabled="loading || !exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length"
                                           v-model="baseAmount"/>
                         </div>
                         <div class="mx-6 mt-4">
-                            <span class="text-subtitle-2">{{ $t('Base Currency') }}</span>
+                            <span class="text-subtitle-2">{{ tt('Base Currency') }}</span>
                         </div>
                         <v-tabs show-arrows class="mb-4" direction="vertical"
                                 :disabled="loading" v-model="baseCurrency"
@@ -46,7 +46,7 @@
                         </v-tabs>
                         <div class="mx-6 mt-2 mb-4"
                              v-else-if="!exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length">
-                            <span v-if="!loading">{{ $t('None') }}</span>
+                            <span v-if="!loading">{{ tt('None') }}</span>
                             <span v-else-if="loading">
                                 <v-skeleton-loader class="skeleton-no-margin pt-2 pb-5" type="text"
                                                    :key="itemIdx" :loading="loading"
@@ -64,14 +64,14 @@
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
                                                 <v-icon :icon="icons.menu" size="24" />
                                             </v-btn>
-                                            <span>{{ $t('Exchange Rates Data') }}</span>
+                                            <span>{{ tt('Exchange Rates Data') }}</span>
                                             <v-btn density="compact" color="default" variant="text" size="24"
                                                    class="ml-2" :icon="true" :loading="loading" @click="reload">
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
                                                 </template>
                                                 <v-icon :icon="icons.refresh" size="24" />
-                                                <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
+                                                <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                                             </v-btn>
                                         </div>
                                     </template>
@@ -81,9 +81,9 @@
                                         <tr>
                                             <th>
                                                 <div class="d-flex align-center">
-                                                    <span>{{ $t('Currency') }}</span>
+                                                    <span>{{ tt('Currency') }}</span>
                                                     <v-spacer/>
-                                                    <span>{{ $t('Amount') }}</span>
+                                                    <span>{{ tt('Amount') }}</span>
                                                 </div>
                                             </th>
                                         </tr>
@@ -98,7 +98,7 @@
                                         </tr>
 
                                         <tr v-if="!loading && (!exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length)">
-                                            <td>{{ $t('No exchange rates data') }}</td>
+                                            <td>{{ tt('No exchange rates data') }}</td>
                                         </tr>
 
                                         <tr class="exchange-rates-table-row-data" :key="exchangeRate.currencyCode"
@@ -112,10 +112,10 @@
                                                            density="comfortable" variant="text"
                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                            v-if="exchangeRate.currencyCode !== baseCurrency"
-                                                           @click="setAsBaseline(exchangeRate.currencyCode, getConvertedAmount(exchangeRate))">
-                                                        {{ $t('Set as Base') }}
+                                                           @click="setAsBaseline(exchangeRate.currencyCode, getFinalConvertedAmount(exchangeRate))">
+                                                        {{ tt('Set as Base') }}
                                                     </v-btn>
-                                                    <span>{{ getConvertedAmount(exchangeRate) }}</span>
+                                                    <span>{{ getFinalConvertedAmount(exchangeRate) }}</span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -133,132 +133,114 @@
     <snack-bar ref="snackbar" />
 </template>
 
-<script>
+<script setup lang="ts">
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { ref, useTemplateRef, watch } from 'vue';
 import { useDisplay } from 'vuetify';
 
-import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.ts';
-import { useUserStore } from '@/stores/user.ts';
+import { useI18n } from '@/locales/helpers.ts';
+import { useExchangeRatesPageBase } from '@/views/base/ExchangeRatesPageBase.ts';
+
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
+import type { LocalizedLatestExchangeRate } from '@/models/exchange_rate.ts';
+
 import logger from '@/lib/logger.ts';
-import { getConvertedAmount } from '@/lib/numeral.ts';
 
 import {
     mdiRefresh,
     mdiMenu
 } from '@mdi/js';
 
-export default {
-    data() {
-        const { mdAndUp } = useDisplay();
-        const userStore = useUserStore();
+type SnackBarType = InstanceType<typeof SnackBar>;
 
-        return {
-            activeTab: 'exchangeRatesPage',
-            baseCurrency: userStore.currentUserDefaultCurrency,
-            baseAmount: 100,
-            loading: true,
-            alwaysShowNav: mdAndUp.value,
-            showNav: mdAndUp.value,
-            icons: {
-                refresh: mdiRefresh,
-                menu: mdiMenu
-            }
-        };
-    },
-    computed: {
-        ...mapStores(useSettingsStore, useUserStore, useExchangeRatesStore),
-        exchangeRatesData() {
-            return this.exchangeRatesStore.latestExchangeRates.data;
-        },
-        exchangeRatesDataUpdateTime() {
-            const exchangeRatesLastUpdateTime = this.exchangeRatesStore.exchangeRatesLastUpdateTime;
-            return exchangeRatesLastUpdateTime ? this.$locale.formatUnixTimeToLongDate(this.userStore, exchangeRatesLastUpdateTime) : '';
-        },
-        availableExchangeRates() {
-            return this.$locale.getAllDisplayExchangeRates(this.settingsStore, this.exchangeRatesData);
-        }
-    },
-    created() {
-        this.reload(false);
-    },
-    setup() {
-        const display = useDisplay();
+const { mdAndUp } = useDisplay();
 
-        return {
-            display: display
-        };
-    },
-    watch: {
-        'display.mdAndUp.value': function (newValue) {
-            this.alwaysShowNav = newValue;
+const { tt, formatExchangeRateAmount } = useI18n();
+const { baseCurrency, baseAmount, exchangeRatesData, exchangeRatesDataUpdateTime, availableExchangeRates, getConvertedAmount, setAsBaseline } = useExchangeRatesPageBase();
 
-            if (!this.showNav) {
-                this.showNav = newValue;
-            }
-        }
-    },
-    methods: {
-        reload(force) {
-            const self = this;
+const exchangeRatesStore = useExchangeRatesStore();
 
-            self.loading = true;
+const icons = {
+    refresh: mdiRefresh,
+    menu: mdiMenu
+};
 
-            self.exchangeRatesStore.getLatestExchangeRates({
-                silent: false,
-                force: force
-            }).then(() => {
-                self.loading = false;
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
-                if (self.exchangeRatesData && self.exchangeRatesData.exchangeRates) {
-                    let foundDefaultCurrency = false;
+const activeTab = ref<string>('exchangeRatesPage');
+const loading = ref<boolean>(true);
+const alwaysShowNav = ref<boolean>(mdAndUp.value);
+const showNav = ref<boolean>(mdAndUp.value);
 
-                    for (let i = 0; i < self.exchangeRatesData.exchangeRates.length; i++) {
-                        const exchangeRate = self.exchangeRatesData.exchangeRates[i];
-                        if (exchangeRate.currency === self.baseCurrency) {
-                            foundDefaultCurrency = true;
-                            break;
-                        }
-                    }
+function reload(force: boolean): void {
+    loading.value = true;
 
-                    if (force) {
-                        self.$refs.snackbar.showMessage('Exchange rates data has been updated');
-                    } else if (!foundDefaultCurrency) {
-                        self.$refs.snackbar.showMessage('There is no exchange rates data for your default currency');
-                    }
+    exchangeRatesStore.getLatestExchangeRates({
+        silent: false,
+        force: force
+    }).then(() => {
+        loading.value = false;
+
+        if (exchangeRatesData.value && exchangeRatesData.value.exchangeRates) {
+            const exchangeRates = exchangeRatesData.value.exchangeRates;
+            let foundDefaultCurrency = false;
+
+            for (let i = 0; i < exchangeRates.length; i++) {
+                const exchangeRate = exchangeRates[i];
+                if (exchangeRate.currency === baseCurrency.value) {
+                    foundDefaultCurrency = true;
+                    break;
                 }
-            }).catch(error => {
-                self.loading = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        getConvertedAmount(toExchangeRate) {
-            if (!this.baseCurrency) {
-                return 0;
             }
 
-            const fromExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[this.baseCurrency];
-            let exchangeRateAmount = 0;
-
-            try {
-                exchangeRateAmount = getConvertedAmount(this.baseAmount / 100, fromExchangeRate, toExchangeRate);
-            } catch (ex) {
-                exchangeRateAmount = 0;
-                logger.warn('failed to convert amount by exchange rates, original base amount is ' + this.baseAmount, ex)
+            if (force) {
+                snackbar.value?.showMessage(tt('Exchange rates data has been updated'));
+            } else if (!foundDefaultCurrency) {
+                snackbar.value?.showMessage(tt('There is no exchange rates data for your default currency'));
             }
-
-            return this.$locale.formatExchangeRateAmount(this.userStore, exchangeRateAmount);
-        },
-        setAsBaseline(currency, amount) {
-            this.baseCurrency = currency;
-            this.baseAmount = this.$locale.parseAmount(this.userStore, amount);
         }
-    }
+    }).catch(error => {
+        loading.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
 }
+
+function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate): string {
+    if (!baseCurrency.value) {
+        return '0';
+    }
+
+    const fromExchangeRate = exchangeRatesStore.latestExchangeRateMap[baseCurrency.value];
+    let exchangeRateAmount: number | '' | null = 0;
+
+    try {
+        exchangeRateAmount = getConvertedAmount(baseAmount.value / 100, fromExchangeRate, toExchangeRate);
+    } catch (ex) {
+        exchangeRateAmount = 0;
+        logger.warn('failed to convert amount by exchange rates, original base amount is ' + baseAmount.value, ex)
+    }
+
+    if (!exchangeRateAmount) {
+        return '0';
+    }
+
+    return formatExchangeRateAmount(exchangeRateAmount);
+}
+
+watch(mdAndUp, (newValue) => {
+    alwaysShowNav.value = newValue;
+
+    if (!showNav.value) {
+        showNav.value = newValue;
+    }
+});
+
+reload(false);
 </script>
 
 <style>

@@ -47,7 +47,6 @@ import {
     appendDigitGroupingSymbol,
     parseAmount,
     formatAmount,
-    formatExchangeRateAmount,
     getAdaptiveDisplayAmountRate
 } from '@/lib/numeral.ts';
 
@@ -970,11 +969,6 @@ function getFormattedAmountWithCurrency(value, currencyCode, translateFn, userSt
     return appendCurrencySymbol(value, currencyDisplayType, currencyCode, currencyUnit, currencyName, isPlural);
 }
 
-function getFormattedExchangeRateAmount(value, translateFn, userStore) {
-    const numberFormatOptions = getNumberFormatOptions(translateFn, userStore);
-    return formatExchangeRateAmount(value, numberFormatOptions);
-}
-
 function getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, translateFn, userStore) {
     const numberFormatOptions = getNumberFormatOptions(translateFn, userStore);
     return getAdaptiveDisplayAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, numberFormatOptions);
@@ -1538,7 +1532,6 @@ export function i18nFunctions(i18nGlobal) {
         parseAmount: (userStore, value) => getParsedAmountNumber(value, i18nGlobal.t, userStore),
         formatAmount: (userStore, value, currencyCode) => getFormattedAmount(value, i18nGlobal.t, userStore, currencyCode),
         formatAmountWithCurrency: (settingsStore, userStore, value, currencyCode) => getFormattedAmountWithCurrency(value, currencyCode, i18nGlobal.t, userStore, settingsStore),
-        formatExchangeRateAmount: (userStore, value) => getFormattedExchangeRateAmount(value, i18nGlobal.t, userStore),
         getAdaptiveAmountRate: (userStore, amount1, amount2, fromExchangeRate, toExchangeRate) => getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, i18nGlobal.t, userStore),
         getAllExpenseAmountColors: () => getAllExpenseIncomeAmountColors(i18nGlobal.t, 1),
         getAllIncomeAmountColors: () => getAllExpenseIncomeAmountColors(i18nGlobal.t, 2),

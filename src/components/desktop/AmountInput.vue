@@ -337,6 +337,10 @@ watch(currentValue, (newValue) => {
 </script>
 
 <style>
+.text-field-with-colored-label.has-pretend-text .v-field {
+    grid-template-columns: max-content minmax(0, 1fr) min-content min-content;
+}
+
 .text-field-with-colored-label.has-pretend-text .v-field__input {
     padding-left: 0.5rem;
 }

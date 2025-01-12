@@ -301,7 +301,7 @@ func (s *UserService) UpdateUser(c core.Context, user *models.User, modifyUserLa
 		updateCols = append(updateCols, "short_time_format")
 	}
 
-	if core.DECIMAL_SEPARATOR_DEFAULT <= user.DecimalSeparator && user.DecimalSeparator <= core.DECIMAL_SEPARATOR_SPACE {
+	if core.DECIMAL_SEPARATOR_DEFAULT <= user.DecimalSeparator && user.DecimalSeparator <= core.DECIMAL_SEPARATOR_COMMA {
 		updateCols = append(updateCols, "decimal_separator")
 	}
 

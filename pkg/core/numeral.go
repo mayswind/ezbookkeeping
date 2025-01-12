@@ -12,7 +12,6 @@ const (
 	DECIMAL_SEPARATOR_DEFAULT DecimalSeparator = 0
 	DECIMAL_SEPARATOR_DOT     DecimalSeparator = 1
 	DECIMAL_SEPARATOR_COMMA   DecimalSeparator = 2
-	DECIMAL_SEPARATOR_SPACE   DecimalSeparator = 3
 	DECIMAL_SEPARATOR_INVALID DecimalSeparator = 255
 )
 
@@ -25,8 +24,6 @@ func (f DecimalSeparator) String() string {
 		return "Dot"
 	case DECIMAL_SEPARATOR_COMMA:
 		return "Comma"
-	case DECIMAL_SEPARATOR_SPACE:
-		return "Space"
 	case DECIMAL_SEPARATOR_INVALID:
 		return "Invalid"
 	default:

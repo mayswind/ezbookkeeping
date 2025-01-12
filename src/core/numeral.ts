@@ -34,7 +34,6 @@ export class DecimalSeparator implements TypeAndName, NumeralSymbolType {
     public static readonly LanguageDefaultType: number = 0;
     public static readonly Dot = new DecimalSeparator(1, 'Dot', '.');
     public static readonly Comma = new DecimalSeparator(2, 'Comma', ',');
-    public static readonly Space = new DecimalSeparator(3, 'Space', ' ');
 
     public static readonly Default = DecimalSeparator.Dot;
 

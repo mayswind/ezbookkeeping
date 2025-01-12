@@ -229,6 +229,7 @@ function onKeyUpDown(e: KeyboardEvent): void {
             e.preventDefault();
         }
     } catch (ex) {
+        logger.warn('cannot parse amount in amount input, original value is ' + str, ex);
         target.value = '0';
     }
 }

@@ -1,10 +1,10 @@
 <template>
     <f7-page>
         <f7-navbar>
-            <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
-            <f7-nav-title :title="$t('Text Size')"></f7-nav-title>
+            <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-title :title="tt('Text Size')"></f7-nav-title>
             <f7-nav-right>
-                <f7-link :text="$t('Done')" @click="setFontSize"></f7-link>
+                <f7-link :text="tt('Done')" @click="setFontSize"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -48,7 +48,7 @@
                                             <div class="item-title-row">
                                                 <div class="item-title">
                                                     <div class="transaction-category-name no-padding">
-                                                        <span>{{ $t('Category Name') }}</span>
+                                                        <span>{{ tt('Category Name') }}</span>
                                                     </div>
                                                 </div>
                                                 <div class="item-after">
@@ -59,12 +59,12 @@
                                             </div>
                                             <div class="item-text">
                                                 <div class="transaction-description">
-                                                    <span>{{ $t('Description') }}</span>
+                                                    <span>{{ tt('Description') }}</span>
                                                 </div>
                                             </div>
                                             <div class="item-footer">
                                                 <div class="transaction-tags">
-                                                    <f7-chip media-bg-color="black" class="transaction-tag" :text="$t('Tag Title')">
+                                                    <f7-chip media-bg-color="black" class="transaction-tag" :text="tt('Tag Title')">
                                                         <template #media>
                                                             <f7-icon f7="number"></f7-icon>
                                                         </template>
@@ -73,7 +73,7 @@
                                                 <div class="transaction-footer">
                                                     <span>{{ currentShortTime }}</span>
                                                     <span>·</span>
-                                                    <span>{{ $t('Account Name') }}</span>
+                                                    <span>{{ tt('Account Name') }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -92,14 +92,14 @@
                     <div class="display-flex justify-content-space-between">
                         <div class="fontsize-minimum">A</div>
                         <div class="fontsize-maximum">A</div>
-                        <div class="fontsize-default" :style="`left: calc(${100 / maxFontSizeType}% - 6px)`">{{ $t('Default') }}</div>
+                        <div class="fontsize-default" :style="`left: calc(${100 / FontSize.MaximumFontSize.type}% - 6px)`">{{ tt('Default') }}</div>
                     </div>
                     <f7-range
-                        :min="minFontSizeType"
-                        :max="maxFontSizeType"
+                        :min="FontSize.MinimumFontSize.type"
+                        :max="FontSize.MaximumFontSize.type"
                         :step="1"
                         :scale="true"
-                        :scale-steps="maxFontSizeType"
+                        :scale-steps="FontSize.MaximumFontSize.type"
                         :scale-sub-steps="1"
                         :format-scale-label="getFontSizeName"
                         v-model:value="fontSize"
@@ -111,69 +111,52 @@
     </f7-page>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import type { Router } from 'framework7/types';
+
+import { useI18n } from '@/locales/helpers.ts';
+
 import { useSettingsStore } from '@/stores/setting.ts';
-import { useUserStore } from '@/stores/user.ts';
 
 import { FontSize } from '@/core/font.ts';
-import { getCurrentUnixTime, getDay, getDayOfWeekName } from '@/lib/datetime.ts';
+import { getLocalDatetimeFromUnixTime, getCurrentUnixTime, getDay, getDayOfWeekName } from '@/lib/datetime.ts';
 import { setAppFontSize, getFontSizePreviewClassName } from '@/lib/ui/mobile.ts';
 
-export default {
-    props: [
-        'f7router'
-    ],
-    data() {
-        const settingsStore = useSettingsStore();
+const props = defineProps<{
+    f7router: Router.Router;
+}>();
 
-        return {
-            currentTime: getCurrentUnixTime(),
-            fontSize: settingsStore.appSettings.fontSize
-        }
-    },
-    computed: {
-        ...mapStores(useSettingsStore, useUserStore),
-        minFontSizeType() {
-            return FontSize.MinimumFontSize.type;
-        },
-        maxFontSizeType() {
-            return FontSize.MaximumFontSize.type;
-        },
-        fontSizePreviewClassName() {
-            return getFontSizePreviewClassName(this.fontSize);
-        },
-        currentLongYearMonth() {
-            return this.$locale.formatUnixTimeToLongYearMonth(this.userStore, this.currentTime);
-        },
-        currentDayOfMonth() {
-            return getDay(this.currentTime);
-        },
-        currentDayOfWeek() {
-            return this.$locale.getWeekdayShortName(getDayOfWeekName(this.currentTime));
-        },
-        currentShortTime() {
-            return this.$locale.formatUnixTimeToShortTime(this.userStore, this.currentTime);
-        }
-    },
-    methods: {
-        setFontSize() {
-            const router = this.f7router;
+const { tt, getWeekdayShortName, formatUnixTimeToLongYearMonth, formatUnixTimeToShortTime, formatAmountWithCurrency } = useI18n();
 
-            if (this.fontSize !== this.settingsStore.appSettings.fontSize) {
-                this.settingsStore.setFontSize(this.fontSize);
-                setAppFontSize(this.fontSize);
-            }
+const settingsStore = useSettingsStore();
 
-            router.back();
-        },
-        getFontSizeName() {
-            return '';
-        },
-        getDisplayAmount(value) {
-            return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value);
-        }
+const currentUnixTime = ref<number>(getCurrentUnixTime());
+const fontSize = ref<number>(settingsStore.appSettings.fontSize);
+
+const fontSizePreviewClassName = computed<string>(() => getFontSizePreviewClassName(fontSize.value));
+const currentLongYearMonth = computed<string>(() => formatUnixTimeToLongYearMonth(currentUnixTime.value));
+const currentDayOfMonth = computed<number>(() => getDay(getLocalDatetimeFromUnixTime(currentUnixTime.value)));
+const currentDayOfWeek = computed<string>(() => getWeekdayShortName(getDayOfWeekName(getLocalDatetimeFromUnixTime(currentUnixTime.value))));
+const currentShortTime = computed<string>(() => formatUnixTimeToShortTime(currentUnixTime.value));
+
+function getFontSizeName(): string {
+    return '';
+}
+
+function getDisplayAmount(value: string): string {
+    return formatAmountWithCurrency(value);
+}
+
+function setFontSize(): void {
+    const router = props.f7router;
+
+    if (fontSize.value !== settingsStore.appSettings.fontSize) {
+        settingsStore.setFontSize(fontSize.value);
+        setAppFontSize(fontSize.value);
     }
+
+    router.back();
 }
 </script>
 

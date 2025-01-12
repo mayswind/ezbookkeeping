@@ -1,17 +1,17 @@
 <template>
     <f7-page>
-        <f7-navbar :title="$t('Page Settings')" :back-link="$t('Back')"></f7-navbar>
+        <f7-navbar :title="tt('Page Settings')" :back-link="tt('Back')"></f7-navbar>
 
-        <f7-block-title class="margin-top">{{ $t('Overview Page') }}</f7-block-title>
+        <f7-block-title class="margin-top">{{ tt('Overview Page') }}</f7-block-title>
         <f7-list strong inset dividers>
             <f7-list-item>
-                <span>{{ $t('Show Amount') }}</span>
+                <span>{{ tt('Show Amount') }}</span>
                 <f7-toggle :checked="showAmountInHomePage" @toggle:change="showAmountInHomePage = $event"></f7-toggle>
             </f7-list-item>
 
             <f7-list-item
-                :title="$t('Timezone Used for Statistics')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone Type'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                :title="tt('Timezone Used for Statistics')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Timezone Type'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), popupCloseLinkText: tt('Done') }">
                 <select v-model="timezoneUsedForStatisticsInHomePage">
                     <option :value="timezoneType.type"
                             :key="timezoneType.type"
@@ -20,40 +20,40 @@
             </f7-list-item>
         </f7-list>
 
-        <f7-block-title>{{ $t('Transaction List Page') }}</f7-block-title>
+        <f7-block-title>{{ tt('Transaction List Page') }}</f7-block-title>
         <f7-list strong inset dividers>
             <f7-list-item>
-                <span>{{ $t('Show Monthly Total Amount') }}</span>
+                <span>{{ tt('Show Monthly Total Amount') }}</span>
                 <f7-toggle :checked="showTotalAmountInTransactionListPage" @toggle:change="showTotalAmountInTransactionListPage = $event"></f7-toggle>
             </f7-list-item>
             <f7-list-item>
-                <span>{{ $t('Show Transaction Tag') }}</span>
+                <span>{{ tt('Show Transaction Tag') }}</span>
                 <f7-toggle :checked="showTagInTransactionListPage" @toggle:change="showTagInTransactionListPage = $event"></f7-toggle>
             </f7-list-item>
         </f7-list>
 
-        <f7-block-title>{{ $t('Transaction Edit Page') }}</f7-block-title>
+        <f7-block-title>{{ tt('Transaction Edit Page') }}</f7-block-title>
         <f7-list strong inset dividers>
             <f7-list-item
-                :title="$t('Automatically Save Draft')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Automatically Save Draft'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                :title="tt('Automatically Save Draft')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Automatically Save Draft'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), popupCloseLinkText: tt('Done') }">
                 <select v-model="autoSaveTransactionDraft">
-                    <option value="disabled">{{ $t('Disabled') }}</option>
-                    <option value="enabled">{{ $t('Enabled') }}</option>
-                    <option value="confirmation">{{ $t('Show Confirmation Every Time') }}</option>
+                    <option value="disabled">{{ tt('Disabled') }}</option>
+                    <option value="enabled">{{ tt('Enabled') }}</option>
+                    <option value="confirmation">{{ tt('Show Confirmation Every Time') }}</option>
                 </select>
             </f7-list-item>
             <f7-list-item>
-                <span>{{ $t('Automatically Add Geolocation') }}</span>
+                <span>{{ tt('Automatically Add Geolocation') }}</span>
                 <f7-toggle :checked="isAutoGetCurrentGeoLocation" @toggle:change="isAutoGetCurrentGeoLocation = $event"></f7-toggle>
             </f7-list-item>
         </f7-list>
 
-        <f7-block-title>{{ $t('Exchange Rates Data Page') }}</f7-block-title>
+        <f7-block-title>{{ tt('Exchange Rates Data Page') }}</f7-block-title>
         <f7-list strong inset dividers>
             <f7-list-item
-                :title="$t('Sort by')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Sort by'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                :title="tt('Sort by')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Sort by'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), popupCloseLinkText: tt('Done') }">
                 <select v-model="currencySortByInExchangeRatesPage">
                     <option :value="sortingType.type"
                             :key="sortingType.type"
@@ -64,82 +64,20 @@
     </f7-page>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.ts';
-import { useTransactionsStore } from '@/stores/transaction.js';
-import { useOverviewStore } from '@/stores/overview.ts';
+<script setup lang="ts">
+import { useI18n } from '@/locales/helpers.ts';
+import { useAppSettingPageBase } from '@/views/base/settings/AppSettingsPageBase.ts';
 
-export default {
-    computed: {
-        ...mapStores(useSettingsStore, useTransactionsStore, useOverviewStore),
-        allTimezoneTypesUsedForStatistics() {
-            return this.$locale.getAllTimezoneTypesUsedForStatistics();
-        },
-        allCurrencySortingTypes() {
-            return this.$locale.getAllCurrencySortingTypes();
-        },
-        showAmountInHomePage: {
-            get: function () {
-                return this.settingsStore.appSettings.showAmountInHomePage;
-            },
-            set: function (value) {
-                this.settingsStore.setShowAmountInHomePage(value);
-            }
-        },
-        timezoneUsedForStatisticsInHomePage: {
-            get: function () {
-                return this.settingsStore.appSettings.timezoneUsedForStatisticsInHomePage;
-            },
-            set: function (value) {
-                this.settingsStore.setTimezoneUsedForStatisticsInHomePage(value);
-                this.overviewStore.updateTransactionOverviewInvalidState(true);
-            }
-        },
-        showTotalAmountInTransactionListPage: {
-            get: function () {
-                return this.settingsStore.appSettings.showTotalAmountInTransactionListPage;
-            },
-            set: function (value) {
-                this.settingsStore.setShowTotalAmountInTransactionListPage(value);
-            }
-        },
-        showTagInTransactionListPage: {
-            get: function () {
-                return this.settingsStore.appSettings.showTagInTransactionListPage;
-            },
-            set: function (value) {
-                this.settingsStore.setShowTagInTransactionListPage(value);
-            }
-        },
-        autoSaveTransactionDraft: {
-            get: function () {
-                return this.settingsStore.appSettings.autoSaveTransactionDraft;
-            },
-            set: function (value) {
-                this.settingsStore.setAutoSaveTransactionDraft(value);
-
-                if (value === 'disabled') {
-                    this.transactionsStore.clearTransactionDraft();
-                }
-            }
-        },
-        isAutoGetCurrentGeoLocation: {
-            get: function () {
-                return this.settingsStore.appSettings.autoGetCurrentGeoLocation;
-            },
-            set: function (value) {
-                this.settingsStore.setAutoGetCurrentGeoLocation(value);
-            }
-        },
-        currencySortByInExchangeRatesPage: {
-            get: function () {
-                return this.settingsStore.appSettings.currencySortByInExchangeRatesPage;
-            },
-            set: function (value) {
-                this.settingsStore.setCurrencySortByInExchangeRatesPage(value);
-            }
-        }
-    }
-};
+const { tt } = useI18n();
+const {
+    allTimezoneTypesUsedForStatistics,
+    allCurrencySortingTypes,
+    showAmountInHomePage,
+    timezoneUsedForStatisticsInHomePage,
+    showTotalAmountInTransactionListPage,
+    showTagInTransactionListPage,
+    autoSaveTransactionDraft,
+    isAutoGetCurrentGeoLocation,
+    currencySortByInExchangeRatesPage
+} = useAppSettingPageBase();
 </script>

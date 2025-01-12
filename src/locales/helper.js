@@ -1216,16 +1216,6 @@ function getAllSupportedImportFileTypes(i18nGlobal, translateFn) {
     return allSupportedImportFileTypes;
 }
 
-function getEnableDisableOptions(translateFn) {
-    return [{
-        value: true,
-        displayName: translateFn('Enable')
-    },{
-        value: false,
-        displayName: translateFn('Disable')
-    }];
-}
-
 function getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, translateFn) {
     const ret = [];
     const allCategories = AccountCategory.values();
@@ -1546,7 +1536,6 @@ export function i18nFunctions(i18nGlobal) {
         getAllTransactionDefaultCategories: (categoryType, locale) => getAllTransactionDefaultCategories(categoryType, locale, i18nGlobal.t),
         getAllDisplayExchangeRates: (settingsStore, exchangeRatesData) => getAllDisplayExchangeRates(settingsStore, exchangeRatesData, i18nGlobal.t),
         getAllSupportedImportFileTypes: () => getAllSupportedImportFileTypes(i18nGlobal, i18nGlobal.t),
-        getEnableDisableOptions: () => getEnableDisableOptions(i18nGlobal.t),
         getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t),
         getServerTipContent: (tipConfig) => getServerTipContent(tipConfig, i18nGlobal),
         joinMultiText: (textArray) => joinMultiText(textArray, i18nGlobal.t),

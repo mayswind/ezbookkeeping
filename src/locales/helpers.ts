@@ -1,7 +1,7 @@
 import { useI18n as useVueI18n } from 'vue-i18n';
 import moment from 'moment-timezone';
 
-import type { TypeAndName, TypeAndDisplayName } from '@/core/base.ts';
+import type {TypeAndName, TypeAndDisplayName, LocalizedSwitchOption } from '@/core/base.ts';
 
 import { type LanguageInfo, allLanguages, DEFAULT_LANGUAGE } from '@/locales/index.ts';
 
@@ -23,6 +23,7 @@ import {
 } from '@/core/datetime.ts';
 
 import {
+    type LocalizedTimezoneInfo,
     TimezoneTypeForStatistics
 } from '@/core/timezone.ts';
 
@@ -69,6 +70,7 @@ import {
 import type { LocaleDefaultSettings } from '@/core/setting.ts';
 import type { ErrorResponse } from '@/core/api.ts';
 
+import { UTC_TIMEZONE, ALL_TIMEZONES } from '@/consts/timezone.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS } from '@/consts/api.ts';
 
@@ -85,6 +87,10 @@ import {
     isPM,
     formatUnixTime,
     getTimezoneOffset,
+    getTimezoneOffsetMinutes,
+    getBrowserTimezoneOffset,
+    getBrowserTimezoneOffsetMinutes,
+    getTimeDifferenceHoursAndMinutes,
     getDateTimeFormatType,
     getRecentMonthDateRanges
 } from '@/lib/datetime.ts';
@@ -534,6 +540,16 @@ export function useI18n() {
         return t('default.firstDayOfWeek');
     }
 
+    function getAllEnableDisableOptions(): LocalizedSwitchOption[] {
+        return [{
+            value: true,
+            displayName: t('Enable')
+        },{
+            value: false,
+            displayName: t('Disable')
+        }];
+    }
+
     function getAllMeridiemIndicators(): LocalizedMeridiemIndicator {
         const allMeridiemIndicators = MeridiemIndicator.values();
         const meridiemIndicatorNames = [];
@@ -672,6 +688,50 @@ export function useI18n() {
         }
 
         return allRecentMonthDateRanges;
+    }
+
+    function getAllTimezones(includeSystemDefault?: boolean): LocalizedTimezoneInfo[] {
+        const defaultTimezoneOffset = getBrowserTimezoneOffset();
+        const defaultTimezoneOffsetMinutes = getBrowserTimezoneOffsetMinutes();
+        const allTimezoneInfos: LocalizedTimezoneInfo[] = [];
+
+        for (let i = 0; i < ALL_TIMEZONES.length; i++) {
+            const utcOffset = (ALL_TIMEZONES[i].timezoneName !== UTC_TIMEZONE.timezoneName ? getTimezoneOffset(ALL_TIMEZONES[i].timezoneName) : '');
+            const displayName = t(`timezone.${ALL_TIMEZONES[i].displayName}`);
+
+            allTimezoneInfos.push({
+                name: ALL_TIMEZONES[i].timezoneName,
+                utcOffset: utcOffset,
+                utcOffsetMinutes: getTimezoneOffsetMinutes(ALL_TIMEZONES[i].timezoneName),
+                displayName: displayName,
+                displayNameWithUtcOffset: `(UTC${utcOffset}) ${displayName}`
+            });
+        }
+
+        if (includeSystemDefault) {
+            const defaultDisplayName = t('System Default');
+
+            allTimezoneInfos.push({
+                name: '',
+                utcOffset: defaultTimezoneOffset,
+                utcOffsetMinutes: defaultTimezoneOffsetMinutes,
+                displayName: defaultDisplayName,
+                displayNameWithUtcOffset: `(UTC${defaultTimezoneOffset}) ${defaultDisplayName}`
+            });
+        }
+
+        allTimezoneInfos.sort(function(c1, c2) {
+            const utcOffset1 = parseInt(c1.utcOffset.replace(':', ''));
+            const utcOffset2 = parseInt(c2.utcOffset.replace(':', ''));
+
+            if (utcOffset1 !== utcOffset2) {
+                return utcOffset1 - utcOffset2;
+            }
+
+            return c1.displayName.localeCompare(c2.displayName);
+        })
+
+        return allTimezoneInfos;
     }
 
     function getAllTimezoneTypesUsedForStatistics(currentTimezone?: string): TypeAndDisplayName[] {
@@ -934,6 +994,37 @@ export function useI18n() {
         }
     }
 
+    function getTimezoneDifferenceDisplayText(utcOffset: number): string {
+        const defaultTimezoneOffset = getTimezoneOffsetMinutes();
+        const offsetTime = getTimeDifferenceHoursAndMinutes(utcOffset - defaultTimezoneOffset);
+
+        if (utcOffset > defaultTimezoneOffset) {
+            if (offsetTime.offsetMinutes) {
+                return t('format.misc.hoursMinutesAheadOfDefaultTimezone', {
+                    hours: offsetTime.offsetHours,
+                    minutes: offsetTime.offsetMinutes
+                });
+            } else {
+                return t('format.misc.hoursAheadOfDefaultTimezone', {
+                    hours: offsetTime.offsetHours
+                });
+            }
+        } else if (utcOffset < defaultTimezoneOffset) {
+            if (offsetTime.offsetMinutes) {
+                return t('format.misc.hoursMinutesBehindDefaultTimezone', {
+                    hours: offsetTime.offsetHours,
+                    minutes: offsetTime.offsetMinutes
+                });
+            } else {
+                return t('format.misc.hoursBehindDefaultTimezone', {
+                    hours: offsetTime.offsetHours
+                });
+            }
+        } else {
+            return t('Same time as default timezone');
+        }
+    }
+
     function getNumberWithDigitGroupingSymbol(value: number | string): string {
         const numberFormatOptions = getNumberFormatOptions();
         return appendDigitGroupingSymbol(value, numberFormatOptions);
@@ -1105,6 +1196,7 @@ export function useI18n() {
         getDefaultCurrency,
         getDefaultFirstDayOfWeek,
         // get all localized info of specified type
+        getAllEnableDisableOptions,
         getAllMeridiemIndicators,
         getAllLongMonthNames,
         getAllShortMonthNames,
@@ -1114,6 +1206,7 @@ export function useI18n() {
         getAllWeekDays,
         getAllDateRanges,
         getAllRecentMonthDateRanges,
+        getAllTimezones,
         getAllTimezoneTypesUsedForStatistics,
         getAllDecimalSeparators: () => getLocalizedNumeralSeparatorFormats(DecimalSeparator.values(), DecimalSeparator.parse(t('default.decimalSeparator')), DecimalSeparator.Default, DecimalSeparator.LanguageDefaultType),
         getAllDigitGroupingSymbols: () => getLocalizedNumeralSeparatorFormats(DigitGroupingSymbol.values(), DigitGroupingSymbol.parse(t('default.digitGroupingSymbol')), DigitGroupingSymbol.Default, DigitGroupingSymbol.LanguageDefaultType),
@@ -1164,6 +1257,7 @@ export function useI18n() {
         formatUnixTimeToLongTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongTimeFormat(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortTimeFormat(), utcOffset, currentUtcOffset),
         formatYearQuarter,
+        getTimezoneDifferenceDisplayText,
         appendDigitGroupingSymbol: getNumberWithDigitGroupingSymbol,
         parseAmount: getParsedAmountNumber,
         formatAmount: getFormattedAmount,

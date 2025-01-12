@@ -3,15 +3,15 @@
         <v-tabs show-arrows v-model="activeTab">
             <v-tab value="basicSetting" @click="pushRouter('basicSetting')">
                 <v-icon size="20" start :icon="icons.basicSetting"/>
-                {{ $t('Basic') }}
+                {{ tt('Basic') }}
             </v-tab>
             <v-tab value="applicationLockSetting" @click="pushRouter('applicationLockSetting')">
                 <v-icon size="20" start :icon="icons.applicationLockSetting"/>
-                {{ $t('Application Lock') }}
+                {{ tt('Application Lock') }}
             </v-tab>
             <v-tab value="statisticsSetting" @click="pushRouter('statisticsSetting')">
                 <v-icon size="20" start :icon="icons.statisticsSetting"/>
-                {{ $t('Statistics') }}
+                {{ tt('Statistics') }}
             </v-tab>
         </v-tabs>
 
@@ -31,10 +31,15 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import AppBasicSettingTab from './settings/tabs/AppBasicSettingTab.vue';
 import AppLockSettingTab from './settings/tabs/AppLockSettingTab.vue';
 import AppStatisticsSettingTab from './settings/tabs/AppStatisticsSettingTab.vue';
+
+import { ref } from 'vue';
+import { useRouter, onBeforeRouteUpdate } from 'vue-router';
+
+import { useI18n } from '@/locales/helpers.ts';
 
 import {
     mdiCogOutline,
@@ -42,50 +47,45 @@ import {
     mdiChartPieOutline
 } from '@mdi/js';
 
-export default {
-    components: {
-        AppBasicSettingTab,
-        AppLockSettingTab,
-        AppStatisticsSettingTab
-    },
-    props: [
-        'initTab'
-    ],
-    data() {
-        let queryActiveTab = this.initTab || 'basicSetting';
+const props = defineProps<{
+    initTab?: string;
+}>();
 
-        if ([
-            'basicSetting',
-            'applicationLockSetting',
-            'statisticsSetting'
-        ].indexOf(queryActiveTab) === -1) {
-            queryActiveTab = 'basicSetting';
-        }
+const router = useRouter();
 
-        return {
-            activeTab: queryActiveTab,
-            icons: {
-                basicSetting: mdiCogOutline,
-                applicationLockSetting: mdiLockOpenOutline,
-                statisticsSetting: mdiChartPieOutline
-            }
-        };
-    },
-    beforeRouteUpdate(to) {
-        if (to.query && to.query.tab && [
-            'basicSetting',
-            'applicationLockSetting',
-            'statisticsSetting'
-        ].indexOf(to.query.tab) >= 0) {
-            this.activeTab = to.query.tab;
-        } else {
-            this.activeTab = 'basicSetting';
-        }
-    },
-    methods: {
-        pushRouter(tab) {
-            this.$router.push(`/app/settings?tab=${tab}`);
-        }
+const { tt } = useI18n();
+
+const ALL_TABS: string[] = [
+    'basicSetting',
+    'applicationLockSetting',
+    'statisticsSetting'
+];
+
+const icons = {
+    basicSetting: mdiCogOutline,
+    applicationLockSetting: mdiLockOpenOutline,
+    statisticsSetting: mdiChartPieOutline
+};
+
+const activeTab = ref<string>((() => {
+    let queryActiveTab = props.initTab || 'basicSetting';
+
+    if (ALL_TABS.indexOf(queryActiveTab) < 0) {
+        queryActiveTab = 'basicSetting';
     }
-}
+
+    return queryActiveTab;
+})());
+
+const pushRouter = (tab: string) => {
+    router.push(`/app/settings?tab=${tab}`);
+};
+
+onBeforeRouteUpdate((to) => {
+    if (to.query && to.query.tab && ALL_TABS.indexOf(to.query.tab) >= 0) {
+        activeTab.value = to.query.tab;
+    } else {
+        activeTab.value = 'basicSetting';
+    }
+});
 </script>

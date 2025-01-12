@@ -3,19 +3,19 @@
         <v-tabs show-arrows v-model="activeTab">
             <v-tab value="basicSetting" @click="pushRouter('basicSetting')">
                 <v-icon size="20" start :icon="icons.basicSetting"/>
-                {{ $t('Basic') }}
+                {{ tt('Basic') }}
             </v-tab>
             <v-tab value="securitySetting" @click="pushRouter('securitySetting')">
                 <v-icon size="20" start :icon="icons.securitySetting"/>
-                {{ $t('Security') }}
+                {{ tt('Security') }}
             </v-tab>
             <v-tab value="twoFactorSetting" @click="pushRouter('twoFactorSetting')">
                 <v-icon size="20" start :icon="icons.twoFactorSetting"/>
-                {{ $t('Two-Factor Authentication') }}
+                {{ tt('Two-Factor Authentication') }}
             </v-tab>
             <v-tab value="dataManagementSetting" @click="pushRouter('dataManagementSetting')">
                 <v-icon size="20" start :icon="icons.dataManagementSetting"/>
-                {{ $t('Data Management') }}
+                {{ tt('Data Management') }}
             </v-tab>
         </v-tabs>
 
@@ -39,11 +39,16 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import UserBasicSettingTab from './settings/tabs/UserBasicSettingTab.vue';
 import UserSecuritySettingTab from './settings/tabs/UserSecuritySettingTab.vue';
 import UserTwoFactorAuthSettingTab from './settings/tabs/UserTwoFactorAuthSettingTab.vue';
 import UserDataManagementSettingTab from './settings/tabs/UserDataManagementSettingTab.vue';
+
+import { ref, useTemplateRef, watch } from 'vue';
+import { useRouter, onBeforeRouteUpdate } from 'vue-router';
+
+import { useI18n } from '@/locales/helpers.ts';
 
 import {
     mdiAccountOutline,
@@ -52,61 +57,57 @@ import {
     mdiDatabaseCogOutline
 } from '@mdi/js';
 
-export default {
-    components: {
-        UserBasicSettingTab,
-        UserSecuritySettingTab,
-        UserTwoFactorAuthSettingTab,
-        UserDataManagementSettingTab
-    },
-    props: [
-        'initTab'
-    ],
-    data() {
-        let queryActiveTab = this.initTab || 'basicSetting';
+type TwoFactorSettingTabType = InstanceType<typeof UserTwoFactorAuthSettingTab>;
 
-        if ([
-            'basicSetting',
-            'securitySetting',
-            'twoFactorSetting',
-            'dataManagementSetting'
-        ].indexOf(queryActiveTab) === -1) {
-            queryActiveTab = 'basicSetting';
-        }
+const props = defineProps<{
+    initTab?: string;
+}>();
 
-        return {
-            activeTab: queryActiveTab,
-            icons: {
-                basicSetting: mdiAccountOutline,
-                securitySetting: mdiLockOpenOutline,
-                twoFactorSetting: mdiOnepassword,
-                dataManagementSetting: mdiDatabaseCogOutline
-            }
-        };
-    },
-    watch: {
-        'activeTab': function (newValue, oldValue) {
-            if (oldValue === 'twoFactorSetting' && newValue !== 'twoFactorSetting') {
-                this.$refs.twoFactorSettingTab.reset();
-            }
-        }
-    },
-    beforeRouteUpdate(to) {
-        if (to.query && to.query.tab && [
-            'basicSetting',
-            'securitySetting',
-            'twoFactorSetting',
-            'dataManagementSetting'
-        ].indexOf(to.query.tab) >= 0) {
-            this.activeTab = to.query.tab;
-        } else {
-            this.activeTab = 'basicSetting';
-        }
-    },
-    methods: {
-        pushRouter(tab) {
-            this.$router.push(`/user/settings?tab=${tab}`);
-        }
+const router = useRouter();
+
+const { tt } = useI18n();
+
+const ALL_TABS: string[] = [
+    'basicSetting',
+    'securitySetting',
+    'twoFactorSetting',
+    'dataManagementSetting'
+];
+
+const icons = {
+    basicSetting: mdiAccountOutline,
+    securitySetting: mdiLockOpenOutline,
+    twoFactorSetting: mdiOnepassword,
+    dataManagementSetting: mdiDatabaseCogOutline
+};
+
+const twoFactorSettingTab = useTemplateRef<TwoFactorSettingTabType>('twoFactorSettingTab');
+
+const activeTab = ref<string>((() => {
+    let queryActiveTab = props.initTab || 'basicSetting';
+
+    if (ALL_TABS.indexOf(queryActiveTab) < 0) {
+        queryActiveTab = 'basicSetting';
     }
-}
+
+    return queryActiveTab;
+})());
+
+const pushRouter = (tab: string) => {
+    router.push(`/user/settings?tab=${tab}`);
+};
+
+onBeforeRouteUpdate((to) => {
+    if (to.query && to.query.tab && ALL_TABS.indexOf(to.query.tab) >= 0) {
+        activeTab.value = to.query.tab;
+    } else {
+        activeTab.value = 'basicSetting';
+    }
+});
+
+watch(activeTab, (newValue, oldValue) => {
+    if (oldValue === 'twoFactorSetting' && newValue !== 'twoFactorSetting') {
+        twoFactorSettingTab.value?.reset();
+    }
+});
 </script>

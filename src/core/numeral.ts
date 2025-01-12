@@ -1,4 +1,4 @@
-import type { TypeAndName } from '@/core/base.ts';
+import type { TypeAndName, TypeAndDisplayName } from '@/core/base.ts';
 
 export interface NumberFormatOptions {
     digitGrouping?: number;
@@ -8,7 +8,25 @@ export interface NumberFormatOptions {
     trimTailZero?: boolean;
 }
 
-export class DecimalSeparator implements TypeAndName {
+export interface NumeralSymbolType {
+    readonly type: number;
+    readonly name: string;
+    readonly symbol: string;
+}
+
+export interface LocalizedNumeralSymbolType extends TypeAndDisplayName {
+    readonly type: number;
+    readonly symbol: string;
+    readonly displayName: string;
+}
+
+export interface LocalizedDigitGroupingType extends TypeAndDisplayName {
+    readonly type: number;
+    readonly enabled: boolean;
+    readonly displayName: string;
+}
+
+export class DecimalSeparator implements TypeAndName, NumeralSymbolType {
     private static readonly allInstances: DecimalSeparator[] = [];
     private static readonly allInstancesByType: Record<number, DecimalSeparator> = {};
     private static readonly allInstancesByTypeName: Record<string, DecimalSeparator> = {};
@@ -47,7 +65,7 @@ export class DecimalSeparator implements TypeAndName {
     }
 }
 
-export class DigitGroupingSymbol implements TypeAndName {
+export class DigitGroupingSymbol implements TypeAndName, NumeralSymbolType {
     private static readonly allInstances: DigitGroupingSymbol[] = [];
     private static readonly allInstancesByType: Record<number, DigitGroupingSymbol> = {};
     private static readonly allInstancesByTypeName: Record<string, DigitGroupingSymbol> = {};

@@ -6,20 +6,31 @@ import type { TypeAndName, TypeAndDisplayName } from '@/core/base.ts';
 import { type LanguageInfo, allLanguages, DEFAULT_LANGUAGE } from '@/locales/index.ts';
 
 import {
-    type LocalizedMeridiemIndicator,
     type DateFormat,
     type TimeFormat,
+    type LocalizedMeridiemIndicator,
+    type LocalizedDateRange,
+    type LocalizedRecentMonthDateRange,
     Month,
     WeekDay,
     MeridiemIndicator,
     LongDateFormat,
     ShortDateFormat,
     LongTimeFormat,
-    ShortTimeFormat
+    ShortTimeFormat,
+    DateRange,
+    DateRangeScene
 } from '@/core/datetime.ts';
 
 import {
+    TimezoneTypeForStatistics
+} from '@/core/timezone.ts';
+
+import {
     type NumberFormatOptions,
+    type NumeralSymbolType,
+    type LocalizedNumeralSymbolType,
+    type LocalizedDigitGroupingType,
     DecimalSeparator,
     DigitGroupingSymbol,
     DigitGroupingType
@@ -27,7 +38,8 @@ import {
 
 import {
     type CurrencyPrependAndAppendText,
-    CurrencyDisplayType
+    CurrencyDisplayType,
+    CurrencySortingType
 } from '@/core/currency.ts';
 
 import {
@@ -71,7 +83,8 @@ import {
     isPM,
     formatUnixTime,
     getTimezoneOffset,
-    getDateTimeFormatType
+    getDateTimeFormatType,
+    getRecentMonthDateRanges
 } from '@/lib/datetime.ts';
 
 import {
@@ -84,7 +97,8 @@ import {
 
 import {
     getCurrencyFraction,
-    getAmountPrependAndAppendCurrencySymbol, appendCurrencySymbol
+    appendCurrencySymbol,
+    getAmountPrependAndAppendCurrencySymbol
 } from '@/lib/currency.ts';
 
 import services from '@/lib/services.ts';
@@ -265,6 +279,40 @@ export function useI18n() {
         return localizedParameters;
     }
 
+    function getAllCurrencyDisplayTypes(): TypeAndDisplayName[] {
+        const defaultCurrencyDisplayTypeName = t('default.currencyDisplayType');
+        let defaultCurrencyDisplayType = CurrencyDisplayType.parse(defaultCurrencyDisplayTypeName);
+
+        if (!defaultCurrencyDisplayType) {
+            defaultCurrencyDisplayType = CurrencyDisplayType.Default;
+        }
+
+        const defaultCurrency = userStore.currentUserDefaultCurrency;
+
+        const ret = [];
+        const defaultSampleValue = getFormattedAmountWithCurrency(12345, defaultCurrency, false, defaultCurrencyDisplayType);
+
+        ret.push({
+            type: CurrencyDisplayType.LanguageDefaultType,
+            displayName: `${t('Language Default')} (${defaultSampleValue})`
+        });
+
+        const allCurrencyDisplayTypes = CurrencyDisplayType.values();
+
+        for (let i = 0; i < allCurrencyDisplayTypes.length; i++) {
+            const type = allCurrencyDisplayTypes[i];
+            const sampleValue = getFormattedAmountWithCurrency(12345, defaultCurrency, false, type);
+            const displayName = `${t(type.name)} (${sampleValue})`
+
+            ret.push({
+                type: type.type,
+                displayName: displayName
+            });
+        }
+
+        return ret;
+    }
+
     function getLocalizedDisplayNameAndType(typeAndNames: TypeAndName[]): TypeAndDisplayName[] {
         const ret: TypeAndDisplayName[] = [];
 
@@ -274,6 +322,34 @@ export function useI18n() {
             ret.push({
                 type: nameAndType.type,
                 displayName: t(nameAndType.name)
+            });
+        }
+
+        return ret;
+    }
+
+    function getLocalizedNumeralSeparatorFormats<T extends NumeralSymbolType>(allSeparatorArray: T[], localeDefaultType: T, systemDefaultType: T, languageDefaultValue: number): LocalizedNumeralSymbolType[] {
+        let defaultSeparatorType: T = localeDefaultType;
+
+        if (!defaultSeparatorType) {
+            defaultSeparatorType = systemDefaultType;
+        }
+
+        const ret: LocalizedNumeralSymbolType[] = [];
+
+        ret.push({
+            type: languageDefaultValue,
+            symbol: defaultSeparatorType.symbol,
+            displayName: `${t('Language Default')} (${defaultSeparatorType.symbol})`
+        });
+
+        for (let i = 0; i < allSeparatorArray.length; i++) {
+            const type = allSeparatorArray[i];
+
+            ret.push({
+                type: type.type,
+                symbol: type.symbol,
+                displayName: `${t('numeral.' + type.name)} (${type.symbol})`
             });
         }
 
@@ -362,6 +438,20 @@ export function useI18n() {
         };
     }
 
+    function getCurrencyUnitName(currencyCode: string, isPlural: boolean): string {
+        const currencyInfo = ALL_CURRENCIES[currencyCode];
+
+        if (currencyInfo && currencyInfo.unit) {
+            if (isPlural) {
+                return t(`currency.unit.${currencyInfo.unit}.plural`);
+            } else {
+                return t(`currency.unit.${currencyInfo.unit}.normal`);
+            }
+        }
+
+        return '';
+    }
+
     function getCurrentCurrencyDisplayType(): CurrencyDisplayType {
         let currencyDisplayType = CurrencyDisplayType.valueOf(userStore.currentUserCurrencyDisplayType);
 
@@ -440,24 +530,6 @@ export function useI18n() {
         return t('default.firstDayOfWeek');
     }
 
-    function getCurrencyName(currencyCode: string): string {
-        return t(`currency.name.${currencyCode}`);
-    }
-
-    function getCurrencyUnitName(currencyCode: string, isPlural: boolean): string {
-        const currencyInfo = ALL_CURRENCIES[currencyCode];
-
-        if (currencyInfo && currencyInfo.unit) {
-            if (isPlural) {
-                return t(`currency.unit.${currencyInfo.unit}.plural`);
-            } else {
-                return t(`currency.unit.${currencyInfo.unit}.normal`);
-            }
-        }
-
-        return '';
-    }
-
     function getAllMeridiemIndicators(): LocalizedMeridiemIndicator {
         const allMeridiemIndicators = MeridiemIndicator.values();
         const meridiemIndicatorNames = [];
@@ -519,6 +591,125 @@ export function useI18n() {
             ret.push({
                 type: weekDay.type,
                 displayName: t(`datetime.${weekDay.name}.long`)
+            });
+        }
+
+        return ret;
+    }
+
+    function getAllDateRanges(scene: DateRangeScene, includeCustom?: boolean, includeBillingCycle?: boolean): LocalizedDateRange[] {
+        const ret: LocalizedDateRange[] = [];
+        const allDateRanges = DateRange.values();
+
+        for (let i = 0; i < allDateRanges.length; i++) {
+            const dateRange = allDateRanges[i];
+
+            if (!dateRange.isAvailableForScene(scene)) {
+                continue;
+            }
+
+            if (dateRange.isBillingCycle) {
+                if (includeBillingCycle) {
+                    ret.push({
+                        type: dateRange.type,
+                        displayName: t(dateRange.name),
+                        isBillingCycle: dateRange.isBillingCycle
+                    });
+                }
+
+                continue;
+            }
+
+            if (includeCustom || dateRange.type !== DateRange.Custom.type) {
+                ret.push({
+                    type: dateRange.type,
+                    displayName: t(dateRange.name)
+                });
+            }
+        }
+
+        return ret;
+    }
+
+    function getAllRecentMonthDateRanges(includeAll: boolean, includeCustom: boolean): LocalizedRecentMonthDateRange[] {
+        const allRecentMonthDateRanges: LocalizedRecentMonthDateRange[] = [];
+        const recentDateRanges = getRecentMonthDateRanges(12);
+
+        if (includeAll) {
+            allRecentMonthDateRanges.push({
+                dateType: DateRange.All.type,
+                minTime: 0,
+                maxTime: 0,
+                displayName: t('All')
+            });
+        }
+
+        for (let i = 0; i < recentDateRanges.length; i++) {
+            const recentDateRange = recentDateRanges[i];
+
+            allRecentMonthDateRanges.push({
+                dateType: recentDateRange.dateType,
+                minTime: recentDateRange.minTime,
+                maxTime: recentDateRange.maxTime,
+                year: recentDateRange.year,
+                month: recentDateRange.month,
+                isPreset: true,
+                displayName: formatUnixTime(recentDateRange.minTime, getLocalizedLongYearMonthFormat())
+            });
+        }
+
+        if (includeCustom) {
+            allRecentMonthDateRanges.push({
+                dateType: DateRange.Custom.type,
+                minTime: 0,
+                maxTime: 0,
+                displayName: t('Custom Date')
+            });
+        }
+
+        return allRecentMonthDateRanges;
+    }
+
+    function getAllTimezoneTypesUsedForStatistics(currentTimezone?: string): TypeAndDisplayName[] {
+        const currentTimezoneOffset = getTimezoneOffset(currentTimezone);
+
+        return [
+            {
+                type: TimezoneTypeForStatistics.ApplicationTimezone.type,
+                displayName: t(TimezoneTypeForStatistics.ApplicationTimezone.name) + ` (UTC${currentTimezoneOffset})`
+            },
+            {
+                type: TimezoneTypeForStatistics.TransactionTimezone.type,
+                displayName: t(TimezoneTypeForStatistics.TransactionTimezone.name)
+            }
+        ];
+    }
+
+    function getAllDigitGroupingTypes(): LocalizedDigitGroupingType[] {
+        const defaultDigitGroupingTypeName = t('default.digitGrouping');
+        let defaultDigitGroupingType = DigitGroupingType.parse(defaultDigitGroupingTypeName);
+
+        if (!defaultDigitGroupingType) {
+            defaultDigitGroupingType = DigitGroupingType.Default;
+        }
+
+        const ret: LocalizedDigitGroupingType[] = [];
+
+        ret.push({
+            type: DigitGroupingType.LanguageDefaultType,
+            enabled: defaultDigitGroupingType.enabled,
+            displayName: `${t('Language Default')} (${t('numeral.' + defaultDigitGroupingType.name)})`
+        });
+
+        const allDigitGroupingTypes = DigitGroupingType.values();
+
+        for (let i = 0; i < allDigitGroupingTypes.length; i++) {
+            const type = allDigitGroupingTypes[i];
+
+            ret.push({
+                type: type.type,
+                enabled: type.enabled,
+                displayName: t('numeral.' + type.name)
             });
         }
 
@@ -655,6 +846,10 @@ export function useI18n() {
         }
 
         return digitGroupingType.type;
+    }
+
+    function getCurrencyName(currencyCode: string): string {
+        return t(`currency.name.${currencyCode}`);
     }
 
     function isLongDateMonthAfterYear() {
@@ -850,16 +1045,19 @@ export function useI18n() {
     }
 
     return {
+        // common functions
         tt: t,
         ti: translateIf,
         te: translateError,
         joinMultiText,
+        // get current language info
         getCurrentLanguageTag,
         getCurrentLanguageInfo,
         getCurrentLanguageDisplayName,
+        // get localization default type
         getDefaultCurrency,
         getDefaultFirstDayOfWeek,
-        getCurrencyName,
+        // get all localized info of specified type
         getAllMeridiemIndicators,
         getAllLongMonthNames,
         getAllShortMonthNames,
@@ -867,7 +1065,15 @@ export function useI18n() {
         getAllShortWeekdayNames,
         getAllMinWeekdayNames,
         getAllWeekDays,
-        getAllAccountCategories: () => getAllAccountCategories(),
+        getAllDateRanges,
+        getAllRecentMonthDateRanges,
+        getAllTimezoneTypesUsedForStatistics,
+        getAllDecimalSeparators: () => getLocalizedNumeralSeparatorFormats(DecimalSeparator.values(), DecimalSeparator.parse(t('default.decimalSeparator')), DecimalSeparator.Default, DecimalSeparator.LanguageDefaultType),
+        getAllDigitGroupingSymbols: () => getLocalizedNumeralSeparatorFormats(DigitGroupingSymbol.values(), DigitGroupingSymbol.parse(t('default.digitGroupingSymbol')), DigitGroupingSymbol.Default, DigitGroupingSymbol.LanguageDefaultType),
+        getAllDigitGroupingTypes,
+        getAllCurrencyDisplayTypes,
+        getAllCurrencySortingTypes: () => getLocalizedDisplayNameAndType(CurrencySortingType.values()),
+        getAllAccountCategories,
         getAllAccountTypes: () => getLocalizedDisplayNameAndType(AccountType.values()),
         getAllCategoricalChartTypes: () => getLocalizedDisplayNameAndType(CategoricalChartType.values()),
         getAllTrendChartTypes: () => getLocalizedDisplayNameAndType(TrendChartType.values()),
@@ -877,6 +1083,7 @@ export function useI18n() {
         getAllTransactionEditScopeTypes: () => getLocalizedDisplayNameAndType(TransactionEditScopeType.values()),
         getAllTransactionTagFilterTypes: () => getLocalizedDisplayNameAndType(TransactionTagFilterType.values()),
         getAllTransactionScheduledFrequencyTypes: () => getLocalizedDisplayNameAndType(ScheduledTemplateFrequencyType.values()),
+        // get localized info
         getMonthShortName,
         getMonthLongName,
         getMonthdayOrdinal,
@@ -888,12 +1095,14 @@ export function useI18n() {
         getCurrentDecimalSeparator,
         getCurrentDigitGroupingSymbol,
         getCurrentDigitGroupingType,
+        getCurrencyName,
         isLongDateMonthAfterYear,
         isShortDateMonthAfterYear,
         isLongTime24HourFormat,
         isLongTimeMeridiemIndicatorFirst,
         isShortTime24HourFormat,
         isShortTimeMeridiemIndicatorFirst,
+        // format functions
         formatUnixTimeToLongDateTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongDateFormat() + ' ' + getLocalizedLongTimeFormat(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortDateTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDateFormat() + ' ' + getLocalizedShortTimeFormat(), utcOffset, currentUtcOffset),
         formatUnixTimeToLongDate: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongDateFormat(), utcOffset, currentUtcOffset),
@@ -914,6 +1123,7 @@ export function useI18n() {
         formatExchangeRateAmount: getFormattedExchangeRateAmount,
         getAdaptiveAmountRate,
         getAmountPrependAndAppendText,
+        // localization setting functions
         setLanguage,
         setTimeZone,
         initLocale

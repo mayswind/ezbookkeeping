@@ -1,4 +1,4 @@
-import type { TypeAndName } from '@/core/base.ts';
+import type { TypeAndName, TypeAndDisplayName } from '@/core/base.ts';
 
 export interface YearQuarter {
     readonly year: number;
@@ -57,6 +57,17 @@ export interface PresetDateRange {
     readonly value: Date[];
 }
 
+export interface LocalizedMeridiemIndicator {
+    readonly values: string[];
+    readonly displayValues: string[];
+}
+
+export interface LocalizedDateRange extends TypeAndDisplayName {
+    readonly type: number;
+    readonly displayName: string;
+    readonly isBillingCycle?: boolean;
+}
+
 export interface LocalizedRecentMonthDateRange {
     readonly dateType: number;
     readonly minTime: number;
@@ -65,11 +76,6 @@ export interface LocalizedRecentMonthDateRange {
     readonly month?: number;
     readonly isPreset?: boolean;
     readonly displayName: string;
-}
-
-export interface LocalizedMeridiemIndicator {
-    readonly values: string[];
-    readonly displayValues: string[];
 }
 
 export class YearUnixTime implements UnixTimeRange {

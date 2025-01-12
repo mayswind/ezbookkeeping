@@ -95,16 +95,18 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 import { CategoryType } from '@/core/category.ts';
 import { ALL_CATEGORY_ICONS } from '@/consts/icon.ts';
 import { ALL_CATEGORY_COLORS } from '@/consts/color.ts';
+import { TransactionCategory } from '@/models/transaction_category.ts';
+
 import { generateRandomUUID } from '@/lib/misc.ts';
 import {
     setCategoryModelByAnotherCategory,
     allVisiblePrimaryTransactionCategoriesByType
-} from '@/lib/category.js';
+} from '@/lib/category.ts';
 
 export default {
     props: [
@@ -115,15 +117,12 @@ export default {
         'open'
     ],
     data() {
-        const transactionCategoriesStore = useTransactionCategoriesStore();
-        const newTransactionCategory = transactionCategoriesStore.generateNewTransactionCategoryModel();
-
         return {
             showState: false,
             editCategoryId: null,
             clientSessionId: '',
             loading: false,
-            category: newTransactionCategory,
+            category: TransactionCategory.createNewCategory(),
             submitting: false,
             resolve: null,
             reject: null
@@ -176,7 +175,7 @@ export default {
             self.loading = true;
             self.submitting = false;
 
-            const newTransactionCategory = self.transactionCategoriesStore.generateNewTransactionCategoryModel();
+            const newTransactionCategory = TransactionCategory.createNewCategory();
             setCategoryModelByAnotherCategory(self.category, newTransactionCategory);
 
             if (options.id) {

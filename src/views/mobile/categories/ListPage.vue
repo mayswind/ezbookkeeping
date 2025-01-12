@@ -88,14 +88,14 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 import { CategoryType } from '@/core/category.ts';
 import {
     isNoAvailableCategory,
     getFirstShowingId,
     getLastShowingId
-} from '@/lib/category.js';
+} from '@/lib/category.ts';
 import { onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
 
 export default {

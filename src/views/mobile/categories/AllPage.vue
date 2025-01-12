@@ -19,7 +19,7 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 export default {
     props: [

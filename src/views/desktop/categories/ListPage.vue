@@ -198,13 +198,13 @@ import PresetDialog from './list/dialogs/PresetDialog.vue';
 import { useDisplay } from 'vuetify';
 
 import { mapStores } from 'pinia';
-import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 import { CategoryType } from '@/core/category.ts';
 import {
     isNoAvailableCategory,
     getAvailableCategoryCount
-} from '@/lib/category.js';
+} from '@/lib/category.ts';
 import { getNavSideBarOuterHeight } from '@/lib/ui/desktop.ts';
 
 import {

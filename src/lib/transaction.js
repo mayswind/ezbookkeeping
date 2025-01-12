@@ -12,7 +12,7 @@ import {
     isSubCategoryIdAvailable,
     getFirstAvailableCategoryId,
     getFirstAvailableSubCategoryId
-} from './category.js';
+} from './category.ts';
 
 function getDisplayAmount(amount, currency, hideAmount, formatAmountWithCurrencyFunc) {
     if (hideAmount) {

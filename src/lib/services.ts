@@ -445,8 +445,8 @@ export default {
     removeUnusedTransactionPicture: (req: TransactionPictureUnusedDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transaction/pictures/remove_unused.json', req);
     },
-    getAllTransactionCategories: (): ApiResponsePromise<TransactionCategoryInfoResponse[]> => {
-        return axios.get<ApiResponse<TransactionCategoryInfoResponse[]>>('v1/transaction/categories/list.json');
+    getAllTransactionCategories: (): ApiResponsePromise<Record<number, TransactionCategoryInfoResponse[]>> => {
+        return axios.get<ApiResponse<Record<number, TransactionCategoryInfoResponse[]>>>('v1/transaction/categories/list.json');
     },
     getTransactionCategory: (req: { id: string }): ApiResponsePromise<TransactionCategoryInfoResponse> => {
         return axios.get<ApiResponse<TransactionCategoryInfoResponse>>('v1/transaction/categories/get.json?id=' + req.id);

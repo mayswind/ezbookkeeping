@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { useSettingsStore } from './setting.ts';
 import { useUserStore } from './user.ts';
 import { useAccountsStore } from './account.js';
-import { useTransactionCategoriesStore } from './transactionCategory.js';
+import { useTransactionCategoriesStore } from './transactionCategory.ts';
 import { useOverviewStore } from './overview.ts';
 import { useStatisticsStore } from './statistics.js';
 import { useExchangeRatesStore } from './exchangeRates.ts';
@@ -39,7 +39,7 @@ import {
 } from '@/lib/datetime.ts';
 import { getAmountWithDecimalNumberCount } from '@/lib/numeral.ts';
 import { getCurrencyFraction } from '@/lib/currency.ts';
-import { getFirstAvailableCategoryId } from '@/lib/category.js';
+import { getFirstAvailableCategoryId } from '@/lib/category.ts';
 
 const emptyTransactionResult = {
     items: [],

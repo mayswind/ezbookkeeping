@@ -1,7 +1,8 @@
 import { CategoryType } from '@/core/category.ts';
 import { TransactionType } from '@/core/transaction.ts';
+import { type TransactionCategoriesWithVisibleCount, TransactionCategory } from '@/models/transaction_category.ts';
 
-export function setCategoryModelByAnotherCategory(category, category2) {
+export function setCategoryModelByAnotherCategory(category: TransactionCategory, category2: TransactionCategory): void {
     category.id = category2.id;
     category.type = category2.type;
     category.parentId = category2.parentId;
@@ -12,7 +13,7 @@ export function setCategoryModelByAnotherCategory(category, category2) {
     category.visible = !category2.hidden;
 }
 
-export function transactionTypeToCategoryType(transactionType) {
+export function transactionTypeToCategoryType(transactionType: TransactionType): CategoryType | null {
     if (transactionType === TransactionType.Income) {
         return CategoryType.Income;
     } else if (transactionType === TransactionType.Expense) {
@@ -24,7 +25,7 @@ export function transactionTypeToCategoryType(transactionType) {
     }
 }
 
-export function categoryTypeToTransactionType(categoryType) {
+export function categoryTypeToTransactionType(categoryType: CategoryType): TransactionType | null {
     if (categoryType === CategoryType.Income) {
         return TransactionType.Income;
     } else if (categoryType === CategoryType.Expense) {
@@ -36,14 +37,20 @@ export function categoryTypeToTransactionType(categoryType) {
     }
 }
 
-export function getTransactionPrimaryCategoryName(categoryId, allCategories) {
+export function getTransactionPrimaryCategoryName(categoryId: string, allCategories: TransactionCategory[]): string {
     if (!allCategories) {
         return '';
     }
 
     for (let i = 0; i < allCategories.length; i++) {
-        for (let j = 0; j < allCategories[i].subCategories.length; j++) {
-            const subCategory = allCategories[i].subCategories[j];
+        const subCategoryList = allCategories[i].secondaryCategories;
+
+        if (!subCategoryList) {
+            continue;
+        }
+
+        for (let j = 0; j < subCategoryList.length; j++) {
+            const subCategory = subCategoryList[j];
             if (subCategory.id === categoryId) {
                 return allCategories[i].name;
             }
@@ -53,14 +60,20 @@ export function getTransactionPrimaryCategoryName(categoryId, allCategories) {
     return '';
 }
 
-export function getTransactionSecondaryCategoryName(categoryId, allCategories) {
+export function getTransactionSecondaryCategoryName(categoryId: string, allCategories: TransactionCategory[]): string {
     if (!allCategories) {
         return '';
     }
 
     for (let i = 0; i < allCategories.length; i++) {
-        for (let j = 0; j < allCategories[i].subCategories.length; j++) {
-            const subCategory = allCategories[i].subCategories[j];
+        const subCategoryList = allCategories[i].secondaryCategories;
+
+        if (!subCategoryList) {
+            continue;
+        }
+
+        for (let j = 0; j < subCategoryList.length; j++) {
+            const subCategory = subCategoryList[j];
             if (subCategory.id === categoryId) {
                 return subCategory.name;
             }
@@ -70,12 +83,12 @@ export function getTransactionSecondaryCategoryName(categoryId, allCategories) {
     return '';
 }
 
-export function allTransactionCategoriesWithVisibleCount(allTransactionCategories, allowCategoryTypes) {
-    const ret = {};
+export function allTransactionCategoriesWithVisibleCount(allTransactionCategories: Record<number, TransactionCategory[]>, allowCategoryTypes: Record<number, boolean>): Record<number, TransactionCategoriesWithVisibleCount> {
+    const ret: Record<string, TransactionCategoriesWithVisibleCount> = {};
     const hasAllowCategoryTypes = allowCategoryTypes
-        && (allowCategoryTypes[CategoryType.Income.toString()]
-            || allowCategoryTypes[CategoryType.Expense.toString()]
-            || allowCategoryTypes[CategoryType.Transfer.toString()]);
+        && (allowCategoryTypes[CategoryType.Income]
+            || allowCategoryTypes[CategoryType.Expense]
+            || allowCategoryTypes[CategoryType.Transfer]);
 
     const allCategoryTypes = [ CategoryType.Income, CategoryType.Expense, CategoryType.Transfer ];
 
@@ -90,10 +103,10 @@ export function allTransactionCategoriesWithVisibleCount(allTransactionCategorie
             continue;
         }
 
-        const allCategories = allTransactionCategories[categoryType];
-        const allSubCategories = {};
-        const allVisibleSubCategoryCounts = {};
-        const allFirstVisibleSubCategoryIndexes = {};
+        const allCategories: TransactionCategory[] = allTransactionCategories[categoryType];
+        const allSubCategories: Record<string, TransactionCategory[]> = {};
+        const allVisibleSubCategoryCounts: Record<string, number> = {};
+        const allFirstVisibleSubCategoryIndexes: Record<string, number> = {};
         let allVisibleCategoryCount = 0;
         let firstVisibleCategoryIndex = -1;
 
@@ -108,12 +121,12 @@ export function allTransactionCategoriesWithVisibleCount(allTransactionCategorie
                 }
             }
 
-            if (category.subCategories) {
+            if (category.secondaryCategories) {
                 let visibleSubCategoryCount = 0;
                 let firstVisibleSubCategoryIndex = -1;
 
-                for (let k = 0; k < category.subCategories.length; k++) {
-                    const subCategory = category.subCategories[k];
+                for (let k = 0; k < category.secondaryCategories.length; k++) {
+                    const subCategory = category.secondaryCategories[k];
 
                     if (!subCategory.hidden) {
                         visibleSubCategoryCount++;
@@ -124,16 +137,16 @@ export function allTransactionCategoriesWithVisibleCount(allTransactionCategorie
                     }
                 }
 
-                if (category.subCategories.length > 0) {
-                    allSubCategories[category.id] = category.subCategories;
+                if (category.secondaryCategories.length > 0) {
+                    allSubCategories[category.id] = category.secondaryCategories;
                     allVisibleSubCategoryCounts[category.id] = visibleSubCategoryCount;
                     allFirstVisibleSubCategoryIndexes[category.id] = firstVisibleSubCategoryIndex;
                 }
             }
         }
 
-        ret[categoryType.toString()] = {
-            type: categoryType.toString(),
+        ret[categoryType] = {
+            type: categoryType,
             allCategories: allCategories,
             allVisibleCategoryCount: allVisibleCategoryCount,
             firstVisibleCategoryIndex: firstVisibleCategoryIndex,
@@ -146,9 +159,9 @@ export function allTransactionCategoriesWithVisibleCount(allTransactionCategorie
     return ret;
 }
 
-export function allVisiblePrimaryTransactionCategoriesByType(allTransactionCategories, categoryType) {
+export function allVisiblePrimaryTransactionCategoriesByType(allTransactionCategories: Record<number, TransactionCategory[]>, categoryType: number): TransactionCategory[] {
     const allCategories = allTransactionCategories[categoryType];
-    const visibleCategories = [];
+    const visibleCategories: TransactionCategory[] = [];
 
     if (!allCategories) {
         return visibleCategories;
@@ -167,14 +180,14 @@ export function allVisiblePrimaryTransactionCategoriesByType(allTransactionCateg
     return visibleCategories;
 }
 
-export function getFinalCategoryIdsByFilteredCategoryIds(allTransactionCategoriesMap, filteredCategoryIds) {
+export function getFinalCategoryIdsByFilteredCategoryIds(allTransactionCategoriesMap: Record<number, TransactionCategory>, filteredCategoryIds: Record<string, boolean>): string {
     let finalCategoryIds = '';
 
     if (!allTransactionCategoriesMap) {
         return finalCategoryIds;
     }
 
-    for (let categoryId in allTransactionCategoriesMap) {
+    for (const categoryId in allTransactionCategoriesMap) {
         if (!Object.prototype.hasOwnProperty.call(allTransactionCategoriesMap, categoryId)) {
             continue;
         }
@@ -195,7 +208,7 @@ export function getFinalCategoryIdsByFilteredCategoryIds(allTransactionCategorie
     return finalCategoryIds;
 }
 
-export function isSubCategoryIdAvailable(categories, categoryId) {
+export function isSubCategoryIdAvailable(categories: TransactionCategory[], categoryId: string): boolean {
     if (!categories || !categories.length) {
         return false;
     }
@@ -207,8 +220,14 @@ export function isSubCategoryIdAvailable(categories, categoryId) {
             continue;
         }
 
-        for (let j = 0; j < primaryCategory.subCategories.length; j++) {
-            const secondaryCategory = primaryCategory.subCategories[j];
+        const subCategoryList = primaryCategory.secondaryCategories;
+
+        if (!subCategoryList) {
+            continue;
+        }
+
+        for (let j = 0; j < subCategoryList.length; j++) {
+            const secondaryCategory = subCategoryList[j];
 
             if (secondaryCategory.hidden) {
                 continue;
@@ -223,7 +242,7 @@ export function isSubCategoryIdAvailable(categories, categoryId) {
     return false;
 }
 
-export function getFirstAvailableCategoryId(categories) {
+export function getFirstAvailableCategoryId(categories: TransactionCategory[]): string {
     if (!categories || !categories.length) {
         return '';
     }
@@ -235,8 +254,14 @@ export function getFirstAvailableCategoryId(categories) {
             continue;
         }
 
-        for (let j = 0; j < primaryCategory.subCategories.length; j++) {
-            const secondaryCategory = primaryCategory.subCategories[j];
+        const subCategoryList = primaryCategory.secondaryCategories;
+
+        if (!subCategoryList) {
+            continue;
+        }
+
+        for (let j = 0; j < subCategoryList.length; j++) {
+            const secondaryCategory = subCategoryList[j];
 
             if (secondaryCategory.hidden) {
                 continue;
@@ -249,7 +274,7 @@ export function getFirstAvailableCategoryId(categories) {
     return '';
 }
 
-export function getFirstAvailableSubCategoryId(categories, categoryId) {
+export function getFirstAvailableSubCategoryId(categories: TransactionCategory[], categoryId: string): string {
     if (!categories || !categories.length) {
         return '';
     }
@@ -261,8 +286,14 @@ export function getFirstAvailableSubCategoryId(categories, categoryId) {
             continue;
         }
 
-        for (let j = 0; j < primaryCategory.subCategories.length; j++) {
-            const secondaryCategory = primaryCategory.subCategories[j];
+        const subCategoryList = primaryCategory.secondaryCategories;
+
+        if (!subCategoryList) {
+            return '';
+        }
+
+        for (let j = 0; j < subCategoryList.length; j++) {
+            const secondaryCategory = subCategoryList[j];
 
             if (secondaryCategory.hidden) {
                 continue;
@@ -277,7 +308,7 @@ export function getFirstAvailableSubCategoryId(categories, categoryId) {
     return '';
 }
 
-export function isNoAvailableCategory(categories, showHidden) {
+export function isNoAvailableCategory(categories: TransactionCategory[], showHidden: boolean): boolean {
     for (let i = 0; i < categories.length; i++) {
         if (showHidden || !categories[i].hidden) {
             return false;
@@ -287,7 +318,7 @@ export function isNoAvailableCategory(categories, showHidden) {
     return true;
 }
 
-export function getAvailableCategoryCount(categories, showHidden) {
+export function getAvailableCategoryCount(categories: TransactionCategory[], showHidden: boolean): number {
     let count = 0;
 
     for (let i = 0; i < categories.length; i++) {
@@ -299,7 +330,7 @@ export function getAvailableCategoryCount(categories, showHidden) {
     return count;
 }
 
-export function getFirstShowingId(categories, showHidden) {
+export function getFirstShowingId(categories: TransactionCategory[], showHidden: boolean): string | null {
     for (let i = 0; i < categories.length; i++) {
         if (showHidden || !categories[i].hidden) {
             return categories[i].id;
@@ -309,7 +340,7 @@ export function getFirstShowingId(categories, showHidden) {
     return null;
 }
 
-export function getLastShowingId(categories, showHidden) {
+export function getLastShowingId(categories: TransactionCategory[], showHidden: boolean): string | null {
     for (let i = categories.length - 1; i >= 0; i--) {
         if (showHidden || !categories[i].hidden) {
             return categories[i].id;
@@ -319,8 +350,8 @@ export function getLastShowingId(categories, showHidden) {
     return null;
 }
 
-export function hasAnyAvailableCategory(allTransactionCategories, showHidden) {
-    for (let type in allTransactionCategories) {
+export function hasAnyAvailableCategory(allTransactionCategories: Record<number, TransactionCategoriesWithVisibleCount>, showHidden: boolean): boolean {
+    for (const type in allTransactionCategories) {
         if (!Object.prototype.hasOwnProperty.call(allTransactionCategories, type)) {
             continue;
         }
@@ -341,10 +372,10 @@ export function hasAnyAvailableCategory(allTransactionCategories, showHidden) {
     return false;
 }
 
-export function hasAvailableCategory(allTransactionCategories, showHidden) {
-    const result = {};
+export function hasAvailableCategory(allTransactionCategories: Record<number, TransactionCategoriesWithVisibleCount>, showHidden: boolean): Record<number, boolean> {
+    const result: Record<number, boolean> = {};
 
-    for (let type in allTransactionCategories) {
+    for (const type in allTransactionCategories) {
         if (!Object.prototype.hasOwnProperty.call(allTransactionCategories, type)) {
             continue;
         }
@@ -361,19 +392,19 @@ export function hasAvailableCategory(allTransactionCategories, showHidden) {
     return result;
 }
 
-export function selectSubCategories(filterCategoryIds, category, value) {
-    if (!category || !category.subCategories || !category.subCategories.length) {
+export function selectSubCategories(filterCategoryIds: Record<string, boolean>, category: TransactionCategory, value: boolean): void {
+    if (!category || !category.secondaryCategories || !category.secondaryCategories.length) {
         return;
     }
 
-    for (let i = 0; i < category.subCategories.length; i++) {
-        const subCategory = category.subCategories[i];
+    for (let i = 0; i < category.secondaryCategories.length; i++) {
+        const subCategory = category.secondaryCategories[i];
         filterCategoryIds[subCategory.id] = value;
     }
 }
 
-export function selectAll(filterCategoryIds, allTransactionCategoriesMap) {
-    for (let categoryId in filterCategoryIds) {
+export function selectAll(filterCategoryIds: Record<string, boolean>, allTransactionCategoriesMap: Record<string, TransactionCategory>): void {
+    for (const categoryId in filterCategoryIds) {
         if (!Object.prototype.hasOwnProperty.call(filterCategoryIds, categoryId)) {
             continue;
         }
@@ -386,8 +417,8 @@ export function selectAll(filterCategoryIds, allTransactionCategoriesMap) {
     }
 }
 
-export function selectNone(filterCategoryIds, allTransactionCategoriesMap) {
-    for (let categoryId in filterCategoryIds) {
+export function selectNone(filterCategoryIds: Record<string, boolean>, allTransactionCategoriesMap: Record<string, TransactionCategory>): void {
+    for (const categoryId in filterCategoryIds) {
         if (!Object.prototype.hasOwnProperty.call(filterCategoryIds, categoryId)) {
             continue;
         }
@@ -400,8 +431,8 @@ export function selectNone(filterCategoryIds, allTransactionCategoriesMap) {
     }
 }
 
-export function selectInvert(filterCategoryIds, allTransactionCategoriesMap) {
-    for (let categoryId in filterCategoryIds) {
+export function selectInvert(filterCategoryIds: Record<string, boolean>, allTransactionCategoriesMap: Record<string, TransactionCategory>): void {
+    for (const categoryId in filterCategoryIds) {
         if (!Object.prototype.hasOwnProperty.call(filterCategoryIds, categoryId)) {
             continue;
         }
@@ -414,13 +445,13 @@ export function selectInvert(filterCategoryIds, allTransactionCategoriesMap) {
     }
 }
 
-export function isCategoryOrSubCategoriesAllChecked(category, filterCategoryIds) {
-    if (!category.subCategories) {
+export function isCategoryOrSubCategoriesAllChecked(category: TransactionCategory, filterCategoryIds: Record<string, boolean>): boolean {
+    if (!category.secondaryCategories || category.secondaryCategories.length < 1) {
         return !filterCategoryIds[category.id];
     }
 
-    for (let i = 0; i < category.subCategories.length; i++) {
-        const subCategory = category.subCategories[i];
+    for (let i = 0; i < category.secondaryCategories.length; i++) {
+        const subCategory = category.secondaryCategories[i];
         if (filterCategoryIds[subCategory.id]) {
             return false;
         }
@@ -429,9 +460,13 @@ export function isCategoryOrSubCategoriesAllChecked(category, filterCategoryIds)
     return true;
 }
 
-export function isSubCategoriesAllChecked(category, filterCategoryIds) {
-    for (let i = 0; i < category.subCategories.length; i++) {
-        const subCategory = category.subCategories[i];
+export function isSubCategoriesAllChecked(category: TransactionCategory, filterCategoryIds: Record<string, boolean>): boolean {
+    if (!category.secondaryCategories || category.secondaryCategories.length < 1) {
+        return false;
+    }
+
+    for (let i = 0; i < category.secondaryCategories.length; i++) {
+        const subCategory = category.secondaryCategories[i];
         if (filterCategoryIds[subCategory.id]) {
             return false;
         }
@@ -440,15 +475,19 @@ export function isSubCategoriesAllChecked(category, filterCategoryIds) {
     return true;
 }
 
-export function isSubCategoriesHasButNotAllChecked(category, filterCategoryIds) {
+export function isSubCategoriesHasButNotAllChecked(category: TransactionCategory, filterCategoryIds: Record<string, boolean>): boolean {
     let checkedCount = 0;
 
-    for (let i = 0; i < category.subCategories.length; i++) {
-        const subCategory = category.subCategories[i];
+    if (!category.secondaryCategories || category.secondaryCategories.length < 1) {
+        return false;
+    }
+
+    for (let i = 0; i < category.secondaryCategories.length; i++) {
+        const subCategory = category.secondaryCategories[i];
         if (!filterCategoryIds[subCategory.id]) {
             checkedCount++;
         }
     }
 
-    return checkedCount > 0 && checkedCount < category.subCategories.length;
+    return checkedCount > 0 && checkedCount < category.secondaryCategories.length;
 }

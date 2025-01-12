@@ -434,7 +434,7 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useEnvironmentsStore } from '@/stores/environment.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.js';
-import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.js';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
@@ -463,7 +463,7 @@ import {
     getTransactionPrimaryCategoryName,
     getTransactionSecondaryCategoryName,
     getFirstAvailableCategoryId
-} from '@/lib/category.js';
+} from '@/lib/category.ts';
 import { setTransactionModelByTransaction } from '@/lib/transaction.js';
 import {
     isTransactionPicturesEnabled,

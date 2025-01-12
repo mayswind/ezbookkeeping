@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { useSettingsStore } from './setting.ts';
 import { useUserStore } from './user.ts';
 import { useAccountsStore } from './account.js';
-import { useTransactionCategoriesStore } from './transactionCategory.js';
+import { useTransactionCategoriesStore } from './transactionCategory.ts';
 import { useTransactionTagsStore } from './transactionTag.ts';
 import { useTransactionTemplatesStore } from './transactionTemplate.js';
 import { useTransactionsStore } from './transaction.js';

@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { useSettingsStore } from './setting.ts';
 import { useUserStore } from './user.ts';
 import { useAccountsStore } from './account.js';
-import { useTransactionCategoriesStore } from './transactionCategory.js';
+import { useTransactionCategoriesStore } from './transactionCategory.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { DateRangeScene, DateRange } from '@/core/datetime';
@@ -43,7 +43,7 @@ import {
 } from '@/lib/account.js';
 import {
     getFinalCategoryIdsByFilteredCategoryIds
-} from '@/lib/category.js';
+} from '@/lib/category.ts';
 import {
     sortStatisticsItems
 } from '@/lib/statistics.ts';

@@ -83,7 +83,7 @@
                 <template #default>
                     <div class="grid grid-cols-2">
                         <div class="list-item-subitem no-chevron">
-                            <a class="item-link" href="#" @click="category.showIconSelectionSheet = true">
+                            <a class="item-link" href="#" @click="showIconSelectionSheet = true">
                                 <div class="item-content">
                                     <div class="item-inner">
                                         <div class="item-header">
@@ -100,12 +100,12 @@
 
                             <icon-selection-sheet :all-icon-infos="allCategoryIcons"
                                                   :color="category.color"
-                                                  v-model:show="category.showIconSelectionSheet"
+                                                  v-model:show="showIconSelectionSheet"
                                                   v-model="category.icon"
                             ></icon-selection-sheet>
                         </div>
                         <div class="list-item-subitem no-chevron">
-                            <a class="item-link" href="#" @click="category.showColorSelectionSheet = true">
+                            <a class="item-link" href="#" @click="showColorSelectionSheet = true">
                                 <div class="item-content">
                                     <div class="item-inner">
                                         <div class="item-header">
@@ -121,7 +121,7 @@
                             </a>
 
                             <color-selection-sheet :all-color-infos="allCategoryColors"
-                                                   v-model:show="category.showColorSelectionSheet"
+                                                   v-model:show="showColorSelectionSheet"
                                                    v-model="category.color"
                             ></color-selection-sheet>
                         </div>
@@ -147,17 +147,19 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 import { CategoryType } from '@/core/category.ts';
 import { ALL_CATEGORY_ICONS } from '@/consts/icon.ts';
 import { ALL_CATEGORY_COLORS } from '@/consts/color.ts';
+import { TransactionCategory } from '@/models/transaction_category.ts';
+
 import { getNameByKeyValue } from '@/lib/common.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import {
     setCategoryModelByAnotherCategory,
     allVisiblePrimaryTransactionCategoriesByType
-} from '@/lib/category.js';
+} from '@/lib/category.ts';
 
 export default {
     props: [
@@ -165,19 +167,17 @@ export default {
         'f7router'
     ],
     data() {
-        const transactionCategoriesStore = useTransactionCategoriesStore();
         const query = this.f7route.query;
-        const newTransactionCategory = transactionCategoriesStore.generateNewTransactionCategoryModel(parseInt(query.type), query.parentId);
-        newTransactionCategory.showIconSelectionSheet = false;
-        newTransactionCategory.showColorSelectionSheet = false;
 
         return {
             editCategoryId: null,
             clientSessionId: '',
             loading: false,
             loadingError: null,
-            category: newTransactionCategory,
+            category: TransactionCategory.createNewCategory(parseInt(query.type), query.parentId),
             showPrimaryCategorySheet: false,
+            showIconSelectionSheet: false,
+            showColorSelectionSheet: false,
             submitting: false
         };
     },

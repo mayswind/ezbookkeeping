@@ -141,7 +141,7 @@
 <script>
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.ts';
-import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionsStore } from '@/stores/transaction.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 
@@ -158,7 +158,7 @@ import {
     isCategoryOrSubCategoriesAllChecked,
     isSubCategoriesAllChecked,
     isSubCategoriesHasButNotAllChecked
-} from '@/lib/category.js';
+} from '@/lib/category.ts';
 
 export default {
     props: [
@@ -357,11 +357,11 @@ export default {
         },
         getCategoryTypeName(categoryType) {
             switch (categoryType) {
-                case CategoryType.Income.toString():
+                case CategoryType.Income:
                     return this.$t('Income Categories');
-                case CategoryType.Expense.toString():
+                case CategoryType.Expense:
                     return this.$t('Expense Categories');
-                case CategoryType.Transfer.toString():
+                case CategoryType.Transfer:
                     return this.$t('Transfer Categories');
                 default:
                     return this.$t('Transaction Categories');

@@ -112,7 +112,7 @@
                         <span>{{ $t('None') }}</span>
                     </div>
                 </template>
-                <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                <tree-view-selection-sheet primary-key-field="id" primary-title-field="name"
                                            primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
                                            primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
@@ -143,7 +143,7 @@
                         <span>{{ $t('None') }}</span>
                     </div>
                 </template>
-                <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                <tree-view-selection-sheet primary-key-field="id" primary-title-field="name"
                                            primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
                                            primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
@@ -174,7 +174,7 @@
                         <span>{{ $t('None') }}</span>
                     </div>
                 </template>
-                <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                <tree-view-selection-sheet primary-key-field="id" primary-title-field="name"
                                            primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
                                            primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"

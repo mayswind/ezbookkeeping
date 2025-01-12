@@ -237,12 +237,12 @@ export function getDay(date: SupportedDate): number {
 
 export function getDayOfWeekName(date: SupportedDate): string {
     const dayOfWeek = moment(date).days();
-    return WeekDay.valueOf(dayOfWeek).name;
+    return (WeekDay.valueOf(dayOfWeek) as WeekDay).name;
 }
 
 export function getMonthName(date: SupportedDate): string {
     const month = moment(date).month();
-    return Month.valueOf(month + 1).name;
+    return (Month.valueOf(month + 1) as Month).name;
 }
 
 export function getAMOrPM(hour: number): string {

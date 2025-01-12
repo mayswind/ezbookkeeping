@@ -160,7 +160,7 @@ export class Month {
         return Month.allInstances;
     }
 
-    public static valueOf(month: number): Month {
+    public static valueOf(month: number): Month | undefined {
         return Month.allInstances[month - 1];
     }
 }
@@ -194,11 +194,11 @@ export class WeekDay implements TypeAndName {
         return WeekDay.allInstances;
     }
 
-    public static valueOf(dayOfWeek: number): WeekDay {
+    public static valueOf(dayOfWeek: number): WeekDay | undefined {
         return WeekDay.allInstances[dayOfWeek];
     }
 
-    public static parse(typeName: string): WeekDay {
+    public static parse(typeName: string): WeekDay | undefined {
         return WeekDay.allInstancesByName[typeName];
     }
 }
@@ -269,7 +269,7 @@ export class LongDateFormat implements DateFormat {
         return LongDateFormat.allInstancesByTypeName;
     }
 
-    public static valueOf(type: number): LongDateFormat {
+    public static valueOf(type: number): LongDateFormat | undefined {
         return LongDateFormat.allInstancesByType[type];
     }
 }
@@ -309,7 +309,7 @@ export class ShortDateFormat implements DateFormat {
         return ShortDateFormat.allInstancesByTypeName;
     }
 
-    public static valueOf(type: number): ShortDateFormat {
+    public static valueOf(type: number): ShortDateFormat | undefined {
         return ShortDateFormat.allInstancesByType[type];
     }
 }
@@ -360,7 +360,7 @@ export class LongTimeFormat implements TimeFormat {
         return LongTimeFormat.allInstancesByTypeName;
     }
 
-    public static valueOf(type: number): LongTimeFormat {
+    public static valueOf(type: number): LongTimeFormat | undefined {
         return LongTimeFormat.allInstancesByType[type];
     }
 }
@@ -404,7 +404,7 @@ export class ShortTimeFormat implements TimeFormat {
         return ShortTimeFormat.allInstancesByTypeName;
     }
 
-    public static valueOf(type: number): ShortTimeFormat {
+    public static valueOf(type: number): ShortTimeFormat | undefined {
         return ShortTimeFormat.allInstancesByType[type];
     }
 }
@@ -496,7 +496,7 @@ export class DateRange implements TypeAndName {
         return DateRange.allInstancesByTypeName;
     }
 
-    public static valueOf(type: number): DateRange {
+    public static valueOf(type: number): DateRange | undefined {
         return DateRange.allInstancesByType[type];
     }
 

@@ -56,11 +56,11 @@ export class DecimalSeparator implements TypeAndName, NumeralSymbolType {
         return DecimalSeparator.allInstances;
     }
 
-    public static valueOf(type: number): DecimalSeparator {
+    public static valueOf(type: number): DecimalSeparator | undefined {
         return DecimalSeparator.allInstancesByType[type];
     }
 
-    public static parse(typeName: string): DecimalSeparator {
+    public static parse(typeName: string): DecimalSeparator | undefined {
         return DecimalSeparator.allInstancesByTypeName[typeName];
     }
 }
@@ -96,11 +96,11 @@ export class DigitGroupingSymbol implements TypeAndName, NumeralSymbolType {
         return DigitGroupingSymbol.allInstances;
     }
 
-    public static valueOf(type: number): DigitGroupingSymbol {
+    public static valueOf(type: number): DigitGroupingSymbol | undefined {
         return DigitGroupingSymbol.allInstancesByType[type];
     }
 
-    public static parse(typeName: string): DigitGroupingSymbol {
+    public static parse(typeName: string): DigitGroupingSymbol | undefined {
         return DigitGroupingSymbol.allInstancesByTypeName[typeName];
     }
 }
@@ -136,11 +136,11 @@ export class DigitGroupingType implements TypeAndName {
         return DigitGroupingType.allInstances;
     }
 
-    public static valueOf(type: number): DigitGroupingType {
+    public static valueOf(type: number): DigitGroupingType | undefined {
         return DigitGroupingType.allInstancesByType[type];
     }
 
-    public static parse(typeName: string): DigitGroupingType {
+    public static parse(typeName: string): DigitGroupingType | undefined {
         return DigitGroupingType.allInstancesByTypeName[typeName];
     }
 }
@@ -173,7 +173,7 @@ export class AmountFilterType {
         return AmountFilterType.allInstances;
     }
 
-    public static valueOf(type: string): AmountFilterType {
+    public static valueOf(type: string): AmountFilterType | undefined {
         return AmountFilterType.allInstancesByType[type];
     }
 }

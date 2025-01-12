@@ -328,8 +328,8 @@ export function useI18n() {
         return ret;
     }
 
-    function getLocalizedNumeralSeparatorFormats<T extends NumeralSymbolType>(allSeparatorArray: T[], localeDefaultType: T, systemDefaultType: T, languageDefaultValue: number): LocalizedNumeralSymbolType[] {
-        let defaultSeparatorType: T = localeDefaultType;
+    function getLocalizedNumeralSeparatorFormats<T extends NumeralSymbolType>(allSeparatorArray: T[], localeDefaultType: T | undefined, systemDefaultType: T, languageDefaultValue: number): LocalizedNumeralSymbolType[] {
+        let defaultSeparatorType: T | undefined = localeDefaultType;
 
         if (!defaultSeparatorType) {
             defaultSeparatorType = systemDefaultType;
@@ -431,10 +431,10 @@ export function useI18n() {
 
     function getNumberFormatOptions(currencyCode?: string): NumberFormatOptions {
         return {
-            decimalSeparator: getCurrentDecimalSeparator(userStore.currentUserDecimalSeparator),
+            decimalSeparator: getCurrentDecimalSeparator(),
             decimalNumberCount: getCurrencyFraction(currencyCode),
-            digitGroupingSymbol: getCurrentDigitGroupingSymbol(userStore.currentUserDigitGroupingSymbol),
-            digitGrouping: getCurrentDigitGroupingType(userStore.currentUserDigitGrouping),
+            digitGroupingSymbol: getCurrentDigitGroupingSymbol(),
+            digitGrouping: getCurrentDigitGroupingType(),
         };
     }
 
@@ -803,8 +803,8 @@ export function useI18n() {
         return joinMultiText(finalWeekdayNames);
     }
 
-    function getCurrentDecimalSeparator(decimalSeparator: number): string {
-        let decimalSeparatorType = DecimalSeparator.valueOf(decimalSeparator);
+    function getCurrentDecimalSeparator(): string {
+        let decimalSeparatorType = DecimalSeparator.valueOf(userStore.currentUserDecimalSeparator);
 
         if (!decimalSeparatorType) {
             const defaultDecimalSeparatorTypeName = t('default.decimalSeparator');
@@ -818,8 +818,8 @@ export function useI18n() {
         return decimalSeparatorType.symbol;
     }
 
-    function getCurrentDigitGroupingSymbol(digitGroupingSymbol: number): string {
-        let digitGroupingSymbolType = DigitGroupingSymbol.valueOf(digitGroupingSymbol);
+    function getCurrentDigitGroupingSymbol(): string {
+        let digitGroupingSymbolType = DigitGroupingSymbol.valueOf(userStore.currentUserDigitGroupingSymbol);
 
         if (!digitGroupingSymbolType) {
             const defaultDigitGroupingSymbolTypeName = t('default.digitGroupingSymbol');
@@ -833,8 +833,8 @@ export function useI18n() {
         return digitGroupingSymbolType.symbol;
     }
 
-    function getCurrentDigitGroupingType(digitGrouping: number): number {
-        let digitGroupingType = DigitGroupingType.valueOf(digitGrouping);
+    function getCurrentDigitGroupingType(): number {
+        let digitGroupingType = DigitGroupingType.valueOf(userStore.currentUserDigitGrouping);
 
         if (!digitGroupingType) {
             const defaultDigitGroupingTypeName = t('default.digitGrouping');
@@ -897,7 +897,7 @@ export function useI18n() {
         return parseAmount(value, numberFormatOptions);
     }
 
-    function getFormattedAmount(value: number | string, currencyCode: string): string {
+    function getFormattedAmount(value: number | string, currencyCode?: string): string {
         const numberFormatOptions = getNumberFormatOptions(currencyCode);
         return formatAmount(value, numberFormatOptions);
     }
@@ -1007,7 +1007,7 @@ export function useI18n() {
         let defaultFirstDayOfWeek = WeekDay.DefaultFirstDay.type;
 
         if (WeekDay.parse(defaultFirstDayOfWeekName)) {
-            defaultFirstDayOfWeek = WeekDay.parse(defaultFirstDayOfWeekName).type;
+            defaultFirstDayOfWeek = (WeekDay.parse(defaultFirstDayOfWeekName) as WeekDay).type;
         }
 
         return {

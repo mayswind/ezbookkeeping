@@ -47,7 +47,7 @@ export class PresetAmountColor implements TypeAndName {
         return PresetAmountColor.allInstances;
     }
 
-    public static valueOf(type: number): PresetAmountColor {
+    public static valueOf(type: number): PresetAmountColor | undefined {
         return PresetAmountColor.allInstancesByType[type];
     }
 }

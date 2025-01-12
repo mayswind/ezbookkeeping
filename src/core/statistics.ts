@@ -139,7 +139,7 @@ export class ChartDataType implements TypeAndName {
         return ChartDataType.allInstancesByTypeName;
     }
 
-    public static valueOf(type: number): ChartDataType {
+    public static valueOf(type: number): ChartDataType | undefined {
         return ChartDataType.allInstancesByType[type];
     }
 
@@ -176,7 +176,7 @@ export class ChartSortingType implements TypeAndName {
         return ChartSortingType.allInstances;
     }
 
-    public static valueOf(type: number): ChartSortingType {
+    public static valueOf(type: number): ChartSortingType | undefined {
         return ChartSortingType.allInstancesByType[type];
     }
 }
@@ -206,7 +206,7 @@ export class ChartDateAggregationType implements TypeAndName {
         return ChartDateAggregationType.allInstances;
     }
 
-    public static valueOf(type: number): ChartDateAggregationType {
+    public static valueOf(type: number): ChartDateAggregationType | undefined {
         return ChartDateAggregationType.allInstancesByType[type];
     }
 }

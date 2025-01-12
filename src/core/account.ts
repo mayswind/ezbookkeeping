@@ -70,7 +70,7 @@ export class AccountCategory implements TypeAndName {
         return AccountCategory.allInstances;
     }
 
-    public static valueOf(type: number): AccountCategory {
+    public static valueOf(type: number): AccountCategory | undefined {
         return AccountCategory.allInstancesByType[type];
     }
 }

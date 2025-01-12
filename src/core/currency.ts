@@ -64,11 +64,11 @@ export class CurrencyDisplayType implements TypeAndName {
         return CurrencyDisplayType.allInstances;
     }
 
-    public static valueOf(type: number): CurrencyDisplayType {
+    public static valueOf(type: number): CurrencyDisplayType | undefined {
         return CurrencyDisplayType.allInstancesByType[type];
     }
 
-    public static parse(typeName: string): CurrencyDisplayType {
+    public static parse(typeName: string): CurrencyDisplayType | undefined {
         return CurrencyDisplayType.allInstancesByTypeName[typeName];
     }
 }

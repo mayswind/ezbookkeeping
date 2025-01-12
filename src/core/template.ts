@@ -30,7 +30,7 @@ export class TemplateType implements TypeAndName {
         return TemplateType.allInstancesByTypeName;
     }
 
-    public static valueOf(type: number): TemplateType {
+    public static valueOf(type: number): TemplateType | undefined {
         return TemplateType.allInstancesByType[type];
     }
 }
@@ -66,7 +66,7 @@ export class ScheduledTemplateFrequencyType implements TypeAndName {
         return ScheduledTemplateFrequencyType.allInstancesByTypeName;
     }
 
-    public static valueOf(type: number): ScheduledTemplateFrequencyType {
+    public static valueOf(type: number): ScheduledTemplateFrequencyType | undefined {
         return ScheduledTemplateFrequencyType.allInstancesByType[type];
     }
 }

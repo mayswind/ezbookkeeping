@@ -53,8 +53,7 @@ import {
 
 import {
     getCurrencyFraction,
-    appendCurrencySymbol,
-    getAmountPrependAndAppendCurrencySymbol
+    appendCurrencySymbol
 } from '@/lib/currency.ts';
 
 import {
@@ -981,13 +980,6 @@ function getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRat
     return getAdaptiveDisplayAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, numberFormatOptions);
 }
 
-function getAmountPrependAndAppendText(currencyCode, userStore, settingsStore, isPlural, translateFn) {
-    const currencyDisplayType = getCurrentCurrencyDisplayType(translateFn, userStore);
-    const currencyUnit = getCurrencyUnitName(currencyCode, isPlural, translateFn);
-    const currencyName = getCurrencyName(currencyCode, translateFn);
-    return getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyUnit, currencyName, isPlural);
-}
-
 function getAllExpenseIncomeAmountColors(translateFn, expenseOrIncome) {
     const ret = [];
     let defaultAmountName = '';
@@ -1548,7 +1540,6 @@ export function i18nFunctions(i18nGlobal) {
         formatAmountWithCurrency: (settingsStore, userStore, value, currencyCode) => getFormattedAmountWithCurrency(value, currencyCode, i18nGlobal.t, userStore, settingsStore),
         formatExchangeRateAmount: (userStore, value) => getFormattedExchangeRateAmount(value, i18nGlobal.t, userStore),
         getAdaptiveAmountRate: (userStore, amount1, amount2, fromExchangeRate, toExchangeRate) => getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, i18nGlobal.t, userStore),
-        getAmountPrependAndAppendText: (settingsStore, userStore, currencyCode, isPlural) => getAmountPrependAndAppendText(currencyCode, userStore, settingsStore, isPlural, i18nGlobal.t),
         getAllExpenseAmountColors: () => getAllExpenseIncomeAmountColors(i18nGlobal.t, 1),
         getAllIncomeAmountColors: () => getAllExpenseIncomeAmountColors(i18nGlobal.t, 2),
         getAllAccountCategories: () => getAllAccountCategories(i18nGlobal.t),

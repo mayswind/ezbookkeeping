@@ -1,4 +1,3 @@
-import { useI18n as useVueI18n } from 'vue-i18n';
 import moment from 'moment-timezone';
 
 import { DEFAULT_LANGUAGE, allLanguages } from '@/locales/index.ts';
@@ -11,8 +10,7 @@ import { PresetAmountColor } from '@/core/color.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionEditScopeType, TransactionTagFilterType } from '@/core/transaction.ts';
-import { ScheduledTemplateFrequencyType } from '@/core/template.ts';
-import { CategoricalChartType, TrendChartType, ChartDataType, ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
+import { CategoricalChartType, TrendChartType, ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
 
 import { UTC_TIMEZONE, ALL_TIMEZONES } from '@/consts/timezone.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
@@ -324,14 +322,6 @@ function getAllLongTimeFormats(translateFn) {
 function getAllShortTimeFormats(translateFn) {
     const defaultShortTimeFormatTypeName = translateFn('default.shortTimeFormat');
     return getDateTimeFormats(translateFn, ShortTimeFormat.values(), ShortTimeFormat.values(), 'format.shortTime', defaultShortTimeFormatTypeName, ShortTimeFormat.Default);
-}
-
-function getMonthShortName(monthName, translateFn) {
-    return translateFn(`datetime.${monthName}.short`);
-}
-
-function getMonthLongName(monthName, translateFn) {
-    return translateFn(`datetime.${monthName}.long`);
 }
 
 function getMonthdayOrdinal(monthDay, translateFn) {
@@ -1060,10 +1050,6 @@ function getAllTrendChartTypes(translateFn) {
     return getLocalizedDisplayNameAndType(TrendChartType.values(), translateFn);
 }
 
-function getAllStatisticsChartDataTypes(translateFn, analysisType) {
-    return getLocalizedDisplayNameAndType(ChartDataType.values(analysisType), translateFn);
-}
-
 function getAllStatisticsSortingTypes(translateFn) {
     return getLocalizedDisplayNameAndType(ChartSortingType.values(), translateFn);
 }
@@ -1078,10 +1064,6 @@ function getAllTransactionEditScopeTypes(translateFn) {
 
 function getAllTransactionTagFilterTypes(translateFn) {
     return getLocalizedDisplayNameAndType(TransactionTagFilterType.values(), translateFn);
-}
-
-function getAllTransactionScheduledFrequencyTypes(translateFn) {
-    return getLocalizedDisplayNameAndType(ScheduledTemplateFrequencyType.values(), translateFn);
 }
 
 function getAllTransactionDefaultCategories(categoryType, locale, translateFn) {
@@ -1525,8 +1507,6 @@ export function i18nFunctions(i18nGlobal) {
         getAllShortDateFormats: () => getAllShortDateFormats(i18nGlobal.t),
         getAllLongTimeFormats: () => getAllLongTimeFormats(i18nGlobal.t),
         getAllShortTimeFormats: () => getAllShortTimeFormats(i18nGlobal.t),
-        getMonthShortName: (month) => getMonthShortName(month, i18nGlobal.t),
-        getMonthLongName: (month) => getMonthLongName(month, i18nGlobal.t),
         getMonthdayOrdinal: (monthDay) => getMonthdayOrdinal(monthDay, i18nGlobal.t),
         getMonthdayShortName: (monthDay) => getMonthdayShortName(monthDay, i18nGlobal.t),
         getWeekdayShortName: (weekDay) => getWeekdayShortName(weekDay, i18nGlobal.t),
@@ -1575,12 +1555,10 @@ export function i18nFunctions(i18nGlobal) {
         getAllAccountTypes: () => getAllAccountTypes(i18nGlobal.t),
         getAllCategoricalChartTypes: () => getAllCategoricalChartTypes(i18nGlobal.t),
         getAllTrendChartTypes: () => getAllTrendChartTypes(i18nGlobal.t),
-        getAllStatisticsChartDataTypes: (analysisType) => getAllStatisticsChartDataTypes(i18nGlobal.t, analysisType),
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),
         getAllStatisticsDateAggregationTypes: () => getAllStatisticsDateAggregationTypes(i18nGlobal.t),
         getAllTransactionEditScopeTypes: () => getAllTransactionEditScopeTypes(i18nGlobal.t),
         getAllTransactionTagFilterTypes: () => getAllTransactionTagFilterTypes(i18nGlobal.t),
-        getAllTransactionScheduledFrequencyTypes: () => getAllTransactionScheduledFrequencyTypes(i18nGlobal.t),
         getAllTransactionDefaultCategories: (categoryType, locale) => getAllTransactionDefaultCategories(categoryType, locale, i18nGlobal.t),
         getAllDisplayExchangeRates: (settingsStore, exchangeRatesData) => getAllDisplayExchangeRates(settingsStore, exchangeRatesData, i18nGlobal.t),
         getAllSupportedImportFileTypes: () => getAllSupportedImportFileTypes(i18nGlobal, i18nGlobal.t),
@@ -1588,16 +1566,8 @@ export function i18nFunctions(i18nGlobal) {
         getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t),
         getServerTipContent: (tipConfig) => getServerTipContent(tipConfig, i18nGlobal),
         joinMultiText: (textArray) => joinMultiText(textArray, i18nGlobal.t),
-        tt: (...args) => i18nGlobal.t(...args),
-        ti: (text, isTranslate) => translateIf(text, isTranslate, i18nGlobal.t),
-        te: (message) => translateError(message, i18nGlobal.t),
         setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),
         setTimeZone: (timezone) => setTimeZone(timezone),
         initLocale: (lastUserLanguage, timezone) => initLocale(i18nGlobal, lastUserLanguage, timezone)
     };
-}
-
-export function useI18n() {
-    const i18nGlobal = useVueI18n();
-    return i18nFunctions(i18nGlobal);
 }

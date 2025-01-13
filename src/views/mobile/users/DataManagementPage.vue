@@ -1,6 +1,6 @@
 <template>
     <f7-page @page:afterin="onPageAfterIn">
-        <f7-navbar :title="$t('Data Management')" :back-link="$t('Back')"></f7-navbar>
+        <f7-navbar :title="tt('Data Management')" :back-link="tt('Back')"></f7-navbar>
 
         <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
             <f7-list-item title="Transactions" after="Count"></f7-list-item>
@@ -13,20 +13,20 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" v-else-if="!loading">
-            <f7-list-item :title="$t('Transactions')" :after="displayDataStatistics.totalTransactionCount"></f7-list-item>
-            <f7-list-item :title="$t('Accounts')" :after="displayDataStatistics.totalAccountCount"></f7-list-item>
-            <f7-list-item :title="$t('Transaction Categories')" :after="displayDataStatistics.totalTransactionCategoryCount"></f7-list-item>
-            <f7-list-item :title="$t('Transaction Tags')" :after="displayDataStatistics.totalTransactionTagCount"></f7-list-item>
-            <f7-list-item :title="$t('Transaction Pictures')" :after="displayDataStatistics.totalTransactionPictureCount"></f7-list-item>
-            <f7-list-item :title="$t('Transaction Templates')" :after="displayDataStatistics.totalTransactionTemplateCount"></f7-list-item>
-            <f7-list-item :title="$t('Scheduled Transactions')" :after="displayDataStatistics.totalScheduledTransactionCount"></f7-list-item>
+            <f7-list-item :title="tt('Transactions')" :after="displayDataStatistics ? displayDataStatistics.totalTransactionCount : '-'"></f7-list-item>
+            <f7-list-item :title="tt('Accounts')" :after="displayDataStatistics ? displayDataStatistics.totalAccountCount : '-'"></f7-list-item>
+            <f7-list-item :title="tt('Transaction Categories')" :after="displayDataStatistics ? displayDataStatistics.totalTransactionCategoryCount : '-'"></f7-list-item>
+            <f7-list-item :title="tt('Transaction Tags')" :after="displayDataStatistics ? displayDataStatistics.totalTransactionTagCount : '-'"></f7-list-item>
+            <f7-list-item :title="tt('Transaction Pictures')" :after="displayDataStatistics ? displayDataStatistics.totalTransactionPictureCount : '-'"></f7-list-item>
+            <f7-list-item :title="tt('Transaction Templates')" :after="displayDataStatistics ? displayDataStatistics.totalTransactionTemplateCount : '-'"></f7-list-item>
+            <f7-list-item :title="tt('Scheduled Transactions')" :after="displayDataStatistics ? displayDataStatistics.totalScheduledTransactionCount : '-'"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" :class="{ 'disabled': loading }">
             <f7-list-button :class="{ 'disabled': !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0' }"
-                            v-if="isDataExportingEnabled"
-                            @click="exportedData = null; showExportDataSheet = true">{{ $t('Export Data') }}</f7-list-button>
-            <f7-list-button color="red" @click="clearData(null)">{{ $t('Clear User Data') }}</f7-list-button>
+                            v-if="isDataExportingEnabled()"
+                            @click="exportedData = null; showExportDataSheet = true">{{ tt('Export Data') }}</f7-list-button>
+            <f7-list-button color="red" @click="clearData(null)">{{ tt('Clear User Data') }}</f7-list-button>
         </f7-list>
 
         <f7-sheet swipe-handler=".swipe-handler" style="height:auto"
@@ -36,33 +36,33 @@
             <div class="swipe-handler" style="z-index: 10"></div>
             <f7-page-content class="margin-top no-padding-top">
                 <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div class="ebk-sheet-title"><b>{{ $t('Are you sure you want to export all transaction data to file?') }}</b></div>
+                    <div class="ebk-sheet-title"><b>{{ tt('Are you sure you want to export all transaction data to file?') }}</b></div>
                 </div>
                 <div class="padding-bottom padding-horizontal">
                     <f7-list class="export-file-type-list no-margin" dividers>
                         <f7-list-item radio radio-icon="start" :class="{ 'disabled': exportingData || exportedData }"
-                                      :title="$t('CSV (Comma-separated values) File')"
+                                      :title="tt('CSV (Comma-separated values) File')"
                                       :checked="exportFileType === 'csv'" @change="exportFileType = 'csv'">
                         </f7-list-item>
                         <f7-list-item radio radio-icon="start" :class="{ 'disabled': exportingData || exportedData }"
-                                      :title="$t('TSV (Tab-separated values) File')"
+                                      :title="tt('TSV (Tab-separated values) File')"
                                       :checked="exportFileType === 'tsv'" @change="exportFileType = 'tsv'">
                         </f7-list-item>
                     </f7-list>
                 </div>
                 <div class="padding-horizontal padding-bottom">
-                    <p class="no-margin-top margin-bottom-half">{{ $t('It may take a long time, please wait for a few minutes.') }}</p>
-                    <f7-button large fill :class="{ 'disabled': exportingData }" :text="$t('Continue')" @click="exportData" v-if="!exportedData"></f7-button>
-                    <f7-button large fill external :text="$t('Save Data')" :download="exportFileName" :href="exportedData" target="_blank" v-if="exportedData"></f7-button>
+                    <p class="no-margin-top margin-bottom-half">{{ tt('It may take a long time, please wait for a few minutes.') }}</p>
+                    <f7-button large fill :class="{ 'disabled': exportingData }" :text="tt('Continue')" @click="exportData" v-if="!exportedData"></f7-button>
+                    <f7-button large fill external :text="tt('Save Data')" :download="exportFileName" :href="exportedData" target="_blank" v-if="exportedData"></f7-button>
                     <div class="margin-top text-align-center">
-                        <f7-link :class="{ 'disabled': exportingData }" @click="showExportDataSheet = false" :text="$t('Cancel')"></f7-link>
+                        <f7-link :class="{ 'disabled': exportingData }" @click="showExportDataSheet = false" :text="tt('Cancel')"></f7-link>
                     </div>
                 </div>
             </f7-page-content>
         </f7-sheet>
 
-        <password-input-sheet :title="$t('Are you sure you want to clear all data?')"
-                              :hint="$t('You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.')"
+        <password-input-sheet :title="tt('Are you sure you want to clear all data?')"
+                              :hint="tt('You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.')"
                               :confirm-disabled="clearingData"
                               :cancel-disabled="clearingData"
                               color="red"
@@ -73,152 +73,113 @@
     </f7-page>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import type { Router } from 'framework7/types';
+
+import { useI18n } from '@/locales/helpers.ts';
+import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
+import { useDataManagementPageBase } from '@/views/base/users/DataManagementPageBase.ts';
+
 import { useRootStore } from '@/stores/index.js';
-import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 import { isDataExportingEnabled } from '@/lib/server_settings.ts';
 
-export default {
-    props: [
-        'f7router'
-    ],
-    data() {
-        return {
-            loading: true,
-            loadingError: null,
-            dataStatistics: null,
-            exportFileType: 'csv',
-            exportingData: false,
-            exportedData: null,
-            currentPasswordForClearData: '',
-            clearingData: false,
-            showExportDataSheet: false,
-            showInputPasswordSheetForClearData: false,
-        };
-    },
-    computed: {
-        ...mapStores(useRootStore, useSettingsStore, useUserStore),
-        displayDataStatistics() {
-            const self = this;
+const { tt } = useI18n();
+const { showToast, routeBackOnError } = useI18nUIComponents();
+const { dataStatistics, displayDataStatistics, getExportFileName } = useDataManagementPageBase();
 
-            if (!self.dataStatistics) {
-                return null;
-            }
+const rootStore = useRootStore();
+const userStore = useUserStore();
 
-            return {
-                totalTransactionCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionCount),
-                totalAccountCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalAccountCount),
-                totalTransactionCategoryCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionCategoryCount),
-                totalTransactionTagCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionTagCount),
-                totalTransactionPictureCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionPictureCount),
-                totalTransactionTemplateCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionTemplateCount),
-                totalScheduledTransactionCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalScheduledTransactionCount)
-            };
-        },
-        isDataExportingEnabled() {
-            return isDataExportingEnabled();
-        },
-        exportFileName() {
-            const nickname = this.userStore.currentUserNickname;
+const props = defineProps<{
+    f7router: Router.Router;
+}>();
 
-            if (nickname) {
-                return this.$t('dataExport.exportFilename', {
-                    nickname: nickname
-                }) + '.' + this.exportFileType;
-            }
+const loading = ref<boolean>(true);
+const loadingError = ref<unknown | null>(null);
+const exportFileType = ref<string>('csv');
+const exportingData = ref<boolean>(false);
+const exportedData = ref<string | null>(null);
+const currentPasswordForClearData = ref<string>('');
+const clearingData = ref<boolean>(false);
+const showExportDataSheet = ref<boolean>(false);
+const showInputPasswordSheetForClearData = ref<boolean>(false);
 
-            return this.$t('dataExport.defaultExportFilename') + '.' + this.exportFileType;
-        },
-    },
-    created() {
-        const self = this;
+const exportFileName = computed(() => getExportFileName(exportFileType.value));
 
-        self.loading = true;
+function reloadUserDataStatistics(): void {
+    loading.value = true;
 
-        self.userStore.getUserDataStatistics().then(dataStatistics => {
-            self.dataStatistics = dataStatistics;
-            self.loading = false;
-        }).catch(error => {
-            if (error.processed) {
-                self.loading = false;
-            } else {
-                self.loadingError = error;
-                self.$toast(error.message || error);
-            }
-        });
-    },
-    methods: {
-        onPageAfterIn() {
-            this.$routeBackOnError(this.f7router, 'loadingError');
-        },
-        exportData() {
-            const self = this;
+    userStore.getUserDataStatistics().then(dataStatisticsResponse => {
+        dataStatistics.value = dataStatisticsResponse;
+        loading.value = false;
+    }).catch(error => {
+        if (error.processed) {
+            loading.value = false;
+        } else {
+            loadingError.value = error;
+            showToast(error.message || error);
+        }
+    });
+}
 
-            self.$showLoading();
-            self.exportingData = true;
+function exportData(): void {
+    showLoading();
+    exportingData.value = true;
 
-            self.userStore.getExportedUserData(self.exportFileType).then(data => {
-                self.exportedData = URL.createObjectURL(data);
-                self.exportingData = false;
-                self.$hideLoading();
-            }).catch(error => {
-                self.exportedData = null;
-                self.exportingData = false;
-                self.$hideLoading();
+    userStore.getExportedUserData(exportFileType.value).then(data => {
+        exportedData.value = URL.createObjectURL(data);
+        exportingData.value = false;
+        hideLoading();
+    }).catch(error => {
+        exportedData.value = null;
+        exportingData.value = false;
+        hideLoading();
 
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        clearData(password) {
-            const self = this;
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
 
-            if (!password) {
-                self.currentPasswordForClearData = '';
-                self.showInputPasswordSheetForClearData = true;
-                return;
-            }
-
-            self.clearingData = true;
-            self.$showLoading(() => self.clearingData);
-
-            self.rootStore.clearUserData({
-                password: password
-            }).then(() => {
-                self.clearingData = false;
-                self.$hideLoading();
-
-                self.showInputPasswordSheetForClearData = false;
-                self.$toast('All user data has been cleared');
-
-                self.loading = true;
-
-                self.userStore.getUserDataStatistics().then(dataStatistics => {
-                    self.dataStatistics = dataStatistics;
-                    self.loading = false;
-                }).catch(error => {
-                    if (error.processed) {
-                        self.loading = false;
-                    } else {
-                        self.loadingError = error;
-                        self.$toast(error.message || error);
-                    }
-                });
-            }).catch(error => {
-                self.clearingData = false;
-                self.$hideLoading();
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
+function clearData(password: string | null): void {
+    if (!password) {
+        currentPasswordForClearData.value = '';
+        showInputPasswordSheetForClearData.value = true;
+        return;
     }
-};
+
+    clearingData.value = true;
+    showLoading(() => clearingData.value);
+
+    rootStore.clearUserData({
+        password: password
+    }).then(() => {
+        clearingData.value = false;
+        currentPasswordForClearData.value = '';
+        hideLoading();
+
+        showInputPasswordSheetForClearData.value = false;
+        showToast('All user data has been cleared');
+
+        reloadUserDataStatistics();
+    }).catch(error => {
+        clearingData.value = false;
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function onPageAfterIn(): void {
+    routeBackOnError(props.f7router, loadingError);
+}
+
+reloadUserDataStatistics();
 </script>
 
 <style>

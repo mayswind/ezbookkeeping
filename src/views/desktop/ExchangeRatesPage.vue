@@ -196,9 +196,9 @@ function reload(force: boolean): void {
             }
 
             if (force) {
-                snackbar.value?.showMessage(tt('Exchange rates data has been updated'));
+                snackbar.value?.showMessage('Exchange rates data has been updated');
             } else if (!foundDefaultCurrency) {
-                snackbar.value?.showMessage(tt('There is no exchange rates data for your default currency'));
+                snackbar.value?.showMessage('There is no exchange rates data for your default currency');
             }
         }
     }).catch(error => {

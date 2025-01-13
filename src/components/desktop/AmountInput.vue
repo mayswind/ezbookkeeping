@@ -140,6 +140,11 @@ function onKeyUpDown(e: KeyboardEvent): void {
         return;
     }
 
+    if (props.readonly || props.disabled) {
+        e.preventDefault();
+        return;
+    }
+
     const digitGroupingSymbol = getCurrentDigitGroupingSymbol();
     const decimalSeparator = getCurrentDecimalSeparator();
 
@@ -235,7 +240,7 @@ function onKeyUpDown(e: KeyboardEvent): void {
 }
 
 function onPaste(e: ClipboardEvent): void {
-    if (!e.clipboardData) {
+    if (!e.clipboardData || props.readonly || props.disabled) {
         e.preventDefault();
         return;
     }

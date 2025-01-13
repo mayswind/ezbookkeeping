@@ -63,7 +63,7 @@
                 <f7-toggle :checked="isEnableAnimate" @toggle:change="isEnableAnimate = $event"></f7-toggle>
             </f7-list-item>
 
-            <f7-list-item :title="tt('Switch to Desktop Version')" @click="switchToDesktopVersion"></f7-list-item>
+            <f7-list-item link="#" no-chevron :title="tt('Switch to Desktop Version')" @click="switchToDesktopVersion"></f7-list-item>
 
             <f7-list-item :title="tt('About')" link="/about" :after="version"></f7-list-item>
         </f7-list>

@@ -7,14 +7,14 @@ import { TransactionEditScopeType } from '@/core/transaction.ts';
 import type { TransactionCategoryCreateBatchRequest } from './transaction_category.ts';
 
 export class User {
-    username: string = '';
-    password: string = '';
-    confirmPassword: string = '';
-    email: string = '';
-    nickname: string = '';
-    language: string;
-    defaultCurrency: string;
-    firstDayOfWeek: number;
+    public username: string = '';
+    public password: string = '';
+    public confirmPassword: string = '';
+    public email: string = '';
+    public nickname: string = '';
+    public language: string;
+    public defaultCurrency: string;
+    public firstDayOfWeek: number;
 
     private constructor(language: string, defaultCurrency: string, firstDayOfWeek: number) {
         this.language = language;

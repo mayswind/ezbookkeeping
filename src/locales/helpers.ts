@@ -77,6 +77,7 @@ import { KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS } 
 import type { LatestExchangeRateResponse, LocalizedLatestExchangeRate } from '@/models/exchange_rate.ts';
 
 import {
+    isDefined,
     isObject,
     isString,
     isNumber,
@@ -478,8 +479,12 @@ export function useI18n() {
     }
 
     // public functions
-    function translateIf(text: string, isTranslate: boolean): string {
-        if (isTranslate) {
+    function translateIf(text: string | undefined, isTranslate: boolean): string | undefined {
+        if (!isDefined(text)) {
+            return undefined;
+        }
+
+        if (text && isTranslate) {
             return t(text);
         }
 

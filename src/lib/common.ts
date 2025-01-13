@@ -530,7 +530,7 @@ export function selectInvert(filterItemIds: Record<string, boolean>, allItemsMap
     }
 }
 
-export function isPrimaryItemHasSecondaryValue(primaryItem: Record<string, Record<string, unknown>[]>, primarySubItemsField: string, secondaryValueField: string, secondaryHiddenField: string, secondaryValue: unknown): boolean {
+export function isPrimaryItemHasSecondaryValue(primaryItem: Record<string, Record<string, unknown>[]>, primarySubItemsField: string, secondaryValueField: string | undefined, secondaryHiddenField: string | undefined, secondaryValue: unknown): boolean {
     for (let i = 0; i < primaryItem[primarySubItemsField].length; i++) {
         const secondaryItem = primaryItem[primarySubItemsField][i];
 
@@ -548,7 +548,7 @@ export function isPrimaryItemHasSecondaryValue(primaryItem: Record<string, Recor
     return false;
 }
 
-export function getPrimaryValueBySecondaryValue<T>(items: Record<string, Record<string, T>[]>[] | Record<string, Record<string, Record<string, T>[]>>, primarySubItemsField: string, primaryValueField: string, primaryHiddenField: string, secondaryValueField: string, secondaryHiddenField: string, secondaryValue: T): Record<string, T>[] | Record<string, Record<string, T>[]> | null {
+export function getPrimaryValueBySecondaryValue<T>(items: Record<string, Record<string, T>[]>[] | Record<string, Record<string, Record<string, T>[]>>, primarySubItemsField: string | undefined, primaryValueField: string | undefined, primaryHiddenField: string | undefined, secondaryValueField: string | undefined, secondaryHiddenField: string | undefined, secondaryValue: T): Record<string, T>[] | Record<string, Record<string, T>[]> | null {
     if (primarySubItemsField) {
         if (isArray(items)) {
             const arr = items as Record<string, Record<string, T>[]>[];

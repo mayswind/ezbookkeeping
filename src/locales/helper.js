@@ -1107,49 +1107,6 @@ function getAllTransactionDefaultCategories(categoryType, locale, translateFn) {
     return allCategories;
 }
 
-function getAllDisplayExchangeRates(settingsStore, exchangeRatesData, translateFn) {
-    if (!exchangeRatesData || !exchangeRatesData.exchangeRates) {
-        return [];
-    }
-
-    const availableExchangeRates = [];
-
-    for (let i = 0; i < exchangeRatesData.exchangeRates.length; i++) {
-        const exchangeRate = exchangeRatesData.exchangeRates[i];
-
-        availableExchangeRates.push({
-            currencyCode: exchangeRate.currency,
-            currencyDisplayName: getCurrencyName(exchangeRate.currency, translateFn),
-            rate: exchangeRate.rate
-        });
-    }
-
-    if (settingsStore.appSettings.currencySortByInExchangeRatesPage === CurrencySortingType.Name.type) {
-        availableExchangeRates.sort(function(c1, c2) {
-            return c1.currencyDisplayName.localeCompare(c2.currencyDisplayName);
-        });
-    } else if (settingsStore.appSettings.currencySortByInExchangeRatesPage === CurrencySortingType.CurrencyCode.type) {
-        availableExchangeRates.sort(function(c1, c2) {
-            return c1.currencyCode.localeCompare(c2.currencyCode);
-        });
-    } else if (settingsStore.appSettings.currencySortByInExchangeRatesPage === CurrencySortingType.ExchangeRate.type) {
-        availableExchangeRates.sort(function(c1, c2) {
-            const rate1 = parseFloat(c1.rate);
-            const rate2 = parseFloat(c2.rate);
-
-            if (rate1 > rate2) {
-                return 1;
-            } else if (rate1 < rate2) {
-                return -1;
-            } else {
-                return 0;
-            }
-        });
-    }
-
-    return availableExchangeRates;
-}
-
 function getAllSupportedImportFileTypes(i18nGlobal, translateFn) {
     const allSupportedImportFileTypes = [];
 
@@ -1534,7 +1491,6 @@ export function i18nFunctions(i18nGlobal) {
         getAllTransactionEditScopeTypes: () => getAllTransactionEditScopeTypes(i18nGlobal.t),
         getAllTransactionTagFilterTypes: () => getAllTransactionTagFilterTypes(i18nGlobal.t),
         getAllTransactionDefaultCategories: (categoryType, locale) => getAllTransactionDefaultCategories(categoryType, locale, i18nGlobal.t),
-        getAllDisplayExchangeRates: (settingsStore, exchangeRatesData) => getAllDisplayExchangeRates(settingsStore, exchangeRatesData, i18nGlobal.t),
         getAllSupportedImportFileTypes: () => getAllSupportedImportFileTypes(i18nGlobal, i18nGlobal.t),
         getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t),
         getServerTipContent: (tipConfig) => getServerTipContent(tipConfig, i18nGlobal),

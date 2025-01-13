@@ -104,6 +104,7 @@ const transactionTagsStore = useTransactionTagsStore();
 
 const selectedItemIds = ref<string[]>(copyArrayTo(props.modelValue, []));
 const newTag = ref<TransactionTag | null>(null);
+const heightClass = ref<string>(getHeightClass());
 
 const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
 
@@ -119,15 +120,15 @@ const noAvailableTag = computed<boolean>(() => {
     return true;
 });
 
-const heightClass = computed<string>(() => {
-    if (transactionTagsStore.allTransactionTags && transactionTagsStore.allTransactionTags.length > 10) {
+function getHeightClass(): string {
+    if (transactionTagsStore.allTransactionTags && transactionTagsStore.allTransactionTags.length > 8) {
         return 'tag-selection-huge-sheet';
-    } else if (transactionTagsStore.allTransactionTags && transactionTagsStore.allTransactionTags.length > 6) {
+    } else if (transactionTagsStore.allTransactionTags && transactionTagsStore.allTransactionTags.length > 4) {
         return 'tag-selection-large-sheet';
     } else {
         return '';
     }
-});
+}
 
 function isChecked(itemId: string): boolean {
     return selectedItemIds.value.indexOf(itemId) >= 0;

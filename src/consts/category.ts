@@ -1,16 +1,16 @@
 import type { ColorValue } from '@/core/color.ts';
 
 export interface PresetCategory {
-    name: string;
-    categoryIconId: string;
-    color: ColorValue;
-    subCategories: PresetSubCategory[];
+    readonly name: string;
+    readonly categoryIconId: string;
+    readonly color: ColorValue;
+    readonly subCategories: PresetSubCategory[];
 }
 
 export interface PresetSubCategory {
-    name: string;
-    categoryIconId: string;
-    color: ColorValue;
+    readonly name: string;
+    readonly categoryIconId: string;
+    readonly color: ColorValue;
 }
 
 export const DEFAULT_EXPENSE_CATEGORIES: PresetCategory[] = [

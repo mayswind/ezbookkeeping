@@ -14,8 +14,8 @@ export enum CurrencyDisplayLocation {
 }
 
 export interface CurrencyPrependAndAppendText {
-    prependText?: string;
-    appendText?: string;
+    readonly prependText?: string;
+    readonly appendText?: string;
 }
 
 export class CurrencyDisplayType implements TypeAndName {

@@ -13,8 +13,8 @@ import services from '@/lib/services.ts';
 const exchangeRatesLocalStorageKey = 'ebk_app_exchange_rates';
 
 interface LatestExchangeRates {
-    time?: number;
-    data?: LatestExchangeRateResponse;
+    readonly time?: number;
+    readonly data?: LatestExchangeRateResponse;
 }
 
 function getExchangeRatesFromLocalStorage(): LatestExchangeRates {

@@ -3,11 +3,11 @@ import vi from './vi.json';
 import zhHans from './zh_Hans.json';
 
 export interface LanguageInfo {
-    name: string;
-    displayName: string;
-    alternativeLanguageTag: string;
-    aliases?: string[];
-    content: object;
+    readonly name: string;
+    readonly displayName: string;
+    readonly alternativeLanguageTag: string;
+    readonly aliases?: string[];
+    readonly content: object;
 }
 
 export const DEFAULT_LANGUAGE: string = 'en';

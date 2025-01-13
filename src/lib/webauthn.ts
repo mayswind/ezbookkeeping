@@ -16,30 +16,30 @@ import {
 import logger from './logger.ts';
 
 interface ClientData {
-    challenge: string;
-    crossOrigin: boolean;
-    origin: string;
-    type: string;
+    readonly challenge: string;
+    readonly crossOrigin: boolean;
+    readonly origin: string;
+    readonly type: string;
 }
 
 interface AttestationData {
-    authData: Uint8Array;
-    fmt: string;
+    readonly authData: Uint8Array;
+    readonly fmt: string;
 }
 
 interface WebAuthnRegisterResponse {
-    id: string | null;
-    clientData: ClientData;
-    publicKey: Uint8Array | null;
-    rawCredential: Credential;
+    readonly id: string | null;
+    readonly clientData: ClientData;
+    readonly publicKey: Uint8Array | null;
+    readonly rawCredential: Credential;
 }
 
 interface WebAuthnVerifyResponse {
-    id: string | null;
-    userName: string;
-    userSecret: string;
-    clientData: ClientData;
-    rawCredential: Credential;
+    readonly id: string | null;
+    readonly userName: string;
+    readonly userSecret: string;
+    readonly clientData: ClientData;
+    readonly rawCredential: Credential;
 }
 
 const PUBLIC_KEY_CREDENTIAL_CREATION_OPTIONS_BASE_TEMPLATE = {

@@ -3,18 +3,18 @@ import uaParser from 'ua-parser-js';
 import { TOKEN_CLI_USER_AGENT, type TokenInfoResponse, SessionInfo } from '@/models/token.ts';
 
 interface UserAgentInfo {
-    device: {
-        vendor?: string;
-        model?: string;
-        type?: string;
+    readonly device: {
+        readonly vendor?: string;
+        readonly model?: string;
+        readonly type?: string;
     };
-    os: {
-        name?: string;
-        version?: string;
+    readonly os: {
+        readonly name?: string;
+        readonly version?: string;
     };
-    browser: {
-        name?: string;
-        version?: string;
+    readonly browser: {
+        readonly name?: string;
+        readonly version?: string;
     };
 }
 

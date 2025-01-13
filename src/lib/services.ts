@@ -130,11 +130,11 @@ import { getTimezoneOffsetMinutes } from './datetime.ts';
 import { generateRandomUUID } from './misc.ts';
 
 interface ApiRequestConfig extends AxiosRequestConfig {
-    headers: AxiosRequestHeaders;
-    noAuth?: boolean;
-    ignoreBlocked?: boolean;
-    ignoreError?: boolean;
-    timeout?: number;
+    readonly headers: AxiosRequestHeaders;
+    readonly noAuth?: boolean;
+    readonly ignoreBlocked?: boolean;
+    readonly ignoreError?: boolean;
+    readonly timeout?: number;
 }
 
 export type ApiResponsePromise<T> = Promise<AxiosResponse<ApiResponse<T>>>;

@@ -227,18 +227,18 @@ export interface TransactionAmountsResponseItemAmountInfo {
 export type TransactionOverviewResponse = PartialRecord<TransactionAmountsRequestType, TransactionOverviewResponseItem>;
 
 export interface TransactionOverviewResponseItem {
-    valid: boolean;
-    incomeAmount: number;
-    expenseAmount: number;
-    incompleteIncomeAmount: boolean;
-    incompleteExpenseAmount: boolean;
-    amounts?: TransactionAmountsResponseItemAmountInfo[];
+    readonly valid: boolean;
+    readonly incomeAmount: number;
+    readonly expenseAmount: number;
+    readonly incompleteIncomeAmount: boolean;
+    readonly incompleteExpenseAmount: boolean;
+    readonly amounts?: TransactionAmountsResponseItemAmountInfo[];
 }
 
 export interface TransactionMonthlyIncomeAndExpenseData {
-    monthStartTime: number;
-    incomeAmount: number;
-    expenseAmount: number;
-    incompleteIncomeAmount: boolean;
-    incompleteExpenseAmount: boolean;
+    readonly monthStartTime: number;
+    readonly incomeAmount: number;
+    readonly expenseAmount: number;
+    readonly incompleteIncomeAmount: boolean;
+    readonly incompleteExpenseAmount: boolean;
 }

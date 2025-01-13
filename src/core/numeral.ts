@@ -1,11 +1,11 @@
 import type { TypeAndName, TypeAndDisplayName } from '@/core/base.ts';
 
 export interface NumberFormatOptions {
-    digitGrouping?: number;
-    digitGroupingSymbol?: string;
-    decimalNumberCount?: number;
-    decimalSeparator?: string;
-    trimTailZero?: boolean;
+    readonly digitGrouping?: number;
+    readonly digitGroupingSymbol?: string;
+    readonly decimalNumberCount?: number;
+    readonly decimalSeparator?: string;
+    readonly trimTailZero?: boolean;
 }
 
 export interface NumeralSymbolType {

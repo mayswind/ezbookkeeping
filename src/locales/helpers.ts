@@ -116,14 +116,14 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 export interface LocalizedErrorParameter {
-    key: string;
-    localized: boolean;
-    value: string;
+    readonly key: string;
+    readonly localized: boolean;
+    readonly value: string;
 }
 
 export interface LocalizedError {
-    message: string;
-    parameters?: LocalizedErrorParameter[];
+    readonly message: string;
+    readonly parameters?: LocalizedErrorParameter[];
 }
 
 export function getI18nOptions(): object {

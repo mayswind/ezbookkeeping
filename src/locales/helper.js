@@ -314,12 +314,12 @@ function getAllShortDateFormats(translateFn) {
 
 function getAllLongTimeFormats(translateFn) {
     const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
-    return getDateTimeFormats(translateFn, LongTimeFormat.values(), LongTimeFormat.values(), 'format.longTime', defaultLongTimeFormatTypeName, LongTimeFormat.Default);
+    return getDateTimeFormats(translateFn, LongTimeFormat.all(), LongTimeFormat.values(), 'format.longTime', defaultLongTimeFormatTypeName, LongTimeFormat.Default);
 }
 
 function getAllShortTimeFormats(translateFn) {
     const defaultShortTimeFormatTypeName = translateFn('default.shortTimeFormat');
-    return getDateTimeFormats(translateFn, ShortTimeFormat.values(), ShortTimeFormat.values(), 'format.shortTime', defaultShortTimeFormatTypeName, ShortTimeFormat.Default);
+    return getDateTimeFormats(translateFn, ShortTimeFormat.all(), ShortTimeFormat.values(), 'format.shortTime', defaultShortTimeFormatTypeName, ShortTimeFormat.Default);
 }
 
 function getMonthdayOrdinal(monthDay, translateFn) {
@@ -426,12 +426,12 @@ function getI18nShortMonthDayFormat(translateFn, formatTypeValue) {
 
 function getI18nLongTimeFormat(translateFn, formatTypeValue) {
     const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
-    return getDateTimeFormat(translateFn, LongTimeFormat.values(), LongTimeFormat.values(), 'format.longTime', defaultLongTimeFormatTypeName, LongTimeFormat.Default, formatTypeValue);
+    return getDateTimeFormat(translateFn, LongTimeFormat.all(), LongTimeFormat.values(), 'format.longTime', defaultLongTimeFormatTypeName, LongTimeFormat.Default, formatTypeValue);
 }
 
 function getI18nShortTimeFormat(translateFn, formatTypeValue) {
     const defaultShortTimeFormatTypeName = translateFn('default.shortTimeFormat');
-    return getDateTimeFormat(translateFn, ShortTimeFormat.values(), ShortTimeFormat.values(), 'format.shortTime', defaultShortTimeFormatTypeName, ShortTimeFormat.Default, formatTypeValue);
+    return getDateTimeFormat(translateFn, ShortTimeFormat.all(), ShortTimeFormat.values(), 'format.shortTime', defaultShortTimeFormatTypeName, ShortTimeFormat.Default, formatTypeValue);
 }
 
 function formatYearQuarter(translateFn, year, quarter) {

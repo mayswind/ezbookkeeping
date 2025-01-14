@@ -107,7 +107,7 @@ const clearingData = ref<boolean>(false);
 const showExportDataSheet = ref<boolean>(false);
 const showInputPasswordSheetForClearData = ref<boolean>(false);
 
-const exportFileName = computed(() => getExportFileName(exportFileType.value));
+const exportFileName = computed<string>(() => getExportFileName(exportFileType.value));
 
 function reloadUserDataStatistics(): void {
     loading.value = true;

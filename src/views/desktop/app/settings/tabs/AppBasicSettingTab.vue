@@ -211,6 +211,7 @@ import { useAppSettingPageBase } from '@/views/base/settings/AppSettingsPageBase
 
 import { useSettingsStore } from '@/stores/setting.ts';
 
+import type { LocalizedSwitchOption } from '@/core/base.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { getSystemTheme } from '@/lib/ui/common.ts';
 
@@ -236,7 +237,7 @@ const {
 
 const settingsStore = useSettingsStore();
 
-const enableDisableOptions = computed(() => getAllEnableDisableOptions());
+const enableDisableOptions = computed<LocalizedSwitchOption[]>(() => getAllEnableDisableOptions());
 
 const currentTheme = computed<string>({
     get: () => settingsStore.appSettings.theme,

@@ -1,6 +1,6 @@
 import moment from 'moment-timezone';
 
-import { DEFAULT_LANGUAGE, allLanguages } from '@/locales/index.ts';
+import { DEFAULT_LANGUAGE, ALL_LANGUAGES } from '@/locales/index.ts';
 
 import { Month, WeekDay, MeridiemIndicator, LongDateFormat, ShortDateFormat, LongTimeFormat, ShortTimeFormat, DateRange, LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
@@ -70,12 +70,12 @@ function getLanguageDisplayName(translateFn, languageName) {
 function getAllLanguageInfoArray(translateFn, includeSystemDefault) {
     const ret = [];
 
-    for (const languageTag in allLanguages) {
-        if (!Object.prototype.hasOwnProperty.call(allLanguages, languageTag)) {
+    for (const languageTag in ALL_LANGUAGES) {
+        if (!Object.prototype.hasOwnProperty.call(ALL_LANGUAGES, languageTag)) {
             continue;
         }
 
-        const languageInfo = allLanguages[languageTag];
+        const languageInfo = ALL_LANGUAGES[languageTag];
         let displayName = languageInfo.displayName;
         let languageNameInCurrentLanguage = getLanguageDisplayName(translateFn, languageInfo.name);
 
@@ -104,7 +104,7 @@ function getAllLanguageInfoArray(translateFn, includeSystemDefault) {
 }
 
 function getLanguageInfo(locale) {
-    return allLanguages[locale];
+    return ALL_LANGUAGES[locale];
 }
 
 function getDefaultLanguage() {
@@ -118,7 +118,7 @@ function getDefaultLanguage() {
         return DEFAULT_LANGUAGE;
     }
 
-    if (!allLanguages[browserLocale]) {
+    if (!ALL_LANGUAGES[browserLocale]) {
         const locale = getLocaleFromLanguageAlias(browserLocale);
 
         if (locale) {
@@ -126,11 +126,11 @@ function getDefaultLanguage() {
         }
     }
 
-    if (!allLanguages[browserLocale] && browserLocale.split('-').length > 1) { // maybe language-script-region
+    if (!ALL_LANGUAGES[browserLocale] && browserLocale.split('-').length > 1) { // maybe language-script-region
         const localeParts = browserLocale.split('-');
         browserLocale = localeParts[0] + '-' + localeParts[1];
 
-        if (!allLanguages[browserLocale]) {
+        if (!ALL_LANGUAGES[browserLocale]) {
             const locale = getLocaleFromLanguageAlias(browserLocale);
 
             if (locale) {
@@ -138,7 +138,7 @@ function getDefaultLanguage() {
             }
         }
 
-        if (!allLanguages[browserLocale]) {
+        if (!ALL_LANGUAGES[browserLocale]) {
             browserLocale = localeParts[0];
             const locale = getLocaleFromLanguageAlias(browserLocale);
 
@@ -148,7 +148,7 @@ function getDefaultLanguage() {
         }
     }
 
-    if (!allLanguages[browserLocale]) {
+    if (!ALL_LANGUAGES[browserLocale]) {
         return DEFAULT_LANGUAGE;
     }
 
@@ -156,8 +156,8 @@ function getDefaultLanguage() {
 }
 
 function getLocaleFromLanguageAlias(alias) {
-    for (let locale in allLanguages) {
-        if (!Object.prototype.hasOwnProperty.call(allLanguages, locale)) {
+    for (let locale in ALL_LANGUAGES) {
+        if (!Object.prototype.hasOwnProperty.call(ALL_LANGUAGES, locale)) {
             continue;
         }
 
@@ -165,7 +165,7 @@ function getLocaleFromLanguageAlias(alias) {
             return locale;
         }
 
-        const lang = allLanguages[locale];
+        const lang = ALL_LANGUAGES[locale];
         const aliases = lang.aliases;
 
         if (!aliases || aliases.length < 1) {
@@ -1122,11 +1122,11 @@ function getAllSupportedImportFileTypes(i18nGlobal, translateFn) {
             if (fileType.document.supportMultiLanguages === true) {
                 document.language = getCurrentLanguageTag(i18nGlobal);
                 document.anchor = translateFn(`document.anchor.export_and_import.${fileType.document.anchor}`);
-            } else if (isString(fileType.document.supportMultiLanguages) && allLanguages[fileType.document.supportMultiLanguages]) {
+            } else if (isString(fileType.document.supportMultiLanguages) && ALL_LANGUAGES[fileType.document.supportMultiLanguages]) {
                 document.language = fileType.document.supportMultiLanguages;
 
                 if (document.language !== getCurrentLanguageTag(i18nGlobal)) {
-                    document.displayLanguageName = getLanguageDisplayName(translateFn, allLanguages[fileType.document.supportMultiLanguages].name);
+                    document.displayLanguageName = getLanguageDisplayName(translateFn, ALL_LANGUAGES[fileType.document.supportMultiLanguages].name);
                 }
 
                 document.anchor = fileType.document.anchor;
@@ -1373,34 +1373,6 @@ function setLanguage(i18nGlobal, locale, force) {
     };
 }
 
-function setTimeZone(timezone) {
-    if (timezone) {
-        moment.tz.setDefault(timezone);
-    } else {
-        moment.tz.setDefault();
-    }
-}
-
-function initLocale(i18nGlobal, lastUserLanguage, timezone) {
-    let localeDefaultSettings = null;
-
-    if (lastUserLanguage && getLanguageInfo(lastUserLanguage)) {
-        logger.info(`Last user language is ${lastUserLanguage}`);
-        localeDefaultSettings = setLanguage(i18nGlobal, lastUserLanguage, true);
-    } else {
-        localeDefaultSettings = setLanguage(i18nGlobal, null, true);
-    }
-
-    if (timezone) {
-        logger.info(`Current timezone is ${timezone}`);
-        setTimeZone(timezone);
-    } else {
-        logger.info(`No timezone is set, use browser default ${getTimezoneOffset()} (maybe ${moment.tz.guess(true)})`);
-    }
-
-    return localeDefaultSettings;
-}
-
 export function translateError(message, translateFn) {
     let parameters = {};
 
@@ -1487,8 +1459,6 @@ export function i18nFunctions(i18nGlobal) {
         getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t),
         getServerTipContent: (tipConfig) => getServerTipContent(tipConfig, i18nGlobal),
         joinMultiText: (textArray) => joinMultiText(textArray, i18nGlobal.t),
-        setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),
-        setTimeZone: (timezone) => setTimeZone(timezone),
-        initLocale: (lastUserLanguage, timezone) => initLocale(i18nGlobal, lastUserLanguage, timezone)
+        setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force)
     };
 }

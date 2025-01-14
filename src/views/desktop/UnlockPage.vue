@@ -2,8 +2,8 @@
     <div class="layout-wrapper">
         <router-link to="/">
             <div class="auth-logo d-flex align-start gap-x-3">
-                <img alt="logo" class="login-page-logo" :src="ezBookkeepingLogoPath" />
-                <h1 class="font-weight-medium leading-normal text-2xl">{{ $t('global.app.title') }}</h1>
+                <img alt="logo" class="login-page-logo" :src="APPLICATION_LOGO_PATH" />
+                <h1 class="font-weight-medium leading-normal text-2xl">{{ tt('global.app.title') }}</h1>
             </div>
         </router-link>
         <v-row no-gutters class="auth-wrapper">
@@ -22,9 +22,9 @@
                 <div class="d-flex align-center justify-center h-100">
                     <v-card variant="flat" class="w-100 mt-0 px-4 pt-12" max-width="500">
                         <v-card-text>
-                            <h4 class="text-h4 mb-2">{{ $t('Unlock Application') }}</h4>
-                            <p class="mb-0" v-if="isWebAuthnAvailable">{{ $t('Please enter your PIN code or use WebAuthn to unlock application') }}</p>
-                            <p class="mb-0" v-else-if="!isWebAuthnAvailable">{{ $t('Please enter your PIN code to unlock application') }}</p>
+                            <h4 class="text-h4 mb-2">{{ tt('Unlock Application') }}</h4>
+                            <p class="mb-0" v-if="isWebAuthnAvailable">{{ tt('Please enter your PIN code or use WebAuthn to unlock application') }}</p>
+                            <p class="mb-0" v-else-if="!isWebAuthnAvailable">{{ tt('Please enter your PIN code to unlock application') }}</p>
                         </v-card-text>
 
                         <v-card-text class="pb-0 mb-6">
@@ -39,22 +39,22 @@
                                     <v-col cols="12">
                                         <v-btn block :disabled="!isPinCodeValid(pinCode) || verifyingByWebAuthn"
                                                @click="unlockByPin(pinCode)">
-                                            {{ $t('Unlock with PIN Code') }}
+                                            {{ tt('Unlock with PIN Code') }}
                                         </v-btn>
                                     </v-col>
 
                                     <v-col cols="12" v-if="isWebAuthnAvailable">
                                         <v-btn block variant="tonal" :disabled="verifyingByWebAuthn"
                                                @click="unlockByWebAuthn">
-                                            {{ $t('Unlock with WebAuthn') }}
+                                            {{ tt('Unlock with WebAuthn') }}
                                             <v-progress-circular indeterminate size="22" class="ml-2" v-if="verifyingByWebAuthn"></v-progress-circular>
                                         </v-btn>
                                     </v-col>
 
                                     <v-col cols="12" class="text-center">
-                                        <span class="me-1">{{ $t('Can\'t Unlock?') }}</span>
+                                        <span class="me-1">{{ tt('Can\'t Unlock?') }}</span>
                                         <a class="text-primary" href="javascript:void(0);" @click="relogin">
-                                            {{ $t('Re-login') }}
+                                            {{ tt('Re-login') }}
                                         </a>
                                     </v-col>
                                 </v-row>
@@ -106,16 +106,21 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { ref, computed, useTemplateRef } from 'vue';
+import { useRouter } from 'vue-router';
 import { useTheme } from 'vuetify';
 
-import { mapStores } from 'pinia';
-import { useRootStore } from '@/stores/index.js';
+import type { LanguageOption } from '@/locales/index.ts';
+import { useI18n } from '@/locales/helpers.ts';
+import { useUnlockPageBase } from '@/views/base/UnlockPageBase.ts';
+
+
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
-import { useTokensStore } from '@/stores/token.ts';
-import { useTransactionsStore } from '@/stores/transaction.js';
-import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
@@ -129,165 +134,103 @@ import {
     hasWebAuthnConfig,
     getWebAuthnCredentialId
 } from '@/lib/userstate.ts';
-import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
-export default {
-    data() {
-        return {
-            pinCode: '',
-            verifyingByWebAuthn: false
-        };
-    },
-    computed: {
-        ...mapStores(useRootStore, useSettingsStore, useUserStore, useTokensStore, useTransactionsStore, useExchangeRatesStore),
-        ezBookkeepingLogoPath() {
-            return APPLICATION_LOGO_PATH;
-        },
-        version() {
-            return 'v' + this.$version;
-        },
-        allLanguages() {
-            return this.$locale.getAllLanguageInfoArray(false);
-        },
-        isWebAuthnAvailable() {
-            return this.settingsStore.appSettings.applicationLockWebAuthn
-                && hasWebAuthnConfig()
-                && isWebAuthnSupported();
-        },
-        isDarkMode() {
-            return this.globalTheme.global.name.value === ThemeType.Dark;
-        },
-        currentLanguageName() {
-            return this.$locale.getCurrentLanguageDisplayName();
-        }
-    },
-    setup() {
-        const theme = useTheme();
+type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
+type SnackBarType = InstanceType<typeof SnackBar>;
 
-        return {
-            globalTheme: theme
-        };
-    },
-    methods: {
-        unlockByWebAuthn() {
-            const self = this;
+const router = useRouter();
+const theme = useTheme();
 
-            if (!self.settingsStore.appSettings.applicationLockWebAuthn || !hasWebAuthnConfig()) {
-                self.$refs.snackbar.showMessage('WebAuthn is not enabled');
-                return;
-            }
+const { tt, getCurrentLanguageDisplayName, getAllLanguageOptions } = useI18n();
+const { version, pinCode, isWebAuthnAvailable, isPinCodeValid, changeLanguage, doAfterUnlocked, doRelogin } = useUnlockPageBase();
 
-            if (!isWebAuthnSupported()) {
-                self.$refs.snackbar.showMessage('WebAuth is not supported on this device');
-                return;
-            }
+const settingsStore = useSettingsStore();
+const userStore = useUserStore();
 
-            self.verifyingByWebAuthn = true;
+const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
-            verifyWebAuthnCredential(
-                self.userStore.currentUserBasicInfo,
-                getWebAuthnCredentialId()
-            ).then(({ id, userName, userSecret }) => {
-                self.verifyingByWebAuthn = false;
+const verifyingByWebAuthn = ref<boolean>(false);
 
-                unlockTokenByWebAuthn(id, userName, userSecret);
-                self.transactionsStore.initTransactionDraft();
-                self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
-                    if (response.user) {
-                        const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
-                        self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
+const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const currentLanguageName = computed<string>(() => getCurrentLanguageDisplayName());
 
-                        setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
-                    }
+function unlockByWebAuthn(): void {
+    const webAuthnCredentialId = getWebAuthnCredentialId();
 
-                    if (response.notificationContent) {
-                        self.rootStore.setNotificationContent(response.notificationContent);
-                    }
-                });
-
-                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
-                    self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
-                }
-
-                self.$router.replace('/');
-            }).catch(error => {
-                self.verifyingByWebAuthn = false;
-                logger.error('failed to use webauthn to verify', error);
-
-                if (error.notSupported) {
-                    self.$refs.snackbar.showMessage('WebAuth is not supported on this device');
-                } else if (error.name === 'NotAllowedError') {
-                    self.$refs.snackbar.showMessage('User has canceled authentication');
-                } else if (error.invalid) {
-                    self.$refs.snackbar.showMessage('Failed to authenticate with WebAuthn');
-                } else {
-                    self.$refs.snackbar.showMessage('User has canceled or this device does not support WebAuthn');
-                }
-            });
-        },
-        unlockByPin(pinCode) {
-            const self = this;
-
-            if (!self.isPinCodeValid(pinCode)) {
-                return;
-            }
-
-            const user = self.userStore.currentUserBasicInfo;
-
-            if (!user || !user.username) {
-                self.$refs.snackbar.showMessage('An error occurred');
-                return;
-            }
-
-            try {
-                unlockTokenByPinCode(user.username, pinCode);
-                self.transactionsStore.initTransactionDraft();
-                self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
-                    if (response.user) {
-                        const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
-                        self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-
-                        setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
-                    }
-
-                    if (response.notificationContent) {
-                        self.rootStore.setNotificationContent(response.notificationContent);
-                    }
-                });
-
-                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
-                    self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
-                }
-
-                self.$router.replace('/');
-            } catch (ex) {
-                logger.error('failed to unlock with pin code', ex);
-                self.$refs.snackbar.showMessage('Incorrect PIN code');
-            }
-        },
-        relogin() {
-            const self = this;
-
-            self.$refs.confirmDialog.open('Are you sure you want to re-login?').then(() => {
-                self.rootStore.forceLogout();
-                self.settingsStore.clearAppSettings();
-
-                const localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage, self.settingsStore.appSettings.timeZone);
-                self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-
-                setExpenseAndIncomeAmountColor(self.userStore.currentUserExpenseAmountColor, self.userStore.currentUserIncomeAmountColor);
-
-                self.$router.replace('/login');
-            });
-        },
-        isPinCodeValid(pinCode) {
-            return pinCode && pinCode.length === 6;
-        },
-        changeLanguage(locale) {
-            const localeDefaultSettings = this.$locale.setLanguage(locale);
-            this.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-        }
+    if (!userStore.currentUserBasicInfo || !webAuthnCredentialId) {
+        snackbar.value?.showMessage('An error occurred');
+        return;
     }
+
+    if (!settingsStore.appSettings.applicationLockWebAuthn || !hasWebAuthnConfig()) {
+        snackbar.value?.showMessage('WebAuthn is not enabled');
+        return;
+    }
+
+    if (!isWebAuthnSupported()) {
+        snackbar.value?.showMessage('WebAuth is not supported on this device');
+        return;
+    }
+
+    verifyingByWebAuthn.value = true;
+
+    verifyWebAuthnCredential(
+        userStore.currentUserBasicInfo,
+        webAuthnCredentialId
+    ).then(({ id, userName, userSecret }) => {
+        verifyingByWebAuthn.value = false;
+
+        unlockTokenByWebAuthn(id, userName, userSecret);
+        doAfterUnlocked();
+
+        router.replace('/');
+    }).catch(error => {
+        verifyingByWebAuthn.value = false;
+        logger.error('failed to use webauthn to verify', error);
+
+        if (error.notSupported) {
+            snackbar.value?.showMessage('WebAuth is not supported on this device');
+        } else if (error.name === 'NotAllowedError') {
+            snackbar.value?.showMessage('User has canceled authentication');
+        } else if (error.invalid) {
+            snackbar.value?.showMessage('Failed to authenticate with WebAuthn');
+        } else {
+            snackbar.value?.showMessage('User has canceled or this device does not support WebAuthn');
+        }
+    });
+}
+
+function unlockByPin(pinCode: string): void {
+    if (!isPinCodeValid(pinCode)) {
+        return;
+    }
+
+    const user = userStore.currentUserBasicInfo;
+
+    if (!user || !user.username) {
+        snackbar.value?.showMessage('An error occurred');
+        return;
+    }
+
+    try {
+        unlockTokenByPinCode(user.username, pinCode);
+        doAfterUnlocked();
+
+        router.replace('/');
+    } catch (ex) {
+        logger.error('failed to unlock with pin code', ex);
+        snackbar.value?.showMessage('Incorrect PIN code');
+    }
+}
+
+function relogin(): void {
+    confirmDialog.value?.open('Are you sure you want to re-login?').then(() => {
+        doRelogin();
+
+        router.replace('/login');
+    });
 }
 </script>

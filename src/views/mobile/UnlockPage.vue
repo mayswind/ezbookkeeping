@@ -1,14 +1,14 @@
 <template>
     <f7-page no-navbar no-swipeback login-screen hide-toolbar-on-scroll>
         <f7-login-screen-title>
-            <img alt="logo" class="login-page-logo" :src="ezBookkeepingLogoPath" />
-            <f7-block class="login-page-tile margin-vertical-half">{{ $t('global.app.title') }}</f7-block>
+            <img alt="logo" class="login-page-logo" :src="APPLICATION_LOGO_PATH" />
+            <f7-block class="login-page-tile margin-vertical-half">{{ tt('global.app.title') }}</f7-block>
         </f7-login-screen-title>
 
         <f7-list form>
             <f7-list-item class="no-padding no-margin">
                 <template #inner>
-                    <div class="display-flex justify-content-center full-line">{{ $t('Unlock Application') }}</div>
+                    <div class="display-flex justify-content-center full-line">{{ tt('Unlock Application') }}</div>
                 </template>
             </f7-list-item>
             <f7-list-item class="list-item-pincode-input padding-horizontal margin-horizontal">
@@ -17,10 +17,10 @@
         </f7-list>
 
         <f7-list>
-            <f7-list-button :class="{ 'disabled': !isPinCodeValid(pinCode) }" :text="$t('Unlock with PIN Code')" @click="unlockByPin"></f7-list-button>
-            <f7-list-button v-if="isWebAuthnAvailable" :text="$t('Unlock with WebAuthn')" @click="unlockByWebAuthn"></f7-list-button>
+            <f7-list-button :class="{ 'disabled': !isPinCodeValid(pinCode) }" :text="tt('Unlock with PIN Code')" @click="unlockByPin"></f7-list-button>
+            <f7-list-button v-if="isWebAuthnAvailable" :text="tt('Unlock with WebAuthn')" @click="unlockByWebAuthn"></f7-list-button>
             <f7-block-footer>
-                <f7-link :text="$t('Re-login')" @click="relogin"></f7-link>
+                <f7-link :text="tt('Re-login')" @click="relogin"></f7-link>
             </f7-block-footer>
             <f7-block-footer class="padding-bottom">
             </f7-block-footer>
@@ -64,14 +64,17 @@
     </f7-page>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
-import { useRootStore } from '@/stores/index.js';
+<script setup lang="ts">
+import { computed } from 'vue';
+import type { Router } from 'framework7/types';
+
+import type { LanguageOption } from '@/locales/index.ts';
+import { useI18n } from '@/locales/helpers.ts';
+import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
+import { useUnlockPageBase } from '@/views/base/UnlockPageBase.ts';
+
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
-import { useTokensStore } from '@/stores/token.ts';
-import { useTransactionsStore } from '@/stores/transaction.js';
-import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import {
@@ -84,170 +87,108 @@ import {
     hasWebAuthnConfig,
     getWebAuthnCredentialId
 } from '@/lib/userstate.ts';
-import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 import { isModalShowing } from '@/lib/ui/mobile.ts';
 import logger from '@/lib/logger.ts';
 
-export default {
-    props: [
-        'f7router'
-    ],
-    data() {
-        return {
-            pinCode: ''
-        }
-    },
-    computed: {
-        ...mapStores(useRootStore, useSettingsStore, useUserStore, useTokensStore, useTransactionsStore, useExchangeRatesStore),
-        ezBookkeepingLogoPath() {
-            return APPLICATION_LOGO_PATH;
-        },
-        version() {
-            return 'v' + this.$version;
-        },
-        allLanguages() {
-            return this.$locale.getAllLanguageInfoArray(false);
-        },
-        isWebAuthnAvailable() {
-            return this.settingsStore.appSettings.applicationLockWebAuthn
-                && hasWebAuthnConfig()
-                && isWebAuthnSupported();
-        },
-        currentLanguageCode() {
-            return this.$locale.getCurrentLanguageTag();
-        },
-        currentLanguageName() {
-            return this.$locale.getCurrentLanguageDisplayName();
-        }
-    },
-    methods: {
-        unlockByWebAuthn() {
-            const self = this;
-            const router = self.f7router;
+const { tt, getCurrentLanguageTag, getCurrentLanguageDisplayName, getAllLanguageOptions } = useI18n();
+const { showToast, showConfirm } = useI18nUIComponents();
+const { version, pinCode, isWebAuthnAvailable, isPinCodeValid, changeLanguage, doAfterUnlocked, doRelogin } = useUnlockPageBase();
 
-            if (!self.settingsStore.appSettings.applicationLockWebAuthn || !hasWebAuthnConfig()) {
-                self.$toast('WebAuthn is not enabled');
-                return;
-            }
+const settingsStore = useSettingsStore();
+const userStore = useUserStore();
 
-            if (!isWebAuthnSupported()) {
-                self.$toast('WebAuth is not supported on this device');
-                return;
-            }
+const props = defineProps<{
+    f7router: Router.Router;
+}>();
 
-            self.$showLoading();
+const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
+const currentLanguageCode = computed<string>(() => getCurrentLanguageTag());
+const currentLanguageName = computed<string>(() => getCurrentLanguageDisplayName());
 
-            verifyWebAuthnCredential(
-                self.userStore.currentUserBasicInfo,
-                getWebAuthnCredentialId()
-            ).then(({ id, userName, userSecret }) => {
-                self.$hideLoading();
+function unlockByWebAuthn(): void {
+    const router = props.f7router;
+    const webAuthnCredentialId = getWebAuthnCredentialId();
 
-                unlockTokenByWebAuthn(id, userName, userSecret);
-                self.transactionsStore.initTransactionDraft();
-                self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
-                    if (response.user) {
-                        const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
-                        self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-
-                        setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
-                    }
-
-                    if (response.notificationContent) {
-                        self.rootStore.setNotificationContent(response.notificationContent);
-                    }
-                });
-
-                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
-                    self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
-                }
-
-                router.refreshPage();
-            }).catch(error => {
-                self.$hideLoading();
-                logger.error('failed to use webauthn to verify', error);
-
-                if (error.notSupported) {
-                    self.$toast('WebAuth is not supported on this device');
-                } else if (error.name === 'NotAllowedError') {
-                    self.$toast('User has canceled authentication');
-                } else if (error.invalid) {
-                    self.$toast('Failed to authenticate with WebAuthn');
-                } else {
-                    self.$toast('User has canceled or this device does not support WebAuthn');
-                }
-            });
-        },
-        unlockByPin(pinCode) {
-            const self = this;
-
-            if (!self.isPinCodeValid(pinCode)) {
-                return;
-            }
-
-            if (isModalShowing()) {
-                return;
-            }
-
-            const router = self.f7router;
-            const user = self.userStore.currentUserBasicInfo;
-
-            if (!user || !user.username) {
-                self.$alert('An error occurred');
-                return;
-            }
-
-            try {
-                unlockTokenByPinCode(user.username, pinCode);
-                self.transactionsStore.initTransactionDraft();
-                self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
-                    if (response.user) {
-                        const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
-                        self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-
-                        setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
-                    }
-
-                    if (response.notificationContent) {
-                        self.rootStore.setNotificationContent(response.notificationContent);
-                    }
-                });
-
-                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
-                    self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
-                }
-
-                router.refreshPage();
-            } catch (ex) {
-                logger.error('failed to unlock with pin code', ex);
-                self.$toast('Incorrect PIN code');
-            }
-        },
-        relogin() {
-            const self = this;
-            const router = self.f7router;
-
-            self.$confirm('Are you sure you want to re-login?', () => {
-                self.rootStore.forceLogout();
-                self.settingsStore.clearAppSettings();
-
-                const localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage, self.settingsStore.appSettings.timeZone);
-                self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-
-                setExpenseAndIncomeAmountColor(self.userStore.currentUserExpenseAmountColor, self.userStore.currentUserIncomeAmountColor);
-
-                router.navigate('/login', {
-                    clearPreviousHistory: true
-                });
-            });
-        },
-        isPinCodeValid(pinCode) {
-            return pinCode && pinCode.length === 6;
-        },
-        changeLanguage(locale) {
-            const localeDefaultSettings = this.$locale.setLanguage(locale);
-            this.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-        }
+    if (!userStore.currentUserBasicInfo || !webAuthnCredentialId) {
+        showToast('An error occurred');
+        return;
     }
+
+    if (!settingsStore.appSettings.applicationLockWebAuthn || !hasWebAuthnConfig()) {
+        showToast('WebAuthn is not enabled');
+        return;
+    }
+
+    if (!isWebAuthnSupported()) {
+        showToast('WebAuth is not supported on this device');
+        return;
+    }
+
+    showLoading();
+
+    verifyWebAuthnCredential(
+        userStore.currentUserBasicInfo,
+        webAuthnCredentialId
+    ).then(({ id, userName, userSecret }) => {
+        hideLoading();
+
+        unlockTokenByWebAuthn(id, userName, userSecret);
+        doAfterUnlocked();
+
+        router.refreshPage();
+    }).catch(error => {
+        hideLoading();
+        logger.error('failed to use webauthn to verify', error);
+
+        if (error.notSupported) {
+            showToast('WebAuth is not supported on this device');
+        } else if (error.name === 'NotAllowedError') {
+            showToast('User has canceled authentication');
+        } else if (error.invalid) {
+            showToast('Failed to authenticate with WebAuthn');
+        } else {
+            showToast('User has canceled or this device does not support WebAuthn');
+        }
+    });
+}
+
+function unlockByPin(pinCode: string): void {
+    if (!isPinCodeValid(pinCode)) {
+        return;
+    }
+
+    if (isModalShowing()) {
+        return;
+    }
+
+    const router = props.f7router;
+    const user = userStore.currentUserBasicInfo;
+
+    if (!user || !user.username) {
+        showToast('An error occurred');
+        return;
+    }
+
+    try {
+        unlockTokenByPinCode(user.username, pinCode);
+        doAfterUnlocked();
+
+        router.refreshPage();
+    } catch (ex) {
+        logger.error('failed to unlock with pin code', ex);
+        showToast('Incorrect PIN code');
+    }
+}
+
+function relogin(): void {
+    const router = props.f7router;
+
+    showConfirm('Are you sure you want to re-login?', () => {
+        doRelogin();
+
+        router.navigate('/login', {
+            clearPreviousHistory: true
+        });
+    });
 }
 </script>

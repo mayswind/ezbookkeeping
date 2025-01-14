@@ -10,10 +10,15 @@ export interface LanguageInfo {
     readonly content: object;
 }
 
+export interface LanguageOption {
+    readonly languageTag: string;
+    readonly displayName: string;
+}
+
 export const DEFAULT_LANGUAGE: string = 'en';
 
 // To add new languages, please refer to https://ezbookkeeping.mayswind.net/translating
-export const allLanguages: Record<string, LanguageInfo> = {
+export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
     'en': {
         name: 'English',
         displayName: 'English',

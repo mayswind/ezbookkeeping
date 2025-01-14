@@ -1,9 +1,9 @@
 import { useI18n as useVueI18n } from 'vue-i18n';
 import moment from 'moment-timezone';
 
-import type {TypeAndName, TypeAndDisplayName, LocalizedSwitchOption } from '@/core/base.ts';
+import type { TypeAndName, TypeAndDisplayName, LocalizedSwitchOption } from '@/core/base.ts';
 
-import { type LanguageInfo, allLanguages, DEFAULT_LANGUAGE } from '@/locales/index.ts';
+import { type LanguageInfo, type LanguageOption, ALL_LANGUAGES, DEFAULT_LANGUAGE } from '@/locales/index.ts';
 
 import {
     type DateFormat,
@@ -136,12 +136,12 @@ export function getI18nOptions(): object {
         messages: (function () {
             const messages: Record<string, object> = {};
 
-            for (const languageKey in allLanguages) {
-                if (!Object.prototype.hasOwnProperty.call(allLanguages, languageKey)) {
+            for (const languageKey in ALL_LANGUAGES) {
+                if (!Object.prototype.hasOwnProperty.call(ALL_LANGUAGES, languageKey)) {
                     continue;
                 }
 
-                const languageInfo = allLanguages[languageKey];
+                const languageInfo = ALL_LANGUAGES[languageKey];
                 messages[languageKey] = languageInfo.content;
             }
 
@@ -158,7 +158,11 @@ export function useI18n() {
 
     // private functions
     function getLanguageInfo(languageKey: string): LanguageInfo | undefined {
-        return allLanguages[languageKey];
+        return ALL_LANGUAGES[languageKey];
+    }
+
+    function getLanguageDisplayName(languageName: string): string {
+        return t(`language.${languageName}`);
     }
 
     function getDefaultLanguage(): string {
@@ -172,7 +176,7 @@ export function useI18n() {
             return DEFAULT_LANGUAGE;
         }
 
-        if (!allLanguages[browserLanguage]) {
+        if (!ALL_LANGUAGES[browserLanguage]) {
             const languageKey = getLanguageKeyFromLanguageAlias(browserLanguage);
 
             if (languageKey) {
@@ -180,11 +184,11 @@ export function useI18n() {
             }
         }
 
-        if (!allLanguages[browserLanguage] && browserLanguage.split('-').length > 1) { // maybe language-script-region
+        if (!ALL_LANGUAGES[browserLanguage] && browserLanguage.split('-').length > 1) { // maybe language-script-region
             const languageTagParts = browserLanguage.split('-');
             browserLanguage = languageTagParts[0] + '-' + languageTagParts[1];
 
-            if (!allLanguages[browserLanguage]) {
+            if (!ALL_LANGUAGES[browserLanguage]) {
                 const languageKey = getLanguageKeyFromLanguageAlias(browserLanguage);
 
                 if (languageKey) {
@@ -192,7 +196,7 @@ export function useI18n() {
                 }
             }
 
-            if (!allLanguages[browserLanguage]) {
+            if (!ALL_LANGUAGES[browserLanguage]) {
                 browserLanguage = languageTagParts[0];
                 const languageKey = getLanguageKeyFromLanguageAlias(browserLanguage);
 
@@ -202,7 +206,7 @@ export function useI18n() {
             }
         }
 
-        if (!allLanguages[browserLanguage]) {
+        if (!ALL_LANGUAGES[browserLanguage]) {
             return DEFAULT_LANGUAGE;
         }
 
@@ -210,8 +214,8 @@ export function useI18n() {
     }
 
     function getLanguageKeyFromLanguageAlias(alias: string): string | null {
-        for (const languageKey in allLanguages) {
-            if (!Object.prototype.hasOwnProperty.call(allLanguages, languageKey)) {
+        for (const languageKey in ALL_LANGUAGES) {
+            if (!Object.prototype.hasOwnProperty.call(ALL_LANGUAGES, languageKey)) {
                 continue;
             }
 
@@ -219,7 +223,7 @@ export function useI18n() {
                 return languageKey;
             }
 
-            const langInfo = allLanguages[languageKey];
+            const langInfo = ALL_LANGUAGES[languageKey];
             const aliases = langInfo.aliases;
 
             if (!aliases || aliases.length < 1) {
@@ -543,6 +547,42 @@ export function useI18n() {
 
     function getDefaultFirstDayOfWeek(): string {
         return t('default.firstDayOfWeek');
+    }
+
+    function getAllLanguageOptions(includeSystemDefault: boolean): LanguageOption[] {
+        const ret: LanguageOption[] = [];
+
+        for (const languageTag in ALL_LANGUAGES) {
+            if (!Object.prototype.hasOwnProperty.call(ALL_LANGUAGES, languageTag)) {
+                continue;
+            }
+
+            const languageInfo = ALL_LANGUAGES[languageTag];
+            let displayName = languageInfo.displayName;
+            const languageNameInCurrentLanguage = getLanguageDisplayName(languageInfo.name);
+
+            if (languageNameInCurrentLanguage && languageNameInCurrentLanguage !== displayName) {
+                displayName = `${languageNameInCurrentLanguage} (${displayName})`;
+            }
+
+            ret.push({
+                languageTag: languageTag,
+                displayName: displayName
+            });
+        }
+
+        ret.sort(function (lang1, lang2) {
+            return lang1.languageTag.localeCompare(lang2.languageTag);
+        });
+
+        if (includeSystemDefault) {
+            ret.splice(0, 0, {
+                languageTag: '',
+                displayName: t('System Default')
+            });
+        }
+
+        return ret;
     }
 
     function getAllEnableDisableOptions(): LocalizedSwitchOption[] {
@@ -1167,7 +1207,7 @@ export function useI18n() {
         }
     }
 
-    function initLocale(lastUserLanguage: string, timezone: string): LocaleDefaultSettings | null {
+    function initLocale(lastUserLanguage?: string, timezone?: string): LocaleDefaultSettings | null {
         let localeDefaultSettings: LocaleDefaultSettings | null = null;
 
         if (lastUserLanguage && getLanguageInfo(lastUserLanguage)) {
@@ -1201,6 +1241,7 @@ export function useI18n() {
         getDefaultCurrency,
         getDefaultFirstDayOfWeek,
         // get all localized info of specified type
+        getAllLanguageOptions,
         getAllEnableDisableOptions,
         getAllMeridiemIndicators,
         getAllLongMonthNames,

@@ -1401,14 +1401,6 @@ function initLocale(i18nGlobal, lastUserLanguage, timezone) {
     return localeDefaultSettings;
 }
 
-export function translateIf(text, isTranslate, translateFn) {
-    if (isTranslate) {
-        return translateFn(text);
-    }
-
-    return text;
-}
-
 export function translateError(message, translateFn) {
     let parameters = {};
 

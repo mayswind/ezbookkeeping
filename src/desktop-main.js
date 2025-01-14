@@ -73,7 +73,6 @@ import router from '@/router/desktop.js';
 import { getVersion, getBuildTime } from '@/lib/version.ts';
 import { getI18nOptions } from '@/locales/helpers.ts';
 import {
-    translateIf,
     translateError,
     i18nFunctions
 } from '@/locales/helper.js';
@@ -473,7 +472,6 @@ app.config.globalProperties.$version = getVersion();
 app.config.globalProperties.$buildTime = getBuildTime();
 
 app.config.globalProperties.$locale = i18nFunctions(i18n.global);
-app.config.globalProperties.$tIf = (text, isTranslate) => translateIf(text, isTranslate, i18n.global.t);
 app.config.globalProperties.$tError = (message) => translateError(message, i18n.global.t);
 
 app.mount('#app');

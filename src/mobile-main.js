@@ -82,7 +82,6 @@ import '@vuepic/vue-datepicker/dist/main.css';
 import { getVersion, getBuildTime } from '@/lib/version.ts';
 import { getI18nOptions } from '@/locales/helpers.ts';
 import {
-    translateIf,
     i18nFunctions
 } from '@/locales/helper.js';
 import {
@@ -206,7 +205,6 @@ app.config.globalProperties.$version = getVersion();
 app.config.globalProperties.$buildTime = getBuildTime();
 
 app.config.globalProperties.$locale = i18nFunctions(i18n.global);
-app.config.globalProperties.$tIf = (text, isTranslate) => translateIf(text, isTranslate, i18n.global.t);
 
 app.config.globalProperties.$alert = (message, confirmCallback) => showAlert(message, confirmCallback, i18n.global.t);
 app.config.globalProperties.$confirm = (message, confirmCallback, cancelCallback) => showConfirm(message, confirmCallback, cancelCallback, i18n.global.t);

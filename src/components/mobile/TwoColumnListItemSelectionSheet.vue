@@ -16,9 +16,9 @@
                             <f7-list-item link="#" no-chevron
                                           :class="{ 'primary-list-item-selected': item === selectedPrimaryItem }"
                                           :value="primaryValueField ? (item as Record<string, unknown>)[primaryValueField] : item"
-                                          :title="ti(primaryTitleField ? (item as Record<string, unknown>)[primaryTitleField] as string : '', !!primaryTitleI18n)"
-                                          :header="ti(primaryHeaderField ? (item as Record<string, unknown>)[primaryHeaderField] as string : '', !!primaryHeaderI18n)"
-                                          :footer="ti(primaryFooterField ? (item as Record<string, unknown>)[primaryFooterField] as string : '', !!primaryFooterI18n)"
+                                          :title="primaryTitleField ? ti((item as Record<string, unknown>)[primaryTitleField] as string, !!primaryTitleI18n) : ''"
+                                          :header="primaryHeaderField ? ti((item as Record<string, unknown>)[primaryHeaderField] as string, !!primaryHeaderI18n) : ''"
+                                          :footer="primaryFooterField ? ti((item as Record<string, unknown>)[primaryFooterField] as string, !!primaryFooterI18n) : ''"
                                           :key="primaryKeyField ? (item as Record<string, unknown>)[primaryKeyField] : item"
                                           v-for="item in items"
                                           v-show="item && (!primaryHiddenField || !(item as Record<string, unknown>)[primaryHiddenField])"
@@ -39,9 +39,9 @@
                             <f7-list-item link="#" no-chevron
                                           :class="{ 'secondary-list-item-selected': isSecondarySelected(subItem) }"
                                           :value="secondaryValueField ? subItem[secondaryValueField] : subItem"
-                                          :title="ti(secondaryTitleField ? subItem[secondaryTitleField] as string : '', !!secondaryTitleI18n)"
-                                          :header="ti(secondaryHeaderField ? subItem[secondaryHeaderField] as string : '', !!secondaryHeaderI18n)"
-                                          :footer="ti(secondaryFooterField ? subItem[secondaryFooterField] as string : '', !!secondaryFooterI18n)"
+                                          :title="secondaryTitleField ? ti(subItem[secondaryTitleField] as string, !!secondaryTitleI18n) : ''"
+                                          :header="secondaryHeaderField ? ti(subItem[secondaryHeaderField] as string, !!secondaryHeaderI18n) : ''"
+                                          :footer="secondaryFooterField ? ti(subItem[secondaryFooterField] as string, !!secondaryFooterI18n) : ''"
                                           :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
                                           v-for="subItem in (selectedPrimaryItem as Record<string, unknown>)[primarySubItemsField]"
                                           v-show="subItem && (!secondaryHiddenField || !subItem[secondaryHiddenField])"
@@ -86,7 +86,7 @@ const props = defineProps<{
     primaryIconType?: string;
     primaryColorField?: string;
     primaryHiddenField?: string;
-    primarySubItemsField?: string;
+    primarySubItemsField: string;
     secondaryKeyField?: string;
     secondaryValueField?: string;
     secondaryTitleField?: string;

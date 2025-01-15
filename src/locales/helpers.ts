@@ -1,7 +1,7 @@
 import { useI18n as useVueI18n } from 'vue-i18n';
 import moment from 'moment-timezone';
 
-import type { TypeAndName, TypeAndDisplayName, LocalizedSwitchOption } from '@/core/base.ts';
+import type { PartialRecord, TypeAndName, TypeAndDisplayName, LocalizedSwitchOption } from '@/core/base.ts';
 
 import { type LanguageInfo, type LanguageOption, ALL_LANGUAGES, DEFAULT_LANGUAGE } from '@/locales/index.ts';
 
@@ -50,6 +50,14 @@ import {
 } from '@/core/account.ts';
 
 import {
+    type PresetCategory,
+    type LocalizedPresetCategory,
+    type LocalizedPresetSubCategory,
+    CategoryType,
+    ALL_CATEGORY_TYPES
+} from '@/core/category.ts';
+
+import {
     TransactionEditScopeType,
     TransactionTagFilterType
 } from '@/core/transaction.ts';
@@ -72,6 +80,7 @@ import type { ErrorResponse } from '@/core/api.ts';
 
 import { UTC_TIMEZONE, ALL_TIMEZONES } from '@/consts/timezone.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
+import { DEFAULT_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES, DEFAULT_TRANSFER_CATEGORIES } from '@/consts/category.ts';
 import { KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS } from '@/consts/api.ts';
 
 import type { LatestExchangeRateResponse, LocalizedLatestExchangeRate } from '@/models/exchange_rate.ts';
@@ -81,7 +90,8 @@ import {
     isObject,
     isString,
     isNumber,
-    isBoolean
+    isBoolean,
+    copyArrayTo
 } from '@/lib/common.ts';
 
 import {
@@ -842,6 +852,61 @@ export function useI18n() {
         return ret;
     }
 
+    function getAllTransactionDefaultCategories(categoryType: 0 | CategoryType, locale: string): PartialRecord<CategoryType, LocalizedPresetCategory[]> {
+        const allCategories: PartialRecord<CategoryType, LocalizedPresetCategory[]> = {};
+        const categoryTypes: CategoryType[] = [];
+
+        if (categoryType === 0) {
+            categoryTypes.push(...ALL_CATEGORY_TYPES);
+        } else {
+            categoryTypes.push(categoryType);
+        }
+
+        for (let i = 0; i < categoryTypes.length; i++) {
+            const categories: LocalizedPresetCategory[] = [];
+            const categoryType = categoryTypes[i];
+            let defaultCategories: PresetCategory[] = [];
+
+            if (categoryType === CategoryType.Income) {
+                defaultCategories = copyArrayTo(DEFAULT_INCOME_CATEGORIES, []);
+            } else if (categoryType === CategoryType.Expense) {
+                defaultCategories = copyArrayTo(DEFAULT_EXPENSE_CATEGORIES, []);
+            } else if (categoryType === CategoryType.Transfer) {
+                defaultCategories = copyArrayTo(DEFAULT_TRANSFER_CATEGORIES, []);
+            }
+
+            for (let j = 0; j < defaultCategories.length; j++) {
+                const category = defaultCategories[j];
+
+                const submitCategory: LocalizedPresetCategory = {
+                    name: t('category.' + category.name, {}, { locale: locale }),
+                    type: categoryType,
+                    icon: category.categoryIconId,
+                    color: category.color,
+                    subCategories: []
+                };
+
+                for (let k = 0; k < category.subCategories.length; k++) {
+                    const subCategory = category.subCategories[k];
+                    const submitSubCategory: LocalizedPresetSubCategory = {
+                        name: t('category.' + subCategory.name, {}, { locale: locale }),
+                        type: categoryType,
+                        icon: subCategory.categoryIconId,
+                        color: subCategory.color
+                    };
+
+                    submitCategory.subCategories.push(submitSubCategory);
+                }
+
+                categories.push(submitCategory);
+            }
+
+            allCategories[categoryType] = categories;
+        }
+
+        return allCategories;
+    }
+
     function getAllDisplayExchangeRates(exchangeRatesData?: LatestExchangeRateResponse): LocalizedLatestExchangeRate[] {
         const availableExchangeRates: LocalizedLatestExchangeRate[] = [];
 
@@ -1269,6 +1334,7 @@ export function useI18n() {
         getAllTransactionEditScopeTypes: () => getLocalizedDisplayNameAndType(TransactionEditScopeType.values()),
         getAllTransactionTagFilterTypes: () => getLocalizedDisplayNameAndType(TransactionTagFilterType.values()),
         getAllTransactionScheduledFrequencyTypes: () => getLocalizedDisplayNameAndType(ScheduledTemplateFrequencyType.values()),
+        getAllTransactionDefaultCategories,
         getAllDisplayExchangeRates,
         // get localized info
         getMonthShortName,

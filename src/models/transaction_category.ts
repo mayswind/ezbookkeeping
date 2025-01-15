@@ -1,4 +1,4 @@
-import { CategoryType } from '@/core/category.ts';
+import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { DEFAULT_CATEGORY_ICON_ID } from '@/consts/icon.ts';
 import { DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
 
@@ -131,16 +131,7 @@ export interface TransactionCategoryCreateRequest {
 }
 
 export interface TransactionCategoryCreateBatchRequest {
-    readonly categories: TransactionCategoryCreateWithSubCategories[];
-}
-
-export interface TransactionCategoryCreateWithSubCategories {
-    readonly name: string;
-    readonly type: number;
-    readonly icon: string;
-    readonly color: string;
-    readonly comment: string;
-    readonly subCategories: TransactionCategoryCreateRequest[];
+    readonly categories: LocalizedPresetCategory[];
 }
 
 export interface TransactionCategoryModifyRequest {

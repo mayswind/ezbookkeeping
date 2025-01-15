@@ -59,11 +59,11 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
         clearExchangeRatesFromLocalStorage();
     }
 
-    function getLatestExchangeRates(req: { silent: boolean, force: boolean }): Promise<LatestExchangeRateResponse> {
+    function getLatestExchangeRates({ silent, force }: { silent: boolean, force: boolean }): Promise<LatestExchangeRateResponse> {
         const currentExchangeRateData = latestExchangeRates.value;
         const now = getCurrentUnixTime();
 
-        if (!req.force) {
+        if (!force) {
             if (currentExchangeRateData && currentExchangeRateData.time && currentExchangeRateData.data &&
                 formatUnixTime(currentExchangeRateData.data.updateTime, 'YYYY-MM-DD') === formatUnixTime(now, 'YYYY-MM-DD')) {
                 return Promise.resolve(currentExchangeRateData.data);
@@ -77,7 +77,7 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
 
         return new Promise((resolve, reject) => {
             services.getLatestExchangeRates({
-                ignoreError: req.silent
+                ignoreError: silent
             }).then(response => {
                 const data = response.data;
 
@@ -88,7 +88,7 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
 
                 const currentData = getExchangeRatesFromLocalStorage();
 
-                if (req.force && currentData && currentData.data && isEquals(currentData.data, data.result)) {
+                if (force && currentData && currentData.data && isEquals(currentData.data, data.result)) {
                     reject({ message: 'Exchange rates data is up to date' });
                     return;
                 }

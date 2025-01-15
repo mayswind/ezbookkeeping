@@ -62,12 +62,9 @@ export const useTokensStore = defineStore('tokens', () => {
         });
     }
 
-    function revokeToken(req: { tokenId: string, ignoreError?: boolean }): Promise<boolean> {
+    function revokeToken({ tokenId, ignoreError }: { tokenId: string, ignoreError?: boolean }): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            services.revokeToken({
-                tokenId: req.tokenId,
-                ignoreError: !!req.ignoreError
-            }).then(response => {
+            services.revokeToken({ tokenId, ignoreError }).then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {

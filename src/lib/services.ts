@@ -200,30 +200,30 @@ export default {
     authorize: (data: UserLoginRequest): ApiResponsePromise<AuthResponse> => {
         return axios.post<ApiResponse<AuthResponse>>('authorize.json', data);
     },
-    authorize2FA: (req: { passcode: string, token: string }): ApiResponsePromise<AuthResponse> => {
+    authorize2FA: ({ passcode, token }: { passcode: string, token: string }): ApiResponsePromise<AuthResponse> => {
         return axios.post<ApiResponse<AuthResponse>>('2fa/authorize.json', {
-            passcode: req.passcode
+            passcode: passcode
         }, {
             headers: {
-                Authorization: `Bearer ${req.token}`
+                Authorization: `Bearer ${token}`
             }
         });
     },
-    authorize2FAByBackupCode: (req: { recoveryCode: string, token: string }): ApiResponsePromise<AuthResponse> => {
+    authorize2FAByBackupCode: ({ recoveryCode, token }: { recoveryCode: string, token: string }): ApiResponsePromise<AuthResponse> => {
         return axios.post<ApiResponse<AuthResponse>>('2fa/recovery.json', {
-            recoveryCode: req.recoveryCode
+            recoveryCode: recoveryCode
         }, {
             headers: {
-                Authorization: `Bearer ${req.token}`
+                Authorization: `Bearer ${token}`
             }
         });
     },
     register: (req: UserRegisterRequest): ApiResponsePromise<RegisterResponse> => {
         return axios.post<ApiResponse<RegisterResponse>>('register.json', req);
     },
-    verifyEmail: (req: { token: string, requestNewToken: boolean }): ApiResponsePromise<UserVerifyEmailResponse> => {
-        return axios.post<ApiResponse<UserVerifyEmailResponse>>('verify_email/by_token.json?token=' + req.token, {
-            requestNewToken: req.requestNewToken
+    verifyEmail: ({ token, requestNewToken }: { token: string, requestNewToken: boolean }): ApiResponsePromise<UserVerifyEmailResponse> => {
+        return axios.post<ApiResponse<UserVerifyEmailResponse>>('verify_email/by_token.json?token=' + token, {
+            requestNewToken: requestNewToken
         }, {
             noAuth: true,
             ignoreError: true
@@ -235,10 +235,10 @@ export default {
     requestResetPassword: (req: ForgetPasswordRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('forget_password/request.json', req);
     },
-    resetPassword: (req: { email: string, token: string, password: string }): ApiResponsePromise<boolean> => {
-        return axios.post<ApiResponse<boolean>>('forget_password/reset/by_token.json?token=' + req.token, {
-            email: req.email,
-            password: req.password
+    resetPassword: ({ email, token, password }: { email: string, token: string, password: string }): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('forget_password/reset/by_token.json?token=' + token, {
+            email: email,
+            password: password
         }, {
             noAuth: true,
             ignoreError: true
@@ -269,11 +269,11 @@ export default {
     getTokens: (): ApiResponsePromise<TokenInfoResponse[]> => {
         return axios.get<ApiResponse<TokenInfoResponse[]>>('v1/tokens/list.json');
     },
-    revokeToken: (req: { tokenId: string, ignoreError?: boolean }): ApiResponsePromise<boolean> => {
+    revokeToken: ({ tokenId, ignoreError }: { tokenId: string, ignoreError?: boolean }): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/tokens/revoke.json', {
-            tokenId: req.tokenId
+            tokenId: tokenId
         }, {
-            ignoreError: !!req.ignoreError
+            ignoreError: !!ignoreError
         } as ApiRequestConfig);
     },
     revokeAllTokens: (): ApiResponsePromise<boolean> => {
@@ -285,9 +285,9 @@ export default {
     updateProfile: (req: UserProfileUpdateRequest): ApiResponsePromise<UserProfileUpdateResponse> => {
         return axios.post<ApiResponse<UserProfileUpdateResponse>>('v1/users/profile/update.json', req);
     },
-    updateAvatar: (req: { avatarFile: unknown }): ApiResponsePromise<UserProfileResponse> => {
+    updateAvatar: ({ avatarFile }: { avatarFile: unknown }): ApiResponsePromise<UserProfileResponse> => {
         return axios.postForm<ApiResponse<UserProfileResponse>>('v1/users/avatar/update.json', {
-            avatar: req.avatarFile
+            avatar: avatarFile
         }, {
             timeout: DEFAULT_UPLOAD_API_TIMEOUT
         });
@@ -328,11 +328,11 @@ export default {
     clearData: (req: ClearDataRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/data/clear.json', req);
     },
-    getAllAccounts: (req: { visibleOnly: boolean }): ApiResponsePromise<AccountInfoResponse[]> => {
-        return axios.get<ApiResponse<AccountInfoResponse[]>>('v1/accounts/list.json?visible_only=' + req.visibleOnly);
+    getAllAccounts: ({ visibleOnly }: { visibleOnly: boolean }): ApiResponsePromise<AccountInfoResponse[]> => {
+        return axios.get<ApiResponse<AccountInfoResponse[]>>('v1/accounts/list.json?visible_only=' + visibleOnly);
     },
-    getAccount: (req: { id: string }): ApiResponsePromise<AccountInfoResponse> => {
-        return axios.get<ApiResponse<AccountInfoResponse>>('v1/accounts/get.json?id=' + req.id);
+    getAccount: ({ id }: { id: string }): ApiResponsePromise<AccountInfoResponse> => {
+        return axios.get<ApiResponse<AccountInfoResponse>>('v1/accounts/get.json?id=' + id);
     },
     addAccount: (req: AccountCreateRequest): ApiResponsePromise<AccountInfoResponse> => {
         return axios.post<ApiResponse<AccountInfoResponse>>('v1/accounts/add.json', req);
@@ -405,12 +405,12 @@ export default {
         const req = TransactionAmountsRequest.of(params);
         return axios.get<ApiResponse<TransactionAmountsResponse>>(`v1/transactions/amounts.json?${req.buildQuery()}`);
     },
-    getTransaction: (req: { id: string, withPictures: boolean | undefined }): ApiResponsePromise<TransactionInfoResponse> => {
-        if (!isDefined(req.withPictures)) {
-            req.withPictures = true;
+    getTransaction: ({ id, withPictures }: { id: string, withPictures: boolean | undefined }): ApiResponsePromise<TransactionInfoResponse> => {
+        if (!isDefined(withPictures)) {
+            withPictures = true;
         }
 
-        return axios.get<ApiResponse<TransactionInfoResponse>>(`v1/transactions/get.json?id=${req.id}&with_pictures=${req.withPictures}&trim_account=true&trim_category=true&trim_tag=true`);
+        return axios.get<ApiResponse<TransactionInfoResponse>>(`v1/transactions/get.json?id=${id}&with_pictures=${withPictures}&trim_account=true&trim_category=true&trim_tag=true`);
     },
     addTransaction: (req: TransactionCreateRequest): ApiResponsePromise<TransactionInfoResponse> => {
         return axios.post<ApiResponse<TransactionInfoResponse>>('v1/transactions/add.json', req);
@@ -421,10 +421,10 @@ export default {
     deleteTransaction: (req: TransactionDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transactions/delete.json', req);
     },
-    parseImportTransaction: (req: { fileType: string, importFile: unknown }): ApiResponsePromise<ImportTransactionResponsePageWrapper> => {
+    parseImportTransaction: ({ fileType, importFile }: { fileType: string, importFile: unknown }): ApiResponsePromise<ImportTransactionResponsePageWrapper> => {
         return axios.postForm<ApiResponse<ImportTransactionResponsePageWrapper>>('v1/transactions/parse_import.json', {
-            fileType: req.fileType,
-            file: req.importFile
+            fileType: fileType,
+            file: importFile
         }, {
             timeout: DEFAULT_UPLOAD_API_TIMEOUT
         } as ApiRequestConfig);
@@ -434,10 +434,10 @@ export default {
             timeout: DEFAULT_IMPORT_API_TIMEOUT
         } as ApiRequestConfig);
     },
-    uploadTransactionPicture: (req: { pictureFile: unknown, clientSessionId: string }): ApiResponsePromise<TransactionPictureInfoBasicResponse> => {
+    uploadTransactionPicture: ({ pictureFile, clientSessionId }: { pictureFile: unknown, clientSessionId: string }): ApiResponsePromise<TransactionPictureInfoBasicResponse> => {
         return axios.postForm<ApiResponse<TransactionPictureInfoBasicResponse>>('v1/transaction/pictures/upload.json', {
-            picture: req.pictureFile,
-            clientSessionId: req.clientSessionId
+            picture: pictureFile,
+            clientSessionId: clientSessionId
         }, {
             timeout: DEFAULT_UPLOAD_API_TIMEOUT
         } as ApiRequestConfig);
@@ -448,8 +448,8 @@ export default {
     getAllTransactionCategories: (): ApiResponsePromise<Record<number, TransactionCategoryInfoResponse[]>> => {
         return axios.get<ApiResponse<Record<number, TransactionCategoryInfoResponse[]>>>('v1/transaction/categories/list.json');
     },
-    getTransactionCategory: (req: { id: string }): ApiResponsePromise<TransactionCategoryInfoResponse> => {
-        return axios.get<ApiResponse<TransactionCategoryInfoResponse>>('v1/transaction/categories/get.json?id=' + req.id);
+    getTransactionCategory: ({ id }: { id: string }): ApiResponsePromise<TransactionCategoryInfoResponse> => {
+        return axios.get<ApiResponse<TransactionCategoryInfoResponse>>('v1/transaction/categories/get.json?id=' + id);
     },
     addTransactionCategory: (req: TransactionCategoryCreateRequest): ApiResponsePromise<TransactionCategoryInfoResponse> => {
         return axios.post<ApiResponse<TransactionCategoryInfoResponse>>('v1/transaction/categories/add.json', req);
@@ -472,8 +472,8 @@ export default {
     getAllTransactionTags: (): ApiResponsePromise<TransactionTagInfoResponse[]> => {
         return axios.get<ApiResponse<TransactionTagInfoResponse[]>>('v1/transaction/tags/list.json');
     },
-    getTransactionTag: (req: { id: string }): ApiResponsePromise<TransactionTagInfoResponse> => {
-        return axios.get<ApiResponse<TransactionTagInfoResponse>>('v1/transaction/tags/get.json?id=' + req.id);
+    getTransactionTag: ({ id }: { id: string }): ApiResponsePromise<TransactionTagInfoResponse> => {
+        return axios.get<ApiResponse<TransactionTagInfoResponse>>('v1/transaction/tags/get.json?id=' + id);
     },
     addTransactionTag: (req: TransactionTagCreateRequest): ApiResponsePromise<TransactionTagInfoResponse> => {
         return axios.post<ApiResponse<TransactionTagInfoResponse>>('v1/transaction/tags/add.json', req);
@@ -490,11 +490,11 @@ export default {
     deleteTransactionTag: (req: TransactionTagDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transaction/tags/delete.json', req);
     },
-    getAllTransactionTemplates: (req: { templateType: number }): ApiResponsePromise<TransactionTemplateInfoResponse[]> => {
-        return axios.get<ApiResponse<TransactionTemplateInfoResponse[]>>('v1/transaction/templates/list.json?templateType=' + req.templateType);
+    getAllTransactionTemplates: ({ templateType }: { templateType: number }): ApiResponsePromise<TransactionTemplateInfoResponse[]> => {
+        return axios.get<ApiResponse<TransactionTemplateInfoResponse[]>>('v1/transaction/templates/list.json?templateType=' + templateType);
     },
-    getTransactionTemplate: (req: { id: string }): ApiResponsePromise<TransactionTemplateInfoResponse> => {
-        return axios.get<ApiResponse<TransactionTemplateInfoResponse>>('v1/transaction/templates/get.json?id=' + req.id);
+    getTransactionTemplate: ({ id }: { id: string }): ApiResponsePromise<TransactionTemplateInfoResponse> => {
+        return axios.get<ApiResponse<TransactionTemplateInfoResponse>>('v1/transaction/templates/get.json?id=' + id);
     },
     addTransactionTemplate: (req: TransactionTemplateCreateRequest): ApiResponsePromise<TransactionTemplateInfoResponse> => {
         return axios.post<ApiResponse<TransactionTemplateInfoResponse>>('v1/transaction/templates/add.json', req);

@@ -154,11 +154,9 @@ export const useUserStore = defineStore('user', () => {
         });
     }
 
-    function updateUserTransactionEditScope(req: { transactionEditScope: number }): Promise<UserProfileUpdateResponse> {
+    function updateUserTransactionEditScope({ transactionEditScope }: { transactionEditScope: number }): Promise<UserProfileUpdateResponse> {
         return new Promise((resolve, reject) => {
-            services.updateProfile({
-                transactionEditScope: req.transactionEditScope,
-            }).then(response => {
+            services.updateProfile({ transactionEditScope }).then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result || !data.result.user || !isObject(data.result.user)) {
@@ -183,9 +181,9 @@ export const useUserStore = defineStore('user', () => {
         });
     }
 
-    function updateUserAvatar(req: { avatarFile: unknown }): Promise<UserProfileResponse> {
+    function updateUserAvatar({ avatarFile }: { avatarFile: unknown }): Promise<UserProfileResponse> {
         return new Promise((resolve, reject) => {
-            services.updateAvatar({ avatarFile: req.avatarFile }).then(response => {
+            services.updateAvatar({ avatarFile }).then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {

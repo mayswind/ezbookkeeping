@@ -59,13 +59,13 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
         allTransactionTagsMap.value[tag.id] = tag;
     }
 
-    function updateTagDisplayOrderInTransactionTagList(params: { from: number, to: number }): void {
-        allTransactionTags.value.splice(params.to, 0, allTransactionTags.value.splice(params.from, 1)[0]);
+    function updateTagDisplayOrderInTransactionTagList({ from, to }: { from: number, to: number }): void {
+        allTransactionTags.value.splice(to, 0, allTransactionTags.value.splice(from, 1)[0]);
     }
 
-    function updateTagVisibilityInTransactionTagList(params: { tag: TransactionTag, hidden: boolean }): void {
-        if (allTransactionTagsMap.value[params.tag.id]) {
-            allTransactionTagsMap.value[params.tag.id].hidden = params.hidden;
+    function updateTagVisibilityInTransactionTagList({ tag, hidden }: { tag: TransactionTag, hidden: boolean }): void {
+        if (allTransactionTagsMap.value[tag.id]) {
+            allTransactionTagsMap.value[tag.id].hidden = hidden;
         }
     }
 
@@ -92,8 +92,8 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
         transactionTagListStateInvalid.value = true;
     }
 
-    function loadAllTags(params: { force?: boolean }): Promise<TransactionTag[]> {
-        if (!params.force && !transactionTagListStateInvalid.value) {
+    function loadAllTags({ force }: { force?: boolean }): Promise<TransactionTag[]> {
+        if (!force && !transactionTagListStateInvalid.value) {
             return new Promise((resolve) => {
                 resolve(allTransactionTags.value);
             });
@@ -114,7 +114,7 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
 
                 const transactionTags = TransactionTag.ofMany(data.result);
 
-                if (params.force && data.result && isEquals(allTransactionTags.value, transactionTags)) {
+                if (force && data.result && isEquals(allTransactionTags.value, transactionTags)) {
                     reject({ message: 'Tag list is up to date' });
                     return;
                 }
@@ -123,7 +123,7 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
 
                 resolve(transactionTags);
             }).catch(error => {
-                if (params.force) {
+                if (force) {
                     logger.error('failed to force load tag list', error);
                 } else {
                     logger.error('failed to load tag list', error);
@@ -140,21 +140,21 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
         });
     }
 
-    function saveTag(params: { tag: TransactionTag }): Promise<TransactionTag> {
+    function saveTag({ tag }: { tag: TransactionTag }): Promise<TransactionTag> {
         return new Promise((resolve, reject) => {
             let promise: ApiResponsePromise<TransactionTagInfoResponse>;
 
-            if (!params.tag.id) {
-                promise = services.addTransactionTag(params.tag.toCreateRequest());
+            if (!tag.id) {
+                promise = services.addTransactionTag(tag.toCreateRequest());
             } else {
-                promise = services.modifyTransactionTag(params.tag.toModifyRequest());
+                promise = services.modifyTransactionTag(tag.toModifyRequest());
             }
 
             promise.then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
-                    if (!params.tag.id) {
+                    if (!tag.id) {
                         reject({ message: 'Unable to add tag' });
                     } else {
                         reject({ message: 'Unable to save tag' });
@@ -164,7 +164,7 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
 
                 const transactionTag = TransactionTag.of(data.result);
 
-                if (!params.tag.id) {
+                if (!tag.id) {
                     addTagToTransactionTagList(transactionTag);
                 } else {
                     updateTagInTransactionTagList(transactionTag);
@@ -177,7 +177,7 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     reject({ error: error.response.data });
                 } else if (!error.processed) {
-                    if (!params.tag.id) {
+                    if (!tag.id) {
                         reject({ message: 'Unable to add tag' });
                     } else {
                         reject({ message: 'Unable to save tag' });
@@ -189,18 +189,18 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
         });
     }
 
-    function changeTagDisplayOrder(params: { tagId: string, from: number, to: number }): Promise<void> {
+    function changeTagDisplayOrder({ tagId, from, to }: { tagId: string, from: number, to: number }): Promise<void> {
         return new Promise((resolve, reject) => {
             let tag: TransactionTag | null = null;
 
             for (let i = 0; i < allTransactionTags.value.length; i++) {
-                if (allTransactionTags.value[i].id === params.tagId) {
+                if (allTransactionTags.value[i].id === tagId) {
                     tag = allTransactionTags.value[i];
                     break;
                 }
             }
 
-            if (!tag || !allTransactionTags.value[params.to]) {
+            if (!tag || !allTransactionTags.value[to]) {
                 reject({ message: 'Unable to move tag' });
                 return;
             }
@@ -209,10 +209,7 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
                 updateTransactionTagListInvalidState(true);
             }
 
-            updateTagDisplayOrderInTransactionTagList({
-                from: params.from,
-                to: params.to
-            });
+            updateTagDisplayOrderInTransactionTagList({ from, to });
 
             resolve();
         });
@@ -258,16 +255,16 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
         });
     }
 
-    function hideTag(params: { tag: TransactionTag, hidden: boolean }): Promise<boolean> {
+    function hideTag({ tag, hidden }: { tag: TransactionTag, hidden: boolean }): Promise<boolean> {
         return new Promise((resolve, reject) => {
             services.hideTransactionTag({
-                id: params.tag.id,
-                hidden: params.hidden
+                id: tag.id,
+                hidden: hidden
             }).then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
-                    if (params.hidden) {
+                    if (hidden) {
                         reject({ message: 'Unable to hide this tag' });
                     } else {
                         reject({ message: 'Unable to unhide this tag' });
@@ -275,10 +272,7 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
                     return;
                 }
 
-                updateTagVisibilityInTransactionTagList({
-                    tag: params.tag,
-                    hidden: params.hidden
-                });
+                updateTagVisibilityInTransactionTagList({ tag, hidden });
 
                 resolve(data.result);
             }).catch(error => {
@@ -287,7 +281,7 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     reject({ error: error.response.data });
                 } else if (!error.processed) {
-                    if (params.hidden) {
+                    if (hidden) {
                         reject({ message: 'Unable to hide this tag' });
                     } else {
                         reject({ message: 'Unable to unhide this tag' });
@@ -299,10 +293,10 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
         });
     }
 
-    function deleteTag(params: { tag: TransactionTag, beforeResolve?: BeforeResolveFunction }): Promise<boolean> {
+    function deleteTag({ tag, beforeResolve }: { tag: TransactionTag, beforeResolve?: BeforeResolveFunction }): Promise<boolean> {
         return new Promise((resolve, reject) => {
             services.deleteTransactionTag({
-                id: params.tag.id
+                id: tag.id
             }).then(response => {
                 const data = response.data;
 
@@ -311,12 +305,12 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
                     return;
                 }
 
-                if (params.beforeResolve) {
-                    params.beforeResolve(() => {
-                        removeTagFromTransactionTagList(params.tag);
+                if (beforeResolve) {
+                    beforeResolve(() => {
+                        removeTagFromTransactionTagList(tag);
                     });
                 } else {
-                    removeTagFromTransactionTagList(params.tag);
+                    removeTagFromTransactionTagList(tag);
                 }
 
                 resolve(data.result);

@@ -94,23 +94,23 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         return true;
     }
 
-    function updateCategoryDisplayOrderInCategoryList(params: { category: TransactionCategory, from: number, to: number }): void {
+    function updateCategoryDisplayOrderInCategoryList({ category, from, to }: { category: TransactionCategory, from: number, to: number }): void {
         let categoryList: TransactionCategory[] | undefined = undefined;
 
-        if (!params.category.parentId || params.category.parentId === '0') {
-            categoryList = allTransactionCategories.value[params.category.type];
-        } else if (allTransactionCategoriesMap.value[params.category.parentId]) {
-            categoryList = allTransactionCategoriesMap.value[params.category.parentId].secondaryCategories;
+        if (!category.parentId || category.parentId === '0') {
+            categoryList = allTransactionCategories.value[category.type];
+        } else if (allTransactionCategoriesMap.value[category.parentId]) {
+            categoryList = allTransactionCategoriesMap.value[category.parentId].secondaryCategories;
         }
 
         if (categoryList) {
-            categoryList.splice(params.to, 0, categoryList.splice(params.from, 1)[0]);
+            categoryList.splice(to, 0, categoryList.splice(from, 1)[0]);
         }
     }
 
-    function updateCategoryVisibilityInTransactionCategoryList(params: { category: TransactionCategory, hidden: boolean }): void {
-        if (allTransactionCategoriesMap.value[params.category.id]) {
-            allTransactionCategoriesMap.value[params.category.id].visible = !params.hidden;
+    function updateCategoryVisibilityInTransactionCategoryList({ category, hidden }: { category: TransactionCategory, hidden: boolean }): void {
+        if (allTransactionCategoriesMap.value[category.id]) {
+            allTransactionCategoriesMap.value[category.id].visible = !hidden;
         }
     }
 
@@ -160,8 +160,8 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         transactionCategoryListStateInvalid.value = true;
     }
 
-    function loadAllCategories(params: { force?: boolean }): Promise<Record<number, TransactionCategory[]>> {
-        if (!params.force && !transactionCategoryListStateInvalid.value) {
+    function loadAllCategories({ force }: { force?: boolean }): Promise<Record<number, TransactionCategory[]>> {
+        if (!force && !transactionCategoryListStateInvalid.value) {
             return new Promise((resolve) => {
                 resolve(allTransactionCategories.value);
             });
@@ -194,7 +194,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
 
                 const transactionCategories = TransactionCategory.ofMap(data.result);
 
-                if (params.force && data.result && isEquals(allTransactionCategories.value, transactionCategories)) {
+                if (force && data.result && isEquals(allTransactionCategories.value, transactionCategories)) {
                     reject({ message: 'Category list is up to date' });
                     return;
                 }
@@ -203,7 +203,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
 
                 resolve(transactionCategories);
             }).catch(error => {
-                if (params.force) {
+                if (force) {
                     logger.error('failed to force load category list', error);
                 } else {
                     logger.error('failed to load category list', error);
@@ -220,10 +220,10 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         });
     }
 
-    function getCategory(params: { categoryId: string }): Promise<TransactionCategory> {
+    function getCategory({ categoryId }: { categoryId: string }): Promise<TransactionCategory> {
         return new Promise((resolve, reject) => {
             services.getTransactionCategory({
-                id: params.categoryId
+                id: categoryId
             }).then(response => {
                 const data = response.data;
 
@@ -249,21 +249,21 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         });
     }
 
-    function saveCategory(params: { category: TransactionCategory, isEdit: boolean, clientSessionId: string }): Promise<TransactionCategory> {
+    function saveCategory({ category, isEdit, clientSessionId }: { category: TransactionCategory, isEdit: boolean, clientSessionId: string }): Promise<TransactionCategory> {
         return new Promise((resolve, reject) => {
             let promise: ApiResponsePromise<TransactionCategoryInfoResponse>;
 
-            if (!params.isEdit) {
-                promise = services.addTransactionCategory(params.category.toCreateRequest(params.clientSessionId));
+            if (!isEdit) {
+                promise = services.addTransactionCategory(category.toCreateRequest(clientSessionId));
             } else {
-                promise = services.modifyTransactionCategory(params.category.toModifyRequest());
+                promise = services.modifyTransactionCategory(category.toModifyRequest());
             }
 
             promise.then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
-                    if (!params.isEdit) {
+                    if (!isEdit) {
                         reject({ message: 'Unable to add category' });
                     } else {
                         reject({ message: 'Unable to save category' });
@@ -273,10 +273,10 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
 
                 const transactionCategory = TransactionCategory.of(data.result);
 
-                if (!params.isEdit) {
+                if (!isEdit) {
                     addCategoryToTransactionCategoryList(transactionCategory);
                 } else {
-                    const result = updateCategoryInTransactionCategoryList(transactionCategory, allTransactionCategoriesMap.value[params.category.id]);
+                    const result = updateCategoryInTransactionCategoryList(transactionCategory, allTransactionCategoriesMap.value[category.id]);
 
                     if (!result && !transactionCategoryListStateInvalid.value) {
                         updateTransactionCategoryListInvalidState(true);
@@ -290,7 +290,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     reject({ error: error.response.data });
                 } else if (!error.processed) {
-                    if (!params.isEdit) {
+                    if (!isEdit) {
                         reject({ message: 'Unable to add category' });
                     } else {
                         reject({ message: 'Unable to save category' });
@@ -333,8 +333,8 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         });
     }
 
-    function changeCategoryDisplayOrder(params: { categoryId: string, from: number, to: number }): Promise<void> {
-        const category = allTransactionCategoriesMap.value[params.categoryId];
+    function changeCategoryDisplayOrder({ categoryId, from, to }: { categoryId: string, from: number, to: number }): Promise<void> {
+        const category = allTransactionCategoriesMap.value[categoryId];
 
         return new Promise((resolve, reject) => {
             if (!category) {
@@ -344,14 +344,14 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
 
             if (!category.parentId || category.parentId === '0') {
                 if (!allTransactionCategories.value[category.type] ||
-                    !allTransactionCategories.value[category.type][params.to]) {
+                    !allTransactionCategories.value[category.type][to]) {
                     reject({ message: 'Unable to move category' });
                     return;
                 }
             } else {
                 const subCategoryList = allTransactionCategoriesMap.value[category.parentId].secondaryCategories;
 
-                if (!subCategoryList || !subCategoryList[params.to]) {
+                if (!subCategoryList || !subCategoryList[to]) {
                     reject({ message: 'Unable to move category' });
                     return;
                 }
@@ -361,25 +361,21 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                 updateTransactionCategoryListInvalidState(true);
             }
 
-            updateCategoryDisplayOrderInCategoryList({
-                category: category,
-                from: params.from,
-                to: params.to
-            });
+            updateCategoryDisplayOrderInCategoryList({ category, from, to });
 
             resolve();
         });
     }
 
-    function updateCategoryDisplayOrders(params: { type: CategoryType, parentId: string }): Promise<boolean> {
+    function updateCategoryDisplayOrders({ type, parentId }: { type: CategoryType, parentId: string }): Promise<boolean> {
         const newDisplayOrders: TransactionCategoryNewDisplayOrderRequest[] = [];
 
         let categoryList: TransactionCategory[] | undefined = undefined;
 
-        if (!params.parentId || params.parentId === '0') {
-            categoryList = allTransactionCategories.value[params.type];
-        } else if (allTransactionCategoriesMap.value[params.parentId]) {
-            categoryList = allTransactionCategoriesMap.value[params.parentId].secondaryCategories;
+        if (!parentId || parentId === '0') {
+            categoryList = allTransactionCategories.value[type];
+        } else if (allTransactionCategoriesMap.value[parentId]) {
+            categoryList = allTransactionCategoriesMap.value[parentId].secondaryCategories;
         }
 
         if (categoryList) {
@@ -421,16 +417,16 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         });
     }
 
-    function hideCategory(params: { category: TransactionCategory, hidden: boolean }): Promise<boolean> {
+    function hideCategory({ category, hidden }: { category: TransactionCategory, hidden: boolean }): Promise<boolean> {
         return new Promise((resolve, reject) => {
             services.hideTransactionCategory({
-                id: params.category.id,
-                hidden: params.hidden
+                id: category.id,
+                hidden: hidden
             }).then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
-                    if (params.hidden) {
+                    if (hidden) {
                         reject({ message: 'Unable to hide this category' });
                     } else {
                         reject({ message: 'Unable to unhide this category' });
@@ -439,10 +435,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                     return;
                 }
 
-                updateCategoryVisibilityInTransactionCategoryList({
-                    category: params.category,
-                    hidden: params.hidden
-                });
+                updateCategoryVisibilityInTransactionCategoryList({ category, hidden });
 
                 resolve(data.result);
             }).catch(error => {
@@ -451,7 +444,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     reject({ error: error.response.data });
                 } else if (!error.processed) {
-                    if (params.hidden) {
+                    if (hidden) {
                         reject({ message: 'Unable to hide this category' });
                     } else {
                         reject({ message: 'Unable to unhide this category' });
@@ -463,10 +456,10 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         });
     }
 
-    function deleteCategory(params: { category: TransactionCategory, beforeResolve: BeforeResolveFunction }): Promise<boolean> {
+    function deleteCategory({ category, beforeResolve }: { category: TransactionCategory, beforeResolve: BeforeResolveFunction }): Promise<boolean> {
         return new Promise((resolve, reject) => {
             services.deleteTransactionCategory({
-                id: params.category.id
+                id: category.id
             }).then(response => {
                 const data = response.data;
 
@@ -475,12 +468,12 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                     return;
                 }
 
-                if (params.beforeResolve) {
-                    params.beforeResolve(() => {
-                        removeCategoryFromTransactionCategoryList(params.category);
+                if (beforeResolve) {
+                    beforeResolve(() => {
+                        removeCategoryFromTransactionCategoryList(category);
                     });
                 } else {
-                    removeCategoryFromTransactionCategoryList(params.category);
+                    removeCategoryFromTransactionCategoryList(category);
                 }
 
                 resolve(data.result);

@@ -276,7 +276,7 @@ export const useOverviewStore = defineStore('overview', () => {
         transactionOverviewStateInvalid.value = true;
     }
 
-    function loadTransactionOverview(params: { force: boolean, loadLast11Months: boolean }): Promise<TransactionAmountsResponse> {
+    function loadTransactionOverview({ force, loadLast11Months }: { force: boolean, loadLast11Months: boolean }): Promise<TransactionAmountsResponse> {
         let dateChanged = false;
         let rangeChanged = false;
 
@@ -285,11 +285,11 @@ export const useOverviewStore = defineStore('overview', () => {
             updateTransactionDateRange();
         }
 
-        if (params.loadLast11Months && !transactionOverviewOptions.value.loadLast11Months) {
+        if (loadLast11Months && !transactionOverviewOptions.value.loadLast11Months) {
             rangeChanged = true;
         }
 
-        if (!dateChanged && !rangeChanged && !params.force && !transactionOverviewStateInvalid.value) {
+        if (!dateChanged && !rangeChanged && !force && !transactionOverviewStateInvalid.value) {
             return new Promise((resolve) => {
                 resolve(transactionOverviewData.value);
             });
@@ -303,7 +303,7 @@ export const useOverviewStore = defineStore('overview', () => {
             thisYear: transactionDataRange.value.thisYear
         };
 
-        if (params.loadLast11Months) {
+        if (loadLast11Months) {
             requestParams.lastMonth = transactionDataRange.value.lastMonth;
             requestParams.monthBeforeLastMonth = transactionDataRange.value.monthBeforeLastMonth;
             requestParams.monthBeforeLast2Months = transactionDataRange.value.monthBeforeLast2Months;
@@ -330,17 +330,17 @@ export const useOverviewStore = defineStore('overview', () => {
                     updateTransactionOverviewInvalidState(false);
                 }
 
-                if (params.force && data.result && isEquals(transactionOverviewData.value, data.result)) {
+                if (force && data.result && isEquals(transactionOverviewData.value, data.result)) {
                     reject({ message: 'Data is up to date' });
                     return;
                 }
 
                 transactionOverviewData.value = data.result;
-                transactionOverviewOptions.value.loadLast11Months = params.loadLast11Months;
+                transactionOverviewOptions.value.loadLast11Months = loadLast11Months;
 
                 resolve(data.result);
             }).catch(error => {
-                if (params.force) {
+                if (force) {
                     logger.error('failed to force load transaction overview', error);
                 } else {
                     logger.error('failed to load transaction overview', error);

@@ -6,8 +6,10 @@
         "types": ["vite/client"],
         "strict": true,
         "noImplicitReturns": true,
+        "noImplicitOverride": true,
         "noUnusedLocals": true,
         "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true,
         "paths": {
             "@/*": ["./src/*"]
         }

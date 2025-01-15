@@ -16,14 +16,14 @@ const BUILD_DIR = resolve(__dirname, './dist',);
 
 export default defineConfig(() => {
     const licenseContent = fs.readFileSync('./LICENSE', { encoding: 'utf-8' });
-    const buildUnixTime = process.env.buildUnixTime || '';
+    const buildUnixTime = process.env['buildUnixTime'] || '';
 
     const options: UserConfig = {
         root: SRC_DIR,
         publicDir: PUBLIC_DIR,
         base: './',
         define: {
-            __EZBOOKKEEPING_IS_PRODUCTION__: process.env.NODE_ENV === 'production',
+            __EZBOOKKEEPING_IS_PRODUCTION__: process.env['NODE_ENV'] === 'production',
             __EZBOOKKEEPING_VERSION__: JSON.stringify(packageFile.version),
             __EZBOOKKEEPING_BUILD_UNIX_TIME__: JSON.stringify(buildUnixTime),
             __EZBOOKKEEPING_BUILD_COMMIT_HASH__: JSON.stringify(git.short()),

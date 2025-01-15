@@ -22,10 +22,10 @@ import { useI18n } from '@/locales/helpers.ts';
 import { isString, isObject } from '@/lib/common.ts';
 
 const props = defineProps<{
-    show?: boolean
-    color?: string
-    title?: string
-    text?: string
+    show?: boolean;
+    color?: string;
+    title?: string;
+    text?: string;
 }>();
 
 const emit = defineEmits<{

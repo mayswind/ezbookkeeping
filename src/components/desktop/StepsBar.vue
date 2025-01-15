@@ -53,10 +53,10 @@ interface StepBarItem {
 }
 
 const props = defineProps<{
-    steps: StepBarItem[]
-    currentStep: string
-    clickable?: string | boolean
-    minWidth: string | number
+    steps: StepBarItem[];
+    currentStep: string;
+    clickable?: string | boolean;
+    minWidth: string | number;
 }>();
 
 const emit = defineEmits<{

@@ -32,12 +32,12 @@ import { useI18n } from '@/locales/helpers.ts';
 import { ClipboardHolder } from '@/lib/clipboard.ts';
 
 const props = defineProps<{
-    title?: string
-    hint?: string
-    information: string
-    rowCount: number
-    enableCopy?: boolean
-    show: boolean
+    title?: string;
+    hint?: string;
+    information: string;
+    rowCount: number;
+    enableCopy?: boolean;
+    show: boolean;
 }>();
 
 const emit = defineEmits<{

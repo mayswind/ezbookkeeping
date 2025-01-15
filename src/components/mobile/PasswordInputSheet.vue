@@ -43,13 +43,13 @@ import { ref } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 
 const props = defineProps<{
-    modelValue: string
-    title?: string
-    hint?: string
-    color?: string
-    confirmDisabled?: boolean
-    cancelDisabled?: boolean
-    show: boolean
+    modelValue: string;
+    title?: string;
+    hint?: string;
+    color?: string;
+    confirmDisabled?: boolean;
+    cancelDisabled?: boolean;
+    show: boolean;
 }>();
 
 const emit = defineEmits<{

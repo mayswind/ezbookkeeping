@@ -49,19 +49,19 @@ const {
 } = useI18n();
 
 const props = defineProps<{
-    class?: string,
-    color?: string,
-    density?: string,
-    currency: string,
-    showCurrency?: boolean,
-    label?: string,
-    placeholder?: string,
-    persistentPlaceholder?: boolean,
-    disabled?: boolean,
-    readonly?: boolean,
-    hide?: boolean,
-    enableRules?: boolean,
-    modelValue: number
+    class?: string;
+    color?: string;
+    density?: string;
+    currency: string;
+    showCurrency?: boolean;
+    label?: string;
+    placeholder?: string;
+    persistentPlaceholder?: boolean;
+    disabled?: boolean;
+    readonly?: boolean;
+    hide?: boolean;
+    enableRules?: boolean;
+    modelValue: number;
 }>();
 
 const emit = defineEmits<{

@@ -210,7 +210,7 @@ function inputNum(num: number): void {
     if (isNumber(props.minValue)) {
         const current = parseAmount(newValue);
 
-        if (current < (props.minValue as number)) {
+        if (current < (props.minValue)) {
             return;
         }
     }
@@ -218,7 +218,7 @@ function inputNum(num: number): void {
     if (isNumber(props.maxValue)) {
         const current = parseAmount(newValue);
 
-        if (current > (props.maxValue as number)) {
+        if (current > (props.maxValue)) {
             return;
         }
     }
@@ -308,14 +308,14 @@ function confirm(): boolean {
         }
 
         if (isNumber(props.minValue)) {
-            if (finalValue < (props.minValue as number)) {
+            if (finalValue < (props.minValue)) {
                 showToast('Numeric Overflow');
                 return false;
             }
         }
 
         if (isNumber(props.maxValue)) {
-            if (finalValue > (props.maxValue as number)) {
+            if (finalValue > (props.maxValue)) {
                 showToast('Numeric Overflow');
                 return false;
             }

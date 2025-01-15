@@ -488,7 +488,7 @@ export function useI18n() {
             return undefined;
         }
 
-        if (text && isTranslate) {
+        if (isTranslate) {
             return t(text);
         }
 
@@ -499,12 +499,12 @@ export function useI18n() {
         let finalMessage = '';
         let parameters = {};
 
-        if (isObject(message) && isObject((message as { error: ErrorResponse }).error)) {
-            const localizedError = getLocalizedError((message as { error: ErrorResponse }).error);
+        if (isObject(message) && isObject(message.error)) {
+            const localizedError = getLocalizedError(message.error);
             finalMessage = localizedError.message;
             parameters = getLocalizedErrorParameters(localizedError.parameters);
         } else if (isString(message)) {
-            finalMessage = message as string;
+            finalMessage = message;
         } else {
             return '';
         }
@@ -941,7 +941,7 @@ export function useI18n() {
             weekdayTypesMap[weekdayTypes[i]] = true;
         }
 
-        const allWeekDays = getAllWeekDays(firstDayOfWeek as number);
+        const allWeekDays = getAllWeekDays(firstDayOfWeek);
         const finalWeekdayNames = [];
 
         for (let i = 0; i < allWeekDays.length; i++) {
@@ -1094,7 +1094,7 @@ export function useI18n() {
             value = value.toString();
         }
 
-        let textualValue = value as string;
+        let textualValue = value;
         const isPlural: boolean = textualValue !== '100' && textualValue !== '-100';
 
         if (!notConvertValue) {

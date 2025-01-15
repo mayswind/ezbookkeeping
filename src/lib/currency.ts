@@ -14,7 +14,7 @@ export function getCurrencyFraction(currencyCode?: string): number | undefined {
 
 export function appendCurrencySymbol(value: unknown, currencyDisplayType: CurrencyDisplayType, currencyCode: string, currencyUnit: string, currencyName: string, isPlural: boolean): string | null {
     if (isNumber(value)) {
-        value = (value as number).toString();
+        value = value.toString();
     }
 
     if (!isString(value)) {
@@ -24,11 +24,11 @@ export function appendCurrencySymbol(value: unknown, currencyDisplayType: Curren
     const symbol = getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyUnit, currencyName, isPlural);
 
     if (!symbol) {
-        return value as string;
+        return value;
     }
 
     const separator = currencyDisplayType.separator || '';
-    let ret = value as string;
+    let ret = value;
 
     if (symbol.prependText) {
         ret = symbol.prependText + separator + ret;

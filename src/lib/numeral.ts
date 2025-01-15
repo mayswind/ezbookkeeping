@@ -9,7 +9,7 @@ export function appendDigitGroupingSymbol(value: number | string, options: Numbe
     if (isNumber(value)) {
         textualValue = value.toString();
     } else {
-        textualValue = value as string;
+        textualValue = value;
     }
 
     if (!textualValue) {
@@ -137,7 +137,7 @@ export function formatAmount(value: number | string, options: NumberFormatOption
     if (isNumber(value)) {
         textualValue = value.toString();
     } else {
-        textualValue = value as string;
+        textualValue = value;
     }
 
     if (!textualValue) {
@@ -157,7 +157,7 @@ export function formatAmount(value: number | string, options: NumberFormatOption
     const decimalSeparator = options.decimalSeparator || DecimalSeparator.Default.symbol;
     let decimalNumberCount = options.decimalNumberCount;
 
-    if (!isNumber(decimalNumberCount) || (decimalNumberCount as number) > MAX_SUPPORTED_DECIMAL_NUMBER_COUNT) {
+    if (!isNumber(decimalNumberCount) || decimalNumberCount > MAX_SUPPORTED_DECIMAL_NUMBER_COUNT) {
         decimalNumberCount = DEFAULT_DECIMAL_NUMBER_COUNT;
     }
 

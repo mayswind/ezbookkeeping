@@ -1,16 +1,17 @@
-export function isFunction(val: unknown): boolean {
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+export function isFunction(val: unknown): val is Function {
     return typeof(val) === 'function';
 }
 
-export function isDefined(val: unknown): boolean {
-    return typeof val !== 'undefined';
+export function isDefined<T>(val: T | null | undefined): val is T {
+    return val !== null && typeof(val) !== 'undefined';
 }
 
-export function isObject(val: unknown): boolean {
+export function isObject(val: unknown): val is object {
     return val != null && typeof(val) === 'object' && !isArray(val);
 }
 
-export function isArray(val: unknown): boolean {
+export function isArray(val: unknown): val is [] {
     if (isFunction(Array.isArray)) {
         return Array.isArray(val);
     }
@@ -18,24 +19,24 @@ export function isArray(val: unknown): boolean {
     return Object.prototype.toString.call(val) === '[object Array]';
 }
 
-export function isString(val: unknown): boolean {
+export function isString(val: unknown): val is string {
     return typeof(val) === 'string';
 }
 
-export function isNumber(val: unknown): boolean {
+export function isNumber(val: unknown): val is number {
     return typeof(val) === 'number';
 }
 
-export function isInteger(val: unknown): boolean {
+export function isInteger(val: unknown): val is number {
     return Number.isInteger(val);
 }
 
-export function isBoolean(val: unknown): boolean {
+export function isBoolean(val: unknown): val is boolean {
     return typeof(val) === 'boolean';
 }
 
 export function isYearMonth(val: unknown): boolean {
-    if (typeof(val) !== 'string') {
+    if (!isString(val)) {
         return false;
     }
 
@@ -54,8 +55,8 @@ export function isEquals(obj1: unknown, obj2: unknown): boolean {
     }
 
     if (isArray(obj1) && isArray(obj2)) {
-        const arr1 = obj1 as unknown[];
-        const arr2 = obj2 as unknown[];
+        const arr1 = obj1;
+        const arr2 = obj2;
 
         if (arr1.length !== arr2.length) {
             return false;
@@ -69,8 +70,8 @@ export function isEquals(obj1: unknown, obj2: unknown): boolean {
 
         return true;
     } else if (isObject(obj1) && isObject(obj2)) {
-        const keys1 = Object.keys(obj1 as Record<string, unknown>);
-        const keys2 = Object.keys(obj2 as Record<string, unknown>);
+        const keys1 = Object.keys(obj1);
+        const keys2 = Object.keys(obj2);
 
         if (keys1.length !== keys2.length) {
             return false;
@@ -135,9 +136,9 @@ export function isObjectEmpty(obj: object): boolean {
 
 export function getNumberValue(value: unknown, defaultValue: number): number {
     if (isString(value)) {
-        return parseInt(value as string, 10);
+        return parseInt(value, 10);
     } else if (isNumber(value)) {
-        return value as number;
+        return value;
     } else {
         return defaultValue;
     }
@@ -254,7 +255,7 @@ export function stringToArrayBuffer(str: string): ArrayBuffer {
 }
 
 export function getFirstVisibleItem<T>(items: Record<string, T>[] | Record<string, Record<string, T>>, hiddenField: string): Record<string, T> | null {
-    if (isArray(items) && (items as Record<string, T>[]).length > 0) {
+    if (isArray(items) && items.length > 0) {
         const arr = items as Record<string, T>[];
 
         for (let i = 0; i < arr.length; i++) {
@@ -326,7 +327,7 @@ export function getNameByKeyValue<T>(src: Record<string, T>[] | Record<string, R
                 }
             }
         } else if (isNumber(value)) {
-            const index = value as number;
+            const index = value;
 
             if (arr[index]) {
                 const option = arr[index];
@@ -350,7 +351,7 @@ export function getNameByKeyValue<T>(src: Record<string, T>[] | Record<string, R
                 }
             }
         } else if (isString(value)) {
-            const key = value as string;
+            const key = value;
 
             if (obj[key]) {
                 const option = obj[key];
@@ -378,20 +379,20 @@ export function copyObjectTo(fromObject: Record<string, unknown> | undefined, to
         }
 
         const fromValue = fromObject[key];
-        const toValue = (toObject as Record<string, unknown>)[key];
+        const toValue = toObject[key];
 
         if (isArray(fromValue)) {
-            (toObject as Record<string, unknown>)[key] = copyArrayTo(fromValue as unknown[], toValue as unknown[]);
+            toObject[key] = copyArrayTo(fromValue, toValue as unknown[]);
         } else if (isObject(fromValue)) {
-            (toObject as Record<string, unknown>)[key] = copyObjectTo(fromValue as Record<string, unknown>, toValue as Record<string, unknown>);
+            toObject[key] = copyObjectTo(fromValue as Record<string, unknown>, toValue as Record<string, unknown>);
         } else {
             if (fromValue !== toValue) {
-                (toObject as Record<string, unknown>)[key] = fromValue;
+                toObject[key] = fromValue;
             }
         }
     }
 
-    return (toObject as Record<string, unknown>);
+    return toObject;
 }
 
 export function copyArrayTo<T>(fromArray: T[], toArray: T[]): T[] {

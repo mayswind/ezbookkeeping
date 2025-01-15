@@ -37,7 +37,7 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
     }
 
     get subCategories(): TransactionCategoryInfoResponse[] | undefined {
-        if (typeof this.secondaryCategories === 'undefined') {
+        if (typeof(this.secondaryCategories) === 'undefined') {
             return undefined;
         }
 

@@ -57,15 +57,15 @@ function open(titleOrText: string, textOrOptions?: string | Record<string, unkno
     } else if (isString(textOrOptions)) { // second parameter is text
         if (!options) {
             titleContent.value = tt(titleOrText);
-            textContent.value = tt(textOrOptions as string);
+            textContent.value = tt(textOrOptions);
         } else {
             titleContent.value = tt(titleOrText, options);
-            textContent.value = tt(textOrOptions as string, options);
+            textContent.value = tt(textOrOptions, options);
         }
     }
 
-    if (options && isString(options.color)) {
-        finalColor.value = (options.color as string) || 'primary';
+    if (options && isString(options['color'])) {
+        finalColor.value = (options['color'] as string) || 'primary';
     }
 
     return new Promise((resolve, reject) => {

@@ -185,7 +185,7 @@ export function parseDateFromUnixTime(unixTime: number, utcOffset?: number, curr
             currentUtcOffset = getTimezoneOffsetMinutes();
         }
 
-        unixTime = getDummyUnixTimeForLocalUsage(unixTime, utcOffset as number, currentUtcOffset as number);
+        unixTime = getDummyUnixTimeForLocalUsage(unixTime, utcOffset, currentUtcOffset);
     }
 
     return moment.unix(unixTime);
@@ -354,9 +354,9 @@ export function getYearMonthFirstUnixTime(yearMonth: YearMonth | string): number
     let yearMonthObj: YearMonth | null = null;
 
     if (isString(yearMonth)) {
-        yearMonthObj = getYearMonthObjectFromString(yearMonth as string);
-    } else if (isObject(yearMonth) && isYearMonthValid((yearMonth as YearMonth).year, (yearMonth as YearMonth).month)) {
-        yearMonthObj = yearMonth as YearMonth;
+        yearMonthObj = getYearMonthObjectFromString(yearMonth);
+    } else if (isObject(yearMonth) && isYearMonthValid(yearMonth.year, yearMonth.month)) {
+        yearMonthObj = yearMonth;
     }
 
     if (!yearMonthObj) {
@@ -375,15 +375,15 @@ export function getStartEndYearMonthRange(startYearMonth: YearMonth | string, en
     let endYearMonthObj: YearMonth | null = null;
 
     if (isString(startYearMonth)) {
-        startYearMonthObj = getYearMonthObjectFromString(startYearMonth as string);
+        startYearMonthObj = getYearMonthObjectFromString(startYearMonth);
     } else if (isObject(startYearMonth)) {
-        startYearMonthObj = startYearMonth as YearMonth;
+        startYearMonthObj = startYearMonth;
     }
 
     if (isString(endYearMonth)) {
-        endYearMonthObj = getYearMonthObjectFromString(endYearMonth as string);
+        endYearMonthObj = getYearMonthObjectFromString(endYearMonth);
     } else {
-        endYearMonthObj = endYearMonth as YearMonth;
+        endYearMonthObj = endYearMonth;
     }
 
     if (!startYearMonthObj || !endYearMonthObj) {

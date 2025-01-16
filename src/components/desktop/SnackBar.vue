@@ -13,6 +13,7 @@ import { ref, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import type { ErrorResponse } from '@/core/api.ts';
 import { isObject, isString } from '@/lib/common.ts';
 
 const emit = defineEmits<{
@@ -34,11 +35,13 @@ function showMessage(message: string, options?: Record<string, unknown>): void {
     }
 }
 
-function showError(error: string | { message: string }): void {
+function showError(error: string | { message: string } | { error: ErrorResponse }): void {
     showState.value = true;
 
-    if (isObject(error) && error.message) {
+    if (isObject(error) && 'message' in error && error.message) {
         messageContent.value = te(error.message);
+    } else if (isObject(error) && 'error' in error) {
+        messageContent.value = te(error);
     } else if (isString(error)) {
         messageContent.value = te(error);
     }

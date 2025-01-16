@@ -156,10 +156,7 @@ import { TransactionCategory } from '@/models/transaction_category.ts';
 
 import { getNameByKeyValue } from '@/lib/common.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
-import {
-    setCategoryModelByAnotherCategory,
-    allVisiblePrimaryTransactionCategoriesByType
-} from '@/lib/category.ts';
+import { allVisiblePrimaryTransactionCategoriesByType } from '@/lib/category.ts';
 
 export default {
     props: [
@@ -238,7 +235,7 @@ export default {
             self.transactionCategoriesStore.getCategory({
                 categoryId: self.editCategoryId
             }).then(category => {
-                setCategoryModelByAnotherCategory(self.category, category);
+                self.category.from(category);
                 self.loading = false;
             }).catch(error => {
                 if (error.processed) {

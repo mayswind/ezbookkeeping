@@ -1,3 +1,4 @@
+import type { ColorValue } from '@/core/color.ts';
 import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { DEFAULT_CATEGORY_ICON_ID } from '@/consts/icon.ts';
 import { DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
@@ -6,15 +7,15 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
     public id: string;
     public name: string;
     public parentId: string;
-    public type: number;
+    public type: CategoryType;
     public icon: string;
-    public color: string;
+    public color: ColorValue;
     public comment: string;
     public displayOrder: number;
     public visible: boolean;
     public secondaryCategories?: TransactionCategory[];
 
-    private constructor(id: string, name: string, parentId: string, type: number, icon: string, color: string, comment: string, displayOrder: number, visible: boolean, secondaryCategories?: TransactionCategory[]) {
+    private constructor(id: string, name: string, parentId: string, type: CategoryType, icon: string, color: ColorValue, comment: string, displayOrder: number, visible: boolean, secondaryCategories?: TransactionCategory[]) {
         this.id = id;
         this.name = name;
         this.parentId = parentId;
@@ -50,6 +51,17 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
         }
 
         return ret;
+    }
+
+    public from(other: TransactionCategory): void {
+        this.id = other.id;
+        this.name = other.name;
+        this.parentId = other.parentId;
+        this.type = other.type;
+        this.icon = other.icon;
+        this.color = other.color;
+        this.comment = other.comment;
+        this.visible = other.visible;
     }
 
     public toCreateRequest(clientSessionId: string): TransactionCategoryCreateRequest {
@@ -92,13 +104,13 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
     }
 
     public static ofMany(categoryResponses: TransactionCategoryInfoResponse[]): TransactionCategory[] {
-        const tags: TransactionCategory[] = [];
+        const categories: TransactionCategory[] = [];
 
-        for (const tagResponse of categoryResponses) {
-            tags.push(TransactionCategory.of(tagResponse));
+        for (const categoryResponse of categoryResponses) {
+            categories.push(TransactionCategory.of(categoryResponse));
         }
 
-        return tags;
+        return categories;
     }
 
     public static ofMap(categoriesByType: Record<number, TransactionCategoryInfoResponse[]>): Record<number, TransactionCategory[]> {

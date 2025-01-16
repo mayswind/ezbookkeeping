@@ -103,10 +103,7 @@ import { ALL_CATEGORY_COLORS } from '@/consts/color.ts';
 import { TransactionCategory } from '@/models/transaction_category.ts';
 
 import { generateRandomUUID } from '@/lib/misc.ts';
-import {
-    setCategoryModelByAnotherCategory,
-    allVisiblePrimaryTransactionCategoriesByType
-} from '@/lib/category.ts';
+import { allVisiblePrimaryTransactionCategoriesByType } from '@/lib/category.ts';
 
 export default {
     props: [
@@ -176,18 +173,18 @@ export default {
             self.submitting = false;
 
             const newTransactionCategory = TransactionCategory.createNewCategory();
-            setCategoryModelByAnotherCategory(self.category, newTransactionCategory);
+            self.category.from(newTransactionCategory);
 
             if (options.id) {
                 if (options.currentCategory) {
-                    setCategoryModelByAnotherCategory(self.category, options.currentCategory);
+                    self.category.from(options.currentCategory);
                 }
 
                 self.editCategoryId = options.id;
                 self.transactionCategoriesStore.getCategory({
                     categoryId: self.editCategoryId
                 }).then(category => {
-                    setCategoryModelByAnotherCategory(self.category, category);
+                    self.category.from(category);
                     self.loading = false;
                 }).catch(error => {
                     self.loading = false;

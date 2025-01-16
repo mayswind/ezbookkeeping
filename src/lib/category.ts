@@ -2,17 +2,6 @@ import { CategoryType } from '@/core/category.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { type TransactionCategoriesWithVisibleCount, TransactionCategory } from '@/models/transaction_category.ts';
 
-export function setCategoryModelByAnotherCategory(category: TransactionCategory, category2: TransactionCategory): void {
-    category.id = category2.id;
-    category.type = category2.type;
-    category.parentId = category2.parentId;
-    category.name = category2.name;
-    category.icon = category2.icon;
-    category.color = category2.color;
-    category.comment = category2.comment;
-    category.visible = !category2.hidden;
-}
-
 export function transactionTypeToCategoryType(transactionType: TransactionType): CategoryType | null {
     if (transactionType === TransactionType.Income) {
         return CategoryType.Income;

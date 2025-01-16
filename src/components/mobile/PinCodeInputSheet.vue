@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -74,6 +74,12 @@ function onSheetOpen(): void {
 function onSheetClosed(): void {
     cancel();
 }
+
+watch(() => props.modelValue, (newValue) => {
+    if (newValue === '') {
+        currentPinCode.value = '';
+    }
+});
 </script>
 
 <style>

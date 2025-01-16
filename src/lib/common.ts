@@ -230,11 +230,7 @@ export function getTextAfter(fullText: string, text: string): string {
     return '';
 }
 
-export function base64encode(arrayBuffer: ArrayBuffer): string | null {
-    if (!arrayBuffer) {
-        return null;
-    }
-
+export function base64encode(arrayBuffer: ArrayBuffer): string {
     return btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(arrayBuffer))));
 }
 

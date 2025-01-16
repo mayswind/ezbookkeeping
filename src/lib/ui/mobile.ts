@@ -21,7 +21,7 @@ export interface Framework7Dom {
 
 type TranslateFunction = (message: string) => string;
 
-export function showAlert(message: string, confirmCallback: (dialog: Dialog.Dialog, e: Event) => void, translateFn: TranslateFunction): void {
+export function showAlert(message: string, confirmCallback: ((dialog: Dialog.Dialog, e: Event) => void) | undefined, translateFn: TranslateFunction): void {
     f7ready((f7) => {
         f7.dialog.create({
             title: translateFn('global.app.title'),
@@ -229,7 +229,7 @@ export function useI18nUIComponents() {
     }
 
     return {
-        showAlert: (message: string, confirmCallback: (dialog: Dialog.Dialog, e: Event) => void) => showAlert(message, confirmCallback, i18nGlobal.t),
+        showAlert: (message: string, confirmCallback?: (dialog: Dialog.Dialog, e: Event) => void) => showAlert(message, confirmCallback, i18nGlobal.t),
         showConfirm: (message: string, confirmCallback: (dialog: Dialog.Dialog, e: Event) => void, cancelCallback?: (dialog: Dialog.Dialog, e: Event) => void): void => showConfirm(message, confirmCallback, cancelCallback, i18nGlobal.t),
         showToast: (message: string, timeout?: number): void => showToast(message, timeout, i18nGlobal.t),
         routeBackOnError

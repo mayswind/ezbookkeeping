@@ -28,7 +28,7 @@ interface AttestationData {
 }
 
 interface WebAuthnRegisterResponse {
-    readonly id: string | null;
+    readonly id: string;
     readonly clientData: ClientData;
     readonly publicKey: Uint8Array | null;
     readonly rawCredential: Credential;
@@ -198,7 +198,7 @@ export function verifyWebAuthnCredential(userInfo: UserBasicInfo, credentialId: 
             clientData && clientData.type === 'webauthn.get' && challengeFromClientData === challenge &&
             userIdParts && userIdParts.length === 2 && userIdParts[0] === userInfo.username) {
             const ret: WebAuthnVerifyResponse = {
-                id: base64encode(rawCredential.rawId) as string,
+                id: base64encode(rawCredential.rawId),
                 userName: userIdParts[0],
                 userSecret: userIdParts[1],
                 clientData: clientData,

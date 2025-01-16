@@ -549,7 +549,7 @@ import {
     getDateRangeByBillingCycleDateType
 } from '@/lib/datetime.ts';
 import { categoryTypeToTransactionType, transactionTypeToCategoryType } from '@/lib/category.ts';
-import { getUnifiedSelectedAccountsCurrencyOrDefaultCurrency } from '@/lib/account.js';
+import { getUnifiedSelectedAccountsCurrencyOrDefaultCurrency } from '@/lib/account.ts';
 import { getTransactionDisplayAmount } from '@/lib/transaction.js';
 import { onSwipeoutDeleted, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
 

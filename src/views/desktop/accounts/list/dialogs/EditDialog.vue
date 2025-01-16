@@ -203,12 +203,10 @@ import { useAccountsStore } from '@/stores/account.js';
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import { ALL_ACCOUNT_ICONS } from '@/consts/icon.ts';
 import { ALL_ACCOUNT_COLORS } from '@/consts/color.ts';
+
 import { isNumber } from '@/lib/common.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
-import {
-    setAccountModelByAnotherAccount,
-    setAccountSuitableIcon
-} from '@/lib/account.js';
+import { setAccountSuitableIcon } from '@/lib/account.ts';
 
 import {
     mdiDotsVertical,
@@ -324,7 +322,7 @@ export default {
             self.submitting = false;
 
             const newAccount = self.accountsStore.generateNewAccountModel();
-            setAccountModelByAnotherAccount(self.account, newAccount);
+            self.account.from(newAccount);
             self.subAccounts = [];
             self.currentAccountIndex = -1;
 
@@ -485,13 +483,13 @@ export default {
             }
         },
         setAccount(account) {
-            setAccountModelByAnotherAccount(this.account, account);
+            this.account.from(account);
             this.subAccounts = [];
 
-            if (account.subAccounts && account.subAccounts.length > 0) {
-                for (let i = 0; i < account.subAccounts.length; i++) {
+            if (account.childrenAccounts && account.childrenAccounts.length > 0) {
+                for (let i = 0; i < account.childrenAccounts.length; i++) {
                     const subAccount = this.accountsStore.generateNewSubAccountModel(this.account);
-                    setAccountModelByAnotherAccount(subAccount, account.subAccounts[i]);
+                    subAccount.from(account.childrenAccounts[i]);
 
                     this.subAccounts.push(subAccount);
                 }

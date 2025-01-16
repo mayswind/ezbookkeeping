@@ -5,13 +5,13 @@ import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import { PARENT_ACCOUNT_CURRENCY_PLACEHOLDER } from '@/consts/currency.ts';
-import { DEFAULT_ACCOUNT_ICON_ID } from '@/consts/icon.ts';
-import { DEFAULT_ACCOUNT_COLOR } from '@/consts/color.ts';
+import { Account } from '@/models/account.ts';
+
 import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 import { isNumber, isEquals } from '@/lib/common.ts';
 import { getCurrentUnixTime } from '@/lib/datetime.ts';
-import { getCategorizedAccountsMap, getAllFilteredAccountsBalance } from '@/lib/account.js';
+import { getCategorizedAccountsMap, getAllFilteredAccountsBalance } from '@/lib/account.ts';
 
 function loadAccountList(state, accounts) {
     state.allAccounts = accounts;
@@ -132,7 +132,7 @@ function updateAccountDisplayOrderInAccountList(state, { account, from, to, upda
 
 function updateAccountVisibilityInAccountList(state, { account, hidden }) {
     if (state.allAccountsMap[account.id]) {
-        state.allAccountsMap[account.id].hidden = hidden;
+        state.allAccountsMap[account.id].visible = !hidden;
     }
 }
 
@@ -260,37 +260,12 @@ export const useAccountsStore = defineStore('accounts', {
         generateNewAccountModel() {
             const userStore = useUserStore();
             const now = getCurrentUnixTime();
-
-            return {
-                category: AccountCategory.Cash.type,
-                type: AccountType.SingleAccount.type,
-                name: '',
-                icon: DEFAULT_ACCOUNT_ICON_ID,
-                color: DEFAULT_ACCOUNT_COLOR,
-                currency: userStore.currentUserDefaultCurrency,
-                balance: 0,
-                balanceTime: now,
-                comment: '',
-                creditCardStatementDate: 0,
-                visible: true
-            };
+            return Account.createNewAccount(userStore.currentUserDefaultCurrency, now);
         },
         generateNewSubAccountModel(parentAccount) {
             const userStore = useUserStore();
             const now = getCurrentUnixTime();
-
-            return {
-                category: null,
-                type: null,
-                name: '',
-                icon: parentAccount.icon,
-                color: parentAccount.color,
-                currency: userStore.currentUserDefaultCurrency,
-                balance: 0,
-                balanceTime: now,
-                comment: '',
-                visible: true
-            };
+            return parentAccount.createNewSubAccount(userStore.currentUserDefaultCurrency, now);
         },
         updateAccountListInvalidState(invalidState) {
             this.accountListStateInvalid = invalidState;
@@ -736,14 +711,16 @@ export const useAccountsStore = defineStore('accounts', {
                         self.updateAccountListInvalidState(false);
                     }
 
-                    if (force && data.result && isEquals(self.allAccounts, data.result)) {
+                    const accounts = Account.ofMany(data.result);
+
+                    if (force && data.result && isEquals(self.allAccounts, accounts)) {
                         reject({ message: 'Account list is up to date' });
                         return;
                     }
 
-                    loadAccountList(self, data.result);
+                    loadAccountList(self, accounts);
 
-                    resolve(data.result);
+                    resolve(accounts);
                 }).catch(error => {
                     if (force) {
                         logger.error('failed to force load account list', error);
@@ -773,7 +750,9 @@ export const useAccountsStore = defineStore('accounts', {
                         return;
                     }
 
-                    resolve(data.result);
+                    const account = Account.of(data.result);
+
+                    resolve(account);
                 }).catch(error => {
                     logger.error('failed to load account info', error);
 
@@ -790,78 +769,21 @@ export const useAccountsStore = defineStore('accounts', {
         saveAccount({ account, subAccounts, isEdit, clientSessionId }) {
             const self = this;
 
-            const submitSubAccounts = [];
-
-            if (account.type === AccountType.MultiSubAccounts.type) {
-                for (let i = 0; i < subAccounts.length; i++) {
-                    const subAccount = subAccounts[i];
-                    const submitAccount = {
-                        category: account.category,
-                        type: AccountType.SingleAccount.type,
-                        name: subAccount.name,
-                        icon: subAccount.icon,
-                        color: subAccount.color,
-                        currency: subAccount.currency,
-                        balance: subAccount.balance,
-                        comment: subAccount.comment
-                    };
-
-                    if (isEdit) {
-                        submitAccount.id = subAccount.id;
-                        submitAccount.hidden = !subAccount.visible;
-                    } else {
-                        submitAccount.balanceTime = subAccount.balanceTime;
-                    }
-
-                    submitSubAccounts.push(submitAccount);
-                }
-            }
-
-            const submitAccount = {
-                category: account.category,
-                type: account.type,
-                name: account.name,
-                icon: account.icon,
-                color: account.color,
-                currency: account.type === AccountType.SingleAccount.type ? account.currency : PARENT_ACCOUNT_CURRENCY_PLACEHOLDER,
-                balance: account.type === AccountType.SingleAccount.type ? account.balance : 0,
-                comment: account.comment,
-                subAccounts: account.type === AccountType.SingleAccount.type ? null : submitSubAccounts,
-            };
-
-            if (account.category === AccountCategory.CreditCard.type) {
-                submitAccount.creditCardStatementDate = account.creditCardStatementDate;
-            }
-
-            if (clientSessionId) {
-                submitAccount.clientSessionId = clientSessionId;
-            }
-
-            if (isEdit) {
-                submitAccount.id = account.id;
-                submitAccount.hidden = !account.visible;
-            } else {
-                if (account.type === AccountType.SingleAccount.type) {
-                    submitAccount.balanceTime = account.balanceTime;
-                }
-            }
-
-            const oldAccount = submitAccount.id ? self.allAccountsMap[submitAccount.id] : null;
-
             return new Promise((resolve, reject) => {
+                const oldAccount = isEdit ? self.allAccountsMap[account.id] : null;
                 let promise = null;
 
-                if (!submitAccount.id) {
-                    promise = services.addAccount(submitAccount);
+                if (!isEdit) {
+                    promise = services.addAccount(account.toCreateRequest(clientSessionId, subAccounts));
                 } else {
-                    promise = services.modifyAccount(submitAccount);
+                    promise = services.modifyAccount(account.toModifyRequest(subAccounts));
                 }
 
                 promise.then(response => {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        if (!submitAccount.id) {
+                        if (!isEdit) {
                             reject({ message: 'Unable to add account' });
                         } else {
                             reject({ message: 'Unable to save account' });
@@ -869,24 +791,26 @@ export const useAccountsStore = defineStore('accounts', {
                         return;
                     }
 
-                    if (!submitAccount.id) {
-                        addAccountToAccountList(self, data.result);
+                    const newAccount = Account.of(data.result);
+
+                    if (!isEdit) {
+                        addAccountToAccountList(self, newAccount);
                     } else {
-                        if (oldAccount && oldAccount.category === data.result.category) {
-                            updateAccountToAccountList(self, data.result);
+                        if (oldAccount && oldAccount.category === newAccount.category) {
+                            updateAccountToAccountList(self, newAccount);
                         } else {
                             self.updateAccountListInvalidState(true);
                         }
                     }
 
-                    resolve(data.result);
+                    resolve(newAccount);
                 }).catch(error => {
                     logger.error('failed to save account', error);
 
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        if (!submitAccount.id) {
+                        if (!isEdit) {
                             reject({ message: 'Unable to add account' });
                         } else {
                             reject({ message: 'Unable to save account' });

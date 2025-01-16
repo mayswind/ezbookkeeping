@@ -497,12 +497,10 @@ import { AccountType, AccountCategory } from '@/core/account.ts';
 import { ALL_ACCOUNT_ICONS } from '@/consts/icon.ts';
 import { ALL_ACCOUNT_COLORS } from '@/consts/color.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
+
 import { getNameByKeyValue } from '@/lib/common.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
-import {
-    setAccountModelByAnotherAccount,
-    setAccountSuitableIcon
-} from '@/lib/account.js';
+import { setAccountSuitableIcon } from '@/lib/account.ts';
 import {
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
@@ -618,13 +616,13 @@ export default {
             self.accountsStore.getAccount({
                 accountId: self.editAccountId
             }).then(account => {
-                setAccountModelByAnotherAccount(self.account, account);
+                self.account.from(account);
                 self.subAccounts = [];
 
-                if (account.subAccounts && account.subAccounts.length > 0) {
-                    for (let i = 0; i < account.subAccounts.length; i++) {
+                if (account.childrenAccounts && account.childrenAccounts.length > 0) {
+                    for (let i = 0; i < account.childrenAccounts.length; i++) {
                         const subAccount = self.accountsStore.generateNewSubAccountModel(self.account);
-                        setAccountModelByAnotherAccount(subAccount, account.subAccounts[i]);
+                        subAccount.from(account.childrenAccounts[i]);
                         subAccount.showIconSelectionSheet = false;
                         subAccount.showColorSelectionSheet = false;
                         subAccount.showBalanceSheet = false;

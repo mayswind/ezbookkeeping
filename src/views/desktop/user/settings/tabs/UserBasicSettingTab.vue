@@ -341,7 +341,7 @@ import { WeekDay } from '@/core/datetime.ts';
 import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
 import { getNameByKeyValue } from '@/lib/common.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
-import { getCategorizedAccounts } from '@/lib/account.js';
+import { getCategorizedAccounts } from '@/lib/account.ts';
 import { isUserVerifyEmailEnabled } from '@/lib/server_settings.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 

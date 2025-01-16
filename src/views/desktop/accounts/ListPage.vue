@@ -271,7 +271,7 @@ import {
     getSubAccountCurrencies,
     getAccountOrSubAccountId,
     getAccountOrSubAccountComment
-} from '@/lib/account.js';
+} from '@/lib/account.ts';
 
 import {
     mdiEyeOutline,

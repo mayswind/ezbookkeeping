@@ -148,7 +148,7 @@ import {
     selectInvert,
     isAccountOrSubAccountsAllChecked,
     isAccountOrSubAccountsHasButNotAllChecked
-} from '@/lib/account.js';
+} from '@/lib/account.ts';
 
 export default {
     props: [

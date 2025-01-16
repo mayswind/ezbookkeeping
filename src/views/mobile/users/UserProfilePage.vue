@@ -340,7 +340,7 @@ import { useAccountsStore } from '@/stores/account.js';
 import { useOverviewStore } from '@/stores/overview.ts';
 
 import { getNameByKeyValue } from '@/lib/common.ts';
-import { getCategorizedAccounts } from '@/lib/account.js';
+import { getCategorizedAccounts } from '@/lib/account.ts';
 import { isUserVerifyEmailEnabled } from '@/lib/server_settings.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 

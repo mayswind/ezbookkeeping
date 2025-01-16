@@ -162,7 +162,7 @@ import {
     selectInvert,
     isAccountOrSubAccountsAllChecked,
     isAccountOrSubAccountsHasButNotAllChecked
-} from '@/lib/account.js';
+} from '@/lib/account.ts';
 
 import {
     mdiSelectAll,

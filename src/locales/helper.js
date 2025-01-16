@@ -58,7 +58,7 @@ import {
 import {
     getCategorizedAccountsMap,
     getAllFilteredAccountsBalance
-} from '@/lib/account.js';
+} from '@/lib/account.ts';
 
 import logger from '@/lib/logger.ts';
 import services from '@/lib/services.ts';

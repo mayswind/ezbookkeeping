@@ -40,7 +40,7 @@ import {
 } from '@/lib/datetime.ts';
 import {
     getFinalAccountIdsByFilteredAccountIds
-} from '@/lib/account.js';
+} from '@/lib/account.ts';
 import {
     getFinalCategoryIdsByFilteredCategoryIds
 } from '@/lib/category.ts';

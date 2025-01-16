@@ -98,8 +98,8 @@ const pushRouter = (tab: string) => {
 };
 
 onBeforeRouteUpdate((to) => {
-    if (to.query && to.query.tab && ALL_TABS.indexOf(to.query.tab) >= 0) {
-        activeTab.value = to.query.tab;
+    if (to.query && to.query['tab'] && ALL_TABS.indexOf(to.query['tab'] as string) >= 0) {
+        activeTab.value = to.query['tab'] as string;
     } else {
         activeTab.value = 'basicSetting';
     }

@@ -1,7 +1,7 @@
 {
     "global": {
         "app": {
-            "title": "ezContabilidad"
+            "title": "ezBookkeeping"
         }
     },
     "language": {
@@ -1335,8 +1335,8 @@
     "Save Display Order": "Guardar orden de visualización",
     "Change Language": "Cambiar idioma",
     "Date is too early": "La fecha es demasiado temprana",
-    "Welcome to ezBookkeeping": "Bienvenido a ezContabilidad",
-    "Please log in with your ezBookkeeping account": "Inicie sesión con su cuenta de ezContabilidad",
+    "Welcome to ezBookkeeping": "Bienvenido a ezBookkeeping",
+    "Please log in with your ezBookkeeping account": "Inicie sesión con su cuenta de ezBookkeeping",
     "Unlock Application": "Desbloquear aplicación",
     "Please enter your PIN code or use WebAuthn to unlock application": "Ingrese su código PIN o use WebAuthn para desbloquear la aplicación",
     "Please enter your PIN code to unlock application": "Ingrese su código PIN para desbloquear la aplicación",
@@ -1554,7 +1554,7 @@
     "File Type": "Tipo de archivo",
     "Filter Description": "Descripción del filtro",
     "How to export this file?": "¿Cómo exportar este archivo?",
-    "ezbookkeeping Data Export File": "Archivo de exportación de datos de ezContabilidad",
+    "ezbookkeeping Data Export File": "Archivo de exportación de datos de ezBookkeeping",
     "Open Financial Exchange (OFX) File": "Abrir archivo de intercambio financiero (OFX)",
     "Quicken Financial Exchange (QFX) File": "Archivo Quicken Financial Exchange (QFX)",
     "Quicken Interchange Format (QIF) File": "Archivo de formato de intercambio Quicken (QIF)",

@@ -5,7 +5,7 @@ type TransactionTag struct {
 	TagId           int64  `xorm:"PK"`
 	Uid             int64  `xorm:"INDEX(IDX_tag_uid_deleted_order) NOT NULL"`
 	Deleted         bool   `xorm:"INDEX(IDX_tag_uid_deleted_order) NOT NULL"`
-	Name            string `xorm:"VARCHAR(32) NOT NULL"`
+	Name            string `xorm:"VARCHAR(64) NOT NULL"`
 	DisplayOrder    int32  `xorm:"INDEX(IDX_tag_uid_deleted_order) NOT NULL"`
 	Hidden          bool   `xorm:"NOT NULL"`
 	CreatedUnixTime int64
@@ -20,13 +20,13 @@ type TransactionTagGetRequest struct {
 
 // TransactionTagCreateRequest represents all parameters of transaction tag creation request
 type TransactionTagCreateRequest struct {
-	Name string `json:"name" binding:"required,notBlank,max=32"`
+	Name string `json:"name" binding:"required,notBlank,max=64"`
 }
 
 // TransactionTagModifyRequest represents all parameters of transaction tag modification request
 type TransactionTagModifyRequest struct {
 	Id   int64  `json:"id,string" binding:"required,min=1"`
-	Name string `json:"name" binding:"required,notBlank,max=32"`
+	Name string `json:"name" binding:"required,notBlank,max=64"`
 }
 
 // TransactionTagHideRequest represents all parameters of transaction tag hiding request

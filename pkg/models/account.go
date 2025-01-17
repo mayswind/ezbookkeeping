@@ -64,7 +64,7 @@ type Account struct {
 	Category        AccountCategory `xorm:"NOT NULL"`
 	Type            AccountType     `xorm:"NOT NULL"`
 	ParentAccountId int64           `xorm:"INDEX(IDX_account_uid_deleted_parent_account_id_order) NOT NULL"`
-	Name            string          `xorm:"VARCHAR(32) NOT NULL"`
+	Name            string          `xorm:"VARCHAR(64) NOT NULL"`
 	DisplayOrder    int32           `xorm:"INDEX(IDX_account_uid_deleted_parent_account_id_order) NOT NULL"`
 	Icon            int64           `xorm:"NOT NULL"`
 	Color           string          `xorm:"VARCHAR(6) NOT NULL"`
@@ -85,7 +85,7 @@ type AccountExtend struct {
 
 // AccountCreateRequest represents all parameters of account creation request
 type AccountCreateRequest struct {
-	Name                    string                  `json:"name" binding:"required,notBlank,max=32"`
+	Name                    string                  `json:"name" binding:"required,notBlank,max=64"`
 	Category                AccountCategory         `json:"category" binding:"required"`
 	Type                    AccountType             `json:"type" binding:"required"`
 	Icon                    int64                   `json:"icon,string" binding:"required,min=1"`
@@ -102,7 +102,7 @@ type AccountCreateRequest struct {
 // AccountModifyRequest represents all parameters of account modification request
 type AccountModifyRequest struct {
 	Id                      int64                   `json:"id,string" binding:"required,min=1"`
-	Name                    string                  `json:"name" binding:"required,notBlank,max=32"`
+	Name                    string                  `json:"name" binding:"required,notBlank,max=64"`
 	Category                AccountCategory         `json:"category" binding:"required"`
 	Icon                    int64                   `json:"icon,string" binding:"min=1"`
 	Color                   string                  `json:"color" binding:"required,len=6,validHexRGBColor"`

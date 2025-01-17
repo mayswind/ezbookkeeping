@@ -31,7 +31,7 @@ type TransactionTemplate struct {
 	Uid                        int64                            `xorm:"INDEX(IDX_transaction_template_uid_deleted_template_type_order) NOT NULL"`
 	Deleted                    bool                             `xorm:"INDEX(IDX_transaction_template_uid_deleted_template_type_order) INDEX(IDX_transaction_template_deleted_type_freqtype_scheduled_at) NOT NULL"`
 	TemplateType               TransactionTemplateType          `xorm:"INDEX(IDX_transaction_template_uid_deleted_template_type_order) INDEX(IDX_transaction_template_deleted_type_freqtype_scheduled_at) NOT NULL"`
-	Name                       string                           `xorm:"VARCHAR(32) NOT NULL"`
+	Name                       string                           `xorm:"VARCHAR(64) NOT NULL"`
 	Type                       TransactionType                  `xorm:"NOT NULL"`
 	CategoryId                 int64                            `xorm:"NOT NULL"`
 	AccountId                  int64                            `xorm:"NOT NULL"`
@@ -65,7 +65,7 @@ type TransactionTemplateGetRequest struct {
 // TransactionTemplateCreateRequest represents all parameters of transaction template creation request
 type TransactionTemplateCreateRequest struct {
 	TemplateType               TransactionTemplateType           `json:"templateType"`
-	Name                       string                            `json:"name" binding:"required,notBlank,max=32"`
+	Name                       string                            `json:"name" binding:"required,notBlank,max=64"`
 	Type                       TransactionType                   `json:"type" binding:"required"`
 	CategoryId                 int64                             `json:"categoryId,string" binding:"required,min=1"`
 	SourceAccountId            int64                             `json:"sourceAccountId,string" binding:"required,min=1"`
@@ -84,13 +84,13 @@ type TransactionTemplateCreateRequest struct {
 // TransactionTemplateModifyNameRequest represents all parameters of transaction template name modification request
 type TransactionTemplateModifyNameRequest struct {
 	Id   int64  `json:"id,string" binding:"required,min=1"`
-	Name string `json:"name" binding:"required,notBlank,max=32"`
+	Name string `json:"name" binding:"required,notBlank,max=64"`
 }
 
 // TransactionTemplateModifyRequest represents all parameters of transaction template modification request
 type TransactionTemplateModifyRequest struct {
 	Id                         int64                             `json:"id,string" binding:"required,min=1"`
-	Name                       string                            `json:"name" binding:"required,notBlank,max=32"`
+	Name                       string                            `json:"name" binding:"required,notBlank,max=64"`
 	Type                       TransactionType                   `json:"type" binding:"required"`
 	CategoryId                 int64                             `json:"categoryId,string" binding:"required,min=1"`
 	SourceAccountId            int64                             `json:"sourceAccountId,string" binding:"required,min=1"`

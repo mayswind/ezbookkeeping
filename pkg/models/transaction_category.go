@@ -20,7 +20,7 @@ type TransactionCategory struct {
 	Deleted          bool                    `xorm:"INDEX(IDX_category_uid_deleted_type_parent_category_id_order) NOT NULL"`
 	Type             TransactionCategoryType `xorm:"INDEX(IDX_category_uid_deleted_type_parent_category_id_order) NOT NULL"`
 	ParentCategoryId int64                   `xorm:"INDEX(IDX_category_uid_deleted_type_parent_category_id_order) NOT NULL"`
-	Name             string                  `xorm:"VARCHAR(32) NOT NULL"`
+	Name             string                  `xorm:"VARCHAR(64) NOT NULL"`
 	DisplayOrder     int32                   `xorm:"INDEX(IDX_category_uid_deleted_type_parent_category_id_order) NOT NULL"`
 	Icon             int64                   `xorm:"NOT NULL"`
 	Color            string                  `xorm:"VARCHAR(6) NOT NULL"`
@@ -44,7 +44,7 @@ type TransactionCategoryGetRequest struct {
 
 // TransactionCategoryCreateRequest represents all parameters of single transaction category creation request
 type TransactionCategoryCreateRequest struct {
-	Name            string                  `json:"name" binding:"required,notBlank,max=32"`
+	Name            string                  `json:"name" binding:"required,notBlank,max=64"`
 	Type            TransactionCategoryType `json:"type" binding:"required"`
 	ParentId        int64                   `json:"parentId,string" binding:"min=0"`
 	Icon            int64                   `json:"icon,string" binding:"min=1"`
@@ -60,7 +60,7 @@ type TransactionCategoryCreateBatchRequest struct {
 
 // TransactionCategoryCreateWithSubCategories represents all parameters of multi transaction categories creation request
 type TransactionCategoryCreateWithSubCategories struct {
-	Name          string                              `json:"name" binding:"required,notBlank,max=32"`
+	Name          string                              `json:"name" binding:"required,notBlank,max=64"`
 	Type          TransactionCategoryType             `json:"type" binding:"required"`
 	Icon          int64                               `json:"icon,string" binding:"min=1"`
 	Color         string                              `json:"color" binding:"required,len=6,validHexRGBColor"`
@@ -71,7 +71,7 @@ type TransactionCategoryCreateWithSubCategories struct {
 // TransactionCategoryModifyRequest represents all parameters of transaction category modification request
 type TransactionCategoryModifyRequest struct {
 	Id       int64  `json:"id,string" binding:"required,min=1"`
-	Name     string `json:"name" binding:"required,notBlank,max=32"`
+	Name     string `json:"name" binding:"required,notBlank,max=64"`
 	ParentId int64  `json:"parentId,string" binding:"min=0"`
 	Icon     int64  `json:"icon,string" binding:"min=1"`
 	Color    string `json:"color" binding:"required,len=6,validHexRGBColor"`

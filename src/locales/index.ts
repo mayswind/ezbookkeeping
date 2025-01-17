@@ -28,7 +28,7 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
     },
     'es': {
         name: 'Spanish',
-        displayName: 'Spanish',
+        displayName: 'Español',
         alternativeLanguageTag: 'es',
         content: es
     },

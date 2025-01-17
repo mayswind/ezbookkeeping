@@ -196,7 +196,7 @@ export function getCategorizedAccountsWithVisibleCount(categorizedAccountsMap: R
     return ret;
 }
 
-export function getAllFilteredAccountsBalance(categorizedAccounts: CategorizedAccount[], accountFilter: (account: Account) => boolean): AccountBalance[] {
+export function getAllFilteredAccountsBalance(categorizedAccounts: Record<number, CategorizedAccount>, accountFilter: (account: Account) => boolean): AccountBalance[] {
     const allAccountCategories = AccountCategory.values();
     const ret: AccountBalance[] = [];
 

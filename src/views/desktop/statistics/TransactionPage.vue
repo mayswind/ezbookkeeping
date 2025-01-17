@@ -321,7 +321,7 @@ import { useDisplay, useTheme } from 'vuetify';
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
-import { useAccountsStore } from '@/stores/account.js';
+import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useStatisticsStore } from '@/stores/statistics.js';
 

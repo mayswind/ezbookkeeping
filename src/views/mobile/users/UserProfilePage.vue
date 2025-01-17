@@ -336,7 +336,7 @@ import { mapStores } from 'pinia';
 import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
-import { useAccountsStore } from '@/stores/account.js';
+import { useAccountsStore } from '@/stores/account.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
 import { getNameByKeyValue } from '@/lib/common.ts';

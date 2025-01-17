@@ -288,6 +288,11 @@ export interface AccountBalance {
     readonly currency: string;
 }
 
+export interface AccountDisplayBalance {
+    readonly balance: string;
+    readonly currency: string;
+}
+
 export interface CategorizedAccount {
     readonly category: number;
     readonly name: string;
@@ -305,4 +310,10 @@ export interface AccountCategoriesWithVisibleCount {
     readonly allSubAccounts: Record<string, Account[]>;
     readonly allVisibleSubAccountCounts: Record<string, number>;
     readonly allFirstVisibleSubAccountIndexes: Record<string, number>;
+}
+
+export interface AccountShowingIds {
+    readonly accounts: Record<number, string>;
+    readonly subAccounts: Record<string, string>;
+
 }

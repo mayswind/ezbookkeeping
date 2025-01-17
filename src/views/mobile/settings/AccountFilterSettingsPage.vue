@@ -134,7 +134,7 @@
 <script>
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.ts';
-import { useAccountsStore } from '@/stores/account.js';
+import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionsStore } from '@/stores/transaction.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 

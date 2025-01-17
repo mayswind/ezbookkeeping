@@ -1,4 +1,5 @@
 import en from './en.json';
+import es from './es.json';
 import vi from './vi.json';
 import zhHans from './zh_Hans.json';
 
@@ -24,6 +25,12 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         displayName: 'English',
         alternativeLanguageTag: 'en',
         content: en
+    },
+    'es': {
+        name: 'Spanish',
+        displayName: 'Spanish',
+        alternativeLanguageTag: 'es',
+        content: es
     },
     'vi': {
         name: 'Vietnamese',

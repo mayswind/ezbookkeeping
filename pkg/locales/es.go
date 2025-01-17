@@ -4,7 +4,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 )
 
-var en = &LocaleTextItems{
+var es = &LocaleTextItems{
 	DefaultTypes: &DefaultTypes{
 		DecimalSeparator:    core.DECIMAL_SEPARATOR_DOT,
 		DigitGroupingSymbol: core.DIGIT_GROUPING_SYMBOL_COMMA,

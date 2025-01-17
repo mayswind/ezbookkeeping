@@ -284,7 +284,7 @@ export const ALL_TIMEZONES: TimezoneInfo[] = [
     },
     {
         displayName: 'Juba',
-        timezoneName: 'Asia/Juba'
+        timezoneName: 'Africa/Juba'
     },
     {
         displayName: 'Kaliningrad',

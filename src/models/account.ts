@@ -48,11 +48,11 @@ export class Account implements AccountInfoResponse {
         }
     }
 
-    get hidden(): boolean {
+    public get hidden(): boolean {
         return !this.visible;
     }
 
-    get subAccounts(): AccountInfoResponse[] | undefined {
+    public get subAccounts(): AccountInfoResponse[] | undefined {
         if (typeof(this.childrenAccounts) === 'undefined') {
             return undefined;
         }

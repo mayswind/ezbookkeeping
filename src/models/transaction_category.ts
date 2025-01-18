@@ -33,11 +33,11 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
         }
     }
 
-    get hidden(): boolean {
+    public get hidden(): boolean {
         return !this.visible;
     }
 
-    get subCategories(): TransactionCategoryInfoResponse[] | undefined {
+    public get subCategories(): TransactionCategoryInfoResponse[] | undefined {
         if (typeof(this.secondaryCategories) === 'undefined') {
             return undefined;
         }

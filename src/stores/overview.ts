@@ -8,6 +8,7 @@ import { useExchangeRatesStore } from './exchangeRates.ts';
 import type { WritableStartEndTime } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import type {
+    TransactionAmountsRequestType,
     TransactionAmountsRequestParams,
     TransactionAmountsResponse,
     TransactionOverviewResponse
@@ -29,7 +30,7 @@ import {
 import logger from '@/lib/logger.ts';
 import services from '@/lib/services.ts';
 
-interface TransactionDataRange extends Record<string, WritableStartEndTime> {
+interface TransactionDataRange extends Record<TransactionAmountsRequestType, WritableStartEndTime> {
     today: {
         startTime: number;
         endTime: number;
@@ -260,8 +261,8 @@ export const useOverviewStore = defineStore('overview', () => {
         transactionDataRange.value.monthBeforeLastMonth.endTime = getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 2, 'months');
 
         for (let i = 2; i <= 10; i++) {
-            transactionDataRange.value[`monthBeforeLast${i}Months`].startTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), i + 1, 'months');
-            transactionDataRange.value[`monthBeforeLast${i}Months`].endTime = getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), i + 1, 'months');
+            transactionDataRange.value[`monthBeforeLast${i}Months` as TransactionAmountsRequestType].startTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), i + 1, 'months');
+            transactionDataRange.value[`monthBeforeLast${i}Months` as TransactionAmountsRequestType].endTime = getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), i + 1, 'months');
         }
     }
 

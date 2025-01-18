@@ -42,7 +42,7 @@ import {
 } from '@/lib/datetime.ts';
 import { getExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
-interface MonthlyIncomeAndExpenseCardClickEvent {
+export interface MonthlyIncomeAndExpenseCardClickEvent {
     transactionType: TransactionType;
     monthStartTime: number;
 }

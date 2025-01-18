@@ -128,13 +128,39 @@ export interface TransactionStatisticTrendsRequest extends YearMonthRangeRequest
 }
 
 export const ALL_TRANSACTION_AMOUNTS_REQUEST_TYPE = [
-    'today', 'thisWeek', 'thisMonth', 'thisYear', 'lastMonth',
-    'monthBeforeLastMonth', 'monthBeforeLast2Months', 'monthBeforeLast3Months',
-    'monthBeforeLast4Months', 'monthBeforeLast5Months', 'monthBeforeLast6Months',
-    'monthBeforeLast7Months', 'monthBeforeLast8Months', 'monthBeforeLast9Months', 'monthBeforeLast10Months'
+    'today',
+    'thisWeek',
+    'thisMonth',
+    'thisYear',
+    'lastMonth',
+    'monthBeforeLastMonth',
+    'monthBeforeLast2Months',
+    'monthBeforeLast3Months',
+    'monthBeforeLast4Months',
+    'monthBeforeLast5Months',
+    'monthBeforeLast6Months',
+    'monthBeforeLast7Months',
+    'monthBeforeLast8Months',
+    'monthBeforeLast9Months',
+    'monthBeforeLast10Months'
 ] as const;
 
 export type TransactionAmountsRequestType = typeof ALL_TRANSACTION_AMOUNTS_REQUEST_TYPE[number];
+
+export const LATEST_12MONTHS_TRANSACTION_AMOUNTS_REQUEST_TYPES: TransactionAmountsRequestType[] = [
+    'monthBeforeLast10Months',
+    'monthBeforeLast9Months',
+    'monthBeforeLast8Months',
+    'monthBeforeLast7Months',
+    'monthBeforeLast6Months',
+    'monthBeforeLast5Months',
+    'monthBeforeLast4Months',
+    'monthBeforeLast3Months',
+    'monthBeforeLast2Months',
+    'monthBeforeLastMonth',
+    'lastMonth',
+    'thisMonth'
+];
 
 export interface TransactionAmountsRequestParams extends PartialRecord<TransactionAmountsRequestType, StartEndTime> {
     readonly useTransactionTimezone: boolean;
@@ -225,6 +251,14 @@ export interface TransactionAmountsResponseItemAmountInfo {
 }
 
 export type TransactionOverviewResponse = PartialRecord<TransactionAmountsRequestType, TransactionOverviewResponseItem>;
+
+export type TransactionOverviewDisplayTime = PartialRecord<TransactionAmountsRequestType, TransactionOverviewDisplayTimeItem>;
+
+export interface TransactionOverviewDisplayTimeItem {
+    readonly displayTime?: string;
+    readonly startTime?: string;
+    readonly endTime?: string;
+}
 
 export interface TransactionOverviewResponseItem {
     readonly valid: boolean;

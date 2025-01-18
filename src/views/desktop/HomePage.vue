@@ -5,9 +5,9 @@
                 <template #title>
                     <div class="d-flex align-center">
                         <div class="d-flex align-baseline">
-                            <span class="text-2xl font-weight-bold">{{ displayDateRange.thisMonth.displayTime }}</span>
+                            <span class="text-2xl font-weight-bold">{{ displayDateRange?.thisMonth?.displayTime }}</span>
                             <span>·</span>
-                            <span style="font-size: 1rem">{{ $t('Expense') }}</span>
+                            <span style="font-size: 1rem">{{ tt('Expense') }}</span>
                         </div>
                         <v-btn density="compact" color="default" variant="text" size="24"
                                class="ml-2" :icon="true" :loading="loadingOverview" @click="reload(true)">
@@ -15,7 +15,7 @@
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
                             <v-icon :icon="icons.refresh" size="24" />
-                            <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
+                            <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                         </v-btn>
                     </div>
                 </template>
@@ -30,11 +30,11 @@
                         </v-btn>
                     </h4>
                     <div class="mt-1 mb-3">
-                        <span class="mr-2">{{ $t('Monthly income') }}</span>
+                        <span class="mr-2">{{ tt('Monthly income') }}</span>
                         <span v-if="!loadingOverview || (transactionOverview && transactionOverview.thisMonth && transactionOverview.thisMonth.valid)">{{ transactionOverview && transactionOverview.thisMonth ? getDisplayIncomeAmount(transactionOverview.thisMonth) : '-' }}</span>
                         <v-skeleton-loader class="d-inline-block skeleton-no-margin mt-2" width="120px" type="text" :loading="true" v-else-if="loadingOverview && (!transactionOverview || !transactionOverview.thisMonth || !transactionOverview.thisMonth.valid)"></v-skeleton-loader>
                     </div>
-                    <v-btn size="small" to="/transaction/list?dateType=7">{{ $t('View Details') }}</v-btn>
+                    <v-btn size="small" to="/transaction/list?dateType=7">{{ tt('View Details') }}</v-btn>
                     <v-img class="overview-card-background" src="img/desktop/card-background.png"/>
                     <v-img class="overview-card-background-image" width="116px" src="img/desktop/document.svg"/>
                 </v-card-text>
@@ -44,12 +44,12 @@
         <v-col cols="12" lg="8" md="12">
             <v-card :class="{ 'disabled': loadingOverview }">
                 <template #title>
-                    <span>{{ $t('Asset Summary') }}</span>
+                    <span>{{ tt('Asset Summary') }}</span>
                 </template>
 
                 <v-card-text>
                     <div class="mb-8">
-                        <span class="text-body-1" v-if="!loadingOverview || (allAccounts && allAccounts.length)">{{ $t('format.misc.youHaveAccounts', { count: allAccounts.length }) }}</span>
+                        <span class="text-body-1" v-if="!loadingOverview || (allAccounts && allAccounts.length)">{{ tt('format.misc.youHaveAccounts', { count: allAccounts.length }) }}</span>
                         <v-skeleton-loader class="skeleton-no-margin mt-1 mb-2 pb-1" width="200px" type="text" :loading="true" v-else-if="loadingOverview && (!allAccounts || !allAccounts.length)"></v-skeleton-loader>
                     </div>
 
@@ -63,7 +63,7 @@
                                 </div>
 
                                 <div class="d-flex flex-column">
-                                    <span class="text-caption">{{ $t('Total assets') }}</span>
+                                    <span class="text-caption">{{ tt('Total assets') }}</span>
                                     <span class="text-h5" v-if="!loadingOverview || (allAccounts && allAccounts.length)">{{ totalAssets }}</span>
                                     <v-skeleton-loader class="skeleton-no-margin mt-3 mb-2" width="120px" type="text" :loading="true" v-else-if="loadingOverview && (!allAccounts || !allAccounts.length)"></v-skeleton-loader>
                                 </div>
@@ -79,7 +79,7 @@
                                 </div>
 
                                 <div class="d-flex flex-column">
-                                    <span class="text-caption">{{ $t('Total liabilities') }}</span>
+                                    <span class="text-caption">{{ tt('Total liabilities') }}</span>
                                     <span class="text-h5" v-if="!loadingOverview || (allAccounts && allAccounts.length)">{{ totalLiabilities }}</span>
                                     <v-skeleton-loader class="skeleton-no-margin mt-3 mb-2" width="120px" type="text" :loading="true" v-else-if="loadingOverview && (!allAccounts || !allAccounts.length)"></v-skeleton-loader>
                                 </div>
@@ -95,7 +95,7 @@
                                 </div>
 
                                 <div class="d-flex flex-column">
-                                    <span class="text-caption">{{ $t('Net assets') }}</span>
+                                    <span class="text-caption">{{ tt('Net assets') }}</span>
                                     <span class="text-h5" v-if="!loadingOverview || (allAccounts && allAccounts.length)">{{ netAssets }}</span>
                                     <v-skeleton-loader class="skeleton-no-margin mt-3 mb-2" width="120px" type="text" :loading="true" v-else-if="loadingOverview && (!allAccounts || !allAccounts.length)"></v-skeleton-loader>
                                 </div>
@@ -111,14 +111,14 @@
                 <v-col cols="12" md="6">
                     <income-expense-overview-card
                         :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarToday"
-                        :title="$t('Today')"
+                        :title="tt('Today')"
                         :expense-amount="transactionOverview.today && transactionOverview.today.valid ? getDisplayExpenseAmount(transactionOverview.today) : ''"
                         :income-amount="transactionOverview.today && transactionOverview.today.valid ? getDisplayIncomeAmount(transactionOverview.today) : ''"
-                        :datetime="displayDateRange.today.displayTime"
+                        :datetime="displayDateRange?.today?.displayTime || ''"
                     >
                         <template #menus>
-                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transaction/list?dateType=' + allDateRanges.Today.type">
-                                <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
+                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transaction/list?dateType=' + DateRange.Today.type">
+                                <v-list-item-title>{{ tt('View Details') }}</v-list-item-title>
                             </v-list-item>
                         </template>
                     </income-expense-overview-card>
@@ -127,14 +127,14 @@
                 <v-col cols="12" md="6">
                     <income-expense-overview-card
                         :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarWeek"
-                        :title="$t('This Week')"
+                        :title="tt('This Week')"
                         :expense-amount="transactionOverview.thisWeek && transactionOverview.thisWeek.valid ? getDisplayExpenseAmount(transactionOverview.thisWeek) : ''"
                         :income-amount="transactionOverview.thisWeek && transactionOverview.thisWeek.valid ? getDisplayIncomeAmount(transactionOverview.thisWeek) : ''"
-                        :datetime="displayDateRange.thisWeek.startTime + '-' + displayDateRange.thisWeek.endTime"
+                        :datetime="displayDateRange?.thisWeek?.startTime + '-' + displayDateRange?.thisWeek?.endTime"
                     >
                         <template #menus>
-                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transaction/list?dateType=' + allDateRanges.ThisWeek.type">
-                                <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
+                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transaction/list?dateType=' + DateRange.ThisWeek.type">
+                                <v-list-item-title>{{ tt('View Details') }}</v-list-item-title>
                             </v-list-item>
                         </template>
                     </income-expense-overview-card>
@@ -143,14 +143,14 @@
                 <v-col cols="12" md="6">
                     <income-expense-overview-card
                         :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarMonth"
-                        :title="$t('This Month')"
+                        :title="tt('This Month')"
                         :expense-amount="transactionOverview.thisMonth && transactionOverview.thisMonth.valid ? getDisplayExpenseAmount(transactionOverview.thisMonth) : ''"
                         :income-amount="transactionOverview.thisMonth && transactionOverview.thisMonth.valid ? getDisplayIncomeAmount(transactionOverview.thisMonth) : ''"
-                        :datetime="displayDateRange.thisMonth.startTime + '-' + displayDateRange.thisMonth.endTime"
+                        :datetime="displayDateRange?.thisMonth?.startTime + '-' + displayDateRange?.thisMonth?.endTime"
                     >
                         <template #menus>
-                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transaction/list?dateType=' + allDateRanges.ThisMonth.type">
-                                <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
+                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transaction/list?dateType=' + DateRange.ThisMonth.type">
+                                <v-list-item-title>{{ tt('View Details') }}</v-list-item-title>
                             </v-list-item>
                         </template>
                     </income-expense-overview-card>
@@ -159,14 +159,14 @@
                 <v-col cols="12" md="6">
                     <income-expense-overview-card
                         :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarYear"
-                        :title="$t('This Year')"
+                        :title="tt('This Year')"
                         :expense-amount="transactionOverview.thisYear && transactionOverview.thisYear.valid ? getDisplayExpenseAmount(transactionOverview.thisYear) : ''"
                         :income-amount="transactionOverview.thisYear && transactionOverview.thisYear.valid ? getDisplayIncomeAmount(transactionOverview.thisYear) : ''"
-                        :datetime="displayDateRange.thisYear.displayTime"
+                        :datetime="displayDateRange?.thisYear?.displayTime || ''"
                     >
                         <template #menus>
-                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transaction/list?dateType=' + allDateRanges.ThisYear.type">
-                                <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
+                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transaction/list?dateType=' + DateRange.ThisYear.type">
+                                <v-list-item-title>{{ tt('View Details') }}</v-list-item-title>
                             </v-list-item>
                         </template>
                     </income-expense-overview-card>
@@ -184,25 +184,26 @@
     <snack-bar ref="snackbar" />
 </template>
 
-<script>
+<script setup lang="ts">
+import SnackBar from '@/components/desktop/SnackBar.vue';
+import IncomeExpenseOverviewCard from './overview/cards/IncomeExpenseOverviewCard.vue';
+import MonthlyIncomeAndExpenseCard, { type MonthlyIncomeAndExpenseCardClickEvent } from './overview/cards/MonthlyIncomeAndExpenseCard.vue';
+
+import { ref, computed, useTemplateRef } from 'vue';
+import { useRouter } from 'vue-router';
 import { useTheme } from 'vuetify';
 
-import IncomeExpenseOverviewCard from './overview/cards/IncomeExpenseOverviewCard.vue';
-import MonthlyIncomeAndExpenseCard from './overview/cards/MonthlyIncomeAndExpenseCard.vue';
+import { useI18n } from '@/locales/helpers.ts';
+import { useHomePageBase } from '@/views/base/HomePageBase.ts';
 
-import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.ts';
-import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
 import { DateRange } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
-import {
-    formatUnixTime,
-    getUnixTimeBeforeUnixTime,
-    getUnixTimeAfterUnixTime
-} from '@/lib/datetime.ts';
+import { type TransactionMonthlyIncomeAndExpenseData, LATEST_12MONTHS_TRANSACTION_AMOUNTS_REQUEST_TYPES } from '@/models/transaction.ts';
+
+import { getUnixTimeBeforeUnixTime, getUnixTimeAfterUnixTime } from '@/lib/datetime.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 
 import {
@@ -220,195 +221,113 @@ import {
     mdiDotsVertical
 } from '@mdi/js';
 
-export default {
-    components: {
-        IncomeExpenseOverviewCard,
-        MonthlyIncomeAndExpenseCard
-    },
-    data() {
-        return {
-            loadingOverview: true,
-            icons: {
-                refresh: mdiRefresh,
-                eye: mdiEyeOutline,
-                eyeSlash: mdiEyeOffOutline,
-                totalAssets: mdiBankOutline,
-                totalLiabilities: mdiCreditCardOutline,
-                netAssets: mdiPiggyBankOutline,
-                calendarToday: mdiCalendarTodayOutline,
-                calendarWeek: mdiCalendarWeekOutline,
-                calendarMonth: mdiCalendarMonthOutline,
-                calendarYear: mdiLayersTripleOutline,
-                viewDetails: mdiListBoxOutline,
-                more: mdiDotsVertical
-            }
-        };
-    },
-    computed: {
-        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useOverviewStore),
-        isDarkMode() {
-            return this.globalTheme.global.name.value === ThemeType.Dark;
-        },
-        showAmountInHomePage: {
-            get: function() {
-                return this.settingsStore.appSettings.showAmountInHomePage;
-            },
-            set: function(value) {
-                this.settingsStore.setShowAmountInHomePage(value);
-            }
-        },
-        defaultCurrency() {
-            return this.userStore.currentUserDefaultCurrency;
-        },
-        allDateRanges() {
-            return DateRange.all();
-        },
-        allAccounts() {
-            return this.accountsStore.allAccounts;
-        },
-        netAssets() {
-            const netAssets = this.accountsStore.getNetAssets(this.showAmountInHomePage);
-            return this.getDisplayCurrency(netAssets, this.defaultCurrency);
-        },
-        totalAssets() {
-            const totalAssets = this.accountsStore.getTotalAssets(this.showAmountInHomePage);
-            return this.getDisplayCurrency(totalAssets, this.defaultCurrency);
-        },
-        totalLiabilities() {
-            const totalLiabilities = this.accountsStore.getTotalLiabilities(this.showAmountInHomePage);
-            return this.getDisplayCurrency(totalLiabilities, this.defaultCurrency);
-        },
-        displayDateRange() {
-            const self = this;
+type SnackBarType = InstanceType<typeof SnackBar>;
 
-            return {
-                today: {
-                    displayTime: self.$locale.formatUnixTimeToLongDate(self.userStore, self.overviewStore.transactionDataRange.today.startTime),
-                },
-                thisWeek: {
-                    startTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.overviewStore.transactionDataRange.thisWeek.startTime),
-                    endTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.overviewStore.transactionDataRange.thisWeek.endTime)
-                },
-                thisMonth: {
-                    displayTime: formatUnixTime(self.overviewStore.transactionDataRange.thisMonth.startTime, 'MMMM'),
-                    startTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.overviewStore.transactionDataRange.thisMonth.startTime),
-                    endTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.overviewStore.transactionDataRange.thisMonth.endTime)
-                },
-                thisYear: {
-                    displayTime: self.$locale.formatUnixTimeToLongYear(self.userStore, self.overviewStore.transactionDataRange.thisYear.startTime)
-                }
-            };
-        },
-        transactionOverview() {
-            return this.overviewStore.transactionOverview;
-        },
-        monthlyIncomeAndExpenseData() {
-            const self = this;
-            const data = [];
+const router = useRouter();
+const theme = useTheme();
 
-            if (!self.transactionOverview || !self.transactionOverview.thisMonth || !self.transactionOverview.thisMonth.valid) {
-                return data;
-            }
+const { tt } = useI18n();
+const {
+    showAmountInHomePage,
+    allAccounts,
+    netAssets,
+    totalAssets,
+    totalLiabilities,
+    displayDateRange,
+    transactionOverview,
+    getDisplayIncomeAmount,
+    getDisplayExpenseAmount
+} = useHomePageBase();
 
-            [
-                'monthBeforeLast10Months',
-                'monthBeforeLast9Months',
-                'monthBeforeLast8Months',
-                'monthBeforeLast7Months',
-                'monthBeforeLast6Months',
-                'monthBeforeLast5Months',
-                'monthBeforeLast4Months',
-                'monthBeforeLast3Months',
-                'monthBeforeLast2Months',
-                'monthBeforeLastMonth',
-                'lastMonth',
-                'thisMonth'
-            ].forEach(fieldName => {
-                if (!Object.prototype.hasOwnProperty.call(self.transactionOverview, fieldName)) {
-                    return;
-                }
+const accountsStore = useAccountsStore();
+const overviewStore = useOverviewStore();
 
-                const dateRange = self.overviewStore.transactionDataRange[fieldName];
+const icons = {
+    refresh: mdiRefresh,
+    eye: mdiEyeOutline,
+    eyeSlash: mdiEyeOffOutline,
+    totalAssets: mdiBankOutline,
+    totalLiabilities: mdiCreditCardOutline,
+    netAssets: mdiPiggyBankOutline,
+    calendarToday: mdiCalendarTodayOutline,
+    calendarWeek: mdiCalendarWeekOutline,
+    calendarMonth: mdiCalendarMonthOutline,
+    calendarYear: mdiLayersTripleOutline,
+    viewDetails: mdiListBoxOutline,
+    more: mdiDotsVertical
+};
 
-                if (!dateRange) {
-                    return;
-                }
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
-                const item = self.overviewStore.transactionOverview[fieldName];
+const loadingOverview = ref<boolean>(true);
 
-                data.push({
-                    monthStartTime: dateRange.startTime,
-                    incomeAmount: item ? item.incomeAmount : 0,
-                    expenseAmount: item ? item.expenseAmount : 0,
-                    incompleteIncomeAmount: item ? item.incompleteIncomeAmount : true,
-                    incompleteExpenseAmount: item ? item.incompleteExpenseAmount : true
-                });
-            });
+const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 
-            return data;
-        }
-    },
-    created() {
-        if (isUserLogined() && isUserUnlocked()) {
-            this.reload(false);
-        }
-    },
-    setup() {
-        const theme = useTheme();
+function clickMonthlyIncomeOrExpense(e: MonthlyIncomeAndExpenseCardClickEvent): void {
+    const minTime = e.monthStartTime;
+    const maxTime = getUnixTimeBeforeUnixTime(getUnixTimeAfterUnixTime(minTime, 1, 'months'), 1, 'seconds');
+    const type = e.transactionType;
 
-        return {
-            globalTheme: theme
-        };
-    },
-    methods: {
-        reload(force) {
-            const self = this;
+    router.push(`/transaction/list?type=${type}&dateType=${DateRange.Custom.type}&maxTime=${maxTime}&minTime=${minTime}`);
+}
 
-            self.loadingOverview = true;
+const monthlyIncomeAndExpenseData = computed<TransactionMonthlyIncomeAndExpenseData[]>(() => {
+    const data: TransactionMonthlyIncomeAndExpenseData[] = [];
 
-            const promises = [
-                self.accountsStore.loadAllAccounts({ force: false }),
-                self.overviewStore.loadTransactionOverview({ force: force, loadLast11Months: true })
-            ];
-
-            Promise.all(promises).then(() => {
-                self.loadingOverview = false;
-
-                if (force) {
-                    self.$refs.snackbar.showMessage('Data has been updated');
-                }
-            }).catch(error => {
-                self.loadingOverview = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        clickMonthlyIncomeOrExpense(e) {
-            const minTime = e.monthStartTime;
-            const maxTime = getUnixTimeBeforeUnixTime(getUnixTimeAfterUnixTime(minTime, 1, 'months'), 1, 'seconds');
-            const type = e.transactionType;
-
-            this.$router.push(`/transaction/list?type=${type}&dateType=${DateRange.Custom.type}&maxTime=${maxTime}&minTime=${minTime}`);
-        },
-        getDisplayCurrency(value, currencyCode) {
-            return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, currencyCode);
-        },
-        getDisplayAmount(amount, incomplete) {
-            if (!this.showAmountInHomePage) {
-                return this.getDisplayCurrency('***', this.defaultCurrency);
-            }
-
-            return this.getDisplayCurrency(amount, this.defaultCurrency) + (incomplete ? '+' : '');
-        },
-        getDisplayIncomeAmount(category) {
-            return this.getDisplayAmount(category.incomeAmount, category.incompleteIncomeAmount);
-        },
-        getDisplayExpenseAmount(category) {
-            return this.getDisplayAmount(category.expenseAmount, category.incompleteExpenseAmount);
-        }
+    if (!transactionOverview.value || !transactionOverview.value.thisMonth || !transactionOverview.value.thisMonth.valid) {
+        return data;
     }
+
+    LATEST_12MONTHS_TRANSACTION_AMOUNTS_REQUEST_TYPES.forEach(amountRequestType => {
+        if (!Object.prototype.hasOwnProperty.call(transactionOverview.value, amountRequestType)) {
+            return;
+        }
+
+        const dateRange = overviewStore.transactionDataRange[amountRequestType];
+
+        if (!dateRange) {
+            return;
+        }
+
+        const item = transactionOverview.value[amountRequestType];
+
+        data.push({
+            monthStartTime: dateRange.startTime,
+            incomeAmount: item?.incomeAmount || 0,
+            expenseAmount: item?.expenseAmount || 0,
+            incompleteIncomeAmount: item ? item.incompleteIncomeAmount : true,
+            incompleteExpenseAmount: item ? item.incompleteExpenseAmount : true
+        });
+    });
+
+    return data;
+});
+
+function reload(force: boolean): void {
+    loadingOverview.value = true;
+
+    const promises = [
+        accountsStore.loadAllAccounts({ force: false }),
+        overviewStore.loadTransactionOverview({ force: force, loadLast11Months: true })
+    ];
+
+    Promise.all(promises).then(() => {
+        loadingOverview.value = false;
+
+        if (force) {
+            snackbar.value?.showMessage('Data has been updated');
+        }
+    }).catch(error => {
+        loadingOverview.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+if (isUserLogined() && isUserUnlocked()) {
+    reload(false);
 }
 </script>
 

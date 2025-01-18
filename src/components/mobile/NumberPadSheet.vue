@@ -74,16 +74,6 @@ import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { isString, isNumber, removeAll } from '@/lib/common.ts';
 
-const {
-    tt,
-    getCurrentDecimalSeparator,
-    getCurrentDigitGroupingSymbol,
-    appendDigitGroupingSymbol,
-    parseAmount,
-    formatAmount
-} = useI18n();
-const { showToast } = useI18nUIComponents();
-
 const props = defineProps<{
     modelValue: number | string;
     minValue?: number;
@@ -96,6 +86,16 @@ const emit = defineEmits<{
     (e: 'update:modelValue', value: number): void;
     (e: 'update:show', value: boolean): void;
 }>();
+
+const {
+    tt,
+    getCurrentDecimalSeparator,
+    getCurrentDigitGroupingSymbol,
+    appendDigitGroupingSymbol,
+    parseAmount,
+    formatAmount
+} = useI18n();
+const { showToast } = useI18nUIComponents();
 
 const previousValue = ref<string>('');
 const currentSymbol = ref<string>('');

@@ -57,9 +57,8 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, useTemplateRef } from 'vue';
 
-import { type CommonScheduleFrequencySelectionProps, useScheduleFrequencySelectionBase } from '@/components/base/ScheduleFrequencySelectionBase.ts';
-
 import { useI18n } from '@/locales/helpers.ts';
+import { type CommonScheduleFrequencySelectionProps, useScheduleFrequencySelectionBase } from '@/components/base/ScheduleFrequencySelectionBase.ts';
 
 import { useUserStore } from '@/stores/user.ts';
 
@@ -74,10 +73,9 @@ const emit = defineEmits<{
 }>();
 
 const { tt, getMultiMonthdayShortNames, getMultiWeekdayLongNames } = useI18n();
+const { allTransactionScheduledFrequencyTypes, allWeekDays, allAvailableMonthDays, getFrequencyValues } = useScheduleFrequencySelectionBase();
 
 const userStore = useUserStore();
-
-const { allTransactionScheduledFrequencyTypes, allWeekDays, allAvailableMonthDays, getFrequencyValues } = useScheduleFrequencySelectionBase();
 
 const dropdownMenu = useTemplateRef<HTMLElement>('dropdownMenu');
 

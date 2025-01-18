@@ -67,9 +67,8 @@
 import { computed, watch } from 'vue';
 import { useTheme } from 'vuetify';
 
-import { type CommonMonthRangeSelectionProps, useMonthRangeSelectionBase } from '@/components/base/MonthRangeSelectionBase.ts';
-
 import { useI18n } from '@/locales/helpers.ts';
+import { type CommonMonthRangeSelectionProps, useMonthRangeSelectionBase } from '@/components/base/MonthRangeSelectionBase.ts';
 
 import { ThemeType } from '@/core/theme.ts';
 import { getYearMonthObjectFromString } from '@/lib/datetime.ts';
@@ -86,8 +85,8 @@ const emit = defineEmits<{
 }>();
 
 const theme = useTheme();
-const { tt, getMonthShortName } = useI18n();
 
+const { tt, getMonthShortName } = useI18n();
 const { yearRange, dateRange, isYearFirst, beginDateTime, endDateTime, getFinalMonthRange } = useMonthRangeSelectionBase(props);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);

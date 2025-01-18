@@ -25,14 +25,14 @@ import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
+const props = defineProps<{
+    f7router: Router.Router;
+}>();
+
 const { tt } = useI18n();
 const { showToast, routeBackOnError } = useI18nUIComponents();
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
-
-const props = defineProps<{
-    f7router: Router.Router;
-}>();
 
 const loading = ref<boolean>(true);
 const loadingError = ref<unknown | null>(null);

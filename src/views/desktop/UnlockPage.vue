@@ -118,7 +118,6 @@ import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 import { useUnlockPageBase } from '@/views/base/UnlockPageBase.ts';
 
-
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 

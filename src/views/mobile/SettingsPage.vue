@@ -87,6 +87,10 @@ import { getVersion, getDesktopVersionPath } from '@/lib/version.ts';
 import { isUserScheduledTransactionEnabled } from '@/lib/server_settings.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
+const props = defineProps<{
+    f7router: Router.Router;
+}>();
+
 const { tt, getCurrentLanguageTag, formatUnixTimeToLongDate, initLocale } = useI18n();
 const { showToast, showConfirm } = useI18nUIComponents();
 const { allTimezones, timeZone, isAutoUpdateExchangeRatesData, showAccountBalance } = useAppSettingPageBase();
@@ -95,10 +99,6 @@ const rootStore = useRootStore();
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
 const exchangeRatesStore = useExchangeRatesStore();
-
-const props = defineProps<{
-    f7router: Router.Router;
-}>();
 
 const version = `v${getVersion()}`;
 

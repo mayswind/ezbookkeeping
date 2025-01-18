@@ -90,16 +90,16 @@ import {
 import { isModalShowing } from '@/lib/ui/mobile.ts';
 import logger from '@/lib/logger.ts';
 
+const props = defineProps<{
+    f7router: Router.Router;
+}>();
+
 const { tt, getCurrentLanguageTag, getCurrentLanguageDisplayName, getAllLanguageOptions } = useI18n();
 const { showToast, showConfirm } = useI18nUIComponents();
 const { version, pinCode, isWebAuthnAvailable, isPinCodeValid, changeLanguage, doAfterUnlocked, doRelogin } = useUnlockPageBase();
 
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
-
-const props = defineProps<{
-    f7router: Router.Router;
-}>();
 
 const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
 const currentLanguageCode = computed<string>(() => getCurrentLanguageTag());

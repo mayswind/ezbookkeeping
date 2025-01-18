@@ -67,9 +67,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 
-import { type CommonScheduleFrequencySelectionProps, useScheduleFrequencySelectionBase } from '@/components/base/ScheduleFrequencySelectionBase.ts';
-
 import { useI18n } from '@/locales/helpers.ts';
+import { type CommonScheduleFrequencySelectionProps, useScheduleFrequencySelectionBase } from '@/components/base/ScheduleFrequencySelectionBase.ts';
 
 import { useUserStore } from '@/stores/user.ts';
 
@@ -89,10 +88,9 @@ const emit = defineEmits<{
 }>();
 
 const { tt } = useI18n();
+const { allTransactionScheduledFrequencyTypes, allWeekDays, allAvailableMonthDays, getFrequencyValues } = useScheduleFrequencySelectionBase();
 
 const userStore = useUserStore();
-
-const { allTransactionScheduledFrequencyTypes, allWeekDays, allAvailableMonthDays, getFrequencyValues } = useScheduleFrequencySelectionBase();
 
 const currentFrequencyType = ref<number>(props.type);
 const currentFrequencyValue = ref<number[]>(getFrequencyValues(props.modelValue));

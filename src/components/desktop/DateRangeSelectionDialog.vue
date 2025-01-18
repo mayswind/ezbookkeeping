@@ -56,9 +56,9 @@
 import { computed, watch } from 'vue';
 import { useTheme } from 'vuetify';
 
+import { useI18n } from '@/locales/helpers.ts';
 import { type CommonDateRangeSelectionProps, useDateRangeSelectionBase } from '@/components/base/DateRangeSelectionBase.ts';
 
-import { useI18n } from '@/locales/helpers.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 import { ThemeType } from '@/core/theme.ts';
@@ -82,11 +82,11 @@ const emit = defineEmits<{
 }>();
 
 const theme = useTheme();
+
 const { tt, getMonthShortName } = useI18n();
+const { yearRange, dateRange, dayNames, isYearFirst, is24Hour, beginDateTime, endDateTime, presetRanges, getFinalDateRange } = useDateRangeSelectionBase(props);
 
 const userStore = useUserStore();
-
-const { yearRange, dateRange, dayNames, isYearFirst, is24Hour, beginDateTime, endDateTime, presetRanges, getFinalDateRange } = useDateRangeSelectionBase(props);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);

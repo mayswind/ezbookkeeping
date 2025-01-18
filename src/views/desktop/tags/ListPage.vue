@@ -256,6 +256,10 @@ import {
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 
+const { tt } = useI18n();
+
+const transactionTagsStore = useTransactionTagsStore();
+
 const icons = {
     refresh: mdiRefresh,
     add: mdiPlus,
@@ -269,10 +273,6 @@ const icons = {
     more: mdiDotsVertical,
     tag: mdiPound
 };
-
-const { tt } = useI18n();
-
-const transactionTagsStore = useTransactionTagsStore();
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');

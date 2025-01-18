@@ -56,10 +56,10 @@
 import { computed, useTemplateRef } from 'vue';
 import VueDatePicker from '@vuepic/vue-datepicker';
 
-import { type CommonDateRangeSelectionProps, useDateRangeSelectionBase } from '@/components/base/DateRangeSelectionBase.ts';
-
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
+import { type CommonDateRangeSelectionProps, useDateRangeSelectionBase } from '@/components/base/DateRangeSelectionBase.ts';
+
 import { useEnvironmentsStore } from '@/stores/environment.ts';
 import { useUserStore } from '@/stores/user.ts';
 
@@ -80,11 +80,10 @@ const emit = defineEmits<{
 
 const { tt, getMonthShortName } = useI18n();
 const { showToast } = useI18nUIComponents();
+const { yearRange, dateRange, dayNames, isYearFirst, is24Hour, beginDateTime, endDateTime, presetRanges, getFinalDateRange } = useDateRangeSelectionBase(props);
 
 const environmentsStore = useEnvironmentsStore();
 const userStore = useUserStore();
-
-const { yearRange, dateRange, dayNames, isYearFirst, is24Hour, beginDateTime, endDateTime, presetRanges, getFinalDateRange } = useDateRangeSelectionBase(props);
 
 const datetimepicker = useTemplateRef<VueDatePickerType>('datetimepicker');
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);

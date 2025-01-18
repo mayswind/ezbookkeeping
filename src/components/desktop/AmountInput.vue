@@ -39,15 +39,6 @@ import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transac
 import { removeAll } from '@/lib/common.ts';
 import logger from '@/lib/logger.ts';
 
-const {
-    tt,
-    getCurrentDecimalSeparator,
-    getCurrentDigitGroupingSymbol,
-    parseAmount,
-    formatAmount,
-    getAmountPrependAndAppendText
-} = useI18n();
-
 const props = defineProps<{
     class?: string;
     color?: string;
@@ -67,6 +58,15 @@ const props = defineProps<{
 const emit = defineEmits<{
     (e: 'update:modelValue', value: number): void;
 }>();
+
+const {
+    tt,
+    getCurrentDecimalSeparator,
+    getCurrentDigitGroupingSymbol,
+    parseAmount,
+    formatAmount,
+    getAmountPrependAndAppendText
+} = useI18n();
 
 const rules = [
     (v: string) => {

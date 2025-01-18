@@ -82,15 +82,15 @@ import { categorizedArrayToPlainArray } from '@/lib/common.ts';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
 
-const { tt, getCurrentLanguageTag, getAllLanguageOptions, getAllTransactionDefaultCategories, getLanguageInfo } = useI18n();
-
-const transactionCategoriesStore = useTransactionCategoriesStore();
-
 const props = defineProps<{
     categoryType: CategoryType;
     persistent?: boolean;
     show: boolean;
 }>();
+
+const { tt, getCurrentLanguageTag, getAllLanguageOptions, getAllTransactionDefaultCategories, getLanguageInfo } = useI18n();
+
+const transactionCategoriesStore = useTransactionCategoriesStore();
 
 const emit = defineEmits<{
     (e: 'update:show', value: boolean): void;

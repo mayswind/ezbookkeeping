@@ -46,10 +46,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { type CommonMonthRangeSelectionProps, useMonthRangeSelectionBase } from '@/components/base/MonthRangeSelectionBase.ts';
-
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
+import { type CommonMonthRangeSelectionProps, useMonthRangeSelectionBase } from '@/components/base/MonthRangeSelectionBase.ts';
+
 import { useEnvironmentsStore } from '@/stores/environment.ts';
 
 import { getYearMonthObjectFromString } from '@/lib/datetime.ts';
@@ -62,10 +62,9 @@ const emit = defineEmits<{
 
 const { tt, getMonthShortName } = useI18n();
 const { showToast } = useI18nUIComponents();
+const { yearRange, dateRange, isYearFirst, beginDateTime, endDateTime, getFinalMonthRange } = useMonthRangeSelectionBase(props);
 
 const environmentsStore = useEnvironmentsStore();
-
-const { yearRange, dateRange, isYearFirst, beginDateTime, endDateTime, getFinalMonthRange } = useMonthRangeSelectionBase(props);
 
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
 

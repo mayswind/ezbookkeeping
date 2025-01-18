@@ -59,7 +59,6 @@ import logger from '@/lib/logger.ts';
 
 const { tt } = useI18n();
 const { showToast } = useI18nUIComponents();
-
 const { isSupportedWebAuthn, isEnableApplicationLock, isEnableApplicationLockWebAuthn } = useAppLockPageBase();
 
 const settingsStore = useSettingsStore();

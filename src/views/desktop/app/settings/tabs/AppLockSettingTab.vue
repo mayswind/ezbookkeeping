@@ -87,7 +87,6 @@ import logger from '@/lib/logger.ts';
 type SnackBarType = InstanceType<typeof SnackBar>;
 
 const { tt } = useI18n();
-
 const { isSupportedWebAuthn, isEnableApplicationLock, isEnableApplicationLockWebAuthn } = useAppLockPageBase();
 
 const settingsStore = useSettingsStore();

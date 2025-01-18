@@ -3,7 +3,7 @@
         <v-card class="pa-2 pa-sm-4 pa-md-8">
             <template #title>
                 <div class="d-flex align-center justify-center">
-                    <h4 class="text-h4">{{ $t('Default Categories') }}</h4>
+                    <h4 class="text-h4">{{ tt('Default Categories') }}</h4>
                 </div>
             </template>
             <v-card-text class="preset-transaction-categories mt-sm-2 mt-md-4 pt-0">
@@ -53,11 +53,11 @@
             <v-card-text class="overflow-y-visible">
                 <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
                     <v-btn :disabled="submitting" @click="save">
-                        {{ $t('Save') }}
+                        {{ tt('Save') }}
                         <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                     </v-btn>
                     <v-btn color="secondary" density="default" variant="tonal"
-                           :disabled="submitting" @click="showState = false">{{ $t('Cancel') }}</v-btn>
+                           :disabled="submitting" @click="showState = false">{{ tt('Cancel') }}</v-btn>
                 </div>
             </v-card-text>
         </v-card>
@@ -66,103 +66,94 @@
     <snack-bar ref="snackbar" />
 </template>
 
-<script>
-import { mapStores } from 'pinia';
+<script setup lang="ts">
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { ref, computed, useTemplateRef } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
-import { CategoryType } from '@/core/category.ts';
+import type { PartialRecord } from '@/core/base.ts';
+import type { LanguageOption } from '@/locales/index.ts';
+import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { categorizedArrayToPlainArray } from '@/lib/common.ts';
 
-import {
-    mdiDotsVertical
-} from '@mdi/js';
+type SnackBarType = InstanceType<typeof SnackBar>;
 
-export default {
-    props: [
-        'categoryType',
-        'persistent',
-        'show'
-    ],
-    emits: [
-        'update:show',
-        'category:saved'
-    ],
-    data() {
-        const self = this;
+const { tt, getCurrentLanguageTag, getAllLanguageOptions, getAllTransactionDefaultCategories, getLanguageInfo } = useI18n();
 
-        return {
-            currentLocale: self.$locale.getCurrentLanguageTag(),
-            allCategoryTypes: [],
-            submitting: false,
-            icons: {
-                more: mdiDotsVertical
-            }
-        };
-    },
-    computed: {
-        ...mapStores(useTransactionCategoriesStore),
-        showState: {
-            get: function () {
-                return this.show;
-            },
-            set: function (value) {
-                this.$emit('update:show', value);
-            }
-        },
-        allLanguages() {
-            return this.$locale.getAllLanguageInfoArray(false);
-        },
-        allPresetCategories() {
-            return this.$locale.getAllTransactionDefaultCategories(this.categoryType, this.currentLocale);
-        },
-        currentLanguageName() {
-            const languageInfo = this.$locale.getLanguageInfo(this.currentLocale);
+const transactionCategoriesStore = useTransactionCategoriesStore();
 
-            if (!languageInfo) {
-                return '';
-            }
+const props = defineProps<{
+    categoryType: CategoryType;
+    persistent?: boolean;
+    show: boolean;
+}>();
 
-            return languageInfo.displayName;
-        }
-    },
-    methods: {
-        save() {
-            const self = this;
+const emit = defineEmits<{
+    (e: 'update:show', value: boolean): void;
+    (e: 'category:saved', event: { message: string }): void;
+}>();
 
-            self.submitting = true;
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
-            const submitCategories = categorizedArrayToPlainArray(self.allPresetCategories);
+const currentLocale = ref<string>(getCurrentLanguageTag());
+const submitting = ref<boolean>(false);
 
-            self.transactionCategoriesStore.addCategories({
-                categories: submitCategories
-            }).then(() => {
-                self.submitting = false;
-                self.showState = false;
+const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
+const allPresetCategories = computed<PartialRecord<CategoryType, LocalizedPresetCategory[]>>(() => getAllTransactionDefaultCategories(props.categoryType, currentLocale.value));
 
-                this.$emit('category:saved', {
-                    message: 'You have added preset categories'
-                });
-            }).catch(error => {
-                self.submitting = false;
+const showState = computed<boolean>({
+    get: () => props.show,
+    set: (value) => emit('update:show', value)
+});
 
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        getCategoryTypeName(categoryType) {
-            switch (categoryType) {
-                case CategoryType.Income.toString():
-                    return this.$t('Income Categories');
-                case CategoryType.Expense.toString():
-                    return this.$t('Expense Categories');
-                case CategoryType.Transfer.toString():
-                    return this.$t('Transfer Categories');
-                default:
-                    return this.$t('Transaction Categories');
-            }
-        }
+const currentLanguageName = computed<string>(() => {
+    const languageInfo = getLanguageInfo(currentLocale.value);
+
+    if (!languageInfo) {
+        return '';
     }
+
+    return languageInfo.displayName;
+});
+
+function getCategoryTypeName(categoryType: CategoryType): string {
+    switch (categoryType) {
+        case CategoryType.Income:
+            return tt('Income Categories');
+        case CategoryType.Expense:
+            return tt('Expense Categories');
+        case CategoryType.Transfer:
+            return tt('Transfer Categories');
+        default:
+            return tt('Transaction Categories');
+    }
+}
+
+function save() {
+    submitting.value = true;
+
+    const submitCategories = categorizedArrayToPlainArray(allPresetCategories.value);
+
+    transactionCategoriesStore.addCategories({
+        categories: submitCategories
+    }).then(() => {
+        submitting.value = false;
+        showState.value = false;
+
+        emit('category:saved', {
+            message: 'You have added preset categories'
+        });
+    }).catch(error => {
+        submitting.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
 }
 </script>
 

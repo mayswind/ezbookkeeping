@@ -167,10 +167,6 @@ export function useI18n() {
     const userStore = useUserStore();
 
     // private functions
-    function getLanguageInfo(languageKey: string): LanguageInfo | undefined {
-        return ALL_LANGUAGES[languageKey];
-    }
-
     function getLanguageDisplayName(languageName: string): string {
         return t(`language.${languageName}`);
     }
@@ -950,6 +946,10 @@ export function useI18n() {
         return availableExchangeRates;
     }
 
+    function getLanguageInfo(languageKey: string): LanguageInfo | undefined {
+        return ALL_LANGUAGES[languageKey];
+    }
+
     function getMonthShortName(monthName: string): string {
         return t(`datetime.${monthName}.short`);
     }
@@ -1337,6 +1337,7 @@ export function useI18n() {
         getAllTransactionDefaultCategories,
         getAllDisplayExchangeRates,
         // get localized info
+        getLanguageInfo,
         getMonthShortName,
         getMonthLongName,
         getMonthdayOrdinal,

@@ -3,7 +3,7 @@
         <v-card class="pa-2 pa-sm-4 pa-md-8">
             <template #title>
                 <div class="d-flex align-center justify-center">
-                    <h4 class="text-h4">{{ $t(title) }}</h4>
+                    <h4 class="text-h4">{{ tt(title) }}</h4>
                     <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
                 </div>
             </template>
@@ -15,8 +15,8 @@
                                 type="text"
                                 persistent-placeholder
                                 :disabled="loading || submitting"
-                                :label="$t('Category Name')"
-                                :placeholder="$t('Category Name')"
+                                :label="tt('Category Name')"
+                                :placeholder="tt('Category Name')"
                                 v-model="category.name"
                             />
                         </v-col>
@@ -26,10 +26,10 @@
                                 item-value="id"
                                 persistent-placeholder
                                 :disabled="loading || submitting"
-                                :label="$t('Primary Category')"
-                                :placeholder="$t('Primary Category')"
+                                :label="tt('Primary Category')"
+                                :placeholder="tt('Primary Category')"
                                 :items="allAvailableCategories"
-                                :no-data-text="$t('No available primary category')"
+                                :no-data-text="tt('No available primary category')"
                                 v-model="category.parentId"
                             >
                                 <template #item="{ props, item }">
@@ -47,15 +47,15 @@
                         </v-col>
                         <v-col cols="12" md="6">
                             <icon-select icon-type="category"
-                                         :all-icon-infos="allCategoryIcons"
-                                          :label="$t('Category Icon')"
+                                         :all-icon-infos="ALL_CATEGORY_ICONS"
+                                          :label="tt('Category Icon')"
                                           :color="category.color"
                                           :disabled="loading || submitting"
                                           v-model="category.icon" />
                         </v-col>
                         <v-col cols="12" md="6">
-                            <color-select :all-color-infos="allCategoryColors"
-                                         :label="$t('Category Color')"
+                            <color-select :all-color-infos="ALL_CATEGORY_COLORS"
+                                         :label="tt('Category Color')"
                                          :disabled="loading || submitting"
                                          v-model="category.color" />
                         </v-col>
@@ -65,14 +65,14 @@
                                 persistent-placeholder
                                 rows="3"
                                 :disabled="loading || submitting"
-                                :label="$t('Description')"
-                                :placeholder="$t('Your category description (optional)')"
+                                :label="tt('Description')"
+                                :placeholder="tt('Your category description (optional)')"
                                 v-model="category.comment"
                             />
                         </v-col>
                         <v-col class="py-0" cols="12" md="12" v-if="editCategoryId">
                             <v-switch :disabled="loading || submitting"
-                                      :label="$t('Visible')" v-model="category.visible"/>
+                                      :label="tt('Visible')" v-model="category.visible"/>
                         </v-col>
                     </v-row>
                 </v-form>
@@ -80,11 +80,11 @@
             <v-card-text class="overflow-y-visible">
                 <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
                     <v-btn :disabled="inputIsEmpty || loading || submitting" @click="save">
-                        {{ $t(saveButtonTitle) }}
+                        {{ tt(saveButtonTitle) }}
                         <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                     </v-btn>
                     <v-btn color="secondary" variant="tonal"
-                           :disabled="loading || submitting" @click="cancel">{{ $t('Cancel') }}</v-btn>
+                           :disabled="loading || submitting" @click="cancel">{{ tt('Cancel') }}</v-btn>
                 </div>
             </v-card-text>
         </v-card>
@@ -93,8 +93,14 @@
     <snack-bar ref="snackbar" />
 </template>
 
-<script>
-import { mapStores } from 'pinia';
+<script setup lang="ts">
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { ref, useTemplateRef } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+import { useCategoryEditPageBase } from '@/views/base/categories/CategoryEditPageBase.ts';
+
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 import { CategoryType } from '@/core/category.ts';
@@ -103,176 +109,134 @@ import { ALL_CATEGORY_COLORS } from '@/consts/color.ts';
 import { TransactionCategory } from '@/models/transaction_category.ts';
 
 import { generateRandomUUID } from '@/lib/misc.ts';
-import { allVisiblePrimaryTransactionCategoriesByType } from '@/lib/category.ts';
 
-export default {
-    props: [
-        'persistent',
-        'show'
-    ],
-    expose: [
-        'open'
-    ],
-    data() {
-        return {
-            showState: false,
-            editCategoryId: null,
-            clientSessionId: '',
-            loading: false,
-            category: TransactionCategory.createNewCategory(),
-            submitting: false,
-            resolve: null,
-            reject: null
-        };
-    },
-    computed: {
-        ...mapStores(useTransactionCategoriesStore),
-        allAvailableCategories() {
-            return allVisiblePrimaryTransactionCategoriesByType(this.transactionCategoriesStore.allTransactionCategories, this.category.type);
-        },
-        title() {
-            if (!this.editCategoryId) {
-                if (this.category.parentId === '0') {
-                    return 'Add Primary Category';
-                } else {
-                    return 'Add Secondary Category';
-                }
-            } else {
-                return 'Edit Category';
-            }
-        },
-        saveButtonTitle() {
-            if (!this.editCategoryId) {
-                return 'Add';
-            } else {
-                return 'Save';
-            }
-        },
-        allCategoryIcons() {
-            return ALL_CATEGORY_ICONS;
-        },
-        allCategoryColors() {
-            return ALL_CATEGORY_COLORS;
-        },
-        inputIsEmpty() {
-            return !!this.inputEmptyProblemMessage;
-        },
-        inputEmptyProblemMessage() {
-            if (!this.category.name) {
-                return 'Category name cannot be blank';
-            } else {
-                return null;
-            }
+interface TransactionCategoryEditRespose {
+    message: string;
+}
+
+type SnackBarType = InstanceType<typeof SnackBar>;
+
+defineProps<{
+    persistent?: boolean;
+}>();
+
+const { tt } = useI18n();
+const {
+    editCategoryId,
+    clientSessionId,
+    loading,
+    submitting,
+    category,
+    allAvailableCategories,
+    title,
+    saveButtonTitle,
+    inputEmptyProblemMessage,
+    inputIsEmpty
+} = useCategoryEditPageBase();
+
+const transactionCategoriesStore = useTransactionCategoriesStore();
+
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+
+const showState = ref<boolean>(false);
+
+let resolveFunc: ((value: TransactionCategoryEditRespose) => void) | null = null;
+let rejectFunc: ((reason?: unknown) => void) | null = null;
+
+defineExpose({
+    open
+});
+
+function open(options: { id?: string; parentId?: string; type?: CategoryType; currentCategory?: TransactionCategory }): Promise<TransactionCategoryEditRespose> {
+    showState.value = true;
+    loading.value = true;
+    submitting.value = false;
+
+    const newTransactionCategory = TransactionCategory.createNewCategory();
+    category.value.from(newTransactionCategory);
+
+    if (options.id) {
+        if (options.currentCategory) {
+            category.value.from(options.currentCategory);
         }
-    },
-    methods: {
-        open(options) {
-            const self = this;
-            self.showState = true;
-            self.loading = true;
-            self.submitting = false;
 
-            const newTransactionCategory = TransactionCategory.createNewCategory();
-            self.category.from(newTransactionCategory);
+        editCategoryId.value = options.id;
+        transactionCategoriesStore.getCategory({
+            categoryId: editCategoryId.value
+        }).then(response => {
+            category.value.from(response);
+            loading.value = false;
+        }).catch(error => {
+            loading.value = false;
+            showState.value = false;
 
-            if (options.id) {
-                if (options.currentCategory) {
-                    self.category.from(options.currentCategory);
-                }
-
-                self.editCategoryId = options.id;
-                self.transactionCategoriesStore.getCategory({
-                    categoryId: self.editCategoryId
-                }).then(category => {
-                    self.category.from(category);
-                    self.loading = false;
-                }).catch(error => {
-                    self.loading = false;
-                    self.showState = false;
-
-                    if (!error.processed) {
-                        if (self.reject) {
-                            self.reject(error);
-                        }
-                    }
-                });
-            } else if (options.parentId) {
-                self.editCategoryId = null;
-
-                const categoryType = parseInt(options.type);
-
-                if (categoryType !== CategoryType.Income &&
-                    categoryType !== CategoryType.Expense &&
-                    categoryType !== CategoryType.Transfer) {
-                    self.loading = false;
-                    self.showState = false;
-
-                    if (self.reject) {
-                        self.reject('Parameter Invalid');
-                    }
-
-                    return;
-                }
-
-                self.category.type = categoryType;
-                self.category.parentId = options.parentId;
-
-                self.clientSessionId = generateRandomUUID();
-                self.loading = false;
+            if (!error.processed) {
+                snackbar.value?.showError(error);
             }
+        });
+    } else if (options.parentId) {
+        editCategoryId.value = null;
 
-            return new Promise((resolve, reject) => {
-                self.resolve = resolve;
-                self.reject = reject;
-            });
-        },
-        save() {
-            const self = this;
+        const categoryType = options.type;
 
-            const problemMessage = self.inputEmptyProblemMessage;
+        if (categoryType !== CategoryType.Income &&
+            categoryType !== CategoryType.Expense &&
+            categoryType !== CategoryType.Transfer) {
+            loading.value = false;
+            showState.value = false;
 
-            if (problemMessage) {
-                self.$refs.snackbar.showMessage(problemMessage);
-                return;
-            }
-
-            self.submitting = true;
-
-            self.transactionCategoriesStore.saveCategory({
-                category: self.category,
-                isEdit: !!self.editCategoryId,
-                clientSessionId: self.clientSessionId
-            }).then(() => {
-                self.submitting = false;
-
-                let message = 'You have saved this category';
-
-                if (!self.editCategoryId) {
-                    message = 'You have added a new category';
-                }
-
-                if (self.resolve) {
-                    self.resolve({
-                        message: message
-                    });
-                }
-
-                self.showState = false;
-            }).catch(error => {
-                self.submitting = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        cancel() {
-            if (this.reject) {
-                this.reject();
-            }
-
-            this.showState = false;
+            return Promise.reject('Parameter Invalid');
         }
+
+        category.value.type = categoryType;
+        category.value.parentId = options.parentId;
+
+        clientSessionId.value = generateRandomUUID();
+        loading.value = false;
     }
+
+    return new Promise((resolve, reject) => {
+        resolveFunc = resolve;
+        rejectFunc = reject;
+    });
+}
+
+function save(): void {
+    const problemMessage = inputEmptyProblemMessage.value;
+
+    if (problemMessage) {
+        snackbar.value?.showMessage(problemMessage);
+        return;
+    }
+
+    submitting.value = true;
+
+    transactionCategoriesStore.saveCategory({
+        category: category.value,
+        isEdit: !!editCategoryId.value,
+        clientSessionId: clientSessionId.value
+    }).then(() => {
+        submitting.value = false;
+
+        let message = 'You have saved this category';
+
+        if (!editCategoryId.value) {
+            message = 'You have added a new category';
+        }
+
+        resolveFunc?.({ message });
+        showState.value = false;
+    }).catch(error => {
+        submitting.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function cancel(): void {
+    rejectFunc?.();
+    showState.value = false;
 }
 </script>

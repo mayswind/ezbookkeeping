@@ -127,6 +127,16 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
         return ret;
     }
 
+    public static findNameById(categories: TransactionCategory[], id: string): string | null {
+        for (const category of categories) {
+            if (category.id === id) {
+                return category.name;
+            }
+        }
+
+        return null;
+    }
+
     public static createNewCategory(type?: CategoryType, parentId?: string): TransactionCategory {
         return new TransactionCategory('', '', parentId || '0', type || CategoryType.Income, DEFAULT_CATEGORY_ICON_ID, DEFAULT_CATEGORY_COLOR, '', 0, true);
     }

@@ -310,16 +310,16 @@ export function getItemByKeyValue<T>(src: Record<string, T>[] | Record<string, R
     return null;
 }
 
-export function getNameByKeyValue<T>(src: Record<string, T>[] | Record<string, Record<string, T>>, value: T, keyField: string | null, nameField: string, defaultName: T): T {
+export function getNameByKeyValue<V, N>(src: Record<string, N | V>[] | Record<string, Record<string, N | V>>, value: V, keyField: string | null, nameField: string, defaultName?: N): N | undefined {
     if (isArray(src)) {
-        const arr = src as Record<string, T>[];
+        const arr = src as Record<string, N | V>[];
 
         if (keyField) {
             for (let i = 0; i < arr.length; i++) {
                 const option = arr[i];
 
                 if (option[keyField] === value) {
-                    return option[nameField];
+                    return option[nameField] as N;
                 }
             }
         } else if (isNumber(value)) {
@@ -328,11 +328,11 @@ export function getNameByKeyValue<T>(src: Record<string, T>[] | Record<string, R
             if (arr[index]) {
                 const option = arr[index];
 
-                return option[nameField];
+                return option[nameField] as N;
             }
         }
     } else if (isObject(src)) {
-        const obj = src as Record<string, Record<string, T>>;
+        const obj = src as Record<string, Record<string, N | V>>;
 
         if (keyField) {
             for (const key in obj) {
@@ -343,7 +343,7 @@ export function getNameByKeyValue<T>(src: Record<string, T>[] | Record<string, R
                 const option = obj[key];
 
                 if (option[keyField] === value) {
-                    return option[nameField];
+                    return option[nameField] as N;
                 }
             }
         } else if (isString(value)) {
@@ -352,7 +352,7 @@ export function getNameByKeyValue<T>(src: Record<string, T>[] | Record<string, R
             if (obj[key]) {
                 const option = obj[key];
 
-                return option[nameField];
+                return option[nameField] as N;
             }
         }
     }

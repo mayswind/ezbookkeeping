@@ -129,6 +129,7 @@ const props = defineProps<{
     items: unknown[];
     noItemText?: string;
 }>();
+
 const emit = defineEmits<{
     (e: 'update:modelValue', value: unknown): void;
 }>();

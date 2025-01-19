@@ -92,6 +92,7 @@ const props = defineProps<{
     allowAddNewTag?: boolean;
     show: boolean;
 }>();
+
 const emit = defineEmits<{
     (e: 'update:modelValue', value: string[]): void;
     (e: 'update:show', value: boolean): void;

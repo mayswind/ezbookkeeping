@@ -88,14 +88,14 @@ const props = defineProps<{
     show: boolean;
 }>();
 
-const { tt, getCurrentLanguageTag, getAllLanguageOptions, getAllTransactionDefaultCategories, getLanguageInfo } = useI18n();
-
-const transactionCategoriesStore = useTransactionCategoriesStore();
-
 const emit = defineEmits<{
     (e: 'update:show', value: boolean): void;
     (e: 'category:saved', event: { message: string }): void;
 }>();
+
+const { tt, getCurrentLanguageTag, getAllLanguageOptions, getAllTransactionDefaultCategories, getLanguageInfo } = useI18n();
+
+const transactionCategoriesStore = useTransactionCategoriesStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 

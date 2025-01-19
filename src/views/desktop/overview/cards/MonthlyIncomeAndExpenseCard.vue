@@ -54,6 +54,7 @@ const props = defineProps<{
     isDarkMode?: boolean;
     enableClickItem?: boolean;
 }>();
+
 const emit = defineEmits<{
     (e: 'click', event: MonthlyIncomeAndExpenseCardClickEvent): void;
 }>();

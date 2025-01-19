@@ -102,6 +102,7 @@ const props = defineProps<{
     items: unknown[];
     show: boolean;
 }>();
+
 const emit = defineEmits<{
     (e: 'update:modelValue', value: unknown): void;
     (e: 'update:show', value: boolean): void;

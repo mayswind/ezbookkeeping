@@ -168,7 +168,7 @@ function logout() {
     });
 }
 
-function onPageAfterIn() {
+function onPageAfterIn(): void {
     currentLocale.value = getCurrentLanguageTag();
 }
 </script>

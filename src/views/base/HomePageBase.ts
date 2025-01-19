@@ -9,6 +9,7 @@ import { useOverviewStore } from '@/stores/overview.ts';
 
 import { Account } from '@/models/account.ts';
 import type {
+    TransactionOverviewResponse,
     TransactionOverviewDisplayTime,
     TransactionOverviewResponseItem
 } from '@/models/transaction.ts';
@@ -70,7 +71,7 @@ export function useHomePageBase() {
         };
     });
 
-    const transactionOverview = computed(() => overviewStore.transactionOverview);
+    const transactionOverview = computed<TransactionOverviewResponse>(() => overviewStore.transactionOverview);
 
     function getDisplayAmount(amount: number, incomplete: boolean): string {
         if (!showAmountInHomePage.value) {

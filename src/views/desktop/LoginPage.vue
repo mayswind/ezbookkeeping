@@ -2,8 +2,8 @@
     <div class="layout-wrapper">
         <router-link to="/">
             <div class="auth-logo d-flex align-start gap-x-3">
-                <img alt="logo" class="login-page-logo" :src="ezBookkeepingLogoPath" />
-                <h1 class="font-weight-medium leading-normal text-2xl">{{ $t('global.app.title') }}</h1>
+                <img alt="logo" class="login-page-logo" :src="APPLICATION_LOGO_PATH" />
+                <h1 class="font-weight-medium leading-normal text-2xl">{{ tt('global.app.title') }}</h1>
             </div>
         </router-link>
         <v-row no-gutters class="auth-wrapper">
@@ -22,8 +22,8 @@
                 <div class="d-flex align-center justify-center h-100">
                     <v-card variant="flat" class="w-100 mt-0 px-4 pt-12" max-width="500">
                         <v-card-text>
-                            <h4 class="text-h4 mb-2">{{ $t('Welcome to ezBookkeeping') }}</h4>
-                            <p class="mb-0">{{ $t('Please log in with your ezBookkeeping account') }}</p>
+                            <h4 class="text-h4 mb-2">{{ tt('Welcome to ezBookkeeping') }}</h4>
+                            <p class="mb-0">{{ tt('Please log in with your ezBookkeeping account') }}</p>
                             <p class="mt-1 mb-0" v-if="tips">{{ tips }}</p>
                         </v-card-text>
 
@@ -36,11 +36,11 @@
                                             autocomplete="username"
                                             autofocus="autofocus"
                                             :disabled="show2faInput || logining || verifying"
-                                            :label="$t('Username')"
-                                            :placeholder="$t('Your username or email')"
+                                            :label="tt('Username')"
+                                            :placeholder="tt('Your username or email')"
                                             v-model="username"
                                             @input="tempToken = ''"
-                                            @keyup.enter="$refs.passwordInput.focus()"
+                                            @keyup.enter="passwordInput?.focus()"
                                         />
                                     </v-col>
 
@@ -50,8 +50,8 @@
                                             ref="passwordInput"
                                             type="password"
                                             :disabled="show2faInput || logining || verifying"
-                                            :label="$t('Password')"
-                                            :placeholder="$t('Your password')"
+                                            :label="tt('Password')"
+                                            :placeholder="tt('Your password')"
                                             v-model="password"
                                             @input="tempToken = ''"
                                             @keyup.enter="login"
@@ -64,8 +64,8 @@
                                             autocomplete="one-time-code"
                                             ref="passcodeInput"
                                             :disabled="logining || verifying"
-                                            :label="$t('Passcode')"
-                                            :placeholder="$t('Passcode')"
+                                            :label="tt('Passcode')"
+                                            :placeholder="tt('Passcode')"
                                             :append-inner-icon="icons.backupCode"
                                             v-model="passcode"
                                             @click:append-inner="twoFAVerifyType = 'backupcode'"
@@ -75,8 +75,8 @@
                                         <v-text-field
                                             type="text"
                                             :disabled="logining || verifying"
-                                            :label="$t('Backup Code')"
-                                            :placeholder="$t('Backup Code')"
+                                            :label="tt('Backup Code')"
+                                            :placeholder="tt('Backup Code')"
                                             :append-inner-icon="icons.passcode"
                                             v-model="backupCode"
                                             @click:append-inner="twoFAVerifyType = 'passcode'"
@@ -88,12 +88,12 @@
                                     <v-col cols="12" class="py-0 mt-1 mb-4">
                                         <div class="d-flex align-center justify-space-between flex-wrap">
                                             <a href="javascript:void(0);" @click="showMobileQrCode = true">
-                                                <span class="nav-item-title">{{ $t('Use on Mobile Device') }}</span>
+                                                <span class="nav-item-title">{{ tt('Use on Mobile Device') }}</span>
                                             </a>
                                             <v-spacer/>
                                             <router-link class="text-primary" to="/forgetpassword"
-                                                         :class="{'disabled': !isUserForgetPasswordEnabled}">
-                                                {{ $t('Forget Password?') }}
+                                                         :class="{'disabled': !isUserForgetPasswordEnabled()}">
+                                                {{ tt('Forget Password?') }}
                                             </router-link>
                                         </div>
                                     </v-col>
@@ -101,21 +101,21 @@
                                     <v-col cols="12">
                                         <v-btn block :disabled="inputIsEmpty || logining || verifying"
                                                @click="login" v-if="!show2faInput">
-                                            {{ $t('Log In') }}
+                                            {{ tt('Log In') }}
                                             <v-progress-circular indeterminate size="22" class="ml-2" v-if="logining"></v-progress-circular>
                                         </v-btn>
                                         <v-btn block :disabled="twoFAInputIsEmpty || logining || verifying"
                                                @click="verify" v-else-if="show2faInput">
-                                            {{ $t('Continue') }}
+                                            {{ tt('Continue') }}
                                             <v-progress-circular indeterminate size="22" class="ml-2" v-if="verifying"></v-progress-circular>
                                         </v-btn>
                                     </v-col>
 
                                     <v-col cols="12" class="text-center text-base">
-                                        <span class="me-1">{{ $t('Don\'t have an account?') }}</span>
+                                        <span class="me-1">{{ tt('Don\'t have an account?') }}</span>
                                         <router-link class="text-primary" to="/signup"
-                                                     :class="{'disabled': !isUserRegistrationEnabled}">
-                                            {{ $t('Create an account') }}
+                                                     :class="{'disabled': !isUserRegistrationEnabled()}">
+                                            {{ tt('Create an account') }}
                                         </router-link>
                                     </v-col>
                                 </v-row>
@@ -167,222 +167,160 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { VTextField } from 'vuetify/components/VTextField';
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { ref, computed, useTemplateRef, nextTick } from 'vue';
+import { useRouter } from 'vue-router';
 import { useTheme } from 'vuetify';
 
-import { mapStores } from 'pinia';
+import type { LanguageOption } from '@/locales/index.ts';
+import { useI18n } from '@/locales/helpers.ts';
+import { useLoginPageBase } from '@/views/base/LoginPageBase.ts';
+
 import { useRootStore } from '@/stores/index.js';
-import { useSettingsStore } from '@/stores/setting.ts';
-import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
 import { ThemeType } from '@/core/theme.ts';
-import {
-    isUserRegistrationEnabled,
-    isUserForgetPasswordEnabled,
-    isUserVerifyEmailEnabled,
-    getLoginPageTips
-} from '@/lib/server_settings.ts';
-import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
+import { isUserRegistrationEnabled, isUserForgetPasswordEnabled, isUserVerifyEmailEnabled } from '@/lib/server_settings.ts';
 
 import {
     mdiOnepassword,
     mdiHelpCircleOutline
 } from '@mdi/js';
 
-export default {
-    data() {
-        return {
-            username: '',
-            password: '',
-            passcode: '',
-            backupCode: '',
-            tempToken: '',
-            logining: false,
-            verifying: false,
-            show2faInput: false,
-            twoFAVerifyType: 'passcode',
-            showMobileQrCode: false,
-            icons: {
-                passcode: mdiOnepassword,
-                backupCode: mdiHelpCircleOutline
-            }
-        };
-    },
-    computed: {
-        ...mapStores(useRootStore, useSettingsStore, useExchangeRatesStore),
-        ezBookkeepingLogoPath() {
-            return APPLICATION_LOGO_PATH;
-        },
-        version() {
-            return 'v' + this.$version;
-        },
-        allLanguages() {
-            return this.$locale.getAllLanguageInfoArray(false);
-        },
-        isUserRegistrationEnabled() {
-            return isUserRegistrationEnabled();
-        },
-        isUserForgetPasswordEnabled() {
-            return isUserForgetPasswordEnabled();
-        },
-        tips() {
-            return this.$locale.getServerTipContent(getLoginPageTips());
-        },
-        inputIsEmpty() {
-            return !this.username || !this.password;
-        },
-        twoFAInputIsEmpty() {
-            if (this.twoFAVerifyType === 'backupcode') {
-                return !this.backupCode;
-            } else {
-                return !this.passcode;
-            }
-        },
-        isDarkMode() {
-            return this.globalTheme.global.name.value === ThemeType.Dark;
-        },
-        currentLanguageName() {
-            return this.$locale.getCurrentLanguageDisplayName();
-        },
-        isUserVerifyEmailEnabled() {
-            return isUserVerifyEmailEnabled();
-        }
-    },
-    setup() {
-        const theme = useTheme();
+type SnackBarType = InstanceType<typeof SnackBar>;
 
-        return {
-            globalTheme: theme
-        };
-    },
-    methods: {
-        login() {
-            const self = this;
+const router = useRouter();
+const theme = useTheme();
 
-            if (!self.username) {
-                self.$refs.snackbar.showMessage('Username cannot be blank');
-                return;
-            }
+const { tt, getCurrentLanguageDisplayName, getAllLanguageOptions } = useI18n();
 
-            if (!self.password) {
-                self.$refs.snackbar.showMessage('Password cannot be blank');
-                return;
-            }
+const rootStore = useRootStore();
 
-            if (self.tempToken) {
-                self.show2faInput = true;
-                return;
-            }
+const {
+    version,
+    username,
+    password,
+    passcode,
+    backupCode,
+    tempToken,
+    twoFAVerifyType,
+    logining,
+    verifying,
+    inputIsEmpty,
+    twoFAInputIsEmpty,
+    tips,
+    changeLanguage,
+    doAfterLogin
+} = useLoginPageBase();
 
-            if (self.logining) {
-                return;
-            }
+const icons = {
+    passcode: mdiOnepassword,
+    backupCode: mdiHelpCircleOutline
+};
 
-            self.logining = true;
+const passwordInput = useTemplateRef<VTextField>('passwordInput');
+const passcodeInput = useTemplateRef<VTextField>('passcodeInput');
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
-            self.rootStore.authorize({
-                loginName: self.username,
-                password: self.password
-            }).then(authResponse => {
-                self.logining = false;
+const show2faInput = ref<boolean>(false);
+const showMobileQrCode = ref<boolean>(false);
 
-                if (authResponse.need2FA) {
-                    self.tempToken = authResponse.token;
-                    self.show2faInput = true;
+const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
+const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const currentLanguageName = computed<string>(() => getCurrentLanguageDisplayName());
 
-                    self.$nextTick(() => {
-                        if (self.$refs.passcodeInput) {
-                            self.$refs.passcodeInput.focus();
-                            self.$refs.passcodeInput.select();
-                        }
-                    });
-
-                    return;
-                }
-
-                if (authResponse.user) {
-                    const localeDefaultSettings = self.$locale.setLanguage(authResponse.user.language);
-                    self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-
-                    setExpenseAndIncomeAmountColor(authResponse.user.expenseAmountColor, authResponse.user.incomeAmountColor);
-                }
-
-                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
-                    self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
-                }
-
-                if (authResponse.notificationContent) {
-                    self.rootStore.setNotificationContent(authResponse.notificationContent);
-                }
-
-                self.$router.replace('/');
-            }).catch(error => {
-                self.logining = false;
-
-                if (self.isUserVerifyEmailEnabled && error.error && error.error.errorCode === KnownErrorCode.UserEmailNotVerified && error.error.context && error.error.context.email) {
-                    self.$router.push(`/verify_email?email=${encodeURIComponent(error.error.context.email)}&emailSent=${error.error.context.hasValidEmailVerifyToken || false}`);
-                    return;
-                }
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        verify() {
-            const self = this;
-
-            if (self.twoFAInputIsEmpty || self.verifying) {
-                return;
-            }
-
-            if (self.twoFAVerifyType === 'passcode' && !self.passcode) {
-                self.$refs.snackbar.showMessage('Passcode cannot be blank');
-                return;
-            } else if (self.twoFAVerifyType === 'backupcode' && !self.backupCode) {
-                self.$refs.snackbar.showMessage('Backup code cannot be blank');
-                return;
-            }
-
-            self.verifying = true;
-
-            self.rootStore.authorize2FA({
-                token: self.tempToken,
-                passcode: self.twoFAVerifyType === 'passcode' ? self.passcode : null,
-                recoveryCode: self.twoFAVerifyType === 'backupcode' ? self.backupCode : null
-            }).then(authResponse => {
-                self.verifying = false;
-
-                if (authResponse.user) {
-                    const localeDefaultSettings = self.$locale.setLanguage(authResponse.user.language);
-                    self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-
-                    setExpenseAndIncomeAmountColor(authResponse.user.expenseAmountColor, authResponse.user.incomeAmountColor);
-                }
-
-                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
-                    self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
-                }
-
-                if (authResponse.notificationContent) {
-                    self.rootStore.setNotificationContent(authResponse.notificationContent);
-                }
-
-                self.$router.replace('/');
-            }).catch(error => {
-                self.verifying = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        changeLanguage(locale) {
-            const localeDefaultSettings = this.$locale.setLanguage(locale);
-            this.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-        }
+function login(): void {
+    if (!username.value) {
+        snackbar.value?.showMessage('Username cannot be blank');
+        return;
     }
+
+    if (!password.value) {
+        snackbar.value?.showMessage('Password cannot be blank');
+        return;
+    }
+
+    if (tempToken.value) {
+        show2faInput.value = true;
+        return;
+    }
+
+    if (logining.value) {
+        return;
+    }
+
+    logining.value = true;
+
+    rootStore.authorize({
+        loginName: username.value,
+        password: password.value
+    }).then(authResponse => {
+        logining.value = false;
+
+        if (authResponse.need2FA) {
+            tempToken.value = authResponse.token;
+            show2faInput.value = true;
+
+            nextTick(() => {
+                if (passcodeInput.value) {
+                    passcodeInput.value.focus();
+                    passcodeInput.value.select();
+                }
+            });
+
+            return;
+        }
+
+        doAfterLogin(authResponse);
+        router.replace('/');
+    }).catch(error => {
+        logining.value = false;
+
+        if (isUserVerifyEmailEnabled() && error.error && error.error.errorCode === KnownErrorCode.UserEmailNotVerified && error.error.context && error.error.context.email) {
+            router.push(`/verify_email?email=${encodeURIComponent(error.error.context.email)}&emailSent=${error.error.context.hasValidEmailVerifyToken || false}`);
+            return;
+        }
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function verify(): void {
+    if (twoFAInputIsEmpty.value || verifying.value) {
+        return;
+    }
+
+    if (twoFAVerifyType.value === 'passcode' && !passcode.value) {
+        snackbar.value?.showMessage('Passcode cannot be blank');
+        return;
+    } else if (twoFAVerifyType.value === 'backupcode' && !backupCode.value) {
+        snackbar.value?.showMessage('Backup code cannot be blank');
+        return;
+    }
+
+    verifying.value = true;
+
+    rootStore.authorize2FA({
+        token: tempToken.value,
+        passcode: twoFAVerifyType.value === 'passcode' ? passcode.value : null,
+        recoveryCode: twoFAVerifyType.value === 'backupcode' ? backupCode.value : null
+    }).then(authResponse => {
+        verifying.value = false;
+
+        doAfterLogin(authResponse);
+        router.replace('/');
+    }).catch(error => {
+        verifying.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
 }
 </script>

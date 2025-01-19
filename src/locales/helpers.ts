@@ -528,6 +528,20 @@ export function useI18n() {
         return textArray.join(separator);
     }
 
+    function getServerTipContent(tipConfig: Record<string, string>): string {
+        if (!tipConfig) {
+            return '';
+        }
+
+        const currentLanguage = getCurrentLanguageTag();
+
+        if (isString(tipConfig[currentLanguage])) {
+            return tipConfig[currentLanguage];
+        }
+
+        return tipConfig['default'] || '';
+    }
+
     function getCurrentLanguageTag(): string {
         return locale.value;
     }
@@ -1298,6 +1312,7 @@ export function useI18n() {
         ti: translateIf,
         te: translateError,
         joinMultiText,
+        getServerTipContent,
         // get current language info
         getCurrentLanguageTag,
         getCurrentLanguageInfo,

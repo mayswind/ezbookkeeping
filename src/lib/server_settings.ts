@@ -1,4 +1,4 @@
-function getServerSetting(key: string): string | number | boolean | undefined | null {
+function getServerSetting(key: string): string | number | boolean | Record<string, string> | undefined | null {
     const settings = window.EZBOOKKEEPING_SERVER_SETTINGS || {};
     return settings[key];
 }
@@ -31,8 +31,8 @@ export function isDataImportingEnabled(): boolean {
     return getServerSetting('i') === 1;
 }
 
-export function getLoginPageTips(): string {
-    return getServerSetting('lpt') as string;
+export function getLoginPageTips(): Record<string, string>{
+    return getServerSetting('lpt') as Record<string, string>;
 }
 
 export function getMapProvider(): string {

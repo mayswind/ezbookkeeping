@@ -1244,20 +1244,6 @@ function getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccoun
     return ret;
 }
 
-function getServerTipContent(tipConfig, i18nGlobal) {
-    if (!tipConfig) {
-        return '';
-    }
-
-    const currentLanguage = getCurrentLanguageTag(i18nGlobal);
-
-    if (tipConfig[currentLanguage]) {
-        return tipConfig[currentLanguage];
-    }
-
-    return tipConfig.default || '';
-}
-
 function joinMultiText(textArray, translateFn) {
     if (!textArray || !textArray.length) {
         return '';
@@ -1388,23 +1374,13 @@ export function translateError(message, translateFn) {
 export function i18nFunctions(i18nGlobal) {
     return {
         getAllLanguageInfoArray: (includeSystemDefault) => getAllLanguageInfoArray(i18nGlobal.t, includeSystemDefault),
-        getLanguageInfo: getLanguageInfo,
-        getCurrentLanguageTag: () => getCurrentLanguageTag(i18nGlobal),
-        getCurrentLanguageInfo: () => getCurrentLanguageInfo(i18nGlobal),
-        getCurrentLanguageDisplayName: () => getCurrentLanguageDisplayName(i18nGlobal),
         getDefaultCurrency: () => getDefaultCurrency(i18nGlobal.t),
         getDefaultFirstDayOfWeek: () => getDefaultFirstDayOfWeek(i18nGlobal.t),
         getCurrencyName: (currencyCode) => getCurrencyName(currencyCode, i18nGlobal.t),
-        getAllLongMonthNames: () => getAllLongMonthNames(i18nGlobal.t),
-        getAllShortMonthNames: () => getAllShortMonthNames(i18nGlobal.t),
-        getAllLongWeekdayNames: () => getAllLongWeekdayNames(i18nGlobal.t),
-        getAllShortWeekdayNames: () => getAllShortWeekdayNames(i18nGlobal.t),
-        getAllMinWeekdayNames: () => getAllMinWeekdayNames(i18nGlobal.t),
         getAllLongDateFormats: () => getAllLongDateFormats(i18nGlobal.t),
         getAllShortDateFormats: () => getAllShortDateFormats(i18nGlobal.t),
         getAllLongTimeFormats: () => getAllLongTimeFormats(i18nGlobal.t),
         getAllShortTimeFormats: () => getAllShortTimeFormats(i18nGlobal.t),
-        getMonthdayOrdinal: (monthDay) => getMonthdayOrdinal(monthDay, i18nGlobal.t),
         getMonthdayShortName: (monthDay) => getMonthdayShortName(monthDay, i18nGlobal.t),
         getWeekdayShortName: (weekDay) => getWeekdayShortName(weekDay, i18nGlobal.t),
         getWeekdayLongName: (weekDay) => getWeekdayLongName(weekDay, i18nGlobal.t),
@@ -1457,7 +1433,6 @@ export function i18nFunctions(i18nGlobal) {
         getAllTransactionDefaultCategories: (categoryType, locale) => getAllTransactionDefaultCategories(categoryType, locale, i18nGlobal.t),
         getAllSupportedImportFileTypes: () => getAllSupportedImportFileTypes(i18nGlobal, i18nGlobal.t),
         getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t),
-        getServerTipContent: (tipConfig) => getServerTipContent(tipConfig, i18nGlobal),
         joinMultiText: (textArray) => joinMultiText(textArray, i18nGlobal.t),
         setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force)
     };

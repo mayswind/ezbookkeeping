@@ -46,7 +46,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-interface StepBarItem {
+export interface StepBarItem {
     name: string;
     title: string;
     subTitle: string;

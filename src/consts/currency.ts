@@ -1,12 +1,4 @@
-export interface CurrencyInfo {
-    readonly code: string,
-    readonly fraction?: number,
-    readonly symbol?: {
-        readonly normal: string,
-        readonly plural?: string
-    },
-    readonly unit: string
-}
+import type { CurrencyInfo } from '@/core/currency.ts';
 
 // ISO 4217
 // Reference: https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml

@@ -1,5 +1,20 @@
 import type { TypeAndName } from './base.ts';
 
+export interface CurrencyInfo {
+    readonly code: string,
+    readonly fraction?: number,
+    readonly symbol?: {
+        readonly normal: string,
+        readonly plural?: string
+    },
+    readonly unit: string
+}
+
+export interface LocalizedCurrencyInfo {
+    readonly currencyCode: string,
+    readonly displayName: string
+}
+
 export enum CurrencyDisplaySymbol {
     None = 0,
     Symbol = 1,

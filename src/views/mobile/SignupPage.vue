@@ -1,10 +1,10 @@
 <template>
     <f7-page>
         <f7-navbar>
-            <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
-            <f7-nav-title :title="$t('Sign Up')"></f7-nav-title>
+            <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-title :title="tt('Sign Up')"></f7-nav-title>
             <f7-nav-right>
-                <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" :text="$t('Submit')" @click="submit"></f7-link>
+                <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" :text="tt('Submit')" @click="submit"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -13,8 +13,8 @@
                 type="text"
                 autocomplete="username"
                 clear-button
-                :label="$t('Username')"
-                :placeholder="$t('Your username')"
+                :label="tt('Username')"
+                :placeholder="tt('Your username')"
                 v-model:value="user.username"
             ></f7-list-input>
 
@@ -22,8 +22,8 @@
                 type="password"
                 autocomplete="new-password"
                 clear-button
-                :label="$t('Password')"
-                :placeholder="$t('Your password, at least 6 characters')"
+                :label="tt('Password')"
+                :placeholder="tt('Your password, at least 6 characters')"
                 v-model:value="user.password"
             ></f7-list-input>
 
@@ -31,8 +31,8 @@
                 type="password"
                 autocomplete="new-password"
                 clear-button
-                :label="$t('Confirm Password')"
-                :placeholder="$t('Re-enter the password')"
+                :label="tt('Confirm Password')"
+                :placeholder="tt('Re-enter the password')"
                 v-model:value="user.confirmPassword"
             ></f7-list-input>
 
@@ -40,8 +40,8 @@
                 type="email"
                 autocomplete="email"
                 clear-button
-                :label="$t('E-mail')"
-                :placeholder="$t('Your email address')"
+                :label="tt('E-mail')"
+                :placeholder="tt('Your email address')"
                 v-model:value="user.email"
             ></f7-list-input>
 
@@ -49,21 +49,21 @@
                 type="text"
                 autocomplete="nickname"
                 clear-button
-                :label="$t('Nickname')"
-                :placeholder="$t('Your nickname')"
+                :label="tt('Nickname')"
+                :placeholder="tt('Your nickname')"
                 v-model:value="user.nickname"
             ></f7-list-input>
 
-            <f7-list-item class="ebk-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
+            <f7-list-item class="ebk-list-item-error-info" v-if="inputIsInvalid" :footer="tt(inputInvalidProblemMessage)"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical">
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :key="currentLocale + '_lang'"
-                :header="$t('Language')"
+                :header="tt('Language')"
                 :title="currentLanguageName"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Language'), popupCloseLinkText: $t('Done') }"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Language'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Language'), popupCloseLinkText: tt('Done') }"
             >
                 <select v-model="currentLocale">
                     <option :value="lang.languageTag"
@@ -75,8 +75,8 @@
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :key="currentLocale + '_currency'"
-                :header="$t('Default Currency')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Default Currency'), popupCloseLinkText: $t('Done') }"
+                :header="tt('Default Currency')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Currency Name'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Default Currency'), popupCloseLinkText: tt('Done') }"
             >
                 <template #title>
                     <f7-block class="no-padding no-margin">
@@ -94,9 +94,9 @@
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :key="currentLocale + '_firstDayOfWeek'"
-                :header="$t('First Day of Week')"
+                :header="tt('First Day of Week')"
                 :title="currentDayOfWeekName"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('First Day of Week'), popupCloseLinkText: $t('Done') }"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Date'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('First Day of Week'), popupCloseLinkText: tt('Done') }"
             >
                 <select v-model="user.firstDayOfWeek">
                     <option :value="weekDay.type"
@@ -107,7 +107,7 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical">
-            <f7-list-item :title="$t('Use preset transaction categories')" link="#" @click="showPresetCategories = true">
+            <f7-list-item :title="tt('Use preset transaction categories')" link="#" @click="showPresetCategories = true">
                 <f7-toggle :checked="usePresetCategories" @toggle:change="usePresetCategories = $event"></f7-toggle>
             </f7-list-item>
         </f7-list>
@@ -117,13 +117,13 @@
             <f7-page>
                 <f7-navbar>
                     <f7-nav-left>
-                        <f7-link popup-close :text="$t('Back')"></f7-link>
+                        <f7-link popup-close :text="tt('Back')"></f7-link>
                     </f7-nav-left>
-                    <f7-nav-title :title="$t('Preset Categories')"></f7-nav-title>
+                    <f7-nav-title :title="tt('Preset Categories')"></f7-nav-title>
                     <f7-nav-right>
                         <f7-link icon-f7="ellipsis" @click="showPresetCategoriesMoreActionSheet = true"></f7-link>
-                        <f7-link close @click="usePresetCategories = true; showPresetCategories = false" v-if="!usePresetCategories">{{ $t('Enable') }}</f7-link>
-                        <f7-link close @click="usePresetCategories = false; showPresetCategories = false" v-if="usePresetCategories">{{ $t('Disable') }}</f7-link>
+                        <f7-link close @click="usePresetCategories = true; showPresetCategories = false" v-if="!usePresetCategories">{{ tt('Enable') }}</f7-link>
+                        <f7-link close @click="usePresetCategories = false; showPresetCategories = false" v-if="usePresetCategories">{{ tt('Disable') }}</f7-link>
                     </f7-nav-right>
                 </f7-navbar>
                 <f7-block class="no-padding no-margin"
@@ -156,10 +156,10 @@
 
             <f7-actions close-by-outside-click close-on-escape :opened="showPresetCategoriesMoreActionSheet" @actions:closed="showPresetCategoriesMoreActionSheet = false">
                 <f7-actions-group>
-                    <f7-actions-button @click="showPresetCategoriesChangeLocaleSheet = true">{{ $t('Change Language') }}</f7-actions-button>
+                    <f7-actions-button @click="showPresetCategoriesChangeLocaleSheet = true">{{ tt('Change Language') }}</f7-actions-button>
                 </f7-actions-group>
                 <f7-actions-group>
-                    <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+                    <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
                 </f7-actions-group>
             </f7-actions>
 
@@ -174,205 +174,114 @@
     </f7-page>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import type { Router } from 'framework7/types';
+
+import type { LanguageOption } from '@/locales/index.ts';
+import { useI18n } from '@/locales/helpers.ts';
+import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
+import { useSignupPageBase } from '@/views/base/SignupPageBase.ts';
+
 import { useRootStore } from '@/stores/index.js';
-import { useSettingsStore } from '@/stores/setting.ts';
-import { useUserStore } from '@/stores/user.ts';
-import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
-import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
-import { CategoryType } from '@/core/category.ts';
-import { getNameByKeyValue, categorizedArrayToPlainArray } from '@/lib/common.ts';
+import type { PartialRecord, TypeAndDisplayName } from '@/core/base.ts';
+import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
+import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
+
+import { findDisplayNameByType, categorizedArrayToPlainArray } from '@/lib/common.ts';
 import { isUserLogined } from '@/lib/userstate.ts';
-import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
-export default {
-    props: [
-        'f7router'
-    ],
-    data() {
-        const userStore = useUserStore();
-        const newUser = userStore.generateNewUserModel(this.$locale.getCurrentLanguageTag());
+const props = defineProps<{
+    f7router: Router.Router;
+}>();
 
-        return {
-            user: newUser,
-            submitting: false,
-            usePresetCategories: false,
-            showPresetCategories: false,
-            showPresetCategoriesMoreActionSheet: false,
-            showPresetCategoriesChangeLocaleSheet: false
-        };
-    },
-    computed: {
-        ...mapStores(useRootStore, useSettingsStore, useTransactionCategoriesStore, useExchangeRatesStore),
-        allLanguages() {
-            return this.$locale.getAllLanguageInfoArray(false);
-        },
-        allCurrencies() {
-            return this.$locale.getAllCurrencies();
-        },
-        allWeekDays() {
-            return this.$locale.getAllWeekDays();
-        },
-        allPresetCategories() {
-            return this.$locale.getAllTransactionDefaultCategories(0, this.currentLocale);
-        },
-        currentLocale: {
-            get: function () {
-                return this.$locale.getCurrentLanguageTag();
-            },
-            set: function (value) {
-                const isCurrencyDefault = this.user.defaultCurrency === this.settingsStore.localeDefaultSettings.currency;
-                const isFirstWeekDayDefault = this.user.firstDayOfWeek === this.settingsStore.localeDefaultSettings.firstDayOfWeek;
+const { tt, getAllLanguageOptions, getAllCurrencies, getAllWeekDays, getAllTransactionDefaultCategories, getCurrencyName } = useI18n();
+const { showAlert, showToast } = useI18nUIComponents();
 
-                this.user.language = value;
+const {
+    user,
+    submitting,
+    currentLocale,
+    currentLanguageName,
+    inputEmptyProblemMessage,
+    inputInvalidProblemMessage,
+    inputIsEmpty,
+    inputIsInvalid,
+    getCategoryTypeName,
+    doAfterSignupSuccess
+} = useSignupPageBase();
 
-                const localeDefaultSettings = this.$locale.setLanguage(value);
-                this.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+const rootStore = useRootStore();
 
-                if (isCurrencyDefault) {
-                    this.user.defaultCurrency = this.settingsStore.localeDefaultSettings.currency;
-                }
+const usePresetCategories = ref<boolean>(false);
+const showPresetCategories = ref<boolean>(false);
+const showPresetCategoriesMoreActionSheet = ref<boolean>(false);
+const showPresetCategoriesChangeLocaleSheet = ref<boolean>(false);
 
-                if (isFirstWeekDayDefault) {
-                    this.user.firstDayOfWeek = this.settingsStore.localeDefaultSettings.firstDayOfWeek;
-                }
-            }
-        },
-        currentLanguageName() {
-            const languageInfo = this.$locale.getLanguageInfo(this.currentLocale);
+const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
+const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies());
+const allWeekDays = computed<TypeAndDisplayName[]>(() => getAllWeekDays());
+const allPresetCategories = computed<PartialRecord<CategoryType, LocalizedPresetCategory[]>>(() => getAllTransactionDefaultCategories(0, currentLocale.value));
+const currentDayOfWeekName = computed<string | null>(() => findDisplayNameByType(allWeekDays.value, user.value.firstDayOfWeek));
 
-            if (!languageInfo) {
-                return '';
-            }
+function submit(): void {
+    const router = props.f7router;
 
-            return languageInfo.displayName;
-        },
-        currentDayOfWeekName() {
-            return getNameByKeyValue(this.allWeekDays, this.user.firstDayOfWeek, 'type', 'displayName');
-        },
-        inputIsEmpty() {
-            return !!this.inputEmptyProblemMessage;
-        },
-        inputIsInvalid() {
-            return !!this.inputInvalidProblemMessage;
-        },
-        inputEmptyProblemMessage() {
-            if (!this.user.username) {
-                return 'Username cannot be blank';
-            } else if (!this.user.password) {
-                return 'Password cannot be blank';
-            } else if (!this.user.confirmPassword) {
-                return 'Password confirmation cannot be blank';
-            } else if (!this.user.email) {
-                return 'Email address cannot be blank';
-            } else if (!this.user.nickname) {
-                return 'Nickname cannot be blank';
-            } else if (!this.user.defaultCurrency) {
-                return 'Default currency cannot be blank';
-            } else {
-                return null;
-            }
-        },
-        inputInvalidProblemMessage() {
-            if (this.user.password && this.user.confirmPassword && this.user.password !== this.user.confirmPassword) {
-                return 'Password and password confirmation do not match';
-            } else {
-                return null;
-            }
-        }
-    },
-    methods: {
-        submit() {
-            const self = this;
-            const router = self.f7router;
+    const problemMessage = inputEmptyProblemMessage.value || inputInvalidProblemMessage.value;
 
-            const problemMessage = self.inputEmptyProblemMessage || self.inputInvalidProblemMessage;
-
-            if (problemMessage) {
-                self.$alert(problemMessage);
-                return;
-            }
-
-            self.submitting = true;
-            self.$showLoading(() => self.submitting);
-
-            let presetCategories = [];
-
-            if (self.usePresetCategories) {
-                presetCategories = categorizedArrayToPlainArray(self.allPresetCategories);
-            }
-
-            self.rootStore.register({
-                user: self.user,
-                presetCategories: presetCategories
-            }).then(response => {
-                if (!isUserLogined()) {
-                    self.submitting = false;
-                    self.$hideLoading();
-
-                    if (self.usePresetCategories && !response.presetCategoriesSaved) {
-                        self.$toast('You have been successfully registered, but there was an failure when adding preset categories. You can re-add preset categories in settings page anytime.', 5000);
-                    } else if (response.needVerifyEmail) {
-                        self.$toast('You have been successfully registered. An account activation link has been sent to your email address, please activate your account first.', 5000);
-                    } else {
-                        self.$toast('You have been successfully registered');
-                    }
-
-                    router.navigate('/');
-                    return;
-                }
-
-                if (response.user) {
-                    const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
-                    self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-
-                    setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
-                }
-
-                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
-                    self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
-                }
-
-                if (response.notificationContent) {
-                    self.rootStore.setNotificationContent(response.notificationContent);
-                }
-
-                self.submitting = false;
-                self.$hideLoading();
-
-                if (self.usePresetCategories && !response.presetCategoriesSaved) {
-                    self.$toast('You have been successfully registered, but there was an failure when adding preset categories. You can re-add preset categories in settings page anytime.');
-                } else {
-                    self.$toast('You have been successfully registered');
-                }
-
-                router.navigate('/');
-            }).catch(error => {
-                self.submitting = false;
-                self.$hideLoading();
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        getCurrencyName(currencyCode) {
-            return this.$locale.getCurrencyName(currencyCode);
-        },
-        getCategoryTypeName(categoryType) {
-            switch (categoryType) {
-                case CategoryType.Income.toString():
-                    return this.$t('Income Categories');
-                case CategoryType.Expense.toString():
-                    return this.$t('Expense Categories');
-                case CategoryType.Transfer.toString():
-                    return this.$t('Transfer Categories');
-                default:
-                    return this.$t('Transaction Categories');
-            }
-        }
+    if (problemMessage) {
+        showAlert(problemMessage);
+        return;
     }
-};
+
+    submitting.value = true;
+    showLoading(() => submitting.value);
+
+    let presetCategories: LocalizedPresetCategory[] = [];
+
+    if (usePresetCategories.value) {
+        presetCategories = categorizedArrayToPlainArray(allPresetCategories.value);
+    }
+
+    rootStore.register({
+        user: user.value,
+        presetCategories: presetCategories
+    }).then(response => {
+        if (!isUserLogined()) {
+            submitting.value = false;
+            hideLoading();
+
+            if (usePresetCategories.value && !response.presetCategoriesSaved) {
+                showToast('You have been successfully registered, but there was an failure when adding preset categories. You can re-add preset categories in settings page anytime.', 5000);
+            } else if (response.needVerifyEmail) {
+                showToast('You have been successfully registered. An account activation link has been sent to your email address, please activate your account first.', 5000);
+            } else {
+                showToast('You have been successfully registered');
+            }
+
+            router.navigate('/');
+            return;
+        }
+
+        doAfterSignupSuccess(response);
+        submitting.value = false;
+        hideLoading();
+
+        if (usePresetCategories.value && !response.presetCategoriesSaved) {
+            showToast('You have been successfully registered, but there was an failure when adding preset categories. You can re-add preset categories in settings page anytime.');
+        } else {
+            showToast('You have been successfully registered');
+        }
+
+        router.navigate('/');
+    }).catch(error => {
+        submitting.value = false;
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
 </script>

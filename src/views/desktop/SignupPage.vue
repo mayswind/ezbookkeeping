@@ -2,8 +2,8 @@
     <div class="layout-wrapper">
         <router-link to="/">
             <div class="auth-logo d-flex align-start gap-x-3">
-                <img alt="logo" class="login-page-logo" :src="ezBookkeepingLogoPath" />
-                <h1 class="font-weight-medium leading-normal text-2xl">{{ $t('global.app.title') }}</h1>
+                <img alt="logo" class="login-page-logo" :src="APPLICATION_LOGO_PATH" />
+                <h1 class="font-weight-medium leading-normal text-2xl">{{ tt('global.app.title') }}</h1>
             </div>
         </router-link>
         <v-row no-gutters class="auth-wrapper">
@@ -25,10 +25,10 @@
                     <v-window class="mt-5 disable-tab-transition" style="max-width: 700px" v-model="currentStep">
                         <v-form>
                             <v-window-item value="basicSetting">
-                                <h4 class="text-h4 mb-1">{{ $t('Basic Information') }}</h4>
+                                <h4 class="text-h4 mb-1">{{ tt('Basic Information') }}</h4>
                                 <p class="text-sm mt-2 mb-5">
-                                    <span>{{ $t('Already have an account?') }}</span>
-                                    <router-link class="ml-1" to="/login">{{ $t('Click here to log in') }}</router-link>
+                                    <span>{{ tt('Already have an account?') }}</span>
+                                    <router-link class="ml-1" to="/login">{{ tt('Click here to log in') }}</router-link>
                                 </p>
                                 <v-row>
                                     <v-col cols="12" md="6">
@@ -36,8 +36,8 @@
                                             type="text"
                                             autocomplete="username"
                                             :disabled="submitting || navigateToHomePage"
-                                            :label="$t('Username')"
-                                            :placeholder="$t('Your username')"
+                                            :label="tt('Username')"
+                                            :placeholder="tt('Your username')"
                                             v-model="user.username"
                                         />
                                     </v-col>
@@ -47,8 +47,8 @@
                                             type="text"
                                             autocomplete="nickname"
                                             :disabled="submitting || navigateToHomePage"
-                                            :label="$t('Nickname')"
-                                            :placeholder="$t('Your nickname')"
+                                            :label="tt('Nickname')"
+                                            :placeholder="tt('Your nickname')"
                                             v-model="user.nickname"
                                         />
                                     </v-col>
@@ -59,8 +59,8 @@
                                             type="email"
                                             autocomplete="email"
                                             :disabled="submitting || navigateToHomePage"
-                                            :label="$t('E-mail')"
-                                            :placeholder="$t('Your email address')"
+                                            :label="tt('E-mail')"
+                                            :placeholder="tt('Your email address')"
                                             v-model="user.email"
                                         />
                                     </v-col>
@@ -71,8 +71,8 @@
                                             autocomplete="new-password"
                                             type="password"
                                             :disabled="submitting || navigateToHomePage"
-                                            :label="$t('Password')"
-                                            :placeholder="$t('Your password, at least 6 characters')"
+                                            :label="tt('Password')"
+                                            :placeholder="tt('Your password, at least 6 characters')"
                                             v-model="user.password"
                                         />
                                     </v-col>
@@ -81,8 +81,8 @@
                                             autocomplete="new-password"
                                             type="password"
                                             :disabled="submitting || navigateToHomePage"
-                                            :label="$t('Confirm Password')"
-                                            :placeholder="$t('Re-enter the password')"
+                                            :label="tt('Confirm Password')"
+                                            :placeholder="tt('Re-enter the password')"
                                             v-model="user.confirmPassword"
                                         />
                                     </v-col>
@@ -94,8 +94,8 @@
                                             item-title="displayName"
                                             item-value="languageTag"
                                             :disabled="submitting || navigateToHomePage"
-                                            :label="$t('Language')"
-                                            :placeholder="$t('Language')"
+                                            :label="tt('Language')"
+                                            :placeholder="tt('Language')"
                                             :items="allLanguages"
                                             v-model="currentLocale"
                                         />
@@ -109,10 +109,10 @@
                                             item-value="currencyCode"
                                             auto-select-first
                                             :disabled="submitting || navigateToHomePage"
-                                            :label="$t('Default Currency')"
-                                            :placeholder="$t('Default Currency')"
+                                            :label="tt('Default Currency')"
+                                            :placeholder="tt('Default Currency')"
                                             :items="allCurrencies"
-                                            :no-data-text="$t('No results')"
+                                            :no-data-text="tt('No results')"
                                             v-model="user.defaultCurrency"
                                         >
                                             <template #append-inner>
@@ -126,8 +126,8 @@
                                             item-title="displayName"
                                             item-value="type"
                                             :disabled="submitting || navigateToHomePage"
-                                            :label="$t('First Day of Week')"
-                                            :placeholder="$t('First Day of Week')"
+                                            :label="tt('First Day of Week')"
+                                            :placeholder="tt('First Day of Week')"
                                             :items="allWeekDays"
                                             v-model="user.firstDayOfWeek"
                                         />
@@ -136,13 +136,13 @@
                             </v-window-item>
 
                             <v-window-item value="presetCategories" class="signup-preset-categories">
-                                <h4 class="text-h4 mb-1">{{ $t('Preset Categories') }}</h4>
-                                <p class="text-sm mt-2 mb-2">{{ $t('Set whether to use preset transaction categories') }}</p>
+                                <h4 class="text-h4 mb-1">{{ tt('Preset Categories') }}</h4>
+                                <p class="text-sm mt-2 mb-2">{{ tt('Set whether to use preset transaction categories') }}</p>
 
                                 <v-row>
                                     <v-col cols="12" sm="6">
                                         <v-switch class="mb-2" :disabled="submitting || navigateToHomePage"
-                                                  :label="$t('Use Preset Transaction Categories')"
+                                                  :label="tt('Use Preset Transaction Categories')"
                                                   v-model="usePresetCategories"/>
                                     </v-col>
                                     <v-col cols="12" sm="6" class="text-right-sm">
@@ -198,7 +198,7 @@
                             </v-window-item>
 
                             <v-window-item value="finalResult" v-if="finalResultMessage">
-                                <h4 class="text-h4 mb-1">{{ $t('Registration Completed') }}</h4>
+                                <h4 class="text-h4 mb-1">{{ tt('Registration Completed') }}</h4>
                                 <p class="my-5">{{ finalResultMessage }}</p>
                             </v-window-item>
                         </v-form>
@@ -208,23 +208,23 @@
                         <v-btn :color="(currentStep === 'basicSetting' || currentStep === 'finalResult') ? 'default' : 'primary'"
                                :disabled="currentStep === 'basicSetting' || currentStep === 'finalResult' || submitting || navigateToHomePage"
                                :prepend-icon="icons.previous"
-                               @click="switchToPreviousTab">{{ $t('Previous') }}</v-btn>
+                               @click="switchToPreviousTab">{{ tt('Previous') }}</v-btn>
                         <v-btn :color="(currentStep === 'presetCategories' || currentStep === 'finalResult') ? 'secondary' : 'primary'"
                                :disabled="currentStep === 'presetCategories' || currentStep === 'finalResult' || submitting || navigateToHomePage"
                                :append-icon="icons.next"
                                @click="switchToNextTab"
-                               v-if="currentStep === 'basicSetting'">{{ $t('Next') }}</v-btn>
+                               v-if="currentStep === 'basicSetting'">{{ tt('Next') }}</v-btn>
                         <v-btn color="teal"
                                :disabled="submitting || navigateToHomePage"
                                :append-icon="!submitting ? icons.submit : null"
                                @click="submit"
                                v-if="currentStep === 'presetCategories'">
-                            {{ $t('Submit') }}
+                            {{ tt('Submit') }}
                             <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                         </v-btn>
                         <v-btn :append-icon="icons.next"
                                @click="navigateToLogin"
-                               v-if="currentStep === 'finalResult'">{{ $t('Continue') }}</v-btn>
+                               v-if="currentStep === 'finalResult'">{{ tt('Continue') }}</v-btn>
                     </div>
                 </v-card>
             </v-col>
@@ -234,22 +234,28 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import SnackBar from '@/components/desktop/SnackBar.vue';
+import type { StepBarItem } from '@/components/desktop/StepsBar.vue';
+
+import { ref, computed, useTemplateRef } from 'vue';
+import { useRouter } from 'vue-router';
 import { useTheme } from 'vuetify';
 
-import { mapStores } from 'pinia';
-import { useRootStore } from '@/stores/index.js';
-import { useSettingsStore } from '@/stores/setting.ts';
-import { useUserStore } from '@/stores/user.ts';
-import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
-import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
+import type { LanguageOption } from '@/locales/index.ts';
+import { useI18n } from '@/locales/helpers.ts';
+import { useSignupPageBase } from '@/views/base/SignupPageBase.ts';
 
-import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
-import { CategoryType } from '@/core/category.ts';
+import { useRootStore } from '@/stores/index.js';
+
+import type { PartialRecord, TypeAndDisplayName } from '@/core/base.ts';
+import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
+import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { ThemeType } from '@/core/theme.ts';
+import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
+
 import { categorizedArrayToPlainArray } from '@/lib/common.ts';
 import { isUserLogined } from '@/lib/userstate.ts';
-import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 import {
     mdiArrowLeft,
@@ -257,256 +263,162 @@ import {
     mdiCheck
 } from '@mdi/js';
 
-export default {
-    data() {
-        const userStore = useUserStore();
-        const newUser = userStore.generateNewUserModel(this.$locale.getCurrentLanguageTag());
+type SnackBarType = InstanceType<typeof SnackBar>;
 
-        return {
-            user: newUser,
-            currentStep: 'basicSetting',
-            submitting: false,
-            usePresetCategories: false,
-            finalResultMessage: null,
-            navigateToHomePage: false,
-            icons: {
-                previous: mdiArrowLeft,
-                next: mdiArrowRight,
-                submit: mdiCheck
-            }
-        };
-    },
-    computed: {
-        ...mapStores(useRootStore, useSettingsStore, useTransactionCategoriesStore, useExchangeRatesStore),
-        ezBookkeepingLogoPath() {
-            return APPLICATION_LOGO_PATH;
-        },
-        allLanguages() {
-            return this.$locale.getAllLanguageInfoArray(false);
-        },
-        allCurrencies() {
-            return this.$locale.getAllCurrencies();
-        },
-        allWeekDays() {
-            return this.$locale.getAllWeekDays();
-        },
-        allPresetCategories() {
-            return this.$locale.getAllTransactionDefaultCategories(0, this.currentLocale);
-        },
-        currentLocale: {
-            get: function () {
-                return this.$locale.getCurrentLanguageTag();
-            },
-            set: function (value) {
-                const isCurrencyDefault = this.user.defaultCurrency === this.settingsStore.localeDefaultSettings.currency;
-                const isFirstWeekDayDefault = this.user.firstDayOfWeek === this.settingsStore.localeDefaultSettings.firstDayOfWeek;
+const router = useRouter();
+const theme = useTheme();
 
-                this.user.language = value;
+const { tt, getAllLanguageOptions, getAllCurrencies, getAllWeekDays, getAllTransactionDefaultCategories } = useI18n();
 
-                const localeDefaultSettings = this.$locale.setLanguage(value);
-                this.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+const {
+    user,
+    submitting,
+    currentLocale,
+    currentLanguageName,
+    inputEmptyProblemMessage,
+    inputInvalidProblemMessage,
+    getCategoryTypeName,
+    doAfterSignupSuccess
+} = useSignupPageBase();
 
-                if (isCurrencyDefault) {
-                    this.user.defaultCurrency = this.settingsStore.localeDefaultSettings.currency;
-                }
+const rootStore = useRootStore();
 
-                if (isFirstWeekDayDefault) {
-                    this.user.firstDayOfWeek = this.settingsStore.localeDefaultSettings.firstDayOfWeek;
-                }
-            }
-        },
-        isDarkMode() {
-            return this.globalTheme.global.name.value === ThemeType.Dark;
-        },
-        currentLanguageName() {
-            const languageInfo = this.$locale.getLanguageInfo(this.currentLocale);
+const icons = {
+    previous: mdiArrowLeft,
+    next: mdiArrowRight,
+    submit: mdiCheck
+};
 
-            if (!languageInfo) {
-                return '';
-            }
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
-            return languageInfo.displayName;
-        },
-        allSteps() {
-            const allSteps = [
-                {
-                    name: 'basicSetting',
-                    title: this.$t('User Information'),
-                    subTitle: this.$t('Basic Information')
-                },
-                {
-                    name: 'presetCategories',
-                    title: this.$t('Transaction Categories'),
-                    subTitle: this.$t('Preset Categories')
-                }
-            ];
+const currentStep = ref<string>('basicSetting');
+const usePresetCategories = ref<boolean>(false);
+const finalResultMessage = ref<string | null>(null);
+const navigateToHomePage = ref<boolean>(false);
 
-            if (this.finalResultMessage) {
-                allSteps.push({
-                    name: 'finalResult',
-                    title: this.$t('Complete'),
-                    subTitle: this.$t('Registration Completed')
-                });
-            }
+const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
+const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies());
+const allWeekDays = computed<TypeAndDisplayName[]>(() => getAllWeekDays());
+const allPresetCategories = computed<PartialRecord<CategoryType, LocalizedPresetCategory[]>>(() => getAllTransactionDefaultCategories(0, currentLocale.value));
+const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 
-            return allSteps;
+const allSteps = computed<StepBarItem[]>(() => {
+    const allSteps = [
+        {
+            name: 'basicSetting',
+            title: tt('User Information'),
+            subTitle: tt('Basic Information')
         },
-        inputIsEmpty() {
-            return !!this.inputEmptyProblemMessage;
-        },
-        inputIsInvalid() {
-            return !!this.inputInvalidProblemMessage;
-        },
-        inputEmptyProblemMessage() {
-            if (!this.user.username) {
-                return 'Username cannot be blank';
-            } else if (!this.user.nickname) {
-                return 'Nickname cannot be blank';
-            } else if (!this.user.email) {
-                return 'Email address cannot be blank';
-            } else if (!this.user.password) {
-                return 'Password cannot be blank';
-            } else if (!this.user.confirmPassword) {
-                return 'Password confirmation cannot be blank';
-            } else if (!this.user.defaultCurrency) {
-                return 'Default currency cannot be blank';
-            } else {
-                return null;
-            }
-        },
-        inputInvalidProblemMessage() {
-            if (this.user.password && this.user.confirmPassword && this.user.password !== this.user.confirmPassword) {
-                return 'Password and password confirmation do not match';
-            } else {
-                return null;
-            }
+        {
+            name: 'presetCategories',
+            title: tt('Transaction Categories'),
+            subTitle: tt('Preset Categories')
         }
-    },
-    setup() {
-        const theme = useTheme();
+    ];
 
-        return {
-            globalTheme: theme
-        };
-    },
-    methods: {
-        switchToTab(tabName) {
-            if (this.submitting || this.currentStep === 'finalResult' || this.navigateToHomePage) {
-                return;
-            }
+    if (finalResultMessage.value) {
+        allSteps.push({
+            name: 'finalResult',
+            title: tt('Complete'),
+            subTitle: tt('Registration Completed')
+        });
+    }
 
-            if (tabName === 'basicSetting') {
-                this.currentStep = 'basicSetting';
-            } else if (tabName === 'presetCategories') {
-                const problemMessage = this.inputEmptyProblemMessage || this.inputInvalidProblemMessage;
+    return allSteps;
+});
 
-                if (problemMessage) {
-                    this.$refs.snackbar.showMessage(problemMessage);
-                    return;
-                }
+function switchToTab(tabName: string): void {
+    if (submitting.value || currentStep.value === 'finalResult' || navigateToHomePage.value) {
+        return;
+    }
 
-                this.currentStep = 'presetCategories';
-            }
-        },
-        switchToPreviousTab() {
-            this.switchToTab('basicSetting');
-        },
-        switchToNextTab() {
-            this.switchToTab('presetCategories');
-        },
-        submit() {
-            const self = this;
+    if (tabName === 'basicSetting') {
+        currentStep.value = 'basicSetting';
+    } else if (tabName === 'presetCategories') {
+        const problemMessage = inputEmptyProblemMessage.value || inputInvalidProblemMessage.value;
 
-            const problemMessage = self.inputEmptyProblemMessage || self.inputInvalidProblemMessage;
-
-            if (problemMessage) {
-                self.$refs.snackbar.showMessage(problemMessage);
-                return;
-            }
-
-            self.navigateToHomePage = false;
-            self.submitting = true;
-
-            let presetCategories = [];
-
-            if (self.usePresetCategories) {
-                presetCategories = categorizedArrayToPlainArray(self.allPresetCategories);
-            }
-
-            self.rootStore.register({
-                user: self.user,
-                presetCategories: presetCategories
-            }).then(response => {
-                if (!isUserLogined()) {
-                    self.submitting = false;
-
-                    if (self.usePresetCategories && !response.presetCategoriesSaved) {
-                        self.finalResultMessage = self.$t('You have been successfully registered, but there was an failure when adding preset categories. You can re-add preset categories in settings page anytime.');
-                        self.currentStep = 'finalResult';
-                    } else if (response.needVerifyEmail) {
-                        self.finalResultMessage = self.$t('You have been successfully registered. An account activation link has been sent to your email address, please activate your account first.');
-                        self.currentStep = 'finalResult';
-                    } else {
-                        self.$refs.snackbar.showMessage('You have been successfully registered');
-                        self.navigateToHomePage = true;
-                    }
-
-                    return;
-                }
-
-                if (response.user) {
-                    const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
-                    self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-
-                    setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
-                }
-
-                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
-                    self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
-                }
-
-                if (response.notificationContent) {
-                    self.rootStore.setNotificationContent(response.notificationContent);
-                }
-
-                self.submitting = false;
-
-                if (self.usePresetCategories && !response.presetCategoriesSaved) {
-                    self.$refs.snackbar.showMessage('You have been successfully registered, but there was an failure when adding preset categories. You can re-add preset categories in settings page anytime.');
-                } else {
-                    self.$refs.snackbar.showMessage('You have been successfully registered');
-                    self.$router.replace('/');
-                }
-
-                self.navigateToHomePage = true;
-            }).catch(error => {
-                self.submitting = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        navigateToLogin() {
-            this.$router.push('/');
-        },
-        onSnackbarShowStateChanged(newValue) {
-            if (!newValue && this.navigateToHomePage) {
-                this.$router.replace('/');
-            }
-        },
-        getCategoryTypeName(categoryType) {
-            switch (categoryType) {
-                case CategoryType.Income.toString():
-                    return this.$t('Income Categories');
-                case CategoryType.Expense.toString():
-                    return this.$t('Expense Categories');
-                case CategoryType.Transfer.toString():
-                    return this.$t('Transfer Categories');
-                default:
-                    return this.$t('Transaction Categories');
-            }
+        if (problemMessage) {
+            snackbar.value?.showMessage(problemMessage);
+            return;
         }
+
+        currentStep.value = 'presetCategories';
+    }
+}
+
+function switchToPreviousTab(): void {
+    switchToTab('basicSetting');
+}
+
+function switchToNextTab(): void {
+    switchToTab('presetCategories');
+}
+
+function submit(): void {
+    const problemMessage = inputEmptyProblemMessage.value || inputInvalidProblemMessage.value;
+
+    if (problemMessage) {
+        snackbar.value?.showMessage(problemMessage);
+        return;
+    }
+
+    navigateToHomePage.value = false;
+    submitting.value = true;
+
+    let presetCategories: LocalizedPresetCategory[] = [];
+
+    if (usePresetCategories.value) {
+        presetCategories = categorizedArrayToPlainArray(allPresetCategories.value);
+    }
+
+    rootStore.register({
+        user: user.value,
+        presetCategories: presetCategories
+    }).then(response => {
+        if (!isUserLogined()) {
+            submitting.value = false;
+
+            if (usePresetCategories.value && !response.presetCategoriesSaved) {
+                finalResultMessage.value = tt('You have been successfully registered, but there was an failure when adding preset categories. You can re-add preset categories in settings page anytime.');
+                currentStep.value = 'finalResult';
+            } else if (response.needVerifyEmail) {
+                finalResultMessage.value = tt('You have been successfully registered. An account activation link has been sent to your email address, please activate your account first.');
+                currentStep.value = 'finalResult';
+            } else {
+                snackbar.value?.showMessage('You have been successfully registered');
+                navigateToHomePage.value = true;
+            }
+
+            return;
+        }
+
+        doAfterSignupSuccess(response);
+        submitting.value = false;
+
+        if (usePresetCategories.value && !response.presetCategoriesSaved) {
+            snackbar.value?.showMessage('You have been successfully registered, but there was an failure when adding preset categories. You can re-add preset categories in settings page anytime.');
+        } else {
+            snackbar.value?.showMessage('You have been successfully registered');
+            router.replace('/');
+        }
+
+        navigateToHomePage.value = true;
+    }).catch(error => {
+        submitting.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function navigateToLogin(): void {
+    router.push('/');
+}
+
+function onSnackbarShowStateChanged(newValue: boolean): void {
+    if (!newValue && navigateToHomePage.value) {
+        router.replace('/');
     }
 }
 </script>

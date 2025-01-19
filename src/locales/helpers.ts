@@ -38,6 +38,7 @@ import {
 } from '@/core/numeral.ts';
 
 import {
+    type LocalizedCurrencyInfo,
     type CurrencyPrependAndAppendText,
     CurrencyDisplayType,
     CurrencySortingType
@@ -615,6 +616,29 @@ export function useI18n() {
         }];
     }
 
+    function getAllCurrencies(): LocalizedCurrencyInfo[] {
+        const allCurrencies: LocalizedCurrencyInfo[] = [];
+
+        for (const currencyCode in ALL_CURRENCIES) {
+            if (!Object.prototype.hasOwnProperty.call(ALL_CURRENCIES, currencyCode)) {
+                continue;
+            }
+
+            const localizedCurrencyInfo: LocalizedCurrencyInfo = {
+                currencyCode: currencyCode,
+                displayName: getCurrencyName(currencyCode)
+            };
+
+            allCurrencies.push(localizedCurrencyInfo);
+        }
+
+        allCurrencies.sort(function(c1, c2) {
+            return c1.displayName.localeCompare(c2.displayName);
+        })
+
+        return allCurrencies;
+    }
+
     function getAllMeridiemIndicators(): LocalizedMeridiemIndicator {
         const allMeridiemIndicators = MeridiemIndicator.values();
         const meridiemIndicatorNames = [];
@@ -653,7 +677,7 @@ export function useI18n() {
         return getAllWeekdayNames('min');
     }
 
-    function getAllWeekDays(firstDayOfWeek: number): TypeAndDisplayName[] {
+    function getAllWeekDays(firstDayOfWeek?: number): TypeAndDisplayName[] {
         const ret: TypeAndDisplayName[] = [];
         const allWeekDays = WeekDay.values();
 
@@ -1323,6 +1347,7 @@ export function useI18n() {
         // get all localized info of specified type
         getAllLanguageOptions,
         getAllEnableDisableOptions,
+        getAllCurrencies,
         getAllMeridiemIndicators,
         getAllLongMonthNames,
         getAllShortMonthNames,

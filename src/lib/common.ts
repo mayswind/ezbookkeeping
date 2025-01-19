@@ -1,3 +1,5 @@
+import type { TypeAndDisplayName } from '@/core/base.ts';
+
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function isFunction(val: unknown): val is Function {
     return typeof(val) === 'function';
@@ -304,6 +306,16 @@ export function getItemByKeyValue<T>(src: Record<string, T>[] | Record<string, R
             if (item[keyField] === value) {
                 return item;
             }
+        }
+    }
+
+    return null;
+}
+
+export function findDisplayNameByType(items: TypeAndDisplayName[], type: number): string | null {
+    for (const item of items) {
+        if (item.type === type) {
+            return item.displayName;
         }
     }
 

@@ -2,8 +2,8 @@
     <div class="layout-wrapper">
         <router-link to="/">
             <div class="auth-logo d-flex align-start gap-x-3">
-                <img alt="logo" class="login-page-logo" :src="ezBookkeepingLogoPath" />
-                <h1 class="font-weight-medium leading-normal text-2xl">{{ $t('global.app.title') }}</h1>
+                <img alt="logo" class="login-page-logo" :src="APPLICATION_LOGO_PATH" />
+                <h1 class="font-weight-medium leading-normal text-2xl">{{ tt('global.app.title') }}</h1>
             </div>
         </router-link>
         <v-row no-gutters class="auth-wrapper">
@@ -22,32 +22,32 @@
                 <div class="d-flex align-center justify-center h-100">
                     <v-card variant="flat" class="w-100 mt-0 px-4 pt-12" max-width="500">
                         <v-card-text>
-                            <h4 class="text-h4 mb-2">{{ $t('Verify your email') }}</h4>
-                            <p class="mb-0" v-if="token && loading">{{ $t('Verifying...') }}</p>
-                            <p class="mb-0" v-if="token && verified">{{ $t('Email address is verified') }}</p>
+                            <h4 class="text-h4 mb-2">{{ tt('Verify your email') }}</h4>
+                            <p class="mb-0" v-if="token && loading">{{ tt('Verifying...') }}</p>
+                            <p class="mb-0" v-if="token && verified">{{ tt('Email address is verified') }}</p>
                             <p class="mb-0" v-if="token && !verified && errorMessage">{{ errorMessage }}</p>
-                            <p class="mb-0" v-if="!token && !email">{{ $t('Parameter Invalid') }}</p>
-                            <p class="mb-0" v-if="!token && email">{{ $t(hasValidEmailVerifyToken ? 'format.misc.accountActivationAndResendValidationEmailTip' : 'format.misc.resendValidationEmailTip', { email: email }) }}</p>
+                            <p class="mb-0" v-if="!token && !email">{{ tt('Parameter Invalid') }}</p>
+                            <p class="mb-0" v-if="!token && email">{{ tt(hasValidEmailVerifyToken ? 'format.misc.accountActivationAndResendValidationEmailTip' : 'format.misc.resendValidationEmailTip', { email: email }) }}</p>
                         </v-card-text>
 
                         <v-card-text class="pb-0 mb-6">
                             <v-form>
                                 <v-row>
-                                    <v-col cols="12" v-if="!loading && !token && email && isUserVerifyEmailEnabled">
+                                    <v-col cols="12" v-if="!loading && !token && email && isUserVerifyEmailEnabled()">
                                         <v-text-field
                                             autocomplete="password"
                                             type="password"
                                             :disabled="loading || resending"
-                                            :label="$t('Password')"
-                                            :placeholder="$t('Your password')"
+                                            :label="tt('Password')"
+                                            :placeholder="tt('Your password')"
                                             v-model="password"
                                             @keyup.enter="resendEmail"
                                         />
                                     </v-col>
 
-                                    <v-col cols="12" v-if="!loading && !token && email && isUserVerifyEmailEnabled">
+                                    <v-col cols="12" v-if="!loading && !token && email && isUserVerifyEmailEnabled()">
                                         <v-btn block type="submit" :disabled="loading || resending || !password" @click="resendEmail">
-                                            {{ $t('Resend Validation Email') }}
+                                            {{ tt('Resend Validation Email') }}
                                             <v-progress-circular indeterminate size="22" class="ml-2" v-if="resending"></v-progress-circular>
                                         </v-btn>
                                     </v-col>
@@ -56,8 +56,8 @@
                                         <router-link class="d-flex align-center justify-center" :to="verified ? '/' : '/login'"
                                                      :class="{ 'disabled': loading || resending }">
                                             <v-icon :icon="icons.left"/>
-                                            <span v-if="!verified">{{ $t('Back to login page') }}</span>
-                                            <span v-else-if="verified">{{ $t('Back to home page') }}</span>
+                                            <span v-if="!verified">{{ tt('Back to login page') }}</span>
+                                            <span v-else-if="verified">{{ tt('Back to home page') }}</span>
                                         </router-link>
                                     </v-col>
                                 </v-row>
@@ -109,10 +109,17 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { ref, computed, useTemplateRef } from 'vue';
+import { useRouter } from 'vue-router';
 import { useTheme } from 'vuetify';
 
-import { mapStores } from 'pinia';
+import type { LanguageOption } from '@/locales/index.ts';
+import { useI18n } from '@/locales/helpers.ts';
+
 import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.ts';
 
@@ -120,114 +127,103 @@ import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { isUserVerifyEmailEnabled } from '@/lib/server_settings.ts';
 import { isUserLogined } from '@/lib/userstate.ts';
+import { getVersion } from '@/lib/version.ts';
 
 import {
     mdiChevronLeft
 } from '@mdi/js';
 
-export default {
-    props: [
-        'email',
-        'token',
-        'hasValidEmailVerifyToken'
-    ],
-    data() {
-        return {
-            password: '',
-            loading: true,
-            resending: false,
-            verified: false,
-            errorMessage: '',
-            icons: {
-                left: mdiChevronLeft
-            }
-        };
-    },
-    computed: {
-        ...mapStores(useRootStore, useSettingsStore),
-        ezBookkeepingLogoPath() {
-            return APPLICATION_LOGO_PATH;
-        },
-        version() {
-            return 'v' + this.$version;
-        },
-        allLanguages() {
-            return this.$locale.getAllLanguageInfoArray(false);
-        },
-        isDarkMode() {
-            return this.globalTheme.global.name.value === ThemeType.Dark;
-        },
-        currentLanguageName() {
-            return this.$locale.getCurrentLanguageDisplayName();
-        },
-        isUserVerifyEmailEnabled() {
-            return isUserVerifyEmailEnabled();
+type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
+type SnackBarType = InstanceType<typeof SnackBar>;
+
+const props = defineProps<{
+    email: string;
+    token: string;
+    hasValidEmailVerifyToken: boolean;
+}>();
+
+const router = useRouter();
+const theme = useTheme();
+
+const { tt, te, getCurrentLanguageDisplayName, getAllLanguageOptions, setLanguage } = useI18n();
+
+const rootStore = useRootStore();
+const settingsStore = useSettingsStore();
+
+const icons = {
+    left: mdiChevronLeft
+};
+
+const version = `v${getVersion()}`;
+
+const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+
+const password = ref<string>('');
+const loading = ref<boolean>(true);
+const resending = ref<boolean>(false);
+const verified = ref<boolean>(false);
+const errorMessage = ref<string>('');
+
+const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
+const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const currentLanguageName = computed<string>(() => getCurrentLanguageDisplayName());
+
+function init(): void {
+    verified.value = false;
+    loading.value = true;
+
+    if (!props.token) {
+        loading.value = false;
+        return;
+    }
+
+    rootStore.verifyEmail({
+        token: props.token,
+        requestNewToken: !isUserLogined()
+    }).then(() => {
+        loading.value = false;
+        verified.value = true;
+        snackbar.value?.showMessage('Email address is verified');
+    }).catch(error => {
+        loading.value = false;
+        verified.value = false;
+
+        if (!error.processed) {
+            errorMessage.value = te(error.message || error);
+            snackbar.value?.showError(error);
         }
-    },
-    setup() {
-        const theme = useTheme();
+    });
+}
 
-        return {
-            globalTheme: theme
-        };
-    },
-    created() {
-        const self = this;
+function resendEmail(): void {
+    resending.value = true;
 
-        self.verified = false;
-        self.loading = true;
+    rootStore.resendVerifyEmailByUnloginUser({
+        email: props.email,
+        password: password.value
+    }).then(() => {
+        resending.value = false;
+        snackbar.value?.showMessage('Validation email has been sent');
+    }).catch(error => {
+        resending.value = false;
 
-        if (!self.token) {
-            self.loading = false;
-            return;
+        if (!error.processed) {
+            snackbar.value?.showError(error);
         }
+    });
+}
 
-        self.rootStore.verifyEmail({
-            token: self.token,
-            requestNewToken: !isUserLogined()
-        }).then(() => {
-            self.loading = false;
-            self.verified = true;
-            self.$refs.snackbar.showMessage('Email address is verified');
-        }).catch(error => {
-            self.loading = false;
-            self.verified = false;
+function changeLanguage(locale: string): void {
+    const localeDefaultSettings = setLanguage(locale);
+    settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+}
 
-            if (!error.processed) {
-                self.errorMessage = self.$tError(error.message || error);
-                self.$refs.snackbar.showError(error);
-            }
-        });
-    },
-    methods: {
-        resendEmail() {
-            const self = this;
-
-            self.resending = true;
-
-            self.rootStore.resendVerifyEmailByUnloginUser({
-                email: self.email,
-                password: self.password
-            }).then(() => {
-                self.resending = false;
-                self.$refs.snackbar.showMessage('Validation email has been sent');
-            }).catch(error => {
-                self.resending = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        onSnackbarShowStateChanged(newValue) {
-            if (!newValue && this.verified && isUserLogined()) {
-                this.$router.replace('/');
-            }
-        },
-        changeLanguage(locale) {
-            const localeDefaultSettings = this.$locale.setLanguage(locale);
-            this.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-        }
+function onSnackbarShowStateChanged(newValue: boolean): void {
+    if (!newValue && verified.value && isUserLogined()) {
+        router.replace('/');
     }
 }
+
+init();
 </script>

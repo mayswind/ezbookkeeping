@@ -2,8 +2,8 @@
     <div class="layout-wrapper">
         <router-link to="/">
             <div class="auth-logo d-flex align-start gap-x-3">
-                <img alt="logo" class="login-page-logo" :src="ezBookkeepingLogoPath" />
-                <h1 class="font-weight-medium leading-normal text-2xl">{{ $t('global.app.title') }}</h1>
+                <img alt="logo" class="login-page-logo" :src="APPLICATION_LOGO_PATH" />
+                <h1 class="font-weight-medium leading-normal text-2xl">{{ tt('global.app.title') }}</h1>
             </div>
         </router-link>
         <v-row no-gutters class="auth-wrapper">
@@ -22,8 +22,8 @@
                 <div class="d-flex align-center justify-center h-100">
                     <v-card variant="flat" class="w-100 mt-0 px-4 pt-12" max-width="500">
                         <v-card-text>
-                            <h4 class="text-h4 mb-2">{{ $t('Reset Password') }}</h4>
-                            <p class="mb-0">{{ $t('Please enter your email address again, and input the new password.') }}</p>
+                            <h4 class="text-h4 mb-2">{{ tt('Reset Password') }}</h4>
+                            <p class="mb-0">{{ tt('Please re-enter your email address, and then enter a new password.') }}</p>
                         </v-card-text>
 
                         <v-card-text class="pb-0 mb-6">
@@ -35,10 +35,10 @@
                                             autocomplete="email"
                                             autofocus="autofocus"
                                             :disabled="updating"
-                                            :label="$t('E-mail')"
-                                            :placeholder="$t('Your email address')"
+                                            :label="tt('E-mail')"
+                                            :placeholder="tt('Your email address')"
                                             v-model="email"
-                                            @keyup.enter="$refs.passwordInput.focus()"
+                                            @keyup.enter="passwordInput?.focus()"
                                         />
                                     </v-col>
 
@@ -48,10 +48,10 @@
                                             ref="passwordInput"
                                             type="password"
                                             :disabled="updating"
-                                            :label="$t('Password')"
-                                            :placeholder="$t('Your password')"
+                                            :label="tt('Password')"
+                                            :placeholder="tt('Your password')"
                                             v-model="newPassword"
-                                            @keyup.enter="$refs.confirmPasswordInput.focus()"
+                                            @keyup.enter="confirmPasswordInput?.focus()"
                                         />
                                     </v-col>
 
@@ -60,8 +60,8 @@
                                             ref="confirmPasswordInput"
                                             type="password"
                                             :disabled="updating"
-                                            :label="$t('Confirm Password')"
-                                            :placeholder="$t('Re-enter the password')"
+                                            :label="tt('Confirm Password')"
+                                            :placeholder="tt('Re-enter the password')"
                                             v-model="confirmPassword"
                                             @keyup.enter="resetPassword"
                                         />
@@ -69,7 +69,7 @@
 
                                     <v-col cols="12">
                                         <v-btn block :disabled="!email || !newPassword || !confirmPassword || updating" @click="resetPassword">
-                                            {{ $t('Update Password') }}
+                                            {{ tt('Update Password') }}
                                             <v-progress-circular indeterminate size="22" class="ml-2" v-if="updating"></v-progress-circular>
                                         </v-btn>
                                     </v-col>
@@ -78,7 +78,7 @@
                                         <router-link class="d-flex align-center justify-center" to="/login"
                                                      :class="{ 'disabled': updating }">
                                             <v-icon :icon="icons.left"/>
-                                            <span>{{ $t('Back to login page') }}</span>
+                                            <span>{{ tt('Back to login page') }}</span>
                                         </router-link>
                                     </v-col>
                                 </v-row>
@@ -130,116 +130,119 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { VTextField } from 'vuetify/components/VTextField';
+import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { ref, computed, useTemplateRef } from 'vue';
+import { useRouter } from 'vue-router';
 import { useTheme } from 'vuetify';
 
-import { mapStores } from 'pinia';
+import type { LanguageOption } from '@/locales/index.ts';
+import { useI18n } from '@/locales/helpers.ts';
+
 import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
+import { getVersion } from '@/lib/version.ts';
 
 import {
     mdiChevronLeft
 } from '@mdi/js';
 
-export default {
-    props: [
-        'token'
-    ],
-    data() {
-        return {
-            email: '',
-            newPassword: '',
-            confirmPassword: '',
-            updating: false,
-            passwordChanged: false,
-            icons: {
-                left: mdiChevronLeft
-            }
-        };
-    },
-    computed: {
-        ...mapStores(useRootStore, useSettingsStore),
-        inputProblemMessage() {
-            if (!this.email) {
-                return 'Email address cannot be blank';
-            } else if (!this.newPassword && !this.confirmPassword) {
-                return 'Nothing has been modified';
-            } else if (!this.newPassword && this.confirmPassword) {
-                return 'New password cannot be blank';
-            } else if (this.newPassword && !this.confirmPassword) {
-                return 'Password confirmation cannot be blank';
-            } else if (this.newPassword && this.confirmPassword && this.newPassword !== this.confirmPassword) {
-                return 'Password and password confirmation do not match';
-            } else {
-                return null;
-            }
-        },
-        ezBookkeepingLogoPath() {
-            return APPLICATION_LOGO_PATH;
-        },
-        version() {
-            return 'v' + this.$version;
-        },
-        allLanguages() {
-            return this.$locale.getAllLanguageInfoArray(false);
-        },
-        isDarkMode() {
-            return this.globalTheme.global.name.value === ThemeType.Dark;
-        },
-        currentLanguageName() {
-            return this.$locale.getCurrentLanguageDisplayName();
-        }
-    },
-    setup() {
-        const theme = useTheme();
+type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
+type SnackBarType = InstanceType<typeof SnackBar>;
 
-        return {
-            globalTheme: theme
-        };
-    },
-    methods: {
-        resetPassword() {
-            const self = this;
-            self.passwordChanged = false;
+const props = defineProps<{
+    token: string;
+}>();
 
-            const problemMessage = self.inputProblemMessage;
+const router = useRouter();
+const theme = useTheme();
 
-            if (problemMessage) {
-                self.$refs.snackbar.showMessage(problemMessage);
-                return;
-            }
+const { tt, getCurrentLanguageDisplayName, getAllLanguageOptions, setLanguage } = useI18n();
 
-            self.updating = true;
+const rootStore = useRootStore();
+const settingsStore = useSettingsStore();
 
-            self.rootStore.resetPassword({
-                token: self.token,
-                email: self.email,
-                password: self.newPassword
-            }).then(() => {
-                self.updating = false;
-                self.passwordChanged = true;
-                self.$refs.snackbar.showMessage('Password has been updated');
-            }).catch(error => {
-                self.updating = false;
-                self.passwordChanged = false;
+const icons = {
+    left: mdiChevronLeft
+};
 
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        onSnackbarShowStateChanged(newValue) {
-            if (!newValue && this.passwordChanged) {
-                this.$router.replace('/login');
-            }
-        },
-        changeLanguage(locale) {
-            const localeDefaultSettings = this.$locale.setLanguage(locale);
-            this.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-        }
+const version = `v${getVersion()}`;
+
+const passwordInput = useTemplateRef<VTextField>('passwordInput');
+const confirmPasswordInput = useTemplateRef<VTextField>('confirmPasswordInput');
+const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+
+const email = ref<string>('');
+const newPassword = ref<string>('');
+const confirmPassword = ref<string>('');
+const updating = ref<boolean>(false);
+const passwordChanged = ref<boolean>(false);
+
+const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
+const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const currentLanguageName = computed<string>(() => getCurrentLanguageDisplayName());
+
+const inputProblemMessage = computed<string | null>(() => {
+    if (!email.value) {
+        return 'Email address cannot be blank';
+    } else if (!newPassword.value && !confirmPassword.value) {
+        return 'Nothing has been modified';
+    } else if (!newPassword.value && confirmPassword.value) {
+        return 'New password cannot be blank';
+    } else if (newPassword.value && !confirmPassword.value) {
+        return 'Password confirmation cannot be blank';
+    } else if (newPassword.value && confirmPassword.value && newPassword.value !== confirmPassword.value) {
+        return 'Password and password confirmation do not match';
+    } else {
+        return null;
     }
+});
+
+function changeLanguage(locale: string): void {
+    const localeDefaultSettings = setLanguage(locale);
+    settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+}
+
+function onSnackbarShowStateChanged(newValue: boolean): void {
+    if (!newValue && passwordChanged.value) {
+        router.replace('/login');
+    }
+}
+
+function resetPassword(): void  {
+    passwordChanged.value = false;
+
+    const problemMessage = inputProblemMessage.value;
+
+    if (problemMessage) {
+        snackbar.value?.showMessage(problemMessage);
+        return;
+    }
+
+    updating.value = true;
+
+    rootStore.resetPassword({
+        token: props.token,
+        email: email.value,
+        password: newPassword.value
+    }).then(() => {
+        updating.value = false;
+        passwordChanged.value = true;
+        snackbar.value?.showMessage('Password has been updated');
+    }).catch(error => {
+        updating.value = false;
+        passwordChanged.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
 }
 </script>

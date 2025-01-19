@@ -2,8 +2,8 @@
     <div class="layout-wrapper">
         <router-link to="/">
             <div class="auth-logo d-flex align-start gap-x-3">
-                <img alt="logo" class="login-page-logo" :src="ezBookkeepingLogoPath" />
-                <h1 class="font-weight-medium leading-normal text-2xl">{{ $t('global.app.title') }}</h1>
+                <img alt="logo" class="login-page-logo" :src="APPLICATION_LOGO_PATH" />
+                <h1 class="font-weight-medium leading-normal text-2xl">{{ tt('global.app.title') }}</h1>
             </div>
         </router-link>
         <v-row no-gutters class="auth-wrapper">
@@ -22,8 +22,8 @@
                 <div class="d-flex align-center justify-center h-100">
                     <v-card variant="flat" class="w-100 mt-0 px-4 pt-12" max-width="500">
                         <v-card-text>
-                            <h4 class="text-h4 mb-2">{{ $t('Forget Password?') }}</h4>
-                            <p class="mb-0">{{ $t('Please enter your email address used for registration and we\'ll send you an email with a reset password link') }}</p>
+                            <h4 class="text-h4 mb-2">{{ tt('Forget Password?') }}</h4>
+                            <p class="mb-0">{{ tt('Please enter your email address used for registration and we\'ll send you an email with a reset password link') }}</p>
                         </v-card-text>
 
                         <v-card-text class="pb-0 mb-6">
@@ -35,8 +35,8 @@
                                             autocomplete="email"
                                             autofocus="autofocus"
                                             :disabled="requesting"
-                                            :label="$t('E-mail')"
-                                            :placeholder="$t('Your email address')"
+                                            :label="tt('E-mail')"
+                                            :placeholder="tt('Your email address')"
                                             v-model="email"
                                             @keyup.enter="requestResetPassword"
                                         />
@@ -44,7 +44,7 @@
 
                                     <v-col cols="12">
                                         <v-btn block type="submit" :disabled="!email || requesting" @click="requestResetPassword">
-                                            {{ $t('Send Reset Link') }}
+                                            {{ tt('Send Reset Link') }}
                                             <v-progress-circular indeterminate size="22" class="ml-2" v-if="requesting"></v-progress-circular>
                                         </v-btn>
                                     </v-col>
@@ -53,7 +53,7 @@
                                         <router-link class="d-flex align-center justify-center" to="/login"
                                                      :class="{ 'disabled': requesting }">
                                             <v-icon :icon="icons.left"/>
-                                            <span>{{ $t('Back to login page') }}</span>
+                                            <span>{{ tt('Back to login page') }}</span>
                                         </router-link>
                                     </v-col>
                                 </v-row>
@@ -105,83 +105,77 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { ref, computed, useTemplateRef } from 'vue';
 import { useTheme } from 'vuetify';
 
-import { mapStores } from 'pinia';
+import type { LanguageOption } from '@/locales/index.ts';
+import { useI18n } from '@/locales/helpers.ts';
+
 import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
+import { getVersion } from '@/lib/version.ts';
 
 import {
     mdiChevronLeft,
 } from '@mdi/js';
 
-export default {
-    data() {
-        return {
-            email: '',
-            requesting: false,
-            icons: {
-                left: mdiChevronLeft
-            }
-        };
-    },
-    computed: {
-        ...mapStores(useRootStore, useSettingsStore),
-        ezBookkeepingLogoPath() {
-            return APPLICATION_LOGO_PATH;
-        },
-        version() {
-            return 'v' + this.$version;
-        },
-        allLanguages() {
-            return this.$locale.getAllLanguageInfoArray(false);
-        },
-        isDarkMode() {
-            return this.globalTheme.global.name.value === ThemeType.Dark;
-        },
-        currentLanguageName() {
-            return this.$locale.getCurrentLanguageDisplayName();
-        }
-    },
-    setup() {
-        const theme = useTheme();
+type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
+type SnackBarType = InstanceType<typeof SnackBar>;
 
-        return {
-            globalTheme: theme
-        };
-    },
-    methods: {
-        requestResetPassword() {
-            const self = this;
+const theme = useTheme();
 
-            if (!self.email) {
-                self.$refs.snackbar.showMessage('Email address cannot be blank');
-                return;
-            }
+const { tt, getCurrentLanguageDisplayName, getAllLanguageOptions, setLanguage } = useI18n();
 
-            self.requesting = true;
+const rootStore = useRootStore();
+const settingsStore = useSettingsStore();
 
-            self.rootStore.requestResetPassword({
-                email: self.email
-            }).then(() => {
-                self.requesting = false;
-                self.$refs.snackbar.showMessage('Password reset email has been sent');
-            }).catch(error => {
-                self.requesting = false;
+const icons = {
+    left: mdiChevronLeft
+};
 
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        changeLanguage(locale) {
-            const localeDefaultSettings = this.$locale.setLanguage(locale);
-            this.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-        }
+const version = `v${getVersion()}`;
+
+const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+
+const email = ref<string>('');
+const requesting = ref<boolean>(false);
+
+const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
+const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const currentLanguageName = computed<string>(() => getCurrentLanguageDisplayName());
+
+function requestResetPassword(): void {
+    if (!email.value) {
+        snackbar.value?.showMessage('Email address cannot be blank');
+        return;
     }
+
+    requesting.value = true;
+
+    rootStore.requestResetPassword({
+        email: email.value
+    }).then(() => {
+        requesting.value = false;
+        snackbar.value?.showMessage('Password reset email has been sent');
+    }).catch(error => {
+        requesting.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function changeLanguage(locale: string): void {
+    const localeDefaultSettings = setLanguage(locale);
+    settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 }
 </script>

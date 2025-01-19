@@ -138,7 +138,7 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 
 const props = defineProps<{
     email: string;
-    token: string;
+    token?: string;
     hasValidEmailVerifyToken: boolean;
 }>();
 

@@ -331,7 +331,7 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useRootStore } from '@/stores/index.js';
+import { useRootStore } from '@/stores/index.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';

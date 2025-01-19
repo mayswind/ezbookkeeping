@@ -2,8 +2,7 @@ import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-// @ts-expect-error the above file is migrating to ts
-import { useRootStore } from '@/stores/index.js';
+import { useRootStore } from '@/stores/index.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';

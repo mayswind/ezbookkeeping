@@ -164,7 +164,7 @@ import { ref, useTemplateRef } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 import { useDataManagementPageBase } from '@/views/base/users/DataManagementPageBase.ts';
 
-import { useRootStore } from '@/stores/index.js';
+import { useRootStore } from '@/stores/index.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 import { isEquals } from '@/lib/common.ts';

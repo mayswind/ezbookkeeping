@@ -142,7 +142,7 @@ import { useTheme } from 'vuetify';
 import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 
-import { useRootStore } from '@/stores/index.js';
+import { useRootStore } from '@/stores/index.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';

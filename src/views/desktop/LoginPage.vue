@@ -179,7 +179,7 @@ import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 import { useLoginPageBase } from '@/views/base/LoginPageBase.ts';
 
-import { useRootStore } from '@/stores/index.js';
+import { useRootStore } from '@/stores/index.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { KnownErrorCode } from '@/consts/api.ts';

@@ -78,7 +78,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
 import { useAppSettingPageBase } from '@/views/base/settings/AppSettingsPageBase.ts';
 
-import { useRootStore } from '@/stores/index.js';
+import { useRootStore } from '@/stores/index.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';

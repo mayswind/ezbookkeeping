@@ -81,7 +81,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
 import { useDataManagementPageBase } from '@/views/base/users/DataManagementPageBase.ts';
 
-import { useRootStore } from '@/stores/index.js';
+import { useRootStore } from '@/stores/index.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 import { isDataExportingEnabled } from '@/lib/server_settings.ts';

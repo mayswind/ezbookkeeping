@@ -201,7 +201,7 @@ import { useRoute, useRouter } from 'vue-router';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-import { useRootStore } from '@/stores/index.js';
+import { useRootStore } from '@/stores/index.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 

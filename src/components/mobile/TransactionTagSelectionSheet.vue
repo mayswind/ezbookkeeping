@@ -37,7 +37,8 @@
                         </f7-block>
                     </template>
                 </f7-list-item>
-                <f7-list-item :title="tt('Add new tag')"
+                <f7-list-item link="#" no-chevron
+                              :title="tt('Add new tag')"
                               v-if="allowAddNewTag && !newTag"
                               @click="addNewTag()">
                 </f7-list-item>

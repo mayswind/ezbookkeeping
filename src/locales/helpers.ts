@@ -1188,7 +1188,7 @@ export function useI18n() {
         return formatAmount(value, numberFormatOptions);
     }
 
-    function getFormattedAmountWithCurrency(value: number | string, currencyCode?: string, notConvertValue?: boolean, currencyDisplayType?: CurrencyDisplayType): string | null {
+    function getFormattedAmountWithCurrency(value: number | string, currencyCode?: string | false, notConvertValue?: boolean, currencyDisplayType?: CurrencyDisplayType): string | null {
         if (!isNumber(value) && !isString(value)) {
             return null;
         }
@@ -1215,13 +1215,17 @@ export function useI18n() {
             }
         }
 
+        let finalCurrencyCode = '';
+
         if (!isBoolean(currencyCode) && !currencyCode) {
-            currencyCode = userStore.currentUserDefaultCurrency;
+            finalCurrencyCode = userStore.currentUserDefaultCurrency;
         } else if (isBoolean(currencyCode) && !currencyCode) {
-            currencyCode = '';
+            finalCurrencyCode = '';
+        } else {
+            finalCurrencyCode = currencyCode;
         }
 
-        if (!currencyCode) {
+        if (!finalCurrencyCode) {
             return textualValue;
         }
 
@@ -1229,9 +1233,9 @@ export function useI18n() {
             currencyDisplayType = getCurrentCurrencyDisplayType();
         }
 
-        const currencyUnit = getCurrencyUnitName(currencyCode, isPlural);
-        const currencyName = getCurrencyName(currencyCode);
-        return appendCurrencySymbol(textualValue, currencyDisplayType, currencyCode, currencyUnit, currencyName, isPlural);
+        const currencyUnit = getCurrencyUnitName(finalCurrencyCode, isPlural);
+        const currencyName = getCurrencyName(finalCurrencyCode);
+        return appendCurrencySymbol(textualValue, currencyDisplayType, finalCurrencyCode, currencyUnit, currencyName, isPlural);
     }
 
     function getFormattedExchangeRateAmount(value: number | string): string {

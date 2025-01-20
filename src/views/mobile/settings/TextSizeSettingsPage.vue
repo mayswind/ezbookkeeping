@@ -64,7 +64,8 @@
                                             </div>
                                             <div class="item-footer">
                                                 <div class="transaction-tags">
-                                                    <f7-chip media-bg-color="black" class="transaction-tag" :text="tt('Tag Title')">
+                                                    <f7-chip media-text-color="var(--f7-chip-text-color)"
+                                                             class="transaction-tag" :text="tt('Tag Title')">
                                                         <template #media>
                                                             <f7-icon f7="number"></f7-icon>
                                                         </template>

@@ -320,7 +320,7 @@
 
                 <template #footer>
                     <f7-block class="margin-top-half no-padding no-margin" v-if="transaction.tagIds && transaction.tagIds.length">
-                        <f7-chip media-bg-color="black" class="transaction-edit-tag"
+                        <f7-chip media-text-color="var(--f7-chip-text-color)" class="transaction-edit-tag"
                                  :text="getTagName(tagId)"
                                  :key="tagId"
                                  v-for="tagId in transaction.tagIds">
@@ -1431,8 +1431,13 @@ export default {
     text-overflow: ellipsis;
 }
 
-.transaction-edit-tag > .chip-media {
-    opacity: 0.6;
+.chip.transaction-edit-tag .chip-media+.chip-label {
+    margin-left: 0;
+}
+
+.chip.transaction-edit-tag .chip-media i.icon {
+    font-size: calc(var(--f7-chip-media-size) - 12px);
+    height: calc(var(--f7-chip-media-size) - 12px);
 }
 
 .transaction-pictures {

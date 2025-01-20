@@ -138,6 +138,11 @@ i.icon.la, i.icon.las, i.icon.lab {
     font-size: var(--ebk-hide-icon-font-size);
 }
 
+.transaction-tag-icon {
+    font-size: var(--ebk-transaction-tag-icon-font-size);
+    align-self: center;
+}
+
 .login-page-logo {
     width: 80px;
     height: 80px;

@@ -212,7 +212,7 @@
                                         </div>
                                         <div class="item-footer">
                                             <div class="transaction-tags" v-if="showTagInTransactionListPage && transaction.tagIds && transaction.tagIds.length">
-                                                <f7-chip media-bg-color="black" class="transaction-tag"
+                                                <f7-chip media-text-color="var(--f7-chip-text-color)" class="transaction-tag"
                                                          :text="allTransactionTags[tagId].name"
                                                          :key="tagId"
                                                          v-for="tagId in transaction.tagIds">
@@ -495,7 +495,7 @@
                               @click="changeTagFilter(transactionTag.id)"
                 >
                     <template #before-title>
-                        <f7-icon f7="number" class="transaction-tag-name"></f7-icon>
+                        <f7-icon class="transaction-tag-name transaction-tag-icon" f7="number"></f7-icon>
                     </template>
                     <template #after>
                         <f7-icon class="list-item-checked-icon"
@@ -1283,8 +1283,8 @@ export default {
     text-overflow: ellipsis;
 }
 
-.list.transaction-info-list li.transaction-info .chip.transaction-tag > .chip-media {
-    opacity: 0.6;
+.list.transaction-info-list li.transaction-info .chip.transaction-tag .chip-media+.chip-label {
+    margin-left: 0;
 }
 
 .list.transaction-info-list li.transaction-info .transaction-footer {

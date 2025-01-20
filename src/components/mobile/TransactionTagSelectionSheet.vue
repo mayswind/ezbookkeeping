@@ -29,7 +29,7 @@
                     <template #title>
                         <f7-block class="no-padding no-margin">
                             <div class="display-flex">
-                                <f7-icon f7="number"></f7-icon>
+                                <f7-icon class="transaction-tag-icon" f7="number"></f7-icon>
                                 <div class="tag-selection-list-item list-item-valign-middle padding-left-half">
                                     {{ tag.name }}
                                 </div>
@@ -44,7 +44,7 @@
                 </f7-list-item>
                 <f7-list-item checkbox indeterminate disabled v-if="allowAddNewTag && newTag">
                     <template #media>
-                        <f7-icon f7="number"></f7-icon>
+                        <f7-icon class="transaction-tag-icon" f7="number"></f7-icon>
                     </template>
                     <template #title>
                         <div class="display-flex">

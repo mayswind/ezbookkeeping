@@ -81,7 +81,7 @@
                                       v-show="showHidden || !transactionTag.hidden"
                                       @change="selectTransactionTag">
                             <template #media>
-                                <f7-icon f7="number">
+                                <f7-icon class="transaction-tag-icon" f7="number">
                                     <f7-badge color="gray" class="right-bottom-icon" v-if="transactionTag.hidden">
                                         <f7-icon f7="eye_slash_fill"></f7-icon>
                                     </f7-badge>

@@ -13,7 +13,7 @@
         <f7-list strong inset dividers class="tag-item-list margin-top skeleton-text" v-if="loading">
             <f7-list-item :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
                 <template #media>
-                    <f7-icon f7="number"></f7-icon>
+                    <f7-icon class="transaction-tag-icon" f7="number"></f7-icon>
                 </template>
                 <template #title>
                     <div class="display-flex">
@@ -38,7 +38,7 @@
                           v-show="showHidden || !tag.hidden"
                           @taphold="setSortable()">
                 <template #media>
-                    <f7-icon f7="number">
+                    <f7-icon class="transaction-tag-icon" f7="number">
                         <f7-badge color="gray" class="right-bottom-icon" v-if="tag.hidden">
                             <f7-icon f7="eye_slash_fill"></f7-icon>
                         </f7-badge>
@@ -91,7 +91,7 @@
 
             <f7-list-item v-if="newTag">
                 <template #media>
-                    <f7-icon f7="number"></f7-icon>
+                    <f7-icon class="transaction-tag-icon" f7="number"></f7-icon>
                 </template>
                 <template #title>
                     <div class="display-flex">

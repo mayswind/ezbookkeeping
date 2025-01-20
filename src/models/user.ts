@@ -15,23 +15,44 @@ export class User {
     public defaultCurrency: string;
     public firstDayOfWeek: number;
 
-    public defaultAccountId?: string;
-    public transactionEditScope?: number;
-    public longDateFormat?: number;
-    public shortDateFormat?: number;
-    public longTimeFormat?: number;
-    public shortTimeFormat?: number;
-    public decimalSeparator?: number;
-    public digitGroupingSymbol?: number;
-    public digitGrouping?: number;
-    public currencyDisplayType?: number;
-    public expenseAmountColor?: number;
-    public incomeAmountColor?: number;
+    public defaultAccountId: string = '';
+    public transactionEditScope: number = 1;
+    public longDateFormat: number = 0;
+    public shortDateFormat: number = 0;
+    public longTimeFormat: number = 0;
+    public shortTimeFormat: number = 0;
+    public decimalSeparator: number = 0;
+    public digitGroupingSymbol: number = 0;
+    public digitGrouping: number = 0;
+    public currencyDisplayType: number = 0;
+    public expenseAmountColor: number = 0;
+    public incomeAmountColor: number = 0;
 
     private constructor(language: string, defaultCurrency: string, firstDayOfWeek: number) {
         this.language = language;
         this.defaultCurrency = defaultCurrency;
         this.firstDayOfWeek = firstDayOfWeek;
+    }
+
+    public from(user: User | UserBasicInfo | UserProfileResponse): void {
+        this.username = user.username;
+        this.email = user.email;
+        this.nickname = user.nickname;
+        this.language = user.language;
+        this.defaultCurrency = user.defaultCurrency;
+        this.firstDayOfWeek = user.firstDayOfWeek;
+        this.defaultAccountId = user.defaultAccountId;
+        this.transactionEditScope = user.transactionEditScope;
+        this.longDateFormat = user.longDateFormat;
+        this.shortDateFormat = user.shortDateFormat;
+        this.longTimeFormat = user.longTimeFormat;
+        this.shortTimeFormat = user.shortTimeFormat;
+        this.decimalSeparator = user.decimalSeparator;
+        this.digitGroupingSymbol = user.digitGroupingSymbol;
+        this.digitGrouping = user.digitGrouping;
+        this.currencyDisplayType = user.currencyDisplayType;
+        this.expenseAmountColor = user.expenseAmountColor;
+        this.incomeAmountColor = user.incomeAmountColor;
     }
 
     public toRegisterRequest(categories?: LocalizedPresetCategory[]): UserRegisterRequest {
@@ -71,20 +92,20 @@ export class User {
         };
     }
 
-    public static of(profileResponse: UserProfileResponse): User {
-        const user = new User(profileResponse.language, profileResponse.defaultCurrency, profileResponse.firstDayOfWeek);
-        user.defaultAccountId = profileResponse.defaultAccountId;
-        user.transactionEditScope = profileResponse.transactionEditScope;
-        user.longDateFormat = profileResponse.longDateFormat;
-        user.shortDateFormat = profileResponse.shortDateFormat;
-        user.longTimeFormat = profileResponse.longTimeFormat;
-        user.shortTimeFormat = profileResponse.shortTimeFormat;
-        user.decimalSeparator = profileResponse.decimalSeparator;
-        user.digitGroupingSymbol = profileResponse.digitGroupingSymbol;
-        user.digitGrouping = profileResponse.digitGrouping;
-        user.currencyDisplayType = profileResponse.currencyDisplayType;
-        user.expenseAmountColor = profileResponse.expenseAmountColor;
-        user.incomeAmountColor = profileResponse.incomeAmountColor;
+    public static of(userInfo: UserBasicInfo): User {
+        const user = new User(userInfo.language, userInfo.defaultCurrency, userInfo.firstDayOfWeek);
+        user.defaultAccountId = userInfo.defaultAccountId;
+        user.transactionEditScope = userInfo.transactionEditScope;
+        user.longDateFormat = userInfo.longDateFormat;
+        user.shortDateFormat = userInfo.shortDateFormat;
+        user.longTimeFormat = userInfo.longTimeFormat;
+        user.shortTimeFormat = userInfo.shortTimeFormat;
+        user.decimalSeparator = userInfo.decimalSeparator;
+        user.digitGroupingSymbol = userInfo.digitGroupingSymbol;
+        user.digitGrouping = userInfo.digitGrouping;
+        user.currencyDisplayType = userInfo.currencyDisplayType;
+        user.expenseAmountColor = userInfo.expenseAmountColor;
+        user.incomeAmountColor = userInfo.incomeAmountColor;
 
         return user;
     }

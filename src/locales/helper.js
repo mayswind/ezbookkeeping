@@ -2,11 +2,10 @@ import moment from 'moment-timezone';
 
 import { DEFAULT_LANGUAGE, ALL_LANGUAGES } from '@/locales/index.ts';
 
-import { Month, WeekDay, MeridiemIndicator, LongDateFormat, ShortDateFormat, LongTimeFormat, ShortTimeFormat, DateRange, LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE } from '@/core/datetime.ts';
+import { Month, WeekDay, MeridiemIndicator, LongDateFormat, ShortDateFormat, LongTimeFormat, ShortTimeFormat, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { DecimalSeparator, DigitGroupingSymbol, DigitGroupingType } from '@/core/numeral.ts';
-import { CurrencyDisplayType, CurrencySortingType } from '@/core/currency.ts';
-import { PresetAmountColor } from '@/core/color.ts';
+import { CurrencyDisplayType, CurrencySortingType } from '@/core/currency.ts'
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionEditScopeType, TransactionTagFilterType } from '@/core/transaction.ts';
@@ -30,7 +29,6 @@ import {
     isPM,
     parseDateFromUnixTime,
     formatUnixTime,
-    formatCurrentTime,
     getYear,
     getTimezoneOffset,
     getTimezoneOffsetMinutes,
@@ -65,42 +63,6 @@ import services from '@/lib/services.ts';
 
 function getLanguageDisplayName(translateFn, languageName) {
     return translateFn(`language.${languageName}`);
-}
-
-function getAllLanguageInfoArray(translateFn, includeSystemDefault) {
-    const ret = [];
-
-    for (const languageTag in ALL_LANGUAGES) {
-        if (!Object.prototype.hasOwnProperty.call(ALL_LANGUAGES, languageTag)) {
-            continue;
-        }
-
-        const languageInfo = ALL_LANGUAGES[languageTag];
-        let displayName = languageInfo.displayName;
-        let languageNameInCurrentLanguage = getLanguageDisplayName(translateFn, languageInfo.name);
-
-        if (languageNameInCurrentLanguage && languageNameInCurrentLanguage !== displayName) {
-            displayName = `${languageNameInCurrentLanguage} (${displayName})`;
-        }
-
-        ret.push({
-            languageTag: languageTag,
-            displayName: displayName
-        });
-    }
-
-    ret.sort(function (lang1, lang2) {
-        return lang1.languageTag.localeCompare(lang2.languageTag);
-    });
-
-    if (includeSystemDefault) {
-        ret.splice(0, 0, {
-            languageTag: '',
-            displayName: translateFn('System Default')
-        });
-    }
-
-    return ret;
 }
 
 function getLanguageInfo(locale) {
@@ -302,26 +264,6 @@ function getAllMinWeekdayNames(translateFn) {
     return ret;
 }
 
-function getAllLongDateFormats(translateFn) {
-    const defaultLongDateFormatTypeName = translateFn('default.longDateFormat');
-    return getDateTimeFormats(translateFn, LongDateFormat.all(), LongDateFormat.values(), 'format.longDate', defaultLongDateFormatTypeName, LongDateFormat.Default);
-}
-
-function getAllShortDateFormats(translateFn) {
-    const defaultShortDateFormatTypeName = translateFn('default.shortDateFormat');
-    return getDateTimeFormats(translateFn, ShortDateFormat.all(), ShortDateFormat.values(), 'format.shortDate', defaultShortDateFormatTypeName, ShortDateFormat.Default);
-}
-
-function getAllLongTimeFormats(translateFn) {
-    const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
-    return getDateTimeFormats(translateFn, LongTimeFormat.all(), LongTimeFormat.values(), 'format.longTime', defaultLongTimeFormatTypeName, LongTimeFormat.Default);
-}
-
-function getAllShortTimeFormats(translateFn) {
-    const defaultShortTimeFormatTypeName = translateFn('default.shortTimeFormat');
-    return getDateTimeFormats(translateFn, ShortTimeFormat.all(), ShortTimeFormat.values(), 'format.shortTime', defaultShortTimeFormatTypeName, ShortTimeFormat.Default);
-}
-
 function getMonthdayOrdinal(monthDay, translateFn) {
     return translateFn(`datetime.monthDayOrdinal.${monthDay}`);
 }
@@ -443,31 +385,6 @@ function formatYearQuarter(translateFn, year, quarter) {
     } else {
         return '';
     }
-}
-
-function getDateTimeFormats(translateFn, allFormatMap, allFormatArray, localeFormatPathPrefix, localeDefaultFormatTypeName, systemDefaultFormatType) {
-    const defaultFormat = getDateTimeFormat(translateFn, allFormatMap, allFormatArray,
-        localeFormatPathPrefix, localeDefaultFormatTypeName, systemDefaultFormatType, LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE);
-    const ret = [];
-
-    ret.push({
-        type: LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE,
-        format: defaultFormat,
-        displayName: `${translateFn('Language Default')} (${formatCurrentTime(defaultFormat)})`
-    });
-
-    for (let i = 0; i < allFormatArray.length; i++) {
-        const formatType = allFormatArray[i];
-        const format = translateFn(`${localeFormatPathPrefix}.${formatType.key}`);
-
-        ret.push({
-            type: formatType.type,
-            format: format,
-            displayName: formatCurrentTime(format)
-        });
-    }
-
-    return ret;
 }
 
 function getDateTimeFormat(translateFn, allFormatMap, allFormatArray, localeFormatPathPrefix, localeDefaultFormatTypeName, systemDefaultFormatType, formatTypeValue) {
@@ -974,39 +891,6 @@ function getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRat
     return getAdaptiveDisplayAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, numberFormatOptions);
 }
 
-function getAllExpenseIncomeAmountColors(translateFn, expenseOrIncome) {
-    const ret = [];
-    let defaultAmountName = '';
-
-    if (expenseOrIncome === 1) { // expense
-        defaultAmountName = PresetAmountColor.DefaultExpenseColor.name;
-    } else if (expenseOrIncome === 2) { // income
-        defaultAmountName = PresetAmountColor.DefaultIncomeColor.name;
-    }
-
-    if (defaultAmountName) {
-        defaultAmountName = translateFn('color.amount.' + defaultAmountName);
-    }
-
-    ret.push({
-        type: PresetAmountColor.SystemDefaultType,
-        displayName: translateFn('System Default') + (defaultAmountName ? ` (${defaultAmountName})` : '')
-    });
-
-    const allPresetAmountColors = PresetAmountColor.values();
-
-    for (let i = 0; i < allPresetAmountColors.length; i++) {
-        const amountColor = allPresetAmountColors[i];
-
-        ret.push({
-            type: amountColor.type,
-            displayName: translateFn('color.amount.' + amountColor.name)
-        });
-    }
-
-    return ret;
-}
-
 function getAllAccountCategories(translateFn) {
     const ret = [];
     const allCategories = AccountCategory.values();
@@ -1373,14 +1257,9 @@ export function translateError(message, translateFn) {
 
 export function i18nFunctions(i18nGlobal) {
     return {
-        getAllLanguageInfoArray: (includeSystemDefault) => getAllLanguageInfoArray(i18nGlobal.t, includeSystemDefault),
         getDefaultCurrency: () => getDefaultCurrency(i18nGlobal.t),
         getDefaultFirstDayOfWeek: () => getDefaultFirstDayOfWeek(i18nGlobal.t),
         getCurrencyName: (currencyCode) => getCurrencyName(currencyCode, i18nGlobal.t),
-        getAllLongDateFormats: () => getAllLongDateFormats(i18nGlobal.t),
-        getAllShortDateFormats: () => getAllShortDateFormats(i18nGlobal.t),
-        getAllLongTimeFormats: () => getAllLongTimeFormats(i18nGlobal.t),
-        getAllShortTimeFormats: () => getAllShortTimeFormats(i18nGlobal.t),
         getMonthdayShortName: (monthDay) => getMonthdayShortName(monthDay, i18nGlobal.t),
         getWeekdayShortName: (weekDay) => getWeekdayShortName(weekDay, i18nGlobal.t),
         getWeekdayLongName: (weekDay) => getWeekdayLongName(weekDay, i18nGlobal.t),
@@ -1420,8 +1299,6 @@ export function i18nFunctions(i18nGlobal) {
         formatAmount: (userStore, value, currencyCode) => getFormattedAmount(value, i18nGlobal.t, userStore, currencyCode),
         formatAmountWithCurrency: (settingsStore, userStore, value, currencyCode) => getFormattedAmountWithCurrency(value, currencyCode, i18nGlobal.t, userStore, settingsStore),
         getAdaptiveAmountRate: (userStore, amount1, amount2, fromExchangeRate, toExchangeRate) => getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, i18nGlobal.t, userStore),
-        getAllExpenseAmountColors: () => getAllExpenseIncomeAmountColors(i18nGlobal.t, 1),
-        getAllIncomeAmountColors: () => getAllExpenseIncomeAmountColors(i18nGlobal.t, 2),
         getAllAccountCategories: () => getAllAccountCategories(i18nGlobal.t),
         getAllAccountTypes: () => getAllAccountTypes(i18nGlobal.t),
         getAllCategoricalChartTypes: () => getAllCategoricalChartTypes(i18nGlobal.t),

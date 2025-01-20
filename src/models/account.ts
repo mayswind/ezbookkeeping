@@ -215,6 +215,16 @@ export class Account implements AccountInfoResponse {
 
         return accounts;
     }
+
+    public static findAccountNameById(accounts: Account[], accountId: string, defaultName?: string): string | undefined {
+        for (const account of accounts) {
+            if (account.id === accountId) {
+                return account.name;
+            }
+        }
+
+        return defaultName;
+    }
 }
 
 export interface AccountCreateRequest {

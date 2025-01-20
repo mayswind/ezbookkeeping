@@ -1,11 +1,11 @@
 <template>
     <f7-page @page:afterin="onPageAfterIn">
         <f7-navbar>
-            <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
-            <f7-nav-title :title="$t('User Profile')"></f7-nav-title>
+            <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-title :title="tt('User Profile')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
-                <f7-link icon-f7="ellipsis" :class="{ 'disabled': !isUserVerifyEmailEnabled || loading || emailVerified }" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link :class="{ 'disabled': inputIsNotChanged || inputIsInvalid || saving }" :text="$t('Save')" @click="save"></f7-link>
+                <f7-link icon-f7="ellipsis" :class="{ 'disabled': !isUserVerifyEmailEnabled() || loading || emailVerified }" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link :class="{ 'disabled': inputIsNotChanged || inputIsInvalid || saving }" :text="tt('Save')" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -51,8 +51,8 @@
                 type="password"
                 autocomplete="new-password"
                 clear-button
-                :label="$t('Password')"
-                :placeholder="$t('Your password')"
+                :label="tt('Password')"
+                :placeholder="tt('Your password')"
                 v-model:value="newProfile.password"
             ></f7-list-input>
 
@@ -60,8 +60,8 @@
                 type="password"
                 autocomplete="new-password"
                 clear-button
-                :label="$t('Confirm Password')"
-                :placeholder="$t('Re-enter the password')"
+                :label="tt('Confirm Password')"
+                :placeholder="tt('Re-enter the password')"
                 v-model:value="newProfile.confirmPassword"
             ></f7-list-input>
 
@@ -69,8 +69,8 @@
                 type="email"
                 autocomplete="email"
                 clear-button
-                :label="$t('E-mail') + ' ' + (emailVerified ? $t('(Verified)') : $t('(Not Verified)'))"
-                :placeholder="$t('Your email address')"
+                :label="tt('E-mail') + ' ' + (emailVerified ? tt('(Verified)') : tt('(Not Verified)'))"
+                :placeholder="tt('Your email address')"
                 v-model:value="newProfile.email"
             ></f7-list-input>
 
@@ -78,12 +78,12 @@
                 type="text"
                 autocomplete="nickname"
                 clear-button
-                :label="$t('Nickname')"
-                :placeholder="$t('Your nickname')"
+                :label="tt('Nickname')"
+                :placeholder="tt('Your nickname')"
                 v-model:value="newProfile.nickname"
             ></f7-list-input>
 
-            <f7-list-item class="ebk-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
+            <f7-list-item class="ebk-list-item-error-info" v-if="inputIsInvalid" :footer="tt(inputInvalidProblemMessage || '')"></f7-list-item>
         </f7-list>
 
         <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
@@ -91,8 +91,8 @@
                 class="list-item-with-header-and-title"
                 link="#" no-chevron
                 :class="{ 'disabled': !allVisibleAccounts.length }"
-                :header="$t('Default Account')"
-                :title="getNameByKeyValue(allAccounts, newProfile.defaultAccountId, 'id', 'name', $t('Unspecified'))"
+                :header="tt('Default Account')"
+                :title="Account.findAccountNameById(allAccounts, newProfile.defaultAccountId, tt('Unspecified'))"
                 @click="showAccountSheet = true"
             >
                 <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category"
@@ -111,9 +111,9 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Editable Transaction Range')"
-                :title="getNameByKeyValue(allTransactionEditScopeTypes, newProfile.transactionEditScope, 'type', 'displayName')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date Range'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Editable Transaction Range'), popupCloseLinkText: $t('Done') }"
+                :header="tt('Editable Transaction Range')"
+                :title="findDisplayNameByType(allTransactionEditScopeTypes, newProfile.transactionEditScope)"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Date Range'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Editable Transaction Range'), popupCloseLinkText: tt('Done') }"
             >
                 <select v-model="newProfile.transactionEditScope">
                     <option :value="option.type"
@@ -122,15 +122,15 @@
                 </select>
             </f7-list-item>
 
-            <f7-list-item class="ebk-list-item-error-info" v-if="extendInputIsInvalid" :footer="$t(extendInputInvalidProblemMessage)"></f7-list-item>
+            <f7-list-item class="ebk-list-item-error-info" v-if="extendInputIsInvalid" :footer="tt(extendInputInvalidProblemMessage || '')"></f7-list-item>
         </f7-list>
 
         <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Language')"
+                :header="tt('Language')"
                 :title="currentLanguageName"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Language'), popupCloseLinkText: $t('Done') }">
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Language'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Language'), popupCloseLinkText: tt('Done') }">
                 <select v-model="newProfile.language">
                     <option :value="language.languageTag"
                             :key="language.languageTag"
@@ -140,8 +140,8 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Default Currency')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Default Currency'), popupCloseLinkText: $t('Done') }"
+                :header="tt('Default Currency')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Currency Name'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Default Currency'), popupCloseLinkText: tt('Done') }"
             >
                 <template #title>
                     <f7-block class="no-padding no-margin">
@@ -158,9 +158,9 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('First Day of Week')"
+                :header="tt('First Day of Week')"
                 :title="currentDayOfWeekName"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('First Day of Week'), popupCloseLinkText: $t('Done') }"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Date'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('First Day of Week'), popupCloseLinkText: tt('Done') }"
             >
                 <select v-model="newProfile.firstDayOfWeek">
                     <option :value="weekDay.type"
@@ -173,9 +173,9 @@
         <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Long Date Format')"
-                :title="getNameByKeyValue(allLongDateFormats, newProfile.longDateFormat, 'type', 'displayName')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Long Date Format'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Long Date Format'), popupCloseLinkText: $t('Done') }"
+                :header="tt('Long Date Format')"
+                :title="findDisplayNameByType(allLongDateFormats, newProfile.longDateFormat)"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Long Date Format'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Long Date Format'), popupCloseLinkText: tt('Done') }"
             >
                 <select v-model="newProfile.longDateFormat">
                     <option :value="format.type"
@@ -186,9 +186,9 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Short Date Format')"
-                :title="getNameByKeyValue(allShortDateFormats, newProfile.shortDateFormat, 'type', 'displayName')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Short Date Format'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Short Date Format'), popupCloseLinkText: $t('Done') }"
+                :header="tt('Short Date Format')"
+                :title="findDisplayNameByType(allShortDateFormats, newProfile.shortDateFormat)"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Short Date Format'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Short Date Format'), popupCloseLinkText: tt('Done') }"
             >
                 <select v-model="newProfile.shortDateFormat">
                     <option :value="format.type"
@@ -199,9 +199,9 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Long Time Format')"
-                :title="getNameByKeyValue(allLongTimeFormats, newProfile.longTimeFormat, 'type', 'displayName')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Long Time Format'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Long Time Format'), popupCloseLinkText: $t('Done') }"
+                :header="tt('Long Time Format')"
+                :title="findDisplayNameByType(allLongTimeFormats, newProfile.longTimeFormat)"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Long Time Format'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Long Time Format'), popupCloseLinkText: tt('Done') }"
             >
                 <select v-model="newProfile.longTimeFormat">
                     <option :value="format.type"
@@ -212,9 +212,9 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Short Time Format')"
-                :title="getNameByKeyValue(allShortTimeFormats, newProfile.shortTimeFormat, 'type', 'displayName')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Short Time Format'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Short Time Format'), popupCloseLinkText: $t('Done') }"
+                :header="tt('Short Time Format')"
+                :title="findDisplayNameByType(allShortTimeFormats, newProfile.shortTimeFormat)"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Short Time Format'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Short Time Format'), popupCloseLinkText: tt('Done') }"
             >
                 <select v-model="newProfile.shortTimeFormat">
                     <option :value="format.type"
@@ -227,9 +227,9 @@
         <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Currency Display Mode')"
-                :title="getNameByKeyValue(allCurrencyDisplayTypes, newProfile.currencyDisplayType, 'type', 'displayName')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Display Mode'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Currency Display Mode'), popupCloseLinkText: $t('Done') }"
+                :header="tt('Currency Display Mode')"
+                :title="findDisplayNameByType(allCurrencyDisplayTypes, newProfile.currencyDisplayType)"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Currency Display Mode'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Currency Display Mode'), popupCloseLinkText: tt('Done') }"
             >
                 <select v-model="newProfile.currencyDisplayType">
                     <option :value="format.type"
@@ -240,9 +240,9 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Digit Grouping')"
-                :title="getNameByKeyValue(allDigitGroupingTypes, newProfile.digitGrouping, 'type', 'displayName')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Digit Grouping'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Digit Grouping'), popupCloseLinkText: $t('Done') }"
+                :header="tt('Digit Grouping')"
+                :title="findDisplayNameByType(allDigitGroupingTypes, newProfile.digitGrouping)"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Digit Grouping'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Digit Grouping'), popupCloseLinkText: tt('Done') }"
             >
                 <select v-model="newProfile.digitGrouping">
                     <option :value="format.type"
@@ -253,10 +253,10 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :disabled="!getNameByKeyValue(allDigitGroupingTypes, newProfile.digitGrouping, 'type', 'enabled')"
-                :header="$t('Digit Grouping Symbol')"
-                :title="getNameByKeyValue(allDigitGroupingSymbols, newProfile.digitGroupingSymbol, 'type', 'displayName')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Digit Grouping Symbol'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Digit Grouping Symbol'), popupCloseLinkText: $t('Done') }"
+                :disabled="!supportDigitGroupingSymbol"
+                :header="tt('Digit Grouping Symbol')"
+                :title="findDisplayNameByType(allDigitGroupingSymbols, newProfile.digitGroupingSymbol)"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Digit Grouping Symbol'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Digit Grouping Symbol'), popupCloseLinkText: tt('Done') }"
             >
                 <select v-model="newProfile.digitGroupingSymbol">
                     <option :value="format.type"
@@ -267,9 +267,9 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Decimal Separator')"
-                :title="getNameByKeyValue(allDecimalSeparators, newProfile.decimalSeparator, 'type', 'displayName')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Decimal Separator'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Decimal Separator'), popupCloseLinkText: $t('Done') }"
+                :header="tt('Decimal Separator')"
+                :title="findDisplayNameByType(allDecimalSeparators, newProfile.decimalSeparator)"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Decimal Separator'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Decimal Separator'), popupCloseLinkText: tt('Done') }"
             >
                 <select v-model="newProfile.decimalSeparator">
                     <option :value="format.type"
@@ -282,9 +282,9 @@
         <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Expense Amount Color')"
-                :title="getNameByKeyValue(allExpenseAmountColorTypes, newProfile.expenseAmountColor, 'type', 'displayName')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Color'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Expense Amount Color'), popupCloseLinkText: $t('Done') }"
+                :header="tt('Expense Amount Color')"
+                :title="findDisplayNameByType(allExpenseAmountColorTypes, newProfile.expenseAmountColor)"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Color'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Expense Amount Color'), popupCloseLinkText: tt('Done') }"
             >
                 <select v-model="newProfile.expenseAmountColor">
                     <option :value="format.type"
@@ -295,9 +295,9 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Income Amount Color')"
-                :title="getNameByKeyValue(allIncomeAmountColorTypes, newProfile.incomeAmountColor, 'type', 'displayName')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Color'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Income Amount Color'), popupCloseLinkText: $t('Done') }"
+                :header="tt('Income Amount Color')"
+                :title="findDisplayNameByType(allIncomeAmountColorTypes, newProfile.incomeAmountColor)"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Color'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Income Amount Color'), popupCloseLinkText: tt('Done') }"
             >
                 <select v-model="newProfile.incomeAmountColor">
                     <option :value="format.type"
@@ -306,22 +306,22 @@
                 </select>
             </f7-list-item>
 
-            <f7-list-item class="ebk-list-item-error-info" v-if="langAndRegionInputIsInvalid" :footer="$t(langAndRegionInputInvalidProblemMessage)"></f7-list-item>
+            <f7-list-item class="ebk-list-item-error-info" v-if="langAndRegionInputIsInvalid" :footer="tt(langAndRegionInputInvalidProblemMessage || '')"></f7-list-item>
         </f7-list>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
                 <f7-actions-button :class="{ 'disabled': loading || resending }" @click="resendVerifyEmail"
-                                   v-if="isUserVerifyEmailEnabled && !loading && !emailVerified"
-                >{{ $t('Resend Validation Email') }}</f7-actions-button>
+                                   v-if="isUserVerifyEmailEnabled() && !loading && !emailVerified"
+                >{{ tt('Resend Validation Email') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
-                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+                <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
             </f7-actions-group>
         </f7-actions>
 
-        <password-input-sheet :title="$t('Modify Password')"
-                              :hint="$t('Please enter your current password when modifying your password')"
+        <password-input-sheet :title="tt('Modify Password')"
+                              :hint="tt('Please enter your current password when modifying your password')"
                               :confirm-disabled="saving"
                               :cancel-disabled="saving"
                               v-model:show="showInputPasswordSheet"
@@ -331,356 +331,175 @@
     </f7-page>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import type { Router } from 'framework7/types';
+
+import { useI18n } from '@/locales/helpers.ts';
+import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
+import { useUserProfilePageBase } from '@/views/base/users/UserProfilePageBase.ts';
+
 import { useRootStore } from '@/stores/index.ts';
-import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
-import { useOverviewStore } from '@/stores/overview.ts';
 
-import { getNameByKeyValue } from '@/lib/common.ts';
-import { getCategorizedAccounts } from '@/lib/account.ts';
+import type { UserProfileResponse } from '@/models/user.ts';
+import { Account } from '@/models/account.ts';
+
+import { findDisplayNameByType } from '@/lib/common.ts';
 import { isUserVerifyEmailEnabled } from '@/lib/server_settings.ts';
-import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
-export default {
-    props: [
-        'f7router'
-    ],
-    data() {
-        return {
-            newProfile: {
-                password: '',
-                confirmPassword: '',
-                email: '',
-                nickname: '',
-                defaultAccountId: '',
-                transactionEditScope: 1,
-                language: '',
-                defaultCurrency: '',
-                firstDayOfWeek: 0,
-                longDateFormat: 0,
-                shortDateFormat: 0,
-                longTimeFormat: 0,
-                shortTimeFormat: 0,
-                decimalSeparator: 0,
-                digitGroupingSymbol: 0,
-                digitGrouping: 0,
-                currencyDisplayType: 0,
-                expenseAmountColor: 0,
-                incomeAmountColor: 0
-            },
-            oldProfile: {
-                email: '',
-                nickname: '',
-                defaultAccountId: '',
-                transactionEditScope: 1,
-                language: '',
-                defaultCurrency: '',
-                firstDayOfWeek: 0,
-                longDateFormat: 0,
-                shortDateFormat: 0,
-                longTimeFormat: 0,
-                shortTimeFormat: 0,
-                decimalSeparator: 0,
-                digitGroupingSymbol: 0,
-                digitGrouping: 0,
-                currencyDisplayType: 0,
-                expenseAmountColor: 0,
-                incomeAmountColor: 0
-            },
-            emailVerified: false,
-            currentPassword: '',
-            loading: true,
-            loadingError: null,
-            resending: false,
-            saving: false,
-            showInputPasswordSheet: false,
-            showAccountSheet: false,
-            showMoreActionSheet: false
-        };
-    },
-    computed: {
-        ...mapStores(useRootStore, useSettingsStore, useUserStore, useAccountsStore, useOverviewStore),
-        allLanguages() {
-            return this.$locale.getAllLanguageInfoArray(true);
-        },
-        allCurrencies() {
-            return this.$locale.getAllCurrencies();
-        },
-        allAccounts() {
-            return this.accountsStore.allPlainAccounts;
-        },
-        allVisibleAccounts() {
-            return this.accountsStore.allVisiblePlainAccounts;
-        },
-        allVisibleCategorizedAccounts() {
-            return getCategorizedAccounts(this.allVisibleAccounts);
-        },
-        allWeekDays() {
-            return this.$locale.getAllWeekDays();
-        },
-        allLongDateFormats() {
-            return this.$locale.getAllLongDateFormats();
-        },
-        allShortDateFormats() {
-            return this.$locale.getAllShortDateFormats();
-        },
-        allLongTimeFormats() {
-            return this.$locale.getAllLongTimeFormats();
-        },
-        allShortTimeFormats() {
-            return this.$locale.getAllShortTimeFormats();
-        },
-        allDecimalSeparators() {
-            return this.$locale.getAllDecimalSeparators();
-        },
-        allDigitGroupingSymbols() {
-            return this.$locale.getAllDigitGroupingSymbols();
-        },
-        allDigitGroupingTypes() {
-            return this.$locale.getAllDigitGroupingTypes();
-        },
-        allCurrencyDisplayTypes() {
-            return this.$locale.getAllCurrencyDisplayTypes(this.settingsStore, this.userStore);
-        },
-        allExpenseAmountColorTypes() {
-            return this.$locale.getAllExpenseAmountColors();
-        },
-        allIncomeAmountColorTypes() {
-            return this.$locale.getAllIncomeAmountColors();
-        },
-        allTransactionEditScopeTypes() {
-            return this.$locale.getAllTransactionEditScopeTypes();
-        },
-        currentLanguageName() {
-            for (let i = 0; i < this.allLanguages.length; i++) {
-                if (this.allLanguages[i].languageTag === this.newProfile.language) {
-                    return this.allLanguages[i].displayName;
-                }
-            }
+const props = defineProps<{
+    f7router: Router.Router;
+}>();
 
-            return this.$t('Unknown');
-        },
-        currentDayOfWeekName() {
-            return getNameByKeyValue(this.allWeekDays, this.newProfile.firstDayOfWeek, 'type', 'displayName');
-        },
-        isUserVerifyEmailEnabled() {
-            return isUserVerifyEmailEnabled();
-        },
-        inputIsNotChanged() {
-            return !!this.inputIsNotChangedProblemMessage;
-        },
-        inputIsInvalid() {
-            return !!this.inputInvalidProblemMessage;
-        },
-        extendInputIsInvalid() {
-            return !!this.extendInputInvalidProblemMessage;
-        },
-        langAndRegionInputIsInvalid() {
-            return !!this.langAndRegionInputInvalidProblemMessage;
-        },
-        inputIsNotChangedProblemMessage() {
-            if (!this.newProfile.password && !this.newProfile.confirmPassword && !this.newProfile.email && !this.newProfile.nickname) {
-                return 'Nothing has been modified';
-            } else if (!this.newProfile.password && !this.newProfile.confirmPassword &&
-                this.newProfile.email === this.oldProfile.email &&
-                this.newProfile.nickname === this.oldProfile.nickname &&
-                this.newProfile.defaultAccountId === this.oldProfile.defaultAccountId &&
-                this.newProfile.transactionEditScope === this.oldProfile.transactionEditScope &&
-                this.newProfile.language === this.oldProfile.language &&
-                this.newProfile.defaultCurrency === this.oldProfile.defaultCurrency &&
-                this.newProfile.firstDayOfWeek === this.oldProfile.firstDayOfWeek &&
-                this.newProfile.longDateFormat === this.oldProfile.longDateFormat &&
-                this.newProfile.shortDateFormat === this.oldProfile.shortDateFormat &&
-                this.newProfile.longTimeFormat === this.oldProfile.longTimeFormat &&
-                this.newProfile.shortTimeFormat === this.oldProfile.shortTimeFormat &&
-                this.newProfile.decimalSeparator === this.oldProfile.decimalSeparator &&
-                this.newProfile.digitGroupingSymbol === this.oldProfile.digitGroupingSymbol &&
-                this.newProfile.digitGrouping === this.oldProfile.digitGrouping &&
-                this.newProfile.currencyDisplayType === this.oldProfile.currencyDisplayType &&
-                this.newProfile.expenseAmountColor === this.oldProfile.expenseAmountColor &&
-                this.newProfile.incomeAmountColor === this.oldProfile.incomeAmountColor) {
-                return 'Nothing has been modified';
-            } else if (!this.newProfile.password && this.newProfile.confirmPassword) {
-                return 'Password cannot be blank';
-            } else if (this.newProfile.password && !this.newProfile.confirmPassword) {
-                return 'Password confirmation cannot be blank';
-            } else {
-                return null;
-            }
-        },
-        inputInvalidProblemMessage() {
-            if (this.newProfile.password && this.newProfile.confirmPassword && this.newProfile.password !== this.newProfile.confirmPassword) {
-                return 'Password and password confirmation do not match';
-            } else if (!this.newProfile.email) {
-                return 'Email address cannot be blank';
-            } else if (!this.newProfile.nickname) {
-                return 'Nickname cannot be blank';
-            } else if (!this.newProfile.defaultCurrency) {
-                return 'Default currency cannot be blank';
-            } else {
-                return null;
-            }
-        },
-        extendInputInvalidProblemMessage() {
-            return null;
-        },
-        langAndRegionInputInvalidProblemMessage() {
-            if (!this.newProfile.defaultCurrency) {
-                return 'Default currency cannot be blank';
-            } else {
-                return null;
-            }
-        }
-    },
-    created() {
-        const self = this;
+const { tt, getCurrencyName } = useI18n();
+const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
-        self.loading = true;
+const {
+    newProfile,
+    emailVerified,
+    loading,
+    resending,
+    saving,
+    allLanguages,
+    allCurrencies,
+    allAccounts,
+    allVisibleAccounts,
+    allVisibleCategorizedAccounts,
+    allWeekDays,
+    allLongDateFormats,
+    allShortDateFormats,
+    allLongTimeFormats,
+    allShortTimeFormats,
+    allDecimalSeparators,
+    allDigitGroupingSymbols,
+    allDigitGroupingTypes,
+    allCurrencyDisplayTypes,
+    allExpenseAmountColorTypes,
+    allIncomeAmountColorTypes,
+    allTransactionEditScopeTypes,
+    supportDigitGroupingSymbol,
+    inputIsNotChangedProblemMessage,
+    inputInvalidProblemMessage,
+    langAndRegionInputInvalidProblemMessage,
+    extendInputInvalidProblemMessage,
+    inputIsNotChanged,
+    inputIsInvalid,
+    langAndRegionInputIsInvalid,
+    extendInputIsInvalid,
+    setCurrentUserProfile,
+    doAfterProfileUpdate
+} = useUserProfilePageBase();
 
-        const promises = [
-            self.accountsStore.loadAllAccounts({ force: false }),
-            self.userStore.getCurrentUserProfile()
-        ];
+const rootStore = useRootStore();
+const userStore = useUserStore();
+const accountsStore = useAccountsStore();
 
-        Promise.all(promises).then(responses => {
-            const profile = responses[1];
-            self.setCurrentUserProfile(profile);
-            self.loading = false;
-        }).catch(error => {
-            if (error.processed) {
-                self.loading = false;
-            } else {
-                self.loadingError = error;
-                self.$toast(error.message || error);
-            }
-        });
-    },
-    methods: {
-        onPageAfterIn() {
-            this.$routeBackOnError(this.f7router, 'loadingError');
-        },
-        save() {
-            const self = this;
-            const router = self.f7router;
+const currentPassword = ref<string>('');
+const loadingError = ref<unknown | null>(null);
+const showInputPasswordSheet = ref<boolean>(false);
+const showAccountSheet = ref<boolean>(false);
+const showMoreActionSheet = ref<boolean>(false);
 
-            self.showInputPasswordSheet = false;
-
-            const problemMessage = self.inputIsNotChangedProblemMessage || self.inputInvalidProblemMessage || self.extendInputInvalidProblemMessage || self.langAndRegionInputInvalidProblemMessage;
-
-            if (problemMessage) {
-                self.$alert(problemMessage);
-                return;
-            }
-
-            if (self.newProfile.password && !self.currentPassword) {
-                self.showInputPasswordSheet = true;
-                return;
-            }
-
-            self.saving = true;
-            self.$showLoading(() => self.saving);
-
-            self.rootStore.updateUserProfile({
-                profile: self.newProfile,
-                currentPassword: self.currentPassword
-            }).then(response => {
-                self.saving = false;
-                self.$hideLoading();
-                self.currentPassword = '';
-
-                if (response.user) {
-                    if (response.user.firstDayOfWeek !== self.oldProfile.firstDayOfWeek) {
-                        this.overviewStore.resetTransactionOverview();
-                    }
-
-                    self.setCurrentUserProfile(response.user);
-
-                    const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
-                    self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-
-                    setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
-                }
-
-                self.$toast('Your profile has been successfully updated');
-                router.back();
-            }).catch(error => {
-                self.saving = false;
-                self.$hideLoading();
-                self.currentPassword = '';
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        resendVerifyEmail() {
-            const self = this;
-
-            self.resending = true;
-            self.$showLoading(() => self.resending);
-
-            self.rootStore.resendVerifyEmailByLoginedUser().then(() => {
-                self.resending = false;
-                self.$hideLoading();
-
-                self.$toast('Validation email has been sent');
-            }).catch(error => {
-                self.resending = false;
-                self.$hideLoading();
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        getNameByKeyValue(src, value, keyField, nameField, defaultName) {
-            return getNameByKeyValue(src, value, keyField, nameField, defaultName);
-        },
-        getCurrencyName(currencyCode) {
-            return this.$locale.getCurrencyName(currencyCode);
-        },
-        setCurrentUserProfile(profile) {
-            this.emailVerified = profile.emailVerified;
-
-            this.oldProfile.email = profile.email;
-            this.oldProfile.nickname = profile.nickname;
-            this.oldProfile.defaultAccountId = profile.defaultAccountId;
-            this.oldProfile.transactionEditScope = profile.transactionEditScope;
-            this.oldProfile.language = profile.language;
-            this.oldProfile.defaultCurrency = profile.defaultCurrency;
-            this.oldProfile.firstDayOfWeek = profile.firstDayOfWeek;
-            this.oldProfile.longDateFormat = profile.longDateFormat;
-            this.oldProfile.shortDateFormat = profile.shortDateFormat;
-            this.oldProfile.longTimeFormat = profile.longTimeFormat;
-            this.oldProfile.shortTimeFormat = profile.shortTimeFormat;
-            this.oldProfile.decimalSeparator = profile.decimalSeparator;
-            this.oldProfile.digitGroupingSymbol = profile.digitGroupingSymbol;
-            this.oldProfile.digitGrouping = profile.digitGrouping;
-            this.oldProfile.currencyDisplayType = profile.currencyDisplayType;
-            this.oldProfile.expenseAmountColor = profile.expenseAmountColor;
-            this.oldProfile.incomeAmountColor = profile.incomeAmountColor;
-
-            this.newProfile.email = this.oldProfile.email
-            this.newProfile.nickname = this.oldProfile.nickname;
-            this.newProfile.defaultAccountId = this.oldProfile.defaultAccountId;
-            this.newProfile.transactionEditScope = this.oldProfile.transactionEditScope;
-            this.newProfile.language = this.oldProfile.language;
-            this.newProfile.defaultCurrency = this.oldProfile.defaultCurrency;
-            this.newProfile.firstDayOfWeek = this.oldProfile.firstDayOfWeek;
-            this.newProfile.longDateFormat = this.oldProfile.longDateFormat;
-            this.newProfile.shortDateFormat = this.oldProfile.shortDateFormat;
-            this.newProfile.longTimeFormat = this.oldProfile.longTimeFormat;
-            this.newProfile.shortTimeFormat = this.oldProfile.shortTimeFormat;
-            this.newProfile.decimalSeparator = this.oldProfile.decimalSeparator;
-            this.newProfile.digitGroupingSymbol = this.oldProfile.digitGroupingSymbol;
-            this.newProfile.digitGrouping = this.oldProfile.digitGrouping;
-            this.newProfile.currencyDisplayType = this.oldProfile.currencyDisplayType;
-            this.newProfile.expenseAmountColor = this.oldProfile.expenseAmountColor;
-            this.newProfile.incomeAmountColor = this.oldProfile.incomeAmountColor;
+const currentLanguageName = computed<string>(() => {
+    for (let i = 0; i < allLanguages.value.length; i++) {
+        if (allLanguages.value[i].languageTag === newProfile.value.language) {
+            return allLanguages.value[i].displayName;
         }
     }
-};
+
+    return tt('Unknown');
+});
+
+const currentDayOfWeekName = computed<string | null>(() => findDisplayNameByType(allWeekDays.value, newProfile.value.firstDayOfWeek));
+
+function init(): void {
+    loading.value = true;
+
+    const promises = [
+        accountsStore.loadAllAccounts({ force: false }),
+        userStore.getCurrentUserProfile()
+    ];
+
+    Promise.all(promises).then(responses => {
+        const profile = responses[1] as UserProfileResponse;
+        setCurrentUserProfile(profile);
+        loading.value = false;
+    }).catch(error => {
+        if (error.processed) {
+            loading.value = false;
+        } else {
+            loadingError.value = error;
+            showToast(error.message || error);
+        }
+    });
+}
+
+function save(): void {
+    const router = props.f7router;
+
+    showInputPasswordSheet.value = false;
+
+    const problemMessage = inputIsNotChangedProblemMessage.value || inputInvalidProblemMessage.value || extendInputInvalidProblemMessage.value || langAndRegionInputInvalidProblemMessage.value;
+
+    if (problemMessage) {
+        showAlert(problemMessage);
+        return;
+    }
+
+    if (newProfile.value.password && !currentPassword.value) {
+        showInputPasswordSheet.value = true;
+        return;
+    }
+
+    saving.value = true;
+    showLoading(() => saving.value);
+
+    rootStore.updateUserProfile({
+        profile: newProfile.value,
+        currentPassword: currentPassword.value
+    }).then(response => {
+        saving.value = false;
+        hideLoading();
+        currentPassword.value = '';
+
+        doAfterProfileUpdate(response.user);
+        showToast('Your profile has been successfully updated');
+        router.back();
+    }).catch(error => {
+        saving.value = false;
+        hideLoading();
+        currentPassword.value = '';
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function resendVerifyEmail(): void {
+    resending.value = true;
+    showLoading(() => resending.value);
+
+    rootStore.resendVerifyEmailByLoginedUser().then(() => {
+        resending.value = false;
+        hideLoading();
+
+        showToast('Validation email has been sent');
+    }).catch(error => {
+        resending.value = false;
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function onPageAfterIn(): void {
+    routeBackOnError(props.f7router, loadingError);
+}
+
+init();
 </script>

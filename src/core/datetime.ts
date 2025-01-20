@@ -62,6 +62,12 @@ export interface LocalizedMeridiemIndicator {
     readonly displayValues: string[];
 }
 
+export interface LocalizedDateTimeFormat extends TypeAndDisplayName {
+    readonly type: number;
+    readonly format: string;
+    readonly displayName: string;
+}
+
 export interface LocalizedDateRange extends TypeAndDisplayName {
     readonly type: number;
     readonly displayName: string;

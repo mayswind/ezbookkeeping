@@ -19,6 +19,7 @@ import type {
 
 import {
     isObject,
+    isString,
     isNumber
 } from '@/lib/common.ts';
 
@@ -289,12 +290,20 @@ export const useUserStore = defineStore('user', () => {
         });
     }
 
-    function getUserAvatarUrl(userInfo: UserBasicInfo, disableBrowserCache: boolean | string): string | null {
-        if (!userInfo || !userInfo.avatar) {
+    function getUserAvatarUrl(userInfoOrAvatarUrl: UserBasicInfo | string, disableBrowserCache: boolean | string): string | null {
+        let avatarUrl = '';
+
+        if (isObject(userInfoOrAvatarUrl)) {
+            avatarUrl = userInfoOrAvatarUrl.avatar;
+        } else if (isString(userInfoOrAvatarUrl)) {
+            avatarUrl = userInfoOrAvatarUrl;
+        }
+
+        if (!avatarUrl) {
             return null;
         }
 
-        return services.getInternalAvatarUrlWithToken(userInfo.avatar, disableBrowserCache);
+        return services.getInternalAvatarUrlWithToken(avatarUrl, disableBrowserCache);
     }
 
     return {

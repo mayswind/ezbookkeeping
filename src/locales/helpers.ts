@@ -9,6 +9,7 @@ import {
     type DateFormat,
     type TimeFormat,
     type LocalizedMeridiemIndicator,
+    type LocalizedDateTimeFormat,
     type LocalizedDateRange,
     type LocalizedRecentMonthDateRange,
     Month,
@@ -19,7 +20,8 @@ import {
     LongTimeFormat,
     ShortTimeFormat,
     DateRange,
-    DateRangeScene
+    DateRangeScene,
+    LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE
 } from '@/core/datetime.ts';
 
 import {
@@ -43,6 +45,10 @@ import {
     CurrencyDisplayType,
     CurrencySortingType
 } from '@/core/currency.ts';
+
+import {
+    PresetAmountColor
+} from '@/core/color.ts';
 
 import {
     type LocalizedAccountCategory,
@@ -98,6 +104,7 @@ import {
 import {
     isPM,
     formatUnixTime,
+    formatCurrentTime,
     getTimezoneOffset,
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffset,
@@ -706,6 +713,30 @@ export function useI18n() {
         return ret;
     }
 
+    function getLocalizedDateTimeFormats<T extends DateFormat | TimeFormat>(type: string, allFormatMap: Record<string, T>, allFormatArray: T[], languageDefaultTypeNameKey: string, systemDefaultFormatType: T): LocalizedDateTimeFormat[] {
+        const defaultFormat = getLocalizedDateTimeFormat<T>(type, allFormatMap, allFormatArray, LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE, languageDefaultTypeNameKey, systemDefaultFormatType);
+        const ret: LocalizedDateTimeFormat[] = [];
+
+        ret.push({
+            type: LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE,
+            format: defaultFormat,
+            displayName: `${t('Language Default')} (${formatCurrentTime(defaultFormat)})`
+        });
+
+        for (let i = 0; i < allFormatArray.length; i++) {
+            const formatType = allFormatArray[i];
+            const format = t(`format.${type}.${formatType.key}`);
+
+            ret.push({
+                type: formatType.type,
+                format: format,
+                displayName: formatCurrentTime(format)
+            });
+        }
+
+        return ret;
+    }
+
     function getAllDateRanges(scene: DateRangeScene, includeCustom?: boolean, includeBillingCycle?: boolean): LocalizedDateRange[] {
         const ret: LocalizedDateRange[] = [];
         const allDateRanges = DateRange.values();
@@ -863,6 +894,39 @@ export function useI18n() {
                 type: type.type,
                 enabled: type.enabled,
                 displayName: t('numeral.' + type.name)
+            });
+        }
+
+        return ret;
+    }
+
+    function getAllExpenseIncomeAmountColors(categoryType: CategoryType): TypeAndDisplayName[] {
+        const ret: TypeAndDisplayName[] = [];
+        let defaultAmountName = '';
+
+        if (categoryType === CategoryType.Expense) {
+            defaultAmountName = PresetAmountColor.DefaultExpenseColor.name;
+        } else if (categoryType === CategoryType.Income) { // income
+            defaultAmountName = PresetAmountColor.DefaultIncomeColor.name;
+        }
+
+        if (defaultAmountName) {
+            defaultAmountName = t('color.amount.' + defaultAmountName);
+        }
+
+        ret.push({
+            type: PresetAmountColor.SystemDefaultType,
+            displayName: t('System Default') + (defaultAmountName ? ` (${defaultAmountName})` : '')
+        });
+
+        const allPresetAmountColors = PresetAmountColor.values();
+
+        for (let i = 0; i < allPresetAmountColors.length; i++) {
+            const amountColor = allPresetAmountColors[i];
+
+            ret.push({
+                type: amountColor.type,
+                displayName: t('color.amount.' + amountColor.name)
             });
         }
 
@@ -1359,6 +1423,10 @@ export function useI18n() {
         getAllShortWeekdayNames,
         getAllMinWeekdayNames,
         getAllWeekDays,
+        getAllLongDateFormats: () => getLocalizedDateTimeFormats<LongDateFormat>('longDate', LongDateFormat.all(), LongDateFormat.values(), 'longDateFormat', LongDateFormat.Default),
+        getAllShortDateFormats: () => getLocalizedDateTimeFormats<ShortDateFormat>('shortDate', ShortDateFormat.all(), ShortDateFormat.values(), 'shortDateFormat', ShortDateFormat.Default),
+        getAllLongTimeFormats: () => getLocalizedDateTimeFormats<LongTimeFormat>('longTime', LongTimeFormat.all(), LongTimeFormat.values(), 'longTimeFormat', LongTimeFormat.Default),
+        getAllShortTimeFormats: () => getLocalizedDateTimeFormats<ShortTimeFormat>('shortTime', ShortTimeFormat.all(), ShortTimeFormat.values(), 'shortTimeFormat', ShortTimeFormat.Default),
         getAllDateRanges,
         getAllRecentMonthDateRanges,
         getAllTimezones,
@@ -1368,6 +1436,8 @@ export function useI18n() {
         getAllDigitGroupingTypes,
         getAllCurrencyDisplayTypes,
         getAllCurrencySortingTypes: () => getLocalizedDisplayNameAndType(CurrencySortingType.values()),
+        getAllExpenseAmountColors: () => getAllExpenseIncomeAmountColors(CategoryType.Expense),
+        getAllIncomeAmountColors: () => getAllExpenseIncomeAmountColors(CategoryType.Income),
         getAllAccountCategories,
         getAllAccountTypes: () => getLocalizedDisplayNameAndType(AccountType.values()),
         getAllCategoricalChartTypes: () => getLocalizedDisplayNameAndType(CategoricalChartType.values()),

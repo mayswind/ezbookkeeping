@@ -372,27 +372,7 @@ export const useRootStore = defineStore('root', () => {
 
     function updateUserProfile({ profile, currentPassword }: { profile: User, currentPassword?: string }): Promise<UserProfileUpdateResponse> {
         return new Promise((resolve, reject) => {
-            services.updateProfile({
-                password: profile.password,
-                oldPassword: currentPassword,
-                email: profile.email,
-                nickname: profile.nickname,
-                defaultAccountId: profile.defaultAccountId,
-                transactionEditScope: profile.transactionEditScope,
-                language: profile.language,
-                defaultCurrency: profile.defaultCurrency,
-                firstDayOfWeek: profile.firstDayOfWeek,
-                longDateFormat: profile.longDateFormat,
-                shortDateFormat: profile.shortDateFormat,
-                longTimeFormat: profile.longTimeFormat,
-                shortTimeFormat: profile.shortTimeFormat,
-                decimalSeparator: profile.decimalSeparator,
-                digitGroupingSymbol: profile.digitGroupingSymbol,
-                digitGrouping: profile.digitGrouping,
-                currencyDisplayType: profile.currencyDisplayType,
-                expenseAmountColor: profile.expenseAmountColor,
-                incomeAmountColor: profile.incomeAmountColor
-            }).then(response => {
+            services.updateProfile(profile.toProfileUpdateRequest(currentPassword)).then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {

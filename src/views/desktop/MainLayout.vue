@@ -210,8 +210,6 @@ import { ThemeType } from '@/core/theme.ts';
 import { isUserScheduledTransactionEnabled } from '@/lib/server_settings.ts';
 import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
-
 import {
     mdiMenu,
     mdiHomeOutline,
@@ -234,6 +232,8 @@ import {
     mdiLockOutline,
     mdiLogout
 } from '@mdi/js';
+
+type SnackBarType = InstanceType<typeof SnackBar>;
 
 const display = useDisplay();
 const theme = useTheme();
@@ -277,21 +277,11 @@ const showVerticalOverlayMenu = ref<boolean>(false);
 const showLoading = ref<boolean>(false);
 const showMobileQrCode = ref<boolean>(false);
 
-const mdAndDown = computed<boolean>(() => {
-    return display.mdAndDown.value;
-});
+const mdAndDown = computed<boolean>(() => display.mdAndDown.value);
+const currentRoutePath = computed<string>(() => route.path);
 
-const currentRoutePath = computed<string>(() => {
-    return route.path;
-});
-
-const currentNickName = computed<string>(() => {
-    return userStore.currentUserNickname || tt('User');
-});
-
-const currentUserAvatar = computed<string | null>(() => {
-    return userStore.getUserAvatarUrl(userStore.currentUserBasicInfo, true);
-});
+const currentNickName = computed<string>(() => userStore.currentUserNickname || tt('User'));
+const currentUserAvatar = computed<string | null>(() => userStore.getUserAvatarUrl(userStore.currentUserBasicInfo, true));
 
 const currentTheme = computed<string>({
     get: () => {
@@ -310,9 +300,7 @@ const currentTheme = computed<string>({
     }
 });
 
-const isEnableApplicationLock = computed<boolean>(() => {
-    return settingsStore.appSettings.applicationLock;
-});
+const isEnableApplicationLock = computed<boolean>(() => settingsStore.appSettings.applicationLock);
 
 function handleNavScroll(e: Event): void {
     isVerticalNavScrolled.value = (e.target as HTMLElement).scrollTop > 0;

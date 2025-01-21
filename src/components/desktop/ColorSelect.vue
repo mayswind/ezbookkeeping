@@ -72,9 +72,7 @@ const icons = {
 const dropdownMenu = useTemplateRef<HTMLElement>('dropdownMenu');
 const itemPerRow = ref<number>(props.columnCount || 7);
 
-const allColorRows = computed<ColorInfo[][]>(() => {
-    return getColorsInRows(props.allColorInfos, itemPerRow.value);
-});
+const allColorRows = computed<ColorInfo[][]>(() => getColorsInRows(props.allColorInfos, itemPerRow.value));
 
 const color = computed<ColorValue>({
     get: () => props.modelValue,

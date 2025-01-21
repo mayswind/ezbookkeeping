@@ -99,9 +99,7 @@ const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWee
 const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllMinWeekdayNames(), firstDayOfWeek.value));
 const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
 const is24Hour = computed<boolean>(() => isLongTime24HourFormat());
-const displayTime = computed<string>(() => {
-    return formatUnixTimeToLongDateTime(getActualUnixTimeForStore(getUnixTime(dateTime.value), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
-});
+const displayTime = computed<string>(() => formatUnixTimeToLongDateTime(getActualUnixTimeForStore(getUnixTime(dateTime.value), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())));
 </script>
 
 <style>

@@ -98,9 +98,7 @@ const pinCode = ref<string>('');
 const enablingWebAuthn = ref<boolean>(false);
 const transactionsStore = useTransactionsStore();
 
-const pinCodeValid = computed<boolean>(() => {
-    return pinCode.value?.length === 6 || false;
-});
+const pinCodeValid = computed<boolean>(() => pinCode.value?.length === 6 || false);
 
 function confirm(): void {
     if (isEnableApplicationLock.value) {

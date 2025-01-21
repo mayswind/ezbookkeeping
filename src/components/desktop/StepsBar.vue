@@ -63,9 +63,7 @@ const emit = defineEmits<{
     (e: 'step:change', stepName: string): void;
 }>();
 
-const isClickable = computed<boolean>(() => {
-    return props.clickable !== 'false' && props.clickable !== false;
-});
+const isClickable = computed<boolean>(() => props.clickable !== 'false' && props.clickable !== false);
 
 function changeStep(step: StepBarItem): void {
     if (isClickable.value) {

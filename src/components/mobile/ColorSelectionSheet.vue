@@ -55,9 +55,7 @@ const { tt } = useI18n();
 const currentValue = ref<ColorValue>(props.modelValue);
 const itemPerRow = ref<number>(props.columnCount || 7);
 
-const allColorRows = computed<ColorInfo[][]>(() => {
-    return getColorsInRows(props.allColorInfos, itemPerRow.value);
-});
+const allColorRows = computed<ColorInfo[][]>(() => getColorsInRows(props.allColorInfos, itemPerRow.value));
 
 function onColorClicked(colorInfo: ColorInfo): void {
     currentValue.value = colorInfo.color;

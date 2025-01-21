@@ -56,9 +56,7 @@ const { tt } = useI18n();
 const currentValue = ref<string>(props.modelValue);
 const itemPerRow = ref<number>(props.columnCount || 7);
 
-const allIconRows = computed<IconInfoWithId[][]>(() => {
-    return getIconsInRows(props.allIconInfos, itemPerRow.value);
-});
+const allIconRows = computed<IconInfoWithId[][]>(() => getIconsInRows(props.allIconInfos, itemPerRow.value));
 
 const heightClass = computed<string>(() => {
     if (allIconRows.value.length > 10) {

@@ -410,9 +410,7 @@ const avatarUrl = ref<string>('');
 const avatarProvider = ref<string | undefined>('');
 const avatarNoCacheId = ref<string>('');
 
-const currentUserAvatar = computed<string | null>(() => {
-    return userStore.getUserAvatarUrl(avatarUrl.value, avatarNoCacheId.value);
-});
+const currentUserAvatar = computed<string | null>(() => userStore.getUserAvatarUrl(avatarUrl.value, avatarNoCacheId.value));
 
 function init(): void {
     loading.value = true;

@@ -34,13 +34,8 @@ const initCenter = ref<MapPosition>({
 });
 const zoomLevel = ref<number>(1);
 
-const mapSupported = computed<boolean>(() => {
-    return !!mapInstance.value;
-});
-
-const mapDependencyLoaded = computed<boolean>(() => {
-    return mapInstance.value?.dependencyLoaded || false;
-});
+const mapSupported = computed<boolean>(() => !!mapInstance.value);
+const mapDependencyLoaded = computed<boolean>(() => mapInstance.value?.dependencyLoaded || false);
 
 const finalMapStyle = computed<Record<string, unknown>>(() => {
     const styles: Record<string, unknown> = copyObjectTo(props.mapStyle, {});

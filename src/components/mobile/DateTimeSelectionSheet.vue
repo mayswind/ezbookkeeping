@@ -109,9 +109,7 @@ const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode 
 const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
 const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllMinWeekdayNames(), firstDayOfWeek.value));
 const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
-const displayTime = computed<string>(() => {
-    return formatUnixTimeToLongDateTime(getActualUnixTimeForStore(getUnixTime(dateTime.value), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
-});
+const displayTime = computed<string>(() => formatUnixTimeToLongDateTime(getActualUnixTimeForStore(getUnixTime(dateTime.value), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())));
 const switchButtonTitle = computed<string>(() => mode.value === 'time' ? 'Date' : 'Time');
 
 function switchMode(): void {

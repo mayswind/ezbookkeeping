@@ -70,9 +70,7 @@ const icons = {
 const dropdownMenu = useTemplateRef<HTMLElement>('dropdownMenu');
 const itemPerRow = ref<number>(props.columnCount || 7);
 
-const allIconRows = computed<IconInfoWithId[][]>(() => {
-    return getIconsInRows(props.allIconInfos, itemPerRow.value);
-});
+const allIconRows = computed<IconInfoWithId[][]>(() => getIconsInRows(props.allIconInfos, itemPerRow.value));
 
 const icon = computed<string>({
     get: () => props.modelValue,

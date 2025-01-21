@@ -50,9 +50,7 @@ const { tt } = useI18n();
 
 const currentPinCode = ref<string>('');
 
-const currentPinCodeValid = computed<boolean>(() => {
-    return currentPinCode.value?.length === 6 || false;
-});
+const currentPinCodeValid = computed<boolean>(() => currentPinCode.value?.length === 6 || false);
 
 function confirm(): void {
     if (!currentPinCodeValid.value || props.confirmDisabled) {

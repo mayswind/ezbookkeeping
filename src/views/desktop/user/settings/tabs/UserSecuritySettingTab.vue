@@ -1,10 +1,10 @@
 <template>
     <v-row>
         <v-col cols="12">
-            <v-card :class="{ 'disabled': updatingPassword }" :title="$t('Modify Password')">
+            <v-card :class="{ 'disabled': updatingPassword }" :title="tt('Modify Password')">
                 <v-form>
                     <v-card-text class="pt-0">
-                        <span class="text-body-1">{{ $t('After changing the password, other devices will be logged out. Please use the new password to log in on other devices.') }}</span>
+                        <span class="text-body-1">{{ tt('After changing the password, other devices will be logged out. Please use the new password to log in on other devices.') }}</span>
                     </v-card-text>
 
                     <v-card-text>
@@ -15,8 +15,8 @@
                                     ref="currentPasswordInput"
                                     type="password"
                                     :disabled="updatingPassword"
-                                    :label="$t('Current Password')"
-                                    :placeholder="$t('Current Password')"
+                                    :label="tt('Current Password')"
+                                    :placeholder="tt('Current Password')"
                                     v-model="currentPassword"
                                     @keyup.enter="$refs.newPasswordInput.focus()"
                                 />
@@ -30,8 +30,8 @@
                                     ref="newPasswordInput"
                                     type="password"
                                     :disabled="updatingPassword"
-                                    :label="$t('New Password')"
-                                    :placeholder="$t('New Password')"
+                                    :label="tt('New Password')"
+                                    :placeholder="tt('New Password')"
                                     v-model="newPassword"
                                     @keyup.enter="$refs.confirmPasswordInput.focus()"
                                 />
@@ -44,8 +44,8 @@
                                     ref="confirmPasswordInput"
                                     type="password"
                                     :disabled="updatingPassword"
-                                    :label="$t('Confirm Password')"
-                                    :placeholder="$t('Re-enter the password')"
+                                    :label="tt('Confirm Password')"
+                                    :placeholder="tt('Re-enter the password')"
                                     v-model="confirmPassword"
                                     @keyup.enter="updatePassword"
                                 />
@@ -55,7 +55,7 @@
 
                     <v-card-text class="d-flex flex-wrap gap-4">
                         <v-btn :disabled="!currentPassword || !newPassword || !confirmPassword || updatingPassword" @click="updatePassword">
-                            {{ $t('Save Changes') }}
+                            {{ tt('Save Changes') }}
                             <v-progress-circular indeterminate size="22" class="ml-2" v-if="updatingPassword"></v-progress-circular>
                         </v-btn>
                     </v-card-text>
@@ -67,14 +67,14 @@
             <v-card :class="{ 'disabled': loadingSession }">
                 <template #title>
                     <div class="d-flex align-center">
-                        <span>{{ $t('Device & Sessions') }}</span>
+                        <span>{{ tt('Device & Sessions') }}</span>
                         <v-btn density="compact" color="default" variant="text" size="24"
-                               class="ml-2" :icon="true" :loading="loadingSession" @click="reloadSessions">
+                               class="ml-2" :icon="true" :loading="loadingSession" @click="reloadSessions(false)">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
                             <v-icon :icon="icons.refresh" size="24" />
-                            <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
+                            <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                         </v-btn>
                     </div>
                 </template>
@@ -82,14 +82,14 @@
                 <v-table class="table-striped text-no-wrap" :hover="!loadingSession">
                     <thead>
                     <tr>
-                        <th>{{ $t('Type') }}</th>
-                        <th>{{ $t('Device Info') }}</th>
-                        <th>{{ $t('Last Activity Time') }}</th>
+                        <th>{{ tt('Type') }}</th>
+                        <th>{{ tt('Device Info') }}</th>
+                        <th>{{ tt('Last Activity Time') }}</th>
                         <th class="text-right">
                             <v-btn density="comfortable" color="error" variant="tonal"
                                    :disabled="sessions.length < 2 || loadingSession"
                                    @click="revokeAllSessions">
-                                {{ $t('Logout All') }}
+                                {{ tt('Logout All') }}
                             </v-btn>
                         </th>
                     </tr>
@@ -106,7 +106,7 @@
                         v-for="session in sessions">
                         <td class="text-sm">
                             <v-icon start :icon="session.icon"/>
-                            {{ $t(session.isCurrent ? 'Current' : 'Other Device') }}
+                            {{ tt(session.isCurrent ? 'Current' : 'Other Device') }}
                         </td>
                         <td class="text-sm">{{ session.deviceInfo }}</td>
                         <td class="text-sm">{{ session.lastSeenDateTime }}</td>
@@ -114,7 +114,7 @@
                             <v-btn density="comfortable" color="error" variant="tonal"
                                    :disabled="session.isCurrent || loadingSession"
                                    @click="revokeSession(session)">
-                                {{ $t('Log Out') }}
+                                {{ tt('Log Out') }}
                             </v-btn>
                         </td>
                     </tr>
@@ -128,12 +128,19 @@
     <snack-bar ref="snackbar" />
 </template>
 
-<script>
-import { mapStores } from 'pinia';
+<script setup lang="ts">
+import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { ref, computed, useTemplateRef } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+
 import { useRootStore } from '@/stores/index.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
-import { useUserStore } from '@/stores/user.ts';
 import { useTokensStore } from '@/stores/token.ts';
+
+import { type TokenInfoResponse, SessionInfo } from '@/models/token.ts';
 
 import { isEquals } from '@/lib/common.ts';
 import { parseSessionInfo } from '@/lib/session.ts';
@@ -148,206 +155,214 @@ import {
     mdiDevices
 } from '@mdi/js';
 
-export default {
-    data() {
-        return {
-            tokens: [],
-            currentPassword: '',
-            newPassword: '',
-            confirmPassword: '',
-            updatingPassword: false,
-            loadingSession: true,
-            icons: {
-                refresh: mdiRefresh
-            }
-        };
-    },
-    computed: {
-        ...mapStores(useRootStore, useSettingsStore, useUserStore, useTokensStore),
-        inputProblemMessage() {
-            if (!this.currentPassword) {
-                return 'Current password cannot be blank';
-            } else if (!this.newPassword && !this.confirmPassword) {
-                return 'Nothing has been modified';
-            } else if (!this.newPassword && this.confirmPassword) {
-                return 'New password cannot be blank';
-            } else if (this.newPassword && !this.confirmPassword) {
-                return 'Password confirmation cannot be blank';
-            } else if (this.newPassword && this.confirmPassword && this.newPassword !== this.confirmPassword) {
-                return 'Password and password confirmation do not match';
-            } else {
-                return null;
-            }
-        },
-        sessions() {
-            if (!this.tokens) {
-                return this.tokens;
-            }
+class DesktopPageSessionInfo extends SessionInfo {
+    public readonly icon: string;
+    public readonly lastSeenDateTime: string;
 
-            const sessions = [];
+    public constructor(sessionInfo: SessionInfo) {
+        super(sessionInfo.tokenId, sessionInfo.isCurrent, sessionInfo.deviceType, sessionInfo.deviceInfo, sessionInfo.createdByCli, sessionInfo.lastSeen);
+        this.icon = getTokenIcon(sessionInfo.deviceType);
+        this.lastSeenDateTime = sessionInfo.lastSeen ? formatUnixTimeToLongDateTime(sessionInfo.lastSeen) : '-';
+    }
+}
 
-            for (let i = 0; i < this.tokens.length; i++) {
-                const token = this.tokens[i];
-                const sessionInfo = parseSessionInfo(token);
-                sessionInfo.icon = this.getTokenIcon(sessionInfo.deviceType);
-                sessionInfo.lastSeenDateTime = sessionInfo.lastSeen ? this.$locale.formatUnixTimeToLongDateTime(this.userStore, sessionInfo.lastSeen) : '-';
-                sessions.push(sessionInfo);
-            }
+type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
+type SnackBarType = InstanceType<typeof SnackBar>;
 
-            return sessions;
+const { tt, formatUnixTimeToLongDateTime, setLanguage } = useI18n();
+
+const rootStore = useRootStore();
+const settingsStore = useSettingsStore();
+const tokensStore = useTokensStore();
+
+const icons = {
+    refresh: mdiRefresh
+};
+
+const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+
+const tokens = ref<TokenInfoResponse[]>([]);
+const currentPassword = ref<string>('');
+const newPassword = ref<string>('');
+const confirmPassword = ref<string>('');
+const updatingPassword = ref<boolean>(false);
+const loadingSession = ref<boolean>(true);
+
+const sessions = computed<DesktopPageSessionInfo[]>(() => {
+    const sessions: DesktopPageSessionInfo[] = [];
+
+    if (!tokens.value) {
+        return sessions;
+    }
+
+    for (let i = 0; i < tokens.value.length; i++) {
+        const token = tokens.value[i];
+        const sessionInfo = parseSessionInfo(token);
+        sessions.push(new DesktopPageSessionInfo(sessionInfo));
+    }
+
+    return sessions;
+});
+
+const inputProblemMessage = computed<string | null>(() => {
+    if (!currentPassword.value) {
+        return 'Current password cannot be blank';
+    } else if (!newPassword.value && !confirmPassword.value) {
+        return 'Nothing has been modified';
+    } else if (!newPassword.value && confirmPassword.value) {
+        return 'New password cannot be blank';
+    } else if (newPassword.value && !confirmPassword.value) {
+        return 'Password confirmation cannot be blank';
+    } else if (newPassword.value && confirmPassword.value && newPassword.value !== confirmPassword.value) {
+        return 'Password and password confirmation do not match';
+    } else {
+        return null;
+    }
+});
+
+function getTokenIcon(deviceType: string): string {
+    if (deviceType === 'phone') {
+        return mdiCellphone;
+    } else if (deviceType === 'wearable') {
+        return mdiWatch;
+    } else if (deviceType === 'tablet') {
+        return mdiTablet;
+    } else if (deviceType === 'tv') {
+        return mdiTelevision;
+    } else if (deviceType === 'cli') {
+        return mdiConsole;
+    } else {
+        return mdiDevices;
+    }
+}
+
+function init(): void {
+    loadingSession.value = true;
+
+    tokensStore.getAllTokens().then(response => {
+        tokens.value = response;
+        loadingSession.value = false;
+    }).catch(error => {
+        loadingSession.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
         }
-    },
-    created() {
-        const self = this;
+    });
+}
 
-        self.loadingSession = true;
+function updatePassword(): void {
+    const problemMessage = inputProblemMessage.value;
 
-        self.tokensStore.getAllTokens().then(tokens => {
-            self.tokens = tokens;
-            self.loadingSession = false;
+    if (problemMessage) {
+        snackbar.value?.showMessage(problemMessage);
+        return;
+    }
+
+    updatingPassword.value = true;
+
+    rootStore.updateUserProfile({
+        password: newPassword.value,
+        oldPassword: currentPassword.value
+    }).then(response => {
+        updatingPassword.value = false;
+        currentPassword.value = '';
+        newPassword.value = '';
+        confirmPassword.value = '';
+
+        if (response.user) {
+            const localeDefaultSettings = setLanguage(response.user.language);
+            settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+        }
+
+        reloadSessions(true);
+
+        snackbar.value?.showMessage('Your profile has been successfully updated');
+    }).catch(error => {
+        updatingPassword.value = false;
+        currentPassword.value = '';
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function reloadSessions(silent?: boolean): void {
+    loadingSession.value = true;
+
+    tokensStore.getAllTokens().then(response => {
+        if (!silent) {
+            if (isEquals(tokens.value, response)) {
+                snackbar.value?.showMessage('Session list is up to date');
+            } else {
+                snackbar.value?.showMessage('Session list has been updated');
+            }
+        }
+
+        tokens.value = response;
+        loadingSession.value = false;
+    }).catch(error => {
+        loadingSession.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function revokeSession(session: SessionInfo): void {
+    confirmDialog.value?.open('Are you sure you want to logout from this session?').then(() => {
+        loadingSession.value = true;
+
+        tokensStore.revokeToken({
+            tokenId: session.tokenId
+        }).then(() => {
+            loadingSession.value = false;
+
+            for (let i = 0; i < tokens.value.length; i++) {
+                if (tokens.value[i].tokenId === session.tokenId) {
+                    tokens.value.splice(i, 1);
+                }
+            }
         }).catch(error => {
-            self.loadingSession = false;
+            loadingSession.value = false;
 
             if (!error.processed) {
-                self.$refs.snackbar.showError(error);
+                snackbar.value?.showError(error);
             }
         });
-    },
-    methods: {
-        updatePassword() {
-            const self = this;
+    });
+}
 
-            const problemMessage = self.inputProblemMessage;
-
-            if (problemMessage) {
-                self.$refs.snackbar.showMessage(problemMessage);
-                return;
-            }
-
-            self.updatingPassword = true;
-
-            self.rootStore.updateUserProfile({
-                profile: {
-                    password: self.newPassword,
-                    confirmPassword: self.confirmPassword
-                },
-                currentPassword: self.currentPassword
-            }).then(response => {
-                self.updatingPassword = false;
-                self.currentPassword = '';
-                self.newPassword = '';
-                self.confirmPassword = '';
-
-                if (response.user) {
-                    const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
-                    self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-                }
-
-                self.reloadSessions(true);
-
-                self.$refs.snackbar.showMessage('Your profile has been successfully updated');
-            }).catch(error => {
-                self.updatingPassword = false;
-                self.currentPassword = '';
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        reloadSessions(silent) {
-            const self = this;
-
-            self.loadingSession = true;
-
-            self.tokensStore.getAllTokens().then(tokens => {
-                if (!silent) {
-                    if (isEquals(self.tokens, tokens)) {
-                        self.$refs.snackbar.showMessage('Session list is up to date');
-                    } else {
-                        self.$refs.snackbar.showMessage('Session list has been updated');
-                    }
-                }
-
-                self.tokens = tokens;
-                self.loadingSession = false;
-            }).catch(error => {
-                self.loadingSession = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        revokeSession(session) {
-            const self = this;
-
-            self.$refs.confirmDialog.open('Are you sure you want to logout from this session?').then(() => {
-                self.loadingSession = true;
-
-                self.tokensStore.revokeToken({
-                    tokenId: session.tokenId
-                }).then(() => {
-                    self.loadingSession = false;
-
-                    for (let i = 0; i < self.tokens.length; i++) {
-                        if (self.tokens[i].tokenId === session.tokenId) {
-                            self.tokens.splice(i, 1);
-                        }
-                    }
-                }).catch(error => {
-                    self.loadingSession = false;
-
-                    if (!error.processed) {
-                        self.$refs.snackbar.showError(error);
-                    }
-                });
-            });
-        },
-        revokeAllSessions() {
-            const self = this;
-
-            if (self.tokens.length < 2) {
-                return;
-            }
-
-            self.$refs.confirmDialog.open('Are you sure you want to logout all other sessions?').then(() => {
-                self.loadingSession = true;
-
-                self.tokensStore.revokeAllTokens().then(() => {
-                    self.loadingSession = false;
-
-                    for (let i = self.tokens.length - 1; i >= 0; i--) {
-                        if (!self.tokens[i].isCurrent) {
-                            self.tokens.splice(i, 1);
-                        }
-                    }
-
-                    self.$refs.snackbar.showMessage('You have logged out all other sessions');
-                }).catch(error => {
-                    self.loadingSession = false
-
-                    if (!error.processed) {
-                        self.$refs.snackbar.showError(error);
-                    }
-                });
-            });
-        },
-        getTokenIcon(deviceType) {
-            if (deviceType === 'phone') {
-                return mdiCellphone;
-            } else if (deviceType === 'wearable') {
-                return mdiWatch;
-            } else if (deviceType === 'tablet') {
-                return mdiTablet;
-            } else if (deviceType === 'tv') {
-                return mdiTelevision;
-            } else if (deviceType === 'cli') {
-                return mdiConsole;
-            } else {
-                return mdiDevices;
-            }
-        }
+function revokeAllSessions(): void {
+    if (sessions.value.length < 2) {
+        return;
     }
-};
+
+    confirmDialog.value?.open('Are you sure you want to logout all other sessions?').then(() => {
+        loadingSession.value = true;
+
+        tokensStore.revokeAllTokens().then(() => {
+            loadingSession.value = false;
+
+            for (let i = tokens.value.length - 1; i >= 0; i--) {
+                if (!tokens.value[i].isCurrent) {
+                    tokens.value.splice(i, 1);
+                }
+            }
+
+            snackbar.value?.showMessage('You have logged out all other sessions');
+        }).catch(error => {
+            loadingSession.value = false;
+
+            if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+        });
+    });
+}
+
+init();
 </script>

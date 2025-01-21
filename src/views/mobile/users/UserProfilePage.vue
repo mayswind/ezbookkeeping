@@ -456,10 +456,7 @@ function save(): void {
     saving.value = true;
     showLoading(() => saving.value);
 
-    rootStore.updateUserProfile({
-        profile: newProfile.value,
-        currentPassword: currentPassword.value
-    }).then(response => {
+    rootStore.updateUserProfile(newProfile.value.toProfileUpdateRequest(currentPassword.value)).then(response => {
         saving.value = false;
         hideLoading();
         currentPassword.value = '';

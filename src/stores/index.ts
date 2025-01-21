@@ -16,7 +16,14 @@ import { useStatisticsStore } from './statistics.js';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import type { AuthResponse, RegisterResponse } from '@/models/auth_response.ts';
-import type { User, UserLoginRequest, UserResendVerifyEmailRequest, UserVerifyEmailResponse, UserProfileUpdateResponse } from '@/models/user.ts';
+import type {
+    User,
+    UserLoginRequest,
+    UserResendVerifyEmailRequest,
+    UserVerifyEmailResponse,
+    UserProfileUpdateRequest,
+    UserProfileUpdateResponse
+} from '@/models/user.ts';
 import type { LocalizedPresetCategory } from '@/core/category.ts';
 import type { ForgetPasswordRequest } from '@/models/forget_password.ts';
 
@@ -370,9 +377,9 @@ export const useRootStore = defineStore('root', () => {
         });
     }
 
-    function updateUserProfile({ profile, currentPassword }: { profile: User, currentPassword?: string }): Promise<UserProfileUpdateResponse> {
+    function updateUserProfile(req: UserProfileUpdateRequest): Promise<UserProfileUpdateResponse> {
         return new Promise((resolve, reject) => {
-            services.updateProfile(profile.toProfileUpdateRequest(currentPassword)).then(response => {
+            services.updateProfile(req).then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {

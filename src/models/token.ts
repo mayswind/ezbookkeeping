@@ -25,7 +25,7 @@ export class SessionInfo {
     public readonly createdByCli: boolean;
     public readonly lastSeen: number;
 
-    private constructor(tokenId: string, isCurrent: boolean, deviceType: string, deviceInfo: string, createdByCli: boolean, lastSeen: number) {
+    protected constructor(tokenId: string, isCurrent: boolean, deviceType: string, deviceInfo: string, createdByCli: boolean, lastSeen: number) {
         this.tokenId = tokenId;
         this.isCurrent = isCurrent;
         this.deviceType = deviceType;

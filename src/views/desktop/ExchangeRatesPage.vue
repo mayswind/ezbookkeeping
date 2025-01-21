@@ -66,7 +66,7 @@
                                             </v-btn>
                                             <span>{{ tt('Exchange Rates Data') }}</span>
                                             <v-btn density="compact" color="default" variant="text" size="24"
-                                                   class="ml-2" :icon="true" :loading="loading" @click="reload">
+                                                   class="ml-2" :icon="true" :loading="loading" @click="reload(true)">
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
                                                 </template>

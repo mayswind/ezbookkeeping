@@ -6,16 +6,16 @@
                     <v-navigation-drawer ref="navbar" :permanent="alwaysShowNav" v-model="showNav">
                         <div class="mx-6 my-4">
                             <btn-vertical-group :disabled="loading" :buttons="[
-                                { name: $t('Expense'), value: allCategoryTypes.Expense },
-                                { name: $t('Income'), value: allCategoryTypes.Income },
-                                { name: $t('Transfer'), value: allCategoryTypes.Transfer }
+                                { name: tt('Expense'), value: CategoryType.Expense },
+                                { name: tt('Income'), value: CategoryType.Income },
+                                { name: tt('Transfer'), value: CategoryType.Transfer }
                             ]" v-model="activeCategoryType" @update:model-value="switchAllPrimaryCategories" />
                         </div>
                         <v-divider />
                         <v-tabs show-arrows class="my-4" direction="vertical"
                                 :disabled="loading" v-model="primaryCategoryId">
                             <v-tab class="tab-text-truncate" value="0" @click="switchAllPrimaryCategories">
-                                <span class="text-truncate">{{ $t('Primary Categories') }}</span>
+                                <span class="text-truncate">{{ tt('Primary Categories') }}</span>
                             </v-tab>
                             <template :key="category.id" v-for="category in primaryCategories">
                                 <v-tab class="tab-text-truncate" :value="category.id" v-if="!category.hidden"
@@ -39,19 +39,19 @@
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
                                                 <v-icon :icon="icons.menu" size="24" />
                                             </v-btn>
-                                            <span>{{ $t('Transaction Categories') }}</span>
+                                            <span>{{ tt('Transaction Categories') }}</span>
                                             <v-btn class="ml-3" color="default" variant="outlined"
-                                                   :disabled="loading || updating" @click="add">{{ $t('Add') }}</v-btn>
+                                                   :disabled="loading || updating" @click="add">{{ tt('Add') }}</v-btn>
                                             <v-btn class="ml-3" color="primary" variant="tonal"
                                                    :disabled="loading || updating" @click="saveSortResult"
-                                                   v-if="displayOrderModified">{{ $t('Save Display Order') }}</v-btn>
+                                                   v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
                                             <v-btn density="compact" color="default" variant="text" size="24"
-                                                   class="ml-2" :icon="true" :loading="loading || updating" @click="reload">
+                                                   class="ml-2" :icon="true" :loading="loading || updating" @click="reload(true)">
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
                                                 </template>
                                                 <v-icon :icon="icons.refresh" size="24" />
-                                                <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
+                                                <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                                             </v-btn>
                                             <v-spacer/>
                                             <v-btn density="comfortable" color="default" variant="text" class="ml-2"
@@ -60,10 +60,10 @@
                                                 <v-menu activator="parent">
                                                     <v-list>
                                                         <v-list-item :prepend-icon="icons.show"
-                                                                     :title="$t('Show Hidden Transaction Categories')"
+                                                                     :title="tt('Show Hidden Transaction Categories')"
                                                                      v-if="!showHidden" @click="showHidden = true"></v-list-item>
                                                         <v-list-item :prepend-icon="icons.hide"
-                                                                     :title="$t('Hide Hidden Transaction Categories')"
+                                                                     :title="tt('Hide Hidden Transaction Categories')"
                                                                      v-if="showHidden" @click="showHidden = false"></v-list-item>
                                                     </v-list>
                                                 </v-menu>
@@ -76,9 +76,9 @@
                                         <tr>
                                             <th>
                                                 <div class="d-flex align-center">
-                                                    <span>{{ $t('Category Name') }}</span>
+                                                    <span>{{ tt('Category Name') }}</span>
                                                     <v-spacer/>
-                                                    <span>{{ $t('Operation') }}</span>
+                                                    <span>{{ tt('Operation') }}</span>
                                                 </div>
                                             </th>
                                         </tr>
@@ -96,11 +96,11 @@
                                         <tr>
                                             <td>
                                                 <div class="d-flex align-center">
-                                                    <span>{{ $t('No available category') }}</span>
+                                                    <span>{{ tt('No available category') }}</span>
                                                     <v-btn class="ml-3" color="default" variant="outlined"
                                                            @click="showPresetDialog = true"
                                                            v-if="hasSubCategories && noCategory">
-                                                        {{ $t('Add Default Categories') }}
+                                                        {{ tt('Add Default Categories') }}
                                                     </v-btn>
                                                 </div>
                                             </td>
@@ -141,7 +141,7 @@
                                                                 <template #loader>
                                                                     <v-progress-circular indeterminate size="20" width="2"/>
                                                                 </template>
-                                                                {{ element.hidden ? $t('Show') : $t('Hide') }}
+                                                                {{ element.hidden ? tt('Show') : tt('Hide') }}
                                                             </v-btn>
                                                             <v-btn class="px-2" color="default"
                                                                    density="comfortable" variant="text"
@@ -149,7 +149,7 @@
                                                                    :prepend-icon="icons.edit"
                                                                    :disabled="loading || updating"
                                                                    @click="edit(element)">
-                                                                {{ $t('Edit') }}
+                                                                {{ tt('Edit') }}
                                                             </v-btn>
                                                             <v-btn class="px-2" color="default"
                                                                    density="comfortable" variant="text"
@@ -161,12 +161,12 @@
                                                                 <template #loader>
                                                                     <v-progress-circular indeterminate size="20" width="2"/>
                                                                 </template>
-                                                                {{ $t('Delete') }}
+                                                                {{ tt('Delete') }}
                                                             </v-btn>
                                                             <span class="ml-2">
                                                                 <v-icon :class="!loading && !updating && availableCategoryCount > 1 ? 'drag-handle' : 'disabled'"
                                                                         :icon="icons.drag"/>
-                                                                <v-tooltip activator="parent" v-if="!loading && !updating && availableCategoryCount > 1">{{ $t('Drag to Reorder') }}</v-tooltip>
+                                                                <v-tooltip activator="parent" v-if="!loading && !updating && availableCategoryCount > 1">{{ tt('Drag to Reorder') }}</v-tooltip>
                                                             </span>
                                                         </div>
                                                     </td>
@@ -185,22 +185,30 @@
 
     <edit-dialog ref="editDialog" :persistent="true" />
     <preset-dialog :category-type="activeCategoryType" v-model:show="showPresetDialog"
-                            @category:saved="presetCategorySaved" />
+                            @category:saved="onPresetCategorySaved" />
 
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
 </template>
 
-<script>
+<script setup lang="ts">
+import { VNavigationDrawer } from 'vuetify/components/VNavigationDrawer';
+
+import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
 import EditDialog from './list/dialogs/EditDialog.vue';
 import PresetDialog from './list/dialogs/PresetDialog.vue';
 
+import { ref, computed, useTemplateRef, watch, nextTick } from 'vue';
 import { useDisplay } from 'vuetify';
 
-import { mapStores } from 'pinia';
+import { useI18n } from '@/locales/helpers.ts';
+
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 import { CategoryType } from '@/core/category.ts';
+import type { TransactionCategory } from '@/models/transaction_category.ts';
+
 import {
     isNoAvailableCategory,
     getAvailableCategoryCount
@@ -218,296 +226,278 @@ import {
     mdiDotsVertical
 } from '@mdi/js';
 
-export default {
-    components: {
-        EditDialog,
-        PresetDialog
-    },
-    data() {
-        const { mdAndUp } = useDisplay();
+type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
+type SnackBarType = InstanceType<typeof SnackBar>;
+type EditDialogType = InstanceType<typeof EditDialog>;
 
-        return {
-            activeCategoryType: CategoryType.Expense,
-            activeTab: 'categoryPage',
-            primaryCategoryId: '0',
-            loading: true,
-            updating: false,
-            categoryHiding: {},
-            categoryRemoving: {},
-            displayOrderModified: false,
-            cardMinHeight: 680,
-            alwaysShowNav: mdAndUp.value,
-            showNav: mdAndUp.value,
-            showHidden: false,
-            showPresetDialog: false,
-            icons: {
-                refresh: mdiRefresh,
-                menu: mdiMenu,
-                edit: mdiPencilOutline,
-                show: mdiEyeOutline,
-                hide: mdiEyeOffOutline,
-                remove: mdiDeleteOutline,
-                drag: mdiDrag,
-                more: mdiDotsVertical
-            }
-        };
-    },
-    computed: {
-        ...mapStores(useTransactionCategoriesStore),
-        allCategoryTypes() {
-            return CategoryType;
-        },
-        primaryCategories() {
-            if (!this.transactionCategoriesStore.allTransactionCategories || !this.transactionCategoriesStore.allTransactionCategories[this.activeCategoryType]) {
-                return [];
-            }
+const display = useDisplay();
+const { tt } = useI18n();
 
-            return this.transactionCategoriesStore.allTransactionCategories[this.activeCategoryType];
-        },
-        secondaryCategories() {
-            if (!this.transactionCategoriesStore.allTransactionCategoriesMap || !this.transactionCategoriesStore.allTransactionCategoriesMap[this.primaryCategoryId]) {
-                return [];
-            }
+const transactionCategoriesStore = useTransactionCategoriesStore();
 
-            return this.transactionCategoriesStore.allTransactionCategoriesMap[this.primaryCategoryId].subCategories;
-        },
-        hasSubCategories() {
-            return !this.primaryCategoryId || this.primaryCategoryId === '' || this.primaryCategoryId === '0';
-        },
-        categories() {
-            if (this.hasSubCategories) {
-                return this.primaryCategories;
-            } else {
-                return this.secondaryCategories;
-            }
-        },
-        noAvailableCategory() {
-            return isNoAvailableCategory(this.categories, this.showHidden);
-        },
-        noCategory() {
-            return this.categories.length < 1;
-        },
-        availableCategoryCount() {
-            return getAvailableCategoryCount(this.categories, this.showHidden);
+const icons = {
+    refresh: mdiRefresh,
+    menu: mdiMenu,
+    edit: mdiPencilOutline,
+    show: mdiEyeOutline,
+    hide: mdiEyeOffOutline,
+    remove: mdiDeleteOutline,
+    drag: mdiDrag,
+    more: mdiDotsVertical
+};
+
+const navbar = useTemplateRef<VNavigationDrawer>('navbar');
+const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const editDialog = useTemplateRef<EditDialogType>('editDialog');
+
+const activeCategoryType = ref<CategoryType>(CategoryType.Expense);
+const activeTab = ref<string>('categoryPage');
+const primaryCategoryId = ref<string>('0');
+const loading = ref<boolean>(true);
+const updating = ref<boolean>(false);
+const categoryHiding = ref<Record<string, boolean>>({});
+const categoryRemoving = ref<Record<string, boolean>>({});
+const displayOrderModified = ref<boolean>(false);
+const cardMinHeight = ref<number>(680);
+const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
+const showNav = ref<boolean>(display.mdAndUp.value);
+const showHidden = ref<boolean>(false);
+const showPresetDialog = ref<boolean>(false);
+
+const primaryCategories = computed<TransactionCategory[]>(() => {
+    if (!transactionCategoriesStore.allTransactionCategories || !transactionCategoriesStore.allTransactionCategories[activeCategoryType.value]) {
+        return [];
+    }
+
+    return transactionCategoriesStore.allTransactionCategories[activeCategoryType.value];
+});
+
+const secondaryCategories = computed<TransactionCategory[]>(() => {
+    if (!transactionCategoriesStore.allTransactionCategoriesMap || !transactionCategoriesStore.allTransactionCategoriesMap[primaryCategoryId.value]) {
+        return [];
+    }
+
+    return transactionCategoriesStore.allTransactionCategoriesMap[primaryCategoryId.value].secondaryCategories || [];
+});
+
+const hasSubCategories = computed<boolean>(() => {
+    return !primaryCategoryId.value || primaryCategoryId.value === '' || primaryCategoryId.value === '0';
+});
+
+const categories = computed<TransactionCategory[]>(() => {
+    if (hasSubCategories.value) {
+        return primaryCategories.value;
+    } else {
+        return secondaryCategories.value;
+    }
+});
+
+const noAvailableCategory = computed<boolean>(() => isNoAvailableCategory(categories.value, showHidden.value));
+const noCategory = computed<boolean>(() => categories.value.length < 1);
+const availableCategoryCount = computed<number>(() => getAvailableCategoryCount(categories.value, showHidden.value));
+
+function updateCardMinHeight(): void {
+    nextTick(() => {
+        if (navbar.value && navbar.value.$el && navbar.value.$el.nextElementSibling) {
+            const navbarHeight = getNavSideBarOuterHeight(navbar.value.$el.nextElementSibling);
+            cardMinHeight.value = Math.max(navbarHeight, 680);
         }
-    },
-    created() {
-        this.reload(false);
-    },
-    setup() {
-        const display = useDisplay();
+    });
+}
 
-        return {
-            display: display
-        };
-    },
-    watch: {
-        'display.mdAndUp.value': function (newValue) {
-            this.alwaysShowNav = newValue;
+function isCategorySupportSwitch(category: TransactionCategory): boolean {
+    if (!category || category.hidden) {
+        return false;
+    }
 
-            if (!this.showNav) {
-                this.showNav = newValue;
-            }
+    return !category.parentId || category.parentId === '' || category.parentId === '0';
+}
+
+function switchAllPrimaryCategories(): void {
+    primaryCategoryId.value = '0';
+    updateCardMinHeight();
+}
+
+function switchPrimaryCategory(category: TransactionCategory): void {
+    if (!category || category.hidden) {
+        return;
+    }
+
+    if (!category.parentId || category.parentId === '' || category.parentId === '0') {
+        primaryCategoryId.value = category.id;
+    }
+
+    updateCardMinHeight();
+}
+
+function reload(force: boolean): void {
+    loading.value = true;
+
+    transactionCategoriesStore.loadAllCategories({
+        force: force
+    }).then(() => {
+        loading.value = false;
+        displayOrderModified.value = false;
+
+        if (force) {
+            snackbar.value?.showMessage('Category list has been updated');
         }
-    },
-    methods: {
-        reload(force) {
-            const self = this;
 
-            self.loading = true;
+        updateCardMinHeight();
+    }).catch(error => {
+        loading.value = false;
 
-            self.transactionCategoriesStore.loadAllCategories({
-                force: force
-            }).then(() => {
-                self.loading = false;
-                self.displayOrderModified = false;
-
-                if (force) {
-                    self.$refs.snackbar.showMessage('Category list has been updated');
-                }
-
-                self.updateCardMinHeight();
-            }).catch(error => {
-                self.loading = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        onMove(event) {
-            if (!event || !event.moved) {
-                return;
-            }
-
-            const self = this;
-            const moveEvent = event.moved;
-
-            if (!moveEvent.element || !moveEvent.element.id) {
-                self.$refs.snackbar.showMessage('Unable to move category');
-                return;
-            }
-
-            self.transactionCategoriesStore.changeCategoryDisplayOrder({
-                categoryId: moveEvent.element.id,
-                from: moveEvent.oldIndex,
-                to: moveEvent.newIndex
-            }).then(() => {
-                self.displayOrderModified = true;
-            }).catch(error => {
-                self.$refs.snackbar.showError(error);
-            });
-        },
-        saveSortResult() {
-            const self = this;
-
-            if (!self.displayOrderModified) {
-                return;
-            }
-
-            self.loading = true;
-
-            self.transactionCategoriesStore.updateCategoryDisplayOrders({
-                type: self.activeCategoryType,
-                parentId: self.primaryCategoryId,
-            }).then(() => {
-                self.loading = false;
-                self.displayOrderModified = false;
-            }).catch(error => {
-                self.loading = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        add() {
-            const self = this;
-
-            self.$refs.editDialog.open({
-                type: self.activeCategoryType,
-                parentId: self.primaryCategoryId
-            }).then(result => {
-                if (result && result.message) {
-                    self.$refs.snackbar.showMessage(result.message);
-                }
-
-                self.updateCardMinHeight();
-            }).catch(error => {
-                if (error) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        edit(category) {
-            const self = this;
-
-            self.$refs.editDialog.open({
-                id: category.id,
-                currentCategory: category
-            }).then(result => {
-                if (result && result.message) {
-                    self.$refs.snackbar.showMessage(result.message);
-                }
-
-                if (self.transactionCategoriesStore.transactionCategoryListStateInvalid) {
-                    self.reload(true);
-                }
-
-                self.updateCardMinHeight();
-            }).catch(error => {
-                if (error) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        hide(category, hidden) {
-            const self = this;
-
-            self.updating = true;
-            self.categoryHiding[category.id] = true;
-
-            self.transactionCategoriesStore.hideCategory({
-                category: category,
-                hidden: hidden
-            }).then(() => {
-                self.updating = false;
-                self.categoryHiding[category.id] = false;
-
-                self.updateCardMinHeight();
-            }).catch(error => {
-                self.updating = false;
-                self.categoryHiding[category.id] = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        remove(category) {
-            const self = this;
-
-            self.$refs.confirmDialog.open('Are you sure you want to delete this category?').then(() => {
-                self.updating = true;
-                self.categoryRemoving[category.id] = true;
-
-                self.transactionCategoriesStore.deleteCategory({
-                    category: category
-                }).then(() => {
-                    self.updating = false;
-                    self.categoryRemoving[category.id] = false;
-
-                    self.updateCardMinHeight();
-                }).catch(error => {
-                    self.updating = false;
-                    self.categoryRemoving[category.id] = false;
-
-                    if (!error.processed) {
-                        self.$refs.snackbar.showError(error);
-                    }
-                });
-            });
-        },
-        presetCategorySaved(e) {
-            if (e && e.message) {
-                this.$refs.snackbar.showMessage(e.message);
-                this.reload(false);
-            }
-        },
-        isCategorySupportSwitch(category) {
-            if (!category || category.hidden) {
-                return false;
-            }
-
-            return !category.parentId || category.parentId === '' || category.parentId === '0';
-        },
-        switchAllPrimaryCategories() {
-            this.primaryCategoryId = '0';
-            this.updateCardMinHeight();
-        },
-        switchPrimaryCategory(category) {
-            if (!category || category.hidden) {
-                return;
-            }
-
-            if (!category.parentId || category.parentId === '' || category.parentId === '0') {
-                this.primaryCategoryId = category.id;
-            }
-
-            this.updateCardMinHeight();
-        },
-        updateCardMinHeight() {
-            const self = this
-
-            self.$nextTick(() => {
-                if (self.$refs.navbar && self.$refs.navbar.$el && self.$refs.navbar.$el.nextElementSibling) {
-                    const navbarHeight = getNavSideBarOuterHeight(self.$refs.navbar.$el.nextElementSibling);
-                    self.cardMinHeight = Math.max(navbarHeight, 680);
-                }
-            });
+        if (!error.processed) {
+            snackbar.value?.showError(error);
         }
+    });
+}
+
+function add(): void {
+    editDialog.value?.open({
+        type: activeCategoryType.value,
+        parentId: primaryCategoryId.value
+    }).then(result => {
+        if (result && result.message) {
+            snackbar.value?.showMessage(result.message);
+        }
+
+        updateCardMinHeight();
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function edit(category: TransactionCategory): void {
+    editDialog.value?.open({
+        id: category.id,
+        currentCategory: category
+    }).then(result => {
+        if (result && result.message) {
+            snackbar.value?.showMessage(result.message);
+        }
+
+        if (transactionCategoriesStore.transactionCategoryListStateInvalid) {
+            reload(true);
+        }
+
+        updateCardMinHeight();
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function hide(category: TransactionCategory, hidden: boolean): void {
+    updating.value = true;
+    categoryHiding.value[category.id] = true;
+
+    transactionCategoriesStore.hideCategory({
+        category: category,
+        hidden: hidden
+    }).then(() => {
+        updating.value = false;
+        categoryHiding.value[category.id] = false;
+
+        updateCardMinHeight();
+    }).catch(error => {
+        updating.value = false;
+        categoryHiding.value[category.id] = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function remove(category: TransactionCategory): void {
+    confirmDialog.value?.open('Are you sure you want to delete this category?').then(() => {
+        updating.value = true;
+        categoryRemoving.value[category.id] = true;
+
+        transactionCategoriesStore.deleteCategory({
+            category: category
+        }).then(() => {
+            updating.value = false;
+            categoryRemoving.value[category.id] = false;
+
+            updateCardMinHeight();
+        }).catch(error => {
+            updating.value = false;
+            categoryRemoving.value[category.id] = false;
+
+            if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+        });
+    });
+}
+
+function saveSortResult(): void {
+    if (!displayOrderModified.value) {
+        return;
+    }
+
+    loading.value = true;
+
+    transactionCategoriesStore.updateCategoryDisplayOrders({
+        type: activeCategoryType.value,
+        parentId: primaryCategoryId.value
+    }).then(() => {
+        loading.value = false;
+        displayOrderModified.value = false;
+    }).catch(error => {
+        loading.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function onMove(event: { moved: { element: { id: string }, oldIndex: number, newIndex: number } }): void {
+    if (!event || !event.moved) {
+        return;
+    }
+
+    const moveEvent = event.moved;
+
+    if (!moveEvent.element || !moveEvent.element.id) {
+        snackbar.value?.showMessage('Unable to move category');
+        return;
+    }
+
+    transactionCategoriesStore.changeCategoryDisplayOrder({
+        categoryId: moveEvent.element.id,
+        from: moveEvent.oldIndex,
+        to: moveEvent.newIndex
+    }).then(() => {
+        displayOrderModified.value = true;
+    }).catch(error => {
+        snackbar.value?.showError(error);
+    });
+}
+
+function onPresetCategorySaved(e: { message: string }): void {
+    if (e && e.message) {
+        snackbar.value?.showMessage(e.message);
+        reload(false);
     }
 }
+
+watch(() => display.mdAndUp.value, (newValue) => {
+    alwaysShowNav.value = newValue;
+
+    if (!showNav.value) {
+        showNav.value = newValue;
+    }
+});
+
+reload(false);
 </script>
 
 <style>

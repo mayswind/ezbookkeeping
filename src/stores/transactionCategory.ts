@@ -456,7 +456,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         });
     }
 
-    function deleteCategory({ category, beforeResolve }: { category: TransactionCategory, beforeResolve: BeforeResolveFunction }): Promise<boolean> {
+    function deleteCategory({ category, beforeResolve }: { category: TransactionCategory, beforeResolve?: BeforeResolveFunction }): Promise<boolean> {
         return new Promise((resolve, reject) => {
             services.deleteTransactionCategory({
                 id: category.id

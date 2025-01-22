@@ -1,12 +1,12 @@
 <template>
     <f7-page :ptr="!sortable" @ptr:refresh="reload" @page:afterin="onPageAfterIn">
         <f7-navbar>
-            <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
-            <f7-nav-title :title="$t(title)"></f7-nav-title>
+            <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-title :title="tt(title)"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': !categories.length }" v-if="!sortable" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link :href="'/category/add?type=' + categoryType + '&parentId=' + primaryCategoryId" icon-f7="plus" v-if="!sortable"></f7-link>
-                <f7-link :text="$t('Done')" :class="{ 'disabled': displayOrderSaving }" @click="saveSortResult" v-else-if="sortable"></f7-link>
+                <f7-link :text="tt('Done')" :class="{ 'disabled': displayOrderSaving }" @click="saveSortResult" v-else-if="sortable"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -21,9 +21,9 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-top" v-if="!loading && noAvailableCategory">
-            <f7-list-item :title="$t('No available category')"></f7-list-item>
+            <f7-list-item :title="tt('No available category')"></f7-list-item>
             <f7-list-button v-if="hasSubCategories && noCategory"
-                            :title="$t('Add Default Categories')"
+                            :title="tt('Add Default Categories')"
                             :href="'/category/preset?type=' + categoryType"></f7-list-button>
         </f7-list>
 
@@ -55,7 +55,7 @@
                     </f7-swipeout-button>
                 </f7-swipeout-actions>
                 <f7-swipeout-actions right v-if="!sortable">
-                    <f7-swipeout-button color="orange" close :text="$t('Edit')" @click="edit(category)"></f7-swipeout-button>
+                    <f7-swipeout-button color="orange" close :text="tt('Edit')" @click="edit(category)"></f7-swipeout-button>
                     <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(category, false)">
                         <f7-icon f7="trash"></f7-icon>
                     </f7-swipeout-button>
@@ -65,326 +65,321 @@
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
-                <f7-actions-button @click="setSortable()">{{ $t('Sort') }}</f7-actions-button>
-                <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ $t('Show Hidden Transaction Categories') }}</f7-actions-button>
-                <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ $t('Hide Hidden Transaction Categories') }}</f7-actions-button>
+                <f7-actions-button @click="setSortable()">{{ tt('Sort') }}</f7-actions-button>
+                <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ tt('Show Hidden Transaction Categories') }}</f7-actions-button>
+                <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ tt('Hide Hidden Transaction Categories') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
-                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+                <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
             </f7-actions-group>
         </f7-actions>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showDeleteActionSheet" @actions:closed="showDeleteActionSheet = false">
             <f7-actions-group>
-                <f7-actions-label>{{ $t('Are you sure you want to delete this category?') }}</f7-actions-label>
-                <f7-actions-button color="red" @click="remove(categoryToDelete, true)">{{ $t('Delete') }}</f7-actions-button>
+                <f7-actions-label>{{ tt('Are you sure you want to delete this category?') }}</f7-actions-label>
+                <f7-actions-button color="red" @click="remove(categoryToDelete, true)">{{ tt('Delete') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
-                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+                <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
             </f7-actions-group>
         </f7-actions>
     </f7-page>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import type { Router } from 'framework7/types';
+
+import { useI18n } from '@/locales/helpers.ts';
+import { useI18nUIComponents, showLoading, hideLoading, onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
+
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 import { CategoryType } from '@/core/category.ts';
+import type { TransactionCategory } from '@/models/transaction_category.ts';
+
 import {
     isNoAvailableCategory,
     getFirstShowingId,
     getLastShowingId
 } from '@/lib/category.ts';
-import { onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
 
-export default {
-    props: [
-        'f7route',
-        'f7router'
-    ],
-    data() {
-        return {
-            hasSubCategories: false,
-            categoryType: 0,
-            primaryCategoryId: '',
-            loading: true,
-            loadingError: null,
-            showHidden: false,
-            sortable: false,
-            categoryToDelete: null,
-            showMoreActionSheet: false,
-            showDeleteActionSheet: false,
-            displayOrderModified: false,
-            displayOrderSaving: false
-        };
-    },
-    computed: {
-        ...mapStores(useTransactionCategoriesStore),
-        categories() {
-            if (!this.primaryCategoryId || this.primaryCategoryId === '' || this.primaryCategoryId === '0') {
-                if (!this.transactionCategoriesStore.allTransactionCategories || !this.transactionCategoriesStore.allTransactionCategories[this.categoryType]) {
-                    return [];
-                }
+const props = defineProps<{
+    f7route: Router.Route;
+    f7router: Router.Router;
+}>();
 
-                return this.transactionCategoriesStore.allTransactionCategories[this.categoryType];
-            } else if (this.primaryCategoryId && this.primaryCategoryId !== '' && this.primaryCategoryId !== '0') {
-                if (!this.transactionCategoriesStore.allTransactionCategoriesMap || !this.transactionCategoriesStore.allTransactionCategoriesMap[this.primaryCategoryId]) {
-                    return [];
-                }
+const { tt } = useI18n();
+const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
-                return this.transactionCategoriesStore.allTransactionCategoriesMap[this.primaryCategoryId].subCategories;
-            } else {
-                return [];
-            }
-        },
-        title() {
-            let title = '';
+const transactionCategoriesStore = useTransactionCategoriesStore();
 
-            switch (this.categoryType) {
-                case CategoryType.Income:
-                    title = 'Income';
-                    break;
-                case CategoryType.Expense:
-                    title = 'Expense';
-                    break;
-                case CategoryType.Transfer:
-                    title = 'Transfer';
-                    break;
-                default:
-                    title = 'Transaction';
-                    break;
-            }
+const hasSubCategories = ref<boolean>(false);
+const categoryType = ref<CategoryType | 0>(0);
+const primaryCategoryId = ref<string>('0');
+const loading = ref<boolean>(true);
+const loadingError = ref<unknown | null>(null);
+const showHidden = ref<boolean>(false);
+const sortable = ref<boolean>(false);
+const categoryToDelete = ref<TransactionCategory | null>(null);
+const showMoreActionSheet = ref<boolean>(false);
+const showDeleteActionSheet = ref<boolean>(false);
+const displayOrderModified = ref<boolean>(false);
+const displayOrderSaving = ref<boolean>(false);
 
-            switch (this.hasSubCategories) {
-                case true:
-                    title += ' Primary';
-                    break;
-                case false:
-                    title += ' Secondary';
-                    break;
-            }
-
-            return title + ' Categories';
-        },
-        firstShowingId() {
-            return getFirstShowingId(this.categories, this.showHidden);
-        },
-        lastShowingId() {
-            return getLastShowingId(this.categories, this.showHidden);
-        },
-        noAvailableCategory() {
-            return isNoAvailableCategory(this.categories, this.showHidden);
-        },
-        noCategory() {
-            return this.categories.length < 1;
-        }
-    },
-    created() {
-        const self = this;
-        const query = self.f7route.query;
-
-        self.categoryType = parseInt(query.type);
-
-        if (self.categoryType !== CategoryType.Income &&
-            self.categoryType !== CategoryType.Expense &&
-            self.categoryType !== CategoryType.Transfer) {
-            self.$toast('Parameter Invalid');
-            self.loadingError = 'Parameter Invalid';
-            return;
+const categories = computed<TransactionCategory[]>(() => {
+    if (!primaryCategoryId.value || primaryCategoryId.value === '' || primaryCategoryId.value === '0') {
+        if (!transactionCategoriesStore.allTransactionCategories || !transactionCategoriesStore.allTransactionCategories[categoryType.value]) {
+            return [];
         }
 
-        if (query.id && query.id !== '0') {
-            self.primaryCategoryId = query.id;
-            self.hasSubCategories = false;
-        } else {
-            self.primaryCategoryId = '0';
-            self.hasSubCategories = true;
+        return transactionCategoriesStore.allTransactionCategories[categoryType.value];
+    } else if (primaryCategoryId.value && primaryCategoryId.value !== '' && primaryCategoryId.value !== '0') {
+        if (!transactionCategoriesStore.allTransactionCategoriesMap || !transactionCategoriesStore.allTransactionCategoriesMap[primaryCategoryId.value]) {
+            return [];
         }
 
-        self.loading = true;
-
-        self.transactionCategoriesStore.loadAllCategories({
-            force: false
-        }).then(() => {
-            self.loading = false;
-        }).catch(error => {
-            if (error.processed) {
-                self.loading = false;
-            } else {
-                self.loadingError = error;
-                self.$toast(error.message || error);
-            }
-        });
-    },
-    methods: {
-        onPageAfterIn() {
-            if (this.transactionCategoriesStore.transactionCategoryListStateInvalid && !this.loading) {
-                this.reload(null);
-            }
-
-            this.$routeBackOnError(this.f7router, 'loadingError');
-        },
-        reload(done) {
-            if (this.sortable) {
-                done();
-                return;
-            }
-
-            const self = this;
-            const force = !!done;
-
-            self.transactionCategoriesStore.loadAllCategories({
-                force: force
-            }).then(() => {
-                if (done) {
-                    done();
-                }
-
-                if (force) {
-                    self.$toast('Category list has been updated');
-                }
-            }).catch(error => {
-                if (done) {
-                    done();
-                }
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        setSortable() {
-            if (this.sortable) {
-                return;
-            }
-
-            this.showHidden = true;
-            this.sortable = true;
-            this.displayOrderModified = false;
-        },
-        onSort(event) {
-            const self = this;
-
-            if (!event || !event.el || !event.el.id) {
-                self.$toast('Unable to move category');
-                return;
-            }
-
-            const id = self.parseCategoryIdFromDomId(event.el.id);
-
-            if (!id) {
-                self.$toast('Unable to move category');
-                return;
-            }
-
-            self.transactionCategoriesStore.changeCategoryDisplayOrder({
-                categoryId: id,
-                from: event.from,
-                to: event.to
-            }).then(() => {
-                self.displayOrderModified = true;
-            }).catch(error => {
-                self.$toast(error.message || error);
-            });
-        },
-        saveSortResult() {
-            const self = this;
-
-            if (!self.displayOrderModified) {
-                self.showHidden = false;
-                self.sortable = false;
-                return;
-            }
-
-            self.displayOrderSaving = true;
-            self.$showLoading();
-
-            self.transactionCategoriesStore.updateCategoryDisplayOrders({
-                type: self.categoryType,
-                parentId: self.primaryCategoryId,
-            }).then(() => {
-                self.displayOrderSaving = false;
-                self.$hideLoading();
-
-                self.showHidden = false;
-                self.sortable = false;
-                self.displayOrderModified = false;
-            }).catch(error => {
-                self.displayOrderSaving = false;
-                self.$hideLoading();
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        edit(category) {
-            this.f7router.navigate('/category/edit?id=' + category.id);
-        },
-        hide(category, hidden) {
-            const self = this;
-
-            self.$showLoading();
-
-            self.transactionCategoriesStore.hideCategory({
-                category: category,
-                hidden: hidden
-            }).then(() => {
-                self.$hideLoading();
-            }).catch(error => {
-                self.$hideLoading();
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        remove(category, confirm) {
-            const self = this;
-
-            if (!category) {
-                self.$alert('An error occurred');
-                return;
-            }
-
-            if (!confirm) {
-                self.categoryToDelete = category;
-                self.showDeleteActionSheet = true;
-                return;
-            }
-
-            self.showDeleteActionSheet = false;
-            self.categoryToDelete = null;
-            self.$showLoading();
-
-            self.transactionCategoriesStore.deleteCategory({
-                category: category,
-                beforeResolve: (done) => {
-                    onSwipeoutDeleted(self.getCategoryDomId(category), done);
-                }
-            }).then(() => {
-                self.$hideLoading();
-            }).catch(error => {
-                self.$hideLoading();
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        getCategoryDomId(category) {
-            return 'category_' + category.id;
-        },
-        parseCategoryIdFromDomId(domId) {
-            if (!domId || domId.indexOf('category_') !== 0) {
-                return null;
-            }
-
-            return domId.substring(9); // category_
-        }
+        return transactionCategoriesStore.allTransactionCategoriesMap[primaryCategoryId.value].secondaryCategories || [];
+    } else {
+        return [];
     }
-};
+});
+
+const title = computed<string>(() => {
+    let title = '';
+
+    switch (categoryType.value) {
+        case CategoryType.Income:
+            title = 'Income';
+            break;
+        case CategoryType.Expense:
+            title = 'Expense';
+            break;
+        case CategoryType.Transfer:
+            title = 'Transfer';
+            break;
+        default:
+            title = 'Transaction';
+            break;
+    }
+
+    switch (hasSubCategories.value) {
+        case true:
+            title += ' Primary';
+            break;
+        case false:
+            title += ' Secondary';
+            break;
+    }
+
+    return title + ' Categories';
+});
+
+const firstShowingId = computed<string | null>(() => getFirstShowingId(categories.value, showHidden.value));
+const lastShowingId = computed<string | null>(() => getLastShowingId(categories.value, showHidden.value));
+const noAvailableCategory = computed<boolean>(() => isNoAvailableCategory(categories.value, showHidden.value));
+const noCategory = computed<boolean>(() => categories.value.length < 1);
+
+function getCategoryDomId(category: TransactionCategory): string {
+    return 'category_' + category.id;
+}
+
+function parseCategoryIdFromDomId(domId: string): string | null {
+    if (!domId || domId.indexOf('category_') !== 0) {
+        return null;
+    }
+
+    return domId.substring(9); // category_
+}
+
+function init(): void {
+    const query = props.f7route.query;
+
+    categoryType.value = parseInt(query['type'] || '0');
+
+    if (categoryType.value !== CategoryType.Income &&
+        categoryType.value !== CategoryType.Expense &&
+        categoryType.value !== CategoryType.Transfer) {
+        showToast('Parameter Invalid');
+        loadingError.value = 'Parameter Invalid';
+        return;
+    }
+
+    if (query['id'] && query['id'] !== '0') {
+        primaryCategoryId.value = query['id'];
+        hasSubCategories.value = false;
+    } else {
+        primaryCategoryId.value = '0';
+        hasSubCategories.value = true;
+    }
+
+    loading.value = true;
+
+    transactionCategoriesStore.loadAllCategories({
+        force: false
+    }).then(() => {
+        loading.value = false;
+    }).catch(error => {
+        if (error.processed) {
+            loading.value = false;
+        } else {
+            loadingError.value = error;
+            showToast(error.message || error);
+        }
+    });
+}
+
+function reload(done: (() => void) | null): void {
+    if (sortable.value) {
+        done?.();
+        return;
+    }
+
+    const force = !!done;
+
+    transactionCategoriesStore.loadAllCategories({
+        force: force
+    }).then(() => {
+        done?.();
+
+        if (force) {
+            showToast('Category list has been updated');
+        }
+    }).catch(error => {
+        done?.();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function edit(category: TransactionCategory): void {
+    props.f7router.navigate('/category/edit?id=' + category.id);
+}
+
+function hide(category: TransactionCategory, hidden: boolean): void {
+    showLoading();
+
+    transactionCategoriesStore.hideCategory({
+        category: category,
+        hidden: hidden
+    }).then(() => {
+        hideLoading();
+    }).catch(error => {
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function remove(category: TransactionCategory | null, confirm: boolean): void {
+    if (!category) {
+        showAlert('An error occurred');
+        return;
+    }
+
+    if (!confirm) {
+        categoryToDelete.value = category;
+        showDeleteActionSheet.value = true;
+        return;
+    }
+
+    showDeleteActionSheet.value = false;
+    categoryToDelete.value = null;
+    showLoading();
+
+    transactionCategoriesStore.deleteCategory({
+        category: category,
+        beforeResolve: (done) => {
+            onSwipeoutDeleted(getCategoryDomId(category), done);
+        }
+    }).then(() => {
+        hideLoading();
+    }).catch(error => {
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function setSortable(): void {
+    if (sortable.value) {
+        return;
+    }
+
+    showHidden.value = true;
+    sortable.value = true;
+    displayOrderModified.value = false;
+}
+
+function saveSortResult(): void {
+    if (!displayOrderModified.value) {
+        showHidden.value = false;
+        sortable.value = false;
+        return;
+    }
+
+    displayOrderSaving.value = true;
+    showLoading();
+
+    transactionCategoriesStore.updateCategoryDisplayOrders({
+        type: categoryType.value as CategoryType,
+        parentId: primaryCategoryId.value
+    }).then(() => {
+        displayOrderSaving.value = false;
+        hideLoading();
+
+        showHidden.value = false;
+        sortable.value = false;
+        displayOrderModified.value = false;
+    }).catch(error => {
+        displayOrderSaving.value = false;
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function onPageAfterIn(): void {
+    if (transactionCategoriesStore.transactionCategoryListStateInvalid && !loading.value) {
+        reload(null);
+    }
+
+    routeBackOnError(props.f7router, loadingError);
+}
+
+function onSort(event: { el: { id: string }; from: number; to: number }): void {
+    if (!event || !event.el || !event.el.id) {
+        showToast('Unable to move category');
+        return;
+    }
+
+    const id = parseCategoryIdFromDomId(event.el.id);
+
+    if (!id) {
+        showToast('Unable to move category');
+        return;
+    }
+
+    transactionCategoriesStore.changeCategoryDisplayOrder({
+        categoryId: id,
+        from: event.from,
+        to: event.to
+    }).then(() => {
+        displayOrderModified.value = true;
+    }).catch(error => {
+        showToast(error.message || error);
+    });
+}
+
+init();
 </script>
 
 <style>

@@ -433,7 +433,7 @@ export default {
             }).catch(error => {
                 self.loading = false;
 
-                if (error && error.message === 'Account list is up to date') {
+                if (error && error.isUpToDate) {
                     self.displayOrderModified = false;
                 }
 

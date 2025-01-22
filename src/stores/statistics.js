@@ -938,7 +938,7 @@ export const useStatisticsStore = defineStore('statistics', {
                     }
 
                     if (force && data.result && isEquals(self.transactionCategoryStatisticsData, data.result)) {
-                        reject({ message: 'Data is up to date' });
+                        reject({ message: 'Data is up to date', isUpToDate: true });
                         return;
                     }
 
@@ -982,7 +982,7 @@ export const useStatisticsStore = defineStore('statistics', {
                     }
 
                     if (force && data.result && isEquals(self.transactionCategoryTrendsData, data.result)) {
-                        reject({ message: 'Data is up to date' });
+                        reject({ message: 'Data is up to date', isUpToDate: true });
                         return;
                     }
 

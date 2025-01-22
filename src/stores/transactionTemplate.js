@@ -161,7 +161,7 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
                     }
 
                     if (force && data.result && isEquals(self.allTransactionTemplates[templateType], data.result)) {
-                        reject({ message: 'Template list is up to date' });
+                        reject({ message: 'Template list is up to date', isUpToDate: true });
                         return;
                     }
 

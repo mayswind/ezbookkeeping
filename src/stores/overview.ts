@@ -332,7 +332,7 @@ export const useOverviewStore = defineStore('overview', () => {
                 }
 
                 if (force && data.result && isEquals(transactionOverviewData.value, data.result)) {
-                    reject({ message: 'Data is up to date' });
+                    reject({ message: 'Data is up to date', isUpToDate: true });
                     return;
                 }
 

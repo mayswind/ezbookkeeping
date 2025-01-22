@@ -195,7 +195,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                 const transactionCategories = TransactionCategory.ofMap(data.result);
 
                 if (force && data.result && isEquals(allTransactionCategories.value, transactionCategories)) {
-                    reject({ message: 'Category list is up to date' });
+                    reject({ message: 'Category list is up to date', isUpToDate: true });
                     return;
                 }
 

@@ -254,6 +254,10 @@ export default {
             }).catch(error => {
                 self.loading = false;
 
+                if (error && error.isUpToDate) {
+                    self.displayOrderModified = false;
+                }
+
                 if (!error.processed) {
                     self.$refs.snackbar.showError(error);
                 }

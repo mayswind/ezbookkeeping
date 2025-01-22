@@ -348,6 +348,10 @@ function reload(force: boolean): void {
     }).catch(error => {
         loading.value = false;
 
+        if (error && error.isUpToDate) {
+            displayOrderModified.value = false;
+        }
+
         if (!error.processed) {
             snackbar.value?.showError(error);
         }

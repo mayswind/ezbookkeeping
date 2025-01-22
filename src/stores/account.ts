@@ -726,7 +726,7 @@ export const useAccountsStore = defineStore('accounts', () => {
                 const accounts = Account.ofMany(data.result);
 
                 if (force && data.result && isEquals(allAccounts.value, accounts)) {
-                    reject({ message: 'Account list is up to date' });
+                    reject({ message: 'Account list is up to date', isUpToDate: true });
                     return;
                 }
 

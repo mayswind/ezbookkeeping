@@ -115,7 +115,7 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
                 const transactionTags = TransactionTag.ofMany(data.result);
 
                 if (force && data.result && isEquals(allTransactionTags.value, transactionTags)) {
-                    reject({ message: 'Tag list is up to date' });
+                    reject({ message: 'Tag list is up to date', isUpToDate: true });
                     return;
                 }
 

@@ -201,9 +201,6 @@ app.component('ScheduleFrequencySheet', ScheduleFrequencySheet);
 
 app.directive('TextareaAutoSize', TextareaAutoSize);
 
-app.config.globalProperties.$version = getVersion();
-app.config.globalProperties.$buildTime = getBuildTime();
-
 app.config.globalProperties.$locale = i18nFunctions(i18n.global);
 
 app.config.globalProperties.$alert = (message, confirmCallback) => showAlert(message, confirmCallback, i18n.global.t);

@@ -1,32 +1,25 @@
-import moment from 'moment-timezone';
-
 import { DEFAULT_LANGUAGE, ALL_LANGUAGES } from '@/locales/index.ts';
 
-import { Month, WeekDay, MeridiemIndicator, LongDateFormat, ShortDateFormat, LongTimeFormat, ShortTimeFormat, DateRange } from '@/core/datetime.ts';
-import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
+import { WeekDay, LongDateFormat, ShortDateFormat, LongTimeFormat, ShortTimeFormat, DateRange } from '@/core/datetime.ts';
 import { DecimalSeparator, DigitGroupingSymbol, DigitGroupingType } from '@/core/numeral.ts';
-import { CurrencyDisplayType, CurrencySortingType } from '@/core/currency.ts'
+import { CurrencyDisplayType } from '@/core/currency.ts'
 import { AccountType, AccountCategory } from '@/core/account.ts';
-import { CategoryType } from '@/core/category.ts';
-import { TransactionEditScopeType, TransactionTagFilterType } from '@/core/transaction.ts';
+import { TransactionTagFilterType } from '@/core/transaction.ts';
 import { CategoricalChartType, TrendChartType, ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
 
 import { UTC_TIMEZONE, ALL_TIMEZONES } from '@/consts/timezone.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { SUPPORTED_IMPORT_FILE_TYPES } from '@/consts/file.ts';
-import { DEFAULT_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES, DEFAULT_TRANSFER_CATEGORIES } from '@/consts/category.ts';
 import { KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS } from '@/consts/api.ts';
 
 import {
     isString,
     isNumber,
     isBoolean,
-    copyObjectTo,
-    copyArrayTo
+    copyObjectTo
 } from '@/lib/common.ts';
 
 import {
-    isPM,
     parseDateFromUnixTime,
     formatUnixTime,
     getYear,
@@ -42,8 +35,6 @@ import {
 } from '@/lib/datetime.ts';
 
 import {
-    appendDigitGroupingSymbol,
-    parseAmount,
     formatAmount,
     getAdaptiveDisplayAmountRate
 } from '@/lib/numeral.ts';
@@ -58,109 +49,12 @@ import {
     getAllFilteredAccountsBalance
 } from '@/lib/account.ts';
 
-import logger from '@/lib/logger.ts';
-import services from '@/lib/services.ts';
-
 function getLanguageDisplayName(translateFn, languageName) {
     return translateFn(`language.${languageName}`);
 }
 
-function getLanguageInfo(locale) {
-    return ALL_LANGUAGES[locale];
-}
-
-function getDefaultLanguage() {
-    if (!window || !window.navigator) {
-        return DEFAULT_LANGUAGE;
-    }
-
-    let browserLocale = window.navigator.browserLanguage || window.navigator.language;
-
-    if (!browserLocale) {
-        return DEFAULT_LANGUAGE;
-    }
-
-    if (!ALL_LANGUAGES[browserLocale]) {
-        const locale = getLocaleFromLanguageAlias(browserLocale);
-
-        if (locale) {
-            browserLocale = locale;
-        }
-    }
-
-    if (!ALL_LANGUAGES[browserLocale] && browserLocale.split('-').length > 1) { // maybe language-script-region
-        const localeParts = browserLocale.split('-');
-        browserLocale = localeParts[0] + '-' + localeParts[1];
-
-        if (!ALL_LANGUAGES[browserLocale]) {
-            const locale = getLocaleFromLanguageAlias(browserLocale);
-
-            if (locale) {
-                browserLocale = locale;
-            }
-        }
-
-        if (!ALL_LANGUAGES[browserLocale]) {
-            browserLocale = localeParts[0];
-            const locale = getLocaleFromLanguageAlias(browserLocale);
-
-            if (locale) {
-                browserLocale = locale;
-            }
-        }
-    }
-
-    if (!ALL_LANGUAGES[browserLocale]) {
-        return DEFAULT_LANGUAGE;
-    }
-
-    return browserLocale;
-}
-
-function getLocaleFromLanguageAlias(alias) {
-    for (let locale in ALL_LANGUAGES) {
-        if (!Object.prototype.hasOwnProperty.call(ALL_LANGUAGES, locale)) {
-            continue;
-        }
-
-        if (locale.toLowerCase() === alias.toLowerCase()) {
-            return locale;
-        }
-
-        const lang = ALL_LANGUAGES[locale];
-        const aliases = lang.aliases;
-
-        if (!aliases || aliases.length < 1) {
-            continue;
-        }
-
-        for (let i = 0; i < aliases.length; i++) {
-            if (aliases[i].toLowerCase() === alias.toLowerCase()) {
-                return locale;
-            }
-        }
-    }
-
-    return null;
-}
-
 function getCurrentLanguageTag(i18nGlobal) {
     return i18nGlobal.locale;
-}
-
-function getCurrentLanguageInfo(i18nGlobal) {
-    const locale = getLanguageInfo(i18nGlobal.locale);
-
-    if (locale) {
-        return locale;
-    }
-
-    return getLanguageInfo(getDefaultLanguage());
-}
-
-function getCurrentLanguageDisplayName(i18nGlobal) {
-    const currentLanguageInfo = getCurrentLanguageInfo(i18nGlobal);
-    return currentLanguageInfo.displayName;
 }
 
 function getLocalizedDisplayNameAndType(typeAndNames, translateFn) {
@@ -176,14 +70,6 @@ function getLocalizedDisplayNameAndType(typeAndNames, translateFn) {
     }
 
     return ret;
-}
-
-function getDefaultCurrency(translateFn) {
-    return translateFn('default.currency');
-}
-
-function getDefaultFirstDayOfWeek(translateFn) {
-    return translateFn('default.firstDayOfWeek');
 }
 
 function getCurrencyName(currencyCode, translateFn) {
@@ -202,66 +88,6 @@ function getCurrencyUnitName(currencyCode, isPlural, translateFn) {
     }
 
     return '';
-}
-
-function getAllLongMonthNames(translateFn) {
-    const ret = [];
-    const allMonths = Month.values();
-
-    for (let i = 0; i < allMonths.length; i++) {
-        const month = allMonths[i];
-        ret.push(translateFn(`datetime.${month.name}.long`));
-    }
-
-    return ret;
-}
-
-function getAllShortMonthNames(translateFn) {
-    const ret = [];
-    const allMonths = Month.values();
-
-    for (let i = 0; i < allMonths.length; i++) {
-        const month = allMonths[i];
-        ret.push(translateFn(`datetime.${month.name}.short`));
-    }
-
-    return ret;
-}
-
-function getAllLongWeekdayNames(translateFn) {
-    const ret = [];
-    const allWeekDays = WeekDay.values();
-
-    for (let i = 0; i < allWeekDays.length; i++) {
-        const weekDay = allWeekDays[i];
-        ret.push(translateFn(`datetime.${weekDay.name}.long`));
-    }
-
-    return ret;
-}
-
-function getAllShortWeekdayNames(translateFn) {
-    const ret = [];
-    const allWeekDays = WeekDay.values();
-
-    for (let i = 0; i < allWeekDays.length; i++) {
-        const weekDay = allWeekDays[i];
-        ret.push(translateFn(`datetime.${weekDay.name}.short`));
-    }
-
-    return ret;
-}
-
-function getAllMinWeekdayNames(translateFn) {
-    const ret = [];
-    const allWeekDays = WeekDay.values();
-
-    for (let i = 0; i < allWeekDays.length; i++) {
-        const weekDay = allWeekDays[i];
-        ret.push(translateFn(`datetime.${weekDay.name}.min`));
-    }
-
-    return ret;
 }
 
 function getMonthdayOrdinal(monthDay, translateFn) {
@@ -635,128 +461,6 @@ function getDateRangeDisplayName(userStore, dateType, startTime, endTime, transl
     return `${displayStartTime} ~ ${displayEndTime}`;
 }
 
-function getAllTimezoneTypesUsedForStatistics(currentTimezone, translateFn) {
-    const currentTimezoneOffset = getTimezoneOffset(currentTimezone);
-
-    return [
-        {
-            displayName: translateFn(TimezoneTypeForStatistics.ApplicationTimezone.name) + ` (UTC${currentTimezoneOffset})`,
-            type: TimezoneTypeForStatistics.ApplicationTimezone.type
-        },
-        {
-            displayName: translateFn(TimezoneTypeForStatistics.TransactionTimezone.name),
-            type: TimezoneTypeForStatistics.TransactionTimezone.type
-        }
-    ];
-}
-
-function getAllDecimalSeparators(translateFn) {
-    const defaultDecimalSeparatorTypeName = translateFn('default.decimalSeparator');
-    return getNumeralSeparatorFormats(translateFn, DecimalSeparator.values(), DecimalSeparator.parse(defaultDecimalSeparatorTypeName), DecimalSeparator.Default, DecimalSeparator.LanguageDefaultType);
-}
-
-function getAllDigitGroupingSymbols(translateFn) {
-    const defaultDigitGroupingSymbolTypeName = translateFn('default.digitGroupingSymbol');
-    return getNumeralSeparatorFormats(translateFn, DigitGroupingSymbol.values(), DigitGroupingSymbol.parse(defaultDigitGroupingSymbolTypeName), DigitGroupingSymbol.Default, DigitGroupingSymbol.LanguageDefaultType);
-}
-
-function getNumeralSeparatorFormats(translateFn, allSeparatorArray, localeDefaultType, systemDefaultType, languageDefaultValue) {
-    let defaultSeparatorType = localeDefaultType;
-
-    if (!defaultSeparatorType) {
-        defaultSeparatorType = systemDefaultType;
-    }
-
-    const ret = [];
-
-    ret.push({
-        type: languageDefaultValue,
-        symbol: defaultSeparatorType.symbol,
-        displayName: `${translateFn('Language Default')} (${defaultSeparatorType.symbol})`
-    });
-
-    for (let i = 0; i < allSeparatorArray.length; i++) {
-        const type = allSeparatorArray[i];
-
-        ret.push({
-            type: type.type,
-            symbol: type.symbol,
-            displayName: `${translateFn('numeral.' + type.name)} (${type.symbol})`
-        });
-    }
-
-    return ret;
-}
-
-function getAllDigitGroupingTypes(translateFn) {
-    const defaultDigitGroupingTypeName = translateFn('default.digitGrouping');
-    let defaultDigitGroupingType = DigitGroupingType.parse(defaultDigitGroupingTypeName);
-
-    if (!defaultDigitGroupingType) {
-        defaultDigitGroupingType = DigitGroupingType.Default;
-    }
-
-    const ret = [];
-
-    ret.push({
-        type: DigitGroupingType.LanguageDefaultType,
-        enabled: defaultDigitGroupingType.enabled,
-        displayName: `${translateFn('Language Default')} (${translateFn('numeral.' + defaultDigitGroupingType.name)})`
-    });
-
-    const allDigitGroupingTypes = DigitGroupingType.values();
-
-    for (let i = 0; i < allDigitGroupingTypes.length; i++) {
-        const type = allDigitGroupingTypes[i];
-
-        ret.push({
-            type: type.type,
-            enabled: type.enabled,
-            displayName: translateFn('numeral.' + type.name)
-        });
-    }
-
-    return ret;
-}
-
-function getAllCurrencyDisplayTypes(userStore, settingsStore, translateFn) {
-    const defaultCurrencyDisplayTypeName = translateFn('default.currencyDisplayType');
-    let defaultCurrencyDisplayType = CurrencyDisplayType.parse(defaultCurrencyDisplayTypeName);
-
-    if (!defaultCurrencyDisplayType) {
-        defaultCurrencyDisplayType = CurrencyDisplayType.Default;
-    }
-
-    const defaultCurrency = userStore.currentUserDefaultCurrency;
-
-    const ret = [];
-    const defaultSampleValue = getFormattedAmountWithCurrency(12345, defaultCurrency, translateFn, userStore, settingsStore, false, defaultCurrencyDisplayType);
-
-    ret.push({
-        type: CurrencyDisplayType.LanguageDefaultType,
-        displayName: `${translateFn('Language Default')} (${defaultSampleValue})`
-    });
-
-    const allCurrencyDisplayTypes = CurrencyDisplayType.values();
-
-    for (let i = 0; i < allCurrencyDisplayTypes.length; i++) {
-        const type = allCurrencyDisplayTypes[i];
-        const sampleValue = getFormattedAmountWithCurrency(12345, defaultCurrency, translateFn, userStore, settingsStore, false, type);
-        const displayName = `${translateFn(type.name)} (${sampleValue})`
-
-        ret.push({
-            type: type.type,
-            displayName: displayName
-        });
-    }
-
-    return ret;
-}
-
-function getAllCurrencySortingTypes(translateFn) {
-    return getLocalizedDisplayNameAndType(CurrencySortingType.values(), translateFn);
-}
-
 function getCurrentDecimalSeparator(translateFn, decimalSeparator) {
     let decimalSeparatorType = DecimalSeparator.valueOf(decimalSeparator);
 
@@ -809,16 +513,6 @@ function getNumberFormatOptions(translateFn, userStore, currencyCode) {
         digitGroupingSymbol: getCurrentDigitGroupingSymbol(translateFn, userStore.currentUserDigitGroupingSymbol),
         digitGrouping: getCurrentDigitGroupingType(translateFn, userStore.currentUserDigitGrouping),
     };
-}
-
-function getNumberWithDigitGroupingSymbol(value, translateFn, userStore) {
-    const numberFormatOptions = getNumberFormatOptions(translateFn, userStore);
-    return appendDigitGroupingSymbol(value, numberFormatOptions);
-}
-
-function getParsedAmountNumber(value, translateFn, userStore) {
-    const numberFormatOptions = getNumberFormatOptions(translateFn, userStore);
-    return parseAmount(value, numberFormatOptions);
 }
 
 function getFormattedAmount(value, translateFn, userStore, currencyCode) {
@@ -928,67 +622,8 @@ function getAllStatisticsDateAggregationTypes(translateFn) {
     return getLocalizedDisplayNameAndType(ChartDateAggregationType.values(), translateFn);
 }
 
-function getAllTransactionEditScopeTypes(translateFn) {
-    return getLocalizedDisplayNameAndType(TransactionEditScopeType.values(), translateFn);
-}
-
 function getAllTransactionTagFilterTypes(translateFn) {
     return getLocalizedDisplayNameAndType(TransactionTagFilterType.values(), translateFn);
-}
-
-function getAllTransactionDefaultCategories(categoryType, locale, translateFn) {
-    const allCategories = {};
-    const categoryTypes = [];
-
-    if (categoryType === 0) {
-        for (let i = CategoryType.Income; i <= CategoryType.Transfer; i++) {
-            categoryTypes.push(i);
-        }
-    } else {
-        categoryTypes.push(categoryType);
-    }
-
-    for (let i = 0; i < categoryTypes.length; i++) {
-        const categories = [];
-        const categoryType = categoryTypes[i];
-        let defaultCategories = [];
-
-        if (categoryType === CategoryType.Income) {
-            defaultCategories = copyArrayTo(DEFAULT_INCOME_CATEGORIES, []);
-        } else if (categoryType === CategoryType.Expense) {
-            defaultCategories = copyArrayTo(DEFAULT_EXPENSE_CATEGORIES, []);
-        } else if (categoryType === CategoryType.Transfer) {
-            defaultCategories = copyArrayTo(DEFAULT_TRANSFER_CATEGORIES, []);
-        }
-
-        for (let j = 0; j < defaultCategories.length; j++) {
-            const category = defaultCategories[j];
-
-            const submitCategory = {
-                name: translateFn('category.' + category.name, {}, { locale: locale }),
-                type: categoryType,
-                icon: category.categoryIconId,
-                color: category.color,
-                subCategories: []
-            }
-
-            for (let k = 0; k < category.subCategories.length; k++) {
-                const subCategory = category.subCategories[k];
-                submitCategory.subCategories.push({
-                    name: translateFn('category.' + subCategory.name, {}, { locale: locale }),
-                    type: categoryType,
-                    icon: subCategory.categoryIconId,
-                    color: subCategory.color
-                });
-            }
-
-            categories.push(submitCategory);
-        }
-
-        allCategories[categoryType] = categories;
-    }
-
-    return allCategories;
 }
 
 function getAllSupportedImportFileTypes(i18nGlobal, translateFn) {
@@ -1192,57 +827,6 @@ function getLocalizedErrorParameters(parameters, i18nFunc) {
     return localizedParameters;
 }
 
-function setLanguage(i18nGlobal, locale, force) {
-    if (!locale) {
-        locale = getDefaultLanguage();
-        logger.info(`No specified language, use browser default language ${locale}`);
-    }
-
-    if (!getLanguageInfo(locale)) {
-        locale = getDefaultLanguage();
-        logger.warn(`Not found language ${locale}, use browser default language ${locale}`);
-    }
-
-    if (!force && i18nGlobal.locale === locale) {
-        logger.info(`Current locale is already ${locale}`);
-        return null;
-    }
-
-    logger.info(`Apply current language to ${locale}`);
-
-    i18nGlobal.locale = locale;
-    moment.updateLocale(locale, {
-        months : getAllLongMonthNames(i18nGlobal.t),
-        monthsShort : getAllShortMonthNames(i18nGlobal.t),
-        weekdays : getAllLongWeekdayNames(i18nGlobal.t),
-        weekdaysShort : getAllShortWeekdayNames(i18nGlobal.t),
-        weekdaysMin : getAllMinWeekdayNames(i18nGlobal.t),
-        meridiem: function (hours) {
-            if (isPM(hours)) {
-                return i18nGlobal.t(`datetime.${MeridiemIndicator.PM.name}.content`);
-            } else {
-                return i18nGlobal.t(`datetime.${MeridiemIndicator.AM.name}.content`);
-            }
-        }
-    });
-
-    services.setLocale(locale);
-    document.querySelector('html').setAttribute('lang', locale);
-
-    const defaultCurrency = getDefaultCurrency(i18nGlobal.t);
-    const defaultFirstDayOfWeekName = getDefaultFirstDayOfWeek(i18nGlobal.t);
-    let defaultFirstDayOfWeek = WeekDay.DefaultFirstDay.type;
-
-    if (WeekDay.parse(defaultFirstDayOfWeekName)) {
-        defaultFirstDayOfWeek = WeekDay.parse(defaultFirstDayOfWeekName).type;
-    }
-
-    return {
-        currency: defaultCurrency,
-        firstDayOfWeek: defaultFirstDayOfWeek
-    };
-}
-
 export function translateError(message, translateFn) {
     let parameters = {};
 
@@ -1257,8 +841,6 @@ export function translateError(message, translateFn) {
 
 export function i18nFunctions(i18nGlobal) {
     return {
-        getDefaultCurrency: () => getDefaultCurrency(i18nGlobal.t),
-        getDefaultFirstDayOfWeek: () => getDefaultFirstDayOfWeek(i18nGlobal.t),
         getCurrencyName: (currencyCode) => getCurrencyName(currencyCode, i18nGlobal.t),
         getMonthdayShortName: (monthDay) => getMonthdayShortName(monthDay, i18nGlobal.t),
         getWeekdayShortName: (weekDay) => getWeekdayShortName(weekDay, i18nGlobal.t),
@@ -1266,15 +848,12 @@ export function i18nFunctions(i18nGlobal) {
         getMultiMonthdayShortNames: (monthdays) => getMultiMonthdayShortNames(monthdays, i18nGlobal.t),
         getMultiWeekdayLongNames: (weekdayTypes, firstDayOfWeek) => getMultiWeekdayLongNames(weekdayTypes, firstDayOfWeek, i18nGlobal.t),
         formatUnixTimeToLongDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18nGlobal.t, userStore.currentUserLongDateFormat) + ' ' + getI18nLongTimeFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat), utcOffset, currentUtcOffset),
-        formatUnixTimeToShortDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortDateFormat(i18nGlobal.t, userStore.currentUserShortDateFormat) + ' ' + getI18nShortTimeFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToLongDate: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18nGlobal.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
-        formatUnixTimeToShortDate: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortDateFormat(i18nGlobal.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToLongYear: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongYearFormat(i18nGlobal.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToShortYear: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortYearFormat(i18nGlobal.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToLongYearMonth: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongYearMonthFormat(i18nGlobal.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToShortYearMonth: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortYearMonthFormat(i18nGlobal.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToLongMonthDay: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongMonthDayFormat(i18nGlobal.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
-        formatUnixTimeToShortMonthDay: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortMonthDayFormat(i18nGlobal.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToLongTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongTimeFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToShortTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortTimeFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat), utcOffset, currentUtcOffset),
         formatYearQuarter: (year, quarter) => formatYearQuarter(i18nGlobal.t, year, quarter),
@@ -1285,17 +864,9 @@ export function i18nFunctions(i18nGlobal) {
         getAllDateRanges: (scene, includeCustom, includeBillingCycle) => getAllDateRanges(scene, includeCustom, includeBillingCycle, i18nGlobal.t),
         getAllRecentMonthDateRanges: (userStore, includeAll, includeCustom) => getAllRecentMonthDateRanges(userStore, includeAll, includeCustom, i18nGlobal.t),
         getDateRangeDisplayName: (userStore, dateType, startTime, endTime) => getDateRangeDisplayName(userStore, dateType, startTime, endTime, i18nGlobal.t),
-        getAllTimezoneTypesUsedForStatistics: (currentTimezone) => getAllTimezoneTypesUsedForStatistics(currentTimezone, i18nGlobal.t),
-        getAllDecimalSeparators: () => getAllDecimalSeparators(i18nGlobal.t),
-        getAllDigitGroupingSymbols: () => getAllDigitGroupingSymbols(i18nGlobal.t),
-        getAllDigitGroupingTypes: () => getAllDigitGroupingTypes(i18nGlobal.t),
-        getAllCurrencyDisplayTypes: (settingsStore, userStore) => getAllCurrencyDisplayTypes(userStore, settingsStore, i18nGlobal.t),
-        getAllCurrencySortingTypes: () => getAllCurrencySortingTypes(i18nGlobal.t),
         getCurrentDecimalSeparator: (userStore) => getCurrentDecimalSeparator(i18nGlobal.t, userStore.currentUserDecimalSeparator),
         getCurrentDigitGroupingSymbol: (userStore) => getCurrentDigitGroupingSymbol(i18nGlobal.t, userStore.currentUserDigitGroupingSymbol),
         getCurrentDigitGroupingType: (userStore) => getCurrentDigitGroupingType(i18nGlobal.t, userStore.currentUserDigitGrouping),
-        appendDigitGroupingSymbol: (userStore, value) => getNumberWithDigitGroupingSymbol(value, i18nGlobal.t, userStore),
-        parseAmount: (userStore, value) => getParsedAmountNumber(value, i18nGlobal.t, userStore),
         formatAmount: (userStore, value, currencyCode) => getFormattedAmount(value, i18nGlobal.t, userStore, currencyCode),
         formatAmountWithCurrency: (settingsStore, userStore, value, currencyCode) => getFormattedAmountWithCurrency(value, currencyCode, i18nGlobal.t, userStore, settingsStore),
         getAdaptiveAmountRate: (userStore, amount1, amount2, fromExchangeRate, toExchangeRate) => getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, i18nGlobal.t, userStore),
@@ -1305,12 +876,9 @@ export function i18nFunctions(i18nGlobal) {
         getAllTrendChartTypes: () => getAllTrendChartTypes(i18nGlobal.t),
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),
         getAllStatisticsDateAggregationTypes: () => getAllStatisticsDateAggregationTypes(i18nGlobal.t),
-        getAllTransactionEditScopeTypes: () => getAllTransactionEditScopeTypes(i18nGlobal.t),
         getAllTransactionTagFilterTypes: () => getAllTransactionTagFilterTypes(i18nGlobal.t),
-        getAllTransactionDefaultCategories: (categoryType, locale) => getAllTransactionDefaultCategories(categoryType, locale, i18nGlobal.t),
         getAllSupportedImportFileTypes: () => getAllSupportedImportFileTypes(i18nGlobal, i18nGlobal.t),
         getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t),
-        joinMultiText: (textArray) => joinMultiText(textArray, i18nGlobal.t),
-        setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force)
+        joinMultiText: (textArray) => joinMultiText(textArray, i18nGlobal.t)
     };
 }

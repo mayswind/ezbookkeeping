@@ -468,10 +468,6 @@ app.component('DateRangeSelectionDialog', DateRangeSelectionDialog);
 app.component('MonthRangeSelectionDialog', MonthRangeSelectionDialog);
 app.component('SwitchToMobileDialog', SwitchToMobileDialog);
 
-app.config.globalProperties.$version = getVersion();
-app.config.globalProperties.$buildTime = getBuildTime();
-
 app.config.globalProperties.$locale = i18nFunctions(i18n.global);
-app.config.globalProperties.$tError = (message) => translateError(message, i18n.global.t);
 
 app.mount('#app');

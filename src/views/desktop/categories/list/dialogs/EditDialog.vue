@@ -110,7 +110,7 @@ import { TransactionCategory } from '@/models/transaction_category.ts';
 
 import { generateRandomUUID } from '@/lib/misc.ts';
 
-interface TransactionCategoryEditRespose {
+interface TransactionCategoryEditResponse {
     message: string;
 }
 
@@ -140,10 +140,10 @@ const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const showState = ref<boolean>(false);
 
-let resolveFunc: ((value: TransactionCategoryEditRespose) => void) | null = null;
+let resolveFunc: ((value: TransactionCategoryEditResponse) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
-function open(options: { id?: string; parentId?: string; type?: CategoryType; currentCategory?: TransactionCategory }): Promise<TransactionCategoryEditRespose> {
+function open(options: { id?: string; parentId?: string; type?: CategoryType; currentCategory?: TransactionCategory }): Promise<TransactionCategoryEditResponse> {
     showState.value = true;
     loading.value = true;
     submitting.value = false;

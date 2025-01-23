@@ -4,51 +4,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { useTheme } from 'vuetify';
 
 import type { ECElementEvent } from 'echarts/core';
 import type { CallbackDataParams } from 'echarts/types/dist/shared';
 
 import { useI18n } from '@/locales/helpers.ts';
+import { type CommonPieChartDataItem, type CommonPieChartProps, usePieChartBase } from '@/components/base/PieChartBase.ts'
 
 import type { ColorValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { DEFAULT_ICON_COLOR, DEFAULT_CHART_COLORS } from '@/consts/color.ts';
+import { DEFAULT_ICON_COLOR } from '@/consts/color.ts';
 
-import { isNumber } from '@/lib/common.ts';
-import { formatPercent } from '@/lib/numeral.ts';
-
-interface DesktopPieChartDataItem {
-    id: string;
-    name: string;
-    displayName: string;
-    value: number;
-    percent: number;
-    actualPercent: number;
+interface DesktopPieChartDataItem extends CommonPieChartDataItem {
     itemStyle: {
         color: ColorValue;
     };
     selected: boolean;
-    sourceItem: Record<string, unknown>;
-    displayPercent?: string;
-    displayValue?: string;
 }
 
-const props = defineProps<{
-    skeleton?: boolean;
-    items: Record<string, unknown>[];
-    idField?: string;
-    nameField: string;
-    valueField: string;
-    percentField?: string;
-    colorField?: string;
-    hiddenField?: string;
-    minValidPercent?: number;
-    defaultCurrency?: string;
-    showValue?: boolean;
-    enableClickItem?: boolean;
-}>();
+interface DesktopPieChartProps extends CommonPieChartProps {}
+
+const props = defineProps<DesktopPieChartProps>();
 
 const emit = defineEmits<{
     (e: 'click', value: Record<string, unknown>): void;
@@ -57,9 +35,9 @@ const emit = defineEmits<{
 const theme = useTheme();
 
 const { formatAmountWithCurrency } = useI18n();
+const { selectedIndex, validItems } = usePieChartBase(props);
 
 const selectedLegends = ref<Record<string, boolean> | null>(null);
-const selectedIndex = ref<number>(0);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 
@@ -82,50 +60,21 @@ const itemsMap = computed<Record<string, Record<string, unknown>>>(() => {
     return map;
 });
 
-const validItems = computed<DesktopPieChartDataItem[]>(() => {
-    let totalValidValue = 0;
+const seriesData = computed<DesktopPieChartDataItem[]>(() => {
+    const ret: DesktopPieChartDataItem[] = [];
 
-    for (let i = 0; i < props.items.length; i++) {
-        const item = props.items[i];
-        const value = item[props.valueField];
-
-        if (isNumber(value) && value > 0 && (!props.hiddenField || !item[props.hiddenField])) {
-            totalValidValue += value;
-        }
+    for (let i = 0; i < validItems.value.length; i++) {
+        const item = validItems.value[i];
+        ret.push({
+            ...item,
+            itemStyle: {
+                color: getColor(item.color),
+            },
+            selected: true
+        });
     }
 
-    const validItems: DesktopPieChartDataItem[] = [];
-
-    for (let i = 0; i < props.items.length; i++) {
-        const item = props.items[i];
-        const value = item[props.valueField];
-        const percent = props.percentField ? item[props.percentField] : -1;
-
-        if (isNumber(value) && value > 0 &&
-            (!props.hiddenField || !item[props.hiddenField]) &&
-            (!props.minValidPercent || value / totalValidValue > props.minValidPercent)) {
-            const finalItem: DesktopPieChartDataItem = {
-                id: (props.idField && item[props.idField]) ? item[props.idField] as string : item[props.nameField] as string,
-                name: (props.idField && item[props.idField]) ? item[props.idField] as string : item[props.nameField] as string,
-                displayName: item[props.nameField] as string,
-                value: value,
-                percent: (isNumber(percent) && percent >= 0) ? percent : (value / totalValidValue * 100),
-                actualPercent: value / totalValidValue,
-                itemStyle: {
-                    color: getColor((props.colorField && item[props.colorField]) ? item[props.colorField] as ColorValue : DEFAULT_CHART_COLORS[validItems.length % DEFAULT_CHART_COLORS.length]),
-                },
-                selected: true,
-                sourceItem: item
-            };
-
-            finalItem.displayPercent = formatPercent(finalItem.percent, 2, '&lt;0.01');
-            finalItem.displayValue = formatAmountWithCurrency(finalItem.value, props.defaultCurrency) as string;
-
-            validItems.push(finalItem);
-        }
-    }
-
-    return validItems;
+    return ret;
 });
 
 const hasUnselectedItem = computed<boolean>(() => {
@@ -221,7 +170,7 @@ const chartOptions = computed(() => {
         series: [
             {
                 type: 'pie',
-                data: validItems.value,
+                data: seriesData.value,
                 top: 50,
                 startAngle: -90 + firstItemAndHalfCurrentItemTotalPercent.value * 360,
                 emphasis: {
@@ -311,10 +260,6 @@ function onLegendSelectChanged(e: { selected: Record<string, boolean> }): void {
         selectedIndex.value = newSelectedIndex;
     }
 }
-
-watch(() => props.items, () => {
-    selectedIndex.value = 0;
-});
 </script>
 
 <style scoped>

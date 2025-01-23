@@ -60,6 +60,7 @@
                     :show-center-text="true"
                     :show-selected-item-info="true"
                     class="statistics-pie-chart"
+                    name-field="name"
                     value-field="value"
                     color-field="color"
                     center-text-background="#cccccc"

@@ -58,7 +58,7 @@
                     </p>
                     <f7-link class="pie-chart-selected-item-info" :no-link-class="!enableClickItem" v-if="selectedItem" @click="clickItem(selectedItem)">
                         <span class="skeleton-text" v-if="skeleton">Name</span>
-                        <span v-else-if="!skeleton && selectedItem.name">{{ selectedItem.name }}</span>
+                        <span v-else-if="!skeleton && selectedItem.displayName">{{ selectedItem.displayName }}</span>
                         <span class="skeleton-text" v-if="skeleton">Value</span>
                         <span v-else-if="!skeleton && showValue" :style="getColorStyle(selectedItem ? selectedItem.color : '')">{{ selectedItem.displayValue }}</span>
                         <f7-icon class="item-navigate-icon" f7="chevron_right" v-if="enableClickItem"></f7-icon>
@@ -77,95 +77,33 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
+import { type CommonPieChartDataItem, type CommonPieChartProps, usePieChartBase } from '@/components/base/PieChartBase.ts'
 
 import type { ColorValue } from '@/core/color.ts';
-import { DEFAULT_ICON_COLOR, DEFAULT_CHART_COLORS } from '@/consts/color.ts';
+import { DEFAULT_ICON_COLOR } from '@/consts/color.ts';
 
-import { isNumber } from '@/lib/common.ts';
-import { formatPercent } from '@/lib/numeral.ts';
+interface MobilePieChartDataItem extends CommonPieChartDataItem {}
 
-interface MobilePieChartDataItem {
-    name: string;
-    value: number;
-    percent: number;
-    actualPercent: number;
-    color: ColorValue;
-    sourceItem: Record<string, unknown>;
-    displayPercent?: string;
-    displayValue?: string;
-}
-
-const props = defineProps<{
-    skeleton?: boolean;
-    items: Record<string, unknown>[];
-    nameField: string;
-    valueField: string;
-    percentField?: string;
-    colorField?: string;
-    hiddenField?: string;
-    minValidPercent?: number;
-    defaultCurrency?: string;
-    showValue?: boolean;
+interface MobilePieChartProps extends CommonPieChartProps {
     showCenterText?: boolean;
     showSelectedItemInfo?: boolean;
-    enableClickItem?: boolean;
     centerTextBackground?: ColorValue;
-}>();
+}
+
+const props = defineProps<MobilePieChartProps>();
 
 const emit = defineEmits<{
     (e: 'click', value: Record<string, unknown>): void;
 }>();
 
-const { tt, formatAmountWithCurrency } = useI18n();
+const { tt } = useI18n();
+const { selectedIndex, validItems } = usePieChartBase(props);
 
 const diameter: number = 100;
 const circumference: number = diameter * Math.PI;
-
-const selectedIndex = ref<number>(0);
-
-const validItems = computed<MobilePieChartDataItem[]>(() => {
-    let totalValidValue = 0;
-
-    for (let i = 0; i < props.items.length; i++) {
-        const item = props.items[i];
-        const value = item[props.valueField];
-
-        if (isNumber(value) && value > 0 && (!props.hiddenField || !item[props.hiddenField])) {
-            totalValidValue += value;
-        }
-    }
-
-    const validItems: MobilePieChartDataItem[] = [];
-
-    for (let i = 0; i < props.items.length; i++) {
-        const item = props.items[i];
-        const value = item[props.valueField];
-        const percent = props.percentField ? item[props.percentField] : -1;
-
-        if (isNumber(value) && value > 0 &&
-            (!props.hiddenField || !item[props.hiddenField]) &&
-            (!props.minValidPercent || value / totalValidValue > props.minValidPercent)) {
-            const finalItem: MobilePieChartDataItem = {
-                name: item[props.nameField] as string,
-                value: value,
-                percent: (isNumber(percent) && percent >= 0) ? percent : (value / totalValidValue * 100),
-                actualPercent: value / totalValidValue,
-                color: (props.colorField && item[props.colorField]) ? item[props.colorField] as ColorValue : DEFAULT_CHART_COLORS[validItems.length % DEFAULT_CHART_COLORS.length],
-                sourceItem: item
-            };
-
-            finalItem.displayPercent = formatPercent(finalItem.percent, 2, '&lt;0.01');
-            finalItem.displayValue = formatAmountWithCurrency(finalItem.value, props.defaultCurrency) as string;
-
-            validItems.push(finalItem);
-        }
-    }
-
-    return validItems;
-});
 
 const totalValidValue = computed<number>(() => {
     let totalValidValue = 0;
@@ -199,44 +137,6 @@ const itemCommonDashOffset = computed<number>(() => {
     return offset;
 });
 
-const selectedItem = computed<MobilePieChartDataItem | null>(() => {
-    if (!validItems.value || !validItems.value.length) {
-        return null;
-    }
-
-    let index = selectedIndex.value;
-
-    if (index < 0 || index >= validItems.value.length) {
-        index = 0;
-    }
-
-    return validItems.value[index];
-});
-
-watch(() => props.items, () => {
-    selectedIndex.value = 0;
-});
-
-function switchSelectedIndex(index: number): void {
-    selectedIndex.value = index;
-}
-
-function switchSelectedItem(offset: number): void {
-    let newSelectedIndex = selectedIndex.value + offset;
-
-    while (newSelectedIndex < 0) {
-        newSelectedIndex += validItems.value.length;
-    }
-
-    selectedIndex.value = newSelectedIndex % validItems.value.length;
-}
-
-function clickItem(item: MobilePieChartDataItem): void {
-    if (props.enableClickItem) {
-        emit('click', item.sourceItem);
-    }
-}
-
 function getColor(color: ColorValue): ColorValue {
     if (color && color !== DEFAULT_ICON_COLOR) {
         color = '#' + color;
@@ -248,12 +148,14 @@ function getColor(color: ColorValue): ColorValue {
 }
 
 function getColorStyle(color: ColorValue, additionalFieldName?: string): Record<string, string> {
+    const finalColor = getColor(color);
+
     const ret: Record<string, string> = {
-        color: getColor(color)
+        color: finalColor
     };
 
     if (additionalFieldName) {
-        ret[additionalFieldName] = ret.color;
+        ret[additionalFieldName] = finalColor;
     }
 
     return ret;
@@ -289,6 +191,40 @@ function getItemDashOffset(item: MobilePieChartDataItem, items: MobilePieChartDa
 
     const allPreviousLength = allPreviousPercent * circumference;
     return circumference - allPreviousLength + offset;
+}
+
+const selectedItem = computed<MobilePieChartDataItem | null>(() => {
+    if (!validItems.value || !validItems.value.length) {
+        return null;
+    }
+
+    let index = selectedIndex.value;
+
+    if (index < 0 || index >= validItems.value.length) {
+        index = 0;
+    }
+
+    return validItems.value[index];
+});
+
+function switchSelectedIndex(index: number): void {
+    selectedIndex.value = index;
+}
+
+function switchSelectedItem(offset: number): void {
+    let newSelectedIndex = selectedIndex.value + offset;
+
+    while (newSelectedIndex < 0) {
+        newSelectedIndex += validItems.value.length;
+    }
+
+    selectedIndex.value = newSelectedIndex % validItems.value.length;
+}
+
+function clickItem(item: MobilePieChartDataItem): void {
+    if (props.enableClickItem) {
+        emit('click', item.sourceItem);
+    }
 }
 </script>
 

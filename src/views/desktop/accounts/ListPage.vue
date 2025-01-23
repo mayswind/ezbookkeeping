@@ -267,11 +267,6 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import { isObject } from '@/lib/common.ts';
-import {
-    getSubAccountCurrencies,
-    getAccountOrSubAccountId,
-    getAccountOrSubAccountComment
-} from '@/lib/account.ts';
 
 import {
     mdiEyeOutline,
@@ -450,10 +445,10 @@ export default {
             }
         },
         accountOrSubAccountId(account) {
-            return getAccountOrSubAccountId(account, this.activeSubAccount[account.id]);
+            return account.getAccountOrSubAccountId(this.activeSubAccount[account.id]);
         },
         accountComment(account) {
-            return getAccountOrSubAccountComment(account, this.activeSubAccount[account.id]);
+            return account.getAccountOrSubAccountComment(this.activeSubAccount[account.id]);
         },
         accountCurrency(account) {
             const self = this;
@@ -461,7 +456,7 @@ export default {
             if (account.type === self.allAccountTypes.SingleAccount.type) {
                 return self.$locale.getCurrencyName(account.currency);
             } else if (account.type === self.allAccountTypes.MultiSubAccounts.type) {
-                const subAccountCurrencies = getSubAccountCurrencies(account, self.showHidden, self.activeSubAccount[account.id])
+                const subAccountCurrencies = account.getSubAccountCurrencies(self.showHidden, self.activeSubAccount[account.id])
                     .map(currencyCode => self.$locale.getCurrencyName(currencyCode));
                 return self.$locale.joinMultiText(subAccountCurrencies);
             } else {

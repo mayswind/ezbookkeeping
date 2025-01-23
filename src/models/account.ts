@@ -146,6 +146,82 @@ export class Account implements AccountInfoResponse {
         };
     }
 
+    public getAccountOrSubAccountId(subAccountId: string): string | null {
+        if (this.type === AccountType.SingleAccount.type) {
+            return this.id;
+        } else if (this.type === AccountType.MultiSubAccounts.type && !subAccountId) {
+            return this.id;
+        } else if (this.type === AccountType.MultiSubAccounts.type && subAccountId) {
+            if (!this.childrenAccounts || !this.childrenAccounts.length) {
+                return null;
+            }
+
+            for (let i = 0; i < this.childrenAccounts.length; i++) {
+                const subAccount = this.childrenAccounts[i];
+
+                if (subAccountId && subAccountId === subAccount.id) {
+                    return subAccount.id;
+                }
+            }
+
+            return null;
+        } else {
+            return null;
+        }
+    }
+
+    public getAccountOrSubAccountComment(subAccountId: string): string | null {
+        if (this.type === AccountType.SingleAccount.type) {
+            return this.comment;
+        } else if (this.type === AccountType.MultiSubAccounts.type && !subAccountId) {
+            return this.comment;
+        } else if (this.type === AccountType.MultiSubAccounts.type && subAccountId) {
+            if (!this.childrenAccounts || !this.childrenAccounts.length) {
+                return null;
+            }
+
+            for (let i = 0; i < this.childrenAccounts.length; i++) {
+                const subAccount = this.childrenAccounts[i];
+
+                if (subAccountId && subAccountId === subAccount.id) {
+                    return subAccount.comment;
+                }
+            }
+
+            return null;
+        } else {
+            return null;
+        }
+    }
+
+    public getSubAccountCurrencies(showHidden: boolean, subAccountId: string): string[] {
+        if (!this.childrenAccounts || !this.childrenAccounts.length) {
+            return [];
+        }
+
+        const subAccountCurrenciesMap: Record<string, boolean> = {};
+        const subAccountCurrencies: string[] = [];
+
+        for (let i = 0; i < this.childrenAccounts.length; i++) {
+            const subAccount = this.childrenAccounts[i];
+
+            if (!showHidden && subAccount.hidden) {
+                continue;
+            }
+
+            if (subAccountId && subAccountId === subAccount.id) {
+                return [subAccount.currency];
+            } else {
+                if (!subAccountCurrenciesMap[subAccount.currency]) {
+                    subAccountCurrenciesMap[subAccount.currency] = true;
+                    subAccountCurrencies.push(subAccount.currency);
+                }
+            }
+        }
+
+        return subAccountCurrencies;
+    }
+
     public createNewSubAccount(currency: string, balanceTime: number): Account {
         return new Account(
             '', // id

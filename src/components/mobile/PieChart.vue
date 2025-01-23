@@ -85,8 +85,6 @@ import { type CommonPieChartDataItem, type CommonPieChartProps, usePieChartBase 
 import type { ColorValue } from '@/core/color.ts';
 import { DEFAULT_ICON_COLOR } from '@/consts/color.ts';
 
-interface MobilePieChartDataItem extends CommonPieChartDataItem {}
-
 interface MobilePieChartProps extends CommonPieChartProps {
     showCenterText?: boolean;
     showSelectedItemInfo?: boolean;
@@ -161,12 +159,12 @@ function getColorStyle(color: ColorValue, additionalFieldName?: string): Record<
     return ret;
 }
 
-function getItemStrokeDash(item: MobilePieChartDataItem): string {
+function getItemStrokeDash(item: CommonPieChartDataItem): string {
     const length = item.actualPercent * circumference;
     return `${length} ${circumference - length}`;
 }
 
-function getItemDashOffset(item: MobilePieChartDataItem, items: MobilePieChartDataItem[], offset?: number): number {
+function getItemDashOffset(item: CommonPieChartDataItem, items: CommonPieChartDataItem[], offset?: number): number {
     let allPreviousPercent = 0;
 
     for (let i = 0; i < items.length; i++) {
@@ -193,7 +191,7 @@ function getItemDashOffset(item: MobilePieChartDataItem, items: MobilePieChartDa
     return circumference - allPreviousLength + offset;
 }
 
-const selectedItem = computed<MobilePieChartDataItem | null>(() => {
+const selectedItem = computed<CommonPieChartDataItem | null>(() => {
     if (!validItems.value || !validItems.value.length) {
         return null;
     }
@@ -221,7 +219,7 @@ function switchSelectedItem(offset: number): void {
     selectedIndex.value = newSelectedIndex % validItems.value.length;
 }
 
-function clickItem(item: MobilePieChartDataItem): void {
+function clickItem(item: CommonPieChartDataItem): void {
     if (props.enableClickItem) {
         emit('click', item.sourceItem);
     }

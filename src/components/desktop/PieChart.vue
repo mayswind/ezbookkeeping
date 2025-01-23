@@ -24,9 +24,7 @@ interface DesktopPieChartDataItem extends CommonPieChartDataItem {
     selected: boolean;
 }
 
-interface DesktopPieChartProps extends CommonPieChartProps {}
-
-const props = defineProps<DesktopPieChartProps>();
+const props = defineProps<CommonPieChartProps>();
 
 const emit = defineEmits<{
     (e: 'click', value: Record<string, unknown>): void;

@@ -497,9 +497,9 @@ export function useI18n() {
     }
 
     // public functions
-    function translateIf(text: string | undefined, isTranslate: boolean): string | undefined {
+    function translateIf(text: string | undefined, isTranslate?: boolean): string {
         if (!isDefined(text)) {
-            return undefined;
+            return '';
         }
 
         if (isTranslate) {

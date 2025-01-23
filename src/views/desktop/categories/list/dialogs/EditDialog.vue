@@ -143,10 +143,6 @@ const showState = ref<boolean>(false);
 let resolveFunc: ((value: TransactionCategoryEditRespose) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
-defineExpose({
-    open
-});
-
 function open(options: { id?: string; parentId?: string; type?: CategoryType; currentCategory?: TransactionCategory }): Promise<TransactionCategoryEditRespose> {
     showState.value = true;
     loading.value = true;
@@ -239,4 +235,8 @@ function cancel(): void {
     rejectFunc?.();
     showState.value = false;
 }
+
+defineExpose({
+    open
+});
 </script>

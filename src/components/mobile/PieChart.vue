@@ -64,7 +64,7 @@
                         <f7-icon class="item-navigate-icon" f7="chevron_right" v-if="enableClickItem"></f7-icon>
                     </f7-link>
                     <f7-link :no-link-class="true" v-else-if="!validItems || !validItems.length">
-                        {{ $t('No transaction data') }}
+                        {{ tt('No transaction data') }}
                     </f7-link>
                 </div>
 
@@ -76,206 +76,219 @@
     </div>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.ts';
-import { useUserStore } from '@/stores/user.ts';
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue';
 
+import { useI18n } from '@/locales/helpers.ts';
+
+import type { ColorValue } from '@/core/color.ts';
 import { DEFAULT_ICON_COLOR, DEFAULT_CHART_COLORS } from '@/consts/color.ts';
+
+import { isNumber } from '@/lib/common.ts';
 import { formatPercent } from '@/lib/numeral.ts';
 
-export default {
-    props: [
-        'skeleton',
-        'items',
-        'nameField',
-        'valueField',
-        'percentField',
-        'colorField',
-        'hiddenField',
-        'minValidPercent',
-        'defaultCurrency',
-        'showValue',
-        'showCenterText',
-        'showSelectedItemInfo',
-        'enableClickItem',
-        'centerTextBackground',
-    ],
-    emits: [
-        'click'
-    ],
-    data: function () {
-        const diameter = 100;
+interface MobilePieChartDataItem {
+    name: string;
+    value: number;
+    percent: number;
+    actualPercent: number;
+    color: ColorValue;
+    sourceItem: Record<string, unknown>;
+    displayPercent?: string;
+    displayValue?: string;
+}
 
-        return {
-            diameter: diameter,
-            circumference: diameter * Math.PI,
-            selectedIndex: 0
-        }
-    },
-    computed: {
-        ...mapStores(useSettingsStore, useUserStore),
-        validItems: function () {
-            let totalValidValue = 0;
+const props = defineProps<{
+    skeleton?: boolean;
+    items: Record<string, unknown>[];
+    nameField: string;
+    valueField: string;
+    percentField?: string;
+    colorField?: string;
+    hiddenField?: string;
+    minValidPercent?: number;
+    defaultCurrency?: string;
+    showValue?: boolean;
+    showCenterText?: boolean;
+    showSelectedItemInfo?: boolean;
+    enableClickItem?: boolean;
+    centerTextBackground?: ColorValue;
+}>();
 
-            for (let i = 0; i < this.items.length; i++) {
-                const item = this.items[i];
+const emit = defineEmits<{
+    (e: 'click', value: Record<string, unknown>): void;
+}>();
 
-                if (item[this.valueField] && item[this.valueField] > 0 && (!this.hiddenField || !item[this.hiddenField])) {
-                    totalValidValue += item[this.valueField];
-                }
-            }
+const { tt, formatAmountWithCurrency } = useI18n();
 
-            const validItems = [];
+const diameter: number = 100;
+const circumference: number = diameter * Math.PI;
 
-            for (let i = 0; i < this.items.length; i++) {
-                const item = this.items[i];
+const selectedIndex = ref<number>(0);
 
-                if (item[this.valueField] && item[this.valueField] > 0 &&
-                    (!this.hiddenField || !item[this.hiddenField]) &&
-                    (!this.minValidPercent || item[this.valueField] / totalValidValue > this.minValidPercent)) {
-                    const finalItem = {
-                        name: item[this.nameField],
-                        value: item[this.valueField],
-                        percent: (item[this.percentField] > 0 || item[this.percentField] === 0 || item[this.percentField] === '0') ? item[this.percentField] : (item[this.valueField] / totalValidValue * 100),
-                        actualPercent: item[this.valueField] / totalValidValue,
-                        color: item[this.colorField] ? item[this.colorField] : DEFAULT_CHART_COLORS[validItems.length % DEFAULT_CHART_COLORS.length],
-                        sourceItem: item
-                    };
+const validItems = computed<MobilePieChartDataItem[]>(() => {
+    let totalValidValue = 0;
 
-                    finalItem.displayPercent = formatPercent(finalItem.percent, 2, '&lt;0.01');
-                    finalItem.displayValue = this.getDisplayCurrency(finalItem.value, this.defaultCurrency);
+    for (let i = 0; i < props.items.length; i++) {
+        const item = props.items[i];
+        const value = item[props.valueField];
 
-                    validItems.push(finalItem);
-                }
-            }
-
-            return validItems;
-        },
-        totalValidValue: function () {
-            let totalValidValue = 0;
-
-            for (let i = 0; i < this.validItems.length; i++) {
-                totalValidValue += this.validItems[i].value;
-            }
-
-            return totalValidValue;
-        },
-        itemCommonDashOffset: function () {
-            if (this.totalValidValue <= 0) {
-                return 0;
-            }
-
-            let offset = 0;
-
-            for (let i = 0; i < Math.min(this.selectedIndex + 1, this.validItems.length); i++) {
-                const item = this.validItems[i];
-
-                if (item.actualPercent > 0) {
-                    if (i === this.selectedIndex) {
-                        offset += -this.circumference * (1 - item.actualPercent) / 2;
-                    } else {
-                        offset += -this.circumference * (1 - item.actualPercent);
-                    }
-                }
-            }
-
-            return offset;
-        },
-        selectedItem: function () {
-            if (!this.validItems || !this.validItems.length) {
-                return null;
-            }
-
-            let selectedIndex = this.selectedIndex;
-
-            if (selectedIndex < 0 || selectedIndex >= this.validItems.length) {
-                selectedIndex = 0;
-            }
-
-            return this.validItems[selectedIndex];
-        }
-    },
-    watch: {
-        'items': {
-            handler() {
-                this.selectedIndex = 0;
-            },
-            deep: true
-        }
-    },
-    methods: {
-        switchSelectedIndex: function (index) {
-            this.selectedIndex = index;
-        },
-        switchSelectedItem: function (offset) {
-            let newSelectedIndex = this.selectedIndex + offset;
-
-            while (newSelectedIndex < 0) {
-                newSelectedIndex += this.validItems.length;
-            }
-
-            this.selectedIndex = newSelectedIndex % this.validItems.length;
-        },
-        clickItem: function (item) {
-            if (this.enableClickItem) {
-                this.$emit('click', item.sourceItem);
-            }
-        },
-        getColor: function (color) {
-            if (color && color !== DEFAULT_ICON_COLOR) {
-                color = '#' + color;
-            } else {
-                color = 'var(--default-icon-color)';
-            }
-
-            return color;
-        },
-        getColorStyle: function (color, additionalFieldName) {
-            const ret = {
-                color: this.getColor(color)
-            };
-
-            if (additionalFieldName) {
-                ret[additionalFieldName] = ret.color;
-            }
-
-            return ret;
-        },
-        getItemStrokeDash(item) {
-            const length = item.actualPercent * this.circumference;
-            return `${length} ${this.circumference - length}`;
-        },
-        getItemDashOffset(item, items, offset) {
-            let allPreviousPercent = 0;
-
-            for (let i = 0; i < items.length; i++) {
-                const curItem = items[i];
-
-                if (curItem === item) {
-                    break;
-                }
-
-                allPreviousPercent += curItem.actualPercent;
-            }
-
-            if (offset) {
-                offset += this.circumference / 4;
-            } else {
-                offset = this.circumference / 4;
-            }
-
-            if (allPreviousPercent <= 0) {
-                return offset;
-            }
-
-            const allPreviousLength = allPreviousPercent * this.circumference;
-            return this.circumference - allPreviousLength + offset;
-        },
-        getDisplayCurrency(value, currencyCode) {
-            return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, currencyCode);
+        if (isNumber(value) && value > 0 && (!props.hiddenField || !item[props.hiddenField])) {
+            totalValidValue += value;
         }
     }
+
+    const validItems: MobilePieChartDataItem[] = [];
+
+    for (let i = 0; i < props.items.length; i++) {
+        const item = props.items[i];
+        const value = item[props.valueField];
+        const percent = props.percentField ? item[props.percentField] : -1;
+
+        if (isNumber(value) && value > 0 &&
+            (!props.hiddenField || !item[props.hiddenField]) &&
+            (!props.minValidPercent || value / totalValidValue > props.minValidPercent)) {
+            const finalItem: MobilePieChartDataItem = {
+                name: item[props.nameField] as string,
+                value: value,
+                percent: (isNumber(percent) && percent >= 0) ? percent : (value / totalValidValue * 100),
+                actualPercent: value / totalValidValue,
+                color: (props.colorField && item[props.colorField]) ? item[props.colorField] as ColorValue : DEFAULT_CHART_COLORS[validItems.length % DEFAULT_CHART_COLORS.length],
+                sourceItem: item
+            };
+
+            finalItem.displayPercent = formatPercent(finalItem.percent, 2, '&lt;0.01');
+            finalItem.displayValue = formatAmountWithCurrency(finalItem.value, props.defaultCurrency) as string;
+
+            validItems.push(finalItem);
+        }
+    }
+
+    return validItems;
+});
+
+const totalValidValue = computed<number>(() => {
+    let totalValidValue = 0;
+
+    for (let i = 0; i < validItems.value.length; i++) {
+        totalValidValue += validItems.value[i].value;
+    }
+
+    return totalValidValue;
+});
+
+const itemCommonDashOffset = computed<number>(() => {
+    if (totalValidValue.value <= 0) {
+        return 0;
+    }
+
+    let offset = 0;
+
+    for (let i = 0; i < Math.min(selectedIndex.value + 1, validItems.value.length); i++) {
+        const item = validItems.value[i];
+
+        if (item.actualPercent > 0) {
+            if (i === selectedIndex.value) {
+                offset += -circumference * (1 - item.actualPercent) / 2;
+            } else {
+                offset += -circumference * (1 - item.actualPercent);
+            }
+        }
+    }
+
+    return offset;
+});
+
+const selectedItem = computed<MobilePieChartDataItem | null>(() => {
+    if (!validItems.value || !validItems.value.length) {
+        return null;
+    }
+
+    let index = selectedIndex.value;
+
+    if (index < 0 || index >= validItems.value.length) {
+        index = 0;
+    }
+
+    return validItems.value[index];
+});
+
+watch(() => props.items, () => {
+    selectedIndex.value = 0;
+});
+
+function switchSelectedIndex(index: number): void {
+    selectedIndex.value = index;
+}
+
+function switchSelectedItem(offset: number): void {
+    let newSelectedIndex = selectedIndex.value + offset;
+
+    while (newSelectedIndex < 0) {
+        newSelectedIndex += validItems.value.length;
+    }
+
+    selectedIndex.value = newSelectedIndex % validItems.value.length;
+}
+
+function clickItem(item: MobilePieChartDataItem): void {
+    if (props.enableClickItem) {
+        emit('click', item.sourceItem);
+    }
+}
+
+function getColor(color: ColorValue): ColorValue {
+    if (color && color !== DEFAULT_ICON_COLOR) {
+        color = '#' + color;
+    } else {
+        color = 'var(--default-icon-color)';
+    }
+
+    return color;
+}
+
+function getColorStyle(color: ColorValue, additionalFieldName?: string): Record<string, string> {
+    const ret: Record<string, string> = {
+        color: getColor(color)
+    };
+
+    if (additionalFieldName) {
+        ret[additionalFieldName] = ret.color;
+    }
+
+    return ret;
+}
+
+function getItemStrokeDash(item: MobilePieChartDataItem): string {
+    const length = item.actualPercent * circumference;
+    return `${length} ${circumference - length}`;
+}
+
+function getItemDashOffset(item: MobilePieChartDataItem, items: MobilePieChartDataItem[], offset?: number): number {
+    let allPreviousPercent = 0;
+
+    for (let i = 0; i < items.length; i++) {
+        const curItem = items[i];
+
+        if (curItem === item) {
+            break;
+        }
+
+        allPreviousPercent += curItem.actualPercent;
+    }
+
+    if (offset) {
+        offset += circumference / 4;
+    } else {
+        offset = circumference / 4;
+    }
+
+    if (allPreviousPercent <= 0) {
+        return offset;
+    }
+
+    const allPreviousLength = allPreviousPercent * circumference;
+    return circumference - allPreviousLength + offset;
 }
 </script>
 

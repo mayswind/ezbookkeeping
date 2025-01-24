@@ -604,7 +604,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.js';
 import { useOverviewStore } from '@/stores/overview.ts';
-import { useStatisticsStore } from '@/stores/statistics.js';
+import { useStatisticsStore } from '@/stores/statistics.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { CategoryType } from '@/core/category.ts';

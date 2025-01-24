@@ -5,7 +5,7 @@ import { useUserStore } from './user.ts';
 import { useAccountsStore } from './account.ts';
 import { useTransactionCategoriesStore } from './transactionCategory.ts';
 import { useOverviewStore } from './overview.ts';
-import { useStatisticsStore } from './statistics.js';
+import { useStatisticsStore } from './statistics.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { DateRange } from '@/core/datetime.ts';

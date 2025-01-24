@@ -323,7 +323,7 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
-import { useStatisticsStore } from '@/stores/statistics.js';
+import { useStatisticsStore } from '@/stores/statistics.ts';
 
 import { DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';

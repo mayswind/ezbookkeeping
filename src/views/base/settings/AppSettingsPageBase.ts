@@ -6,8 +6,7 @@ import { useSettingsStore } from '@/stores/setting.ts';
 // @ts-expect-error the above file is migrating to ts
 import { useTransactionsStore } from '@/stores/transaction.js';
 import { useOverviewStore } from '@/stores/overview.ts';
-// @ts-expect-error the above file is migrating to ts
-import { useStatisticsStore } from '@/stores/statistics.js';
+import { useStatisticsStore } from '@/stores/statistics.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import type { LocalizedTimezoneInfo } from '@/core/timezone.ts';

@@ -147,7 +147,7 @@ import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionsStore } from '@/stores/transaction.js';
-import { useStatisticsStore } from '@/stores/statistics.js';
+import { useStatisticsStore } from '@/stores/statistics.ts';
 
 import { CategoryType } from '@/core/category.ts';
 import { copyObjectTo, arrayItemToObjectField } from '@/lib/common.ts';

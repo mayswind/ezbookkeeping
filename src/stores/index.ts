@@ -11,8 +11,7 @@ import { useTransactionTemplatesStore } from './transactionTemplate.js';
 // @ts-expect-error the above file is migrating to ts
 import { useTransactionsStore } from './transaction.js';
 import { useOverviewStore } from './overview.ts';
-// @ts-expect-error the above file is migrating to ts
-import { useStatisticsStore } from './statistics.js';
+import { useStatisticsStore } from './statistics.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import type { AuthResponse, RegisterResponse } from '@/models/auth_response.ts';

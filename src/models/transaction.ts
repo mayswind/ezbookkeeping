@@ -227,13 +227,69 @@ export interface TransactionStatisticResponse {
 export interface TransactionStatisticResponseItem {
     readonly categoryId: string;
     readonly accountId: string;
-    readonly totalAmount: number;
+    readonly amount: number;
 }
 
-export interface TransactionStatisticTrendsItem {
+export interface TransactionStatisticResponseWithInfo {
+    readonly startTime: number;
+    readonly endTime: number;
+    readonly items: TransactionStatisticResponseItemWithInfo[];
+}
+
+export interface TransactionStatisticResponseItemWithInfo extends TransactionStatisticResponseItem {
+    readonly account?: AccountInfoResponse;
+    readonly primaryAccount?: AccountInfoResponse;
+    readonly category?: TransactionCategoryInfoResponse;
+    readonly primaryCategory?: TransactionCategoryInfoResponse;
+    readonly amountInDefaultCurrency: number | null;
+}
+
+export interface TransactionStatisticTrendsResponseItem {
     readonly year: number;
     readonly month: number;
     readonly items: TransactionStatisticResponseItem[];
+}
+
+export interface TransactionStatisticTrendsResponseItemWithInfo {
+    readonly year: number;
+    readonly month: number;
+    readonly items: TransactionStatisticResponseItemWithInfo[];
+}
+
+export type TransactionStatisticDataItemType = 'category' | 'account' | 'total';
+
+export interface TransactionStatisticDataItemBase {
+    readonly name: string;
+    readonly type: TransactionStatisticDataItemType;
+    readonly id: string;
+    readonly icon: string;
+    readonly color: string;
+    readonly hidden: boolean;
+    readonly displayOrders: number[];
+    readonly totalAmount: number;
+}
+
+export interface TransactionCategoricalAnalysisData {
+    readonly totalAmount: number;
+    readonly items: TransactionCategoricalAnalysisDataItem[];
+}
+
+export interface TransactionCategoricalAnalysisDataItem extends TransactionStatisticDataItemBase {
+    readonly percent: number;
+}
+
+export interface TransactionTrendsAnalysisData {
+    readonly items: TransactionTrendsAnalysisDataItem[];
+}
+
+export interface TransactionTrendsAnalysisDataItem extends TransactionStatisticDataItemBase {
+    readonly items: TransactionTrendsAnalysisDataAmount[];
+}
+
+export interface TransactionTrendsAnalysisDataAmount {
+    readonly year: number;
+    readonly month: number;
+    readonly totalAmount: number;
 }
 
 export type TransactionAmountsResponse = PartialRecord<TransactionAmountsRequestType, TransactionAmountsResponseItem>;

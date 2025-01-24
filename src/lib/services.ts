@@ -53,7 +53,7 @@ import type {
     TransactionStatisticRequest,
     TransactionStatisticResponse,
     TransactionStatisticTrendsRequest,
-    TransactionStatisticTrendsItem,
+    TransactionStatisticTrendsResponseItem,
     TransactionAmountsRequestParams,
     TransactionAmountsResponse
 } from '@/models/transaction.ts';
@@ -380,7 +380,7 @@ export default {
 
         return axios.get<ApiResponse<TransactionStatisticResponse>>(`v1/transactions/statistics.json?use_transaction_timezone=${req.useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));
     },
-    getTransactionStatisticsTrends: (req: TransactionStatisticTrendsRequest): ApiResponsePromise<TransactionStatisticTrendsItem[]> => {
+    getTransactionStatisticsTrends: (req: TransactionStatisticTrendsRequest): ApiResponsePromise<TransactionStatisticTrendsResponseItem[]> => {
         const queryParams = [];
 
         if (req.startYearMonth) {
@@ -399,7 +399,7 @@ export default {
             queryParams.push(`tag_filter_type=${req.tagFilterType}`);
         }
 
-        return axios.get<ApiResponse<TransactionStatisticTrendsItem[]>>(`v1/transactions/statistics/trends.json?use_transaction_timezone=${req.useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));
+        return axios.get<ApiResponse<TransactionStatisticTrendsResponseItem[]>>(`v1/transactions/statistics/trends.json?use_transaction_timezone=${req.useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));
     },
     getTransactionAmounts: (params: TransactionAmountsRequestParams): ApiResponsePromise<TransactionAmountsResponse> => {
         const req = TransactionAmountsRequest.of(params);

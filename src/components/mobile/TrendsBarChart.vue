@@ -310,7 +310,7 @@ export default {
                 dateRange: {
                     minTime: minUnixTime,
                     maxTime: maxUnixTime,
-                    type: dateRangeType
+                    dateType: dateRangeType
                 }
             });
         },

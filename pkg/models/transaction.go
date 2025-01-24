@@ -311,8 +311,8 @@ type TransactionStatisticResponseItem struct {
 	TotalAmount int64 `json:"amount"`
 }
 
-// TransactionStatisticTrendsItem represents the data within each statistic interval
-type TransactionStatisticTrendsItem struct {
+// TransactionStatisticTrendsResponseItem represents the data within each statistic interval
+type TransactionStatisticTrendsResponseItem struct {
 	Year  int32                               `json:"year"`
 	Month int32                               `json:"month"`
 	Items []*TransactionStatisticResponseItem `json:"items"`
@@ -493,21 +493,21 @@ func (s TransactionInfoResponseSlice) Less(i, j int) bool {
 	return s[i].Id > s[j].Id
 }
 
-// TransactionStatisticTrendsItemSlice represents the slice data structure of TransactionStatisticTrendsItem
-type TransactionStatisticTrendsItemSlice []*TransactionStatisticTrendsItem
+// TransactionStatisticTrendsResponseItemSlice represents the slice data structure of TransactionStatisticTrendsResponseItem
+type TransactionStatisticTrendsResponseItemSlice []*TransactionStatisticTrendsResponseItem
 
 // Len returns the count of items
-func (s TransactionStatisticTrendsItemSlice) Len() int {
+func (s TransactionStatisticTrendsResponseItemSlice) Len() int {
 	return len(s)
 }
 
 // Swap swaps two items
-func (s TransactionStatisticTrendsItemSlice) Swap(i, j int) {
+func (s TransactionStatisticTrendsResponseItemSlice) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 
 // Less reports whether the first item is less than the second one
-func (s TransactionStatisticTrendsItemSlice) Less(i, j int) bool {
+func (s TransactionStatisticTrendsResponseItemSlice) Less(i, j int) bool {
 	if s[i].Year != s[j].Year {
 		return s[i].Year < s[j].Year
 	}

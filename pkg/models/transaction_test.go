@@ -127,25 +127,25 @@ func TestTransactionInfoResponseSliceLess(t *testing.T) {
 	assert.Equal(t, int64(4), transactionRespSlice[4].Id)
 }
 
-func TestTransactionStatisticTrendsItemSliceLess(t *testing.T) {
-	var transactionTrendsSlice TransactionStatisticTrendsItemSlice
-	transactionTrendsSlice = append(transactionTrendsSlice, &TransactionStatisticTrendsItem{
+func TestTransactionStatisticTrendsResponseItemSliceLess(t *testing.T) {
+	var transactionTrendsSlice TransactionStatisticTrendsResponseItemSlice
+	transactionTrendsSlice = append(transactionTrendsSlice, &TransactionStatisticTrendsResponseItem{
 		Year:  2024,
 		Month: 9,
 	})
-	transactionTrendsSlice = append(transactionTrendsSlice, &TransactionStatisticTrendsItem{
+	transactionTrendsSlice = append(transactionTrendsSlice, &TransactionStatisticTrendsResponseItem{
 		Year:  2022,
 		Month: 10,
 	})
-	transactionTrendsSlice = append(transactionTrendsSlice, &TransactionStatisticTrendsItem{
+	transactionTrendsSlice = append(transactionTrendsSlice, &TransactionStatisticTrendsResponseItem{
 		Year:  2023,
 		Month: 1,
 	})
-	transactionTrendsSlice = append(transactionTrendsSlice, &TransactionStatisticTrendsItem{
+	transactionTrendsSlice = append(transactionTrendsSlice, &TransactionStatisticTrendsResponseItem{
 		Year:  2022,
 		Month: 2,
 	})
-	transactionTrendsSlice = append(transactionTrendsSlice, &TransactionStatisticTrendsItem{
+	transactionTrendsSlice = append(transactionTrendsSlice, &TransactionStatisticTrendsResponseItem{
 		Year:  2024,
 		Month: 1,
 	})

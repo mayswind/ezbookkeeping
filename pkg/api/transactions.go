@@ -382,10 +382,10 @@ func (a *TransactionsApi) TransactionStatisticsTrendsHandler(c *core.WebContext)
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	statisticTrendsResp := make(models.TransactionStatisticTrendsItemSlice, 0, len(allMonthlyTotalAmounts))
+	statisticTrendsResp := make(models.TransactionStatisticTrendsResponseItemSlice, 0, len(allMonthlyTotalAmounts))
 
 	for yearMonth, monthlyTotalAmounts := range allMonthlyTotalAmounts {
-		monthlyStatisticResp := &models.TransactionStatisticTrendsItem{
+		monthlyStatisticResp := &models.TransactionStatisticTrendsResponseItem{
 			Year:  yearMonth / 100,
 			Month: yearMonth % 100,
 			Items: make([]*models.TransactionStatisticResponseItem, len(monthlyTotalAmounts)),

@@ -3,7 +3,7 @@ import { DEFAULT_LANGUAGE, ALL_LANGUAGES } from '@/locales/index.ts';
 import { WeekDay, LongDateFormat, ShortDateFormat, LongTimeFormat, ShortTimeFormat, DateRange } from '@/core/datetime.ts';
 import { DecimalSeparator, DigitGroupingSymbol, DigitGroupingType } from '@/core/numeral.ts';
 import { CurrencyDisplayType } from '@/core/currency.ts'
-import { AccountType, AccountCategory } from '@/core/account.ts';
+import { AccountCategory } from '@/core/account.ts';
 import { TransactionTagFilterType } from '@/core/transaction.ts';
 import { CategoricalChartType, TrendChartType, ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
 
@@ -92,12 +92,6 @@ function getCurrencyUnitName(currencyCode, isPlural, translateFn) {
 
 function getMonthdayOrdinal(monthDay, translateFn) {
     return translateFn(`datetime.monthDayOrdinal.${monthDay}`);
-}
-
-function getMonthdayShortName(monthDay, translateFn) {
-    return translateFn('format.misc.monthDay', {
-        ordinal: getMonthdayOrdinal(monthDay, translateFn)
-    });
 }
 
 function getWeekdayShortName(weekDayName, translateFn) {
@@ -291,27 +285,6 @@ function getTimezoneDifferenceDisplayText(utcOffset, translateFn) {
     } else {
         return translateFn('Same time as default timezone');
     }
-}
-
-function getAllCurrencies(translateFn) {
-    const allCurrencies = [];
-
-    for (let currencyCode in ALL_CURRENCIES) {
-        if (!Object.prototype.hasOwnProperty.call(ALL_CURRENCIES, currencyCode)) {
-            continue;
-        }
-
-        allCurrencies.push({
-            currencyCode: currencyCode,
-            displayName: getCurrencyName(currencyCode, translateFn)
-        });
-    }
-
-    allCurrencies.sort(function(c1, c2) {
-        return c1.displayName.localeCompare(c2.displayName);
-    })
-
-    return allCurrencies;
 }
 
 function getAllWeekDays(firstDayOfWeek, translateFn) {
@@ -585,27 +558,6 @@ function getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRat
     return getAdaptiveDisplayAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, numberFormatOptions);
 }
 
-function getAllAccountCategories(translateFn) {
-    const ret = [];
-    const allCategories = AccountCategory.values();
-
-    for (let i = 0; i < allCategories.length; i++) {
-        const accountCategory = allCategories[i];
-
-        ret.push({
-            type: accountCategory.type,
-            displayName: translateFn(accountCategory.name),
-            defaultAccountIconId: accountCategory.defaultAccountIconId
-        });
-    }
-
-    return ret;
-}
-
-function getAllAccountTypes(translateFn) {
-    return getLocalizedDisplayNameAndType(AccountType.values(), translateFn);
-}
-
 function getAllCategoricalChartTypes(translateFn) {
     return getLocalizedDisplayNameAndType(CategoricalChartType.values(), translateFn);
 }
@@ -842,7 +794,6 @@ export function translateError(message, translateFn) {
 export function i18nFunctions(i18nGlobal) {
     return {
         getCurrencyName: (currencyCode) => getCurrencyName(currencyCode, i18nGlobal.t),
-        getMonthdayShortName: (monthDay) => getMonthdayShortName(monthDay, i18nGlobal.t),
         getWeekdayShortName: (weekDay) => getWeekdayShortName(weekDay, i18nGlobal.t),
         getWeekdayLongName: (weekDay) => getWeekdayLongName(weekDay, i18nGlobal.t),
         getMultiMonthdayShortNames: (monthdays) => getMultiMonthdayShortNames(monthdays, i18nGlobal.t),
@@ -859,7 +810,6 @@ export function i18nFunctions(i18nGlobal) {
         formatYearQuarter: (year, quarter) => formatYearQuarter(i18nGlobal.t, year, quarter),
         getAllTimezones: (includeSystemDefault) => getAllTimezones(includeSystemDefault, i18nGlobal.t),
         getTimezoneDifferenceDisplayText: (utcOffset) => getTimezoneDifferenceDisplayText(utcOffset, i18nGlobal.t),
-        getAllCurrencies: () => getAllCurrencies(i18nGlobal.t),
         getAllWeekDays: (firstDayOfWeek) => getAllWeekDays(firstDayOfWeek, i18nGlobal.t),
         getAllDateRanges: (scene, includeCustom, includeBillingCycle) => getAllDateRanges(scene, includeCustom, includeBillingCycle, i18nGlobal.t),
         getAllRecentMonthDateRanges: (userStore, includeAll, includeCustom) => getAllRecentMonthDateRanges(userStore, includeAll, includeCustom, i18nGlobal.t),
@@ -870,8 +820,6 @@ export function i18nFunctions(i18nGlobal) {
         formatAmount: (userStore, value, currencyCode) => getFormattedAmount(value, i18nGlobal.t, userStore, currencyCode),
         formatAmountWithCurrency: (settingsStore, userStore, value, currencyCode) => getFormattedAmountWithCurrency(value, currencyCode, i18nGlobal.t, userStore, settingsStore),
         getAdaptiveAmountRate: (userStore, amount1, amount2, fromExchangeRate, toExchangeRate) => getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, i18nGlobal.t, userStore),
-        getAllAccountCategories: () => getAllAccountCategories(i18nGlobal.t),
-        getAllAccountTypes: () => getAllAccountTypes(i18nGlobal.t),
         getAllCategoricalChartTypes: () => getAllCategoricalChartTypes(i18nGlobal.t),
         getAllTrendChartTypes: () => getAllTrendChartTypes(i18nGlobal.t),
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),

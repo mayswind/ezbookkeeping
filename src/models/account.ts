@@ -401,5 +401,4 @@ export interface AccountCategoriesWithVisibleCount {
 export interface AccountShowingIds {
     readonly accounts: Record<number, string>;
     readonly subAccounts: Record<string, string>;
-
 }

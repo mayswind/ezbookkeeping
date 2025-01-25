@@ -3,16 +3,16 @@
         <v-card class="pa-2 pa-sm-4 pa-md-4">
             <template #title>
                 <div class="d-flex align-center justify-center">
-                    <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'expenseCategory'">{{ $t('Batch Replace Selected Expense Categories') }}</h4>
-                    <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'incomeCategory'">{{ $t('Batch Replace Selected Income Categories') }}</h4>
-                    <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'transferCategory'">{{ $t('Batch Replace Selected Transfer Categories') }}</h4>
-                    <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'account'">{{ $t('Batch Replace Selected Accounts') }}</h4>
-                    <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'destinationAccount'">{{ $t('Batch Replace Selected Destination Accounts') }}</h4>
-                    <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'expenseCategory'">{{ $t('Replace Invalid Expense Categories') }}</h4>
-                    <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'incomeCategory'">{{ $t('Replace Invalid Income Categories') }}</h4>
-                    <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'transferCategory'">{{ $t('Replace Invalid Transfer Categories') }}</h4>
-                    <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'account'">{{ $t('Replace Invalid Accounts') }}</h4>
-                    <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'tag'">{{ $t('Replace Invalid Transaction Tags') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'expenseCategory'">{{ tt('Batch Replace Selected Expense Categories') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'incomeCategory'">{{ tt('Batch Replace Selected Income Categories') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'transferCategory'">{{ tt('Batch Replace Selected Transfer Categories') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'account'">{{ tt('Batch Replace Selected Accounts') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'destinationAccount'">{{ tt('Batch Replace Selected Destination Accounts') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'expenseCategory'">{{ tt('Replace Invalid Expense Categories') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'incomeCategory'">{{ tt('Replace Invalid Income Categories') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'transferCategory'">{{ tt('Replace Invalid Transfer Categories') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'account'">{{ tt('Replace Invalid Accounts') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'tag'">{{ tt('Replace Invalid Transaction Tags') }}</h4>
                 </div>
             </template>
             <v-card-text class="my-md-4 w-100 d-flex justify-center" v-if="type === 'expenseCategory' || type === 'incomeCategory' || type === 'transferCategory'">
@@ -22,10 +22,10 @@
                             item-title="name"
                             item-value="value"
                             persistent-placeholder
-                            :label="$t('Invalid Category')"
-                            :placeholder="$t('Invalid Category')"
+                            :label="tt('Invalid Category')"
+                            :placeholder="tt('Invalid Category')"
                             :items="invalidItems"
-                            :no-data-text="$t('No available category')"
+                            :no-data-text="tt('No available category')"
                             v-model="sourceItem">
                         </v-autocomplete>
                     </v-col>
@@ -38,11 +38,11 @@
                                            secondary-hidden-field="hidden"
                                            :disabled="!hasAvailableExpenseCategories"
                                            :show-selection-primary-text="true"
-                                           :custom-selection-primary-text="getPrimaryCategoryName(targetItem, allCategories[allCategoryTypes.Expense])"
-                                           :custom-selection-secondary-text="getSecondaryCategoryName(targetItem, allCategories[allCategoryTypes.Expense])"
-                                           :label="$t('Target Category')"
-                                           :placeholder="$t('Target Category')"
-                                           :items="allCategories[allCategoryTypes.Expense]"
+                                           :custom-selection-primary-text="getTransactionPrimaryCategoryName(targetItem, allCategories[CategoryType.Expense])"
+                                           :custom-selection-secondary-text="getTransactionSecondaryCategoryName(targetItem, allCategories[CategoryType.Expense])"
+                                           :label="tt('Target Category')"
+                                           :placeholder="tt('Target Category')"
+                                           :items="allCategories[CategoryType.Expense]"
                                            v-model="targetItem"
                                            v-if="type === 'expenseCategory'">
                         </two-column-select>
@@ -54,11 +54,11 @@
                                            secondary-hidden-field="hidden"
                                            :disabled="!hasAvailableIncomeCategories"
                                            :show-selection-primary-text="true"
-                                           :custom-selection-primary-text="getPrimaryCategoryName(targetItem, allCategories[allCategoryTypes.Income])"
-                                           :custom-selection-secondary-text="getSecondaryCategoryName(targetItem, allCategories[allCategoryTypes.Income])"
-                                           :label="$t('Target Category')"
-                                           :placeholder="$t('Target Category')"
-                                           :items="allCategories[allCategoryTypes.Income]"
+                                           :custom-selection-primary-text="getTransactionPrimaryCategoryName(targetItem, allCategories[CategoryType.Income])"
+                                           :custom-selection-secondary-text="getTransactionSecondaryCategoryName(targetItem, allCategories[CategoryType.Income])"
+                                           :label="tt('Target Category')"
+                                           :placeholder="tt('Target Category')"
+                                           :items="allCategories[CategoryType.Income]"
                                            v-model="targetItem"
                                            v-if="type === 'incomeCategory'">
                         </two-column-select>
@@ -70,11 +70,11 @@
                                            secondary-hidden-field="hidden"
                                            :disabled="!hasAvailableTransferCategories"
                                            :show-selection-primary-text="true"
-                                           :custom-selection-primary-text="getPrimaryCategoryName(targetItem, allCategories[allCategoryTypes.Transfer])"
-                                           :custom-selection-secondary-text="getSecondaryCategoryName(targetItem, allCategories[allCategoryTypes.Transfer])"
-                                           :label="$t('Target Category')"
-                                           :placeholder="$t('Target Category')"
-                                           :items="allCategories[allCategoryTypes.Transfer]"
+                                           :custom-selection-primary-text="getTransactionPrimaryCategoryName(targetItem, allCategories[CategoryType.Transfer])"
+                                           :custom-selection-secondary-text="getTransactionSecondaryCategoryName(targetItem, allCategories[CategoryType.Transfer])"
+                                           :label="tt('Target Category')"
+                                           :placeholder="tt('Target Category')"
+                                           :items="allCategories[CategoryType.Transfer]"
                                            v-model="targetItem"
                                            v-if="type === 'transferCategory'">
                         </two-column-select>
@@ -88,10 +88,10 @@
                             item-title="name"
                             item-value="value"
                             persistent-placeholder
-                            :label="$t('Invalid Account')"
-                            :placeholder="$t('Invalid Account')"
+                            :label="tt('Invalid Account')"
+                            :placeholder="tt('Invalid Account')"
                             :items="invalidItems"
-                            :no-data-text="$t('No available account')"
+                            :no-data-text="tt('No available account')"
                             v-model="sourceItem">
                         </v-autocomplete>
                     </v-col>
@@ -106,8 +106,8 @@
                                            secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
                                            :disabled="!allVisibleAccounts.length"
                                            :custom-selection-primary-text="getAccountDisplayName(targetItem)"
-                                           :label="$t('Target Account')"
-                                           :placeholder="$t('Target Account')"
+                                           :label="tt('Target Account')"
+                                           :placeholder="tt('Target Account')"
                                            :items="allVisibleCategorizedAccounts"
                                            v-model="targetItem">
                         </two-column-select>
@@ -121,10 +121,10 @@
                             item-title="name"
                             item-value="value"
                             persistent-placeholder
-                            :label="$t('Invalid Tag')"
-                            :placeholder="$t('Invalid Tag')"
+                            :label="tt('Invalid Tag')"
+                            :placeholder="tt('Invalid Tag')"
                             :items="invalidItems"
-                            :no-data-text="$t('No available tag')"
+                            :no-data-text="tt('No available tag')"
                             v-model="sourceItem">
                         </v-autocomplete>
                     </v-col>
@@ -134,10 +134,10 @@
                             item-value="id"
                             persistent-placeholder
                             chips
-                            :label="$t('Target Tag')"
-                            :placeholder="$t('Target Tag')"
+                            :label="tt('Target Tag')"
+                            :placeholder="tt('Target Tag')"
                             :items="allTags"
-                            :no-data-text="$t('No available tag')"
+                            :no-data-text="tt('No available tag')"
                             v-model="targetItem"
                         >
                             <template #chip="{ props, item }">
@@ -162,27 +162,29 @@
             </v-card-text>
             <v-card-text class="overflow-y-visible">
                 <div class="w-100 d-flex justify-center gap-4">
-                    <v-btn :disabled="(mode === 'replaceInvalidItems' && !sourceItem && sourceItem !== '') || (!targetItem && targetItem !== '')" @click="confirm">{{ $t('OK') }}</v-btn>
-                    <v-btn color="secondary" variant="tonal" @click="cancel">{{ $t('Cancel') }}</v-btn>
+                    <v-btn :disabled="(mode === 'replaceInvalidItems' && !sourceItem && sourceItem !== '') || (!targetItem && targetItem !== '')" @click="confirm">{{ tt('OK') }}</v-btn>
+                    <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
                 </div>
             </v-card-text>
         </v-card>
     </v-dialog>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+
 import { useSettingsStore } from '@/stores/setting.ts';
-import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
-import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { CategoryType } from '@/core/category.ts';
-import {
-    getNameByKeyValue
-} from '@/lib/common.ts';
+import { type CategorizedAccountWithDisplayBalance, Account } from '@/models/account.ts';
+import type { TransactionCategory } from '@/models/transaction_category.ts';
+import type { TransactionTag } from '@/models/transaction_tag.ts';
+
 import {
     getTransactionPrimaryCategoryName,
     getTransactionSecondaryCategoryName,
@@ -193,137 +195,124 @@ import {
     mdiPound
 } from '@mdi/js';
 
-export default {
-    props: [
-        'persistent'
-    ],
-    expose: [
-        'open'
-    ],
-    data() {
-        return {
-            showState: false,
-            mode: '',
-            type: '',
-            invalidItems: [],
-            sourceItem: null,
-            targetItem: null,
-            icons: {
-                tag: mdiPound
-            }
-        }
-    },
-    computed: {
-        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useExchangeRatesStore),
-        defaultCurrency() {
-            return this.userStore.currentUserDefaultCurrency;
-        },
-        allCategoryTypes() {
-            return CategoryType;
-        },
-        allAccounts() {
-            return this.accountsStore.allPlainAccounts;
-        },
-        allVisibleCategorizedAccounts() {
-            return this.$locale.getCategorizedAccountsWithDisplayBalance(this.allVisibleAccounts, this.showAccountBalance, this.defaultCurrency, this.settingsStore, this.userStore, this.exchangeRatesStore);
-        },
-        allVisibleAccounts() {
-            return this.accountsStore.allVisiblePlainAccounts;
-        },
-        allCategories() {
-            return this.transactionCategoriesStore.allTransactionCategories;
-        },
-        allTags() {
-            return this.transactionTagsStore.allTransactionTags;
-        },
-        allTagsMap() {
-            return this.transactionTagsStore.allTransactionTagsMap;
-        },
-        hasAvailableExpenseCategories() {
-            if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Expense] || !this.allCategories[this.allCategoryTypes.Expense].length) {
-                return false;
-            }
+interface BatchReplaceDialogInvalidItem {
+    name: string;
+    value: string;
+}
 
-            const firstAvailableCategoryId = getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Expense]);
-            return firstAvailableCategoryId !== '';
-        },
-        hasAvailableIncomeCategories() {
-            if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Income] || !this.allCategories[this.allCategoryTypes.Income].length) {
-                return false;
-            }
+interface BatchReplaceDialogResponse {
+    sourceItem?: string;
+    targetItem?: string;
+}
 
-            const firstAvailableCategoryId = getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Income]);
-            return firstAvailableCategoryId !== '';
-        },
-        hasAvailableTransferCategories() {
-            if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Transfer] || !this.allCategories[this.allCategoryTypes.Transfer].length) {
-                return false;
-            }
+defineProps<{
+    persistent?: boolean;
+}>();
 
-            const firstAvailableCategoryId = getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Transfer]);
-            return firstAvailableCategoryId !== '';
-        },
-        showAccountBalance() {
-            return this.settingsStore.appSettings.showAccountBalance;
-        },
-    },
-    methods: {
-        open(options) {
-            const self = this;
-            self.mode = options.mode;
-            self.type = options.type;
-            self.sourceItem = null;
+const { tt, getCategorizedAccountsWithDisplayBalance } = useI18n();
 
-            if (self.mode === 'batchReplace') {
-                self.invalidItems = null;
-            } else if (self.mode === 'replaceInvalidItems') {
-                self.invalidItems = options.invalidItems;
-            }
+const settingsStore = useSettingsStore();
+const accountsStore = useAccountsStore();
+const transactionCategoriesStore = useTransactionCategoriesStore();
+const transactionTagsStore = useTransactionTagsStore();
 
-            self.targetItem = null;
-            self.showState = true;
+const icons = {
+    tag: mdiPound
+};
 
-            return new Promise((resolve, reject) => {
-                self.resolve = resolve;
-                self.reject = reject;
-            });
-        },
-        confirm() {
-            if (this.resolve) {
-                if (this.mode === 'batchReplace') {
-                    this.resolve({
-                        targetItem: this.targetItem
-                    });
-                } else if (this.mode === 'replaceInvalidItems') {
-                    this.resolve({
-                        sourceItem: this.sourceItem,
-                        targetItem: this.targetItem
-                    });
-                }
-            }
+const showState = ref<boolean>(false);
+const mode = ref<string>('');
+const type = ref<string>('');
+const invalidItems = ref<BatchReplaceDialogInvalidItem[] | undefined>([]);
+const sourceItem = ref<string | undefined>(undefined);
+const targetItem = ref<string | undefined>(undefined);
 
-            this.showState = false;
-        },
-        cancel() {
-            if (this.reject) {
-                this.reject();
-            }
+let resolveFunc: ((response: BatchReplaceDialogResponse) => void) | null = null;
+let rejectFunc: ((reason?: unknown) => void) | null = null;
 
-            this.showState = false;
-        },
-        getPrimaryCategoryName(categoryId, allCategories) {
-            return getTransactionPrimaryCategoryName(categoryId, allCategories);
-        },
-        getSecondaryCategoryName(categoryId, allCategories) {
-            return getTransactionSecondaryCategoryName(categoryId, allCategories);
-        },
-        getAccountDisplayName(accountId) {
-            if (accountId) {
-                return getNameByKeyValue(this.allAccounts, accountId, 'id', 'name');
-            } else {
-                return this.$t('None');
-            }
-        }
+const showAccountBalance = computed<boolean>(() => settingsStore.appSettings.showAccountBalance);
+const allAccounts = computed<Account[]>(() => accountsStore.allPlainAccounts);
+const allVisibleAccounts = computed<Account[]>(() => accountsStore.allVisiblePlainAccounts);
+const allVisibleCategorizedAccounts = computed<CategorizedAccountWithDisplayBalance[]>(() => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts.value, showAccountBalance.value));
+const allCategories = computed<Record<number, TransactionCategory[]>>(() => transactionCategoriesStore.allTransactionCategories);
+const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
+
+const hasAvailableExpenseCategories = computed<boolean>(() => {
+    if (!allCategories.value || !allCategories.value[CategoryType.Expense] || !allCategories.value[CategoryType.Expense].length) {
+        return false;
+    }
+
+    const firstAvailableCategoryId = getFirstAvailableCategoryId(allCategories.value[CategoryType.Expense]);
+    return firstAvailableCategoryId !== '';
+});
+
+const hasAvailableIncomeCategories = computed<boolean>(() => {
+    if (!allCategories.value || !allCategories.value[CategoryType.Income] || !allCategories.value[CategoryType.Income].length) {
+        return false;
+    }
+
+    const firstAvailableCategoryId = getFirstAvailableCategoryId(allCategories.value[CategoryType.Income]);
+    return firstAvailableCategoryId !== '';
+});
+
+const hasAvailableTransferCategories = computed<boolean>(() => {
+    if (!allCategories.value || !allCategories.value[CategoryType.Transfer] || !allCategories.value[CategoryType.Transfer].length) {
+        return false;
+    }
+
+    const firstAvailableCategoryId = getFirstAvailableCategoryId(allCategories.value[CategoryType.Transfer]);
+    return firstAvailableCategoryId !== '';
+});
+
+function getAccountDisplayName(accountId?: string): string {
+    if (accountId) {
+        return Account.findAccountNameById(allAccounts.value, accountId) || '';
+    } else {
+        return tt('None');
     }
 }
+
+function open(options: { mode: string; type: string; invalidItems?: BatchReplaceDialogInvalidItem[] }): Promise<BatchReplaceDialogResponse> {
+    mode.value = options.mode;
+    type.value = options.type;
+    sourceItem.value = undefined;
+
+    if (mode.value === 'batchReplace') {
+        invalidItems.value = undefined;
+    } else if (mode.value === 'replaceInvalidItems') {
+        invalidItems.value = options.invalidItems;
+    }
+
+    targetItem.value = undefined;
+    showState.value = true;
+
+    return new Promise((resolve, reject) => {
+        resolveFunc = resolve;
+        rejectFunc = reject;
+    });
+}
+
+function confirm(): void {
+    if (mode.value === 'batchReplace') {
+        resolveFunc?.({
+            targetItem: targetItem.value
+        });
+    } else if (mode.value === 'replaceInvalidItems') {
+        resolveFunc?.({
+            sourceItem: sourceItem.value,
+            targetItem: targetItem.value
+        });
+    }
+
+    showState.value = false;
+}
+
+function cancel(): void {
+    rejectFunc?.();
+    showState.value = false;
+}
+
+defineExpose({
+    open
+});
 </script>

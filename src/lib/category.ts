@@ -26,7 +26,7 @@ export function categoryTypeToTransactionType(categoryType: CategoryType): Trans
     }
 }
 
-export function getTransactionPrimaryCategoryName(categoryId: string, allCategories: TransactionCategory[]): string {
+export function getTransactionPrimaryCategoryName(categoryId: string | null | undefined, allCategories: TransactionCategory[]): string {
     if (!allCategories) {
         return '';
     }
@@ -49,7 +49,7 @@ export function getTransactionPrimaryCategoryName(categoryId: string, allCategor
     return '';
 }
 
-export function getTransactionSecondaryCategoryName(categoryId: string, allCategories: TransactionCategory[]): string {
+export function getTransactionSecondaryCategoryName(categoryId: string | null | undefined, allCategories: TransactionCategory[]): string {
     if (!allCategories) {
         return '';
     }

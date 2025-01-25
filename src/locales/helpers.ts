@@ -90,6 +90,12 @@ import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { DEFAULT_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES, DEFAULT_TRANSFER_CATEGORIES } from '@/consts/category.ts';
 import { KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS } from '@/consts/api.ts';
 
+import {
+    type CategorizedAccount,
+    Account,
+    AccountWithDisplayBalance,
+    CategorizedAccountWithDisplayBalance
+} from '@/models/account.ts';
 import type { LatestExchangeRateResponse, LocalizedLatestExchangeRate } from '@/models/exchange_rate.ts';
 
 import {
@@ -98,6 +104,7 @@ import {
     isString,
     isNumber,
     isBoolean,
+    copyObjectTo,
     copyArrayTo
 } from '@/lib/common.ts';
 
@@ -132,11 +139,17 @@ import {
     getAmountPrependAndAppendCurrencySymbol
 } from '@/lib/currency.ts';
 
+import {
+    getCategorizedAccountsMap,
+    getAllFilteredAccountsBalance
+} from '@/lib/account.ts';
+
 import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 export interface LocalizedErrorParameter {
     readonly key: string;
@@ -177,6 +190,7 @@ export function useI18n() {
 
     const settingsStore = useSettingsStore();
     const userStore = useUserStore();
+    const exchangeRatesStore = useExchangeRatesStore();
 
     // private functions
     function getLanguageDisplayName(languageName: string): string {
@@ -1371,6 +1385,87 @@ export function useI18n() {
         return getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyUnit, currencyName, isPlural);
     }
 
+    function getCategorizedAccountsWithDisplayBalance(allVisibleAccounts: Account[], showAccountBalance: boolean): CategorizedAccountWithDisplayBalance[] {
+        const ret: CategorizedAccountWithDisplayBalance[] = [];
+        const defaultCurrency = userStore.currentUserDefaultCurrency;
+        const allCategories = AccountCategory.values();
+        const categorizedAccounts: Record<number, CategorizedAccount> = copyObjectTo(getCategorizedAccountsMap(allVisibleAccounts), {}) as Record<number, CategorizedAccount>;
+
+        for (let i = 0; i < allCategories.length; i++) {
+            const category = allCategories[i];
+
+            if (!categorizedAccounts[category.type]) {
+                continue;
+            }
+
+            const accountCategory = categorizedAccounts[category.type];
+            const accountsWithDisplayBalance: AccountWithDisplayBalance[] = [];
+
+            if (accountCategory.accounts) {
+                for (let i = 0; i < accountCategory.accounts.length; i++) {
+                    const account = accountCategory.accounts[i];
+                    let accountWithDisplaceBalance: AccountWithDisplayBalance;
+
+                    if (showAccountBalance && account.isAsset) {
+                        accountWithDisplaceBalance = AccountWithDisplayBalance.fromAccount(account, getFormattedAmountWithCurrency(account.balance, account.currency) as string);
+                    } else if (showAccountBalance && account.isLiability) {
+                        accountWithDisplaceBalance = AccountWithDisplayBalance.fromAccount(account, getFormattedAmountWithCurrency(-account.balance, account.currency) as string);
+                    } else {
+                        accountWithDisplaceBalance = AccountWithDisplayBalance.fromAccount(account, '***');
+                    }
+
+                    accountsWithDisplayBalance.push(accountWithDisplaceBalance);
+                }
+            }
+
+            let finalTotalBalance = '';
+
+            if (showAccountBalance) {
+                const accountsBalance = getAllFilteredAccountsBalance(categorizedAccounts, account => account.category === accountCategory.category);
+                let totalBalance = 0;
+                let hasUnCalculatedAmount = false;
+
+                for (let i = 0; i < accountsBalance.length; i++) {
+                    if (accountsBalance[i].currency === defaultCurrency) {
+                        if (accountsBalance[i].isAsset) {
+                            totalBalance += accountsBalance[i].balance;
+                        } else if (accountsBalance[i].isLiability) {
+                            totalBalance -= accountsBalance[i].balance;
+                        }
+                    } else {
+                        const balance = exchangeRatesStore.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, defaultCurrency);
+
+                        if (!isNumber(balance)) {
+                            hasUnCalculatedAmount = true;
+                            continue;
+                        }
+
+                        if (accountsBalance[i].isAsset) {
+                            totalBalance += Math.floor(balance);
+                        } else if (accountsBalance[i].isLiability) {
+                            totalBalance -= Math.floor(balance);
+                        }
+                    }
+                }
+
+                finalTotalBalance = totalBalance.toString();
+
+                if (hasUnCalculatedAmount) {
+                    finalTotalBalance = finalTotalBalance + '+';
+                }
+
+                finalTotalBalance = getFormattedAmountWithCurrency(finalTotalBalance, defaultCurrency) as string;
+            } else {
+                finalTotalBalance = '***';
+            }
+
+            const accountCategoryWithDisplayBalance = CategorizedAccountWithDisplayBalance.of(accountCategory, accountsWithDisplayBalance, finalTotalBalance);
+            ret.push(accountCategoryWithDisplayBalance);
+        }
+
+        return ret;
+    }
+
     function setLanguage(languageKey: string | null, force?: boolean): LocaleDefaultSettings | null {
         if (!languageKey) {
             languageKey = getDefaultLanguage();
@@ -1547,6 +1642,7 @@ export function useI18n() {
         formatExchangeRateAmount: getFormattedExchangeRateAmount,
         getAdaptiveAmountRate,
         getAmountPrependAndAppendText,
+        getCategorizedAccountsWithDisplayBalance,
         // localization setting functions
         setLanguage,
         setTimeZone,

@@ -23,7 +23,7 @@ export class Account implements AccountInfoResponse {
     public visible: boolean;
     public childrenAccounts?: Account[];
 
-    private constructor(id: string, name: string, parentId: string, category: number, type: number, icon: string, color: string, currency: string, balance: number, comment: string, displayOrder: number, visible: boolean, balanceTime?: number, creditCardStatementDate?: number, isAsset?: boolean, isLiability?: boolean, childrenAccounts?: Account[]) {
+    protected constructor(id: string, name: string, parentId: string, category: number, type: number, icon: string, color: string, currency: string, balance: number, comment: string, displayOrder: number, visible: boolean, balanceTime?: number, creditCardStatementDate?: number, isAsset?: boolean, isLiability?: boolean, childrenAccounts?: Account[]) {
         this.id = id;
         this.name = name;
         this.parentId = parentId;
@@ -303,6 +303,38 @@ export class Account implements AccountInfoResponse {
     }
 }
 
+export class AccountWithDisplayBalance extends Account {
+    public displayBalance: string;
+
+    private constructor(Account: Account, displayBalance: string) {
+        super(
+            Account.id,
+            Account.name,
+            Account.parentId,
+            Account.category,
+            Account.type,
+            Account.icon,
+            Account.color,
+            Account.currency,
+            Account.balance,
+            Account.comment,
+            Account.displayOrder,
+            Account.visible,
+            Account.balanceTime,
+            Account.creditCardStatementDate,
+            Account.isAsset,
+            Account.isLiability,
+            Account.childrenAccounts
+        );
+
+        this.displayBalance = displayBalance;
+    }
+
+    public static fromAccount(account: Account, displayBalance: string): AccountWithDisplayBalance {
+        return new AccountWithDisplayBalance(account, displayBalance);
+    }
+}
+
 export interface AccountCreateRequest {
     readonly name: string;
     readonly category: number;
@@ -384,6 +416,26 @@ export interface CategorizedAccount {
     readonly name: string;
     readonly icon: string;
     readonly accounts: Account[];
+}
+
+export class CategorizedAccountWithDisplayBalance {
+    public category: number;
+    public name: string;
+    public icon: string;
+    public accounts: AccountWithDisplayBalance[];
+    public displayBalance: string;
+
+    private constructor(category: number, name: string, icon: string, accounts: AccountWithDisplayBalance[], displayBalance: string) {
+        this.category = category;
+        this.name = name;
+        this.icon = icon;
+        this.accounts = accounts;
+        this.displayBalance = displayBalance;
+    }
+
+    public static of(categorizedAccount: CategorizedAccount, accounts: AccountWithDisplayBalance[], displayBalance: string): CategorizedAccountWithDisplayBalance {
+        return new CategorizedAccountWithDisplayBalance(categorizedAccount.category, categorizedAccount.name, categorizedAccount.icon, accounts, displayBalance);
+    }
 }
 
 export interface AccountCategoriesWithVisibleCount {

@@ -5,7 +5,6 @@ import { DecimalSeparator, DigitGroupingSymbol, DigitGroupingType } from '@/core
 import { CurrencyDisplayType } from '@/core/currency.ts'
 import { AccountCategory } from '@/core/account.ts';
 import { TransactionTagFilterType } from '@/core/transaction.ts';
-import { CategoricalChartType, TrendChartType, ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
 
 import { UTC_TIMEZONE, ALL_TIMEZONES } from '@/consts/timezone.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
@@ -558,22 +557,6 @@ function getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRat
     return getAdaptiveDisplayAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, numberFormatOptions);
 }
 
-function getAllCategoricalChartTypes(translateFn) {
-    return getLocalizedDisplayNameAndType(CategoricalChartType.values(), translateFn);
-}
-
-function getAllTrendChartTypes(translateFn) {
-    return getLocalizedDisplayNameAndType(TrendChartType.values(), translateFn);
-}
-
-function getAllStatisticsSortingTypes(translateFn) {
-    return getLocalizedDisplayNameAndType(ChartSortingType.values(), translateFn);
-}
-
-function getAllStatisticsDateAggregationTypes(translateFn) {
-    return getLocalizedDisplayNameAndType(ChartDateAggregationType.values(), translateFn);
-}
-
 function getAllTransactionTagFilterTypes(translateFn) {
     return getLocalizedDisplayNameAndType(TransactionTagFilterType.values(), translateFn);
 }
@@ -810,20 +793,12 @@ export function i18nFunctions(i18nGlobal) {
         formatYearQuarter: (year, quarter) => formatYearQuarter(i18nGlobal.t, year, quarter),
         getAllTimezones: (includeSystemDefault) => getAllTimezones(includeSystemDefault, i18nGlobal.t),
         getTimezoneDifferenceDisplayText: (utcOffset) => getTimezoneDifferenceDisplayText(utcOffset, i18nGlobal.t),
-        getAllWeekDays: (firstDayOfWeek) => getAllWeekDays(firstDayOfWeek, i18nGlobal.t),
         getAllDateRanges: (scene, includeCustom, includeBillingCycle) => getAllDateRanges(scene, includeCustom, includeBillingCycle, i18nGlobal.t),
         getAllRecentMonthDateRanges: (userStore, includeAll, includeCustom) => getAllRecentMonthDateRanges(userStore, includeAll, includeCustom, i18nGlobal.t),
         getDateRangeDisplayName: (userStore, dateType, startTime, endTime) => getDateRangeDisplayName(userStore, dateType, startTime, endTime, i18nGlobal.t),
-        getCurrentDecimalSeparator: (userStore) => getCurrentDecimalSeparator(i18nGlobal.t, userStore.currentUserDecimalSeparator),
-        getCurrentDigitGroupingSymbol: (userStore) => getCurrentDigitGroupingSymbol(i18nGlobal.t, userStore.currentUserDigitGroupingSymbol),
-        getCurrentDigitGroupingType: (userStore) => getCurrentDigitGroupingType(i18nGlobal.t, userStore.currentUserDigitGrouping),
         formatAmount: (userStore, value, currencyCode) => getFormattedAmount(value, i18nGlobal.t, userStore, currencyCode),
         formatAmountWithCurrency: (settingsStore, userStore, value, currencyCode) => getFormattedAmountWithCurrency(value, currencyCode, i18nGlobal.t, userStore, settingsStore),
         getAdaptiveAmountRate: (userStore, amount1, amount2, fromExchangeRate, toExchangeRate) => getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, i18nGlobal.t, userStore),
-        getAllCategoricalChartTypes: () => getAllCategoricalChartTypes(i18nGlobal.t),
-        getAllTrendChartTypes: () => getAllTrendChartTypes(i18nGlobal.t),
-        getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),
-        getAllStatisticsDateAggregationTypes: () => getAllStatisticsDateAggregationTypes(i18nGlobal.t),
         getAllTransactionTagFilterTypes: () => getAllTransactionTagFilterTypes(i18nGlobal.t),
         getAllSupportedImportFileTypes: () => getAllSupportedImportFileTypes(i18nGlobal, i18nGlobal.t),
         getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t),

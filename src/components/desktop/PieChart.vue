@@ -121,7 +121,7 @@ const firstItemAndHalfCurrentItemTotalPercent = computed<number>(() => {
     }
 });
 
-const chartOptions = computed(() => {
+const chartOptions = computed<object>(() => {
     return {
         tooltip: {
             trigger: 'item',

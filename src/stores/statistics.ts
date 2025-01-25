@@ -89,7 +89,7 @@ interface WritableTransactionCategoricalAnalysisDataItem {
     percent?: number;
 }
 
-interface WritableTransactioTrendsAnalysisDataItem {
+interface WritableTransactionTrendsAnalysisDataItem {
     name: string;
     type: TransactionStatisticDataItemType;
     id: string;
@@ -373,7 +373,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
             return null;
         }
 
-        const combinedDataMap: Record<string, WritableTransactioTrendsAnalysisDataItem> = {};
+        const combinedDataMap: Record<string, WritableTransactionTrendsAnalysisDataItem> = {};
 
         for (let i = 0; i < transactionCategoryTrendsDataWithCategoryAndAccountInfo.value.length; i++) {
             const trendItem = transactionCategoryTrendsDataWithCategoryAndAccountInfo.value[i];

@@ -7,9 +7,9 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
 
-import type { Notification, Actions, Dialog, Popover, Popup, Sheet } from 'framework7/types';
+import type { Framework7Parameters, Notification, Actions, Dialog, Popover, Popup, Sheet } from 'framework7/types';
 import { f7ready } from 'framework7-vue';
-import routes from './router/mobile.js';
+import routes from './router/mobile.ts';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -38,7 +38,7 @@ const userStore = useUserStore();
 const tokensStore = useTokensStore();
 const exchangeRatesStore = useExchangeRatesStore();
 
-const f7params = ref<object>({
+const f7params = ref<Framework7Parameters>({
     name: 'ezBookkeeping',
     theme: 'ios',
     colors: {
@@ -70,6 +70,7 @@ const f7params = ref<object>({
         closeOnEscape: true
     },
     dialog: {
+        // @ts-expect-error there is an "animate" field in dialog parameters, but it is not declared in the type definition file
         animate: isEnableAnimate(),
         backdrop: true
     },

@@ -1,3 +1,5 @@
+import type { Router } from 'framework7/types';
+
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 
 import HomePage from '@/views/mobile/HomePage.vue';
@@ -40,15 +42,15 @@ import TagListPage from '@/views/mobile/tags/ListPage.vue';
 
 import TemplateListPage from '@/views/mobile/templates/ListPage.vue';
 
-function asyncResolve(component) {
-    return function({ resolve }) {
+function asyncResolve(component: unknown): (ctx: Router.RouteCallbackCtx) => void {
+    return function({ resolve }: { resolve: ({ component }: { component: unknown }) => void }): void {
         return resolve({
             component: component
         });
-    };
+    } as unknown as (ctx: Router.RouteCallbackCtx) => void;
 }
 
-function checkLogin({ router, resolve, reject }) {
+function checkLogin({ router, resolve, reject }: { router: Router.Router, resolve: () => void, reject: () => void }): void {
     if (!isUserLogined()) {
         reject();
         router.navigate('/login', {
@@ -70,7 +72,7 @@ function checkLogin({ router, resolve, reject }) {
     resolve();
 }
 
-function checkLocked({ router, resolve, reject }) {
+function checkLocked({ router, resolve, reject }: { router: Router.Router, resolve: () => void, reject: () => void }): void {
     if (!isUserLogined()) {
         reject();
         router.navigate('/login', {
@@ -92,12 +94,12 @@ function checkLocked({ router, resolve, reject }) {
     resolve();
 }
 
-function checkNotLogin({ router, resolve, reject }) {
+function checkNotLogin({ router, resolve, reject }: { router: Router.Router, resolve: () => void, reject: () => void }): void {
     if (isUserLogined() && !isUserUnlocked()) {
         reject();
         router.navigate('/unlock', {
             clearPreviousHistory: true,
-            pushState: false
+            browserHistory: false
         });
         return;
     }
@@ -106,7 +108,7 @@ function checkNotLogin({ router, resolve, reject }) {
         reject();
         router.navigate('/', {
             clearPreviousHistory: true,
-            pushState: false
+            browserHistory: false
         });
         return;
     }
@@ -114,7 +116,7 @@ function checkNotLogin({ router, resolve, reject }) {
     resolve();
 }
 
-const routes = [
+const routes: Router.RouteParameters[] = [
     {
         path: '/',
         async: asyncResolve(HomePage),

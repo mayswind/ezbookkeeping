@@ -36,7 +36,9 @@ import Framework7Treeview from 'framework7/components/treeview';
 import Framework7Typography from 'framework7/components/typography';
 import Framework7Swiper from 'framework7/components/swiper';
 import Framework7PhotoBrowser from 'framework7/components/photo-browser';
+// @ts-expect-error there is a function called "registerComponents" in the framework7-vue package, but it is not declared in the type definition file
 import Framework7Vue, { registerComponents } from 'framework7-vue/bundle';
+import type { Dialog } from 'framework7/types';
 
 import 'framework7/css';
 import 'framework7/components/dialog/css';
@@ -79,11 +81,9 @@ import 'line-awesome/dist/line-awesome/css/line-awesome.css';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
-import { getVersion, getBuildTime } from '@/lib/version.ts';
 import { getI18nOptions } from '@/locales/helpers.ts';
-import {
-    i18nFunctions
-} from '@/locales/helper.js';
+// @ts-expect-error the above file is migrating to ts
+import { i18nFunctions } from '@/locales/helper.js';
 import {
     showAlert,
     showConfirm,
@@ -201,13 +201,13 @@ app.component('ScheduleFrequencySheet', ScheduleFrequencySheet);
 
 app.directive('TextareaAutoSize', TextareaAutoSize);
 
-app.config.globalProperties.$locale = i18nFunctions(i18n.global);
+app.config.globalProperties['$locale'] = i18nFunctions(i18n.global);
 
-app.config.globalProperties.$alert = (message, confirmCallback) => showAlert(message, confirmCallback, i18n.global.t);
-app.config.globalProperties.$confirm = (message, confirmCallback, cancelCallback) => showConfirm(message, confirmCallback, cancelCallback, i18n.global.t);
-app.config.globalProperties.$toast = (message, timeout) => showToast(message, timeout, i18n.global.t);
-app.config.globalProperties.$showLoading = showLoading;
-app.config.globalProperties.$hideLoading = hideLoading;
-app.config.globalProperties.$routeBackOnError = routeBackOnError;
+app.config.globalProperties['$alert'] = (message: string, confirmCallback: ((dialog: Dialog.Dialog, e: Event) => void) | undefined) => showAlert(message, confirmCallback, i18n.global.t);
+app.config.globalProperties['$confirm'] = (message: string, confirmCallback: (dialog: Dialog.Dialog, e: Event) => void, cancelCallback: ((dialog: Dialog.Dialog, e: Event) => void) | undefined) => showConfirm(message, confirmCallback, cancelCallback, i18n.global.t);
+app.config.globalProperties['$toast'] = (message: string, timeout: number | undefined) => showToast(message, timeout, i18n.global.t);
+app.config.globalProperties['$showLoading'] = showLoading;
+app.config.globalProperties['$hideLoading'] = hideLoading;
+app.config.globalProperties['$routeBackOnError'] = routeBackOnError;
 
 app.mount('#app');

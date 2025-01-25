@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { type NavigationGuardReturn, createRouter, createWebHashHistory } from 'vue-router';
 
 import { TemplateType } from '@/core/template.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
@@ -31,7 +31,7 @@ import AppSettingsPage from '@/views/desktop/app/AppSettingsPage.vue';
 import ExchangeRatesPage from '@/views/desktop/ExchangeRatesPage.vue';
 import AboutPage from '@/views/desktop/AboutPage.vue';
 
-function checkLogin() {
+function checkLogin(): NavigationGuardReturn {
     if (!isUserLogined()) {
         return {
             path: '/login',
@@ -45,9 +45,11 @@ function checkLogin() {
             replace: true
         };
     }
+
+    return true;
 }
 
-function checkLocked() {
+function checkLocked(): NavigationGuardReturn {
     if (!isUserLogined()) {
         return {
             path: '/login',
@@ -61,9 +63,11 @@ function checkLocked() {
             replace: true
         };
     }
+
+    return true;
 }
 
-function checkNotLogin() {
+function checkNotLogin(): NavigationGuardReturn {
     if (isUserLogined() && !isUserUnlocked()) {
         return {
             path: '/unlock',
@@ -77,6 +81,8 @@ function checkNotLogin() {
             replace: true
         };
     }
+
+    return true;
 }
 
 const router = createRouter({
@@ -97,16 +103,16 @@ const router = createRouter({
                     component: TransactionListPage,
                     beforeEnter: checkLogin,
                     props: route => ({
-                        initDateType: route.query.dateType,
-                        initMaxTime: route.query.maxTime,
-                        initMinTime: route.query.minTime,
-                        initType: route.query.type,
-                        initCategoryIds: route.query.categoryIds,
-                        initAccountIds: route.query.accountIds,
-                        initTagIds: route.query.tagIds,
-                        initTagFilterType: route.query.tagFilterType,
-                        initAmountFilter: route.query.amountFilter,
-                        initKeyword: route.query.keyword
+                        initDateType: route.query['dateType'],
+                        initMaxTime: route.query['maxTime'],
+                        initMinTime: route.query['minTime'],
+                        initType: route.query['type'],
+                        initCategoryIds: route.query['categoryIds'],
+                        initAccountIds: route.query['accountIds'],
+                        initTagIds: route.query['tagIds'],
+                        initTagFilterType: route.query['tagFilterType'],
+                        initAmountFilter: route.query['amountFilter'],
+                        initKeyword: route.query['keyword']
                     })
                 },
                 {
@@ -114,18 +120,18 @@ const router = createRouter({
                     component: StatisticsTransactionPage,
                     beforeEnter: checkLogin,
                     props: route => ({
-                        initAnalysisType: route.query.analysisType,
-                        initChartDataType: route.query.chartDataType,
-                        initChartType: route.query.chartType,
-                        initChartDateType: route.query.chartDateType,
-                        initStartTime: route.query.startTime,
-                        initEndTime: route.query.endTime,
-                        initFilterAccountIds: route.query.filterAccountIds,
-                        initFilterCategoryIds: route.query.filterCategoryIds,
-                        initTagIds: route.query.tagIds,
-                        initTagFilterType: route.query.tagFilterType,
-                        initSortingType: route.query.sortingType,
-                        initTrendDateAggregationType: route.query.trendDateAggregationType
+                        initAnalysisType: route.query['analysisType'],
+                        initChartDataType: route.query['chartDataType'],
+                        initChartType: route.query['chartType'],
+                        initChartDateType: route.query['chartDateType'],
+                        initStartTime: route.query['startTime'],
+                        initEndTime: route.query['endTime'],
+                        initFilterAccountIds: route.query['filterAccountIds'],
+                        initFilterCategoryIds: route.query['filterCategoryIds'],
+                        initTagIds: route.query['tagIds'],
+                        initTagFilterType: route.query['tagFilterType'],
+                        initSortingType: route.query['sortingType'],
+                        initTrendDateAggregationType: route.query['trendDateAggregationType']
                     })
                 },
                 {
@@ -169,7 +175,7 @@ const router = createRouter({
                     component: UserSettingsPage,
                     beforeEnter: checkLogin,
                     props: route => ({
-                        initTab: route.query.tab
+                        initTab: route.query['tab']
                     })
                 },
                 {
@@ -177,7 +183,7 @@ const router = createRouter({
                     component: AppSettingsPage,
                     beforeEnter: checkLogin,
                     props: route => ({
-                        initTab: route.query.tab
+                        initTab: route.query['tab']
                     })
                 },
                 {
@@ -201,9 +207,9 @@ const router = createRouter({
             path: '/verify_email',
             component: VerifyEmailPage,
             props: route => ({
-                email: route.query.email,
-                token: route.query.token,
-                hasValidEmailVerifyToken: route.query.emailSent === 'true'
+                email: route.query['email'],
+                token: route.query['token'],
+                hasValidEmailVerifyToken: route.query['emailSent'] === 'true'
             })
         },
         {
@@ -215,7 +221,7 @@ const router = createRouter({
             path: '/resetpassword',
             component: ResetPasswordPage,
             props: route => ({
-                token: route.query.token
+                token: route.query['token']
             })
         },
         {

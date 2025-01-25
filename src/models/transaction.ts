@@ -1,5 +1,5 @@
 import type { PartialRecord } from '@/core/base.ts';
-import type { StartEndTime } from '@/core/datetime.ts';
+import type { YearMonth, StartEndTime } from '@/core/datetime.ts';
 
 import type { AccountInfoResponse } from './account.ts';
 import type { TransactionCategoryInfoResponse } from './transaction_category.ts';
@@ -256,9 +256,21 @@ export interface TransactionStatisticTrendsResponseItemWithInfo {
     readonly items: TransactionStatisticResponseItemWithInfo[];
 }
 
+export interface YearMonthDataItem extends YearMonth, Record<string, unknown> {}
+
+export interface YearMonthItems<T extends YearMonth> extends Record<string, unknown> {
+    readonly items: T[];
+}
+
+export interface SortableTransactionStatisticDataItem {
+    readonly name: string;
+    readonly displayOrders: number[];
+    readonly totalAmount: number;
+}
+
 export type TransactionStatisticDataItemType = 'category' | 'account' | 'total';
 
-export interface TransactionStatisticDataItemBase {
+export interface TransactionStatisticDataItemBase extends SortableTransactionStatisticDataItem {
     readonly name: string;
     readonly type: TransactionStatisticDataItemType;
     readonly id: string;

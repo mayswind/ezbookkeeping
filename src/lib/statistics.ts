@@ -1,6 +1,9 @@
 import type { YearMonth, YearUnixTime, YearQuarterUnixTime, YearMonthUnixTime } from '@/core/datetime.ts';
 import { ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
-import type { TransactionStatisticDataItemBase } from '@/models/transaction.ts';
+import type {
+    YearMonthItems,
+    SortableTransactionStatisticDataItem
+} from '@/models/transaction.ts';
 
 import {
     getAllMonthsStartAndEndUnixTimes,
@@ -8,7 +11,7 @@ import {
     getAllYearsStartAndEndUnixTimes
 } from '@/lib/datetime.ts';
 
-export function sortStatisticsItems(items: TransactionStatisticDataItemBase[], sortingType: number): void {
+export function sortStatisticsItems<T extends SortableTransactionStatisticDataItem>(items: T[], sortingType: number): void {
     if (sortingType === ChartSortingType.DisplayOrder.type) {
         items.sort(function (data1, data2) {
             for (let i = 0; i < Math.min(data1.displayOrders.length, data2.displayOrders.length); i++) {
@@ -43,7 +46,7 @@ export function sortStatisticsItems(items: TransactionStatisticDataItemBase[], s
     }
 }
 
-export function getAllDateRanges(items: { items: YearMonth[] }[], startYearMonth: YearMonth | string, endYearMonth: YearMonth | string, dateAggregationType: number): YearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] {
+export function getAllDateRanges<T extends YearMonth>(items: YearMonthItems<T>[], startYearMonth: YearMonth | string, endYearMonth: YearMonth | string, dateAggregationType: number): YearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] {
     if ((!startYearMonth || !endYearMonth) && items && items.length) {
         let minYear = Number.MAX_SAFE_INTEGER, minMonth = Number.MAX_SAFE_INTEGER, maxYear = 0, maxMonth = 0;
 

@@ -245,6 +245,8 @@
                                             :type="queryChartType"
                                             :start-year-month="query.trendChartStartYearMonth"
                                             :end-year-month="query.trendChartEndYearMonth"
+                                            :sorting-type="querySortingType"
+                                            :date-aggregation-type="trendDateAggregationType"
                                             :items="[]"
                                             :skeleton="true"
                                             id-field="id"

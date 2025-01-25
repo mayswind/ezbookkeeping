@@ -27,7 +27,7 @@
     </f7-list>
 
     <f7-list v-else-if="!loading && (!allDisplayDataItems || !allDisplayDataItems.data || !allDisplayDataItems.data.length)">
-        <f7-list-item :title="$t('No transaction data')"></f7-list-item>
+        <f7-list-item :title="tt('No transaction data')"></f7-list-item>
     </f7-list>
 
     <f7-list v-else-if="!loading && allDisplayDataItems && allDisplayDataItems.data && allDisplayDataItems.data.length">
@@ -47,7 +47,6 @@
                       link="#"
                       :key="idx"
                       v-for="(item, idx) in allDisplayDataItems.data"
-                      v-show="!item.hidden"
                       @click="clickItem(item)"
         >
             <template #media>
@@ -65,7 +64,7 @@
             </template>
 
             <template #after>
-                <span>{{ getDisplayCurrency(item.totalAmount, defaultCurrency) }}</span>
+                <span>{{ formatAmountWithCurrency(item.totalAmount, defaultCurrency) }}</span>
             </template>
 
             <template #inner-end>
@@ -88,252 +87,257 @@
     </f7-list>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.ts';
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+import { type CommonTrendsChartProps, type TrendsBarChartClickEvent, useTrendsChartBase } from '@/components/base/TrendsChartBase.ts'
+
 import { useUserStore } from '@/stores/user.ts';
 
-import { DateRangeScene } from '@/core/datetime.ts';
+import { type YearMonth, type UnixTimeRange, DateRangeScene } from '@/core/datetime.ts';
 import { ChartDateAggregationType } from '@/core/statistics.ts';
-import { DEFAULT_ICON_COLOR, DEFAULT_CHART_COLORS } from '@/consts/color.ts';
-import { isNumber } from '@/lib/common.ts';
+import { DEFAULT_CHART_COLORS } from '@/consts/color.ts';
+import type { YearMonthDataItem, SortableTransactionStatisticDataItem } from '@/models/transaction.ts';
+
+import {
+    isNumber
+} from '@/lib/common.ts';
 import {
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
     getDateTypeByDateRange
 } from '@/lib/datetime.ts';
 import {
-    sortStatisticsItems,
-    getAllDateRanges
+    sortStatisticsItems
 } from '@/lib/statistics.ts';
 
-export default {
-    props: [
-        'loading',
-        'items',
-        'startYearMonth',
-        'endYearMonth',
-        'sortingType',
-        'dateAggregationType',
-        'idField',
-        'nameField',
-        'valueField',
-        'colorField',
-        'hiddenField',
-        'displayOrdersField',
-        'translateName',
-        'defaultCurrency',
-        'enableClickItem'
-    ],
-    emits: [
-        'click'
-    ],
-    data() {
-        return {
-            unselectedLegends: {}
+interface TrendsBarChartLegend {
+    readonly id: string;
+    readonly name: string;
+    readonly color: string;
+    readonly displayOrders: number[];
+}
+
+interface TrendsBarChartDataAmount extends SortableTransactionStatisticDataItem, TrendsBarChartLegend {
+    totalAmount: number;
+}
+
+interface TrendsBarChartDataItem {
+    dateRange: UnixTimeRange;
+    displayDateRange: string;
+    items: TrendsBarChartDataAmount[];
+    totalAmount: number;
+    totalPositiveAmount: number;
+    percent: number;
+}
+
+interface TrendsBarChartData {
+    readonly data: TrendsBarChartDataItem[];
+    readonly legends: TrendsBarChartLegend[];
+}
+
+interface MobileTrendsChartProps<T extends YearMonth> extends CommonTrendsChartProps<T> {
+    loading?: boolean;
+}
+
+const props = defineProps<MobileTrendsChartProps<YearMonthDataItem>>();
+
+const emit = defineEmits<{
+    (e: 'click', value: TrendsBarChartClickEvent): void;
+}>();
+
+const { tt, formatUnixTimeToShortYear, formatYearQuarter, formatUnixTimeToShortYearMonth, formatAmountWithCurrency } = useI18n();
+const { allDateRanges, getItemName, getColor } = useTrendsChartBase(props);
+
+const userStore = useUserStore();
+
+const unselectedLegends = ref<Record<string, boolean>>({});
+
+const allDisplayDataItems = computed<TrendsBarChartData>(() => {
+    const allDateRangeItemsMap: Record<string, TrendsBarChartDataAmount[]> = {};
+    const legends: TrendsBarChartLegend[] = [];
+
+    for (let i = 0; i < props.items.length; i++) {
+        const item = props.items[i];
+
+        if (props.hiddenField && item[props.hiddenField]) {
+            continue;
+        }
+
+        const id = (props.idField && item[props.idField]) ? item[props.idField] as string : getItemName(item[props.nameField] as string);
+
+        const legend: TrendsBarChartLegend = {
+            id: id,
+            name: (props.nameField && item[props.nameField]) ? getItemName(item[props.nameField] as string) : id,
+            color: getColor(props.colorField && item[props.colorField] ? item[props.colorField] as string : DEFAULT_CHART_COLORS[i % DEFAULT_CHART_COLORS.length]),
+            displayOrders: (props.displayOrdersField && item[props.displayOrdersField]) ? item[props.displayOrdersField] as number[] : [0]
         };
-    },
-    computed: {
-        ...mapStores(useSettingsStore, useUserStore),
-        allDateRanges: function () {
-            return getAllDateRanges(this.items, this.startYearMonth, this.endYearMonth, this.dateAggregationType);
-        },
-        allDisplayDataItems: function () {
-            const allDateRangeItemsMap = {};
-            const legends = [];
 
-            for (let i = 0; i < this.items.length; i++) {
-                const item = this.items[i];
+        legends.push(legend);
 
-                if (!this.hiddenField || item[this.hiddenField]) {
-                    continue;
-                }
-
-                const id = (this.idField && item[this.idField]) ? item[this.idField] : this.getItemName(item[this.nameField]);
-
-                const legend = {
-                    id: id,
-                    name: (this.nameField && item[this.nameField]) ? this.getItemName(item[this.nameField]) : id,
-                    color: this.getColor(item[this.colorField] ? item[this.colorField] : DEFAULT_CHART_COLORS[i % DEFAULT_CHART_COLORS.length]),
-                    displayOrders: (this.displayOrdersField && item[this.displayOrdersField]) ? item[this.displayOrdersField] : [0]
-                };
-
-                legends.push(legend);
-
-                if (this.unselectedLegends[id]) {
-                    continue;
-                }
-
-                const dateRangeItemMap = {};
-
-                for (let j = 0; j < item.items.length; j++) {
-                    const dataItem = item.items[j];
-                    let dateRangeKey = '';
-
-                    if (this.dateAggregationType === ChartDateAggregationType.Year.type) {
-                        dateRangeKey = dataItem.year;
-                    } else if (this.dateAggregationType === ChartDateAggregationType.Quarter.type) {
-                        dateRangeKey = `${dataItem.year}-${Math.floor((dataItem.month - 1) / 3) + 1}`;
-                    } else { // if (this.dateAggregationType === ChartDateAggregationType.Month.type) {
-                        dateRangeKey = `${dataItem.year}-${dataItem.month}`;
-                    }
-
-                    if (dateRangeItemMap[dateRangeKey]) {
-                        dateRangeItemMap[dateRangeKey].totalAmount += (this.valueField && isNumber(dataItem[this.valueField])) ? dataItem[this.valueField] : 0;
-                    } else {
-                        const allDataItems = allDateRangeItemsMap[dateRangeKey] || [];
-                        const finalDataItem = Object.assign({}, legend, {
-                            totalAmount: (this.valueField && isNumber(dataItem[this.valueField])) ? dataItem[this.valueField] : 0
-                        });
-
-                        allDataItems.push(finalDataItem);
-                        dateRangeItemMap[dateRangeKey] = finalDataItem;
-                        allDateRangeItemsMap[dateRangeKey] = allDataItems;
-                    }
-                }
-            }
-
-            const finalDataItems = [];
-            let maxTotalAmount = 0;
-
-            for (let i = 0; i < this.allDateRanges.length; i++) {
-                const dateRange = this.allDateRanges[i];
-                let dateRangeKey = '';
-
-                if (this.dateAggregationType === ChartDateAggregationType.Year.type) {
-                    dateRangeKey = dateRange.year;
-                } else if (this.dateAggregationType === ChartDateAggregationType.Quarter.type) {
-                    dateRangeKey = `${dateRange.year}-${dateRange.quarter}`;
-                } else { // if (this.dateAggregationType === ChartDateAggregationType.Month.type) {
-                    dateRangeKey = `${dateRange.year}-${dateRange.month + 1}`;
-                }
-
-                let displayDateRange = '';
-
-                if (this.dateAggregationType === ChartDateAggregationType.Year.type) {
-                    displayDateRange = this.$locale.formatUnixTimeToShortYear(this.userStore, dateRange.minUnixTime);
-                } else if (this.dateAggregationType === ChartDateAggregationType.Quarter.type) {
-                    displayDateRange = this.$locale.formatYearQuarter(dateRange.year, dateRange.quarter);
-                } else { // if (this.dateAggregationType === ChartDateAggregationType.Month.type) {
-                    displayDateRange = this.$locale.formatUnixTimeToShortYearMonth(this.userStore, dateRange.minUnixTime);
-                }
-
-                const dataItems = allDateRangeItemsMap[dateRangeKey] || [];
-                let totalAmount = 0;
-                let totalPositiveAmount = 0;
-
-                sortStatisticsItems(dataItems, this.sortingType);
-
-                for (let j = 0; j < dataItems.length; j++) {
-                    if (dataItems[j].totalAmount > 0) {
-                        totalPositiveAmount += dataItems[j].totalAmount;
-                    }
-
-                    totalAmount += dataItems[j].totalAmount;
-                }
-
-                if (totalAmount > maxTotalAmount) {
-                    maxTotalAmount = totalAmount;
-                }
-
-                finalDataItems.push({
-                    dateRange: dateRange,
-                    displayDateRange: displayDateRange,
-                    items: dataItems,
-                    totalAmount: totalAmount,
-                    totalPositiveAmount: totalPositiveAmount
-                });
-            }
-
-            for (let i = 0; i < finalDataItems.length; i++) {
-                if (maxTotalAmount > 0 && finalDataItems[i].totalAmount > 0) {
-                    finalDataItems[i].percent = 100.0 * finalDataItems[i].totalAmount / maxTotalAmount;
-                } else {
-                    finalDataItems[i].percent = 0.0;
-                }
-            }
-
-            return {
-                data: finalDataItems,
-                legends: legends
-            };
+        if (unselectedLegends.value[id]) {
+            continue;
         }
-    },
-    methods: {
-        clickItem: function (item) {
-            let itemId = '';
 
-            for (let i = 0; i < this.items.length; i++) {
-                const item = this.items[i];
+        const dateRangeItemMap: Record<string, TrendsBarChartDataAmount> = {};
 
-                if (!this.hiddenField || item[this.hiddenField]) {
-                    continue;
-                }
+        for (let j = 0; j < item.items.length; j++) {
+            const dataItem = item.items[j];
+            let dateRangeKey = '';
 
-                const id = (this.idField && item[this.idField]) ? item[this.idField] : this.getItemName(item[this.nameField]);
-
-                if (this.unselectedLegends[id]) {
-                    continue;
-                }
-
-                if (itemId.length) {
-                    itemId += ',';
-                }
-
-                itemId += id;
+            if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
+                dateRangeKey = dataItem.year.toString();
+            } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type) {
+                dateRangeKey = `${dataItem.year}-${Math.floor((dataItem.month - 1) / 3) + 1}`;
+            } else { // if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
+                dateRangeKey = `${dataItem.year}-${dataItem.month}`;
             }
 
-            const dateRange = item.dateRange;
-            let minUnixTime = dateRange.minUnixTime;
-            let maxUnixTime = dateRange.maxUnixTime;
-
-            if (this.startYearMonth) {
-                const startMinUnixTime = getYearMonthFirstUnixTime(this.startYearMonth);
-
-                if (startMinUnixTime > minUnixTime) {
-                    minUnixTime = startMinUnixTime;
-                }
-            }
-
-            if (this.endYearMonth) {
-                const endMaxUnixTime = getYearMonthLastUnixTime(this.endYearMonth);
-
-                if (endMaxUnixTime < maxUnixTime) {
-                    maxUnixTime = endMaxUnixTime;
-                }
-            }
-
-            const dateRangeType = getDateTypeByDateRange(minUnixTime, maxUnixTime, this.userStore.currentUserFirstDayOfWeek, DateRangeScene.Normal);
-
-            this.$emit('click', {
-                itemId: itemId,
-                dateRange: {
-                    minTime: minUnixTime,
-                    maxTime: maxUnixTime,
-                    dateType: dateRangeType
-                }
-            });
-        },
-        toggleLegend(legend) {
-            if (this.unselectedLegends[legend.id]) {
-                delete this.unselectedLegends[legend.id];
+            if (dateRangeItemMap[dateRangeKey]) {
+                dateRangeItemMap[dateRangeKey].totalAmount += (props.valueField && isNumber(dataItem[props.valueField])) ? dataItem[props.valueField] as number : 0;
             } else {
-                this.unselectedLegends[legend.id] = true;
+                const allDataItems: TrendsBarChartDataAmount[] = allDateRangeItemsMap[dateRangeKey] || [];
+                const finalDataItem: TrendsBarChartDataAmount = Object.assign({}, legend, {
+                    totalAmount: (props.valueField && isNumber(dataItem[props.valueField])) ? dataItem[props.valueField] as number : 0
+                });
+
+                allDataItems.push(finalDataItem);
+                dateRangeItemMap[dateRangeKey] = finalDataItem;
+                allDateRangeItemsMap[dateRangeKey] = allDataItems;
             }
-        },
-        getColor: function (color) {
-            if (color && color !== DEFAULT_ICON_COLOR) {
-                color = '#' + color;
+        }
+    }
+
+    const finalDataItems: TrendsBarChartDataItem[] = [];
+    let maxTotalAmount = 0;
+
+    for (let i = 0; i < allDateRanges.value.length; i++) {
+        const dateRange = allDateRanges.value[i];
+        let dateRangeKey = '';
+
+        if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
+            dateRangeKey = dateRange.year.toString();
+        } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type && 'quarter' in dateRange) {
+            dateRangeKey = `${dateRange.year}-${dateRange.quarter}`;
+        } else if (props.dateAggregationType === ChartDateAggregationType.Month.type && 'month' in dateRange) {
+            dateRangeKey = `${dateRange.year}-${dateRange.month + 1}`;
+        }
+
+        let displayDateRange = '';
+
+        if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
+            displayDateRange = formatUnixTimeToShortYear(dateRange.minUnixTime);
+        } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type && 'quarter' in dateRange) {
+            displayDateRange = formatYearQuarter(dateRange.year, dateRange.quarter);
+        } else { // if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
+            displayDateRange = formatUnixTimeToShortYearMonth(dateRange.minUnixTime);
+        }
+
+        const dataItems = allDateRangeItemsMap[dateRangeKey] || [];
+        let totalAmount = 0;
+        let totalPositiveAmount = 0;
+
+        sortStatisticsItems(dataItems, props.sortingType);
+
+        for (let j = 0; j < dataItems.length; j++) {
+            if (dataItems[j].totalAmount > 0) {
+                totalPositiveAmount += dataItems[j].totalAmount;
             }
 
-            return color;
-        },
-        getItemName(name) {
-            return this.translateName ? this.$t(name) : name;
-        },
-        getDisplayCurrency(value, currencyCode) {
-            return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, currencyCode);
+            totalAmount += dataItems[j].totalAmount;
         }
+
+        if (totalAmount > maxTotalAmount) {
+            maxTotalAmount = totalAmount;
+        }
+
+        const finalDataItem: TrendsBarChartDataItem = {
+            dateRange: dateRange,
+            displayDateRange: displayDateRange,
+            items: dataItems,
+            totalAmount: totalAmount,
+            totalPositiveAmount: totalPositiveAmount,
+            percent: 0.0
+        };
+
+        finalDataItems.push(finalDataItem);
+    }
+
+    for (let i = 0; i < finalDataItems.length; i++) {
+        if (maxTotalAmount > 0 && finalDataItems[i].totalAmount > 0) {
+            finalDataItems[i].percent = 100.0 * finalDataItems[i].totalAmount / maxTotalAmount;
+        } else {
+            finalDataItems[i].percent = 0.0;
+        }
+    }
+
+    return {
+        data: finalDataItems,
+        legends: legends
+    };
+});
+
+function clickItem(item: TrendsBarChartDataItem): void {
+    let itemId = '';
+
+    for (let i = 0; i < props.items.length; i++) {
+        const item = props.items[i];
+
+        if (!props.hiddenField || item[props.hiddenField]) {
+            continue;
+        }
+
+        const id = (props.idField && item[props.idField]) ? item[props.idField] as string : getItemName(item[props.nameField] as string);
+
+        if (unselectedLegends.value[id]) {
+            continue;
+        }
+
+        if (itemId.length) {
+            itemId += ',';
+        }
+
+        itemId += id;
+    }
+
+    const dateRange = item.dateRange;
+    let minUnixTime = dateRange.minUnixTime;
+    let maxUnixTime = dateRange.maxUnixTime;
+
+    if (props.startYearMonth) {
+        const startMinUnixTime = getYearMonthFirstUnixTime(props.startYearMonth);
+
+        if (startMinUnixTime > minUnixTime) {
+            minUnixTime = startMinUnixTime;
+        }
+    }
+
+    if (props.endYearMonth) {
+        const endMaxUnixTime = getYearMonthLastUnixTime(props.endYearMonth);
+
+        if (endMaxUnixTime < maxUnixTime) {
+            maxUnixTime = endMaxUnixTime;
+        }
+    }
+
+    const dateRangeType = getDateTypeByDateRange(minUnixTime, maxUnixTime, userStore.currentUserFirstDayOfWeek, DateRangeScene.Normal);
+
+    emit('click', {
+        itemId: itemId,
+        dateRange: {
+            minTime: minUnixTime,
+            maxTime: maxUnixTime,
+            dateType: dateRangeType
+        }
+    });
+}
+
+function toggleLegend(legend: TrendsBarChartLegend): void {
+    if (unselectedLegends.value[legend.id]) {
+        delete unselectedLegends.value[legend.id];
+    } else {
+        unselectedLegends.value[legend.id] = true;
     }
 }
 </script>

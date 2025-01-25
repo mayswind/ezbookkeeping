@@ -1,4 +1,4 @@
-import type { TypeAndDisplayName } from '@/core/base.ts';
+import type { TypeAndName, TypeAndDisplayName } from '@/core/base.ts';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function isFunction(val: unknown): val is Function {
@@ -37,7 +37,7 @@ export function isBoolean(val: unknown): val is boolean {
     return typeof(val) === 'boolean';
 }
 
-export function isYearMonth(val: unknown): boolean {
+export function isYearMonth(val: unknown): val is string {
     if (!isString(val)) {
         return false;
     }
@@ -306,6 +306,16 @@ export function getItemByKeyValue<T>(src: Record<string, T>[] | Record<string, R
             if (item[keyField] === value) {
                 return item;
             }
+        }
+    }
+
+    return null;
+}
+
+export function findNameByType(items: TypeAndName[], type: number): string | null {
+    for (const item of items) {
+        if (item.type === type) {
+            return item.name;
         }
     }
 

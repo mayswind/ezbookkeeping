@@ -101,7 +101,24 @@ interface WritableTransactioTrendsAnalysisDataItem {
     items: TransactionTrendsAnalysisDataAmount[];
 }
 
-export interface TransactionStatisticsFilter {
+export interface TransactionStatisticsPartialFilter {
+    chartDataType?: number;
+    categoricalChartType?: number;
+    categoricalChartDateType?: number;
+    categoricalChartStartTime?: number;
+    categoricalChartEndTime?: number;
+    trendChartType?: number;
+    trendChartDateType?: number;
+    trendChartStartYearMonth?: string;
+    trendChartEndYearMonth?: string;
+    filterAccountIds?: Record<string, boolean>;
+    filterCategoryIds?: Record<string, boolean>;
+    tagIds?: string;
+    tagFilterType?: number;
+    sortingType?: number;
+}
+
+export interface TransactionStatisticsFilter extends TransactionStatisticsPartialFilter {
     chartDataType: number;
     categoricalChartType: number;
     categoricalChartDateType: number;
@@ -672,7 +689,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
         transactionStatisticsStateInvalid.value = true;
     }
 
-    function initTransactionStatisticsFilter(analysisType: StatisticsAnalysisType, filter?: TransactionStatisticsFilter): void {
+    function initTransactionStatisticsFilter(analysisType: StatisticsAnalysisType, filter?: TransactionStatisticsPartialFilter): void {
         if (filter && isInteger(filter.chartDataType)) {
             transactionStatisticsFilter.value.chartDataType = filter.chartDataType;
         } else {
@@ -810,7 +827,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
         }
     }
 
-    function updateTransactionStatisticsFilter(filter: TransactionStatisticsFilter): boolean {
+    function updateTransactionStatisticsFilter(filter: TransactionStatisticsPartialFilter): boolean {
         let changed = false;
 
         if (filter && isInteger(filter.chartDataType) && transactionStatisticsFilter.value.chartDataType !== filter.chartDataType) {
@@ -943,7 +960,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
         return querys.join('&');
     }
 
-    function getTransactionListPageParams(analysisType: StatisticsAnalysisType, itemId: string, dateRange: TimeRangeAndDateType): string {
+    function getTransactionListPageParams(analysisType: StatisticsAnalysisType, itemId: string, dateRange?: TimeRangeAndDateType): string {
         const querys: string[] = [];
 
         if (transactionStatisticsFilter.value.chartDataType === ChartDataType.IncomeByAccount.type

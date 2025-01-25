@@ -119,7 +119,7 @@ export class ChartDataType implements TypeAndName {
         return this.availableAnalysisTypes[analysisType] || false;
     }
 
-    public static values(analysisType: StatisticsAnalysisType | undefined): ChartDataType[] {
+    public static values(analysisType?: StatisticsAnalysisType): ChartDataType[] {
         if (analysisType === undefined) {
             return ChartDataType.allInstances;
         }

@@ -105,13 +105,17 @@ import {
     isPM,
     formatUnixTime,
     formatCurrentTime,
+    parseDateFromUnixTime,
+    getYear,
     getTimezoneOffset,
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffset,
     getBrowserTimezoneOffsetMinutes,
     getTimeDifferenceHoursAndMinutes,
     getDateTimeFormatType,
-    getRecentMonthDateRanges
+    getRecentMonthDateRanges,
+    isDateRangeMatchFullYears,
+    isDateRangeMatchFullMonths
 } from '@/lib/datetime.ts';
 
 import {
@@ -1206,6 +1210,54 @@ export function useI18n() {
         }
     }
 
+    function formatDateRange(dateType: number, startTime: number, endTime: number): string {
+        if (dateType === DateRange.All.type) {
+            return t(DateRange.All.name);
+        }
+
+        const allDateRanges = DateRange.values();
+
+        for (let i = 0; i < allDateRanges.length; i++) {
+            const dateRange = allDateRanges[i];
+
+            if (dateRange && dateRange.type !== DateRange.Custom.type && dateRange.type === dateType && dateRange.name) {
+                return t(dateRange.name);
+            }
+        }
+
+        if (isDateRangeMatchFullYears(startTime, endTime)) {
+            const format = getLocalizedShortYearFormat();
+            const displayStartTime = formatUnixTime(startTime, format);
+            const displayEndTime = formatUnixTime(endTime, format);
+
+            return displayStartTime !== displayEndTime ? `${displayStartTime} ~ ${displayEndTime}` : displayStartTime;
+        }
+
+        if (isDateRangeMatchFullMonths(startTime, endTime)) {
+            const format = getLocalizedShortYearMonthFormat();
+            const displayStartTime = formatUnixTime(startTime, format);
+            const displayEndTime = formatUnixTime(endTime, format);
+
+            return displayStartTime !== displayEndTime ? `${displayStartTime} ~ ${displayEndTime}` : displayStartTime;
+        }
+
+        const startTimeYear = getYear(parseDateFromUnixTime(startTime));
+        const endTimeYear = getYear(parseDateFromUnixTime(endTime));
+
+        const format = getLocalizedShortDateFormat();
+        const displayStartTime = formatUnixTime(startTime, format);
+        const displayEndTime = formatUnixTime(endTime, format);
+
+        if (displayStartTime === displayEndTime) {
+            return displayStartTime;
+        } else if (startTimeYear === endTimeYear) {
+            const displayShortEndTime = formatUnixTime(endTime, getLocalizedShortMonthDayFormat());
+            return `${displayStartTime} ~ ${displayShortEndTime}`;
+        }
+
+        return `${displayStartTime} ~ ${displayEndTime}`;
+    }
+
     function getTimezoneDifferenceDisplayText(utcOffset: number): string {
         const defaultTimezoneOffset = getTimezoneOffsetMinutes();
         const offsetTime = getTimeDifferenceHoursAndMinutes(utcOffset - defaultTimezoneOffset);
@@ -1486,6 +1538,7 @@ export function useI18n() {
         formatUnixTimeToLongTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongTimeFormat(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortTimeFormat(), utcOffset, currentUtcOffset),
         formatYearQuarter,
+        formatDateRange,
         getTimezoneDifferenceDisplayText,
         appendDigitGroupingSymbol: getNumberWithDigitGroupingSymbol,
         parseAmount: getParsedAmountNumber,

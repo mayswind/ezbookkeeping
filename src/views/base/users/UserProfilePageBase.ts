@@ -20,6 +20,7 @@ import { getCategorizedAccounts } from '@/lib/account.ts';
 
 export function useUserProfilePageBase() {
     const {
+        tt,
         getDefaultCurrency,
         getDefaultFirstDayOfWeek,
         getAllLanguageOptions,
@@ -71,6 +72,16 @@ export function useUserProfilePageBase() {
     const allExpenseAmountColorTypes = computed<TypeAndDisplayName[]>(() => getAllExpenseAmountColors());
     const allIncomeAmountColorTypes = computed<TypeAndDisplayName[]>(() => getAllIncomeAmountColors());
     const allTransactionEditScopeTypes = computed<TypeAndDisplayName[]>(() => getAllTransactionEditScopeTypes());
+
+    const languageTitle = computed<string>(() => {
+        const languageInCurrentLanguage = tt('Language');
+
+        if (languageInCurrentLanguage !== 'Language') {
+            return `${languageInCurrentLanguage} / Language`;
+        }
+
+        return languageInCurrentLanguage;
+    });
 
     const supportDigitGroupingSymbol = computed<boolean>(() => {
         for (const digitGroupingType of allDigitGroupingTypes.value) {
@@ -195,6 +206,7 @@ export function useUserProfilePageBase() {
         allExpenseAmountColorTypes,
         allIncomeAmountColorTypes,
         allTransactionEditScopeTypes,
+        languageTitle,
         supportDigitGroupingSymbol,
         inputIsNotChangedProblemMessage,
         inputInvalidProblemMessage,

@@ -128,9 +128,9 @@
         <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="tt('Language')"
+                :header="languageTitle"
                 :title="currentLanguageName"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Language'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Language'), popupCloseLinkText: tt('Done') }">
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: languageTitle, searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: languageTitle, popupCloseLinkText: tt('Done') }">
                 <select v-model="newProfile.language">
                     <option :value="language.languageTag"
                             :key="language.languageTag"
@@ -379,6 +379,7 @@ const {
     allExpenseAmountColorTypes,
     allIncomeAmountColorTypes,
     allTransactionEditScopeTypes,
+    languageTitle,
     supportDigitGroupingSymbol,
     inputIsNotChangedProblemMessage,
     inputInvalidProblemMessage,

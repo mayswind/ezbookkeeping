@@ -120,8 +120,8 @@
                                     item-value="languageTag"
                                     persistent-placeholder
                                     :disabled="loading || saving"
-                                    :label="tt('Language')"
-                                    :placeholder="tt('Language')"
+                                    :label="languageTitle"
+                                    :placeholder="languageTitle"
                                     :items="allLanguages"
                                     v-model="newProfile.language"
                                 />
@@ -381,6 +381,7 @@ const {
     allExpenseAmountColorTypes,
     allIncomeAmountColorTypes,
     allTransactionEditScopeTypes,
+    languageTitle,
     supportDigitGroupingSymbol,
     inputIsNotChangedProblemMessage,
     inputInvalidProblemMessage,

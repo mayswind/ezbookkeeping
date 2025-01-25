@@ -134,13 +134,13 @@ const exchangeRatesLastUpdateDate = computed<string>(() => {
     return exchangeRatesLastUpdateTime ? formatUnixTimeToLongDate(exchangeRatesLastUpdateTime) : '';
 });
 
-function switchToDesktopVersion() {
+function switchToDesktopVersion(): void {
     showConfirm('Are you sure you want to switch to desktop version?', () => {
         window.location.replace(getDesktopVersionPath());
     });
 }
 
-function logout() {
+function logout(): void {
     showConfirm('Are you sure you want to log out?', () => {
         logouting.value = true;
         showLoading(() => logouting.value);

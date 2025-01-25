@@ -133,7 +133,7 @@ function getCategoryTypeName(categoryType: CategoryType): string {
     }
 }
 
-function save() {
+function save(): void {
     submitting.value = true;
 
     const submitCategories = categorizedArrayToPlainArray(allPresetCategories.value);

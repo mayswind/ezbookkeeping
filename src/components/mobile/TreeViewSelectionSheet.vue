@@ -151,7 +151,7 @@ function onSheetOpen(event: { $el: Framework7Dom }): void {
     scrollToSelectedItem(event.$el, '.page-content', '.treeview-item .treeview-item-selected');
 }
 
-function onSheetClosed() {
+function onSheetClosed(): void {
     emit('update:show', false);
 }
 </script>

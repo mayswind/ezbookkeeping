@@ -143,11 +143,11 @@ export function getTimezoneOffsetMinutes(timezone?: string): number {
     }
 }
 
-export function getBrowserTimezoneOffset() {
+export function getBrowserTimezoneOffset(): string {
     return getUtcOffsetByUtcOffsetMinutes(getBrowserTimezoneOffsetMinutes());
 }
 
-export function getBrowserTimezoneOffsetMinutes() {
+export function getBrowserTimezoneOffsetMinutes(): number {
     return -new Date().getTimezoneOffset();
 }
 

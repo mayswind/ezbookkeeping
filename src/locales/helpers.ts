@@ -568,7 +568,7 @@ export function useI18n() {
         return getLanguageInfo(getDefaultLanguage()) as LanguageInfo;
     }
 
-    function getCurrentLanguageDisplayName() {
+    function getCurrentLanguageDisplayName(): string {
         const currentLanguageInfo = getCurrentLanguageInfo();
         return currentLanguageInfo.displayName;
     }
@@ -1175,27 +1175,27 @@ export function useI18n() {
         return t(`currency.name.${currencyCode}`);
     }
 
-    function isLongDateMonthAfterYear() {
+    function isLongDateMonthAfterYear():boolean {
         return getLocalizedDateTimeType(LongDateFormat.all(), LongDateFormat.values(), userStore.currentUserLongDateFormat, 'longDateFormat', LongDateFormat.Default).isMonthAfterYear;
     }
 
-    function isShortDateMonthAfterYear() {
+    function isShortDateMonthAfterYear():boolean {
         return getLocalizedDateTimeType(ShortDateFormat.all(), ShortDateFormat.values(), userStore.currentUserShortDateFormat, 'shortDateFormat', ShortDateFormat.Default).isMonthAfterYear;
     }
 
-    function isLongTime24HourFormat() {
+    function isLongTime24HourFormat():boolean {
         return getLocalizedDateTimeType(LongTimeFormat.all(), LongTimeFormat.values(), userStore.currentUserLongTimeFormat, 'longTimeFormat', LongTimeFormat.Default).is24HourFormat;
     }
 
-    function isLongTimeMeridiemIndicatorFirst() {
+    function isLongTimeMeridiemIndicatorFirst():boolean {
         return getLocalizedDateTimeType(LongTimeFormat.all(), LongTimeFormat.values(), userStore.currentUserLongTimeFormat, 'longTimeFormat', LongTimeFormat.Default).isMeridiemIndicatorFirst;
     }
 
-    function isShortTime24HourFormat() {
+    function isShortTime24HourFormat():boolean {
         return getLocalizedDateTimeType(ShortTimeFormat.all(), ShortTimeFormat.values(), userStore.currentUserShortTimeFormat, 'shortTimeFormat', ShortTimeFormat.Default).is24HourFormat;
     }
 
-    function isShortTimeMeridiemIndicatorFirst() {
+    function isShortTimeMeridiemIndicatorFirst():boolean {
         return getLocalizedDateTimeType(ShortTimeFormat.all(), ShortTimeFormat.values(), userStore.currentUserShortTimeFormat, 'shortTimeFormat', ShortTimeFormat.Default).isMeridiemIndicatorFirst;
     }
 

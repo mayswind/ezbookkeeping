@@ -133,7 +133,7 @@ const selectedPrimaryItem = computed<unknown>(() => {
     }
 });
 
-function close() {
+function close(): void {
     emit('update:show', false);
 }
 
@@ -163,7 +163,7 @@ function onSheetOpen(event: { $el: Framework7Dom }): void {
     scrollToSelectedItem(event.$el, '.secondary-list-container', 'li.secondary-list-item-selected');
 }
 
-function onSheetClosed() {
+function onSheetClosed(): void {
     close();
 }
 </script>

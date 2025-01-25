@@ -136,13 +136,13 @@ function changeFrequencyValue(e: Event): void {
     }
 }
 
-function save() {
+function save(): void {
     emit('update:type', currentFrequencyType.value);
     emit('update:modelValue', sortNumbersArray(currentFrequencyValue.value).join(','));
     emit('update:show', false);
 }
 
-function close() {
+function close(): void {
     emit('update:show', false);
 }
 
@@ -152,7 +152,7 @@ function onSheetOpen(event: { $el: Framework7Dom }): void {
     scrollToSelectedItem(event.$el, '.schedule-frequency-value-container', 'li.list-item-selected');
 }
 
-function onSheetClosed() {
+function onSheetClosed(): void {
     close();
 }
 </script>

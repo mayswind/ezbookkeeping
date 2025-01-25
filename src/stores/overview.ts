@@ -270,7 +270,7 @@ export const useOverviewStore = defineStore('overview', () => {
         transactionOverviewStateInvalid.value = invalidState;
     }
 
-    function resetTransactionOverview() {
+    function resetTransactionOverview(): void {
         updateTransactionDateRange();
         transactionOverviewOptions.value.loadLast11Months = false;
         transactionOverviewData.value = {};

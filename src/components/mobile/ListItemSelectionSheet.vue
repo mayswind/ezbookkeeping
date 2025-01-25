@@ -94,7 +94,7 @@ function getItemValue(item: unknown, index: number, fieldName: string | undefine
     }
 }
 
-function close() {
+function close(): void {
     emit('update:show', false);
 }
 

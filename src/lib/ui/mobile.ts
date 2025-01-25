@@ -84,7 +84,7 @@ export function showLoading(delayConditionFunc?: () => boolean, delayMills?: num
     });
 }
 
-export function hideLoading() {
+export function hideLoading(): void {
     f7ready((f7) => {
         return f7.preloader.hide();
     });

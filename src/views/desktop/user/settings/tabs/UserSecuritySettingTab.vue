@@ -18,7 +18,7 @@
                                     :label="tt('Current Password')"
                                     :placeholder="tt('Current Password')"
                                     v-model="currentPassword"
-                                    @keyup.enter="$refs.newPasswordInput.focus()"
+                                    @keyup.enter="newPasswordInput?.focus()"
                                 />
                             </v-col>
                         </v-row>
@@ -33,7 +33,7 @@
                                     :label="tt('New Password')"
                                     :placeholder="tt('New Password')"
                                     v-model="newPassword"
-                                    @keyup.enter="$refs.confirmPasswordInput.focus()"
+                                    @keyup.enter="confirmPasswordInput?.focus()"
                                 />
                             </v-col>
                         </v-row>
@@ -129,6 +129,7 @@
 </template>
 
 <script setup lang="ts">
+import { VTextField } from 'vuetify/components/VTextField';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
@@ -179,6 +180,8 @@ const icons = {
     refresh: mdiRefresh
 };
 
+const newPasswordInput = useTemplateRef<VTextField>('newPasswordInput');
+const confirmPasswordInput = useTemplateRef<VTextField>('confirmPasswordInput');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 

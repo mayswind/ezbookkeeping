@@ -43,7 +43,7 @@ const props = defineProps<{
     class?: string;
     color?: string;
     density?: string;
-    currency?: string;
+    currency: string;
     showCurrency?: boolean;
     label?: string;
     placeholder?: string;

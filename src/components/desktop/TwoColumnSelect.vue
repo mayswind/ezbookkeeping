@@ -196,7 +196,7 @@ const noSelectionText = computed<string>(() => props.noItemText ? props.noItemTe
 const selectionPrimaryItemText = computed<string>(() => {
     if (props.primaryValueField && props.primaryTitleField) {
         if (currentPrimaryValue.value) {
-            return getNameByKeyValue(props.items as Record<string, unknown>[] | Record<string, Record<string, unknown>>, currentPrimaryValue.value, props.primaryValueField, props.primaryTitleField, noSelectionText.value) as string;
+            return getNameByKeyValue(props.items as Record<string, string>[] | Record<string, Record<string, string>>, currentPrimaryValue.value, props.primaryValueField, props.primaryTitleField, noSelectionText.value) as string;
         } else {
             return noSelectionText.value;
         }
@@ -208,7 +208,7 @@ const selectionPrimaryItemText = computed<string>(() => {
 const selectionSecondaryItemText = computed<string>(() => {
     if (props.secondaryValueField && props.secondaryTitleField) {
         if (currentSecondaryValue.value && selectedPrimaryItem.value && (selectedPrimaryItem.value as Record<string, unknown>)[props.primarySubItemsField]) {
-            return getNameByKeyValue((selectedPrimaryItem.value as Record<string, unknown>)[props.primarySubItemsField] as Record<string, unknown>[] | Record<string, Record<string, unknown>>, currentSecondaryValue.value, props.secondaryValueField, props.secondaryTitleField, noSelectionText.value) as string;
+            return getNameByKeyValue((selectedPrimaryItem.value as Record<string, unknown>)[props.primarySubItemsField] as Record<string, string>[] | Record<string, Record<string, string>>, currentSecondaryValue.value, props.secondaryValueField, props.secondaryTitleField, noSelectionText.value) as string;
         } else {
             return noSelectionText.value;
         }

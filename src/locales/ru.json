@@ -246,7 +246,7 @@
         }
     },
     "timezone": {
-        "International Date Line West": "Запад Международной линии перемены дат",
+        "International Date Line West": "Западная международная линия перемены дат",
         "Coordinated Universal Time-11": "Координированное универсальное время-11",
         "Aleutian Islands": "Алеутские острова",
         "Hawaii": "Гавайи",
@@ -969,7 +969,7 @@
     },
     "mapprovider": {
         "openstreetmap": "OpenStreetMap",
-        "openstreetmap-humanitarian": "Гуманитарная команда OpenStreetMap",
+        "openstreetmap-humanitarian": "Humanitarian OpenStreetMap",
         "opentopomap": "OpenTopoMap",
         "opnvkarte": "MeMoMaps",
         "cyclosm": "CyclOSM",
@@ -1214,9 +1214,9 @@
     "document": {
         "anchor": {
             "export_and_import": {
-                "export-transactions": "экспорт-транзакций",
-                "how-to-get-gnucash-xml-database-file": "как-получить-gnucash-xml-файл-базы-данных",
-                "how-to-get-firefly-iii-data-export-file": "как-получить-файл-экспорта-данных-firefly-iii"
+                "export-transactions": "export-transactions",
+                "how-to-get-gnucash-xml-database-file": "how-to-get-gnucash-xml-database-file",
+                "how-to-get-firefly-iii-data-export-file": "how-to-get-firefly-iii-data-export-file"
             }
         }
     },

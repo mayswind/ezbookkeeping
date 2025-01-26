@@ -19,8 +19,8 @@
                                     <template #title>
                                         <small>{{ currentLongYearMonth }}</small>
                                         <small class="transaction-amount-statistics">
-                                            <span class="text-income">{{ `+${getDisplayAmount('12345')}` }}</span>
-                                            <span class="text-expense">{{ `-${getDisplayAmount('67890')}` }}</span>
+                                            <span class="text-income">{{ `+${formatAmountWithCurrency('12345')}` }}</span>
+                                            <span class="text-expense">{{ `-${formatAmountWithCurrency('67890')}` }}</span>
                                         </small>
                                         <f7-icon class="combination-list-chevron-icon" f7="chevron_up"></f7-icon>
                                     </template>
@@ -53,7 +53,7 @@
                                                 </div>
                                                 <div class="item-after">
                                                     <div class="transaction-amount">
-                                                        <span>{{ getDisplayAmount('12345') }}</span>
+                                                        <span>{{ formatAmountWithCurrency('12345') }}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -143,10 +143,6 @@ const currentShortTime = computed<string>(() => formatUnixTimeToShortTime(curren
 
 function getFontSizeName(): string {
     return '';
-}
-
-function getDisplayAmount(value: string): string {
-    return formatAmountWithCurrency(value);
 }
 
 function setFontSize(): void {

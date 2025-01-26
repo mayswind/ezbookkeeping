@@ -531,7 +531,7 @@ function getTransactionItemLinkUrl(itemId: string, dateRange?: TimeRangeAndDateT
 function init(initProps: TransactionStatisticsProps): void {
     let needReload = !isDefined(initProps.initAnalysisType);
 
-    let filter: TransactionStatisticsPartialFilter | undefined = {
+    const filter: TransactionStatisticsPartialFilter = {
         chartDataType: initProps.initChartDataType ? parseInt(initProps.initChartDataType) : undefined,
         filterAccountIds: initProps.initFilterAccountIds ? arrayItemToObjectField(initProps.initFilterAccountIds.split(','), true) : {},
         filterCategoryIds: initProps.initFilterCategoryIds ? arrayItemToObjectField(initProps.initFilterCategoryIds.split(','), true) : {},
@@ -586,10 +586,10 @@ function init(initProps: TransactionStatisticsProps): void {
 
     if (!isDefined(initProps.initAnalysisType)) {
         analysisType.value = StatisticsAnalysisType.CategoricalAnalysis;
-        filter = undefined;
+        statisticsStore.initTransactionStatisticsFilter(analysisType.value);
+    } else {
+        statisticsStore.initTransactionStatisticsFilter(analysisType.value, filter);
     }
-
-    statisticsStore.initTransactionStatisticsFilter(analysisType.value, filter);
 
     if (!needReload && !statisticsStore.transactionStatisticsStateInvalid) {
         loading.value = false;
@@ -905,18 +905,18 @@ function onShowDateRangeError(message: string): void {
 onBeforeRouteUpdate((to) => {
     if (to.query) {
         init({
-            initAnalysisType: to.query['analysisType'],
-            initChartDataType: to.query['chartDataType'],
-            initChartType: to.query['chartType'],
-            initChartDateType: to.query['chartDateType'],
-            initStartTime: to.query['startTime'],
-            initEndTime: to.query['endTime'],
-            initFilterAccountIds: to.query['filterAccountIds'],
-            initFilterCategoryIds: to.query['filterCategoryIds'],
-            initTagIds: to.query['tagIds'],
-            initTagFilterType: to.query['tagFilterType'],
-            initSortingType: to.query['sortingType'],
-            initTrendDateAggregationType: to.query['trendDateAggregationType']
+            initAnalysisType: (to.query['analysisType'] as string | null) || undefined,
+            initChartDataType: (to.query['chartDataType'] as string | null) || undefined,
+            initChartType: (to.query['chartType'] as string | null) || undefined,
+            initChartDateType: (to.query['chartDateType'] as string | null) || undefined,
+            initStartTime: (to.query['startTime'] as string | null) || undefined,
+            initEndTime: (to.query['endTime'] as string | null) || undefined,
+            initFilterAccountIds: (to.query['filterAccountIds'] as string | null) || undefined,
+            initFilterCategoryIds: (to.query['filterCategoryIds'] as string | null) || undefined,
+            initTagIds: (to.query['tagIds'] as string | null) || undefined,
+            initTagFilterType: (to.query['tagFilterType'] as string | null) || undefined,
+            initSortingType: (to.query['sortingType'] as string | null) || undefined,
+            initTrendDateAggregationType: (to.query['trendDateAggregationType'] as string | null) || undefined
         });
     } else {
         init({});

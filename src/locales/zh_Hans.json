@@ -6,10 +6,10 @@
     },
     "language": {
         "English": "英语",
-        "Russian": "俄语",
-        "Simplified Chinese": "简体中文",
         "Spanish": "西班牙语",
-        "Vietnamese": "越南语"
+        "Russian": "俄语",
+        "Vietnamese": "越南语",
+        "Simplified Chinese": "简体中文"
     },
     "default": {
         "currency": "CNY",

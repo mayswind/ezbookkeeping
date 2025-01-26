@@ -6,10 +6,10 @@
     },
     "language": {
         "English": "Tiếng Anh",
-        "Russian": "Tiếng Nga",
-        "Simplified Chinese": "Tiếng Trung Giản Thể",
         "Spanish": "Tiếng Tây Ban Nha",
-        "Vietnamese": "Tiếng Việt"
+        "Russian": "Tiếng Nga",
+        "Vietnamese": "Tiếng Việt",
+        "Simplified Chinese": "Tiếng Trung Giản Thể"
     },
     "default": {
         "currency": "VND",

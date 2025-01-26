@@ -13,11 +13,11 @@ var AllLanguages = map[string]*LocaleInfo{
 	"en": {
 		Content: en,
 	},
-	"ru": {
-		Content: ru,
-	},
 	"es": {
 		Content: es,
+	},
+	"ru": {
+		Content: ru,
 	},
 	"vi": {
 		Content: vi,

@@ -6,10 +6,10 @@
     },
     "language": {
         "English": "English",
-        "Russian": "Russian",
-        "Simplified Chinese": "Simplified Chinese",
         "Spanish": "Spanish",
-        "Vietnamese": "Vietnamese"
+        "Russian": "Russian",
+        "Vietnamese": "Vietnamese",
+        "Simplified Chinese": "Simplified Chinese"
     },
     "default": {
         "currency": "USD",

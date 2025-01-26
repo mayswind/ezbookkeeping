@@ -5,7 +5,7 @@
                   :label="label" :placeholder="placeholder"
                   :persistent-placeholder="!!persistentPlaceholder"
                   :rules="enableRules ? rules : []" v-model="currentValue" v-if="!hide"
-                  @keydown="onKeyUpDown" @keyup="onKeyUpDown" @paste="onPaste">
+                  @keydown="onKeyUpDown" @keyup="onKeyUpDown" @paste="onPaste" @click="onClick">
         <template #prepend-inner v-if="currency && prependText">
             <div>{{ prependText }}</div>
         </template>
@@ -19,7 +19,7 @@
                   :label="label" :placeholder="placeholder"
                   :persistent-placeholder="!!persistentPlaceholder"
                   :rules="enableRules ? rules : []" v-model="currentValue" v-if="hide"
-                  @keydown="onKeyUpDown" @keyup="onKeyUpDown" @paste="onPaste">
+                  @keydown="onKeyUpDown" @keyup="onKeyUpDown" @paste="onPaste" @click="onClick">
         <template #prepend-inner v-if="currency && prependText">
             <div>{{ prependText }}</div>
         </template>
@@ -90,6 +90,7 @@ const rules = [
 ];
 
 const currentValue = ref<string>(getFormattedValue(props.modelValue));
+
 const prependText = computed<string | undefined>(() => {
     if (!props.currency || !props.showCurrency) {
         return '';
@@ -259,6 +260,13 @@ function onPaste(e: ClipboardEvent): void {
 
     currentValue.value = getValidFormattedValue(value, textualValue, hasDecimalSeparator);
     e.preventDefault();
+}
+
+function onClick(e: MouseEvent): void {
+    if (!props.disabled && !props.readonly && props.modelValue === 0) {
+        const input = e.target as HTMLInputElement;
+        input?.select();
+    }
 }
 
 function getValidFormattedValue(value: number, textualValue: string, hasDecimalSeparator: boolean): string {

@@ -41,11 +41,11 @@ const finalMapStyle = computed<Record<string, unknown>>(() => {
     const styles: Record<string, unknown> = copyObjectTo(props.mapStyle, {});
 
     if (props.height) {
-        styles.height = props.height;
+        styles['height'] = props.height;
     }
 
     if (!mapSupported.value || !mapDependencyLoaded.value) {
-        styles.height = '0';
+        styles['height'] = '0';
     }
 
     return styles;

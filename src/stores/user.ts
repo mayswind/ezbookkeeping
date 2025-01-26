@@ -290,7 +290,7 @@ export const useUserStore = defineStore('user', () => {
         });
     }
 
-    function getUserAvatarUrl(userInfoOrAvatarUrl: UserBasicInfo | string, disableBrowserCache: boolean | string): string | null {
+    function getUserAvatarUrl(userInfoOrAvatarUrl: UserBasicInfo | string | null, disableBrowserCache: boolean | string): string | null {
         let avatarUrl = '';
 
         if (isObject(userInfoOrAvatarUrl)) {

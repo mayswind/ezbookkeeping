@@ -1,7 +1,7 @@
 import { CurrencyDisplaySymbol, CurrencyDisplayLocation, type CurrencyPrependAndAppendText, CurrencyDisplayType } from '@/core/currency.ts';
 import { ALL_CURRENCIES, DEFAULT_CURRENCY_SYMBOL } from '@/consts/currency.ts';
 
-import { isString, isNumber } from './common.ts';
+import { isNumber } from './common.ts';
 
 export function getCurrencyFraction(currencyCode?: string): number | undefined {
     if (!currencyCode) {
@@ -12,13 +12,9 @@ export function getCurrencyFraction(currencyCode?: string): number | undefined {
     return currencyInfo?.fraction;
 }
 
-export function appendCurrencySymbol(value: unknown, currencyDisplayType: CurrencyDisplayType, currencyCode: string, currencyUnit: string, currencyName: string, isPlural: boolean): string | null {
+export function appendCurrencySymbol(value: number | string, currencyDisplayType: CurrencyDisplayType, currencyCode: string, currencyUnit: string, currencyName: string, isPlural: boolean): string {
     if (isNumber(value)) {
         value = value.toString();
-    }
-
-    if (!isString(value)) {
-        return null;
     }
 
     const symbol = getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyUnit, currencyName, isPlural);

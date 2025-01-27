@@ -74,7 +74,7 @@ export function usePieChartBase(props: CommonPieChartProps) {
                 };
 
                 finalItem.displayPercent = formatPercent(finalItem.percent, 2, '&lt;0.01');
-                finalItem.displayValue = formatAmountWithCurrency(finalItem.value, props.defaultCurrency) as string;
+                finalItem.displayValue = formatAmountWithCurrency(finalItem.value, props.defaultCurrency);
 
                 validItems.push(finalItem);
             }

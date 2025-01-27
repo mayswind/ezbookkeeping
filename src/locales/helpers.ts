@@ -1318,11 +1318,7 @@ export function useI18n() {
         return formatAmount(value, numberFormatOptions);
     }
 
-    function getFormattedAmountWithCurrency(value: number | string, currencyCode?: string | false, notConvertValue?: boolean, currencyDisplayType?: CurrencyDisplayType): string | null {
-        if (!isNumber(value) && !isString(value)) {
-            return null;
-        }
-
+    function getFormattedAmountWithCurrency(value: number | string, currencyCode?: string | false, notConvertValue?: boolean, currencyDisplayType?: CurrencyDisplayType): string {
         if (isNumber(value)) {
             value = value.toString();
         }
@@ -1407,9 +1403,9 @@ export function useI18n() {
                     let accountWithDisplaceBalance: AccountWithDisplayBalance;
 
                     if (showAccountBalance && account.isAsset) {
-                        accountWithDisplaceBalance = AccountWithDisplayBalance.fromAccount(account, getFormattedAmountWithCurrency(account.balance, account.currency) as string);
+                        accountWithDisplaceBalance = AccountWithDisplayBalance.fromAccount(account, getFormattedAmountWithCurrency(account.balance, account.currency));
                     } else if (showAccountBalance && account.isLiability) {
-                        accountWithDisplaceBalance = AccountWithDisplayBalance.fromAccount(account, getFormattedAmountWithCurrency(-account.balance, account.currency) as string);
+                        accountWithDisplaceBalance = AccountWithDisplayBalance.fromAccount(account, getFormattedAmountWithCurrency(-account.balance, account.currency));
                     } else {
                         accountWithDisplaceBalance = AccountWithDisplayBalance.fromAccount(account, '***');
                     }
@@ -1454,7 +1450,7 @@ export function useI18n() {
                     finalTotalBalance = finalTotalBalance + '+';
                 }
 
-                finalTotalBalance = getFormattedAmountWithCurrency(finalTotalBalance, defaultCurrency) as string;
+                finalTotalBalance = getFormattedAmountWithCurrency(finalTotalBalance, defaultCurrency);
             } else {
                 finalTotalBalance = '***';
             }

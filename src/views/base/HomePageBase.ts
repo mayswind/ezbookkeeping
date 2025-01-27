@@ -38,17 +38,17 @@ export function useHomePageBase() {
 
     const netAssets = computed<string>(() => {
         const netAssets = accountsStore.getNetAssets(showAmountInHomePage.value);
-        return formatAmountWithCurrency(netAssets, defaultCurrency.value) as string;
+        return formatAmountWithCurrency(netAssets, defaultCurrency.value);
     });
 
     const totalAssets = computed<string>(() => {
         const totalAssets = accountsStore.getTotalAssets(showAmountInHomePage.value);
-        return formatAmountWithCurrency(totalAssets, defaultCurrency.value) as string;
+        return formatAmountWithCurrency(totalAssets, defaultCurrency.value);
     });
 
     const totalLiabilities = computed<string>(() => {
         const totalLiabilities = accountsStore.getTotalLiabilities(showAmountInHomePage.value);
-        return formatAmountWithCurrency(totalLiabilities, defaultCurrency.value) as string;
+        return formatAmountWithCurrency(totalLiabilities, defaultCurrency.value);
     });
 
     const displayDateRange = computed<TransactionOverviewDisplayTime>(() => {
@@ -75,7 +75,7 @@ export function useHomePageBase() {
 
     function getDisplayAmount(amount: number, incomplete: boolean): string {
         if (!showAmountInHomePage.value) {
-            return formatAmountWithCurrency('***', defaultCurrency.value) as string;
+            return formatAmountWithCurrency('***', defaultCurrency.value);
         }
 
         return formatAmountWithCurrency(amount, defaultCurrency.value) + (incomplete ? '+' : '');

@@ -273,7 +273,7 @@ const chartOptions = computed<object>(() => {
 });
 
 function getDisplayCurrency(value: number | string, currencyCode: string): string {
-    return formatAmountWithCurrency(value, currencyCode) || '0';
+    return formatAmountWithCurrency(value, currencyCode);
 }
 
 function getDisplayAmount(amount: number, incomplete: boolean): string {

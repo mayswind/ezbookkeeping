@@ -191,7 +191,7 @@ export function useStatisticsTransactionPageBase() {
     const trendsAnalysisData = computed<TransactionTrendsAnalysisData | null>(() => statisticsStore.trendsAnalysisData);
 
     function getDisplayAmount(amount: number, currency: string, textLimit?: number): string {
-        const finalAmount = formatAmountWithCurrency(amount, currency) as string;
+        const finalAmount = formatAmountWithCurrency(amount, currency);
 
         if (!showAccountBalance.value
             && (query.value.chartDataType === ChartDataType.AccountTotalAssets.type

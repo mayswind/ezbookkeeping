@@ -238,8 +238,8 @@ const yAxisWidth = computed<number>(() => {
         }
     }
 
-    const maxValueText = formatAmountWithCurrency(maxValue, props.defaultCurrency) || '';
-    const minValueText = formatAmountWithCurrency(minValue, props.defaultCurrency) || '';
+    const maxValueText = formatAmountWithCurrency(maxValue, props.defaultCurrency);
+    const minValueText = formatAmountWithCurrency(minValue, props.defaultCurrency);
     const maxLengthText = maxValueText.length > minValueText.length ? maxValueText : minValueText;
 
     const canvas = document.createElement('canvas');

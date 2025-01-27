@@ -27,6 +27,10 @@ import type { LocalizedPresetCategory } from '@/core/category.ts';
 import type { ForgetPasswordRequest } from '@/models/forget_password.ts';
 
 import {
+    isObject,
+    isString
+} from '@/lib/common.ts';
+import {
     hasUserAppLockState,
     getUserAppLockState,
     updateCurrentToken,
@@ -36,7 +40,6 @@ import {
 } from '@/lib/userstate.ts';
 import services, { type ApiResponsePromise } from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
-import { isObject, isString } from '@/lib/common.ts';
 
 export const useRootStore = defineStore('root', () => {
     const settingsStore = useSettingsStore();

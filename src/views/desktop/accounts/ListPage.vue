@@ -5,21 +5,21 @@
                 <v-layout>
                     <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
                         <div class="mx-6 my-4">
-                            <span class="text-subtitle-2">{{ $t('Net assets') }}</span>
+                            <span class="text-subtitle-2">{{ tt('Net assets') }}</span>
                             <p class="account-statistic-item-value text-income text-truncate mt-1 mb-3">
                                 <span v-if="!loading || allAccountCount > 0">{{ netAssets }}</span>
                                 <span v-else-if="loading && allAccountCount <= 0">
                                     <v-skeleton-loader class="skeleton-no-margin pt-2 pb-1" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
-                            <span class="text-subtitle-2">{{ $t('Total liabilities') }}</span>
+                            <span class="text-subtitle-2">{{ tt('Total liabilities') }}</span>
                             <p class="account-statistic-item-value text-expense text-truncate mt-1 mb-3">
                                 <span v-if="!loading || allAccountCount > 0">{{ totalLiabilities }}</span>
                                 <span v-else-if="loading && allAccountCount <= 0">
                                     <v-skeleton-loader class="skeleton-no-margin pt-2 pb-1" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
-                            <span class="text-subtitle-2">{{ $t('Total assets') }}</span>
+                            <span class="text-subtitle-2">{{ tt('Total assets') }}</span>
                             <p class="account-statistic-item-value mt-1">
                                 <span v-if="!loading || allAccountCount > 0">{{ totalAssets }}</span>
                                 <span v-else-if="loading && allAccountCount <= 0">
@@ -31,7 +31,7 @@
                         <v-tabs show-arrows class="account-category-tabs my-4" direction="vertical"
                                 :disabled="loading" v-model="activeAccountCategoryType">
                             <v-tab class="tab-text-truncate" :key="accountCategory.type" :value="accountCategory.type"
-                                   v-for="accountCategory in allAccountCategories">
+                                   v-for="accountCategory in AccountCategory.values()">
                                 <ItemIcon icon-type="account" :icon-id="accountCategory.defaultAccountIconId" />
                                 <div class="d-flex flex-column text-truncate ml-2">
                                     <small class="text-truncate text-left smaller" v-if="!loading || allAccountCount > 0">{{ accountCategoryTotalBalance(accountCategory) }}</small>
@@ -39,7 +39,7 @@
                                         <v-skeleton-loader class="skeleton-no-margin"
                                                            width="100px" height="16" type="text" :loading="true"></v-skeleton-loader>
                                     </small>
-                                    <span class="text-truncate text-left">{{ $t(accountCategory.name) }}</span>
+                                    <span class="text-truncate text-left">{{ tt(accountCategory.name) }}</span>
                                 </div>
                             </v-tab>
                         </v-tabs>
@@ -54,19 +54,19 @@
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
                                                 <v-icon :icon="icons.menu" size="24" />
                                             </v-btn>
-                                            <span>{{ $t('Account List') }}</span>
+                                            <span>{{ tt('Account List') }}</span>
                                             <v-btn class="ml-3" color="default" variant="outlined"
-                                                   :disabled="loading" @click="add">{{ $t('Add') }}</v-btn>
+                                                   :disabled="loading" @click="add">{{ tt('Add') }}</v-btn>
                                             <v-btn class="ml-3" color="primary" variant="tonal"
                                                    :disabled="loading" @click="saveSortResult"
-                                                   v-if="displayOrderModified">{{ $t('Save Display Order') }}</v-btn>
+                                                   v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
                                             <v-btn density="compact" color="default" variant="text" size="24"
-                                                   class="ml-2" :icon="true" :loading="loading" @click="reload">
+                                                   class="ml-2" :icon="true" :loading="loading" @click="reload(true)">
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
                                                 </template>
                                                 <v-icon :icon="icons.refresh" size="24" />
-                                                <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
+                                                <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                                             </v-btn>
                                             <v-spacer/>
                                             <v-btn density="comfortable" color="default" variant="text" class="ml-2"
@@ -75,10 +75,10 @@
                                                 <v-menu activator="parent">
                                                     <v-list>
                                                         <v-list-item :prepend-icon="icons.show"
-                                                                     :title="$t('Show Hidden Accounts')"
+                                                                     :title="tt('Show Hidden Accounts')"
                                                                      v-if="!showHidden" @click="showHidden = true"></v-list-item>
                                                         <v-list-item :prepend-icon="icons.hide"
-                                                                     :title="$t('Hide Hidden Accounts')"
+                                                                     :title="tt('Hide Hidden Accounts')"
                                                                      v-if="showHidden" @click="showHidden = false"></v-list-item>
                                                     </v-list>
                                                 </v-menu>
@@ -87,18 +87,18 @@
                                     </template>
 
                                     <v-card-text class="accounts-overview-title text-truncate pt-0">
-                                        <span class="accounts-overview-subtitle">{{ $t('Balance') }}</span>
-                                        <v-skeleton-loader class="skeleton-no-margin ml-3 mb-2" width="120px" type="text" :loading="true" v-if="loading && !hasAccount(activeAccountCategory)"></v-skeleton-loader>
-                                        <span class="accounts-overview-amount ml-3" v-else-if="!loading || hasAccount(activeAccountCategory)">{{ activeAccountCategoryTotalBalance }}</span>
+                                        <span class="accounts-overview-subtitle">{{ tt('Balance') }}</span>
+                                        <v-skeleton-loader class="skeleton-no-margin ml-3 mb-2" width="120px" type="text" :loading="true" v-if="loading && activeAccountCategory && !hasAccount(activeAccountCategory)"></v-skeleton-loader>
+                                        <span class="accounts-overview-amount ml-3" v-else-if="!loading || !activeAccountCategory || hasAccount(activeAccountCategory)">{{ activeAccountCategoryTotalBalance }}</span>
                                         <v-btn class="ml-2" density="compact" color="default" variant="text"
                                                :icon="true" :disabled="loading"
                                                @click="showAccountBalance = !showAccountBalance">
                                             <v-icon :icon="showAccountBalance ? icons.eyeSlash : icons.eye" size="20" />
-                                            <v-tooltip activator="parent">{{ showAccountBalance ? $t('Hide Account Balance') : $t('Show Account Balance') }}</v-tooltip>
+                                            <v-tooltip activator="parent">{{ showAccountBalance ? tt('Hide Account Balance') : tt('Show Account Balance') }}</v-tooltip>
                                         </v-btn>
                                     </v-card-text>
 
-                                    <v-row class="pl-6 pr-6 pr-md-8" v-if="loading && !hasAccount(activeAccountCategory)">
+                                    <v-row class="pl-6 pr-6 pr-md-8" v-if="loading && activeAccountCategory && !hasAccount(activeAccountCategory)">
                                         <v-col cols="12">
                                             <v-card border class="card-title-with-bg account-card mb-8 h-auto">
                                                 <template #title>
@@ -119,7 +119,7 @@
                                                     <div class="d-flex account-toolbar align-center">
                                                         <v-btn class="px-2" density="comfortable" color="default" variant="text"
                                                                :disabled="true" :prepend-icon="icons.transactions">
-                                                            {{ $t('Transaction List') }}
+                                                            {{ tt('Transaction List') }}
                                                         </v-btn>
                                                         <v-spacer/>
                                                         <span class="account-balance ml-2">
@@ -132,9 +132,9 @@
                                         </v-col>
                                     </v-row>
 
-                                    <v-row class="pl-5 pr-2 pr-md-4" v-if="!loading && !hasAccount(activeAccountCategory)">
+                                    <v-row class="pl-5 pr-2 pr-md-4" v-if="!loading && activeAccountCategory && !hasAccount(activeAccountCategory)">
                                         <v-col cols="12">
-                                            {{ $t('No available account') }}
+                                            {{ tt('No available account') }}
                                         </v-col>
                                     </v-row>
 
@@ -147,7 +147,7 @@
                                                 ghost-class="dragging-item"
                                                 :disabled="activeAccountCategoryVisibleAccountCount <= 1"
                                                 :list="allCategorizedAccountsMap[activeAccountCategory.type].accounts"
-                                                v-if="allCategorizedAccountsMap[activeAccountCategory.type] && allCategorizedAccountsMap[activeAccountCategory.type].accounts && allCategorizedAccountsMap[activeAccountCategory.type].accounts.length"
+                                                v-if="activeAccountCategory && allCategorizedAccountsMap[activeAccountCategory.type] && allCategorizedAccountsMap[activeAccountCategory.type].accounts && allCategorizedAccountsMap[activeAccountCategory.type].accounts.length"
                                                 @change="onMove"
                                             >
                                                 <template #item="{ element }">
@@ -165,11 +165,11 @@
                                                                     <span class="align-self-center">
                                                                         <v-icon :class="!loading && activeAccountCategoryVisibleAccountCount > 1 ? 'drag-handle' : 'disabled'"
                                                                                 :icon="icons.drag"/>
-                                                                        <v-tooltip activator="parent" v-if="!loading && activeAccountCategoryVisibleAccountCount > 1">{{ $t('Drag to Reorder') }}</v-tooltip>
+                                                                        <v-tooltip activator="parent" v-if="!loading && activeAccountCategoryVisibleAccountCount > 1">{{ tt('Drag to Reorder') }}</v-tooltip>
                                                                     </span>
                                                                 </div>
 
-                                                                <div class="mt-4" v-if="element.type === allAccountTypes.MultiSubAccounts.type">
+                                                                <div class="mt-4" v-if="element.type === AccountType.MultiSubAccounts.type">
                                                                     <v-btn-toggle
                                                                         class="account-subaccounts"
                                                                         variant="outlined"
@@ -181,10 +181,10 @@
                                                                         v-model="activeSubAccount[element.id]"
                                                                     >
                                                                         <v-btn :value="''">
-                                                                            <span>{{ $t('All') }}</span>
+                                                                            <span>{{ tt('All') }}</span>
                                                                         </v-btn>
                                                                         <v-btn :key="subAccount.id" :value="subAccount.id"
-                                                                               v-for="subAccount in element.subAccounts"
+                                                                               v-for="subAccount in element.childrenAccounts"
                                                                                v-show="showHidden || !subAccount.hidden">
                                                                             <ItemIcon size="1.5rem" icon-type="account" :icon-id="subAccount.icon"
                                                                                       :color="subAccount.color" :hidden-status="subAccount.hidden" />
@@ -205,7 +205,7 @@
                                                                     <v-btn class="px-2" density="comfortable" color="default" variant="text"
                                                                            :disabled="loading" :prepend-icon="icons.transactions"
                                                                            :to="`/transaction/list?accountIds=${accountOrSubAccountId(element)}`">
-                                                                        {{ $t('Transaction List') }}
+                                                                        {{ tt('Transaction List') }}
                                                                     </v-btn>
                                                                     <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
@@ -213,21 +213,21 @@
                                                                            :prepend-icon="element.hidden ? icons.show : icons.hide"
                                                                            v-if="!activeSubAccount[element.id]"
                                                                            @click="hide(element, !element.hidden)">
-                                                                        {{ element.hidden ? $t('Show') : $t('Hide') }}
+                                                                        {{ element.hidden ? tt('Show') : tt('Hide') }}
                                                                     </v-btn>
                                                                     <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading" :prepend-icon="icons.edit"
                                                                            v-if="!activeSubAccount[element.id]"
                                                                            @click="edit(element)">
-                                                                        {{ $t('Edit') }}
+                                                                        {{ tt('Edit') }}
                                                                     </v-btn>
                                                                     <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading" :prepend-icon="icons.remove"
                                                                            v-if="!activeSubAccount[element.id]"
                                                                            @click="remove(element)">
-                                                                        {{ $t('Delete') }}
+                                                                        {{ tt('Delete') }}
                                                                     </v-btn>
                                                                     <v-spacer/>
                                                                     <span class="account-balance ml-2">{{ accountBalance(element) }}</span>
@@ -254,19 +254,23 @@
     <snack-bar ref="snackbar" />
 </template>
 
-<script>
+<script setup lang="ts">
+import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
 import EditDialog from './list/dialogs/EditDialog.vue';
 
+import { ref, computed, useTemplateRef, watch } from 'vue';
 import { useDisplay } from 'vuetify';
 
-import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.ts';
-import { useUserStore } from '@/stores/user.ts';
+import { useI18n } from '@/locales/helpers.ts';
+import { useAccountListPageBaseBase } from '@/views/base/accounts/AccountListPageBase.ts';
+
 import { useAccountsStore } from '@/stores/account.ts';
-import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { AccountType, AccountCategory } from '@/core/account.ts';
-import { isObject } from '@/lib/common.ts';
+import type { Account } from '@/models/account.ts';
+
+import { isObject, isString } from '@/lib/common.ts';
 
 import {
     mdiEyeOutline,
@@ -281,330 +285,282 @@ import {
     mdiDotsVertical
 } from '@mdi/js';
 
-export default {
-    components: {
-        EditDialog
-    },
-    data() {
-        const { mdAndUp } = useDisplay();
+type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
+type SnackBarType = InstanceType<typeof SnackBar>;
+type EditDialogType = InstanceType<typeof EditDialog>;
 
-        return {
-            activeAccountCategoryType: AccountCategory.Default.type,
-            activeTab: 'accountPage',
-            activeSubAccount: {},
-            loading: true,
-            displayOrderModified: false,
-            alwaysShowNav: mdAndUp.value,
-            showNav: mdAndUp.value,
-            showHidden: false,
-            icons: {
-                eye: mdiEyeOutline,
-                eyeSlash: mdiEyeOffOutline,
-                refresh: mdiRefresh,
-                square: mdiSquareRounded,
-                menu: mdiMenu,
-                edit: mdiPencilOutline,
-                show: mdiEyeOutline,
-                hide: mdiEyeOffOutline,
-                remove: mdiDeleteOutline,
-                transactions: mdiListBoxOutline,
-                drag: mdiDrag,
-                more: mdiDotsVertical
-            }
-        };
-    },
-    computed: {
-        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useExchangeRatesStore),
-        defaultCurrency() {
-            return this.userStore.currentUserDefaultCurrency;
-        },
-        allAccountTypes() {
-            return AccountType.all();
-        },
-        allAccountCategories() {
-            return AccountCategory.values();
-        },
-        allAccounts() {
-            return this.accountsStore.allAccounts;
-        },
-        allCategorizedAccountsMap() {
-            return this.accountsStore.allCategorizedAccountsMap;
-        },
-        allAccountCount() {
-            return this.accountsStore.allAvailableAccountsCount;
-        },
-        netAssets() {
-            const netAssets = this.accountsStore.getNetAssets(this.showAccountBalance);
-            return this.getDisplayCurrency(netAssets, this.defaultCurrency);
-        },
-        totalAssets() {
-            const totalAssets = this.accountsStore.getTotalAssets(this.showAccountBalance);
-            return this.getDisplayCurrency(totalAssets, this.defaultCurrency);
-        },
-        totalLiabilities() {
-            const totalLiabilities = this.accountsStore.getTotalLiabilities(this.showAccountBalance);
-            return this.getDisplayCurrency(totalLiabilities, this.defaultCurrency);
-        },
-        activeAccountCategory() {
-            return AccountCategory.valueOf(this.activeAccountCategoryType);
-        },
-        activeAccountCategoryTotalBalance() {
-            return this.accountCategoryTotalBalance(this.activeAccountCategory);
-        },
-        activeAccountCategoryVisibleAccountCount() {
-            if (!this.allCategorizedAccountsMap[this.activeAccountCategory.type] || !this.allCategorizedAccountsMap[this.activeAccountCategory.type].accounts) {
-                return 0;
-            }
+const display = useDisplay();
 
-            const accounts = this.allCategorizedAccountsMap[this.activeAccountCategory.type].accounts;
+const { tt, getCurrencyName, formatAmountWithCurrency, joinMultiText } = useI18n();
 
-            if (this.showHidden) {
-                return accounts.length;
-            }
+const {
+    loading,
+    showHidden,
+    displayOrderModified,
+    showAccountBalance,
+    allAccounts,
+    allCategorizedAccountsMap,
+    allAccountCount,
+    netAssets,
+    totalAssets,
+    totalLiabilities,
+    accountCategoryTotalBalance
+} = useAccountListPageBaseBase();
 
-            let visibleCount = 0;
+const accountsStore = useAccountsStore();
 
-            for (let i = 0; i < accounts.length; i++) {
-                if (!accounts[i].hidden) {
-                    visibleCount++;
-                }
-            }
+const icons = {
+    eye: mdiEyeOutline,
+    eyeSlash: mdiEyeOffOutline,
+    refresh: mdiRefresh,
+    square: mdiSquareRounded,
+    menu: mdiMenu,
+    edit: mdiPencilOutline,
+    show: mdiEyeOutline,
+    hide: mdiEyeOffOutline,
+    remove: mdiDeleteOutline,
+    transactions: mdiListBoxOutline,
+    drag: mdiDrag,
+    more: mdiDotsVertical
+};
 
-            return visibleCount;
-        },
-        showAccountBalance: {
-            get: function () {
-                return this.settingsStore.appSettings.showAccountBalance;
-            },
-            set: function (value) {
-                this.settingsStore.setShowAccountBalance(value);
-            }
-        }
-    },
-    created() {
-        this.reload(false);
-    },
-    setup() {
-        const display = useDisplay();
+const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
-        return {
-            display: display
-        };
-    },
-    watch: {
-        'display.mdAndUp.value': function (newValue) {
-            this.alwaysShowNav = newValue;
+const activeAccountCategoryType = ref<number>(AccountCategory.Default.type);
+const activeTab = ref<string>('accountPage');
+const activeSubAccount = ref<Record<string, string>>({});
+const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
+const showNav = ref<boolean>(display.mdAndUp.value);
 
-            if (!this.showNav) {
-                this.showNav = newValue;
-            }
-        }
-    },
-    methods: {
-        reload(force) {
-            const self = this;
+const activeAccountCategory = computed<AccountCategory | undefined>(() => AccountCategory.valueOf(activeAccountCategoryType.value));
+const activeAccountCategoryTotalBalance = computed<string>(() => accountCategoryTotalBalance(activeAccountCategory.value));
 
-            self.loading = true;
+const activeAccountCategoryVisibleAccountCount = computed<number>(() => {
+    if (!activeAccountCategory.value || !allCategorizedAccountsMap.value[activeAccountCategory.value.type] || !allCategorizedAccountsMap.value[activeAccountCategory.value.type].accounts) {
+        return 0;
+    }
 
-            self.accountsStore.loadAllAccounts({
-                force: force
-            }).then(() => {
-                self.loading = false;
-                self.displayOrderModified = false;
+    const accounts = allCategorizedAccountsMap.value[activeAccountCategory.value.type].accounts;
 
-                if (self.allAccounts) {
-                    for (let i = 0; i < self.allAccounts.length; i++) {
-                        const account = self.allAccounts[i];
+    if (showHidden.value) {
+        return accounts.length;
+    }
 
-                        if (account.type === self.allAccountTypes.MultiSubAccounts.type && !self.activeSubAccount[account.id]) {
-                            self.activeSubAccount[account.id] = '';
-                        }
-                    }
-                }
+    let visibleCount = 0;
 
-                if (force) {
-                    self.$refs.snackbar.showMessage('Account list has been updated');
-                }
-            }).catch(error => {
-                self.loading = false;
-
-                if (error && error.isUpToDate) {
-                    self.displayOrderModified = false;
-                }
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        hasAccount(accountCategory) {
-            if (this.showHidden) {
-                return this.accountsStore.hasAccount(accountCategory, false);
-            } else {
-                return this.accountsStore.hasAccount(accountCategory, true);
-            }
-        },
-        accountOrSubAccountId(account) {
-            return account.getAccountOrSubAccountId(this.activeSubAccount[account.id]);
-        },
-        accountComment(account) {
-            return account.getAccountOrSubAccountComment(this.activeSubAccount[account.id]);
-        },
-        accountCurrency(account) {
-            const self = this;
-
-            if (account.type === self.allAccountTypes.SingleAccount.type) {
-                return self.$locale.getCurrencyName(account.currency);
-            } else if (account.type === self.allAccountTypes.MultiSubAccounts.type) {
-                const subAccountCurrencies = account.getSubAccountCurrencies(self.showHidden, self.activeSubAccount[account.id])
-                    .map(currencyCode => self.$locale.getCurrencyName(currencyCode));
-                return self.$locale.joinMultiText(subAccountCurrencies);
-            } else {
-                return null;
-            }
-        },
-        accountBalance(account) {
-            if (account.type === this.allAccountTypes.SingleAccount.type) {
-                const balance = this.accountsStore.getAccountBalance(this.showAccountBalance, account);
-                return this.getDisplayCurrency(balance, account.currency);
-            } else if (account.type === this.allAccountTypes.MultiSubAccounts.type) {
-                const balanceResult = this.accountsStore.getAccountSubAccountBalance(this.showAccountBalance, this.showHidden, account, this.activeSubAccount[account.id]);
-
-                if (!isObject(balanceResult)) {
-                    return this.getDisplayCurrency(balanceResult, this.defaultCurrency);
-                }
-
-                return this.getDisplayCurrency(balanceResult.balance, balanceResult.currency);
-            } else {
-                return null;
-            }
-        },
-        accountCategoryTotalBalance(accountCategory) {
-            const totalBalance = this.accountsStore.getAccountCategoryTotalBalance(this.showAccountBalance, accountCategory);
-            return this.getDisplayCurrency(totalBalance, this.defaultCurrency);
-        },
-        onMove(event) {
-            if (!event || !event.moved) {
-                return;
-            }
-
-            const self = this;
-            const moveEvent = event.moved;
-
-            if (!moveEvent.element || !moveEvent.element.id) {
-                self.$refs.snackbar.showMessage('Unable to move account');
-                return;
-            }
-
-            self.accountsStore.changeAccountDisplayOrder({
-                accountId: moveEvent.element.id,
-                from: moveEvent.oldIndex,
-                to: moveEvent.newIndex,
-                updateListOrder: false,
-                updateGlobalListOrder: true
-            }).then(() => {
-                self.displayOrderModified = true;
-            }).catch(error => {
-                self.$refs.snackbar.showError(error);
-            });
-        },
-        saveSortResult() {
-            const self = this;
-
-            if (!self.displayOrderModified) {
-                return;
-            }
-
-            self.loading = true;
-
-            self.accountsStore.updateAccountDisplayOrders().then(() => {
-                self.loading = false;
-                self.displayOrderModified = false;
-            }).catch(error => {
-                self.loading = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        add() {
-            const self = this;
-
-            self.$refs.editDialog.open({
-                category: self.activeAccountCategoryType
-            }).then(result => {
-                if (result && result.message) {
-                    self.$refs.snackbar.showMessage(result.message);
-                }
-            }).catch(error => {
-                if (error) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        edit(account) {
-            const self = this;
-
-            self.$refs.editDialog.open({
-                id: account.id,
-                currentAccount: account
-            }).then(result => {
-                if (result && result.message) {
-                    self.$refs.snackbar.showMessage(result.message);
-                }
-
-                if (self.accountsStore.accountListStateInvalid && !self.loading) {
-                    self.reload(false);
-                }
-            }).catch(error => {
-                if (error) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        hide(account, hidden) {
-            const self = this;
-
-            self.loading = true;
-
-            self.accountsStore.hideAccount({
-                account: account,
-                hidden: hidden
-            }).then(() => {
-                self.loading = false;
-            }).catch(error => {
-                self.loading = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        remove(account) {
-            const self = this;
-
-            self.$refs.confirmDialog.open('Are you sure you want to delete this account?').then(() => {
-                self.loading = true;
-
-                self.accountsStore.deleteAccount({
-                    account: account
-                }).then(() => {
-                    self.loading = false;
-                }).catch(error => {
-                    self.loading = false;
-
-                    if (!error.processed) {
-                        self.$refs.snackbar.showError(error);
-                    }
-                });
-            });
-        },
-        getDisplayCurrency(value, currencyCode) {
-            return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, currencyCode);
+    for (let i = 0; i < accounts.length; i++) {
+        if (!accounts[i].hidden) {
+            visibleCount++;
         }
     }
+
+    return visibleCount;
+});
+
+function reload(force: boolean): void {
+    loading.value = true;
+
+    accountsStore.loadAllAccounts({
+        force: force
+    }).then(() => {
+        loading.value = false;
+        displayOrderModified.value = false;
+
+        if (allAccounts.value) {
+            for (let i = 0; i < allAccounts.value.length; i++) {
+                const account = allAccounts.value[i];
+
+                if (account.type === AccountType.MultiSubAccounts.type && !activeSubAccount.value[account.id]) {
+                    activeSubAccount.value[account.id] = '';
+                }
+            }
+        }
+
+        if (force) {
+            snackbar.value?.showMessage('Account list has been updated');
+        }
+    }).catch(error => {
+        loading.value = false;
+
+        if (error && error.isUpToDate) {
+            displayOrderModified.value = false;
+        }
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
 }
+
+function hasAccount(accountCategory: AccountCategory): boolean {
+    return accountsStore.hasAccount(accountCategory, !showHidden.value);
+}
+
+function accountOrSubAccountId(account: Account): string | null {
+    return account.getAccountOrSubAccountId(activeSubAccount.value[account.id]);
+}
+
+function accountComment(account: Account): string | null {
+    return account.getAccountOrSubAccountComment(activeSubAccount.value[account.id]);
+}
+
+function accountCurrency(account: Account): string | null {
+    if (account.type === AccountType.SingleAccount.type) {
+        return getCurrencyName(account.currency);
+    } else if (account.type === AccountType.MultiSubAccounts.type) {
+        const subAccountCurrencies = account.getSubAccountCurrencies(showHidden.value, activeSubAccount.value[account.id])
+            .map(currencyCode => getCurrencyName(currencyCode));
+        return joinMultiText(subAccountCurrencies);
+    } else {
+        return null;
+    }
+}
+
+function accountBalance(account: Account): string | null {
+    if (account.type === AccountType.SingleAccount.type) {
+        const balance = accountsStore.getAccountBalance(showAccountBalance.value, account);
+
+        if (!isString(balance)) {
+            return '';
+        }
+
+        return formatAmountWithCurrency(balance, account.currency);
+    } else if (account.type === AccountType.MultiSubAccounts.type) {
+        const balanceResult = accountsStore.getAccountSubAccountBalance(showAccountBalance.value, showHidden.value, account, activeSubAccount.value[account.id]);
+
+        if (!isObject(balanceResult)) {
+            return '';
+        }
+
+        return formatAmountWithCurrency(balanceResult.balance, balanceResult.currency);
+    } else {
+        return null;
+    }
+}
+
+function add(): void {
+    editDialog.value?.open({
+        category: activeAccountCategoryType.value
+    }).then(result => {
+        if (result && result.message) {
+            snackbar.value?.showMessage(result.message);
+        }
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function edit(account: Account): void {
+    editDialog.value?.open({
+        id: account.id,
+        currentAccount: account
+    }).then(result => {
+        if (result && result.message) {
+            snackbar.value?.showMessage(result.message);
+        }
+
+        if (accountsStore.accountListStateInvalid && !loading.value) {
+            reload(false);
+        }
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function hide(account: Account, hidden: boolean): void {
+    loading.value = true;
+
+    accountsStore.hideAccount({
+        account: account,
+        hidden: hidden
+    }).then(() => {
+        loading.value = false;
+    }).catch(error => {
+        loading.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function remove(account: Account): void {
+    confirmDialog.value?.open('Are you sure you want to delete this account?').then(() => {
+        loading.value = true;
+
+        accountsStore.deleteAccount({
+            account: account
+        }).then(() => {
+            loading.value = false;
+        }).catch(error => {
+            loading.value = false;
+
+            if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+        });
+    });
+}
+
+function saveSortResult(): void {
+    if (!displayOrderModified.value) {
+        return;
+    }
+
+    loading.value = true;
+
+    accountsStore.updateAccountDisplayOrders().then(() => {
+        loading.value = false;
+        displayOrderModified.value = false;
+    }).catch(error => {
+        loading.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function onMove(event: { moved: { element: { id: string }, oldIndex: number, newIndex: number } }): void {
+    if (!event || !event.moved) {
+        return;
+    }
+
+    const moveEvent = event.moved;
+
+    if (!moveEvent.element || !moveEvent.element.id) {
+        snackbar.value?.showMessage('Unable to move account');
+        return;
+    }
+
+    accountsStore.changeAccountDisplayOrder({
+        accountId: moveEvent.element.id,
+        from: moveEvent.oldIndex,
+        to: moveEvent.newIndex,
+        updateListOrder: false,
+        updateGlobalListOrder: true
+    }).then(() => {
+        displayOrderModified.value = true;
+    }).catch(error => {
+        snackbar.value?.showError(error);
+    });
+}
+
+watch(() => display.mdAndUp.value, (newValue) => {
+    alwaysShowNav.value = newValue;
+
+    if (!showNav.value) {
+        showNav.value = newValue;
+    }
+});
+
+reload(false);
 </script>
 
 <style>

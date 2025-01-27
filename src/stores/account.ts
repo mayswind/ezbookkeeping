@@ -943,7 +943,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         });
     }
 
-    function deleteAccount({ account, beforeResolve }: { account: Account, beforeResolve: BeforeResolveFunction }): Promise<boolean> {
+    function deleteAccount({ account, beforeResolve }: { account: Account, beforeResolve?: BeforeResolveFunction }): Promise<boolean> {
         return new Promise((resolve, reject) => {
             services.deleteAccount({
                 id: account.id

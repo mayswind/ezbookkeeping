@@ -765,7 +765,6 @@ export function translateError(message, translateFn) {
 
 export function i18nFunctions(i18nGlobal) {
     return {
-        getCurrencyName: (currencyCode) => getCurrencyName(currencyCode, i18nGlobal.t),
         getWeekdayShortName: (weekDay) => getWeekdayShortName(weekDay, i18nGlobal.t),
         getWeekdayLongName: (weekDay) => getWeekdayLongName(weekDay, i18nGlobal.t),
         getMultiMonthdayShortNames: (monthdays) => getMultiMonthdayShortNames(monthdays, i18nGlobal.t),
@@ -787,7 +786,6 @@ export function i18nFunctions(i18nGlobal) {
         getAdaptiveAmountRate: (userStore, amount1, amount2, fromExchangeRate, toExchangeRate) => getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, i18nGlobal.t, userStore),
         getAllTransactionTagFilterTypes: () => getAllTransactionTagFilterTypes(i18nGlobal.t),
         getAllSupportedImportFileTypes: () => getAllSupportedImportFileTypes(i18nGlobal, i18nGlobal.t),
-        getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t),
-        joinMultiText: (textArray) => joinMultiText(textArray, i18nGlobal.t)
+        getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t)
     };
 }

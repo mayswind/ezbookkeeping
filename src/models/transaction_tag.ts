@@ -38,8 +38,8 @@ export class TransactionTag implements TransactionTagInfoResponse {
         return tags;
     }
 
-    public static createNewTag(): TransactionTag {
-        return new TransactionTag('', '', 0, false);
+    public static createNewTag(name?: string): TransactionTag {
+        return new TransactionTag('', name || '', 0, false);
     }
 }
 

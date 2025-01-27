@@ -406,7 +406,8 @@ import { TemplateType, ScheduledTemplateFrequencyType } from '@/core/template.ts
 import { TRANSACTION_MAX_PICTURE_COUNT } from '@/consts/transaction.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
 import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
-import logger from '@/lib/logger.ts';
+import { TransactionTag } from '@/models/transaction_tag.ts';
+
 import {
     isArray,
     getNameByKeyValue
@@ -427,6 +428,7 @@ import {
     isTransactionPicturesEnabled,
     getMapProvider
 } from '@/lib/server_settings.ts';
+import logger from '@/lib/logger.ts';
 
 import {
     mdiDotsVertical,
@@ -1181,9 +1183,7 @@ export default {
             self.submitting = true;
 
             self.transactionTagsStore.saveTag({
-                tag: {
-                    name: tagName
-                }
+                tag: TransactionTag.createNewTag(tagName)
             }).then(tag => {
                 self.submitting = false;
 

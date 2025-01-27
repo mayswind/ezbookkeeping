@@ -558,7 +558,7 @@ export default {
     generateAmapApiInternalProxyUrl: (): string => {
         return `${window.location.origin}${BASE_AMAP_API_PROXY_URL_PATH}`;
     },
-    getInternalAvatarUrlWithToken(avatarUrl: string, disableBrowserCache: boolean | string): string {
+    getInternalAvatarUrlWithToken(avatarUrl: string, disableBrowserCache?: boolean | string): string {
         if (!avatarUrl) {
             return avatarUrl;
         }
@@ -580,7 +580,7 @@ export default {
             return avatarUrl + '?' + params.join('&');
         }
     },
-    getTransactionPictureUrlWithToken(pictureUrl: string, disableBrowserCache: boolean | string): string {
+    getTransactionPictureUrlWithToken(pictureUrl: string, disableBrowserCache?: boolean | string): string {
         if (!pictureUrl) {
             return pictureUrl;
         }

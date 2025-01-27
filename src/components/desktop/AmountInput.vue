@@ -263,7 +263,7 @@ function onPaste(e: ClipboardEvent): void {
 }
 
 function onClick(e: MouseEvent): void {
-    if (!props.disabled && !props.readonly && props.modelValue === 0) {
+    if (!props.disabled && !props.readonly && props.modelValue === 0 && e.target instanceof HTMLInputElement) {
         const input = e.target as HTMLInputElement;
         input?.select();
     }

@@ -1047,6 +1047,7 @@ export default {
 
             this.editId = null;
             this.duplicateFromId = this.transaction.id;
+            this.activeTab = 'basicInfo';
             this.transaction.id = '';
             this.transaction.time = getCurrentUnixTime();
             this.transaction.timeZone = this.settingsStore.appSettings.timeZone;

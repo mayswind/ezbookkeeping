@@ -7,7 +7,8 @@
                         <h4 class="text-h4">{{ $t('Import Transactions') }}</h4>
                         <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
                     </div>
-                    <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true"
+                    <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                           :icon="true" :disabled="loading || submitting"
                            v-if="currentStep === 'checkData'">
                         <v-icon :icon="icons.filter" />
                         <v-menu activator="parent" max-height="500">
@@ -94,7 +95,8 @@
                             </v-list>
                         </v-menu>
                     </v-btn>
-                    <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true"
+                    <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                           :icon="true" :disabled="loading || submitting"
                            v-if="currentStep === 'checkData'">
                         <v-icon :icon="icons.more" />
                         <v-menu activator="parent">
@@ -478,17 +480,19 @@
                                 <v-select class="ml-2" density="compact" max-width="100"
                                           item-title="title"
                                           item-value="value"
-                                          :disabled="loading"
+                                          :disabled="loading || submitting"
                                           :items="importTransactionsTablePageOptions"
                                           v-model="countPerPage"
                                 />
                                 <v-pagination density="compact"
+                                              :disabled="loading || submitting"
                                               :total-visible="6"
                                               :length="totalPageCount"
                                               v-model="currentPage">
                                     <template #item="{ page, isActive }">
                                         <v-btn density="compact"
                                                variant="text"
+                                               :disabled="loading || submitting"
                                                :icon="true"
                                                :color="isActive ? 'primary' : 'default'"
                                                @click="currentPage = parseInt(page)"
@@ -499,11 +503,12 @@
                                         <v-btn density="compact"
                                                variant="text"
                                                color="default"
+                                               :disabled="loading || submitting"
                                                :icon="true"
                                                v-if="page === '...'"
                                         >
                                             <span>{{ page }}</span>
-                                            <v-menu :close-on-content-click="false" activator="parent">
+                                            <v-menu :disabled="loading || submitting" :close-on-content-click="false" activator="parent">
                                                 <v-list>
                                                     <v-list-item class="text-sm" density="compact">
                                                         <v-list-item-title class="cursor-pointer">

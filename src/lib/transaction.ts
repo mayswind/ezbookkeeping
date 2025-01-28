@@ -1,5 +1,10 @@
 import { CategoryType } from '@/core/category.ts';
 import { TransactionType } from '@/core/transaction.ts';
+import { Account } from '@/models/account.ts';
+import { TransactionCategory } from '@/models/transaction_category.ts';
+import { TransactionTag } from '@/models/transaction_tag.ts';
+import {Transaction, TransactionPicture} from '@/models/transaction.ts';
+
 import {
     isNumber
 } from './common.ts';
@@ -14,7 +19,18 @@ import {
     getFirstAvailableSubCategoryId
 } from './category.ts';
 
-function getDisplayAmount(amount, currency, hideAmount, formatAmountWithCurrencyFunc) {
+export interface SetTransactionOptions {
+    type: number;
+    categoryId: string;
+    accountId: string;
+    destinationAccountId: string;
+    amount: number;
+    destinationAmount: number;
+    tagIds: string;
+    comment: string;
+}
+
+function getDisplayAmount(amount: number, currency: string, hideAmount: boolean, formatAmountWithCurrencyFunc: (value: number | string, currencyCode?: string) => string): string {
     if (hideAmount) {
         return formatAmountWithCurrencyFunc('***', currency);
     }
@@ -22,8 +38,8 @@ function getDisplayAmount(amount, currency, hideAmount, formatAmountWithCurrency
     return formatAmountWithCurrencyFunc(amount, currency);
 }
 
-export function setTransactionModelByTransaction(transaction, transaction2, allCategories, allCategoriesMap, allVisibleAccounts, allAccountsMap, allTagsMap, defaultAccountId, options, setContextData, convertContextTime) {
-    if ((!options.type || options.type === '0') && options.categoryId && options.categoryId !== '0' && allCategoriesMap[options.categoryId]) {
+export function setTransactionModelByTransaction(transaction: Transaction, transaction2: Transaction | null | undefined, allCategories: Record<number, TransactionCategory[]>, allCategoriesMap: Record<string, TransactionCategory>, allVisibleAccounts: Account[], allAccountsMap: Record<string, Account>, allTagsMap: Record<string, TransactionTag>, defaultAccountId: string, options: SetTransactionOptions, setContextData: boolean, convertContextTime: boolean): void {
+    if (!options.type && options.categoryId && options.categoryId !== '0' && allCategoriesMap[options.categoryId]) {
         const category = allCategoriesMap[options.categoryId];
         const type = categoryTypeToTransactionType(category.type);
 
@@ -36,14 +52,14 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
         allCategories[CategoryType.Expense].length) {
         if (options.categoryId && options.categoryId !== '0') {
             if (isSubCategoryIdAvailable(allCategories[CategoryType.Expense], options.categoryId)) {
-                transaction.expenseCategory = options.categoryId;
+                transaction.expenseCategoryId = options.categoryId;
             } else {
-                transaction.expenseCategory = getFirstAvailableSubCategoryId(allCategories[CategoryType.Expense], options.categoryId);
+                transaction.expenseCategoryId = getFirstAvailableSubCategoryId(allCategories[CategoryType.Expense], options.categoryId);
             }
         }
 
-        if (!transaction.expenseCategory) {
-            transaction.expenseCategory = getFirstAvailableCategoryId(allCategories[CategoryType.Expense]);
+        if (!transaction.expenseCategoryId) {
+            transaction.expenseCategoryId = getFirstAvailableCategoryId(allCategories[CategoryType.Expense]);
         }
     }
 
@@ -51,14 +67,14 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
         allCategories[CategoryType.Income].length) {
         if (options.categoryId && options.categoryId !== '0') {
             if (isSubCategoryIdAvailable(allCategories[CategoryType.Income], options.categoryId)) {
-                transaction.incomeCategory = options.categoryId;
+                transaction.incomeCategoryId = options.categoryId;
             } else {
-                transaction.incomeCategory = getFirstAvailableSubCategoryId(allCategories[CategoryType.Income], options.categoryId);
+                transaction.incomeCategoryId = getFirstAvailableSubCategoryId(allCategories[CategoryType.Income], options.categoryId);
             }
         }
 
-        if (!transaction.incomeCategory) {
-            transaction.incomeCategory = getFirstAvailableCategoryId(allCategories[CategoryType.Income]);
+        if (!transaction.incomeCategoryId) {
+            transaction.incomeCategoryId = getFirstAvailableCategoryId(allCategories[CategoryType.Income]);
         }
     }
 
@@ -66,14 +82,14 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
         allCategories[CategoryType.Transfer].length) {
         if (options.categoryId && options.categoryId !== '0') {
             if (isSubCategoryIdAvailable(allCategories[CategoryType.Transfer], options.categoryId)) {
-                transaction.transferCategory = options.categoryId;
+                transaction.transferCategoryId = options.categoryId;
             } else {
-                transaction.transferCategory = getFirstAvailableSubCategoryId(allCategories[CategoryType.Transfer], options.categoryId);
+                transaction.transferCategoryId = getFirstAvailableSubCategoryId(allCategories[CategoryType.Transfer], options.categoryId);
             }
         }
 
-        if (!transaction.transferCategory) {
-            transaction.transferCategory = getFirstAvailableCategoryId(allCategories[CategoryType.Transfer]);
+        if (!transaction.transferCategoryId) {
+            transaction.transferCategoryId = getFirstAvailableCategoryId(allCategories[CategoryType.Transfer]);
         }
     }
 
@@ -129,11 +145,11 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
         transaction.type = transaction2.type;
 
         if (transaction.type === TransactionType.Expense) {
-            transaction.expenseCategory = transaction2.categoryId || '';
+            transaction.expenseCategoryId = transaction2.categoryId || '';
         } else if (transaction.type === TransactionType.Income) {
-            transaction.incomeCategory = transaction2.categoryId || '';
+            transaction.incomeCategoryId = transaction2.categoryId || '';
         } else if (transaction.type === TransactionType.Transfer) {
-            transaction.transferCategory = transaction2.categoryId || '';
+            transaction.transferCategoryId = transaction2.categoryId || '';
         }
 
         if (setContextData) {
@@ -165,17 +181,17 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
 
         transaction.hideAmount = transaction2.hideAmount;
         transaction.tagIds = transaction2.tagIds || [];
-        transaction.pictures = transaction2.pictures || [];
+        transaction.setPictures(TransactionPicture.ofMany(transaction2.pictures || []));
 
         transaction.comment = transaction2.comment;
 
         if (setContextData) {
-            transaction.geoLocation = transaction2.geoLocation;
+            transaction.setGeoLocation(transaction2.geoLocation);
         }
     }
 }
 
-export function getTransactionDisplayAmount(transaction, allFilterAccountIdsCount, allFilterAccountIds, formatAmountWithCurrencyFunc) {
+export function getTransactionDisplayAmount(transaction: Transaction, allFilterAccountIdsCount: number, allFilterAccountIds: Record<string, boolean>, formatAmountWithCurrencyFunc: (value: number | string, currencyCode?: string) => string): string {
     if (allFilterAccountIdsCount < 1) {
         if (transaction.sourceAccount) {
             return getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount, formatAmountWithCurrencyFunc);

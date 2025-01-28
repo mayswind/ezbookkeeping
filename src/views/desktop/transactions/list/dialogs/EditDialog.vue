@@ -115,11 +115,11 @@
                                                        :readonly="mode === 'view'"
                                                        :disabled="loading || submitting || !hasAvailableExpenseCategories"
                                                        :show-selection-primary-text="true"
-                                                       :custom-selection-primary-text="getPrimaryCategoryName(transaction.expenseCategory, allCategories[allCategoryTypes.Expense])"
-                                                       :custom-selection-secondary-text="getSecondaryCategoryName(transaction.expenseCategory, allCategories[allCategoryTypes.Expense])"
+                                                       :custom-selection-primary-text="getPrimaryCategoryName(transaction.expenseCategoryId, allCategories[allCategoryTypes.Expense])"
+                                                       :custom-selection-secondary-text="getSecondaryCategoryName(transaction.expenseCategoryId, allCategories[allCategoryTypes.Expense])"
                                                        :label="$t('Category')" :placeholder="$t('Category')"
                                                        :items="allCategories[allCategoryTypes.Expense]"
-                                                       v-model="transaction.expenseCategory">
+                                                       v-model="transaction.expenseCategoryId">
                                     </two-column-select>
                                 </v-col>
                                 <v-col cols="12" md="12" v-if="transaction.type === allTransactionTypes.Income">
@@ -132,11 +132,11 @@
                                                        :readonly="mode === 'view'"
                                                        :disabled="loading || submitting || !hasAvailableIncomeCategories"
                                                        :show-selection-primary-text="true"
-                                                       :custom-selection-primary-text="getPrimaryCategoryName(transaction.incomeCategory, allCategories[allCategoryTypes.Income])"
-                                                       :custom-selection-secondary-text="getSecondaryCategoryName(transaction.incomeCategory, allCategories[allCategoryTypes.Income])"
+                                                       :custom-selection-primary-text="getPrimaryCategoryName(transaction.incomeCategoryId, allCategories[allCategoryTypes.Income])"
+                                                       :custom-selection-secondary-text="getSecondaryCategoryName(transaction.incomeCategoryId, allCategories[allCategoryTypes.Income])"
                                                        :label="$t('Category')" :placeholder="$t('Category')"
                                                        :items="allCategories[allCategoryTypes.Income]"
-                                                       v-model="transaction.incomeCategory">
+                                                       v-model="transaction.incomeCategoryId">
                                     </two-column-select>
                                 </v-col>
                                 <v-col cols="12" md="12" v-if="transaction.type === allTransactionTypes.Transfer">
@@ -149,11 +149,11 @@
                                                        :readonly="mode === 'view'"
                                                        :disabled="loading || submitting || !hasAvailableTransferCategories"
                                                        :show-selection-primary-text="true"
-                                                       :custom-selection-primary-text="getPrimaryCategoryName(transaction.transferCategory, allCategories[allCategoryTypes.Transfer])"
-                                                       :custom-selection-secondary-text="getSecondaryCategoryName(transaction.transferCategory, allCategories[allCategoryTypes.Transfer])"
+                                                       :custom-selection-primary-text="getPrimaryCategoryName(transaction.transferCategoryId, allCategories[allCategoryTypes.Transfer])"
+                                                       :custom-selection-secondary-text="getSecondaryCategoryName(transaction.transferCategoryId, allCategories[allCategoryTypes.Transfer])"
                                                        :label="$t('Category')" :placeholder="$t('Category')"
                                                        :items="allCategories[allCategoryTypes.Transfer]"
-                                                       v-model="transaction.transferCategory">
+                                                       v-model="transaction.transferCategoryId">
                                     </two-column-select>
                                 </v-col>
                                 <v-col cols="12" :md="transaction.type === allTransactionTypes.Transfer ? 6 : 12">
@@ -396,7 +396,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
-import { useTransactionsStore } from '@/stores/transaction.js';
+import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
@@ -423,7 +423,7 @@ import {
     getTransactionSecondaryCategoryName,
     getFirstAvailableCategoryId
 } from '@/lib/category.ts';
-import { setTransactionModelByTransaction } from '@/lib/transaction.js';
+import { setTransactionModelByTransaction } from '@/lib/transaction.ts';
 import {
     isTransactionPicturesEnabled,
     getMapProvider
@@ -715,7 +715,7 @@ export default {
         },
         inputEmptyProblemMessage() {
             if (this.transaction.type === this.allTransactionTypes.Expense) {
-                if (!this.transaction.expenseCategory || this.transaction.expenseCategory === '') {
+                if (!this.transaction.expenseCategoryId || this.transaction.expenseCategoryId === '') {
                     return 'Transaction category cannot be blank';
                 }
 
@@ -723,7 +723,7 @@ export default {
                     return 'Transaction account cannot be blank';
                 }
             } else if (this.transaction.type === this.allTransactionTypes.Income) {
-                if (!this.transaction.incomeCategory || this.transaction.incomeCategory === '') {
+                if (!this.transaction.incomeCategoryId || this.transaction.incomeCategoryId === '') {
                     return 'Transaction category cannot be blank';
                 }
 
@@ -731,7 +731,7 @@ export default {
                     return 'Transaction account cannot be blank';
                 }
             } else if (this.transaction.type === this.allTransactionTypes.Transfer) {
-                if (!this.transaction.transferCategory || this.transaction.transferCategory === '') {
+                if (!this.transaction.transferCategoryId || this.transaction.transferCategoryId === '') {
                     return 'Transaction category cannot be blank';
                 }
 
@@ -869,7 +869,7 @@ export default {
                 } else {
                     self.mode = 'add';
                     self.editId = null;
-                    self.transaction.id = null;
+                    self.transaction.id = '';
                 }
             }
 
@@ -1047,12 +1047,12 @@ export default {
 
             this.editId = null;
             this.duplicateFromId = this.transaction.id;
-            this.transaction.id = null;
+            this.transaction.id = '';
             this.transaction.time = getCurrentUnixTime();
             this.transaction.timeZone = this.settingsStore.appSettings.timeZone;
             this.transaction.utcOffset = getTimezoneOffsetMinutes(this.transaction.timeZone);
-            this.transaction.geoLocation = null;
-            this.transaction.pictures = [];
+            this.transaction.removeGeoLocation();
+            this.transaction.clearPictures();
             this.mode = 'add';
         },
         edit() {
@@ -1157,10 +1157,7 @@ export default {
 
                 self.geoLocationStatus = 'success';
 
-                self.transaction.geoLocation = {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude
-                };
+                self.transaction.setLatitudeAndLongitude(position.coords.latitude, position.coords.longitude);
             }, function (err) {
                 logger.error('cannot retrieve current position', err);
                 self.geoLocationStatus = 'error';
@@ -1175,7 +1172,7 @@ export default {
         clearGeoLocation() {
             this.geoMenuState = false;
             this.geoLocationStatus = null;
-            this.transaction.geoLocation = null;
+            this.transaction.removeGeoLocation();
         },
         saveNewTag(tagName) {
             const self = this;
@@ -1232,12 +1229,7 @@ export default {
             self.submitting = true;
 
             self.transactionsStore.uploadTransactionPicture({ pictureFile }).then(response => {
-                if (!isArray(self.transaction.pictures)) {
-                    self.transaction.pictures = [];
-                }
-
-                self.transaction.pictures.push(response);
-
+                self.transaction.addPicture(response);
                 self.uploadingPicture = false;
                 self.submitting = false;
             }).catch(error => {
@@ -1262,23 +1254,15 @@ export default {
                 self.submitting = true;
 
                 self.transactionsStore.removeUnusedTransactionPicture({ pictureInfo }).then(response => {
-                    if (response && isArray(self.transaction.pictures)) {
-                        for (let i = 0; i < self.transaction.pictures.length; i++) {
-                            if (self.transaction.pictures[i].pictureId === pictureInfo.pictureId) {
-                                self.transaction.pictures.splice(i, 1);
-                            }
-                        }
+                    if (response) {
+                        self.transaction.removePicture(pictureInfo);
                     }
 
                     self.removingPictureId = '';
                     self.submitting = false;
                 }).catch(error => {
                     if (error.error && error.error.errorCode === KnownErrorCode.TransactionPictureNotFound) {
-                        for (let i = 0; i < self.transaction.pictures.length; i++) {
-                            if (self.transaction.pictures[i].pictureId === pictureInfo.pictureId) {
-                                self.transaction.pictures.splice(i, 1);
-                            }
-                        }
+                        self.transaction.removePicture(pictureInfo);
                     } else if (!error.processed) {
                         self.$refs.snackbar.showError(error);
                     }

@@ -238,11 +238,11 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
             }
 
             if (template.type === TransactionType.Expense) {
-                submitTemplate.categoryId = template.expenseCategory;
+                submitTemplate.categoryId = template.expenseCategoryId;
             } else if (template.type === TransactionType.Income) {
-                submitTemplate.categoryId = template.incomeCategory;
+                submitTemplate.categoryId = template.incomeCategoryId;
             } else if (template.type === TransactionType.Transfer) {
-                submitTemplate.categoryId = template.transferCategory;
+                submitTemplate.categoryId = template.transferCategoryId;
                 submitTemplate.destinationAccountId = template.destinationAccountId;
                 submitTemplate.destinationAmount = template.destinationAmount;
             } else {

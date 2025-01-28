@@ -489,6 +489,41 @@ export function arrayItemToObjectField<T>(array: string[], value: T): Record<str
     return ret;
 }
 
+export function splitItemsToMap(str: string | undefined | null, separator: string): Record<string, boolean> {
+    const ret: Record<string, boolean> = {};
+
+    if (!str) {
+        return ret;
+    }
+
+    const items = str.split(separator);
+
+    for (let i = 0; i < items.length; i++) {
+        if (items[i]) {
+            ret[items[i]] = true;
+        }
+    }
+
+    return ret;
+}
+
+export function countSplitItems(str: string | undefined | null, separator: string): number {
+    if (!str) {
+        return 0;
+    }
+
+    const items = str.split(separator);
+    let count = 0;
+
+    for (let i = 0; i < items.length; i++) {
+        if (items[i]) {
+            count++;
+        }
+    }
+
+    return count;
+}
+
 export function categorizedArrayToPlainArray<T>(object: Record<string, T[]>): T[] {
     const ret: T[] = [];
 

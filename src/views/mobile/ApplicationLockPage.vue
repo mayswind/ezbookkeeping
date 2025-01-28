@@ -44,7 +44,7 @@ import { useAppLockPageBase } from '@/views/base/settings/AppLockPageBase.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
-import { useTransactionsStore } from '@/stores/transaction.js';
+import { useTransactionsStore } from '@/stores/transaction.ts';
 
 import { registerWebAuthnCredential } from '@/lib/webauthn.ts';
 import {

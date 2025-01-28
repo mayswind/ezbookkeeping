@@ -133,7 +133,7 @@
 <script>
 import { mapStores } from 'pinia';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
-import { useTransactionsStore } from '@/stores/transaction.js';
+import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 
 import { TransactionTagFilterType } from '@/core/transaction.ts';

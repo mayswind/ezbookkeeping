@@ -58,7 +58,7 @@ import type { Router } from 'framework7/types';
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
 
-import { useTransactionsStore } from '@/stores/transaction.js';
+import { useTransactionsStore } from '@/stores/transaction.ts';
 
 import { AmountFilterType } from '@/core/numeral.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';

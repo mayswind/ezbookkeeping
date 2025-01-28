@@ -602,13 +602,15 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
-import { useTransactionsStore } from '@/stores/transaction.js';
+import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { CategoryType } from '@/core/category.ts';
 import { TransactionType } from '@/core/transaction.ts';
+import { ImportTransaction } from '@/models/imported_transaction.ts';
+
 import {
     isString,
     isNumber,
@@ -1139,17 +1141,12 @@ export default {
                 fileType: fileType,
                 importFile: self.importFile
             }).then(response => {
-                const parsedTransactions = response.items;
+                const parsedTransactions = [];
 
-                if (parsedTransactions) {
-                    for (let i = 0; i < parsedTransactions.length; i++) {
-                        const transaction = parsedTransactions[i];
-                        transaction.index = i;
-                        transaction.selected = false;
-                        transaction.valid = self.isTransactionValid(transaction);
-                        transaction.actualCategoryName = transaction.originalCategoryName;
-                        transaction.actualSourceAccountName = transaction.originalSourceAccountName;
-                        transaction.actualDestinationAccountName = transaction.originalDestinationAccountName;
+                if (response.items) {
+                    for (let i = 0; i < response.items.length; i++) {
+                        const parsedTransaction = ImportTransaction.of(response.items[i], i);
+                        parsedTransactions.push(parsedTransaction);
                     }
                 }
 
@@ -1408,7 +1405,7 @@ export default {
             }
         },
         updateTransactionData(transaction) {
-            transaction.valid = this.isTransactionValid(transaction);
+            transaction.valid = transaction.isTransactionValid();
 
             if (transaction.categoryId && this.allCategoriesMap[transaction.categoryId]) {
                 transaction.actualCategoryName = this.allCategoriesMap[transaction.categoryId].name;
@@ -1716,33 +1713,6 @@ export default {
             }
 
             return invalidTags;
-        },
-        isTransactionValid(transaction) {
-            if (!transaction) {
-                return false;
-            }
-
-            if (transaction.type !== this.allTransactionTypes.ModifyBalance && (!transaction.categoryId || transaction.categoryId === '0')) {
-                return false;
-            }
-
-            if (!transaction.sourceAccountId || transaction.sourceAccountId === '0') {
-                return false;
-            }
-
-            if (transaction.type === this.allTransactionTypes.Transfer && (!transaction.destinationAccountId || transaction.destinationAccountId === '0')) {
-                return false;
-            }
-
-            if (transaction.tagIds && transaction.tagIds.length) {
-                for (let j = 0; j < transaction.tagIds.length; j++) {
-                    if (!transaction.tagIds[j] || transaction.tagIds[j] === '0') {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
         },
         isTagValid(tagIds, tagIndex) {
             if (!tagIds || !tagIds[tagIndex]) {

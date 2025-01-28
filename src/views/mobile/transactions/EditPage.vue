@@ -104,9 +104,9 @@
             >
                 <template #title>
                     <div class="list-item-custom-title" v-if="hasAvailableExpenseCategories">
-                        <span>{{ getPrimaryCategoryName(transaction.expenseCategory, allCategories[allCategoryTypes.Expense]) }}</span>
+                        <span>{{ getPrimaryCategoryName(transaction.expenseCategoryId, allCategories[allCategoryTypes.Expense]) }}</span>
                         <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
-                        <span>{{ getSecondaryCategoryName(transaction.expenseCategory, allCategories[allCategoryTypes.Expense]) }}</span>
+                        <span>{{ getSecondaryCategoryName(transaction.expenseCategoryId, allCategories[allCategoryTypes.Expense]) }}</span>
                     </div>
                     <div class="list-item-custom-title" v-else-if="!hasAvailableExpenseCategories">
                         <span>{{ $t('None') }}</span>
@@ -120,7 +120,7 @@
                                            secondary-hidden-field="hidden"
                                            :items="allCategories[allCategoryTypes.Expense]"
                                            v-model:show="showCategorySheet"
-                                           v-model="transaction.expenseCategory">
+                                           v-model="transaction.expenseCategoryId">
                 </tree-view-selection-sheet>
             </f7-list-item>
 
@@ -135,9 +135,9 @@
             >
                 <template #title>
                     <div class="list-item-custom-title" v-if="hasAvailableIncomeCategories">
-                        <span>{{ getPrimaryCategoryName(transaction.incomeCategory, allCategories[allCategoryTypes.Income]) }}</span>
+                        <span>{{ getPrimaryCategoryName(transaction.incomeCategoryId, allCategories[allCategoryTypes.Income]) }}</span>
                         <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
-                        <span>{{ getSecondaryCategoryName(transaction.incomeCategory, allCategories[allCategoryTypes.Income]) }}</span>
+                        <span>{{ getSecondaryCategoryName(transaction.incomeCategoryId, allCategories[allCategoryTypes.Income]) }}</span>
                     </div>
                     <div class="list-item-custom-title" v-else-if="!hasAvailableIncomeCategories">
                         <span>{{ $t('None') }}</span>
@@ -151,7 +151,7 @@
                                            secondary-hidden-field="hidden"
                                            :items="allCategories[allCategoryTypes.Income]"
                                            v-model:show="showCategorySheet"
-                                           v-model="transaction.incomeCategory">
+                                           v-model="transaction.incomeCategoryId">
                 </tree-view-selection-sheet>
             </f7-list-item>
 
@@ -166,9 +166,9 @@
             >
                 <template #title>
                     <div class="list-item-custom-title" v-if="hasAvailableTransferCategories">
-                        <span>{{ getPrimaryCategoryName(transaction.transferCategory, allCategories[allCategoryTypes.Transfer]) }}</span>
+                        <span>{{ getPrimaryCategoryName(transaction.transferCategoryId, allCategories[allCategoryTypes.Transfer]) }}</span>
                         <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
-                        <span>{{ getSecondaryCategoryName(transaction.transferCategory, allCategories[allCategoryTypes.Transfer]) }}</span>
+                        <span>{{ getSecondaryCategoryName(transaction.transferCategoryId, allCategories[allCategoryTypes.Transfer]) }}</span>
                     </div>
                     <div class="list-item-custom-title" v-else-if="!hasAvailableTransferCategories">
                         <span>{{ $t('None') }}</span>
@@ -182,7 +182,7 @@
                                            secondary-hidden-field="hidden"
                                            :items="allCategories[allCategoryTypes.Transfer]"
                                            v-model:show="showCategorySheet"
-                                           v-model="transaction.transferCategory">
+                                           v-model="transaction.transferCategoryId">
                 </tree-view-selection-sheet>
             </f7-list-item>
 
@@ -436,7 +436,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
-import { useTransactionsStore } from '@/stores/transaction.js';
+import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
@@ -446,6 +446,7 @@ import { TemplateType, ScheduledTemplateFrequencyType } from '@/core/template.ts
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT, TRANSACTION_MAX_PICTURE_COUNT } from '@/consts/transaction.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
 import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
+
 import logger from '@/lib/logger.ts';
 import {
     isArray,
@@ -464,7 +465,7 @@ import {
     getTransactionSecondaryCategoryName,
     getFirstAvailableCategoryId
 } from '@/lib/category.ts';
-import { setTransactionModelByTransaction } from '@/lib/transaction.js';
+import { setTransactionModelByTransaction } from '@/lib/transaction.ts';
 import {
     isTransactionPicturesEnabled,
     getMapProvider
@@ -840,7 +841,7 @@ export default {
         },
         inputEmptyProblemMessage() {
             if (this.transaction.type === this.allTransactionTypes.Expense) {
-                if (!this.transaction.expenseCategory || this.transaction.expenseCategory === '') {
+                if (!this.transaction.expenseCategoryId || this.transaction.expenseCategoryId === '') {
                     return 'Transaction category cannot be blank';
                 }
 
@@ -848,7 +849,7 @@ export default {
                     return 'Transaction account cannot be blank';
                 }
             } else if (this.transaction.type === this.allTransactionTypes.Income) {
-                if (!this.transaction.incomeCategory || this.transaction.incomeCategory === '') {
+                if (!this.transaction.incomeCategoryId || this.transaction.incomeCategoryId === '') {
                     return 'Transaction category cannot be blank';
                 }
 
@@ -856,7 +857,7 @@ export default {
                     return 'Transaction account cannot be blank';
                 }
             } else if (this.transaction.type === this.allTransactionTypes.Transfer) {
-                if (!this.transaction.transferCategory || this.transaction.transferCategory === '') {
+                if (!this.transaction.transferCategoryId || this.transaction.transferCategoryId === '') {
                     return 'Transaction category cannot be blank';
                 }
 
@@ -1226,10 +1227,7 @@ export default {
 
                 self.geoLocationStatus = 'success';
 
-                self.transaction.geoLocation = {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude
-                };
+                self.transaction.setLatitudeAndLongitude(position.coords.latitude, position.coords.longitude);
             }, function (err) {
                 logger.error('cannot retrieve current position', err);
                 self.geoLocationStatus = 'error';
@@ -1243,7 +1241,7 @@ export default {
         },
         clearGeoLocation() {
             this.geoLocationStatus = null;
-            this.transaction.geoLocation = null;
+            this.transaction.removeGeoLocation();
         },
         swapTransactionData(swapAccount, swapAmount) {
             if (swapAccount) {
@@ -1287,12 +1285,7 @@ export default {
             self.submitting = true;
 
             self.transactionsStore.uploadTransactionPicture({ pictureFile }).then(response => {
-                if (!isArray(self.transaction.pictures)) {
-                    self.transaction.pictures = [];
-                }
-
-                self.transaction.pictures.push(response);
-
+                self.transaction.addPicture(response);
                 self.uploadingPicture = false;
                 self.submitting = false;
             }).catch(error => {
@@ -1317,23 +1310,15 @@ export default {
                 self.submitting = true;
 
                 self.transactionsStore.removeUnusedTransactionPicture({ pictureInfo }).then(response => {
-                    if (response && isArray(self.transaction.pictures)) {
-                        for (let i = 0; i < self.transaction.pictures.length; i++) {
-                            if (self.transaction.pictures[i].pictureId === pictureInfo.pictureId) {
-                                self.transaction.pictures.splice(i, 1);
-                            }
-                        }
+                    if (response) {
+                        self.transaction.removePicture(pictureInfo);
                     }
 
                     self.removingPictureId = '';
                     self.submitting = false;
                 }).catch(error => {
                     if (error.error && error.error.errorCode === KnownErrorCode.TransactionPictureNotFound) {
-                        for (let i = 0; i < self.transaction.pictures.length; i++) {
-                            if (self.transaction.pictures[i].pictureId === pictureInfo.pictureId) {
-                                self.transaction.pictures.splice(i, 1);
-                            }
-                        }
+                        self.transaction.removePicture(pictureInfo);
                     } else if (!error.processed) {
                         self.$toast(error.message || error);
                     }

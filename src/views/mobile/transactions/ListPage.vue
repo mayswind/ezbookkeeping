@@ -526,7 +526,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
-import { useTransactionsStore } from '@/stores/transaction.js';
+import { useTransactionsStore } from '@/stores/transaction.ts';
 
 import { DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { AmountFilterType } from '@/core/numeral.ts';
@@ -550,7 +550,7 @@ import {
 } from '@/lib/datetime.ts';
 import { categoryTypeToTransactionType, transactionTypeToCategoryType } from '@/lib/category.ts';
 import { getUnifiedSelectedAccountsCurrencyOrDefaultCurrency } from '@/lib/account.ts';
-import { getTransactionDisplayAmount } from '@/lib/transaction.js';
+import { getTransactionDisplayAmount } from '@/lib/transaction.ts';
 import { onSwipeoutDeleted, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
 
 export default {

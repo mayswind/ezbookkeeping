@@ -135,7 +135,7 @@
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
-import { useTransactionsStore } from '@/stores/transaction.js';
+import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 
 import { AccountType, AccountCategory } from '@/core/account.ts';

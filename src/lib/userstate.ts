@@ -2,6 +2,7 @@ import CryptoJS from 'crypto-js';
 
 import type { ApplicationLockState, WebAuthnConfig } from '@/core/setting.ts';
 import type { UserBasicInfo } from '@/models/user.ts';
+import type { TransactionDraft } from '@/models/transaction.ts';
 
 import { isString, isObject } from './common.ts';
 import { isEnableApplicationLock } from './settings.ts';
@@ -257,7 +258,7 @@ export function clearCurrentUserInfo(): void {
     localStorage.removeItem(userInfoLocalStorageKey);
 }
 
-export function getUserTransactionDraft(): unknown | null {
+export function getUserTransactionDraft(): TransactionDraft | null {
     let data = localStorage.getItem(transactionDraftLocalStorageKey);
 
     if (!data) {
@@ -274,10 +275,10 @@ export function getUserTransactionDraft(): unknown | null {
         data = getDecryptedToken(data, appLockState);
     }
 
-    return JSON.parse(data);
+    return JSON.parse(data) as TransactionDraft;
 }
 
-export function updateUserTransactionDraft(transaction: unknown): void {
+export function updateUserTransactionDraft(transaction?: TransactionDraft | null): void {
     if (!isObject(transaction)) {
         return;
     }

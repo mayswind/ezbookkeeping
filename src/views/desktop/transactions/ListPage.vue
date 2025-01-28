@@ -593,7 +593,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
-import { useTransactionsStore } from '@/stores/transaction.js';
+import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 
 import { DateRangeScene, DateRange } from '@/core/datetime.ts';
@@ -629,7 +629,7 @@ import {
     transactionTypeToCategoryType
 } from '@/lib/category.ts';
 import { getUnifiedSelectedAccountsCurrencyOrDefaultCurrency } from '@/lib/account.ts';
-import { getTransactionDisplayAmount } from '@/lib/transaction.js';
+import { getTransactionDisplayAmount } from '@/lib/transaction.ts';
 import { isDataImportingEnabled } from '@/lib/server_settings.ts';
 import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';
 

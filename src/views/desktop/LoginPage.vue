@@ -111,10 +111,9 @@
                                         </v-btn>
                                     </v-col>
 
-                                    <v-col cols="12" class="text-center text-base">
+                                    <v-col cols="12" class="text-center text-base" v-if="isUserRegistrationEnabled()">
                                         <span class="me-1">{{ tt('Don\'t have an account?') }}</span>
-                                        <router-link class="text-primary" to="/signup"
-                                                     :class="{'disabled': !isUserRegistrationEnabled()}">
+                                        <router-link class="text-primary" to="/signup">
                                             {{ tt('Create an account') }}
                                         </router-link>
                                     </v-col>

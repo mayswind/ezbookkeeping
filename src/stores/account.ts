@@ -16,7 +16,6 @@ import {
 } from '@/models/account.ts';
 
 import { isNumber, isEquals } from '@/lib/common.ts';
-import { getCurrentUnixTime } from '@/lib/datetime.ts';
 import { getCategorizedAccountsMap, getAllFilteredAccountsBalance } from '@/lib/account.ts';
 import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
@@ -267,14 +266,6 @@ export const useAccountsStore = defineStore('accounts', () => {
 
         return shownAccountCount;
     });
-
-    function generateNewAccountModel(): Account {
-        return Account.createNewAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTime());
-    }
-
-    function generateNewSubAccountModel(parentAccount: Account): Account {
-        return parentAccount.createNewSubAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTime());
-    }
 
     function updateAccountListInvalidState(invalidState: boolean): void {
         accountListStateInvalid.value = invalidState;
@@ -990,8 +981,6 @@ export const useAccountsStore = defineStore('accounts', () => {
         allAvailableAccountsCount,
         allVisibleAccountsCount,
         // functions
-        generateNewAccountModel,
-        generateNewSubAccountModel,
         updateAccountListInvalidState,
         resetAccounts,
         getFirstShowingIds,

@@ -2,14 +2,15 @@ import { ref, computed, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-import { useAccountsStore } from '@/stores/account.ts';
+import { useUserStore } from '@/stores/user.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { AccountCategory, AccountType } from '@/core/account.ts';
 import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
 import type { LocalizedAccountCategory } from '@/core/account.ts';
-import type { Account } from '@/models/account.ts';
+import { Account } from '@/models/account.ts';
 
+import { getCurrentUnixTime } from '@/lib/datetime.ts';
 import { setAccountSuitableIcon } from '@/lib/account.ts';
 
 export interface DayAndDisplayName {
@@ -19,13 +20,14 @@ export interface DayAndDisplayName {
 
 export function useAccountEditPageBaseBase() {
     const { tt, getAllCurrencies, getAllAccountCategories, getAllAccountTypes, getMonthdayShortName } = useI18n();
-    const accountsStore = useAccountsStore();
+
+    const userStore = useUserStore();
 
     const editAccountId = ref<string | null>(null);
     const clientSessionId = ref<string>('');
     const loading = ref<boolean>(false);
     const submitting = ref<boolean>(false);
-    const account = ref<Account>(accountsStore.generateNewAccountModel());
+    const account = ref<Account>(Account.createNewAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTime()));
     const subAccounts = ref<Account[]>([]);
 
     const title = computed<string>(() => {
@@ -133,7 +135,7 @@ export function useAccountEditPageBaseBase() {
             return false;
         }
 
-        const subAccount = accountsStore.generateNewSubAccountModel(account.value);
+        const subAccount = account.value.createNewSubAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTime());
         subAccounts.value.push(subAccount);
         return true;
     }
@@ -144,7 +146,7 @@ export function useAccountEditPageBaseBase() {
 
         if (newAccount.childrenAccounts && newAccount.childrenAccounts.length > 0) {
             for (let i = 0; i < newAccount.childrenAccounts.length; i++) {
-                const subAccount = accountsStore.generateNewSubAccountModel(account.value);
+                const subAccount = account.value.createNewSubAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTime());
                 subAccount.from(newAccount.childrenAccounts[i]);
 
                 subAccounts.value.push(subAccount);

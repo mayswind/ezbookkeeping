@@ -204,14 +204,16 @@ import { ref, computed, useTemplateRef, watch } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 import { useAccountEditPageBaseBase } from '@/views/base/accounts/AccountEditPageBase.ts';
 
+import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 
 import { AccountType } from '@/core/account.ts';
 import { ALL_ACCOUNT_ICONS } from '@/consts/icon.ts';
 import { ALL_ACCOUNT_COLORS } from '@/consts/color.ts';
-import type { Account } from '@/models/account.ts';
+import { Account } from '@/models/account.ts';
 
 import { isNumber } from '@/lib/common.ts';
+import { getCurrentUnixTime } from '@/lib/datetime.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import { setAccountSuitableIcon } from '@/lib/account.ts';
 
@@ -254,6 +256,7 @@ const {
     setAccount
 } = useAccountEditPageBaseBase();
 
+const userStore = useUserStore();
 const accountsStore = useAccountsStore();
 
 const icons = {
@@ -285,7 +288,7 @@ function open(options?: { id?: string, currentAccount?: Account, category?: numb
     loading.value = true;
     submitting.value = false;
 
-    const newAccount = accountsStore.generateNewAccountModel();
+    const newAccount = Account.createNewAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTime());
     account.value.from(newAccount);
     subAccounts.value = [];
     currentAccountIndex.value = -1;

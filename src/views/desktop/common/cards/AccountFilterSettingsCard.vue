@@ -3,7 +3,7 @@
         <template #title>
             <div class="d-flex align-center justify-center" v-if="dialogMode">
                 <div class="w-100 text-center">
-                    <h4 class="text-h4">{{ $t(title) }}</h4>
+                    <h4 class="text-h4">{{ tt(title) }}</h4>
                 </div>
                 <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                        :disabled="loading || !hasAnyAvailableAccount" :icon="true">
@@ -11,30 +11,30 @@
                     <v-menu activator="parent">
                         <v-list>
                             <v-list-item :prepend-icon="icons.selectAll"
-                                         :title="$t('Select All')"
+                                         :title="tt('Select All')"
                                          :disabled="!hasAnyVisibleAccount"
-                                         @click="selectAll"></v-list-item>
+                                         @click="selectAllAccounts"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectNone"
-                                         :title="$t('Select None')"
+                                         :title="tt('Select None')"
                                          :disabled="!hasAnyVisibleAccount"
-                                         @click="selectNone"></v-list-item>
+                                         @click="selectNoneAccounts"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectInverse"
-                                         :title="$t('Invert Selection')"
+                                         :title="tt('Invert Selection')"
                                          :disabled="!hasAnyVisibleAccount"
-                                         @click="selectInvert"></v-list-item>
+                                         @click="selectInvertAccounts"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="icons.show"
-                                         :title="$t('Show Hidden Accounts')"
+                                         :title="tt('Show Hidden Accounts')"
                                          v-if="!showHidden" @click="showHidden = true"></v-list-item>
                             <v-list-item :prepend-icon="icons.hide"
-                                         :title="$t('Hide Hidden Accounts')"
+                                         :title="tt('Hide Hidden Accounts')"
                                          v-if="showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
                     </v-menu>
                 </v-btn>
             </div>
             <div class="d-flex align-center" v-else-if="!dialogMode">
-                <span>{{ $t(title) }}</span>
+                <span>{{ tt(title) }}</span>
                 <v-spacer/>
                 <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                        :disabled="loading" :icon="true">
@@ -42,23 +42,23 @@
                     <v-menu activator="parent">
                         <v-list>
                             <v-list-item :prepend-icon="icons.selectAll"
-                                         :title="$t('Select All')"
+                                         :title="tt('Select All')"
                                          :disabled="!hasAnyVisibleAccount"
-                                         @click="selectAll"></v-list-item>
+                                         @click="selectAllAccounts"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectNone"
-                                         :title="$t('Select None')"
+                                         :title="tt('Select None')"
                                          :disabled="!hasAnyVisibleAccount"
-                                         @click="selectNone"></v-list-item>
+                                         @click="selectNoneAccounts"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectInverse"
-                                         :title="$t('Invert Selection')"
+                                         :title="tt('Invert Selection')"
                                          :disabled="!hasAnyVisibleAccount"
-                                         @click="selectInvert"></v-list-item>
+                                         @click="selectInvertAccounts"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="icons.show"
-                                         :title="$t('Show Hidden Accounts')"
+                                         :title="tt('Show Hidden Accounts')"
                                          v-if="!showHidden" @click="showHidden = true"></v-list-item>
                             <v-list-item :prepend-icon="icons.hide"
-                                         :title="$t('Hide Hidden Accounts')"
+                                         :title="tt('Hide Hidden Accounts')"
                                          v-if="showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
                     </v-menu>
@@ -72,7 +72,7 @@
         </div>
 
         <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-if="!loading && !hasAnyVisibleAccount">
-            <span class="text-body-1">{{ $t('No available account') }}</span>
+            <span class="text-body-1">{{ tt('No available account') }}</span>
         </v-card-text>
 
         <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-else-if="!loading && hasAnyVisibleAccount">
@@ -83,7 +83,7 @@
                                    v-for="accountCategory in allCategorizedAccounts"
                                    v-show="showHidden || accountCategory.allVisibleAccountCount > 0">
                     <v-expansion-panel-title class="expand-panel-title-with-bg py-0">
-                        <span class="ml-3">{{ $t(accountCategory.name) }}</span>
+                        <span class="ml-3">{{ tt(accountCategory.name) }}</span>
                     </v-expansion-panel-title>
                     <v-expansion-panel-text>
                         <v-list rounded density="comfortable" class="pa-0">
@@ -95,7 +95,7 @@
                                     <template #prepend>
                                         <v-checkbox :model-value="isAccountOrSubAccountsAllChecked(account, filterAccountIds)"
                                                     :indeterminate="isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds)"
-                                                    @update:model-value="selectAccountOrSubAccounts(account, $event)">
+                                                    @update:model-value="updateAccountOrSubAccountsSelected(account, $event)">
                                             <template #label>
                                                 <ItemIcon class="d-flex" icon-type="account" :icon-id="account.icon"
                                                           :color="account.color" :hidden-status="account.hidden"></ItemIcon>
@@ -105,10 +105,10 @@
                                     </template>
                                 </v-list-item>
 
-                                <v-divider v-if="(showHidden || !account.hidden) && account.type === allAccountTypes.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])"/>
+                                <v-divider v-if="(showHidden || !account.hidden) && account.type === AccountType.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])"/>
 
                                 <v-list rounded density="comfortable" class="pa-0 ml-4"
-                                        v-if="(showHidden || !account.hidden) && account.type === allAccountTypes.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])">
+                                        v-if="(showHidden || !account.hidden) && account.type === AccountType.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])">
                                     <template :key="subAccount.id"
                                               v-for="(subAccount, subIdx) in accountCategory.allSubAccounts[account.id]">
                                         <v-divider v-if="showHidden ? subIdx > 0 : (!subAccount.hidden ? subIdx > accountCategory.allFirstVisibleSubAccountIndexes[account.id] : false)"/>
@@ -116,7 +116,7 @@
                                         <v-list-item v-if="showHidden || !subAccount.hidden">
                                             <template #prepend>
                                                 <v-checkbox :model-value="isAccountChecked(subAccount, filterAccountIds)"
-                                                            @update:model-value="selectAccount(subAccount, $event)">
+                                                            @update:model-value="updateAccountSelected(subAccount, $event)">
                                                     <template #label>
                                                         <ItemIcon class="d-flex" icon-type="account" :icon-id="subAccount.icon"
                                                                   :color="subAccount.color" :hidden-status="subAccount.hidden"></ItemIcon>
@@ -136,8 +136,8 @@
 
         <v-card-text class="overflow-y-visible" v-if="dialogMode">
             <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
-                <v-btn :disabled="!hasAnyVisibleAccount" @click="save">{{ $t(applyText) }}</v-btn>
-                <v-btn color="secondary" variant="tonal" @click="cancel">{{ $t('Cancel') }}</v-btn>
+                <v-btn :disabled="!hasAnyVisibleAccount" @click="save">{{ tt(applyText) }}</v-btn>
+                <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
             </div>
         </v-card-text>
     </v-card>
@@ -145,17 +145,20 @@
     <snack-bar ref="snackbar" />
 </template>
 
-<script>
-import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.ts';
+<script setup lang="ts">
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { ref, useTemplateRef } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+import { useAccountFilterSettingPageBase } from '@/views/base/settings/AccountFilterSettingPageBase.ts';
+
 import { useAccountsStore } from '@/stores/account.ts';
-import { useTransactionsStore } from '@/stores/transaction.ts';
-import { useStatisticsStore } from '@/stores/statistics.ts';
 
 import { AccountType, AccountCategory } from '@/core/account.ts';
-import { copyObjectTo } from '@/lib/common.ts';
+import type { Account } from '@/models/account.ts';
+
 import {
-    getCategorizedAccountsWithVisibleCount,
     selectAccountOrSubAccounts,
     selectAll,
     selectNone,
@@ -173,215 +176,117 @@ import {
     mdiDotsVertical
 } from '@mdi/js';
 
-export default {
-    props: [
-        'dialogMode',
-        'type',
-        'autoSave'
-    ],
-    emits: [
-        'settings:change'
-    ],
-    data: function () {
-        return {
-            loading: true,
-            expandAccountCategories: AccountCategory.values().map(category => category.type),
-            filterAccountIds: {},
-            showHidden: false,
-            icons: {
-                selectAll: mdiSelectAll,
-                selectNone: mdiSelect,
-                selectInverse: mdiSelectInverse,
-                show: mdiEyeOutline,
-                hide: mdiEyeOffOutline,
-                more: mdiDotsVertical
-            }
+type SnackBarType = InstanceType<typeof SnackBar>;
+
+const props = defineProps<{
+    type: string;
+    dialogMode?: boolean;
+    autoSave?: boolean;
+}>();
+
+const emit = defineEmits<{
+    (e: 'settings:change', changed: boolean): void;
+}>();
+
+const { tt } = useI18n();
+
+const {
+    loading,
+    showHidden,
+    filterAccountIds,
+    title,
+    applyText,
+    allCategorizedAccounts,
+    hasAnyAvailableAccount,
+    hasAnyVisibleAccount,
+    isAccountChecked,
+    loadFilterAccountIds,
+    saveFilterAccountIds
+} = useAccountFilterSettingPageBase(props.type);
+
+const accountsStore = useAccountsStore();
+
+const icons = {
+    selectAll: mdiSelectAll,
+    selectNone: mdiSelect,
+    selectInverse: mdiSelectInverse,
+    show: mdiEyeOutline,
+    hide: mdiEyeOffOutline,
+    more: mdiDotsVertical
+};
+
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+
+const expandAccountCategories = ref<number[]>(AccountCategory.values().map(category => category.type));
+
+function init(): void {
+    accountsStore.loadAllAccounts({
+        force: false
+    }).then(() => {
+        loading.value = false;
+
+        if (!loadFilterAccountIds()) {
+            snackbar.value?.showError('Parameter Invalid');
         }
-    },
-    computed: {
-        ...mapStores(useSettingsStore, useAccountsStore, useTransactionsStore, useStatisticsStore),
-        title() {
-            if (this.type === 'statisticsDefault') {
-                return 'Default Account Filter';
-            } else {
-                return 'Filter Accounts';
-            }
-        },
-        applyText() {
-            if (this.type === 'statisticsDefault') {
-                return 'Save';
-            } else {
-                return 'Apply';
-            }
-        },
-        allAccountTypes() {
-            return AccountType.all();
-        },
-        allCategorizedAccounts() {
-            return getCategorizedAccountsWithVisibleCount(this.accountsStore.allCategorizedAccountsMap);
-        },
-        hasAnyAvailableAccount() {
-            return this.accountsStore.allAvailableAccountsCount > 0;
-        },
-        hasAnyVisibleAccount() {
-            if (this.showHidden) {
-                return this.accountsStore.allAvailableAccountsCount > 0;
-            } else {
-                return this.accountsStore.allVisibleAccountsCount > 0;
-            }
+    }).catch(error => {
+        loading.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
         }
-    },
-    created() {
-        const self = this;
+    });
+}
 
-        self.accountsStore.loadAllAccounts({
-            force: false
-        }).then(() => {
-            self.loading = false;
+function updateAccountOrSubAccountsSelected(account: Account, value: boolean | null): void {
+    selectAccountOrSubAccounts(filterAccountIds.value, account, !value);
 
-            const allAccountIds = {};
-
-            for (const accountId in self.accountsStore.allAccountsMap) {
-                if (!Object.prototype.hasOwnProperty.call(self.accountsStore.allAccountsMap, accountId)) {
-                    continue;
-                }
-
-                const account = self.accountsStore.allAccountsMap[accountId];
-
-                if (self.type === 'transactionListCurrent' && self.transactionsStore.allFilterAccountIdsCount > 0) {
-                    allAccountIds[account.id] = true;
-                } else {
-                    allAccountIds[account.id] = false;
-                }
-            }
-
-            if (self.type === 'statisticsDefault') {
-                self.filterAccountIds = copyObjectTo(self.settingsStore.appSettings.statistics.defaultAccountFilter, allAccountIds);
-            } else if (self.type === 'statisticsCurrent') {
-                self.filterAccountIds = copyObjectTo(self.statisticsStore.transactionStatisticsFilter.filterAccountIds, allAccountIds);
-            } else if (self.type === 'transactionListCurrent') {
-                for (const accountId in self.transactionsStore.allFilterAccountIds) {
-                    if (!Object.prototype.hasOwnProperty.call(self.transactionsStore.allFilterAccountIds, accountId)) {
-                        continue;
-                    }
-
-                    const account = self.accountsStore.allAccountsMap[accountId];
-
-                    if (account) {
-                        selectAccountOrSubAccounts(allAccountIds, account, false);
-                    }
-                }
-                self.filterAccountIds = allAccountIds;
-            } else {
-                self.$refs.snackbar.showError('Parameter Invalid');
-            }
-        }).catch(error => {
-            self.loading = false;
-
-            if (!error.processed) {
-                self.$refs.snackbar.showError(error);
-            }
-        });
-    },
-    methods: {
-        save() {
-            const self = this;
-
-            const filteredAccountIds = {};
-            let isAllSelected = true;
-            let finalAccountIds = '';
-            let changed = true;
-
-            for (const accountId in self.filterAccountIds) {
-                if (!Object.prototype.hasOwnProperty.call(self.filterAccountIds, accountId)) {
-                    continue;
-                }
-
-                const account = self.accountsStore.allAccountsMap[accountId];
-
-                if (!isAccountOrSubAccountsAllChecked(account, self.filterAccountIds)) {
-                    filteredAccountIds[accountId] = true;
-                    isAllSelected = false;
-                } else {
-                    if (finalAccountIds.length > 0) {
-                        finalAccountIds += ',';
-                    }
-
-                    finalAccountIds += accountId;
-                }
-            }
-
-            if (this.type === 'statisticsDefault') {
-                self.settingsStore.setStatisticsDefaultAccountFilter(filteredAccountIds);
-            } else if (this.type === 'statisticsCurrent') {
-                changed = self.statisticsStore.updateTransactionStatisticsFilter({
-                    filterAccountIds: filteredAccountIds
-                });
-
-                if (changed) {
-                    self.statisticsStore.updateTransactionStatisticsInvalidState(true);
-                }
-            } else if (this.type === 'transactionListCurrent') {
-                changed = self.transactionsStore.updateTransactionListFilter({
-                    accountIds: isAllSelected ? '' : finalAccountIds
-                });
-
-                if (changed) {
-                    self.transactionsStore.updateTransactionListInvalidState(true);
-                }
-            }
-
-            self.$emit('settings:change', changed);
-        },
-        cancel() {
-            this.$emit('settings:change', false);
-        },
-        selectAccountOrSubAccounts(account, value) {
-            selectAccountOrSubAccounts(this.filterAccountIds, account, !value);
-
-            if (this.autoSave) {
-                this.save();
-            }
-        },
-        selectAccount(account, value) {
-            this.filterAccountIds[account.id] = !value;
-
-            if (this.autoSave) {
-                this.save();
-            }
-        },
-        selectAll() {
-            selectAll(this.filterAccountIds, this.accountsStore.allAccountsMap);
-
-            if (this.autoSave) {
-                this.save();
-            }
-        },
-        selectNone() {
-            selectNone(this.filterAccountIds, this.accountsStore.allAccountsMap);
-
-            if (this.autoSave) {
-                this.save();
-            }
-        },
-        selectInvert() {
-            selectInvert(this.filterAccountIds, this.accountsStore.allAccountsMap);
-
-            if (this.autoSave) {
-                this.save();
-            }
-        },
-        isAccountChecked(account, filterAccountIds) {
-            return !filterAccountIds[account.id];
-        },
-        isAccountOrSubAccountsAllChecked(account, filterAccountIds) {
-            return isAccountOrSubAccountsAllChecked(account, filterAccountIds);
-        },
-        isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds) {
-            return isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds);
-        }
+    if (props.autoSave) {
+        save();
     }
 }
+
+function updateAccountSelected(account: Account, value: boolean | null): void {
+    filterAccountIds.value[account.id] = !value;
+
+    if (props.autoSave) {
+        save();
+    }
+}
+
+function selectAllAccounts(): void {
+    selectAll(filterAccountIds.value, accountsStore.allAccountsMap);
+
+    if (props.autoSave) {
+        save();
+    }
+}
+
+function selectNoneAccounts(): void {
+    selectNone(filterAccountIds.value, accountsStore.allAccountsMap);
+
+    if (props.autoSave) {
+        save();
+    }
+}
+
+function selectInvertAccounts(): void {
+    selectInvert(filterAccountIds.value, accountsStore.allAccountsMap);
+
+    if (props.autoSave) {
+        save();
+    }
+}
+
+function save(): void {
+    const changed = saveFilterAccountIds();
+    emit('settings:change', changed);
+}
+
+function cancel(): void {
+    emit('settings:change', false);
+}
+
+init();
 </script>
 
 <style>

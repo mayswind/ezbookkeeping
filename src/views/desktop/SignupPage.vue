@@ -20,213 +20,227 @@
             </v-col>
             <v-col cols="12" md="8" class="auth-card d-flex align-center justify-center pa-10">
                 <v-card variant="flat" class="mt-12 mt-sm-0 pt-sm-12 pt-md-0">
-                    <steps-bar min-width="700" :steps="allSteps" :current-step="currentStep" @step:change="switchToTab" />
+                    <template v-if="isUserRegistrationEnabled()">
+                        <steps-bar min-width="700" :steps="allSteps" :current-step="currentStep" @step:change="switchToTab" />
+                        <v-window class="mt-5 disable-tab-transition" style="max-width: 700px" v-model="currentStep">
+                            <v-form>
+                                <v-window-item value="basicSetting">
+                                    <h4 class="text-h4 mb-1">{{ tt('Basic Information') }}</h4>
+                                    <p class="text-sm mt-2 mb-5">
+                                        <span>{{ tt('Already have an account?') }}</span>
+                                        <router-link class="ml-1" to="/login">{{ tt('Click here to log in') }}</router-link>
+                                    </p>
+                                    <v-row>
+                                        <v-col cols="12" md="6">
+                                            <v-text-field
+                                                type="text"
+                                                autocomplete="username"
+                                                :disabled="submitting || navigateToHomePage"
+                                                :label="tt('Username')"
+                                                :placeholder="tt('Your username')"
+                                                v-model="user.username"
+                                            />
+                                        </v-col>
 
-                    <v-window class="mt-5 disable-tab-transition" style="max-width: 700px" v-model="currentStep">
-                        <v-form>
-                            <v-window-item value="basicSetting">
-                                <h4 class="text-h4 mb-1">{{ tt('Basic Information') }}</h4>
-                                <p class="text-sm mt-2 mb-5">
-                                    <span>{{ tt('Already have an account?') }}</span>
-                                    <router-link class="ml-1" to="/login">{{ tt('Click here to log in') }}</router-link>
-                                </p>
-                                <v-row>
-                                    <v-col cols="12" md="6">
-                                        <v-text-field
-                                            type="text"
-                                            autocomplete="username"
-                                            :disabled="submitting || navigateToHomePage"
-                                            :label="tt('Username')"
-                                            :placeholder="tt('Your username')"
-                                            v-model="user.username"
-                                        />
-                                    </v-col>
-
-                                    <v-col cols="12" md="6">
-                                        <v-text-field
-                                            type="text"
-                                            autocomplete="nickname"
-                                            :disabled="submitting || navigateToHomePage"
-                                            :label="tt('Nickname')"
-                                            :placeholder="tt('Your nickname')"
-                                            v-model="user.nickname"
-                                        />
-                                    </v-col>
-                                </v-row>
-                                <v-row>
-                                    <v-col cols="12" md="12">
-                                        <v-text-field
-                                            type="email"
-                                            autocomplete="email"
-                                            :disabled="submitting || navigateToHomePage"
-                                            :label="tt('E-mail')"
-                                            :placeholder="tt('Your email address')"
-                                            v-model="user.email"
-                                        />
-                                    </v-col>
-                                </v-row>
-                                <v-row>
-                                    <v-col cols="12" md="6">
-                                        <v-text-field
-                                            autocomplete="new-password"
-                                            type="password"
-                                            :disabled="submitting || navigateToHomePage"
-                                            :label="tt('Password')"
-                                            :placeholder="tt('Your password, at least 6 characters')"
-                                            v-model="user.password"
-                                        />
-                                    </v-col>
-                                    <v-col cols="12" md="6">
-                                        <v-text-field
-                                            autocomplete="new-password"
-                                            type="password"
-                                            :disabled="submitting || navigateToHomePage"
-                                            :label="tt('Confirm Password')"
-                                            :placeholder="tt('Re-enter the password')"
-                                            v-model="user.confirmPassword"
-                                        />
-                                    </v-col>
-                                </v-row>
-
-                                <v-row>
-                                    <v-col cols="12" md="12">
-                                        <v-select
-                                            item-title="displayName"
-                                            item-value="languageTag"
-                                            :disabled="submitting || navigateToHomePage"
-                                            :label="tt('Language')"
-                                            :placeholder="tt('Language')"
-                                            :items="allLanguages"
-                                            v-model="currentLocale"
-                                        />
-                                    </v-col>
-                                </v-row>
-
-                                <v-row>
-                                    <v-col cols="12" md="6">
-                                        <v-autocomplete
-                                            item-title="displayName"
-                                            item-value="currencyCode"
-                                            auto-select-first
-                                            :disabled="submitting || navigateToHomePage"
-                                            :label="tt('Default Currency')"
-                                            :placeholder="tt('Default Currency')"
-                                            :items="allCurrencies"
-                                            :no-data-text="tt('No results')"
-                                            v-model="user.defaultCurrency"
-                                        >
-                                            <template #append-inner>
-                                                <small class="text-field-append-text smaller">{{ user.defaultCurrency }}</small>
-                                            </template>
-                                        </v-autocomplete>
-                                    </v-col>
-
-                                    <v-col cols="12" md="6">
-                                        <v-select
-                                            item-title="displayName"
-                                            item-value="type"
-                                            :disabled="submitting || navigateToHomePage"
-                                            :label="tt('First Day of Week')"
-                                            :placeholder="tt('First Day of Week')"
-                                            :items="allWeekDays"
-                                            v-model="user.firstDayOfWeek"
-                                        />
-                                    </v-col>
-                                </v-row>
-                            </v-window-item>
-
-                            <v-window-item value="presetCategories" class="signup-preset-categories">
-                                <h4 class="text-h4 mb-1">{{ tt('Preset Categories') }}</h4>
-                                <p class="text-sm mt-2 mb-2">{{ tt('Set whether to use preset transaction categories') }}</p>
-
-                                <v-row>
-                                    <v-col cols="12" sm="6">
-                                        <v-switch class="mb-2" :disabled="submitting || navigateToHomePage"
-                                                  :label="tt('Use Preset Transaction Categories')"
-                                                  v-model="usePresetCategories"/>
-                                    </v-col>
-                                    <v-col cols="12" sm="6" class="text-right-sm">
-                                        <v-menu location="bottom">
-                                            <template #activator="{ props }">
-                                                <v-btn variant="text"
-                                                       :disabled="submitting || navigateToHomePage"
-                                                       v-bind="props">{{ currentLanguageName }}</v-btn>
-                                            </template>
-                                            <v-list>
-                                                <v-list-item v-for="lang in allLanguages" :key="lang.languageTag">
-                                                    <v-list-item-title
-                                                        class="cursor-pointer"
-                                                        @click="currentLocale = lang.languageTag">
-                                                        {{ lang.displayName }}
-                                                    </v-list-item-title>
-                                                </v-list-item>
-                                            </v-list>
-                                        </v-menu>
-                                    </v-col>
-                                </v-row>
-
-                                <div class="overflow-y-auto px-3" :class="{ 'disabled': !usePresetCategories || submitting || navigateToHomePage }" style="max-height: 323px">
-                                    <v-row :key="categoryType" v-for="(categories, categoryType) in allPresetCategories">
-                                        <v-col cols="12" md="12">
-                                            <h4 class="mb-3">{{ getCategoryTypeName(categoryType) }}</h4>
-
-                                            <v-expansion-panels class="border rounded" variant="accordion" multiple>
-                                                <v-expansion-panel :key="idx" v-for="(category, idx) in categories">
-                                                    <v-expansion-panel-title class="py-0">
-                                                        <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
-                                                        <span class="ml-3">{{ category.name }}</span>
-                                                    </v-expansion-panel-title>
-                                                    <v-expansion-panel-text v-if="category.subCategories.length">
-                                                        <v-list rounded density="comfortable" class="pa-0">
-                                                            <template :key="subIdx"
-                                                                      v-for="(subCategory, subIdx) in category.subCategories">
-                                                                <v-list-item>
-                                                                    <template #prepend>
-                                                                        <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
-                                                                    </template>
-                                                                    <span class="ml-3">{{ subCategory.name }}</span>
-                                                                </v-list-item>
-                                                                <v-divider v-if="subIdx !== category.subCategories.length - 1"/>
-                                                            </template>
-                                                        </v-list>
-                                                    </v-expansion-panel-text>
-                                                </v-expansion-panel>
-                                            </v-expansion-panels>
+                                        <v-col cols="12" md="6">
+                                            <v-text-field
+                                                type="text"
+                                                autocomplete="nickname"
+                                                :disabled="submitting || navigateToHomePage"
+                                                :label="tt('Nickname')"
+                                                :placeholder="tt('Your nickname')"
+                                                v-model="user.nickname"
+                                            />
                                         </v-col>
                                     </v-row>
-                                </div>
-                            </v-window-item>
+                                    <v-row>
+                                        <v-col cols="12" md="12">
+                                            <v-text-field
+                                                type="email"
+                                                autocomplete="email"
+                                                :disabled="submitting || navigateToHomePage"
+                                                :label="tt('E-mail')"
+                                                :placeholder="tt('Your email address')"
+                                                v-model="user.email"
+                                            />
+                                        </v-col>
+                                    </v-row>
+                                    <v-row>
+                                        <v-col cols="12" md="6">
+                                            <v-text-field
+                                                autocomplete="new-password"
+                                                type="password"
+                                                :disabled="submitting || navigateToHomePage"
+                                                :label="tt('Password')"
+                                                :placeholder="tt('Your password, at least 6 characters')"
+                                                v-model="user.password"
+                                            />
+                                        </v-col>
+                                        <v-col cols="12" md="6">
+                                            <v-text-field
+                                                autocomplete="new-password"
+                                                type="password"
+                                                :disabled="submitting || navigateToHomePage"
+                                                :label="tt('Confirm Password')"
+                                                :placeholder="tt('Re-enter the password')"
+                                                v-model="user.confirmPassword"
+                                            />
+                                        </v-col>
+                                    </v-row>
 
-                            <v-window-item value="finalResult" v-if="finalResultMessage">
-                                <h4 class="text-h4 mb-1">{{ tt('Registration Completed') }}</h4>
-                                <p class="my-5">{{ finalResultMessage }}</p>
-                            </v-window-item>
-                        </v-form>
-                    </v-window>
+                                    <v-row>
+                                        <v-col cols="12" md="12">
+                                            <v-select
+                                                item-title="displayName"
+                                                item-value="languageTag"
+                                                :disabled="submitting || navigateToHomePage"
+                                                :label="tt('Language')"
+                                                :placeholder="tt('Language')"
+                                                :items="allLanguages"
+                                                v-model="currentLocale"
+                                            />
+                                        </v-col>
+                                    </v-row>
 
-                    <div class="d-flex justify-sm-space-between gap-4 flex-wrap justify-center mt-5">
-                        <v-btn :color="(currentStep === 'basicSetting' || currentStep === 'finalResult') ? 'default' : 'primary'"
-                               :disabled="currentStep === 'basicSetting' || currentStep === 'finalResult' || submitting || navigateToHomePage"
-                               :prepend-icon="icons.previous"
-                               @click="switchToPreviousTab">{{ tt('Previous') }}</v-btn>
-                        <v-btn :color="(currentStep === 'presetCategories' || currentStep === 'finalResult') ? 'secondary' : 'primary'"
-                               :disabled="currentStep === 'presetCategories' || currentStep === 'finalResult' || submitting || navigateToHomePage"
-                               :append-icon="icons.next"
-                               @click="switchToNextTab"
-                               v-if="currentStep === 'basicSetting'">{{ tt('Next') }}</v-btn>
-                        <v-btn color="teal"
-                               :disabled="submitting || navigateToHomePage"
-                               :append-icon="!submitting ? icons.submit : null"
-                               @click="submit"
-                               v-if="currentStep === 'presetCategories'">
-                            {{ tt('Submit') }}
-                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
-                        </v-btn>
-                        <v-btn :append-icon="icons.next"
-                               @click="navigateToLogin"
-                               v-if="currentStep === 'finalResult'">{{ tt('Continue') }}</v-btn>
-                    </div>
+                                    <v-row>
+                                        <v-col cols="12" md="6">
+                                            <v-autocomplete
+                                                item-title="displayName"
+                                                item-value="currencyCode"
+                                                auto-select-first
+                                                :disabled="submitting || navigateToHomePage"
+                                                :label="tt('Default Currency')"
+                                                :placeholder="tt('Default Currency')"
+                                                :items="allCurrencies"
+                                                :no-data-text="tt('No results')"
+                                                v-model="user.defaultCurrency"
+                                            >
+                                                <template #append-inner>
+                                                    <small class="text-field-append-text smaller">{{ user.defaultCurrency }}</small>
+                                                </template>
+                                            </v-autocomplete>
+                                        </v-col>
+
+                                        <v-col cols="12" md="6">
+                                            <v-select
+                                                item-title="displayName"
+                                                item-value="type"
+                                                :disabled="submitting || navigateToHomePage"
+                                                :label="tt('First Day of Week')"
+                                                :placeholder="tt('First Day of Week')"
+                                                :items="allWeekDays"
+                                                v-model="user.firstDayOfWeek"
+                                            />
+                                        </v-col>
+                                    </v-row>
+                                </v-window-item>
+
+                                <v-window-item value="presetCategories" class="signup-preset-categories">
+                                    <h4 class="text-h4 mb-1">{{ tt('Preset Categories') }}</h4>
+                                    <p class="text-sm mt-2 mb-2">{{ tt('Set whether to use preset transaction categories') }}</p>
+
+                                    <v-row>
+                                        <v-col cols="12" sm="6">
+                                            <v-switch class="mb-2" :disabled="submitting || navigateToHomePage"
+                                                    :label="tt('Use Preset Transaction Categories')"
+                                                    v-model="usePresetCategories"/>
+                                        </v-col>
+                                        <v-col cols="12" sm="6" class="text-right-sm">
+                                            <v-menu location="bottom">
+                                                <template #activator="{ props }">
+                                                    <v-btn variant="text"
+                                                        :disabled="submitting || navigateToHomePage"
+                                                        v-bind="props">{{ currentLanguageName }}</v-btn>
+                                                </template>
+                                                <v-list>
+                                                    <v-list-item v-for="lang in allLanguages" :key="lang.languageTag">
+                                                        <v-list-item-title
+                                                            class="cursor-pointer"
+                                                            @click="currentLocale = lang.languageTag">
+                                                            {{ lang.displayName }}
+                                                        </v-list-item-title>
+                                                    </v-list-item>
+                                                </v-list>
+                                            </v-menu>
+                                        </v-col>
+                                    </v-row>
+
+                                    <div class="overflow-y-auto px-3" :class="{ 'disabled': !usePresetCategories || submitting || navigateToHomePage }" style="max-height: 323px">
+                                        <v-row :key="categoryType" v-for="(categories, categoryType) in allPresetCategories">
+                                            <v-col cols="12" md="12">
+                                                <h4 class="mb-3">{{ getCategoryTypeName(categoryType) }}</h4>
+
+                                                <v-expansion-panels class="border rounded" variant="accordion" multiple>
+                                                    <v-expansion-panel :key="idx" v-for="(category, idx) in categories">
+                                                        <v-expansion-panel-title class="py-0">
+                                                            <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
+                                                            <span class="ml-3">{{ category.name }}</span>
+                                                        </v-expansion-panel-title>
+                                                        <v-expansion-panel-text v-if="category.subCategories.length">
+                                                            <v-list rounded density="comfortable" class="pa-0">
+                                                                <template :key="subIdx"
+                                                                        v-for="(subCategory, subIdx) in category.subCategories">
+                                                                    <v-list-item>
+                                                                        <template #prepend>
+                                                                            <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
+                                                                        </template>
+                                                                        <span class="ml-3">{{ subCategory.name }}</span>
+                                                                    </v-list-item>
+                                                                    <v-divider v-if="subIdx !== category.subCategories.length - 1"/>
+                                                                </template>
+                                                            </v-list>
+                                                        </v-expansion-panel-text>
+                                                    </v-expansion-panel>
+                                                </v-expansion-panels>
+                                            </v-col>
+                                        </v-row>
+                                    </div>
+                                </v-window-item>
+
+                                <v-window-item value="finalResult" v-if="finalResultMessage">
+                                    <h4 class="text-h4 mb-1">{{ tt('Registration Completed') }}</h4>
+                                    <p class="my-5">{{ finalResultMessage }}</p>
+                                </v-window-item>
+                            </v-form>
+                        </v-window>
+                        <div class="d-flex justify-sm-space-between gap-4 flex-wrap justify-center mt-5">
+                            <v-btn :color="(currentStep === 'basicSetting' || currentStep === 'finalResult') ? 'default' : 'primary'"
+                                :disabled="currentStep === 'basicSetting' || currentStep === 'finalResult' || submitting || navigateToHomePage"
+                                :prepend-icon="icons.previous"
+                                @click="switchToPreviousTab">{{ tt('Previous') }}</v-btn>
+                            <v-btn :color="(currentStep === 'presetCategories' || currentStep === 'finalResult') ? 'secondary' : 'primary'"
+                                :disabled="currentStep === 'presetCategories' || currentStep === 'finalResult' || submitting || navigateToHomePage"
+                                :append-icon="icons.next"
+                                @click="switchToNextTab"
+                                v-if="currentStep === 'basicSetting'">{{ tt('Next') }}</v-btn>
+                            <v-btn color="teal"
+                                :disabled="submitting || navigateToHomePage"
+                                :append-icon="!submitting ? icons.submit : null"
+                                @click="submit"
+                                v-if="currentStep === 'presetCategories'">
+                                {{ tt('Submit') }}
+                                <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
+                            </v-btn>
+                            <v-btn :append-icon="icons.next"
+                                @click="navigateToLogin"
+                                v-if="currentStep === 'finalResult'">{{ tt('Continue') }}</v-btn>
+                        </div>
+                    </template>
+
+                    <template v-else>
+                        <div class="d-flex justify-sm-space-between gap-4 flex-wrap justify-center mt-5">
+                            <v-col cols="12">
+                                <p>{{ tt('User registration is disabled') }}</p>
+                            </v-col>
+                            <v-col cols="12">
+                                <v-btn :color="primary"
+                                :prepend-icon="icons.previous"
+                                to="/login">{{ tt('Back to login page') }}</v-btn>
+                            </v-col>
+                        </div>
+                    </template>
                 </v-card>
+
             </v-col>
         </v-row>
 
@@ -247,6 +261,8 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useSignupPageBase } from '@/views/base/SignupPageBase.ts';
 
 import { useRootStore } from '@/stores/index.ts';
+
+import { isUserRegistrationEnabled } from '@/lib/server_settings.ts';
 
 import type { PartialRecord, TypeAndDisplayName } from '@/core/base.ts';
 import type { LocalizedCurrencyInfo } from '@/core/currency.ts';

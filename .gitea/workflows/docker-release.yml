@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: |
             ${{ secrets.DOCKER_REPO }}/mayswind/ezbookkeeping
@@ -24,10 +24,10 @@ jobs:
             type=raw,value=latest
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Set up the environment
         run: |
@@ -44,7 +44,7 @@ jobs:
           chmod +x docker/custom-frontend-pre-setup.sh
 
       - name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           file: Dockerfile
           context: .

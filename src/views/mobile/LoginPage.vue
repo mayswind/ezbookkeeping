@@ -48,9 +48,9 @@
 
         <f7-list class="margin-vertical-half">
             <f7-list-button :class="{ 'disabled': inputIsEmpty || logining }" :text="tt('Log In')" @click="login"></f7-list-button>
-            <f7-block-footer>
+            <f7-block-footer v-if="isUserRegistrationEnabled()">
                 <span>{{ tt('Don\'t have an account?') }}</span>&nbsp;
-                <f7-link :class="{'disabled': !isUserRegistrationEnabled()}" href="/signup" :text="tt('Create an account')"></f7-link>
+                <f7-link href="/signup" :text="tt('Create an account')"></f7-link>
             </f7-block-footer>
             <f7-block-footer class="padding-bottom">
             </f7-block-footer>

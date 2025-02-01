@@ -1409,6 +1409,7 @@
     "Unable to resend validation email": "Unable to resend validation email",
     "Send Reset Link": "Send Reset Link",
     "Please enter your email address used for registration and we'll send you an email with a reset password link": "Please enter your email address used for registration and we'll send you an email with a reset password link",
+    "Resetting passwords is not enabled. Please contact the administrator for assistance": "Resetting passwords is not enabled. Please contact the administrator for assistance",
     "Password reset email has been sent": "Password reset email has been sent",
     "Unable to send password reset email": "Unable to send password reset email",
     "Reset Password": "Reset Password",

@@ -23,41 +23,59 @@
                     <v-card variant="flat" class="w-100 mt-0 px-4 pt-12" max-width="500">
                         <v-card-text>
                             <h4 class="text-h4 mb-2">{{ tt('Forget Password?') }}</h4>
-                            <p class="mb-0">{{ tt('Please enter your email address used for registration and we\'ll send you an email with a reset password link') }}</p>
                         </v-card-text>
-
+                        
                         <v-card-text class="pb-0 mb-6">
-                            <v-form>
+                            <template v-if="isUserForgetPasswordEnabled()">
+                                <v-form>
+                                    <v-row>
+                                        <v-col cols="12">
+                                            <p class="mb-0">{{ tt('Please enter your email address used for registration and we\'ll send you an email with a reset password link') }}</p>
+                                        </v-col>
+                                        <v-col cols="12">
+                                            <v-text-field
+                                                type="email"
+                                                autocomplete="email"
+                                                autofocus="autofocus"
+                                                :disabled="requesting"
+                                                :label="tt('E-mail')"
+                                                :placeholder="tt('Your email address')"
+                                                v-model="email"
+                                                @keyup.enter="requestResetPassword"
+                                            />
+                                        </v-col>
+
+                                        <v-col cols="12">
+                                            <v-btn block type="submit" :disabled="!email || requesting" @click="requestResetPassword">
+                                                {{ tt('Send Reset Link') }}
+                                                <v-progress-circular indeterminate size="22" class="ml-2" v-if="requesting"></v-progress-circular>
+                                            </v-btn>
+                                        </v-col>
+
+                                        <v-col cols="12">
+                                            <router-link class="d-flex align-center justify-center" to="/login"
+                                                        :class="{ 'disabled': requesting }">
+                                                <v-icon :icon="icons.left"/>
+                                                <span>{{ tt('Back to login page') }}</span>
+                                            </router-link>
+                                        </v-col>
+                                    </v-row>
+                                </v-form>
+                            </template>
+                            <template v-else>
                                 <v-row>
                                     <v-col cols="12">
-                                        <v-text-field
-                                            type="email"
-                                            autocomplete="email"
-                                            autofocus="autofocus"
-                                            :disabled="requesting"
-                                            :label="tt('E-mail')"
-                                            :placeholder="tt('Your email address')"
-                                            v-model="email"
-                                            @keyup.enter="requestResetPassword"
-                                        />
+                                        <p class="mb-0">{{ tt('Resetting passwords is not enabled. Please contact the administrator for assistance.') }}</p>
                                     </v-col>
-
                                     <v-col cols="12">
-                                        <v-btn block type="submit" :disabled="!email || requesting" @click="requestResetPassword">
-                                            {{ tt('Send Reset Link') }}
-                                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="requesting"></v-progress-circular>
-                                        </v-btn>
-                                    </v-col>
-
-                                    <v-col cols="12">
-                                        <router-link class="d-flex align-center justify-center" to="/login"
-                                                     :class="{ 'disabled': requesting }">
+                                        <router-link class="d-flex align-center justify-center" to="/login">
                                             <v-icon :icon="icons.left"/>
                                             <span>{{ tt('Back to login page') }}</span>
                                         </router-link>
                                     </v-col>
                                 </v-row>
-                            </v-form>
+                            </template>
+
                         </v-card-text>
                     </v-card>
                 </div>
@@ -118,6 +136,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useRootStore } from '@/stores/index.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
 
+import { isUserForgetPasswordEnabled } from '@/lib/server_settings.ts';
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { getVersion } from '@/lib/version.ts';

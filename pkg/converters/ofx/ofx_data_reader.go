@@ -20,8 +20,9 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
-const ofxUnicodeEncoding = "unicode"
-const ofxUSAsciiEncoding = "usascii"
+const ofx1USAsciiEncoding = "usascii"
+const ofx1UnicodeEncoding = "unicode"
+const ofx1UTF8Encoding = "utf8" // non-standard ofx 1.x encoding, used by some banks (https://github.com/mayswind/ezbookkeeping/issues/48)
 const ofx1SGMLDataFormat = "OFXSGML"
 
 var ofx2HeaderPattern = regexp.MustCompile("<\\?OFX( +[A-Z]+=\"[^=]*\")* *\\?>")
@@ -231,7 +232,7 @@ func readOFX1FileHeader(ctx core.Context, data []byte) (fileHeader *ofxFileHeade
 		}
 	}
 
-	if fileEncoding == ofxUSAsciiEncoding {
+	if fileEncoding == ofx1USAsciiEncoding {
 		if utils.IsStringOnlyContainsDigits(fileCharset) {
 			fileCharset = "cp" + fileCharset
 		}
@@ -245,11 +246,17 @@ func readOFX1FileHeader(ctx core.Context, data []byte) (fileHeader *ofxFileHeade
 		if enc == nil {
 			enc = charmap.Windows1252
 		}
-	} else if fileEncoding == ofxUnicodeEncoding {
-		enc, _ = charset.Lookup(ofxUnicodeEncoding)
+	} else if fileEncoding == ofx1UnicodeEncoding {
+		enc, _ = charset.Lookup(ofx1UnicodeEncoding)
 
 		if enc == nil {
 			enc = unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
+		}
+	} else if fileEncoding == ofx1UTF8Encoding {
+		enc, _ = charset.Lookup(ofx1UTF8Encoding)
+
+		if enc == nil {
+			enc = unicode.UTF8
 		}
 	} else {
 		log.Errorf(ctx, "[ofx_data_reader.readOFX1FileHeader] cannot parse ofx 1.x file, because encoding \"%s\" is unknown", fileEncoding)

@@ -3,7 +3,7 @@
         <template #title>
             <div class="d-flex align-center justify-center" v-if="dialogMode">
                 <div class="w-100 text-center">
-                    <h4 class="text-h4">{{ $t(title) }}</h4>
+                    <h4 class="text-h4">{{ tt(title) }}</h4>
                 </div>
                 <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                        :disabled="loading || !hasAnyAvailableTag" :icon="true">
@@ -11,30 +11,30 @@
                     <v-menu activator="parent">
                         <v-list>
                             <v-list-item :prepend-icon="icons.selectAll"
-                                         :title="$t('Select All')"
+                                         :title="tt('Select All')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="selectAll"></v-list-item>
+                                         @click="selectAllTransactionTags"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectNone"
-                                         :title="$t('Select None')"
+                                         :title="tt('Select None')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="selectNone"></v-list-item>
+                                         @click="selectNoneTransactionTags"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectInverse"
-                                         :title="$t('Invert Selection')"
+                                         :title="tt('Invert Selection')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="selectInvert"></v-list-item>
+                                         @click="selectInvertTransactionTags"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="icons.show"
-                                         :title="$t('Show Hidden Transaction Tags')"
+                                         :title="tt('Show Hidden Transaction Tags')"
                                          v-if="!showHidden" @click="showHidden = true"></v-list-item>
                             <v-list-item :prepend-icon="icons.hide"
-                                         :title="$t('Hide Hidden Transaction Tags')"
+                                         :title="tt('Hide Hidden Transaction Tags')"
                                          v-if="showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
                     </v-menu>
                 </v-btn>
             </div>
             <div class="d-flex align-center" v-else-if="!dialogMode">
-                <span>{{ $t(title) }}</span>
+                <span>{{ tt(title) }}</span>
                 <v-spacer/>
                 <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                        :disabled="loading" :icon="true">
@@ -42,23 +42,23 @@
                     <v-menu activator="parent">
                         <v-list>
                             <v-list-item :prepend-icon="icons.selectAll"
-                                         :title="$t('Select All')"
+                                         :title="tt('Select All')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="selectAll"></v-list-item>
+                                         @click="selectAllTransactionTags"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectNone"
-                                         :title="$t('Select None')"
+                                         :title="tt('Select None')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="selectNone"></v-list-item>
+                                         @click="selectNoneTransactionTags"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectInverse"
-                                         :title="$t('Invert Selection')"
+                                         :title="tt('Invert Selection')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="selectInvert"></v-list-item>
+                                         @click="selectInvertTransactionTags"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="icons.show"
-                                         :title="$t('Show Hidden Transaction Tags')"
+                                         :title="tt('Show Hidden Transaction Tags')"
                                          v-if="!showHidden" @click="showHidden = true"></v-list-item>
                             <v-list-item :prepend-icon="icons.hide"
-                                         :title="$t('Hide Hidden Transaction Tags')"
+                                         :title="tt('Hide Hidden Transaction Tags')"
                                          v-if="showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
                     </v-menu>
@@ -72,7 +72,7 @@
         </div>
 
         <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-if="!loading && !hasAnyVisibleTag">
-            <span class="text-body-1">{{ $t('No available tag') }}</span>
+            <span class="text-body-1">{{ tt('No available tag') }}</span>
         </v-card-text>
 
         <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-else-if="!loading && hasAnyVisibleTag">
@@ -80,7 +80,7 @@
                 <v-btn border class="justify-start" :key="filterType.type"
                        :color="tagFilterType === filterType.type ? 'primary' : 'default'"
                        :variant="tagFilterType === filterType.type ? 'tonal' : 'outlined'"
-                       :append-icon="(tagFilterType === filterType.type ? icons.check : null)"
+                       :append-icon="(tagFilterType === filterType.type ? icons.check : undefined)"
                        v-for="filterType in allTagFilterTypes"
                        @click="tagFilterType = filterType.type">
                     {{ filterType.displayName }}
@@ -90,7 +90,7 @@
             <v-expansion-panels class="tag-categories" multiple v-model="expandTagCategories">
                 <v-expansion-panel class="border" key="default" value="default">
                     <v-expansion-panel-title class="expand-panel-title-with-bg py-0">
-                        <span class="ml-3">{{ $t('Tags') }}</span>
+                        <span class="ml-3">{{ tt('Tags') }}</span>
                     </v-expansion-panel-title>
                     <v-expansion-panel-text>
                         <v-list rounded density="comfortable" class="pa-0">
@@ -99,7 +99,7 @@
                                 <v-list-item v-if="showHidden || !transactionTag.hidden">
                                     <template #prepend>
                                         <v-checkbox :model-value="!filterTagIds[transactionTag.id]"
-                                                    @update:model-value="selectTransactionTag(transactionTag, $event)">
+                                                    @update:model-value="updateTransactionTagSelected(transactionTag, $event)">
                                             <template #label>
                                                 <v-badge class="right-bottom-icon" color="secondary"
                                                          location="bottom right" offset-x="2" offset-y="2" :icon="icons.hide"
@@ -121,8 +121,8 @@
 
         <v-card-text class="overflow-y-visible" v-if="dialogMode">
             <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
-                <v-btn :disabled="!hasAnyVisibleTag" @click="save">{{ $t(applyText) }}</v-btn>
-                <v-btn color="secondary" variant="tonal" @click="cancel">{{ $t('Cancel') }}</v-btn>
+                <v-btn :disabled="!hasAnyVisibleTag" @click="save">{{ tt(applyText) }}</v-btn>
+                <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
             </div>
         </v-card-text>
     </v-card>
@@ -130,13 +130,17 @@
     <snack-bar ref="snackbar" />
 </template>
 
-<script>
-import { mapStores } from 'pinia';
-import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
-import { useTransactionsStore } from '@/stores/transaction.ts';
-import { useStatisticsStore } from '@/stores/statistics.ts';
+<script setup lang="ts">
+import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { TransactionTagFilterType } from '@/core/transaction.ts';
+import { ref, useTemplateRef } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+import { useTransactionTagFilterSettingPageBase } from '@/views/base/settings/TransactionTagFilterSettingPageBase.ts';
+
+import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
+
+import type { TransactionTag } from '@/models/transaction_tag.ts';
 
 import {
     selectAll,
@@ -155,195 +159,112 @@ import {
     mdiPound
 } from '@mdi/js';
 
-export default {
-    props: [
-        'dialogMode',
-        'type',
-        'autoSave'
-    ],
-    emits: [
-        'settings:change'
-    ],
-    data: function () {
-        return {
-            loading: true,
-            expandTagCategories: [ 'default' ],
-            filterTagIds: {},
-            tagFilterType: TransactionTagFilterType.Default.type,
-            showHidden: false,
-            icons: {
-                selectAll: mdiSelectAll,
-                selectNone: mdiSelect,
-                selectInverse: mdiSelectInverse,
-                show: mdiEyeOutline,
-                hide: mdiEyeOffOutline,
-                more: mdiDotsVertical,
-                check: mdiCheck,
-                tag: mdiPound
-            }
+type SnackBarType = InstanceType<typeof SnackBar>;
+
+const props = defineProps<{
+    type: string;
+    dialogMode?: boolean;
+    autoSave?: boolean;
+}>();
+
+const emit = defineEmits<{
+    (e: 'settings:change', changed: boolean): void;
+}>();
+
+const { tt } = useI18n();
+
+const {
+    loading,
+    showHidden,
+    filterTagIds,
+    tagFilterType,
+    title,
+    applyText,
+    allTags,
+    allTagFilterTypes,
+    hasAnyAvailableTag,
+    hasAnyVisibleTag,
+    loadFilterTagIds,
+    saveFilterTagIds
+} = useTransactionTagFilterSettingPageBase(props.type);
+
+const transactionTagsStore = useTransactionTagsStore();
+
+const icons = {
+    selectAll: mdiSelectAll,
+    selectNone: mdiSelect,
+    selectInverse: mdiSelectInverse,
+    show: mdiEyeOutline,
+    hide: mdiEyeOffOutline,
+    more: mdiDotsVertical,
+    check: mdiCheck,
+    tag: mdiPound
+};
+
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+
+const expandTagCategories = ref<string[]>([ 'default' ]);
+
+function init(): void {
+    transactionTagsStore.loadAllTags({
+        force: false
+    }).then(() => {
+        loading.value = false;
+
+        if (!loadFilterTagIds()) {
+            snackbar.value?.showError('Parameter Invalid');
         }
-    },
-    computed: {
-        ...mapStores(useTransactionTagsStore, useTransactionsStore, useStatisticsStore),
-        title() {
-            return 'Filter Transaction Tags';
-        },
-        applyText() {
-            return 'Apply';
-        },
-        allTags() {
-            return this.transactionTagsStore.allTransactionTags;
-        },
-        allTagFilterTypes() {
-            return this.$locale.getAllTransactionTagFilterTypes();
-        },
-        hasAnyAvailableTag() {
-            return this.transactionTagsStore.allAvailableTagsCount > 0;
-        },
-        hasAnyVisibleTag() {
-            if (this.showHidden) {
-                return this.transactionTagsStore.allAvailableTagsCount > 0;
-            } else {
-                return this.transactionTagsStore.allVisibleTagsCount > 0;
-            }
+    }).catch(error => {
+        loading.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
         }
-    },
-    created() {
-        const self = this;
+    });
+}
 
-        self.transactionTagsStore.loadAllTags({
-            force: false
-        }).then(() => {
-            self.loading = false;
+function updateTransactionTagSelected(transactionTag: TransactionTag, value: boolean | null): void {
+    filterTagIds.value[transactionTag.id] = !value;
 
-            const allTransactionTagIds = {};
-
-            for (const transactionTagId in self.transactionTagsStore.allTransactionTagsMap) {
-                if (!Object.prototype.hasOwnProperty.call(self.transactionTagsStore.allTransactionTagsMap, transactionTagId)) {
-                    continue;
-                }
-
-                const transactionTag = self.transactionTagsStore.allTransactionTagsMap[transactionTagId];
-                allTransactionTagIds[transactionTag.id] = true;
-            }
-
-            if (self.type === 'statisticsCurrent') {
-                const transactionTagIds = self.statisticsStore.transactionStatisticsFilter.tagIds ? self.statisticsStore.transactionStatisticsFilter.tagIds.split(',') : [];
-
-                for (let i = 0; i < transactionTagIds.length; i++) {
-                    const transactionTagId = transactionTagIds[i];
-                    const transactionTag = self.transactionTagsStore.allTransactionTagsMap[transactionTagId];
-
-                    if (transactionTag) {
-                        allTransactionTagIds[transactionTag.id] = false;
-                    }
-                }
-                self.filterTagIds = allTransactionTagIds;
-                self.tagFilterType = self.statisticsStore.transactionStatisticsFilter.tagFilterType;
-            } else if (self.type === 'transactionListCurrent') {
-                for (const transactionTagId in self.transactionsStore.allFilterTagIds) {
-                    if (!Object.prototype.hasOwnProperty.call(self.transactionsStore.allFilterTagIds, transactionTagId)) {
-                        continue;
-                    }
-
-                    const transactionTag = self.transactionTagsStore.allTransactionTagsMap[transactionTagId];
-
-                    if (transactionTag) {
-                        allTransactionTagIds[transactionTag.id] = false;
-                    }
-                }
-                self.filterTagIds = allTransactionTagIds;
-            } else {
-                self.$refs.snackbar.showError('Parameter Invalid');
-            }
-        }).catch(error => {
-            self.loading = false;
-
-            if (!error.processed) {
-                self.$refs.snackbar.showError(error);
-            }
-        });
-    },
-    methods: {
-        save() {
-            const self = this;
-
-            const filteredTagIds = {};
-            let finalTagIds = '';
-            let changed = true;
-
-            for (const transactionTagId in self.filterTagIds) {
-                if (!Object.prototype.hasOwnProperty.call(self.filterTagIds, transactionTagId)) {
-                    continue;
-                }
-
-                const transactionTag = self.transactionTagsStore.allTransactionTagsMap[transactionTagId];
-
-                if (self.filterTagIds[transactionTag.id]) {
-                    filteredTagIds[transactionTag.id] = true;
-                } else {
-                    if (finalTagIds.length > 0) {
-                        finalTagIds += ',';
-                    }
-
-                    finalTagIds += transactionTag.id;
-                }
-            }
-
-            if (this.type === 'statisticsCurrent') {
-                changed = self.statisticsStore.updateTransactionStatisticsFilter({
-                    tagIds: finalTagIds,
-                    tagFilterType: self.tagFilterType
-                });
-
-                if (changed) {
-                    self.statisticsStore.updateTransactionStatisticsInvalidState(true);
-                }
-            } else if (this.type === 'transactionListCurrent') {
-                changed = self.transactionsStore.updateTransactionListFilter({
-                    tagIds: finalTagIds
-                });
-
-                if (changed) {
-                    self.transactionsStore.updateTransactionListInvalidState(true);
-                }
-            }
-
-            self.$emit('settings:change', changed);
-        },
-        cancel() {
-            this.$emit('settings:change', false);
-        },
-        selectTransactionTag(transactionTag, value) {
-            this.filterTagIds[transactionTag.id] = !value;
-
-            if (this.autoSave) {
-                this.save();
-            }
-        },
-        selectAll() {
-            selectAll(this.filterTagIds, this.transactionTagsStore.allTransactionTagsMap);
-
-            if (this.autoSave) {
-                this.save();
-            }
-        },
-        selectNone() {
-            selectNone(this.filterTagIds, this.transactionTagsStore.allTransactionTagsMap);
-
-            if (this.autoSave) {
-                this.save();
-            }
-        },
-        selectInvert() {
-            selectInvert(this.filterTagIds, this.transactionTagsStore.allTransactionTagsMap);
-
-            if (this.autoSave) {
-                this.save();
-            }
-        }
+    if (props.autoSave) {
+        save();
     }
 }
+
+function selectAllTransactionTags(): void {
+    selectAll(filterTagIds.value, transactionTagsStore.allTransactionTagsMap);
+
+    if (props.autoSave) {
+        save();
+    }
+}
+
+function selectNoneTransactionTags(): void {
+    selectNone(filterTagIds.value, transactionTagsStore.allTransactionTagsMap);
+
+    if (props.autoSave) {
+        save();
+    }
+}
+
+function selectInvertTransactionTags(): void {
+    selectInvert(filterTagIds.value, transactionTagsStore.allTransactionTagsMap);
+
+    if (props.autoSave) {
+        save();
+    }
+}
+
+function save(): void {
+    const changed = saveFilterTagIds();
+    emit('settings:change', changed);
+}
+
+function cancel(): void {
+    emit('settings:change', false);
+}
+
+init();
 </script>
 
 <style>

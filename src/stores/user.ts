@@ -182,7 +182,7 @@ export const useUserStore = defineStore('user', () => {
         });
     }
 
-    function updateUserAvatar({ avatarFile }: { avatarFile: unknown }): Promise<UserProfileResponse> {
+    function updateUserAvatar({ avatarFile }: { avatarFile: File }): Promise<UserProfileResponse> {
         return new Promise((resolve, reject) => {
             services.updateAvatar({ avatarFile }).then(response => {
                 const data = response.data;

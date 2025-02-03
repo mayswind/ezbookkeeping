@@ -285,7 +285,7 @@ export default {
     updateProfile: (req: UserProfileUpdateRequest): ApiResponsePromise<UserProfileUpdateResponse> => {
         return axios.post<ApiResponse<UserProfileUpdateResponse>>('v1/users/profile/update.json', req);
     },
-    updateAvatar: ({ avatarFile }: { avatarFile: unknown }): ApiResponsePromise<UserProfileResponse> => {
+    updateAvatar: ({ avatarFile }: { avatarFile: File }): ApiResponsePromise<UserProfileResponse> => {
         return axios.postForm<ApiResponse<UserProfileResponse>>('v1/users/avatar/update.json', {
             avatar: avatarFile
         }, {
@@ -421,7 +421,7 @@ export default {
     deleteTransaction: (req: TransactionDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transactions/delete.json', req);
     },
-    parseImportTransaction: ({ fileType, importFile }: { fileType: string, importFile: unknown }): ApiResponsePromise<ImportTransactionResponsePageWrapper> => {
+    parseImportTransaction: ({ fileType, importFile }: { fileType: string, importFile: File }): ApiResponsePromise<ImportTransactionResponsePageWrapper> => {
         return axios.postForm<ApiResponse<ImportTransactionResponsePageWrapper>>('v1/transactions/parse_import.json', {
             fileType: fileType,
             file: importFile
@@ -434,7 +434,7 @@ export default {
             timeout: DEFAULT_IMPORT_API_TIMEOUT
         } as ApiRequestConfig);
     },
-    uploadTransactionPicture: ({ pictureFile, clientSessionId }: { pictureFile: unknown, clientSessionId: string }): ApiResponsePromise<TransactionPictureInfoBasicResponse> => {
+    uploadTransactionPicture: ({ pictureFile, clientSessionId }: { pictureFile: File, clientSessionId: string }): ApiResponsePromise<TransactionPictureInfoBasicResponse> => {
         return axios.postForm<ApiResponse<TransactionPictureInfoBasicResponse>>('v1/transaction/pictures/upload.json', {
             picture: pictureFile,
             clientSessionId: clientSessionId

@@ -1071,7 +1071,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         });
     }
 
-    function parseImportTransaction({ fileType, importFile }: { fileType: string, importFile: unknown }): Promise<ImportTransactionResponsePageWrapper> {
+    function parseImportTransaction({ fileType, importFile }: { fileType: string, importFile: File }): Promise<ImportTransactionResponsePageWrapper> {
         return new Promise((resolve, reject) => {
             services.parseImportTransaction({ fileType, importFile }).then(response => {
                 const data = response.data;
@@ -1133,7 +1133,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         });
     }
 
-    function uploadTransactionPicture({ pictureFile, clientSessionId }: { pictureFile: unknown, clientSessionId: string }): Promise<TransactionPictureInfoBasicResponse> {
+    function uploadTransactionPicture({ pictureFile, clientSessionId }: { pictureFile: File, clientSessionId: string }): Promise<TransactionPictureInfoBasicResponse> {
         return new Promise((resolve, reject) => {
             services.uploadTransactionPicture({ pictureFile, clientSessionId }).then(response => {
                 const data = response.data;

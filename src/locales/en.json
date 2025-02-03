@@ -1571,6 +1571,7 @@
     "Alipay (Web) Transaction Flow File": "Alipay (Web) Transaction Flow File",
     "WeChat Pay Billing File": "WeChat Pay Billing File",
     "Data File": "Data File",
+    "Please select a file to import": "Please select a file to import",
     "No data to import": "No data to import",
     "Cannot import invalid transactions": "Cannot import invalid transactions",
     "Unable to parse import file": "Unable to parse import file",

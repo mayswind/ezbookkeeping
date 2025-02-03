@@ -1493,6 +1493,7 @@ function setImportFile(event: Event): void {
 
 function parseData(): void {
     if (!importFile.value) {
+        snackbar.value?.showError('Please select a file to import');
         return;
     }
 

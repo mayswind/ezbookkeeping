@@ -1571,6 +1571,7 @@
     "Alipay (Web) Transaction Flow File": "支付宝 (网页版) 交易流水文件",
     "WeChat Pay Billing File": "微信支付账单文件",
     "Data File": "数据文件",
+    "Please select a file to import": "请选择要导入的文件",
     "No data to import": "没有可以导入的数据",
     "Cannot import invalid transactions": "不能导入无效的交易",
     "Unable to parse import file": "无法解析导入的文件",

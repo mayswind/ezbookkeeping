@@ -91,8 +91,7 @@
                                                 <span class="nav-item-title">{{ tt('Use on Mobile Device') }}</span>
                                             </a>
                                             <v-spacer/>
-                                            <router-link class="text-primary" to="/forgetpassword"
-                                                         :class="{'disabled': !isUserForgetPasswordEnabled()}">
+                                            <router-link class="text-primary" to="/forgetpassword">
                                                 {{ tt('Forget Password?') }}
                                             </router-link>
                                         </div>
@@ -111,10 +110,9 @@
                                         </v-btn>
                                     </v-col>
 
-                                    <v-col cols="12" class="text-center text-base">
+                                    <v-col cols="12" class="text-center text-base" v-if="isUserRegistrationEnabled()">
                                         <span class="me-1">{{ tt('Don\'t have an account?') }}</span>
-                                        <router-link class="text-primary" to="/signup"
-                                                     :class="{'disabled': !isUserRegistrationEnabled()}">
+                                        <router-link class="text-primary" to="/signup">
                                             {{ tt('Create an account') }}
                                         </router-link>
                                     </v-col>
@@ -184,7 +182,7 @@ import { useRootStore } from '@/stores/index.ts';
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { isUserRegistrationEnabled, isUserForgetPasswordEnabled, isUserVerifyEmailEnabled } from '@/lib/server_settings.ts';
+import { isUserRegistrationEnabled, isUserVerifyEmailEnabled } from '@/lib/server_settings.ts';
 
 import {
     mdiOnepassword,

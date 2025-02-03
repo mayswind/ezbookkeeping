@@ -4,7 +4,7 @@
             <template #title>
                 <div class="d-flex align-center justify-center">
                     <div class="d-flex w-100 align-center justify-center">
-                        <h4 class="text-h4">{{ $t('Import Transactions') }}</h4>
+                        <h4 class="text-h4">{{ tt('Import Transactions') }}</h4>
                         <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
                     </div>
                     <v-btn density="comfortable" color="default" variant="text" class="ml-2"
@@ -13,84 +13,84 @@
                         <v-icon :icon="icons.filter" />
                         <v-menu activator="parent" max-height="500">
                             <v-list>
-                                <v-list-subheader :title="$t('Date Range')"/>
-                                <v-list-item :title="$t('All')"
-                                             :append-icon="filters.minDatetime === null || filters.maxDatetime === null ? icons.checked : null"
+                                <v-list-subheader :title="tt('Date Range')"/>
+                                <v-list-item :title="tt('All')"
+                                             :append-icon="filters.minDatetime === null || filters.maxDatetime === null ? icons.checked : undefined"
                                              @click="filters.minDatetime = filters.maxDatetime = null"></v-list-item>
-                                <v-list-item :title="$t('Custom')"
+                                <v-list-item :title="tt('Custom')"
                                              :subtitle="displayFilterCustomDateRange"
-                                             :append-icon="filters.minDatetime !== null && filters.maxDatetime !== null ? icons.checked : null"
+                                             :append-icon="filters.minDatetime !== null && filters.maxDatetime !== null ? icons.checked : undefined"
                                              @click="showCustomDateRangeDialog = true"></v-list-item>
                                 <v-divider class="my-2"/>
-                                <v-list-subheader :title="$t('Type')"/>
-                                <v-list-item :title="$t('All')"
-                                             :append-icon="filters.transactionType === null ? icons.checked : null"
+                                <v-list-subheader :title="tt('Type')"/>
+                                <v-list-item :title="tt('All')"
+                                             :append-icon="filters.transactionType === null ? icons.checked : undefined"
                                              @click="filters.transactionType = null"></v-list-item>
-                                <v-list-item :title="$t('Income')"
-                                             :append-icon="filters.transactionType === allTransactionTypes.Income ? icons.checked : null"
-                                             @click="filters.transactionType = allTransactionTypes.Income"></v-list-item>
-                                <v-list-item :title="$t('Expense')"
-                                             :append-icon="filters.transactionType === allTransactionTypes.Expense ? icons.checked : null"
-                                             @click="filters.transactionType = allTransactionTypes.Expense"></v-list-item>
-                                <v-list-item :title="$t('Transfer')"
-                                             :append-icon="filters.transactionType === allTransactionTypes.Transfer ? icons.checked : null"
-                                             @click="filters.transactionType = allTransactionTypes.Transfer"></v-list-item>
+                                <v-list-item :title="tt('Income')"
+                                             :append-icon="filters.transactionType === TransactionType.Income ? icons.checked : undefined"
+                                             @click="filters.transactionType = TransactionType.Income"></v-list-item>
+                                <v-list-item :title="tt('Expense')"
+                                             :append-icon="filters.transactionType === TransactionType.Expense ? icons.checked : undefined"
+                                             @click="filters.transactionType = TransactionType.Expense"></v-list-item>
+                                <v-list-item :title="tt('Transfer')"
+                                             :append-icon="filters.transactionType === TransactionType.Transfer ? icons.checked : undefined"
+                                             @click="filters.transactionType = TransactionType.Transfer"></v-list-item>
                                 <v-divider class="my-2"/>
-                                <v-list-subheader :title="$t('Category')"/>
-                                <v-list-item :title="$t('All')"
-                                             :append-icon="filters.category === null ? icons.checked : null"
+                                <v-list-subheader :title="tt('Category')"/>
+                                <v-list-item :title="tt('All')"
+                                             :append-icon="filters.category === null ? icons.checked : undefined"
                                              @click="filters.category = null"></v-list-item>
-                                <v-list-item :title="$t('Invalid Category')"
-                                             :append-icon="filters.category === undefined ? icons.checked : null"
+                                <v-list-item :title="tt('Invalid Category')"
+                                             :append-icon="filters.category === undefined ? icons.checked : undefined"
                                              @click="filters.category = undefined"></v-list-item>
-                                <v-list-item :title="$t('None')"
-                                             :append-icon="filters.category === '' ? icons.checked : null"
+                                <v-list-item :title="tt('None')"
+                                             :append-icon="filters.category === '' ? icons.checked : undefined"
                                              @click="filters.category = ''"></v-list-item>
                                 <v-list-item :title="name" :key="name"
-                                             :append-icon="filters.category === name ? icons.checked : null"
+                                             :append-icon="filters.category === name ? icons.checked : undefined"
                                              v-for="name in allUsedCategoryNames"
                                              @click="filters.category = name"></v-list-item>
                                 <v-divider class="my-2"/>
-                                <v-list-subheader :title="$t('Account')"/>
-                                <v-list-item :title="$t('All')"
-                                             :append-icon="filters.account === null ? icons.checked : null"
+                                <v-list-subheader :title="tt('Account')"/>
+                                <v-list-item :title="tt('All')"
+                                             :append-icon="filters.account === null ? icons.checked : undefined"
                                              @click="filters.account = null"></v-list-item>
-                                <v-list-item :title="$t('Invalid Account')"
-                                             :append-icon="filters.account === undefined ? icons.checked : null"
+                                <v-list-item :title="tt('Invalid Account')"
+                                             :append-icon="filters.account === undefined ? icons.checked : undefined"
                                              @click="filters.account = undefined"></v-list-item>
-                                <v-list-item :title="$t('None')"
-                                             :append-icon="filters.account === '' ? icons.checked : null"
+                                <v-list-item :title="tt('None')"
+                                             :append-icon="filters.account === '' ? icons.checked : undefined"
                                              @click="filters.account = ''"></v-list-item>
                                 <v-list-item :title="name" :key="name"
-                                             :append-icon="filters.account === name ? icons.checked : null"
+                                             :append-icon="filters.account === name ? icons.checked : undefined"
                                              v-for="name in allUsedAccountNames"
                                              @click="filters.account = name"></v-list-item>
                                 <v-divider class="my-2"/>
-                                <v-list-subheader :title="$t('Tags')"/>
-                                <v-list-item :title="$t('All')"
-                                             :append-icon="filters.tag === null ? icons.checked : null"
+                                <v-list-subheader :title="tt('Tags')"/>
+                                <v-list-item :title="tt('All')"
+                                             :append-icon="filters.tag === null ? icons.checked : undefined"
                                              @click="filters.tag = null"></v-list-item>
-                                <v-list-item :title="$t('Invalid Tag')"
-                                             :append-icon="filters.tag === undefined ? icons.checked : null"
+                                <v-list-item :title="tt('Invalid Tag')"
+                                             :append-icon="filters.tag === undefined ? icons.checked : undefined"
                                              @click="filters.tag = undefined"></v-list-item>
-                                <v-list-item :title="$t('None')"
-                                             :append-icon="filters.tag === '' ? icons.checked : null"
+                                <v-list-item :title="tt('None')"
+                                             :append-icon="filters.tag === '' ? icons.checked : undefined"
                                              @click="filters.tag = ''"></v-list-item>
                                 <v-list-item :title="name" :key="name"
-                                             :append-icon="filters.tag === name ? icons.checked : null"
+                                             :append-icon="filters.tag === name ? icons.checked : undefined"
                                              v-for="name in allUsedTagNames"
                                              @click="filters.tag = name"></v-list-item>
                                 <v-divider class="my-2"/>
-                                <v-list-subheader :title="$t('Description')"/>
-                                <v-list-item :title="$t('All')"
-                                             :append-icon="filters.description === null ? icons.checked : null"
+                                <v-list-subheader :title="tt('Description')"/>
+                                <v-list-item :title="tt('All')"
+                                             :append-icon="filters.description === null ? icons.checked : undefined"
                                              @click="filters.description = null"></v-list-item>
-                                <v-list-item :title="$t('None')"
-                                             :append-icon="filters.description === '' ? icons.checked : null"
+                                <v-list-item :title="tt('None')"
+                                             :append-icon="filters.description === '' ? icons.checked : undefined"
                                              @click="filters.description = ''"></v-list-item>
-                                <v-list-item :title="$t('Custom')"
-                                             :subtitle="filters.description"
-                                             :append-icon="filters.description !== null && filters.description !== '' ? icons.checked : null"
+                                <v-list-item :title="tt('Custom')"
+                                             :subtitle="filters.description !== null ? filters.description : undefined"
+                                             :append-icon="filters.description !== null && filters.description !== '' ? icons.checked : undefined"
                                              @click="currentDescriptionFilterValue = filters.description || ''; showCustomDescriptionDialog = true"></v-list-item>
                             </v-list>
                         </v-menu>
@@ -102,45 +102,45 @@
                         <v-menu activator="parent">
                             <v-list>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="editingTransaction || selectedExpenseTransactionCount < 1"
-                                             :title="$t('Batch Replace Selected Expense Categories')"
+                                             :disabled="!!editingTransaction || selectedExpenseTransactionCount < 1"
+                                             :title="tt('Batch Replace Selected Expense Categories')"
                                              @click="showBatchReplaceDialog('expenseCategory')"></v-list-item>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="editingTransaction || selectedIncomeTransactionCount < 1"
-                                             :title="$t('Batch Replace Selected Income Categories')"
+                                             :disabled="!!editingTransaction || selectedIncomeTransactionCount < 1"
+                                             :title="tt('Batch Replace Selected Income Categories')"
                                              @click="showBatchReplaceDialog('incomeCategory')"></v-list-item>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="editingTransaction || selectedTransferTransactionCount < 1"
-                                             :title="$t('Batch Replace Selected Transfer Categories')"
+                                             :disabled="!!editingTransaction || selectedTransferTransactionCount < 1"
+                                             :title="tt('Batch Replace Selected Transfer Categories')"
                                              @click="showBatchReplaceDialog('transferCategory')"></v-list-item>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="editingTransaction || selectedImportTransactionCount < 1"
-                                             :title="$t('Batch Replace Selected Accounts')"
+                                             :disabled="!!editingTransaction || selectedImportTransactionCount < 1"
+                                             :title="tt('Batch Replace Selected Accounts')"
                                              @click="showBatchReplaceDialog('account')"></v-list-item>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="editingTransaction || selectedTransferTransactionCount < 1"
-                                             :title="$t('Batch Replace Selected Destination Accounts')"
+                                             :disabled="!!editingTransaction || selectedTransferTransactionCount < 1"
+                                             :title="tt('Batch Replace Selected Destination Accounts')"
                                              @click="showBatchReplaceDialog('destinationAccount')"></v-list-item>
                                 <v-divider class="my-2"/>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="editingTransaction || allInvalidExpenseCategoryNames < 1"
-                                             :title="$t('Replace Invalid Expense Categories')"
+                                             :disabled="!!editingTransaction || !allInvalidExpenseCategoryNames || allInvalidExpenseCategoryNames.length < 1"
+                                             :title="tt('Replace Invalid Expense Categories')"
                                              @click="showReplaceInvalidItemDialog('expenseCategory', allInvalidExpenseCategoryNames)"></v-list-item>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="editingTransaction || allInvalidIncomeCategoryNames < 1"
-                                             :title="$t('Replace Invalid Income Categories')"
+                                             :disabled="!!editingTransaction || !allInvalidIncomeCategoryNames || allInvalidIncomeCategoryNames.length < 1"
+                                             :title="tt('Replace Invalid Income Categories')"
                                              @click="showReplaceInvalidItemDialog('incomeCategory', allInvalidIncomeCategoryNames)"></v-list-item>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="editingTransaction || allInvalidTransferCategoryNames < 1"
-                                             :title="$t('Replace Invalid Transfer Categories')"
+                                             :disabled="!!editingTransaction || !allInvalidTransferCategoryNames || allInvalidTransferCategoryNames.length < 1"
+                                             :title="tt('Replace Invalid Transfer Categories')"
                                              @click="showReplaceInvalidItemDialog('transferCategory', allInvalidTransferCategoryNames)"></v-list-item>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="editingTransaction || allInvalidAccountNames < 1"
-                                             :title="$t('Replace Invalid Accounts')"
+                                             :disabled="!!editingTransaction || !allInvalidAccountNames || allInvalidAccountNames.length < 1"
+                                             :title="tt('Replace Invalid Accounts')"
                                              @click="showReplaceInvalidItemDialog('account', allInvalidAccountNames)"></v-list-item>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="editingTransaction || allInvalidTransactionTagNames < 1"
-                                             :title="$t('Replace Invalid Transaction Tags')"
+                                             :disabled="!!editingTransaction || !allInvalidTransactionTagNames || allInvalidTransactionTagNames.length < 1"
+                                             :title="tt('Replace Invalid Transaction Tags')"
                                              @click="showReplaceInvalidItemDialog('tag', allInvalidTransactionTagNames)"></v-list-item>
                             </v-list>
                         </v-menu>
@@ -160,8 +160,8 @@
                                 item-title="displayName"
                                 item-value="type"
                                 :disabled="submitting"
-                                :label="$t('File Type')"
-                                :placeholder="$t('File Type')"
+                                :label="tt('File Type')"
+                                :placeholder="tt('File Type')"
                                 :items="allSupportedImportFileTypes"
                                 v-model="fileType"
                             />
@@ -172,8 +172,8 @@
                                 item-title="displayName"
                                 item-value="type"
                                 :disabled="submitting"
-                                :label="$t('Format')"
-                                :placeholder="$t('Format')"
+                                :label="tt('Format')"
+                                :placeholder="tt('Format')"
                                 :items="allFileSubTypes"
                                 v-model="fileSubType"
                             />
@@ -186,8 +186,8 @@
                                 type="text"
                                 class="always-cursor-pointer"
                                 :disabled="submitting"
-                                :label="$t('Data File')"
-                                :placeholder="$t('format.misc.clickToSelectedFile', { extensions: supportedImportFileExtensions })"
+                                :label="tt('Data File')"
+                                :placeholder="tt('format.misc.clickToSelectedFile', { extensions: supportedImportFileExtensions })"
                                 v-model="fileName"
                                 @click="showOpenFileDialog"
                             />
@@ -196,7 +196,7 @@
                         <v-col cols="12" md="12" class="mb-0 pb-0" v-if="exportFileGuideDocumentUrl">
                             <a :href="exportFileGuideDocumentUrl" :class="{ 'disabled': submitting }" target="_blank">
                                 <v-icon :icon="icons.document" size="16" />
-                                <span class="ml-1">{{ $t('How to export this file?') }}</span>
+                                <span class="ml-1">{{ tt('How to export this file?') }}</span>
                                 <span class="ml-1" v-if="exportFileGuideDocumentLanguageName">({{ exportFileGuideDocumentLanguageName }})</span>
                             </a>
                         </v-col>
@@ -216,7 +216,7 @@
                         :items="importTransactions"
                         :search="JSON.stringify(filters)"
                         :custom-filter="importTransactionsFilter"
-                        :no-data-text="$t('No data to import')"
+                        :no-data-text="tt('No data to import')"
                         v-model:items-per-page="countPerPage"
                         v-model:page="currentPage"
                     >
@@ -230,37 +230,37 @@
                                 <v-menu activator="parent" location="bottom">
                                     <v-list>
                                         <v-list-item :prepend-icon="icons.selectAll"
-                                                     :title="$t('Select All Valid Items')"
+                                                     :title="tt('Select All Valid Items')"
                                                      :disabled="loading || submitting"
                                                      @click="selectAllValid"></v-list-item>
                                         <v-list-item :prepend-icon="icons.selectAll"
-                                                     :title="$t('Select All Invalid Items')"
+                                                     :title="tt('Select All Invalid Items')"
                                                      :disabled="loading || submitting"
                                                      @click="selectAllInvalid"></v-list-item>
                                         <v-divider class="my-2"/>
                                         <v-list-item :prepend-icon="icons.selectAll"
-                                                     :title="$t('Select All')"
+                                                     :title="tt('Select All')"
                                                      :disabled="loading || submitting"
                                                      @click="selectAll"></v-list-item>
                                         <v-list-item :prepend-icon="icons.selectNone"
-                                                     :title="$t('Select None')"
+                                                     :title="tt('Select None')"
                                                      :disabled="loading || submitting"
                                                      @click="selectNone"></v-list-item>
                                         <v-list-item :prepend-icon="icons.selectInverse"
-                                                     :title="$t('Invert Selection')"
+                                                     :title="tt('Invert Selection')"
                                                      :disabled="loading || submitting"
                                                      @click="selectInvert"></v-list-item>
                                         <v-divider class="my-2"/>
                                         <v-list-item :prepend-icon="icons.selectAll"
-                                                     :title="$t('Select All in This Page')"
+                                                     :title="tt('Select All in This Page')"
                                                      :disabled="loading || submitting"
                                                      @click="selectAllInThisPage"></v-list-item>
                                         <v-list-item :prepend-icon="icons.selectNone"
-                                                     :title="$t('Select None in This Page')"
+                                                     :title="tt('Select None in This Page')"
                                                      :disabled="loading || submitting"
                                                      @click="selectNoneInThisPage"></v-list-item>
                                         <v-list-item :prepend-icon="icons.selectInverse"
-                                                     :title="$t('Invert Selection in This Page')"
+                                                     :title="tt('Invert Selection in This Page')"
                                                      :disabled="loading || submitting"
                                                      @click="selectInvertInThisPage"></v-list-item>
                                     </v-list>
@@ -278,7 +278,7 @@
                                     :icon="editingTransaction === item ? icons.complete : icons.edit"
                                     @click="editTransaction(item)">
                             </v-icon>
-                            <v-tooltip activator="parent" v-if="!loading && !submitting">{{ $t('Edit') }}</v-tooltip>
+                            <v-tooltip activator="parent" v-if="!loading && !submitting">{{ tt('Edit') }}</v-tooltip>
                         </template>
                         <template #item.time="{ item }">
                             <span>{{ getDisplayDateTime(item) }}</span>
@@ -286,28 +286,28 @@
                                     v-if="item.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimezone(item) }}</v-chip>
                         </template>
                         <template #item.type="{ value }">
-                            <v-chip label color="secondary" variant="outlined" size="x-small" v-if="value === allTransactionTypes.ModifyBalance">{{ $t('Modify Balance') }}</v-chip>
-                            <v-chip label class="text-income" variant="outlined" size="x-small" v-else-if="value === allTransactionTypes.Income">{{ $t('Income') }}</v-chip>
-                            <v-chip label class="text-expense" variant="outlined" size="x-small" v-else-if="value === allTransactionTypes.Expense">{{ $t('Expense') }}</v-chip>
-                            <v-chip label color="primary" variant="outlined" size="x-small" v-else-if="value === allTransactionTypes.Transfer">{{ $t('Transfer') }}</v-chip>
-                            <v-chip label color="default" variant="outlined" size="x-small" v-else>{{ $t('Unknown') }}</v-chip>
+                            <v-chip label color="secondary" variant="outlined" size="x-small" v-if="value === TransactionType.ModifyBalance">{{ tt('Modify Balance') }}</v-chip>
+                            <v-chip label class="text-income" variant="outlined" size="x-small" v-else-if="value === TransactionType.Income">{{ tt('Income') }}</v-chip>
+                            <v-chip label class="text-expense" variant="outlined" size="x-small" v-else-if="value === TransactionType.Expense">{{ tt('Expense') }}</v-chip>
+                            <v-chip label color="primary" variant="outlined" size="x-small" v-else-if="value === TransactionType.Transfer">{{ tt('Transfer') }}</v-chip>
+                            <v-chip label color="default" variant="outlined" size="x-small" v-else>{{ tt('Unknown') }}</v-chip>
                         </template>
                         <template #item.actualCategoryName="{ item }">
-                            <div class="d-flex align-center" v-if="editingTransaction !== item || item.type === allTransactionTypes.ModifyBalance">
-                                <span v-if="item.type === allTransactionTypes.ModifyBalance">-</span>
+                            <div class="d-flex align-center" v-if="editingTransaction !== item || item.type === TransactionType.ModifyBalance">
+                                <span v-if="item.type === TransactionType.ModifyBalance">-</span>
                                 <ItemIcon size="24px" icon-type="category"
                                           :icon-id="allCategoriesMap[item.categoryId].icon"
                                           :color="allCategoriesMap[item.categoryId].color"
-                                          v-if="item.type !== allTransactionTypes.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]"></ItemIcon>
-                                <span class="ml-2" v-if="item.type !== allTransactionTypes.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]">
+                                          v-if="item.type !== TransactionType.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]"></ItemIcon>
+                                <span class="ml-2" v-if="item.type !== TransactionType.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]">
                                     {{ allCategoriesMap[item.categoryId].name }}
                                 </span>
-                                <div class="text-error font-italic" v-else-if="item.type !== allTransactionTypes.ModifyBalance && (!item.categoryId || item.categoryId === '0' || !allCategoriesMap[item.categoryId])">
+                                <div class="text-error font-italic" v-else-if="item.type !== TransactionType.ModifyBalance && (!item.categoryId || item.categoryId === '0' || !allCategoriesMap[item.categoryId])">
                                     <v-icon class="mr-1" :icon="icons.alert"/>
                                     <span>{{ item.originalCategoryName }}</span>
                                 </div>
                             </div>
-                            <div style="width: 260px" v-if="editingTransaction === item && item.type === allTransactionTypes.Expense">
+                            <div style="width: 260px" v-if="editingTransaction === item && item.type === TransactionType.Expense">
                                 <two-column-select density="compact" variant="plain"
                                                    primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                    primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
@@ -317,14 +317,14 @@
                                                    secondary-hidden-field="hidden"
                                                    :disabled="loading || submitting || !hasAvailableExpenseCategories"
                                                    :show-selection-primary-text="true"
-                                                   :custom-selection-primary-text="getPrimaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Expense])"
-                                                   :custom-selection-secondary-text="getSecondaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Expense])"
-                                                   :placeholder="$t('Category')"
-                                                   :items="allCategories[allCategoryTypes.Expense]"
+                                                   :custom-selection-primary-text="getTransactionPrimaryCategoryName(item.categoryId, allCategories[CategoryType.Expense])"
+                                                   :custom-selection-secondary-text="getTransactionSecondaryCategoryName(item.categoryId, allCategories[CategoryType.Expense])"
+                                                   :placeholder="tt('Category')"
+                                                   :items="allCategories[CategoryType.Expense]"
                                                    v-model="item.categoryId">
                                 </two-column-select>
                             </div>
-                            <div style="width: 260px" v-if="editingTransaction === item && item.type === allTransactionTypes.Income">
+                            <div style="width: 260px" v-if="editingTransaction === item && item.type === TransactionType.Income">
                                 <two-column-select density="compact" variant="plain"
                                                    primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                    primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
@@ -334,14 +334,14 @@
                                                    secondary-hidden-field="hidden"
                                                    :disabled="loading || submitting || !hasAvailableIncomeCategories"
                                                    :show-selection-primary-text="true"
-                                                   :custom-selection-primary-text="getPrimaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Income])"
-                                                   :custom-selection-secondary-text="getSecondaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Income])"
-                                                   :placeholder="$t('Category')"
-                                                   :items="allCategories[allCategoryTypes.Income]"
+                                                   :custom-selection-primary-text="getTransactionPrimaryCategoryName(item.categoryId, allCategories[CategoryType.Income])"
+                                                   :custom-selection-secondary-text="getTransactionSecondaryCategoryName(item.categoryId, allCategories[CategoryType.Income])"
+                                                   :placeholder="tt('Category')"
+                                                   :items="allCategories[CategoryType.Income]"
                                                    v-model="item.categoryId">
                                 </two-column-select>
                             </div>
-                            <div style="width: 260px" v-if="editingTransaction === item && item.type === allTransactionTypes.Transfer">
+                            <div style="width: 260px" v-if="editingTransaction === item && item.type === TransactionType.Transfer">
                                 <two-column-select density="compact" variant="plain"
                                                    primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                    primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
@@ -351,18 +351,18 @@
                                                    secondary-hidden-field="hidden"
                                                    :disabled="loading || submitting || !hasAvailableTransferCategories"
                                                    :show-selection-primary-text="true"
-                                                   :custom-selection-primary-text="getPrimaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Transfer])"
-                                                   :custom-selection-secondary-text="getSecondaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Transfer])"
-                                                   :placeholder="$t('Category')"
-                                                   :items="allCategories[allCategoryTypes.Transfer]"
+                                                   :custom-selection-primary-text="getTransactionPrimaryCategoryName(item.categoryId, allCategories[CategoryType.Transfer])"
+                                                   :custom-selection-secondary-text="getTransactionSecondaryCategoryName(item.categoryId, allCategories[CategoryType.Transfer])"
+                                                   :placeholder="tt('Category')"
+                                                   :items="allCategories[CategoryType.Transfer]"
                                                    v-model="item.categoryId">
                                 </two-column-select>
                             </div>
                         </template>
                         <template #item.sourceAmount="{ item }">
                             <span>{{ getTransactionDisplayAmount(item) }}</span>
-                            <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="item.type === allTransactionTypes.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
-                            <span v-if="item.type === allTransactionTypes.Transfer && item.sourceAccountId !== item.destinationAccountId">{{ getTransactionDisplayDestinationAmount(item) }}</span>
+                            <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
+                            <span v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId">{{ getTransactionDisplayDestinationAmount(item) }}</span>
                         </template>
                         <template #item.actualSourceAccountName="{ item }">
                             <div class="d-flex align-center" v-if="editingTransaction !== item">
@@ -371,9 +371,9 @@
                                     <v-icon class="mr-1" :icon="icons.alert"/>
                                     <span>{{ item.originalSourceAccountName }}</span>
                                 </div>
-                                <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="item.type === allTransactionTypes.Transfer"></v-icon>
-                                <span v-if="item.type === allTransactionTypes.Transfer && item.destinationAccountId && item.destinationAccountId !== '0' && allAccountsMap[item.destinationAccountId]">{{allAccountsMap[item.destinationAccountId].name }}</span>
-                                <div class="text-error font-italic" v-else-if="item.type === allTransactionTypes.Transfer && (!item.destinationAccountId || item.destinationAccountId === '0' || !allAccountsMap[item.destinationAccountId])">
+                                <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
+                                <span v-if="item.type === TransactionType.Transfer && item.destinationAccountId && item.destinationAccountId !== '0' && allAccountsMap[item.destinationAccountId]">{{allAccountsMap[item.destinationAccountId].name }}</span>
+                                <div class="text-error font-italic" v-else-if="item.type === TransactionType.Transfer && (!item.destinationAccountId || item.destinationAccountId === '0' || !allAccountsMap[item.destinationAccountId])">
                                     <v-icon class="mr-1" :icon="icons.alert"/>
                                     <span>{{ item.originalDestinationAccountName }}</span>
                                 </div>
@@ -394,7 +394,7 @@
                                                    :items="allVisibleCategorizedAccounts"
                                                    v-model="item.sourceAccountId">
                                 </two-column-select>
-                                <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="item.type === allTransactionTypes.Transfer"></v-icon>
+                                <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
                                 <two-column-select density="compact" variant="plain"
                                                    primary-key-field="id" primary-value-field="category"
                                                    primary-title-field="name" primary-footer-field="displayBalance"
@@ -406,16 +406,16 @@
                                                    secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
                                                    :disabled="loading || submitting || !allVisibleAccounts.length"
                                                    :custom-selection-primary-text="getDestinationAccountDisplayName(item)"
-                                                   :placeholder="$t('Destination Account')"
+                                                   :placeholder="tt('Destination Account')"
                                                    :items="allVisibleCategorizedAccounts"
                                                    v-model="item.destinationAccountId"
-                                                   v-if="item.type === allTransactionTypes.Transfer">
+                                                   v-if="item.type === TransactionType.Transfer">
                                 </two-column-select>
                             </div>
                         </template>
                         <template #item.geoLocation="{ item }">
                             <span v-if="item.geoLocation">{{ `(${item.geoLocation.longitude}, ${item.geoLocation.latitude})` }}</span>
-                            <span v-else-if="!item.geoLocation">{{ $t('None') }}</span>
+                            <span v-else-if="!item.geoLocation">{{ tt('None') }}</span>
                         </template>
                         <template #item.tagIds="{ item }">
                             <div v-if="editingTransaction !== item">
@@ -427,7 +427,7 @@
                                         :key="tagId"
                                         v-for="(tagId, index) in item.tagIds"/>
                                 <v-chip class="transaction-tag" size="small"
-                                        :text="$t('None')"
+                                        :text="tt('None')"
                                         v-if="!item.tagIds || !item.tagIds.length"/>
                             </div>
                             <div style="width: 200px" v-if="editingTransaction === item">
@@ -441,9 +441,9 @@
                                     closable-chips
                                     density="compact" variant="plain"
                                     :disabled="loading || submitting"
-                                    :placeholder="$t('None')"
+                                    :placeholder="tt('None')"
                                     :items="allTags"
-                                    :no-data-text="$t('No available tag')"
+                                    :no-data-text="tt('No available tag')"
                                     v-model="editingTags"
                                 >
                                     <template #chip="{ props, index }">
@@ -473,10 +473,10 @@
                             <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2"
                                  v-if="importTransactions && importTransactions.length > 10">
                                 <span :class="{ 'text-error': selectedInvalidTransactionCount > 0 }">
-                                    {{ $t('format.misc.selectedCount', { count: selectedImportTransactionCount, totalCount: importTransactions.length }) }}
+                                    {{ tt('format.misc.selectedCount', { count: selectedImportTransactionCount, totalCount: importTransactions.length }) }}
                                 </span>
                                 <v-spacer/>
-                                <span>{{ $t('Transactions Per Page') }}</span>
+                                <span>{{ tt('Transactions Per Page') }}</span>
                                 <v-select class="ml-2" density="compact" max-width="100"
                                           item-title="title"
                                           item-value="value"
@@ -517,7 +517,7 @@
                                                                             item-title="page"
                                                                             item-value="page"
                                                                             :items="allPages"
-                                                                            :no-data-text="$t('No results')"
+                                                                            :no-data-text="tt('No results')"
                                                                             v-model="inputCurrentPage"
                                                             />
                                                         </v-list-item-title>
@@ -532,31 +532,31 @@
                     </v-data-table>
                 </v-window-item>
                 <v-window-item value="finalResult">
-                    <h4 class="text-h4 mb-1">{{ $t('Data Import Completed') }}</h4>
-                    <p class="my-5">{{ $t('format.misc.importTransactionResult', { count: importedCount }) }}</p>
+                    <h4 class="text-h4 mb-1">{{ tt('Data Import Completed') }}</h4>
+                    <p class="my-5">{{ tt('format.misc.importTransactionResult', { count: importedCount }) }}</p>
                 </v-window-item>
             </v-window>
 
             <div class="d-flex justify-sm-space-between gap-4 flex-wrap justify-center mt-10">
                 <v-btn color="secondary" variant="tonal" :disabled="loading || submitting"
-                       :prepend-icon="icons.previous" @click="cancel(false)"
-                       v-if="currentStep !== 'finalResult'">{{ $t('Cancel') }}</v-btn>
+                       :prepend-icon="icons.previous" @click="close(false)"
+                       v-if="currentStep !== 'finalResult'">{{ tt('Cancel') }}</v-btn>
                 <v-btn color="primary" :disabled="loading || submitting || !importFile"
-                       :append-icon="!submitting ? icons.next : null" @click="parseData"
+                       :append-icon="!submitting ? icons.next : undefined" @click="parseData"
                        v-if="currentStep === 'uploadFile'">
-                    {{ $t('Next') }}
+                    {{ tt('Next') }}
                     <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
-                <v-btn color="teal" :disabled="submitting || editingTransaction || selectedImportTransactionCount < 1 || selectedInvalidTransactionCount > 0"
-                       :append-icon="!submitting ? icons.next : null" @click="submit"
+                <v-btn color="teal" :disabled="submitting || !!editingTransaction || selectedImportTransactionCount < 1 || selectedInvalidTransactionCount > 0"
+                       :append-icon="!submitting ? icons.next : undefined" @click="submit"
                        v-if="currentStep === 'checkData'">
-                    {{ $t('Import') }}
+                    {{ tt('Import') }}
                     <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
                 <v-btn color="secondary" variant="tonal"
                        :append-icon="icons.complete"
-                       @click="cancel(true)"
-                       v-if="currentStep === 'finalResult'">{{ $t('Close') }}</v-btn>
+                       @click="close(true)"
+                       v-if="currentStep === 'finalResult'">{{ tt('Close') }}</v-btn>
             </div>
         </v-card>
     </v-dialog>
@@ -565,43 +565,49 @@
         <v-card class="pa-2 pa-sm-4 pa-md-4">
             <template #title>
                 <div class="d-flex align-center justify-center">
-                    <h4 class="text-h4">{{ $t('Filter Description') }}</h4>
+                    <h4 class="text-h4">{{ tt('Filter Description') }}</h4>
                 </div>
             </template>
             <v-card-text class="mb-md-4 w-100 d-flex justify-center">
                 <v-text-field
                     type="text"
                     persistent-placeholder
-                    :label="$t('Description')"
-                    :placeholder="$t('Description')"
+                    :label="tt('Description')"
+                    :placeholder="tt('Description')"
                     v-model="currentDescriptionFilterValue"
                 />
             </v-card-text>
             <v-card-text class="overflow-y-visible">
                 <div class="w-100 d-flex justify-center gap-4">
-                    <v-btn :disabled="!currentDescriptionFilterValue" @click="showCustomDescriptionDialog = false; filters.description = currentDescriptionFilterValue">{{ $t('OK') }}</v-btn>
-                    <v-btn color="secondary" variant="tonal" @click="showCustomDescriptionDialog = false; currentDescriptionFilterValue = ''">{{ $t('Cancel') }}</v-btn>
+                    <v-btn :disabled="!currentDescriptionFilterValue" @click="showCustomDescriptionDialog = false; filters.description = currentDescriptionFilterValue">{{ tt('OK') }}</v-btn>
+                    <v-btn color="secondary" variant="tonal" @click="showCustomDescriptionDialog = false; currentDescriptionFilterValue = ''">{{ tt('Cancel') }}</v-btn>
                 </div>
             </v-card-text>
         </v-card>
     </v-dialog>
 
-    <date-range-selection-dialog :title="$t('Custom Date Range')"
+    <date-range-selection-dialog :title="tt('Custom Date Range')"
                                  :min-time="filters.minDatetime"
                                  :max-time="filters.maxDatetime"
                                  v-model:show="showCustomDateRangeDialog"
                                  @dateRange:change="changeCustomDateFilter"
-                                 @error="showError" />
+                                 @error="onShowDateRangeError" />
     <batch-replace-dialog ref="batchReplaceDialog" />
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
     <input ref="fileInput" type="file" style="display: none" :accept="supportedImportFileExtensions" @change="setImportFile($event)" />
 </template>
 
-<script>
+<script setup lang="ts">
+import type { StepBarItem } from '@/components/desktop/StepsBar.vue';
+import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
 import BatchReplaceDialog from './BatchReplaceDialog.vue';
 
-import { mapStores } from 'pinia';
+import { ref, computed, useTemplateRef, watch } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
@@ -610,19 +616,25 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
-import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
+import type { NameValue } from '@/core/base.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionType } from '@/core/transaction.ts';
+import type { LocalizedImportFileType, LocalizedImportFileTypeSubType } from '@/core/file.ts';
+import { Account, type CategorizedAccountWithDisplayBalance } from '@/models/account.ts';
+import type { TransactionCategory } from '@/models/transaction_category.ts';
+import type { TransactionTag } from '@/models/transaction_tag.ts';
 import { ImportTransaction } from '@/models/imported_transaction.ts';
 
 import {
     isString,
     isNumber,
-    getNameByKeyValue,
     objectFieldToArrayItem
 } from '@/lib/common.ts';
-import { isFileExtensionSupported } from '@/lib/file.ts';
+import {
+    findExtensionByType,
+    isFileExtensionSupported
+} from '@/lib/file.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import logger from '@/lib/logger.ts';
 import {
@@ -653,1147 +665,1253 @@ import {
     mdiPound
 } from '@mdi/js';
 
-export default {
-    components: {
-        BatchReplaceDialog
+type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
+type SnackBarType = InstanceType<typeof SnackBar>;
+type BatchReplaceDialogType = InstanceType<typeof BatchReplaceDialog>;
+
+interface ImportTransactionDialogFilter {
+    minDatetime: number | null; // minDatetime or maxDatetime is null for 'All Date Range', all are not null for 'Custom Date Range'
+    maxDatetime: number | null;
+    transactionType: TransactionType | null; // null for 'All Transaction Type'
+    category: string | null | undefined; // null for 'All Category', undefined for 'Invalid Category'
+    account: string | null | undefined; // null for 'All Account', undefined for 'Invalid Account'
+    tag: string | null | undefined; // null for 'All Tag', undefined for 'Invalid Tag'
+    description: string | null; // null for 'All Description'
+}
+
+interface ImportTransactionsDialogTablePageOption {
+    value: number;
+    title: string;
+}
+
+defineProps<{
+    persistent?: boolean;
+}>();
+
+const {
+    tt,
+    getAllSupportedImportFileTypes,
+    formatUnixTimeToLongDateTime,
+    formatAmountWithCurrency,
+    getCategorizedAccountsWithDisplayBalance
+} = useI18n();
+
+const settingsStore = useSettingsStore();
+const userStore = useUserStore();
+const accountsStore = useAccountsStore();
+const transactionCategoriesStore = useTransactionCategoriesStore();
+const transactionTagsStore = useTransactionTagsStore();
+const transactionsStore = useTransactionsStore();
+const overviewStore = useOverviewStore();
+const statisticsStore = useStatisticsStore();
+
+const icons = {
+    filter: mdiFilterOutline,
+    checked: mdiCheck,
+    more: mdiDotsVertical,
+    document: mdiHelpCircleOutline,
+    replace: mdiFindReplace,
+    previous: mdiClose,
+    next: mdiArrowRight,
+    complete: mdiCheck,
+    select: mdiSelect,
+    selectAll: mdiSelectAll,
+    selectNone: mdiSelect,
+    selectInverse: mdiSelectInverse,
+    edit: mdiPencilOutline,
+    arrowRight: mdiArrowRight,
+    alert: mdiAlertOutline,
+    tag: mdiPound
+};
+
+const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const batchReplaceDialog = useTemplateRef<BatchReplaceDialogType>('batchReplaceDialog');
+const fileInput = useTemplateRef<HTMLInputElement>('fileInput');
+
+const showState = ref<boolean>(false);
+const clientSessionId = ref<string>('');
+const currentStep = ref<string>('uploadFile');
+const fileType = ref<string>('ezbookkeeping');
+const fileSubType = ref<string>('ezbookkeeping_csv');
+const importFile = ref<File | null>(null);
+const importTransactions = ref<ImportTransaction[] | undefined>(undefined);
+const editingTransaction = ref<ImportTransaction | null>(null);
+const editingTags = ref<string[]>([]);
+const filters = ref<ImportTransactionDialogFilter>({
+    minDatetime: null,
+    maxDatetime: null,
+    transactionType: null,
+    category: null,
+    account: null,
+    tag: null,
+    description: null
+});
+
+const currentPage = ref<number>(1);
+const countPerPage = ref<number>(10);
+const importedCount = ref<number | null>(null);
+const showCustomDateRangeDialog = ref<boolean>(false);
+const showCustomDescriptionDialog = ref<boolean>(false);
+const currentDescriptionFilterValue = ref<string | null>(null);
+const loading = ref<boolean>(true);
+const submitting = ref<boolean>(false);
+
+let resolveFunc: (() => void) | null = null;
+let rejectFunc: ((reason?: unknown) => void) | null = null;
+
+const showAccountBalance = computed<boolean>(() => settingsStore.appSettings.showAccountBalance);
+const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
+
+const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
+
+const allSteps = computed<StepBarItem[]>(() => [
+    {
+        name: 'uploadFile',
+        title: tt('Upload File'),
+        subTitle: tt('Upload Transaction Data File')
     },
-    props: [
-        'persistent'
-    ],
-    expose: [
-        'open'
-    ],
-    data() {
-        return {
-            showState: false,
-            clientSessionId: '',
-            currentStep: 'uploadFile',
-            fileType: 'ezbookkeeping',
-            fileSubType: 'ezbookkeeping_csv',
-            importFile: null,
-            importTransactions: null,
-            editingTransaction: null,
-            editingTags: [],
-            filters: {
-                minDatetime: null,
-                maxDatetime: null,
-                transactionType: null,
-                category: null,
-                account: null,
-                tag: null,
-                description: null
-            },
-            currentPage: 1,
-            countPerPage: 10,
-            importedCount: null,
-            showCustomDateRangeDialog: false,
-            showCustomDescriptionDialog: false,
-            currentDescriptionFilterValue: null,
-            loading: true,
-            submitting: false,
-            resolve: null,
-            reject: null,
-            icons: {
-                filter: mdiFilterOutline,
-                checked: mdiCheck,
-                more: mdiDotsVertical,
-                document: mdiHelpCircleOutline,
-                replace: mdiFindReplace,
-                previous: mdiClose,
-                next: mdiArrowRight,
-                complete: mdiCheck,
-                select: mdiSelect,
-                selectAll: mdiSelectAll,
-                selectNone: mdiSelect,
-                selectInverse: mdiSelectInverse,
-                edit: mdiPencilOutline,
-                arrowRight: mdiArrowRight,
-                alert: mdiAlertOutline,
-                tag: mdiPound
-            }
+    {
+        name: 'checkData',
+        title: tt('Check & Modify'),
+        subTitle: tt('Check and Modify Your Data')
+    },
+    {
+        name: 'finalResult',
+        title: tt('Complete'),
+        subTitle: tt('Data Import Completed')
+    }
+]);
+
+const allSupportedImportFileTypes = computed<LocalizedImportFileType[]>(() => getAllSupportedImportFileTypes());
+
+const allFileSubTypes = computed<LocalizedImportFileTypeSubType[] | undefined>(() => {
+    for (const importFileType of allSupportedImportFileTypes.value) {
+        if (importFileType.type === fileType.value) {
+            return importFileType.subTypes;
         }
-    },
-    computed: {
-        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore, useOverviewStore, useStatisticsStore, useExchangeRatesStore),
-        defaultCurrency() {
-            return this.userStore.currentUserDefaultCurrency;
-        },
-        allSteps() {
-            return [
-                {
-                    name: 'uploadFile',
-                    title: this.$t('Upload File'),
-                    subTitle: this.$t('Upload Transaction Data File')
-                },
-                {
-                    name: 'checkData',
-                    title: this.$t('Check & Modify'),
-                    subTitle: this.$t('Check and Modify Your Data')
-                },
-                {
-                    name: 'finalResult',
-                    title: this.$t('Complete'),
-                    subTitle: this.$t('Data Import Completed')
-                }
-            ];
-        },
-        allSupportedImportFileTypes() {
-            return this.$locale.getAllSupportedImportFileTypes();
-        },
-        allFileSubTypes() {
-            return getNameByKeyValue(this.allSupportedImportFileTypes, this.fileType, 'type', 'subTypes');
-        },
-        allTransactionTypes() {
-            return TransactionType;
-        },
-        allCategoryTypes() {
-            return CategoryType;
-        },
-        allAccounts() {
-            return this.accountsStore.allPlainAccounts;
-        },
-        allVisibleAccounts() {
-            return this.accountsStore.allVisiblePlainAccounts;
-        },
-        allVisibleCategorizedAccounts() {
-            return this.$locale.getCategorizedAccountsWithDisplayBalance(this.allVisibleAccounts, this.showAccountBalance, this.defaultCurrency, this.settingsStore, this.userStore, this.exchangeRatesStore);
-        },
-        allAccountsMap() {
-            return this.accountsStore.allAccountsMap;
-        },
-        allCategories() {
-            return this.transactionCategoriesStore.allTransactionCategories;
-        },
-        allCategoriesMap() {
-            return this.transactionCategoriesStore.allTransactionCategoriesMap;
-        },
-        allTags() {
-            return this.transactionTagsStore.allTransactionTags;
-        },
-        allTagsMap() {
-            return this.transactionTagsStore.allTransactionTagsMap;
-        },
-        hasAvailableExpenseCategories() {
-            if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Expense] || !this.allCategories[this.allCategoryTypes.Expense].length) {
-                return false;
-            }
+    }
 
-            const firstAvailableCategoryId = getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Expense]);
-            return firstAvailableCategoryId !== '';
-        },
-        hasAvailableIncomeCategories() {
-            if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Income] || !this.allCategories[this.allCategoryTypes.Income].length) {
-                return false;
-            }
+    return undefined;
+});
 
-            const firstAvailableCategoryId = getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Income]);
-            return firstAvailableCategoryId !== '';
-        },
-        hasAvailableTransferCategories() {
-            if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Transfer] || !this.allCategories[this.allCategoryTypes.Transfer].length) {
-                return false;
-            }
+const allAccounts = computed<Account[]>(() => accountsStore.allPlainAccounts);
+const allVisibleAccounts = computed<Account[]>(() => accountsStore.allVisiblePlainAccounts);
+const allVisibleCategorizedAccounts = computed<CategorizedAccountWithDisplayBalance[]>(() => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts.value, showAccountBalance.value));
+const allAccountsMap = computed<Record<string, Account>>(() => accountsStore.allAccountsMap);
+const allCategories = computed<Record<number, TransactionCategory[]>>(() => transactionCategoriesStore.allTransactionCategories);
+const allCategoriesMap = computed<Record<string, TransactionCategory>>(() => transactionCategoriesStore.allTransactionCategoriesMap);
+const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
+const allTagsMap = computed<Record<string, TransactionTag>>(() => transactionTagsStore.allTransactionTagsMap);
 
-            const firstAvailableCategoryId = getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Transfer]);
-            return firstAvailableCategoryId !== '';
-        },
-        showAccountBalance() {
-            return this.settingsStore.appSettings.showAccountBalance;
-        },
-        currentTimezoneOffsetMinutes() {
-            return getTimezoneOffsetMinutes(this.settingsStore.appSettings.timeZone);
-        },
-        supportedImportFileExtensions() {
-            if (this.allFileSubTypes && this.allFileSubTypes.length) {
-                const subTypeExtensions = getNameByKeyValue(this.allFileSubTypes, this.fileSubType, 'type', 'extensions');
+const hasAvailableExpenseCategories = computed<boolean>(() => {
+    if (!allCategories.value || !allCategories.value[CategoryType.Expense] || !allCategories.value[CategoryType.Expense].length) {
+        return false;
+    }
 
-                if (subTypeExtensions) {
-                    return subTypeExtensions;
-                }
-            }
+    const firstAvailableCategoryId = getFirstAvailableCategoryId(allCategories.value[CategoryType.Expense]);
+    return firstAvailableCategoryId !== '';
+});
 
-            return getNameByKeyValue(this.allSupportedImportFileTypes, this.fileType, 'type', 'extensions');
-        },
-        exportFileGuideDocumentUrl() {
-            const document = getNameByKeyValue(this.allSupportedImportFileTypes, this.fileType, 'type', 'document');
+const hasAvailableIncomeCategories = computed<boolean>(() => {
+    if (!allCategories.value || !allCategories.value[CategoryType.Income] || !allCategories.value[CategoryType.Income].length) {
+        return false;
+    }
+
+    const firstAvailableCategoryId = getFirstAvailableCategoryId(allCategories.value[CategoryType.Income]);
+    return firstAvailableCategoryId !== '';
+});
+
+const hasAvailableTransferCategories = computed<boolean>(() => {
+    if (!allCategories.value || !allCategories.value[CategoryType.Transfer] || !allCategories.value[CategoryType.Transfer].length) {
+        return false;
+    }
+
+    const firstAvailableCategoryId = getFirstAvailableCategoryId(allCategories.value[CategoryType.Transfer]);
+    return firstAvailableCategoryId !== '';
+});
+
+const supportedImportFileExtensions = computed<string | undefined>(() => {
+    if (allFileSubTypes.value && allFileSubTypes.value.length) {
+        const subTypeExtensions = findExtensionByType(allFileSubTypes.value, fileSubType.value);
+
+        if (subTypeExtensions) {
+            return subTypeExtensions;
+        }
+    }
+
+    return findExtensionByType(allSupportedImportFileTypes.value, fileType.value);
+});
+
+const exportFileGuideDocumentUrl = computed<string | undefined>(() => {
+    for (const importFileType of allSupportedImportFileTypes.value) {
+        if (importFileType.type === fileType.value) {
+            const document = importFileType.document;
 
             if (!document) {
-                return null;
+                return undefined;
             }
 
             const language = document.language ? document.language + '/' : '';
             const anchor = document.anchor ? '#' + document.anchor : '';
             return `https://ezbookkeeping.mayswind.net/${language}export_and_import${anchor}`;
-        },
-        exportFileGuideDocumentLanguageName() {
-            const document = getNameByKeyValue(this.allSupportedImportFileTypes, this.fileType, 'type', 'document');
-
-            if (!document) {
-                return null;
-            }
-
-            return document.displayLanguageName;
-        },
-        fileName: {
-            get: function () {
-                if (this.importFile == null) {
-                    return '';
-                } else {
-                    return this.importFile.name;
-                }
-            }
-        },
-        importTransactionsTableHeight() {
-            if (this.countPerPage <= 10 || !this.importTransactions || this.importTransactions.length <= 10) {
-                return undefined;
-            } else {
-                return 400;
-            }
-        },
-        importTransactionHeaders() {
-            return [
-                { value: 'valid', sortable: true, nowrap: true, width: 35 },
-                { value: 'time', title: this.$t('Transaction Time'), sortable: true, nowrap: true, maxWidth: 280 },
-                { value: 'type', title: this.$t('Type'), sortable: true, nowrap: true, maxWidth: 140 },
-                { value: 'actualCategoryName', title: this.$t('Category'), sortable: true, nowrap: true },
-                { value: 'sourceAmount', title: this.$t('Amount'), sortable: true, nowrap: true },
-                { value: 'actualSourceAccountName', title: this.$t('Account'), sortable: true, nowrap: true },
-                { value: 'geoLocation', title: this.$t('Geographic Location'), sortable: true, nowrap: true },
-                { value: 'tagIds', title: this.$t('Tags'), sortable: true, nowrap: true },
-                { value: 'comment', title: this.$t('Description'), sortable: true, nowrap: true },
-            ];
-        },
-        importTransactionsTablePageOptions() {
-            const pageOptions = [];
-
-            if (!this.importTransactions || this.importTransactions.length < 1) {
-                pageOptions.push({ value: -1, title: this.$t('All') });
-                return pageOptions;
-            }
-
-            const availableCountPerPage = [ 5, 10, 15, 20, 25, 30, 50 ];
-
-            for (let i = 0; i < availableCountPerPage.length; i++) {
-                const count = availableCountPerPage[i];
-
-                if (this.importTransactions.length < count) {
-                    break;
-                }
-
-                pageOptions.push({ value: count, title: count.toString() });
-            }
-
-            pageOptions.push({ value: -1, title: this.$t('All') });
-
-            return pageOptions;
-        },
-        allPages() {
-            const pages = [];
-
-            for (let i = 1; i < this.totalPageCount; i++) {
-                pages.push({
-                    page: i
-                });
-            }
-
-            return pages;
-        },
-        inputCurrentPage: {
-            get: function () {
-                return this.currentPage;
-            },
-            set: function (value) {
-                if (value && value >= 1 && value < this.totalPageCount) {
-                    this.currentPage = value;
-                }
-            }
-        },
-        totalPageCount() {
-            if (!this.importTransactions || this.importTransactions.length < 1) {
-                return 1;
-            }
-
-            let count = 0;
-
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                if (this.isTransactionDisplayed(this.importTransactions[i])) {
-                    count++;
-                }
-            }
-
-            return Math.ceil(count / this.countPerPage);
-        },
-        currentPageTransactions() {
-            const ret = [];
-            const previousCount = Math.max(0, (this.currentPage - 1) * this.countPerPage);
-            let count = 0;
-
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                if (ret.length >= this.countPerPage) {
-                    break;
-                }
-
-                if (this.isTransactionDisplayed(this.importTransactions[i])) {
-                    if (count >= previousCount) {
-                        ret.push(this.importTransactions[i]);
-                    }
-
-                    count++;
-                }
-            }
-
-            return ret;
-        },
-        selectedImportTransactionCount() {
-            let count = 0;
-
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                if (this.importTransactions[i].selected) {
-                    count++;
-                }
-            }
-
-            return count;
-        },
-        selectedExpenseTransactionCount() {
-            let count = 0;
-
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                if (this.importTransactions[i].selected && this.importTransactions[i].type === this.allTransactionTypes.Expense) {
-                    count++;
-                }
-            }
-
-            return count;
-        },
-        selectedIncomeTransactionCount() {
-            let count = 0;
-
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                if (this.importTransactions[i].selected && this.importTransactions[i].type === this.allTransactionTypes.Income) {
-                    count++;
-                }
-            }
-
-            return count;
-        },
-        selectedTransferTransactionCount() {
-            let count = 0;
-
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                if (this.importTransactions[i].selected && this.importTransactions[i].type === this.allTransactionTypes.Transfer) {
-                    count++;
-                }
-            }
-
-            return count;
-        },
-        selectedInvalidTransactionCount() {
-            let count = 0;
-
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                if (!this.importTransactions[i].valid && this.importTransactions[i].selected) {
-                    count++;
-                }
-            }
-
-            return count;
-        },
-        anyButNotAllTransactionSelected: {
-            get: function () {
-                return this.selectedImportTransactionCount > 0 && this.selectedImportTransactionCount !== this.importTransactions.length;
-            }
-        },
-        allTransactionSelected: {
-            get: function () {
-                return this.selectedImportTransactionCount === this.importTransactions.length;
-            }
-        },
-        allUsedCategoryNames() {
-            return this.getAllUsedCategoryNames();
-        },
-        allUsedAccountNames() {
-            return this.getAllUsedAccountNames();
-        },
-        allUsedTagNames() {
-            return this.getAllUsedTagNames();
-        },
-        allInvalidExpenseCategoryNames() {
-            return this.getCurrentInvalidCategoryNames(this.allTransactionTypes.Expense);
-        },
-        allInvalidIncomeCategoryNames() {
-            return this.getCurrentInvalidCategoryNames(this.allTransactionTypes.Income);
-        },
-        allInvalidTransferCategoryNames() {
-            return this.getCurrentInvalidCategoryNames(this.allTransactionTypes.Transfer);
-        },
-        allInvalidAccountNames() {
-            return this.getCurrentInvalidAccountNames();
-        },
-        allInvalidTransactionTagNames() {
-            return this.getCurrentInvalidTagNames();
-        },
-        displayFilterCustomDateRange() {
-            if (this.filters.minDatetime === null || this.filters.maxDatetime === null) {
-                return '';
-            }
-
-            const minDisplayTime = this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.filters.minDatetime);
-            const maxDisplayTime = this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.filters.maxDatetime);
-
-            return `${minDisplayTime} - ${maxDisplayTime}`
         }
-    },
-    watch: {
-        fileType: function () {
-            if (this.allFileSubTypes && this.allFileSubTypes.length) {
-                this.fileSubType = this.allFileSubTypes[0].type;
-            }
+    }
 
-            this.importFile = null;
-            this.importTransactions = null;
-            this.editingTransaction = null;
-            this.editingTags = [];
-            this.currentPage = 1;
-            this.countPerPage = 10;
-        },
-        fileSubType: function (newValue) {
-            let supportedExtensions = getNameByKeyValue(this.allFileSubTypes, newValue, 'type', 'extensions');
+    return undefined;
+});
 
-            if (!supportedExtensions) {
-                supportedExtensions = getNameByKeyValue(this.allSupportedImportFileTypes, this.fileType, 'type', 'extensions');
-            }
-
-            if (this.importFile && this.importFile.name && !isFileExtensionSupported(this.importFile.name, supportedExtensions)) {
-                this.importFile = null;
-            }
+const exportFileGuideDocumentLanguageName = computed<string | undefined>(() => {
+    for (const importFileType of allSupportedImportFileTypes.value) {
+        if (importFileType.type === fileType.value) {
+            const document = importFileType.document;
+            return document?.displayLanguageName;
         }
-    },
-    methods: {
-        open() {
-            const self = this;
-            self.fileType = 'ezbookkeeping';
-            self.fileSubType = 'ezbookkeeping_csv';
-            self.currentStep = 'uploadFile';
-            self.importFile = null;
-            self.importTransactions = null;
-            self.editingTransaction = null;
-            self.editingTags = [];
-            self.filters.minDatetime = null;
-            self.filters.maxDatetime = null;
-            self.filters.transactionType = null;
-            self.filters.category = null;
-            self.filters.account = null;
-            self.filters.tag = null;
-            self.filters.description = null;
-            self.currentPage = 1;
-            self.countPerPage = 10;
-            self.showState = true;
-            self.clientSessionId = generateRandomUUID();
+    }
 
-            const promises = [
-                self.accountsStore.loadAllAccounts({ force: false }),
-                self.transactionCategoriesStore.loadAllCategories({ force: false }),
-                self.transactionTagsStore.loadAllTags({ force: false })
-            ];
+    return undefined;
+});
 
-            Promise.all(promises).then(function () {
-                self.loading = false;
-            }).catch(error => {
-                logger.error('failed to load essential data for importing transaction', error);
+const fileName = computed<string>(() => importFile.value?.name || '');
 
-                self.loading = false;
-                self.showState = false;
+const importTransactionsTableHeight = computed<number | undefined>(() => {
+    if (countPerPage.value <= 10 || !importTransactions.value || importTransactions.value.length <= 10) {
+        return undefined;
+    } else {
+        return 400;
+    }
+});
 
-                if (!error.processed) {
-                    if (self.reject) {
-                        self.reject(error);
-                    }
-                }
-            });
+const importTransactionHeaders = computed<object[]>(() => {
+    return [
+        { value: 'valid', sortable: true, nowrap: true, width: 35 },
+        { value: 'time', title: tt('Transaction Time'), sortable: true, nowrap: true, maxWidth: 280 },
+        { value: 'type', title: tt('Type'), sortable: true, nowrap: true, maxWidth: 140 },
+        { value: 'actualCategoryName', title: tt('Category'), sortable: true, nowrap: true },
+        { value: 'sourceAmount', title: tt('Amount'), sortable: true, nowrap: true },
+        { value: 'actualSourceAccountName', title: tt('Account'), sortable: true, nowrap: true },
+        { value: 'geoLocation', title: tt('Geographic Location'), sortable: true, nowrap: true },
+        { value: 'tagIds', title: tt('Tags'), sortable: true, nowrap: true },
+        { value: 'comment', title: tt('Description'), sortable: true, nowrap: true },
+    ];
+});
 
-            return new Promise((resolve, reject) => {
-                self.resolve = resolve;
-                self.reject = reject;
-            });
-        },
-        showOpenFileDialog() {
-            if (this.submitting) {
-                return;
+const importTransactionsTablePageOptions = computed<ImportTransactionsDialogTablePageOption[]>(() => {
+    const pageOptions: ImportTransactionsDialogTablePageOption[] = [];
+
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        pageOptions.push({ value: -1, title: tt('All') });
+        return pageOptions;
+    }
+
+    const availableCountPerPage = [ 5, 10, 15, 20, 25, 30, 50 ];
+
+    for (let i = 0; i < availableCountPerPage.length; i++) {
+        const count = availableCountPerPage[i];
+
+        if (importTransactions.value.length < count) {
+            break;
+        }
+
+        pageOptions.push({ value: count, title: count.toString() });
+    }
+
+    pageOptions.push({ value: -1, title: tt('All') });
+
+    return pageOptions;
+});
+
+const allPages = computed<{ page: number }[]>(() => {
+    const pages = [];
+
+    for (let i = 1; i < totalPageCount.value; i++) {
+        pages.push({
+            page: i
+        });
+    }
+
+    return pages;
+});
+
+const inputCurrentPage = computed<number>({
+    get: () => currentPage.value,
+    set: (value) => {
+        if (value && value >= 1 && value < totalPageCount.value) {
+            currentPage.value = value;
+        }
+    }
+});
+
+const totalPageCount = computed<number>(() => {
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return 1;
+    }
+
+    let count = 0;
+
+    for (let i = 0; i < importTransactions.value.length; i++) {
+        if (isTransactionDisplayed(importTransactions.value[i])) {
+            count++;
+        }
+    }
+
+    return Math.ceil(count / countPerPage.value);
+});
+
+const currentPageTransactions = computed<ImportTransaction[]>(() => {
+    const ret: ImportTransaction[] = [];
+
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return ret;
+    }
+
+    const previousCount = Math.max(0, (currentPage.value - 1) * countPerPage.value);
+    let count = 0;
+
+    for (let i = 0; i < importTransactions.value.length; i++) {
+        if (ret.length >= countPerPage.value) {
+            break;
+        }
+
+        if (isTransactionDisplayed(importTransactions.value[i])) {
+            if (count >= previousCount) {
+                ret.push(importTransactions.value[i]);
             }
 
-            this.$refs.fileInput.click();
-        },
-        setImportFile(event) {
-            if (!event || !event.target || !event.target.files || !event.target.files.length) {
-                return;
-            }
-
-            this.importFile = event.target.files[0];
-            event.target.value = null;
-        },
-        parseData() {
-            const self = this;
-            self.submitting = true;
-
-            let fileType = self.fileType;
-
-            if (self.allFileSubTypes) {
-                fileType = self.fileSubType;
-            }
-
-            self.transactionsStore.parseImportTransaction({
-                fileType: fileType,
-                importFile: self.importFile
-            }).then(response => {
-                const parsedTransactions = [];
-
-                if (response.items) {
-                    for (let i = 0; i < response.items.length; i++) {
-                        const parsedTransaction = ImportTransaction.of(response.items[i], i);
-                        parsedTransactions.push(parsedTransaction);
-                    }
-                }
-
-                self.importTransactions = parsedTransactions;
-                self.editingTransaction = null;
-                self.editingTags = [];
-                self.currentPage = 1;
-
-                if (self.importTransactions && self.importTransactions.length >= 0 && self.importTransactions.length < 10) {
-                    self.countPerPage = -1;
-                } else {
-                    self.countPerPage = 10;
-                }
-
-                self.currentStep = 'checkData';
-                self.submitting = false;
-            }).catch(error => {
-                self.submitting = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        submit() {
-            const self = this;
-
-            if (self.editingTransaction) {
-                return;
-            }
-
-            const transactions = [];
-
-            for (let i = 0; i < self.importTransactions.length; i++) {
-                const transaction = self.importTransactions[i];
-
-                if (transaction.valid && transaction.selected) {
-                    transactions.push(transaction);
-                } else if (!transaction.valid && transaction.selected) {
-                    self.$refs.snackbar.showError('Cannot import invalid transactions');
-                    return;
-                }
-            }
-
-            if (transactions.length < 1) {
-                self.$refs.snackbar.showError('No data to import');
-                return;
-            }
-
-            self.$refs.confirmDialog.open('format.misc.confirmImportTransactions', {
-                count: transactions.length
-            }).then(() => {
-                self.editingTransaction = null;
-                self.editingTags = [];
-                self.submitting = true;
-
-                self.transactionsStore.importTransactions({
-                    transactions: transactions,
-                    clientSessionId: self.clientSessionId
-                }).then(response => {
-                    self.importedCount = response;
-                    self.currentStep = 'finalResult';
-
-                    self.accountsStore.updateAccountListInvalidState(true);
-                    self.transactionsStore.updateTransactionListInvalidState(true);
-                    self.overviewStore.updateTransactionOverviewInvalidState(true);
-                    self.statisticsStore.updateTransactionStatisticsInvalidState(true);
-
-                    self.submitting = false;
-                }).catch(error => {
-                    self.submitting = false;
-
-                    if (!error.processed) {
-                        self.$refs.snackbar.showError(error);
-                    }
-                });
-            });
-        },
-        cancel(completed) {
-            if (completed) {
-                if (this.resolve) {
-                    this.resolve();
-                }
-            } else {
-                if (this.reject) {
-                    this.reject();
-                }
-            }
-
-            this.showState = false;
-        },
-        changeCustomDateFilter(minTime, maxTime) {
-            this.filters.minDatetime = minTime;
-            this.filters.maxDatetime = maxTime;
-            this.showCustomDateRangeDialog = false;
-        },
-        importTransactionsFilter(value, query, item) {
-            if (!item || !item.raw) {
-                return false;
-            }
-
-            return this.isTransactionDisplayed(item.raw);
-        },
-        isTransactionDisplayed(transaction) {
-            if (isNumber(this.filters.minDatetime) && isNumber(this.filters.maxDatetime) && (transaction.time < this.filters.minDatetime || transaction.time > this.filters.maxDatetime)) {
-                return false;
-            }
-
-            if (isNumber(this.filters.transactionType) && transaction.type !== this.filters.transactionType) {
-                return false;
-            }
-
-            if (isString(this.filters.category)) {
-                if (this.filters.category === '' && transaction.actualCategoryName !== '') {
-                    return false;
-                } else if (this.filters.category !== '' && transaction.actualCategoryName !== this.filters.category) {
-                    return false;
-                }
-            } else if (this.filters.category === undefined) {
-                if (transaction.type !== this.allTransactionTypes.ModifyBalance && transaction.categoryId && transaction.categoryId !== '0') {
-                    return false;
-                }
-            }
-
-            if (isString(this.filters.account)) {
-                if (this.filters.account === '' && (transaction.actualSourceAccountName !== '' || transaction.actualDestinationAccountName !== '')) {
-                    return false;
-                } else if (this.filters.account !== '' && transaction.actualSourceAccountName !== this.filters.account && transaction.actualDestinationAccountName !== this.filters.account) {
-                    return false;
-                }
-            } else if (this.filters.account === undefined) {
-                if (transaction.type !== this.allTransactionTypes.Transfer && transaction.sourceAccountId && transaction.sourceAccountId !== '0') {
-                    return false;
-                } else if (transaction.type === this.allTransactionTypes.Transfer && transaction.sourceAccountId && transaction.sourceAccountId !== '0' && transaction.destinationAccountId && transaction.destinationAccountId !== '0') {
-                    return false;
-                }
-            }
-
-            if (isString(this.filters.tag)) {
-                if (this.filters.tag === '' && transaction.tagIds && transaction.tagIds.length) {
-                    return false;
-                } else if (this.filters.tag !== '') {
-                    let hasTagName = false;
-
-                    if (transaction.tagIds && transaction.tagIds.length) {
-                        for (let i = 0; i < transaction.tagIds.length; i++) {
-                            const tagId = transaction.tagIds[i];
-                            let tagName = transaction.originalTagNames ? transaction.originalTagNames[i] : "";
-
-                            if (tagId && tagId !== '0' && this.allTagsMap[tagId] && this.allTagsMap[tagId].name) {
-                                tagName = this.allTagsMap[tagId].name;
-                            }
-
-                            if (tagName === this.filters.tag) {
-                                hasTagName = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!hasTagName) {
-                        return false;
-                    }
-                }
-            } else if (this.filters.tag === undefined) {
-                if (transaction.tagIds && transaction.tagIds.length) {
-                    let hasInvalidTag = false;
-
-                    for (let i = 0; i < transaction.tagIds.length; i++) {
-                        if (!transaction.tagIds[i] || transaction.tagIds[i] === '0') {
-                            hasInvalidTag = true;
-                            break;
-                        }
-                    }
-
-                    if (!hasInvalidTag) {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-            }
-
-            if (isString(this.filters.description)) {
-                if (this.filters.description === '' && transaction.comment !== '') {
-                    return false;
-                } else if (this.filters.description !== '' && transaction.comment.indexOf(this.filters.description) < 0) {
-                    return false;
-                }
-            }
-
-            return true;
-        },
-        selectAllValid() {
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                if (this.importTransactions[i].valid && this.isTransactionDisplayed(this.importTransactions[i])) {
-                    this.importTransactions[i].selected = true;
-                }
-            }
-        },
-        selectAllInvalid() {
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                if (!this.importTransactions[i].valid && this.isTransactionDisplayed(this.importTransactions[i])) {
-                    this.importTransactions[i].selected = true;
-                }
-            }
-        },
-        selectAll() {
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                if (this.isTransactionDisplayed(this.importTransactions[i])) {
-                    this.importTransactions[i].selected = true;
-                }
-            }
-        },
-        selectNone() {
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                if (this.isTransactionDisplayed(this.importTransactions[i])) {
-                    this.importTransactions[i].selected = false;
-                }
-            }
-        },
-        selectInvert() {
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                if (this.isTransactionDisplayed(this.importTransactions[i])) {
-                    this.importTransactions[i].selected = !this.importTransactions[i].selected;
-                }
-            }
-        },
-        selectAllInThisPage() {
-            for (let i = 0; i < this.currentPageTransactions.length; i++) {
-                this.currentPageTransactions[i].selected = true;
-            }
-        },
-        selectNoneInThisPage() {
-            for (let i = 0; i < this.currentPageTransactions.length; i++) {
-                this.currentPageTransactions[i].selected = false;
-            }
-        },
-        selectInvertInThisPage() {
-            for (let i = 0; i < this.currentPageTransactions.length; i++) {
-                this.currentPageTransactions[i].selected = !this.currentPageTransactions[i].selected;
-            }
-        },
-        editTransaction(transaction) {
-            if (this.editingTransaction) {
-                this.editingTransaction.tagIds = this.editingTags;
-                this.updateTransactionData(this.editingTransaction);
-            }
-
-            if (this.editingTransaction === transaction) {
-                this.editingTags = [];
-                this.editingTransaction = null;
-            } else {
-                this.editingTransaction = transaction;
-                this.editingTags = this.editingTransaction.tagIds;
-            }
-        },
-        updateTransactionData(transaction) {
-            transaction.valid = transaction.isTransactionValid();
-
-            if (transaction.categoryId && this.allCategoriesMap[transaction.categoryId]) {
-                transaction.actualCategoryName = this.allCategoriesMap[transaction.categoryId].name;
-            }
-
-            if (transaction.sourceAccountId && this.allAccountsMap[transaction.sourceAccountId]) {
-                transaction.actualSourceAccountName = this.allAccountsMap[transaction.sourceAccountId].name;
-            }
-
-            if (transaction.destinationAccountId && this.allAccountsMap[transaction.destinationAccountId]) {
-                transaction.actualDestinationAccountName = this.allAccountsMap[transaction.destinationAccountId].name;
-            }
-        },
-        showBatchReplaceDialog(type) {
-            const self = this;
-
-            if (self.editingTransaction) {
-                return;
-            }
-
-            self.$refs.batchReplaceDialog.open({
-                mode: 'batchReplace',
-                type: type
-            }).then(result => {
-                if (!result || !result.targetItem) {
-                    return;
-                }
-
-                let updatedCount = 0;
-
-                for (let i = 0; i < self.importTransactions.length; i++) {
-                    const transaction = self.importTransactions[i];
-
-                    if (!transaction.selected) {
-                        continue;
-                    }
-
-                    let updated = false;
-
-                    if (type === 'expenseCategory') {
-                        if (transaction.type === self.allTransactionTypes.Expense) {
-                            transaction.categoryId = result.targetItem;
-                            updated = true;
-                        }
-                    } else if (type === 'incomeCategory') {
-                        if (transaction.type === self.allTransactionTypes.Income) {
-                            transaction.categoryId = result.targetItem;
-                            updated = true;
-                        }
-                    } else if (type === 'transferCategory') {
-                        if (transaction.type === self.allTransactionTypes.Transfer) {
-                            transaction.categoryId = result.targetItem;
-                            updated = true;
-                        }
-                    } else if (type === 'account') {
-                        transaction.sourceAccountId = result.targetItem;
-                        updated = true;
-                    } else if (type === 'destinationAccount') {
-                        if (transaction.type === self.allTransactionTypes.Transfer) {
-                            transaction.destinationAccountId = result.targetItem;
-                            updated = true;
-                        }
-                    }
-
-                    if (updated) {
-                        updatedCount++;
-                        self.updateTransactionData(transaction);
-                    }
-                }
-
-                if (updatedCount > 0) {
-                    self.$refs.snackbar.showMessage('format.misc.youHaveUpdatedTransactions', {
-                        count: updatedCount
-                    });
-                }
-            });
-        },
-        showReplaceInvalidItemDialog(type, invalidItems) {
-            const self = this;
-
-            if (self.editingTransaction) {
-                return;
-            }
-
-            self.$refs.batchReplaceDialog.open({
-                mode: 'replaceInvalidItems',
-                type: type,
-                invalidItems: invalidItems
-            }).then(result => {
-                if (!result || (!result.sourceItem && result.sourceItem !== '') || !result.targetItem) {
-                    return;
-                }
-
-                let updatedCount = 0;
-
-                for (let i = 0; i < self.importTransactions.length; i++) {
-                    const transaction = self.importTransactions[i];
-
-                    if (transaction.valid) {
-                        continue;
-                    }
-
-                    let updated = false;
-
-                    if (type === 'expenseCategory' || type === 'incomeCategory' || type === 'transferCategory') {
-                        const categoryId = transaction.categoryId;
-                        const originalCategoryName = transaction.originalCategoryName;
-
-                        if (transaction.type !== self.allTransactionTypes.ModifyBalance && originalCategoryName === result.sourceItem && (!categoryId || categoryId === '0' || !self.allCategoriesMap[categoryId])) {
-                            if (type === 'expenseCategory' && transaction.type === self.allTransactionTypes.Expense) {
-                                transaction.categoryId = result.targetItem;
-                                updated = true;
-                            } else if (type === 'incomeCategory' && transaction.type === self.allTransactionTypes.Income) {
-                                transaction.categoryId = result.targetItem;
-                                updated = true;
-                            } else if (type === 'transferCategory' && transaction.type === self.allTransactionTypes.Transfer) {
-                                transaction.categoryId = result.targetItem;
-                                updated = true;
-                            }
-                        }
-                    } else if (type === 'account') {
-                        const sourceAccountId = transaction.sourceAccountId;
-                        const originalSourceAccountName = transaction.originalSourceAccountName;
-                        const destinationAccountId = transaction.destinationAccountId;
-                        const originalDestinationAccountName = transaction.originalDestinationAccountName;
-
-                        if (originalSourceAccountName === result.sourceItem && (!sourceAccountId || sourceAccountId === '0' || !self.allAccountsMap[sourceAccountId])) {
-                            transaction.sourceAccountId = result.targetItem;
-                            updated = true;
-                        }
-
-                        if (transaction.type === self.allTransactionTypes.Transfer && originalDestinationAccountName === result.sourceItem && (!destinationAccountId || destinationAccountId === '0' || !self.allAccountsMap[destinationAccountId])) {
-                            transaction.destinationAccountId = result.targetItem;
-                            updated = true;
-                        }
-                    } else if (type === 'tag' && transaction.tagIds) {
-                        for (let j = 0; j < transaction.tagIds.length; j++) {
-                            const tagId = transaction.tagIds[j];
-                            const originalTagName = transaction.originalTagNames ? transaction.originalTagNames[j] : "";
-
-                            if (originalTagName === result.sourceItem && (!tagId || tagId === '0' || !self.allTagsMap[tagId])) {
-                                transaction.tagIds[j] = result.targetItem;
-                                updated = true;
-                            }
-                        }
-                    }
-
-                    if (updated) {
-                        updatedCount++;
-                        self.updateTransactionData(transaction);
-                    }
-                }
-
-                if (updatedCount > 0) {
-                    self.$refs.snackbar.showMessage('format.misc.youHaveUpdatedTransactions', {
-                        count: updatedCount
-                    });
-                }
-            });
-        },
-        showError(message) {
-            this.$refs.snackbar.showError(message);
-        },
-        getAllUsedCategoryNames() {
-            const categoryNames = {};
-
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                const transaction = this.importTransactions[i];
-
-                if (transaction.actualCategoryName && transaction.actualCategoryName !== '') {
-                    categoryNames[transaction.actualCategoryName] = true;
-                }
-            }
-
-            return objectFieldToArrayItem(categoryNames);
-        },
-        getAllUsedAccountNames() {
-            const accountNames = {};
-
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                const transaction = this.importTransactions[i];
-
-                if (transaction.actualSourceAccountName && transaction.actualSourceAccountName !== '') {
-                    accountNames[transaction.actualSourceAccountName] = true;
-                }
-
-                if (transaction.actualDestinationAccountName && transaction.actualDestinationAccountName !== '') {
-                    accountNames[transaction.actualDestinationAccountName] = true;
-                }
-            }
-
-            return objectFieldToArrayItem(accountNames);
-        },
-        getAllUsedTagNames(){
-            const tagNames = {};
-
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                const transaction = this.importTransactions[i];
-
-                if (!transaction.tagIds || !transaction.originalTagNames) {
-                    continue;
-                }
-
-                for (let j = 0; j < transaction.tagIds.length; j++) {
-                    const tagId = transaction.tagIds[j];
-                    const originalTagName = transaction.originalTagNames[j];
-
-                    if (tagId && tagId !== '0' && this.allTagsMap[tagId] && this.allTagsMap[tagId].name) {
-                        tagNames[this.allTagsMap[tagId].name] = true;
-                    } else if (originalTagName) {
-                        tagNames[originalTagName] = true;
-                    }
-                }
-            }
-
-            return objectFieldToArrayItem(tagNames);
-        },
-        getCurrentInvalidCategoryNames(transactionType) {
-            const invalidCategoryNames = {};
-            const invalidCategories = [];
-
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                const transaction = this.importTransactions[i];
-                const categoryId = transaction.categoryId;
-
-                if (transaction.type === transactionType && (!categoryId || categoryId === '0' || !this.allCategoriesMap[categoryId])) {
-                    invalidCategoryNames[transaction.originalCategoryName] = true;
-                }
-            }
-
-            for (const name in invalidCategoryNames) {
-                if (!Object.prototype.hasOwnProperty.call(invalidCategoryNames, name)) {
-                    continue;
-                }
-
-                invalidCategories.push({
-                    name: name || this.$t('(Empty)'),
-                    value: name
-                });
-            }
-
-            return invalidCategories;
-        },
-        getCurrentInvalidAccountNames() {
-            const invalidAccountNames = {};
-            const invalidAccounts = [];
-
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                const transaction = this.importTransactions[i];
-                const sourceAccountId = transaction.sourceAccountId;
-                const destinationAccountId = transaction.destinationAccountId;
-
-                if (!sourceAccountId || sourceAccountId === '0' || !this.allAccountsMap[sourceAccountId]) {
-                    invalidAccountNames[transaction.originalSourceAccountName] = true;
-                }
-
-                if (transaction.type === this.allTransactionTypes.Transfer && (!destinationAccountId || destinationAccountId === '0' || !this.allAccountsMap[destinationAccountId])) {
-                    invalidAccountNames[transaction.originalDestinationAccountName] = true;
-                }
-            }
-
-            for (const name in invalidAccountNames) {
-                if (!Object.prototype.hasOwnProperty.call(invalidAccountNames, name)) {
-                    continue;
-                }
-
-                invalidAccounts.push({
-                    name: name || this.$t('(Empty)'),
-                    value: name
-                });
-            }
-
-            return invalidAccounts;
-        },
-        getCurrentInvalidTagNames() {
-            const invalidTagNames = {};
-            const invalidTags = [];
-
-            for (let i = 0; i < this.importTransactions.length; i++) {
-                const transaction = this.importTransactions[i];
-
-                if (!transaction.tagIds || !transaction.originalTagNames) {
-                    continue;
-                }
-
-                for (let j = 0; j < transaction.tagIds.length; j++) {
-                    const tagId = transaction.tagIds[j];
-                    const originalTagName = transaction.originalTagNames[j];
-
-                    if (!tagId || tagId === '0' || !this.allTagsMap[tagId]) {
-                        invalidTagNames[originalTagName] = true;
-                    }
-                }
-            }
-
-            for (const name in invalidTagNames) {
-                if (!Object.prototype.hasOwnProperty.call(invalidTagNames, name)) {
-                    continue;
-                }
-
-                invalidTags.push({
-                    name: name || this.$t('(Empty)'),
-                    value: name
-                });
-            }
-
-            return invalidTags;
-        },
-        isTagValid(tagIds, tagIndex) {
-            if (!tagIds || !tagIds[tagIndex]) {
-                return false;
-            }
-
-            if (tagIds[tagIndex] === '0') {
-                return false;
-            }
-
-            const tagId = tagIds[tagIndex];
-            return !!this.allTagsMap[tagId];
-        },
-        getDisplayDateTime(transaction) {
-            const transactionTime = getUnixTime(parseDateFromUnixTime(transaction.time, transaction.utcOffset, this.currentTimezoneOffsetMinutes));
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, transactionTime);
-        },
-        getDisplayTimezone(transaction) {
-            return `UTC${getUtcOffsetByUtcOffsetMinutes(transaction.utcOffset)}`;
-        },
-        getDisplayCurrency(value, currencyCode) {
-            return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, currencyCode);
-        },
-        getTransactionDisplayAmount(transaction) {
-            let currency = transaction.originalSourceAccountCurrency || this.userStore.currentUserDefaultCurrency;
-
-            if (transaction.sourceAccountId && transaction.sourceAccountId !== '0' && this.allAccountsMap[transaction.sourceAccountId]) {
-                currency = this.allAccountsMap[transaction.sourceAccountId].currency;
-            }
-
-            return this.getDisplayCurrency(transaction.sourceAmount, currency);
-        },
-        getTransactionDisplayDestinationAmount(transaction) {
-            if (transaction.type !== this.allTransactionTypes.Transfer) {
-                return '-';
-            }
-
-            let currency = transaction.originalDestinationAccountCurrency || this.userStore.currentUserDefaultCurrency;
-
-            if (transaction.destinationAccountId && transaction.destinationAccountId !== '0' && this.allAccountsMap[transaction.destinationAccountId]) {
-                currency = this.allAccountsMap[transaction.destinationAccountId].currency;
-            }
-
-            return this.getDisplayCurrency(transaction.destinationAmount, currency);
-        },
-        getPrimaryCategoryName(categoryId, allCategories) {
-            return getTransactionPrimaryCategoryName(categoryId, allCategories);
-        },
-        getSecondaryCategoryName(categoryId, allCategories) {
-            return getTransactionSecondaryCategoryName(categoryId, allCategories);
-        },
-        getSourceAccountTitle(transaction) {
-            if (transaction.type === this.allTransactionTypes.Expense || transaction.type === this.allTransactionTypes.Income) {
-                return this.$t('Account');
-            } else if (transaction.type === this.allTransactionTypes.Transfer) {
-                return this.$t('Source Account');
-            } else {
-                return this.$t('Account');
-            }
-        },
-        getSourceAccountDisplayName(transaction) {
-            if (transaction.sourceAccountId) {
-                return getNameByKeyValue(this.allAccounts, transaction.sourceAccountId, 'id', 'name');
-            } else {
-                return this.$t('None');
-            }
-        },
-        getDestinationAccountDisplayName(transaction) {
-            if (transaction.destinationAccountId) {
-                return getNameByKeyValue(this.allAccounts, transaction.destinationAccountId, 'id', 'name');
-            } else {
-                return this.$t('None');
+            count++;
+        }
+    }
+
+    return ret;
+});
+
+const selectedImportTransactionCount = computed<number>(() => {
+    let count = 0;
+
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return count;
+    }
+
+    for (let i = 0; i < importTransactions.value.length; i++) {
+        if (importTransactions.value[i].selected) {
+            count++;
+        }
+    }
+
+    return count;
+});
+
+const selectedExpenseTransactionCount = computed<number>(() => {
+    let count = 0;
+
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return count;
+    }
+
+    for (let i = 0; i < importTransactions.value.length; i++) {
+        if (importTransactions.value[i].selected && importTransactions.value[i].type === TransactionType.Expense) {
+            count++;
+        }
+    }
+
+    return count;
+});
+
+const selectedIncomeTransactionCount = computed<number>(() => {
+    let count = 0;
+
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return count;
+    }
+
+    for (let i = 0; i < importTransactions.value.length; i++) {
+        if (importTransactions.value[i].selected && importTransactions.value[i].type === TransactionType.Income) {
+            count++;
+        }
+    }
+
+    return count;
+});
+
+const selectedTransferTransactionCount = computed<number>(() => {
+    let count = 0;
+
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return count;
+    }
+
+    for (let i = 0; i < importTransactions.value.length; i++) {
+        if (importTransactions.value[i].selected && importTransactions.value[i].type === TransactionType.Transfer) {
+            count++;
+        }
+    }
+
+    return count;
+});
+
+const selectedInvalidTransactionCount = computed<number>(() => {
+    let count = 0;
+
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return count;
+    }
+
+    for (let i = 0; i < importTransactions.value.length; i++) {
+        if (!importTransactions.value[i].valid && importTransactions.value[i].selected) {
+            count++;
+        }
+    }
+
+    return count;
+});
+
+const anyButNotAllTransactionSelected = computed<boolean>(() => !!importTransactions.value && selectedImportTransactionCount.value > 0 && selectedImportTransactionCount.value !== importTransactions.value.length);
+const allTransactionSelected = computed<boolean>(() => !!importTransactions.value && selectedImportTransactionCount.value === importTransactions.value.length);
+
+const allUsedCategoryNames = computed<string[]>(() => {
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return [];
+    }
+
+    const categoryNames: Record<string, boolean> = {};
+
+    for (const transaction of importTransactions.value) {
+        if (transaction.actualCategoryName && transaction.actualCategoryName !== '') {
+            categoryNames[transaction.actualCategoryName] = true;
+        }
+    }
+
+    return objectFieldToArrayItem(categoryNames);
+});
+
+const allUsedAccountNames = computed<string[]>(() => {
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return [];
+    }
+
+    const accountNames: Record<string, boolean> = {};
+
+    for (const transaction of importTransactions.value) {
+        if (transaction.actualSourceAccountName && transaction.actualSourceAccountName !== '') {
+            accountNames[transaction.actualSourceAccountName] = true;
+        }
+
+        if (transaction.actualDestinationAccountName && transaction.actualDestinationAccountName !== '') {
+            accountNames[transaction.actualDestinationAccountName] = true;
+        }
+    }
+
+    return objectFieldToArrayItem(accountNames);
+});
+
+const allUsedTagNames = computed<string[]>(() => {
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return [];
+    }
+
+    const tagNames: Record<string, boolean> = {};
+
+    for (const transaction of importTransactions.value) {
+        if (!transaction.tagIds || !transaction.originalTagNames) {
+            continue;
+        }
+
+        for (let j = 0; j < transaction.tagIds.length; j++) {
+            const tagId = transaction.tagIds[j];
+            const originalTagName = transaction.originalTagNames[j];
+
+            if (tagId && tagId !== '0' && allTagsMap.value[tagId] && allTagsMap.value[tagId].name) {
+                tagNames[allTagsMap.value[tagId].name] = true;
+            } else if (originalTagName) {
+                tagNames[originalTagName] = true;
             }
         }
     }
+
+    return objectFieldToArrayItem(tagNames);
+});
+
+const allInvalidExpenseCategoryNames = computed<NameValue[]>(() => getCurrentInvalidCategoryNames(TransactionType.Expense));
+const allInvalidIncomeCategoryNames = computed<NameValue[]>(() => getCurrentInvalidCategoryNames(TransactionType.Income));
+const allInvalidTransferCategoryNames = computed<NameValue[]>(() => getCurrentInvalidCategoryNames(TransactionType.Transfer));
+const allInvalidAccountNames = computed<NameValue[]>(() => getCurrentInvalidAccountNames());
+const allInvalidTransactionTagNames = computed<NameValue[]>(() => getCurrentInvalidTagNames());
+
+const displayFilterCustomDateRange = computed<string>(() => {
+    if (filters.value.minDatetime === null || filters.value.maxDatetime === null) {
+        return '';
+    }
+
+    const minDisplayTime = formatUnixTimeToLongDateTime(filters.value.minDatetime);
+    const maxDisplayTime = formatUnixTimeToLongDateTime(filters.value.maxDatetime);
+
+    return `${minDisplayTime} - ${maxDisplayTime}`
+});
+
+function isTransactionDisplayed(transaction: ImportTransaction): boolean {
+    if (isNumber(filters.value.minDatetime) && isNumber(filters.value.maxDatetime) && (transaction.time < filters.value.minDatetime || transaction.time > filters.value.maxDatetime)) {
+        return false;
+    }
+
+    if (isNumber(filters.value.transactionType) && transaction.type !== filters.value.transactionType) {
+        return false;
+    }
+
+    if (isString(filters.value.category)) {
+        if (filters.value.category === '' && transaction.actualCategoryName !== '') {
+            return false;
+        } else if (filters.value.category !== '' && transaction.actualCategoryName !== filters.value.category) {
+            return false;
+        }
+    } else if (filters.value.category === undefined) {
+        if (transaction.type !== TransactionType.ModifyBalance && transaction.categoryId && transaction.categoryId !== '0') {
+            return false;
+        }
+    }
+
+    if (isString(filters.value.account)) {
+        if (filters.value.account === '' && (transaction.actualSourceAccountName !== '' || transaction.actualDestinationAccountName !== '')) {
+            return false;
+        } else if (filters.value.account !== '' && transaction.actualSourceAccountName !== filters.value.account && transaction.actualDestinationAccountName !== filters.value.account) {
+            return false;
+        }
+    } else if (filters.value.account === undefined) {
+        if (transaction.type !== TransactionType.Transfer && transaction.sourceAccountId && transaction.sourceAccountId !== '0') {
+            return false;
+        } else if (transaction.type === TransactionType.Transfer && transaction.sourceAccountId && transaction.sourceAccountId !== '0' && transaction.destinationAccountId && transaction.destinationAccountId !== '0') {
+            return false;
+        }
+    }
+
+    if (isString(filters.value.tag)) {
+        if (filters.value.tag === '' && transaction.tagIds && transaction.tagIds.length) {
+            return false;
+        } else if (filters.value.tag !== '') {
+            let hasTagName = false;
+
+            if (transaction.tagIds && transaction.tagIds.length) {
+                for (let i = 0; i < transaction.tagIds.length; i++) {
+                    const tagId = transaction.tagIds[i];
+                    let tagName = transaction.originalTagNames ? transaction.originalTagNames[i] : "";
+
+                    if (tagId && tagId !== '0' && allTagsMap.value[tagId] && allTagsMap.value[tagId].name) {
+                        tagName = allTagsMap.value[tagId].name;
+                    }
+
+                    if (tagName === filters.value.tag) {
+                        hasTagName = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!hasTagName) {
+                return false;
+            }
+        }
+    } else if (filters.value.tag === undefined) {
+        if (transaction.tagIds && transaction.tagIds.length) {
+            let hasInvalidTag = false;
+
+            for (let i = 0; i < transaction.tagIds.length; i++) {
+                if (!transaction.tagIds[i] || transaction.tagIds[i] === '0') {
+                    hasInvalidTag = true;
+                    break;
+                }
+            }
+
+            if (!hasInvalidTag) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    if (isString(filters.value.description)) {
+        if (filters.value.description === '' && transaction.comment !== '') {
+            return false;
+        } else if (filters.value.description !== '' && transaction.comment.indexOf(filters.value.description) < 0) {
+            return false;
+        }
+    }
+
+    return true;
 }
+
+function isTagValid(tagIds: string[], tagIndex: number): boolean {
+    if (!tagIds || !tagIds[tagIndex]) {
+        return false;
+    }
+
+    if (tagIds[tagIndex] === '0') {
+        return false;
+    }
+
+    const tagId = tagIds[tagIndex];
+    return !!allTagsMap.value[tagId];
+}
+
+function getDisplayDateTime(transaction: ImportTransaction): string {
+    const transactionTime = getUnixTime(parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value));
+    return formatUnixTimeToLongDateTime(transactionTime);
+}
+
+function getDisplayTimezone(transaction: ImportTransaction): string {
+    return `UTC${getUtcOffsetByUtcOffsetMinutes(transaction.utcOffset)}`;
+}
+
+function getDisplayCurrency(value: number, currencyCode: string): string {
+    return formatAmountWithCurrency(value, currencyCode);
+}
+
+function getTransactionDisplayAmount(transaction: ImportTransaction): string {
+    let currency = transaction.originalSourceAccountCurrency || defaultCurrency.value;
+
+    if (transaction.sourceAccountId && transaction.sourceAccountId !== '0' && allAccountsMap.value[transaction.sourceAccountId]) {
+        currency = allAccountsMap.value[transaction.sourceAccountId].currency;
+    }
+
+    return getDisplayCurrency(transaction.sourceAmount, currency);
+}
+
+function getTransactionDisplayDestinationAmount(transaction: ImportTransaction): string {
+    if (transaction.type !== TransactionType.Transfer) {
+        return '-';
+    }
+
+    let currency = transaction.originalDestinationAccountCurrency || defaultCurrency.value;
+
+    if (transaction.destinationAccountId && transaction.destinationAccountId !== '0' && allAccountsMap.value[transaction.destinationAccountId]) {
+        currency = allAccountsMap.value[transaction.destinationAccountId].currency;
+    }
+
+    return getDisplayCurrency(transaction.destinationAmount, currency);
+}
+
+function getSourceAccountTitle(transaction: ImportTransaction): string {
+    if (transaction.type === TransactionType.Expense || transaction.type === TransactionType.Income) {
+        return tt('Account');
+    } else if (transaction.type === TransactionType.Transfer) {
+        return tt('Source Account');
+    } else {
+        return tt('Account');
+    }
+}
+
+function getSourceAccountDisplayName(transaction: ImportTransaction): string {
+    if (transaction.sourceAccountId) {
+        return Account.findAccountNameById(allAccounts.value, transaction.sourceAccountId) || '';
+    } else {
+        return tt('None');
+    }
+}
+
+function getDestinationAccountDisplayName(transaction: ImportTransaction): string {
+    if (transaction.destinationAccountId) {
+        return Account.findAccountNameById(allAccounts.value, transaction.destinationAccountId) || '';
+    } else {
+        return tt('None');
+    }
+}
+
+function getCurrentInvalidCategoryNames(transactionType: TransactionType): NameValue[] {
+    const invalidCategoryNames: Record<string, boolean> = {};
+    const invalidCategories: NameValue[] = [];
+
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return invalidCategories;
+    }
+
+    for (let i = 0; i < importTransactions.value.length; i++) {
+        const transaction: ImportTransaction = importTransactions.value[i];
+        const categoryId = transaction.categoryId;
+
+        if (transaction.type === transactionType && (!categoryId || categoryId === '0' || !allCategoriesMap.value[categoryId])) {
+            invalidCategoryNames[transaction.originalCategoryName] = true;
+        }
+    }
+
+    for (const name in invalidCategoryNames) {
+        if (!Object.prototype.hasOwnProperty.call(invalidCategoryNames, name)) {
+            continue;
+        }
+
+        invalidCategories.push({
+            name: name || tt('(Empty)'),
+            value: name
+        });
+    }
+
+    return invalidCategories;
+}
+
+function getCurrentInvalidAccountNames(): NameValue[] {
+    const invalidAccountNames: Record<string, boolean> = {};
+    const invalidAccounts: NameValue[] = [];
+
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return invalidAccounts;
+    }
+
+    for (let i = 0; i < importTransactions.value.length; i++) {
+        const transaction: ImportTransaction = importTransactions.value[i];
+        const sourceAccountId = transaction.sourceAccountId;
+        const destinationAccountId = transaction.destinationAccountId;
+
+        if (!sourceAccountId || sourceAccountId === '0' || !allAccountsMap.value[sourceAccountId]) {
+            invalidAccountNames[transaction.originalSourceAccountName] = true;
+        }
+
+        if (transaction.type === TransactionType.Transfer && isString(transaction.originalDestinationAccountName) && (!destinationAccountId || destinationAccountId === '0' || !allAccountsMap.value[destinationAccountId])) {
+            invalidAccountNames[transaction.originalDestinationAccountName] = true;
+        }
+    }
+
+    for (const name in invalidAccountNames) {
+        if (!Object.prototype.hasOwnProperty.call(invalidAccountNames, name)) {
+            continue;
+        }
+
+        invalidAccounts.push({
+            name: name || tt('(Empty)'),
+            value: name
+        });
+    }
+
+    return invalidAccounts;
+}
+
+function getCurrentInvalidTagNames(): NameValue[] {
+    const invalidTagNames: Record<string, boolean> = {};
+    const invalidTags: NameValue[] = [];
+
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return invalidTags;
+    }
+
+    for (let i = 0; i < importTransactions.value.length; i++) {
+        const transaction: ImportTransaction = importTransactions.value[i];
+
+        if (!transaction.tagIds || !transaction.originalTagNames) {
+            continue;
+        }
+
+        for (let j = 0; j < transaction.tagIds.length; j++) {
+            const tagId = transaction.tagIds[j];
+            const originalTagName = transaction.originalTagNames[j];
+
+            if (!tagId || tagId === '0' || !allTagsMap.value[tagId]) {
+                invalidTagNames[originalTagName] = true;
+            }
+        }
+    }
+
+    for (const name in invalidTagNames) {
+        if (!Object.prototype.hasOwnProperty.call(invalidTagNames, name)) {
+            continue;
+        }
+
+        invalidTags.push({
+            name: name || tt('(Empty)'),
+            value: name
+        });
+    }
+
+    return invalidTags;
+}
+
+function open(): Promise<void> {
+    fileType.value = 'ezbookkeeping';
+    fileSubType.value = 'ezbookkeeping_csv';
+    currentStep.value = 'uploadFile';
+    importFile.value = null;
+    importTransactions.value = undefined;
+    editingTransaction.value = null;
+    editingTags.value = [];
+    filters.value.minDatetime = null;
+    filters.value.maxDatetime = null;
+    filters.value.transactionType = null;
+    filters.value.category = null;
+    filters.value.account = null;
+    filters.value.tag = null;
+    filters.value.description = null;
+    currentPage.value = 1;
+    countPerPage.value = 10;
+    showState.value = true;
+    clientSessionId.value = generateRandomUUID();
+
+    const promises = [
+        accountsStore.loadAllAccounts({ force: false }),
+        transactionCategoriesStore.loadAllCategories({ force: false }),
+        transactionTagsStore.loadAllTags({ force: false })
+    ];
+
+    Promise.all(promises).then(() => {
+        loading.value = false;
+    }).catch(error => {
+        logger.error('failed to load essential data for importing transaction', error);
+
+        loading.value = false;
+        showState.value = false;
+
+        if (!error.processed) {
+            if (rejectFunc) {
+                rejectFunc(error);
+            }
+        }
+    });
+
+    return new Promise((resolve, reject) => {
+        resolveFunc = resolve;
+        rejectFunc = reject;
+    });
+}
+
+function showOpenFileDialog(): void {
+    if (submitting.value) {
+        return;
+    }
+
+    fileInput.value?.click();
+}
+
+function setImportFile(event: Event): void {
+    if (!event || !event.target) {
+        return;
+    }
+
+    const el = event.target as HTMLInputElement;
+
+    if (!el.files || !el.files.length) {
+        return;
+    }
+
+    importFile.value = el.files[0];
+    el.value = '';
+}
+
+function parseData(): void {
+    if (!importFile.value) {
+        return;
+    }
+
+    submitting.value = true;
+
+    let type: string = fileType.value;
+
+    if (allFileSubTypes.value) {
+        type = fileSubType.value;
+    }
+
+    transactionsStore.parseImportTransaction({
+        fileType: type,
+        importFile: importFile.value
+    }).then(response => {
+        const parsedTransactions: ImportTransaction[] = [];
+
+        if (response.items) {
+            for (let i = 0; i < response.items.length; i++) {
+                const parsedTransaction = ImportTransaction.of(response.items[i], i);
+                parsedTransactions.push(parsedTransaction);
+            }
+        }
+
+        importTransactions.value = parsedTransactions;
+        editingTransaction.value = null;
+        editingTags.value = [];
+        currentPage.value = 1;
+
+        if (importTransactions.value && importTransactions.value.length >= 0 && importTransactions.value.length < 10) {
+            countPerPage.value = -1;
+        } else {
+            countPerPage.value = 10;
+        }
+
+        currentStep.value = 'checkData';
+        submitting.value = false;
+    }).catch(error => {
+        submitting.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function submit(): void {
+    if (editingTransaction.value) {
+        return;
+    }
+
+    const transactions: ImportTransaction[] = [];
+
+    if (importTransactions.value) {
+        for (let i = 0; i < importTransactions.value.length; i++) {
+            const transaction: ImportTransaction = importTransactions.value[i];
+
+            if (transaction.valid && transaction.selected) {
+                transactions.push(transaction);
+            } else if (!transaction.valid && transaction.selected) {
+                snackbar.value?.showError('Cannot import invalid transactions');
+                return;
+            }
+        }
+    }
+
+    if (transactions.length < 1) {
+        snackbar.value?.showError('No data to import');
+        return;
+    }
+
+    confirmDialog.value?.open('format.misc.confirmImportTransactions', {
+        count: transactions.length
+    }).then(() => {
+        editingTransaction.value = null;
+        editingTags.value = [];
+        submitting.value = true;
+
+        transactionsStore.importTransactions({
+            transactions: transactions,
+            clientSessionId: clientSessionId.value
+        }).then(response => {
+            importedCount.value = response;
+            currentStep.value = 'finalResult';
+
+            accountsStore.updateAccountListInvalidState(true);
+            transactionsStore.updateTransactionListInvalidState(true);
+            overviewStore.updateTransactionOverviewInvalidState(true);
+            statisticsStore.updateTransactionStatisticsInvalidState(true);
+
+            submitting.value = false;
+        }).catch(error => {
+            submitting.value = false;
+
+            if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+        });
+    });
+}
+
+function close(completed: boolean): void {
+    if (completed) {
+        if (resolveFunc) {
+            resolveFunc();
+        }
+    } else {
+        if (rejectFunc) {
+            rejectFunc();
+        }
+    }
+
+    showState.value = false;
+}
+
+function changeCustomDateFilter(minTime: number, maxTime: number): void {
+    filters.value.minDatetime = minTime;
+    filters.value.maxDatetime = maxTime;
+    showCustomDateRangeDialog.value = false;
+}
+
+function importTransactionsFilter(value: string, query: string, item?: { value: unknown, raw: ImportTransaction }): boolean {
+    if (!item || !item.raw) {
+        return false;
+    }
+
+    return isTransactionDisplayed(item.raw);
+}
+
+function selectAllValid(): void {
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return;
+    }
+
+    for (let i = 0; i < importTransactions.value.length; i++) {
+        if (importTransactions.value[i].valid && isTransactionDisplayed(importTransactions.value[i])) {
+            importTransactions.value[i].selected = true;
+        }
+    }
+}
+
+function selectAllInvalid(): void {
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return;
+    }
+
+    for (let i = 0; i < importTransactions.value.length; i++) {
+        if (!importTransactions.value[i].valid && isTransactionDisplayed(importTransactions.value[i])) {
+            importTransactions.value[i].selected = true;
+        }
+    }
+}
+
+function selectAll(): void {
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return;
+    }
+
+    for (let i = 0; i < importTransactions.value.length; i++) {
+        if (isTransactionDisplayed(importTransactions.value[i])) {
+            importTransactions.value[i].selected = true;
+        }
+    }
+}
+
+function selectNone(): void {
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return;
+    }
+
+    for (let i = 0; i < importTransactions.value.length; i++) {
+        if (isTransactionDisplayed(importTransactions.value[i])) {
+            importTransactions.value[i].selected = false;
+        }
+    }
+}
+
+function selectInvert(): void {
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return;
+    }
+
+    for (let i = 0; i < importTransactions.value.length; i++) {
+        if (isTransactionDisplayed(importTransactions.value[i])) {
+            importTransactions.value[i].selected = !importTransactions.value[i].selected;
+        }
+    }
+}
+
+function selectAllInThisPage(): void {
+    for (let i = 0; i < currentPageTransactions.value.length; i++) {
+        currentPageTransactions.value[i].selected = true;
+    }
+}
+
+function selectNoneInThisPage(): void {
+    for (let i = 0; i < currentPageTransactions.value.length; i++) {
+        currentPageTransactions.value[i].selected = false;
+    }
+}
+
+function selectInvertInThisPage(): void {
+    for (let i = 0; i < currentPageTransactions.value.length; i++) {
+        currentPageTransactions.value[i].selected = !currentPageTransactions.value[i].selected;
+    }
+}
+
+function editTransaction(transaction: ImportTransaction): void {
+    if (editingTransaction.value) {
+        editingTransaction.value.tagIds = editingTags.value;
+        updateTransactionData(editingTransaction.value);
+    }
+
+    if (editingTransaction.value === transaction) {
+        editingTags.value = [];
+        editingTransaction.value = null;
+    } else {
+        editingTransaction.value = transaction;
+        editingTags.value = editingTransaction.value.tagIds;
+    }
+}
+
+function updateTransactionData(transaction: ImportTransaction): void {
+    transaction.valid = transaction.isTransactionValid();
+
+    if (transaction.categoryId && allCategoriesMap.value[transaction.categoryId]) {
+        transaction.actualCategoryName = allCategoriesMap.value[transaction.categoryId].name;
+    }
+
+    if (transaction.sourceAccountId && allAccountsMap.value[transaction.sourceAccountId]) {
+        transaction.actualSourceAccountName = allAccountsMap.value[transaction.sourceAccountId].name;
+    }
+
+    if (transaction.destinationAccountId && allAccountsMap.value[transaction.destinationAccountId]) {
+        transaction.actualDestinationAccountName = allAccountsMap.value[transaction.destinationAccountId].name;
+    }
+}
+
+function showBatchReplaceDialog(type: string): void {
+    if (editingTransaction.value) {
+        return;
+    }
+
+    batchReplaceDialog.value?.open({
+        mode: 'batchReplace',
+        type: type
+    }).then(result => {
+        if (!result || !result.targetItem) {
+            return;
+        }
+
+        let updatedCount = 0;
+
+        if (importTransactions.value) {
+            for (let i = 0; i < importTransactions.value.length; i++) {
+                const transaction: ImportTransaction = importTransactions.value[i];
+
+                if (!transaction.selected) {
+                    continue;
+                }
+
+                let updated = false;
+
+                if (type === 'expenseCategory') {
+                    if (transaction.type === TransactionType.Expense) {
+                        transaction.categoryId = result.targetItem;
+                        updated = true;
+                    }
+                } else if (type === 'incomeCategory') {
+                    if (transaction.type === TransactionType.Income) {
+                        transaction.categoryId = result.targetItem;
+                        updated = true;
+                    }
+                } else if (type === 'transferCategory') {
+                    if (transaction.type === TransactionType.Transfer) {
+                        transaction.categoryId = result.targetItem;
+                        updated = true;
+                    }
+                } else if (type === 'account') {
+                    transaction.sourceAccountId = result.targetItem;
+                    updated = true;
+                } else if (type === 'destinationAccount') {
+                    if (transaction.type === TransactionType.Transfer) {
+                        transaction.destinationAccountId = result.targetItem;
+                        updated = true;
+                    }
+                }
+
+                if (updated) {
+                    updatedCount++;
+                    updateTransactionData(transaction);
+                }
+            }
+        }
+
+        if (updatedCount > 0) {
+            snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
+                count: updatedCount
+            });
+        }
+    });
+}
+
+function showReplaceInvalidItemDialog(type: string, invalidItems: NameValue[]): void {
+    if (editingTransaction.value) {
+        return;
+    }
+
+    batchReplaceDialog.value?.open({
+        mode: 'replaceInvalidItems',
+        type: type,
+        invalidItems: invalidItems
+    }).then(result => {
+        if (!result || (!result.sourceItem && result.sourceItem !== '') || !result.targetItem) {
+            return;
+        }
+
+        let updatedCount = 0;
+
+        if (importTransactions.value) {
+            for (let i = 0; i < importTransactions.value.length; i++) {
+                const transaction: ImportTransaction = importTransactions.value[i];
+
+                if (transaction.valid) {
+                    continue;
+                }
+
+                let updated = false;
+
+                if (type === 'expenseCategory' || type === 'incomeCategory' || type === 'transferCategory') {
+                    const categoryId = transaction.categoryId;
+                    const originalCategoryName = transaction.originalCategoryName;
+
+                    if (transaction.type !== TransactionType.ModifyBalance && originalCategoryName === result.sourceItem && (!categoryId || categoryId === '0' || !allCategoriesMap.value[categoryId])) {
+                        if (type === 'expenseCategory' && transaction.type === TransactionType.Expense) {
+                            transaction.categoryId = result.targetItem;
+                            updated = true;
+                        } else if (type === 'incomeCategory' && transaction.type === TransactionType.Income) {
+                            transaction.categoryId = result.targetItem;
+                            updated = true;
+                        } else if (type === 'transferCategory' && transaction.type === TransactionType.Transfer) {
+                            transaction.categoryId = result.targetItem;
+                            updated = true;
+                        }
+                    }
+                } else if (type === 'account') {
+                    const sourceAccountId = transaction.sourceAccountId;
+                    const originalSourceAccountName = transaction.originalSourceAccountName;
+                    const destinationAccountId = transaction.destinationAccountId;
+                    const originalDestinationAccountName = transaction.originalDestinationAccountName;
+
+                    if (originalSourceAccountName === result.sourceItem && (!sourceAccountId || sourceAccountId === '0' || !allAccountsMap.value[sourceAccountId])) {
+                        transaction.sourceAccountId = result.targetItem;
+                        updated = true;
+                    }
+
+                    if (transaction.type === TransactionType.Transfer && originalDestinationAccountName === result.sourceItem && (!destinationAccountId || destinationAccountId === '0' || !allAccountsMap.value[destinationAccountId])) {
+                        transaction.destinationAccountId = result.targetItem;
+                        updated = true;
+                    }
+                } else if (type === 'tag' && transaction.tagIds) {
+                    for (let j = 0; j < transaction.tagIds.length; j++) {
+                        const tagId = transaction.tagIds[j];
+                        const originalTagName = transaction.originalTagNames ? transaction.originalTagNames[j] : "";
+
+                        if (originalTagName === result.sourceItem && (!tagId || tagId === '0' || !allTagsMap.value[tagId])) {
+                            transaction.tagIds[j] = result.targetItem;
+                            updated = true;
+                        }
+                    }
+                }
+
+                if (updated) {
+                    updatedCount++;
+                    updateTransactionData(transaction);
+                }
+            }
+        }
+
+        if (updatedCount > 0) {
+            snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
+                count: updatedCount
+            });
+        }
+    });
+}
+
+function onShowDateRangeError(message: string): void {
+    snackbar.value?.showError(message);
+}
+
+watch(fileType, () => {
+    if (allFileSubTypes.value && allFileSubTypes.value.length) {
+        fileSubType.value = allFileSubTypes.value[0].type;
+    }
+
+    importFile.value = null;
+    importTransactions.value = undefined;
+    editingTransaction.value = null;
+    editingTags.value = [];
+    currentPage.value = 1;
+    countPerPage.value = 10;
+});
+
+watch(fileSubType, (newValue) => {
+    let supportedExtensions: string | undefined = findExtensionByType(allFileSubTypes.value, newValue);
+
+    if (!supportedExtensions) {
+        supportedExtensions = findExtensionByType(allSupportedImportFileTypes.value, fileType.value);
+    }
+
+    if (importFile.value && importFile.value.name && !isFileExtensionSupported(importFile.value.name, supportedExtensions || '')) {
+        importFile.value = null;
+    }
+});
+
+defineExpose({
+    open
+});
 </script>
 
 <style>

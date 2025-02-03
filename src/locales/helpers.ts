@@ -82,6 +82,12 @@ import {
     ChartDateAggregationType
 } from '@/core/statistics.ts';
 
+import {
+    type LocalizedImportFileType,
+    type LocalizedImportFileTypeSubType,
+    type LocalizedImportFileDocument,
+} from '@/core/file.ts';
+
 import type { LocaleDefaultSettings } from '@/core/setting.ts';
 import type { ErrorResponse } from '@/core/api.ts';
 
@@ -89,6 +95,7 @@ import { UTC_TIMEZONE, ALL_TIMEZONES } from '@/consts/timezone.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { DEFAULT_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES, DEFAULT_TRANSFER_CATEGORIES } from '@/consts/category.ts';
 import { KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS } from '@/consts/api.ts';
+import { DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE, SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE, SUPPORTED_IMPORT_FILE_TYPES } from '@/consts/file.ts';
 
 import {
     type CategorizedAccount,
@@ -1066,6 +1073,85 @@ export function useI18n() {
         return availableExchangeRates;
     }
 
+    function getAllSupportedImportFileTypes(): LocalizedImportFileType[] {
+        const allSupportedImportFileTypes: LocalizedImportFileType[] = [];
+
+        for (let i = 0; i < SUPPORTED_IMPORT_FILE_TYPES.length; i++) {
+            const fileType = SUPPORTED_IMPORT_FILE_TYPES[i];
+            let document: LocalizedImportFileDocument | undefined;
+
+            if (fileType.document) {
+                let documentLanguage = '';
+                let documentDisplayLanguageName = '';
+                let documentAnchor = '';
+
+                if (fileType.document.supportMultiLanguages === true) {
+                    documentLanguage = getCurrentLanguageTag();
+
+                    if (SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE[documentLanguage]) {
+                        documentAnchor = t(`document.anchor.export_and_import.${fileType.document.anchor}`);
+                    } else {
+                        documentLanguage = DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE;
+                        documentAnchor = t(`document.anchor.export_and_import.${fileType.document.anchor}`, {}, { locale: documentLanguage });
+                    }
+                } else if (isString(fileType.document.supportMultiLanguages) && ALL_LANGUAGES[fileType.document.supportMultiLanguages]) {
+                    documentLanguage = fileType.document.supportMultiLanguages;
+                    documentAnchor = fileType.document.anchor;
+                }
+
+                if (documentLanguage && documentLanguage !== getCurrentLanguageTag()) {
+                    documentDisplayLanguageName = getLanguageDisplayName(ALL_LANGUAGES[documentLanguage].name);
+                }
+
+                if (documentLanguage) {
+                    documentLanguage = documentLanguage.replace(/-/g, '_');
+                }
+
+                if (documentAnchor) {
+                    documentAnchor = documentAnchor.toLowerCase().replace(/ /g, '-');
+                }
+
+                if (documentLanguage === DEFAULT_LANGUAGE) {
+                    documentLanguage = '';
+                }
+
+                document = {
+                    language: documentLanguage,
+                    displayLanguageName: documentDisplayLanguageName,
+                    anchor: documentAnchor
+                };
+            } else {
+                document = undefined;
+            }
+
+            const subTypes: LocalizedImportFileTypeSubType[] = [];
+
+            if (fileType.subTypes) {
+                for (let i = 0; i < fileType.subTypes.length; i++) {
+                    const subType = fileType.subTypes[i];
+                    const localizedSubType: LocalizedImportFileTypeSubType = {
+                        type: subType.type,
+                        displayName: t(subType.name),
+                        extensions: subType.extensions
+                    };
+
+                    subTypes.push(localizedSubType);
+                }
+            }
+
+            const localizedFileType: LocalizedImportFileType = {
+                type: fileType.type,
+                displayName: t(fileType.name),
+                extensions: fileType.extensions,
+                subTypes: subTypes.length ? subTypes : undefined,
+                document: document
+            };
+            allSupportedImportFileTypes.push(localizedFileType);
+        }
+
+        return allSupportedImportFileTypes;
+    }
+
     function getLanguageInfo(languageKey: string): LanguageInfo | undefined {
         return ALL_LANGUAGES[languageKey];
     }
@@ -1593,6 +1679,7 @@ export function useI18n() {
         getAllTransactionScheduledFrequencyTypes: () => getLocalizedDisplayNameAndType(ScheduledTemplateFrequencyType.values()),
         getAllTransactionDefaultCategories,
         getAllDisplayExchangeRates,
+        getAllSupportedImportFileTypes,
         // get localized info
         getLanguageInfo,
         getMonthShortName,

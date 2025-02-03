@@ -1,5 +1,3 @@
-import { DEFAULT_LANGUAGE, ALL_LANGUAGES } from '@/locales/index.ts';
-
 import { WeekDay, LongDateFormat, ShortDateFormat, LongTimeFormat, ShortTimeFormat, DateRange } from '@/core/datetime.ts';
 import { DecimalSeparator, DigitGroupingSymbol, DigitGroupingType } from '@/core/numeral.ts';
 import { CurrencyDisplayType } from '@/core/currency.ts'
@@ -8,7 +6,6 @@ import { TransactionTagFilterType } from '@/core/transaction.ts';
 
 import { UTC_TIMEZONE, ALL_TIMEZONES } from '@/consts/timezone.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
-import { SUPPORTED_IMPORT_FILE_TYPES } from '@/consts/file.ts';
 import { KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS } from '@/consts/api.ts';
 
 import {
@@ -47,14 +44,6 @@ import {
     getCategorizedAccountsMap,
     getAllFilteredAccountsBalance
 } from '@/lib/account.ts';
-
-function getLanguageDisplayName(translateFn, languageName) {
-    return translateFn(`language.${languageName}`);
-}
-
-function getCurrentLanguageTag(i18nGlobal) {
-    return i18nGlobal.locale;
-}
 
 function getLocalizedDisplayNameAndType(typeAndNames, translateFn) {
     const ret = [];
@@ -550,72 +539,6 @@ function getAllTransactionTagFilterTypes(translateFn) {
     return getLocalizedDisplayNameAndType(TransactionTagFilterType.values(), translateFn);
 }
 
-function getAllSupportedImportFileTypes(i18nGlobal, translateFn) {
-    const allSupportedImportFileTypes = [];
-
-    for (let i = 0; i < SUPPORTED_IMPORT_FILE_TYPES.length; i++) {
-        const fileType = SUPPORTED_IMPORT_FILE_TYPES[i];
-        let document = {
-            language: '',
-            displayLanguageName: '',
-            anchor: ''
-        };
-
-        if (fileType.document) {
-            if (fileType.document.supportMultiLanguages === true) {
-                document.language = getCurrentLanguageTag(i18nGlobal);
-                document.anchor = translateFn(`document.anchor.export_and_import.${fileType.document.anchor}`);
-            } else if (isString(fileType.document.supportMultiLanguages) && ALL_LANGUAGES[fileType.document.supportMultiLanguages]) {
-                document.language = fileType.document.supportMultiLanguages;
-
-                if (document.language !== getCurrentLanguageTag(i18nGlobal)) {
-                    document.displayLanguageName = getLanguageDisplayName(translateFn, ALL_LANGUAGES[fileType.document.supportMultiLanguages].name);
-                }
-
-                document.anchor = fileType.document.anchor;
-            }
-
-            if (document.language) {
-                document.language = document.language.replace(/-/g, '_');
-            }
-
-            if (document.anchor) {
-                document.anchor = document.anchor.toLowerCase().replace(/ /g, '-');
-            }
-
-            if (document.language === DEFAULT_LANGUAGE) {
-                document.language = '';
-            }
-        } else {
-            document = null;
-        }
-
-        const subTypes = [];
-
-        if (fileType.subTypes) {
-            for (let i = 0; i < fileType.subTypes.length; i++) {
-                const subType = fileType.subTypes[i];
-
-                subTypes.push({
-                    type: subType.type,
-                    displayName: translateFn(subType.name),
-                    extensions: subType.extensions
-                });
-            }
-        }
-
-        allSupportedImportFileTypes.push({
-            type: fileType.type,
-            displayName: translateFn(fileType.name),
-            extensions: fileType.extensions,
-            subTypes: subTypes.length ? subTypes : undefined,
-            document: document
-        });
-    }
-
-    return allSupportedImportFileTypes;
-}
-
 function getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, translateFn) {
     const ret = [];
     const allCategories = AccountCategory.values();
@@ -785,7 +708,6 @@ export function i18nFunctions(i18nGlobal) {
         formatAmountWithCurrency: (settingsStore, userStore, value, currencyCode) => getFormattedAmountWithCurrency(value, currencyCode, i18nGlobal.t, userStore, settingsStore),
         getAdaptiveAmountRate: (userStore, amount1, amount2, fromExchangeRate, toExchangeRate) => getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, i18nGlobal.t, userStore),
         getAllTransactionTagFilterTypes: () => getAllTransactionTagFilterTypes(i18nGlobal.t),
-        getAllSupportedImportFileTypes: () => getAllSupportedImportFileTypes(i18nGlobal, i18nGlobal.t),
         getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t)
     };
 }

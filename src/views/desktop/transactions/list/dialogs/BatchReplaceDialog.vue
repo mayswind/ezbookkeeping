@@ -180,8 +180,9 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
+import type { NameValue } from '@/core/base.ts';
 import { CategoryType } from '@/core/category.ts';
-import { type CategorizedAccountWithDisplayBalance, Account } from '@/models/account.ts';
+import { Account, type CategorizedAccountWithDisplayBalance } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 import type { TransactionTag } from '@/models/transaction_tag.ts';
 
@@ -194,11 +195,6 @@ import {
 import {
     mdiPound
 } from '@mdi/js';
-
-interface BatchReplaceDialogInvalidItem {
-    name: string;
-    value: string;
-}
 
 interface BatchReplaceDialogResponse {
     sourceItem?: string;
@@ -223,7 +219,7 @@ const icons = {
 const showState = ref<boolean>(false);
 const mode = ref<string>('');
 const type = ref<string>('');
-const invalidItems = ref<BatchReplaceDialogInvalidItem[] | undefined>([]);
+const invalidItems = ref<NameValue[] | undefined>([]);
 const sourceItem = ref<string | undefined>(undefined);
 const targetItem = ref<string | undefined>(undefined);
 
@@ -272,7 +268,7 @@ function getAccountDisplayName(accountId?: string): string {
     }
 }
 
-function open(options: { mode: string; type: string; invalidItems?: BatchReplaceDialogInvalidItem[] }): Promise<BatchReplaceDialogResponse> {
+function open(options: { mode: string; type: string; invalidItems?: NameValue[] }): Promise<BatchReplaceDialogResponse> {
     mode.value = options.mode;
     type.value = options.type;
     sourceItem.value = undefined;

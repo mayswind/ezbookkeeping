@@ -309,7 +309,9 @@ function open(options?: { id?: string, currentAccount?: Account, category?: numb
             showState.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                if (rejectFunc) {
+                    rejectFunc(error);
+                }
             }
         });
     } else {

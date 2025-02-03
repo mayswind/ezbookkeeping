@@ -167,7 +167,9 @@ function open(options: { id?: string; parentId?: string; type?: CategoryType; cu
             showState.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                if (rejectFunc) {
+                    rejectFunc(error);
+                }
             }
         });
     } else if (options.parentId) {

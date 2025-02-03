@@ -22,8 +22,7 @@
                     <f7-list-item :title="tt(dataType.name)"
                                   :class="{ 'list-item-selected': analysisType === StatisticsAnalysisType.CategoricalAnalysis && query.chartDataType === dataType.type }"
                                   :key="dataType.type"
-                                  v-for="dataType in ChartDataType.all()"
-                                  v-show="dataType.isAvailableAnalysisType(StatisticsAnalysisType.CategoricalAnalysis)"
+                                  v-for="dataType in ChartDataType.values(StatisticsAnalysisType.CategoricalAnalysis)"
                                   @click="setChartDataType(StatisticsAnalysisType.CategoricalAnalysis, dataType.type)">
                         <template #after>
                             <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="analysisType === StatisticsAnalysisType.CategoricalAnalysis && query.chartDataType === dataType.type"></f7-icon>
@@ -35,8 +34,7 @@
                     <f7-list-item :title="tt(dataType.name)"
                                   :class="{ 'list-item-selected': analysisType === StatisticsAnalysisType.TrendAnalysis && query.chartDataType === dataType.type }"
                                   :key="dataType.type"
-                                  v-for="dataType in ChartDataType.all()"
-                                  v-show="dataType.isAvailableAnalysisType(StatisticsAnalysisType.TrendAnalysis)"
+                                  v-for="dataType in ChartDataType.values(StatisticsAnalysisType.TrendAnalysis)"
                                   @click="setChartDataType(StatisticsAnalysisType.TrendAnalysis, dataType.type)">
                         <template #after>
                             <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="analysisType === StatisticsAnalysisType.TrendAnalysis && query.chartDataType === dataType.type"></f7-icon>

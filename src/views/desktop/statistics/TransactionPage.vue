@@ -38,7 +38,8 @@
                         <v-tabs show-arrows class="my-4" direction="vertical"
                                 :disabled="loading" v-model="queryChartDataType">
                             <v-tab class="tab-text-truncate" :key="dataType.type" :value="dataType.type"
-                                   v-for="dataType in ChartDataType.all()" v-show="dataType.isAvailableAnalysisType(queryAnalysisType)">
+                                   v-for="dataType in ChartDataType.values()"
+                                   v-show="dataType.isAvailableAnalysisType(queryAnalysisType)">
                                 <span class="text-truncate">{{ tt(dataType.name) }}</span>
                                 <v-tooltip activator="parent" location="right">{{ tt(dataType.name) }}</v-tooltip>
                             </v-tab>

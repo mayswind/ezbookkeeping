@@ -40,7 +40,6 @@ type ScheduledTemplateFrequencyTypeName = 'Disabled' | 'Weekly' | 'Monthly';
 export class ScheduledTemplateFrequencyType implements TypeAndName {
     private static readonly allInstances: ScheduledTemplateFrequencyType[] = [];
     private static readonly allInstancesByType: Record<number, ScheduledTemplateFrequencyType> = {};
-    private static readonly allInstancesByTypeName: Record<string, ScheduledTemplateFrequencyType> = {};
 
     public static readonly Disabled = new ScheduledTemplateFrequencyType(0, 'Disabled');
     public static readonly Weekly = new ScheduledTemplateFrequencyType(1, 'Weekly');
@@ -55,15 +54,10 @@ export class ScheduledTemplateFrequencyType implements TypeAndName {
 
         ScheduledTemplateFrequencyType.allInstances.push(this);
         ScheduledTemplateFrequencyType.allInstancesByType[type] = this;
-        ScheduledTemplateFrequencyType.allInstancesByTypeName[name] = this;
     }
 
     public static values(): ScheduledTemplateFrequencyType[] {
         return ScheduledTemplateFrequencyType.allInstances;
-    }
-
-    public static all(): Record<ScheduledTemplateFrequencyTypeName, ScheduledTemplateFrequencyType> {
-        return ScheduledTemplateFrequencyType.allInstancesByTypeName;
     }
 
     public static valueOf(type: number): ScheduledTemplateFrequencyType | undefined {

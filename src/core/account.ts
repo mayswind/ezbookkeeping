@@ -4,7 +4,6 @@ type AccountTypeName = 'SingleAccount' | 'MultiSubAccounts';
 
 export class AccountType implements TypeAndName {
     private static readonly allInstances: AccountType[] = [];
-    private static readonly allInstancesByTypeName: Record<string, AccountType> = {};
 
     public static readonly SingleAccount = new AccountType(1, 'SingleAccount', 'Single Account');
     public static readonly MultiSubAccounts = new AccountType(2, 'MultiSubAccounts', 'Multiple Sub-accounts');
@@ -19,15 +18,10 @@ export class AccountType implements TypeAndName {
         this.name = name;
 
         AccountType.allInstances.push(this);
-        AccountType.allInstancesByTypeName[typeName] = this;
     }
 
     public static values(): AccountType[] {
         return AccountType.allInstances;
-    }
-
-    public static all(): Record<AccountTypeName, AccountType> {
-        return AccountType.allInstancesByTypeName;
     }
 }
 
@@ -36,7 +30,6 @@ type AccountCategoryTypeName = 'Cash' | 'CheckingAccount' | 'SavingsAccount' | '
 export class AccountCategory implements TypeAndName {
     private static readonly allInstances: AccountCategory[] = [];
     private static readonly allInstancesByType: Record<number, AccountCategory> = {};
-    private static readonly allInstancesByTypeName: Record<string, AccountCategory> = {};
 
     public static readonly Cash = new AccountCategory(1, 'Cash', 'Cash', '1');
     public static readonly CheckingAccount = new AccountCategory(2, 'CheckingAccount', 'Checking Account', '100');
@@ -63,7 +56,6 @@ export class AccountCategory implements TypeAndName {
 
         AccountCategory.allInstances.push(this);
         AccountCategory.allInstancesByType[type] = this;
-        AccountCategory.allInstancesByTypeName[typeName] = this;
     }
 
     public static values(): AccountCategory[] {

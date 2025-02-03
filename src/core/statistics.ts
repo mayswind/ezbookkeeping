@@ -10,7 +10,6 @@ type CategoricalChartTypeName = 'Pie' | 'Bar';
 
 export class CategoricalChartType implements TypeAndName {
     private static readonly allInstances: CategoricalChartType[] = [];
-    private static readonly allInstancesByTypeName: Record<string, CategoricalChartType> = {};
 
     public static readonly Pie = new CategoricalChartType(0, 'Pie', 'Pie Chart');
     public static readonly Bar = new CategoricalChartType(1, 'Bar', 'Bar Chart');
@@ -27,15 +26,10 @@ export class CategoricalChartType implements TypeAndName {
         this.name = name;
 
         CategoricalChartType.allInstances.push(this);
-        CategoricalChartType.allInstancesByTypeName[typeName] = this;
     }
 
     public static values(): CategoricalChartType[] {
         return CategoricalChartType.allInstances;
-    }
-
-    public static all(): Record<CategoricalChartTypeName, CategoricalChartType> {
-        return CategoricalChartType.allInstancesByTypeName;
     }
 }
 
@@ -43,7 +37,6 @@ type TrendChartTypeName = 'Area' | 'Column';
 
 export class TrendChartType implements TypeAndName {
     private static readonly allInstances: TrendChartType[] = [];
-    private static readonly allInstancesByTypeName: Record<string, TrendChartType> = {};
 
     public static readonly Area = new TrendChartType(0, 'Area', 'Area Chart');
     public static readonly Column = new TrendChartType(1, 'Column', 'Column Chart');
@@ -60,15 +53,10 @@ export class TrendChartType implements TypeAndName {
         this.name = name;
 
         TrendChartType.allInstances.push(this);
-        TrendChartType.allInstancesByTypeName[typeName] = this;
     }
 
     public static values(): TrendChartType[] {
         return TrendChartType.allInstances;
-    }
-
-    public static all(): Record<TrendChartTypeName, TrendChartType> {
-        return TrendChartType.allInstancesByTypeName;
     }
 }
 
@@ -77,7 +65,6 @@ type ChartDataTypeName = 'ExpenseByAccount' | 'ExpenseByPrimaryCategory' | 'Expe
 export class ChartDataType implements TypeAndName {
     private static readonly allInstances: ChartDataType[] = [];
     private static readonly allInstancesByType: Record<number, ChartDataType> = {};
-    private static readonly allInstancesByTypeName: Record<string, ChartDataType> = {};
 
     public static readonly ExpenseByAccount = new ChartDataType(0, 'ExpenseByAccount', 'Expense By Account', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
     public static readonly ExpenseByPrimaryCategory = new ChartDataType(1, 'ExpenseByPrimaryCategory', 'Expense By Primary Category', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
@@ -112,7 +99,6 @@ export class ChartDataType implements TypeAndName {
 
         ChartDataType.allInstances.push(this);
         ChartDataType.allInstancesByType[type] = this;
-        ChartDataType.allInstancesByTypeName[typeName] = this;
     }
 
     public isAvailableAnalysisType(analysisType: StatisticsAnalysisType): boolean {
@@ -133,10 +119,6 @@ export class ChartDataType implements TypeAndName {
         }
 
         return ret;
-    }
-
-    public static all(): Record<ChartDataTypeName, ChartDataType> {
-        return ChartDataType.allInstancesByTypeName;
     }
 
     public static valueOf(type: number): ChartDataType | undefined {

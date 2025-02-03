@@ -269,6 +269,7 @@
                         </template>
                         <template #item.data-table-select="{ item }">
                             <v-checkbox density="compact"
+                                        :color="!item.valid ? 'error' : 'primary'"
                                         :disabled="loading || submitting"
                                         v-model="item.selected"></v-checkbox>
                         </template>

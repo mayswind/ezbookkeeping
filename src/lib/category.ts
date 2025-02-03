@@ -72,7 +72,7 @@ export function getTransactionSecondaryCategoryName(categoryId: string | null | 
     return '';
 }
 
-export function allTransactionCategoriesWithVisibleCount(allTransactionCategories: Record<number, TransactionCategory[]>, allowCategoryTypes: Record<number, boolean>): Record<number, TransactionCategoriesWithVisibleCount> {
+export function allTransactionCategoriesWithVisibleCount(allTransactionCategories: Record<number, TransactionCategory[]>, allowCategoryTypes?: Record<number, boolean>): Record<number, TransactionCategoriesWithVisibleCount> {
     const ret: Record<string, TransactionCategoriesWithVisibleCount> = {};
     const hasAllowCategoryTypes = allowCategoryTypes
         && (allowCategoryTypes[CategoryType.Income]
@@ -339,7 +339,7 @@ export function getLastShowingId(categories: TransactionCategory[], showHidden: 
     return null;
 }
 
-export function hasAnyAvailableCategory(allTransactionCategories: Record<number, TransactionCategoriesWithVisibleCount>, showHidden: boolean): boolean {
+export function containsAnyAvailableCategory(allTransactionCategories: Record<number, TransactionCategoriesWithVisibleCount>, showHidden: boolean): boolean {
     for (const type in allTransactionCategories) {
         if (!Object.prototype.hasOwnProperty.call(allTransactionCategories, type)) {
             continue;
@@ -361,7 +361,7 @@ export function hasAnyAvailableCategory(allTransactionCategories: Record<number,
     return false;
 }
 
-export function hasAvailableCategory(allTransactionCategories: Record<number, TransactionCategoriesWithVisibleCount>, showHidden: boolean): Record<number, boolean> {
+export function containsAvailableCategory(allTransactionCategories: Record<number, TransactionCategoriesWithVisibleCount>, showHidden: boolean): Record<number, boolean> {
     const result: Record<number, boolean> = {};
 
     for (const type in allTransactionCategories) {
@@ -381,7 +381,7 @@ export function hasAvailableCategory(allTransactionCategories: Record<number, Tr
     return result;
 }
 
-export function selectSubCategories(filterCategoryIds: Record<string, boolean>, category: TransactionCategory, value: boolean): void {
+export function selectAllSubCategories(filterCategoryIds: Record<string, boolean>, category: TransactionCategory, value: boolean): void {
     if (!category || !category.secondaryCategories || !category.secondaryCategories.length) {
         return;
     }

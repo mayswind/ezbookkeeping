@@ -3,7 +3,7 @@
         <template #title>
             <div class="d-flex align-center justify-center" v-if="dialogMode">
                 <div class="w-100 text-center">
-                    <h4 class="text-h4">{{ $t(title) }}</h4>
+                    <h4 class="text-h4">{{ tt(title) }}</h4>
                 </div>
                 <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                        :disabled="loading || !hasAnyAvailableCategory" :icon="true">
@@ -11,30 +11,30 @@
                     <v-menu activator="parent">
                         <v-list>
                             <v-list-item :prepend-icon="icons.selectAll"
-                                         :title="$t('Select All')"
+                                         :title="tt('Select All')"
                                          :disabled="!hasAnyVisibleCategory"
-                                         @click="selectAll"></v-list-item>
+                                         @click="selectAllCategories"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectNone"
-                                         :title="$t('Select None')"
+                                         :title="tt('Select None')"
                                          :disabled="!hasAnyVisibleCategory"
-                                         @click="selectNone"></v-list-item>
+                                         @click="selectNoneCategories"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectInverse"
-                                         :title="$t('Invert Selection')"
+                                         :title="tt('Invert Selection')"
                                          :disabled="!hasAnyVisibleCategory"
-                                         @click="selectInvert"></v-list-item>
+                                         @click="selectInvertCategories"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="icons.show"
-                                         :title="$t('Show Hidden Transaction Categories')"
+                                         :title="tt('Show Hidden Transaction Categories')"
                                          v-if="!showHidden" @click="showHidden = true"></v-list-item>
                             <v-list-item :prepend-icon="icons.hide"
-                                         :title="$t('Hide Hidden Transaction Categories')"
+                                         :title="tt('Hide Hidden Transaction Categories')"
                                          v-if="showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
                     </v-menu>
                 </v-btn>
             </div>
             <div class="d-flex align-center" v-else-if="!dialogMode">
-                <span>{{ $t(title) }}</span>
+                <span>{{ tt(title) }}</span>
                 <v-spacer/>
                 <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                        :disabled="loading" :icon="true">
@@ -42,23 +42,23 @@
                     <v-menu activator="parent">
                         <v-list>
                             <v-list-item :prepend-icon="icons.selectAll"
-                                         :title="$t('Select All')"
+                                         :title="tt('Select All')"
                                          :disabled="!hasAnyVisibleCategory"
-                                         @click="selectAll"></v-list-item>
+                                         @click="selectAllCategories"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectNone"
-                                         :title="$t('Select None')"
+                                         :title="tt('Select None')"
                                          :disabled="!hasAnyVisibleCategory"
-                                         @click="selectNone"></v-list-item>
+                                         @click="selectNoneCategories"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectInverse"
-                                         :title="$t('Invert Selection')"
+                                         :title="tt('Invert Selection')"
                                          :disabled="!hasAnyVisibleCategory"
-                                         @click="selectInvert"></v-list-item>
+                                         @click="selectInvertCategories"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="icons.show"
-                                         :title="$t('Show Hidden Transaction Categories')"
+                                         :title="tt('Show Hidden Transaction Categories')"
                                          v-if="!showHidden" @click="showHidden = true"></v-list-item>
                             <v-list-item :prepend-icon="icons.hide"
-                                         :title="$t('Hide Hidden Transaction Categories')"
+                                         :title="tt('Hide Hidden Transaction Categories')"
                                          v-if="showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
                     </v-menu>
@@ -82,7 +82,7 @@
                     </v-expansion-panel-title>
                     <v-expansion-panel-text>
                         <v-list rounded density="comfortable" class="pa-0">
-                            <div class="py-3" v-if="!hasAvailableCategory[transactionType.type]">{{ $t('No available category') }}</div>
+                            <div class="py-3" v-if="!hasAvailableCategory[transactionType.type]">{{ tt('No available category') }}</div>
 
                             <template :key="category.id"
                                       v-for="(category, idx) in transactionType.allCategories">
@@ -92,7 +92,7 @@
                                     <template #prepend>
                                         <v-checkbox :model-value="isSubCategoriesAllChecked(category, filterCategoryIds)"
                                                     :indeterminate="isSubCategoriesHasButNotAllChecked(category, filterCategoryIds)"
-                                                    @update:model-value="selectSubCategories(category, $event)">
+                                                    @update:model-value="updateAllSubCategoriesSelected(category, $event)">
                                             <template #label>
                                                 <ItemIcon class="d-flex" icon-type="category" :icon-id="category.icon"
                                                           :color="category.color" :hidden-status="category.hidden"></ItemIcon>
@@ -113,7 +113,7 @@
                                         <v-list-item v-if="showHidden || !subCategory.hidden">
                                             <template #prepend>
                                                 <v-checkbox :model-value="isCategoryChecked(subCategory, filterCategoryIds)"
-                                                            @update:model-value="selectCategory(subCategory, $event)">
+                                                            @update:model-value="updateCategorySelected(subCategory, $event)">
                                                     <template #label>
                                                         <ItemIcon class="d-flex" icon-type="category" :icon-id="subCategory.icon"
                                                                   :color="subCategory.color" :hidden-status="subCategory.hidden"></ItemIcon>
@@ -133,8 +133,8 @@
 
         <v-card-text class="overflow-y-visible" v-if="dialogMode">
             <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
-                <v-btn :disabled="!hasAnyVisibleCategory" @click="save">{{ $t(applyText) }}</v-btn>
-                <v-btn color="secondary" variant="tonal" @click="cancel">{{ $t('Cancel') }}</v-btn>
+                <v-btn :disabled="!hasAnyVisibleCategory" @click="save">{{ tt(applyText) }}</v-btn>
+                <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
             </div>
         </v-card-text>
     </v-card>
@@ -142,24 +142,24 @@
     <snack-bar ref="snackbar" />
 </template>
 
-<script>
-import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.ts';
+<script setup lang="ts">
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { ref, useTemplateRef } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+import { useCategoryFilterSettingPageBase } from '@/views/base/settings/CategoryFilterSettingPageBase.ts';
+
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
-import { useTransactionsStore } from '@/stores/transaction.ts';
-import { useStatisticsStore } from '@/stores/statistics.ts';
 
 import { CategoryType } from '@/core/category.ts';
-import { copyObjectTo, arrayItemToObjectField } from '@/lib/common.ts';
+import type { TransactionCategory } from '@/models/transaction_category.ts';
+
 import {
-    allTransactionCategoriesWithVisibleCount,
-    hasAnyAvailableCategory,
-    hasAvailableCategory,
-    selectSubCategories,
+    selectAllSubCategories,
     selectAll,
     selectNone,
     selectInvert,
-    isCategoryOrSubCategoriesAllChecked,
     isSubCategoriesAllChecked,
     isSubCategoriesHasButNotAllChecked
 } from '@/lib/category.ts';
@@ -173,242 +173,128 @@ import {
     mdiDotsVertical
 } from '@mdi/js';
 
-export default {
-    props: [
-        'dialogMode',
-        'categoryTypes',
-        'type',
-        'autoSave'
-    ],
-    emits: [
-        'settings:change'
-    ],
-    data: function () {
-        return {
-            loading: true,
-            expandCategoryTypes: [
-                CategoryType.Income,
-                CategoryType.Expense,
-                CategoryType.Transfer
-            ],
-            filterCategoryIds: {},
-            showHidden: false,
-            icons: {
-                selectAll: mdiSelectAll,
-                selectNone: mdiSelect,
-                selectInverse: mdiSelectInverse,
-                show: mdiEyeOutline,
-                hide: mdiEyeOffOutline,
-                more: mdiDotsVertical
-            }
+type SnackBarType = InstanceType<typeof SnackBar>;
+
+const props = defineProps<{
+    type: string;
+    dialogMode?: boolean;
+    autoSave?: boolean;
+    categoryTypes?: string;
+}>();
+
+const emit = defineEmits<{
+    (e: 'settings:change', changed: boolean): void;
+}>();
+
+const { tt } = useI18n();
+
+const {
+    loading,
+    showHidden,
+    filterCategoryIds,
+    title,
+    applyText,
+    allTransactionCategories,
+    hasAnyAvailableCategory,
+    hasAnyVisibleCategory,
+    hasAvailableCategory,
+    isCategoryChecked,
+    getCategoryTypeName,
+    loadFilterCategoryIds,
+    saveFilterCategoryIds
+} = useCategoryFilterSettingPageBase(props.type, props.categoryTypes);
+
+const transactionCategoriesStore = useTransactionCategoriesStore();
+
+const icons = {
+    selectAll: mdiSelectAll,
+    selectNone: mdiSelect,
+    selectInverse: mdiSelectInverse,
+    show: mdiEyeOutline,
+    hide: mdiEyeOffOutline,
+    more: mdiDotsVertical
+};
+
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+
+const expandCategoryTypes = ref<CategoryType[]>([
+    CategoryType.Income,
+    CategoryType.Expense,
+    CategoryType.Transfer
+]);
+
+function init(): void {
+    transactionCategoriesStore.loadAllCategories({
+        force: false
+    }).then(() => {
+        loading.value = false;
+
+        if (!loadFilterCategoryIds()) {
+            snackbar.value?.showError('Parameter Invalid');
         }
-    },
-    computed: {
-        ...mapStores(useSettingsStore, useTransactionCategoriesStore, useTransactionsStore, useStatisticsStore),
-        title() {
-            if (this.type === 'statisticsDefault') {
-                return 'Default Transaction Category Filter';
-            } else {
-                return 'Filter Transaction Categories';
-            }
-        },
-        applyText() {
-            if (this.type === 'statisticsDefault') {
-                return 'Save';
-            } else {
-                return 'Apply';
-            }
-        },
-        allowCategoryTypes() {
-            return this.categoryTypes ? arrayItemToObjectField(this.categoryTypes.split(','), true) : null;
-        },
-        allTransactionCategories() {
-            return allTransactionCategoriesWithVisibleCount(this.transactionCategoriesStore.allTransactionCategories, this.allowCategoryTypes);
-        },
-        hasAnyAvailableCategory() {
-            return hasAnyAvailableCategory(this.allTransactionCategories, true);
-        },
-        hasAnyVisibleCategory() {
-            return hasAnyAvailableCategory(this.allTransactionCategories, this.showHidden);
-        },
-        hasAvailableCategory() {
-            return hasAvailableCategory(this.allTransactionCategories, this.showHidden);
+    }).catch(error => {
+        loading.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
         }
-    },
-    created() {
-        const self = this;
+    });
+}
 
-        self.transactionCategoriesStore.loadAllCategories({
-            force: false
-        }).then(() => {
-            self.loading = false;
+function updateCategorySelected(category: TransactionCategory, value: boolean | null): void {
+    if (!category) {
+        return;
+    }
 
-            const allCategoryIds = {};
+    filterCategoryIds.value[category.id] = !value;
 
-            for (const categoryId in self.transactionCategoriesStore.allTransactionCategoriesMap) {
-                if (!Object.prototype.hasOwnProperty.call(self.transactionCategoriesStore.allTransactionCategoriesMap, categoryId)) {
-                    continue;
-                }
-
-                const category = self.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
-
-                if (self.allowCategoryTypes && !self.allowCategoryTypes[category.type]) {
-                    continue;
-                }
-
-                if (self.type === 'transactionListCurrent' && self.transactionsStore.allFilterCategoryIdsCount > 0) {
-                    allCategoryIds[category.id] = true;
-                } else {
-                    allCategoryIds[category.id] = false;
-                }
-            }
-
-            if (self.type === 'statisticsDefault') {
-                self.filterCategoryIds = copyObjectTo(self.settingsStore.appSettings.statistics.defaultTransactionCategoryFilter, allCategoryIds);
-            } else if (self.type === 'statisticsCurrent') {
-                self.filterCategoryIds = copyObjectTo(self.statisticsStore.transactionStatisticsFilter.filterCategoryIds, allCategoryIds);
-            } else if (self.type === 'transactionListCurrent') {
-                for (const categoryId in self.transactionsStore.allFilterCategoryIds) {
-                    if (!Object.prototype.hasOwnProperty.call(self.transactionsStore.allFilterCategoryIds, categoryId)) {
-                        continue;
-                    }
-
-                    const category = self.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
-
-                    if (category && (!category.subCategories || !category.subCategories.length)) {
-                        allCategoryIds[category.id] = false;
-                    } else if (category) {
-                        selectSubCategories(allCategoryIds, category, false);
-                    }
-                }
-
-                self.filterCategoryIds = allCategoryIds;
-            } else {
-                self.$refs.snackbar.showError('Parameter Invalid');
-            }
-        }).catch(error => {
-            self.loading = false;
-
-            if (!error.processed) {
-                self.$refs.snackbar.showError(error);
-            }
-        });
-    },
-    methods: {
-        save() {
-            const self = this;
-
-            const filteredCategoryIds = {};
-            let isAllSelected = true;
-            let finalCategoryIds = '';
-            let changed = true;
-
-            for (const categoryId in self.filterCategoryIds) {
-                if (!Object.prototype.hasOwnProperty.call(self.filterCategoryIds, categoryId)) {
-                    continue;
-                }
-
-                const category = self.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
-
-                if (!isCategoryOrSubCategoriesAllChecked(category, self.filterCategoryIds)) {
-                    filteredCategoryIds[categoryId] = true;
-                    isAllSelected = false;
-                } else {
-                    if (finalCategoryIds.length > 0) {
-                        finalCategoryIds += ',';
-                    }
-
-                    finalCategoryIds += categoryId;
-                }
-            }
-
-            if (this.type === 'statisticsDefault') {
-                self.settingsStore.setStatisticsDefaultTransactionCategoryFilter(filteredCategoryIds);
-            } else if (this.type === 'statisticsCurrent') {
-                changed = self.statisticsStore.updateTransactionStatisticsFilter({
-                    filterCategoryIds: filteredCategoryIds
-                });
-
-                if (changed) {
-                    self.statisticsStore.updateTransactionStatisticsInvalidState(true);
-                }
-            } else if (this.type === 'transactionListCurrent') {
-                changed = self.transactionsStore.updateTransactionListFilter({
-                    categoryIds: isAllSelected ? '' : finalCategoryIds
-                });
-
-                if (changed) {
-                    self.transactionsStore.updateTransactionListInvalidState(true);
-                }
-            }
-
-            self.$emit('settings:change', changed);
-        },
-        cancel() {
-            this.$emit('settings:change', false);
-        },
-        selectCategory(category, value) {
-            if (!category) {
-                return;
-            }
-
-            this.filterCategoryIds[category.id] = !value;
-
-            if (this.autoSave) {
-                this.save();
-            }
-        },
-        selectSubCategories(category, value) {
-            selectSubCategories(this.filterCategoryIds, category, !value);
-
-            if (this.autoSave) {
-                this.save();
-            }
-        },
-        selectAll() {
-            selectAll(this.filterCategoryIds, this.transactionCategoriesStore.allTransactionCategoriesMap);
-
-            if (this.autoSave) {
-                this.save();
-            }
-        },
-        selectNone() {
-            selectNone(this.filterCategoryIds, this.transactionCategoriesStore.allTransactionCategoriesMap);
-
-            if (this.autoSave) {
-                this.save();
-            }
-        },
-        selectInvert() {
-            selectInvert(this.filterCategoryIds, this.transactionCategoriesStore.allTransactionCategoriesMap);
-
-            if (this.autoSave) {
-                this.save();
-            }
-        },
-        getCategoryTypeName(categoryType) {
-            switch (categoryType) {
-                case CategoryType.Income:
-                    return this.$t('Income Categories');
-                case CategoryType.Expense:
-                    return this.$t('Expense Categories');
-                case CategoryType.Transfer:
-                    return this.$t('Transfer Categories');
-                default:
-                    return this.$t('Transaction Categories');
-            }
-        },
-        isCategoryChecked(category, filterCategoryIds) {
-            return !filterCategoryIds[category.id];
-        },
-        isSubCategoriesAllChecked(category, filterCategoryIds) {
-            return isSubCategoriesAllChecked(category, filterCategoryIds);
-        },
-        isSubCategoriesHasButNotAllChecked(category, filterCategoryIds) {
-            return isSubCategoriesHasButNotAllChecked(category, filterCategoryIds);
-        }
+    if (props.autoSave) {
+        save();
     }
 }
+
+function updateAllSubCategoriesSelected(category: TransactionCategory, value: boolean | null): void {
+    selectAllSubCategories(filterCategoryIds.value, category, !value);
+
+    if (props.autoSave) {
+        save();
+    }
+}
+
+function selectAllCategories(): void {
+    selectAll(filterCategoryIds.value, transactionCategoriesStore.allTransactionCategoriesMap);
+
+    if (props.autoSave) {
+        save();
+    }
+}
+
+function selectNoneCategories(): void {
+    selectNone(filterCategoryIds.value, transactionCategoriesStore.allTransactionCategoriesMap);
+
+    if (props.autoSave) {
+        save();
+    }
+}
+
+function selectInvertCategories(): void {
+    selectInvert(filterCategoryIds.value, transactionCategoriesStore.allTransactionCategoriesMap);
+
+    if (props.autoSave) {
+        save();
+    }
+}
+
+function save(): void {
+    const changed = saveFilterCategoryIds();
+    emit('settings:change', changed);
+}
+
+function cancel(): void {
+    emit('settings:change', false);
+}
+
+init();
 </script>
 
 <style>

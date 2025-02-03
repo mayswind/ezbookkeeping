@@ -211,15 +211,11 @@ function init(): void {
             loadingError.value = 'Parameter Invalid';
         }
     }).catch(error => {
-        loading.value = false;
-
-        if (!error.processed) {
-            if (error.processed) {
-                loading.value = false;
-            } else {
-                loadingError.value = error;
-                showToast(error.message || error);
-            }
+        if (error.processed) {
+            loading.value = false;
+        } else {
+            loadingError.value = error;
+            showToast(error.message || error);
         }
     });
 }

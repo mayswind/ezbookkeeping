@@ -208,9 +208,9 @@
                         fixed-footer
                         show-select
                         multi-sort
-                        class="import-transaction-table"
                         density="compact"
                         item-value="index"
+                        :class="{ 'import-transaction-table': true, 'disabled': loading || submitting }"
                         :height="importTransactionsTableHeight"
                         :headers="importTransactionHeaders"
                         :items="importTransactions"

@@ -216,7 +216,7 @@
                                v-if="currentStep === 'basicSetting'">{{ tt('Next') }}</v-btn>
                         <v-btn color="teal"
                                :disabled="submitting || navigateToHomePage"
-                               :append-icon="!submitting ? icons.submit : null"
+                               :append-icon="!submitting ? icons.submit : undefined"
                                @click="submit"
                                v-if="currentStep === 'presetCategories'">
                             {{ tt('Submit') }}

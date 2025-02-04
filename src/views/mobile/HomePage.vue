@@ -1,7 +1,7 @@
 <template>
     <f7-page ptr @ptr:refresh="reload" @page:afterin="onPageAfterIn">
         <f7-navbar>
-            <f7-nav-title :title="$t('global.app.title')"></f7-nav-title>
+            <f7-nav-title :title="tt('global.app.title')"></f7-nav-title>
         </f7-navbar>
 
         <f7-card class="home-summary-card" :class="{ 'skeleton-text': loading }">
@@ -13,14 +13,14 @@
                         <small>Expense</small>
                     </span>
                     <span class="card-header-content" v-else-if="!loading">
-                        <span class="home-summary-month">{{ displayDateRange.thisMonth.displayTime }}</span>
+                        <span class="home-summary-month">{{ displayDateRange?.thisMonth?.displayTime }}</span>
                         <span>·</span>
-                        <small>{{ $t('Expense') }}</small>
+                        <small>{{ tt('Expense') }}</small>
                     </span>
                 </p>
                 <p class="no-margin">
                     <span class="month-expense" v-if="loading">0.00 USD</span>
-                    <span class="month-expense" v-else-if="!loading">{{ getDisplayExpenseAmount(transactionOverview.thisMonth) }}</span>
+                    <span class="month-expense" v-else-if="!loading">{{ transactionOverview && transactionOverview.thisMonth ? getDisplayExpenseAmount(transactionOverview.thisMonth) : '-' }}</span>
                     <f7-link class="margin-left-half" @click="showAmountInHomePage = !showAmountInHomePage">
                         <f7-icon class="ebk-hide-icon" :f7="showAmountInHomePage ? 'eye_slash_fill' : 'eye_fill'"></f7-icon>
                     </f7-link>
@@ -28,28 +28,28 @@
                 <p class="no-margin">
                     <small class="home-summary-misc" v-if="loading">Monthly income 0.00 USD</small>
                     <small class="home-summary-misc" v-else-if="!loading">
-                        <span>{{ $t('Monthly income') }}</span>
-                        <span>{{ getDisplayIncomeAmount(transactionOverview.thisMonth) }}</span>
+                        <span>{{ tt('Monthly income') }}</span>
+                        <span>{{ transactionOverview && transactionOverview.thisMonth ? getDisplayIncomeAmount(transactionOverview.thisMonth) : '-' }}</span>
                     </small>
                 </p>
             </f7-card-header>
         </f7-card>
 
         <f7-list strong inset dividers class="margin-top overview-transaction-list" :class="{ 'skeleton-text': loading }">
-            <f7-list-item :link="'/transaction/list?dateType=' + allDateRanges.Today.type" chevron-center>
+            <f7-list-item :link="'/transaction/list?dateType=' + DateRange.Today.type" chevron-center>
                 <template #media>
                     <f7-icon f7="calendar_today"></f7-icon>
                 </template>
                 <template #title>
                     <div class="padding-top-half">
                         <span v-if="loading">Today</span>
-                        <span v-else-if="!loading">{{ $t('Today') }}</span>
+                        <span v-else-if="!loading">{{ tt('Today') }}</span>
                     </div>
                 </template>
                 <template #footer>
                     <div class="overview-transaction-footer padding-bottom-half">
                         <span v-if="loading">MM/DD/YYYY</span>
-                        <span v-else-if="!loading">{{ displayDateRange.today.displayTime }}</span>
+                        <span v-else-if="!loading">{{ displayDateRange?.today?.displayTime }}</span>
                     </div>
                 </template>
                 <template #after>
@@ -66,23 +66,23 @@
                 </template>
             </f7-list-item>
 
-            <f7-list-item :link="'/transaction/list?dateType=' + allDateRanges.ThisWeek.type" chevron-center>
+            <f7-list-item :link="'/transaction/list?dateType=' + DateRange.ThisWeek.type" chevron-center>
                 <template #media>
                     <f7-icon f7="calendar"></f7-icon>
                 </template>
                 <template #title>
                     <div class="padding-top-half">
                         <span v-if="loading">This Week</span>
-                        <span v-else-if="!loading">{{ $t('This Week') }}</span>
+                        <span v-else-if="!loading">{{ tt('This Week') }}</span>
                     </div>
                 </template>
                 <template #footer>
                     <div class="overview-transaction-footer padding-bottom-half">
                         <span v-if="loading">MM/DD</span>
-                        <span v-else-if="!loading">{{ displayDateRange.thisWeek.startTime }}</span>
+                        <span v-else-if="!loading">{{ displayDateRange?.thisWeek?.startTime }}</span>
                         <span>-</span>
                         <span v-if="loading">MM/DD</span>
-                        <span v-else-if="!loading">{{ displayDateRange.thisWeek.endTime }}</span>
+                        <span v-else-if="!loading">{{ displayDateRange?.thisWeek?.endTime }}</span>
                     </div>
                 </template>
                 <template #after>
@@ -99,23 +99,23 @@
                 </template>
             </f7-list-item>
 
-            <f7-list-item :link="'/transaction/list?dateType=' + allDateRanges.ThisMonth.type" chevron-center>
+            <f7-list-item :link="'/transaction/list?dateType=' + DateRange.ThisMonth.type" chevron-center>
                 <template #media>
                     <f7-icon f7="calendar"></f7-icon>
                 </template>
                 <template #title>
                     <div class="padding-top-half">
                         <span v-if="loading">This Month</span>
-                        <span v-else-if="!loading">{{ $t('This Month') }}</span>
+                        <span v-else-if="!loading">{{ tt('This Month') }}</span>
                     </div>
                 </template>
                 <template #footer>
                     <div class="overview-transaction-footer padding-bottom-half">
                         <span v-if="loading">MM/DD</span>
-                        <span v-else-if="!loading">{{ displayDateRange.thisMonth.startTime }}</span>
+                        <span v-else-if="!loading">{{ displayDateRange?.thisMonth?.startTime }}</span>
                         <span>-</span>
                         <span v-if="loading">MM/DD</span>
-                        <span v-else-if="!loading">{{ displayDateRange.thisMonth.endTime }}</span>
+                        <span v-else-if="!loading">{{ displayDateRange?.thisMonth?.endTime }}</span>
                     </div>
                 </template>
                 <template #after>
@@ -132,20 +132,20 @@
                 </template>
             </f7-list-item>
 
-            <f7-list-item :link="'/transaction/list?dateType=' + allDateRanges.ThisYear.type" chevron-center>
+            <f7-list-item :link="'/transaction/list?dateType=' + DateRange.ThisYear.type" chevron-center>
                 <template #media>
                     <f7-icon f7="square_stack_3d_up"></f7-icon>
                 </template>
                 <template #title>
                     <div class="padding-top-half">
                         <span v-if="loading">This Year</span>
-                        <span v-else-if="!loading">{{ $t('This Year') }}</span>
+                        <span v-else-if="!loading">{{ tt('This Year') }}</span>
                     </div>
                 </template>
                 <template #footer>
                     <div class="overview-transaction-footer padding-bottom-half">
                         <span v-if="loading">YYYY</span>
-                        <span v-else-if="!loading">{{ displayDateRange.thisYear.displayTime }}</span>
+                        <span v-else-if="!loading">{{ displayDateRange?.thisYear?.displayTime }}</span>
                     </div>
                 </template>
                 <template #after>
@@ -166,22 +166,22 @@
         <f7-toolbar tabbar icons bottom class="main-tabbar">
             <f7-link class="link" href="/transaction/list">
                 <f7-icon f7="square_list"></f7-icon>
-                <span class="tabbar-label">{{ $t('Details') }}</span>
+                <span class="tabbar-label">{{ tt('Details') }}</span>
             </f7-link>
             <f7-link class="link" href="/account/list">
                 <f7-icon f7="creditcard"></f7-icon>
-                <span class="tabbar-label">{{ $t('Accounts') }}</span>
+                <span class="tabbar-label">{{ tt('Accounts') }}</span>
             </f7-link>
             <f7-link id="homepage-add-button" class="link" href="/transaction/add" @taphold="openTransactionTemplatePopover">
                 <f7-icon f7="plus_square" class="ebk-tarbar-big-icon"></f7-icon>
             </f7-link>
             <f7-link class="link" href="/statistic/transaction">
                 <f7-icon f7="chart_pie"></f7-icon>
-                <span class="tabbar-label">{{ $t('Statistics') }}</span>
+                <span class="tabbar-label">{{ tt('Statistics') }}</span>
             </f7-link>
             <f7-link class="link" href="/settings">
                 <f7-icon f7="gear_alt"></f7-icon>
-                <span class="tabbar-label">{{ $t('Settings') }}</span>
+                <span class="tabbar-label">{{ tt('Settings') }}</span>
             </f7-link>
         </f7-toolbar>
 
@@ -200,150 +200,100 @@
     </f7-page>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.ts';
-import { useUserStore } from '@/stores/user.ts';
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
+import { useHomePageBase } from '@/views/base/HomePageBase.ts';
+
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
 import { DateRange } from '@/core/datetime.ts';
 import { TemplateType } from '@/core/template.ts';
-import { formatUnixTime } from '@/lib/datetime.ts';
+import { TransactionTemplate } from '@/models/transaction_template.ts';
+
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 
-export default {
-    props: [
-        'f7router'
-    ],
-    data() {
-        return {
-            loading: true,
-            showTransactionTemplatePopover: false
-        };
-    },
-    computed: {
-        ...mapStores(useSettingsStore, useUserStore, useTransactionTemplatesStore, useOverviewStore),
-        showAmountInHomePage: {
-            get: function() {
-                return this.settingsStore.appSettings.showAmountInHomePage;
-            },
-            set: function(value) {
-                this.settingsStore.setShowAmountInHomePage(value);
-            }
-        },
-        defaultCurrency() {
-            return this.userStore.currentUserDefaultCurrency;
-        },
-        allTransactionTemplates() {
-            const allTemplates = this.transactionTemplatesStore.allVisibleTemplates;
-            return allTemplates[TemplateType.Normal.type] || [];
-        },
-        allDateRanges() {
-            return DateRange.all();
-        },
-        displayDateRange() {
-            const self = this;
+const { tt } = useI18n();
+const { showToast } = useI18nUIComponents();
 
-            return {
-                today: {
-                    displayTime: self.$locale.formatUnixTimeToLongDate(self.userStore, self.overviewStore.transactionDataRange.today.startTime),
-                },
-                thisWeek: {
-                    startTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.overviewStore.transactionDataRange.thisWeek.startTime),
-                    endTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.overviewStore.transactionDataRange.thisWeek.endTime)
-                },
-                thisMonth: {
-                    displayTime: formatUnixTime(self.overviewStore.transactionDataRange.thisMonth.startTime, 'MMMM'),
-                    startTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.overviewStore.transactionDataRange.thisMonth.startTime),
-                    endTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.overviewStore.transactionDataRange.thisMonth.endTime)
-                },
-                thisYear: {
-                    displayTime: self.$locale.formatUnixTimeToLongYear(self.userStore, self.overviewStore.transactionDataRange.thisYear.startTime)
-                }
-            };
-        },
-        transactionOverview() {
-            return this.overviewStore.transactionOverview;
-        }
-    },
-    created() {
-        const self = this;
+const {
+    showAmountInHomePage,
+    displayDateRange,
+    transactionOverview,
+    getDisplayIncomeAmount,
+    getDisplayExpenseAmount
+} = useHomePageBase();
 
-        if (isUserLogined() && isUserUnlocked()) {
-            self.loading = true;
+const transactionTemplatesStore = useTransactionTemplatesStore();
+const overviewStore = useOverviewStore();
 
-            self.overviewStore.loadTransactionOverview({
-                force: false
-            }).then(() => {
-                self.loading = false;
-            }).catch(error => {
-                self.loading = false;
+const loading = ref<boolean>(true);
+const showTransactionTemplatePopover = ref<boolean>(false);
 
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
+const allTransactionTemplates = computed<TransactionTemplate[]>(() => {
+    const allTemplates = transactionTemplatesStore.allVisibleTemplates;
+    return allTemplates[TemplateType.Normal.type] || [];
+});
 
-            self.transactionTemplatesStore.loadAllTemplates({
-                templateType: TemplateType.Normal.type,
-                force: false
-            });
-        }
-    },
-    methods: {
-        onPageAfterIn() {
-            if (!this.loading) {
-                this.reload(null);
-            }
-        },
-        reload(done) {
-            const self = this;
-            const force = !!done;
-
-            self.overviewStore.loadTransactionOverview({
-                force: force
-            }).then(() => {
-                if (done) {
-                    done();
-                }
-
-                if (force) {
-                    self.$toast('Data has been updated');
-                }
-            }).catch(error => {
-                if (done) {
-                    done();
-                }
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        openTransactionTemplatePopover() {
-            if (this.allTransactionTemplates && this.allTransactionTemplates.length) {
-                this.showTransactionTemplatePopover = true;
-            }
-        },
-        getDisplayCurrency(value, currencyCode) {
-            return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, currencyCode);
-        },
-        getDisplayAmount(amount, incomplete) {
-            if (!this.showAmountInHomePage) {
-                return this.getDisplayCurrency('***', this.defaultCurrency);
-            }
-
-            return this.getDisplayCurrency(amount, this.defaultCurrency) + (incomplete ? '+' : '');
-        },
-        getDisplayIncomeAmount(category) {
-            return this.getDisplayAmount(category.incomeAmount, category.incompleteIncomeAmount);
-        },
-        getDisplayExpenseAmount(category) {
-            return this.getDisplayAmount(category.expenseAmount, category.incompleteExpenseAmount);
-        }
+function openTransactionTemplatePopover(): void {
+    if (allTransactionTemplates.value && allTransactionTemplates.value.length) {
+        showTransactionTemplatePopover.value = true;
     }
 }
+
+function init(): void {
+    if (isUserLogined() && isUserUnlocked()) {
+        loading.value = true;
+
+        overviewStore.loadTransactionOverview({
+            force: false
+        }).then(() => {
+            loading.value = false;
+        }).catch(error => {
+            loading.value = false;
+
+            if (!error.processed) {
+                showToast(error.message || error);
+            }
+        });
+
+        transactionTemplatesStore.loadAllTemplates({
+            templateType: TemplateType.Normal.type,
+            force: false
+        });
+    }
+}
+
+function reload(done: (() => void) | null): void {
+    const force = !!done;
+
+    overviewStore.loadTransactionOverview({
+        force: force
+    }).then(() => {
+        done?.();
+
+        if (force) {
+            showToast('Data has been updated');
+        }
+    }).catch(error => {
+        done?.();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function onPageAfterIn(): void {
+    if (!loading.value) {
+        reload(null);
+    }
+}
+
+init();
 </script>
 
 <style>

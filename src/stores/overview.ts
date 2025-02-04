@@ -277,7 +277,7 @@ export const useOverviewStore = defineStore('overview', () => {
         transactionOverviewStateInvalid.value = true;
     }
 
-    function loadTransactionOverview({ force, loadLast11Months }: { force: boolean, loadLast11Months: boolean }): Promise<TransactionAmountsResponse> {
+    function loadTransactionOverview({ force, loadLast11Months }: { force: boolean, loadLast11Months?: boolean }): Promise<TransactionAmountsResponse> {
         let dateChanged = false;
         let rangeChanged = false;
 
@@ -337,7 +337,7 @@ export const useOverviewStore = defineStore('overview', () => {
                 }
 
                 transactionOverviewData.value = data.result;
-                transactionOverviewOptions.value.loadLast11Months = loadLast11Months;
+                transactionOverviewOptions.value.loadLast11Months = !!loadLast11Months;
 
                 resolve(data.result);
             }).catch(error => {

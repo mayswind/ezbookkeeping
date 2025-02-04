@@ -86,7 +86,7 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
+import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 
 import { TemplateType } from '@/core/template.ts';
 import { isDefined } from '@/lib/common.ts';
@@ -94,7 +94,7 @@ import {
     isNoAvailableTemplate,
     getFirstShowingId,
     getLastShowingId
-} from '@/lib/template.js';
+} from '@/lib/template.ts';
 import { onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
 
 export default {

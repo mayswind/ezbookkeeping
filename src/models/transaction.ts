@@ -38,7 +38,7 @@ export class Transaction implements TransactionInfoResponse {
     private _day?: number = undefined; // only for displaying transaction in transaction list
     private _dayOfWeek?: string = undefined; // only for displaying transaction in transaction list
 
-    private constructor(id: string, timeSequenceId: string, type: number, categoryId: string, time: number, timeZone: string | undefined, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, tagIds: string[], comment: string, editable: boolean) {
+    protected constructor(id: string, timeSequenceId: string, type: number, categoryId: string, time: number, timeZone: string | undefined, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, tagIds: string[], comment: string, editable: boolean) {
         this.id = id;
         this.timeSequenceId = timeSequenceId;
         this.type = type;

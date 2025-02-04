@@ -594,7 +594,7 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
-import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
+import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 
 import { DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { AmountFilterType } from '@/core/numeral.ts';

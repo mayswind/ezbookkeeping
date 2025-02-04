@@ -13,7 +13,7 @@ export function isObject(val: unknown): val is object {
     return val != null && typeof(val) === 'object' && !isArray(val);
 }
 
-export function isArray(val: unknown): val is [] {
+export function isArray<T>(val: unknown): val is T[] {
     if (isFunction(Array.isArray)) {
         return Array.isArray(val);
     }

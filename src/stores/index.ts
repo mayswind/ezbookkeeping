@@ -6,8 +6,7 @@ import { useUserStore } from './user.ts';
 import { useAccountsStore } from './account.ts';
 import { useTransactionCategoriesStore } from './transactionCategory.ts';
 import { useTransactionTagsStore } from './transactionTag.ts';
-// @ts-expect-error the above file is migrating to ts
-import { useTransactionTemplatesStore } from './transactionTemplate.js';
+import { useTransactionTemplatesStore } from './transactionTemplate.ts';
 import { useTransactionsStore } from './transaction.ts';
 import { useOverviewStore } from './overview.ts';
 import { useStatisticsStore } from './statistics.ts';

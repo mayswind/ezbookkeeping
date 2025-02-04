@@ -397,7 +397,7 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
-import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
+import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { CategoryType } from '@/core/category.ts';
@@ -407,6 +407,7 @@ import { TRANSACTION_MAX_PICTURE_COUNT } from '@/consts/transaction.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
 import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
 import { TransactionTag } from '@/models/transaction_tag.ts';
+import { TransactionTemplate } from '@/models/transaction_template.ts';
 
 import {
     isArray,
@@ -836,6 +837,7 @@ export default {
                     }
                 }
             } else if (self.type === 'template') {
+                self.transaction = TransactionTemplate.createNewTransactionTemplate(self.transaction);
                 self.transaction.name = '';
 
                 if (options && options.templateType) {

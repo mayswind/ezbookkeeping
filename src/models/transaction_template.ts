@@ -1,4 +1,125 @@
-import type { TransactionInfoResponse } from './transaction.ts';
+import { TransactionType } from '@/core/transaction.ts';
+import { TemplateType } from '@/core/template.ts';
+
+import { Transaction, type TransactionInfoResponse } from './transaction.ts';
+
+export class TransactionTemplate extends Transaction implements TransactionTemplateInfoResponse {
+    public templateType: number;
+    public name: string;
+    public scheduledFrequencyType?: number;
+    public scheduledFrequency?: string;
+    public scheduledAt?: number;
+    public displayOrder: number;
+    public hidden: boolean;
+
+    private constructor(id: string, templateType: number, name: string, type: number, categoryId: string, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, scheduledFrequencyType: number | undefined, scheduledFrequency: string | undefined, scheduledAt: number | undefined, tagIds: string[], comment: string, editable: boolean, displayOrder: number, hidden: boolean) {
+        super(id, '', type, categoryId, 0, undefined, utcOffset, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, editable);
+        this.templateType = templateType;
+        this.name = name;
+        this.scheduledFrequencyType = scheduledFrequencyType;
+        this.scheduledFrequency = scheduledFrequency;
+        this.scheduledAt = scheduledAt;
+        this.displayOrder = displayOrder;
+        this.hidden = hidden;
+    }
+
+    public toTemplateCreateRequest(clientSessionId: string): TransactionTemplateCreateRequest {
+        return {
+            templateType: this.templateType,
+            name: this.name,
+            type: this.type,
+            categoryId: this.getCategoryId(),
+            sourceAccountId: this.sourceAccountId,
+            destinationAccountId: this.type === TransactionType.Transfer ? this.destinationAccountId : '0',
+            sourceAmount: this.sourceAmount,
+            destinationAmount: this.type === TransactionType.Transfer ? this.destinationAmount : 0,
+            hideAmount: this.hideAmount,
+            tagIds: this.tagIds,
+            comment: this.comment,
+            scheduledFrequencyType: this.templateType === TemplateType.Schedule.type ? this.scheduledFrequencyType : undefined,
+            scheduledFrequency: this.templateType === TemplateType.Schedule.type ? this.scheduledFrequency : undefined,
+            utcOffset: this.templateType === TemplateType.Schedule.type ? this.utcOffset : undefined,
+            clientSessionId: clientSessionId
+        };
+    }
+
+    public toTemplateModifyRequest(): TransactionTemplateModifyRequest {
+        return {
+            id: this.id,
+            name: this.name,
+            type: this.type,
+            categoryId: this.getCategoryId(),
+            sourceAccountId: this.sourceAccountId,
+            destinationAccountId: this.type === TransactionType.Transfer ? this.destinationAccountId : '0',
+            sourceAmount: this.sourceAmount,
+            destinationAmount: this.type === TransactionType.Transfer ? this.destinationAmount : 0,
+            hideAmount: this.hideAmount,
+            tagIds: this.tagIds,
+            comment: this.comment,
+            scheduledFrequencyType: this.templateType === TemplateType.Schedule.type ? this.scheduledFrequencyType : undefined,
+            scheduledFrequency: this.templateType === TemplateType.Schedule.type ? this.scheduledFrequency : undefined,
+            utcOffset: this.templateType === TemplateType.Schedule.type ? this.utcOffset : undefined
+        };
+    }
+
+    public static createNewTransactionTemplate(transaction: Transaction): TransactionTemplate {
+        return new TransactionTemplate(
+            transaction.id,
+            0, // templateType
+            '', // name
+            transaction.type,
+            transaction.categoryId,
+            transaction.utcOffset,
+            transaction.sourceAccountId,
+            transaction.destinationAccountId,
+            transaction.sourceAmount,
+            transaction.destinationAmount,
+            transaction.hideAmount,
+            undefined, // scheduledFrequencyType
+            undefined, // scheduledFrequency
+            undefined, // scheduledAt
+            transaction.tagIds,
+            transaction.comment,
+            true,
+            0,
+            false
+        );
+    }
+
+    public static ofTemplate(templateResponse: TransactionTemplateInfoResponse): TransactionTemplate {
+        return new TransactionTemplate(
+            templateResponse.id,
+            templateResponse.templateType,
+            templateResponse.name,
+            templateResponse.type,
+            templateResponse.categoryId,
+            templateResponse.utcOffset ?? 0,
+            templateResponse.sourceAccountId,
+            templateResponse.destinationAccountId,
+            templateResponse.sourceAmount,
+            templateResponse.destinationAmount,
+            templateResponse.hideAmount,
+            templateResponse.scheduledFrequencyType,
+            templateResponse.scheduledFrequency,
+            templateResponse.scheduledAt,
+            templateResponse.tagIds,
+            templateResponse.comment,
+            true, // editable
+            templateResponse.displayOrder,
+            templateResponse.hidden
+        );
+    }
+
+    public static ofManyTemplates(templateResponses: TransactionTemplateInfoResponse[]): TransactionTemplate[] {
+        const templates: TransactionTemplate[] = [];
+
+        for (const templateResponse of templateResponses) {
+            templates.push(TransactionTemplate.ofTemplate(templateResponse));
+        }
+
+        return templates;
+    }
+}
 
 export interface TransactionTemplateCreateRequest {
     readonly templateType: number;

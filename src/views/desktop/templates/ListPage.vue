@@ -149,13 +149,13 @@
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
 
 import { mapStores } from 'pinia';
-import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
+import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 
 import { TemplateType } from '@/core/template.ts';
 import {
     isNoAvailableTemplate,
     getAvailableTemplateCount
-} from '@/lib/template.js';
+} from '@/lib/template.ts';
 
 import {
     mdiRefresh,

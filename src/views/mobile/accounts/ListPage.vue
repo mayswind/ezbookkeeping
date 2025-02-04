@@ -363,32 +363,6 @@ function setSortable(): void {
     displayOrderModified.value = false;
 }
 
-function onSort(event: { el: { id: string }; from: number; to: number }): void {
-    if (!event || !event.el || !event.el.id) {
-        showToast('Unable to move account');
-        return;
-    }
-
-    const id = parseAccountIdFromDomId(event.el.id);
-
-    if (!id) {
-        showToast('Unable to move account');
-        return;
-    }
-
-    accountsStore.changeAccountDisplayOrder({
-        accountId: id,
-        from: event.from - 1, // first item in the list is title, so the index need minus one
-        to: event.to - 1,
-        updateListOrder: true,
-        updateGlobalListOrder: true
-    }).then(() => {
-        displayOrderModified.value = true;
-    }).catch(error => {
-        showToast(error.message || error);
-    });
-}
-
 function saveSortResult(): void {
     if (!displayOrderModified.value) {
         showHidden.value = false;
@@ -413,6 +387,32 @@ function saveSortResult(): void {
         if (!error.processed) {
             showToast(error.message || error);
         }
+    });
+}
+
+function onSort(event: { el: { id: string }; from: number; to: number }): void {
+    if (!event || !event.el || !event.el.id) {
+        showToast('Unable to move account');
+        return;
+    }
+
+    const id = parseAccountIdFromDomId(event.el.id);
+
+    if (!id) {
+        showToast('Unable to move account');
+        return;
+    }
+
+    accountsStore.changeAccountDisplayOrder({
+        accountId: id,
+        from: event.from - 1, // first item in the list is title, so the index need minus one
+        to: event.to - 1,
+        updateListOrder: true,
+        updateGlobalListOrder: true
+    }).then(() => {
+        displayOrderModified.value = true;
+    }).catch(error => {
+        showToast(error.message || error);
     });
 }
 

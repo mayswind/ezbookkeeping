@@ -165,7 +165,7 @@ const props = defineProps<{
 }>();
 
 const { tt } = useI18n();
-const { showToast, routeBackOnError } = useI18nUIComponents();
+const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
 const transactionTagsStore = useTransactionTagsStore();
 
@@ -207,7 +207,24 @@ function parseTagIdFromDomId(domId: string): string | null {
     return domId.substring(4); // tag_
 }
 
-function reload(done?: () => void): void {
+function init(): void {
+    loading.value = true;
+
+    transactionTagsStore.loadAllTags({
+        force: false
+    }).then(() => {
+        loading.value = false;
+    }).catch(error => {
+        if (error.processed) {
+            loading.value = false;
+        } else {
+            loadingError.value = error;
+            showToast(error.message || error);
+        }
+    });
+}
+
+function reload(done: (() => void) | null): void {
     if (sortable.value || hasEditingTag.value) {
         done?.();
         return;
@@ -273,6 +290,55 @@ function cancelSave(tag: TransactionTag): void {
     }
 }
 
+function hide(tag: TransactionTag, hidden: boolean): void {
+    showLoading();
+
+    transactionTagsStore.hideTag({
+        tag: tag,
+        hidden: hidden
+    }).then(() => {
+        hideLoading();
+    }).catch(error => {
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function remove(tag: TransactionTag | null, confirm: boolean): void {
+    if (!tag) {
+        showAlert('An error occurred');
+        return;
+    }
+
+    if (!confirm) {
+        tagToDelete.value = tag;
+        showDeleteActionSheet.value = true;
+        return;
+    }
+
+    showDeleteActionSheet.value = false;
+    tagToDelete.value = null;
+    showLoading();
+
+    transactionTagsStore.deleteTag({
+        tag: tag,
+        beforeResolve: (done) => {
+            onSwipeoutDeleted(getTagDomId(tag), done);
+        }
+    }).then(() => {
+        hideLoading();
+    }).catch(error => {
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
 function setSortable(): void {
     if (sortable.value || hasEditingTag.value) {
         return;
@@ -310,59 +376,6 @@ function saveSortResult(): void {
     });
 }
 
-function hide(tag: TransactionTag, hidden: boolean): void {
-    showLoading();
-
-    transactionTagsStore.hideTag({
-        tag: tag,
-        hidden: hidden
-    }).then(() => {
-        hideLoading();
-    }).catch(error => {
-        hideLoading();
-
-        if (!error.processed) {
-            showToast(error.message || error);
-        }
-    });
-}
-
-function remove(tag: TransactionTag | null, confirm: boolean): void {
-    if (!tag) {
-        showToast('An error occurred');
-        return;
-    }
-
-    if (!confirm) {
-        tagToDelete.value = tag;
-        showDeleteActionSheet.value = true;
-        return;
-    }
-
-    showDeleteActionSheet.value = false;
-    tagToDelete.value = null;
-    showLoading();
-
-    transactionTagsStore.deleteTag({
-        tag: tag,
-        beforeResolve: (done) => {
-            onSwipeoutDeleted(getTagDomId(tag), done);
-        }
-    }).then(() => {
-        hideLoading();
-    }).catch(error => {
-        hideLoading();
-
-        if (!error.processed) {
-            showToast(error.message || error);
-        }
-    });
-}
-
-function onPageAfterIn(): void {
-    routeBackOnError(props.f7router, loadingError);
-}
-
 function onSort(event: { el: { id: string }, from: number, to: number }): void {
     if (!event || !event.el || !event.el.id) {
         showToast('Unable to move tag');
@@ -387,18 +400,15 @@ function onSort(event: { el: { id: string }, from: number, to: number }): void {
     });
 }
 
-transactionTagsStore.loadAllTags({
-    force: false
-}).then(() => {
-    loading.value = false;
-}).catch(error => {
-    if (error.processed) {
-        loading.value = false;
-    } else {
-        loadingError.value = error;
-        showToast(error.message || error);
+function onPageAfterIn(): void {
+    if (transactionTagsStore.transactionTagListStateInvalid && !loading.value) {
+        reload(null);
     }
-});
+
+    routeBackOnError(props.f7router, loadingError);
+}
+
+init();
 </script>
 
 <style>

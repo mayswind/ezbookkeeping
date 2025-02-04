@@ -347,14 +347,6 @@ function saveSortResult(): void {
     });
 }
 
-function onPageAfterIn(): void {
-    if (transactionCategoriesStore.transactionCategoryListStateInvalid && !loading.value) {
-        reload(null);
-    }
-
-    routeBackOnError(props.f7router, loadingError);
-}
-
 function onSort(event: { el: { id: string }; from: number; to: number }): void {
     if (!event || !event.el || !event.el.id) {
         showToast('Unable to move category');
@@ -377,6 +369,14 @@ function onSort(event: { el: { id: string }; from: number; to: number }): void {
     }).catch(error => {
         showToast(error.message || error);
     });
+}
+
+function onPageAfterIn(): void {
+    if (transactionCategoriesStore.transactionCategoryListStateInvalid && !loading.value) {
+        reload(null);
+    }
+
+    routeBackOnError(props.f7router, loadingError);
 }
 
 init();

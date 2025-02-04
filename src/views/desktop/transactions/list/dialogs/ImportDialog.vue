@@ -646,8 +646,7 @@ import {
 } from '@/lib/datetime.ts';
 import {
     getTransactionPrimaryCategoryName,
-    getTransactionSecondaryCategoryName,
-    getFirstAvailableCategoryId
+    getTransactionSecondaryCategoryName
 } from '@/lib/category.ts';
 
 import {
@@ -805,32 +804,9 @@ const allCategoriesMap = computed<Record<string, TransactionCategory>>(() => tra
 const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
 const allTagsMap = computed<Record<string, TransactionTag>>(() => transactionTagsStore.allTransactionTagsMap);
 
-const hasAvailableExpenseCategories = computed<boolean>(() => {
-    if (!allCategories.value || !allCategories.value[CategoryType.Expense] || !allCategories.value[CategoryType.Expense].length) {
-        return false;
-    }
-
-    const firstAvailableCategoryId = getFirstAvailableCategoryId(allCategories.value[CategoryType.Expense]);
-    return firstAvailableCategoryId !== '';
-});
-
-const hasAvailableIncomeCategories = computed<boolean>(() => {
-    if (!allCategories.value || !allCategories.value[CategoryType.Income] || !allCategories.value[CategoryType.Income].length) {
-        return false;
-    }
-
-    const firstAvailableCategoryId = getFirstAvailableCategoryId(allCategories.value[CategoryType.Income]);
-    return firstAvailableCategoryId !== '';
-});
-
-const hasAvailableTransferCategories = computed<boolean>(() => {
-    if (!allCategories.value || !allCategories.value[CategoryType.Transfer] || !allCategories.value[CategoryType.Transfer].length) {
-        return false;
-    }
-
-    const firstAvailableCategoryId = getFirstAvailableCategoryId(allCategories.value[CategoryType.Transfer]);
-    return firstAvailableCategoryId !== '';
-});
+const hasAvailableExpenseCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableExpenseCategories);
+const hasAvailableIncomeCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableIncomeCategories);
+const hasAvailableTransferCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableTransferCategories);
 
 const supportedImportFileExtensions = computed<string | undefined>(() => {
     if (allFileSubTypes.value && allFileSubTypes.value.length) {

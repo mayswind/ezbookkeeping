@@ -11,7 +11,6 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import type { LocalizedTimezoneInfo } from '@/core/timezone.ts';
-import { CategoryType } from '@/core/category.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { TemplateType } from '@/core/template.ts';
 import { TRANSACTION_MAX_PICTURE_COUNT } from '@/consts/transaction.ts';
@@ -32,10 +31,6 @@ import {
     getTimezoneOffsetMinutes,
     getCurrentUnixTime
 } from '@/lib/datetime.ts';
-
-import {
-    getFirstAvailableCategoryId
-} from '@/lib/category.ts';
 
 export enum TransactionEditPageType {
     Transaction = 'transaction',
@@ -102,6 +97,10 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
     const allCategoriesMap = computed<Record<string, TransactionCategory>>(() => transactionCategoriesStore.allTransactionCategoriesMap);
     const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
     const allTagsMap = computed<Record<string, TransactionTag>>(() => transactionTagsStore.allTransactionTagsMap);
+
+    const hasAvailableExpenseCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableExpenseCategories);
+    const hasAvailableIncomeCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableIncomeCategories);
+    const hasAvailableTransferCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableTransferCategories);
 
     const canAddTransactionPicture = computed<boolean>(() => {
         if (type !== TransactionEditPageType.Transaction || (mode.value !== TransactionEditPageMode.Add && mode.value !== TransactionEditPageMode.Edit)) {
@@ -192,33 +191,6 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         }
 
         return tt('Transfer In Amount') + ` (${amountRate})`;
-    });
-
-    const hasAvailableExpenseCategories = computed<boolean>(() => {
-        if (!allCategories.value || !allCategories.value[CategoryType.Expense] || !allCategories.value[CategoryType.Expense].length) {
-            return false;
-        }
-
-        const firstAvailableCategoryId = getFirstAvailableCategoryId(allCategories.value[CategoryType.Expense]);
-        return firstAvailableCategoryId !== '';
-    });
-
-    const hasAvailableIncomeCategories = computed<boolean>(() => {
-        if (!allCategories.value || !allCategories.value[CategoryType.Income] || !allCategories.value[CategoryType.Income].length) {
-            return false;
-        }
-
-        const firstAvailableCategoryId = getFirstAvailableCategoryId(allCategories.value[CategoryType.Income]);
-        return firstAvailableCategoryId !== '';
-    });
-
-    const hasAvailableTransferCategories = computed<boolean>(() => {
-        if (!allCategories.value || !allCategories.value[CategoryType.Transfer] || !allCategories.value[CategoryType.Transfer].length) {
-            return false;
-        }
-
-        const firstAvailableCategoryId = getFirstAvailableCategoryId(allCategories.value[CategoryType.Transfer]);
-        return firstAvailableCategoryId !== '';
     });
 
     const sourceAccountName = computed<string>(() => {
@@ -422,6 +394,9 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         allCategoriesMap,
         allTags,
         allTagsMap,
+        hasAvailableExpenseCategories,
+        hasAvailableIncomeCategories,
+        hasAvailableTransferCategories,
         canAddTransactionPicture,
         title,
         saveButtonTitle,
@@ -429,9 +404,6 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         sourceAmountName,
         sourceAccountTitle,
         transferInAmountTitle,
-        hasAvailableExpenseCategories,
-        hasAvailableIncomeCategories,
-        hasAvailableTransferCategories,
         sourceAccountName,
         destinationAccountName,
         sourceAccountCurrency,

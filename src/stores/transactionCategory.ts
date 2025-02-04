@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 
 import type { BeforeResolveFunction } from '@/core/base.ts';
@@ -13,6 +13,7 @@ import {
 } from '@/models/transaction_category.ts';
 
 import { isEquals } from '@/lib/common.ts';
+import { getFirstAvailableCategoryId } from '@/lib/category.ts';
 import services, { type ApiResponsePromise } from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 
@@ -20,6 +21,33 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
     const allTransactionCategories = ref<Record<number, TransactionCategory[]>>({});
     const allTransactionCategoriesMap = ref<Record<string, TransactionCategory>>({});
     const transactionCategoryListStateInvalid = ref<boolean>(true);
+
+    const hasAvailableExpenseCategories = computed<boolean>(() => {
+        if (!allTransactionCategories.value || !allTransactionCategories.value[CategoryType.Expense] || !allTransactionCategories.value[CategoryType.Expense].length) {
+            return false;
+        }
+
+        const firstAvailableCategoryId = getFirstAvailableCategoryId(allTransactionCategories.value[CategoryType.Expense]);
+        return firstAvailableCategoryId !== '';
+    });
+
+    const hasAvailableIncomeCategories = computed<boolean>(() => {
+        if (!allTransactionCategories.value || !allTransactionCategories.value[CategoryType.Income] || !allTransactionCategories.value[CategoryType.Income].length) {
+            return false;
+        }
+
+        const firstAvailableCategoryId = getFirstAvailableCategoryId(allTransactionCategories.value[CategoryType.Income]);
+        return firstAvailableCategoryId !== '';
+    });
+
+    const hasAvailableTransferCategories = computed<boolean>(() => {
+        if (!allTransactionCategories.value || !allTransactionCategories.value[CategoryType.Transfer] || !allTransactionCategories.value[CategoryType.Transfer].length) {
+            return false;
+        }
+
+        const firstAvailableCategoryId = getFirstAvailableCategoryId(allTransactionCategories.value[CategoryType.Transfer]);
+        return firstAvailableCategoryId !== '';
+    });
 
     function loadTransactionCategoryList(allCategories: Record<number, TransactionCategory[]>): void {
         allTransactionCategories.value = allCategories;
@@ -496,6 +524,10 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         allTransactionCategories,
         allTransactionCategoriesMap,
         transactionCategoryListStateInvalid,
+        // computed states
+        hasAvailableExpenseCategories,
+        hasAvailableIncomeCategories,
+        hasAvailableTransferCategories,
         // functions
         updateTransactionCategoryListInvalidState,
         resetTransactionCategories,

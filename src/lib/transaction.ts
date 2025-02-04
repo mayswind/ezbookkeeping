@@ -20,14 +20,14 @@ import {
 } from './category.ts';
 
 export interface SetTransactionOptions {
-    type: number;
-    categoryId: string;
-    accountId: string;
-    destinationAccountId: string;
-    amount: number;
-    destinationAmount: number;
-    tagIds: string;
-    comment: string;
+    type?: number;
+    categoryId?: string;
+    accountId?: string;
+    destinationAccountId?: string;
+    amount?: number;
+    destinationAmount?: number;
+    tagIds?: string;
+    comment?: string;
 }
 
 function getDisplayAmount(amount: number, currency: string, hideAmount: boolean, formatAmountWithCurrencyFunc: (value: number | string, currencyCode?: string) => string): string {

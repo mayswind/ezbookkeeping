@@ -23,6 +23,18 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
         this.hidden = hidden;
     }
 
+    public from(other: TransactionTemplate): void {
+        this.templateType = other.templateType;
+        this.name = other.name;
+
+        if (this.templateType === TemplateType.Schedule.type) {
+            this.scheduledFrequencyType = other.scheduledFrequencyType;
+            this.scheduledFrequency = other.scheduledFrequency;
+            this.utcOffset = other.utcOffset;
+            this.timeZone = undefined;
+        }
+    }
+
     public toTemplateCreateRequest(clientSessionId: string): TransactionTemplateCreateRequest {
         return {
             templateType: this.templateType,

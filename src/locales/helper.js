@@ -1,29 +1,21 @@
-import { WeekDay, LongDateFormat, ShortDateFormat, LongTimeFormat, ShortTimeFormat, DateRange } from '@/core/datetime.ts';
+import { LongDateFormat, ShortDateFormat, LongTimeFormat, ShortTimeFormat, DateRange } from '@/core/datetime.ts';
 import { DecimalSeparator, DigitGroupingSymbol, DigitGroupingType } from '@/core/numeral.ts';
 import { CurrencyDisplayType } from '@/core/currency.ts'
-import { AccountCategory } from '@/core/account.ts';
 import { TransactionTagFilterType } from '@/core/transaction.ts';
 
-import { UTC_TIMEZONE, ALL_TIMEZONES } from '@/consts/timezone.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS } from '@/consts/api.ts';
 
 import {
     isString,
     isNumber,
-    isBoolean,
-    copyObjectTo
+    isBoolean
 } from '@/lib/common.ts';
 
 import {
     parseDateFromUnixTime,
     formatUnixTime,
     getYear,
-    getTimezoneOffset,
-    getTimezoneOffsetMinutes,
-    getBrowserTimezoneOffset,
-    getBrowserTimezoneOffsetMinutes,
-    getTimeDifferenceHoursAndMinutes,
     getDateTimeFormatType,
     getRecentMonthDateRanges,
     isDateRangeMatchFullYears,
@@ -31,19 +23,13 @@ import {
 } from '@/lib/datetime.ts';
 
 import {
-    formatAmount,
-    getAdaptiveDisplayAmountRate
+    formatAmount
 } from '@/lib/numeral.ts';
 
 import {
     getCurrencyFraction,
     appendCurrencySymbol
 } from '@/lib/currency.ts';
-
-import {
-    getCategorizedAccountsMap,
-    getAllFilteredAccountsBalance
-} from '@/lib/account.ts';
 
 function getLocalizedDisplayNameAndType(typeAndNames, translateFn) {
     const ret = [];
@@ -78,60 +64,12 @@ function getCurrencyUnitName(currencyCode, isPlural, translateFn) {
     return '';
 }
 
-function getMonthdayOrdinal(monthDay, translateFn) {
-    return translateFn(`datetime.monthDayOrdinal.${monthDay}`);
-}
-
 function getWeekdayShortName(weekDayName, translateFn) {
     return translateFn(`datetime.${weekDayName}.short`);
 }
 
 function getWeekdayLongName(weekDayName, translateFn) {
     return translateFn(`datetime.${weekDayName}.long`);
-}
-
-function getMultiMonthdayShortNames(monthDays, translateFn) {
-    if (!monthDays) {
-        return '';
-    }
-
-    if (monthDays.length === 1) {
-        return translateFn('format.misc.monthDay', {
-            ordinal: getMonthdayOrdinal(monthDays[0], translateFn)
-        });
-    } else {
-        return translateFn('format.misc.monthDays', {
-            multiMonthDays: joinMultiText(monthDays.map(monthDay =>
-                translateFn('format.misc.eachMonthDayInMonthDays', {
-                    ordinal: getMonthdayOrdinal(monthDay, translateFn)
-                })), translateFn)
-        });
-    }
-}
-
-function getMultiWeekdayLongNames(weekdayTypes, firstDayOfWeek, translateFn) {
-    const weekdayTypesMap = {};
-
-    if (!isNumber(firstDayOfWeek)) {
-        firstDayOfWeek = WeekDay.DefaultFirstDay.type;
-    }
-
-    for (let i = 0; i < weekdayTypes.length; i++) {
-        weekdayTypesMap[weekdayTypes[i]] = true;
-    }
-
-    const allWeekDays = getAllWeekDays(firstDayOfWeek, translateFn);
-    const finalWeekdayNames = [];
-
-    for (let i = 0; i < allWeekDays.length; i++) {
-        const weekDay = allWeekDays[i];
-
-        if (weekdayTypesMap[weekDay.type]) {
-            finalWeekdayNames.push(weekDay.displayName);
-        }
-    }
-
-    return joinMultiText(finalWeekdayNames, translateFn);
 }
 
 function getI18nLongDateFormat(translateFn, formatTypeValue) {
@@ -182,110 +120,6 @@ function getI18nShortTimeFormat(translateFn, formatTypeValue) {
 function getDateTimeFormat(translateFn, allFormatMap, allFormatArray, localeFormatPathPrefix, localeDefaultFormatTypeName, systemDefaultFormatType, formatTypeValue) {
     const type = getDateTimeFormatType(allFormatMap, allFormatArray, formatTypeValue, localeDefaultFormatTypeName, systemDefaultFormatType);
     return translateFn(`${localeFormatPathPrefix}.${type.key}`);
-}
-
-function getAllTimezones(includeSystemDefault, translateFn) {
-    const defaultTimezoneOffset = getBrowserTimezoneOffset();
-    const defaultTimezoneOffsetMinutes = getBrowserTimezoneOffsetMinutes();
-    const allTimezoneInfos = [];
-
-    for (let i = 0; i < ALL_TIMEZONES.length; i++) {
-        const utcOffset = (ALL_TIMEZONES[i].timezoneName !== UTC_TIMEZONE.timezoneName ? getTimezoneOffset(ALL_TIMEZONES[i].timezoneName) : '');
-        const displayName = translateFn(`timezone.${ALL_TIMEZONES[i].displayName}`);
-
-        allTimezoneInfos.push({
-            name: ALL_TIMEZONES[i].timezoneName,
-            utcOffset: utcOffset,
-            utcOffsetMinutes: getTimezoneOffsetMinutes(ALL_TIMEZONES[i].timezoneName),
-            displayName: displayName,
-            displayNameWithUtcOffset: `(UTC${utcOffset}) ${displayName}`
-        });
-    }
-
-    if (includeSystemDefault) {
-        const defaultDisplayName = translateFn('System Default');
-
-        allTimezoneInfos.push({
-            name: '',
-            utcOffset: defaultTimezoneOffset,
-            utcOffsetMinutes: defaultTimezoneOffsetMinutes,
-            displayName: defaultDisplayName,
-            displayNameWithUtcOffset: `(UTC${defaultTimezoneOffset}) ${defaultDisplayName}`
-        });
-    }
-
-    allTimezoneInfos.sort(function(c1, c2) {
-        const utcOffset1 = parseInt(c1.utcOffset.replace(':', ''));
-        const utcOffset2 = parseInt(c2.utcOffset.replace(':', ''));
-
-        if (utcOffset1 !== utcOffset2) {
-            return utcOffset1 - utcOffset2;
-        }
-
-        return c1.displayName.localeCompare(c2.displayName);
-    })
-
-    return allTimezoneInfos;
-}
-
-function getTimezoneDifferenceDisplayText(utcOffset, translateFn) {
-    const defaultTimezoneOffset = getTimezoneOffsetMinutes();
-    const offsetTime = getTimeDifferenceHoursAndMinutes(utcOffset - defaultTimezoneOffset);
-
-    if (utcOffset > defaultTimezoneOffset) {
-        if (offsetTime.offsetMinutes) {
-            return translateFn('format.misc.hoursMinutesAheadOfDefaultTimezone', {
-                hours: offsetTime.offsetHours,
-                minutes: offsetTime.offsetMinutes
-            });
-        } else {
-            return translateFn('format.misc.hoursAheadOfDefaultTimezone', {
-                hours: offsetTime.offsetHours
-            });
-        }
-    } else if (utcOffset < defaultTimezoneOffset) {
-        if (offsetTime.offsetMinutes) {
-            return translateFn('format.misc.hoursMinutesBehindDefaultTimezone', {
-                hours: offsetTime.offsetHours,
-                minutes: offsetTime.offsetMinutes
-            });
-        } else {
-            return translateFn('format.misc.hoursBehindDefaultTimezone', {
-                hours: offsetTime.offsetHours
-            });
-        }
-    } else {
-        return translateFn('Same time as default timezone');
-    }
-}
-
-function getAllWeekDays(firstDayOfWeek, translateFn) {
-    const ret = [];
-    const allWeekDays = WeekDay.values();
-
-    if (!isNumber(firstDayOfWeek)) {
-        firstDayOfWeek = WeekDay.DefaultFirstDay.type;
-    }
-
-    for (let i = firstDayOfWeek; i < allWeekDays.length; i++) {
-        const weekDay = allWeekDays[i];
-
-        ret.push({
-            type: weekDay.type,
-            displayName: translateFn(`datetime.${weekDay.name}.long`)
-        });
-    }
-
-    for (let i = 0; i < firstDayOfWeek; i++) {
-        const weekDay = allWeekDays[i];
-
-        ret.push({
-            type: weekDay.type,
-            displayName: translateFn(`datetime.${weekDay.name}.long`)
-        });
-    }
-
-    return ret;
 }
 
 function getAllDateRanges(scene, includeCustom, includeBillingCycle, translateFn) {
@@ -460,11 +294,6 @@ function getNumberFormatOptions(translateFn, userStore, currencyCode) {
     };
 }
 
-function getFormattedAmount(value, translateFn, userStore, currencyCode) {
-    const numberFormatOptions = getNumberFormatOptions(translateFn, userStore, currencyCode);
-    return formatAmount(value, numberFormatOptions);
-}
-
 function getCurrentCurrencyDisplayType(translateFn, userStore) {
     let currencyDisplayType = CurrencyDisplayType.valueOf(userStore.currentUserCurrencyDisplayType);
 
@@ -525,94 +354,8 @@ function getFormattedAmountWithCurrency(value, currencyCode, translateFn, userSt
     return appendCurrencySymbol(value, currencyDisplayType, currencyCode, currencyUnit, currencyName, isPlural);
 }
 
-function getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, translateFn, userStore) {
-    const numberFormatOptions = getNumberFormatOptions(translateFn, userStore);
-    return getAdaptiveDisplayAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, numberFormatOptions);
-}
-
 function getAllTransactionTagFilterTypes(translateFn) {
     return getLocalizedDisplayNameAndType(TransactionTagFilterType.values(), translateFn);
-}
-
-function getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, translateFn) {
-    const ret = [];
-    const allCategories = AccountCategory.values();
-    const categorizedAccounts = copyObjectTo(getCategorizedAccountsMap(allVisibleAccounts), {});
-
-    for (let i = 0; i < allCategories.length; i++) {
-        const category = allCategories[i];
-
-        if (!categorizedAccounts[category.type]) {
-            continue;
-        }
-
-        const accountCategory = categorizedAccounts[category.type];
-
-        if (accountCategory.accounts) {
-            for (let i = 0; i < accountCategory.accounts.length; i++) {
-                const account = accountCategory.accounts[i];
-
-                if (showAccountBalance && account.isAsset) {
-                    account.displayBalance = getFormattedAmountWithCurrency(account.balance, account.currency, translateFn, userStore, settingsStore);
-                } else if (showAccountBalance && account.isLiability) {
-                    account.displayBalance = getFormattedAmountWithCurrency(-account.balance, account.currency, translateFn, userStore, settingsStore);
-                } else {
-                    account.displayBalance = '***';
-                }
-            }
-        }
-
-        if (showAccountBalance) {
-            const accountsBalance = getAllFilteredAccountsBalance(categorizedAccounts, account => account.category === accountCategory.category);
-            let totalBalance = 0;
-            let hasUnCalculatedAmount = false;
-
-            for (let i = 0; i < accountsBalance.length; i++) {
-                if (accountsBalance[i].currency === defaultCurrency) {
-                    if (accountsBalance[i].isAsset) {
-                        totalBalance += accountsBalance[i].balance;
-                    } else if (accountsBalance[i].isLiability) {
-                        totalBalance -= accountsBalance[i].balance;
-                    }
-                } else {
-                    const balance = exchangeRatesStore.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, defaultCurrency);
-
-                    if (!isNumber(balance)) {
-                        hasUnCalculatedAmount = true;
-                        continue;
-                    }
-
-                    if (accountsBalance[i].isAsset) {
-                        totalBalance += Math.floor(balance);
-                    } else if (accountsBalance[i].isLiability) {
-                        totalBalance -= Math.floor(balance);
-                    }
-                }
-            }
-
-            if (hasUnCalculatedAmount) {
-                totalBalance = totalBalance + '+';
-            }
-
-            accountCategory.displayBalance = getFormattedAmountWithCurrency(totalBalance, defaultCurrency, translateFn, userStore, settingsStore);
-        } else {
-            accountCategory.displayBalance = '***';
-        }
-
-        ret.push(accountCategory);
-    }
-
-    return ret;
-}
-
-function joinMultiText(textArray, translateFn) {
-    if (!textArray || !textArray.length) {
-        return '';
-    }
-
-    const separator = translateFn('format.misc.multiTextJoinSeparator');
-
-    return textArray.join(separator);
 }
 
 function getLocalizedError(error) {
@@ -685,23 +428,15 @@ export function i18nFunctions(i18nGlobal) {
     return {
         getWeekdayShortName: (weekDay) => getWeekdayShortName(weekDay, i18nGlobal.t),
         getWeekdayLongName: (weekDay) => getWeekdayLongName(weekDay, i18nGlobal.t),
-        getMultiMonthdayShortNames: (monthdays) => getMultiMonthdayShortNames(monthdays, i18nGlobal.t),
-        getMultiWeekdayLongNames: (weekdayTypes, firstDayOfWeek) => getMultiWeekdayLongNames(weekdayTypes, firstDayOfWeek, i18nGlobal.t),
         formatUnixTimeToLongDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18nGlobal.t, userStore.currentUserLongDateFormat) + ' ' + getI18nLongTimeFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToLongDate: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18nGlobal.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToLongYear: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongYearFormat(i18nGlobal.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToLongYearMonth: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongYearMonthFormat(i18nGlobal.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
-        formatUnixTimeToLongTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongTimeFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToShortTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortTimeFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat), utcOffset, currentUtcOffset),
-        getAllTimezones: (includeSystemDefault) => getAllTimezones(includeSystemDefault, i18nGlobal.t),
-        getTimezoneDifferenceDisplayText: (utcOffset) => getTimezoneDifferenceDisplayText(utcOffset, i18nGlobal.t),
         getAllDateRanges: (scene, includeCustom, includeBillingCycle) => getAllDateRanges(scene, includeCustom, includeBillingCycle, i18nGlobal.t),
         getAllRecentMonthDateRanges: (userStore, includeAll, includeCustom) => getAllRecentMonthDateRanges(userStore, includeAll, includeCustom, i18nGlobal.t),
         getDateRangeDisplayName: (userStore, dateType, startTime, endTime) => getDateRangeDisplayName(userStore, dateType, startTime, endTime, i18nGlobal.t),
-        formatAmount: (userStore, value, currencyCode) => getFormattedAmount(value, i18nGlobal.t, userStore, currencyCode),
         formatAmountWithCurrency: (settingsStore, userStore, value, currencyCode) => getFormattedAmountWithCurrency(value, currencyCode, i18nGlobal.t, userStore, settingsStore),
-        getAdaptiveAmountRate: (userStore, amount1, amount2, fromExchangeRate, toExchangeRate) => getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, i18nGlobal.t, userStore),
-        getAllTransactionTagFilterTypes: () => getAllTransactionTagFilterTypes(i18nGlobal.t),
-        getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t)
+        getAllTransactionTagFilterTypes: () => getAllTransactionTagFilterTypes(i18nGlobal.t)
     };
 }

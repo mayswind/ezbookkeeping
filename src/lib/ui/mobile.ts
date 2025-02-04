@@ -37,26 +37,6 @@ export function showAlert(message: string, confirmCallback: ((dialog: Dialog.Dia
     });
 }
 
-export function showConfirm(message: string, confirmCallback: (dialog: Dialog.Dialog, e: Event) => void, cancelCallback: ((dialog: Dialog.Dialog, e: Event) => void) | undefined, translateFn: TranslateFunction): void {
-    f7ready((f7) => {
-        f7.dialog.create({
-            title: translateFn('global.app.title'),
-            text: translateFn(message),
-            animate: isEnableAnimate(),
-            buttons: [
-                {
-                    text: translateFn('Cancel'),
-                    onClick: cancelCallback
-                },
-                {
-                    text: translateFn('OK'),
-                    onClick: confirmCallback
-                }
-            ]
-        }).open();
-    });
-}
-
 export function showToast(message: string, timeout: number | undefined, translateFn: TranslateFunction): void {
     f7ready((f7) => {
         f7.toast.create({
@@ -210,7 +190,7 @@ export function scrollToSelectedItem(parentEl: Framework7Dom, containerSelector:
 }
 
 export function useI18nUIComponents() {
-    const i18nGlobal = useVueI18n();
+    const { t } = useVueI18n();
 
     function routeBackOnError<T>(f7router: Router.Router, errorRef: Ref<T>): void {
         const unwatch = watch(errorRef, (newValue) => {
@@ -228,10 +208,30 @@ export function useI18nUIComponents() {
         });
     }
 
+    function showConfirm(message: string, confirmCallback?: (dialog: Dialog.Dialog, e: Event) => void, cancelCallback?: ((dialog: Dialog.Dialog, e: Event) => void) | undefined): void {
+        f7ready((f7) => {
+            f7.dialog.create({
+                title: t('global.app.title'),
+                text: t(message),
+                animate: isEnableAnimate(),
+                buttons: [
+                    {
+                        text: t('Cancel'),
+                        onClick: cancelCallback
+                    },
+                    {
+                        text: t('OK'),
+                        onClick: confirmCallback
+                    }
+                ]
+            }).open();
+        });
+    }
+
     return {
-        showAlert: (message: string, confirmCallback?: (dialog: Dialog.Dialog, e: Event) => void) => showAlert(message, confirmCallback, i18nGlobal.t),
-        showConfirm: (message: string, confirmCallback: (dialog: Dialog.Dialog, e: Event) => void, cancelCallback?: (dialog: Dialog.Dialog, e: Event) => void): void => showConfirm(message, confirmCallback, cancelCallback, i18nGlobal.t),
-        showToast: (message: string, timeout?: number): void => showToast(message, timeout, i18nGlobal.t),
+        showAlert: (message: string, confirmCallback?: (dialog: Dialog.Dialog, e: Event) => void) => showAlert(message, confirmCallback, t),
+        showConfirm: showConfirm,
+        showToast: (message: string, timeout?: number): void => showToast(message, timeout, t),
         routeBackOnError
     }
 }

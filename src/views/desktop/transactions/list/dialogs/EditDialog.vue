@@ -1,35 +1,35 @@
 <template>
-    <v-dialog width="1000" :persistent="!!persistent && mode !== 'view'" v-model="showState">
+    <v-dialog width="1000" :persistent="!!persistent && mode !== TransactionEditPageMode.View" v-model="showState">
         <v-card class="pa-2 pa-sm-4 pa-md-8">
             <template #title>
                 <div class="d-flex align-center justify-center">
                     <div class="d-flex w-100 align-center justify-center">
-                        <h4 class="text-h4">{{ $t(title) }}</h4>
+                        <h4 class="text-h4">{{ tt(title) }}</h4>
                         <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
                     </div>
                     <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true"
-                           :disabled="loading || submitting" v-if="mode !== 'view'">
+                           :disabled="loading || submitting" v-if="mode !== TransactionEditPageMode.View">
                         <v-icon :icon="icons.more" />
                         <v-menu activator="parent">
                             <v-list>
                                 <v-list-item :prepend-icon="icons.swap"
-                                             :title="$t('Swap Account')"
-                                             v-if="transaction.type === allTransactionTypes.Transfer"
+                                             :title="tt('Swap Account')"
+                                             v-if="transaction.type === TransactionType.Transfer"
                                              @click="swapTransactionData(true, false)"></v-list-item>
                                 <v-list-item :prepend-icon="icons.swap"
-                                             :title="$t('Swap Amount')"
-                                             v-if="transaction.type === allTransactionTypes.Transfer"
+                                             :title="tt('Swap Amount')"
+                                             v-if="transaction.type === TransactionType.Transfer"
                                              @click="swapTransactionData(false, true)"></v-list-item>
                                 <v-list-item :prepend-icon="icons.swap"
-                                             :title="$t('Swap Account and Amount')"
-                                             v-if="transaction.type === allTransactionTypes.Transfer"
+                                             :title="tt('Swap Account and Amount')"
+                                             v-if="transaction.type === TransactionType.Transfer"
                                              @click="swapTransactionData(true, true)"></v-list-item>
-                                <v-divider v-if="transaction.type === allTransactionTypes.Transfer" />
+                                <v-divider v-if="transaction.type === TransactionType.Transfer" />
                                 <v-list-item :prepend-icon="icons.show"
-                                             :title="$t('Show Amount')"
+                                             :title="tt('Show Amount')"
                                              v-if="transaction.hideAmount" @click="transaction.hideAmount = false"></v-list-item>
                                 <v-list-item :prepend-icon="icons.hide"
-                                             :title="$t('Hide Amount')"
+                                             :title="tt('Hide Amount')"
                                              v-if="!transaction.hideAmount" @click="transaction.hideAmount = true"></v-list-item>
                             </v-list>
                         </v-menu>
@@ -38,31 +38,31 @@
             </template>
             <v-card-text class="d-flex flex-column flex-md-row mt-md-4 pt-0">
                 <div class="mb-4">
-                    <v-tabs class="v-tabs-pill" direction="vertical" :class="{ 'readonly': type === 'transaction' && mode !== 'add' }"
+                    <v-tabs class="v-tabs-pill" direction="vertical" :class="{ 'readonly': type === TransactionEditPageType.Transaction && mode !== TransactionEditPageMode.Add }"
                             :disabled="loading || submitting" v-model="transaction.type">
-                        <v-tab :value="allTransactionTypes.Expense" :disabled="type === 'transaction' && mode !== 'add' && transaction.type !== allTransactionTypes.Expense" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
-                            <span>{{ $t('Expense') }}</span>
+                        <v-tab :value="TransactionType.Expense" :disabled="type === TransactionEditPageType.Transaction && mode !== TransactionEditPageMode.Add && transaction.type !== TransactionType.Expense" v-if="transaction.type !== TransactionType.ModifyBalance">
+                            <span>{{ tt('Expense') }}</span>
                         </v-tab>
-                        <v-tab :value="allTransactionTypes.Income" :disabled="type === 'transaction' && mode !== 'add' && transaction.type !== allTransactionTypes.Income" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
-                            <span>{{ $t('Income') }}</span>
+                        <v-tab :value="TransactionType.Income" :disabled="type === TransactionEditPageType.Transaction && mode !== TransactionEditPageMode.Add && transaction.type !== TransactionType.Income" v-if="transaction.type !== TransactionType.ModifyBalance">
+                            <span>{{ tt('Income') }}</span>
                         </v-tab>
-                        <v-tab :value="allTransactionTypes.Transfer" :disabled="type === 'transaction' && mode !== 'add' && transaction.type !== allTransactionTypes.Transfer" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
-                            <span>{{ $t('Transfer') }}</span>
+                        <v-tab :value="TransactionType.Transfer" :disabled="type === TransactionEditPageType.Transaction && mode !== TransactionEditPageMode.Add && transaction.type !== TransactionType.Transfer" v-if="transaction.type !== TransactionType.ModifyBalance">
+                            <span>{{ tt('Transfer') }}</span>
                         </v-tab>
-                        <v-tab :value="allTransactionTypes.ModifyBalance" v-if="type === 'transaction' && transaction.type === allTransactionTypes.ModifyBalance">
-                            <span>{{ $t('Modify Balance') }}</span>
+                        <v-tab :value="TransactionType.ModifyBalance" v-if="type === TransactionEditPageType.Transaction && transaction.type === TransactionType.ModifyBalance">
+                            <span>{{ tt('Modify Balance') }}</span>
                         </v-tab>
                     </v-tabs>
                     <v-divider class="my-2"/>
                     <v-tabs direction="vertical" :disabled="loading || submitting" v-model="activeTab">
                         <v-tab value="basicInfo">
-                            <span>{{ $t('Basic Information') }}</span>
+                            <span>{{ tt('Basic Information') }}</span>
                         </v-tab>
-                        <v-tab value="map" :disabled="!transaction.geoLocation" v-if="type === 'transaction' && mapProvider">
-                            <span>{{ $t('Location on Map') }}</span>
+                        <v-tab value="map" :disabled="!transaction.geoLocation" v-if="type === TransactionEditPageType.Transaction && !!getMapProvider()">
+                            <span>{{ tt('Location on Map') }}</span>
                         </v-tab>
-                        <v-tab value="pictures" :disabled="mode !== 'add' && mode !== 'edit' && (!transaction.pictures || !transaction.pictures.length)" v-if="type === 'transaction' && isTransactionPicturesEnabled">
-                            <span>{{ $t('Pictures') }}</span>
+                        <v-tab value="pictures" :disabled="mode !== TransactionEditPageMode.Add && mode !== TransactionEditPageMode.Edit && (!transaction.pictures || !transaction.pictures.length)" v-if="type === TransactionEditPageType.Transaction && isTransactionPicturesEnabled()">
+                            <span>{{ tt('Pictures') }}</span>
                         </v-tab>
                     </v-tabs>
                 </div>
@@ -72,91 +72,91 @@
                     <v-window-item value="basicInfo">
                         <v-form class="mt-2">
                             <v-row>
-                                <v-col cols="12" v-if="type === 'template'">
+                                <v-col cols="12" v-if="type === TransactionEditPageType.Template && transaction instanceof TransactionTemplate">
                                     <v-text-field
                                         type="text"
                                         persistent-placeholder
                                         :disabled="loading || submitting"
-                                        :label="$t('Template Name')"
-                                        :placeholder="$t('Template Name')"
+                                        :label="tt('Template Name')"
+                                        :placeholder="tt('Template Name')"
                                         v-model="transaction.name"
                                     />
                                 </v-col>
-                                <v-col cols="12" :md="transaction.type === allTransactionTypes.Transfer ? 6 : 12">
+                                <v-col cols="12" :md="transaction.type === TransactionType.Transfer ? 6 : 12">
                                     <amount-input class="transaction-edit-amount font-weight-bold"
                                                   :color="sourceAmountColor"
                                                   :currency="sourceAccountCurrency"
-                                                  :readonly="mode === 'view'"
+                                                  :readonly="mode === TransactionEditPageMode.View"
                                                   :disabled="loading || submitting"
                                                   :persistent-placeholder="true"
                                                   :hide="transaction.hideAmount"
-                                                  :label="$t(sourceAmountName)"
-                                                  :placeholder="$t(sourceAmountName)"
+                                                  :label="tt(sourceAmountName)"
+                                                  :placeholder="tt(sourceAmountName)"
                                                   v-model="transaction.sourceAmount"/>
                                 </v-col>
-                                <v-col cols="12" :md="6" v-if="transaction.type === allTransactionTypes.Transfer">
+                                <v-col cols="12" :md="6" v-if="transaction.type === TransactionType.Transfer">
                                     <amount-input class="transaction-edit-amount font-weight-bold" color="primary"
                                                   :currency="destinationAccountCurrency"
-                                                  :readonly="mode === 'view'"
+                                                  :readonly="mode === TransactionEditPageMode.View"
                                                   :disabled="loading || submitting"
                                                   :persistent-placeholder="true"
                                                   :hide="transaction.hideAmount"
                                                   :label="transferInAmountTitle"
-                                                  :placeholder="$t('Transfer In Amount')"
+                                                  :placeholder="tt('Transfer In Amount')"
                                                   v-model="transaction.destinationAmount"/>
                                 </v-col>
-                                <v-col cols="12" md="12" v-if="transaction.type === allTransactionTypes.Expense">
+                                <v-col cols="12" md="12" v-if="transaction.type === TransactionType.Expense">
                                     <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                        primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
                                                        primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                                        secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                        secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                        secondary-hidden-field="hidden"
-                                                       :readonly="mode === 'view'"
+                                                       :readonly="mode === TransactionEditPageMode.View"
                                                        :disabled="loading || submitting || !hasAvailableExpenseCategories"
                                                        :show-selection-primary-text="true"
-                                                       :custom-selection-primary-text="getPrimaryCategoryName(transaction.expenseCategoryId, allCategories[allCategoryTypes.Expense])"
-                                                       :custom-selection-secondary-text="getSecondaryCategoryName(transaction.expenseCategoryId, allCategories[allCategoryTypes.Expense])"
-                                                       :label="$t('Category')" :placeholder="$t('Category')"
-                                                       :items="allCategories[allCategoryTypes.Expense]"
+                                                       :custom-selection-primary-text="getTransactionPrimaryCategoryName(transaction.expenseCategoryId, allCategories[CategoryType.Expense])"
+                                                       :custom-selection-secondary-text="getTransactionSecondaryCategoryName(transaction.expenseCategoryId, allCategories[CategoryType.Expense])"
+                                                       :label="tt('Category')" :placeholder="tt('Category')"
+                                                       :items="allCategories[CategoryType.Expense] || []"
                                                        v-model="transaction.expenseCategoryId">
                                     </two-column-select>
                                 </v-col>
-                                <v-col cols="12" md="12" v-if="transaction.type === allTransactionTypes.Income">
+                                <v-col cols="12" md="12" v-if="transaction.type === TransactionType.Income">
                                     <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                        primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
                                                        primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                                        secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                        secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                        secondary-hidden-field="hidden"
-                                                       :readonly="mode === 'view'"
+                                                       :readonly="mode === TransactionEditPageMode.View"
                                                        :disabled="loading || submitting || !hasAvailableIncomeCategories"
                                                        :show-selection-primary-text="true"
-                                                       :custom-selection-primary-text="getPrimaryCategoryName(transaction.incomeCategoryId, allCategories[allCategoryTypes.Income])"
-                                                       :custom-selection-secondary-text="getSecondaryCategoryName(transaction.incomeCategoryId, allCategories[allCategoryTypes.Income])"
-                                                       :label="$t('Category')" :placeholder="$t('Category')"
-                                                       :items="allCategories[allCategoryTypes.Income]"
+                                                       :custom-selection-primary-text="getTransactionPrimaryCategoryName(transaction.incomeCategoryId, allCategories[CategoryType.Income])"
+                                                       :custom-selection-secondary-text="getTransactionSecondaryCategoryName(transaction.incomeCategoryId, allCategories[CategoryType.Income])"
+                                                       :label="tt('Category')" :placeholder="tt('Category')"
+                                                       :items="allCategories[CategoryType.Income] || []"
                                                        v-model="transaction.incomeCategoryId">
                                     </two-column-select>
                                 </v-col>
-                                <v-col cols="12" md="12" v-if="transaction.type === allTransactionTypes.Transfer">
+                                <v-col cols="12" md="12" v-if="transaction.type === TransactionType.Transfer">
                                     <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                        primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
                                                        primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                                        secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                        secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                        secondary-hidden-field="hidden"
-                                                       :readonly="mode === 'view'"
+                                                       :readonly="mode === TransactionEditPageMode.View"
                                                        :disabled="loading || submitting || !hasAvailableTransferCategories"
                                                        :show-selection-primary-text="true"
-                                                       :custom-selection-primary-text="getPrimaryCategoryName(transaction.transferCategoryId, allCategories[allCategoryTypes.Transfer])"
-                                                       :custom-selection-secondary-text="getSecondaryCategoryName(transaction.transferCategoryId, allCategories[allCategoryTypes.Transfer])"
-                                                       :label="$t('Category')" :placeholder="$t('Category')"
-                                                       :items="allCategories[allCategoryTypes.Transfer]"
+                                                       :custom-selection-primary-text="getTransactionPrimaryCategoryName(transaction.transferCategoryId, allCategories[CategoryType.Transfer])"
+                                                       :custom-selection-secondary-text="getTransactionSecondaryCategoryName(transaction.transferCategoryId, allCategories[CategoryType.Transfer])"
+                                                       :label="tt('Category')" :placeholder="tt('Category')"
+                                                       :items="allCategories[CategoryType.Transfer] || []"
                                                        v-model="transaction.transferCategoryId">
                                     </two-column-select>
                                 </v-col>
-                                <v-col cols="12" :md="transaction.type === allTransactionTypes.Transfer ? 6 : 12">
+                                <v-col cols="12" :md="transaction.type === TransactionType.Transfer ? 6 : 12">
                                     <two-column-select primary-key-field="id" primary-value-field="category"
                                                        primary-title-field="name" primary-footer-field="displayBalance"
                                                        primary-icon-field="icon" primary-icon-type="account"
@@ -165,16 +165,16 @@
                                                        secondary-key-field="id" secondary-value-field="id"
                                                        secondary-title-field="name" secondary-footer-field="displayBalance"
                                                        secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                                       :readonly="mode === 'view'"
+                                                       :readonly="mode === TransactionEditPageMode.View"
                                                        :disabled="loading || submitting || !allVisibleAccounts.length"
                                                        :custom-selection-primary-text="sourceAccountName"
-                                                       :label="$t(sourceAccountTitle)"
-                                                       :placeholder="$t(sourceAccountTitle)"
+                                                       :label="tt(sourceAccountTitle)"
+                                                       :placeholder="tt(sourceAccountTitle)"
                                                        :items="allVisibleCategorizedAccounts"
                                                        v-model="transaction.sourceAccountId">
                                     </two-column-select>
                                 </v-col>
-                                <v-col cols="12" md="6" v-if="transaction.type === allTransactionTypes.Transfer">
+                                <v-col cols="12" md="6" v-if="transaction.type === TransactionType.Transfer">
                                     <two-column-select primary-key-field="id" primary-value-field="category"
                                                        primary-title-field="name" primary-footer-field="displayBalance"
                                                        primary-icon-field="icon" primary-icon-type="account"
@@ -183,44 +183,44 @@
                                                        secondary-key-field="id" secondary-value-field="id"
                                                        secondary-title-field="name" secondary-footer-field="displayBalance"
                                                        secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                                       :readonly="mode === 'view'"
+                                                       :readonly="mode === TransactionEditPageMode.View"
                                                        :disabled="loading || submitting || !allVisibleAccounts.length"
                                                        :custom-selection-primary-text="destinationAccountName"
-                                                       :label="$t('Destination Account')"
-                                                       :placeholder="$t('Destination Account')"
+                                                       :label="tt('Destination Account')"
+                                                       :placeholder="tt('Destination Account')"
                                                        :items="allVisibleCategorizedAccounts"
                                                        v-model="transaction.destinationAccountId">
                                     </two-column-select>
                                 </v-col>
-                                <v-col cols="12" md="6" v-if="type === 'transaction'">
+                                <v-col cols="12" md="6" v-if="type === TransactionEditPageType.Transaction">
                                     <date-time-select
-                                        :readonly="mode === 'view'"
+                                        :readonly="mode === TransactionEditPageMode.View"
                                         :disabled="loading || submitting"
-                                        :label="$t('Transaction Time')"
+                                        :label="tt('Transaction Time')"
                                         v-model="transaction.time"
-                                        @error="showDateTimeError" />
+                                        @error="onShowDateTimeError" />
                                 </v-col>
-                                <v-col cols="12" md="6" v-if="type === 'template' && transaction.templateType === allTemplateTypes.Schedule.type">
+                                <v-col cols="12" md="6" v-if="type === TransactionEditPageType.Template && transaction instanceof TransactionTemplate && transaction.templateType === TemplateType.Schedule.type">
                                     <schedule-frequency-select
-                                        :readonly="mode === 'view'"
+                                        :readonly="mode === TransactionEditPageMode.View"
                                         :disabled="loading || submitting"
-                                        :label="$t('Scheduled Transaction Frequency')"
+                                        :label="tt('Scheduled Transaction Frequency')"
                                         v-model:type="transaction.scheduledFrequencyType"
                                         v-model="transaction.scheduledFrequency" />
                                 </v-col>
-                                <v-col cols="12" md="6" v-if="type === 'transaction' || (type === 'template' && transaction.templateType === allTemplateTypes.Schedule.type)">
+                                <v-col cols="12" md="6" v-if="type === TransactionEditPageType.Transaction || (type === TransactionEditPageType.Template && transaction instanceof TransactionTemplate && transaction.templateType === TemplateType.Schedule.type)">
                                     <v-autocomplete
                                         class="transaction-edit-timezone"
                                         item-title="displayNameWithUtcOffset"
                                         item-value="name"
                                         auto-select-first
                                         persistent-placeholder
-                                        :readonly="mode === 'view'"
+                                        :readonly="mode === TransactionEditPageMode.View"
                                         :disabled="loading || submitting"
-                                        :label="$t('Transaction Timezone')"
-                                        :placeholder="!transaction.timeZone && transaction.timeZone !== '' ? `(${transactionDisplayTimezone}) ${transactionTimezoneTimeDifference}` : $t('Timezone')"
+                                        :label="tt('Transaction Timezone')"
+                                        :placeholder="!transaction.timeZone && transaction.timeZone !== '' ? `(${transactionDisplayTimezone}) ${transactionTimezoneTimeDifference}` : tt('Timezone')"
                                         :items="allTimezones"
-                                        :no-data-text="$t('No results')"
+                                        :no-data-text="tt('No results')"
                                         v-model="transaction.timeZone"
                                     >
                                         <template #selection="{ item }">
@@ -230,12 +230,12 @@
                                         </template>
                                     </v-autocomplete>
                                 </v-col>
-                                <v-col cols="12" md="12" v-if="type === 'transaction'">
+                                <v-col cols="12" md="12" v-if="type === TransactionEditPageType.Transaction">
                                     <v-select
                                         persistent-placeholder
-                                        :readonly="mode === 'view'"
+                                        :readonly="mode === TransactionEditPageMode.View"
                                         :disabled="loading || submitting"
-                                        :label="$t('Geographic Location')"
+                                        :label="tt('Geographic Location')"
                                         v-model="transaction"
                                         v-model:menu="geoMenuState"
                                     >
@@ -246,8 +246,8 @@
 
                                         <template #no-data>
                                             <v-list class="py-0">
-                                                <v-list-item v-if="mode !== 'view'" @click="updateGeoLocation(true)">{{ $t('Update Geographic Location') }}</v-list-item>
-                                                <v-list-item v-if="mode !== 'view'" @click="clearGeoLocation">{{ $t('Clear Geographic Location') }}</v-list-item>
+                                                <v-list-item v-if="mode !== TransactionEditPageMode.View" @click="updateGeoLocation(true)">{{ tt('Update Geographic Location') }}</v-list-item>
+                                                <v-list-item v-if="mode !== TransactionEditPageMode.View" @click="clearGeoLocation">{{ tt('Clear Geographic Location') }}</v-list-item>
                                             </v-list>
                                         </template>
                                     </v-select>
@@ -260,11 +260,11 @@
                                         persistent-placeholder
                                         multiple
                                         chips
-                                        :closable-chips="mode !== 'view'"
-                                        :readonly="mode === 'view'"
+                                        :closable-chips="mode !== TransactionEditPageMode.View"
+                                        :readonly="mode === TransactionEditPageMode.View"
                                         :disabled="loading || submitting"
-                                        :label="$t('Tags')"
-                                        :placeholder="$t('None')"
+                                        :label="tt('Tags')"
+                                        :placeholder="tt('None')"
                                         :items="allTags"
                                         v-model="transaction.tagIds"
                                         v-model:search="tagSearchContent"
@@ -288,8 +288,8 @@
 
                                         <template #no-data>
                                             <v-list class="py-0">
-                                                <v-list-item v-if="tagSearchContent" @click="saveNewTag(tagSearchContent)">{{ $t('format.misc.addNewTag', { tag: tagSearchContent }) }}</v-list-item>
-                                                <v-list-item v-else-if="!tagSearchContent">{{ $t('No available tag') }}</v-list-item>
+                                                <v-list-item v-if="tagSearchContent" @click="saveNewTag(tagSearchContent)">{{ tt('format.misc.addNewTag', { tag: tagSearchContent }) }}</v-list-item>
+                                                <v-list-item v-else-if="!tagSearchContent">{{ tt('No available tag') }}</v-list-item>
                                             </v-list>
                                         </template>
                                     </v-autocomplete>
@@ -299,10 +299,10 @@
                                         type="text"
                                         persistent-placeholder
                                         rows="3"
-                                        :readonly="mode === 'view'"
+                                        :readonly="mode === TransactionEditPageMode.View"
                                         :disabled="loading || submitting"
-                                        :label="$t('Description')"
-                                        :placeholder="$t('Your transaction description (optional)')"
+                                        :label="tt('Description')"
+                                        :placeholder="tt('Your transaction description (optional)')"
                                         v-model="transaction.comment"
                                     />
                                 </v-col>
@@ -314,12 +314,12 @@
                             <v-col cols="12" md="12">
                                 <map-view ref="map" map-class="transaction-edit-map-view" :geo-location="transaction.geoLocation">
                                     <template #error-title="{ mapSupported, mapDependencyLoaded }">
-                                        <span class="text-subtitle-1" v-if="!mapSupported"><b>{{ $t('Unsupported Map Provider') }}</b></span>
-                                        <span class="text-subtitle-1" v-else-if="!mapDependencyLoaded"><b>{{ $t('Cannot Initialize Map') }}</b></span>
+                                        <span class="text-subtitle-1" v-if="!mapSupported"><b>{{ tt('Unsupported Map Provider') }}</b></span>
+                                        <span class="text-subtitle-1" v-else-if="!mapDependencyLoaded"><b>{{ tt('Cannot Initialize Map') }}</b></span>
                                     </template>
                                     <template #error-content>
                                         <p class="text-body-1">
-                                            {{ $t('Please refresh the page and try again. If the error persists, ensure that the server\'s map settings are correctly configured.') }}
+                                            {{ tt('Please refresh the page and try again. If the error persists, ensure that the server\'s map settings are correctly configured.') }}
                                         </p>
                                     </template>
                                 </map-view>
@@ -340,9 +340,9 @@
                                         </template>
                                     </v-img>
                                     <div class="picture-control-icon" :class="{ 'show-control-icon': pictureInfo.pictureId === removingPictureId }">
-                                        <v-icon size="64" :icon="icons.remove" v-if="(mode === 'add' || mode === 'edit') && pictureInfo.pictureId !== removingPictureId"/>
-                                        <v-progress-circular color="grey-500" indeterminate size="48" v-if="(mode === 'add' || mode === 'edit') && pictureInfo.pictureId === removingPictureId"></v-progress-circular>
-                                        <v-icon size="64" :icon="icons.fullscreen" v-if="mode !== 'add' && mode !== 'edit'"/>
+                                        <v-icon size="64" :icon="icons.remove" v-if="(mode === TransactionEditPageMode.Add || mode === TransactionEditPageMode.Edit) && pictureInfo.pictureId !== removingPictureId"/>
+                                        <v-progress-circular color="grey-500" indeterminate size="48" v-if="(mode === TransactionEditPageMode.Add || mode === TransactionEditPageMode.Edit) && pictureInfo.pictureId === removingPictureId"></v-progress-circular>
+                                        <v-icon size="64" :icon="icons.fullscreen" v-if="mode !== TransactionEditPageMode.Add && mode !== TransactionEditPageMode.Edit"/>
                                     </div>
                                 </v-avatar>
                             </v-col>
@@ -351,7 +351,7 @@
                                           class="transaction-picture transaction-picture-add"
                                           :class="{ 'enabled': !submitting, 'cursor-pointer': !submitting }"
                                           color="rgba(0,0,0,0)" @click="showOpenPictureDialog">
-                                    <v-tooltip activator="parent" v-if="!submitting">{{ $t('Add Picture') }}</v-tooltip>
+                                    <v-tooltip activator="parent" v-if="!submitting">{{ tt('Add Picture') }}</v-tooltip>
                                     <v-icon class="transaction-picture-add-icon" size="56" :icon="icons.add" v-if="!uploadingPicture"/>
                                     <v-progress-circular color="grey-500" indeterminate size="48" v-if="uploadingPicture"></v-progress-circular>
                                 </v-avatar>
@@ -362,23 +362,23 @@
             </v-card-text>
             <v-card-text class="overflow-y-visible">
                 <div class="w-100 d-flex justify-center flex-wrap mt-2 mt-sm-4 mt-md-6 gap-4">
-                    <v-btn :disabled="inputIsEmpty || loading || submitting" v-if="mode !== 'view'" @click="save">
-                        {{ $t(saveButtonTitle) }}
+                    <v-btn :disabled="inputIsEmpty || loading || submitting" v-if="mode !== TransactionEditPageMode.View" @click="save">
+                        {{ tt(saveButtonTitle) }}
                         <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                     </v-btn>
                     <v-btn variant="tonal" :disabled="loading || submitting"
-                           v-if="mode === 'view' && transaction.type !== allTransactionTypes.ModifyBalance"
-                           @click="duplicate">{{ $t('Duplicate') }}</v-btn>
+                           v-if="mode === TransactionEditPageMode.View && transaction.type !== TransactionType.ModifyBalance"
+                           @click="duplicate">{{ tt('Duplicate') }}</v-btn>
                     <v-btn color="warning" variant="tonal" :disabled="loading || submitting"
-                           v-if="mode === 'view' && originalTransactionEditable && transaction.type !== allTransactionTypes.ModifyBalance"
-                           @click="edit">{{ $t('Edit') }}</v-btn>
+                           v-if="mode === TransactionEditPageMode.View && originalTransactionEditable && transaction.type !== TransactionType.ModifyBalance"
+                           @click="edit">{{ tt('Edit') }}</v-btn>
                     <v-btn color="error" variant="tonal" :disabled="loading || submitting"
-                           v-if="mode === 'view' && originalTransactionEditable" @click="remove">
-                        {{ $t('Delete') }}
+                           v-if="mode === TransactionEditPageMode.View && originalTransactionEditable" @click="remove">
+                        {{ tt('Delete') }}
                         <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                     </v-btn>
                     <v-btn color="secondary" variant="tonal" :disabled="loading || submitting"
-                           @click="cancel">{{ $t(cancelButtonTitle) }}</v-btn>
+                           @click="cancel">{{ tt(cancelButtonTitle) }}</v-btn>
                 </div>
             </v-card-text>
         </v-card>
@@ -386,11 +386,24 @@
 
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
-    <input ref="pictureInput" type="file" style="display: none" :accept="supportedImageExtensions" @change="uploadPicture($event)" />
+    <input ref="pictureInput" type="file" style="display: none" :accept="SUPPORTED_IMAGE_EXTENSIONS" @change="uploadPicture($event)" />
 </template>
 
-<script>
-import { mapStores } from 'pinia';
+<script setup lang="ts">
+import MapView from '@/components/common/MapView.vue';
+import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { ref, computed, useTemplateRef, watch, nextTick } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+import {
+    TransactionEditPageMode,
+    TransactionEditPageType,
+    GeoLocationStatus,
+    useTransactionEditPageBase
+} from '@/views/base/transactions/TransactionEditPageBase.ts';
+
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
@@ -398,33 +411,28 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
-import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { CategoryType } from '@/core/category.ts';
 import { TransactionType, TransactionEditScopeType } from '@/core/transaction.ts';
 import { TemplateType, ScheduledTemplateFrequencyType } from '@/core/template.ts';
-import { TRANSACTION_MAX_PICTURE_COUNT } from '@/consts/transaction.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
 import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
+
 import { TransactionTag } from '@/models/transaction_tag.ts';
 import { TransactionTemplate } from '@/models/transaction_template.ts';
+import type { TransactionPictureInfoBasicResponse } from '@/models/transaction_picture_info.ts';
+import { Transaction } from '@/models/transaction.ts';
 
 import {
-    isArray,
-    getNameByKeyValue
-} from '@/lib/common.ts';
-import {
-    getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffsetMinutes,
     getCurrentUnixTime
 } from '@/lib/datetime.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import {
     getTransactionPrimaryCategoryName,
-    getTransactionSecondaryCategoryName,
-    getFirstAvailableCategoryId
+    getTransactionSecondaryCategoryName
 } from '@/lib/category.ts';
-import { setTransactionModelByTransaction } from '@/lib/transaction.ts';
+import { type SetTransactionOptions, setTransactionModelByTransaction } from '@/lib/transaction.ts';
 import {
     isTransactionPicturesEnabled,
     getMapProvider
@@ -443,873 +451,628 @@ import {
     mdiFullscreen
 } from '@mdi/js';
 
-export default {
-    props: [
-        'persistent',
-        'type',
-        'show'
-    ],
-    expose: [
-        'open'
-    ],
-    data() {
-        const transactionsStore = useTransactionsStore();
-        const newTransaction = transactionsStore.generateNewTransactionModel();
+export interface TransactionEditOptions extends SetTransactionOptions {
+    id?: string;
+    templateType?: number;
+    template?: TransactionTemplate;
+    currentTransaction?: Transaction;
+    currentTemplate?: TransactionTemplate;
+}
 
-        return {
-            showState: false,
-            mode: 'add',
-            activeTab: 'basicInfo',
-            addByTemplateId: null,
-            duplicateFromId: null,
-            editId: null,
-            originalTransactionEditable: false,
-            clientSessionId: '',
-            loading: true,
-            transaction: newTransaction,
-            geoLocationStatus: null,
-            geoMenuState: false,
-            tagSearchContent: '',
-            submitting: false,
-            uploadingPicture: false,
-            removingPictureId: '',
-            isSupportGeoLocation: !!navigator.geolocation,
-            resolve: null,
-            reject: null,
-            icons: {
-                more: mdiDotsVertical,
-                show: mdiEyeOutline,
-                hide: mdiEyeOffOutline,
-                swap: mdiSwapHorizontal,
-                tag: mdiPound,
-                picture: mdiImageOutline ,
-                add: mdiImagePlusOutline,
-                remove: mdiTrashCanOutline,
-                fullscreen : mdiFullscreen
-            }
-        };
-    },
-    computed: {
-        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore, useTransactionTemplatesStore, useExchangeRatesStore),
-        title() {
-            if (this.type === 'transaction') {
-                if (this.mode === 'add') {
-                    return 'Add Transaction';
-                } else if (this.mode === 'edit') {
-                    return 'Edit Transaction';
-                } else {
-                    return 'Transaction Detail';
-                }
-            } else if (this.type === 'template' && this.transaction.templateType === TemplateType.Normal.type) {
-                if (this.mode === 'add') {
-                    return 'Add Transaction Template';
-                } else if (this.mode === 'edit') {
-                    return 'Edit Transaction Template';
-                }
-            } else if (this.type === 'template' && this.transaction.templateType === TemplateType.Schedule.type) {
-                if (this.mode === 'add') {
-                    return 'Add Scheduled Transaction';
-                } else if (this.mode === 'edit') {
-                    return 'Edit Scheduled Transaction';
-                }
-            }
+interface TransactionEditResponse {
+    message: string;
+}
 
-            return '';
-        },
-        saveButtonTitle() {
-            if (this.mode === 'add') {
-                return 'Add';
-            } else {
-                return 'Save';
-            }
-        },
-        cancelButtonTitle() {
-            if (this.mode === 'view') {
-                return 'Close';
-            } else {
-                return 'Cancel';
-            }
-        },
-        sourceAmountName() {
-            if (this.transaction.type === this.allTransactionTypes.Expense) {
-                return 'Expense Amount';
-            } else if (this.transaction.type === this.allTransactionTypes.Income) {
-                return 'Income Amount';
-            } else if (this.transaction.type === this.allTransactionTypes.Transfer) {
-                return 'Transfer Out Amount';
-            } else {
-                return 'Amount';
-            }
-        },
-        sourceAccountTitle() {
-            if (this.transaction.type === this.allTransactionTypes.Expense || this.transaction.type === this.allTransactionTypes.Income) {
-                return 'Account';
-            } else if (this.transaction.type === this.allTransactionTypes.Transfer) {
-                return 'Source Account';
-            } else {
-                return 'Account';
-            }
-        },
-        transferInAmountTitle() {
-            const sourceAccount = this.allAccountsMap[this.transaction.sourceAccountId];
-            const destinationAccount = this.allAccountsMap[this.transaction.destinationAccountId];
+type MapViewType = InstanceType<typeof MapView>;
+type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
+type SnackBarType = InstanceType<typeof SnackBar>;
 
-            if (!sourceAccount || !destinationAccount || sourceAccount.currency === destinationAccount.currency) {
-                return this.$t('Transfer In Amount');
-            }
+const props = defineProps<{
+    type: TransactionEditPageType;
+    persistent?: boolean;
+    show?: boolean;
+}>();
 
-            const fromExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[sourceAccount.currency];
-            const toExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[destinationAccount.currency];
-            const amountRate = this.$locale.getAdaptiveAmountRate(this.userStore, this.transaction.sourceAmount, this.transaction.destinationAmount, fromExchangeRate, toExchangeRate);
+const { tt } = useI18n();
 
-            if (!amountRate) {
-                return this.$t('Transfer In Amount');
-            }
+const {
+    mode,
+    isSupportGeoLocation,
+    editId,
+    addByTemplateId,
+    duplicateFromId,
+    clientSessionId,
+    loading,
+    submitting,
+    uploadingPicture,
+    geoLocationStatus,
+    transaction,
+    defaultCurrency,
+    defaultAccountId,
+    allTimezones,
+    allVisibleAccounts,
+    allAccountsMap,
+    allVisibleCategorizedAccounts,
+    allCategories,
+    allCategoriesMap,
+    allTags,
+    allTagsMap,
+    canAddTransactionPicture,
+    title,
+    saveButtonTitle,
+    cancelButtonTitle,
+    sourceAmountName,
+    sourceAccountTitle,
+    transferInAmountTitle,
+    hasAvailableExpenseCategories,
+    hasAvailableIncomeCategories,
+    hasAvailableTransferCategories,
+    sourceAccountName,
+    destinationAccountName,
+    sourceAccountCurrency,
+    destinationAccountCurrency,
+    transactionDisplayTimezone,
+    transactionTimezoneTimeDifference,
+    geoLocationStatusInfo,
+    inputEmptyProblemMessage,
+    inputIsEmpty,
+    createNewTransactionModel,
+    swapTransactionData,
+    getTransactionPictureUrl
+} = useTransactionEditPageBase(props.type);
 
-            return this.$t('Transfer In Amount') + ` (${amountRate})`;
+const settingsStore = useSettingsStore();
+const userStore = useUserStore();
+const accountsStore = useAccountsStore();
+const transactionCategoriesStore = useTransactionCategoriesStore();
+const transactionTagsStore = useTransactionTagsStore();
+const transactionsStore = useTransactionsStore();
+const transactionTemplatesStore = useTransactionTemplatesStore();
+
+const icons = {
+    more: mdiDotsVertical,
+    show: mdiEyeOutline,
+    hide: mdiEyeOffOutline,
+    swap: mdiSwapHorizontal,
+    tag: mdiPound,
+    picture: mdiImageOutline ,
+    add: mdiImagePlusOutline,
+    remove: mdiTrashCanOutline,
+    fullscreen : mdiFullscreen
+};
+
+const map = useTemplateRef<MapViewType>('map');
+const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const pictureInput = useTemplateRef<HTMLInputElement>('pictureInput');
+
+const showState = ref<boolean>(false);
+const activeTab = ref<string>('basicInfo');
+const originalTransactionEditable = ref<boolean>(false);
+const geoMenuState = ref<boolean>(false);
+const tagSearchContent = ref<string>('');
+const removingPictureId = ref<string>('');
+
+let resolveFunc: ((response?: TransactionEditResponse) => void) | null = null;
+let rejectFunc: ((reason?: unknown) => void) | null = null;
+
+const sourceAmountColor = computed<string | undefined>(() => {
+    if (transaction.value.type === TransactionType.Expense) {
+        return 'expense';
+    } else if (transaction.value.type === TransactionType.Income) {
+        return 'income';
+    } else if (transaction.value.type === TransactionType.Transfer) {
+        return 'primary';
+    }
+
+    return undefined;
+});
+
+function setTransaction(newTransaction: Transaction | null, options: SetTransactionOptions, setContextData: boolean, convertContextTime: boolean): void {
+    setTransactionModelByTransaction(
+        transaction.value,
+        newTransaction,
+        allCategories.value,
+        allCategoriesMap.value,
+        allVisibleAccounts.value,
+        allAccountsMap.value,
+        allTagsMap.value,
+        defaultAccountId.value,
+        {
+            type: options.type,
+            categoryId: options.categoryId,
+            accountId: options.accountId,
+            destinationAccountId: options.destinationAccountId,
+            amount: options.amount,
+            destinationAmount: options.destinationAmount,
+            tagIds: options.tagIds,
+            comment: options.comment
         },
-        defaultCurrency() {
-            return this.userStore.currentUserDefaultCurrency;
-        },
-        defaultAccountId() {
-            return this.userStore.currentUserDefaultAccountId;
-        },
-        allTransactionTypes() {
-            return TransactionType;
-        },
-        allCategoryTypes() {
-            return CategoryType;
-        },
-        allTemplateTypes() {
-            return TemplateType.all();
-        },
-        allTimezones() {
-            return this.$locale.getAllTimezones(true);
-        },
-        allAccounts() {
-            return this.accountsStore.allPlainAccounts;
-        },
-        allVisibleAccounts() {
-            return this.accountsStore.allVisiblePlainAccounts;
-        },
-        allVisibleCategorizedAccounts() {
-            return this.$locale.getCategorizedAccountsWithDisplayBalance(this.allVisibleAccounts, this.showAccountBalance, this.defaultCurrency, this.settingsStore, this.userStore, this.exchangeRatesStore);
-        },
-        allAccountsMap() {
-            return this.accountsStore.allAccountsMap;
-        },
-        allCategories() {
-            return this.transactionCategoriesStore.allTransactionCategories;
-        },
-        allCategoriesMap() {
-            return this.transactionCategoriesStore.allTransactionCategoriesMap;
-        },
-        allTags() {
-            return this.transactionTagsStore.allTransactionTags;
-        },
-        allTagsMap() {
-            return this.transactionTagsStore.allTransactionTagsMap;
-        },
-        supportedImageExtensions() {
-            return SUPPORTED_IMAGE_EXTENSIONS;
-        },
-        hasAvailableExpenseCategories() {
-            if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Expense] || !this.allCategories[this.allCategoryTypes.Expense].length) {
-                return false;
+        setContextData,
+        convertContextTime
+    );
+}
+
+function open(options: TransactionEditOptions): Promise<TransactionEditResponse | undefined> {
+    addByTemplateId.value = null;
+    duplicateFromId.value = null;
+    showState.value = true;
+    activeTab.value = 'basicInfo';
+    loading.value = true;
+    submitting.value = false;
+    geoLocationStatus.value = null;
+    originalTransactionEditable.value = false;
+
+    const newTransaction = createNewTransactionModel(options.type);
+    setTransaction(newTransaction, options, true, false);
+
+    const promises: Promise<unknown>[] = [
+        accountsStore.loadAllAccounts({ force: false }),
+        transactionCategoriesStore.loadAllCategories({ force: false }),
+        transactionTagsStore.loadAllTags({ force: false })
+    ];
+
+    if (props.type === TransactionEditPageType.Transaction) {
+        if (options && options.id) {
+            if (options.currentTransaction) {
+                setTransaction(options.currentTransaction, options, true, true);
             }
 
-            const firstAvailableCategoryId = getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Expense]);
-            return firstAvailableCategoryId !== '';
-        },
-        hasAvailableIncomeCategories() {
-            if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Income] || !this.allCategories[this.allCategoryTypes.Income].length) {
-                return false;
+            mode.value = TransactionEditPageMode.View;
+            editId.value = options.id;
+
+            promises.push(transactionsStore.getTransaction({ transactionId: editId.value }));
+        } else {
+            mode.value = TransactionEditPageMode.Add;
+            editId.value = null;
+
+            if (options.template) {
+                setTransaction(options.template, options, false, false);
+                addByTemplateId.value = options.template.id;
+            } else if ((settingsStore.appSettings.autoSaveTransactionDraft === 'enabled' || settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') && transactionsStore.transactionDraft) {
+                setTransaction(Transaction.ofDraft(transactionsStore.transactionDraft), options, false, false);
             }
 
-            const firstAvailableCategoryId = getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Income]);
-            return firstAvailableCategoryId !== '';
-        },
-        hasAvailableTransferCategories() {
-            if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Transfer] || !this.allCategories[this.allCategoryTypes.Transfer].length) {
-                return false;
-            }
-
-            const firstAvailableCategoryId = getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Transfer]);
-            return firstAvailableCategoryId !== '';
-        },
-        sourceAccountName() {
-            if (this.transaction.sourceAccountId) {
-                return getNameByKeyValue(this.allAccounts, this.transaction.sourceAccountId, 'id', 'name');
-            } else {
-                return this.$t('None');
-            }
-        },
-        destinationAccountName() {
-            if (this.transaction.destinationAccountId) {
-                return getNameByKeyValue(this.allAccounts, this.transaction.destinationAccountId, 'id', 'name');
-            } else {
-                return this.$t('None');
-            }
-        },
-        sourceAccountCurrency() {
-            const sourceAccount = this.allAccountsMap[this.transaction.sourceAccountId];
-
-            if (sourceAccount) {
-                return sourceAccount.currency;
-            }
-
-            return this.defaultCurrency;
-        },
-        destinationAccountCurrency() {
-            const destinationAccount = this.allAccountsMap[this.transaction.destinationAccountId];
-
-            if (destinationAccount) {
-                return destinationAccount.currency;
-            }
-
-            return this.defaultCurrency;
-        },
-        transactionDisplayTimezone() {
-            return `UTC${getUtcOffsetByUtcOffsetMinutes(this.transaction.utcOffset)}`;
-        },
-        transactionTimezoneTimeDifference() {
-            return this.$locale.getTimezoneDifferenceDisplayText(this.transaction.utcOffset);
-        },
-        sourceAmountColor() {
-            if (this.transaction.type === this.allTransactionTypes.Expense) {
-                return 'expense';
-            } else if (this.transaction.type === this.allTransactionTypes.Income) {
-                return 'income';
-            } else if (this.transaction.type === this.allTransactionTypes.Transfer) {
-                return 'primary';
-            }
-
-            return null;
-        },
-        geoLocationStatusInfo() {
-            if (this.geoLocationStatus === 'success') {
-                return '';
-            } else if (this.geoLocationStatus === 'getting') {
-                return this.$t('Getting Location...');
-            } else {
-                return this.$t('No Location');
-            }
-        },
-        showAccountBalance() {
-            return this.settingsStore.appSettings.showAccountBalance;
-        },
-        isTransactionPicturesEnabled() {
-            return isTransactionPicturesEnabled();
-        },
-        canAddTransactionPicture() {
-            if (this.type !== 'transaction' || (this.mode !== 'add' && this.mode !== 'edit')) {
-                return false;
-            }
-
-            return !isArray(this.transaction.pictures) || this.transaction.pictures.length < TRANSACTION_MAX_PICTURE_COUNT;
-        },
-        mapProvider() {
-            return getMapProvider();
-        },
-        inputIsEmpty() {
-            return !!this.inputEmptyProblemMessage;
-        },
-        inputEmptyProblemMessage() {
-            if (this.transaction.type === this.allTransactionTypes.Expense) {
-                if (!this.transaction.expenseCategoryId || this.transaction.expenseCategoryId === '') {
-                    return 'Transaction category cannot be blank';
-                }
-
-                if (!this.transaction.sourceAccountId || this.transaction.sourceAccountId === '') {
-                    return 'Transaction account cannot be blank';
-                }
-            } else if (this.transaction.type === this.allTransactionTypes.Income) {
-                if (!this.transaction.incomeCategoryId || this.transaction.incomeCategoryId === '') {
-                    return 'Transaction category cannot be blank';
-                }
-
-                if (!this.transaction.sourceAccountId || this.transaction.sourceAccountId === '') {
-                    return 'Transaction account cannot be blank';
-                }
-            } else if (this.transaction.type === this.allTransactionTypes.Transfer) {
-                if (!this.transaction.transferCategoryId || this.transaction.transferCategoryId === '') {
-                    return 'Transaction category cannot be blank';
-                }
-
-                if (!this.transaction.sourceAccountId || this.transaction.sourceAccountId === '') {
-                    return 'Source account cannot be blank';
-                }
-
-                if (!this.transaction.destinationAccountId || this.transaction.destinationAccountId === '') {
-                    return 'Destination account cannot be blank';
-                }
-            }
-
-            if (this.type === 'template') {
-                if (!this.transaction.name) {
-                    return 'Template name cannot be blank';
-                }
-            }
-
-            return null;
-        }
-    },
-    watch: {
-        'activeTab': function (newValue) {
-            if (newValue === 'map') {
-                this.$nextTick(() => {
-                    if (this.$refs.map) {
-                        this.$refs.map.initMapView();
-                    }
-                });
-            }
-        },
-        'transaction.sourceAmount': function (newValue, oldValue) {
-            if (this.mode === 'view' || this.loading) {
-                return;
-            }
-
-            this.transactionsStore.setTransactionSuitableDestinationAmount(this.transaction, oldValue, newValue);
-        },
-        'transaction.destinationAmount': function (newValue) {
-            if (this.mode === 'view' || this.loading) {
-                return;
-            }
-
-            if (this.transaction.type === this.allTransactionTypes.Expense || this.transaction.type === this.allTransactionTypes.Income) {
-                this.transaction.sourceAmount = newValue;
-            }
-        },
-        'transaction.timeZone': function (newValue) {
-            for (let i = 0; i < this.allTimezones.length; i++) {
-                if (this.allTimezones[i].name === newValue) {
-                    this.transaction.utcOffset = this.allTimezones[i].utcOffsetMinutes;
-                    break;
-                }
+            if (settingsStore.appSettings.autoGetCurrentGeoLocation
+                && !geoLocationStatus.value && !transaction.value.geoLocation) {
+                updateGeoLocation(false);
             }
         }
-    },
-    methods: {
-        open(options) {
-            const self = this;
-            self.addByTemplateId = null;
-            self.duplicateFromId = null;
-            self.showState = true;
-            self.activeTab = 'basicInfo';
-            self.loading = true;
-            self.submitting = false;
-            self.geoLocationStatus = null;
-            self.originalTransactionEditable = false;
+    } else if (props.type === TransactionEditPageType.Template) {
+        const template = TransactionTemplate.createNewTransactionTemplate(transaction.value);
+        template.name = '';
 
-            const newTransaction = self.transactionsStore.generateNewTransactionModel(options.type);
-            self.setTransaction(newTransaction, options, true, false);
+        if (options && options.templateType) {
+            template.templateType = options.templateType;
+        }
 
-            const promises = [
-                self.accountsStore.loadAllAccounts({ force: false }),
-                self.transactionCategoriesStore.loadAllCategories({ force: false }),
-                self.transactionTagsStore.loadAllTags({ force: false })
-            ];
+        if (template.templateType === TemplateType.Schedule.type) {
+            template.scheduledFrequencyType = ScheduledTemplateFrequencyType.Disabled.type;
+            template.scheduledFrequency = '';
+        }
 
-            if (self.type === 'transaction') {
-                if (options && options.id) {
-                    if (options.currentTransaction) {
-                        self.setTransaction(options.currentTransaction, options, true, true);
-                    }
+        transaction.value = template;
 
-                    self.mode = 'view';
-                    self.editId = options.id;
-
-                    promises.push(self.transactionsStore.getTransaction({ transactionId: self.editId }));
-                } else {
-                    self.mode = 'add';
-                    self.editId = null;
-
-                    if (options.template) {
-                        self.setTransaction(options.template, options, false, false);
-                        self.addByTemplateId = options.template.id;
-                    } else if ((self.settingsStore.appSettings.autoSaveTransactionDraft === 'enabled' || self.settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') && self.transactionsStore.transactionDraft) {
-                        self.setTransaction(self.transactionsStore.transactionDraft, options, false, false);
-                    }
-
-                    if (self.settingsStore.appSettings.autoGetCurrentGeoLocation
-                        && !self.geoLocationStatus && !self.transaction.geoLocation) {
-                        self.updateGeoLocation(false);
-                    }
-                }
-            } else if (self.type === 'template') {
-                self.transaction = TransactionTemplate.createNewTransactionTemplate(self.transaction);
-                self.transaction.name = '';
-
-                if (options && options.templateType) {
-                    self.transaction.templateType = options.templateType;
-                }
-
-                if (self.transaction.templateType === TemplateType.Schedule.type) {
-                    self.transaction.scheduledFrequencyType = ScheduledTemplateFrequencyType.Disabled.type;
-                    self.transaction.scheduledFrequency = '';
-                }
-
-                if (options && options.id) {
-                    if (options.currentTemplate) {
-                        self.setTransaction(options.currentTemplate, options, false, false);
-                        self.transaction.templateType = options.currentTemplate.templateType;
-                        self.transaction.name = options.currentTemplate.name;
-
-                        if (self.transaction.templateType === TemplateType.Schedule.type) {
-                            self.transaction.scheduledFrequencyType = options.currentTemplate.scheduledFrequencyType;
-                            self.transaction.scheduledFrequency = options.currentTemplate.scheduledFrequency;
-                            self.transaction.utcOffset = options.currentTemplate.utcOffset;
-                            self.transaction.timeZone = undefined;
-                        }
-                    }
-
-                    self.mode = 'edit';
-                    self.editId = options.id;
-                    self.transaction.id = options.id;
-
-                    promises.push(self.transactionTemplatesStore.getTemplate({ templateId: self.editId }));
-                } else {
-                    self.mode = 'add';
-                    self.editId = null;
-                    self.transaction.id = '';
-                }
+        if (options && options.id) {
+            if (options.currentTemplate) {
+                setTransaction(options.currentTemplate, options, false, false);
+                (transaction.value as TransactionTemplate).from(options.currentTemplate);
             }
 
-            if (options.type && options.type !== '0' &&
-                options.type >= self.allTransactionTypes.Income &&
-                options.type <= self.allTransactionTypes.Transfer) {
-                self.transaction.type = parseInt(options.type);
-            }
+            mode.value = TransactionEditPageMode.Edit;
+            editId.value = options.id;
+            transaction.value.id = options.id;
 
-            if (self.mode === 'add') {
-                self.clientSessionId = generateRandomUUID();
-            }
-
-            Promise.all(promises).then(function (responses) {
-                if (self.editId && !responses[3]) {
-                    if (self.reject) {
-                        if (self.type === 'transaction') {
-                            self.reject('Unable to retrieve transaction');
-                        } else if (self.type === 'template') {
-                            self.reject('Unable to retrieve template');
-                        }
-                    }
-
-                    return;
-                }
-
-                if (self.type === 'transaction' && options && options.id && responses[3]) {
-                    const transaction = responses[3];
-                    self.setTransaction(transaction, options, true, true);
-                    self.originalTransactionEditable = transaction.editable;
-                } else if (self.type === 'template' && options && options.id && responses[3]) {
-                    const template = responses[3];
-                    self.setTransaction(template, options, false, false);
-                    self.transaction.templateType = template.templateType;
-                    self.transaction.name = template.name;
-
-                    if (self.transaction.templateType === TemplateType.Schedule.type) {
-                        self.transaction.scheduledFrequencyType = template.scheduledFrequencyType;
-                        self.transaction.scheduledFrequency = template.scheduledFrequency;
-                        self.transaction.utcOffset = template.utcOffset;
-                        self.transaction.timeZone = undefined;
-                    }
-                } else {
-                    self.setTransaction(null, options, true, true);
-                }
-
-                self.loading = false;
-            }).catch(error => {
-                logger.error('failed to load essential data for editing transaction', error);
-
-                self.loading = false;
-                self.showState = false;
-
-                if (!error.processed) {
-                    if (self.reject) {
-                        self.reject(error);
-                    }
-                }
-            });
-
-            return new Promise((resolve, reject) => {
-                self.resolve = resolve;
-                self.reject = reject;
-            });
-        },
-        save() {
-            const self = this;
-
-            const problemMessage = self.inputEmptyProblemMessage;
-
-            if (problemMessage) {
-                self.$refs.snackbar.showMessage(problemMessage);
-                return;
-            }
-
-            if (self.type === 'transaction' && (self.mode === 'add' || self.mode === 'edit')) {
-                const doSubmit = function () {
-                    self.submitting = true;
-
-                    self.transactionsStore.saveTransaction({
-                        transaction: self.transaction,
-                        defaultCurrency: self.defaultCurrency,
-                        isEdit: self.mode === 'edit',
-                        clientSessionId: self.clientSessionId
-                    }).then(() => {
-                        self.submitting = false;
-
-                        if (self.resolve) {
-                            if (self.mode === 'add') {
-                                self.resolve({
-                                    message: 'You have added a new transaction'
-                                });
-                            } else if (self.mode === 'edit') {
-                                self.resolve({
-                                    message: 'You have saved this transaction'
-                                });
-                            }
-                        }
-
-                        if (self.mode === 'add' && !self.addByTemplateId && !self.duplicateFromId) {
-                            self.transactionsStore.clearTransactionDraft();
-                        }
-
-                        self.showState = false;
-                    }).catch(error => {
-                        self.submitting = false;
-
-                        if (error.error && (error.error.errorCode === KnownErrorCode.TransactionCannotCreateInThisTime || error.error.errorCode === KnownErrorCode.TransactionCannotModifyInThisTime)) {
-                            self.$refs.confirmDialog.open('You have set this time range to prevent editing transactions. Would you like to change the editable transaction range to All?').then(() => {
-                                self.submitting = true;
-
-                                self.userStore.updateUserTransactionEditScope({
-                                    transactionEditScope: TransactionEditScopeType.All.type
-                                }).then(() => {
-                                    self.submitting = false;
-
-                                    self.$refs.snackbar.showMessage('Your editable transaction range has been set to All');
-                                }).catch(error => {
-                                    self.submitting = false;
-
-                                    if (!error.processed) {
-                                        self.$refs.snackbar.showError(error);
-                                    }
-                                });
-                            });
-                        } else if (!error.processed) {
-                            self.$refs.snackbar.showError(error);
-                        }
-                    });
-                };
-
-                if (self.transaction.sourceAmount === 0) {
-                    self.$refs.confirmDialog.open('Are you sure you want to save this transaction with a zero amount?').then(() => {
-                        doSubmit();
-                    });
-                } else {
-                    doSubmit();
-                }
-            } else if (self.type === 'template' && (self.mode === 'add' || self.mode === 'edit')) {
-                self.submitting = true;
-
-                self.transactionTemplatesStore.saveTemplateContent({
-                    template: self.transaction,
-                    isEdit: self.mode === 'edit',
-                    clientSessionId: self.clientSessionId
-                }).then(() => {
-                    self.submitting = false;
-
-                    if (self.resolve) {
-                        if (self.mode === 'add') {
-                            self.resolve({
-                                message: 'You have added a new template'
-                            });
-                        } else if (self.mode === 'edit') {
-                            self.resolve({
-                                message: 'You have saved this template'
-                            });
-                        }
-                    }
-
-                    self.showState = false;
-                }).catch(error => {
-                    self.submitting = false;
-
-                    if (!error.processed) {
-                        self.$refs.snackbar.showError(error);
-                    }
-                });
-            }
-        },
-        duplicate() {
-            if (this.type !== 'transaction' || this.mode !== 'view') {
-                return;
-            }
-
-            this.editId = null;
-            this.duplicateFromId = this.transaction.id;
-            this.activeTab = 'basicInfo';
-            this.transaction.id = '';
-            this.transaction.time = getCurrentUnixTime();
-            this.transaction.timeZone = this.settingsStore.appSettings.timeZone;
-            this.transaction.utcOffset = getTimezoneOffsetMinutes(this.transaction.timeZone);
-            this.transaction.removeGeoLocation();
-            this.transaction.clearPictures();
-            this.mode = 'add';
-        },
-        edit() {
-            if (this.type !== 'transaction' || this.mode !== 'view') {
-                return;
-            }
-
-            this.mode = 'edit';
-        },
-        remove() {
-            const self = this;
-
-            if (self.type !== 'transaction' || self.mode !== 'view') {
-                return;
-            }
-
-            self.$refs.confirmDialog.open('Are you sure you want to delete this transaction?').then(() => {
-                self.submitting = true;
-
-                self.transactionsStore.deleteTransaction({
-                    transaction: self.transaction,
-                    defaultCurrency: self.defaultCurrency
-                }).then(() => {
-                    if (self.resolve) {
-                        self.resolve();
-                    }
-
-                    self.submitting = false;
-                    self.showState = false;
-                }).catch(error => {
-                    self.submitting = false;
-
-                    if (!error.processed) {
-                        self.$refs.snackbar.showError(error);
-                    }
-                });
-            });
-        },
-        cancel() {
-            const self = this;
-
-            const doClose = function () {
-                if (self.reject) {
-                    self.reject();
-                }
-
-                self.showState = false;
-            };
-
-            if (self.type !== 'transaction' || self.mode !== 'add' || self.addByTemplateId || self.duplicateFromId) {
-                doClose();
-                return;
-            }
-
-            if (self.settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') {
-                if (self.transactionsStore.isTransactionDraftModified(self.transaction)) {
-                    self.$refs.confirmDialog.open('Do you want to save this transaction draft?').then(() => {
-                        self.transactionsStore.saveTransactionDraft(self.transaction);
-                        doClose();
-                    }).catch(() => {
-                        self.transactionsStore.clearTransactionDraft();
-                        doClose();
-                    });
-                } else {
-                    self.transactionsStore.clearTransactionDraft();
-                    doClose();
-                }
-            } else if (self.settingsStore.appSettings.autoSaveTransactionDraft === 'enabled') {
-                self.transactionsStore.saveTransactionDraft(self.transaction);
-                doClose();
-            } else {
-                doClose();
-            }
-        },
-        showDateTimeError(error) {
-            this.$refs.snackbar.showError(error);
-        },
-        updateGeoLocation(forceUpdate) {
-            const self = this;
-            self.geoMenuState = false;
-
-            if (!self.isSupportGeoLocation) {
-                logger.warn('this browser does not support geo location');
-
-                if (forceUpdate) {
-                    self.$refs.snackbar.showMessage('Unable to retrieve current position');
-                }
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(function (position) {
-                if (!position || !position.coords) {
-                    logger.error('current position is null');
-                    self.geoLocationStatus = 'error';
-
-                    if (forceUpdate) {
-                        self.$refs.snackbar.showMessage('Unable to retrieve current position');
-                    }
-
-                    return;
-                }
-
-                self.geoLocationStatus = 'success';
-
-                self.transaction.setLatitudeAndLongitude(position.coords.latitude, position.coords.longitude);
-            }, function (err) {
-                logger.error('cannot retrieve current position', err);
-                self.geoLocationStatus = 'error';
-
-                if (forceUpdate) {
-                    self.$refs.snackbar.showMessage('Unable to retrieve current position');
-                }
-            });
-
-            self.geoLocationStatus = 'getting';
-        },
-        clearGeoLocation() {
-            this.geoMenuState = false;
-            this.geoLocationStatus = null;
-            this.transaction.removeGeoLocation();
-        },
-        saveNewTag(tagName) {
-            const self = this;
-
-            self.submitting = true;
-
-            self.transactionTagsStore.saveTag({
-                tag: TransactionTag.createNewTag(tagName)
-            }).then(tag => {
-                self.submitting = false;
-
-                if (tag && tag.id) {
-                    self.transaction.tagIds.push(tag.id);
-                }
-            }).catch(error => {
-                self.submitting = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        swapTransactionData(swapAccount, swapAmount) {
-            if (swapAccount) {
-                const oldSourceAccountId = this.transaction.sourceAccountId;
-                this.transaction.sourceAccountId = this.transaction.destinationAccountId;
-                this.transaction.destinationAccountId = oldSourceAccountId;
-            }
-
-            if (swapAmount) {
-                const oldSourceAmount = this.transaction.sourceAmount;
-                this.transaction.sourceAmount = this.transaction.destinationAmount;
-                this.transaction.destinationAmount = oldSourceAmount;
-            }
-        },
-        showOpenPictureDialog() {
-            if (!this.canAddTransactionPicture || this.submitting) {
-                return;
-            }
-
-            this.$refs.pictureInput.click();
-        },
-        uploadPicture(event) {
-            if (!event || !event.target || !event.target.files || !event.target.files.length) {
-                return;
-            }
-
-            const self = this;
-            const pictureFile = event.target.files[0];
-
-            event.target.value = null;
-
-            self.uploadingPicture = true;
-            self.submitting = true;
-
-            self.transactionsStore.uploadTransactionPicture({ pictureFile }).then(response => {
-                self.transaction.addPicture(response);
-                self.uploadingPicture = false;
-                self.submitting = false;
-            }).catch(error => {
-                self.uploadingPicture = false;
-                self.submitting = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        viewOrRemovePicture(pictureInfo) {
-            if (this.mode !== 'add' && this.mode !== 'edit') {
-                window.open(this.getTransactionPictureUrl(pictureInfo), '_blank');
-                return;
-            }
-
-            const self = this;
-
-            self.$refs.confirmDialog.open('Are you sure you want to remove this transaction picture?').then(() => {
-                self.removingPictureId = pictureInfo.pictureId;
-                self.submitting = true;
-
-                self.transactionsStore.removeUnusedTransactionPicture({ pictureInfo }).then(response => {
-                    if (response) {
-                        self.transaction.removePicture(pictureInfo);
-                    }
-
-                    self.removingPictureId = '';
-                    self.submitting = false;
-                }).catch(error => {
-                    if (error.error && error.error.errorCode === KnownErrorCode.TransactionPictureNotFound) {
-                        self.transaction.removePicture(pictureInfo);
-                    } else if (!error.processed) {
-                        self.$refs.snackbar.showError(error);
-                    }
-
-                    self.removingPictureId = '';
-                    self.submitting = false;
-                });
-            });
-        },
-        getTransactionPictureUrl(pictureInfo) {
-            return this.transactionsStore.getTransactionPictureUrl(pictureInfo);
-        },
-        getPrimaryCategoryName(categoryId, allCategories) {
-            return getTransactionPrimaryCategoryName(categoryId, allCategories);
-        },
-        getSecondaryCategoryName(categoryId, allCategories) {
-            return getTransactionSecondaryCategoryName(categoryId, allCategories);
-        },
-        setTransaction(transaction, options, setContextData, convertContextTime) {
-            setTransactionModelByTransaction(
-                this.transaction,
-                transaction,
-                this.allCategories,
-                this.allCategoriesMap,
-                this.allVisibleAccounts,
-                this.allAccountsMap,
-                this.allTagsMap,
-                this.defaultAccountId,
-                {
-                    type: options.type,
-                    categoryId: options.categoryId,
-                    accountId: options.accountId,
-                    destinationAccountId: options.destinationAccountId,
-                    amount: options.amount,
-                    destinationAmount: options.destinationAmount,
-                    tagIds: options.tagIds,
-                    comment: options.comment
-                },
-                setContextData,
-                convertContextTime
-            );
+            promises.push(transactionTemplatesStore.getTemplate({ templateId: editId.value }));
+        } else {
+            mode.value = TransactionEditPageMode.Add;
+            editId.value = null;
+            transaction.value.id = '';
         }
     }
+
+    if (options.type &&
+        options.type >= TransactionType.Income &&
+        options.type <= TransactionType.Transfer) {
+        transaction.value.type = options.type;
+    }
+
+    if (mode.value === TransactionEditPageMode.Add) {
+        clientSessionId.value = generateRandomUUID();
+    }
+
+    Promise.all(promises).then(function (responses) {
+        if (editId.value && !responses[3]) {
+            if (rejectFunc) {
+                if (props.type === TransactionEditPageType.Transaction) {
+                    rejectFunc('Unable to retrieve transaction');
+                } else if (props.type === TransactionEditPageType.Template) {
+                    rejectFunc('Unable to retrieve template');
+                }
+            }
+
+            return;
+        }
+
+        if (props.type === TransactionEditPageType.Transaction && options && options.id && responses[3] && responses[3] instanceof Transaction) {
+            const transaction: Transaction = responses[3];
+            setTransaction(transaction, options, true, true);
+            originalTransactionEditable.value = transaction.editable;
+        } else if (props.type === TransactionEditPageType.Template && options && options.id && responses[3] && responses[3] instanceof TransactionTemplate) {
+            const template: TransactionTemplate = responses[3];
+            setTransaction(template, options, false, false);
+
+            if (!(transaction.value instanceof TransactionTemplate)) {
+                transaction.value = TransactionTemplate.createNewTransactionTemplate(transaction.value);
+            }
+
+            (transaction.value as TransactionTemplate).from(template);
+        } else {
+            setTransaction(null, options, true, true);
+        }
+
+        loading.value = false;
+    }).catch(error => {
+        logger.error('failed to load essential data for editing transaction', error);
+
+        loading.value = false;
+        showState.value = false;
+
+        if (!error.processed) {
+            if (rejectFunc) {
+                rejectFunc(error);
+            }
+        }
+    });
+
+    return new Promise((resolve, reject) => {
+        resolveFunc = resolve;
+        rejectFunc = reject;
+    });
 }
+
+function save(): void {
+    const problemMessage = inputEmptyProblemMessage.value;
+
+    if (problemMessage) {
+        snackbar.value?.showMessage(problemMessage);
+        return;
+    }
+
+    if (props.type === TransactionEditPageType.Transaction && (mode.value === TransactionEditPageMode.Add || mode.value === TransactionEditPageMode.Edit)) {
+        const doSubmit = function () {
+            submitting.value = true;
+
+            transactionsStore.saveTransaction({
+                transaction: transaction.value as Transaction,
+                defaultCurrency: defaultCurrency.value,
+                isEdit: mode.value === TransactionEditPageMode.Edit,
+                clientSessionId: clientSessionId.value
+            }).then(() => {
+                submitting.value = false;
+
+                if (resolveFunc) {
+                    if (mode.value === TransactionEditPageMode.Add) {
+                        resolveFunc({
+                            message: 'You have added a new transaction'
+                        });
+                    } else if (mode.value === TransactionEditPageMode.Edit) {
+                        resolveFunc({
+                            message: 'You have saved this transaction'
+                        });
+                    }
+                }
+
+                if (mode.value === TransactionEditPageMode.Add && !addByTemplateId.value && !duplicateFromId.value) {
+                    transactionsStore.clearTransactionDraft();
+                }
+
+                showState.value = false;
+            }).catch(error => {
+                submitting.value = false;
+
+                if (error.error && (error.error.errorCode === KnownErrorCode.TransactionCannotCreateInThisTime || error.error.errorCode === KnownErrorCode.TransactionCannotModifyInThisTime)) {
+                    confirmDialog.value?.open('You have set this time range to prevent editing transactions. Would you like to change the editable transaction range to All?').then(() => {
+                        submitting.value = true;
+
+                        userStore.updateUserTransactionEditScope({
+                            transactionEditScope: TransactionEditScopeType.All.type
+                        }).then(() => {
+                            submitting.value = false;
+
+                            snackbar.value?.showMessage('Your editable transaction range has been set to All');
+                        }).catch(error => {
+                            submitting.value = false;
+
+                            if (!error.processed) {
+                                snackbar.value?.showError(error);
+                            }
+                        });
+                    });
+                } else if (!error.processed) {
+                    snackbar.value?.showError(error);
+                }
+            });
+        };
+
+        if (transaction.value.sourceAmount === 0) {
+            confirmDialog.value?.open('Are you sure you want to save this transaction with a zero amount?').then(() => {
+                doSubmit();
+            });
+        } else {
+            doSubmit();
+        }
+    } else if (props.type === TransactionEditPageType.Template && (mode.value === TransactionEditPageMode.Add || mode.value === TransactionEditPageMode.Edit)) {
+        submitting.value = true;
+
+        transactionTemplatesStore.saveTemplateContent({
+            template: transaction.value as TransactionTemplate,
+            isEdit: mode.value === TransactionEditPageMode.Edit,
+            clientSessionId: clientSessionId.value
+        }).then(() => {
+            submitting.value = false;
+
+            if (resolveFunc) {
+                if (mode.value === TransactionEditPageMode.Add) {
+                    resolveFunc({
+                        message: 'You have added a new template'
+                    });
+                } else if (mode.value === TransactionEditPageMode.Edit) {
+                    resolveFunc({
+                        message: 'You have saved this template'
+                    });
+                }
+            }
+
+            showState.value = false;
+        }).catch(error => {
+            submitting.value = false;
+
+            if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+        });
+    }
+}
+
+function duplicate(): void {
+    if (props.type !== TransactionEditPageType.Transaction || mode.value !== TransactionEditPageMode.View) {
+        return;
+    }
+
+    editId.value = null;
+    duplicateFromId.value = transaction.value.id;
+    activeTab.value = 'basicInfo';
+    transaction.value.id = '';
+    transaction.value.time = getCurrentUnixTime();
+    transaction.value.timeZone = settingsStore.appSettings.timeZone;
+    transaction.value.utcOffset = getTimezoneOffsetMinutes(transaction.value.timeZone);
+    transaction.value.removeGeoLocation();
+    transaction.value.clearPictures();
+    mode.value = TransactionEditPageMode.Add;
+}
+
+function edit(): void {
+    if (props.type !== TransactionEditPageType.Transaction || mode.value !== TransactionEditPageMode.View) {
+        return;
+    }
+
+    mode.value = TransactionEditPageMode.Edit;
+}
+
+function remove(): void {
+    if (props.type !== TransactionEditPageType.Transaction || mode.value !== TransactionEditPageMode.View) {
+        return;
+    }
+
+    confirmDialog.value?.open('Are you sure you want to delete this transaction?').then(() => {
+        submitting.value = true;
+
+        transactionsStore.deleteTransaction({
+            transaction: transaction.value as Transaction,
+            defaultCurrency: defaultCurrency.value
+        }).then(() => {
+            if (resolveFunc) {
+                resolveFunc();
+            }
+
+            submitting.value = false;
+            showState.value = false;
+        }).catch(error => {
+            submitting.value = false;
+
+            if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+        });
+    });
+}
+
+function cancel(): void {
+    const doClose = function () {
+        if (rejectFunc) {
+            rejectFunc();
+        }
+
+        showState.value = false;
+    };
+
+    if (props.type !== TransactionEditPageType.Transaction || mode.value !== TransactionEditPageMode.Add || addByTemplateId.value || duplicateFromId.value) {
+        doClose();
+        return;
+    }
+
+    if (settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') {
+        if (transactionsStore.isTransactionDraftModified(transaction.value)) {
+            confirmDialog.value?.open('Do you want to save this transaction draft?').then(() => {
+                transactionsStore.saveTransactionDraft(transaction.value);
+                doClose();
+            }).catch(() => {
+                transactionsStore.clearTransactionDraft();
+                doClose();
+            });
+        } else {
+            transactionsStore.clearTransactionDraft();
+            doClose();
+        }
+    } else if (settingsStore.appSettings.autoSaveTransactionDraft === 'enabled') {
+        transactionsStore.saveTransactionDraft(transaction.value);
+        doClose();
+    } else {
+        doClose();
+    }
+}
+
+function updateGeoLocation(forceUpdate: boolean): void {
+    geoMenuState.value = false;
+
+    if (!isSupportGeoLocation) {
+        logger.warn('this browser does not support geo location');
+
+        if (forceUpdate) {
+            snackbar.value?.showMessage('Unable to retrieve current position');
+        }
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(function (position) {
+        if (!position || !position.coords) {
+            logger.error('current position is null');
+            geoLocationStatus.value = GeoLocationStatus.Error;
+
+            if (forceUpdate) {
+                snackbar.value?.showMessage('Unable to retrieve current position');
+            }
+
+            return;
+        }
+
+        geoLocationStatus.value = GeoLocationStatus.Success;
+
+        transaction.value.setLatitudeAndLongitude(position.coords.latitude, position.coords.longitude);
+    }, function (err) {
+        logger.error('cannot retrieve current position', err);
+        geoLocationStatus.value = GeoLocationStatus.Error;
+
+        if (forceUpdate) {
+            snackbar.value?.showMessage('Unable to retrieve current position');
+        }
+    });
+
+    geoLocationStatus.value = GeoLocationStatus.Getting;
+}
+
+function clearGeoLocation(): void {
+    geoMenuState.value = false;
+    geoLocationStatus.value = null;
+    transaction.value.removeGeoLocation();
+}
+
+function saveNewTag(tagName: string): void {
+    submitting.value = true;
+
+    transactionTagsStore.saveTag({
+        tag: TransactionTag.createNewTag(tagName)
+    }).then(tag => {
+        submitting.value = false;
+
+        if (tag && tag.id) {
+            transaction.value.tagIds.push(tag.id);
+        }
+    }).catch(error => {
+        submitting.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function showOpenPictureDialog(): void {
+    if (!canAddTransactionPicture.value || submitting.value) {
+        return;
+    }
+
+    pictureInput.value?.click();
+}
+
+function uploadPicture(event: Event): void {
+    if (!event || !event.target) {
+        return;
+    }
+
+    const el = event.target as HTMLInputElement;
+
+    if (!el.files || !el.files.length) {
+        return;
+    }
+
+    const pictureFile = el.files[0];
+
+    el.value = '';
+
+    uploadingPicture.value = true;
+    submitting.value = true;
+
+    transactionsStore.uploadTransactionPicture({ pictureFile }).then(response => {
+        transaction.value.addPicture(response);
+        uploadingPicture.value = false;
+        submitting.value = false;
+    }).catch(error => {
+        uploadingPicture.value = false;
+        submitting.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function viewOrRemovePicture(pictureInfo: TransactionPictureInfoBasicResponse): void {
+    if (mode.value !== TransactionEditPageMode.Add && mode.value !== TransactionEditPageMode.Edit) {
+        window.open(getTransactionPictureUrl(pictureInfo), '_blank');
+        return;
+    }
+
+    confirmDialog.value?.open('Are you sure you want to remove this transaction picture?').then(() => {
+        removingPictureId.value = pictureInfo.pictureId;
+        submitting.value = true;
+
+        transactionsStore.removeUnusedTransactionPicture({ pictureInfo }).then(response => {
+            if (response) {
+                transaction.value.removePicture(pictureInfo);
+            }
+
+            removingPictureId.value = '';
+            submitting.value = false;
+        }).catch(error => {
+            if (error.error && error.error.errorCode === KnownErrorCode.TransactionPictureNotFound) {
+                transaction.value.removePicture(pictureInfo);
+            } else if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+
+            removingPictureId.value = '';
+            submitting.value = false;
+        });
+    });
+}
+
+function onShowDateTimeError(error: string): void {
+    snackbar.value?.showError(error);
+}
+
+watch(activeTab, (newValue) => {
+    if (newValue === 'map') {
+        nextTick(() => {
+            map.value?.initMapView();
+        });
+    }
+});
+
+defineExpose({
+    open
+});
 </script>
 
 <style>

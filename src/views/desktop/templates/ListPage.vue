@@ -139,7 +139,7 @@
         </v-col>
     </v-row>
 
-    <edit-dialog ref="editDialog" type="template" :persistent="true" />
+    <edit-dialog ref="editDialog" :type="TransactionEditPageType.Template" :persistent="true" />
 
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
@@ -149,6 +149,7 @@
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
+import { TransactionEditPageType } from '@/views/base/transactions/TransactionEditPageBase.ts';
 
 import { ref, computed, useTemplateRef } from 'vue';
 

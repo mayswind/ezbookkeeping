@@ -5,7 +5,6 @@ type TemplateTypeName = 'Normal' | 'Schedule';
 export class TemplateType implements TypeAndName {
     private static readonly allInstances: TemplateType[] = [];
     private static readonly allInstancesByType: Record<number, TemplateType> = {};
-    private static readonly allInstancesByTypeName: Record<string, TemplateType> = {};
 
     public static readonly Normal = new TemplateType(1, 'Normal');
     public static readonly Schedule = new TemplateType(2, 'Schedule');
@@ -19,15 +18,10 @@ export class TemplateType implements TypeAndName {
 
         TemplateType.allInstances.push(this);
         TemplateType.allInstancesByType[type] = this;
-        TemplateType.allInstancesByTypeName[name] = this;
     }
 
     public static values(): TemplateType[] {
         return TemplateType.allInstances;
-    }
-
-    public static all(): Record<TemplateTypeName, TemplateType> {
-        return TemplateType.allInstancesByTypeName;
     }
 
     public static valueOf(type: number): TemplateType | undefined {

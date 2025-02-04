@@ -86,7 +86,6 @@ import { getI18nOptions } from '@/locales/helpers.ts';
 import { i18nFunctions } from '@/locales/helper.js';
 import {
     showAlert,
-    showConfirm,
     showToast,
     showLoading,
     hideLoading,
@@ -204,7 +203,6 @@ app.directive('TextareaAutoSize', TextareaAutoSize);
 app.config.globalProperties['$locale'] = i18nFunctions(i18n.global);
 
 app.config.globalProperties['$alert'] = (message: string, confirmCallback: ((dialog: Dialog.Dialog, e: Event) => void) | undefined) => showAlert(message, confirmCallback, i18n.global.t);
-app.config.globalProperties['$confirm'] = (message: string, confirmCallback: (dialog: Dialog.Dialog, e: Event) => void, cancelCallback: ((dialog: Dialog.Dialog, e: Event) => void) | undefined) => showConfirm(message, confirmCallback, cancelCallback, i18n.global.t);
 app.config.globalProperties['$toast'] = (message: string, timeout: number | undefined) => showToast(message, timeout, i18n.global.t);
 app.config.globalProperties['$showLoading'] = showLoading;
 app.config.globalProperties['$hideLoading'] = hideLoading;

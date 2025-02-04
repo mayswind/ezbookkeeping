@@ -434,7 +434,7 @@ export default {
             timeout: DEFAULT_IMPORT_API_TIMEOUT
         } as ApiRequestConfig);
     },
-    uploadTransactionPicture: ({ pictureFile, clientSessionId }: { pictureFile: File, clientSessionId: string }): ApiResponsePromise<TransactionPictureInfoBasicResponse> => {
+    uploadTransactionPicture: ({ pictureFile, clientSessionId }: { pictureFile: File, clientSessionId?: string }): ApiResponsePromise<TransactionPictureInfoBasicResponse> => {
         return axios.postForm<ApiResponse<TransactionPictureInfoBasicResponse>>('v1/transaction/pictures/upload.json', {
             picture: pictureFile,
             clientSessionId: clientSessionId

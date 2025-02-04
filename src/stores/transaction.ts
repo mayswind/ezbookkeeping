@@ -43,7 +43,6 @@ import {
     countSplitItems
 } from '@/lib/common.ts';
 import {
-    getCurrentUnixTime,
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
@@ -508,21 +507,6 @@ export const useTransactionsStore = defineStore('transactions', () => {
     function clearTransactionDraft(): void {
         transactionDraft.value = null;
         clearUserTransactionDraft();
-    }
-
-    function generateNewTransactionModel(type: string): Transaction {
-        const now: number = getCurrentUnixTime();
-        const currentTimezone: string = settingsStore.appSettings.timeZone;
-
-        let defaultType: TransactionType = TransactionType.Expense;
-
-        if (type === TransactionType.Income.toString()) {
-            defaultType = TransactionType.Income;
-        } else if (type === TransactionType.Transfer.toString()) {
-            defaultType = TransactionType.Transfer;
-        }
-
-        return Transaction.createNewTransaction(defaultType, now, currentTimezone, getTimezoneOffsetMinutes(currentTimezone));
     }
 
     function setTransactionSuitableDestinationAmount(transaction: Transaction, oldValue: number, newValue: number): void {
@@ -1133,7 +1117,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         });
     }
 
-    function uploadTransactionPicture({ pictureFile, clientSessionId }: { pictureFile: File, clientSessionId: string }): Promise<TransactionPictureInfoBasicResponse> {
+    function uploadTransactionPicture({ pictureFile, clientSessionId }: { pictureFile: File, clientSessionId?: string }): Promise<TransactionPictureInfoBasicResponse> {
         return new Promise((resolve, reject) => {
             services.uploadTransactionPicture({ pictureFile, clientSessionId }).then(response => {
                 const data = response.data;
@@ -1183,9 +1167,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
         });
     }
 
-    function getTransactionPictureUrl(pictureInfo?: TransactionPictureInfoBasicResponse | null, disableBrowserCache?: boolean | string): string | null {
+    function getTransactionPictureUrl(pictureInfo?: TransactionPictureInfoBasicResponse | null, disableBrowserCache?: boolean | string): string | undefined {
         if (!pictureInfo || !pictureInfo.originalUrl) {
-            return null;
+            return undefined;
         }
 
         return services.getTransactionPictureUrlWithToken(pictureInfo.originalUrl, disableBrowserCache);
@@ -1218,7 +1202,6 @@ export const useTransactionsStore = defineStore('transactions', () => {
         isTransactionDraftModified,
         saveTransactionDraft,
         clearTransactionDraft,
-        generateNewTransactionModel,
         setTransactionSuitableDestinationAmount,
         updateTransactionListInvalidState,
         resetTransactions,

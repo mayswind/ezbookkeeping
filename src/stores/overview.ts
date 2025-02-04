@@ -102,68 +102,7 @@ export const useOverviewStore = defineStore('overview', () => {
     const userStore = useUserStore();
     const exchangeRatesStore = useExchangeRatesStore();
 
-    const transactionDataRange = ref<TransactionDataRange>({
-        today: {
-            startTime: getTodayFirstUnixTime(),
-            endTime: getTodayLastUnixTime()
-        },
-        thisWeek: {
-            startTime: getThisWeekFirstUnixTime(userStore.currentUserFirstDayOfWeek),
-            endTime: getThisWeekLastUnixTime(userStore.currentUserFirstDayOfWeek)
-        },
-        thisMonth: {
-            startTime: getThisMonthFirstUnixTime(),
-            endTime: getThisMonthLastUnixTime()
-        },
-        thisYear: {
-            startTime: getThisYearFirstUnixTime(),
-            endTime: getThisYearLastUnixTime()
-        },
-        lastMonth: {
-            startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 1, 'months'),
-            endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 1, 'months')
-        },
-        monthBeforeLastMonth: {
-            startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 2, 'months'),
-            endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 2, 'months')
-        },
-        monthBeforeLast2Months: {
-            startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 3, 'months'),
-            endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 3, 'months')
-        },
-        monthBeforeLast3Months: {
-            startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 4, 'months'),
-            endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 4, 'months')
-        },
-        monthBeforeLast4Months: {
-            startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 5, 'months'),
-            endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 5, 'months')
-        },
-        monthBeforeLast5Months: {
-            startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 6, 'months'),
-            endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 6, 'months')
-        },
-        monthBeforeLast6Months: {
-            startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 7, 'months'),
-            endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 7, 'months')
-        },
-        monthBeforeLast7Months: {
-            startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 8, 'months'),
-            endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 8, 'months')
-        },
-        monthBeforeLast8Months: {
-            startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 9, 'months'),
-            endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 9, 'months')
-        },
-        monthBeforeLast9Months: {
-            startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 10, 'months'),
-            endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 10, 'months')
-        },
-        monthBeforeLast10Months: {
-            startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 11, 'months'),
-            endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 11, 'months')
-        }
-    });
+    const transactionDataRange = ref<TransactionDataRange>(getTransactionDateRange());
 
     const transactionOverviewOptions = ref<TransactionOverviewOptions>({
         loadLast11Months: false
@@ -241,29 +180,59 @@ export const useOverviewStore = defineStore('overview', () => {
         return finalOverviewData;
     });
 
-    function updateTransactionDateRange(): void {
-        transactionDataRange.value.today.startTime = getTodayFirstUnixTime();
-        transactionDataRange.value.today.endTime = getTodayLastUnixTime();
+    function getTransactionDateRange(): TransactionDataRange {
+        const dateRange: TransactionDataRange = {
+            today: { startTime: 0, endTime: 0 },
+            thisWeek: { startTime: 0, endTime: 0 },
+            thisMonth: { startTime: 0, endTime: 0 },
+            thisYear: { startTime: 0, endTime: 0 },
+            lastMonth: { startTime: 0, endTime: 0 },
+            monthBeforeLastMonth: { startTime: 0, endTime: 0 },
+            monthBeforeLast2Months: { startTime: 0, endTime: 0 },
+            monthBeforeLast3Months: { startTime: 0, endTime: 0 },
+            monthBeforeLast4Months: { startTime: 0, endTime: 0 },
+            monthBeforeLast5Months: { startTime: 0, endTime: 0 },
+            monthBeforeLast6Months: { startTime: 0, endTime: 0 },
+            monthBeforeLast7Months: { startTime: 0, endTime: 0 },
+            monthBeforeLast8Months: { startTime: 0, endTime: 0 },
+            monthBeforeLast9Months: { startTime: 0, endTime: 0 },
+            monthBeforeLast10Months: { startTime: 0, endTime: 0 }
+        };
 
-        transactionDataRange.value.thisWeek.startTime = getThisWeekFirstUnixTime(userStore.currentUserFirstDayOfWeek);
-        transactionDataRange.value.thisWeek.endTime = getThisWeekLastUnixTime(userStore.currentUserFirstDayOfWeek);
+        initTransactionDateRange(dateRange);
+        return dateRange;
+    }
 
-        transactionDataRange.value.thisMonth.startTime = getThisMonthFirstUnixTime();
-        transactionDataRange.value.thisMonth.endTime = getThisMonthLastUnixTime();
+    function initTransactionDateRange(dateRange: TransactionDataRange): void {
+        dateRange.today.startTime = getTodayFirstUnixTime();
+        dateRange.today.endTime = getTodayLastUnixTime();
 
-        transactionDataRange.value.thisYear.startTime = getThisYearFirstUnixTime();
-        transactionDataRange.value.thisYear.endTime = getThisYearLastUnixTime();
+        dateRange.thisWeek.startTime = getThisWeekFirstUnixTime(userStore.currentUserFirstDayOfWeek);
+        dateRange.thisWeek.endTime = getThisWeekLastUnixTime(userStore.currentUserFirstDayOfWeek);
 
-        transactionDataRange.value.lastMonth.startTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 1, 'months');
-        transactionDataRange.value.lastMonth.endTime = getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 1, 'months');
+        dateRange.thisMonth.startTime = getThisMonthFirstUnixTime();
+        dateRange.thisMonth.endTime = getThisMonthLastUnixTime();
 
-        transactionDataRange.value.monthBeforeLastMonth.startTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 2, 'months');
-        transactionDataRange.value.monthBeforeLastMonth.endTime = getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 2, 'months');
+        dateRange.thisYear.startTime = getThisYearFirstUnixTime();
+        dateRange.thisYear.endTime = getThisYearLastUnixTime();
 
-        for (let i = 2; i <= 10; i++) {
-            transactionDataRange.value[`monthBeforeLast${i}Months` as TransactionAmountsRequestType].startTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), i + 1, 'months');
-            transactionDataRange.value[`monthBeforeLast${i}Months` as TransactionAmountsRequestType].endTime = getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), i + 1, 'months');
+        dateRange.lastMonth.startTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 1, 'months');
+        dateRange.lastMonth.endTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 1, 'seconds');
+
+        dateRange.monthBeforeLastMonth.startTime = getUnixTimeBeforeUnixTime(dateRange.lastMonth.startTime, 1, 'months');
+        dateRange.monthBeforeLastMonth.endTime = getUnixTimeBeforeUnixTime(dateRange.lastMonth.startTime, 1, 'seconds');
+
+        dateRange.monthBeforeLast2Months.startTime = getUnixTimeBeforeUnixTime(dateRange.monthBeforeLastMonth.startTime, 1, 'months');
+        dateRange.monthBeforeLast2Months.endTime = getUnixTimeBeforeUnixTime(dateRange.monthBeforeLastMonth.startTime, 1, 'seconds');
+
+        for (let i = 3; i <= 10; i++) {
+            dateRange[`monthBeforeLast${i}Months` as TransactionAmountsRequestType].startTime = getUnixTimeBeforeUnixTime(dateRange[`monthBeforeLast${i - 1}Months` as TransactionAmountsRequestType].startTime, 1, 'months');
+            dateRange[`monthBeforeLast${i}Months` as TransactionAmountsRequestType].endTime = getUnixTimeBeforeUnixTime(dateRange[`monthBeforeLast${i - 1}Months` as TransactionAmountsRequestType].startTime, 1, 'seconds');
         }
+    }
+
+    function updateTransactionDateRange(): void {
+        initTransactionDateRange(transactionDataRange.value);
     }
 
     function updateTransactionOverviewInvalidState(invalidState: boolean): void {

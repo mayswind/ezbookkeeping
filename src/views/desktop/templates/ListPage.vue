@@ -4,12 +4,12 @@
             <v-card>
                 <template #title>
                     <div class="title-and-toolbar d-flex align-center">
-                        <span>{{ templateType === allTemplateTypes.Schedule.type ? $t('Scheduled Transactions') : $t('Transaction Templates') }}</span>
+                        <span>{{ templateType === TemplateType.Schedule.type ? tt('Scheduled Transactions') : tt('Transaction Templates') }}</span>
                         <v-btn class="ml-3" color="default" variant="outlined"
-                               :disabled="loading || updating" @click="add">{{ $t('Add') }}</v-btn>
+                               :disabled="loading || updating" @click="add">{{ tt('Add') }}</v-btn>
                         <v-btn class="ml-3" color="primary" variant="tonal"
                                :disabled="loading || updating" @click="saveSortResult"
-                               v-if="displayOrderModified">{{ $t('Save Display Order') }}</v-btn>
+                               v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
                         <v-btn density="compact" color="default" variant="text" size="24"
                                class="ml-2" :icon="true" :disabled="loading || updating"
                                :loading="loading" @click="reload">
@@ -17,7 +17,7 @@
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
                             <v-icon :icon="icons.refresh" size="24" />
-                            <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
+                            <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                         </v-btn>
                         <v-spacer/>
                         <v-btn density="comfortable" color="default" variant="text" class="ml-2"
@@ -26,10 +26,10 @@
                             <v-menu activator="parent">
                                 <v-list>
                                     <v-list-item :prepend-icon="icons.show"
-                                                 :title="$t('Show Hidden Transaction Templates')"
+                                                 :title="tt('Show Hidden Transaction Templates')"
                                                  v-if="!showHidden" @click="showHidden = true"></v-list-item>
                                     <v-list-item :prepend-icon="icons.hide"
-                                                 :title="$t('Hide Hidden Transaction Templates')"
+                                                 :title="tt('Hide Hidden Transaction Templates')"
                                                  v-if="showHidden" @click="showHidden = false"></v-list-item>
                                 </v-list>
                             </v-menu>
@@ -42,9 +42,9 @@
                     <tr>
                         <th>
                             <div class="d-flex align-center">
-                                <span>{{ $t('Template Name') }}</span>
+                                <span>{{ tt('Template Name') }}</span>
                                 <v-spacer/>
-                                <span>{{ $t('Operation') }}</span>
+                                <span>{{ tt('Operation') }}</span>
                             </div>
                         </th>
                     </tr>
@@ -60,9 +60,9 @@
 
                     <tbody v-if="!loading && noAvailableTemplate">
                     <tr>
-                        <td v-if="templateType === allTemplateTypes.Normal.type">{{ $t('No available template. Once you add templates, you can quickly add a new transaction using the dropdown menu of the Add button on the transaction list page') }}</td>
-                        <td v-else-if="templateType === allTemplateTypes.Schedule.type">{{ $t('No available scheduled transactions') }}</td>
-                        <td v-else>{{ $t('No available template') }}</td>
+                        <td v-if="templateType === TemplateType.Normal.type">{{ tt('No available template. Once you add templates, you can quickly add a new transaction using the dropdown menu of the Add button on the transaction list page') }}</td>
+                        <td v-else-if="templateType === TemplateType.Schedule.type">{{ tt('No available scheduled transactions') }}</td>
+                        <td v-else>{{ tt('No available template') }}</td>
                     </tr>
                     </tbody>
 
@@ -81,9 +81,9 @@
                                             <v-badge class="right-bottom-icon" color="secondary"
                                                      location="bottom right" offset-x="8" :icon="icons.hide"
                                                      v-if="element.hidden">
-                                                <v-icon size="20" start :icon="templateType === allTemplateTypes.Schedule.type ? icons.clock : icons.text"/>
+                                                <v-icon size="20" start :icon="templateType === TemplateType.Schedule.type ? icons.clock : icons.text"/>
                                             </v-badge>
-                                            <v-icon size="20" start :icon="templateType === allTemplateTypes.Schedule.type ? icons.clock : icons.text" v-else-if="!element.hidden"/>
+                                            <v-icon size="20" start :icon="templateType === TemplateType.Schedule.type ? icons.clock : icons.text" v-else-if="!element.hidden"/>
                                             <span class="transaction-template-name">{{ element.name }}</span>
                                         </div>
 
@@ -99,7 +99,7 @@
                                             <template #loader>
                                                 <v-progress-circular indeterminate size="20" width="2"/>
                                             </template>
-                                            {{ element.hidden ? $t('Show') : $t('Hide') }}
+                                            {{ element.hidden ? tt('Show') : tt('Hide') }}
                                         </v-btn>
                                         <v-btn class="px-2" color="default"
                                                density="comfortable" variant="text"
@@ -110,7 +110,7 @@
                                             <template #loader>
                                                 <v-progress-circular indeterminate size="20" width="2"/>
                                             </template>
-                                            {{ $t('Edit') }}
+                                            {{ tt('Edit') }}
                                         </v-btn>
                                         <v-btn class="px-2" color="default"
                                                density="comfortable" variant="text"
@@ -122,12 +122,12 @@
                                             <template #loader>
                                                 <v-progress-circular indeterminate size="20" width="2"/>
                                             </template>
-                                            {{ $t('Delete') }}
+                                            {{ tt('Delete') }}
                                         </v-btn>
                                         <span class="ml-2">
                                             <v-icon :class="!loading && !updating && availableTemplateCount > 1 ? 'drag-handle' : 'disabled'"
                                                     :icon="icons.drag"/>
-                                            <v-tooltip activator="parent" v-if="!loading && !updating && availableTemplateCount > 1">{{ $t('Drag to Reorder') }}</v-tooltip>
+                                            <v-tooltip activator="parent" v-if="!loading && !updating && availableTemplateCount > 1">{{ tt('Drag to Reorder') }}</v-tooltip>
                                         </span>
                                     </div>
                                 </td>
@@ -145,13 +145,20 @@
     <snack-bar ref="snackbar" />
 </template>
 
-<script>
+<script setup lang="ts">
+import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
 
-import { mapStores } from 'pinia';
+import { ref, computed, useTemplateRef } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 
 import { TemplateType } from '@/core/template.ts';
+import { TransactionTemplate } from '@/models/transaction_template.ts';
+
 import {
     isNoAvailableTemplate,
     getAvailableTemplateCount
@@ -172,234 +179,207 @@ import {
     mdiClockTimeNineOutline
 } from '@mdi/js';
 
-export default {
-    components: {
-        EditDialog
-    },
-    props: [
-        'initType',
-    ],
-    data() {
-        return {
-            templateType: TemplateType.Normal.type,
-            loading: true,
-            updating: false,
-            templateHiding: {},
-            templateRemoving: {},
-            displayOrderModified: false,
-            showHidden: false,
-            icons: {
-                refresh: mdiRefresh,
-                add: mdiPlus,
-                edit: mdiPencilOutline,
-                confirm: mdiCheck,
-                cancel: mdiClose,
-                show: mdiEyeOutline,
-                hide: mdiEyeOffOutline,
-                remove: mdiDeleteOutline,
-                drag: mdiDrag,
-                more: mdiDotsVertical,
-                text: mdiTextBoxOutline,
-                clock: mdiClockTimeNineOutline
-            }
-        };
-    },
-    computed: {
-        ...mapStores(useTransactionTemplatesStore),
-        templates() {
-            return this.transactionTemplatesStore.allTransactionTemplates[this.templateType] || [];
-        },
-        noAvailableTemplate() {
-            return isNoAvailableTemplate(this.templates, this.showHidden);
-        },
-        availableTemplateCount() {
-            return getAvailableTemplateCount(this.templates, this.showHidden);
-        },
-        allTemplateTypes() {
-            return TemplateType.all();
+type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
+type SnackBarType = InstanceType<typeof SnackBar>;
+type EditDialogType = InstanceType<typeof EditDialog>;
+
+const props = defineProps<{
+    initType: number;
+}>();
+
+const { tt } = useI18n();
+
+const transactionTemplatesStore = useTransactionTemplatesStore();
+
+const icons = {
+    refresh: mdiRefresh,
+    add: mdiPlus,
+    edit: mdiPencilOutline,
+    confirm: mdiCheck,
+    cancel: mdiClose,
+    show: mdiEyeOutline,
+    hide: mdiEyeOffOutline,
+    remove: mdiDeleteOutline,
+    drag: mdiDrag,
+    more: mdiDotsVertical,
+    text: mdiTextBoxOutline,
+    clock: mdiClockTimeNineOutline
+};
+
+const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const editDialog = useTemplateRef<EditDialogType>('editDialog');
+
+const templateType = ref<number>(TemplateType.Normal.type);
+const loading = ref<boolean>(true);
+const updating = ref<boolean>(false);
+const templateHiding = ref<Record<string, boolean>>({});
+const templateRemoving = ref<Record<string, boolean>>({});
+const displayOrderModified = ref<boolean>(false);
+const showHidden = ref<boolean>(false);
+
+const templates = computed<TransactionTemplate[]>(() => transactionTemplatesStore.allTransactionTemplates[templateType.value] || []);
+const noAvailableTemplate = computed<boolean>(() => isNoAvailableTemplate(templates.value, showHidden.value));
+const availableTemplateCount = computed<number>(() => getAvailableTemplateCount(templates.value, showHidden.value));
+
+function init(): void {
+    templateType.value = props.initType;
+    loading.value = true;
+
+    transactionTemplatesStore.loadAllTemplates({
+        templateType: templateType.value,
+        force: false
+    }).then(() => {
+        loading.value = false;
+    }).catch(error => {
+        loading.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
         }
-    },
-    created() {
-        const self = this;
+    });
+}
 
-        self.templateType = self.initType;
-        self.loading = true;
+function reload(): void {
+    loading.value = true;
 
-        self.transactionTemplatesStore.loadAllTemplates({
-            templateType: self.templateType,
-            force: false
+    transactionTemplatesStore.loadAllTemplates({
+        templateType: templateType.value,
+        force: true
+    }).then(() => {
+        loading.value = false;
+        displayOrderModified.value = false;
+
+        snackbar.value?.showMessage('Template list has been updated');
+    }).catch(error => {
+        loading.value = false;
+
+        if (error && error.isUpToDate) {
+            displayOrderModified.value = false;
+        }
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function add(): void {
+    editDialog.value?.open({
+        templateType: templateType.value
+    }).then(result => {
+        if (result && result.message) {
+            snackbar.value?.showMessage(result.message);
+        }
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function edit(template: TransactionTemplate): void {
+    editDialog.value?.open({
+        id: template.id,
+        currentTemplate: template
+    }).then(result => {
+        if (result && result.message) {
+            snackbar.value?.showMessage(result.message);
+        }
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function hide(template: TransactionTemplate, hidden: boolean): void {
+    updating.value = true;
+    templateHiding.value[template.id] = true;
+
+    transactionTemplatesStore.hideTemplate({
+        template: template,
+        hidden: hidden
+    }).then(() => {
+        updating.value = false;
+        templateHiding.value[template.id] = false;
+    }).catch(error => {
+        updating.value = false;
+        templateHiding.value[template.id] = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function remove(template: TransactionTemplate): void {
+    confirmDialog.value?.open('Are you sure you want to delete this template?').then(() => {
+        updating.value = true;
+        templateRemoving.value[template.id] = true;
+
+        transactionTemplatesStore.deleteTemplate({
+            template: template
         }).then(() => {
-            self.loading = false;
+            updating.value = false;
+            templateRemoving.value[template.id] = false;
         }).catch(error => {
-            self.loading = false;
+            updating.value = false;
+            templateRemoving.value[template.id] = false;
 
             if (!error.processed) {
-                self.$refs.snackbar.showError(error);
+                snackbar.value?.showError(error);
             }
         });
-    },
-    methods: {
-        reload() {
-            const self = this;
-            self.loading = true;
-
-            self.transactionTemplatesStore.loadAllTemplates({
-                templateType: self.templateType,
-                force: true
-            }).then(() => {
-                self.loading = false;
-                self.displayOrderModified = false;
-
-                self.$refs.snackbar.showMessage('Template list has been updated');
-            }).catch(error => {
-                self.loading = false;
-
-                if (error && error.isUpToDate) {
-                    self.displayOrderModified = false;
-                }
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        onMove(event) {
-            if (!event || !event.moved) {
-                return;
-            }
-
-            const self = this;
-            const moveEvent = event.moved;
-
-            if (!moveEvent.element || !moveEvent.element.id) {
-                self.$refs.snackbar.showMessage('Unable to move template');
-                return;
-            }
-
-            self.transactionTemplatesStore.changeTemplateDisplayOrder({
-                templateType: self.templateType,
-                templateId: moveEvent.element.id,
-                from: moveEvent.oldIndex,
-                to: moveEvent.newIndex
-            }).then(() => {
-                self.displayOrderModified = true;
-            }).catch(error => {
-                self.$refs.snackbar.showError(error);
-            });
-        },
-        saveSortResult() {
-            const self = this;
-
-            if (!self.displayOrderModified) {
-                return;
-            }
-
-            self.loading = true;
-
-            self.transactionTemplatesStore.updateTemplateDisplayOrders({
-                templateType: self.templateType
-            }).then(() => {
-                self.loading = false;
-                self.displayOrderModified = false;
-            }).catch(error => {
-                self.loading = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        add() {
-            const self = this;
-
-            self.$refs.editDialog.open({
-                templateType: self.templateType
-            }).then(result => {
-                if (result && result.message) {
-                    self.$refs.snackbar.showMessage(result.message);
-                }
-            }).catch(error => {
-                if (error) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        edit(template) {
-            const self = this;
-
-            self.$refs.editDialog.open({
-                id: template.id,
-                currentTemplate: {
-                    templateType: template.templateType,
-                    name: template.name,
-                    type: template.type,
-                    categoryId: template.categoryId,
-                    sourceAccountId: template.sourceAccountId,
-                    destinationAccountId: template.destinationAccountId,
-                    sourceAmount: template.sourceAmount,
-                    destinationAmount: template.destinationAmount,
-                    hideAmount: template.hideAmount,
-                    tagIds: template.tagIds,
-                    comment: template.comment,
-                    scheduledFrequencyType: template.scheduledFrequencyType,
-                    scheduledFrequency: template.scheduledFrequency,
-                    utcOffset: template.utcOffset
-                }
-            }).then(result => {
-                if (result && result.message) {
-                    self.$refs.snackbar.showMessage(result.message);
-                }
-            }).catch(error => {
-                if (error) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        hide(template, hidden) {
-            const self = this;
-
-            self.updating = true;
-            self.templateHiding[template.id] = true;
-
-            self.transactionTemplatesStore.hideTemplate({
-                template: template,
-                hidden: hidden
-            }).then(() => {
-                self.updating = false;
-                self.templateHiding[template.id] = false;
-            }).catch(error => {
-                self.updating = false;
-                self.templateHiding[template.id] = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
-        remove(template) {
-            const self = this;
-
-            self.$refs.confirmDialog.open('Are you sure you want to delete this template?').then(() => {
-                self.updating = true;
-                self.templateRemoving[template.id] = true;
-
-                self.transactionTemplatesStore.deleteTemplate({
-                    template: template
-                }).then(() => {
-                    self.updating = false;
-                    self.templateRemoving[template.id] = false;
-                }).catch(error => {
-                    self.updating = false;
-                    self.templateRemoving[template.id] = false;
-
-                    if (!error.processed) {
-                        self.$refs.snackbar.showError(error);
-                    }
-                });
-            });
-        }
-    }
+    });
 }
+
+function saveSortResult(): void {
+    if (!displayOrderModified.value) {
+        return;
+    }
+
+    loading.value = true;
+
+    transactionTemplatesStore.updateTemplateDisplayOrders({
+        templateType: templateType.value
+    }).then(() => {
+        loading.value = false;
+        displayOrderModified.value = false;
+    }).catch(error => {
+        loading.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function onMove(event: { moved: { element: { id: string }, oldIndex: number, newIndex: number } }): void {
+    if (!event || !event.moved) {
+        return;
+    }
+
+    const moveEvent = event.moved;
+
+    if (!moveEvent.element || !moveEvent.element.id) {
+        snackbar.value?.showMessage('Unable to move template');
+        return;
+    }
+
+    transactionTemplatesStore.changeTemplateDisplayOrder({
+        templateType: templateType.value,
+        templateId: moveEvent.element.id,
+        from: moveEvent.oldIndex,
+        to: moveEvent.newIndex
+    }).then(() => {
+        displayOrderModified.value = true;
+    }).catch(error => {
+        snackbar.value?.showError(error);
+    });
+}
+
+init();
 </script>
 
 <style>

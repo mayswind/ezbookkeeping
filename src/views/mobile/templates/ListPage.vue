@@ -1,12 +1,12 @@
 <template>
     <f7-page :ptr="!sortable" @ptr:refresh="reload" @page:afterin="onPageAfterIn">
         <f7-navbar>
-            <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
-            <f7-nav-title :title="templateType === allTemplateTypes.Schedule.type ? $t('Scheduled Transactions') : $t('Transaction Templates')"></f7-nav-title>
+            <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-title :title="templateType === TemplateType.Schedule.type ? tt('Scheduled Transactions') : tt('Transaction Templates')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': !templates.length }" v-if="!sortable" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link :href="'/template/add?templateType=' + templateType" icon-f7="plus" v-if="!sortable"></f7-link>
-                <f7-link :text="$t('Done')" :class="{ 'disabled': displayOrderSaving }" @click="saveSortResult" v-else-if="sortable"></f7-link>
+                <f7-link :text="tt('Done')" :class="{ 'disabled': displayOrderSaving }" @click="saveSortResult" v-else-if="sortable"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -20,11 +20,11 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-top" v-if="!loading && noAvailableTemplate">
-            <f7-list-item :title="$t('No available template')"
-                          :footer="$t('Once you add templates, you can long press the Add button on the home page to quickly add a new transaction')"
-                          v-if="templateType === allTemplateTypes.Normal.type"></f7-list-item>
-            <f7-list-item :title="$t('No available scheduled transactions')" v-else-if="templateType === allTemplateTypes.Schedule.type"></f7-list-item>
-            <f7-list-item :title="$t('No available template')" v-else></f7-list-item>
+            <f7-list-item :title="tt('No available template')"
+                          :footer="tt('Once you add templates, you can long press the Add button on the home page to quickly add a new transaction')"
+                          v-if="templateType === TemplateType.Normal.type"></f7-list-item>
+            <f7-list-item :title="tt('No available scheduled transactions')" v-else-if="templateType === TemplateType.Schedule.type"></f7-list-item>
+            <f7-list-item :title="tt('No available template')" v-else></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers sortable class="margin-top template-list"
@@ -40,7 +40,7 @@
                           v-show="showHidden || !template.hidden"
                           @taphold="setSortable()">
                 <template #media>
-                    <f7-icon :f7="templateType === allTemplateTypes.Schedule.type ? 'clock' : 'doc_plaintext'">
+                    <f7-icon :f7="templateType === TemplateType.Schedule.type ? 'clock' : 'doc_plaintext'">
                         <f7-badge color="gray" class="right-bottom-icon" v-if="template.hidden">
                             <f7-icon f7="eye_slash_fill"></f7-icon>
                         </f7-badge>
@@ -53,7 +53,7 @@
                     </f7-swipeout-button>
                 </f7-swipeout-actions>
                 <f7-swipeout-actions right v-if="!sortable">
-                    <f7-swipeout-button color="orange" close :text="$t('Edit')" @click="edit(template)"></f7-swipeout-button>
+                    <f7-swipeout-button color="orange" close :text="tt('Edit')" @click="edit(template)"></f7-swipeout-button>
                     <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(template, false)">
                         <f7-icon f7="trash"></f7-icon>
                     </f7-swipeout-button>
@@ -63,271 +63,260 @@
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
-                <f7-actions-button @click="setSortable()">{{ $t('Sort') }}</f7-actions-button>
-                <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ $t('Show Hidden Transaction Templates') }}</f7-actions-button>
-                <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ $t('Hide Hidden Transaction Templates') }}</f7-actions-button>
+                <f7-actions-button @click="setSortable()">{{ tt('Sort') }}</f7-actions-button>
+                <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ tt('Show Hidden Transaction Templates') }}</f7-actions-button>
+                <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ tt('Hide Hidden Transaction Templates') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
-                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+                <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
             </f7-actions-group>
         </f7-actions>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showDeleteActionSheet" @actions:closed="showDeleteActionSheet = false">
             <f7-actions-group>
-                <f7-actions-label>{{ $t('Are you sure you want to delete this template?') }}</f7-actions-label>
-                <f7-actions-button color="red" @click="remove(templateToDelete, true)">{{ $t('Delete') }}</f7-actions-button>
+                <f7-actions-label>{{ tt('Are you sure you want to delete this template?') }}</f7-actions-label>
+                <f7-actions-button color="red" @click="remove(templateToDelete, true)">{{ tt('Delete') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
-                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+                <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
             </f7-actions-group>
         </f7-actions>
     </f7-page>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import type { Router } from 'framework7/types';
+
+import { useI18n } from '@/locales/helpers.ts';
+import { useI18nUIComponents, showLoading, hideLoading, onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
+
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 
 import { TemplateType } from '@/core/template.ts';
+import { TransactionTemplate } from '@/models/transaction_template.ts';
+
 import { isDefined } from '@/lib/common.ts';
 import {
     isNoAvailableTemplate,
     getFirstShowingId,
     getLastShowingId
 } from '@/lib/template.ts';
-import { onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
 
-export default {
-    props: [
-        'f7route',
-        'f7router'
-    ],
-    data() {
-        return {
-            templateType: TemplateType.Normal.type,
-            loading: true,
-            loadingError: null,
-            showHidden: false,
-            sortable: false,
-            templateToDelete: null,
-            showMoreActionSheet: false,
-            showDeleteActionSheet: false,
-            displayOrderModified: false,
-            displayOrderSaving: false
-        };
-    },
-    computed: {
-        ...mapStores(useTransactionTemplatesStore),
-        templates() {
-            return this.transactionTemplatesStore.allTransactionTemplates[this.templateType] || [];
-        },
-        firstShowingId() {
-            return getFirstShowingId(this.templates, this.showHidden);
-        },
-        lastShowingId() {
-            return getLastShowingId(this.templates, this.showHidden);
-        },
-        noAvailableTemplate() {
-            return isNoAvailableTemplate(this.templates, this.showHidden);
-        },
-        allTemplateTypes() {
-            return TemplateType.all();
-        }
-    },
-    created() {
-        const self = this;
+const props = defineProps<{
+    f7route: Router.Route;
+    f7router: Router.Router;
+}>();
 
-        if (self.f7route.path === '/template/list') {
-            self.templateType = TemplateType.Normal.type;
-        } else if (self.f7route.path === '/schedule/list') {
-            self.templateType = TemplateType.Schedule.type;
-        }
+const { tt } = useI18n();
+const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
-        self.loading = true;
+const transactionTemplatesStore = useTransactionTemplatesStore();
 
-        self.transactionTemplatesStore.loadAllTemplates({
-            templateType: self.templateType,
-            force: false
-        }).then(() => {
-            self.loading = false;
-        }).catch(error => {
-            if (error.processed) {
-                self.loading = false;
-            } else {
-                self.loadingError = error;
-                self.$toast(error.message || error);
-            }
-        });
-    },
-    methods: {
-        onPageAfterIn() {
-            if ((!isDefined(this.transactionTemplatesStore.transactionTemplateListStatesInvalid[this.templateType]) || this.transactionTemplatesStore.transactionTemplateListStatesInvalid[this.templateType]) && !this.loading) {
-                this.reload(null);
-            }
+const templateType = ref<number>(TemplateType.Normal.type);
+const loading = ref<boolean>(true);
+const loadingError = ref<unknown | null>(null);
+const showHidden = ref<boolean>(false);
+const sortable = ref<boolean>(false);
+const templateToDelete = ref<TransactionTemplate | null>(null);
+const showMoreActionSheet = ref<boolean>(false);
+const showDeleteActionSheet = ref<boolean>(false);
+const displayOrderModified = ref<boolean>(false);
+const displayOrderSaving = ref<boolean>(false);
 
-            this.$routeBackOnError(this.f7router, 'loadingError');
-        },
-        reload(done) {
-            if (this.sortable) {
-                done();
-                return;
-            }
+const templates = computed<TransactionTemplate[]>(() => transactionTemplatesStore.allTransactionTemplates[templateType.value] || []);
+const firstShowingId = computed<string | null>(() => getFirstShowingId(templates.value, showHidden.value));
+const lastShowingId = computed<string | null>(() => getLastShowingId(templates.value, showHidden.value));
+const noAvailableTemplate = computed<boolean>(() => isNoAvailableTemplate(templates.value, showHidden.value));
 
-            const self = this;
-            const force = !!done;
+function getTemplateDomId(template: TransactionTemplate): string {
+    return 'template_' + template.id;
+}
 
-            self.transactionTemplatesStore.loadAllTemplates({
-                templateType: self.templateType,
-                force: force
-            }).then(() => {
-                if (done) {
-                    done();
-                }
-
-                if (force) {
-                    self.$toast('Template list has been updated');
-                }
-            }).catch(error => {
-                if (done) {
-                    done();
-                }
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        setSortable() {
-            if (this.sortable) {
-                return;
-            }
-
-            this.showHidden = true;
-            this.sortable = true;
-            this.displayOrderModified = false;
-        },
-        onSort(event) {
-            const self = this;
-
-            if (!event || !event.el || !event.el.id) {
-                self.$toast('Unable to move template');
-                return;
-            }
-
-            const id = self.parseTemplateIdFromDomId(event.el.id);
-
-            if (!id) {
-                self.$toast('Unable to move template');
-                return;
-            }
-
-            self.transactionTemplatesStore.changeTemplateDisplayOrder({
-                templateType: self.templateType,
-                templateId: id,
-                from: event.from,
-                to: event.to
-            }).then(() => {
-                self.displayOrderModified = true;
-            }).catch(error => {
-                self.$toast(error.message || error);
-            });
-        },
-        saveSortResult() {
-            const self = this;
-
-            if (!self.displayOrderModified) {
-                self.showHidden = false;
-                self.sortable = false;
-                return;
-            }
-
-            self.displayOrderSaving = true;
-            self.$showLoading();
-
-            self.transactionTemplatesStore.updateTemplateDisplayOrders({
-                templateType: self.templateType
-            }).then(() => {
-                self.displayOrderSaving = false;
-                self.$hideLoading();
-
-                self.showHidden = false;
-                self.sortable = false;
-                self.displayOrderModified = false;
-            }).catch(error => {
-                self.displayOrderSaving = false;
-                self.$hideLoading();
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        edit(template) {
-            this.f7router.navigate(`/template/edit?id=${template.id}&templateType=${template.templateType}`);
-        },
-        hide(template, hidden) {
-            const self = this;
-
-            self.$showLoading();
-
-            self.transactionTemplatesStore.hideTemplate({
-                template: template,
-                hidden: hidden
-            }).then(() => {
-                self.$hideLoading();
-            }).catch(error => {
-                self.$hideLoading();
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        remove(template, confirm) {
-            const self = this;
-
-            if (!template) {
-                self.$alert('An error occurred');
-                return;
-            }
-
-            if (!confirm) {
-                self.templateToDelete = template;
-                self.showDeleteActionSheet = true;
-                return;
-            }
-
-            self.showDeleteActionSheet = false;
-            self.templateToDelete = null;
-            self.$showLoading();
-
-            self.transactionTemplatesStore.deleteTemplate({
-                template: template,
-                beforeResolve: (done) => {
-                    onSwipeoutDeleted(self.getTemplateDomId(template), done);
-                }
-            }).then(() => {
-                self.$hideLoading();
-            }).catch(error => {
-                self.$hideLoading();
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        getTemplateDomId(template) {
-            return 'template_' + template.id;
-        },
-        parseTemplateIdFromDomId(domId) {
-            if (!domId || domId.indexOf('template_') !== 0) {
-                return null;
-            }
-
-            return domId.substring(9); // template_
-        }
+function parseTemplateIdFromDomId(domId: string): string | null {
+    if (!domId || domId.indexOf('template_') !== 0) {
+        return null;
     }
-};
+
+    return domId.substring(9); // template_
+}
+
+function init(): void {
+    if (props.f7route.path === '/template/list') {
+        templateType.value = TemplateType.Normal.type;
+    } else if (props.f7route.path === '/schedule/list') {
+        templateType.value = TemplateType.Schedule.type;
+    }
+
+    loading.value = true;
+
+    transactionTemplatesStore.loadAllTemplates({
+        templateType: templateType.value,
+        force: false
+    }).then(() => {
+        loading.value = false;
+    }).catch(error => {
+        if (error.processed) {
+            loading.value = false;
+        } else {
+            loadingError.value = error;
+            showToast(error.message || error);
+        }
+    });
+}
+
+function reload(done: (() => void) | null): void {
+    if (sortable.value) {
+        done?.();
+        return;
+    }
+
+    const force = !!done;
+
+    transactionTemplatesStore.loadAllTemplates({
+        templateType: templateType.value,
+        force: force
+    }).then(() => {
+        done?.();
+
+        if (force) {
+            showToast('Template list has been updated');
+        }
+    }).catch(error => {
+        done?.();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function edit(template: TransactionTemplate): void {
+    props.f7router.navigate(`/template/edit?id=${template.id}&templateType=${template.templateType}`);
+}
+
+function hide(template: TransactionTemplate, hidden: boolean): void {
+    showLoading();
+
+    transactionTemplatesStore.hideTemplate({
+        template: template,
+        hidden: hidden
+    }).then(() => {
+        hideLoading();
+    }).catch(error => {
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function remove(template: TransactionTemplate | null, confirm: boolean): void {
+    if (!template) {
+        showAlert('An error occurred');
+        return;
+    }
+
+    if (!confirm) {
+        templateToDelete.value = template;
+        showDeleteActionSheet.value = true;
+        return;
+    }
+
+    showDeleteActionSheet.value = false;
+    templateToDelete.value = null;
+    showLoading();
+
+    transactionTemplatesStore.deleteTemplate({
+        template: template,
+        beforeResolve: (done) => {
+            onSwipeoutDeleted(getTemplateDomId(template), done);
+        }
+    }).then(() => {
+        hideLoading();
+    }).catch(error => {
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function setSortable(): void {
+    if (sortable.value) {
+        return;
+    }
+
+    showHidden.value = true;
+    sortable.value = true;
+    displayOrderModified.value = false;
+}
+
+function saveSortResult(): void {
+    if (!displayOrderModified.value) {
+        showHidden.value = false;
+        sortable.value = false;
+        return;
+    }
+
+    displayOrderSaving.value = true;
+    showLoading();
+
+    transactionTemplatesStore.updateTemplateDisplayOrders({
+        templateType: templateType.value
+    }).then(() => {
+        displayOrderSaving.value = false;
+        hideLoading();
+
+        showHidden.value = false;
+        sortable.value = false;
+        displayOrderModified.value = false;
+    }).catch(error => {
+        displayOrderSaving.value = false;
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function onSort(event: { el: { id: string }; from: number; to: number }): void {
+    if (!event || !event.el || !event.el.id) {
+        showToast('Unable to move template');
+        return;
+    }
+
+    const id = parseTemplateIdFromDomId(event.el.id);
+
+    if (!id) {
+        showToast('Unable to move template');
+        return;
+    }
+
+    transactionTemplatesStore.changeTemplateDisplayOrder({
+        templateType: templateType.value,
+        templateId: id,
+        from: event.from,
+        to: event.to
+    }).then(() => {
+        displayOrderModified.value = true;
+    }).catch(error => {
+        showToast(error.message || error);
+    });
+}
+
+function onPageAfterIn(): void {
+    if ((!isDefined(transactionTemplatesStore.transactionTemplateListStatesInvalid[templateType.value]) || transactionTemplatesStore.transactionTemplateListStatesInvalid[templateType.value]) && !loading.value) {
+        reload(null);
+    }
+
+    routeBackOnError(props.f7router, loadingError);
+}
+
+init();
 </script>
 
 <style>

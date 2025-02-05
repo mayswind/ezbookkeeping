@@ -77,12 +77,12 @@
 import { ref, computed, useTemplateRef, nextTick } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
+import { type CommonTwoColumnListItemSelectionProps, useTwoColumnListItemSelectionBase } from '@/components/base/TwoColumnListItemSelectionBase.ts';
 
 import {
     getFirstVisibleItem,
     getItemByKeyValue,
-    getNameByKeyValue,
-    getPrimaryValueBySecondaryValue
+    getNameByKeyValue
 } from '@/lib/common.ts';
 import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';
 
@@ -90,8 +90,7 @@ import {
     mdiChevronRight
 } from '@mdi/js';
 
-const props = defineProps<{
-    modelValue: unknown;
+interface DesktopTwoColumnListItemSelectionProps extends CommonTwoColumnListItemSelectionProps {
     density?: string;
     variant?: string;
     disabled?: boolean;
@@ -101,40 +100,25 @@ const props = defineProps<{
     showSelectionSecondaryIcon?: boolean;
     customSelectionPrimaryText?: string;
     customSelectionSecondaryText?: string;
-    primaryKeyField?: string;
-    primaryValueField?: string;
-    primaryTitleField?: string;
-    primaryTitleI18n?: boolean;
-    primaryHeaderField?: string;
-    primaryHeaderI18n?: boolean;
-    primaryFooterField?: string;
-    primaryFooterI18n?: boolean;
-    primaryIconField?: string;
-    primaryIconType?: string;
-    primaryColorField?: string;
-    primaryHiddenField?: string;
-    primarySubItemsField: string;
-    secondaryKeyField?: string;
-    secondaryValueField?: string;
-    secondaryTitleField?: string;
-    secondaryTitleI18n?: boolean;
-    secondaryHeaderField?: string;
-    secondaryHeaderI18n?: boolean;
-    secondaryFooterField?: string;
-    secondaryFooterI18n?: boolean;
-    secondaryIconField?: string;
-    secondaryIconType?: string;
-    secondaryColorField?: string;
-    secondaryHiddenField?: string;
-    items: unknown[];
     noItemText?: string;
-}>();
+}
+
+const props = defineProps<DesktopTwoColumnListItemSelectionProps>();
 
 const emit = defineEmits<{
     (e: 'update:modelValue', value: unknown): void;
 }>();
 
 const { tt, ti } = useI18n();
+
+const {
+    getCurrentPrimaryValueBySecondaryValue,
+    isSecondaryValueSelected,
+    getSelectedPrimaryItem,
+    getSelectedSecondaryItem,
+    updateCurrentPrimaryValue,
+    updateCurrentSecondaryValue
+} = useTwoColumnListItemSelectionBase(props);
 
 const icons = {
     chevronRight: mdiChevronRight
@@ -175,21 +159,8 @@ const currentSecondaryValue = computed<unknown>({
     }
 });
 
-const selectedPrimaryItem = computed<unknown>(() => {
-    if (props.primaryValueField) {
-        return getItemByKeyValue(props.items as Record<string, unknown>[] | Record<string, Record<string, unknown>>, currentPrimaryValue.value, props.primaryValueField);
-    } else {
-        return currentPrimaryValue.value;
-    }
-});
-
-const selectedSecondaryItem = computed<unknown>(() => {
-    if (currentSecondaryValue.value && selectedPrimaryItem.value && (selectedPrimaryItem.value as Record<string, unknown>)[props.primarySubItemsField]) {
-        return getItemByKeyValue((selectedPrimaryItem.value as Record<string, unknown>)[props.primarySubItemsField] as Record<string, unknown>[] | Record<string, Record<string, unknown>>, currentSecondaryValue.value, props.secondaryValueField as string);
-    } else {
-        return null;
-    }
-});
+const selectedPrimaryItem = computed<unknown>(() => getSelectedPrimaryItem(currentPrimaryValue.value));
+const selectedSecondaryItem = computed<unknown>(() => getSelectedSecondaryItem(currentSecondaryValue.value, selectedPrimaryItem.value));
 
 const noSelectionText = computed<string>(() => props.noItemText ? props.noItemText : tt('None'));
 
@@ -217,32 +188,16 @@ const selectionSecondaryItemText = computed<string>(() => {
     }
 });
 
-function getCurrentPrimaryValueBySecondaryValue(secondaryValue: unknown): unknown {
-    return getPrimaryValueBySecondaryValue(props.items as Record<string, Record<string, unknown>[]>[] | Record<string, Record<string, Record<string, unknown>[]>>, props.primarySubItemsField, props.primaryValueField, props.primaryHiddenField, props.secondaryValueField, props.secondaryHiddenField, secondaryValue);
-}
-
 function isSecondarySelected(subItem: unknown): boolean {
-    if (props.secondaryValueField) {
-        return currentSecondaryValue.value === (subItem as Record<string, unknown>)[props.secondaryValueField];
-    } else {
-        return currentSecondaryValue.value === subItem;
-    }
+    return isSecondaryValueSelected(currentSecondaryValue.value, subItem);
 }
 
 function onPrimaryItemClicked(item: unknown): void {
-    if (props.primaryValueField) {
-        currentPrimaryValue.value = (item as Record<string, unknown>)[props.primaryValueField];
-    } else {
-        currentPrimaryValue.value = item;
-    }
+    updateCurrentPrimaryValue(currentPrimaryValue, item);
 }
 
 function onSecondaryItemClicked(subItem: unknown): void {
-    if (props.secondaryValueField) {
-        currentSecondaryValue.value = (subItem as Record<string, unknown>)[props.secondaryValueField];
-    } else {
-        currentSecondaryValue.value = subItem;
-    }
+    updateCurrentSecondaryValue(currentSecondaryValue, subItem);
 }
 
 function onMenuStateChanged(state: boolean): void {

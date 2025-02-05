@@ -65,43 +65,15 @@
 import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
+import { type CommonTwoColumnListItemSelectionProps, useTwoColumnListItemSelectionBase } from '@/components/base/TwoColumnListItemSelectionBase.ts';
 
-import {
-    getItemByKeyValue,
-    getPrimaryValueBySecondaryValue
-} from '@/lib/common.ts';
 import { type Framework7Dom, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
 
-const props = defineProps<{
-    modelValue: unknown;
-    primaryKeyField?: string;
-    primaryValueField?: string;
-    primaryTitleField?: string;
-    primaryTitleI18n?: boolean;
-    primaryHeaderField?: string;
-    primaryHeaderI18n?: boolean;
-    primaryFooterField?: string;
-    primaryFooterI18n?: boolean;
-    primaryIconField?: string;
-    primaryIconType?: string;
-    primaryColorField?: string;
-    primaryHiddenField?: string;
-    primarySubItemsField: string;
-    secondaryKeyField?: string;
-    secondaryValueField?: string;
-    secondaryTitleField?: string;
-    secondaryTitleI18n?: boolean;
-    secondaryHeaderField?: string;
-    secondaryHeaderI18n?: boolean;
-    secondaryFooterField?: string;
-    secondaryFooterI18n?: boolean;
-    secondaryIconField?: string;
-    secondaryIconType?: string;
-    secondaryColorField?: string;
-    secondaryHiddenField?: string;
-    items: unknown[];
+interface MobileTwoColumnListItemSelectionProps extends CommonTwoColumnListItemSelectionProps {
     show: boolean;
-}>();
+}
+
+const props = defineProps<MobileTwoColumnListItemSelectionProps>();
 
 const emit = defineEmits<{
     (e: 'update:modelValue', value: unknown): void;
@@ -110,48 +82,34 @@ const emit = defineEmits<{
 
 const { tt, ti } = useI18n();
 
+const {
+    getCurrentPrimaryValueBySecondaryValue,
+    isSecondaryValueSelected,
+    getSelectedPrimaryItem,
+    updateCurrentPrimaryValue,
+    updateCurrentSecondaryValue
+} = useTwoColumnListItemSelectionBase(props);
+
+
 const currentPrimaryValue = ref<unknown>(getCurrentPrimaryValueBySecondaryValue(props.modelValue));
 const currentSecondaryValue = ref<unknown>(props.modelValue);
 
-function getCurrentPrimaryValueBySecondaryValue(secondaryValue: unknown): unknown {
-    return getPrimaryValueBySecondaryValue(props.items as Record<string, Record<string, unknown>[]>[] | Record<string, Record<string, Record<string, unknown>[]>>, props.primarySubItemsField, props.primaryValueField, props.primaryHiddenField, props.secondaryValueField, props.secondaryHiddenField, secondaryValue);
-}
+const selectedPrimaryItem = computed<unknown>(() => getSelectedPrimaryItem(currentPrimaryValue.value));
 
 function isSecondarySelected(subItem: unknown): boolean {
-    if (props.secondaryValueField) {
-        return currentSecondaryValue.value === (subItem as Record<string, unknown>)[props.secondaryValueField];
-    } else {
-        return currentSecondaryValue.value === subItem;
-    }
+    return isSecondaryValueSelected(currentSecondaryValue.value, subItem);
 }
-
-const selectedPrimaryItem = computed<unknown>(() => {
-    if (props.primaryValueField) {
-        return getItemByKeyValue(props.items as Record<string, unknown>[] | Record<string, Record<string, unknown>>, currentPrimaryValue.value, props.primaryValueField);
-    } else {
-        return currentPrimaryValue.value;
-    }
-});
 
 function close(): void {
     emit('update:show', false);
 }
 
 function onPrimaryItemClicked(item: unknown): void {
-    if (props.primaryValueField) {
-        currentPrimaryValue.value = (item as Record<string, unknown>)[props.primaryValueField];
-    } else {
-        currentPrimaryValue.value = item;
-    }
+    updateCurrentPrimaryValue(currentPrimaryValue, item);
 }
 
 function onSecondaryItemClicked(subItem: unknown): void {
-    if (props.secondaryValueField) {
-        currentSecondaryValue.value = (subItem as Record<string, unknown>)[props.secondaryValueField];
-    } else {
-        currentSecondaryValue.value = subItem;
-    }
-
+    updateCurrentSecondaryValue(currentSecondaryValue, subItem);
     emit('update:modelValue', currentSecondaryValue.value);
     close();
 }

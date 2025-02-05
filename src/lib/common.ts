@@ -120,6 +120,26 @@ export function isYearMonthEquals(val1: unknown, val2: unknown): boolean {
     return (!!parseInt(items1[0]) && !!parseInt(items1[1])) && (parseInt(items1[0]) === parseInt(items2[0])) && (parseInt(items1[1]) === parseInt(items2[1]));
 }
 
+export function isArray1SubsetOfArray2<T>(array1: T[], array2: T[]): boolean {
+    if (array1.length > array2.length) {
+        return false;
+    }
+
+    const array2ValuesMap: Map<T, boolean> = new Map<T, boolean>();
+
+    for (let i = 0; i < array2.length; i++) {
+        array2ValuesMap.set(array2[i], true);
+    }
+
+    for (let i = 0; i < array1.length; i++) {
+        if (!array2ValuesMap.get(array1[i])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 export function isObjectEmpty(obj: object): boolean {
     if (!obj) {
         return true;

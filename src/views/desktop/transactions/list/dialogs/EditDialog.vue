@@ -553,6 +553,10 @@ const geoMenuState = ref<boolean>(false);
 const tagSearchContent = ref<string>('');
 const removingPictureId = ref<string>('');
 
+const initCategoryId = ref<string | undefined>(undefined);
+const initAccountId = ref<string | undefined>(undefined);
+const initTagIds = ref<string | undefined>(undefined);
+
 let resolveFunc: ((response?: TransactionEditResponse) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
@@ -602,6 +606,10 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
     submitting.value = false;
     geoLocationStatus.value = null;
     originalTransactionEditable.value = false;
+
+    initCategoryId.value = options.categoryId;
+    initAccountId.value = options.accountId;
+    initTagIds.value = options.tagIds;
 
     const newTransaction = createNewTransactionModel(options.type);
     setTransaction(newTransaction, options, true, false);
@@ -903,9 +911,9 @@ function cancel(): void {
     }
 
     if (settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') {
-        if (transactionsStore.isTransactionDraftModified(transaction.value)) {
+        if (transactionsStore.isTransactionDraftModified(transaction.value, initCategoryId.value, initAccountId.value, initTagIds.value)) {
             confirmDialog.value?.open('Do you want to save this transaction draft?').then(() => {
-                transactionsStore.saveTransactionDraft(transaction.value);
+                transactionsStore.saveTransactionDraft(transaction.value, initCategoryId.value, initAccountId.value, initTagIds.value);
                 doClose();
             }).catch(() => {
                 transactionsStore.clearTransactionDraft();
@@ -916,7 +924,7 @@ function cancel(): void {
             doClose();
         }
     } else if (settingsStore.appSettings.autoSaveTransactionDraft === 'enabled') {
-        transactionsStore.saveTransactionDraft(transaction.value);
+        transactionsStore.saveTransactionDraft(transaction.value, initCategoryId.value, initAccountId.value, initTagIds.value);
         doClose();
     } else {
         doClose();

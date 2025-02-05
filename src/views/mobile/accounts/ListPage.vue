@@ -69,7 +69,7 @@
 
         <div :key="accountCategory.type"
              v-for="accountCategory in AccountCategory.values()"
-             v-show="(showHidden && hasAccount(accountCategory, false)) || hasAccount(accountCategory, true)">
+             v-show="!loading && ((showHidden && hasAccount(accountCategory, false)) || hasAccount(accountCategory, true))">
             <f7-list strong inset dividers sortable class="list-has-group-title account-list margin-vertical"
                      :sortable-enabled="sortable"
                      v-if="allCategorizedAccountsMap[accountCategory.type]"

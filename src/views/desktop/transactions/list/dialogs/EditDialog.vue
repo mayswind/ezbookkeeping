@@ -108,7 +108,7 @@
                                 <v-col cols="12" md="12" v-if="transaction.type === TransactionType.Expense">
                                     <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                        primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                                       primary-hidden-field="hidden" primary-sub-items-field="subCategories"
+                                                       primary-hidden-field="hidden" primary-sub-items-field="secondaryCategories"
                                                        secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                        secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                        secondary-hidden-field="hidden"
@@ -126,7 +126,7 @@
                                 <v-col cols="12" md="12" v-if="transaction.type === TransactionType.Income">
                                     <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                        primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                                       primary-hidden-field="hidden" primary-sub-items-field="subCategories"
+                                                       primary-hidden-field="hidden" primary-sub-items-field="secondaryCategories"
                                                        secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                        secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                        secondary-hidden-field="hidden"
@@ -144,7 +144,7 @@
                                 <v-col cols="12" md="12" v-if="transaction.type === TransactionType.Transfer">
                                     <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                        primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                                       primary-hidden-field="hidden" primary-sub-items-field="subCategories"
+                                                       primary-hidden-field="hidden" primary-sub-items-field="secondaryCategories"
                                                        secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                        secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                        secondary-hidden-field="hidden"

@@ -109,7 +109,7 @@ export function useCategoryFilterSettingPageBase(type?: string, allowCategoryTyp
 
                 const category = transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
 
-                if (category && (!category.subCategories || !category.subCategories.length)) {
+                if (category && (!category.secondaryCategories || !category.secondaryCategories.length)) {
                     allCategoryIds[category.id] = false;
                 } else if (category) {
                     selectAllSubCategories(allCategoryIds, category, false);

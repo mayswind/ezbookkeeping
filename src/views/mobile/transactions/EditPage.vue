@@ -114,7 +114,7 @@
                 </template>
                 <tree-view-selection-sheet primary-key-field="id" primary-title-field="name"
                                            primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                           primary-hidden-field="hidden" primary-sub-items-field="subCategories"
+                                           primary-hidden-field="hidden" primary-sub-items-field="secondaryCategories"
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                            secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                            secondary-hidden-field="hidden"
@@ -145,7 +145,7 @@
                 </template>
                 <tree-view-selection-sheet primary-key-field="id" primary-title-field="name"
                                            primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                           primary-hidden-field="hidden" primary-sub-items-field="subCategories"
+                                           primary-hidden-field="hidden" primary-sub-items-field="secondaryCategories"
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                            secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                            secondary-hidden-field="hidden"
@@ -176,7 +176,7 @@
                 </template>
                 <tree-view-selection-sheet primary-key-field="id" primary-title-field="name"
                                            primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                           primary-hidden-field="hidden" primary-sub-items-field="subCategories"
+                                           primary-hidden-field="hidden" primary-sub-items-field="secondaryCategories"
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                            secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                            secondary-hidden-field="hidden"

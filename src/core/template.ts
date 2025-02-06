@@ -1,7 +1,5 @@
 import type { TypeAndName } from './base.ts';
 
-type TemplateTypeName = 'Normal' | 'Schedule';
-
 export class TemplateType implements TypeAndName {
     private static readonly allInstances: TemplateType[] = [];
     private static readonly allInstancesByType: Record<number, TemplateType> = {};
@@ -10,9 +8,9 @@ export class TemplateType implements TypeAndName {
     public static readonly Schedule = new TemplateType(2, 'Schedule');
 
     public readonly type: number;
-    public readonly name: TemplateTypeName;
+    public readonly name: string;
 
-    private constructor(type: number, name: TemplateTypeName) {
+    private constructor(type: number, name: string) {
         this.type = type;
         this.name = name;
 
@@ -29,8 +27,6 @@ export class TemplateType implements TypeAndName {
     }
 }
 
-type ScheduledTemplateFrequencyTypeName = 'Disabled' | 'Weekly' | 'Monthly';
-
 export class ScheduledTemplateFrequencyType implements TypeAndName {
     private static readonly allInstances: ScheduledTemplateFrequencyType[] = [];
     private static readonly allInstancesByType: Record<number, ScheduledTemplateFrequencyType> = {};
@@ -40,9 +36,9 @@ export class ScheduledTemplateFrequencyType implements TypeAndName {
     public static readonly Monthly = new ScheduledTemplateFrequencyType(2, 'Monthly');
 
     public readonly type: number;
-    public readonly name: ScheduledTemplateFrequencyTypeName;
+    public readonly name: string;
 
-    private constructor(type: number, name: ScheduledTemplateFrequencyTypeName) {
+    private constructor(type: number, name: string) {
         this.type = type;
         this.name = name;
 

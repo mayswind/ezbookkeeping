@@ -6,23 +6,19 @@ export enum StatisticsAnalysisType {
     TrendAnalysis = 1
 }
 
-type CategoricalChartTypeName = 'Pie' | 'Bar';
-
 export class CategoricalChartType implements TypeAndName {
     private static readonly allInstances: CategoricalChartType[] = [];
 
-    public static readonly Pie = new CategoricalChartType(0, 'Pie', 'Pie Chart');
-    public static readonly Bar = new CategoricalChartType(1, 'Bar', 'Bar Chart');
+    public static readonly Pie = new CategoricalChartType(0, 'Pie Chart');
+    public static readonly Bar = new CategoricalChartType(1, 'Bar Chart');
 
     public static readonly Default = CategoricalChartType.Pie;
 
     public readonly type: number;
-    public readonly typeName: CategoricalChartTypeName;
     public readonly name: string;
 
-    private constructor(type: number, typeName: CategoricalChartTypeName, name: string) {
+    private constructor(type: number, name: string) {
         this.type = type;
-        this.typeName = typeName;
         this.name = name;
 
         CategoricalChartType.allInstances.push(this);
@@ -33,23 +29,19 @@ export class CategoricalChartType implements TypeAndName {
     }
 }
 
-type TrendChartTypeName = 'Area' | 'Column';
-
 export class TrendChartType implements TypeAndName {
     private static readonly allInstances: TrendChartType[] = [];
 
-    public static readonly Area = new TrendChartType(0, 'Area', 'Area Chart');
-    public static readonly Column = new TrendChartType(1, 'Column', 'Column Chart');
+    public static readonly Area = new TrendChartType(0, 'Area Chart');
+    public static readonly Column = new TrendChartType(1, 'Column Chart');
 
     public static readonly Default = TrendChartType.Column;
 
     public readonly type: number;
-    public readonly typeName: TrendChartTypeName;
     public readonly name: string;
 
-    private constructor(type: number, typeName: TrendChartTypeName, name: string) {
+    private constructor(type: number, name: string) {
         this.type = type;
-        this.typeName = typeName;
         this.name = name;
 
         TrendChartType.allInstances.push(this);
@@ -60,34 +52,30 @@ export class TrendChartType implements TypeAndName {
     }
 }
 
-type ChartDataTypeName = 'ExpenseByAccount' | 'ExpenseByPrimaryCategory' | 'ExpenseBySecondaryCategory' | 'IncomeByAccount' | 'IncomeByPrimaryCategory' | 'IncomeBySecondaryCategory' | 'AccountTotalAssets' | 'AccountTotalLiabilities' | 'TotalExpense' | 'TotalIncome' | 'TotalBalance';
-
 export class ChartDataType implements TypeAndName {
     private static readonly allInstances: ChartDataType[] = [];
     private static readonly allInstancesByType: Record<number, ChartDataType> = {};
 
-    public static readonly ExpenseByAccount = new ChartDataType(0, 'ExpenseByAccount', 'Expense By Account', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
-    public static readonly ExpenseByPrimaryCategory = new ChartDataType(1, 'ExpenseByPrimaryCategory', 'Expense By Primary Category', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
-    public static readonly ExpenseBySecondaryCategory = new ChartDataType(2, 'ExpenseBySecondaryCategory', 'Expense By Secondary Category', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
-    public static readonly IncomeByAccount = new ChartDataType(3, 'IncomeByAccount', 'Income By Account', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
-    public static readonly IncomeByPrimaryCategory = new ChartDataType(4, 'IncomeByPrimaryCategory', 'Income By Primary Category', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
-    public static readonly IncomeBySecondaryCategory = new ChartDataType(5, 'IncomeBySecondaryCategory', 'Income By Secondary Category', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
-    public static readonly AccountTotalAssets = new ChartDataType(6, 'AccountTotalAssets', 'Account Total Assets', StatisticsAnalysisType.CategoricalAnalysis);
-    public static readonly AccountTotalLiabilities = new ChartDataType(7, 'AccountTotalLiabilities', 'Account Total Liabilities', StatisticsAnalysisType.CategoricalAnalysis);
-    public static readonly TotalExpense = new ChartDataType(8, 'TotalExpense', 'Total Expense', StatisticsAnalysisType.TrendAnalysis);
-    public static readonly TotalIncome = new ChartDataType(9, 'TotalIncome', 'Total Income', StatisticsAnalysisType.TrendAnalysis);
-    public static readonly TotalBalance = new ChartDataType(10, 'TotalBalance', 'Total Balance', StatisticsAnalysisType.TrendAnalysis);
+    public static readonly ExpenseByAccount = new ChartDataType(0, 'Expense By Account', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
+    public static readonly ExpenseByPrimaryCategory = new ChartDataType(1, 'Expense By Primary Category', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
+    public static readonly ExpenseBySecondaryCategory = new ChartDataType(2, 'Expense By Secondary Category', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
+    public static readonly IncomeByAccount = new ChartDataType(3, 'Income By Account', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
+    public static readonly IncomeByPrimaryCategory = new ChartDataType(4, 'Income By Primary Category', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
+    public static readonly IncomeBySecondaryCategory = new ChartDataType(5, 'Income By Secondary Category', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
+    public static readonly AccountTotalAssets = new ChartDataType(6, 'Account Total Assets', StatisticsAnalysisType.CategoricalAnalysis);
+    public static readonly AccountTotalLiabilities = new ChartDataType(7, 'Account Total Liabilities', StatisticsAnalysisType.CategoricalAnalysis);
+    public static readonly TotalExpense = new ChartDataType(8, 'Total Expense', StatisticsAnalysisType.TrendAnalysis);
+    public static readonly TotalIncome = new ChartDataType(9, 'Total Income', StatisticsAnalysisType.TrendAnalysis);
+    public static readonly TotalBalance = new ChartDataType(10, 'Total Balance', StatisticsAnalysisType.TrendAnalysis);
 
     public static readonly Default = ChartDataType.ExpenseByPrimaryCategory;
 
     public readonly type: number;
-    public readonly typeName: ChartDataTypeName;
     public readonly name: string;
     private readonly availableAnalysisTypes: Record<number, boolean>;
 
-    private constructor(type: number, typeName: ChartDataTypeName, name: string, ...availableAnalysisTypes: StatisticsAnalysisType[]) {
+    private constructor(type: number, name: string, ...availableAnalysisTypes: StatisticsAnalysisType[]) {
         this.type = type;
-        this.typeName = typeName;
         this.name = name;
         this.availableAnalysisTypes = {};
 

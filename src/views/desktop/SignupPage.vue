@@ -207,22 +207,22 @@
                     <div class="d-flex justify-sm-space-between gap-4 flex-wrap justify-center mt-5">
                         <v-btn :color="(currentStep === 'basicSetting' || currentStep === 'finalResult') ? 'default' : 'primary'"
                                :disabled="currentStep === 'basicSetting' || currentStep === 'finalResult' || submitting || navigateToHomePage"
-                               :prepend-icon="icons.previous"
+                               :prepend-icon="mdiArrowLeft"
                                @click="switchToPreviousTab">{{ tt('Previous') }}</v-btn>
                         <v-btn :color="(currentStep === 'presetCategories' || currentStep === 'finalResult') ? 'secondary' : 'primary'"
                                :disabled="currentStep === 'presetCategories' || currentStep === 'finalResult' || submitting || navigateToHomePage"
-                               :append-icon="icons.next"
+                               :append-icon="mdiArrowRight"
                                @click="switchToNextTab"
                                v-if="currentStep === 'basicSetting'">{{ tt('Next') }}</v-btn>
                         <v-btn color="teal"
                                :disabled="submitting || navigateToHomePage"
-                               :append-icon="!submitting ? icons.submit : undefined"
+                               :append-icon="!submitting ? mdiCheck : undefined"
                                @click="submit"
                                v-if="currentStep === 'presetCategories'">
                             {{ tt('Submit') }}
                             <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                         </v-btn>
-                        <v-btn :append-icon="icons.next"
+                        <v-btn :append-icon="mdiArrowRight"
                                @click="navigateToLogin"
                                v-if="currentStep === 'finalResult'">{{ tt('Continue') }}</v-btn>
                     </div>
@@ -282,12 +282,6 @@ const {
 } = useSignupPageBase();
 
 const rootStore = useRootStore();
-
-const icons = {
-    previous: mdiArrowLeft,
-    next: mdiArrowRight,
-    submit: mdiCheck
-};
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 

@@ -55,7 +55,7 @@
                                     <v-col cols="12">
                                         <router-link class="d-flex align-center justify-center" :to="verified ? '/' : '/login'"
                                                      :class="{ 'disabled': loading || resending }">
-                                            <v-icon :icon="icons.left"/>
+                                            <v-icon :icon="mdiChevronLeft"/>
                                             <span v-if="!verified">{{ tt('Back to login page') }}</span>
                                             <span v-else-if="verified">{{ tt('Back to home page') }}</span>
                                         </router-link>
@@ -149,10 +149,6 @@ const { tt, te, getCurrentLanguageDisplayName, getAllLanguageOptions, setLanguag
 
 const rootStore = useRootStore();
 const settingsStore = useSettingsStore();
-
-const icons = {
-    left: mdiChevronLeft
-};
 
 const version = `v${getVersion()}`;
 

@@ -145,7 +145,7 @@
                             v-model="targetItem"
                         >
                             <template #chip="{ props, item }">
-                                <v-chip :prepend-icon="icons.tag" :text="item.title" v-bind="props"/>
+                                <v-chip :prepend-icon="mdiPound" :text="item.title" v-bind="props"/>
                             </template>
 
                             <template #item="{ props, item }">
@@ -153,7 +153,7 @@
                                     <template #title>
                                         <v-list-item-title>
                                             <div class="d-flex align-center">
-                                                <v-icon size="20" start :icon="icons.tag"/>
+                                                <v-icon size="20" start :icon="mdiPound"/>
                                                 <span>{{ item.title }}</span>
                                             </div>
                                         </v-list-item-title>
@@ -214,10 +214,6 @@ const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
-
-const icons = {
-    tag: mdiPound
-};
 
 const showState = ref<boolean>(false);
 const mode = ref<string>('');

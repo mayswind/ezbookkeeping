@@ -7,7 +7,7 @@
             <span class="font-weight-bold ml-3">{{ title }}</span>
             <v-spacer/>
             <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true">
-                <v-icon :icon="icons.more" />
+                <v-icon :icon="mdiDotsVertical" />
                 <v-menu activator="parent">
                     <v-list>
                         <slot name="menus"></slot>
@@ -46,8 +46,4 @@ defineProps<{
 }>();
 
 const { tt } = useI18n();
-
-const icons = {
-    more: mdiDotsVertical
-};
 </script>

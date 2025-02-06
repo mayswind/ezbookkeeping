@@ -73,7 +73,7 @@
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
-                            <v-icon :icon="icons.refresh" size="24" />
+                            <v-icon :icon="mdiRefresh" size="24" />
                             <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                         </v-btn>
                     </div>
@@ -175,10 +175,6 @@ const { tt, formatUnixTimeToLongDateTime, setLanguage } = useI18n();
 const rootStore = useRootStore();
 const settingsStore = useSettingsStore();
 const tokensStore = useTokensStore();
-
-const icons = {
-    refresh: mdiRefresh
-};
 
 const newPasswordInput = useTemplateRef<VTextField>('newPasswordInput');
 const confirmPasswordInput = useTemplateRef<VTextField>('confirmPasswordInput');

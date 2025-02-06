@@ -62,7 +62,7 @@
                                         <div class="title-and-toolbar d-flex align-center">
                                             <v-btn class="mr-3 d-md-none" density="compact" color="default" variant="plain"
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
-                                                <v-icon :icon="icons.menu" size="24" />
+                                                <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
                                             <span>{{ tt('Exchange Rates Data') }}</span>
                                             <v-btn density="compact" color="default" variant="text" size="24"
@@ -70,7 +70,7 @@
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
                                                 </template>
-                                                <v-icon :icon="icons.refresh" size="24" />
+                                                <v-icon :icon="mdiRefresh" size="24" />
                                                 <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                                             </v-btn>
                                         </div>
@@ -161,11 +161,6 @@ const { tt, formatExchangeRateAmount } = useI18n();
 const { baseCurrency, baseAmount, exchangeRatesData, exchangeRatesDataUpdateTime, availableExchangeRates, getConvertedAmount, setAsBaseline } = useExchangeRatesPageBase();
 
 const exchangeRatesStore = useExchangeRatesStore();
-
-const icons = {
-    refresh: mdiRefresh,
-    menu: mdiMenu
-};
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 

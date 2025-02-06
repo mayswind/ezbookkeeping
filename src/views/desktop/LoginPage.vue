@@ -66,7 +66,7 @@
                                             :disabled="logining || verifying"
                                             :label="tt('Passcode')"
                                             :placeholder="tt('Passcode')"
-                                            :append-inner-icon="icons.backupCode"
+                                            :append-inner-icon="mdiHelpCircleOutline"
                                             v-model="passcode"
                                             @click:append-inner="twoFAVerifyType = 'backupcode'"
                                             @keyup.enter="verify"
@@ -77,7 +77,7 @@
                                             :disabled="logining || verifying"
                                             :label="tt('Backup Code')"
                                             :placeholder="tt('Backup Code')"
-                                            :append-inner-icon="icons.passcode"
+                                            :append-inner-icon="mdiOnepassword"
                                             v-model="backupCode"
                                             @click:append-inner="twoFAVerifyType = 'passcode'"
                                             @keyup.enter="verify"
@@ -216,11 +216,6 @@ const {
     changeLanguage,
     doAfterLogin
 } = useLoginPageBase();
-
-const icons = {
-    passcode: mdiOnepassword,
-    backupCode: mdiHelpCircleOutline
-};
 
 const passwordInput = useTemplateRef<VTextField>('passwordInput');
 const passcodeInput = useTemplateRef<VTextField>('passcodeInput');

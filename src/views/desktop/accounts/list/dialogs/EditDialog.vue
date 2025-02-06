@@ -9,10 +9,10 @@
                     </div>
                     <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true"
                            :disabled="loading || submitting || !!editAccountId || account.type !== AccountType.MultiSubAccounts.type">
-                        <v-icon :icon="icons.more" />
+                        <v-icon :icon="mdiDotsVertical" />
                         <v-menu activator="parent">
                             <v-list>
-                                <v-list-item :prepend-icon="icons.add"
+                                <v-list-item :prepend-icon="mdiCreditCardPlusOutline"
                                              :title="tt('Add Sub-account')"
                                              @click="addSubAccount"></v-list-item>
                             </v-list>
@@ -30,7 +30,7 @@
                             <v-tab :key="idx" :value="idx" v-for="(subAccount, idx) in subAccounts">
                                 <span>{{ tt('Sub Account') + ' #' + (idx + 1) }}</span>
                                 <v-btn class="ml-2" color="error" size="24" variant="text"
-                                       :icon="icons.delete" v-if="!editAccountId"
+                                       :icon="mdiDeleteOutline" v-if="!editAccountId"
                                        @click="removeSubAccount(subAccount)"></v-btn>
                             </v-tab>
                         </template>
@@ -258,12 +258,6 @@ const {
 
 const userStore = useUserStore();
 const accountsStore = useAccountsStore();
-
-const icons = {
-    more: mdiDotsVertical,
-    add: mdiCreditCardPlusOutline,
-    delete: mdiDeleteOutline
-};
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');

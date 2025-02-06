@@ -16,19 +16,19 @@
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
-                            <v-icon :icon="icons.refresh" size="24" />
+                            <v-icon :icon="mdiRefresh" size="24" />
                             <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                         </v-btn>
                         <v-spacer/>
                         <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                                :disabled="loading || updating" :icon="true">
-                            <v-icon :icon="icons.more" />
+                            <v-icon :icon="mdiDotsVertical" />
                             <v-menu activator="parent">
                                 <v-list>
-                                    <v-list-item :prepend-icon="icons.show"
+                                    <v-list-item :prepend-icon="mdiEyeOutline"
                                                  :title="tt('Show Hidden Transaction Templates')"
                                                  v-if="!showHidden" @click="showHidden = true"></v-list-item>
-                                    <v-list-item :prepend-icon="icons.hide"
+                                    <v-list-item :prepend-icon="mdiEyeOffOutline"
                                                  :title="tt('Hide Hidden Transaction Templates')"
                                                  v-if="showHidden" @click="showHidden = false"></v-list-item>
                                 </v-list>
@@ -79,11 +79,11 @@
                                     <div class="d-flex align-center">
                                         <div class="d-flex align-center">
                                             <v-badge class="right-bottom-icon" color="secondary"
-                                                     location="bottom right" offset-x="8" :icon="icons.hide"
+                                                     location="bottom right" offset-x="8" :icon="mdiEyeOffOutline"
                                                      v-if="element.hidden">
-                                                <v-icon size="20" start :icon="templateType === TemplateType.Schedule.type ? icons.clock : icons.text"/>
+                                                <v-icon size="20" start :icon="templateType === TemplateType.Schedule.type ? mdiClockTimeNineOutline : mdiTextBoxOutline"/>
                                             </v-badge>
-                                            <v-icon size="20" start :icon="templateType === TemplateType.Schedule.type ? icons.clock : icons.text" v-else-if="!element.hidden"/>
+                                            <v-icon size="20" start :icon="templateType === TemplateType.Schedule.type ? mdiClockTimeNineOutline : mdiTextBoxOutline" v-else-if="!element.hidden"/>
                                             <span class="transaction-template-name">{{ element.name }}</span>
                                         </div>
 
@@ -92,7 +92,7 @@
                                         <v-btn class="px-2 ml-2" color="default"
                                                density="comfortable" variant="text"
                                                :class="{ 'd-none': loading, 'hover-display': !loading }"
-                                               :prepend-icon="element.hidden ? icons.show : icons.hide"
+                                               :prepend-icon="element.hidden ? mdiEyeOutline : mdiEyeOffOutline"
                                                :loading="templateHiding[element.id]"
                                                :disabled="loading || updating"
                                                @click="hide(element, !element.hidden)">
@@ -104,7 +104,7 @@
                                         <v-btn class="px-2" color="default"
                                                density="comfortable" variant="text"
                                                :class="{ 'd-none': loading, 'hover-display': !loading }"
-                                               :prepend-icon="icons.edit"
+                                               :prepend-icon="mdiPencilOutline"
                                                :disabled="loading || updating"
                                                @click="edit(element)">
                                             <template #loader>
@@ -115,7 +115,7 @@
                                         <v-btn class="px-2" color="default"
                                                density="comfortable" variant="text"
                                                :class="{ 'd-none': loading, 'hover-display': !loading }"
-                                               :prepend-icon="icons.remove"
+                                               :prepend-icon="mdiDeleteOutline"
                                                :loading="templateRemoving[element.id]"
                                                :disabled="loading || updating"
                                                @click="remove(element)">
@@ -126,7 +126,7 @@
                                         </v-btn>
                                         <span class="ml-2">
                                             <v-icon :class="!loading && !updating && availableTemplateCount > 1 ? 'drag-handle' : 'disabled'"
-                                                    :icon="icons.drag"/>
+                                                    :icon="mdiDrag"/>
                                             <v-tooltip activator="parent" v-if="!loading && !updating && availableTemplateCount > 1">{{ tt('Drag to Reorder') }}</v-tooltip>
                                         </span>
                                     </div>
@@ -167,10 +167,7 @@ import {
 
 import {
     mdiRefresh,
-    mdiPlus,
     mdiPencilOutline,
-    mdiCheck,
-    mdiClose,
     mdiEyeOffOutline,
     mdiEyeOutline,
     mdiDeleteOutline,
@@ -191,21 +188,6 @@ const props = defineProps<{
 const { tt } = useI18n();
 
 const transactionTemplatesStore = useTransactionTemplatesStore();
-
-const icons = {
-    refresh: mdiRefresh,
-    add: mdiPlus,
-    edit: mdiPencilOutline,
-    confirm: mdiCheck,
-    cancel: mdiClose,
-    show: mdiEyeOutline,
-    hide: mdiEyeOffOutline,
-    remove: mdiDeleteOutline,
-    drag: mdiDrag,
-    more: mdiDotsVertical,
-    text: mdiTextBoxOutline,
-    clock: mdiClockTimeNineOutline
-};
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');

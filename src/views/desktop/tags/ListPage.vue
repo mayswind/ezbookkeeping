@@ -16,19 +16,19 @@
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
-                            <v-icon :icon="icons.refresh" size="24" />
+                            <v-icon :icon="mdiRefresh" size="24" />
                             <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                         </v-btn>
                         <v-spacer/>
                         <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                                :disabled="loading || updating || hasEditingTag" :icon="true">
-                            <v-icon :icon="icons.more" />
+                            <v-icon :icon="mdiDotsVertical" />
                             <v-menu activator="parent">
                                 <v-list>
-                                    <v-list-item :prepend-icon="icons.show"
+                                    <v-list-item :prepend-icon="mdiEyeOutline"
                                                  :title="tt('Show Hidden Transaction Tags')"
                                                  v-if="!showHidden" @click="showHidden = true"></v-list-item>
-                                    <v-list-item :prepend-icon="icons.hide"
+                                    <v-list-item :prepend-icon="mdiEyeOffOutline"
                                                  :title="tt('Hide Hidden Transaction Tags')"
                                                  v-if="showHidden" @click="showHidden = false"></v-list-item>
                                 </v-list>
@@ -78,11 +78,11 @@
                                     <div class="d-flex align-center">
                                         <div class="d-flex align-center" v-if="editingTag.id !== element.id">
                                             <v-badge class="right-bottom-icon" color="secondary"
-                                                     location="bottom right" offset-x="8" :icon="icons.hide"
+                                                     location="bottom right" offset-x="8" :icon="mdiEyeOffOutline"
                                                      v-if="element.hidden">
-                                                <v-icon size="20" start :icon="icons.tag"/>
+                                                <v-icon size="20" start :icon="mdiPound"/>
                                             </v-badge>
-                                            <v-icon size="20" start :icon="icons.tag" v-else-if="!element.hidden"/>
+                                            <v-icon size="20" start :icon="mdiPound" v-else-if="!element.hidden"/>
                                             <span class="transaction-tag-name">{{ element.name }}</span>
                                         </div>
 
@@ -96,11 +96,11 @@
                                         >
                                             <template #prepend>
                                                 <v-badge class="right-bottom-icon" color="secondary"
-                                                         location="bottom right" offset-x="8" :icon="icons.hide"
+                                                         location="bottom right" offset-x="8" :icon="mdiEyeOffOutline"
                                                          v-if="element.hidden">
-                                                    <v-icon size="20" start :icon="icons.tag"/>
+                                                    <v-icon size="20" start :icon="mdiPound"/>
                                                 </v-badge>
-                                                <v-icon size="20" start :icon="icons.tag" v-else-if="!element.hidden"/>
+                                                <v-icon size="20" start :icon="mdiPound" v-else-if="!element.hidden"/>
                                             </template>
                                         </v-text-field>
 
@@ -109,7 +109,7 @@
                                         <v-btn class="px-2 ml-2" color="default"
                                                density="comfortable" variant="text"
                                                :class="{ 'd-none': loading, 'hover-display': !loading }"
-                                               :prepend-icon="element.hidden ? icons.show : icons.hide"
+                                               :prepend-icon="element.hidden ? mdiEyeOutline : mdiEyeOffOutline"
                                                :loading="tagHiding[element.id]"
                                                :disabled="loading || updating"
                                                v-if="editingTag.id !== element.id"
@@ -122,7 +122,7 @@
                                         <v-btn class="px-2" color="default"
                                                density="comfortable" variant="text"
                                                :class="{ 'd-none': loading, 'hover-display': !loading }"
-                                               :prepend-icon="icons.edit"
+                                               :prepend-icon="mdiPencilOutline"
                                                :loading="tagUpdating[element.id]"
                                                :disabled="loading || updating"
                                                v-if="editingTag.id !== element.id"
@@ -135,7 +135,7 @@
                                         <v-btn class="px-2" color="default"
                                                density="comfortable" variant="text"
                                                :class="{ 'd-none': loading, 'hover-display': !loading }"
-                                               :prepend-icon="icons.remove"
+                                               :prepend-icon="mdiDeleteOutline"
                                                :loading="tagRemoving[element.id]"
                                                :disabled="loading || updating"
                                                v-if="editingTag.id !== element.id"
@@ -147,7 +147,7 @@
                                         </v-btn>
                                         <v-btn class="px-2"
                                                density="comfortable" variant="text"
-                                               :prepend-icon="icons.confirm"
+                                               :prepend-icon="mdiCheck"
                                                :loading="tagUpdating[element.id]"
                                                :disabled="loading || updating || !isTagModified(element)"
                                                v-if="editingTag.id === element.id" @click="save(editingTag)">
@@ -158,14 +158,14 @@
                                         </v-btn>
                                         <v-btn class="px-2" color="default"
                                                density="comfortable" variant="text"
-                                               :prepend-icon="icons.cancel"
+                                               :prepend-icon="mdiClose"
                                                :disabled="loading || updating"
                                                v-if="editingTag.id === element.id" @click="cancelSave(editingTag)">
                                             {{ tt('Cancel') }}
                                         </v-btn>
                                         <span class="ml-2">
                                             <v-icon :class="!loading && !updating && !hasEditingTag && availableTagCount > 1 ? 'drag-handle' : 'disabled'"
-                                                    :icon="icons.drag"/>
+                                                    :icon="mdiDrag"/>
                                             <v-tooltip activator="parent" v-if="!loading && !updating && !hasEditingTag && availableTagCount > 1">{{ tt('Drag to Reorder') }}</v-tooltip>
                                         </span>
                                     </div>
@@ -183,14 +183,14 @@
                                               :disabled="loading || updating" :placeholder="tt('Tag Title')"
                                               v-model="newTag.name" @keyup.enter="save(newTag)">
                                     <template #prepend>
-                                        <v-icon size="20" start :icon="icons.tag"/>
+                                        <v-icon size="20" start :icon="mdiPound"/>
                                     </template>
                                 </v-text-field>
 
                                 <v-spacer/>
 
                                 <v-btn class="px-2" density="comfortable" variant="text"
-                                       :prepend-icon="icons.confirm"
+                                       :prepend-icon="mdiCheck"
                                        :loading="tagUpdating['']"
                                        :disabled="loading || updating || !isTagModified(newTag)"
                                        @click="save(newTag)">
@@ -201,13 +201,13 @@
                                 </v-btn>
                                 <v-btn class="px-2" color="default"
                                        density="comfortable" variant="text"
-                                       :prepend-icon="icons.cancel"
+                                       :prepend-icon="mdiClose"
                                        :disabled="loading || updating"
                                        @click="cancelSave(newTag)">
                                     {{ tt('Cancel') }}
                                 </v-btn>
                                 <span class="ml-2">
-                                    <v-icon class="disabled" :icon="icons.drag"/>
+                                    <v-icon class="disabled" :icon="mdiDrag"/>
                                 </span>
                             </div>
                         </td>
@@ -241,7 +241,6 @@ import {
 
 import {
     mdiRefresh,
-    mdiPlus,
     mdiPencilOutline,
     mdiCheck,
     mdiClose,
@@ -259,20 +258,6 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 const { tt } = useI18n();
 
 const transactionTagsStore = useTransactionTagsStore();
-
-const icons = {
-    refresh: mdiRefresh,
-    add: mdiPlus,
-    edit: mdiPencilOutline,
-    confirm: mdiCheck,
-    cancel: mdiClose,
-    show: mdiEyeOutline,
-    hide: mdiEyeOffOutline,
-    remove: mdiDeleteOutline,
-    drag: mdiDrag,
-    more: mdiDotsVertical,
-    tag: mdiPound
-};
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');

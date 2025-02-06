@@ -7,26 +7,26 @@
                 </div>
                 <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                        :disabled="loading || !hasAnyAvailableAccount" :icon="true">
-                    <v-icon :icon="icons.more" />
+                    <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent">
                         <v-list>
-                            <v-list-item :prepend-icon="icons.selectAll"
+                            <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Select All')"
                                          :disabled="!hasAnyVisibleAccount"
                                          @click="selectAllAccounts"></v-list-item>
-                            <v-list-item :prepend-icon="icons.selectNone"
+                            <v-list-item :prepend-icon="mdiSelect"
                                          :title="tt('Select None')"
                                          :disabled="!hasAnyVisibleAccount"
                                          @click="selectNoneAccounts"></v-list-item>
-                            <v-list-item :prepend-icon="icons.selectInverse"
+                            <v-list-item :prepend-icon="mdiSelectInverse"
                                          :title="tt('Invert Selection')"
                                          :disabled="!hasAnyVisibleAccount"
                                          @click="selectInvertAccounts"></v-list-item>
                             <v-divider class="my-2"/>
-                            <v-list-item :prepend-icon="icons.show"
+                            <v-list-item :prepend-icon="mdiEyeOutline"
                                          :title="tt('Show Hidden Accounts')"
                                          v-if="!showHidden" @click="showHidden = true"></v-list-item>
-                            <v-list-item :prepend-icon="icons.hide"
+                            <v-list-item :prepend-icon="mdiEyeOffOutline"
                                          :title="tt('Hide Hidden Accounts')"
                                          v-if="showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
@@ -38,26 +38,26 @@
                 <v-spacer/>
                 <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                        :disabled="loading" :icon="true">
-                    <v-icon :icon="icons.more" />
+                    <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent">
                         <v-list>
-                            <v-list-item :prepend-icon="icons.selectAll"
+                            <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Select All')"
                                          :disabled="!hasAnyVisibleAccount"
                                          @click="selectAllAccounts"></v-list-item>
-                            <v-list-item :prepend-icon="icons.selectNone"
+                            <v-list-item :prepend-icon="mdiSelect"
                                          :title="tt('Select None')"
                                          :disabled="!hasAnyVisibleAccount"
                                          @click="selectNoneAccounts"></v-list-item>
-                            <v-list-item :prepend-icon="icons.selectInverse"
+                            <v-list-item :prepend-icon="mdiSelectInverse"
                                          :title="tt('Invert Selection')"
                                          :disabled="!hasAnyVisibleAccount"
                                          @click="selectInvertAccounts"></v-list-item>
                             <v-divider class="my-2"/>
-                            <v-list-item :prepend-icon="icons.show"
+                            <v-list-item :prepend-icon="mdiEyeOutline"
                                          :title="tt('Show Hidden Accounts')"
                                          v-if="!showHidden" @click="showHidden = true"></v-list-item>
-                            <v-list-item :prepend-icon="icons.hide"
+                            <v-list-item :prepend-icon="mdiEyeOffOutline"
                                          :title="tt('Hide Hidden Accounts')"
                                          v-if="showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
@@ -205,15 +205,6 @@ const {
 } = useAccountFilterSettingPageBase(props.type);
 
 const accountsStore = useAccountsStore();
-
-const icons = {
-    selectAll: mdiSelectAll,
-    selectNone: mdiSelect,
-    selectInverse: mdiSelectInverse,
-    show: mdiEyeOutline,
-    hide: mdiEyeOffOutline,
-    more: mdiDotsVertical
-};
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 

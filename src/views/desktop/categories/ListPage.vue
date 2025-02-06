@@ -37,7 +37,7 @@
                                         <div class="title-and-toolbar d-flex align-center">
                                             <v-btn class="mr-3 d-md-none" density="compact" color="default" variant="plain"
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
-                                                <v-icon :icon="icons.menu" size="24" />
+                                                <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
                                             <span>{{ tt('Transaction Categories') }}</span>
                                             <v-btn class="ml-3" color="default" variant="outlined"
@@ -50,19 +50,19 @@
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
                                                 </template>
-                                                <v-icon :icon="icons.refresh" size="24" />
+                                                <v-icon :icon="mdiRefresh" size="24" />
                                                 <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                                             </v-btn>
                                             <v-spacer/>
                                             <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                                                    :disabled="loading || updating" :icon="true">
-                                                <v-icon :icon="icons.more" />
+                                                <v-icon :icon="mdiDotsVertical" />
                                                 <v-menu activator="parent">
                                                     <v-list>
-                                                        <v-list-item :prepend-icon="icons.show"
+                                                        <v-list-item :prepend-icon="mdiEyeOutline"
                                                                      :title="tt('Show Hidden Transaction Categories')"
                                                                      v-if="!showHidden" @click="showHidden = true"></v-list-item>
-                                                        <v-list-item :prepend-icon="icons.hide"
+                                                        <v-list-item :prepend-icon="mdiEyeOffOutline"
                                                                      :title="tt('Hide Hidden Transaction Categories')"
                                                                      v-if="showHidden" @click="showHidden = false"></v-list-item>
                                                     </v-list>
@@ -134,7 +134,7 @@
                                                             <v-btn class="px-2 ml-2" color="default"
                                                                    density="comfortable" variant="text"
                                                                    :class="{ 'd-none': loading, 'hover-display': !loading }"
-                                                                   :prepend-icon="element.hidden ? icons.show : icons.hide"
+                                                                   :prepend-icon="element.hidden ? mdiEyeOutline : mdiEyeOffOutline"
                                                                    :loading="categoryHiding[element.id]"
                                                                    :disabled="loading || updating"
                                                                    @click="hide(element, !element.hidden)">
@@ -146,7 +146,7 @@
                                                             <v-btn class="px-2" color="default"
                                                                    density="comfortable" variant="text"
                                                                    :class="{ 'd-none': loading, 'hover-display': !loading }"
-                                                                   :prepend-icon="icons.edit"
+                                                                   :prepend-icon="mdiPencilOutline"
                                                                    :disabled="loading || updating"
                                                                    @click="edit(element)">
                                                                 {{ tt('Edit') }}
@@ -154,7 +154,7 @@
                                                             <v-btn class="px-2" color="default"
                                                                    density="comfortable" variant="text"
                                                                    :class="{ 'd-none': loading, 'hover-display': !loading }"
-                                                                   :prepend-icon="icons.remove"
+                                                                   :prepend-icon="mdiDeleteOutline"
                                                                    :loading="categoryRemoving[element.id]"
                                                                    :disabled="loading || updating"
                                                                    @click="remove(element)">
@@ -165,7 +165,7 @@
                                                             </v-btn>
                                                             <span class="ml-2">
                                                                 <v-icon :class="!loading && !updating && availableCategoryCount > 1 ? 'drag-handle' : 'disabled'"
-                                                                        :icon="icons.drag"/>
+                                                                        :icon="mdiDrag"/>
                                                                 <v-tooltip activator="parent" v-if="!loading && !updating && availableCategoryCount > 1">{{ tt('Drag to Reorder') }}</v-tooltip>
                                                             </span>
                                                         </div>
@@ -234,17 +234,6 @@ const display = useDisplay();
 const { tt } = useI18n();
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
-
-const icons = {
-    refresh: mdiRefresh,
-    menu: mdiMenu,
-    edit: mdiPencilOutline,
-    show: mdiEyeOutline,
-    hide: mdiEyeOffOutline,
-    remove: mdiDeleteOutline,
-    drag: mdiDrag,
-    more: mdiDotsVertical
-};
 
 const navbar = useTemplateRef<VNavigationDrawer>('navbar');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');

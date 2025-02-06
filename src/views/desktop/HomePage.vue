@@ -14,7 +14,7 @@
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
-                            <v-icon :icon="icons.refresh" size="24" />
+                            <v-icon :icon="mdiRefresh" size="24" />
                             <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                         </v-btn>
                     </div>
@@ -26,7 +26,7 @@
                         <v-skeleton-loader class="d-inline-block skeleton-no-margin mt-3 pb-1" width="120px" type="text" :loading="true" v-else-if="loadingOverview && (!transactionOverview || !transactionOverview.thisMonth || !transactionOverview.thisMonth.valid)"></v-skeleton-loader>
                         <v-btn class="ml-1" density="compact" color="default" variant="text"
                                :icon="true" @click="showAmountInHomePage = !showAmountInHomePage">
-                            <v-icon :icon="showAmountInHomePage ? icons.eyeSlash : icons.eye" size="20" />
+                            <v-icon :icon="showAmountInHomePage ? mdiEyeOffOutline : mdiEyeOutline" size="20" />
                         </v-btn>
                     </h4>
                     <div class="mt-1 mb-3">
@@ -58,7 +58,7 @@
                             <div class="d-flex align-center">
                                 <div class="me-3">
                                     <v-avatar rounded color="secondary" size="42" class="elevation-1">
-                                        <v-icon size="24" :icon="icons.totalAssets"/>
+                                        <v-icon size="24" :icon="mdiBankOutline"/>
                                     </v-avatar>
                                 </div>
 
@@ -74,7 +74,7 @@
                             <div class="d-flex align-center">
                                 <div class="me-3">
                                     <v-avatar rounded color="expense" size="42" class="elevation-1">
-                                        <v-icon size="24" :icon="icons.totalLiabilities"/>
+                                        <v-icon size="24" :icon="mdiCreditCardOutline"/>
                                     </v-avatar>
                                 </div>
 
@@ -90,7 +90,7 @@
                             <div class="d-flex align-center">
                                 <div class="me-3">
                                     <v-avatar rounded color="primary" size="42" class="elevation-1">
-                                        <v-icon size="24" :icon="icons.netAssets"/>
+                                        <v-icon size="24" :icon="mdiPiggyBankOutline"/>
                                     </v-avatar>
                                 </div>
 
@@ -110,14 +110,14 @@
             <v-row>
                 <v-col cols="12" md="6">
                     <income-expense-overview-card
-                        :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarToday"
+                        :loading="loadingOverview" :disabled="loadingOverview" :icon="mdiCalendarTodayOutline"
                         :title="tt('Today')"
                         :expense-amount="transactionOverview.today && transactionOverview.today.valid ? getDisplayExpenseAmount(transactionOverview.today) : ''"
                         :income-amount="transactionOverview.today && transactionOverview.today.valid ? getDisplayIncomeAmount(transactionOverview.today) : ''"
                         :datetime="displayDateRange?.today?.displayTime || ''"
                     >
                         <template #menus>
-                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transaction/list?dateType=' + DateRange.Today.type">
+                            <v-list-item :prepend-icon="mdiListBoxOutline" :to="'/transaction/list?dateType=' + DateRange.Today.type">
                                 <v-list-item-title>{{ tt('View Details') }}</v-list-item-title>
                             </v-list-item>
                         </template>
@@ -126,14 +126,14 @@
 
                 <v-col cols="12" md="6">
                     <income-expense-overview-card
-                        :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarWeek"
+                        :loading="loadingOverview" :disabled="loadingOverview" :icon="mdiCalendarWeekOutline"
                         :title="tt('This Week')"
                         :expense-amount="transactionOverview.thisWeek && transactionOverview.thisWeek.valid ? getDisplayExpenseAmount(transactionOverview.thisWeek) : ''"
                         :income-amount="transactionOverview.thisWeek && transactionOverview.thisWeek.valid ? getDisplayIncomeAmount(transactionOverview.thisWeek) : ''"
                         :datetime="displayDateRange?.thisWeek?.startTime + '-' + displayDateRange?.thisWeek?.endTime"
                     >
                         <template #menus>
-                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transaction/list?dateType=' + DateRange.ThisWeek.type">
+                            <v-list-item :prepend-icon="mdiListBoxOutline" :to="'/transaction/list?dateType=' + DateRange.ThisWeek.type">
                                 <v-list-item-title>{{ tt('View Details') }}</v-list-item-title>
                             </v-list-item>
                         </template>
@@ -142,14 +142,14 @@
 
                 <v-col cols="12" md="6">
                     <income-expense-overview-card
-                        :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarMonth"
+                        :loading="loadingOverview" :disabled="loadingOverview" :icon="mdiCalendarMonthOutline"
                         :title="tt('This Month')"
                         :expense-amount="transactionOverview.thisMonth && transactionOverview.thisMonth.valid ? getDisplayExpenseAmount(transactionOverview.thisMonth) : ''"
                         :income-amount="transactionOverview.thisMonth && transactionOverview.thisMonth.valid ? getDisplayIncomeAmount(transactionOverview.thisMonth) : ''"
                         :datetime="displayDateRange?.thisMonth?.startTime + '-' + displayDateRange?.thisMonth?.endTime"
                     >
                         <template #menus>
-                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transaction/list?dateType=' + DateRange.ThisMonth.type">
+                            <v-list-item :prepend-icon="mdiListBoxOutline" :to="'/transaction/list?dateType=' + DateRange.ThisMonth.type">
                                 <v-list-item-title>{{ tt('View Details') }}</v-list-item-title>
                             </v-list-item>
                         </template>
@@ -158,14 +158,14 @@
 
                 <v-col cols="12" md="6">
                     <income-expense-overview-card
-                        :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarYear"
+                        :loading="loadingOverview" :disabled="loadingOverview" :icon="mdiLayersTripleOutline"
                         :title="tt('This Year')"
                         :expense-amount="transactionOverview.thisYear && transactionOverview.thisYear.valid ? getDisplayExpenseAmount(transactionOverview.thisYear) : ''"
                         :income-amount="transactionOverview.thisYear && transactionOverview.thisYear.valid ? getDisplayIncomeAmount(transactionOverview.thisYear) : ''"
                         :datetime="displayDateRange?.thisYear?.displayTime || ''"
                     >
                         <template #menus>
-                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transaction/list?dateType=' + DateRange.ThisYear.type">
+                            <v-list-item :prepend-icon="mdiListBoxOutline" :to="'/transaction/list?dateType=' + DateRange.ThisYear.type">
                                 <v-list-item-title>{{ tt('View Details') }}</v-list-item-title>
                             </v-list-item>
                         </template>
@@ -217,8 +217,7 @@ import {
     mdiCalendarWeekOutline,
     mdiCalendarMonthOutline,
     mdiLayersTripleOutline,
-    mdiListBoxOutline,
-    mdiDotsVertical
+    mdiListBoxOutline
 } from '@mdi/js';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
@@ -241,21 +240,6 @@ const {
 
 const accountsStore = useAccountsStore();
 const overviewStore = useOverviewStore();
-
-const icons = {
-    refresh: mdiRefresh,
-    eye: mdiEyeOutline,
-    eyeSlash: mdiEyeOffOutline,
-    totalAssets: mdiBankOutline,
-    totalLiabilities: mdiCreditCardOutline,
-    netAssets: mdiPiggyBankOutline,
-    calendarToday: mdiCalendarTodayOutline,
-    calendarWeek: mdiCalendarWeekOutline,
-    calendarMonth: mdiCalendarMonthOutline,
-    calendarYear: mdiLayersTripleOutline,
-    viewDetails: mdiListBoxOutline,
-    more: mdiDotsVertical
-};
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 

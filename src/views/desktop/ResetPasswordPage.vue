@@ -77,7 +77,7 @@
                                     <v-col cols="12">
                                         <router-link class="d-flex align-center justify-center" to="/login"
                                                      :class="{ 'disabled': updating }">
-                                            <v-icon :icon="icons.left"/>
+                                            <v-icon :icon="mdiChevronLeft"/>
                                             <span>{{ tt('Back to login page') }}</span>
                                         </router-link>
                                     </v-col>
@@ -167,10 +167,6 @@ const { tt, getCurrentLanguageDisplayName, getAllLanguageOptions, setLanguage } 
 
 const rootStore = useRootStore();
 const settingsStore = useSettingsStore();
-
-const icons = {
-    left: mdiChevronLeft
-};
 
 const version = `v${getVersion()}`;
 

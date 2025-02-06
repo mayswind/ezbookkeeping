@@ -10,7 +10,7 @@
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
-                            <v-icon :icon="icons.refresh" size="24" />
+                            <v-icon :icon="mdiRefresh" size="24" />
                             <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                         </v-btn>
                     </div>
@@ -22,43 +22,43 @@
                             {
                                 title: 'Transactions',
                                 count: displayDataStatistics ? displayDataStatistics.totalTransactionCount : '-',
-                                icon: icons.transactions,
+                                icon: mdiListBoxOutline,
                                 color: 'info-darken-1'
                             },
                             {
                                 title: 'Accounts',
                                 count: displayDataStatistics ? displayDataStatistics.totalAccountCount : '-',
-                                icon: icons.accounts,
+                                icon: mdiCreditCardOutline,
                                 color: 'primary'
                             },
                             {
                                 title: 'Transaction Categories',
                                 count: displayDataStatistics ? displayDataStatistics.totalTransactionCategoryCount : '-',
-                                icon: icons.categories,
+                                icon: mdiViewDashboardOutline,
                                 color: 'teal'
                             },
                             {
                                 title: 'Transaction Tags',
                                 count: displayDataStatistics ? displayDataStatistics.totalTransactionTagCount : '-',
-                                icon: icons.tags,
+                                icon: mdiTagOutline,
                                 color: 'secondary'
                             },
                             {
                                 title: 'Transaction Pictures',
                                 count: displayDataStatistics ? displayDataStatistics.totalTransactionPictureCount : '-',
-                                icon: icons.pictures,
+                                icon: mdiImage,
                                 color: 'error-darken-1'
                             },
                             {
                                 title: 'Transaction Templates',
                                 count: displayDataStatistics ? displayDataStatistics.totalTransactionTemplateCount : '-',
-                                icon: icons.templates,
+                                icon: mdiClipboardTextOutline,
                                 color: 'secondary-darken-1'
                             },
                             {
                                 title: 'Scheduled Transactions',
                                 count: displayDataStatistics ? displayDataStatistics.totalScheduledTransactionCount : '-',
-                                icon: icons.scheduledTransactions,
+                                icon: mdiClipboardTextClockOutline,
                                 color: 'success-darken-1'
                             }
                         ]">
@@ -117,7 +117,7 @@
                 <v-form>
                     <v-card-text class="py-0">
                     <span class="text-body-1 text-error">
-                        <v-icon :icon="icons.alert"/>
+                        <v-icon :icon="mdiAlert"/>
                         {{ tt('You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.') }}
                     </span>
                     </v-card-text>
@@ -191,18 +191,6 @@ const { dataStatistics, displayDataStatistics, getExportFileName } = useDataMana
 
 const rootStore = useRootStore();
 const userStore = useUserStore();
-
-const icons = {
-    refresh: mdiRefresh,
-    transactions: mdiListBoxOutline,
-    accounts: mdiCreditCardOutline,
-    categories: mdiViewDashboardOutline,
-    tags: mdiTagOutline,
-    pictures: mdiImage,
-    templates: mdiClipboardTextOutline,
-    scheduledTransactions: mdiClipboardTextClockOutline,
-    alert: mdiAlert
-};
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');

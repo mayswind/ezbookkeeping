@@ -2,15 +2,15 @@
     <div>
         <v-tabs show-arrows v-model="activeTab">
             <v-tab value="basicSetting" @click="pushRouter('basicSetting')">
-                <v-icon size="20" start :icon="icons.basicSetting"/>
+                <v-icon size="20" start :icon="mdiCogOutline"/>
                 {{ tt('Basic') }}
             </v-tab>
             <v-tab value="applicationLockSetting" @click="pushRouter('applicationLockSetting')">
-                <v-icon size="20" start :icon="icons.applicationLockSetting"/>
+                <v-icon size="20" start :icon="mdiLockOpenOutline"/>
                 {{ tt('Application Lock') }}
             </v-tab>
             <v-tab value="statisticsSetting" @click="pushRouter('statisticsSetting')">
-                <v-icon size="20" start :icon="icons.statisticsSetting"/>
+                <v-icon size="20" start :icon="mdiChartPieOutline"/>
                 {{ tt('Statistics') }}
             </v-tab>
         </v-tabs>
@@ -60,12 +60,6 @@ const ALL_TABS: string[] = [
     'applicationLockSetting',
     'statisticsSetting'
 ];
-
-const icons = {
-    basicSetting: mdiCogOutline,
-    applicationLockSetting: mdiLockOpenOutline,
-    statisticsSetting: mdiChartPieOutline
-};
 
 const activeTab = ref<string>((() => {
     let queryActiveTab = props.initTab || 'basicSetting';

@@ -17,7 +17,7 @@
             >
                 <li class="nav-link home-link">
                     <router-link to="/">
-                        <v-icon class="nav-item-icon" :icon="icons.overview"/>
+                        <v-icon class="nav-item-icon" :icon="mdiHomeOutline"/>
                         <span class="nav-item-title">{{ tt('Overview') }}</span>
                     </router-link>
                 </li>
@@ -28,13 +28,13 @@
                 </li>
                 <li class="nav-link">
                     <router-link to="/transaction/list?dateType=7">
-                        <v-icon class="nav-item-icon" :icon="icons.transactions"/>
+                        <v-icon class="nav-item-icon" :icon="mdiListBoxOutline"/>
                         <span class="nav-item-title">{{ tt('Transaction Details') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-link">
                     <router-link to="/statistics/transaction">
-                        <v-icon class="nav-item-icon" :icon="icons.statistics"/>
+                        <v-icon class="nav-item-icon" :icon="mdiChartPieOutline"/>
                         <span class="nav-item-title">{{ tt('Statistics & Analysis') }}</span>
                     </router-link>
                 </li>
@@ -45,31 +45,31 @@
                 </li>
                 <li class="nav-link">
                     <router-link to="/account/list">
-                        <v-icon class="nav-item-icon" :icon="icons.accounts"/>
+                        <v-icon class="nav-item-icon" :icon="mdiCreditCardOutline"/>
                         <span class="nav-item-title">{{ tt('Accounts') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-link">
                     <router-link to="/category/list">
-                        <v-icon class="nav-item-icon" :icon="icons.categories"/>
+                        <v-icon class="nav-item-icon" :icon="mdiViewDashboardOutline"/>
                         <span class="nav-item-title">{{ tt('Transaction Categories') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-link">
                     <router-link to="/tag/list">
-                        <v-icon class="nav-item-icon" :icon="icons.tags"/>
+                        <v-icon class="nav-item-icon" :icon="mdiTagOutline"/>
                         <span class="nav-item-title">{{ tt('Transaction Tags') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-link">
                     <router-link to="/template/list">
-                        <v-icon class="nav-item-icon" :icon="icons.templates"/>
+                        <v-icon class="nav-item-icon" :icon="mdiClipboardTextOutline"/>
                         <span class="nav-item-title">{{ tt('Transaction Templates') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-link" v-if="isUserScheduledTransactionEnabled()">
                     <router-link to="/schedule/list">
-                        <v-icon class="nav-item-icon" :icon="icons.scheduledTransactions"/>
+                        <v-icon class="nav-item-icon" :icon="mdiClipboardTextClockOutline"/>
                         <span class="nav-item-title">{{ tt('Scheduled Transactions') }}</span>
                     </router-link>
                 </li>
@@ -80,19 +80,19 @@
                 </li>
                 <li class="nav-link">
                     <router-link to="/exchange_rates">
-                        <v-icon class="nav-item-icon" :icon="icons.exchangeRates"/>
+                        <v-icon class="nav-item-icon" :icon="mdiSwapHorizontal"/>
                         <span class="nav-item-title">{{ tt('Exchange Rates Data') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-link">
                     <a href="javascript:void(0);" @click="showMobileQrCode = true">
-                        <v-icon class="nav-item-icon" :icon="icons.mobile"/>
+                        <v-icon class="nav-item-icon" :icon="mdiCellphone"/>
                         <span class="nav-item-title">{{ tt('Use on Mobile Device') }}</span>
                     </a>
                 </li>
                 <li class="nav-link">
                     <router-link to="/about">
-                        <v-icon class="nav-item-icon" :icon="icons.about"/>
+                        <v-icon class="nav-item-icon" :icon="mdiInformationOutline"/>
                         <span class="nav-item-title">{{ tt('About') }}</span>
                     </router-link>
                 </li>
@@ -105,7 +105,7 @@
                     <div class="d-flex h-100 align-center">
                         <v-btn class="ms-n3 mr-2 d-lg-none" color="default" variant="text"
                                :icon="true" @click="showVerticalOverlayMenu = true">
-                            <v-icon :icon="icons.menu" size="24" />
+                            <v-icon :icon="mdiMenu" size="24" />
                         </v-btn>
                         <div class="app-logo d-flex align-center gap-x-3 app-title-wrapper" v-if="mdAndDown">
                             <div class="d-flex">
@@ -116,18 +116,18 @@
                         <v-spacer />
                         <v-btn color="primary" variant="text" class="me-2"
                                :icon="true" @click="(currentTheme === 'light' ? currentTheme = 'dark' : (currentTheme === 'dark' ? currentTheme = 'auto' : currentTheme = 'light'))">
-                            <v-icon :icon="(currentTheme === 'light' ? icons.themeLight : (currentTheme === 'dark' ? icons.themeDark : icons.themeAuto))" size="24" />
+                            <v-icon :icon="(currentTheme === 'light' ? mdiWeatherSunny : (currentTheme === 'dark' ? mdiWeatherNight : mdiThemeLightDark))" size="24" />
                         </v-btn>
                         <v-avatar class="cursor-pointer" variant="tonal"
                                   :color="currentUserAvatar ? 'rgba(0,0,0,0)' : 'primary'">
                             <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
                                 <template #placeholder>
                                     <div class="d-flex align-center justify-center fill-height bg-light-primary">
-                                        <v-icon color="primary" :icon="icons.user"/>
+                                        <v-icon color="primary" :icon="mdiAccount"/>
                                     </div>
                                 </template>
                             </v-img>
-                            <v-icon :icon="icons.user" v-else-if="!currentUserAvatar"/>
+                            <v-icon :icon="mdiAccount" v-else-if="!currentUserAvatar"/>
                             <v-menu activator="parent" width="230" location="bottom end" offset="14px">
                                 <v-list>
                                     <v-list-item>
@@ -138,11 +138,11 @@
                                                     <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
                                                         <template #placeholder>
                                                             <div class="d-flex align-center justify-center fill-height bg-light-primary">
-                                                                <v-icon color="primary" :icon="icons.user"/>
+                                                                <v-icon color="primary" :icon="mdiAccount"/>
                                                             </div>
                                                         </template>
                                                     </v-img>
-                                                    <v-icon :icon="icons.user" v-else-if="!currentUserAvatar"/>
+                                                    <v-icon :icon="mdiAccount" v-else-if="!currentUserAvatar"/>
                                                 </v-avatar>
                                             </v-list-item-action>
                                         </template>
@@ -151,19 +151,19 @@
                                         </v-list-item-title>
                                     </v-list-item>
                                     <v-divider class="my-2"/>
-                                    <v-list-item :prepend-icon="icons.profile"
+                                    <v-list-item :prepend-icon="mdiAccountCogOutline"
                                                  :title="tt('User Settings')"
                                                  to="/user/settings"></v-list-item>
-                                    <v-list-item :prepend-icon="icons.settings"
+                                    <v-list-item :prepend-icon="mdiCogOutline"
                                                  :title="tt('Application Settings')"
                                                  to="/app/settings"></v-list-item>
                                     <v-divider class="my-2"/>
-                                    <v-list-item :prepend-icon="icons.lock"
+                                    <v-list-item :prepend-icon="mdiLockOutline"
                                                  :title="tt('Lock Application')"
                                                  v-if="isEnableApplicationLock"
                                                  @click="lock"></v-list-item>
                                     <v-list-item :disabled="logouting"
-                                                 :prepend-icon="icons.logout"
+                                                 :prepend-icon="mdiLogout"
                                                  :title="tt('Log Out')"
                                                  @click="logout"></v-list-item>
                                 </v-list>
@@ -245,29 +245,6 @@ const { tt, initLocale } = useI18n();
 const rootStore = useRootStore();
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
-
-const icons = {
-    menu: mdiMenu,
-    overview: mdiHomeOutline,
-    transactions: mdiListBoxOutline,
-    accounts: mdiCreditCardOutline,
-    categories: mdiViewDashboardOutline,
-    tags: mdiTagOutline,
-    templates: mdiClipboardTextOutline,
-    scheduledTransactions: mdiClipboardTextClockOutline,
-    statistics: mdiChartPieOutline,
-    exchangeRates: mdiSwapHorizontal,
-    settings: mdiCogOutline,
-    mobile: mdiCellphone,
-    about: mdiInformationOutline,
-    themeAuto: mdiThemeLightDark,
-    themeLight: mdiWeatherSunny,
-    themeDark: mdiWeatherNight,
-    user: mdiAccount,
-    profile: mdiAccountCogOutline,
-    lock: mdiLockOutline,
-    logout: mdiLogout
-};
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 

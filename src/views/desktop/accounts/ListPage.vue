@@ -52,7 +52,7 @@
                                         <div class="title-and-toolbar d-flex align-center">
                                             <v-btn class="mr-3 d-md-none" density="compact" color="default" variant="plain"
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
-                                                <v-icon :icon="icons.menu" size="24" />
+                                                <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
                                             <span>{{ tt('Account List') }}</span>
                                             <v-btn class="ml-3" color="default" variant="outlined"
@@ -65,19 +65,19 @@
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
                                                 </template>
-                                                <v-icon :icon="icons.refresh" size="24" />
+                                                <v-icon :icon="mdiRefresh" size="24" />
                                                 <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                                             </v-btn>
                                             <v-spacer/>
                                             <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                                                    :disabled="loading" :icon="true">
-                                                <v-icon :icon="icons.more" />
+                                                <v-icon :icon="mdiDotsVertical" />
                                                 <v-menu activator="parent">
                                                     <v-list>
-                                                        <v-list-item :prepend-icon="icons.show"
+                                                        <v-list-item :prepend-icon="mdiEyeOutline"
                                                                      :title="tt('Show Hidden Accounts')"
                                                                      v-if="!showHidden" @click="showHidden = true"></v-list-item>
-                                                        <v-list-item :prepend-icon="icons.hide"
+                                                        <v-list-item :prepend-icon="mdiEyeOffOutline"
                                                                      :title="tt('Hide Hidden Accounts')"
                                                                      v-if="showHidden" @click="showHidden = false"></v-list-item>
                                                     </v-list>
@@ -93,7 +93,7 @@
                                         <v-btn class="ml-2" density="compact" color="default" variant="text"
                                                :icon="true" :disabled="loading"
                                                @click="showAccountBalance = !showAccountBalance">
-                                            <v-icon :icon="showAccountBalance ? icons.eyeSlash : icons.eye" size="20" />
+                                            <v-icon :icon="showAccountBalance ? mdiEyeOffOutline : mdiEyeOutline" size="20" />
                                             <v-tooltip activator="parent">{{ showAccountBalance ? tt('Hide Account Balance') : tt('Show Account Balance') }}</v-tooltip>
                                         </v-btn>
                                     </v-card-text>
@@ -103,14 +103,14 @@
                                             <v-card border class="card-title-with-bg account-card mb-8 h-auto">
                                                 <template #title>
                                                     <div class="account-title d-flex align-center">
-                                                        <v-icon class="disabled mr-0" size="28px" :icon="icons.square" />
+                                                        <v-icon class="disabled mr-0" size="28px" :icon="mdiSquareRounded" />
                                                         <span class="account-name text-truncate ml-2">
                                                             <v-skeleton-loader class="skeleton-no-margin my-1"
                                                                                width="120px" type="text" :loading="true"></v-skeleton-loader>
                                                         </span>
                                                         <v-spacer/>
                                                         <span class="align-self-center">
-                                                            <v-icon class="disabled" :icon="icons.drag"/>
+                                                            <v-icon class="disabled" :icon="mdiDrag"/>
                                                         </span>
                                                     </div>
                                                 </template>
@@ -118,7 +118,7 @@
                                                 <v-card-text>
                                                     <div class="d-flex account-toolbar align-center">
                                                         <v-btn class="px-2" density="comfortable" color="default" variant="text"
-                                                               :disabled="true" :prepend-icon="icons.transactions">
+                                                               :disabled="true" :prepend-icon="mdiListBoxOutline">
                                                             {{ tt('Transaction List') }}
                                                         </v-btn>
                                                         <v-spacer/>
@@ -164,7 +164,7 @@
                                                                     <v-spacer/>
                                                                     <span class="align-self-center">
                                                                         <v-icon :class="!loading && activeAccountCategoryVisibleAccountCount > 1 ? 'drag-handle' : 'disabled'"
-                                                                                :icon="icons.drag"/>
+                                                                                :icon="mdiDrag"/>
                                                                         <v-tooltip activator="parent" v-if="!loading && activeAccountCategoryVisibleAccountCount > 1">{{ tt('Drag to Reorder') }}</v-tooltip>
                                                                     </span>
                                                                 </div>
@@ -203,28 +203,28 @@
                                                             <v-card-text>
                                                                 <div class="d-flex account-toolbar align-center">
                                                                     <v-btn class="px-2" density="comfortable" color="default" variant="text"
-                                                                           :disabled="loading" :prepend-icon="icons.transactions"
+                                                                           :disabled="loading" :prepend-icon="mdiListBoxOutline"
                                                                            :to="`/transaction/list?accountIds=${accountOrSubAccountId(element)}`">
                                                                         {{ tt('Transaction List') }}
                                                                     </v-btn>
                                                                     <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading"
-                                                                           :prepend-icon="element.hidden ? icons.show : icons.hide"
+                                                                           :prepend-icon="element.hidden ? mdiEyeOutline : mdiEyeOffOutline"
                                                                            v-if="!activeSubAccount[element.id]"
                                                                            @click="hide(element, !element.hidden)">
                                                                         {{ element.hidden ? tt('Show') : tt('Hide') }}
                                                                     </v-btn>
                                                                     <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
-                                                                           :disabled="loading" :prepend-icon="icons.edit"
+                                                                           :disabled="loading" :prepend-icon="mdiPencilOutline"
                                                                            v-if="!activeSubAccount[element.id]"
                                                                            @click="edit(element)">
                                                                         {{ tt('Edit') }}
                                                                     </v-btn>
                                                                     <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
-                                                                           :disabled="loading" :prepend-icon="icons.remove"
+                                                                           :disabled="loading" :prepend-icon="mdiDeleteOutline"
                                                                            v-if="!activeSubAccount[element.id]"
                                                                            @click="remove(element)">
                                                                         {{ tt('Delete') }}
@@ -308,21 +308,6 @@ const {
 } = useAccountListPageBaseBase();
 
 const accountsStore = useAccountsStore();
-
-const icons = {
-    eye: mdiEyeOutline,
-    eyeSlash: mdiEyeOffOutline,
-    refresh: mdiRefresh,
-    square: mdiSquareRounded,
-    menu: mdiMenu,
-    edit: mdiPencilOutline,
-    show: mdiEyeOutline,
-    hide: mdiEyeOffOutline,
-    remove: mdiDeleteOutline,
-    transactions: mdiListBoxOutline,
-    drag: mdiDrag,
-    more: mdiDotsVertical
-};
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');

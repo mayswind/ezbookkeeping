@@ -24,7 +24,7 @@
                         <div class="cursor-pointer" @click="icon = iconInfo.id">
                             <ItemIcon class="ma-2" icon-type="fixed" :icon-id="iconInfo.icon" :color="color" v-if="!modelValue || modelValue !== iconInfo.id" />
                             <v-badge class="right-bottom-icon" color="primary"
-                                     location="bottom right" offset-x="8" offset-y="10" :icon="icons.checked"
+                                     location="bottom right" offset-x="8" offset-y="10" :icon="mdiCheck"
                                      v-if="modelValue && modelValue === iconInfo.id">
                                 <ItemIcon class="ma-2" icon-type="fixed" :icon-id="iconInfo.icon" :color="color" />
                             </v-badge>
@@ -62,10 +62,6 @@ const props = defineProps<{
 const emit = defineEmits<{
     (e: 'update:modelValue', value: string): void;
 }>();
-
-const icons = {
-    checked: mdiCheck
-};
 
 const dropdownMenu = useTemplateRef<HTMLElement>('dropdownMenu');
 const itemPerRow = ref<number>(props.columnCount || 7);

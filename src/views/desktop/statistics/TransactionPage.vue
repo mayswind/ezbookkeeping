@@ -53,11 +53,11 @@
                                         <div class="title-and-toolbar d-flex align-center">
                                             <v-btn class="mr-3 d-md-none" density="compact" color="default" variant="plain"
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
-                                                <v-icon :icon="icons.menu" size="24" />
+                                                <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
                                             <span>{{ tt('Statistics & Analysis') }}</span>
                                             <v-btn-group class="ml-4" color="default" density="comfortable" variant="outlined" divided>
-                                                <v-btn :icon="icons.left"
+                                                <v-btn :icon="mdiArrowLeft"
                                                        :disabled="loading || !canShiftDateRange"
                                                        @click="shiftDateRange(-1)"/>
                                                 <v-menu location="bottom">
@@ -67,7 +67,7 @@
                                                     </template>
                                                     <v-list :selected="[queryDateType]">
                                                         <v-list-item :key="dateRange.type" :value="dateRange.type"
-                                                                     :append-icon="(queryDateType === dateRange.type ? icons.check : undefined)"
+                                                                     :append-icon="(queryDateType === dateRange.type ? mdiCheck : undefined)"
                                                                      v-for="dateRange in allDateRanges">
                                                             <v-list-item-title
                                                                 class="cursor-pointer"
@@ -83,7 +83,7 @@
                                                         </v-list-item>
                                                     </v-list>
                                                 </v-menu>
-                                                <v-btn :icon="icons.right"
+                                                <v-btn :icon="mdiArrowRight"
                                                        :disabled="loading || !canShiftDateRange"
                                                        @click="shiftDateRange(1)"/>
                                             </v-btn-group>
@@ -91,12 +91,12 @@
                                             <v-menu location="bottom" v-if="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis">
                                                 <template #activator="{ props }">
                                                     <v-btn class="ml-3" color="default" variant="outlined"
-                                                           :prepend-icon="icons.dateAggregation" :disabled="loading"
+                                                           :prepend-icon="mdiCalendarRangeOutline" :disabled="loading"
                                                            v-bind="props">{{ queryTrendDateAggregationTypeName }}</v-btn>
                                                 </template>
                                                 <v-list>
                                                     <v-list-item class="cursor-pointer" :key="aggregationType.type" :value="aggregationType.type"
-                                                                 :append-icon="(trendDateAggregationType === aggregationType.type ? icons.check : undefined)"
+                                                                 :append-icon="(trendDateAggregationType === aggregationType.type ? mdiCheck : undefined)"
                                                                  :title="aggregationType.displayName"
                                                                  v-for="aggregationType in allDateAggregationTypes"
                                                                  @click="setTrendDateAggregationType(aggregationType.type)">
@@ -109,27 +109,27 @@
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
                                                 </template>
-                                                <v-icon :icon="icons.refresh" size="24" />
+                                                <v-icon :icon="mdiRefresh" size="24" />
                                                 <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                                             </v-btn>
                                             <v-spacer/>
                                             <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                                                    :disabled="loading" :icon="true">
-                                                <v-icon :icon="icons.more" />
+                                                <v-icon :icon="mdiDotsVertical" />
                                                 <v-menu activator="parent">
                                                     <v-list>
-                                                        <v-list-item :prepend-icon="icons.filter"
+                                                        <v-list-item :prepend-icon="mdiFilterOutline"
                                                                      :title="tt('Filter Accounts')"
                                                                      @click="showFilterAccountDialog = true"></v-list-item>
-                                                        <v-list-item :prepend-icon="icons.filter"
+                                                        <v-list-item :prepend-icon="mdiFilterOutline"
                                                                      :title="tt('Filter Transaction Categories')"
                                                                      @click="showFilterCategoryDialog = true"></v-list-item>
-                                                        <v-list-item :prepend-icon="icons.filter"
+                                                        <v-list-item :prepend-icon="mdiFilterOutline"
                                                                      :title="tt('Filter Transaction Tags')"
                                                                      @click="showFilterTagDialog = true"></v-list-item>
                                                         <v-divider class="my-2"/>
                                                         <v-list-item to="/app/settings?tab=statisticsSetting"
-                                                                     :prepend-icon="icons.filterSettings"
+                                                                     :prepend-icon="mdiFilterCogOutline"
                                                                      :title="tt('Settings')"></v-list-item>
                                                     </v-list>
                                                 </v-menu>
@@ -192,7 +192,7 @@
                                                 <v-list-item class="pl-0">
                                                     <template #prepend>
                                                         <div>
-                                                            <v-icon class="disabled mr-0" size="34" :icon="icons.square" />
+                                                            <v-icon class="disabled mr-0" size="34" :icon="mdiSquareRounded" />
                                                         </div>
                                                     </template>
                                                     <div class="d-flex flex-column ml-2">
@@ -374,7 +374,6 @@ import {
     mdiMenu,
     mdiFilterOutline,
     mdiFilterCogOutline,
-    mdiPencilOutline,
     mdiDotsVertical
 } from '@mdi/js';
 
@@ -432,20 +431,6 @@ const {
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const statisticsStore = useStatisticsStore();
-
-const icons = {
-    check: mdiCheck,
-    left: mdiArrowLeft,
-    right: mdiArrowRight,
-    dateAggregation: mdiCalendarRangeOutline,
-    refresh: mdiRefresh,
-    square: mdiSquareRounded,
-    menu: mdiMenu,
-    filter: mdiFilterOutline,
-    filterSettings: mdiFilterCogOutline,
-    pencil: mdiPencilOutline,
-    more: mdiDotsVertical
-};
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 

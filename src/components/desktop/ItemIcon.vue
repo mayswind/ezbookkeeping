@@ -3,7 +3,7 @@
         <slot></slot>
     </i>
     <v-badge class="right-bottom-icon" color="secondary"
-             location="bottom right" offset-y="4" :icon="icons.hide"
+             location="bottom right" offset-y="4" :icon="mdiEyeOffOutline"
              v-if="hiddenStatus">
         <i class="item-icon" :class="classes" :style="style">
             <slot></slot>
@@ -26,10 +26,6 @@ interface DesktopItemIconProps extends CommonIconProps {
 
 const props = defineProps<DesktopItemIconProps>();
 const { style, getAccountIcon, getCategoryIcon } = useItemIconBase(props);
-
-const icons = {
-    hide: mdiEyeOffOutline
-};
 
 const classes = computed<string>(() => {
     let allClasses = props.class ? (props.class + ' ') : '';

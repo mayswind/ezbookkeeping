@@ -2,19 +2,19 @@
     <div>
         <v-tabs show-arrows v-model="activeTab">
             <v-tab value="basicSetting" @click="pushRouter('basicSetting')">
-                <v-icon size="20" start :icon="icons.basicSetting"/>
+                <v-icon size="20" start :icon="mdiAccountOutline"/>
                 {{ tt('Basic') }}
             </v-tab>
             <v-tab value="securitySetting" @click="pushRouter('securitySetting')">
-                <v-icon size="20" start :icon="icons.securitySetting"/>
+                <v-icon size="20" start :icon="mdiLockOpenOutline"/>
                 {{ tt('Security') }}
             </v-tab>
             <v-tab value="twoFactorSetting" @click="pushRouter('twoFactorSetting')">
-                <v-icon size="20" start :icon="icons.twoFactorSetting"/>
+                <v-icon size="20" start :icon="mdiOnepassword"/>
                 {{ tt('Two-Factor Authentication') }}
             </v-tab>
             <v-tab value="dataManagementSetting" @click="pushRouter('dataManagementSetting')">
-                <v-icon size="20" start :icon="icons.dataManagementSetting"/>
+                <v-icon size="20" start :icon="mdiDatabaseCogOutline"/>
                 {{ tt('Data Management') }}
             </v-tab>
         </v-tabs>
@@ -73,13 +73,6 @@ const ALL_TABS: string[] = [
     'twoFactorSetting',
     'dataManagementSetting'
 ];
-
-const icons = {
-    basicSetting: mdiAccountOutline,
-    securitySetting: mdiLockOpenOutline,
-    twoFactorSetting: mdiOnepassword,
-    dataManagementSetting: mdiDatabaseCogOutline
-};
 
 const twoFactorSettingTab = useTemplateRef<TwoFactorSettingTabType>('twoFactorSettingTab');
 

@@ -11,7 +11,7 @@
     >
         <template #selection="{ item }">
             <v-label class="cursor-pointer" style="padding-top: 3px">
-                <v-icon size="28" :icon="icons.square" :color="getFinalColor(item.raw)"/>
+                <v-icon size="28" :icon="mdiSquareRounded" :color="getFinalColor(item.raw)"/>
             </v-label>
         </template>
 
@@ -23,12 +23,12 @@
                     <div class="text-center" :key="colorInfo.color" v-for="colorInfo in row">
                         <div class="cursor-pointer" @click="color = colorInfo.color">
                             <v-icon class="ma-2" size="28"
-                                    :icon="icons.square" :color="getFinalColor(colorInfo.color)"
+                                    :icon="mdiSquareRounded" :color="getFinalColor(colorInfo.color)"
                                     v-if="!modelValue || modelValue !== colorInfo.color" />
                             <v-badge class="right-bottom-icon" color="primary"
-                                     location="bottom right" offset-x="8" offset-y="8" :icon="icons.checked"
+                                     location="bottom right" offset-x="8" offset-y="8" :icon="mdiCheck"
                                      v-if="modelValue && modelValue === colorInfo.color">
-                                <v-icon class="ma-2" size="28" :icon="icons.square" :color="getFinalColor(colorInfo.color)" />
+                                <v-icon class="ma-2" size="28" :icon="mdiSquareRounded" :color="getFinalColor(colorInfo.color)" />
                             </v-badge>
                         </div>
                     </div>
@@ -63,11 +63,6 @@ const props = defineProps<{
 const emit = defineEmits<{
     (e: 'update:modelValue', value: ColorValue): void;
 }>();
-
-const icons = {
-    square: mdiSquareRounded,
-    checked: mdiCheck
-};
 
 const dropdownMenu = useTemplateRef<HTMLElement>('dropdownMenu');
 const itemPerRow = ref<number>(props.columnCount || 7);

@@ -10,87 +10,87 @@
                     <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                            :icon="true" :disabled="loading || submitting"
                            v-if="currentStep === 'checkData'">
-                        <v-icon :icon="icons.filter" />
+                        <v-icon :icon="mdiFilterOutline" />
                         <v-menu activator="parent" max-height="500">
                             <v-list>
                                 <v-list-subheader :title="tt('Date Range')"/>
                                 <v-list-item :title="tt('All')"
-                                             :append-icon="filters.minDatetime === null || filters.maxDatetime === null ? icons.checked : undefined"
+                                             :append-icon="filters.minDatetime === null || filters.maxDatetime === null ? mdiCheck : undefined"
                                              @click="filters.minDatetime = filters.maxDatetime = null"></v-list-item>
                                 <v-list-item :title="tt('Custom')"
                                              :subtitle="displayFilterCustomDateRange"
-                                             :append-icon="filters.minDatetime !== null && filters.maxDatetime !== null ? icons.checked : undefined"
+                                             :append-icon="filters.minDatetime !== null && filters.maxDatetime !== null ? mdiCheck : undefined"
                                              @click="showCustomDateRangeDialog = true"></v-list-item>
                                 <v-divider class="my-2"/>
                                 <v-list-subheader :title="tt('Type')"/>
                                 <v-list-item :title="tt('All')"
-                                             :append-icon="filters.transactionType === null ? icons.checked : undefined"
+                                             :append-icon="filters.transactionType === null ? mdiCheck : undefined"
                                              @click="filters.transactionType = null"></v-list-item>
                                 <v-list-item :title="tt('Income')"
-                                             :append-icon="filters.transactionType === TransactionType.Income ? icons.checked : undefined"
+                                             :append-icon="filters.transactionType === TransactionType.Income ? mdiCheck : undefined"
                                              @click="filters.transactionType = TransactionType.Income"></v-list-item>
                                 <v-list-item :title="tt('Expense')"
-                                             :append-icon="filters.transactionType === TransactionType.Expense ? icons.checked : undefined"
+                                             :append-icon="filters.transactionType === TransactionType.Expense ? mdiCheck : undefined"
                                              @click="filters.transactionType = TransactionType.Expense"></v-list-item>
                                 <v-list-item :title="tt('Transfer')"
-                                             :append-icon="filters.transactionType === TransactionType.Transfer ? icons.checked : undefined"
+                                             :append-icon="filters.transactionType === TransactionType.Transfer ? mdiCheck : undefined"
                                              @click="filters.transactionType = TransactionType.Transfer"></v-list-item>
                                 <v-divider class="my-2"/>
                                 <v-list-subheader :title="tt('Category')"/>
                                 <v-list-item :title="tt('All')"
-                                             :append-icon="filters.category === null ? icons.checked : undefined"
+                                             :append-icon="filters.category === null ? mdiCheck : undefined"
                                              @click="filters.category = null"></v-list-item>
                                 <v-list-item :title="tt('Invalid Category')"
-                                             :append-icon="filters.category === undefined ? icons.checked : undefined"
+                                             :append-icon="filters.category === undefined ? mdiCheck : undefined"
                                              @click="filters.category = undefined"></v-list-item>
                                 <v-list-item :title="tt('None')"
-                                             :append-icon="filters.category === '' ? icons.checked : undefined"
+                                             :append-icon="filters.category === '' ? mdiCheck : undefined"
                                              @click="filters.category = ''"></v-list-item>
                                 <v-list-item :title="name" :key="name"
-                                             :append-icon="filters.category === name ? icons.checked : undefined"
+                                             :append-icon="filters.category === name ? mdiCheck : undefined"
                                              v-for="name in allUsedCategoryNames"
                                              @click="filters.category = name"></v-list-item>
                                 <v-divider class="my-2"/>
                                 <v-list-subheader :title="tt('Account')"/>
                                 <v-list-item :title="tt('All')"
-                                             :append-icon="filters.account === null ? icons.checked : undefined"
+                                             :append-icon="filters.account === null ? mdiCheck : undefined"
                                              @click="filters.account = null"></v-list-item>
                                 <v-list-item :title="tt('Invalid Account')"
-                                             :append-icon="filters.account === undefined ? icons.checked : undefined"
+                                             :append-icon="filters.account === undefined ? mdiCheck : undefined"
                                              @click="filters.account = undefined"></v-list-item>
                                 <v-list-item :title="tt('None')"
-                                             :append-icon="filters.account === '' ? icons.checked : undefined"
+                                             :append-icon="filters.account === '' ? mdiCheck : undefined"
                                              @click="filters.account = ''"></v-list-item>
                                 <v-list-item :title="name" :key="name"
-                                             :append-icon="filters.account === name ? icons.checked : undefined"
+                                             :append-icon="filters.account === name ? mdiCheck : undefined"
                                              v-for="name in allUsedAccountNames"
                                              @click="filters.account = name"></v-list-item>
                                 <v-divider class="my-2"/>
                                 <v-list-subheader :title="tt('Tags')"/>
                                 <v-list-item :title="tt('All')"
-                                             :append-icon="filters.tag === null ? icons.checked : undefined"
+                                             :append-icon="filters.tag === null ? mdiCheck : undefined"
                                              @click="filters.tag = null"></v-list-item>
                                 <v-list-item :title="tt('Invalid Tag')"
-                                             :append-icon="filters.tag === undefined ? icons.checked : undefined"
+                                             :append-icon="filters.tag === undefined ? mdiCheck : undefined"
                                              @click="filters.tag = undefined"></v-list-item>
                                 <v-list-item :title="tt('None')"
-                                             :append-icon="filters.tag === '' ? icons.checked : undefined"
+                                             :append-icon="filters.tag === '' ? mdiCheck : undefined"
                                              @click="filters.tag = ''"></v-list-item>
                                 <v-list-item :title="name" :key="name"
-                                             :append-icon="filters.tag === name ? icons.checked : undefined"
+                                             :append-icon="filters.tag === name ? mdiCheck : undefined"
                                              v-for="name in allUsedTagNames"
                                              @click="filters.tag = name"></v-list-item>
                                 <v-divider class="my-2"/>
                                 <v-list-subheader :title="tt('Description')"/>
                                 <v-list-item :title="tt('All')"
-                                             :append-icon="filters.description === null ? icons.checked : undefined"
+                                             :append-icon="filters.description === null ? mdiCheck : undefined"
                                              @click="filters.description = null"></v-list-item>
                                 <v-list-item :title="tt('None')"
-                                             :append-icon="filters.description === '' ? icons.checked : undefined"
+                                             :append-icon="filters.description === '' ? mdiCheck : undefined"
                                              @click="filters.description = ''"></v-list-item>
                                 <v-list-item :title="tt('Custom')"
                                              :subtitle="filters.description !== null ? filters.description : undefined"
-                                             :append-icon="filters.description !== null && filters.description !== '' ? icons.checked : undefined"
+                                             :append-icon="filters.description !== null && filters.description !== '' ? mdiCheck : undefined"
                                              @click="currentDescriptionFilterValue = filters.description || ''; showCustomDescriptionDialog = true"></v-list-item>
                             </v-list>
                         </v-menu>
@@ -98,47 +98,47 @@
                     <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                            :icon="true" :disabled="loading || submitting"
                            v-if="currentStep === 'checkData'">
-                        <v-icon :icon="icons.more" />
+                        <v-icon :icon="mdiDotsVertical" />
                         <v-menu activator="parent">
                             <v-list>
-                                <v-list-item :prepend-icon="icons.replace"
+                                <v-list-item :prepend-icon="mdiFindReplace"
                                              :disabled="!!editingTransaction || selectedExpenseTransactionCount < 1"
                                              :title="tt('Batch Replace Selected Expense Categories')"
                                              @click="showBatchReplaceDialog('expenseCategory')"></v-list-item>
-                                <v-list-item :prepend-icon="icons.replace"
+                                <v-list-item :prepend-icon="mdiFindReplace"
                                              :disabled="!!editingTransaction || selectedIncomeTransactionCount < 1"
                                              :title="tt('Batch Replace Selected Income Categories')"
                                              @click="showBatchReplaceDialog('incomeCategory')"></v-list-item>
-                                <v-list-item :prepend-icon="icons.replace"
+                                <v-list-item :prepend-icon="mdiFindReplace"
                                              :disabled="!!editingTransaction || selectedTransferTransactionCount < 1"
                                              :title="tt('Batch Replace Selected Transfer Categories')"
                                              @click="showBatchReplaceDialog('transferCategory')"></v-list-item>
-                                <v-list-item :prepend-icon="icons.replace"
+                                <v-list-item :prepend-icon="mdiFindReplace"
                                              :disabled="!!editingTransaction || selectedImportTransactionCount < 1"
                                              :title="tt('Batch Replace Selected Accounts')"
                                              @click="showBatchReplaceDialog('account')"></v-list-item>
-                                <v-list-item :prepend-icon="icons.replace"
+                                <v-list-item :prepend-icon="mdiFindReplace"
                                              :disabled="!!editingTransaction || selectedTransferTransactionCount < 1"
                                              :title="tt('Batch Replace Selected Destination Accounts')"
                                              @click="showBatchReplaceDialog('destinationAccount')"></v-list-item>
                                 <v-divider class="my-2"/>
-                                <v-list-item :prepend-icon="icons.replace"
+                                <v-list-item :prepend-icon="mdiFindReplace"
                                              :disabled="!!editingTransaction || !allInvalidExpenseCategoryNames || allInvalidExpenseCategoryNames.length < 1"
                                              :title="tt('Replace Invalid Expense Categories')"
                                              @click="showReplaceInvalidItemDialog('expenseCategory', allInvalidExpenseCategoryNames)"></v-list-item>
-                                <v-list-item :prepend-icon="icons.replace"
+                                <v-list-item :prepend-icon="mdiFindReplace"
                                              :disabled="!!editingTransaction || !allInvalidIncomeCategoryNames || allInvalidIncomeCategoryNames.length < 1"
                                              :title="tt('Replace Invalid Income Categories')"
                                              @click="showReplaceInvalidItemDialog('incomeCategory', allInvalidIncomeCategoryNames)"></v-list-item>
-                                <v-list-item :prepend-icon="icons.replace"
+                                <v-list-item :prepend-icon="mdiFindReplace"
                                              :disabled="!!editingTransaction || !allInvalidTransferCategoryNames || allInvalidTransferCategoryNames.length < 1"
                                              :title="tt('Replace Invalid Transfer Categories')"
                                              @click="showReplaceInvalidItemDialog('transferCategory', allInvalidTransferCategoryNames)"></v-list-item>
-                                <v-list-item :prepend-icon="icons.replace"
+                                <v-list-item :prepend-icon="mdiFindReplace"
                                              :disabled="!!editingTransaction || !allInvalidAccountNames || allInvalidAccountNames.length < 1"
                                              :title="tt('Replace Invalid Accounts')"
                                              @click="showReplaceInvalidItemDialog('account', allInvalidAccountNames)"></v-list-item>
-                                <v-list-item :prepend-icon="icons.replace"
+                                <v-list-item :prepend-icon="mdiFindReplace"
                                              :disabled="!!editingTransaction || !allInvalidTransactionTagNames || allInvalidTransactionTagNames.length < 1"
                                              :title="tt('Replace Invalid Transaction Tags')"
                                              @click="showReplaceInvalidItemDialog('tag', allInvalidTransactionTagNames)"></v-list-item>
@@ -195,7 +195,7 @@
 
                         <v-col cols="12" md="12" class="mb-0 pb-0" v-if="exportFileGuideDocumentUrl">
                             <a :href="exportFileGuideDocumentUrl" :class="{ 'disabled': submitting }" target="_blank">
-                                <v-icon :icon="icons.document" size="16" />
+                                <v-icon :icon="mdiHelpCircleOutline" size="16" />
                                 <span class="ml-1">{{ tt('How to export this file?') }}</span>
                                 <span class="ml-1" v-if="exportFileGuideDocumentLanguageName">({{ exportFileGuideDocumentLanguageName }})</span>
                             </a>
@@ -229,37 +229,37 @@
                             >
                                 <v-menu activator="parent" location="bottom">
                                     <v-list>
-                                        <v-list-item :prepend-icon="icons.selectAll"
+                                        <v-list-item :prepend-icon="mdiSelectAll"
                                                      :title="tt('Select All Valid Items')"
                                                      :disabled="loading || submitting"
                                                      @click="selectAllValid"></v-list-item>
-                                        <v-list-item :prepend-icon="icons.selectAll"
+                                        <v-list-item :prepend-icon="mdiSelectAll"
                                                      :title="tt('Select All Invalid Items')"
                                                      :disabled="loading || submitting"
                                                      @click="selectAllInvalid"></v-list-item>
                                         <v-divider class="my-2"/>
-                                        <v-list-item :prepend-icon="icons.selectAll"
+                                        <v-list-item :prepend-icon="mdiSelectAll"
                                                      :title="tt('Select All')"
                                                      :disabled="loading || submitting"
                                                      @click="selectAll"></v-list-item>
-                                        <v-list-item :prepend-icon="icons.selectNone"
+                                        <v-list-item :prepend-icon="mdiSelect"
                                                      :title="tt('Select None')"
                                                      :disabled="loading || submitting"
                                                      @click="selectNone"></v-list-item>
-                                        <v-list-item :prepend-icon="icons.selectInverse"
+                                        <v-list-item :prepend-icon="mdiSelectInverse"
                                                      :title="tt('Invert Selection')"
                                                      :disabled="loading || submitting"
                                                      @click="selectInvert"></v-list-item>
                                         <v-divider class="my-2"/>
-                                        <v-list-item :prepend-icon="icons.selectAll"
+                                        <v-list-item :prepend-icon="mdiSelectAll"
                                                      :title="tt('Select All in This Page')"
                                                      :disabled="loading || submitting"
                                                      @click="selectAllInThisPage"></v-list-item>
-                                        <v-list-item :prepend-icon="icons.selectNone"
+                                        <v-list-item :prepend-icon="mdiSelect"
                                                      :title="tt('Select None in This Page')"
                                                      :disabled="loading || submitting"
                                                      @click="selectNoneInThisPage"></v-list-item>
-                                        <v-list-item :prepend-icon="icons.selectInverse"
+                                        <v-list-item :prepend-icon="mdiSelectInverse"
                                                      :title="tt('Invert Selection in This Page')"
                                                      :disabled="loading || submitting"
                                                      @click="selectInvertInThisPage"></v-list-item>
@@ -276,7 +276,7 @@
                         <template #item.valid="{ item }">
                             <v-icon size="small" :class="{ 'text-error': !item.valid }"
                                     :disabled="loading || submitting"
-                                    :icon="editingTransaction === item ? icons.complete : icons.edit"
+                                    :icon="editingTransaction === item ? mdiCheck : mdiPencilOutline"
                                     @click="editTransaction(item)">
                             </v-icon>
                             <v-tooltip activator="parent" v-if="!loading && !submitting">{{ tt('Edit') }}</v-tooltip>
@@ -304,7 +304,7 @@
                                     {{ allCategoriesMap[item.categoryId].name }}
                                 </span>
                                 <div class="text-error font-italic" v-else-if="item.type !== TransactionType.ModifyBalance && (!item.categoryId || item.categoryId === '0' || !allCategoriesMap[item.categoryId])">
-                                    <v-icon class="mr-1" :icon="icons.alert"/>
+                                    <v-icon class="mr-1" :icon="mdiAlertOutline"/>
                                     <span>{{ item.originalCategoryName }}</span>
                                 </div>
                             </div>
@@ -365,20 +365,20 @@
                         </template>
                         <template #item.sourceAmount="{ item }">
                             <span>{{ getTransactionDisplayAmount(item) }}</span>
-                            <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
+                            <v-icon class="mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
                             <span v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId">{{ getTransactionDisplayDestinationAmount(item) }}</span>
                         </template>
                         <template #item.actualSourceAccountName="{ item }">
                             <div class="d-flex align-center" v-if="editingTransaction !== item">
                                 <span v-if="item.sourceAccountId && item.sourceAccountId !== '0' && allAccountsMap[item.sourceAccountId]">{{ allAccountsMap[item.sourceAccountId].name }}</span>
                                 <div class="text-error font-italic" v-else>
-                                    <v-icon class="mr-1" :icon="icons.alert"/>
+                                    <v-icon class="mr-1" :icon="mdiAlertOutline"/>
                                     <span>{{ item.originalSourceAccountName }}</span>
                                 </div>
-                                <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
+                                <v-icon class="mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
                                 <span v-if="item.type === TransactionType.Transfer && item.destinationAccountId && item.destinationAccountId !== '0' && allAccountsMap[item.destinationAccountId]">{{allAccountsMap[item.destinationAccountId].name }}</span>
                                 <div class="text-error font-italic" v-else-if="item.type === TransactionType.Transfer && (!item.destinationAccountId || item.destinationAccountId === '0' || !allAccountsMap[item.destinationAccountId])">
-                                    <v-icon class="mr-1" :icon="icons.alert"/>
+                                    <v-icon class="mr-1" :icon="mdiAlertOutline"/>
                                     <span>{{ item.originalDestinationAccountName }}</span>
                                 </div>
                             </div>
@@ -399,7 +399,7 @@
                                                    :items="allVisibleCategorizedAccounts"
                                                    v-model="item.sourceAccountId">
                                 </two-column-select>
-                                <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
+                                <v-icon class="mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
                                 <two-column-select density="compact" variant="plain"
                                                    primary-key-field="id" primary-value-field="category"
                                                    primary-title-field="name" primary-footer-field="displayBalance"
@@ -427,7 +427,7 @@
                             <div v-if="editingTransaction !== item">
                                 <v-chip class="transaction-tag" size="small"
                                         :class="{ 'font-italic': !tagId || tagId === '0' || !allTagsMap[tagId] }"
-                                        :prepend-icon="tagId && tagId !== '0' && allTagsMap[tagId] ? icons.tag : icons.alert"
+                                        :prepend-icon="tagId && tagId !== '0' && allTagsMap[tagId] ? mdiPound : mdiAlertOutline"
                                         :color="tagId && tagId !== '0' && allTagsMap[tagId] ? 'default' : 'error'"
                                         :text="tagId && tagId !== '0' && allTagsMap[tagId] ? allTagsMap[tagId].name : item.originalTagNames[index]"
                                         :key="tagId"
@@ -454,7 +454,7 @@
                                 >
                                     <template #chip="{ props, index }">
                                         <v-chip :class="{ 'font-italic': !isTagValid(editingTags, index) }"
-                                                :prepend-icon="isTagValid(editingTags, index) ? icons.tag : icons.alert"
+                                                :prepend-icon="isTagValid(editingTags, index) ? mdiPound : mdiAlertOutline"
                                                 :color="isTagValid(editingTags, index) ? 'default' : 'error'"
                                                 :text="isTagValid(editingTags, index) ? allTagsMap[editingTags[index]].name : item.originalTagNames[index]"
                                                 v-bind="props"/>
@@ -465,7 +465,7 @@
                                             <template #title>
                                                 <v-list-item-title>
                                                     <div class="d-flex align-center">
-                                                        <v-icon size="20" start :icon="icons.tag"/>
+                                                        <v-icon size="20" start :icon="mdiPound"/>
                                                         <span>{{ item.title }}</span>
                                                     </div>
                                                 </v-list-item-title>
@@ -545,22 +545,22 @@
 
             <div class="d-flex justify-sm-space-between gap-4 flex-wrap justify-center mt-10">
                 <v-btn color="secondary" variant="tonal" :disabled="loading || submitting"
-                       :prepend-icon="icons.previous" @click="close(false)"
+                       :prepend-icon="mdiClose" @click="close(false)"
                        v-if="currentStep !== 'finalResult'">{{ tt('Cancel') }}</v-btn>
                 <v-btn color="primary" :disabled="loading || submitting || !importFile"
-                       :append-icon="!submitting ? icons.next : undefined" @click="parseData"
+                       :append-icon="!submitting ? mdiArrowRight : undefined" @click="parseData"
                        v-if="currentStep === 'uploadFile'">
                     {{ tt('Next') }}
                     <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
                 <v-btn color="teal" :disabled="submitting || !!editingTransaction || selectedImportTransactionCount < 1 || selectedInvalidTransactionCount > 0"
-                       :append-icon="!submitting ? icons.next : undefined" @click="submit"
+                       :append-icon="!submitting ? mdiArrowRight : undefined" @click="submit"
                        v-if="currentStep === 'checkData'">
                     {{ tt('Import') }}
                     <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
                 <v-btn color="secondary" variant="tonal"
-                       :append-icon="icons.complete"
+                       :append-icon="mdiCheck"
                        @click="close(true)"
                        v-if="currentStep === 'finalResult'">{{ tt('Close') }}</v-btn>
             </div>
@@ -709,25 +709,6 @@ const transactionTagsStore = useTransactionTagsStore();
 const transactionsStore = useTransactionsStore();
 const overviewStore = useOverviewStore();
 const statisticsStore = useStatisticsStore();
-
-const icons = {
-    filter: mdiFilterOutline,
-    checked: mdiCheck,
-    more: mdiDotsVertical,
-    document: mdiHelpCircleOutline,
-    replace: mdiFindReplace,
-    previous: mdiClose,
-    next: mdiArrowRight,
-    complete: mdiCheck,
-    select: mdiSelect,
-    selectAll: mdiSelectAll,
-    selectNone: mdiSelect,
-    selectInverse: mdiSelectInverse,
-    edit: mdiPencilOutline,
-    arrowRight: mdiArrowRight,
-    alert: mdiAlertOutline,
-    tag: mdiPound
-};
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');

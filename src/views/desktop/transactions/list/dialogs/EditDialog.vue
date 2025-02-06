@@ -9,26 +9,26 @@
                     </div>
                     <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true"
                            :disabled="loading || submitting" v-if="mode !== TransactionEditPageMode.View">
-                        <v-icon :icon="icons.more" />
+                        <v-icon :icon="mdiDotsVertical" />
                         <v-menu activator="parent">
                             <v-list>
-                                <v-list-item :prepend-icon="icons.swap"
+                                <v-list-item :prepend-icon="mdiSwapHorizontal"
                                              :title="tt('Swap Account')"
                                              v-if="transaction.type === TransactionType.Transfer"
                                              @click="swapTransactionData(true, false)"></v-list-item>
-                                <v-list-item :prepend-icon="icons.swap"
+                                <v-list-item :prepend-icon="mdiSwapHorizontal"
                                              :title="tt('Swap Amount')"
                                              v-if="transaction.type === TransactionType.Transfer"
                                              @click="swapTransactionData(false, true)"></v-list-item>
-                                <v-list-item :prepend-icon="icons.swap"
+                                <v-list-item :prepend-icon="mdiSwapHorizontal"
                                              :title="tt('Swap Account and Amount')"
                                              v-if="transaction.type === TransactionType.Transfer"
                                              @click="swapTransactionData(true, true)"></v-list-item>
                                 <v-divider v-if="transaction.type === TransactionType.Transfer" />
-                                <v-list-item :prepend-icon="icons.show"
+                                <v-list-item :prepend-icon="mdiEyeOutline"
                                              :title="tt('Show Amount')"
                                              v-if="transaction.hideAmount" @click="transaction.hideAmount = false"></v-list-item>
-                                <v-list-item :prepend-icon="icons.hide"
+                                <v-list-item :prepend-icon="mdiEyeOffOutline"
                                              :title="tt('Hide Amount')"
                                              v-if="!transaction.hideAmount" @click="transaction.hideAmount = true"></v-list-item>
                             </v-list>
@@ -275,7 +275,7 @@
                                         v-model:search="tagSearchContent"
                                     >
                                         <template #chip="{ props, item }">
-                                            <v-chip :prepend-icon="icons.tag" :text="item.title" v-bind="props"/>
+                                            <v-chip :prepend-icon="mdiPound" :text="item.title" v-bind="props"/>
                                         </template>
 
                                         <template #item="{ props, item }">
@@ -283,7 +283,7 @@
                                                 <template #title>
                                                     <v-list-item-title>
                                                         <div class="d-flex align-center">
-                                                            <v-icon size="20" start :icon="icons.tag"/>
+                                                            <v-icon size="20" start :icon="mdiPound"/>
                                                             <span>{{ item.title }}</span>
                                                         </div>
                                                     </v-list-item-title>
@@ -345,9 +345,9 @@
                                         </template>
                                     </v-img>
                                     <div class="picture-control-icon" :class="{ 'show-control-icon': pictureInfo.pictureId === removingPictureId }">
-                                        <v-icon size="64" :icon="icons.remove" v-if="(mode === TransactionEditPageMode.Add || mode === TransactionEditPageMode.Edit) && pictureInfo.pictureId !== removingPictureId"/>
+                                        <v-icon size="64" :icon="mdiTrashCanOutline" v-if="(mode === TransactionEditPageMode.Add || mode === TransactionEditPageMode.Edit) && pictureInfo.pictureId !== removingPictureId"/>
                                         <v-progress-circular color="grey-500" indeterminate size="48" v-if="(mode === TransactionEditPageMode.Add || mode === TransactionEditPageMode.Edit) && pictureInfo.pictureId === removingPictureId"></v-progress-circular>
-                                        <v-icon size="64" :icon="icons.fullscreen" v-if="mode !== TransactionEditPageMode.Add && mode !== TransactionEditPageMode.Edit"/>
+                                        <v-icon size="64" :icon="mdiFullscreen" v-if="mode !== TransactionEditPageMode.Add && mode !== TransactionEditPageMode.Edit"/>
                                     </div>
                                 </v-avatar>
                             </v-col>
@@ -357,7 +357,7 @@
                                           :class="{ 'enabled': !submitting, 'cursor-pointer': !submitting }"
                                           color="rgba(0,0,0,0)" @click="showOpenPictureDialog">
                                     <v-tooltip activator="parent" v-if="!submitting">{{ tt('Add Picture') }}</v-tooltip>
-                                    <v-icon class="transaction-picture-add-icon" size="56" :icon="icons.add" v-if="!uploadingPicture"/>
+                                    <v-icon class="transaction-picture-add-icon" size="56" :icon="mdiImagePlusOutline" v-if="!uploadingPicture"/>
                                     <v-progress-circular color="grey-500" indeterminate size="48" v-if="uploadingPicture"></v-progress-circular>
                                 </v-avatar>
                             </v-col>
@@ -450,7 +450,6 @@ import {
     mdiEyeOutline,
     mdiSwapHorizontal,
     mdiPound,
-    mdiImageOutline,
     mdiImagePlusOutline,
     mdiTrashCanOutline,
     mdiFullscreen
@@ -533,18 +532,6 @@ const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
 const transactionsStore = useTransactionsStore();
 const transactionTemplatesStore = useTransactionTemplatesStore();
-
-const icons = {
-    more: mdiDotsVertical,
-    show: mdiEyeOutline,
-    hide: mdiEyeOffOutline,
-    swap: mdiSwapHorizontal,
-    tag: mdiPound,
-    picture: mdiImageOutline ,
-    add: mdiImagePlusOutline,
-    remove: mdiTrashCanOutline,
-    fullscreen : mdiFullscreen
-};
 
 const map = useTemplateRef<MapViewType>('map');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');

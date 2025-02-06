@@ -84,7 +84,7 @@
                     <v-btn id="copy-to-clipboard-icon" ref="copyToClipboardIcon"
                            density="compact" color="default" variant="text" size="24"
                            class="ml-2" :icon="true">
-                        <v-icon :icon="icons.copy" size="20" />
+                        <v-icon :icon="mdiContentCopy" size="20" />
                         <v-tooltip activator="parent">{{ tt('Copy') }}</v-tooltip>
                     </v-btn>
                 </template>
@@ -122,10 +122,6 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 const { tt } = useI18n();
 
 const twoFactorAuthStore = useTwoFactorAuthStore();
-
-const icons = {
-    copy: mdiContentCopy
-};
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const iconCopyToClipboard = useTemplateRef<unknown>('copyToClipboardIcon');

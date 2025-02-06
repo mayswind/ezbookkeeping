@@ -7,26 +7,26 @@
                 </div>
                 <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                        :disabled="loading || !hasAnyAvailableTag" :icon="true">
-                    <v-icon :icon="icons.more" />
+                    <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent">
                         <v-list>
-                            <v-list-item :prepend-icon="icons.selectAll"
+                            <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Select All')"
                                          :disabled="!hasAnyVisibleTag"
                                          @click="selectAllTransactionTags"></v-list-item>
-                            <v-list-item :prepend-icon="icons.selectNone"
+                            <v-list-item :prepend-icon="mdiSelect"
                                          :title="tt('Select None')"
                                          :disabled="!hasAnyVisibleTag"
                                          @click="selectNoneTransactionTags"></v-list-item>
-                            <v-list-item :prepend-icon="icons.selectInverse"
+                            <v-list-item :prepend-icon="mdiSelectInverse"
                                          :title="tt('Invert Selection')"
                                          :disabled="!hasAnyVisibleTag"
                                          @click="selectInvertTransactionTags"></v-list-item>
                             <v-divider class="my-2"/>
-                            <v-list-item :prepend-icon="icons.show"
+                            <v-list-item :prepend-icon="mdiEyeOutline"
                                          :title="tt('Show Hidden Transaction Tags')"
                                          v-if="!showHidden" @click="showHidden = true"></v-list-item>
-                            <v-list-item :prepend-icon="icons.hide"
+                            <v-list-item :prepend-icon="mdiEyeOffOutline"
                                          :title="tt('Hide Hidden Transaction Tags')"
                                          v-if="showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
@@ -38,26 +38,26 @@
                 <v-spacer/>
                 <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                        :disabled="loading" :icon="true">
-                    <v-icon :icon="icons.more" />
+                    <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent">
                         <v-list>
-                            <v-list-item :prepend-icon="icons.selectAll"
+                            <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Select All')"
                                          :disabled="!hasAnyVisibleTag"
                                          @click="selectAllTransactionTags"></v-list-item>
-                            <v-list-item :prepend-icon="icons.selectNone"
+                            <v-list-item :prepend-icon="mdiSelect"
                                          :title="tt('Select None')"
                                          :disabled="!hasAnyVisibleTag"
                                          @click="selectNoneTransactionTags"></v-list-item>
-                            <v-list-item :prepend-icon="icons.selectInverse"
+                            <v-list-item :prepend-icon="mdiSelectInverse"
                                          :title="tt('Invert Selection')"
                                          :disabled="!hasAnyVisibleTag"
                                          @click="selectInvertTransactionTags"></v-list-item>
                             <v-divider class="my-2"/>
-                            <v-list-item :prepend-icon="icons.show"
+                            <v-list-item :prepend-icon="mdiEyeOutline"
                                          :title="tt('Show Hidden Transaction Tags')"
                                          v-if="!showHidden" @click="showHidden = true"></v-list-item>
-                            <v-list-item :prepend-icon="icons.hide"
+                            <v-list-item :prepend-icon="mdiEyeOffOutline"
                                          :title="tt('Hide Hidden Transaction Tags')"
                                          v-if="showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
@@ -80,7 +80,7 @@
                 <v-btn border class="justify-start" :key="filterType.type"
                        :color="tagFilterType === filterType.type ? 'primary' : 'default'"
                        :variant="tagFilterType === filterType.type ? 'tonal' : 'outlined'"
-                       :append-icon="(tagFilterType === filterType.type ? icons.check : undefined)"
+                       :append-icon="(tagFilterType === filterType.type ? mdiCheck : undefined)"
                        v-for="filterType in allTagFilterTypes"
                        @click="tagFilterType = filterType.type">
                     {{ filterType.displayName }}
@@ -102,11 +102,11 @@
                                                     @update:model-value="updateTransactionTagSelected(transactionTag, $event)">
                                             <template #label>
                                                 <v-badge class="right-bottom-icon" color="secondary"
-                                                         location="bottom right" offset-x="2" offset-y="2" :icon="icons.hide"
+                                                         location="bottom right" offset-x="2" offset-y="2" :icon="mdiEyeOffOutline"
                                                          v-if="transactionTag.hidden">
-                                                    <v-icon size="24" :icon="icons.tag"/>
+                                                    <v-icon size="24" :icon="mdiPound"/>
                                                 </v-badge>
-                                                <v-icon size="24" :icon="icons.tag" v-else-if="!transactionTag.hidden"/>
+                                                <v-icon size="24" :icon="mdiPound" v-else-if="!transactionTag.hidden"/>
                                                 <span class="ml-3">{{ transactionTag.name }}</span>
                                             </template>
                                         </v-checkbox>
@@ -189,17 +189,6 @@ const {
 } = useTransactionTagFilterSettingPageBase(props.type);
 
 const transactionTagsStore = useTransactionTagsStore();
-
-const icons = {
-    selectAll: mdiSelectAll,
-    selectNone: mdiSelect,
-    selectInverse: mdiSelectInverse,
-    show: mdiEyeOutline,
-    hide: mdiEyeOffOutline,
-    more: mdiDotsVertical,
-    check: mdiCheck,
-    tag: mdiPound
-};
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 

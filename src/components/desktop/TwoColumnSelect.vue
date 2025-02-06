@@ -14,11 +14,11 @@
         <template #selection>
             <div class="d-flex align-center text-truncate cursor-pointer">
                 <span class="text-truncate" v-if="customSelectionPrimaryText">{{ customSelectionPrimaryText }}</span>
-                <v-icon class="disabled" :icon="icons.chevronRight" size="23" v-if="customSelectionPrimaryText && customSelectionSecondaryText" />
+                <v-icon class="disabled" :icon="mdiChevronRight" size="23" v-if="customSelectionPrimaryText && customSelectionSecondaryText" />
                 <span class="text-truncate" v-if="customSelectionPrimaryText && customSelectionSecondaryText">{{ customSelectionSecondaryText }}</span>
                 <span class="text-truncate" v-if="!customSelectionPrimaryText && !selectedPrimaryItem && !selectedSecondaryItem">{{ noSelectionText }}</span>
                 <span class="text-truncate" v-if="!customSelectionPrimaryText && showSelectionPrimaryText && selectedPrimaryItem">{{ selectionPrimaryItemText }}</span>
-                <v-icon class="disabled" :icon="icons.chevronRight" size="23" v-if="!customSelectionPrimaryText && showSelectionPrimaryText && selectedPrimaryItem && selectedSecondaryItem" />
+                <v-icon class="disabled" :icon="mdiChevronRight" size="23" v-if="!customSelectionPrimaryText && showSelectionPrimaryText && selectedPrimaryItem && selectedSecondaryItem" />
                 <ItemIcon class="mr-2" icon-type="account" size="21.5px"
                           :icon-id="selectedSecondaryItem && secondaryIconField ? (selectedSecondaryItem as Record<string, unknown>)[secondaryIconField] : null"
                           :color="selectedSecondaryItem && secondaryColorField ? (selectedSecondaryItem as Record<string, unknown>)[secondaryColorField] : null"
@@ -28,13 +28,21 @@
         </template>
 
         <template #no-data>
-            <div ref="dropdownMenu" class="two-column-list-container">
+            <div class="mx-2 mt-2" v-if="enableFilter">
+                <v-text-field density="compact"
+                              :prepend-inner-icon="mdiMagnify"
+                              :placeholder="filterPlaceholder"
+                              v-model="filterContent"></v-text-field>
+            </div>
+            <div class="mx-4 my-3" v-show="!filteredItems || !filteredItems.length">
+                {{ filterNoItemsText }}
+            </div>
+            <div ref="dropdownMenu" class="two-column-list-container" v-show="filteredItems && filteredItems.length">
                 <div class="primary-list-container">
                     <v-list :class="{ 'list-item-with-header': !!primaryHeaderField, 'list-item-with-footer': !!primaryFooterField }">
                         <v-list-item :class="{ 'primary-list-item-selected v-list-item--active text-primary': item === selectedPrimaryItem }"
                                      :key="primaryKeyField ? (item as Record<string, unknown>)[primaryKeyField] : item"
-                                     v-for="item in items"
-                                     v-show="item && (!primaryHiddenField || !(item as Record<string, unknown>)[primaryHiddenField])"
+                                     v-for="item in filteredItems"
                                      @click="onPrimaryItemClicked(item)">
                             <template #prepend>
                                 <ItemIcon class="mr-2" :icon-type="primaryIconType"
@@ -53,8 +61,7 @@
                             v-if="selectedPrimaryItem && primarySubItemsField && (selectedPrimaryItem as Record<string, unknown>)[primarySubItemsField]">
                         <v-list-item :class="{ 'secondary-list-item-selected v-list-item--active text-primary': isSecondarySelected(subItem) }"
                                      :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
-                                     v-for="subItem in (selectedPrimaryItem as Record<string, unknown>)[primarySubItemsField]"
-                                     v-show="subItem && (!secondaryHiddenField || !subItem[secondaryHiddenField])"
+                                     v-for="subItem in filteredSubItems"
                                      @click="onSecondaryItemClicked(subItem)">
                             <template #prepend>
                                 <ItemIcon class="mr-2" :icon-type="secondaryIconType"
@@ -87,7 +94,8 @@ import {
 import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';
 
 import {
-    mdiChevronRight
+    mdiChevronRight,
+    mdiMagnify
 } from '@mdi/js';
 
 interface DesktopTwoColumnListItemSelectionProps extends CommonTwoColumnListItemSelectionProps {
@@ -112,6 +120,9 @@ const emit = defineEmits<{
 const { tt, ti } = useI18n();
 
 const {
+    filterContent,
+    filteredItems,
+    getFilteredSubItems,
     getCurrentPrimaryValueBySecondaryValue,
     isSecondaryValueSelected,
     getSelectedPrimaryItem,
@@ -120,26 +131,24 @@ const {
     updateCurrentSecondaryValue
 } = useTwoColumnListItemSelectionBase(props);
 
-const icons = {
-    chevronRight: mdiChevronRight
-};
-
 const dropdownMenu = useTemplateRef<HTMLElement>('dropdownMenu');
 
 const menuState = ref<boolean>(false);
+
+const filteredSubItems = computed<Record<string, unknown>[]>(() => getFilteredSubItems(selectedPrimaryItem.value));
 
 const currentPrimaryValue = computed<unknown>({
     get: () => {
         return getCurrentPrimaryValueBySecondaryValue(props.modelValue);
     },
     set: (value) => {
-        const primaryItem = getItemByKeyValue(props.items as Record<string, unknown>[] | Record<string, Record<string, unknown>>, value, props.primaryValueField as string);
+        const primaryItem = getItemByKeyValue(filteredItems.value, value, props.primaryValueField as string);
 
         if (!primaryItem) {
             return;
         }
 
-        const secondaryItem = getFirstVisibleItem(primaryItem[props.primarySubItemsField] as Record<string, unknown>[] | Record<string, Record<string, unknown>>, props.primaryHiddenField as string);
+        const secondaryItem = getFirstVisibleItem(getFilteredSubItems(primaryItem), props.primaryHiddenField as string);
 
         if (secondaryItem) {
             if (props.secondaryValueField) {
@@ -167,7 +176,7 @@ const noSelectionText = computed<string>(() => props.noItemText ? props.noItemTe
 const selectionPrimaryItemText = computed<string>(() => {
     if (props.primaryValueField && props.primaryTitleField) {
         if (currentPrimaryValue.value) {
-            return getNameByKeyValue(props.items as Record<string, string>[] | Record<string, Record<string, string>>, currentPrimaryValue.value, props.primaryValueField, props.primaryTitleField, noSelectionText.value) as string;
+            return getNameByKeyValue(props.items as Record<string, string>[], currentPrimaryValue.value, props.primaryValueField, props.primaryTitleField, noSelectionText.value) as string;
         } else {
             return noSelectionText.value;
         }
@@ -179,7 +188,7 @@ const selectionPrimaryItemText = computed<string>(() => {
 const selectionSecondaryItemText = computed<string>(() => {
     if (props.secondaryValueField && props.secondaryTitleField) {
         if (currentSecondaryValue.value && selectedPrimaryItem.value && (selectedPrimaryItem.value as Record<string, unknown>)[props.primarySubItemsField]) {
-            return getNameByKeyValue((selectedPrimaryItem.value as Record<string, unknown>)[props.primarySubItemsField] as Record<string, string>[] | Record<string, Record<string, string>>, currentSecondaryValue.value, props.secondaryValueField, props.secondaryTitleField, noSelectionText.value) as string;
+            return getNameByKeyValue((selectedPrimaryItem.value as Record<string, unknown>)[props.primarySubItemsField] as Record<string, string>[], currentSecondaryValue.value, props.secondaryValueField, props.secondaryTitleField, noSelectionText.value) as string;
         } else {
             return noSelectionText.value;
         }

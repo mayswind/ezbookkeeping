@@ -103,6 +103,7 @@
                                                       secondary-key-field="id" secondary-value-field="id"
                                                       secondary-title-field="name"
                                                       secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                      :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
                                                       :items="allVisibleCategorizedAccounts"
                                                       v-model:show="showAccountSheet"
                                                       v-model="newProfile.defaultAccountId">

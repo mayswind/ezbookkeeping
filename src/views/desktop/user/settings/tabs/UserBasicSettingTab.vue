@@ -87,6 +87,7 @@
                                                    secondary-title-field="name"
                                                    secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
                                                    :disabled="loading || saving || !allVisibleAccounts.length"
+                                                   :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
                                                    :label="tt('Default Account')"
                                                    :placeholder="tt('Default Account')"
                                                    :items="allVisibleCategorizedAccounts"

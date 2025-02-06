@@ -9,31 +9,39 @@
             </div>
         </f7-toolbar>
         <f7-page-content>
-            <div class="grid grid-cols-2 grid-gap">
+            <div v-if="enableFilter">
+                <f7-searchbar ref="searchbar" custom-searchs
+                              :value="filterContent"
+                              :placeholder="filterPlaceholder"
+                              :disable-button="false"
+                              @input="filterContent = $event.target.value"></f7-searchbar>
+            </div>
+            <div class="grid grid-gap" :class="{ 'grid-cols-2': filteredItems && filteredItems.length }">
                 <div>
                     <div class="primary-list-container">
                         <f7-list dividers class="primary-list no-margin-vertical">
                             <f7-list-item link="#" no-chevron
                                           :class="{ 'primary-list-item-selected': item === selectedPrimaryItem }"
-                                          :value="primaryValueField ? (item as Record<string, unknown>)[primaryValueField] : item"
-                                          :title="primaryTitleField ? ti((item as Record<string, unknown>)[primaryTitleField] as string, !!primaryTitleI18n) : ''"
-                                          :header="primaryHeaderField ? ti((item as Record<string, unknown>)[primaryHeaderField] as string, !!primaryHeaderI18n) : ''"
-                                          :footer="primaryFooterField ? ti((item as Record<string, unknown>)[primaryFooterField] as string, !!primaryFooterI18n) : ''"
-                                          :key="primaryKeyField ? (item as Record<string, unknown>)[primaryKeyField] : item"
-                                          v-for="item in items"
-                                          v-show="item && (!primaryHiddenField || !(item as Record<string, unknown>)[primaryHiddenField])"
+                                          :value="primaryValueField ? item[primaryValueField] : item"
+                                          :title="primaryTitleField ? ti(item[primaryTitleField] as string, !!primaryTitleI18n) : ''"
+                                          :header="primaryHeaderField ? ti(item[primaryHeaderField] as string, !!primaryHeaderI18n) : ''"
+                                          :footer="primaryFooterField ? ti(item[primaryFooterField] as string, !!primaryFooterI18n) : ''"
+                                          :key="primaryKeyField ? item[primaryKeyField] : item"
+                                          v-for="item in filteredItems"
                                           @click="onPrimaryItemClicked(item)">
                                 <template #media>
-                                    <ItemIcon :icon-type="primaryIconType" :icon-id="primaryIconField ? (item as Record<string, unknown>)[primaryIconField] : undefined" :color="primaryColorField ? (item as Record<string, unknown>)[primaryColorField] : undefined"></ItemIcon>
+                                    <ItemIcon :icon-type="primaryIconType" :icon-id="primaryIconField ? item[primaryIconField] : undefined" :color="primaryColorField ? item[primaryColorField] : undefined"></ItemIcon>
                                 </template>
                                 <template #after>
                                     <f7-icon class="list-item-showing" f7="chevron_right" v-if="item === selectedPrimaryItem"></f7-icon>
                                 </template>
                             </f7-list-item>
+                            <f7-list-item v-if="!filteredItems || !filteredItems.length"
+                                            :title="filterNoItemsText"></f7-list-item>
                         </f7-list>
                     </div>
                 </div>
-                <div>
+                <div v-show="filteredItems && filteredItems.length">
                     <div class="secondary-list-container">
                         <f7-list dividers class="secondary-list no-margin-vertical" v-if="selectedPrimaryItem && primarySubItemsField && (selectedPrimaryItem as Record<string, unknown>)[primarySubItemsField]">
                             <f7-list-item link="#" no-chevron
@@ -43,8 +51,7 @@
                                           :header="secondaryHeaderField ? ti(subItem[secondaryHeaderField] as string, !!secondaryHeaderI18n) : ''"
                                           :footer="secondaryFooterField ? ti(subItem[secondaryFooterField] as string, !!secondaryFooterI18n) : ''"
                                           :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
-                                          v-for="subItem in (selectedPrimaryItem as Record<string, unknown>)[primarySubItemsField]"
-                                          v-show="subItem && (!secondaryHiddenField || !subItem[secondaryHiddenField])"
+                                          v-for="subItem in filteredSubItems"
                                           @click="onSecondaryItemClicked(subItem)">
                                 <template #media>
                                     <ItemIcon :icon-type="secondaryIconType" :icon-id="secondaryIconField ? subItem[secondaryIconField] : undefined" :color="secondaryColorField ? subItem[secondaryColorField] : undefined"></ItemIcon>
@@ -62,7 +69,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, useTemplateRef } from 'vue';
+import type { Searchbar } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { type CommonTwoColumnListItemSelectionProps, useTwoColumnListItemSelectionBase } from '@/components/base/TwoColumnListItemSelectionBase.ts';
@@ -83,6 +91,9 @@ const emit = defineEmits<{
 const { tt, ti } = useI18n();
 
 const {
+    filterContent,
+    filteredItems,
+    getFilteredSubItems,
     getCurrentPrimaryValueBySecondaryValue,
     isSecondaryValueSelected,
     getSelectedPrimaryItem,
@@ -90,10 +101,12 @@ const {
     updateCurrentSecondaryValue
 } = useTwoColumnListItemSelectionBase(props);
 
+const searchbar = useTemplateRef<Searchbar.Searchbar>('searchbar');
 
 const currentPrimaryValue = ref<unknown>(getCurrentPrimaryValueBySecondaryValue(props.modelValue));
 const currentSecondaryValue = ref<unknown>(props.modelValue);
 
+const filteredSubItems = computed<Record<string, unknown>[]>(() => getFilteredSubItems(selectedPrimaryItem.value));
 const selectedPrimaryItem = computed<unknown>(() => getSelectedPrimaryItem(currentPrimaryValue.value));
 
 function isSecondarySelected(subItem: unknown): boolean {
@@ -123,6 +136,8 @@ function onSheetOpen(event: { $el: Framework7Dom }): void {
 
 function onSheetClosed(): void {
     close();
+    filterContent.value = '';
+    searchbar.value?.clear();
 }
 </script>
 

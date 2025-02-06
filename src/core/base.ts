@@ -4,8 +4,8 @@ export type PartialRecord<K extends keyof any, T> = {
 }
 
 export interface NameValue {
-    name: string;
-    value: string;
+    readonly name: string;
+    readonly value: string;
 }
 
 export interface TypeAndName {

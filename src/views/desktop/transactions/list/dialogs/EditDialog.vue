@@ -289,6 +289,17 @@
                                                     </v-list-item-title>
                                                 </template>
                                             </v-list-item>
+                                            <v-list-item :disabled="true" v-bind="props"
+                                                         v-if="item.raw.hidden && item.raw.name.toLowerCase().indexOf(tagSearchContent.toLowerCase()) >= 0 && isAllFilteredTagHidden">
+                                                <template #title>
+                                                    <v-list-item-title>
+                                                        <div class="d-flex align-center">
+                                                            <v-icon size="20" start :icon="mdiPound"/>
+                                                            <span>{{ item.title }}</span>
+                                                        </div>
+                                                    </v-list-item-title>
+                                                </template>
+                                            </v-list-item>
                                         </template>
 
                                         <template #no-data>
@@ -562,6 +573,23 @@ const sourceAmountColor = computed<string | undefined>(() => {
     }
 
     return undefined;
+});
+
+const isAllFilteredTagHidden = computed<boolean>(() => {
+    const lowerCaseTagSearchContent = tagSearchContent.value.toLowerCase();
+    let hiddenCount = 0;
+
+    for (const tag of allTags.value) {
+        if (!lowerCaseTagSearchContent || tag.name.toLowerCase().indexOf(lowerCaseTagSearchContent) >= 0) {
+            if (!tag.hidden) {
+                return false;
+            }
+
+            hiddenCount++;
+        }
+    }
+
+    return hiddenCount > 0;
 });
 
 function setTransaction(newTransaction: Transaction | null, options: SetTransactionOptions, setContextData: boolean, convertContextTime: boolean): void {

@@ -29,6 +29,86 @@ export const useAccountsStore = defineStore('accounts', () => {
     const allCategorizedAccountsMap = ref<Record<number, CategorizedAccount>>({});
     const accountListStateInvalid = ref<boolean>(true);
 
+    const allPlainAccounts = computed<Account[]>(() => {
+        const allAccountsList = [];
+
+        for (let i = 0; i < allAccounts.value.length; i++) {
+            const account = allAccounts.value[i];
+
+            if (account.type === AccountType.SingleAccount.type) {
+                allAccountsList.push(account);
+            } else if (account.type === AccountType.MultiSubAccounts.type) {
+                if (account.childrenAccounts) {
+                    for (let j = 0; j < account.childrenAccounts.length; j++) {
+                        const subAccount = account.childrenAccounts[j];
+                        allAccountsList.push(subAccount);
+                    }
+                }
+            }
+        }
+
+        return allAccountsList;
+    });
+
+    const allVisiblePlainAccounts = computed<Account[]>(() => {
+        const allVisibleAccounts = [];
+
+        for (let i = 0; i < allAccounts.value.length; i++) {
+            const account = allAccounts.value[i];
+
+            if (account.hidden) {
+                continue;
+            }
+
+            if (account.type === AccountType.SingleAccount.type) {
+                allVisibleAccounts.push(account);
+            } else if (account.type === AccountType.MultiSubAccounts.type) {
+                if (account.childrenAccounts) {
+                    for (let j = 0; j < account.childrenAccounts.length; j++) {
+                        const subAccount = account.childrenAccounts[j];
+                        allVisibleAccounts.push(subAccount);
+                    }
+                }
+            }
+        }
+
+        return allVisibleAccounts;
+    });
+
+    const allAvailableAccountsCount = computed<number>(() => {
+        let allAccountCount = 0;
+
+        for (const category in allCategorizedAccountsMap.value) {
+            if (!Object.prototype.hasOwnProperty.call(allCategorizedAccountsMap.value, category)) {
+                continue;
+            }
+
+            allAccountCount += allCategorizedAccountsMap.value[category].accounts.length;
+        }
+
+        return allAccountCount;
+    });
+
+    const allVisibleAccountsCount = computed<number>(() => {
+        let shownAccountCount = 0;
+
+        for (const category in allCategorizedAccountsMap.value) {
+            if (!Object.prototype.hasOwnProperty.call(allCategorizedAccountsMap.value, category)) {
+                continue;
+            }
+
+            const accountList = allCategorizedAccountsMap.value[category].accounts;
+
+            for (let i = 0; i < accountList.length; i++) {
+                if (!accountList[i].hidden) {
+                    shownAccountCount++;
+                }
+            }
+        }
+
+        return shownAccountCount;
+    });
+
     function loadAccountList(accounts: Account[]): void {
         allAccounts.value = accounts;
         allAccountsMap.value = {};
@@ -186,86 +266,6 @@ export const useAccountsStore = defineStore('accounts', () => {
             }
         }
     }
-
-    const allPlainAccounts = computed<Account[]>(() => {
-        const allAccountsList = [];
-
-        for (let i = 0; i < allAccounts.value.length; i++) {
-            const account = allAccounts.value[i];
-
-            if (account.type === AccountType.SingleAccount.type) {
-                allAccountsList.push(account);
-            } else if (account.type === AccountType.MultiSubAccounts.type) {
-                if (account.childrenAccounts) {
-                    for (let j = 0; j < account.childrenAccounts.length; j++) {
-                        const subAccount = account.childrenAccounts[j];
-                        allAccountsList.push(subAccount);
-                    }
-                }
-            }
-        }
-
-        return allAccountsList;
-    });
-
-    const allVisiblePlainAccounts = computed<Account[]>(() => {
-        const allVisibleAccounts = [];
-
-        for (let i = 0; i < allAccounts.value.length; i++) {
-            const account = allAccounts.value[i];
-
-            if (account.hidden) {
-                continue;
-            }
-
-            if (account.type === AccountType.SingleAccount.type) {
-                allVisibleAccounts.push(account);
-            } else if (account.type === AccountType.MultiSubAccounts.type) {
-                if (account.childrenAccounts) {
-                    for (let j = 0; j < account.childrenAccounts.length; j++) {
-                        const subAccount = account.childrenAccounts[j];
-                        allVisibleAccounts.push(subAccount);
-                    }
-                }
-            }
-        }
-
-        return allVisibleAccounts;
-    });
-
-    const allAvailableAccountsCount = computed<number>(() => {
-        let allAccountCount = 0;
-
-        for (const category in allCategorizedAccountsMap.value) {
-            if (!Object.prototype.hasOwnProperty.call(allCategorizedAccountsMap.value, category)) {
-                continue;
-            }
-
-            allAccountCount += allCategorizedAccountsMap.value[category].accounts.length;
-        }
-
-        return allAccountCount;
-    });
-
-    const allVisibleAccountsCount = computed<number>(() => {
-        let shownAccountCount = 0;
-
-        for (const category in allCategorizedAccountsMap.value) {
-            if (!Object.prototype.hasOwnProperty.call(allCategorizedAccountsMap.value, category)) {
-                continue;
-            }
-
-            const accountList = allCategorizedAccountsMap.value[category].accounts;
-
-            for (let i = 0; i < accountList.length; i++) {
-                if (!accountList[i].hidden) {
-                    shownAccountCount++;
-                }
-            }
-        }
-
-        return shownAccountCount;
-    });
 
     function updateAccountListInvalidState(invalidState: boolean): void {
         accountListStateInvalid.value = invalidState;

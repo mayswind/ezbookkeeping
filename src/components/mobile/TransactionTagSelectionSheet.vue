@@ -63,7 +63,7 @@
                         </div>
                     </template>
                     <template #after>
-                        <f7-button class="no-padding"
+                        <f7-button :class="{ 'no-padding': true, 'disabled': !newTag || !newTag.name }"
                                    raised fill
                                    icon-f7="checkmark_alt"
                                    color="blue"

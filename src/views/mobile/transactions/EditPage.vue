@@ -315,7 +315,7 @@
                 :header="tt('Tags')"
                 @click="showTransactionTagSheet = true"
             >
-                <transaction-tag-selection-sheet :allow-add-new-tag="true"
+                <transaction-tag-selection-sheet :allow-add-new-tag="true" :enable-filter="true"
                                                  v-model:show="showTransactionTagSheet"
                                                  v-model="transaction.tagIds">
                 </transaction-tag-selection-sheet>

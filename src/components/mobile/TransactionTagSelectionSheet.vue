@@ -1,6 +1,6 @@
 <template>
     <f7-sheet swipe-to-close swipe-handler=".swipe-handler"
-              :class="heightClass" :opened="show"
+              style="height: auto" :opened="show"
               @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
             <div class="swipe-handler"></div>
@@ -13,7 +13,14 @@
                          :text="tt('Add')" v-if="!allTags || !allTags.length || noAvailableTag" @click="addNewTag"></f7-link>
             </div>
         </f7-toolbar>
-        <f7-page-content>
+        <f7-searchbar ref="searchbar" custom-searchs
+                      :value="filterContent"
+                      :placeholder="tt('Find tag')"
+                      :disable-button="false"
+                      v-if="enableFilter"
+                      @input="filterContent = $event.target.value">
+        </f7-searchbar>
+        <f7-page-content :class="'no-padding-top ' + heightClass">
             <f7-list class="no-margin-top no-margin-bottom" v-if="(!allTags || !allTags.length || noAvailableTag) && !newTag">
                 <f7-list-item :title="tt('No available tag')"></f7-list-item>
             </f7-list>
@@ -24,7 +31,6 @@
                               :checked="isChecked(tag.id)"
                               :key="tag.id"
                               v-for="tag in allTags"
-                              v-show="!tag.hidden || isChecked(tag.id)"
                               @change="changeTagSelection">
                     <template #title>
                         <f7-block class="no-padding no-margin">
@@ -77,7 +83,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, useTemplateRef } from 'vue';
+import type { Searchbar } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
@@ -91,6 +98,7 @@ import { type Framework7Dom, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
 const props = defineProps<{
     modelValue: string[];
     allowAddNewTag?: boolean;
+    enableFilter?: boolean;
     show: boolean;
 }>();
 
@@ -104,11 +112,33 @@ const { showToast } = useI18nUIComponents();
 
 const transactionTagsStore = useTransactionTagsStore();
 
+const searchbar = useTemplateRef<Searchbar.Searchbar>('searchbar');
+
+const filterContent = ref<string>('');
 const selectedItemIds = ref<string[]>(copyArrayTo(props.modelValue, []));
 const newTag = ref<TransactionTag | null>(null);
 const heightClass = ref<string>(getHeightClass());
 
-const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
+const allTags = computed<TransactionTag[]>(() => {
+    const finalTags: TransactionTag[] = [];
+
+    for (const tag of transactionTagsStore.allTransactionTags) {
+        if (tag.hidden && !isChecked(tag.id)) {
+            continue;
+        }
+
+        if (!props.enableFilter || !filterContent.value) {
+            finalTags.push(tag);
+            continue;
+        }
+
+        if (tag.name.toLowerCase().indexOf(filterContent.value.toLowerCase()) >= 0) {
+            finalTags.push(tag);
+        }
+    }
+
+    return finalTags;
+});
 
 const noAvailableTag = computed<boolean>(() => {
     if (transactionTagsStore.allTransactionTags) {
@@ -123,12 +153,12 @@ const noAvailableTag = computed<boolean>(() => {
 });
 
 function getHeightClass(): string {
-    if (transactionTagsStore.allTransactionTags && transactionTagsStore.allTransactionTags.length > 8) {
+    if (transactionTagsStore.allTransactionTags && transactionTagsStore.allVisibleTagsCount > 8) {
         return 'tag-selection-huge-sheet';
-    } else if (transactionTagsStore.allTransactionTags && transactionTagsStore.allTransactionTags.length > 4) {
+    } else if (transactionTagsStore.allTransactionTags && transactionTagsStore.allVisibleTagsCount > 4) {
         return 'tag-selection-large-sheet';
     } else {
-        return '';
+        return 'tag-selection-default-sheet';
     }
 }
 
@@ -198,17 +228,23 @@ function onSheetOpen(event: { $el: Framework7Dom }): void {
 
 function onSheetClosed(): void {
     emit('update:show', false);
+    filterContent.value = '';
+    searchbar.value?.clear();
 }
 </script>
 
 <style>
 @media (min-height: 630px) {
+    .tag-selection-default-sheet {
+        height: 200px;
+    }
+
     .tag-selection-large-sheet {
-        height: 310px;
+        height: 250px;
     }
 
     .tag-selection-huge-sheet {
-        height: 400px;
+        height: 340px;
     }
 }
 

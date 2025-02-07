@@ -8,14 +8,14 @@
                 <f7-link sheet-close :text="tt('Done')"></f7-link>
             </div>
         </f7-toolbar>
-        <f7-page-content>
-            <div v-if="enableFilter">
-                <f7-searchbar ref="searchbar" custom-searchs
-                              :value="filterContent"
-                              :placeholder="filterPlaceholder"
-                              :disable-button="false"
-                              @input="filterContent = $event.target.value"></f7-searchbar>
-            </div>
+        <f7-searchbar ref="searchbar" custom-searchs
+                      :value="filterContent"
+                      :placeholder="filterPlaceholder"
+                      :disable-button="false"
+                      v-if="enableFilter"
+                      @input="filterContent = $event.target.value">
+        </f7-searchbar>
+        <f7-page-content class="no-padding-top">
             <div class="grid grid-gap" :class="{ 'grid-cols-2': filteredItems && filteredItems.length }">
                 <div>
                     <div class="primary-list-container">

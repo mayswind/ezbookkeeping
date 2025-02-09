@@ -30,6 +30,7 @@
                                 <v-autocomplete width="100"
                                                 item-title="page"
                                                 item-value="page"
+                                                auto-select-first="exact"
                                                 :density="density"
                                                 :items="allPages"
                                                 :no-data-text="tt('No results')"

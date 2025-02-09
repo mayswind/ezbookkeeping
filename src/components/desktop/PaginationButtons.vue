@@ -4,7 +4,7 @@
                   :total-visible="totalVisible ?? 7"
                   :length="totalPageCount"
                   v-model="currentPage">
-        <template #item="{ page, isActive }">
+        <template #item="{ key, page, isActive }">
             <v-btn variant="text"
                    :density="density"
                    :disabled="disabled"
@@ -23,7 +23,10 @@
                    v-if="page === '...'"
             >
                 <span>{{ page }}</span>
-                <v-menu :disabled="disabled" :close-on-content-click="false" activator="parent">
+                <v-menu activator="parent"
+                        :disabled="disabled"
+                        :close-on-content-click="false"
+                        v-model="showMenus[key]">
                     <v-list>
                         <v-list-item class="text-sm" :density="density">
                             <v-list-item-title class="cursor-pointer">
@@ -34,8 +37,7 @@
                                                 :density="density"
                                                 :items="allPages"
                                                 :no-data-text="tt('No results')"
-                                                v-model="currentPage"
-                                />
+                                                v-model="currentPage"/>
                             </v-list-item-title>
                         </v-list-item>
                     </v-list>
@@ -46,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -66,6 +68,8 @@ const emit = defineEmits<{
 
 const { tt } = useI18n();
 
+const showMenus = ref<Record<string, boolean>>({});
+
 const allPages = computed<{ page: number }[]>(() => {
     const pages = [];
 
@@ -83,6 +87,14 @@ const currentPage = computed<number>({
     set: (value) => {
         if (value && value >= 1 && value <= props.totalPageCount) {
             emit('update:modelValue', value);
+
+            for (const key in showMenus.value) {
+                if (!Object.prototype.hasOwnProperty.call(showMenus.value, key)) {
+                    continue;
+                }
+
+                showMenus.value[key] = false;
+            }
         }
     }
 });

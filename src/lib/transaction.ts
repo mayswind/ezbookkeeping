@@ -3,7 +3,7 @@ import { TransactionType } from '@/core/transaction.ts';
 import { Account } from '@/models/account.ts';
 import { TransactionCategory } from '@/models/transaction_category.ts';
 import { TransactionTag } from '@/models/transaction_tag.ts';
-import {Transaction, TransactionPicture} from '@/models/transaction.ts';
+import { Transaction, TransactionPicture } from '@/models/transaction.ts';
 
 import {
     isNumber
@@ -28,14 +28,6 @@ export interface SetTransactionOptions {
     destinationAmount?: number;
     tagIds?: string;
     comment?: string;
-}
-
-function getDisplayAmount(amount: number, currency: string, hideAmount: boolean, formatAmountWithCurrencyFunc: (value: number | string, currencyCode?: string) => string): string {
-    if (hideAmount) {
-        return formatAmountWithCurrencyFunc('***', currency);
-    }
-
-    return formatAmountWithCurrencyFunc(amount, currency);
 }
 
 export function setTransactionModelByTransaction(transaction: Transaction, transaction2: Transaction | null | undefined, allCategories: Record<number, TransactionCategory[]>, allCategoriesMap: Record<string, TransactionCategory>, allVisibleAccounts: Account[], allAccountsMap: Record<string, Account>, allTagsMap: Record<string, TransactionTag>, defaultAccountId: string, options: SetTransactionOptions, setContextData: boolean, convertContextTime: boolean): void {
@@ -189,34 +181,4 @@ export function setTransactionModelByTransaction(transaction: Transaction, trans
             transaction.setGeoLocation(transaction2.geoLocation);
         }
     }
-}
-
-export function getTransactionDisplayAmount(transaction: Transaction, allFilterAccountIdsCount: number, allFilterAccountIds: Record<string, boolean>, formatAmountWithCurrencyFunc: (value: number | string, currencyCode?: string) => string): string {
-    if (allFilterAccountIdsCount < 1) {
-        if (transaction.sourceAccount) {
-            return getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount, formatAmountWithCurrencyFunc);
-        }
-    } else if (allFilterAccountIdsCount === 1) {
-        if (transaction.sourceAccount && (allFilterAccountIds[transaction.sourceAccount.id] || allFilterAccountIds[transaction.sourceAccount.parentId])) {
-            return getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount , formatAmountWithCurrencyFunc);
-        } else if (transaction.destinationAccount && (allFilterAccountIds[transaction.destinationAccount.id] || allFilterAccountIds[transaction.destinationAccount.parentId])) {
-            return getDisplayAmount(transaction.destinationAmount, transaction.destinationAccount.currency, transaction.hideAmount , formatAmountWithCurrencyFunc);
-        }
-    } else { // allFilterAccountIdsCount > 1
-        if (transaction.sourceAccount && transaction.destinationAccount) {
-            if ((allFilterAccountIds[transaction.sourceAccount.id] || allFilterAccountIds[transaction.sourceAccount.parentId])
-                && !allFilterAccountIds[transaction.destinationAccount.id] && !allFilterAccountIds[transaction.destinationAccount.parentId]) {
-                return getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount , formatAmountWithCurrencyFunc);
-            } else if ((allFilterAccountIds[transaction.destinationAccount.id] || allFilterAccountIds[transaction.destinationAccount.parentId])
-                && !allFilterAccountIds[transaction.sourceAccount.id] && !allFilterAccountIds[transaction.sourceAccount.parentId]) {
-                return getDisplayAmount(transaction.destinationAmount, transaction.destinationAccount.currency, transaction.hideAmount , formatAmountWithCurrencyFunc);
-            }
-        }
-    }
-
-    if (transaction.sourceAccount) {
-        return getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount, formatAmountWithCurrencyFunc);
-    }
-
-    return '';
 }

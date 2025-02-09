@@ -545,7 +545,7 @@ export function getShiftedDateRangeAndDateType(minTime: number, maxTime: number,
     };
 }
 
-export function getShiftedDateRangeAndDateTypeForBillingCycle(minTime: number, maxTime: number, scale: number, firstDayOfWeek: number, scene: number, statementDate: number): TimeRangeAndDateType | null {
+export function getShiftedDateRangeAndDateTypeForBillingCycle(minTime: number, maxTime: number, scale: number, firstDayOfWeek: number, scene: number, statementDate: number | undefined | null): TimeRangeAndDateType | null {
     if (!statementDate || !DateRange.PreviousBillingCycle.isAvailableForScene(scene) || !DateRange.CurrentBillingCycle.isAvailableForScene(scene)) {
         return null;
     }
@@ -588,7 +588,7 @@ export function getDateTypeByDateRange(minTime: number, maxTime: number, firstDa
     return newDateType;
 }
 
-export function getDateTypeByBillingCycleDateRange(minTime: number, maxTime: number, firstDayOfWeek: number, scene: DateRangeScene, statementDate: number): number | null {
+export function getDateTypeByBillingCycleDateRange(minTime: number, maxTime: number, firstDayOfWeek: number, scene: DateRangeScene, statementDate: number | undefined | null): number | null {
     if (!statementDate || !DateRange.PreviousBillingCycle.isAvailableForScene(scene) || !DateRange.CurrentBillingCycle.isAvailableForScene(scene)) {
         return null;
     }
@@ -605,7 +605,7 @@ export function getDateTypeByBillingCycleDateRange(minTime: number, maxTime: num
     return null;
 }
 
-export function getDateRangeByDateType(dateType: number, firstDayOfWeek: number): TimeRangeAndDateType | null {
+export function getDateRangeByDateType(dateType: number | undefined, firstDayOfWeek: number): TimeRangeAndDateType | null {
     let maxTime = 0;
     let minTime = 0;
 
@@ -671,7 +671,7 @@ export function getDateRangeByDateType(dateType: number, firstDayOfWeek: number)
     };
 }
 
-export function getDateRangeByBillingCycleDateType(dateType: number, firstDayOfWeek: number, statementDate: number): TimeRangeAndDateType | null {
+export function getDateRangeByBillingCycleDateType(dateType: number, firstDayOfWeek: number, statementDate: number | undefined | null): TimeRangeAndDateType | null {
     let maxTime = 0;
     let minTime = 0;
 

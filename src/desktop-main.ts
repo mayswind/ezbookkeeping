@@ -71,8 +71,6 @@ import draggable from 'vuedraggable';
 import router from '@/router/desktop.ts';
 
 import { getI18nOptions } from '@/locales/helpers.ts';
-// @ts-expect-error the above file is migrating to ts
-import { i18nFunctions } from '@/locales/helper.js';
 
 import PinCodeInput from '@/components/common/PinCodeInput.vue';
 import MapView from '@/components/common/MapView.vue';
@@ -464,7 +462,5 @@ app.component('TrendsChart', TrendsChartComponent);
 app.component('DateRangeSelectionDialog', DateRangeSelectionDialog);
 app.component('MonthRangeSelectionDialog', MonthRangeSelectionDialog);
 app.component('SwitchToMobileDialog', SwitchToMobileDialog);
-
-app.config.globalProperties['$locale'] = i18nFunctions(i18n.global);
 
 app.mount('#app');

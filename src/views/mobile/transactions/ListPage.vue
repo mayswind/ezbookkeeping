@@ -8,8 +8,8 @@
              @page:afterin="onPageAfterIn"
              @infinite="loadMore(true)">
         <f7-navbar>
-            <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
-            <f7-nav-title :title="$t('Transaction List')"></f7-nav-title>
+            <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-title :title="tt('Transaction List')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
                 <f7-link icon-f7="plus" :class="{ 'disabled': !canAddTransaction }" :href="`/transaction/add?type=${query.type}&categoryId=${queryAllFilterCategoryIdsCount === 1 ? query.categoryIds : ''}&accountId=${queryAllFilterAccountIdsCount === 1 ? query.accountIds : ''}&tagIds=${query.tagIds || ''}`"></f7-link>
             </f7-nav-right>
@@ -18,21 +18,21 @@
                 <f7-searchbar
                     custom-searchs
                     :value="query.keyword"
-                    :placeholder="$t('Search transaction description')"
-                    :disable-button-text="$t('Cancel')"
+                    :placeholder="tt('Search transaction description')"
+                    :disable-button-text="tt('Cancel')"
                     @change="changeKeywordFilter($event.target.value)"
                 ></f7-searchbar>
             </f7-subnavbar>
         </f7-navbar>
 
         <f7-toolbar tabbar bottom class="toolbar-item-auto-size transaction-list-toolbar">
-            <f7-link :class="{ 'disabled': loading || query.dateType === allDateRanges.All.type }" @click="shiftDateRange(query.minTime, query.maxTime, -1)">
+            <f7-link :class="{ 'disabled': loading || query.dateType === DateRange.All.type }" @click="shiftDateRange(query.minTime, query.maxTime, -1)">
                 <f7-icon f7="arrow_left_square"></f7-icon>
             </f7-link>
             <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': loading }" popover-open=".date-popover-menu">
-                <span :class="{ 'tabbar-item-changed': query.dateType !== allDateRanges.All.type }">{{ queryDateRangeName }}</span>
+                <span :class="{ 'tabbar-item-changed': query.dateType !== DateRange.All.type }">{{ queryDateRangeName }}</span>
             </f7-link>
-            <f7-link :class="{ 'disabled': loading || query.dateType === allDateRanges.All.type }" @click="shiftDateRange(query.minTime, query.maxTime, 1)">
+            <f7-link :class="{ 'disabled': loading || query.dateType === DateRange.All.type }" @click="shiftDateRange(query.minTime, query.maxTime, 1)">
                 <f7-icon f7="arrow_right_square"></f7-icon>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".category-popover-menu" :class="{ 'disabled': query.type === 1 }">
@@ -119,7 +119,7 @@
         </div>
 
         <f7-list strong inset dividers class="margin-vertical" v-if="!loading && noTransaction">
-            <f7-list-item :title="$t('No transaction data')"></f7-list-item>
+            <f7-list-item :title="tt('No transaction data')"></f7-list-item>
         </f7-list>
 
         <f7-block class="combination-list-wrapper margin-vertical"
@@ -135,7 +135,7 @@
                             <f7-list-item>
                                 <template #title>
                                     <small>
-                                        <span>{{ getDisplayYearMonth(transactionMonthList) }}</span>
+                                        <span>{{ getDisplayLongYearMonth(transactionMonthList) }}</span>
                                     </small>
                                     <small class="transaction-amount-statistics" v-if="showTotalAmountInTransactionListPage && transactionMonthList.totalAmount">
                                         <span class="text-income">
@@ -156,7 +156,7 @@
                         <f7-list-item swipeout chevron-center
                                       class="transaction-info"
                                       :id="getTransactionDomId(transaction)"
-                                      :link="transaction.type !== allTransactionTypes.ModifyBalance ? `/transaction/detail?id=${transaction.id}&type=${transaction.type}` : null"
+                                      :link="transaction.type !== TransactionType.ModifyBalance ? `/transaction/detail?id=${transaction.id}&type=${transaction.type}` : null"
                                       :key="transaction.id"
                                       v-for="(transaction, idx) in transactionMonthList.items"
                         >
@@ -165,8 +165,8 @@
                                     <span class="transaction-day full-line flex-direction-column">
                                         {{ transaction.day }}
                                     </span>
-                                    <span class="transaction-day-of-week full-line flex-direction-column">
-                                        {{ getWeekdayShortName(transaction) }}
+                                    <span class="transaction-day-of-week full-line flex-direction-column" v-if="transaction.dayOfWeek">
+                                        {{ getWeekdayShortName(transaction.dayOfWeek) }}
                                     </span>
                                 </div>
                             </template>
@@ -187,21 +187,21 @@
                                         <div class="item-title-row">
                                             <div class="item-title">
                                                 <div class="transaction-category-name no-padding">
-                                                    <span v-if="transaction.type === allTransactionTypes.ModifyBalance">
-                                                        {{ $t('Modify Balance') }}
+                                                    <span v-if="transaction.type === TransactionType.ModifyBalance">
+                                                        {{ tt('Modify Balance') }}
                                                     </span>
-                                                        <span v-else-if="transaction.type !== allTransactionTypes.ModifyBalance && transaction.category">
+                                                        <span v-else-if="transaction.type !== TransactionType.ModifyBalance && transaction.category">
                                                         {{ transaction.category.name }}
                                                     </span>
-                                                        <span v-else-if="transaction.type !== allTransactionTypes.ModifyBalance && !transaction.category">
+                                                        <span v-else-if="transaction.type !== TransactionType.ModifyBalance && !transaction.category">
                                                         {{ getTransactionTypeName(transaction.type, 'Transaction') }}
                                                     </span>
                                                 </div>
                                             </div>
                                             <div class="item-after">
                                                 <div class="transaction-amount" v-if="transaction.sourceAccount"
-                                                     :class="{ 'text-expense': transaction.type === allTransactionTypes.Expense, 'text-income': transaction.type === allTransactionTypes.Income }">
-                                                    <span>{{ getTransactionDisplayAmount(transaction) }}</span>
+                                                     :class="{ 'text-expense': transaction.type === TransactionType.Expense, 'text-income': transaction.type === TransactionType.Income }">
+                                                    <span>{{ getDisplayAmount(transaction) }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -226,8 +226,8 @@
                                                 <span v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ `(${getDisplayTimezone(transaction)})` }}</span>
                                                 <span v-if="transaction.sourceAccount">·</span>
                                                 <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
-                                                <f7-icon f7="arrow_right" class="transaction-account-arrow" v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id"></f7-icon>
-                                                <span v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">{{ transaction.destinationAccount.name }}</span>
+                                                <f7-icon f7="arrow_right" class="transaction-account-arrow" v-if="transaction.sourceAccount && transaction.type === TransactionType.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id"></f7-icon>
+                                                <span v-if="transaction.sourceAccount && transaction.type === TransactionType.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">{{ transaction.destinationAccount.name }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -235,12 +235,12 @@
                             </template>
                             <f7-swipeout-actions right>
                                 <f7-swipeout-button color="primary" close
-                                                    :text="$t('Duplicate')"
-                                                    v-if="transaction.type !== allTransactionTypes.ModifyBalance"
+                                                    :text="tt('Duplicate')"
+                                                    v-if="transaction.type !== TransactionType.ModifyBalance"
                                                     @click="duplicate(transaction)"></f7-swipeout-button>
                                 <f7-swipeout-button color="orange" close
-                                                    :text="$t('Edit')"
-                                                    v-if="transaction.editable && transaction.type !== allTransactionTypes.ModifyBalance"
+                                                    :text="tt('Edit')"
+                                                    v-if="transaction.editable && transaction.type !== TransactionType.ModifyBalance"
                                                     @click="edit(transaction)"></f7-swipeout-button>
                                 <f7-swipeout-button color="red" class="padding-left padding-right"
                                                     v-if="transaction.editable"
@@ -255,23 +255,23 @@
         </f7-block>
 
         <f7-block class="text-align-center" :class="{ 'disabled': loadingMore }" v-show="!loading && hasMoreTransaction">
-            <f7-link href="#" @click="loadMore(false)">{{ $t('Load More') }}</f7-link>
+            <f7-link href="#" @click="loadMore(false)">{{ tt('Load More') }}</f7-link>
         </f7-block>
 
         <f7-popover class="date-popover-menu"
                     v-model:opened="showDatePopover"
-                    @popover:open="scrollPopoverToSelectedItem">
+                    @popover:open="onPopoverOpen">
             <f7-list dividers>
                 <f7-list-item :title="dateRange.displayName"
                               :class="{ 'list-item-selected': query.dateType === dateRange.type }"
                               :key="dateRange.type"
-                              v-for="dateRange in allDateRangesArray"
+                              v-for="dateRange in allDateRanges"
                               @click="changeDateFilter(dateRange.type)">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
                     </template>
                     <template #footer>
-                        <div v-if="((dateRange.isBillingCycle || dateRange.type === allDateRanges.Custom.type) && query.dateType === dateRange.type) && query.minTime && query.maxTime">
+                        <div v-if="((dateRange.isBillingCycle || dateRange.type === DateRange.Custom.type) && query.dateType === dateRange.type) && query.minTime && query.maxTime">
                             <span>{{ queryMinTime }}</span>
                             <span>&nbsp;-&nbsp;</span>
                             <br/>
@@ -282,7 +282,7 @@
             </f7-list>
         </f7-popover>
 
-        <date-range-selection-sheet :title="$t('Custom Date Range')"
+        <date-range-selection-sheet :title="tt('Custom Date Range')"
                                     :min-time="customMinDatetime"
                                     :max-time="customMaxDatetime"
                                     v-model:show="showCustomDateRangeSheet"
@@ -291,9 +291,9 @@
 
         <f7-popover class="category-popover-menu"
                     v-model:opened="showCategoryPopover"
-                    @popover:open="scrollPopoverToSelectedItem">
+                    @popover:open="onPopoverOpen">
             <f7-list dividers accordion-list>
-                <f7-list-item :class="{ 'list-item-selected': !query.categoryIds }" :title="$t('All')" @click="changeCategoryFilter('')">
+                <f7-list-item :class="{ 'list-item-selected': !query.categoryIds }" :title="tt('All')" @click="changeCategoryFilter('')">
                     <template #media>
                         <f7-icon f7="rectangle_grid_2x2"></f7-icon>
                     </template>
@@ -302,7 +302,7 @@
                     </template>
                 </f7-list-item>
                 <f7-list-item :class="{ 'list-item-selected': query.categoryIds && queryAllFilterCategoryIdsCount > 1 }"
-                              :title="$t('Multiple Categories')"
+                              :title="tt('Multiple Categories')"
                               @click="filterMultipleCategories()"
                               v-if="allAvailableCategoriesCount > 0">
                     <template #media>
@@ -319,7 +319,7 @@
                      v-for="(categories, categoryType) in allPrimaryCategories"
                      v-show="categories && categories.length"
             >
-                <f7-list-item divider :title="getTransactionTypeName(getTransactionTypeFromCategoryType(categoryType), 'Type')"></f7-list-item>
+                <f7-list-item divider :title="getTransactionTypeName(categoryTypeToTransactionType(categoryType), 'Type')"></f7-list-item>
                 <f7-list-item accordion-item
                               :title="category.name"
                               :class="getCategoryListItemCheckedClass(category, queryAllFilterCategoryIds)"
@@ -333,7 +333,7 @@
                     <f7-accordion-content>
                         <f7-list dividers class="padding-left">
                             <f7-list-item :class="{ 'list-item-selected': query.categoryIds === category.id, 'item-in-multiple-selection': queryAllFilterCategoryIdsCount > 1 && queryAllFilterCategoryIds[category.id] }"
-                                          :title="$t('All')" @click="changeCategoryFilter(category.id)">
+                                          :title="tt('All')" @click="changeCategoryFilter(category.id)">
                                 <template #media>
                                     <f7-icon f7="rectangle_grid_2x2"></f7-icon>
                                 </template>
@@ -344,7 +344,7 @@
                             <f7-list-item :title="subCategory.name"
                                           :class="{ 'list-item-selected': query.categoryIds === subCategory.id, 'item-in-multiple-selection': queryAllFilterCategoryIdsCount > 1 && queryAllFilterCategoryIds[subCategory.id] }"
                                           :key="subCategory.id"
-                                          v-for="subCategory in category.subCategories"
+                                          v-for="subCategory in category.secondaryCategories"
                                           v-show="!subCategory.hidden || query.categoryIds === subCategory.id"
                                           @click="changeCategoryFilter(subCategory.id)"
                             >
@@ -366,9 +366,9 @@
 
         <f7-popover class="account-popover-menu"
                     v-model:opened="showAccountPopover"
-                    @popover:open="scrollPopoverToSelectedItem">
+                    @popover:open="onPopoverOpen">
             <f7-list dividers>
-                <f7-list-item :class="{ 'list-item-selected': !query.accountIds }" :title="$t('All')" @click="changeAccountFilter('')">
+                <f7-list-item :class="{ 'list-item-selected': !query.accountIds }" :title="tt('All')" @click="changeAccountFilter('')">
                     <template #media>
                         <f7-icon f7="rectangle_grid_2x2"></f7-icon>
                     </template>
@@ -377,7 +377,7 @@
                     </template>
                 </f7-list-item>
                 <f7-list-item :class="{ 'list-item-selected': query.accountIds && queryAllFilterAccountIdsCount > 1 }"
-                              :title="$t('Multiple Accounts')"
+                              :title="tt('Multiple Accounts')"
                               @click="filterMultipleAccounts()"
                               v-if="allAvailableAccountsCount > 0">
                     <template #media>
@@ -410,43 +410,43 @@
         <f7-popover class="more-popover-menu"
                     v-model:opened="showMorePopover">
             <f7-list dividers>
-                <f7-list-item group-title :title="$t('Type')" />
-                <f7-list-item :class="{ 'list-item-selected': query.type === 0 }" :title="$t('All')" @click="changeTypeFilter(0)">
+                <f7-list-item group-title :title="tt('Type')" />
+                <f7-list-item :class="{ 'list-item-selected': query.type === 0 }" :title="tt('All')" @click="changeTypeFilter(0)">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 0"></f7-icon>
                     </template>
                 </f7-list-item>
-                <f7-list-item :class="{ 'list-item-selected': query.type === 1 }" :title="$t('Modify Balance')" @click="changeTypeFilter(1)">
+                <f7-list-item :class="{ 'list-item-selected': query.type === 1 }" :title="tt('Modify Balance')" @click="changeTypeFilter(1)">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 1"></f7-icon>
                     </template>
                 </f7-list-item>
-                <f7-list-item :class="{ 'list-item-selected': query.type === 2 }" :title="$t('Income')" @click="changeTypeFilter(2)">
+                <f7-list-item :class="{ 'list-item-selected': query.type === 2 }" :title="tt('Income')" @click="changeTypeFilter(2)">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 2"></f7-icon>
                     </template>
                 </f7-list-item>
-                <f7-list-item :class="{ 'list-item-selected': query.type === 3 }" :title="$t('Expense')" @click="changeTypeFilter(3)">
+                <f7-list-item :class="{ 'list-item-selected': query.type === 3 }" :title="tt('Expense')" @click="changeTypeFilter(3)">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 3"></f7-icon>
                     </template>
                 </f7-list-item>
-                <f7-list-item :class="{ 'list-item-selected': query.type === 4 }" :title="$t('Transfer')" @click="changeTypeFilter(4)">
+                <f7-list-item :class="{ 'list-item-selected': query.type === 4 }" :title="tt('Transfer')" @click="changeTypeFilter(4)">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 4"></f7-icon>
                     </template>
                 </f7-list-item>
 
-                <f7-list-item group-title :title="$t('Amount')" />
-                <f7-list-item :class="{ 'list-item-selected': !query.amountFilter }" :title="$t('All')" @click="changeAmountFilter('')">
+                <f7-list-item group-title :title="tt('Amount')" />
+                <f7-list-item :class="{ 'list-item-selected': !query.amountFilter }" :title="tt('All')" @click="changeAmountFilter('')">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.amountFilter"></f7-icon>
                     </template>
                 </f7-list-item>
                 <f7-list-item :key="filterType.type"
                               :class="{ 'list-item-selected': query.amountFilter && query.amountFilter.startsWith(`${filterType.type}:`) }"
-                              :title="$t(filterType.name)"
-                              v-for="filterType in allAmountFilterTypes"
+                              :title="tt(filterType.name)"
+                              v-for="filterType in AmountFilterType.values()"
                               @click="changeAmountFilter(filterType.type)">
                     <template #after>
                         <span class="margin-right-half" v-if="query.amountFilter && query.amountFilter.startsWith(`${filterType.type}:`)">{{ queryAmount }}</span>
@@ -454,19 +454,19 @@
                     </template>
                 </f7-list-item>
 
-                <f7-list-item group-title :title="$t('Tags')" />
-                <f7-list-item :class="{ 'list-item-selected': !query.tagIds }" :title="$t('All')" @click="changeTagFilter('')">
+                <f7-list-item group-title :title="tt('Tags')" />
+                <f7-list-item :class="{ 'list-item-selected': !query.tagIds }" :title="tt('All')" @click="changeTagFilter('')">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.tagIds"></f7-icon>
                     </template>
                 </f7-list-item>
-                <f7-list-item :class="{ 'list-item-selected': query.tagIds === 'none' }" :title="$t('Without Tags')" @click="changeTagFilter('none')">
+                <f7-list-item :class="{ 'list-item-selected': query.tagIds === 'none' }" :title="tt('Without Tags')" @click="changeTagFilter('none')">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.tagIds === 'none'"></f7-icon>
                     </template>
                 </f7-list-item>
                 <f7-list-item :class="{ 'list-item-selected': query.tagIds && queryAllFilterTagIdsCount > 1 }"
-                              :title="$t('Multiple Tags')" @click="filterMultipleTags()" v-if="allAvailableTagsCount > 0">
+                              :title="tt('Multiple Tags')" @click="filterMultipleTags()" v-if="allAvailableTagsCount > 0">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.tagIds && queryAllFilterTagIdsCount > 1"></f7-icon>
                     </template>
@@ -509,38 +509,45 @@
 
         <f7-actions close-by-outside-click close-on-escape :opened="showDeleteActionSheet" @actions:closed="showDeleteActionSheet = false">
             <f7-actions-group>
-                <f7-actions-label>{{ $t('Are you sure you want to delete this transaction?') }}</f7-actions-label>
-                <f7-actions-button color="red" @click="remove(transactionToDelete, true)">{{ $t('Delete') }}</f7-actions-button>
+                <f7-actions-label>{{ tt('Are you sure you want to delete this transaction?') }}</f7-actions-label>
+                <f7-actions-button color="red" @click="remove(transactionToDelete, true)">{{ tt('Delete') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
-                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+                <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
             </f7-actions-group>
         </f7-actions>
     </f7-page>
 </template>
 
-<script>
-import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.ts';
-import { useUserStore } from '@/stores/user.ts';
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import type { Router } from 'framework7/types';
+
+import { useI18n } from '@/locales/helpers.ts';
+import { type Framework7Dom, useI18nUIComponents, showLoading, hideLoading, onSwipeoutDeleted, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
+import { useTransactionListPageBase } from '@/views/base/transactions/TransactionListPageBase.ts';
+
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
-import { useTransactionsStore } from '@/stores/transaction.ts';
+import { type TransactionMonthList, useTransactionsStore } from '@/stores/transaction.ts';
 
-import { DateRangeScene, DateRange } from '@/core/datetime.ts';
+import type { TypeAndDisplayName } from '@/core/base.ts';
+import {
+    type TimeRangeAndDateType,
+    DateRangeScene,
+    DateRange,
+} from '@/core/datetime.ts';
 import { AmountFilterType } from '@/core/numeral.ts';
-import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
-import { getNameByKeyValue } from '@/lib/common.ts';
+import type { TransactionCategory } from '@/models/transaction_category.ts';
+import type { Transaction } from '@/models/transaction.ts';
+
 import {
     getCurrentUnixTime,
     getSpecifiedDayFirstUnixTime,
-    getUtcOffsetByUtcOffsetMinutes,
-    getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
-    getYearMonthFirstUnixTime,
     getShiftedDateRangeAndDateType,
     getShiftedDateRangeAndDateTypeForBillingCycle,
     getDateTypeByDateRange,
@@ -548,673 +555,532 @@ import {
     getDateRangeByDateType,
     getDateRangeByBillingCycleDateType
 } from '@/lib/datetime.ts';
-import { categoryTypeToTransactionType, transactionTypeToCategoryType } from '@/lib/category.ts';
-import { getUnifiedSelectedAccountsCurrencyOrDefaultCurrency } from '@/lib/account.ts';
-import { getTransactionDisplayAmount } from '@/lib/transaction.ts';
-import { onSwipeoutDeleted, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
+import {
+    categoryTypeToTransactionType,
+    transactionTypeToCategoryType
+} from '@/lib/category.ts';
 
-export default {
-    props: [
-        'f7route',
-        'f7router'
-    ],
-    data() {
+const props = defineProps<{
+    f7route: Router.Route;
+    f7router: Router.Router;
+}>();
+
+const {
+    tt,
+    getAllTransactionTagFilterTypes,
+    getWeekdayShortName
+} = useI18n();
+
+const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
+
+const {
+    loading,
+    customMinDatetime,
+    customMaxDatetime,
+    currentTimezoneOffsetMinutes,
+    firstDayOfWeek,
+    defaultCurrency,
+    showTotalAmountInTransactionListPage,
+    showTagInTransactionListPage,
+    allDateRanges,
+    allAccounts,
+    allAvailableAccountsCount,
+    allCategories,
+    allPrimaryCategories,
+    allAvailableCategoriesCount,
+    allTransactionTags,
+    allAvailableTagsCount,
+    query,
+    queryDateRangeName,
+    queryMinTime,
+    queryMaxTime,
+    queryAllFilterCategoryIds,
+    queryAllFilterAccountIds,
+    queryAllFilterTagIds,
+    queryAllFilterCategoryIdsCount,
+    queryAllFilterAccountIdsCount,
+    queryAllFilterTagIdsCount,
+    queryAccountName,
+    queryCategoryName,
+    queryAmount,
+    canAddTransaction,
+    getDisplayTime,
+    getDisplayLongYearMonth,
+    getDisplayTimezone,
+    getDisplayAmount,
+    getDisplayMonthTotalAmount,
+    getTransactionTypeName,
+} = useTransactionListPageBase();
+
+const accountsStore = useAccountsStore();
+const transactionCategoriesStore = useTransactionCategoriesStore();
+const transactionTagsStore = useTransactionTagsStore();
+const transactionsStore = useTransactionsStore();
+
+const loadingError = ref<unknown | null>(null);
+const loadingMore = ref<boolean>(false);
+const transactionToDelete = ref<Transaction | null>(null);
+const showDatePopover = ref<boolean>(false);
+const showCategoryPopover = ref<boolean>(false);
+const showAccountPopover = ref<boolean>(false);
+const showMorePopover = ref<boolean>(false);
+const showCustomDateRangeSheet = ref<boolean>(false);
+const showDeleteActionSheet = ref<boolean>(false);
+
+const allTransactionTagFilterTypes = computed<TypeAndDisplayName[]>(() => getAllTransactionTagFilterTypes());
+
+const transactions = computed<TransactionMonthList[]>(() => {
+    if (loading.value) {
+        return [];
+    }
+
+    return transactionsStore.transactions;
+});
+
+const noTransaction = computed<boolean>(() => transactionsStore.noTransaction);
+const hasMoreTransaction = computed<boolean>(() => transactionsStore.hasMoreTransaction);
+
+function getTransactionDomId(transaction: Transaction): string {
+    return 'transaction_' + transaction.id;
+}
+
+function getTransactionDateStyle(transaction: Transaction, previousTransaction: Transaction | null): Record<string, string> {
+    if (!previousTransaction || transaction.day !== previousTransaction.day) {
+        return {};
+    }
+
+    return {
+        color: 'transparent'
+    };
+}
+
+function getCategoryListItemCheckedClass(category: TransactionCategory, queryCategoryIds: Record<string, boolean>): Record<string, boolean> {
+    if (queryCategoryIds && queryCategoryIds[category.id]) {
         return {
-            loading: true,
-            loadingError: null,
-            loadingMore: false,
-            customMinDatetime: 0,
-            customMaxDatetime: 0,
-            transactionToDelete: null,
-            showDatePopover: false,
-            showCategoryPopover: false,
-            showAccountPopover: false,
-            showMorePopover: false,
-            showCustomDateRangeSheet: false,
-            showDeleteActionSheet: false
+            'list-item-checked': true
         };
-    },
-    computed: {
-        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore),
-        defaultCurrency() {
-            return getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(this.allAccounts, this.queryAllFilterAccountIds, this.userStore.currentUserDefaultCurrency);
-        },
-        canAddTransaction() {
-            if (this.query.accountIds && this.queryAllFilterAccountIdsCount === 1) {
-                const account = this.allAccounts[this.query.accountIds];
-
-                if (account && account.type === AccountType.MultiSubAccounts.type) {
-                    return false;
-                }
-            }
-
-            return true;
-        },
-        currentTimezoneOffsetMinutes() {
-            return getTimezoneOffsetMinutes(this.settingsStore.appSettings.timeZone);
-        },
-        firstDayOfWeek() {
-            return this.userStore.currentUserFirstDayOfWeek;
-        },
-        query() {
-            return this.transactionsStore.transactionsFilter;
-        },
-        queryDateRangeName() {
-            if (this.query.dateType === this.allDateRanges.All.type) {
-                return this.$t('Date');
-            }
-
-            return this.$locale.getDateRangeDisplayName(this.userStore, this.query.dateType, this.query.minTime, this.query.maxTime);
-        },
-        queryMinTime() {
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.minTime);
-        },
-        queryMaxTime() {
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.maxTime);
-        },
-        queryAllFilterCategoryIds() {
-            return this.transactionsStore.allFilterCategoryIds;
-        },
-        queryAllFilterAccountIds() {
-            return this.transactionsStore.allFilterAccountIds;
-        },
-        queryAllFilterTagIds() {
-            return this.transactionsStore.allFilterTagIds;
-        },
-        queryAllFilterCategoryIdsCount() {
-            return this.transactionsStore.allFilterCategoryIdsCount;
-        },
-        queryAllFilterAccountIdsCount() {
-            return this.transactionsStore.allFilterAccountIdsCount;
-        },
-        queryAllFilterTagIdsCount() {
-            return this.transactionsStore.allFilterTagIdsCount;
-        },
-        queryCategoryName() {
-            if (this.queryAllFilterCategoryIdsCount > 1) {
-                return this.$t('Multiple Categories');
-            }
-
-            return getNameByKeyValue(this.allCategories, this.query.categoryIds, null, 'name', this.$t('Category'));
-        },
-        queryAccountName() {
-            if (this.queryAllFilterAccountIdsCount > 1) {
-                return this.$t('Multiple Accounts');
-            }
-
-            return getNameByKeyValue(this.allAccounts, this.query.accountIds, null, 'name', this.$t('Account'));
-        },
-        queryAmount() {
-            if (!this.query.amountFilter) {
-                return '';
-            }
-
-            const amountFilterItems = this.query.amountFilter.split(':');
-
-            if (amountFilterItems.length < 2) {
-                return '';
-            }
-
-            const displayAmount = [];
-
-            for (let i = 1; i < amountFilterItems.length; i++) {
-                displayAmount.push(this.getDisplayCurrency(amountFilterItems[i], false));
-            }
-
-            return displayAmount.join(' ~ ');
-        },
-        transactions() {
-            if (this.loading) {
-                return [];
-            }
-
-            return this.transactionsStore.transactions;
-        },
-        noTransaction() {
-            return this.transactionsStore.noTransaction;
-        },
-        hasMoreTransaction() {
-            return this.transactionsStore.hasMoreTransaction;
-        },
-        allAmountFilterTypes() {
-            return AmountFilterType.values();
-        },
-        allTransactionTypes() {
-            return TransactionType;
-        },
-        allTransactionTagFilterTypes() {
-            return this.$locale.getAllTransactionTagFilterTypes();
-        },
-        allAccounts() {
-            return this.accountsStore.allAccountsMap;
-        },
-        allAvailableAccountsCount() {
-            return this.accountsStore.allAvailableAccountsCount;
-        },
-        allCategories() {
-            return this.transactionCategoriesStore.allTransactionCategoriesMap;
-        },
-        allPrimaryCategories() {
-            const primaryCategories = {};
-
-            for (const categoryType in this.transactionCategoriesStore.allTransactionCategories) {
-                if (!Object.prototype.hasOwnProperty.call(this.transactionCategoriesStore.allTransactionCategories, categoryType)) {
-                    continue;
-                }
-
-                if (this.query.type && this.getTransactionTypeFromCategoryType(categoryType) !== this.query.type) {
-                    continue;
-                }
-
-                primaryCategories[categoryType] = this.transactionCategoriesStore.allTransactionCategories[categoryType];
-            }
-
-            return primaryCategories;
-        },
-        allAvailableCategoriesCount() {
-            let totalCount = 0;
-
-            for (const categoryType in this.transactionCategoriesStore.allTransactionCategories) {
-                if (!Object.prototype.hasOwnProperty.call(this.transactionCategoriesStore.allTransactionCategories, categoryType)) {
-                    continue;
-                }
-
-                if (this.query.type && this.getTransactionTypeFromCategoryType(categoryType) !== this.query.type) {
-                    continue;
-                }
-
-                if (this.transactionCategoriesStore.allTransactionCategories[categoryType]) {
-                    totalCount += this.transactionCategoriesStore.allTransactionCategories[categoryType].length;
-                }
-            }
-
-            return totalCount;
-        },
-        allTransactionTags() {
-            return this.transactionTagsStore.allTransactionTagsMap;
-        },
-        allAvailableTagsCount() {
-            return this.transactionTagsStore.allAvailableTagsCount;
-        },
-        allDateRanges() {
-            return DateRange.all();
-        },
-        allDateRangesArray() {
-            return this.$locale.getAllDateRanges(DateRangeScene.Normal, true, !!this.accountsStore.getAccountStatementDate(this.query.accountIds));
-        },
-        showTotalAmountInTransactionListPage() {
-            return this.settingsStore.appSettings.showTotalAmountInTransactionListPage;
-        },
-        showTagInTransactionListPage() {
-            return this.settingsStore.appSettings.showTagInTransactionListPage;
-        }
-    },
-    created() {
-        const self = this;
-        const query = self.f7route.query;
-
-        let dateRange = getDateRangeByDateType(query.dateType ? parseInt(query.dateType) : undefined, self.firstDayOfWeek);
-
-        if (!dateRange &&
-            (DateRange.isBillingCycle(query.dateType) || query.dateType === DateRange.Custom.type.toString()) &&
-            parseInt(query.maxTime) > 0 && parseInt(query.minTime) > 0) {
-            dateRange = {
-                dateType: parseInt(query.dateType),
-                maxTime: parseInt(query.maxTime),
-                minTime: parseInt(query.minTime)
-            };
-        }
-
-        this.transactionsStore.initTransactionListFilter({
-            dateType: dateRange ? dateRange.dateType : undefined,
-            maxTime: dateRange ? dateRange.maxTime : undefined,
-            minTime: dateRange ? dateRange.minTime : undefined,
-            type: parseInt(query.type) > 0 ? parseInt(query.type) : undefined,
-            categoryIds: query.categoryIds,
-            accountIds: query.accountIds,
-            tagIds: query.tagIds,
-            tagFilterType: query.tagFilterType && parseInt(query.tagFilterType) >= 0 ? parseInt(query.tagFilterType) : undefined
-        });
-
-        this.reload(null);
-    },
-    methods: {
-        onPageAfterIn() {
-            if (this.transactionsStore.transactionListStateInvalid && !this.loading) {
-                this.reload(null);
-            }
-
-            this.$routeBackOnError(this.f7router, 'loadingError');
-        },
-        reload(done) {
-            const self = this;
-            const force = !!done;
-
-            if (!done) {
-                self.loading = true;
-            }
-
-            Promise.all([
-                self.accountsStore.loadAllAccounts({ force: false }),
-                self.transactionCategoriesStore.loadAllCategories({ force: false }),
-                self.transactionTagsStore.loadAllTags({ force: false })
-            ]).then(() => {
-                return self.transactionsStore.loadTransactions({
-                    reload: true,
-                    force: force,
-                    autoExpand: true,
-                    defaultCurrency: self.defaultCurrency
-                });
-            }).then(() => {
-                if (done) {
-                    done();
-                }
-
-                if (force) {
-                    self.$toast('Data has been updated');
-                }
-
-                self.loading = false;
-            }).catch(error => {
-                if (error.processed || done) {
-                    self.loading = false;
-                }
-
-                if (done) {
-                    done();
-                }
-
-                if (!error.processed) {
-                    if (!done) {
-                        self.loadingError = error;
-                    }
-
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        loadMore(autoExpand) {
-            const self = this;
-
-            if (!self.hasMoreTransaction) {
-                return;
-            }
-
-            if (self.loadingMore || self.loading) {
-                return;
-            }
-
-            self.loadingMore = true;
-
-            self.transactionsStore.loadTransactions({
-                reload: false,
-                autoExpand: autoExpand,
-                defaultCurrency: self.defaultCurrency
-            }).then(() => {
-                self.loadingMore = false;
-            }).catch(error => {
-                self.loadingMore = false;
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        collapseTransactionMonthList(month, collapse) {
-            this.transactionsStore.collapseMonthInTransactionList({
-                month: month,
-                collapse: collapse
-            });
-        },
-        changeDateFilter(dateType) {
-            if (dateType === this.allDateRanges.Custom.type) { // Custom
-                if (!this.query.minTime || !this.query.maxTime) {
-                    this.customMaxDatetime = getActualUnixTimeForStore(getCurrentUnixTime(), this.currentTimezoneOffsetMinutes, getBrowserTimezoneOffsetMinutes());
-                    this.customMinDatetime = getSpecifiedDayFirstUnixTime(this.customMaxDatetime);
-                } else {
-                    this.customMaxDatetime = this.query.maxTime;
-                    this.customMinDatetime = this.query.minTime;
-                }
-
-                this.showCustomDateRangeSheet = true;
-                this.showDatePopover = false;
-                return;
-            } else if (this.query.dateType === dateType) {
-                return;
-            }
-
-            let dateRange = null;
-
-            if (DateRange.isBillingCycle(dateType)) {
-                dateRange = getDateRangeByBillingCycleDateType(dateType, this.firstDayOfWeek, this.accountsStore.getAccountStatementDate(this.query.accountIds));
-            } else {
-                dateRange = getDateRangeByDateType(dateType, this.firstDayOfWeek);
-            }
-
-            if (!dateRange) {
-                return;
-            }
-
-            const changed = this.transactionsStore.updateTransactionListFilter({
-                dateType: dateRange.dateType,
-                maxTime: dateRange.maxTime,
-                minTime: dateRange.minTime
-            });
-
-            this.showDatePopover = false;
-
-            if (changed) {
-                this.reload(null);
-            }
-        },
-        changeCustomDateFilter(minTime, maxTime) {
-            if (!minTime || !maxTime) {
-                return;
-            }
-
-            let dateType = getDateTypeByBillingCycleDateRange(minTime, maxTime, this.firstDayOfWeek, DateRangeScene.Normal, this.accountsStore.getAccountStatementDate(this.query.accountIds));
-
-            if (!dateType) {
-                dateType = getDateTypeByDateRange(minTime, maxTime, this.firstDayOfWeek, DateRangeScene.Normal);
-            }
-
-            const changed = this.transactionsStore.updateTransactionListFilter({
-                dateType: dateType,
-                maxTime: maxTime,
-                minTime: minTime
-            });
-
-            this.showCustomDateRangeSheet = false;
-
-            if (changed) {
-                this.reload(null);
-            }
-        },
-        changeTypeFilter(type) {
-            if (this.query.type === type) {
-                return;
-            }
-
-            let newCategoryFilter = undefined;
-
-            if (type && this.query.categoryIds) {
-                newCategoryFilter = '';
-
-                for (const categoryId in this.queryAllFilterCategoryIds) {
-                    if (!Object.prototype.hasOwnProperty.call(this.queryAllFilterCategoryIds, categoryId)) {
-                        continue;
-                    }
-
-                    const category = this.allCategories[categoryId];
-
-                    if (category && category.type === transactionTypeToCategoryType(type)) {
-                        if (newCategoryFilter.length > 0) {
-                            newCategoryFilter += ',';
-                        }
-
-                        newCategoryFilter += categoryId;
-                    }
-                }
-            }
-
-            const changed = this.transactionsStore.updateTransactionListFilter({
-                type: type,
-                categoryIds: newCategoryFilter
-            });
-
-            this.showMorePopover = false;
-
-            if (changed) {
-                this.reload(null);
-            }
-        },
-        changeCategoryFilter(categoryIds) {
-            if (this.query.categoryIds === categoryIds) {
-                return;
-            }
-
-            const changed = this.transactionsStore.updateTransactionListFilter({
-                categoryIds: categoryIds
-            });
-
-            this.showCategoryPopover = false;
-
-            if (changed) {
-                this.reload(null);
-            }
-        },
-        changeAccountFilter(accountIds) {
-            if (this.query.accountIds === accountIds) {
-                return;
-            }
-
-            const changed = this.transactionsStore.updateTransactionListFilter({
-                accountIds: accountIds
-            });
-
-            this.showAccountPopover = false;
-
-            if (changed) {
-                this.reload(null);
-            }
-        },
-        changeTagFilter(tagIds) {
-            if (this.query.tagIds === tagIds) {
-                return;
-            }
-
-            const changed = this.transactionsStore.updateTransactionListFilter({
-                tagIds: tagIds
-            });
-
-            this.showMorePopover = false;
-
-            if (changed) {
-                this.reload(null);
-            }
-        },
-        changeTagFilterType(filterType) {
-            if (this.query.tagFilterType === filterType) {
-                return;
-            }
-
-            const changed = this.transactionsStore.updateTransactionListFilter({
-                tagFilterType: filterType
-            });
-
-            this.showMorePopover = false;
-
-            if (changed) {
-                this.reload(null);
-            }
-        },
-        changeAmountFilter(filterType) {
-            if (this.query.amountFilter === filterType) {
-                return;
-            }
-
-            if (filterType) {
-                this.showMorePopover = false;
-                this.f7router.navigate(`/transaction/filter/amount?type=${filterType}&value=${this.query.amountFilter}`);
-                return;
-            }
-
-            const changed = this.transactionsStore.updateTransactionListFilter({
-                amountFilter: filterType
-            });
-
-            this.showMorePopover = false;
-
-            if (changed) {
-                this.reload(null);
-            }
-        },
-        changeKeywordFilter(keyword) {
-            if (this.query.keyword === keyword) {
-                return;
-            }
-
-            const changed = this.transactionsStore.updateTransactionListFilter({
-                keyword: keyword
-            });
-
-            if (changed) {
-                this.reload(null);
-            }
-        },
-        filterMultipleCategories() {
-            let navigateUrl = '/settings/filter/category?type=transactionListCurrent';
-
-            if (this.allTransactionTypes.Income <= this.query.type && this.query.type <= this.allTransactionTypes.Transfer) {
-               navigateUrl += '&allowCategoryTypes=' + transactionTypeToCategoryType(this.query.type);
-            }
-
-            this.f7router.navigate(navigateUrl);
-        },
-        filterMultipleAccounts() {
-            this.f7router.navigate('/settings/filter/account?type=transactionListCurrent');
-        },
-        filterMultipleTags() {
-            this.f7router.navigate('/settings/filter/tag?type=transactionListCurrent');
-        },
-        duplicate(transaction) {
-            this.f7router.navigate(`/transaction/add?id=${transaction.id}&type=${transaction.type}`);
-        },
-        edit(transaction) {
-            this.f7router.navigate(`/transaction/edit?id=${transaction.id}&type=${transaction.type}`);
-        },
-        remove(transaction, confirm) {
-            const self = this;
-
-            if (!transaction) {
-                self.$alert('An error occurred');
-                return;
-            }
-
-            if (!confirm) {
-                self.transactionToDelete = transaction;
-                self.showDeleteActionSheet = true;
-                return;
-            }
-
-            self.showDeleteActionSheet = false;
-            self.transactionToDelete = null;
-            self.$showLoading();
-
-            self.transactionsStore.deleteTransaction({
-                transaction: transaction,
-                defaultCurrency: self.defaultCurrency,
-                beforeResolve: (done) => {
-                    onSwipeoutDeleted(self.getTransactionDomId(transaction), done);
-                }
-            }).then(() => {
-                self.$hideLoading();
-            }).catch(error => {
-                self.$hideLoading();
-
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
-        },
-        shiftDateRange(minTime, maxTime, scale) {
-            if (this.query.dateType === this.allDateRanges.All.type) {
-                return;
-            }
-
-            let newDateRange = null;
-
-            if (DateRange.isBillingCycle(this.query.dateType) || this.query.dateType === this.allDateRanges.Custom.type) {
-                newDateRange = getShiftedDateRangeAndDateTypeForBillingCycle(minTime, maxTime, scale, this.firstDayOfWeek, DateRangeScene.Normal, this.accountsStore.getAccountStatementDate(this.query.accountIds));
-            }
-
-            if (!newDateRange) {
-                newDateRange = getShiftedDateRangeAndDateType(minTime, maxTime, scale, this.firstDayOfWeek, DateRangeScene.Normal);
-            }
-
-            const changed = this.transactionsStore.updateTransactionListFilter({
-                dateType: newDateRange.dateType,
-                maxTime: newDateRange.maxTime,
-                minTime: newDateRange.minTime
-            });
-
-            if (changed) {
-                this.reload(null);
-            }
-        },
-        scrollPopoverToSelectedItem(event) {
-            scrollToSelectedItem(event.$el, '.popover-inner', 'li.list-item-selected');
-        },
-        getDisplayYearMonth(transactionMonthList) {
-            return this.$locale.formatUnixTimeToLongYearMonth(this.userStore, getYearMonthFirstUnixTime(transactionMonthList.yearMonth));
-        },
-        getDisplayTime(transaction) {
-            return this.$locale.formatUnixTimeToShortTime(this.userStore, transaction.time, transaction.utcOffset, this.currentTimezoneOffsetMinutes);
-        },
-        getDisplayTimezone(transaction) {
-            return `UTC${getUtcOffsetByUtcOffsetMinutes(transaction.utcOffset)}`;
-        },
-        getDisplayMonthTotalAmount(amount, currency, symbol, incomplete) {
-            const displayAmount = this.getDisplayCurrency(amount, currency);
-            return symbol + displayAmount + (incomplete ? '+' : '');
-        },
-        getDisplayCurrency(value, currencyCode) {
-            return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, currencyCode);
-        },
-        getWeekdayShortName(transaction) {
-            return this.$locale.getWeekdayShortName(transaction.dayOfWeek);
-        },
-        getTransactionTypeName(type, defaultName) {
-            switch (type){
-                case this.allTransactionTypes.ModifyBalance:
-                    return this.$t('Modify Balance');
-                case this.allTransactionTypes.Income:
-                    return this.$t('Income');
-                case this.allTransactionTypes.Expense:
-                    return this.$t('Expense');
-                case this.allTransactionTypes.Transfer:
-                    return this.$t('Transfer');
-                default:
-                    return this.$t(defaultName);
-            }
-        },
-        getTransactionTypeFromCategoryType(categoryType) {
-            return categoryTypeToTransactionType(parseInt(categoryType));
-        },
-        getTransactionDisplayAmount(transaction) {
-            return getTransactionDisplayAmount(transaction, this.queryAllFilterAccountIdsCount, this.queryAllFilterAccountIds, this.getDisplayCurrency);
-        },
-        getTransactionDomId(transaction) {
-            return 'transaction_' + transaction.id;
-        },
-        getTransactionDateStyle(transaction, previousTransaction) {
-            if (!previousTransaction || transaction.day !== previousTransaction.day) {
-                return {};
-            }
-
-            return {
-                color: 'transparent'
-            }
-        },
-        getCategoryListItemCheckedClass(category, queryCategoryIds) {
-            if (queryCategoryIds && queryCategoryIds[category.id]) {
+    }
+
+    if (category.secondaryCategories) {
+        for (let i = 0; i < category.secondaryCategories.length; i++) {
+            if (queryCategoryIds && queryCategoryIds[category.secondaryCategories[i].id]) {
                 return {
                     'list-item-checked': true
                 };
             }
-
-            for (let i = 0; i < category.subCategories.length; i++) {
-                if (queryCategoryIds && queryCategoryIds[category.subCategories[i].id]) {
-                    return {
-                        'list-item-checked': true
-                    };
-                }
-            }
-
-            return [];
         }
     }
-};
+
+    return {};
+}
+
+function init(): void {
+    const initQuery = props.f7route.query;
+
+    let dateRange: TimeRangeAndDateType | null = getDateRangeByDateType(initQuery['dateType'] ? parseInt(initQuery['dateType']) : undefined, firstDayOfWeek.value);
+
+    if (!dateRange && initQuery['dateType'] && initQuery['maxTime'] && initQuery['minTime'] &&
+        (DateRange.isBillingCycle(parseInt(initQuery['dateType'])) || initQuery['dateType'] === DateRange.Custom.type.toString()) &&
+        parseInt(initQuery['maxTime']) > 0 && parseInt(initQuery['minTime']) > 0) {
+        dateRange = {
+            dateType: parseInt(initQuery['dateType']),
+            maxTime: parseInt(initQuery['maxTime']),
+            minTime: parseInt(initQuery['minTime'])
+        };
+    }
+
+    transactionsStore.initTransactionListFilter({
+        dateType: dateRange ? dateRange.dateType : undefined,
+        maxTime: dateRange ? dateRange.maxTime : undefined,
+        minTime: dateRange ? dateRange.minTime : undefined,
+        type: initQuery['type'] && parseInt(initQuery['type']) > 0 ? parseInt(initQuery['type']) : undefined,
+        categoryIds: initQuery['categoryIds'],
+        accountIds: initQuery['accountIds'],
+        tagIds: initQuery['tagIds'],
+        tagFilterType: initQuery['tagFilterType'] && parseInt(initQuery['tagFilterType']) >= 0 ? parseInt(initQuery['tagFilterType']) : undefined
+    });
+
+    reload(null);
+}
+
+function reload(done: (() => void) | null): void {
+    const force = !!done;
+
+    if (!done) {
+        loading.value = true;
+    }
+
+    Promise.all([
+        accountsStore.loadAllAccounts({ force: false }),
+        transactionCategoriesStore.loadAllCategories({ force: false }),
+        transactionTagsStore.loadAllTags({ force: false })
+    ]).then(() => {
+        return transactionsStore.loadTransactions({
+            reload: true,
+            autoExpand: true,
+            defaultCurrency: defaultCurrency.value
+        });
+    }).then(() => {
+        done?.();
+
+        if (force) {
+            showToast('Data has been updated');
+        }
+
+        loading.value = false;
+    }).catch(error => {
+        if (error.processed || done) {
+            loading.value = false;
+        }
+
+        done?.();
+
+        if (!error.processed) {
+            if (!done) {
+                loadingError.value = error;
+            }
+
+            showToast(error.message || error);
+        }
+    });
+}
+
+function loadMore(autoExpand: boolean): void {
+    if (!hasMoreTransaction.value) {
+        return;
+    }
+
+    if (loadingMore.value || loading.value) {
+        return;
+    }
+
+    loadingMore.value = true;
+
+    transactionsStore.loadTransactions({
+        reload: false,
+        autoExpand: autoExpand,
+        defaultCurrency: defaultCurrency.value
+    }).then(() => {
+        loadingMore.value = false;
+    }).catch(error => {
+        loadingMore.value = false;
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function changeDateFilter(dateType: number): void {
+    if (dateType === DateRange.Custom.type) { // Custom
+        if (!query.value.minTime || !query.value.maxTime) {
+            customMaxDatetime.value = getActualUnixTimeForStore(getCurrentUnixTime(), currentTimezoneOffsetMinutes.value, getBrowserTimezoneOffsetMinutes());
+            customMinDatetime.value = getSpecifiedDayFirstUnixTime(customMaxDatetime.value);
+        } else {
+            customMaxDatetime.value = query.value.maxTime;
+            customMinDatetime.value = query.value.minTime;
+        }
+
+        showCustomDateRangeSheet.value = true;
+        showDatePopover.value = false;
+        return;
+    } else if (query.value.dateType === dateType) {
+        return;
+    }
+
+    let dateRange: TimeRangeAndDateType | null = null;
+
+    if (DateRange.isBillingCycle(dateType)) {
+        dateRange = getDateRangeByBillingCycleDateType(dateType, firstDayOfWeek.value, accountsStore.getAccountStatementDate(query.value.accountIds));
+    } else {
+        dateRange = getDateRangeByDateType(dateType, firstDayOfWeek.value);
+    }
+
+    if (!dateRange) {
+        return;
+    }
+
+    const changed = transactionsStore.updateTransactionListFilter({
+        dateType: dateRange.dateType,
+        maxTime: dateRange.maxTime,
+        minTime: dateRange.minTime
+    });
+
+    showDatePopover.value = false;
+
+    if (changed) {
+        reload(null);
+    }
+}
+
+function changeCustomDateFilter(minTime: number, maxTime: number): void {
+    if (!minTime || !maxTime) {
+        return;
+    }
+
+    let dateType: number | null = getDateTypeByBillingCycleDateRange(minTime, maxTime, firstDayOfWeek.value, DateRangeScene.Normal, accountsStore.getAccountStatementDate(query.value.accountIds));
+
+    if (!dateType) {
+        dateType = getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek.value, DateRangeScene.Normal);
+    }
+
+    const changed = transactionsStore.updateTransactionListFilter({
+        dateType: dateType,
+        maxTime: maxTime,
+        minTime: minTime
+    });
+
+    showCustomDateRangeSheet.value = false;
+
+    if (changed) {
+        reload(null);
+    }
+}
+
+function shiftDateRange(minTime: number, maxTime: number, scale: number): void {
+    if (query.value.dateType === DateRange.All.type) {
+        return;
+    }
+
+    let newDateRange: TimeRangeAndDateType | null = null;
+
+    if (DateRange.isBillingCycle(query.value.dateType) || query.value.dateType === DateRange.Custom.type) {
+        newDateRange = getShiftedDateRangeAndDateTypeForBillingCycle(minTime, maxTime, scale, firstDayOfWeek.value, DateRangeScene.Normal, accountsStore.getAccountStatementDate(query.value.accountIds));
+    }
+
+    if (!newDateRange) {
+        newDateRange = getShiftedDateRangeAndDateType(minTime, maxTime, scale, firstDayOfWeek.value, DateRangeScene.Normal);
+    }
+
+    const changed = transactionsStore.updateTransactionListFilter({
+        dateType: newDateRange.dateType,
+        maxTime: newDateRange.maxTime,
+        minTime: newDateRange.minTime
+    });
+
+    if (changed) {
+        reload(null);
+    }
+}
+
+function changeTypeFilter(type: number): void {
+    if (query.value.type === type) {
+        return;
+    }
+
+    let newCategoryFilter = undefined;
+
+    if (type && query.value.categoryIds) {
+        newCategoryFilter = '';
+
+        for (const categoryId in queryAllFilterCategoryIds.value) {
+            if (!Object.prototype.hasOwnProperty.call(queryAllFilterCategoryIds.value, categoryId)) {
+                continue;
+            }
+
+            const category = allCategories.value[categoryId];
+
+            if (category && category.type === transactionTypeToCategoryType(type)) {
+                if (newCategoryFilter.length > 0) {
+                    newCategoryFilter += ',';
+                }
+
+                newCategoryFilter += categoryId;
+            }
+        }
+    }
+
+    const changed = transactionsStore.updateTransactionListFilter({
+        type: type,
+        categoryIds: newCategoryFilter
+    });
+
+    showMorePopover.value = false;
+
+    if (changed) {
+        reload(null);
+    }
+}
+
+function changeCategoryFilter(categoryIds: string): void {
+    if (query.value.categoryIds === categoryIds) {
+        return;
+    }
+
+    const changed = transactionsStore.updateTransactionListFilter({
+        categoryIds: categoryIds
+    });
+
+    showCategoryPopover.value = false;
+
+    if (changed) {
+        reload(null);
+    }
+}
+
+function filterMultipleCategories(): void {
+    let navigateUrl = '/settings/filter/category?type=transactionListCurrent';
+
+    if (TransactionType.Income <= query.value.type && query.value.type <= TransactionType.Transfer) {
+        navigateUrl += '&allowCategoryTypes=' + transactionTypeToCategoryType(query.value.type);
+    }
+
+    props.f7router.navigate(navigateUrl);
+}
+
+function changeAccountFilter(accountIds: string): void {
+    if (query.value.accountIds === accountIds) {
+        return;
+    }
+
+    const changed = transactionsStore.updateTransactionListFilter({
+        accountIds: accountIds
+    });
+
+    showAccountPopover.value = false;
+
+    if (changed) {
+        reload(null);
+    }
+}
+
+function filterMultipleAccounts(): void {
+    props.f7router.navigate('/settings/filter/account?type=transactionListCurrent');
+}
+
+function changeTagFilter(tagIds: string): void {
+    if (query.value.tagIds === tagIds) {
+        return;
+    }
+
+    const changed = transactionsStore.updateTransactionListFilter({
+        tagIds: tagIds
+    });
+
+    showMorePopover.value = false;
+
+    if (changed) {
+        reload(null);
+    }
+}
+
+function filterMultipleTags(): void {
+    props.f7router.navigate('/settings/filter/tag?type=transactionListCurrent');
+}
+
+function changeTagFilterType(filterType: number): void {
+    if (query.value.tagFilterType === filterType) {
+        return;
+    }
+
+    const changed = transactionsStore.updateTransactionListFilter({
+        tagFilterType: filterType
+    });
+
+    showMorePopover.value = false;
+
+    if (changed) {
+        reload(null);
+    }
+}
+
+function changeKeywordFilter(keyword: string): void {
+    if (query.value.keyword === keyword) {
+        return;
+    }
+
+    const changed = transactionsStore.updateTransactionListFilter({
+        keyword: keyword
+    });
+
+    if (changed) {
+        reload(null);
+    }
+}
+
+function changeAmountFilter(filterType: string): void {
+    if (query.value.amountFilter === filterType) {
+        return;
+    }
+
+    if (filterType) {
+        showMorePopover.value = false;
+        props.f7router.navigate(`/transaction/filter/amount?type=${filterType}&value=${query.value.amountFilter}`);
+        return;
+    }
+
+    const changed = transactionsStore.updateTransactionListFilter({
+        amountFilter: filterType
+    });
+
+    showMorePopover.value = false;
+
+    if (changed) {
+        reload(null);
+    }
+}
+
+function duplicate(transaction: Transaction): void {
+    props.f7router.navigate(`/transaction/add?id=${transaction.id}&type=${transaction.type}`);
+}
+
+function edit(transaction: Transaction): void {
+    props.f7router.navigate(`/transaction/edit?id=${transaction.id}&type=${transaction.type}`);
+}
+
+function remove(transaction: Transaction | null, confirm: boolean): void {
+    if (!transaction) {
+        showAlert('An error occurred');
+        return;
+    }
+
+    if (!confirm) {
+        transactionToDelete.value = transaction;
+        showDeleteActionSheet.value = true;
+        return;
+    }
+
+    showDeleteActionSheet.value = false;
+    transactionToDelete.value = null;
+    showLoading();
+
+    transactionsStore.deleteTransaction({
+        transaction: transaction,
+        defaultCurrency: defaultCurrency.value,
+        beforeResolve: (done) => {
+            onSwipeoutDeleted(getTransactionDomId(transaction), done);
+        }
+    }).then(() => {
+        hideLoading();
+    }).catch(error => {
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function collapseTransactionMonthList(month: TransactionMonthList, collapse: boolean): void {
+    transactionsStore.collapseMonthInTransactionList({
+        month: month,
+        collapse: collapse
+    });
+}
+
+function onPopoverOpen(event: { $el: Framework7Dom }): void {
+    scrollToSelectedItem(event.$el, '.popover-inner', 'li.list-item-selected');
+}
+
+function onPageAfterIn(): void {
+    if (transactionsStore.transactionListStateInvalid && !loading.value) {
+        reload(null);
+    }
+
+    routeBackOnError(props.f7router, loadingError);
+}
+
+init();
 </script>
 
 <style>

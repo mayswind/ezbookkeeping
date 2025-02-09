@@ -38,7 +38,6 @@ import Framework7Swiper from 'framework7/components/swiper';
 import Framework7PhotoBrowser from 'framework7/components/photo-browser';
 // @ts-expect-error there is a function called "registerComponents" in the framework7-vue package, but it is not declared in the type definition file
 import Framework7Vue, { registerComponents } from 'framework7-vue/bundle';
-import type { Dialog } from 'framework7/types';
 
 import 'framework7/css';
 import 'framework7/components/dialog/css';
@@ -82,15 +81,6 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
 import { getI18nOptions } from '@/locales/helpers.ts';
-// @ts-expect-error the above file is migrating to ts
-import { i18nFunctions } from '@/locales/helper.js';
-import {
-    showAlert,
-    showToast,
-    showLoading,
-    hideLoading,
-    routeBackOnError
-} from '@/lib/ui/mobile.ts';
 
 import PinCodeInput from '@/components/common/PinCodeInput.vue';
 import MapView from '@/components/common/MapView.vue';
@@ -199,13 +189,5 @@ app.component('TransactionTagSelectionSheet', TransactionTagSelectionSheet);
 app.component('ScheduleFrequencySheet', ScheduleFrequencySheet);
 
 app.directive('TextareaAutoSize', TextareaAutoSize);
-
-app.config.globalProperties['$locale'] = i18nFunctions(i18n.global);
-
-app.config.globalProperties['$alert'] = (message: string, confirmCallback: ((dialog: Dialog.Dialog, e: Event) => void) | undefined) => showAlert(message, confirmCallback, i18n.global.t);
-app.config.globalProperties['$toast'] = (message: string, timeout: number | undefined) => showToast(message, timeout, i18n.global.t);
-app.config.globalProperties['$showLoading'] = showLoading;
-app.config.globalProperties['$hideLoading'] = hideLoading;
-app.config.globalProperties['$routeBackOnError'] = routeBackOnError;
 
 app.mount('#app');

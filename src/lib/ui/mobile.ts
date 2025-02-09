@@ -1,13 +1,12 @@
 import { type Ref, watch } from 'vue';
-import { useI18n as useVueI18n } from 'vue-i18n';
 import { f7, f7ready } from 'framework7-vue';
 import type { Dialog, Picker, Router } from 'framework7/types';
+
+import { useI18n } from '@/locales/helpers.ts';
 
 import { FontSize, FONT_SIZE_PREVIEW_CLASSNAME_PREFIX } from '@/core/font.ts';
 import { getNumberValue } from '../common.ts';
 import { isEnableAnimate } from '../settings.ts';
-// @ts-expect-error the above file is migrating to ts
-import { translateError } from '@/locales/helper.js';
 
 export interface Framework7Dom {
     length: number;
@@ -17,34 +16,6 @@ export interface Framework7Dom {
     scrollTop(position: number, duration?: number, callback?: () => void): Framework7Dom;
     outerHeight(includeMargin?: boolean): number;
     css(property: string): string | number;
-}
-
-type TranslateFunction = (message: string) => string;
-
-export function showAlert(message: string, confirmCallback: ((dialog: Dialog.Dialog, e: Event) => void) | undefined, translateFn: TranslateFunction): void {
-    f7ready((f7) => {
-        f7.dialog.create({
-            title: translateFn('global.app.title'),
-            text: translateError(message, translateFn),
-            animate: isEnableAnimate(),
-            buttons: [
-                {
-                    text: translateFn('OK'),
-                    onClick: confirmCallback
-                }
-            ]
-        }).open();
-    });
-}
-
-export function showToast(message: string, timeout: number | undefined, translateFn: TranslateFunction): void {
-    f7ready((f7) => {
-        f7.toast.create({
-            text: translateError(message, translateFn),
-            position: 'center',
-            closeTimeout: timeout || 1500
-        }).open();
-    });
 }
 
 export function showLoading(delayConditionFunc?: () => boolean, delayMills?: number): void {
@@ -79,26 +50,6 @@ export function createInlinePicker(containerEl: string, inputEl: string, cols: P
         value: value,
         cols: cols,
         on: events || {}
-    });
-}
-
-export function routeBackOnError(f7router: Router.Router, errorPropertyName: string): void {
-    // @ts-expect-error vue SFC would be migrated to composition API and this function would be removed in the future
-    const self = this;
-    const router = f7router;
-
-    const unwatch = self.$watch(errorPropertyName, () => {
-        if (self[errorPropertyName]) {
-            setTimeout(() => {
-                if (unwatch) {
-                    unwatch();
-                }
-
-                router.back();
-            }, 200);
-        }
-    }, {
-        immediate: true
     });
 }
 
@@ -190,7 +141,7 @@ export function scrollToSelectedItem(parentEl: Framework7Dom, containerSelector:
 }
 
 export function useI18nUIComponents() {
-    const { t } = useVueI18n();
+    const { tt, te } = useI18n();
 
     function routeBackOnError<T>(f7router: Router.Router, errorRef: Ref<T>): void {
         const unwatch = watch(errorRef, (newValue) => {
@@ -208,19 +159,15 @@ export function useI18nUIComponents() {
         });
     }
 
-    function showConfirm(message: string, confirmCallback?: (dialog: Dialog.Dialog, e: Event) => void, cancelCallback?: ((dialog: Dialog.Dialog, e: Event) => void) | undefined): void {
+    function showAlert(message: string, confirmCallback?: (dialog: Dialog.Dialog, e: Event) => void): void {
         f7ready((f7) => {
             f7.dialog.create({
-                title: t('global.app.title'),
-                text: t(message),
+                title: tt('global.app.title'),
+                text: te(message),
                 animate: isEnableAnimate(),
                 buttons: [
                     {
-                        text: t('Cancel'),
-                        onClick: cancelCallback
-                    },
-                    {
-                        text: t('OK'),
+                        text: tt('OK'),
                         onClick: confirmCallback
                     }
                 ]
@@ -228,10 +175,40 @@ export function useI18nUIComponents() {
         });
     }
 
+    function showConfirm(message: string, confirmCallback?: (dialog: Dialog.Dialog, e: Event) => void, cancelCallback?: (dialog: Dialog.Dialog, e: Event) => void): void {
+        f7ready((f7) => {
+            f7.dialog.create({
+                title: tt('global.app.title'),
+                text: tt(message),
+                animate: isEnableAnimate(),
+                buttons: [
+                    {
+                        text: tt('Cancel'),
+                        onClick: cancelCallback
+                    },
+                    {
+                        text: tt('OK'),
+                        onClick: confirmCallback
+                    }
+                ]
+            }).open();
+        });
+    }
+
+    function showToast(message: string, timeout?: number): void {
+        f7ready((f7) => {
+            f7.toast.create({
+                text: te(message),
+                position: 'center',
+                closeTimeout: timeout || 1500
+            }).open();
+        });
+    }
+
     return {
-        showAlert: (message: string, confirmCallback?: (dialog: Dialog.Dialog, e: Event) => void) => showAlert(message, confirmCallback, t),
+        showAlert: showAlert,
         showConfirm: showConfirm,
-        showToast: (message: string, timeout?: number): void => showToast(message, timeout, t),
+        showToast: showToast,
         routeBackOnError
     }
 }

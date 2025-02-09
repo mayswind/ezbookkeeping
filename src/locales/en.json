@@ -9,7 +9,8 @@
         "Spanish": "Spanish",
         "Russian": "Russian",
         "Vietnamese": "Vietnamese",
-        "Simplified Chinese": "Simplified Chinese"
+        "Simplified Chinese": "Simplified Chinese",
+        "German": "German"
     },
     "default": {
         "currency": "USD",

@@ -9,7 +9,8 @@
         "Spanish": "Tiếng Tây Ban Nha",
         "Russian": "Tiếng Nga",
         "Vietnamese": "Tiếng Việt",
-        "Simplified Chinese": "Tiếng Trung Giản Thể"
+        "Simplified Chinese": "Tiếng Trung Giản Thể",
+        "German": "Tiếng Đức"
     },
     "default": {
         "currency": "VND",

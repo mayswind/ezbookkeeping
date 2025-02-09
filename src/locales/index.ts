@@ -3,6 +3,7 @@ import ru from './ru.json';
 import es from './es.json';
 import vi from './vi.json';
 import zhHans from './zh_Hans.json';
+import de from './de.json';
 
 export interface LanguageInfo {
     readonly name: string;
@@ -51,5 +52,11 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         alternativeLanguageTag: 'zh-CN',
         aliases: ['zh-CHS', 'zh-CN', 'zh-SG'],
         content: zhHans
+    },
+    'de': {
+        name: 'German',
+        displayName: 'Deutsch',
+        alternativeLanguageTag: 'de-DE',
+        content: de
     }
 };

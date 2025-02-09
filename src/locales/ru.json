@@ -9,7 +9,8 @@
         "Spanish": "Испанский",
         "Russian": "Русский",
         "Vietnamese": "Вьетнамский язык",
-        "Simplified Chinese": "Упрощенный Китайский"
+        "Simplified Chinese": "Упрощенный Китайский",
+        "German": "Немецкий"
     },
     "default": {
         "currency": "RUB",

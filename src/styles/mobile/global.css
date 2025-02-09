@@ -96,6 +96,15 @@ i.icon.la, i.icon.las, i.icon.lab {
     border: 0;
 }
 
+.actions-button.disabled {
+    --f7-actions-bg-color: rgba(208, 208, 208, 0.95);
+    opacity: inherit !important;
+}
+
+.actions-button.disabled .actions-button-text {
+    opacity: 0.55 !important;
+}
+
 /** custom class **/
 :root {
     --default-icon-color: #000;

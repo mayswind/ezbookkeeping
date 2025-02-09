@@ -5,12 +5,12 @@
         }
     },
     "language": {
+        "German": "Tiếng Đức",
         "English": "Tiếng Anh",
         "Spanish": "Tiếng Tây Ban Nha",
         "Russian": "Tiếng Nga",
         "Vietnamese": "Tiếng Việt",
-        "Simplified Chinese": "Tiếng Trung Giản Thể",
-        "German": "Tiếng Đức"
+        "Simplified Chinese": "Tiếng Trung Giản Thể"
     },
     "default": {
         "currency": "VND",

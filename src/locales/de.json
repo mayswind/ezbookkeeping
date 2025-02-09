@@ -5,12 +5,12 @@
         }
     },
     "language": {
+        "Deutsch": "Deutsch",
         "English": "English",
         "Spanish": "Spanish",
         "Russian": "Russian",
         "Vietnamese": "Vietnamese",
-        "Simplified Chinese": "Simplified Chinese",
-        "Deutsch": "Deutsch"
+        "Simplified Chinese": "Simplified Chinese"
     },
     "default": {
         "currency": "EUR",

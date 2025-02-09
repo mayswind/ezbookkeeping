@@ -22,23 +22,29 @@ export const DEFAULT_LANGUAGE: string = 'en';
 
 // To add new languages, please refer to https://ezbookkeeping.mayswind.net/translating
 export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
+    'de': {
+        name: 'German',
+        displayName: 'Deutsch',
+        alternativeLanguageTag: 'de-DE',
+        content: de
+    },
     'en': {
         name: 'English',
         displayName: 'English',
         alternativeLanguageTag: 'en',
         content: en
     },
-    'ru': {
-        name: 'Russian',
-        displayName: 'Русский',
-        alternativeLanguageTag: 'ru-RU',
-        content: ru
-    },
     'es': {
         name: 'Spanish',
         displayName: 'Español',
         alternativeLanguageTag: 'es',
         content: es
+    },
+    'ru': {
+        name: 'Russian',
+        displayName: 'Русский',
+        alternativeLanguageTag: 'ru-RU',
+        content: ru
     },
     'vi': {
         name: 'Vietnamese',
@@ -52,11 +58,5 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         alternativeLanguageTag: 'zh-CN',
         aliases: ['zh-CHS', 'zh-CN', 'zh-SG'],
         content: zhHans
-    },
-    'de': {
-        name: 'German',
-        displayName: 'Deutsch',
-        alternativeLanguageTag: 'de-DE',
-        content: de
     }
 };

@@ -165,7 +165,7 @@ function init(): void {
     });
 }
 
-function reload(done: (() => void) | null): void {
+function reload(done?: () => void): void {
     if (sortable.value) {
         done?.();
         return;
@@ -310,7 +310,7 @@ function onSort(event: { el: { id: string }; from: number; to: number }): void {
 
 function onPageAfterIn(): void {
     if ((!isDefined(transactionTemplatesStore.transactionTemplateListStatesInvalid[templateType.value]) || transactionTemplatesStore.transactionTemplateListStatesInvalid[templateType.value]) && !loading.value) {
-        reload(null);
+        reload();
     }
 
     routeBackOnError(props.f7router, loadingError);

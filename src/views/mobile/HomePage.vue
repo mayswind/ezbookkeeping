@@ -267,7 +267,7 @@ function init(): void {
     }
 }
 
-function reload(done: (() => void) | null): void {
+function reload(done?: () => void): void {
     const force = !!done;
 
     overviewStore.loadTransactionOverview({
@@ -289,7 +289,7 @@ function reload(done: (() => void) | null): void {
 
 function onPageAfterIn(): void {
     if (!loading.value) {
-        reload(null);
+        reload();
     }
 }
 

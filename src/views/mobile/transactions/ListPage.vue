@@ -700,10 +700,10 @@ function init(): void {
         tagFilterType: initQuery['tagFilterType'] && parseInt(initQuery['tagFilterType']) >= 0 ? parseInt(initQuery['tagFilterType']) : undefined
     });
 
-    reload(null);
+    reload();
 }
 
-function reload(done: (() => void) | null): void {
+function reload(done?: () => void): void {
     const force = !!done;
 
     if (!done) {
@@ -809,7 +809,7 @@ function changeDateFilter(dateType: number): void {
     showDatePopover.value = false;
 
     if (changed) {
-        reload(null);
+        reload();
     }
 }
 
@@ -833,7 +833,7 @@ function changeCustomDateFilter(minTime: number, maxTime: number): void {
     showCustomDateRangeSheet.value = false;
 
     if (changed) {
-        reload(null);
+        reload();
     }
 }
 
@@ -859,7 +859,7 @@ function shiftDateRange(minTime: number, maxTime: number, scale: number): void {
     });
 
     if (changed) {
-        reload(null);
+        reload();
     }
 }
 
@@ -898,7 +898,7 @@ function changeTypeFilter(type: number): void {
     showMorePopover.value = false;
 
     if (changed) {
-        reload(null);
+        reload();
     }
 }
 
@@ -914,7 +914,7 @@ function changeCategoryFilter(categoryIds: string): void {
     showCategoryPopover.value = false;
 
     if (changed) {
-        reload(null);
+        reload();
     }
 }
 
@@ -940,7 +940,7 @@ function changeAccountFilter(accountIds: string): void {
     showAccountPopover.value = false;
 
     if (changed) {
-        reload(null);
+        reload();
     }
 }
 
@@ -960,7 +960,7 @@ function changeTagFilter(tagIds: string): void {
     showMorePopover.value = false;
 
     if (changed) {
-        reload(null);
+        reload();
     }
 }
 
@@ -980,7 +980,7 @@ function changeTagFilterType(filterType: number): void {
     showMorePopover.value = false;
 
     if (changed) {
-        reload(null);
+        reload();
     }
 }
 
@@ -994,7 +994,7 @@ function changeKeywordFilter(keyword: string): void {
     });
 
     if (changed) {
-        reload(null);
+        reload();
     }
 }
 
@@ -1016,7 +1016,7 @@ function changeAmountFilter(filterType: string): void {
     showMorePopover.value = false;
 
     if (changed) {
-        reload(null);
+        reload();
     }
 }
 
@@ -1074,7 +1074,7 @@ function onPopoverOpen(event: { $el: Framework7Dom }): void {
 
 function onPageAfterIn(): void {
     if (transactionsStore.transactionListStateInvalid && !loading.value) {
-        reload(null);
+        reload();
     }
 
     routeBackOnError(props.f7router, loadingError);

@@ -228,6 +228,10 @@ input[type=number] {
     }
 }
 
+.v-btn__overlay {
+    transition: none;
+}
+
 .w-100-window-container.v-window > .v-window__container {
     width: 100%;
 }

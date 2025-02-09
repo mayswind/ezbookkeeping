@@ -490,49 +490,10 @@
                                           :items="importTransactionsTablePageOptions"
                                           v-model="countPerPage"
                                 />
-                                <v-pagination density="compact"
-                                              :disabled="loading || submitting"
-                                              :total-visible="6"
-                                              :length="totalPageCount"
-                                              v-model="currentPage">
-                                    <template #item="{ page, isActive }">
-                                        <v-btn density="compact"
-                                               variant="text"
-                                               :disabled="loading || submitting"
-                                               :icon="true"
-                                               :color="isActive ? 'primary' : 'default'"
-                                               @click="currentPage = parseInt(page)"
-                                               v-if="page !== '...'"
-                                        >
-                                            <span>{{ page }}</span>
-                                        </v-btn>
-                                        <v-btn density="compact"
-                                               variant="text"
-                                               color="default"
-                                               :disabled="loading || submitting"
-                                               :icon="true"
-                                               v-if="page === '...'"
-                                        >
-                                            <span>{{ page }}</span>
-                                            <v-menu :disabled="loading || submitting" :close-on-content-click="false" activator="parent">
-                                                <v-list>
-                                                    <v-list-item class="text-sm" density="compact">
-                                                        <v-list-item-title class="cursor-pointer">
-                                                            <v-autocomplete density="compact"
-                                                                            width="100"
-                                                                            item-title="page"
-                                                                            item-value="page"
-                                                                            :items="allPages"
-                                                                            :no-data-text="tt('No results')"
-                                                                            v-model="inputCurrentPage"
-                                                            />
-                                                        </v-list-item-title>
-                                                    </v-list-item>
-                                                </v-list>
-                                            </v-menu>
-                                        </v-btn>
-                                    </template>
-                                </v-pagination>
+                                <pagination-buttons density="compact"
+                                                    :disabled="loading || submitting"
+                                                    :totalPageCount="totalPageCount"
+                                                    v-model="currentPage"></pagination-buttons>
                             </div>
                         </template>
                     </v-data-table>
@@ -606,6 +567,7 @@
 
 <script setup lang="ts">
 import type { StepBarItem } from '@/components/desktop/StepsBar.vue';
+import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import BatchReplaceDialog from './BatchReplaceDialog.vue';
@@ -882,27 +844,6 @@ const importTransactionsTablePageOptions = computed<ImportTransactionsDialogTabl
     pageOptions.push({ value: -1, title: tt('All') });
 
     return pageOptions;
-});
-
-const allPages = computed<{ page: number }[]>(() => {
-    const pages = [];
-
-    for (let i = 1; i < totalPageCount.value; i++) {
-        pages.push({
-            page: i
-        });
-    }
-
-    return pages;
-});
-
-const inputCurrentPage = computed<number>({
-    get: () => currentPage.value,
-    set: (value) => {
-        if (value && value >= 1 && value < totalPageCount.value) {
-            currentPage.value = value;
-        }
-    }
 });
 
 const totalPageCount = computed<number>(() => {

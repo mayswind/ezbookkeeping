@@ -171,7 +171,6 @@ export interface LocalizedError {
 
 export function getI18nOptions(): object {
     return {
-        legacy: true,
         locale: DEFAULT_LANGUAGE,
         fallbackLocale: DEFAULT_LANGUAGE,
         formatFallbackMessages: true,

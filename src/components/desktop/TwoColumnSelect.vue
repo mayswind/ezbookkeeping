@@ -91,7 +91,7 @@ import {
     getItemByKeyValue,
     getNameByKeyValue
 } from '@/lib/common.ts';
-import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';
+import { type ComponentDensity, type InputVariant, scrollToSelectedItem } from '@/lib/ui/desktop.ts';
 
 import {
     mdiChevronRight,
@@ -99,8 +99,8 @@ import {
 } from '@mdi/js';
 
 interface DesktopTwoColumnListItemSelectionProps extends CommonTwoColumnListItemSelectionProps {
-    density?: string;
-    variant?: string;
+    density?: ComponentDensity;
+    variant?: InputVariant;
     disabled?: boolean;
     readonly?: boolean;
     label?: string;

@@ -37,12 +37,13 @@ import { useI18n } from '@/locales/helpers.ts';
 import type { CurrencyPrependAndAppendText } from '@/core/currency.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import { removeAll } from '@/lib/common.ts';
+import type { ComponentDensity } from '@/lib/ui/desktop.ts';
 import logger from '@/lib/logger.ts';
 
 const props = defineProps<{
     class?: string;
     color?: string;
-    density?: string;
+    density?: ComponentDensity;
     currency: string;
     showCurrency?: boolean;
     label?: string;

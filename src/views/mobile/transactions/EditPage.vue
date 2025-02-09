@@ -4,7 +4,7 @@
             <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title :title="tt(title)"></f7-nav-title>
             <f7-nav-right>
-                <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true" v-if="mode !== TransactionEditPageMode.View"></f7-link>
+                <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" :text="tt(saveButtonTitle)" @click="save" v-if="mode !== TransactionEditPageMode.View"></f7-link>
             </f7-nav-right>
 
@@ -403,17 +403,23 @@
         </f7-actions>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
-            <f7-actions-group v-if="transaction.type === TransactionType.Transfer">
+            <f7-actions-group v-if="mode !== TransactionEditPageMode.View && transaction.type === TransactionType.Transfer">
                 <f7-actions-button @click="swapTransactionData(true, false)">{{ tt('Swap Account') }}</f7-actions-button>
                 <f7-actions-button @click="swapTransactionData(false, true)">{{ tt('Swap Amount') }}</f7-actions-button>
                 <f7-actions-button @click="swapTransactionData(true, true)">{{ tt('Swap Account and Amount') }}</f7-actions-button>
             </f7-actions-group>
-            <f7-actions-group>
+            <f7-actions-group v-if="mode !== TransactionEditPageMode.View">
                 <f7-actions-button v-if="transaction.hideAmount" @click="transaction.hideAmount = false">{{ tt('Show Amount') }}</f7-actions-button>
                 <f7-actions-button v-if="!transaction.hideAmount" @click="transaction.hideAmount = true">{{ tt('Hide Amount') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group v-if="pageTypeAndMode?.type === TransactionEditPageType.Transaction && (mode === TransactionEditPageMode.Add || mode === TransactionEditPageMode.Edit) && isTransactionPicturesEnabled() && !showTransactionPictures">
                 <f7-actions-button @click="showTransactionPictures = true">{{ tt('Add Picture') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group v-if="pageTypeAndMode?.type === TransactionEditPageType.Transaction && mode === TransactionEditPageMode.View">
+                <f7-actions-button @click="duplicate(false, false)">{{ tt('Duplicate') }}</f7-actions-button>
+                <f7-actions-button @click="duplicate(true, false)">{{ tt('Duplicate (With Time)') }}</f7-actions-button>
+                <f7-actions-button @click="duplicate(false, true)" v-if="transaction.geoLocation">{{ tt('Duplicate (With Geographic Location)') }}</f7-actions-button>
+                <f7-actions-button @click="duplicate(true, true)" v-if="transaction.geoLocation">{{ tt('Duplicate (With Time and Geographic Location)') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
@@ -863,7 +869,17 @@ function init(): void {
             pageTypeAndMode.type === TransactionEditPageType.Transaction && (mode.value === TransactionEditPageMode.Edit || mode.value === TransactionEditPageMode.View)
         );
 
-        if (pageTypeAndMode.type === TransactionEditPageType.Template && query['id'] && responses[4] instanceof TransactionTemplate) {
+        if (pageTypeAndMode.type === TransactionEditPageType.Transaction && query['id'] && responses[4] instanceof Transaction) {
+            if (fromTransaction && query['withTime'] && query['withTime'] === 'true') {
+                transaction.value.time = fromTransaction.time;
+                transaction.value.timeZone = fromTransaction.timeZone;
+                transaction.value.utcOffset = fromTransaction.utcOffset;
+            }
+
+            if (fromTransaction && query['withGeoLocation'] && query['withGeoLocation'] === 'true') {
+                transaction.value.setGeoLocation(fromTransaction.geoLocation);
+            }
+        } else if (pageTypeAndMode.type === TransactionEditPageType.Template && query['id'] && responses[4] instanceof TransactionTemplate) {
             const template = responses[4];
             transaction.value.id = template.id;
 
@@ -1115,6 +1131,10 @@ function viewOrRemovePicture(pictureInfo: TransactionPictureInfoBasicResponse): 
             submitting.value = false;
         });
     });
+}
+
+function duplicate(withTime?: boolean, withGeoLocation?: boolean): void {
+    props.f7router.navigate(`/transaction/add?id=${transaction.value.id}&type=${transaction.value.type}&withTime=${withTime ?? false}&withGeoLocation=${withGeoLocation ?? false}`);
 }
 
 function onPageAfterIn(): void {

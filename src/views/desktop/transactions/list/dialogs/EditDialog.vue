@@ -382,9 +382,26 @@
                         {{ tt(saveButtonTitle) }}
                         <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                     </v-btn>
-                    <v-btn variant="tonal" :disabled="loading || submitting"
-                           v-if="mode === TransactionEditPageMode.View && transaction.type !== TransactionType.ModifyBalance"
-                           @click="duplicate">{{ tt('Duplicate') }}</v-btn>
+                    <v-btn-group variant="tonal" density="comfortable"
+                                 v-if="mode === TransactionEditPageMode.View && transaction.type !== TransactionType.ModifyBalance">
+                        <v-btn :disabled="loading || submitting"
+                               @click="duplicate(false, false)">{{ tt('Duplicate') }}</v-btn>
+                        <v-btn density="compact" :disabled="loading || submitting" :icon="true">
+                            <v-icon :icon="mdiMenuDown" size="24" />
+                            <v-menu activator="parent">
+                                <v-list>
+                                    <v-list-item :title="tt('Duplicate (With Time)')"
+                                                 @click="duplicate(true, false)"></v-list-item>
+                                    <v-list-item :title="tt('Duplicate (With Geographic Location)')"
+                                                 @click="duplicate(false, true)"
+                                                 v-if="transaction.geoLocation"></v-list-item>
+                                    <v-list-item :title="tt('Duplicate (With Time and Geographic Location)')"
+                                                 @click="duplicate(true, true)"
+                                                 v-if="transaction.geoLocation"></v-list-item>
+                                </v-list>
+                            </v-menu>
+                        </v-btn>
+                    </v-btn-group>
                     <v-btn color="warning" variant="tonal" :disabled="loading || submitting"
                            v-if="mode === TransactionEditPageMode.View && originalTransactionEditable && transaction.type !== TransactionType.ModifyBalance"
                            @click="edit">{{ tt('Edit') }}</v-btn>
@@ -461,6 +478,7 @@ import {
     mdiEyeOutline,
     mdiSwapHorizontal,
     mdiPound,
+    mdiMenuDown,
     mdiImagePlusOutline,
     mdiTrashCanOutline,
     mdiFullscreen
@@ -863,7 +881,7 @@ function save(): void {
     }
 }
 
-function duplicate(): void {
+function duplicate(withTime?: boolean, withGeoLocation?: boolean): void {
     if (props.type !== TransactionEditPageType.Transaction || mode.value !== TransactionEditPageMode.View) {
         return;
     }
@@ -872,10 +890,17 @@ function duplicate(): void {
     duplicateFromId.value = transaction.value.id;
     activeTab.value = 'basicInfo';
     transaction.value.id = '';
-    transaction.value.time = getCurrentUnixTime();
-    transaction.value.timeZone = settingsStore.appSettings.timeZone;
-    transaction.value.utcOffset = getTimezoneOffsetMinutes(transaction.value.timeZone);
-    transaction.value.removeGeoLocation();
+
+    if (!withTime) {
+        transaction.value.time = getCurrentUnixTime();
+        transaction.value.timeZone = settingsStore.appSettings.timeZone;
+        transaction.value.utcOffset = getTimezoneOffsetMinutes(transaction.value.timeZone);
+    }
+
+    if (!withGeoLocation) {
+        transaction.value.removeGeoLocation();
+    }
+
     transaction.value.clearPictures();
     mode.value = TransactionEditPageMode.Add;
 }

@@ -30,7 +30,7 @@ export const useAccountsStore = defineStore('accounts', () => {
     const accountListStateInvalid = ref<boolean>(true);
 
     const allPlainAccounts = computed<Account[]>(() => {
-        const allAccountsList = [];
+        const allAccountsList: Account[] = [];
 
         for (let i = 0; i < allAccounts.value.length; i++) {
             const account = allAccounts.value[i];
@@ -47,11 +47,11 @@ export const useAccountsStore = defineStore('accounts', () => {
             }
         }
 
-        return allAccountsList;
+        return Account.sortAccounts(allAccountsList);
     });
 
     const allVisiblePlainAccounts = computed<Account[]>(() => {
-        const allVisibleAccounts = [];
+        const allVisibleAccounts: Account[] = [];
 
         for (let i = 0; i < allAccounts.value.length; i++) {
             const account = allAccounts.value[i];
@@ -72,7 +72,7 @@ export const useAccountsStore = defineStore('accounts', () => {
             }
         }
 
-        return allVisibleAccounts;
+        return Account.sortAccounts(allVisibleAccounts);
     });
 
     const allAvailableAccountsCount = computed<number>(() => {
@@ -129,12 +129,17 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
 
     function addAccountToAccountList(account: Account): void {
-        let insertIndexToAllList = 0;
+        const newAccountCategory = AccountCategory.valueOf(account.category);
+        let insertIndexToAllList = allAccounts.value.length;
 
-        for (let i = 0; i < allAccounts.value.length; i++) {
-            if (allAccounts.value[i].category > account.category) {
-                insertIndexToAllList = i;
-                break;
+        if (newAccountCategory) {
+            for (let i = 0; i < allAccounts.value.length; i++) {
+                const accountCategory = AccountCategory.valueOf(allAccounts.value[i].category);
+
+                if (accountCategory && accountCategory.displayOrder > newAccountCategory.displayOrder) {
+                    insertIndexToAllList = i;
+                    break;
+                }
             }
         }
 
@@ -714,7 +719,7 @@ export const useAccountsStore = defineStore('accounts', () => {
                     updateAccountListInvalidState(false);
                 }
 
-                const accounts = Account.ofMany(data.result);
+                const accounts = Account.sortAccounts(Account.ofMany(data.result));
 
                 if (force && data.result && isEquals(allAccounts.value, accounts)) {
                     reject({ message: 'Account list is up to date', isUpToDate: true });

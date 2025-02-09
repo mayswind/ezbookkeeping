@@ -60,13 +60,14 @@ export function useTransactionListPageBase() {
 
     const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
     const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
-    const defaultCurrency = computed<string>(() => getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(allAccounts.value, queryAllFilterAccountIds.value, userStore.currentUserDefaultCurrency));
+    const defaultCurrency = computed<string>(() => getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(allAccountsMap.value, queryAllFilterAccountIds.value, userStore.currentUserDefaultCurrency));
     const showTotalAmountInTransactionListPage = computed<boolean>(() => settingsStore.appSettings.showTotalAmountInTransactionListPage);
     const showTagInTransactionListPage = computed<boolean>(() => settingsStore.appSettings.showTagInTransactionListPage);
 
     const allDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.Normal, true, !!accountsStore.getAccountStatementDate(query.value.accountIds)));
 
-    const allAccounts = computed<Record<string, Account>>(() => accountsStore.allAccountsMap);
+    const allAccounts = computed<Account[]>(() => accountsStore.allPlainAccounts);
+    const allAccountsMap = computed<Record<string, Account>>(() => accountsStore.allAccountsMap);
     const allAvailableAccountsCount = computed<number>(() => accountsStore.allAvailableAccountsCount);
     const allPrimaryCategories = computed<Record<number, TransactionCategory[]>>(() => {
         const primaryCategories: Record<number, TransactionCategory[]> = {};
@@ -131,7 +132,7 @@ export function useTransactionListPageBase() {
             return tt('Multiple Accounts');
         }
 
-        return allAccounts.value[query.value.accountIds]?.name || tt('Account');
+        return allAccountsMap.value[query.value.accountIds]?.name || tt('Account');
     });
 
     const queryCategoryName = computed<string>(() => {
@@ -176,7 +177,7 @@ export function useTransactionListPageBase() {
 
     const canAddTransaction = computed<boolean>(() => {
         if (query.value.accountIds && queryAllFilterAccountIdsCount.value === 1) {
-            const account = allAccounts.value[query.value.accountIds];
+            const account = allAccountsMap.value[query.value.accountIds];
 
             if (account && account.type === AccountType.MultiSubAccounts.type) {
                 return false;
@@ -278,6 +279,7 @@ export function useTransactionListPageBase() {
         showTagInTransactionListPage,
         allDateRanges,
         allAccounts,
+        allAccountsMap,
         allAvailableAccountsCount,
         allCategories,
         allPrimaryCategories,

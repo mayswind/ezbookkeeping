@@ -285,6 +285,31 @@ export class Account implements AccountInfoResponse {
 
         return defaultName;
     }
+
+    public static sortAccounts(accounts: Account[]): Account[] {
+        if (!accounts || !accounts.length) {
+            return accounts;
+        }
+
+        return accounts.sort(function (account1, account2) {
+            if (account1.category !== account2.category) {
+                const account1Category = AccountCategory.valueOf(account1.category);
+                const account2Category = AccountCategory.valueOf(account2.category);
+
+                if (!account1Category) {
+                    return 1;
+                }
+
+                if (!account2Category) {
+                    return -1;
+                }
+
+                return account1Category.displayOrder - account2Category.displayOrder;
+            }
+
+            return account1.displayOrder - account2.displayOrder;
+        });
+    }
 }
 
 export class AccountWithDisplayBalance extends Account {

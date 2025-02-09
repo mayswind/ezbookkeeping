@@ -346,12 +346,12 @@
                                                         </v-list-item>
                                                         <template :key="account.id"
                                                                   v-for="account in allAccounts">
-                                                            <v-divider v-if="(!account.hidden && (!allAccounts[account.parentId] || !allAccounts[account.parentId].hidden)) || query.accountIds === account.id" />
+                                                            <v-divider v-if="(!account.hidden && (!allAccountsMap[account.parentId] || !allAccountsMap[account.parentId].hidden)) || query.accountIds === account.id" />
                                                             <v-list-item class="text-sm" density="compact"
                                                                          :value="account.id"
                                                                          :class="{ 'list-item-selected': query.accountIds === account.id, 'item-in-multiple-selection': queryAllFilterAccountIdsCount > 1 && queryAllFilterAccountIds[account.id] }"
                                                                          :append-icon="(query.accountIds === account.id ? mdiCheck : undefined)"
-                                                                         v-if="(!account.hidden && (!allAccounts[account.parentId] || !allAccounts[account.parentId].hidden)) || query.accountIds === account.id">
+                                                                         v-if="(!account.hidden && (!allAccountsMap[account.parentId] || !allAccountsMap[account.parentId].hidden)) || query.accountIds === account.id">
                                                                 <v-list-item-title class="cursor-pointer"
                                                                                    @click="changeAccountFilter(account.id)">
                                                                     <div class="d-flex align-center">
@@ -721,6 +721,7 @@ const {
     showTagInTransactionListPage,
     allDateRanges,
     allAccounts,
+    allAccountsMap,
     allAvailableAccountsCount,
     allCategories,
     allPrimaryCategories,

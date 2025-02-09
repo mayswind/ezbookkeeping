@@ -13,9 +13,9 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
     public comment: string;
     public displayOrder: number;
     public visible: boolean;
-    public secondaryCategories?: TransactionCategory[];
+    public subCategories?: TransactionCategory[];
 
-    private constructor(id: string, name: string, parentId: string, type: CategoryType, icon: string, color: ColorValue, comment: string, displayOrder: number, visible: boolean, secondaryCategories?: TransactionCategory[]) {
+    private constructor(id: string, name: string, parentId: string, type: CategoryType, icon: string, color: ColorValue, comment: string, displayOrder: number, visible: boolean, subCategories?: TransactionCategory[]) {
         this.id = id;
         this.name = name;
         this.parentId = parentId;
@@ -26,31 +26,15 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
         this.displayOrder = displayOrder;
         this.visible = visible;
 
-        if (secondaryCategories) {
-            this.secondaryCategories = secondaryCategories;
-        } else if (!secondaryCategories && (!parentId || parentId === '0')) {
-            this.secondaryCategories = [];
+        if (subCategories) {
+            this.subCategories = subCategories;
+        } else if (!subCategories && (!parentId || parentId === '0')) {
+            this.subCategories = [];
         }
     }
 
     public get hidden(): boolean {
         return !this.visible;
-    }
-
-    public get subCategories(): TransactionCategoryInfoResponse[] | undefined {
-        if (typeof(this.secondaryCategories) === 'undefined') {
-            return undefined;
-        }
-
-        const ret: TransactionCategoryInfoResponse[] = [];
-
-        if (this.secondaryCategories) {
-            for (const subCategory of this.secondaryCategories) {
-                ret.push(subCategory);
-            }
-        }
-
-        return ret;
     }
 
     public from(other: TransactionCategory): void {

@@ -78,12 +78,12 @@ export function getCategorizedAccountsWithVisibleCount(categorizedAccountsMap: R
                 }
             }
 
-            if (account.type === AccountType.MultiSubAccounts.type && account.childrenAccounts) {
+            if (account.type === AccountType.MultiSubAccounts.type && account.subAccounts) {
                 let visibleSubAccountCount = 0;
                 let firstVisibleSubAccountIndex = -1;
 
-                for (let k = 0; k < account.childrenAccounts.length; k++) {
-                    const subAccount = account.childrenAccounts[k];
+                for (let k = 0; k < account.subAccounts.length; k++) {
+                    const subAccount = account.subAccounts[k];
 
                     if (!subAccount.hidden) {
                         visibleSubAccountCount++;
@@ -94,8 +94,8 @@ export function getCategorizedAccountsWithVisibleCount(categorizedAccountsMap: R
                     }
                 }
 
-                if (account.childrenAccounts.length > 0) {
-                    allSubAccounts[account.id] = account.childrenAccounts;
+                if (account.subAccounts.length > 0) {
+                    allSubAccounts[account.id] = account.subAccounts;
                     allVisibleSubAccountCounts[account.id] = visibleSubAccountCount;
                     allFirstVisibleSubAccountIndexes[account.id] = firstVisibleSubAccountIndex;
                 }
@@ -145,9 +145,9 @@ export function getAllFilteredAccountsBalance(categorizedAccounts: Record<number
                     isLiability: !!account.isLiability,
                     currency: account.currency
                 });
-            } else if (account.type === AccountType.MultiSubAccounts.type && account.childrenAccounts) {
-                for (let subAccountIdx = 0; subAccountIdx < account.childrenAccounts.length; subAccountIdx++) {
-                    const subAccount = account.childrenAccounts[subAccountIdx];
+            } else if (account.type === AccountType.MultiSubAccounts.type && account.subAccounts) {
+                for (let subAccountIdx = 0; subAccountIdx < account.subAccounts.length; subAccountIdx++) {
+                    const subAccount = account.subAccounts[subAccountIdx];
 
                     if (subAccount.hidden || !accountFilter(subAccount)) {
                         continue;
@@ -231,12 +231,12 @@ export function selectAccountOrSubAccounts(filterAccountIds: Record<string, bool
     if (account.type === AccountType.SingleAccount.type) {
         filterAccountIds[account.id] = value;
     } else if (account.type === AccountType.MultiSubAccounts.type) {
-        if (!account.childrenAccounts || !account.childrenAccounts.length) {
+        if (!account.subAccounts || !account.subAccounts.length) {
             return;
         }
 
-        for (let i = 0; i < account.childrenAccounts.length; i++) {
-            const subAccount = account.childrenAccounts[i];
+        for (let i = 0; i < account.subAccounts.length; i++) {
+            const subAccount = account.subAccounts[i];
             filterAccountIds[subAccount.id] = value;
         }
     }
@@ -285,12 +285,12 @@ export function selectInvert(filterAccountIds: Record<string, boolean>, allAccou
 }
 
 export function isAccountOrSubAccountsAllChecked(account: Account, filterAccountIds: Record<string, boolean>): boolean {
-    if (!account.childrenAccounts) {
+    if (!account.subAccounts) {
         return !filterAccountIds[account.id];
     }
 
-    for (let i = 0; i < account.childrenAccounts.length; i++) {
-        const subAccount = account.childrenAccounts[i];
+    for (let i = 0; i < account.subAccounts.length; i++) {
+        const subAccount = account.subAccounts[i];
         if (filterAccountIds[subAccount.id]) {
             return false;
         }
@@ -300,20 +300,20 @@ export function isAccountOrSubAccountsAllChecked(account: Account, filterAccount
 }
 
 export function isAccountOrSubAccountsHasButNotAllChecked(account: Account, filterAccountIds: Record<string, boolean>): boolean {
-    if (!account.childrenAccounts) {
+    if (!account.subAccounts) {
         return false;
     }
 
     let checkedCount = 0;
 
-    for (let i = 0; i < account.childrenAccounts.length; i++) {
-        const subAccount = account.childrenAccounts[i];
+    for (let i = 0; i < account.subAccounts.length; i++) {
+        const subAccount = account.subAccounts[i];
         if (!filterAccountIds[subAccount.id]) {
             checkedCount++;
         }
     }
 
-    return checkedCount > 0 && checkedCount < account.childrenAccounts.length;
+    return checkedCount > 0 && checkedCount < account.subAccounts.length;
 }
 
 export function setAccountSuitableIcon(account: Account, oldCategory: number, newCategory: number): void {

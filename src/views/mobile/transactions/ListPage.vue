@@ -344,7 +344,7 @@
                             <f7-list-item :title="subCategory.name"
                                           :class="{ 'list-item-selected': query.categoryIds === subCategory.id, 'item-in-multiple-selection': queryAllFilterCategoryIdsCount > 1 && queryAllFilterCategoryIds[subCategory.id] }"
                                           :key="subCategory.id"
-                                          v-for="subCategory in category.secondaryCategories"
+                                          v-for="subCategory in category.subCategories"
                                           v-show="!subCategory.hidden || query.categoryIds === subCategory.id"
                                           @click="changeCategoryFilter(subCategory.id)"
                             >
@@ -661,9 +661,9 @@ function getCategoryListItemCheckedClass(category: TransactionCategory, queryCat
         };
     }
 
-    if (category.secondaryCategories) {
-        for (let i = 0; i < category.secondaryCategories.length; i++) {
-            if (queryCategoryIds && queryCategoryIds[category.secondaryCategories[i].id]) {
+    if (category.subCategories) {
+        for (let i = 0; i < category.subCategories.length; i++) {
+            if (queryCategoryIds && queryCategoryIds[category.subCategories[i].id]) {
                 return {
                     'list-item-checked': true
                 };

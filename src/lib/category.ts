@@ -32,7 +32,7 @@ export function getTransactionPrimaryCategoryName(categoryId: string | null | un
     }
 
     for (let i = 0; i < allCategories.length; i++) {
-        const subCategoryList = allCategories[i].secondaryCategories;
+        const subCategoryList = allCategories[i].subCategories;
 
         if (!subCategoryList) {
             continue;
@@ -55,7 +55,7 @@ export function getTransactionSecondaryCategoryName(categoryId: string | null | 
     }
 
     for (let i = 0; i < allCategories.length; i++) {
-        const subCategoryList = allCategories[i].secondaryCategories;
+        const subCategoryList = allCategories[i].subCategories;
 
         if (!subCategoryList) {
             continue;
@@ -110,12 +110,12 @@ export function allTransactionCategoriesWithVisibleCount(allTransactionCategorie
                 }
             }
 
-            if (category.secondaryCategories) {
+            if (category.subCategories) {
                 let visibleSubCategoryCount = 0;
                 let firstVisibleSubCategoryIndex = -1;
 
-                for (let k = 0; k < category.secondaryCategories.length; k++) {
-                    const subCategory = category.secondaryCategories[k];
+                for (let k = 0; k < category.subCategories.length; k++) {
+                    const subCategory = category.subCategories[k];
 
                     if (!subCategory.hidden) {
                         visibleSubCategoryCount++;
@@ -126,8 +126,8 @@ export function allTransactionCategoriesWithVisibleCount(allTransactionCategorie
                     }
                 }
 
-                if (category.secondaryCategories.length > 0) {
-                    allSubCategories[category.id] = category.secondaryCategories;
+                if (category.subCategories.length > 0) {
+                    allSubCategories[category.id] = category.subCategories;
                     allVisibleSubCategoryCounts[category.id] = visibleSubCategoryCount;
                     allFirstVisibleSubCategoryIndexes[category.id] = firstVisibleSubCategoryIndex;
                 }
@@ -209,7 +209,7 @@ export function isSubCategoryIdAvailable(categories: TransactionCategory[], cate
             continue;
         }
 
-        const subCategoryList = primaryCategory.secondaryCategories;
+        const subCategoryList = primaryCategory.subCategories;
 
         if (!subCategoryList) {
             continue;
@@ -243,7 +243,7 @@ export function getFirstAvailableCategoryId(categories: TransactionCategory[]): 
             continue;
         }
 
-        const subCategoryList = primaryCategory.secondaryCategories;
+        const subCategoryList = primaryCategory.subCategories;
 
         if (!subCategoryList) {
             continue;
@@ -275,7 +275,7 @@ export function getFirstAvailableSubCategoryId(categories: TransactionCategory[]
             continue;
         }
 
-        const subCategoryList = primaryCategory.secondaryCategories;
+        const subCategoryList = primaryCategory.subCategories;
 
         if (!subCategoryList) {
             return '';
@@ -382,12 +382,12 @@ export function containsAvailableCategory(allTransactionCategories: Record<numbe
 }
 
 export function selectAllSubCategories(filterCategoryIds: Record<string, boolean>, category: TransactionCategory, value: boolean): void {
-    if (!category || !category.secondaryCategories || !category.secondaryCategories.length) {
+    if (!category || !category.subCategories || !category.subCategories.length) {
         return;
     }
 
-    for (let i = 0; i < category.secondaryCategories.length; i++) {
-        const subCategory = category.secondaryCategories[i];
+    for (let i = 0; i < category.subCategories.length; i++) {
+        const subCategory = category.subCategories[i];
         filterCategoryIds[subCategory.id] = value;
     }
 }
@@ -435,12 +435,12 @@ export function selectInvert(filterCategoryIds: Record<string, boolean>, allTran
 }
 
 export function isCategoryOrSubCategoriesAllChecked(category: TransactionCategory, filterCategoryIds: Record<string, boolean>): boolean {
-    if (!category.secondaryCategories || category.secondaryCategories.length < 1) {
+    if (!category.subCategories || category.subCategories.length < 1) {
         return !filterCategoryIds[category.id];
     }
 
-    for (let i = 0; i < category.secondaryCategories.length; i++) {
-        const subCategory = category.secondaryCategories[i];
+    for (let i = 0; i < category.subCategories.length; i++) {
+        const subCategory = category.subCategories[i];
         if (filterCategoryIds[subCategory.id]) {
             return false;
         }
@@ -450,12 +450,12 @@ export function isCategoryOrSubCategoriesAllChecked(category: TransactionCategor
 }
 
 export function isSubCategoriesAllChecked(category: TransactionCategory, filterCategoryIds: Record<string, boolean>): boolean {
-    if (!category.secondaryCategories || category.secondaryCategories.length < 1) {
+    if (!category.subCategories || category.subCategories.length < 1) {
         return false;
     }
 
-    for (let i = 0; i < category.secondaryCategories.length; i++) {
-        const subCategory = category.secondaryCategories[i];
+    for (let i = 0; i < category.subCategories.length; i++) {
+        const subCategory = category.subCategories[i];
         if (filterCategoryIds[subCategory.id]) {
             return false;
         }
@@ -467,16 +467,16 @@ export function isSubCategoriesAllChecked(category: TransactionCategory, filterC
 export function isSubCategoriesHasButNotAllChecked(category: TransactionCategory, filterCategoryIds: Record<string, boolean>): boolean {
     let checkedCount = 0;
 
-    if (!category.secondaryCategories || category.secondaryCategories.length < 1) {
+    if (!category.subCategories || category.subCategories.length < 1) {
         return false;
     }
 
-    for (let i = 0; i < category.secondaryCategories.length; i++) {
-        const subCategory = category.secondaryCategories[i];
+    for (let i = 0; i < category.subCategories.length; i++) {
+        const subCategory = category.subCategories[i];
         if (!filterCategoryIds[subCategory.id]) {
             checkedCount++;
         }
     }
 
-    return checkedCount > 0 && checkedCount < category.secondaryCategories.length;
+    return checkedCount > 0 && checkedCount < category.subCategories.length;
 }

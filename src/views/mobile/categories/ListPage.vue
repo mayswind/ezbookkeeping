@@ -139,7 +139,7 @@ const categories = computed<TransactionCategory[]>(() => {
             return [];
         }
 
-        return transactionCategoriesStore.allTransactionCategoriesMap[primaryCategoryId.value].secondaryCategories || [];
+        return transactionCategoriesStore.allTransactionCategoriesMap[primaryCategoryId.value].subCategories || [];
     } else {
         return [];
     }

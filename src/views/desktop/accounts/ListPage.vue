@@ -184,7 +184,7 @@
                                                                             <span>{{ tt('All') }}</span>
                                                                         </v-btn>
                                                                         <v-btn :key="subAccount.id" :value="subAccount.id"
-                                                                               v-for="subAccount in element.childrenAccounts"
+                                                                               v-for="subAccount in element.subAccounts"
                                                                                v-show="showHidden || !subAccount.hidden">
                                                                             <ItemIcon size="1.5rem" icon-type="account" :icon-id="subAccount.icon"
                                                                                       :color="subAccount.color" :hidden-status="subAccount.hidden" />

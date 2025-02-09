@@ -675,30 +675,10 @@ export interface TransactionStatisticResponseItem {
     readonly amount: number;
 }
 
-export interface TransactionStatisticResponseWithInfo {
-    readonly startTime: number;
-    readonly endTime: number;
-    readonly items: TransactionStatisticResponseItemWithInfo[];
-}
-
-export interface TransactionStatisticResponseItemWithInfo extends TransactionStatisticResponseItem {
-    readonly account?: AccountInfoResponse;
-    readonly primaryAccount?: AccountInfoResponse;
-    readonly category?: TransactionCategoryInfoResponse;
-    readonly primaryCategory?: TransactionCategoryInfoResponse;
-    readonly amountInDefaultCurrency: number | null;
-}
-
 export interface TransactionStatisticTrendsResponseItem {
     readonly year: number;
     readonly month: number;
     readonly items: TransactionStatisticResponseItem[];
-}
-
-export interface TransactionStatisticTrendsResponseItemWithInfo {
-    readonly year: number;
-    readonly month: number;
-    readonly items: TransactionStatisticResponseItemWithInfo[];
 }
 
 export interface YearMonthDataItem extends YearMonth, Record<string, unknown> {}

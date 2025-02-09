@@ -38,9 +38,9 @@ export const useAccountsStore = defineStore('accounts', () => {
             if (account.type === AccountType.SingleAccount.type) {
                 allAccountsList.push(account);
             } else if (account.type === AccountType.MultiSubAccounts.type) {
-                if (account.childrenAccounts) {
-                    for (let j = 0; j < account.childrenAccounts.length; j++) {
-                        const subAccount = account.childrenAccounts[j];
+                if (account.subAccounts) {
+                    for (let j = 0; j < account.subAccounts.length; j++) {
+                        const subAccount = account.subAccounts[j];
                         allAccountsList.push(subAccount);
                     }
                 }
@@ -63,9 +63,9 @@ export const useAccountsStore = defineStore('accounts', () => {
             if (account.type === AccountType.SingleAccount.type) {
                 allVisibleAccounts.push(account);
             } else if (account.type === AccountType.MultiSubAccounts.type) {
-                if (account.childrenAccounts) {
-                    for (let j = 0; j < account.childrenAccounts.length; j++) {
-                        const subAccount = account.childrenAccounts[j];
+                if (account.subAccounts) {
+                    for (let j = 0; j < account.subAccounts.length; j++) {
+                        const subAccount = account.subAccounts[j];
                         allVisibleAccounts.push(subAccount);
                     }
                 }
@@ -117,9 +117,9 @@ export const useAccountsStore = defineStore('accounts', () => {
             const account = accounts[i];
             allAccountsMap.value[account.id] = account;
 
-            if (account.childrenAccounts) {
-                for (let j = 0; j < account.childrenAccounts.length; j++) {
-                    const subAccount = account.childrenAccounts[j];
+            if (account.subAccounts) {
+                for (let j = 0; j < account.subAccounts.length; j++) {
+                    const subAccount = account.subAccounts[j];
                     allAccountsMap.value[subAccount.id] = subAccount;
                 }
             }
@@ -142,9 +142,9 @@ export const useAccountsStore = defineStore('accounts', () => {
 
         allAccountsMap.value[account.id] = account;
 
-        if (account.childrenAccounts) {
-            for (let i = 0; i < account.childrenAccounts.length; i++) {
-                const subAccount = account.childrenAccounts[i];
+        if (account.subAccounts) {
+            for (let i = 0; i < account.subAccounts.length; i++) {
+                const subAccount = account.subAccounts[i];
                 allAccountsMap.value[subAccount.id] = subAccount;
             }
         }
@@ -167,9 +167,9 @@ export const useAccountsStore = defineStore('accounts', () => {
 
         allAccountsMap.value[account.id] = account;
 
-        if (account.childrenAccounts) {
-            for (let i = 0; i < account.childrenAccounts.length; i++) {
-                const subAccount = account.childrenAccounts[i];
+        if (account.subAccounts) {
+            for (let i = 0; i < account.subAccounts.length; i++) {
+                const subAccount = account.subAccounts[i];
                 allAccountsMap.value[subAccount.id] = subAccount;
             }
         }
@@ -240,8 +240,8 @@ export const useAccountsStore = defineStore('accounts', () => {
             }
         }
 
-        if (allAccountsMap.value[account.id] && allAccountsMap.value[account.id].childrenAccounts) {
-            const subAccounts = allAccountsMap.value[account.id].childrenAccounts as Account[];
+        if (allAccountsMap.value[account.id] && allAccountsMap.value[account.id].subAccounts) {
+            const subAccounts = allAccountsMap.value[account.id].subAccounts as Account[];
 
             for (let i = 0; i < subAccounts.length; i++) {
                 const subAccount = subAccounts[i];
@@ -298,9 +298,9 @@ export const useAccountsStore = defineStore('accounts', () => {
             for (let i = 0; i < accounts.length; i++) {
                 const account = accounts[i];
 
-                if (account.type === AccountType.MultiSubAccounts.type && account.childrenAccounts) {
-                    for (let j = 0; j < account.childrenAccounts.length; j++) {
-                        const subAccount = account.childrenAccounts[j];
+                if (account.type === AccountType.MultiSubAccounts.type && account.subAccounts) {
+                    for (let j = 0; j < account.subAccounts.length; j++) {
+                        const subAccount = account.subAccounts[j];
 
                         if (showHidden || !subAccount.hidden) {
                             ret.subAccounts[account.id] = subAccount.id;
@@ -339,9 +339,9 @@ export const useAccountsStore = defineStore('accounts', () => {
             for (let i = accounts.length - 1; i >= 0; i--) {
                 const account = accounts[i];
 
-                if (account.type === AccountType.MultiSubAccounts.type && account.childrenAccounts) {
-                    for (let j = account.childrenAccounts.length - 1; j >= 0; j--) {
-                        const subAccount = account.childrenAccounts[j];
+                if (account.type === AccountType.MultiSubAccounts.type && account.subAccounts) {
+                    for (let j = account.subAccounts.length - 1; j >= 0; j--) {
+                        const subAccount = account.subAccounts[j];
 
                         if (showHidden || !subAccount.hidden) {
                             ret.subAccounts[account.id] = subAccount.id;
@@ -563,7 +563,7 @@ export const useAccountsStore = defineStore('accounts', () => {
 
         let resultCurrency = userStore.currentUserDefaultCurrency;
 
-        if (!account.childrenAccounts || !account.childrenAccounts.length) {
+        if (!account.subAccounts || !account.subAccounts.length) {
             return {
                 balance: showAccountBalance ? '0' : '***',
                 currency: resultCurrency
@@ -574,8 +574,8 @@ export const useAccountsStore = defineStore('accounts', () => {
         const allSubAccountCurrencies: string[] = [];
         let totalBalance = 0;
 
-        for (let i = 0; i < account.childrenAccounts.length; i++) {
-            const subAccount = account.childrenAccounts[i];
+        for (let i = 0; i < account.subAccounts.length; i++) {
+            const subAccount = account.subAccounts[i];
 
             if (!showHidden && subAccount.hidden) {
                 continue;
@@ -600,8 +600,8 @@ export const useAccountsStore = defineStore('accounts', () => {
 
         let hasUnCalculatedAmount = false;
 
-        for (let i = 0; i < account.childrenAccounts.length; i++) {
-            const subAccount = account.childrenAccounts[i];
+        for (let i = 0; i < account.subAccounts.length; i++) {
+            const subAccount = account.subAccounts[i];
 
             if (!showHidden && subAccount.hidden) {
                 continue;
@@ -679,12 +679,12 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
 
     function hasVisibleSubAccount(showHidden: boolean, account: Account): boolean {
-        if (!account || account.type !== AccountType.MultiSubAccounts.type || !account.childrenAccounts) {
+        if (!account || account.type !== AccountType.MultiSubAccounts.type || !account.subAccounts) {
             return false;
         }
 
-        for (let i = 0; i < account.childrenAccounts.length; i++) {
-            if (showHidden || !account.childrenAccounts[i].hidden) {
+        for (let i = 0; i < account.subAccounts.length; i++) {
+            if (showHidden || !account.subAccounts[i].hidden) {
                 return true;
             }
         }

@@ -24,15 +24,12 @@ import {
 import { DEFAULT_ACCOUNT_ICON, DEFAULT_CATEGORY_ICON } from '@/consts/icon.ts';
 import { DEFAULT_ACCOUNT_COLOR, DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
 
-import type { AccountInfoResponse } from '@/models/account.ts';
-import type { TransactionCategoryInfoResponse } from '@/models/transaction_category.ts';
+import type { Account } from '@/models/account.ts';
+import type { TransactionCategory } from '@/models/transaction_category.ts';
 import type {
     TransactionStatisticResponse,
     TransactionStatisticResponseItem,
-    TransactionStatisticResponseWithInfo,
-    TransactionStatisticResponseItemWithInfo,
     TransactionStatisticTrendsResponseItem,
-    TransactionStatisticTrendsResponseItemWithInfo,
     TransactionStatisticDataItemType,
     TransactionStatisticDataItemBase,
     TransactionCategoricalAnalysisData,
@@ -60,15 +57,27 @@ import { sortStatisticsItems } from '@/lib/statistics.ts';
 import logger from '@/lib/logger.ts';
 import services from '@/lib/services.ts';
 
-interface WritableTransactionStatisticResponseItemWithInfo extends TransactionStatisticResponseItemWithInfo {
+interface TransactionStatisticResponseItemWithInfo extends TransactionStatisticResponseItem {
     categoryId: string;
     accountId: string;
     amount: number;
-    account?: AccountInfoResponse;
-    primaryAccount?: AccountInfoResponse;
-    category?: TransactionCategoryInfoResponse;
-    primaryCategory?: TransactionCategoryInfoResponse;
+    account?: Account;
+    primaryAccount?: Account;
+    category?: TransactionCategory;
+    primaryCategory?: TransactionCategory;
     amountInDefaultCurrency: number | null;
+}
+
+interface TransactionStatisticResponseWithInfo {
+    readonly startTime: number;
+    readonly endTime: number;
+    readonly items: TransactionStatisticResponseItemWithInfo[];
+}
+
+interface TransactionStatisticTrendsResponseItemWithInfo {
+    readonly year: number;
+    readonly month: number;
+    readonly items: TransactionStatisticResponseItemWithInfo[];
 }
 
 interface WritableTransactionCategoricalAnalysisData {
@@ -438,7 +447,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
 
         for (let i = 0; i < items.length; i++) {
             const dataItem = items[i];
-            const item: WritableTransactionStatisticResponseItemWithInfo = {
+            const item: TransactionStatisticResponseItemWithInfo = {
                 categoryId: dataItem.categoryId,
                 accountId: dataItem.accountId,
                 amount: dataItem.amount,

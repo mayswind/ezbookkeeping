@@ -267,7 +267,7 @@ const secondaryCategories = computed<TransactionCategory[]>(() => {
         return [];
     }
 
-    return transactionCategoriesStore.allTransactionCategoriesMap[primaryCategoryId.value].secondaryCategories || [];
+    return transactionCategoriesStore.allTransactionCategoriesMap[primaryCategoryId.value].subCategories || [];
 });
 
 const hasSubCategories = computed<boolean>(() => {

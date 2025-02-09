@@ -144,10 +144,10 @@ export function useAccountEditPageBaseBase() {
         account.value.from(newAccount);
         subAccounts.value = [];
 
-        if (newAccount.childrenAccounts && newAccount.childrenAccounts.length > 0) {
-            for (let i = 0; i < newAccount.childrenAccounts.length; i++) {
+        if (newAccount.subAccounts && newAccount.subAccounts.length > 0) {
+            for (let i = 0; i < newAccount.subAccounts.length; i++) {
                 const subAccount = account.value.createNewSubAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTime());
-                subAccount.from(newAccount.childrenAccounts[i]);
+                subAccount.from(newAccount.subAccounts[i]);
 
                 subAccounts.value.push(subAccount);
             }

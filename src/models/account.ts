@@ -21,9 +21,9 @@ export class Account implements AccountInfoResponse {
     public isAsset?: boolean;
     public isLiability?: boolean;
     public visible: boolean;
-    public childrenAccounts?: Account[];
+    public subAccounts?: Account[];
 
-    protected constructor(id: string, name: string, parentId: string, category: number, type: number, icon: string, color: string, currency: string, balance: number, comment: string, displayOrder: number, visible: boolean, balanceTime?: number, creditCardStatementDate?: number, isAsset?: boolean, isLiability?: boolean, childrenAccounts?: Account[]) {
+    protected constructor(id: string, name: string, parentId: string, category: number, type: number, icon: string, color: string, currency: string, balance: number, comment: string, displayOrder: number, visible: boolean, balanceTime?: number, creditCardStatementDate?: number, isAsset?: boolean, isLiability?: boolean, subAccounts?: Account[]) {
         this.id = id;
         this.name = name;
         this.parentId = parentId;
@@ -41,31 +41,15 @@ export class Account implements AccountInfoResponse {
         this.isAsset = isAsset;
         this.isLiability = isLiability;
 
-        if (typeof(childrenAccounts) !== 'undefined') {
-            this.childrenAccounts = childrenAccounts;
+        if (typeof(subAccounts) !== 'undefined') {
+            this.subAccounts = subAccounts;
         } else {
-            this.childrenAccounts = undefined;
+            this.subAccounts = undefined;
         }
     }
 
     public get hidden(): boolean {
         return !this.visible;
-    }
-
-    public get subAccounts(): AccountInfoResponse[] | undefined {
-        if (typeof(this.childrenAccounts) === 'undefined') {
-            return undefined;
-        }
-
-        const ret: AccountInfoResponse[] = [];
-
-        if (this.childrenAccounts) {
-            for (const subCategory of this.childrenAccounts) {
-                ret.push(subCategory);
-            }
-        }
-
-        return ret;
     }
 
     public from(other: Account): void {
@@ -83,19 +67,19 @@ export class Account implements AccountInfoResponse {
         this.visible = other.visible;
     }
 
-    public toCreateRequest(clientSessionId: string, childrenAccounts?: Account[], parentAccount?: Account): AccountCreateRequest {
-        let subAccounts: AccountCreateRequest[] | undefined = undefined;
+    public toCreateRequest(clientSessionId: string, subAccounts?: Account[], parentAccount?: Account): AccountCreateRequest {
+        let subAccountCreateRequests: AccountCreateRequest[] | undefined = undefined;
 
         if (this.type === AccountType.MultiSubAccounts.type) {
-            subAccounts = [];
+            subAccountCreateRequests = [];
 
-            if (!childrenAccounts) {
-                childrenAccounts = this.childrenAccounts;
+            if (!subAccounts) {
+                subAccounts = this.subAccounts;
             }
 
-            if (childrenAccounts) {
-                for (const subAccount of childrenAccounts) {
-                    subAccounts.push(subAccount.toCreateRequest(clientSessionId, undefined, this));
+            if (subAccounts) {
+                for (const subAccount of subAccounts) {
+                    subAccountCreateRequests.push(subAccount.toCreateRequest(clientSessionId, undefined, this));
                 }
             }
         }
@@ -111,24 +95,24 @@ export class Account implements AccountInfoResponse {
             balanceTime: (parentAccount || this.type === AccountType.SingleAccount.type) && this.balanceTime ? this.balanceTime : 0,
             comment: this.comment,
             creditCardStatementDate: !parentAccount && this.category === AccountCategory.CreditCard.type ? this.creditCardStatementDate : undefined,
-            subAccounts: !parentAccount ? subAccounts : undefined,
+            subAccounts: !parentAccount ? subAccountCreateRequests : undefined,
             clientSessionId: !parentAccount ? clientSessionId : undefined
         };
     }
 
-    public toModifyRequest(childrenAccounts?: Account[], parentAccount?: Account): AccountModifyRequest {
-        let subAccounts: AccountModifyRequest[] | undefined = undefined;
+    public toModifyRequest(subAccounts?: Account[], parentAccount?: Account): AccountModifyRequest {
+        let subAccountModifyRequests: AccountModifyRequest[] | undefined = undefined;
 
         if (this.type === AccountType.MultiSubAccounts.type) {
-            subAccounts = [];
+            subAccountModifyRequests = [];
 
-            if (!childrenAccounts) {
-                childrenAccounts = this.childrenAccounts;
+            if (!subAccounts) {
+                subAccounts = this.subAccounts;
             }
 
-            if (childrenAccounts) {
-                for (const subAccount of childrenAccounts) {
-                    subAccounts.push(subAccount.toModifyRequest(undefined, this));
+            if (subAccounts) {
+                for (const subAccount of subAccounts) {
+                    subAccountModifyRequests.push(subAccount.toModifyRequest(undefined, this));
                 }
             }
         }
@@ -142,7 +126,7 @@ export class Account implements AccountInfoResponse {
             comment: this.comment,
             creditCardStatementDate: !parentAccount && this.category === AccountCategory.CreditCard.type ? this.creditCardStatementDate : undefined,
             hidden: !this.visible,
-            subAccounts: !parentAccount ? subAccounts : undefined,
+            subAccounts: !parentAccount ? subAccountModifyRequests : undefined,
         };
     }
 
@@ -152,12 +136,12 @@ export class Account implements AccountInfoResponse {
         } else if (this.type === AccountType.MultiSubAccounts.type && !subAccountId) {
             return this.id;
         } else if (this.type === AccountType.MultiSubAccounts.type && subAccountId) {
-            if (!this.childrenAccounts || !this.childrenAccounts.length) {
+            if (!this.subAccounts || !this.subAccounts.length) {
                 return null;
             }
 
-            for (let i = 0; i < this.childrenAccounts.length; i++) {
-                const subAccount = this.childrenAccounts[i];
+            for (let i = 0; i < this.subAccounts.length; i++) {
+                const subAccount = this.subAccounts[i];
 
                 if (subAccountId && subAccountId === subAccount.id) {
                     return subAccount.id;
@@ -176,12 +160,12 @@ export class Account implements AccountInfoResponse {
         } else if (this.type === AccountType.MultiSubAccounts.type && !subAccountId) {
             return this.comment;
         } else if (this.type === AccountType.MultiSubAccounts.type && subAccountId) {
-            if (!this.childrenAccounts || !this.childrenAccounts.length) {
+            if (!this.subAccounts || !this.subAccounts.length) {
                 return null;
             }
 
-            for (let i = 0; i < this.childrenAccounts.length; i++) {
-                const subAccount = this.childrenAccounts[i];
+            for (let i = 0; i < this.subAccounts.length; i++) {
+                const subAccount = this.subAccounts[i];
 
                 if (subAccountId && subAccountId === subAccount.id) {
                     return subAccount.comment;
@@ -195,15 +179,15 @@ export class Account implements AccountInfoResponse {
     }
 
     public getSubAccountCurrencies(showHidden: boolean, subAccountId: string): string[] {
-        if (!this.childrenAccounts || !this.childrenAccounts.length) {
+        if (!this.subAccounts || !this.subAccounts.length) {
             return [];
         }
 
         const subAccountCurrenciesMap: Record<string, boolean> = {};
         const subAccountCurrencies: string[] = [];
 
-        for (let i = 0; i < this.childrenAccounts.length; i++) {
-            const subAccount = this.childrenAccounts[i];
+        for (let i = 0; i < this.subAccounts.length; i++) {
+            const subAccount = this.subAccounts[i];
 
             if (!showHidden && subAccount.hidden) {
                 continue;
@@ -324,7 +308,7 @@ export class AccountWithDisplayBalance extends Account {
             Account.creditCardStatementDate,
             Account.isAsset,
             Account.isLiability,
-            Account.childrenAccounts
+            Account.subAccounts
         );
 
         this.displayBalance = displayBalance;

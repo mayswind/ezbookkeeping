@@ -120,7 +120,7 @@
                                               :title="subAccount.name" :footer="subAccount.comment" :after="accountBalance(subAccount)"
                                               :link="!sortable ? '/transaction/list?accountIds=' + subAccount.id : null"
                                               :key="subAccount.id"
-                                              v-for="subAccount in account.childrenAccounts"
+                                              v-for="subAccount in account.subAccounts"
                                               v-show="showHidden || !subAccount.hidden"
                                 >
                                     <template #media>

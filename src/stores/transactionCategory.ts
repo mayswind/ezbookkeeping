@@ -64,12 +64,12 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                 const category = categories[i];
                 allTransactionCategoriesMap.value[category.id] = category;
 
-                if (!category.secondaryCategories) {
+                if (!category.subCategories) {
                     continue;
                 }
 
-                for (let j = 0; j < category.secondaryCategories.length; j++) {
-                    const subCategory = category.secondaryCategories[j];
+                for (let j = 0; j < category.subCategories.length; j++) {
+                    const subCategory = category.subCategories[j];
                     allTransactionCategoriesMap.value[subCategory.id] = subCategory;
                 }
             }
@@ -82,7 +82,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         if (!category.parentId || category.parentId === '0') {
             categoryList = allTransactionCategories.value[category.type];
         } else if (allTransactionCategoriesMap.value[category.parentId]) {
-            categoryList = allTransactionCategoriesMap.value[category.parentId].secondaryCategories;
+            categoryList = allTransactionCategoriesMap.value[category.parentId].subCategories;
         }
 
         if (categoryList) {
@@ -102,14 +102,14 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         if (!category.parentId || category.parentId === '0') {
             categoryList = allTransactionCategories.value[category.type];
         } else if (allTransactionCategoriesMap.value[category.parentId]) {
-            categoryList = allTransactionCategoriesMap.value[category.parentId].secondaryCategories;
+            categoryList = allTransactionCategoriesMap.value[category.parentId].subCategories;
         }
 
         if (categoryList) {
             for (let i = 0; i < categoryList.length; i++) {
                 if (categoryList[i].id === category.id) {
                     if (!category.parentId || category.parentId === '0') {
-                        category.secondaryCategories = categoryList[i].secondaryCategories;
+                        category.subCategories = categoryList[i].subCategories;
                     }
 
                     categoryList.splice(i, 1, category);
@@ -128,7 +128,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         if (!category.parentId || category.parentId === '0') {
             categoryList = allTransactionCategories.value[category.type];
         } else if (allTransactionCategoriesMap.value[category.parentId]) {
-            categoryList = allTransactionCategoriesMap.value[category.parentId].secondaryCategories;
+            categoryList = allTransactionCategoriesMap.value[category.parentId].subCategories;
         }
 
         if (categoryList) {
@@ -148,7 +148,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         if (!category.parentId || category.parentId === '0') {
             categoryList = allTransactionCategories.value[category.type];
         } else if (allTransactionCategoriesMap.value[category.parentId]) {
-            categoryList = allTransactionCategoriesMap.value[category.parentId].secondaryCategories;
+            categoryList = allTransactionCategoriesMap.value[category.parentId].subCategories;
         }
 
         if (categoryList) {
@@ -160,8 +160,8 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
             }
         }
 
-        if (allTransactionCategoriesMap.value[category.id] && allTransactionCategoriesMap.value[category.id].secondaryCategories) {
-            const subCategoryList = allTransactionCategoriesMap.value[category.id].secondaryCategories;
+        if (allTransactionCategoriesMap.value[category.id] && allTransactionCategoriesMap.value[category.id].subCategories) {
+            const subCategoryList = allTransactionCategoriesMap.value[category.id].subCategories;
 
             if (subCategoryList) {
                 for (let i = 0; i < subCategoryList.length; i++) {
@@ -377,7 +377,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                     return;
                 }
             } else {
-                const subCategoryList = allTransactionCategoriesMap.value[category.parentId].secondaryCategories;
+                const subCategoryList = allTransactionCategoriesMap.value[category.parentId].subCategories;
 
                 if (!subCategoryList || !subCategoryList[to]) {
                     reject({ message: 'Unable to move category' });
@@ -403,7 +403,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         if (!parentId || parentId === '0') {
             categoryList = allTransactionCategories.value[type];
         } else if (allTransactionCategoriesMap.value[parentId]) {
-            categoryList = allTransactionCategoriesMap.value[parentId].secondaryCategories;
+            categoryList = allTransactionCategoriesMap.value[parentId].subCategories;
         }
 
         if (categoryList) {

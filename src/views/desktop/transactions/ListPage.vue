@@ -539,8 +539,8 @@
                                     </v-table>
 
                                     <div class="mt-2 mb-4">
-                                        <v-pagination :total-visible="6" :length="totalPageCount"
-                                                      v-model="paginationCurrentPage"></v-pagination>
+                                        <pagination-buttons :totalPageCount="totalPageCount"
+                                                            v-model="paginationCurrentPage"></pagination-buttons>
                                     </div>
                                 </v-card>
                             </v-window-item>
@@ -581,6 +581,7 @@
 
 <script setup lang="ts">
 import { VMenu } from 'vuetify/components/VMenu';
+import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import EditDialog from './list/dialogs/EditDialog.vue';

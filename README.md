@@ -47,13 +47,13 @@ Online Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-dem
 To deploy with Docker, run:
 
 ```sh
-$ docker run -p8080:8080 mayswind/ezbookkeeping
+docker run -p8080:8080 mayswind/ezbookkeeping
 ```
 
 For the latest development build:
 
 ```sh
-$ docker run -p8080:8080 mayswind/ezbookkeeping:latest-snapshot
+docker run -p8080:8080 mayswind/ezbookkeeping:latest-snapshot
 ```
 
 More images and tags are available on [Docker Hub](https://hub.docker.com/r/mayswind/ezbookkeeping).
@@ -63,12 +63,12 @@ Download the latest release from [GitHub Releases](https://github.com/mayswind/e
 
 **Linux / macOS:**
 ```sh
-$ ./ezbookkeeping server run
+./ezbookkeeping server run
 ```
 
 **Windows:**
 ```sh
-> .\ezbookkeeping.exe server run
+.\ezbookkeeping.exe server run
 ```
 
 The app runs on port 8080 by default. Access it via `http://{YOUR_HOST_ADDRESS}:8080/`.

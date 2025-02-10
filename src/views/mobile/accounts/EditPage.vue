@@ -214,7 +214,7 @@
                 </template>
                 <template #title>
                     <div class="account-edit-balancetime-title">
-                        <div @click="showDateTimeDialog(accountContext, 'date')">{{ getAccountBalanceDate(account.balanceTime as number) }}</div>&nbsp;<div class="account-edit-balancetime-time" @click="showDateTimeDialog(accountContext, 'time')">{{ getAccountBalanceTime(account.balanceTime as number) }}</div>
+                        <div @click="showDateTimeDialog(accountContext, 'date')">{{ formatAccountBalanceDate(account) }}</div>&nbsp;<div class="account-edit-balancetime-time" @click="showDateTimeDialog(accountContext, 'time')">{{ formatAccountBalanceTime(account) }}</div>
                     </div>
                 </template>
                 <date-time-selection-sheet :init-mode="accountContext.balanceDateTimeSheetMode"
@@ -442,7 +442,7 @@
                     </template>
                     <template #title>
                         <div class="account-edit-balancetime-title">
-                            <div @click="showDateTimeDialog(subAccountContexts[idx], 'date')">{{ getAccountBalanceDate(subAccount.balanceTime as number) }}</div>&nbsp;<div class="account-edit-balancetime-time" @click="showDateTimeDialog(subAccountContexts[idx], 'time')">{{ getAccountBalanceTime(subAccount.balanceTime as number) }}</div>
+                            <div @click="showDateTimeDialog(subAccountContexts[idx], 'date')">{{ formatAccountBalanceDate(subAccount) }}</div>&nbsp;<div class="account-edit-balancetime-time" @click="showDateTimeDialog(subAccountContexts[idx], 'time')">{{ formatAccountBalanceTime(subAccount) }}</div>
                         </div>
                     </template>
                     <date-time-selection-sheet :init-mode="subAccountContexts[idx].balanceDateTimeSheetMode"
@@ -503,7 +503,7 @@ import { ALL_ACCOUNT_COLORS } from '@/consts/color.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import type { Account } from '@/models/account.ts';
 
-import { findDisplayNameByType } from '@/lib/common.ts';
+import { isDefined, findDisplayNameByType } from '@/lib/common.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import {
     getTimezoneOffsetMinutes,
@@ -566,12 +566,20 @@ const showAccountTypeSheet = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
 
-function getAccountBalanceDate(balanceTime: number): string {
-    return formatUnixTimeToLongDate(getActualUnixTimeForStore(balanceTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+function formatAccountBalanceDate(account: Account): string {
+    if (!isDefined(account.balanceTime)) {
+        return '';
+    }
+
+    return formatUnixTimeToLongDate(getActualUnixTimeForStore(account.balanceTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
 }
 
-function getAccountBalanceTime(balanceTime: number): string {
-    return formatUnixTimeToLongTime(getActualUnixTimeForStore(balanceTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+function formatAccountBalanceTime(account: Account): string {
+    if (!isDefined(account.balanceTime)) {
+        return '';
+    }
+
+    return formatUnixTimeToLongTime(getActualUnixTimeForStore(account.balanceTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
 }
 
 function init(): void {

@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
@@ -75,10 +75,11 @@ import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { isString, isNumber, removeAll } from '@/lib/common.ts';
 
 const props = defineProps<{
-    modelValue: number | string;
+    modelValue: number;
     minValue?: number;
     maxValue?: number;
     currency?: string;
+    flipNegative?: boolean;
     show: boolean;
 }>();
 
@@ -99,7 +100,7 @@ const { showToast } = useI18nUIComponents();
 
 const previousValue = ref<string>('');
 const currentSymbol = ref<string>('');
-const currentValue = ref<string>(getStringValue(props.modelValue));
+const currentValue = ref<string>(getInitedStringValue(props.modelValue, props.flipNegative));
 
 const decimalSeparator = computed<string>(() => getCurrentDecimalSeparator());
 
@@ -139,6 +140,14 @@ const confirmText = computed<string>(() => {
         return tt('OK');
     }
 });
+
+function getInitedStringValue(value: number, flipNegative?: boolean): string {
+    if (flipNegative) {
+        value = -value;
+    }
+
+    return getStringValue(value);
+}
 
 function getStringValue(value: number | string): string {
     if (!isNumber(value) && !isString(value)) {
@@ -333,7 +342,11 @@ function confirm(): boolean {
 
         return true;
     } else {
-        const value = parseAmount(currentValue.value);
+        let value: number = parseAmount(currentValue.value);
+
+        if (props.flipNegative) {
+            value = -value;
+        }
 
         emit('update:modelValue', value);
         close();
@@ -347,12 +360,16 @@ function close(): void {
 }
 
 function onSheetOpen(): void {
-    currentValue.value = getStringValue(props.modelValue);
+    currentValue.value = getInitedStringValue(props.modelValue, props.flipNegative);
 }
 
 function onSheetClosed(): void {
     close();
 }
+
+watch(() => props.flipNegative, (newValue) => {
+    currentValue.value = getInitedStringValue(props.modelValue, newValue);
+});
 </script>
 
 <style>

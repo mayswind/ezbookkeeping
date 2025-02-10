@@ -53,6 +53,7 @@ const props = defineProps<{
     readonly?: boolean;
     hide?: boolean;
     enableRules?: boolean;
+    flipNegative?: boolean;
     modelValue: number;
 }>();
 
@@ -90,7 +91,7 @@ const rules = [
     }
 ];
 
-const currentValue = ref<string>(getFormattedValue(props.modelValue));
+const currentValue = ref<string>(getInitedFormattedValue(props.modelValue, props.flipNegative));
 
 const prependText = computed<string | undefined>(() => {
     if (!props.currency || !props.showCurrency) {
@@ -292,6 +293,14 @@ function getValidFormattedValue(value: number, textualValue: string, hasDecimalS
     return textualValue;
 }
 
+function getInitedFormattedValue(value: number, flipNegative?: boolean): string {
+    if (flipNegative) {
+        value = -value;
+    }
+
+    return getFormattedValue(value);
+}
+
 function getFormattedValue(value: number): string {
     if (!Number.isNaN(value) && Number.isFinite(value)) {
         const digitGroupingSymbol = getCurrentDigitGroupingSymbol();
@@ -309,7 +318,15 @@ function getDisplayCurrencyPrependAndAppendText(): CurrencyPrependAndAppendText 
 }
 
 watch(() => props.currency, () => {
-    const newStringValue = getFormattedValue(props.modelValue);
+    const newStringValue = getInitedFormattedValue(props.modelValue, props.flipNegative);
+
+    if (!(newStringValue === '0' && currentValue.value === '')) {
+        currentValue.value = newStringValue;
+    }
+});
+
+watch(() => props.flipNegative, (newValue) => {
+    const newStringValue = getInitedFormattedValue(props.modelValue, newValue);
 
     if (!(newStringValue === '0' && currentValue.value === '')) {
         currentValue.value = newStringValue;
@@ -317,6 +334,10 @@ watch(() => props.currency, () => {
 });
 
 watch(() => props.modelValue, (newValue) => {
+    if (props.flipNegative) {
+        newValue = -newValue;
+    }
+
     const numericCurrentValue = parseAmount(currentValue.value);
 
     if (newValue !== numericCurrentValue) {
@@ -346,7 +367,13 @@ watch(currentValue, (newValue) => {
     if (finalValue !== newValue) {
         currentValue.value = finalValue;
     } else {
-        emit('update:modelValue', parseAmount(finalValue));
+        let value: number = parseAmount(finalValue);
+
+        if (props.flipNegative) {
+            value = -value;
+        }
+
+        emit('update:modelValue', value);
     }
 });
 </script>

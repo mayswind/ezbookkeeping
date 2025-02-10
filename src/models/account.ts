@@ -18,10 +18,11 @@ export class Account implements AccountInfoResponse {
     public comment: string;
     public creditCardStatementDate?: number;
     public displayOrder: number;
-    public isAsset?: boolean;
-    public isLiability?: boolean;
     public visible: boolean;
     public subAccounts?: Account[];
+
+    private readonly _isAsset?: boolean;
+    private readonly _isLiability?: boolean;
 
     protected constructor(id: string, name: string, parentId: string, category: number, type: number, icon: string, color: string, currency: string, balance: number, comment: string, displayOrder: number, visible: boolean, balanceTime?: number, creditCardStatementDate?: number, isAsset?: boolean, isLiability?: boolean, subAccounts?: Account[]) {
         this.id = id;
@@ -38,14 +39,42 @@ export class Account implements AccountInfoResponse {
         this.displayOrder = displayOrder;
         this.visible = visible;
         this.creditCardStatementDate = creditCardStatementDate;
-        this.isAsset = isAsset;
-        this.isLiability = isLiability;
+        this._isAsset = isAsset;
+        this._isLiability = isLiability;
 
         if (typeof(subAccounts) !== 'undefined') {
             this.subAccounts = subAccounts;
         } else {
             this.subAccounts = undefined;
         }
+    }
+
+    public get isAsset(): boolean {
+        if (typeof(this._isAsset) !== 'undefined') {
+            return this._isAsset;
+        }
+
+        const accountCategory = AccountCategory.valueOf(this.category);
+
+        if (accountCategory) {
+            return accountCategory.isAsset;
+        }
+
+        return false;
+    }
+
+    public get isLiability(): boolean {
+        if (typeof(this._isLiability) !== 'undefined') {
+            return this._isLiability;
+        }
+
+        const accountCategory = AccountCategory.valueOf(this.category);
+
+        if (accountCategory) {
+            return accountCategory.isLiability;
+        }
+
+        return false;
     }
 
     public get hidden(): boolean {

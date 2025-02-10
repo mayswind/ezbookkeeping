@@ -146,8 +146,9 @@
                                                   :persistent-placeholder="true"
                                                   :currency="selectedAccount.currency"
                                                   :show-currency="true"
-                                                  :label="currentAccountIndex < 0 ? tt('Account Balance') : tt('Sub-account Balance')"
-                                                  :placeholder="currentAccountIndex < 0 ? tt('Account Balance') : tt('Sub-account Balance')"
+                                                  :flip-negative="account.isLiability"
+                                                  :label="accountAmountTitle"
+                                                  :placeholder="accountAmountTitle"
                                                   v-model="selectedAccount.balance"/>
                                 </v-col>
                                 <v-col cols="12" md="6" v-show="selectedAccount.balance"
@@ -272,6 +273,14 @@ const selectedAccount = computed<Account>(() => {
     }
 
     return subAccounts.value[currentAccountIndex.value];
+});
+
+const accountAmountTitle = computed<string>(() => {
+    if (currentAccountIndex.value < 0) {
+        return account.value.isLiability ? tt('Account Outstanding Balance') : tt('Account Balance');
+    } else {
+        return account.value.isLiability ? tt('Sub-account Outstanding Balance') : tt('Sub-account Balance');
+    }
 });
 
 let resolveFunc: ((value: AccountEditResponse) => void) | null = null;

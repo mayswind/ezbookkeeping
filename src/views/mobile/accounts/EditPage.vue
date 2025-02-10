@@ -191,13 +191,14 @@
                 link="#" no-chevron
                 class="list-item-with-header-and-title"
                 :class="{ 'disabled': editAccountId }"
-                :header="tt('Account Balance')"
-                :title="formatAmountWithCurrency(account.balance, account.currency)"
+                :header="account.isLiability ? tt('Account Outstanding Balance') : tt('Account Balance')"
+                :title="formatAccountDisplayBalance(account)"
                 @click="accountContext.showBalanceSheet = true"
             >
                 <number-pad-sheet :min-value="TRANSACTION_MIN_AMOUNT"
                                   :max-value="TRANSACTION_MAX_AMOUNT"
                                   :currency="account.currency"
+                                  :flip-negative="account.isLiability"
                                   v-model:show="accountContext.showBalanceSheet"
                                   v-model="account.balance"
                 ></number-pad-sheet>
@@ -419,13 +420,14 @@
                     link="#" no-chevron
                     class="list-item-with-header-and-title"
                     :class="{ 'disabled': editAccountId }"
-                    :header="tt('Sub-account Balance')"
-                    :title="formatAmountWithCurrency(subAccount.balance, subAccount.currency)"
+                    :header="account.isLiability ? tt('Sub-account Outstanding Balance') : tt('Sub-account Balance')"
+                    :title="formatAccountDisplayBalance(subAccount)"
                     @click="subAccountContexts[idx].showBalanceSheet = true"
                 >
                     <number-pad-sheet :min-value="TRANSACTION_MIN_AMOUNT"
                                       :max-value="TRANSACTION_MAX_AMOUNT"
                                       :currency="subAccount.currency"
+                                      :flip-negative="account.isLiability"
                                       v-model:show="subAccountContexts[idx].showBalanceSheet"
                                       v-model="subAccount.balance"
                     ></number-pad-sheet>
@@ -565,6 +567,11 @@ const showAccountCategorySheet = ref<boolean>(false);
 const showAccountTypeSheet = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
+
+function formatAccountDisplayBalance(selectedAccount: Account): string {
+    const balance = account.value.isLiability ? -selectedAccount.balance : selectedAccount.balance;
+    return formatAmountWithCurrency(balance, selectedAccount.currency);
+}
 
 function formatAccountBalanceDate(account: Account): string {
     if (!isDefined(account.balanceTime)) {

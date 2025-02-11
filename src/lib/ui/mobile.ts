@@ -140,6 +140,24 @@ export function scrollToSelectedItem(parentEl: Framework7Dom, containerSelector:
     container.scrollTop(targetPos);
 }
 
+export function scrollSheetToTop(sheetElement: HTMLElement | undefined, windowNormalInnerHeight: number): void {
+    if (!sheetElement) {
+        return;
+    }
+
+    const sheetHeight = sheetElement.offsetHeight;
+
+    if (sheetHeight < windowNormalInnerHeight) {
+        setTimeout(() => {
+            const windowNewInnerHeight = window.innerHeight;
+
+            if (windowNewInnerHeight < windowNormalInnerHeight && sheetHeight < windowNewInnerHeight) {
+                window.scrollTo({ top: windowNormalInnerHeight - sheetHeight - 24, behavior: "smooth" });
+            }
+        }, 300);
+    }
+}
+
 export function useI18nUIComponents() {
     const { tt, te } = useI18n();
 

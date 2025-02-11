@@ -235,6 +235,27 @@ export class Account implements AccountInfoResponse {
         return subAccountCurrencies;
     }
 
+    public clone(): Account {
+        return new Account(
+            this.id,
+            this.name,
+            this.parentId,
+            this.category,
+            this.type,
+            this.icon,
+            this.color,
+            this.currency,
+            this.balance,
+            this.comment,
+            this.displayOrder,
+            this.visible,
+            this.balanceTime,
+            this.creditCardStatementDate,
+            this.isAsset,
+            this.isLiability,
+            typeof(this.subAccounts) !== 'undefined' ? Account.cloneAccounts(this.subAccounts) : undefined);
+    }
+
     public createNewSubAccount(currency: string, balanceTime: number): Account {
         return new Account(
             '', // id
@@ -313,6 +334,16 @@ export class Account implements AccountInfoResponse {
         }
 
         return defaultName;
+    }
+
+    public static cloneAccounts(accounts: Account[]): Account[] {
+        const clonedAccounts: Account[] = [];
+
+        for (const account of accounts) {
+            clonedAccounts.push(account.clone());
+        }
+
+        return clonedAccounts;
     }
 
     public static sortAccounts(accounts: Account[]): Account[] {

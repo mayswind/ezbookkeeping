@@ -111,7 +111,6 @@ import {
     isString,
     isNumber,
     isBoolean,
-    copyObjectTo,
     copyArrayTo
 } from '@/lib/common.ts';
 
@@ -1471,7 +1470,7 @@ export function useI18n() {
         const ret: CategorizedAccountWithDisplayBalance[] = [];
         const defaultCurrency = userStore.currentUserDefaultCurrency;
         const allCategories = AccountCategory.values();
-        const categorizedAccounts: Record<number, CategorizedAccount> = copyObjectTo(getCategorizedAccountsMap(allVisibleAccounts), {}) as Record<number, CategorizedAccount>;
+        const categorizedAccounts: Record<number, CategorizedAccount> = getCategorizedAccountsMap(Account.cloneAccounts(allVisibleAccounts));
 
         for (let i = 0; i < allCategories.length; i++) {
             const category = allCategories[i];

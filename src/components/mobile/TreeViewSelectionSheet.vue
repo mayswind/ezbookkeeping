@@ -145,17 +145,24 @@ function onSheetClosed(): void {
 </script>
 
 <style>
-@media (min-height: 630px) {
-    .tree-view-selection-default-sheet {
-        height: 200px;
-    }
+.tree-view-selection-default-sheet {
+    height: 200px;
+}
 
+@media (min-height: 630px) {
     .tree-view-selection-large-sheet {
-        height: 250px;
+        height: 260px;
     }
 
     .tree-view-selection-huge-sheet {
-        height: 340px;
+        height: 380px;
+    }
+}
+
+@media (max-height: 629px) {
+    .tree-view-selection-large-sheet,
+    .tree-view-selection-huge-sheet {
+        height: 240px;
     }
 }
 </style>

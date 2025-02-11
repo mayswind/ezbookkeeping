@@ -147,6 +147,12 @@ function onSheetClosed(): void {
     overflow-y: auto;
 }
 
+@media (max-height: 629px) {
+    .primary-list-container, .secondary-list-container {
+        height: 240px;
+    }
+}
+
 .primary-list.list .item-inner {
     padding-right: 6px;
 }

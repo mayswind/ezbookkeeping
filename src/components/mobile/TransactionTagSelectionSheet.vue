@@ -234,17 +234,24 @@ function onSheetClosed(): void {
 </script>
 
 <style>
-@media (min-height: 630px) {
-    .tag-selection-default-sheet {
-        height: 200px;
-    }
+.tag-selection-default-sheet {
+    height: 200px;
+}
 
+@media (min-height: 630px) {
     .tag-selection-large-sheet {
-        height: 250px;
+        height: 260px;
     }
 
     .tag-selection-huge-sheet {
-        height: 340px;
+        height: 380px;
+    }
+}
+
+@media (max-height: 629px) {
+    .tag-selection-large-sheet,
+    .tag-selection-huge-sheet {
+        height: 240px;
     }
 }
 

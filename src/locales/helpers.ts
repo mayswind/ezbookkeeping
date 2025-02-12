@@ -110,8 +110,7 @@ import {
     isObject,
     isString,
     isNumber,
-    isBoolean,
-    copyArrayTo
+    isBoolean
 } from '@/lib/common.ts';
 
 import {
@@ -990,11 +989,11 @@ export function useI18n() {
             let defaultCategories: PresetCategory[] = [];
 
             if (categoryType === CategoryType.Income) {
-                defaultCategories = copyArrayTo(DEFAULT_INCOME_CATEGORIES, []);
+                defaultCategories = DEFAULT_INCOME_CATEGORIES;
             } else if (categoryType === CategoryType.Expense) {
-                defaultCategories = copyArrayTo(DEFAULT_EXPENSE_CATEGORIES, []);
+                defaultCategories = DEFAULT_EXPENSE_CATEGORIES;
             } else if (categoryType === CategoryType.Transfer) {
-                defaultCategories = copyArrayTo(DEFAULT_TRANSFER_CATEGORIES, []);
+                defaultCategories = DEFAULT_TRANSFER_CATEGORIES;
             }
 
             for (let j = 0; j < defaultCategories.length; j++) {

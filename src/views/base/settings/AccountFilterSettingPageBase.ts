@@ -7,7 +7,6 @@ import { useStatisticsStore } from '@/stores/statistics.ts';
 
 import type { Account, AccountCategoriesWithVisibleCount } from '@/models/account.ts';
 
-import { copyObjectTo } from '@/lib/common.ts';
 import {
     getCategorizedAccountsWithVisibleCount,
     selectAccountOrSubAccounts,
@@ -73,10 +72,10 @@ export function useAccountFilterSettingPageBase(type?: string) {
         }
 
         if (type === 'statisticsDefault') {
-            filterAccountIds.value = copyObjectTo(settingsStore.appSettings.statistics.defaultAccountFilter, allAccountIds) as Record<string, boolean>;
+            filterAccountIds.value = Object.assign(allAccountIds, settingsStore.appSettings.statistics.defaultAccountFilter);
             return true;
         } else if (type === 'statisticsCurrent') {
-            filterAccountIds.value = copyObjectTo(statisticsStore.transactionStatisticsFilter.filterAccountIds, allAccountIds) as Record<string, boolean>;
+            filterAccountIds.value = Object.assign(allAccountIds, statisticsStore.transactionStatisticsFilter.filterAccountIds);
             return true;
         } else if (type === 'transactionListCurrent') {
             for (const accountId in transactionsStore.allFilterAccountIds) {

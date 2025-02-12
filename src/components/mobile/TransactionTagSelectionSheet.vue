@@ -93,7 +93,6 @@ import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.t
 import { TransactionTag } from '@/models/transaction_tag.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
-import { copyArrayTo } from '@/lib/common.ts';
 import { type Framework7Dom, scrollToSelectedItem, scrollSheetToTop } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{
@@ -117,7 +116,7 @@ const sheet = useTemplateRef<Sheet.Sheet>('sheet');
 const searchbar = useTemplateRef<Searchbar.Searchbar>('searchbar');
 
 const filterContent = ref<string>('');
-const selectedItemIds = ref<string[]>(copyArrayTo(props.modelValue, []));
+const selectedItemIds = ref<string[]>(Array.from(props.modelValue));
 const newTag = ref<TransactionTag | null>(null);
 const heightClass = ref<string>(getHeightClass());
 
@@ -227,7 +226,7 @@ function onSearchBarFocus(): void {
 }
 
 function onSheetOpen(event: { $el: Framework7Dom }): void {
-    selectedItemIds.value = copyArrayTo(props.modelValue, []);
+    selectedItemIds.value = Array.from(props.modelValue);
     newTag.value = null;
     scrollToSelectedItem(event.$el, '.page-content', 'li.list-item-selected');
 }

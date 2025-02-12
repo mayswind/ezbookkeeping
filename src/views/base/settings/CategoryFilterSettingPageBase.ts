@@ -11,7 +11,6 @@ import { CategoryType } from '@/core/category.ts';
 import type { TransactionCategory, TransactionCategoriesWithVisibleCount } from '@/models/transaction_category.ts';
 
 import {
-    copyObjectTo,
     arrayItemToObjectField
 } from '@/lib/common.ts';
 import {
@@ -96,10 +95,10 @@ export function useCategoryFilterSettingPageBase(type?: string, allowCategoryTyp
         }
 
         if (type === 'statisticsDefault') {
-            filterCategoryIds.value = copyObjectTo(settingsStore.appSettings.statistics.defaultTransactionCategoryFilter, allCategoryIds) as Record<string, boolean>;
+            filterCategoryIds.value = Object.assign(allCategoryIds, settingsStore.appSettings.statistics.defaultTransactionCategoryFilter);
             return true;
         } else if (type === 'statisticsCurrent') {
-            filterCategoryIds.value = copyObjectTo(statisticsStore.transactionStatisticsFilter.filterCategoryIds, allCategoryIds) as Record<string, boolean>;
+            filterCategoryIds.value = Object.assign(allCategoryIds, statisticsStore.transactionStatisticsFilter.filterCategoryIds);
             return true;
         } else if (type === 'transactionListCurrent') {
             for (const categoryId in transactionsStore.allFilterCategoryIds) {

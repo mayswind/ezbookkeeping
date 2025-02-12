@@ -13,7 +13,6 @@ import { ref, computed, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-import { copyObjectTo } from '@/lib/common.ts';
 import type { MapInstance, MapPosition } from '@/lib/map/base.ts';
 import { createMapInstance } from '@/lib/map/index.ts';
 
@@ -38,7 +37,7 @@ const mapSupported = computed<boolean>(() => !!mapInstance.value);
 const mapDependencyLoaded = computed<boolean>(() => mapInstance.value?.dependencyLoaded || false);
 
 const finalMapStyle = computed<Record<string, unknown>>(() => {
-    const styles: Record<string, unknown> = copyObjectTo(props.mapStyle, {});
+    const styles: Record<string, unknown> = Object.assign({}, props.mapStyle);
 
     if (props.height) {
         styles['height'] = props.height;

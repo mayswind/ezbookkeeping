@@ -375,25 +375,25 @@ export class Account implements AccountInfoResponse {
 export class AccountWithDisplayBalance extends Account {
     public displayBalance: string;
 
-    private constructor(Account: Account, displayBalance: string) {
+    private constructor(account: Account, displayBalance: string) {
         super(
-            Account.id,
-            Account.name,
-            Account.parentId,
-            Account.category,
-            Account.type,
-            Account.icon,
-            Account.color,
-            Account.currency,
-            Account.balance,
-            Account.comment,
-            Account.displayOrder,
-            Account.visible,
-            Account.balanceTime,
-            Account.creditCardStatementDate,
-            Account.isAsset,
-            Account.isLiability,
-            Account.subAccounts
+            account.id,
+            account.name,
+            account.parentId,
+            account.category,
+            account.type,
+            account.icon,
+            account.color,
+            account.currency,
+            account.balance,
+            account.comment,
+            account.displayOrder,
+            account.visible,
+            account.balanceTime,
+            account.creditCardStatementDate,
+            account.isAsset,
+            account.isLiability,
+            account.subAccounts
         );
 
         this.displayBalance = displayBalance;

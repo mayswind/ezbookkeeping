@@ -223,35 +223,6 @@ export function limitText(value: string, maxLength: number): string {
     return value.substring(0, maxLength - 3) + '...';
 }
 
-export function getTextBefore(fullText: string, text: string): string {
-    if (!text) {
-        return fullText;
-    }
-
-    const index = fullText.indexOf(text);
-
-    if (index >= 0) {
-        return fullText.substring(0, index);
-    }
-
-    return '';
-}
-
-export function getTextAfter(fullText: string, text: string): string {
-    if (!text) {
-        return fullText;
-    }
-
-    let index = fullText.indexOf(text);
-
-    if (index >= 0) {
-        index += text.length;
-        return fullText.substring(index);
-    }
-
-    return '';
-}
-
 export function base64encode(arrayBuffer: ArrayBuffer): string {
     return btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(arrayBuffer))));
 }

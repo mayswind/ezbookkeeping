@@ -214,7 +214,7 @@ func (r *iifDataReader) readTransactionSampleLines(ctx core.Context, items []str
 	}
 
 	if len(transactionEndSampleItems) < 1 || transactionEndSampleItems[0] != iifTransactionEndSampleLineSignColumnName {
-		log.Errorf(ctx, "[iif_data_reader.readTransactionSampleLines] expected reading transaction end sample line, but read \"%s\"", strings.Join(splitSampleItems, "\t"))
+		log.Errorf(ctx, "[iif_data_reader.readTransactionSampleLines] expected reading transaction end sample line, but read \"%s\"", strings.Join(transactionEndSampleItems, "\t"))
 		return nil, errs.ErrInvalidIIFFile
 	}
 

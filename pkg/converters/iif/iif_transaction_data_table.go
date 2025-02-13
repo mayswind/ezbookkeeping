@@ -3,6 +3,7 @@ package iif
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -314,6 +315,10 @@ func (t *iifTransactionDataRowIterator) parseTransactionTime(dataset *iifTransac
 		year = dateParts[0]
 		month = dateParts[1]
 		day = dateParts[2]
+	}
+
+	if len(year) == 2 {
+		year = utils.IntToString(time.Now().Year()/100) + year
 	}
 
 	if len(month) < 2 {

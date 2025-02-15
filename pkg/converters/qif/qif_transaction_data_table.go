@@ -105,6 +105,7 @@ func (t *qifTransactionDataRowIterator) Next(ctx core.Context, user *models.User
 	rowItems, err := t.parseTransaction(ctx, user, data)
 
 	if err != nil {
+		log.Errorf(ctx, "[qif_transaction_data_table.Next] cannot parsing transaction in row#%d, because %s", t.currentIndex, err.Error())
 		return nil, err
 	}
 

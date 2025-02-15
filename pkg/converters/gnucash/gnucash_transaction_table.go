@@ -98,6 +98,7 @@ func (t *gnucashTransactionDataRowIterator) Next(ctx core.Context, user *models.
 	rowItems, isValid, err := t.parseTransaction(ctx, user, data)
 
 	if err != nil {
+		log.Errorf(ctx, "[gnucash_transaction_table.Next] cannot parsing transaction in row#%d, because %s", t.currentIndex, err.Error())
 		return nil, err
 	}
 

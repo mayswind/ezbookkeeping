@@ -253,7 +253,7 @@ func (s *TransactionService) CreateTransaction(c core.Context, transaction *mode
 	}
 
 	return s.UserDataDB(transaction.Uid).DoTransaction(c, func(sess *xorm.Session) error {
-		return s.doCreateTransaction(sess, transaction, transactionTagIndexes, tagIds, pictureIds, pictureUpdateModel)
+		return s.doCreateTransaction(c, sess, transaction, transactionTagIndexes, tagIds, pictureIds, pictureUpdateModel)
 	})
 }
 
@@ -360,7 +360,7 @@ func (s *TransactionService) BatchCreateTransactions(c core.Context, uid int64, 
 			transaction := transactions[i]
 			transactionTagIndexes := allTransactionTagIndexes[transaction.TransactionId]
 			transactionTagIds := allTransactionTagIds[transaction.TransactionId]
-			err := s.doCreateTransaction(sess, transaction, transactionTagIndexes, transactionTagIds, nil, nil)
+			err := s.doCreateTransaction(c, sess, transaction, transactionTagIndexes, transactionTagIds, nil, nil)
 
 			if err != nil {
 				transactionUnixTime := utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime)
@@ -546,6 +546,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 		has, err := sess.ID(transaction.TransactionId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(oldTransaction)
 
 		if err != nil {
+			log.Errorf(c, "[transactions.ModifyTransaction] failed to get current transaction, because %s", err.Error())
 			return err
 		} else if !has {
 			return errs.ErrTransactionNotFound
@@ -568,6 +569,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 		sourceAccount, destinationAccount, err := s.getAccountModels(sess, transaction)
 
 		if err != nil {
+			log.Errorf(c, "[transactions.ModifyTransaction] failed to get account, because %s", err.Error())
 			return err
 		}
 
@@ -592,6 +594,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 		oldSourceAccount, oldDestinationAccount, err := s.getOldAccountModels(sess, transaction, oldTransaction, sourceAccount, destinationAccount)
 
 		if err != nil {
+			log.Errorf(c, "[transactions.ModifyTransaction] failed to get old account, because %s", err.Error())
 			return err
 		}
 
@@ -625,6 +628,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 			has, err = sess.Where("uid=? AND deleted=? AND transaction_time>=? AND transaction_time<=?", transaction.Uid, false, minTransactionTime, maxTransactionTime).OrderBy("transaction_time desc").Limit(1).Get(sameSecondLatestTransaction)
 
 			if err != nil {
+				log.Errorf(c, "[transactions.ModifyTransaction] failed to get trasaction time, because %s", err.Error())
 				return err
 			}
 
@@ -706,6 +710,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 			}
 
 			if err != nil {
+				log.Errorf(c, "[transactions.ModifyTransaction] failed to get whether other transactions exist, because %s", err.Error())
 				return err
 			} else if otherTransactionExists {
 				return errs.ErrCannotAddTransactionBeforeBalanceModificationTransaction
@@ -716,6 +721,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 		updatedRows, err := sess.ID(transaction.TransactionId).Cols(updateCols...).Where("uid=? AND deleted=?", transaction.Uid, false).Update(transaction)
 
 		if err != nil {
+			log.Errorf(c, "[transactions.ModifyTransaction] failed to update transaction, because %s", err.Error())
 			return err
 		} else if updatedRows < 1 {
 			return errs.ErrTransactionNotFound
@@ -732,6 +738,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 			updatedRows, err := sess.ID(relatedTransaction.TransactionId).Cols(relatedUpdateCols...).Where("uid=? AND deleted=?", relatedTransaction.Uid, false).Update(relatedTransaction)
 
 			if err != nil {
+				log.Errorf(c, "[transactions.ModifyTransaction] failed to update related transaction, because %s", err.Error())
 				return err
 			} else if updatedRows < 1 {
 				return errs.ErrDatabaseOperationFailed
@@ -748,6 +755,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 			deletedRows, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=? AND transaction_id=?", transaction.Uid, false, transaction.TransactionId).In("tag_id", removeTagIds).Update(tagIndexUpdateModel)
 
 			if err != nil {
+				log.Errorf(c, "[transactions.ModifyTransaction] failed to remove old transaction tag index, because %s", err.Error())
 				return err
 			} else if deletedRows < 1 {
 				return errs.ErrTransactionTagNotFound
@@ -762,6 +770,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 				_, err := sess.Insert(transactionTagIndex)
 
 				if err != nil {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to add new transaction tag index, because %s", err.Error())
 					return err
 				}
 			}
@@ -773,6 +782,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 			_, err := sess.Where("uid=? AND deleted=? AND transaction_id=?", transaction.Uid, false, transaction.TransactionId).Update(tagIndexUpdateModel)
 
 			if err != nil {
+				log.Errorf(c, "[transactions.ModifyTransaction] failed to update transaction tag index, because %s", err.Error())
 				return err
 			}
 		}
@@ -787,6 +797,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 			deletedRows, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=? AND transaction_id=?", transaction.Uid, false, transaction.TransactionId).In("picture_id", removePictureIds).Update(pictureUpdateModel)
 
 			if err != nil {
+				log.Errorf(c, "[transactions.ModifyTransaction] failed to remove old transaction picture info, because %s", err.Error())
 				return err
 			} else if deletedRows < 1 {
 				return errs.ErrTransactionPictureNotFound
@@ -802,6 +813,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 			_, err = sess.Cols("transaction_id", "updated_unix_time").Where("uid=? AND deleted=? AND transaction_id=?", transaction.Uid, false, models.TransactionPictureNewPictureTransactionId).In("picture_id", addPictureIds).Update(pictureUpdateModel)
 
 			if err != nil {
+				log.Errorf(c, "[transactions.ModifyTransaction] failed to update new transaction picture info, because %s", err.Error())
 				return err
 			}
 		}
@@ -817,6 +829,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 				updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)+(%d)", oldTransaction.RelatedAccountAmount, transaction.RelatedAccountAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
 
 				if err != nil {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
 					return errs.ErrDatabaseOperationFailed
@@ -837,6 +850,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 				updatedRows, err := sess.ID(oldSourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)+(%d)", oldTransaction.Amount, oldAccountNewAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", oldSourceAccount.Uid, false).Update(oldSourceAccount)
 
 				if err != nil {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
 					return errs.ErrDatabaseOperationFailed
@@ -848,6 +862,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 				updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", newAccountNewAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
 
 				if err != nil {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
 					return errs.ErrDatabaseOperationFailed
@@ -868,6 +883,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 				updatedRows, err := sess.ID(oldSourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)-(%d)", oldTransaction.Amount, oldAccountNewAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", oldSourceAccount.Uid, false).Update(oldSourceAccount)
 
 				if err != nil {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
 					return errs.ErrDatabaseOperationFailed
@@ -879,6 +895,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 				updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)", newAccountNewAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
 
 				if err != nil {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
 					return errs.ErrDatabaseOperationFailed
@@ -899,6 +916,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 				updatedRows, err := sess.ID(oldSourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)-(%d)", oldTransaction.Amount, oldSourceAccountNewAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", oldSourceAccount.Uid, false).Update(oldSourceAccount)
 
 				if err != nil {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
 					return errs.ErrDatabaseOperationFailed
@@ -910,6 +928,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 				updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)", newSourceAccountNewAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
 
 				if err != nil {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
 					return errs.ErrDatabaseOperationFailed
@@ -930,6 +949,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 				updatedRows, err := sess.ID(oldDestinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)+(%d)", oldTransaction.RelatedAccountAmount, oldDestinationAccountNewAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", oldDestinationAccount.Uid, false).Update(oldDestinationAccount)
 
 				if err != nil {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
 					return errs.ErrDatabaseOperationFailed
@@ -941,6 +961,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 				updatedRows, err := sess.ID(destinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", newDestinationAccountNewAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", destinationAccount.Uid, false).Update(destinationAccount)
 
 				if err != nil {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
 					return errs.ErrDatabaseOperationFailed
@@ -1541,7 +1562,7 @@ func (s *TransactionService) GetTransactionIds(transactions []*models.Transactio
 	return transactionIds
 }
 
-func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction *models.Transaction, transactionTagIndexes []*models.TransactionTagIndex, tagIds []int64, pictureIds []int64, pictureUpdateModel *models.TransactionPictureInfo) error {
+func (s *TransactionService) doCreateTransaction(c core.Context, sess *xorm.Session, transaction *models.Transaction, transactionTagIndexes []*models.TransactionTagIndex, tagIds []int64, pictureIds []int64, pictureUpdateModel *models.TransactionPictureInfo) error {
 	// Get and verify source and destination account
 	sourceAccount, destinationAccount, err := s.getAccountModels(sess, transaction)
 
@@ -1593,6 +1614,7 @@ func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction
 		otherTransactionExists, err := sess.Cols("uid", "deleted", "account_id").Where("uid=? AND deleted=? AND account_id=?", transaction.Uid, false, sourceAccount.AccountId).Limit(1).Exist(&models.Transaction{})
 
 		if err != nil {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to get whether other transactions exist, because %s", err.Error())
 			return err
 		} else if otherTransactionExists {
 			return errs.ErrBalanceModificationTransactionCannotAddWhenNotEmpty
@@ -1610,6 +1632,7 @@ func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction
 		}
 
 		if err != nil {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to get whether other transactions exist, because %s", err.Error())
 			return err
 		} else if otherTransactionExists {
 			return errs.ErrCannotAddTransactionBeforeBalanceModificationTransaction
@@ -1626,6 +1649,12 @@ func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction
 	createdRows, err := sess.Insert(transaction)
 
 	if err != nil || createdRows < 1 { // maybe another transaction has same time
+		if err != nil {
+			log.Warnf(c, "[transactions.doCreateTransaction] cannot create trasaction, because %s, regenerate transaction time value", err.Error())
+		} else {
+			log.Warnf(c, "[transactions.doCreateTransaction] cannot create trasaction, regenerate transaction time value")
+		}
+
 		sameSecondLatestTransaction := &models.Transaction{}
 		minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
 		maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
@@ -1633,6 +1662,7 @@ func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction
 		has, err := sess.Where("uid=? AND transaction_time>=? AND transaction_time<=?", transaction.Uid, minTransactionTime, maxTransactionTime).OrderBy("transaction_time desc").Limit(1).Get(sameSecondLatestTransaction)
 
 		if err != nil {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to get trasaction time, because %s", err.Error())
 			return err
 		} else if !has {
 			return errs.ErrDatabaseOperationFailed
@@ -1644,6 +1674,7 @@ func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction
 		createdRows, err := sess.Insert(transaction)
 
 		if err != nil {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to add transaction again, because %s", err.Error())
 			return err
 		} else if createdRows < 1 {
 			return errs.ErrDatabaseOperationFailed
@@ -1660,6 +1691,7 @@ func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction
 		createdRows, err := sess.Insert(relatedTransaction)
 
 		if err != nil {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to add related transaction, because %s", err.Error())
 			return err
 		} else if createdRows < 1 {
 			return errs.ErrDatabaseOperationFailed
@@ -1677,6 +1709,7 @@ func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction
 			_, err := sess.Insert(transactionTagIndex)
 
 			if err != nil {
+				log.Errorf(c, "[transactions.doCreateTransaction] failed to add transaction tag index, because %s", err.Error())
 				return err
 			}
 		}
@@ -1687,6 +1720,7 @@ func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction
 		_, err = sess.Cols("transaction_id", "updated_unix_time").Where("uid=? AND deleted=? AND transaction_id=?", transaction.Uid, false, models.TransactionPictureNewPictureTransactionId).In("picture_id", pictureIds).Update(pictureUpdateModel)
 
 		if err != nil {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to update transaction picture info, because %s", err.Error())
 			return err
 		}
 	}
@@ -1697,6 +1731,7 @@ func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction
 		updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", transaction.RelatedAccountAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
 
 		if err != nil {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to update account balance, because %s", err.Error())
 			return err
 		} else if updatedRows < 1 {
 			return errs.ErrDatabaseOperationFailed
@@ -1706,6 +1741,7 @@ func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction
 		updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", transaction.Amount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
 
 		if err != nil {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to update account balance, because %s", err.Error())
 			return err
 		} else if updatedRows < 1 {
 			return errs.ErrDatabaseOperationFailed
@@ -1715,6 +1751,7 @@ func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction
 		updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)", transaction.Amount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
 
 		if err != nil {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to update account balance, because %s", err.Error())
 			return err
 		} else if updatedRows < 1 {
 			return errs.ErrDatabaseOperationFailed
@@ -1724,6 +1761,7 @@ func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction
 		updatedSourceRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)", transaction.Amount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
 
 		if err != nil {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to update account balance, because %s", err.Error())
 			return err
 		} else if updatedSourceRows < 1 {
 			return errs.ErrDatabaseOperationFailed
@@ -1733,6 +1771,7 @@ func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction
 		updatedDestinationRows, err := sess.ID(destinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", transaction.RelatedAccountAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", destinationAccount.Uid, false).Update(destinationAccount)
 
 		if err != nil {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to update account balance, because %s", err.Error())
 			return err
 		} else if updatedDestinationRows < 1 {
 			return errs.ErrDatabaseOperationFailed

@@ -9,6 +9,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 	"github.com/mayswind/ezbookkeeping/pkg/uuid"
@@ -270,7 +271,9 @@ func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Acco
 		}
 	}
 
-	return s.UserDataDB(mainAccount.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+	userDataDb := s.UserDataDB(mainAccount.Uid)
+
+	return userDataDb.DoTransaction(c, func(sess *xorm.Session) error {
 		for i := 0; i < len(allAccounts); i++ {
 			account := allAccounts[i]
 			_, err := sess.Insert(account)
@@ -282,9 +285,25 @@ func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Acco
 
 		for i := 0; i < len(allInitTransactions); i++ {
 			transaction := allInitTransactions[i]
+
+			insertTransactionSavePointName := "insert_transaction"
+			err := userDataDb.SetSavePoint(sess, insertTransactionSavePointName)
+
+			if err != nil {
+				log.Errorf(c, "[accounts.CreateAccounts] failed to set save point \"%s\", because %s", insertTransactionSavePointName, err.Error())
+				return err
+			}
+
 			createdRows, err := sess.Insert(transaction)
 
 			if err != nil || createdRows < 1 { // maybe another transaction has same time
+				err = userDataDb.RollbackToSavePoint(sess, insertTransactionSavePointName)
+
+				if err != nil {
+					log.Errorf(c, "[accounts.CreateAccounts] failed to rollback to save point \"%s\", because %s", insertTransactionSavePointName, err.Error())
+					return err
+				}
+
 				sameSecondLatestTransaction := &models.Transaction{}
 				minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
 				maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))

@@ -104,7 +104,8 @@ func initializeDatabase(dbConfig *settings.DatabaseConfig) (*Database, error) {
 	engineGroup.SetConnMaxLifetime(time.Duration(dbConfig.ConnectionMaxLifeTime) * time.Second)
 
 	return &Database{
-		engineGroup: engineGroup,
+		databaseType: dbConfig.DatabaseType,
+		engineGroup:  engineGroup,
 	}, nil
 }
 

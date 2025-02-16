@@ -252,8 +252,10 @@ func (s *TransactionService) CreateTransaction(c core.Context, transaction *mode
 		UpdatedUnixTime: now,
 	}
 
-	return s.UserDataDB(transaction.Uid).DoTransaction(c, func(sess *xorm.Session) error {
-		return s.doCreateTransaction(c, sess, transaction, transactionTagIndexes, tagIds, pictureIds, pictureUpdateModel)
+	userDataDb := s.UserDataDB(transaction.Uid)
+
+	return userDataDb.DoTransaction(c, func(sess *xorm.Session) error {
+		return s.doCreateTransaction(c, userDataDb, sess, transaction, transactionTagIndexes, tagIds, pictureIds, pictureUpdateModel)
 	})
 }
 
@@ -355,12 +357,14 @@ func (s *TransactionService) BatchCreateTransactions(c core.Context, uid int64, 
 		allTransactionTagIds[transaction.TransactionId] = uniqueTagIds
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	userDataDb := s.UserDataDB(uid)
+
+	return userDataDb.DoTransaction(c, func(sess *xorm.Session) error {
 		for i := 0; i < len(transactions); i++ {
 			transaction := transactions[i]
 			transactionTagIndexes := allTransactionTagIndexes[transaction.TransactionId]
 			transactionTagIds := allTransactionTagIds[transaction.TransactionId]
-			err := s.doCreateTransaction(c, sess, transaction, transactionTagIndexes, transactionTagIds, nil, nil)
+			err := s.doCreateTransaction(c, userDataDb, sess, transaction, transactionTagIndexes, transactionTagIds, nil, nil)
 
 			if err != nil {
 				transactionUnixTime := utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime)
@@ -1562,7 +1566,7 @@ func (s *TransactionService) GetTransactionIds(transactions []*models.Transactio
 	return transactionIds
 }
 
-func (s *TransactionService) doCreateTransaction(c core.Context, sess *xorm.Session, transaction *models.Transaction, transactionTagIndexes []*models.TransactionTagIndex, tagIds []int64, pictureIds []int64, pictureUpdateModel *models.TransactionPictureInfo) error {
+func (s *TransactionService) doCreateTransaction(c core.Context, database *datastore.Database, sess *xorm.Session, transaction *models.Transaction, transactionTagIndexes []*models.TransactionTagIndex, tagIds []int64, pictureIds []int64, pictureUpdateModel *models.TransactionPictureInfo) error {
 	// Get and verify source and destination account
 	sourceAccount, destinationAccount, err := s.getAccountModels(sess, transaction)
 
@@ -1646,6 +1650,14 @@ func (s *TransactionService) doCreateTransaction(c core.Context, sess *xorm.Sess
 		relatedTransaction = s.GetRelatedTransferTransaction(transaction)
 	}
 
+	insertTransactionSavePointName := "insert_transaction"
+	err = database.SetSavePoint(sess, insertTransactionSavePointName)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.doCreateTransaction] failed to set save point \"%s\", because %s", insertTransactionSavePointName, err.Error())
+		return err
+	}
+
 	createdRows, err := sess.Insert(transaction)
 
 	if err != nil || createdRows < 1 { // maybe another transaction has same time
@@ -1653,6 +1665,13 @@ func (s *TransactionService) doCreateTransaction(c core.Context, sess *xorm.Sess
 			log.Warnf(c, "[transactions.doCreateTransaction] cannot create trasaction, because %s, regenerate transaction time value", err.Error())
 		} else {
 			log.Warnf(c, "[transactions.doCreateTransaction] cannot create trasaction, regenerate transaction time value")
+		}
+
+		err = database.RollbackToSavePoint(sess, insertTransactionSavePointName)
+
+		if err != nil {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to rollback to save point \"%s\", because %s", insertTransactionSavePointName, err.Error())
+			return err
 		}
 
 		sameSecondLatestTransaction := &models.Transaction{}

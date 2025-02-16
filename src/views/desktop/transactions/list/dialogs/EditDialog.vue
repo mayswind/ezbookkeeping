@@ -888,6 +888,7 @@ function duplicate(withTime?: boolean, withGeoLocation?: boolean): void {
 
     editId.value = null;
     duplicateFromId.value = transaction.value.id;
+    clientSessionId.value = generateRandomUUID();
     activeTab.value = 'basicInfo';
     transaction.value.id = '';
 

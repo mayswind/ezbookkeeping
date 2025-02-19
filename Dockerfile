@@ -1,5 +1,5 @@
 # Build backend binary file
-FROM golang:1.23.4-alpine3.21 AS be-builder
+FROM golang:1.24.0-alpine3.21 AS be-builder
 ARG RELEASE_BUILD
 ARG SKIP_TESTS
 ENV RELEASE_BUILD=$RELEASE_BUILD

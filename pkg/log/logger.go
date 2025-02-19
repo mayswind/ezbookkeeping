@@ -141,7 +141,7 @@ func SetLoggerConfiguration(config *settings.Config, isDisableBootLog bool) erro
 	return nil
 }
 
-// DebugfWithRequestId logs debug log with custom format
+// Debugf logs debug log with custom format
 func Debugf(c core.Context, format string, args ...any) {
 	if c == nil {
 		defaultLogger.Debug(getFinalLog(format, args...))

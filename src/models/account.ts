@@ -346,7 +346,7 @@ export class Account implements AccountInfoResponse {
         return clonedAccounts;
     }
 
-    public static sortAccounts(accounts: Account[]): Account[] {
+    public static sortAccounts(accounts: Account[], allAccountsMap?: Record<string, Account>): Account[] {
         if (!accounts || !accounts.length) {
             return accounts;
         }
@@ -367,7 +367,40 @@ export class Account implements AccountInfoResponse {
                 return account1Category.displayOrder - account2Category.displayOrder;
             }
 
-            return account1.displayOrder - account2.displayOrder;
+            if (account1.parentId === account2.parentId) {
+                return account1.displayOrder - account2.displayOrder;
+            }
+
+            if (account1.id === account2.parentId) {
+                return -1;
+            } else if (account2.id === account1.parentId) {
+                return 1;
+            }
+
+            let account1DisplayOrder: number | null = account1.displayOrder;
+            let account2DisplayOrder: number | null = account2.displayOrder;
+
+            if (account1.parentId && account1.parentId !== '0') {
+                if (allAccountsMap && allAccountsMap[account1.parentId]) {
+                    account1DisplayOrder = allAccountsMap[account1.parentId].displayOrder;
+                } else {
+                    account1DisplayOrder = null;
+                }
+            }
+
+            if (account2.parentId && account2.parentId !== '0') {
+                if (allAccountsMap && allAccountsMap[account2.parentId]) {
+                    account2DisplayOrder = allAccountsMap[account2.parentId].displayOrder;
+                } else {
+                    account2DisplayOrder = null;
+                }
+            }
+
+            if (account1DisplayOrder !== null && account2DisplayOrder !== null) {
+                return account1DisplayOrder - account2DisplayOrder;
+            } else {
+                return account1.id.localeCompare(account2.id);
+            }
         });
     }
 }

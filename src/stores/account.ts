@@ -47,7 +47,7 @@ export const useAccountsStore = defineStore('accounts', () => {
             }
         }
 
-        return Account.sortAccounts(allAccountsList);
+        return Account.sortAccounts(allAccountsList, allAccountsMap.value);
     });
 
     const allVisiblePlainAccounts = computed<Account[]>(() => {
@@ -72,7 +72,7 @@ export const useAccountsStore = defineStore('accounts', () => {
             }
         }
 
-        return Account.sortAccounts(allVisibleAccounts);
+        return Account.sortAccounts(allVisibleAccounts, allAccountsMap.value);
     });
 
     const allAvailableAccountsCount = computed<number>(() => {

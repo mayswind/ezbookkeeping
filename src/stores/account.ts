@@ -50,6 +50,29 @@ export const useAccountsStore = defineStore('accounts', () => {
         return Account.sortAccounts(allAccountsList, allAccountsMap.value);
     });
 
+    const allMixedPlainAccounts = computed<Account[]>(() => {
+        const allAccountsList: Account[] = [];
+
+        for (let i = 0; i < allAccounts.value.length; i++) {
+            const account = allAccounts.value[i];
+
+            if (account.type === AccountType.SingleAccount.type) {
+                allAccountsList.push(account);
+            } else if (account.type === AccountType.MultiSubAccounts.type) {
+                allAccountsList.push(account);
+
+                if (account.subAccounts) {
+                    for (let j = 0; j < account.subAccounts.length; j++) {
+                        const subAccount = account.subAccounts[j];
+                        allAccountsList.push(subAccount);
+                    }
+                }
+            }
+        }
+
+        return Account.sortAccounts(allAccountsList, allAccountsMap.value);
+    });
+
     const allVisiblePlainAccounts = computed<Account[]>(() => {
         const allVisibleAccounts: Account[] = [];
 
@@ -982,6 +1005,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         accountListStateInvalid,
         // computed states
         allPlainAccounts,
+        allMixedPlainAccounts,
         allVisiblePlainAccounts,
         allAvailableAccountsCount,
         allVisibleAccountsCount,

@@ -66,7 +66,7 @@ export function useTransactionListPageBase() {
 
     const allDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.Normal, true, !!accountsStore.getAccountStatementDate(query.value.accountIds)));
 
-    const allAccounts = computed<Account[]>(() => accountsStore.allPlainAccounts);
+    const allAccounts = computed<Account[]>(() => accountsStore.allMixedPlainAccounts);
     const allAccountsMap = computed<Record<string, Account>>(() => accountsStore.allAccountsMap);
     const allAvailableAccountsCount = computed<number>(() => accountsStore.allAvailableAccountsCount);
     const allPrimaryCategories = computed<Record<number, TransactionCategory[]>>(() => {

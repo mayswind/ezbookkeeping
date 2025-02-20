@@ -80,6 +80,8 @@ func (e *InternationalMonetaryFundDataSource) BuildRequests() ([]*http.Request, 
 		return nil, err
 	}
 
+	req.Header.Set("User-Agent", "") // Do not set custom user agent
+
 	return []*http.Request{req}, nil
 }
 

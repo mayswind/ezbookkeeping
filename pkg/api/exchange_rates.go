@@ -66,7 +66,7 @@ func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.WebContext) (any, *
 
 	for i := 0; i < len(requests); i++ {
 		req := requests[i]
-		req.Header.Set("User-Agent", fmt.Sprintf("ezBookkeeping/%s ", settings.Version))
+		req.Header.Set("User-Agent", fmt.Sprintf("ezBookkeeping/%s", settings.Version))
 
 		resp, err := client.Do(req)
 

@@ -8,16 +8,20 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
     public name: string;
     public scheduledFrequencyType?: number;
     public scheduledFrequency?: string;
+    public scheduledStartDate?: string;
+    public scheduledEndDate?: string;
     public scheduledAt?: number;
     public displayOrder: number;
     public hidden: boolean;
 
-    private constructor(id: string, templateType: number, name: string, type: number, categoryId: string, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, scheduledFrequencyType: number | undefined, scheduledFrequency: string | undefined, scheduledAt: number | undefined, tagIds: string[], comment: string, editable: boolean, displayOrder: number, hidden: boolean) {
+    private constructor(id: string, templateType: number, name: string, type: number, categoryId: string, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, scheduledFrequencyType: number | undefined, scheduledFrequency: string | undefined, scheduledStartDate: string | undefined, scheduledEndDate: string | undefined, scheduledAt: number | undefined, tagIds: string[], comment: string, editable: boolean, displayOrder: number, hidden: boolean) {
         super(id, '', type, categoryId, 0, undefined, utcOffset, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, editable);
         this.templateType = templateType;
         this.name = name;
         this.scheduledFrequencyType = scheduledFrequencyType;
         this.scheduledFrequency = scheduledFrequency;
+        this.scheduledStartDate = scheduledStartDate;
+        this.scheduledEndDate = scheduledEndDate;
         this.scheduledAt = scheduledAt;
         this.displayOrder = displayOrder;
         this.hidden = hidden;
@@ -30,6 +34,8 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
         if (this.templateType === TemplateType.Schedule.type) {
             this.scheduledFrequencyType = other.scheduledFrequencyType;
             this.scheduledFrequency = other.scheduledFrequency;
+            this.scheduledStartDate = other.scheduledStartDate;
+            this.scheduledEndDate = other.scheduledEndDate;
             this.utcOffset = other.utcOffset;
             this.timeZone = undefined;
         }
@@ -50,6 +56,8 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             comment: this.comment,
             scheduledFrequencyType: this.templateType === TemplateType.Schedule.type ? this.scheduledFrequencyType : undefined,
             scheduledFrequency: this.templateType === TemplateType.Schedule.type ? this.scheduledFrequency : undefined,
+            scheduledStartDate: this.templateType === TemplateType.Schedule.type && this.scheduledStartDate ? this.scheduledStartDate : undefined,
+            scheduledEndDate: this.templateType === TemplateType.Schedule.type && this.scheduledEndDate ? this.scheduledEndDate : undefined,
             utcOffset: this.templateType === TemplateType.Schedule.type ? this.utcOffset : undefined,
             clientSessionId: clientSessionId
         };
@@ -70,6 +78,8 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             comment: this.comment,
             scheduledFrequencyType: this.templateType === TemplateType.Schedule.type ? this.scheduledFrequencyType : undefined,
             scheduledFrequency: this.templateType === TemplateType.Schedule.type ? this.scheduledFrequency : undefined,
+            scheduledStartDate: this.templateType === TemplateType.Schedule.type && this.scheduledStartDate ? this.scheduledStartDate : undefined,
+            scheduledEndDate: this.templateType === TemplateType.Schedule.type && this.scheduledEndDate ? this.scheduledEndDate : undefined,
             utcOffset: this.templateType === TemplateType.Schedule.type ? this.utcOffset : undefined
         };
     }
@@ -89,6 +99,8 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             transaction.hideAmount,
             undefined, // scheduledFrequencyType
             undefined, // scheduledFrequency
+            undefined, // scheduledStartDate
+            undefined, // scheduledEndDate
             undefined, // scheduledAt
             transaction.tagIds,
             transaction.comment,
@@ -113,6 +125,8 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             templateResponse.hideAmount,
             templateResponse.scheduledFrequencyType,
             templateResponse.scheduledFrequency,
+            templateResponse.scheduledStartDate ?? undefined,
+            templateResponse.scheduledEndDate ?? undefined,
             templateResponse.scheduledAt,
             templateResponse.tagIds,
             templateResponse.comment,
@@ -147,6 +161,8 @@ export interface TransactionTemplateCreateRequest {
     readonly comment: string;
     readonly scheduledFrequencyType?: number;
     readonly scheduledFrequency?: string;
+    readonly scheduledStartDate?: string;
+    readonly scheduledEndDate?: string;
     readonly utcOffset?: number;
     readonly clientSessionId: string;
 }
@@ -165,6 +181,8 @@ export interface TransactionTemplateModifyRequest {
     readonly comment: string;
     readonly scheduledFrequencyType?: number;
     readonly scheduledFrequency?: string;
+    readonly scheduledStartDate?: string;
+    readonly scheduledEndDate?: string;
     readonly utcOffset?: number;
 }
 
@@ -191,6 +209,8 @@ export interface TransactionTemplateInfoResponse extends TransactionInfoResponse
     readonly name: string;
     readonly scheduledFrequencyType?: number;
     readonly scheduledFrequency?: string;
+    readonly scheduledStartDate?: string;
+    readonly scheduledEndDate?: string;
     readonly scheduledAt?: number;
     readonly displayOrder: number;
     readonly hidden: boolean;

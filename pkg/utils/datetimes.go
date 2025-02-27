@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	longDateFormat                  = "2006-01-02"
 	longDateTimeFormat              = "2006-01-02 15:04:05"
 	longDateTimeWithTimezoneFormat  = "2006-01-02 15:04:05Z07:00"
 	longDateTimeWithTimezoneFormat2 = "2006-01-02 15:04:05 Z0700"
@@ -40,6 +41,17 @@ func ParseNumericYearMonth(yearMonth string) (int32, int32, error) {
 	}
 
 	return year, month, nil
+}
+
+// FormatUnixTimeToLongDate returns a textual representation of the unix time formatted by long date time format
+func FormatUnixTimeToLongDate(unixTime int64, timezone *time.Location) string {
+	t := parseFromUnixTime(unixTime)
+
+	if timezone != nil {
+		t = t.In(timezone)
+	}
+
+	return t.Format(longDateFormat)
 }
 
 // FormatUnixTimeToLongDateTime returns a textual representation of the unix time formatted by long date time format
@@ -117,6 +129,24 @@ func GetMinUnixTimeWithSameLocalDateTime(unixTime int64, currentUtcOffset int16)
 // GetMaxUnixTimeWithSameLocalDateTime returns the maximum UnixTime for date with the same local date
 func GetMaxUnixTimeWithSameLocalDateTime(unixTime int64, currentUtcOffset int16) int64 {
 	return unixTime + int64(currentUtcOffset)*60 - westernmostTimezoneUtcOffset*60
+}
+
+// ParseFromLongDateFirstTime parses a formatted string in long date format
+func ParseFromLongDateFirstTime(t string, utcOffset int16) (time.Time, error) {
+	timezone := time.FixedZone("Timezone", int(utcOffset)*60)
+	return time.ParseInLocation(longDateFormat, t, timezone)
+}
+
+// ParseFromLongDateLastTime parses a formatted string in long date format
+func ParseFromLongDateLastTime(t string, utcOffset int16) (time.Time, error) {
+	timezone := time.FixedZone("Timezone", int(utcOffset)*60)
+	lastTime, err := time.ParseInLocation(longDateFormat, t, timezone)
+
+	if err != nil {
+		return lastTime, err
+	}
+
+	return lastTime.Add(24 * time.Hour).Add(-1 * time.Nanosecond), nil
 }
 
 // ParseFromLongDateTimeToMinUnixTime parses a formatted string in long date time format to minimal unix time (the westernmost timezone)

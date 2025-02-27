@@ -2,6 +2,7 @@ package models
 
 import (
 	"strings"
+	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
@@ -29,15 +30,17 @@ const (
 type TransactionTemplate struct {
 	TemplateId                 int64                            `xorm:"PK"`
 	Uid                        int64                            `xorm:"INDEX(IDX_transaction_template_uid_deleted_template_type_order) NOT NULL"`
-	Deleted                    bool                             `xorm:"INDEX(IDX_transaction_template_uid_deleted_template_type_order) INDEX(IDX_transaction_template_deleted_type_freqtype_scheduled_at) NOT NULL"`
-	TemplateType               TransactionTemplateType          `xorm:"INDEX(IDX_transaction_template_uid_deleted_template_type_order) INDEX(IDX_transaction_template_deleted_type_freqtype_scheduled_at) NOT NULL"`
+	Deleted                    bool                             `xorm:"INDEX(IDX_transaction_template_uid_deleted_template_type_order) INDEX(IDX_transaction_template_deleted_type_freqtype_scheduled_time) NOT NULL"`
+	TemplateType               TransactionTemplateType          `xorm:"INDEX(IDX_transaction_template_uid_deleted_template_type_order) INDEX(IDX_transaction_template_deleted_type_freqtype_scheduled_time) NOT NULL"`
 	Name                       string                           `xorm:"VARCHAR(64) NOT NULL"`
 	Type                       TransactionType                  `xorm:"NOT NULL"`
 	CategoryId                 int64                            `xorm:"NOT NULL"`
 	AccountId                  int64                            `xorm:"NOT NULL"`
-	ScheduledFrequencyType     TransactionScheduleFrequencyType `xorm:"INDEX(IDX_transaction_template_deleted_type_freqtype_scheduled_at)"`
+	ScheduledFrequencyType     TransactionScheduleFrequencyType `xorm:"INDEX(IDX_transaction_template_deleted_type_freqtype_scheduled_time)"`
 	ScheduledFrequency         string                           `xorm:"VARCHAR(100)"`
-	ScheduledAt                int16                            `xorm:"INDEX(IDX_transaction_template_deleted_type_freqtype_scheduled_at)"`
+	ScheduledStartTime         *int64                           `xorm:"INDEX(IDX_transaction_template_deleted_type_freqtype_scheduled_time)"`
+	ScheduledEndTime           *int64                           `xorm:"INDEX(IDX_transaction_template_deleted_type_freqtype_scheduled_time)"`
+	ScheduledAt                int16                            `xorm:"INDEX(IDX_transaction_template_deleted_type_freqtype_scheduled_time)"`
 	ScheduledTimezoneUtcOffset int16
 	TagIds                     string `xorm:"VARCHAR(255) NOT NULL"`
 	Amount                     int64  `xorm:"NOT NULL"`
@@ -77,6 +80,8 @@ type TransactionTemplateCreateRequest struct {
 	Comment                    string                            `json:"comment" binding:"max=255"`
 	ScheduledFrequencyType     *TransactionScheduleFrequencyType `json:"scheduledFrequencyType" binding:"omitempty"`
 	ScheduledFrequency         *string                           `json:"scheduledFrequency" binding:"omitempty"`
+	ScheduledStartDate         *string                           `json:"scheduledStartDate" binding:"omitempty"`
+	ScheduledEndDate           *string                           `json:"scheduledEndDate" binding:"omitempty"`
 	ScheduledTimezoneUtcOffset *int16                            `json:"utcOffset" binding:"omitempty,min=-720,max=840"`
 	ClientSessionId            string                            `json:"clientSessionId"`
 }
@@ -102,6 +107,8 @@ type TransactionTemplateModifyRequest struct {
 	Comment                    string                            `json:"comment" binding:"max=255"`
 	ScheduledFrequencyType     *TransactionScheduleFrequencyType `json:"scheduledFrequencyType" binding:"omitempty"`
 	ScheduledFrequency         *string                           `json:"scheduledFrequency" binding:"omitempty"`
+	ScheduledStartDate         *string                           `json:"scheduledStartDate" binding:"omitempty"`
+	ScheduledEndDate           *string                           `json:"scheduledEndDate" binding:"omitempty"`
 	ScheduledTimezoneUtcOffset *int16                            `json:"utcOffset" binding:"omitempty,min=-720,max=840"`
 }
 
@@ -133,6 +140,8 @@ type TransactionTemplateInfoResponse struct {
 	Name                   string                            `json:"name"`
 	ScheduledFrequencyType *TransactionScheduleFrequencyType `json:"scheduledFrequencyType,omitempty"`
 	ScheduledFrequency     *string                           `json:"scheduledFrequency,omitempty"`
+	ScheduledStartDate     *string                           `json:"scheduledStartDate" binding:"omitempty"`
+	ScheduledEndDate       *string                           `json:"scheduledEndDate" binding:"omitempty"`
 	ScheduledAt            *int16                            `json:"scheduledAt,omitempty"`
 	DisplayOrder           int32                             `json:"displayOrder"`
 	Hidden                 bool                              `json:"hidden"`
@@ -171,6 +180,18 @@ func (t *TransactionTemplate) ToTransactionTemplateInfoResponse(serverUtcOffset 
 		response.ScheduledFrequencyType = &t.ScheduledFrequencyType
 		response.ScheduledFrequency = &t.ScheduledFrequency
 		response.ScheduledAt = &t.ScheduledAt
+
+		templateTimeZone := time.FixedZone("Template Timezone", int(t.ScheduledTimezoneUtcOffset)*60)
+
+		if t.ScheduledStartTime != nil {
+			startDate := utils.FormatUnixTimeToLongDate(*t.ScheduledStartTime, templateTimeZone)
+			response.ScheduledStartDate = &startDate
+		}
+
+		if t.ScheduledEndTime != nil {
+			endDate := utils.FormatUnixTimeToLongDate(*t.ScheduledEndTime, templateTimeZone)
+			response.ScheduledEndDate = &endDate
+		}
 	}
 
 	return response

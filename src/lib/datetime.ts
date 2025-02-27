@@ -199,6 +199,10 @@ export function formatCurrentTime(format: string): string {
     return moment().format(format);
 }
 
+export function formatDate(date: string, format: string): string {
+    return moment(date, 'YYYY-MM-DD').format(format);
+}
+
 export function getUnixTime(date: SupportedDate): number {
     return moment(date).unix();
 }

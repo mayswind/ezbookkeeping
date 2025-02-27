@@ -18,6 +18,20 @@ func TestParseNumericYearMonth(t *testing.T) {
 	assert.Equal(t, expectedMonth, actualMonth)
 }
 
+func TestFormatUnixTimeToLongDate(t *testing.T) {
+	unixTime := int64(1617228083)
+	utcTimezone := time.FixedZone("Test Timezone", 0)      // UTC
+	utc8Timezone := time.FixedZone("Test Timezone", 28800) // UTC+8
+
+	expectedValue := "2021-03-31"
+	actualValue := FormatUnixTimeToLongDate(unixTime, utcTimezone)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "2021-04-01"
+	actualValue = FormatUnixTimeToLongDate(unixTime, utc8Timezone)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
 func TestFormatUnixTimeToLongDateTime(t *testing.T) {
 	unixTime := int64(1617228083)
 	utcTimezone := time.FixedZone("Test Timezone", 0)      // UTC
@@ -103,6 +117,24 @@ func TestGetMaxUnixTimeWithSameLocalDateTime(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 
 	actualValue = GetMaxUnixTimeWithSameLocalDateTime(1690873200, -420)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestParseFromLongDateFirstTime(t *testing.T) {
+	expectedValue := int64(1690819200)
+	actualTime, err := ParseFromLongDateFirstTime("2023-08-01", 480)
+	assert.Equal(t, nil, err)
+
+	actualValue := actualTime.Unix()
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestParseFromLongDateLastTime(t *testing.T) {
+	expectedValue := int64(1690905599)
+	actualTime, err := ParseFromLongDateLastTime("2023-08-01", 480)
+	assert.Equal(t, nil, err)
+
+	actualValue := actualTime.Unix()
 	assert.Equal(t, expectedValue, actualValue)
 }
 

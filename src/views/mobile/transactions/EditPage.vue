@@ -272,6 +272,34 @@
             </f7-list-item>
 
             <f7-list-item
+                class="transaction-edit-datetime list-item-with-header-and-title"
+                link="#" no-chevron
+                :class="{ 'readonly': mode === TransactionEditPageMode.View }"
+                :header="tt('Start Date')"
+                :title="transactionDisplayScheduledStartDate"
+                @click="showScheduledStartDateSheet = true"
+                v-if="pageTypeAndMode?.type === TransactionEditPageType.Template && transaction instanceof TransactionTemplate && transaction.templateType === TemplateType.Schedule.type"
+            >
+                <date-selection-sheet v-model:show="showScheduledStartDateSheet"
+                                      v-model="transaction.scheduledStartDate">
+                </date-selection-sheet>
+            </f7-list-item>
+
+            <f7-list-item
+                class="transaction-edit-datetime list-item-with-header-and-title"
+                link="#" no-chevron
+                :class="{ 'readonly': mode === TransactionEditPageMode.View }"
+                :header="tt('End Date')"
+                :title="transactionDisplayScheduledEndDate"
+                @click="showScheduledEndDateSheet = true"
+                v-if="pageTypeAndMode?.type === TransactionEditPageType.Template && transaction instanceof TransactionTemplate && transaction.templateType === TemplateType.Schedule.type"
+            >
+                <date-selection-sheet v-model:show="showScheduledEndDateSheet"
+                                      v-model="transaction.scheduledEndDate">
+                </date-selection-sheet>
+            </f7-list-item>
+
+            <f7-list-item
                 :no-chevron="mode === TransactionEditPageMode.View"
                 class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after"
                 :class="{ 'readonly': mode === TransactionEditPageMode.View }"
@@ -497,7 +525,8 @@ const {
     getMultiMonthdayShortNames,
     getMultiWeekdayLongNames,
     formatUnixTimeToLongDate,
-    formatUnixTimeToLongTime
+    formatUnixTimeToLongTime,
+    formatDateToLongDate
 } = useI18n();
 const { showAlert, showConfirm, showToast, routeBackOnError } = useI18nUIComponents();
 
@@ -574,6 +603,8 @@ const showSourceAccountSheet = ref<boolean>(false);
 const showDestinationAccountSheet = ref<boolean>(false);
 const showTransactionDateTimeSheet = ref<boolean>(false);
 const showTransactionScheduledFrequencySheet = ref<boolean>(false);
+const showScheduledStartDateSheet = ref<boolean>(false);
+const showScheduledEndDateSheet = ref<boolean>(false);
 const showGeoLocationMapSheet = ref<boolean>(false);
 const showTransactionTagSheet = ref<boolean>(false);
 const showTransactionPictures = ref<boolean>(false);
@@ -697,6 +728,34 @@ const transactionDisplayScheduledFrequency = computed<string>(() => {
         }
     } else {
         return '';
+    }
+});
+
+const transactionDisplayScheduledStartDate = computed<string>(() => {
+    if (pageTypeAndMode?.type !== TransactionEditPageType.Template) {
+        return '';
+    }
+
+    const template = transaction.value as TransactionTemplate;
+
+    if (template.scheduledStartDate) {
+        return formatDateToLongDate(template.scheduledStartDate);
+    } else {
+        return tt('Unspecified');
+    }
+});
+
+const transactionDisplayScheduledEndDate = computed<string>(() => {
+    if (pageTypeAndMode?.type !== TransactionEditPageType.Template) {
+        return '';
+    }
+
+    const template = transaction.value as TransactionTemplate;
+
+    if (template.scheduledEndDate) {
+        return formatDateToLongDate(template.scheduledEndDate);
+    } else {
+        return tt('Unspecified');
     }
 });
 

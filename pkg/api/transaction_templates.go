@@ -156,7 +156,12 @@ func (a *TransactionTemplatesApi) TemplateCreateHandler(c *core.WebContext) (any
 	}
 
 	serverUtcOffset := utils.GetServerTimezoneOffsetMinutes()
-	template := a.createNewTemplateModel(uid, &templateCreateReq, maxOrderId+1)
+	template, err := a.createNewTemplateModel(uid, &templateCreateReq, maxOrderId+1)
+
+	if err != nil {
+		log.Errorf(c, "[transaction_templates.TemplateCreateHandler] failed to create new template for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
 
 	if a.CurrentConfig().EnableDuplicateSubmissionsCheck && templateCreateReq.ClientSessionId != "" {
 		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_TEMPLATE, uid, templateCreateReq.ClientSessionId)
@@ -260,6 +265,34 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.WebContext) (any
 		newTemplate.ScheduledFrequency = a.getOrderedFrequencyValues(*templateModifyReq.ScheduledFrequency)
 		newTemplate.ScheduledAt = a.getUTCScheduledAt(*templateModifyReq.ScheduledTimezoneUtcOffset)
 		newTemplate.ScheduledTimezoneUtcOffset = *templateModifyReq.ScheduledTimezoneUtcOffset
+
+		if templateModifyReq.ScheduledStartDate != nil {
+			startTime, err := utils.ParseFromLongDateFirstTime(*templateModifyReq.ScheduledStartDate, *templateModifyReq.ScheduledTimezoneUtcOffset)
+
+			if err != nil {
+				log.Errorf(c, "[transaction_templates.TemplateModifyHandler] failed to parse scheduled start date for user \"uid:%d\", because %s", uid, err.Error())
+				return nil, errs.Or(err, errs.ErrOperationFailed)
+			}
+
+			startUnixTime := startTime.Unix()
+			newTemplate.ScheduledStartTime = &startUnixTime
+		}
+
+		if templateModifyReq.ScheduledEndDate != nil {
+			endTime, err := utils.ParseFromLongDateLastTime(*templateModifyReq.ScheduledEndDate, *templateModifyReq.ScheduledTimezoneUtcOffset)
+
+			if err != nil {
+				log.Errorf(c, "[transaction_templates.TemplateModifyHandler] failed to parse scheduled end date for user \"uid:%d\", because %s", uid, err.Error())
+				return nil, errs.Or(err, errs.ErrOperationFailed)
+			}
+
+			endUnixTime := endTime.Unix()
+			newTemplate.ScheduledEndTime = &endUnixTime
+		}
+
+		if newTemplate.ScheduledStartTime != nil && newTemplate.ScheduledEndTime != nil && *newTemplate.ScheduledStartTime > *newTemplate.ScheduledEndTime {
+			return nil, errs.ErrScheduledTransactionTemplateStartDataLaterThanEndDate
+		}
 	}
 
 	if newTemplate.Name == template.Name &&
@@ -277,6 +310,8 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.WebContext) (any
 		} else if template.TemplateType == models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE {
 			if newTemplate.ScheduledFrequencyType == template.ScheduledFrequencyType &&
 				newTemplate.ScheduledFrequency == template.ScheduledFrequency &&
+				newTemplate.ScheduledStartTime == template.ScheduledStartTime &&
+				newTemplate.ScheduledEndTime == template.ScheduledEndTime &&
 				newTemplate.ScheduledAt == template.ScheduledAt &&
 				newTemplate.ScheduledTimezoneUtcOffset == template.ScheduledTimezoneUtcOffset {
 				return nil, errs.ErrNothingWillBeUpdated
@@ -419,7 +454,7 @@ func (a *TransactionTemplatesApi) TemplateDeleteHandler(c *core.WebContext) (any
 	return true, nil
 }
 
-func (a *TransactionTemplatesApi) createNewTemplateModel(uid int64, templateCreateReq *models.TransactionTemplateCreateRequest, order int32) *models.TransactionTemplate {
+func (a *TransactionTemplatesApi) createNewTemplateModel(uid int64, templateCreateReq *models.TransactionTemplateCreateRequest, order int32) (*models.TransactionTemplate, error) {
 	template := &models.TransactionTemplate{
 		Uid:                  uid,
 		TemplateType:         templateCreateReq.TemplateType,
@@ -441,9 +476,35 @@ func (a *TransactionTemplatesApi) createNewTemplateModel(uid int64, templateCrea
 		template.ScheduledFrequency = a.getOrderedFrequencyValues(*templateCreateReq.ScheduledFrequency)
 		template.ScheduledAt = a.getUTCScheduledAt(*templateCreateReq.ScheduledTimezoneUtcOffset)
 		template.ScheduledTimezoneUtcOffset = *templateCreateReq.ScheduledTimezoneUtcOffset
+
+		if templateCreateReq.ScheduledStartDate != nil {
+			startTime, err := utils.ParseFromLongDateFirstTime(*templateCreateReq.ScheduledStartDate, *templateCreateReq.ScheduledTimezoneUtcOffset)
+
+			if err != nil {
+				return nil, err
+			}
+
+			startUnixTime := startTime.Unix()
+			template.ScheduledStartTime = &startUnixTime
+		}
+
+		if templateCreateReq.ScheduledEndDate != nil {
+			endTime, err := utils.ParseFromLongDateLastTime(*templateCreateReq.ScheduledEndDate, *templateCreateReq.ScheduledTimezoneUtcOffset)
+
+			if err != nil {
+				return nil, err
+			}
+
+			endUnixTime := endTime.Unix()
+			template.ScheduledEndTime = &endUnixTime
+		}
+
+		if template.ScheduledStartTime != nil && template.ScheduledEndTime != nil && *template.ScheduledStartTime > *template.ScheduledEndTime {
+			return nil, errs.ErrScheduledTransactionTemplateStartDataLaterThanEndDate
+		}
 	}
 
-	return template
+	return template, nil
 }
 
 func (a *TransactionTemplatesApi) getUTCScheduledAt(scheduledTimezoneUtcOffset int16) int16 {

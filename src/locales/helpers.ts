@@ -117,6 +117,7 @@ import {
     isPM,
     formatUnixTime,
     formatCurrentTime,
+    formatDate,
     parseDateFromUnixTime,
     getYear,
     getTimezoneOffset,
@@ -1297,6 +1298,10 @@ export function useI18n() {
         return getLocalizedDateTimeType(ShortTimeFormat.all(), ShortTimeFormat.values(), userStore.currentUserShortTimeFormat, 'shortTimeFormat', ShortTimeFormat.Default).isMeridiemIndicatorFirst || false;
     }
 
+    function formatDateToLongDate(date: string): string {
+        return formatDate(date, getLocalizedLongDateFormat());
+    }
+
     function formatYearQuarter(year: number, quarter: number): string {
         if (1 <= quarter && quarter <= 4) {
             return t('format.yearQuarter.q' + quarter, {
@@ -1713,6 +1718,7 @@ export function useI18n() {
         formatUnixTimeToShortMonthDay: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortMonthDayFormat(), utcOffset, currentUtcOffset),
         formatUnixTimeToLongTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongTimeFormat(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortTimeFormat(), utcOffset, currentUtcOffset),
+        formatDateToLongDate,
         formatYearQuarter,
         formatDateRange,
         getTimezoneDifferenceDisplayText,

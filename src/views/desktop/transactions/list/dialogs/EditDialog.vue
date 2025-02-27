@@ -235,6 +235,22 @@
                                         </template>
                                     </v-autocomplete>
                                 </v-col>
+                                <v-col cols="12" md="6" v-if="type === TransactionEditPageType.Template && transaction instanceof TransactionTemplate && transaction.templateType === TemplateType.Schedule.type">
+                                    <date-select
+                                        :readonly="mode === TransactionEditPageMode.View"
+                                        :disabled="loading || submitting"
+                                        :clearable="true"
+                                        :label="tt('Start Date')"
+                                        v-model="transaction.scheduledStartDate" />
+                                </v-col>
+                                <v-col cols="12" md="6" v-if="type === TransactionEditPageType.Template && transaction instanceof TransactionTemplate && transaction.templateType === TemplateType.Schedule.type">
+                                    <date-select
+                                        :readonly="mode === TransactionEditPageMode.View"
+                                        :disabled="loading || submitting"
+                                        :clearable="true"
+                                        :label="tt('End Date')"
+                                        v-model="transaction.scheduledEndDate" />
+                                </v-col>
                                 <v-col cols="12" md="12" v-if="type === TransactionEditPageType.Transaction">
                                     <v-select
                                         persistent-placeholder

@@ -398,7 +398,7 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 
 	for i := 0; i < s.UserDataDBCount(); i++ {
 		var templates []*models.TransactionTemplate
-		err := s.UserDataDBByIndex(i).NewSession(c).Where("deleted=? AND template_type=? AND (scheduled_frequency_type=? OR scheduled_frequency_type=?) AND scheduled_at>=? AND scheduled_at<?", false, models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY, minScheduledAt, maxScheduledAt).Find(&templates)
+		err := s.UserDataDBByIndex(i).NewSession(c).Where("deleted=? AND template_type=? AND (scheduled_frequency_type=? OR scheduled_frequency_type=?) AND (scheduled_start_time IS NULL OR scheduled_start_time<=?) AND (scheduled_end_time IS NULL OR scheduled_end_time>=?) AND scheduled_at>=? AND scheduled_at<?", false, models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY, startTime.Unix(), startTime.Unix(), minScheduledAt, maxScheduledAt).Find(&templates)
 
 		if err != nil {
 			return err
@@ -454,6 +454,18 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 		} else if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY && !frequencyValueSet[int64(transactionTime.Day())] {
 			skipCount++
 			log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, today is %d of month", template.TemplateId, startTimeInUTC.Day())
+			continue
+		}
+
+		if template.ScheduledStartTime != nil && *template.ScheduledStartTime > transactionUnixTime {
+			skipCount++
+			log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, now is earlier than the start time %d", template.TemplateId, *template.ScheduledStartTime)
+			continue
+		}
+
+		if template.ScheduledEndTime != nil && *template.ScheduledEndTime < transactionUnixTime {
+			skipCount++
+			log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, now is later than the end time %d", template.TemplateId, *template.ScheduledEndTime)
 			continue
 		}
 

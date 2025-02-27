@@ -152,9 +152,10 @@ func (t *ofxTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 		return nil, errs.ErrAmountInvalid
 	}
 
-	amount, err := utils.ParseAmount(strings.ReplaceAll(ofxTransaction.Amount, ",", ".")) // ofx supports decimal point or comma to indicate the start of the fractional amount
+	amount, err := utils.ParseAmount(utils.TrimTrailingZerosInDecimal(strings.ReplaceAll(ofxTransaction.Amount, ",", "."))) // ofx supports decimal point or comma to indicate the start of the fractional amount
 
 	if err != nil {
+		log.Errorf(ctx, "[ofx_transaction_table.parseTransaction] cannot parsing transaction amount \"%s\", because %s", ofxTransaction.Amount, err.Error())
 		return nil, errs.ErrAmountInvalid
 	}
 

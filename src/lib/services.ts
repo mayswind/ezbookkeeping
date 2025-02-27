@@ -9,6 +9,7 @@ import {
     BASE_AMAP_API_PROXY_URL_PATH,
     DEFAULT_API_TIMEOUT,
     DEFAULT_UPLOAD_API_TIMEOUT,
+    DEFAULT_EXPORT_API_TIMEOUT,
     DEFAULT_IMPORT_API_TIMEOUT,
     GOOGLE_MAP_JAVASCRIPT_URL,
     BAIDU_MAP_JAVASCRIPT_URL,
@@ -318,9 +319,13 @@ export default {
     },
     getExportedUserData: (fileType: string): Promise<AxiosResponse<BlobPart>> => {
         if (fileType === 'csv') {
-            return axios.get<BlobPart>('v1/data/export.csv');
+            return axios.get<BlobPart>('v1/data/export.csv', {
+                timeout: DEFAULT_EXPORT_API_TIMEOUT
+            } as ApiRequestConfig);
         } else if (fileType === 'tsv') {
-            return axios.get<BlobPart>('v1/data/export.tsv');
+            return axios.get<BlobPart>('v1/data/export.tsv', {
+                timeout: DEFAULT_EXPORT_API_TIMEOUT
+            } as ApiRequestConfig);
         } else {
             return Promise.reject('Parameter Invalid');
         }

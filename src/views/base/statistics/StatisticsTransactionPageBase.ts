@@ -116,8 +116,16 @@ export function useStatisticsTransactionPageBase() {
                 return false;
             }
 
+            if (query.value.categoricalChartDateType === settingsStore.appSettings.statistics.defaultCategoricalChartDataRangeType) {
+                return false;
+            }
+
             return !!query.value.categoricalChartStartTime || !!query.value.categoricalChartEndTime;
         } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
+            if (query.value.trendChartDateType === settingsStore.appSettings.statistics.defaultTrendChartDataRangeType) {
+                return false;
+            }
+
             return !!query.value.trendChartStartYearMonth || !!query.value.trendChartEndYearMonth;
         } else {
             return false;

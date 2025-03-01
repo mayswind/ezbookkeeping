@@ -792,7 +792,11 @@ func exportUserTransaction(c *core.CliContext) error {
 	filePath := c.String("file")
 	fileType := c.String("type")
 
-	if fileType != "" && fileType != "csv" && fileType != "tsv" {
+	if fileType == "" {
+		fileType = "csv"
+	}
+
+	if fileType != "csv" && fileType != "tsv" {
 		log.CliErrorf(c, "[user_data.exportUserTransaction] export file type is not supported")
 		return errs.ErrNotSupported
 	}

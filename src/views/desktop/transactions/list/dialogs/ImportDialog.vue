@@ -99,7 +99,7 @@
                            :icon="true" :disabled="loading || submitting"
                            v-if="currentStep === 'checkData'">
                         <v-icon :icon="mdiDotsVertical" />
-                        <v-menu activator="parent">
+                        <v-menu activator="parent" max-height="500">
                             <v-list>
                                 <v-list-item :prepend-icon="mdiFindReplace"
                                              :disabled="!!editingTransaction || selectedExpenseTransactionCount < 1"
@@ -142,6 +142,31 @@
                                              :disabled="!!editingTransaction || !allInvalidTransactionTagNames || allInvalidTransactionTagNames.length < 1"
                                              :title="tt('Replace Invalid Transaction Tags')"
                                              @click="showReplaceInvalidItemDialog('tag', allInvalidTransactionTagNames)"></v-list-item>
+                                <v-divider class="my-2"/>
+                                <v-list-item :prepend-icon="mdiFindReplace"
+                                             :disabled="!!editingTransaction || selectedExpenseTransactionCount < 1"
+                                             :title="tt('Batch Convert Expense Transaction to Income Transaction')"
+                                             @click="convertTransactionType(TransactionType.Expense, TransactionType.Income)"></v-list-item>
+                                <v-list-item :prepend-icon="mdiFindReplace"
+                                             :disabled="!!editingTransaction || selectedExpenseTransactionCount < 1"
+                                             :title="tt('Batch Convert Expense Transaction to Transfer Transaction')"
+                                             @click="convertTransactionType(TransactionType.Expense, TransactionType.Transfer)"></v-list-item>
+                                <v-list-item :prepend-icon="mdiFindReplace"
+                                             :disabled="!!editingTransaction || selectedIncomeTransactionCount < 1"
+                                             :title="tt('Batch Convert Income Transaction to Expense Transaction')"
+                                             @click="convertTransactionType(TransactionType.Income, TransactionType.Expense)"></v-list-item>
+                                <v-list-item :prepend-icon="mdiFindReplace"
+                                             :disabled="!!editingTransaction || selectedIncomeTransactionCount < 1"
+                                             :title="tt('Batch Convert Income Transaction to Transfer Transaction')"
+                                             @click="convertTransactionType(TransactionType.Income, TransactionType.Transfer)"></v-list-item>
+                                <v-list-item :prepend-icon="mdiFindReplace"
+                                             :disabled="!!editingTransaction || selectedTransferTransactionCount < 1"
+                                             :title="tt('Batch Convert Transfer Transaction to Expense Transaction')"
+                                             @click="convertTransactionType(TransactionType.Transfer, TransactionType.Expense)"></v-list-item>
+                                <v-list-item :prepend-icon="mdiFindReplace"
+                                             :disabled="!!editingTransaction || selectedTransferTransactionCount < 1"
+                                             :title="tt('Batch Convert Transfer Transaction to Income Transaction')"
+                                             @click="convertTransactionType(TransactionType.Transfer, TransactionType.Income)"></v-list-item>
                             </v-list>
                         </v-menu>
                     </v-btn>
@@ -818,6 +843,11 @@ import {
     getTimezoneOffsetMinutes
 } from '@/lib/datetime.ts';
 import {
+    getAccountMapByName
+} from '@/lib/account.ts';
+import {
+    transactionTypeToCategoryType,
+    getSecondaryTransactionMapByName,
     getTransactionPrimaryCategoryName,
     getTransactionSecondaryCategoryName
 } from '@/lib/category.ts';
@@ -1029,6 +1059,7 @@ const allAccounts = computed<Account[]>(() => accountsStore.allPlainAccounts);
 const allVisibleAccounts = computed<Account[]>(() => accountsStore.allVisiblePlainAccounts);
 const allVisibleCategorizedAccounts = computed<CategorizedAccountWithDisplayBalance[]>(() => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts.value, showAccountBalance.value));
 const allAccountsMap = computed<Record<string, Account>>(() => accountsStore.allAccountsMap);
+const allAccountsMapByName = computed<Record<string, Account>>(() => getAccountMapByName(accountsStore.allAccounts));
 const allCategories = computed<Record<number, TransactionCategory[]>>(() => transactionCategoriesStore.allTransactionCategories);
 const allCategoriesMap = computed<Record<string, TransactionCategory>>(() => transactionCategoriesStore.allTransactionCategoriesMap);
 const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
@@ -2390,6 +2421,46 @@ function showReplaceInvalidItemDialog(type: string, invalidItems: NameValue[]): 
             });
         }
     });
+}
+
+function convertTransactionType(fromType: TransactionType, toType: TransactionType): void {
+    if (!importTransactions.value || importTransactions.value.length < 1) {
+        return;
+    }
+
+    const categoryType = transactionTypeToCategoryType(toType);
+
+    if (!categoryType) {
+        return;
+    }
+
+    const categoryMapByName: Record<string, TransactionCategory> = getSecondaryTransactionMapByName(allCategories.value[categoryType]);
+
+    for (let i = 0; i < importTransactions.value.length; i++) {
+        const transaction: ImportTransaction = importTransactions.value[i];
+
+        if (!transaction.selected || transaction.type !== fromType) {
+            continue;
+        }
+
+        transaction.type = toType;
+        transaction.categoryId = categoryMapByName[transaction.originalCategoryName]?.id || '0';
+
+        if (transaction.type === TransactionType.Transfer) {
+            transaction.destinationAccountId = allAccountsMapByName.value[transaction.originalDestinationAccountName || '']?.id || '0';
+            transaction.destinationAmount = transaction.sourceAmount;
+        } else {
+            if (fromType === TransactionType.Transfer && toType === TransactionType.Income) {
+                transaction.sourceAccountId = transaction.destinationAccountId;
+                transaction.sourceAmount = transaction.destinationAmount;
+            }
+
+            transaction.destinationAccountId = '0';
+            transaction.destinationAmount = 0;
+        }
+
+        updateTransactionData(transaction);
+    }
 }
 
 function onShowDateRangeError(message: string): void {

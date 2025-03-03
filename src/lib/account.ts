@@ -49,6 +49,29 @@ export function getCategorizedAccounts(allAccounts: Account[]): CategorizedAccou
     return ret;
 }
 
+export function getAccountMapByName(allAccounts: Account[]): Record<string, Account> {
+    const ret: Record<string, Account> = {};
+
+    if (!allAccounts) {
+        return ret;
+    }
+
+    for (let i = 0; i < allAccounts.length; i++) {
+        const account = allAccounts[i];
+
+        if (account.type === AccountType.SingleAccount.type) {
+            ret[account.name] = account;
+        } else if (account.type === AccountType.MultiSubAccounts.type && account.subAccounts) {
+            for (let j = 0; j < account.subAccounts.length; j++) {
+                const subAccount = account.subAccounts[j];
+                ret[subAccount.name] = subAccount;
+            }
+        }
+    }
+
+    return ret;
+}
+
 export function getCategorizedAccountsWithVisibleCount(categorizedAccountsMap: Record<number, CategorizedAccount>): AccountCategoriesWithVisibleCount[] {
     const ret: AccountCategoriesWithVisibleCount[] = [];
     const allCategories = AccountCategory.values();

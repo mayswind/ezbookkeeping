@@ -26,6 +26,27 @@ export function categoryTypeToTransactionType(categoryType: CategoryType): Trans
     }
 }
 
+export function getSecondaryTransactionMapByName(allCategories: TransactionCategory[]): Record<string, TransactionCategory> {
+    const ret: Record<string, TransactionCategory> = {};
+
+    if (!allCategories) {
+        return ret;
+    }
+
+    for (let i = 0; i < allCategories.length; i++) {
+        const category = allCategories[i];
+
+        if (category.subCategories) {
+            for (let j = 0; j < category.subCategories.length; j++) {
+                const subCategory = category.subCategories[j];
+                ret[subCategory.name] = subCategory;
+            }
+        }
+    }
+
+    return ret;
+}
+
 export function getTransactionPrimaryCategoryName(categoryId: string | null | undefined, allCategories: TransactionCategory[]): string {
     if (!allCategories) {
         return '';

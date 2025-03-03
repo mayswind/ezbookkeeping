@@ -66,7 +66,8 @@ import {
 
 import {
     TransactionEditScopeType,
-    TransactionTagFilterType
+    TransactionTagFilterType,
+    ImportTransactionColumnType
 } from '@/core/transaction.ts';
 
 import {
@@ -85,6 +86,7 @@ import {
 import {
     type LocalizedImportFileType,
     type LocalizedImportFileTypeSubType,
+    type LocalizedImportFileTypeSupportedEncodings,
     type LocalizedImportFileDocument,
 } from '@/core/file.ts';
 
@@ -1138,11 +1140,27 @@ export function useI18n() {
                 }
             }
 
+            const supportedEncodings: LocalizedImportFileTypeSupportedEncodings[] = [];
+
+            if (fileType.supportedEncodings) {
+                for (let i = 0; i < fileType.supportedEncodings.length; i++) {
+                    const encoding = fileType.supportedEncodings[i];
+                    const localizedEncoding: LocalizedImportFileTypeSupportedEncodings = {
+                        encoding: encoding,
+                        displayName: t(`encoding.${encoding}`)
+                    };
+
+                    supportedEncodings.push(localizedEncoding);
+                }
+            }
+
             const localizedFileType: LocalizedImportFileType = {
                 type: fileType.type,
                 displayName: t(fileType.name),
                 extensions: fileType.extensions,
                 subTypes: subTypes.length ? subTypes : undefined,
+                supportedEncodings: supportedEncodings.length ? supportedEncodings : undefined,
+                dataFromTextbox: fileType.dataFromTextbox,
                 document: document
             };
             allSupportedImportFileTypes.push(localizedFileType);
@@ -1680,6 +1698,7 @@ export function useI18n() {
         getAllTransactionEditScopeTypes: () => getLocalizedDisplayNameAndType(TransactionEditScopeType.values()),
         getAllTransactionTagFilterTypes: () => getLocalizedDisplayNameAndType(TransactionTagFilterType.values()),
         getAllTransactionScheduledFrequencyTypes: () => getLocalizedDisplayNameAndType(ScheduledTemplateFrequencyType.values()),
+        getAllImportTransactionColumnTypes: () => getLocalizedDisplayNameAndType(ImportTransactionColumnType.values()),
         getAllTransactionDefaultCategories,
         getAllDisplayExchangeRates,
         getAllSupportedImportFileTypes,

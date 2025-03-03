@@ -179,7 +179,19 @@
                             />
                         </v-col>
 
-                        <v-col cols="12" md="12">
+                        <v-col cols="12" md="12" v-if="!isImportDataFromTextbox && allSupportedEncodings">
+                            <v-select
+                                item-title="displayName"
+                                item-value="encoding"
+                                :disabled="submitting"
+                                :label="tt('File Encoding')"
+                                :placeholder="tt('File Encoding')"
+                                :items="allSupportedEncodings"
+                                v-model="fileEncoding"
+                            />
+                        </v-col>
+
+                        <v-col cols="12" md="12" v-if="!isImportDataFromTextbox">
                             <v-text-field
                                 readonly
                                 persistent-placeholder
@@ -193,6 +205,17 @@
                             />
                         </v-col>
 
+                        <v-col cols="12" md="12" v-if="isImportDataFromTextbox">
+                            <v-textarea
+                                type="text"
+                                persistent-placeholder
+                                rows="5"
+                                :disabled="submitting"
+                                :placeholder="tt('Data to import')"
+                                v-model="importData"
+                            />
+                        </v-col>
+
                         <v-col cols="12" md="12" class="mb-0 pb-0" v-if="exportFileGuideDocumentUrl">
                             <a :href="exportFileGuideDocumentUrl" :class="{ 'disabled': submitting }" target="_blank">
                                 <v-icon :icon="mdiHelpCircleOutline" size="16" />
@@ -201,6 +224,184 @@
                             </a>
                         </v-col>
                     </v-row>
+                </v-window-item>
+                <v-window-item value="defineColumn">
+                    <v-data-table
+                        fixed-header
+                        fixed-footer
+                        density="compact"
+                        item-value="index"
+                        :class="{ 'import-transaction-table': true, 'disabled': loading || submitting }"
+                        :height="parsedFileLinesTableHeight"
+                        :disable-sort="true"
+                        :headers="parsedFileLinesHeaders"
+                        :items="parsedFileLines"
+                        :no-data-text="tt('No data to import')"
+                        v-model:items-per-page="countPerPage"
+                        v-model:page="currentPage"
+                    >
+                        <template #headers="{ columns }">
+                            <tr>
+                                <th class="text-no-wrap" :key="column.key ?? undefined" v-for="column in columns">
+                                    <span v-if="!column.key || column.key === 'index'">{{ column.title }}</span>
+                                    <div class="py-1" v-if="column.key && column.key !== 'index'">
+                                        <span>{{ getParseDataMappedColumnDisplayName(parseInt(column.key)) }}</span>
+                                        <br/>
+                                        <span>({{ column.title }})</span>
+                                        <v-menu activator="parent" location="bottom" max-height="500">
+                                            <v-list>
+                                                <v-list-item :key="columnType.type"
+                                                             :append-icon="parsedFileDataColumnMapping[columnType.type] === parseInt(column.key) ? mdiCheck : undefined"
+                                                             v-for="columnType in allImportTransactionColumnTypes"
+                                                             @click="updateParseDataMappedColumn(parseInt(column.key), columnType.type)">
+                                                    <v-list-item-title class="cursor-pointer">
+                                                        {{ columnType.displayName }}
+                                                    </v-list-item-title>
+                                                </v-list-item>
+                                            </v-list>
+                                        </v-menu>
+                                    </div>
+                                </th>
+                            </tr>
+                        </template>
+                        <template #bottom>
+                            <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2" v-if="parsedFileData">
+                                <v-btn color="secondary" density="compact" variant="outlined"
+                                       :append-icon="parsedFileIncludeHeader ? mdiCheck : mdiClose"
+                                       @click="parsedFileIncludeHeader = !parsedFileIncludeHeader">{{ tt('Include Header Line') }}</v-btn>
+                                <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
+                                       :disabled="!parsedFileDataColumnMapping || !isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.TransactionType.type]) || !parsedFileAllTransactionTypes">
+                                    <span>{{ tt('Transaction Type Mapping') }}</span>
+                                    <span class="ml-1" v-if="parsedFileDataColumnMapping && isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.TransactionType.type]) && parsedFileAllTransactionTypes">({{ getObjectOwnFieldCount(parsedFileValidMappedTransactionTypes) || tt('None') }})</span>
+                                    <v-menu eager activator="parent" location="bottom" max-height="500"
+                                            :close-on-content-click="false">
+                                        <v-list class="pa-0">
+                                            <v-list-item class="pa-0">
+                                                <v-table class="transaction-types-popup-menu">
+                                                    <tbody>
+                                                    <tr :key="typeName"
+                                                        v-for="typeName in parsedFileAllTransactionTypes">
+                                                        <td>{{ typeName }}</td>
+                                                        <td>
+                                                            <v-btn-toggle class="transaction-types-toggle" density="compact" variant="outlined"
+                                                                          mandatory="force" divided
+                                                                          v-model="parsedFileTransactionTypeMapping[typeName]">
+                                                                <v-btn :value="undefined">{{ tt('None') }}</v-btn>
+                                                                <v-btn :value="TransactionType.ModifyBalance">{{ tt('Modify Balance') }}</v-btn>
+                                                                <v-btn :value="TransactionType.Income">{{ tt('Income') }}</v-btn>
+                                                                <v-btn :value="TransactionType.Expense">{{ tt('Expense') }}</v-btn>
+                                                                <v-btn :value="TransactionType.Transfer">{{ tt('Transfer') }}</v-btn>
+                                                            </v-btn-toggle>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </v-table>
+                                            </v-list-item>
+                                        </v-list>
+                                    </v-menu>
+                                </v-btn>
+                                <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
+                                       :disabled="!parsedFileDataColumnMapping || !isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.TransactionTime.type])">
+                                    <span>{{ tt('Time Format') }}</span>
+                                    <span class="ml-1" v-if="parsedFileDataColumnMapping && isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.TransactionTime.type])">({{ parsedFileTimeFormat || parsedFileAutoDetectedTimeFormat || tt('Unknown') }})</span>
+                                    <v-menu eager activator="parent" location="bottom" max-height="500">
+                                        <v-list>
+                                            <v-list-item key="auto"
+                                                         :append-icon="parsedFileTimeFormat === '' ? mdiCheck : undefined"
+                                                         @click="parsedFileTimeFormat = ''">
+                                                <v-list-item-title class="cursor-pointer">
+                                                    <span>{{ tt('Auto detect') }}</span>
+                                                    <span class="ml-1" v-if="parsedFileAutoDetectedTimeFormat">({{ parsedFileAutoDetectedTimeFormat }})</span>
+                                                    <span class="ml-1" v-if="!parsedFileAutoDetectedTimeFormat">({{ tt('Unknown') }})</span>
+                                                </v-list-item-title>
+                                            </v-list-item>
+                                            <v-list-item :key="dateTimeFormat.format"
+                                                         :append-icon="parsedFileTimeFormat === dateTimeFormat.format ? mdiCheck : undefined"
+                                                         v-for="dateTimeFormat in KnownDateTimeFormat.values()"
+                                                         @click="parsedFileTimeFormat = dateTimeFormat.format">
+                                                <v-list-item-title class="cursor-pointer">
+                                                    {{ dateTimeFormat.format }}
+                                                </v-list-item-title>
+                                            </v-list-item>
+                                        </v-list>
+                                    </v-menu>
+                                </v-btn>
+                                <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
+                                       v-if="parsedFileDataColumnMapping && isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.TransactionTimezone.type])">
+                                    <span>{{ tt('Timezone Format') }}</span>
+                                    <span class="ml-1" v-if="parsedFileDataColumnMapping && isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.TransactionTimezone.type])">({{ KnownDateTimezoneFormat.valueOf(parsedFileTimezoneFormat || parsedFileAutoDetectedTimezoneFormat || '')?.name || tt('Unknown') }})</span>
+                                    <v-menu eager activator="parent" location="bottom" max-height="500">
+                                        <v-list>
+                                            <v-list-item key="auto"
+                                                         :append-icon="parsedFileTimezoneFormat === '' ? mdiCheck : undefined"
+                                                         @click="parsedFileTimezoneFormat = ''">
+                                                <v-list-item-title class="cursor-pointer">
+                                                    <span>{{ tt('Auto detect') }}</span>
+                                                    <span class="ml-1" v-if="parsedFileAutoDetectedTimezoneFormat && KnownDateTimezoneFormat.valueOf(parsedFileAutoDetectedTimezoneFormat || '')">({{ KnownDateTimezoneFormat.valueOf(parsedFileAutoDetectedTimezoneFormat || '')?.name }})</span>
+                                                    <span class="ml-1" v-if="!parsedFileAutoDetectedTimezoneFormat || !KnownDateTimezoneFormat.valueOf(parsedFileAutoDetectedTimezoneFormat || '')">({{ tt('Unknown') }})</span>
+                                                </v-list-item-title>
+                                            </v-list-item>
+                                            <v-list-item :key="timezoneFormat.value"
+                                                         :append-icon="parsedFileTimezoneFormat === timezoneFormat.value ? mdiCheck : undefined"
+                                                         v-for="timezoneFormat in KnownDateTimezoneFormat.values()"
+                                                         @click="parsedFileTimezoneFormat = timezoneFormat.value">
+                                                <v-list-item-title class="cursor-pointer">
+                                                    {{ timezoneFormat.name }}
+                                                </v-list-item-title>
+                                            </v-list-item>
+                                        </v-list>
+                                    </v-menu>
+                                </v-btn>
+                                <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
+                                       v-if="parsedFileDataColumnMapping && isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.GeographicLocation.type])">
+                                    <span>{{ tt('Geographic Location Separator') }}</span>
+                                    <span class="ml-1" v-if="parsedFileGeoLocationSeparator">({{ parsedFileGeoLocationSeparator }})</span>
+                                    <v-menu eager activator="parent" location="bottom" max-height="500">
+                                        <v-list>
+                                            <v-list-item :key="separator.value"
+                                                         :append-icon="parsedFileGeoLocationSeparator === separator.value ? mdiCheck : undefined"
+                                                         v-for="separator in allSeparators"
+                                                         @click="parsedFileGeoLocationSeparator = separator.value">
+                                                <v-list-item-title class="cursor-pointer">
+                                                    {{ separator.name }} ({{separator.value}})
+                                                </v-list-item-title>
+                                            </v-list-item>
+                                        </v-list>
+                                    </v-menu>
+                                </v-btn>
+                                <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
+                                       v-if="parsedFileDataColumnMapping && isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.Tags.type])">
+                                    <span>{{ tt('Transaction Tags Separator') }}</span>
+                                    <span class="ml-1" v-if="parsedFileTagSeparator">({{ parsedFileTagSeparator }})</span>
+                                    <v-menu eager activator="parent" location="bottom" max-height="500">
+                                        <v-list>
+                                            <v-list-item :key="separator.value"
+                                                         :append-icon="parsedFileTagSeparator === separator.value ? mdiCheck : undefined"
+                                                         v-for="separator in allSeparators"
+                                                         @click="parsedFileTagSeparator = separator.value">
+                                                <v-list-item-title class="cursor-pointer">
+                                                    {{ separator.name }} ({{separator.value}})
+                                                </v-list-item-title>
+                                            </v-list-item>
+                                        </v-list>
+                                    </v-menu>
+                                </v-btn>
+                                <v-spacer/>
+                                <span>{{ tt('Lines Per Page') }}</span>
+                                <v-select class="ml-2" density="compact" max-width="100"
+                                          item-title="title"
+                                          item-value="value"
+                                          :disabled="loading || submitting"
+                                          :items="parsedFileLinesTablePageOptions"
+                                          v-model="countPerPage"
+                                />
+                                <pagination-buttons density="compact"
+                                                    :disabled="loading || submitting"
+                                                    :totalPageCount="Math.ceil((parsedFileLines ? parsedFileLines.length : 0) / countPerPage)"
+                                                    v-model="currentPage"></pagination-buttons>
+                            </div>
+                        </template>
+                    </v-data-table>
                 </v-window-item>
                 <v-window-item value="checkData">
                     <v-data-table
@@ -508,9 +709,9 @@
                 <v-btn color="secondary" variant="tonal" :disabled="loading || submitting"
                        :prepend-icon="mdiClose" @click="close(false)"
                        v-if="currentStep !== 'finalResult'">{{ tt('Cancel') }}</v-btn>
-                <v-btn color="primary" :disabled="loading || submitting || !importFile"
+                <v-btn color="primary" :disabled="loading || submitting || (!isImportDataFromTextbox && !importFile) || (isImportDataFromTextbox && !importData)"
                        :append-icon="!submitting ? mdiArrowRight : undefined" @click="parseData"
-                       v-if="currentStep === 'uploadFile'">
+                       v-if="currentStep === 'defineColumn' || currentStep === 'uploadFile'">
                     {{ tt('Next') }}
                     <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
@@ -585,10 +786,12 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 
-import type { NameValue } from '@/core/base.ts';
+import type { NameValue, TypeAndDisplayName } from '@/core/base.ts';
+import { KnownDateTimeFormat } from '@/core/datetime.ts';
+import { KnownDateTimezoneFormat } from '@/core/timezone.ts';
 import { CategoryType } from '@/core/category.ts';
-import { TransactionType } from '@/core/transaction.ts';
-import type { LocalizedImportFileType, LocalizedImportFileTypeSubType } from '@/core/file.ts';
+import { TransactionType, ImportTransactionColumnType } from '@/core/transaction.ts';
+import type { LocalizedImportFileType, LocalizedImportFileTypeSubType, LocalizedImportFileTypeSupportedEncodings } from '@/core/file.ts';
 import { Account, type CategorizedAccountWithDisplayBalance } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 import type { TransactionTag } from '@/models/transaction_tag.ts';
@@ -597,6 +800,9 @@ import { ImportTransaction } from '@/models/imported_transaction.ts';
 import {
     isString,
     isNumber,
+    isObjectEmpty,
+    getObjectOwnFieldCount,
+    findDisplayNameByType,
     objectFieldToArrayItem
 } from '@/lib/common.ts';
 import {
@@ -636,6 +842,8 @@ type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type BatchReplaceDialogType = InstanceType<typeof BatchReplaceDialog>;
 
+type ImportTransactionDialogStep = 'uploadFile' | 'defineColumn' | 'checkData' | 'finalResult';
+
 interface ImportTransactionDialogFilter {
     minDatetime: number | null; // minDatetime or maxDatetime is null for 'All Date Range', all are not null for 'Custom Date Range'
     maxDatetime: number | null;
@@ -657,6 +865,7 @@ defineProps<{
 
 const {
     tt,
+    getAllImportTransactionColumnTypes,
     getAllSupportedImportFileTypes,
     formatUnixTimeToLongDateTime,
     formatAmountWithCurrency,
@@ -679,10 +888,20 @@ const fileInput = useTemplateRef<HTMLInputElement>('fileInput');
 
 const showState = ref<boolean>(false);
 const clientSessionId = ref<string>('');
-const currentStep = ref<string>('uploadFile');
+const currentStep = ref<ImportTransactionDialogStep>('uploadFile');
 const fileType = ref<string>('ezbookkeeping');
 const fileSubType = ref<string>('ezbookkeeping_csv');
+const fileEncoding = ref<string>('utf-8');
 const importFile = ref<File | null>(null);
+const importData = ref<string>('');
+const parsedFileData = ref<string[][] | undefined>(undefined);
+const parsedFileIncludeHeader = ref<boolean>(true);
+const parsedFileDataColumnMapping = ref<Record<number, number>>({});
+const parsedFileTransactionTypeMapping = ref<Record<string, TransactionType>>({});
+const parsedFileTimeFormat = ref<string>('');
+const parsedFileTimezoneFormat = ref<string>('');
+const parsedFileGeoLocationSeparator = ref<string>(' ');
+const parsedFileTagSeparator = ref<string>(';');
 const importTransactions = ref<ImportTransaction[] | undefined>(undefined);
 const editingTransaction = ref<ImportTransaction | null>(null);
 const editingTags = ref<string[]>([]);
@@ -713,30 +932,93 @@ const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMin
 
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
-const allSteps = computed<StepBarItem[]>(() => [
-    {
-        name: 'uploadFile',
-        title: tt('Upload File'),
-        subTitle: tt('Upload Transaction Data File')
-    },
-    {
-        name: 'checkData',
-        title: tt('Check & Modify'),
-        subTitle: tt('Check and Modify Your Data')
-    },
-    {
-        name: 'finalResult',
-        title: tt('Complete'),
-        subTitle: tt('Data Import Completed')
-    }
-]);
+const allSteps = computed<StepBarItem[]>(() => {
+    const steps: StepBarItem[] = [
+        {
+            name: 'uploadFile',
+            title: tt('Upload File'),
+            subTitle: tt('Upload Transaction Data File')
+        }
+    ];
 
+    if (fileType.value === 'dsv' || fileType.value === 'dsv_data') {
+        steps.push({
+            name: 'defineColumn',
+            title: tt('Define Column'),
+            subTitle: tt('Define and Check Column Mapping')
+        });
+    }
+
+    steps.push(...[
+        {
+            name: 'checkData',
+            title: tt('Check & Modify'),
+            subTitle: tt('Check and Modify Your Data')
+        },
+        {
+            name: 'finalResult',
+            title: tt('Complete'),
+            subTitle: tt('Data Import Completed')
+        }
+    ]);
+
+    return steps;
+});
+
+const allImportTransactionColumnTypes = computed<TypeAndDisplayName[]>(() => getAllImportTransactionColumnTypes());
 const allSupportedImportFileTypes = computed<LocalizedImportFileType[]>(() => getAllSupportedImportFileTypes());
+
+const allSeparators = computed<NameValue[]>(() => {
+    const separators: NameValue[] = [
+        {
+            name: tt('Space'),
+            value: ' '
+        },
+        {
+            name: tt('Comma'),
+            value: ','
+        },
+        {
+            name: tt('Semicolon'),
+            value: ';'
+        },
+        {
+            name: tt('Tab'),
+            value: '\t'
+        },
+        {
+            name: tt('Vertical Bar'),
+            value: '|'
+        }
+    ];
+
+    return separators;
+});
+
+const isImportDataFromTextbox = computed<boolean>(() => {
+    for (const importFileType of allSupportedImportFileTypes.value) {
+        if (importFileType.type === fileType.value) {
+            return !!importFileType.dataFromTextbox;
+        }
+    }
+
+    return false;
+});
 
 const allFileSubTypes = computed<LocalizedImportFileTypeSubType[] | undefined>(() => {
     for (const importFileType of allSupportedImportFileTypes.value) {
         if (importFileType.type === fileType.value) {
             return importFileType.subTypes;
+        }
+    }
+
+    return undefined;
+});
+
+const allSupportedEncodings = computed<LocalizedImportFileTypeSupportedEncodings[] | undefined>(() => {
+    for (const importFileType of allSupportedImportFileTypes.value) {
+        if (importFileType.type === fileType.value) {
+            return importFileType.supportedEncodings;
         }
     }
 
@@ -799,6 +1081,182 @@ const exportFileGuideDocumentLanguageName = computed<string | undefined>(() => {
 
 const fileName = computed<string>(() => importFile.value?.name || '');
 
+const parsedFileLines = computed<Record<string, string>[] | undefined>(() => {
+    if (!parsedFileData.value) {
+        return undefined;
+    }
+
+    const allLines: Record<string, string>[] = [];
+    const startIndex = parsedFileIncludeHeader.value ? 1 : 0;
+
+    for (let i = startIndex, index = 1; i < parsedFileData.value.length; i++, index++) {
+        const line: Record<string, string> = {};
+        const columns = parsedFileData.value[i];
+
+        for (let j = 0; j < columns.length; j++) {
+            line['index'] = index.toString();
+            line[`column${j + 1}`] = columns[j];
+        }
+
+        allLines.push(line);
+    }
+
+    return allLines;
+});
+
+const parsedFileLinesTableHeight = computed<number | undefined>(() => {
+    if (countPerPage.value <= 10 || !parsedFileLines.value || parsedFileLines.value.length <= 10) {
+        return undefined;
+    } else {
+        return 400;
+    }
+});
+
+const parsedFileLinesHeaders = computed<object[]>(() => {
+    let maxColumnCount = 0;
+
+    if (parsedFileData.value) {
+        for (let i = 0; i < parsedFileData.value.length; i++) {
+            if (parsedFileData.value[i].length > maxColumnCount) {
+                maxColumnCount = parsedFileData.value[i].length;
+            }
+        }
+    }
+
+    const headers: object[] = [];
+
+    headers.push({ key: 'index', value: 'index', title: '#', sortable: true, nowrap: true });
+
+    for (let i = 0; i < maxColumnCount; i++) {
+        let title = `#${i + 1}`;
+
+        if (parsedFileIncludeHeader.value && parsedFileData.value && parsedFileData.value[0][i]) {
+            title = parsedFileData.value[0][i];
+        }
+
+        headers.push({ key: i.toString(), value: `column${i + 1}`, title: title, sortable: true, nowrap: true });
+    }
+
+    return headers;
+});
+
+const parsedFileLinesTablePageOptions = computed<ImportTransactionsDialogTablePageOption[]>(() => getTablePageOptions(parsedFileLines.value?.length));
+
+const parsedFileAllTransactionTypes = computed<string[]>(() => {
+    if (!parsedFileData.value || !parsedFileData.value.length || !isNumber(parsedFileDataColumnMapping.value[ImportTransactionColumnType.TransactionType.type])) {
+        return [];
+    }
+
+    const allTypeMap: Record<string, boolean> = {};
+    const allTypes: string[] = [];
+    const typeColumnIndex = parsedFileDataColumnMapping.value[ImportTransactionColumnType.TransactionType.type];
+
+    const startIndex = parsedFileIncludeHeader.value ? 1 : 0;
+
+    for (let i = startIndex; i < parsedFileData.value.length; i++) {
+        if (parsedFileData.value[i].length <= typeColumnIndex) {
+            continue;
+        }
+
+        const type = parsedFileData.value[i][typeColumnIndex];
+
+        if (type && !allTypeMap[type]) {
+            allTypes.push(type);
+            allTypeMap[type] = true;
+        }
+    }
+
+    return allTypes;
+});
+
+const parsedFileValidMappedTransactionTypes = computed<Record<string, TransactionType>>(() => {
+    if (!parsedFileData.value || !parsedFileData.value.length || !isNumber(parsedFileDataColumnMapping.value[ImportTransactionColumnType.TransactionType.type])) {
+        return {};
+    }
+
+    const result: Record<string, TransactionType> = {};
+
+    if (!parsedFileTransactionTypeMapping.value) {
+        return result;
+    }
+
+    for (const name in parsedFileTransactionTypeMapping.value) {
+        if (!Object.prototype.hasOwnProperty.call(parsedFileTransactionTypeMapping.value, name)) {
+            continue;
+        }
+
+        const type = parsedFileTransactionTypeMapping.value[name];
+
+        if (TransactionType.ModifyBalance <= type && type <= TransactionType.Transfer) {
+            result[name] = type;
+        }
+    }
+
+    return result;
+});
+
+const parsedFileAutoDetectedTimeFormat = computed<string | undefined>(() => {
+    if (!parsedFileData.value || !parsedFileData.value.length || !isNumber(parsedFileDataColumnMapping.value[ImportTransactionColumnType.TransactionTime.type])) {
+        return undefined;
+    }
+
+    const allDateTimes: string[] = [];
+    const dateTimeColumnIndex = parsedFileDataColumnMapping.value[ImportTransactionColumnType.TransactionTime.type];
+
+    const startIndex = parsedFileIncludeHeader.value ? 1 : 0;
+
+    for (let i = startIndex; i < parsedFileData.value.length; i++) {
+        if (parsedFileData.value[i].length <= dateTimeColumnIndex) {
+            continue;
+        }
+
+        const dateTime = parsedFileData.value[i][dateTimeColumnIndex];
+
+        if (dateTime) {
+            allDateTimes.push(dateTime);
+        }
+    }
+
+    const detectedFormats = KnownDateTimeFormat.detectMany(allDateTimes);
+
+    if (!detectedFormats || !detectedFormats.length || detectedFormats.length > 1) {
+        return undefined;
+    }
+
+    return detectedFormats[0].format;
+});
+
+const parsedFileAutoDetectedTimezoneFormat = computed<string | undefined>(() => {
+    if (!parsedFileData.value || !parsedFileData.value.length || !isNumber(parsedFileDataColumnMapping.value[ImportTransactionColumnType.TransactionTimezone.type])) {
+        return undefined;
+    }
+
+    const allTimezones: string[] = [];
+    const timezoneColumnIndex = parsedFileDataColumnMapping.value[ImportTransactionColumnType.TransactionTimezone.type];
+
+    const startIndex = parsedFileIncludeHeader.value ? 1 : 0;
+
+    for (let i = startIndex; i < parsedFileData.value.length; i++) {
+        if (parsedFileData.value[i].length <= timezoneColumnIndex) {
+            continue;
+        }
+
+        const timezone = parsedFileData.value[i][timezoneColumnIndex];
+
+        if (timezone) {
+            allTimezones.push(timezone);
+        }
+    }
+
+    const detectedFormats = KnownDateTimezoneFormat.detectMany(allTimezones);
+
+    if (!detectedFormats || !detectedFormats.length || detectedFormats.length > 1) {
+        return undefined;
+    }
+
+    return detectedFormats[0].value;
+});
+
 const importTransactionsTableHeight = computed<number | undefined>(() => {
     if (countPerPage.value <= 10 || !importTransactions.value || importTransactions.value.length <= 10) {
         return undefined;
@@ -821,30 +1279,7 @@ const importTransactionHeaders = computed<object[]>(() => {
     ];
 });
 
-const importTransactionsTablePageOptions = computed<ImportTransactionsDialogTablePageOption[]>(() => {
-    const pageOptions: ImportTransactionsDialogTablePageOption[] = [];
-
-    if (!importTransactions.value || importTransactions.value.length < 1) {
-        pageOptions.push({ value: -1, title: tt('All') });
-        return pageOptions;
-    }
-
-    const availableCountPerPage = [ 5, 10, 15, 20, 25, 30, 50 ];
-
-    for (let i = 0; i < availableCountPerPage.length; i++) {
-        const count = availableCountPerPage[i];
-
-        if (importTransactions.value.length < count) {
-            break;
-        }
-
-        pageOptions.push({ value: count, title: count.toString() });
-    }
-
-    pageOptions.push({ value: -1, title: tt('All') });
-
-    return pageOptions;
-});
+const importTransactionsTablePageOptions = computed<ImportTransactionsDialogTablePageOption[]>(() => getTablePageOptions(importTransactions.value?.length));
 
 const totalPageCount = computed<number>(() => {
     if (!importTransactions.value || importTransactions.value.length < 1) {
@@ -1051,6 +1486,55 @@ const displayFilterCustomDateRange = computed<string>(() => {
 
     return `${minDisplayTime} - ${maxDisplayTime}`
 });
+
+function getTablePageOptions(linesCount?: number): ImportTransactionsDialogTablePageOption[] {
+    const pageOptions: ImportTransactionsDialogTablePageOption[] = [];
+
+    if (!linesCount || linesCount < 1) {
+        pageOptions.push({ value: -1, title: tt('All') });
+        return pageOptions;
+    }
+
+    const availableCountPerPage = [ 5, 10, 15, 20, 25, 30, 50 ];
+
+    for (let i = 0; i < availableCountPerPage.length; i++) {
+        const count = availableCountPerPage[i];
+
+        if (linesCount < count) {
+            break;
+        }
+
+        pageOptions.push({ value: count, title: count.toString() });
+    }
+
+    pageOptions.push({ value: -1, title: tt('All') });
+
+    return pageOptions;
+}
+
+function getParseDataMappedColumnDisplayName(columnIndex: number): string {
+    for (const columnType in parsedFileDataColumnMapping.value) {
+        if (parsedFileDataColumnMapping.value[columnType] === columnIndex) {
+            return findDisplayNameByType(allImportTransactionColumnTypes.value, parseInt(columnType)) || tt('Unspecified');
+        }
+    }
+
+    return tt('Unspecified');
+}
+
+function updateParseDataMappedColumn(columnIndex: number, columnType: number): void {
+    if (parsedFileDataColumnMapping.value[columnType] === columnIndex) {
+        delete parsedFileDataColumnMapping.value[columnType];
+    } else {
+        parsedFileDataColumnMapping.value[columnType] = columnIndex;
+    }
+
+    for (const otherColumnType in parsedFileDataColumnMapping.value) {
+        if (otherColumnType !== columnType.toString() && parsedFileDataColumnMapping.value[otherColumnType] === columnIndex) {
+            delete parsedFileDataColumnMapping.value[otherColumnType];
+        }
+    }
+}
 
 function isTransactionDisplayed(transaction: ImportTransaction): boolean {
     if (isNumber(filters.value.minDatetime) && isNumber(filters.value.maxDatetime) && (transaction.time < filters.value.minDatetime || transaction.time > filters.value.maxDatetime)) {
@@ -1328,8 +1812,18 @@ function getCurrentInvalidTagNames(): NameValue[] {
 function open(): Promise<void> {
     fileType.value = 'ezbookkeeping';
     fileSubType.value = 'ezbookkeeping_csv';
+    fileEncoding.value = 'utf-8';
     currentStep.value = 'uploadFile';
     importFile.value = null;
+    importData.value = '';
+    parsedFileData.value = undefined;
+    parsedFileIncludeHeader.value = true;
+    parsedFileDataColumnMapping.value = {};
+    parsedFileTransactionTypeMapping.value = {};
+    parsedFileTimeFormat.value = '';
+    parsedFileTimezoneFormat.value = '';
+    parsedFileGeoLocationSeparator.value = ' ';
+    parsedFileTagSeparator.value = ';';
     importTransactions.value = undefined;
     editingTransaction.value = null;
     editingTags.value = [];
@@ -1396,52 +1890,165 @@ function setImportFile(event: Event): void {
 }
 
 function parseData(): void {
-    if (!importFile.value) {
-        snackbar.value?.showError('Please select a file to import');
-        return;
-    }
-
-    submitting.value = true;
-
+    let uploadFile: File;
     let type: string = fileType.value;
+    let encoding: string | undefined = undefined;
 
     if (allFileSubTypes.value) {
         type = fileSubType.value;
     }
 
-    transactionsStore.parseImportTransaction({
-        fileType: type,
-        importFile: importFile.value
-    }).then(response => {
-        const parsedTransactions: ImportTransaction[] = [];
+    if (allSupportedEncodings.value) {
+        encoding = fileEncoding.value;
+    }
 
-        if (response.items) {
-            for (let i = 0; i < response.items.length; i++) {
-                const parsedTransaction = ImportTransaction.of(response.items[i], i);
-                parsedTransactions.push(parsedTransaction);
+    if (!isImportDataFromTextbox.value) {
+        if (!importFile.value) {
+            snackbar.value?.showError('Please select a file to import');
+            return;
+        }
+
+        uploadFile = importFile.value;
+    } else if (isImportDataFromTextbox.value) {
+        if (!importData.value) {
+            snackbar.value?.showError('No data to import');
+            return;
+        }
+
+        if (type === 'custom_csv') {
+            uploadFile = new File([importData.value], 'import.csv', { type: 'text/csv' });
+        } else if (type === 'custom_tsv') {
+            uploadFile = new File([importData.value], 'import.tsv', { type: 'text/tab-separated-values' });
+        } else {
+            snackbar.value?.showError('Parameter Invalid');
+            return;
+        }
+
+        encoding = 'utf-8';
+    } else { // should not happen, but ts would check whether uploadFile has been assigned a value
+        snackbar.value?.showMessage('An error occurred');
+        return;
+    }
+
+    const isDsvFileType: boolean = fileType.value === 'dsv' || fileType.value === 'dsv_data';
+
+    if (isDsvFileType && currentStep.value === 'uploadFile') {
+        submitting.value = true;
+
+        transactionsStore.parseImportDsvFile({
+            fileType: type,
+            fileEncoding: encoding,
+            importFile: uploadFile
+        }).then(response => {
+            if (response && response.length) {
+                parsedFileData.value = response;
+                currentPage.value = 1;
+                countPerPage.value = 10;
+                currentStep.value = 'defineColumn';
+            } else {
+                parsedFileData.value = undefined;
+                snackbar.value?.showError('No data to import');
+            }
+
+            submitting.value = false;
+        }).catch(error => {
+            submitting.value = false;
+
+            if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+        });
+    } else {
+        let columnMapping: Record<number, number> | undefined = undefined;
+        let transactionTypeMapping: Record<string, TransactionType> | undefined = undefined;
+        let hasHeaderLine: boolean | undefined = undefined;
+        let timeFormat: string | undefined = undefined;
+        let timezoneFormat: string | undefined = undefined;
+        let geoLocationSeparator: string | undefined = undefined;
+        let tagSeparator: string | undefined = undefined;
+
+        if (isDsvFileType) {
+            columnMapping = parsedFileDataColumnMapping.value;
+            transactionTypeMapping = parsedFileValidMappedTransactionTypes.value;
+            hasHeaderLine = parsedFileIncludeHeader.value;
+            timeFormat = parsedFileTimeFormat.value;
+            timezoneFormat = parsedFileTimezoneFormat.value;
+            geoLocationSeparator = parsedFileGeoLocationSeparator.value;
+            tagSeparator = parsedFileTagSeparator.value;
+
+            if (!columnMapping
+                || !isNumber(columnMapping[ImportTransactionColumnType.TransactionTime.type])
+                || !isNumber(columnMapping[ImportTransactionColumnType.TransactionType.type])
+                || !isNumber(columnMapping[ImportTransactionColumnType.Amount.type])) {
+                snackbar.value?.showError('Missing transaction time, transaction type, or amount column mapping');
+                return;
+            }
+
+            if (!transactionTypeMapping || isObjectEmpty(transactionTypeMapping)) {
+                snackbar.value?.showError('Transaction type mapping is not set');
+                return;
+            }
+
+            if (!parsedFileTimeFormat.value) {
+                timeFormat = parsedFileAutoDetectedTimeFormat.value;
+            }
+
+            if (!parsedFileTimezoneFormat.value) {
+                timezoneFormat = parsedFileAutoDetectedTimezoneFormat.value;
+            }
+
+            if (!timeFormat) {
+                snackbar.value?.showError('Transaction time format is not set');
+                return;
             }
         }
 
-        importTransactions.value = parsedTransactions;
-        editingTransaction.value = null;
-        editingTags.value = [];
-        currentPage.value = 1;
+        submitting.value = true;
 
-        if (importTransactions.value && importTransactions.value.length >= 0 && importTransactions.value.length < 10) {
-            countPerPage.value = -1;
-        } else {
+        transactionsStore.parseImportTransaction({
+            fileType: type,
+            fileEncoding: encoding,
+            importFile: uploadFile,
+            columnMapping: columnMapping,
+            transactionTypeMapping: transactionTypeMapping,
+            hasHeaderLine: hasHeaderLine,
+            timeFormat: timeFormat,
+            timezoneFormat: timezoneFormat,
+            geoSeparator: geoLocationSeparator,
+            tagSeparator: tagSeparator
+        }).then(response => {
+            const parsedTransactions: ImportTransaction[] = [];
+
+            if (response.items) {
+                for (let i = 0; i < response.items.length; i++) {
+                    const parsedTransaction = ImportTransaction.of(response.items[i], i);
+                    parsedTransactions.push(parsedTransaction);
+                }
+            }
+
+            importTransactions.value = parsedTransactions;
+            editingTransaction.value = null;
+            editingTags.value = [];
+            currentPage.value = 1;
+
+            if (importTransactions.value && importTransactions.value.length >= 0 && importTransactions.value.length < 10) {
+                countPerPage.value = -1;
+            } else {
+                countPerPage.value = 10;
+            }
+
+            currentPage.value = 1;
             countPerPage.value = 10;
-        }
+            currentStep.value = 'checkData';
+            submitting.value = false;
+        }).catch(error => {
+            submitting.value = false;
 
-        currentStep.value = 'checkData';
-        submitting.value = false;
-    }).catch(error => {
-        submitting.value = false;
-
-        if (!error.processed) {
-            snackbar.value?.showError(error);
-        }
-    });
+            if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+        });
+    }
 }
 
 function submit(): void {
@@ -1820,6 +2427,40 @@ defineExpose({
 </script>
 
 <style>
+.transaction-types-popup-menu .transaction-types-toggle {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.transaction-types-popup-menu .transaction-types-toggle.v-btn-toggle {
+    height: auto !important;
+    padding: 0;
+    border: none;
+}
+
+.transaction-types-popup-menu .transaction-types-toggle.v-btn-toggle > .v-btn {
+    border-color: rgba(var(--v-border-color), var(--v-border-opacity));
+}
+
+.transaction-types-popup-menu .transaction-types-toggle.v-btn-toggle > .v-btn:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: none;
+}
+
+.transaction-types-popup-menu .transaction-types-toggle.v-btn-toggle > .v-btn:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.transaction-types-popup-menu .transaction-types-toggle.v-btn-toggle > .v-btn {
+    border: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
+}
+
+.transaction-types-popup-menu .transaction-types-toggle.v-btn-toggle button.v-btn {
+    width: auto !important;
+}
+
 .import-transaction-table .v-autocomplete.v-input.v-input--density-compact:not(.v-textarea) .v-field__input,
 .import-transaction-table .v-select.v-input.v-input--density-compact:not(.v-textarea) .v-field__input {
     min-height: inherit;

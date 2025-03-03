@@ -230,6 +230,78 @@ export class MeridiemIndicator {
     }
 }
 
+export class KnownDateTimeFormat {
+    private static readonly allInstances: KnownDateTimeFormat[] = [];
+
+    public static readonly DefaultDateTime = new KnownDateTimeFormat('YYYY-MM-DD HH:mm:ss', /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/);
+    public static readonly DefaultDateTimeWithTimezone = new KnownDateTimeFormat('YYYY-MM-DD HH:mm:ssZ', /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](Z|[+-](0[0-9]|1[0-4]):[0-5][0-9])$/);
+    public static readonly DefaultDateTimeWithoutSecond = new KnownDateTimeFormat('YYYY-MM-DD HH:mm', /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) ([0-1][0-9]|2[0-3]):[0-5][0-9]$/);
+    public static readonly DefaultDate = new KnownDateTimeFormat('YYYY-MM-DD', /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/);
+    public static readonly RFC3339 = new KnownDateTimeFormat('YYYY-MM-DDTHH:mm:ssZ', /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](Z|[+-](0[0-9]|1[0-4]):[0-5][0-9])$/);
+    public static readonly YYYYMMDDSlashWithTime = new KnownDateTimeFormat('YYYY/MM/DD HH:mm:ss', /^\d{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[1-2][0-9]|3[0-1]) ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/);
+    public static readonly MMDDYYSlashWithTime = new KnownDateTimeFormat('MM/DD/YYYY HH:mm:ss', /^(0[1-9]|1[0-2])\/(0[1-9]|[1-2][0-9]|3[0-1])\/\d{4} ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/);
+    public static readonly DDMMYYSlashWithTime = new KnownDateTimeFormat('DD/MM/YYYY HH:mm:ss', /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4} ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/);
+    public static readonly YYYYMMDDSlash = new KnownDateTimeFormat('YYYY/MM/DD', /^\d{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[1-2][0-9]|3[0-1])$/);
+    public static readonly MMDDYYSlash = new KnownDateTimeFormat('MM/DD/YYYY', /^(0[1-9]|1[0-2])\/(0[1-9]|[1-2][0-9]|3[0-1])\/\d{4}$/);
+    public static readonly DDMMYYSlash = new KnownDateTimeFormat('DD/MM/YYYY', /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/);
+
+    public readonly format: string;
+    private readonly regex: RegExp;
+
+    private constructor(format: string, regex: RegExp) {
+        this.format = format;
+        this.regex = regex;
+
+        KnownDateTimeFormat.allInstances.push(this);
+    }
+
+    public isValid(dateTime: string): boolean {
+        return this.regex.test(dateTime);
+    }
+
+    public static values(): KnownDateTimeFormat[] {
+        return KnownDateTimeFormat.allInstances;
+    }
+
+    public static detect(dateTime: string): KnownDateTimeFormat[] | undefined {
+        const result: KnownDateTimeFormat[] = [];
+
+        for (const format of KnownDateTimeFormat.allInstances) {
+            if (format.isValid(dateTime)) {
+                result.push(format);
+            }
+        }
+
+        return result.length > 0 ? result : undefined;
+    }
+
+    public static detectMany(dateTimes: string[]): KnownDateTimeFormat[] | undefined {
+        const detectedCounts: Record<string, number> = {};
+
+        for (const dateTime of dateTimes) {
+            const detectedFormats = KnownDateTimeFormat.detect(dateTime);
+
+            if (detectedFormats) {
+                for (const format of detectedFormats) {
+                    detectedCounts[format.format] = (detectedCounts[format.format] || 0) + 1;
+                }
+            } else {
+                return undefined;
+            }
+        }
+
+        const result: KnownDateTimeFormat[] = [];
+
+        for (const format of KnownDateTimeFormat.allInstances) {
+            if (detectedCounts[format.format] === dateTimes.length) {
+                result.push(format);
+            }
+        }
+
+        return result.length > 0 ? result : undefined;
+    }
+}
+
 export const LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE: number = 0;
 
 export interface DateFormat {

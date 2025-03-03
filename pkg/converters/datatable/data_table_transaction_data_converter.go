@@ -418,7 +418,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 		geoLongitude := float64(0)
 		geoLatitude := float64(0)
 
-		if dataTable.HasColumn(TRANSACTION_DATA_TABLE_GEOGRAPHIC_LOCATION) {
+		if dataTable.HasColumn(TRANSACTION_DATA_TABLE_GEOGRAPHIC_LOCATION) && c.geoLocationSeparator != "" {
 			geoLocationItems := strings.Split(dataRow.GetData(TRANSACTION_DATA_TABLE_GEOGRAPHIC_LOCATION), c.geoLocationSeparator)
 
 			if len(geoLocationItems) == 2 {
@@ -442,7 +442,13 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 		var tagNames []string
 
 		if dataTable.HasColumn(TRANSACTION_DATA_TABLE_TAGS) {
-			tagNameItems := strings.Split(dataRow.GetData(TRANSACTION_DATA_TABLE_TAGS), c.transactionTagSeparator)
+			var tagNameItems []string
+
+			if c.transactionTagSeparator != "" {
+				tagNameItems = strings.Split(dataRow.GetData(TRANSACTION_DATA_TABLE_TAGS), c.transactionTagSeparator)
+			} else {
+				tagNameItems = append(tagNameItems, dataRow.GetData(TRANSACTION_DATA_TABLE_TAGS))
+			}
 
 			for i := 0; i < len(tagNameItems); i++ {
 				tagName := tagNameItems[i]

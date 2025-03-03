@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"io"
 	"sort"
 	"strings"
@@ -8,6 +9,8 @@ import (
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters"
+	baseconverters "github.com/mayswind/ezbookkeeping/pkg/converters/base"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -1030,6 +1033,83 @@ func (a *TransactionsApi) TransactionDeleteHandler(c *core.WebContext) (any, *er
 	return true, nil
 }
 
+// TransactionParseImportDsvFileDataHandler returns the parsed file data by request parameters for current user
+func (a *TransactionsApi) TransactionParseImportDsvFileDataHandler(c *core.WebContext) (any, *errs.Error) {
+	uid := c.GetCurrentUid()
+	form, err := c.MultipartForm()
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionParseImportDsvFileDataHandler] failed to get multi-part form data for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrParameterInvalid
+	}
+
+	fileTypes := form.Value["fileType"]
+
+	if len(fileTypes) < 1 || fileTypes[0] == "" {
+		return nil, errs.ErrImportFileTypeIsEmpty
+	}
+
+	fileType := fileTypes[0]
+
+	if !converters.IsCustomDelimiterSeparatedValuesFileType(fileType) {
+		return nil, errs.Or(err, errs.ErrImportFileTypeNotSupported)
+	}
+
+	fileEncodings := form.Value["fileEncoding"]
+
+	if len(fileEncodings) < 1 || fileEncodings[0] == "" {
+		return nil, errs.ErrImportFileEncodingIsEmpty
+	}
+
+	fileEncoding := fileEncodings[0]
+	dataParser, err := converters.CreateNewDelimiterSeparatedValuesDataParser(fileType, fileEncoding)
+
+	if err != nil {
+		return nil, errs.Or(err, errs.ErrImportFileTypeNotSupported)
+	}
+
+	importFiles := form.File["file"]
+
+	if len(importFiles) < 1 {
+		log.Warnf(c, "[transactions.TransactionParseImportDsvFileDataHandler] there is no import file in request for user \"uid:%d\"", uid)
+		return nil, errs.ErrNoFilesUpload
+	}
+
+	if importFiles[0].Size < 1 {
+		log.Warnf(c, "[transactions.TransactionParseImportDsvFileDataHandler] the size of import file in request is zero for user \"uid:%d\"", uid)
+		return nil, errs.ErrUploadedFileEmpty
+	}
+
+	if importFiles[0].Size > int64(a.CurrentConfig().MaxImportFileSize) {
+		log.Warnf(c, "[transactions.TransactionParseImportDsvFileDataHandler] the upload file size \"%d\" exceeds the maximum size \"%d\" of import file for user \"uid:%d\"", importFiles[0].Size, a.CurrentConfig().MaxImportFileSize, uid)
+		return nil, errs.ErrExceedMaxUploadFileSize
+	}
+
+	importFile, err := importFiles[0].Open()
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionParseImportDsvFileDataHandler] failed to get import file from request for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	defer importFile.Close()
+	fileData, err := io.ReadAll(importFile)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionParseImportDsvFileDataHandler] failed to read import file data for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	allLines, err := dataParser.ParseDsvFileLines(c, fileData)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionParseImportDsvFileDataHandler] failed to parse import file data for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	return allLines, nil
+}
+
 // TransactionParseImportFileHandler returns the parsed transaction data by request parameters for current user
 func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
@@ -1054,7 +1134,84 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 	}
 
 	fileType := fileTypes[0]
-	dataImporter, err := converters.GetTransactionDataImporter(fileType)
+
+	var dataImporter baseconverters.TransactionDataImporter
+
+	if converters.IsCustomDelimiterSeparatedValuesFileType(fileType) {
+		fileEncodings := form.Value["fileEncoding"]
+
+		if len(fileEncodings) < 1 || fileEncodings[0] == "" {
+			return nil, errs.ErrImportFileEncodingIsEmpty
+		}
+
+		fileEncoding := fileEncodings[0]
+
+		columnMappings := form.Value["columnMapping"]
+
+		if len(columnMappings) < 1 || columnMappings[0] == "" {
+			return nil, errs.ErrImportFileColumnMappingInvalid
+		}
+
+		var columnIndexMapping = map[datatable.TransactionDataTableColumn]int{}
+		err = json.Unmarshal([]byte(columnMappings[0]), &columnIndexMapping)
+
+		if err != nil {
+			log.Errorf(c, "[transactions.TransactionParseImportFileHandler] failed to parse column mapping for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.ErrImportFileColumnMappingInvalid
+		}
+
+		transactionTypeMappings := form.Value["transactionTypeMapping"]
+
+		if len(transactionTypeMappings) < 1 || transactionTypeMappings[0] == "" {
+			return nil, errs.ErrImportFileTransactionTypeMappingInvalid
+		}
+
+		var transactionTypeNameMapping = map[string]models.TransactionType{}
+		err = json.Unmarshal([]byte(transactionTypeMappings[0]), &transactionTypeNameMapping)
+
+		if err != nil {
+			log.Errorf(c, "[transactions.TransactionParseImportFileHandler] failed to parse transaction type mapping for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.ErrImportFileTransactionTypeMappingInvalid
+		}
+
+		hasHeaderLines := form.Value["hasHeaderLine"]
+		hasHeaderLine := false
+
+		if len(hasHeaderLines) > 0 {
+			hasHeaderLine = hasHeaderLines[0] == "true"
+		}
+
+		timeFormats := form.Value["timeFormat"]
+
+		if len(timeFormats) < 1 || timeFormats[0] == "" {
+			return nil, errs.ErrImportFileTransactionTimeFormatInvalid
+		}
+
+		timezoneFormats := form.Value["timezoneFormat"]
+		timezoneFormat := ""
+
+		if len(timezoneFormats) > 0 {
+			timezoneFormat = timezoneFormats[0]
+		}
+
+		geoLocationSeparators := form.Value["geoSeparator"]
+		geoLocationSeparator := ""
+
+		if len(geoLocationSeparators) > 0 {
+			geoLocationSeparator = geoLocationSeparators[0]
+		}
+
+		transactionTagSeparators := form.Value["tagSeparator"]
+		transactionTagSeparator := ""
+
+		if len(transactionTagSeparators) > 0 {
+			transactionTagSeparator = transactionTagSeparators[0]
+		}
+
+		dataImporter, err = converters.CreateNewDelimiterSeparatedValuesDataImporter(fileType, fileEncoding, columnIndexMapping, transactionTypeNameMapping, hasHeaderLine, timeFormats[0], timezoneFormat, geoLocationSeparator, transactionTagSeparator)
+	} else {
+		dataImporter, err = converters.GetTransactionDataImporter(fileType)
+	}
 
 	if err != nil {
 		return nil, errs.Or(err, errs.ErrImportFileTypeNotSupported)
@@ -1084,6 +1241,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 		return nil, errs.ErrOperationFailed
 	}
 
+	defer importFile.Close()
 	fileData, err := io.ReadAll(importFile)
 
 	if err != nil {

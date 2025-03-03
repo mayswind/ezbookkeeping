@@ -3,6 +3,10 @@ import axios, { type AxiosRequestConfig, type AxiosRequestHeaders, type AxiosRes
 import type { ApiResponse } from '@/core/api.ts';
 
 import {
+    TransactionType
+} from '@/core/transaction.ts';
+
+import {
     BASE_API_URL_PATH,
     BASE_QRCODE_PATH,
     BASE_PROXY_URL_PATH,
@@ -426,10 +430,43 @@ export default {
     deleteTransaction: (req: TransactionDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transactions/delete.json', req);
     },
-    parseImportTransaction: ({ fileType, importFile }: { fileType: string, importFile: File }): ApiResponsePromise<ImportTransactionResponsePageWrapper> => {
+    parseImportDsvFile: ({ fileType, fileEncoding, importFile }: { fileType: string, fileEncoding?: string, importFile: File }): ApiResponsePromise<string[][]> => {
+        return axios.postForm<ApiResponse<string[][]>>('v1/transactions/parse_dsv_file.json', {
+            fileType: fileType,
+            fileEncoding: fileEncoding,
+            file: importFile
+        }, {
+            timeout: DEFAULT_UPLOAD_API_TIMEOUT
+        } as ApiRequestConfig);
+    },
+    parseImportTransaction: ({ fileType, fileEncoding, importFile, columnMapping, transactionTypeMapping, hasHeaderLine, timeFormat, timezoneFormat, geoSeparator, tagSeparator }: { fileType: string, fileEncoding?: string, importFile: File, columnMapping?: Record<number, number>, transactionTypeMapping?: Record<string, TransactionType>, hasHeaderLine?: boolean, timeFormat?: string, timezoneFormat?: string, geoSeparator?: string, tagSeparator?: string }): ApiResponsePromise<ImportTransactionResponsePageWrapper> => {
+        let textualColumnMapping: string | undefined = undefined;
+        let textualTransactionTypeMapping: string | undefined = undefined;
+        let textualHasHeaderLine: string | undefined = undefined;
+
+        if (columnMapping) {
+            textualColumnMapping = JSON.stringify(columnMapping);
+        }
+
+        if (transactionTypeMapping) {
+            textualTransactionTypeMapping = JSON.stringify(transactionTypeMapping);
+        }
+
+        if (hasHeaderLine) {
+            textualHasHeaderLine = 'true';
+        }
+
         return axios.postForm<ApiResponse<ImportTransactionResponsePageWrapper>>('v1/transactions/parse_import.json', {
             fileType: fileType,
-            file: importFile
+            fileEncoding: fileEncoding,
+            file: importFile,
+            columnMapping: textualColumnMapping,
+            transactionTypeMapping: textualTransactionTypeMapping,
+            hasHeaderLine: textualHasHeaderLine,
+            timeFormat: timeFormat,
+            timezoneFormat: timezoneFormat,
+            geoSeparator: geoSeparator,
+            tagSeparator: tagSeparator
         }, {
             timeout: DEFAULT_UPLOAD_API_TIMEOUT
         } as ApiRequestConfig);

@@ -3,7 +3,9 @@ package converters
 import (
 	"github.com/mayswind/ezbookkeeping/pkg/converters/alipay"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/base"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/default"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/dsv"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/feidee"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/fireflyIII"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/gnucash"
@@ -12,6 +14,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/converters/qif"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/wechat"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
 // GetTransactionDataExporter returns the transaction data exporter according to the file type
@@ -60,4 +63,19 @@ func GetTransactionDataImporter(fileType string) (base.TransactionDataImporter, 
 	} else {
 		return nil, errs.ErrImportFileTypeNotSupported
 	}
+}
+
+// IsCustomDelimiterSeparatedValuesFileType returns whether the file type is the delimiter-separated values file type
+func IsCustomDelimiterSeparatedValuesFileType(fileType string) bool {
+	return dsv.IsDelimiterSeparatedValuesFileType(fileType)
+}
+
+// CreateNewDelimiterSeparatedValuesDataParser returns a new delimiter-separated values data parser according to the file type and encoding
+func CreateNewDelimiterSeparatedValuesDataParser(fileType string, fileEncoding string) (dsv.CustomTransactionDataDsvFileParser, error) {
+	return dsv.CreateNewCustomTransactionDataDsvFileParser(fileType, fileEncoding)
+}
+
+// CreateNewDelimiterSeparatedValuesDataImporter returns a new delimiter-separated values data importer according to the file type and encoding
+func CreateNewDelimiterSeparatedValuesDataImporter(fileType string, fileEncoding string, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, hasHeaderLine bool, timeFormat string, timezoneFormat string, geoLocationSeparator string, transactionTagSeparator string) (base.TransactionDataImporter, error) {
+	return dsv.CreateNewCustomTransactionDataDsvFileImporter(fileType, fileEncoding, columnIndexMapping, transactionTypeNameMapping, hasHeaderLine, timeFormat, timezoneFormat, geoLocationSeparator, transactionTagSeparator)
 }

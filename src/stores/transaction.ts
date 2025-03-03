@@ -1056,9 +1056,34 @@ export const useTransactionsStore = defineStore('transactions', () => {
         });
     }
 
-    function parseImportTransaction({ fileType, importFile }: { fileType: string, importFile: File }): Promise<ImportTransactionResponsePageWrapper> {
+    function parseImportDsvFile({ fileType, fileEncoding, importFile }: { fileType: string, fileEncoding?: string, importFile: File }): Promise<string[][]> {
         return new Promise((resolve, reject) => {
-            services.parseImportTransaction({ fileType, importFile }).then(response => {
+            services.parseImportDsvFile({ fileType, fileEncoding, importFile }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to parse import file' });
+                    return;
+                }
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('Unable to parse import file', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to parse import file' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    function parseImportTransaction({ fileType, fileEncoding, importFile, columnMapping, transactionTypeMapping, hasHeaderLine, timeFormat, timezoneFormat, geoSeparator, tagSeparator }: { fileType: string, fileEncoding?: string, importFile: File, columnMapping?: Record<number, number>, transactionTypeMapping?: Record<string, TransactionType>, hasHeaderLine?: boolean, timeFormat?: string, timezoneFormat?: string, geoSeparator?: string, tagSeparator?: string }): Promise<ImportTransactionResponsePageWrapper> {
+        return new Promise((resolve, reject) => {
+            services.parseImportTransaction({ fileType, fileEncoding, importFile, columnMapping, transactionTypeMapping, hasHeaderLine, timeFormat, timezoneFormat, geoSeparator, tagSeparator }).then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
@@ -1215,6 +1240,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         getTransaction,
         saveTransaction,
         deleteTransaction,
+        parseImportDsvFile,
         parseImportTransaction,
         importTransactions,
         uploadTransactionPicture,

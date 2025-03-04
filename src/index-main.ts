@@ -22,9 +22,9 @@ function isMobileDevice(): boolean {
 
 function navigate(type: string): void {
     if (__EZBOOKKEEPING_IS_PRODUCTION__) {
-        window.location.replace(`${type}/`);
+        window.location.replace(`${type}#/`);
     } else {
-        window.location.replace(`${type}.html`);
+        window.location.replace(`${type}.html#/`);
     }
 }
 

@@ -133,6 +133,7 @@ import {
 } from './server_settings.ts';
 import { getTimezoneOffsetMinutes } from './datetime.ts';
 import { generateRandomUUID } from './misc.ts';
+import { getBasePath } from './web.ts';
 
 interface ApiRequestConfig extends AxiosRequestConfig {
     readonly headers: AxiosRequestHeaders;
@@ -147,7 +148,7 @@ export type ApiResponsePromise<T> = Promise<AxiosResponse<ApiResponse<T>>>;
 let needBlockRequest = false;
 const blockedRequests: ((token: string | undefined) => void)[] = [];
 
-axios.defaults.baseURL = BASE_API_URL_PATH;
+axios.defaults.baseURL = getBasePath() + BASE_API_URL_PATH;
 axios.defaults.timeout = DEFAULT_API_TIMEOUT;
 axios.interceptors.request.use((config: ApiRequestConfig) => {
     const token = getCurrentToken();
@@ -560,11 +561,11 @@ export default {
         } as ApiRequestConfig);
     },
     generateQrCodeUrl: (qrCodeName: string): string => {
-        return `${BASE_QRCODE_PATH}/${qrCodeName}.png`;
+        return `${getBasePath()}${BASE_QRCODE_PATH}/${qrCodeName}.png`;
     },
     generateMapProxyTileImageUrl: (mapProvider: string, language: string): string => {
         const token = getCurrentToken();
-        let url = `${BASE_PROXY_URL_PATH}/map/tile/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
+        let url = `${getBasePath()}${BASE_PROXY_URL_PATH}/map/tile/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
 
         if (language) {
             url = url + `&language=${language}`;
@@ -574,7 +575,7 @@ export default {
     },
     generateMapProxyAnnotationImageUrl: (mapProvider: string, language: string): string => {
         const token = getCurrentToken();
-        let url = `${BASE_PROXY_URL_PATH}/map/annotation/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
+        let url = `${getBasePath()}${BASE_PROXY_URL_PATH}/map/annotation/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
 
         if (language) {
             url = url + `&language=${language}`;
@@ -598,7 +599,7 @@ export default {
         return `${AMAP_JAVASCRIPT_URL}&key=${getAmapApplicationKey()}&plugin=AMap.ToolBar&callback=${callbackFnName}`;
     },
     generateAmapApiInternalProxyUrl: (): string => {
-        return `${window.location.origin}${BASE_AMAP_API_PROXY_URL_PATH}`;
+        return `${window.location.origin}${getBasePath()}${BASE_AMAP_API_PROXY_URL_PATH}`;
     },
     getInternalAvatarUrlWithToken(avatarUrl: string, disableBrowserCache?: boolean | string): string {
         if (!avatarUrl) {

@@ -1,3 +1,5 @@
+import { getBasePath } from './web.ts';
+
 export function isProduction(): boolean {
     return __EZBOOKKEEPING_IS_PRODUCTION__;
 }
@@ -28,15 +30,15 @@ export function getBuildTime(): string {
 
 export function getMobileVersionPath(): string {
     if (isProduction()) {
-        return '../mobile';
+        return getBasePath() + '/mobile#/';
     } else {
-        return 'mobile.html';
+        return getBasePath() + '/mobile.html#/';
     }
 }
 export function getDesktopVersionPath(): string {
     if (isProduction()) {
-        return '../desktop';
+        return getBasePath() + '/desktop#/';
     } else {
-        return 'desktop.html';
+        return getBasePath() + '/desktop.html#/';
     }
 }

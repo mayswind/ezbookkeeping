@@ -11,7 +11,7 @@
         "Japanese": "日本語",
         "Russian": "ロシア語",
         "Vietnamese": "ベトナム語",
-        "Simplified Chinese": "中国語（簡体字）"
+        "Chinese (Simplified)": "中国語 (簡体字)"
     },
     "default": {
         "currency": "JPY",
@@ -1417,7 +1417,7 @@
     "Username": "ユーザー名",
     "Your username": "ユーザー名",
     "Your username or email": "ユーザー名かメールアドレス",
-    "Password": "・パスワード",
+    "Password": "パスワード",
     "Your password": "パスワード",
     "Your password, at least 6 characters": "パスワード（6文字以上）",
     "Confirm Password": "パスワードの確認",

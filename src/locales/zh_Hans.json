@@ -11,7 +11,7 @@
         "Japanese": "日语",
         "Russian": "俄语",
         "Vietnamese": "越南语",
-        "Simplified Chinese": "简体中文"
+        "Chinese (Simplified)": "中文 (简体)"
     },
     "default": {
         "currency": "CNY",
@@ -1265,9 +1265,9 @@
         "windows-1255": "希伯来语 (Windows-1255)",
         "windows-874": "泰语 (Windows-874)",
         "windows-1258": "越南语 (Windows-1258)",
-        "gb18030": "简体中文 (GB18030)",
-        "gbk": "简体中文 (GBK)",
-        "big5": "繁体中文 (Big5)",
+        "gb18030": "中文 (简体, GB18030)",
+        "gbk": "中文 (简体, GBK)",
+        "big5": "中文 (繁体, Big5)",
         "euc-kr": "韩语 (EUC-KR)",
         "euc-jp": "日语 (EUC-JP)",
         "iso-2022-jp": "日语 (ISO-2022-JP)",

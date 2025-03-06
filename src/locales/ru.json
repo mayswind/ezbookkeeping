@@ -10,8 +10,8 @@
         "Spanish": "Испанский",
         "Japanese": "Японский",
         "Russian": "Русский",
-        "Vietnamese": "Вьетнамский язык",
-        "Simplified Chinese": "Упрощенный Китайский"
+        "Vietnamese": "Вьетнамский",
+        "Chinese (Simplified)": "Китайский (Упрощенный)"
     },
     "default": {
         "currency": "RUB",
@@ -1265,9 +1265,9 @@
         "windows-1255": "Hebrew (Windows-1255)",
         "windows-874": "Thai (Windows-874)",
         "windows-1258": "Vietnamese (Windows-1258)",
-        "gb18030": "Simplified Chinese (GB18030)",
-        "gbk": "Simplified Chinese (GBK)",
-        "big5": "Traditional Chinese (Big5)",
+        "gb18030": "Chinese (Simplified, GB18030)",
+        "gbk": "Chinese (Simplified, GBK)",
+        "big5": "Chinese (Traditional, Big5)",
         "euc-kr": "Korean (EUC-KR)",
         "euc-jp": "Japanese (EUC-JP)",
         "iso-2022-jp": "Japanese (ISO-2022-JP)",

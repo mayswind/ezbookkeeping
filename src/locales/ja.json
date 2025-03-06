@@ -11,11 +11,11 @@
         "Japanese": "日本語",
         "Russian": "ロシア語",
         "Vietnamese": "ベトナム語",
-        "簡体字中国語": "簡体字"
+        "Simplified Chinese": "中国語（簡体字）"
     },
     "default": {
         "currency": "JPY",
-        "firstDayOfWeek": "日曜日",
+        "firstDayOfWeek": "Sunday",
         "longDateFormat": "YYYYMMDD",
         "shortDateFormat": "YYYYMMDD",
         "longTimeFormat": "HHMMSS",
@@ -1265,9 +1265,9 @@
         "windows-1255": "ヘブライ語 (Windows-1255)",
         "windows-874": "タイ語 (Windows-874)",
         "windows-1258": "ベトナム語 (Windows-1258)",
-        "gb18030": "簡体字中国語 (GB18030)",
-        "gbk": "簡体字中国語 (GBK)",
-        "big5": "繁体字中国語 (Big5)",
+        "gb18030": "中国語（簡体字） (GB18030)",
+        "gbk": "中国語（簡体字） (GBK)",
+        "big5": "中国語（繁体字） (Big5)",
         "euc-kr": "韓国語 (EUC-KR)",
         "euc-jp": "日本語 (EUC-JP)",
         "iso-2022-jp": "日本語 (ISO-2022-JP)",

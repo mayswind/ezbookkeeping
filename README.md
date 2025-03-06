@@ -88,7 +88,7 @@ You can also build docker image, make sure you have [docker](https://www.docker.
 
 ## Documents
 1. [English](http://ezbookkeeping.mayswind.net)
-1. [简体中文 (Simplified Chinese)](http://ezbookkeeping.mayswind.net/zh_Hans)
+1. [中文 (简体) / Chinese (Simplified)](http://ezbookkeeping.mayswind.net/zh_Hans)
 
 ## License
 [MIT](https://github.com/mayswind/ezbookkeeping/blob/master/LICENSE)

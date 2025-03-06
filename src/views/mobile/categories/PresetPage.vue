@@ -47,7 +47,8 @@
 
         <list-item-selection-sheet value-type="item"
                                    value-field="languageTag"
-                                   title-field="displayName"
+                                   title-field="nativeDisplayName"
+                                   after-field="displayName"
                                    :items="allLanguages"
                                    v-model:show="showChangeLocaleSheet"
                                    v-model="currentLocale">

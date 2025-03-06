@@ -68,22 +68,7 @@
                         <v-card-text class="pt-0">
                             <v-row>
                                 <v-col cols="12" class="text-center">
-                                    <v-menu location="bottom">
-                                        <template #activator="{ props }">
-                                            <v-btn variant="text"
-                                                   :disabled="verifyingByWebAuthn"
-                                                   v-bind="props">{{ currentLanguageName }}</v-btn>
-                                        </template>
-                                        <v-list>
-                                            <v-list-item v-for="lang in allLanguages" :key="lang.languageTag">
-                                                <v-list-item-title
-                                                    class="cursor-pointer"
-                                                    @click="changeLanguage(lang.languageTag)">
-                                                    {{ lang.displayName }}
-                                                </v-list-item-title>
-                                            </v-list-item>
-                                        </v-list>
-                                    </v-menu>
+                                    <language-select-button :disabled="verifyingByWebAuthn" />
                                 </v-col>
 
                                 <v-col cols="12" class="d-flex align-center pt-0">
@@ -114,7 +99,6 @@ import { ref, computed, useTemplateRef } from 'vue';
 import { useRouter } from 'vue-router';
 import { useTheme } from 'vuetify';
 
-import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 import { useUnlockPageBase } from '@/views/base/UnlockPageBase.ts';
 
@@ -141,8 +125,8 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 const router = useRouter();
 const theme = useTheme();
 
-const { tt, getCurrentLanguageDisplayName, getAllLanguageOptions } = useI18n();
-const { version, pinCode, isWebAuthnAvailable, isPinCodeValid, changeLanguage, doAfterUnlocked, doRelogin } = useUnlockPageBase();
+const { tt } = useI18n();
+const { version, pinCode, isWebAuthnAvailable, isPinCodeValid, doAfterUnlocked, doRelogin } = useUnlockPageBase();
 
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
@@ -152,9 +136,7 @@ const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const verifyingByWebAuthn = ref<boolean>(false);
 
-const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
-const currentLanguageName = computed<string>(() => getCurrentLanguageDisplayName());
 
 function unlockByWebAuthn(): void {
     const webAuthnCredentialId = getWebAuthnCredentialId();

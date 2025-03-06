@@ -61,14 +61,14 @@
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :key="currentLocale + '_lang'"
-                :header="tt('Language')"
+                :header="languageTitle"
                 :title="currentLanguageName"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Language'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Language'), popupCloseLinkText: tt('Done') }"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Language'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: languageTitle, popupCloseLinkText: tt('Done') }"
             >
                 <select v-model="currentLocale">
                     <option :value="lang.languageTag"
                             :key="lang.languageTag"
-                            v-for="lang in allLanguages">{{ lang.displayName }}</option>
+                            v-for="lang in allLanguages">{{ lang.nativeDisplayName }}</option>
                 </select>
             </f7-list-item>
 
@@ -165,7 +165,8 @@
 
             <list-item-selection-sheet value-type="item"
                                        value-field="languageTag"
-                                       title-field="displayName"
+                                       title-field="nativeDisplayName"
+                                       after-field="displayName"
                                        :items="allLanguages"
                                        v-model:show="showPresetCategoriesChangeLocaleSheet"
                                        v-model="currentLocale">
@@ -202,6 +203,7 @@ const { showAlert, showToast } = useI18nUIComponents();
 const {
     user,
     submitting,
+    languageTitle,
     currentLocale,
     currentLanguageName,
     inputEmptyProblemMessage,

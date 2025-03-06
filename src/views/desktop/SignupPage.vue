@@ -91,14 +91,29 @@
                                 <v-row>
                                     <v-col cols="12" md="12">
                                         <v-select
-                                            item-title="displayName"
+                                            item-title="nativeDisplayName"
                                             item-value="languageTag"
                                             :disabled="submitting || navigateToHomePage"
-                                            :label="tt('Language')"
-                                            :placeholder="tt('Language')"
+                                            :label="languageTitle"
+                                            :placeholder="languageTitle"
                                             :items="allLanguages"
                                             v-model="currentLocale"
-                                        />
+                                        >
+                                            <template #item="{ props, item }">
+                                                <v-list-item :value="item.value" v-bind="props">
+                                                    <template #title>
+                                                        <v-list-item-title>
+                                                            <div class="d-flex align-center">
+                                                                <span>{{ item.title }}</span>
+                                                                <v-spacer />
+                                                                <v-icon :icon="mdiCheck" v-if="currentLocale == item.raw.languageTag" />
+                                                                <span class="text-field-append-text" v-if="currentLocale !== item.raw.languageTag">{{ item.raw.displayName }}</span>
+                                                            </div>
+                                                        </v-list-item-title>
+                                                    </template>
+                                                </v-list-item>
+                                            </template>
+                                        </v-select>
                                     </v-col>
                                 </v-row>
 
@@ -146,22 +161,8 @@
                                                   v-model="usePresetCategories"/>
                                     </v-col>
                                     <v-col cols="12" sm="6" class="text-right-sm">
-                                        <v-menu location="bottom">
-                                            <template #activator="{ props }">
-                                                <v-btn variant="text"
-                                                       :disabled="submitting || navigateToHomePage"
-                                                       v-bind="props">{{ currentLanguageName }}</v-btn>
-                                            </template>
-                                            <v-list>
-                                                <v-list-item v-for="lang in allLanguages" :key="lang.languageTag">
-                                                    <v-list-item-title
-                                                        class="cursor-pointer"
-                                                        @click="currentLocale = lang.languageTag">
-                                                        {{ lang.displayName }}
-                                                    </v-list-item-title>
-                                                </v-list-item>
-                                            </v-list>
-                                        </v-menu>
+                                        <language-select-button :disabled="submitting || navigateToHomePage"
+                                                                :use-model-value="true" v-model="currentLocale" />
                                     </v-col>
                                 </v-row>
 
@@ -273,8 +274,8 @@ const { tt, getAllLanguageOptions, getAllCurrencies, getAllWeekDays, getAllTrans
 const {
     user,
     submitting,
+    languageTitle,
     currentLocale,
-    currentLanguageName,
     inputEmptyProblemMessage,
     inputInvalidProblemMessage,
     getCategoryTypeName,

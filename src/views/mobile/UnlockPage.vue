@@ -26,7 +26,7 @@
             </f7-block-footer>
         </f7-list>
 
-        <f7-button small popover-open=".lang-popover-menu" :text="currentLanguageName"></f7-button>
+        <language-select-button />
 
         <f7-list class="login-page-bottom">
             <f7-block-footer>
@@ -45,30 +45,12 @@
                 <span>{{ version }}</span>
             </div>
         </f7-toolbar>
-
-        <f7-popover class="lang-popover-menu">
-            <f7-list dividers>
-                <f7-list-item
-                    link="#" no-chevron popover-close
-                    :title="lang.displayName"
-                    :key="lang.languageTag"
-                    v-for="lang in allLanguages"
-                    @click="changeLanguage(lang.languageTag)"
-                >
-                    <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="currentLanguageCode === lang.languageTag"></f7-icon>
-                    </template>
-                </f7-list-item>
-            </f7-list>
-        </f7-popover>
     </f7-page>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import type { Router } from 'framework7/types';
 
-import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
 import { useUnlockPageBase } from '@/views/base/UnlockPageBase.ts';
@@ -94,16 +76,12 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getCurrentLanguageTag, getCurrentLanguageDisplayName, getAllLanguageOptions } = useI18n();
+const { tt } = useI18n();
 const { showToast, showConfirm } = useI18nUIComponents();
-const { version, pinCode, isWebAuthnAvailable, isPinCodeValid, changeLanguage, doAfterUnlocked, doRelogin } = useUnlockPageBase();
+const { version, pinCode, isWebAuthnAvailable, isPinCodeValid, doAfterUnlocked, doRelogin } = useUnlockPageBase();
 
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
-
-const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
-const currentLanguageCode = computed<string>(() => getCurrentLanguageTag());
-const currentLanguageName = computed<string>(() => getCurrentLanguageDisplayName());
 
 function unlockByWebAuthn(): void {
     const router = props.f7router;

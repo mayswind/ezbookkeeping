@@ -42,11 +42,6 @@ export function useLoginPageBase() {
 
     const tips = computed<string>(() => getServerTipContent(getLoginPageTips()));
 
-    function changeLanguage(locale: string): void {
-        const localeDefaultSettings = setLanguage(locale);
-        settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-    }
-
     function doAfterLogin(authResponse: AuthResponse): void {
         if (authResponse.user) {
             const localeDefaultSettings = setLanguage(authResponse.user.language);
@@ -76,11 +71,11 @@ export function useLoginPageBase() {
         twoFAVerifyType,
         logining,
         verifying,
+        // computed states
         inputIsEmpty,
         twoFAInputIsEmpty,
         tips,
         // functions
-        changeLanguage,
         doAfterLogin
     }
 }

@@ -612,16 +612,13 @@ export function useI18n() {
             }
 
             const languageInfo = ALL_LANGUAGES[languageTag];
-            let displayName = languageInfo.displayName;
+            const displayName = languageInfo.displayName;
             const languageNameInCurrentLanguage = getLanguageDisplayName(languageInfo.name);
-
-            if (languageNameInCurrentLanguage && languageNameInCurrentLanguage !== displayName) {
-                displayName = `${languageNameInCurrentLanguage} (${displayName})`;
-            }
 
             ret.push({
                 languageTag: languageTag,
-                displayName: displayName
+                displayName: languageNameInCurrentLanguage,
+                nativeDisplayName: displayName
             });
         }
 
@@ -632,7 +629,8 @@ export function useI18n() {
         if (includeSystemDefault) {
             ret.splice(0, 0, {
                 languageTag: '',
-                displayName: t('System Default')
+                displayName: '',
+                nativeDisplayName: t('System Default')
             });
         }
 

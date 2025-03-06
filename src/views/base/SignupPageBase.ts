@@ -23,6 +23,16 @@ export function useSignupPageBase() {
     const user = ref<User>(userStore.generateNewUserModel(getCurrentLanguageTag()));
     const submitting = ref<boolean>(false);
 
+    const languageTitle = computed<string>(() => {
+        const languageInCurrentLanguage = tt('Language');
+
+        if (languageInCurrentLanguage !== 'Language') {
+            return `${languageInCurrentLanguage} / Language`;
+        }
+
+        return languageInCurrentLanguage;
+    });
+
     const currentLocale = computed<string>({
         get: () => getCurrentLanguageTag(),
         set: (value: string) => {
@@ -118,6 +128,7 @@ export function useSignupPageBase() {
         user,
         submitting,
         // computed states
+        languageTitle,
         currentLocale,
         currentLanguageName,
         inputEmptyProblemMessage,

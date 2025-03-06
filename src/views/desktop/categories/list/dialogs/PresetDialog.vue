@@ -11,19 +11,8 @@
                     <div class="d-flex align-center mb-1">
                         <h4>{{ getCategoryTypeName(categoryType) }}</h4>
                         <v-spacer/>
-                        <v-menu location="bottom">
-                            <template #activator="{ props }">
-                                <v-btn variant="text" :disabled="submitting"
-                                       v-bind="props">{{ currentLanguageName }}</v-btn>
-                            </template>
-                            <v-list>
-                                <v-list-item :key="lang.languageTag" :value="lang.languageTag" v-for="lang in allLanguages">
-                                    <v-list-item-title class="cursor-pointer" @click="currentLocale = lang.languageTag">
-                                        {{ lang.displayName }}
-                                    </v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                        </v-menu>
+                        <language-select-button :disabled="submitting"
+                                                :use-model-value="true" v-model="currentLocale" />
                     </div>
 
                     <v-expansion-panels class="border rounded mb-2" variant="accordion" multiple :disabled="submitting">
@@ -76,7 +65,6 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 import type { PartialRecord } from '@/core/base.ts';
-import type { LanguageOption } from '@/locales/index.ts';
 import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { categorizedArrayToPlainArray } from '@/lib/common.ts';
 
@@ -93,7 +81,7 @@ const emit = defineEmits<{
     (e: 'category:saved', event: { message: string }): void;
 }>();
 
-const { tt, getCurrentLanguageTag, getAllLanguageOptions, getAllTransactionDefaultCategories, getLanguageInfo } = useI18n();
+const { tt, getCurrentLanguageTag, getAllTransactionDefaultCategories } = useI18n();
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
 
@@ -102,22 +90,11 @@ const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const currentLocale = ref<string>(getCurrentLanguageTag());
 const submitting = ref<boolean>(false);
 
-const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
 const allPresetCategories = computed<PartialRecord<CategoryType, LocalizedPresetCategory[]>>(() => getAllTransactionDefaultCategories(props.categoryType, currentLocale.value));
 
 const showState = computed<boolean>({
     get: () => props.show,
     set: (value) => emit('update:show', value)
-});
-
-const currentLanguageName = computed<string>(() => {
-    const languageInfo = getLanguageInfo(currentLocale.value);
-
-    if (!languageInfo) {
-        return '';
-    }
-
-    return languageInfo.displayName;
 });
 
 function getCategoryTypeName(categoryType: CategoryType): string {

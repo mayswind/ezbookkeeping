@@ -135,7 +135,7 @@
                 <select v-model="newProfile.language">
                     <option :value="language.languageTag"
                             :key="language.languageTag"
-                            v-for="language in allLanguages">{{ language.displayName }}</option>
+                            v-for="language in allLanguages">{{ language.nativeDisplayName }}</option>
                 </select>
             </f7-list-item>
 
@@ -407,7 +407,7 @@ const showMoreActionSheet = ref<boolean>(false);
 const currentLanguageName = computed<string>(() => {
     for (let i = 0; i < allLanguages.value.length; i++) {
         if (allLanguages.value[i].languageTag === newProfile.value.language) {
-            return allLanguages.value[i].displayName;
+            return allLanguages.value[i].nativeDisplayName;
         }
     }
 

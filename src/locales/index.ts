@@ -17,6 +17,7 @@ export interface LanguageInfo {
 export interface LanguageOption {
     readonly languageTag: string;
     readonly displayName: string;
+    readonly nativeDisplayName: string;
 }
 
 export const DEFAULT_LANGUAGE: string = 'en';

@@ -71,22 +71,7 @@
                         <v-card-text class="pt-0">
                             <v-row>
                                 <v-col cols="12" class="text-center">
-                                    <v-menu location="bottom">
-                                        <template #activator="{ props }">
-                                            <v-btn variant="text"
-                                                   :disabled="resending"
-                                                   v-bind="props">{{ currentLanguageName }}</v-btn>
-                                        </template>
-                                        <v-list>
-                                            <v-list-item v-for="lang in allLanguages" :key="lang.languageTag">
-                                                <v-list-item-title
-                                                    class="cursor-pointer"
-                                                    @click="changeLanguage(lang.languageTag)">
-                                                    {{ lang.displayName }}
-                                                </v-list-item-title>
-                                            </v-list-item>
-                                        </v-list>
-                                    </v-menu>
+                                    <language-select-button :disabled="resending" />
                                 </v-col>
 
                                 <v-col cols="12" class="d-flex align-center pt-0">
@@ -117,11 +102,9 @@ import { ref, computed, useTemplateRef } from 'vue';
 import { useRouter } from 'vue-router';
 import { useTheme } from 'vuetify';
 
-import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useRootStore } from '@/stores/index.ts';
-import { useSettingsStore } from '@/stores/setting.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
@@ -145,10 +128,9 @@ const props = defineProps<{
 const router = useRouter();
 const theme = useTheme();
 
-const { tt, te, getCurrentLanguageDisplayName, getAllLanguageOptions, setLanguage } = useI18n();
+const { tt, te } = useI18n();
 
 const rootStore = useRootStore();
-const settingsStore = useSettingsStore();
 
 const version = `v${getVersion()}`;
 
@@ -161,9 +143,7 @@ const resending = ref<boolean>(false);
 const verified = ref<boolean>(false);
 const errorMessage = ref<string>('');
 
-const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
-const currentLanguageName = computed<string>(() => getCurrentLanguageDisplayName());
 
 function init(): void {
     verified.value = false;
@@ -208,11 +188,6 @@ function resendEmail(): void {
             snackbar.value?.showError(error);
         }
     });
-}
-
-function changeLanguage(locale: string): void {
-    const localeDefaultSettings = setLanguage(locale);
-    settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 }
 
 function onSnackbarShowStateChanged(newValue: boolean): void {

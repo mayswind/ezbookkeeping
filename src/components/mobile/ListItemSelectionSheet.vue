@@ -14,6 +14,7 @@
                 <f7-list-item link="#" no-chevron
                               :title="ti((titleField ? (item as Record<string, unknown>)[titleField] : item) as string, !!titleI18n)"
                               :value="getItemValue(item, index, valueField, valueType)"
+                              :after="ti((afterField ? (item as Record<string, unknown>)[afterField] : item) as string, !!afterI18n)"
                               :class="{ 'list-item-selected': isSelected(item, index) }"
                               :key="getItemValue(item, index, keyField, valueType)"
                               v-for="(item, index) in items"
@@ -45,6 +46,8 @@ const props = defineProps<{
     valueField?: string; // for value type == item
     titleField: string;
     titleI18n?: boolean;
+    afterField: string;
+    afterI18n?: boolean;
     iconField?: string;
     iconType?: string;
     colorField?: string;

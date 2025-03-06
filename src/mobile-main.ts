@@ -86,6 +86,7 @@ import PinCodeInput from '@/components/common/PinCodeInput.vue';
 import MapView from '@/components/common/MapView.vue';
 
 import ItemIcon from '@/components/mobile/ItemIcon.vue';
+import LanguageSelectButton from '@/components/mobile/LanguageSelectButton.vue';
 import PieChart from '@/components/mobile/PieChart.vue';
 import TrendsBarChart from '@/components/mobile/TrendsBarChart.vue';
 import PinCodeInputSheet from '@/components/mobile/PinCodeInputSheet.vue';
@@ -170,6 +171,7 @@ app.component('PinCodeInput', PinCodeInput);
 app.component('MapView', MapView);
 
 app.component('ItemIcon', ItemIcon);
+app.component('LanguageSelectButton', LanguageSelectButton);
 app.component('PieChart', PieChart);
 app.component('TrendsBarChart', TrendsBarChart);
 app.component('PinCodeInputSheet', PinCodeInputSheet);

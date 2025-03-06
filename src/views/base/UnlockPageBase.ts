@@ -38,11 +38,6 @@ export function useUnlockPageBase() {
         return !!pinCode && pinCode.length === 6;
     }
 
-    function changeLanguage(locale: string): void {
-        const localeDefaultSettings = setLanguage(locale);
-        settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-    }
-
     function doAfterUnlocked(): void {
         transactionsStore.initTransactionDraft();
         tokensStore.refreshTokenAndRevokeOldToken().then(response => {
@@ -82,7 +77,6 @@ export function useUnlockPageBase() {
         isWebAuthnAvailable,
         // methods
         isPinCodeValid,
-        changeLanguage,
         doAfterUnlocked,
         doRelogin
     };

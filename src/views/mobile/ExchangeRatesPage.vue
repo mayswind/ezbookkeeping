@@ -22,9 +22,8 @@
                     </div>
                 </template>
                 <list-item-selection-popup value-type="item"
-                                           value-field="currencyCode"
-                                           title-field="currencyDisplayName"
-                                           after-field="currencyCode"
+                                           key-field="currencyCode" value-field="currencyCode"
+                                           title-field="currencyDisplayName" after-field="currencyCode"
                                            :title="tt('Base Currency')"
                                            :enable-filter="true"
                                            :filter-placeholder="tt('Currency Name')"

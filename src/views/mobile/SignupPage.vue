@@ -86,9 +86,8 @@
                     </f7-block>
                 </template>
                 <list-item-selection-popup value-type="item"
-                                           value-field="currencyCode"
-                                           title-field="displayName"
-                                           after-field="currencyCode"
+                                           key-field="currencyCode" value-field="currencyCode"
+                                           title-field="displayName" after-field="currencyCode"
                                            :title="tt('Default Currency')"
                                            :enable-filter="true"
                                            :filter-placeholder="tt('Currency Name')"
@@ -172,9 +171,8 @@
             </f7-actions>
 
             <list-item-selection-sheet value-type="item"
-                                       value-field="languageTag"
-                                       title-field="nativeDisplayName"
-                                       after-field="displayName"
+                                       key-field="languageTag" value-field="languageTag"
+                                       title-field="nativeDisplayName" after-field="displayName"
                                        :items="allLanguages"
                                        v-model:show="showPresetCategoriesChangeLocaleSheet"
                                        v-model="currentLocale">

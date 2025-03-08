@@ -46,9 +46,8 @@
         </f7-actions>
 
         <list-item-selection-sheet value-type="item"
-                                   value-field="languageTag"
-                                   title-field="nativeDisplayName"
-                                   after-field="displayName"
+                                   key-field="languageTag" value-field="languageTag"
+                                   title-field="nativeDisplayName" after-field="displayName"
                                    :items="allLanguages"
                                    v-model:show="showChangeLocaleSheet"
                                    v-model="currentLocale">

@@ -266,7 +266,7 @@ export const useOverviewStore = defineStore('overview', () => {
         }
 
         const requestParams: TransactionAmountsRequestParams = {
-            useTransactionTimezone: settingsStore.appSettings.timezoneUsedForStatisticsInHomePage == TimezoneTypeForStatistics.TransactionTimezone.type,
+            useTransactionTimezone: settingsStore.appSettings.timezoneUsedForStatisticsInHomePage === TimezoneTypeForStatistics.TransactionTimezone.type,
             today: transactionDataRange.value.today,
             thisWeek: transactionDataRange.value.thisWeek,
             thisMonth: transactionDataRange.value.thisMonth,

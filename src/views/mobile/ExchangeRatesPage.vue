@@ -11,8 +11,9 @@
         <f7-list strong inset dividers class="margin-vertical" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
+                link="#"
                 :header="tt('Base Currency')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Currency Name'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Base Currency'), popupCloseLinkText: tt('Done') }"
+                @click="showBaseCurrencyPopup = true"
             >
                 <template #title>
                     <div class="no-padding no-margin">
@@ -20,11 +21,18 @@
                         <small class="smaller">{{ baseCurrency }}</small>
                     </div>
                 </template>
-                <select v-model="baseCurrency">
-                    <option :value="exchangeRate.currencyCode"
-                            :key="exchangeRate.currencyCode"
-                            v-for="exchangeRate in availableExchangeRates">{{ exchangeRate.currencyDisplayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           value-field="currencyCode"
+                                           title-field="currencyDisplayName"
+                                           after-field="currencyCode"
+                                           :title="tt('Base Currency')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Currency Name')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="availableExchangeRates"
+                                           v-model:show="showBaseCurrencyPopup"
+                                           v-model="baseCurrency">
+                </list-item-selection-popup>
             </f7-list-item>
             <f7-list-item
                 class="currency-base-amount"
@@ -111,6 +119,7 @@ const exchangeRatesStore = useExchangeRatesStore();
 
 const updating = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
+const showBaseCurrencyPopup = ref<boolean>(false);
 const showBaseAmountSheet = ref<boolean>(false);
 
 const displayBaseAmount = computed<string>(() => formatAmount(baseAmount.value, baseCurrency.value));

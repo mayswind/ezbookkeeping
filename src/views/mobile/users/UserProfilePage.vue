@@ -141,8 +141,9 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
+                link="#"
                 :header="tt('Default Currency')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Currency Name'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Default Currency'), popupCloseLinkText: tt('Done') }"
+                @click="showDefaultCurrencyPopup = true"
             >
                 <template #title>
                     <f7-block class="no-padding no-margin">
@@ -150,11 +151,18 @@
                         <small class="smaller">{{ newProfile.defaultCurrency }}</small>
                     </f7-block>
                 </template>
-                <select autocomplete="transaction-currency" v-model="newProfile.defaultCurrency">
-                    <option :value="currency.currencyCode"
-                            :key="currency.currencyCode"
-                            v-for="currency in allCurrencies">{{ currency.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           value-field="currencyCode"
+                                           title-field="displayName"
+                                           after-field="currencyCode"
+                                           :title="tt('Default Currency')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Currency Name')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allCurrencies"
+                                           v-model:show="showDefaultCurrencyPopup"
+                                           v-model="newProfile.defaultCurrency">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item
@@ -402,6 +410,7 @@ const currentPassword = ref<string>('');
 const loadingError = ref<unknown | null>(null);
 const showInputPasswordSheet = ref<boolean>(false);
 const showAccountSheet = ref<boolean>(false);
+const showDefaultCurrencyPopup = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 
 const currentLanguageName = computed<string>(() => {

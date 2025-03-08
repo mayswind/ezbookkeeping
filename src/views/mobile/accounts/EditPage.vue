@@ -155,10 +155,11 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
+                link="#"
                 :class="{ 'disabled': editAccountId }"
                 :header="tt('Currency')"
                 :no-chevron="!!editAccountId"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Currency Name'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Currency Name'), popupCloseLinkText: tt('Done') }"
+                @click="accountContext.showCurrencyPopup = true"
             >
                 <template #title>
                     <div class="no-padding no-margin">
@@ -166,11 +167,18 @@
                         <small class="smaller">{{ account.currency }}</small>
                     </div>
                 </template>
-                <select autocomplete="transaction-currency" v-model="account.currency">
-                    <option :value="currency.currencyCode"
-                            :key="currency.currencyCode"
-                            v-for="currency in allCurrencies">{{ currency.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           value-field="currencyCode"
+                                           title-field="displayName"
+                                           after-field="currencyCode"
+                                           :title="tt('Currency Name')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Currency Name')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allCurrencies"
+                                           v-model:show="accountContext.showCurrencyPopup"
+                                           v-model="account.currency">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item
@@ -398,10 +406,11 @@
 
                 <f7-list-item
                     class="list-item-with-header-and-title list-item-no-item-after"
+                    link="#"
                     :class="{ 'disabled': editAccountId }"
                     :header="tt('Currency')"
                     :no-chevron="!!editAccountId"
-                    smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Currency Name'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Currency Name'), popupCloseLinkText: tt('Done') }"
+                    @click="subAccountContexts[idx].showCurrencyPopup = true"
                 >
                     <template #title>
                         <div class="no-padding no-margin">
@@ -409,11 +418,18 @@
                             <small class="smaller">{{ subAccount.currency }}</small>
                         </div>
                     </template>
-                    <select autocomplete="transaction-currency" v-model="subAccount.currency">
-                        <option :value="currency.currencyCode"
-                                :key="currency.currencyCode"
-                                v-for="currency in allCurrencies">{{ currency.displayName }}</option>
-                    </select>
+                    <list-item-selection-popup value-type="item"
+                                               value-field="currencyCode"
+                                               title-field="displayName"
+                                               after-field="currencyCode"
+                                               :title="tt('Currency Name')"
+                                               :enable-filter="true"
+                                               :filter-placeholder="tt('Currency Name')"
+                                               :filter-no-items-text="tt('No results')"
+                                               :items="allCurrencies"
+                                               v-model:show="subAccountContexts[idx].showCurrencyPopup"
+                                               v-model="subAccount.currency">
+                    </list-item-selection-popup>
                 </f7-list-item>
 
                 <f7-list-item
@@ -516,6 +532,7 @@ import {
 interface AccountContext {
     showIconSelectionSheet: boolean;
     showColorSelectionSheet: boolean;
+    showCurrencyPopup: boolean;
     showBalanceSheet: boolean;
     showBalanceDateTimeSheet: boolean;
     balanceDateTimeSheetMode: string;
@@ -554,6 +571,7 @@ const accountsStore = useAccountsStore();
 const DEFAULT_ACCOUNT_CONTEXT: AccountContext = {
     showIconSelectionSheet: false,
     showColorSelectionSheet: false,
+    showCurrencyPopup: false,
     showBalanceSheet: false,
     showBalanceDateTimeSheet: false,
     balanceDateTimeSheetMode: 'time'

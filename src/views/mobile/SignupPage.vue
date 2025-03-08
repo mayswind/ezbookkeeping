@@ -74,9 +74,10 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
+                link="#"
                 :key="currentLocale + '_currency'"
                 :header="tt('Default Currency')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Currency Name'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Default Currency'), popupCloseLinkText: tt('Done') }"
+                @click="showDefaultCurrencyPopup = true"
             >
                 <template #title>
                     <f7-block class="no-padding no-margin">
@@ -84,11 +85,18 @@
                         <small class="smaller">{{ user.defaultCurrency }}</small>
                     </f7-block>
                 </template>
-                <select autocomplete="transaction-currency" v-model="user.defaultCurrency">
-                    <option :value="currency.currencyCode"
-                            :key="currency.currencyCode"
-                            v-for="currency in allCurrencies">{{ currency.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           value-field="currencyCode"
+                                           title-field="displayName"
+                                           after-field="currencyCode"
+                                           :title="tt('Default Currency')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Currency Name')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allCurrencies"
+                                           v-model:show="showDefaultCurrencyPopup"
+                                           v-model="user.defaultCurrency">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item
@@ -217,6 +225,7 @@ const {
 const rootStore = useRootStore();
 
 const usePresetCategories = ref<boolean>(false);
+const showDefaultCurrencyPopup = ref<boolean>(false);
 const showPresetCategories = ref<boolean>(false);
 const showPresetCategoriesMoreActionSheet = ref<boolean>(false);
 const showPresetCategoriesChangeLocaleSheet = ref<boolean>(false);

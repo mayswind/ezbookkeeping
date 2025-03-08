@@ -129,14 +129,22 @@
         <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
+                link="#"
                 :header="languageTitle"
                 :title="currentLanguageName"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: languageTitle, searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: languageTitle, popupCloseLinkText: tt('Done') }">
-                <select v-model="newProfile.language">
-                    <option :value="language.languageTag"
-                            :key="language.languageTag"
-                            v-for="language in allLanguages">{{ language.nativeDisplayName }}</option>
-                </select>
+                @click="showLanguagePopup = true"
+            >
+                <list-item-selection-popup value-type="item"
+                                           key-field="languageTag" value-field="languageTag"
+                                           title-field="nativeDisplayName" after-field="displayName"
+                                           :title="languageTitle"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Language')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allLanguages"
+                                           v-model:show="showLanguagePopup"
+                                           v-model="newProfile.language">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item
@@ -410,6 +418,7 @@ const currentPassword = ref<string>('');
 const loadingError = ref<unknown | null>(null);
 const showInputPasswordSheet = ref<boolean>(false);
 const showAccountSheet = ref<boolean>(false);
+const showLanguagePopup = ref<boolean>(false);
 const showDefaultCurrencyPopup = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 

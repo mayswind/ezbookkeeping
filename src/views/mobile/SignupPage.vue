@@ -60,22 +60,27 @@
         <f7-list strong inset dividers class="margin-vertical">
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :key="currentLocale + '_lang'"
+                link="#"
                 :header="languageTitle"
                 :title="currentLanguageName"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Language'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: languageTitle, popupCloseLinkText: tt('Done') }"
+                @click="showLanguagePopup = true"
             >
-                <select v-model="currentLocale">
-                    <option :value="lang.languageTag"
-                            :key="lang.languageTag"
-                            v-for="lang in allLanguages">{{ lang.nativeDisplayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           key-field="languageTag" value-field="languageTag"
+                                           title-field="nativeDisplayName" after-field="displayName"
+                                           :title="languageTitle"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Language')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allLanguages"
+                                           v-model:show="showLanguagePopup"
+                                           v-model="currentLocale">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
                 link="#"
-                :key="currentLocale + '_currency'"
                 :header="tt('Default Currency')"
                 @click="showDefaultCurrencyPopup = true"
             >
@@ -100,7 +105,6 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :key="currentLocale + '_firstDayOfWeek'"
                 :header="tt('First Day of Week')"
                 :title="currentDayOfWeekName"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Date'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('First Day of Week'), popupCloseLinkText: tt('Done') }"
@@ -223,6 +227,7 @@ const {
 const rootStore = useRootStore();
 
 const usePresetCategories = ref<boolean>(false);
+const showLanguagePopup = ref<boolean>(false);
 const showDefaultCurrencyPopup = ref<boolean>(false);
 const showPresetCategories = ref<boolean>(false);
 const showPresetCategoriesMoreActionSheet = ref<boolean>(false);

@@ -10,7 +10,7 @@ export function isDefined<T>(val: T | null | undefined): val is T {
 }
 
 export function isObject(val: unknown): val is object {
-    return val != null && typeof(val) === 'object' && !isArray(val);
+    return val !== null && typeof(val) === 'object' && !isArray(val);
 }
 
 export function isArray<T>(val: unknown): val is T[] {

@@ -344,6 +344,7 @@
 import { ref, computed } from 'vue';
 import type { Router } from 'framework7/types';
 
+import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
 import { useUserProfilePageBase } from '@/views/base/users/UserProfilePageBase.ts';
@@ -362,7 +363,7 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getCurrencyName } = useI18n();
+const { tt, getAllLanguageOptions, getCurrencyName } = useI18n();
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
 const {
@@ -371,7 +372,6 @@ const {
     loading,
     resending,
     saving,
-    allLanguages,
     allCurrencies,
     allAccounts,
     allVisibleAccounts,
@@ -412,6 +412,8 @@ const showInputPasswordSheet = ref<boolean>(false);
 const showAccountSheet = ref<boolean>(false);
 const showDefaultCurrencyPopup = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
+
+const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(true));
 
 const currentLanguageName = computed<string>(() => {
     for (let i = 0; i < allLanguages.value.length; i++) {

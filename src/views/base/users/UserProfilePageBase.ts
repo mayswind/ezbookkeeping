@@ -1,6 +1,5 @@
 import { ref, computed } from 'vue';
 
-import { type LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
@@ -23,7 +22,6 @@ export function useUserProfilePageBase() {
         tt,
         getDefaultCurrency,
         getDefaultFirstDayOfWeek,
-        getAllLanguageOptions,
         getAllCurrencies,
         getAllWeekDays,
         getAllLongDateFormats,
@@ -55,7 +53,6 @@ export function useUserProfilePageBase() {
     const resending = ref<boolean>(false);
     const saving = ref<boolean>(false);
 
-    const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(true));
     const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies());
     const allAccounts = computed<Account[]>(() => accountsStore.allPlainAccounts);
     const allVisibleAccounts = computed<Account[]>(() => accountsStore.allVisiblePlainAccounts);
@@ -189,7 +186,6 @@ export function useUserProfilePageBase() {
         resending,
         saving,
         // computed states
-        allLanguages,
         allCurrencies,
         allAccounts,
         allVisibleAccounts,

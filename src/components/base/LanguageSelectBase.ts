@@ -5,22 +5,23 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 
-export interface LanguageSelectButtonBaseProps {
+export interface LanguageSelectBaseProps {
     disabled?: boolean;
+    includeSystemDefault?: boolean;
     useModelValue?: boolean;
     modelValue?: string;
 }
 
-export interface LanguageSelectButtonBaseEmits {
+export interface LanguageSelectBaseEmits {
     (e: 'update:modelValue', value: string): void;
 }
 
-export function useLanguageSelectButtonBase(props: LanguageSelectButtonBaseProps, emit: LanguageSelectButtonBaseEmits) {
+export function useLanguageSelectButtonBase(props: LanguageSelectBaseProps, emit: LanguageSelectBaseEmits) {
     const { getCurrentLanguageTag, getCurrentLanguageDisplayName, getAllLanguageOptions, getLanguageInfo, setLanguage } = useI18n();
 
     const settingsStore = useSettingsStore();
 
-    const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
+    const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(!!props.includeSystemDefault));
 
     const currentLocale = computed<string>({
         get: () => getCurrentLanguageTag(),

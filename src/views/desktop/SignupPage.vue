@@ -90,30 +90,10 @@
 
                                 <v-row>
                                     <v-col cols="12" md="12">
-                                        <v-select
-                                            item-title="nativeDisplayName"
-                                            item-value="languageTag"
-                                            :disabled="submitting || navigateToHomePage"
-                                            :label="languageTitle"
-                                            :placeholder="languageTitle"
-                                            :items="allLanguages"
-                                            v-model="currentLocale"
-                                        >
-                                            <template #item="{ props, item }">
-                                                <v-list-item :value="item.value" v-bind="props">
-                                                    <template #title>
-                                                        <v-list-item-title>
-                                                            <div class="d-flex align-center">
-                                                                <span>{{ item.title }}</span>
-                                                                <v-spacer />
-                                                                <v-icon :icon="mdiCheck" v-if="currentLocale == item.raw.languageTag" />
-                                                                <span class="text-field-append-text" v-if="currentLocale !== item.raw.languageTag">{{ item.raw.displayName }}</span>
-                                                            </div>
-                                                        </v-list-item-title>
-                                                    </template>
-                                                </v-list-item>
-                                            </template>
-                                        </v-select>
+                                        <language-select :disabled="submitting || navigateToHomePage"
+                                                         :label="languageTitle"
+                                                         :placeholder="languageTitle"
+                                                         :use-model-value="true" v-model="currentLocale" />
                                     </v-col>
                                 </v-row>
 
@@ -243,7 +223,6 @@ import { ref, computed, useTemplateRef } from 'vue';
 import { useRouter } from 'vue-router';
 import { useTheme } from 'vuetify';
 
-import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 import { useSignupPageBase } from '@/views/base/SignupPageBase.ts';
 
@@ -269,7 +248,7 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 const router = useRouter();
 const theme = useTheme();
 
-const { tt, getAllLanguageOptions, getAllCurrencies, getAllWeekDays, getAllTransactionDefaultCategories } = useI18n();
+const { tt, getAllCurrencies, getAllWeekDays, getAllTransactionDefaultCategories } = useI18n();
 
 const {
     user,
@@ -291,7 +270,6 @@ const usePresetCategories = ref<boolean>(false);
 const finalResultMessage = ref<string | null>(null);
 const navigateToHomePage = ref<boolean>(false);
 
-const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
 const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies());
 const allWeekDays = computed<TypeAndDisplayName[]>(() => getAllWeekDays());
 const allPresetCategories = computed<PartialRecord<CategoryType, LocalizedPresetCategory[]>>(() => getAllTransactionDefaultCategories(0, currentLocale.value));

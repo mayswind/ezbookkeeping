@@ -18,10 +18,10 @@
 </template>
 
 <script setup lang="ts">
-import { type LanguageSelectButtonBaseProps, type LanguageSelectButtonBaseEmits, useLanguageSelectButtonBase } from '@/components/base/LanguageSelectButtonBase.ts';
+import { type LanguageSelectBaseProps, type LanguageSelectBaseEmits, useLanguageSelectButtonBase } from '@/components/base/LanguageSelectBase.ts';
 
-const props = defineProps<LanguageSelectButtonBaseProps>();
-const emit = defineEmits<LanguageSelectButtonBaseEmits>();
+const props = defineProps<LanguageSelectBaseProps>();
+const emit = defineEmits<LanguageSelectBaseEmits>();
 
 const {
     allLanguages,

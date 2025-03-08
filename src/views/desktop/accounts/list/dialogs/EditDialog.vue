@@ -109,22 +109,10 @@
                                                   v-model="selectedAccount.color" />
                                 </v-col>
                                 <v-col cols="12" :md="currentAccountIndex < 0 && isAccountSupportCreditCardStatementDate ? 6 : 12" v-if="account.type === AccountType.SingleAccount.type || currentAccountIndex >= 0">
-                                    <v-autocomplete
-                                        item-title="displayName"
-                                        item-value="currencyCode"
-                                        auto-select-first
-                                        persistent-placeholder
-                                        :disabled="loading || submitting || !!editAccountId"
-                                        :label="tt('Currency')"
-                                        :placeholder="tt('Currency')"
-                                        :items="allCurrencies"
-                                        :no-data-text="tt('No results')"
-                                        v-model="selectedAccount.currency"
-                                    >
-                                        <template #append-inner>
-                                            <small class="text-field-append-text smaller">{{ selectedAccount.currency }}</small>
-                                        </template>
-                                    </v-autocomplete>
+                                    <currency-select :disabled="loading || submitting || !!editAccountId"
+                                                     :label="tt('Currency')"
+                                                     :placeholder="tt('Currency')"
+                                                     v-model="selectedAccount.currency" />
                                 </v-col>
                                 <v-col cols="12" :md="account.type === AccountType.SingleAccount.type || currentAccountIndex >= 0 ? 6 : 12" v-if="currentAccountIndex < 0 && isAccountSupportCreditCardStatementDate">
                                     <v-autocomplete
@@ -248,7 +236,6 @@ const {
     saveButtonTitle,
     allAccountCategories,
     allAccountTypes,
-    allCurrencies,
     allAvailableMonthDays,
     isAccountSupportCreditCardStatementDate,
     isInputEmpty,

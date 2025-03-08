@@ -506,7 +506,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -515,6 +515,7 @@ import { useAccountEditPageBaseBase } from '@/views/base/accounts/AccountEditPag
 
 import { useAccountsStore } from '@/stores/account.ts';
 
+import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
 import { AccountType } from '@/core/account.ts';
 import { ALL_ACCOUNT_ICONS } from '@/consts/icon.ts';
 import { ALL_ACCOUNT_COLORS } from '@/consts/color.ts';
@@ -543,7 +544,7 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getCurrencyName, formatUnixTimeToLongDate, formatUnixTimeToLongTime, formatAmountWithCurrency } = useI18n();
+const { tt, getAllCurrencies, getCurrencyName, formatUnixTimeToLongDate, formatUnixTimeToLongTime, formatAmountWithCurrency } = useI18n();
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 const {
     editAccountId,
@@ -556,7 +557,6 @@ const {
     saveButtonTitle,
     allAccountCategories,
     allAccountTypes,
-    allCurrencies,
     allAvailableMonthDays,
     isAccountSupportCreditCardStatementDate,
     getAccountCreditCardStatementDate,
@@ -585,6 +585,8 @@ const showAccountCategorySheet = ref<boolean>(false);
 const showAccountTypeSheet = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
+
+const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies());
 
 function formatAccountDisplayBalance(selectedAccount: Account): string {
     const balance = account.value.isLiability ? -selectedAccount.balance : selectedAccount.balance;

@@ -6,7 +6,6 @@ import { useUserStore } from '@/stores/user.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { AccountCategory, AccountType } from '@/core/account.ts';
-import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
 import type { LocalizedAccountCategory } from '@/core/account.ts';
 import { Account } from '@/models/account.ts';
 
@@ -19,7 +18,7 @@ export interface DayAndDisplayName {
 }
 
 export function useAccountEditPageBaseBase() {
-    const { tt, getAllCurrencies, getAllAccountCategories, getAllAccountTypes, getMonthdayShortName } = useI18n();
+    const { tt, getAllAccountCategories, getAllAccountTypes, getMonthdayShortName } = useI18n();
 
     const userStore = useUserStore();
 
@@ -48,7 +47,6 @@ export function useAccountEditPageBaseBase() {
 
     const allAccountCategories = computed<LocalizedAccountCategory[]>(() => getAllAccountCategories());
     const allAccountTypes = computed<TypeAndDisplayName[]>(() => getAllAccountTypes());
-    const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies());
 
     const allAvailableMonthDays = computed<DayAndDisplayName[]>(() => {
         const allAvailableDays: DayAndDisplayName[] = [];
@@ -171,7 +169,6 @@ export function useAccountEditPageBaseBase() {
         saveButtonTitle,
         allAccountCategories,
         allAccountTypes,
-        allCurrencies,
         allAvailableMonthDays,
         isAccountSupportCreditCardStatementDate,
         // functions

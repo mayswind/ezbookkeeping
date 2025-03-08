@@ -353,6 +353,8 @@ import { useRootStore } from '@/stores/index.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 
+import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
+
 import type { UserProfileResponse } from '@/models/user.ts';
 import { Account } from '@/models/account.ts';
 
@@ -363,7 +365,7 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getAllLanguageOptions, getCurrencyName } = useI18n();
+const { tt, getAllLanguageOptions, getAllCurrencies, getCurrencyName } = useI18n();
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
 const {
@@ -372,7 +374,6 @@ const {
     loading,
     resending,
     saving,
-    allCurrencies,
     allAccounts,
     allVisibleAccounts,
     allVisibleCategorizedAccounts,
@@ -414,6 +415,7 @@ const showDefaultCurrencyPopup = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 
 const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(true));
+const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies());
 
 const currentLanguageName = computed<string>(() => {
     for (let i = 0; i < allLanguages.value.length; i++) {

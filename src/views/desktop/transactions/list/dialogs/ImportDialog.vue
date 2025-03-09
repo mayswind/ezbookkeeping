@@ -245,7 +245,7 @@
                             <a :href="exportFileGuideDocumentUrl" :class="{ 'disabled': submitting }" target="_blank">
                                 <v-icon :icon="mdiHelpCircleOutline" size="16" />
                                 <span class="ml-1">{{ tt('How to export this file?') }}</span>
-                                <span class="ml-1" v-if="exportFileGuideDocumentLanguageName">({{ exportFileGuideDocumentLanguageName }})</span>
+                                <span class="ml-1" v-if="exportFileGuideDocumentLanguageName">[{{ exportFileGuideDocumentLanguageName }}]</span>
                             </a>
                         </v-col>
                     </v-row>

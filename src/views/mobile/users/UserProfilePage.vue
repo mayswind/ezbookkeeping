@@ -171,7 +171,7 @@
                                            title-field="displayName" after-field="currencyCode"
                                            :title="tt('Default Currency')"
                                            :enable-filter="true"
-                                           :filter-placeholder="tt('Currency Name')"
+                                           :filter-placeholder="tt('Currency')"
                                            :filter-no-items-text="tt('No results')"
                                            :items="allCurrencies"
                                            v-model:show="showDefaultCurrencyPopup"

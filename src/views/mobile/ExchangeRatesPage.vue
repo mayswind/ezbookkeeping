@@ -26,7 +26,7 @@
                                            title-field="currencyDisplayName" after-field="currencyCode"
                                            :title="tt('Base Currency')"
                                            :enable-filter="true"
-                                           :filter-placeholder="tt('Currency Name')"
+                                           :filter-placeholder="tt('Currency')"
                                            :filter-no-items-text="tt('No results')"
                                            :items="availableExchangeRates"
                                            v-model:show="showBaseCurrencyPopup"

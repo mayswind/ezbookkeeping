@@ -59,7 +59,7 @@
                                                 {{ tt('Import') }}
                                             </v-btn>
                                             <v-btn density="compact" color="default" variant="text" size="24"
-                                                   class="ml-2" :icon="true" :loading="loading" @click="reload">
+                                                   class="ml-2" :icon="true" :loading="loading" @click="reload(true, false)">
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
                                                 </template>
@@ -604,6 +604,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { type TransactionMonthList, useTransactionsStore } from '@/stores/transaction.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import {
@@ -757,6 +758,7 @@ const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
 const transactionsStore = useTransactionsStore();
 const transactionTemplatesStore = useTransactionTemplatesStore();
+const desktopPageStore = useDesktopPageStore();
 
 const tagFilterIconMap: Record<number, string> = {
     [TransactionTagFilterType.HasAny.type]: mdiPlusBoxMultipleOutline,
@@ -927,7 +929,7 @@ const countPerPage = computed<number>({
         temporaryCountPerPage.value = value;
 
         if (!queryMonthlyData.value) {
-            reload(false);
+            reload(false, false);
         }
     }
 });
@@ -940,7 +942,7 @@ const paginationCurrentPage = computed<number>({
         currentPage.value = value;
 
         if (!queryMonthlyData.value) {
-            reload(false);
+            reload(false, false);
         }
     }
 });
@@ -1038,7 +1040,7 @@ function init(initProps: TransactionListProps): void {
     currentAmountFilterType.value = '';
 
     currentPage.value = 1;
-    reload(false);
+    reload(false, true);
 
     transactionTemplatesStore.loadAllTemplates({
         templateType: TemplateType.Normal.type,
@@ -1046,7 +1048,7 @@ function init(initProps: TransactionListProps): void {
     });
 }
 
-function reload(force: boolean): void {
+function reload(force: boolean, init: boolean): void {
     loading.value = true;
 
     const page = currentPage.value;
@@ -1056,6 +1058,13 @@ function reload(force: boolean): void {
         transactionCategoriesStore.loadAllCategories({ force: false }),
         transactionTagsStore.loadAllTags({ force: false })
     ]).then(() => {
+        if (init) {
+            if (desktopPageStore.showAddTransactionDialogInTransactionList) {
+                desktopPageStore.resetShowAddTransactionDialogInTransactionList();
+                add();
+            }
+        }
+
         if (queryMonthlyData.value) {
             const currentMonthMinDate = parseDateFromUnixTime(query.value.minTime);
             const currentYear = getYear(currentMonthMinDate);
@@ -1352,7 +1361,7 @@ function add(template?: TransactionTemplate): void {
             snackbar.value?.showMessage(result.message);
         }
 
-        reload(false);
+        reload(false, false);
     }).catch(error => {
         if (error) {
             snackbar.value?.showError(error);
@@ -1362,7 +1371,7 @@ function add(template?: TransactionTemplate): void {
 
 function importTransaction(): void {
     importDialog.value?.open().then(() => {
-        reload(false);
+        reload(false, false);
     }).catch(error => {
         if (error) {
             snackbar.value?.showError(error);
@@ -1383,7 +1392,7 @@ function show(transaction: Transaction): void {
             snackbar.value?.showMessage(result.message);
         }
 
-        reload(false);
+        reload(false, false);
     }).catch(error => {
         if (error) {
             snackbar.value?.showError(error);
@@ -1478,6 +1487,13 @@ watch(() => display.mdAndUp.value, (newValue) => {
 
     if (!showNav.value) {
         showNav.value = newValue;
+    }
+});
+
+watch(() => desktopPageStore.showAddTransactionDialogInTransactionList, (newValue) => {
+    if (newValue) {
+        desktopPageStore.resetShowAddTransactionDialogInTransactionList();
+        add();
     }
 });
 

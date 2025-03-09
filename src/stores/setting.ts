@@ -54,6 +54,11 @@ export const useSettingsStore = defineStore('settings', () => {
         appSettings.value.autoGetCurrentGeoLocation = value;
     }
 
+    function setShowAddTransactionButtonInDesktopNavbar(value: boolean): void {
+        updateApplicationSettingsValue('showAddTransactionButtonInDesktopNavbar', value);
+        appSettings.value.showAddTransactionButtonInDesktopNavbar = value;
+    }
+
     function setShowAmountInHomePage(value: boolean): void {
         updateApplicationSettingsValue('showAmountInHomePage', value);
         appSettings.value.showAmountInHomePage = value;
@@ -166,6 +171,7 @@ export const useSettingsStore = defineStore('settings', () => {
         setAutoUpdateExchangeRatesData,
         setAutoSaveTransactionDraft,
         setAutoGetCurrentGeoLocation,
+        setShowAddTransactionButtonInDesktopNavbar,
         setShowAmountInHomePage,
         setTimezoneUsedForStatisticsInHomePage,
         setItemsCountInTransactionListPage,

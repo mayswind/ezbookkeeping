@@ -61,6 +61,28 @@
         </v-col>
 
         <v-col cols="12">
+            <v-card :title="tt('Navigation Bar')">
+                <v-form>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="value"
+                                    persistent-placeholder
+                                    :label="tt('Show Add Transaction Button')"
+                                    :placeholder="tt('Show Add Transaction Button')"
+                                    :items="enableDisableOptions"
+                                    v-model="showAddTransactionButtonInDesktopNavbar"
+                                />
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-form>
+            </v-card>
+        </v-col>
+
+        <v-col cols="12">
             <v-card :title="tt('Overview Page')">
                 <v-form>
                     <v-card-text>
@@ -246,5 +268,10 @@ const currentTheme = computed<string>({
             }
         }
     }
+});
+
+const showAddTransactionButtonInDesktopNavbar = computed<boolean>({
+    get: () => settingsStore.appSettings.showAddTransactionButtonInDesktopNavbar,
+    set: (value) => settingsStore.setShowAddTransactionButtonInDesktopNavbar(value)
 });
 </script>

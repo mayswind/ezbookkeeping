@@ -29,7 +29,13 @@
                 <li class="nav-link">
                     <router-link to="/transaction/list?dateType=7">
                         <v-icon class="nav-item-icon" :icon="mdiListBoxOutline"/>
-                        <span class="nav-item-title">{{ tt('Transaction Details') }}</span>
+                        <span class="nav-item-title d-inline-block">{{ tt('Transaction Details') }}</span>
+                        <v-btn density="compact" color="secondary" variant="text" size="22"
+                               class="ml-1" :icon="true" v-if="showAddTransactionButtonInDesktopNavbar"
+                               @click="showAddDialogInTransactionListPage">
+                            <v-icon :icon="mdiPlusCircle" size="22" />
+                            <v-tooltip activator="parent">{{ tt('Add Transaction') }}</v-tooltip>
+                        </v-btn>
                     </router-link>
                 </li>
                 <li class="nav-link">
@@ -204,6 +210,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useRootStore } from '@/stores/index.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
@@ -214,6 +221,7 @@ import {
     mdiMenu,
     mdiHomeOutline,
     mdiListBoxOutline,
+    mdiPlusCircle,
     mdiCreditCardOutline,
     mdiViewDashboardOutline,
     mdiTagOutline,
@@ -245,6 +253,7 @@ const { tt, initLocale } = useI18n();
 const rootStore = useRootStore();
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
+const desktopPageStore = useDesktopPageStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
@@ -277,6 +286,7 @@ const currentTheme = computed<string>({
     }
 });
 
+const showAddTransactionButtonInDesktopNavbar = computed<boolean>(() => settingsStore.appSettings.showAddTransactionButtonInDesktopNavbar);
 const isEnableApplicationLock = computed<boolean>(() => settingsStore.appSettings.applicationLock);
 
 function handleNavScroll(e: Event): void {
@@ -312,6 +322,10 @@ function logout(): void {
             snackbar.value?.showError(error);
         }
     });
+}
+
+function showAddDialogInTransactionListPage(): void {
+    desktopPageStore.setShowAddTransactionDialogInTransactionList();
 }
 </script>
 

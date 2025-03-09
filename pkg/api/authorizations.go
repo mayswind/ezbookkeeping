@@ -5,6 +5,7 @@ import (
 
 	"github.com/mayswind/ezbookkeeping/pkg/avatars"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -15,6 +16,7 @@ import (
 // AuthorizationsApi represents authorization api
 type AuthorizationsApi struct {
 	ApiUsingConfig
+	ApiUsingDuplicateChecker
 	ApiWithUserInfo
 	users                   *services.UserService
 	tokens                  *services.TokenService
@@ -26,6 +28,12 @@ var (
 	Authorizations = &AuthorizationsApi{
 		ApiUsingConfig: ApiUsingConfig{
 			container: settings.Container,
+		},
+		ApiUsingDuplicateChecker: ApiUsingDuplicateChecker{
+			ApiUsingConfig: ApiUsingConfig{
+				container: settings.Container,
+			},
+			container: duplicatechecker.Container,
 		},
 		ApiWithUserInfo: ApiWithUserInfo{
 			ApiUsingConfig: ApiUsingConfig{
@@ -51,7 +59,23 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.WebContext) (any, *errs.Err
 		return nil, errs.ErrLoginNameOrPasswordInvalid
 	}
 
-	user, err := a.users.GetUserByUsernameOrEmailAndPassword(c, credential.LoginName, credential.Password)
+	err = a.CheckFailureCount(c, 0)
+
+	if err != nil {
+		log.Warnf(c, "[authorizations.AuthorizeHandler] cannot login for user \"%s\", because %s", credential.LoginName, err.Error())
+		return nil, errs.Or(err, errs.ErrFailureCountLimitReached)
+	}
+
+	user, uid, err := a.users.GetUserByUsernameOrEmailAndPassword(c, credential.LoginName, credential.Password)
+
+	if errs.IsCustomError(err) {
+		failureCheckErr := a.CheckAndIncreaseFailureCount(c, uid)
+
+		if failureCheckErr != nil {
+			log.Warnf(c, "[authorizations.AuthorizeHandler] cannot login for user \"%s\", because %s", credential.LoginName, failureCheckErr.Error())
+			return nil, errs.Or(failureCheckErr, errs.ErrFailureCountLimitReached)
+		}
+	}
 
 	if err != nil {
 		log.Warnf(c, "[authorizations.AuthorizeHandler] login failed for user \"%s\", because %s", credential.LoginName, err.Error())
@@ -133,6 +157,13 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.WebContext) (any, 
 	}
 
 	uid := c.GetCurrentUid()
+	err = a.CheckFailureCount(c, uid)
+
+	if err != nil {
+		log.Warnf(c, "[authorizations.TwoFactorAuthorizeHandler] cannot auth for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrFailureCountLimitReached)
+	}
+
 	twoFactorSetting, err := a.twoFactorAuthorizations.GetUserTwoFactorSettingByUid(c, uid)
 
 	if err != nil {
@@ -142,6 +173,14 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.WebContext) (any, 
 
 	if !totp.Validate(credential.Passcode, twoFactorSetting.Secret) {
 		log.Warnf(c, "[authorizations.TwoFactorAuthorizeHandler] passcode is invalid for user \"uid:%d\"", uid)
+
+		err = a.CheckAndIncreaseFailureCount(c, uid)
+
+		if err != nil {
+			log.Warnf(c, "[authorizations.TwoFactorAuthorizeHandler] cannot auth for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.Or(err, errs.ErrFailureCountLimitReached)
+		}
+
 		return nil, errs.ErrPasscodeInvalid
 	}
 
@@ -196,6 +235,13 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.WebC
 	}
 
 	uid := c.GetCurrentUid()
+	err = a.CheckFailureCount(c, uid)
+
+	if err != nil {
+		log.Warnf(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] cannot auth for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrFailureCountLimitReached)
+	}
+
 	enableTwoFactor, err := a.twoFactorAuthorizations.ExistsTwoFactorSetting(c, uid)
 
 	if err != nil {
@@ -225,6 +271,15 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.WebC
 	}
 
 	err = a.twoFactorAuthorizations.GetAndUseUserTwoFactorRecoveryCode(c, uid, credential.RecoveryCode, user.Salt)
+
+	if errs.IsCustomError(err) {
+		failureCheckErr := a.CheckAndIncreaseFailureCount(c, uid)
+
+		if failureCheckErr != nil {
+			log.Warnf(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] cannot auth for user \"uid:%d\", because %s", uid, failureCheckErr.Error())
+			return nil, errs.Or(failureCheckErr, errs.ErrFailureCountLimitReached)
+		}
+	}
 
 	if err != nil {
 		log.Warnf(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] failed to get two-factor recovery code for user \"uid:%d\", because %s", uid, err.Error())

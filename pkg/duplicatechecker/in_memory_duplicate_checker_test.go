@@ -155,3 +155,77 @@ func TestGetOrSetRunningInfoConcurrent(t *testing.T) {
 
 	assert.Equal(t, uint32(999), setRunningInfoCount.Load())
 }
+
+func TestGetFailureCount(t *testing.T) {
+	checker, _ := NewInMemoryDuplicateChecker(&settings.Config{
+		DuplicateSubmissionsIntervalDuration:            time.Second,
+		InMemoryDuplicateCheckerCleanupIntervalDuration: time.Second,
+	})
+
+	failureKey := "127.0.0.1"
+
+	failureCount := checker.GetFailureCount(failureKey)
+	assert.Equal(t, uint32(0), failureCount)
+
+	failureCount = checker.IncreaseFailureCount(failureKey)
+	assert.Equal(t, uint32(1), failureCount)
+
+	failureCount = checker.GetFailureCount(failureKey)
+	assert.Equal(t, uint32(1), failureCount)
+}
+
+func TestIncreaseFailureCount(t *testing.T) {
+	checker, _ := NewInMemoryDuplicateChecker(&settings.Config{
+		DuplicateSubmissionsIntervalDuration:            time.Second,
+		InMemoryDuplicateCheckerCleanupIntervalDuration: time.Second,
+	})
+
+	failureKey := "127.0.0.1"
+
+	failureCount := checker.IncreaseFailureCount(failureKey)
+	assert.Equal(t, uint32(1), failureCount)
+
+	failureCount = checker.GetFailureCount(failureKey)
+	assert.Equal(t, uint32(1), failureCount)
+
+	failureCount = checker.IncreaseFailureCount(failureKey)
+	assert.Equal(t, uint32(2), failureCount)
+
+	failureCount = checker.GetFailureCount(failureKey)
+	assert.Equal(t, uint32(2), failureCount)
+
+	failureCount = checker.IncreaseFailureCount(failureKey)
+	assert.Equal(t, uint32(3), failureCount)
+
+	failureCount = checker.GetFailureCount(failureKey)
+	assert.Equal(t, uint32(3), failureCount)
+}
+
+func TestIncreaseFailureCountConcurrent(t *testing.T) {
+	checker, _ := NewInMemoryDuplicateChecker(&settings.Config{
+		DuplicateSubmissionsIntervalDuration:            time.Second,
+		InMemoryDuplicateCheckerCleanupIntervalDuration: time.Second,
+	})
+
+	failureKey := "127.0.0.1"
+
+	concurrentCount := 10
+	var waitGroup sync.WaitGroup
+
+	for routineIndex := 0; routineIndex < concurrentCount; routineIndex++ {
+		waitGroup.Add(1)
+
+		go func(currentRoutineIndex int) {
+			for cycle := 0; cycle < 10; cycle++ {
+				checker.IncreaseFailureCount(failureKey)
+			}
+
+			waitGroup.Done()
+		}(routineIndex)
+	}
+
+	waitGroup.Wait()
+
+	failureCount := checker.GetFailureCount(failureKey)
+	assert.Equal(t, uint32(100), failureCount)
+}

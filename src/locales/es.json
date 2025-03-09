@@ -1167,7 +1167,8 @@
         "number invalid": "El número no es válido",
         "no files uploaded": "No se subieron archivos",
         "uploaded file is empty": "El archivo subido está vacío",
-        "uploaded file size exceeds the maximum allowed size": "El tamaño del archivo cargado excede el tamaño máximo permitido"
+        "uploaded file size exceeds the maximum allowed size": "El tamaño del archivo cargado excede el tamaño máximo permitido",
+        "failure count exceeded maximum limit": "Failure count exceeded maximum limit, please try again after some time"
     },
     "parameter": {
         "id": "IDENTIFICACIÓN",

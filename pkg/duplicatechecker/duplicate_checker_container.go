@@ -48,3 +48,13 @@ func (c *DuplicateCheckerContainer) GetOrSetCronJobRunningInfo(jobName string, r
 func (c *DuplicateCheckerContainer) RemoveCronJobRunningInfo(jobName string) {
 	c.Current.RemoveCronJobRunningInfo(jobName)
 }
+
+// GetFailureCount returns the failure count of the specified failure key
+func (c *DuplicateCheckerContainer) GetFailureCount(failureKey string) uint32 {
+	return c.Current.GetFailureCount(failureKey)
+}
+
+// IncreaseFailureCount increases the failure count of the specified failure key
+func (c *DuplicateCheckerContainer) IncreaseFailureCount(failureKey string) uint32 {
+	return c.Current.IncreaseFailureCount(failureKey)
+}

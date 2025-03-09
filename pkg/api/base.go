@@ -5,9 +5,13 @@ import (
 	"sort"
 
 	"github.com/mayswind/ezbookkeeping/pkg/avatars"
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 const internalTransactionPictureUrlFormat = "%spictures/%d.%s"
@@ -100,6 +104,7 @@ func (a *ApiUsingConfig) GetAfterOpenNotificationContent(userLanguage string, cl
 
 // ApiUsingDuplicateChecker represents an api that need to use duplicate checker
 type ApiUsingDuplicateChecker struct {
+	ApiUsingConfig
 	container *duplicatechecker.DuplicateCheckerContainer
 }
 
@@ -111,6 +116,67 @@ func (a *ApiUsingDuplicateChecker) GetSubmissionRemark(checkerType duplicatechec
 // SetSubmissionRemark saves the identification and remark to in-memory cache by the current duplicate checker
 func (a *ApiUsingDuplicateChecker) SetSubmissionRemark(checkerType duplicatechecker.DuplicateCheckerType, uid int64, identification string, remark string) {
 	a.container.SetSubmissionRemark(checkerType, uid, identification, remark)
+}
+
+// CheckFailureCount returns whether the failure count of the specified IP and user has reached the limit and increases the failure count
+func (a *ApiUsingDuplicateChecker) CheckFailureCount(c *core.WebContext, uid int64) error {
+	if a.CurrentConfig().MaxFailuresPerIpPerMinute > 0 {
+		clientIp := c.ClientIP()
+		ipFailureCount := a.container.GetFailureCount(clientIp)
+
+		if ipFailureCount >= a.CurrentConfig().MaxFailuresPerIpPerMinute {
+			log.Warnf(c, "[base.CheckFailureCount] operation failure via IP \"%s\", current failure count: %d reached the limit", clientIp, ipFailureCount)
+			return errs.ErrFailureCountLimitReached
+		}
+	}
+
+	if a.CurrentConfig().MaxFailuresPerUserPerMinute > 0 && uid > 0 {
+		uidFailureCount := a.container.GetFailureCount(utils.Int64ToString(uid))
+
+		if uidFailureCount >= a.CurrentConfig().MaxFailuresPerUserPerMinute {
+			log.Warnf(c, "[base.CheckFailureCount] operation failure via uid \"%d\", current failure count: %d reached the limit", uid, uidFailureCount)
+			return errs.ErrFailureCountLimitReached
+		}
+	}
+
+	return nil
+}
+
+// CheckAndIncreaseFailureCount returns whether the failure count of the specified IP and user has reached the limit and increases the failure count
+func (a *ApiUsingDuplicateChecker) CheckAndIncreaseFailureCount(c *core.WebContext, uid int64) error {
+	clientIp := c.ClientIP()
+	ipFailureCount := uint32(0)
+	uidFailureCount := uint32(0)
+
+	if a.CurrentConfig().MaxFailuresPerIpPerMinute > 0 {
+		ipFailureCount = a.container.GetFailureCount(clientIp)
+	}
+
+	if a.CurrentConfig().MaxFailuresPerUserPerMinute > 0 && uid > 0 {
+		uidFailureCount = a.container.GetFailureCount(utils.Int64ToString(uid))
+	}
+
+	if a.CurrentConfig().MaxFailuresPerIpPerMinute > 0 && ipFailureCount < a.CurrentConfig().MaxFailuresPerIpPerMinute {
+		log.Warnf(c, "[base.CheckAndIncreaseFailureCount] operation failure via IP \"%s\", previous failure count: %d", clientIp, ipFailureCount)
+		a.container.IncreaseFailureCount(clientIp)
+	}
+
+	if a.CurrentConfig().MaxFailuresPerUserPerMinute > 0 && uid > 0 && uidFailureCount < a.CurrentConfig().MaxFailuresPerUserPerMinute {
+		log.Warnf(c, "[base.CheckAndIncreaseFailureCount] operation failure via uid \"%d\", previous failure count: %d", uid, uidFailureCount)
+		a.container.IncreaseFailureCount(utils.Int64ToString(uid))
+	}
+
+	if a.CurrentConfig().MaxFailuresPerIpPerMinute > 0 && ipFailureCount >= a.CurrentConfig().MaxFailuresPerIpPerMinute {
+		log.Warnf(c, "[base.CheckAndIncreaseFailureCount] operation failure via IP \"%s\", current failure count: %d reached the limit", clientIp, ipFailureCount)
+		return errs.ErrFailureCountLimitReached
+	}
+
+	if a.CurrentConfig().MaxFailuresPerUserPerMinute > 0 && uid > 0 && uidFailureCount >= a.CurrentConfig().MaxFailuresPerUserPerMinute {
+		log.Warnf(c, "[base.CheckAndIncreaseFailureCount] operation failure via uid \"%d\", current failure count: %d reached the limit", uid, uidFailureCount)
+		return errs.ErrFailureCountLimitReached
+	}
+
+	return nil
 }
 
 // ApiUsingAvatarProvider represents an api that need to use avatar provider

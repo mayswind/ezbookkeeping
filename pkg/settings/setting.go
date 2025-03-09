@@ -144,6 +144,8 @@ const (
 	defaultTemporaryTokenExpiredTime     uint32 = 300     // 5 minutes
 	defaultEmailVerifyTokenExpiredTime   uint32 = 3600    // 60 minutes
 	defaultPasswordResetTokenExpiredTime uint32 = 3600    // 60 minutes
+	defaultMaxFailuresPerIpPerMinute     uint32 = 5
+	defaultMaxFailuresPerUserPerMinute   uint32 = 5
 
 	defaultTransactionPictureFileMaxSize uint32 = 10485760 // 10MB
 	defaultUserAvatarFileMaxSize         uint32 = 1048576  // 1MB
@@ -286,6 +288,8 @@ type Config struct {
 	EmailVerifyTokenExpiredTimeDuration   time.Duration
 	PasswordResetTokenExpiredTime         uint32
 	PasswordResetTokenExpiredTimeDuration time.Duration
+	MaxFailuresPerIpPerMinute             uint32
+	MaxFailuresPerUserPerMinute           uint32
 	EnableRequestIdHeader                 bool
 
 	// User
@@ -767,6 +771,9 @@ func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName
 	}
 
 	config.PasswordResetTokenExpiredTimeDuration = time.Duration(config.PasswordResetTokenExpiredTime) * time.Second
+
+	config.MaxFailuresPerIpPerMinute = getConfigItemUint32Value(configFile, sectionName, "max_failures_per_ip_per_minute", defaultMaxFailuresPerIpPerMinute)
+	config.MaxFailuresPerUserPerMinute = getConfigItemUint32Value(configFile, sectionName, "max_failures_per_user_per_minute", defaultMaxFailuresPerUserPerMinute)
 
 	config.EnableRequestIdHeader = getConfigItemBoolValue(configFile, sectionName, "request_id_header", true)
 

@@ -58,7 +58,7 @@ var (
 )
 
 // GetUserByUsernameOrEmailAndPassword returns the user model according to login name and password
-func (s *UserService) GetUserByUsernameOrEmailAndPassword(c core.Context, loginname string, password string) (*models.User, error) {
+func (s *UserService) GetUserByUsernameOrEmailAndPassword(c core.Context, loginname string, password string) (*models.User, int64, error) {
 	var user *models.User
 	var err error
 
@@ -71,14 +71,18 @@ func (s *UserService) GetUserByUsernameOrEmailAndPassword(c core.Context, loginn
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, 0, err
+	}
+
+	if user == nil {
+		return nil, 0, errs.ErrUserNotFound
 	}
 
 	if !s.IsPasswordEqualsUserPassword(password, user) {
-		return nil, errs.ErrUserPasswordWrong
+		return nil, user.Uid, errs.ErrUserPasswordWrong
 	}
 
-	return user, nil
+	return user, user.Uid, nil
 }
 
 // GetUserById returns the user model according to user uid

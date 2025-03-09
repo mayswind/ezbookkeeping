@@ -1167,7 +1167,8 @@
         "number invalid": "Số không hợp lệ",
         "no files uploaded": "Không có tệp nào được tải lên",
         "uploaded file is empty": "Tệp đã tải lên trống",
-        "uploaded file size exceeds the maximum allowed size": "Kích thước tệp đã tải lên vượt quá kích thước tối đa cho phép"
+        "uploaded file size exceeds the maximum allowed size": "Kích thước tệp đã tải lên vượt quá kích thước tối đa cho phép",
+        "failure count exceeded maximum limit": "Failure count exceeded maximum limit, please try again after some time"
     },
     "parameter": {
         "id": "ID",

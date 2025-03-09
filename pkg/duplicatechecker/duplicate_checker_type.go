@@ -12,4 +12,5 @@ const (
 	DUPLICATE_CHECKER_TYPE_NEW_TEMPLATE        DuplicateCheckerType = 4
 	DUPLICATE_CHECKER_TYPE_NEW_PICTURE         DuplicateCheckerType = 5
 	DUPLICATE_CHECKER_TYPE_IMPORT_TRANSACTIONS DuplicateCheckerType = 6
+	DUPLICATE_CHECKER_TYPE_FAILURE_CHECK       DuplicateCheckerType = 255
 )

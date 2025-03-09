@@ -69,6 +69,34 @@ func (c *InMemoryDuplicateChecker) RemoveCronJobRunningInfo(jobName string) {
 	c.cache.Delete(c.getCacheKey(DUPLICATE_CHECKER_TYPE_BACKGROUND_CRON_JOB, 0, jobName))
 }
 
+// GetFailureCount returns the failure count of the specified failure key
+func (c *InMemoryDuplicateChecker) GetFailureCount(failureKey string) uint32 {
+	existedFailureCount, found := c.cache.Get(c.getCacheKey(DUPLICATE_CHECKER_TYPE_FAILURE_CHECK, 0, failureKey))
+
+	if found {
+		return existedFailureCount.(uint32)
+	}
+
+	return 0
+}
+
+// IncreaseFailureCount increases the failure count of the specified failure key
+func (c *InMemoryDuplicateChecker) IncreaseFailureCount(failureKey string) uint32 {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	cacheKey := c.getCacheKey(DUPLICATE_CHECKER_TYPE_FAILURE_CHECK, 0, failureKey)
+	_, found := c.cache.Get(cacheKey)
+
+	if found {
+		failureCount, _ := c.cache.IncrementUint32(cacheKey, uint32(1))
+		return failureCount
+	} else {
+		c.cache.Set(cacheKey, uint32(1), 1*time.Minute)
+		return 1
+	}
+}
+
 func (c *InMemoryDuplicateChecker) getCacheKey(checkerType DuplicateCheckerType, uid int64, identification string) string {
 	return fmt.Sprintf("%d|%d|%s", checkerType, uid, identification)
 }

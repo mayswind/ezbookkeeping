@@ -43,6 +43,9 @@ var (
 			container: settings.Container,
 		},
 		ApiUsingDuplicateChecker: ApiUsingDuplicateChecker{
+			ApiUsingConfig: ApiUsingConfig{
+				container: settings.Container,
+			},
 			container: duplicatechecker.Container,
 		},
 		transactions:          services.Transactions,

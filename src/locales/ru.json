@@ -1167,7 +1167,8 @@
         "number invalid": "Число недействительно",
         "no files uploaded": "Файлы не загружены",
         "uploaded file is empty": "Загруженный файл пуст",
-        "uploaded file size exceeds the maximum allowed size": "Размер загруженного файла превышает максимально допустимый размер"
+        "uploaded file size exceeds the maximum allowed size": "Размер загруженного файла превышает максимально допустимый размер",
+        "failure count exceeded maximum limit": "Failure count exceeded maximum limit, please try again after some time"
     },
     "parameter": {
         "id": "ID",

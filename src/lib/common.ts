@@ -1,4 +1,4 @@
-import type { TypeAndName, TypeAndDisplayName } from '@/core/base.ts';
+import type { NameValue, TypeAndName, TypeAndDisplayName} from '@/core/base.ts';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function isFunction(val: unknown): val is Function {
@@ -297,6 +297,16 @@ export function getItemByKeyValue<T>(src: Record<string, T>[] | Record<string, R
             if (item[keyField] === value) {
                 return item;
             }
+        }
+    }
+
+    return null;
+}
+
+export function findNameByValue(items: NameValue[], value: string): string | null {
+    for (const item of items) {
+        if (item.value === value) {
+            return item.name;
         }
     }
 

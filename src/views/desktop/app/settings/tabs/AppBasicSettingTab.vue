@@ -7,16 +7,12 @@
                         <v-row>
                             <v-col cols="12" md="6">
                                 <v-select
-                                    item-title="displayName"
+                                    item-title="name"
                                     item-value="value"
                                     persistent-placeholder
                                     :label="tt('Theme')"
                                     :placeholder="tt('Theme')"
-                                    :items="[
-                                        { value: 'auto', displayName: tt('System Default') },
-                                        { value: 'light', displayName: tt('Light') },
-                                        { value: 'dark', displayName: tt('Dark') }
-                                    ]"
+                                    :items="allThemes"
                                     v-model="currentTheme"
                                 />
                             </v-col>
@@ -147,16 +143,12 @@
                         <v-row>
                             <v-col cols="12" md="6">
                                 <v-select
-                                    item-title="displayName"
+                                    item-title="name"
                                     item-value="value"
                                     persistent-placeholder
                                     :label="tt('Automatically Save Draft')"
                                     :placeholder="tt('Automatically Save Draft')"
-                                    :items="[
-                                        { value: 'disabled', displayName: tt('Disabled') },
-                                        { value: 'enabled', displayName: tt('Enabled') },
-                                        { value: 'confirmation', displayName: tt('Show Confirmation Every Time') }
-                                    ]"
+                                    :items="allAutoSaveTransactionDraftTypes"
                                     v-model="autoSaveTransactionDraft"
                                 />
                             </v-col>
@@ -219,9 +211,11 @@ const theme = useTheme();
 
 const { tt, getAllEnableDisableOptions } = useI18n();
 const {
+    allThemes,
     allTimezones,
     allTimezoneTypesUsedForStatistics,
     allCurrencySortingTypes,
+    allAutoSaveTransactionDraftTypes,
     timeZone,
     isAutoUpdateExchangeRatesData,
     showAccountBalance,

@@ -24,7 +24,6 @@ import Framework7Checkbox from 'framework7/components/checkbox';
 import Framework7Radio from 'framework7/components/radio';
 import Framework7Toggle from 'framework7/components/toggle';
 import Framework7Range from 'framework7/components/range';
-import Framework7SmartSelect from 'framework7/components/smart-select';
 import Framework7Grid from 'framework7/components/grid';
 import Framework7Picker from 'framework7/components/picker';
 import Framework7InfiniteScroll from 'framework7/components/infinite-scroll';
@@ -61,7 +60,6 @@ import 'framework7/components/checkbox/css';
 import 'framework7/components/radio/css';
 import 'framework7/components/toggle/css';
 import 'framework7/components/range/css';
-import 'framework7/components/smart-select/css';
 import 'framework7/components/grid/css';
 import 'framework7/components/picker/css';
 import 'framework7/components/infinite-scroll/css';
@@ -144,7 +142,6 @@ Framework7.use([
     Framework7Radio,
     Framework7Toggle,
     Framework7Range,
-    Framework7SmartSelect,
     Framework7Grid,
     Framework7Picker,
     Framework7InfiniteScroll,

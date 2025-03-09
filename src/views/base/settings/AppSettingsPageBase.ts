@@ -7,20 +7,36 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 
-import type { TypeAndDisplayName } from '@/core/base.ts';
+import type { NameValue, TypeAndDisplayName } from '@/core/base.ts';
 import type { LocalizedTimezoneInfo } from '@/core/timezone.ts';
 
 export function useAppSettingPageBase() {
-    const { getAllTimezones, getAllTimezoneTypesUsedForStatistics, getAllCurrencySortingTypes, setTimeZone } = useI18n();
+    const { tt, getAllTimezones, getAllTimezoneTypesUsedForStatistics, getAllCurrencySortingTypes, setTimeZone } = useI18n();
 
     const settingsStore = useSettingsStore();
     const transactionsStore = useTransactionsStore();
     const overviewStore = useOverviewStore();
     const statisticsStore = useStatisticsStore();
 
+    const allThemes = computed<NameValue[]>(() => {
+        return [
+            { name: tt('System Default'), value: 'auto' },
+            { name: tt('Light'), value: 'light' },
+            { name: tt('Dark'), value: 'dark' }
+        ];
+    });
+
     const allTimezones = computed<LocalizedTimezoneInfo[]>(() => getAllTimezones(true));
     const allTimezoneTypesUsedForStatistics = computed<TypeAndDisplayName[]>(() => getAllTimezoneTypesUsedForStatistics());
     const allCurrencySortingTypes = computed<TypeAndDisplayName[]>(() => getAllCurrencySortingTypes());
+
+    const allAutoSaveTransactionDraftTypes = computed<NameValue[]>(() => {
+        return [
+            { name: tt('Disabled'), value: 'disabled' },
+            { name: tt('Enabled'), value: 'enabled' },
+            { name: tt('Show Confirmation Every Time'), value: 'confirmation' }
+        ];
+    });
 
     const timeZone = computed<string>({
         get: () => settingsStore.appSettings.timeZone,
@@ -94,9 +110,11 @@ export function useAppSettingPageBase() {
 
     return {
         // computed states
+        allThemes,
         allTimezones,
         allTimezoneTypesUsedForStatistics,
         allCurrencySortingTypes,
+        allAutoSaveTransactionDraftTypes,
         timeZone,
         isAutoUpdateExchangeRatesData,
         showAccountBalance,

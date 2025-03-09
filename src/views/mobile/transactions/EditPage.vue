@@ -301,16 +301,13 @@
 
             <f7-list-item
                 :no-chevron="mode === TransactionEditPageMode.View"
+                link="#"
                 class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after"
                 :class="{ 'readonly': mode === TransactionEditPageMode.View }"
                 :header="tt('Transaction Timezone')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Timezone'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Transaction Timezone'), popupCloseLinkText: tt('Done') }"
                 v-if="pageTypeAndMode?.type === TransactionEditPageType.Transaction || (pageTypeAndMode?.type === TransactionEditPageType.Template && transaction instanceof TransactionTemplate && transaction.templateType === TemplateType.Schedule.type)"
+                @click="showTimezonePopup = true"
             >
-                <select v-model="transaction.timeZone">
-                    <option :value="timezone.name" :key="timezone.name"
-                            v-for="timezone in allTimezones">{{ timezone.displayNameWithUtcOffset }}</option>
-                </select>
                 <template #title>
                     <f7-block class="list-item-custom-title no-padding no-margin">
                         <span>{{ `(${transactionDisplayTimezone})` }}</span>
@@ -318,6 +315,17 @@
                         <span class="transaction-edit-timezone-name" v-else-if="!transaction.timeZone && transaction.timeZone !== ''">{{ transactionTimezoneTimeDifference }}</span>
                     </f7-block>
                 </template>
+                <list-item-selection-popup value-type="item"
+                                           key-field="name" value-field="name"
+                                           title-field="displayNameWithUtcOffset"
+                                           :title="tt('Transaction Timezone')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Timezone')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allTimezones"
+                                           v-model:show="showTimezonePopup"
+                                           v-model="transaction.timeZone">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item
@@ -594,6 +602,7 @@ const submitted = ref<boolean>(false);
 const removingPictureId = ref<string | null>(null);
 const transactionDateTimeSheetMode = ref<string>('time');
 const showTimeInDefaultTimezone = ref<boolean>(false);
+const showTimezonePopup = ref<boolean>(false);
 const showGeoLocationActionSheet = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 const showSourceAmountSheet = ref<boolean>(false);

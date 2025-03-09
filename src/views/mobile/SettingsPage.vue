@@ -1,5 +1,5 @@
 <template>
-    <f7-page @page:afterin="onPageAfterIn">
+    <f7-page>
         <f7-navbar :title="tt('Settings')" :back-link="tt('Back')"></f7-navbar>
 
         <f7-block-title class="margin-top">{{ currentNickName }}</f7-block-title>
@@ -16,28 +16,45 @@
         </f7-list>
 
         <f7-block-title>{{ tt('Application') }}</f7-block-title>
-        <f7-list strong inset dividers>
+        <f7-list strong inset dividers class="settings-list">
             <f7-list-item
-                :key="currentLocale + '_theme'"
+                link="#"
                 :title="tt('Theme')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Theme'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), popupCloseLinkText: tt('Done') }">
-                <select v-model="currentTheme">
-                    <option value="auto">{{ tt('System Default') }}</option>
-                    <option value="light">{{ tt('Light') }}</option>
-                    <option value="dark">{{ tt('Dark') }}</option>
-                </select>
+                :after="findNameByValue(allThemes, currentTheme)"
+                @click="showThemePopup = true"
+            >
+                <list-item-selection-popup value-type="item"
+                                           key-field="value" value-field="value"
+                                           title-field="name"
+                                           :title="tt('Theme')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Theme')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allThemes"
+                                           v-model:show="showThemePopup"
+                                           v-model="currentTheme">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item :title="tt('Text Size')" link="/settings/textsize"></f7-list-item>
 
             <f7-list-item
-                :key="currentLocale + '_timezone'"
+                link="#"
                 :title="tt('Timezone')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Timezone'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), popupCloseLinkText: tt('Done') }">
-                <select v-model="timeZone">
-                    <option :value="tz.name" :key="tz.name"
-                            v-for="tz in allTimezones">{{ tz.displayNameWithUtcOffset }}</option>
-                </select>
+                :after="currentTimezoneName"
+                @click="showTimezonePopup = true"
+            >
+                <list-item-selection-popup value-type="item"
+                                           key-field="name" value-field="name"
+                                           title-field="displayNameWithUtcOffset"
+                                           :title="tt('Timezone')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Timezone')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allTimezones"
+                                           v-model:show="showTimezonePopup"
+                                           v-model="timeZone">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item :title="tt('Application Lock')" :after="isEnableApplicationLock ? tt('Enabled') : tt('Disabled')" link="/app_lock"></f7-list-item>
@@ -83,6 +100,7 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
+import { findNameByValue } from '@/lib/common.ts';
 import { getVersion, getDesktopVersionPath } from '@/lib/version.ts';
 import { isUserScheduledTransactionEnabled } from '@/lib/server_settings.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
@@ -91,9 +109,9 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getCurrentLanguageTag, formatUnixTimeToLongDate, initLocale } = useI18n();
+const { tt, formatUnixTimeToLongDate, initLocale } = useI18n();
 const { showToast, showConfirm } = useI18nUIComponents();
-const { allTimezones, timeZone, isAutoUpdateExchangeRatesData, showAccountBalance } = useAppSettingPageBase();
+const { allThemes, allTimezones, timeZone, isAutoUpdateExchangeRatesData, showAccountBalance } = useAppSettingPageBase();
 
 const rootStore = useRootStore();
 const settingsStore = useSettingsStore();
@@ -102,8 +120,9 @@ const exchangeRatesStore = useExchangeRatesStore();
 
 const version = `v${getVersion()}`;
 
-const currentLocale = ref<string>(getCurrentLanguageTag());
 const logouting = ref<boolean>(false);
+const showThemePopup = ref<boolean>(false);
+const showTimezonePopup = ref<boolean>(false);
 
 const currentNickName = computed<string>(() => userStore.currentUserNickname || tt('User'));
 
@@ -115,6 +134,16 @@ const currentTheme = computed<string>({
             location.reload();
         }
     }
+});
+
+const currentTimezoneName = computed<string>(() => {
+    for (const item of allTimezones.value) {
+        if (item.name === timeZone.value) {
+            return item.displayNameWithUtcOffset;
+        }
+    }
+
+    return '';
 });
 
 const isEnableAnimate = computed<boolean>({
@@ -166,9 +195,5 @@ function logout(): void {
             }
         });
     });
-}
-
-function onPageAfterIn(): void {
-    currentLocale.value = getCurrentLanguageTag();
 }
 </script>

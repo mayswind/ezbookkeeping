@@ -111,16 +111,23 @@
             </f7-list-item>
 
             <f7-list-item
+                link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Editable Transaction Range')"
                 :title="findDisplayNameByType(allTransactionEditScopeTypes, newProfile.transactionEditScope)"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Date Range'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Editable Transaction Range'), popupCloseLinkText: tt('Done') }"
+                @click="showEditableTransactionRangePopup = true"
             >
-                <select v-model="newProfile.transactionEditScope">
-                    <option :value="option.type"
-                            :key="option.type"
-                            v-for="option in allTransactionEditScopeTypes">{{ option.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Editable Transaction Range')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Date Range')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allTransactionEditScopeTypes"
+                                           v-model:show="showEditableTransactionRangePopup"
+                                           v-model="newProfile.transactionEditScope">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item class="ebk-list-item-error-info" v-if="extendInputIsInvalid" :footer="tt(extendInputInvalidProblemMessage || '')"></f7-list-item>
@@ -173,153 +180,230 @@
             </f7-list-item>
 
             <f7-list-item
+                link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('First Day of Week')"
                 :title="currentDayOfWeekName"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Date'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('First Day of Week'), popupCloseLinkText: tt('Done') }"
+                @click="showFirstDayOfWeekPopup = true"
             >
-                <select v-model="newProfile.firstDayOfWeek">
-                    <option :value="weekDay.type"
-                            :key="weekDay.type"
-                            v-for="weekDay in allWeekDays">{{ weekDay.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('First Day of Week')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Date')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allWeekDays"
+                                           v-model:show="showFirstDayOfWeekPopup"
+                                           v-model="newProfile.firstDayOfWeek">
+                </list-item-selection-popup>
             </f7-list-item>
         </f7-list>
 
         <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
             <f7-list-item
+                link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Long Date Format')"
                 :title="findDisplayNameByType(allLongDateFormats, newProfile.longDateFormat)"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Long Date Format'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Long Date Format'), popupCloseLinkText: tt('Done') }"
+                @click="showLongDateFormatPopup = true"
             >
-                <select v-model="newProfile.longDateFormat">
-                    <option :value="format.type"
-                            :key="format.type"
-                            v-for="format in allLongDateFormats">{{ format.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Long Date Format')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Long Date Format')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allLongDateFormats"
+                                           v-model:show="showLongDateFormatPopup"
+                                           v-model="newProfile.longDateFormat">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item
+                link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Short Date Format')"
                 :title="findDisplayNameByType(allShortDateFormats, newProfile.shortDateFormat)"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Short Date Format'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Short Date Format'), popupCloseLinkText: tt('Done') }"
+                @click="showShortDateFormatPopup = true"
             >
-                <select v-model="newProfile.shortDateFormat">
-                    <option :value="format.type"
-                            :key="format.type"
-                            v-for="format in allShortDateFormats">{{ format.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Short Date Format')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Short Date Format')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allShortDateFormats"
+                                           v-model:show="showShortDateFormatPopup"
+                                           v-model="newProfile.shortDateFormat">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item
+                link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Long Time Format')"
                 :title="findDisplayNameByType(allLongTimeFormats, newProfile.longTimeFormat)"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Long Time Format'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Long Time Format'), popupCloseLinkText: tt('Done') }"
+                @click="showLongTimeFormatPopup = true"
             >
-                <select v-model="newProfile.longTimeFormat">
-                    <option :value="format.type"
-                            :key="format.type"
-                            v-for="format in allLongTimeFormats">{{ format.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Long Time Format')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Long Time Format')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allLongTimeFormats"
+                                           v-model:show="showLongTimeFormatPopup"
+                                           v-model="newProfile.longTimeFormat">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item
+                link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Short Time Format')"
                 :title="findDisplayNameByType(allShortTimeFormats, newProfile.shortTimeFormat)"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Short Time Format'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Short Time Format'), popupCloseLinkText: tt('Done') }"
+                @click="showShortTimeFormatPopup = true"
             >
-                <select v-model="newProfile.shortTimeFormat">
-                    <option :value="format.type"
-                            :key="format.type"
-                            v-for="format in allShortTimeFormats">{{ format.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Short Time Format')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Short Time Format')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allShortTimeFormats"
+                                           v-model:show="showShortTimeFormatPopup"
+                                           v-model="newProfile.shortTimeFormat">
+                </list-item-selection-popup>
             </f7-list-item>
         </f7-list>
 
         <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
             <f7-list-item
+                link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Currency Display Mode')"
                 :title="findDisplayNameByType(allCurrencyDisplayTypes, newProfile.currencyDisplayType)"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Currency Display Mode'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Currency Display Mode'), popupCloseLinkText: tt('Done') }"
+                @click="showCurrencyDisplayTypePopup = true"
             >
-                <select v-model="newProfile.currencyDisplayType">
-                    <option :value="format.type"
-                            :key="format.type"
-                            v-for="format in allCurrencyDisplayTypes">{{ format.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Currency Display Mode')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Currency Display Mode')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allCurrencyDisplayTypes"
+                                           v-model:show="showCurrencyDisplayTypePopup"
+                                           v-model="newProfile.currencyDisplayType">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item
+                link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Digit Grouping')"
                 :title="findDisplayNameByType(allDigitGroupingTypes, newProfile.digitGrouping)"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Digit Grouping'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Digit Grouping'), popupCloseLinkText: tt('Done') }"
+                @click="showDigitGroupingPopup = true"
             >
-                <select v-model="newProfile.digitGrouping">
-                    <option :value="format.type"
-                            :key="format.type"
-                            v-for="format in allDigitGroupingTypes">{{ format.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Digit Grouping')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Digit Grouping')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allDigitGroupingTypes"
+                                           v-model:show="showDigitGroupingPopup"
+                                           v-model="newProfile.digitGrouping">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item
+                link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :disabled="!supportDigitGroupingSymbol"
                 :header="tt('Digit Grouping Symbol')"
                 :title="findDisplayNameByType(allDigitGroupingSymbols, newProfile.digitGroupingSymbol)"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Digit Grouping Symbol'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Digit Grouping Symbol'), popupCloseLinkText: tt('Done') }"
+                @click="showDigitGroupingSymbolPopup = true"
             >
-                <select v-model="newProfile.digitGroupingSymbol">
-                    <option :value="format.type"
-                            :key="format.type"
-                            v-for="format in allDigitGroupingSymbols">{{ format.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Digit Grouping Symbol')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Digit Grouping Symbol')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allDigitGroupingSymbols"
+                                           v-model:show="showDigitGroupingSymbolPopup"
+                                           v-model="newProfile.digitGroupingSymbol">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item
+                link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Decimal Separator')"
                 :title="findDisplayNameByType(allDecimalSeparators, newProfile.decimalSeparator)"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Decimal Separator'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Decimal Separator'), popupCloseLinkText: tt('Done') }"
+                @click="showDecimalSeparatorPopup = true"
             >
-                <select v-model="newProfile.decimalSeparator">
-                    <option :value="format.type"
-                            :key="format.type"
-                            v-for="format in allDecimalSeparators">{{ format.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Decimal Separator')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Decimal Separator')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allDecimalSeparators"
+                                           v-model:show="showDecimalSeparatorPopup"
+                                           v-model="newProfile.decimalSeparator">
+                </list-item-selection-popup>
             </f7-list-item>
         </f7-list>
 
         <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
             <f7-list-item
+                link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Expense Amount Color')"
                 :title="findDisplayNameByType(allExpenseAmountColorTypes, newProfile.expenseAmountColor)"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Color'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Expense Amount Color'), popupCloseLinkText: tt('Done') }"
+                @click="showExpenseAmountColorPopup = true"
             >
-                <select v-model="newProfile.expenseAmountColor">
-                    <option :value="format.type"
-                            :key="format.type"
-                            v-for="format in allExpenseAmountColorTypes">{{ format.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Expense Amount Color')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Color')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allExpenseAmountColorTypes"
+                                           v-model:show="showExpenseAmountColorPopup"
+                                           v-model="newProfile.expenseAmountColor">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item
+                link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Income Amount Color')"
                 :title="findDisplayNameByType(allIncomeAmountColorTypes, newProfile.incomeAmountColor)"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Color'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Income Amount Color'), popupCloseLinkText: tt('Done') }"
+                @click="showIncomeAmountColorPopup = true"
             >
-                <select v-model="newProfile.incomeAmountColor">
-                    <option :value="format.type"
-                            :key="format.type"
-                            v-for="format in allIncomeAmountColorTypes">{{ format.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Income Amount Color')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Color')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allIncomeAmountColorTypes"
+                                           v-model:show="showIncomeAmountColorPopup"
+                                           v-model="newProfile.incomeAmountColor">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item class="ebk-list-item-error-info" v-if="langAndRegionInputIsInvalid" :footer="tt(langAndRegionInputInvalidProblemMessage || '')"></f7-list-item>
@@ -418,8 +502,20 @@ const currentPassword = ref<string>('');
 const loadingError = ref<unknown | null>(null);
 const showInputPasswordSheet = ref<boolean>(false);
 const showAccountSheet = ref<boolean>(false);
+const showEditableTransactionRangePopup = ref<boolean>(false);
 const showLanguagePopup = ref<boolean>(false);
 const showDefaultCurrencyPopup = ref<boolean>(false);
+const showFirstDayOfWeekPopup = ref<boolean>(false);
+const showLongDateFormatPopup = ref<boolean>(false);
+const showShortDateFormatPopup = ref<boolean>(false);
+const showLongTimeFormatPopup = ref<boolean>(false);
+const showShortTimeFormatPopup = ref<boolean>(false);
+const showCurrencyDisplayTypePopup = ref<boolean>(false);
+const showDigitGroupingPopup = ref<boolean>(false);
+const showDigitGroupingSymbolPopup = ref<boolean>(false);
+const showDecimalSeparatorPopup = ref<boolean>(false);
+const showExpenseAmountColorPopup = ref<boolean>(false);
+const showIncomeAmountColorPopup = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 
 const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(true));

@@ -104,16 +104,23 @@
             </f7-list-item>
 
             <f7-list-item
+                link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('First Day of Week')"
                 :title="currentDayOfWeekName"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Date'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('First Day of Week'), popupCloseLinkText: tt('Done') }"
+                @click="showFirstDayOfWeekPopup = true"
             >
-                <select v-model="user.firstDayOfWeek">
-                    <option :value="weekDay.type"
-                            :key="weekDay.type"
-                            v-for="weekDay in allWeekDays">{{ weekDay.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('First Day of Week')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Date')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allWeekDays"
+                                           v-model:show="showFirstDayOfWeekPopup"
+                                           v-model="user.firstDayOfWeek">
+                </list-item-selection-popup>
             </f7-list-item>
         </f7-list>
 
@@ -229,6 +236,7 @@ const rootStore = useRootStore();
 const usePresetCategories = ref<boolean>(false);
 const showLanguagePopup = ref<boolean>(false);
 const showDefaultCurrencyPopup = ref<boolean>(false);
+const showFirstDayOfWeekPopup = ref<boolean>(false);
 const showPresetCategories = ref<boolean>(false);
 const showPresetCategoriesMoreActionSheet = ref<boolean>(false);
 const showPresetCategoriesChangeLocaleSheet = ref<boolean>(false);

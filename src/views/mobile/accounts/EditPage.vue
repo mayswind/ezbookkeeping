@@ -181,17 +181,24 @@
             </f7-list-item>
 
             <f7-list-item
+                link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Statement Date')"
                 :title="getAccountCreditCardStatementDate(account.creditCardStatementDate)"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Statement Date'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Statement Date'), popupCloseLinkText: tt('Done') }"
                 v-if="isAccountSupportCreditCardStatementDate"
+                @click="accountContext.showCreditCardStatementDatePopup = true"
             >
-                <select v-model="account.creditCardStatementDate">
-                    <option :value="monthDay.day"
-                            :key="monthDay.day"
-                            v-for="monthDay in allAvailableMonthDays">{{ monthDay.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           key-field="day" value-field="day"
+                                           title-field="displayName"
+                                           :title="tt('Statement Date')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Statement Date')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allAvailableMonthDays"
+                                           v-model:show="accountContext.showCreditCardStatementDatePopup"
+                                           v-model="account.creditCardStatementDate">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item
@@ -305,17 +312,24 @@
             </f7-list-item>
 
             <f7-list-item
+                link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Statement Date')"
                 :title="getAccountCreditCardStatementDate(account.creditCardStatementDate)"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: tt('Statement Date'), searchbarDisableText: tt('Cancel'), appendSearchbarNotFound: tt('No results'), pageTitle: tt('Statement Date'), popupCloseLinkText: tt('Done') }"
                 v-if="isAccountSupportCreditCardStatementDate"
+                @click="accountContext.showCreditCardStatementDatePopup = true"
             >
-                <select v-model="account.creditCardStatementDate">
-                    <option :value="monthDay.day"
-                            :key="monthDay.day"
-                            v-for="monthDay in allAvailableMonthDays">{{ monthDay.displayName }}</option>
-                </select>
+                <list-item-selection-popup value-type="item"
+                                           key-field="day" value-field="day"
+                                           title-field="displayName"
+                                           :title="tt('Statement Date')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Statement Date')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allAvailableMonthDays"
+                                           v-model:show="accountContext.showCreditCardStatementDatePopup"
+                                           v-model="account.creditCardStatementDate">
+                </list-item-selection-popup>
             </f7-list-item>
 
             <f7-list-item :title="tt('Visible')" v-if="editAccountId">
@@ -532,6 +546,7 @@ interface AccountContext {
     showIconSelectionSheet: boolean;
     showColorSelectionSheet: boolean;
     showCurrencyPopup: boolean;
+    showCreditCardStatementDatePopup: boolean;
     showBalanceSheet: boolean;
     showBalanceDateTimeSheet: boolean;
     balanceDateTimeSheetMode: string;
@@ -570,6 +585,7 @@ const DEFAULT_ACCOUNT_CONTEXT: AccountContext = {
     showIconSelectionSheet: false,
     showColorSelectionSheet: false,
     showCurrencyPopup: false,
+    showCreditCardStatementDatePopup: false,
     showBalanceSheet: false,
     showBalanceDateTimeSheet: false,
     balanceDateTimeSheetMode: 'time'

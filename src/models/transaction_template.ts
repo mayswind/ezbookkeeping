@@ -14,8 +14,8 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
     public displayOrder: number;
     public hidden: boolean;
 
-    private constructor(id: string, templateType: number, name: string, type: number, categoryId: string, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, scheduledFrequencyType: number | undefined, scheduledFrequency: string | undefined, scheduledStartDate: string | undefined, scheduledEndDate: string | undefined, scheduledAt: number | undefined, tagIds: string[], comment: string, editable: boolean, displayOrder: number, hidden: boolean) {
-        super(id, '', type, categoryId, 0, undefined, utcOffset, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, editable);
+    private constructor(id: string, templateType: number, name: string, type: number, categoryId: string, timeZone: string | undefined, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, scheduledFrequencyType: number | undefined, scheduledFrequency: string | undefined, scheduledStartDate: string | undefined, scheduledEndDate: string | undefined, scheduledAt: number | undefined, tagIds: string[], comment: string, editable: boolean, displayOrder: number, hidden: boolean) {
+        super(id, '', type, categoryId, 0, timeZone, utcOffset, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, editable);
         this.templateType = templateType;
         this.name = name;
         this.scheduledFrequencyType = scheduledFrequencyType;
@@ -91,6 +91,7 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             '', // name
             transaction.type,
             transaction.categoryId,
+            transaction.timeZone,
             transaction.utcOffset,
             transaction.sourceAccountId,
             transaction.destinationAccountId,
@@ -117,6 +118,7 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             templateResponse.name,
             templateResponse.type,
             templateResponse.categoryId,
+            undefined, // only in new transaction template
             templateResponse.utcOffset ?? 0,
             templateResponse.sourceAccountId,
             templateResponse.destinationAccountId,

@@ -112,7 +112,7 @@ export function scrollToSelectedItem(parentEl: Framework7Dom, containerSelector:
         return;
     }
 
-    const containerPaddingTop = getNumberValue(container.css('padding-top'), 0);
+    const containerPaddingTop = getNumberValue(container.css('padding-top'), 0) / 2;
 
     let targetPos = selectedItem.offset().top - container.offset().top - containerPaddingTop
         - (container.outerHeight() - selectedItem.outerHeight()) / 2;

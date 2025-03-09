@@ -1983,7 +1983,7 @@ func (s *TransactionService) appendFilterTagIdsConditionToQuery(sess *xorm.Sessi
 
 	if noTags {
 		subQuery := builder.Select("transaction_id").From("transaction_tag_index").Where(subQueryCondition)
-		sess.NotIn("transaction_id", subQuery)
+		sess.NotIn("transaction_id", subQuery).NotIn("related_id", subQuery)
 		return sess
 	}
 
@@ -1999,9 +1999,9 @@ func (s *TransactionService) appendFilterTagIdsConditionToQuery(sess *xorm.Sessi
 	}
 
 	if tagFilterType == models.TRANSACTION_TAG_FILTER_HAS_ANY || tagFilterType == models.TRANSACTION_TAG_FILTER_HAS_ALL {
-		sess.In("transaction_id", subQuery)
+		sess.And(builder.Or(builder.In("transaction_id", subQuery), builder.In("related_id", subQuery)))
 	} else if tagFilterType == models.TRANSACTION_TAG_FILTER_NOT_HAS_ANY || tagFilterType == models.TRANSACTION_TAG_FILTER_NOT_HAS_ALL {
-		sess.NotIn("transaction_id", subQuery)
+		sess.NotIn("transaction_id", subQuery).NotIn("related_id", subQuery)
 	}
 
 	return sess

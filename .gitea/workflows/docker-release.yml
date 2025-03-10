@@ -54,5 +54,6 @@ jobs:
           push: true
           build-args: |
             RELEASE_BUILD=1
+            SKIP_TESTS=${{ vars.SKIP_TESTS }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

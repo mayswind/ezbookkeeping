@@ -1,7 +1,7 @@
 package qif
 
 import (
-	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
@@ -49,7 +49,7 @@ func (c *qifTransactionDataImporter) ParseImportedData(ctx core.Context, user *m
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	dataTableImporter := datatable.CreateNewSimpleImporter(qifTransactionTypeNameMapping)
+	dataTableImporter := converter.CreateNewSimpleImporterWithTypeNameMapping(qifTransactionTypeNameMapping)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }

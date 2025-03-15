@@ -15,7 +15,7 @@ import (
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 
-	"github.com/mayswind/ezbookkeeping/pkg/converters/base"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	csvconverter "github.com/mayswind/ezbookkeeping/pkg/converters/csv"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -156,7 +156,7 @@ func (c *customTransactionDataDsvFileImporter) ParseImportedData(ctx core.Contex
 
 	dataTable := csvconverter.CreateNewCustomCsvImportedDataTable(allLines)
 	transactionDataTable := CreateNewCustomPlainTextDataTable(dataTable, c.columnIndexMapping, c.transactionTypeNameMapping, c.timeFormat, c.timezoneFormat)
-	dataTableImporter := datatable.CreateNewImporter(customTransactionTypeNameMapping, c.geoLocationSeparator, c.transactionTagSeparator)
+	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(customTransactionTypeNameMapping, c.geoLocationSeparator, c.transactionTagSeparator)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }
@@ -188,7 +188,7 @@ func CreateNewCustomTransactionDataDsvFileParser(fileType string, fileEncoding s
 }
 
 // CreateNewCustomTransactionDataDsvFileImporter returns a new custom dsv importer for transaction data
-func CreateNewCustomTransactionDataDsvFileImporter(fileType string, fileEncoding string, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, hasHeaderLine bool, timeFormat string, timezoneFormat string, geoLocationSeparator string, transactionTagSeparator string) (base.TransactionDataImporter, error) {
+func CreateNewCustomTransactionDataDsvFileImporter(fileType string, fileEncoding string, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, hasHeaderLine bool, timeFormat string, timezoneFormat string, geoLocationSeparator string, transactionTagSeparator string) (converter.TransactionDataImporter, error) {
 	separator, exists := supportedFileTypeSeparators[fileType]
 
 	if !exists {

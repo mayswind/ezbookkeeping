@@ -3,6 +3,7 @@ package fireflyIII
 import (
 	"bytes"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/csv"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -49,7 +50,7 @@ func (c *fireflyIIITransactionDataCsvFileImporter) ParseImportedData(ctx core.Co
 
 	transactionRowParser := createFireflyIIITransactionDataRowParser()
 	transactionDataTable := datatable.CreateNewImportedTransactionDataTableWithRowParser(dataTable, fireflyIIITransactionDataColumnNameMapping, transactionRowParser)
-	dataTableImporter := datatable.CreateNewImporter(fireflyIIITransactionTypeNameMapping, "", ",")
+	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(fireflyIIITransactionTypeNameMapping, "", ",")
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }

@@ -9,6 +9,7 @@ import (
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	csvdatatable "github.com/mayswind/ezbookkeeping/pkg/converters/csv"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -78,7 +79,7 @@ func (c *alipayTransactionDataCsvFileImporter) ParseImportedData(ctx core.Contex
 
 	transactionRowParser := createAlipayTransactionDataRowParser(c.originalColumnNames)
 	transactionDataTable := datatable.CreateNewCommonTransactionDataTable(commonDataTable, alipayTransactionSupportedColumns, transactionRowParser)
-	dataTableImporter := datatable.CreateNewSimpleImporter(alipayTransactionTypeNameMapping)
+	dataTableImporter := converter.CreateNewSimpleImporterWithTypeNameMapping(alipayTransactionTypeNameMapping)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }

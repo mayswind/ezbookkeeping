@@ -8,6 +8,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	csvdatatable "github.com/mayswind/ezbookkeeping/pkg/converters/csv"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -82,7 +83,7 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) ParseImportedData(ctx c
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	dataTableImporter := datatable.CreateNewSimpleImporter(feideeMymoneyTransactionTypeNameMapping)
+	dataTableImporter := converter.CreateNewSimpleImporterWithTypeNameMapping(feideeMymoneyTransactionTypeNameMapping)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }

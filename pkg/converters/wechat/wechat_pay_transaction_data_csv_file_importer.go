@@ -8,6 +8,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	csvdatatable "github.com/mayswind/ezbookkeeping/pkg/converters/csv"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -67,7 +68,7 @@ func (c *wechatPayTransactionDataCsvFileImporter) ParseImportedData(ctx core.Con
 
 	transactionRowParser := createWeChatPayTransactionDataRowParser()
 	transactionDataTable := datatable.CreateNewCommonTransactionDataTable(commonDataTable, wechatPayTransactionSupportedColumns, transactionRowParser)
-	dataTableImporter := datatable.CreateNewSimpleImporter(wechatPayTransactionTypeNameMapping)
+	dataTableImporter := converter.CreateNewSimpleImporterWithTypeNameMapping(wechatPayTransactionTypeNameMapping)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }

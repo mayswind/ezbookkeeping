@@ -9,7 +9,7 @@ import (
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters"
-	baseconverters "github.com/mayswind/ezbookkeeping/pkg/converters/base"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
@@ -1138,7 +1138,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 
 	fileType := fileTypes[0]
 
-	var dataImporter baseconverters.TransactionDataImporter
+	var dataImporter converter.TransactionDataImporter
 
 	if converters.IsCustomDelimiterSeparatedValuesFileType(fileType) {
 		fileEncodings := form.Value["fileEncoding"]

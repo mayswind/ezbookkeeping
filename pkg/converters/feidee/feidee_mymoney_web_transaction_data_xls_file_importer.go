@@ -1,6 +1,7 @@
 package feidee
 
 import (
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/excel"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -20,7 +21,7 @@ var feideeMymoneyWebDataColumnNameMapping = map[datatable.TransactionDataTableCo
 
 // feideeMymoneyWebTransactionDataXlsFileImporter defines the structure of feidee mymoney (web) xls importer for transaction data
 type feideeMymoneyWebTransactionDataXlsFileImporter struct {
-	datatable.DataTableTransactionDataImporter
+	converter.DataTableTransactionDataImporter
 }
 
 // Initialize a feidee mymoney (web) transaction data xls file importer singleton instance
@@ -38,7 +39,7 @@ func (c *feideeMymoneyWebTransactionDataXlsFileImporter) ParseImportedData(ctx c
 
 	transactionRowParser := createFeideeMymoneyTransactionDataRowParser()
 	transactionDataTable := datatable.CreateNewImportedTransactionDataTableWithRowParser(dataTable, feideeMymoneyWebDataColumnNameMapping, transactionRowParser)
-	dataTableImporter := datatable.CreateNewSimpleImporter(feideeMymoneyTransactionTypeNameMapping)
+	dataTableImporter := converter.CreateNewSimpleImporterWithTypeNameMapping(feideeMymoneyTransactionTypeNameMapping)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }

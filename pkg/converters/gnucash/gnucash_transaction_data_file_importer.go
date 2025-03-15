@@ -1,7 +1,7 @@
 package gnucash
 
 import (
-	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
@@ -43,7 +43,7 @@ func (c *gnucashTransactionDataImporter) ParseImportedData(ctx core.Context, use
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	dataTableImporter := datatable.CreateNewSimpleImporter(gnucashTransactionTypeNameMapping)
+	dataTableImporter := converter.CreateNewSimpleImporterWithTypeNameMapping(gnucashTransactionTypeNameMapping)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }

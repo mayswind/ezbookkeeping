@@ -1,6 +1,7 @@
 package _default
 
 import (
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -66,7 +67,7 @@ func (c *defaultTransactionDataPlainTextConverter) ToExportedContent(ctx core.Co
 		ezbookkeepingLineSeparator,
 	)
 
-	dataTableExporter := datatable.CreateNewExporter(
+	dataTableExporter := converter.CreateNewExporter(
 		ezbookkeepingTransactionTypeNameMapping,
 		ezbookkeepingGeoLocationSeparator,
 		ezbookkeepingTagSeparator,
@@ -95,7 +96,7 @@ func (c *defaultTransactionDataPlainTextConverter) ParseImportedData(ctx core.Co
 
 	transactionDataTable := datatable.CreateNewImportedTransactionDataTable(dataTable, ezbookkeepingDataColumnNameMapping)
 
-	dataTableImporter := datatable.CreateNewImporter(
+	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(
 		ezbookkeepingTransactionTypeNameMapping,
 		ezbookkeepingGeoLocationSeparator,
 		ezbookkeepingTagSeparator,

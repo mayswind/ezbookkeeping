@@ -10,27 +10,27 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
 
-// ExcelFileImportedDataTable defines the structure of excel file data table
-type ExcelFileImportedDataTable struct {
+// ExcelMSCFBFileImportedDataTable defines the structure of excel (microsoft compound file binary) file data table
+type ExcelMSCFBFileImportedDataTable struct {
 	workbook              *xls.WorkBook
 	headerLineColumnNames []string
 }
 
-// ExcelFileDataRow defines the structure of excel file data table row
-type ExcelFileDataRow struct {
+// ExcelMSCFBFileDataRow defines the structure of excel (microsoft compound file binary) file data table row
+type ExcelMSCFBFileDataRow struct {
 	sheet    *xls.WorkSheet
 	rowIndex int
 }
 
-// ExcelFileDataRowIterator defines the structure of excel file data table row iterator
-type ExcelFileDataRowIterator struct {
-	dataTable              *ExcelFileImportedDataTable
+// ExcelMSCFBFileDataRowIterator defines the structure of excel (microsoft compound file binary) file data table row iterator
+type ExcelMSCFBFileDataRowIterator struct {
+	dataTable              *ExcelMSCFBFileImportedDataTable
 	currentSheetIndex      int
 	currentRowIndexInSheet uint16
 }
 
 // DataRowCount returns the total count of data row
-func (t *ExcelFileImportedDataTable) DataRowCount() int {
+func (t *ExcelMSCFBFileImportedDataTable) DataRowCount() int {
 	totalDataRowCount := 0
 
 	for i := 0; i < t.workbook.NumSheets(); i++ {
@@ -47,13 +47,13 @@ func (t *ExcelFileImportedDataTable) DataRowCount() int {
 }
 
 // HeaderColumnNames returns the header column name list
-func (t *ExcelFileImportedDataTable) HeaderColumnNames() []string {
+func (t *ExcelMSCFBFileImportedDataTable) HeaderColumnNames() []string {
 	return t.headerLineColumnNames
 }
 
 // DataRowIterator returns the iterator of data row
-func (t *ExcelFileImportedDataTable) DataRowIterator() datatable.ImportedDataRowIterator {
-	return &ExcelFileDataRowIterator{
+func (t *ExcelMSCFBFileImportedDataTable) DataRowIterator() datatable.ImportedDataRowIterator {
+	return &ExcelMSCFBFileDataRowIterator{
 		dataTable:              t,
 		currentSheetIndex:      0,
 		currentRowIndexInSheet: 0,
@@ -61,19 +61,19 @@ func (t *ExcelFileImportedDataTable) DataRowIterator() datatable.ImportedDataRow
 }
 
 // ColumnCount returns the total count of column in this data row
-func (r *ExcelFileDataRow) ColumnCount() int {
+func (r *ExcelMSCFBFileDataRow) ColumnCount() int {
 	row := r.sheet.Row(r.rowIndex)
 	return row.LastCol() + 1
 }
 
 // GetData returns the data in the specified column index
-func (r *ExcelFileDataRow) GetData(columnIndex int) string {
+func (r *ExcelMSCFBFileDataRow) GetData(columnIndex int) string {
 	row := r.sheet.Row(r.rowIndex)
 	return row.Col(columnIndex)
 }
 
 // HasNext returns whether the iterator does not reach the end
-func (t *ExcelFileDataRowIterator) HasNext() bool {
+func (t *ExcelMSCFBFileDataRowIterator) HasNext() bool {
 	workbook := t.dataTable.workbook
 
 	if t.currentSheetIndex >= workbook.NumSheets() {
@@ -100,12 +100,12 @@ func (t *ExcelFileDataRowIterator) HasNext() bool {
 }
 
 // CurrentRowId returns current index
-func (t *ExcelFileDataRowIterator) CurrentRowId() string {
+func (t *ExcelMSCFBFileDataRowIterator) CurrentRowId() string {
 	return fmt.Sprintf("table#%d-row#%d", t.currentSheetIndex, t.currentRowIndexInSheet)
 }
 
 // Next returns the next imported data row
-func (t *ExcelFileDataRowIterator) Next() datatable.ImportedDataRow {
+func (t *ExcelMSCFBFileDataRowIterator) Next() datatable.ImportedDataRow {
 	workbook := t.dataTable.workbook
 	currentRowIndexInTable := t.currentRowIndexInSheet
 
@@ -133,14 +133,14 @@ func (t *ExcelFileDataRowIterator) Next() datatable.ImportedDataRow {
 		return nil
 	}
 
-	return &ExcelFileDataRow{
+	return &ExcelMSCFBFileDataRow{
 		sheet:    currentSheet,
 		rowIndex: int(t.currentRowIndexInSheet),
 	}
 }
 
-// CreateNewExcelFileImportedDataTable returns excel xls data table by file binary data
-func CreateNewExcelFileImportedDataTable(data []byte) (*ExcelFileImportedDataTable, error) {
+// CreateNewExcelMSCFBFileImportedDataTable returns excel (microsoft compound file binary) data table by file binary data
+func CreateNewExcelMSCFBFileImportedDataTable(data []byte) (*ExcelMSCFBFileImportedDataTable, error) {
 	reader := bytes.NewReader(data)
 	workbook, err := xls.OpenReader(reader, "")
 
@@ -184,7 +184,7 @@ func CreateNewExcelFileImportedDataTable(data []byte) (*ExcelFileImportedDataTab
 		}
 	}
 
-	return &ExcelFileImportedDataTable{
+	return &ExcelMSCFBFileImportedDataTable{
 		workbook:              workbook,
 		headerLineColumnNames: headerRowItems,
 	}, nil

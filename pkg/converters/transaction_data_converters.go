@@ -54,6 +54,8 @@ func GetTransactionDataImporter(fileType string) (converter.TransactionDataImpor
 		return feidee.FeideeMymoneyAppTransactionDataCsvFileImporter, nil
 	} else if fileType == "feidee_mymoney_xls" {
 		return feidee.FeideeMymoneyWebTransactionDataXlsFileImporter, nil
+	} else if fileType == "feidee_mymoney_elecloud_xlsx" {
+		return feidee.FeideeMymoneyElecloudTransactionDataXlsxFileImporter, nil
 	} else if fileType == "alipay_app_csv" {
 		return alipay.AlipayAppTransactionDataCsvFileImporter, nil
 	} else if fileType == "alipay_web_csv" {

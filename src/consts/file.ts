@@ -190,6 +190,15 @@ export const SUPPORTED_IMPORT_FILE_TYPES: ImportFileType[] = [
         }
     },
     {
+        type: 'feidee_mymoney_elecloud_xlsx',
+        name: 'Feidee MyMoney (Elecloud) Data Export File',
+        extensions: '.xlsx',
+        document: {
+            supportMultiLanguages: 'zh-Hans',
+            anchor: '如何获取随手记神象云账本数据导出文件'
+        }
+    },
+    {
         type: 'alipay_app_csv',
         name: 'Alipay (App) Transaction Flow File',
         extensions: '.csv',

@@ -124,6 +124,12 @@
         "licenseUrl": "https://github.com/boombuler/barcode/blob/v1.0.2/LICENSE"
     },
     {
+        "name": "Excelize",
+        "copyright": "Copyright (c) 2016-2024 The excelize Authors. Copyright (c) 2011-2017 Geoffrey J. Teale",
+        "url": "https://github.com/qax-os/excelize",
+        "licenseUrl": "https://github.com/qax-os/excelize/blob/v2.9.0/LICENSE"
+    },
+    {
         "name": "xls",
         "url": "https://github.com/extrame/xls",
         "licenseUrl": "https://github.com/extrame/xls/blob/4a6cf263071b975a90abf74ca3e804b48243be28/LICENSE"

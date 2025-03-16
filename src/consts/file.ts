@@ -84,40 +84,6 @@ export const SUPPORTED_IMPORT_FILE_TYPES: ImportFileType[] = [
         }
     },
     {
-        type: 'ofx',
-        name: 'Open Financial Exchange (OFX) File',
-        extensions: '.ofx'
-    },
-    {
-        type: 'qfx',
-        name: 'Quicken Financial Exchange (QFX) File',
-        extensions: '.qfx'
-    },
-    {
-        type: 'qif',
-        name: 'Quicken Interchange Format (QIF) File',
-        extensions: '.qif',
-        subTypes: [
-            {
-                type: 'qif_ymd',
-                name: 'Year-month-day format',
-            },
-            {
-                type: 'qif_mdy',
-                name: 'Month-day-year format',
-            },
-            {
-                type: 'qif_dmy',
-                name: 'Day-month-year format',
-            }
-        ]
-    },
-    {
-        type: 'iif',
-        name: 'Intuit Interchange Format (IIF) File',
-        extensions: '.iif'
-    },
-    {
         type: 'dsv',
         name: 'Delimiter-separated Values (DSV) File',
         extensions: '.csv,.tsv',
@@ -152,6 +118,40 @@ export const SUPPORTED_IMPORT_FILE_TYPES: ImportFileType[] = [
             }
         ],
         dataFromTextbox: true
+    },
+    {
+        type: 'ofx',
+        name: 'Open Financial Exchange (OFX) File',
+        extensions: '.ofx'
+    },
+    {
+        type: 'qfx',
+        name: 'Quicken Financial Exchange (QFX) File',
+        extensions: '.qfx'
+    },
+    {
+        type: 'qif',
+        name: 'Quicken Interchange Format (QIF) File',
+        extensions: '.qif',
+        subTypes: [
+            {
+                type: 'qif_ymd',
+                name: 'Year-month-day format',
+            },
+            {
+                type: 'qif_mdy',
+                name: 'Month-day-year format',
+            },
+            {
+                type: 'qif_dmy',
+                name: 'Day-month-year format',
+            }
+        ]
+    },
+    {
+        type: 'iif',
+        name: 'Intuit Interchange Format (IIF) File',
+        extensions: '.iif'
     },
     {
         type: 'gnucash',

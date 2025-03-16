@@ -31,7 +31,7 @@ Online Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-dem
 7. Multi-language support
 8. Two-factor authentication
 9. Application lock (PIN code / WebAuthn)
-10. Data export & import (OFX, QFX, QIF, IIF, CSV, GnuCash, FireFly III, Beancount, etc.)
+10. Data export & import (CSV, OFX, QFX, QIF, IIF, GnuCash, FireFly III, Beancount, etc.)
 
 ## Screenshots
 ### Desktop Version

@@ -25,4 +25,7 @@ var (
 	ErrInvalidIIFFile                      = NewNormalError(NormalSubcategoryConverter, 18, http.StatusBadRequest, "invalid iif file")
 	ErrInvalidOFXFile                      = NewNormalError(NormalSubcategoryConverter, 19, http.StatusBadRequest, "invalid ofx file")
 	ErrInvalidSGMLFile                     = NewNormalError(NormalSubcategoryConverter, 20, http.StatusBadRequest, "invalid sgml file")
+	ErrInvalidBeancountFile                = NewNormalError(NormalSubcategoryConverter, 21, http.StatusBadRequest, "invalid beancount file")
+	ErrBeancountFileNotSupportInclude      = NewNormalError(NormalSubcategoryConverter, 22, http.StatusBadRequest, "not support include directive for beancount file")
+	ErrInvalidAmountExpression             = NewNormalError(NormalSubcategoryConverter, 23, http.StatusBadRequest, "invalid amount expression")
 )

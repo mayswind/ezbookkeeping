@@ -172,6 +172,11 @@ export const SUPPORTED_IMPORT_FILE_TYPES: ImportFileType[] = [
         }
     },
     {
+        type: 'beancount',
+        name: 'Beancount Data File',
+        extensions: '.beancount'
+    },
+    {
         type: 'feidee_mymoney_csv',
         name: 'Feidee MyMoney (App) Data Export File',
         extensions: '.csv',

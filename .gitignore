@@ -144,3 +144,9 @@ dist/
 # Visual Studio Code
 .vscode/
 *.code-workspace
+ezbookkeeping
+ezbookkeeping-0.9.0-20250319-x86_64.tar.gz
+package/
+data/
+log/
+storage/

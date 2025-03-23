@@ -28,7 +28,7 @@ export class TransactionTag implements TransactionTagInfoResponse {
         return new TransactionTag(tagResponse.id, tagResponse.name, tagResponse.displayOrder, tagResponse.hidden);
     }
 
-    public static ofMany(tagResponses: TransactionTagInfoResponse[]): TransactionTag[] {
+    public static ofMulti(tagResponses: TransactionTagInfoResponse[]): TransactionTag[] {
         const tags: TransactionTag[] = [];
 
         for (const tagResponse of tagResponses) {

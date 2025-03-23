@@ -275,7 +275,7 @@ export class KnownDateTimeFormat {
         return result.length > 0 ? result : undefined;
     }
 
-    public static detectMany(dateTimes: string[]): KnownDateTimeFormat[] | undefined {
+    public static detectMulti(dateTimes: string[]): KnownDateTimeFormat[] | undefined {
         const detectedCounts: Record<string, number> = {};
 
         for (const dateTime of dateTimes) {

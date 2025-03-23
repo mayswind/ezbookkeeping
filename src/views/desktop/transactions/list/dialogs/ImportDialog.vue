@@ -1248,7 +1248,7 @@ const parsedFileAutoDetectedTimeFormat = computed<string | undefined>(() => {
         }
     }
 
-    const detectedFormats = KnownDateTimeFormat.detectMany(allDateTimes);
+    const detectedFormats = KnownDateTimeFormat.detectMulti(allDateTimes);
 
     if (!detectedFormats || !detectedFormats.length || detectedFormats.length > 1) {
         return undefined;
@@ -1279,7 +1279,7 @@ const parsedFileAutoDetectedTimezoneFormat = computed<string | undefined>(() => 
         }
     }
 
-    const detectedFormats = KnownDateTimezoneFormat.detectMany(allTimezones);
+    const detectedFormats = KnownDateTimezoneFormat.detectMulti(allTimezones);
 
     if (!detectedFormats || !detectedFormats.length || detectedFormats.length > 1) {
         return undefined;

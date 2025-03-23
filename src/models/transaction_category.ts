@@ -83,11 +83,11 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
             categoryResponse.comment,
             categoryResponse.displayOrder,
             !categoryResponse.hidden,
-            categoryResponse.subCategories ? TransactionCategory.ofMany(categoryResponse.subCategories) : undefined
+            categoryResponse.subCategories ? TransactionCategory.ofMulti(categoryResponse.subCategories) : undefined
         );
     }
 
-    public static ofMany(categoryResponses: TransactionCategoryInfoResponse[]): TransactionCategory[] {
+    public static ofMulti(categoryResponses: TransactionCategoryInfoResponse[]): TransactionCategory[] {
         const categories: TransactionCategory[] = [];
 
         for (const categoryResponse of categoryResponses) {
@@ -105,7 +105,7 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
                 continue;
             }
 
-            ret[categoryType] = TransactionCategory.ofMany(categoriesByType[categoryType]);
+            ret[categoryType] = TransactionCategory.ofMulti(categoriesByType[categoryType]);
         }
 
         return ret;

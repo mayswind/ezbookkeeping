@@ -777,7 +777,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 }
 
                 const transactionPageWrapper: TransactionPageWrapper = {
-                    items: Transaction.ofMany(data.result.items),
+                    items: Transaction.ofMulti(data.result.items),
                     totalCount: data.result.totalCount
                 };
 
@@ -855,7 +855,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 }
 
                 const transactionPageWrapper: TransactionPageWrapper = {
-                    items: Transaction.ofMany(data.result.items),
+                    items: Transaction.ofMulti(data.result.items),
                     totalCount: data.result.totalCount
                 };
 

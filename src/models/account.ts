@@ -312,11 +312,11 @@ export class Account implements AccountInfoResponse {
             accountResponse.creditCardStatementDate,
             accountResponse.isAsset,
             accountResponse.isLiability,
-            accountResponse.subAccounts ? Account.ofMany(accountResponse.subAccounts) : undefined
+            accountResponse.subAccounts ? Account.ofMulti(accountResponse.subAccounts) : undefined
         );
     }
 
-    public static ofMany(accountResponses: AccountInfoResponse[]): Account[] {
+    public static ofMulti(accountResponses: AccountInfoResponse[]): Account[] {
         const accounts: Account[] = [];
 
         for (const accountResponse of accountResponses) {

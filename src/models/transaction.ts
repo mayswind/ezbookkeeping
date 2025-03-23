@@ -318,7 +318,7 @@ export class Transaction implements TransactionInfoResponse {
         }
 
         if (transactionResponse.tags) {
-            transaction.setTags(TransactionTag.ofMany(transactionResponse.tags));
+            transaction.setTags(TransactionTag.ofMulti(transactionResponse.tags));
         }
 
         if (transactionResponse.pictures) {
@@ -338,7 +338,7 @@ export class Transaction implements TransactionInfoResponse {
         return transaction;
     }
 
-    public static ofMany(transactionResponses: TransactionInfoResponse[]): Transaction[] {
+    public static ofMulti(transactionResponses: TransactionInfoResponse[]): Transaction[] {
         const transactions: Transaction[] = [];
 
         for (const transactionResponse of transactionResponses) {
@@ -404,7 +404,7 @@ export class TransactionPicture implements TransactionPictureInfoBasicResponse {
         return new TransactionPicture(picture.pictureId, picture.originalUrl);
     }
 
-    public static ofMany(pictureResponses: TransactionPictureInfoBasicResponse[]): TransactionPicture[] {
+    public static ofMulti(pictureResponses: TransactionPictureInfoBasicResponse[]): TransactionPicture[] {
         const pictures: TransactionPicture[] = [];
 
         for (const pictureResponse of pictureResponses) {

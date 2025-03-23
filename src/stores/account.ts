@@ -742,7 +742,7 @@ export const useAccountsStore = defineStore('accounts', () => {
                     updateAccountListInvalidState(false);
                 }
 
-                const accounts = Account.sortAccounts(Account.ofMany(data.result));
+                const accounts = Account.sortAccounts(Account.ofMulti(data.result));
 
                 if (force && data.result && isEquals(allAccounts.value, accounts)) {
                     reject({ message: 'Account list is up to date', isUpToDate: true });

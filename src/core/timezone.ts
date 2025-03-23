@@ -57,7 +57,7 @@ export class KnownDateTimezoneFormat implements NameValue {
         return result.length > 0 ? result : undefined;
     }
 
-    public static detectMany(dateTimes: string[]): KnownDateTimezoneFormat[] | undefined {
+    public static detectMulti(dateTimes: string[]): KnownDateTimezoneFormat[] | undefined {
         const detectedCounts: Record<string, number> = {};
 
         for (const dateTime of dateTimes) {

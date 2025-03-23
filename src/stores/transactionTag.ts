@@ -112,7 +112,7 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
                     updateTransactionTagListInvalidState(false);
                 }
 
-                const transactionTags = TransactionTag.ofMany(data.result);
+                const transactionTags = TransactionTag.ofMulti(data.result);
 
                 if (force && data.result && isEquals(allTransactionTags.value, transactionTags)) {
                     reject({ message: 'Tag list is up to date', isUpToDate: true });

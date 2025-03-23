@@ -143,27 +143,44 @@
                                              :title="tt('Replace Invalid Transaction Tags')"
                                              @click="showReplaceInvalidItemDialog('tag', allInvalidTransactionTagNames)"></v-list-item>
                                 <v-divider class="my-2"/>
-                                <v-list-item :prepend-icon="mdiFindReplace"
+                                <v-list-item :prepend-icon="mdiShapePlusOutline"
+                                             :disabled="!!editingTransaction || !allInvalidExpenseCategoryNames || allInvalidExpenseCategoryNames.length < 1"
+                                             :title="tt('Create Nonexistent Expense Categories')"
+                                             @click="showBatchCreateInvalidItemDialog('expenseCategory', allInvalidExpenseCategoryNames)"></v-list-item>
+                                <v-list-item :prepend-icon="mdiShapePlusOutline"
+                                             :disabled="!!editingTransaction || !allInvalidIncomeCategoryNames || allInvalidIncomeCategoryNames.length < 1"
+                                             :title="tt('Create Nonexistent Income Categories')"
+                                             @click="showBatchCreateInvalidItemDialog('incomeCategory', allInvalidIncomeCategoryNames)"></v-list-item>
+                                <v-list-item :prepend-icon="mdiShapePlusOutline"
+                                             :disabled="!!editingTransaction || !allInvalidTransferCategoryNames || allInvalidTransferCategoryNames.length < 1"
+                                             :title="tt('Create Nonexistent Transfer Categories')"
+                                             @click="showBatchCreateInvalidItemDialog('transferCategory', allInvalidTransferCategoryNames)"></v-list-item>
+<!--                                <v-list-item :prepend-icon="mdiShapePlusOutline"-->
+<!--                                             :disabled="!!editingTransaction || !allInvalidTransactionTagNames || allInvalidTransactionTagNames.length < 1"-->
+<!--                                             :title="tt('Create Nonexistent Transaction Tags')"-->
+<!--                                             @click="showBatchCreateInvalidItemDialog('tag', allInvalidTransactionTagNames)"></v-list-item>-->
+                                <v-divider class="my-2"/>
+                                <v-list-item :prepend-icon="mdiTransfer"
                                              :disabled="!!editingTransaction || selectedExpenseTransactionCount < 1"
                                              :title="tt('Batch Convert Expense Transaction to Income Transaction')"
                                              @click="convertTransactionType(TransactionType.Expense, TransactionType.Income)"></v-list-item>
-                                <v-list-item :prepend-icon="mdiFindReplace"
+                                <v-list-item :prepend-icon="mdiTransfer"
                                              :disabled="!!editingTransaction || selectedExpenseTransactionCount < 1"
                                              :title="tt('Batch Convert Expense Transaction to Transfer Transaction')"
                                              @click="convertTransactionType(TransactionType.Expense, TransactionType.Transfer)"></v-list-item>
-                                <v-list-item :prepend-icon="mdiFindReplace"
+                                <v-list-item :prepend-icon="mdiTransfer"
                                              :disabled="!!editingTransaction || selectedIncomeTransactionCount < 1"
                                              :title="tt('Batch Convert Income Transaction to Expense Transaction')"
                                              @click="convertTransactionType(TransactionType.Income, TransactionType.Expense)"></v-list-item>
-                                <v-list-item :prepend-icon="mdiFindReplace"
+                                <v-list-item :prepend-icon="mdiTransfer"
                                              :disabled="!!editingTransaction || selectedIncomeTransactionCount < 1"
                                              :title="tt('Batch Convert Income Transaction to Transfer Transaction')"
                                              @click="convertTransactionType(TransactionType.Income, TransactionType.Transfer)"></v-list-item>
-                                <v-list-item :prepend-icon="mdiFindReplace"
+                                <v-list-item :prepend-icon="mdiTransfer"
                                              :disabled="!!editingTransaction || selectedTransferTransactionCount < 1"
                                              :title="tt('Batch Convert Transfer Transaction to Expense Transaction')"
                                              @click="convertTransactionType(TransactionType.Transfer, TransactionType.Expense)"></v-list-item>
-                                <v-list-item :prepend-icon="mdiFindReplace"
+                                <v-list-item :prepend-icon="mdiTransfer"
                                              :disabled="!!editingTransaction || selectedTransferTransactionCount < 1"
                                              :title="tt('Batch Convert Transfer Transaction to Income Transaction')"
                                              @click="convertTransactionType(TransactionType.Transfer, TransactionType.Income)"></v-list-item>
@@ -812,6 +829,7 @@
                                  @dateRange:change="changeCustomDateFilter"
                                  @error="onShowDateRangeError" />
     <batch-replace-dialog ref="batchReplaceDialog" />
+    <BatchCreateDialog ref="batchCreateDialog" />
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
     <input ref="fileInput" type="file" style="display: none" :accept="supportedImportFileExtensions" @change="setImportFile($event)" />
@@ -823,6 +841,7 @@ import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import BatchReplaceDialog, { type BatchReplaceDialogDataType } from './dialogs/BatchReplaceDialog.vue';
+import BatchCreateDialog, { type BatchCreateDialogDataType } from './dialogs/BatchCreateDialog.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
 
@@ -885,6 +904,8 @@ import {
     mdiDotsVertical,
     mdiHelpCircleOutline,
     mdiFindReplace,
+    mdiShapePlusOutline,
+    mdiTransfer,
     mdiClose,
     mdiArrowRight,
     mdiSelectAll,
@@ -898,6 +919,7 @@ import {
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type BatchReplaceDialogType = InstanceType<typeof BatchReplaceDialog>;
+type BatchCreateDialogType = InstanceType<typeof BatchCreateDialog>;
 
 type ImportTransactionDialogStep = 'uploadFile' | 'defineColumn' | 'checkData' | 'finalResult';
 
@@ -941,6 +963,7 @@ const statisticsStore = useStatisticsStore();
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const batchReplaceDialog = useTemplateRef<BatchReplaceDialogType>('batchReplaceDialog');
+const batchCreateDialog = useTemplateRef<BatchCreateDialogType>('batchCreateDialog');
 const fileInput = useTemplateRef<HTMLInputElement>('fileInput');
 
 const showState = ref<boolean>(false);
@@ -2487,6 +2510,78 @@ function showReplaceInvalidItemDialog(type: BatchReplaceDialogDataType, invalidI
 
                         if (originalTagName === result.sourceItem && (!tagId || tagId === '0' || !allTagsMap.value[tagId])) {
                             transaction.tagIds[j] = result.targetItem;
+                            updated = true;
+                        }
+                    }
+                }
+
+                if (updated) {
+                    updatedCount++;
+                    updateTransactionData(transaction);
+                }
+            }
+        }
+
+        if (updatedCount > 0) {
+            snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
+                count: updatedCount
+            });
+        }
+    });
+}
+
+function showBatchCreateInvalidItemDialog(type: BatchCreateDialogDataType, invalidItems: NameValue[]): void {
+    if (editingTransaction.value) {
+        return;
+    }
+
+    batchCreateDialog.value?.open({
+        type: type,
+        invalidItems: invalidItems
+    }).then(result => {
+        if (!result || !result.sourceTargetMap) {
+            return;
+        }
+
+        let updatedCount = 0;
+
+        if (importTransactions.value) {
+            const sourceTargetMap: Record<string, string> = result.sourceTargetMap;
+
+            for (let i = 0; i < importTransactions.value.length; i++) {
+                const transaction: ImportTransaction = importTransactions.value[i];
+
+                if (transaction.valid) {
+                    continue;
+                }
+
+                let updated = false;
+
+                if (type === 'expenseCategory' || type === 'incomeCategory' || type === 'transferCategory') {
+                    const categoryId = transaction.categoryId;
+                    const originalCategoryName = transaction.originalCategoryName;
+                    const targetItem = sourceTargetMap[originalCategoryName];
+
+                    if (transaction.type !== TransactionType.ModifyBalance && targetItem && (!categoryId || categoryId === '0' || !allCategoriesMap.value[categoryId])) {
+                        if (type === 'expenseCategory' && transaction.type === TransactionType.Expense) {
+                            transaction.categoryId = targetItem;
+                            updated = true;
+                        } else if (type === 'incomeCategory' && transaction.type === TransactionType.Income) {
+                            transaction.categoryId = targetItem;
+                            updated = true;
+                        } else if (type === 'transferCategory' && transaction.type === TransactionType.Transfer) {
+                            transaction.categoryId = targetItem;
+                            updated = true;
+                        }
+                    }
+                } else if (type === 'tag' && transaction.tagIds) {
+                    for (let j = 0; j < transaction.tagIds.length; j++) {
+                        const tagId = transaction.tagIds[j];
+                        const originalTagName = transaction.originalTagNames ? transaction.originalTagNames[j] : "";
+                        const targetItem = sourceTargetMap[originalTagName];
+
+                        if (targetItem && (!tagId || tagId === '0' || !allTagsMap.value[tagId])) {
+                            transaction.tagIds[j] = targetItem;
                             updated = true;
                         }
                     }

@@ -164,6 +164,7 @@ export const ALL_ACCOUNT_ICONS: Record<string, IconInfo> = {
 export const DEFAULT_ACCOUNT_ICON = ALL_ACCOUNT_ICONS[DEFAULT_ACCOUNT_ICON_ID];
 
 export const DEFAULT_CATEGORY_ICON_ID = '1';
+export const AUTOMATICALLY_CREATED_CATEGORY_ICON_ID = '561';
 
 export const ALL_CATEGORY_ICONS: Record<string, IconInfo> = {
     // 1 - 99 : Expense - Food & Drink

@@ -378,6 +378,32 @@
                                     </v-menu>
                                 </v-btn>
                                 <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
+                                       :disabled="!parsedFileDataColumnMapping || !isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.Amount.type])">
+                                    <span>{{ tt('Amount Format') }}</span>
+                                    <span class="ml-1" v-if="parsedFileDataColumnMapping && isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.Amount.type])">({{ KnownAmountFormat.valueOf(parsedFileAmountFormat || parsedFileAutoDetectedAmountFormat || '')?.format || tt('Unknown') }})</span>
+                                    <v-menu eager activator="parent" location="bottom" max-height="500">
+                                        <v-list>
+                                            <v-list-item key="auto"
+                                                         :append-icon="parsedFileAmountFormat === '' ? mdiCheck : undefined"
+                                                         @click="parsedFileAmountFormat = ''">
+                                                <v-list-item-title class="cursor-pointer">
+                                                    <span>{{ tt('Auto detect') }}</span>
+                                                    <span class="ml-1" v-if="parsedFileAutoDetectedAmountFormat && KnownAmountFormat.valueOf(parsedFileAutoDetectedAmountFormat || '')">({{ KnownAmountFormat.valueOf(parsedFileAutoDetectedAmountFormat || '')?.format }})</span>
+                                                    <span class="ml-1" v-if="!parsedFileAutoDetectedAmountFormat || !KnownAmountFormat.valueOf(parsedFileAutoDetectedAmountFormat || '')">({{ tt('Unknown') }})</span>
+                                                </v-list-item-title>
+                                            </v-list-item>
+                                            <v-list-item :key="amountFormat.type"
+                                                         :append-icon="parsedFileAmountFormat === amountFormat.type ? mdiCheck : undefined"
+                                                         v-for="amountFormat in KnownAmountFormat.values()"
+                                                         @click="parsedFileAmountFormat = amountFormat.type">
+                                                <v-list-item-title class="cursor-pointer">
+                                                    {{ amountFormat.format }}
+                                                </v-list-item-title>
+                                            </v-list-item>
+                                        </v-list>
+                                    </v-menu>
+                                </v-btn>
+                                <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
                                        v-if="parsedFileDataColumnMapping && isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.GeographicLocation.type])">
                                     <span>{{ tt('Geographic Location Separator') }}</span>
                                     <span class="ml-1" v-if="parsedFileGeoLocationSeparator">({{ parsedFileGeoLocationSeparator }})</span>
@@ -812,6 +838,7 @@ import { useOverviewStore } from '@/stores/overview.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 
 import type { NameValue, TypeAndDisplayName } from '@/core/base.ts';
+import { KnownAmountFormat } from '@/core/numeral.ts';
 import { KnownDateTimeFormat } from '@/core/datetime.ts';
 import { KnownDateTimezoneFormat } from '@/core/timezone.ts';
 import { CategoryType } from '@/core/category.ts';
@@ -930,6 +957,7 @@ const parsedFileDataColumnMapping = ref<Record<number, number>>({});
 const parsedFileTransactionTypeMapping = ref<Record<string, TransactionType>>({});
 const parsedFileTimeFormat = ref<string>('');
 const parsedFileTimezoneFormat = ref<string>('');
+const parsedFileAmountFormat = ref<string>('');
 const parsedFileGeoLocationSeparator = ref<string>(' ');
 const parsedFileTagSeparator = ref<string>(';');
 const importTransactions = ref<ImportTransaction[] | undefined>(undefined);
@@ -1286,6 +1314,37 @@ const parsedFileAutoDetectedTimezoneFormat = computed<string | undefined>(() => 
     }
 
     return detectedFormats[0].value;
+});
+
+const parsedFileAutoDetectedAmountFormat = computed<string | undefined>(() => {
+    if (!parsedFileData.value || !parsedFileData.value.length || !isNumber(parsedFileDataColumnMapping.value[ImportTransactionColumnType.Amount.type])) {
+        return undefined;
+    }
+
+    const allAmounts: string[] = [];
+    const amountColumnIndex = parsedFileDataColumnMapping.value[ImportTransactionColumnType.Amount.type];
+
+    const startIndex = parsedFileIncludeHeader.value ? 1 : 0;
+
+    for (let i = startIndex; i < parsedFileData.value.length; i++) {
+        if (parsedFileData.value[i].length <= amountColumnIndex) {
+            continue;
+        }
+
+        const amount = parsedFileData.value[i][amountColumnIndex];
+
+        if (amount) {
+            allAmounts.push(amount);
+        }
+    }
+
+    const detectedFormats = KnownAmountFormat.detectMulti(allAmounts);
+
+    if (!detectedFormats || !detectedFormats.length) {
+        return undefined;
+    }
+
+    return detectedFormats[0].type;
 });
 
 const importTransactionsTableHeight = computed<number | undefined>(() => {
@@ -1853,6 +1912,7 @@ function open(): Promise<void> {
     parsedFileTransactionTypeMapping.value = {};
     parsedFileTimeFormat.value = '';
     parsedFileTimezoneFormat.value = '';
+    parsedFileAmountFormat.value = '';
     parsedFileGeoLocationSeparator.value = ' ';
     parsedFileTagSeparator.value = ';';
     importTransactions.value = undefined;
@@ -1995,6 +2055,9 @@ function parseData(): void {
         let hasHeaderLine: boolean | undefined = undefined;
         let timeFormat: string | undefined = undefined;
         let timezoneFormat: string | undefined = undefined;
+        let amountFormat: string | undefined = undefined;
+        let amountDecimalSeparator: string | undefined = undefined;
+        let amountDigitGroupingSymbol: string | undefined = undefined;
         let geoLocationSeparator: string | undefined = undefined;
         let tagSeparator: string | undefined = undefined;
 
@@ -2004,6 +2067,7 @@ function parseData(): void {
             hasHeaderLine = parsedFileIncludeHeader.value;
             timeFormat = parsedFileTimeFormat.value;
             timezoneFormat = parsedFileTimezoneFormat.value;
+            amountFormat = parsedFileAmountFormat.value;
             geoLocationSeparator = parsedFileGeoLocationSeparator.value;
             tagSeparator = parsedFileTagSeparator.value;
 
@@ -2028,8 +2092,26 @@ function parseData(): void {
                 timezoneFormat = parsedFileAutoDetectedTimezoneFormat.value;
             }
 
+            if (!parsedFileAmountFormat.value) {
+                amountFormat = parsedFileAutoDetectedAmountFormat.value;
+            }
+
+            if (amountFormat) {
+                const knownAmountFormat = KnownAmountFormat.valueOf(amountFormat);
+
+                if (knownAmountFormat) {
+                    amountDecimalSeparator = knownAmountFormat.decimalSeparator.symbol;
+                    amountDigitGroupingSymbol = knownAmountFormat.digitGroupingSymbol?.symbol;
+                }
+            }
+
             if (!timeFormat) {
                 snackbar.value?.showError('Transaction time format is not set');
+                return;
+            }
+
+            if (!amountDecimalSeparator) {
+                snackbar.value?.showError('Transaction amount format is not set');
                 return;
             }
         }
@@ -2045,6 +2127,8 @@ function parseData(): void {
             hasHeaderLine: hasHeaderLine,
             timeFormat: timeFormat,
             timezoneFormat: timezoneFormat,
+            amountDecimalSeparator: amountDecimalSeparator,
+            amountDigitGroupingSymbol: amountDigitGroupingSymbol,
             geoSeparator: geoLocationSeparator,
             tagSeparator: tagSeparator
         }).then(response => {

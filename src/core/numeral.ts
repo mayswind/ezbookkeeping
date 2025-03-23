@@ -144,6 +144,87 @@ export class DigitGroupingType implements TypeAndName {
     }
 }
 
+export class KnownAmountFormat {
+    private static readonly allInstances: KnownAmountFormat[] = [];
+    private static readonly allInstancesByType: Record<string, KnownAmountFormat> = {};
+
+    public static readonly DotDecimalSeparator = new KnownAmountFormat('1234.56', DecimalSeparator.Dot, undefined, /^-?[0-9]+(\.[0-9]+)?$/);
+    public static readonly CommaDecimalSeparator = new KnownAmountFormat('1234,56', DecimalSeparator.Comma, undefined, /^-?[0-9]+(,[0-9]+)?$/);
+    public static readonly DotDecimalSeparatorWithCommaGroupingSymbol = new KnownAmountFormat('1,234.56', DecimalSeparator.Dot, DigitGroupingSymbol.Comma, /^-?([0-9]+,)*[0-9]+(\.[0-9]+)?$/);
+    public static readonly CommaDecimalSeparatorWithDotGroupingSymbol = new KnownAmountFormat('1.234,56', DecimalSeparator.Comma, DigitGroupingSymbol.Dot, /^-?([0-9]+\.)*[0-9]+(,[0-9]+)?$/);
+    public static readonly DotDecimalSeparatorWithSpaceGroupingSymbol = new KnownAmountFormat('1 234.56', DecimalSeparator.Dot, DigitGroupingSymbol.Space, /^-?([0-9]+ )*[0-9]+(\.[0-9]+)?$/);
+    public static readonly CommaDecimalSeparatorWithSpaceGroupingSymbol = new KnownAmountFormat('1 234,56', DecimalSeparator.Comma, DigitGroupingSymbol.Space, /^-?([0-9]+ )*[0-9]+(,[0-9]+)?$/);
+    public static readonly DotDecimalSeparatorWithApostropheGroupingSymbol = new KnownAmountFormat('1\'234.56', DecimalSeparator.Dot, DigitGroupingSymbol.Apostrophe, /^-?([0-9]+')*[0-9]+(\.[0-9]+)?$/);
+    public static readonly CommaDecimalSeparatorWithApostropheGroupingSymbol = new KnownAmountFormat('1\'234,56', DecimalSeparator.Comma, DigitGroupingSymbol.Apostrophe, /^-?([0-9]+')*[0-9]+(,[0-9]+)?$/);
+
+    public readonly format: string;
+    public readonly decimalSeparator: DecimalSeparator;
+    public readonly digitGroupingSymbol?: DigitGroupingSymbol;
+    public readonly type: string;
+    private readonly regex: RegExp;
+
+    private constructor(format: string, decimalSeparator: DecimalSeparator, digitGroupingSymbol: DigitGroupingSymbol | undefined, regex: RegExp) {
+        this.format = format;
+        this.decimalSeparator = decimalSeparator;
+        this.digitGroupingSymbol = digitGroupingSymbol;
+        this.type = this.decimalSeparator.type + '-' + (this.digitGroupingSymbol ? this.digitGroupingSymbol.type : 0).toString();
+        this.regex = regex;
+
+        KnownAmountFormat.allInstances.push(this);
+        KnownAmountFormat.allInstancesByType[this.type] = this;
+    }
+
+    public isValid(amount: string): boolean {
+        return this.regex.test(amount);
+    }
+
+    public static values(): KnownAmountFormat[] {
+        return KnownAmountFormat.allInstances;
+    }
+
+    public static valueOf(type: string): KnownAmountFormat | undefined {
+        return KnownAmountFormat.allInstancesByType[type];
+    }
+
+    public static detect(amount: string): KnownAmountFormat[] | undefined {
+        const result: KnownAmountFormat[] = [];
+
+        for (const format of KnownAmountFormat.allInstances) {
+            if (format.isValid(amount)) {
+                result.push(format);
+            }
+        }
+
+        return result.length > 0 ? result : undefined;
+    }
+
+    public static detectMulti(amounts: string[]): KnownAmountFormat[] | undefined {
+        const detectedCounts: Record<string, number> = {};
+
+        for (const amount of amounts) {
+            const detectedFormats = KnownAmountFormat.detect(amount);
+
+            if (detectedFormats) {
+                for (const format of detectedFormats) {
+                    detectedCounts[format.type] = (detectedCounts[format.type] || 0) + 1;
+                }
+            } else {
+                return undefined;
+            }
+        }
+
+        const result: KnownAmountFormat[] = [];
+
+        for (const format of KnownAmountFormat.allInstances) {
+            if (detectedCounts[format.type] === amounts.length) {
+                result.push(format);
+            }
+        }
+
+        return result.length > 0 ? result : undefined;
+    }
+}
+
 export class AmountFilterType {
     private static readonly allInstances: AmountFilterType[] = [];
     private static readonly allInstancesByType: Record<string, AmountFilterType> = {};

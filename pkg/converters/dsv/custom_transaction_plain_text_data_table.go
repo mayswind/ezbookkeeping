@@ -20,6 +20,8 @@ type customPlainTextDataTable struct {
 	timeFormat                 string
 	timezoneFormat             string
 	timeFormatIncludeTimezone  bool
+	amountDecimalSeparator     string
+	amountDigitGroupingSymbol  string
 }
 
 // customPlainTextDataRow defines the structure of custom plain text transaction data row
@@ -174,27 +176,25 @@ func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user
 
 	// trim trailing zero in decimal
 	if rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT] != "" {
-		rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.TrimTrailingZerosInDecimal(rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT])
-		amount, err := utils.ParseAmount(rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT])
+		amount, err := t.parseAmount(ctx, rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT])
 
 		if err != nil {
 			log.Errorf(ctx, "[custom_transaction_plain_text_data_table.parseTransaction] cannot parsing transaction amount \"%s\", because %s", rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT], err.Error())
-			return nil, false, errs.ErrAmountInvalid
+			return nil, false, err
 		}
 
-		rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(amount)
+		rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = amount
 	}
 
 	if rowData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] != "" {
-		rowData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = utils.TrimTrailingZerosInDecimal(rowData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT])
-		amount, err := utils.ParseAmount(rowData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT])
+		amount, err := t.parseAmount(ctx, rowData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT])
 
 		if err != nil {
 			log.Errorf(ctx, "[custom_transaction_plain_text_data_table.parseTransaction] cannot parsing transaction related amount \"%s\", because %s", rowData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT], err.Error())
-			return nil, false, errs.ErrAmountInvalid
+			return nil, false, err
 		}
 
-		rowData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = utils.FormatAmount(amount)
+		rowData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = amount
 	}
 
 	if _, exists := rowData[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY]; !exists {
@@ -212,8 +212,31 @@ func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user
 	return rowData, true, nil
 }
 
+func (t *customPlainTextDataRowIterator) parseAmount(ctx core.Context, amountValue string) (string, error) {
+	if t.transactionDataTable.amountDigitGroupingSymbol != "" {
+		amountValue = strings.ReplaceAll(amountValue, t.transactionDataTable.amountDigitGroupingSymbol, "")
+	}
+
+	if t.transactionDataTable.amountDecimalSeparator != "" && t.transactionDataTable.amountDecimalSeparator != "." {
+		if strings.Contains(amountValue, ".") {
+			return "", errs.ErrAmountInvalid
+		}
+
+		amountValue = strings.ReplaceAll(amountValue, t.transactionDataTable.amountDecimalSeparator, ".")
+	}
+
+	amountValue = utils.TrimTrailingZerosInDecimal(amountValue)
+	amount, err := utils.ParseAmount(amountValue)
+
+	if err != nil {
+		return "", errs.ErrAmountInvalid
+	}
+
+	return utils.FormatAmount(amount), nil
+}
+
 // CreateNewCustomPlainTextDataTable returns transaction data table from imported data table
-func CreateNewCustomPlainTextDataTable(dataTable datatable.ImportedDataTable, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, timeFormat string, timezoneFormat string) *customPlainTextDataTable {
+func CreateNewCustomPlainTextDataTable(dataTable datatable.ImportedDataTable, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, timeFormat string, timezoneFormat string, amountDecimalSeparator string, amountDigitGroupingSymbol string) *customPlainTextDataTable {
 	timeFormatIncludeTimezone := strings.Contains(timeFormat, "z") || strings.Contains(timeFormat, "Z")
 
 	return &customPlainTextDataTable{
@@ -223,6 +246,8 @@ func CreateNewCustomPlainTextDataTable(dataTable datatable.ImportedDataTable, co
 		timeFormat:                 getDateTimeFormat(timeFormat),
 		timezoneFormat:             timezoneFormat,
 		timeFormatIncludeTimezone:  timeFormatIncludeTimezone,
+		amountDecimalSeparator:     amountDecimalSeparator,
+		amountDigitGroupingSymbol:  amountDigitGroupingSymbol,
 	}
 }
 

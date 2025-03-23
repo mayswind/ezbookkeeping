@@ -103,6 +103,8 @@ type customTransactionDataDsvFileImporter struct {
 	hasHeaderLine              bool
 	timeFormat                 string
 	timezoneFormat             string
+	amountDecimalSeparator     string
+	amountDigitGroupingSymbol  string
 	geoLocationSeparator       string
 	transactionTagSeparator    string
 }
@@ -155,7 +157,7 @@ func (c *customTransactionDataDsvFileImporter) ParseImportedData(ctx core.Contex
 	}
 
 	dataTable := csvconverter.CreateNewCustomCsvImportedDataTable(allLines)
-	transactionDataTable := CreateNewCustomPlainTextDataTable(dataTable, c.columnIndexMapping, c.transactionTypeNameMapping, c.timeFormat, c.timezoneFormat)
+	transactionDataTable := CreateNewCustomPlainTextDataTable(dataTable, c.columnIndexMapping, c.transactionTypeNameMapping, c.timeFormat, c.timezoneFormat, c.amountDecimalSeparator, c.amountDigitGroupingSymbol)
 	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(customTransactionTypeNameMapping, c.geoLocationSeparator, c.transactionTagSeparator)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
@@ -188,7 +190,7 @@ func CreateNewCustomTransactionDataDsvFileParser(fileType string, fileEncoding s
 }
 
 // CreateNewCustomTransactionDataDsvFileImporter returns a new custom dsv importer for transaction data
-func CreateNewCustomTransactionDataDsvFileImporter(fileType string, fileEncoding string, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, hasHeaderLine bool, timeFormat string, timezoneFormat string, geoLocationSeparator string, transactionTagSeparator string) (converter.TransactionDataImporter, error) {
+func CreateNewCustomTransactionDataDsvFileImporter(fileType string, fileEncoding string, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, hasHeaderLine bool, timeFormat string, timezoneFormat string, amountDecimalSeparator string, amountDigitGroupingSymbol string, geoLocationSeparator string, transactionTagSeparator string) (converter.TransactionDataImporter, error) {
 	separator, exists := supportedFileTypeSeparators[fileType]
 
 	if !exists {
@@ -221,6 +223,8 @@ func CreateNewCustomTransactionDataDsvFileImporter(fileType string, fileEncoding
 		hasHeaderLine:              hasHeaderLine,
 		timeFormat:                 timeFormat,
 		timezoneFormat:             timezoneFormat,
+		amountDecimalSeparator:     amountDecimalSeparator,
+		amountDigitGroupingSymbol:  amountDigitGroupingSymbol,
 		geoLocationSeparator:       geoLocationSeparator,
 		transactionTagSeparator:    transactionTagSeparator,
 	}, nil

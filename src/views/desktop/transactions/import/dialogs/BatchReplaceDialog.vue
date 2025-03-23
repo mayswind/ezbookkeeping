@@ -13,6 +13,15 @@
                     <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'transferCategory'">{{ tt('Replace Invalid Transfer Categories') }}</h4>
                     <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'account'">{{ tt('Replace Invalid Accounts') }}</h4>
                     <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'tag'">{{ tt('Replace Invalid Transaction Tags') }}</h4>
+                    <v-btn density="compact" color="default" variant="text" size="24"
+                           class="ml-2" :icon="true" :disabled="loading"
+                           :loading="loading" @click="reload">
+                        <template #loader>
+                            <v-progress-circular indeterminate size="20"/>
+                        </template>
+                        <v-icon :icon="mdiRefresh" size="24" />
+                        <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
+                    </v-btn>
                 </div>
             </template>
             <v-card-text class="my-md-4 w-100 d-flex justify-center" v-if="type === 'expenseCategory' || type === 'incomeCategory' || type === 'transferCategory'">
@@ -22,6 +31,7 @@
                             item-title="name"
                             item-value="value"
                             persistent-placeholder
+                            :disabled="loading"
                             :label="tt('Invalid Category')"
                             :placeholder="tt('Invalid Category')"
                             :items="invalidItems"
@@ -36,7 +46,7 @@
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                            secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                            secondary-hidden-field="hidden"
-                                           :disabled="!hasAvailableExpenseCategories"
+                                           :disabled="loading || !hasAvailableExpenseCategories"
                                            :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
                                            :show-selection-primary-text="true"
                                            :custom-selection-primary-text="getTransactionPrimaryCategoryName(targetItem, allCategories[CategoryType.Expense])"
@@ -53,7 +63,7 @@
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                            secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                            secondary-hidden-field="hidden"
-                                           :disabled="!hasAvailableIncomeCategories"
+                                           :disabled="loading || !hasAvailableIncomeCategories"
                                            :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
                                            :show-selection-primary-text="true"
                                            :custom-selection-primary-text="getTransactionPrimaryCategoryName(targetItem, allCategories[CategoryType.Income])"
@@ -70,7 +80,7 @@
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                            secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                            secondary-hidden-field="hidden"
-                                           :disabled="!hasAvailableTransferCategories"
+                                           :disabled="loading || !hasAvailableTransferCategories"
                                            :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
                                            :show-selection-primary-text="true"
                                            :custom-selection-primary-text="getTransactionPrimaryCategoryName(targetItem, allCategories[CategoryType.Transfer])"
@@ -91,6 +101,7 @@
                             item-title="name"
                             item-value="value"
                             persistent-placeholder
+                            :disabled="loading"
                             :label="tt('Invalid Account')"
                             :placeholder="tt('Invalid Account')"
                             :items="invalidItems"
@@ -107,7 +118,7 @@
                                            secondary-key-field="id" secondary-value-field="id"
                                            secondary-title-field="name" secondary-footer-field="displayBalance"
                                            secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                           :disabled="!allVisibleAccounts.length"
+                                           :disabled="loading || !allVisibleAccounts.length"
                                            :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
                                            :custom-selection-primary-text="getAccountDisplayName(targetItem)"
                                            :label="tt('Target Account')"
@@ -125,6 +136,7 @@
                             item-title="name"
                             item-value="value"
                             persistent-placeholder
+                            :disabled="loading"
                             :label="tt('Invalid Tag')"
                             :placeholder="tt('Invalid Tag')"
                             :items="invalidItems"
@@ -138,6 +150,7 @@
                             item-value="id"
                             persistent-placeholder
                             chips
+                            :disabled="loading"
                             :label="tt('Target Tag')"
                             :placeholder="tt('Target Tag')"
                             :items="allTags"
@@ -166,16 +179,20 @@
             </v-card-text>
             <v-card-text class="overflow-y-visible">
                 <div class="w-100 d-flex justify-center gap-4">
-                    <v-btn :disabled="(mode === 'replaceInvalidItems' && !sourceItem && sourceItem !== '') || (!targetItem && targetItem !== '')" @click="confirm">{{ tt('OK') }}</v-btn>
-                    <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
+                    <v-btn :disabled="loading || (mode === 'replaceInvalidItems' && !sourceItem && sourceItem !== '') || (!targetItem && targetItem !== '')" @click="confirm">{{ tt('OK') }}</v-btn>
+                    <v-btn color="secondary" variant="tonal" :disabled="loading" @click="cancel">{{ tt('Cancel') }}</v-btn>
                 </div>
             </v-card-text>
         </v-card>
     </v-dialog>
+
+    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { ref, computed, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -196,8 +213,14 @@ import {
 } from '@/lib/category.ts';
 
 import {
+    mdiRefresh,
     mdiPound
 } from '@mdi/js';
+
+export type BatchReplaceDialogMode = 'batchReplace' | 'replaceInvalidItems';
+export type BatchReplaceDialogDataType = 'expenseCategory' | 'incomeCategory' | 'transferCategory' | 'account' | 'destinationAccount' | 'tag';
+
+type SnackBarType = InstanceType<typeof SnackBar>;
 
 interface BatchReplaceDialogResponse {
     sourceItem?: string;
@@ -215,9 +238,12 @@ const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
 
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+
 const showState = ref<boolean>(false);
-const mode = ref<string>('');
-const type = ref<string>('');
+const loading = ref<boolean>(false);
+const mode = ref<BatchReplaceDialogMode | ''>('');
+const type = ref<BatchReplaceDialogDataType | ''>('');
 const invalidItems = ref<NameValue[] | undefined>([]);
 const sourceItem = ref<string | undefined>(undefined);
 const targetItem = ref<string | undefined>(undefined);
@@ -244,7 +270,7 @@ function getAccountDisplayName(accountId?: string): string {
     }
 }
 
-function open(options: { mode: string; type: string; invalidItems?: NameValue[] }): Promise<BatchReplaceDialogResponse> {
+function open(options: { mode: BatchReplaceDialogMode; type: BatchReplaceDialogDataType; invalidItems?: NameValue[] }): Promise<BatchReplaceDialogResponse> {
     mode.value = options.mode;
     type.value = options.type;
     sourceItem.value = undefined;
@@ -262,6 +288,46 @@ function open(options: { mode: string; type: string; invalidItems?: NameValue[] 
         resolveFunc = resolve;
         rejectFunc = reject;
     });
+}
+
+function reload(): void {
+    if (type.value === 'expenseCategory' || type.value === 'incomeCategory' || type.value === 'transferCategory') {
+        loading.value = true;
+
+        transactionCategoriesStore.loadAllCategories({ force: true }).then(() => {
+            loading.value = false;
+        }).catch(error => {
+            loading.value = false;
+
+            if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+        });
+    } else if (type.value === 'account' || type.value === 'destinationAccount') {
+        loading.value = true;
+
+        accountsStore.loadAllAccounts({ force: true }).then(() => {
+            loading.value = false;
+        }).catch(error => {
+            loading.value = false;
+
+            if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+        });
+    } else if (type.value === 'tag') {
+        loading.value = true;
+
+        transactionTagsStore.loadAllTags({ force: true }).then(() => {
+            loading.value = false;
+        }).catch(error => {
+            loading.value = false;
+
+            if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+        });
+    }
 }
 
 function confirm(): void {

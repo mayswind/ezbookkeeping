@@ -149,18 +149,18 @@ function open(options: { id?: string; parentId?: string; type?: CategoryType; cu
     submitting.value = false;
 
     const newTransactionCategory = TransactionCategory.createNewCategory();
-    category.value.from(newTransactionCategory);
+    category.value.fillFrom(newTransactionCategory);
 
     if (options.id) {
         if (options.currentCategory) {
-            category.value.from(options.currentCategory);
+            category.value.fillFrom(options.currentCategory);
         }
 
         editCategoryId.value = options.id;
         transactionCategoriesStore.getCategory({
             categoryId: editCategoryId.value
         }).then(response => {
-            category.value.from(response);
+            category.value.fillFrom(response);
             loading.value = false;
         }).catch(error => {
             loading.value = false;

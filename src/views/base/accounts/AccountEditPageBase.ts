@@ -139,13 +139,13 @@ export function useAccountEditPageBaseBase() {
     }
 
     function setAccount(newAccount: Account): void {
-        account.value.from(newAccount);
+        account.value.fillFrom(newAccount);
         subAccounts.value = [];
 
         if (newAccount.subAccounts && newAccount.subAccounts.length > 0) {
             for (let i = 0; i < newAccount.subAccounts.length; i++) {
-                const subAccount = account.value.createNewSubAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTime());
-                subAccount.from(newAccount.subAccounts[i]);
+                const subAccount: Account = account.value.createNewSubAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTime());
+                subAccount.fillFrom(newAccount.subAccounts[i]);
 
                 subAccounts.value.push(subAccount);
             }

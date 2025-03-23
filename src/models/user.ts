@@ -34,7 +34,7 @@ export class User {
         this.firstDayOfWeek = firstDayOfWeek;
     }
 
-    public from(user: User | UserBasicInfo | UserProfileResponse): void {
+    public fillFrom(user: User | UserBasicInfo | UserProfileResponse): void {
         this.username = user.username;
         this.email = user.email;
         this.nickname = user.nickname;

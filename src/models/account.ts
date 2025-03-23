@@ -81,7 +81,7 @@ export class Account implements AccountInfoResponse {
         return !this.visible;
     }
 
-    public from(other: Account): void {
+    public fillFrom(other: Account): void {
         this.id = other.id;
         this.category = other.category;
         this.type = other.type;

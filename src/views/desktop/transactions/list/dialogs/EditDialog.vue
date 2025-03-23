@@ -718,7 +718,7 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
         if (options && options.id) {
             if (options.currentTemplate) {
                 setTransaction(options.currentTemplate, options, false, false);
-                (transaction.value as TransactionTemplate).from(options.currentTemplate);
+                (transaction.value as TransactionTemplate).fillFrom(options.currentTemplate);
             }
 
             mode.value = TransactionEditPageMode.Edit;
@@ -768,7 +768,7 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
                 transaction.value = TransactionTemplate.createNewTransactionTemplate(transaction.value);
             }
 
-            (transaction.value as TransactionTemplate).from(template);
+            (transaction.value as TransactionTemplate).fillFrom(template);
         } else {
             setTransaction(null, options, true, true);
         }

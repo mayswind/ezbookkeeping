@@ -151,12 +151,12 @@ export function useUserProfilePageBase() {
 
     function setCurrentUserProfile(profile: UserBasicInfo): void {
         emailVerified.value = profile.emailVerified;
-        oldProfile.value.from(profile);
-        newProfile.value.from(oldProfile.value);
+        oldProfile.value.fillFrom(profile);
+        newProfile.value.fillFrom(oldProfile.value);
     }
 
     function reset(): void {
-        newProfile.value.from(oldProfile.value);
+        newProfile.value.fillFrom(oldProfile.value);
     }
 
     function doAfterProfileUpdate(user: UserBasicInfo): void {

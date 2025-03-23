@@ -209,7 +209,7 @@ function init(): void {
         transactionCategoriesStore.getCategory({
             categoryId: editCategoryId.value
         }).then(response => {
-            category.value.from(response);
+            category.value.fillFrom(response);
             loading.value = false;
         }).catch(error => {
             if (error.processed) {

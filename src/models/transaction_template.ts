@@ -27,7 +27,7 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
         this.hidden = hidden;
     }
 
-    public from(other: TransactionTemplate): void {
+    public fillFrom(other: TransactionTemplate): void {
         this.templateType = other.templateType;
         this.name = other.name;
 

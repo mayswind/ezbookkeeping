@@ -37,7 +37,7 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
         return !this.visible;
     }
 
-    public from(other: TransactionCategory): void {
+    public fillFrom(other: TransactionCategory): void {
         this.id = other.id;
         this.name = other.name;
         this.parentId = other.parentId;

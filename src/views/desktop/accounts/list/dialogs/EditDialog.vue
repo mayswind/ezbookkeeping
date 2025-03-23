@@ -279,7 +279,7 @@ function open(options?: { id?: string, currentAccount?: Account, category?: numb
     submitting.value = false;
 
     const newAccount = Account.createNewAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTime());
-    account.value.from(newAccount);
+    account.value.fillFrom(newAccount);
     subAccounts.value = [];
     currentAccountIndex.value = -1;
 

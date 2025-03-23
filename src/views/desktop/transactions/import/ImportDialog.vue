@@ -796,7 +796,7 @@ import type { StepBarItem } from '@/components/desktop/StepsBar.vue';
 import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
-import BatchReplaceDialog from './BatchReplaceDialog.vue';
+import BatchReplaceDialog from './dialogs/BatchReplaceDialog.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
 

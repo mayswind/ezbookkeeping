@@ -1,6 +1,11 @@
-import { CategoryType } from '@/core/category.ts';
+import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { TransactionType } from '@/core/transaction.ts';
-import { type TransactionCategoriesWithVisibleCount, TransactionCategory } from '@/models/transaction_category.ts';
+import {
+    type TransactionCategoriesWithVisibleCount,
+    type TransactionCategoryCreateRequest,
+    type TransactionCategoryCreateWithSubCategories,
+    TransactionCategory
+} from '@/models/transaction_category.ts';
 
 export function transactionTypeToCategoryType(transactionType: TransactionType): CategoryType | null {
     if (transactionType === TransactionType.Income) {
@@ -24,6 +29,47 @@ export function categoryTypeToTransactionType(categoryType: CategoryType): Trans
     } else {
         return null;
     }
+}
+
+export function localizedPresetCategoryToTransactionCategoryCreateWithSubCategorys(presetCategory: LocalizedPresetCategory): TransactionCategoryCreateWithSubCategories {
+    const subCategories: TransactionCategoryCreateRequest[] = [];
+
+    for (let i = 0; i < presetCategory.subCategories.length; i++) {
+        const subPresetCategory = presetCategory.subCategories[i];
+        const subCategory: TransactionCategoryCreateRequest = {
+            name: subPresetCategory.name,
+            type: subPresetCategory.type,
+            parentId: '',
+            icon: subPresetCategory.icon,
+            color: subPresetCategory.color,
+            comment: '',
+            clientSessionId: ''
+        };
+
+        subCategories.push(subCategory);
+    }
+
+    const categoryWithSubCategories: TransactionCategoryCreateWithSubCategories = {
+        name: presetCategory.name,
+        type: presetCategory.type,
+        icon: presetCategory.icon,
+        color: presetCategory.color,
+        subCategories: subCategories
+    };
+
+    return categoryWithSubCategories;
+}
+
+export function localizedPresetCategoriesToTransactionCategoryCreateWithSubCategories(presetCategories: LocalizedPresetCategory[]): TransactionCategoryCreateWithSubCategories[] {
+    const categories: TransactionCategoryCreateWithSubCategories[] = [];
+
+    for (let i = 0; i < presetCategories.length; i++) {
+        const presetCategory = presetCategories[i];
+        const categoryWithSubCategories = localizedPresetCategoryToTransactionCategoryCreateWithSubCategorys(presetCategory);
+        categories.push(categoryWithSubCategories);
+    }
+
+    return categories;
 }
 
 export function getSecondaryTransactionMapByName(allCategories: TransactionCategory[]): Record<string, TransactionCategory> {

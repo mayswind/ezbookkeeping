@@ -67,6 +67,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import type { PartialRecord } from '@/core/base.ts';
 import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { categorizedArrayToPlainArray } from '@/lib/common.ts';
+import { localizedPresetCategoriesToTransactionCategoryCreateWithSubCategories } from '@/lib/category.ts';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
 
@@ -113,7 +114,8 @@ function getCategoryTypeName(categoryType: CategoryType): string {
 function save(): void {
     submitting.value = true;
 
-    const submitCategories = categorizedArrayToPlainArray(allPresetCategories.value);
+    const presetCategoriesArray = categorizedArrayToPlainArray(allPresetCategories.value);
+    const submitCategories = localizedPresetCategoriesToTransactionCategoryCreateWithSubCategories(presetCategoriesArray);
 
     transactionCategoriesStore.addCategories({
         categories: submitCategories

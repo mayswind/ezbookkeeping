@@ -68,6 +68,7 @@ import type { PartialRecord } from '@/core/base.ts';
 import type { LanguageOption } from '@/locales/index.ts';
 import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { getObjectOwnFieldCount, categorizedArrayToPlainArray } from '@/lib/common.ts';
+import { localizedPresetCategoriesToTransactionCategoryCreateWithSubCategories } from '@/lib/category.ts';
 
 const props = defineProps<{
     f7route: Router.Route;
@@ -109,7 +110,8 @@ function save(): void {
     submitting.value = true;
     showLoading(() => submitting.value);
 
-    const submitCategories = categorizedArrayToPlainArray(allPresetCategories.value);
+    const presetCategoriesArray = categorizedArrayToPlainArray(allPresetCategories.value);
+    const submitCategories = localizedPresetCategoriesToTransactionCategoryCreateWithSubCategories(presetCategoriesArray);
 
     transactionCategoriesStore.addCategories({
         categories: submitCategories

@@ -1,5 +1,5 @@
 <template>
-    <v-dialog width="600" :persistent="!!persistent" v-model="showState">
+    <v-dialog width="600" :persistent="!!submitting || !!selectedNames.length" v-model="showState">
         <v-card class="pa-2 pa-sm-4 pa-md-4">
             <template #title>
                 <div class="d-flex align-center justify-center">
@@ -98,10 +98,6 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 interface BatchCreateDialogResponse {
     sourceTargetMap: Record<string, string>;
 }
-
-defineProps<{
-    persistent?: boolean;
-}>();
 
 const { tt } = useI18n();
 

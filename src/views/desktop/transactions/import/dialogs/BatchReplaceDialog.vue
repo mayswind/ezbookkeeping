@@ -1,5 +1,5 @@
 <template>
-    <v-dialog width="600" :persistent="!!persistent" v-model="showState">
+    <v-dialog width="600" :persistent="!!loading || (mode === 'replaceInvalidItems' && !!sourceItem) || !!targetItem" v-model="showState">
         <v-card class="pa-2 pa-sm-4 pa-md-4">
             <template #title>
                 <div class="d-flex align-center justify-center">
@@ -226,10 +226,6 @@ interface BatchReplaceDialogResponse {
     sourceItem?: string;
     targetItem?: string;
 }
-
-defineProps<{
-    persistent?: boolean;
-}>();
 
 const { tt, getCategorizedAccountsWithDisplayBalance } = useI18n();
 

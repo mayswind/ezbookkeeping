@@ -6,32 +6,39 @@
 [![Latest Release](https://img.shields.io/github/release/mayswind/ezbookkeeping.svg?style=flat)](https://github.com/mayswind/ezbookkeeping/releases)
 
 ## Introduction
-ezBookkeeping is a lightweight personal bookkeeping app hosted by yourself. It can be deployed on almost all platforms, including Windows, macOS and Linux on x86, amd64 and ARM architectures. You can even deploy it on an raspberry device. It also supports many different databases, including SQLite, MySQL and PostgreSQL. With docker, you can just deploy it via one command without complicated configuration.
+ezBookkeeping is a lightweight self-hosted personal bookkeeping app with user-friendly interface for both desktop and mobile devices. Built with PWA technology, it provides near-native experience on mobile device. It's easily to be deployed and configured, you can just deploy it by a single command via Docker. It supports almost all platforms, including Windows, macOS, and Linux, and is compatible with x86, amd64 and ARM architectures. It only requires very few system resources, and you can even run it on a Raspberry Pi device.
 
 Online Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-demo.mayswind.net)
 
 ## Features
-1. Open source & Self-hosted
+1. Open Source & Self-Hosted
 2. Lightweight & Fast
-3. Easy to install
-    * Docker support
-    * Multiple database support (SQLite, MySQL, PostgreSQL, etc.)
-    * Multiple operation system & hardware support (Windows, macOS, Linux & x86, amd64, ARM)
-4. User-friendly interface
-    * Both desktop and mobile UI
-    * Close to native app experience (for mobile device)
-    * Two-level account & two-level category support
-    * Plentiful preset categories
-    * Geographic location and map support
-    * Searching & filtering history records
-    * Data statistics
+3. Easy Installation
+    * Support Docker
+    * Support multiple databases (SQLite, MySQL, PostgreSQL, etc.)
+    * Support multiple operation system & hardware architectures (Windows, macOS, Linux & x86, amd64, ARM)
+4. User-Friendly Interface
+    * Native UI for both desktop and mobile devices
+    * Support PWA, providing near-native experience for mobile devices
     * Dark theme
-5. Multiple currency support & automatically updating exchange rates
-6. Multiple timezone support
-7. Multi-language support
-8. Two-factor authentication
-9. Application lock (PIN code / WebAuthn)
-10. Data export & import (CSV, OFX, QFX, QIF, IIF, GnuCash, FireFly III, Beancount, etc.)
+5. Powerful Bookkeeping Features
+    * Support two-level account
+    * Support two-level transaction categories and predefined categories
+    * Support transaction pictures
+    * Support geographic location tracking and map
+    * Support recurring transactions
+    * Search and filtering transaction records
+    * Data visualization and statistical analysis
+6. Localization Support
+    * Multi-language support
+    * Multi-currency support with automatic exchange rate updates from various financial institutions
+    * Multi-timezone support
+    * Customizable date, time, number, and currency display formats
+7. Security & Reliability
+    * Two-factor authentication (2FA)
+    * Login rate limiting
+    * Application lock (PIN code / WebAuthn)
+8. Data export & import (CSV, OFX, QFX, QIF, IIF, GnuCash, FireFly III, Beancount, etc.)
 
 ## Screenshots
 ### Desktop Version

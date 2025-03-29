@@ -155,10 +155,10 @@
                                              :disabled="!!editingTransaction || !allInvalidTransferCategoryNames || allInvalidTransferCategoryNames.length < 1"
                                              :title="tt('Create Nonexistent Transfer Categories')"
                                              @click="showBatchCreateInvalidItemDialog('transferCategory', allInvalidTransferCategoryNames)"></v-list-item>
-<!--                                <v-list-item :prepend-icon="mdiShapePlusOutline"-->
-<!--                                             :disabled="!!editingTransaction || !allInvalidTransactionTagNames || allInvalidTransactionTagNames.length < 1"-->
-<!--                                             :title="tt('Create Nonexistent Transaction Tags')"-->
-<!--                                             @click="showBatchCreateInvalidItemDialog('tag', allInvalidTransactionTagNames)"></v-list-item>-->
+                                <v-list-item :prepend-icon="mdiShapePlusOutline"
+                                             :disabled="!!editingTransaction || !allInvalidTransactionTagNames || allInvalidTransactionTagNames.length < 1"
+                                             :title="tt('Create Nonexistent Transaction Tags')"
+                                             @click="showBatchCreateInvalidItemDialog('tag', allInvalidTransactionTagNames)"></v-list-item>
                                 <v-divider class="my-2"/>
                                 <v-list-item :prepend-icon="mdiTransfer"
                                              :disabled="!!editingTransaction || selectedExpenseTransactionCount < 1"

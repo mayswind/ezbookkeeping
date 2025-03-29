@@ -222,6 +222,76 @@ func (s *TransactionTagService) CreateTag(c core.Context, tag *models.Transactio
 	})
 }
 
+// CreateTags saves a few transaction tag models to database
+func (s *TransactionTagService) CreateTags(c core.Context, uid int64, tags []*models.TransactionTag, skipExists bool) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	allTagNames := make([]string, len(tags))
+
+	for i := 0; i < len(tags); i++ {
+		allTagNames[i] = tags[i].Name
+	}
+
+	var existTags []*models.TransactionTag
+	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).In("name", allTagNames).Find(&existTags)
+
+	if err != nil {
+		return err
+	} else if !skipExists && len(existTags) > 0 {
+		return errs.ErrTransactionTagNameAlreadyExists
+	}
+
+	existsNameTagMap := make(map[string]*models.TransactionTag, len(existTags))
+
+	for i := 0; i < len(existTags); i++ {
+		tag := existTags[i]
+		existsNameTagMap[tag.Name] = tag
+	}
+
+	newTags := make([]*models.TransactionTag, 0, len(tags)-len(existTags))
+
+	for i := 0; i < len(tags); i++ {
+		tag := tags[i]
+		existsTag, exists := existsNameTagMap[tag.Name]
+
+		if exists {
+			tag.FillFromOtherTag(existsTag)
+			continue
+		}
+
+		newTags = append(newTags, tag)
+	}
+
+	tagUuids := s.GenerateUuids(uuid.UUID_TYPE_TAG_INDEX, uint16(len(newTags)))
+
+	if len(tagUuids) < len(newTags) {
+		return errs.ErrSystemIsBusy
+	}
+
+	for i := 0; i < len(newTags); i++ {
+		tag := newTags[i]
+		tag.TagId = tagUuids[i]
+		tag.Deleted = false
+		tag.CreatedUnixTime = time.Now().Unix()
+		tag.UpdatedUnixTime = time.Now().Unix()
+	}
+
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+		for i := 0; i < len(newTags); i++ {
+			tag := newTags[i]
+			_, err := sess.Insert(tag)
+
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
 // ModifyTag saves an existed transaction tag model to database
 func (s *TransactionTagService) ModifyTag(c core.Context, tag *models.TransactionTag) error {
 	if tag.Uid <= 0 {

@@ -80,6 +80,7 @@ import type {
 } from '@/models/transaction_picture_info.ts';
 import type {
     TransactionTagCreateRequest,
+    TransactionTagCreateBatchRequest,
     TransactionTagModifyRequest,
     TransactionTagHideRequest,
     TransactionTagMoveRequest,
@@ -522,6 +523,9 @@ export default {
     },
     addTransactionTag: (req: TransactionTagCreateRequest): ApiResponsePromise<TransactionTagInfoResponse> => {
         return axios.post<ApiResponse<TransactionTagInfoResponse>>('v1/transaction/tags/add.json', req);
+    },
+    addTransactionTagBatch: (req: TransactionTagCreateBatchRequest): ApiResponsePromise<TransactionTagInfoResponse[]> => {
+        return axios.post<ApiResponse<TransactionTagInfoResponse[]>>('v1/transaction/tags/add_batch.json', req);
     },
     modifyTransactionTag: (req: TransactionTagModifyRequest): ApiResponsePromise<TransactionTagInfoResponse> => {
         return axios.post<ApiResponse<TransactionTagInfoResponse>>('v1/transaction/tags/modify.json', req);

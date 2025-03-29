@@ -23,6 +23,12 @@ type TransactionTagCreateRequest struct {
 	Name string `json:"name" binding:"required,notBlank,max=64"`
 }
 
+// TransactionTagCreateBatchRequest represents all parameters of transaction tag batch creation request
+type TransactionTagCreateBatchRequest struct {
+	Tags       []*TransactionTagCreateRequest `json:"tags" binding:"required"`
+	SkipExists bool                           `json:"skipExists"`
+}
+
 // TransactionTagModifyRequest represents all parameters of transaction tag modification request
 type TransactionTagModifyRequest struct {
 	Id   int64  `json:"id,string" binding:"required,min=1"`
@@ -57,6 +63,19 @@ type TransactionTagInfoResponse struct {
 	Name         string `json:"name"`
 	DisplayOrder int32  `json:"displayOrder"`
 	Hidden       bool   `json:"hidden"`
+}
+
+// FillFromOtherTag fills all the fields in this current tag from other transaction tag
+func (t *TransactionTag) FillFromOtherTag(tag *TransactionTag) {
+	t.TagId = tag.TagId
+	t.Uid = tag.Uid
+	t.Deleted = tag.Deleted
+	t.Name = tag.Name
+	t.DisplayOrder = tag.DisplayOrder
+	t.Hidden = tag.Hidden
+	t.CreatedUnixTime = tag.CreatedUnixTime
+	t.UpdatedUnixTime = tag.UpdatedUnixTime
+	t.DeletedUnixTime = tag.DeletedUnixTime
 }
 
 // ToTransactionTagInfoResponse returns a view-object according to database model

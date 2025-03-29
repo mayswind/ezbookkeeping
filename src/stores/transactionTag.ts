@@ -4,6 +4,7 @@ import { defineStore } from 'pinia';
 import type { BeforeResolveFunction } from '@/core/base.ts';
 
 import {
+    type TransactionTagCreateBatchRequest,
     type TransactionTagInfoResponse,
     type TransactionTagNewDisplayOrderRequest,
     TransactionTag
@@ -189,6 +190,37 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
         });
     }
 
+    function addTags(req: TransactionTagCreateBatchRequest): Promise<TransactionTag[]> {
+        return new Promise((resolve, reject) => {
+            services.addTransactionTagBatch(req).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to add tag' });
+                    return;
+                }
+
+                if (!transactionTagListStateInvalid.value) {
+                    updateTransactionTagListInvalidState(true);
+                }
+
+                const transactionTags = TransactionTag.ofMulti(data.result);
+
+                resolve(transactionTags);
+            }).catch(error => {
+                logger.error('failed to add tags', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to add tag' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
     function changeTagDisplayOrder({ tagId, from, to }: { tagId: string, from: number, to: number }): Promise<void> {
         return new Promise((resolve, reject) => {
             let tag: TransactionTag | null = null;
@@ -342,6 +374,7 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
         resetTransactionTags,
         loadAllTags,
         saveTag,
+        addTags,
         changeTagDisplayOrder,
         updateTagDisplayOrders,
         hideTag,

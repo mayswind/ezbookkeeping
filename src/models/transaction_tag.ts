@@ -47,6 +47,11 @@ export interface TransactionTagCreateRequest {
     readonly name: string;
 }
 
+export interface TransactionTagCreateBatchRequest {
+    readonly tags: TransactionTagCreateRequest[];
+    readonly skipExists: boolean;
+}
+
 export interface TransactionTagModifyRequest {
     readonly id: string;
     readonly name: string;

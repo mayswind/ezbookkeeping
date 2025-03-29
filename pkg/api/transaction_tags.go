@@ -101,6 +101,47 @@ func (a *TransactionTagsApi) TagCreateHandler(c *core.WebContext) (any, *errs.Er
 	return tagResp, nil
 }
 
+// TagCreateBatchHandler saves some new transaction tags by request parameters for current user
+func (a *TransactionTagsApi) TagCreateBatchHandler(c *core.WebContext) (any, *errs.Error) {
+	var tagCreateBatchReq models.TransactionTagCreateBatchRequest
+	err := c.ShouldBindJSON(&tagCreateBatchReq)
+
+	if err != nil {
+		log.Warnf(c, "[transaction_tags.TagCreateBatchHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+
+	maxOrderId, err := a.tags.GetMaxDisplayOrder(c, uid)
+
+	if err != nil {
+		log.Errorf(c, "[transaction_tags.TagCreateBatchHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	tags := a.createNewTagModels(uid, &tagCreateBatchReq, maxOrderId+1)
+
+	err = a.tags.CreateTags(c, uid, tags, tagCreateBatchReq.SkipExists)
+
+	if err != nil {
+		log.Errorf(c, "[transaction_tags.TagCreateBatchHandler] failed to create tags for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.Infof(c, "[transaction_tags.TagCreateBatchHandler] user \"uid:%d\" has created tags successfully", uid)
+
+	tagResps := make(models.TransactionTagInfoResponseSlice, len(tags))
+
+	for i := 0; i < len(tags); i++ {
+		tagResps[i] = tags[i].ToTransactionTagInfoResponse()
+	}
+
+	sort.Sort(tagResps)
+
+	return tagResps, nil
+}
+
 // TagModifyHandler saves an existed transaction tag by request parameters for current user
 func (a *TransactionTagsApi) TagModifyHandler(c *core.WebContext) (any, *errs.Error) {
 	var tagModifyReq models.TransactionTagModifyRequest
@@ -229,4 +270,16 @@ func (a *TransactionTagsApi) createNewTagModel(uid int64, tagCreateReq *models.T
 		Name:         tagCreateReq.Name,
 		DisplayOrder: order,
 	}
+}
+
+func (a *TransactionTagsApi) createNewTagModels(uid int64, tagCreateBatchReq *models.TransactionTagCreateBatchRequest, order int32) []*models.TransactionTag {
+	tags := make([]*models.TransactionTag, len(tagCreateBatchReq.Tags))
+
+	for i := 0; i < len(tagCreateBatchReq.Tags); i++ {
+		tagCreateReq := tagCreateBatchReq.Tags[i]
+		tag := a.createNewTagModel(uid, tagCreateReq, order+int32(i))
+		tags[i] = tag
+	}
+
+	return tags
 }

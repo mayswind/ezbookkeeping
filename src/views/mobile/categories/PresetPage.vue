@@ -113,7 +113,7 @@ function save(): void {
     const presetCategoriesArray = categorizedArrayToPlainArray(allPresetCategories.value);
     const submitCategories = localizedPresetCategoriesToTransactionCategoryCreateWithSubCategories(presetCategoriesArray);
 
-    transactionCategoriesStore.addCategories({
+    transactionCategoriesStore.addPresetCategories({
         categories: submitCategories
     }).then(() => {
         submitting.value = false;

@@ -336,6 +336,37 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to add category' });
+                    return;
+                }
+
+                if (!transactionCategoryListStateInvalid.value) {
+                    updateTransactionCategoryListInvalidState(true);
+                }
+
+                const transactionCategories = TransactionCategory.ofMap(data.result);
+
+                resolve(transactionCategories);
+            }).catch(error => {
+                logger.error('failed to add categories', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to add category' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    function addPresetCategories(req: TransactionCategoryCreateBatchRequest): Promise<Record<number, TransactionCategory[]>> {
+        return new Promise((resolve, reject) => {
+            services.addTransactionCategoryBatch(req).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
                     reject({ message: 'Unable to add preset categories' });
                     return;
                 }
@@ -535,6 +566,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         getCategory,
         saveCategory,
         addCategories,
+        addPresetCategories,
         changeCategoryDisplayOrder,
         updateCategoryDisplayOrders,
         hideCategory,

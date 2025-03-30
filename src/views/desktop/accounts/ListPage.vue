@@ -248,7 +248,7 @@
         </v-col>
     </v-row>
 
-    <edit-dialog ref="editDialog" :persistent="true" />
+    <edit-dialog ref="editDialog" />
 
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />

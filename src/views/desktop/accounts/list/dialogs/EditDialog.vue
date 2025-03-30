@@ -1,5 +1,5 @@
 <template>
-    <v-dialog :width="account.type === AccountType.MultiSubAccounts.type ? 1000 : 800" :persistent="!!persistent" v-model="showState">
+    <v-dialog :width="account.type === AccountType.MultiSubAccounts.type ? 1000 : 800" :persistent="isAccountModified" v-model="showState">
         <v-card class="pa-2 pa-sm-4 pa-md-8">
             <template #title>
                 <div class="d-flex align-center justify-center">
@@ -220,7 +220,6 @@ type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 
 defineProps<{
-    persistent?: boolean;
     show?: boolean;
 }>();
 
@@ -267,6 +266,14 @@ const accountAmountTitle = computed<string>(() => {
         return account.value.isLiability ? tt('Account Outstanding Balance') : tt('Account Balance');
     } else {
         return account.value.isLiability ? tt('Sub-account Outstanding Balance') : tt('Sub-account Balance');
+    }
+});
+
+const isAccountModified = computed<boolean>(() => {
+    if (!editAccountId.value) {
+        return !account.value.equals(Account.createNewAccount(userStore.currentUserDefaultCurrency, account.value.balanceTime ?? getCurrentUnixTime()));
+    } else {
+        return true;
     }
 });
 

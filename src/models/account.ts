@@ -81,6 +81,43 @@ export class Account implements AccountInfoResponse {
         return !this.visible;
     }
 
+    public equals(other: Account): boolean {
+        const isEqual = this.id === other.id &&
+            this.name === other.name &&
+            this.parentId === other.parentId &&
+            this.category === other.category &&
+            this.type === other.type &&
+            this.icon === other.icon &&
+            this.color === other.color &&
+            this.currency === other.currency &&
+            this.balance === other.balance &&
+            this.balanceTime === other.balanceTime &&
+            this.comment === other.comment &&
+            this.displayOrder === other.displayOrder &&
+            this.visible === other.visible &&
+            this.creditCardStatementDate === other.creditCardStatementDate;
+
+        if (!isEqual) {
+            return false;
+        }
+
+        if (this.subAccounts && other.subAccounts) {
+            if (this.subAccounts.length !== other.subAccounts.length) {
+                return false;
+            }
+
+            for (let i = 0; i < this.subAccounts.length; i++) {
+                if (!this.subAccounts[i].equals(other.subAccounts[i])) {
+                    return false;
+                }
+            }
+        } else if ((this.subAccounts && this.subAccounts.length) || (other.subAccounts && other.subAccounts.length)) {
+            return false;
+        }
+
+        return true;
+    }
+
     public fillFrom(other: Account): void {
         this.id = other.id;
         this.category = other.category;

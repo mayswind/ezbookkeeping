@@ -183,7 +183,7 @@
         </v-col>
     </v-row>
 
-    <edit-dialog ref="editDialog" :persistent="true" />
+    <edit-dialog ref="editDialog" />
     <preset-dialog :category-type="activeCategoryType" v-model:show="showPresetDialog"
                             @category:saved="onPresetCategorySaved" />
 

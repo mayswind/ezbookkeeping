@@ -1,5 +1,5 @@
 <template>
-    <v-dialog width="800" :persistent="!!persistent" v-model="showState">
+    <v-dialog width="800" :persistent="isCategoryModified" v-model="showState">
         <v-card class="pa-2 pa-sm-4 pa-md-8">
             <template #title>
                 <div class="d-flex align-center justify-center">
@@ -96,7 +96,7 @@
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { ref, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useCategoryEditPageBase } from '@/views/base/categories/CategoryEditPageBase.ts';
@@ -115,10 +115,6 @@ interface TransactionCategoryEditResponse {
 }
 
 type SnackBarType = InstanceType<typeof SnackBar>;
-
-defineProps<{
-    persistent?: boolean;
-}>();
 
 const { tt } = useI18n();
 const {
@@ -142,6 +138,14 @@ const showState = ref<boolean>(false);
 
 let resolveFunc: ((value: TransactionCategoryEditResponse) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
+
+const isCategoryModified = computed<boolean>(() => {
+    if (!editCategoryId.value) { // Add
+        return !category.value.equals(TransactionCategory.createNewCategory(category.value.type, category.value.parentId));
+    } else { // Edit
+        return true;
+    }
+});
 
 function open(options: { id?: string; parentId?: string; type?: CategoryType; currentCategory?: TransactionCategory }): Promise<TransactionCategoryEditResponse> {
     showState.value = true;

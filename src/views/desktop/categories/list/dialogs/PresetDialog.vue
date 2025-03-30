@@ -1,5 +1,5 @@
 <template>
-    <v-dialog width="800" :persistent="!!persistent" v-model="showState">
+    <v-dialog width="800" :persistent="submitting" v-model="showState">
         <v-card class="pa-2 pa-sm-4 pa-md-8">
             <template #title>
                 <div class="d-flex align-center justify-center">
@@ -73,7 +73,6 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 
 const props = defineProps<{
     categoryType: CategoryType;
-    persistent?: boolean;
     show: boolean;
 }>();
 

@@ -1,5 +1,5 @@
 <template>
-    <v-dialog width="1000" :persistent="!!persistent && mode !== TransactionEditPageMode.View" v-model="showState">
+    <v-dialog width="1000" :persistent="isTransactionModified" v-model="showState">
         <v-card class="pa-2 pa-sm-4 pa-md-8">
             <template #title>
                 <div class="d-flex align-center justify-center">
@@ -624,6 +624,16 @@ const isAllFilteredTagHidden = computed<boolean>(() => {
     }
 
     return hiddenCount > 0;
+});
+
+const isTransactionModified = computed<boolean>(() => {
+    if (mode.value === TransactionEditPageMode.Add) {
+        return transactionsStore.isTransactionDraftModified(transaction.value, initCategoryId.value, initAccountId.value, initTagIds.value);
+    } else if (mode.value === TransactionEditPageMode.Edit) {
+        return true;
+    } else {
+        return false;
+    }
 });
 
 function setTransaction(newTransaction: Transaction | null, options: SetTransactionOptions, setContextData: boolean, convertContextTime: boolean): void {

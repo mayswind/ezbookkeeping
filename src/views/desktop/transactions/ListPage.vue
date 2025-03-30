@@ -557,7 +557,7 @@
                                  v-model:show="showCustomDateRangeDialog"
                                  @dateRange:change="changeCustomDateFilter"
                                  @error="onShowDateRangeError" />
-    <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" :persistent="true" />
+    <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
     <import-dialog ref="importDialog" :persistent="true" />
 
     <v-dialog width="800" v-model="showFilterAccountDialog">

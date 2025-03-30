@@ -139,7 +139,7 @@
         </v-col>
     </v-row>
 
-    <edit-dialog ref="editDialog" :type="TransactionEditPageType.Template" :persistent="true" />
+    <edit-dialog ref="editDialog" :type="TransactionEditPageType.Template" />
 
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />

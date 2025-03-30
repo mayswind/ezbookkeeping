@@ -37,6 +37,38 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
         return !this.visible;
     }
 
+    public equals(other: TransactionCategory): boolean {
+        const isEqual = this.id === other.id &&
+            this.name === other.name &&
+            this.parentId === other.parentId &&
+            this.type === other.type &&
+            this.icon === other.icon &&
+            this.color === other.color &&
+            this.comment === other.comment &&
+            this.displayOrder === other.displayOrder &&
+            this.visible === other.visible;
+
+        if (!isEqual) {
+            return false;
+        }
+
+        if (this.subCategories && other.subCategories) {
+            if (this.subCategories.length !== other.subCategories.length) {
+                return false;
+            }
+
+            for (let i = 0; i < this.subCategories.length; i++) {
+                if (!this.subCategories[i].equals(other.subCategories[i])) {
+                    return false;
+                }
+            }
+        } else if ((this.subCategories && this.subCategories.length) || (other.subCategories && other.subCategories.length)) {
+            return false;
+        }
+
+        return true;
+    }
+
     public fillFrom(other: TransactionCategory): void {
         this.id = other.id;
         this.name = other.name;

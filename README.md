@@ -6,7 +6,7 @@
 [![Latest Release](https://img.shields.io/github/release/mayswind/ezbookkeeping.svg?style=flat)](https://github.com/mayswind/ezbookkeeping/releases)
 
 ## Introduction
-ezBookkeeping is a lightweight self-hosted personal bookkeeping app with user-friendly interface for both desktop and mobile devices. Built with PWA technology, it provides near-native experience on mobile device. It's easily to be deployed and configured, you can just deploy it by a single command via Docker. It supports almost all platforms, including Windows, macOS, and Linux, and is compatible with x86, amd64 and ARM architectures. It only requires very few system resources, and you can even run it on a Raspberry Pi device.
+ezBookkeeping is a lightweight self-hosted personal bookkeeping app with user-friendly interface for both desktop and mobile devices. It supports PWA, you can add the app homepage to the home screen of your mobile device and use it just like a native app. It's easily to be deployed and configured, you can just deploy it by a single command via Docker. It supports almost all platforms, including Windows, macOS, and Linux, and is compatible with x86, amd64 and ARM hardware architectures. It only requires very few system resources, and you can even run it on a Raspberry Pi device.
 
 Online Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-demo.mayswind.net)
 
@@ -33,12 +33,12 @@ Online Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-dem
     * Multi-language support
     * Multi-currency support with automatic exchange rate updates from various financial institutions
     * Multi-timezone support
-    * Customizable date, time, number, and currency display formats
+    * Customizable date, time, number and currency display formats
 7. Security & Reliability
     * Two-factor authentication (2FA)
     * Login rate limiting
     * Application lock (PIN code / WebAuthn)
-8. Data export & import (CSV, OFX, QFX, QIF, IIF, GnuCash, FireFly III, Beancount, etc.)
+8. Data Export & Import (CSV, OFX, QFX, QIF, IIF, GnuCash, FireFly III, Beancount, etc.)
 
 ## Screenshots
 ### Desktop Version

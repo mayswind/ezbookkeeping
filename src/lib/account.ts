@@ -338,23 +338,3 @@ export function isAccountOrSubAccountsHasButNotAllChecked(account: Account, filt
 
     return checkedCount > 0 && checkedCount < account.subAccounts.length;
 }
-
-export function setAccountSuitableIcon(account: Account, oldCategory: number, newCategory: number): void {
-    const allCategories = AccountCategory.values();
-
-    for (let i = 0; i < allCategories.length; i++) {
-        if (allCategories[i].type === oldCategory) {
-            if (account.icon !== allCategories[i].defaultAccountIconId) {
-                return;
-            } else {
-                break;
-            }
-        }
-    }
-
-    for (let i = 0; i < allCategories.length; i++) {
-        if (allCategories[i].type === newCategory) {
-            account.icon = allCategories[i].defaultAccountIconId;
-        }
-    }
-}

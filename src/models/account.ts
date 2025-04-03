@@ -133,6 +133,26 @@ export class Account implements AccountInfoResponse {
         this.visible = other.visible;
     }
 
+    public setSuitableIcon(oldCategory: number, newCategory: number): void {
+        const allCategories = AccountCategory.values();
+
+        for (let i = 0; i < allCategories.length; i++) {
+            if (allCategories[i].type === oldCategory) {
+                if (this.icon !== allCategories[i].defaultAccountIconId) {
+                    return;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        for (let i = 0; i < allCategories.length; i++) {
+            if (allCategories[i].type === newCategory) {
+                this.icon = allCategories[i].defaultAccountIconId;
+            }
+        }
+    }
+
     public toCreateRequest(clientSessionId: string, subAccounts?: Account[], parentAccount?: Account): AccountCreateRequest {
         let subAccountCreateRequests: AccountCreateRequest[] | undefined = undefined;
 

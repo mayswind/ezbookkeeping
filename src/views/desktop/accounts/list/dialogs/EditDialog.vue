@@ -204,7 +204,6 @@ import { Account } from '@/models/account.ts';
 import { isNumber } from '@/lib/common.ts';
 import { getCurrentUnixTime } from '@/lib/datetime.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
-import { setAccountSuitableIcon } from '@/lib/account.ts';
 
 import {
     mdiDotsVertical,
@@ -314,7 +313,7 @@ function open(options?: { id?: string, currentAccount?: Account, category?: numb
     } else {
         if (options && isNumber(options.category)) {
             account.value.category = options.category;
-            setAccountSuitableIcon(account.value, 1, options.category);
+            account.value.setSuitableIcon(1, options.category);
         }
 
         editAccountId.value = null;

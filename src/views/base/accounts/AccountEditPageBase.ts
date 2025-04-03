@@ -10,7 +10,6 @@ import type { LocalizedAccountCategory } from '@/core/account.ts';
 import { Account } from '@/models/account.ts';
 
 import { getCurrentUnixTime } from '@/lib/datetime.ts';
-import { setAccountSuitableIcon } from '@/lib/account.ts';
 
 export interface DayAndDisplayName {
     readonly day: number;
@@ -153,7 +152,7 @@ export function useAccountEditPageBaseBase() {
     }
 
     watch(() => account.value.category, (newValue, oldValue) => {
-        setAccountSuitableIcon(account.value, oldValue, newValue);
+        account.value.setSuitableIcon(oldValue, newValue);
     });
 
     return {

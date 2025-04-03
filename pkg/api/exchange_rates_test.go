@@ -191,7 +191,7 @@ func TestExchangeRatesApiLatestExchangeRateHandler_NationalBankOfPolandDataSourc
 
 	assert.Equal(t, "PLN", exchangeRateResponse.BaseCurrency)
 
-	supportedCurrencyCodes := []string{"AED", "AFN", "ALL", "AMD", "ANG", "AOA", "ARS", "AUD", "AWG", "AZN",
+	supportedCurrencyCodes := []string{"AED", "AFN", "ALL", "AMD", "AOA", "ARS", "AUD", "AWG", "AZN",
 		"BAM", "BBD", "BDT", "BGN", "BHD", "BIF", "BND", "BOB", "BRL", "BSD", "BWP", "BYN", "BZD",
 		"CAD", "CDF", "CHF", "CLP", "CNY", "COP", "CRC", "CUP", "CVE", "CZK",
 		"DJF", "DKK", "DOP", "DZD", "EGP", "ERN", "ETB", "EUR", "FJD",

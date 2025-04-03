@@ -5,7 +5,7 @@ import { TransactionType } from '@/core/transaction.ts';
 import { Account, type AccountInfoResponse } from './account.ts';
 import { TransactionCategory, type TransactionCategoryInfoResponse } from './transaction_category.ts';
 import { TransactionTag, type TransactionTagInfoResponse } from './transaction_tag.ts';
-import type { TransactionPictureInfoBasicResponse } from './transaction_picture_info.ts';
+import { TransactionPicture, type TransactionPictureInfoBasicResponse } from './transaction_picture_info.ts';
 
 export class Transaction implements TransactionInfoResponse {
     public id: string;
@@ -388,30 +388,6 @@ export class Transaction implements TransactionInfoResponse {
         }
 
         return transaction;
-    }
-}
-
-export class TransactionPicture implements TransactionPictureInfoBasicResponse {
-    public pictureId: string;
-    public originalUrl: string;
-
-    private constructor(pictureId: string, originalUrl: string) {
-        this.pictureId = pictureId;
-        this.originalUrl = originalUrl;
-    }
-
-    public static of(picture: TransactionPictureInfoBasicResponse): TransactionPicture {
-        return new TransactionPicture(picture.pictureId, picture.originalUrl);
-    }
-
-    public static ofMulti(pictureResponses: TransactionPictureInfoBasicResponse[]): TransactionPicture[] {
-        const pictures: TransactionPicture[] = [];
-
-        for (const pictureResponse of pictureResponses) {
-            pictures.push(TransactionPicture.of(pictureResponse));
-        }
-
-        return pictures;
     }
 }
 

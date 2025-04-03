@@ -3,7 +3,8 @@ import { TransactionType } from '@/core/transaction.ts';
 import { Account } from '@/models/account.ts';
 import { TransactionCategory } from '@/models/transaction_category.ts';
 import { TransactionTag } from '@/models/transaction_tag.ts';
-import { Transaction, TransactionPicture } from '@/models/transaction.ts';
+import { TransactionPicture } from '@/models/transaction_picture_info.ts';
+import { Transaction } from '@/models/transaction.ts';
 
 import {
     isNumber

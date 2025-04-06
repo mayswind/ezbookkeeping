@@ -5,7 +5,7 @@
             <f7-nav-title :title="tt(title)"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': !categories.length }" v-if="!sortable" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link :href="'/category/add?type=' + categoryType + '&parentId=' + primaryCategoryId" icon-f7="plus" v-if="!sortable"></f7-link>
+                <f7-link :href="'/category/add?type=' + categoryType + '&parentId=' + primaryCategoryId + (currentPrimaryCategory ? `&color=${currentPrimaryCategory.color}&icon=${currentPrimaryCategory.icon}` : '')" icon-f7="plus" v-if="!sortable"></f7-link>
                 <f7-link :text="tt('Done')" :class="{ 'disabled': displayOrderSaving }" @click="saveSortResult" v-else-if="sortable"></f7-link>
             </f7-nav-right>
         </f7-navbar>
@@ -92,6 +92,7 @@ import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading, onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
+import { useCategoryListPageBase } from '@/views/base/categories/CategoryListPageBase.ts';
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
@@ -111,13 +112,12 @@ const props = defineProps<{
 
 const { tt } = useI18n();
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
+const { loading, primaryCategoryId, currentPrimaryCategory } = useCategoryListPageBase();
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
 
 const hasSubCategories = ref<boolean>(false);
 const categoryType = ref<CategoryType | 0>(0);
-const primaryCategoryId = ref<string>('0');
-const loading = ref<boolean>(true);
 const loadingError = ref<unknown | null>(null);
 const showHidden = ref<boolean>(false);
 const sortable = ref<boolean>(false);

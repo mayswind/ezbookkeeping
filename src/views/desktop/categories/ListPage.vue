@@ -203,6 +203,7 @@ import { ref, computed, useTemplateRef, watch, nextTick } from 'vue';
 import { useDisplay } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
+import { useCategoryListPageBase } from '@/views/base/categories/CategoryListPageBase.ts';
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
@@ -232,6 +233,7 @@ type EditDialogType = InstanceType<typeof EditDialog>;
 
 const display = useDisplay();
 const { tt } = useI18n();
+const { loading, primaryCategoryId, currentPrimaryCategory } = useCategoryListPageBase();
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
 
@@ -242,8 +244,6 @@ const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
 const activeCategoryType = ref<CategoryType>(CategoryType.Expense);
 const activeTab = ref<string>('categoryPage');
-const primaryCategoryId = ref<string>('0');
-const loading = ref<boolean>(true);
 const updating = ref<boolean>(false);
 const categoryHiding = ref<Record<string, boolean>>({});
 const categoryRemoving = ref<Record<string, boolean>>({});
@@ -350,7 +350,9 @@ function reload(force: boolean): void {
 function add(): void {
     editDialog.value?.open({
         type: activeCategoryType.value,
-        parentId: primaryCategoryId.value
+        parentId: primaryCategoryId.value,
+        color: currentPrimaryCategory.value?.color,
+        icon: currentPrimaryCategory.value?.icon
     }).then(result => {
         if (result && result.message) {
             snackbar.value?.showMessage(result.message);

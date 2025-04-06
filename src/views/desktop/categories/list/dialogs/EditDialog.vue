@@ -103,6 +103,7 @@ import { useCategoryEditPageBase } from '@/views/base/categories/CategoryEditPag
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
+import type { ColorValue } from '@/core/color.ts';
 import { CategoryType } from '@/core/category.ts';
 import { ALL_CATEGORY_ICONS } from '@/consts/icon.ts';
 import { ALL_CATEGORY_COLORS } from '@/consts/color.ts';
@@ -147,7 +148,7 @@ const isCategoryModified = computed<boolean>(() => {
     }
 });
 
-function open(options: { id?: string; parentId?: string; type?: CategoryType; currentCategory?: TransactionCategory }): Promise<TransactionCategoryEditResponse> {
+function open(options: { id?: string; parentId?: string; type?: CategoryType; currentCategory?: TransactionCategory, color?: ColorValue, icon?: string }): Promise<TransactionCategoryEditResponse> {
     showState.value = true;
     loading.value = true;
     submitting.value = false;
@@ -192,6 +193,14 @@ function open(options: { id?: string; parentId?: string; type?: CategoryType; cu
 
         category.value.type = categoryType;
         category.value.parentId = options.parentId;
+
+        if (options.color) {
+            category.value.color = options.color;
+        }
+
+        if (options.icon) {
+            category.value.icon = options.icon;
+        }
 
         clientSessionId.value = generateRandomUUID();
         loading.value = false;

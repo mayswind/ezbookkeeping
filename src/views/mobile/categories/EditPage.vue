@@ -155,6 +155,7 @@ import { useCategoryEditPageBase } from '@/views/base/categories/CategoryEditPag
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
+import type { ColorValue } from '@/core/color.ts';
 import { CategoryType } from '@/core/category.ts';
 import { ALL_CATEGORY_ICONS } from '@/consts/icon.ts';
 import { ALL_CATEGORY_COLORS } from '@/consts/color.ts';
@@ -228,6 +229,14 @@ function init(): void {
             showToast('Parameter Invalid');
             loadingError.value = 'Parameter Invalid';
             return;
+        }
+
+        if (query['color']) {
+            category.value.color = query['color'] as ColorValue;
+        }
+
+        if (query['icon']) {
+            category.value.icon = query['icon'];
         }
 
         clientSessionId.value = generateRandomUUID();

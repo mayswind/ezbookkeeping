@@ -1,0 +1,1498 @@
+{
+    "test_cases_getFiscalYearFromUnixTime": [
+        {
+            "date": "2022-01-01",
+            "expected": {
+                "January 1": 2022,
+                "April 1": 2022,
+                "October 1": 2022
+            }
+        },
+        {
+            "date": "2022-03-31",
+            "expected": {
+                "January 1": 2022,
+                "April 1": 2022,
+                "October 1": 2022
+            }
+        },
+        {
+            "date": "2022-04-01",
+            "expected": {
+                "January 1": 2022,
+                "April 1": 2023,
+                "October 1": 2022
+            }
+        },
+        {
+            "date": "2022-09-30",
+            "expected": {
+                "January 1": 2022,
+                "April 1": 2023,
+                "October 1": 2022
+            }
+        },
+        {
+            "date": "2022-10-01",
+            "expected": {
+                "January 1": 2022,
+                "April 1": 2023,
+                "October 1": 2023
+            }
+        },
+        {
+            "date": "2022-12-31",
+            "expected": {
+                "January 1": 2022,
+                "April 1": 2023,
+                "October 1": 2023
+            }
+        },
+        {
+            "date": "2023-01-01",
+            "expected": {
+                "January 1": 2023,
+                "April 1": 2023,
+                "October 1": 2023
+            }
+        },
+        {
+            "date": "2023-03-31",
+            "expected": {
+                "January 1": 2023,
+                "April 1": 2023,
+                "October 1": 2023
+            }
+        },
+        {
+            "date": "2023-04-01",
+            "expected": {
+                "January 1": 2023,
+                "April 1": 2024,
+                "October 1": 2023
+            }
+        },
+        {
+            "date": "2023-09-30",
+            "expected": {
+                "January 1": 2023,
+                "April 1": 2024,
+                "October 1": 2023
+            }
+        },
+        {
+            "date": "2023-10-01",
+            "expected": {
+                "January 1": 2023,
+                "April 1": 2024,
+                "October 1": 2024
+            }
+        },
+        {
+            "date": "2023-12-31",
+            "expected": {
+                "January 1": 2023,
+                "April 1": 2024,
+                "October 1": 2024
+            }
+        },
+        {
+            "date": "2024-01-01",
+            "expected": {
+                "January 1": 2024,
+                "April 1": 2024,
+                "October 1": 2024
+            }
+        },
+        {
+            "date": "2024-03-31",
+            "expected": {
+                "January 1": 2024,
+                "April 1": 2024,
+                "October 1": 2024
+            }
+        },
+        {
+            "date": "2024-04-01",
+            "expected": {
+                "January 1": 2024,
+                "April 1": 2025,
+                "October 1": 2024
+            }
+        },
+        {
+            "date": "2024-09-30",
+            "expected": {
+                "January 1": 2024,
+                "April 1": 2025,
+                "October 1": 2024
+            }
+        },
+        {
+            "date": "2024-10-01",
+            "expected": {
+                "January 1": 2024,
+                "April 1": 2025,
+                "October 1": 2025
+            }
+        },
+        {
+            "date": "2024-12-31",
+            "expected": {
+                "January 1": 2024,
+                "April 1": 2025,
+                "October 1": 2025
+            }
+        },
+        {
+            "date": "2025-01-01",
+            "expected": {
+                "January 1": 2025,
+                "April 1": 2025,
+                "October 1": 2025
+            }
+        },
+        {
+            "date": "2025-03-31",
+            "expected": {
+                "January 1": 2025,
+                "April 1": 2025,
+                "October 1": 2025
+            }
+        },
+        {
+            "date": "2025-04-01",
+            "expected": {
+                "January 1": 2025,
+                "April 1": 2026,
+                "October 1": 2025
+            }
+        },
+        {
+            "date": "2025-09-30",
+            "expected": {
+                "January 1": 2025,
+                "April 1": 2026,
+                "October 1": 2025
+            }
+        },
+        {
+            "date": "2025-10-01",
+            "expected": {
+                "January 1": 2025,
+                "April 1": 2026,
+                "October 1": 2026
+            }
+        },
+        {
+            "date": "2025-12-31",
+            "expected": {
+                "January 1": 2025,
+                "April 1": 2026,
+                "October 1": 2026
+            }
+        }
+    ],
+    "test_cases_getFiscalYearStartUnixTime": [
+        {
+            "date": "2022-01-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1640995200,
+                    "unixTimeISO": "2022-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1617235200,
+                    "unixTimeISO": "2021-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1633046400,
+                    "unixTimeISO": "2021-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2022-03-31",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1640995200,
+                    "unixTimeISO": "2022-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1617235200,
+                    "unixTimeISO": "2021-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1633046400,
+                    "unixTimeISO": "2021-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2022-04-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1640995200,
+                    "unixTimeISO": "2022-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1648771200,
+                    "unixTimeISO": "2022-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1633046400,
+                    "unixTimeISO": "2021-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2022-09-30",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1640995200,
+                    "unixTimeISO": "2022-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1648771200,
+                    "unixTimeISO": "2022-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1633046400,
+                    "unixTimeISO": "2021-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2022-10-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1640995200,
+                    "unixTimeISO": "2022-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1648771200,
+                    "unixTimeISO": "2022-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1664582400,
+                    "unixTimeISO": "2022-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2022-12-31",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1640995200,
+                    "unixTimeISO": "2022-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1648771200,
+                    "unixTimeISO": "2022-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1664582400,
+                    "unixTimeISO": "2022-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2023-01-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1672531200,
+                    "unixTimeISO": "2023-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1648771200,
+                    "unixTimeISO": "2022-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1664582400,
+                    "unixTimeISO": "2022-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2023-03-31",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1672531200,
+                    "unixTimeISO": "2023-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1648771200,
+                    "unixTimeISO": "2022-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1664582400,
+                    "unixTimeISO": "2022-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2023-04-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1672531200,
+                    "unixTimeISO": "2023-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1680307200,
+                    "unixTimeISO": "2023-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1664582400,
+                    "unixTimeISO": "2022-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2023-09-30",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1672531200,
+                    "unixTimeISO": "2023-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1680307200,
+                    "unixTimeISO": "2023-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1664582400,
+                    "unixTimeISO": "2022-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2023-10-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1672531200,
+                    "unixTimeISO": "2023-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1680307200,
+                    "unixTimeISO": "2023-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1696118400,
+                    "unixTimeISO": "2023-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2023-12-31",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1672531200,
+                    "unixTimeISO": "2023-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1680307200,
+                    "unixTimeISO": "2023-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1696118400,
+                    "unixTimeISO": "2023-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2024-01-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1704067200,
+                    "unixTimeISO": "2024-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1680307200,
+                    "unixTimeISO": "2023-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1696118400,
+                    "unixTimeISO": "2023-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2024-03-31",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1704067200,
+                    "unixTimeISO": "2024-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1680307200,
+                    "unixTimeISO": "2023-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1696118400,
+                    "unixTimeISO": "2023-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2024-04-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1704067200,
+                    "unixTimeISO": "2024-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1711929600,
+                    "unixTimeISO": "2024-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1696118400,
+                    "unixTimeISO": "2023-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2024-09-30",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1704067200,
+                    "unixTimeISO": "2024-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1711929600,
+                    "unixTimeISO": "2024-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1696118400,
+                    "unixTimeISO": "2023-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2024-10-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1704067200,
+                    "unixTimeISO": "2024-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1711929600,
+                    "unixTimeISO": "2024-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1727740800,
+                    "unixTimeISO": "2024-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2024-12-31",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1704067200,
+                    "unixTimeISO": "2024-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1711929600,
+                    "unixTimeISO": "2024-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1727740800,
+                    "unixTimeISO": "2024-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2025-01-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1735689600,
+                    "unixTimeISO": "2025-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1711929600,
+                    "unixTimeISO": "2024-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1727740800,
+                    "unixTimeISO": "2024-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2025-03-31",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1735689600,
+                    "unixTimeISO": "2025-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1711929600,
+                    "unixTimeISO": "2024-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1727740800,
+                    "unixTimeISO": "2024-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2025-04-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1735689600,
+                    "unixTimeISO": "2025-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1743465600,
+                    "unixTimeISO": "2025-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1727740800,
+                    "unixTimeISO": "2024-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2025-09-30",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1735689600,
+                    "unixTimeISO": "2025-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1743465600,
+                    "unixTimeISO": "2025-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1727740800,
+                    "unixTimeISO": "2024-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2025-10-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1735689600,
+                    "unixTimeISO": "2025-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1743465600,
+                    "unixTimeISO": "2025-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1759276800,
+                    "unixTimeISO": "2025-10-01T00:00:00Z"
+                }
+            }
+        },
+        {
+            "date": "2025-12-31",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1735689600,
+                    "unixTimeISO": "2025-01-01T00:00:00Z"
+                },
+                "April 1": {
+                    "unixTime": 1743465600,
+                    "unixTimeISO": "2025-04-01T00:00:00Z"
+                },
+                "October 1": {
+                    "unixTime": 1759276800,
+                    "unixTimeISO": "2025-10-01T00:00:00Z"
+                }
+            }
+        }
+    ],
+    "test_cases_getFiscalYearEndUnixTime": [
+        {
+            "date": "2022-01-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1672531199,
+                    "unixTimeISO": "2022-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1648771199,
+                    "unixTimeISO": "2022-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1664582399,
+                    "unixTimeISO": "2022-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2022-03-31",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1672531199,
+                    "unixTimeISO": "2022-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1648771199,
+                    "unixTimeISO": "2022-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1664582399,
+                    "unixTimeISO": "2022-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2022-04-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1672531199,
+                    "unixTimeISO": "2022-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1680307199,
+                    "unixTimeISO": "2023-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1664582399,
+                    "unixTimeISO": "2022-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2022-09-30",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1672531199,
+                    "unixTimeISO": "2022-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1680307199,
+                    "unixTimeISO": "2023-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1664582399,
+                    "unixTimeISO": "2022-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2022-10-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1672531199,
+                    "unixTimeISO": "2022-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1680307199,
+                    "unixTimeISO": "2023-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1696118399,
+                    "unixTimeISO": "2023-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2022-12-31",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1672531199,
+                    "unixTimeISO": "2022-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1680307199,
+                    "unixTimeISO": "2023-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1696118399,
+                    "unixTimeISO": "2023-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2023-01-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1704067199,
+                    "unixTimeISO": "2023-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1680307199,
+                    "unixTimeISO": "2023-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1696118399,
+                    "unixTimeISO": "2023-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2023-03-31",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1704067199,
+                    "unixTimeISO": "2023-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1680307199,
+                    "unixTimeISO": "2023-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1696118399,
+                    "unixTimeISO": "2023-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2023-04-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1704067199,
+                    "unixTimeISO": "2023-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1711929599,
+                    "unixTimeISO": "2024-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1696118399,
+                    "unixTimeISO": "2023-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2023-09-30",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1704067199,
+                    "unixTimeISO": "2023-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1711929599,
+                    "unixTimeISO": "2024-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1696118399,
+                    "unixTimeISO": "2023-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2023-10-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1704067199,
+                    "unixTimeISO": "2023-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1711929599,
+                    "unixTimeISO": "2024-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1727740799,
+                    "unixTimeISO": "2024-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2023-12-31",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1704067199,
+                    "unixTimeISO": "2023-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1711929599,
+                    "unixTimeISO": "2024-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1727740799,
+                    "unixTimeISO": "2024-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2024-01-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1735689599,
+                    "unixTimeISO": "2024-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1711929599,
+                    "unixTimeISO": "2024-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1727740799,
+                    "unixTimeISO": "2024-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2024-03-31",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1735689599,
+                    "unixTimeISO": "2024-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1711929599,
+                    "unixTimeISO": "2024-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1727740799,
+                    "unixTimeISO": "2024-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2024-04-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1735689599,
+                    "unixTimeISO": "2024-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1743465599,
+                    "unixTimeISO": "2025-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1727740799,
+                    "unixTimeISO": "2024-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2024-09-30",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1735689599,
+                    "unixTimeISO": "2024-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1743465599,
+                    "unixTimeISO": "2025-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1727740799,
+                    "unixTimeISO": "2024-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2024-10-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1735689599,
+                    "unixTimeISO": "2024-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1743465599,
+                    "unixTimeISO": "2025-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1759276799,
+                    "unixTimeISO": "2025-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2024-12-31",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1735689599,
+                    "unixTimeISO": "2024-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1743465599,
+                    "unixTimeISO": "2025-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1759276799,
+                    "unixTimeISO": "2025-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2025-01-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1767225599,
+                    "unixTimeISO": "2025-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1743465599,
+                    "unixTimeISO": "2025-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1759276799,
+                    "unixTimeISO": "2025-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2025-03-31",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1767225599,
+                    "unixTimeISO": "2025-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1743465599,
+                    "unixTimeISO": "2025-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1759276799,
+                    "unixTimeISO": "2025-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2025-04-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1767225599,
+                    "unixTimeISO": "2025-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1775001599,
+                    "unixTimeISO": "2026-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1759276799,
+                    "unixTimeISO": "2025-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2025-09-30",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1767225599,
+                    "unixTimeISO": "2025-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1775001599,
+                    "unixTimeISO": "2026-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1759276799,
+                    "unixTimeISO": "2025-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2025-10-01",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1767225599,
+                    "unixTimeISO": "2025-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1775001599,
+                    "unixTimeISO": "2026-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1790812799,
+                    "unixTimeISO": "2026-09-30T23:59:59Z"
+                }
+            }
+        },
+        {
+            "date": "2025-12-31",
+            "expected": {
+                "January 1": {
+                    "unixTime": 1767225599,
+                    "unixTimeISO": "2025-12-31T23:59:59Z"
+                },
+                "April 1": {
+                    "unixTime": 1775001599,
+                    "unixTimeISO": "2026-03-31T23:59:59Z"
+                },
+                "October 1": {
+                    "unixTime": 1790812799,
+                    "unixTimeISO": "2026-09-30T23:59:59Z"
+                }
+            }
+        }
+    ],
+    "test_cases_getFiscalYearUnixTimeRange": [
+        {
+            "date": "2022-01-01",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2022,
+                    "minUnixTime": 1640995200,
+                    "maxUnixTime": 1672531199
+                },
+                "April 1": {
+                    "fiscalYear": 2022,
+                    "minUnixTime": 1617235200,
+                    "maxUnixTime": 1648771199
+                },
+                "October 1": {
+                    "fiscalYear": 2022,
+                    "minUnixTime": 1633046400,
+                    "maxUnixTime": 1664582399
+                }
+            }
+        },
+        {
+            "date": "2022-03-31",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2022,
+                    "minUnixTime": 1640995200,
+                    "maxUnixTime": 1672531199
+                },
+                "April 1": {
+                    "fiscalYear": 2022,
+                    "minUnixTime": 1617235200,
+                    "maxUnixTime": 1648771199
+                },
+                "October 1": {
+                    "fiscalYear": 2022,
+                    "minUnixTime": 1633046400,
+                    "maxUnixTime": 1664582399
+                }
+            }
+        },
+        {
+            "date": "2022-04-01",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2022,
+                    "minUnixTime": 1640995200,
+                    "maxUnixTime": 1672531199
+                },
+                "April 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1648771200,
+                    "maxUnixTime": 1680307199
+                },
+                "October 1": {
+                    "fiscalYear": 2022,
+                    "minUnixTime": 1633046400,
+                    "maxUnixTime": 1664582399
+                }
+            }
+        },
+        {
+            "date": "2022-09-30",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2022,
+                    "minUnixTime": 1640995200,
+                    "maxUnixTime": 1672531199
+                },
+                "April 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1648771200,
+                    "maxUnixTime": 1680307199
+                },
+                "October 1": {
+                    "fiscalYear": 2022,
+                    "minUnixTime": 1633046400,
+                    "maxUnixTime": 1664582399
+                }
+            }
+        },
+        {
+            "date": "2022-10-01",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2022,
+                    "minUnixTime": 1640995200,
+                    "maxUnixTime": 1672531199
+                },
+                "April 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1648771200,
+                    "maxUnixTime": 1680307199
+                },
+                "October 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1664582400,
+                    "maxUnixTime": 1696118399
+                }
+            }
+        },
+        {
+            "date": "2022-12-31",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2022,
+                    "minUnixTime": 1640995200,
+                    "maxUnixTime": 1672531199
+                },
+                "April 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1648771200,
+                    "maxUnixTime": 1680307199
+                },
+                "October 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1664582400,
+                    "maxUnixTime": 1696118399
+                }
+            }
+        },
+        {
+            "date": "2023-01-01",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1672531200,
+                    "maxUnixTime": 1704067199
+                },
+                "April 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1648771200,
+                    "maxUnixTime": 1680307199
+                },
+                "October 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1664582400,
+                    "maxUnixTime": 1696118399
+                }
+            }
+        },
+        {
+            "date": "2023-03-31",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1672531200,
+                    "maxUnixTime": 1704067199
+                },
+                "April 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1648771200,
+                    "maxUnixTime": 1680307199
+                },
+                "October 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1664582400,
+                    "maxUnixTime": 1696118399
+                }
+            }
+        },
+        {
+            "date": "2023-04-01",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1672531200,
+                    "maxUnixTime": 1704067199
+                },
+                "April 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1680307200,
+                    "maxUnixTime": 1711929599
+                },
+                "October 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1664582400,
+                    "maxUnixTime": 1696118399
+                }
+            }
+        },
+        {
+            "date": "2023-09-30",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1672531200,
+                    "maxUnixTime": 1704067199
+                },
+                "April 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1680307200,
+                    "maxUnixTime": 1711929599
+                },
+                "October 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1664582400,
+                    "maxUnixTime": 1696118399
+                }
+            }
+        },
+        {
+            "date": "2023-10-01",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1672531200,
+                    "maxUnixTime": 1704067199
+                },
+                "April 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1680307200,
+                    "maxUnixTime": 1711929599
+                },
+                "October 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1696118400,
+                    "maxUnixTime": 1727740799
+                }
+            }
+        },
+        {
+            "date": "2023-12-31",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2023,
+                    "minUnixTime": 1672531200,
+                    "maxUnixTime": 1704067199
+                },
+                "April 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1680307200,
+                    "maxUnixTime": 1711929599
+                },
+                "October 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1696118400,
+                    "maxUnixTime": 1727740799
+                }
+            }
+        },
+        {
+            "date": "2024-01-01",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1704067200,
+                    "maxUnixTime": 1735689599
+                },
+                "April 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1680307200,
+                    "maxUnixTime": 1711929599
+                },
+                "October 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1696118400,
+                    "maxUnixTime": 1727740799
+                }
+            }
+        },
+        {
+            "date": "2024-03-31",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1704067200,
+                    "maxUnixTime": 1735689599
+                },
+                "April 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1680307200,
+                    "maxUnixTime": 1711929599
+                },
+                "October 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1696118400,
+                    "maxUnixTime": 1727740799
+                }
+            }
+        },
+        {
+            "date": "2024-04-01",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1704067200,
+                    "maxUnixTime": 1735689599
+                },
+                "April 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1711929600,
+                    "maxUnixTime": 1743465599
+                },
+                "October 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1696118400,
+                    "maxUnixTime": 1727740799
+                }
+            }
+        },
+        {
+            "date": "2024-09-30",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1704067200,
+                    "maxUnixTime": 1735689599
+                },
+                "April 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1711929600,
+                    "maxUnixTime": 1743465599
+                },
+                "October 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1696118400,
+                    "maxUnixTime": 1727740799
+                }
+            }
+        },
+        {
+            "date": "2024-10-01",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1704067200,
+                    "maxUnixTime": 1735689599
+                },
+                "April 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1711929600,
+                    "maxUnixTime": 1743465599
+                },
+                "October 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1727740800,
+                    "maxUnixTime": 1759276799
+                }
+            }
+        },
+        {
+            "date": "2024-12-31",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2024,
+                    "minUnixTime": 1704067200,
+                    "maxUnixTime": 1735689599
+                },
+                "April 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1711929600,
+                    "maxUnixTime": 1743465599
+                },
+                "October 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1727740800,
+                    "maxUnixTime": 1759276799
+                }
+            }
+        },
+        {
+            "date": "2025-01-01",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1735689600,
+                    "maxUnixTime": 1767225599
+                },
+                "April 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1711929600,
+                    "maxUnixTime": 1743465599
+                },
+                "October 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1727740800,
+                    "maxUnixTime": 1759276799
+                }
+            }
+        },
+        {
+            "date": "2025-03-31",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1735689600,
+                    "maxUnixTime": 1767225599
+                },
+                "April 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1711929600,
+                    "maxUnixTime": 1743465599
+                },
+                "October 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1727740800,
+                    "maxUnixTime": 1759276799
+                }
+            }
+        },
+        {
+            "date": "2025-04-01",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1735689600,
+                    "maxUnixTime": 1767225599
+                },
+                "April 1": {
+                    "fiscalYear": 2026,
+                    "minUnixTime": 1743465600,
+                    "maxUnixTime": 1775001599
+                },
+                "October 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1727740800,
+                    "maxUnixTime": 1759276799
+                }
+            }
+        },
+        {
+            "date": "2025-09-30",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1735689600,
+                    "maxUnixTime": 1767225599
+                },
+                "April 1": {
+                    "fiscalYear": 2026,
+                    "minUnixTime": 1743465600,
+                    "maxUnixTime": 1775001599
+                },
+                "October 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1727740800,
+                    "maxUnixTime": 1759276799
+                }
+            }
+        },
+        {
+            "date": "2025-10-01",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1735689600,
+                    "maxUnixTime": 1767225599
+                },
+                "April 1": {
+                    "fiscalYear": 2026,
+                    "minUnixTime": 1743465600,
+                    "maxUnixTime": 1775001599
+                },
+                "October 1": {
+                    "fiscalYear": 2026,
+                    "minUnixTime": 1759276800,
+                    "maxUnixTime": 1790812799
+                }
+            }
+        },
+        {
+            "date": "2025-12-31",
+            "expected": {
+                "January 1": {
+                    "fiscalYear": 2025,
+                    "minUnixTime": 1735689600,
+                    "maxUnixTime": 1767225599
+                },
+                "April 1": {
+                    "fiscalYear": 2026,
+                    "minUnixTime": 1743465600,
+                    "maxUnixTime": 1775001599
+                },
+                "October 1": {
+                    "fiscalYear": 2026,
+                    "minUnixTime": 1759276800,
+                    "maxUnixTime": 1790812799
+                }
+            }
+        }
+    ]
+}

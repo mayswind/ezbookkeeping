@@ -16,6 +16,7 @@
     "default": {
         "currency": "USD",
         "firstDayOfWeek": "Sunday",
+        "fiscalYearStart": "01-01",
         "longDateFormat": "MMDDYYYY",
         "shortDateFormat": "MMDDYYYY",
         "longTimeFormat": "HHMMSSA",
@@ -1183,6 +1184,7 @@
         "oldPassword": "Current Password",
         "defaultCurrency": "Default Currency",
         "firstDayOfWeek": "First Day of Week",
+        "fiscalYearStart": "Fiscal Year Start Date",
         "transactionEditScope": "Editable Transaction Range",
         "name": "Name",
         "category": "Category",
@@ -1433,6 +1435,7 @@
     "Default Currency": "Default Currency",
     "Default Account": "Default Account",
     "First Day of Week": "First Day of Week",
+    "Fiscal Year Start Date": "Fiscal Year Start Date",
     "Long Date Format": "Long Date Format",
     "Short Date Format": "Short Date Format",
     "Long Time Format": "Long Time Format",

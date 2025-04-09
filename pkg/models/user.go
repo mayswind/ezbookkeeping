@@ -94,6 +94,7 @@ type User struct {
 	Language             string                   `xorm:"VARCHAR(10)"`
 	DefaultCurrency      string                   `xorm:"VARCHAR(3) NOT NULL"`
 	FirstDayOfWeek       core.WeekDay             `xorm:"TINYINT NOT NULL"`
+	FiscalYearStart      core.FiscalYearStart     `xorm:"SMALLINT"`
 	LongDateFormat       core.LongDateFormat      `xorm:"TINYINT"`
 	ShortDateFormat      core.ShortDateFormat     `xorm:"TINYINT"`
 	LongTimeFormat       core.LongTimeFormat      `xorm:"TINYINT"`
@@ -126,6 +127,7 @@ type UserBasicInfo struct {
 	Language             string                   `json:"language"`
 	DefaultCurrency      string                   `json:"defaultCurrency"`
 	FirstDayOfWeek       core.WeekDay             `json:"firstDayOfWeek"`
+	FiscalYearStart      core.FiscalYearStart     `json:"fiscalYearStart"`
 	LongDateFormat       core.LongDateFormat      `json:"longDateFormat"`
 	ShortDateFormat      core.ShortDateFormat     `json:"shortDateFormat"`
 	LongTimeFormat       core.LongTimeFormat      `json:"longTimeFormat"`
@@ -186,6 +188,7 @@ type UserProfileUpdateRequest struct {
 	Language             string                    `json:"language" binding:"omitempty,min=2,max=16"`
 	DefaultCurrency      string                    `json:"defaultCurrency" binding:"omitempty,len=3,validCurrency"`
 	FirstDayOfWeek       *core.WeekDay             `json:"firstDayOfWeek" binding:"omitempty,min=0,max=6"`
+	FiscalYearStart      *core.FiscalYearStart     `json:"fiscalYearStart" binding:"omitempty,validFiscalYearStart"`
 	LongDateFormat       *core.LongDateFormat      `json:"longDateFormat" binding:"omitempty,min=0,max=3"`
 	ShortDateFormat      *core.ShortDateFormat     `json:"shortDateFormat" binding:"omitempty,min=0,max=3"`
 	LongTimeFormat       *core.LongTimeFormat      `json:"longTimeFormat" binding:"omitempty,min=0,max=3"`
@@ -265,6 +268,7 @@ func (u *User) ToUserBasicInfo(avatarProvider core.UserAvatarProviderType, avata
 		Language:             u.Language,
 		DefaultCurrency:      u.DefaultCurrency,
 		FirstDayOfWeek:       u.FirstDayOfWeek,
+		FiscalYearStart:      u.FiscalYearStart,
 		LongDateFormat:       u.LongDateFormat,
 		ShortDateFormat:      u.ShortDateFormat,
 		LongTimeFormat:       u.LongTimeFormat,

@@ -349,6 +349,15 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 		userNew.FirstDayOfWeek = core.WEEKDAY_INVALID
 	}
 
+	if userUpdateReq.FiscalYearStart != nil && *userUpdateReq.FiscalYearStart != user.FiscalYearStart {
+		user.FiscalYearStart = *userUpdateReq.FiscalYearStart
+		userNew.FiscalYearStart = *userUpdateReq.FiscalYearStart
+		modifyProfileBasicInfo = true
+		anythingUpdate = true
+	} else {
+		userNew.FiscalYearStart = core.FISCAL_YEAR_START_INVALID
+	}
+
 	if userUpdateReq.LongDateFormat != nil && *userUpdateReq.LongDateFormat != user.LongDateFormat {
 		user.LongDateFormat = *userUpdateReq.LongDateFormat
 		userNew.LongDateFormat = *userUpdateReq.LongDateFormat

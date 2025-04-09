@@ -203,6 +203,10 @@ export function formatDate(date: string, format: string): string {
     return moment(date, 'YYYY-MM-DD').format(format);
 }
 
+export function formatMonthDay(monthDay: string, format: string): string {
+    return moment(monthDay, 'MM-DD').format(format);
+}
+
 export function getUnixTime(date: SupportedDate): number {
     return moment(date).unix();
 }

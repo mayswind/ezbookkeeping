@@ -47,6 +47,10 @@ import {
 } from '@/core/currency.ts';
 
 import {
+    FiscalYearStart
+} from '@/core/fiscalyear.ts';
+
+import {
     PresetAmountColor
 } from '@/core/color.ts';
 
@@ -130,7 +134,8 @@ import {
     getDateTimeFormatType,
     getRecentMonthDateRanges,
     isDateRangeMatchFullYears,
-    isDateRangeMatchFullMonths
+    isDateRangeMatchFullMonths,
+    formatMonthDay
 } from '@/lib/datetime.ts';
 
 import {
@@ -601,6 +606,10 @@ export function useI18n() {
 
     function getDefaultFirstDayOfWeek(): string {
         return t('default.firstDayOfWeek');
+    }
+
+    function getDefaultFiscalYearStart(): string {
+        return t('default.fiscalYearStart');
     }
 
     function getAllLanguageOptions(includeSystemDefault: boolean): LanguageOption[] {
@@ -1241,6 +1250,18 @@ export function useI18n() {
         return joinMultiText(finalWeekdayNames);
     }
 
+    // Returns FiscalYearStart object, to facilitate diverse uses and conversions
+    function getCurrentFiscalYearStart(): FiscalYearStart {
+        let fiscalYearStart = FiscalYearStart.fromNumber(userStore.currentUserFiscalYearStart);
+        if ( fiscalYearStart ) {
+            return fiscalYearStart;
+        }
+        if ( !fiscalYearStart ) {
+            fiscalYearStart = FiscalYearStart.fromMonthDashDayString(getDefaultFiscalYearStart());
+        }
+        return FiscalYearStart.Default;
+    }
+
     function getCurrentDecimalSeparator(): string {
         let decimalSeparatorType = DecimalSeparator.valueOf(userStore.currentUserDecimalSeparator);
 
@@ -1316,6 +1337,10 @@ export function useI18n() {
 
     function formatDateToLongDate(date: string): string {
         return formatDate(date, getLocalizedLongDateFormat());
+    }
+
+    function formatMonthDayToLongDate(monthDay: string): string {
+        return formatMonthDay(monthDay, getLocalizedLongMonthDayFormat());
     }
 
     function formatYearQuarter(year: number, quarter: number): string {
@@ -1660,6 +1685,7 @@ export function useI18n() {
         // get localization default type
         getDefaultCurrency,
         getDefaultFirstDayOfWeek,
+        getDefaultFiscalYearStart,
         // get all localized info of specified type
         getAllLanguageOptions,
         getAllEnableDisableOptions,
@@ -1710,6 +1736,7 @@ export function useI18n() {
         getWeekdayLongName,
         getMultiMonthdayShortNames,
         getMultiWeekdayLongNames,
+        getCurrentFiscalYearStart,
         getCurrentDecimalSeparator,
         getCurrentDigitGroupingSymbol,
         getCurrentDigitGroupingType,
@@ -1736,6 +1763,7 @@ export function useI18n() {
         formatUnixTimeToLongTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongTimeFormat(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortTimeFormat(), utcOffset, currentUtcOffset),
         formatDateToLongDate,
+        formatMonthDayToLongDate,
         formatYearQuarter,
         formatDateRange,
         getTimezoneDifferenceDisplayText,

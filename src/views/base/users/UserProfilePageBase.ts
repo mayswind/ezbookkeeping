@@ -97,6 +97,7 @@ export function useUserProfilePageBase() {
             newProfile.value.transactionEditScope === oldProfile.value.transactionEditScope &&
             newProfile.value.language === oldProfile.value.language &&
             newProfile.value.defaultCurrency === oldProfile.value.defaultCurrency &&
+            newProfile.value.fiscalYearStart === oldProfile.value.fiscalYearStart &&
             newProfile.value.firstDayOfWeek === oldProfile.value.firstDayOfWeek &&
             newProfile.value.longDateFormat === oldProfile.value.longDateFormat &&
             newProfile.value.shortDateFormat === oldProfile.value.shortDateFormat &&

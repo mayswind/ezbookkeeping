@@ -4,6 +4,7 @@ import { CurrencyDisplayType } from '@/core/currency.ts';
 import { PresetAmountColor } from '@/core/color.ts';
 import type { LocalizedPresetCategory } from '@/core/category.ts';
 import { TransactionEditScopeType } from '@/core/transaction.ts';
+import { FiscalYearStart } from '@/core/fiscalyear';
 
 export class User {
     public username: string = '';
@@ -17,6 +18,7 @@ export class User {
 
     public defaultAccountId: string = '';
     public transactionEditScope: number = 1;
+    public fiscalYearStart: number = 0;
     public longDateFormat: number = 0;
     public shortDateFormat: number = 0;
     public longTimeFormat: number = 0;
@@ -43,6 +45,7 @@ export class User {
         this.firstDayOfWeek = user.firstDayOfWeek;
         this.defaultAccountId = user.defaultAccountId;
         this.transactionEditScope = user.transactionEditScope;
+        this.fiscalYearStart = user.fiscalYearStart;
         this.longDateFormat = user.longDateFormat;
         this.shortDateFormat = user.shortDateFormat;
         this.longTimeFormat = user.longTimeFormat;
@@ -79,6 +82,7 @@ export class User {
             language: this.language,
             defaultCurrency: this.defaultCurrency,
             firstDayOfWeek: this.firstDayOfWeek,
+            fiscalYearStart: this.fiscalYearStart,
             longDateFormat: this.longDateFormat,
             shortDateFormat: this.shortDateFormat,
             longTimeFormat: this.longTimeFormat,
@@ -96,6 +100,7 @@ export class User {
         const user = new User(userInfo.language, userInfo.defaultCurrency, userInfo.firstDayOfWeek);
         user.defaultAccountId = userInfo.defaultAccountId;
         user.transactionEditScope = userInfo.transactionEditScope;
+        user.fiscalYearStart = userInfo.fiscalYearStart;
         user.longDateFormat = userInfo.longDateFormat;
         user.shortDateFormat = userInfo.shortDateFormat;
         user.longTimeFormat = userInfo.longTimeFormat;
@@ -125,6 +130,7 @@ export interface UserBasicInfo {
     readonly transactionEditScope: number;
     readonly language: string;
     readonly defaultCurrency: string;
+    readonly fiscalYearStart: number;
     readonly firstDayOfWeek: number;
     readonly longDateFormat: number;
     readonly shortDateFormat: number;
@@ -176,6 +182,7 @@ export interface UserProfileUpdateRequest {
     readonly language?: string;
     readonly defaultCurrency?: string;
     readonly firstDayOfWeek?: number;
+    readonly fiscalYearStart?: number;
     readonly longDateFormat?: number;
     readonly shortDateFormat?: number;
     readonly longTimeFormat?: number;
@@ -208,6 +215,7 @@ export const EMPTY_USER_BASIC_INFO: UserBasicInfo = {
     language: '',
     defaultCurrency: '',
     firstDayOfWeek: -1,
+    fiscalYearStart: FiscalYearStart.DefaultNumber,
     longDateFormat: LongDateFormat.Default.type,
     shortDateFormat: ShortDateFormat.Default.type,
     longTimeFormat: LongTimeFormat.Default.type,

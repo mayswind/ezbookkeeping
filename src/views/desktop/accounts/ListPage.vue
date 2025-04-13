@@ -196,24 +196,24 @@
 
                                                             <v-divider/>
 
-                                                            <v-card-text v-if="accountComment(element)">
-                                                                {{ accountComment(element) }}
+                                                            <v-card-text v-if="element.getAccountOrSubAccountComment(activeSubAccount[element.id])">
+                                                                {{ element.getAccountOrSubAccountComment(activeSubAccount[element.id]) }}
                                                             </v-card-text>
 
                                                             <v-card-text>
                                                                 <div class="d-flex account-toolbar align-center">
                                                                     <v-btn class="px-2" density="comfortable" color="default" variant="text"
                                                                            :disabled="loading" :prepend-icon="mdiListBoxOutline"
-                                                                           :to="`/transaction/list?accountIds=${accountOrSubAccountId(element)}`">
+                                                                           :to="`/transaction/list?accountIds=${element.getAccountOrSubAccountId(activeSubAccount[element.id])}`">
                                                                         {{ tt('Transaction List') }}
                                                                     </v-btn>
                                                                     <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading"
-                                                                           :prepend-icon="element.hidden ? mdiEyeOutline : mdiEyeOffOutline"
-                                                                           v-if="!activeSubAccount[element.id]"
-                                                                           @click="hide(element, !element.hidden)">
-                                                                        {{ element.hidden ? tt('Show') : tt('Hide') }}
+                                                                           :prepend-icon="element.isAccountOrSubAccountHidden(activeSubAccount[element.id]) ? mdiEyeOutline : mdiEyeOffOutline"
+                                                                           v-if="!activeSubAccount[element.id] || element.getSubAccount(activeSubAccount[element.id])"
+                                                                           @click="hide(element, element.getAccountOrSubAccount(activeSubAccount[element.id]), !element.isAccountOrSubAccountHidden(activeSubAccount[element.id]))">
+                                                                        {{ element.isAccountOrSubAccountHidden(activeSubAccount[element.id]) ? tt('Show') : tt('Hide') }}
                                                                     </v-btn>
                                                                     <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
@@ -225,7 +225,7 @@
                                                                     <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading" :prepend-icon="mdiDeleteOutline"
-                                                                           v-if="!activeSubAccount[element.id]"
+                                                                           v-if="!activeSubAccount[element.id] || element.getSubAccount(activeSubAccount[element.id])"
                                                                            @click="remove(element)">
                                                                         {{ tt('Delete') }}
                                                                     </v-btn>
@@ -383,14 +383,6 @@ function hasAccount(accountCategory: AccountCategory): boolean {
     return accountsStore.hasAccount(accountCategory, !showHidden.value);
 }
 
-function accountOrSubAccountId(account: Account): string | null {
-    return account.getAccountOrSubAccountId(activeSubAccount.value[account.id]);
-}
-
-function accountComment(account: Account): string | null {
-    return account.getAccountOrSubAccountComment(activeSubAccount.value[account.id]);
-}
-
 function accountCurrency(account: Account): string | null {
     if (account.type === AccountType.SingleAccount.type) {
         return getCurrencyName(account.currency);
@@ -458,13 +450,17 @@ function edit(account: Account): void {
     });
 }
 
-function hide(account: Account, hidden: boolean): void {
+function hide(account: Account, targetAccount: Account, hidden: boolean): void {
     loading.value = true;
 
     accountsStore.hideAccount({
-        account: account,
+        account: targetAccount,
         hidden: hidden
     }).then(() => {
+        if (hidden && !showHidden.value && activeSubAccount.value[account.id]) {
+            activeSubAccount.value[account.id] = '';
+        }
+
         loading.value = false;
     }).catch(error => {
         loading.value = false;
@@ -476,21 +472,46 @@ function hide(account: Account, hidden: boolean): void {
 }
 
 function remove(account: Account): void {
-    confirmDialog.value?.open('Are you sure you want to delete this account?').then(() => {
-        loading.value = true;
+    if (activeSubAccount.value[account.id]) {
+        const subAccount: Account | null = account.getSubAccount(activeSubAccount.value[account.id]);
 
-        accountsStore.deleteAccount({
-            account: account
-        }).then(() => {
-            loading.value = false;
-        }).catch(error => {
-            loading.value = false;
+        if (!subAccount) {
+            snackbar.value?.showMessage('Unable to delete this sub-account');
+            return;
+        }
 
-            if (!error.processed) {
-                snackbar.value?.showError(error);
-            }
+        confirmDialog.value?.open('Are you sure you want to delete this sub-account?').then(() => {
+            loading.value = true;
+
+            accountsStore.deleteSubAccount({
+                subAccount: subAccount
+            }).then(() => {
+                loading.value = false;
+            }).catch(error => {
+                loading.value = false;
+
+                if (!error.processed) {
+                    snackbar.value?.showError(error);
+                }
+            });
         });
-    });
+    } else {
+        confirmDialog.value?.open('Are you sure you want to delete this account?').then(() => {
+            loading.value = true;
+
+            accountsStore.deleteAccount({
+                account: account
+            }).then(() => {
+                loading.value = false;
+            }).catch(error => {
+                loading.value = false;
+
+                if (!error.processed) {
+                    snackbar.value?.showError(error);
+                }
+            });
+        });
+    }
 }
 
 function saveSortResult(): void {

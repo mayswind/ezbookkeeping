@@ -240,6 +240,30 @@ export class Account implements AccountInfoResponse {
         }
     }
 
+    public isAccountOrSubAccountHidden(subAccountId: string): boolean {
+        if (this.type === AccountType.SingleAccount.type) {
+            return this.hidden;
+        } else if (this.type === AccountType.MultiSubAccounts.type && !subAccountId) {
+            return this.hidden;
+        } else if (this.type === AccountType.MultiSubAccounts.type && subAccountId) {
+            if (!this.subAccounts || !this.subAccounts.length) {
+                return false;
+            }
+
+            for (let i = 0; i < this.subAccounts.length; i++) {
+                const subAccount = this.subAccounts[i];
+
+                if (subAccountId && subAccountId === subAccount.id) {
+                    return subAccount.hidden;
+                }
+            }
+
+            return false;
+        } else {
+            return false;
+        }
+    }
+
     public getAccountOrSubAccountComment(subAccountId: string): string | null {
         if (this.type === AccountType.SingleAccount.type) {
             return this.comment;
@@ -262,6 +286,46 @@ export class Account implements AccountInfoResponse {
         } else {
             return null;
         }
+    }
+
+    public getAccountOrSubAccount(subAccountId: string): Account | null {
+        if (this.type === AccountType.SingleAccount.type) {
+            return this;
+        } else if (this.type === AccountType.MultiSubAccounts.type && !subAccountId) {
+            return this;
+        } else if (this.type === AccountType.MultiSubAccounts.type && subAccountId) {
+            if (!this.subAccounts || !this.subAccounts.length) {
+                return null;
+            }
+
+            for (let i = 0; i < this.subAccounts.length; i++) {
+                const subAccount = this.subAccounts[i];
+
+                if (subAccountId && subAccountId === subAccount.id) {
+                    return subAccount;
+                }
+            }
+
+            return null;
+        } else {
+            return null;
+        }
+    }
+
+    public getSubAccount(subAccountId: string): Account | null {
+        if (!this.subAccounts || !this.subAccounts.length) {
+            return null;
+        }
+
+        for (let i = 0; i < this.subAccounts.length; i++) {
+            const subAccount = this.subAccounts[i];
+
+            if (subAccountId && subAccountId === subAccount.id) {
+                return subAccount;
+            }
+        }
+
+        return null;
     }
 
     public getSubAccountCurrencies(showHidden: boolean, subAccountId: string): string[] {

@@ -508,6 +508,28 @@ func (a *AccountsApi) AccountDeleteHandler(c *core.WebContext) (any, *errs.Error
 	return true, nil
 }
 
+// SubAccountDeleteHandler deletes an existed sub-account by request parameters for current user
+func (a *AccountsApi) SubAccountDeleteHandler(c *core.WebContext) (any, *errs.Error) {
+	var accountDeleteReq models.AccountDeleteRequest
+	err := c.ShouldBindJSON(&accountDeleteReq)
+
+	if err != nil {
+		log.Warnf(c, "[accounts.SubAccountDeleteHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+	err = a.accounts.DeleteSubAccount(c, uid, accountDeleteReq.Id)
+
+	if err != nil {
+		log.Errorf(c, "[accounts.SubAccountDeleteHandler] failed to delete sub-account \"id:%d\" for user \"uid:%d\", because %s", accountDeleteReq.Id, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.Infof(c, "[accounts.SubAccountDeleteHandler] user \"uid:%d\" has deleted sub-account \"id:%d\"", uid, accountDeleteReq.Id)
+	return true, nil
+}
+
 func (a *AccountsApi) createNewAccountModel(uid int64, accountCreateReq *models.AccountCreateRequest, isSubAccount bool, order int32) *models.Account {
 	accountExtend := &models.AccountExtend{}
 

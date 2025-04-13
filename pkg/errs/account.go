@@ -22,4 +22,6 @@ var (
 	ErrAccountBalanceTimeNotSet               = NewNormalError(NormalSubcategoryAccount, 15, http.StatusBadRequest, "account balance time is not set")
 	ErrCannotSetStatementDateForNonCreditCard = NewNormalError(NormalSubcategoryAccount, 16, http.StatusBadRequest, "cannot set statement date for non credit card account")
 	ErrCannotSetStatementDateForSubAccount    = NewNormalError(NormalSubcategoryAccount, 17, http.StatusBadRequest, "cannot set statement date for sub account")
+	ErrSubAccountNotFound                     = NewNormalError(NormalSubcategoryAccount, 18, http.StatusBadRequest, "sub-account not found")
+	ErrSubAccountInUseCannotBeDeleted         = NewNormalError(NormalSubcategoryAccount, 19, http.StatusBadRequest, "sub-account is in use and cannot be deleted")
 )

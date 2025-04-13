@@ -429,7 +429,7 @@ func (s *AccountService) DeleteAccount(c core.Context, uid int64, accountId int6
 
 	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		var accountAndSubAccounts []*models.Account
-		err := sess.Where("uid=? AND deleted=? AND (account_id=? OR parent_account_id=?)", uid, false, accountId, accountId).Find(&accountAndSubAccounts)
+		err := sess.Where("uid=? AND deleted=? AND ((account_id=? AND parent_account_id=?) OR parent_account_id=?)", uid, false, accountId, models.LevelOneAccountParentId, accountId).Find(&accountAndSubAccounts)
 
 		if err != nil {
 			return err
@@ -472,6 +472,86 @@ func (s *AccountService) DeleteAccount(c core.Context, uid int64, accountId int6
 			return err
 		} else if deletedRows < 1 {
 			return errs.ErrAccountNotFound
+		}
+
+		if len(relatedTransactionsByAccount) > 0 {
+			updateTransaction := &models.Transaction{
+				Deleted:         true,
+				DeletedUnixTime: now,
+			}
+
+			transactionIds := make([]int64, len(relatedTransactionsByAccount))
+
+			for i := 0; i < len(relatedTransactionsByAccount); i++ {
+				transactionIds[i] = relatedTransactionsByAccount[i].TransactionId
+			}
+
+			deletedTransactionRows, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).In("transaction_id", transactionIds).Update(updateTransaction)
+
+			if err != nil {
+				return err
+			} else if deletedTransactionRows < int64(len(transactionIds)) {
+				return errs.ErrDatabaseOperationFailed
+			}
+		}
+
+		return err
+	})
+}
+
+// DeleteSubAccount deletes an existed sub-account from database
+func (s *AccountService) DeleteSubAccount(c core.Context, uid int64, accountId int64) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.Account{
+		Balance:         0,
+		Deleted:         true,
+		DeletedUnixTime: now,
+	}
+
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+		account := &models.Account{}
+		has, err := sess.Cols("account_id", "uid", "deleted", "parent_account_id").Where("uid=? AND deleted=? AND account_id=? AND parent_account_id<>?", uid, false, accountId, models.LevelOneAccountParentId).Limit(1).Get(account)
+
+		if err != nil {
+			return err
+		} else if !has {
+			return errs.ErrSubAccountNotFound
+		}
+
+		subAccountsCount, err := sess.Where("uid=? AND deleted=? AND parent_account_id=?", uid, false, account.ParentAccountId).Count(&models.Account{})
+
+		if subAccountsCount <= 1 {
+			return errs.ErrAccountHaveNoSubAccount
+		}
+
+		var relatedTransactionsByAccount []*models.Transaction
+		err = sess.Cols("transaction_id", "uid", "deleted", "account_id", "type").Where("uid=? AND deleted=? AND account_id=?", uid, false, accountId).Limit(2).Find(&relatedTransactionsByAccount)
+
+		if err != nil {
+			return err
+		} else if len(relatedTransactionsByAccount) > 1 {
+			return errs.ErrSubAccountInUseCannotBeDeleted
+		} else if len(relatedTransactionsByAccount) > 0 {
+			for i := 0; i < len(relatedTransactionsByAccount); i++ {
+				transaction := relatedTransactionsByAccount[i]
+
+				if transaction.Type != models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+					return errs.ErrSubAccountInUseCannotBeDeleted
+				}
+			}
+		}
+
+		deletedRows, err := sess.Cols("balance", "deleted", "deleted_unix_time").Where("uid=? AND deleted=? AND account_id=?", uid, false, accountId).Update(updateModel)
+
+		if err != nil {
+			return err
+		} else if deletedRows < 1 {
+			return errs.ErrSubAccountNotFound
 		}
 
 		if len(relatedTransactionsByAccount) > 0 {

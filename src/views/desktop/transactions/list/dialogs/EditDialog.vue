@@ -86,6 +86,7 @@
                                     <amount-input class="transaction-edit-amount font-weight-bold"
                                                   :color="sourceAmountColor"
                                                   :currency="sourceAccountCurrency"
+                                                  :show-currency="true"
                                                   :readonly="mode === TransactionEditPageMode.View"
                                                   :disabled="loading || submitting"
                                                   :persistent-placeholder="true"
@@ -97,6 +98,7 @@
                                 <v-col cols="12" :md="6" v-if="transaction.type === TransactionType.Transfer">
                                     <amount-input class="transaction-edit-amount font-weight-bold" color="primary"
                                                   :currency="destinationAccountCurrency"
+                                                  :show-currency="true"
                                                   :readonly="mode === TransactionEditPageMode.View"
                                                   :disabled="loading || submitting"
                                                   :persistent-placeholder="true"
@@ -1156,6 +1158,8 @@ defineExpose({
 </script>
 
 <style>
+.transaction-edit-amount .v-field__prepend-inner,
+.transaction-edit-amount .v-field__append-inner,
 .transaction-edit-amount .v-field__field > input {
     font-size: 1.25rem;
 }

@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  ezbookkeeping:
+    image: mayswind/ezbookkeeping:latest 
+    environment:
+      - EBK_SERVER_DOMAIN=ezbookkeeping.yourdomain 
+      - EBK_SERVER_ENABLE_GZIP=true
+      - EBK_LOG_MODE=console
+      - EBK_SECURITY_SECRET_KEY=its_should_be_a_random_string
+      - EBK_DATABASE_TYPE=mysql
+      - EBK_DATABASE_HOST=mariadb 
+      - EBK_DATABASE_NAME=ezbookkeeping
+      - EBK_DATABASE_USER=ezbookkeeping
+      - EBK_DATABASE_PASSWD=ezbookkeeping
+      - TZ=Etc/UTC
+    ports:
+      - "8080:8080"
+    volumes:
+      - ezbookkeeping-data:/ezbookkeeping/storage
+    depends_on:
+      - mariadb
+
+  mariadb:
+    image: mariadb:lts
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=ezbookkeeping
+      - MYSQL_PASSWORD=ezbookkeeping
+      - MYSQL_DATABASE=ezbookkeeping
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    restart: unless-stopped
+
+volumes:
+  ezbookkeeping-data:
+  mariadb-data:
+

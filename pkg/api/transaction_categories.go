@@ -229,11 +229,11 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.WebContext) (an
 		return nil, errs.ErrNothingWillBeUpdated
 	}
 
-	if category.ParentCategoryId == 0 && newCategory.ParentCategoryId != 0 {
+	if category.ParentCategoryId == models.LevelOneTransactionCategoryParentId && newCategory.ParentCategoryId != models.LevelOneTransactionCategoryParentId {
 		return nil, errs.Or(err, errs.ErrNotAllowChangePrimaryTransactionCategoryToSecondary)
 	}
 
-	if category.ParentCategoryId != 0 && newCategory.ParentCategoryId == 0 {
+	if category.ParentCategoryId != models.LevelOneTransactionCategoryParentId && newCategory.ParentCategoryId == models.LevelOneTransactionCategoryParentId {
 		return nil, errs.Or(err, errs.ErrNotAllowChangeSecondaryTransactionCategoryToPrimary)
 	}
 
@@ -256,7 +256,7 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.WebContext) (an
 			return nil, errs.Or(err, errs.ErrNotAllowChangePrimaryTransactionType)
 		}
 
-		if toPrimaryCategory.ParentCategoryId != 0 {
+		if toPrimaryCategory.ParentCategoryId != models.LevelOneTransactionCategoryParentId {
 			return nil, errs.Or(err, errs.ErrNotAllowUseSecondaryTransactionAsPrimaryCategory)
 		}
 	}
@@ -433,7 +433,7 @@ func (a *TransactionCategoriesApi) getTransactionCategoryListByTypeResponse(cate
 	for i := 0; i < len(categoryResps); i++ {
 		categoryResp := categoryResps[i]
 
-		if categoryResp.ParentId <= models.LevelOneTransactionParentId {
+		if categoryResp.ParentId <= models.LevelOneTransactionCategoryParentId {
 			continue
 		}
 
@@ -449,7 +449,7 @@ func (a *TransactionCategoriesApi) getTransactionCategoryListByTypeResponse(cate
 	finalCategoryResps := make(models.TransactionCategoryInfoResponseSlice, 0)
 
 	for i := 0; i < len(categoryResps); i++ {
-		if parentId <= 0 && categoryResps[i].ParentId == models.LevelOneTransactionParentId {
+		if parentId <= 0 && categoryResps[i].ParentId == models.LevelOneTransactionCategoryParentId {
 			sort.Sort(categoryResps[i].SubCategories)
 			finalCategoryResps = append(finalCategoryResps, categoryResps[i])
 		} else if parentId > 0 && categoryResps[i].ParentId == parentId {

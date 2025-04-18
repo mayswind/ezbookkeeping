@@ -876,7 +876,7 @@ func (l *UserDataCli) getUserEssentialData(c *core.CliContext, uid int64, userna
 	return accountMap, categoryMap, tagMap, tagIndexes, tagIndexesMap, nil
 }
 
-func (l *UserDataCli) getUserEssentialDataForImport(c *core.CliContext, uid int64, username string) (accountMap map[string]*models.Account, expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag, err error) {
+func (l *UserDataCli) getUserEssentialDataForImport(c *core.CliContext, uid int64, username string) (accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag, err error) {
 	if uid <= 0 {
 		log.CliErrorf(c, "[user_data.getUserEssentialDataForImport] user uid \"%d\" is invalid", uid)
 		return nil, nil, nil, nil, nil, errs.ErrUserIdInvalid
@@ -898,7 +898,7 @@ func (l *UserDataCli) getUserEssentialDataForImport(c *core.CliContext, uid int6
 		return nil, nil, nil, nil, nil, err
 	}
 
-	expenseCategoryMap, incomeCategoryMap, transferCategoryMap = l.categories.GetCategoryNameMapByList(categories)
+	expenseCategoryMap, incomeCategoryMap, transferCategoryMap = l.categories.GetSubCategoryNameMapByList(categories)
 
 	tags, err := l.tags.GetAllTagsByUid(c, uid)
 

@@ -21,7 +21,7 @@ type DataTableTransactionDataImporter struct {
 }
 
 // ParseImportedData returns the imported transaction data
-func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, user *models.User, dataTable datatable.TransactionDataTable, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
+func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, user *models.User, dataTable datatable.TransactionDataTable, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	if dataTable.TransactionRowCount() < 1 {
 		log.Errorf(ctx, "[data_table_transaction_data_exporter.ParseImportedData] cannot parse import data for user \"uid:%d\", because data table row count is less 1", user.Uid)
 		return nil, nil, nil, nil, nil, nil, errs.ErrNotFoundTransactionDataInFile
@@ -48,15 +48,15 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 	}
 
 	if expenseCategoryMap == nil {
-		expenseCategoryMap = make(map[string]*models.TransactionCategory)
+		expenseCategoryMap = make(map[string]map[string]*models.TransactionCategory)
 	}
 
 	if incomeCategoryMap == nil {
-		incomeCategoryMap = make(map[string]*models.TransactionCategory)
+		incomeCategoryMap = make(map[string]map[string]*models.TransactionCategory)
 	}
 
 	if transferCategoryMap == nil {
-		transferCategoryMap = make(map[string]*models.TransactionCategory)
+		transferCategoryMap = make(map[string]map[string]*models.TransactionCategory)
 	}
 
 	if tagMap == nil {
@@ -114,6 +114,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 		}
 
 		categoryId := int64(0)
+		categoryName := ""
 		subCategoryName := ""
 
 		if transactionDbType != models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
@@ -124,35 +125,51 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 				return nil, nil, nil, nil, nil, nil, errs.Or(err, errs.ErrTransactionTypeInvalid)
 			}
 
+			categoryName = dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_CATEGORY)
 			subCategoryName = dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY)
 
 			if transactionDbType == models.TRANSACTION_DB_TYPE_EXPENSE {
-				subCategory, exists := expenseCategoryMap[subCategoryName]
+				subCategory, exists := c.getTransactionCategory(expenseCategoryMap, categoryName, subCategoryName)
 
 				if !exists {
 					subCategory = c.createNewTransactionCategoryModel(user.Uid, subCategoryName, transactionCategoryType)
 					allNewSubExpenseCategories = append(allNewSubExpenseCategories, subCategory)
-					expenseCategoryMap[subCategoryName] = subCategory
+
+					if _, exists = expenseCategoryMap[subCategoryName]; !exists {
+						expenseCategoryMap[subCategoryName] = make(map[string]*models.TransactionCategory)
+					}
+
+					expenseCategoryMap[subCategoryName][categoryName] = subCategory
 				}
 
 				categoryId = subCategory.CategoryId
 			} else if transactionDbType == models.TRANSACTION_DB_TYPE_INCOME {
-				subCategory, exists := incomeCategoryMap[subCategoryName]
+				subCategory, exists := c.getTransactionCategory(incomeCategoryMap, categoryName, subCategoryName)
 
 				if !exists {
 					subCategory = c.createNewTransactionCategoryModel(user.Uid, subCategoryName, transactionCategoryType)
 					allNewSubIncomeCategories = append(allNewSubIncomeCategories, subCategory)
-					incomeCategoryMap[subCategoryName] = subCategory
+
+					if _, exists = incomeCategoryMap[subCategoryName]; !exists {
+						incomeCategoryMap[subCategoryName] = make(map[string]*models.TransactionCategory)
+					}
+
+					incomeCategoryMap[subCategoryName][categoryName] = subCategory
 				}
 
 				categoryId = subCategory.CategoryId
 			} else if transactionDbType == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
-				subCategory, exists := transferCategoryMap[subCategoryName]
+				subCategory, exists := c.getTransactionCategory(transferCategoryMap, categoryName, subCategoryName)
 
 				if !exists {
 					subCategory = c.createNewTransactionCategoryModel(user.Uid, subCategoryName, transactionCategoryType)
 					allNewSubTransferCategories = append(allNewSubTransferCategories, subCategory)
-					transferCategoryMap[subCategoryName] = subCategory
+
+					if _, exists = transferCategoryMap[subCategoryName]; !exists {
+						transferCategoryMap[subCategoryName] = make(map[string]*models.TransactionCategory)
+					}
+
+					transferCategoryMap[subCategoryName][categoryName] = subCategory
 				}
 
 				categoryId = subCategory.CategoryId
@@ -391,6 +408,38 @@ func (c *DataTableTransactionDataImporter) getTransactionCategoryType(transactio
 	} else {
 		return 0, errs.ErrTransactionTypeInvalid
 	}
+}
+
+func (c *DataTableTransactionDataImporter) getTransactionCategory(categories map[string]map[string]*models.TransactionCategory, categoryName string, subCategoryName string) (*models.TransactionCategory, bool) {
+	if len(categories) < 1 {
+		return nil, false
+	}
+
+	subCategories, exists := categories[subCategoryName]
+
+	if !exists || len(subCategories) < 1 {
+		return nil, false
+	}
+
+	if categoryName == "" {
+		for _, subCategory := range subCategories {
+			if subCategory != nil {
+				return subCategory, true
+			}
+		}
+	}
+
+	subCategory, exists := subCategories[categoryName]
+
+	if !exists {
+		for _, subCategory := range subCategories {
+			if subCategory != nil {
+				return subCategory, true
+			}
+		}
+	}
+
+	return subCategory, exists
 }
 
 func (c *DataTableTransactionDataImporter) createNewAccountModel(uid int64, accountName string, currency string) *models.Account {

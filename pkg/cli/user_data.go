@@ -959,7 +959,7 @@ func (l *UserDataCli) checkTransactionCategory(c *core.CliContext, transaction *
 		return errs.ErrTransactionCategoryNotFound
 	}
 
-	if category.ParentCategoryId == models.LevelOneTransactionParentId {
+	if category.ParentCategoryId == models.LevelOneTransactionCategoryParentId {
 		log.CliErrorf(c, "[user_data.checkTransactionCategory] the transaction category \"id:%d\" of transaction \"id:%d\" is not a sub category", transaction.CategoryId, transaction.TransactionId)
 		return errs.ErrOperationFailed
 	}

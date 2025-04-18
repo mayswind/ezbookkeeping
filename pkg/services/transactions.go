@@ -2191,7 +2191,7 @@ func (s *TransactionService) isCategoryValid(sess *xorm.Session, transaction *mo
 			return errs.ErrCannotUseHiddenTransactionCategory
 		}
 
-		if category.ParentCategoryId < 1 {
+		if category.ParentCategoryId == models.LevelOneTransactionCategoryParentId {
 			return errs.ErrCannotUsePrimaryCategoryForTransaction
 		}
 

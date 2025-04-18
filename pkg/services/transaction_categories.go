@@ -161,7 +161,7 @@ func (s *TransactionCategoryService) GetMaxDisplayOrder(c core.Context, uid int6
 	}
 
 	category := &models.TransactionCategory{}
-	has, err := s.UserDataDB(uid).NewSession(c).Cols("uid", "deleted", "parent_category_id", "display_order").Where("uid=? AND deleted=? AND type=? AND parent_category_id=?", uid, false, categoryType, models.LevelOneTransactionParentId).OrderBy("display_order desc").Limit(1).Get(category)
+	has, err := s.UserDataDB(uid).NewSession(c).Cols("uid", "deleted", "parent_category_id", "display_order").Where("uid=? AND deleted=? AND type=? AND parent_category_id=?", uid, false, categoryType, models.LevelOneTransactionCategoryParentId).OrderBy("display_order desc").Limit(1).Get(category)
 
 	if err != nil {
 		return 0, err
@@ -463,7 +463,7 @@ func (s *TransactionCategoryService) GetSubCategoryNameMapByList(categories []*m
 	for i := 0; i < len(categories); i++ {
 		category := categories[i]
 
-		if category.ParentCategoryId == models.LevelOneTransactionParentId {
+		if category.ParentCategoryId == models.LevelOneTransactionCategoryParentId {
 			continue
 		}
 

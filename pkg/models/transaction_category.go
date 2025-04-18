@@ -1,7 +1,7 @@
 package models
 
-// LevelOneTransactionParentId represents the parent id of level-one transaction category
-const LevelOneTransactionParentId = 0
+// LevelOneTransactionCategoryParentId represents the parent id of level-one transaction category
+const LevelOneTransactionCategoryParentId = 0
 
 // TransactionCategoryType represents transaction category type
 type TransactionCategoryType byte

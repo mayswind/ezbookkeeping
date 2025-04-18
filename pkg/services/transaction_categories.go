@@ -161,7 +161,7 @@ func (s *TransactionCategoryService) GetMaxDisplayOrder(c core.Context, uid int6
 	}
 
 	category := &models.TransactionCategory{}
-	has, err := s.UserDataDB(uid).NewSession(c).Cols("uid", "deleted", "parent_category_id", "display_order").Where("uid=? AND deleted=? AND type=? AND parent_category_id=?", uid, false, categoryType, models.LevelOneTransactionParentId).OrderBy("display_order desc").Limit(1).Get(category)
+	has, err := s.UserDataDB(uid).NewSession(c).Cols("uid", "deleted", "parent_category_id", "display_order").Where("uid=? AND deleted=? AND type=? AND parent_category_id=?", uid, false, categoryType, models.LevelOneTransactionCategoryParentId).OrderBy("display_order desc").Limit(1).Get(category)
 
 	if err != nil {
 		return 0, err
@@ -448,22 +448,59 @@ func (s *TransactionCategoryService) GetCategoryMapByList(categories []*models.T
 	return categoryMap
 }
 
-// GetCategoryNameMapByList returns a transaction category map by a list
-func (s *TransactionCategoryService) GetCategoryNameMapByList(categories []*models.TransactionCategory) (expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory) {
-	expenseCategoryMap = make(map[string]*models.TransactionCategory)
-	incomeCategoryMap = make(map[string]*models.TransactionCategory)
-	transferCategoryMap = make(map[string]*models.TransactionCategory)
+// GetSubCategoryNameMapByList returns a sub transaction category map by a list
+func (s *TransactionCategoryService) GetSubCategoryNameMapByList(categories []*models.TransactionCategory) (expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory) {
+	categoryMap := make(map[int64]*models.TransactionCategory, len(categories))
+	expenseCategoryMap = make(map[string]map[string]*models.TransactionCategory)
+	incomeCategoryMap = make(map[string]map[string]*models.TransactionCategory)
+	transferCategoryMap = make(map[string]map[string]*models.TransactionCategory)
+
+	for i := 0; i < len(categories); i++ {
+		category := categories[i]
+		categoryMap[category.CategoryId] = category
+	}
 
 	for i := 0; i < len(categories); i++ {
 		category := categories[i]
 
-		if category.Type == models.CATEGORY_TYPE_INCOME {
-			incomeCategoryMap[category.Name] = category
-		} else if category.Type == models.CATEGORY_TYPE_EXPENSE {
-			expenseCategoryMap[category.Name] = category
-		} else if category.Type == models.CATEGORY_TYPE_TRANSFER {
-			transferCategoryMap[category.Name] = category
+		if category.ParentCategoryId == models.LevelOneTransactionCategoryParentId {
+			continue
 		}
+
+		parentCategory, exists := categoryMap[category.ParentCategoryId]
+
+		if !exists {
+			continue
+		}
+
+		var categories map[string]*models.TransactionCategory
+
+		if category.Type == models.CATEGORY_TYPE_INCOME {
+			categories, exists = incomeCategoryMap[category.Name]
+
+			if !exists {
+				categories = make(map[string]*models.TransactionCategory)
+				incomeCategoryMap[category.Name] = categories
+			}
+		} else if category.Type == models.CATEGORY_TYPE_EXPENSE {
+			categories, exists = expenseCategoryMap[category.Name]
+
+			if !exists {
+				categories = make(map[string]*models.TransactionCategory)
+				expenseCategoryMap[category.Name] = categories
+			}
+		} else if category.Type == models.CATEGORY_TYPE_TRANSFER {
+			categories, exists = transferCategoryMap[category.Name]
+
+			if !exists {
+				categories = make(map[string]*models.TransactionCategory)
+				transferCategoryMap[category.Name] = categories
+			}
+		} else {
+			continue
+		}
+
+		categories[parentCategory.Name] = category
 	}
 
 	return expenseCategoryMap, incomeCategoryMap, transferCategoryMap

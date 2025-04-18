@@ -78,7 +78,7 @@ func (c *DataTableTransactionDataExporter) getExportedTransactionCategoryName(da
 		return ""
 	}
 
-	if category.ParentCategoryId == 0 {
+	if category.ParentCategoryId == models.LevelOneTransactionCategoryParentId {
 		return dataTableBuilder.ReplaceDelimiters(category.Name)
 	}
 

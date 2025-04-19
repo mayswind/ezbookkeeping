@@ -17,6 +17,8 @@
     "default": {
         "currency": "USD",
         "firstDayOfWeek": "Sunday",
+        "fiscalYearStart": "01-01",
+        "fiscalYearFormat": "StartYYYY_EndYYYY",
         "longDateFormat": "MMDDYYYY",
         "shortDateFormat": "MMDDYYYY",
         "longTimeFormat": "HHMMSSA",
@@ -232,6 +234,13 @@
             "30": "30th",
             "31": "31th"
         }
+    },
+    "fiscalYear": {
+        "StartYYYY_EndYYYY": "FY {StartYYYY}-{EndYYYY}",
+        "StartYYYY_EndYY": "FY {StartYYYY}-{EndYY}",
+        "StartYY_EndYY": "FY {StartYY}-{EndYY}",
+        "EndYYYY": "FY {EndYYYY}",
+        "EndYY": "FY {EndYY}"
     },
     "numeral": {
         "Dot": "Dot",
@@ -1186,6 +1195,7 @@
         "oldPassword": "Current Password",
         "defaultCurrency": "Default Currency",
         "firstDayOfWeek": "First Day of Week",
+        "fiscalYearStart": "Fiscal Year Start Date",
         "transactionEditScope": "Editable Transaction Range",
         "name": "Name",
         "category": "Category",
@@ -1355,6 +1365,8 @@
     "Last month": "Last month",
     "This year": "This year",
     "Last year": "Last year",
+    "This fiscal year": "This fiscal year",
+    "Last fiscal year": "Last fiscal year",
     "Recent 12 months": "Recent 12 months",
     "Recent 24 months": "Recent 24 months",
     "Recent 36 months": "Recent 36 months",
@@ -1436,10 +1448,12 @@
     "Default Currency": "Default Currency",
     "Default Account": "Default Account",
     "First Day of Week": "First Day of Week",
+    "Fiscal Year Start Date": "Fiscal Year Start Date",
     "Long Date Format": "Long Date Format",
     "Short Date Format": "Short Date Format",
     "Long Time Format": "Long Time Format",
     "Short Time Format": "Short Time Format",
+    "Fiscal Year Format": "Fiscal Year Format",
     "Decimal Separator": "Decimal Separator",
     "Digit Grouping Symbol": "Digit Grouping Symbol",
     "Digit Grouping": "Digit Grouping",
@@ -1785,6 +1799,7 @@
     "Aggregate by Month": "Aggregate by Month",
     "Aggregate by Quarter": "Aggregate by Quarter",
     "Aggregate by Year": "Aggregate by Year",
+    "Aggregate by Fiscal Year": "Aggregate by Fiscal Year",
     "Filter Accounts": "Filter Accounts",
     "Filter Transaction Categories": "Filter Transaction Categories",
     "Filter Transaction Tags": "Filter Transaction Tags",

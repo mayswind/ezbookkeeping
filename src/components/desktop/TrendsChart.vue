@@ -397,7 +397,7 @@ function clickItem(e: ECElementEvent): void {
         }
     }
 
-    const dateRangeType = getDateTypeByDateRange(minUnixTime, maxUnixTime, userStore.currentUserFirstDayOfWeek, DateRangeScene.Normal);
+    const dateRangeType = getDateTypeByDateRange(minUnixTime, maxUnixTime, userStore.currentUserFirstDayOfWeek, userStore.currentUserFiscalYearStart, DateRangeScene.Normal);
 
     emit('click', {
         itemId: itemId,

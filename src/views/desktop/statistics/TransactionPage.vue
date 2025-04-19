@@ -407,6 +407,7 @@ const {
     trendDateAggregationType,
     defaultCurrency,
     firstDayOfWeek,
+    fiscalYearStart,
     allDateRanges,
     allSortingTypes,
     allDateAggregationTypes,
@@ -749,7 +750,7 @@ function setDateFilter(dateType: number): void {
         }
     }
 
-    const dateRange = getDateRangeByDateType(dateType, firstDayOfWeek.value);
+    const dateRange = getDateRangeByDateType(dateType, firstDayOfWeek.value, fiscalYearStart.value);
 
     if (!dateRange) {
         return;
@@ -786,7 +787,7 @@ function setCustomDateFilter(startTime: number | string, endTime: number | strin
     let changed = false;
 
     if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis && isNumber(startTime) && isNumber(endTime)) {
-        const chartDateType = getDateTypeByDateRange(startTime, endTime, firstDayOfWeek.value, DateRangeScene.Normal);
+        const chartDateType = getDateTypeByDateRange(startTime, endTime, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.Normal);
 
         changed = statisticsStore.updateTransactionStatisticsFilter({
             categoricalChartDateType: chartDateType,
@@ -796,7 +797,7 @@ function setCustomDateFilter(startTime: number | string, endTime: number | strin
 
         showCustomDateRangeDialog.value = false;
     } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis && isString(startTime) && isString(endTime)) {
-        const chartDateType = getDateTypeByDateRange(getYearMonthFirstUnixTime(startTime), getYearMonthLastUnixTime(endTime), firstDayOfWeek.value, DateRangeScene.TrendAnalysis);
+        const chartDateType = getDateTypeByDateRange(getYearMonthFirstUnixTime(startTime), getYearMonthLastUnixTime(endTime), firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.TrendAnalysis);
 
         changed = statisticsStore.updateTransactionStatisticsFilter({
             trendChartDateType: chartDateType,
@@ -822,7 +823,7 @@ function shiftDateRange(scale: number): void {
     let changed = false;
 
     if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
-        const newDateRange = getShiftedDateRangeAndDateType(query.value.categoricalChartStartTime, query.value.categoricalChartEndTime, scale, firstDayOfWeek.value, DateRangeScene.Normal);
+        const newDateRange = getShiftedDateRangeAndDateType(query.value.categoricalChartStartTime, query.value.categoricalChartEndTime, scale, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.Normal);
 
         changed = statisticsStore.updateTransactionStatisticsFilter({
             categoricalChartDateType: newDateRange.dateType,
@@ -830,7 +831,7 @@ function shiftDateRange(scale: number): void {
             categoricalChartEndTime: newDateRange.maxTime
         });
     } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
-        const newDateRange = getShiftedDateRangeAndDateType(getYearMonthFirstUnixTime(query.value.trendChartStartYearMonth), getYearMonthLastUnixTime(query.value.trendChartEndYearMonth), scale, firstDayOfWeek.value, DateRangeScene.TrendAnalysis);
+        const newDateRange = getShiftedDateRangeAndDateType(getYearMonthFirstUnixTime(query.value.trendChartStartYearMonth), getYearMonthLastUnixTime(query.value.trendChartEndYearMonth), scale, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.TrendAnalysis);
 
         changed = statisticsStore.updateTransactionStatisticsFilter({
             trendChartDateType: newDateRange.dateType,

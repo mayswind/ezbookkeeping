@@ -6,6 +6,7 @@ export const UTC_TIMEZONE: TimezoneInfo = {
 };
 
 // Reference: https://github.com/nodatime/nodatime/blob/main/data/cldr/windowsZones-45.xml
+// Reference: https://github.com/mattjohnsonpint/TimeZoneNames/blob/main/src/TimeZoneNames.DataBuilder/data/windows-displaynames.json
 export const ALL_TIMEZONES: TimezoneInfo[] = [
     // UTC-12:00
     {
@@ -59,7 +60,7 @@ export const ALL_TIMEZONES: TimezoneInfo[] = [
         timezoneName: 'America/Phoenix'
     },
     {
-        displayName: 'Chihuahua, La Paz, Mazatlan',
+        displayName: 'La Paz, Mazatlan',
         timezoneName: 'America/Chihuahua'
     },
     {
@@ -168,10 +169,6 @@ export const ALL_TIMEZONES: TimezoneInfo[] = [
         timezoneName: 'America/Buenos_Aires'
     },
     {
-        displayName: 'Greenland',
-        timezoneName: 'America/Godthab'
-    },
-    {
         displayName: 'Montevideo',
         timezoneName: 'America/Montevideo'
     },
@@ -192,13 +189,17 @@ export const ALL_TIMEZONES: TimezoneInfo[] = [
         displayName: 'Coordinated Universal Time-02',
         timezoneName: 'Etc/GMT+2'
     },
+    {
+        displayName: 'Greenland',
+        timezoneName: 'America/Godthab'
+    },
     // UTC-01:00
     {
         displayName: 'Azores',
         timezoneName: 'Atlantic/Azores'
     },
     {
-        displayName: 'Cabo Verde Is',
+        displayName: 'Cabo Verde Is.',
         timezoneName: 'Atlantic/Cape_Verde'
     },
     // UTC
@@ -243,10 +244,6 @@ export const ALL_TIMEZONES: TimezoneInfo[] = [
     },
     // UTC+02:00
     {
-        displayName: 'Amman',
-        timezoneName: 'Asia/Amman'
-    },
-    {
         displayName: 'Athens, Bucharest',
         timezoneName: 'Europe/Bucharest'
     },
@@ -261,10 +258,6 @@ export const ALL_TIMEZONES: TimezoneInfo[] = [
     {
         displayName: 'Chisinau',
         timezoneName: 'Europe/Chisinau'
-    },
-    {
-        displayName: 'Damascus',
-        timezoneName: 'Asia/Damascus'
     },
     {
         displayName: 'Gaza, Hebron',
@@ -304,8 +297,16 @@ export const ALL_TIMEZONES: TimezoneInfo[] = [
     },
     // UTC+03:00
     {
+        displayName: 'Amman',
+        timezoneName: 'Asia/Amman'
+    },
+    {
         displayName: 'Baghdad',
         timezoneName: 'Asia/Baghdad'
+    },
+    {
+        displayName: 'Damascus',
+        timezoneName: 'Asia/Damascus'
     },
     {
         displayName: 'Istanbul',
@@ -320,12 +321,16 @@ export const ALL_TIMEZONES: TimezoneInfo[] = [
         timezoneName: 'Europe/Minsk'
     },
     {
-        displayName: 'Moscow, St Petersburg, Volgograd',
+        displayName: 'Moscow, St. Petersburg',
         timezoneName: 'Europe/Moscow'
     },
     {
         displayName: 'Nairobi',
         timezoneName: 'Africa/Nairobi'
+    },
+    {
+        displayName: 'Volgograd',
+        timezoneName: 'Europe/Volgograd'
     },
     {
         displayName: 'Tehran',
@@ -375,16 +380,16 @@ export const ALL_TIMEZONES: TimezoneInfo[] = [
         timezoneName: 'Asia/Tashkent'
     },
     {
+        displayName: 'Astana',
+        timezoneName: 'Asia/Qyzylorda'
+    },
+    {
         displayName: 'Ekaterinburg',
         timezoneName: 'Asia/Yekaterinburg'
     },
     {
         displayName: 'Islamabad, Karachi',
         timezoneName: 'Asia/Karachi'
-    },
-    {
-        displayName: 'Qyzylorda',
-        timezoneName: 'Asia/Qyzylorda'
     },
     // UTC+05:30
     {
@@ -402,8 +407,8 @@ export const ALL_TIMEZONES: TimezoneInfo[] = [
     },
     // UTC+06:00
     {
-        displayName: 'Astana',
-        timezoneName: 'Asia/Almaty'
+        displayName: 'Bishkek',
+        timezoneName: 'Asia/Bishkek'
     },
     {
         displayName: 'Dhaka',

@@ -59,14 +59,14 @@ func InitializeExchangeRatesDataSource(config *settings.Config) error {
 	} else if config.ExchangeRatesDataSource == settings.SwissNationalBankDataSource {
 		Container.Current = &SwissNationalBankDataSource{}
 		return nil
+	} else if config.ExchangeRatesDataSource == settings.NationalBankOfUkraineDataSource {
+		Container.Current = &NationalBankOfUkraineDataSource{}
+		return nil
 	} else if config.ExchangeRatesDataSource == settings.CentralBankOfUzbekistanDataSource {
 		Container.Current = &CentralBankOfUzbekistanDataSource{}
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.InternationalMonetaryFundDataSource {
 		Container.Current = &InternationalMonetaryFundDataSource{}
-		return nil
-	} else if config.ExchangeRatesDataSource == settings.NationalBankOfUkraineDataSource {
-		Container.Current = &NationalBankOfUkraineDataSource{}
 		return nil
 	}
 

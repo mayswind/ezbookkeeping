@@ -116,6 +116,7 @@ const (
 	SwissNationalBankDataSource         string = "swiss_national_bank"
 	CentralBankOfUzbekistanDataSource   string = "central_bank_of_uzbekistan"
 	InternationalMonetaryFundDataSource string = "international_monetary_fund"
+	NationalBankOfUkraineDataSource     string = "national_bank_of_ukraine"
 )
 
 const (
@@ -910,7 +911,8 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 		dataSource == BankOfRussiaDataSource ||
 		dataSource == SwissNationalBankDataSource ||
 		dataSource == CentralBankOfUzbekistanDataSource ||
-		dataSource == InternationalMonetaryFundDataSource {
+		dataSource == InternationalMonetaryFundDataSource ||
+		dataSource == NationalBankOfUkraineDataSource {
 		config.ExchangeRatesDataSource = dataSource
 	} else {
 		return errs.ErrInvalidExchangeRatesDataSource

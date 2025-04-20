@@ -41,7 +41,7 @@
                     </v-row>
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
-                            <span class="text-body-1">{{ tt('Documents') }}</span>
+                            <span class="text-body-1">{{ tt('Getting help') }}</span>
                         </v-col>
                         <v-col cols="12" md="10">
                             <a class="text-body-1" href="https://ezbookkeeping.mayswind.net" target="_blank">

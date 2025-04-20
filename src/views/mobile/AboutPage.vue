@@ -8,7 +8,7 @@
             <f7-list-item :title="tt('Build Time')" :after="buildTime" v-if="buildTime"></f7-list-item>
             <f7-list-item external :title="tt('Official Website')" link="https://github.com/mayswind/ezbookkeeping" target="_blank"></f7-list-item>
             <f7-list-item external :title="tt('Report Issue')" link="https://github.com/mayswind/ezbookkeeping/issues" target="_blank"></f7-list-item>
-            <f7-list-item external :title="tt('Documents')" link="https://ezbookkeeping.mayswind.net" target="_blank"></f7-list-item>
+            <f7-list-item external :title="tt('Getting help')" link="https://ezbookkeeping.mayswind.net" target="_blank"></f7-list-item>
             <f7-list-item :title="tt('License')" link="#" popup-open=".license-popup"></f7-list-item>
         </f7-list>
 

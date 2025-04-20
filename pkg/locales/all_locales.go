@@ -34,6 +34,9 @@ var AllLanguages = map[string]*LocaleInfo{
 	"zh-Hans": {
 		Content: zhHans,
 	},
+	"zh-Hant": {
+		Content: zhHant,
+	},
 }
 
 func GetLocaleTextItems(locale string) *LocaleTextItems {

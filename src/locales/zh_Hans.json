@@ -12,7 +12,8 @@
         "Russian": "俄语",
         "Ukrainian": "乌克兰语",
         "Vietnamese": "越南语",
-        "Chinese (Simplified)": "中文 (简体)"
+        "Chinese (Simplified)": "中文 (简体)",
+        "Chinese (Traditional)": "中文 (繁体)"
     },
     "default": {
         "currency": "CNY",

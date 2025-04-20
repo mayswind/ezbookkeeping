@@ -1087,8 +1087,11 @@ export function useI18n() {
                 if (fileType.document.supportMultiLanguages === true) {
                     documentLanguage = getCurrentLanguageTag();
 
-                    if (SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE[documentLanguage]) {
+                    if (SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE[documentLanguage] === documentLanguage) {
                         documentAnchor = t(`document.anchor.export_and_import.${fileType.document.anchor}`);
+                    } else if (SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE[documentLanguage]) {
+                        documentLanguage = SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE[documentLanguage];
+                        documentAnchor = t(`document.anchor.export_and_import.${fileType.document.anchor}`, {}, { locale: documentLanguage });
                     } else {
                         documentLanguage = DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE;
                         documentAnchor = t(`document.anchor.export_and_import.${fileType.document.anchor}`, {}, { locale: documentLanguage });

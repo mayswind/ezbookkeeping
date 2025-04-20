@@ -79,7 +79,7 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         name: 'Chinese (Traditional)',
         displayName: '中文 (繁體)',
         alternativeLanguageTag: 'zh-TW',
-        aliases: ['zh-CHT', 'zh-HK', 'zh-MO'],
+        aliases: ['zh-CHT', 'zh-TW', 'zh-HK', 'zh-MO'],
         content: zhHant
     }
 };

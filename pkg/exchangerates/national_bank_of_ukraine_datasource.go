@@ -15,7 +15,7 @@ import (
 )
 
 const nationalBankOfUkraineExchangeRateUrl = "https://bank.gov.ua/NBU_Exchange/exchange?json"
-const nationalBankOfUkraineExchangeRateReferenceUrl = "https://bank.gov.ua/ua/markets/exchangerates"
+const nationalBankOfUkraineExchangeRateReferenceUrl = "https://bank.gov.ua/en/markets/exchangerates"
 const nationalBankOfUkraineDataSource = "Національний банк України"
 const nationalBankOfUkraineBaseCurrency = "UAH"
 

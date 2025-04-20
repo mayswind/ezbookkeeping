@@ -319,7 +319,7 @@
                      v-for="(categories, categoryType) in allPrimaryCategories"
                      v-show="categories && categories.length"
             >
-                <f7-list-item divider :title="getTransactionTypeName(categoryTypeToTransactionType(categoryType), 'Type')"></f7-list-item>
+                <f7-list-item divider :title="getTransactionTypeName(categoryTypeToTransactionType(parseInt(categoryType)), 'Type')"></f7-list-item>
                 <f7-list-item accordion-item
                               :title="category.name"
                               :class="getCategoryListItemCheckedClass(category, queryAllFilterCategoryIds)"

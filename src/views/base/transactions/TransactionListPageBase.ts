@@ -69,8 +69,8 @@ export function useTransactionListPageBase() {
     const allAccounts = computed<Account[]>(() => accountsStore.allMixedPlainAccounts);
     const allAccountsMap = computed<Record<string, Account>>(() => accountsStore.allAccountsMap);
     const allAvailableAccountsCount = computed<number>(() => accountsStore.allAvailableAccountsCount);
-    const allPrimaryCategories = computed<Record<number, TransactionCategory[]>>(() => {
-        const primaryCategories: Record<number, TransactionCategory[]> = {};
+    const allPrimaryCategories = computed<Record<string, TransactionCategory[]>>(() => {
+        const primaryCategories: Record<string, TransactionCategory[]> = {};
 
         for (const categoryType in transactionCategoriesStore.allTransactionCategories) {
             if (!Object.prototype.hasOwnProperty.call(transactionCategoriesStore.allTransactionCategories, categoryType)) {

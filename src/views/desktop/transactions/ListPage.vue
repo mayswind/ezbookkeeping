@@ -200,7 +200,7 @@
                                                                   v-for="(categories, categoryType) in allPrimaryCategories">
                                                             <v-list-item density="compact" v-show="categories && categories.length">
                                                                 <v-list-item-title>
-                                                                    <span class="text-sm">{{ getTransactionTypeName(categoryTypeToTransactionType(categoryType), 'Type') }}</span>
+                                                                    <span class="text-sm">{{ getTransactionTypeName(categoryTypeToTransactionType(parseInt(categoryType)), 'Type') }}</span>
                                                                 </v-list-item-title>
                                                             </v-list-item>
 

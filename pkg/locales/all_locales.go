@@ -19,6 +19,9 @@ var AllLanguages = map[string]*LocaleInfo{
 	"es": {
 		Content: es,
 	},
+	"it": {
+		Content: it,
+	},
 	"ja": {
 		Content: ja,
 	},

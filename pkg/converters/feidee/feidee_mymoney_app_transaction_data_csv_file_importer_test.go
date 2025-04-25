@@ -109,6 +109,56 @@ func TestFeideeMymoneyCsvFileImporterParseImportedData_MinimumValidData(t *testi
 	assert.Equal(t, "Test Category3", allNewSubTransferCategories[0].Name)
 }
 
+func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseOutstandingBalanceModification(t *testing.T) {
+	converter := FeideeMymoneyAppTransactionDataCsvFileImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, _, _, err := converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"负债变更\",\"2024-09-01 00:00:00\",\"\",\"Test Account\",\"123.45\",\"\",\"\"\n"+
+		"\"负债变更\",\"2024-09-01 01:00:00\",\"\",\"Test Account2\",\"-0.12\",\"\",\"\"\n"), 0, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, 2, len(allNewTransactions))
+	assert.Equal(t, 2, len(allNewAccounts))
+	assert.Equal(t, 1, len(allNewSubExpenseCategories))
+	assert.Equal(t, 1, len(allNewSubIncomeCategories))
+
+	assert.Equal(t, int64(1234567890), allNewTransactions[0].Uid)
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_EXPENSE, allNewTransactions[0].Type)
+	assert.Equal(t, "2024-09-01 00:00:00", utils.FormatUnixTimeToLongDateTime(utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime), time.UTC))
+	assert.Equal(t, int64(12345), allNewTransactions[0].Amount)
+	assert.Equal(t, "Test Account", allNewTransactions[0].OriginalSourceAccountName)
+	assert.Equal(t, "", allNewTransactions[0].OriginalCategoryName)
+
+	assert.Equal(t, int64(1234567890), allNewTransactions[1].Uid)
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_INCOME, allNewTransactions[1].Type)
+	assert.Equal(t, "2024-09-01 01:00:00", utils.FormatUnixTimeToLongDateTime(utils.GetUnixTimeFromTransactionTime(allNewTransactions[1].TransactionTime), time.UTC))
+	assert.Equal(t, int64(12), allNewTransactions[1].Amount)
+	assert.Equal(t, "Test Account2", allNewTransactions[1].OriginalSourceAccountName)
+	assert.Equal(t, "", allNewTransactions[1].OriginalCategoryName)
+
+	assert.Equal(t, int64(1234567890), allNewAccounts[0].Uid)
+	assert.Equal(t, "Test Account", allNewAccounts[0].Name)
+	assert.Equal(t, "CNY", allNewAccounts[0].Currency)
+
+	assert.Equal(t, int64(1234567890), allNewAccounts[1].Uid)
+	assert.Equal(t, "Test Account2", allNewAccounts[1].Name)
+	assert.Equal(t, "CNY", allNewAccounts[1].Currency)
+
+	assert.Equal(t, int64(1234567890), allNewSubExpenseCategories[0].Uid)
+	assert.Equal(t, "", allNewSubExpenseCategories[0].Name)
+
+	assert.Equal(t, int64(1234567890), allNewSubIncomeCategories[0].Uid)
+	assert.Equal(t, "", allNewSubIncomeCategories[0].Name)
+}
+
 func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T) {
 	converter := FeideeMymoneyAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()
@@ -236,6 +286,11 @@ func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidAmount(t *tes
 	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
 		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
 		"\"余额变更\",\"2024-09-01 01:23:45\",\"\",\"Test Account\",\"123 45\",\"\",\"\""), 0, nil, nil, nil, nil, nil)
+	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
+
+	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"负债变更\",\"2024-09-01 01:23:45\",\"\",\"Test Account\",\"123 45\",\"\",\"\""), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+

@@ -30,6 +30,7 @@ const feideeMymoneyAppTransactionDescriptionColumnName = "备注"
 const feideeMymoneyAppTransactionRelatedIdColumnName = "关联Id"
 
 const feideeMymoneyAppTransactionTypeModifyBalanceText = "余额变更"
+const feideeMymoneyAppTransactionTypeModifyOutstandingBalanceText = "负债变更"
 const feideeMymoneyAppTransactionTypeIncomeText = "收入"
 const feideeMymoneyAppTransactionTypeExpenseText = "支出"
 const feideeMymoneyAppTransactionTypeTransferInText = "转入"
@@ -190,9 +191,12 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyA
 
 		transactionType := data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE]
 
-		if transactionType == feideeMymoneyAppTransactionTypeModifyBalanceText || transactionType == feideeMymoneyAppTransactionTypeIncomeText || transactionType == feideeMymoneyAppTransactionTypeExpenseText {
+		if transactionType == feideeMymoneyAppTransactionTypeModifyBalanceText || transactionType == feideeMymoneyAppTransactionTypeModifyOutstandingBalanceText ||
+			transactionType == feideeMymoneyAppTransactionTypeIncomeText || transactionType == feideeMymoneyAppTransactionTypeExpenseText {
 			if transactionType == feideeMymoneyAppTransactionTypeModifyBalanceText {
 				data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_MODIFY_BALANCE]
+			} else if transactionType == feideeMymoneyAppTransactionTypeModifyOutstandingBalanceText {
+				data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeModifyOutstandingBalanceName
 			} else if transactionType == feideeMymoneyAppTransactionTypeIncomeText {
 				data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME]
 			} else if transactionType == feideeMymoneyAppTransactionTypeExpenseText {

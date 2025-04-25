@@ -14,6 +14,8 @@ var feideeMymoneyTransactionTypeNameMapping = map[models.TransactionType]string{
 	models.TRANSACTION_TYPE_TRANSFER:       "转账",
 }
 
+var feideeMymoneyTransactionTypeModifyOutstandingBalanceName = "负债变更"
+
 // feideeMymoneyTransactionDataRowParser defines the structure of feidee mymoney transaction data row parser
 type feideeMymoneyTransactionDataRowParser struct {
 }
@@ -47,6 +49,20 @@ func (p *feideeMymoneyTransactionDataRowParser) Parse(data map[datatable.Transac
 			rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME]
 		} else {
 			rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE]
+			rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
+		}
+	} else if rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] == feideeMymoneyTransactionTypeModifyOutstandingBalanceName {
+		amount, err := utils.ParseAmount(rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT])
+
+		if err != nil {
+			return nil, false, errs.ErrAmountInvalid
+		}
+
+		// outstanding balance modification transaction in feidee mymoney app is not the opening balance transaction, it can be added many times
+		if amount >= 0 {
+			rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE]
+		} else {
+			rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME]
 			rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
 		}
 	}

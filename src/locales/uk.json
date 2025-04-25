@@ -32,17 +32,17 @@
         "longDate": {
             "yyyy_mm_dd": "YYYY MMMM DD",
             "mm_dd_yyyy": "MMMM D, YYYY",
-            "dd_mm_yyyy": "D MMMM, YYYY"
+            "dd_mm_yyyy": "D MMMM YYYY р."
         },
         "shortDate": {
-            "yyyy_mm_dd": "YYYY-M-D",
-            "mm_dd_yyyy": "M/D/YYYY",
-            "dd_mm_yyyy": "D/M/YYYY"
+            "yyyy_mm_dd": "YYYY-MM-DD",
+            "mm_dd_yyyy": "MM/DD/YYYY",
+            "dd_mm_yyyy": "DD.MM.YYYY"
         },
         "longYear": {
-            "yyyy_mm_dd": "YYYY",
-            "mm_dd_yyyy": "YYYY",
-            "dd_mm_yyyy": "YYYY"
+            "yyyy_mm_dd": "YYYY р.",
+            "mm_dd_yyyy": "YYYY р.",
+            "dd_mm_yyyy": "YYYY р."
         },
         "shortYear": {
             "yyyy_mm_dd": "YYYY",
@@ -55,7 +55,7 @@
             "dd_mm_yyyy": "MMMM, YYYY"
         },
         "shortYearMonth": {
-            "yyyy_mm_dd": "YYYY-M",
+            "yyyy_mm_dd": "YYYY-MM",
             "mm_dd_yyyy": "MMM, YYYY",
             "dd_mm_yyyy": "MMM, YYYY"
         },
@@ -65,9 +65,9 @@
             "dd_mm_yyyy": "D MMMM"
         },
         "shortMonthDay": {
-            "yyyy_mm_dd": "M-D",
-            "mm_dd_yyyy": "M/D",
-            "dd_mm_yyyy": "D/M"
+            "yyyy_mm_dd": "MM-DD",
+            "mm_dd_yyyy": "MM/DD",
+            "dd_mm_yyyy": "DD.MM"
         },
         "longTime": {
             "hh_mm_ss": "HH:mm:ss",

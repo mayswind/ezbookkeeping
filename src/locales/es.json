@@ -31,12 +31,12 @@
         "longDate": {
             "yyyy_mm_dd": "YYYY MMMM DD",
             "mm_dd_yyyy": "MMMM D, YYYY",
-            "dd_mm_yyyy": "D MMMM, YYYY"
+            "dd_mm_yyyy": "D [de] MMMM [de] YYYY"
         },
         "shortDate": {
-            "yyyy_mm_dd": "YYYY-M-D",
-            "mm_dd_yyyy": "M/D/YYYY",
-            "dd_mm_yyyy": "D/M/YYYY"
+            "yyyy_mm_dd": "YYYY/MM/DD",
+            "mm_dd_yyyy": "MM/DD/YYYY",
+            "dd_mm_yyyy": "DD/MM/YYYY"
         },
         "longYear": {
             "yyyy_mm_dd": "YYYY",
@@ -51,32 +51,32 @@
         "longYearMonth": {
             "yyyy_mm_dd": "YYYY MMMM",
             "mm_dd_yyyy": "MMMM, YYYY",
-            "dd_mm_yyyy": "MMMM, YYYY"
+            "dd_mm_yyyy": "MMMM [de] YYYY"
         },
         "shortYearMonth": {
-            "yyyy_mm_dd": "YYYY-M",
+            "yyyy_mm_dd": "YYYY/MM",
             "mm_dd_yyyy": "MMM, YYYY",
             "dd_mm_yyyy": "MMM, YYYY"
         },
         "longMonthDay": {
             "yyyy_mm_dd": "MMMM DD",
             "mm_dd_yyyy": "MMMM D",
-            "dd_mm_yyyy": "D MMMM"
+            "dd_mm_yyyy": "D [de] MMMM"
         },
         "shortMonthDay": {
-            "yyyy_mm_dd": "M-D",
-            "mm_dd_yyyy": "M/D",
-            "dd_mm_yyyy": "D/M"
+            "yyyy_mm_dd": "MM/DD",
+            "mm_dd_yyyy": "MM/DD",
+            "dd_mm_yyyy": "DD/MM"
         },
         "longTime": {
-            "hh_mm_ss": "HH:mm:ss",
-            "a_hh_mm_ss": "A hh:mm:ss",
-            "hh_mm_ss_a": "hh:mm:ss A"
+            "hh_mm_ss": "H:mm:ss",
+            "a_hh_mm_ss": "A h:mm:ss",
+            "hh_mm_ss_a": "h:mm:ss A"
         },
         "shortTime": {
-            "hh_mm": "HH:mm",
-            "a_hh_mm": "A hh:mm",
-            "hh_mm_a": "hh:mm A"
+            "hh_mm": "H:mm",
+            "a_hh_mm": "A h:mm",
+            "hh_mm_a": "h:mm A"
         },
         "yearQuarter": {
             "q1": "{year}T1",

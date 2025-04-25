@@ -19,10 +19,10 @@
     "default": {
         "currency": "EUR",
         "firstDayOfWeek": "Monday",
-        "longDateFormat": "MMDDYYYY",
-        "shortDateFormat": "MMDDYYYY",
-        "longTimeFormat": "HHMMSSA",
-        "shortTimeFormat": "HHMMA",
+        "longDateFormat": "DDMMYYYY",
+        "shortDateFormat": "DDMMYYYY",
+        "longTimeFormat": "HHMMSS",
+        "shortTimeFormat": "HHMM",
         "decimalSeparator": "Dot",
         "digitGroupingSymbol": "Comma",
         "digitGrouping": "ThousandsSeparator",
@@ -31,13 +31,13 @@
     "format": {
         "longDate": {
             "yyyy_mm_dd": "YYYY MMMM DD",
-            "mm_dd_yyyy": "MMMM D, YYYY",
-            "dd_mm_yyyy": "D MMMM, YYYY"
+            "mm_dd_yyyy": "MMMM D YYYY",
+            "dd_mm_yyyy": "D MMMM YYYY"
         },
         "shortDate": {
-            "yyyy_mm_dd": "YYYY-M-D",
-            "mm_dd_yyyy": "M/D/YYYY",
-            "dd_mm_yyyy": "D/M/YYYY"
+            "yyyy_mm_dd": "YYYY-MM-DD",
+            "mm_dd_yyyy": "MM/DD/YYYY",
+            "dd_mm_yyyy": "DD/MM/YYYY"
         },
         "longYear": {
             "yyyy_mm_dd": "YYYY",
@@ -51,13 +51,13 @@
         },
         "longYearMonth": {
             "yyyy_mm_dd": "YYYY MMMM",
-            "mm_dd_yyyy": "MMMM, YYYY",
-            "dd_mm_yyyy": "MMMM, YYYY"
+            "mm_dd_yyyy": "MMMM YYYY",
+            "dd_mm_yyyy": "MMMM YYYY"
         },
         "shortYearMonth": {
-            "yyyy_mm_dd": "YYYY-M",
-            "mm_dd_yyyy": "MMM, YYYY",
-            "dd_mm_yyyy": "MMM, YYYY"
+            "yyyy_mm_dd": "YYYY-MM",
+            "mm_dd_yyyy": "MMM YYYY",
+            "dd_mm_yyyy": "MMM YYYY"
         },
         "longMonthDay": {
             "yyyy_mm_dd": "MMMM DD",
@@ -65,9 +65,9 @@
             "dd_mm_yyyy": "D MMMM"
         },
         "shortMonthDay": {
-            "yyyy_mm_dd": "M-D",
-            "mm_dd_yyyy": "M/D",
-            "dd_mm_yyyy": "D/M"
+            "yyyy_mm_dd": "MM-DD",
+            "mm_dd_yyyy": "MM/DD",
+            "dd_mm_yyyy": "DD/MM"
         },
         "longTime": {
             "hh_mm_ss": "HH:mm:ss",

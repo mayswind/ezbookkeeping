@@ -201,28 +201,25 @@ func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Acco
 		return errs.ErrUserIdInvalid
 	}
 
+	needAccountUuidCount := uint16(len(childrenAccounts) + 1)
+	accountUuids := s.GenerateUuids(uuid.UUID_TYPE_ACCOUNT, needAccountUuidCount)
+
+	if len(accountUuids) < int(needAccountUuidCount) {
+		return errs.ErrSystemIsBusy
+	}
+
 	now := time.Now().Unix()
 
 	allAccounts := make([]*models.Account, len(childrenAccounts)+1)
 	var allInitTransactions []*models.Transaction
 
-	mainAccount.AccountId = s.GenerateUuid(uuid.UUID_TYPE_ACCOUNT)
-
-	if mainAccount.AccountId < 1 {
-		return errs.ErrSystemIsBusy
-	}
-
+	mainAccount.AccountId = accountUuids[0]
 	allAccounts[0] = mainAccount
 
 	if mainAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
 		for i := 0; i < len(childrenAccounts); i++ {
 			childAccount := childrenAccounts[i]
-			childAccount.AccountId = s.GenerateUuid(uuid.UUID_TYPE_ACCOUNT)
-
-			if childAccount.AccountId < 1 {
-				return errs.ErrSystemIsBusy
-			}
-
+			childAccount.AccountId = accountUuids[i+1]
 			childAccount.ParentAccountId = mainAccount.AccountId
 			childAccount.Uid = mainAccount.Uid
 			childAccount.Type = models.ACCOUNT_TYPE_SINGLE_ACCOUNT

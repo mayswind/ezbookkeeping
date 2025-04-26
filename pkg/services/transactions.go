@@ -525,6 +525,13 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 		return errs.ErrUserIdInvalid
 	}
 
+	needTagIndexUuidCount := uint16(len(addTagIds))
+	tagIndexUuids := s.GenerateUuids(uuid.UUID_TYPE_TAG_INDEX, needTagIndexUuidCount)
+
+	if len(tagIndexUuids) < int(needTagIndexUuidCount) {
+		return errs.ErrSystemIsBusy
+	}
+
 	updateCols := make([]string, 0, 16)
 
 	now := time.Now().Unix()
@@ -539,14 +546,8 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 	transactionTagIndexes := make([]*models.TransactionTagIndex, len(addTagIds))
 
 	for i := 0; i < len(addTagIds); i++ {
-		tagIndexId := s.GenerateUuid(uuid.UUID_TYPE_TAG_INDEX)
-
-		if tagIndexId < 1 {
-			return errs.ErrSystemIsBusy
-		}
-
 		transactionTagIndexes[i] = &models.TransactionTagIndex{
-			TagIndexId:      tagIndexId,
+			TagIndexId:      tagIndexUuids[i],
 			Uid:             transaction.Uid,
 			Deleted:         false,
 			TagId:           addTagIds[i],

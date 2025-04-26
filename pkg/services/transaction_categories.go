@@ -229,14 +229,16 @@ func (s *TransactionCategoryService) CreateCategories(c core.Context, uid int64,
 	var allCategories []*models.TransactionCategory
 	primaryCategories := categories[nil]
 
+	needPrimaryCategoryUuidCount := uint16(len(primaryCategories))
+	primaryCategoryUuids := s.GenerateUuids(uuid.UUID_TYPE_CATEGORY, needPrimaryCategoryUuidCount)
+
+	if len(primaryCategoryUuids) < int(needPrimaryCategoryUuidCount) {
+		return nil, errs.ErrSystemIsBusy
+	}
+
 	for i := 0; i < len(primaryCategories); i++ {
 		primaryCategory := primaryCategories[i]
-		primaryCategory.CategoryId = s.GenerateUuid(uuid.UUID_TYPE_CATEGORY)
-
-		if primaryCategory.CategoryId < 1 {
-			return nil, errs.ErrSystemIsBusy
-		}
-
+		primaryCategory.CategoryId = primaryCategoryUuids[i]
 		primaryCategory.Deleted = false
 		primaryCategory.CreatedUnixTime = time.Now().Unix()
 		primaryCategory.UpdatedUnixTime = time.Now().Unix()
@@ -245,16 +247,17 @@ func (s *TransactionCategoryService) CreateCategories(c core.Context, uid int64,
 
 		secondaryCategories := categories[primaryCategory]
 
+		needSecondaryCategoryUuidCount := uint16(len(secondaryCategories))
+		secondaryCategoryUuids := s.GenerateUuids(uuid.UUID_TYPE_CATEGORY, needSecondaryCategoryUuidCount)
+
+		if len(secondaryCategoryUuids) < int(needSecondaryCategoryUuidCount) {
+			return nil, errs.ErrSystemIsBusy
+		}
+
 		for j := 0; j < len(secondaryCategories); j++ {
 			secondaryCategory := secondaryCategories[j]
-			secondaryCategory.CategoryId = s.GenerateUuid(uuid.UUID_TYPE_CATEGORY)
-
-			if secondaryCategory.CategoryId < 1 {
-				return nil, errs.ErrSystemIsBusy
-			}
-
+			secondaryCategory.CategoryId = secondaryCategoryUuids[j]
 			secondaryCategory.ParentCategoryId = primaryCategory.CategoryId
-
 			secondaryCategory.Deleted = false
 			secondaryCategory.CreatedUnixTime = time.Now().Unix()
 			secondaryCategory.UpdatedUnixTime = time.Now().Unix()

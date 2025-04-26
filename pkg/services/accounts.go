@@ -334,26 +334,210 @@ func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Acco
 }
 
 // ModifyAccounts saves an existed account model to database
-func (s *AccountService) ModifyAccounts(c core.Context, uid int64, accounts []*models.Account) error {
-	if uid <= 0 {
+func (s *AccountService) ModifyAccounts(c core.Context, mainAccount *models.Account, updateAccounts []*models.Account, addSubAccounts []*models.Account, addSubAccountBalanceTimes []int64, removeSubAccountIds []int64, utcOffset int16) error {
+	if mainAccount.Uid <= 0 {
 		return errs.ErrUserIdInvalid
+	}
+
+	needAccountUuidCount := uint16(len(addSubAccounts))
+	newAccountUuids := s.GenerateUuids(uuid.UUID_TYPE_ACCOUNT, needAccountUuidCount)
+
+	if len(newAccountUuids) < int(needAccountUuidCount) {
+		return errs.ErrSystemIsBusy
 	}
 
 	now := time.Now().Unix()
 
-	for i := 0; i < len(accounts); i++ {
-		accounts[i].UpdatedUnixTime = now
+	var addInitTransactions []*models.Transaction
+
+	for i := 0; i < len(updateAccounts); i++ {
+		updateAccounts[i].UpdatedUnixTime = now
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
-		for i := 0; i < len(accounts); i++ {
-			account := accounts[i]
-			updatedRows, err := sess.ID(account.AccountId).Cols("name", "category", "icon", "color", "comment", "extend", "hidden", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(account)
+	if mainAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
+		defaultTransactionTime := utils.GetMinTransactionTimeFromUnixTime(now)
+
+		for i := 0; i < len(addSubAccounts); i++ {
+			childAccount := addSubAccounts[i]
+			childAccount.AccountId = newAccountUuids[i]
+			childAccount.ParentAccountId = mainAccount.AccountId
+			childAccount.Uid = mainAccount.Uid
+			childAccount.Type = models.ACCOUNT_TYPE_SINGLE_ACCOUNT
+			childAccount.Deleted = false
+			childAccount.CreatedUnixTime = now
+			childAccount.UpdatedUnixTime = now
+
+			if childAccount.Balance != 0 {
+				transactionId := s.GenerateUuid(uuid.UUID_TYPE_TRANSACTION)
+
+				if transactionId < 1 {
+					return errs.ErrSystemIsBusy
+				}
+
+				transactionTime := defaultTransactionTime
+
+				if len(addSubAccountBalanceTimes) > i && addSubAccountBalanceTimes[i] > 0 {
+					transactionTime = utils.GetMinTransactionTimeFromUnixTime(addSubAccountBalanceTimes[i])
+				} else {
+					defaultTransactionTime++
+				}
+
+				newTransaction := &models.Transaction{
+					TransactionId:        transactionId,
+					Uid:                  childAccount.Uid,
+					Deleted:              false,
+					Type:                 models.TRANSACTION_DB_TYPE_MODIFY_BALANCE,
+					TransactionTime:      transactionTime,
+					TimezoneUtcOffset:    utcOffset,
+					AccountId:            childAccount.AccountId,
+					Amount:               childAccount.Balance,
+					RelatedAccountId:     childAccount.AccountId,
+					RelatedAccountAmount: childAccount.Balance,
+					CreatedUnixTime:      now,
+					UpdatedUnixTime:      now,
+				}
+
+				addInitTransactions = append(addInitTransactions, newTransaction)
+			}
+		}
+	}
+
+	userDataDb := s.UserDataDB(mainAccount.Uid)
+
+	return userDataDb.DoTransaction(c, func(sess *xorm.Session) error {
+		// update accounts
+		for i := 0; i < len(updateAccounts); i++ {
+			account := updateAccounts[i]
+			updatedRows, err := sess.ID(account.AccountId).Cols("name", "category", "icon", "color", "comment", "extend", "hidden", "updated_unix_time").Where("uid=? AND deleted=?", account.Uid, false).Update(account)
 
 			if err != nil {
 				return err
 			} else if updatedRows < 1 {
 				return errs.ErrAccountNotFound
+			}
+		}
+
+		// add new sub accounts
+		for i := 0; i < len(addSubAccounts); i++ {
+			account := addSubAccounts[i]
+			_, err := sess.Insert(account)
+
+			if err != nil {
+				return err
+			}
+		}
+
+		// add init transaction for new sub accounts
+		for i := 0; i < len(addInitTransactions); i++ {
+			transaction := addInitTransactions[i]
+
+			insertTransactionSavePointName := "insert_transaction"
+			err := userDataDb.SetSavePoint(sess, insertTransactionSavePointName)
+
+			if err != nil {
+				log.Errorf(c, "[accounts.ModifyAccounts] failed to set save point \"%s\", because %s", insertTransactionSavePointName, err.Error())
+				return err
+			}
+
+			createdRows, err := sess.Insert(transaction)
+
+			if err != nil || createdRows < 1 { // maybe another transaction has same time
+				err = userDataDb.RollbackToSavePoint(sess, insertTransactionSavePointName)
+
+				if err != nil {
+					log.Errorf(c, "[accounts.ModifyAccounts] failed to rollback to save point \"%s\", because %s", insertTransactionSavePointName, err.Error())
+					return err
+				}
+
+				sameSecondLatestTransaction := &models.Transaction{}
+				minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
+				maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
+
+				has, err := sess.Where("uid=? AND transaction_time>=? AND transaction_time<=?", transaction.Uid, minTransactionTime, maxTransactionTime).OrderBy("transaction_time desc").Limit(1).Get(sameSecondLatestTransaction)
+
+				if err != nil {
+					return err
+				} else if !has {
+					return errs.ErrDatabaseOperationFailed
+				} else if sameSecondLatestTransaction.TransactionTime == maxTransactionTime-1 {
+					return errs.ErrTooMuchTransactionInOneSecond
+				}
+
+				transaction.TransactionTime = sameSecondLatestTransaction.TransactionTime + 1
+				createdRows, err := sess.Insert(transaction)
+
+				if err != nil {
+					return err
+				} else if createdRows < 1 {
+					return errs.ErrDatabaseOperationFailed
+				}
+			}
+		}
+
+		// remove sub accounts
+		if len(removeSubAccountIds) > 0 {
+			subAccountsCount, err := sess.Where("uid=? AND deleted=? AND parent_account_id=?", mainAccount.Uid, false, mainAccount.AccountId).Count(&models.Account{})
+
+			if subAccountsCount <= int64(len(removeSubAccountIds)) {
+				return errs.ErrAccountHaveNoSubAccount
+			}
+
+			var relatedTransactionsByAccount []*models.Transaction
+			err = sess.Cols("transaction_id", "uid", "deleted", "account_id", "type").Where("uid=? AND deleted=?", mainAccount.Uid, false).In("account_id", removeSubAccountIds).Limit(len(removeSubAccountIds) + 1).Find(&relatedTransactionsByAccount)
+
+			if err != nil {
+				return err
+			} else if len(relatedTransactionsByAccount) > len(removeSubAccountIds) {
+				return errs.ErrSubAccountInUseCannotBeDeleted
+			} else if len(relatedTransactionsByAccount) > 0 {
+				accountTransactionExists := make(map[int64]bool)
+
+				for i := 0; i < len(relatedTransactionsByAccount); i++ {
+					transaction := relatedTransactionsByAccount[i]
+
+					if transaction.Type != models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+						return errs.ErrAccountInUseCannotBeDeleted
+					} else if _, exists := accountTransactionExists[transaction.AccountId]; exists {
+						return errs.ErrAccountInUseCannotBeDeleted
+					}
+
+					accountTransactionExists[transaction.AccountId] = true
+				}
+			}
+
+			deleteAccountUpdateModel := &models.Account{
+				Balance:         0,
+				Deleted:         true,
+				DeletedUnixTime: now,
+			}
+
+			deletedRows, err := sess.Cols("balance", "deleted", "deleted_unix_time").Where("uid=? AND deleted=?", mainAccount.Uid, false).In("account_id", removeSubAccountIds).Update(deleteAccountUpdateModel)
+
+			if err != nil {
+				return err
+			} else if deletedRows < 1 {
+				return errs.ErrSubAccountNotFound
+			}
+
+			if len(relatedTransactionsByAccount) > 0 {
+				updateTransaction := &models.Transaction{
+					Deleted:         true,
+					DeletedUnixTime: now,
+				}
+
+				transactionIds := make([]int64, len(relatedTransactionsByAccount))
+
+				for i := 0; i < len(relatedTransactionsByAccount); i++ {
+					transactionIds[i] = relatedTransactionsByAccount[i].TransactionId
+				}
+
+				deletedTransactionRows, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", mainAccount.Uid, false).In("transaction_id", transactionIds).Update(updateTransaction)
+
+				if err != nil {
+					return err
+				} else if deletedTransactionRows < int64(len(transactionIds)) {
+					return errs.ErrDatabaseOperationFailed
+				}
 			}
 		}
 

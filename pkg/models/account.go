@@ -101,15 +101,19 @@ type AccountCreateRequest struct {
 
 // AccountModifyRequest represents all parameters of account modification request
 type AccountModifyRequest struct {
-	Id                      int64                   `json:"id,string" binding:"required,min=1"`
+	Id                      int64                   `json:"id,string" binding:"required,min=0"`
 	Name                    string                  `json:"name" binding:"required,notBlank,max=64"`
 	Category                AccountCategory         `json:"category" binding:"required"`
 	Icon                    int64                   `json:"icon,string" binding:"min=1"`
 	Color                   string                  `json:"color" binding:"required,len=6,validHexRGBColor"`
+	Currency                *string                 `json:"currency" binding:"omitempty,len=3,validCurrency"`
+	Balance                 *int64                  `json:"balance" binding:"omitempty"`
+	BalanceTime             *int64                  `json:"balanceTime" binding:"omitempty"`
 	Comment                 string                  `json:"comment" binding:"max=255"`
 	CreditCardStatementDate int                     `json:"creditCardStatementDate" binding:"min=0,max=28"`
 	Hidden                  bool                    `json:"hidden"`
 	SubAccounts             []*AccountModifyRequest `json:"subAccounts" binding:"omitempty"`
+	ClientSessionId         string                  `json:"clientSessionId"`
 }
 
 // AccountListRequest represents all parameters of account listing request

@@ -311,9 +311,25 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
+	if accountModifyReq.Id <= 0 {
+		return nil, errs.ErrAccountIdInvalid
+	}
+
+	utcOffset, err := c.GetClientTimezoneOffset()
+
+	if err != nil {
+		log.Warnf(c, "[accounts.AccountModifyHandler] cannot get client timezone offset, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
 	if accountModifyReq.Category < models.ACCOUNT_CATEGORY_CASH || accountModifyReq.Category > models.ACCOUNT_CATEGORY_CERTIFICATE_OF_DEPOSIT {
 		log.Warnf(c, "[accounts.AccountModifyHandler] account category invalid, category is %d", accountModifyReq.Category)
 		return nil, errs.ErrAccountCategoryInvalid
+	}
+
+	if accountModifyReq.Category != models.ACCOUNT_CATEGORY_CREDIT_CARD && accountModifyReq.CreditCardStatementDate != 0 {
+		log.Warnf(c, "[accounts.AccountModifyHandler] cannot set statement date with category \"%d\"", accountModifyReq.Category)
+		return nil, errs.ErrCannotSetStatementDateForNonCreditCard
 	}
 
 	uid := c.GetCurrentUid()
@@ -331,20 +347,81 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 		return nil, errs.ErrAccountNotFound
 	}
 
-	if len(accountModifyReq.SubAccounts)+1 != len(accountAndSubAccounts) {
-		return nil, errs.ErrCannotAddOrDeleteSubAccountsWhenModify
+	if accountModifyReq.Currency != nil && mainAccount.Currency != *accountModifyReq.Currency {
+		return nil, errs.ErrNotSupportedChangeCurrency
 	}
 
-	if accountModifyReq.Category != models.ACCOUNT_CATEGORY_CREDIT_CARD && accountModifyReq.CreditCardStatementDate != 0 {
-		log.Warnf(c, "[accounts.AccountModifyHandler] cannot set statement date with category \"%d\"", accountModifyReq.Category)
-		return nil, errs.ErrCannotSetStatementDateForNonCreditCard
+	if accountModifyReq.Balance != nil {
+		return nil, errs.ErrNotSupportedChangeBalance
 	}
 
-	if mainAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
+	if accountModifyReq.BalanceTime != nil {
+		return nil, errs.ErrNotSupportedChangeBalanceTime
+	}
+
+	if mainAccount.Type == models.ACCOUNT_TYPE_SINGLE_ACCOUNT {
+		if len(accountModifyReq.SubAccounts) > 0 {
+			log.Warnf(c, "[accounts.AccountModifyHandler] account cannot have any sub-accounts")
+			return nil, errs.ErrAccountCannotHaveSubAccounts
+		}
+	} else if mainAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
+		if len(accountModifyReq.SubAccounts) < 1 {
+			log.Warnf(c, "[accounts.AccountModifyHandler] account does not have any sub-accounts")
+			return nil, errs.ErrAccountHaveNoSubAccount
+		}
+
 		for i := 0; i < len(accountModifyReq.SubAccounts); i++ {
-			subAccount := accountModifyReq.SubAccounts[i]
+			subAccountReq := accountModifyReq.SubAccounts[i]
 
-			if subAccount.CreditCardStatementDate != 0 {
+			if subAccountReq.Category != accountModifyReq.Category {
+				log.Warnf(c, "[accounts.AccountModifyHandler] category of sub-account#%d not equals to parent", i)
+				return nil, errs.ErrSubAccountCategoryNotEqualsToParent
+			}
+
+			if subAccountReq.Id == 0 { // create new sub-account
+				if subAccountReq.Currency == nil {
+					log.Warnf(c, "[accounts.AccountModifyHandler] sub-account#%d not set currency", i)
+					return nil, errs.ErrAccountCurrencyInvalid
+				} else if subAccountReq.Currency != nil && *subAccountReq.Currency == validators.ParentAccountCurrencyPlaceholder {
+					log.Warnf(c, "[accounts.AccountModifyHandler] sub-account#%d cannot set currency placeholder", i)
+					return nil, errs.ErrAccountCurrencyInvalid
+				}
+
+				if subAccountReq.Balance == nil {
+					defaultBalance := int64(0)
+					subAccountReq.Balance = &defaultBalance
+				}
+
+				if *subAccountReq.Balance == 0 {
+					defaultBalanceTime := int64(0)
+					subAccountReq.BalanceTime = &defaultBalanceTime
+				}
+
+				if *subAccountReq.Balance != 0 && (subAccountReq.BalanceTime == nil || *subAccountReq.BalanceTime <= 0) {
+					log.Warnf(c, "[accounts.AccountModifyHandler] sub-account#%d balance time is not set", i)
+					return nil, errs.ErrAccountBalanceTimeNotSet
+				}
+			} else { // modify existed sub-account
+				subAccount, exists := accountMap[subAccountReq.Id]
+
+				if !exists {
+					return nil, errs.ErrAccountNotFound
+				}
+
+				if subAccountReq.Currency != nil && subAccount.Currency != *subAccountReq.Currency {
+					return nil, errs.ErrNotSupportedChangeCurrency
+				}
+
+				if subAccountReq.Balance != nil {
+					return nil, errs.ErrNotSupportedChangeBalance
+				}
+
+				if subAccountReq.BalanceTime != nil {
+					return nil, errs.ErrNotSupportedChangeBalanceTime
+				}
+			}
+
+			if subAccountReq.CreditCardStatementDate != 0 {
 				log.Warnf(c, "[accounts.AccountModifyHandler] sub-account#%d cannot set statement date", i)
 				return nil, errs.ErrCannotSetStatementDateForSubAccount
 			}
@@ -353,6 +430,9 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 
 	anythingUpdate := false
 	var toUpdateAccounts []*models.Account
+	var toAddAccounts []*models.Account
+	var toAddAccountBalanceTimes []int64
+	var toDeleteAccountIds []int64
 
 	toUpdateAccount := a.getToUpdateAccount(uid, &accountModifyReq, mainAccount, false)
 
@@ -361,18 +441,43 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 		toUpdateAccounts = append(toUpdateAccounts, toUpdateAccount)
 	}
 
+	toDeleteAccountIds = a.getToDeleteSubAccountIds(&accountModifyReq, mainAccount, accountAndSubAccounts)
+
+	if len(toDeleteAccountIds) > 0 {
+		anythingUpdate = true
+	}
+
+	maxOrderId := int32(0)
+
+	for i := 0; i < len(accountAndSubAccounts); i++ {
+		account := accountAndSubAccounts[i]
+
+		if account.AccountId != mainAccount.AccountId && account.DisplayOrder > maxOrderId {
+			maxOrderId = account.DisplayOrder
+		}
+	}
+
 	for i := 0; i < len(accountModifyReq.SubAccounts); i++ {
 		subAccountReq := accountModifyReq.SubAccounts[i]
 
 		if _, exists := accountMap[subAccountReq.Id]; !exists {
-			return nil, errs.ErrAccountNotFound
-		}
-
-		toUpdateSubAccount := a.getToUpdateAccount(uid, subAccountReq, accountMap[subAccountReq.Id], true)
-
-		if toUpdateSubAccount != nil {
 			anythingUpdate = true
-			toUpdateAccounts = append(toUpdateAccounts, toUpdateSubAccount)
+			maxOrderId = maxOrderId + 1
+			newSubAccount := a.createNewSubAccountModelForModify(uid, mainAccount.Type, subAccountReq, maxOrderId)
+			toAddAccounts = append(toAddAccounts, newSubAccount)
+
+			if subAccountReq.BalanceTime != nil {
+				toAddAccountBalanceTimes = append(toAddAccountBalanceTimes, *subAccountReq.BalanceTime)
+			} else {
+				toAddAccountBalanceTimes = append(toAddAccountBalanceTimes, 0)
+			}
+		} else {
+			toUpdateSubAccount := a.getToUpdateAccount(uid, subAccountReq, accountMap[subAccountReq.Id], true)
+
+			if toUpdateSubAccount != nil {
+				anythingUpdate = true
+				toUpdateAccounts = append(toUpdateAccounts, toUpdateSubAccount)
+			}
 		}
 	}
 
@@ -380,7 +485,43 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 		return nil, errs.ErrNothingWillBeUpdated
 	}
 
-	err = a.accounts.ModifyAccounts(c, uid, toUpdateAccounts)
+	if len(toAddAccounts) > 0 && a.CurrentConfig().EnableDuplicateSubmissionsCheck && accountModifyReq.ClientSessionId != "" {
+		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_SUBACCOUNT, uid, accountModifyReq.ClientSessionId)
+
+		if found {
+			log.Infof(c, "[accounts.AccountModifyHandler] another account \"id:%s\" modification has been created for user \"uid:%d\"", remark, uid)
+			accountId, err := utils.StringToInt64(remark)
+
+			if err == nil {
+				accountAndSubAccounts, err := a.accounts.GetAccountAndSubAccountsByAccountId(c, uid, accountId)
+
+				if err != nil {
+					log.Errorf(c, "[accounts.AccountModifyHandler] failed to get existed account \"id:%d\" for user \"uid:%d\", because %s", accountId, uid, err.Error())
+					return nil, errs.Or(err, errs.ErrOperationFailed)
+				}
+
+				accountMap := a.accounts.GetAccountMapByList(accountAndSubAccounts)
+				mainAccount, exists := accountMap[accountId]
+
+				if !exists {
+					return nil, errs.ErrOperationFailed
+				}
+
+				accountInfoResp := mainAccount.ToAccountInfoResponse()
+
+				for i := 0; i < len(accountAndSubAccounts); i++ {
+					if accountAndSubAccounts[i].ParentAccountId == mainAccount.AccountId {
+						subAccountResp := accountAndSubAccounts[i].ToAccountInfoResponse()
+						accountInfoResp.SubAccounts = append(accountInfoResp.SubAccounts, subAccountResp)
+					}
+				}
+
+				return accountInfoResp, nil
+			}
+		}
+	}
+
+	err = a.accounts.ModifyAccounts(c, mainAccount, toUpdateAccounts, toAddAccounts, toAddAccountBalanceTimes, toDeleteAccountIds, utcOffset)
 
 	if err != nil {
 		log.Errorf(c, "[accounts.AccountModifyHandler] failed to update account \"id:%d\" for user \"uid:%d\", because %s", accountModifyReq.Id, uid, err.Error())
@@ -388,6 +529,10 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 	}
 
 	log.Infof(c, "[accounts.AccountModifyHandler] user \"uid:%d\" has updated account \"id:%d\" successfully", uid, accountModifyReq.Id)
+
+	if len(toAddAccounts) > 0 {
+		a.SetSubmissionRemarkIfEnable(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_SUBACCOUNT, uid, accountModifyReq.ClientSessionId, utils.Int64ToString(mainAccount.AccountId))
+	}
 
 	accountRespMap := make(map[int64]*models.AccountInfoResponse)
 
@@ -405,11 +550,23 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 		accountRespMap[accountResp.Id] = accountResp
 	}
 
+	for i := 0; i < len(toAddAccounts); i++ {
+		account := toAddAccounts[i]
+		accountResp := account.ToAccountInfoResponse()
+		accountRespMap[accountResp.Id] = accountResp
+	}
+
+	deletedAccountIds := make(map[int64]bool)
+
+	for i := 0; i < len(toDeleteAccountIds); i++ {
+		deletedAccountIds[toDeleteAccountIds[i]] = true
+	}
+
 	for i := 0; i < len(accountAndSubAccounts); i++ {
 		oldAccount := accountAndSubAccounts[i]
 		_, exists := accountRespMap[oldAccount.AccountId]
 
-		if !exists {
+		if !exists && !deletedAccountIds[oldAccount.AccountId] {
 			oldAccountResp := oldAccount.ToAccountInfoResponse()
 			accountRespMap[oldAccountResp.Id] = oldAccountResp
 		}
@@ -418,8 +575,19 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 	accountResp := accountRespMap[accountModifyReq.Id]
 
 	for i := 0; i < len(accountAndSubAccounts); i++ {
-		if accountAndSubAccounts[i].ParentAccountId == accountResp.Id {
-			subAccountResp := accountRespMap[accountAndSubAccounts[i].AccountId]
+		account := accountAndSubAccounts[i]
+
+		if account.ParentAccountId == accountResp.Id && !deletedAccountIds[account.AccountId] {
+			subAccountResp := accountRespMap[account.AccountId]
+			accountResp.SubAccounts = append(accountResp.SubAccounts, subAccountResp)
+		}
+	}
+
+	for i := 0; i < len(toAddAccounts); i++ {
+		account := toAddAccounts[i]
+
+		if account.ParentAccountId == accountResp.Id {
+			subAccountResp := accountRespMap[account.AccountId]
 			accountResp.SubAccounts = append(accountResp.SubAccounts, subAccountResp)
 		}
 	}
@@ -552,6 +720,24 @@ func (a *AccountsApi) createNewAccountModel(uid int64, accountCreateReq *models.
 	}
 }
 
+func (a *AccountsApi) createNewSubAccountModelForModify(uid int64, accountType models.AccountType, accountModifyReq *models.AccountModifyRequest, order int32) *models.Account {
+	accountExtend := &models.AccountExtend{}
+
+	return &models.Account{
+		Uid:          uid,
+		Name:         accountModifyReq.Name,
+		DisplayOrder: order,
+		Category:     accountModifyReq.Category,
+		Type:         accountType,
+		Icon:         accountModifyReq.Icon,
+		Color:        accountModifyReq.Color,
+		Currency:     *accountModifyReq.Currency,
+		Balance:      *accountModifyReq.Balance,
+		Comment:      accountModifyReq.Comment,
+		Extend:       accountExtend,
+	}
+}
+
 func (a *AccountsApi) createSubAccountModels(uid int64, accountCreateReq *models.AccountCreateRequest) ([]*models.Account, []int64) {
 	if len(accountCreateReq.SubAccounts) <= 0 {
 		return nil, nil
@@ -608,4 +794,28 @@ func (a *AccountsApi) getToUpdateAccount(uid int64, accountModifyReq *models.Acc
 	}
 
 	return nil
+}
+
+func (a *AccountsApi) getToDeleteSubAccountIds(accountModifyReq *models.AccountModifyRequest, mainAccount *models.Account, accountAndSubAccounts []*models.Account) []int64 {
+	newSubAccountIds := make(map[int64]bool, len(accountModifyReq.SubAccounts))
+
+	for i := 0; i < len(accountModifyReq.SubAccounts); i++ {
+		newSubAccountIds[accountModifyReq.SubAccounts[i].Id] = true
+	}
+
+	toDeleteAccountIds := make([]int64, 0)
+
+	for i := 0; i < len(accountAndSubAccounts); i++ {
+		subAccount := accountAndSubAccounts[i]
+
+		if subAccount.AccountId == mainAccount.AccountId {
+			continue
+		}
+
+		if _, exists := newSubAccountIds[subAccount.AccountId]; !exists {
+			toDeleteAccountIds = append(toDeleteAccountIds, subAccount.AccountId)
+		}
+	}
+
+	return toDeleteAccountIds
 }

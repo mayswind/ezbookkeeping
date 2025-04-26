@@ -185,29 +185,38 @@ export const useAccountsStore = defineStore('accounts', () => {
         }
     }
 
-    function updateAccountToAccountList(account: Account): void {
+    function updateAccountToAccountList(oldAccount: Account, newAccount: Account): void {
         for (let i = 0; i < allAccounts.value.length; i++) {
-            if (allAccounts.value[i].id === account.id) {
-                allAccounts.value.splice(i, 1, account);
+            if (allAccounts.value[i].id === newAccount.id) {
+                allAccounts.value.splice(i, 1, newAccount);
                 break;
             }
         }
 
-        allAccountsMap.value[account.id] = account;
+        if (oldAccount.subAccounts) {
+            for (let i = 0; i < oldAccount.subAccounts.length; i++) {
+                const subAccount = oldAccount.subAccounts[i];
+                if (allAccountsMap.value[subAccount.id]) {
+                    delete allAccountsMap.value[subAccount.id];
+                }
+            }
+        }
 
-        if (account.subAccounts) {
-            for (let i = 0; i < account.subAccounts.length; i++) {
-                const subAccount = account.subAccounts[i];
+        allAccountsMap.value[newAccount.id] = newAccount;
+
+        if (newAccount.subAccounts) {
+            for (let i = 0; i < newAccount.subAccounts.length; i++) {
+                const subAccount = newAccount.subAccounts[i];
                 allAccountsMap.value[subAccount.id] = subAccount;
             }
         }
 
-        if (allCategorizedAccountsMap.value[account.category]) {
-            const accountList = allCategorizedAccountsMap.value[account.category].accounts;
+        if (allCategorizedAccountsMap.value[newAccount.category]) {
+            const accountList = allCategorizedAccountsMap.value[newAccount.category].accounts;
 
             for (let i = 0; i < accountList.length; i++) {
-                if (accountList[i].id === account.id) {
-                    accountList.splice(i, 1, account);
+                if (accountList[i].id === newAccount.id) {
+                    accountList.splice(i, 1, newAccount);
                     break;
                 }
             }
@@ -847,7 +856,7 @@ export const useAccountsStore = defineStore('accounts', () => {
             if (!isEdit) {
                 promise = services.addAccount(account.toCreateRequest(clientSessionId, subAccounts));
             } else {
-                promise = services.modifyAccount(account.toModifyRequest(subAccounts));
+                promise = services.modifyAccount(account.toModifyRequest(clientSessionId, subAccounts));
             }
 
             promise.then(response => {
@@ -868,7 +877,7 @@ export const useAccountsStore = defineStore('accounts', () => {
                     addAccountToAccountList(newAccount);
                 } else {
                     if (oldAccount && oldAccount.category === newAccount.category) {
-                        updateAccountToAccountList(newAccount);
+                        updateAccountToAccountList(oldAccount, newAccount);
                     } else {
                         updateAccountListInvalidState(true);
                     }

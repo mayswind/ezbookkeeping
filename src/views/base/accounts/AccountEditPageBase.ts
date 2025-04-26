@@ -91,6 +91,10 @@ export function useAccountEditPageBaseBase() {
         }
     }
 
+    function isNewAccount(account: Account): boolean {
+        return account.id === '' || account.id === '0';
+    }
+
     function isInputEmpty(): boolean {
         const isAccountEmpty = !!getInputEmptyProblemMessage(account.value, false);
 
@@ -172,6 +176,7 @@ export function useAccountEditPageBaseBase() {
         isAccountSupportCreditCardStatementDate,
         // functions
         getAccountCreditCardStatementDate,
+        isNewAccount,
         isInputEmpty,
         getAccountOrSubAccountProblemMessage,
         addSubAccount,

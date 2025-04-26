@@ -8,7 +8,7 @@
                         <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
                     </div>
                     <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true"
-                           :disabled="loading || submitting || !!editAccountId || account.type !== AccountType.MultiSubAccounts.type">
+                           :disabled="loading || submitting || account.type !== AccountType.MultiSubAccounts.type">
                         <v-icon :icon="mdiDotsVertical" />
                         <v-menu activator="parent">
                             <v-list>
@@ -30,7 +30,7 @@
                             <v-tab :key="idx" :value="idx" v-for="(subAccount, idx) in subAccounts">
                                 <span>{{ tt('Sub Account') + ' #' + (idx + 1) }}</span>
                                 <v-btn class="ml-2" color="error" size="24" variant="text"
-                                       :icon="mdiDeleteOutline" v-if="!editAccountId"
+                                       :icon="mdiDeleteOutline"
                                        @click="removeSubAccount(subAccount)"></v-btn>
                             </v-tab>
                         </template>
@@ -109,7 +109,7 @@
                                                   v-model="selectedAccount.color" />
                                 </v-col>
                                 <v-col cols="12" :md="currentAccountIndex < 0 && isAccountSupportCreditCardStatementDate ? 6 : 12" v-if="account.type === AccountType.SingleAccount.type || currentAccountIndex >= 0">
-                                    <currency-select :disabled="loading || submitting || !!editAccountId"
+                                    <currency-select :disabled="loading || submitting || (!!editAccountId && !isNewAccount(selectedAccount))"
                                                      :label="tt('Currency')"
                                                      :placeholder="tt('Currency')"
                                                      v-model="selectedAccount.currency" />
@@ -128,9 +128,9 @@
                                         v-model="account.creditCardStatementDate"
                                     ></v-autocomplete>
                                 </v-col>
-                                <v-col cols="12" :md="!editAccountId && selectedAccount.balance ? 6 : 12"
+                                <v-col cols="12" :md="(!editAccountId || isNewAccount(selectedAccount)) && selectedAccount.balance ? 6 : 12"
                                        v-if="account.type === AccountType.SingleAccount.type || currentAccountIndex >= 0">
-                                    <amount-input :disabled="loading || submitting || !!editAccountId"
+                                    <amount-input :disabled="loading || submitting || (!!editAccountId && !isNewAccount(selectedAccount))"
                                                   :persistent-placeholder="true"
                                                   :currency="selectedAccount.currency"
                                                   :show-currency="true"
@@ -140,7 +140,7 @@
                                                   v-model="selectedAccount.balance"/>
                                 </v-col>
                                 <v-col cols="12" md="6" v-show="selectedAccount.balance"
-                                       v-if="!editAccountId && (account.type === AccountType.SingleAccount.type || currentAccountIndex >= 0)">
+                                       v-if="(!editAccountId || isNewAccount(selectedAccount)) && (account.type === AccountType.SingleAccount.type || currentAccountIndex >= 0)">
                                     <date-time-select
                                         :disabled="loading || submitting"
                                         :label="tt('Balance Time')"
@@ -158,7 +158,7 @@
                                         v-model="selectedAccount.comment"
                                     />
                                 </v-col>
-                                <v-col class="py-0" cols="12" md="12" v-if="editAccountId">
+                                <v-col class="py-0" cols="12" md="12" v-if="editAccountId && !isNewAccount(selectedAccount)">
                                     <v-switch :disabled="loading || submitting"
                                               :label="tt('Visible')" v-model="selectedAccount.visible"/>
                                 </v-col>
@@ -236,6 +236,7 @@ const {
     allAccountTypes,
     allAvailableMonthDays,
     isAccountSupportCreditCardStatementDate,
+    isNewAccount,
     isInputEmpty,
     getAccountOrSubAccountProblemMessage,
     addSubAccount,
@@ -288,6 +289,7 @@ function open(options?: { id?: string, currentAccount?: Account, category?: numb
     account.value.fillFrom(newAccount);
     subAccounts.value = [];
     currentAccountIndex.value = -1;
+    clientSessionId.value = generateRandomUUID();
 
     if (options && options.id) {
         if (options.currentAccount) {
@@ -317,7 +319,6 @@ function open(options?: { id?: string, currentAccount?: Account, category?: numb
         }
 
         editAccountId.value = null;
-        clientSessionId.value = generateRandomUUID();
         loading.value = false;
     }
 

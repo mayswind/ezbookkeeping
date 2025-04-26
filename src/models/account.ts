@@ -186,7 +186,7 @@ export class Account implements AccountInfoResponse {
         };
     }
 
-    public toModifyRequest(subAccounts?: Account[], parentAccount?: Account): AccountModifyRequest {
+    public toModifyRequest(clientSessionId: string, subAccounts?: Account[], parentAccount?: Account): AccountModifyRequest {
         let subAccountModifyRequests: AccountModifyRequest[] | undefined = undefined;
 
         if (this.type === AccountType.MultiSubAccounts.type) {
@@ -198,21 +198,25 @@ export class Account implements AccountInfoResponse {
 
             if (subAccounts) {
                 for (const subAccount of subAccounts) {
-                    subAccountModifyRequests.push(subAccount.toModifyRequest(undefined, this));
+                    subAccountModifyRequests.push(subAccount.toModifyRequest(clientSessionId, undefined, this));
                 }
             }
         }
 
         return {
-            id: this.id,
+            id: this.id || '0',
             name: this.name,
             category: parentAccount ? parentAccount.category : this.category,
             icon: this.icon,
             color: this.color,
+            currency: parentAccount && (!this.id || this.id === '0') ? this.currency : undefined,
+            balance: parentAccount && (!this.id || this.id === '0') ? this.balance : undefined,
+            balanceTime: parentAccount && (!this.id || this.id === '0') ? this.balanceTime : undefined,
             comment: this.comment,
             creditCardStatementDate: !parentAccount && this.category === AccountCategory.CreditCard.type ? this.creditCardStatementDate : undefined,
             hidden: !this.visible,
             subAccounts: !parentAccount ? subAccountModifyRequests : undefined,
+            clientSessionId: !parentAccount ? clientSessionId : undefined
         };
     }
 
@@ -579,10 +583,14 @@ export interface AccountModifyRequest {
     readonly category: number;
     readonly icon: string;
     readonly color: string;
+    readonly currency?: string;
+    readonly balance?: number;
+    readonly balanceTime?: number;
     readonly comment: string;
     readonly creditCardStatementDate?: number;
     readonly hidden: boolean;
     readonly subAccounts?: AccountModifyRequest[];
+    readonly clientSessionId?: string;
 }
 
 export interface AccountInfoResponse {

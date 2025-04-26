@@ -4,7 +4,7 @@
             <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title :title="tt(title)"></f7-nav-title>
             <f7-nav-right>
-                <f7-link icon-f7="ellipsis" :class="{ 'disabled': editAccountId || account.type !== AccountType.MultiSubAccounts.type }" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link icon-f7="ellipsis" :class="{ 'disabled': account.type !== AccountType.MultiSubAccounts.type }" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link :class="{ 'disabled': isInputEmpty() || submitting }" :text="tt(saveButtonTitle)" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
@@ -354,7 +354,6 @@
                     <small>{{ tt('Sub Account') + ' #' + (idx + 1) }}</small>
                     <f7-button rasied fill class="subaccount-delete-button" color="red" icon-f7="trash" icon-size="16px"
                                :tooltip="tt('Remove Sub-account')"
-                               v-if="!editAccountId"
                                @click="removeSubAccount(subAccount, false)">
                     </f7-button>
                 </f7-list-item>
@@ -420,9 +419,9 @@
                 <f7-list-item
                     class="list-item-with-header-and-title list-item-no-item-after"
                     link="#"
-                    :class="{ 'disabled': editAccountId }"
+                    :class="{ 'disabled': editAccountId && !isNewAccount(subAccount) }"
                     :header="tt('Currency')"
-                    :no-chevron="!!editAccountId"
+                    :no-chevron="!!editAccountId && !isNewAccount(subAccount)"
                     @click="subAccountContexts[idx].showCurrencyPopup = true"
                 >
                     <template #title>
@@ -447,7 +446,7 @@
                 <f7-list-item
                     link="#" no-chevron
                     class="list-item-with-header-and-title"
-                    :class="{ 'disabled': editAccountId }"
+                    :class="{ 'disabled': editAccountId && !isNewAccount(subAccount) }"
                     :header="account.isLiability ? tt('Sub-account Outstanding Balance') : tt('Sub-account Balance')"
                     :title="formatAccountDisplayBalance(subAccount)"
                     @click="subAccountContexts[idx].showBalanceSheet = true"
@@ -465,7 +464,7 @@
                     class="account-edit-balancetime list-item-with-header-and-title"
                     link="#" no-chevron
                     v-show="subAccount.balance"
-                    v-if="!editAccountId"
+                    v-if="!editAccountId || isNewAccount(subAccount)"
                 >
                     <template #header>
                         <div class="account-edit-balancetime-header" @click="showDateTimeDialog(subAccountContexts[idx], 'time')">{{ tt('Sub-account Balance Time') }}</div>
@@ -481,7 +480,7 @@
                     </date-time-selection-sheet>
                 </f7-list-item>
 
-                <f7-list-item :title="tt('Visible')" v-if="editAccountId">
+                <f7-list-item :title="tt('Visible')" v-if="editAccountId && !isNewAccount(subAccount)">
                     <f7-toggle :checked="subAccount.visible" @toggle:change="subAccount.visible = $event"></f7-toggle>
                 </f7-list-item>
 
@@ -573,6 +572,7 @@ const {
     allAvailableMonthDays,
     isAccountSupportCreditCardStatementDate,
     getAccountCreditCardStatementDate,
+    isNewAccount,
     isInputEmpty,
     getAccountOrSubAccountProblemMessage,
     addSubAccount,
@@ -625,6 +625,7 @@ function formatAccountBalanceTime(account: Account): string {
 
 function init(): void {
     const query = props.f7route.query;
+    clientSessionId.value = generateRandomUUID();
 
     if (query['id']) {
         loading.value = true;
@@ -651,7 +652,6 @@ function init(): void {
             }
         });
     } else {
-        clientSessionId.value = generateRandomUUID();
         loading.value = false;
     }
 }

@@ -231,6 +231,8 @@ func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Acco
 		}
 	}
 
+	defaultTransactionTime := utils.GetMinTransactionTimeFromUnixTime(now)
+
 	for i := 0; i < len(allAccounts); i++ {
 		allAccounts[i].Deleted = false
 		allAccounts[i].CreatedUnixTime = now
@@ -243,12 +245,14 @@ func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Acco
 				return errs.ErrSystemIsBusy
 			}
 
-			transactionTime := utils.GetMinTransactionTimeFromUnixTime(now)
+			transactionTime := defaultTransactionTime
 
 			if i == 0 && mainAccountBalanceTime > 0 {
 				transactionTime = utils.GetMinTransactionTimeFromUnixTime(mainAccountBalanceTime)
 			} else if i > 0 && len(childrenAccountBalanceTimes) > i-1 && childrenAccountBalanceTimes[i-1] > 0 {
 				transactionTime = utils.GetMinTransactionTimeFromUnixTime(childrenAccountBalanceTimes[i-1])
+			} else {
+				defaultTransactionTime++
 			}
 
 			newTransaction := &models.Transaction{
@@ -266,7 +270,6 @@ func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Acco
 				UpdatedUnixTime:      now,
 			}
 
-			transactionTime++
 			allInitTransactions = append(allInitTransactions, newTransaction)
 		}
 	}

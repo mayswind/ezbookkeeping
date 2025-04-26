@@ -36,19 +36,19 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
     'en': {
         name: 'English',
         displayName: 'English',
-        alternativeLanguageTag: 'en',
+        alternativeLanguageTag: 'en-US',
         content: en
     },
     'es': {
         name: 'Spanish',
         displayName: 'Español',
-        alternativeLanguageTag: 'es',
+        alternativeLanguageTag: 'es-ES',
         content: es
     },
     'it': {
         name: 'Italian',
         displayName: 'Italiano',
-        alternativeLanguageTag: 'it',
+        alternativeLanguageTag: 'it-IT',
         content: it
     },
     'ja': {

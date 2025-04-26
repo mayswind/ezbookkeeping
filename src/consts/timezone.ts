@@ -199,7 +199,7 @@ export const ALL_TIMEZONES: TimezoneInfo[] = [
         timezoneName: 'Atlantic/Azores'
     },
     {
-        displayName: 'Cabo Verde Is.',
+        displayName: 'Cabo Verde Is',
         timezoneName: 'Atlantic/Cape_Verde'
     },
     // UTC
@@ -321,7 +321,7 @@ export const ALL_TIMEZONES: TimezoneInfo[] = [
         timezoneName: 'Europe/Minsk'
     },
     {
-        displayName: 'Moscow, St. Petersburg',
+        displayName: 'Moscow, St Petersburg',
         timezoneName: 'Europe/Moscow'
     },
     {

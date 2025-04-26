@@ -115,7 +115,7 @@ func (a *TransactionPicturesApi) TransactionPictureUploadHandler(c *core.WebCont
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	a.SetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_PICTURE, uid, clientSessionId, utils.Int64ToString(pictureInfo.PictureId))
+	a.SetSubmissionRemarkIfEnable(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_PICTURE, uid, clientSessionId, utils.Int64ToString(pictureInfo.PictureId))
 	pictureInfoResp := a.GetTransactionPictureInfoResponse(pictureInfo)
 
 	return pictureInfoResp, nil

@@ -113,9 +113,11 @@ func (a *ApiUsingDuplicateChecker) GetSubmissionRemark(checkerType duplicatechec
 	return a.container.GetSubmissionRemark(checkerType, uid, identification)
 }
 
-// SetSubmissionRemark saves the identification and remark to in-memory cache by the current duplicate checker
-func (a *ApiUsingDuplicateChecker) SetSubmissionRemark(checkerType duplicatechecker.DuplicateCheckerType, uid int64, identification string, remark string) {
-	a.container.SetSubmissionRemark(checkerType, uid, identification, remark)
+// SetSubmissionRemarkIfEnable saves the identification and remark to in-memory cache by the current duplicate checker if the duplicate submission check is enabled
+func (a *ApiUsingDuplicateChecker) SetSubmissionRemarkIfEnable(checkerType duplicatechecker.DuplicateCheckerType, uid int64, identification string, remark string) {
+	if a.CurrentConfig().EnableDuplicateSubmissionsCheck {
+		a.container.SetSubmissionRemark(checkerType, uid, identification, remark)
+	}
 }
 
 // CheckFailureCount returns whether the failure count of the specified IP and user has reached the limit and increases the failure count

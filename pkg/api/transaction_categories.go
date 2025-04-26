@@ -164,7 +164,7 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.WebContext) (an
 
 	log.Infof(c, "[transaction_categories.CategoryCreateHandler] user \"uid:%d\" has created a new category \"id:%d\" successfully", uid, category.CategoryId)
 
-	a.SetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_CATEGORY, uid, categoryCreateReq.ClientSessionId, utils.Int64ToString(category.CategoryId))
+	a.SetSubmissionRemarkIfEnable(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_CATEGORY, uid, categoryCreateReq.ClientSessionId, utils.Int64ToString(category.CategoryId))
 	categoryResp := category.ToTransactionCategoryInfoResponse()
 
 	return categoryResp, nil

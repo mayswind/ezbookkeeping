@@ -39,7 +39,7 @@ export function localizedPresetCategoryToTransactionCategoryCreateWithSubCategor
         const subCategory: TransactionCategoryCreateRequest = {
             name: subPresetCategory.name,
             type: subPresetCategory.type,
-            parentId: '',
+            parentId: '0',
             icon: subPresetCategory.icon,
             color: subPresetCategory.color,
             comment: '',

@@ -218,7 +218,7 @@
                                                                     <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading" :prepend-icon="mdiPencilOutline"
-                                                                           v-if="!activeSubAccount[element.id]"
+                                                                           v-if="!activeSubAccount[element.id] || element.getSubAccount(activeSubAccount[element.id])"
                                                                            @click="edit(element)">
                                                                         {{ tt('Edit') }}
                                                                     </v-btn>

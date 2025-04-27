@@ -161,25 +161,25 @@
         "name": "Pinia",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/pinia",
-        "licenseUrl": "https://github.com/vuejs/pinia/blob/pinia%402.3.0/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/pinia/blob/v3.0.2/LICENSE"
     },
     {
         "name": "vue-router",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/router",
-        "licenseUrl": "https://github.com/vuejs/router/blob/v4.5.0/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/router/blob/v4.5.1/LICENSE"
     },
     {
         "name": "vue-i18n",
         "copyright": "Copyright (c) 2016 kazuya kawaguchi",
         "url": "https://github.com/intlify/vue-i18n-next",
-        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v11.1.1/LICENSE"
+        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v11.1.3/LICENSE"
     },
     {
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-2023 John Jeremy Leider",
         "url": "https://vuetifyjs.com",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.7.11/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.8.2/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -245,13 +245,13 @@
         "name": "@vuepic/vue-datepicker",
         "copyright": "Copyright (c) 2021-present Vuepic",
         "url": "https://vue3datepicker.com/",
-        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v11.0.1/LICENSE"
+        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v11.0.2/LICENSE"
     },
     {
         "name": "axios",
         "copyright": "Copyright (c) 2014-present Matt Zabriskie & Collaborators",
         "url": "https://axios-http.com",
-        "licenseUrl": "https://github.com/axios/axios/blob/v1.7.9/LICENSE"
+        "licenseUrl": "https://github.com/axios/axios/blob/v1.9.0/LICENSE"
     },
     {
         "name": "Moment.js",
@@ -263,7 +263,7 @@
         "name": "Moment Timezone",
         "copyright": "Copyright (c) JS Foundation and other contributors",
         "url": "https://momentjs.com",
-        "licenseUrl": "https://github.com/moment/moment-timezone/blob/0.5.47/LICENSE"
+        "licenseUrl": "https://github.com/moment/moment-timezone/blob/0.5.48/LICENSE"
     },
     {
         "name": "Leaflet",

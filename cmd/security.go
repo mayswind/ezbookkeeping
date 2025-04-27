@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
@@ -13,7 +13,7 @@ import (
 var SecurityUtils = &cli.Command{
 	Name:  "security",
 	Usage: "ezBookkeeping security utilities",
-	Subcommands: []*cli.Command{
+	Commands: []*cli.Command{
 		{
 			Name:   "gen-secret-key",
 			Usage:  "Generate a random secret key",

@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 
 	"github.com/mayswind/ezbookkeeping/pkg/api"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -29,7 +29,7 @@ import (
 var WebServer = &cli.Command{
 	Name:  "server",
 	Usage: "ezBookkeeping web server operation",
-	Subcommands: []*cli.Command{
+	Commands: []*cli.Command{
 		{
 			Name:   "run",
 			Usage:  "Run ezBookkeeping web server",

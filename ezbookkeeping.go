@@ -1,12 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 
 	"github.com/mayswind/ezbookkeeping/cmd"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
@@ -28,7 +29,7 @@ func main() {
 	settings.Version = Version
 	settings.CommitHash = CommitHash
 
-	app := &cli.App{
+	cmd := &cli.Command{
 		Name:    "ezBookkeeping",
 		Usage:   "A lightweight personal bookkeeping app hosted by yourself.",
 		Version: GetFullVersion(),
@@ -52,7 +53,7 @@ func main() {
 		},
 	}
 
-	err := app.Run(os.Args)
+	err := cmd.Run(context.Background(), os.Args)
 
 	if err != nil {
 		log.Fatalf("Failed to run ezBookkeeping with %s: %v", os.Args, err)

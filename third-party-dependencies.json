@@ -9,13 +9,13 @@
         "name": "Cache gin's middleware",
         "copyright": "Copyright (c) 2016 Gin-Gonic",
         "url": "https://github.com/gin-contrib/cache",
-        "licenseUrl": "https://github.com/gin-contrib/cache/blob/v1.3.1/LICENSE"
+        "licenseUrl": "https://github.com/gin-contrib/cache/blob/v1.3.2/LICENSE"
     },
     {
         "name": "GZIP gin's middleware",
         "copyright": "Copyright (c) 2017 Gin-Gonic",
         "url": "https://github.com/gin-contrib/gzip",
-        "licenseUrl": "https://github.com/gin-contrib/gzip/blob/v1.2.2/LICENSE"
+        "licenseUrl": "https://github.com/gin-contrib/gzip/blob/v1.2.3/LICENSE"
     },
     {
         "name": "xorm",
@@ -37,9 +37,9 @@
     },
     {
         "name": "cli",
-        "copyright": "Copyright (c) 2022 urfave/cli maintainers",
+        "copyright": "Copyright (c) 2023 urfave/cli maintainers",
         "url": "https://github.com/urfave/cli",
-        "licenseUrl": "https://github.com/urfave/cli/blob/v2.27.5/LICENSE"
+        "licenseUrl": "https://github.com/urfave/cli/blob/v3.2.0/LICENSE"
     },
     {
         "name": "INI",
@@ -51,13 +51,13 @@
         "name": "Package validator",
         "copyright": "Copyright (c) 2015 Dean Karn",
         "url": "https://github.com/go-playground/validator",
-        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.24.0/LICENSE"
+        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.26.0/LICENSE"
     },
     {
         "name": "jwt-go",
         "copyright": "Copyright (c) 2012 Dave Grijalva, Copyright (c) 2021 golang-jwt maintainers",
         "url": "https://github.com/golang-jwt/jwt",
-        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/v5.2.1/LICENSE"
+        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/v5.2.2/LICENSE"
     },
     {
         "name": "otp",
@@ -67,7 +67,7 @@
     {
         "name": "Go-MySQL-Driver",
         "url": "https://github.com/go-sql-driver/mysql",
-        "licenseUrl": "https://github.com/go-sql-driver/mysql/blob/v1.8.1/LICENSE"
+        "licenseUrl": "https://github.com/go-sql-driver/mysql/blob/v1.9.2/LICENSE"
     },
     {
         "name": "pq",
@@ -79,25 +79,25 @@
         "name": "go-sqlite3",
         "copyright": "Copyright (c) 2014 Yasuhiro Matsumoto",
         "url": "https://github.com/mattn/go-sqlite3",
-        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.24/LICENSE"
+        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.28/LICENSE"
     },
     {
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.33.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.37.0:LICENSE"
     },
     {
         "name": "Go Networking",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/net",
-        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.34.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.39.0:LICENSE"
     },
     {
         "name": "Go Text",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/text",
-        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.22.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.24.0:LICENSE"
     },
     {
         "name": "Gomail",
@@ -109,13 +109,13 @@
         "name": "MinIO Go Client SDK",
         "copyright": "MinIO Cloud Storage, (C) 2014-2020 MinIO, Inc.",
         "url": "https://github.com/minio/minio-go",
-        "licenseUrl": "https://github.com/minio/minio-go/blob/v7.0.85/LICENSE"
+        "licenseUrl": "https://github.com/minio/minio-go/blob/v7.0.91/LICENSE"
     },
     {
         "name": "gocron",
         "copyright": "Copyright (c) 2014, 辣椒面",
         "url": "https://github.com/go-co-op/gocron",
-        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.15.0/LICENSE"
+        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.16.1/LICENSE"
     },
     {
         "name": "barcode",

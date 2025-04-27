@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/cron"
@@ -14,7 +14,7 @@ import (
 var CronJobs = &cli.Command{
 	Name:  "cron",
 	Usage: "ezBookkeeping cron job utilities",
-	Subcommands: []*cli.Command{
+	Commands: []*cli.Command{
 		{
 			Name:   "list",
 			Usage:  "List all enabled cron jobs",

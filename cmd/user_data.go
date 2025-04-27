@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 
 	clis "github.com/mayswind/ezbookkeeping/pkg/cli"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -18,7 +18,7 @@ import (
 var UserData = &cli.Command{
 	Name:  "userdata",
 	Usage: "ezBookkeeping user data maintenance",
-	Subcommands: []*cli.Command{
+	Commands: []*cli.Command{
 		{
 			Name:   "user-add",
 			Usage:  "Add new user",

@@ -889,7 +889,7 @@ func (l *UserDataCli) getUserEssentialDataForImport(c *core.CliContext, uid int6
 		return nil, nil, nil, nil, nil, err
 	}
 
-	accountMap = l.accounts.GetAccountNameMapByList(accounts)
+	accountMap = l.accounts.GetVisibleAccountNameMapByList(accounts)
 
 	categories, err := l.categories.GetAllCategoriesByUid(c, uid, 0, -1)
 
@@ -898,7 +898,7 @@ func (l *UserDataCli) getUserEssentialDataForImport(c *core.CliContext, uid int6
 		return nil, nil, nil, nil, nil, err
 	}
 
-	expenseCategoryMap, incomeCategoryMap, transferCategoryMap = l.categories.GetSubCategoryNameMapByList(categories)
+	expenseCategoryMap, incomeCategoryMap, transferCategoryMap = l.categories.GetVisibleSubCategoryNameMapByList(categories)
 
 	tags, err := l.tags.GetAllTagsByUid(c, uid)
 

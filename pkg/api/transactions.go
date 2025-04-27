@@ -1287,7 +1287,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	accountMap := a.accounts.GetAccountNameMapByList(accounts)
+	accountMap := a.accounts.GetVisibleAccountNameMapByList(accounts)
 
 	categories, err := a.transactionCategories.GetAllCategoriesByUid(c, user.Uid, 0, -1)
 
@@ -1296,7 +1296,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	expenseCategoryMap, incomeCategoryMap, transferCategoryMap := a.transactionCategories.GetSubCategoryNameMapByList(categories)
+	expenseCategoryMap, incomeCategoryMap, transferCategoryMap := a.transactionCategories.GetVisibleSubCategoryNameMapByList(categories)
 
 	tags, err := a.transactionTags.GetAllTagsByUid(c, user.Uid)
 

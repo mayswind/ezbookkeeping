@@ -774,12 +774,21 @@ func (s *AccountService) GetAccountMapByList(accounts []*models.Account) map[int
 	return accountMap
 }
 
-// GetAccountNameMapByList returns an account map by a list
-func (s *AccountService) GetAccountNameMapByList(accounts []*models.Account) map[string]*models.Account {
+// GetVisibleAccountNameMapByList returns visible account map by a list
+func (s *AccountService) GetVisibleAccountNameMapByList(accounts []*models.Account) map[string]*models.Account {
 	accountMap := make(map[string]*models.Account)
 
 	for i := 0; i < len(accounts); i++ {
 		account := accounts[i]
+
+		if account.Hidden {
+			continue
+		}
+
+		if account.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
+			continue
+		}
+
 		accountMap[account.Name] = account
 	}
 	return accountMap

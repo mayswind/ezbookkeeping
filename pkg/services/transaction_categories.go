@@ -451,8 +451,8 @@ func (s *TransactionCategoryService) GetCategoryMapByList(categories []*models.T
 	return categoryMap
 }
 
-// GetSubCategoryNameMapByList returns a sub transaction category map by a list
-func (s *TransactionCategoryService) GetSubCategoryNameMapByList(categories []*models.TransactionCategory) (expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory) {
+// GetVisibleSubCategoryNameMapByList returns visible sub transaction category map by a list
+func (s *TransactionCategoryService) GetVisibleSubCategoryNameMapByList(categories []*models.TransactionCategory) (expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory) {
 	categoryMap := make(map[int64]*models.TransactionCategory, len(categories))
 	expenseCategoryMap = make(map[string]map[string]*models.TransactionCategory)
 	incomeCategoryMap = make(map[string]map[string]*models.TransactionCategory)
@@ -465,6 +465,10 @@ func (s *TransactionCategoryService) GetSubCategoryNameMapByList(categories []*m
 
 	for i := 0; i < len(categories); i++ {
 		category := categories[i]
+
+		if category.Hidden {
+			continue
+		}
 
 		if category.ParentCategoryId == models.LevelOneTransactionCategoryParentId {
 			continue

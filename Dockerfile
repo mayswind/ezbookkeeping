@@ -1,5 +1,5 @@
 # Build backend binary file
-FROM golang:1.24.0-alpine3.21 AS be-builder
+FROM golang:1.24.2-alpine3.21 AS be-builder
 ARG RELEASE_BUILD
 ARG SKIP_TESTS
 ENV RELEASE_BUILD=$RELEASE_BUILD
@@ -11,7 +11,7 @@ RUN apk add git gcc g++ libc-dev
 RUN ./build.sh backend
 
 # Build frontend files
-FROM --platform=$BUILDPLATFORM node:22.14.0-alpine3.21 AS fe-builder
+FROM --platform=$BUILDPLATFORM node:22.15.0-alpine3.21 AS fe-builder
 ARG RELEASE_BUILD
 ENV RELEASE_BUILD=$RELEASE_BUILD
 WORKDIR /go/src/github.com/mayswind/ezbookkeeping

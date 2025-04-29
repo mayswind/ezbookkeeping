@@ -297,6 +297,12 @@ func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Acco
 			createdRows, err := sess.Insert(transaction)
 
 			if err != nil || createdRows < 1 { // maybe another transaction has same time
+				if err != nil {
+					log.Warnf(c, "[accounts.CreateAccounts] cannot create trasaction, because %s, regenerate transaction time value", err.Error())
+				} else {
+					log.Warnf(c, "[accounts.CreateAccounts] cannot create trasaction, regenerate transaction time value")
+				}
+
 				err = userDataDb.RollbackToSavePoint(sess, insertTransactionSavePointName)
 
 				if err != nil {
@@ -313,6 +319,7 @@ func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Acco
 				if err != nil {
 					return err
 				} else if !has {
+					log.Errorf(c, "[accounts.CreateAccounts] it should have transactions in %d - %d, but result is empty", minTransactionTime, maxTransactionTime)
 					return errs.ErrDatabaseOperationFailed
 				} else if sameSecondLatestTransaction.TransactionTime == maxTransactionTime-1 {
 					return errs.ErrTooMuchTransactionInOneSecond
@@ -322,8 +329,10 @@ func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Acco
 				createdRows, err := sess.Insert(transaction)
 
 				if err != nil {
+					log.Errorf(c, "[accounts.CreateAccounts] failed to add transaction again, because %s", err.Error())
 					return err
 				} else if createdRows < 1 {
+					log.Errorf(c, "[accounts.CreateAccounts] failed to add transaction again")
 					return errs.ErrDatabaseOperationFailed
 				}
 			}
@@ -442,6 +451,12 @@ func (s *AccountService) ModifyAccounts(c core.Context, mainAccount *models.Acco
 			createdRows, err := sess.Insert(transaction)
 
 			if err != nil || createdRows < 1 { // maybe another transaction has same time
+				if err != nil {
+					log.Warnf(c, "[accounts.ModifyAccounts] cannot create trasaction, because %s, regenerate transaction time value", err.Error())
+				} else {
+					log.Warnf(c, "[accounts.ModifyAccounts] cannot create trasaction, regenerate transaction time value")
+				}
+
 				err = userDataDb.RollbackToSavePoint(sess, insertTransactionSavePointName)
 
 				if err != nil {
@@ -458,6 +473,7 @@ func (s *AccountService) ModifyAccounts(c core.Context, mainAccount *models.Acco
 				if err != nil {
 					return err
 				} else if !has {
+					log.Errorf(c, "[accounts.ModifyAccounts] it should have transactions in %d - %d, but result is empty", minTransactionTime, maxTransactionTime)
 					return errs.ErrDatabaseOperationFailed
 				} else if sameSecondLatestTransaction.TransactionTime == maxTransactionTime-1 {
 					return errs.ErrTooMuchTransactionInOneSecond
@@ -467,8 +483,10 @@ func (s *AccountService) ModifyAccounts(c core.Context, mainAccount *models.Acco
 				createdRows, err := sess.Insert(transaction)
 
 				if err != nil {
+					log.Errorf(c, "[accounts.ModifyAccounts] failed to add transaction again, because %s", err.Error())
 					return err
 				} else if createdRows < 1 {
+					log.Errorf(c, "[accounts.ModifyAccounts] failed to add transaction again")
 					return errs.ErrDatabaseOperationFailed
 				}
 			}
@@ -536,6 +554,7 @@ func (s *AccountService) ModifyAccounts(c core.Context, mainAccount *models.Acco
 				if err != nil {
 					return err
 				} else if deletedTransactionRows < int64(len(transactionIds)) {
+					log.Errorf(c, "[accounts.ModifyAccounts] it should delete %d transactions, but have deleted %d actually", len(transactionIds), deletedTransactionRows)
 					return errs.ErrDatabaseOperationFailed
 				}
 			}
@@ -675,6 +694,7 @@ func (s *AccountService) DeleteAccount(c core.Context, uid int64, accountId int6
 			if err != nil {
 				return err
 			} else if deletedTransactionRows < int64(len(transactionIds)) {
+				log.Errorf(c, "[accounts.DeleteAccount] it should delete %d transactions, but have deleted %d actually", len(transactionIds), deletedTransactionRows)
 				return errs.ErrDatabaseOperationFailed
 			}
 		}
@@ -755,6 +775,7 @@ func (s *AccountService) DeleteSubAccount(c core.Context, uid int64, accountId i
 			if err != nil {
 				return err
 			} else if deletedTransactionRows < int64(len(transactionIds)) {
+				log.Errorf(c, "[accounts.DeleteSubAccount] it should delete %d transactions, but have deleted %d actually", len(transactionIds), deletedTransactionRows)
 				return errs.ErrDatabaseOperationFailed
 			}
 		}

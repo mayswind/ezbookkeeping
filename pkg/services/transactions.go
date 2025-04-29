@@ -758,6 +758,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 				log.Errorf(c, "[transactions.ModifyTransaction] failed to update related transaction, because %s", err.Error())
 				return err
 			} else if updatedRows < 1 {
+				log.Errorf(c, "[transactions.ModifyTransaction] failed to update related transaction")
 				return errs.ErrDatabaseOperationFailed
 			}
 		}
@@ -849,6 +850,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance")
 					return errs.ErrDatabaseOperationFailed
 				}
 			}
@@ -870,6 +872,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance")
 					return errs.ErrDatabaseOperationFailed
 				}
 			}
@@ -882,6 +885,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance")
 					return errs.ErrDatabaseOperationFailed
 				}
 			}
@@ -903,6 +907,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance")
 					return errs.ErrDatabaseOperationFailed
 				}
 			}
@@ -915,6 +920,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance")
 					return errs.ErrDatabaseOperationFailed
 				}
 			}
@@ -936,6 +942,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance")
 					return errs.ErrDatabaseOperationFailed
 				}
 			}
@@ -948,6 +955,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance")
 					return errs.ErrDatabaseOperationFailed
 				}
 			}
@@ -969,6 +977,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance")
 					return errs.ErrDatabaseOperationFailed
 				}
 			}
@@ -981,6 +990,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance, because %s", err.Error())
 					return err
 				} else if updatedRows < 1 {
+					log.Errorf(c, "[transactions.ModifyTransaction] failed to update account balance")
 					return errs.ErrDatabaseOperationFailed
 				}
 			}
@@ -1088,6 +1098,7 @@ func (s *TransactionService) DeleteTransaction(c core.Context, uid int64, transa
 			if err != nil {
 				return err
 			} else if updatedRows < 1 {
+				log.Errorf(c, "[transactions.DeleteTransaction] failed to update account balance")
 				return errs.ErrDatabaseOperationFailed
 			}
 		} else if oldTransaction.Type == models.TRANSACTION_DB_TYPE_INCOME {
@@ -1097,6 +1108,7 @@ func (s *TransactionService) DeleteTransaction(c core.Context, uid int64, transa
 			if err != nil {
 				return err
 			} else if updatedRows < 1 {
+				log.Errorf(c, "[transactions.DeleteTransaction] failed to update account balance")
 				return errs.ErrDatabaseOperationFailed
 			}
 		} else if oldTransaction.Type == models.TRANSACTION_DB_TYPE_EXPENSE {
@@ -1106,6 +1118,7 @@ func (s *TransactionService) DeleteTransaction(c core.Context, uid int64, transa
 			if err != nil {
 				return err
 			} else if updatedRows < 1 {
+				log.Errorf(c, "[transactions.DeleteTransaction] failed to update account balance")
 				return errs.ErrDatabaseOperationFailed
 			}
 		} else if oldTransaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
@@ -1115,6 +1128,7 @@ func (s *TransactionService) DeleteTransaction(c core.Context, uid int64, transa
 			if err != nil {
 				return err
 			} else if updatedSourceRows < 1 {
+				log.Errorf(c, "[transactions.DeleteTransaction] failed to update account balance")
 				return errs.ErrDatabaseOperationFailed
 			}
 
@@ -1124,6 +1138,7 @@ func (s *TransactionService) DeleteTransaction(c core.Context, uid int64, transa
 			if err != nil {
 				return err
 			} else if updatedDestinationRows < 1 {
+				log.Errorf(c, "[transactions.DeleteTransaction] failed to update account balance")
 				return errs.ErrDatabaseOperationFailed
 			}
 		} else if oldTransaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
@@ -1697,6 +1712,7 @@ func (s *TransactionService) doCreateTransaction(c core.Context, database *datas
 			log.Errorf(c, "[transactions.doCreateTransaction] failed to get trasaction time, because %s", err.Error())
 			return err
 		} else if !has {
+			log.Errorf(c, "[transactions.doCreateTransaction] it should have transactions in %d - %d, but result is empty", minTransactionTime, maxTransactionTime)
 			return errs.ErrDatabaseOperationFailed
 		} else if sameSecondLatestTransaction.TransactionTime == maxTransactionTime-1 {
 			return errs.ErrTooMuchTransactionInOneSecond
@@ -1709,6 +1725,7 @@ func (s *TransactionService) doCreateTransaction(c core.Context, database *datas
 			log.Errorf(c, "[transactions.doCreateTransaction] failed to add transaction again, because %s", err.Error())
 			return err
 		} else if createdRows < 1 {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to add transaction again")
 			return errs.ErrDatabaseOperationFailed
 		}
 	}
@@ -1726,6 +1743,7 @@ func (s *TransactionService) doCreateTransaction(c core.Context, database *datas
 			log.Errorf(c, "[transactions.doCreateTransaction] failed to add related transaction, because %s", err.Error())
 			return err
 		} else if createdRows < 1 {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to add related transaction")
 			return errs.ErrDatabaseOperationFailed
 		}
 	}
@@ -1766,6 +1784,7 @@ func (s *TransactionService) doCreateTransaction(c core.Context, database *datas
 			log.Errorf(c, "[transactions.doCreateTransaction] failed to update account balance, because %s", err.Error())
 			return err
 		} else if updatedRows < 1 {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to update account balance")
 			return errs.ErrDatabaseOperationFailed
 		}
 	} else if transaction.Type == models.TRANSACTION_DB_TYPE_INCOME {
@@ -1776,6 +1795,7 @@ func (s *TransactionService) doCreateTransaction(c core.Context, database *datas
 			log.Errorf(c, "[transactions.doCreateTransaction] failed to update account balance, because %s", err.Error())
 			return err
 		} else if updatedRows < 1 {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to update account balance")
 			return errs.ErrDatabaseOperationFailed
 		}
 	} else if transaction.Type == models.TRANSACTION_DB_TYPE_EXPENSE {
@@ -1786,6 +1806,7 @@ func (s *TransactionService) doCreateTransaction(c core.Context, database *datas
 			log.Errorf(c, "[transactions.doCreateTransaction] failed to update account balance, because %s", err.Error())
 			return err
 		} else if updatedRows < 1 {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to update account balance")
 			return errs.ErrDatabaseOperationFailed
 		}
 	} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
@@ -1796,6 +1817,7 @@ func (s *TransactionService) doCreateTransaction(c core.Context, database *datas
 			log.Errorf(c, "[transactions.doCreateTransaction] failed to update account balance, because %s", err.Error())
 			return err
 		} else if updatedSourceRows < 1 {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to update account balance")
 			return errs.ErrDatabaseOperationFailed
 		}
 
@@ -1806,6 +1828,7 @@ func (s *TransactionService) doCreateTransaction(c core.Context, database *datas
 			log.Errorf(c, "[transactions.doCreateTransaction] failed to update account balance, because %s", err.Error())
 			return err
 		} else if updatedDestinationRows < 1 {
+			log.Errorf(c, "[transactions.doCreateTransaction] failed to update account balance")
 			return errs.ErrDatabaseOperationFailed
 		}
 	} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {

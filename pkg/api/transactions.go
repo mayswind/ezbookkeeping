@@ -1283,7 +1283,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 	accounts, err := a.accounts.GetAllAccountsByUid(c, user.Uid)
 
 	if err != nil {
-		log.BootErrorf(c, "[transactions.TransactionParseImportFileHandler] failed to get accounts for user \"uid:%d\", because %s", user.Uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionParseImportFileHandler] failed to get accounts for user \"uid:%d\", because %s", user.Uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -1292,7 +1292,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 	categories, err := a.transactionCategories.GetAllCategoriesByUid(c, user.Uid, 0, -1)
 
 	if err != nil {
-		log.BootErrorf(c, "[transactions.TransactionParseImportFileHandler] failed to get categories for user \"uid:%d\", because %s", user.Uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionParseImportFileHandler] failed to get categories for user \"uid:%d\", because %s", user.Uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -1301,7 +1301,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 	tags, err := a.transactionTags.GetAllTagsByUid(c, user.Uid)
 
 	if err != nil {
-		log.BootErrorf(c, "[transactions.TransactionParseImportFileHandler] failed to get tags for user \"uid:%d\", because %s", user.Uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionParseImportFileHandler] failed to get tags for user \"uid:%d\", because %s", user.Uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -1310,7 +1310,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 	parsedTransactions, _, _, _, _, _, err := dataImporter.ParseImportedData(c, user, fileData, utcOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 
 	if err != nil {
-		log.BootErrorf(c, "[transactions.TransactionParseImportFileHandler] failed to parse imported data for user \"uid:%d\", because %s", user.Uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionParseImportFileHandler] failed to parse imported data for user \"uid:%d\", because %s", user.Uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 

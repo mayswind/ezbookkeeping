@@ -420,6 +420,18 @@ func bindApiWithTokenUpdate(fn core.ApiHandlerFunc, config *settings.Config) gin
 	}
 }
 
+func bindEventStreamApi(fn core.EventStreamApiHandlerFunc) gin.HandlerFunc {
+	return func(ginCtx *gin.Context) {
+		c := core.WrapWebContext(ginCtx)
+		utils.SetEventStreamHeader(c)
+		err := fn(c)
+
+		if err != nil {
+			utils.WriteEventStreamJsonErrorResult(c, err)
+		}
+	}
+}
+
 func bindCachedJs(fn core.DataHandlerFunc, store persistence.CacheStore) gin.HandlerFunc {
 	return cache.CachePage(store, time.Minute, func(ginCtx *gin.Context) {
 		c := core.WrapWebContext(ginCtx)

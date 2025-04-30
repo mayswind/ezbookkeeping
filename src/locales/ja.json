@@ -102,6 +102,7 @@
             "selectedCount": "{count} / {totalCount}を選択",
             "youHaveUpdatedTransactions": "{count}件の取引を更新しました",
             "confirmImportTransactions": "本当に{count}件の取引をインポートしますか？",
+            "importingTransactions": "Importing ({process}%)",
             "importTransactionResult": "{count}件の取引を正常にインポートしました。",
             "accountActivationAndResendValidationEmailTip": "アカウントの有効化リンクがメールアドレスに送信されました:{email}、メールが届かない場合はパスワードをもう一度入力して下のボタンをクリックして認証メールを再送信してください。",
             "resendValidationEmailTip": "メールが届かない場合は、パスワードをもう一度入力の上、以下のボタンをクリックして検証メールを再送信してください: {email}"
@@ -1179,7 +1180,8 @@
         "no files uploaded": "アップロードされたファイルはありません",
         "uploaded file is empty": "アップロードされたファイルは空です",
         "uploaded file size exceeds the maximum allowed size": "アップロードされたファイルが最大許容サイズを超えています",
-        "failure count exceeded maximum limit": "Failure count exceeded maximum limit, please try again after some time"
+        "failure count exceeded maximum limit": "Failure count exceeded maximum limit, please try again after some time",
+        "repeated request": "Repeated Request"
     },
     "parameter": {
         "id": "ID",
@@ -1689,6 +1691,7 @@
     "Transaction amount format is not set": "Transaction amount format is not set",
     "Cannot import invalid transactions": "無効な取引をインポートできません",
     "Unable to parse import file": "インポートファイルを解析できません",
+    "Unable to import transactions": "Unable to import transactions",
     "Batch Replace Selected Expense Categories": "バッチは選択した支出カテゴリを置き換えます",
     "Batch Replace Selected Income Categories": "バッチは選択した収入カテゴリを置き換えます",
     "Batch Replace Selected Transfer Categories": "バッチは選択した振替カテゴリを置き換えます",

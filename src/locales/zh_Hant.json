@@ -102,6 +102,7 @@
             "selectedCount": "已選擇 {count} / {totalCount}",
             "youHaveUpdatedTransactions": "您已經更新 {count} 個交易",
             "confirmImportTransactions": "您確定要匯入 {count} 個交易？",
+            "importingTransactions": "正在匯入 ({process}%)",
             "importTransactionResult": "您已經成功匯入 {count} 個交易。",
             "accountActivationAndResendValidationEmailTip": "帳號啟用連結已經傳送到您的信箱地址：{email}，如果您沒有收到郵件，請再次輸入密碼並點擊下方的按鈕重新發送驗證郵件。",
             "resendValidationEmailTip": "如果您沒有收到郵件，請再次輸入密碼並點擊下方的按鈕重新發送驗證郵件到：{email}"
@@ -1179,7 +1180,8 @@
         "no files uploaded": "沒有上傳檔案",
         "uploaded file is empty": "上傳的檔案為空",
         "uploaded file size exceeds the maximum allowed size": "上傳的檔案大小超出了允許的最大大小",
-        "failure count exceeded maximum limit": "失敗次數超出最大限制，請稍後重試"
+        "failure count exceeded maximum limit": "失敗次數超出最大限制，請稍後重試",
+        "repeated request": "重複的請求"
     },
     "parameter": {
         "id": "ID",
@@ -1689,6 +1691,7 @@
     "Transaction amount format is not set": "交易金額格式沒有設定",
     "Cannot import invalid transactions": "無法匯入無效的交易",
     "Unable to parse import file": "無法解析匯入的檔案",
+    "Unable to import transactions": "無法匯入交易",
     "Batch Replace Selected Expense Categories": "批次替換選中的支出分類",
     "Batch Replace Selected Income Categories": "批次替換選中的收入分類",
     "Batch Replace Selected Transfer Categories": "批次替換選中的轉帳分類",

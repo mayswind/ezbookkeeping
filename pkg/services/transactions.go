@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"math"
 	"strings"
 	"time"
 
@@ -260,8 +261,11 @@ func (s *TransactionService) CreateTransaction(c core.Context, transaction *mode
 }
 
 // BatchCreateTransactions saves new transactions to database
-func (s *TransactionService) BatchCreateTransactions(c core.Context, uid int64, transactions []*models.Transaction, allTagIds map[int][]int64) error {
+func (s *TransactionService) BatchCreateTransactions(c core.Context, uid int64, transactions []*models.Transaction, allTagIds map[int][]int64, processHandler core.TaskProcessUpdateHandler) error {
 	now := time.Now().Unix()
+	currentProcess := float64(0)
+	processUpdateStep := int(math.Max(100.0, float64(len(transactions)/100.0)))
+
 	needTransactionUuidCount := uint16(0)
 	needTagIndexUuidCount := uint16(0)
 
@@ -365,6 +369,12 @@ func (s *TransactionService) BatchCreateTransactions(c core.Context, uid int64, 
 			transactionTagIndexes := allTransactionTagIndexes[transaction.TransactionId]
 			transactionTagIds := allTransactionTagIds[transaction.TransactionId]
 			err := s.doCreateTransaction(c, userDataDb, sess, transaction, transactionTagIndexes, transactionTagIds, nil, nil)
+
+			currentProcess = float64(i) / float64(len(transactions)) * 100
+
+			if processHandler != nil && i%processUpdateStep == 0 {
+				processHandler(currentProcess)
+			}
 
 			if err != nil {
 				transactionUnixTime := utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime)

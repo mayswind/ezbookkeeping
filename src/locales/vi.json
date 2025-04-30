@@ -102,6 +102,7 @@
             "selectedCount": "Đã chọn {count} trên {totalCount}",
             "youHaveUpdatedTransactions": "Bạn đã cập nhật {count} giao dịch",
             "confirmImportTransactions": "Bạn có chắc chắn muốn nhập {count} giao dịch không?",
+            "importingTransactions": "Importing ({process}%)",
             "importTransactionResult": "Bạn đã nhập thành công {count} giao dịch.",
             "accountActivationAndResendValidationEmailTip": "Liên kết kích hoạt tài khoản đã được gửi tới email của bạn: {email}. Nếu bạn không nhận được email, vui lòng nhập lại mật khẩu và nhấp nút bên dưới để gửi lại email xác nhận.",
             "resendValidationEmailTip": "Nếu bạn không nhận được email, vui lòng nhập lại mật khẩu và nhấp nút bên dưới để gửi lại email xác nhận tới: {email}"
@@ -1179,7 +1180,8 @@
         "no files uploaded": "Không có tệp nào được tải lên",
         "uploaded file is empty": "Tệp đã tải lên trống",
         "uploaded file size exceeds the maximum allowed size": "Kích thước tệp đã tải lên vượt quá kích thước tối đa cho phép",
-        "failure count exceeded maximum limit": "Failure count exceeded maximum limit, please try again after some time"
+        "failure count exceeded maximum limit": "Failure count exceeded maximum limit, please try again after some time",
+        "repeated request": "Repeated Request"
     },
     "parameter": {
         "id": "ID",
@@ -1689,6 +1691,7 @@
     "Transaction amount format is not set": "Transaction amount format is not set",
     "Cannot import invalid transactions": "Không thể nhập giao dịch không hợp lệ",
     "Unable to parse import file": "Không thể phân tích tệp nhập",
+    "Unable to import transactions": "Unable to import transactions",
     "Batch Replace Selected Expense Categories": "Thay thế hàng loạt các danh mục chi phí đã chọn",
     "Batch Replace Selected Income Categories": "Thay thế hàng loạt các danh mục thu nhập đã chọn",
     "Batch Replace Selected Transfer Categories": "Thay thế hàng loạt các danh mục chuyển khoản đã chọn",

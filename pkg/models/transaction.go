@@ -149,6 +149,11 @@ type TransactionImportRequest struct {
 	ClientSessionId string                      `json:"clientSessionId"`
 }
 
+// TransactionImportProcessRequest represents all parameters of transaction import process request
+type TransactionImportProcessRequest struct {
+	ClientSessionId string `form:"client_session_id"`
+}
+
 // TransactionCountRequest represents transaction count request
 type TransactionCountRequest struct {
 	Type          TransactionDbType        `form:"type" binding:"min=0,max=4"`

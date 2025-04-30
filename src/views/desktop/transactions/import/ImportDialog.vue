@@ -786,7 +786,7 @@
                 <v-btn color="teal" :disabled="submitting || !!editingTransaction || selectedImportTransactionCount < 1 || selectedInvalidTransactionCount > 0"
                        :append-icon="!submitting ? mdiArrowRight : undefined" @click="submit"
                        v-if="currentStep === 'checkData'">
-                    {{ tt('Import') }}
+                    {{ (submitting && importProcess > 0 ? tt('format.misc.importingTransactions', { process: importProcess.toFixed(2) }) : tt('Import')) }}
                     <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
                 <v-btn color="secondary" variant="tonal"
@@ -969,6 +969,7 @@ const fileInput = useTemplateRef<HTMLInputElement>('fileInput');
 const showState = ref<boolean>(false);
 const clientSessionId = ref<string>('');
 const currentStep = ref<ImportTransactionDialogStep>('uploadFile');
+const importProcess = ref<number>(0);
 const fileType = ref<string>('ezbookkeeping');
 const fileSubType = ref<string>('ezbookkeeping_csv');
 const fileEncoding = ref<string>('utf-8');
@@ -1927,6 +1928,7 @@ function open(): Promise<void> {
     fileSubType.value = 'ezbookkeeping_csv';
     fileEncoding.value = 'utf-8';
     currentStep.value = 'uploadFile';
+    importProcess.value = 0;
     importFile.value = null;
     importData.value = '';
     parsedFileData.value = undefined;
@@ -2221,10 +2223,48 @@ function submit(): void {
         editingTags.value = [];
         submitting.value = true;
 
+        let showProcessTimer : number | undefined = undefined;
+
+        if (transactions.length > 100) {
+            setTimeout(() => {
+                if (!submitting.value) {
+                    logger.warn('transaction import is not submitting');
+                    return;
+                }
+
+                // @ts-expect-error the return value of setInterval is number, but lint shows it as NodeJS.Timer
+                showProcessTimer = setInterval(() => {
+                    if (submitting.value) {
+                        transactionsStore.getImportTransactionsProcess({
+                            clientSessionId: clientSessionId.value
+                        }).then(response => {
+                            if (isNumber(response) && 0 <= response && response < 100) {
+                                importProcess.value = response;
+                            } else {
+                                importProcess.value = 0;
+                                clearInterval(showProcessTimer);
+                                showProcessTimer = undefined;
+                            }
+                        }).catch(() => {
+                            importProcess.value = 0;
+                            clearInterval(showProcessTimer);
+                            showProcessTimer = undefined;
+                        });
+                    }
+                }, 2000);
+            }, 2000);
+        }
+
         transactionsStore.importTransactions({
             transactions: transactions,
             clientSessionId: clientSessionId.value
         }).then(response => {
+            if (showProcessTimer) {
+                importProcess.value = 0;
+                clearInterval(showProcessTimer);
+                showProcessTimer = undefined;
+            }
+
             importedCount.value = response;
             currentStep.value = 'finalResult';
 
@@ -2235,6 +2275,12 @@ function submit(): void {
 
             submitting.value = false;
         }).catch(error => {
+            if (showProcessTimer) {
+                importProcess.value = 0;
+                clearInterval(showProcessTimer);
+                showProcessTimer = undefined;
+            }
+
             submitting.value = false;
 
             if (!error.processed) {

@@ -483,6 +483,11 @@ export default {
             timeout: DEFAULT_IMPORT_API_TIMEOUT
         } as ApiRequestConfig);
     },
+    getImportTransactionsProcess: (clientSessionId: string): ApiResponsePromise<number | null> => {
+        return axios.get<ApiResponse<number | null>>('v1/transactions/import/process.json?client_session_id=' + clientSessionId, {
+            ignoreError: true
+        } as ApiRequestConfig);
+    },
     uploadTransactionPicture: ({ pictureFile, clientSessionId }: { pictureFile: File, clientSessionId?: string }): ApiResponsePromise<TransactionPictureInfoBasicResponse> => {
         return axios.postForm<ApiResponse<TransactionPictureInfoBasicResponse>>('v1/transaction/pictures/upload.json', {
             picture: pictureFile,

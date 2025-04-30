@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"sort"
 	"strings"
@@ -1344,11 +1345,21 @@ func (a *TransactionsApi) TransactionImportHandler(c *core.WebContext) (any, *er
 		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_IMPORT_TRANSACTIONS, uid, transactionImportReq.ClientSessionId)
 
 		if found {
-			log.Infof(c, "[transactions.TransactionImportHandler] another \"%s\" transactions has been imported for user \"uid:%d\"", remark, uid)
-			count, err := utils.StringToInt(remark)
+			items := strings.Split(remark, ":")
 
-			if err == nil {
-				return count, nil
+			if len(items) >= 2 {
+				if items[0] == "finished" {
+					log.Infof(c, "[transactions.TransactionImportHandler] another \"%s\" transactions has been imported for user \"uid:%d\"", items[1], uid)
+					count, err := utils.StringToInt(items[1])
+
+					if err == nil {
+						return count, nil
+					}
+				} else if items[0] == "processing" {
+					return nil, errs.ErrRepeatedRequest
+				}
+			} else {
+				log.Warnf(c, "[transactions.TransactionImportHandler] another transaction import task may be executing, but remark \"%s\" is invalid", remark)
 			}
 		}
 	}
@@ -1422,7 +1433,9 @@ func (a *TransactionsApi) TransactionImportHandler(c *core.WebContext) (any, *er
 		newTransactions[i] = transaction
 	}
 
-	err = a.transactions.BatchCreateTransactions(c, user.Uid, newTransactions, newTransactionTagIdsMap)
+	err = a.transactions.BatchCreateTransactions(c, user.Uid, newTransactions, newTransactionTagIdsMap, func(currentProcess float64) {
+		a.SetSubmissionRemarkIfEnable(duplicatechecker.DUPLICATE_CHECKER_TYPE_IMPORT_TRANSACTIONS, uid, transactionImportReq.ClientSessionId, fmt.Sprintf("processing:%.2f", currentProcess))
+	})
 	count := len(newTransactions)
 
 	if err != nil {
@@ -1432,9 +1445,59 @@ func (a *TransactionsApi) TransactionImportHandler(c *core.WebContext) (any, *er
 
 	log.Infof(c, "[transactions.TransactionImportHandler] user \"uid:%d\" has imported %d transactions successfully", uid, count)
 
-	a.SetSubmissionRemarkIfEnable(duplicatechecker.DUPLICATE_CHECKER_TYPE_IMPORT_TRANSACTIONS, uid, transactionImportReq.ClientSessionId, utils.IntToString(count))
+	a.SetSubmissionRemarkIfEnable(duplicatechecker.DUPLICATE_CHECKER_TYPE_IMPORT_TRANSACTIONS, uid, transactionImportReq.ClientSessionId, fmt.Sprintf("finished:%d", count))
 
 	return count, nil
+}
+
+// TransactionImportProcessHandler returns the process of specified transaction import task by request parameters for current user
+func (a *TransactionsApi) TransactionImportProcessHandler(c *core.WebContext) (any, *errs.Error) {
+	var transactionImportProcessReq models.TransactionImportProcessRequest
+	err := c.ShouldBindQuery(&transactionImportProcessReq)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionImportProcessHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+
+	if !a.CurrentConfig().EnableDuplicateSubmissionsCheck {
+		return nil, nil
+	}
+
+	found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_IMPORT_TRANSACTIONS, uid, transactionImportProcessReq.ClientSessionId)
+
+	if !found {
+		return nil, nil
+	}
+
+	items := strings.Split(remark, ":")
+
+	if len(items) < 2 {
+		return nil, nil
+	}
+
+	if items[0] == "finished" {
+		return 100, nil
+	} else if items[0] != "processing" {
+		return nil, nil
+	}
+
+	process, err := utils.StringToFloat64(items[1])
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionImportProcessHandler] parse process failed, because %s", err.Error())
+		return nil, nil
+	}
+
+	if process < 0 {
+		return nil, nil
+	} else if process >= 100 {
+		process = 100
+	}
+
+	return process, nil
 }
 
 func (a *TransactionsApi) filterTransactions(c *core.WebContext, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account) []*models.Transaction {

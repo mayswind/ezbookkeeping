@@ -102,6 +102,7 @@
             "selectedCount": "Selected {count} of {totalCount}",
             "youHaveUpdatedTransactions": "You have updated {count} transactions",
             "confirmImportTransactions": "Are you sure you want to import {count} transactions?",
+            "importingTransactions": "Importing ({process}%)",
             "importTransactionResult": "You have imported {count} transactions successfully.",
             "accountActivationAndResendValidationEmailTip": "Account activation link has been sent to your email address: {email}, If you don't receive the mail, please fill password again and click the button below to resend the validation mail.",
             "resendValidationEmailTip": "If you don't receive the mail, please fill password again and click the button below to resend the validation mail to: {email}"
@@ -1179,7 +1180,8 @@
         "no files uploaded": "No files uploaded",
         "uploaded file is empty": "Uploaded file is empty",
         "uploaded file size exceeds the maximum allowed size": "Uploaded file size exceeds the maximum allowed size",
-        "failure count exceeded maximum limit": "Failure count exceeded maximum limit, please try again after some time"
+        "failure count exceeded maximum limit": "Failure count exceeded maximum limit, please try again after some time",
+        "repeated request": "Repeated Request"
     },
     "parameter": {
         "id": "ID",
@@ -1689,6 +1691,7 @@
     "Transaction amount format is not set": "Transaction amount format is not set",
     "Cannot import invalid transactions": "Cannot import invalid transactions",
     "Unable to parse import file": "Unable to parse import file",
+    "Unable to import transactions": "Unable to import transactions",
     "Batch Replace Selected Expense Categories": "Batch Replace Selected Expense Categories",
     "Batch Replace Selected Income Categories": "Batch Replace Selected Income Categories",
     "Batch Replace Selected Transfer Categories": "Batch Replace Selected Transfer Categories",

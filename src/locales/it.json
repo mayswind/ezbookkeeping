@@ -102,6 +102,7 @@
             "selectedCount": "{count} selezionati su {totalCount}",
             "youHaveUpdatedTransactions": "Hai aggiornato {count} transazioni",
             "confirmImportTransactions": "Sei sicuro di voler importare {count} transazioni?",
+            "importingTransactions": "Importing ({process}%)",
             "importTransactionResult": "Hai importato {count} transazioni.",
             "accountActivationAndResendValidationEmailTip": "Abbiamo inviato un link per l'attivazione del tuo account all'indirizzo {email}. Se non hai ricevuto la mail, inserisci nuovamente la password e premi il bottone per ritentare l'invio.",
             "resendValidationEmailTip": "Se non hai ricevuto la mail, inserisci nuovamente la password e premi il bottone per ritentare l'invio all'indirizzo: {email}"
@@ -1179,7 +1180,8 @@
         "no files uploaded": "Nessun file caricato",
         "uploaded file is empty": "Il file caricato è vuoto",
         "uploaded file size exceeds the maximum allowed size": "La dimensione del file caricato supera la dimensione massima consentita",
-        "failure count exceeded maximum limit": "Il conteggio dei fallimenti ha superato il limite massimo, riprova più tardi"
+        "failure count exceeded maximum limit": "Il conteggio dei fallimenti ha superato il limite massimo, riprova più tardi",
+        "repeated request": "Repeated Request"
     },
     "parameter": {
         "id": "ID",
@@ -1689,6 +1691,7 @@
     "Transaction amount format is not set": "Formato importo transazione non impostato",
     "Cannot import invalid transactions": "Impossibile importare transazioni non valide",
     "Unable to parse import file": "Impossibile analizzare il file di importazione",
+    "Unable to import transactions": "Unable to import transactions",
     "Batch Replace Selected Expense Categories": "Sostituisci in blocco categorie di spesa selezionate",
     "Batch Replace Selected Income Categories": "Sostituisci in blocco categorie di entrata selezionate",
     "Batch Replace Selected Transfer Categories": "Sostituisci in blocco categorie di trasferimento selezionate",

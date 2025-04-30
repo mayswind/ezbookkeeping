@@ -102,6 +102,7 @@
             "selectedCount": "Выбрано {count} из {totalCount}",
             "youHaveUpdatedTransactions": "Вы обновили {count} транзакций",
             "confirmImportTransactions": "Вы уверены, что хотите импортировать {count} транзакций?",
+            "importingTransactions": "Importing ({process}%)",
             "importTransactionResult": "Вы успешно импортировали {count} транзакций.",
             "accountActivationAndResendValidationEmailTip": "Ссылка для активации учетной записи была отправлена на ваш электронный адрес: {email}. Если вы не получили письмо, заполните пароль снова и нажмите кнопку ниже, чтобы отправить письмо повторно.",
             "resendValidationEmailTip": "Если вы не получили письмо, заполните пароль снова и нажмите кнопку ниже, чтобы отправить письмо повторно на: {email}"
@@ -1179,7 +1180,8 @@
         "no files uploaded": "Файлы не загружены",
         "uploaded file is empty": "Загруженный файл пуст",
         "uploaded file size exceeds the maximum allowed size": "Размер загруженного файла превышает максимально допустимый размер",
-        "failure count exceeded maximum limit": "Failure count exceeded maximum limit, please try again after some time"
+        "failure count exceeded maximum limit": "Failure count exceeded maximum limit, please try again after some time",
+        "repeated request": "Repeated Request"
     },
     "parameter": {
         "id": "ID",
@@ -1689,6 +1691,7 @@
     "Transaction amount format is not set": "Transaction amount format is not set",
     "Cannot import invalid transactions": "Невозможно импортировать недействительные транзакции",
     "Unable to parse import file": "Не удалось обработать файл импорта",
+    "Unable to import transactions": "Unable to import transactions",
     "Batch Replace Selected Expense Categories": "Пакетная замена выбранных категорий расходов",
     "Batch Replace Selected Income Categories": "Пакетная замена выбранных категорий доходов",
     "Batch Replace Selected Transfer Categories": "Пакетная замена выбранных категорий переводов",

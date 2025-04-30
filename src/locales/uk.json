@@ -102,6 +102,7 @@
             "selectedCount": "Вибрано {count} з {totalCount}",
             "youHaveUpdatedTransactions": "Ви оновили {count} транзакцій",
             "confirmImportTransactions": "Ви впевнені, що хочете імпортувати {count} транзакцій?",
+            "importingTransactions": "Importing ({process}%)",
             "importTransactionResult": "Ви успішно імпортували {count} транзакцій.",
             "accountActivationAndResendValidationEmailTip": "Посилання для активації облікового запису було надіслано на вашу електронну адресу: {email}. Якщо ви не отримали лист, введіть пароль ще раз і натисніть кнопку нижче, щоб надіслати лист повторно.",
             "resendValidationEmailTip": "Якщо ви не отримали лист, введіть пароль ще раз і натисніть кнопку нижче, щоб надіслати лист повторно на адресу: {email}"
@@ -1179,7 +1180,8 @@
         "no files uploaded": "Файли не завантажено",
         "uploaded file is empty": "Завантажений файл порожній",
         "uploaded file size exceeds the maximum allowed size": "Розмір завантаженого файлу перевищує максимально допустимий",
-        "failure count exceeded maximum limit": "Кількість невдали спроб перевищила допустимий ліміт, спробуйте пізніше"
+        "failure count exceeded maximum limit": "Кількість невдали спроб перевищила допустимий ліміт, спробуйте пізніше",
+        "repeated request": "Repeated Request"
     },
     "parameter": {
         "id": "ID",
@@ -1689,6 +1691,7 @@
     "Transaction amount format is not set": "Не вказано формат суми транзакцій",
     "Cannot import invalid transactions": "Неможливо імпортувати недійсні транзакції",
     "Unable to parse import file": "Не вдалося обробити файл імпорту",
+    "Unable to import transactions": "Unable to import transactions",
     "Batch Replace Selected Expense Categories": "Пакетна заміна вибраних категорій витрат",
     "Batch Replace Selected Income Categories": "Пакетна заміна вибраних категорій доходів",
     "Batch Replace Selected Transfer Categories": "Пакетна заміна вибраних категорій переказів",

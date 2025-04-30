@@ -1143,6 +1143,31 @@ export const useTransactionsStore = defineStore('transactions', () => {
         });
     }
 
+    function getImportTransactionsProcess({ clientSessionId }: { clientSessionId: string }): Promise<number | null> {
+        return new Promise((resolve, reject) => {
+            services.getImportTransactionsProcess(clientSessionId).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to get transactions import process' });
+                    return;
+                }
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('Unable to get transactions import process', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to get transactions import process' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
     function uploadTransactionPicture({ pictureFile, clientSessionId }: { pictureFile: File, clientSessionId?: string }): Promise<TransactionPictureInfoBasicResponse> {
         return new Promise((resolve, reject) => {
             services.uploadTransactionPicture({ pictureFile, clientSessionId }).then(response => {
@@ -1243,6 +1268,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         parseImportDsvFile,
         parseImportTransaction,
         importTransactions,
+        getImportTransactionsProcess,
         uploadTransactionPicture,
         removeUnusedTransactionPicture,
         getTransactionPictureUrl,

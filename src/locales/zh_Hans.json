@@ -102,6 +102,7 @@
             "selectedCount": "已选择 {count} / {totalCount}",
             "youHaveUpdatedTransactions": "您已经更新 {count} 个交易",
             "confirmImportTransactions": "您确定要导入 {count} 个交易？",
+            "importingTransactions": "正在导入 ({process}%)",
             "importTransactionResult": "您已经成功导入 {count} 个交易。",
             "accountActivationAndResendValidationEmailTip": "账号激活链接已经发送到您的邮箱地址：{email}，如果您没有收到邮件，请再次输入密码并点击下方的按钮重新发送验证邮件。",
             "resendValidationEmailTip": "如果您没有收到邮件，请再次输入密码并点击下方的按钮重新发送验证邮件到：{email}"
@@ -1179,7 +1180,8 @@
         "no files uploaded": "没有上传文件",
         "uploaded file is empty": "上传的文件为空",
         "uploaded file size exceeds the maximum allowed size": "上传的文件大小超出了允许的最大大小",
-        "failure count exceeded maximum limit": "失败次数超出最大限制，请稍后重试"
+        "failure count exceeded maximum limit": "失败次数超出最大限制，请稍后重试",
+        "repeated request": "重复的请求"
     },
     "parameter": {
         "id": "ID",
@@ -1689,6 +1691,7 @@
     "Transaction amount format is not set": "交易金额格式没有设置",
     "Cannot import invalid transactions": "不能导入无效的交易",
     "Unable to parse import file": "无法解析导入的文件",
+    "Unable to import transactions": "无法导入交易",
     "Batch Replace Selected Expense Categories": "批量替换选中的支出分类",
     "Batch Replace Selected Income Categories": "批量替换选中的收入分类",
     "Batch Replace Selected Transfer Categories": "批量替换选中的转账分类",

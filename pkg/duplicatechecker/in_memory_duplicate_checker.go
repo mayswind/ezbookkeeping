@@ -42,6 +42,11 @@ func (c *InMemoryDuplicateChecker) SetSubmissionRemark(checkerType DuplicateChec
 	c.cache.Set(c.getCacheKey(checkerType, uid, identification), remark, cache.DefaultExpiration)
 }
 
+// RemoveSubmissionRemark removes the identification and remark in in-memory cache
+func (c *InMemoryDuplicateChecker) RemoveSubmissionRemark(checkerType DuplicateCheckerType, uid int64, identification string) {
+	c.cache.Delete(c.getCacheKey(checkerType, uid, identification))
+}
+
 // GetOrSetCronJobRunningInfo returns the running info when the cron job is running or saves the running info by the current duplicate checker
 func (c *InMemoryDuplicateChecker) GetOrSetCronJobRunningInfo(jobName string, runningInfo string, runningInterval time.Duration) (bool, string) {
 	c.mutex.Lock()

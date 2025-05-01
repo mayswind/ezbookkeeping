@@ -1439,6 +1439,7 @@ func (a *TransactionsApi) TransactionImportHandler(c *core.WebContext) (any, *er
 	count := len(newTransactions)
 
 	if err != nil {
+		a.RemoveSubmissionRemarkIfEnable(duplicatechecker.DUPLICATE_CHECKER_TYPE_IMPORT_TRANSACTIONS, uid, transactionImportReq.ClientSessionId)
 		log.Errorf(c, "[transactions.TransactionImportHandler] failed to import %d transactions for user \"uid:%d\", because %s", count, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}

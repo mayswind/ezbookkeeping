@@ -34,9 +34,14 @@ func (c *DuplicateCheckerContainer) GetSubmissionRemark(checkerType DuplicateChe
 	return c.Current.GetSubmissionRemark(checkerType, uid, identification)
 }
 
-// SetSubmissionRemark saves the identification and remark to in-memory cache by the current duplicate checker
+// SetSubmissionRemark saves the identification and remark by the current duplicate checker
 func (c *DuplicateCheckerContainer) SetSubmissionRemark(checkerType DuplicateCheckerType, uid int64, identification string, remark string) {
 	c.Current.SetSubmissionRemark(checkerType, uid, identification, remark)
+}
+
+// RemoveSubmissionRemark removes the identification and remark by the current duplicate checker
+func (c *DuplicateCheckerContainer) RemoveSubmissionRemark(checkerType DuplicateCheckerType, uid int64, identification string) {
+	c.Current.RemoveSubmissionRemark(checkerType, uid, identification)
 }
 
 // GetOrSetCronJobRunningInfo returns the running info when the cron job is running or saves the running info by the current duplicate checker

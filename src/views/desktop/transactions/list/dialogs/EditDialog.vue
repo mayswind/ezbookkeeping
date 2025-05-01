@@ -8,10 +8,10 @@
                         <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
                     </div>
                     <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true"
-                           :disabled="loading || submitting" v-if="mode !== TransactionEditPageMode.View">
+                           :disabled="loading || submitting" v-if="mode !== TransactionEditPageMode.View && (activeTab === 'basicInfo' || (activeTab === 'map' && isSupportGetGeoLocationByClick()))">
                         <v-icon :icon="mdiDotsVertical" />
                         <v-menu activator="parent">
-                            <v-list>
+                            <v-list v-if="activeTab === 'basicInfo'">
                                 <v-list-item :prepend-icon="mdiSwapHorizontal"
                                              :title="tt('Swap Account')"
                                              v-if="transaction.type === TransactionType.Transfer"
@@ -31,6 +31,19 @@
                                 <v-list-item :prepend-icon="mdiEyeOffOutline"
                                              :title="tt('Hide Amount')"
                                              v-if="!transaction.hideAmount" @click="transaction.hideAmount = true"></v-list-item>
+                            </v-list>
+                            <v-list v-if="activeTab === 'map'">
+                                <v-list-item key="setGeoLocationByClickMap" value="setGeoLocationByClickMap"
+                                             :prepend-icon="mdiMapMarkerOutline"
+                                             :disabled="!transaction.geoLocation" v-if="isSupportGetGeoLocationByClick()">
+                                    <v-list-item-title class="cursor-pointer" @click="setGeoLocationByClickMap = !setGeoLocationByClickMap; geoMenuState = false">
+                                        <div class="d-flex align-center">
+                                            <span>{{ tt('Click on Map to Set Geographic Location') }}</span>
+                                            <v-spacer/>
+                                            <v-icon :icon="mdiCheck" v-if="setGeoLocationByClickMap" />
+                                        </div>
+                                    </v-list-item-title>
+                                </v-list-item>
                             </v-list>
                         </v-menu>
                     </v-btn>
@@ -346,7 +359,7 @@
                     <v-window-item value="map">
                         <v-row>
                             <v-col cols="12" md="12">
-                                <map-view ref="map" map-class="transaction-edit-map-view" :geo-location="transaction.geoLocation">
+                                <map-view ref="map" map-class="transaction-edit-map-view" :geo-location="transaction.geoLocation" @click="updateSpecifiedGeoLocation">
                                     <template #error-title="{ mapSupported, mapDependencyLoaded }">
                                         <span class="text-subtitle-1" v-if="!mapSupported"><b>{{ tt('Unsupported Map Provider') }}</b></span>
                                         <span class="text-subtitle-1" v-else-if="!mapDependencyLoaded"><b>{{ tt('Cannot Initialize Map') }}</b></span>
@@ -463,6 +476,7 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 
+import type { MapPosition } from '@/core/map.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionType, TransactionEditScopeType } from '@/core/transaction.ts';
 import { TemplateType, ScheduledTemplateFrequencyType } from '@/core/template.ts';
@@ -488,6 +502,9 @@ import {
     isTransactionPicturesEnabled,
     getMapProvider
 } from '@/lib/server_settings.ts';
+import {
+    isSupportGetGeoLocationByClick
+} from '@/lib/map/index.ts';
 import logger from '@/lib/logger.ts';
 
 import {
@@ -495,6 +512,8 @@ import {
     mdiEyeOffOutline,
     mdiEyeOutline,
     mdiSwapHorizontal,
+    mdiMapMarkerOutline,
+    mdiCheck,
     mdiPound,
     mdiMenuDown,
     mdiImagePlusOutline,
@@ -537,6 +556,7 @@ const {
     submitting,
     uploadingPicture,
     geoLocationStatus,
+    setGeoLocationByClickMap,
     transaction,
     defaultCurrency,
     defaultAccountId,
@@ -671,6 +691,7 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
     loading.value = true;
     submitting.value = false;
     geoLocationStatus.value = null;
+    setGeoLocationByClickMap.value = false;
     originalTransactionEditable.value = false;
 
     initCategoryId.value = options.categoryId;
@@ -1042,6 +1063,13 @@ function updateGeoLocation(forceUpdate: boolean): void {
     });
 
     geoLocationStatus.value = GeoLocationStatus.Getting;
+}
+
+function updateSpecifiedGeoLocation(mapPosition: MapPosition): void {
+    if (isSupportGetGeoLocationByClick() && setGeoLocationByClickMap.value) {
+        transaction.value.setLatitudeAndLongitude(mapPosition.latitude, mapPosition.longitude);
+        map.value?.setMarkerPosition(transaction.value.geoLocation);
+    }
 }
 
 function clearGeoLocation(): void {

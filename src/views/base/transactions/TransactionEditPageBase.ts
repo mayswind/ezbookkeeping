@@ -79,6 +79,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
     const submitting = ref<boolean>(false);
     const uploadingPicture = ref<boolean>(false);
     const geoLocationStatus = ref<GeoLocationStatus | null>(null);
+    const setGeoLocationByClickMap = ref<boolean>(false);
 
     const transaction = ref<Transaction | TransactionTemplate>(createNewTransactionModel(transactionDefaultType));
 
@@ -378,6 +379,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         submitting,
         uploadingPicture,
         geoLocationStatus,
+        setGeoLocationByClickMap,
         transaction,
         // computed states
         currentTimezoneOffsetMinutes,

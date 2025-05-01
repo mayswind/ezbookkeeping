@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import type { MapProvider, MapInstance, MapInstanceInitOptions, MapPosition } from './base.ts';
+import type { MapPosition } from '@/core/map.ts';
+import type { MapProvider, MapInstance, MapInstanceInitOptions } from './base.ts';
 
 import { asyncLoadAssets } from '@/lib/misc.ts';
 import services from '@/lib/services.ts';
@@ -16,6 +17,10 @@ export class AmapMapProvider implements MapProvider {
 
     public getWebsite(): string {
         return 'https://www.amap.com';
+    }
+
+    public isSupportGetGeoLocationByClick(): boolean {
+        return false;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -85,6 +90,15 @@ export class AmapMapInstance implements MapInstance {
             position: 'LT'
         });
         amapInstance.addControl(amapToolbar);
+
+        amapInstance.on('click', function(e) {
+            if (options.onClick) {
+                options.onClick({
+                    latitude: e.lnglat.lat,
+                    longitude: e.lnglat.lng
+                });
+            }
+        });
 
         this.amapInstance = amapInstance;
         this.amapToolbar = amapToolbar;

@@ -1,8 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
+import type { MapPosition } from '@/core/map.ts';
+
 import { type LeafletTileSource, type LeafletTileSourceExtraParam, LEAFLET_TILE_SOURCES } from '@/consts/map.ts';
 
-import type { MapProvider, MapInstance, MapInstanceInitOptions, MapPosition } from './base.ts';
+import type { MapProvider, MapInstance, MapInstanceInitOptions } from './base.ts';
 
 import {
     isMapDataFetchProxyEnabled,
@@ -33,6 +35,10 @@ export class LeafletMapProvider implements MapProvider {
         } else {
             return '';
         }
+    }
+
+    public isSupportGetGeoLocationByClick(): boolean {
+        return true;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -157,6 +163,15 @@ export class LeafletMapInstance implements MapInstance {
             attribution.addTo(leafletInstance);
             this.leafletAttribution = attribution;
         }
+
+        leafletInstance.addEventListener('click', function(e) {
+            if (options.onClick) {
+                options.onClick({
+                    latitude: e.latlng.lat,
+                    longitude: e.latlng.lng
+                });
+            }
+        });
 
         this.leafletInstance = leafletInstance;
         this.leafletTileLayer = tileLayer;

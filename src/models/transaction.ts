@@ -1,5 +1,6 @@
 import type { PartialRecord } from '@/core/base.ts';
 import type { YearMonth, StartEndTime } from '@/core/datetime.ts';
+import type { MapPosition } from '@/core/map.ts';
 import { TransactionType } from '@/core/transaction.ts';
 
 import { Account, type AccountInfoResponse } from './account.ts';
@@ -70,6 +71,11 @@ export class Transaction implements TransactionInfoResponse {
 
     public get geoLocation(): TransactionGeoLocationResponse | undefined {
         return this._geoLocation;
+    }
+
+
+    public set geoLocation(value: MapPosition) {
+        this._geoLocation = TransactionGeoLocation.of(value);
     }
 
     public get categoryId(): string {
@@ -404,8 +410,8 @@ export class TransactionGeoLocation implements TransactionGeoLocationRequest {
         return new TransactionGeoLocation(latitude, longitude);
     }
 
-    public static of(geoLocation: TransactionGeoLocationRequest): TransactionGeoLocation {
-        return new TransactionGeoLocation(geoLocation.latitude, geoLocation.longitude);
+    public static of(mapPosition: MapPosition): TransactionGeoLocation {
+        return new TransactionGeoLocation(mapPosition.latitude, mapPosition.longitude);
     }
 }
 
@@ -496,10 +502,7 @@ export interface TransactionListInMonthByPageRequest {
     readonly keyword: string;
 }
 
-export interface TransactionGeoLocationResponse {
-    readonly latitude: number;
-    readonly longitude: number;
-}
+export type TransactionGeoLocationResponse = MapPosition;
 
 export interface TransactionInfoResponse {
     readonly id: string;

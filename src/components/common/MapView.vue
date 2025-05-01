@@ -13,7 +13,8 @@ import { ref, computed, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-import type { MapInstance, MapPosition } from '@/lib/map/base.ts';
+import type { MapPosition } from '@/core/map.ts';
+import type { MapInstance } from '@/lib/map/base.ts';
 import { createMapInstance } from '@/lib/map/index.ts';
 
 const props = defineProps<{
@@ -21,6 +22,10 @@ const props = defineProps<{
     mapClass?: string;
     mapStyle?: Record<string, string>;
     geoLocation?: MapPosition;
+}>();
+
+const emit = defineEmits<{
+    (e: 'click', geoLocation: MapPosition): void;
 }>();
 
 const { tt, getCurrentLanguageInfo } = useI18n();
@@ -86,6 +91,9 @@ function initMapView(): void {
             text: {
                 zoomIn: tt('Zoom in'),
                 zoomOut: tt('Zoom out'),
+            },
+            onClick: (geoLocation: MapPosition) => {
+                emit('click', geoLocation);
             }
         });
 
@@ -105,7 +113,18 @@ function initMapView(): void {
     }
 }
 
+function setMarkerPosition(geoLocation?: MapPosition): void {
+    if (!mapInstance.value) {
+        return;
+    }
+
+    if (geoLocation) {
+        mapInstance.value.setMapCenterMarker(geoLocation);
+    }
+}
+
 defineExpose({
-    initMapView
+    initMapView,
+    setMarkerPosition
 });
 </script>

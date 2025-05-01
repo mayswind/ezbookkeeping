@@ -344,6 +344,7 @@
                 </template>
 
                 <map-sheet v-model="transaction.geoLocation"
+                           v-model:set-geo-location-by-click-map="setGeoLocationByClickMap"
                            v-model:show="showGeoLocationMapSheet">
                 </map-sheet>
             </f7-list-item>
@@ -549,6 +550,7 @@ const {
     submitting,
     uploadingPicture,
     geoLocationStatus,
+    setGeoLocationByClickMap,
     transaction,
     currentTimezoneOffsetMinutes,
     defaultCurrency,

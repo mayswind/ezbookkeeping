@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import type { MapProvider, MapInstance, MapInstanceInitOptions, MapPosition } from './base.ts';
+import type { MapPosition } from '@/core/map.ts';
+import type { MapProvider, MapInstance, MapInstanceInitOptions } from './base.ts';
 
 import { asyncLoadAssets } from '@/lib/misc.ts';
 import services from '@/lib/services.ts';
@@ -13,6 +14,10 @@ export class GoogleMapProvider implements MapProvider {
 
     public getWebsite(): string {
         return 'https://maps.google.com';
+    }
+
+    public isSupportGetGeoLocationByClick(): boolean {
+        return true;
     }
 
     public asyncLoadAssets(language?: string): Promise<unknown> {
@@ -76,6 +81,16 @@ export class GoogleMapInstance implements MapInstance {
                 position: GoogleMapProvider.ControlPosition.LEFT_TOP
             }
         });
+
+        this.googleMapInstance.addListener('click', function(e) {
+            if (options.onClick) {
+                options.onClick({
+                    latitude: e.latLng.lat(),
+                    longitude: e.latLng.lng()
+                });
+            }
+        });
+
         this.inited = true;
     }
 

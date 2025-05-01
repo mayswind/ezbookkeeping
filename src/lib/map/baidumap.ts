@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import type { MapProvider, MapInstance, MapInstanceInitOptions, MapPosition } from './base.ts';
+import type { MapPosition } from '@/core/map.ts';
+import type { MapProvider, MapInstance, MapInstanceInitOptions } from './base.ts';
 
 import { asyncLoadAssets } from '@/lib/misc.ts';
 import services from '@/lib/services.ts';
@@ -15,6 +16,10 @@ export class BaiduMapProvider implements MapProvider {
 
     public getWebsite(): string {
         return 'https://map.baidu.com';
+    }
+
+    public isSupportGetGeoLocationByClick(): boolean {
+        return false;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -75,6 +80,15 @@ export class BaiduMapInstance implements MapInstance {
         });
         baiduMapInstance.addControl(baiduMapNavigationControl);
         baiduMapInstance.centerAndZoom(new BMap.Point(options.initCenter.longitude, options.initCenter.latitude), options.zoomLevel);
+
+        baiduMapInstance.addEventListener('click', function(e) {
+            if (options.onClick) {
+                options.onClick({
+                    latitude: e.point.lat,
+                    longitude: e.point.lng
+                });
+            }
+        });
 
         this.baiduMapInstance = baiduMapInstance;
         this.baiduMapConverter = new BMap.Convertor();

@@ -1,5 +1,8 @@
+import type { MapPosition } from '@/core/map.ts';
+
 export interface MapProvider {
     getWebsite(): string;
+    isSupportGetGeoLocationByClick(): boolean;
     asyncLoadAssets(language?: string): Promise<unknown>;
     createMapInstance(): MapInstance | null;
 }
@@ -22,10 +25,6 @@ export interface MapInstanceInitOptions {
     readonly text: {
         readonly zoomIn: string;
         readonly zoomOut: string;
-    }
-}
-
-export interface MapPosition {
-    latitude: number;
-    longitude: number;
+    };
+    readonly onClick?: (position: MapPosition) => void;
 }

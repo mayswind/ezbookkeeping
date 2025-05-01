@@ -31,6 +31,10 @@ export function getMapWebsite(): string {
     return mapProvider?.getWebsite() || '';
 }
 
+export function isSupportGetGeoLocationByClick(): boolean {
+    return mapProvider?.isSupportGetGeoLocationByClick() || false;
+}
+
 export function createMapInstance(): MapInstance | null {
     return mapProvider?.createMapInstance() || null;
 }

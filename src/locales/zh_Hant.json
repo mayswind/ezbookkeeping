@@ -1291,6 +1291,7 @@
         "anchor": {
             "export_and_import": {
                 "export-transactions": "匯出交易",
+                "how-to-import-delimiter-separated-values-dsv-file-or-data": "如何匯入分隔符分隔值-dsv-檔案資料",
                 "how-to-get-gnucash-xml-database-file": "如何取得-gnucash-xml-資料庫檔案",
                 "how-to-get-firefly-iii-data-export-file": "如何取得-firefly-iii-資料匯出檔案"
             }

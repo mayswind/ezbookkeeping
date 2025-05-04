@@ -1291,6 +1291,7 @@
         "anchor": {
             "export_and_import": {
                 "export-transactions": "取引のエクスポート",
+                "how-to-import-delimiter-separated-values-dsv-file-or-data": "how-to-import-delimiter-separated-values-dsv-file-or-data",
                 "how-to-get-gnucash-xml-database-file": "gnucash-xmlデータベースファイルの取得方法",
                 "how-to-get-firefly-iii-data-export-file": "firefly-iiiデータエクスポートファイルを取得する方法"
             }

@@ -1290,6 +1290,7 @@
         "anchor": {
             "export_and_import": {
                 "export-transactions": "export-transactions",
+                "how-to-import-delimiter-separated-values-dsv-file-or-data": "how-to-import-delimiter-separated-values-dsv-file-or-data",
                 "how-to-get-gnucash-xml-database-file": "how-to-get-gnucash-xml-database-file",
                 "how-to-get-firefly-iii-data-export-file": "how-to-get-firefly-iii-data-export-file"
             }

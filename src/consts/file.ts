@@ -100,7 +100,11 @@ export const SUPPORTED_IMPORT_FILE_TYPES: ImportFileType[] = [
                 extensions: '.tsv,.txt',
             }
         ],
-        supportedEncodings: SUPPORTED_FILE_ENCODINGS
+        supportedEncodings: SUPPORTED_FILE_ENCODINGS,
+        document: {
+            supportMultiLanguages: true,
+            anchor: 'how-to-import-delimiter-separated-values-dsv-file-or-data'
+        }
     },
     {
         type: 'dsv_data',
@@ -118,7 +122,11 @@ export const SUPPORTED_IMPORT_FILE_TYPES: ImportFileType[] = [
                 extensions: '.tsv,.txt',
             }
         ],
-        dataFromTextbox: true
+        dataFromTextbox: true,
+        document: {
+            supportMultiLanguages: true,
+            anchor: 'how-to-import-delimiter-separated-values-dsv-file-or-data'
+        }
     },
     {
         type: 'ofx',

@@ -4,13 +4,48 @@
                   :density="density" :readonly="!!readonly" :disabled="!!disabled"
                   :label="label" :placeholder="placeholder"
                   :persistent-placeholder="!!persistentPlaceholder"
-                  :rules="enableRules ? rules : []" v-model="currentValue" v-if="!hide"
+                  :rules="enableRules ? rules : []" v-model="currentValue" v-if="!hide && !formulaMode"
                   @keydown="onKeyUpDown" @keyup="onKeyUpDown" @paste="onPaste" @click="onClick">
         <template #prepend-inner v-if="currency && prependText">
             <div>{{ prependText }}</div>
         </template>
-        <template #append-inner v-if="currency && appendText">
-            <div class="text-no-wrap">{{ appendText }}</div>
+        <template #append-inner>
+            <div class="text-no-wrap" v-if="currency && appendText">{{ appendText }}</div>
+            <v-tooltip :text="tt('Enter formula mode')">
+                <template v-slot:activator="{ props }">
+                    <v-icon class="ml-2" :icon="mdiCalculatorVariantOutline"
+                            @keydown.enter="enterFormulaMode" @keydown.space="enterFormulaMode" @click="enterFormulaMode"
+                            v-bind="props" v-if="enableFormula && !formulaMode"></v-icon>
+                </template>
+            </v-tooltip>
+        </template>
+    </v-text-field>
+    <v-text-field type="text" class="text-field-with-colored-label" :class="extraClass"
+                  :color="color" :base-color="color"
+                  :density="density" :readonly="!!readonly" :disabled="!!disabled"
+                  :label="label" :placeholder="placeholder"
+                  :persistent-placeholder="!!persistentPlaceholder"
+                  v-model="currentFormula" v-if="!hide && formulaMode"
+                  @keydown.enter="calculateFormula" @click="onClick">
+        <template #prepend-inner v-if="currency && prependText">
+            <div>{{ prependText }}</div>
+        </template>
+        <template #append-inner>
+            <div class="text-no-wrap" v-if="currency && appendText">{{ appendText }}</div>
+            <v-tooltip :text="tt('Calculate formula result')">
+                <template v-slot:activator="{ props }">
+                    <v-icon class="ml-2" color="primary" :icon="mdiCheck"
+                            @click="calculateFormula" v-bind="props"
+                            v-if="formulaMode"></v-icon>
+                </template>
+            </v-tooltip>
+            <v-tooltip :text="tt('Exit formula mode')">
+                <template v-slot:activator="{ props }">
+                    <v-icon class="ml-2" color="secondary" :icon="mdiClose"
+                            @click="exitFormulaMode" v-bind="props"
+                            v-if="formulaMode"></v-icon>
+                </template>
+            </v-tooltip>
         </template>
     </v-text-field>
     <v-text-field type="password" class="text-field-with-colored-label" :class="extraClass"
@@ -27,18 +62,32 @@
             <div class="text-no-wrap">{{ appendText }}</div>
         </template>
     </v-text-field>
+
+    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { ref, computed, useTemplateRef, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import { DecimalSeparator } from '@/core/numeral.ts';
 import type { CurrencyPrependAndAppendText } from '@/core/currency.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
-import { removeAll } from '@/lib/common.ts';
+import { isNumber, replaceAll, removeAll } from '@/lib/common.ts';
+import { evaluateExpression } from '@/lib/evaluator.ts';
 import type { ComponentDensity } from '@/lib/ui/desktop.ts';
 import logger from '@/lib/logger.ts';
+
+import {
+    mdiCalculatorVariantOutline,
+    mdiCheck,
+    mdiClose
+} from '@mdi/js';
+
+type SnackBarType = InstanceType<typeof SnackBar>;
 
 const props = defineProps<{
     class?: string;
@@ -53,6 +102,7 @@ const props = defineProps<{
     readonly?: boolean;
     hide?: boolean;
     enableRules?: boolean;
+    enableFormula?: boolean;
     flipNegative?: boolean;
     modelValue: number;
 }>();
@@ -67,8 +117,11 @@ const {
     getCurrentDigitGroupingSymbol,
     parseAmount,
     formatAmount,
+    formatNumber,
     getAmountPrependAndAppendText
 } = useI18n();
+
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const rules = [
     (v: string) => {
@@ -92,6 +145,8 @@ const rules = [
 ];
 
 const currentValue = ref<string>(getInitedFormattedValue(props.modelValue, props.flipNegative));
+const currentFormula = ref<string>('');
+const formulaMode = ref<boolean>(false);
 
 const prependText = computed<string | undefined>(() => {
     if (!props.currency || !props.showCurrency) {
@@ -134,6 +189,44 @@ const extraClass = computed<string>(() => {
 
     return finalClass;
 });
+
+function enterFormulaMode(): void {
+    if (!props.enableFormula) {
+        return;
+    }
+
+    currentFormula.value = currentValue.value;
+    formulaMode.value = true;
+}
+
+function calculateFormula(): void {
+    const systemDecimalSeparator = DecimalSeparator.Dot.symbol;
+    const decimalSeparator = getCurrentDecimalSeparator();
+    let finalFormula = currentFormula.value;
+
+    if (systemDecimalSeparator !== decimalSeparator && finalFormula.indexOf(systemDecimalSeparator) >= 0) {
+        snackbar.value?.showMessage('Formula is invalid');
+        return;
+    } else if (systemDecimalSeparator !== decimalSeparator) {
+        finalFormula = replaceAll(currentFormula.value, decimalSeparator, systemDecimalSeparator);
+    }
+
+    const calculatedValue = evaluateExpression(finalFormula);
+
+    if (isNumber(calculatedValue)) {
+        const textualValue = formatNumber(calculatedValue, 2);
+        const hasDecimalSeparator = textualValue.indexOf(decimalSeparator) >= 0;
+        currentValue.value = getValidFormattedValue(calculatedValue, textualValue, hasDecimalSeparator);
+        formulaMode.value = false;
+    } else {
+        snackbar.value?.showMessage('Formula is invalid');
+    }
+}
+
+function exitFormulaMode(): void {
+    formulaMode.value = false;
+    currentFormula.value = '';
+}
 
 function onKeyUpDown(e: KeyboardEvent): void {
     if (e.altKey || e.ctrlKey || e.metaKey || (e.key.indexOf('F') === 0 && (e.key.length === 2 || e.key.length === 3))

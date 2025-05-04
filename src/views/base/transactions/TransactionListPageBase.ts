@@ -60,6 +60,7 @@ export function useTransactionListPageBase() {
 
     const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
     const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
+    const fiscalYearStart = computed<number>(() => userStore.currentUserFiscalYearStart);
     const defaultCurrency = computed<string>(() => getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(allAccountsMap.value, queryAllFilterAccountIds.value, userStore.currentUserDefaultCurrency));
     const showTotalAmountInTransactionListPage = computed<boolean>(() => settingsStore.appSettings.showTotalAmountInTransactionListPage);
     const showTagInTransactionListPage = computed<boolean>(() => settingsStore.appSettings.showTagInTransactionListPage);
@@ -274,6 +275,7 @@ export function useTransactionListPageBase() {
         // computed states
         currentTimezoneOffsetMinutes,
         firstDayOfWeek,
+        fiscalYearStart,
         defaultCurrency,
         showTotalAmountInTransactionListPage,
         showTagInTransactionListPage,

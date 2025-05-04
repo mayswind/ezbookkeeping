@@ -1,7 +1,7 @@
-import { type NumberFormatOptions, DecimalSeparator, DigitGroupingSymbol, DigitGroupingType} from '@/core/numeral.ts';
+import { type NumberFormatOptions, DecimalSeparator, DigitGroupingSymbol, DigitGroupingType } from '@/core/numeral.ts';
 import { DEFAULT_DECIMAL_NUMBER_COUNT, MAX_SUPPORTED_DECIMAL_NUMBER_COUNT } from '@/consts/numeral.ts';
 
-import { isString, isNumber, removeAll } from './common.ts';
+import {isString, isNumber, replaceAll, removeAll } from './common.ts';
 
 export function appendDigitGroupingSymbol(value: number | string, options: NumberFormatOptions): string {
     let textualValue = '';
@@ -73,6 +73,67 @@ export function appendDigitGroupingSymbol(value: number | string, options: Numbe
         return `${newInteger}${decimalSeparator}${decimals}`;
     } else {
         return newInteger;
+    }
+}
+
+export function appendDecimalSeparator(value: number | string, options: NumberFormatOptions): string {
+    let textualValue = '';
+
+    if (isNumber(value)) {
+        textualValue = value.toString();
+    } else {
+        textualValue = value;
+    }
+
+    if (!textualValue) {
+        return textualValue;
+    }
+
+    if (!options) {
+        options = {};
+    }
+
+    if (!isString(options.decimalSeparator)) {
+        return textualValue;
+    }
+
+    if (textualValue.length < 1) {
+        return textualValue;
+    }
+
+    const negative = textualValue.charAt(0) === '-';
+
+    if (negative) {
+        textualValue = textualValue.substring(1);
+    }
+
+    const decimalSeparator = options.decimalSeparator || DecimalSeparator.Default.symbol;
+
+    let currentDecimalSeparator = '';
+    let integer = '';
+    let decimals = '';
+
+    for (let i = 0; i < textualValue.length; i++) {
+        const ch = textualValue.charAt(i);
+
+        if ('0' <= ch && ch <= '9') {
+            integer += ch;
+        } else {
+            currentDecimalSeparator = ch;
+            decimals = textualValue.substring(i + 1);
+            break;
+        }
+    }
+
+
+    if (negative) {
+        integer = `-${integer}`;
+    }
+
+    if (currentDecimalSeparator) {
+        return `${integer}${decimalSeparator}${decimals}`;
+    } else {
+        return integer;
     }
 }
 
@@ -208,16 +269,30 @@ export function formatAmount(value: number | string, options: NumberFormatOption
     return textualValue;
 }
 
-export function formatPercent(value: number, precision: number, lowPrecisionValue: string): string {
+export function formatNumber(value: number, precision: number, options: NumberFormatOptions): string {
+    const ratio = Math.pow(10, precision);
+    const normalizedValue = Math.floor(value * ratio);
+    const textualValue = (normalizedValue / ratio).toString();
+
+    return appendDecimalSeparator(textualValue, options);
+}
+
+export function formatPercent(value: number, precision: number, lowPrecisionValue: string, options: NumberFormatOptions): string {
     const ratio = Math.pow(10, precision);
     const normalizedValue = Math.floor(value * ratio);
 
     if (value > 0 && normalizedValue < 1 && lowPrecisionValue) {
-        return lowPrecisionValue + '%';
+        const systemDecimalSeparator = DecimalSeparator.Dot.symbol;
+        const decimalSeparator = options.decimalSeparator || DecimalSeparator.Default.symbol;
+
+        if (systemDecimalSeparator === decimalSeparator) {
+            return lowPrecisionValue + '%';
+        }
+
+        return replaceAll(lowPrecisionValue, systemDecimalSeparator, decimalSeparator) + '%';
     }
 
-    const result = normalizedValue / ratio;
-    return result + '%';
+    return formatNumber(value, precision, options) + '%';
 }
 
 export function getAmountWithDecimalNumberCount(amount: number, decimalNumberCount: number): number {

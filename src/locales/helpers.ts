@@ -137,6 +137,8 @@ import {
     appendDigitGroupingSymbol,
     parseAmount,
     formatAmount,
+    formatNumber,
+    formatPercent,
     formatExchangeRateAmount,
     getAdaptiveDisplayAmountRate
 } from '@/lib/numeral.ts';
@@ -1472,6 +1474,16 @@ export function useI18n() {
         return appendCurrencySymbol(textualValue, currencyDisplayType, finalCurrencyCode, currencyUnit, currencyName, isPlural);
     }
 
+    function getFormattedNumber(value: number, precision: number): string {
+        const numberFormatOptions = getNumberFormatOptions();
+        return formatNumber(value, precision, numberFormatOptions);
+    }
+
+    function getFormattedPercentValue(value: number, precision: number, lowPrecisionValue: string): string {
+        const numberFormatOptions = getNumberFormatOptions();
+        return formatPercent(value, precision, lowPrecisionValue, numberFormatOptions);
+    }
+
     function getFormattedExchangeRateAmount(value: number | string): string {
         const numberFormatOptions = getNumberFormatOptions();
         return formatExchangeRateAmount(value, numberFormatOptions);
@@ -1746,6 +1758,8 @@ export function useI18n() {
         parseAmount: getParsedAmountNumber,
         formatAmount: getFormattedAmount,
         formatAmountWithCurrency: getFormattedAmountWithCurrency,
+        formatNumber: getFormattedNumber,
+        formatPercent: getFormattedPercentValue,
         formatExchangeRateAmount: getFormattedExchangeRateAmount,
         getAdaptiveAmountRate,
         getAmountPrependAndAppendText,

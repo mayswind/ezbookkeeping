@@ -353,9 +353,6 @@ import {
     arrayItemToObjectField
 } from '@/lib/common.ts'
 import {
-    formatPercent
-} from '@/lib/numeral.ts';
-import {
     getYearAndMonthFromUnixTime,
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
@@ -399,7 +396,7 @@ const props = defineProps<TransactionStatisticsProps>();
 const router = useRouter();
 const display = useDisplay();
 const theme = useTheme();
-const { tt, getAllCategoricalChartTypes, getAllTrendChartTypes } = useI18n();
+const { tt, getAllCategoricalChartTypes, getAllTrendChartTypes, formatPercent } = useI18n();
 
 const {
     loading,

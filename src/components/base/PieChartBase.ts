@@ -5,7 +5,6 @@ import { useI18n } from '@/locales/helpers.ts';
 import { DEFAULT_CHART_COLORS } from '@/consts/color.ts';
 
 import { isNumber } from '@/lib/common.ts';
-import { formatPercent } from '@/lib/numeral.ts';
 
 export interface CommonPieChartDataItem {
     id: string;
@@ -36,7 +35,7 @@ export interface CommonPieChartProps {
 }
 
 export function usePieChartBase(props: CommonPieChartProps) {
-    const { formatAmountWithCurrency } = useI18n();
+    const { formatAmountWithCurrency, formatPercent } = useI18n();
 
     const selectedIndex = ref<number>(0);
 

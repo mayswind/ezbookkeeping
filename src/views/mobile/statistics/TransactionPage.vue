@@ -344,7 +344,6 @@ import {
 } from '@/core/statistics.ts';
 
 import { isString, isNumber } from '@/lib/common.ts';
-import { formatPercent } from '@/lib/numeral.ts';
 import {
     getYearAndMonthFromUnixTime,
     getYearMonthFirstUnixTime,
@@ -359,7 +358,7 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getAllCategoricalChartTypes } = useI18n();
+const { tt, getAllCategoricalChartTypes, formatPercent } = useI18n();
 const { showToast, routeBackOnError } = useI18nUIComponents();
 
 const {

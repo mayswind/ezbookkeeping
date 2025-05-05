@@ -317,6 +317,15 @@ export function getThisMonthLastUnixTime(): number {
     return moment.unix(getThisMonthFirstUnixTime()).add(1, 'months').subtract(1, 'seconds').unix();
 }
 
+export function getMonthFirstUnixTimeBySpecifiedUnixTime(unixTime: number): number {
+    const date = moment.unix(unixTime).set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+    return date.subtract(date.date() - 1, 'days').unix();
+}
+
+export function getMonthLastUnixTimeBySpecifiedUnixTime(unixTime: number): number {
+    return moment.unix(getMonthFirstUnixTimeBySpecifiedUnixTime(unixTime)).add(1, 'months').subtract(1, 'seconds').unix();
+}
+
 export function getThisMonthSpecifiedDayFirstUnixTime(date: number): number {
     return moment().set({ date: date, hour: 0, minute: 0, second: 0, millisecond: 0 }).unix();
 }
@@ -792,6 +801,28 @@ export function getRecentDateRangeType(allRecentMonthDateRanges: LocalizedRecent
     return getRecentDateRangeTypeByDateType(allRecentMonthDateRanges, DateRange.Custom.type);
 }
 
+export function getFullMonthDateRange(minTime: number, maxTime: number, firstDayOfWeek: number): TimeRangeAndDateType | null {
+    if (isDateRangeMatchOneMonth(minTime, maxTime)) {
+        return null;
+    }
+
+    if (!minTime) {
+        return getDateRangeByDateType(DateRange.ThisMonth.type, firstDayOfWeek);
+    }
+
+    const monthFirstUnixTime = getMonthFirstUnixTimeBySpecifiedUnixTime(minTime);
+    const monthLastUnixTime = getMonthLastUnixTimeBySpecifiedUnixTime(minTime);
+    const dateType = getDateTypeByDateRange(monthFirstUnixTime, monthLastUnixTime, firstDayOfWeek, DateRangeScene.Normal);
+
+    const dateRange: TimeRangeAndDateType = {
+        dateType: dateType,
+        maxTime: monthLastUnixTime,
+        minTime: monthFirstUnixTime
+    };
+
+    return dateRange;
+}
+
 export function getTimeValues(date: Date, is24Hour: boolean, isMeridiemIndicatorFirst: boolean): string[] {
     const hourMinuteSeconds = [
         getTwoDigitsString(is24Hour ? date.getHours() : getHourIn12HourFormat(date.getHours())),
@@ -847,6 +878,20 @@ export function getCombinedDateAndTimeValues(date: Date, timeValues: string[], i
     newDateTime.setSeconds(seconds);
 
     return newDateTime;
+}
+
+export function getMonthFirstDayOrCurrentDayShortDate(unixTime: number): string {
+    const currentTime = moment();
+    let dateTime = moment.unix(unixTime);
+
+    if (dateTime.year() === currentTime.year() && dateTime.month() === currentTime.month()) {
+        return getShortDate(currentTime);
+    }
+
+    dateTime = dateTime.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+    dateTime = dateTime.subtract(dateTime.date() - 1, 'days');
+
+    return getShortDate(dateTime);
 }
 
 export function isDateRangeMatchFullYears(minTime: number, maxTime: number): boolean {

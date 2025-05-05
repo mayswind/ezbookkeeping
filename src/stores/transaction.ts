@@ -87,18 +87,21 @@ export interface TransactionListFilter extends TransactionListPartialFilter {
     keyword: string;
 }
 
+export interface TransactionTotalAmount {
+    expense: number;
+    incompleteExpense: boolean;
+    income: number;
+    incompleteIncome: boolean;
+}
+
 export interface TransactionMonthList {
     readonly year: number;
     readonly month: number;
     readonly yearMonth: string;
     opened: boolean;
     readonly items: Transaction[];
-    readonly totalAmount: {
-        expense: number;
-        incompleteExpense: boolean;
-        income: number;
-        incompleteIncome: boolean;
-    };
+    readonly totalAmount: TransactionTotalAmount;
+    readonly dailyTotalAmounts: Record<string, TransactionTotalAmount>;
 }
 
 export const useTransactionsStore = defineStore('transactions', () => {
@@ -216,7 +219,8 @@ export const useTransactionsStore = defineStore('transactions', () => {
                             incompleteExpense: true,
                             income: 0,
                             incompleteIncome: true
-                        }
+                        },
+                        dailyTotalAmounts: {}
                     };
 
                     transactions.value.push(monthList);
@@ -319,6 +323,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         let totalIncome = 0;
         let hasUnCalculatedTotalExpense = false;
         let hasUnCalculatedTotalIncome = false;
+        const dailyTotalAmounts: Record<string, TransactionTotalAmount> = {};
 
         const allAccountIdsMap: Record<string, boolean> = {};
         let totalAccountIdsCount = 0;
@@ -336,6 +341,18 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
         for (let i = 0; i < transactionMonthList.items.length; i++) {
             const transaction = transactionMonthList.items[i];
+            const transactionDay = isNumber(transaction.day) ? transaction.day.toString() : '0';
+            let dailyTotalAmount = dailyTotalAmounts[transactionDay];
+
+            if (!dailyTotalAmount) {
+                dailyTotalAmount = {
+                    expense: 0,
+                    incompleteExpense: false,
+                    income: 0,
+                    incompleteIncome: false
+                };
+                dailyTotalAmounts[transactionDay] = dailyTotalAmount;
+            }
 
             let amount = transaction.sourceAmount;
             let account = transaction.sourceAccount;
@@ -357,8 +374,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 if (!isNumber(balance)) {
                     if (transaction.type === TransactionType.Expense) {
                         hasUnCalculatedTotalExpense = true;
+                        dailyTotalAmount.incompleteExpense = true;
                     } else if (transaction.type === TransactionType.Income) {
                         hasUnCalculatedTotalIncome = true;
+                        dailyTotalAmount.incompleteIncome = true;
                     }
 
                     continue;
@@ -369,8 +388,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
             if (transaction.type === TransactionType.Expense) {
                 totalExpense += amount;
+                dailyTotalAmount.expense += amount;
             } else if (transaction.type === TransactionType.Income) {
                 totalIncome += amount;
+                dailyTotalAmount.income += amount;
             } else if (transaction.type === TransactionType.Transfer && totalAccountIdsCount > 0) {
                 if (allAccountIdsMap[transaction.sourceAccountId] && allAccountIdsMap[transaction.destinationAccountId]) {
                     // Do Nothing
@@ -382,8 +403,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     // Do Nothing
                 } else if (allAccountIdsMap[transaction.sourceAccountId] || (transaction.sourceAccount && allAccountIdsMap[transaction.sourceAccount.parentId])) {
                     totalExpense += amount;
+                    dailyTotalAmount.expense += amount;
                 } else if (allAccountIdsMap[transaction.destinationAccountId] || (transaction.destinationAccount && allAccountIdsMap[transaction.destinationAccount.parentId])) {
                     totalIncome += amount;
+                    dailyTotalAmount.income += amount;
                 }
             }
         }
@@ -392,6 +415,29 @@ export const useTransactionsStore = defineStore('transactions', () => {
         transactionMonthList.totalAmount.incompleteExpense = incomplete || hasUnCalculatedTotalExpense;
         transactionMonthList.totalAmount.income = Math.floor(totalIncome);
         transactionMonthList.totalAmount.incompleteIncome = incomplete || hasUnCalculatedTotalIncome;
+
+        for (const day in transactionMonthList.dailyTotalAmounts) {
+            if (!Object.prototype.hasOwnProperty.call(transactionMonthList.dailyTotalAmounts, day)) {
+                continue;
+            }
+
+            delete transactionMonthList.dailyTotalAmounts[day];
+        }
+
+        for (const day in dailyTotalAmounts) {
+            if (!Object.prototype.hasOwnProperty.call(dailyTotalAmounts, day)) {
+                continue;
+            }
+
+            const dailyTotalAmount = dailyTotalAmounts[day];
+
+            transactionMonthList.dailyTotalAmounts[day] = {
+                expense: Math.floor(dailyTotalAmount.expense),
+                incompleteExpense: incomplete || dailyTotalAmount.incompleteExpense,
+                income: Math.floor(dailyTotalAmount.income),
+                incompleteIncome: incomplete || dailyTotalAmount.incompleteIncome
+            };
+        }
     }
 
     function fillTransactionObject(transaction: Transaction, currentUtcOffset: number): void {
@@ -691,8 +737,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
         return changed;
     }
 
-    function getTransactionListPageParams(): string {
+    function getTransactionListPageParams(pageType: number): string {
         const querys: string[] = [];
+
+        querys.push('pageType=' + pageType);
 
         if (transactionsFilter.value.type) {
             querys.push('type=' + transactionsFilter.value.type);

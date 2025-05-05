@@ -103,6 +103,7 @@ const router = createRouter({
                     component: TransactionListPage,
                     beforeEnter: checkLogin,
                     props: route => ({
+                        initPageType: route.query['pageType'],
                         initDateType: route.query['dateType'],
                         initMaxTime: route.query['maxTime'],
                         initMinTime: route.query['minTime'],

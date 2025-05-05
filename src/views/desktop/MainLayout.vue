@@ -27,7 +27,7 @@
                     </div>
                 </li>
                 <li class="nav-link">
-                    <router-link to="/transaction/list?dateType=7">
+                    <router-link to="/transaction/list?pageType=0&dateType=7">
                         <v-icon class="nav-item-icon" :icon="mdiListBoxOutline"/>
                         <span class="nav-item-title d-inline-block">{{ tt('Transaction Details') }}</span>
                         <v-btn density="compact" color="secondary" variant="text" size="22"

@@ -9,6 +9,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { type TransactionListFilter, type TransactionMonthList, useTransactionsStore } from '@/stores/transaction.ts';
 
+import type { TypeAndName } from '@/core/base.ts';
 import { type LocalizedDateRange, DateRange, DateRangeScene } from '@/core/datetime.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
@@ -17,6 +18,10 @@ import type { Account } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 import type { TransactionTag } from '@/models/transaction_tag.ts';
 import type { Transaction } from '@/models/transaction.ts';
+
+import {
+    arrangeArrayWithNewStartIndex
+} from '@/lib/common.ts';
 
 import {
     getUtcOffsetByUtcOffsetMinutes,
@@ -35,9 +40,39 @@ import {
     categoryTypeToTransactionType
 } from '@/lib/category.ts';
 
+export class TransactionListPageType implements TypeAndName {
+    private static readonly allInstances: TransactionListPageType[] = [];
+    private static readonly allInstancesByType: Record<number, TransactionListPageType> = {};
+
+    public static readonly List = new TransactionListPageType(0, 'Transaction List');
+    public static readonly Calendar = new TransactionListPageType(1, 'Transaction Calendar');
+
+    public static readonly Default = TransactionListPageType.List;
+
+    public readonly type: number;
+    public readonly name: string;
+
+    private constructor(type: number, name: string) {
+        this.type = type;
+        this.name = name;
+
+        TransactionListPageType.allInstances.push(this);
+        TransactionListPageType.allInstancesByType[type] = this;
+    }
+
+    public static values(): TransactionListPageType[] {
+        return TransactionListPageType.allInstances;
+    }
+
+    public static valueOf(type: number): TransactionListPageType | undefined {
+        return TransactionListPageType.allInstancesByType[type];
+    }
+}
+
 export function useTransactionListPageBase() {
     const {
         tt,
+        getAllLongWeekdayNames,
         getAllDateRanges,
         formatUnixTimeToLongDateTime,
         formatUnixTimeToLongDate,
@@ -54,12 +89,15 @@ export function useTransactionListPageBase() {
     const transactionTagsStore = useTransactionTagsStore();
     const transactionsStore = useTransactionsStore();
 
+    const pageType = ref<number>(TransactionListPageType.List.type);
     const loading = ref<boolean>(true);
     const customMinDatetime = ref<number>(0);
     const customMaxDatetime = ref<number>(0);
+    const currentCalendarDate = ref<string>('');
 
     const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
     const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
+    const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllLongWeekdayNames(), firstDayOfWeek.value));
     const defaultCurrency = computed<string>(() => getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(allAccountsMap.value, queryAllFilterAccountIds.value, userStore.currentUserDefaultCurrency));
     const showTotalAmountInTransactionListPage = computed<boolean>(() => settingsStore.appSettings.showTotalAmountInTransactionListPage);
     const showTagInTransactionListPage = computed<boolean>(() => settingsStore.appSettings.showTagInTransactionListPage);
@@ -109,6 +147,16 @@ export function useTransactionListPageBase() {
     });
     const allTransactionTags = computed<Record<string, TransactionTag>>(() => transactionTagsStore.allTransactionTagsMap);
     const allAvailableTagsCount = computed<number>(() => transactionTagsStore.allAvailableTagsCount);
+
+    const displayPageTypeName = computed<string>(() => {
+        const type = TransactionListPageType.valueOf(pageType.value);
+
+        if (type) {
+            return tt(type.name);
+        }
+
+        return tt(TransactionListPageType.List.name);
+    });
 
     const query = computed<TransactionListFilter>(() => transactionsStore.transactionsFilter);
     const queryDateRangeName = computed<string>(() => {
@@ -268,12 +316,15 @@ export function useTransactionListPageBase() {
 
     return {
         // states
+        pageType,
         loading,
         customMinDatetime,
         customMaxDatetime,
+        currentCalendarDate,
         // computed states
         currentTimezoneOffsetMinutes,
         firstDayOfWeek,
+        dayNames,
         defaultCurrency,
         showTotalAmountInTransactionListPage,
         showTagInTransactionListPage,
@@ -286,6 +337,7 @@ export function useTransactionListPageBase() {
         allAvailableCategoriesCount,
         allTransactionTags,
         allAvailableTagsCount,
+        displayPageTypeName,
         query,
         queryDateRangeName,
         queryMinTime,

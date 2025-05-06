@@ -4,8 +4,8 @@
             <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title>
                 <f7-link popover-open=".chart-data-type-popover-menu">
-                    <span>{{ queryChartDataTypeName }}</span>
-                    <f7-icon size="14px" :f7="showChartDataTypePopover ? 'arrowtriangle_up_fill' : 'arrowtriangle_down_fill'"></f7-icon>
+                    <span style="color: var(--f7-text-color)">{{ queryChartDataTypeName }}</span>
+                    <f7-icon size="16px" color="gray" style="opacity: 0.5" f7="chevron_down_circle_fill"></f7-icon>
                 </f7-link>
             </f7-nav-title>
             <f7-nav-right>

@@ -676,7 +676,8 @@ import type { TransactionTemplate } from '@/models/transaction_template.ts';
 import {
     isObject,
     isString,
-    isNumber
+    isNumber,
+    arrangeArrayWithNewStartIndex
 } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
@@ -765,6 +766,7 @@ const theme = useTheme();
 
 const {
     tt,
+    getAllLongWeekdayNames,
     getAllRecentMonthDateRanges,
     getAllTransactionTagFilterTypes,
     getMonthShortName,
@@ -779,7 +781,6 @@ const {
     currentCalendarDate,
     currentTimezoneOffsetMinutes,
     firstDayOfWeek,
-    dayNames,
     defaultCurrency,
     showTotalAmountInTransactionListPage,
     showTagInTransactionListPage,
@@ -860,6 +861,7 @@ const showFilterCategoryDialog = ref<boolean>(false);
 const showFilterTagDialog = ref<boolean>(false);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllLongWeekdayNames(), firstDayOfWeek.value));
 
 const recentMonthDateRanges = computed<LocalizedRecentMonthDateRange[]>(() => getAllRecentMonthDateRanges(pageType.value === TransactionListPageType.List.type, true));
 

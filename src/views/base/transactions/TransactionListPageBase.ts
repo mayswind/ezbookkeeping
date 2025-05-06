@@ -20,10 +20,6 @@ import type { TransactionTag } from '@/models/transaction_tag.ts';
 import type { Transaction } from '@/models/transaction.ts';
 
 import {
-    arrangeArrayWithNewStartIndex
-} from '@/lib/common.ts';
-
-import {
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffset,
     getTimezoneOffsetMinutes,
@@ -72,7 +68,6 @@ export class TransactionListPageType implements TypeAndName {
 export function useTransactionListPageBase() {
     const {
         tt,
-        getAllLongWeekdayNames,
         getAllDateRanges,
         formatUnixTimeToLongDateTime,
         formatUnixTimeToLongDate,
@@ -97,7 +92,6 @@ export function useTransactionListPageBase() {
 
     const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
     const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
-    const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllLongWeekdayNames(), firstDayOfWeek.value));
     const defaultCurrency = computed<string>(() => getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(allAccountsMap.value, queryAllFilterAccountIds.value, userStore.currentUserDefaultCurrency));
     const showTotalAmountInTransactionListPage = computed<boolean>(() => settingsStore.appSettings.showTotalAmountInTransactionListPage);
     const showTagInTransactionListPage = computed<boolean>(() => settingsStore.appSettings.showTagInTransactionListPage);
@@ -324,7 +318,6 @@ export function useTransactionListPageBase() {
         // computed states
         currentTimezoneOffsetMinutes,
         firstDayOfWeek,
-        dayNames,
         defaultCurrency,
         showTotalAmountInTransactionListPage,
         showTagInTransactionListPage,

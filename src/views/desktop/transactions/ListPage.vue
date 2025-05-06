@@ -39,7 +39,7 @@
                             />
                         </div>
                         <v-tabs show-arrows class="my-4" direction="vertical"
-                                :disabled="loading" v-model="recentDateRangeType">
+                                :disabled="loading" v-model="recentDateRangeIndex">
                             <v-tab class="tab-text-truncate" :key="idx" :value="idx" v-for="(recentDateRange, idx) in recentMonthDateRanges"
                                    @click="changeDateFilter(recentDateRange)">
                                 <span class="text-truncate">{{ recentDateRange.displayName }}</span>
@@ -694,7 +694,7 @@ import {
     getDateTypeByBillingCycleDateRange,
     getDateRangeByDateType,
     getDateRangeByBillingCycleDateType,
-    getRecentDateRangeType,
+    getRecentDateRangeIndex,
     getFullMonthDateRange,
     getMonthFirstDayOrCurrentDayShortDate,
     isDateRangeMatchOneMonth
@@ -954,8 +954,8 @@ const currentMonthTransactionData = computed<TransactionMonthList | null>(() => 
     return null;
 });
 
-const recentDateRangeType = computed<number>({
-    get: () => getRecentDateRangeType(recentMonthDateRanges.value, query.value.dateType, query.value.minTime, query.value.maxTime, firstDayOfWeek.value),
+const recentDateRangeIndex = computed<number>({
+    get: () => getRecentDateRangeIndex(recentMonthDateRanges.value, query.value.dateType, query.value.minTime, query.value.maxTime, firstDayOfWeek.value),
     set: (value) => {
         if (value < 0 || value >= recentMonthDateRanges.value.length) {
             value = 0;
@@ -1339,9 +1339,9 @@ function changeCustomDateFilter(minTime: number, maxTime: number): void {
 }
 
 function shiftDateRange(startTime: number, endTime: number, scale: number): void {
-    if (recentDateRangeType.value === DateRange.All.type) {
+    if (pageType.value === TransactionListPageType.List.type && recentDateRangeIndex.value === 0) { // first item is "All"
         return;
-    }
+    } // transaction calendar mode not display "All" item
 
     let newDateRange: TimeRangeAndDateType | null = null;
 

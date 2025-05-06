@@ -761,7 +761,7 @@ export function getRecentMonthDateRanges(monthCount: number): RecentMonthDateRan
     return recentDateRanges;
 }
 
-export function getRecentDateRangeTypeByDateType(allRecentMonthDateRanges: LocalizedRecentMonthDateRange[], dateType: number): number {
+export function getRecentDateRangeIndexByDateType(allRecentMonthDateRanges: LocalizedRecentMonthDateRange[], dateType: number): number {
     for (let i = 0; i < allRecentMonthDateRanges.length; i++) {
         if (!allRecentMonthDateRanges[i].isPreset && allRecentMonthDateRanges[i].dateType === dateType) {
             return i;
@@ -771,15 +771,15 @@ export function getRecentDateRangeTypeByDateType(allRecentMonthDateRanges: Local
     return -1;
 }
 
-export function getRecentDateRangeType(allRecentMonthDateRanges: LocalizedRecentMonthDateRange[], dateType: number, minTime: number, maxTime: number, firstDayOfWeek: number): number {
+export function getRecentDateRangeIndex(allRecentMonthDateRanges: LocalizedRecentMonthDateRange[], dateType: number, minTime: number, maxTime: number, firstDayOfWeek: number): number {
     let dateRange = getDateRangeByDateType(dateType, firstDayOfWeek);
 
     if (dateRange && dateRange.dateType === DateRange.All.type) {
-        return getRecentDateRangeTypeByDateType(allRecentMonthDateRanges, DateRange.All.type);
+        return getRecentDateRangeIndexByDateType(allRecentMonthDateRanges, DateRange.All.type);
     }
 
     if (!dateRange && (!maxTime || !minTime)) {
-        return getRecentDateRangeTypeByDateType(allRecentMonthDateRanges, DateRange.Custom.type);
+        return getRecentDateRangeIndexByDateType(allRecentMonthDateRanges, DateRange.Custom.type);
     }
 
     if (!dateRange) {
@@ -798,7 +798,7 @@ export function getRecentDateRangeType(allRecentMonthDateRanges: LocalizedRecent
         }
     }
 
-    return getRecentDateRangeTypeByDateType(allRecentMonthDateRanges, DateRange.Custom.type);
+    return getRecentDateRangeIndexByDateType(allRecentMonthDateRanges, DateRange.Custom.type);
 }
 
 export function getFullMonthDateRange(minTime: number, maxTime: number, firstDayOfWeek: number): TimeRangeAndDateType | null {

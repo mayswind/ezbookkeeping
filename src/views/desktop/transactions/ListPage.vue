@@ -141,6 +141,7 @@
                                                          month-name-format="long"
                                                          class="justify-content-center"
                                                          :config="{ noSwipe: true }"
+                                                         :readonly="loading"
                                                          :disable-month-year-select="true"
                                                          :month-change-on-scroll="false"
                                                          :month-change-on-arrows="false"

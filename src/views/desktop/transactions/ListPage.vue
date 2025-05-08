@@ -139,7 +139,6 @@
                                     <v-card-text class="transaction-calendar-container pt-0" v-if="pageType === TransactionListPageType.Calendar.type">
                                         <vue-date-picker inline auto-apply model-type="yyyy-M-d"
                                                          month-name-format="long"
-                                                         class="justify-content-center"
                                                          :config="{ noSwipe: true }"
                                                          :readonly="loading"
                                                          :disable-month-year-select="true"
@@ -156,17 +155,11 @@
                                                          :week-start="firstDayOfWeek"
                                                          :day-names="dayNames"
                                                          v-model="currentCalendarDate">
-                                            <template #month="{ text }">
-                                                {{ getMonthShortName(text) }}
-                                            </template>
-                                            <template #month-overlay-value="{ text }">
-                                                {{ getMonthShortName(text) }}
-                                            </template>
                                             <template #day="{ day }">
-                                                <div class="block">
-                                                    <div :class="{ 'font-weight-bold': currentMonthTransactionData && currentMonthTransactionData.dailyTotalAmounts[day] }">{{ day }}</div>
-                                                    <div class="text-income" v-if="currentMonthTransactionData && currentMonthTransactionData.dailyTotalAmounts[day] && currentMonthTransactionData.dailyTotalAmounts[day].income">{{ getDisplayMonthTotalAmount(currentMonthTransactionData.dailyTotalAmounts[day].income, defaultCurrency, '', currentMonthTransactionData.dailyTotalAmounts[day].incompleteIncome) }}</div>
-                                                    <div class="text-expense" v-if="currentMonthTransactionData && currentMonthTransactionData.dailyTotalAmounts[day] && currentMonthTransactionData.dailyTotalAmounts[day].expense">{{ getDisplayMonthTotalAmount(currentMonthTransactionData.dailyTotalAmounts[day].expense, defaultCurrency, '', currentMonthTransactionData.dailyTotalAmounts[day].incompleteExpense) }}</div>
+                                                <div class="transaction-calendar-daily-amounts d-flex flex-column align-center justify-center w-100">
+                                                    <span :class="{ 'font-weight-bold': currentMonthTransactionData && currentMonthTransactionData.dailyTotalAmounts[day] }">{{ day }}</span>
+                                                    <span class="text-income" v-if="currentMonthTransactionData && currentMonthTransactionData.dailyTotalAmounts[day] && currentMonthTransactionData.dailyTotalAmounts[day].income">{{ getDisplayMonthTotalAmount(currentMonthTransactionData.dailyTotalAmounts[day].income, defaultCurrency, '', currentMonthTransactionData.dailyTotalAmounts[day].incompleteIncome) }}</span>
+                                                    <span class="text-expense" v-if="currentMonthTransactionData && currentMonthTransactionData.dailyTotalAmounts[day] && currentMonthTransactionData.dailyTotalAmounts[day].expense">{{ getDisplayMonthTotalAmount(currentMonthTransactionData.dailyTotalAmounts[day].expense, defaultCurrency, '', currentMonthTransactionData.dailyTotalAmounts[day].incompleteExpense) }}</span>
                                                 </div>
                                             </template>
                                         </vue-date-picker>
@@ -1778,9 +1771,30 @@ init(props);
     font-weight: bold;
 }
 
-.transaction-calendar-container .dp__calendar .dp__calendar_row {
+.transaction-calendar-container .dp__main .dp__menu {
+    --dp-border-radius: 6px;
+    --dp-menu-border-color: rgba(var(--v-border-color), var(--v-border-opacity));
+}
+
+.transaction-calendar-container .dp__main .dp__calendar {
+    --dp-border-color: rgba(var(--v-border-color), var(--v-border-opacity));
+}
+
+.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row {
     --dp-cell-size: 80px;
     --dp-primary-color: rgba(var(--v-theme-primary), var(--v-activated-opacity));
     --dp-primary-text-color: rgb(var(--v-theme-primary));
+}
+
+.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item {
+    overflow: hidden;
+}
+
+.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > span {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>

@@ -146,8 +146,8 @@
                                                          :month-change-on-arrows="false"
                                                          :enable-time-picker="false"
                                                          :hide-offset-dates="true"
-                                                         :min-date="getShortDate(parseDateFromUnixTime(query.minTime))"
-                                                         :max-date="getShortDate(parseDateFromUnixTime(query.maxTime))"
+                                                         :min-date="transactionCalendarMinDate"
+                                                         :max-date="transactionCalendarMaxDate"
                                                          :disabled-dates="noTransactionInMonthDay"
                                                          :prevent-min-max-navigation="true"
                                                          :clearable="false"
@@ -648,7 +648,7 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
-import { type TransactionMonthList, useTransactionsStore } from '@/stores/transaction.ts';
+import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
@@ -676,10 +676,8 @@ import {
 import {
     getCurrentUnixTime,
     parseDateFromUnixTime,
-    getShortDate,
     getYear,
     getMonth,
-    getDay,
     getSpecifiedDayFirstUnixTime,
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
@@ -691,8 +689,7 @@ import {
     getDateRangeByBillingCycleDateType,
     getRecentDateRangeIndex,
     getFullMonthDateRange,
-    getMonthFirstDayOrCurrentDayShortDate,
-    isDateRangeMatchOneMonth
+    getMonthFirstDayOrCurrentDayShortDate
 } from '@/lib/datetime.ts';
 import {
     categoryTypeToTransactionType,
@@ -763,7 +760,6 @@ const {
     getAllLongWeekdayNames,
     getAllRecentMonthDateRanges,
     getAllTransactionTagFilterTypes,
-    getMonthShortName,
     getWeekdayLongName
 } = useI18n();
 
@@ -790,6 +786,7 @@ const {
     query,
     queryMinTime,
     queryMaxTime,
+    queryMonthlyData,
     queryAllFilterCategoryIds,
     queryAllFilterAccountIds,
     queryAllFilterTagIds,
@@ -800,6 +797,10 @@ const {
     queryCategoryName,
     queryTagName,
     queryAmount,
+    transactionCalendarMinDate,
+    transactionCalendarMaxDate,
+    currentMonthTransactionData,
+    noTransactionInMonthDay,
     canAddTransaction,
     getDisplayTime,
     getDisplayLongDate,
@@ -930,26 +931,6 @@ const transactions = computed<Transaction[]>(() => {
     }
 });
 
-const currentMonthTransactionData = computed<TransactionMonthList | null>(() => {
-    const allTransactions = transactionsStore.transactions;
-
-    if (!allTransactions || !allTransactions.length) {
-        return null;
-    }
-
-    const currentMonthMinDate = parseDateFromUnixTime(query.value.minTime);
-    const currentYear = getYear(currentMonthMinDate);
-    const currentMonth = getMonth(currentMonthMinDate);
-
-    for (let i = 0; i < allTransactions.length; i++) {
-        if (allTransactions[i].year === currentYear && allTransactions[i].month === currentMonth) {
-            return allTransactions[i];
-        }
-    }
-
-    return null;
-});
-
 const recentDateRangeIndex = computed<number>({
     get: () => getRecentDateRangeIndex(recentMonthDateRanges.value, query.value.dateType, query.value.minTime, query.value.maxTime, firstDayOfWeek.value),
     set: (value) => {
@@ -1000,8 +981,6 @@ const queryAllSelectedFilterTagIds = computed<string>(() => {
         return 'multiple';
     }
 });
-
-const queryMonthlyData = computed<boolean>(() => isDateRangeMatchOneMonth(query.value.minTime, query.value.maxTime));
 
 const countPerPage = computed<number>({
     get: () => {
@@ -1065,10 +1044,6 @@ const currentMonthTotalAmount = computed<TransactionListDisplayTotalAmount | nul
         return null;
     }
 });
-
-function noTransactionInMonthDay(date: Date): boolean {
-    return !currentMonthTransactionData.value || !currentMonthTransactionData.value.dailyTotalAmounts || !currentMonthTransactionData.value.dailyTotalAmounts[getDay(date)];
-}
 
 function getCategoryListItemCheckedClass(category: TransactionCategory, queryCategoryIds: Record<string, boolean>): Record<string, boolean> {
     if (queryCategoryIds && queryCategoryIds[category.id]) {
@@ -1150,6 +1125,7 @@ function init(initProps: TransactionListProps): void {
                     });
 
                     if (changed) {
+                        currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(query.value.minTime);
                         updateUrlWhenChanged(changed);
                         return;
                     }
@@ -1243,6 +1219,7 @@ function changePageType(type: number): void {
                 maxTime: dateRange.maxTime,
                 minTime: dateRange.minTime
             });
+            currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(query.value.minTime);
         }
     }
 
@@ -1281,6 +1258,7 @@ function changeDateFilter(dateRange: TimeRangeAndDateType | number | null): void
 
         if (fullMonthDateRange) {
             dateRange = fullMonthDateRange;
+            currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(dateRange.minTime);
         }
     }
 
@@ -1316,6 +1294,7 @@ function changeCustomDateFilter(minTime: number, maxTime: number): void {
             minTime = dateRange.minTime;
             maxTime = dateRange.maxTime;
             dateType = dateRange.dateType;
+            currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(minTime);
         }
     }
 
@@ -1355,6 +1334,7 @@ function shiftDateRange(startTime: number, endTime: number, scale: number): void
 
         if (fullMonthDateRange) {
             newDateRange = fullMonthDateRange;
+            currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(newDateRange.minTime);
         }
     }
 

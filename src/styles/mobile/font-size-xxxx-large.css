@@ -75,6 +75,8 @@
     --ebk-transaction-date-width: 40px;
     --ebk-transaction-day-font-size: 24px;
     --ebk-transaction-day-of-week-font-size: 19px;
+    --ebk-transaction-calendar-amount-font-size: 19px;
+    --ebk-transaction-calendar-daily-amounts-height: 85px;
     --ebk-transaction-account-arrow-font-size: 19px;
     --ebk-transaction-account-arrow-margin-top: -4px;
     --ebk-transaction-tag-icon-font-size: 32px;

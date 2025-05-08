@@ -48,6 +48,7 @@ input[type=number] {
 /** Custom class **/
 :root {
     --default-icon-color: #000;
+    --ebk-primary-color: 198, 126, 72;
     --v-expand-panel-title-bg: rgba(var(--v-theme-on-surface), var(--v-hover-opacity));
     --v-card-title-bg: rgba(var(--v-theme-on-surface), var(--v-hover-opacity));
 }

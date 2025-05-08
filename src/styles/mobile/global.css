@@ -108,6 +108,7 @@ i.icon.la, i.icon.las, i.icon.lab {
 /** custom class **/
 :root {
     --default-icon-color: #000;
+    --ebk-primary-color: 198, 126, 72;
     --ebk-transaction-tag-chip-bg-color: rgba(0, 0, 0, 0.04);
 }
 
@@ -533,6 +534,10 @@ i.icon.la, i.icon.las, i.icon.lab {
 
 .combination-list-wrapper .list.combination-list-content.inset > ul {
     border-radius: 0 0 var(--f7-list-inset-border-radius) var(--f7-list-inset-border-radius);
+}
+
+.combination-list-wrapper.no-accordion-toggle .list.combination-list-content.inset > ul {
+    border-radius: var(--f7-list-inset-border-radius);
 }
 
 /** Nested List item for framework7 **/

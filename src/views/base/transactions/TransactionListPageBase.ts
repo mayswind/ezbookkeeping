@@ -335,7 +335,7 @@ export function useTransactionListPageBase() {
         return '';
     }
 
-    function getDisplayMonthTotalAmount(amount: number, currency: string, symbol: string, incomplete: boolean): string {
+    function getDisplayMonthTotalAmount(amount: number, currency: string | false, symbol: string, incomplete: boolean): string {
         const displayAmount = formatAmountWithCurrency(amount, currency);
         return symbol + displayAmount + (incomplete ? '+' : '');
     }

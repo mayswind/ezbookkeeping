@@ -175,6 +175,10 @@ export function getCurrentYear(): number {
     return moment().year();
 }
 
+export function getCurrentYearAndMonth(): string {
+    return getYearAndMonth(moment());
+}
+
 export function getCurrentDay(): number {
     return moment().date();
 }

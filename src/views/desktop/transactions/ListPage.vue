@@ -603,6 +603,13 @@
                                  v-model:show="showCustomDateRangeDialog"
                                  @dateRange:change="changeCustomDateFilter"
                                  @error="onShowDateRangeError" />
+
+    <month-selection-dialog :title="tt('Custom Date Range')"
+                            :model-value="queryMonth"
+                            v-model:show="showCustomMonthDialog"
+                            @update:modelValue="changeCustomMonthDateFilter"
+                            @error="onShowDateRangeError" />
+
     <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
     <import-dialog ref="importDialog" :persistent="true" />
 
@@ -678,9 +685,11 @@ import {
     parseDateFromUnixTime,
     getYear,
     getMonth,
-    getSpecifiedDayFirstUnixTime,
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
+    getSpecifiedDayFirstUnixTime,
+    getYearMonthFirstUnixTime,
+    getYearMonthLastUnixTime,
     getShiftedDateRangeAndDateType,
     getShiftedDateRangeAndDateTypeForBillingCycle,
     getDateTypeByDateRange,
@@ -787,6 +796,7 @@ const {
     queryMinTime,
     queryMaxTime,
     queryMonthlyData,
+    queryMonth,
     queryAllFilterCategoryIds,
     queryAllFilterAccountIds,
     queryAllFilterTagIds,
@@ -851,6 +861,7 @@ const amountMenuState = ref<boolean>(false);
 const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
 const showNav = ref<boolean>(display.mdAndUp.value);
 const showCustomDateRangeDialog = ref<boolean>(false);
+const showCustomMonthDialog = ref<boolean>(false);
 const showFilterAccountDialog = ref<boolean>(false);
 const showFilterCategoryDialog = ref<boolean>(false);
 const showFilterTagDialog = ref<boolean>(false);
@@ -1236,7 +1247,12 @@ function changeDateFilter(dateRange: TimeRangeAndDateType | number | null): void
             customMinDatetime.value = query.value.minTime;
         }
 
-        showCustomDateRangeDialog.value = true;
+        if (pageType.value === TransactionListPageType.Calendar.type) {
+            showCustomMonthDialog.value = true;
+        } else {
+            showCustomDateRangeDialog.value = true;
+        }
+
         return;
     }
 
@@ -1310,6 +1326,34 @@ function changeCustomDateFilter(minTime: number, maxTime: number): void {
     });
 
     showCustomDateRangeDialog.value = false;
+    updateUrlWhenChanged(changed);
+}
+
+function changeCustomMonthDateFilter(yearMonth: string): void {
+    if (!yearMonth) {
+        return;
+    }
+
+    const minTime = getYearMonthFirstUnixTime(yearMonth);
+    const maxTime = getYearMonthLastUnixTime(yearMonth);
+    const dateType = getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek.value, DateRangeScene.Normal);
+
+    if (pageType.value === TransactionListPageType.Calendar.type) {
+        currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(minTime);
+    }
+
+    if (query.value.dateType === dateType && query.value.maxTime === maxTime && query.value.minTime === minTime) {
+        showCustomMonthDialog.value = false;
+        return;
+    }
+
+    const changed = transactionsStore.updateTransactionListFilter({
+        dateType: dateType,
+        maxTime: maxTime,
+        minTime: minTime
+    });
+
+    showCustomMonthDialog.value = false;
     updateUrlWhenChanged(changed);
 }
 

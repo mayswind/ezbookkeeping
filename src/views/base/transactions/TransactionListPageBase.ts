@@ -27,12 +27,14 @@ import {
     getLocalDatetimeFromUnixTime,
     getActualUnixTimeForStore,
     getDummyUnixTimeForLocalUsage,
+    getCurrentYearAndMonth,
     parseDateFromUnixTime,
-    getUnixTime,
+    getYearAndMonth,
     getYear,
     getMonth,
-    getDay,
     getYearMonthFirstUnixTime,
+    getDay,
+    getUnixTime,
     isDateRangeMatchOneMonth
 } from '@/lib/datetime.ts';
 
@@ -171,6 +173,14 @@ export function useTransactionListPageBase() {
     const queryMinTime = computed<string>(() => formatUnixTimeToLongDateTime(query.value.minTime));
     const queryMaxTime = computed<string>(() => formatUnixTimeToLongDateTime(query.value.maxTime));
     const queryMonthlyData = computed<boolean>(() => isDateRangeMatchOneMonth(query.value.minTime, query.value.maxTime));
+    const queryMonth = computed<string>(() => {
+        if (!query.value.minTime || !query.value.maxTime) {
+            return getCurrentYearAndMonth();
+        }
+
+        return getYearAndMonth(parseDateFromUnixTime(query.value.minTime));
+    });
+
     const queryAllFilterCategoryIds = computed<Record<string, boolean>>(() => transactionsStore.allFilterCategoryIds);
     const queryAllFilterAccountIds = computed<Record<string, boolean>>(() => transactionsStore.allFilterAccountIds);
     const queryAllFilterTagIds = computed<Record<string, boolean>>(() => transactionsStore.allFilterTagIds);
@@ -373,6 +383,7 @@ export function useTransactionListPageBase() {
         queryMinTime,
         queryMaxTime,
         queryMonthlyData,
+        queryMonth,
         queryAllFilterCategoryIds,
         queryAllFilterAccountIds,
         queryAllFilterTagIds,

@@ -342,6 +342,12 @@
                                     @dateRange:change="changeCustomDateFilter">
         </date-range-selection-sheet>
 
+        <month-selection-sheet :title="tt('Custom Date Range')"
+                               :model-value="queryMonth"
+                               v-model:show="showCustomMonthSheet"
+                               @update:modelValue="changeCustomMonthDateFilter">
+        </month-selection-sheet>
+
         <f7-popover class="category-popover-menu"
                     v-model:opened="showCategoryPopover"
                     @popover:open="onPopoverOpen">
@@ -603,9 +609,13 @@ import {
 import {
     getCurrentUnixTime,
     parseDateFromUnixTime,
-    getSpecifiedDayFirstUnixTime,
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
+    getYear,
+    getMonth,
+    getSpecifiedDayFirstUnixTime,
+    getYearMonthFirstUnixTime,
+    getYearMonthLastUnixTime,
     getShiftedDateRangeAndDateType,
     getShiftedDateRangeAndDateTypeForBillingCycle,
     getDateTypeByDateRange,
@@ -613,7 +623,7 @@ import {
     getDateRangeByDateType,
     getDateRangeByBillingCycleDateType,
     getFullMonthDateRange,
-    getMonthFirstDayOrCurrentDayShortDate, getYear, getMonth
+    getMonthFirstDayOrCurrentDayShortDate
 } from '@/lib/datetime.ts';
 import {
     categoryTypeToTransactionType,
@@ -660,6 +670,7 @@ const {
     queryMinTime,
     queryMaxTime,
     queryMonthlyData,
+    queryMonth,
     queryAllFilterCategoryIds,
     queryAllFilterAccountIds,
     queryAllFilterTagIds,
@@ -700,6 +711,7 @@ const showCategoryPopover = ref<boolean>(false);
 const showAccountPopover = ref<boolean>(false);
 const showMorePopover = ref<boolean>(false);
 const showCustomDateRangeSheet = ref<boolean>(false);
+const showCustomMonthSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
 
 const allTransactionTagFilterTypes = computed<TypeAndDisplayName[]>(() => getAllTransactionTagFilterTypes());
@@ -941,7 +953,12 @@ function changeDateFilter(dateType: number): void {
             customMinDatetime.value = query.value.minTime;
         }
 
-        showCustomDateRangeSheet.value = true;
+        if (pageType.value === TransactionListPageType.Calendar.type) {
+            showCustomMonthSheet.value = true;
+        } else {
+            showCustomDateRangeSheet.value = true;
+        }
+
         showDatePopover.value = false;
         return;
     } else if (query.value.dateType === dateType) {
@@ -1013,6 +1030,32 @@ function changeCustomDateFilter(minTime: number, maxTime: number): void {
     });
 
     showCustomDateRangeSheet.value = false;
+
+    if (changed) {
+        reload();
+    }
+}
+
+function changeCustomMonthDateFilter(yearMonth: string): void {
+    if (!yearMonth) {
+        return;
+    }
+
+    const minTime = getYearMonthFirstUnixTime(yearMonth);
+    const maxTime = getYearMonthLastUnixTime(yearMonth);
+    const dateType = getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek.value, DateRangeScene.Normal);
+
+    if (pageType.value === TransactionListPageType.Calendar.type) {
+        currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(minTime);
+    }
+
+    const changed = transactionsStore.updateTransactionListFilter({
+        dateType: dateType,
+        maxTime: maxTime,
+        minTime: minTime
+    });
+
+    showCustomMonthSheet.value = false;
 
     if (changed) {
         reload();

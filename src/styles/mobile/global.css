@@ -124,6 +124,10 @@ i.icon.la, i.icon.las, i.icon.lab {
     --ebk-pin-code-input-height: 46px;
 }
 
+.page-title-bar-icon {
+    font-size: var(--ebk-page-title-bar-icon-font-size);
+}
+
 .ebk-small-amount {
     --f7-list-item-title-font-size: var(--ebk-amount-small-font-size) !important;
 }

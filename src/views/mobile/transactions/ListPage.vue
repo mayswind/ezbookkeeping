@@ -12,7 +12,7 @@
             <f7-nav-title>
                 <f7-link popover-open=".chart-data-type-popover-menu">
                     <span style="color: var(--f7-text-color)">{{ displayPageTypeName }}</span>
-                    <f7-icon size="16px" color="gray" style="opacity: 0.5" f7="chevron_down_circle_fill"></f7-icon>
+                    <f7-icon class="page-title-bar-icon" color="gray" style="opacity: 0.5" f7="chevron_down_circle_fill"></f7-icon>
                 </f7-link>
             </f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">

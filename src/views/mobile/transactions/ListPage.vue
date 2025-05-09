@@ -1393,6 +1393,7 @@ init();
 
 .transaction-calendar-container .dp__main .dp__menu {
     --dp-border-radius: var(--f7-list-inset-border-radius);
+    --dp-menu-padding: 4px 6px;
     --dp-menu-border-color: transparent;
 }
 
@@ -1421,12 +1422,24 @@ init();
     border: inherit;
 }
 
+.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item > .dp__date_hover_end:hover,
+.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item > .dp__date_hover_start:hover,
+.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item > .dp__date_hover:hover {
+    background-color: transparent;
+}
+
 .transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item > .dp__active_date .transaction-calendar-daily-amounts {
     background-color: rgba(var(--ebk-primary-color), 0.16);
 }
 
 .transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item > .dp__today .transaction-calendar-daily-amounts {
     border: 1px solid var(--dp-primary-color);
+}
+
+.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item > .dp__date_hover_end:hover .transaction-calendar-daily-amounts,
+.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item > .dp__date_hover_start:hover .transaction-calendar-daily-amounts,
+.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item > .dp__date_hover:hover .transaction-calendar-daily-amounts {
+    background: var(--dp-hover-color);
 }
 
 .transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item {

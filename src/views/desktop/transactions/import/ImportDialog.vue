@@ -261,7 +261,8 @@
                         <v-col cols="12" md="12" class="mb-0 pb-0" v-if="exportFileGuideDocumentUrl">
                             <a :href="exportFileGuideDocumentUrl" :class="{ 'disabled': submitting }" target="_blank">
                                 <v-icon :icon="mdiHelpCircleOutline" size="16" />
-                                <span class="ml-1">{{ tt('How to export this file?') }}</span>
+                                <span class="ml-1" v-if="fileType === 'dsv' || fileType === 'dsv_data'">{{ tt('How to import this file?') }}</span>
+                                <span class="ml-1" v-if="fileType !== 'dsv' && fileType !== 'dsv_data'">{{ tt('How to export this file?') }}</span>
                                 <span class="ml-1" v-if="exportFileGuideDocumentLanguageName">[{{ exportFileGuideDocumentLanguageName }}]</span>
                             </a>
                         </v-col>

@@ -1358,9 +1358,9 @@ function changeCustomMonthDateFilter(yearMonth: string): void {
 }
 
 function shiftDateRange(startTime: number, endTime: number, scale: number): void {
-    if (pageType.value === TransactionListPageType.List.type && recentDateRangeIndex.value === 0) { // first item is "All"
+    if (recentMonthDateRanges.value[recentDateRangeIndex.value].dateType === DateRange.All.type) {
         return;
-    } // transaction calendar mode not display "All" item
+    }
 
     let newDateRange: TimeRangeAndDateType | null = null;
 

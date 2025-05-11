@@ -1747,6 +1747,7 @@
     "Are you sure you want to remove this transaction picture?": "您確定要移除這張交易圖片？",
     "Unable to upload transaction picture": "無法上傳交易圖片",
     "Unable to remove transaction picture": "無法移除交易圖片",
+    "Failed to load image, please check whether the config \"domain\" and \"root_url\" are set correctly.": "無法載入圖片，請檢查設定 \"domain\" 和 \"root_url\" 是否設定正確。",
     "Search transaction description": "搜尋交易描述",
     "Unable to retrieve transaction list": "無法取得交易清單",
     "Custom Date Range": "自訂日期範圍",

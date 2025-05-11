@@ -1747,6 +1747,7 @@
     "Are you sure you want to remove this transaction picture?": "この取引画像を削除しますか？",
     "Unable to upload transaction picture": "取引画像をアップロードできません",
     "Unable to remove transaction picture": "取引画像を削除できません",
+    "Failed to load image, please check whether the config \"domain\" and \"root_url\" are set correctly.": "Failed to load image, please check whether the config \"domain\" and \"root_url\" are set correctly.",
     "Search transaction description": "取引の説明を検索",
     "Unable to retrieve transaction list": "取引リストを取得できません",
     "Custom Date Range": "カスタム日付範囲",

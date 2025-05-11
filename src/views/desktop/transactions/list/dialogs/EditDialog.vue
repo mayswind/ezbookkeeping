@@ -387,6 +387,11 @@
                                                 <v-progress-circular color="grey-500" indeterminate size="48"></v-progress-circular>
                                             </div>
                                         </template>
+                                        <template #error>
+                                            <div class="d-flex align-center justify-center fill-height bg-light-primary">
+                                                <span class="text-body-1">{{ tt('Failed to load image, please check whether the config "domain" and "root_url" are set correctly.') }}</span>
+                                            </div>
+                                        </template>
                                     </v-img>
                                     <div class="picture-control-icon" :class="{ 'show-control-icon': pictureInfo.pictureId === removingPictureId }">
                                         <v-icon size="64" :icon="mdiTrashCanOutline" v-if="(mode === TransactionEditPageMode.Add || mode === TransactionEditPageMode.Edit) && pictureInfo.pictureId !== removingPictureId"/>

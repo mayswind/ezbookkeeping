@@ -1747,6 +1747,7 @@
     "Are you sure you want to remove this transaction picture?": "Are you sure you want to remove this transaction picture?",
     "Unable to upload transaction picture": "Unable to upload transaction picture",
     "Unable to remove transaction picture": "Unable to remove transaction picture",
+    "Failed to load image, please check whether the config \"domain\" and \"root_url\" are set correctly.": "Failed to load image, please check whether the config \"domain\" and \"root_url\" are set correctly.",
     "Search transaction description": "Search transaction description",
     "Unable to retrieve transaction list": "Unable to retrieve transaction list",
     "Custom Date Range": "Custom Date Range",

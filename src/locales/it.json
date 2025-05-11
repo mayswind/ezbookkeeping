@@ -1747,6 +1747,7 @@
     "Are you sure you want to remove this transaction picture?": "Sei sicuro di voler rimuovere questa immagine della transazione?",
     "Unable to upload transaction picture": "Impossibile caricare l'immagine della transazione",
     "Unable to remove transaction picture": "Impossibile rimuovere l'immagine della transazione",
+    "Failed to load image, please check whether the config \"domain\" and \"root_url\" are set correctly.": "Failed to load image, please check whether the config \"domain\" and \"root_url\" are set correctly.",
     "Search transaction description": "Cerca descrizione transazione",
     "Unable to retrieve transaction list": "Impossibile recuperare l'elenco delle transazioni",
     "Custom Date Range": "Intervallo date personalizzato",

@@ -1747,6 +1747,7 @@
     "Are you sure you want to remove this transaction picture?": "Вы уверены, что хотите удалить это изображение транзакции?",
     "Unable to upload transaction picture": "Не удалось загрузить изображение транзакции",
     "Unable to remove transaction picture": "Не удалось удалить изображение транзакции",
+    "Failed to load image, please check whether the config \"domain\" and \"root_url\" are set correctly.": "Failed to load image, please check whether the config \"domain\" and \"root_url\" are set correctly.",
     "Search transaction description": "Поиск описания транзакции",
     "Unable to retrieve transaction list": "Не удалось получить список транзакций",
     "Custom Date Range": "Пользовательский диапазон дат",

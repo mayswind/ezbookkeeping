@@ -1747,6 +1747,7 @@
     "Are you sure you want to remove this transaction picture?": "Bạn có chắc chắn muốn xóa ảnh giao dịch này không?",
     "Unable to upload transaction picture": "Không thể tải lên ảnh giao dịch",
     "Unable to remove transaction picture": "Không thể xóa ảnh giao dịch",
+    "Failed to load image, please check whether the config \"domain\" and \"root_url\" are set correctly.": "Failed to load image, please check whether the config \"domain\" and \"root_url\" are set correctly.",
     "Search transaction description": "Tìm kiếm mô tả giao dịch",
     "Unable to retrieve transaction list": "Không thể lấy danh sách giao dịch",
     "Custom Date Range": "Phạm vi ngày tùy chỉnh",

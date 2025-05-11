@@ -1747,6 +1747,7 @@
     "Are you sure you want to remove this transaction picture?": "Ви впевнені, що хочете видалити це зображення транзакції?",
     "Unable to upload transaction picture": "Не вдалося завантажити зображення транзакції",
     "Unable to remove transaction picture": "Не вдалося видалити зображення транзакції",
+    "Failed to load image, please check whether the config \"domain\" and \"root_url\" are set correctly.": "Failed to load image, please check whether the config \"domain\" and \"root_url\" are set correctly.",
     "Search transaction description": "Пошук за описом транзакції",
     "Unable to retrieve transaction list": "Не вдалося отримати список транзакцій",
     "Custom Date Range": "Користувацький діапазон дат",

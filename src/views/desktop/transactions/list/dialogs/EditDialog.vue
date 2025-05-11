@@ -104,7 +104,7 @@
                                                   :disabled="loading || submitting"
                                                   :persistent-placeholder="true"
                                                   :hide="transaction.hideAmount"
-                                                  :label="tt(sourceAmountName)"
+                                                  :label="sourceAmountTitle"
                                                   :placeholder="tt(sourceAmountName)"
                                                   :enable-formula="mode !== TransactionEditPageMode.View"
                                                   v-model="transaction.sourceAmount"/>
@@ -583,6 +583,7 @@ const {
     saveButtonTitle,
     cancelButtonTitle,
     sourceAmountName,
+    sourceAmountTitle,
     sourceAccountTitle,
     transferInAmountTitle,
     sourceAccountName,

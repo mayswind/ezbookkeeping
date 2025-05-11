@@ -27,6 +27,10 @@ import {
 } from '@/lib/common.ts';
 
 import {
+    getExchangedAmountByRate
+} from '@/lib/numeral.ts';
+
+import {
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffsetMinutes,
     getCurrentUnixTime
@@ -163,6 +167,33 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         } else {
             return 'Amount';
         }
+    });
+
+    const sourceAmountTitle = computed<string>(() => {
+        const sourceAccount = allAccountsMap.value[transaction.value.sourceAccountId];
+        const amountName = tt(sourceAmountName.value);
+
+        if (!sourceAccount || sourceAccount.currency === defaultCurrency.value || !transaction.value.sourceAmount || transaction.value.hideAmount) {
+            return amountName;
+        }
+
+        const fromExchangeRate = exchangeRatesStore.latestExchangeRateMap[sourceAccount.currency];
+        const toExchangeRate = exchangeRatesStore.latestExchangeRateMap[defaultCurrency.value];
+
+        if (!fromExchangeRate || !fromExchangeRate.rate || !toExchangeRate || !toExchangeRate.rate) {
+            return amountName;
+        }
+
+        let amountInDefaultCurrency = getExchangedAmountByRate(transaction.value.sourceAmount, fromExchangeRate.rate, toExchangeRate.rate);
+
+        if (!amountInDefaultCurrency) {
+            return amountName;
+        }
+
+        amountInDefaultCurrency = Math.floor(amountInDefaultCurrency);
+
+        const displayAmountInDefaultCurrency = getDisplayAmount(amountInDefaultCurrency, transaction.value.hideAmount, defaultCurrency.value);
+        return amountName + ` (${displayAmountInDefaultCurrency})`;
     });
 
     const sourceAccountTitle = computed<string>(() => {
@@ -404,6 +435,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         saveButtonTitle,
         cancelButtonTitle,
         sourceAmountName,
+        sourceAmountTitle,
         sourceAccountTitle,
         transferInAmountTitle,
         sourceAccountName,

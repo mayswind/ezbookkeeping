@@ -64,7 +64,7 @@
                 class="transaction-edit-amount"
                 link="#" no-chevron
                 :class="sourceAmountClass"
-                :header="tt(sourceAmountName)"
+                :header="sourceAmountTitle"
                 :title="getDisplayAmount(transaction.sourceAmount, transaction.hideAmount, sourceAccountCurrency)"
                 @click="showSourceAmountSheet = true"
             >
@@ -570,7 +570,7 @@ const {
     canAddTransactionPicture,
     title,
     saveButtonTitle,
-    sourceAmountName,
+    sourceAmountTitle,
     sourceAccountTitle,
     transferInAmountTitle,
     sourceAccountName,

@@ -158,6 +158,7 @@ export class ChartDateAggregationType implements TypeAndName {
     public static readonly Month = new ChartDateAggregationType(0, 'Aggregate by Month');
     public static readonly Quarter = new ChartDateAggregationType(1, 'Aggregate by Quarter');
     public static readonly Year = new ChartDateAggregationType(2, 'Aggregate by Year');
+    public static readonly FiscalYear = new ChartDateAggregationType(3, 'Aggregate by Fiscal Year');
 
     public static readonly Default = ChartDateAggregationType.Month;
 

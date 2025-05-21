@@ -178,7 +178,7 @@
             <f7-accordion-item :opened="transactionMonthList.opened"
                                @accordion:open="collapseTransactionMonthList(transactionMonthList, false)"
                                @accordion:close="collapseTransactionMonthList(transactionMonthList, true)">
-                <f7-block-title v-if="pageType === TransactionListPageType.List.type">
+                <f7-block-title :id="getTransactionMonthTitleDomId(transactionMonthList.yearMonth)" v-if="pageType === TransactionListPageType.List.type">
                     <f7-accordion-toggle>
                         <f7-list strong inset dividers media-list
                                  class="transaction-amount-list combination-list-header"
@@ -202,8 +202,12 @@
                         </f7-list>
                     </f7-accordion-toggle>
                 </f7-block-title>
-                <f7-accordion-content :style="{ height: transactionMonthList.opened ? 'auto' : '' }">
-                    <f7-list strong inset dividers media-list accordion-list class="transaction-info-list combination-list-content">
+                <f7-accordion-content :style="{ height: getTransactionMonthListHeight(transactionMonthList) }">
+                    <f7-list strong inset dividers media-list accordion-list
+                             class="transaction-info-list transaction-month-list combination-list-content"
+                             :id="getTransactionMonthListDomId(transactionMonthList.yearMonth)"
+                             v-if="!isTransactionMonthListInvisible(transactionMonthList)"
+                    >
                         <f7-list-item swipeout chevron-center
                                       class="transaction-info"
                                       :id="getTransactionDomId(transaction)"
@@ -579,11 +583,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
 import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { type Framework7Dom, useI18nUIComponents, showLoading, hideLoading, onSwipeoutDeleted, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
+import {
+    type Framework7Dom,
+    useI18nUIComponents,
+    showLoading,
+    hideLoading,
+    onSwipeoutDeleted,
+    getElementActualHeights,
+    getElementBoundingRect,
+    scrollToSelectedItem,
+    onInfiniteScrolling
+} from '@/lib/ui/mobile.ts';
 import { TransactionListPageType, useTransactionListPageBase } from '@/views/base/transactions/TransactionListPageBase.ts';
 
 import { useEnvironmentsStore } from '@/stores/environment.ts';
@@ -604,6 +618,7 @@ import type { TransactionCategory } from '@/models/transaction_category.ts';
 import type { Transaction } from '@/models/transaction.ts';
 
 import {
+    isNumber,
     arrangeArrayWithNewStartIndex
 } from '@/lib/common.ts';
 import {
@@ -699,12 +714,11 @@ const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
 const transactionsStore = useTransactionsStore();
 
-const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
-const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllShortWeekdayNames(), firstDayOfWeek.value));
-
 const loadingError = ref<unknown | null>(null);
 const loadingMore = ref<boolean>(false);
 const transactionToDelete = ref<Transaction | null>(null);
+const transactionInvisibleYearMonths = ref<Record<string, boolean>>({});
+const transactionYearMonthListHeights = ref<Record<string, number>>({});
 const showTransactionListPageTypePopover = ref<boolean>(false);
 const showDatePopover = ref<boolean>(false);
 const showCategoryPopover = ref<boolean>(false);
@@ -713,6 +727,9 @@ const showMorePopover = ref<boolean>(false);
 const showCustomDateRangeSheet = ref<boolean>(false);
 const showCustomMonthSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
+
+const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
+const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllShortWeekdayNames(), firstDayOfWeek.value));
 
 const allTransactionTagFilterTypes = computed<TypeAndDisplayName[]>(() => getAllTransactionTagFilterTypes());
 
@@ -777,8 +794,97 @@ const noTransaction = computed<boolean>(() => {
 
 const hasMoreTransaction = computed<boolean>(() => transactionsStore.hasMoreTransaction);
 
+function getTransactionMonthTitleDomId(yearMonth: string): string {
+    return 'transaction_month_title_' + yearMonth;
+}
+
+function getTransactionMonthListDomId(yearMonth: string): string {
+    return 'transaction_month_list_' + yearMonth;
+}
+
 function getTransactionDomId(transaction: Transaction): string {
     return 'transaction_' + transaction.id;
+}
+
+function isTransactionMonthListInvisible(transactionMonthList: TransactionMonthList): boolean {
+    if (!transactionMonthList.opened) {
+        return true;
+    }
+
+    if (!transactionYearMonthListHeights.value[transactionMonthList.yearMonth]) {
+        return false;
+    }
+
+    if (transactionInvisibleYearMonths.value[transactionMonthList.yearMonth]) {
+        return true;
+    }
+
+    return false;
+}
+
+function getTransactionMonthListHeight(transactionMonthList: TransactionMonthList): string {
+    if (!transactionMonthList.opened) {
+        return '';
+    }
+
+    if (isTransactionMonthListInvisible(transactionMonthList)) {
+        return transactionYearMonthListHeights.value[transactionMonthList.yearMonth] + 'px';
+    }
+
+    return 'auto';
+}
+
+function setTransactionMonthListHeights(reset: boolean): Promise<unknown> {
+    return nextTick(() => {
+        if (reset) {
+            transactionInvisibleYearMonths.value = {};
+            transactionYearMonthListHeights.value = {};
+        }
+
+        if (transactions.value && transactions.value.length) {
+            const heights: Record<string, number> = getElementActualHeights('.transaction-month-list');
+
+            for (let i = 0; i < transactions.value.length - 1; i++) {
+                const transactionMonthList = transactions.value[i];
+                const yearMonth = transactionMonthList.yearMonth;
+                const domId = getTransactionMonthListDomId(yearMonth);
+                const height = heights[domId];
+
+                if (!transactionYearMonthListHeights.value[yearMonth] && isNumber(height)) {
+                    transactionYearMonthListHeights.value[yearMonth] = height;
+                }
+            }
+        }
+    });
+}
+
+function setTransactionInvisibleYearMonthList(): void {
+    if (!transactions.value || !transactions.value.length) {
+        return;
+    }
+
+    for (let i = 0; i < transactions.value.length - 1; i++) {
+        const transactionMonthList = transactions.value[i];
+        const yearMonth = transactionMonthList.yearMonth;
+
+        const titleDomId = getTransactionMonthTitleDomId(yearMonth);
+        const titleRect = getElementBoundingRect(`#${titleDomId}`);
+
+        if (!titleRect) {
+            continue;
+        }
+
+        const listHeight = transactionYearMonthListHeights.value[yearMonth] || 0;
+        const listRectTop = titleRect.top + titleRect.height;
+        const listRectBottom = listRectTop + listHeight;
+        const invisible = listRectTop > 2 * window.innerHeight || listRectBottom < -2 * window.innerHeight;
+
+        if (invisible) {
+            transactionInvisibleYearMonths.value[yearMonth] = true;
+        } else {
+            delete transactionInvisibleYearMonths.value[yearMonth];
+        }
+    }
 }
 
 function getTransactionDateStyle(transaction: Transaction, previousTransaction: Transaction | null): Record<string, string> {
@@ -847,6 +953,9 @@ function reload(done?: () => void): void {
         loading.value = true;
     }
 
+    transactionInvisibleYearMonths.value = {};
+    transactionYearMonthListHeights.value = {};
+
     Promise.all([
         accountsStore.loadAllAccounts({ force: false }),
         transactionCategoriesStore.loadAllCategories({ force: false }),
@@ -878,6 +987,7 @@ function reload(done?: () => void): void {
         }
 
         loading.value = false;
+        setTransactionMonthListHeights(true);
     }).catch(error => {
         if (error.processed || done) {
             loading.value = false;
@@ -912,6 +1022,7 @@ function loadMore(autoExpand: boolean): void {
         defaultCurrency: defaultCurrency.value
     }).then(() => {
         loadingMore.value = false;
+        setTransactionMonthListHeights(false);
     }).catch(error => {
         loadingMore.value = false;
 
@@ -1301,6 +1412,12 @@ function collapseTransactionMonthList(month: TransactionMonthList, collapse: boo
         month: month,
         collapse: collapse
     });
+
+    nextTick(() => {
+        return setTransactionMonthListHeights(false);
+    }).then(() => {
+        setTransactionInvisibleYearMonthList();
+    });
 }
 
 function onPopoverOpen(event: { $el: Framework7Dom }): void {
@@ -1314,6 +1431,26 @@ function onPageAfterIn(): void {
 
     routeBackOnError(props.f7router, loadingError);
 }
+
+function onResize(): void {
+    setTransactionMonthListHeights(true)
+        .then(() => {
+            setTransactionMonthListHeights(false);
+        });
+}
+
+function onScroll(): void {
+    setTransactionInvisibleYearMonthList();
+}
+
+onMounted(() => {
+    window.addEventListener('resize', onResize);
+    onInfiniteScrolling(onScroll);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('resize', onResize);
+});
 
 init();
 </script>

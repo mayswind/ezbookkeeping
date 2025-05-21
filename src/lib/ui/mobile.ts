@@ -100,6 +100,34 @@ export function getFontSizePreviewClassName(type: number): string {
     return FONT_SIZE_PREVIEW_CLASSNAME_PREFIX + FontSize.Default.className;
 }
 
+export function getElementActualHeights(selector: string): Record<string, number> {
+    const elements = f7.$(selector);
+    const heights: Record<string, number> = {};
+
+    if (!elements || !elements.length) {
+        return heights;
+    }
+
+    for (let i = 0; i < elements.length; i++) {
+        const el = elements[i];
+        const rect = el.getBoundingClientRect();
+        heights[el.id] = rect.height;
+    }
+
+    return heights;
+}
+
+export function getElementBoundingRect(selector: string): DOMRect | null {
+    const elements = f7.$(selector);
+
+    if (!elements || !elements.length) {
+        return null;
+    }
+
+    const el = elements[0];
+    return el.getBoundingClientRect();
+}
+
 export function scrollToSelectedItem(parentEl: Framework7Dom, containerSelector: string, selectedItemSelector: string): void {
     if (!parentEl || !parentEl.length) {
         return;
@@ -156,6 +184,14 @@ export function scrollSheetToTop(sheetElement: HTMLElement | undefined, windowNo
             }
         }, 300);
     }
+}
+
+export function onInfiniteScrolling(callback: (e: Event) => void): void {
+    f7.$('.infinite-scroll-content').on('scroll', (e: Event) => {
+        callback(e);
+    }, {
+        passive: true
+    });
 }
 
 export function useI18nUIComponents() {

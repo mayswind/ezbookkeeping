@@ -26,6 +26,7 @@ export function useUserProfilePageBase() {
         getAllShortDateFormats,
         getAllLongTimeFormats,
         getAllShortTimeFormats,
+        getAllFiscalYearFormats,
         getAllDecimalSeparators,
         getAllDigitGroupingSymbols,
         getAllDigitGroupingTypes,
@@ -59,6 +60,7 @@ export function useUserProfilePageBase() {
     const allShortDateFormats = computed<TypeAndDisplayName[]>(() => getAllShortDateFormats());
     const allLongTimeFormats = computed<TypeAndDisplayName[]>(() => getAllLongTimeFormats());
     const allShortTimeFormats = computed<TypeAndDisplayName[]>(() => getAllShortTimeFormats());
+    const allFiscalYearFormats = computed<TypeAndDisplayName[]>(() => getAllFiscalYearFormats());
     const allDecimalSeparators = computed<TypeAndDisplayName[]>(() => getAllDecimalSeparators());
     const allDigitGroupingSymbols = computed<TypeAndDisplayName[]>(() => getAllDigitGroupingSymbols());
     const allDigitGroupingTypes = computed<LocalizedDigitGroupingType[]>(() => getAllDigitGroupingTypes());
@@ -97,11 +99,14 @@ export function useUserProfilePageBase() {
             newProfile.value.transactionEditScope === oldProfile.value.transactionEditScope &&
             newProfile.value.language === oldProfile.value.language &&
             newProfile.value.defaultCurrency === oldProfile.value.defaultCurrency &&
+            newProfile.value.fiscalYearStart === oldProfile.value.fiscalYearStart &&
+            newProfile.value.fiscalYearFormat === oldProfile.value.fiscalYearFormat &&
             newProfile.value.firstDayOfWeek === oldProfile.value.firstDayOfWeek &&
             newProfile.value.longDateFormat === oldProfile.value.longDateFormat &&
             newProfile.value.shortDateFormat === oldProfile.value.shortDateFormat &&
             newProfile.value.longTimeFormat === oldProfile.value.longTimeFormat &&
             newProfile.value.shortTimeFormat === oldProfile.value.shortTimeFormat &&
+            newProfile.value.fiscalYearFormat === oldProfile.value.fiscalYearFormat &&
             newProfile.value.decimalSeparator === oldProfile.value.decimalSeparator &&
             newProfile.value.digitGroupingSymbol === oldProfile.value.digitGroupingSymbol &&
             newProfile.value.digitGrouping === oldProfile.value.digitGrouping &&
@@ -191,6 +196,7 @@ export function useUserProfilePageBase() {
         allShortDateFormats,
         allLongTimeFormats,
         allShortTimeFormats,
+        allFiscalYearFormats,
         allDecimalSeparators,
         allDigitGroupingSymbols,
         allDigitGroupingTypes,

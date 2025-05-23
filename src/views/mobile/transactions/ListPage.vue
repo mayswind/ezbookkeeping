@@ -667,6 +667,7 @@ const {
     currentCalendarDate,
     currentTimezoneOffsetMinutes,
     firstDayOfWeek,
+    fiscalYearStart,
     defaultCurrency,
     showTotalAmountInTransactionListPage,
     showTagInTransactionListPage,
@@ -920,7 +921,7 @@ function getCategoryListItemCheckedClass(category: TransactionCategory, queryCat
 function init(): void {
     const initQuery = props.f7route.query;
 
-    let dateRange: TimeRangeAndDateType | null = getDateRangeByDateType(initQuery['dateType'] ? parseInt(initQuery['dateType']) : undefined, firstDayOfWeek.value);
+    let dateRange: TimeRangeAndDateType | null = getDateRangeByDateType(initQuery['dateType'] ? parseInt(initQuery['dateType']) : undefined, firstDayOfWeek.value, fiscalYearStart.value);
 
     if (!dateRange && initQuery['dateType'] && initQuery['maxTime'] && initQuery['minTime'] &&
         (DateRange.isBillingCycle(parseInt(initQuery['dateType'])) || initQuery['dateType'] === DateRange.Custom.type.toString()) &&
@@ -1079,9 +1080,9 @@ function changeDateFilter(dateType: number): void {
     let dateRange: TimeRangeAndDateType | null = null;
 
     if (DateRange.isBillingCycle(dateType)) {
-        dateRange = getDateRangeByBillingCycleDateType(dateType, firstDayOfWeek.value, accountsStore.getAccountStatementDate(query.value.accountIds));
+        dateRange = getDateRangeByBillingCycleDateType(dateType, firstDayOfWeek.value, fiscalYearStart.value, accountsStore.getAccountStatementDate(query.value.accountIds));
     } else {
-        dateRange = getDateRangeByDateType(dateType, firstDayOfWeek.value);
+        dateRange = getDateRangeByDateType(dateType, firstDayOfWeek.value, fiscalYearStart.value);
     }
 
     if (!dateRange) {
@@ -1116,10 +1117,10 @@ function changeCustomDateFilter(minTime: number, maxTime: number): void {
         return;
     }
 
-    let dateType: number | null = getDateTypeByBillingCycleDateRange(minTime, maxTime, firstDayOfWeek.value, DateRangeScene.Normal, accountsStore.getAccountStatementDate(query.value.accountIds));
+    let dateType: number | null = getDateTypeByBillingCycleDateRange(minTime, maxTime, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.Normal, accountsStore.getAccountStatementDate(query.value.accountIds));
 
     if (!dateType) {
-        dateType = getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek.value, DateRangeScene.Normal);
+        dateType = getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.Normal);
     }
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
@@ -1181,11 +1182,11 @@ function shiftDateRange(minTime: number, maxTime: number, scale: number): void {
     let newDateRange: TimeRangeAndDateType | null = null;
 
     if (DateRange.isBillingCycle(query.value.dateType) || query.value.dateType === DateRange.Custom.type) {
-        newDateRange = getShiftedDateRangeAndDateTypeForBillingCycle(minTime, maxTime, scale, firstDayOfWeek.value, DateRangeScene.Normal, accountsStore.getAccountStatementDate(query.value.accountIds));
+        newDateRange = getShiftedDateRangeAndDateTypeForBillingCycle(minTime, maxTime, scale, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.Normal, accountsStore.getAccountStatementDate(query.value.accountIds));
     }
 
     if (!newDateRange) {
-        newDateRange = getShiftedDateRangeAndDateType(minTime, maxTime, scale, firstDayOfWeek.value, DateRangeScene.Normal);
+        newDateRange = getShiftedDateRangeAndDateType(minTime, maxTime, scale, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.Normal);
     }
 
     if (pageType.value === TransactionListPageType.Calendar.type) {

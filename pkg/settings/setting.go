@@ -349,7 +349,9 @@ type Config struct {
 func LoadConfiguration(configFilePath string) (*Config, error) {
 	var err error
 
-	cfgFile, err := ini.LoadSources(ini.LoadOptions{}, configFilePath)
+	cfgFile, err := ini.LoadSources(ini.LoadOptions{
+		IgnoreInlineComment: true,
+	}, configFilePath)
 
 	if err != nil {
 		return nil, err

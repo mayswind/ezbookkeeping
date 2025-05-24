@@ -1274,9 +1274,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
         return services.getTransactionPictureUrlWithToken(pictureInfo.originalUrl, disableBrowserCache);
     }
 
-    function collapseMonthInTransactionList({ month, collapse }: { month: TransactionMonthList, collapse: boolean }): void {
-        if (month) {
-            month.opened = !collapse;
+    function collapseMonthInTransactionList({ monthList, collapse }: { monthList: TransactionMonthList, collapse: boolean }): void {
+        if (monthList) {
+            monthList.opened = !collapse;
         }
     }
 

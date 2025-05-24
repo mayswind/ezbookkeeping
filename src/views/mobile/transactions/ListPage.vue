@@ -177,7 +177,9 @@
                   :key="transactionMonthList.yearMonth" v-for="(transactionMonthList) in transactions">
             <f7-accordion-item :opened="transactionMonthList.opened"
                                @accordion:open="collapseTransactionMonthList(transactionMonthList, false)"
-                               @accordion:close="collapseTransactionMonthList(transactionMonthList, true)">
+                               @accordion:opened="onTransactionMonthListCollapseStateChanged"
+                               @accordion:close="collapseTransactionMonthList(transactionMonthList, true)"
+                               @accordion:closed="onTransactionMonthListCollapseStateChanged">
                 <f7-block-title :id="getTransactionMonthTitleDomId(transactionMonthList.yearMonth)" v-if="pageType === TransactionListPageType.List.type">
                     <f7-accordion-toggle>
                         <f7-list strong inset dividers media-list
@@ -202,13 +204,15 @@
                         </f7-list>
                     </f7-accordion-toggle>
                 </f7-block-title>
-                <f7-accordion-content :style="{ height: getTransactionMonthListHeight(transactionMonthList) }">
+                <f7-accordion-content>
+                    <f7-block :style="{ height: getTransactionMonthListHeight(transactionMonthList) }"
+                              v-if="isTransactionMonthListInvisible(transactionMonthList)" />
                     <f7-list strong inset dividers media-list accordion-list
                              class="transaction-info-list transaction-month-list combination-list-content"
                              :id="getTransactionMonthListDomId(transactionMonthList.yearMonth)"
                              v-if="!isTransactionMonthListInvisible(transactionMonthList)"
                     >
-                        <f7-list-item swipeout chevron-center
+                        <f7-list-item swipeout chevron-center accordion-item
                                       class="transaction-info"
                                       :id="getTransactionDomId(transaction)"
                                       :link="transaction.type !== TransactionType.ModifyBalance ? `/transaction/detail?id=${transaction.id}&type=${transaction.type}` : null"
@@ -807,12 +811,12 @@ function getTransactionDomId(transaction: Transaction): string {
 }
 
 function isTransactionMonthListInvisible(transactionMonthList: TransactionMonthList): boolean {
-    if (!transactionMonthList.opened) {
-        return true;
-    }
-
     if (!transactionYearMonthListHeights.value[transactionMonthList.yearMonth]) {
         return false;
+    }
+
+    if (!transactionMonthList.opened) {
+        return true;
     }
 
     if (transactionInvisibleYearMonths.value[transactionMonthList.yearMonth]) {
@@ -823,10 +827,6 @@ function isTransactionMonthListInvisible(transactionMonthList: TransactionMonthL
 }
 
 function getTransactionMonthListHeight(transactionMonthList: TransactionMonthList): string {
-    if (!transactionMonthList.opened) {
-        return '';
-    }
-
     if (isTransactionMonthListInvisible(transactionMonthList)) {
         return transactionYearMonthListHeights.value[transactionMonthList.yearMonth] + 'px';
     }
@@ -1407,17 +1407,15 @@ function remove(transaction: Transaction | null, confirm: boolean): void {
     });
 }
 
-function collapseTransactionMonthList(month: TransactionMonthList, collapse: boolean): void {
+function collapseTransactionMonthList(monthList: TransactionMonthList, collapse: boolean): void {
     transactionsStore.collapseMonthInTransactionList({
-        month: month,
+        monthList: monthList,
         collapse: collapse
     });
 
-    nextTick(() => {
-        return setTransactionMonthListHeights(false);
-    }).then(() => {
-        setTransactionInvisibleYearMonthList();
-    });
+    if (!collapse && transactionInvisibleYearMonths.value[monthList.yearMonth]) {
+        delete transactionInvisibleYearMonths.value[monthList.yearMonth];
+    }
 }
 
 function onPopoverOpen(event: { $el: Framework7Dom }): void {
@@ -1441,6 +1439,13 @@ function onResize(): void {
 
 function onScroll(): void {
     setTransactionInvisibleYearMonthList();
+}
+
+function onTransactionMonthListCollapseStateChanged(): void {
+    setTransactionMonthListHeights(false)
+        .then(() => {
+            setTransactionInvisibleYearMonthList();
+        });
 }
 
 onMounted(() => {

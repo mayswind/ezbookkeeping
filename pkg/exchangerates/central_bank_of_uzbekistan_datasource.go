@@ -24,7 +24,7 @@ const centralBankOfUzbekistanUpdateDateTimezone = "Asia/Samarkand"
 
 // CentralBankOfUzbekistanDataSource defines the structure of exchange rates data source of the central bank of the Republic of Uzbekistan
 type CentralBankOfUzbekistanDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 // CentralBankOfUzbekistanExchangeRates represents the exchange rates data from the central bank of the Republic of Uzbekistan

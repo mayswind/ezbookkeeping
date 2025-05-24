@@ -28,7 +28,7 @@ const nationalBankOfPolandDataUpdateDateTimezone = "Europe/Warsaw"
 
 // NationalBankOfPolandDataSource defines the structure of exchange rates data source of National Bank of Poland
 type NationalBankOfPolandDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 // NationalBankOfPolandExchangeRateData represents the whole data from National Bank of Poland

@@ -30,7 +30,7 @@ var centralBankOfMyanmarSpecialCurrencyUnits = map[string]int32{
 
 // CentralBankOfMyanmarDataSource defines the structure of exchange rates data source of central bank of Myanmar
 type CentralBankOfMyanmarDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 // CentralBankOfMyanmarExchangeRate represents the exchange rate data from central bank of Myanmar

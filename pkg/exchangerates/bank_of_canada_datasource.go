@@ -25,7 +25,7 @@ const bankOfCanadaDataUpdateDateTimezone = "America/Toronto"
 
 // BankOfCanadaDataSource defines the structure of exchange rates data source of bank of Canada
 type BankOfCanadaDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 // BankOfCanadaExchangeRateData represents the whole data from bank of Canada

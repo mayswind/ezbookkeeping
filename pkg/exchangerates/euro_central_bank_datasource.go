@@ -26,7 +26,7 @@ const euroCentralBankDataUpdateDateTimezone = "Europe/Berlin"
 
 // EuroCentralBankDataSource defines the structure of exchange rates data source of euro central bank
 type EuroCentralBankDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 // EuroCentralBankExchangeRateData represents the whole data from euro central bank

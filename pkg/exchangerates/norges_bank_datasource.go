@@ -27,7 +27,7 @@ const norgesBankUpdateDateTimezone = "Europe/Oslo"
 
 // NorgesBankDataSource defines the structure of exchange rates data source of Norges Bank
 type NorgesBankDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 // NorgesBankExchangeRateData represents the whole data from Norges Bank

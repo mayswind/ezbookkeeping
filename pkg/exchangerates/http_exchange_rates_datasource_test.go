@@ -1,4 +1,4 @@
-package api
+package exchangerates
 
 import (
 	"net/http/httptest"
@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/exchangerates"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
@@ -318,27 +317,19 @@ func executeLatestExchangeRateHandler(t *testing.T, dataSourceType string) *mode
 		ExchangeRatesSkipTLSVerify:  true,
 	}
 
-	settingsContainer := &settings.ConfigContainer{
-		Current: config,
-	}
-
-	err := exchangerates.InitializeExchangeRatesDataSource(config)
+	err := InitializeExchangeRatesDataSource(config)
 	assert.Nil(t, err)
 
-	exchangeRatesApi := &ExchangeRatesApi{
-		ApiUsingConfig: ApiUsingConfig{
-			container: settingsContainer,
-		},
-	}
+	dataSource := Container.Current
+	assert.NotNil(t, dataSource)
 
 	ginContext, _ := gin.CreateTestContext(httptest.NewRecorder())
-
-	response, err := exchangeRatesApi.LatestExchangeRateHandler(&core.WebContext{
+	context := &core.WebContext{
 		Context: ginContext,
-	})
-	assert.Nil(t, err)
+	}
 
-	exchangeRateResponse := response.(*models.LatestExchangeRateResponse)
+	exchangeRateResponse, err := dataSource.GetLatestExchangeRates(context, context.GetCurrentUid(), config)
+	assert.Nil(t, err)
 	assert.NotNil(t, exchangeRateResponse)
 
 	return exchangeRateResponse

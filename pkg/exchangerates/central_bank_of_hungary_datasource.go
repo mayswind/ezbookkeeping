@@ -27,7 +27,7 @@ const centralBankOfHungaryUpdateDateTimezone = "Europe/Budapest"
 
 // CentralBankOfHungaryDataSource defines the structure of exchange rates data source of central bank of Hungary
 type CentralBankOfHungaryDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 // CentralBankOfHungaryExchangeRateServiceResponse represents the response data of exchange rate service for central bank of Hungary

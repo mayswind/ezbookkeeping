@@ -23,7 +23,7 @@ const nationalBankOfUkraineUpdateDateFormat = "02.01.2006"
 
 // NationalBankOfUkraineDataSource defines the structure of exchange rates data source of National Bank of Ukraine
 type NationalBankOfUkraineDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 // NationalBankOfUkraineExchangeRates  represents the exchange rates data from National Bank of Ukraine

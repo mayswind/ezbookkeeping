@@ -27,7 +27,7 @@ const swissNationalBankExchangeRatePeriodDateFormat = "2006-01-02"
 
 // SwissNationalBankDataSource defines the structure of exchange rates data source of the reserve Swiss National Bank
 type SwissNationalBankDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 // SwissNationalBankData represents the whole data from the reserve Swiss National Bank

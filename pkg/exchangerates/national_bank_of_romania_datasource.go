@@ -26,7 +26,7 @@ const nationalBankOfRomaniaUpdateDateTimezone = "Europe/Bucharest"
 
 // NationalBankOfRomaniaDataSource defines the structure of exchange rates data source of national bank of Romania
 type NationalBankOfRomaniaDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 // NationalBankOfRomaniaExchangeRateData represents the whole data from national bank of Romania

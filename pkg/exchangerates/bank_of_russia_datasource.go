@@ -28,7 +28,7 @@ const bankOfRussiaUpdateDateTimezone = "Europe/Moscow"
 
 // BankOfRussiaDataSource defines the structure of exchange rates data source of bank of Russia
 type BankOfRussiaDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 // BankOfRussiaExchangeRateData represents the whole data from bank of Russia

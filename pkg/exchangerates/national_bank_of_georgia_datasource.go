@@ -23,7 +23,7 @@ const nationalBankOfGeorgiaUpdateDateFormat = "2006-01-02T15:04:05.999Z"
 
 // NationalBankOfGeorgiaDataSource defines the structure of exchange rates data source of national bank of Georgia
 type NationalBankOfGeorgiaDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 // NationalBankOfGeorgiaExchangeRates represents the exchange rates data from national bank of Georgia

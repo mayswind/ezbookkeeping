@@ -26,7 +26,7 @@ const danmarksNationalbankDataUpdateDateTimezone = "Europe/Copenhagen"
 
 // DanmarksNationalbankDataSource defines the structure of exchange rates data source of Danmarks Nationalbank
 type DanmarksNationalbankDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 // DanmarksNationalbankExchangeRateData represents the whole data from Danmarks Nationalbank

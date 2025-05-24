@@ -25,7 +25,7 @@ const reserveBankOfAustraliaDataUpdateDateFormat = "2006-01-02T15:04:05Z07:00"
 
 // ReserveBankOfAustraliaDataSource defines the structure of exchange rates data source of the reserve bank of Australia
 type ReserveBankOfAustraliaDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 // ReserveBankOfAustraliaData represents the whole data from the reserve bank of Australia

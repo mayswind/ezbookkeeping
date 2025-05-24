@@ -25,7 +25,7 @@ const czechNationalBankDataUpdateDateTimezone = "Europe/Prague"
 
 // CzechNationalBankDataSource defines the structure of exchange rates data source of Czech National Bank
 type CzechNationalBankDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 // BuildRequests returns the Czech National Bank exchange rates http requests

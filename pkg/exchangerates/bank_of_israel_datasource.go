@@ -26,7 +26,7 @@ const bankOfIsraelDataUpdateDateFormat = "2006-01-02T15:04:05.9999999Z"
 
 // BankOfIsraelDataSource defines the structure of exchange rates data source of bank of Israel
 type BankOfIsraelDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 // BankOfIsraelExchangeRateData represents the whole data from bank of Israel

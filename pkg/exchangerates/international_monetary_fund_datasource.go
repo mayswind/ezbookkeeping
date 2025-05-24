@@ -27,7 +27,7 @@ var internationalMonetaryFundCurrencyNameCodeMap map[string]string
 
 // InternationalMonetaryFundDataSource defines the structure of exchange rates data source of international monetary fund
 type InternationalMonetaryFundDataSource struct {
-	ExchangeRatesDataSource
+	HttpExchangeRatesDataSource
 }
 
 func init() {

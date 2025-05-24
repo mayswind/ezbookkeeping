@@ -18,55 +18,55 @@ var (
 // InitializeExchangeRatesDataSource initializes the current exchange rates data source according to the config
 func InitializeExchangeRatesDataSource(config *settings.Config) error {
 	if config.ExchangeRatesDataSource == settings.ReserveBankOfAustraliaDataSource {
-		Container.Current = &ReserveBankOfAustraliaDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&ReserveBankOfAustraliaDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.BankOfCanadaDataSource {
-		Container.Current = &BankOfCanadaDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&BankOfCanadaDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.CzechNationalBankDataSource {
-		Container.Current = &CzechNationalBankDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&CzechNationalBankDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.DanmarksNationalbankDataSource {
-		Container.Current = &DanmarksNationalbankDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&DanmarksNationalbankDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.EuroCentralBankDataSource {
-		Container.Current = &EuroCentralBankDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&EuroCentralBankDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.NationalBankOfGeorgiaDataSource {
-		Container.Current = &NationalBankOfGeorgiaDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&NationalBankOfGeorgiaDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.CentralBankOfHungaryDataSource {
-		Container.Current = &CentralBankOfHungaryDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&CentralBankOfHungaryDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.BankOfIsraelDataSource {
-		Container.Current = &BankOfIsraelDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&BankOfIsraelDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.CentralBankOfMyanmarDataSource {
-		Container.Current = &CentralBankOfMyanmarDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&CentralBankOfMyanmarDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.NorgesBankDataSource {
-		Container.Current = &NorgesBankDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&NorgesBankDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.NationalBankOfPolandDataSource {
-		Container.Current = &NationalBankOfPolandDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&NationalBankOfPolandDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.NationalBankOfRomaniaDataSource {
-		Container.Current = &NationalBankOfRomaniaDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&NationalBankOfRomaniaDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.BankOfRussiaDataSource {
-		Container.Current = &BankOfRussiaDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&BankOfRussiaDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.SwissNationalBankDataSource {
-		Container.Current = &SwissNationalBankDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&SwissNationalBankDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.NationalBankOfUkraineDataSource {
-		Container.Current = &NationalBankOfUkraineDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&NationalBankOfUkraineDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.CentralBankOfUzbekistanDataSource {
-		Container.Current = &CentralBankOfUzbekistanDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&CentralBankOfUzbekistanDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.InternationalMonetaryFundDataSource {
-		Container.Current = &InternationalMonetaryFundDataSource{}
+		Container.Current = newCommonHttpExchangeRatesDataSource(&InternationalMonetaryFundDataSource{})
 		return nil
 	}
 

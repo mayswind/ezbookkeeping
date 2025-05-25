@@ -97,7 +97,8 @@ export class LeafletMapInstance implements MapInstance {
             center: [ options.initCenter.latitude, options.initCenter.longitude ],
             zoom: options.zoomLevel,
             attributionControl: false,
-            zoomControl: false
+            zoomControl: false,
+            worldCopyJump: true
         });
 
         let tileUrlFormat, tileUrlSubDomains, annotationUrlFormat, annotationUrlSubDomains: string | undefined;

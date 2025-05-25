@@ -94,10 +94,12 @@ type User struct {
 	Language             string                   `xorm:"VARCHAR(10)"`
 	DefaultCurrency      string                   `xorm:"VARCHAR(3) NOT NULL"`
 	FirstDayOfWeek       core.WeekDay             `xorm:"TINYINT NOT NULL"`
+	FiscalYearStart      core.FiscalYearStart     `xorm:"SMALLINT"`
 	LongDateFormat       core.LongDateFormat      `xorm:"TINYINT"`
 	ShortDateFormat      core.ShortDateFormat     `xorm:"TINYINT"`
 	LongTimeFormat       core.LongTimeFormat      `xorm:"TINYINT"`
 	ShortTimeFormat      core.ShortTimeFormat     `xorm:"TINYINT"`
+	FiscalYearFormat     core.FiscalYearFormat    `xorm:"TINYINT"`
 	DecimalSeparator     core.DecimalSeparator    `xorm:"TINYINT"`
 	DigitGroupingSymbol  core.DigitGroupingSymbol `xorm:"TINYINT"`
 	DigitGrouping        core.DigitGroupingType   `xorm:"TINYINT"`
@@ -126,10 +128,12 @@ type UserBasicInfo struct {
 	Language             string                   `json:"language"`
 	DefaultCurrency      string                   `json:"defaultCurrency"`
 	FirstDayOfWeek       core.WeekDay             `json:"firstDayOfWeek"`
+	FiscalYearStart      core.FiscalYearStart     `json:"fiscalYearStart"`
 	LongDateFormat       core.LongDateFormat      `json:"longDateFormat"`
 	ShortDateFormat      core.ShortDateFormat     `json:"shortDateFormat"`
 	LongTimeFormat       core.LongTimeFormat      `json:"longTimeFormat"`
 	ShortTimeFormat      core.ShortTimeFormat     `json:"shortTimeFormat"`
+	FiscalYearFormat     core.FiscalYearFormat    `json:"fiscalYearFormat"`
 	DecimalSeparator     core.DecimalSeparator    `json:"decimalSeparator"`
 	DigitGroupingSymbol  core.DigitGroupingSymbol `json:"digitGroupingSymbol"`
 	DigitGrouping        core.DigitGroupingType   `json:"digitGrouping"`
@@ -186,10 +190,12 @@ type UserProfileUpdateRequest struct {
 	Language             string                    `json:"language" binding:"omitempty,min=2,max=16"`
 	DefaultCurrency      string                    `json:"defaultCurrency" binding:"omitempty,len=3,validCurrency"`
 	FirstDayOfWeek       *core.WeekDay             `json:"firstDayOfWeek" binding:"omitempty,min=0,max=6"`
+	FiscalYearStart      *core.FiscalYearStart     `json:"fiscalYearStart" binding:"omitempty,validFiscalYearStart"`
 	LongDateFormat       *core.LongDateFormat      `json:"longDateFormat" binding:"omitempty,min=0,max=3"`
 	ShortDateFormat      *core.ShortDateFormat     `json:"shortDateFormat" binding:"omitempty,min=0,max=3"`
 	LongTimeFormat       *core.LongTimeFormat      `json:"longTimeFormat" binding:"omitempty,min=0,max=3"`
 	ShortTimeFormat      *core.ShortTimeFormat     `json:"shortTimeFormat" binding:"omitempty,min=0,max=3"`
+	FiscalYearFormat     *core.FiscalYearFormat    `json:"fiscalYearFormat" binding:"omitempty,min=0,max=5"`
 	DecimalSeparator     *core.DecimalSeparator    `json:"decimalSeparator" binding:"omitempty,min=0,max=3"`
 	DigitGroupingSymbol  *core.DigitGroupingSymbol `json:"digitGroupingSymbol" binding:"omitempty,min=0,max=4"`
 	DigitGrouping        *core.DigitGroupingType   `json:"digitGrouping" binding:"omitempty,min=0,max=2"`
@@ -265,10 +271,12 @@ func (u *User) ToUserBasicInfo(avatarProvider core.UserAvatarProviderType, avata
 		Language:             u.Language,
 		DefaultCurrency:      u.DefaultCurrency,
 		FirstDayOfWeek:       u.FirstDayOfWeek,
+		FiscalYearStart:      u.FiscalYearStart,
 		LongDateFormat:       u.LongDateFormat,
 		ShortDateFormat:      u.ShortDateFormat,
 		LongTimeFormat:       u.LongTimeFormat,
 		ShortTimeFormat:      u.ShortTimeFormat,
+		FiscalYearFormat:     u.FiscalYearFormat,
 		DecimalSeparator:     u.DecimalSeparator,
 		DigitGroupingSymbol:  u.DigitGroupingSymbol,
 		DigitGrouping:        u.DigitGrouping,

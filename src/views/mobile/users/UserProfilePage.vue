@@ -198,6 +198,21 @@
                                            v-model="newProfile.firstDayOfWeek">
                 </list-item-selection-popup>
             </f7-list-item>
+
+            <f7-list-item
+                link="#"
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="tt('Fiscal Year Start Date')"
+                :title="currentFiscalYearStartDate"
+                @click="showFiscalYearStartSheet = true"
+            >
+                <fiscal-year-start-selection-sheet
+                    v-model:show="showFiscalYearStartSheet"
+                    v-model="newProfile.fiscalYearStart"
+                    v-model:title="currentFiscalYearStartDate">
+                </fiscal-year-start-selection-sheet>
+            </f7-list-item>
+
         </f7-list>
 
         <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
@@ -278,6 +293,26 @@
                                            :items="allShortTimeFormats"
                                            v-model:show="showShortTimeFormatPopup"
                                            v-model="newProfile.shortTimeFormat">
+                </list-item-selection-popup>
+            </f7-list-item>
+
+            <f7-list-item
+                link="#"
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="tt('Fiscal Year Format')"
+                :title="findDisplayNameByType(allFiscalYearFormats, newProfile.fiscalYearFormat)"
+                @click="showFiscalYearFormatPopup = true"
+            >
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Fiscal Year Format')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Fiscal Year Format')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allFiscalYearFormats"
+                                           v-model:show="showFiscalYearFormatPopup"
+                                           v-model="newProfile.fiscalYearFormat">
                 </list-item-selection-popup>
             </f7-list-item>
         </f7-list>
@@ -456,7 +491,7 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getAllLanguageOptions, getAllCurrencies, getCurrencyName } = useI18n();
+const { tt, getAllLanguageOptions, getAllCurrencies, getCurrencyName, getCurrentFiscalYearStartFormatted } = useI18n();
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
 const {
@@ -473,6 +508,7 @@ const {
     allShortDateFormats,
     allLongTimeFormats,
     allShortTimeFormats,
+    allFiscalYearFormats,
     allDecimalSeparators,
     allDigitGroupingSymbols,
     allDigitGroupingTypes,
@@ -506,10 +542,12 @@ const showEditableTransactionRangePopup = ref<boolean>(false);
 const showLanguagePopup = ref<boolean>(false);
 const showDefaultCurrencyPopup = ref<boolean>(false);
 const showFirstDayOfWeekPopup = ref<boolean>(false);
+const showFiscalYearStartSheet = ref<boolean>(false);
 const showLongDateFormatPopup = ref<boolean>(false);
 const showShortDateFormatPopup = ref<boolean>(false);
 const showLongTimeFormatPopup = ref<boolean>(false);
 const showShortTimeFormatPopup = ref<boolean>(false);
+const showFiscalYearFormatPopup = ref<boolean>(false);
 const showCurrencyDisplayTypePopup = ref<boolean>(false);
 const showDigitGroupingPopup = ref<boolean>(false);
 const showDigitGroupingSymbolPopup = ref<boolean>(false);
@@ -532,6 +570,7 @@ const currentLanguageName = computed<string>(() => {
 });
 
 const currentDayOfWeekName = computed<string | null>(() => findDisplayNameByType(allWeekDays.value, newProfile.value.firstDayOfWeek));
+const currentFiscalYearStartDate = ref<string>(getCurrentFiscalYearStartFormatted());
 
 function init(): void {
     loading.value = true;

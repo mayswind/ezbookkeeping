@@ -1,3 +1,16 @@
+export interface UserCustomExchangeRateUpdateRequest {
+    readonly currency: string;
+    readonly rate: string;
+}
+
+export interface UserCustomExchangeRateDeleteRequest {
+    readonly currency: string;
+}
+
+export interface UserCustomExchangeRateUpdateResponse extends LatestExchangeRate {
+    readonly updateTime: number;
+}
+
 export interface LatestExchangeRate {
     readonly currency: string;
     readonly rate: string;
@@ -6,7 +19,7 @@ export interface LatestExchangeRate {
 export interface LatestExchangeRateResponse {
     readonly dataSource: string;
     readonly referenceUrl: string;
-    readonly updateTime: number;
+    updateTime: number;
     readonly baseCurrency: string;
     readonly exchangeRates: LatestExchangeRate[];
 }

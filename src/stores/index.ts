@@ -378,6 +378,8 @@ export const useRootStore = defineStore('root', () => {
     }
 
     function updateUserProfile(req: UserProfileUpdateRequest): Promise<UserProfileUpdateResponse> {
+        const userDefaultCurrency = userStore.currentUserDefaultCurrency;
+
         return new Promise((resolve, reject) => {
             services.updateProfile(req).then(response => {
                 const data = response.data;
@@ -405,6 +407,10 @@ export const useRootStore = defineStore('root', () => {
 
                 if (!statisticsStore.transactionStatisticsStateInvalid) {
                     statisticsStore.updateTransactionStatisticsInvalidState(true);
+                }
+
+                if (data.result.user && data.result.user.defaultCurrency !== userDefaultCurrency) {
+                    exchangeRatesStore.resetLatestExchangeRates();
                 }
 
                 resolve(data.result);

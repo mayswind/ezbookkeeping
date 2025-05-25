@@ -152,6 +152,10 @@ i.icon.la, i.icon.las, i.icon.lab {
     font-size: var(--ebk-hide-icon-font-size);
 }
 
+.separate-icon {
+    font-size: var(--ebk-separate-icon-font-size);
+}
+
 .transaction-tag-icon {
     font-size: var(--ebk-transaction-tag-icon-font-size);
     align-self: center;

@@ -25,7 +25,8 @@ import TransactionTagFilterSettingsPage from '@/views/mobile/settings/Transactio
 
 import SettingsPage from '@/views/mobile/SettingsPage.vue';
 import ApplicationLockPage from '@/views/mobile/ApplicationLockPage.vue';
-import ExchangeRatesPage from '@/views/mobile/ExchangeRatesPage.vue';
+import ExchangeRatesListPage from '@/views/mobile/exchangerates/ListPage.vue';
+import ExchangeRatesUpdatePage from '@/views/mobile/exchangerates/UpdatePage.vue';
 import AboutPage from '@/views/mobile/AboutPage.vue';
 
 import UserProfilePage from '@/views/mobile/users/UserProfilePage.vue';
@@ -236,7 +237,12 @@ const routes: Router.RouteParameters[] = [
     },
     {
         path: '/exchange_rates',
-        async: asyncResolve(ExchangeRatesPage),
+        async: asyncResolve(ExchangeRatesListPage),
+        beforeEnter: [checkLogin]
+    },
+    {
+        path: '/exchange_rates/update',
+        async: asyncResolve(ExchangeRatesUpdatePage),
         beforeEnter: [checkLogin]
     },
     {

@@ -1,7 +1,13 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 
-import type { LatestExchangeRate, LatestExchangeRateResponse } from '@/models/exchange_rate.ts';
+import type { BeforeResolveFunction } from '@/core/base.ts';
+
+import type {
+    UserCustomExchangeRateUpdateResponse,
+    LatestExchangeRate,
+    LatestExchangeRateResponse
+} from '@/models/exchange_rate.ts';
 
 import { isEquals } from '@/lib/common.ts';
 import { getCurrentUnixTime, formatUnixTime } from '@/lib/datetime.ts';
@@ -11,6 +17,7 @@ import logger from '@/lib/logger.ts';
 import services from '@/lib/services.ts';
 
 const exchangeRatesLocalStorageKey = 'ebk_app_exchange_rates';
+const userDataSourceType = 'user_custom';
 
 interface LatestExchangeRates {
     readonly time?: number;
@@ -34,6 +41,14 @@ function clearExchangeRatesFromLocalStorage(): void {
 export const useExchangeRatesStore = defineStore('exchangeRates', () => {
     const latestExchangeRates = ref<LatestExchangeRates>(getExchangeRatesFromLocalStorage());
 
+    const isUserCustomExchangeRates = computed((): boolean => {
+        if (!latestExchangeRates.value || !latestExchangeRates.value.data) {
+            return false;
+        }
+
+        return latestExchangeRates.value.data.dataSource === userDataSourceType;
+    });
+
     const exchangeRatesLastUpdateTime = computed<number | null>(() => {
         const exchangeRates = latestExchangeRates.value || {};
         return exchangeRates && exchangeRates.data ? exchangeRates.data.updateTime : null;
@@ -53,6 +68,55 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
 
         return exchangeRateMap;
     });
+
+    function updateExchangeRateToLatestExchangeRateList(exchangeRate: LatestExchangeRate, updateTime: number): void {
+        if (!latestExchangeRates.value || !latestExchangeRates.value.data || !latestExchangeRates.value.data.exchangeRates) {
+            return;
+        }
+
+        const exchangeRates = latestExchangeRates.value.data.exchangeRates;
+        let changed = false;
+
+        for (let i = 0; i < exchangeRates.length; i++) {
+            if (exchangeRates[i].currency === exchangeRate.currency) {
+                exchangeRates.splice(i, 1, exchangeRate);
+                changed = true;
+                break;
+            }
+        }
+
+        if (!changed) {
+            exchangeRates.push(exchangeRate);
+            changed = true;
+        }
+
+        latestExchangeRates.value.data.updateTime = updateTime;
+
+        if (changed) {
+            setExchangeRatesToLocalStorage(latestExchangeRates.value);
+        }
+    }
+
+    function removeExchangeRateFromLatestExchangeRateList(currency: string): void {
+        if (!latestExchangeRates.value || !latestExchangeRates.value.data || !latestExchangeRates.value.data.exchangeRates) {
+            return;
+        }
+
+        const exchangeRates = latestExchangeRates.value.data.exchangeRates;
+        let changed = false;
+
+        for (let i = 0; i < exchangeRates.length; i++) {
+            if (exchangeRates[i].currency === currency) {
+                exchangeRates.splice(i, 1);
+                changed = true;
+                break;
+            }
+        }
+
+        if (changed) {
+            setExchangeRatesToLocalStorage(latestExchangeRates.value);
+        }
+    }
 
     function resetLatestExchangeRates(): void {
         latestExchangeRates.value = {};
@@ -114,6 +178,76 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
         });
     }
 
+    function updateUserCustomExchangeRate({ currency, rate }: { currency: string, rate: number }): Promise<UserCustomExchangeRateUpdateResponse> {
+        return new Promise((resolve, reject) => {
+            services.updateUserCustomExchangeRate({
+                currency: currency,
+                rate: rate.toString()
+            }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to update user custom exchange rate' });
+                    return;
+                }
+
+                const exchangeRate: LatestExchangeRate = {
+                    currency: data.result.currency,
+                    rate: data.result.rate
+                };
+
+                updateExchangeRateToLatestExchangeRateList(exchangeRate, data.result.updateTime);
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to update user custom exchange rate', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to update user custom exchange rate' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    function deleteUserCustomExchangeRate({ currency, beforeResolve }: { currency: string, beforeResolve?: BeforeResolveFunction }): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            services.deleteUserCustomExchangeRate({
+                currency: currency
+            }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to delete this user custom exchange rate' });
+                    return;
+                }
+
+                if (beforeResolve) {
+                    beforeResolve(() => {
+                        removeExchangeRateFromLatestExchangeRateList(currency);
+                    });
+                } else {
+                    removeExchangeRateFromLatestExchangeRateList(currency);
+                }
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to delete user custom exchange rate', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to delete this user custom exchange rate' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
     function getExchangedAmount(amount: number, fromCurrency: string, toCurrency: string): number | null {
         if (amount === 0) {
             return 0;
@@ -145,11 +279,14 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
         // states
         latestExchangeRates,
         // computed states
+        isUserCustomExchangeRates,
         exchangeRatesLastUpdateTime,
         latestExchangeRateMap,
         // functions
         resetLatestExchangeRates,
         getLatestExchangeRates,
+        updateUserCustomExchangeRate,
+        deleteUserCustomExchangeRate,
         getExchangedAmount
     };
 });

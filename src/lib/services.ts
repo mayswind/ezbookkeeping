@@ -37,6 +37,9 @@ import type {
     DataStatisticsResponse
 } from '@/models/data_management.ts';
 import type {
+    UserCustomExchangeRateUpdateRequest,
+    UserCustomExchangeRateDeleteRequest,
+    UserCustomExchangeRateUpdateResponse,
     LatestExchangeRateResponse
 } from '@/models/exchange_rate.ts';
 import type {
@@ -573,6 +576,12 @@ export default {
             ignoreError: !!param.ignoreError,
             timeout: getExchangeRatesRequestTimeout() || DEFAULT_API_TIMEOUT
         } as ApiRequestConfig);
+    },
+    updateUserCustomExchangeRate: (req: UserCustomExchangeRateUpdateRequest): ApiResponsePromise<UserCustomExchangeRateUpdateResponse> => {
+        return axios.post<ApiResponse<UserCustomExchangeRateUpdateResponse>>('v1/exchange_rates/user_custom/update.json', req);
+    },
+    deleteUserCustomExchangeRate: (req: UserCustomExchangeRateDeleteRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/exchange_rates/user_custom/delete.json', req);
     },
     generateQrCodeUrl: (qrCodeName: string): string => {
         return `${getBasePath()}${BASE_QRCODE_PATH}/${qrCodeName}.png`;

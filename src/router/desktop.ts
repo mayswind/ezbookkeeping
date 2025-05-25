@@ -28,7 +28,7 @@ import TransactionTemplateListPage from '@/views/desktop/templates/ListPage.vue'
 import UserSettingsPage from '@/views/desktop/user/UserSettingsPage.vue';
 import AppSettingsPage from '@/views/desktop/app/AppSettingsPage.vue';
 
-import ExchangeRatesPage from '@/views/desktop/ExchangeRatesPage.vue';
+import ExchangeRatesListPage from '@/views/desktop/exchangerates/ListPage.vue';
 import AboutPage from '@/views/desktop/AboutPage.vue';
 
 function checkLogin(): NavigationGuardReturn {
@@ -168,7 +168,7 @@ const router = createRouter({
                 },
                 {
                     path: '/exchange_rates',
-                    component: ExchangeRatesPage,
+                    component: ExchangeRatesListPage,
                     beforeEnter: checkLogin
                 },
                 {

@@ -20,14 +20,15 @@ const pageCountForDataExport = 1000
 // DataManagementsApi represents data management api
 type DataManagementsApi struct {
 	ApiUsingConfig
-	tokens       *services.TokenService
-	users        *services.UserService
-	accounts     *services.AccountService
-	transactions *services.TransactionService
-	categories   *services.TransactionCategoryService
-	tags         *services.TransactionTagService
-	pictures     *services.TransactionPictureService
-	templates    *services.TransactionTemplateService
+	tokens                  *services.TokenService
+	users                   *services.UserService
+	accounts                *services.AccountService
+	transactions            *services.TransactionService
+	categories              *services.TransactionCategoryService
+	tags                    *services.TransactionTagService
+	pictures                *services.TransactionPictureService
+	templates               *services.TransactionTemplateService
+	userCustomExchangeRates *services.UserCustomExchangeRatesService
 }
 
 // Initialize a data management api singleton instance
@@ -36,14 +37,15 @@ var (
 		ApiUsingConfig: ApiUsingConfig{
 			container: settings.Container,
 		},
-		tokens:       services.Tokens,
-		users:        services.Users,
-		accounts:     services.Accounts,
-		transactions: services.Transactions,
-		categories:   services.TransactionCategories,
-		tags:         services.TransactionTags,
-		pictures:     services.TransactionPictures,
-		templates:    services.TransactionTemplates,
+		tokens:                  services.Tokens,
+		users:                   services.Users,
+		accounts:                services.Accounts,
+		transactions:            services.Transactions,
+		categories:              services.TransactionCategories,
+		tags:                    services.TransactionTags,
+		pictures:                services.TransactionPictures,
+		templates:               services.TransactionTemplates,
+		userCustomExchangeRates: services.UserCustomExchangeRates,
 	}
 )
 
@@ -176,6 +178,13 @@ func (a *DataManagementsApi) ClearDataHandler(c *core.WebContext) (any, *errs.Er
 
 	if err != nil {
 		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all transaction tags, because %s", err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	err = a.userCustomExchangeRates.DeleteAllCustomExchangeRates(c, uid)
+
+	if err != nil {
+		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all user custom exchange rates, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 

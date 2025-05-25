@@ -1,5 +1,5 @@
 <template>
-    <f7-page ptr @ptr:refresh="update">
+    <f7-page ptr @ptr:refresh="reload">
         <f7-navbar>
             <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title :title="tt('Exchange Rates Data')"></f7-nav-title>
@@ -56,16 +56,27 @@
 
         <f7-list strong inset dividers class="margin-vertical" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
             <f7-list-item swipeout
+                          :id="getExchangeRateDomId(exchangeRate)"
                           :after="getFinalConvertedAmount(exchangeRate)"
-                          :key="exchangeRate.currencyCode" v-for="exchangeRate in availableExchangeRates">
+                          :key="baseCurrencyChangedTime + '_' + exchangeRate.currencyCode" v-for="exchangeRate in availableExchangeRates"
+                          @swipeout:closed="onExchangeRateSwipeoutClosed()">
                 <template #title>
                     <div class="no-padding no-margin">
                         <span style="margin-right: 5px">{{ exchangeRate.currencyDisplayName }}</span>
                         <small class="smaller">{{ exchangeRate.currencyCode }}</small>
                     </div>
                 </template>
-                <f7-swipeout-actions right v-if="exchangeRate.currencyCode !== baseCurrency">
-                    <f7-swipeout-button color="primary" close :text="tt('Set as Base')" @click="setAsBaseline(exchangeRate.currencyCode, getFinalConvertedAmount(exchangeRate))"></f7-swipeout-button>
+                <f7-swipeout-actions right v-if="exchangeRate.currencyCode !== baseCurrency || (exchangeRate.currencyCode !== defaultCurrency && isUserCustomExchangeRates)">
+                    <f7-swipeout-button color="primary" close
+                                        :text="tt('Set as Base')"
+                                        :class="{ 'disabled': exchangeRate.currencyCode === baseCurrency }"
+                                        @click="setAsBaseline(exchangeRate.currencyCode, getFinalConvertedAmount(exchangeRate)); settingBaseLine = true"
+                                        v-if="settingBaseLine || exchangeRate.currencyCode !== baseCurrency"></f7-swipeout-button>
+                    <f7-swipeout-button color="red" class="padding-left padding-right"
+                                        @click="remove(exchangeRate, false)"
+                                        v-if="exchangeRate.currencyCode !== defaultCurrency && isUserCustomExchangeRates">
+                        <f7-icon f7="trash"></f7-icon>
+                    </f7-swipeout-button>
                 </f7-swipeout-actions>
             </f7-list-item>
         </f7-list>
@@ -78,17 +89,33 @@
             <f7-list-item>
                 <small>{{ tt('Data source') }}</small>
                 <small>
-                    <f7-link external target="_blank" :href="exchangeRatesData.referenceUrl" v-if="exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</f7-link>
-                    <span v-else-if="!exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
+                    <f7-link external target="_blank" :href="exchangeRatesData.referenceUrl" v-if="!isUserCustomExchangeRates && exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</f7-link>
+                    <span v-else-if="!isUserCustomExchangeRates && !exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
+                    <span v-else-if="isUserCustomExchangeRates">{{ tt('User Custom') }}</span>
                 </small>
             </f7-list-item>
         </f7-list>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
-            <f7-actions-group>
-                <f7-actions-button :class="{ 'disabled': updating }" @click="update(undefined)">
+            <f7-actions-group v-if="isUserCustomExchangeRates">
+                <f7-actions-button :class="{ 'disabled': loading }" @click="update()">
                     <span>{{ tt('Update') }}</span>
                 </f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button :class="{ 'disabled': loading }" @click="reload(undefined)">
+                    <span>{{ tt('Refresh') }}</span>
+                </f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
+            </f7-actions-group>
+        </f7-actions>
+
+        <f7-actions close-by-outside-click close-on-escape :opened="showDeleteActionSheet" @actions:closed="showDeleteActionSheet = false">
+            <f7-actions-group>
+                <f7-actions-label>{{ tt('Are you sure you want to delete this user custom exchange rate?') }}</f7-actions-label>
+                <f7-actions-button color="red" @click="remove(customExchangeRateToDelete, true)">{{ tt('Delete') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
@@ -99,9 +126,10 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
+import { useI18nUIComponents, showLoading, hideLoading, onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
 import { useExchangeRatesPageBase } from '@/views/base/ExchangeRatesPageBase.ts';
 
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
@@ -110,16 +138,38 @@ import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transac
 
 import type { LocalizedLatestExchangeRate } from '@/models/exchange_rate.ts';
 
+import {
+    getCurrentUnixTime
+} from '@/lib/datetime.ts';
+
+const props = defineProps<{
+    f7router: Router.Router;
+}>();
+
 const { tt, getCurrencyName, formatAmount, formatExchangeRateAmount } = useI18n();
-const { showToast } = useI18nUIComponents();
-const { baseCurrency, baseAmount, exchangeRatesData, exchangeRatesDataUpdateTime, availableExchangeRates, getConvertedAmount, setAsBaseline } = useExchangeRatesPageBase();
+const { showAlert, showToast } = useI18nUIComponents();
+const {
+    baseCurrency,
+    baseAmount,
+    defaultCurrency,
+    exchangeRatesData,
+    isUserCustomExchangeRates,
+    exchangeRatesDataUpdateTime,
+    availableExchangeRates,
+    getConvertedAmount,
+    setAsBaseline
+} = useExchangeRatesPageBase();
 
 const exchangeRatesStore = useExchangeRatesStore();
 
-const updating = ref<boolean>(false);
+const loading = ref<boolean>(false);
+const baseCurrencyChangedTime = ref<number>(getCurrentUnixTime());
+const settingBaseLine = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 const showBaseCurrencyPopup = ref<boolean>(false);
 const showBaseAmountSheet = ref<boolean>(false);
+const customExchangeRateToDelete = ref<LocalizedLatestExchangeRate | null>(null);
+const showDeleteActionSheet = ref<boolean>(false);
 
 const displayBaseAmount = computed<string>(() => formatAmount(baseAmount.value, baseCurrency.value));
 const baseAmountFontSizeClass = computed<string>(() => {
@@ -132,13 +182,17 @@ const baseAmountFontSizeClass = computed<string>(() => {
     }
 });
 
-function update(done?: () => void): void {
-    if (updating.value) {
+function getExchangeRateDomId(exchangeRate: LocalizedLatestExchangeRate): string {
+    return 'exchangeRate_' + exchangeRate.currencyCode;
+}
+
+function reload(done?: () => void): void {
+    if (loading.value) {
         done?.();
         return;
     }
 
-    updating.value = true;
+    loading.value = true;
 
     if (!done) {
         showLoading();
@@ -150,14 +204,54 @@ function update(done?: () => void): void {
     }).then(() => {
         done?.();
 
-        updating.value = false;
+        loading.value = false;
         hideLoading();
 
         showToast('Exchange rates data has been updated');
     }).catch(error => {
         done?.();
 
-        updating.value = false;
+        loading.value = false;
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function update(): void {
+    props.f7router.navigate('/exchange_rates/update');
+}
+
+function remove(customExchangeRate: LocalizedLatestExchangeRate | null, confirm: boolean): void {
+    if (!customExchangeRate) {
+        showAlert('An error occurred');
+        return;
+    }
+
+    if (!confirm) {
+        customExchangeRateToDelete.value = customExchangeRate;
+        showDeleteActionSheet.value = true;
+        return;
+    }
+
+    showDeleteActionSheet.value = false;
+    customExchangeRateToDelete.value = null;
+    showLoading();
+
+    exchangeRatesStore.deleteUserCustomExchangeRate({
+        currency: customExchangeRate.currencyCode,
+        beforeResolve: (done) => {
+            onSwipeoutDeleted(getExchangeRateDomId(customExchangeRate), done);
+        }
+    }).then(() => {
+        if (customExchangeRate.currencyCode === baseCurrency.value) {
+            baseCurrency.value = defaultCurrency.value;
+        }
+
+        hideLoading();
+    }).catch(error => {
         hideLoading();
 
         if (!error.processed) {
@@ -177,22 +271,32 @@ function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate): s
     return formatExchangeRateAmount(exchangeRateAmount);
 }
 
-if (exchangeRatesData.value && exchangeRatesData.value.exchangeRates) {
-    const exchangeRates = exchangeRatesData.value.exchangeRates;
-    let hasBaseCurrency = false;
+function onExchangeRateSwipeoutClosed(): void {
+    baseCurrencyChangedTime.value = getCurrentUnixTime();
+    settingBaseLine.value = false;
+}
 
-    for (let i = 0; i < exchangeRates.length; i++) {
-        const exchangeRate = exchangeRates[i];
-        if (exchangeRate.currency === baseCurrency.value) {
-            hasBaseCurrency = true;
-            break;
+exchangeRatesStore.getLatestExchangeRates({
+    silent: true,
+    force: false
+}).then(() => {
+    if (exchangeRatesData.value && exchangeRatesData.value.exchangeRates) {
+        const exchangeRates = exchangeRatesData.value.exchangeRates;
+        let hasBaseCurrency = false;
+
+        for (let i = 0; i < exchangeRates.length; i++) {
+            const exchangeRate = exchangeRates[i];
+            if (exchangeRate.currency === baseCurrency.value) {
+                hasBaseCurrency = true;
+                break;
+            }
+        }
+
+        if (!hasBaseCurrency) {
+            showToast('There is no exchange rates data for your default currency');
         }
     }
-
-    if (!hasBaseCurrency) {
-        showToast('There is no exchange rates data for your default currency');
-    }
-}
+});
 </script>
 
 <style>

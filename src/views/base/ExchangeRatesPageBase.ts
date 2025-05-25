@@ -22,7 +22,9 @@ export function useExchangeRatesPageBase() {
     const baseCurrency = ref<string>(userStore.currentUserDefaultCurrency);
     const baseAmount = ref<number>(100);
 
+    const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
     const exchangeRatesData = computed<LatestExchangeRateResponse | undefined>(() => exchangeRatesStore.latestExchangeRates.data);
+    const isUserCustomExchangeRates = computed<boolean>(() => exchangeRatesStore.isUserCustomExchangeRates);
 
     const exchangeRatesDataUpdateTime = computed<string>(() => {
         const exchangeRatesLastUpdateTime = exchangeRatesStore.exchangeRatesLastUpdateTime;
@@ -55,7 +57,9 @@ export function useExchangeRatesPageBase() {
         baseCurrency,
         baseAmount,
         // computed states
+        defaultCurrency,
         exchangeRatesData,
+        isUserCustomExchangeRates,
         exchangeRatesDataUpdateTime,
         availableExchangeRates,
         // functions

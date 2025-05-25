@@ -7,8 +7,9 @@
                         <div class="mx-6 my-4">
                             <span class="text-subtitle-2">{{ tt('Data source') }}</span>
                             <p class="text-body-1 mt-1 mb-3">
-                                <a tabindex="-1" target="_blank" :href="exchangeRatesData.referenceUrl" v-if="!loading && exchangeRatesData && exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</a>
-                                <span v-else-if="!loading && exchangeRatesData && !exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
+                                <a tabindex="-1" target="_blank" :href="exchangeRatesData.referenceUrl" v-if="!loading && exchangeRatesData && !isUserCustomExchangeRates && exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</a>
+                                <span v-else-if="!loading && exchangeRatesData && !isUserCustomExchangeRates && !exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
+                                <span v-else-if="!loading && exchangeRatesData && isUserCustomExchangeRates">{{ tt('User Custom') }}</span>
                                 <span v-else-if="!loading && !exchangeRatesData">{{ tt('None') }}</span>
                                 <span v-else-if="loading">
                                     <v-skeleton-loader class="skeleton-no-margin mt-3 mb-4" type="text" :loading="true"></v-skeleton-loader>
@@ -65,6 +66,9 @@
                                                 <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
                                             <span>{{ tt('Exchange Rates Data') }}</span>
+                                            <v-btn class="ml-3" color="default" variant="outlined"
+                                                   :disabled="loading" @click="update"
+                                                   v-if="isUserCustomExchangeRates">{{ tt('Update') }}</v-btn>
                                             <v-btn density="compact" color="default" variant="text" size="24"
                                                    class="ml-2" :icon="true" :loading="loading" @click="reload(true)">
                                                 <template #loader>
@@ -107,15 +111,30 @@
                                                 <div class="d-flex align-center">
                                                     <span class="text-sm">{{ exchangeRate.currencyDisplayName }}</span>
                                                     <span class="text-caption ml-1">{{ exchangeRate.currencyCode }}</span>
+
                                                     <v-spacer/>
-                                                    <v-btn class="px-2 ml-2 mr-3" color="default"
+
+                                                    <v-btn class="px-2 ml-2" color="default"
                                                            density="comfortable" variant="text"
                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                            v-if="exchangeRate.currencyCode !== baseCurrency"
                                                            @click="setAsBaseline(exchangeRate.currencyCode, getFinalConvertedAmount(exchangeRate))">
                                                         {{ tt('Set as Base') }}
                                                     </v-btn>
-                                                    <span>{{ getFinalConvertedAmount(exchangeRate) }}</span>
+                                                    <v-btn class="px-2" color="default"
+                                                           density="comfortable" variant="text"
+                                                           :class="{ 'd-none': loading, 'hover-display': !loading }"
+                                                           :prepend-icon="mdiDeleteOutline"
+                                                           :loading="customExchangeRateRemoving[exchangeRate.currencyCode]"
+                                                           :disabled="loading || updating"
+                                                           v-if="exchangeRate.currencyCode !== defaultCurrency && isUserCustomExchangeRates"
+                                                           @click="remove(exchangeRate.currencyCode)">
+                                                        <template #loader>
+                                                            <v-progress-circular indeterminate size="20" width="2"/>
+                                                        </template>
+                                                        {{ tt('Delete') }}
+                                                    </v-btn>
+                                                    <span class="ml-3">{{ getFinalConvertedAmount(exchangeRate) }}</span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -130,11 +149,16 @@
         </v-col>
     </v-row>
 
+    <update-dialog ref="updateDialog" />
+
+    <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
+import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
+import UpdateDialog from './list/dialogs/UpdateDialog.vue';
 
 import { ref, useTemplateRef, watch } from 'vue';
 import { useDisplay } from 'vuetify';
@@ -150,22 +174,39 @@ import logger from '@/lib/logger.ts';
 
 import {
     mdiRefresh,
-    mdiMenu
+    mdiMenu,
+    mdiDeleteOutline
 } from '@mdi/js';
 
+type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
+type UpdateDialogType = InstanceType<typeof UpdateDialog>;
 
 const { mdAndUp } = useDisplay();
 
 const { tt, formatExchangeRateAmount } = useI18n();
-const { baseCurrency, baseAmount, exchangeRatesData, exchangeRatesDataUpdateTime, availableExchangeRates, getConvertedAmount, setAsBaseline } = useExchangeRatesPageBase();
+const {
+    baseCurrency,
+    baseAmount,
+    defaultCurrency,
+    exchangeRatesData,
+    isUserCustomExchangeRates,
+    exchangeRatesDataUpdateTime,
+    availableExchangeRates,
+    getConvertedAmount,
+    setAsBaseline
+} = useExchangeRatesPageBase();
 
 const exchangeRatesStore = useExchangeRatesStore();
 
+const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const updateDialog = useTemplateRef<UpdateDialogType>('updateDialog');
 
 const activeTab = ref<string>('exchangeRatesPage');
 const loading = ref<boolean>(true);
+const updating = ref<boolean>(false);
+const customExchangeRateRemoving = ref<Record<string, boolean>>({});
 const alwaysShowNav = ref<boolean>(mdAndUp.value);
 const showNav = ref<boolean>(mdAndUp.value);
 
@@ -202,6 +243,43 @@ function reload(force: boolean): void {
         if (!error.processed) {
             snackbar.value?.showError(error);
         }
+    });
+}
+
+function update(): void {
+    updateDialog.value?.open().then(result => {
+        if (result && result.message) {
+            snackbar.value?.showMessage(result.message);
+        }
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function remove(currency: string): void {
+    confirmDialog.value?.open('Are you sure you want to delete this user custom exchange rate?').then(() => {
+        updating.value = true;
+        customExchangeRateRemoving.value[currency] = true;
+
+        exchangeRatesStore.deleteUserCustomExchangeRate({
+            currency: currency
+        }).then(() => {
+            if (currency === baseCurrency.value) {
+                baseCurrency.value = defaultCurrency.value;
+            }
+
+            updating.value = false;
+            customExchangeRateRemoving.value[currency] = false;
+        }).catch(error => {
+            updating.value = false;
+            customExchangeRateRemoving.value[currency] = false;
+
+            if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+        });
     });
 }
 

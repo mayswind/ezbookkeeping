@@ -42,6 +42,10 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Geographic Location Format" title="Coordinate Format" link="#"></f7-list-item>
+        </f7-list>
+
+        <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Expense Amount Color" title="Amount Color" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Income Amount Color" title="Amount Color" link="#"></f7-list-item>
         </f7-list>
@@ -369,6 +373,28 @@
             <f7-list-item
                 link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
+                :header="tt('Geographic Location Format')"
+                :title="findDisplayNameByType(allCoordinateDisplayTypes, newProfile.coordinateDisplayType)"
+                @click="showCoordinateDisplayTypePopup = true"
+            >
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Geographic Location Format')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Geographic Location Format')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allCoordinateDisplayTypes"
+                                           v-model:show="showCoordinateDisplayTypePopup"
+                                           v-model="newProfile.coordinateDisplayType">
+                </list-item-selection-popup>
+            </f7-list-item>
+        </f7-list>
+
+        <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
+            <f7-list-item
+                link="#"
+                class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Expense Amount Color')"
                 :title="findDisplayNameByType(allExpenseAmountColorTypes, newProfile.expenseAmountColor)"
                 @click="showExpenseAmountColorPopup = true"
@@ -477,6 +503,7 @@ const {
     allDigitGroupingSymbols,
     allDigitGroupingTypes,
     allCurrencyDisplayTypes,
+    allCoordinateDisplayTypes,
     allExpenseAmountColorTypes,
     allIncomeAmountColorTypes,
     allTransactionEditScopeTypes,
@@ -514,6 +541,7 @@ const showCurrencyDisplayTypePopup = ref<boolean>(false);
 const showDigitGroupingPopup = ref<boolean>(false);
 const showDigitGroupingSymbolPopup = ref<boolean>(false);
 const showDecimalSeparatorPopup = ref<boolean>(false);
+const showCoordinateDisplayTypePopup = ref<boolean>(false);
 const showExpenseAmountColorPopup = ref<boolean>(false);
 const showIncomeAmountColorPopup = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);

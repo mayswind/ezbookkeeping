@@ -321,6 +321,10 @@ func (s *UserService) UpdateUser(c core.Context, user *models.User, modifyUserLa
 		updateCols = append(updateCols, "currency_display_type")
 	}
 
+	if core.COORDINATE_DISPLAY_TYPE_DEFAULT <= user.CoordinateDisplayType && user.CoordinateDisplayType <= core.COORDINATE_DISPLAY_TYPE_LONGITUDE_LATITUDE_DEGREES_MINUTES_SECONDS {
+		updateCols = append(updateCols, "coordinate_display_type")
+	}
+
 	if models.AMOUNT_COLOR_TYPE_DEFAULT <= user.ExpenseAmountColor && user.ExpenseAmountColor <= models.AMOUNT_COLOR_TYPE_BLACK_OR_WHITE {
 		updateCols = append(updateCols, "expense_amount_color")
 	}

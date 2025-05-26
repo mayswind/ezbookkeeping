@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import type { MapPosition } from '@/core/map.ts';
+import type { Coordinate } from '@/core/coordinate.ts';
 import type { MapProvider, MapInstance, MapInstanceInitOptions } from './base.ts';
 
 import { asyncLoadAssets } from '@/lib/misc.ts';
@@ -94,7 +94,7 @@ export class GoogleMapInstance implements MapInstance {
         this.inited = true;
     }
 
-    public setMapCenterTo(center: MapPosition, zoomLevel: number): void {
+    public setMapCenterTo(center: Coordinate, zoomLevel: number): void {
         if (!GoogleMapProvider.GoogleMap || !this.googleMapInstance) {
             return;
         }
@@ -106,7 +106,7 @@ export class GoogleMapInstance implements MapInstance {
         this.googleMapInstance.setZoom(zoomLevel);
     }
 
-    public setMapCenterMarker(position: MapPosition): void {
+    public setMapCenterMarker(position: Coordinate): void {
         if (!GoogleMapProvider.GoogleMap || !this.googleMapInstance) {
             return;
         }

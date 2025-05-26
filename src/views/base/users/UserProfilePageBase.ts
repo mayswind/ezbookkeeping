@@ -30,6 +30,7 @@ export function useUserProfilePageBase() {
         getAllDigitGroupingSymbols,
         getAllDigitGroupingTypes,
         getAllCurrencyDisplayTypes,
+        getAllCoordinateDisplayTypes,
         getAllExpenseAmountColors,
         getAllIncomeAmountColors,
         getAllTransactionEditScopeTypes,
@@ -63,6 +64,7 @@ export function useUserProfilePageBase() {
     const allDigitGroupingSymbols = computed<TypeAndDisplayName[]>(() => getAllDigitGroupingSymbols());
     const allDigitGroupingTypes = computed<LocalizedDigitGroupingType[]>(() => getAllDigitGroupingTypes());
     const allCurrencyDisplayTypes = computed<TypeAndDisplayName[]>(() => getAllCurrencyDisplayTypes());
+    const allCoordinateDisplayTypes = computed<TypeAndDisplayName[]>(() => getAllCoordinateDisplayTypes());
     const allExpenseAmountColorTypes = computed<TypeAndDisplayName[]>(() => getAllExpenseAmountColors());
     const allIncomeAmountColorTypes = computed<TypeAndDisplayName[]>(() => getAllIncomeAmountColors());
     const allTransactionEditScopeTypes = computed<TypeAndDisplayName[]>(() => getAllTransactionEditScopeTypes());
@@ -106,6 +108,7 @@ export function useUserProfilePageBase() {
             newProfile.value.digitGroupingSymbol === oldProfile.value.digitGroupingSymbol &&
             newProfile.value.digitGrouping === oldProfile.value.digitGrouping &&
             newProfile.value.currencyDisplayType === oldProfile.value.currencyDisplayType &&
+            newProfile.value.coordinateDisplayType === oldProfile.value.coordinateDisplayType &&
             newProfile.value.expenseAmountColor === oldProfile.value.expenseAmountColor &&
             newProfile.value.incomeAmountColor === oldProfile.value.incomeAmountColor) {
             return 'Nothing has been modified';
@@ -195,6 +198,7 @@ export function useUserProfilePageBase() {
         allDigitGroupingSymbols,
         allDigitGroupingTypes,
         allCurrencyDisplayTypes,
+        allCoordinateDisplayTypes,
         allExpenseAmountColorTypes,
         allIncomeAmountColorTypes,
         allTransactionEditScopeTypes,

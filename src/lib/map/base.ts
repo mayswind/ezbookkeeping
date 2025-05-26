@@ -1,4 +1,4 @@
-import type { MapPosition } from '@/core/map.ts';
+import type { Coordinate } from '@/core/coordinate.ts';
 
 export interface MapProvider {
     getWebsite(): string;
@@ -13,18 +13,18 @@ export interface MapInstance {
     readonly defaultZoomLevel: number;
     readonly minZoomLevel: number;
     initMapInstance(mapContainer: HTMLElement, options: MapInstanceInitOptions): void;
-    setMapCenterTo(center: MapPosition, zoomLevel: number): void;
-    setMapCenterMarker(position: MapPosition): void;
+    setMapCenterTo(center: Coordinate, zoomLevel: number): void;
+    setMapCenterMarker(position: Coordinate): void;
     removeMapCenterMarker(): void;
 }
 
 export interface MapInstanceInitOptions {
     readonly language?: string;
-    readonly initCenter: MapPosition;
+    readonly initCenter: Coordinate;
     readonly zoomLevel: number;
     readonly text: {
         readonly zoomIn: string;
         readonly zoomOut: string;
     };
-    readonly onClick?: (position: MapPosition) => void;
+    readonly onClick?: (position: Coordinate) => void;
 }

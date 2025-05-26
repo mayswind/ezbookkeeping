@@ -690,7 +690,7 @@
                             </div>
                         </template>
                         <template #item.geoLocation="{ item }">
-                            <span v-if="item.geoLocation">{{ `(${item.geoLocation.longitude}, ${item.geoLocation.latitude})` }}</span>
+                            <span v-if="item.geoLocation">{{ `(${formatCoordinate(item.geoLocation, coordinateDisplayType)})` }}</span>
                             <span v-else-if="!item.geoLocation">{{ tt('None') }}</span>
                         </template>
                         <template #item.tagIds="{ item }">
@@ -889,6 +889,7 @@ import {
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffsetMinutes
 } from '@/lib/datetime.ts';
+import { formatCoordinate } from '@/lib/coordinate.ts';
 import {
     getAccountMapByName
 } from '@/lib/account.ts';
@@ -1015,6 +1016,7 @@ const showAccountBalance = computed<boolean>(() => settingsStore.appSettings.sho
 const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
 
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
+const coordinateDisplayType = computed<number>(() => userStore.currentUserCoordinateDisplayType);
 
 const allSteps = computed<StepBarItem[]>(() => {
     const steps: StepBarItem[] = [

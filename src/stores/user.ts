@@ -106,6 +106,11 @@ export const useUserStore = defineStore('user', () => {
         return userInfo.currencyDisplayType;
     });
 
+    const currentUserCoordinateDisplayType = computed<number>(() => {
+        const userInfo = currentUserBasicInfo.value || EMPTY_USER_BASIC_INFO;
+        return userInfo.coordinateDisplayType;
+    });
+
     const currentUserExpenseAmountColor = computed<number>(() => {
         const userInfo = currentUserBasicInfo.value || EMPTY_USER_BASIC_INFO;
         return userInfo.expenseAmountColor;
@@ -324,6 +329,7 @@ export const useUserStore = defineStore('user', () => {
         currentUserDigitGroupingSymbol,
         currentUserDigitGrouping,
         currentUserCurrencyDisplayType,
+        currentUserCoordinateDisplayType,
         currentUserExpenseAmountColor,
         currentUserIncomeAmountColor,
         // functions

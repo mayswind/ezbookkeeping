@@ -92,6 +92,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
     const defaultAccountId = computed<string>(() => userStore.currentUserDefaultAccountId);
     const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
+    const coordinateDisplayType = computed<number>(() => userStore.currentUserCoordinateDisplayType);
 
     const allTimezones = computed<LocalizedTimezoneInfo[]>(() => getAllTimezones(true));
     const allAccounts = computed<Account[]>(() => accountsStore.allPlainAccounts);
@@ -416,8 +417,9 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         currentTimezoneOffsetMinutes,
         showAccountBalance,
         defaultCurrency,
-        firstDayOfWeek,
         defaultAccountId,
+        firstDayOfWeek,
+        coordinateDisplayType,
         allTimezones,
         allAccounts,
         allVisibleAccounts,

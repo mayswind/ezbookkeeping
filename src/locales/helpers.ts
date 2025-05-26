@@ -47,6 +47,10 @@ import {
 } from '@/core/currency.ts';
 
 import {
+    CoordinateDisplayType
+} from '@/core/coordinate.ts';
+
+import {
     PresetAmountColor
 } from '@/core/color.ts';
 
@@ -372,6 +376,26 @@ export function useI18n() {
 
     function getLocalizedDisplayNameAndType(typeAndNames: TypeAndName[]): TypeAndDisplayName[] {
         const ret: TypeAndDisplayName[] = [];
+
+        for (let i = 0; i < typeAndNames.length; i++) {
+            const nameAndType = typeAndNames[i];
+
+            ret.push({
+                type: nameAndType.type,
+                displayName: t(nameAndType.name)
+            });
+        }
+
+        return ret;
+    }
+
+    function getLocalizedDisplayNameAndTypeWithSystemDefault(typeAndNames: TypeAndName[], defaultValue: number, defaultType: TypeAndName): TypeAndDisplayName[] {
+        const ret: TypeAndDisplayName[] = [];
+
+        ret.push({
+            type: defaultValue,
+            displayName: t('System Default') + (defaultType.name ? ` (${t(defaultType.name)})` : '')
+        });
 
         for (let i = 0; i < typeAndNames.length; i++) {
             const nameAndType = typeAndNames[i];
@@ -1699,6 +1723,7 @@ export function useI18n() {
         getAllDigitGroupingTypes,
         getAllCurrencyDisplayTypes,
         getAllCurrencySortingTypes: () => getLocalizedDisplayNameAndType(CurrencySortingType.values()),
+        getAllCoordinateDisplayTypes: () => getLocalizedDisplayNameAndTypeWithSystemDefault(CoordinateDisplayType.values(), CoordinateDisplayType.SystemDefaultType, CoordinateDisplayType.Default),
         getAllExpenseAmountColors: () => getAllExpenseIncomeAmountColors(CategoryType.Expense),
         getAllIncomeAmountColors: () => getAllExpenseIncomeAmountColors(CategoryType.Income),
         getAllAccountCategories,

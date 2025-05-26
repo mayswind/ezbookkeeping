@@ -1,6 +1,6 @@
 import type { PartialRecord } from '@/core/base.ts';
 import type { YearMonth, StartEndTime } from '@/core/datetime.ts';
-import type { MapPosition } from '@/core/map.ts';
+import { type Coordinate, getNormalizedCoordinate } from '@/core/coordinate.ts';
 import { TransactionType } from '@/core/transaction.ts';
 
 import { Account, type AccountInfoResponse } from './account.ts';
@@ -74,7 +74,7 @@ export class Transaction implements TransactionInfoResponse {
     }
 
 
-    public set geoLocation(value: MapPosition) {
+    public set geoLocation(value: Coordinate) {
         this._geoLocation = TransactionGeoLocation.of(value);
     }
 
@@ -196,8 +196,20 @@ export class Transaction implements TransactionInfoResponse {
         this._pictures = [];
     }
 
-    public setGeoLocation(geoLocation?: TransactionGeoLocation): void {
-        this._geoLocation = geoLocation;
+    public getNormalizedGeoLocation(): Coordinate | undefined {
+        if (!this._geoLocation) {
+            return undefined;
+        }
+
+        return this._geoLocation.toNormalizedCoordinate();
+    }
+
+    public setGeoLocation(geoLocation?: Coordinate): void {
+        if (geoLocation) {
+            this._geoLocation = TransactionGeoLocation.createNewGeoLocation(geoLocation.latitude, geoLocation.longitude);
+        } else {
+            this._geoLocation = undefined;
+        }
     }
 
     public setLatitudeAndLongitude(latitude: number, longitude: number): void {
@@ -228,7 +240,7 @@ export class Transaction implements TransactionInfoResponse {
             tagIds: this.tagIds,
             pictureIds: this.getPictureIds(),
             comment: this.comment,
-            geoLocation: this.geoLocation,
+            geoLocation: this.getNormalizedGeoLocation(),
             clientSessionId: clientSessionId
         };
     }
@@ -247,7 +259,7 @@ export class Transaction implements TransactionInfoResponse {
             tagIds: this.tagIds,
             pictureIds: this.getPictureIds(),
             comment: this.comment,
-            geoLocation: this.geoLocation
+            geoLocation: this.getNormalizedGeoLocation()
         };
     }
 
@@ -410,8 +422,12 @@ export class TransactionGeoLocation implements TransactionGeoLocationRequest {
         return new TransactionGeoLocation(latitude, longitude);
     }
 
-    public static of(mapPosition: MapPosition): TransactionGeoLocation {
-        return new TransactionGeoLocation(mapPosition.latitude, mapPosition.longitude);
+    public static of(coordinate: Coordinate): TransactionGeoLocation {
+        return new TransactionGeoLocation(coordinate.latitude, coordinate.longitude);
+    }
+
+    public toNormalizedCoordinate(): Coordinate {
+        return getNormalizedCoordinate(this);
     }
 }
 
@@ -502,7 +518,7 @@ export interface TransactionListInMonthByPageRequest {
     readonly keyword: string;
 }
 
-export type TransactionGeoLocationResponse = MapPosition;
+export type TransactionGeoLocationResponse = Coordinate;
 
 export interface TransactionInfoResponse {
     readonly id: string;

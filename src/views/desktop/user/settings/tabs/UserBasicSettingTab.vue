@@ -271,6 +271,25 @@
                                     item-value="type"
                                     persistent-placeholder
                                     :disabled="loading || saving"
+                                    :label="tt('Geographic Location Format')"
+                                    :placeholder="tt('Geographic Location Format')"
+                                    :items="allCoordinateDisplayTypes"
+                                    v-model="newProfile.coordinateDisplayType"
+                                />
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+
+                    <v-divider />
+
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :disabled="loading || saving"
                                     :label="tt('Expense Amount Color')"
                                     :placeholder="tt('Expense Amount Color')"
                                     :items="allExpenseAmountColorTypes"
@@ -360,6 +379,7 @@ const {
     allDigitGroupingSymbols,
     allDigitGroupingTypes,
     allCurrencyDisplayTypes,
+    allCoordinateDisplayTypes,
     allExpenseAmountColorTypes,
     allIncomeAmountColorTypes,
     allTransactionEditScopeTypes,

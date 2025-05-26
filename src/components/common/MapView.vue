@@ -13,7 +13,7 @@ import { ref, computed, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-import type { MapPosition } from '@/core/map.ts';
+import type { Coordinate } from '@/core/coordinate.ts';
 import type { MapInstance } from '@/lib/map/base.ts';
 import { createMapInstance } from '@/lib/map/index.ts';
 
@@ -21,18 +21,18 @@ const props = defineProps<{
     height?: string;
     mapClass?: string;
     mapStyle?: Record<string, string>;
-    geoLocation?: MapPosition;
+    geoLocation?: Coordinate;
 }>();
 
 const emit = defineEmits<{
-    (e: 'click', geoLocation: MapPosition): void;
+    (e: 'click', geoLocation: Coordinate): void;
 }>();
 
 const { tt, getCurrentLanguageInfo } = useI18n();
 
 const mapContainer = useTemplateRef<HTMLElement>('mapContainer');
 const mapInstance = ref<MapInstance | null>(createMapInstance());
-const initCenter = ref<MapPosition>({
+const initCenter = ref<Coordinate>({
     latitude: 0,
     longitude: 0
 });
@@ -92,7 +92,7 @@ function initMapView(): void {
                 zoomIn: tt('Zoom in'),
                 zoomOut: tt('Zoom out'),
             },
-            onClick: (geoLocation: MapPosition) => {
+            onClick: (geoLocation: Coordinate) => {
                 emit('click', geoLocation);
             }
         });
@@ -113,7 +113,7 @@ function initMapView(): void {
     }
 }
 
-function setMarkerPosition(geoLocation?: MapPosition): void {
+function setMarkerPosition(geoLocation?: Coordinate): void {
     if (!mapInstance.value) {
         return;
     }

@@ -278,7 +278,7 @@
                                         v-model:menu="geoMenuState"
                                     >
                                         <template #selection>
-                                            <span class="cursor-pointer" v-if="transaction.geoLocation">{{ `(${transaction.geoLocation.longitude}, ${transaction.geoLocation.latitude})` }}</span>
+                                            <span class="cursor-pointer" v-if="transaction.geoLocation">{{ `(${formatCoordinate(transaction.geoLocation, coordinateDisplayType)})` }}</span>
                                             <span class="cursor-pointer" v-else-if="!transaction.geoLocation">{{ geoLocationStatusInfo }}</span>
                                         </template>
 
@@ -483,7 +483,7 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 
-import type { MapPosition } from '@/core/map.ts';
+import type { Coordinate } from '@/core/coordinate.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionType, TransactionEditScopeType } from '@/core/transaction.ts';
 import { TemplateType, ScheduledTemplateFrequencyType } from '@/core/template.ts';
@@ -499,6 +499,7 @@ import {
     getTimezoneOffsetMinutes,
     getCurrentUnixTime
 } from '@/lib/datetime.ts';
+import { formatCoordinate } from '@/lib/coordinate.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import {
     getTransactionPrimaryCategoryName,
@@ -567,6 +568,7 @@ const {
     transaction,
     defaultCurrency,
     defaultAccountId,
+    coordinateDisplayType,
     allTimezones,
     allVisibleAccounts,
     allAccountsMap,
@@ -1073,9 +1075,9 @@ function updateGeoLocation(forceUpdate: boolean): void {
     geoLocationStatus.value = GeoLocationStatus.Getting;
 }
 
-function updateSpecifiedGeoLocation(mapPosition: MapPosition): void {
+function updateSpecifiedGeoLocation(coordinate: Coordinate): void {
     if (isSupportGetGeoLocationByClick() && setGeoLocationByClickMap.value) {
-        transaction.value.setLatitudeAndLongitude(mapPosition.latitude, mapPosition.longitude);
+        transaction.value.setLatitudeAndLongitude(coordinate.latitude, coordinate.longitude);
         map.value?.setMarkerPosition(transaction.value.geoLocation);
     }
 }

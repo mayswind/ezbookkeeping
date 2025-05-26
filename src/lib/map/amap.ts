@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import type { MapPosition } from '@/core/map.ts';
+import type { Coordinate } from '@/core/coordinate.ts';
 import type { MapProvider, MapInstance, MapInstanceInitOptions } from './base.ts';
 
 import { asyncLoadAssets } from '@/lib/misc.ts';
@@ -105,7 +105,7 @@ export class AmapMapInstance implements MapInstance {
         this.inited = true;
     }
 
-    public setMapCenterTo(center: MapPosition, zoomLevel: number): void {
+    public setMapCenterTo(center: Coordinate, zoomLevel: number): void {
         if (!AmapMapProvider.AMap || !this.amapInstance) {
             return;
         }
@@ -146,7 +146,7 @@ export class AmapMapInstance implements MapInstance {
         });
     }
 
-    public setMapCenterMarker(position: MapPosition): void {
+    public setMapCenterMarker(position: Coordinate): void {
         if (!AmapMapProvider.AMap || !this.amapInstance) {
             return;
         }

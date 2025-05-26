@@ -903,6 +903,7 @@ func printUserInfo(user *models.User) {
 	fmt.Printf("[DigitGroupingSymbol] %s (%d)\n", user.DigitGroupingSymbol, user.DigitGroupingSymbol)
 	fmt.Printf("[DigitGrouping] %s (%d)\n", user.DigitGrouping, user.DigitGrouping)
 	fmt.Printf("[CurrencyDisplayType] %s (%d)\n", user.CurrencyDisplayType, user.CurrencyDisplayType)
+	fmt.Printf("[CoordinateDisplayType] %s (%d)\n", user.CoordinateDisplayType, user.CoordinateDisplayType)
 	fmt.Printf("[ExpenseAmountColor] %s (%d)\n", user.ExpenseAmountColor, user.ExpenseAmountColor)
 	fmt.Printf("[IncomeAmountColor] %s (%d)\n", user.IncomeAmountColor, user.IncomeAmountColor)
 	fmt.Printf("[FeatureRestriction] %s (%d)\n", user.FeatureRestriction, user.FeatureRestriction)

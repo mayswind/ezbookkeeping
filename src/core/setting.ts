@@ -29,6 +29,7 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     autoUpdateExchangeRatesData: boolean;
     autoSaveTransactionDraft: string;
     autoGetCurrentGeoLocation: boolean;
+    alwaysShowTransactionPicturesInMobileTransactionEditPage: boolean;
     showAddTransactionButtonInDesktopNavbar: boolean;
     showAmountInHomePage: boolean;
     timezoneUsedForStatisticsInHomePage: number;
@@ -75,6 +76,7 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     autoUpdateExchangeRatesData: true,
     autoSaveTransactionDraft: 'disabled',
     autoGetCurrentGeoLocation: false,
+    alwaysShowTransactionPicturesInMobileTransactionEditPage: false,
     showAddTransactionButtonInDesktopNavbar: true,
     showAmountInHomePage: true,
     timezoneUsedForStatisticsInHomePage: TimezoneTypeForStatistics.Default.type,

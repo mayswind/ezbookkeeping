@@ -61,9 +61,15 @@
                                            v-model="autoSaveTransactionDraft">
                 </list-item-selection-popup>
             </f7-list-item>
+
             <f7-list-item>
                 <span>{{ tt('Automatically Add Geolocation') }}</span>
                 <f7-toggle :checked="isAutoGetCurrentGeoLocation" @toggle:change="isAutoGetCurrentGeoLocation = $event"></f7-toggle>
+            </f7-list-item>
+
+            <f7-list-item>
+                <span>{{ tt('Always Show Transaction Pictures') }}</span>
+                <f7-toggle :checked="alwaysShowTransactionPicturesInMobileTransactionEditPage" @toggle:change="alwaysShowTransactionPicturesInMobileTransactionEditPage = $event"></f7-toggle>
             </f7-list-item>
         </f7-list>
 
@@ -92,10 +98,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useAppSettingPageBase } from '@/views/base/settings/AppSettingsPageBase.ts';
+
+import { useSettingsStore } from '@/stores/setting.ts';
+
+import { findNameByValue, findDisplayNameByType } from '@/lib/common.ts';
 
 const { tt } = useI18n();
 const {
@@ -111,9 +121,14 @@ const {
     currencySortByInExchangeRatesPage
 } = useAppSettingPageBase();
 
-import { findNameByValue, findDisplayNameByType } from '@/lib/common.ts';
+const settingsStore = useSettingsStore();
 
 const showTimezoneUsedForStatisticsInHomePagePopup = ref<boolean>(false);
 const showAutoSaveTransactionDraftPopup = ref<boolean>(false);
 const showCurrencySortByInExchangeRatesPagePopup = ref<boolean>(false);
+
+const alwaysShowTransactionPicturesInMobileTransactionEditPage = computed<boolean>({
+    get: () => settingsStore.appSettings.alwaysShowTransactionPicturesInMobileTransactionEditPage,
+    set: (value) => settingsStore.setAlwaysShowTransactionPicturesInMobileTransactionEditPage(value)
+});
 </script>

@@ -620,7 +620,9 @@ const showScheduledStartDateSheet = ref<boolean>(false);
 const showScheduledEndDateSheet = ref<boolean>(false);
 const showGeoLocationMapSheet = ref<boolean>(false);
 const showTransactionTagSheet = ref<boolean>(false);
-const showTransactionPictures = ref<boolean>(false);
+const showTransactionPictures = ref<boolean>(pageTypeAndMode?.type === TransactionEditPageType.Transaction
+    && (pageTypeAndMode?.mode === TransactionEditPageMode.Add || pageTypeAndMode?.mode === TransactionEditPageMode.Edit)
+    && settingsStore.appSettings.alwaysShowTransactionPicturesInMobileTransactionEditPage);
 
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
 

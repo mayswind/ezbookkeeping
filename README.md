@@ -27,7 +27,7 @@ Online Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-dem
     * Support transaction pictures
     * Support geographic location tracking and map
     * Support recurring transactions
-    * Search and filtering transaction records
+    * Search and filter transaction records
     * Data visualization and statistical analysis
 6. Localization Support
     * Multi-language support

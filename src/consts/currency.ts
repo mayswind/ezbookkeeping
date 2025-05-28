@@ -338,7 +338,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
         code: 'ERN',
         fraction: 2,
         symbol: {
-            normal: 'Nkf'
+            normal: 'Nfk'
         },
         unit: 'Nakfa'
     },

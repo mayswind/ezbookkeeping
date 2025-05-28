@@ -27,12 +27,16 @@ export function useAboutPageBase() {
 
         return formatUnixTimeToLongDateTime(parseInt(time));
     });
+
     const exchangeRatesData = computed<LatestExchangeRateResponse | undefined>(() => exchangeRatesStore.latestExchangeRates.data);
+    const isUserCustomExchangeRates = computed<boolean>(() => exchangeRatesStore.isUserCustomExchangeRates);
+
     const mapProviderName = computed<string>(() => {
         const provider = getMapProvider();
         return provider ? tt(`mapprovider.${provider}`) : '';
     });
     const mapProviderWebsite = computed<string>(() => getMapWebsite());
+
     const licenseLines = computed<string[]>(() => getLicense().replaceAll(/\r/g, '').split('\n'));
     const thirdPartyLicenses = computed<LicenseInfo[]>(() => getThirdPartyLicenses());
 
@@ -42,6 +46,7 @@ export function useAboutPageBase() {
         // computed states
         buildTime,
         exchangeRatesData,
+        isUserCustomExchangeRates,
         mapProviderName,
         mapProviderWebsite,
         licenseLines,

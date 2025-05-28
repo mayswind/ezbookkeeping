@@ -53,7 +53,7 @@
             </v-card>
         </v-col>
 
-        <v-col cols="12" v-if="exchangeRatesData">
+        <v-col cols="12" v-if="exchangeRatesData && !isUserCustomExchangeRates">
             <v-card :title="tt('Exchange Rates Data')">
                 <v-card-text>
                     <v-row no-gutters>
@@ -124,5 +124,14 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useAboutPageBase } from '@/views/base/AboutPageBase.ts';
 
 const { tt } = useI18n();
-const { version, buildTime, exchangeRatesData, mapProviderName, mapProviderWebsite, licenseLines, thirdPartyLicenses } = useAboutPageBase();
+const {
+    version,
+    buildTime,
+    exchangeRatesData,
+    isUserCustomExchangeRates,
+    mapProviderName,
+    mapProviderWebsite,
+    licenseLines,
+    thirdPartyLicenses
+} = useAboutPageBase();
 </script>

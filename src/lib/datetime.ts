@@ -884,18 +884,27 @@ export function getCombinedDateAndTimeValues(date: Date, timeValues: string[], i
     return newDateTime;
 }
 
-export function getMonthFirstDayOrCurrentDayShortDate(unixTime: number): string {
+export function getValidMonthDayOrCurrentDayShortDate(unixTime: number, currentShortDate: string): string {
     const currentTime = moment();
-    let dateTime = moment.unix(unixTime);
+    let monthLastTime = moment.unix(getMonthLastUnixTimeBySpecifiedUnixTime(unixTime));
 
-    if (dateTime.year() === currentTime.year() && dateTime.month() === currentTime.month()) {
+    if (currentShortDate) {
+        const yearMonthDay = currentShortDate.split('-');
+
+        if (yearMonthDay.length === 3) {
+            const currentDay = parseInt(yearMonthDay[2]);
+
+            if (currentDay < monthLastTime.date()) {
+                return getShortDate(monthLastTime.set({ date: currentDay }));
+            }
+        }
+    }
+
+    if (monthLastTime.year() === currentTime.year() && monthLastTime.month() === currentTime.month()) {
         return getShortDate(currentTime);
     }
 
-    dateTime = dateTime.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
-    dateTime = dateTime.subtract(dateTime.date() - 1, 'days');
-
-    return getShortDate(dateTime);
+    return getShortDate(monthLastTime);
 }
 
 export function isDateRangeMatchFullYears(minTime: number, maxTime: number): boolean {

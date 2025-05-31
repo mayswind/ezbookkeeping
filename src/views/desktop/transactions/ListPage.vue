@@ -698,7 +698,7 @@ import {
     getDateRangeByBillingCycleDateType,
     getRecentDateRangeIndex,
     getFullMonthDateRange,
-    getMonthFirstDayOrCurrentDayShortDate
+    getValidMonthDayOrCurrentDayShortDate
 } from '@/lib/datetime.ts';
 import {
     categoryTypeToTransactionType,
@@ -1123,7 +1123,7 @@ function init(initProps: TransactionListProps): void {
 
         if (type) {
             pageType.value = type.type;
-            currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(query.value.minTime);
+            currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(query.value.minTime, currentCalendarDate.value);
 
             if (pageType.value === TransactionListPageType.Calendar.type) {
                 const dateRange = getFullMonthDateRange(query.value.minTime, query.value.maxTime, firstDayOfWeek.value);
@@ -1136,7 +1136,7 @@ function init(initProps: TransactionListProps): void {
                     });
 
                     if (changed) {
-                        currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(query.value.minTime);
+                        currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(query.value.minTime, currentCalendarDate.value);
                         updateUrlWhenChanged(changed);
                         return;
                     }
@@ -1219,7 +1219,7 @@ function reload(force: boolean, init: boolean): void {
 
 function changePageType(type: number): void {
     pageType.value = type;
-    currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(query.value.minTime);
+    currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(query.value.minTime, currentCalendarDate.value);
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
         const dateRange = getFullMonthDateRange(query.value.minTime, query.value.maxTime, firstDayOfWeek.value);
@@ -1230,7 +1230,7 @@ function changePageType(type: number): void {
                 maxTime: dateRange.maxTime,
                 minTime: dateRange.minTime
             });
-            currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(query.value.minTime);
+            currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(query.value.minTime, currentCalendarDate.value);
         }
     }
 
@@ -1269,12 +1269,12 @@ function changeDateFilter(dateRange: TimeRangeAndDateType | number | null): void
     }
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
-        currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(dateRange.minTime);
+        currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(dateRange.minTime, currentCalendarDate.value);
         const fullMonthDateRange = getFullMonthDateRange(dateRange.minTime, dateRange.maxTime, firstDayOfWeek.value);
 
         if (fullMonthDateRange) {
             dateRange = fullMonthDateRange;
-            currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(dateRange.minTime);
+            currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(dateRange.minTime, currentCalendarDate.value);
         }
     }
 
@@ -1303,14 +1303,14 @@ function changeCustomDateFilter(minTime: number, maxTime: number): void {
     }
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
-        currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(minTime);
+        currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(minTime, currentCalendarDate.value);
         const dateRange = getFullMonthDateRange(minTime, maxTime, firstDayOfWeek.value);
 
         if (dateRange) {
             minTime = dateRange.minTime;
             maxTime = dateRange.maxTime;
             dateType = dateRange.dateType;
-            currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(minTime);
+            currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(minTime, currentCalendarDate.value);
         }
     }
 
@@ -1339,7 +1339,7 @@ function changeCustomMonthDateFilter(yearMonth: string): void {
     const dateType = getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek.value, DateRangeScene.Normal);
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
-        currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(minTime);
+        currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(minTime, currentCalendarDate.value);
     }
 
     if (query.value.dateType === dateType && query.value.maxTime === maxTime && query.value.minTime === minTime) {
@@ -1373,12 +1373,12 @@ function shiftDateRange(startTime: number, endTime: number, scale: number): void
     }
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
-        currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(newDateRange.minTime);
+        currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(newDateRange.minTime, currentCalendarDate.value);
         const fullMonthDateRange = getFullMonthDateRange(newDateRange.minTime, newDateRange.maxTime, firstDayOfWeek.value);
 
         if (fullMonthDateRange) {
             newDateRange = fullMonthDateRange;
-            currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(newDateRange.minTime);
+            currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(newDateRange.minTime, currentCalendarDate.value);
         }
     }
 

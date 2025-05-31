@@ -642,7 +642,7 @@ import {
     getDateRangeByDateType,
     getDateRangeByBillingCycleDateType,
     getFullMonthDateRange,
-    getMonthFirstDayOrCurrentDayShortDate
+    getValidMonthDayOrCurrentDayShortDate
 } from '@/lib/datetime.ts';
 import {
     categoryTypeToTransactionType,
@@ -1034,7 +1034,7 @@ function loadMore(autoExpand: boolean): void {
 
 function changePageType(type: number): void {
     pageType.value = type;
-    currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(query.value.minTime);
+    currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(query.value.minTime, currentCalendarDate.value);
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
         const dateRange = getFullMonthDateRange(query.value.minTime, query.value.maxTime, firstDayOfWeek.value);
@@ -1047,7 +1047,7 @@ function changePageType(type: number): void {
             });
 
             if (changed) {
-                currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(query.value.minTime);
+                currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(query.value.minTime, currentCalendarDate.value);
                 reload();
             }
         }
@@ -1089,12 +1089,12 @@ function changeDateFilter(dateType: number): void {
     }
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
-        currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(dateRange.minTime);
+        currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(dateRange.minTime, currentCalendarDate.value);
         const fullMonthDateRange = getFullMonthDateRange(dateRange.minTime, dateRange.maxTime, firstDayOfWeek.value);
 
         if (fullMonthDateRange) {
             dateRange = fullMonthDateRange;
-            currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(dateRange.minTime);
+            currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(dateRange.minTime, currentCalendarDate.value);
         }
     }
 
@@ -1123,14 +1123,14 @@ function changeCustomDateFilter(minTime: number, maxTime: number): void {
     }
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
-        currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(minTime);
+        currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(minTime, currentCalendarDate.value);
         const dateRange = getFullMonthDateRange(minTime, maxTime, firstDayOfWeek.value);
 
         if (dateRange) {
             minTime = dateRange.minTime;
             maxTime = dateRange.maxTime;
             dateType = dateRange.dateType;
-            currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(minTime);
+            currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(minTime, currentCalendarDate.value);
         }
     }
 
@@ -1157,7 +1157,7 @@ function changeCustomMonthDateFilter(yearMonth: string): void {
     const dateType = getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek.value, DateRangeScene.Normal);
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
-        currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(minTime);
+        currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(minTime, currentCalendarDate.value);
     }
 
     const changed = transactionsStore.updateTransactionListFilter({
@@ -1189,12 +1189,12 @@ function shiftDateRange(minTime: number, maxTime: number, scale: number): void {
     }
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
-        currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(newDateRange.minTime);
+        currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(newDateRange.minTime, currentCalendarDate.value);
         const fullMonthDateRange = getFullMonthDateRange(newDateRange.minTime, newDateRange.maxTime, firstDayOfWeek.value);
 
         if (fullMonthDateRange) {
             newDateRange = fullMonthDateRange;
-            currentCalendarDate.value = getMonthFirstDayOrCurrentDayShortDate(newDateRange.minTime);
+            currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(newDateRange.minTime, currentCalendarDate.value);
         }
     }
 

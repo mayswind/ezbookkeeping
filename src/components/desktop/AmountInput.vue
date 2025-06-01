@@ -72,9 +72,11 @@ import SnackBar from '@/components/desktop/SnackBar.vue';
 import { ref, computed, useTemplateRef, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
+import { type CommonNumberInputProps, useCommonNumberInputBase } from '@/components/base/CommonNumberInputBase.ts';
 
 import { DecimalSeparator } from '@/core/numeral.ts';
 import type { CurrencyPrependAndAppendText } from '@/core/currency.ts';
+import { DEFAULT_DECIMAL_NUMBER_COUNT } from '@/consts/numeral.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import { isNumber, replaceAll, removeAll } from '@/lib/common.ts';
 import { evaluateExpression } from '@/lib/evaluator.ts';
@@ -89,23 +91,20 @@ import {
 
 type SnackBarType = InstanceType<typeof SnackBar>;
 
-const props = defineProps<{
+interface DesktopAmountInputProps extends CommonNumberInputProps {
     class?: string;
     color?: string;
     density?: ComponentDensity;
     currency: string;
     showCurrency?: boolean;
-    label?: string;
-    placeholder?: string;
     persistentPlaceholder?: boolean;
-    disabled?: boolean;
-    readonly?: boolean;
     hide?: boolean;
     enableRules?: boolean;
     enableFormula?: boolean;
     flipNegative?: boolean;
-    modelValue: number;
-}>();
+}
+
+const props = defineProps<DesktopAmountInputProps>();
 
 const emit = defineEmits<{
     (e: 'update:modelValue', value: number): void;
@@ -120,6 +119,12 @@ const {
     formatNumber,
     getAmountPrependAndAppendText
 } = useI18n();
+
+const {
+    currentValue,
+    onKeyUpDown,
+    onPaste
+} = useCommonNumberInputBase(props, DEFAULT_DECIMAL_NUMBER_COUNT, getInitedFormattedValue(props.modelValue, props.flipNegative), parseAmount, getFormattedValue, getValidFormattedValue);
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
@@ -144,7 +149,6 @@ const rules = [
     }
 ];
 
-const currentValue = ref<string>(getInitedFormattedValue(props.modelValue, props.flipNegative));
 const currentFormula = ref<string>('');
 const formulaMode = ref<boolean>(false);
 
@@ -226,135 +230,6 @@ function calculateFormula(): void {
 function exitFormulaMode(): void {
     formulaMode.value = false;
     currentFormula.value = '';
-}
-
-function onKeyUpDown(e: KeyboardEvent): void {
-    if (e.altKey || e.ctrlKey || e.metaKey || (e.key.indexOf('F') === 0 && (e.key.length === 2 || e.key.length === 3))
-        || e.key === 'ArrowLeft' || e.key === 'ArrowRight'
-        || e.key === 'Home' || e.key === 'End' || e.key === 'Tab'
-        || e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Del') {
-        return;
-    }
-
-    if (props.readonly || props.disabled) {
-        e.preventDefault();
-        return;
-    }
-
-    const digitGroupingSymbol = getCurrentDigitGroupingSymbol();
-    const decimalSeparator = getCurrentDecimalSeparator();
-
-    if (!('0' <= e.key && e.key <= '9') && e.key !== '-' && e.key !== decimalSeparator) {
-        e.preventDefault();
-        return;
-    }
-
-    if (!e.target) {
-        return;
-    }
-
-    const target = e.target as HTMLInputElement;
-
-    let str = target.value;
-
-    if (str.indexOf(digitGroupingSymbol) >= 0) {
-        str = removeAll(str, digitGroupingSymbol);
-    }
-
-    if (e.key === '-' && str.lastIndexOf('-') > 0) {
-        const lastMinusPos = str.lastIndexOf('-');
-        target.value = str.substring(0, lastMinusPos) + str.substring(lastMinusPos + 1, str.length);
-        currentValue.value = target.value;
-        e.preventDefault();
-        return;
-    }
-
-    if (e.key === decimalSeparator && str.indexOf(decimalSeparator) !== str.lastIndexOf(decimalSeparator)) {
-        const lastDecimalSeparatorPos = str.lastIndexOf(decimalSeparator);
-        target.value = str.substring(0, lastDecimalSeparatorPos) + str.substring(lastDecimalSeparatorPos + 1, str.length);
-        currentValue.value = target.value;
-        e.preventDefault();
-        return;
-    }
-
-    if (e.key === decimalSeparator && (str.indexOf(decimalSeparator) === 0 || (str.indexOf(decimalSeparator) === 1 && str.charAt(0) === '-'))) {
-        const negative = str.charAt(0) === '-';
-
-        if (negative) {
-            str = str.substring(1);
-        }
-
-        str = (negative ? '-0' : '0') + str;
-        target.value = str;
-        currentValue.value = target.value;
-        e.preventDefault();
-        return;
-    }
-
-    let decimalLength = 0;
-    const decimalIndex = str.indexOf(decimalSeparator);
-
-    if (decimalIndex >= 0) {
-        decimalLength = str.length - str.indexOf(decimalSeparator) - 1;
-    } else if ((str.startsWith('0') && str.length >= 2) || (str.startsWith('-0') && str.length >= 3)) {
-        const negative = str.charAt(0) === '-';
-
-        if (negative) {
-            str = str.substring(1);
-        }
-
-        while (str.charAt(0) === '0' && (str.length >= 2 || e.key !== '0')) {
-            str = str.substring(1);
-        }
-
-        target.value = (negative ? '-' : '') + str;
-        currentValue.value = target.value;
-        e.preventDefault();
-        return;
-    }
-
-    if (decimalLength > 2) {
-        target.value = str.substring(0, Math.min(decimalIndex + 3, str.length - 1));
-        currentValue.value = target.value;
-        e.preventDefault();
-        return;
-    }
-
-    try {
-        const val = parseAmount(str);
-        const finalValue = getValidFormattedValue(val, str, decimalIndex >= 0);
-
-        if (finalValue !== str) {
-            target.value = finalValue;
-            currentValue.value = finalValue;
-            e.preventDefault();
-        }
-    } catch (ex) {
-        logger.warn('cannot parse amount in amount input, original value is ' + str, ex);
-        target.value = '0';
-    }
-}
-
-function onPaste(e: ClipboardEvent): void {
-    if (!e.clipboardData || props.readonly || props.disabled) {
-        e.preventDefault();
-        return;
-    }
-
-    const text = e.clipboardData.getData('Text');
-
-    if (!text) {
-        e.preventDefault();
-        return;
-    }
-
-    const value = parseAmount(text);
-    const textualValue = getFormattedValue(value);
-    const decimalSeparator = getCurrentDecimalSeparator();
-    const hasDecimalSeparator = text.indexOf(decimalSeparator) >= 0;
-
-    currentValue.value = getValidFormattedValue(value, textualValue, hasDecimalSeparator);
-    e.preventDefault();
 }
 
 function onClick(e: MouseEvent): void {

@@ -886,7 +886,7 @@ export function getCombinedDateAndTimeValues(date: Date, timeValues: string[], i
 
 export function getValidMonthDayOrCurrentDayShortDate(unixTime: number, currentShortDate: string): string {
     const currentTime = moment();
-    let monthLastTime = moment.unix(getMonthLastUnixTimeBySpecifiedUnixTime(unixTime));
+    const monthLastTime = moment.unix(getMonthLastUnixTimeBySpecifiedUnixTime(unixTime));
 
     if (currentShortDate) {
         const yearMonthDay = currentShortDate.split('-');

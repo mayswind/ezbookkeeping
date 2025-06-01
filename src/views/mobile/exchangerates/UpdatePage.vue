@@ -10,13 +10,17 @@
         </f7-navbar>
 
         <f7-list form strong inset dividers class="margin-vertical">
-            <f7-list-input
-                type="number"
-                :disabled="submitting"
-                :label="tt('Amount')"
-                :placeholder="tt('Amount')"
-                v-model:value="defaultCurrencyAmount"
-            ></f7-list-input>
+            <template #list>
+                <list-number-input
+                    :disabled="submitting"
+                    :label="tt('Amount')"
+                    :placeholder="tt('Amount')"
+                    :min-value="USER_CUSTOM_EXCHANGE_RATE_MIN_VALUE"
+                    :max-value="USER_CUSTOM_EXCHANGE_RATE_MAX_VALUE"
+                    :max-decimal-count="4"
+                    v-model="defaultCurrencyAmount"
+                ></list-number-input>
+            </template>
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
@@ -39,13 +43,17 @@
         </f7-block>
 
         <f7-list form strong inset dividers class="margin-vertical">
-            <f7-list-input
-                type="number"
-                :disabled="submitting"
-                :label="tt('Amount')"
-                :placeholder="tt('Amount')"
-                v-model:value="targetCurrencyAmount"
-            ></f7-list-input>
+            <template #list>
+                <list-number-input
+                    :disabled="submitting"
+                    :label="tt('Amount')"
+                    :placeholder="tt('Amount')"
+                    :min-value="USER_CUSTOM_EXCHANGE_RATE_MIN_VALUE"
+                    :max-value="USER_CUSTOM_EXCHANGE_RATE_MAX_VALUE"
+                    :max-decimal-count="4"
+                    v-model="targetCurrencyAmount"
+                ></list-number-input>
+            </template>
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
@@ -87,6 +95,11 @@ import { useUserStore } from '@/stores/user.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
+
+import {
+    USER_CUSTOM_EXCHANGE_RATE_MAX_VALUE,
+    USER_CUSTOM_EXCHANGE_RATE_MIN_VALUE
+} from '@/consts/exchange_rate.ts';
 
 const props = defineProps<{
     f7router: Router.Router;

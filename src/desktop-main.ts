@@ -77,6 +77,7 @@ import MapView from '@/components/common/MapView.vue';
 
 import ItemIcon from '@/components/desktop/ItemIcon.vue';
 import BtnVerticalGroup from '@/components/desktop/BtnVerticalGroup.vue';
+import NumberInput from '@/components/desktop/NumberInput.vue';
 import AmountInput from '@/components/desktop/AmountInput.vue';
 import LanguageSelect from '@/components/desktop/LanguageSelect.vue';
 import LanguageSelectButton from '@/components/desktop/LanguageSelectButton.vue';
@@ -453,6 +454,7 @@ app.component('MapView', MapView);
 
 app.component('ItemIcon', ItemIcon);
 app.component('BtnVerticalGroup', BtnVerticalGroup);
+app.component('NumberInput', NumberInput);
 app.component('AmountInput', AmountInput);
 app.component('LanguageSelect', LanguageSelect);
 app.component('LanguageSelectButton', LanguageSelectButton);

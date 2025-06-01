@@ -11,11 +11,13 @@
             <v-card-text class="my-md-4 w-100 d-flex justify-center">
                 <v-row>
                     <v-col cols="12" md="6">
-                        <v-text-field type="number"
-                                      :disabled="submitting"
+                        <number-input :disabled="submitting"
                                       :label="tt('Amount')"
                                       :placeholder="tt('Amount')"
                                       :persistent-placeholder="true"
+                                      :min-value="USER_CUSTOM_EXCHANGE_RATE_MIN_VALUE"
+                                      :max-value="USER_CUSTOM_EXCHANGE_RATE_MAX_VALUE"
+                                      :max-decimal-count="4"
                                       v-model="defaultCurrencyAmount"/>
                     </v-col>
                     <v-col cols="12" md="6">
@@ -28,11 +30,13 @@
                         <v-icon :icon="mdiSwapVertical" size="24" />
                     </v-col>
                     <v-col cols="12" md="6">
-                        <v-text-field type="number"
-                                      :disabled="submitting"
+                        <number-input :disabled="submitting"
                                       :label="tt('Amount')"
                                       :placeholder="tt('Amount')"
                                       :persistent-placeholder="true"
+                                      :min-value="USER_CUSTOM_EXCHANGE_RATE_MIN_VALUE"
+                                      :max-value="USER_CUSTOM_EXCHANGE_RATE_MAX_VALUE"
+                                      :max-decimal-count="4"
                                       v-model="targetCurrencyAmount"/>
                     </v-col>
                     <v-col cols="12" md="6">
@@ -67,6 +71,11 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useUserStore } from '@/stores/user.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
+
+import {
+    USER_CUSTOM_EXCHANGE_RATE_MAX_VALUE,
+    USER_CUSTOM_EXCHANGE_RATE_MIN_VALUE
+} from '@/consts/exchange_rate.ts';
 
 import {
     mdiSwapVertical

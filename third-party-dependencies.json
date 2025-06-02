@@ -3,13 +3,13 @@
         "name": "Gin",
         "copyright": "Copyright (c) 2014 Manuel Martínez-Almeida",
         "url": "https://github.com/gin-gonic/gin",
-        "licenseUrl": "https://github.com/gin-gonic/gin/blob/v1.10.0/LICENSE"
+        "licenseUrl": "https://github.com/gin-gonic/gin/blob/v1.10.1/LICENSE"
     },
     {
         "name": "Cache gin's middleware",
         "copyright": "Copyright (c) 2016 Gin-Gonic",
         "url": "https://github.com/gin-contrib/cache",
-        "licenseUrl": "https://github.com/gin-contrib/cache/blob/v1.3.2/LICENSE"
+        "licenseUrl": "https://github.com/gin-contrib/cache/blob/v1.4.0/LICENSE"
     },
     {
         "name": "GZIP gin's middleware",
@@ -39,7 +39,7 @@
         "name": "cli",
         "copyright": "Copyright (c) 2023 urfave/cli maintainers",
         "url": "https://github.com/urfave/cli",
-        "licenseUrl": "https://github.com/urfave/cli/blob/v3.2.0/LICENSE"
+        "licenseUrl": "https://github.com/urfave/cli/blob/v3.3.3/LICENSE"
     },
     {
         "name": "INI",
@@ -62,7 +62,7 @@
     {
         "name": "otp",
         "url": "https://github.com/pquerna/otp",
-        "licenseUrl": "https://github.com/pquerna/otp/blob/v1.4.0/LICENSE"
+        "licenseUrl": "https://github.com/pquerna/otp/blob/v1.5.0/LICENSE"
     },
     {
         "name": "Go-MySQL-Driver",
@@ -85,19 +85,19 @@
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.37.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.38.0:LICENSE"
     },
     {
         "name": "Go Networking",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/net",
-        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.39.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.40.0:LICENSE"
     },
     {
         "name": "Go Text",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/text",
-        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.24.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.25.0:LICENSE"
     },
     {
         "name": "Gomail",
@@ -109,13 +109,13 @@
         "name": "MinIO Go Client SDK",
         "copyright": "MinIO Cloud Storage, (C) 2014-2020 MinIO, Inc.",
         "url": "https://github.com/minio/minio-go",
-        "licenseUrl": "https://github.com/minio/minio-go/blob/v7.0.91/LICENSE"
+        "licenseUrl": "https://github.com/minio/minio-go/blob/v7.0.92/LICENSE"
     },
     {
         "name": "gocron",
         "copyright": "Copyright (c) 2014, 辣椒面",
         "url": "https://github.com/go-co-op/gocron",
-        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.16.1/LICENSE"
+        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.16.2/LICENSE"
     },
     {
         "name": "barcode",
@@ -125,9 +125,9 @@
     },
     {
         "name": "Excelize",
-        "copyright": "Copyright (c) 2016-2024 The excelize Authors. Copyright (c) 2011-2017 Geoffrey J. Teale",
+        "copyright": "Copyright (c) 2016-2025 The excelize Authors. Copyright (c) 2011-2017 Geoffrey J. Teale",
         "url": "https://github.com/qax-os/excelize",
-        "licenseUrl": "https://github.com/qax-os/excelize/blob/v2.9.0/LICENSE"
+        "licenseUrl": "https://github.com/qax-os/excelize/blob/v2.9.1/LICENSE"
     },
     {
         "name": "xls",

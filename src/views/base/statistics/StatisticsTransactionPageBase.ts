@@ -37,6 +37,7 @@ export function useStatisticsTransactionPageBase() {
     const showAccountBalance = computed<boolean>(() => settingsStore.appSettings.showAccountBalance);
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
     const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
+    const fiscalYearStart = computed<number>(() => userStore.currentUserFiscalYearStart);
 
     const allDateRanges = computed<LocalizedDateRange[]>(() => {
         if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
@@ -224,6 +225,7 @@ export function useStatisticsTransactionPageBase() {
         showAccountBalance,
         defaultCurrency,
         firstDayOfWeek,
+        fiscalYearStart,
         allDateRanges,
         allSortingTypes,
         allDateAggregationTypes,

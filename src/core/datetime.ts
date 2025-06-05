@@ -512,6 +512,8 @@ export class DateRange implements TypeAndName {
     // Date ranges for normal and trend analysis scene
     public static readonly ThisYear = new DateRange(9, 'This year', false, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
     public static readonly LastYear = new DateRange(10, 'Last year', false, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
+    public static readonly ThisFiscalYear = new DateRange(11, 'This fiscal year', false, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
+    public static readonly LastFiscalYear = new DateRange(12, 'Last fiscal year', false, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
 
     // Billing cycle date ranges for normal scene only
     public static readonly PreviousBillingCycle = new DateRange(51, 'Previous Billing Cycle', true, DateRangeScene.Normal);

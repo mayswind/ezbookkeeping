@@ -780,6 +780,7 @@ const {
     currentCalendarDate,
     currentTimezoneOffsetMinutes,
     firstDayOfWeek,
+    fiscalYearStart,
     defaultCurrency,
     showTotalAmountInTransactionListPage,
     showTagInTransactionListPage,
@@ -943,7 +944,7 @@ const transactions = computed<Transaction[]>(() => {
 });
 
 const recentDateRangeIndex = computed<number>({
-    get: () => getRecentDateRangeIndex(recentMonthDateRanges.value, query.value.dateType, query.value.minTime, query.value.maxTime, firstDayOfWeek.value),
+    get: () => getRecentDateRangeIndex(recentMonthDateRanges.value, query.value.dateType, query.value.minTime, query.value.maxTime, firstDayOfWeek.value, fiscalYearStart.value),
     set: (value) => {
         if (value < 0 || value >= recentMonthDateRanges.value.length) {
             value = 0;
@@ -1093,7 +1094,7 @@ function updateUrlWhenChanged(changed: boolean): void {
 }
 
 function init(initProps: TransactionListProps): void {
-    let dateRange: TimeRangeAndDateType | null = getDateRangeByDateType(initProps.initDateType ? parseInt(initProps.initDateType) : undefined, firstDayOfWeek.value);
+    let dateRange: TimeRangeAndDateType | null = getDateRangeByDateType(initProps.initDateType ? parseInt(initProps.initDateType) : undefined, firstDayOfWeek.value, fiscalYearStart.value);
 
     if (!dateRange && initProps.initDateType && initProps.initMaxTime && initProps.initMinTime &&
         (DateRange.isBillingCycle(parseInt(initProps.initDateType)) || initProps.initDateType === DateRange.Custom.type.toString()) &&
@@ -1258,9 +1259,9 @@ function changeDateFilter(dateRange: TimeRangeAndDateType | number | null): void
 
     if (isNumber(dateRange)) {
         if (DateRange.isBillingCycle(dateRange)) {
-            dateRange = getDateRangeByBillingCycleDateType(dateRange, firstDayOfWeek.value, accountsStore.getAccountStatementDate(query.value.accountIds));
+            dateRange = getDateRangeByBillingCycleDateType(dateRange, firstDayOfWeek.value, fiscalYearStart.value, accountsStore.getAccountStatementDate(query.value.accountIds));
         } else {
-            dateRange = getDateRangeByDateType(dateRange, firstDayOfWeek.value);
+            dateRange = getDateRangeByDateType(dateRange, firstDayOfWeek.value, fiscalYearStart.value);
         }
     }
 
@@ -1296,10 +1297,10 @@ function changeCustomDateFilter(minTime: number, maxTime: number): void {
         return;
     }
 
-    let dateType: number | null = getDateTypeByBillingCycleDateRange(minTime, maxTime, firstDayOfWeek.value, DateRangeScene.Normal, accountsStore.getAccountStatementDate(query.value.accountIds));
+    let dateType: number | null = getDateTypeByBillingCycleDateRange(minTime, maxTime, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.Normal, accountsStore.getAccountStatementDate(query.value.accountIds));
 
     if (!dateType) {
-        dateType = getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek.value, DateRangeScene.Normal);
+        dateType = getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.Normal);
     }
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
@@ -1365,11 +1366,11 @@ function shiftDateRange(startTime: number, endTime: number, scale: number): void
     let newDateRange: TimeRangeAndDateType | null = null;
 
     if (DateRange.isBillingCycle(query.value.dateType) || query.value.dateType === DateRange.Custom.type) {
-        newDateRange = getShiftedDateRangeAndDateTypeForBillingCycle(startTime, endTime, scale, firstDayOfWeek.value, DateRangeScene.Normal, accountsStore.getAccountStatementDate(query.value.accountIds));
+        newDateRange = getShiftedDateRangeAndDateTypeForBillingCycle(startTime, endTime, scale, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.Normal, accountsStore.getAccountStatementDate(query.value.accountIds));
     }
 
     if (!newDateRange) {
-        newDateRange = getShiftedDateRangeAndDateType(startTime, endTime, scale, firstDayOfWeek.value, DateRangeScene.Normal);
+        newDateRange = getShiftedDateRangeAndDateType(startTime, endTime, scale, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.Normal);
     }
 
     if (pageType.value === TransactionListPageType.Calendar.type) {

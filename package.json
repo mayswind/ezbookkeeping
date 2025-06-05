@@ -15,7 +15,8 @@
     "serve": "cross-env NODE_ENV=development vite",
     "build": "cross-env NODE_ENV=production vite build",
     "serve:dist": "vite preview",
-    "lint": "tsc --noEmit && eslint . --fix"
+    "lint": "tsc --noEmit && eslint . --fix",
+    "test": "jest"
   },
   "dependencies": {
     "@mdi/js": "^7.4.47",
@@ -47,11 +48,13 @@
     "vuetify": "^3.8.7"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@tsconfig/node22": "^22.0.2",
     "@types/cbor-js": "^0.1.1",
     "@types/crypto-js": "^4.2.2",
     "@types/git-rev-sync": "^2.0.2",
     "@types/node": "^22.15.29",
+    "@types/jest": "^29.5.14",
     "@types/ua-parser-js": "^0.7.39",
     "@vitejs/plugin-vue": "^5.2.4",
     "@vue/eslint-config-typescript": "^14.5.0",
@@ -60,8 +63,11 @@
     "eslint": "^9.28.0",
     "eslint-plugin-vue": "^10.1.0",
     "git-rev-sync": "^3.0.2",
+    "jest": "^29.7.0",
     "postcss-preset-env": "^10.2.0",
     "sass": "^1.89.1",
+    "ts-jest": "^29.3.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
     "vite-plugin-pwa": "^1.0.0",

@@ -106,7 +106,8 @@ import {
 import {
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
-    getDateTypeByDateRange
+    getDateTypeByDateRange,
+    getFiscalYearFromUnixTime
 } from '@/lib/datetime.ts';
 import {
     sortStatisticsItems
@@ -147,7 +148,7 @@ const emit = defineEmits<{
     (e: 'click', value: TrendsBarChartClickEvent): void;
 }>();
 
-const { tt, formatUnixTimeToShortYear, formatYearQuarter, formatUnixTimeToShortYearMonth, formatAmountWithCurrency } = useI18n();
+const { tt, formatUnixTimeToShortYear, formatYearQuarter, formatUnixTimeToShortYearMonth, formatUnixTimeToFiscalYear, formatYearToFiscalYear, formatAmountWithCurrency } = useI18n();
 const { allDateRanges, getItemName, getColor } = useTrendsChartBase(props);
 
 const userStore = useUserStore();
@@ -188,6 +189,12 @@ const allDisplayDataItems = computed<TrendsBarChartData>(() => {
 
             if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
                 dateRangeKey = dataItem.year.toString();
+            } else if (props.dateAggregationType === ChartDateAggregationType.FiscalYear.type) {
+                const fiscalYear = getFiscalYearFromUnixTime(
+                    getYearMonthFirstUnixTime({ year: dataItem.year, month: dataItem.month }),
+                    props.fiscalYearStart
+                );
+                dateRangeKey = formatYearToFiscalYear(fiscalYear);
             } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type) {
                 dateRangeKey = `${dataItem.year}-${Math.floor((dataItem.month - 1) / 3) + 1}`;
             } else { // if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
@@ -218,6 +225,8 @@ const allDisplayDataItems = computed<TrendsBarChartData>(() => {
 
         if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
             dateRangeKey = dateRange.year.toString();
+        } else if (props.dateAggregationType === ChartDateAggregationType.FiscalYear.type) {
+            dateRangeKey = formatYearToFiscalYear(dateRange.year);
         } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type && 'quarter' in dateRange) {
             dateRangeKey = `${dateRange.year}-${dateRange.quarter}`;
         } else if (props.dateAggregationType === ChartDateAggregationType.Month.type && 'month' in dateRange) {
@@ -228,6 +237,8 @@ const allDisplayDataItems = computed<TrendsBarChartData>(() => {
 
         if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
             displayDateRange = formatUnixTimeToShortYear(dateRange.minUnixTime);
+        } else if (props.dateAggregationType === ChartDateAggregationType.FiscalYear.type) {
+            displayDateRange = formatUnixTimeToFiscalYear(dateRange.minUnixTime);
         } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type && 'quarter' in dateRange) {
             displayDateRange = formatYearQuarter(dateRange.year, dateRange.quarter);
         } else { // if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
@@ -321,7 +332,7 @@ function clickItem(item: TrendsBarChartDataItem): void {
         }
     }
 
-    const dateRangeType = getDateTypeByDateRange(minUnixTime, maxUnixTime, userStore.currentUserFirstDayOfWeek, DateRangeScene.Normal);
+    const dateRangeType = getDateTypeByDateRange(minUnixTime, maxUnixTime, userStore.currentUserFirstDayOfWeek, userStore.currentUserFiscalYearStart, DateRangeScene.Normal);
 
     emit('click', {
         itemId: itemId,

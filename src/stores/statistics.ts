@@ -747,7 +747,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 transactionStatisticsFilter.value.categoricalChartEndTime = 0;
             }
         } else {
-            const categoricalChartDateRange = getDateRangeByDateType(transactionStatisticsFilter.value.categoricalChartDateType, userStore.currentUserFirstDayOfWeek);
+            const categoricalChartDateRange = getDateRangeByDateType(transactionStatisticsFilter.value.categoricalChartDateType, userStore.currentUserFirstDayOfWeek, userStore.currentUserFiscalYearStart);
 
             if (categoricalChartDateRange) {
                 transactionStatisticsFilter.value.categoricalChartDateType = categoricalChartDateRange.dateType;
@@ -792,7 +792,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 transactionStatisticsFilter.value.trendChartEndYearMonth = '';
             }
         } else {
-            const trendChartDateRange = getDateRangeByDateType(transactionStatisticsFilter.value.trendChartDateType, userStore.currentUserFirstDayOfWeek);
+            const trendChartDateRange = getDateRangeByDateType(transactionStatisticsFilter.value.trendChartDateType, userStore.currentUserFirstDayOfWeek, userStore.currentUserFiscalYearStart);
 
             if (trendChartDateRange) {
                 transactionStatisticsFilter.value.trendChartDateType = trendChartDateRange.dateType;

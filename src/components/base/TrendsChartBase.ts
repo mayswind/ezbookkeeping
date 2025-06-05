@@ -9,6 +9,7 @@ import type {
     YearQuarterUnixTime,
     YearMonthUnixTime
 } from '@/core/datetime.ts';
+import type { FiscalYearUnixTime } from '@/core/fiscalyear.ts';
 import type { ColorValue } from '@/core/color.ts';
 import { DEFAULT_ICON_COLOR } from '@/consts/color.ts';
 import type { YearMonthItems } from '@/models/transaction.ts';
@@ -19,6 +20,7 @@ export interface CommonTrendsChartProps<T extends YearMonth> {
     items: YearMonthItems<T>[];
     startYearMonth: string;
     endYearMonth: string;
+    fiscalYearStart: number;
     sortingType: number;
     dateAggregationType: number;
     idField?: string;
@@ -40,7 +42,7 @@ export interface TrendsBarChartClickEvent {
 export function useTrendsChartBase<T extends YearMonth>(props: CommonTrendsChartProps<T>) {
     const { tt } = useI18n();
 
-    const allDateRanges = computed<YearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[]>(() => getAllDateRanges(props.items, props.startYearMonth, props.endYearMonth, props.dateAggregationType));
+    const allDateRanges = computed<YearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] | FiscalYearUnixTime[]>(() => getAllDateRanges(props.items, props.startYearMonth, props.endYearMonth, props.fiscalYearStart, props.dateAggregationType));
 
     function getItemName(name: string): string {
         return props.translateName ? tt(name) : name;

@@ -12,6 +12,7 @@ import {
     type LocalizedDateTimeFormat,
     type LocalizedDateRange,
     type LocalizedRecentMonthDateRange,
+    type UnixTimeRange,
     Month,
     WeekDay,
     MeridiemIndicator,
@@ -45,6 +46,13 @@ import {
     CurrencyDisplayType,
     CurrencySortingType
 } from '@/core/currency.ts';
+
+import {
+    FiscalYearStart,
+    FiscalYearFormat,
+    FiscalYearUnixTime,
+    LANGUAGE_DEFAULT_FISCAL_YEAR_FORMAT_VALUE,
+} from '@/core/fiscalyear.ts';
 
 import {
     CoordinateDisplayType
@@ -120,21 +128,25 @@ import {
 } from '@/lib/common.ts';
 
 import {
-    isPM,
-    formatUnixTime,
     formatCurrentTime,
     formatDate,
-    parseDateFromUnixTime,
-    getYear,
-    getTimezoneOffset,
-    getTimezoneOffsetMinutes,
+    formatMonthDay,
+    formatUnixTime,
     getBrowserTimezoneOffset,
     getBrowserTimezoneOffsetMinutes,
-    getTimeDifferenceHoursAndMinutes,
+    getCurrentUnixTime,
     getDateTimeFormatType,
+    getFiscalYearTimeRangeFromUnixTime,
+    getFiscalYearTimeRangeFromYear,
     getRecentMonthDateRanges,
+    getTimeDifferenceHoursAndMinutes,
+    getTimezoneOffset,
+    getTimezoneOffsetMinutes,
+    getYear,
+    isDateRangeMatchFullMonths,
     isDateRangeMatchFullYears,
-    isDateRangeMatchFullMonths
+    isPM,
+    parseDateFromUnixTime,
 } from '@/lib/datetime.ts';
 
 import {
@@ -629,6 +641,14 @@ export function useI18n() {
         return t('default.firstDayOfWeek');
     }
 
+    function getDefaultFiscalYearStart(): string {
+        return t('default.fiscalYearStart');
+    }
+
+    function getDefaultFiscalYearFormat(): string {
+        return t('default.fiscalYearFormat');
+    }
+
     function getAllLanguageOptions(includeSystemDefault: boolean): LanguageOption[] {
         const ret: LanguageOption[] = [];
 
@@ -766,7 +786,7 @@ export function useI18n() {
     function getLocalizedDateTimeFormats<T extends DateFormat | TimeFormat>(type: string, allFormatMap: Record<string, T>, allFormatArray: T[], languageDefaultTypeNameKey: string, systemDefaultFormatType: T): LocalizedDateTimeFormat[] {
         const defaultFormat = getLocalizedDateTimeFormat<T>(type, allFormatMap, allFormatArray, LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE, languageDefaultTypeNameKey, systemDefaultFormatType);
         const ret: LocalizedDateTimeFormat[] = [];
-
+        
         ret.push({
             type: LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE,
             format: defaultFormat,
@@ -786,7 +806,7 @@ export function useI18n() {
 
         return ret;
     }
-
+    
     function getAllDateRanges(scene: DateRangeScene, includeCustom?: boolean, includeBillingCycle?: boolean): LocalizedDateRange[] {
         const ret: LocalizedDateRange[] = [];
         const allDateRanges = DateRange.values();
@@ -917,6 +937,37 @@ export function useI18n() {
                 displayName: t(TimezoneTypeForStatistics.TransactionTimezone.name)
             }
         ];
+    }
+
+    function getAllFiscalYearFormats(): FiscalYearFormat[] {
+        const now = getCurrentUnixTime();
+        let fiscalYearStart = userStore.currentUserFiscalYearStart;
+        if (!fiscalYearStart) {
+            fiscalYearStart = FiscalYearStart.Default.value;
+        }
+        let nowFiscalYearRange = getFiscalYearTimeRangeFromUnixTime(now, userStore.currentUserFiscalYearStart);
+
+        const ret: FiscalYearFormat[] = [];
+
+        let defaultFiscalYearFormatType = FiscalYearFormat.parse(t('default.fiscalYearFormat'));
+        if (!defaultFiscalYearFormatType) {
+            defaultFiscalYearFormatType = FiscalYearFormat.Default;
+        }
+        ret.push({
+            type: LANGUAGE_DEFAULT_FISCAL_YEAR_FORMAT_VALUE,
+            displayName: `${t('Language Default')} (${formatTimeRangeToFiscalYearFormat(defaultFiscalYearFormatType, nowFiscalYearRange)})`
+        });
+
+        const allFiscalYearFormats = FiscalYearFormat.values();
+        for (let i = 0; i < allFiscalYearFormats.length; i++) {
+            const type = allFiscalYearFormats[i];
+            ret.push({
+                type: type.type,
+                displayName: formatTimeRangeToFiscalYearFormat(type, nowFiscalYearRange),
+            });
+        }
+
+        return ret;
     }
 
     function getAllDigitGroupingTypes(): LocalizedDigitGroupingType[] {
@@ -1315,6 +1366,21 @@ export function useI18n() {
         return digitGroupingType.type;
     }
 
+    function getCurrentFiscalYearFormatType(): number {
+        let fiscalYearFormat = FiscalYearFormat.valueOf(userStore.currentUserFiscalYearFormat);
+
+        if (!fiscalYearFormat) {
+            const defaultFiscalYearFormatTypeName = t('default.fiscalYearFormat');
+            fiscalYearFormat = FiscalYearFormat.parse(defaultFiscalYearFormatTypeName);
+
+            if (!fiscalYearFormat) {
+                fiscalYearFormat = FiscalYearFormat.Default;
+            }
+        }
+
+        return fiscalYearFormat.type;
+    }
+
     function getCurrencyName(currencyCode: string): string {
         return t(`currency.name.${currencyCode}`);
     }
@@ -1347,6 +1413,10 @@ export function useI18n() {
         return formatDate(date, getLocalizedLongDateFormat());
     }
 
+    function formatMonthDayToLongDay(monthDay: string): string {
+        return formatMonthDay(monthDay, getLocalizedLongMonthDayFormat());
+    }
+
     function formatYearQuarter(year: number, quarter: number): string {
         if (1 <= quarter && quarter <= 4) {
             return t('format.yearQuarter.q' + quarter, {
@@ -1357,7 +1427,7 @@ export function useI18n() {
             return '';
         }
     }
-
+    
     function formatDateRange(dateType: number, startTime: number, endTime: number): string {
         if (dateType === DateRange.All.type) {
             return t(DateRange.All.name);
@@ -1406,6 +1476,53 @@ export function useI18n() {
         return `${displayStartTime} ~ ${displayEndTime}`;
     }
 
+    function formatTimeRangeToFiscalYearFormat(format: FiscalYearFormat, timeRange: FiscalYearUnixTime | UnixTimeRange): string {
+        if (!format) {
+            format = FiscalYearFormat.Default;
+        }
+
+        return t('format.fiscalYear.' + format.displayName, {
+            StartYYYY: formatUnixTime(timeRange.minUnixTime, 'YYYY'),
+            StartYY: formatUnixTime(timeRange.minUnixTime, 'YY'),
+            EndYYYY: formatUnixTime(timeRange.maxUnixTime, 'YYYY'),
+            EndYY: formatUnixTime(timeRange.maxUnixTime, 'YY'),
+        });
+    }
+
+    function formatUnixTimeToFiscalYear(unixTime: number): string {
+        let fiscalYearFormat = FiscalYearFormat.valueOf(getCurrentFiscalYearFormatType());
+
+        if (!fiscalYearFormat) {
+            fiscalYearFormat = FiscalYearFormat.Default;
+        }
+
+        let timeRange = getFiscalYearTimeRangeFromUnixTime(unixTime, userStore.currentUserFiscalYearStart);
+
+        return formatTimeRangeToFiscalYearFormat(fiscalYearFormat, timeRange);
+    }
+
+    function formatYearToFiscalYear(year: number) {
+        let fiscalYearFormat = FiscalYearFormat.valueOf(getCurrentFiscalYearFormatType());
+
+        if (!fiscalYearFormat) {
+            fiscalYearFormat = FiscalYearFormat.Default;
+        }
+
+        let timeRange = getFiscalYearTimeRangeFromYear(year, userStore.currentUserFiscalYearStart);
+
+        return formatTimeRangeToFiscalYearFormat(fiscalYearFormat, timeRange);
+    }
+
+    function formatFiscalYearStart(fiscalYearStart: number) {
+        let fy = FiscalYearStart.fromNumber(fiscalYearStart);
+
+        if ( !fy ) {
+            fy = FiscalYearStart.Default;
+        }
+        
+        return formatMonthDayToLongDay(fy.toMonthDashDayString());
+    }
+        
     function getTimezoneDifferenceDisplayText(utcOffset: number): string {
         const defaultTimezoneOffset = getTimezoneOffsetMinutes();
         const offsetTime = getTimeDifferenceHoursAndMinutes(utcOffset - defaultTimezoneOffset);
@@ -1699,6 +1816,8 @@ export function useI18n() {
         // get localization default type
         getDefaultCurrency,
         getDefaultFirstDayOfWeek,
+        getDefaultFiscalYearStart,
+        getDefaultFiscalYearFormat,
         // get all localized info of specified type
         getAllLanguageOptions,
         getAllEnableDisableOptions,
@@ -1714,6 +1833,7 @@ export function useI18n() {
         getAllShortDateFormats: () => getLocalizedDateTimeFormats<ShortDateFormat>('shortDate', ShortDateFormat.all(), ShortDateFormat.values(), 'shortDateFormat', ShortDateFormat.Default),
         getAllLongTimeFormats: () => getLocalizedDateTimeFormats<LongTimeFormat>('longTime', LongTimeFormat.all(), LongTimeFormat.values(), 'longTimeFormat', LongTimeFormat.Default),
         getAllShortTimeFormats: () => getLocalizedDateTimeFormats<ShortTimeFormat>('shortTime', ShortTimeFormat.all(), ShortTimeFormat.values(), 'shortTimeFormat', ShortTimeFormat.Default),
+        getAllFiscalYearFormats,
         getAllDateRanges,
         getAllRecentMonthDateRanges,
         getAllTimezones,
@@ -1750,6 +1870,8 @@ export function useI18n() {
         getWeekdayLongName,
         getMultiMonthdayShortNames,
         getMultiWeekdayLongNames,
+        getCurrentFiscalYearStartFormatted: () => formatMonthDayToLongDay(FiscalYearStart.strictFromNumber(userStore.currentUserFiscalYearStart).toMonthDashDayString()),
+        getCurrentFiscalYearFormatType,
         getCurrentDecimalSeparator,
         getCurrentDigitGroupingSymbol,
         getCurrentDigitGroupingType,
@@ -1776,8 +1898,13 @@ export function useI18n() {
         formatUnixTimeToLongTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongTimeFormat(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortTimeFormat(), utcOffset, currentUtcOffset),
         formatDateToLongDate,
+        formatMonthDayToLongDay,
         formatYearQuarter,
         formatDateRange,
+        formatFiscalYearStart,
+        formatTimeRangeToFiscalYearFormat,
+        formatUnixTimeToFiscalYear,
+        formatYearToFiscalYear,
         getTimezoneDifferenceDisplayText,
         appendDigitGroupingSymbol: getNumberWithDigitGroupingSymbol,
         parseAmount: getParsedAmountNumber,

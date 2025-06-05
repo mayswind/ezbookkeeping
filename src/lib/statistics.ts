@@ -1,4 +1,5 @@
 import type { YearMonth, YearUnixTime, YearQuarterUnixTime, YearMonthUnixTime } from '@/core/datetime.ts';
+import type { FiscalYearUnixTime } from '@/core/fiscalyear.ts';
 import { ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
 import type {
     YearMonthItems,
@@ -8,7 +9,8 @@ import type {
 import {
     getAllMonthsStartAndEndUnixTimes,
     getAllQuartersStartAndEndUnixTimes,
-    getAllYearsStartAndEndUnixTimes
+    getAllYearsStartAndEndUnixTimes,
+    getAllFiscalYearsStartAndEndUnixTimes
 } from '@/lib/datetime.ts';
 
 export function sortStatisticsItems<T extends SortableTransactionStatisticDataItem>(items: T[], sortingType: number): void {
@@ -46,7 +48,7 @@ export function sortStatisticsItems<T extends SortableTransactionStatisticDataIt
     }
 }
 
-export function getAllDateRanges<T extends YearMonth>(items: YearMonthItems<T>[], startYearMonth: YearMonth | string, endYearMonth: YearMonth | string, dateAggregationType: number): YearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] {
+export function getAllDateRanges<T extends YearMonth>(items: YearMonthItems<T>[], startYearMonth: YearMonth | string, endYearMonth: YearMonth | string, fiscalYearStart: number, dateAggregationType: number): YearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] | FiscalYearUnixTime[] {
     if ((!startYearMonth || !endYearMonth) && items && items.length) {
         let minYear = Number.MAX_SAFE_INTEGER, minMonth = Number.MAX_SAFE_INTEGER, maxYear = 0, maxMonth = 0;
 
@@ -78,6 +80,8 @@ export function getAllDateRanges<T extends YearMonth>(items: YearMonthItems<T>[]
 
     if (dateAggregationType === ChartDateAggregationType.Year.type) {
         return getAllYearsStartAndEndUnixTimes(startYearMonth, endYearMonth);
+    } else if (dateAggregationType === ChartDateAggregationType.FiscalYear.type) {
+        return getAllFiscalYearsStartAndEndUnixTimes(startYearMonth, endYearMonth, fiscalYearStart);
     } else if (dateAggregationType === ChartDateAggregationType.Quarter.type) {
         return getAllQuartersStartAndEndUnixTimes(startYearMonth, endYearMonth);
     } else { // if (dateAggregationType === ChartDateAggregationType.Month.type) {

@@ -289,6 +289,10 @@ func (s *UserService) UpdateUser(c core.Context, user *models.User, modifyUserLa
 		updateCols = append(updateCols, "first_day_of_week")
 	}
 
+	if core.FISCAL_YEAR_START_MIN <= user.FiscalYearStart && core.FISCAL_YEAR_START_MAX >= user.FiscalYearStart {
+		updateCols = append(updateCols, "fiscal_year_start")
+	}
+
 	if core.LONG_DATE_FORMAT_DEFAULT <= user.LongDateFormat && user.LongDateFormat <= core.LONG_DATE_FORMAT_D_M_YYYY {
 		updateCols = append(updateCols, "long_date_format")
 	}
@@ -303,6 +307,10 @@ func (s *UserService) UpdateUser(c core.Context, user *models.User, modifyUserLa
 
 	if core.SHORT_TIME_FORMAT_DEFAULT <= user.ShortTimeFormat && user.ShortTimeFormat <= core.SHORT_TIME_FORMAT_HH_MM_A {
 		updateCols = append(updateCols, "short_time_format")
+	}
+
+	if core.FISCAL_YEAR_FORMAT_DEFAULT <= user.FiscalYearFormat && user.FiscalYearFormat <= core.FISCAL_YEAR_FORMAT_ENDYY {
+		updateCols = append(updateCols, "fiscal_year_format")
 	}
 
 	if core.DECIMAL_SEPARATOR_DEFAULT <= user.DecimalSeparator && user.DecimalSeparator <= core.DECIMAL_SEPARATOR_COMMA {

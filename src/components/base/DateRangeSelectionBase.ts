@@ -81,9 +81,12 @@ export function useDateRangeSelectionBase(props: CommonDateRangeSelectionProps) 
             DateRange.LastThirtyDays,
             DateRange.ThisWeek,
             DateRange.ThisMonth,
-            DateRange.ThisYear
+            DateRange.ThisYear,
+            DateRange.LastYear,
+            DateRange.ThisFiscalYear,
+            DateRange.LastFiscalYear
         ].forEach(dateRangeType => {
-            const dateRange = getDateRangeByDateType(dateRangeType.type, firstDayOfWeek.value) as TimeRangeAndDateType;
+            const dateRange = getDateRangeByDateType(dateRangeType.type, firstDayOfWeek.value, userStore.currentUserFiscalYearStart) as TimeRangeAndDateType;
 
             presetRanges.push({
                 label: tt(dateRangeType.name),

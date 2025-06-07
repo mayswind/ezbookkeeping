@@ -4,8 +4,9 @@ import (
 	"testing"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 )
 
 type fiscalYearStartContainer struct {
@@ -14,7 +15,8 @@ type fiscalYearStartContainer struct {
 
 func TestValidateFiscalYearStart_ValidValues(t *testing.T) {
 	validate := validator.New()
-	validate.RegisterValidation("validFiscalYearStart", ValidateFiscalYearStart)
+	err := validate.RegisterValidation("validFiscalYearStart", ValidateFiscalYearStart)
+	assert.Nil(t, err)
 
 	testCases := []struct {
 		name  string
@@ -37,7 +39,8 @@ func TestValidateFiscalYearStart_ValidValues(t *testing.T) {
 
 func TestValidateFiscalYearStart_InvalidValues(t *testing.T) {
 	validate := validator.New()
-	validate.RegisterValidation("validFiscalYearStart", ValidateFiscalYearStart)
+	err := validate.RegisterValidation("validFiscalYearStart", ValidateFiscalYearStart)
+	assert.Nil(t, err)
 
 	testCases := []struct {
 		name  string

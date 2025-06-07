@@ -37,7 +37,7 @@ export function useAboutPageBase() {
     });
     const mapProviderWebsite = computed<string>(() => getMapWebsite());
 
-    const licenseLines = computed<string[]>(() => getLicense().replaceAll(/\r/g, '').split('\n'));
+    const licenseLines = computed<string[]>(() => getLicense().replace(/\r/g, '').split('\n'));
     const thirdPartyLicenses = computed<LicenseInfo[]>(() => getThirdPartyLicenses());
 
     return {

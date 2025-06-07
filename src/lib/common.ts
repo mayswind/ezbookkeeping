@@ -196,7 +196,7 @@ export function replaceAll(value: string, originalValue: string, targetValue: st
     // rather than as special regex symbols.
     const escapedOriginalValue = originalValue.replace(/([.*+?^=!:${}()|\-/\\])/g, '\\$1');
 
-    return value.replaceAll(new RegExp(escapedOriginalValue, 'g'), targetValue);
+    return value.replace(new RegExp(escapedOriginalValue, 'g'), targetValue);
 }
 
 export function removeAll(value: string, originalValue: string): string {

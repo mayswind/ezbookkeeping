@@ -6,8 +6,10 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 
-import type { AccountCategory } from '@/core/account.ts';
+import { type AccountCategory, AccountType } from '@/core/account.ts';
 import type { Account, CategorizedAccount } from '@/models/account.ts';
+
+import { isObject, isString } from '@/lib/common.ts';
 
 export function useAccountListPageBaseBase() {
     const { formatAmountWithCurrency } = useI18n();
@@ -55,6 +57,28 @@ export function useAccountListPageBaseBase() {
         return formatAmountWithCurrency(totalBalance, defaultCurrency.value);
     }
 
+    function accountBalance(account: Account, currentSubAccountId?: string): string | null {
+        if (account.type === AccountType.SingleAccount.type) {
+            const balance = accountsStore.getAccountBalance(showAccountBalance.value, account);
+
+            if (!isString(balance)) {
+                return '';
+            }
+
+            return formatAmountWithCurrency(balance, account.currency);
+        } else if (account.type === AccountType.MultiSubAccounts.type) {
+            const balanceResult = accountsStore.getAccountSubAccountBalance(showAccountBalance.value, showHidden.value, account, currentSubAccountId);
+
+            if (!isObject(balanceResult)) {
+                return '';
+            }
+
+            return formatAmountWithCurrency(balanceResult.balance, balanceResult.currency);
+        } else {
+            return null;
+        }
+    }
+
     return {
         // states
         loading,
@@ -70,6 +94,7 @@ export function useAccountListPageBaseBase() {
         totalAssets,
         totalLiabilities,
         // functions
-        accountCategoryTotalBalance
+        accountCategoryTotalBalance,
+        accountBalance
     };
 }

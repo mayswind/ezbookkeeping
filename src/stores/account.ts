@@ -633,7 +633,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         }
     }
 
-    function getAccountSubAccountBalance(showAccountBalance: boolean, showHidden: boolean, account: Account, subAccountId: string): AccountDisplayBalance | null {
+    function getAccountSubAccountBalance(showAccountBalance: boolean, showHidden: boolean, account: Account, subAccountId?: string): AccountDisplayBalance | null {
         if (account.type !== AccountType.MultiSubAccounts.type) {
             return null;
         }

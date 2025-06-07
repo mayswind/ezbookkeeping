@@ -230,7 +230,7 @@
                                                                         {{ tt('Delete') }}
                                                                     </v-btn>
                                                                     <v-spacer/>
-                                                                    <span class="account-balance ml-2">{{ accountBalance(element) }}</span>
+                                                                    <span class="account-balance ml-2">{{ accountBalance(element, activeSubAccount[element.id]) }}</span>
                                                                 </div>
                                                             </v-card-text>
                                                         </v-card>
@@ -270,8 +270,6 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import type { Account } from '@/models/account.ts';
 
-import { isObject, isString } from '@/lib/common.ts';
-
 import {
     mdiEyeOutline,
     mdiEyeOffOutline,
@@ -291,7 +289,7 @@ type EditDialogType = InstanceType<typeof EditDialog>;
 
 const display = useDisplay();
 
-const { tt, getCurrencyName, formatAmountWithCurrency, joinMultiText } = useI18n();
+const { tt, getCurrencyName, joinMultiText } = useI18n();
 
 const {
     loading,
@@ -304,7 +302,8 @@ const {
     netAssets,
     totalAssets,
     totalLiabilities,
-    accountCategoryTotalBalance
+    accountCategoryTotalBalance,
+    accountBalance
 } = useAccountListPageBaseBase();
 
 const accountsStore = useAccountsStore();
@@ -390,28 +389,6 @@ function accountCurrency(account: Account): string | null {
         const subAccountCurrencies = account.getSubAccountCurrencies(showHidden.value, activeSubAccount.value[account.id])
             .map(currencyCode => getCurrencyName(currencyCode));
         return joinMultiText(subAccountCurrencies);
-    } else {
-        return null;
-    }
-}
-
-function accountBalance(account: Account): string | null {
-    if (account.type === AccountType.SingleAccount.type) {
-        const balance = accountsStore.getAccountBalance(showAccountBalance.value, account);
-
-        if (!isString(balance)) {
-            return '';
-        }
-
-        return formatAmountWithCurrency(balance, account.currency);
-    } else if (account.type === AccountType.MultiSubAccounts.type) {
-        const balanceResult = accountsStore.getAccountSubAccountBalance(showAccountBalance.value, showHidden.value, account, activeSubAccount.value[account.id]);
-
-        if (!isObject(balanceResult)) {
-            return '';
-        }
-
-        return formatAmountWithCurrency(balanceResult.balance, balanceResult.currency);
     } else {
         return null;
     }

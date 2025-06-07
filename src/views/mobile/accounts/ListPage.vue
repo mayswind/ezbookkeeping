@@ -84,7 +84,7 @@
                               class="nested-list-item"
                               :id="getAccountDomId(account)"
                               :class="{ 'has-child-list-item': account.type === AccountType.MultiSubAccounts.type && hasVisibleSubAccount(account), 'actual-first-child': account.id === firstShowingIds.accounts[accountCategory.type], 'actual-last-child': account.id === lastShowingIds.accounts[accountCategory.type] }"
-                              :after="accountBalance(account)"
+                              :after="account.type === AccountType.SingleAccount.type ? accountBalance(account) : ''"
                               :link="!sortable ? '/transaction/list?accountIds=' + account.id : null"
                               :key="account.id"
                               v-for="account in allCategorizedAccountsMap[accountCategory.type].accounts"
@@ -100,7 +100,7 @@
                     </template>
 
                     <template #title>
-                        <div class="display-flex padding-top-half padding-bottom-half">
+                        <div class="nested-list-item-inner display-flex padding-top-half padding-bottom-half">
                             <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color"
                                       v-if="account.type === AccountType.MultiSubAccounts.type && hasVisibleSubAccount(account)">
                                 <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
@@ -111,13 +111,16 @@
                                 <span>{{ account.name }}</span>
                                 <div class="item-footer" v-if="account.comment">{{ account.comment }}</div>
                             </div>
+                            <div class="nested-list-item-after" v-if="account.type === AccountType.MultiSubAccounts.type">
+                                <span>{{ accountBalance(account) }}</span>
+                            </div>
                         </div>
                         <li v-if="account.type === AccountType.MultiSubAccounts.type">
                             <ul class="no-padding">
                                 <f7-list-item class="no-sortable nested-list-item-child"
                                               :class="{ 'actual-first-child': subAccount.id === firstShowingIds.subAccounts[account.id], 'actual-last-child': subAccount.id === lastShowingIds.subAccounts[account.id] }"
                                               :id="getAccountDomId(subAccount)"
-                                              :title="subAccount.name" :footer="subAccount.comment" :after="accountBalance(subAccount)"
+                                              :title="subAccount.name" :footer="subAccount.comment" :after="accountBalance(account, subAccount.id)"
                                               :link="!sortable ? '/transaction/list?accountIds=' + subAccount.id : null"
                                               :key="subAccount.id"
                                               v-for="subAccount in account.subAccounts"
@@ -186,14 +189,13 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import type { Account, AccountShowingIds } from '@/models/account.ts';
 
-import { isString } from '@/lib/common.ts';
 import { onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, formatAmountWithCurrency } = useI18n();
+const { tt } = useI18n();
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
 const {
@@ -206,7 +208,8 @@ const {
     netAssets,
     totalAssets,
     totalLiabilities,
-    accountCategoryTotalBalance
+    accountCategoryTotalBalance,
+    accountBalance
 } = useAccountListPageBaseBase();
 
 const accountsStore = useAccountsStore();
@@ -234,16 +237,6 @@ function hasAccount(accountCategory: AccountCategory, visibleOnly: boolean): boo
 
 function hasVisibleSubAccount(account: Account): boolean {
     return accountsStore.hasVisibleSubAccount(showHidden.value, account);
-}
-
-function accountBalance(account: Account): string {
-    const balance = accountsStore.getAccountBalance(showAccountBalance.value, account);
-
-    if (!isString(balance)) {
-        return '';
-    }
-
-    return formatAmountWithCurrency(balance, account.currency);
 }
 
 function getAccountDomId(account: Account): string {

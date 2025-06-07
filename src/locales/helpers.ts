@@ -786,7 +786,7 @@ export function useI18n() {
     function getLocalizedDateTimeFormats<T extends DateFormat | TimeFormat>(type: string, allFormatMap: Record<string, T>, allFormatArray: T[], languageDefaultTypeNameKey: string, systemDefaultFormatType: T): LocalizedDateTimeFormat[] {
         const defaultFormat = getLocalizedDateTimeFormat<T>(type, allFormatMap, allFormatArray, LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE, languageDefaultTypeNameKey, systemDefaultFormatType);
         const ret: LocalizedDateTimeFormat[] = [];
-        
+
         ret.push({
             type: LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE,
             format: defaultFormat,
@@ -806,7 +806,7 @@ export function useI18n() {
 
         return ret;
     }
-    
+
     function getAllDateRanges(scene: DateRangeScene, includeCustom?: boolean, includeBillingCycle?: boolean): LocalizedDateRange[] {
         const ret: LocalizedDateRange[] = [];
         const allDateRanges = DateRange.values();
@@ -945,7 +945,7 @@ export function useI18n() {
         if (!fiscalYearStart) {
             fiscalYearStart = FiscalYearStart.Default.value;
         }
-        let nowFiscalYearRange = getFiscalYearTimeRangeFromUnixTime(now, userStore.currentUserFiscalYearStart);
+        const nowFiscalYearRange = getFiscalYearTimeRangeFromUnixTime(now, userStore.currentUserFiscalYearStart);
 
         const ret: FiscalYearFormat[] = [];
 
@@ -1427,7 +1427,7 @@ export function useI18n() {
             return '';
         }
     }
-    
+
     function formatDateRange(dateType: number, startTime: number, endTime: number): string {
         if (dateType === DateRange.All.type) {
             return t(DateRange.All.name);
@@ -1496,7 +1496,7 @@ export function useI18n() {
             fiscalYearFormat = FiscalYearFormat.Default;
         }
 
-        let timeRange = getFiscalYearTimeRangeFromUnixTime(unixTime, userStore.currentUserFiscalYearStart);
+        const timeRange = getFiscalYearTimeRangeFromUnixTime(unixTime, userStore.currentUserFiscalYearStart);
 
         return formatTimeRangeToFiscalYearFormat(fiscalYearFormat, timeRange);
     }
@@ -1508,7 +1508,7 @@ export function useI18n() {
             fiscalYearFormat = FiscalYearFormat.Default;
         }
 
-        let timeRange = getFiscalYearTimeRangeFromYear(year, userStore.currentUserFiscalYearStart);
+        const timeRange = getFiscalYearTimeRangeFromYear(year, userStore.currentUserFiscalYearStart);
 
         return formatTimeRangeToFiscalYearFormat(fiscalYearFormat, timeRange);
     }
@@ -1519,10 +1519,10 @@ export function useI18n() {
         if ( !fy ) {
             fy = FiscalYearStart.Default;
         }
-        
+
         return formatMonthDayToLongDay(fy.toMonthDashDayString());
     }
-        
+
     function getTimezoneDifferenceDisplayText(utcOffset: number): string {
         const defaultTimezoneOffset = getTimezoneOffsetMinutes();
         const offsetTime = getTimeDifferenceHoursAndMinutes(utcOffset - defaultTimezoneOffset);

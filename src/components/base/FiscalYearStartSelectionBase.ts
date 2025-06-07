@@ -22,7 +22,7 @@ export function useFiscalYearStartSelectionBase(props: FiscalYearStartSelectionB
     const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllMinWeekdayNames(), firstDayOfWeek.value));
 
     const displayName = computed<string>(() => {
-        let fy = FiscalYearStart.fromNumber(selectedFiscalYearStart.value);
+        const fy = FiscalYearStart.fromNumber(selectedFiscalYearStart.value);
 
         if ( fy ) {
             return formatMonthDayToLongDay(fy.toMonthDashDayString())
@@ -46,7 +46,7 @@ export function useFiscalYearStartSelectionBase(props: FiscalYearStartSelectionB
     const userStore = useUserStore();
 
     function selectedDisplayName(dateString: string): string {
-        let fy = FiscalYearStart.fromMonthDashDayString(dateString);
+        const fy = FiscalYearStart.fromMonthDashDayString(dateString);
         if ( fy ) {
             return formatMonthDayToLongDay(fy.toMonthDashDayString());
         }
@@ -56,7 +56,7 @@ export function useFiscalYearStartSelectionBase(props: FiscalYearStartSelectionB
     function getModelValueToDateString(): string {
         const input = selectedFiscalYearStart.value;
         
-        let fy = FiscalYearStart.fromNumber(input);
+        const fy = FiscalYearStart.fromNumber(input);
 
         if ( fy ) {
             return fy.toMonthDashDayString();

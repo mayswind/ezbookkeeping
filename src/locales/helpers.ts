@@ -641,10 +641,6 @@ export function useI18n() {
         return t('default.firstDayOfWeek');
     }
 
-    function getDefaultFiscalYearStart(): string {
-        return t('default.fiscalYearStart');
-    }
-
     function getDefaultFiscalYearFormat(): string {
         return t('default.fiscalYearFormat');
     }
@@ -1816,7 +1812,6 @@ export function useI18n() {
         // get localization default type
         getDefaultCurrency,
         getDefaultFirstDayOfWeek,
-        getDefaultFiscalYearStart,
         getDefaultFiscalYearFormat,
         // get all localized info of specified type
         getAllLanguageOptions,

@@ -289,7 +289,7 @@ func (s *UserService) UpdateUser(c core.Context, user *models.User, modifyUserLa
 		updateCols = append(updateCols, "first_day_of_week")
 	}
 
-	if core.FISCAL_YEAR_START_MIN <= user.FiscalYearStart && core.FISCAL_YEAR_START_MAX >= user.FiscalYearStart {
+	if core.FISCAL_YEAR_START_MIN <= user.FiscalYearStart && user.FiscalYearStart <= core.FISCAL_YEAR_START_MAX {
 		updateCols = append(updateCols, "fiscal_year_start")
 	}
 

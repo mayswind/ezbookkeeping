@@ -82,39 +82,39 @@ func (s AmountColorType) String() string {
 
 // User represents user data stored in database
 type User struct {
-	Uid                  int64  `xorm:"PK"`
-	Username             string `xorm:"VARCHAR(32) UNIQUE NOT NULL"`
-	Email                string `xorm:"VARCHAR(100) UNIQUE NOT NULL"`
-	Nickname             string `xorm:"VARCHAR(64) NOT NULL"`
-	Password             string `xorm:"VARCHAR(64) NOT NULL"`
-	Salt                 string `xorm:"VARCHAR(10) NOT NULL"`
-	CustomAvatarType     string `xorm:"VARCHAR(10)"`
-	DefaultAccountId     int64
-	TransactionEditScope TransactionEditScope     `xorm:"TINYINT NOT NULL"`
-	Language             string                   `xorm:"VARCHAR(10)"`
-	DefaultCurrency      string                   `xorm:"VARCHAR(3) NOT NULL"`
-	FirstDayOfWeek       core.WeekDay             `xorm:"TINYINT NOT NULL"`
-	FiscalYearStart      core.FiscalYearStart     `xorm:"SMALLINT"`
-	LongDateFormat       core.LongDateFormat      `xorm:"TINYINT"`
-	ShortDateFormat      core.ShortDateFormat     `xorm:"TINYINT"`
-	LongTimeFormat       core.LongTimeFormat      `xorm:"TINYINT"`
-	ShortTimeFormat      core.ShortTimeFormat     `xorm:"TINYINT"`
-	FiscalYearFormat     core.FiscalYearFormat    `xorm:"TINYINT"`
-	DecimalSeparator     core.DecimalSeparator    `xorm:"TINYINT"`
-	DigitGroupingSymbol  core.DigitGroupingSymbol `xorm:"TINYINT"`
-	DigitGrouping        core.DigitGroupingType   `xorm:"TINYINT"`
-	CurrencyDisplayType  core.CurrencyDisplayType `xorm:"TINYINT"`
+	Uid                   int64  `xorm:"PK"`
+	Username              string `xorm:"VARCHAR(32) UNIQUE NOT NULL"`
+	Email                 string `xorm:"VARCHAR(100) UNIQUE NOT NULL"`
+	Nickname              string `xorm:"VARCHAR(64) NOT NULL"`
+	Password              string `xorm:"VARCHAR(64) NOT NULL"`
+	Salt                  string `xorm:"VARCHAR(10) NOT NULL"`
+	CustomAvatarType      string `xorm:"VARCHAR(10)"`
+	DefaultAccountId      int64
+	TransactionEditScope  TransactionEditScope       `xorm:"TINYINT NOT NULL"`
+	Language              string                     `xorm:"VARCHAR(10)"`
+	DefaultCurrency       string                     `xorm:"VARCHAR(3) NOT NULL"`
+	FirstDayOfWeek        core.WeekDay               `xorm:"TINYINT NOT NULL"`
+	FiscalYearStart       core.FiscalYearStart       `xorm:"SMALLINT"`
+	LongDateFormat        core.LongDateFormat        `xorm:"TINYINT"`
+	ShortDateFormat       core.ShortDateFormat       `xorm:"TINYINT"`
+	LongTimeFormat        core.LongTimeFormat        `xorm:"TINYINT"`
+	ShortTimeFormat       core.ShortTimeFormat       `xorm:"TINYINT"`
+	FiscalYearFormat      core.FiscalYearFormat      `xorm:"TINYINT"`
+	DecimalSeparator      core.DecimalSeparator      `xorm:"TINYINT"`
+	DigitGroupingSymbol   core.DigitGroupingSymbol   `xorm:"TINYINT"`
+	DigitGrouping         core.DigitGroupingType     `xorm:"TINYINT"`
+	CurrencyDisplayType   core.CurrencyDisplayType   `xorm:"TINYINT"`
 	CoordinateDisplayType core.CoordinateDisplayType `xorm:"TINYINT"`
-	ExpenseAmountColor   AmountColorType          `xorm:"TINYINT"`
-	IncomeAmountColor    AmountColorType          `xorm:"TINYINT"`
-	FeatureRestriction   core.UserFeatureRestrictions
-	Disabled             bool
-	Deleted              bool `xorm:"NOT NULL"`
-	EmailVerified        bool `xorm:"NOT NULL"`
-	CreatedUnixTime      int64
-	UpdatedUnixTime      int64
-	DeletedUnixTime      int64
-	LastLoginUnixTime    int64
+	ExpenseAmountColor    AmountColorType            `xorm:"TINYINT"`
+	IncomeAmountColor     AmountColorType            `xorm:"TINYINT"`
+	FeatureRestriction    core.UserFeatureRestrictions
+	Disabled              bool
+	Deleted               bool `xorm:"NOT NULL"`
+	EmailVerified         bool `xorm:"NOT NULL"`
+	CreatedUnixTime       int64
+	UpdatedUnixTime       int64
+	DeletedUnixTime       int64
+	LastLoginUnixTime     int64
 }
 
 // UserBasicInfo represents a view-object of user basic info

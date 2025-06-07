@@ -25,6 +25,7 @@
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Default Language" title="Language" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Default Currency" title="Currency" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="First Day of Week" title="Week Day" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Fiscal Year Start Date" title="January 1" link="#"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
@@ -32,6 +33,7 @@
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Short Date Format" title="YYYY-MM-DD" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Long Time Format" title="HH:mm:ss" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Short Time Format" title="HH:mm" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Fiscal Year Format" title="FY YYYY" link="#"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
@@ -207,7 +209,7 @@
                 link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Fiscal Year Start Date')"
-                :title="currentFiscalYearStartDate"
+                :title="formatFiscalYearStartToLongDay(newProfile.fiscalYearStart)"
                 @click="showFiscalYearStartSheet = true"
             >
                 <fiscal-year-start-selection-sheet
@@ -516,7 +518,7 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getAllLanguageOptions, getAllCurrencies, getCurrencyName, formatFiscalYearStart } = useI18n();
+const { tt, getAllLanguageOptions, getAllCurrencies, getCurrencyName, formatFiscalYearStartToLongDay } = useI18n();
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
 const {
@@ -597,7 +599,6 @@ const currentLanguageName = computed<string>(() => {
 });
 
 const currentDayOfWeekName = computed<string | null>(() => findDisplayNameByType(allWeekDays.value, newProfile.value.firstDayOfWeek));
-const currentFiscalYearStartDate = computed<string | null>( () => formatFiscalYearStart(newProfile.value.fiscalYearStart) );
 
 function init(): void {
     loading.value = true;

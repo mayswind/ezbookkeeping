@@ -3,18 +3,16 @@
         persistent-placeholder
         :readonly="readonly"
         :disabled="disabled"
-        :clearable="modelValue ? clearable : false"
         :label="label"
         :menu-props="{ contentClass: 'fiscal-year-start-select-menu' }"
-        v-model="selectedDate"
+        v-model="selectedFiscalYearStartValue"
     >
         <template #selection>
-            <span class="text-truncate cursor-pointer">{{ displayName }}</span>
+            <span class="text-truncate cursor-pointer">{{ displayFiscalYearStartDate }}</span>
         </template>
 
         <template #no-data>
-            <vue-date-picker inline vertical auto-apply hide-offset-dates disable-year-select
-                             ref="datepicker"
+            <vue-date-picker inline auto-apply hide-offset-dates disable-year-select
                              month-name-format="long"
                              model-type="MM-dd"
                              :clearable="false"
@@ -23,8 +21,7 @@
                              :week-start="firstDayOfWeek"
                              :day-names="dayNames"
                              :disabled-dates="disabledDates"
-                             :start-date="selectedDate"
-                             v-model="selectedDate"
+                             v-model="selectedFiscalYearStartValue"
                              >
                 <template #month="{ text }">
                     {{ getMonthShortName(text) }}
@@ -38,50 +35,45 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { useTheme } from 'vuetify';
-import { useUserStore } from '@/stores/user.ts';
-import { ThemeType } from '@/core/theme.ts';
-import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
-import {
-    type FiscalYearStartSelectionBaseProps,
-    type FiscalYearStartSelectionBaseEmits,
-    useFiscalYearStartSelectionBase
-} from '@/components/base/FiscalYearStartSelectionBase.ts';
+
 import { useI18n } from '@/locales/helpers.ts';
 
-interface FiscalYearStartSelectProps extends FiscalYearStartSelectionBaseProps {
-    disabled?: boolean;
-    readonly?: boolean;
-    clearable?: boolean;
-    label?: string;
-}
+import {
+    type CommonFiscalYearStartSelectionProps,
+    type CommonFiscalYearStartSelectionEmits,
+    useFiscalYearStartSelectionBase
+} from '@/components/base/FiscalYearStartSelectionBase.ts';
 
-const props = defineProps<FiscalYearStartSelectProps>();
-const emit = defineEmits<FiscalYearStartSelectionBaseEmits>();
+import { ThemeType } from '@/core/theme.ts';
+
+const props = defineProps<CommonFiscalYearStartSelectionProps>();
+const emit = defineEmits<CommonFiscalYearStartSelectionEmits>();
 
 const { getMonthShortName } = useI18n();
+
 const theme = useTheme();
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 
-// Get all base functionality
 const {
-    dayNames,
-    displayName,
     disabledDates,
+    selectedFiscalYearStart,
+    selectedFiscalYearStartValue,
+    displayFiscalYearStartDate,
     firstDayOfWeek,
-    getModelValueToDateString,
-    getDateStringToModelValue,
-} = useFiscalYearStartSelectionBase(props, emit);
+    dayNames
+} = useFiscalYearStartSelectionBase(props);
 
-const selectedDate = computed<string>({
-    get: () => {
-        return getModelValueToDateString();
-    },
-    set: (value: string) => {
-        emit('update:modelValue', getDateStringToModelValue(value));
+watch(() => props.modelValue, (newValue) => {
+    if (newValue) {
+        selectedFiscalYearStart.value = newValue;
     }
+});
+
+watch(selectedFiscalYearStart, (newValue) => {
+    emit('update:modelValue', newValue);
 });
 </script>
 

@@ -3,8 +3,9 @@ package core
 import (
 	"testing"
 
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
 
 func TestNewFiscalYearStart_ValidMonthDay(t *testing.T) {

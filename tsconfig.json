@@ -16,6 +16,7 @@
     },
     "include": [
         "src/**/*",
-        "vite.config.ts"
+        "vite.config.ts",
+        "jest.config.ts"
     ]
 }

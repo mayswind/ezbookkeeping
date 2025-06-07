@@ -935,31 +935,36 @@ export function useI18n() {
         ];
     }
 
-    function getAllFiscalYearFormats(): FiscalYearFormat[] {
+    function getAllFiscalYearFormats(): TypeAndDisplayName[] {
         const now = getCurrentUnixTime();
         let fiscalYearStart = userStore.currentUserFiscalYearStart;
+
         if (!fiscalYearStart) {
             fiscalYearStart = FiscalYearStart.Default.value;
         }
-        const nowFiscalYearRange = getFiscalYearTimeRangeFromUnixTime(now, userStore.currentUserFiscalYearStart);
 
-        const ret: FiscalYearFormat[] = [];
+        const currentFiscalYearRange = getFiscalYearTimeRangeFromUnixTime(now, fiscalYearStart);
+        const ret: TypeAndDisplayName[] = [];
 
-        let defaultFiscalYearFormatType = FiscalYearFormat.parse(t('default.fiscalYearFormat'));
-        if (!defaultFiscalYearFormatType) {
-            defaultFiscalYearFormatType = FiscalYearFormat.Default;
+        let fiscalYearFormat = FiscalYearFormat.parse(getDefaultFiscalYearFormat());
+
+        if (!fiscalYearFormat) {
+            fiscalYearFormat = FiscalYearFormat.Default;
         }
+
         ret.push({
             type: LANGUAGE_DEFAULT_FISCAL_YEAR_FORMAT_VALUE,
-            displayName: `${t('Language Default')} (${formatTimeRangeToFiscalYearFormat(defaultFiscalYearFormatType, nowFiscalYearRange)})`
+            displayName: `${t('Language Default')} (${formatTimeRangeToFiscalYearFormat(fiscalYearFormat, currentFiscalYearRange)})`
         });
 
         const allFiscalYearFormats = FiscalYearFormat.values();
+
         for (let i = 0; i < allFiscalYearFormats.length; i++) {
-            const type = allFiscalYearFormats[i];
+            const format = allFiscalYearFormats[i];
+
             ret.push({
-                type: type.type,
-                displayName: formatTimeRangeToFiscalYearFormat(type, nowFiscalYearRange),
+                type: format.type,
+                displayName: formatTimeRangeToFiscalYearFormat(format, currentFiscalYearRange),
             });
         }
 
@@ -1366,7 +1371,7 @@ export function useI18n() {
         let fiscalYearFormat = FiscalYearFormat.valueOf(userStore.currentUserFiscalYearFormat);
 
         if (!fiscalYearFormat) {
-            const defaultFiscalYearFormatTypeName = t('default.fiscalYearFormat');
+            const defaultFiscalYearFormatTypeName = getDefaultFiscalYearFormat();
             fiscalYearFormat = FiscalYearFormat.parse(defaultFiscalYearFormatTypeName);
 
             if (!fiscalYearFormat) {
@@ -1477,7 +1482,7 @@ export function useI18n() {
             format = FiscalYearFormat.Default;
         }
 
-        return t('format.fiscalYear.' + format.displayName, {
+        return t('format.fiscalYear.' + format.typeName, {
             StartYYYY: formatUnixTime(timeRange.minUnixTime, 'YYYY'),
             StartYY: formatUnixTime(timeRange.minUnixTime, 'YY'),
             EndYYYY: formatUnixTime(timeRange.maxUnixTime, 'YYYY'),
@@ -1493,7 +1498,6 @@ export function useI18n() {
         }
 
         const timeRange = getFiscalYearTimeRangeFromUnixTime(unixTime, userStore.currentUserFiscalYearStart);
-
         return formatTimeRangeToFiscalYearFormat(fiscalYearFormat, timeRange);
     }
 
@@ -1505,18 +1509,17 @@ export function useI18n() {
         }
 
         const timeRange = getFiscalYearTimeRangeFromYear(year, userStore.currentUserFiscalYearStart);
-
         return formatTimeRangeToFiscalYearFormat(fiscalYearFormat, timeRange);
     }
 
-    function formatFiscalYearStart(fiscalYearStart: number) {
-        let fy = FiscalYearStart.fromNumber(fiscalYearStart);
+    function formatFiscalYearStartToLongDay(fiscalYearStartValue: number) {
+        let fiscalYearStart = FiscalYearStart.valueOf(fiscalYearStartValue);
 
-        if ( !fy ) {
-            fy = FiscalYearStart.Default;
+        if (!fiscalYearStart) {
+            fiscalYearStart = FiscalYearStart.Default;
         }
 
-        return formatMonthDayToLongDay(fy.toMonthDashDayString());
+        return formatMonthDayToLongDay(fiscalYearStart.toMonthDashDayString());
     }
 
     function getTimezoneDifferenceDisplayText(utcOffset: number): string {
@@ -1865,7 +1868,6 @@ export function useI18n() {
         getWeekdayLongName,
         getMultiMonthdayShortNames,
         getMultiWeekdayLongNames,
-        getCurrentFiscalYearStartFormatted: () => formatMonthDayToLongDay(FiscalYearStart.strictFromNumber(userStore.currentUserFiscalYearStart).toMonthDashDayString()),
         getCurrentFiscalYearFormatType,
         getCurrentDecimalSeparator,
         getCurrentDigitGroupingSymbol,
@@ -1896,7 +1898,7 @@ export function useI18n() {
         formatMonthDayToLongDay,
         formatYearQuarter,
         formatDateRange,
-        formatFiscalYearStart,
+        formatFiscalYearStartToLongDay,
         formatTimeRangeToFiscalYearFormat,
         formatUnixTimeToFiscalYear,
         formatYearToFiscalYear,

@@ -442,7 +442,7 @@ export function getAllYearsStartAndEndUnixTimes(startYearMonth: YearMonth | stri
     return allYearTimes;
 }
 
-export function getAllFiscalYearsStartAndEndUnixTimes(startYearMonth: YearMonth | string, endYearMonth: YearMonth | string, fiscalYearStart: number): FiscalYearUnixTime[] {
+export function getAllFiscalYearsStartAndEndUnixTimes(startYearMonth: YearMonth | string, endYearMonth: YearMonth | string, fiscalYearStartValue: number): FiscalYearUnixTime[] {
     // user selects date range: start=2024-01 and end=2026-12
     // result should be 4x FiscalYearUnixTime made up of:
     // - 2024-01->2024-06 (FY 24) - input start year-month->end of fiscal year in which the input start year-month falls
@@ -459,39 +459,45 @@ export function getAllFiscalYearsStartAndEndUnixTimes(startYearMonth: YearMonth 
 
     const inputStartUnixTime = getYearMonthFirstUnixTime(range.startYearMonth);
     const inputEndUnixTime = getYearMonthLastUnixTime(range.endYearMonth);
-    const fiscalYearStartMonth = FiscalYearStart.strictFromNumber(fiscalYearStart).month;
-    
+    let fiscalYearStart = FiscalYearStart.valueOf(fiscalYearStartValue);
+
+    if (!fiscalYearStart) {
+        fiscalYearStart = FiscalYearStart.Default;
+    }
+
+    const fiscalYearStartMonth = fiscalYearStart.month;
+
     // Loop over 1 year before and 1 year after the input date range
     // to include fiscal years that start in the previous calendar year.
     for (let year = range.startYearMonth.year - 1; year <= range.endYearMonth.year + 1; year++) {
         const thisYearMonthUnixTime = getYearMonthFirstUnixTime({ year: year, month: fiscalYearStartMonth });
-        const fiscalStartTime = getFiscalYearStartUnixTime(thisYearMonthUnixTime, fiscalYearStart);
-        const fiscalEndTime = getFiscalYearEndUnixTime(thisYearMonthUnixTime, fiscalYearStart);
-    
-        const fiscalYear = getFiscalYearFromUnixTime(fiscalStartTime, fiscalYearStart);
-        
+        const fiscalStartTime = getFiscalYearStartUnixTime(thisYearMonthUnixTime, fiscalYearStart.value);
+        const fiscalEndTime = getFiscalYearEndUnixTime(thisYearMonthUnixTime, fiscalYearStart.value);
+
+        const fiscalYear = getFiscalYearFromUnixTime(fiscalStartTime, fiscalYearStart.value);
+
         if (fiscalStartTime <= inputEndUnixTime && fiscalEndTime >= inputStartUnixTime) {
             let minUnixTime = fiscalStartTime;
             let maxUnixTime = fiscalEndTime;
-            
+
             // Cap the min and max unix times to the input date range
             if (minUnixTime < inputStartUnixTime) {
                 minUnixTime = inputStartUnixTime;
             }
-            
+
             if (maxUnixTime > inputEndUnixTime) {
                 maxUnixTime = inputEndUnixTime;
             }
-            
+
             const fiscalYearTime: FiscalYearUnixTime = {
                 year: fiscalYear,
                 minUnixTime: minUnixTime,
                 maxUnixTime: maxUnixTime,
             };
-            
+
             allFiscalYearTimes.push(fiscalYearTime);
         }
-        
+
         if (fiscalStartTime > inputEndUnixTime) {
             break;
         }
@@ -1010,25 +1016,29 @@ export function isDateRangeMatchOneMonth(minTime: number, maxTime: number): bool
     return isDateRangeMatchFullMonths(minTime, maxTime);
 }
 
-export function getFiscalYearFromUnixTime(unixTime: number, fiscalYearStart: number): number {
+export function getFiscalYearFromUnixTime(unixTime: number, fiscalYearStartValue: number): number {
     const date = moment.unix(unixTime);
-    
+
     // For January 1 fiscal year start, fiscal year matches calendar year
-    if (fiscalYearStart === 0x0101) {
+    if (fiscalYearStartValue === FiscalYearStart.JanuaryFirstDay.value) {
         return date.year();
     }
-    
+
     // Get date components
     const month = date.month() + 1; // 1-index
     const day = date.date();
     const year = date.year();
-    
-    const [fiscalYearStartMonth, fiscalYearStartDay] = FiscalYearStart.strictFromNumber(fiscalYearStart).values();
-    
+
+    let fiscalYearStart = FiscalYearStart.valueOf(fiscalYearStartValue);
+
+    if (!fiscalYearStart) {
+        fiscalYearStart = FiscalYearStart.Default;
+    }
+
     // For other fiscal year starts:
     // If input time comes before the fiscal year start day in the calendar year,
     // it belongs to the fiscal year that ends in the current calendar year
-    if (month < fiscalYearStartMonth || (month === fiscalYearStartMonth && day < fiscalYearStartDay)) {
+    if (month < fiscalYearStart.month || (month === fiscalYearStart.month && day < fiscalYearStart.day)) {
         return year;
     }
 
@@ -1037,33 +1047,38 @@ export function getFiscalYearFromUnixTime(unixTime: number, fiscalYearStart: num
     return year + 1;
 }
 
-export function getFiscalYearStartUnixTime(unixTime: number, fiscalYearStart: number): number {
+export function getFiscalYearStartUnixTime(unixTime: number, fiscalYearStartValue: number): number {
     const date = moment.unix(unixTime);
-    
+
     // For January 1 fiscal year start, fiscal year start time is always January 1 in the input calendar year
-    if (fiscalYearStart === 0x0101) {
+    if (fiscalYearStartValue === FiscalYearStart.JanuaryFirstDay.value) {
         return moment().year(date.year()).month(0).date(1).hour(0).minute(0).second(0).millisecond(0).unix();
     }
 
-    const [fiscalYearStartMonth, fiscalYearStartDay] = FiscalYearStart.strictFromNumber(fiscalYearStart).values();
+    let fiscalYearStart = FiscalYearStart.valueOf(fiscalYearStartValue);
+
+    if (!fiscalYearStart) {
+        fiscalYearStart = FiscalYearStart.Default;
+    }
+
     const month = date.month() + 1; // 1-index
     const day = date.date();
     const year = date.year();
-    
+
     // For other fiscal year starts:
     // If input time comes before the fiscal year start day in the calendar year,
     // the relevant fiscal year has a start date in Calendar Year = Input Year, and end date in Calendar Year = Input Year + 1.
     // If input time comes on or after the fiscal year start day in the calendar year,
     // the relevant fiscal year has a start date in Calendar Year = Input Year - 1, and end date in Calendar Year = Input Year.
     let startYear = year - 1;
-    if (month > fiscalYearStartMonth || (month === fiscalYearStartMonth && day >= fiscalYearStartDay)) {
+    if (month > fiscalYearStart.month || (month === fiscalYearStart.month && day >= fiscalYearStart.day)) {
         startYear = year;
     }
 
     return moment().set({
         year: startYear,
-        month: fiscalYearStartMonth - 1, // 0-index
-        date: fiscalYearStartDay,
+        month: fiscalYearStart.month - 1, // 0-index
+        date: fiscalYearStart.day,
         hour: 0,
         minute: 0,
         second: 0,
@@ -1073,7 +1088,7 @@ export function getFiscalYearStartUnixTime(unixTime: number, fiscalYearStart: nu
 
 export function getFiscalYearEndUnixTime(unixTime: number, fiscalYearStart: number): number {
     const fiscalYearStartTime = moment.unix(getFiscalYearStartUnixTime(unixTime, fiscalYearStart));
-    return fiscalYearStartTime.add(1, 'year').subtract(1, 'second').unix();
+    return fiscalYearStartTime.add(1, 'years').subtract(1, 'seconds').unix();
 }
 
 export function getCurrentFiscalYear(fiscalYearStart: number): number {
@@ -1091,33 +1106,35 @@ export function getFiscalYearTimeRangeFromUnixTime(unixTime: number, fiscalYearS
     };
 }
 
-export function getFiscalYearTimeRangeFromYear(year: number, fiscalYearStart: number): FiscalYearUnixTime {
+export function getFiscalYearTimeRangeFromYear(year: number, fiscalYearStartValue: number): FiscalYearUnixTime {
     const fiscalYear = year;
-    const fiscalYearStartObj = FiscalYearStart.strictFromNumber(fiscalYearStart);
-    
+    let fiscalYearStart = FiscalYearStart.valueOf(fiscalYearStartValue);
+
+    if (!fiscalYearStart) {
+        fiscalYearStart = FiscalYearStart.Default;
+    }
+
     // For a specified fiscal year (e.g., 2023), the start date is in the previous calendar year
     // unless fiscal year starts on January 1
-    const calendarStartYear = fiscalYearStart === 0x0101 ? fiscalYear : fiscalYear - 1;
-    
+    const calendarStartYear = fiscalYearStartValue === FiscalYearStart.JanuaryFirstDay.value ? fiscalYear : fiscalYear - 1;
+
     // Create the timestamp for the start of the fiscal year
     const fiscalYearStartUnixTime = moment().set({
         year: calendarStartYear,
-        month: fiscalYearStartObj.month - 1, // 0-index
-        date: fiscalYearStartObj.day,
+        month: fiscalYearStart.month - 1, // 0-index
+        date: fiscalYearStart.day,
         hour: 0,
         minute: 0,
         second: 0,
         millisecond: 0,
     }).unix();
-    
+
     // Fiscal year end is one year after start minus 1 second
-    const fiscalYearEndUnixTime = moment.unix(fiscalYearStartUnixTime).add(1, 'year').subtract(1, 'second').unix();
-    
+    const fiscalYearEndUnixTime = moment.unix(fiscalYearStartUnixTime).add(1, 'years').subtract(1, 'seconds').unix();
+
     return {
         year: fiscalYear,
         minUnixTime: fiscalYearStartUnixTime,
         maxUnixTime: fiscalYearEndUnixTime,
     };
 }
-
-

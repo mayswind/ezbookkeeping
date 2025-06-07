@@ -17,11 +17,25 @@ const (
 	FISCAL_YEAR_START_INVALID FiscalYearStart = 0xFFFF // Invalid
 )
 
+var MONTH_MAX_DAYS = []uint8{
+	uint8(31), // January
+	uint8(28), // February (Disallow fiscal year start on leap day)
+	uint8(31), // March
+	uint8(30), // April
+	uint8(31), // May
+	uint8(30), // June
+	uint8(31), // July
+	uint8(31), // August
+	uint8(30), // September
+	uint8(31), // October
+	uint8(30), // November
+	uint8(31), // December
+}
+
 // NewFiscalYearStart creates a new FiscalYearStart from month and day values
 func NewFiscalYearStart(month uint8, day uint8) (FiscalYearStart, error) {
-	month, day, err := validateMonthDay(month, day)
-	if err != nil {
-		return 0, err
+	if !isValidMonthDay(month, day) {
+		return 0, errs.ErrFormatInvalid
 	}
 
 	return FiscalYearStart(uint16(month)<<8 | uint16(day)), nil
@@ -37,39 +51,27 @@ func (f FiscalYearStart) GetMonthDay() (uint8, uint8, error) {
 	month := uint8(f >> 8)
 	day := uint8(f & 0xFF)
 
-	return validateMonthDay(month, day)
+	if !isValidMonthDay(month, day) {
+		return 0, 0, errs.ErrFormatInvalid
+	}
+
+	return month, day, nil
 }
 
 // String returns a string representation of FiscalYearStart in MM/DD format
 func (f FiscalYearStart) String() string {
 	month, day, err := f.GetMonthDay()
+
 	if err != nil {
 		return "Invalid"
 	}
+
 	return fmt.Sprintf("%02d-%02d", month, day)
 }
 
-// validateMonthDay validates a month and day and returns them if valid
-func validateMonthDay(month uint8, day uint8) (uint8, uint8, error) {
-	if month < 1 || month > 12 || day < 1 {
-		return 0, 0, errs.ErrFormatInvalid
-	}
-
-	maxDays := uint8(31)
-	switch month {
-	case 1, 3, 5, 7, 8, 10, 12: // January, March, May, July, August, October, December
-		maxDays = 31
-	case 4, 6, 9, 11: // April, June, September, November
-		maxDays = 30
-	case 2: // February
-		maxDays = 28 // Disallow fiscal year start on leap day
-	}
-
-	if day > maxDays {
-		return 0, 0, errs.ErrFormatInvalid
-	}
-
-	return month, day, nil
+// isValidMonthDay returns whether the specified month and day is valid
+func isValidMonthDay(month uint8, day uint8) bool {
+	return uint8(1) <= month && month <= uint8(12) && uint8(1) <= day && day <= MONTH_MAX_DAYS[int(month)-1]
 }
 
 // FiscalYearFormat represents the fiscal year format as a uint8

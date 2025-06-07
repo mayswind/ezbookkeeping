@@ -4,7 +4,7 @@
         <f7-toolbar>
             <div class="swipe-handler"></div>
             <div class="left">
-                <f7-link :text="tt('Clear')" @click="clear"></f7-link>
+                <f7-link :text="tt('Reset')" @click="reset"></f7-link>
             </div>
             <div class="right">
                 <f7-link :text="tt('Done')" @click="confirm"></f7-link>
@@ -17,14 +17,13 @@
                                  model-type="MM-dd"
                                  six-weeks="center"
                                  class="justify-content-center"
+                                 :clearable="false"
                                  :enable-time-picker="false"
-                                 :clearable="true"
                                  :dark="isDarkMode"
                                  :week-start="firstDayOfWeek"
                                  :day-names="dayNames"
                                  :disabled-dates="disabledDates"
-                                 :start-date="selectedDate"
-                                 v-model="selectedDate">
+                                 v-model="selectedFiscalYearStartValue">
                     <template #month="{ text }">
                         {{ getMonthShortName(text) }}
                     </template>
@@ -38,71 +37,71 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useEnvironmentsStore } from '@/stores/environment.ts';
+import { useUserStore } from '@/stores/user.ts';
 
 import {
-    type FiscalYearStartSelectionBaseProps,
-    type FiscalYearStartSelectionBaseEmits,
+    type CommonFiscalYearStartSelectionProps,
+    type CommonFiscalYearStartSelectionEmits,
     useFiscalYearStartSelectionBase
 } from '@/components/base/FiscalYearStartSelectionBase.ts';
 
-interface FiscalYearStartSelectionSheetProps extends FiscalYearStartSelectionBaseProps {
+import { FiscalYearStart } from '@/core/fiscalyear.ts';
+
+interface MobileFiscalYearStartSelectionSheetProps extends CommonFiscalYearStartSelectionProps {
     clearable?: boolean;
-    disabled?: boolean;
-    label?: string;
-    readonly?: boolean;
     show: boolean;
     title?: string;
 }
 
-const props = defineProps<FiscalYearStartSelectionSheetProps>();
-
-interface FiscalYearStartSelectionSheetEmits extends FiscalYearStartSelectionBaseEmits {
+interface MobileFiscalYearStartSelectionSheetEmits extends CommonFiscalYearStartSelectionEmits {
     (e: 'update:show', value: boolean): void;
-    (e: 'update:title', value: string): void;
 }
 
-const emit = defineEmits<FiscalYearStartSelectionSheetEmits>();
+const props = defineProps<MobileFiscalYearStartSelectionSheetProps>();
+const emit = defineEmits<MobileFiscalYearStartSelectionSheetEmits>();
 
-const { tt, getMonthShortName, getCurrentFiscalYearStartFormatted } = useI18n();
+const { tt, getMonthShortName } = useI18n();
 
 const environmentsStore = useEnvironmentsStore();
+const userStore = useUserStore();
 
 const {
-    dayNames,
     disabledDates,
+    selectedFiscalYearStart,
+    selectedFiscalYearStartValue,
     firstDayOfWeek,
-    getDateStringToModelValue,
-    getModelValueToDateString,
-    selectedDisplayName,
-} = useFiscalYearStartSelectionBase(props, emit);
+    dayNames
+} = useFiscalYearStartSelectionBase(props);
 
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
 
-const selectedDate = ref<string>(getModelValueToDateString());
+function confirm(): void {
+    emit('update:modelValue', selectedFiscalYearStart.value);
+    emit('update:show', false);
+}
+
+function reset(): void {
+    selectedFiscalYearStart.value = userStore.currentUserFiscalYearStart;
+}
 
 function onSheetOpen(): void {
-    selectedDate.value = getModelValueToDateString();
+    if (props.modelValue) {
+        const fiscalYearStart = FiscalYearStart.valueOf(props.modelValue);
+
+        if (fiscalYearStart) {
+            selectedFiscalYearStart.value = fiscalYearStart.value;
+        }
+    }
 }
 
 function onSheetClosed(): void {
     emit('update:show', false);
 }
-
-function clear(): void {
-    selectedDate.value = getCurrentFiscalYearStartFormatted();
-}
-
-function confirm(): void {
-    emit('update:modelValue', getDateStringToModelValue(selectedDate.value));
-    emit('update:show', false);
-    emit('update:title', selectedDisplayName(selectedDate.value));
-}
-
 </script>
 
 <style>

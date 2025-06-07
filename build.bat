@@ -191,6 +191,17 @@ goto :pre_parse_args
         )
     )
 
+    if "%NO_TEST%"=="0" (
+        echo Executing frontend unit testing...
+
+        call npm run test
+
+        if !errorlevel! neq 0 (
+            call :echo_red "Error: Failed to pass unit testing"
+            goto :end
+        )
+    )
+
     endlocal
 
     echo Building frontend files(%RELEASE_TYPE%)...

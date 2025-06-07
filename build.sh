@@ -179,6 +179,17 @@ build_frontend() {
         fi
     fi
 
+    if [ "$NO_TEST" = "0" ]; then
+        echo "Executing frontend unit testing..."
+
+        npm run test
+
+        if [ "$?" != "0" ]; then
+            echo_red "Error: Failed to pass unit testing"
+            exit 1
+        fi
+    fi
+
     echo "Building frontend files ($RELEASE_TYPE)..."
 
     if [ "$RELEASE" = "0" ]; then

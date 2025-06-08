@@ -12,7 +12,7 @@
         </f7-toolbar>
         <f7-page-content>
             <div class="block block-outline no-margin no-padding">
-                <vue-date-picker inline auto-apply hide-offset-dates disable-year-select
+                <vue-date-picker inline auto-apply disable-year-select
                                  month-name-format="long"
                                  model-type="MM-dd"
                                  six-weeks="center"
@@ -53,9 +53,7 @@ import {
 import { FiscalYearStart } from '@/core/fiscalyear.ts';
 
 interface MobileFiscalYearStartSelectionSheetProps extends CommonFiscalYearStartSelectionProps {
-    clearable?: boolean;
     show: boolean;
-    title?: string;
 }
 
 interface MobileFiscalYearStartSelectionSheetEmits extends CommonFiscalYearStartSelectionEmits {

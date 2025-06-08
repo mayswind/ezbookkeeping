@@ -12,9 +12,10 @@
         </template>
 
         <template #no-data>
-            <vue-date-picker inline auto-apply hide-offset-dates disable-year-select
+            <vue-date-picker inline auto-apply disable-year-select
                              month-name-format="long"
                              model-type="MM-dd"
+                             six-weeks="center"
                              :clearable="false"
                              :enable-time-picker="false"
                              :dark="isDarkMode"

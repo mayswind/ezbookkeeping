@@ -528,7 +528,7 @@ export function getAllQuartersStartAndEndUnixTimes(startYearMonth: Year0BasedMon
         return allYearQuarterTimes;
     }
 
-    for (let year = range.startYearMonth.year, month0base = range.startYearMonth.month0base; year < range.endYearMonth.year || (year === range.endYearMonth.year && ((month0base / 3) <= (range.endYearMonth.month0base / 3))); ) {
+    for (let year = range.startYearMonth.year, month0base = range.startYearMonth.month0base; year < range.endYearMonth.year || (year === range.endYearMonth.year && (Math.floor(month0base / 3) <= Math.floor(range.endYearMonth.month0base / 3))); ) {
         const yearQuarter: YearQuarter = {
             year: year,
             quarter: Math.floor((month0base / 3)) + 1

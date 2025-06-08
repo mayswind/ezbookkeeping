@@ -42,7 +42,7 @@ export interface TrendsBarChartClickEvent {
 export function useTrendsChartBase<T extends YearMonth>(props: CommonTrendsChartProps<T>) {
     const { tt } = useI18n();
 
-    const allDateRanges = computed<YearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] | FiscalYearUnixTime[]>(() => getAllDateRanges(props.items, props.startYearMonth, props.endYearMonth, props.fiscalYearStart, props.dateAggregationType));
+    const allDateRanges = computed<YearUnixTime[] | FiscalYearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[]>(() => getAllDateRanges(props.items, props.startYearMonth, props.endYearMonth, props.fiscalYearStart, props.dateAggregationType));
 
     function getItemName(name: string): string {
         return props.translateName ? tt(name) : name;

@@ -48,7 +48,7 @@ export function sortStatisticsItems<T extends SortableTransactionStatisticDataIt
     }
 }
 
-export function getAllDateRanges<T extends YearMonth>(items: YearMonthItems<T>[], startYearMonth: YearMonth | string, endYearMonth: YearMonth | string, fiscalYearStart: number, dateAggregationType: number): YearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] | FiscalYearUnixTime[] {
+export function getAllDateRanges<T extends YearMonth>(items: YearMonthItems<T>[], startYearMonth: YearMonth | string, endYearMonth: YearMonth | string, fiscalYearStart: number, dateAggregationType: number): YearUnixTime[] | FiscalYearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] {
     if ((!startYearMonth || !endYearMonth) && items && items.length) {
         let minYear = Number.MAX_SAFE_INTEGER, minMonth = Number.MAX_SAFE_INTEGER, maxYear = 0, maxMonth = 0;
 

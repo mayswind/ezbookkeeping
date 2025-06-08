@@ -641,10 +641,6 @@ export function useI18n() {
         return t('default.firstDayOfWeek');
     }
 
-    function getDefaultFiscalYearFormat(): string {
-        return t('default.fiscalYearFormat');
-    }
-
     function getAllLanguageOptions(includeSystemDefault: boolean): LanguageOption[] {
         const ret: LanguageOption[] = [];
 
@@ -944,27 +940,27 @@ export function useI18n() {
         }
 
         const currentFiscalYearRange = getFiscalYearTimeRangeFromUnixTime(now, fiscalYearStart);
-        const ret: TypeAndDisplayName[] = [];
+        let defaultFiscalYearFormat = FiscalYearFormat.parse(t('default.fiscalYearFormat'));
 
-        let fiscalYearFormat = FiscalYearFormat.parse(getDefaultFiscalYearFormat());
-
-        if (!fiscalYearFormat) {
-            fiscalYearFormat = FiscalYearFormat.Default;
+        if (!defaultFiscalYearFormat) {
+            defaultFiscalYearFormat = FiscalYearFormat.Default;
         }
+
+        const ret: TypeAndDisplayName[] = [];
 
         ret.push({
             type: LANGUAGE_DEFAULT_FISCAL_YEAR_FORMAT_VALUE,
-            displayName: `${t('Language Default')} (${formatTimeRangeToFiscalYearFormat(fiscalYearFormat, currentFiscalYearRange)})`
+            displayName: `${t('Language Default')} (${formatTimeRangeToFiscalYearFormat(defaultFiscalYearFormat, currentFiscalYearRange)})`
         });
 
         const allFiscalYearFormats = FiscalYearFormat.values();
 
         for (let i = 0; i < allFiscalYearFormats.length; i++) {
-            const format = allFiscalYearFormats[i];
+            const fiscalYearFormat = allFiscalYearFormats[i];
 
             ret.push({
-                type: format.type,
-                displayName: formatTimeRangeToFiscalYearFormat(format, currentFiscalYearRange),
+                type: fiscalYearFormat.type,
+                displayName: formatTimeRangeToFiscalYearFormat(fiscalYearFormat, currentFiscalYearRange),
             });
         }
 
@@ -1371,7 +1367,7 @@ export function useI18n() {
         let fiscalYearFormat = FiscalYearFormat.valueOf(userStore.currentUserFiscalYearFormat);
 
         if (!fiscalYearFormat) {
-            const defaultFiscalYearFormatTypeName = getDefaultFiscalYearFormat();
+            const defaultFiscalYearFormatTypeName = t('default.fiscalYearFormat');
             fiscalYearFormat = FiscalYearFormat.parse(defaultFiscalYearFormatTypeName);
 
             if (!fiscalYearFormat) {
@@ -1815,7 +1811,6 @@ export function useI18n() {
         // get localization default type
         getDefaultCurrency,
         getDefaultFirstDayOfWeek,
-        getDefaultFiscalYearFormat,
         // get all localized info of specified type
         getAllLanguageOptions,
         getAllEnableDisableOptions,

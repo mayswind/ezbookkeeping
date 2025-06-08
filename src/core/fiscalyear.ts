@@ -30,7 +30,7 @@ export class FiscalYearStart {
     }
 
     public static of(month: number, day: number): FiscalYearStart | undefined {
-        if (!FiscalYearStart.isValidMonthDay(month, day)) {
+        if (!FiscalYearStart.isValidFiscalYearMonthDay(month, day)) {
             return undefined;
         }
 
@@ -79,7 +79,7 @@ export class FiscalYearStart {
         return `${this.month.toString().padStart(2, '0')}-${this.day.toString().padStart(2, '0')}`;
     }
 
-    private static isValidMonthDay(month: number, day: number): boolean {
+    private static isValidFiscalYearMonthDay(month: number, day: number): boolean {
         return 1 <= month && month <= 12 && 1 <= day && day <= FiscalYearStart.MONTH_MAX_DAYS[month - 1];
     }
 }

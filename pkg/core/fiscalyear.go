@@ -34,7 +34,7 @@ var MONTH_MAX_DAYS = []uint8{
 
 // NewFiscalYearStart creates a new FiscalYearStart from month and day values
 func NewFiscalYearStart(month uint8, day uint8) (FiscalYearStart, error) {
-	if !isValidMonthDay(month, day) {
+	if !isValidFiscalYearMonthDay(month, day) {
 		return 0, errs.ErrFormatInvalid
 	}
 
@@ -51,7 +51,7 @@ func (f FiscalYearStart) GetMonthDay() (uint8, uint8, error) {
 	month := uint8(f >> 8)
 	day := uint8(f & 0xFF)
 
-	if !isValidMonthDay(month, day) {
+	if !isValidFiscalYearMonthDay(month, day) {
 		return 0, 0, errs.ErrFormatInvalid
 	}
 
@@ -69,8 +69,8 @@ func (f FiscalYearStart) String() string {
 	return fmt.Sprintf("%02d-%02d", month, day)
 }
 
-// isValidMonthDay returns whether the specified month and day is valid
-func isValidMonthDay(month uint8, day uint8) bool {
+// isValidFiscalYearMonthDay returns whether the specified month and day is valid
+func isValidFiscalYearMonthDay(month uint8, day uint8) bool {
 	return uint8(1) <= month && month <= uint8(12) && uint8(1) <= day && day <= MONTH_MAX_DAYS[int(month)-1]
 }
 

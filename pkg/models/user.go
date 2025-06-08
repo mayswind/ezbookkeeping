@@ -263,6 +263,12 @@ func (u *User) CanEditTransactionByTransactionTime(transactionTime int64, utcOff
 
 // ToUserBasicInfo returns a user basic view-object according to database model
 func (u *User) ToUserBasicInfo(avatarProvider core.UserAvatarProviderType, avatarUrl string) *UserBasicInfo {
+	fiscalYearStart := u.FiscalYearStart
+
+	if fiscalYearStart < core.FISCAL_YEAR_START_MIN || fiscalYearStart > core.FISCAL_YEAR_START_MAX {
+		fiscalYearStart = core.FISCAL_YEAR_START_DEFAULT
+	}
+
 	return &UserBasicInfo{
 		Username:              u.Username,
 		Email:                 u.Email,
@@ -274,7 +280,7 @@ func (u *User) ToUserBasicInfo(avatarProvider core.UserAvatarProviderType, avata
 		Language:              u.Language,
 		DefaultCurrency:       u.DefaultCurrency,
 		FirstDayOfWeek:        u.FirstDayOfWeek,
-		FiscalYearStart:       u.FiscalYearStart,
+		FiscalYearStart:       fiscalYearStart,
 		LongDateFormat:        u.LongDateFormat,
 		ShortDateFormat:       u.ShortDateFormat,
 		LongTimeFormat:        u.LongTimeFormat,

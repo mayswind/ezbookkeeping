@@ -4,6 +4,7 @@ import { defineStore } from 'pinia';
 import { useSettingsStore } from './setting.ts';
 
 import { WeekDay } from '@/core/datetime.ts';
+import { FiscalYearStart } from '@/core/fiscalyear.ts';
 
 import {
     type UserBasicInfo,
@@ -68,7 +69,7 @@ export const useUserStore = defineStore('user', () => {
 
     const currentUserFiscalYearStart = computed<number>(() => {
         const userInfo = currentUserBasicInfo.value || EMPTY_USER_BASIC_INFO;
-        return userInfo.fiscalYearStart;
+        return isNumber(userInfo.fiscalYearStart) && FiscalYearStart.valueOf(userInfo.fiscalYearStart) ? userInfo.fiscalYearStart : EMPTY_USER_BASIC_INFO.fiscalYearStart;
     });
 
     const currentUserLongDateFormat = computed<number>(() => {

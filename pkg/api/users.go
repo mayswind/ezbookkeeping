@@ -78,6 +78,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.WebContext) (any, *errs.Error) {
 		Language:             userRegisterReq.Language,
 		DefaultCurrency:      userRegisterReq.DefaultCurrency,
 		FirstDayOfWeek:       userRegisterReq.FirstDayOfWeek,
+		FiscalYearStart:      core.FISCAL_YEAR_START_DEFAULT,
 		TransactionEditScope: models.TRANSACTION_EDIT_SCOPE_ALL,
 		FeatureRestriction:   a.CurrentConfig().DefaultFeatureRestrictions,
 	}

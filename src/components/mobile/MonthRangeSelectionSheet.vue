@@ -52,8 +52,6 @@ import { type CommonMonthRangeSelectionProps, useMonthRangeSelectionBase } from 
 
 import { useEnvironmentsStore } from '@/stores/environment.ts';
 
-import { getYearMonthObjectFromString } from '@/lib/datetime.ts';
-
 const props = defineProps<CommonMonthRangeSelectionProps>();
 const emit = defineEmits<{
     (e: 'update:show', value: boolean): void;
@@ -62,7 +60,7 @@ const emit = defineEmits<{
 
 const { tt, getMonthShortName } = useI18n();
 const { showToast } = useI18nUIComponents();
-const { yearRange, dateRange, isYearFirst, beginDateTime, endDateTime, getFinalMonthRange } = useMonthRangeSelectionBase(props);
+const { yearRange, dateRange, isYearFirst, beginDateTime, endDateTime, getMonthSelectionValue, getFinalMonthRange } = useMonthRangeSelectionBase(props);
 
 const environmentsStore = useEnvironmentsStore();
 
@@ -90,7 +88,7 @@ function cancel(): void {
 
 function onSheetOpen(): void {
     if (props.minTime) {
-        const yearMonth = getYearMonthObjectFromString(props.minTime);
+        const yearMonth = getMonthSelectionValue(props.minTime);
 
         if (yearMonth) {
             dateRange.value[0] = yearMonth;
@@ -98,7 +96,7 @@ function onSheetOpen(): void {
     }
 
     if (props.maxTime) {
-        const yearMonth = getYearMonthObjectFromString(props.maxTime);
+        const yearMonth = getMonthSelectionValue(props.maxTime);
 
         if (yearMonth) {
             dateRange.value[1] = yearMonth;

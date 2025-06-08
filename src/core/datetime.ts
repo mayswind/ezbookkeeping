@@ -5,14 +5,19 @@ export interface YearQuarter {
     readonly quarter: number;
 }
 
-export interface YearMonth {
+export interface Year0BasedMonth {
     readonly year: number;
-    readonly month: number;
+    readonly month0base: number;
+}
+
+export interface Year1BasedMonth {
+    readonly year: number;
+    readonly month1base: number;
 }
 
 export interface YearMonthRange {
-    readonly startYearMonth: YearMonth;
-    readonly endYearMonth: YearMonth;
+    readonly startYearMonth: Year0BasedMonth;
+    readonly endYearMonth: Year0BasedMonth;
 }
 
 export interface TimeRange {
@@ -49,7 +54,7 @@ export interface RecentMonthDateRange {
     readonly minTime: number;
     readonly maxTime: number;
     readonly year: number;
-    readonly month: number;
+    readonly month: number; // 1-based (1 = January, 12 = December)
 }
 
 export interface PresetDateRange {
@@ -118,21 +123,21 @@ export class YearQuarterUnixTime implements YearQuarter, UnixTimeRange {
     }
 }
 
-export class YearMonthUnixTime implements YearMonth, UnixTimeRange {
+export class YearMonthUnixTime implements Year0BasedMonth, UnixTimeRange {
     public readonly year: number;
-    public readonly month: number;
+    public readonly month0base: number;
     public readonly minUnixTime: number;
     public readonly maxUnixTime: number;
 
-    private constructor(year: number, month: number, minUnixTime: number, maxUnixTime: number) {
+    private constructor(year: number, month0base: number, minUnixTime: number, maxUnixTime: number) {
         this.year = year;
-        this.month = month;
+        this.month0base = month0base;
         this.minUnixTime = minUnixTime;
         this.maxUnixTime = maxUnixTime;
     }
 
-    public static of(yearMonth: YearMonth, minUnixTime: number, maxUnixTime: number): YearMonthUnixTime {
-        return new YearMonthUnixTime(yearMonth.year, yearMonth.month, minUnixTime, maxUnixTime);
+    public static of(yearMonth: Year0BasedMonth, minUnixTime: number, maxUnixTime: number): YearMonthUnixTime {
+        return new YearMonthUnixTime(yearMonth.year, yearMonth.month0base, minUnixTime, maxUnixTime);
     }
 }
 
@@ -152,7 +157,7 @@ export class Month {
     public static readonly November = new Month(11, 'November');
     public static readonly December = new Month(12, 'December');
 
-    public readonly month: number;
+    public readonly month: number; // 1-based (1 = January, 12 = December)
     public readonly name: string;
 
     private constructor(month: number, name: string) {

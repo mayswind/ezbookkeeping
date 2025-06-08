@@ -76,7 +76,7 @@ interface TransactionStatisticResponseWithInfo {
 
 interface TransactionStatisticTrendsResponseItemWithInfo {
     readonly year: number;
-    readonly month: number;
+    readonly month: number; // 1-based (1 = January, 12 = December)
     readonly items: TransactionStatisticResponseItemWithInfo[];
 }
 
@@ -412,7 +412,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
 
                 combinedData.items.push({
                     year: trendItem.year,
-                    month: trendItem.month,
+                    month1base: trendItem.month,
                     totalAmount: item.totalAmount
                 });
 

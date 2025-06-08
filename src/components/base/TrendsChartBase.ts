@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 
 import type {
-    YearMonth,
+    Year1BasedMonth,
     TimeRangeAndDateType,
     YearUnixTime,
     YearQuarterUnixTime,
@@ -16,7 +16,7 @@ import type { YearMonthItems } from '@/models/transaction.ts';
 
 import { getAllDateRanges } from '@/lib/statistics.ts';
 
-export interface CommonTrendsChartProps<T extends YearMonth> {
+export interface CommonTrendsChartProps<T extends Year1BasedMonth> {
     items: YearMonthItems<T>[];
     startYearMonth: string;
     endYearMonth: string;
@@ -39,7 +39,7 @@ export interface TrendsBarChartClickEvent {
     dateRange: TimeRangeAndDateType;
 }
 
-export function useTrendsChartBase<T extends YearMonth>(props: CommonTrendsChartProps<T>) {
+export function useTrendsChartBase<T extends Year1BasedMonth>(props: CommonTrendsChartProps<T>) {
     const { tt } = useI18n();
 
     const allDateRanges = computed<YearUnixTime[] | FiscalYearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[]>(() => getAllDateRanges(props.items, props.startYearMonth, props.endYearMonth, props.fiscalYearStart, props.dateAggregationType));

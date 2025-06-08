@@ -14,7 +14,7 @@ import { type CommonTrendsChartProps, type TrendsBarChartClickEvent, useTrendsCh
 
 import { useUserStore } from '@/stores/user.ts';
 
-import { type YearMonth, DateRangeScene } from '@/core/datetime.ts';
+import { type Year1BasedMonth, DateRangeScene } from '@/core/datetime.ts';
 import type { ColorValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { TrendChartType, ChartDateAggregationType } from '@/core/statistics.ts';
@@ -35,7 +35,7 @@ import {
     sortStatisticsItems
 } from '@/lib/statistics.ts';
 
-interface DesktopTrendsChartProps<T extends YearMonth> extends CommonTrendsChartProps<T> {
+interface DesktopTrendsChartProps<T extends Year1BasedMonth> extends CommonTrendsChartProps<T> {
     skeleton?: boolean;
     type: number;
     showValue?: boolean;
@@ -155,14 +155,14 @@ const allSeries = computed<TrendsChartDataItem[]>(() => {
                 dateRangeKey = dataItem.year.toString();
             } else if (props.dateAggregationType === ChartDateAggregationType.FiscalYear.type) {
                 const fiscalYear = getFiscalYearFromUnixTime(
-                    getYearMonthFirstUnixTime({ year: dataItem.year, month: dataItem.month - 1 }),
+                    getYearMonthFirstUnixTime({ year: dataItem.year, month1base: dataItem.month1base }),
                     props.fiscalYearStart
                 );
                 dateRangeKey = fiscalYear.toString();
             } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type) {
-                dateRangeKey = `${dataItem.year}-${Math.floor((dataItem.month - 1) / 3) + 1}`;
+                dateRangeKey = `${dataItem.year}-${Math.floor((dataItem.month1base - 1) / 3) + 1}`;
             } else { // if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
-                dateRangeKey = `${dataItem.year}-${dataItem.month}`;
+                dateRangeKey = `${dataItem.year}-${dataItem.month1base}`;
             }
 
             const dataItems = dateRangeAmountMap[dateRangeKey] || [];
@@ -181,8 +181,8 @@ const allSeries = computed<TrendsChartDataItem[]>(() => {
                 dateRangeKey = dateRange.year.toString();
             } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type && 'quarter' in dateRange) {
                 dateRangeKey = `${dateRange.year}-${dateRange.quarter}`;
-            } else if (props.dateAggregationType === ChartDateAggregationType.Month.type && 'month' in dateRange) {
-                dateRangeKey = `${dateRange.year}-${dateRange.month + 1}`;
+            } else if (props.dateAggregationType === ChartDateAggregationType.Month.type && 'month0base' in dateRange) {
+                dateRangeKey = `${dateRange.year}-${dateRange.month0base + 1}`;
             }
 
             let amount = 0;

@@ -19,7 +19,7 @@ export class FiscalYearStart {
         31 // December
     ];
 
-    public readonly month: number;
+    public readonly month: number; // 1-based (1 = January, 12 = December)
     public readonly day: number;
     public readonly value: number;
 

@@ -96,7 +96,7 @@ export interface TransactionTotalAmount {
 
 export interface TransactionMonthList {
     readonly year: number;
-    readonly month: number;
+    readonly month: number; // 1-based (1 = January, 12 = December)
     readonly yearMonth: string;
     opened: boolean;
     readonly items: Transaction[];

@@ -46,8 +46,6 @@ import { type CommonMonthSelectionProps, useMonthSelectionBase } from '@/compone
 
 import { useEnvironmentsStore } from '@/stores/environment.ts';
 
-import { getYearMonthObjectFromString } from '@/lib/datetime.ts';
-
 const props = defineProps<CommonMonthSelectionProps>();
 const emit = defineEmits<{
     (e: 'update:modelValue', value: string): void;
@@ -56,7 +54,7 @@ const emit = defineEmits<{
 
 const { tt, getMonthShortName } = useI18n();
 const { showToast } = useI18nUIComponents();
-const { yearRange, monthValue, isYearFirst, getTextualYearMonth } = useMonthSelectionBase(props);
+const { yearRange, monthValue, isYearFirst, getMonthSelectionValue, getTextualYearMonth } = useMonthSelectionBase(props);
 
 const environmentsStore = useEnvironmentsStore();
 
@@ -84,7 +82,7 @@ function cancel(): void {
 
 function onSheetOpen(): void {
     if (props.modelValue) {
-        const yearMonth = getYearMonthObjectFromString(props.modelValue);
+        const yearMonth = getMonthSelectionValue(props.modelValue);
 
         if (yearMonth) {
             monthValue.value = yearMonth;

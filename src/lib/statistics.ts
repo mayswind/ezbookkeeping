@@ -1,4 +1,4 @@
-import type { YearMonth, YearUnixTime, YearQuarterUnixTime, YearMonthUnixTime } from '@/core/datetime.ts';
+import type { Year1BasedMonth, YearUnixTime, YearQuarterUnixTime, YearMonthUnixTime } from '@/core/datetime.ts';
 import type { FiscalYearUnixTime } from '@/core/fiscalyear.ts';
 import { ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
 import type {
@@ -48,7 +48,7 @@ export function sortStatisticsItems<T extends SortableTransactionStatisticDataIt
     }
 }
 
-export function getAllDateRanges<T extends YearMonth>(items: YearMonthItems<T>[], startYearMonth: YearMonth | string, endYearMonth: YearMonth | string, fiscalYearStart: number, dateAggregationType: number): YearUnixTime[] | FiscalYearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] {
+export function getAllDateRanges<T extends Year1BasedMonth>(items: YearMonthItems<T>[], startYearMonth: Year1BasedMonth | string, endYearMonth: Year1BasedMonth | string, fiscalYearStart: number, dateAggregationType: number): YearUnixTime[] | FiscalYearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] {
     if ((!startYearMonth || !endYearMonth) && items && items.length) {
         let minYear = Number.MAX_SAFE_INTEGER, minMonth = Number.MAX_SAFE_INTEGER, maxYear = 0, maxMonth = 0;
 
@@ -58,14 +58,14 @@ export function getAllDateRanges<T extends YearMonth>(items: YearMonthItems<T>[]
             for (let j = 0; j < item.items.length; j++) {
                 const dataItem = item.items[j];
 
-                if (dataItem.year < minYear || (dataItem.year === minYear && dataItem.month < minMonth)) {
+                if (dataItem.year < minYear || (dataItem.year === minYear && dataItem.month1base < minMonth)) {
                     minYear = dataItem.year;
-                    minMonth = dataItem.month;
+                    minMonth = dataItem.month1base;
                 }
 
-                if (dataItem.year > maxYear || (dataItem.year === maxYear && dataItem.month > maxMonth)) {
+                if (dataItem.year > maxYear || (dataItem.year === maxYear && dataItem.month1base > maxMonth)) {
                     maxYear = dataItem.year;
-                    maxMonth = dataItem.month;
+                    maxMonth = dataItem.month1base;
                 }
             }
         }

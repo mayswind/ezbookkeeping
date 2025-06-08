@@ -1,11 +1,11 @@
 import { ref, computed } from 'vue';
 
-import type { YearMonth } from '@/core/datetime.ts';
+import type { Year0BasedMonth } from '@/core/datetime.ts';
 
 import {
-    getYearMonthObjectFromUnixTime,
-    getYearMonthObjectFromString,
-    getYearMonthStringFromObject,
+    getYear0BasedMonthObjectFromUnixTime,
+    getYear0BasedMonthObjectFromString,
+    getYearMonthStringFromYear0BasedMonthObject,
     getCurrentUnixTime,
     getCurrentYear,
     getThisYearFirstUnixTime,
@@ -15,6 +15,11 @@ import {
 
 import { useI18n } from '@/locales/helpers.ts';
 
+export interface MonthSelectionValue {
+    year: number;
+    month: number; // 0-based month (0 = January, 11 = December)
+}
+
 export interface CommonMonthRangeSelectionProps {
     minTime?: string;
     maxTime?: string;
@@ -23,12 +28,12 @@ export interface CommonMonthRangeSelectionProps {
     show: boolean;
 }
 
-function getMonthRangeFromProps(props: CommonMonthRangeSelectionProps): { minDate: YearMonth; maxDate: YearMonth } {
-    let minDate: YearMonth = getYearMonthObjectFromUnixTime(getThisYearFirstUnixTime());
-    let maxDate: YearMonth = getYearMonthObjectFromUnixTime(getCurrentUnixTime());
+function getMonthRangeFromProps(props: CommonMonthRangeSelectionProps): { minDate: MonthSelectionValue; maxDate: MonthSelectionValue } {
+    let minDate: Year0BasedMonth = getYear0BasedMonthObjectFromUnixTime(getThisYearFirstUnixTime());
+    let maxDate: Year0BasedMonth = getYear0BasedMonthObjectFromUnixTime(getCurrentUnixTime());
 
     if (props.minTime) {
-        const yearMonth = getYearMonthObjectFromString(props.minTime);
+        const yearMonth = getYear0BasedMonthObjectFromString(props.minTime);
 
         if (yearMonth) {
             minDate = yearMonth;
@@ -36,7 +41,7 @@ function getMonthRangeFromProps(props: CommonMonthRangeSelectionProps): { minDat
     }
 
     if (props.maxTime) {
-        const yearMonth = getYearMonthObjectFromString(props.maxTime);
+        const yearMonth = getYear0BasedMonthObjectFromString(props.maxTime);
 
         if (yearMonth) {
             maxDate = yearMonth;
@@ -44,8 +49,14 @@ function getMonthRangeFromProps(props: CommonMonthRangeSelectionProps): { minDat
     }
 
     return {
-        minDate,
-        maxDate
+        minDate: {
+            year: minDate.year,
+            month: minDate.month0base
+        },
+        maxDate: {
+            year: maxDate.year,
+            month: maxDate.month0base
+        }
     };
 }
 
@@ -58,14 +69,33 @@ export function useMonthRangeSelectionBase(props: CommonMonthRangeSelectionProps
         getCurrentYear() + 1
     ]);
 
-    const dateRange = ref<YearMonth[]>([
+    const dateRange = ref<MonthSelectionValue[]>([
         minDate,
         maxDate
     ]);
 
     const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
-    const beginDateTime = computed<string>(() => formatUnixTimeToLongYearMonth(getYearMonthFirstUnixTime(dateRange.value[0])));
-    const endDateTime = computed<string>(() => formatUnixTimeToLongYearMonth(getYearMonthLastUnixTime(dateRange.value[1])));
+    const beginDateTime = computed<string>(() => formatUnixTimeToLongYearMonth(getYearMonthFirstUnixTime({
+        year: dateRange.value[0].year,
+        month0base: dateRange.value[0].month
+    })));
+    const endDateTime = computed<string>(() => formatUnixTimeToLongYearMonth(getYearMonthLastUnixTime({
+        year: dateRange.value[1].year,
+        month0base: dateRange.value[1].month
+    })));
+
+    function getMonthSelectionValue(yearMonth: string): MonthSelectionValue | null {
+        const yearMonthObj = getYear0BasedMonthObjectFromString(yearMonth);
+
+        if (!yearMonthObj) {
+            return null;
+        }
+
+        return {
+            year: yearMonthObj.year,
+            month: yearMonthObj.month0base
+        };
+    }
 
     function getFinalMonthRange(): { minYearMonth: string, maxYearMonth: string } | null {
         if (!dateRange.value[0] || !dateRange.value[1]) {
@@ -76,8 +106,14 @@ export function useMonthRangeSelectionBase(props: CommonMonthRangeSelectionProps
             throw new Error('Date is too early');
         }
 
-        const minYearMonth = getYearMonthStringFromObject(dateRange.value[0]);
-        const maxYearMonth = getYearMonthStringFromObject(dateRange.value[1]);
+        const minYearMonth = getYearMonthStringFromYear0BasedMonthObject({
+            year: dateRange.value[0].year,
+            month0base: dateRange.value[0].month
+        });
+        const maxYearMonth = getYearMonthStringFromYear0BasedMonthObject({
+            year: dateRange.value[1].year,
+            month0base: dateRange.value[1].month
+        });
 
         return {
             minYearMonth,
@@ -94,6 +130,7 @@ export function useMonthRangeSelectionBase(props: CommonMonthRangeSelectionProps
         beginDateTime,
         endDateTime,
         // functions
+        getMonthSelectionValue,
         getFinalMonthRange
     };
 }

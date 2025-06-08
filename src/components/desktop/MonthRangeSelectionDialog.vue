@@ -71,7 +71,6 @@ import { useI18n } from '@/locales/helpers.ts';
 import { type CommonMonthRangeSelectionProps, useMonthRangeSelectionBase } from '@/components/base/MonthRangeSelectionBase.ts';
 
 import { ThemeType } from '@/core/theme.ts';
-import { getYearMonthObjectFromString } from '@/lib/datetime.ts';
 
 interface DesktopMonthRangeSelectionProps extends CommonMonthRangeSelectionProps {
     persistent?: boolean;
@@ -87,7 +86,7 @@ const emit = defineEmits<{
 const theme = useTheme();
 
 const { tt, getMonthShortName } = useI18n();
-const { yearRange, dateRange, isYearFirst, beginDateTime, endDateTime, getFinalMonthRange } = useMonthRangeSelectionBase(props);
+const { yearRange, dateRange, isYearFirst, beginDateTime, endDateTime, getMonthSelectionValue, getFinalMonthRange } = useMonthRangeSelectionBase(props);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 const showState = computed<boolean>({
@@ -117,7 +116,7 @@ function cancel(): void {
 
 watch(() => props.minTime, (newValue) => {
     if (newValue) {
-        const yearMonth = getYearMonthObjectFromString(newValue);
+        const yearMonth = getMonthSelectionValue(newValue);
 
         if (yearMonth) {
             dateRange.value[0] = yearMonth;
@@ -127,7 +126,7 @@ watch(() => props.minTime, (newValue) => {
 
 watch(() => props.maxTime, (newValue) => {
     if (newValue) {
-        const yearMonth = getYearMonthObjectFromString(newValue);
+        const yearMonth = getMonthSelectionValue(newValue);
 
         if (yearMonth) {
             dateRange.value[1] = yearMonth;

@@ -1,5 +1,5 @@
 import type { PartialRecord } from '@/core/base.ts';
-import type { YearMonth, StartEndTime } from '@/core/datetime.ts';
+import type { Year1BasedMonth, StartEndTime } from '@/core/datetime.ts';
 import { type Coordinate, getNormalizedCoordinate } from '@/core/coordinate.ts';
 import { TransactionType } from '@/core/transaction.ts';
 
@@ -508,7 +508,7 @@ export interface TransactionListByMaxTimeRequest {
 
 export interface TransactionListInMonthByPageRequest {
     readonly year: number;
-    readonly month: number;
+    readonly month: number; // 1-based (1 = January, 12 = December)
     readonly type: number;
     readonly categoryIds: string;
     readonly accountIds: string;
@@ -672,13 +672,13 @@ export interface TransactionStatisticResponseItem {
 
 export interface TransactionStatisticTrendsResponseItem {
     readonly year: number;
-    readonly month: number;
+    readonly month: number; // 1-based (1 = January, 12 = December)
     readonly items: TransactionStatisticResponseItem[];
 }
 
-export interface YearMonthDataItem extends YearMonth, Record<string, unknown> {}
+export interface YearMonthDataItem extends Year1BasedMonth, Record<string, unknown> {}
 
-export interface YearMonthItems<T extends YearMonth> extends Record<string, unknown> {
+export interface YearMonthItems<T extends Year1BasedMonth> extends Record<string, unknown> {
     readonly items: T[];
 }
 
@@ -718,9 +718,9 @@ export interface TransactionTrendsAnalysisDataItem extends TransactionStatisticD
     readonly items: TransactionTrendsAnalysisDataAmount[];
 }
 
-export interface TransactionTrendsAnalysisDataAmount {
+export interface TransactionTrendsAnalysisDataAmount extends Year1BasedMonth {
     readonly year: number;
-    readonly month: number;
+    readonly month1base: number;
     readonly totalAmount: number;
 }
 

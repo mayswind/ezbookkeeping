@@ -465,12 +465,10 @@ export function getAllFiscalYearsStartAndEndUnixTimes(startYearMonth: YearMonth 
         fiscalYearStart = FiscalYearStart.Default;
     }
 
-    const fiscalYearStartMonth = fiscalYearStart.month;
-
     // Loop over 1 year before and 1 year after the input date range
     // to include fiscal years that start in the previous calendar year.
     for (let year = range.startYearMonth.year - 1; year <= range.endYearMonth.year + 1; year++) {
-        const thisYearMonthUnixTime = getYearMonthFirstUnixTime({ year: year, month: fiscalYearStartMonth });
+        const thisYearMonthUnixTime = getYearMonthFirstUnixTime({ year: year, month: fiscalYearStart.month - 1 });
         const fiscalStartTime = getFiscalYearStartUnixTime(thisYearMonthUnixTime, fiscalYearStart.value);
         const fiscalEndTime = getFiscalYearEndUnixTime(thisYearMonthUnixTime, fiscalYearStart.value);
 

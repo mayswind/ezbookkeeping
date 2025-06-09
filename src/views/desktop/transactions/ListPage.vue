@@ -1127,7 +1127,7 @@ function init(initProps: TransactionListProps): void {
             currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(query.value.minTime, currentCalendarDate.value);
 
             if (pageType.value === TransactionListPageType.Calendar.type) {
-                const dateRange = getFullMonthDateRange(query.value.minTime, query.value.maxTime, firstDayOfWeek.value);
+                const dateRange = getFullMonthDateRange(query.value.minTime, query.value.maxTime, firstDayOfWeek.value, fiscalYearStart.value);
 
                 if (dateRange) {
                     const changed = transactionsStore.updateTransactionListFilter({
@@ -1223,7 +1223,7 @@ function changePageType(type: number): void {
     currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(query.value.minTime, currentCalendarDate.value);
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
-        const dateRange = getFullMonthDateRange(query.value.minTime, query.value.maxTime, firstDayOfWeek.value);
+        const dateRange = getFullMonthDateRange(query.value.minTime, query.value.maxTime, firstDayOfWeek.value, fiscalYearStart.value);
 
         if (dateRange) {
             transactionsStore.updateTransactionListFilter({
@@ -1271,7 +1271,7 @@ function changeDateFilter(dateRange: TimeRangeAndDateType | number | null): void
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
         currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(dateRange.minTime, currentCalendarDate.value);
-        const fullMonthDateRange = getFullMonthDateRange(dateRange.minTime, dateRange.maxTime, firstDayOfWeek.value);
+        const fullMonthDateRange = getFullMonthDateRange(dateRange.minTime, dateRange.maxTime, firstDayOfWeek.value, fiscalYearStart.value);
 
         if (fullMonthDateRange) {
             dateRange = fullMonthDateRange;
@@ -1305,7 +1305,7 @@ function changeCustomDateFilter(minTime: number, maxTime: number): void {
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
         currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(minTime, currentCalendarDate.value);
-        const dateRange = getFullMonthDateRange(minTime, maxTime, firstDayOfWeek.value);
+        const dateRange = getFullMonthDateRange(minTime, maxTime, firstDayOfWeek.value, fiscalYearStart.value);
 
         if (dateRange) {
             minTime = dateRange.minTime;
@@ -1337,7 +1337,7 @@ function changeCustomMonthDateFilter(yearMonth: string): void {
 
     const minTime = getYearMonthFirstUnixTime(yearMonth);
     const maxTime = getYearMonthLastUnixTime(yearMonth);
-    const dateType = getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek.value, DateRangeScene.Normal);
+    const dateType = getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.Normal);
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
         currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(minTime, currentCalendarDate.value);
@@ -1375,7 +1375,7 @@ function shiftDateRange(startTime: number, endTime: number, scale: number): void
 
     if (pageType.value === TransactionListPageType.Calendar.type) {
         currentCalendarDate.value = getValidMonthDayOrCurrentDayShortDate(newDateRange.minTime, currentCalendarDate.value);
-        const fullMonthDateRange = getFullMonthDateRange(newDateRange.minTime, newDateRange.maxTime, firstDayOfWeek.value);
+        const fullMonthDateRange = getFullMonthDateRange(newDateRange.minTime, newDateRange.maxTime, firstDayOfWeek.value, fiscalYearStart.value);
 
         if (fullMonthDateRange) {
             newDateRange = fullMonthDateRange;

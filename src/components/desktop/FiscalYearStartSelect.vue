@@ -16,12 +16,16 @@
                              month-name-format="long"
                              model-type="MM-dd"
                              six-weeks="center"
-                             :clearable="false"
+                             :config="{ noSwipe: true }"
+                             :month-change-on-scroll="false"
                              :enable-time-picker="false"
+                             :min-date="allowedMinDate"
+                             :max-date="allowedMaxDate"
+                             :disabled-dates="disabledDates"
+                             :clearable="false"
                              :dark="isDarkMode"
                              :week-start="firstDayOfWeek"
                              :day-names="dayNames"
-                             :disabled-dates="disabledDates"
                              v-model="selectedFiscalYearStartValue"
                              >
                 <template #month="{ text }">
@@ -63,6 +67,8 @@ const {
     selectedFiscalYearStart,
     selectedFiscalYearStartValue,
     displayFiscalYearStartDate,
+    allowedMinDate,
+    allowedMaxDate,
     firstDayOfWeek,
     dayNames
 } = useFiscalYearStartSelectionBase(props);

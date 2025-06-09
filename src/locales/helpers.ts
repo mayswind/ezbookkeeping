@@ -13,6 +13,7 @@ import {
     type LocalizedDateRange,
     type LocalizedRecentMonthDateRange,
     type UnixTimeRange,
+    type WeekDayValue,
     Month,
     WeekDay,
     MeridiemIndicator,
@@ -746,7 +747,7 @@ export function useI18n() {
         return getAllWeekdayNames('min');
     }
 
-    function getAllWeekDays(firstDayOfWeek?: number): TypeAndDisplayName[] {
+    function getAllWeekDays(firstDayOfWeek?: WeekDayValue): TypeAndDisplayName[] {
         const ret: TypeAndDisplayName[] = [];
         const allWeekDays = WeekDay.values();
 
@@ -1293,7 +1294,7 @@ export function useI18n() {
         }
     }
 
-    function getMultiWeekdayLongNames(weekdayTypes: number[], firstDayOfWeek?: number): string {
+    function getMultiWeekdayLongNames(weekdayTypes: number[], firstDayOfWeek?: WeekDayValue): string {
         const weekdayTypesMap: Record<number, boolean> = {};
 
         if (!isNumber(firstDayOfWeek)) {

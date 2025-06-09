@@ -37,7 +37,7 @@
             <div class="block block-outline no-margin no-padding padding-vertical-half" v-show="mode === 'time'">
                 <div id="time-picker-container" class="time-picker-container"></div>
             </div>
-            <input id="time-picker-input" style="display: none" type="text" readonly="readonly"/>
+            <input id="time-picker-input" style="display: none" type="text" :readonly="true"/>
             <div class="margin-top text-align-center">
                 <div class="display-flex padding-horizontal justify-content-space-between">
                     <div class="align-self-center">{{ displayTime }}</div>
@@ -59,6 +59,7 @@ import { useI18nUIComponents, createInlinePicker } from '@/lib/ui/mobile.ts';
 import { useEnvironmentsStore } from '@/stores/environment.ts';
 import { useUserStore } from '@/stores/user.ts';
 
+import { type WeekDayValue } from '@/core/datetime.ts';
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
@@ -106,7 +107,7 @@ const timeValues = ref<string[]>(getTimeValues(dateTime.value, is24Hour, isMerid
 const datetimepicker = useTemplateRef<VueDatePickerType>('datetimepicker');
 
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
-const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
+const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
 const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllMinWeekdayNames(), firstDayOfWeek.value));
 const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
 const displayTime = computed<string>(() => formatUnixTimeToLongDateTime(getActualUnixTimeForStore(getUnixTime(dateTime.value), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())));

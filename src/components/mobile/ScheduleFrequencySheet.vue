@@ -72,6 +72,7 @@ import { type CommonScheduleFrequencySelectionProps, useScheduleFrequencySelecti
 
 import { useUserStore } from '@/stores/user.ts';
 
+import { type WeekDayValue } from '@/core/datetime.ts';
 import { ScheduledTemplateFrequencyType } from '@/core/template.ts';
 import { sortNumbersArray } from '@/lib/common.ts';
 import { type Framework7Dom, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
@@ -95,7 +96,7 @@ const userStore = useUserStore();
 const currentFrequencyType = ref<number>(props.type);
 const currentFrequencyValue = ref<number[]>(getFrequencyValues(props.modelValue));
 
-const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
+const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
 
 function isChecked(value: number): boolean {
     return currentFrequencyValue.value.indexOf(value) >= 0;

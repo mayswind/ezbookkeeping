@@ -12,6 +12,7 @@ import {
     type TimeDifference,
     type RecentMonthDateRange,
     type LocalizedRecentMonthDateRange,
+    type WeekDayValue,
     type DateFormat,
     type TimeFormat,
     YearQuarterUnixTime,
@@ -301,7 +302,7 @@ export function getTodayLastUnixTime(): number {
     return moment.unix(getTodayFirstUnixTime()).add(1, 'days').subtract(1, 'seconds').unix();
 }
 
-export function getThisWeekFirstUnixTime(firstDayOfWeek: number): number {
+export function getThisWeekFirstUnixTime(firstDayOfWeek: WeekDayValue): number {
     const today = moment.unix(getTodayFirstUnixTime());
 
     if (!isNumber(firstDayOfWeek)) {
@@ -317,7 +318,7 @@ export function getThisWeekFirstUnixTime(firstDayOfWeek: number): number {
     return today.subtract(dayOfWeek, 'days').unix();
 }
 
-export function getThisWeekLastUnixTime(firstDayOfWeek: number): number {
+export function getThisWeekLastUnixTime(firstDayOfWeek: WeekDayValue): number {
     return moment.unix(getThisWeekFirstUnixTime(firstDayOfWeek)).add(7, 'days').subtract(1, 'seconds').unix();
 }
 
@@ -637,7 +638,7 @@ export function getShiftedDateRange(minTime: number, maxTime: number, scale: num
     };
 }
 
-export function getShiftedDateRangeAndDateType(minTime: number, maxTime: number, scale: number, firstDayOfWeek: number, fiscalYearStart: number, scene: DateRangeScene): TimeRangeAndDateType {
+export function getShiftedDateRangeAndDateType(minTime: number, maxTime: number, scale: number, firstDayOfWeek: WeekDayValue, fiscalYearStart: number, scene: DateRangeScene): TimeRangeAndDateType {
     const newDateRange = getShiftedDateRange(minTime, maxTime, scale);
     const newDateType = getDateTypeByDateRange(newDateRange.minTime, newDateRange.maxTime, firstDayOfWeek, fiscalYearStart, scene);
 
@@ -648,7 +649,7 @@ export function getShiftedDateRangeAndDateType(minTime: number, maxTime: number,
     };
 }
 
-export function getShiftedDateRangeAndDateTypeForBillingCycle(minTime: number, maxTime: number, scale: number, firstDayOfWeek: number, fiscalYearStart: number, scene: number, statementDate: number | undefined | null): TimeRangeAndDateType | null {
+export function getShiftedDateRangeAndDateTypeForBillingCycle(minTime: number, maxTime: number, scale: number, firstDayOfWeek: WeekDayValue, fiscalYearStart: number, scene: number, statementDate: number | undefined | null): TimeRangeAndDateType | null {
     if (!statementDate || !DateRange.PreviousBillingCycle.isAvailableForScene(scene) || !DateRange.CurrentBillingCycle.isAvailableForScene(scene)) {
         return null;
     }
@@ -669,7 +670,7 @@ export function getShiftedDateRangeAndDateTypeForBillingCycle(minTime: number, m
     return null;
 }
 
-export function getDateTypeByDateRange(minTime: number, maxTime: number, firstDayOfWeek: number, fiscalYearStart: number, scene: DateRangeScene): number {
+export function getDateTypeByDateRange(minTime: number, maxTime: number, firstDayOfWeek: WeekDayValue, fiscalYearStart: number, scene: DateRangeScene): number {
     const allDateRanges = DateRange.values();
     let newDateType = DateRange.Custom.type;
 
@@ -691,7 +692,7 @@ export function getDateTypeByDateRange(minTime: number, maxTime: number, firstDa
     return newDateType;
 }
 
-export function getDateTypeByBillingCycleDateRange(minTime: number, maxTime: number, firstDayOfWeek: number, fiscalYearStart: number, scene: DateRangeScene, statementDate: number | undefined | null): number | null {
+export function getDateTypeByBillingCycleDateRange(minTime: number, maxTime: number, firstDayOfWeek: WeekDayValue, fiscalYearStart: number, scene: DateRangeScene, statementDate: number | undefined | null): number | null {
     if (!statementDate || !DateRange.PreviousBillingCycle.isAvailableForScene(scene) || !DateRange.CurrentBillingCycle.isAvailableForScene(scene)) {
         return null;
     }
@@ -708,7 +709,7 @@ export function getDateTypeByBillingCycleDateRange(minTime: number, maxTime: num
     return null;
 }
 
-export function getDateRangeByDateType(dateType: number | undefined, firstDayOfWeek: number, fiscalYearStart: number): TimeRangeAndDateType | null {
+export function getDateRangeByDateType(dateType: number | undefined, firstDayOfWeek: WeekDayValue, fiscalYearStart: number): TimeRangeAndDateType | null {
     let maxTime = 0;
     let minTime = 0;
 
@@ -780,7 +781,7 @@ export function getDateRangeByDateType(dateType: number | undefined, firstDayOfW
     };
 }
 
-export function getDateRangeByBillingCycleDateType(dateType: number, firstDayOfWeek: number, fiscalYearStart: number, statementDate: number | undefined | null): TimeRangeAndDateType | null {
+export function getDateRangeByBillingCycleDateType(dateType: number, firstDayOfWeek: WeekDayValue, fiscalYearStart: number, statementDate: number | undefined | null): TimeRangeAndDateType | null {
     let maxTime = 0;
     let minTime = 0;
 
@@ -867,7 +868,7 @@ export function getRecentDateRangeIndexByDateType(allRecentMonthDateRanges: Loca
     return -1;
 }
 
-export function getRecentDateRangeIndex(allRecentMonthDateRanges: LocalizedRecentMonthDateRange[], dateType: number, minTime: number, maxTime: number, firstDayOfWeek: number, fiscalYearStart: number): number {
+export function getRecentDateRangeIndex(allRecentMonthDateRanges: LocalizedRecentMonthDateRange[], dateType: number, minTime: number, maxTime: number, firstDayOfWeek: WeekDayValue, fiscalYearStart: number): number {
     let dateRange = getDateRangeByDateType(dateType, firstDayOfWeek, fiscalYearStart);
 
     if (dateRange && dateRange.dateType === DateRange.All.type) {
@@ -897,7 +898,7 @@ export function getRecentDateRangeIndex(allRecentMonthDateRanges: LocalizedRecen
     return getRecentDateRangeIndexByDateType(allRecentMonthDateRanges, DateRange.Custom.type);
 }
 
-export function getFullMonthDateRange(minTime: number, maxTime: number, firstDayOfWeek: number, fiscalYearStart: number): TimeRangeAndDateType | null {
+export function getFullMonthDateRange(minTime: number, maxTime: number, firstDayOfWeek: WeekDayValue, fiscalYearStart: number): TimeRangeAndDateType | null {
     if (isDateRangeMatchOneMonth(minTime, maxTime)) {
         return null;
     }

@@ -5,7 +5,7 @@
         :disabled="disabled"
         :clearable="modelValue ? clearable : false"
         :label="label"
-        :menu-props="{ 'content-class': 'date-select-menu' }"
+        :menu-props="{ contentClass: 'date-select-menu' }"
         v-model="dateTime"
     >
         <template #selection>
@@ -44,6 +44,7 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useUserStore } from '@/stores/user.ts';
 
+import { type WeekDayValue } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
 import { getCurrentYear } from '@/lib/datetime.ts';
@@ -76,7 +77,7 @@ const dateTime = computed<string>({
 });
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
-const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
+const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
 const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllMinWeekdayNames(), firstDayOfWeek.value));
 const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
 const displayTime = computed<string>(() => {

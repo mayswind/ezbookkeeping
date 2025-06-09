@@ -7,7 +7,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { type TransactionStatisticsFilter, useStatisticsStore } from '@/stores/statistics.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
-import { type LocalizedDateRange, DateRangeScene, DateRange } from '@/core/datetime.ts';
+import { type LocalizedDateRange, type WeekDayValue, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { StatisticsAnalysisType, ChartDataType, ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
 import type { TransactionCategoricalAnalysisData, TransactionTrendsAnalysisData } from '@/models/transaction.ts';
 
@@ -36,7 +36,7 @@ export function useStatisticsTransactionPageBase() {
 
     const showAccountBalance = computed<boolean>(() => settingsStore.appSettings.showAccountBalance);
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
-    const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
+    const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
     const fiscalYearStart = computed<number>(() => userStore.currentUserFiscalYearStart);
 
     const allDateRanges = computed<LocalizedDateRange[]>(() => {

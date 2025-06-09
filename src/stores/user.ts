@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 
 import { useSettingsStore } from './setting.ts';
 
-import { WeekDay } from '@/core/datetime.ts';
+import { type WeekDayValue, WeekDay } from '@/core/datetime.ts';
 import { FiscalYearStart } from '@/core/fiscalyear.ts';
 
 import {
@@ -62,9 +62,9 @@ export const useUserStore = defineStore('user', () => {
         return userInfo.defaultCurrency || settingsStore.localeDefaultSettings.currency;
     });
 
-    const currentUserFirstDayOfWeek = computed<number>(() => {
+    const currentUserFirstDayOfWeek = computed<WeekDayValue>(() => {
         const userInfo = currentUserBasicInfo.value || EMPTY_USER_BASIC_INFO;
-        return isNumber(userInfo.firstDayOfWeek) && WeekDay.valueOf(userInfo.firstDayOfWeek) ? userInfo.firstDayOfWeek : settingsStore.localeDefaultSettings.firstDayOfWeek;
+        return isNumber(userInfo.firstDayOfWeek) && WeekDay.valueOf(userInfo.firstDayOfWeek) ? userInfo.firstDayOfWeek as WeekDayValue : settingsStore.localeDefaultSettings.firstDayOfWeek;
     });
 
     const currentUserFiscalYearStart = computed<number>(() => {

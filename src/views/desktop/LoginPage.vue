@@ -34,7 +34,7 @@
                                         <v-text-field
                                             type="text"
                                             autocomplete="username"
-                                            autofocus="autofocus"
+                                            :autofocus="true"
                                             :disabled="show2faInput || logining || verifying"
                                             :label="tt('Username')"
                                             :placeholder="tt('Your username or email')"

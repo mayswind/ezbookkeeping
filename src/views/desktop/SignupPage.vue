@@ -179,8 +179,8 @@
                                :disabled="currentStep === 'basicSetting' || currentStep === 'finalResult' || submitting || navigateToHomePage"
                                :prepend-icon="mdiArrowLeft"
                                @click="switchToPreviousTab">{{ tt('Previous') }}</v-btn>
-                        <v-btn :color="(currentStep === 'presetCategories' || currentStep === 'finalResult') ? 'secondary' : 'primary'"
-                               :disabled="currentStep === 'presetCategories' || currentStep === 'finalResult' || submitting || navigateToHomePage"
+                        <v-btn color="primary"
+                               :disabled="submitting || navigateToHomePage"
                                :append-icon="mdiArrowRight"
                                @click="switchToNextTab"
                                v-if="currentStep === 'basicSetting'">{{ tt('Next') }}</v-btn>

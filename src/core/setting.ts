@@ -1,4 +1,4 @@
-import { WeekDay } from './datetime.ts';
+import { type WeekDayValue, WeekDay } from './datetime.ts';
 import { TimezoneTypeForStatistics } from './timezone.ts';
 import { CurrencySortingType } from './currency.ts';
 import {
@@ -54,7 +54,7 @@ export interface ApplicationSettings extends BaseApplicationSetting {
 
 export interface LocaleDefaultSettings {
     currency: string;
-    firstDayOfWeek: number;
+    firstDayOfWeek: WeekDayValue;
 }
 
 export interface ApplicationLockState {

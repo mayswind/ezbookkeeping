@@ -4,7 +4,7 @@
         :readonly="readonly"
         :disabled="disabled"
         :label="label"
-        :menu-props="{ 'content-class': 'schedule-frequency-select-menu' }"
+        :menu-props="{ contentClass: 'schedule-frequency-select-menu' }"
         v-model="frequencyType"
         v-model:menu="menuState"
         @update:menu="onMenuStateChanged"
@@ -62,6 +62,7 @@ import { type CommonScheduleFrequencySelectionProps, useScheduleFrequencySelecti
 
 import { useUserStore } from '@/stores/user.ts';
 
+import { type WeekDayValue } from '@/core/datetime.ts';
 import { ScheduledTemplateFrequencyType } from '@/core/template.ts';
 import { sortNumbersArray } from '@/lib/common.ts';
 import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';
@@ -81,7 +82,7 @@ const dropdownMenu = useTemplateRef<HTMLElement>('dropdownMenu');
 
 const menuState = ref<boolean>(false);
 
-const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
+const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
 
 const frequencyType = computed<number>({
     get: () => props.type,

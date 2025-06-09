@@ -6,7 +6,7 @@
         :readonly="readonly"
         :disabled="disabled"
         :label="label"
-        :menu-props="{ 'content-class': 'two-column-select-menu' }"
+        :menu-props="{ contentClass: 'two-column-select-menu' }"
         v-model="currentSecondaryValue"
         v-model:menu="menuState"
         @update:menu="onMenuStateChanged"
@@ -41,7 +41,7 @@
                 <div class="primary-list-container">
                     <v-list :class="{ 'list-item-with-header': !!primaryHeaderField, 'list-item-with-footer': !!primaryFooterField }">
                         <v-list-item :class="{ 'primary-list-item-selected v-list-item--active text-primary': item === selectedPrimaryItem }"
-                                     :key="primaryKeyField ? (item as Record<string, unknown>)[primaryKeyField] : item"
+                                     :key="primaryKeyField ? (item as Record<string, unknown>)[primaryKeyField] as string : JSON.stringify(item)"
                                      v-for="item in filteredItems"
                                      @click="onPrimaryItemClicked(item)">
                             <template #prepend>
@@ -60,7 +60,7 @@
                     <v-list :class="{ 'list-item-with-header': !!secondaryHeaderField, 'list-item-with-footer': !!secondaryFooterField }"
                             v-if="selectedPrimaryItem && primarySubItemsField && (selectedPrimaryItem as Record<string, unknown>)[primarySubItemsField]">
                         <v-list-item :class="{ 'secondary-list-item-selected v-list-item--active text-primary': isSecondarySelected(subItem) }"
-                                     :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
+                                     :key="secondaryKeyField ? subItem[secondaryKeyField] as string : JSON.stringify(subItem)"
                                      v-for="subItem in filteredSubItems"
                                      @click="onSecondaryItemClicked(subItem)">
                             <template #prepend>

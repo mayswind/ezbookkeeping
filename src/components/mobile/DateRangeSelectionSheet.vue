@@ -63,6 +63,8 @@ import { type CommonDateRangeSelectionProps, useDateRangeSelectionBase } from '@
 import { useEnvironmentsStore } from '@/stores/environment.ts';
 import { useUserStore } from '@/stores/user.ts';
 
+import { type WeekDayValue } from '@/core/datetime.ts';
+
 import {
     getLocalDatetimeFromUnixTime,
     getDummyUnixTimeForLocalUsage,
@@ -87,7 +89,7 @@ const userStore = useUserStore();
 
 const datetimepicker = useTemplateRef<VueDatePickerType>('datetimepicker');
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
-const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
+const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
 
 function confirm(): void {
     try {

@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue';
 
-import { type TimeRangeAndDateType, type PresetDateRange, type UnixTimeRange, DateRange } from '@/core/datetime.ts';
+import { type TimeRangeAndDateType, type PresetDateRange, type UnixTimeRange, type WeekDayValue, DateRange } from '@/core/datetime.ts';
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
@@ -60,7 +60,7 @@ export function useDateRangeSelectionBase(props: CommonDateRangeSelectionProps) 
         getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(maxDate, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()))
     ]);
 
-    const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
+    const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
     const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllMinWeekdayNames(), firstDayOfWeek.value));
     const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
     const is24Hour = computed<boolean>(() => isLongTime24HourFormat());

@@ -93,7 +93,7 @@
                     <p class="text-body-1" v-if="status === true">
                         {{ tt('Please copy these backup codes to safe place, the following backup codes will be displayed only once. If these codes were lost, you can regenerate them at any time.') }}
                     </p>
-                    <v-textarea class="backup-code" readonly="readonly" :rows="10" :value="currentBackupCode"/>
+                    <v-textarea class="backup-code" :readonly="true" :rows="10" :value="currentBackupCode"/>
                 </v-card-text>
             </v-card>
         </v-col>

@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue';
 
+import { type WeekDayValue } from '@/core/datetime.ts';
 import { FiscalYearStart } from '@/core/fiscalyear.ts';
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
 
@@ -78,7 +79,7 @@ export function useFiscalYearStartSelectionBase(props: CommonFiscalYearStartSele
         return formatMonthDayToLongDay(fiscalYearStart.toMonthDashDayString());
     });
 
-    const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
+    const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
     const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllMinWeekdayNames(), firstDayOfWeek.value));
 
     return {

@@ -141,6 +141,8 @@ export class YearMonthUnixTime implements Year0BasedMonth, UnixTimeRange {
     }
 }
 
+export type MonthValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+
 export class Month {
     private static readonly allInstances: Month[] = [];
 
@@ -157,10 +159,10 @@ export class Month {
     public static readonly November = new Month(11, 'November');
     public static readonly December = new Month(12, 'December');
 
-    public readonly month: number; // 1-based (1 = January, 12 = December)
+    public readonly month: MonthValue; // 1-based (1 = January, 12 = December)
     public readonly name: string;
 
-    private constructor(month: number, name: string) {
+    private constructor(month: MonthValue, name: string) {
         this.month = month;
         this.name = name;
 
@@ -176,6 +178,8 @@ export class Month {
     }
 }
 
+export type WeekDayValue = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
 export class WeekDay implements TypeAndName {
     private static readonly allInstances: WeekDay[] = [];
     private static readonly allInstancesByName: Record<string, WeekDay> = {};
@@ -190,10 +194,10 @@ export class WeekDay implements TypeAndName {
 
     public static readonly DefaultFirstDay = WeekDay.Sunday;
 
-    public readonly type: number;
+    public readonly type: WeekDayValue;
     public readonly name: string;
 
-    private constructor(type: number, name: string) {
+    private constructor(type: WeekDayValue, name: string) {
         this.type = type;
         this.name = name;
 

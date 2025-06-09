@@ -33,7 +33,7 @@
                                         <v-text-field
                                             type="email"
                                             autocomplete="email"
-                                            autofocus="autofocus"
+                                            :autofocus="true"
                                             :disabled="requesting"
                                             :label="tt('E-mail')"
                                             :placeholder="tt('Your email address')"

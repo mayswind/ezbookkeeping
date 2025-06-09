@@ -41,8 +41,8 @@ const zoomLevel = ref<number>(1);
 const mapSupported = computed<boolean>(() => !!mapInstance.value);
 const mapDependencyLoaded = computed<boolean>(() => mapInstance.value?.dependencyLoaded || false);
 
-const finalMapStyle = computed<Record<string, unknown>>(() => {
-    const styles: Record<string, unknown> = Object.assign({}, props.mapStyle);
+const finalMapStyle = computed<Record<string, string>>(() => {
+    const styles: Record<string, string> = Object.assign({}, props.mapStyle);
 
     if (props.height) {
         styles['height'] = props.height;

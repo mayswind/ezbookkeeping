@@ -61,6 +61,7 @@ import { type CommonDateRangeSelectionProps, useDateRangeSelectionBase } from '@
 
 import { useUserStore } from '@/stores/user.ts';
 
+import { type WeekDayValue } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
 
 import {
@@ -89,7 +90,7 @@ const { yearRange, dateRange, dayNames, isYearFirst, is24Hour, beginDateTime, en
 const userStore = useUserStore();
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
-const firstDayOfWeek = computed<number>(() => userStore.currentUserFirstDayOfWeek);
+const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
 const showState = computed<boolean>({
     get: () => props.show || false,
     set: (value) => emit('update:show', value)

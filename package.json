@@ -15,7 +15,7 @@
     "serve": "cross-env NODE_ENV=development vite",
     "build": "cross-env NODE_ENV=production vite build",
     "serve:dist": "vite preview",
-    "lint": "tsc --noEmit && eslint . --fix",
+    "lint": "vue-tsc --noEmit && eslint . --fix",
     "test": "cross-env TS_NODE_PROJECT=\"./tsconfig.jest.json\" jest"
   },
   "dependencies": {

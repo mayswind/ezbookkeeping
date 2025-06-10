@@ -5,6 +5,7 @@ import { type UserConfig, defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue';
 import vuetify from 'vite-plugin-vuetify';
 import { VitePWA } from 'vite-plugin-pwa';
+import Checker from 'vite-plugin-checker';
 import git from 'git-rev-sync';
 
 import packageFile from './package.json';
@@ -42,6 +43,9 @@ export default defineConfig(() => {
                 styles: {
                     configFile: 'styles/desktop/configured-variables/_vuetify.scss'
                 }
+            }),
+            Checker({
+                vueTsc: true
             }),
             VitePWA({
                 filename: 'sw.js',

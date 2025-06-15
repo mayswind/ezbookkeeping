@@ -183,7 +183,7 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
                     updateTransactionTemplateListInvalidState(templateType, false);
                 }
 
-                const templates = TransactionTemplate.ofManyTemplates(data.result);
+                const templates = TransactionTemplate.ofMultiTemplates(data.result);
 
                 if (force && data.result && isEquals(allTransactionTemplates.value[templateType], templates)) {
                     reject({ message: 'Template list is up to date', isUpToDate: true });

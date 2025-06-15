@@ -138,7 +138,7 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
         );
     }
 
-    public static ofManyTemplates(templateResponses: TransactionTemplateInfoResponse[]): TransactionTemplate[] {
+    public static ofMultiTemplates(templateResponses: TransactionTemplateInfoResponse[]): TransactionTemplate[] {
         const templates: TransactionTemplate[] = [];
 
         for (const templateResponse of templateResponses) {

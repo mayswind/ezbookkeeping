@@ -9,9 +9,9 @@
             <div class="padding-horizontal padding-bottom">
                 <p class="no-margin-top margin-bottom-half" v-if="hint">
                     <span>{{ hint }}</span>
-                    <f7-link id="copy-to-clipboard-icon" ref="copyToClipboardIcon"
-                             class="icon-after-text"
+                    <f7-link class="icon-after-text"
                              icon-only icon-f7="doc_on_doc"
+                             @click="copyBackupCodes"
                              v-if="enableCopy"
                     ></f7-link>
                 </p>
@@ -25,11 +25,9 @@
 </template>
 
 <script setup lang="ts">
-import { useTemplateRef, watch, onMounted, onUpdated } from 'vue';
-
 import { useI18n } from '@/locales/helpers.ts';
 
-import { ClipboardHolder } from '@/lib/clipboard.ts';
+import { copyTextToClipboard } from '@/lib/ui/common.ts';
 
 const props = defineProps<{
     title?: string;
@@ -47,24 +45,9 @@ const emit = defineEmits<{
 
 const { tt } = useI18n();
 
-const iconCopyToClipboard = useTemplateRef<unknown>('copyToClipboardIcon');
-
-let clipboardHolder: ClipboardHolder | null = null;
-
-function makeCopyToClipboardClickable(): void {
-    if (clipboardHolder) {
-        return;
-    }
-
-    if (iconCopyToClipboard.value) {
-        clipboardHolder = ClipboardHolder.create({
-            el: '#copy-to-clipboard-icon',
-            text: props.information,
-            successCallback: function () {
-                emit('info:copied');
-            }
-        });
-    }
+function copyBackupCodes(): void {
+    copyTextToClipboard(props.information);
+    emit('info:copied');
 }
 
 function close(): void {
@@ -74,18 +57,4 @@ function close(): void {
 function onSheetClosed(): void {
     close();
 }
-
-onMounted(() => {
-    makeCopyToClipboardClickable();
-});
-
-onUpdated(() => {
-    makeCopyToClipboardClickable();
-});
-
-watch(() => props.information, (newValue) => {
-    if (clipboardHolder) {
-        clipboardHolder.setClipboardText(newValue);
-    }
-});
 </script>

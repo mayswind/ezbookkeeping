@@ -1,3 +1,5 @@
+import Clipboard from 'clipboard';
+
 import { ThemeType } from '@/core/theme.ts';
 
 import { type AmountColor, PresetAmountColor } from '@/core/color.ts';
@@ -74,6 +76,12 @@ export function setExpenseAndIncomeAmountColor(expenseAmountColorType: number, i
             htmlElement.classList.remove(amountColor.incomeClassName);
         }
     }
+}
+
+export function copyTextToClipboard(text: string, container?: Element | null): void {
+    Clipboard.copy(text, {
+        container: container || document.body
+    });
 }
 
 export function startDownloadFile(fileName: string, fileData: Blob): void {

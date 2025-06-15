@@ -81,9 +81,8 @@
             <v-card v-if="currentBackupCode">
                 <template #title>
                     <span>{{ tt('Backup Code') }}</span>
-                    <v-btn id="copy-to-clipboard-icon" ref="copyToClipboardIcon"
-                           density="compact" color="default" variant="text" size="24"
-                           class="ml-2" :icon="true">
+                    <v-btn density="compact" color="default" variant="text" size="24"
+                           class="ml-2" :icon="true" @click="copyBackupCodes">
                         <v-icon :icon="mdiContentCopy" size="20" />
                         <v-tooltip activator="parent">{{ tt('Copy') }}</v-tooltip>
                     </v-btn>
@@ -105,13 +104,13 @@
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { ref, useTemplateRef, watch, nextTick } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useTwoFactorAuthStore } from '@/stores/twoFactorAuth.ts';
 
-import { ClipboardHolder } from '@/lib/clipboard.ts';
+import { copyTextToClipboard } from '@/lib/ui/common.ts';
 
 import {
     mdiContentCopy
@@ -124,7 +123,6 @@ const { tt } = useI18n();
 const twoFactorAuthStore = useTwoFactorAuthStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
-const iconCopyToClipboard = useTemplateRef<unknown>('copyToClipboardIcon');
 
 const status = ref<boolean | null>(null);
 const loading = ref<boolean>(true);
@@ -137,24 +135,6 @@ const enabling = ref<boolean>(false);
 const enableConfirming = ref<boolean>(false);
 const disabling = ref<boolean>(false);
 const regenerating = ref<boolean>(false);
-
-let clipboardHolder: ClipboardHolder | null = null;
-
-function makeCopyToClipboardClickable(): void {
-    if (clipboardHolder) {
-        return;
-    }
-
-    if (iconCopyToClipboard.value) {
-        clipboardHolder = ClipboardHolder.create({
-            el: '#copy-to-clipboard-icon',
-            text: currentBackupCode.value,
-            successCallback: function () {
-                snackbar.value?.showMessage('Backup codes copied');
-            }
-        });
-    }
-}
 
 function init(): void {
     loading.value = true;
@@ -223,10 +203,6 @@ function enableConfirm(): void {
         if (response.recoveryCodes && response.recoveryCodes.length) {
             currentBackupCode.value = response.recoveryCodes.join('\n');
         }
-
-        nextTick(() => {
-            makeCopyToClipboardClickable();
-        });
     }).catch(error => {
         enableConfirming.value = false;
 
@@ -292,10 +268,6 @@ function regenerateBackupCode(): void {
         regenerating.value = false;
 
         currentBackupCode.value = response.recoveryCodes.join('\n');
-
-        nextTick(() => {
-            makeCopyToClipboardClickable();
-        });
     }).catch(error => {
         regenerating.value = false;
 
@@ -317,11 +289,10 @@ function reset(): void {
     regenerating.value = false;
 }
 
-watch(currentBackupCode, (newValue) => {
-    if (clipboardHolder) {
-        clipboardHolder.setClipboardText(newValue);
-    }
-});
+function copyBackupCodes(): void {
+    copyTextToClipboard(currentBackupCode.value);
+    snackbar.value?.showMessage('Backup codes copied');
+}
 
 defineExpose({
     reset

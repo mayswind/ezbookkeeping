@@ -10,15 +10,19 @@
                         <v-icon :icon="mdiDotsVertical" />
                         <v-menu activator="parent">
                             <v-list>
-                                <v-list-subheader :title="tt('Field Separator')"/>
+                                <v-list-subheader :title="tt('File Format')"/>
                                 <v-list-item :prepend-icon="mdiComma"
-                                             :append-icon="separator === ',' ? mdiCheck : undefined"
-                                             :title="tt('Comma')"
-                                             @click="separator = ','"></v-list-item>
+                                             :append-icon="fileFormat === 'csv' ? mdiCheck : undefined"
+                                             :title="tt('CSV (Comma-separated values) File')"
+                                             @click="fileFormat = 'csv'"></v-list-item>
                                 <v-list-item :prepend-icon="mdiKeyboardTab"
-                                             :append-icon="separator === '\t' ? mdiCheck : undefined"
-                                             :title="tt('Tab')"
-                                             @click="separator = '\t'"></v-list-item>
+                                             :append-icon="fileFormat === 'tsv' ? mdiCheck : undefined"
+                                             :title="tt('TSV (Tab-separated values) File')"
+                                             @click="fileFormat = 'tsv'"></v-list-item>
+                                <v-list-item :prepend-icon="mdiLanguageMarkdownOutline"
+                                             :append-icon="fileFormat === 'md' ? mdiCheck : undefined"
+                                             :title="tt('Markdown File')"
+                                             @click="fileFormat = 'md'"></v-list-item>
                             </v-list>
                         </v-menu>
                     </v-btn>
@@ -87,6 +91,7 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useUserStore } from '@/stores/user.ts';
 
+import { replaceAll } from '@/lib/common.ts';
 import { copyTextToClipboard, startDownloadFile } from '@/lib/ui/common.ts';
 
 import {
@@ -94,6 +99,7 @@ import {
     mdiCheck,
     mdiComma,
     mdiKeyboardTab,
+    mdiLanguageMarkdownOutline,
     mdiMenuDown
 } from '@mdi/js';
 
@@ -109,7 +115,7 @@ const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const showState = ref<boolean>(false);
 const headers = ref<string[]>([]);
 const data = ref<string[][]>([]);
-const separator = ref<string>(',');
+const fileFormat = ref<string>('csv');
 const showRawData = ref<boolean>(false);
 
 const dataTableHeaders = computed<object[]>(() => {
@@ -137,14 +143,32 @@ const dataTableItems = computed<object[]>(() => {
 const exportedData = computed<string>(() => {
     let ret = '';
 
-    if (headers.value.length > 0) {
-        ret += headers.value.join(separator.value);
+    if (fileFormat.value === 'csv' || fileFormat.value === 'tsv') {
+        let separator = ',';
+
+        if (fileFormat.value === 'tsv') {
+            separator = '\t';
+        }
+
+        if (headers.value.length > 0) {
+            ret += headers.value.map(item => replaceAll(item, separator, ' ')).join(separator);
+        }
+
+        for (const row of data.value) {
+            ret += '\n';
+            ret += row.map(item => replaceAll(item, separator, ' ')).join(separator);
+        }
+    } else if (fileFormat.value === 'md') {
+        ret += '| ' + headers.value.map(item => replaceAll(item, '|', ' ')).join(' | ') + ' |';
+        ret += '\n';
+        ret += '| ' + headers.value.map(() => '---').join(' | ') + ' |';
+
+        for (const row of data.value) {
+            ret += '\n';
+            ret += '| ' + row.map(item => replaceAll(item, '|', ' ')).join(' | ') + ' |';
+        }
     }
 
-    for (const row of data.value) {
-        ret += '\n';
-        ret += row.join(separator.value);
-    }
 
     return ret;
 });
@@ -164,7 +188,7 @@ function getExportFileName(fileExtension: string): string {
 function open(options: { headers: string[], data: string[][] }): void {
     headers.value = options.headers || [];
     data.value = options.data || [];
-    separator.value = ',';
+    fileFormat.value = 'csv';
     showRawData.value = false;
     showState.value = true;
 }
@@ -175,15 +199,15 @@ function copy(): void {
 }
 
 function save(): void {
-    let fileExtension = 'csv';
     let contentType = 'text/csv';
 
-    if (separator.value === '\t') {
-        fileExtension = 'tsv';
+    if (fileFormat.value === 'tsv') {
         contentType = 'text/tab-separated-values';
+    } else if (fileFormat.value === 'md') {
+        contentType = 'text/markdown';
     }
 
-    startDownloadFile(getExportFileName(fileExtension), new Blob([exportedData.value], { type: contentType }));
+    startDownloadFile(getExportFileName(fileFormat.value), new Blob([exportedData.value], { type: contentType }));
 }
 
 function cancel(): void {

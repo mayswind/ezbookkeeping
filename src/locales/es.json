@@ -118,7 +118,9 @@
     },
     "dataExport": {
         "defaultExportFilename": "ezBookkeeping_export_data",
-        "exportFilename": "ezBookkeeping_{nickname}_export_data"
+        "exportFilename": "ezBookkeeping_{nickname}_export_data",
+        "defaultExportStatisticsFileName": "ezBookkeeping_statistics_data",
+        "exportStatisticsFileName": "ezBookkeeping_{nickname}_statistics_data"
     },
     "datetime": {
         "AM": {
@@ -1429,7 +1431,11 @@
     "Select All Invalid Items": "Seleccionar todos los artículos no válidos",
     "Back": "Atrás",
     "Load More": "Cargar más",
+    "Export Results": "Export Results",
     "No data": "Sin datos",
+    "Data copied": "Data copied",
+    "Table": "Table",
+    "Raw Data": "Raw Data",
     "Zoom in": "Acercar",
     "Zoom out": "Alejar",
     "Drag to Reorder": "Arrastrar para reordenar",
@@ -1814,6 +1820,7 @@
     "Maximum Amount": "Importe Máximo",
     "Display Order": "Orden de visualización",
     "Name": "Nombre",
+    "Proportion (%)": "Proportion (%)",
     "Sort by Amount": "Ordenar por Importe",
     "Sort by Display Order": "Ordenar por orden de visualización",
     "Sort by Name": "Ordenar por Nombre",
@@ -1915,6 +1922,7 @@
     "Data Management": "Gestión de datos",
     "Unable to retrieve user statistics data": "No se pueden recuperar datos de estadísticas de usuario",
     "Export Data": "Exportar datos",
+    "Field Separator": "Field Separator",
     "CSV (Comma-separated values) File": "Archivo CSV (valores separados por comas)",
     "TSV (Tab-separated values) File": "Archivo TSV (valores separados por tabulaciones)",
     "Clear User Data": "Borrar datos de usuario",

@@ -26,6 +26,9 @@ import {
     isNumber
 } from '@/lib/common.ts';
 import {
+    formatAmount
+} from '@/lib/numeral.ts';
+import {
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
     getDateTypeByDateRange,
@@ -420,9 +423,38 @@ function clickItem(e: ECElementEvent): void {
     });
 }
 
+function exportData(): { headers: string[], data: string[][] } {
+    const headers: string[] = [];
+    const data: string[][] = [];
+
+    headers.push(tt('Date'));
+
+    for (let i = 0; i < allSeries.value.length; i++) {
+        const id = allSeries.value[i].id;
+        const name = itemsMap.value[id] && props.nameField && itemsMap.value[id][props.nameField] ? getItemName(itemsMap.value[id][props.nameField] as string) : id;
+        headers.push(name);
+    }
+
+    for (let i = 0; i < allDisplayDateRanges.value.length; i++) {
+        const row: string[] = [];
+        row.push(allDisplayDateRanges.value[i]);
+        row.push(...allSeries.value.map(item => formatAmount(item.data[i], {})));
+        data.push(row);
+    }
+
+    return {
+        headers: headers,
+        data: data
+    };
+}
+
 function onLegendSelectChanged(e: { selected: Record<string, boolean> }): void {
     selectedLegends.value = e.selected;
 }
+
+defineExpose({
+    exportData
+})
 </script>
 
 <style scoped>

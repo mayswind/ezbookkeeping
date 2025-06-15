@@ -118,7 +118,9 @@
     },
     "dataExport": {
         "defaultExportFilename": "ezBookkeeping_エクスポートデータ",
-        "exportFilename": "ezBookkeeping_{nickname}_エクスポートデータ"
+        "exportFilename": "ezBookkeeping_{nickname}_エクスポートデータ",
+        "defaultExportStatisticsFileName": "ezBookkeeping_statistics_data",
+        "exportStatisticsFileName": "ezBookkeeping_{nickname}_statistics_data"
     },
     "datetime": {
         "AM": {
@@ -1429,7 +1431,11 @@
     "Select All Invalid Items": "すべての無効なアイテムを選択します",
     "Back": "戻る",
     "Load More": "さらに読み込む",
+    "Export Results": "Export Results",
     "No data": "データはありません",
+    "Data copied": "Data copied",
+    "Table": "Table",
+    "Raw Data": "Raw Data",
     "Zoom in": "拡大",
     "Zoom out": "縮小",
     "Drag to Reorder": "ドラッグして並べ替え",
@@ -1814,6 +1820,7 @@
     "Maximum Amount": "最大金額",
     "Display Order": "表示順",
     "Name": "名前",
+    "Proportion (%)": "Proportion (%)",
     "Sort by Amount": "金額で並べ替え",
     "Sort by Display Order": "表示で並べ替え",
     "Sort by Name": "名前で並べ替え",
@@ -1915,6 +1922,7 @@
     "Data Management": "データ管理",
     "Unable to retrieve user statistics data": "ユーザー統計データを取得できません",
     "Export Data": "データのエクスポート",
+    "Field Separator": "Field Separator",
     "CSV (Comma-separated values) File": "CSV（コンマ区切り）ファイル",
     "TSV (Tab-separated values) File": "TSV（タブ区切り）ファイル",
     "Clear User Data": "ユーザーデータをクリア",

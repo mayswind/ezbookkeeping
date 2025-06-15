@@ -118,7 +118,9 @@
     },
     "dataExport": {
         "defaultExportFilename": "ezBookkeeping_export_data",
-        "exportFilename": "ezBookkeeping_{nickname}_export_data"
+        "exportFilename": "ezBookkeeping_{nickname}_export_data",
+        "defaultExportStatisticsFileName": "ezBookkeeping_statistics_data",
+        "exportStatisticsFileName": "ezBookkeeping_{nickname}_statistics_data"
     },
     "datetime": {
         "AM": {
@@ -1429,7 +1431,11 @@
     "Select All Invalid Items": "Chọn tất cả các mục không hợp lệ",
     "Back": "Quay lại",
     "Load More": "Tải thêm",
+    "Export Results": "Export Results",
     "No data": "Không có dữ liệu",
+    "Data copied": "Data copied",
+    "Table": "Table",
+    "Raw Data": "Raw Data",
     "Zoom in": "Phóng to",
     "Zoom out": "Thu nhỏ",
     "Drag to Reorder": "Kéo để sắp xếp lại",
@@ -1814,6 +1820,7 @@
     "Maximum Amount": "Số tiền tối đa",
     "Display Order": "Thứ tự hiển thị",
     "Name": "Tên",
+    "Proportion (%)": "Proportion (%)",
     "Sort by Amount": "Sắp xếp theo số tiền",
     "Sort by Display Order": "Sắp xếp theo thứ tự hiển thị",
     "Sort by Name": "Sắp xếp theo tên",
@@ -1915,6 +1922,7 @@
     "Data Management": "Quản lý dữ liệu",
     "Unable to retrieve user statistics data": "Không thể lấy dữ liệu thống kê người dùng",
     "Export Data": "Xuất dữ liệu",
+    "Field Separator": "Field Separator",
     "CSV (Comma-separated values) File": "Tệp CSV (Giá trị phân cách bằng dấu phẩy)",
     "TSV (Tab-separated values) File": "Tệp TSV (Giá trị phân cách bằng tab)",
     "Clear User Data": "Xóa dữ liệu người dùng",

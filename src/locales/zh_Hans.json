@@ -118,7 +118,9 @@
     },
     "dataExport": {
         "defaultExportFilename": "ezBookkeeping_导出数据",
-        "exportFilename": "ezBookkeeping_{nickname}_导出数据"
+        "exportFilename": "ezBookkeeping_{nickname}_导出数据",
+        "defaultExportStatisticsFileName": "ezBookkeeping_统计数据",
+        "exportStatisticsFileName": "ezBookkeeping_{nickname}_统计数据"
     },
     "datetime": {
         "AM": {
@@ -1429,7 +1431,11 @@
     "Select All Invalid Items": "选择全部无效项目",
     "Back": "返回",
     "Load More": "加载更多",
+    "Export Results": "导出结果",
     "No data": "没有数据",
+    "Data copied": "数据已复制",
+    "Table": "表格",
+    "Raw Data": "原始数据",
     "Zoom in": "放大",
     "Zoom out": "缩小",
     "Drag to Reorder": "拖拽改变顺序",
@@ -1814,6 +1820,7 @@
     "Maximum Amount": "最大金额",
     "Display Order": "显示顺序",
     "Name": "名称",
+    "Proportion (%)": "比例 (%)",
     "Sort by Amount": "按金额排序",
     "Sort by Display Order": "按显示顺序排序",
     "Sort by Name": "按名称排序",
@@ -1915,6 +1922,7 @@
     "Data Management": "数据管理",
     "Unable to retrieve user statistics data": "无法获取用户统计数据",
     "Export Data": "导出数据",
+    "Field Separator": "字段分隔符",
     "CSV (Comma-separated values) File": "CSV (逗号分隔的值) 文件",
     "TSV (Tab-separated values) File": "TSV (制表符分隔的值) 文件",
     "Clear User Data": "清除用户数据",

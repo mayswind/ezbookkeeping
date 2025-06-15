@@ -128,6 +128,11 @@
                                                                      :title="tt('Filter Transaction Tags')"
                                                                      @click="showFilterTagDialog = true"></v-list-item>
                                                         <v-divider class="my-2"/>
+                                                        <v-list-item :prepend-icon="mdiExport"
+                                                                     :title="tt('Export Results')"
+                                                                     :disabled="!statisticsDataHasData"
+                                                                     @click="exportResults"></v-list-item>
+                                                        <v-divider class="my-2"/>
                                                         <v-list-item to="/app/settings?tab=statisticsSetting"
                                                                      :prepend-icon="mdiFilterCogOutline"
                                                                      :title="tt('Settings')"></v-list-item>
@@ -270,6 +275,7 @@
                                             :enable-click-item="true"
                                             :default-currency="defaultCurrency"
                                             :show-total-amount-in-tooltip="showTotalAmountInTrendsChart"
+                                            ref="trendsChart"
                                             id-field="id"
                                             name-field="name"
                                             value-field="totalAmount"
@@ -317,14 +323,18 @@
                                               @settings:change="setTagFilter" />
     </v-dialog>
 
+    <export-dialog ref="exportDialog" />
+
     <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
+import TrendsChart from '@/components/desktop/TrendsChart.vue';
 import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
 import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
 import TransactionTagFilterSettingsCard from '@/views/desktop/common/cards/TransactionTagFilterSettingsCard.vue';
+import ExportDialog from '@/views/desktop/statistics/transaction/dialogs/ExportDialog.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
 import { useRouter, onBeforeRouteUpdate } from 'vue-router';
@@ -353,7 +363,10 @@ import {
     isString,
     isNumber,
     arrayItemToObjectField
-} from '@/lib/common.ts'
+} from '@/lib/common.ts';
+import {
+    formatAmount
+} from '@/lib/numeral.ts';
 import {
     getYearAndMonthFromUnixTime,
     getYearMonthFirstUnixTime,
@@ -373,10 +386,13 @@ import {
     mdiMenu,
     mdiFilterOutline,
     mdiFilterCogOutline,
+    mdiExport,
     mdiDotsVertical
 } from '@mdi/js';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
+type TrendsChartType = InstanceType<typeof TrendsChart>;
+type ExportDialogType = InstanceType<typeof ExportDialog>;
 
 interface TransactionStatisticsProps {
     initAnalysisType?: string,
@@ -433,6 +449,8 @@ const transactionCategoriesStore = useTransactionCategoriesStore();
 const statisticsStore = useStatisticsStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const trendsChart = useTemplateRef<TrendsChartType>('trendsChart');
+const exportDialog = useTemplateRef<ExportDialogType>('exportDialog');
 
 const activeTab = ref<string>('statisticsPage');
 const initing = ref<boolean>(true);
@@ -445,6 +463,16 @@ const showFilterCategoryDialog = ref<boolean>(false);
 const showFilterTagDialog = ref<boolean>(false);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+
+const statisticsDataHasData = computed<boolean>(() => {
+    if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
+        return !!categoricalAnalysisData.value && !!categoricalAnalysisData.value.items && categoricalAnalysisData.value.items.length > 0;
+    } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
+        return !!trendsAnalysisData.value && !!trendsAnalysisData.value.items && trendsAnalysisData.value.items.length > 0 && !!trendsChart.value;
+    }
+
+    return false;
+});
 
 const allChartTypes = computed<TypeAndDisplayName[]>(() => {
     if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
@@ -873,6 +901,31 @@ function setTagFilter(changed: boolean): void {
         loading.value = true;
         statisticsStore.updateTransactionStatisticsInvalidState(true);
         router.push(getFilterLinkUrl());
+    }
+}
+
+function exportResults(): void {
+    if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis && categoricalAnalysisData.value && categoricalAnalysisData.value.items) {
+        exportDialog.value?.open({
+            headers: [
+                tt('Name'),
+                tt('Amount') + ` (${defaultCurrency.value})`,
+                tt('Proportion (%)')
+            ],
+            data: categoricalAnalysisData.value.items
+                .filter(item => !item.hidden)
+                .map(item => [
+                    item.name,
+                    formatAmount(item.totalAmount, {}),
+                    item.percent.toFixed(4)
+                ])
+        });
+    } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis && trendsAnalysisData.value && trendsAnalysisData.value.items && trendsChart.value) {
+        const exportData = trendsChart.value.exportData();
+        exportDialog.value?.open({
+            headers: exportData.headers || [],
+            data: exportData.data || []
+        });
     }
 }
 

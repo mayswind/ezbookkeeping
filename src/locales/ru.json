@@ -118,7 +118,9 @@
     },
     "dataExport": {
         "defaultExportFilename": "ezBookkeeping_export_data",
-        "exportFilename": "ezBookkeeping_{nickname}_export_data"
+        "exportFilename": "ezBookkeeping_{nickname}_export_data",
+        "defaultExportStatisticsFileName": "ezBookkeeping_statistics_data",
+        "exportStatisticsFileName": "ezBookkeeping_{nickname}_statistics_data"
     },
     "datetime": {
         "AM": {
@@ -1429,7 +1431,11 @@
     "Select All Invalid Items": "Выбрать все недействительные элементы",
     "Back": "Назад",
     "Load More": "Загрузить еще",
+    "Export Results": "Export Results",
     "No data": "Нет данных",
+    "Data copied": "Data copied",
+    "Table": "Table",
+    "Raw Data": "Raw Data",
     "Zoom in": "Увеличить",
     "Zoom out": "Уменьшить",
     "Drag to Reorder": "Перетащите для изменения порядка",
@@ -1814,6 +1820,7 @@
     "Maximum Amount": "Максимальная сумма",
     "Display Order": "Порядок отображения",
     "Name": "Имя",
+    "Proportion (%)": "Proportion (%)",
     "Sort by Amount": "Сортировать по сумме",
     "Sort by Display Order": "Сортировать по порядку отображения",
     "Sort by Name": "Сортировать по имени",
@@ -1915,6 +1922,7 @@
     "Data Management": "Управление данными",
     "Unable to retrieve user statistics data": "Не удалось получить статистические данные пользователя",
     "Export Data": "Экспорт данных",
+    "Field Separator": "Field Separator",
     "CSV (Comma-separated values) File": "Файл CSV (значения, разделенные запятыми)",
     "TSV (Tab-separated values) File": "Файл TSV (значения, разделенные табуляцией)",
     "Clear User Data": "Очистить данные пользователя",

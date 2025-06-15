@@ -118,7 +118,9 @@
     },
     "dataExport": {
         "defaultExportFilename": "ezBookkeeping_export_data",
-        "exportFilename": "ezBookkeeping_{nickname}_export_data"
+        "exportFilename": "ezBookkeeping_{nickname}_export_data",
+        "defaultExportStatisticsFileName": "ezBookkeeping_statistics_data",
+        "exportStatisticsFileName": "ezBookkeeping_{nickname}_statistics_data"
     },
     "datetime": {
         "AM": {
@@ -1429,7 +1431,11 @@
     "Select All Invalid Items": "Вибрати всі недійсні елементи",
     "Back": "Назад",
     "Load More": "Завантажити ще",
+    "Export Results": "Export Results",
     "No data": "Немає даних",
+    "Data copied": "Data copied",
+    "Table": "Table",
+    "Raw Data": "Raw Data",
     "Zoom in": "Збільшити",
     "Zoom out": "Зменшити",
     "Drag to Reorder": "Перетягніть для зміни порядку",
@@ -1814,6 +1820,7 @@
     "Maximum Amount": "Максимальна сума",
     "Display Order": "Порядок відображення",
     "Name": "Ім'я",
+    "Proportion (%)": "Proportion (%)",
     "Sort by Amount": "Сортувати за сумою",
     "Sort by Display Order": "Сортувати за порядком відображення",
     "Sort by Name": "Сортувати за назвою",
@@ -1915,6 +1922,7 @@
     "Data Management": "Керування даними",
     "Unable to retrieve user statistics data": "Не вдалося отримати статистику користувача",
     "Export Data": "Експорт даних",
+    "Field Separator": "Field Separator",
     "CSV (Comma-separated values) File": "Файл CSV (значення, розділені комами)",
     "TSV (Tab-separated values) File": "Файл TSV (значення, розділені табуляцією)",
     "Clear User Data": "Очистити дані користувача",

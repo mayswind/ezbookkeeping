@@ -133,6 +133,14 @@ input[type=number] {
     height: 10px;
 }
 
+.code-container {
+    background-color: #efefef;
+}
+
+.v-theme--dark .code-container {
+    background-color: #2f2f2f;
+}
+
 /** Common class for replacing the default style of vuetify **/
 .v-input.v-input--readonly input,
 .v-input.v-input--readonly textarea,

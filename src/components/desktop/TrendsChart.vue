@@ -37,7 +37,7 @@ import {
 
 interface DesktopTrendsChartProps<T extends Year1BasedMonth> extends CommonTrendsChartProps<T> {
     skeleton?: boolean;
-    type: number;
+    type?: number;
     showValue?: boolean;
     showTotalAmountInTooltip?: boolean;
 }

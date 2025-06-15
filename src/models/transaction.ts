@@ -706,7 +706,7 @@ export interface TransactionCategoricalAnalysisData {
     readonly items: TransactionCategoricalAnalysisDataItem[];
 }
 
-export interface TransactionCategoricalAnalysisDataItem extends TransactionStatisticDataItemBase {
+export interface TransactionCategoricalAnalysisDataItem extends Record<string, unknown> , TransactionStatisticDataItemBase {
     readonly percent: number;
 }
 
@@ -714,11 +714,11 @@ export interface TransactionTrendsAnalysisData {
     readonly items: TransactionTrendsAnalysisDataItem[];
 }
 
-export interface TransactionTrendsAnalysisDataItem extends TransactionStatisticDataItemBase {
+export interface TransactionTrendsAnalysisDataItem extends Record<string, unknown>, TransactionStatisticDataItemBase {
     readonly items: TransactionTrendsAnalysisDataAmount[];
 }
 
-export interface TransactionTrendsAnalysisDataAmount extends Year1BasedMonth {
+export interface TransactionTrendsAnalysisDataAmount extends Record<string, unknown>, Year1BasedMonth {
     readonly year: number;
     readonly month1base: number;
     readonly totalAmount: number;

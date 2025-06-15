@@ -86,7 +86,7 @@ interface WritableTransactionCategoricalAnalysisData {
     items: Record<string, WritableTransactionCategoricalAnalysisDataItem>;
 }
 
-interface WritableTransactionCategoricalAnalysisDataItem {
+interface WritableTransactionCategoricalAnalysisDataItem extends Record<string, unknown> {
     name: string;
     type: TransactionStatisticDataItemType;
     id: string;
@@ -98,7 +98,7 @@ interface WritableTransactionCategoricalAnalysisDataItem {
     percent?: number;
 }
 
-interface WritableTransactionTrendsAnalysisDataItem {
+interface WritableTransactionTrendsAnalysisDataItem extends Record<string, unknown> {
     name: string;
     type: TransactionStatisticDataItemType;
     id: string;

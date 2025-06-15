@@ -50,7 +50,7 @@ func (c *fireflyIIITransactionDataCsvFileImporter) ParseImportedData(ctx core.Co
 
 	transactionRowParser := createFireflyIIITransactionDataRowParser()
 	transactionDataTable := datatable.CreateNewImportedTransactionDataTableWithRowParser(dataTable, fireflyIIITransactionDataColumnNameMapping, transactionRowParser)
-	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(fireflyIIITransactionTypeNameMapping, "", ",")
+	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(fireflyIIITransactionTypeNameMapping, "", "", ",")
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }

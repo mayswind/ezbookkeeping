@@ -14,6 +14,7 @@ type defaultTransactionDataPlainTextConverter struct {
 
 const ezbookkeepingLineSeparator = "\n"
 const ezbookkeepingGeoLocationSeparator = " "
+const ezbookkeepingGeoLocationOrder = converter.TRANSACTION_GEO_LOCATION_ORDER_LONGITUDE_LATITUDE
 const ezbookkeepingTagSeparator = ";"
 
 var ezbookkeepingDataColumnNameMapping = map[datatable.TransactionDataTableColumn]string{
@@ -99,6 +100,7 @@ func (c *defaultTransactionDataPlainTextConverter) ParseImportedData(ctx core.Co
 	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(
 		ezbookkeepingTransactionTypeNameMapping,
 		ezbookkeepingGeoLocationSeparator,
+		ezbookkeepingGeoLocationOrder,
 		ezbookkeepingTagSeparator,
 	)
 

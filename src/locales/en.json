@@ -1657,6 +1657,8 @@
     "Same time as default timezone": "Same time as default timezone",
     "Transaction Type": "Transaction Type",
     "Geographic Location": "Geographic Location",
+    "Longitude": "Longitude",
+    "Latitude": "Latitude",
     "No Location": "No Location",
     "Getting Location...": "Getting Location...",
     "Show on the map": "Show on the map",

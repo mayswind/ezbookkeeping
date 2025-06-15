@@ -1657,6 +1657,8 @@
     "Same time as default timezone": "Cùng thời gian với múi giờ mặc định",
     "Transaction Type": "Transaction Type",
     "Geographic Location": "Vị trí địa lý",
+    "Longitude": "Longitude",
+    "Latitude": "Latitude",
     "No Location": "Không có vị trí",
     "Getting Location...": "Đang lấy vị trí...",
     "Show on the map": "Hiển thị trên bản đồ",

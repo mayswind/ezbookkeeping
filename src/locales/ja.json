@@ -1657,6 +1657,8 @@
     "Same time as default timezone": "デフォルトのタイムゾーンと同じ時間",
     "Transaction Type": "取引タイプ",
     "Geographic Location": "地理座標",
+    "Longitude": "Longitude",
+    "Latitude": "Latitude",
     "No Location": "座標はありません",
     "Getting Location...": "座標を取得中...",
     "Show on the map": "マップに表示",

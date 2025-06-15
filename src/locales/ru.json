@@ -1657,6 +1657,8 @@
     "Same time as default timezone": "То же время, что и в часовом поясе по умолчанию",
     "Transaction Type": "Transaction Type",
     "Geographic Location": "Географическое местоположение",
+    "Longitude": "Longitude",
+    "Latitude": "Latitude",
     "No Location": "Нет местоположения",
     "Getting Location...": "Получение местоположения...",
     "Show on the map": "Показать на карте",

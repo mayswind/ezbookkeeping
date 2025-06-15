@@ -106,6 +106,7 @@ type customTransactionDataDsvFileImporter struct {
 	amountDecimalSeparator     string
 	amountDigitGroupingSymbol  string
 	geoLocationSeparator       string
+	geoLocationOrder           converter.TransactionGeoLocationOrder
 	transactionTagSeparator    string
 }
 
@@ -158,7 +159,7 @@ func (c *customTransactionDataDsvFileImporter) ParseImportedData(ctx core.Contex
 
 	dataTable := csvconverter.CreateNewCustomCsvImportedDataTable(allLines)
 	transactionDataTable := CreateNewCustomPlainTextDataTable(dataTable, c.columnIndexMapping, c.transactionTypeNameMapping, c.timeFormat, c.timezoneFormat, c.amountDecimalSeparator, c.amountDigitGroupingSymbol)
-	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(customTransactionTypeNameMapping, c.geoLocationSeparator, c.transactionTagSeparator)
+	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(customTransactionTypeNameMapping, c.geoLocationSeparator, c.geoLocationOrder, c.transactionTagSeparator)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }
@@ -190,7 +191,7 @@ func CreateNewCustomTransactionDataDsvFileParser(fileType string, fileEncoding s
 }
 
 // CreateNewCustomTransactionDataDsvFileImporter returns a new custom dsv importer for transaction data
-func CreateNewCustomTransactionDataDsvFileImporter(fileType string, fileEncoding string, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, hasHeaderLine bool, timeFormat string, timezoneFormat string, amountDecimalSeparator string, amountDigitGroupingSymbol string, geoLocationSeparator string, transactionTagSeparator string) (converter.TransactionDataImporter, error) {
+func CreateNewCustomTransactionDataDsvFileImporter(fileType string, fileEncoding string, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, hasHeaderLine bool, timeFormat string, timezoneFormat string, amountDecimalSeparator string, amountDigitGroupingSymbol string, geoLocationSeparator string, geoLocationOrder string, transactionTagSeparator string) (converter.TransactionDataImporter, error) {
 	separator, exists := supportedFileTypeSeparators[fileType]
 
 	if !exists {
@@ -201,6 +202,13 @@ func CreateNewCustomTransactionDataDsvFileImporter(fileType string, fileEncoding
 
 	if !exists {
 		return nil, errs.ErrImportFileEncodingNotSupported
+	}
+
+	if geoLocationOrder == "" {
+		geoLocationOrder = string(converter.TRANSACTION_GEO_LOCATION_ORDER_LONGITUDE_LATITUDE)
+	} else if geoLocationOrder != string(converter.TRANSACTION_GEO_LOCATION_ORDER_LONGITUDE_LATITUDE) &&
+		geoLocationOrder != string(converter.TRANSACTION_GEO_LOCATION_ORDER_LATITUDE_LONGITUDE) {
+		return nil, errs.ErrImportFileTypeNotSupported
 	}
 
 	if _, exists = columnIndexMapping[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME]; !exists {
@@ -226,6 +234,7 @@ func CreateNewCustomTransactionDataDsvFileImporter(fileType string, fileEncoding
 		amountDecimalSeparator:     amountDecimalSeparator,
 		amountDigitGroupingSymbol:  amountDigitGroupingSymbol,
 		geoLocationSeparator:       geoLocationSeparator,
+		geoLocationOrder:           converter.TransactionGeoLocationOrder(geoLocationOrder),
 		transactionTagSeparator:    transactionTagSeparator,
 	}, nil
 }

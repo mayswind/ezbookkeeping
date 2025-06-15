@@ -77,7 +77,7 @@ func TestCustomTransactionDataDsvFileImporter_MinimumValidData(t *testing.T) {
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 		"T": models.TRANSACTION_TYPE_TRANSFER,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", ".", "", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", ".", "", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -168,7 +168,7 @@ func TestCustomTransactionDataDsvFileImporter_WithAllSupportedColumns(t *testing
 		"Expense":              models.TRANSACTION_TYPE_EXPENSE,
 		"Transfer":             models.TRANSACTION_TYPE_TRANSFER,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, true, "YYYY-MM-DD HH:mm:ss", "", ".", "", " ", ";")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, true, "YYYY-MM-DD HH:mm:ss", "", ".", "", " ", "lonlat", ";")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -261,7 +261,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseInvalidTime(t *testing.T) {
 	transactionTypeMapping := map[string]models.TransactionType{
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -292,7 +292,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseTransactionWithoutType(t *tes
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 		"T": models.TRANSACTION_TYPE_TRANSFER,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -316,7 +316,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseInvalidType(t *testing.T) {
 	transactionTypeMapping := map[string]models.TransactionType{
 		"B": 0,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -340,7 +340,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseTimeWithTimezone(t *testing.T
 	transactionTypeMapping := map[string]models.TransactionType{
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ssZ", "", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ssZ", "", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -378,7 +378,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseTimeWithTimezone2(t *testing.
 	transactionTypeMapping := map[string]models.TransactionType{
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ssZZ", "", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ssZZ", "", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -417,7 +417,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseValidTimezone(t *testing.T) {
 	transactionTypeMapping := map[string]models.TransactionType{
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -456,7 +456,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseValidTimezone2(t *testing.T) 
 	transactionTypeMapping := map[string]models.TransactionType{
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "ZZ", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "ZZ", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -495,7 +495,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseInvalidTimezoneFormat(t *test
 	transactionTypeMapping := map[string]models.TransactionType{
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "z", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "z", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -520,7 +520,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseInvalidTimezone(t *testing.T)
 	transactionTypeMapping := map[string]models.TransactionType{
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -549,7 +549,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseInvalidTimezone2(t *testing.T
 	transactionTypeMapping := map[string]models.TransactionType{
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "ZZ", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "ZZ", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -577,7 +577,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseAmountWithCustomFormat(t *tes
 	transactionTypeMapping := map[string]models.TransactionType{
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_tsv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ",", ".", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_tsv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ",", ".", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -603,7 +603,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseInvalidAmountWithCustomFormat
 	transactionTypeMapping := map[string]models.TransactionType{
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_tsv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", ",", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_tsv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", ",", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -627,7 +627,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseInvalidAmountWithCustomFormat
 	transactionTypeMapping := map[string]models.TransactionType{
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_tsv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ",", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_tsv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ",", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -655,7 +655,7 @@ func TestCustomTransactionDataDsvFileImporter_ParsePrimaryCategory(t *testing.T)
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 		"T": models.TRANSACTION_TYPE_TRANSFER,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -724,7 +724,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseValidAccountCurrency(t *testi
 		"B": models.TRANSACTION_TYPE_MODIFY_BALANCE,
 		"T": models.TRANSACTION_TYPE_TRANSFER,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -767,7 +767,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseInvalidAccountCurrency(t *tes
 		"B": models.TRANSACTION_TYPE_MODIFY_BALANCE,
 		"T": models.TRANSACTION_TYPE_TRANSFER,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -803,7 +803,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseNotSupportedCurrency(t *testi
 		"B": models.TRANSACTION_TYPE_MODIFY_BALANCE,
 		"T": models.TRANSACTION_TYPE_TRANSFER,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -835,7 +835,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseValidAmount(t *testing.T) {
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 		"T": models.TRANSACTION_TYPE_TRANSFER,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -886,7 +886,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseInvalidAmount(t *testing.T) {
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 		"T": models.TRANSACTION_TYPE_TRANSFER,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -917,7 +917,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseNoAmount2(t *testing.T) {
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 		"T": models.TRANSACTION_TYPE_TRANSFER,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -952,7 +952,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseValidGeographicLocation(t *te
 	transactionTypeMapping := map[string]models.TransactionType{
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", ";", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", ";", "lonlat", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -981,7 +981,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseInvalidGeographicLocation(t *
 	transactionTypeMapping := map[string]models.TransactionType{
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", " ", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", " ", "lonlat", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -1013,7 +1013,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseTag(t *testing.T) {
 	transactionTypeMapping := map[string]models.TransactionType{
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", ";")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", ";")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -1053,7 +1053,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseTagWithoutSeparator(t *testin
 	transactionTypeMapping := map[string]models.TransactionType{
 		"E": models.TRANSACTION_TYPE_EXPENSE,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -1084,7 +1084,7 @@ func TestCustomTransactionDataDsvFileImporter_ParseDescription(t *testing.T) {
 	transactionTypeMapping := map[string]models.TransactionType{
 		"T": models.TRANSACTION_TYPE_TRANSFER,
 	}
-	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	converter, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.Nil(t, err)
 
 	context := core.NewNullContext()
@@ -1111,7 +1111,7 @@ func TestCustomTransactionDataDsvFileImporter_InvalidSeparator(t *testing.T) {
 		datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE: 1,
 		datatable.TRANSACTION_DATA_TABLE_AMOUNT:           2,
 	}
-	_, err := CreateNewCustomTransactionDataDsvFileImporter("test", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	_, err := CreateNewCustomTransactionDataDsvFileImporter("test", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.EqualError(t, err, errs.ErrImportFileTypeNotSupported.Message)
 }
 
@@ -1124,7 +1124,7 @@ func TestCustomTransactionDataDsvFileImporter_InvalidFileEncoding(t *testing.T) 
 		datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE: 1,
 		datatable.TRANSACTION_DATA_TABLE_AMOUNT:           2,
 	}
-	_, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "ascii", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	_, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "ascii", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.EqualError(t, err, errs.ErrImportFileEncodingNotSupported.Message)
 }
 
@@ -1138,7 +1138,7 @@ func TestCustomTransactionDataDsvFileImporter_MissingRequiredColumn(t *testing.T
 		datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE: 0,
 		datatable.TRANSACTION_DATA_TABLE_AMOUNT:           1,
 	}
-	_, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	_, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Type Column
@@ -1146,7 +1146,7 @@ func TestCustomTransactionDataDsvFileImporter_MissingRequiredColumn(t *testing.T
 		datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME: 0,
 		datatable.TRANSACTION_DATA_TABLE_AMOUNT:           1,
 	}
-	_, err = CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	_, err = CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Amount Column
@@ -1154,6 +1154,6 @@ func TestCustomTransactionDataDsvFileImporter_MissingRequiredColumn(t *testing.T
 		datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME: 0,
 		datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE: 1,
 	}
-	_, err = CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "")
+	_, err = CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", "", "", "", "")
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 }

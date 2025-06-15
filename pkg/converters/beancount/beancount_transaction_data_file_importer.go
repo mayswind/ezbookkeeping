@@ -43,7 +43,7 @@ func (c *beancountTransactionDataImporter) ParseImportedData(ctx core.Context, u
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(beancountTransactionTypeNameMapping, "", BEANCOUNT_TRANSACTION_TAG_SEPARATOR)
+	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(beancountTransactionTypeNameMapping, "", "", BEANCOUNT_TRANSACTION_TAG_SEPARATOR)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }

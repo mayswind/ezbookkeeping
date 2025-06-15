@@ -1657,6 +1657,8 @@
     "Same time as default timezone": "与默认时区时间相同",
     "Transaction Type": "交易类型",
     "Geographic Location": "地理位置",
+    "Longitude": "经度",
+    "Latitude": "纬度",
     "No Location": "没有位置",
     "Getting Location...": "正在获取位置...",
     "Show on the map": "在地图上显示",

@@ -424,16 +424,33 @@
                                 <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
                                        v-if="parsedFileDataColumnMapping && isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.GeographicLocation.type])">
                                     <span>{{ tt('Geographic Location Separator') }}</span>
-                                    <span class="ml-1" v-if="parsedFileGeoLocationSeparator">({{ parsedFileGeoLocationSeparator }})</span>
-                                    <v-menu eager activator="parent" location="bottom" max-height="500">
-                                        <v-list>
-                                            <v-list-item :key="separator.value"
-                                                         :append-icon="parsedFileGeoLocationSeparator === separator.value ? mdiCheck : undefined"
-                                                         v-for="separator in allSeparators"
-                                                         @click="parsedFileGeoLocationSeparator = separator.value">
-                                                <v-list-item-title class="cursor-pointer">
-                                                    {{ separator.name }} ({{separator.value}})
-                                                </v-list-item-title>
+                                    <span class="ml-1" v-if="parsedFileGeoLocationSeparator">({{ parsedFileGeoLocationOrder === 'latlon' ? `${tt('Latitude')}${parsedFileGeoLocationSeparator}${tt('Longitude')}` : `${tt('Longitude')}${parsedFileGeoLocationSeparator}${tt('Latitude')}` }})</span>
+                                    <v-menu eager activator="parent" location="bottom" max-height="500"
+                                            :close-on-content-click="false">
+                                        <v-list class="pa-0">
+                                            <v-list-item class="pa-0">
+                                                <v-table class="transaction-types-popup-menu">
+                                                    <tbody>
+                                                    <tr :key="separator.value"
+                                                        v-for="separator in allSeparators">
+                                                        <td>{{ separator.name }} ({{separator.value}})</td>
+                                                        <td>
+                                                            <v-btn-toggle class="transaction-types-toggle" density="compact" variant="outlined"
+                                                                          mandatory="force" divided
+                                                                          v-model="parsedFileGeoLocationOrder"
+                                                                          v-if="parsedFileGeoLocationSeparator === separator.value">
+                                                                <v-btn value="latlon">{{ `${tt('Latitude')}${separator.value}${tt('Longitude')}` }}</v-btn>
+                                                                <v-btn value="lonlat">{{ `${tt('Longitude')}${separator.value}${tt('Latitude')}` }}</v-btn>
+                                                            </v-btn-toggle>
+                                                            <v-btn-group class="transaction-types-toggle" density="compact" variant="outlined"
+                                                                          divided v-if="parsedFileGeoLocationSeparator !== separator.value">
+                                                                <v-btn @click="parsedFileGeoLocationSeparator = separator.value; parsedFileGeoLocationOrder = 'latlon'">{{ `${tt('Latitude')}${separator.value}${tt('Longitude')}` }}</v-btn>
+                                                                <v-btn @click="parsedFileGeoLocationSeparator = separator.value; parsedFileGeoLocationOrder = 'lonlat'">{{ `${tt('Longitude')}${separator.value}${tt('Latitude')}` }}</v-btn>
+                                                            </v-btn-group>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </v-table>
                                             </v-list-item>
                                         </v-list>
                                     </v-menu>
@@ -986,6 +1003,7 @@ const parsedFileTimeFormat = ref<string>('');
 const parsedFileTimezoneFormat = ref<string>('');
 const parsedFileAmountFormat = ref<string>('');
 const parsedFileGeoLocationSeparator = ref<string>(' ');
+const parsedFileGeoLocationOrder = ref<string>('lonlat');
 const parsedFileTagSeparator = ref<string>(';');
 const importTransactions = ref<ImportTransaction[] | undefined>(undefined);
 const editingTransaction = ref<ImportTransaction | null>(null);
@@ -1943,6 +1961,7 @@ function open(): Promise<void> {
     parsedFileTimezoneFormat.value = '';
     parsedFileAmountFormat.value = '';
     parsedFileGeoLocationSeparator.value = ' ';
+    parsedFileGeoLocationOrder.value = 'lonlat';
     parsedFileTagSeparator.value = ';';
     importTransactions.value = undefined;
     editingTransaction.value = null;
@@ -2088,6 +2107,7 @@ function parseData(): void {
         let amountDecimalSeparator: string | undefined = undefined;
         let amountDigitGroupingSymbol: string | undefined = undefined;
         let geoLocationSeparator: string | undefined = undefined;
+        let geoLocationOrder: string | undefined = undefined;
         let tagSeparator: string | undefined = undefined;
 
         if (isDsvFileType) {
@@ -2098,6 +2118,7 @@ function parseData(): void {
             timezoneFormat = parsedFileTimezoneFormat.value;
             amountFormat = parsedFileAmountFormat.value;
             geoLocationSeparator = parsedFileGeoLocationSeparator.value;
+            geoLocationOrder = parsedFileGeoLocationOrder.value;
             tagSeparator = parsedFileTagSeparator.value;
 
             if (!columnMapping
@@ -2159,6 +2180,7 @@ function parseData(): void {
             amountDecimalSeparator: amountDecimalSeparator,
             amountDigitGroupingSymbol: amountDigitGroupingSymbol,
             geoSeparator: geoLocationSeparator,
+            geoOrder: geoLocationOrder,
             tagSeparator: tagSeparator
         }).then(response => {
             const parsedTransactions: ImportTransaction[] = [];

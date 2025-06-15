@@ -1219,6 +1219,13 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 			geoLocationSeparator = geoLocationSeparators[0]
 		}
 
+		geoLocationOrders := form.Value["geoOrder"]
+		geoLocationOrder := ""
+
+		if len(geoLocationOrders) > 0 {
+			geoLocationOrder = geoLocationOrders[0]
+		}
+
 		transactionTagSeparators := form.Value["tagSeparator"]
 		transactionTagSeparator := ""
 
@@ -1226,7 +1233,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 			transactionTagSeparator = transactionTagSeparators[0]
 		}
 
-		dataImporter, err = converters.CreateNewDelimiterSeparatedValuesDataImporter(fileType, fileEncoding, columnIndexMapping, transactionTypeNameMapping, hasHeaderLine, timeFormats[0], timezoneFormat, amountDecimalSeparator, amountDigitGroupingSymbol, geoLocationSeparator, transactionTagSeparator)
+		dataImporter, err = converters.CreateNewDelimiterSeparatedValuesDataImporter(fileType, fileEncoding, columnIndexMapping, transactionTypeNameMapping, hasHeaderLine, timeFormats[0], timezoneFormat, amountDecimalSeparator, amountDigitGroupingSymbol, geoLocationSeparator, geoLocationOrder, transactionTagSeparator)
 	} else {
 		dataImporter, err = converters.GetTransactionDataImporter(fileType)
 	}

@@ -28,4 +28,5 @@ var (
 	ErrInvalidBeancountFile                = NewNormalError(NormalSubcategoryConverter, 21, http.StatusBadRequest, "invalid beancount file")
 	ErrBeancountFileNotSupportInclude      = NewNormalError(NormalSubcategoryConverter, 22, http.StatusBadRequest, "not support include directive for beancount file")
 	ErrInvalidAmountExpression             = NewNormalError(NormalSubcategoryConverter, 23, http.StatusBadRequest, "invalid amount expression")
+	ErrInvalidXmlFile                      = NewNormalError(NormalSubcategoryConverter, 24, http.StatusBadRequest, "invalid xml file")
 )

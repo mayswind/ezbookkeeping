@@ -163,6 +163,11 @@ export const SUPPORTED_IMPORT_FILE_TYPES: ImportFileType[] = [
         extensions: '.iif'
     },
     {
+        type: 'camt053',
+        name: 'Camt.053 Bank to Customer Statement File',
+        extensions: '.xml'
+    },
+    {
         type: 'gnucash',
         name: 'GnuCash XML Database File',
         extensions: '.gnucash',

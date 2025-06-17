@@ -73,3 +73,6 @@ const (
 	TRANSACTION_DATA_TABLE_TAGS                     TransactionDataTableColumn = 13
 	TRANSACTION_DATA_TABLE_DESCRIPTION              TransactionDataTableColumn = 14
 )
+
+// TRANSACTION_DATA_TABLE_TIMEZONE_NOT_AVAILABLE represents the constant for timezone not available
+const TRANSACTION_DATA_TABLE_TIMEZONE_NOT_AVAILABLE = "TIMEZONE_NOT_AVAILABLE"

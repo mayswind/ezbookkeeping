@@ -96,7 +96,8 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 
 		timezoneOffset := defaultTimezoneOffset
 
-		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE) {
+		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE) &&
+			dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE) != datatable.TRANSACTION_DATA_TABLE_TIMEZONE_NOT_AVAILABLE {
 			transactionTimezone, err := utils.ParseFromTimezoneOffset(dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE))
 
 			if err != nil {

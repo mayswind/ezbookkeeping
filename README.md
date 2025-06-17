@@ -38,7 +38,7 @@ Online Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-dem
     * Two-factor authentication (2FA)
     * Login rate limiting
     * Application lock (PIN code / WebAuthn)
-8. Data Export & Import (CSV, OFX, QFX, QIF, IIF, GnuCash, FireFly III, Beancount, etc.)
+8. Data Export & Import (CSV, OFX, QFX, QIF, IIF, Camt.053, GnuCash, FireFly III, Beancount, etc.)
 
 ## Screenshots
 ### Desktop Version

@@ -47,6 +47,7 @@ type ofxVersion2FileReader struct {
 }
 
 // read returns the imported open financial exchange (ofx) file
+// Reference: https://www.financialdataexchange.org/FDX/FDX/About/OFX-Work-Group.aspx?a315d1c24e44=2
 func (r *ofxVersion1FileReader) read(ctx core.Context) (*ofxFile, error) {
 	file := &ofxFile{}
 

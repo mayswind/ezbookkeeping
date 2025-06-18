@@ -16,6 +16,7 @@ type camt053FileReader struct {
 }
 
 // read returns the imported camt.053 data
+// Reference: https://www.iso20022.org/message-set/1196/download
 func (r *camt053FileReader) read(ctx core.Context) (*camt053File, error) {
 	file := &camt053File{}
 

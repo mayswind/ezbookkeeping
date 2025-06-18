@@ -16,28 +16,28 @@ type excelOOXMLSheet struct {
 	allData   [][]string
 }
 
-// ExcelOOXMLFileImportedDataTable defines the structure of excel (Office Open XML) file data table
-type ExcelOOXMLFileImportedDataTable struct {
+// ExcelOOXMLFileBasicDataTable defines the structure of excel (Office Open XML) file data table
+type ExcelOOXMLFileBasicDataTable struct {
 	sheets                []*excelOOXMLSheet
 	headerLineColumnNames []string
 }
 
-// ExcelOOXMLFileDataRow defines the structure of excel (Office Open XML) file data table row
-type ExcelOOXMLFileDataRow struct {
+// ExcelOOXMLFileBasicDataTableRow defines the structure of excel (Office Open XML) file data table row
+type ExcelOOXMLFileBasicDataTableRow struct {
 	sheet    *excelOOXMLSheet
 	rowData  []string
 	rowIndex int
 }
 
-// ExcelOOXMLFileDataRowIterator defines the structure of excel (Office Open XML) file data table row iterator
-type ExcelOOXMLFileDataRowIterator struct {
-	dataTable              *ExcelOOXMLFileImportedDataTable
+// ExcelOOXMLFileBasicDataTableRowIterator defines the structure of excel (Office Open XML) file data table row iterator
+type ExcelOOXMLFileBasicDataTableRowIterator struct {
+	dataTable              *ExcelOOXMLFileBasicDataTable
 	currentSheetIndex      int
 	currentRowIndexInSheet int
 }
 
 // DataRowCount returns the total count of data row
-func (t *ExcelOOXMLFileImportedDataTable) DataRowCount() int {
+func (t *ExcelOOXMLFileBasicDataTable) DataRowCount() int {
 	totalDataRowCount := 0
 
 	for i := 0; i < len(t.sheets); i++ {
@@ -54,13 +54,13 @@ func (t *ExcelOOXMLFileImportedDataTable) DataRowCount() int {
 }
 
 // HeaderColumnNames returns the header column name list
-func (t *ExcelOOXMLFileImportedDataTable) HeaderColumnNames() []string {
+func (t *ExcelOOXMLFileBasicDataTable) HeaderColumnNames() []string {
 	return t.headerLineColumnNames
 }
 
 // DataRowIterator returns the iterator of data row
-func (t *ExcelOOXMLFileImportedDataTable) DataRowIterator() datatable.ImportedDataRowIterator {
-	return &ExcelOOXMLFileDataRowIterator{
+func (t *ExcelOOXMLFileBasicDataTable) DataRowIterator() datatable.BasicDataTableRowIterator {
+	return &ExcelOOXMLFileBasicDataTableRowIterator{
 		dataTable:              t,
 		currentSheetIndex:      0,
 		currentRowIndexInSheet: 0,
@@ -68,12 +68,12 @@ func (t *ExcelOOXMLFileImportedDataTable) DataRowIterator() datatable.ImportedDa
 }
 
 // ColumnCount returns the total count of column in this data row
-func (r *ExcelOOXMLFileDataRow) ColumnCount() int {
+func (r *ExcelOOXMLFileBasicDataTableRow) ColumnCount() int {
 	return len(r.rowData)
 }
 
 // GetData returns the data in the specified column index
-func (r *ExcelOOXMLFileDataRow) GetData(columnIndex int) string {
+func (r *ExcelOOXMLFileBasicDataTableRow) GetData(columnIndex int) string {
 	if columnIndex < 0 || columnIndex >= len(r.rowData) {
 		return ""
 	}
@@ -82,7 +82,7 @@ func (r *ExcelOOXMLFileDataRow) GetData(columnIndex int) string {
 }
 
 // HasNext returns whether the iterator does not reach the end
-func (t *ExcelOOXMLFileDataRowIterator) HasNext() bool {
+func (t *ExcelOOXMLFileBasicDataTableRowIterator) HasNext() bool {
 	sheets := t.dataTable.sheets
 
 	if t.currentSheetIndex >= len(sheets) {
@@ -109,12 +109,12 @@ func (t *ExcelOOXMLFileDataRowIterator) HasNext() bool {
 }
 
 // CurrentRowId returns current index
-func (t *ExcelOOXMLFileDataRowIterator) CurrentRowId() string {
-	return fmt.Sprintf("table#%d-row#%d", t.currentSheetIndex, t.currentRowIndexInSheet)
+func (t *ExcelOOXMLFileBasicDataTableRowIterator) CurrentRowId() string {
+	return fmt.Sprintf("sheet#%d-row#%d", t.currentSheetIndex, t.currentRowIndexInSheet)
 }
 
-// Next returns the next imported data row
-func (t *ExcelOOXMLFileDataRowIterator) Next() datatable.ImportedDataRow {
+// Next returns the next basic data row
+func (t *ExcelOOXMLFileBasicDataTableRowIterator) Next() datatable.BasicDataTableRow {
 	sheets := t.dataTable.sheets
 	currentRowIndexInTable := t.currentRowIndexInSheet
 
@@ -142,15 +142,15 @@ func (t *ExcelOOXMLFileDataRowIterator) Next() datatable.ImportedDataRow {
 		return nil
 	}
 
-	return &ExcelOOXMLFileDataRow{
+	return &ExcelOOXMLFileBasicDataTableRow{
 		sheet:    currentSheet,
 		rowData:  currentSheet.allData[t.currentRowIndexInSheet],
 		rowIndex: t.currentRowIndexInSheet,
 	}
 }
 
-// CreateNewExcelOOXMLFileImportedDataTable returns excel (Office Open XML) data table by file binary data
-func CreateNewExcelOOXMLFileImportedDataTable(data []byte) (*ExcelOOXMLFileImportedDataTable, error) {
+// CreateNewExcelOOXMLFileBasicDataTable returns excel (Office Open XML) data table by file binary data
+func CreateNewExcelOOXMLFileBasicDataTable(data []byte) (datatable.BasicDataTable, error) {
 	reader := bytes.NewReader(data)
 	file, err := excelize.OpenReader(reader)
 
@@ -204,7 +204,7 @@ func CreateNewExcelOOXMLFileImportedDataTable(data []byte) (*ExcelOOXMLFileImpor
 		})
 	}
 
-	return &ExcelOOXMLFileImportedDataTable{
+	return &ExcelOOXMLFileBasicDataTable{
 		sheets:                sheets,
 		headerLineColumnNames: headerRowItems,
 	}, nil

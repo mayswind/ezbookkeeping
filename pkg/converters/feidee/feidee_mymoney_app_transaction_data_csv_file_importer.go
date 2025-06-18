@@ -60,13 +60,13 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) ParseImportedData(ctx c
 	fallback := unicode.UTF8.NewDecoder()
 	reader := transform.NewReader(bytes.NewReader(data), unicode.BOMOverride(fallback))
 
-	dataTable, err := c.createNewFeideeMymoneyAppImportedDataTable(ctx, reader)
+	dataTable, err := c.createNewFeideeMymoneyAppBasicDataTable(ctx, reader)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	commonDataTable := datatable.CreateNewImportedCommonDataTable(dataTable)
+	commonDataTable := datatable.CreateNewCommonDataTableFromBasicDataTable(dataTable)
 
 	if !commonDataTable.HasColumn(feideeMymoneyAppTransactionTimeColumnName) ||
 		!commonDataTable.HasColumn(feideeMymoneyAppTransactionTypeColumnName) ||
@@ -89,7 +89,7 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) ParseImportedData(ctx c
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }
 
-func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyAppImportedDataTable(ctx core.Context, reader io.Reader) (datatable.ImportedDataTable, error) {
+func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyAppBasicDataTable(ctx core.Context, reader io.Reader) (datatable.BasicDataTable, error) {
 	csvReader := csv.NewReader(reader)
 	csvReader.FieldsPerRecord = -1
 
@@ -132,7 +132,7 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyA
 		return nil, errs.ErrNotFoundTransactionDataInFile
 	}
 
-	dataTable := csvdatatable.CreateNewCustomCsvImportedDataTable(allOriginalLines)
+	dataTable := csvdatatable.CreateNewCustomCsvBasicDataTable(allOriginalLines)
 
 	return dataTable, nil
 }

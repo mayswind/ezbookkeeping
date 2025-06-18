@@ -42,14 +42,14 @@ var (
 // ParseImportedData returns the imported data by parsing the firefly III transaction csv data
 func (c *fireflyIIITransactionDataCsvFileImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	reader := bytes.NewReader(data)
-	dataTable, err := csv.CreateNewCsvImportedDataTable(ctx, reader)
+	dataTable, err := csv.CreateNewCsvBasicDataTable(ctx, reader)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
 	transactionRowParser := createFireflyIIITransactionDataRowParser()
-	transactionDataTable := datatable.CreateNewImportedTransactionDataTableWithRowParser(dataTable, fireflyIIITransactionDataColumnNameMapping, transactionRowParser)
+	transactionDataTable := datatable.CreateNewTransactionDataTableFromBasicDataTableWithRowParser(dataTable, fireflyIIITransactionDataColumnNameMapping, transactionRowParser)
 	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(fireflyIIITransactionTypeNameMapping, "", "", ",")
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)

@@ -1,7 +1,7 @@
 package datatable
 
-// ImportedDataTable defines the structure of imported data table
-type ImportedDataTable interface {
+// BasicDataTable defines the structure of basic data table
+type BasicDataTable interface {
 	// DataRowCount returns the total count of data row
 	DataRowCount() int
 
@@ -9,11 +9,11 @@ type ImportedDataTable interface {
 	HeaderColumnNames() []string
 
 	// DataRowIterator returns the iterator of data row
-	DataRowIterator() ImportedDataRowIterator
+	DataRowIterator() BasicDataTableRowIterator
 }
 
-// ImportedDataRow defines the structure of imported data row
-type ImportedDataRow interface {
+// BasicDataTableRow defines the structure of basic data row
+type BasicDataTableRow interface {
 	// ColumnCount returns the total count of column in this data row
 	ColumnCount() int
 
@@ -21,14 +21,14 @@ type ImportedDataRow interface {
 	GetData(columnIndex int) string
 }
 
-// ImportedDataRowIterator defines the structure of imported data row iterator
-type ImportedDataRowIterator interface {
+// BasicDataTableRowIterator defines the structure of basic data row iterator
+type BasicDataTableRowIterator interface {
 	// HasNext returns whether the iterator does not reach the end
 	HasNext() bool
 
 	// CurrentRowId returns current row id
 	CurrentRowId() string
 
-	// Next returns the next imported data row
-	Next() ImportedDataRow
+	// Next returns the next basic data row
+	Next() BasicDataTableRow
 }

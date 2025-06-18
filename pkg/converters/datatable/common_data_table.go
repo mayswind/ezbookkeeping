@@ -12,11 +12,11 @@ type CommonDataTable interface {
 	DataRowCount() int
 
 	// DataRowIterator returns the iterator of common data row
-	DataRowIterator() CommonDataRowIterator
+	DataRowIterator() CommonDataTableRowIterator
 }
 
-// CommonDataRow defines the structure of common data row
-type CommonDataRow interface {
+// CommonDataTableRow defines the structure of common data row
+type CommonDataTableRow interface {
 	// ColumnCount returns the total count of column in this data row
 	ColumnCount() int
 
@@ -27,8 +27,8 @@ type CommonDataRow interface {
 	GetData(columnName string) string
 }
 
-// CommonDataRowIterator defines the structure of common data row iterator
-type CommonDataRowIterator interface {
+// CommonDataTableRowIterator defines the structure of common data row iterator
+type CommonDataTableRowIterator interface {
 	// HasNext returns whether the iterator does not reach the end
 	HasNext() bool
 
@@ -36,5 +36,5 @@ type CommonDataRowIterator interface {
 	CurrentRowId() string
 
 	// Next returns the next common data row
-	Next() CommonDataRow
+	Next() CommonDataTableRow
 }

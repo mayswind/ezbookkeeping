@@ -14,7 +14,7 @@ import (
 
 // customPlainTextDataTable defines the structure of custom plain text transaction data table
 type customPlainTextDataTable struct {
-	innerDataTable             datatable.ImportedDataTable
+	innerDataTable             datatable.BasicDataTable
 	columnIndexMapping         map[datatable.TransactionDataTableColumn]int
 	transactionTypeNameMapping map[string]models.TransactionType
 	timeFormat                 string
@@ -34,7 +34,7 @@ type customPlainTextDataRow struct {
 // customPlainTextDataRowIterator defines the structure of custom plain text transaction data row iterator
 type customPlainTextDataRowIterator struct {
 	transactionDataTable *customPlainTextDataTable
-	innerIterator        datatable.ImportedDataRowIterator
+	innerIterator        datatable.BasicDataTableRowIterator
 }
 
 // HasColumn returns whether the data table has specified column
@@ -105,7 +105,7 @@ func (t *customPlainTextDataRowIterator) Next(ctx core.Context, user *models.Use
 	}, nil
 }
 
-func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user *models.User, row datatable.ImportedDataRow) (map[datatable.TransactionDataTableColumn]string, bool, error) {
+func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user *models.User, row datatable.BasicDataTableRow) (map[datatable.TransactionDataTableColumn]string, bool, error) {
 	rowData := make(map[datatable.TransactionDataTableColumn]string, len(t.transactionDataTable.columnIndexMapping))
 
 	for column, columnIndex := range t.transactionDataTable.columnIndexMapping {
@@ -236,7 +236,7 @@ func (t *customPlainTextDataRowIterator) parseAmount(ctx core.Context, amountVal
 }
 
 // CreateNewCustomPlainTextDataTable returns transaction data table from imported data table
-func CreateNewCustomPlainTextDataTable(dataTable datatable.ImportedDataTable, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, timeFormat string, timezoneFormat string, amountDecimalSeparator string, amountDigitGroupingSymbol string) *customPlainTextDataTable {
+func CreateNewCustomPlainTextDataTable(dataTable datatable.BasicDataTable, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, timeFormat string, timezoneFormat string, amountDecimalSeparator string, amountDigitGroupingSymbol string) *customPlainTextDataTable {
 	timeFormatIncludeTimezone := strings.Contains(timeFormat, "z") || strings.Contains(timeFormat, "Z")
 
 	return &customPlainTextDataTable{

@@ -157,7 +157,7 @@ func (c *customTransactionDataDsvFileImporter) ParseImportedData(ctx core.Contex
 		allLines = append([][]string{{}}, allLines...)
 	}
 
-	dataTable := csvconverter.CreateNewCustomCsvImportedDataTable(allLines)
+	dataTable := csvconverter.CreateNewCustomCsvBasicDataTable(allLines)
 	transactionDataTable := CreateNewCustomPlainTextDataTable(dataTable, c.columnIndexMapping, c.transactionTypeNameMapping, c.timeFormat, c.timezoneFormat, c.amountDecimalSeparator, c.amountDigitGroupingSymbol)
 	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(customTransactionTypeNameMapping, c.geoLocationSeparator, c.geoLocationOrder, c.transactionTagSeparator)
 

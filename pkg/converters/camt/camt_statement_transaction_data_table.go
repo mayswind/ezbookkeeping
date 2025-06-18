@@ -138,7 +138,7 @@ func (t *camtStatementTransactionDataRowIterator) HasNext() bool {
 	return false
 }
 
-// Next returns the next imported data row
+// Next returns the next transaction data row
 func (t *camtStatementTransactionDataRowIterator) Next(ctx core.Context, user *models.User) (daraRow datatable.TransactionDataRow, err error) {
 	allStatements := t.dataTable.allStatements
 

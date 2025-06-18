@@ -49,13 +49,13 @@ func (c *wechatPayTransactionDataCsvFileImporter) ParseImportedData(ctx core.Con
 	fallback := unicode.UTF8.NewDecoder()
 	reader := transform.NewReader(bytes.NewReader(data), unicode.BOMOverride(fallback))
 
-	dataTable, err := c.createNewWeChatPayImportedDataTable(ctx, reader)
+	dataTable, err := c.createNewWeChatPayBasicDataTable(ctx, reader)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	commonDataTable := datatable.CreateNewImportedCommonDataTable(dataTable)
+	commonDataTable := datatable.CreateNewCommonDataTableFromBasicDataTable(dataTable)
 
 	if !commonDataTable.HasColumn(wechatPayTransactionTimeColumnName) ||
 		!commonDataTable.HasColumn(wechatPayTransactionCategoryColumnName) ||
@@ -66,14 +66,14 @@ func (c *wechatPayTransactionDataCsvFileImporter) ParseImportedData(ctx core.Con
 		return nil, nil, nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow
 	}
 
-	transactionRowParser := createWeChatPayTransactionDataRowParser()
-	transactionDataTable := datatable.CreateNewCommonTransactionDataTable(commonDataTable, wechatPayTransactionSupportedColumns, transactionRowParser)
+	transactionRowParser := createWeChatPayTransactionDataRowParser(dataTable.HeaderColumnNames())
+	transactionDataTable := datatable.CreateNewTransactionDataTableFromCommonDataTable(commonDataTable, wechatPayTransactionSupportedColumns, transactionRowParser)
 	dataTableImporter := converter.CreateNewSimpleImporterWithTypeNameMapping(wechatPayTransactionTypeNameMapping)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }
 
-func (c *wechatPayTransactionDataCsvFileImporter) createNewWeChatPayImportedDataTable(ctx core.Context, reader io.Reader) (datatable.ImportedDataTable, error) {
+func (c *wechatPayTransactionDataCsvFileImporter) createNewWeChatPayBasicDataTable(ctx core.Context, reader io.Reader) (datatable.BasicDataTable, error) {
 	csvReader := csv.NewReader(reader)
 	csvReader.FieldsPerRecord = -1
 
@@ -89,7 +89,7 @@ func (c *wechatPayTransactionDataCsvFileImporter) createNewWeChatPayImportedData
 		}
 
 		if err != nil {
-			log.Errorf(ctx, "[wechat_pay_transaction_data_csv_file_importer.createNewWeChatPayImportedDataTable] cannot parse wechat pay csv data, because %s", err.Error())
+			log.Errorf(ctx, "[wechat_pay_transaction_data_csv_file_importer.createNewWeChatPayBasicDataTable] cannot parse wechat pay csv data, because %s", err.Error())
 			return nil, errs.ErrInvalidCSVFile
 		}
 
@@ -100,7 +100,7 @@ func (c *wechatPayTransactionDataCsvFileImporter) createNewWeChatPayImportedData
 				hasFileHeader = true
 				continue
 			} else {
-				log.Warnf(ctx, "[wechat_pay_transaction_data_csv_file_importer.createNewWeChatPayImportedDataTable] read unexpected line before read file header, line content is %s", strings.Join(items, ","))
+				log.Warnf(ctx, "[wechat_pay_transaction_data_csv_file_importer.createNewWeChatPayBasicDataTable] read unexpected line before read file header, line content is %s", strings.Join(items, ","))
 				continue
 			}
 		}
@@ -126,7 +126,7 @@ func (c *wechatPayTransactionDataCsvFileImporter) createNewWeChatPayImportedData
 			}
 
 			if len(allOriginalLines) > 0 && len(items) < len(allOriginalLines[0]) {
-				log.Errorf(ctx, "[wechat_pay_transaction_data_csv_file_importer.createNewWeChatPayImportedDataTable] cannot parse row \"index:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", len(allOriginalLines), len(items), len(allOriginalLines[0]))
+				log.Errorf(ctx, "[wechat_pay_transaction_data_csv_file_importer.createNewWeChatPayBasicDataTable] cannot parse row \"index:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", len(allOriginalLines), len(items), len(allOriginalLines[0]))
 				return nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
 			}
 
@@ -139,11 +139,11 @@ func (c *wechatPayTransactionDataCsvFileImporter) createNewWeChatPayImportedData
 	}
 
 	if len(allOriginalLines) < 2 {
-		log.Errorf(ctx, "[wechat_pay_transaction_data_csv_file_importer.createNewWeChatPayImportedDataTable] cannot parse import data, because data table row count is less 1")
+		log.Errorf(ctx, "[wechat_pay_transaction_data_csv_file_importer.createNewWeChatPayBasicDataTable] cannot parse import data, because data table row count is less 1")
 		return nil, errs.ErrNotFoundTransactionDataInFile
 	}
 
-	dataTable := csvdatatable.CreateNewCustomCsvImportedDataTable(allOriginalLines)
+	dataTable := csvdatatable.CreateNewCustomCsvBasicDataTable(allOriginalLines)
 
 	return dataTable, nil
 }

@@ -26,11 +26,12 @@ const alipayTransactionDataProductNameRepaymentText = "还款"
 
 // alipayTransactionDataRowParser defines the structure of alipay transaction data row parser
 type alipayTransactionDataRowParser struct {
-	columns alipayTransactionColumnNames
+	columns                    alipayTransactionColumnNames
+	existedOriginalDataColumns map[string]bool
 }
 
 // Parse returns the converted transaction data row
-func (p *alipayTransactionDataRowParser) Parse(ctx core.Context, user *models.User, dataTable *datatable.CommonTransactionDataTable, dataRow datatable.CommonDataRow, rowId string) (rowData map[datatable.TransactionDataTableColumn]string, rowDataValid bool, err error) {
+func (p *alipayTransactionDataRowParser) Parse(ctx core.Context, user *models.User, dataRow datatable.CommonDataTableRow, rowId string) (rowData map[datatable.TransactionDataTableColumn]string, rowDataValid bool, err error) {
 	if dataRow.GetData(p.columns.typeColumnName) != alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME] &&
 		dataRow.GetData(p.columns.typeColumnName) != alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE] &&
 		dataRow.GetData(p.columns.typeColumnName) != alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER] {
@@ -50,23 +51,23 @@ func (p *alipayTransactionDataRowParser) Parse(ctx core.Context, user *models.Us
 
 	data := make(map[datatable.TransactionDataTableColumn]string, len(alipayTransactionSupportedColumns))
 
-	if dataTable.HasOriginalColumn(p.columns.timeColumnName) {
+	if p.hasOriginalColumn(p.columns.timeColumnName) {
 		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = dataRow.GetData(p.columns.timeColumnName)
 	}
 
-	if dataTable.HasOriginalColumn(p.columns.categoryColumnName) {
+	if p.hasOriginalColumn(p.columns.categoryColumnName) {
 		data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = dataRow.GetData(p.columns.categoryColumnName)
 	} else {
 		data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = ""
 	}
 
-	if dataTable.HasOriginalColumn(p.columns.amountColumnName) {
+	if p.hasOriginalColumn(p.columns.amountColumnName) {
 		data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = dataRow.GetData(p.columns.amountColumnName)
 	}
 
-	if dataTable.HasOriginalColumn(p.columns.descriptionColumnName) && dataRow.GetData(p.columns.descriptionColumnName) != "" {
+	if p.hasOriginalColumn(p.columns.descriptionColumnName) && dataRow.GetData(p.columns.descriptionColumnName) != "" {
 		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = dataRow.GetData(p.columns.descriptionColumnName)
-	} else if dataTable.HasOriginalColumn(p.columns.productNameColumnName) && dataRow.GetData(p.columns.productNameColumnName) != "" {
+	} else if p.hasOriginalColumn(p.columns.productNameColumnName) && dataRow.GetData(p.columns.productNameColumnName) != "" {
 		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = dataRow.GetData(p.columns.productNameColumnName)
 	} else {
 		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = ""
@@ -74,13 +75,13 @@ func (p *alipayTransactionDataRowParser) Parse(ctx core.Context, user *models.Us
 
 	relatedAccountName := ""
 
-	if dataTable.HasOriginalColumn(p.columns.relatedAccountColumnName) {
+	if p.hasOriginalColumn(p.columns.relatedAccountColumnName) {
 		relatedAccountName = dataRow.GetData(p.columns.relatedAccountColumnName)
 	}
 
 	statusName := ""
 
-	if dataTable.HasOriginalColumn(p.columns.statusColumnName) {
+	if p.hasOriginalColumn(p.columns.statusColumnName) {
 		statusName = dataRow.GetData(p.columns.statusColumnName)
 	}
 
@@ -92,7 +93,7 @@ func (p *alipayTransactionDataRowParser) Parse(ctx core.Context, user *models.Us
 
 	localeTextItems := locales.GetLocaleTextItems(locale)
 
-	if dataTable.HasOriginalColumn(p.columns.typeColumnName) {
+	if p.hasOriginalColumn(p.columns.typeColumnName) {
 		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = dataRow.GetData(p.columns.typeColumnName)
 
 		if dataRow.GetData(p.columns.typeColumnName) == alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME] {
@@ -117,11 +118,11 @@ func (p *alipayTransactionDataRowParser) Parse(ctx core.Context, user *models.Us
 			targetName := ""
 			productName := ""
 
-			if dataTable.HasOriginalColumn(p.columns.targetNameColumnName) {
+			if p.hasOriginalColumn(p.columns.targetNameColumnName) {
 				targetName = dataRow.GetData(p.columns.targetNameColumnName)
 			}
 
-			if dataTable.HasOriginalColumn(p.columns.productNameColumnName) {
+			if p.hasOriginalColumn(p.columns.productNameColumnName) {
 				productName = dataRow.GetData(p.columns.productNameColumnName)
 			}
 
@@ -170,9 +171,21 @@ func (p *alipayTransactionDataRowParser) Parse(ctx core.Context, user *models.Us
 	return data, true, nil
 }
 
+func (p *alipayTransactionDataRowParser) hasOriginalColumn(columnName string) bool {
+	_, exists := p.existedOriginalDataColumns[columnName]
+	return exists
+}
+
 // createAlipayTransactionDataRowParser returns alipay transaction data row parser
-func createAlipayTransactionDataRowParser(originalColumnNames alipayTransactionColumnNames) datatable.CommonTransactionDataRowParser {
+func createAlipayTransactionDataRowParser(originalColumnNames alipayTransactionColumnNames, headerColumnNames []string) datatable.CommonTransactionDataRowParser {
+	existedOriginalDataColumns := make(map[string]bool, len(headerColumnNames))
+
+	for i := 0; i < len(headerColumnNames); i++ {
+		existedOriginalDataColumns[headerColumnNames[i]] = true
+	}
+
 	return &alipayTransactionDataRowParser{
-		columns: originalColumnNames,
+		columns:                    originalColumnNames,
+		existedOriginalDataColumns: existedOriginalDataColumns,
 	}
 }

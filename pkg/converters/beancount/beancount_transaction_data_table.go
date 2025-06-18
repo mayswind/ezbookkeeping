@@ -85,7 +85,7 @@ func (t *beancountTransactionDataRowIterator) HasNext() bool {
 	return t.currentIndex+1 < len(t.dataTable.allData)
 }
 
-// Next returns the next imported data row
+// Next returns the next transaction data row
 func (t *beancountTransactionDataRowIterator) Next(ctx core.Context, user *models.User) (daraRow datatable.TransactionDataRow, err error) {
 	if t.currentIndex+1 >= len(t.dataTable.allData) {
 		return nil, nil

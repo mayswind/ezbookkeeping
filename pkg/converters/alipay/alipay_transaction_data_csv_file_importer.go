@@ -61,13 +61,13 @@ func (c *alipayTransactionDataCsvFileImporter) ParseImportedData(ctx core.Contex
 	enc := simplifiedchinese.GB18030
 	reader := transform.NewReader(bytes.NewReader(data), enc.NewDecoder())
 
-	dataTable, err := c.createNewAlipayImportedDataTable(ctx, reader, c.fileHeaderLine, c.dataHeaderStartContent, c.dataBottomEndLineRune)
+	dataTable, err := c.createNewAlipayBasicDataTable(ctx, reader, c.fileHeaderLine, c.dataHeaderStartContent, c.dataBottomEndLineRune)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	commonDataTable := datatable.CreateNewImportedCommonDataTable(dataTable)
+	commonDataTable := datatable.CreateNewCommonDataTableFromBasicDataTable(dataTable)
 
 	if !commonDataTable.HasColumn(c.originalColumnNames.timeColumnName) ||
 		!commonDataTable.HasColumn(c.originalColumnNames.amountColumnName) ||
@@ -77,14 +77,14 @@ func (c *alipayTransactionDataCsvFileImporter) ParseImportedData(ctx core.Contex
 		return nil, nil, nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow
 	}
 
-	transactionRowParser := createAlipayTransactionDataRowParser(c.originalColumnNames)
-	transactionDataTable := datatable.CreateNewCommonTransactionDataTable(commonDataTable, alipayTransactionSupportedColumns, transactionRowParser)
+	transactionRowParser := createAlipayTransactionDataRowParser(c.originalColumnNames, dataTable.HeaderColumnNames())
+	transactionDataTable := datatable.CreateNewTransactionDataTableFromCommonDataTable(commonDataTable, alipayTransactionSupportedColumns, transactionRowParser)
 	dataTableImporter := converter.CreateNewSimpleImporterWithTypeNameMapping(alipayTransactionTypeNameMapping)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }
 
-func (c *alipayTransactionDataCsvFileImporter) createNewAlipayImportedDataTable(ctx core.Context, reader io.Reader, fileHeaderLine string, dataHeaderStartContent string, dataBottomEndLineRune rune) (datatable.ImportedDataTable, error) {
+func (c *alipayTransactionDataCsvFileImporter) createNewAlipayBasicDataTable(ctx core.Context, reader io.Reader, fileHeaderLine string, dataHeaderStartContent string, dataBottomEndLineRune rune) (datatable.BasicDataTable, error) {
 	csvReader := csv.NewReader(reader)
 	csvReader.FieldsPerRecord = -1
 
@@ -100,7 +100,7 @@ func (c *alipayTransactionDataCsvFileImporter) createNewAlipayImportedDataTable(
 		}
 
 		if err != nil {
-			log.Errorf(ctx, "[alipay_transaction_csv_data_table.createNewAlipayImportedDataTable] cannot parse alipay csv data, because %s", err.Error())
+			log.Errorf(ctx, "[alipay_transaction_data_csv_file_importer.createNewAlipayBasicDataTable] cannot parse alipay csv data, because %s", err.Error())
 			return nil, errs.ErrInvalidCSVFile
 		}
 
@@ -111,7 +111,7 @@ func (c *alipayTransactionDataCsvFileImporter) createNewAlipayImportedDataTable(
 				hasFileHeader = true
 				continue
 			} else {
-				log.Warnf(ctx, "[alipay_transaction_csv_data_table.createNewAlipayImportedDataTable] read unexpected line before read file header, line content is %s", strings.Join(items, ","))
+				log.Warnf(ctx, "[alipay_transaction_data_csv_file_importer.createNewAlipayBasicDataTable] read unexpected line before read file header, line content is %s", strings.Join(items, ","))
 				continue
 			}
 		}
@@ -139,7 +139,7 @@ func (c *alipayTransactionDataCsvFileImporter) createNewAlipayImportedDataTable(
 			}
 
 			if len(allOriginalLines) > 0 && len(items) < len(allOriginalLines[0]) {
-				log.Errorf(ctx, "[alipay_transaction_csv_data_table.createNewAlipayImportedDataTable] cannot parse row \"index:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", len(allOriginalLines), len(items), len(allOriginalLines[0]))
+				log.Errorf(ctx, "[alipay_transaction_data_csv_file_importer.createNewAlipayBasicDataTable] cannot parse row \"index:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", len(allOriginalLines), len(items), len(allOriginalLines[0]))
 				return nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
 			}
 
@@ -152,11 +152,11 @@ func (c *alipayTransactionDataCsvFileImporter) createNewAlipayImportedDataTable(
 	}
 
 	if len(allOriginalLines) < 2 {
-		log.Errorf(ctx, "[alipay_transaction_csv_data_table.createNewAlipayImportedDataTable] cannot parse import data, because data table row count is less 1")
+		log.Errorf(ctx, "[alipay_transaction_data_csv_file_importer.createNewAlipayBasicDataTable] cannot parse import data, because data table row count is less 1")
 		return nil, errs.ErrNotFoundTransactionDataInFile
 	}
 
-	dataTable := csvdatatable.CreateNewCustomCsvImportedDataTable(allOriginalLines)
+	dataTable := csvdatatable.CreateNewCustomCsvBasicDataTable(allOriginalLines)
 
 	return dataTable, nil
 }

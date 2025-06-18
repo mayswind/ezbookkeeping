@@ -7,30 +7,30 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
-// ImportedTransactionDataTable defines the structure of imported transaction data table
-type ImportedTransactionDataTable struct {
-	innerDataTable    ImportedDataTable
+// basicDataTableToTransactionDataTableWrapper defines the structure of basic data table to transaction data table wrapper
+type basicDataTableToTransactionDataTableWrapper struct {
+	innerDataTable    BasicDataTable
 	dataColumnMapping map[TransactionDataTableColumn]string
 	dataColumnIndexes map[TransactionDataTableColumn]int
 	rowParser         TransactionDataRowParser
 	addedColumns      map[TransactionDataTableColumn]bool
 }
 
-// ImportedTransactionDataRow defines the structure of imported transaction data row
-type ImportedTransactionDataRow struct {
-	transactionDataTable *ImportedTransactionDataTable
+// basicDataTableToTransactionDataTableWrapperRow defines the data row structure of basic data table to transaction data table wrapper
+type basicDataTableToTransactionDataTableWrapperRow struct {
+	transactionDataTable *basicDataTableToTransactionDataTableWrapper
 	rowData              map[TransactionDataTableColumn]string
 	rowDataValid         bool
 }
 
-// ImportedTransactionDataRowIterator defines the structure of imported transaction data row iterator
-type ImportedTransactionDataRowIterator struct {
-	transactionDataTable *ImportedTransactionDataTable
-	innerIterator        ImportedDataRowIterator
+// basicDataTableToTransactionDataTableWrapperRowIterator defines the data row iterator structure of basic data table to transaction data table wrapper
+type basicDataTableToTransactionDataTableWrapperRowIterator struct {
+	transactionDataTable *basicDataTableToTransactionDataTableWrapper
+	innerIterator        BasicDataTableRowIterator
 }
 
 // HasColumn returns whether the data table has specified column
-func (t *ImportedTransactionDataTable) HasColumn(column TransactionDataTableColumn) bool {
+func (t *basicDataTableToTransactionDataTableWrapper) HasColumn(column TransactionDataTableColumn) bool {
 	index, exists := t.dataColumnIndexes[column]
 
 	if exists && index >= 0 {
@@ -49,25 +49,25 @@ func (t *ImportedTransactionDataTable) HasColumn(column TransactionDataTableColu
 }
 
 // TransactionRowCount returns the total count of transaction data row
-func (t *ImportedTransactionDataTable) TransactionRowCount() int {
+func (t *basicDataTableToTransactionDataTableWrapper) TransactionRowCount() int {
 	return t.innerDataTable.DataRowCount()
 }
 
 // TransactionRowIterator returns the iterator of transaction data row
-func (t *ImportedTransactionDataTable) TransactionRowIterator() TransactionDataRowIterator {
-	return &ImportedTransactionDataRowIterator{
+func (t *basicDataTableToTransactionDataTableWrapper) TransactionRowIterator() TransactionDataRowIterator {
+	return &basicDataTableToTransactionDataTableWrapperRowIterator{
 		transactionDataTable: t,
 		innerIterator:        t.innerDataTable.DataRowIterator(),
 	}
 }
 
 // IsValid returns whether this row is valid data for importing
-func (r *ImportedTransactionDataRow) IsValid() bool {
+func (r *basicDataTableToTransactionDataTableWrapperRow) IsValid() bool {
 	return r.rowDataValid
 }
 
 // GetData returns the data in the specified column type
-func (r *ImportedTransactionDataRow) GetData(column TransactionDataTableColumn) string {
+func (r *basicDataTableToTransactionDataTableWrapperRow) GetData(column TransactionDataTableColumn) string {
 	if !r.rowDataValid {
 		return ""
 	}
@@ -90,28 +90,28 @@ func (r *ImportedTransactionDataRow) GetData(column TransactionDataTableColumn) 
 }
 
 // HasNext returns whether the iterator does not reach the end
-func (t *ImportedTransactionDataRowIterator) HasNext() bool {
+func (t *basicDataTableToTransactionDataTableWrapperRowIterator) HasNext() bool {
 	return t.innerIterator.HasNext()
 }
 
 // Next returns the next transaction data row
-func (t *ImportedTransactionDataRowIterator) Next(ctx core.Context, user *models.User) (daraRow TransactionDataRow, err error) {
-	importedRow := t.innerIterator.Next()
+func (t *basicDataTableToTransactionDataTableWrapperRowIterator) Next(ctx core.Context, user *models.User) (daraRow TransactionDataRow, err error) {
+	basicDataRow := t.innerIterator.Next()
 
-	if importedRow == nil {
+	if basicDataRow == nil {
 		return nil, nil
 	}
 
-	if importedRow.ColumnCount() == 1 && importedRow.GetData(0) == "" {
-		return &ImportedTransactionDataRow{
+	if basicDataRow.ColumnCount() == 1 && basicDataRow.GetData(0) == "" {
+		return &basicDataTableToTransactionDataTableWrapperRow{
 			transactionDataTable: t.transactionDataTable,
 			rowData:              nil,
 			rowDataValid:         false,
 		}, nil
 	}
 
-	if importedRow.ColumnCount() < len(t.transactionDataTable.dataColumnIndexes) {
-		log.Errorf(ctx, "[imported_transaction_data_table.Next] cannot parse data row, because may missing some columns (column count %d in data row is less than header column count %d)", importedRow.ColumnCount(), len(t.transactionDataTable.dataColumnIndexes))
+	if basicDataRow.ColumnCount() < len(t.transactionDataTable.dataColumnIndexes) {
+		log.Errorf(ctx, "[basic_data_table_to_transaction_data_table_wrapper.Next] cannot parse data row, because may missing some columns (column count %d in data row is less than header column count %d)", basicDataRow.ColumnCount(), len(t.transactionDataTable.dataColumnIndexes))
 		return nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
 	}
 
@@ -119,11 +119,11 @@ func (t *ImportedTransactionDataRowIterator) Next(ctx core.Context, user *models
 	rowDataValid := true
 
 	for column, columnIndex := range t.transactionDataTable.dataColumnIndexes {
-		if columnIndex < 0 || columnIndex >= importedRow.ColumnCount() {
+		if columnIndex < 0 || columnIndex >= basicDataRow.ColumnCount() {
 			continue
 		}
 
-		value := importedRow.GetData(columnIndex)
+		value := basicDataRow.GetData(columnIndex)
 		rowData[column] = value
 	}
 
@@ -131,25 +131,25 @@ func (t *ImportedTransactionDataRowIterator) Next(ctx core.Context, user *models
 		rowData, rowDataValid, err = t.transactionDataTable.rowParser.Parse(rowData)
 
 		if err != nil {
-			log.Errorf(ctx, "[imported_transaction_data_table.Next] cannot parse data row, because %s", err.Error())
+			log.Errorf(ctx, "[basic_data_table_to_transaction_data_table_wrapper.Next] cannot parse data row, because %s", err.Error())
 			return nil, err
 		}
 	}
 
-	return &ImportedTransactionDataRow{
+	return &basicDataTableToTransactionDataTableWrapperRow{
 		transactionDataTable: t.transactionDataTable,
 		rowData:              rowData,
 		rowDataValid:         rowDataValid,
 	}, nil
 }
 
-// CreateNewImportedTransactionDataTable returns transaction data table from imported data table
-func CreateNewImportedTransactionDataTable(dataTable ImportedDataTable, dataColumnMapping map[TransactionDataTableColumn]string) *ImportedTransactionDataTable {
-	return CreateNewImportedTransactionDataTableWithRowParser(dataTable, dataColumnMapping, nil)
+// CreateNewTransactionDataTableFromBasicDataTable returns transaction data table from basic data table
+func CreateNewTransactionDataTableFromBasicDataTable(dataTable BasicDataTable, dataColumnMapping map[TransactionDataTableColumn]string) TransactionDataTable {
+	return CreateNewTransactionDataTableFromBasicDataTableWithRowParser(dataTable, dataColumnMapping, nil)
 }
 
-// CreateNewImportedTransactionDataTableWithRowParser returns transaction data table from imported data table
-func CreateNewImportedTransactionDataTableWithRowParser(dataTable ImportedDataTable, dataColumnMapping map[TransactionDataTableColumn]string, rowParser TransactionDataRowParser) *ImportedTransactionDataTable {
+// CreateNewTransactionDataTableFromBasicDataTableWithRowParser returns transaction data table from basic data table
+func CreateNewTransactionDataTableFromBasicDataTableWithRowParser(dataTable BasicDataTable, dataColumnMapping map[TransactionDataTableColumn]string, rowParser TransactionDataRowParser) TransactionDataTable {
 	headerLineItems := dataTable.HeaderColumnNames()
 	headerItemMap := make(map[string]int, len(headerLineItems))
 
@@ -178,7 +178,7 @@ func CreateNewImportedTransactionDataTableWithRowParser(dataTable ImportedDataTa
 		}
 	}
 
-	return &ImportedTransactionDataTable{
+	return &basicDataTableToTransactionDataTableWrapper{
 		innerDataTable:    dataTable,
 		dataColumnMapping: dataColumnMapping,
 		dataColumnIndexes: dataColumnIndexes,

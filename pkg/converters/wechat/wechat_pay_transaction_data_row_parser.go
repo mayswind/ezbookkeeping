@@ -31,10 +31,11 @@ const wechatPayTransactionDataStatusRefundName = "退款"
 
 // weChatPayTransactionDataRowParser defines the structure of wechat pay transaction data row parser
 type weChatPayTransactionDataRowParser struct {
+	existedOriginalDataColumns map[string]bool
 }
 
 // Parse returns the converted transaction data row
-func (t *weChatPayTransactionDataRowParser) Parse(ctx core.Context, user *models.User, dataTable *datatable.CommonTransactionDataTable, dataRow datatable.CommonDataRow, rowId string) (rowData map[datatable.TransactionDataTableColumn]string, rowDataValid bool, err error) {
+func (p *weChatPayTransactionDataRowParser) Parse(ctx core.Context, user *models.User, dataRow datatable.CommonDataTableRow, rowId string) (rowData map[datatable.TransactionDataTableColumn]string, rowDataValid bool, err error) {
 	if dataRow.GetData(wechatPayTransactionTypeColumnName) != wechatPayTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME] &&
 		dataRow.GetData(wechatPayTransactionTypeColumnName) != wechatPayTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE] &&
 		dataRow.GetData(wechatPayTransactionTypeColumnName) != wechatPayTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER] {
@@ -44,15 +45,15 @@ func (t *weChatPayTransactionDataRowParser) Parse(ctx core.Context, user *models
 
 	data := make(map[datatable.TransactionDataTableColumn]string, len(wechatPayTransactionSupportedColumns))
 
-	if dataTable.HasOriginalColumn(wechatPayTransactionTimeColumnName) {
+	if p.hasOriginalColumn(wechatPayTransactionTimeColumnName) {
 		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = dataRow.GetData(wechatPayTransactionTimeColumnName)
 	}
 
-	if dataTable.HasOriginalColumn(wechatPayTransactionCategoryColumnName) {
+	if p.hasOriginalColumn(wechatPayTransactionCategoryColumnName) {
 		data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = dataRow.GetData(wechatPayTransactionCategoryColumnName)
 	}
 
-	if dataTable.HasOriginalColumn(wechatPayTransactionAmountColumnName) {
+	if p.hasOriginalColumn(wechatPayTransactionAmountColumnName) {
 		amount, success := utils.ParseFirstConsecutiveNumber(dataRow.GetData(wechatPayTransactionAmountColumnName))
 
 		if !success {
@@ -63,9 +64,9 @@ func (t *weChatPayTransactionDataRowParser) Parse(ctx core.Context, user *models
 		data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = amount
 	}
 
-	if dataTable.HasOriginalColumn(wechatPayTransactionDescriptionColumnName) && dataRow.GetData(wechatPayTransactionDescriptionColumnName) != "" && dataRow.GetData(wechatPayTransactionDescriptionColumnName) != "/" {
+	if p.hasOriginalColumn(wechatPayTransactionDescriptionColumnName) && dataRow.GetData(wechatPayTransactionDescriptionColumnName) != "" && dataRow.GetData(wechatPayTransactionDescriptionColumnName) != "/" {
 		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = dataRow.GetData(wechatPayTransactionDescriptionColumnName)
-	} else if dataTable.HasOriginalColumn(wechatPayTransactionProductNameColumnName) && dataRow.GetData(wechatPayTransactionProductNameColumnName) != "" && dataRow.GetData(wechatPayTransactionProductNameColumnName) != "/" {
+	} else if p.hasOriginalColumn(wechatPayTransactionProductNameColumnName) && dataRow.GetData(wechatPayTransactionProductNameColumnName) != "" && dataRow.GetData(wechatPayTransactionProductNameColumnName) != "/" {
 		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = dataRow.GetData(wechatPayTransactionProductNameColumnName)
 	} else {
 		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = ""
@@ -73,13 +74,13 @@ func (t *weChatPayTransactionDataRowParser) Parse(ctx core.Context, user *models
 
 	relatedAccountName := ""
 
-	if dataTable.HasOriginalColumn(wechatPayTransactionRelatedAccountColumnName) {
+	if p.hasOriginalColumn(wechatPayTransactionRelatedAccountColumnName) {
 		relatedAccountName = dataRow.GetData(wechatPayTransactionRelatedAccountColumnName)
 	}
 
 	statusName := ""
 
-	if dataTable.HasOriginalColumn(wechatPayTransactionStatusColumnName) {
+	if p.hasOriginalColumn(wechatPayTransactionStatusColumnName) {
 		statusName = dataRow.GetData(wechatPayTransactionStatusColumnName)
 	}
 
@@ -91,7 +92,7 @@ func (t *weChatPayTransactionDataRowParser) Parse(ctx core.Context, user *models
 
 	localeTextItems := locales.GetLocaleTextItems(locale)
 
-	if dataTable.HasOriginalColumn(wechatPayTransactionTypeColumnName) {
+	if p.hasOriginalColumn(wechatPayTransactionTypeColumnName) {
 		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = dataRow.GetData(wechatPayTransactionTypeColumnName)
 
 		if dataRow.GetData(wechatPayTransactionTypeColumnName) == wechatPayTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME] {
@@ -132,7 +133,20 @@ func (t *weChatPayTransactionDataRowParser) Parse(ctx core.Context, user *models
 	return data, true, nil
 }
 
+func (p *weChatPayTransactionDataRowParser) hasOriginalColumn(columnName string) bool {
+	_, exists := p.existedOriginalDataColumns[columnName]
+	return exists
+}
+
 // createWeChatPayTransactionDataRowParser returns wechat pay transaction data row parser
-func createWeChatPayTransactionDataRowParser() datatable.CommonTransactionDataRowParser {
-	return &weChatPayTransactionDataRowParser{}
+func createWeChatPayTransactionDataRowParser(headerColumnNames []string) datatable.CommonTransactionDataRowParser {
+	existedOriginalDataColumns := make(map[string]bool, len(headerColumnNames))
+
+	for i := 0; i < len(headerColumnNames); i++ {
+		existedOriginalDataColumns[headerColumnNames[i]] = true
+	}
+
+	return &weChatPayTransactionDataRowParser{
+		existedOriginalDataColumns: existedOriginalDataColumns,
+	}
 }

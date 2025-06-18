@@ -52,7 +52,7 @@ func (t *defaultPlainTextDataTable) HeaderColumnNames() []string {
 }
 
 // DataRowIterator returns the iterator of data row
-func (t *defaultPlainTextDataTable) DataRowIterator() datatable.ImportedDataRowIterator {
+func (t *defaultPlainTextDataTable) DataRowIterator() datatable.BasicDataTableRowIterator {
 	return &defaultPlainTextDataRowIterator{
 		dataTable:    t,
 		currentIndex: 0,
@@ -83,8 +83,8 @@ func (t *defaultPlainTextDataRowIterator) CurrentRowId() string {
 	return fmt.Sprintf("line#%d", t.currentIndex)
 }
 
-// Next returns the next imported data row
-func (t *defaultPlainTextDataRowIterator) Next() datatable.ImportedDataRow {
+// Next returns the next basic data row
+func (t *defaultPlainTextDataRowIterator) Next() datatable.BasicDataTableRow {
 	if t.currentIndex+1 >= len(t.dataTable.allLines) {
 		return nil
 	}

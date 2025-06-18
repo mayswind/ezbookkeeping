@@ -9,8 +9,8 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 )
 
-func TestCsvFileImportedDataTableDataRowCount(t *testing.T) {
-	datatable := CreateNewCustomCsvImportedDataTable([][]string{
+func TestCsvFileBasicDataTableDataRowCount(t *testing.T) {
+	datatable := CreateNewCustomCsvBasicDataTable([][]string{
 		{"A1", "B1", "C1"},
 		{"A2", "B2", "C2"},
 		{"A3", "B3", "C3"},
@@ -19,22 +19,22 @@ func TestCsvFileImportedDataTableDataRowCount(t *testing.T) {
 	assert.Equal(t, 2, datatable.DataRowCount())
 }
 
-func TestCsvFileImportedDataTableDataRowCount_OnlyHeaderLine(t *testing.T) {
-	datatable := CreateNewCustomCsvImportedDataTable([][]string{
+func TestCsvFileBasicDataTableDataRowCount_OnlyHeaderLine(t *testing.T) {
+	datatable := CreateNewCustomCsvBasicDataTable([][]string{
 		{"A1", "B1", "C1"},
 	})
 
 	assert.Equal(t, 0, datatable.DataRowCount())
 }
 
-func TestCsvFileImportedDataTableDataRowCount_EmptyContent(t *testing.T) {
-	datatable := CreateNewCustomCsvImportedDataTable([][]string{})
+func TestCsvFileBasicDataTableDataRowCount_EmptyContent(t *testing.T) {
+	datatable := CreateNewCustomCsvBasicDataTable([][]string{})
 
 	assert.Equal(t, 0, datatable.DataRowCount())
 }
 
-func TestCsvFileImportedDataTableHeaderColumnNames(t *testing.T) {
-	datatable := CreateNewCustomCsvImportedDataTable([][]string{
+func TestCsvFileBasicDataTableHeaderColumnNames(t *testing.T) {
+	datatable := CreateNewCustomCsvBasicDataTable([][]string{
 		{"A1", "B1", "C1"},
 		{"A2", "B2", "C2"},
 		{"A3", "B3", "C3"},
@@ -43,14 +43,14 @@ func TestCsvFileImportedDataTableHeaderColumnNames(t *testing.T) {
 	assert.EqualValues(t, []string{"A1", "B1", "C1"}, datatable.HeaderColumnNames())
 }
 
-func TestCsvFileImportedDataTableHeaderColumnNames_EmptyContent(t *testing.T) {
-	datatable := CreateNewCustomCsvImportedDataTable([][]string{})
+func TestCsvFileBasicDataTableHeaderColumnNames_EmptyContent(t *testing.T) {
+	datatable := CreateNewCustomCsvBasicDataTable([][]string{})
 
 	assert.Nil(t, datatable.HeaderColumnNames())
 }
 
-func TestCsvFileImportedDataRowIterator(t *testing.T) {
-	datatable := CreateNewCustomCsvImportedDataTable([][]string{
+func TestCsvFileBasicDataTableRowIterator(t *testing.T) {
+	datatable := CreateNewCustomCsvBasicDataTable([][]string{
 		{"A1", "B1", "C1"},
 		{"A2", "B2", "C2"},
 		{"A3", "B3", "C3"},
@@ -76,8 +76,8 @@ func TestCsvFileImportedDataRowIterator(t *testing.T) {
 	assert.False(t, iterator.HasNext())
 }
 
-func TestCsvFileImportedDataRowColumnCount(t *testing.T) {
-	datatable := CreateNewCustomCsvImportedDataTable([][]string{
+func TestCsvFileBasicDataTableRowColumnCount(t *testing.T) {
+	datatable := CreateNewCustomCsvBasicDataTable([][]string{
 		{"A1", "B1", "C1"},
 		{"A2", "B2", "C2"},
 		{"A3", "B3", "C3"},
@@ -92,8 +92,8 @@ func TestCsvFileImportedDataRowColumnCount(t *testing.T) {
 	assert.EqualValues(t, 3, row2.ColumnCount())
 }
 
-func TestCsvFileImportedDataRowGetData(t *testing.T) {
-	datatable := CreateNewCustomCsvImportedDataTable([][]string{
+func TestCsvFileBasicDataTableRowGetData(t *testing.T) {
+	datatable := CreateNewCustomCsvBasicDataTable([][]string{
 		{"A1", "B1", "C1"},
 		{"A2", "B2", "C2"},
 		{"A3", "B3", "C3"},
@@ -112,8 +112,8 @@ func TestCsvFileImportedDataRowGetData(t *testing.T) {
 	assert.Equal(t, "C3", row2.GetData(2))
 }
 
-func TestCsvFileImportedDataRowGetData_GetNotExistedColumnData(t *testing.T) {
-	datatable := CreateNewCustomCsvImportedDataTable([][]string{
+func TestCsvFileBasicDataTableRowGetData_GetNotExistedColumnData(t *testing.T) {
+	datatable := CreateNewCustomCsvBasicDataTable([][]string{
 		{"A1", "B1", "C1"},
 		{"A2", "B2", "C2"},
 		{"A3", "B3", "C3"},
@@ -125,12 +125,12 @@ func TestCsvFileImportedDataRowGetData_GetNotExistedColumnData(t *testing.T) {
 	assert.Equal(t, "", row1.GetData(3))
 }
 
-func TestCreateNewCsvImportedDataTable(t *testing.T) {
+func TestCreateNewCsvBasicDataTable(t *testing.T) {
 	context := core.NewNullContext()
 	reader := bytes.NewReader([]byte("A1,B1,C1\n" +
 		"A2,B2,C2\n" +
 		"A3,B3,C3\n"))
-	datatable, err := CreateNewCsvImportedDataTable(context, reader)
+	datatable, err := CreateNewCsvBasicDataTable(context, reader)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 2, datatable.DataRowCount())
@@ -153,14 +153,14 @@ func TestCreateNewCsvImportedDataTable(t *testing.T) {
 	assert.False(t, iterator.HasNext())
 }
 
-func TestCreateNewCsvImportedDataTable_SkipBlankLine(t *testing.T) {
+func TestCreateNewCsvBasicDataTable_SkipBlankLine(t *testing.T) {
 	context := core.NewNullContext()
 	reader := bytes.NewReader([]byte("\n" +
 		"A1,B1,C1\n" +
 		"A2,B2,C2\n" +
 		"\n" +
 		"A3,B3,C3\n"))
-	datatable, err := CreateNewCsvImportedDataTable(context, reader)
+	datatable, err := CreateNewCsvBasicDataTable(context, reader)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 2, datatable.DataRowCount())

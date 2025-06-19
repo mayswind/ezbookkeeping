@@ -1,7 +1,6 @@
 package qif
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
@@ -223,15 +222,7 @@ func (t *qifTransactionDataRowIterator) parseTransactionTime(ctx core.Context, d
 		return "", errs.ErrTransactionTimeInvalid
 	}
 
-	if len(month) < 2 {
-		month = "0" + month
-	}
-
-	if len(day) < 2 {
-		day = "0" + day
-	}
-
-	return fmt.Sprintf("%s-%s-%s 00:00:00", year, month, day), nil
+	return utils.FormatYearMonthDayToLongDateTime(year, month, day)
 }
 
 func createNewQifTransactionDataTable(dateFormatType qifDateFormatType, qifData *qifData) (*qifTransactionDataTable, error) {

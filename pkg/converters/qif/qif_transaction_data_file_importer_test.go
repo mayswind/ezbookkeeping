@@ -226,6 +226,44 @@ func TestQIFTransactionDataFileParseImportedData_ParseDayYearMonthDateFormatTime
 	assert.Equal(t, int64(1725494400), utils.GetUnixTimeFromTransactionTime(allNewTransactions[4].TransactionTime))
 }
 
+func TestQIFTransactionDataFileParseImportedData_ParseShortYearMonthDayDateFormatTime(t *testing.T) {
+	converter := QifYearMonthDayTransactionDataImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+		"!Type:Bank\n"+
+			"D24-09-01\n"+
+			"T-123.45\n"+
+			"^\n"+
+			"D24-9-2\n"+
+			"T-123.45\n"+
+			"^\n"+
+			"D24/9/3\n"+
+			"T-123.45\n"+
+			"^\n"+
+			"D24.9.4\n"+
+			"T-123.45\n"+
+			"^\n"+
+			"D24'9.5\n"+
+			"T-123.45\n"+
+			"^\n"), 0, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, 5, len(allNewTransactions))
+
+	assert.Equal(t, int64(1725148800), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
+	assert.Equal(t, int64(1725235200), utils.GetUnixTimeFromTransactionTime(allNewTransactions[1].TransactionTime))
+	assert.Equal(t, int64(1725321600), utils.GetUnixTimeFromTransactionTime(allNewTransactions[2].TransactionTime))
+	assert.Equal(t, int64(1725408000), utils.GetUnixTimeFromTransactionTime(allNewTransactions[3].TransactionTime))
+	assert.Equal(t, int64(1725494400), utils.GetUnixTimeFromTransactionTime(allNewTransactions[4].TransactionTime))
+}
+
 func TestQIFTransactionDataFileParseImportedData_ParseInvalidTime(t *testing.T) {
 	converter := QifYearMonthDayTransactionDataImporter
 	context := core.NewNullContext()

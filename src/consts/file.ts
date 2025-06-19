@@ -168,6 +168,11 @@ export const SUPPORTED_IMPORT_FILE_TYPES: ImportFileType[] = [
         extensions: '.xml'
     },
     {
+        type: 'mt940',
+        name: 'MT940 Consumer Statement Message File',
+        extensions: '.txt'
+    },
+    {
         type: 'gnucash',
         name: 'GnuCash XML Database File',
         extensions: '.gnucash',

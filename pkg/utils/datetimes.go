@@ -65,6 +65,35 @@ func FormatUnixTimeToLongDateTime(unixTime int64, timezone *time.Location) strin
 	return t.Format(longDateTimeFormat)
 }
 
+func FormatYearMonthDayToLongDateTime(year string, month string, day string) (string, error) {
+	if len(year) == 2 {
+		yearLast2Digits, err := StringToInt(year)
+
+		if err != nil {
+			return "", err
+		}
+
+		currentYear := time.Now().Year()
+		currentYearLast2Digits := currentYear % 100
+
+		if yearLast2Digits <= currentYearLast2Digits {
+			year = IntToString(currentYear/100) + year
+		} else {
+			year = IntToString(currentYear/100-1) + year
+		}
+	}
+
+	if len(month) < 2 {
+		month = "0" + month
+	}
+
+	if len(day) < 2 {
+		day = "0" + day
+	}
+
+	return fmt.Sprintf("%s-%s-%s 00:00:00", year, month, day), nil
+}
+
 // FormatUnixTimeToLongDateTimeInServerTimezone returns a textual representation of the unix time formatted by long date time format
 func FormatUnixTimeToLongDateTimeInServerTimezone(unixTime int64) string {
 	return parseFromUnixTime(unixTime).Format(longDateTimeFormat)

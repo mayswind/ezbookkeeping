@@ -1,9 +1,7 @@
 package iif
 
 import (
-	"fmt"
 	"strings"
-	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -441,25 +439,13 @@ func (t *iifTransactionDataRowIterator) parseTransactionTime(dataset *iifTransac
 	day := dateParts[1]
 	year := dateParts[2]
 
-	if utils.IsValidYearMonthDayLongOrShortDateFormat(date) {
+	if utils.IsValidYearMonthDayLongOrShortDateFormat(date) && !utils.IsValidMonthDayYearLongOrShortDateFormat(date) {
 		year = dateParts[0]
 		month = dateParts[1]
 		day = dateParts[2]
 	}
 
-	if len(year) == 2 {
-		year = utils.IntToString(time.Now().Year()/100) + year
-	}
-
-	if len(month) < 2 {
-		month = "0" + month
-	}
-
-	if len(day) < 2 {
-		day = "0" + day
-	}
-
-	return fmt.Sprintf("%s-%s-%s 00:00:00", year, month, day), nil
+	return utils.FormatYearMonthDayToLongDateTime(year, month, day)
 }
 
 func createNewIIfTransactionDataTable(ctx core.Context, accountDatasets []*iifAccountDataset, transactionDatasets []*iifTransactionDataset) (*iifTransactionDataTable, error) {

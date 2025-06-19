@@ -236,6 +236,11 @@ func TestIsValidYearMonthDayLongOrShortDateFormat_ValidFormat(t *testing.T) {
 	actualValue := IsValidYearMonthDayLongOrShortDateFormat(datetime)
 	assert.Equal(t, expectedValue, actualValue)
 
+	datetime = "24-09-01"
+	expectedValue = true
+	actualValue = IsValidYearMonthDayLongOrShortDateFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
 	datetime = "2024-09-1"
 	expectedValue = true
 	actualValue = IsValidYearMonthDayLongOrShortDateFormat(datetime)
@@ -278,6 +283,11 @@ func TestIsValidMonthDayYearLongOrShortDateFormat_ValidFormat(t *testing.T) {
 	actualValue := IsValidMonthDayYearLongOrShortDateFormat(datetime)
 	assert.Equal(t, expectedValue, actualValue)
 
+	datetime = "09-01-24"
+	expectedValue = true
+	actualValue = IsValidMonthDayYearLongOrShortDateFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
 	datetime = "09-1-2024"
 	expectedValue = true
 	actualValue = IsValidMonthDayYearLongOrShortDateFormat(datetime)
@@ -318,6 +328,11 @@ func TestIsValidDayMonthYearLongDateFormat_ValidLongDateFormat(t *testing.T) {
 	datetime := "01-09-2024"
 	expectedValue := true
 	actualValue := IsValidDayMonthYearLongOrShortDateFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
+	datetime = "01-09-24"
+	expectedValue = true
+	actualValue = IsValidDayMonthYearLongOrShortDateFormat(datetime)
 	assert.Equal(t, expectedValue, actualValue)
 
 	datetime = "1-09-2024"

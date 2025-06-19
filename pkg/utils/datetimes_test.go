@@ -46,6 +46,23 @@ func TestFormatUnixTimeToLongDateTime(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
+func TestFormatYearMonthDayToLongDateTime(t *testing.T) {
+	expectedValue := "2025-06-01 00:00:00"
+	actualValue, err := FormatYearMonthDayToLongDateTime("25", "06", "01")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "2025-06-01 00:00:00"
+	actualValue, err = FormatYearMonthDayToLongDateTime("25", "6", "1")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "1990-06-01 00:00:00"
+	actualValue, err = FormatYearMonthDayToLongDateTime("90", "06", "01")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
 func TestFormatUnixTimeToLongDateTimeWithoutSecond(t *testing.T) {
 	unixTime := int64(1617228083)
 	utcTimezone := time.FixedZone("Test Timezone", 0)      // UTC

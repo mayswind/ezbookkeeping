@@ -383,8 +383,8 @@ func TestIIFTransactionDataFileParseImportedData_ParseShortMonthDayTwoDigitsYear
 			"TRNS\t09/2/24\tTest Account\t123.45\n"+
 			"SPL\t09/2/24\tTest Account2\t-123.45\n"+
 			"ENDTRNS\t\t\t\n"+
-			"TRNS\t9/3/24\tTest Account\t123.45\n"+
-			"SPL\t9/3/24\tTest Account2\t-123.45\n"+
+			"TRNS\t24/9/3\tTest Account\t123.45\n"+
+			"SPL\t24/9/3\tTest Account2\t-123.45\n"+
 			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)

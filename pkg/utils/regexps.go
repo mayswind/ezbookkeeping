@@ -9,9 +9,9 @@ var (
 	longDateTimePattern                = regexp.MustCompile("^([1-9][0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|1[0-9]|2[0-9]|3[01]) ([0-1][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$")
 	longDateTimeWithoutSecondPattern   = regexp.MustCompile("^([1-9][0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|1[0-9]|2[0-9]|3[01]) ([0-1][0-9]|2[0-3]):([0-5][0-9])$")
 	longDatePattern                    = regexp.MustCompile("^([1-9][0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|1[0-9]|2[0-9]|3[01])$")
-	longOrShortYearMonthDayDatePattern = regexp.MustCompile("^([1-9][0-9]{3})[-/.']([1-9]|0[1-9]|1[0-2])[-/.']([1-9]|0[1-9]|1[0-9]|2[0-9]|3[01])$")
-	longOrShortMonthDayYearDatePattern = regexp.MustCompile("^([1-9]|0[1-9]|1[0-2])[-/.']([1-9]|0[1-9]|1[0-9]|2[0-9]|3[01])[-/.']([1-9][0-9]{3})$")
-	longOrShortDayMonthYearDatePattern = regexp.MustCompile("^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[01])[-/.']([1-9]|0[1-9]|1[0-2])[-/.']([1-9][0-9]{3})$")
+	longOrShortYearMonthDayDatePattern = regexp.MustCompile("^(([1-9][0-9])?[0-9]{2})[-/.']([1-9]|0[1-9]|1[0-2])[-/.']([1-9]|0[1-9]|1[0-9]|2[0-9]|3[01])$")
+	longOrShortMonthDayYearDatePattern = regexp.MustCompile("^([1-9]|0[1-9]|1[0-2])[-/.']([1-9]|0[1-9]|1[0-9]|2[0-9]|3[01])[-/.'](([1-9][0-9])?[0-9]{2})$")
+	longOrShortDayMonthYearDatePattern = regexp.MustCompile("^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[01])[-/.']([1-9]|0[1-9]|1[0-2])[-/.'](([1-9][0-9])?[0-9]{2})$")
 )
 
 // IsValidUsername reports whether username is valid

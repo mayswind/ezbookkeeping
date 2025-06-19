@@ -98,18 +98,18 @@ func (r *qifDataReader) read(ctx core.Context) (*qifData, error) {
 					continue
 				}
 
-				transactionData.account = currentAccount
+				transactionData.Account = currentAccount
 
 				if currentEntryHeader == qifBankTransactionHeader {
-					data.bankAccountTransactions = append(data.bankAccountTransactions, transactionData)
+					data.BankAccountTransactions = append(data.BankAccountTransactions, transactionData)
 				} else if currentEntryHeader == qifCashTransactionHeader {
-					data.cashAccountTransactions = append(data.cashAccountTransactions, transactionData)
+					data.CashAccountTransactions = append(data.CashAccountTransactions, transactionData)
 				} else if currentEntryHeader == qifCreditCardTransactionHeader {
-					data.creditCardAccountTransactions = append(data.creditCardAccountTransactions, transactionData)
+					data.CreditCardAccountTransactions = append(data.CreditCardAccountTransactions, transactionData)
 				} else if currentEntryHeader == qifAssetAccountTransactionHeader {
-					data.assetAccountTransactions = append(data.assetAccountTransactions, transactionData)
+					data.AssetAccountTransactions = append(data.AssetAccountTransactions, transactionData)
 				} else if currentEntryHeader == qifLiabilityAccountTransactionHeader {
-					data.liabilityAccountTransactions = append(data.liabilityAccountTransactions, transactionData)
+					data.LiabilityAccountTransactions = append(data.LiabilityAccountTransactions, transactionData)
 				}
 			} else if currentEntryHeader == qifMemorizedTransactionHeader || currentEntryHeader == qifMemorisedTransactionHeader {
 				transactionData, err := r.parseMemorizedTransaction(ctx, entryData)
@@ -122,8 +122,8 @@ func (r *qifDataReader) read(ctx core.Context) (*qifData, error) {
 					continue
 				}
 
-				transactionData.account = currentAccount
-				data.memorizedTransactions = append(data.memorizedTransactions, transactionData)
+				transactionData.Account = currentAccount
+				data.MemorizedTransactions = append(data.MemorizedTransactions, transactionData)
 			} else if currentEntryHeader == qifInvestmentTransactionHeader {
 				transactionData, err := r.parseInvestmentTransaction(ctx, entryData)
 
@@ -135,8 +135,8 @@ func (r *qifDataReader) read(ctx core.Context) (*qifData, error) {
 					continue
 				}
 
-				transactionData.account = currentAccount
-				data.investmentAccountTransactions = append(data.investmentAccountTransactions, transactionData)
+				transactionData.Account = currentAccount
+				data.InvestmentAccountTransactions = append(data.InvestmentAccountTransactions, transactionData)
 			} else if currentEntryHeader == qifAccountHeader {
 				accountData, err := r.parseAccount(ctx, entryData)
 
@@ -149,7 +149,7 @@ func (r *qifDataReader) read(ctx core.Context) (*qifData, error) {
 				}
 
 				currentAccount = accountData
-				data.accounts = append(data.accounts, accountData)
+				data.Accounts = append(data.Accounts, accountData)
 			} else if currentEntryHeader == qifCategoryHeader {
 				categoryData, err := r.parseCategory(ctx, entryData)
 
@@ -161,7 +161,7 @@ func (r *qifDataReader) read(ctx core.Context) (*qifData, error) {
 					continue
 				}
 
-				data.categories = append(data.categories, categoryData)
+				data.Categories = append(data.Categories, categoryData)
 			} else if currentEntryHeader == qifClassHeader {
 				classData, err := r.parseClass(ctx, entryData)
 
@@ -173,7 +173,7 @@ func (r *qifDataReader) read(ctx core.Context) (*qifData, error) {
 					continue
 				}
 
-				data.classes = append(data.classes, classData)
+				data.Classes = append(data.Classes, classData)
 			} else {
 				log.Warnf(ctx, "[qif_data_reader.read] read unsupported entry header \"%s\" and skip this entry", currentEntryHeader)
 			}
@@ -202,27 +202,27 @@ func (r *qifDataReader) parseTransaction(ctx core.Context, data []string, ignore
 		}
 
 		if line[0] == 'D' {
-			transactionData.date = line[1:]
+			transactionData.Date = line[1:]
 		} else if line[0] == 'T' {
-			transactionData.amount = line[1:]
+			transactionData.Amount = line[1:]
 		} else if line[0] == 'C' {
-			transactionData.clearedStatus = r.parseClearedStatus(ctx, line[1:])
+			transactionData.ClearedStatus = r.parseClearedStatus(ctx, line[1:])
 		} else if line[0] == 'N' {
-			transactionData.num = line[1:]
+			transactionData.Num = line[1:]
 		} else if line[0] == 'P' {
-			transactionData.payee = line[1:]
+			transactionData.Payee = line[1:]
 		} else if line[0] == 'M' {
-			transactionData.memo = line[1:]
+			transactionData.Memo = line[1:]
 		} else if line[0] == 'A' {
-			transactionData.addresses = append(transactionData.addresses, line[1:])
+			transactionData.Addresses = append(transactionData.Addresses, line[1:])
 		} else if line[0] == 'L' {
-			transactionData.category = line[1:]
+			transactionData.Category = line[1:]
 		} else if line[0] == 'S' {
-			transactionData.subTransactionCategory = append(transactionData.subTransactionCategory, line[1:])
+			transactionData.SubTransactionCategory = append(transactionData.SubTransactionCategory, line[1:])
 		} else if line[0] == 'E' {
-			transactionData.subTransactionMemo = append(transactionData.subTransactionMemo, line[1:])
+			transactionData.SubTransactionMemo = append(transactionData.SubTransactionMemo, line[1:])
 		} else if line[0] == '$' {
-			transactionData.subTransactionAmount = append(transactionData.subTransactionAmount, line[1:])
+			transactionData.SubTransactionAmount = append(transactionData.SubTransactionAmount, line[1:])
 		} else {
 			if !ignoreUnknown {
 				log.Warnf(ctx, "[qif_data_reader.parseTransaction] read unsupported line \"%s\" and skip this line", line)
@@ -247,7 +247,7 @@ func (r *qifDataReader) parseMemorizedTransaction(ctx core.Context, data []strin
 
 	transactionData := &qifMemorizedTransactionData{
 		qifTransactionData: *baseTransactionData,
-		amortization:       qifMemorizedTransactionAmortizationData{},
+		Amortization:       qifMemorizedTransactionAmortizationData{},
 	}
 
 	for i := 0; i < len(data); i++ {
@@ -266,33 +266,33 @@ func (r *qifDataReader) parseMemorizedTransaction(ctx core.Context, data []strin
 
 		if line[0] == 'K' {
 			if line == string(qifCheckTransactionType) {
-				transactionData.transactionType = qifCheckTransactionType
+				transactionData.TransactionType = qifCheckTransactionType
 			} else if line == string(qifDepositTransactionType) {
-				transactionData.transactionType = qifDepositTransactionType
+				transactionData.TransactionType = qifDepositTransactionType
 			} else if line == string(qifPaymentTransactionType) {
-				transactionData.transactionType = qifPaymentTransactionType
+				transactionData.TransactionType = qifPaymentTransactionType
 			} else if line == string(qifInvestmentTransactionType) {
-				transactionData.transactionType = qifInvestmentTransactionType
+				transactionData.TransactionType = qifInvestmentTransactionType
 			} else if line == string(qifElectronicPayeeTransactionType) {
-				transactionData.transactionType = qifElectronicPayeeTransactionType
+				transactionData.TransactionType = qifElectronicPayeeTransactionType
 			} else {
 				log.Warnf(ctx, "[qif_data_reader.parseMemorizedTransaction] read unsupported transaction type \"%s\" and skip this line", line)
 				continue
 			}
 		} else if line[0] == '1' {
-			transactionData.amortization.firstPaymentDate = line[1:]
+			transactionData.Amortization.FirstPaymentDate = line[1:]
 		} else if line[0] == '2' {
-			transactionData.amortization.totalYearsForLoan = line[1:]
+			transactionData.Amortization.TotalYearsForLoan = line[1:]
 		} else if line[0] == '3' {
-			transactionData.amortization.numberOfPayments = line[1:]
+			transactionData.Amortization.NumberOfPayments = line[1:]
 		} else if line[0] == '4' {
-			transactionData.amortization.numberOfPeriodsPerYear = line[1:]
+			transactionData.Amortization.NumberOfPeriodsPerYear = line[1:]
 		} else if line[0] == '5' {
-			transactionData.amortization.interestRate = line[1:]
+			transactionData.Amortization.InterestRate = line[1:]
 		} else if line[0] == '6' {
-			transactionData.amortization.currentLoanBalance = line[1:]
+			transactionData.Amortization.CurrentLoanBalance = line[1:]
 		} else if line[0] == '7' {
-			transactionData.amortization.originalLoanAmount = line[1:]
+			transactionData.Amortization.OriginalLoanAmount = line[1:]
 		} else {
 			log.Warnf(ctx, "[qif_data_reader.parseMemorizedTransaction] read unsupported line \"%s\" and skip this line", line)
 			continue
@@ -317,29 +317,29 @@ func (r *qifDataReader) parseInvestmentTransaction(ctx core.Context, data []stri
 		}
 
 		if line[0] == 'D' {
-			transactionData.date = line[1:]
+			transactionData.Date = line[1:]
 		} else if line[0] == 'N' {
-			transactionData.action = line[1:]
+			transactionData.Action = line[1:]
 		} else if line[0] == 'Y' {
-			transactionData.security = line[1:]
+			transactionData.Security = line[1:]
 		} else if line[0] == 'I' {
-			transactionData.price = line[1:]
+			transactionData.Price = line[1:]
 		} else if line[0] == 'Q' {
-			transactionData.quantity = line[1:]
+			transactionData.Quantity = line[1:]
 		} else if line[0] == 'T' {
-			transactionData.amount = line[1:]
+			transactionData.Amount = line[1:]
 		} else if line[0] == 'C' {
-			transactionData.clearedStatus = r.parseClearedStatus(ctx, line[1:])
+			transactionData.ClearedStatus = r.parseClearedStatus(ctx, line[1:])
 		} else if line[0] == 'P' {
-			transactionData.text = line[1:]
+			transactionData.Text = line[1:]
 		} else if line[0] == 'M' {
-			transactionData.memo = line[1:]
+			transactionData.Memo = line[1:]
 		} else if line[0] == 'O' {
-			transactionData.commission = line[1:]
+			transactionData.Commission = line[1:]
 		} else if line[0] == 'L' {
-			transactionData.accountForTransfer = line[1:]
+			transactionData.AccountForTransfer = line[1:]
 		} else if line[0] == '$' {
-			transactionData.amountTransferred = line[1:]
+			transactionData.AmountTransferred = line[1:]
 		} else {
 			log.Warnf(ctx, "[qif_data_reader.parseInvestmentTransaction] read unsupported line \"%s\" and skip this line", line)
 			continue
@@ -364,17 +364,17 @@ func (r *qifDataReader) parseAccount(ctx core.Context, data []string) (*qifAccou
 		}
 
 		if line[0] == 'N' {
-			accountData.name = line[1:]
+			accountData.Name = line[1:]
 		} else if line[0] == 'T' {
-			accountData.accountType = line[1:]
+			accountData.AccountType = line[1:]
 		} else if line[0] == 'D' {
-			accountData.description = line[1:]
+			accountData.Description = line[1:]
 		} else if line[0] == 'L' {
-			accountData.creditLimit = line[1:]
+			accountData.CreditLimit = line[1:]
 		} else if line[0] == '/' {
-			accountData.statementBalanceDate = line[1:]
+			accountData.StatementBalanceDate = line[1:]
 		} else if line[0] == '$' {
-			accountData.statementBalanceAmount = line[1:]
+			accountData.StatementBalanceAmount = line[1:]
 		} else {
 			log.Warnf(ctx, "[qif_data_reader.parseAccount] read unsupported line \"%s\" and skip this line", line)
 			continue
@@ -399,27 +399,27 @@ func (r *qifDataReader) parseCategory(ctx core.Context, data []string) (*qifCate
 		}
 
 		if line[0] == 'N' {
-			categoryData.name = line[1:]
+			categoryData.Name = line[1:]
 		} else if line[0] == 'D' {
-			categoryData.description = line[1:]
+			categoryData.Description = line[1:]
 		} else if line[0] == 'T' {
-			categoryData.taxRelated = true
+			categoryData.TaxRelated = true
 		} else if line[0] == 'I' {
-			categoryData.categoryType = qifIncomeTransaction
+			categoryData.CategoryType = qifIncomeTransaction
 		} else if line[0] == 'E' {
-			categoryData.categoryType = qifExpenseTransaction
+			categoryData.CategoryType = qifExpenseTransaction
 		} else if line[0] == 'B' {
-			categoryData.budgetAmount = line[1:]
+			categoryData.BudgetAmount = line[1:]
 		} else if line[0] == 'R' {
-			categoryData.taxScheduleInformation = line[1:]
+			categoryData.TaxScheduleInformation = line[1:]
 		} else {
 			log.Warnf(ctx, "[qif_data_reader.parseCategory] read unsupported line \"%s\" and skip this line", line)
 			continue
 		}
 	}
 
-	if categoryData.categoryType == "" {
-		categoryData.categoryType = qifExpenseTransaction
+	if categoryData.CategoryType == "" {
+		categoryData.CategoryType = qifExpenseTransaction
 	}
 
 	return categoryData, nil
@@ -440,9 +440,9 @@ func (r *qifDataReader) parseClass(ctx core.Context, data []string) (*qifClassDa
 		}
 
 		if line[0] == 'N' {
-			classData.name = line[1:]
+			classData.Name = line[1:]
 		} else if line[0] == 'D' {
-			classData.description = line[1:]
+			classData.Description = line[1:]
 		} else {
 			log.Warnf(ctx, "[qif_data_reader.parseClass] read unsupported line \"%s\" and skip this line", line)
 			continue

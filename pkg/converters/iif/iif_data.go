@@ -13,20 +13,20 @@ type iifAccountData struct {
 
 // iifTransactionDataset defines the structure of intuit interchange format (iif) transaction dataset
 type iifTransactionDataset struct {
-	transactionDataColumnIndexes map[string]int
-	splitDataColumnIndexes       map[string]int
-	transactions                 []*iifTransactionData
+	TransactionDataColumnIndexes map[string]int
+	SplitDataColumnIndexes       map[string]int
+	Transactions                 []*iifTransactionData
 }
 
 // iifTransactionData defines the structure of intuit interchange format (iif) transaction data
 type iifTransactionData struct {
-	dataItems []string
-	splitData []*iifTransactionSplitData
+	DataItems []string
+	SplitData []*iifTransactionSplitData
 }
 
 // iifTransactionSplitData defines the structure of intuit interchange format (iif) transaction split data
 type iifTransactionSplitData struct {
-	dataItems []string
+	DataItems []string
 }
 
 func (s *iifTransactionDataset) getTransactionDataItemValue(transactionData *iifTransactionData, columnName string) (string, bool) {
@@ -34,13 +34,13 @@ func (s *iifTransactionDataset) getTransactionDataItemValue(transactionData *iif
 		return "", false
 	}
 
-	index, exists := s.transactionDataColumnIndexes[columnName]
+	index, exists := s.TransactionDataColumnIndexes[columnName]
 
-	if !exists || index < 0 || index >= len(transactionData.dataItems) {
+	if !exists || index < 0 || index >= len(transactionData.DataItems) {
 		return "", false
 	}
 
-	return transactionData.dataItems[index], true
+	return transactionData.DataItems[index], true
 }
 
 func (s *iifTransactionDataset) getSplitDataItemValue(splitData *iifTransactionSplitData, columnName string) (string, bool) {
@@ -48,11 +48,11 @@ func (s *iifTransactionDataset) getSplitDataItemValue(splitData *iifTransactionS
 		return "", false
 	}
 
-	index, exists := s.splitDataColumnIndexes[columnName]
+	index, exists := s.SplitDataColumnIndexes[columnName]
 
-	if !exists || index < 0 || index >= len(splitData.dataItems) {
+	if !exists || index < 0 || index >= len(splitData.DataItems) {
 		return "", false
 	}
 
-	return splitData.dataItems[index], true
+	return splitData.DataItems[index], true
 }

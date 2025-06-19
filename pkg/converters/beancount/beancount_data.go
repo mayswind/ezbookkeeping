@@ -41,49 +41,49 @@ const (
 
 // beancountData defines the structure of beancount data
 type beancountData struct {
-	accounts     map[string]*beancountAccount
-	transactions []*beancountTransactionEntry
+	Accounts     map[string]*beancountAccount
+	Transactions []*beancountTransactionEntry
 }
 
 // beancountAccount defines the structure of beancount account
 type beancountAccount struct {
-	name        string
-	accountType beancountAccountType
-	openDate    string
-	closeDate   string
+	Name        string
+	AccountType beancountAccountType
+	OpenDate    string
+	CloseDate   string
 }
 
 // beancountTransactionEntry defines the structure of beancount transaction entry
 type beancountTransactionEntry struct {
-	date      string
-	directive beancountDirective
-	payee     string
-	narration string
-	postings  []*beancountPosting
-	tags      []string
-	links     []string
-	metadata  map[string]string
+	Date      string
+	Directive beancountDirective
+	Payee     string
+	Narration string
+	Postings  []*beancountPosting
+	Tags      []string
+	Links     []string
+	Metadata  map[string]string
 }
 
 // beancountPosting defines the structure of beancount transaction posting
 type beancountPosting struct {
-	account            string
-	amount             string
-	originalAmount     string
-	commodity          string
-	totalCost          string
-	totalCostCommodity string
-	price              string
-	priceCommodity     string
-	metadata           map[string]string
+	Account            string
+	Amount             string
+	OriginalAmount     string
+	Commodity          string
+	TotalCost          string
+	TotalCostCommodity string
+	Price              string
+	PriceCommodity     string
+	Metadata           map[string]string
 }
 
 func (a *beancountAccount) isOpeningBalanceEquityAccount() bool {
-	if a.accountType != beancountEquityAccountType {
+	if a.AccountType != beancountEquityAccountType {
 		return false
 	}
 
-	nameItems := strings.Split(a.name, string(beancountMetadataKeySuffix))
+	nameItems := strings.Split(a.Name, string(beancountMetadataKeySuffix))
 
 	if len(nameItems) != 2 {
 		return false

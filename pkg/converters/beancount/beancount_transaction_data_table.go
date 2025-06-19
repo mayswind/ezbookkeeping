@@ -110,49 +110,49 @@ func (t *beancountTransactionDataRowIterator) Next(ctx core.Context, user *model
 func (t *beancountTransactionDataRowIterator) parseTransaction(ctx core.Context, user *models.User, beancountEntry *beancountTransactionEntry) (map[datatable.TransactionDataTableColumn]string, error) {
 	data := make(map[datatable.TransactionDataTableColumn]string, len(beancountTransactionSupportedColumns))
 
-	if beancountEntry.date == "" {
+	if beancountEntry.Date == "" {
 		return nil, errs.ErrMissingTransactionTime
 	}
 
 	// Beancount supports the international ISO 8601 standard format for dates, with dashes or the same ordering with slashes
-	data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = strings.ReplaceAll(beancountEntry.date, "/", "-") + " 00:00:00"
+	data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = strings.ReplaceAll(beancountEntry.Date, "/", "-") + " 00:00:00"
 
-	if len(beancountEntry.postings) == 2 {
-		splitData1 := beancountEntry.postings[0]
-		splitData2 := beancountEntry.postings[1]
+	if len(beancountEntry.Postings) == 2 {
+		splitData1 := beancountEntry.Postings[0]
+		splitData2 := beancountEntry.Postings[1]
 
-		account1 := t.dataTable.accountMap[splitData1.account]
-		account2 := t.dataTable.accountMap[splitData2.account]
+		account1 := t.dataTable.accountMap[splitData1.Account]
+		account2 := t.dataTable.accountMap[splitData2.Account]
 
 		if account1 == nil || account2 == nil {
 			return nil, errs.ErrMissingAccountData
 		}
 
-		amount1, err := utils.ParseAmount(splitData1.amount)
+		amount1, err := utils.ParseAmount(splitData1.Amount)
 
 		if err != nil {
-			log.Errorf(ctx, "[beancount_transaction_data_table.parseTransaction] cannot parse amount \"%s\", because %s", splitData1.amount, err.Error())
+			log.Errorf(ctx, "[beancount_transaction_data_table.parseTransaction] cannot parse amount \"%s\", because %s", splitData1.Amount, err.Error())
 			return nil, errs.ErrAmountInvalid
 		}
 
-		amount2, err := utils.ParseAmount(splitData2.amount)
+		amount2, err := utils.ParseAmount(splitData2.Amount)
 
 		if err != nil {
-			log.Errorf(ctx, "[beancount_transaction_data_table.parseTransaction] cannot parse amount \"%s\", because %s", splitData2.amount, err.Error())
+			log.Errorf(ctx, "[beancount_transaction_data_table.parseTransaction] cannot parse amount \"%s\", because %s", splitData2.Amount, err.Error())
 			return nil, errs.ErrAmountInvalid
 		}
 
-		if ((account1.accountType == beancountEquityAccountType || account1.accountType == beancountIncomeAccountType) && (account2.accountType == beancountAssetsAccountType || account2.accountType == beancountLiabilitiesAccountType)) ||
-			((account2.accountType == beancountEquityAccountType || account2.accountType == beancountIncomeAccountType) && (account1.accountType == beancountAssetsAccountType || account1.accountType == beancountLiabilitiesAccountType)) { // income
+		if ((account1.AccountType == beancountEquityAccountType || account1.AccountType == beancountIncomeAccountType) && (account2.AccountType == beancountAssetsAccountType || account2.AccountType == beancountLiabilitiesAccountType)) ||
+			((account2.AccountType == beancountEquityAccountType || account2.AccountType == beancountIncomeAccountType) && (account1.AccountType == beancountAssetsAccountType || account1.AccountType == beancountLiabilitiesAccountType)) { // income
 			fromAccount := account1
 			toAccount := account2
-			toCurrency := splitData2.commodity
+			toCurrency := splitData2.Commodity
 			toAmount := amount2
 
-			if (account2.accountType == beancountEquityAccountType || account2.accountType == beancountIncomeAccountType) && (account1.accountType == beancountAssetsAccountType || account1.accountType == beancountLiabilitiesAccountType) {
+			if (account2.AccountType == beancountEquityAccountType || account2.AccountType == beancountIncomeAccountType) && (account1.AccountType == beancountAssetsAccountType || account1.AccountType == beancountLiabilitiesAccountType) {
 				fromAccount = account2
 				toAccount = account1
-				toCurrency = splitData1.commodity
+				toCurrency = splitData1.Commodity
 				toAmount = amount1
 			}
 
@@ -162,48 +162,48 @@ func (t *beancountTransactionDataRowIterator) parseTransaction(ctx core.Context,
 				data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = utils.IntToString(int(models.TRANSACTION_TYPE_INCOME))
 			}
 
-			data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = fromAccount.name
-			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = toAccount.name
+			data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = fromAccount.Name
+			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = toAccount.Name
 			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = toCurrency
 			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(toAmount)
-		} else if account1.accountType == beancountExpensesAccountType && (account2.accountType == beancountAssetsAccountType || account2.accountType == beancountLiabilitiesAccountType) ||
-			(account2.accountType == beancountExpensesAccountType && (account1.accountType == beancountAssetsAccountType || account1.accountType == beancountLiabilitiesAccountType)) { // expense
+		} else if account1.AccountType == beancountExpensesAccountType && (account2.AccountType == beancountAssetsAccountType || account2.AccountType == beancountLiabilitiesAccountType) ||
+			(account2.AccountType == beancountExpensesAccountType && (account1.AccountType == beancountAssetsAccountType || account1.AccountType == beancountLiabilitiesAccountType)) { // expense
 			fromAccount := account1
-			fromCurrency := splitData1.commodity
+			fromCurrency := splitData1.Commodity
 			fromAmount := amount1
 			toAccount := account2
 
-			if account1.accountType == beancountExpensesAccountType && (account2.accountType == beancountAssetsAccountType || account2.accountType == beancountLiabilitiesAccountType) {
+			if account1.AccountType == beancountExpensesAccountType && (account2.AccountType == beancountAssetsAccountType || account2.AccountType == beancountLiabilitiesAccountType) {
 				fromAccount = account2
-				fromCurrency = splitData2.commodity
+				fromCurrency = splitData2.Commodity
 				fromAmount = amount2
 				toAccount = account1
 			}
 
 			data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = utils.IntToString(int(models.TRANSACTION_TYPE_EXPENSE))
-			data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = toAccount.name
-			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = fromAccount.name
+			data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = toAccount.Name
+			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = fromAccount.Name
 			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = fromCurrency
 			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-fromAmount)
-		} else if (account1.accountType == beancountAssetsAccountType || account1.accountType == beancountLiabilitiesAccountType) &&
-			(account2.accountType == beancountAssetsAccountType || account2.accountType == beancountLiabilitiesAccountType) {
+		} else if (account1.AccountType == beancountAssetsAccountType || account1.AccountType == beancountLiabilitiesAccountType) &&
+			(account2.AccountType == beancountAssetsAccountType || account2.AccountType == beancountLiabilitiesAccountType) {
 			var fromAccount, toAccount *beancountAccount
 			var fromAmount, toAmount int64
 			var fromCurrency, toCurrency string
 
 			if amount1 < 0 {
 				fromAccount = account1
-				fromCurrency = splitData1.commodity
+				fromCurrency = splitData1.Commodity
 				fromAmount = -amount1
 				toAccount = account2
-				toCurrency = splitData2.commodity
+				toCurrency = splitData2.Commodity
 				toAmount = amount2
 			} else if amount2 < 0 {
 				fromAccount = account2
-				fromCurrency = splitData2.commodity
+				fromCurrency = splitData2.Commodity
 				fromAmount = -amount2
 				toAccount = account1
-				toCurrency = splitData1.commodity
+				toCurrency = splitData1.Commodity
 				toAmount = amount1
 			} else {
 				log.Errorf(ctx, "[beancount_transaction_data_table.parseTransaction] cannot parse transfer transaction, because unexcepted account amounts \"%d\" and \"%d\"", amount1, amount2)
@@ -212,26 +212,26 @@ func (t *beancountTransactionDataRowIterator) parseTransaction(ctx core.Context,
 
 			data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = utils.IntToString(int(models.TRANSACTION_TYPE_TRANSFER))
 			data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = ""
-			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = fromAccount.name
+			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = fromAccount.Name
 			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = fromCurrency
 			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(fromAmount)
-			data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = toAccount.name
+			data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = toAccount.Name
 			data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = toCurrency
 			data[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = utils.FormatAmount(toAmount)
 		} else {
-			log.Errorf(ctx, "[beancount_transaction_data_table.parseTransaction] cannot parse transaction, because unexcepted account types \"%d\" and \"%d\"", account1.accountType, account2.accountType)
+			log.Errorf(ctx, "[beancount_transaction_data_table.parseTransaction] cannot parse transaction, because unexcepted account types \"%d\" and \"%d\"", account1.AccountType, account2.AccountType)
 			return nil, errs.ErrThereAreNotSupportedTransactionType
 		}
-	} else if len(beancountEntry.postings) <= 1 {
-		log.Errorf(ctx, "[beancount_transaction_data_table.parseTransaction] cannot parse transaction, because postings count is %d", len(beancountEntry.postings))
+	} else if len(beancountEntry.Postings) <= 1 {
+		log.Errorf(ctx, "[beancount_transaction_data_table.parseTransaction] cannot parse transaction, because postings count is %d", len(beancountEntry.Postings))
 		return nil, errs.ErrInvalidBeancountFile
 	} else {
-		log.Errorf(ctx, "[beancount_transaction_data_table.parseTransaction] cannot parse split transaction, because postings count is %d", len(beancountEntry.postings))
+		log.Errorf(ctx, "[beancount_transaction_data_table.parseTransaction] cannot parse split transaction, because postings count is %d", len(beancountEntry.Postings))
 		return nil, errs.ErrNotSupportedSplitTransactions
 	}
 
-	data[datatable.TRANSACTION_DATA_TABLE_TAGS] = strings.Join(beancountEntry.tags, BEANCOUNT_TRANSACTION_TAG_SEPARATOR)
-	data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = beancountEntry.narration
+	data[datatable.TRANSACTION_DATA_TABLE_TAGS] = strings.Join(beancountEntry.Tags, BEANCOUNT_TRANSACTION_TAG_SEPARATOR)
+	data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = beancountEntry.Narration
 
 	return data, nil
 }
@@ -242,7 +242,7 @@ func createNewBeancountTransactionDataTable(beancountData *beancountData) (*bean
 	}
 
 	return &beancountTransactionDataTable{
-		allData:    beancountData.transactions,
-		accountMap: beancountData.accounts,
+		allData:    beancountData.Transactions,
+		accountMap: beancountData.Accounts,
 	}, nil
 }

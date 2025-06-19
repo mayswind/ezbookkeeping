@@ -119,8 +119,8 @@ func (r *iifDataReader) read(ctx core.Context) ([]*iifAccountDataset, []*iifTran
 			if lastLineSign == "" {
 				if items[0] == iifTransactionLineSignColumnName {
 					currentTransactionData = &iifTransactionData{
-						dataItems: items,
-						splitData: make([]*iifTransactionSplitData, 0),
+						DataItems: items,
+						SplitData: make([]*iifTransactionSplitData, 0),
 					}
 					lastLineSign = items[0]
 				} else {
@@ -134,8 +134,8 @@ func (r *iifDataReader) read(ctx core.Context) ([]*iifAccountDataset, []*iifTran
 						return nil, nil, errs.ErrInvalidIIFFile
 					}
 
-					currentTransactionData.splitData = append(currentTransactionData.splitData, &iifTransactionSplitData{
-						dataItems: items,
+					currentTransactionData.SplitData = append(currentTransactionData.SplitData, &iifTransactionSplitData{
+						DataItems: items,
 					})
 					lastLineSign = items[0]
 				} else if items[0] == iifTransactionEndLineSignColumnName {
@@ -144,12 +144,12 @@ func (r *iifDataReader) read(ctx core.Context) ([]*iifAccountDataset, []*iifTran
 						return nil, nil, errs.ErrInvalidIIFFile
 					}
 
-					if len(currentTransactionData.splitData) < 1 {
+					if len(currentTransactionData.SplitData) < 1 {
 						log.Errorf(ctx, "[iif_data_reader.read] expected reading transaction split line, but read \"%s\"", items[0])
 						return nil, nil, errs.ErrInvalidIIFFile
 					}
 
-					currentTransactionDataset.transactions = append(currentTransactionDataset.transactions, currentTransactionData)
+					currentTransactionDataset.Transactions = append(currentTransactionDataset.Transactions, currentTransactionData)
 					lastLineSign = ""
 				} else {
 					log.Errorf(ctx, "[iif_data_reader.read] iif line expected reading split sign or transaction end sign, but actual is \"%s\"", items[0])
@@ -234,9 +234,9 @@ func (r *iifDataReader) readTransactionSampleLines(ctx core.Context, items []str
 	}
 
 	return &iifTransactionDataset{
-		transactionDataColumnIndexes: transactionDataColumnIndexes,
-		splitDataColumnIndexes:       splitDataColumnIndexes,
-		transactions:                 make([]*iifTransactionData, 0),
+		TransactionDataColumnIndexes: transactionDataColumnIndexes,
+		SplitDataColumnIndexes:       splitDataColumnIndexes,
+		Transactions:                 make([]*iifTransactionData, 0),
 	}, nil
 }
 

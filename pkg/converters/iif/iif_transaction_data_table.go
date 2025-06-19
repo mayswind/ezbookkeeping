@@ -74,11 +74,11 @@ func (t *iifTransactionDataTable) TransactionRowCount() int {
 	for i := 0; i < len(t.transactionDatasets); i++ {
 		datasets := t.transactionDatasets[i]
 
-		for j := 0; j < len(datasets.transactions); j++ {
-			transaction := datasets.transactions[j]
+		for j := 0; j < len(datasets.Transactions); j++ {
+			transaction := datasets.Transactions[j]
 
-			if transaction.splitData != nil {
-				totalDataRowCount += len(transaction.splitData)
+			if transaction.SplitData != nil {
+				totalDataRowCount += len(transaction.SplitData)
 			}
 		}
 	}
@@ -122,17 +122,17 @@ func (t *iifTransactionDataRowIterator) HasNext() bool {
 
 	currentDataset := allDatasets[t.currentDatasetIndex]
 
-	if t.currentIndexInDataset+1 < len(currentDataset.transactions) {
+	if t.currentIndexInDataset+1 < len(currentDataset.Transactions) {
 		return true
-	} else if t.currentIndexInDataset < len(currentDataset.transactions) &&
-		t.currentSplitDataIndex+1 < len(currentDataset.transactions[t.currentIndexInDataset].splitData) {
+	} else if t.currentIndexInDataset < len(currentDataset.Transactions) &&
+		t.currentSplitDataIndex+1 < len(currentDataset.Transactions[t.currentIndexInDataset].SplitData) {
 		return true
 	}
 
 	for i := t.currentDatasetIndex + 1; i < len(allDatasets); i++ {
 		dataset := allDatasets[i]
 
-		if len(dataset.transactions) < 1 {
+		if len(dataset.Transactions) < 1 {
 			continue
 		}
 
@@ -150,8 +150,8 @@ func (t *iifTransactionDataRowIterator) Next(ctx core.Context, user *models.User
 		foundNextRow := false
 		dataset := allDatasets[i]
 
-		for j := t.currentIndexInDataset; j < len(dataset.transactions); j++ {
-			if t.currentSplitDataIndex+1 < len(dataset.transactions[j].splitData) {
+		for j := t.currentIndexInDataset; j < len(dataset.Transactions); j++ {
+			if t.currentSplitDataIndex+1 < len(dataset.Transactions[j].SplitData) {
 				t.currentSplitDataIndex++
 				foundNextRow = true
 				break
@@ -176,22 +176,22 @@ func (t *iifTransactionDataRowIterator) Next(ctx core.Context, user *models.User
 
 	currentDataset := allDatasets[t.currentDatasetIndex]
 
-	if t.currentIndexInDataset >= len(currentDataset.transactions) {
+	if t.currentIndexInDataset >= len(currentDataset.Transactions) {
 		return nil, nil
 	}
 
-	data := currentDataset.transactions[t.currentIndexInDataset]
+	data := currentDataset.Transactions[t.currentIndexInDataset]
 
-	if len(data.splitData) < 1 {
+	if len(data.SplitData) < 1 {
 		log.Errorf(ctx, "[iif_transaction_data_table.Next] cannot parsing transaction in row#%d (dataset#%d), because split data is empty", t.currentIndexInDataset, t.currentDatasetIndex)
 		return nil, errs.ErrInvalidIIFFile
 	}
 
-	if t.currentSplitDataIndex >= len(data.splitData) {
+	if t.currentSplitDataIndex >= len(data.SplitData) {
 		return nil, nil
 	}
 
-	if len(data.splitData) > 1 {
+	if len(data.SplitData) > 1 {
 		_, err := t.isSplitTransactionSupported(ctx, currentDataset, data)
 
 		if err != nil {
@@ -222,11 +222,11 @@ func (t *iifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 		return nil, err
 	}
 
-	transactionType, _ := dataset.getSplitDataItemValue(transactionData.splitData[splitDataIndex], iifTransactionTypeColumnName)
+	transactionType, _ := dataset.getSplitDataItemValue(transactionData.SplitData[splitDataIndex], iifTransactionTypeColumnName)
 	mainAccountName, _ := dataset.getTransactionDataItemValue(transactionData, iifTransactionAccountNameColumnName)
-	splitAccountName, _ := dataset.getSplitDataItemValue(transactionData.splitData[splitDataIndex], iifTransactionAccountNameColumnName)
+	splitAccountName, _ := dataset.getSplitDataItemValue(transactionData.SplitData[splitDataIndex], iifTransactionAccountNameColumnName)
 	mainAmount, _ := dataset.getTransactionDataItemValue(transactionData, iifTransactionAmountColumnName)
-	splitAmount, _ := dataset.getSplitDataItemValue(transactionData.splitData[splitDataIndex], iifTransactionAmountColumnName)
+	splitAmount, _ := dataset.getSplitDataItemValue(transactionData.SplitData[splitDataIndex], iifTransactionAmountColumnName)
 	mainAmountNum, err := parseAmount(mainAmount)
 
 	if err != nil {
@@ -254,7 +254,7 @@ func (t *iifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 			categoryName = mainAccountName
 			accountName = splitAccountName
 
-			if len(transactionData.splitData) > 1 {
+			if len(transactionData.SplitData) > 1 {
 				amountNum = splitAmountNum
 			} else {
 				amountNum = -mainAmountNum
@@ -263,7 +263,7 @@ func (t *iifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 			categoryName = splitAccountName
 			accountName = mainAccountName
 
-			if len(transactionData.splitData) > 1 {
+			if len(transactionData.SplitData) > 1 {
 				amountNum = -splitAmountNum
 			} else {
 				amountNum = mainAmountNum
@@ -295,7 +295,7 @@ func (t *iifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 			categoryName = mainAccountName
 			accountName = splitAccountName
 
-			if len(transactionData.splitData) > 1 {
+			if len(transactionData.SplitData) > 1 {
 				amountNum = -splitAmountNum
 			} else {
 				amountNum = mainAmountNum
@@ -304,7 +304,7 @@ func (t *iifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 			categoryName = splitAccountName
 			accountName = mainAccountName
 
-			if len(transactionData.splitData) > 1 {
+			if len(transactionData.SplitData) > 1 {
 				amountNum = splitAmountNum
 			} else {
 				amountNum = -mainAmountNum
@@ -332,7 +332,7 @@ func (t *iifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 		relatedAmountNum := int64(0)
 		mainAccountTransferToSplitAccount := false
 
-		if len(transactionData.splitData) > 1 {
+		if len(transactionData.SplitData) > 1 {
 			amountNum = splitAmountNum
 			relatedAmountNum = splitAmountNum
 			mainAccountTransferToSplitAccount = amountNum >= 0
@@ -369,11 +369,11 @@ func (t *iifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 		}
 	}
 
-	if splitMemo, _ := dataset.getSplitDataItemValue(transactionData.splitData[splitDataIndex], iifTransactionMemoColumnName); splitMemo != "" {
+	if splitMemo, _ := dataset.getSplitDataItemValue(transactionData.SplitData[splitDataIndex], iifTransactionMemoColumnName); splitMemo != "" {
 		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = splitMemo
 	} else if memo, _ := dataset.getTransactionDataItemValue(transactionData, iifTransactionMemoColumnName); memo != "" {
 		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = memo
-	} else if splitName, _ := dataset.getSplitDataItemValue(transactionData.splitData[splitDataIndex], iifTransactionNameColumnName); splitName != "" {
+	} else if splitName, _ := dataset.getSplitDataItemValue(transactionData.SplitData[splitDataIndex], iifTransactionNameColumnName); splitName != "" {
 		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = splitName
 	} else if name, _ := dataset.getTransactionDataItemValue(transactionData, iifTransactionNameColumnName); name != "" {
 		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = name
@@ -402,8 +402,8 @@ func (t *iifTransactionDataRowIterator) isSplitTransactionSupported(ctx core.Con
 
 		splitTotalAmount := int64(0)
 
-		for i := 0; i < len(transactionData.splitData); i++ {
-			splitAmountStr, _ := dataset.getSplitDataItemValue(transactionData.splitData[i], iifTransactionAmountColumnName)
+		for i := 0; i < len(transactionData.SplitData); i++ {
+			splitAmountStr, _ := dataset.getSplitDataItemValue(transactionData.SplitData[i], iifTransactionAmountColumnName)
 			splitAmount, err := parseAmount(splitAmountStr)
 
 			if err != nil {
@@ -420,7 +420,7 @@ func (t *iifTransactionDataRowIterator) isSplitTransactionSupported(ctx core.Con
 		}
 	}
 
-	if len(transactionData.splitData) > 1 && !supportSplitTransactions {
+	if len(transactionData.SplitData) > 1 && !supportSplitTransactions {
 		return false, errs.ErrNotSupportedSplitTransactions
 	}
 
@@ -463,7 +463,7 @@ func createNewIIfTransactionDataTable(ctx core.Context, accountDatasets []*iifAc
 			iifTransactionAccountNameColumnName,
 			iifTransactionAmountColumnName,
 		} {
-			if _, exists := transactionDataset.transactionDataColumnIndexes[requiredColumnName]; !exists {
+			if _, exists := transactionDataset.TransactionDataColumnIndexes[requiredColumnName]; !exists {
 				return nil, errs.ErrMissingRequiredFieldInHeaderRow
 			}
 		}

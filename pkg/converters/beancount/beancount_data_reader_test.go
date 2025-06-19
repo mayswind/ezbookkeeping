@@ -41,56 +41,56 @@ func TestBeancountDataReaderRead(t *testing.T) {
 	actualData, err := reader.read(context)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 5, len(actualData.accounts))
-	assert.Equal(t, "AssetsAccount:TestAccount", actualData.accounts["AssetsAccount:TestAccount"].name)
-	assert.Equal(t, beancountAssetsAccountType, actualData.accounts["AssetsAccount:TestAccount"].accountType)
-	assert.Equal(t, "2024-01-01", actualData.accounts["AssetsAccount:TestAccount"].openDate)
-	assert.Equal(t, "2024-01-07", actualData.accounts["AssetsAccount:TestAccount"].closeDate)
+	assert.Equal(t, 5, len(actualData.Accounts))
+	assert.Equal(t, "AssetsAccount:TestAccount", actualData.Accounts["AssetsAccount:TestAccount"].Name)
+	assert.Equal(t, beancountAssetsAccountType, actualData.Accounts["AssetsAccount:TestAccount"].AccountType)
+	assert.Equal(t, "2024-01-01", actualData.Accounts["AssetsAccount:TestAccount"].OpenDate)
+	assert.Equal(t, "2024-01-07", actualData.Accounts["AssetsAccount:TestAccount"].CloseDate)
 
-	assert.Equal(t, "LiabilitiesAccount:TestAccount2", actualData.accounts["LiabilitiesAccount:TestAccount2"].name)
-	assert.Equal(t, beancountLiabilitiesAccountType, actualData.accounts["LiabilitiesAccount:TestAccount2"].accountType)
-	assert.Equal(t, "2024-01-02", actualData.accounts["LiabilitiesAccount:TestAccount2"].openDate)
+	assert.Equal(t, "LiabilitiesAccount:TestAccount2", actualData.Accounts["LiabilitiesAccount:TestAccount2"].Name)
+	assert.Equal(t, beancountLiabilitiesAccountType, actualData.Accounts["LiabilitiesAccount:TestAccount2"].AccountType)
+	assert.Equal(t, "2024-01-02", actualData.Accounts["LiabilitiesAccount:TestAccount2"].OpenDate)
 
-	assert.Equal(t, 2, len(actualData.transactions))
+	assert.Equal(t, 2, len(actualData.Transactions))
 
-	assert.Equal(t, "2024-01-05", actualData.transactions[0].date)
-	assert.Equal(t, "Payee Name", actualData.transactions[0].payee)
-	assert.Equal(t, "Foo Bar", actualData.transactions[0].narration)
-	assert.Equal(t, 2, len(actualData.transactions[0].postings))
-	assert.Equal(t, "IncomeAccount:TestCategory", actualData.transactions[0].postings[0].account)
-	assert.Equal(t, "-123.45", actualData.transactions[0].postings[0].amount)
-	assert.Equal(t, "CNY", actualData.transactions[0].postings[0].commodity)
-	assert.Equal(t, "AssetsAccount:TestAccount", actualData.transactions[0].postings[1].account)
-	assert.Equal(t, "123.45", actualData.transactions[0].postings[1].amount)
-	assert.Equal(t, "CNY", actualData.transactions[0].postings[1].commodity)
+	assert.Equal(t, "2024-01-05", actualData.Transactions[0].Date)
+	assert.Equal(t, "Payee Name", actualData.Transactions[0].Payee)
+	assert.Equal(t, "Foo Bar", actualData.Transactions[0].Narration)
+	assert.Equal(t, 2, len(actualData.Transactions[0].Postings))
+	assert.Equal(t, "IncomeAccount:TestCategory", actualData.Transactions[0].Postings[0].Account)
+	assert.Equal(t, "-123.45", actualData.Transactions[0].Postings[0].Amount)
+	assert.Equal(t, "CNY", actualData.Transactions[0].Postings[0].Commodity)
+	assert.Equal(t, "AssetsAccount:TestAccount", actualData.Transactions[0].Postings[1].Account)
+	assert.Equal(t, "123.45", actualData.Transactions[0].Postings[1].Amount)
+	assert.Equal(t, "CNY", actualData.Transactions[0].Postings[1].Commodity)
 
-	assert.Equal(t, 4, len(actualData.transactions[0].tags))
-	assert.Equal(t, actualData.transactions[0].tags[0], "tag1")
-	assert.Equal(t, actualData.transactions[0].tags[1], "tag2")
-	assert.Equal(t, actualData.transactions[0].tags[2], "tag3")
-	assert.Equal(t, actualData.transactions[0].tags[3], "tag4")
+	assert.Equal(t, 4, len(actualData.Transactions[0].Tags))
+	assert.Equal(t, actualData.Transactions[0].Tags[0], "tag1")
+	assert.Equal(t, actualData.Transactions[0].Tags[1], "tag2")
+	assert.Equal(t, actualData.Transactions[0].Tags[2], "tag3")
+	assert.Equal(t, actualData.Transactions[0].Tags[3], "tag4")
 
-	assert.Equal(t, 1, len(actualData.transactions[0].links))
-	assert.Equal(t, actualData.transactions[0].links[0], "test-link")
+	assert.Equal(t, 1, len(actualData.Transactions[0].Links))
+	assert.Equal(t, actualData.Transactions[0].Links[0], "test-link")
 
-	assert.Equal(t, "2024-01-06", actualData.transactions[1].date)
-	assert.Equal(t, "", actualData.transactions[1].payee)
-	assert.Equal(t, "test\n#test2", actualData.transactions[1].narration)
-	assert.Equal(t, 2, len(actualData.transactions[1].postings))
-	assert.Equal(t, "LiabilitiesAccount:TestAccount2", actualData.transactions[1].postings[0].account)
-	assert.Equal(t, "-0.12", actualData.transactions[1].postings[0].amount)
-	assert.Equal(t, "USD", actualData.transactions[1].postings[0].commodity)
-	assert.Equal(t, "ExpensesAccount:TestCategory2", actualData.transactions[1].postings[1].account)
-	assert.Equal(t, "0.12", actualData.transactions[1].postings[1].amount)
-	assert.Equal(t, "USD", actualData.transactions[1].postings[1].commodity)
+	assert.Equal(t, "2024-01-06", actualData.Transactions[1].Date)
+	assert.Equal(t, "", actualData.Transactions[1].Payee)
+	assert.Equal(t, "test\n#test2", actualData.Transactions[1].Narration)
+	assert.Equal(t, 2, len(actualData.Transactions[1].Postings))
+	assert.Equal(t, "LiabilitiesAccount:TestAccount2", actualData.Transactions[1].Postings[0].Account)
+	assert.Equal(t, "-0.12", actualData.Transactions[1].Postings[0].Amount)
+	assert.Equal(t, "USD", actualData.Transactions[1].Postings[0].Commodity)
+	assert.Equal(t, "ExpensesAccount:TestCategory2", actualData.Transactions[1].Postings[1].Account)
+	assert.Equal(t, "0.12", actualData.Transactions[1].Postings[1].Amount)
+	assert.Equal(t, "USD", actualData.Transactions[1].Postings[1].Commodity)
 
-	assert.Equal(t, 3, len(actualData.transactions[1].tags))
-	assert.Equal(t, actualData.transactions[1].tags[0], "tag2")
-	assert.Equal(t, actualData.transactions[1].tags[1], "tag5")
-	assert.Equal(t, actualData.transactions[1].tags[2], "tag6")
+	assert.Equal(t, 3, len(actualData.Transactions[1].Tags))
+	assert.Equal(t, actualData.Transactions[1].Tags[0], "tag2")
+	assert.Equal(t, actualData.Transactions[1].Tags[1], "tag5")
+	assert.Equal(t, actualData.Transactions[1].Tags[2], "tag6")
 
-	assert.Equal(t, 1, len(actualData.transactions[1].links))
-	assert.Equal(t, actualData.transactions[1].links[0], "test-link2")
+	assert.Equal(t, 1, len(actualData.Transactions[1].Links))
+	assert.Equal(t, actualData.Transactions[1].Links[0], "test-link2")
 }
 
 func TestBeancountDataReaderRead_EmptyContent(t *testing.T) {
@@ -147,17 +147,17 @@ func TestBeancountDataReaderReadAndSetOption_AccountTypeName(t *testing.T) {
 	actualData, err := reader.read(context)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 3, len(actualData.accounts))
+	assert.Equal(t, 3, len(actualData.Accounts))
 
-	assert.Equal(t, "A:TestAccount", actualData.accounts["A:TestAccount"].name)
-	assert.Equal(t, beancountAssetsAccountType, actualData.accounts["A:TestAccount"].accountType)
+	assert.Equal(t, "A:TestAccount", actualData.Accounts["A:TestAccount"].Name)
+	assert.Equal(t, beancountAssetsAccountType, actualData.Accounts["A:TestAccount"].AccountType)
 
-	assert.Equal(t, "L:TestAccount2", actualData.accounts["L:TestAccount2"].name)
-	assert.Equal(t, beancountLiabilitiesAccountType, actualData.accounts["L:TestAccount2"].accountType)
+	assert.Equal(t, "L:TestAccount2", actualData.Accounts["L:TestAccount2"].Name)
+	assert.Equal(t, beancountLiabilitiesAccountType, actualData.Accounts["L:TestAccount2"].AccountType)
 
-	assert.Equal(t, "E:Opening-Balances", actualData.accounts["E:Opening-Balances"].name)
-	assert.Equal(t, beancountEquityAccountType, actualData.accounts["E:Opening-Balances"].accountType)
-	assert.True(t, actualData.accounts["E:Opening-Balances"].isOpeningBalanceEquityAccount())
+	assert.Equal(t, "E:Opening-Balances", actualData.Accounts["E:Opening-Balances"].Name)
+	assert.Equal(t, beancountEquityAccountType, actualData.Accounts["E:Opening-Balances"].AccountType)
+	assert.True(t, actualData.Accounts["E:Opening-Balances"].isOpeningBalanceEquityAccount())
 }
 
 func TestBeancountDataReaderReadAndSetOption_InvalidLineOrUnsupportedOption(t *testing.T) {
@@ -203,31 +203,31 @@ func TestBeancountDataReaderReadAndSetTags(t *testing.T) {
 	actualData, err := reader.read(context)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 5, len(actualData.transactions))
+	assert.Equal(t, 5, len(actualData.Transactions))
 
-	assert.Equal(t, 4, len(actualData.transactions[0].tags))
-	assert.Equal(t, actualData.transactions[0].tags[0], "tag1")
-	assert.Equal(t, actualData.transactions[0].tags[1], "tag2")
-	assert.Equal(t, actualData.transactions[0].tags[2], "tag3")
-	assert.Equal(t, actualData.transactions[0].tags[3], "tag4")
+	assert.Equal(t, 4, len(actualData.Transactions[0].Tags))
+	assert.Equal(t, actualData.Transactions[0].Tags[0], "tag1")
+	assert.Equal(t, actualData.Transactions[0].Tags[1], "tag2")
+	assert.Equal(t, actualData.Transactions[0].Tags[2], "tag3")
+	assert.Equal(t, actualData.Transactions[0].Tags[3], "tag4")
 
-	assert.Equal(t, 2, len(actualData.transactions[1].tags))
-	assert.Equal(t, actualData.transactions[1].tags[0], "tag5")
-	assert.Equal(t, actualData.transactions[1].tags[1], "tag6")
+	assert.Equal(t, 2, len(actualData.Transactions[1].Tags))
+	assert.Equal(t, actualData.Transactions[1].Tags[0], "tag5")
+	assert.Equal(t, actualData.Transactions[1].Tags[1], "tag6")
 
-	assert.Equal(t, 2, len(actualData.transactions[2].tags))
-	assert.Equal(t, actualData.transactions[2].tags[0], "tag5")
-	assert.Equal(t, actualData.transactions[2].tags[1], "tag6")
+	assert.Equal(t, 2, len(actualData.Transactions[2].Tags))
+	assert.Equal(t, actualData.Transactions[2].Tags[0], "tag5")
+	assert.Equal(t, actualData.Transactions[2].Tags[1], "tag6")
 
-	assert.Equal(t, 3, len(actualData.transactions[3].tags))
-	assert.Equal(t, actualData.transactions[3].tags[0], "tag3")
-	assert.Equal(t, actualData.transactions[3].tags[1], "tag6")
-	assert.Equal(t, actualData.transactions[3].tags[2], "tag5")
+	assert.Equal(t, 3, len(actualData.Transactions[3].Tags))
+	assert.Equal(t, actualData.Transactions[3].Tags[0], "tag3")
+	assert.Equal(t, actualData.Transactions[3].Tags[1], "tag6")
+	assert.Equal(t, actualData.Transactions[3].Tags[2], "tag5")
 
-	assert.Equal(t, 3, len(actualData.transactions[4].tags))
-	assert.Equal(t, actualData.transactions[4].tags[0], "tag3")
-	assert.Equal(t, actualData.transactions[4].tags[1], "tag6")
-	assert.Equal(t, actualData.transactions[4].tags[2], "tag5")
+	assert.Equal(t, 3, len(actualData.Transactions[4].Tags))
+	assert.Equal(t, actualData.Transactions[4].Tags[0], "tag3")
+	assert.Equal(t, actualData.Transactions[4].Tags[1], "tag6")
+	assert.Equal(t, actualData.Transactions[4].Tags[2], "tag5")
 }
 
 func TestBeancountDataReaderReadAccountLine_InvalidLine(t *testing.T) {
@@ -238,7 +238,7 @@ func TestBeancountDataReaderReadAccountLine_InvalidLine(t *testing.T) {
 
 	actualData, err := reader.read(context)
 	assert.Nil(t, err)
-	assert.Equal(t, 0, len(actualData.accounts))
+	assert.Equal(t, 0, len(actualData.Accounts))
 }
 
 func TestBeancountDataReaderReadAccountLine_InvalidAccountType(t *testing.T) {
@@ -274,44 +274,44 @@ func TestBeancountDataReaderReadTransactionLine(t *testing.T) {
 	actualData, err := reader.read(context)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 6, len(actualData.transactions))
+	assert.Equal(t, 6, len(actualData.Transactions))
 
-	assert.Equal(t, "2024-01-01", actualData.transactions[0].date)
-	assert.Equal(t, beancountDirectiveCompletedTransaction, actualData.transactions[0].directive)
-	assert.Equal(t, "", actualData.transactions[0].payee)
-	assert.Equal(t, "", actualData.transactions[0].narration)
+	assert.Equal(t, "2024-01-01", actualData.Transactions[0].Date)
+	assert.Equal(t, beancountDirectiveCompletedTransaction, actualData.Transactions[0].Directive)
+	assert.Equal(t, "", actualData.Transactions[0].Payee)
+	assert.Equal(t, "", actualData.Transactions[0].Narration)
 
-	assert.Equal(t, "2024-01-02", actualData.transactions[1].date)
-	assert.Equal(t, beancountDirectiveCompletedTransaction, actualData.transactions[1].directive)
-	assert.Equal(t, "", actualData.transactions[1].payee)
-	assert.Equal(t, "test\ttest2\ntest3", actualData.transactions[1].narration)
+	assert.Equal(t, "2024-01-02", actualData.Transactions[1].Date)
+	assert.Equal(t, beancountDirectiveCompletedTransaction, actualData.Transactions[1].Directive)
+	assert.Equal(t, "", actualData.Transactions[1].Payee)
+	assert.Equal(t, "test\ttest2\ntest3", actualData.Transactions[1].Narration)
 
-	assert.Equal(t, "2024-01-03", actualData.transactions[2].date)
-	assert.Equal(t, beancountDirectiveInCompleteTransaction, actualData.transactions[2].directive)
-	assert.Equal(t, "test", actualData.transactions[2].payee)
-	assert.Equal(t, "test2", actualData.transactions[2].narration)
+	assert.Equal(t, "2024-01-03", actualData.Transactions[2].Date)
+	assert.Equal(t, beancountDirectiveInCompleteTransaction, actualData.Transactions[2].Directive)
+	assert.Equal(t, "test", actualData.Transactions[2].Payee)
+	assert.Equal(t, "test2", actualData.Transactions[2].Narration)
 
-	assert.Equal(t, "2024-01-04", actualData.transactions[3].date)
-	assert.Equal(t, beancountDirectivePaddingTransaction, actualData.transactions[3].directive)
-	assert.Equal(t, "", actualData.transactions[3].payee)
-	assert.Equal(t, "test", actualData.transactions[3].narration)
+	assert.Equal(t, "2024-01-04", actualData.Transactions[3].Date)
+	assert.Equal(t, beancountDirectivePaddingTransaction, actualData.Transactions[3].Directive)
+	assert.Equal(t, "", actualData.Transactions[3].Payee)
+	assert.Equal(t, "test", actualData.Transactions[3].Narration)
 
-	assert.Equal(t, 2, len(actualData.transactions[3].tags))
-	assert.Equal(t, actualData.transactions[3].tags[0], "tag")
-	assert.Equal(t, actualData.transactions[3].tags[1], "tag2")
+	assert.Equal(t, 2, len(actualData.Transactions[3].Tags))
+	assert.Equal(t, actualData.Transactions[3].Tags[0], "tag")
+	assert.Equal(t, actualData.Transactions[3].Tags[1], "tag2")
 
-	assert.Equal(t, "2024-01-05", actualData.transactions[4].date)
-	assert.Equal(t, beancountDirectiveTransaction, actualData.transactions[4].directive)
-	assert.Equal(t, "", actualData.transactions[4].payee)
-	assert.Equal(t, "test", actualData.transactions[4].narration)
+	assert.Equal(t, "2024-01-05", actualData.Transactions[4].Date)
+	assert.Equal(t, beancountDirectiveTransaction, actualData.Transactions[4].Directive)
+	assert.Equal(t, "", actualData.Transactions[4].Payee)
+	assert.Equal(t, "test", actualData.Transactions[4].Narration)
 
-	assert.Equal(t, 1, len(actualData.transactions[4].links))
-	assert.Equal(t, actualData.transactions[4].links[0], "scheme://path/to/test/link")
+	assert.Equal(t, 1, len(actualData.Transactions[4].Links))
+	assert.Equal(t, actualData.Transactions[4].Links[0], "scheme://path/to/test/link")
 
-	assert.Equal(t, "2024-01-06", actualData.transactions[5].date)
-	assert.Equal(t, beancountDirectiveTransaction, actualData.transactions[5].directive)
-	assert.Equal(t, "", actualData.transactions[5].payee)
-	assert.Equal(t, "", actualData.transactions[5].narration)
+	assert.Equal(t, "2024-01-06", actualData.Transactions[5].Date)
+	assert.Equal(t, beancountDirectiveTransaction, actualData.Transactions[5].Directive)
+	assert.Equal(t, "", actualData.Transactions[5].Payee)
+	assert.Equal(t, "", actualData.Transactions[5].Narration)
 }
 
 func TestBeancountDataReaderReadTransactionPostingLine(t *testing.T) {
@@ -331,39 +331,39 @@ func TestBeancountDataReaderReadTransactionPostingLine(t *testing.T) {
 	actualData, err := reader.read(context)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 2, len(actualData.transactions))
+	assert.Equal(t, 2, len(actualData.Transactions))
 
-	assert.Equal(t, "2024-01-01", actualData.transactions[0].date)
-	assert.Equal(t, 2, len(actualData.transactions[0].postings))
-	assert.Equal(t, "Income:TestCategory", actualData.transactions[0].postings[0].account)
-	assert.Equal(t, "-123.45", actualData.transactions[0].postings[0].amount)
-	assert.Equal(t, "CNY", actualData.transactions[0].postings[0].commodity)
+	assert.Equal(t, "2024-01-01", actualData.Transactions[0].Date)
+	assert.Equal(t, 2, len(actualData.Transactions[0].Postings))
+	assert.Equal(t, "Income:TestCategory", actualData.Transactions[0].Postings[0].Account)
+	assert.Equal(t, "-123.45", actualData.Transactions[0].Postings[0].Amount)
+	assert.Equal(t, "CNY", actualData.Transactions[0].Postings[0].Commodity)
 
-	assert.Equal(t, "Assets:TestAccount", actualData.transactions[0].postings[1].account)
-	assert.Equal(t, "123.45", actualData.transactions[0].postings[1].amount)
-	assert.Equal(t, "CNY", actualData.transactions[0].postings[1].commodity)
+	assert.Equal(t, "Assets:TestAccount", actualData.Transactions[0].Postings[1].Account)
+	assert.Equal(t, "123.45", actualData.Transactions[0].Postings[1].Amount)
+	assert.Equal(t, "CNY", actualData.Transactions[0].Postings[1].Commodity)
 
-	assert.Equal(t, "2024-01-02", actualData.transactions[1].date)
-	assert.Equal(t, 4, len(actualData.transactions[1].postings))
+	assert.Equal(t, "2024-01-02", actualData.Transactions[1].Date)
+	assert.Equal(t, 4, len(actualData.Transactions[1].Postings))
 
-	assert.Equal(t, "Liabilities:TestAccount2", actualData.transactions[1].postings[0].account)
-	assert.Equal(t, "-0.23", actualData.transactions[1].postings[0].amount)
-	assert.Equal(t, "USD", actualData.transactions[1].postings[0].commodity)
-	assert.Equal(t, "Expenses:TestCategory2", actualData.transactions[1].postings[1].account)
+	assert.Equal(t, "Liabilities:TestAccount2", actualData.Transactions[1].Postings[0].Account)
+	assert.Equal(t, "-0.23", actualData.Transactions[1].Postings[0].Amount)
+	assert.Equal(t, "USD", actualData.Transactions[1].Postings[0].Commodity)
+	assert.Equal(t, "Expenses:TestCategory2", actualData.Transactions[1].Postings[1].Account)
 
-	assert.Equal(t, "0.12", actualData.transactions[1].postings[1].amount)
-	assert.Equal(t, "USD", actualData.transactions[1].postings[1].commodity)
-	assert.Equal(t, "0.84", actualData.transactions[1].postings[1].totalCost)
-	assert.Equal(t, "CNY", actualData.transactions[1].postings[1].totalCostCommodity)
-	assert.Equal(t, "Expenses:TestCategory3", actualData.transactions[1].postings[2].account)
+	assert.Equal(t, "0.12", actualData.Transactions[1].Postings[1].Amount)
+	assert.Equal(t, "USD", actualData.Transactions[1].Postings[1].Commodity)
+	assert.Equal(t, "0.84", actualData.Transactions[1].Postings[1].TotalCost)
+	assert.Equal(t, "CNY", actualData.Transactions[1].Postings[1].TotalCostCommodity)
+	assert.Equal(t, "Expenses:TestCategory3", actualData.Transactions[1].Postings[2].Account)
 
-	assert.Equal(t, "0.11", actualData.transactions[1].postings[2].amount)
-	assert.Equal(t, "USD", actualData.transactions[1].postings[2].commodity)
-	assert.Equal(t, "7.12", actualData.transactions[1].postings[2].price)
-	assert.Equal(t, "CNY", actualData.transactions[1].postings[2].priceCommodity)
+	assert.Equal(t, "0.11", actualData.Transactions[1].Postings[2].Amount)
+	assert.Equal(t, "USD", actualData.Transactions[1].Postings[2].Commodity)
+	assert.Equal(t, "7.12", actualData.Transactions[1].Postings[2].Price)
+	assert.Equal(t, "CNY", actualData.Transactions[1].Postings[2].PriceCommodity)
 
-	assert.Equal(t, "0.00", actualData.transactions[1].postings[3].amount)
-	assert.Equal(t, "USD", actualData.transactions[1].postings[3].commodity)
+	assert.Equal(t, "0.00", actualData.Transactions[1].Postings[3].Amount)
+	assert.Equal(t, "USD", actualData.Transactions[1].Postings[3].Commodity)
 }
 
 func TestBeancountDataReaderReadTransactionPostingLine_AmountExpression(t *testing.T) {
@@ -377,19 +377,19 @@ func TestBeancountDataReaderReadTransactionPostingLine_AmountExpression(t *testi
 	actualData, err := reader.read(context)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 1, len(actualData.transactions))
+	assert.Equal(t, 1, len(actualData.Transactions))
 
-	assert.Equal(t, "2024-01-01", actualData.transactions[0].date)
-	assert.Equal(t, 2, len(actualData.transactions[0].postings))
-	assert.Equal(t, "Income:TestCategory", actualData.transactions[0].postings[0].account)
-	assert.Equal(t, "(1.2-3.4) * 5.6 / 7.8", actualData.transactions[0].postings[0].originalAmount)
-	assert.Equal(t, "-1.58", actualData.transactions[0].postings[0].amount)
-	assert.Equal(t, "CNY", actualData.transactions[0].postings[0].commodity)
+	assert.Equal(t, "2024-01-01", actualData.Transactions[0].Date)
+	assert.Equal(t, 2, len(actualData.Transactions[0].Postings))
+	assert.Equal(t, "Income:TestCategory", actualData.Transactions[0].Postings[0].Account)
+	assert.Equal(t, "(1.2-3.4) * 5.6 / 7.8", actualData.Transactions[0].Postings[0].OriginalAmount)
+	assert.Equal(t, "-1.58", actualData.Transactions[0].Postings[0].Amount)
+	assert.Equal(t, "CNY", actualData.Transactions[0].Postings[0].Commodity)
 
-	assert.Equal(t, "Assets:TestAccount", actualData.transactions[0].postings[1].account)
-	assert.Equal(t, "1.2 * 3.4/-5.6 - 7.8", actualData.transactions[0].postings[1].originalAmount)
-	assert.Equal(t, "-8.53", actualData.transactions[0].postings[1].amount)
-	assert.Equal(t, "CNY", actualData.transactions[0].postings[1].commodity)
+	assert.Equal(t, "Assets:TestAccount", actualData.Transactions[0].Postings[1].Account)
+	assert.Equal(t, "1.2 * 3.4/-5.6 - 7.8", actualData.Transactions[0].Postings[1].OriginalAmount)
+	assert.Equal(t, "-8.53", actualData.Transactions[0].Postings[1].Amount)
+	assert.Equal(t, "CNY", actualData.Transactions[0].Postings[1].Commodity)
 }
 
 func TestBeancountDataReaderReadTransactionPostingLine_InvalidAmountExpression(t *testing.T) {
@@ -444,8 +444,8 @@ func TestBeancountDataReaderReadTransactionPostingLine_MissingAmount(t *testing.
 
 	actualData, err := reader.read(context)
 	assert.Nil(t, err)
-	assert.Equal(t, 1, len(actualData.transactions))
-	assert.Equal(t, 0, len(actualData.transactions[0].postings))
+	assert.Equal(t, 1, len(actualData.Transactions))
+	assert.Equal(t, 0, len(actualData.Transactions[0].Postings))
 
 	reader, err = createNewBeancountDataReader(context, []byte(""+
 		"2024-01-01 *\n"+
@@ -454,8 +454,8 @@ func TestBeancountDataReaderReadTransactionPostingLine_MissingAmount(t *testing.
 
 	actualData, err = reader.read(context)
 	assert.Nil(t, err)
-	assert.Equal(t, 1, len(actualData.transactions))
-	assert.Equal(t, 0, len(actualData.transactions[0].postings))
+	assert.Equal(t, 1, len(actualData.Transactions))
+	assert.Equal(t, 0, len(actualData.Transactions[0].Postings))
 }
 
 func TestBeancountDataReaderReadTransactionPostingLine_MissingCommodity(t *testing.T) {
@@ -503,18 +503,18 @@ func TestBeancountDataReaderReadTransactionMetadataLine(t *testing.T) {
 	actualData, err := reader.read(context)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 2, len(actualData.transactions))
+	assert.Equal(t, 2, len(actualData.Transactions))
 
-	assert.Equal(t, "2024-01-01", actualData.transactions[0].date)
-	assert.Equal(t, 2, len(actualData.transactions[0].postings))
-	assert.Equal(t, 2, len(actualData.transactions[0].metadata))
-	assert.Equal(t, "value", actualData.transactions[0].metadata["key"])
-	assert.Equal(t, "value 2", actualData.transactions[0].metadata["key2"])
+	assert.Equal(t, "2024-01-01", actualData.Transactions[0].Date)
+	assert.Equal(t, 2, len(actualData.Transactions[0].Postings))
+	assert.Equal(t, 2, len(actualData.Transactions[0].Metadata))
+	assert.Equal(t, "value", actualData.Transactions[0].Metadata["key"])
+	assert.Equal(t, "value 2", actualData.Transactions[0].Metadata["key2"])
 
-	assert.Equal(t, "2024-01-02", actualData.transactions[1].date)
-	assert.Equal(t, 2, len(actualData.transactions[1].postings))
-	assert.Equal(t, 2, len(actualData.transactions[1].postings[0].metadata))
-	assert.Equal(t, "value6", actualData.transactions[1].postings[0].metadata["key6"])
-	assert.Equal(t, "value 7", actualData.transactions[1].postings[0].metadata["key7"])
-	assert.Equal(t, 0, len(actualData.transactions[1].postings[1].metadata))
+	assert.Equal(t, "2024-01-02", actualData.Transactions[1].Date)
+	assert.Equal(t, 2, len(actualData.Transactions[1].Postings))
+	assert.Equal(t, 2, len(actualData.Transactions[1].Postings[0].Metadata))
+	assert.Equal(t, "value6", actualData.Transactions[1].Postings[0].Metadata["key6"])
+	assert.Equal(t, "value 7", actualData.Transactions[1].Postings[0].Metadata["key7"])
+	assert.Equal(t, 0, len(actualData.Transactions[1].Postings[1].Metadata))
 }

@@ -119,11 +119,11 @@ func (t *qifTransactionDataRowIterator) Next(ctx core.Context, user *models.User
 func (t *qifTransactionDataRowIterator) parseTransaction(ctx core.Context, user *models.User, qifTransaction *qifTransactionData) (map[datatable.TransactionDataTableColumn]string, error) {
 	data := make(map[datatable.TransactionDataTableColumn]string, len(qifTransactionSupportedColumns))
 
-	if qifTransaction.date == "" {
+	if qifTransaction.Date == "" {
 		return nil, errs.ErrMissingTransactionTime
 	}
 
-	transactionTime, err := t.parseTransactionTime(ctx, qifTransaction.date)
+	transactionTime, err := t.parseTransactionTime(ctx, qifTransaction.Date)
 
 	if err != nil {
 		return nil, err
@@ -131,37 +131,37 @@ func (t *qifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 
 	data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = transactionTime
 
-	if qifTransaction.amount == "" {
+	if qifTransaction.Amount == "" {
 		return nil, errs.ErrAmountInvalid
 	}
 
-	amount, err := utils.ParseAmount(strings.ReplaceAll(qifTransaction.amount, ",", "")) // trim thousands separator
+	amount, err := utils.ParseAmount(strings.ReplaceAll(qifTransaction.Amount, ",", "")) // trim thousands separator
 
 	if err != nil {
 		return nil, errs.ErrAmountInvalid
 	}
 
-	if qifTransaction.account != nil {
-		data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = qifTransaction.account.name
+	if qifTransaction.Account != nil {
+		data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = qifTransaction.Account.Name
 	} else {
 		data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = ""
 	}
 
-	if len(qifTransaction.category) > 0 && qifTransaction.category[0] == '[' && qifTransaction.category[len(qifTransaction.category)-1] == ']' {
-		if qifTransaction.payee == qifOpeningBalancePayeeText { // balance modification
+	if len(qifTransaction.Category) > 0 && qifTransaction.Category[0] == '[' && qifTransaction.Category[len(qifTransaction.Category)-1] == ']' {
+		if qifTransaction.Payee == qifOpeningBalancePayeeText { // balance modification
 			data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = qifTransactionTypeNameMapping[models.TRANSACTION_TYPE_MODIFY_BALANCE]
 			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(amount)
-			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = qifTransaction.category[1 : len(qifTransaction.category)-1]
+			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = qifTransaction.Category[1 : len(qifTransaction.Category)-1]
 		} else { // transfer
 			data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = qifTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER]
 
 			if amount >= 0 { // transfer from [account name]
 				data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(amount)
 				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME]
-				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = qifTransaction.category[1 : len(qifTransaction.category)-1]
+				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = qifTransaction.Category[1 : len(qifTransaction.Category)-1]
 			} else { // transfer to [account name]
 				data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
-				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = qifTransaction.category[1 : len(qifTransaction.category)-1]
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = qifTransaction.Category[1 : len(qifTransaction.Category)-1]
 			}
 		}
 	} else { // income/expense
@@ -173,20 +173,20 @@ func (t *qifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
 		}
 
-		if strings.Index(qifTransaction.category, ":") > 0 { // category:subcategory
-			categories := strings.Split(qifTransaction.category, ":")
+		if strings.Index(qifTransaction.Category, ":") > 0 { // category:subcategory
+			categories := strings.Split(qifTransaction.Category, ":")
 			data[datatable.TRANSACTION_DATA_TABLE_CATEGORY] = categories[0]
 			data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = categories[len(categories)-1]
 		} else {
 			data[datatable.TRANSACTION_DATA_TABLE_CATEGORY] = ""
-			data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = qifTransaction.category
+			data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = qifTransaction.Category
 		}
 	}
 
-	if qifTransaction.memo != "" {
-		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = qifTransaction.memo
-	} else if qifTransaction.payee != "" && qifTransaction.payee != qifOpeningBalancePayeeText {
-		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = qifTransaction.payee
+	if qifTransaction.Memo != "" {
+		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = qifTransaction.Memo
+	} else if qifTransaction.Payee != "" && qifTransaction.Payee != qifOpeningBalancePayeeText {
+		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = qifTransaction.Payee
 	}
 
 	return data, nil
@@ -240,11 +240,11 @@ func createNewQifTransactionDataTable(dateFormatType qifDateFormatType, qifData 
 	}
 
 	allData := make([]*qifTransactionData, 0)
-	allData = append(allData, qifData.bankAccountTransactions...)
-	allData = append(allData, qifData.cashAccountTransactions...)
-	allData = append(allData, qifData.creditCardAccountTransactions...)
-	allData = append(allData, qifData.assetAccountTransactions...)
-	allData = append(allData, qifData.liabilityAccountTransactions...)
+	allData = append(allData, qifData.BankAccountTransactions...)
+	allData = append(allData, qifData.CashAccountTransactions...)
+	allData = append(allData, qifData.CreditCardAccountTransactions...)
+	allData = append(allData, qifData.AssetAccountTransactions...)
+	allData = append(allData, qifData.LiabilityAccountTransactions...)
 
 	return &qifTransactionDataTable{
 		dateFormatType: dateFormatType,

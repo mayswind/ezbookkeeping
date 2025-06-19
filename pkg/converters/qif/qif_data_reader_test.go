@@ -64,48 +64,48 @@ func TestQifDataReaderParse(t *testing.T) {
 	actualData, err := reader.read(context)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 2, len(actualData.bankAccountTransactions))
-	assert.Equal(t, "2024/10/9", actualData.bankAccountTransactions[0].date)
-	assert.Equal(t, "-123.45", actualData.bankAccountTransactions[0].amount)
-	assert.Equal(t, "2024/10/12", actualData.bankAccountTransactions[1].date)
-	assert.Equal(t, "+234.56", actualData.bankAccountTransactions[1].amount)
+	assert.Equal(t, 2, len(actualData.BankAccountTransactions))
+	assert.Equal(t, "2024/10/9", actualData.BankAccountTransactions[0].Date)
+	assert.Equal(t, "-123.45", actualData.BankAccountTransactions[0].Amount)
+	assert.Equal(t, "2024/10/12", actualData.BankAccountTransactions[1].Date)
+	assert.Equal(t, "+234.56", actualData.BankAccountTransactions[1].Amount)
 
-	assert.Equal(t, 1, len(actualData.cashAccountTransactions))
-	assert.Equal(t, "2024/9/1", actualData.cashAccountTransactions[0].date)
-	assert.Equal(t, "100.00", actualData.cashAccountTransactions[0].amount)
-	assert.Equal(t, "Opening Balance", actualData.cashAccountTransactions[0].payee)
-	assert.Equal(t, "[Wallet]", actualData.cashAccountTransactions[0].category)
+	assert.Equal(t, 1, len(actualData.CashAccountTransactions))
+	assert.Equal(t, "2024/9/1", actualData.CashAccountTransactions[0].Date)
+	assert.Equal(t, "100.00", actualData.CashAccountTransactions[0].Amount)
+	assert.Equal(t, "Opening Balance", actualData.CashAccountTransactions[0].Payee)
+	assert.Equal(t, "[Wallet]", actualData.CashAccountTransactions[0].Category)
 
-	assert.Equal(t, 1, len(actualData.memorizedTransactions))
-	assert.Equal(t, qifCheckTransactionType, actualData.memorizedTransactions[0].transactionType)
-	assert.Equal(t, "-123.45", actualData.memorizedTransactions[0].amount)
-	assert.Equal(t, "2024/10/13", actualData.memorizedTransactions[0].amortization.firstPaymentDate)
-	assert.Equal(t, "3", actualData.memorizedTransactions[0].amortization.totalYearsForLoan)
-	assert.Equal(t, "1", actualData.memorizedTransactions[0].amortization.numberOfPayments)
-	assert.Equal(t, "2", actualData.memorizedTransactions[0].amortization.numberOfPeriodsPerYear)
-	assert.Equal(t, "12.34", actualData.memorizedTransactions[0].amortization.interestRate)
-	assert.Equal(t, "100.45", actualData.memorizedTransactions[0].amortization.currentLoanBalance)
-	assert.Equal(t, "234.56", actualData.memorizedTransactions[0].amortization.originalLoanAmount)
+	assert.Equal(t, 1, len(actualData.MemorizedTransactions))
+	assert.Equal(t, qifCheckTransactionType, actualData.MemorizedTransactions[0].TransactionType)
+	assert.Equal(t, "-123.45", actualData.MemorizedTransactions[0].Amount)
+	assert.Equal(t, "2024/10/13", actualData.MemorizedTransactions[0].Amortization.FirstPaymentDate)
+	assert.Equal(t, "3", actualData.MemorizedTransactions[0].Amortization.TotalYearsForLoan)
+	assert.Equal(t, "1", actualData.MemorizedTransactions[0].Amortization.NumberOfPayments)
+	assert.Equal(t, "2", actualData.MemorizedTransactions[0].Amortization.NumberOfPeriodsPerYear)
+	assert.Equal(t, "12.34", actualData.MemorizedTransactions[0].Amortization.InterestRate)
+	assert.Equal(t, "100.45", actualData.MemorizedTransactions[0].Amortization.CurrentLoanBalance)
+	assert.Equal(t, "234.56", actualData.MemorizedTransactions[0].Amortization.OriginalLoanAmount)
 
-	assert.Equal(t, 1, len(actualData.investmentAccountTransactions))
-	assert.Equal(t, "2024/10/14", actualData.investmentAccountTransactions[0].date)
-	assert.Equal(t, "Buy", actualData.investmentAccountTransactions[0].action)
-	assert.Equal(t, "Test", actualData.investmentAccountTransactions[0].security)
-	assert.Equal(t, "12.34", actualData.investmentAccountTransactions[0].price)
-	assert.Equal(t, "10", actualData.investmentAccountTransactions[0].quantity)
-	assert.Equal(t, "-123.4", actualData.investmentAccountTransactions[0].amount)
+	assert.Equal(t, 1, len(actualData.InvestmentAccountTransactions))
+	assert.Equal(t, "2024/10/14", actualData.InvestmentAccountTransactions[0].Date)
+	assert.Equal(t, "Buy", actualData.InvestmentAccountTransactions[0].Action)
+	assert.Equal(t, "Test", actualData.InvestmentAccountTransactions[0].Security)
+	assert.Equal(t, "12.34", actualData.InvestmentAccountTransactions[0].Price)
+	assert.Equal(t, "10", actualData.InvestmentAccountTransactions[0].Quantity)
+	assert.Equal(t, "-123.4", actualData.InvestmentAccountTransactions[0].Amount)
 
-	assert.Equal(t, 2, len(actualData.accounts))
-	assert.Equal(t, "Test Account", actualData.accounts[0].name)
-	assert.Equal(t, "Wallet", actualData.accounts[1].name)
+	assert.Equal(t, 2, len(actualData.Accounts))
+	assert.Equal(t, "Test Account", actualData.Accounts[0].Name)
+	assert.Equal(t, "Wallet", actualData.Accounts[1].Name)
 
-	assert.Equal(t, 1, len(actualData.categories))
-	assert.Equal(t, "Test Category", actualData.categories[0].name)
-	assert.Equal(t, qifIncomeTransaction, actualData.categories[0].categoryType)
+	assert.Equal(t, 1, len(actualData.Categories))
+	assert.Equal(t, "Test Category", actualData.Categories[0].Name)
+	assert.Equal(t, qifIncomeTransaction, actualData.Categories[0].CategoryType)
 
-	assert.Equal(t, 1, len(actualData.classes))
-	assert.Equal(t, "Test Class", actualData.classes[0].name)
-	assert.Equal(t, "Foo Bar", actualData.classes[0].description)
+	assert.Equal(t, 1, len(actualData.Classes))
+	assert.Equal(t, "Test Class", actualData.Classes[0].Name)
+	assert.Equal(t, "Foo Bar", actualData.Classes[0].Description)
 }
 
 func TestQifDataReaderParse_AccountEntryBeforeTransaction(t *testing.T) {
@@ -137,21 +137,21 @@ func TestQifDataReaderParse_AccountEntryBeforeTransaction(t *testing.T) {
 	actualData, err := reader.read(context)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 2, len(actualData.bankAccountTransactions))
-	assert.Equal(t, "2024/10/9", actualData.bankAccountTransactions[0].date)
-	assert.Equal(t, "-123.45", actualData.bankAccountTransactions[0].amount)
-	assert.Equal(t, "2024/10/12", actualData.bankAccountTransactions[1].date)
-	assert.Equal(t, "+234.56", actualData.bankAccountTransactions[1].amount)
+	assert.Equal(t, 2, len(actualData.BankAccountTransactions))
+	assert.Equal(t, "2024/10/9", actualData.BankAccountTransactions[0].Date)
+	assert.Equal(t, "-123.45", actualData.BankAccountTransactions[0].Amount)
+	assert.Equal(t, "2024/10/12", actualData.BankAccountTransactions[1].Date)
+	assert.Equal(t, "+234.56", actualData.BankAccountTransactions[1].Amount)
 
-	assert.Equal(t, 1, len(actualData.cashAccountTransactions))
-	assert.Equal(t, "2024/9/1", actualData.cashAccountTransactions[0].date)
-	assert.Equal(t, "100.00", actualData.cashAccountTransactions[0].amount)
-	assert.Equal(t, "Opening Balance", actualData.cashAccountTransactions[0].payee)
-	assert.Equal(t, "[Wallet]", actualData.cashAccountTransactions[0].category)
+	assert.Equal(t, 1, len(actualData.CashAccountTransactions))
+	assert.Equal(t, "2024/9/1", actualData.CashAccountTransactions[0].Date)
+	assert.Equal(t, "100.00", actualData.CashAccountTransactions[0].Amount)
+	assert.Equal(t, "Opening Balance", actualData.CashAccountTransactions[0].Payee)
+	assert.Equal(t, "[Wallet]", actualData.CashAccountTransactions[0].Category)
 
-	assert.Equal(t, 2, len(actualData.accounts))
-	assert.Equal(t, "Test Account", actualData.accounts[0].name)
-	assert.Equal(t, "Wallet", actualData.accounts[1].name)
+	assert.Equal(t, 2, len(actualData.Accounts))
+	assert.Equal(t, "Test Account", actualData.Accounts[0].Name)
+	assert.Equal(t, "Wallet", actualData.Accounts[1].Name)
 }
 
 func TestQifDataReaderParse_EmptyContent(t *testing.T) {
@@ -188,13 +188,13 @@ func TestQifDataReaderParse_EmptyEntry(t *testing.T) {
 	actualData, err := reader.read(context)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 0, len(actualData.bankAccountTransactions))
-	assert.Equal(t, 0, len(actualData.cashAccountTransactions))
-	assert.Equal(t, 0, len(actualData.memorizedTransactions))
-	assert.Equal(t, 0, len(actualData.investmentAccountTransactions))
-	assert.Equal(t, 0, len(actualData.accounts))
-	assert.Equal(t, 0, len(actualData.categories))
-	assert.Equal(t, 0, len(actualData.classes))
+	assert.Equal(t, 0, len(actualData.BankAccountTransactions))
+	assert.Equal(t, 0, len(actualData.CashAccountTransactions))
+	assert.Equal(t, 0, len(actualData.MemorizedTransactions))
+	assert.Equal(t, 0, len(actualData.InvestmentAccountTransactions))
+	assert.Equal(t, 0, len(actualData.Accounts))
+	assert.Equal(t, 0, len(actualData.Categories))
+	assert.Equal(t, 0, len(actualData.Classes))
 }
 
 func TestQifDataReaderParse_UnsupportedEntryHeader(t *testing.T) {
@@ -215,9 +215,9 @@ func TestQifDataReaderParse_UnsupportedEntryHeader(t *testing.T) {
 	actualData, err := reader.read(context)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 1, len(actualData.bankAccountTransactions))
-	assert.Equal(t, "2024/10/9", actualData.bankAccountTransactions[0].date)
-	assert.Equal(t, "-123.45", actualData.bankAccountTransactions[0].amount)
+	assert.Equal(t, 1, len(actualData.BankAccountTransactions))
+	assert.Equal(t, "2024/10/9", actualData.BankAccountTransactions[0].Date)
+	assert.Equal(t, "-123.45", actualData.BankAccountTransactions[0].Amount)
 }
 
 func TestQifDataReaderParse_UnsupportedLine(t *testing.T) {
@@ -238,11 +238,11 @@ func TestQifDataReaderParse_UnsupportedLine(t *testing.T) {
 	actualData, err := reader.read(context)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 2, len(actualData.bankAccountTransactions))
-	assert.Equal(t, "2024/10/9", actualData.bankAccountTransactions[0].date)
-	assert.Equal(t, "-123.45", actualData.bankAccountTransactions[0].amount)
-	assert.Equal(t, "2024/10/11", actualData.bankAccountTransactions[1].date)
-	assert.Equal(t, "100.00", actualData.bankAccountTransactions[1].amount)
+	assert.Equal(t, 2, len(actualData.BankAccountTransactions))
+	assert.Equal(t, "2024/10/9", actualData.BankAccountTransactions[0].Date)
+	assert.Equal(t, "-123.45", actualData.BankAccountTransactions[0].Amount)
+	assert.Equal(t, "2024/10/11", actualData.BankAccountTransactions[1].Date)
+	assert.Equal(t, "100.00", actualData.BankAccountTransactions[1].Amount)
 }
 
 func TestQifDataReaderParse_NewEntryHeaderAfterUnclosedEntry(t *testing.T) {
@@ -289,26 +289,26 @@ func TestQifDataReaderParseTransaction_SupportedFields(t *testing.T) {
 	}, false)
 
 	assert.Nil(t, err)
-	assert.Equal(t, "2024/10/12", actualData.date)
-	assert.Equal(t, "-123.45", actualData.amount)
-	assert.Equal(t, qifClearedStatusUnreconciled, actualData.clearedStatus)
-	assert.Equal(t, "100", actualData.num)
-	assert.Equal(t, "Foo", actualData.payee)
-	assert.Equal(t, "Bar", actualData.memo)
-	assert.Equal(t, 3, len(actualData.addresses))
-	assert.Equal(t, "Address 1", actualData.addresses[0])
-	assert.Equal(t, "Address 2", actualData.addresses[1])
-	assert.Equal(t, "Address 3", actualData.addresses[2])
-	assert.Equal(t, "Test Category", actualData.category)
-	assert.Equal(t, 2, len(actualData.subTransactionCategory))
-	assert.Equal(t, "Part1 Category", actualData.subTransactionCategory[0])
-	assert.Equal(t, "Part2 Category", actualData.subTransactionCategory[1])
-	assert.Equal(t, 2, len(actualData.subTransactionMemo))
-	assert.Equal(t, "Part1 Memo", actualData.subTransactionMemo[0])
-	assert.Equal(t, "Part2 Memo", actualData.subTransactionMemo[1])
-	assert.Equal(t, 2, len(actualData.subTransactionAmount))
-	assert.Equal(t, "-100.00", actualData.subTransactionAmount[0])
-	assert.Equal(t, "-23.45", actualData.subTransactionAmount[1])
+	assert.Equal(t, "2024/10/12", actualData.Date)
+	assert.Equal(t, "-123.45", actualData.Amount)
+	assert.Equal(t, qifClearedStatusUnreconciled, actualData.ClearedStatus)
+	assert.Equal(t, "100", actualData.Num)
+	assert.Equal(t, "Foo", actualData.Payee)
+	assert.Equal(t, "Bar", actualData.Memo)
+	assert.Equal(t, 3, len(actualData.Addresses))
+	assert.Equal(t, "Address 1", actualData.Addresses[0])
+	assert.Equal(t, "Address 2", actualData.Addresses[1])
+	assert.Equal(t, "Address 3", actualData.Addresses[2])
+	assert.Equal(t, "Test Category", actualData.Category)
+	assert.Equal(t, 2, len(actualData.SubTransactionCategory))
+	assert.Equal(t, "Part1 Category", actualData.SubTransactionCategory[0])
+	assert.Equal(t, "Part2 Category", actualData.SubTransactionCategory[1])
+	assert.Equal(t, 2, len(actualData.SubTransactionMemo))
+	assert.Equal(t, "Part1 Memo", actualData.SubTransactionMemo[0])
+	assert.Equal(t, "Part2 Memo", actualData.SubTransactionMemo[1])
+	assert.Equal(t, 2, len(actualData.SubTransactionAmount))
+	assert.Equal(t, "-100.00", actualData.SubTransactionAmount[0])
+	assert.Equal(t, "-23.45", actualData.SubTransactionAmount[1])
 }
 
 func TestQifDataReaderParseMemorizedTransaction_SupportedFields(t *testing.T) {
@@ -333,36 +333,36 @@ func TestQifDataReaderParseMemorizedTransaction_SupportedFields(t *testing.T) {
 	})
 
 	assert.Nil(t, err)
-	assert.Equal(t, qifCheckTransactionType, actualData.transactionType)
-	assert.Equal(t, "2024/10/12", actualData.date)
-	assert.Equal(t, "-123.45", actualData.amount)
-	assert.Equal(t, qifClearedStatusCleared, actualData.clearedStatus)
-	assert.Equal(t, "100", actualData.num)
-	assert.Equal(t, "Foo", actualData.payee)
-	assert.Equal(t, "Bar", actualData.memo)
-	assert.Equal(t, "2024/10/13", actualData.amortization.firstPaymentDate)
-	assert.Equal(t, "3", actualData.amortization.totalYearsForLoan)
-	assert.Equal(t, "1", actualData.amortization.numberOfPayments)
-	assert.Equal(t, "2", actualData.amortization.numberOfPeriodsPerYear)
-	assert.Equal(t, "12.34", actualData.amortization.interestRate)
-	assert.Equal(t, "100.45", actualData.amortization.currentLoanBalance)
-	assert.Equal(t, "234.56", actualData.amortization.originalLoanAmount)
+	assert.Equal(t, qifCheckTransactionType, actualData.TransactionType)
+	assert.Equal(t, "2024/10/12", actualData.Date)
+	assert.Equal(t, "-123.45", actualData.Amount)
+	assert.Equal(t, qifClearedStatusCleared, actualData.ClearedStatus)
+	assert.Equal(t, "100", actualData.Num)
+	assert.Equal(t, "Foo", actualData.Payee)
+	assert.Equal(t, "Bar", actualData.Memo)
+	assert.Equal(t, "2024/10/13", actualData.Amortization.FirstPaymentDate)
+	assert.Equal(t, "3", actualData.Amortization.TotalYearsForLoan)
+	assert.Equal(t, "1", actualData.Amortization.NumberOfPayments)
+	assert.Equal(t, "2", actualData.Amortization.NumberOfPeriodsPerYear)
+	assert.Equal(t, "12.34", actualData.Amortization.InterestRate)
+	assert.Equal(t, "100.45", actualData.Amortization.CurrentLoanBalance)
+	assert.Equal(t, "234.56", actualData.Amortization.OriginalLoanAmount)
 
 	actualData, err = reader.parseMemorizedTransaction(context, []string{"KD"})
 	assert.Nil(t, err)
-	assert.Equal(t, qifDepositTransactionType, actualData.transactionType)
+	assert.Equal(t, qifDepositTransactionType, actualData.TransactionType)
 
 	actualData, err = reader.parseMemorizedTransaction(context, []string{"KP"})
 	assert.Nil(t, err)
-	assert.Equal(t, qifPaymentTransactionType, actualData.transactionType)
+	assert.Equal(t, qifPaymentTransactionType, actualData.TransactionType)
 
 	actualData, err = reader.parseMemorizedTransaction(context, []string{"KI"})
 	assert.Nil(t, err)
-	assert.Equal(t, qifInvestmentTransactionType, actualData.transactionType)
+	assert.Equal(t, qifInvestmentTransactionType, actualData.TransactionType)
 
 	actualData, err = reader.parseMemorizedTransaction(context, []string{"KE"})
 	assert.Nil(t, err)
-	assert.Equal(t, qifElectronicPayeeTransactionType, actualData.transactionType)
+	assert.Equal(t, qifElectronicPayeeTransactionType, actualData.TransactionType)
 }
 
 func TestQifDataReaderParseInvestmentTransaction_SupportedFields(t *testing.T) {
@@ -385,18 +385,18 @@ func TestQifDataReaderParseInvestmentTransaction_SupportedFields(t *testing.T) {
 	})
 
 	assert.Nil(t, err)
-	assert.Equal(t, "2024/10/12", actualData.date)
-	assert.Equal(t, "Buy", actualData.action)
-	assert.Equal(t, "Test", actualData.security)
-	assert.Equal(t, "12.34", actualData.price)
-	assert.Equal(t, "10", actualData.quantity)
-	assert.Equal(t, "-123.4", actualData.amount)
-	assert.Equal(t, qifClearedStatusReconciled, actualData.clearedStatus)
-	assert.Equal(t, "Foo", actualData.text)
-	assert.Equal(t, "Bar", actualData.memo)
-	assert.Equal(t, "Test2", actualData.commission)
-	assert.Equal(t, "Account Name", actualData.accountForTransfer)
-	assert.Equal(t, "100", actualData.amountTransferred)
+	assert.Equal(t, "2024/10/12", actualData.Date)
+	assert.Equal(t, "Buy", actualData.Action)
+	assert.Equal(t, "Test", actualData.Security)
+	assert.Equal(t, "12.34", actualData.Price)
+	assert.Equal(t, "10", actualData.Quantity)
+	assert.Equal(t, "-123.4", actualData.Amount)
+	assert.Equal(t, qifClearedStatusReconciled, actualData.ClearedStatus)
+	assert.Equal(t, "Foo", actualData.Text)
+	assert.Equal(t, "Bar", actualData.Memo)
+	assert.Equal(t, "Test2", actualData.Commission)
+	assert.Equal(t, "Account Name", actualData.AccountForTransfer)
+	assert.Equal(t, "100", actualData.AmountTransferred)
 }
 
 func TestQifDataReaderParseAccount_SupportedFields(t *testing.T) {
@@ -413,12 +413,12 @@ func TestQifDataReaderParseAccount_SupportedFields(t *testing.T) {
 	})
 
 	assert.Nil(t, err)
-	assert.Equal(t, "Account Name", actualData.name)
-	assert.Equal(t, "Account Type", actualData.accountType)
-	assert.Equal(t, "Some Text", actualData.description)
-	assert.Equal(t, "1234.56", actualData.creditLimit)
-	assert.Equal(t, "2024/10/12", actualData.statementBalanceDate)
-	assert.Equal(t, "123.45", actualData.statementBalanceAmount)
+	assert.Equal(t, "Account Name", actualData.Name)
+	assert.Equal(t, "Account Type", actualData.AccountType)
+	assert.Equal(t, "Some Text", actualData.Description)
+	assert.Equal(t, "1234.56", actualData.CreditLimit)
+	assert.Equal(t, "2024/10/12", actualData.StatementBalanceDate)
+	assert.Equal(t, "123.45", actualData.StatementBalanceAmount)
 }
 
 func TestQifDataReaderParseCategory_SupportedFields(t *testing.T) {
@@ -435,12 +435,12 @@ func TestQifDataReaderParseCategory_SupportedFields(t *testing.T) {
 	})
 
 	assert.Nil(t, err)
-	assert.Equal(t, "Category Name:Sub Category Name", actualData.name)
-	assert.Equal(t, "Some Text", actualData.description)
-	assert.Equal(t, true, actualData.taxRelated)
-	assert.Equal(t, qifIncomeTransaction, actualData.categoryType)
-	assert.Equal(t, "123.45", actualData.budgetAmount)
-	assert.Equal(t, "Test", actualData.taxScheduleInformation)
+	assert.Equal(t, "Category Name:Sub Category Name", actualData.Name)
+	assert.Equal(t, "Some Text", actualData.Description)
+	assert.Equal(t, true, actualData.TaxRelated)
+	assert.Equal(t, qifIncomeTransaction, actualData.CategoryType)
+	assert.Equal(t, "123.45", actualData.BudgetAmount)
+	assert.Equal(t, "Test", actualData.TaxScheduleInformation)
 
 	actualData2, err := reader.parseCategory(context, []string{
 		"NCategory Name:Sub Category Name",
@@ -449,10 +449,10 @@ func TestQifDataReaderParseCategory_SupportedFields(t *testing.T) {
 	})
 
 	assert.Nil(t, err)
-	assert.Equal(t, "Category Name:Sub Category Name", actualData2.name)
-	assert.Equal(t, "Some Text", actualData2.description)
-	assert.Equal(t, false, actualData2.taxRelated)
-	assert.Equal(t, qifExpenseTransaction, actualData2.categoryType)
+	assert.Equal(t, "Category Name:Sub Category Name", actualData2.Name)
+	assert.Equal(t, "Some Text", actualData2.Description)
+	assert.Equal(t, false, actualData2.TaxRelated)
+	assert.Equal(t, qifExpenseTransaction, actualData2.CategoryType)
 
 	actualData3, err := reader.parseCategory(context, []string{
 		"NCategory Name:Sub Category Name",
@@ -460,9 +460,9 @@ func TestQifDataReaderParseCategory_SupportedFields(t *testing.T) {
 	})
 
 	assert.Nil(t, err)
-	assert.Equal(t, "Category Name:Sub Category Name", actualData3.name)
-	assert.Equal(t, "Some Text", actualData3.description)
-	assert.Equal(t, qifExpenseTransaction, actualData3.categoryType)
+	assert.Equal(t, "Category Name:Sub Category Name", actualData3.Name)
+	assert.Equal(t, "Some Text", actualData3.Description)
+	assert.Equal(t, qifExpenseTransaction, actualData3.CategoryType)
 }
 
 func TestQifDataReaderParseClass_SupportedFields(t *testing.T) {
@@ -475,8 +475,8 @@ func TestQifDataReaderParseClass_SupportedFields(t *testing.T) {
 	})
 
 	assert.Nil(t, err)
-	assert.Equal(t, "Class Name", actualData.name)
-	assert.Equal(t, "Some Text", actualData.description)
+	assert.Equal(t, "Class Name", actualData.Name)
+	assert.Equal(t, "Some Text", actualData.Description)
 }
 
 func TestQifDataReaderParse_UnsupportedFieldsOrValues(t *testing.T) {
@@ -489,7 +489,7 @@ func TestQifDataReaderParse_UnsupportedFieldsOrValues(t *testing.T) {
 		"",
 	}, false)
 	assert.Nil(t, err)
-	assert.Equal(t, qifClearedStatusUnreconciled, actualTransactionData.clearedStatus)
+	assert.Equal(t, qifClearedStatusUnreconciled, actualTransactionData.ClearedStatus)
 
 	actualMemorizedTransactionData, err := reader.parseMemorizedTransaction(context, []string{
 		"ZTest",
@@ -497,7 +497,7 @@ func TestQifDataReaderParse_UnsupportedFieldsOrValues(t *testing.T) {
 		"",
 	})
 	assert.Nil(t, err)
-	assert.Equal(t, qifInvalidTransactionType, actualMemorizedTransactionData.transactionType)
+	assert.Equal(t, qifInvalidTransactionType, actualMemorizedTransactionData.TransactionType)
 
 	_, err = reader.parseInvestmentTransaction(context, []string{
 		"ZTest",

@@ -49,8 +49,8 @@ func (r *beancountDataReader) read(ctx core.Context) (*beancountData, error) {
 	}
 
 	data := &beancountData{
-		accounts:     make(map[string]*beancountAccount),
-		transactions: make([]*beancountTransactionEntry, 0),
+		Accounts:     make(map[string]*beancountAccount),
+		Transactions: make([]*beancountTransactionEntry, 0),
 	}
 
 	var err error
@@ -100,7 +100,7 @@ func (r *beancountDataReader) read(ctx core.Context) (*beancountData, error) {
 
 			if ('A' <= actualFirstItem[0] && actualFirstItem[0] <= 'Z') || actualFirstItem[0] == '!' { // transaction posting
 				if currentTransactionEntry != nil && currentTransactionPosting != nil {
-					currentTransactionEntry.postings = append(currentTransactionEntry.postings, currentTransactionPosting)
+					currentTransactionEntry.Postings = append(currentTransactionEntry.Postings, currentTransactionPosting)
 					currentTransactionPosting = nil
 				}
 
@@ -120,12 +120,12 @@ func (r *beancountDataReader) read(ctx core.Context) (*beancountData, error) {
 				metadataValue := metadata[1]
 
 				if currentTransactionPosting != nil {
-					if _, exists := currentTransactionPosting.metadata[metadataKey]; !exists {
-						currentTransactionPosting.metadata[metadataKey] = metadataValue
+					if _, exists := currentTransactionPosting.Metadata[metadataKey]; !exists {
+						currentTransactionPosting.Metadata[metadataKey] = metadataValue
 					}
 				} else if currentTransactionEntry != nil {
-					if _, exists := currentTransactionEntry.metadata[metadataKey]; !exists {
-						currentTransactionEntry.metadata[metadataKey] = metadataValue
+					if _, exists := currentTransactionEntry.Metadata[metadataKey]; !exists {
+						currentTransactionEntry.Metadata[metadataKey] = metadataValue
 					}
 				}
 			} else {
@@ -172,11 +172,11 @@ func (r *beancountDataReader) read(ctx core.Context) (*beancountData, error) {
 
 	if currentTransactionEntry != nil {
 		if currentTransactionPosting != nil {
-			currentTransactionEntry.postings = append(currentTransactionEntry.postings, currentTransactionPosting)
+			currentTransactionEntry.Postings = append(currentTransactionEntry.Postings, currentTransactionPosting)
 			currentTransactionPosting = nil
 		}
 
-		data.transactions = append(data.transactions, currentTransactionEntry)
+		data.Transactions = append(data.Transactions, currentTransactionEntry)
 		currentTransactionEntry = nil
 	}
 
@@ -186,11 +186,11 @@ func (r *beancountDataReader) read(ctx core.Context) (*beancountData, error) {
 func (r *beancountDataReader) updateCurrentState(data *beancountData, currentTransactionEntry *beancountTransactionEntry, currentTransactionPosting *beancountPosting) (*beancountTransactionEntry, *beancountPosting) {
 	if currentTransactionEntry != nil {
 		if currentTransactionPosting != nil {
-			currentTransactionEntry.postings = append(currentTransactionEntry.postings, currentTransactionPosting)
+			currentTransactionEntry.Postings = append(currentTransactionEntry.Postings, currentTransactionPosting)
 			currentTransactionPosting = nil
 		}
 
-		data.transactions = append(data.transactions, currentTransactionEntry)
+		data.Transactions = append(data.Transactions, currentTransactionEntry)
 		currentTransactionEntry = nil
 		currentTransactionPosting = nil
 	}
@@ -277,7 +277,7 @@ func (r *beancountDataReader) readAccountLine(ctx core.Context, lineIndex int, i
 
 	var err error
 	accountName := r.getNotEmptyItemByIndex(items, 2)
-	account, exists := data.accounts[accountName]
+	account, exists := data.Accounts[accountName]
 
 	if !exists {
 		account, err = r.createAccount(ctx, data, accountName)
@@ -288,10 +288,10 @@ func (r *beancountDataReader) readAccountLine(ctx core.Context, lineIndex int, i
 	}
 
 	if directive == beancountDirectiveOpen {
-		account.openDate = date
+		account.OpenDate = date
 		return account, nil
 	} else if directive == beancountDirectiveClose {
-		account.closeDate = date
+		account.CloseDate = date
 		return account, nil
 	} else {
 		log.Warnf(ctx, "[beancount_data_reader.parseAccount] cannot parse account line#%d \"%s\", because directive is invalid", lineIndex, strings.Join(items, " "))
@@ -301,8 +301,8 @@ func (r *beancountDataReader) readAccountLine(ctx core.Context, lineIndex int, i
 
 func (r *beancountDataReader) createAccount(ctx core.Context, data *beancountData, accountName string) (*beancountAccount, error) {
 	account := &beancountAccount{
-		name:        accountName,
-		accountType: beancountUnknownAccountType,
+		Name:        accountName,
+		AccountType: beancountUnknownAccountType,
 	}
 
 	accountNameItems := strings.Split(accountName, beancountAccountNameItemsSeparator)
@@ -311,31 +311,31 @@ func (r *beancountDataReader) createAccount(ctx core.Context, data *beancountDat
 		accountType, exists := r.accountTypeNameMap[accountNameItems[0]]
 
 		if exists {
-			account.accountType = accountType
+			account.AccountType = accountType
 		} else {
 			log.Warnf(ctx, "[beancount_data_reader.createAccount] cannot parse account \"%s\", because account type \"%s\" is invalid", accountName, accountNameItems[0])
 			return nil, errs.ErrInvalidBeancountFile
 		}
 	}
 
-	data.accounts[accountName] = account
+	data.Accounts[accountName] = account
 	return account, nil
 }
 
 func (r *beancountDataReader) readTransactionLine(ctx core.Context, lineIndex int, items []string, date string, directive beancountDirective, tags []string) *beancountTransactionEntry {
 	transactionEntry := &beancountTransactionEntry{
-		date:      date,
-		directive: directive,
-		tags:      make([]string, 0),
-		links:     make([]string, 0),
-		metadata:  make(map[string]string),
+		Date:      date,
+		Directive: directive,
+		Tags:      make([]string, 0),
+		Links:     make([]string, 0),
+		Metadata:  make(map[string]string),
 	}
 
-	transactionEntry.tags = append(transactionEntry.tags, tags...)
+	transactionEntry.Tags = append(transactionEntry.Tags, tags...)
 
-	allTags := make(map[string]bool, len(transactionEntry.tags))
+	allTags := make(map[string]bool, len(transactionEntry.Tags))
 
-	for _, tag := range transactionEntry.tags {
+	for _, tag := range transactionEntry.Tags {
 		allTags[tag] = true
 	}
 
@@ -363,7 +363,7 @@ func (r *beancountDataReader) readTransactionLine(ctx core.Context, lineIndex in
 			tagName := item[1:]
 
 			if _, exists := allTags[tagName]; !exists {
-				transactionEntry.tags = append(transactionEntry.tags, tagName)
+				transactionEntry.Tags = append(transactionEntry.Tags, tagName)
 				allTags[tagName] = true
 			}
 
@@ -371,7 +371,7 @@ func (r *beancountDataReader) readTransactionLine(ctx core.Context, lineIndex in
 				payeeNarrationLastIndex = i - 1
 			}
 		} else if item[0] == beancountLinkPrefix { // [ˆlink]
-			transactionEntry.links = append(transactionEntry.links, item[1:])
+			transactionEntry.Links = append(transactionEntry.Links, item[1:])
 
 			if i-1 < payeeNarrationLastIndex {
 				payeeNarrationLastIndex = i - 1
@@ -380,10 +380,10 @@ func (r *beancountDataReader) readTransactionLine(ctx core.Context, lineIndex in
 	}
 
 	if payeeNarrationLastIndex-payeeNarrationFirstIndex >= 1 {
-		transactionEntry.payee = items[payeeNarrationFirstIndex]
-		transactionEntry.narration = items[payeeNarrationFirstIndex+1]
+		transactionEntry.Payee = items[payeeNarrationFirstIndex]
+		transactionEntry.Narration = items[payeeNarrationFirstIndex+1]
 	} else if payeeNarrationLastIndex-payeeNarrationFirstIndex >= 0 {
-		transactionEntry.narration = items[payeeNarrationFirstIndex]
+		transactionEntry.Narration = items[payeeNarrationFirstIndex]
 	}
 
 	return transactionEntry
@@ -410,36 +410,36 @@ func (r *beancountDataReader) readTransactionPostingLine(ctx core.Context, lineI
 	}
 
 	transactionPositing := &beancountPosting{
-		account:  accountName,
-		metadata: make(map[string]string),
+		Account:  accountName,
+		Metadata: make(map[string]string),
 	}
 
 	amountActualLastIndex := -1
-	transactionPositing.originalAmount, amountActualLastIndex = r.getOriginalAmountAndLastIndexFromIndex(items, accountNameActualIndex+1)
+	transactionPositing.OriginalAmount, amountActualLastIndex = r.getOriginalAmountAndLastIndexFromIndex(items, accountNameActualIndex+1)
 
-	if transactionPositing.originalAmount == "" || amountActualLastIndex < 0 {
+	if transactionPositing.OriginalAmount == "" || amountActualLastIndex < 0 {
 		log.Warnf(ctx, "[beancount_data_reader.readTransactionPostingLine] cannot parse transaction posting line#%d \"%s\", because missing amount", lineIndex, strings.Join(items, " "))
 		return nil, errs.ErrAmountInvalid
 	}
 
-	finalAmount, err := evaluateBeancountAmountExpression(ctx, transactionPositing.originalAmount)
+	finalAmount, err := evaluateBeancountAmountExpression(ctx, transactionPositing.OriginalAmount)
 
 	if err != nil {
 		log.Warnf(ctx, "[beancount_data_reader.readTransactionPostingLine] cannot evaluate amount expression in line#%d \"%s\", because %s", lineIndex, strings.Join(items, " "), err.Error())
 		return nil, errs.ErrAmountInvalid
 	} else {
-		transactionPositing.amount = finalAmount
+		transactionPositing.Amount = finalAmount
 	}
 
 	commodityActualIndex := -1
-	transactionPositing.commodity, commodityActualIndex = r.getNotEmptyItemAndIndexFromIndex(items, amountActualLastIndex+1)
+	transactionPositing.Commodity, commodityActualIndex = r.getNotEmptyItemAndIndexFromIndex(items, amountActualLastIndex+1)
 
-	if transactionPositing.commodity == "" || commodityActualIndex < 0 {
+	if transactionPositing.Commodity == "" || commodityActualIndex < 0 {
 		log.Warnf(ctx, "[beancount_data_reader.readTransactionPostingLine] cannot parse transaction posting line#%d \"%s\", because missing commodity", lineIndex, strings.Join(items, " "))
 		return nil, errs.ErrInvalidBeancountFile
 	}
 
-	if strings.ToUpper(transactionPositing.commodity) != transactionPositing.commodity { // The syntax for a currency is a word all in capital letters
+	if strings.ToUpper(transactionPositing.Commodity) != transactionPositing.Commodity { // The syntax for a currency is a word all in capital letters
 		log.Warnf(ctx, "[beancount_data_reader.readTransactionPostingLine] cannot parse transaction posting line#%d \"%s\", because commodity name is not capital letters", lineIndex, strings.Join(items, " "))
 		return nil, errs.ErrInvalidBeancountFile
 	}
@@ -461,13 +461,13 @@ func (r *beancountDataReader) readTransactionPostingLine(ctx core.Context, lineI
 				totalCost, totalCostActualIndex := r.getNotEmptyItemAndIndexFromIndex(items, i+1)
 
 				if totalCostActualIndex > 0 {
-					transactionPositing.totalCost = totalCost
+					transactionPositing.TotalCost = totalCost
 					i = totalCostActualIndex
 
 					totalCostCommodity, totalCostCommodityActualIndex := r.getNotEmptyItemAndIndexFromIndex(items, totalCostActualIndex+1)
 
 					if totalCostCommodityActualIndex > 0 {
-						transactionPositing.totalCostCommodity = totalCostCommodity
+						transactionPositing.TotalCostCommodity = totalCostCommodity
 						i = totalCostCommodityActualIndex
 					}
 				}
@@ -475,13 +475,13 @@ func (r *beancountDataReader) readTransactionPostingLine(ctx core.Context, lineI
 				price, priceActualIndex := r.getNotEmptyItemAndIndexFromIndex(items, i+1)
 
 				if priceActualIndex > 0 {
-					transactionPositing.price = price
+					transactionPositing.Price = price
 					i = priceActualIndex
 
 					priceCommodity, priceCommodityActualIndex := r.getNotEmptyItemAndIndexFromIndex(items, priceActualIndex+1)
 
 					if priceCommodityActualIndex > 0 {
-						transactionPositing.priceCommodity = priceCommodity
+						transactionPositing.PriceCommodity = priceCommodity
 						i = priceCommodityActualIndex
 					}
 				}
@@ -489,11 +489,11 @@ func (r *beancountDataReader) readTransactionPostingLine(ctx core.Context, lineI
 		}
 	}
 
-	if transactionPositing.account != "" {
-		_, exists := data.accounts[transactionPositing.account]
+	if transactionPositing.Account != "" {
+		_, exists := data.Accounts[transactionPositing.Account]
 
 		if !exists {
-			_, err := r.createAccount(ctx, data, transactionPositing.account)
+			_, err := r.createAccount(ctx, data, transactionPositing.Account)
 
 			if err != nil {
 				return nil, err

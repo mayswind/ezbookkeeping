@@ -54,8 +54,8 @@ func TestMT940DataReaderParse(t *testing.T) {
 	assert.Equal(t, "NTRF", actualData.Statements[0].TransactionTypeIdentificationCode)
 	assert.Equal(t, "TEST", actualData.Statements[0].ReferenceForAccountOwner)
 	assert.Equal(t, "ABC123456", actualData.Statements[0].ReferenceOfAccountServicingInstitution)
-	assert.Equal(t, "First Transaction", actualData.Statements[0].AdditionalInformation[0])
-	assert.Equal(t, "Additional Info", actualData.Statements[0].AdditionalInformation[1])
+	assert.Equal(t, "First Transaction", actualData.Statements[0].InformationToAccountOwner[0])
+	assert.Equal(t, "Additional Info", actualData.Statements[0].InformationToAccountOwner[1])
 
 	assert.Equal(t, "250602", actualData.Statements[1].ValueDate)
 	assert.Equal(t, "0620", actualData.Statements[1].EntryDate)
@@ -65,8 +65,8 @@ func TestMT940DataReaderParse(t *testing.T) {
 	assert.Equal(t, "NSTF", actualData.Statements[1].TransactionTypeIdentificationCode)
 	assert.Equal(t, "FOOBAR", actualData.Statements[1].ReferenceForAccountOwner)
 	assert.Equal(t, "DEF789012", actualData.Statements[1].ReferenceOfAccountServicingInstitution)
-	assert.Equal(t, "Second Transaction", actualData.Statements[1].AdditionalInformation[0])
-	assert.Equal(t, "More Info", actualData.Statements[1].AdditionalInformation[1])
+	assert.Equal(t, "Second Transaction", actualData.Statements[1].InformationToAccountOwner[0])
+	assert.Equal(t, "More Info", actualData.Statements[1].InformationToAccountOwner[1])
 
 	assert.Equal(t, MT_MARK_CREDIT, actualData.ClosingBalance.DebitCreditMark)
 	assert.Equal(t, "250602", actualData.ClosingBalance.Date)
@@ -114,7 +114,7 @@ func TestMT940DataReaderParse_NoBlockHeaderFooter(t *testing.T) {
 	assert.Equal(t, "NTRF", actualData.Statements[0].TransactionTypeIdentificationCode)
 	assert.Equal(t, "TEST", actualData.Statements[0].ReferenceForAccountOwner)
 	assert.Equal(t, "ABC123456", actualData.Statements[0].ReferenceOfAccountServicingInstitution)
-	assert.Equal(t, "First Transaction", actualData.Statements[0].AdditionalInformation[0])
+	assert.Equal(t, "First Transaction", actualData.Statements[0].InformationToAccountOwner[0])
 }
 
 func TestMT940DataReaderParse_ReferenceForTheAccountOwnerTwoLine(t *testing.T) {
@@ -138,7 +138,7 @@ func TestMT940DataReaderParse_ReferenceForTheAccountOwnerTwoLine(t *testing.T) {
 	assert.Equal(t, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", actualData.Statements[0].ReferenceForAccountOwner)
 }
 
-func TestMT940DataReaderParse_AdditionalInformationSixLine(t *testing.T) {
+func TestMT940DataReaderParse_InformationToAccountOwnerSixLine(t *testing.T) {
 	reader := &mt940DataReader{
 		allLines: []string{
 			":61:250601D123,45NTRFTEST",
@@ -162,16 +162,16 @@ func TestMT940DataReaderParse_AdditionalInformationSixLine(t *testing.T) {
 	assert.Equal(t, "123,45", actualData.Statements[0].Amount)
 	assert.Equal(t, "NTRF", actualData.Statements[0].TransactionTypeIdentificationCode)
 	assert.Equal(t, "TEST", actualData.Statements[0].ReferenceForAccountOwner)
-	assert.Equal(t, 6, len(actualData.Statements[0].AdditionalInformation))
-	assert.Equal(t, "Additional Info Line 1", actualData.Statements[0].AdditionalInformation[0])
-	assert.Equal(t, "Additional Info Line 2", actualData.Statements[0].AdditionalInformation[1])
-	assert.Equal(t, "Additional Info Line 3", actualData.Statements[0].AdditionalInformation[2])
-	assert.Equal(t, "Additional Info Line 4", actualData.Statements[0].AdditionalInformation[3])
-	assert.Equal(t, "Additional Info Line 5", actualData.Statements[0].AdditionalInformation[4])
-	assert.Equal(t, "Additional Info Line 6", actualData.Statements[0].AdditionalInformation[5])
+	assert.Equal(t, 6, len(actualData.Statements[0].InformationToAccountOwner))
+	assert.Equal(t, "Additional Info Line 1", actualData.Statements[0].InformationToAccountOwner[0])
+	assert.Equal(t, "Additional Info Line 2", actualData.Statements[0].InformationToAccountOwner[1])
+	assert.Equal(t, "Additional Info Line 3", actualData.Statements[0].InformationToAccountOwner[2])
+	assert.Equal(t, "Additional Info Line 4", actualData.Statements[0].InformationToAccountOwner[3])
+	assert.Equal(t, "Additional Info Line 5", actualData.Statements[0].InformationToAccountOwner[4])
+	assert.Equal(t, "Additional Info Line 6", actualData.Statements[0].InformationToAccountOwner[5])
 }
 
-func TestMT940DataReaderParse_AdditionalInformationMoreThanSixLine(t *testing.T) {
+func TestMT940DataReaderParse_InformationToAccountOwnerMoreThanSixLine(t *testing.T) {
 	reader := &mt940DataReader{
 		allLines: []string{
 			":61:250601D123,45NTRFTEST",
@@ -196,13 +196,13 @@ func TestMT940DataReaderParse_AdditionalInformationMoreThanSixLine(t *testing.T)
 	assert.Equal(t, "123,45", actualData.Statements[0].Amount)
 	assert.Equal(t, "NTRF", actualData.Statements[0].TransactionTypeIdentificationCode)
 	assert.Equal(t, "TEST", actualData.Statements[0].ReferenceForAccountOwner)
-	assert.Equal(t, 6, len(actualData.Statements[0].AdditionalInformation))
-	assert.Equal(t, "Additional Info Line 1", actualData.Statements[0].AdditionalInformation[0])
-	assert.Equal(t, "Additional Info Line 2", actualData.Statements[0].AdditionalInformation[1])
-	assert.Equal(t, "Additional Info Line 3", actualData.Statements[0].AdditionalInformation[2])
-	assert.Equal(t, "Additional Info Line 4", actualData.Statements[0].AdditionalInformation[3])
-	assert.Equal(t, "Additional Info Line 5", actualData.Statements[0].AdditionalInformation[4])
-	assert.Equal(t, "Additional Info Line 6", actualData.Statements[0].AdditionalInformation[5])
+	assert.Equal(t, 6, len(actualData.Statements[0].InformationToAccountOwner))
+	assert.Equal(t, "Additional Info Line 1", actualData.Statements[0].InformationToAccountOwner[0])
+	assert.Equal(t, "Additional Info Line 2", actualData.Statements[0].InformationToAccountOwner[1])
+	assert.Equal(t, "Additional Info Line 3", actualData.Statements[0].InformationToAccountOwner[2])
+	assert.Equal(t, "Additional Info Line 4", actualData.Statements[0].InformationToAccountOwner[3])
+	assert.Equal(t, "Additional Info Line 5", actualData.Statements[0].InformationToAccountOwner[4])
+	assert.Equal(t, "Additional Info Line 6", actualData.Statements[0].InformationToAccountOwner[5])
 }
 
 func TestMT940DataReaderParse_DuplicateBlockHeader(t *testing.T) {

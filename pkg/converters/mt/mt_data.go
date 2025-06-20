@@ -1,5 +1,7 @@
 package mt
 
+import "strings"
+
 type mtCreditDebitMark string
 
 const (
@@ -7,6 +9,10 @@ const (
 	MT_MARK_DEBIT           mtCreditDebitMark = "D"
 	MT_MARK_REVERSAL_CREDIT mtCreditDebitMark = "RC"
 	MT_MARK_REVERSAL_DEBIT  mtCreditDebitMark = "RD"
+)
+
+const (
+	MT_INFORMATION_TO_ACCOUNT_OWNER_TAG_REMITTANCE string = "REMI"
 )
 
 // mt940Data defines the structure of mt940 data
@@ -31,7 +37,7 @@ type mtStatement struct {
 	TransactionTypeIdentificationCode      string
 	ReferenceForAccountOwner               string
 	ReferenceOfAccountServicingInstitution string
-	AdditionalInformation                  []string
+	InformationToAccountOwner              []string
 }
 
 // mtBalance defines the structure of mt940 balance
@@ -40,4 +46,28 @@ type mtBalance struct {
 	Date            string
 	Currency        string
 	Amount          string
+}
+
+// GetInformationToAccountOwnerMap returns a map of additional information
+func (s *mtStatement) GetInformationToAccountOwnerMap() map[string]string {
+	additionalInfoMap := make(map[string]string, len(s.InformationToAccountOwner))
+
+	for _, info := range s.InformationToAccountOwner {
+		items := strings.Split(info, "/")
+
+		if len(items) < 3 {
+			continue
+		}
+
+		for i := 2; i < len(items); i += 2 {
+			key := strings.TrimSpace(items[i-1])
+			value := strings.TrimSpace(items[i])
+
+			if len(key) > 0 {
+				additionalInfoMap[key] = value
+			}
+		}
+	}
+
+	return additionalInfoMap
 }

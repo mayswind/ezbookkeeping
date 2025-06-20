@@ -17,20 +17,20 @@ const mtBasicHeaderBlockPrefix = "{1:"
 const mtTextBlockStartPrefix = "{4:"
 const mtTextBlockEndPrefix = "-}"
 const mtTagPrefix = ':'
-const mtStatementAdditionalInformationMaxLines = 6
+const mtInformationToAccountOwnerMaxLines = 6
 
 const (
-	mtTagStatementReferenceNumber       = ":20:"
-	mtTagRelatedReference               = ":21:"
-	mtTagAccountId                      = ":25:"
-	mtTagSequentialNumber               = ":28C:"
-	mtTagOpeningBalanceF                = ":60F:"
-	mtTagOpeningBalanceM                = ":60M:"
-	mtTagClosingBalanceF                = ":62F:"
-	mtTagClosingBalanceM                = ":62M:"
-	mtTagClosingAvailableBalance        = ":64:"
-	mtTagStatementLine                  = ":61:"
-	mtTagStatementAdditionalInformation = ":86:"
+	mtTagStatementReferenceNumber  = ":20:"
+	mtTagRelatedReference          = ":21:"
+	mtTagAccountId                 = ":25:"
+	mtTagSequentialNumber          = ":28C:"
+	mtTagOpeningBalanceF           = ":60F:"
+	mtTagOpeningBalanceM           = ":60M:"
+	mtTagClosingBalanceF           = ":62F:"
+	mtTagClosingBalanceM           = ":62M:"
+	mtTagClosingAvailableBalance   = ":64:"
+	mtTagStatementLine             = ":61:"
+	mtTagInformationToAccountOwner = ":86:"
 )
 
 const (
@@ -123,16 +123,16 @@ func (r *mt940DataReader) read(ctx core.Context) (*mt940Data, error) {
 
 			currentStatement = statement
 			lastTag = mtTagStatementLine
-		} else if strings.HasPrefix(line, mtTagStatementAdditionalInformation) && currentStatement != nil {
-			currentStatement.AdditionalInformation = make([]string, 1)
-			currentStatement.AdditionalInformation[0] = line[len(mtTagStatementAdditionalInformation):]
-			lastTag = mtTagStatementAdditionalInformation
+		} else if strings.HasPrefix(line, mtTagInformationToAccountOwner) && currentStatement != nil {
+			currentStatement.InformationToAccountOwner = make([]string, 1)
+			currentStatement.InformationToAccountOwner[0] = line[len(mtTagInformationToAccountOwner):]
+			lastTag = mtTagInformationToAccountOwner
 		} else if line[0] != mtTagPrefix && lastTag == mtTagStatementLine && currentStatement != nil {
 			currentStatement.ReferenceForAccountOwner += line
 			lastTag = ""
-		} else if line[0] != mtTagPrefix && lastTag == mtTagStatementAdditionalInformation && currentStatement != nil && len(currentStatement.AdditionalInformation) < mtStatementAdditionalInformationMaxLines {
-			currentStatement.AdditionalInformation = append(currentStatement.AdditionalInformation, line)
-			lastTag = mtTagStatementAdditionalInformation
+		} else if line[0] != mtTagPrefix && lastTag == mtTagInformationToAccountOwner && currentStatement != nil && len(currentStatement.InformationToAccountOwner) < mtInformationToAccountOwnerMaxLines {
+			currentStatement.InformationToAccountOwner = append(currentStatement.InformationToAccountOwner, line)
+			lastTag = mtTagInformationToAccountOwner
 		} else {
 			log.Warnf(ctx, "[mt_data_reader.read] unsupported line \"%s\" and skip this line", line)
 		}

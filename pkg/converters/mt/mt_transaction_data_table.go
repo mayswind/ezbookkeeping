@@ -151,7 +151,15 @@ func (t *mt940TransactionDataRowIterator) parseTransaction(ctx core.Context, use
 		return nil, errs.ErrTransactionTypeInvalid
 	}
 
-	data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = strings.Join(statement.AdditionalInformation, "\n")
+	informationToAccountOwnerMap := statement.GetInformationToAccountOwnerMap()
+
+	if len(informationToAccountOwnerMap) > 0 {
+		if value, exists := informationToAccountOwnerMap[MT_INFORMATION_TO_ACCOUNT_OWNER_TAG_REMITTANCE]; exists {
+			data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = value
+		}
+	} else {
+		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = strings.Join(statement.InformationToAccountOwner, "\n")
+	}
 
 	return data, nil
 }

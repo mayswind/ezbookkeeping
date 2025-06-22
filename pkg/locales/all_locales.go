@@ -38,5 +38,5 @@ var AllLanguages = map[string]*LocaleInfo{
 	},
 	"pt-BR": {
 		Content: ptBR,
-	}
+	},
 }

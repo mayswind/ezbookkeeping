@@ -12,17 +12,17 @@
                             <v-list>
                                 <v-list-subheader :title="tt('File Format')"/>
                                 <v-list-item :prepend-icon="mdiComma"
-                                             :append-icon="fileFormat === 'csv' ? mdiCheck : undefined"
+                                             :append-icon="fileFormat === KnownFileType.CSV.extension ? mdiCheck : undefined"
                                              :title="tt('CSV (Comma-separated values) File')"
-                                             @click="fileFormat = 'csv'"></v-list-item>
+                                             @click="fileFormat = KnownFileType.CSV.extension"></v-list-item>
                                 <v-list-item :prepend-icon="mdiKeyboardTab"
-                                             :append-icon="fileFormat === 'tsv' ? mdiCheck : undefined"
+                                             :append-icon="fileFormat === KnownFileType.TSV.extension ? mdiCheck : undefined"
                                              :title="tt('TSV (Tab-separated values) File')"
-                                             @click="fileFormat = 'tsv'"></v-list-item>
+                                             @click="fileFormat = KnownFileType.TSV.extension"></v-list-item>
                                 <v-list-item :prepend-icon="mdiLanguageMarkdownOutline"
-                                             :append-icon="fileFormat === 'md' ? mdiCheck : undefined"
+                                             :append-icon="fileFormat === KnownFileType.MARKDOWN.extension ? mdiCheck : undefined"
                                              :title="tt('Markdown File')"
-                                             @click="fileFormat = 'md'"></v-list-item>
+                                             @click="fileFormat = KnownFileType.MARKDOWN.extension"></v-list-item>
                             </v-list>
                         </v-menu>
                     </v-btn>
@@ -91,6 +91,7 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useUserStore } from '@/stores/user.ts';
 
+import { KnownFileType } from '@/core/file.ts';
 import { replaceAll } from '@/lib/common.ts';
 import { copyTextToClipboard, startDownloadFile } from '@/lib/ui/common.ts';
 
@@ -115,8 +116,20 @@ const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const showState = ref<boolean>(false);
 const headers = ref<string[]>([]);
 const data = ref<string[][]>([]);
-const fileFormat = ref<string>('csv');
+const fileFormat = ref<string>(KnownFileType.CSV.extension);
 const showRawData = ref<boolean>(false);
+
+const fileName = computed<string>(() => {
+    const nickname = userStore.currentUserNickname;
+
+    if (nickname) {
+        return tt('dataExport.exportStatisticsFileName', {
+            nickname: nickname
+        });
+    }
+
+    return tt('dataExport.defaultExportStatisticsFileName');
+});
 
 const dataTableHeaders = computed<object[]>(() => {
     return headers.value.map((header, index) => ({
@@ -143,10 +156,10 @@ const dataTableItems = computed<object[]>(() => {
 const exportedData = computed<string>(() => {
     let ret = '';
 
-    if (fileFormat.value === 'csv' || fileFormat.value === 'tsv') {
+    if (fileFormat.value === KnownFileType.CSV.extension || fileFormat.value === KnownFileType.TSV.extension) {
         let separator = ',';
 
-        if (fileFormat.value === 'tsv') {
+        if (fileFormat.value === KnownFileType.TSV.extension) {
             separator = '\t';
         }
 
@@ -158,7 +171,7 @@ const exportedData = computed<string>(() => {
             ret += '\n';
             ret += row.map(item => replaceAll(item, separator, ' ')).join(separator);
         }
-    } else if (fileFormat.value === 'md') {
+    } else if (fileFormat.value === KnownFileType.MARKDOWN.extension) {
         ret += '| ' + headers.value.map(item => replaceAll(item, '|', ' ')).join(' | ') + ' |';
         ret += '\n';
         ret += '| ' + headers.value.map(() => '---').join(' | ') + ' |';
@@ -173,22 +186,10 @@ const exportedData = computed<string>(() => {
     return ret;
 });
 
-function getExportFileName(fileExtension: string): string {
-    const nickname = userStore.currentUserNickname;
-
-    if (nickname) {
-        return tt('dataExport.exportStatisticsFileName', {
-            nickname: nickname
-        }) + '.' + fileExtension;
-    }
-
-    return tt('dataExport.defaultExportStatisticsFileName') + '.' + fileExtension;
-}
-
 function open(options: { headers: string[], data: string[][] }): void {
     headers.value = options.headers || [];
     data.value = options.data || [];
-    fileFormat.value = 'csv';
+    fileFormat.value = KnownFileType.CSV.extension;
     showRawData.value = false;
     showState.value = true;
 }
@@ -199,15 +200,13 @@ function copy(): void {
 }
 
 function save(): void {
-    let contentType = 'text/csv';
+    let fileType = KnownFileType.parse(fileFormat.value);
 
-    if (fileFormat.value === 'tsv') {
-        contentType = 'text/tab-separated-values';
-    } else if (fileFormat.value === 'md') {
-        contentType = 'text/markdown';
+    if (!fileType) {
+        fileType = KnownFileType.CSV;
     }
 
-    startDownloadFile(getExportFileName(fileFormat.value), new Blob([exportedData.value], { type: contentType }));
+    startDownloadFile(fileType.formatFileName(fileName.value), fileType.createBlob(exportedData.value));
 }
 
 function cancel(): void {

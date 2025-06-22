@@ -55,6 +55,7 @@ const props = defineProps<{
     readonly?: boolean;
     clearable?: boolean;
     label?: string;
+    noDataText?: string;
 }>();
 
 const emit = defineEmits<{
@@ -83,6 +84,8 @@ const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
 const displayTime = computed<string>(() => {
     if (props.modelValue) {
         return formatDateToLongDate(props.modelValue);
+    } else if (props.noDataText) {
+        return props.noDataText;
     } else {
         return tt('Unspecified');
     }

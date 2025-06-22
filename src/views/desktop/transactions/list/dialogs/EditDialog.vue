@@ -258,6 +258,7 @@
                                         :disabled="loading || submitting"
                                         :clearable="true"
                                         :label="tt('Start Date')"
+                                        :no-data-text="tt('No limit')"
                                         v-model="transaction.scheduledStartDate" />
                                 </v-col>
                                 <v-col cols="12" md="6" v-if="type === TransactionEditPageType.Template && transaction instanceof TransactionTemplate && transaction.templateType === TemplateType.Schedule.type">
@@ -266,6 +267,7 @@
                                         :disabled="loading || submitting"
                                         :clearable="true"
                                         :label="tt('End Date')"
+                                        :no-data-text="tt('No limit')"
                                         v-model="transaction.scheduledEndDate" />
                                 </v-col>
                                 <v-col cols="12" md="12" v-if="type === TransactionEditPageType.Transaction">

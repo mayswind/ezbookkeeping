@@ -756,7 +756,7 @@ const transactionDisplayScheduledStartDate = computed<string>(() => {
     if (template.scheduledStartDate) {
         return formatDateToLongDate(template.scheduledStartDate);
     } else {
-        return tt('Unspecified');
+        return tt('No limit');
     }
 });
 
@@ -770,7 +770,7 @@ const transactionDisplayScheduledEndDate = computed<string>(() => {
     if (template.scheduledEndDate) {
         return formatDateToLongDate(template.scheduledEndDate);
     } else {
-        return tt('Unspecified');
+        return tt('No limit');
     }
 });
 

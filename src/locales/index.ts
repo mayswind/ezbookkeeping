@@ -59,6 +59,12 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         alternativeLanguageTag: 'ja-JP',
         content: ja
     },
+    'pt-BR': {
+        name: 'Portuguese (Brazil)',
+        displayName: 'Português (Brasil)',
+        alternativeLanguageTag: 'pt-BR',
+        content: ptBR
+    },
     'ru': {
         name: 'Russian',
         displayName: 'Русский',
@@ -90,12 +96,5 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         alternativeLanguageTag: 'zh-TW',
         aliases: ['zh-CHT', 'zh-TW', 'zh-HK', 'zh-MO'],
         content: zhHant
-    },
-    'pt-BR': {
-        name: 'Portuguese (Brazil)',
-        displayName: 'Português (Brasil)',
-        alternativeLanguageTag: 'pt-BR',
-        aliases: ['pt'],
-        content: ptBR
     },
 };

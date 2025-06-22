@@ -17,28 +17,28 @@
         "Chinese (Traditional)": "Chinês (Tradicional)"
     },
     "default": {
-        "currency": "USD",
-        "firstDayOfWeek": "Domingo",
+        "currency": "BRL",
+        "firstDayOfWeek": "Monday",
         "fiscalYearFormat": "EndYYYY",
-        "longDateFormat": "MMDDYYYY",
-        "shortDateFormat": "MMDDYYYY",
-        "longTimeFormat": "HHMMSSA",
-        "shortTimeFormat": "HHMMA",
-        "decimalSeparator": "Ponto",
-        "digitGroupingSymbol": "Vírgula",
-        "digitGrouping": "SeparadorDeMilhares",
-        "currencyDisplayType": "SímboloAntesDoValor"
+        "longDateFormat": "DDMMYYYY",
+        "shortDateFormat": "DDMMYYYY",
+        "longTimeFormat": "HHMMSS",
+        "shortTimeFormat": "HHMM",
+        "decimalSeparator": "Comma",
+        "digitGroupingSymbol": "Space",
+        "digitGrouping": "ThousandsSeparator",
+        "currencyDisplayType": "SymbolAfterAmount"
     },
     "format": {
         "longDate": {
             "yyyy_mm_dd": "YYYY MMMM DD",
             "mm_dd_yyyy": "MMMM D, YYYY",
-            "dd_mm_yyyy": "D MMMM, YYYY"
+            "dd_mm_yyyy": "D [de] MMMM [de] YYYY"
         },
         "shortDate": {
-            "yyyy_mm_dd": "YYYY-M-D",
-            "mm_dd_yyyy": "M/D/YYYY",
-            "dd_mm_yyyy": "D/M/YYYY"
+            "yyyy_mm_dd": "YYYY/MM/DD",
+            "mm_dd_yyyy": "MM/DD/YYYY",
+            "dd_mm_yyyy": "DD/MM/YYYY"
         },
         "longYear": {
             "yyyy_mm_dd": "YYYY",
@@ -53,22 +53,22 @@
         "longYearMonth": {
             "yyyy_mm_dd": "YYYY MMMM",
             "mm_dd_yyyy": "MMMM, YYYY",
-            "dd_mm_yyyy": "MMMM, YYYY"
+            "dd_mm_yyyy": "MMMM [de] YYYY"
         },
         "shortYearMonth": {
-            "yyyy_mm_dd": "YYYY-M",
+            "yyyy_mm_dd": "YYYY/MM",
             "mm_dd_yyyy": "MMM, YYYY",
             "dd_mm_yyyy": "MMM, YYYY"
         },
         "longMonthDay": {
             "yyyy_mm_dd": "MMMM DD",
             "mm_dd_yyyy": "MMMM D",
-            "dd_mm_yyyy": "D MMMM"
+            "dd_mm_yyyy": "D [de] MMMM"
         },
         "shortMonthDay": {
-            "yyyy_mm_dd": "M-D",
-            "mm_dd_yyyy": "M/D",
-            "dd_mm_yyyy": "D/M"
+            "yyyy_mm_dd": "MM/DD",
+            "mm_dd_yyyy": "MM/DD",
+            "dd_mm_yyyy": "DD/MM"
         },
         "longTime": {
             "hh_mm_ss": "HH:mm:ss",
@@ -81,10 +81,10 @@
             "hh_mm_a": "hh:mm A"
         },
         "yearQuarter": {
-            "q1": "{year}T1",
-            "q2": "{year}T2",
-            "q3": "{year}T3",
-            "q4": "{year}T4"
+            "q1": "T1 {year}",
+            "q2": "T2 {year}",
+            "q3": "T3 {year}",
+            "q4": "T4 {year}"
         },
         "fiscalYear": {
             "StartYYYY_EndYYYY": "AF {StartYYYY}-{EndYYYY}",
@@ -94,7 +94,7 @@
             "EndYY": "AF {EndYY}"
         },
         "misc": {
-            "multiTextJoinSeparator": ",",
+            "multiTextJoinSeparator": ", ",
             "hoursBehindDefaultTimezone": "{hours} hora(s) atrás do fuso horário padrão",
             "hoursAheadOfDefaultTimezone": "{hours} hora(s) à frente do fuso horário padrão",
             "hoursMinutesBehindDefaultTimezone": "{hours} hora(s) e {minutes} minutos atrás do fuso horário padrão",
@@ -263,68 +263,68 @@
         }
     },
     "timezone": {
-        "International Date Line West": "Linha Internacional de Data Oeste",
+        "International Date Line West": "Linha de Data Internacional Oeste",
         "Coordinated Universal Time-11": "Tempo Universal Coordenado-11",
         "Aleutian Islands": "Ilhas Aleutas",
         "Hawaii": "Havaí",
         "Marquesas Islands": "Ilhas Marquesas",
         "Alaska": "Alasca",
         "Coordinated Universal Time-09": "Tempo Universal Coordenado-09",
-        "Baja California": "Baixa Califórnia",
+        "Baja California": "Baja Califórnia",
         "Coordinated Universal Time-08": "Tempo Universal Coordenado-08",
-        "Pacific Time (US & Canada)": "Horário do Pacífico (EUA e Canadá)",
+        "Pacific Time (US & Canada)": "Hora do Pacífico (EUA e Canadá)",
         "Arizona": "Arizona",
         "La Paz, Mazatlan": "La Paz, Mazatlán",
-        "Mountain Time (US & Canada)": "Horário das Montanhas (EUA e Canadá)",
+        "Mountain Time (US & Canada)": "Hora das Montanhas (EUA e Canadá)",
         "Yukon": "Yukon",
         "Central America": "América Central",
-        "Central Time (US & Canada)": "Horário Central (EUA e Canadá)",
-        "Easter Island": "Ilha de Páscoa",
+        "Central Time (US & Canada)": "Hora Central (EUA e Canadá)",
+        "Easter Island": "Ilha da Páscoa",
         "Guadalajara, Mexico City, Monterrey": "Guadalajara, Cidade do México, Monterrey",
         "Saskatchewan": "Saskatchewan",
         "Bogota, Lima, Quito, Rio Branco": "Bogotá, Lima, Quito, Rio Branco",
         "Chetumal": "Chetumal",
-        "Eastern Time (US & Canada)": "Horário do Leste (EUA e Canadá)",
+        "Eastern Time (US & Canada)": "Hora Oriental (EUA e Canadá)",
         "Haiti": "Haiti",
         "Havana": "Havana",
         "Indiana (East)": "Indiana (Leste)",
-        "Turks and Caicos": "Turks e Caicos",
+        "Turks and Caicos": "Turcos e Caicos",
         "Asuncion": "Assunção",
-        "Atlantic Time (Canada)": "Horário do Atlântico (Canadá)",
+        "Atlantic Time (Canada)": "Hora do Atlântico (Canadá)",
         "Caracas": "Caracas",
         "Cuiaba": "Cuiabá",
         "Georgetown, La Paz, Manaus, San Juan": "Georgetown, La Paz, Manaus, San Juan",
         "Santiago": "Santiago",
-        "Newfoundland": "Terra Nova",
-        "Araguaina": "Araguaína",
+        "Newfoundland": "Newfoundland",
+        "Araguaina": "Araguaina",
         "Brasilia": "Brasília",
         "Cayenne, Fortaleza": "Caiena, Fortaleza",
         "City of Buenos Aires": "Cidade de Buenos Aires",
-        "Montevideo": "Montevideu",
+        "Montevideo": "Montevidéu",
         "Punta Arenas": "Punta Arenas",
-        "Saint Pierre and Miquelon": "Saint-Pierre e Miquelon",
+        "Saint Pierre and Miquelon": "São Pedro e Miquelon",
         "Salvador": "Salvador",
         "Coordinated Universal Time-02": "Tempo Universal Coordenado-02",
-        "Greenland": "Gronelândia",
+        "Greenland": "Groenlândia",
         "Azores": "Açores",
-        "Cabo Verde Is": "Ilhas de Cabo Verde",
+        "Cabo Verde Is": "Ilha de Cabo Verde",
         "Coordinated Universal Time": "Tempo Universal Coordenado",
-        "Dublin, Edinburgh, Lisbon, London": "Dublin, Edimburgo, Lisboa, Londres",
+        "Dublin, Edinburgh, Lisbon, London": "Dublin, Edinburgo, Lisboa, Londres",
         "Monrovia, Reykjavik": "Monróvia, Reykjavik",
         "Sao Tome": "São Tomé",
         "Casablanca": "Casablanca",
         "Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna": "Amsterdã, Berlim, Berna, Roma, Estocolmo, Viena",
         "Belgrade, Bratislava, Budapest, Ljubljana, Prague": "Belgrado, Bratislava, Budapeste, Liubliana, Praga",
         "Brussels, Copenhagen, Madrid, Paris": "Bruxelas, Copenhague, Madri, Paris",
-        "Sarajevo, Skopje, Warsaw, Zagreb": "Sarajevo, Escópia, Varsóvia, Zagreb",
-        "West Central Africa": "África Central Ocidental",
+        "Sarajevo, Skopje, Warsaw, Zagreb": "Sarajevo, Skoplie, Varsóvia, Zagreb",
+        "West Central Africa": "Centro-oeste da África",
         "Athens, Bucharest": "Atenas, Bucareste",
         "Beirut": "Beirute",
         "Cairo": "Cairo",
         "Chisinau": "Chisinau",
         "Gaza, Hebron": "Gaza, Hebron",
         "Harare, Pretoria": "Harare, Pretória",
-        "Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius": "Helsinque, Kyiv, Riga, Sófia, Tallinn, Vilnius",
+        "Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius": "Helsinque, Kiev, Riga, Sófia, Tallinn, Vilnius",
         "Jerusalem": "Jerusalém",
         "Juba": "Juba",
         "Kaliningrad": "Kaliningrado",
@@ -342,37 +342,37 @@
         "Volgograd": "Volgogrado",
         "Tehran": "Teerã",
         "Abu Dhabi, Muscat": "Abu Dhabi, Mascate",
-        "Astrakhan, Ulyanovsk": "Astrakhan, Uliánovsk",
+        "Astrakhan, Ulyanovsk": "Astrakhan, Ulyanovsk",
         "Baku": "Baku",
         "Izhevsk, Samara": "Izhevsk, Samara",
         "Port Louis": "Port Louis",
         "Saratov": "Saratov",
         "Tbilisi": "Tbilisi",
-        "Yerevan": "Erevan",
-        "Kabul": "Cabu",
+        "Yerevan": "Ierevan",
+        "Kabul": "Cabul",
         "Ashgabat, Tashkent": "Ashgabat, Tashkent",
         "Astana": "Astana",
-        "Ekaterinburg": "Ekaterinburgo",
-        "Islamabad, Karachi": "Islamabad, Carachi",
-        "Chennai, Kolkata, Mumbai, New Delhi": "Chennai, Kolkata, Mumbai, Nova Délhi",
+        "Ekaterinburg": "Ekaterimburgo",
+        "Islamabad, Karachi": "Islamabad, Karachi",
+        "Chennai, Kolkata, Mumbai, New Delhi": "Chennai (Madras), Kolkata (Calcutá), Mumbai, Nova Délhi",
         "Sri Jayawardenepura": "Sri Jayawardenepura",
         "Kathmandu": "Katmandu",
         "Bishkek": "Bishkek",
-        "Dhaka": "Daca",
+        "Dhaka": "Dacca",
         "Omsk": "Omsk",
         "Yangon (Rangoon)": "Yangon (Rangoon)",
-        "Bangkok, Hanoi, Jakarta": "Bangkok, Hanoi, Jacarta",
+        "Bangkok, Hanoi, Jakarta": "Bancoc, Hanói, Jacarta",
         "Barnaul, Gorno-Altaysk": "Barnaul, Gorno-Altaysk",
         "Hovd": "Hovd",
         "Krasnoyarsk": "Krasnoyarsk",
         "Novosibirsk": "Novosibirsk",
         "Tomsk": "Tomsk",
-        "Beijing, Chongqing, Hong Kong SAR, Urumqi": "Pequim, Chongqing, RAE de Hong Kong, Urumqi",
+        "Beijing, Chongqing, Hong Kong SAR, Urumqi": "Pequim, Chonquim, Hong Kong, Urumqui",
         "Irkutsk": "Irkutsk",
-        "Kuala Lumpur, Singapore": "Kuala Lumpur, Singapura",
+        "Kuala Lumpur, Singapore": "Kuala Lumpur, Cingapura",
         "Perth": "Perth",
-        "Taipei": "Taipei",
-        "Ulaanbaatar": "Ulã Bator",
+        "Taipei": "Taipé",
+        "Ulaanbaatar": "Ulaanbaatar",
         "Eucla": "Eucla",
         "Chita": "Chita",
         "Osaka, Sapporo, Tokyo": "Osaka, Sapporo, Tóquio",
@@ -382,14 +382,14 @@
         "Adelaide": "Adelaide",
         "Darwin": "Darwin",
         "Brisbane": "Brisbane",
-        "Canberra, Melbourne, Sydney": "Canberra, Melbourne, Sydney",
-        "Guam, Port Moresby": "Guam, Porto Moresby",
+        "Canberra, Melbourne, Sydney": "Camberra, Melbourne, Sydney",
+        "Guam, Port Moresby": "Guam, Port Moresby",
         "Hobart": "Hobart",
         "Vladivostok": "Vladivostok",
         "Lord Howe Island": "Ilha Lord Howe",
         "Bougainville Island": "Ilha Bougainville",
         "Chokurdakh": "Chokurdakh",
-        "Magadan": "Magadan",
+        "Magadan": "Magadã",
         "Norfolk Island": "Ilha Norfolk",
         "Sakhalin": "Sakhalin",
         "Solomon Is, New Caledonia": "Ilhas Salomão, Nova Caledônia",
@@ -1499,12 +1499,8 @@
     "Default currency cannot be blank": "A moeda padrão não pode estar em branco",
     "Unable to log in": "Não foi possível fazer login",
     "Two-Factor Authentication": "Autenticação de Dois Fatores",
-    "Two-factor authentication is not enabled yet": {
-        "": "A autenticação de dois fatores ainda não está habilitada."
-    },
-    "Two-factor authentication is already enabled": {
-        "": "A autenticação de dois fatores já está habilitada."
-    },
+    "Two-factor authentication is not enabled yet.": "A autenticação de dois fatores ainda não está habilitada.",
+    "Two-factor authentication is already enabled.": "A autenticação de dois fatores já está habilitada.",
     "Passcode": "Código de acesso",
     "Backup Code": "Código de Backup",
     "Verify": "Verificar",
@@ -1516,13 +1512,7 @@
     "Invalid PIN code": "Código PIN inválido",
     "Incorrect PIN code": "Código PIN incorreto",
     "Verify your email": "Verifique seu e-mail",
-    "Verifying": {
-        "": {
-            "": {
-                "": "Verificando..."
-            }
-        }
-    },
+    "Verifying...": "Verificando...",
     "Resend Validation Email": "Reenviar E-mail de Validação",
     "Validation email has been sent": "E-mail de validação foi enviado",
     "Unable to verify email": "Não foi possível verificar o e-mail",
@@ -1533,9 +1523,7 @@
     "Unable to send password reset email": "Não foi possível enviar o e-mail de redefinição de senha",
     "Reset Password": "Redefinir Senha",
     "Update Password": "Atualizar Senha",
-    "Please re-enter your email address, and then enter a new password": {
-        "": "Por favor, insira novamente seu endereço de e-mail e, em seguida, uma nova senha."
-    },
+    "Please re-enter your email address, and then enter a new password.": "Por favor, insira novamente seu endereço de e-mail e, em seguida, uma nova senha.",
     "Password has been updated": "A senha foi atualizada",
     "Unable to reset password": "Não foi possível redefinir a senha",
     "Sign Up": "Registrar-se",
@@ -1674,13 +1662,7 @@
     "Longitude": "Longitude",
     "Latitude": "Latitude",
     "No Location": "Sem Localização",
-    "Getting Location": {
-        "": {
-            "": {
-                "": "Obtendo Localização..."
-            }
-        }
-    },
+    "Getting Location...": "Obtendo Localização...",
     "Show on the map": "Mostrar no mapa",
     "Location on Map": "Localização no Mapa",
     "Update Geographic Location": "Atualizar Localização Geográfica",
@@ -1691,11 +1673,7 @@
     "Unable to retrieve current position": "Não é possível recuperar a posição atual",
     "Cannot Initialize Map": "Não é possível Inicializar o Mapa",
     "Unsupported Map Provider": "Provedor de Mapa Não Suportado",
-    "Please refresh the page and try again": {
-        " If the error persists, ensure that the server's map settings are correctly configured": {
-            "": "Por favor, atualize a página e tente novamente. Se o erro persistir, verifique se as configurações de mapa do servidor estão corretamente configuradas."
-        }
-    },
+    "Please refresh the page and try again. If the error persists, ensure that the server's map settings are correctly configured.": "Por favor, atualize a página e tente novamente. Se o erro persistir, verifique se as configurações de mapa do servidor estão corretamente configuradas.",
     "Import Transactions": "Importar Transações",
     "Upload File": "Enviar Arquivo",
     "Upload Transaction Data File": "Enviar Arquivo de Dados de Transação",
@@ -1716,9 +1694,7 @@
     "Month-day-year format": "Formato mês-dia-ano",
     "Day-month-year format": "Formato dia-mês-ano",
     "Intuit Interchange Format (IIF) File": "Arquivo Intuit Interchange Format (IIF)",
-    "Camt": {
-        "053 Bank to Customer Statement File": "Arquivo de Extrato Bancário Camt.053"
-    },
+    "Camt.053 Bank to Customer Statement File": "Arquivo, de Extrato Bancário Camt.053",
     "MT940 Consumer Statement Message File": "Arquivo de Mensagem de Extrato Consumidor MT940",
     "Delimiter-separated Values (DSV) File": "Arquivo de Valores Separados por Delimitador (DSV)",
     "Delimiter-separated Values (DSV) Data": "Dados de Valores Separados por Delimitador (DSV)",
@@ -1787,9 +1763,7 @@
     "Source account cannot be blank": "A conta de origem não pode estar em branco",
     "Destination account cannot be blank": "A conta de destino não pode estar em branco",
     "Are you sure you want to save this transaction with a zero amount?": "Tem certeza de que deseja salvar esta transação com valor zero?",
-    "You have set this time range to prevent editing transactions": {
-        " Would you like to change the editable transaction range to All?": "Você configurou este intervalo de tempo para impedir a edição de transações. Gostaria de mudar o intervalo de transação editável para Todos?"
-    },
+    "You have set this time range to prevent editing transactions. Would you like to change the editable transaction range to All?": "Você configurou este intervalo de tempo para impedir a edição de transações. Gostaria de mudar o intervalo de transação editável para Todos?",
     "Unable to retrieve transaction": "Incapaz de recuperar a transação",
     "Unable to add transaction": "Incapaz de adicionar a transação",
     "Unable to save transaction": "Incapaz de salvar a transação",
@@ -1801,9 +1775,7 @@
     "Are you sure you want to remove this transaction picture?": "Tem certeza de que deseja remover a imagem desta transação?",
     "Unable to upload transaction picture": "Incapaz de carregar a imagem da transação",
     "Unable to remove transaction picture": "Incapaz de remover a imagem da transação",
-    "Failed to load image, please check whether the config \"domain\" and \"root_url\" are set correctly": {
-        "": "Falha ao carregar a imagem, por favor verifique se as configurações \"domain\" e \"root_url\" estão configuradas corretamente."
-    },
+    "Failed to load image, please check whether the config \"domain\" and \"root_url\" are set correctly.": "Falha ao carregar a imagem, por favor verifique se as configurações \"domain\" e \"root_url\" estão configuradas corretamente.",
     "Search transaction description": "Pesquisar descrição da transação",
     "Unable to retrieve transaction list": "Incapaz de recuperar a lista de transações",
     "Custom Date Range": "Intervalo de Datas Personalizado",
@@ -1882,18 +1854,10 @@
     "Currency Name": "Nome da Moeda",
     "Currency Symbol": "Símbolo da Moeda",
     "Geographic Location Format": "Formato de Localização Geográfica",
-    "Latitude Longitude D": {
-        "D°": "Latitude Longitude D.D°"
-    },
-    "Longitude Latitude D": {
-        "D°": "Longitude Latitude D.D°"
-    },
-    "Latitude Longitude D°M": {
-        "M'": "Latitude Longitude D°M.M'"
-    },
-    "Longitude Latitude D°M": {
-        "M'": "Longitude Latitude D°M.M'"
-    },
+    "Latitude Longitude D.D°": "Latitude Longitude D.D°",
+    "Longitude Latitude D.D°": "Longitude Latitude D.D°",
+    "Latitude Longitude D°M.M'": "Latitude Longitude D°M.M'",
+    "Longitude Latitude D°M.M'": "Longitude Latitude D°M.M'",
     "Latitude Longitude D°M'S\"": "Latitude Longitude D°M'S\"",
     "Longitude Latitude D°M'S\"": "Longitude Latitude D°M'S\"",
     "Expense Amount Color": "Cor do Valor da Despesa",
@@ -1928,16 +1892,9 @@
     "Set whether to use preset transaction categories": "Defina se deseja usar categorias de transação predefinidas",
     "Complete": "Concluído",
     "Registration Completed": "Registro Concluído",
-    "You have been successfully registered": {
-        " An account activation link has been sent to your email address, please activate your account first": {
-            "": "Você foi registrado com sucesso. Um link de ativação da conta foi enviado para o seu endereço de e-mail, por favor, ative sua conta primeiro."
-        }
-    },
-    "You have been successfully registered, but there was an failure when adding preset categories": {
-        " You can re-add preset categories in settings page anytime": {
-            "": "Você foi registrado com sucesso, mas houve uma falha ao adicionar categorias predefinidas. Você pode re-adicionar categorias predefinidas na página de configurações a qualquer momento."
-        }
-    },
+    "You have been successfully registered": "You have been successfully registered",
+    "You have been successfully registered. An account activation link has been sent to your email address, please activate your account first.": "Você foi registrado com sucesso. Um link de ativação da conta foi enviado para o seu endereço de e-mail, por favor, ative sua conta primeiro.",
+    "You have been successfully registered, but there was an failure when adding preset categories. You can re-add preset categories in settings page anytime.": "Você foi registrado com sucesso, mas houve uma falha ao adicionar categorias predefinidas. Você pode re-adicionar categorias predefinidas na página de configurações a qualquer momento.",
     "Unable to sign up": "Não foi possível se cadastrar",
     "User registration is disabled": "O registro de usuário está desativado",
     "Unable to retrieve user profile": "Não foi possível recuperar o perfil do usuário",
@@ -1967,11 +1924,7 @@
     "Are you sure you want to remove avatar?": "Tem certeza de que deseja remover o avatar?",
     "Unable to remove user avatar": "Não foi possível remover o avatar do usuário",
     "Your avatar has been successfully removed": "Seu avatar foi removido com sucesso",
-    "After changing the password, other devices will be logged out": {
-        " Please use the new password to log in on other devices": {
-            "": "Após mudar a senha, outros dispositivos serão desconectados. Por favor, use a nova senha para fazer login em outros dispositivos."
-        }
-    },
+    "After changing the password, other devices will be logged out. Please use the new password to log in on other devices.": "Após mudar a senha, outros dispositivos serão desconectados. Por favor, use a nova senha para fazer login em outros dispositivos.",
     "Data Management": "Gerenciamento de Dados",
     "Unable to retrieve user statistics data": "Não foi possível recuperar os dados estatísticos do usuário",
     "Export Data": "Exportar Dados",
@@ -1980,23 +1933,13 @@
     "TSV (Tab-separated values) File": "Arquivo TSV (Valores separados por tabulações)",
     "Markdown File": "Arquivo Markdown",
     "Clear User Data": "Limpar Dados do Usuário",
-    "Export all transaction data to file": {
-        "": "Exportar todos os dados de transação para arquivo."
-    },
+    "Export all transaction data to file.": "Exportar todos os dados de transação para arquivo.",
     "Are you sure you want to export all transaction data to file?": "Você tem certeza de que deseja exportar todos os dados de transação para arquivo?",
-    "It may take a long time, please wait for a few minutes": {
-        "": "Pode levar algum tempo, por favor, aguarde alguns minutos."
-    },
+    "It may take a long time, please wait for a few minutes.": "Pode levar algum tempo, por favor, aguarde alguns minutos.",
     "Unable to retrieve exported user data": "Não foi possível recuperar os dados de usuário exportados",
     "Save Data": "Salvar Dados",
     "Are you sure you want to clear all data?": "Você tem certeza de que deseja limpar todos os dados?",
-    "You CANNOT undo this action": {
-        " This will clear your accounts, categories, tags and transactions data": {
-            " Please enter your current password to confirm": {
-                "": "Você NÃO PODE desfazer esta ação. Isto apagará seus dados de contas, categorias, tags e transações. Por favor, insira sua senha atual para confirmar."
-            }
-        }
-    },
+    "You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "Você NÃO PODE desfazer esta ação. Isto apagará seus dados de contas, categorias, tags e transações. Por favor, insira sua senha atual para confirmar.",
     "All user data has been cleared": "Todos os dados de usuário foram apagados",
     "Unable to clear user data": "Não foi possível limpar os dados de usuário",
     "Device & Sessions": "Dispositivo e Sessões",
@@ -2075,10 +2018,9 @@
     "Transaction Templates": "Modelos de Transação",
     "Scheduled Transactions": "Transações Agendadas",
     "Template Name": "Nome do Modelo",
-    "No available template": {
-        " Once you add templates, you can quickly add a new transaction using the dropdown menu of the Add button on the transaction list page": "Nenhum modelo disponível. Depois de adicionar modelos, você pode adicionar rapidamente uma nova transação usando o menu suspenso do botão Adicionar na página da lista de transações"
-    },
+    "No available template": "No available template",
     "Once you add templates, you can long press the Add button on the home page to quickly add a new transaction": "Depois de adicionar modelos, você pode pressionar longamente o botão Adicionar na página inicial para adicionar rapidamente uma nova transação",
+    "No available template. Once you add templates, you can quickly add a new transaction using the dropdown menu of the Add button on the transaction list page": "Nenhum modelo disponível. Depois de adicionar modelos, você pode adicionar rapidamente uma nova transação usando o menu suspenso do botão Adicionar na página da lista de transações",
     "No available scheduled transactions": "Nenhuma transação agendada disponível",
     "Unable to retrieve template list": "Não foi possível recuperar a lista de modelos",
     "Template list is up to date": "A lista de modelos está atualizada",
@@ -2104,27 +2046,11 @@
     "Regenerate Backup Codes": "Regenerar Códigos de Backup",
     "Enable Two-Factor Authentication": "Ativar Autenticação de Dois Fatores",
     "Disable Two-Factor Authentication": "Desativar Autenticação de Dois Fatores",
-    "Please use a two-factor authentication app to scan the qrcode below and enter the current passcode": {
-        "": "Por favor, use um aplicativo de autenticação de dois fatores para escanear o qrcode abaixo e insira o código atual."
-    },
-    "Your current password is required to disable two-factor authentication": {
-        "": "Sua senha atual é necessária para desativar a autenticação de dois fatores."
-    },
-    "Your current password is required to regenerate backup codes for two-factor authentication": {
-        " If you regenerate backup codes, the previous ones will become invalid": {
-            "": "Sua senha atual é necessária para regenerar códigos de backup para autenticação de dois fatores. Se você regenerar os códigos de backup, os anteriores se tornarão inválidos."
-        }
-    },
-    "Your current password is required to disable two-factor authentication or regenerate backup codes for two-factor authentication": {
-        " If you regenerate backup codes, the previous ones will become invalid": {
-            "": "Sua senha atual é necessária para desativar a autenticação de dois fatores ou regenerar códigos de backup para autenticação de dois fatores. Se você regenerar os códigos de backup, os anteriores se tornarão inválidos."
-        }
-    },
-    "Please copy these backup codes to safe place, the following backup codes will be displayed only once": {
-        " If these codes were lost, you can regenerate them at any time": {
-            "": "Por favor, copie estes códigos de backup para um lugar seguro, os seguintes códigos de backup serão exibidos apenas uma vez. Se esses códigos forem perdidos, você poderá regenerá-los a qualquer momento."
-        }
-    },
+    "Please use a two-factor authentication app to scan the qrcode below and enter the current passcode.": "Por favor, use um aplicativo de autenticação de dois fatores para escanear o qrcode abaixo e insira o código atual.",
+    "Your current password is required to disable two-factor authentication.": "Sua senha atual é necessária para desativar a autenticação de dois fatores.",
+    "Your current password is required to regenerate backup codes for two-factor authentication. If you regenerate backup codes, the previous ones will become invalid.": "Sua senha atual é necessária para regenerar códigos de backup para autenticação de dois fatores. Se você regenerar os códigos de backup, os anteriores se tornarão inválidos.",
+    "Your current password is required to disable two-factor authentication or regenerate backup codes for two-factor authentication. If you regenerate backup codes, the previous ones will become invalid.": "Sua senha atual é necessária para desativar a autenticação de dois fatores ou regenerar códigos de backup para autenticação de dois fatores. Se você regenerar os códigos de backup, os anteriores se tornarão inválidos.",
+    "Please copy these backup codes to safe place, the following backup codes will be displayed only once. If these codes were lost, you can regenerate them at any time.": "Por favor, copie estes códigos de backup para um lugar seguro, os seguintes códigos de backup serão exibidos apenas uma vez. Se esses códigos forem perdidos, você poderá regenerá-los a qualquer momento.",
     "Backup codes copied": "Códigos de backup copiados",
     "Two-factor authentication has been disabled": "A autenticação de dois fatores foi desativada",
     "Unable to retrieve current two-factor authentication status": "Não foi possível recuperar o status atual da autenticação de dois fatores",
@@ -2142,16 +2068,8 @@
     "PIN Code": "Código PIN",
     "Unlock with PIN Code": "Desbloquear com Código PIN",
     "Unlock with WebAuthn": "Desbloquear com WebAuthn",
-    "Please enter a new 6-digit PIN code": {
-        " The PIN code would encrypt your local data, so you need to enter it every time you open this app": {
-            " If this PIN code is lost, you will need to log in again": {
-                "": "Por favor, insira um novo código PIN de 6 dígitos. O código PIN criptografará seus dados locais, então você precisa inseri-lo toda vez que abrir este aplicativo. Se este código PIN for perdido, será necessário fazer login novamente."
-            }
-        }
-    },
-    "Your current PIN code is required to disable application lock": {
-        "": "Seu código PIN atual é necessário para desativar o bloqueio do aplicativo."
-    },
+    "Please enter a new 6-digit PIN code. The PIN code would encrypt your local data, so you need to enter it every time you open this app. If this PIN code is lost, you will need to log in again.": "Por favor, insira um novo código PIN de 6 dígitos. O código PIN criptografará seus dados locais, então você precisa inseri-lo toda vez que abrir este aplicativo. Se este código PIN for perdido, será necessário fazer login novamente.",
+    "Your current PIN code is required to disable application lock.": "Seu código PIN atual é necessário para desativar o bloqueio do aplicativo.",
     "You have enabled WebAuthn successfully": "Você ativou o WebAuthn com sucesso",
     "WebAuth is not supported on this device": "O WebAuth não é suportado neste dispositivo",
     "Failed to enable WebAuthn": "Falha ao ativar WebAuthn",
@@ -2178,9 +2096,7 @@
     "Are you sure you want to delete this user custom exchange rate?": "Tem certeza de que deseja excluir esta taxa de câmbio personalizada do usuário?",
     "Unable to delete this user custom exchange rate": "Não foi possível excluir esta taxa de câmbio personalizada do usuário",
     "Use on Mobile Device": "Usar no dispositivo móvel",
-    "You can scan the QR code below on your mobile device": {
-        "": "Você pode escanear o código QR abaixo em seu dispositivo móvel."
-    },
+    "You can scan the QR code below on your mobile device.": "Você pode escanear o código QR abaixo em seu dispositivo móvel.",
     "Switch to Mobile Version": "Mudar para a versão móvel",
     "Switch to Desktop Version": "Mudar para a versão desktop",
     "Are you sure you want to switch to desktop version?": "Tem certeza de que deseja mudar para a versão desktop?",

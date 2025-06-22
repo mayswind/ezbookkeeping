@@ -4,11 +4,10 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 )
 
-// ptBR contains all locale texts for Brazilian Portuguese (pt-BR)
 var ptBR = &LocaleTextItems{
 	DefaultTypes: &DefaultTypes{
 		DecimalSeparator:    core.DECIMAL_SEPARATOR_COMMA,
-		DigitGroupingSymbol: core.DIGIT_GROUPING_SYMBOL_DOT,
+		DigitGroupingSymbol: core.DIGIT_GROUPING_SYMBOL_SPACE,
 	},
 	DataConverterTextItems: &DataConverterTextItems{
 		Alipay:       "Alipay",

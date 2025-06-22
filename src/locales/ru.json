@@ -22,8 +22,8 @@
         "fiscalYearFormat": "EndYYYY",
         "longDateFormat": "DDMMYYYY",
         "shortDateFormat": "DDMMYYYY",
-        "longTimeFormat": "HHMMSSA",
-        "shortTimeFormat": "HHMMA",
+        "longTimeFormat": "HHMMSS",
+        "shortTimeFormat": "HHMM",
         "decimalSeparator": "Comma",
         "digitGroupingSymbol": "Space",
         "digitGrouping": "ThousandsSeparator",
@@ -81,17 +81,17 @@
             "hh_mm_a": "h:mm A"
         },
         "yearQuarter": {
-            "q1": "{year}Q1",
-            "q2": "{year}Q2",
-            "q3": "{year}Q3",
-            "q4": "{year}Q4"
+            "q1": "1 квартал {year} г.",
+            "q2": "2 квартал {year} г.",
+            "q3": "3 квартал {year} г.",
+            "q4": "4 квартал {year} г."
         },
         "fiscalYear": {
-            "StartYYYY_EndYYYY": "FY {StartYYYY}-{EndYYYY}",
-            "StartYYYY_EndYY": "FY {StartYYYY}-{EndYY}",
-            "StartYY_EndYY": "FY {StartYY}-{EndYY}",
-            "EndYYYY": "FY {EndYYYY}",
-            "EndYY": "FY {EndYY}"
+            "StartYYYY_EndYYYY": "ФГ {StartYYYY}-{EndYYYY}",
+            "StartYYYY_EndYY": "ФГ {StartYYYY}-{EndYY}",
+            "StartYY_EndYY": "ФГ {StartYY}-{EndYY}",
+            "EndYYYY": "ФГ {EndYYYY}",
+            "EndYY": "ФГ {EndYY}"
         },
         "misc": {
             "multiTextJoinSeparator": ", ",

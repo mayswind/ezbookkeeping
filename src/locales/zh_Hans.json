@@ -87,11 +87,11 @@
             "q4": "{year}Q4"
         },
         "fiscalYear": {
-            "StartYYYY_EndYYYY": "FY {StartYYYY}-{EndYYYY}",
-            "StartYYYY_EndYY": "FY {StartYYYY}-{EndYY}",
-            "StartYY_EndYY": "FY {StartYY}-{EndYY}",
-            "EndYYYY": "FY {EndYYYY}",
-            "EndYY": "FY {EndYY}"
+            "StartYYYY_EndYYYY": "{StartYYYY}-{EndYYYY}财年",
+            "StartYYYY_EndYY": "{StartYYYY}-{EndYY}财年",
+            "StartYY_EndYY": "{StartYY}-{EndYY}财年",
+            "EndYYYY": "{EndYYYY}财年",
+            "EndYY": "{EndYY}财年"
         },
         "misc": {
             "multiTextJoinSeparator": "、",

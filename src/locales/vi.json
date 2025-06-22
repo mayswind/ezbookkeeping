@@ -27,7 +27,7 @@
         "decimalSeparator": "Comma",
         "digitGroupingSymbol": "Dot",
         "digitGrouping": "ThousandsSeparator",
-        "currencyDisplayType": "SymbolBeforeAmount"
+        "currencyDisplayType": "SymbolAfterAmount"
     },
     "format": {
         "longDate": {
@@ -81,10 +81,10 @@
             "hh_mm_a": "hh:mm A"
         },
         "yearQuarter": {
-            "q1": "{year}Q1",
-            "q2": "{year}Q2",
-            "q3": "{year}Q3",
-            "q4": "{year}Q4"
+            "q1": "Quý 1 năm {year}",
+            "q2": "Quý 2 năm {year}",
+            "q3": "Quý 3 năm {year}",
+            "q4": "Quý 4 năm {year}"
         },
         "fiscalYear": {
             "StartYYYY_EndYYYY": "FY {StartYYYY}-{EndYYYY}",

@@ -6,8 +6,8 @@ import (
 
 var es = &LocaleTextItems{
 	DefaultTypes: &DefaultTypes{
-		DecimalSeparator:    core.DECIMAL_SEPARATOR_DOT,
-		DigitGroupingSymbol: core.DIGIT_GROUPING_SYMBOL_COMMA,
+		DecimalSeparator:    core.DECIMAL_SEPARATOR_COMMA,
+		DigitGroupingSymbol: core.DIGIT_GROUPING_SYMBOL_DOT,
 	},
 	DataConverterTextItems: &DataConverterTextItems{
 		Alipay:       "Alipay",

@@ -24,10 +24,10 @@
         "shortDateFormat": "DDMMYYYY",
         "longTimeFormat": "HHMMSS",
         "shortTimeFormat": "HHMM",
-        "decimalSeparator": "Dot",
-        "digitGroupingSymbol": "Comma",
+        "decimalSeparator": "Comma",
+        "digitGroupingSymbol": "Dot",
         "digitGrouping": "ThousandsSeparator",
-        "currencyDisplayType": "SymbolBeforeAmount"
+        "currencyDisplayType": "SymbolAfterAmount"
     },
     "format": {
         "longDate": {
@@ -81,17 +81,17 @@
             "hh_mm_a": "hh:mm A"
         },
         "yearQuarter": {
-            "q1": "{year}Q1",
-            "q2": "{year}Q2",
-            "q3": "{year}Q3",
-            "q4": "{year}Q4"
+            "q1": "T1 {year}",
+            "q2": "T2 {year}",
+            "q3": "T3 {year}",
+            "q4": "T4 {year}"
         },
         "fiscalYear": {
-            "StartYYYY_EndYYYY": "FY {StartYYYY}-{EndYYYY}",
-            "StartYYYY_EndYY": "FY {StartYYYY}-{EndYY}",
-            "StartYY_EndYY": "FY {StartYY}-{EndYY}",
-            "EndYYYY": "FY {EndYYYY}",
-            "EndYY": "FY {EndYY}"
+            "StartYYYY_EndYYYY": "AF {StartYYYY}-{EndYYYY}",
+            "StartYYYY_EndYY": "AF {StartYYYY}-{EndYY}",
+            "StartYY_EndYY": "AF {StartYY}-{EndYY}",
+            "EndYYYY": "AF {EndYYYY}",
+            "EndYY": "AF {EndYY}"
         },
         "misc": {
             "multiTextJoinSeparator": ", ",

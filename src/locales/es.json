@@ -121,7 +121,8 @@
         "defaultExportFilename": "ezBookkeeping_export_data",
         "exportFilename": "ezBookkeeping_{nickname}_export_data",
         "defaultExportStatisticsFileName": "ezBookkeeping_statistics_data",
-        "exportStatisticsFileName": "ezBookkeeping_{nickname}_statistics_data"
+        "exportStatisticsFileName": "ezBookkeeping_{nickname}_statistics_data",
+        "defaultImportDataMappingFileName": "ezBookkeeping_import_data_mapping"
     },
     "datetime": {
         "AM": {
@@ -1728,6 +1729,9 @@
     "Cannot import invalid transactions": "No se pueden importar transacciones no válidas",
     "Unable to parse import file": "No se puede analizar el archivo de importación",
     "Unable to import transactions": "Unable to import transactions",
+    "Load Data Mapping File": "Load Data Mapping File",
+    "Save Data Mapping File": "Save Data Mapping File",
+    "Data mapping file is invalid": "Data mapping file is invalid",
     "Batch Replace Selected Expense Categories": "Reemplazar por lotes categorías de gastos seleccionadas",
     "Batch Replace Selected Income Categories": "Reemplazo por lotes de categorías de ingresos seleccionadas",
     "Batch Replace Selected Transfer Categories": "Reemplazar por lotes las categorías de transferencia seleccionadas",

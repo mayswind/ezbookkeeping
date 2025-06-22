@@ -121,7 +121,8 @@
         "defaultExportFilename": "ezBookkeeping_导出数据",
         "exportFilename": "ezBookkeeping_{nickname}_导出数据",
         "defaultExportStatisticsFileName": "ezBookkeeping_统计数据",
-        "exportStatisticsFileName": "ezBookkeeping_{nickname}_统计数据"
+        "exportStatisticsFileName": "ezBookkeeping_{nickname}_统计数据",
+        "defaultImportDataMappingFileName": "ezBookkeeping_导入数据映射文件"
     },
     "datetime": {
         "AM": {
@@ -1728,6 +1729,9 @@
     "Cannot import invalid transactions": "不能导入无效的交易",
     "Unable to parse import file": "无法解析导入的文件",
     "Unable to import transactions": "无法导入交易",
+    "Load Data Mapping File": "加载数据映射文件",
+    "Save Data Mapping File": "保存数据映射文件",
+    "Data mapping file is invalid": "数据映射文件无效",
     "Batch Replace Selected Expense Categories": "批量替换选中的支出分类",
     "Batch Replace Selected Income Categories": "批量替换选中的收入分类",
     "Batch Replace Selected Transfer Categories": "批量替换选中的转账分类",

@@ -121,7 +121,8 @@
         "defaultExportFilename": "ezBookkeeping_export_data",
         "exportFilename": "ezBookkeeping_{nickname}_export_data",
         "defaultExportStatisticsFileName": "ezBookkeeping_statistics_data",
-        "exportStatisticsFileName": "ezBookkeeping_{nickname}_statistics_data"
+        "exportStatisticsFileName": "ezBookkeeping_{nickname}_statistics_data",
+        "defaultImportDataMappingFileName": "ezBookkeeping_import_data_mapping"
     },
     "datetime": {
         "AM": {
@@ -1728,6 +1729,9 @@
     "Cannot import invalid transactions": "Không thể nhập giao dịch không hợp lệ",
     "Unable to parse import file": "Không thể phân tích tệp nhập",
     "Unable to import transactions": "Unable to import transactions",
+    "Load Data Mapping File": "Load Data Mapping File",
+    "Save Data Mapping File": "Save Data Mapping File",
+    "Data mapping file is invalid": "Data mapping file is invalid",
     "Batch Replace Selected Expense Categories": "Thay thế hàng loạt các danh mục chi phí đã chọn",
     "Batch Replace Selected Income Categories": "Thay thế hàng loạt các danh mục thu nhập đã chọn",
     "Batch Replace Selected Transfer Categories": "Thay thế hàng loạt các danh mục chuyển khoản đã chọn",

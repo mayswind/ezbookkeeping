@@ -79,9 +79,12 @@ import {
 
 import {
     TransactionEditScopeType,
-    TransactionTagFilterType,
-    ImportTransactionColumnType
+    TransactionTagFilterType
 } from '@/core/transaction.ts';
+
+import {
+    ImportTransactionColumnType
+} from '@/core/import_transaction.ts';
 
 import {
     ScheduledTemplateFrequencyType

@@ -9,6 +9,21 @@
                     </div>
                     <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                            :icon="true" :disabled="loading || submitting"
+                           v-if="currentStep === 'defineColumn'">
+                        <v-icon :icon="mdiDotsVertical" />
+                        <v-menu activator="parent" max-height="500">
+                            <v-list>
+                                <v-list-item :prepend-icon="mdiFolderOpenOutline"
+                                             :title="tt('Load Data Mapping File')"
+                                             @click="loadColumnMappingFile()"></v-list-item>
+                                <v-list-item :prepend-icon="mdiContentSaveOutline"
+                                             :title="tt('Save Data Mapping File')"
+                                             @click="saveColumnMappingFile()"></v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </v-btn>
+                    <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                           :icon="true" :disabled="loading || submitting"
                            v-if="currentStep === 'checkData'">
                         <v-icon :icon="mdiFilterOutline" />
                         <v-menu activator="parent" max-height="500">
@@ -294,9 +309,9 @@
                                         <v-menu activator="parent" location="bottom" max-height="500">
                                             <v-list>
                                                 <v-list-item :key="columnType.type"
-                                                             :append-icon="parsedFileDataColumnMapping[columnType.type] === parseInt(column.key) ? mdiCheck : undefined"
+                                                             :append-icon="parsedFileDataColumnMapping.dataColumnMapping[columnType.type] === parseInt(column.key) ? mdiCheck : undefined"
                                                              v-for="columnType in allImportTransactionColumnTypes"
-                                                             @click="updateParseDataMappedColumn(parseInt(column.key), columnType.type)">
+                                                             @click="parsedFileDataColumnMapping.toggleDataMappingColumn(parseInt(column.key), columnType.type)">
                                                     <v-list-item-title class="cursor-pointer">
                                                         {{ columnType.displayName }}
                                                     </v-list-item-title>
@@ -310,12 +325,12 @@
                         <template #bottom>
                             <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2" v-if="parsedFileData">
                                 <v-btn color="secondary" density="compact" variant="outlined"
-                                       :append-icon="parsedFileIncludeHeader ? mdiCheck : mdiClose"
-                                       @click="parsedFileIncludeHeader = !parsedFileIncludeHeader">{{ tt('Include Header Line') }}</v-btn>
+                                       :append-icon="parsedFileDataColumnMapping.includeHeader ? mdiCheck : mdiClose"
+                                       @click="parsedFileDataColumnMapping.toggleIncludeHeader()">{{ tt('Include Header Line') }}</v-btn>
                                 <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
-                                       :disabled="!parsedFileDataColumnMapping || !isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.TransactionType.type]) || !parsedFileAllTransactionTypes">
+                                       :disabled="!parsedFileDataColumnMapping || !parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionType) || !parsedFileAllTransactionTypes">
                                     <span>{{ tt('Transaction Type Mapping') }}</span>
-                                    <span class="ml-1" v-if="parsedFileDataColumnMapping && isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.TransactionType.type]) && parsedFileAllTransactionTypes">({{ getObjectOwnFieldCount(parsedFileValidMappedTransactionTypes) || tt('None') }})</span>
+                                    <span class="ml-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionType) && parsedFileAllTransactionTypes">({{ getObjectOwnFieldCount(parsedFileValidMappedTransactionTypes) || tt('None') }})</span>
                                     <v-menu eager activator="parent" location="bottom" max-height="500"
                                             :close-on-content-click="false">
                                         <v-list class="pa-0">
@@ -328,7 +343,7 @@
                                                         <td>
                                                             <v-btn-toggle class="transaction-types-toggle" density="compact" variant="outlined"
                                                                           mandatory="force" divided
-                                                                          v-model="parsedFileTransactionTypeMapping[typeName]">
+                                                                          v-model="parsedFileDataColumnMapping.transactionTypeMapping[typeName]">
                                                                 <v-btn :value="undefined">{{ tt('None') }}</v-btn>
                                                                 <v-btn :value="TransactionType.ModifyBalance">{{ tt('Modify Balance') }}</v-btn>
                                                                 <v-btn :value="TransactionType.Income">{{ tt('Income') }}</v-btn>
@@ -344,14 +359,14 @@
                                     </v-menu>
                                 </v-btn>
                                 <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
-                                       :disabled="!parsedFileDataColumnMapping || !isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.TransactionTime.type])">
+                                       :disabled="!parsedFileDataColumnMapping || !parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTime)">
                                     <span>{{ tt('Time Format') }}</span>
-                                    <span class="ml-1" v-if="parsedFileDataColumnMapping && isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.TransactionTime.type])">({{ parsedFileTimeFormat || parsedFileAutoDetectedTimeFormat || tt('Unknown') }})</span>
+                                    <span class="ml-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTime)">({{ parsedFileDataColumnMapping.timeFormat || parsedFileAutoDetectedTimeFormat || tt('Unknown') }})</span>
                                     <v-menu eager activator="parent" location="bottom" max-height="500">
                                         <v-list>
                                             <v-list-item key="auto"
-                                                         :append-icon="parsedFileTimeFormat === '' ? mdiCheck : undefined"
-                                                         @click="parsedFileTimeFormat = ''">
+                                                         :append-icon="parsedFileDataColumnMapping.timeFormat === '' ? mdiCheck : undefined"
+                                                         @click="parsedFileDataColumnMapping.timeFormat = ''">
                                                 <v-list-item-title class="cursor-pointer">
                                                     <span>{{ tt('Auto detect') }}</span>
                                                     <span class="ml-1" v-if="parsedFileAutoDetectedTimeFormat">({{ parsedFileAutoDetectedTimeFormat }})</span>
@@ -359,9 +374,9 @@
                                                 </v-list-item-title>
                                             </v-list-item>
                                             <v-list-item :key="dateTimeFormat.format"
-                                                         :append-icon="parsedFileTimeFormat === dateTimeFormat.format ? mdiCheck : undefined"
+                                                         :append-icon="parsedFileDataColumnMapping.timeFormat === dateTimeFormat.format ? mdiCheck : undefined"
                                                          v-for="dateTimeFormat in KnownDateTimeFormat.values()"
-                                                         @click="parsedFileTimeFormat = dateTimeFormat.format">
+                                                         @click="parsedFileDataColumnMapping.timeFormat = dateTimeFormat.format">
                                                 <v-list-item-title class="cursor-pointer">
                                                     {{ dateTimeFormat.format }}
                                                 </v-list-item-title>
@@ -370,14 +385,14 @@
                                     </v-menu>
                                 </v-btn>
                                 <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
-                                       v-if="parsedFileDataColumnMapping && isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.TransactionTimezone.type])">
+                                       v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTimezone)">
                                     <span>{{ tt('Timezone Format') }}</span>
-                                    <span class="ml-1" v-if="parsedFileDataColumnMapping && isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.TransactionTimezone.type])">({{ KnownDateTimezoneFormat.valueOf(parsedFileTimezoneFormat || parsedFileAutoDetectedTimezoneFormat || '')?.name || tt('Unknown') }})</span>
+                                    <span class="ml-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTimezone)">({{ KnownDateTimezoneFormat.valueOf(parsedFileDataColumnMapping.timezoneFormat || parsedFileAutoDetectedTimezoneFormat || '')?.name || tt('Unknown') }})</span>
                                     <v-menu eager activator="parent" location="bottom" max-height="500">
                                         <v-list>
                                             <v-list-item key="auto"
-                                                         :append-icon="parsedFileTimezoneFormat === '' ? mdiCheck : undefined"
-                                                         @click="parsedFileTimezoneFormat = ''">
+                                                         :append-icon="parsedFileDataColumnMapping.timezoneFormat === '' ? mdiCheck : undefined"
+                                                         @click="parsedFileDataColumnMapping.timezoneFormat = ''">
                                                 <v-list-item-title class="cursor-pointer">
                                                     <span>{{ tt('Auto detect') }}</span>
                                                     <span class="ml-1" v-if="parsedFileAutoDetectedTimezoneFormat && KnownDateTimezoneFormat.valueOf(parsedFileAutoDetectedTimezoneFormat || '')">({{ KnownDateTimezoneFormat.valueOf(parsedFileAutoDetectedTimezoneFormat || '')?.name }})</span>
@@ -385,9 +400,9 @@
                                                 </v-list-item-title>
                                             </v-list-item>
                                             <v-list-item :key="timezoneFormat.value"
-                                                         :append-icon="parsedFileTimezoneFormat === timezoneFormat.value ? mdiCheck : undefined"
+                                                         :append-icon="parsedFileDataColumnMapping.timezoneFormat === timezoneFormat.value ? mdiCheck : undefined"
                                                          v-for="timezoneFormat in KnownDateTimezoneFormat.values()"
-                                                         @click="parsedFileTimezoneFormat = timezoneFormat.value">
+                                                         @click="parsedFileDataColumnMapping.timezoneFormat = timezoneFormat.value">
                                                 <v-list-item-title class="cursor-pointer">
                                                     {{ timezoneFormat.name }}
                                                 </v-list-item-title>
@@ -396,14 +411,14 @@
                                     </v-menu>
                                 </v-btn>
                                 <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
-                                       :disabled="!parsedFileDataColumnMapping || !isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.Amount.type])">
+                                       :disabled="!parsedFileDataColumnMapping || !parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.Amount)">
                                     <span>{{ tt('Amount Format') }}</span>
-                                    <span class="ml-1" v-if="parsedFileDataColumnMapping && isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.Amount.type])">({{ KnownAmountFormat.valueOf(parsedFileAmountFormat || parsedFileAutoDetectedAmountFormat || '')?.format || tt('Unknown') }})</span>
+                                    <span class="ml-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.Amount)">({{ KnownAmountFormat.valueOf(parsedFileDataColumnMapping.amountFormat || parsedFileAutoDetectedAmountFormat || '')?.format || tt('Unknown') }})</span>
                                     <v-menu eager activator="parent" location="bottom" max-height="500">
                                         <v-list>
                                             <v-list-item key="auto"
-                                                         :append-icon="parsedFileAmountFormat === '' ? mdiCheck : undefined"
-                                                         @click="parsedFileAmountFormat = ''">
+                                                         :append-icon="parsedFileDataColumnMapping.amountFormat === '' ? mdiCheck : undefined"
+                                                         @click="parsedFileDataColumnMapping.amountFormat = ''">
                                                 <v-list-item-title class="cursor-pointer">
                                                     <span>{{ tt('Auto detect') }}</span>
                                                     <span class="ml-1" v-if="parsedFileAutoDetectedAmountFormat && KnownAmountFormat.valueOf(parsedFileAutoDetectedAmountFormat || '')">({{ KnownAmountFormat.valueOf(parsedFileAutoDetectedAmountFormat || '')?.format }})</span>
@@ -411,9 +426,9 @@
                                                 </v-list-item-title>
                                             </v-list-item>
                                             <v-list-item :key="amountFormat.type"
-                                                         :append-icon="parsedFileAmountFormat === amountFormat.type ? mdiCheck : undefined"
+                                                         :append-icon="parsedFileDataColumnMapping.amountFormat === amountFormat.type ? mdiCheck : undefined"
                                                          v-for="amountFormat in KnownAmountFormat.values()"
-                                                         @click="parsedFileAmountFormat = amountFormat.type">
+                                                         @click="parsedFileDataColumnMapping.amountFormat = amountFormat.type">
                                                 <v-list-item-title class="cursor-pointer">
                                                     {{ amountFormat.format }}
                                                 </v-list-item-title>
@@ -422,9 +437,9 @@
                                     </v-menu>
                                 </v-btn>
                                 <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
-                                       v-if="parsedFileDataColumnMapping && isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.GeographicLocation.type])">
+                                       v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.GeographicLocation)">
                                     <span>{{ tt('Geographic Location Separator') }}</span>
-                                    <span class="ml-1" v-if="parsedFileGeoLocationSeparator">({{ parsedFileGeoLocationOrder === 'latlon' ? `${tt('Latitude')}${parsedFileGeoLocationSeparator}${tt('Longitude')}` : `${tt('Longitude')}${parsedFileGeoLocationSeparator}${tt('Latitude')}` }})</span>
+                                    <span class="ml-1" v-if="parsedFileDataColumnMapping.geoLocationOrder">({{ parsedFileDataColumnMapping.formatGeoLocation(tt('Latitude'), tt('Longitude')) }})</span>
                                     <v-menu eager activator="parent" location="bottom" max-height="500"
                                             :close-on-content-click="false">
                                         <v-list class="pa-0">
@@ -437,15 +452,15 @@
                                                         <td>
                                                             <v-btn-toggle class="transaction-types-toggle" density="compact" variant="outlined"
                                                                           mandatory="force" divided
-                                                                          v-model="parsedFileGeoLocationOrder"
-                                                                          v-if="parsedFileGeoLocationSeparator === separator.value">
+                                                                          v-model="parsedFileDataColumnMapping.geoLocationOrder"
+                                                                          v-if="parsedFileDataColumnMapping.geoLocationSeparator === separator.value">
                                                                 <v-btn value="latlon">{{ `${tt('Latitude')}${separator.value}${tt('Longitude')}` }}</v-btn>
                                                                 <v-btn value="lonlat">{{ `${tt('Longitude')}${separator.value}${tt('Latitude')}` }}</v-btn>
                                                             </v-btn-toggle>
                                                             <v-btn-group class="transaction-types-toggle" density="compact" variant="outlined"
-                                                                          divided v-if="parsedFileGeoLocationSeparator !== separator.value">
-                                                                <v-btn @click="parsedFileGeoLocationSeparator = separator.value; parsedFileGeoLocationOrder = 'latlon'">{{ `${tt('Latitude')}${separator.value}${tt('Longitude')}` }}</v-btn>
-                                                                <v-btn @click="parsedFileGeoLocationSeparator = separator.value; parsedFileGeoLocationOrder = 'lonlat'">{{ `${tt('Longitude')}${separator.value}${tt('Latitude')}` }}</v-btn>
+                                                                          divided v-if="parsedFileDataColumnMapping.geoLocationSeparator !== separator.value">
+                                                                <v-btn @click="parsedFileDataColumnMapping.setGeoLocationFormat(separator.value, 'latlon')">{{ `${tt('Latitude')}${separator.value}${tt('Longitude')}` }}</v-btn>
+                                                                <v-btn @click="parsedFileDataColumnMapping.setGeoLocationFormat(separator.value, 'lonlat')">{{ `${tt('Longitude')}${separator.value}${tt('Latitude')}` }}</v-btn>
                                                             </v-btn-group>
                                                         </td>
                                                     </tr>
@@ -456,15 +471,15 @@
                                     </v-menu>
                                 </v-btn>
                                 <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
-                                       v-if="parsedFileDataColumnMapping && isNumber(parsedFileDataColumnMapping[ImportTransactionColumnType.Tags.type])">
+                                       v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.Tags)">
                                     <span>{{ tt('Transaction Tags Separator') }}</span>
-                                    <span class="ml-1" v-if="parsedFileTagSeparator">({{ parsedFileTagSeparator }})</span>
+                                    <span class="ml-1" v-if="parsedFileDataColumnMapping.tagSeparator">({{ parsedFileDataColumnMapping.tagSeparator }})</span>
                                     <v-menu eager activator="parent" location="bottom" max-height="500">
                                         <v-list>
                                             <v-list-item :key="separator.value"
-                                                         :append-icon="parsedFileTagSeparator === separator.value ? mdiCheck : undefined"
+                                                         :append-icon="parsedFileDataColumnMapping.tagSeparator === separator.value ? mdiCheck : undefined"
                                                          v-for="separator in allSeparators"
-                                                         @click="parsedFileTagSeparator = separator.value">
+                                                         @click="parsedFileDataColumnMapping.tagSeparator = separator.value">
                                                 <v-list-item-title class="cursor-pointer">
                                                     {{ separator.name }} ({{separator.value}})
                                                 </v-list-item-title>
@@ -879,7 +894,10 @@ import { KnownAmountFormat } from '@/core/numeral.ts';
 import { KnownDateTimeFormat } from '@/core/datetime.ts';
 import { KnownDateTimezoneFormat } from '@/core/timezone.ts';
 import { CategoryType } from '@/core/category.ts';
-import { TransactionType, ImportTransactionColumnType } from '@/core/transaction.ts';
+import { TransactionType } from '@/core/transaction.ts';
+import { ImportTransactionColumnType, ImportTransactionDataMapping } from '@/core/import_transaction.ts';
+import { KnownFileType } from '@/core/file.ts';
+
 import type { LocalizedImportFileType, LocalizedImportFileTypeSubType, LocalizedImportFileTypeSupportedEncodings } from '@/core/file.ts';
 import { Account, type CategorizedAccountWithDisplayBalance } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
@@ -916,12 +934,18 @@ import {
     getTransactionPrimaryCategoryName,
     getTransactionSecondaryCategoryName
 } from '@/lib/category.ts';
+import {
+    openTextFileContent,
+    startDownloadFile
+} from '@/lib/ui/common.ts';
 
 import {
     mdiFilterOutline,
     mdiCheck,
     mdiDotsVertical,
     mdiHelpCircleOutline,
+    mdiFolderOpenOutline,
+    mdiContentSaveOutline,
     mdiFindReplace,
     mdiShapePlusOutline,
     mdiTransfer,
@@ -996,15 +1020,7 @@ const fileEncoding = ref<string>('utf-8');
 const importFile = ref<File | null>(null);
 const importData = ref<string>('');
 const parsedFileData = ref<string[][] | undefined>(undefined);
-const parsedFileIncludeHeader = ref<boolean>(true);
-const parsedFileDataColumnMapping = ref<Record<number, number>>({});
-const parsedFileTransactionTypeMapping = ref<Record<string, TransactionType>>({});
-const parsedFileTimeFormat = ref<string>('');
-const parsedFileTimezoneFormat = ref<string>('');
-const parsedFileAmountFormat = ref<string>('');
-const parsedFileGeoLocationSeparator = ref<string>(' ');
-const parsedFileGeoLocationOrder = ref<string>('lonlat');
-const parsedFileTagSeparator = ref<string>(';');
+const parsedFileDataColumnMapping = ref<ImportTransactionDataMapping>(ImportTransactionDataMapping.createEmpty());
 const importTransactions = ref<ImportTransaction[] | undefined>(undefined);
 const editingTransaction = ref<ImportTransaction | null>(null);
 const editingTags = ref<string[]>([]);
@@ -1192,7 +1208,7 @@ const parsedFileLines = computed<Record<string, string>[] | undefined>(() => {
     }
 
     const allLines: Record<string, string>[] = [];
-    const startIndex = parsedFileIncludeHeader.value ? 1 : 0;
+    const startIndex = parsedFileDataColumnMapping.value.includeHeader ? 1 : 0;
 
     for (let i = startIndex, index = 1; i < parsedFileData.value.length; i++, index++) {
         const line: Record<string, string> = {};
@@ -1235,7 +1251,7 @@ const parsedFileLinesHeaders = computed<object[]>(() => {
     for (let i = 0; i < maxColumnCount; i++) {
         let title = `#${i + 1}`;
 
-        if (parsedFileIncludeHeader.value && parsedFileData.value && parsedFileData.value[0][i]) {
+        if (parsedFileDataColumnMapping.value.includeHeader && parsedFileData.value && parsedFileData.value[0][i]) {
             title = parsedFileData.value[0][i];
         }
 
@@ -1247,151 +1263,11 @@ const parsedFileLinesHeaders = computed<object[]>(() => {
 
 const parsedFileLinesTablePageOptions = computed<ImportTransactionsDialogTablePageOption[]>(() => getTablePageOptions(parsedFileLines.value?.length));
 
-const parsedFileAllTransactionTypes = computed<string[]>(() => {
-    if (!parsedFileData.value || !parsedFileData.value.length || !isNumber(parsedFileDataColumnMapping.value[ImportTransactionColumnType.TransactionType.type])) {
-        return [];
-    }
-
-    const allTypeMap: Record<string, boolean> = {};
-    const allTypes: string[] = [];
-    const typeColumnIndex = parsedFileDataColumnMapping.value[ImportTransactionColumnType.TransactionType.type];
-
-    const startIndex = parsedFileIncludeHeader.value ? 1 : 0;
-
-    for (let i = startIndex; i < parsedFileData.value.length; i++) {
-        if (parsedFileData.value[i].length <= typeColumnIndex) {
-            continue;
-        }
-
-        const type = parsedFileData.value[i][typeColumnIndex];
-
-        if (type && !allTypeMap[type]) {
-            allTypes.push(type);
-            allTypeMap[type] = true;
-        }
-    }
-
-    return allTypes;
-});
-
-const parsedFileValidMappedTransactionTypes = computed<Record<string, TransactionType>>(() => {
-    if (!parsedFileData.value || !parsedFileData.value.length || !isNumber(parsedFileDataColumnMapping.value[ImportTransactionColumnType.TransactionType.type])) {
-        return {};
-    }
-
-    const result: Record<string, TransactionType> = {};
-
-    if (!parsedFileTransactionTypeMapping.value) {
-        return result;
-    }
-
-    for (const name in parsedFileTransactionTypeMapping.value) {
-        if (!Object.prototype.hasOwnProperty.call(parsedFileTransactionTypeMapping.value, name)) {
-            continue;
-        }
-
-        const type = parsedFileTransactionTypeMapping.value[name];
-
-        if (TransactionType.ModifyBalance <= type && type <= TransactionType.Transfer) {
-            result[name] = type;
-        }
-    }
-
-    return result;
-});
-
-const parsedFileAutoDetectedTimeFormat = computed<string | undefined>(() => {
-    if (!parsedFileData.value || !parsedFileData.value.length || !isNumber(parsedFileDataColumnMapping.value[ImportTransactionColumnType.TransactionTime.type])) {
-        return undefined;
-    }
-
-    const allDateTimes: string[] = [];
-    const dateTimeColumnIndex = parsedFileDataColumnMapping.value[ImportTransactionColumnType.TransactionTime.type];
-
-    const startIndex = parsedFileIncludeHeader.value ? 1 : 0;
-
-    for (let i = startIndex; i < parsedFileData.value.length; i++) {
-        if (parsedFileData.value[i].length <= dateTimeColumnIndex) {
-            continue;
-        }
-
-        const dateTime = parsedFileData.value[i][dateTimeColumnIndex];
-
-        if (dateTime) {
-            allDateTimes.push(dateTime);
-        }
-    }
-
-    const detectedFormats = KnownDateTimeFormat.detectMulti(allDateTimes);
-
-    if (!detectedFormats || !detectedFormats.length || detectedFormats.length > 1) {
-        return undefined;
-    }
-
-    return detectedFormats[0].format;
-});
-
-const parsedFileAutoDetectedTimezoneFormat = computed<string | undefined>(() => {
-    if (!parsedFileData.value || !parsedFileData.value.length || !isNumber(parsedFileDataColumnMapping.value[ImportTransactionColumnType.TransactionTimezone.type])) {
-        return undefined;
-    }
-
-    const allTimezones: string[] = [];
-    const timezoneColumnIndex = parsedFileDataColumnMapping.value[ImportTransactionColumnType.TransactionTimezone.type];
-
-    const startIndex = parsedFileIncludeHeader.value ? 1 : 0;
-
-    for (let i = startIndex; i < parsedFileData.value.length; i++) {
-        if (parsedFileData.value[i].length <= timezoneColumnIndex) {
-            continue;
-        }
-
-        const timezone = parsedFileData.value[i][timezoneColumnIndex];
-
-        if (timezone) {
-            allTimezones.push(timezone);
-        }
-    }
-
-    const detectedFormats = KnownDateTimezoneFormat.detectMulti(allTimezones);
-
-    if (!detectedFormats || !detectedFormats.length || detectedFormats.length > 1) {
-        return undefined;
-    }
-
-    return detectedFormats[0].value;
-});
-
-const parsedFileAutoDetectedAmountFormat = computed<string | undefined>(() => {
-    if (!parsedFileData.value || !parsedFileData.value.length || !isNumber(parsedFileDataColumnMapping.value[ImportTransactionColumnType.Amount.type])) {
-        return undefined;
-    }
-
-    const allAmounts: string[] = [];
-    const amountColumnIndex = parsedFileDataColumnMapping.value[ImportTransactionColumnType.Amount.type];
-
-    const startIndex = parsedFileIncludeHeader.value ? 1 : 0;
-
-    for (let i = startIndex; i < parsedFileData.value.length; i++) {
-        if (parsedFileData.value[i].length <= amountColumnIndex) {
-            continue;
-        }
-
-        const amount = parsedFileData.value[i][amountColumnIndex];
-
-        if (amount) {
-            allAmounts.push(amount);
-        }
-    }
-
-    const detectedFormats = KnownAmountFormat.detectMulti(allAmounts);
-
-    if (!detectedFormats || !detectedFormats.length) {
-        return undefined;
-    }
-
-    return detectedFormats[0].type;
-});
+const parsedFileAllTransactionTypes = computed<string[]>(() => parsedFileDataColumnMapping.value.parseFileAllTransactionTypes(parsedFileData.value));
+const parsedFileValidMappedTransactionTypes = computed<Record<string, TransactionType>>(() => parsedFileDataColumnMapping.value.parseFileValidMappedTransactionTypes(parsedFileData.value));
+const parsedFileAutoDetectedTimeFormat = computed<string | undefined>(() => parsedFileDataColumnMapping.value.parseFileAutoDetectedTimeFormat(parsedFileData.value));
+const parsedFileAutoDetectedTimezoneFormat = computed<string | undefined>(() => parsedFileDataColumnMapping.value.parseFileAutoDetectedTimezoneFormat(parsedFileData.value));
+const parsedFileAutoDetectedAmountFormat = computed<string | undefined>(() => parsedFileDataColumnMapping.value.parseFileAutoDetectedAmountFormat(parsedFileData.value));
 
 const importTransactionsTableHeight = computed<number | undefined>(() => {
     if (countPerPage.value <= 10 || !importTransactions.value || importTransactions.value.length <= 10) {
@@ -1649,8 +1525,8 @@ function getTablePageOptions(linesCount?: number): ImportTransactionsDialogTable
 }
 
 function getParseDataMappedColumnDisplayName(columnIndex: number): string {
-    for (const columnType in parsedFileDataColumnMapping.value) {
-        if (parsedFileDataColumnMapping.value[columnType] === columnIndex) {
+    for (const columnType in parsedFileDataColumnMapping.value.dataColumnMapping) {
+        if (parsedFileDataColumnMapping.value.dataColumnMapping[columnType] === columnIndex) {
             return findDisplayNameByType(allImportTransactionColumnTypes.value, parseInt(columnType)) || tt('Unspecified');
         }
     }
@@ -1658,18 +1534,27 @@ function getParseDataMappedColumnDisplayName(columnIndex: number): string {
     return tt('Unspecified');
 }
 
-function updateParseDataMappedColumn(columnIndex: number, columnType: number): void {
-    if (parsedFileDataColumnMapping.value[columnType] === columnIndex) {
-        delete parsedFileDataColumnMapping.value[columnType];
-    } else {
-        parsedFileDataColumnMapping.value[columnType] = columnIndex;
-    }
+function loadColumnMappingFile(): void {
+    openTextFileContent({
+        allowedExtensions: KnownFileType.JSON.contentType
+    }).then(content => {
+        const result = ImportTransactionDataMapping.parseFromJson(content);
 
-    for (const otherColumnType in parsedFileDataColumnMapping.value) {
-        if (otherColumnType !== columnType.toString() && parsedFileDataColumnMapping.value[otherColumnType] === columnIndex) {
-            delete parsedFileDataColumnMapping.value[otherColumnType];
+        if (result) {
+            parsedFileDataColumnMapping.value = result;
+        } else {
+            logger.error('Failed to parse data mapping file');
+            snackbar.value?.showError('Data mapping file is invalid');
         }
-    }
+    }).catch(error => {
+        logger.error('Failed to open data mapping file', error);
+        snackbar.value?.showError('Data mapping file is invalid');
+    });
+}
+
+function saveColumnMappingFile(): void {
+    const fileName = KnownFileType.JSON.formatFileName(tt('dataExport.defaultImportDataMappingFileName'));
+    startDownloadFile(fileName, KnownFileType.JSON.createBlob(parsedFileDataColumnMapping.value.toJson()));
 }
 
 function isTransactionDisplayed(transaction: ImportTransaction): boolean {
@@ -1954,15 +1839,7 @@ function open(): Promise<void> {
     importFile.value = null;
     importData.value = '';
     parsedFileData.value = undefined;
-    parsedFileIncludeHeader.value = true;
-    parsedFileDataColumnMapping.value = {};
-    parsedFileTransactionTypeMapping.value = {};
-    parsedFileTimeFormat.value = '';
-    parsedFileTimezoneFormat.value = '';
-    parsedFileAmountFormat.value = '';
-    parsedFileGeoLocationSeparator.value = ' ';
-    parsedFileGeoLocationOrder.value = 'lonlat';
-    parsedFileTagSeparator.value = ';';
+    parsedFileDataColumnMapping.value.reset();
     importTransactions.value = undefined;
     editingTransaction.value = null;
     editingTags.value = [];
@@ -2111,15 +1988,15 @@ function parseData(): void {
         let tagSeparator: string | undefined = undefined;
 
         if (isDsvFileType) {
-            columnMapping = parsedFileDataColumnMapping.value;
+            columnMapping = parsedFileDataColumnMapping.value.dataColumnMapping;
             transactionTypeMapping = parsedFileValidMappedTransactionTypes.value;
-            hasHeaderLine = parsedFileIncludeHeader.value;
-            timeFormat = parsedFileTimeFormat.value;
-            timezoneFormat = parsedFileTimezoneFormat.value;
-            amountFormat = parsedFileAmountFormat.value;
-            geoLocationSeparator = parsedFileGeoLocationSeparator.value;
-            geoLocationOrder = parsedFileGeoLocationOrder.value;
-            tagSeparator = parsedFileTagSeparator.value;
+            hasHeaderLine = parsedFileDataColumnMapping.value.includeHeader;
+            timeFormat = parsedFileDataColumnMapping.value.timeFormat;
+            timezoneFormat = parsedFileDataColumnMapping.value.timezoneFormat;
+            amountFormat = parsedFileDataColumnMapping.value.amountFormat;
+            geoLocationSeparator = parsedFileDataColumnMapping.value.geoLocationSeparator;
+            geoLocationOrder = parsedFileDataColumnMapping.value.geoLocationOrder;
+            tagSeparator = parsedFileDataColumnMapping.value.tagSeparator;
 
             if (!columnMapping
                 || !isNumber(columnMapping[ImportTransactionColumnType.TransactionTime.type])
@@ -2134,15 +2011,15 @@ function parseData(): void {
                 return;
             }
 
-            if (!parsedFileTimeFormat.value) {
+            if (!parsedFileDataColumnMapping.value.timeFormat) {
                 timeFormat = parsedFileAutoDetectedTimeFormat.value;
             }
 
-            if (!parsedFileTimezoneFormat.value) {
+            if (!parsedFileDataColumnMapping.value.timezoneFormat) {
                 timezoneFormat = parsedFileAutoDetectedTimezoneFormat.value;
             }
 
-            if (!parsedFileAmountFormat.value) {
+            if (!parsedFileDataColumnMapping.value.amountFormat) {
                 amountFormat = parsedFileAutoDetectedAmountFormat.value;
             }
 

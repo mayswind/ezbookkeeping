@@ -57,36 +57,3 @@ export class TransactionTagFilterType implements TypeAndName {
         return TransactionTagFilterType.allInstances;
     }
 }
-
-export class ImportTransactionColumnType implements TypeAndName {
-    private static readonly allInstances: ImportTransactionColumnType[] = [];
-
-    public static readonly TransactionTime = new ImportTransactionColumnType(1, 'Transaction Time');
-    public static readonly TransactionTimezone = new ImportTransactionColumnType(2, 'Transaction Timezone');
-    public static readonly TransactionType = new ImportTransactionColumnType(3, 'Transaction Type');
-    public static readonly Category = new ImportTransactionColumnType(4, 'Category');
-    public static readonly SubCategory = new ImportTransactionColumnType(5, 'Secondary Category');
-    public static readonly AccountName = new ImportTransactionColumnType(6, 'Account Name');
-    public static readonly AccountCurrency = new ImportTransactionColumnType(7, 'Currency');
-    public static readonly Amount = new ImportTransactionColumnType(8, 'Amount');
-    public static readonly RelatedAccountName = new ImportTransactionColumnType(9, 'Transfer In Account Name');
-    public static readonly RelatedAccountCurrency = new ImportTransactionColumnType(10, 'Transfer In Currency');
-    public static readonly RelatedAmount = new ImportTransactionColumnType(11, 'Transfer In Amount');
-    public static readonly GeographicLocation = new ImportTransactionColumnType(12, 'Geographic Location');
-    public static readonly Tags = new ImportTransactionColumnType(13, 'Tags');
-    public static readonly Description = new ImportTransactionColumnType(14, 'Description');
-
-    public readonly type: number;
-    public readonly name: string;
-
-    private constructor(type: number, name: string) {
-        this.type = type;
-        this.name = name;
-
-        ImportTransactionColumnType.allInstances.push(this);
-    }
-
-    public static values(): ImportTransactionColumnType[] {
-        return ImportTransactionColumnType.allInstances;
-    }
-}

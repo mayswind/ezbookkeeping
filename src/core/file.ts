@@ -1,6 +1,7 @@
 export class KnownFileType {
     private static readonly allInstancesByExtension: Record<string, KnownFileType> = {};
 
+    public static readonly JSON = new KnownFileType('json', 'application/json');
     public static readonly CSV = new KnownFileType('csv', 'text/csv');
     public static readonly TSV = new KnownFileType('tsv', 'text/tab-separated-values');
     public static readonly MARKDOWN = new KnownFileType('md', 'text/markdown');

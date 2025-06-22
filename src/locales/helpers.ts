@@ -235,41 +235,64 @@ export function useI18n() {
             return DEFAULT_LANGUAGE;
         }
 
-        if (!ALL_LANGUAGES[browserLanguage]) {
-            const languageKey = getLanguageKeyFromLanguageAlias(browserLanguage);
-
-            if (languageKey) {
-                browserLanguage = languageKey;
-            }
+        // try to match the full browser language tag with full language tag in i18n file
+        if (ALL_LANGUAGES[browserLanguage]) {
+            return browserLanguage;
         }
 
-        if (!ALL_LANGUAGES[browserLanguage] && browserLanguage.split('-').length > 1) { // maybe language-script-region
-            const languageTagParts = browserLanguage.split('-');
+        // try to match the full browser language tag with language alias tags in i18n file
+        let alternativeLanguage = getLanguageKeyFromLanguageAlias(browserLanguage);
+
+        if (alternativeLanguage && ALL_LANGUAGES[alternativeLanguage]) {
+            return alternativeLanguage;
+        }
+
+        const languageTagParts = browserLanguage.split('-');
+
+        // maybe browser language is language-script-region format
+        if (languageTagParts.length > 2) {
+            // fallback to use language tag with language-script / language-region format
             browserLanguage = languageTagParts[0] + '-' + languageTagParts[1];
 
-            if (!ALL_LANGUAGES[browserLanguage]) {
-                const languageKey = getLanguageKeyFromLanguageAlias(browserLanguage);
-
-                if (languageKey) {
-                    browserLanguage = languageKey;
-                }
+            // try to match language tag in language-script / language-region format with full language tag in i18n file
+            if (ALL_LANGUAGES[browserLanguage]) {
+                return browserLanguage;
             }
 
-            if (!ALL_LANGUAGES[browserLanguage]) {
-                browserLanguage = languageTagParts[0];
-                const languageKey = getLanguageKeyFromLanguageAlias(browserLanguage);
+            // try to match language tag in language-script / language-region format with language alias tags in i18n file
+            alternativeLanguage = getLanguageKeyFromLanguageAlias(browserLanguage);
 
-                if (languageKey) {
-                    browserLanguage = languageKey;
-                }
+            if (alternativeLanguage && ALL_LANGUAGES[alternativeLanguage]) {
+                return alternativeLanguage;
             }
         }
 
-        if (!ALL_LANGUAGES[browserLanguage]) {
-            return DEFAULT_LANGUAGE;
+        // fallback to use marco language tag
+        if (languageTagParts.length > 1) {
+            browserLanguage = languageTagParts[0];
+
+            // try to match marco language tag with full language tag in i18n file
+            if (ALL_LANGUAGES[browserLanguage]) {
+                return browserLanguage;
+            }
+
+            // try to match marco language tag with language alias tags in i18n file
+            alternativeLanguage = getLanguageKeyFromLanguageAlias(browserLanguage);
+
+            if (alternativeLanguage && ALL_LANGUAGES[alternativeLanguage]) {
+                return alternativeLanguage;
+            }
         }
 
-        return browserLanguage;
+        // fallback to match marco language tag with marco language tag in i18n file
+        alternativeLanguage = getLanguageKeyFromMarcoLanguageTag(browserLanguage);
+
+        if (alternativeLanguage && ALL_LANGUAGES[alternativeLanguage]) {
+            return alternativeLanguage;
+        }
+
+        // fallback to use the default language
+        return DEFAULT_LANGUAGE;
     }
 
     function getLanguageKeyFromLanguageAlias(alias: string): string | null {
@@ -293,6 +316,26 @@ export function useI18n() {
                 if (aliases[i].toLowerCase() === alias.toLowerCase()) {
                     return languageKey;
                 }
+            }
+        }
+
+        return null;
+    }
+
+    function getLanguageKeyFromMarcoLanguageTag(languageTag: string): string | null {
+        for (const languageKey in ALL_LANGUAGES) {
+            if (!Object.prototype.hasOwnProperty.call(ALL_LANGUAGES, languageKey)) {
+                continue;
+            }
+
+            if (languageKey.indexOf('-') < 0) {
+                continue;
+            }
+
+            const marcoLanguageTag = languageKey.split('-')[0];
+
+            if (marcoLanguageTag.toLowerCase() === languageTag.toLowerCase()) {
+                return languageKey;
             }
         }
 

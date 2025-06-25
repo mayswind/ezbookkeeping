@@ -6,7 +6,7 @@
 [![Latest Release](https://img.shields.io/github/release/mayswind/ezbookkeeping.svg?style=flat)](https://github.com/mayswind/ezbookkeeping/releases)
 
 ## Introduction
-ezBookkeeping is a lightweight self-hosted personal bookkeeping app with user-friendly interface for both desktop and mobile devices. It supports PWA, you can [add the app homepage to the home screen](https://raw.githubusercontent.com/wiki/mayswind/ezbookkeeping/img/mobile/add_to_home_screen.gif) of your mobile device and use it just like a native app. It's easily to be deployed and configured, you can just deploy it by a single command via Docker. It supports almost all platforms, including Windows, macOS, and Linux, and is compatible with x86, amd64 and ARM hardware architectures. It only requires very few system resources, and you can even run it on a Raspberry Pi device.
+ezBookkeeping is a lightweight, self-hosted personal finance app with a user-friendly interface and powerful bookkeeping features. It supports PWA, you can [add the app homepage to the home screen](https://raw.githubusercontent.com/wiki/mayswind/ezbookkeeping/img/mobile/add_to_home_screen.gif) of your mobile device and use it just like a native app. It's easily to be deployed and configured, you can just deploy it by a single command via Docker. It supports almost all platforms, including Windows, macOS, and Linux, and is compatible with x86, amd64 and ARM hardware architectures. It only requires very few system resources, and you can even run it on a Raspberry Pi device.
 
 Online Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-demo.mayswind.net)
 

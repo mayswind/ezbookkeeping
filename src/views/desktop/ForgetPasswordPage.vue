@@ -101,7 +101,7 @@ import { useRootStore } from '@/stores/index.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { getVersion } from '@/lib/version.ts';
+import { getClientDisplayVersion } from '@/lib/version.ts';
 
 import {
     mdiChevronLeft,
@@ -115,7 +115,7 @@ const { tt } = useI18n();
 
 const rootStore = useRootStore();
 
-const version = `v${getVersion()}`;
+const version = `${getClientDisplayVersion()}`;
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 

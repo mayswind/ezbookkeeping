@@ -5,6 +5,9 @@ import type { ApiResponse } from '@/core/api.ts';
 import type {
     ApplicationCloudSetting
 } from '@/core/setting.ts';
+import type {
+    VersionInfo
+} from '@/core/version.ts';
 import {
     TransactionType
 } from '@/core/transaction.ts';
@@ -598,6 +601,9 @@ export default {
     },
     deleteUserCustomExchangeRate: (req: UserCustomExchangeRateDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/exchange_rates/user_custom/delete.json', req);
+    },
+    getServerVersion: (): ApiResponsePromise<VersionInfo> => {
+        return axios.get<ApiResponse<VersionInfo>>('v1/systems/version.json');
     },
     generateQrCodeUrl: (qrCodeName: string): string => {
         return `${getBasePath()}${BASE_QRCODE_PATH}/${qrCodeName}.png`;

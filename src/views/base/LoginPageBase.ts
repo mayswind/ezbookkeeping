@@ -9,7 +9,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 import type { AuthResponse } from '@/models/auth_response.ts';
 
 import { getLoginPageTips } from '@/lib/server_settings.ts';
-import { getVersion } from '@/lib/version.ts';
+import { getClientDisplayVersion } from '@/lib/version.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 export function useLoginPageBase() {
@@ -19,7 +19,7 @@ export function useLoginPageBase() {
     const settingsStore = useSettingsStore();
     const exchangeRatesStore = useExchangeRatesStore();
 
-    const version = `v${getVersion()}`;
+    const version = `${getClientDisplayVersion()}`;
 
     const username = ref<string>('');
     const password = ref<string>('');

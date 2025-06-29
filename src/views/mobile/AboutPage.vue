@@ -1,11 +1,19 @@
 <template>
     <f7-page>
-        <f7-navbar :title="tt('About')" :back-link="tt('Back')"></f7-navbar>
+        <f7-navbar>
+            <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-title :title="tt('About')"></f7-nav-title>
+            <f7-nav-right>
+                <f7-link icon-f7="" v-if="clientVersionMatchServerVersion && !forceShowRefreshBrowserCacheMenu"/>
+                <f7-link icon-f7="ellipsis" @click="showRefreshBrowserCacheSheet = true"
+                         v-else-if="!clientVersionMatchServerVersion || forceShowRefreshBrowserCacheMenu"></f7-link>
+            </f7-nav-right>
+        </f7-navbar>
 
         <f7-block-title class="margin-top">{{ tt('global.app.title') }}</f7-block-title>
         <f7-list strong inset dividers>
-            <f7-list-item :title="tt('Version')" :after="version"></f7-list-item>
-            <f7-list-item :title="tt('Build Time')" :after="buildTime" v-if="buildTime"></f7-list-item>
+            <f7-list-item :title="tt('Version')" :after="clientVersion" @click="showVersion"></f7-list-item>
+            <f7-list-item :title="tt('Build Time')" :after="clientBuildTime" v-if="clientBuildTime"></f7-list-item>
             <f7-list-item external :title="tt('Official Website')" link="https://github.com/mayswind/ezbookkeeping" target="_blank"></f7-list-item>
             <f7-list-item external :title="tt('Report Issue')" link="https://github.com/mayswind/ezbookkeeping/issues" target="_blank"></f7-list-item>
             <f7-list-item external :title="tt('Getting help')" link="https://ezbookkeeping.mayswind.net" target="_blank"></f7-list-item>
@@ -54,24 +62,58 @@
                 </f7-block>
             </f7-page>
         </f7-popup>
+
+        <f7-actions close-by-outside-click close-on-escape :opened="showRefreshBrowserCacheSheet" @actions:closed="showRefreshBrowserCacheSheet = false">
+            <f7-actions-group>
+                <f7-actions-button @click="refreshBrowserCache">{{ tt('Refresh Browser Cache') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
+            </f7-actions-group>
+        </f7-actions>
     </f7-page>
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue';
+
 import { useI18n } from '@/locales/helpers.ts';
+import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
 import { useAboutPageBase } from '@/views/base/AboutPageBase.ts';
 
 const { tt } = useI18n();
+const { showAlert } = useI18nUIComponents();
 const {
-    version,
-    buildTime,
+    clientVersion,
+    clientVersionMatchServerVersion,
+    serverDisplayVersion,
+    clientBuildTime,
     exchangeRatesData,
     isUserCustomExchangeRates,
     mapProviderName,
     mapProviderWebsite,
     licenseLines,
-    thirdPartyLicenses
+    thirdPartyLicenses,
+    refreshBrowserCache,
+    init
 } = useAboutPageBase();
+
+const showRefreshBrowserCacheSheet = ref<boolean>(false);
+const versionClickCount = ref<number>(0);
+const forceShowRefreshBrowserCacheMenu = computed<boolean>(() => versionClickCount.value >= 5);
+
+function showVersion(): void {
+    let versionMessage = `${tt('Frontend Version')}: ${clientVersion}`;
+
+    if (serverDisplayVersion.value) {
+        versionMessage += `<br/>${tt('Backend Version')}: ${serverDisplayVersion.value}`;
+    }
+
+    versionClickCount.value++;
+    showAlert(versionMessage);
+}
+
+init();
 </script>
 
 <style>

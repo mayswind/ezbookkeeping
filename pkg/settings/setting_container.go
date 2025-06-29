@@ -9,6 +9,7 @@ type ConfigContainer struct {
 var (
 	Version    string
 	CommitHash string
+	BuildTime  string
 	Container  = &ConfigContainer{}
 )
 

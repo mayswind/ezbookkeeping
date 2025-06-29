@@ -367,6 +367,9 @@ func startWebServer(c *core.CliContext) error {
 			apiV1Route.GET("/exchange_rates/latest.json", bindApi(api.ExchangeRates.LatestExchangeRateHandler))
 			apiV1Route.POST("/exchange_rates/user_custom/update.json", bindApi(api.ExchangeRates.UserCustomExchangeRateUpdateHandler))
 			apiV1Route.POST("/exchange_rates/user_custom/delete.json", bindApi(api.ExchangeRates.UserCustomExchangeRateDeleteHandler))
+
+			// System
+			apiV1Route.GET("/systems/version.json", bindApi(api.Systems.VersionHandler))
 		}
 	}
 

@@ -1,22 +1,34 @@
 <template>
     <v-row class="match-height">
         <v-col cols="12">
-            <v-card :title="tt('global.app.title')">
+            <v-card>
+                <template #title>
+                    <div class="d-flex align-center">
+                        <span>{{ tt('global.app.title') }}</span>
+                        <v-btn density="compact" color="default" variant="text" size="24"
+                               class="ml-2" :icon="true" @click="refreshBrowserCache"
+                               v-if="!clientVersionMatchServerVersion">
+                            <v-icon :icon="mdiWebRefresh" size="24" />
+                            <v-tooltip activator="parent">{{ tt('Refresh Browser Cache') }}</v-tooltip>
+                        </v-btn>
+                    </div>
+                </template>
+
                 <v-card-text>
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
                             <span class="text-body-1">{{ tt('Version') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
-                            <span class="text-body-1">{{ version }}</span>
+                            <span class="text-body-1">{{ clientVersion }}</span>
                         </v-col>
                     </v-row>
-                    <v-row no-gutters v-if="buildTime">
+                    <v-row no-gutters v-if="clientBuildTime">
                         <v-col cols="12" md="2">
                             <span class="text-body-1">{{ tt('Build Time') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
-                            <span class="text-body-1">{{ buildTime }}</span>
+                            <span class="text-body-1">{{ clientBuildTime }}</span>
                         </v-col>
                     </v-row>
                     <v-row no-gutters>
@@ -123,15 +135,24 @@
 import { useI18n } from '@/locales/helpers.ts';
 import { useAboutPageBase } from '@/views/base/AboutPageBase.ts';
 
+import {
+    mdiWebRefresh
+} from '@mdi/js';
+
 const { tt } = useI18n();
 const {
-    version,
-    buildTime,
+    clientVersion,
+    clientVersionMatchServerVersion,
+    clientBuildTime,
     exchangeRatesData,
     isUserCustomExchangeRates,
     mapProviderName,
     mapProviderWebsite,
     licenseLines,
-    thirdPartyLicenses
+    thirdPartyLicenses,
+    refreshBrowserCache,
+    init
 } = useAboutPageBase();
+
+init();
 </script>

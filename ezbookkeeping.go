@@ -28,6 +28,7 @@ var (
 func main() {
 	settings.Version = Version
 	settings.CommitHash = CommitHash
+	settings.BuildTime = BuildUnixTime
 
 	cmd := &cli.Command{
 		Name:    "ezBookkeeping",

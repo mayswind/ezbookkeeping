@@ -101,7 +101,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { findNameByValue } from '@/lib/common.ts';
-import { getVersion, getDesktopVersionPath } from '@/lib/version.ts';
+import { getClientDisplayVersion, getDesktopVersionPath } from '@/lib/version.ts';
 import { isUserScheduledTransactionEnabled } from '@/lib/server_settings.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
@@ -118,7 +118,7 @@ const settingsStore = useSettingsStore();
 const userStore = useUserStore();
 const exchangeRatesStore = useExchangeRatesStore();
 
-const version = `v${getVersion()}`;
+const version = `${getClientDisplayVersion()}`;
 
 const logouting = ref<boolean>(false);
 const showThemePopup = ref<boolean>(false);

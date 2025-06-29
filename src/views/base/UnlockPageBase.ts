@@ -11,7 +11,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { isWebAuthnSupported } from '@/lib/webauthn.ts';
 import { hasWebAuthnConfig } from '@/lib/userstate.ts';
-import { getVersion } from '@/lib/version.ts';
+import { getClientDisplayVersion } from '@/lib/version.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 export function useUnlockPageBase() {
@@ -24,7 +24,7 @@ export function useUnlockPageBase() {
     const transactionsStore = useTransactionsStore();
     const exchangeRatesStore = useExchangeRatesStore();
 
-    const version: string = `v${getVersion()}`;
+    const version: string = `${getClientDisplayVersion()}`;
 
     const pinCode = ref<string>('');
 

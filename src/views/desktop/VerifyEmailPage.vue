@@ -110,7 +110,7 @@ import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { isUserVerifyEmailEnabled } from '@/lib/server_settings.ts';
 import { isUserLogined } from '@/lib/userstate.ts';
-import { getVersion } from '@/lib/version.ts';
+import { getClientDisplayVersion } from '@/lib/version.ts';
 
 import {
     mdiChevronLeft
@@ -132,7 +132,7 @@ const { tt, te } = useI18n();
 
 const rootStore = useRootStore();
 
-const version = `v${getVersion()}`;
+const version = `${getClientDisplayVersion()}`;
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');

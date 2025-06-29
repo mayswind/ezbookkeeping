@@ -13,6 +13,10 @@
                 <v-icon size="20" start :icon="mdiChartPieOutline"/>
                 {{ tt('Statistics') }}
             </v-tab>
+            <v-tab value="cloudSyncSetting" @click="pushRouter('cloudSyncSetting')">
+                <v-icon size="20" start :icon="mdiCloudOutline"/>
+                {{ tt('Settings Sync') }}
+            </v-tab>
         </v-tabs>
 
         <v-window class="mt-4 disable-tab-transition" v-model="activeTab">
@@ -27,6 +31,10 @@
             <v-window-item value="statisticsSetting">
                 <app-statistics-setting-tab/>
             </v-window-item>
+
+            <v-window-item value="cloudSyncSetting">
+                <app-cloud-sync-setting-tab/>
+            </v-window-item>
         </v-window>
     </div>
 </template>
@@ -35,6 +43,7 @@
 import AppBasicSettingTab from './settings/tabs/AppBasicSettingTab.vue';
 import AppLockSettingTab from './settings/tabs/AppLockSettingTab.vue';
 import AppStatisticsSettingTab from './settings/tabs/AppStatisticsSettingTab.vue';
+import AppCloudSyncSettingTab from './settings/tabs/AppCloudSyncSettingTab.vue';
 
 import { ref } from 'vue';
 import { useRouter, onBeforeRouteUpdate } from 'vue-router';
@@ -44,7 +53,8 @@ import { useI18n } from '@/locales/helpers.ts';
 import {
     mdiCogOutline,
     mdiLockOpenOutline,
-    mdiChartPieOutline
+    mdiChartPieOutline,
+    mdiCloudOutline
 } from '@mdi/js';
 
 const props = defineProps<{
@@ -58,7 +68,8 @@ const { tt } = useI18n();
 const ALL_TABS: string[] = [
     'basicSetting',
     'applicationLockSetting',
-    'statisticsSetting'
+    'statisticsSetting',
+    'cloudSyncSetting'
 ];
 
 const activeTab = ref<string>((() => {

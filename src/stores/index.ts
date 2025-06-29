@@ -103,6 +103,8 @@ export const useRootStore = defineStore('root', () => {
                     }
                 }
 
+                settingsStore.setApplicationSettingsFromCloudSettings(data.result.applicationCloudSettings);
+
                 updateCurrentToken(data.result.token);
 
                 if (data.result.user && isObject(data.result.user)) {
@@ -161,6 +163,8 @@ export const useRootStore = defineStore('root', () => {
                         clearWebAuthnConfig();
                     }
                 }
+
+                settingsStore.setApplicationSettingsFromCloudSettings(data.result.applicationCloudSettings);
 
                 updateCurrentToken(data.result.token);
 

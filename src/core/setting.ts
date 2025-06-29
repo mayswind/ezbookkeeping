@@ -20,24 +20,34 @@ export interface BaseApplicationSetting {
 }
 
 export interface ApplicationSettings extends BaseApplicationSetting {
+    // Debug Settings
+    debug: boolean;
+    // Basic Settings
     theme: string;
     fontSize: number;
     timeZone: string;
-    debug: boolean;
+    autoUpdateExchangeRatesData: boolean;
+    showAccountBalance: boolean;
+    animate: boolean;
+    // Application Lock
     applicationLock: boolean;
     applicationLockWebAuthn: boolean;
-    autoUpdateExchangeRatesData: boolean;
-    autoSaveTransactionDraft: string;
-    autoGetCurrentGeoLocation: boolean;
-    alwaysShowTransactionPicturesInMobileTransactionEditPage: boolean;
+    // Navigation Bar
     showAddTransactionButtonInDesktopNavbar: boolean;
+    // Overview Page
     showAmountInHomePage: boolean;
     timezoneUsedForStatisticsInHomePage: number;
+    // Transaction List Page
     itemsCountInTransactionListPage: number;
     showTotalAmountInTransactionListPage: boolean;
     showTagInTransactionListPage: boolean;
-    showAccountBalance: boolean;
+    // Transaction Edit Page
+    autoSaveTransactionDraft: string;
+    autoGetCurrentGeoLocation: boolean;
+    alwaysShowTransactionPicturesInMobileTransactionEditPage: boolean;
+    // Exchange Rates Data Page
     currencySortByInExchangeRatesPage: number;
+    // Statistics Settings
     statistics: {
         defaultChartDataType: number;
         defaultTimezoneType: number;
@@ -49,7 +59,18 @@ export interface ApplicationSettings extends BaseApplicationSetting {
         defaultTrendChartType: number;
         defaultTrendChartDataRangeType: number;
     };
-    animate: boolean;
+}
+
+export enum UserApplicationCloudSettingType {
+    String = 'string',
+    Number = 'number',
+    Boolean = 'boolean',
+    StringBooleanMap = 'string_boolean_map',
+}
+
+export interface ApplicationCloudSetting {
+    readonly settingKey: string;
+    readonly settingValue: string;
 }
 
 export interface LocaleDefaultSettings {
@@ -66,25 +87,63 @@ export interface WebAuthnConfig {
     readonly credentialId: string;
 }
 
+export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserApplicationCloudSettingType> = {
+    // Basic Settings
+    'showAccountBalance': UserApplicationCloudSettingType.Boolean,
+    // Overview Page
+    'showAmountInHomePage': UserApplicationCloudSettingType.Boolean,
+    'timezoneUsedForStatisticsInHomePage': UserApplicationCloudSettingType.Number,
+    // Transaction List Page
+    'itemsCountInTransactionListPage': UserApplicationCloudSettingType.Number,
+    'showTotalAmountInTransactionListPage': UserApplicationCloudSettingType.Boolean,
+    'showTagInTransactionListPage': UserApplicationCloudSettingType.Boolean,
+    // Transaction Edit Page
+    'autoSaveTransactionDraft': UserApplicationCloudSettingType.String,
+    'autoGetCurrentGeoLocation': UserApplicationCloudSettingType.Boolean,
+    'alwaysShowTransactionPicturesInMobileTransactionEditPage': UserApplicationCloudSettingType.Boolean,
+    // Exchange Rates Data Page
+    'currencySortByInExchangeRatesPage': UserApplicationCloudSettingType.Number,
+    // Statistics Settings
+    'statistics.defaultChartDataType': UserApplicationCloudSettingType.Number,
+    'statistics.defaultTimezoneType': UserApplicationCloudSettingType.Number,
+    'statistics.defaultAccountFilter': UserApplicationCloudSettingType.StringBooleanMap,
+    'statistics.defaultTransactionCategoryFilter': UserApplicationCloudSettingType.StringBooleanMap,
+    'statistics.defaultSortingType': UserApplicationCloudSettingType.Number,
+    'statistics.defaultCategoricalChartType': UserApplicationCloudSettingType.Number,
+    'statistics.defaultCategoricalChartDataRangeType': UserApplicationCloudSettingType.Number,
+    'statistics.defaultTrendChartType': UserApplicationCloudSettingType.Number,
+    'statistics.defaultTrendChartDataRangeType': UserApplicationCloudSettingType.Number,
+};
+
 export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
+    // Debug Settings
+    debug: false,
+    // Basic Settings
     theme: 'auto',
     fontSize: 1,
     timeZone: '',
-    debug: false,
+    autoUpdateExchangeRatesData: true,
+    showAccountBalance: true,
+    animate: true,
+    // Application Lock
     applicationLock: false,
     applicationLockWebAuthn: false,
-    autoUpdateExchangeRatesData: true,
-    autoSaveTransactionDraft: 'disabled',
-    autoGetCurrentGeoLocation: false,
-    alwaysShowTransactionPicturesInMobileTransactionEditPage: false,
+    // Navigation Bar
     showAddTransactionButtonInDesktopNavbar: true,
+    // Overview Page
     showAmountInHomePage: true,
     timezoneUsedForStatisticsInHomePage: TimezoneTypeForStatistics.Default.type,
+    // Transaction List Page
     itemsCountInTransactionListPage: 15,
     showTotalAmountInTransactionListPage: true,
     showTagInTransactionListPage: true,
-    showAccountBalance: true,
+    // Transaction Edit Page
+    autoSaveTransactionDraft: 'disabled',
+    autoGetCurrentGeoLocation: false,
+    alwaysShowTransactionPicturesInMobileTransactionEditPage: false,
+    // Exchange Rates Data Page
     currencySortByInExchangeRatesPage: CurrencySortingType.Default.type,
+    // Statistics Settings
     statistics: {
         defaultChartDataType: ChartDataType.Default.type,
         defaultTimezoneType: TimezoneTypeForStatistics.Default.type,
@@ -95,8 +154,7 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
         defaultCategoricalChartDataRangeType: DEFAULT_CATEGORICAL_CHART_DATA_RANGE.type,
         defaultTrendChartType: TrendChartType.Default.type,
         defaultTrendChartDataRangeType: DEFAULT_TREND_CHART_DATA_RANGE.type,
-    },
-    animate: true
+    }
 };
 
 export const DEFAULT_LOCALE_SETTINGS: LocaleDefaultSettings = {

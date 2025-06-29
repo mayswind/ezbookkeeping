@@ -1,3 +1,5 @@
+import type { ApplicationCloudSetting } from '@/core/setting.ts';
+
 import type { UserBasicInfo } from './user.ts';
 
 export const TOKEN_CLI_USER_AGENT: string = 'ezbookkeeping Cli';
@@ -6,6 +8,7 @@ export interface TokenRefreshResponse {
     readonly newToken?: string;
     readonly oldTokenId?: string;
     readonly user: UserBasicInfo;
+    readonly applicationCloudSettings?: ApplicationCloudSetting[];
     readonly notificationContent?: string;
 }
 

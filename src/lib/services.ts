@@ -2,6 +2,9 @@ import axios, { type AxiosRequestConfig, type AxiosRequestHeaders, type AxiosRes
 
 import type { ApiResponse } from '@/core/api.ts';
 
+import type {
+    ApplicationCloudSetting
+} from '@/core/setting.ts';
 import {
     TransactionType
 } from '@/core/transaction.ts';
@@ -119,6 +122,9 @@ import type {
     UserProfileUpdateRequest,
     UserProfileUpdateResponse
 } from '@/models/user.ts';
+import type {
+    UserApplicationCloudSettingsUpdateRequest
+} from '@/models/user_app_cloud_setting.ts';
 
 import {
     getCurrentToken,
@@ -307,6 +313,15 @@ export default {
     },
     resendVerifyEmailByLoginedUser: (): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/users/verify_email/resend.json');
+    },
+    getUserApplicationCloudSettings: (): ApiResponsePromise<ApplicationCloudSetting[] | false> => {
+        return axios.get<ApiResponse<ApplicationCloudSetting[] | false>>('v1/users/settings/cloud/get.json');
+    },
+    updateUserApplicationCloudSettings: (req: UserApplicationCloudSettingsUpdateRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/users/settings/cloud/update.json', req);
+    },
+    disableUserApplicationCloudSettings: (): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/users/settings/cloud/disable.json');
     },
     get2FAStatus: (): ApiResponsePromise<TwoFactorStatusResponse> => {
         return axios.get<ApiResponse<TwoFactorStatusResponse>>('v1/users/2fa/status.json');

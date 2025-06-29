@@ -19,6 +19,7 @@ type AuthorizationsApi struct {
 	ApiUsingDuplicateChecker
 	ApiWithUserInfo
 	users                   *services.UserService
+	userAppCloudSettings    *services.UserApplicationCloudSettingsService
 	tokens                  *services.TokenService
 	twoFactorAuthorizations *services.TwoFactorAuthorizationService
 }
@@ -44,6 +45,7 @@ var (
 			},
 		},
 		users:                   services.Users,
+		userAppCloudSettings:    services.UserApplicationCloudSettings,
 		tokens:                  services.Tokens,
 		twoFactorAuthorizations: services.TwoFactorAuthorizations,
 	}
@@ -140,9 +142,18 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.WebContext) (any, *errs.Err
 
 	c.SetTokenClaims(claims)
 
+	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, user.Uid)
+	var applicationCloudSettingSlice *models.ApplicationCloudSettingSlice = nil
+
+	if err != nil {
+		log.Warnf(c, "[authorizations.AuthorizeHandler] failed to get latest user application cloud settings for user \"uid:%d\", because %s", user.Uid, err.Error())
+	} else if userApplicationCloudSettings != nil && len(userApplicationCloudSettings.Settings) > 0 {
+		applicationCloudSettingSlice = &userApplicationCloudSettings.Settings
+	}
+
 	log.Infof(c, "[authorizations.AuthorizeHandler] user \"uid:%d\" has logined, token type is %d, token will be expired at %d", user.Uid, claims.Type, claims.ExpiresAt)
 
-	authResp := a.getAuthResponse(c, token, twoFactorEnable, user)
+	authResp := a.getAuthResponse(c, token, twoFactorEnable, user, applicationCloudSettingSlice)
 	return authResp, nil
 }
 
@@ -218,9 +229,18 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.WebContext) (any, 
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
 
+	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, user.Uid)
+	var applicationCloudSettingSlice *models.ApplicationCloudSettingSlice = nil
+
+	if err != nil {
+		log.Warnf(c, "[authorizations.TwoFactorAuthorizeHandler] failed to get latest user application cloud settings for user \"uid:%d\", because %s", user.Uid, err.Error())
+	} else if userApplicationCloudSettings != nil && len(userApplicationCloudSettings.Settings) > 0 {
+		applicationCloudSettingSlice = &userApplicationCloudSettings.Settings
+	}
+
 	log.Infof(c, "[authorizations.TwoFactorAuthorizeHandler] user \"uid:%d\" has authorized two-factor via passcode, token will be expired at %d", user.Uid, claims.ExpiresAt)
 
-	authResp := a.getAuthResponse(c, token, false, user)
+	authResp := a.getAuthResponse(c, token, false, user, applicationCloudSettingSlice)
 	return authResp, nil
 }
 
@@ -303,17 +323,27 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.WebC
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
 
+	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, user.Uid)
+	var applicationCloudSettingSlice *models.ApplicationCloudSettingSlice = nil
+
+	if err != nil {
+		log.Warnf(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] failed to get latest user application cloud settings for user \"uid:%d\", because %s", user.Uid, err.Error())
+	} else if userApplicationCloudSettings != nil && len(userApplicationCloudSettings.Settings) > 0 {
+		applicationCloudSettingSlice = &userApplicationCloudSettings.Settings
+	}
+
 	log.Infof(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] user \"uid:%d\" has authorized two-factor via recovery code \"%s\", token will be expired at %d", user.Uid, credential.RecoveryCode, claims.ExpiresAt)
 
-	authResp := a.getAuthResponse(c, token, false, user)
+	authResp := a.getAuthResponse(c, token, false, user, applicationCloudSettingSlice)
 	return authResp, nil
 }
 
-func (a *AuthorizationsApi) getAuthResponse(c *core.WebContext, token string, need2FA bool, user *models.User) *models.AuthResponse {
+func (a *AuthorizationsApi) getAuthResponse(c *core.WebContext, token string, need2FA bool, user *models.User, applicationCloudSettings *models.ApplicationCloudSettingSlice) *models.AuthResponse {
 	return &models.AuthResponse{
-		Token:               token,
-		Need2FA:             need2FA,
-		User:                a.GetUserBasicInfo(user),
-		NotificationContent: a.GetAfterLoginNotificationContent(user.Language, c.GetClientLocale()),
+		Token:                    token,
+		Need2FA:                  need2FA,
+		User:                     a.GetUserBasicInfo(user),
+		ApplicationCloudSettings: applicationCloudSettings,
+		NotificationContent:      a.GetAfterLoginNotificationContent(user.Language, c.GetClientLocale()),
 	}
 }

@@ -18,8 +18,9 @@ import (
 type TokensApi struct {
 	ApiUsingConfig
 	ApiWithUserInfo
-	tokens *services.TokenService
-	users  *services.UserService
+	tokens               *services.TokenService
+	users                *services.UserService
+	userAppCloudSettings *services.UserApplicationCloudSettingsService
 }
 
 // Initialize a token api singleton instance
@@ -36,8 +37,9 @@ var (
 				container: avatars.Container,
 			},
 		},
-		tokens: services.Tokens,
-		users:  services.Users,
+		tokens:               services.Tokens,
+		users:                services.Users,
+		userAppCloudSettings: services.UserApplicationCloudSettings,
 	}
 )
 
@@ -251,9 +253,19 @@ func (a *TokensApi) TokenRefreshHandler(c *core.WebContext) (any, *errs.Error) {
 			}
 		}
 
+		userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, user.Uid)
+		var applicationCloudSettingSlice *models.ApplicationCloudSettingSlice = nil
+
+		if err != nil {
+			log.Warnf(c, "[tokens.TokenRefreshHandler] failed to get latest user application cloud settings for user \"uid:%d\", because %s", user.Uid, err.Error())
+		} else if userApplicationCloudSettings != nil && len(userApplicationCloudSettings.Settings) > 0 {
+			applicationCloudSettingSlice = &userApplicationCloudSettings.Settings
+		}
+
 		refreshResp := &models.TokenRefreshResponse{
-			User:                a.GetUserBasicInfo(user),
-			NotificationContent: a.GetAfterOpenNotificationContent(user.Language, c.GetClientLocale()),
+			User:                     a.GetUserBasicInfo(user),
+			ApplicationCloudSettings: applicationCloudSettingSlice,
+			NotificationContent:      a.GetAfterOpenNotificationContent(user.Language, c.GetClientLocale()),
 		}
 
 		return refreshResp, nil
@@ -276,13 +288,23 @@ func (a *TokensApi) TokenRefreshHandler(c *core.WebContext) (any, *errs.Error) {
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
 
+	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, user.Uid)
+	var applicationCloudSettingSlice *models.ApplicationCloudSettingSlice = nil
+
+	if err != nil {
+		log.Warnf(c, "[tokens.TokenRefreshHandler] failed to get latest user application cloud settings for user \"uid:%d\", because %s", user.Uid, err.Error())
+	} else if userApplicationCloudSettings != nil && len(userApplicationCloudSettings.Settings) > 0 {
+		applicationCloudSettingSlice = &userApplicationCloudSettings.Settings
+	}
+
 	log.Infof(c, "[tokens.TokenRefreshHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)
 
 	refreshResp := &models.TokenRefreshResponse{
-		NewToken:            token,
-		OldTokenId:          a.tokens.GenerateTokenId(oldTokenRecord),
-		User:                a.GetUserBasicInfo(user),
-		NotificationContent: a.GetAfterOpenNotificationContent(user.Language, c.GetClientLocale()),
+		NewToken:                 token,
+		OldTokenId:               a.tokens.GenerateTokenId(oldTokenRecord),
+		User:                     a.GetUserBasicInfo(user),
+		ApplicationCloudSettings: applicationCloudSettingSlice,
+		NotificationContent:      a.GetAfterOpenNotificationContent(user.Language, c.GetClientLocale()),
 	}
 
 	return refreshResp, nil

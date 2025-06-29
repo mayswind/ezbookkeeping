@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+import { useSettingsStore } from './setting.ts';
 import { useUserStore } from './user.ts';
 
 import type { TokenRefreshResponse, TokenInfoResponse } from '@/models/token.ts';
@@ -11,6 +12,9 @@ import logger from '@/lib/logger.ts';
 import services from '@/lib/services.ts';
 
 export const useTokensStore = defineStore('tokens', () => {
+    const settingsStore = useSettingsStore();
+    const userStore = useUserStore();
+
     function getAllTokens(): Promise<TokenInfoResponse[]> {
         return new Promise((resolve, reject) => {
             services.getTokens().then(response => {
@@ -41,8 +45,11 @@ export const useTokensStore = defineStore('tokens', () => {
             services.refreshToken().then(response => {
                 const data = response.data;
 
+                if (data && data.success && data.result) {
+                    settingsStore.setApplicationSettingsFromCloudSettings(data.result.applicationCloudSettings);
+                }
+
                 if (data && data.success && data.result && data.result.user && isObject(data.result.user)) {
-                    const userStore = useUserStore();
                     userStore.storeUserBasicInfo(data.result.user);
                 }
 

@@ -73,6 +73,18 @@
             </f7-list-item>
         </f7-list>
 
+        <f7-block-title>{{ tt('Account List Page') }}</f7-block-title>
+        <f7-list strong inset dividers>
+            <f7-list-item :disabled="!hasAnyVisibleAccount"
+                          :title="tt('Accounts Included in Total')"
+                          link="/settings/filter/account?type=accountListTotalAmount">
+                <template #after>
+                    <f7-preloader v-if="loadingAccounts" />
+                    <span v-else-if="!loadingAccounts">{{ accountsIncludedInTotalDisplayContent }}</span>
+                </template>
+            </f7-list-item>
+        </f7-list>
+
         <f7-block-title>{{ tt('Exchange Rates Data Page') }}</f7-block-title>
         <f7-list strong inset dividers>
             <f7-list-item
@@ -101,14 +113,19 @@
 import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
+import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
 import { useAppSettingPageBase } from '@/views/base/settings/AppSettingsPageBase.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
+import { useAccountsStore } from '@/stores/account.ts';
 
 import { findNameByValue, findDisplayNameByType } from '@/lib/common.ts';
 
 const { tt } = useI18n();
+const { showToast } = useI18nUIComponents();
 const {
+    loadingAccounts,
+    hasAnyVisibleAccount,
     allTimezoneTypesUsedForStatistics,
     allCurrencySortingTypes,
     allAutoSaveTransactionDraftTypes,
@@ -118,10 +135,12 @@ const {
     showTagInTransactionListPage,
     autoSaveTransactionDraft,
     isAutoGetCurrentGeoLocation,
-    currencySortByInExchangeRatesPage
+    currencySortByInExchangeRatesPage,
+    accountsIncludedInTotalDisplayContent
 } = useAppSettingPageBase();
 
 const settingsStore = useSettingsStore();
+const accountsStore = useAccountsStore();
 
 const showTimezoneUsedForStatisticsInHomePagePopup = ref<boolean>(false);
 const showAutoSaveTransactionDraftPopup = ref<boolean>(false);
@@ -131,4 +150,22 @@ const alwaysShowTransactionPicturesInMobileTransactionEditPage = computed<boolea
     get: () => settingsStore.appSettings.alwaysShowTransactionPicturesInMobileTransactionEditPage,
     set: (value) => settingsStore.setAlwaysShowTransactionPicturesInMobileTransactionEditPage(value)
 });
+
+function init(): void {
+    loadingAccounts.value = true;
+
+    accountsStore.loadAllAccounts({
+        force: false
+    }).then(() => {
+        loadingAccounts.value = false;
+    }).catch(error => {
+        loadingAccounts.value = false;
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+init();
 </script>

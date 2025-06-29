@@ -1,8 +1,9 @@
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
+import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
@@ -14,9 +15,12 @@ export function useAppSettingPageBase() {
     const { tt, getAllTimezones, getAllTimezoneTypesUsedForStatistics, getAllCurrencySortingTypes, setTimeZone } = useI18n();
 
     const settingsStore = useSettingsStore();
+    const accountsStore = useAccountsStore();
     const transactionsStore = useTransactionsStore();
     const overviewStore = useOverviewStore();
     const statisticsStore = useStatisticsStore();
+
+    const loadingAccounts = ref<boolean>(false);
 
     const allThemes = computed<NameValue[]>(() => {
         return [
@@ -37,6 +41,8 @@ export function useAppSettingPageBase() {
             { name: tt('Show Confirmation Every Time'), value: 'confirmation' }
         ];
     });
+
+    const hasAnyVisibleAccount = computed<boolean>(() => accountsStore.allVisibleAccountsCount > 0);
 
     const timeZone = computed<string>({
         get: () => settingsStore.appSettings.timeZone,
@@ -108,7 +114,50 @@ export function useAppSettingPageBase() {
         set: (value: number) => settingsStore.setCurrencySortByInExchangeRatesPage(value)
     });
 
+    const accountsIncludedInTotalDisplayContent = computed<string>(() => {
+        if (loadingAccounts.value || !accountsStore.allVisiblePlainAccounts || !accountsStore.allVisiblePlainAccounts.length) {
+            return '';
+        }
+
+        const excludeAccountIds = settingsStore.appSettings.totalAmountExcludeAccountIds;
+        let hasExcludeAccount = false;
+
+        for (const accountId in excludeAccountIds) {
+            if (!Object.prototype.hasOwnProperty.call(excludeAccountIds, accountId)) {
+                continue;
+            }
+
+            if (excludeAccountIds[accountId]) {
+                hasExcludeAccount = true;
+                break;
+            }
+        }
+
+        if (!hasExcludeAccount) {
+            return tt('All');
+        }
+
+        let allVisibleAccountExcluded = true;
+
+        for (let i = 0; i < accountsStore.allVisiblePlainAccounts.length; i++) {
+            const account = accountsStore.allVisiblePlainAccounts[i];
+
+            if (!excludeAccountIds[account.id]) {
+                allVisibleAccountExcluded = false;
+                break;
+            }
+        }
+
+        if (allVisibleAccountExcluded) {
+            return tt('None');
+        }
+
+        return tt('Partial');
+    });
+
     return {
+        // states
+        loadingAccounts,
         // computed states
         allThemes,
         allTimezones,
@@ -116,6 +165,7 @@ export function useAppSettingPageBase() {
         allCurrencySortingTypes,
         allAutoSaveTransactionDraftTypes,
         timeZone,
+        hasAnyVisibleAccount,
         isAutoUpdateExchangeRatesData,
         showAccountBalance,
         showAmountInHomePage,
@@ -125,6 +175,7 @@ export function useAppSettingPageBase() {
         showTagInTransactionListPage,
         autoSaveTransactionDraft,
         isAutoGetCurrentGeoLocation,
-        currencySortByInExchangeRatesPage
+        currencySortByInExchangeRatesPage,
+        accountsIncludedInTotalDisplayContent
     };
 }

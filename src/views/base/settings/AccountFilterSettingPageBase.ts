@@ -39,6 +39,10 @@ export function useAccountFilterSettingPageBase(type?: string) {
         }
     });
 
+    const allowHiddenAccount = computed<boolean>(() => {
+        return type === 'statisticsDefault' || type === 'statisticsCurrent' || type === 'transactionListCurrent';
+    });
+
     const allCategorizedAccounts = computed<AccountCategoriesWithVisibleCount[]>(() => getCategorizedAccountsWithVisibleCount(accountsStore.allCategorizedAccountsMap));
     const hasAnyAvailableAccount = computed<boolean>(() => accountsStore.allAvailableAccountsCount > 0);
 
@@ -63,6 +67,10 @@ export function useAccountFilterSettingPageBase(type?: string) {
             }
 
             const account = accountsStore.allAccountsMap[accountId];
+
+            if (!allowHiddenAccount.value && account.hidden) {
+                continue;
+            }
 
             if (type === 'transactionListCurrent' && transactionsStore.allFilterAccountIdsCount > 0) {
                 allAccountIds[account.id] = true;
@@ -91,6 +99,9 @@ export function useAccountFilterSettingPageBase(type?: string) {
             }
             filterAccountIds.value = allAccountIds;
             return true;
+        } else if (type === 'accountListTotalAmount') {
+            filterAccountIds.value = Object.assign(allAccountIds, settingsStore.appSettings.totalAmountExcludeAccountIds);
+            return true;
         } else {
             return false;
         }
@@ -108,6 +119,10 @@ export function useAccountFilterSettingPageBase(type?: string) {
             }
 
             const account = accountsStore.allAccountsMap[accountId];
+
+            if (!allowHiddenAccount.value && account.hidden) {
+                continue;
+            }
 
             if (!isAccountOrSubAccountsAllChecked(account, filterAccountIds.value)) {
                 filteredAccountIds[accountId] = true;
@@ -135,6 +150,8 @@ export function useAccountFilterSettingPageBase(type?: string) {
             if (changed) {
                 transactionsStore.updateTransactionListInvalidState(true);
             }
+        } else if (type === 'accountListTotalAmount') {
+            settingsStore.setTotalAmountExcludeAccountIds(filteredAccountIds);
         }
 
         return changed;
@@ -148,6 +165,7 @@ export function useAccountFilterSettingPageBase(type?: string) {
         // computed states
         title,
         applyText,
+        allowHiddenAccount,
         allCategorizedAccounts,
         hasAnyAvailableAccount,
         hasAnyVisibleAccount,

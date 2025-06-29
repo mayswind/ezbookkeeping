@@ -80,6 +80,10 @@
                                                         <v-list-item :prepend-icon="mdiEyeOffOutline"
                                                                      :title="tt('Hide Hidden Accounts')"
                                                                      v-if="showHidden" @click="showHidden = false"></v-list-item>
+                                                        <v-divider class="my-2" v-if="hasAnyVisibleAccount"/>
+                                                        <v-list-item :prepend-icon="mdiCalculatorVariantOutline"
+                                                                     :title="tt('Set Accounts Included in Total')"
+                                                                     v-if="hasAnyVisibleAccount" @click="showAccountsIncludedInTotalDialog = true"></v-list-item>
                                                     </v-list>
                                                 </v-menu>
                                             </v-btn>
@@ -248,6 +252,11 @@
         </v-col>
     </v-row>
 
+    <v-dialog width="800" v-model="showAccountsIncludedInTotalDialog">
+        <account-filter-settings-card type="accountListTotalAmount" :dialog-mode="true"
+                                      @settings:change="showAccountsIncludedInTotalDialog = false" />
+    </v-dialog>
+
     <edit-dialog ref="editDialog" />
 
     <confirm-dialog ref="confirmDialog"/>
@@ -258,6 +267,7 @@
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import EditDialog from './list/dialogs/EditDialog.vue';
+import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
 import { useDisplay } from 'vuetify';
@@ -273,6 +283,7 @@ import type { Account } from '@/models/account.ts';
 import {
     mdiEyeOutline,
     mdiEyeOffOutline,
+    mdiCalculatorVariantOutline,
     mdiRefresh,
     mdiSquareRounded,
     mdiMenu,
@@ -317,7 +328,9 @@ const activeTab = ref<string>('accountPage');
 const activeSubAccount = ref<Record<string, string>>({});
 const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
 const showNav = ref<boolean>(display.mdAndUp.value);
+const showAccountsIncludedInTotalDialog = ref<boolean>(false);
 
+const hasAnyVisibleAccount = computed<boolean>(() => accountsStore.allVisibleAccountsCount > 0);
 const activeAccountCategory = computed<AccountCategory | undefined>(() => AccountCategory.valueOf(activeAccountCategoryType.value));
 const activeAccountCategoryTotalBalance = computed<string>(() => accountCategoryTotalBalance(activeAccountCategory.value));
 

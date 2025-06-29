@@ -265,13 +265,17 @@ export function selectAccountOrSubAccounts(filterAccountIds: Record<string, bool
     }
 }
 
-export function selectAll(filterAccountIds: Record<string, boolean>, allAccountsMap: Record<string, Account>): void {
+export function selectAll(filterAccountIds: Record<string, boolean>, allAccountsMap: Record<string, Account>, skipHiddenAccount: boolean): void {
     for (const accountId in filterAccountIds) {
         if (!Object.prototype.hasOwnProperty.call(filterAccountIds, accountId)) {
             continue;
         }
 
         const account = allAccountsMap[accountId];
+
+        if (skipHiddenAccount && account && account.hidden) {
+            continue;
+        }
 
         if (account && account.type === AccountType.SingleAccount.type) {
             filterAccountIds[account.id] = false;
@@ -279,13 +283,17 @@ export function selectAll(filterAccountIds: Record<string, boolean>, allAccounts
     }
 }
 
-export function selectNone(filterAccountIds: Record<string, boolean>, allAccountsMap: Record<string, Account>): void {
+export function selectNone(filterAccountIds: Record<string, boolean>, allAccountsMap: Record<string, Account>, skipHiddenAccount: boolean): void {
     for (const accountId in filterAccountIds) {
         if (!Object.prototype.hasOwnProperty.call(filterAccountIds, accountId)) {
             continue;
         }
 
         const account = allAccountsMap[accountId];
+
+        if (skipHiddenAccount && account && account.hidden) {
+            continue;
+        }
 
         if (account && account.type === AccountType.SingleAccount.type) {
             filterAccountIds[account.id] = true;
@@ -293,13 +301,17 @@ export function selectNone(filterAccountIds: Record<string, boolean>, allAccount
     }
 }
 
-export function selectInvert(filterAccountIds: Record<string, boolean>, allAccountsMap: Record<string, Account>): void {
+export function selectInvert(filterAccountIds: Record<string, boolean>, allAccountsMap: Record<string, Account>, skipHiddenAccount: boolean): void {
     for (const accountId in filterAccountIds) {
         if (!Object.prototype.hasOwnProperty.call(filterAccountIds, accountId)) {
             continue;
         }
 
         const account = allAccountsMap[accountId];
+
+        if (skipHiddenAccount && account && account.hidden) {
+            continue;
+        }
 
         if (account && account.type === AccountType.SingleAccount.type) {
             filterAccountIds[account.id] = !filterAccountIds[account.id];

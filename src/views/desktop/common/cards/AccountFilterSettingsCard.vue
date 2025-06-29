@@ -22,13 +22,13 @@
                                          :title="tt('Invert Selection')"
                                          :disabled="!hasAnyVisibleAccount"
                                          @click="selectInvertAccounts"></v-list-item>
-                            <v-divider class="my-2"/>
+                            <v-divider class="my-2" v-if="allowHiddenAccount"/>
                             <v-list-item :prepend-icon="mdiEyeOutline"
                                          :title="tt('Show Hidden Accounts')"
-                                         v-if="!showHidden" @click="showHidden = true"></v-list-item>
+                                         v-if="allowHiddenAccount && !showHidden" @click="showHidden = true"></v-list-item>
                             <v-list-item :prepend-icon="mdiEyeOffOutline"
                                          :title="tt('Hide Hidden Accounts')"
-                                         v-if="showHidden" @click="showHidden = false"></v-list-item>
+                                         v-if="allowHiddenAccount && showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
                     </v-menu>
                 </v-btn>
@@ -53,13 +53,13 @@
                                          :title="tt('Invert Selection')"
                                          :disabled="!hasAnyVisibleAccount"
                                          @click="selectInvertAccounts"></v-list-item>
-                            <v-divider class="my-2"/>
+                            <v-divider class="my-2" v-if="allowHiddenAccount"/>
                             <v-list-item :prepend-icon="mdiEyeOutline"
                                          :title="tt('Show Hidden Accounts')"
-                                         v-if="!showHidden" @click="showHidden = true"></v-list-item>
+                                         v-if="allowHiddenAccount && !showHidden" @click="showHidden = true"></v-list-item>
                             <v-list-item :prepend-icon="mdiEyeOffOutline"
                                          :title="tt('Hide Hidden Accounts')"
-                                         v-if="showHidden" @click="showHidden = false"></v-list-item>
+                                         v-if="allowHiddenAccount && showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
                     </v-menu>
                 </v-btn>
@@ -196,6 +196,7 @@ const {
     filterAccountIds,
     title,
     applyText,
+    allowHiddenAccount,
     allCategorizedAccounts,
     hasAnyAvailableAccount,
     hasAnyVisibleAccount,
@@ -245,7 +246,7 @@ function updateAccountSelected(account: Account, value: boolean | null): void {
 }
 
 function selectAllAccounts(): void {
-    selectAll(filterAccountIds.value, accountsStore.allAccountsMap);
+    selectAll(filterAccountIds.value, accountsStore.allAccountsMap, !allowHiddenAccount.value);
 
     if (props.autoSave) {
         save();
@@ -253,7 +254,7 @@ function selectAllAccounts(): void {
 }
 
 function selectNoneAccounts(): void {
-    selectNone(filterAccountIds.value, accountsStore.allAccountsMap);
+    selectNone(filterAccountIds.value, accountsStore.allAccountsMap, !allowHiddenAccount.value);
 
     if (props.autoSave) {
         save();
@@ -261,7 +262,7 @@ function selectNoneAccounts(): void {
 }
 
 function selectInvertAccounts(): void {
-    selectInvert(filterAccountIds.value, accountsStore.allAccountsMap);
+    selectInvert(filterAccountIds.value, accountsStore.allAccountsMap, !allowHiddenAccount.value);
 
     if (props.autoSave) {
         save();

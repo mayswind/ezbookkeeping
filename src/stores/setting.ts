@@ -220,6 +220,13 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('alwaysShowTransactionPicturesInMobileTransactionEditPage', value);
     }
 
+    // Account List Page
+    function setTotalAmountExcludeAccountIds(value: Record<string, boolean>): void {
+        updateApplicationSettingsValue('totalAmountExcludeAccountIds', value);
+        appSettings.value.totalAmountExcludeAccountIds = value;
+        updateUserApplicationCloudSettingValue('totalAmountExcludeAccountIds', value);
+    }
+
     // Exchange Rates Data Page
     function setCurrencySortByInExchangeRatesPage(value: number): void {
         updateApplicationSettingsValue('currencySortByInExchangeRatesPage', value);
@@ -429,6 +436,8 @@ export const useSettingsStore = defineStore('settings', () => {
         setAutoSaveTransactionDraft,
         setAutoGetCurrentGeoLocation,
         setAlwaysShowTransactionPicturesInMobileTransactionEditPage,
+        // -- Account List Page
+        setTotalAmountExcludeAccountIds,
         // -- Exchange Rates Data Page
         setCurrencySortByInExchangeRatesPage,
         // -- Statistics Settings

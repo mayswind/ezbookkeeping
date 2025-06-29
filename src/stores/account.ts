@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 
+import { useSettingsStore } from './setting.ts';
 import { useUserStore } from './user.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
@@ -21,6 +22,7 @@ import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 
 export const useAccountsStore = defineStore('accounts', () => {
+    const settingsStore = useSettingsStore();
     const userStore = useUserStore();
     const exchangeRatesStore = useExchangeRatesStore();
 
@@ -484,7 +486,9 @@ export const useAccountsStore = defineStore('accounts', () => {
             return '***';
         }
 
-        const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, () => true);
+        const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, account =>
+            !settingsStore.appSettings.totalAmountExcludeAccountIds[account.id]
+        );
         let netAssets = 0;
         let hasUnCalculatedAmount = false;
 
@@ -515,7 +519,9 @@ export const useAccountsStore = defineStore('accounts', () => {
             return '***';
         }
 
-        const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, account => account.isAsset || false);
+        const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, account =>
+            !settingsStore.appSettings.totalAmountExcludeAccountIds[account.id] && (account.isAsset || false)
+        );
         let totalAssets = 0;
         let hasUnCalculatedAmount = false;
 
@@ -546,7 +552,9 @@ export const useAccountsStore = defineStore('accounts', () => {
             return '***';
         }
 
-        const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, account => account.isLiability || false);
+        const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, account =>
+            !settingsStore.appSettings.totalAmountExcludeAccountIds[account.id] && (account.isLiability || false)
+        );
         let totalLiabilities = 0;
         let hasUnCalculatedAmount = false;
 

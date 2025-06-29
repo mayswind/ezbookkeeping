@@ -120,7 +120,7 @@
                 <f7-actions-button :class="{ 'disabled': !hasAnyVisibleAccount }" @click="selectNoneAccounts">{{ tt('Select None') }}</f7-actions-button>
                 <f7-actions-button :class="{ 'disabled': !hasAnyVisibleAccount }" @click="selectInvertAccounts">{{ tt('Invert Selection') }}</f7-actions-button>
             </f7-actions-group>
-            <f7-actions-group>
+            <f7-actions-group v-if="allowHiddenAccount">
                 <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ tt('Show Hidden Accounts') }}</f7-actions-button>
                 <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ tt('Hide Hidden Accounts') }}</f7-actions-button>
             </f7-actions-group>
@@ -171,6 +171,7 @@ const {
     filterAccountIds,
     title,
     applyText,
+    allowHiddenAccount,
     allCategorizedAccounts,
     hasAnyAvailableAccount,
     hasAnyVisibleAccount,
@@ -245,15 +246,15 @@ function updateAccountSelected(e: Event): void {
 }
 
 function selectAllAccounts(): void {
-    selectAll(filterAccountIds.value, accountsStore.allAccountsMap);
+    selectAll(filterAccountIds.value, accountsStore.allAccountsMap, !allowHiddenAccount.value);
 }
 
 function selectNoneAccounts(): void {
-    selectNone(filterAccountIds.value, accountsStore.allAccountsMap);
+    selectNone(filterAccountIds.value, accountsStore.allAccountsMap, !allowHiddenAccount.value);
 }
 
 function selectInvertAccounts(): void {
-    selectInvert(filterAccountIds.value, accountsStore.allAccountsMap);
+    selectInvert(filterAccountIds.value, accountsStore.allAccountsMap, !allowHiddenAccount.value);
 }
 
 function save(): void {

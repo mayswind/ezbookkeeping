@@ -159,6 +159,9 @@
                 <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ tt('Show Hidden Accounts') }}</f7-actions-button>
                 <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ tt('Hide Hidden Accounts') }}</f7-actions-button>
             </f7-actions-group>
+            <f7-actions-group v-if="hasAnyVisibleAccount">
+                <f7-actions-button @click="setAccountsIncludedInTotal()">{{ tt('Set Accounts Included in Total') }}</f7-actions-button>
+            </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
             </f7-actions-group>
@@ -223,6 +226,7 @@ const displayOrderSaving = ref<boolean>(false);
 
 const firstShowingIds = computed<AccountShowingIds>(() => accountsStore.getFirstShowingIds(showHidden.value));
 const lastShowingIds = computed<AccountShowingIds>(() => accountsStore.getLastShowingIds(showHidden.value));
+const hasAnyVisibleAccount = computed<boolean>(() => accountsStore.allVisibleAccountsCount > 0);
 const noAvailableAccount = computed<boolean>(() => {
     if (showHidden.value) {
         return accountsStore.allAvailableAccountsCount < 1;
@@ -381,6 +385,10 @@ function saveSortResult(): void {
             showToast(error.message || error);
         }
     });
+}
+
+function setAccountsIncludedInTotal(): void {
+    props.f7router.navigate('/settings/filter/account?type=accountListTotalAmount');
 }
 
 function onSort(event: { el: { id: string }; from: number; to: number }): void {

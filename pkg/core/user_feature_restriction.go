@@ -31,7 +31,7 @@ func (r UserFeatureRestrictions) Contains(featureRestrictionType UserFeatureRest
 func (r UserFeatureRestrictions) String() string {
 	builder := strings.Builder{}
 
-	for restrictionType := USER_FEATURE_RESTRICTION_TYPE_UPDATE_PASSWORD; restrictionType <= USER_FEATURE_RESTRICTION_TYPE_CLEAR_ALL_DATA; restrictionType++ {
+	for restrictionType := userFeatureRestrictionTypeMinValue; restrictionType <= userFeatureRestrictionTypeMaxValue; restrictionType++ {
 		if !r.Contains(restrictionType) {
 			continue
 		}
@@ -62,7 +62,7 @@ func ParseUserFeatureRestrictions(featureRestrictions string) UserFeatureRestric
 			continue
 		}
 
-		if uint64(USER_FEATURE_RESTRICTION_TYPE_UPDATE_PASSWORD) <= uint64(value) && uint64(value) <= uint64(USER_FEATURE_RESTRICTION_TYPE_CLEAR_ALL_DATA) {
+		if uint64(userFeatureRestrictionTypeMinValue) <= uint64(value) && uint64(value) <= uint64(userFeatureRestrictionTypeMaxValue) {
 			typeValue := uint64(1 << (value - 1))
 			restrictions = restrictions | typeValue
 		}
@@ -87,7 +87,11 @@ const (
 	USER_FEATURE_RESTRICTION_TYPE_IMPORT_TRANSACTION        UserFeatureRestrictionType = 9
 	USER_FEATURE_RESTRICTION_TYPE_EXPORT_TRANSACTION        UserFeatureRestrictionType = 10
 	USER_FEATURE_RESTRICTION_TYPE_CLEAR_ALL_DATA            UserFeatureRestrictionType = 11
+	USER_FEATURE_RESTRICTION_TYPE_SYNC_APPLICATION_SETTINGS UserFeatureRestrictionType = 12
 )
+
+const userFeatureRestrictionTypeMinValue UserFeatureRestrictionType = USER_FEATURE_RESTRICTION_TYPE_UPDATE_PASSWORD
+const userFeatureRestrictionTypeMaxValue UserFeatureRestrictionType = USER_FEATURE_RESTRICTION_TYPE_SYNC_APPLICATION_SETTINGS
 
 // String returns a textual representation of the restriction type of user features
 func (t UserFeatureRestrictionType) String() string {
@@ -114,6 +118,8 @@ func (t UserFeatureRestrictionType) String() string {
 		return "Export Transactions"
 	case USER_FEATURE_RESTRICTION_TYPE_CLEAR_ALL_DATA:
 		return "Clear All Data"
+	case USER_FEATURE_RESTRICTION_TYPE_SYNC_APPLICATION_SETTINGS:
+		return "Sync Application Settings"
 	default:
 		return fmt.Sprintf("Invalid(%d)", int(t))
 	}

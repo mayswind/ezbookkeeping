@@ -14,12 +14,14 @@ import (
 // UserApplicationCloudSettingsApi represents user application cloud settings api
 type UserApplicationCloudSettingsApi struct {
 	userAppCloudSettings *services.UserApplicationCloudSettingsService
+	users                *services.UserService
 }
 
 // Initialize a user application cloud settings api singleton instance
 var (
 	UserApplicationCloudSettings = &UserApplicationCloudSettingsApi{
 		userAppCloudSettings: services.UserApplicationCloudSettings,
+		users:                services.Users,
 	}
 )
 
@@ -58,6 +60,20 @@ func (a *UserApplicationCloudSettingsApi) ApplicationSettingsUpdateHandler(c *co
 	}
 
 	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Warnf(c, "[user_app_cloud_settings.ApplicationSettingsUpdateHandler] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
+		}
+
+		return false, errs.ErrUserNotFound
+	}
+
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_SYNC_APPLICATION_SETTINGS) {
+		return false, errs.ErrNotPermittedToPerformThisAction
+	}
+
 	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, uid)
 
 	if err != nil {
@@ -179,8 +195,21 @@ func (a *UserApplicationCloudSettingsApi) ApplicationSettingsUpdateHandler(c *co
 // ApplicationSettingsDisableHandler disabled user application cloud settings by request parameters for current user
 func (a *UserApplicationCloudSettingsApi) ApplicationSettingsDisableHandler(c *core.WebContext) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
 
-	err := a.userAppCloudSettings.ClearUserApplicationCloudSettings(c, uid)
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Warnf(c, "[user_app_cloud_settings.ApplicationSettingsDisableHandler] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
+		}
+
+		return false, errs.ErrUserNotFound
+	}
+
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_SYNC_APPLICATION_SETTINGS) {
+		return false, errs.ErrNotPermittedToPerformThisAction
+	}
+
+	err = a.userAppCloudSettings.ClearUserApplicationCloudSettings(c, uid)
 
 	if err != nil {
 		log.Errorf(c, "[user_app_cloud_settings.ApplicationSettingsDisableHandler] failed to clear user application cloud settings for user \"uid:%d\", because %s", uid, err.Error())

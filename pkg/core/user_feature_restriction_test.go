@@ -80,6 +80,7 @@ func TestUserFeatureRestrictionsString(t *testing.T) {
 	featureRestrictions = featureRestrictions.Add(USER_FEATURE_RESTRICTION_TYPE_IMPORT_TRANSACTION)
 	featureRestrictions = featureRestrictions.Add(USER_FEATURE_RESTRICTION_TYPE_EXPORT_TRANSACTION)
 	featureRestrictions = featureRestrictions.Add(USER_FEATURE_RESTRICTION_TYPE_CLEAR_ALL_DATA)
+	featureRestrictions = featureRestrictions.Add(USER_FEATURE_RESTRICTION_TYPE_SYNC_APPLICATION_SETTINGS)
 	expectedValue = "Update Password," +
 		"Update Email," +
 		"Update Profile Basic Info," +
@@ -90,7 +91,8 @@ func TestUserFeatureRestrictionsString(t *testing.T) {
 		"Forget Password," +
 		"Import Transactions," +
 		"Export Transactions," +
-		"Clear All Data"
+		"Clear All Data," +
+		"Sync Application Settings"
 	actualValue = featureRestrictions.String()
 	assert.Equal(t, expectedValue, actualValue)
 }

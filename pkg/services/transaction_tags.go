@@ -1,6 +1,7 @@
 package services
 
 import (
+	"strings"
 	"time"
 
 	"xorm.io/xorm"
@@ -507,6 +508,7 @@ func (s *TransactionTagService) GetTagNames(tags []*models.TransactionTag) []str
 	return tagNames
 }
 
+// GetGroupedTransactionTagIds returns a map of transaction tag ids grouped by transaction id
 func (s *TransactionTagService) GetGroupedTransactionTagIds(tagIndexes []*models.TransactionTagIndex) map[int64][]int64 {
 	allTransactionTagIds := make(map[int64][]int64)
 
@@ -528,4 +530,30 @@ func (s *TransactionTagService) GetGroupedTransactionTagIds(tagIndexes []*models
 	}
 
 	return allTransactionTagIds
+}
+
+// GetTagIds converts a comma-separated string of tag ids into a slice of int64
+func (s *TransactionTagService) GetTagIds(tagIds string) ([]int64, error) {
+	if tagIds == "" || tagIds == "0" {
+		return nil, nil
+	}
+
+	requestTagIds, err := utils.StringArrayToInt64Array(strings.Split(tagIds, ","))
+
+	if err != nil {
+		return nil, errs.Or(err, errs.ErrTransactionTagIdInvalid)
+	}
+
+	return requestTagIds, nil
+}
+
+// GetTransactionTagIds returns a slice of all transaction tag ids from a map of transaction tag ids grouped by transaction id
+func (s *TransactionTagService) GetTransactionTagIds(allTransactionTagIds map[int64][]int64) []int64 {
+	allTagIds := make([]int64, 0, len(allTransactionTagIds))
+
+	for _, tagIds := range allTransactionTagIds {
+		allTagIds = append(allTagIds, tagIds...)
+	}
+
+	return allTagIds
 }

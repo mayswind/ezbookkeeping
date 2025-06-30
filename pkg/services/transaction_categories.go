@@ -10,6 +10,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 	"github.com/mayswind/ezbookkeeping/pkg/uuid"
 )
 
@@ -522,4 +523,57 @@ func (s *TransactionCategoryService) GetCategoryNames(categories []*models.Trans
 	}
 
 	return categoryNames
+}
+
+// GetCategoryOrSubCategoryIds returns all category ids and sub-category ids according to given category ids
+func (s *TransactionCategoryService) GetCategoryOrSubCategoryIds(c *core.WebContext, categoryIds string, uid int64) ([]int64, error) {
+	if categoryIds == "" || categoryIds == "0" {
+		return nil, nil
+	}
+
+	requestCategoryIds, err := utils.StringArrayToInt64Array(strings.Split(categoryIds, ","))
+
+	if err != nil {
+		return nil, errs.Or(err, errs.ErrTransactionCategoryIdInvalid)
+	}
+
+	var allCategoryIds []int64
+
+	if len(requestCategoryIds) > 0 {
+		allSubCategories, err := s.GetSubCategoriesByCategoryIds(c, uid, requestCategoryIds)
+
+		if err != nil {
+			return nil, err
+		}
+
+		categoryIdsMap := make(map[int64]int32, len(requestCategoryIds))
+
+		for i := 0; i < len(requestCategoryIds); i++ {
+			categoryIdsMap[requestCategoryIds[i]] = 0
+		}
+
+		for i := 0; i < len(allSubCategories); i++ {
+			subCategory := allSubCategories[i]
+
+			if refCount, exists := categoryIdsMap[subCategory.ParentCategoryId]; exists {
+				categoryIdsMap[subCategory.ParentCategoryId] = refCount + 1
+			} else {
+				categoryIdsMap[subCategory.ParentCategoryId] = 1
+			}
+
+			if _, exists := categoryIdsMap[subCategory.CategoryId]; exists {
+				delete(categoryIdsMap, subCategory.CategoryId)
+			}
+
+			allCategoryIds = append(allCategoryIds, subCategory.CategoryId)
+		}
+
+		for accountId, refCount := range categoryIdsMap {
+			if refCount < 1 {
+				allCategoryIds = append(allCategoryIds, accountId)
+			}
+		}
+	}
+
+	return allCategoryIds, nil
 }

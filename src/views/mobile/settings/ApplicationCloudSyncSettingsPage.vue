@@ -23,7 +23,6 @@
             </f7-list-item>
             <f7-list-item class="has-child-list-item" checkbox
                           :disabled="loading || enabling || disabling"
-                          :title="tt(categorizedItems.categoryName)"
                           :value="categorizedItems.categoryName"
                           :checked="isAllSettingsSelected(categorizedItems)"
                           :indeterminate="hasSettingSelectedButNotAllChecked(categorizedItems)"
@@ -46,6 +45,12 @@
                             </template>
                         </f7-list-item>
                     </ul>
+                </template>
+
+                <template #title>
+                    <span>{{ tt(categorizedItems.categoryName) }}</span>
+                    <span class="margin-horizontal-half" v-if="categorizedItems.categorySubName">/</span>
+                    <span v-if="categorizedItems.categorySubName">{{ tt(categorizedItems.categorySubName) }}</span>
                 </template>
             </f7-list-item>
         </f7-list>

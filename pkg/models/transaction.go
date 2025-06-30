@@ -19,6 +19,21 @@ const (
 	TRANSACTION_TYPE_TRANSFER       TransactionType = 4
 )
 
+// ToTransactionDbType returns the transaction db type for this enum
+func (t TransactionType) ToTransactionDbType() (TransactionDbType, error) {
+	if t == TRANSACTION_TYPE_MODIFY_BALANCE {
+		return TRANSACTION_DB_TYPE_MODIFY_BALANCE, nil
+	} else if t == TRANSACTION_TYPE_EXPENSE {
+		return TRANSACTION_DB_TYPE_EXPENSE, nil
+	} else if t == TRANSACTION_TYPE_INCOME {
+		return TRANSACTION_DB_TYPE_INCOME, nil
+	} else if t == TRANSACTION_TYPE_TRANSFER {
+		return TRANSACTION_DB_TYPE_TRANSFER_OUT, nil
+	} else {
+		return 0, errs.ErrTransactionTypeInvalid
+	}
+}
+
 // TransactionDbType represents transaction type in database
 type TransactionDbType byte
 
@@ -32,8 +47,8 @@ const (
 )
 
 // String returns a textual representation of the transaction types for db enum
-func (s TransactionDbType) String() string {
-	switch s {
+func (t TransactionDbType) String() string {
+	switch t {
 	case TRANSACTION_DB_TYPE_MODIFY_BALANCE:
 		return "Modify Balance"
 	case TRANSACTION_DB_TYPE_INCOME:
@@ -45,21 +60,21 @@ func (s TransactionDbType) String() string {
 	case TRANSACTION_DB_TYPE_TRANSFER_IN:
 		return "Transfer In"
 	default:
-		return fmt.Sprintf("Invalid(%d)", int(s))
+		return fmt.Sprintf("Invalid(%d)", int(t))
 	}
 }
 
 // ToTransactionType returns the transaction type for this db enum
-func (s TransactionDbType) ToTransactionType() (TransactionType, error) {
-	if s == TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+func (t TransactionDbType) ToTransactionType() (TransactionType, error) {
+	if t == TRANSACTION_DB_TYPE_MODIFY_BALANCE {
 		return TRANSACTION_TYPE_MODIFY_BALANCE, nil
-	} else if s == TRANSACTION_DB_TYPE_EXPENSE {
+	} else if t == TRANSACTION_DB_TYPE_EXPENSE {
 		return TRANSACTION_TYPE_EXPENSE, nil
-	} else if s == TRANSACTION_DB_TYPE_INCOME {
+	} else if t == TRANSACTION_DB_TYPE_INCOME {
 		return TRANSACTION_TYPE_INCOME, nil
-	} else if s == TRANSACTION_DB_TYPE_TRANSFER_OUT {
+	} else if t == TRANSACTION_DB_TYPE_TRANSFER_OUT {
 		return TRANSACTION_TYPE_TRANSFER, nil
-	} else if s == TRANSACTION_DB_TYPE_TRANSFER_IN {
+	} else if t == TRANSACTION_DB_TYPE_TRANSFER_IN {
 		return TRANSACTION_TYPE_TRANSFER, nil
 	} else {
 		return 0, errs.ErrTransactionTypeInvalid
@@ -156,7 +171,7 @@ type TransactionImportProcessRequest struct {
 
 // TransactionCountRequest represents transaction count request
 type TransactionCountRequest struct {
-	Type          TransactionDbType        `form:"type" binding:"min=0,max=4"`
+	Type          TransactionType          `form:"type" binding:"min=0,max=4"`
 	CategoryIds   string                   `form:"category_ids"`
 	AccountIds    string                   `form:"account_ids"`
 	TagIds        string                   `form:"tag_ids"`
@@ -169,7 +184,7 @@ type TransactionCountRequest struct {
 
 // TransactionListByMaxTimeRequest represents all parameters of transaction listing by max time request
 type TransactionListByMaxTimeRequest struct {
-	Type          TransactionDbType        `form:"type" binding:"min=0,max=4"`
+	Type          TransactionType          `form:"type" binding:"min=0,max=4"`
 	CategoryIds   string                   `form:"category_ids"`
 	AccountIds    string                   `form:"account_ids"`
 	TagIds        string                   `form:"tag_ids"`
@@ -191,7 +206,7 @@ type TransactionListByMaxTimeRequest struct {
 type TransactionListInMonthByPageRequest struct {
 	Year          int32                    `form:"year" binding:"required,min=1"`
 	Month         int32                    `form:"month" binding:"required,min=1"`
-	Type          TransactionDbType        `form:"type" binding:"min=0,max=4"`
+	Type          TransactionType          `form:"type" binding:"min=0,max=4"`
 	CategoryIds   string                   `form:"category_ids"`
 	AccountIds    string                   `form:"account_ids"`
 	TagIds        string                   `form:"tag_ids"`

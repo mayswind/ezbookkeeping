@@ -16,6 +16,7 @@ import {
 } from '@/models/user.ts';
 
 import type {
+    ExportTransactionDataRequest,
     DataStatisticsResponse
 } from '@/models/data_management.ts';
 
@@ -360,9 +361,9 @@ export const useUserStore = defineStore('user', () => {
         });
     }
 
-    function getExportedUserData(fileType: string): Promise<Blob> {
+    function getExportedUserData(fileType: string, req?: ExportTransactionDataRequest): Promise<Blob> {
         return new Promise((resolve, reject) => {
-            services.getExportedUserData(fileType).then(response => {
+            services.getExportedUserData(fileType, req).then(response => {
                 if (response && response.headers) {
                     if (fileType === 'csv' && response.headers['content-type'] !== 'text/csv') {
                         reject({ message: 'Unable to retrieve exported user data' });

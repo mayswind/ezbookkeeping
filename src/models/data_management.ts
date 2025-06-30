@@ -1,3 +1,15 @@
+export interface ExportTransactionDataRequest {
+    readonly maxTime: number;
+    readonly minTime: number;
+    readonly type: number;
+    readonly categoryIds: string;
+    readonly accountIds: string;
+    readonly tagIds: string;
+    readonly tagFilterType: number;
+    readonly amountFilter: string;
+    readonly keyword: string;
+}
+
 export interface ClearDataRequest {
     readonly password: string;
 }

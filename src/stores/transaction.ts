@@ -29,6 +29,9 @@ import {
     type ImportTransactionResponsePageWrapper,
     ImportTransaction
 } from '@/models/imported_transaction.ts';
+import {
+    type ExportTransactionDataRequest
+} from '@/models/data_management.ts';
 
 import {
     getUserTransactionDraft,
@@ -780,6 +783,20 @@ export const useTransactionsStore = defineStore('transactions', () => {
         return querys.join('&');
     }
 
+    function getExportTransactionDataRequestByTransactionFilter(): ExportTransactionDataRequest {
+        return {
+            maxTime: transactionsFilter.value.maxTime,
+            minTime: transactionsFilter.value.minTime,
+            type: transactionsFilter.value.type,
+            categoryIds: transactionsFilter.value.categoryIds,
+            accountIds: transactionsFilter.value.accountIds,
+            tagIds: transactionsFilter.value.tagIds,
+            tagFilterType: transactionsFilter.value.tagFilterType,
+            amountFilter: transactionsFilter.value.amountFilter,
+            keyword: transactionsFilter.value.keyword
+        };
+    }
+
     function loadTransactions({ reload, count, page, withCount, autoExpand, defaultCurrency }: { reload?: boolean, count?: number, page?: number, withCount?: boolean, autoExpand: boolean, defaultCurrency: string }): Promise<TransactionPageWrapper> {
         let actualMaxTime = transactionsNextTimeId.value;
 
@@ -1308,6 +1325,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         initTransactionListFilter,
         updateTransactionListFilter,
         getTransactionListPageParams,
+        getExportTransactionDataRequestByTransactionFilter,
         loadTransactions,
         loadMonthlyAllTransactions,
         getTransaction,

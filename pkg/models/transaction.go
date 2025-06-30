@@ -178,8 +178,8 @@ type TransactionCountRequest struct {
 	TagFilterType TransactionTagFilterType `form:"tag_filter_type" binding:"min=0,max=3"`
 	AmountFilter  string                   `form:"amount_filter" binding:"validAmountFilter"`
 	Keyword       string                   `form:"keyword"`
-	MaxTime       int64                    `form:"max_time" binding:"min=0"`
-	MinTime       int64                    `form:"min_time" binding:"min=0"`
+	MaxTime       int64                    `form:"max_time" binding:"min=0"` // Transaction time sequence id
+	MinTime       int64                    `form:"min_time" binding:"min=0"` // Transaction time sequence id
 }
 
 // TransactionListByMaxTimeRequest represents all parameters of transaction listing by max time request
@@ -191,8 +191,8 @@ type TransactionListByMaxTimeRequest struct {
 	TagFilterType TransactionTagFilterType `form:"tag_filter_type" binding:"min=0,max=3"`
 	AmountFilter  string                   `form:"amount_filter" binding:"validAmountFilter"`
 	Keyword       string                   `form:"keyword"`
-	MaxTime       int64                    `form:"max_time" binding:"min=0"`
-	MinTime       int64                    `form:"min_time" binding:"min=0"`
+	MaxTime       int64                    `form:"max_time" binding:"min=0"` // Transaction time sequence id
+	MinTime       int64                    `form:"min_time" binding:"min=0"` // Transaction time sequence id
 	Page          int32                    `form:"page" binding:"min=0"`
 	Count         int32                    `form:"count" binding:"required,min=1,max=50"`
 	WithCount     bool                     `form:"with_count"`

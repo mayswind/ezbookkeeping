@@ -39,6 +39,7 @@ import type {
     RegisterResponse
 } from '@/models/auth_response.ts';
 import type {
+    ExportTransactionDataRequest,
     ClearDataRequest,
     DataStatisticsResponse
 } from '@/models/data_management.ts';
@@ -344,13 +345,23 @@ export default {
     getUserDataStatistics: (): ApiResponsePromise<DataStatisticsResponse> => {
         return axios.get<ApiResponse<DataStatisticsResponse>>('v1/data/statistics.json');
     },
-    getExportedUserData: (fileType: string): Promise<AxiosResponse<BlobPart>> => {
+    getExportedUserData: (fileType: string, req?: ExportTransactionDataRequest): Promise<AxiosResponse<BlobPart>> => {
+        let params = '';
+
+        if (req) {
+            const amountFilter = encodeURIComponent(req.amountFilter);
+            const keyword = encodeURIComponent(req.keyword);
+            params = `max_time=${req.maxTime}&min_time=${req.minTime}&type=${req.type}&category_ids=${req.categoryIds}&account_ids=${req.accountIds}&tag_ids=${req.tagIds}&tag_filter_type=${req.tagFilterType}&amount_filter=${amountFilter}&keyword=${keyword}`;
+        } else {
+            params = 'max_time=0&min_time=0&type=0&category_ids=&account_ids=&tag_ids=&tag_filter_type=0&amount_filter=&keyword=';
+        }
+
         if (fileType === 'csv') {
-            return axios.get<BlobPart>('v1/data/export.csv', {
+            return axios.get<BlobPart>('v1/data/export.csv?' + params, {
                 timeout: DEFAULT_EXPORT_API_TIMEOUT
             } as ApiRequestConfig);
         } else if (fileType === 'tsv') {
-            return axios.get<BlobPart>('v1/data/export.tsv', {
+            return axios.get<BlobPart>('v1/data/export.tsv?' + params, {
                 timeout: DEFAULT_EXPORT_API_TIMEOUT
             } as ApiRequestConfig);
         } else {

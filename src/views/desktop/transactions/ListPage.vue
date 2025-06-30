@@ -74,6 +74,34 @@
                                                    :disabled="loading" @click="importTransaction"
                                                    v-if="isDataImportingEnabled()">
                                                 {{ tt('Import') }}
+                                                <v-menu activator="parent" :open-on-hover="true" v-if="isDataExportingEnabled()">
+                                                    <v-list>
+                                                        <v-list-item :disabled="loading || exportingData || !transactions || !transactions.length || transactions.length < 1"
+                                                                     @click="exportTransactions('csv')">
+                                                            <v-list-item-title>{{ tt('Export to CSV (Comma-separated values) File') }}</v-list-item-title>
+                                                        </v-list-item>
+                                                        <v-list-item :disabled="loading || exportingData || !transactions || !transactions.length || transactions.length < 1"
+                                                                     @click="exportTransactions('tsv')">
+                                                            <v-list-item-title>{{ tt('Export to TSV (Tab-separated values) File') }}</v-list-item-title>
+                                                        </v-list-item>
+                                                    </v-list>
+                                                </v-menu>
+                                            </v-btn>
+                                            <v-btn class="ml-3" color="default" variant="outlined"
+                                                   :disabled="loading || exportingData || !transactions || !transactions.length || transactions.length < 1" v-if="!isDataImportingEnabled() && isDataExportingEnabled()">
+                                                {{ tt('Export') }}
+                                                <v-menu activator="parent">
+                                                    <v-list>
+                                                        <v-list-item :disabled="loading || exportingData || !transactions || !transactions.length || transactions.length < 1"
+                                                                     @click="exportTransactions('csv')">
+                                                            <v-list-item-title>{{ tt('Export to CSV (Comma-separated values) File') }}</v-list-item-title>
+                                                        </v-list-item>
+                                                        <v-list-item :disabled="loading || exportingData || !transactions || !transactions.length || transactions.length < 1"
+                                                                     @click="exportTransactions('tsv')">
+                                                            <v-list-item-title>{{ tt('Export to TSV (Tab-separated values) File') }}</v-list-item-title>
+                                                        </v-list-item>
+                                                    </v-list>
+                                                </v-menu>
                                             </v-btn>
                                             <v-btn density="compact" color="default" variant="text" size="24"
                                                    class="ml-2" :icon="true" :loading="loading" @click="reload(true, false)">
@@ -652,6 +680,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { TransactionListPageType, useTransactionListPageBase } from '@/views/base/transactions/TransactionListPageBase.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
+import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
@@ -704,7 +733,8 @@ import {
     categoryTypeToTransactionType,
     transactionTypeToCategoryType
 } from '@/lib/category.ts';
-import { isDataImportingEnabled } from '@/lib/server_settings.ts';
+import { isDataExportingEnabled, isDataImportingEnabled } from '@/lib/server_settings.ts';
+import { startDownloadFile } from '@/lib/ui/common.ts';
 import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';
 import logger from '@/lib/logger.ts';
 
@@ -823,6 +853,7 @@ const {
 } = useTransactionListPageBase();
 
 const settingsStore = useSettingsStore();
+const userStore = useUserStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
@@ -859,6 +890,7 @@ const currentAmountFilterValue2 = ref<number>(0);
 const currentPageTransactions = ref<Transaction[]>([]);
 const categoryMenuState = ref<boolean>(false);
 const amountMenuState = ref<boolean>(false);
+const exportingData = ref<boolean>(false);
 const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
 const showNav = ref<boolean>(display.mdAndUp.value);
 const showCustomDateRangeDialog = ref<boolean>(false);
@@ -1569,6 +1601,38 @@ function importTransaction(): void {
         reload(false, false);
     }).catch(error => {
         if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function exportTransactions(fileExtension: string): void {
+    if (exportingData.value) {
+        return;
+    }
+
+    const nickname = userStore.currentUserNickname;
+    let exportFileName = '';
+
+    if (nickname) {
+        exportFileName = tt('dataExport.exportFilename', {
+            nickname: nickname
+        }) + '.' + fileExtension;
+    } else {
+        exportFileName = tt('dataExport.defaultExportFilename') + '.' + fileExtension;
+    }
+
+    const exportTransactionReq = transactionsStore.getExportTransactionDataRequestByTransactionFilter();
+
+    exportingData.value = true;
+
+    userStore.getExportedUserData(fileExtension, exportTransactionReq).then(data => {
+        startDownloadFile(exportFileName, data);
+        exportingData.value = false;
+    }).catch(error => {
+        exportingData.value = false;
+
+        if (!error.processed) {
             snackbar.value?.showError(error);
         }
     });

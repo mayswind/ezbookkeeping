@@ -197,6 +197,14 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 		return nil, "", errs.ErrDataExportNotAllowed
 	}
 
+	var exportTransactionDataReq models.ExportTransactionDataRequest
+	err := c.ShouldBindQuery(&exportTransactionDataReq)
+
+	if err != nil {
+		log.Warnf(c, "[data_managements.ExportDataHandler] parse request failed, because %s", err.Error())
+		return nil, "", errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
 	timezone := time.Local
 	utcOffset, err := c.GetClientTimezoneOffset()
 
@@ -253,7 +261,44 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 	categoryMap := a.categories.GetCategoryMapByList(categories)
 	tagMap := a.tags.GetTagMapByList(tags)
 
-	allTransactions, err := a.transactions.GetAllTransactions(c, uid, pageCountForDataExport, true)
+	allAccountIds, err := a.accounts.GetAccountOrSubAccountIds(c, exportTransactionDataReq.AccountIds, uid)
+
+	if err != nil {
+		log.Warnf(c, "[data_managements.ExportDataHandler] get account error, because %s", err.Error())
+		return nil, "", errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	allCategoryIds, err := a.categories.GetCategoryOrSubCategoryIds(c, exportTransactionDataReq.CategoryIds, uid)
+
+	if err != nil {
+		log.Warnf(c, "[data_managements.ExportDataHandler] get transaction category error, because %s", err.Error())
+		return nil, "", errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	var allTagIds []int64
+	noTags := exportTransactionDataReq.TagIds == "none"
+
+	if !noTags {
+		allTagIds, err = a.tags.GetTagIds(exportTransactionDataReq.TagIds)
+
+		if err != nil {
+			log.Warnf(c, "[data_managements.ExportDataHandler] get transaction tag ids error, because %s", err.Error())
+			return nil, "", errs.Or(err, errs.ErrOperationFailed)
+		}
+	}
+
+	maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(time.Now().Unix())
+	minTransactionTime := int64(0)
+
+	if exportTransactionDataReq.MaxTime > 0 {
+		maxTransactionTime = utils.GetMaxTransactionTimeFromUnixTime(exportTransactionDataReq.MaxTime)
+	}
+
+	if exportTransactionDataReq.MinTime > 0 {
+		minTransactionTime = utils.GetMinTransactionTimeFromUnixTime(exportTransactionDataReq.MinTime)
+	}
+
+	allTransactions, err := a.transactions.GetAllSpecifiedTransactions(c, uid, maxTransactionTime, minTransactionTime, exportTransactionDataReq.Type, allCategoryIds, allAccountIds, allTagIds, noTags, exportTransactionDataReq.TagFilterType, exportTransactionDataReq.AmountFilter, exportTransactionDataReq.Keyword, pageCountForDataExport, true)
 
 	if err != nil {
 		log.Errorf(c, "[data_managements.ExportDataHandler] failed to all transactions user \"uid:%d\", because %s", uid, err.Error())

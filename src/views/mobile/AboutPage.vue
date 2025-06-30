@@ -110,7 +110,10 @@ function showVersion(): void {
     }
 
     versionClickCount.value++;
-    showAlert(versionMessage);
+
+    if (serverDisplayVersion.value && serverDisplayVersion.value !== 'unknown' && serverDisplayVersion.value !== clientVersion) {
+        showAlert(versionMessage);
+    }
 }
 
 init();

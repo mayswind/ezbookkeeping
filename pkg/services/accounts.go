@@ -298,9 +298,9 @@ func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Acco
 
 			if err != nil || createdRows < 1 { // maybe another transaction has same time
 				if err != nil {
-					log.Warnf(c, "[accounts.CreateAccounts] cannot create trasaction, because %s, regenerate transaction time value", err.Error())
+					log.Warnf(c, "[accounts.CreateAccounts] cannot create transaction, because %s, regenerate transaction time value", err.Error())
 				} else {
-					log.Warnf(c, "[accounts.CreateAccounts] cannot create trasaction, regenerate transaction time value")
+					log.Warnf(c, "[accounts.CreateAccounts] cannot create transaction, regenerate transaction time value")
 				}
 
 				err = userDataDb.RollbackToSavePoint(sess, insertTransactionSavePointName)

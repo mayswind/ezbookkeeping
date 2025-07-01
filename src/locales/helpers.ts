@@ -1,5 +1,6 @@
 import { useI18n as useVueI18n } from 'vue-i18n';
 import moment from 'moment-timezone';
+import 'moment-timezone/moment-timezone-utils';
 
 import type { PartialRecord, TypeAndName, TypeAndDisplayName, LocalizedSwitchOption } from '@/core/base.ts';
 
@@ -1817,11 +1818,19 @@ export function useI18n() {
     }
 
     function setTimeZone(timezone: string): void {
+        let timezoneOffsetMinutes = getBrowserTimezoneOffsetMinutes();
+
         if (timezone) {
-            moment.tz.setDefault(timezone);
-        } else {
-            moment.tz.setDefault();
+            timezoneOffsetMinutes = getTimezoneOffsetMinutes(timezone);
         }
+
+        moment.tz.add(moment.tz.pack({
+            name: 'Fixed/Timezone',
+            abbrs: ['FIX'],
+            offsets: [-timezoneOffsetMinutes],
+            untils: [0]
+        }));
+        moment.tz.setDefault('Fixed/Timezone');
     }
 
     function initLocale(lastUserLanguage?: string, timezone?: string): LocaleDefaultSettings | null {
@@ -1839,6 +1848,7 @@ export function useI18n() {
             setTimeZone(timezone);
         } else {
             logger.info(`No timezone is set, use browser default ${getTimezoneOffset()} (maybe ${moment.tz.guess(true)})`);
+            setTimeZone('');
         }
 
         return localeDefaultSettings;

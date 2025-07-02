@@ -50,6 +50,8 @@ jobs:
           push: true
           build-args: |
             RELEASE_BUILD=1
+            BUILD_PIPELINE=1
+            CHECK_3RD_API=${{ vars.CHECK_3RD_API }}
             SKIP_TESTS=${{ vars.SKIP_TESTS }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

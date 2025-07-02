@@ -48,6 +48,8 @@ jobs:
             linux/arm/v6
           push: true
           build-args: |
+            BUILD_PIPELINE=1
+            CHECK_3RD_API=${{ vars.CHECK_3RD_API }}
             SKIP_TESTS=${{ vars.SKIP_TESTS }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

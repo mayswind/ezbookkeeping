@@ -27,4 +27,6 @@ jobs:
           platforms: linux/amd64
           push: false
           build-args: |
+            BUILD_PIPELINE=1
+            CHECK_3RD_API=${{ vars.CHECK_3RD_API }}
             SKIP_TESTS=${{ vars.SKIP_TESTS }}

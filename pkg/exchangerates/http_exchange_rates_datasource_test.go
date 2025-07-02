@@ -2,6 +2,7 @@ package exchangerates
 
 import (
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -310,6 +311,10 @@ func TestExchangeRatesApiLatestExchangeRateHandler_InternationalMonetaryFundData
 }
 
 func executeLatestExchangeRateHandler(t *testing.T, dataSourceType string) *models.LatestExchangeRateResponse {
+	if os.Getenv("BUILD_PIPELINE") == "1" && os.Getenv("CHECK_3RD_API") != "1" {
+		return nil
+	}
+
 	config := &settings.Config{
 		ExchangeRatesDataSource:     dataSourceType,
 		ExchangeRatesRequestTimeout: 10000,

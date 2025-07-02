@@ -53,6 +53,8 @@ jobs:
           platforms: ${{ vars.BUILD_SNAPSHOT_PLATFORMS }}
           push: true
           build-args: |
-              SKIP_TESTS=${{ vars.SKIP_TESTS }}
+            BUILD_PIPELINE=1
+            CHECK_3RD_API=${{ vars.CHECK_3RD_API }}
+            SKIP_TESTS=${{ vars.SKIP_TESTS }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

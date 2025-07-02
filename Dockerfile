@@ -1,8 +1,12 @@
 # Build backend binary file
 FROM golang:1.24.4-alpine3.22 AS be-builder
 ARG RELEASE_BUILD
+ARG BUILD_PIPELINE
+ARG CHECK_3RD_API
 ARG SKIP_TESTS
 ENV RELEASE_BUILD=$RELEASE_BUILD
+ENV BUILD_PIPELINE=$BUILD_PIPELINE
+ENV CHECK_3RD_API=$CHECK_3RD_API
 ENV SKIP_TESTS=$SKIP_TESTS
 WORKDIR /go/src/github.com/mayswind/ezbookkeeping
 COPY . .
@@ -13,7 +17,9 @@ RUN ./build.sh backend
 # Build frontend files
 FROM --platform=$BUILDPLATFORM node:22.16.0-alpine3.22 AS fe-builder
 ARG RELEASE_BUILD
+ARG BUILD_PIPELINE
 ENV RELEASE_BUILD=$RELEASE_BUILD
+ENV BUILD_PIPELINE=$BUILD_PIPELINE
 WORKDIR /go/src/github.com/mayswind/ezbookkeeping
 COPY . .
 RUN docker/frontend-build-pre-setup.sh

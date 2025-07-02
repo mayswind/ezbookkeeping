@@ -124,8 +124,8 @@ Currently available translations:
 | ru | Русский | [@artegoser](https://github.com/artegoser) |
 | uk | Українська | [@nktlitvinenko](https://github.com/nktlitvinenko) |
 | vi | Tiếng Việt | [@f97](https://github.com/f97) |
-| zh_Hans | 中文 (简体) | / |
-| zh_Hant | 中文 (繁體) | / |
+| zh-Hans | 中文 (简体) | / |
+| zh-Hant | 中文 (繁體) | / |
 
 Don't see your language? Help us add it!
 

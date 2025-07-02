@@ -407,6 +407,7 @@
     },
     "currency": {
         "name": {
+            "XAU": "Vàng (chỉ)",
             "AED": "United Arab Emirates Dirham",
             "AFN": "Afghan Afghani",
             "ALL": "Albanian Lek",

@@ -71,6 +71,9 @@ func InitializeExchangeRatesDataSource(config *settings.Config) error {
 	} else if config.ExchangeRatesDataSource == settings.UserCustomExchangeRatesDataSource {
 		Container.Current = newUserCustomExchangeRatesDataSource()
 		return nil
+	} else if config.ExchangeRatesDataSource == settings.BankOfVietnamDataSource {
+		Container.Current = newCommonHttpExchangeRatesDataSource(&InternationalTechcombankDataSource{})
+		return nil
 	}
 
 	return errs.ErrInvalidExchangeRatesDataSource

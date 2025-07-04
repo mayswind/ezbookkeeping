@@ -113,7 +113,7 @@ Help make ezBookkeeping accessible to users around the world! If you want to con
 
 Currently available translations:
 
-| Tag | Language | Translator |
+| Tag | Language | Contributors |
 | --- | --- | --- |
 | de | Deutsch | [@chrgm](https://github.com/chrgm) |
 | en | English | / |

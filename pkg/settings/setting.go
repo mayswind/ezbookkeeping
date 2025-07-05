@@ -234,6 +234,10 @@ type Config struct {
 	EnableGZip       bool
 	EnableRequestLog bool
 
+	// MCP
+	EnableMCPServer     bool
+	MCPAllowedRemoteIPs []*core.IPPattern
+
 	// Database
 	DatabaseConfig     *DatabaseConfig
 	EnableQueryLog     bool
@@ -344,9 +348,6 @@ type Config struct {
 	ExchangeRatesRequestTimeoutExceedDefaultValue bool
 	ExchangeRatesProxy                            string
 	ExchangeRatesSkipTLSVerify                    bool
-
-	// MCP
-	EnableMCP bool
 }
 
 // LoadConfiguration loads setting config from given config file path
@@ -375,6 +376,12 @@ func LoadConfiguration(configFilePath string) (*Config, error) {
 	}
 
 	err = loadServerConfiguration(config, cfgFile, "server")
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = loadMCPServerConfiguration(config, cfgFile, "mcp")
 
 	if err != nil {
 		return nil, err
@@ -464,12 +471,6 @@ func LoadConfiguration(configFilePath string) (*Config, error) {
 		return nil, err
 	}
 
-	err = loadMCPConfiguration(config, cfgFile, "mcp")
-
-	if err != nil {
-		return nil, err
-	}
-
 	return config, nil
 }
 
@@ -545,6 +546,35 @@ func loadServerConfiguration(config *Config, configFile *ini.File, sectionName s
 
 	config.EnableGZip = getConfigItemBoolValue(configFile, sectionName, "enable_gzip", false)
 	config.EnableRequestLog = getConfigItemBoolValue(configFile, sectionName, "log_request", false)
+
+	return nil
+}
+
+func loadMCPServerConfiguration(config *Config, configFile *ini.File, sectionName string) error {
+	config.EnableMCPServer = getConfigItemBoolValue(configFile, sectionName, "enable_mcp", false)
+	mcpAllowedRemoteIps := getConfigItemStringValue(configFile, sectionName, "mcp_allowed_remote_ips", "")
+
+	if mcpAllowedRemoteIps != "" {
+		remoteIPs := strings.Split(mcpAllowedRemoteIps, ",")
+		config.MCPAllowedRemoteIPs = make([]*core.IPPattern, 0, len(remoteIPs))
+
+		for i := 0; i < len(remoteIPs); i++ {
+			ip := strings.TrimSpace(remoteIPs[i])
+			pattern, err := core.ParseIPPattern(ip)
+
+			if err != nil {
+				return err
+			}
+
+			if pattern == nil {
+				continue
+			}
+
+			config.MCPAllowedRemoteIPs = append(config.MCPAllowedRemoteIPs, pattern)
+		}
+	} else {
+		config.MCPAllowedRemoteIPs = nil
+	}
 
 	return nil
 }
@@ -1147,10 +1177,4 @@ func getLogLevel(logLevelStr string) (Level, error) {
 	}
 
 	return "", errs.ErrInvalidLogLevel
-}
-
-func loadMCPConfiguration(config *Config, configFile *ini.File, sectionName string) error {
-	config.EnableMCP = getConfigItemBoolValue(configFile, sectionName, "enable", false)
-
-	return nil
 }

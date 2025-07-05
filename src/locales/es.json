@@ -1198,7 +1198,8 @@
         "uploaded file is empty": "El archivo subido está vacío",
         "uploaded file size exceeds the maximum allowed size": "El tamaño del archivo cargado excede el tamaño máximo permitido",
         "failure count exceeded maximum limit": "Failure count exceeded maximum limit, please try again after some time",
-        "repeated request": "Repeated Request"
+        "repeated request": "Repeated Request",
+        "ip address is forbidden to access this resource": "IP address is forbidden to access this resource"
     },
     "parameter": {
         "id": "IDENTIFICACIÓN",

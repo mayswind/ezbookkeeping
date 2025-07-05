@@ -1198,7 +1198,8 @@
         "uploaded file is empty": "上传的文件为空",
         "uploaded file size exceeds the maximum allowed size": "上传的文件大小超出了允许的最大大小",
         "failure count exceeded maximum limit": "失败次数超出最大限制，请稍后重试",
-        "repeated request": "重复的请求"
+        "repeated request": "重复的请求",
+        "ip address is forbidden to access this resource": "IP 地址被禁止访问该资源",
     },
     "parameter": {
         "id": "ID",

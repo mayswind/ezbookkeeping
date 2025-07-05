@@ -32,6 +32,34 @@ func TestFormatUnixTimeToLongDate(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
+func TestFormatUnixTimeToLongDateTimeWithTimezone(t *testing.T) {
+	unixTime := int64(1617228083)
+	utcTimezone := time.FixedZone("Test Timezone", 0)      // UTC
+	utc8Timezone := time.FixedZone("Test Timezone", 28800) // UTC+8
+
+	expectedValue := "2021-03-31 22:01:23Z"
+	actualValue := FormatUnixTimeToLongDateTimeWithTimezone(unixTime, utcTimezone)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "2021-04-01 06:01:23+08:00"
+	actualValue = FormatUnixTimeToLongDateTimeWithTimezone(unixTime, utc8Timezone)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestFormatUnixTimeToLongDateTimeWithTimezoneRFC3389Format(t *testing.T) {
+	unixTime := int64(1617228083)
+	utcTimezone := time.FixedZone("Test Timezone", 0)      // UTC
+	utc8Timezone := time.FixedZone("Test Timezone", 28800) // UTC+8
+
+	expectedValue := "2021-03-31T22:01:23Z"
+	actualValue := FormatUnixTimeToLongDateTimeWithTimezoneRFC3389Format(unixTime, utcTimezone)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "2021-04-01T06:01:23+08:00"
+	actualValue = FormatUnixTimeToLongDateTimeWithTimezoneRFC3389Format(unixTime, utc8Timezone)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
 func TestFormatUnixTimeToLongDateTime(t *testing.T) {
 	unixTime := int64(1617228083)
 	utcTimezone := time.FixedZone("Test Timezone", 0)      // UTC

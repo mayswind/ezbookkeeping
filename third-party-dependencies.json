@@ -135,6 +135,12 @@
         "licenseUrl": "https://github.com/extrame/xls/blob/4a6cf263071b975a90abf74ca3e804b48243be28/LICENSE"
     },
     {
+        "name": "jsonschema",
+        "copyright": "Copyright (C) 2014 Alec Thomas",
+        "url": "https://github.com/invopop/jsonschema",
+        "licenseUrl": "https://github.com/invopop/jsonschema/blob/v0.13.0/COPYING"
+    },
+    {
         "name": "go-ordered-map",
         "url": "https://github.com/wk8/go-ordered-map",
         "licenseUrl": "https://github.com/wk8/go-ordered-map/blob/v2.1.8/LICENSE"

@@ -60,6 +60,47 @@ func PrintJsonErrorResult(c *core.WebContext, err *errs.Error) {
 	c.AbortWithStatusJSON(err.HttpStatusCode, result)
 }
 
+// PrintJSONRPCSuccessResult writes success response in JSON-RPC format to current http context
+func PrintJSONRPCSuccessResult(c *core.WebContext, jsonRPCRequest *core.JSONRPCRequest, result any) {
+	c.JSON(http.StatusOK, core.NewJSONRPCResponse(jsonRPCRequest.ID, result))
+}
+
+// PrintJSONRPCErrorResult writes error response in JSON-RPC format to current http context
+func PrintJSONRPCErrorResult(c *core.WebContext, jsonRPCRequest *core.JSONRPCRequest, err *errs.Error) {
+	c.SetResponseError(err)
+
+	errorMessage := err.Error()
+
+	if err.Code() == errs.ErrIncompleteOrIncorrectSubmission.Code() && len(err.BaseError) > 0 {
+		validationErrors, ok := err.BaseError[0].(validator.ValidationErrors)
+
+		if ok {
+			for _, err := range validationErrors {
+				errorMessage = getValidationErrorText(err)
+				break
+			}
+		}
+	}
+
+	var id any
+
+	if jsonRPCRequest != nil {
+		id = jsonRPCRequest.ID
+	}
+
+	jsonRPCError := core.JSONRPCInternalError
+
+	if err.Code() == errs.ErrIncompleteOrIncorrectSubmission.Code() {
+		jsonRPCError = core.JSONRPCParseError
+	} else if err.Code() == errs.ErrApiNotFound.Code() {
+		jsonRPCError = core.JSONRPCMethodNotFoundError
+	} else if err.Code() == errs.ErrParameterInvalid.Code() {
+		jsonRPCError = core.JSONRPCInvalidParamsError
+	}
+
+	c.AbortWithStatusJSON(err.HttpStatusCode, core.NewJSONRPCErrorResponseWithCause(id, jsonRPCError, errorMessage))
+}
+
 // PrintDataErrorResult writes error response in custom content type to current http context
 func PrintDataErrorResult(c *core.WebContext, contentType string, err *errs.Error) {
 	c.SetResponseError(err)

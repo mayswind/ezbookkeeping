@@ -15,6 +15,9 @@ type MiddlewareHandlerFunc func(*WebContext)
 // ApiHandlerFunc represents the api handler function
 type ApiHandlerFunc func(*WebContext) (any, *errs.Error)
 
+// JSONRPCApiHandlerFunc represents the api handler function
+type JSONRPCApiHandlerFunc func(*WebContext, *JSONRPCRequest) (any, *errs.Error)
+
 // EventStreamApiHandlerFunc represents the event stream api handler function
 type EventStreamApiHandlerFunc func(*WebContext) *errs.Error
 

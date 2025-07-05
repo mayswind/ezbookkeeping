@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"net/http"
 	"path/filepath"
 	"time"
 
@@ -210,6 +211,27 @@ func startWebServer(c *core.CliContext) error {
 	{
 		qrCodeCacheStore := persistence.NewInMemoryStore(time.Minute)
 		qrCodeRoute.GET("/mobile_url.png", bindCachedImage(api.QrCodes.MobileUrlQrCodeHandler, qrCodeCacheStore))
+	}
+
+	if config.EnableMCPServer {
+		mcpRoute := router.Group("/mcp")
+		mcpRoute.Use(bindMiddleware(middlewares.RequestId(config)))
+		mcpRoute.Use(bindMiddleware(middlewares.RequestLog))
+		mcpRoute.Use(bindMiddleware(middlewares.MCPServerIpLimit(config)))
+		mcpRoute.Use(bindMiddleware(middlewares.JWTAuthorization))
+		{
+			mcpRoute.POST("", bindJSONRPCApi(map[string]core.JSONRPCApiHandlerFunc{
+				"initialize":     api.ModelContextProtocols.InitializeHandler,
+				"resources/list": api.ModelContextProtocols.ListResourcesHandler,
+				"resources/read": api.ModelContextProtocols.ReadResourceHandler,
+				"tools/list":     api.ModelContextProtocols.ListToolsHandler,
+				"tools/call":     api.ModelContextProtocols.CallToolHandler,
+				"ping":           api.ModelContextProtocols.PingHandler,
+			}, map[string]int{
+				"notifications/initialized": http.StatusAccepted,
+			}))
+			mcpRoute.GET("", bindApi(api.Default.MethodNotAllowed))
+		}
 	}
 
 	apiRoute := router.Group("/api")
@@ -428,6 +450,44 @@ func bindApiWithTokenUpdate(fn core.ApiHandlerFunc, config *settings.Config) gin
 			utils.PrintJsonErrorResult(c, err)
 		} else {
 			utils.PrintJsonSuccessResult(c, result)
+		}
+	}
+}
+
+func bindJSONRPCApi(fns map[string]core.JSONRPCApiHandlerFunc, skipMethods map[string]int) gin.HandlerFunc {
+	return func(ginCtx *gin.Context) {
+		c := core.WrapWebContext(ginCtx)
+
+		var jsonRPCRequest core.JSONRPCRequest
+		reqErr := c.ShouldBindBodyWithJSON(&jsonRPCRequest)
+
+		if reqErr != nil {
+			utils.PrintJSONRPCErrorResult(c, nil, errs.NewIncompleteOrIncorrectSubmissionError(reqErr))
+			return
+		}
+
+		if skipMethods != nil {
+			httpStatusCode, exists := skipMethods[jsonRPCRequest.Method]
+
+			if exists {
+				c.AbortWithStatus(httpStatusCode)
+				return
+			}
+		}
+
+		fn, exists := fns[jsonRPCRequest.Method]
+
+		if !exists {
+			utils.PrintJSONRPCErrorResult(c, &jsonRPCRequest, errs.ErrApiNotFound)
+			return
+		}
+
+		result, err := fn(c, &jsonRPCRequest)
+
+		if err != nil {
+			utils.PrintJSONRPCErrorResult(c, &jsonRPCRequest, err)
+		} else {
+			utils.PrintJSONRPCSuccessResult(c, &jsonRPCRequest, result)
 		}
 	}
 }

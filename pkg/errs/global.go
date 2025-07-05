@@ -27,6 +27,7 @@ var (
 	ErrExceedMaxUploadFileSize         = NewNormalError(NormalSubcategoryGlobal, 17, http.StatusBadRequest, "uploaded file size exceeds the maximum allowed size")
 	ErrFailureCountLimitReached        = NewNormalError(NormalSubcategoryGlobal, 18, http.StatusBadRequest, "failure count exceeded maximum limit")
 	ErrRepeatedRequest                 = NewNormalError(NormalSubcategoryGlobal, 19, http.StatusBadRequest, "repeated request")
+	ErrMCPNotEnabled                   = NewNormalError(NormalSubcategoryGlobal, 20, http.StatusForbidden, "MCP is not enabled")
 )
 
 // GetParameterInvalidMessage returns specific error message for invalid parameter error

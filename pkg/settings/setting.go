@@ -344,6 +344,9 @@ type Config struct {
 	ExchangeRatesRequestTimeoutExceedDefaultValue bool
 	ExchangeRatesProxy                            string
 	ExchangeRatesSkipTLSVerify                    bool
+
+	// MCP
+	EnableMCP bool
 }
 
 // LoadConfiguration loads setting config from given config file path
@@ -456,6 +459,12 @@ func LoadConfiguration(configFilePath string) (*Config, error) {
 	}
 
 	err = loadExchangeRatesConfiguration(config, cfgFile, "exchange_rates")
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = loadMCPConfiguration(config, cfgFile, "mcp")
 
 	if err != nil {
 		return nil, err
@@ -1138,4 +1147,10 @@ func getLogLevel(logLevelStr string) (Level, error) {
 	}
 
 	return "", errs.ErrInvalidLogLevel
+}
+
+func loadMCPConfiguration(config *Config, configFile *ini.File, sectionName string) error {
+	config.EnableMCP = getConfigItemBoolValue(configFile, sectionName, "enable", false)
+
+	return nil
 }

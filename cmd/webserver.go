@@ -370,6 +370,11 @@ func startWebServer(c *core.CliContext) error {
 
 			// System
 			apiV1Route.GET("/systems/version.json", bindApi(api.Systems.VersionHandler))
+
+			// MCP
+			if config.EnableMCP {
+				apiV1Route.POST("/mcp", bindApi(api.MCP.MCPHandler))
+			}
 		}
 	}
 

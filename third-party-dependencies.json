@@ -127,7 +127,7 @@
         "name": "Excelize",
         "copyright": "Copyright (c) 2016-2025 The excelize Authors. Copyright (c) 2011-2017 Geoffrey J. Teale",
         "url": "https://github.com/qax-os/excelize",
-        "licenseUrl": "https://github.com/qax-os/excelize/blob/v2.9.1/LICENSE"
+        "licenseUrl": "https://github.com/qax-os/excelize/blob/v2.9.0/LICENSE"
     },
     {
         "name": "xls",

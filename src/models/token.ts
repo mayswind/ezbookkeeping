@@ -10,6 +10,10 @@ export interface TokenGenerateMCPRequest {
     readonly password: string;
 }
 
+export interface TokenRevokeRequest {
+    readonly tokenId: string;
+}
+
 export interface TokenGenerateMCPResponse {
     readonly token: string;
     readonly mcpUrl: string;

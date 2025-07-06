@@ -33,7 +33,7 @@ type TokenGenerateMCPResponse struct {
 	MCPUrl string `json:"mcpUrl"`
 }
 
-// TokenRefreshResponse represents all parameters of token refreshing request
+// TokenRefreshResponse represents all response parameters of token refreshing
 type TokenRefreshResponse struct {
 	NewToken                 string                        `json:"newToken,omitempty"`
 	OldTokenId               string                        `json:"oldTokenId,omitempty"`

@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { useSettingsStore } from './setting.ts';
 import { useUserStore } from './user.ts';
 
-import type { TokenRefreshResponse, TokenInfoResponse } from '@/models/token.ts';
+import type { TokenGenerateMCPResponse, TokenRefreshResponse, TokenInfoResponse } from '@/models/token.ts';
 
 import { isObject } from '@/lib/common.ts';
 import { updateCurrentToken } from '@/lib/userstate.ts';
@@ -69,6 +69,31 @@ export const useTokensStore = defineStore('tokens', () => {
         });
     }
 
+    function generateMCPToken({ password }: { password: string }): Promise<TokenGenerateMCPResponse> {
+        return new Promise((resolve, reject) => {
+            services.generateMCPToken({ password }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to generate token' });
+                    return;
+                }
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to generate token', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to generate token' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
     function revokeToken({ tokenId, ignoreError }: { tokenId: string, ignoreError?: boolean }): Promise<boolean> {
         return new Promise((resolve, reject) => {
             services.revokeToken({ tokenId, ignoreError }).then(response => {
@@ -123,6 +148,7 @@ export const useTokensStore = defineStore('tokens', () => {
         // functions
         getAllTokens,
         refreshTokenAndRevokeOldToken,
+        generateMCPToken,
         revokeToken,
         revokeAllTokens
     };

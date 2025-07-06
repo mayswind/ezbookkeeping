@@ -106,6 +106,8 @@ import type {
     TransactionTemplateInfoResponse
 } from '@/models/transaction_template.ts';
 import type {
+    TokenGenerateMCPRequest,
+    TokenGenerateMCPResponse,
     TokenRefreshResponse,
     TokenInfoResponse
 } from '@/models/token.ts';
@@ -288,6 +290,9 @@ export default {
     },
     getTokens: (): ApiResponsePromise<TokenInfoResponse[]> => {
         return axios.get<ApiResponse<TokenInfoResponse[]>>('v1/tokens/list.json');
+    },
+    generateMCPToken: (req: TokenGenerateMCPRequest): ApiResponsePromise<TokenGenerateMCPResponse> => {
+        return axios.post<ApiResponse<TokenGenerateMCPResponse>>('v1/tokens/generate/mcp.json', req);
     },
     revokeToken: ({ tokenId, ignoreError }: { tokenId: string, ignoreError?: boolean }): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/tokens/revoke.json', {

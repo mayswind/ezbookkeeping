@@ -394,7 +394,7 @@ func (l *UserDataCli) ListUserTokens(c *core.CliContext, username string) ([]*mo
 		return nil, err
 	}
 
-	tokens, err := l.tokens.GetAllUnexpiredNormalTokensByUid(c, uid)
+	tokens, err := l.tokens.GetAllUnexpiredNormalAndMCPTokensByUid(c, uid)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.ListUserTokens] failed to get tokens of user \"%s\", because %s", username, err.Error())
@@ -405,7 +405,7 @@ func (l *UserDataCli) ListUserTokens(c *core.CliContext, username string) ([]*mo
 }
 
 // CreateNewUserToken returns a new token for the specified user
-func (l *UserDataCli) CreateNewUserToken(c *core.CliContext, username string) (*models.TokenRecord, string, error) {
+func (l *UserDataCli) CreateNewUserToken(c *core.CliContext, username string, tokenType string) (*models.TokenRecord, string, error) {
 	if username == "" {
 		log.CliErrorf(c, "[user_data.CreateNewUserToken] user name is empty")
 		return nil, "", errs.ErrUsernameIsEmpty
@@ -418,7 +418,16 @@ func (l *UserDataCli) CreateNewUserToken(c *core.CliContext, username string) (*
 		return nil, "", err
 	}
 
-	token, tokenRecord, err := l.tokens.CreateTokenViaCli(c, user)
+	var token string
+	var tokenRecord *models.TokenRecord
+
+	if tokenType == "mcp" {
+		token, tokenRecord, err = l.tokens.CreateMCPTokenViaCli(c, user)
+	} else if tokenType == "normal" {
+		token, tokenRecord, err = l.tokens.CreateTokenViaCli(c, user)
+	} else {
+		return nil, "", errs.ErrParameterInvalid
+	}
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.CreateNewUserToken] failed to create token for user \"%s\", because %s", username, err.Error())

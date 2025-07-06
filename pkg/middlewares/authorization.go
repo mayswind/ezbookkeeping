@@ -94,6 +94,25 @@ func JWTResetPasswordAuthorization(c *core.WebContext) {
 	c.Next()
 }
 
+// JWTMCPAuthorization verifies whether current request is valid by jwt mcp token in header
+func JWTMCPAuthorization(c *core.WebContext) {
+	claims, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
+
+	if err != nil {
+		utils.PrintJsonErrorResult(c, err)
+		return
+	}
+
+	if claims.Type != core.USER_TOKEN_TYPE_MCP {
+		log.Warnf(c, "[authorization.jwtAuthorization] user \"uid:%d\" token type (%d) is not mcp token", claims.Uid, claims.Type)
+		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidTokenType)
+		return
+	}
+
+	c.SetTokenClaims(claims)
+	c.Next()
+}
+
 func jwtAuthorization(c *core.WebContext, source TokenSourceType) {
 	claims, err := getTokenClaims(c, source)
 
@@ -109,7 +128,7 @@ func jwtAuthorization(c *core.WebContext, source TokenSourceType) {
 	}
 
 	if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
-		log.Warnf(c, "[authorization.jwtAuthorization] user \"uid:%d\" token type is invalid", claims.Uid)
+		log.Warnf(c, "[authorization.jwtAuthorization] user \"uid:%d\" token type (%d) is invalid", claims.Uid, claims.Type)
 		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidTokenType)
 		return
 	}

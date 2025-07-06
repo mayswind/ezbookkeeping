@@ -17,9 +17,20 @@ type TokenRecord struct {
 	LastSeenUnixTime int64
 }
 
+// TokenGenerateMCPRequest represents all parameters of mcp token generation request
+type TokenGenerateMCPRequest struct {
+	Password string `json:"password" binding:"omitempty,min=6,max=128"`
+}
+
 // TokenRevokeRequest represents all parameters of token revoking request
 type TokenRevokeRequest struct {
 	TokenId string `json:"tokenId" binding:"required,notBlank"`
+}
+
+// TokenGenerateMCPResponse represents all response parameters of generated mcp token
+type TokenGenerateMCPResponse struct {
+	Token  string `json:"token"`
+	MCPUrl string `json:"mcpUrl"`
 }
 
 // TokenRefreshResponse represents all parameters of token refreshing request

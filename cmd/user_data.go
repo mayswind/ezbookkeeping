@@ -260,6 +260,12 @@ var UserData = &cli.Command{
 					Required: true,
 					Usage:    "Specific user name",
 				},
+				&cli.StringFlag{
+					Name:     "type",
+					Aliases:  []string{"t"},
+					Required: false,
+					Usage:    "Specific token type, supports \"normal\" and \"mcp\", default is \"normal\"",
+				},
 			},
 		},
 		{
@@ -702,7 +708,18 @@ func createNewUserToken(c *core.CliContext) error {
 	}
 
 	username := c.String("username")
-	token, tokenString, err := clis.UserData.CreateNewUserToken(c, username)
+	tokenType := c.String("type")
+
+	if tokenType == "" {
+		tokenType = "normal"
+	}
+
+	if tokenType != "normal" && tokenType != "mcp" {
+		log.CliErrorf(c, "[user_data.createNewUserToken] token type is invalid")
+		return nil
+	}
+
+	token, tokenString, err := clis.UserData.CreateNewUserToken(c, username, tokenType)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.createNewUserToken] error occurs when creating user token")

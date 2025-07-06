@@ -46,7 +46,7 @@ var (
 // TokenListHandler returns available token list of current user
 func (a *TokensApi) TokenListHandler(c *core.WebContext) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
-	tokens, err := a.tokens.GetAllUnexpiredNormalTokensByUid(c, uid)
+	tokens, err := a.tokens.GetAllUnexpiredNormalAndMCPTokensByUid(c, uid)
 
 	if err != nil {
 		log.Errorf(c, "[tokens.TokenListHandler] failed to get all tokens for user \"uid:%d\", because %s", uid, err.Error())
@@ -69,12 +69,55 @@ func (a *TokensApi) TokenListHandler(c *core.WebContext) (any, *errs.Error) {
 			tokenResp.IsCurrent = true
 		}
 
+		if token.TokenType == core.USER_TOKEN_TYPE_MCP && token.UserAgent != services.TokenUserAgentCreatedViaCli {
+			tokenResp.UserAgent = services.TokenUserAgentForMCP
+		}
+
 		tokenResps[i] = tokenResp
 	}
 
 	sort.Sort(tokenResps)
 
 	return tokenResps, nil
+}
+
+// TokenGenerateMCPHandler generates a new MCP token for current user
+func (a *TokensApi) TokenGenerateMCPHandler(c *core.WebContext) (any, *errs.Error) {
+	var generateMCPTokenReq models.TokenGenerateMCPRequest
+	err := c.ShouldBindJSON(&generateMCPTokenReq)
+
+	if err != nil {
+		log.Warnf(c, "[tokens.TokenGenerateMCPHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		log.Warnf(c, "[tokens.TokenGenerateMCPHandler] failed to get user \"uid:%d\" info, because %s", uid, err.Error())
+		return nil, errs.ErrUserNotFound
+	}
+
+	if !a.users.IsPasswordEqualsUserPassword(generateMCPTokenReq.Password, user) {
+		return nil, errs.ErrUserPasswordWrong
+	}
+
+	token, claims, err := a.tokens.CreateMCPToken(c, user)
+
+	if err != nil {
+		log.Errorf(c, "[tokens.TokenGenerateMCPHandler] failed to create mcp token for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrTokenGenerating)
+	}
+
+	log.Infof(c, "[tokens.TokenGenerateMCPHandler] user \"uid:%d\" has generated mcp token, new token will be expired at %d", user.Uid, claims.ExpiresAt)
+
+	generateMCPTokenResp := &models.TokenGenerateMCPResponse{
+		Token:  token,
+		MCPUrl: a.CurrentConfig().RootUrl + "mcp",
+	}
+
+	return generateMCPTokenResp, nil
 }
 
 // TokenRevokeCurrentHandler revokes current token of current user

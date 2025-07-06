@@ -15,6 +15,7 @@ const (
 	USER_TOKEN_TYPE_REQUIRE_2FA    TokenType = 2
 	USER_TOKEN_TYPE_EMAIL_VERIFY   TokenType = 3
 	USER_TOKEN_TYPE_PASSWORD_RESET TokenType = 4
+	USER_TOKEN_TYPE_MCP            TokenType = 5
 )
 
 // UserTokenClaims represents user token

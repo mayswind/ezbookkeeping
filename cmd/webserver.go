@@ -226,7 +226,7 @@ func startWebServer(c *core.CliContext) error {
 		mcpRoute.Use(bindMiddleware(middlewares.RequestId(config)))
 		mcpRoute.Use(bindMiddleware(middlewares.RequestLog))
 		mcpRoute.Use(bindMiddleware(middlewares.MCPServerIpLimit(config)))
-		mcpRoute.Use(bindMiddleware(middlewares.JWTAuthorization))
+		mcpRoute.Use(bindMiddleware(middlewares.JWTMCPAuthorization))
 		{
 			mcpRoute.POST("", bindJSONRPCApi(map[string]core.JSONRPCApiHandlerFunc{
 				"initialize":     api.ModelContextProtocols.InitializeHandler,
@@ -289,6 +289,7 @@ func startWebServer(c *core.CliContext) error {
 		{
 			// Tokens
 			apiV1Route.GET("/tokens/list.json", bindApi(api.Tokens.TokenListHandler))
+			apiV1Route.POST("/tokens/generate/mcp.json", bindApi(api.Tokens.TokenGenerateMCPHandler))
 			apiV1Route.POST("/tokens/revoke.json", bindApi(api.Tokens.TokenRevokeHandler))
 			apiV1Route.POST("/tokens/revoke_all.json", bindApi(api.Tokens.TokenRevokeAllHandler))
 			apiV1Route.POST("/tokens/refresh.json", bindApiWithTokenUpdate(api.Tokens.TokenRefreshHandler, config))

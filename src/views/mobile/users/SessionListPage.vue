@@ -24,7 +24,7 @@
         <f7-list strong inset dividers media-list class="margin-top" v-else-if="!loading">
             <f7-list-item class="list-item-media-valign-middle" swipeout
                           :id="session.domId"
-                          :title="tt(session.isCurrent ? 'Current' : 'Other Device')"
+                          :title="session.deviceType === 'mcp' ? 'MCP' : (tt(session.isCurrent ? 'Current' : 'Other Device'))"
                           :text="session.deviceInfo"
                           :key="session.tokenId"
                           v-for="session in sessions">
@@ -107,6 +107,8 @@ function getTokenIcon(deviceType: string): string {
         return 'device_tablet_portrait';
     } else if (deviceType === 'tv') {
         return 'tv';
+    } else if (deviceType === 'mcp') {
+        return 'wand_stars';
     } else if (deviceType === 'cli') {
         return 'chevron_left_slash_chevron_right';
     } else {

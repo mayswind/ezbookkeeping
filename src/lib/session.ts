@@ -1,6 +1,11 @@
 import uaParser from 'ua-parser-js';
 
-import { TOKEN_CLI_USER_AGENT, type TokenInfoResponse, SessionInfo } from '@/models/token.ts';
+import {
+    TOKEN_TYPE_MCP,
+    TOKEN_CLI_USER_AGENT,
+    type TokenInfoResponse,
+    SessionInfo
+} from '@/models/token.ts';
 
 interface UserAgentInfo {
     readonly device: {
@@ -81,11 +86,14 @@ function parseDeviceInfo(uaInfo: UserAgentInfo): string {
 }
 
 export function parseSessionInfo(token: TokenInfoResponse): SessionInfo {
+    const isCreateForMCP = token.tokenType === TOKEN_TYPE_MCP;
     const isCreatedByCli = isSessionUserAgentCreatedByCli(token.userAgent);
     const uaInfo = parseUserAgent(token.userAgent);
     let deviceType = '';
 
-    if (isCreatedByCli) {
+    if (isCreateForMCP) {
+        deviceType = 'mcp';
+    } else if (isCreatedByCli) {
         deviceType = 'cli';
     } else {
         if (uaInfo && uaInfo.device) {
@@ -109,7 +117,7 @@ export function parseSessionInfo(token: TokenInfoResponse): SessionInfo {
         token.tokenId,
         token.isCurrent,
         deviceType,
-        isCreatedByCli ? token.userAgent : parseDeviceInfo(uaInfo),
+        isCreateForMCP || isCreatedByCli ? token.userAgent : parseDeviceInfo(uaInfo),
         isCreatedByCli,
         token.lastSeen
     );

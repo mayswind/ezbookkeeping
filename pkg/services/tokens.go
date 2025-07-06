@@ -19,6 +19,14 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
+// TokenUserAgentCreatedViaCli is the user agent of token created via cli
+const TokenUserAgentCreatedViaCli = "ezbookkeeping Cli"
+
+// TokenUserAgentForMCP is the user agent for MCP token
+const TokenUserAgentForMCP = "ezbookkeeping MCP"
+
+const tokenMaxExpiredAtUnixTime = int64(253402300799) // 9999-12-31 23:59:59 UTC
+
 // TokenService represents user token service
 type TokenService struct {
 	ServiceUsingDB
@@ -49,8 +57,8 @@ func (s *TokenService) GetAllTokensByUid(c core.Context, uid int64) ([]*models.T
 	return tokenRecords, err
 }
 
-// GetAllUnexpiredNormalTokensByUid returns all available token models of given user
-func (s *TokenService) GetAllUnexpiredNormalTokensByUid(c core.Context, uid int64) ([]*models.TokenRecord, error) {
+// GetAllUnexpiredNormalAndMCPTokensByUid returns all available token models of given user
+func (s *TokenService) GetAllUnexpiredNormalAndMCPTokensByUid(c core.Context, uid int64) ([]*models.TokenRecord, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -58,7 +66,7 @@ func (s *TokenService) GetAllUnexpiredNormalTokensByUid(c core.Context, uid int6
 	now := time.Now().Unix()
 
 	var tokenRecords []*models.TokenRecord
-	err := s.TokenDB(uid).NewSession(c).Cols("uid", "user_token_id", "token_type", "user_agent", "created_unix_time", "expired_unix_time", "last_seen_unix_time").Where("uid=? AND token_type=? AND expired_unix_time>?", uid, core.USER_TOKEN_TYPE_NORMAL, now).Find(&tokenRecords)
+	err := s.TokenDB(uid).NewSession(c).Cols("uid", "user_token_id", "token_type", "user_agent", "created_unix_time", "expired_unix_time", "last_seen_unix_time").Where("uid=? AND (token_type=? OR token_type=?) AND expired_unix_time>?", uid, core.USER_TOKEN_TYPE_NORMAL, core.USER_TOKEN_TYPE_MCP, now).Find(&tokenRecords)
 
 	return tokenRecords, err
 }
@@ -80,7 +88,7 @@ func (s *TokenService) ParseTokenByCookie(c *core.WebContext, tokenCookieName st
 
 // CreateTokenViaCli generates a new normal token and saves to database
 func (s *TokenService) CreateTokenViaCli(c *core.CliContext, user *models.User) (string, *models.TokenRecord, error) {
-	token, _, tokenRecord, err := s.createToken(c, user, core.USER_TOKEN_TYPE_NORMAL, "ezbookkeeping Cli", s.CurrentConfig().TokenExpiredTimeDuration)
+	token, _, tokenRecord, err := s.createToken(c, user, core.USER_TOKEN_TYPE_NORMAL, TokenUserAgentCreatedViaCli, s.CurrentConfig().TokenExpiredTimeDuration)
 	return token, tokenRecord, err
 }
 
@@ -118,6 +126,20 @@ func (s *TokenService) CreatePasswordResetToken(c *core.WebContext, user *models
 func (s *TokenService) CreatePasswordResetTokenWithoutUserAgent(c core.Context, user *models.User) (string, *core.UserTokenClaims, error) {
 	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_PASSWORD_RESET, "", s.CurrentConfig().PasswordResetTokenExpiredTimeDuration)
 	return token, claims, err
+}
+
+// CreateMCPToken generates a new MCP token and saves to database
+func (s *TokenService) CreateMCPToken(c *core.WebContext, user *models.User) (string, *core.UserTokenClaims, error) {
+	tokenExpiredTimeDuration := time.Unix(tokenMaxExpiredAtUnixTime, 0).Sub(time.Now())
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_MCP, s.getUserAgent(c), tokenExpiredTimeDuration)
+	return token, claims, err
+}
+
+// CreateMCPTokenViaCli generates a new MCP token and saves to database
+func (s *TokenService) CreateMCPTokenViaCli(c *core.CliContext, user *models.User) (string, *models.TokenRecord, error) {
+	tokenExpiredTimeDuration := time.Unix(tokenMaxExpiredAtUnixTime, 0).Sub(time.Now())
+	token, _, tokenRecord, err := s.createToken(c, user, core.USER_TOKEN_TYPE_MCP, TokenUserAgentCreatedViaCli, tokenExpiredTimeDuration)
+	return token, tokenRecord, err
 }
 
 // UpdateTokenLastSeen updates the last seen time of specified token

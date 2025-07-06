@@ -68,6 +68,8 @@
                 <template #title>
                     <div class="d-flex align-center">
                         <span>{{ tt('Device & Sessions') }}</span>
+                        <v-btn class="ml-3" density="compact" color="default" variant="outlined"
+                               @click="generateMCPToken">{{ tt('Generate MCP token') }}</v-btn>
                         <v-btn density="compact" color="default" variant="text" size="24"
                                class="ml-2" :icon="true" :loading="loadingSession" @click="reloadSessions(false)">
                             <template #loader>
@@ -106,7 +108,7 @@
                         v-for="session in sessions">
                         <td class="text-sm">
                             <v-icon start :icon="session.icon"/>
-                            {{ tt(session.isCurrent ? 'Current' : 'Other Device') }}
+                            {{ session.deviceType === 'mcp' ? 'MCP' : (tt(session.isCurrent ? 'Current' : 'Other Device')) }}
                         </td>
                         <td class="text-sm">{{ session.deviceInfo }}</td>
                         <td class="text-sm">{{ session.lastSeenDateTime }}</td>
@@ -124,12 +126,14 @@
         </v-col>
     </v-row>
 
+    <user-generate-m-c-p-token-dialog ref="generateMCPTokenDialog" />
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import { VTextField } from 'vuetify/components/VTextField';
+import UserGenerateMCPTokenDialog from '@/views/desktop/user/settings/dialogs/UserGenerateMCPTokenDialog.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
@@ -152,6 +156,7 @@ import {
     mdiTablet,
     mdiWatch,
     mdiTelevision,
+    mdiMagicStaff,
     mdiConsole,
     mdiDevices
 } from '@mdi/js';
@@ -167,6 +172,7 @@ class DesktopPageSessionInfo extends SessionInfo {
     }
 }
 
+type UserGenerateMCPTokenDialogType = InstanceType<typeof UserGenerateMCPTokenDialog>;
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 
@@ -178,6 +184,7 @@ const tokensStore = useTokensStore();
 
 const newPasswordInput = useTemplateRef<VTextField>('newPasswordInput');
 const confirmPasswordInput = useTemplateRef<VTextField>('confirmPasswordInput');
+const generateMCPTokenDialog = useTemplateRef<UserGenerateMCPTokenDialogType>('generateMCPTokenDialog');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
@@ -229,6 +236,8 @@ function getTokenIcon(deviceType: string): string {
         return mdiTablet;
     } else if (deviceType === 'tv') {
         return mdiTelevision;
+    } else if (deviceType === 'mcp') {
+        return mdiMagicStaff;
     } else if (deviceType === 'cli') {
         return mdiConsole;
     } else {
@@ -285,6 +294,12 @@ function updatePassword(): void {
         if (!error.processed) {
             snackbar.value?.showError(error);
         }
+    });
+}
+
+function generateMCPToken(): void {
+    generateMCPTokenDialog.value?.open().then(() => {
+        reloadSessions(true);
     });
 }
 

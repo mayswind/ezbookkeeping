@@ -2,7 +2,18 @@ import type { ApplicationCloudSetting } from '@/core/setting.ts';
 
 import type { UserBasicInfo } from './user.ts';
 
+export const TOKEN_TYPE_MCP: number = 5;
+
 export const TOKEN_CLI_USER_AGENT: string = 'ezbookkeeping Cli';
+
+export interface TokenGenerateMCPRequest {
+    readonly password: string;
+}
+
+export interface TokenGenerateMCPResponse {
+    readonly token: string;
+    readonly mcpUrl: string;
+}
 
 export interface TokenRefreshResponse {
     readonly newToken?: string;

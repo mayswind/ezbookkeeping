@@ -7,6 +7,7 @@ import (
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/mcp"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
@@ -52,6 +53,18 @@ func (a *ModelContextProtocolAPI) InitializeHandler(c *core.WebContext, jsonRPCR
 		return nil, errs.ErrIncompleteOrIncorrectSubmission
 	}
 
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		log.Warnf(c, "[model_context_protocols.InitializeHandler] failed to get user \"uid:%d\" info, because %s", uid, err.Error())
+		return nil, errs.ErrUserNotFound
+	}
+
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_MCP_ACCESS) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
 	protocolVersion := mcp.MCPProtocolVersion(initRequest.ProtocolVersion)
 	_, exists := mcp.SupportedMCPVersion[protocolVersion]
 
@@ -78,6 +91,18 @@ func (a *ModelContextProtocolAPI) InitializeHandler(c *core.WebContext, jsonRPCR
 
 // ListResourcesHandler returns the list of resources for model context protocol
 func (a *ModelContextProtocolAPI) ListResourcesHandler(c *core.WebContext, jsonRPCRequest *core.JSONRPCRequest) (any, *errs.Error) {
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		log.Warnf(c, "[model_context_protocols.ListResourcesHandler] failed to get user \"uid:%d\" info, because %s", uid, err.Error())
+		return nil, errs.ErrUserNotFound
+	}
+
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_MCP_ACCESS) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
 	listResourcesResp := mcp.MCPListResourcesResponse{
 		Resources: make([]*mcp.MCPResource, 0),
 	}
@@ -97,11 +122,35 @@ func (a *ModelContextProtocolAPI) ReadResourceHandler(c *core.WebContext, jsonRP
 		return nil, errs.ErrIncompleteOrIncorrectSubmission
 	}
 
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		log.Warnf(c, "[model_context_protocols.ReadResourceHandler] failed to get user \"uid:%d\" info, because %s", uid, err.Error())
+		return nil, errs.ErrUserNotFound
+	}
+
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_MCP_ACCESS) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
 	return nil, errs.ErrApiNotFound
 }
 
 // ListToolsHandler returns the list of tools for model context protocol
 func (a *ModelContextProtocolAPI) ListToolsHandler(c *core.WebContext, jsonRPCRequest *core.JSONRPCRequest) (any, *errs.Error) {
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		log.Warnf(c, "[model_context_protocols.ListToolsHandler] failed to get user \"uid:%d\" info, because %s", uid, err.Error())
+		return nil, errs.ErrUserNotFound
+	}
+
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_MCP_ACCESS) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
 	mcpVersion := a.getMCPVersion(c)
 	toolsInfo := mcp.Container.GetMCPTools()
 	finalToolsInfos := make([]*mcp.MCPTool, len(toolsInfo))
@@ -128,6 +177,18 @@ func (a *ModelContextProtocolAPI) ListToolsHandler(c *core.WebContext, jsonRPCRe
 
 // CallToolHandler returns the result of calling a specific tool for model context protocol
 func (a *ModelContextProtocolAPI) CallToolHandler(c *core.WebContext, jsonRPCRequest *core.JSONRPCRequest) (any, *errs.Error) {
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		log.Warnf(c, "[model_context_protocols.CallToolHandler] failed to get user \"uid:%d\" info, because %s", uid, err.Error())
+		return nil, errs.ErrUserNotFound
+	}
+
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_MCP_ACCESS) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
 	var callToolReq mcp.MCPCallToolRequest
 
 	if jsonRPCRequest.Params != nil {
@@ -138,10 +199,10 @@ func (a *ModelContextProtocolAPI) CallToolHandler(c *core.WebContext, jsonRPCReq
 		return nil, errs.ErrIncompleteOrIncorrectSubmission
 	}
 
-	result, err := mcp.Container.HandleTool(c, &callToolReq, a.CurrentConfig(), a)
+	result, err := mcp.Container.HandleTool(c, &callToolReq, user, a.CurrentConfig(), a)
 
 	if err != nil {
-		return nil, err
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	return result, nil

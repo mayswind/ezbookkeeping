@@ -88,10 +88,11 @@ const (
 	USER_FEATURE_RESTRICTION_TYPE_EXPORT_TRANSACTION        UserFeatureRestrictionType = 10
 	USER_FEATURE_RESTRICTION_TYPE_CLEAR_ALL_DATA            UserFeatureRestrictionType = 11
 	USER_FEATURE_RESTRICTION_TYPE_SYNC_APPLICATION_SETTINGS UserFeatureRestrictionType = 12
+	USER_FEATURE_RESTRICTION_TYPE_MCP_ACCESS                UserFeatureRestrictionType = 13
 )
 
 const userFeatureRestrictionTypeMinValue UserFeatureRestrictionType = USER_FEATURE_RESTRICTION_TYPE_UPDATE_PASSWORD
-const userFeatureRestrictionTypeMaxValue UserFeatureRestrictionType = USER_FEATURE_RESTRICTION_TYPE_SYNC_APPLICATION_SETTINGS
+const userFeatureRestrictionTypeMaxValue UserFeatureRestrictionType = USER_FEATURE_RESTRICTION_TYPE_MCP_ACCESS
 
 // String returns a textual representation of the restriction type of user features
 func (t UserFeatureRestrictionType) String() string {
@@ -120,6 +121,8 @@ func (t UserFeatureRestrictionType) String() string {
 		return "Clear All Data"
 	case USER_FEATURE_RESTRICTION_TYPE_SYNC_APPLICATION_SETTINGS:
 		return "Sync Application Settings"
+	case USER_FEATURE_RESTRICTION_TYPE_MCP_ACCESS:
+		return "MCP (Model Context Protocol) Access"
 	default:
 		return fmt.Sprintf("Invalid(%d)", int(t))
 	}

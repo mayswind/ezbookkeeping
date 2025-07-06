@@ -63,7 +63,7 @@ func (h *mcpAddTransactionToolHandler) OutputType() reflect.Type {
 }
 
 // Handle processes the MCP call tool request and returns the response
-func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *MCPCallToolRequest, currentConfig *settings.Config, services MCPAvailableServices) (any, []*MCPTextContent, *errs.Error) {
+func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *MCPCallToolRequest, user *models.User, currentConfig *settings.Config, services MCPAvailableServices) (any, []*MCPTextContent, error) {
 	var addTransactionRequest MCPAddTransactionRequest
 
 	if callToolReq.Arguments != nil {
@@ -84,22 +84,12 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 		return nil, nil, errs.ErrTransactionHasTooManyTags
 	}
 
-	uid := c.GetCurrentUid()
-	user, err := services.GetUserService().GetUserById(c, uid)
-
-	if err != nil {
-		if !errs.IsCustomError(err) {
-			log.Errorf(c, "[add_transaction.Handle] failed to get user, because %s", err.Error())
-		}
-
-		return nil, nil, errs.ErrUserNotFound
-	}
-
+	uid := user.Uid
 	allAccounts, err := services.GetAccountService().GetAllAccountsByUid(c, uid)
 
 	if err != nil {
 		log.Warnf(c, "[add_transaction.Handle] get account error, because %s", err.Error())
-		return nil, nil, errs.Or(err, errs.ErrOperationFailed)
+		return nil, nil, err
 	}
 
 	accountsMap := services.GetAccountService().GetVisibleAccountNameMapByList(allAccounts)
@@ -128,7 +118,7 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 
 	if err != nil {
 		log.Warnf(c, "[add_transaction.Handle] get transaction category error, because %s", err.Error())
-		return nil, nil, errs.Or(err, errs.ErrOperationFailed)
+		return nil, nil, err
 	}
 
 	categoriesMap := services.GetTransactionCategoryService().GetVisibleCategoryNameMapByList(allCategories)
@@ -146,7 +136,7 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 
 		if err != nil {
 			log.Warnf(c, "[add_transaction.Handle] get transaction tag ids error, because %s", err.Error())
-			return nil, nil, errs.Or(err, errs.ErrOperationFailed)
+			return nil, nil, err
 		}
 
 		tagMaps := services.GetTransactionTagService().GetTagNameMapByList(allTags)
@@ -173,7 +163,7 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 
 		if err != nil {
 			log.Errorf(c, "[add_transaction.Handle] failed to create transaction \"id:%d\" for user \"uid:%d\", because %s", transaction.TransactionId, uid, err.Error())
-			return nil, nil, errs.Or(err, errs.ErrOperationFailed)
+			return nil, nil, err
 		}
 
 		log.Infof(c, "[add_transaction.Handle] user \"uid:%d\" has created a new transaction \"id:%d\" successfully", uid, transaction.TransactionId)
@@ -193,7 +183,7 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 		structuredResponse, response, err := h.createNewMCPAddTransactionResponse(c, transaction, newAccounts, false)
 
 		if err != nil {
-			return nil, nil, errs.Or(err, errs.ErrOperationFailed)
+			return nil, nil, err
 		}
 
 		return structuredResponse, response, nil
@@ -215,7 +205,7 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 		structuredResponse, response, err := h.createNewMCPAddTransactionResponse(c, transaction, newAccounts, true)
 
 		if err != nil {
-			return nil, nil, errs.Or(err, errs.ErrOperationFailed)
+			return nil, nil, err
 		}
 
 		return structuredResponse, response, nil

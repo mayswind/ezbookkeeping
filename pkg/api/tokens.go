@@ -99,6 +99,10 @@ func (a *TokensApi) TokenGenerateMCPHandler(c *core.WebContext) (any, *errs.Erro
 		return nil, errs.ErrUserNotFound
 	}
 
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_MCP_ACCESS) {
+		return false, errs.ErrNotPermittedToPerformThisAction
+	}
+
 	if !a.users.IsPasswordEqualsUserPassword(generateMCPTokenReq.Password, user) {
 		return nil, errs.ErrUserPasswordWrong
 	}

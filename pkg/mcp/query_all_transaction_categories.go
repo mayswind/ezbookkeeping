@@ -5,7 +5,6 @@ import (
 	"reflect"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
@@ -43,19 +42,19 @@ func (h *mcpQueryAllTransactionCategoriesToolHandler) OutputType() reflect.Type 
 }
 
 // Handle processes the MCP call tool request and returns the response
-func (h *mcpQueryAllTransactionCategoriesToolHandler) Handle(c *core.WebContext, callToolReq *MCPCallToolRequest, currentConfig *settings.Config, services MCPAvailableServices) (any, []*MCPTextContent, *errs.Error) {
-	uid := c.GetCurrentUid()
+func (h *mcpQueryAllTransactionCategoriesToolHandler) Handle(c *core.WebContext, callToolReq *MCPCallToolRequest, user *models.User, currentConfig *settings.Config, services MCPAvailableServices) (any, []*MCPTextContent, error) {
+	uid := user.Uid
 	categories, err := services.GetTransactionCategoryService().GetAllCategoriesByUid(c, uid, 0, -1)
 
 	if err != nil {
 		log.Errorf(c, "[query_all_transaction_categories.Handle] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, nil, errs.Or(err, errs.ErrOperationFailed)
+		return nil, nil, err
 	}
 
 	structuredResponse, response, err := h.createNewMCPQueryAllTransactionCategoriesResponse(c, categories)
 
 	if err != nil {
-		return nil, nil, errs.Or(err, errs.ErrOperationFailed)
+		return nil, nil, err
 	}
 
 	return structuredResponse, response, nil

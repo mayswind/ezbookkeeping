@@ -6,6 +6,7 @@ import (
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
@@ -34,25 +35,25 @@ func (c *MCPContainer) GetMCPTools() []*MCPTool {
 }
 
 // HandleTool returns the result of the MCP tool handler based on the tool name
-func (c *MCPContainer) HandleTool(ctx *core.WebContext, callToolReq *MCPCallToolRequest, currentConfig *settings.Config, services MCPAvailableServices) (any, *errs.Error) {
+func (c *MCPContainer) HandleTool(ctx *core.WebContext, callToolReq *MCPCallToolRequest, user *models.User, currentConfig *settings.Config, services MCPAvailableServices) (any, error) {
 	if handler, exists := c.mcpTextContentTools.Get(callToolReq.Name); exists {
-		return handleTool(ctx, handler, currentConfig, services, callToolReq)
+		return handleTool(ctx, handler, currentConfig, services, callToolReq, user)
 	}
 
 	if handler, exists := c.mcpImageContentTools.Get(callToolReq.Name); exists {
-		return handleTool(ctx, handler, currentConfig, services, callToolReq)
+		return handleTool(ctx, handler, currentConfig, services, callToolReq, user)
 	}
 
 	if handler, exists := c.mcpAudioContentTools.Get(callToolReq.Name); exists {
-		return handleTool(ctx, handler, currentConfig, services, callToolReq)
+		return handleTool(ctx, handler, currentConfig, services, callToolReq, user)
 	}
 
 	if handler, exists := c.mcpResourceLinkTools.Get(callToolReq.Name); exists {
-		return handleTool(ctx, handler, currentConfig, services, callToolReq)
+		return handleTool(ctx, handler, currentConfig, services, callToolReq, user)
 	}
 
 	if handler, exists := c.mcpEmbeddedResourceTools.Get(callToolReq.Name); exists {
-		return handleTool(ctx, handler, currentConfig, services, callToolReq)
+		return handleTool(ctx, handler, currentConfig, services, callToolReq, user)
 	}
 
 	return nil, errs.ErrApiNotFound
@@ -109,8 +110,8 @@ func registerMCPToolHandler[T MCPTextContent | MCPImageContent | MCPAudioContent
 	c.mcpTools = append(c.mcpTools, createNewMCPToolInfo(handler.Name(), handler))
 }
 
-func handleTool[T MCPTextContent | MCPImageContent | MCPAudioContent | MCPResourceLink | MCPEmbeddedResource](ctx *core.WebContext, handler MCPToolHandler[T], currentConfig *settings.Config, services MCPAvailableServices, callToolReq *MCPCallToolRequest) (any, *errs.Error) {
-	structuredResponse, result, err := handler.Handle(ctx, callToolReq, currentConfig, services)
+func handleTool[T MCPTextContent | MCPImageContent | MCPAudioContent | MCPResourceLink | MCPEmbeddedResource](ctx *core.WebContext, handler MCPToolHandler[T], currentConfig *settings.Config, services MCPAvailableServices, callToolReq *MCPCallToolRequest, user *models.User) (any, error) {
+	structuredResponse, result, err := handler.Handle(ctx, callToolReq, user, currentConfig, services)
 
 	if err != nil {
 		return nil, errs.Or(err, errs.ErrOperationFailed)

@@ -422,6 +422,10 @@ func (l *UserDataCli) CreateNewUserToken(c *core.CliContext, username string, to
 	var tokenRecord *models.TokenRecord
 
 	if tokenType == "mcp" {
+		if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_MCP_ACCESS) {
+			return nil, "", errs.ErrNotPermittedToPerformThisAction
+		}
+
 		token, tokenRecord, err = l.tokens.CreateMCPTokenViaCli(c, user)
 	} else if tokenType == "normal" {
 		token, tokenRecord, err = l.tokens.CreateTokenViaCli(c, user)

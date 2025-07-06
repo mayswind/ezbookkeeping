@@ -4,7 +4,7 @@ import (
 	"reflect"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
@@ -33,5 +33,5 @@ type MCPToolHandler[T MCPTextContent | MCPImageContent | MCPAudioContent | MCPRe
 	OutputType() reflect.Type
 
 	// Handle processes the MCP call tool request and returns the response
-	Handle(*core.WebContext, *MCPCallToolRequest, *settings.Config, MCPAvailableServices) (any, []*T, *errs.Error)
+	Handle(*core.WebContext, *MCPCallToolRequest, *models.User, *settings.Config, MCPAvailableServices) (any, []*T, error)
 }

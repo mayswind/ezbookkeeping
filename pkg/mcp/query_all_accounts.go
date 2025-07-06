@@ -5,7 +5,6 @@ import (
 	"reflect"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
@@ -49,19 +48,19 @@ func (h *mcpQueryAllAccountsToolHandler) OutputType() reflect.Type {
 }
 
 // Handle processes the MCP call tool request and returns the response
-func (h *mcpQueryAllAccountsToolHandler) Handle(c *core.WebContext, callToolReq *MCPCallToolRequest, currentConfig *settings.Config, services MCPAvailableServices) (any, []*MCPTextContent, *errs.Error) {
-	uid := c.GetCurrentUid()
+func (h *mcpQueryAllAccountsToolHandler) Handle(c *core.WebContext, callToolReq *MCPCallToolRequest, user *models.User, currentConfig *settings.Config, services MCPAvailableServices) (any, []*MCPTextContent, error) {
+	uid := user.Uid
 	accounts, err := services.GetAccountService().GetAllAccountsByUid(c, uid)
 
 	if err != nil {
 		log.Errorf(c, "[query_all_accounts.Handle] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, nil, errs.Or(err, errs.ErrOperationFailed)
+		return nil, nil, err
 	}
 
 	structuredResponse, response, err := h.createNewMCPQueryAllAccountsResponse(c, accounts)
 
 	if err != nil {
-		return nil, nil, errs.Or(err, errs.ErrOperationFailed)
+		return nil, nil, err
 	}
 
 	return structuredResponse, response, nil

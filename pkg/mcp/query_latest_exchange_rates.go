@@ -57,7 +57,7 @@ func (h *mcpQueryLatestExchangeRatesToolHandler) OutputType() reflect.Type {
 }
 
 // Handle processes the MCP call tool request and returns the response
-func (h *mcpQueryLatestExchangeRatesToolHandler) Handle(c *core.WebContext, callToolReq *MCPCallToolRequest, currentConfig *settings.Config, services MCPAvailableServices) (any, []*MCPTextContent, *errs.Error) {
+func (h *mcpQueryLatestExchangeRatesToolHandler) Handle(c *core.WebContext, callToolReq *MCPCallToolRequest, user *models.User, currentConfig *settings.Config, services MCPAvailableServices) (any, []*MCPTextContent, error) {
 	var exchangeRatesRequest MCPQueryExchangeRatesRequest
 
 	if callToolReq.Arguments != nil {
@@ -74,16 +74,16 @@ func (h *mcpQueryLatestExchangeRatesToolHandler) Handle(c *core.WebContext, call
 		return nil, nil, errs.ErrInvalidExchangeRatesDataSource
 	}
 
-	exchangeRateResponse, err := dataSource.GetLatestExchangeRates(c, c.GetCurrentUid(), currentConfig)
+	exchangeRateResponse, err := dataSource.GetLatestExchangeRates(c, user.Uid, currentConfig)
 
 	if err != nil {
-		return nil, nil, errs.Or(err, errs.ErrOperationFailed)
+		return nil, nil, err
 	}
 
 	structuredResponse, response, err := h.createNewMCPQueryExchangeRatesResponse(exchangeRatesRequest.Currencies, exchangeRateResponse)
 
 	if err != nil {
-		return nil, nil, errs.Or(err, errs.ErrOperationFailed)
+		return nil, nil, err
 	}
 
 	return structuredResponse, response, nil

@@ -74,7 +74,7 @@ func (h *mcpQueryTransactionsToolHandler) OutputType() reflect.Type {
 }
 
 // Handle processes the MCP call tool request and returns the response
-func (h *mcpQueryTransactionsToolHandler) Handle(c *core.WebContext, callToolReq *MCPCallToolRequest, currentConfig *settings.Config, services MCPAvailableServices) (any, []*MCPTextContent, *errs.Error) {
+func (h *mcpQueryTransactionsToolHandler) Handle(c *core.WebContext, callToolReq *MCPCallToolRequest, user *models.User, currentConfig *settings.Config, services MCPAvailableServices) (any, []*MCPTextContent, error) {
 	var queryTransactionsRequest MCPQueryTransactionsRequest
 
 	if callToolReq.Arguments != nil {
@@ -85,7 +85,7 @@ func (h *mcpQueryTransactionsToolHandler) Handle(c *core.WebContext, callToolReq
 		return nil, nil, errs.ErrIncompleteOrIncorrectSubmission
 	}
 
-	uid := c.GetCurrentUid()
+	uid := user.Uid
 	maxTime, err := utils.ParseFromLongDateTimeWithTimezoneRFC3339Format(queryTransactionsRequest.EndTime)
 
 	if err != nil {
@@ -123,7 +123,7 @@ func (h *mcpQueryTransactionsToolHandler) Handle(c *core.WebContext, callToolReq
 
 	if err != nil {
 		log.Warnf(c, "[add_transaction.Handle] get account error, because %s", err.Error())
-		return nil, nil, errs.Or(err, errs.ErrOperationFailed)
+		return nil, nil, err
 	}
 
 	accountsMap := services.GetAccountService().GetVisibleAccountNameMapByList(allAccounts)
@@ -141,7 +141,7 @@ func (h *mcpQueryTransactionsToolHandler) Handle(c *core.WebContext, callToolReq
 
 	if err != nil {
 		log.Warnf(c, "[add_transaction.Handle] get transaction category error, because %s", err.Error())
-		return nil, nil, errs.Or(err, errs.ErrOperationFailed)
+		return nil, nil, err
 	}
 
 	categoriesMap := services.GetTransactionCategoryService().GetVisibleCategoryNameMapByList(allCategories)
@@ -159,14 +159,14 @@ func (h *mcpQueryTransactionsToolHandler) Handle(c *core.WebContext, callToolReq
 
 	if err != nil {
 		log.Errorf(c, "[transactions.TransactionListHandler] failed to get transaction count for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, nil, errs.Or(err, errs.ErrOperationFailed)
+		return nil, nil, err
 	}
 
 	transactions, err := services.GetTransactionService().GetTransactionsByMaxTime(c, uid, maxTransactionTime, minTransactionTime, transactionType, filterCategoryIds, filterAccountIds, nil, false, models.TRANSACTION_TAG_FILTER_HAS_ANY, "", queryTransactionsRequest.Keyword, queryTransactionsRequest.Page, queryTransactionsRequest.Count, false, true)
 	structuredResponse, response, err := h.createNewMCPQueryTransactionsResponse(c, &queryTransactionsRequest, transactions, totalCount, services.GetAccountService().GetAccountMapByList(allAccounts), services.GetTransactionCategoryService().GetCategoryMapByList(allCategories))
 
 	if err != nil {
-		return nil, nil, errs.Or(err, errs.ErrOperationFailed)
+		return nil, nil, err
 	}
 
 	return structuredResponse, response, nil

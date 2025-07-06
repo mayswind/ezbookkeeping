@@ -29,7 +29,7 @@ type MCPQueryExchangeRatesResponse struct {
 // MCPQueryExchangeRateInfo defines the structure of exchange rate information for a specific currency
 type MCPQueryExchangeRateInfo struct {
 	Currency string `json:"currency" jsonschema_description:"Currency code (e.g. USD)"`
-	Rate     string `json:"rate" jsonschema_description:"The amount of the base currency that can be exchanged for 1 of this currency"`
+	Rate     string `json:"rate_to_base" jsonschema_description:"The amount of the base currency that can be obtained for 1 unit of this currency"`
 }
 
 type mcpQueryLatestExchangeRatesToolHandler struct{}
@@ -57,39 +57,39 @@ func (h *mcpQueryLatestExchangeRatesToolHandler) OutputType() reflect.Type {
 }
 
 // Handle processes the MCP call tool request and returns the response
-func (h *mcpQueryLatestExchangeRatesToolHandler) Handle(c *core.WebContext, callToolReq *MCPCallToolRequest, currentConfig *settings.Config, services MCPAvailableServices) ([]*MCPTextContent, *errs.Error) {
+func (h *mcpQueryLatestExchangeRatesToolHandler) Handle(c *core.WebContext, callToolReq *MCPCallToolRequest, currentConfig *settings.Config, services MCPAvailableServices) (any, []*MCPTextContent, *errs.Error) {
 	var exchangeRatesRequest MCPQueryExchangeRatesRequest
 
 	if callToolReq.Arguments != nil {
 		if err := json.Unmarshal(callToolReq.Arguments, &exchangeRatesRequest); err != nil {
-			return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+			return nil, nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 		}
 	} else {
-		return nil, errs.ErrIncompleteOrIncorrectSubmission
+		return nil, nil, errs.ErrIncompleteOrIncorrectSubmission
 	}
 
 	dataSource := exchangerates.Container.Current
 
 	if dataSource == nil {
-		return nil, errs.ErrInvalidExchangeRatesDataSource
+		return nil, nil, errs.ErrInvalidExchangeRatesDataSource
 	}
 
 	exchangeRateResponse, err := dataSource.GetLatestExchangeRates(c, c.GetCurrentUid(), currentConfig)
 
 	if err != nil {
-		return nil, errs.Or(err, errs.ErrOperationFailed)
+		return nil, nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	response, err := h.createNewMCPQueryExchangeRatesResponse(exchangeRatesRequest.Currencies, exchangeRateResponse)
+	structuredResponse, response, err := h.createNewMCPQueryExchangeRatesResponse(exchangeRatesRequest.Currencies, exchangeRateResponse)
 
 	if err != nil {
-		return nil, errs.Or(err, errs.ErrOperationFailed)
+		return nil, nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	return response, nil
+	return structuredResponse, response, nil
 }
 
-func (h *mcpQueryLatestExchangeRatesToolHandler) createNewMCPQueryExchangeRatesResponse(currencies string, exchangeRatesResp *models.LatestExchangeRateResponse) ([]*MCPTextContent, error) {
+func (h *mcpQueryLatestExchangeRatesToolHandler) createNewMCPQueryExchangeRatesResponse(currencies string, exchangeRatesResp *models.LatestExchangeRateResponse) (any, []*MCPTextContent, error) {
 	queryCurrencies := make(map[string]bool)
 
 	for _, currency := range strings.Split(currencies, ",") {
@@ -102,7 +102,7 @@ func (h *mcpQueryLatestExchangeRatesToolHandler) createNewMCPQueryExchangeRatesR
 
 	response := &MCPQueryExchangeRatesResponse{
 		BaseCurrency: exchangeRatesResp.BaseCurrency,
-		UpdateTime:   utils.FormatUnixTimeToLongDateTimeWithTimezoneRFC3389Format(exchangeRatesResp.UpdateTime, time.UTC),
+		UpdateTime:   utils.FormatUnixTimeToLongDateTimeWithTimezoneRFC3339Format(exchangeRatesResp.UpdateTime, time.UTC),
 		Rates:        make([]*MCPQueryExchangeRateInfo, 0, len(exchangeRatesResp.ExchangeRates)),
 	}
 
@@ -120,10 +120,10 @@ func (h *mcpQueryLatestExchangeRatesToolHandler) createNewMCPQueryExchangeRatesR
 	content, err := json.Marshal(response)
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return []*MCPTextContent{
+	return response, []*MCPTextContent{
 		NewMCPTextContent(string(content)),
 	}, nil
 }

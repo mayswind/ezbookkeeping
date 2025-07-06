@@ -20,6 +20,12 @@ const (
 // LatestSupportedMCPVersion defines the latest supported version of Model Context Protocol (MCP)
 const LatestSupportedMCPVersion = MCPProtocolVersion20250618
 
+// ToolResultStructuredContentMinVersion defines the minimum version of structured content supported in tool results
+const ToolResultStructuredContentMinVersion = MCPProtocolVersion20250618
+
+// MCPProtocolVersionHeaderName defines the HTTP header name for the MCP protocol version
+const MCPProtocolVersionHeaderName = "MCP-Protocol-Version"
+
 // SupportedMCPVersion defines a map of supported MCP versions
 var SupportedMCPVersion = map[MCPProtocolVersion]bool{
 	MCPProtocolVersion20250618: true,
@@ -120,7 +126,7 @@ type MCPListToolsResponse struct {
 type MCPTool struct {
 	Name         string             `json:"name"`
 	InputSchema  *jsonschema.Schema `json:"inputSchema"`
-	OutputSchema *jsonschema.Schema `json:"outputSchema"`
+	OutputSchema *jsonschema.Schema `json:"outputSchema,omitempty"`
 	Title        string             `json:"title,omitempty"`
 	Description  string             `json:"description,omitempty"`
 }
@@ -133,8 +139,9 @@ type MCPCallToolRequest struct {
 
 // MCPCallToolResponse defines the response structure for calling a tool in the MCP
 type MCPCallToolResponse[T MCPTextContent | MCPImageContent | MCPAudioContent | MCPResourceLink | MCPEmbeddedResource] struct {
-	Content []*T `json:"content"`
-	IsError bool `json:"isError,omitempty"`
+	Content           []*T `json:"content"`
+	StructuredContent any  `json:"structuredContent,omitempty"`
+	IsError           bool `json:"isError,omitempty"`
 }
 
 // MCPTextContent defines the text content structure used in MCP

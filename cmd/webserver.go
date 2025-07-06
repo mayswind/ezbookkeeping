@@ -19,6 +19,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/cron"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/mcp"
 	"github.com/mayswind/ezbookkeeping/pkg/middlewares"
 	"github.com/mayswind/ezbookkeeping/pkg/requestid"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
@@ -61,6 +62,13 @@ func startWebServer(c *core.CliContext) error {
 
 	if err != nil {
 		log.BootErrorf(c, "[webserver.startWebServer] initializes requestid generator failed, because %s", err.Error())
+		return err
+	}
+
+	err = mcp.InitializeMCPHandlers(config)
+
+	if err != nil {
+		log.BootErrorf(c, "[webserver.startWebServer] initializes mcp handlers failed, because %s", err.Error())
 		return err
 	}
 

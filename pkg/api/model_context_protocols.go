@@ -102,8 +102,25 @@ func (a *ModelContextProtocolAPI) ReadResourceHandler(c *core.WebContext, jsonRP
 
 // ListToolsHandler returns the list of tools for model context protocol
 func (a *ModelContextProtocolAPI) ListToolsHandler(c *core.WebContext, jsonRPCRequest *core.JSONRPCRequest) (any, *errs.Error) {
+	mcpVersion := a.getMCPVersion(c)
+	toolsInfo := mcp.Container.GetMCPTools()
+	finalToolsInfos := make([]*mcp.MCPTool, len(toolsInfo))
+
+	for i := 0; i < len(toolsInfo); i++ {
+		finalToolsInfos[i] = &mcp.MCPTool{
+			Name:        toolsInfo[i].Name,
+			InputSchema: toolsInfo[i].InputSchema,
+			Title:       toolsInfo[i].Title,
+			Description: toolsInfo[i].Description,
+		}
+
+		if mcpVersion >= string(mcp.ToolResultStructuredContentMinVersion) {
+			finalToolsInfos[i].OutputSchema = toolsInfo[i].OutputSchema
+		}
+	}
+
 	listToolsResp := mcp.MCPListToolsResponse{
-		Tools: mcp.AllMCPToolInfos,
+		Tools: finalToolsInfos,
 	}
 
 	return listToolsResp, nil
@@ -121,7 +138,7 @@ func (a *ModelContextProtocolAPI) CallToolHandler(c *core.WebContext, jsonRPCReq
 		return nil, errs.ErrIncompleteOrIncorrectSubmission
 	}
 
-	result, err := mcp.MCPToolHandle(c, &callToolReq, a.CurrentConfig(), a)
+	result, err := mcp.Container.HandleTool(c, &callToolReq, a.CurrentConfig(), a)
 
 	if err != nil {
 		return nil, err
@@ -158,4 +175,9 @@ func (a *ModelContextProtocolAPI) GetAccountService() *services.AccountService {
 // GetUserCustomExchangeRatesService implements the MCPAvailableServices interface
 func (a *ModelContextProtocolAPI) GetUserService() *services.UserService {
 	return a.users
+}
+
+// getMCPVersion returns the MCP protocol version from the request header
+func (a *ModelContextProtocolAPI) getMCPVersion(c *core.WebContext) string {
+	return c.GetHeader(mcp.MCPProtocolVersionHeaderName)
 }

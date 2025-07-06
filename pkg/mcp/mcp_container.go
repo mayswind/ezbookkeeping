@@ -69,6 +69,9 @@ func InitializeMCPHandlers(config *settings.Config) error {
 		mcpTools:                 make([]*MCPTool, 0),
 	}
 
+	registerMCPTextContentToolHandler(container, MCPQueryAllAccountsToolHandler)
+	registerMCPTextContentToolHandler(container, MCPQueryAllTransactionCategoriesToolHandler)
+	registerMCPTextContentToolHandler(container, MCPQueryAllTransactionTagsToolHandler)
 	registerMCPTextContentToolHandler(container, MCPQueryLatestExchangeRatesToolHandler)
 
 	Container = container

@@ -16,7 +16,7 @@ import (
 
 // MCPQueryExchangeRatesRequest represents all parameters of the query exchange rates request
 type MCPQueryExchangeRatesRequest struct {
-	Currencies string `json:"currencies" jsonschema:"required,description=Comma-separated list of currencies to query exchange rates for (e.g. USD,CNY,EUR)"`
+	Currencies string `json:"currencies" jsonschema_description:"Comma-separated list of currencies to query exchange rates for (e.g. USD,CNY,EUR)"`
 }
 
 // MCPQueryExchangeRatesResponse represents the response structure for querying exchange rates
@@ -32,27 +32,32 @@ type MCPQueryExchangeRateInfo struct {
 	Rate     string `json:"rate" jsonschema_description:"The amount of the base currency that can be exchanged for 1 of this currency"`
 }
 
-type mcpQueryLatestExchangeRatesRequestToolHandler struct{}
+type mcpQueryLatestExchangeRatesToolHandler struct{}
 
-var MCPQueryLatestExchangeRatesRequestToolHandler = &mcpQueryLatestExchangeRatesRequestToolHandler{}
+var MCPQueryLatestExchangeRatesToolHandler = &mcpQueryLatestExchangeRatesToolHandler{}
+
+// Name returns the name of the MCP tool
+func (h *mcpQueryLatestExchangeRatesToolHandler) Name() string {
+	return "query_latest_exchange_rates"
+}
 
 // Description returns the description of the MCP tool
-func (h *mcpQueryLatestExchangeRatesRequestToolHandler) Description() string {
+func (h *mcpQueryLatestExchangeRatesToolHandler) Description() string {
 	return "Query latest exchange rates with specified currencies."
 }
 
 // InputType returns the input type for the MCP tool request
-func (h *mcpQueryLatestExchangeRatesRequestToolHandler) InputType() reflect.Type {
+func (h *mcpQueryLatestExchangeRatesToolHandler) InputType() reflect.Type {
 	return reflect.TypeOf(&MCPQueryExchangeRatesRequest{})
 }
 
 // OutputType returns the output type for the MCP tool response
-func (h *mcpQueryLatestExchangeRatesRequestToolHandler) OutputType() reflect.Type {
+func (h *mcpQueryLatestExchangeRatesToolHandler) OutputType() reflect.Type {
 	return reflect.TypeOf(&MCPQueryExchangeRatesResponse{})
 }
 
 // Handle processes the MCP call tool request and returns the response
-func (h *mcpQueryLatestExchangeRatesRequestToolHandler) Handle(c *core.WebContext, callToolReq *MCPCallToolRequest, currentConfig *settings.Config, services MCPAvailableServices) ([]*MCPTextContent, *errs.Error) {
+func (h *mcpQueryLatestExchangeRatesToolHandler) Handle(c *core.WebContext, callToolReq *MCPCallToolRequest, currentConfig *settings.Config, services MCPAvailableServices) ([]*MCPTextContent, *errs.Error) {
 	var exchangeRatesRequest MCPQueryExchangeRatesRequest
 
 	if callToolReq.Arguments != nil {
@@ -84,7 +89,7 @@ func (h *mcpQueryLatestExchangeRatesRequestToolHandler) Handle(c *core.WebContex
 	return response, nil
 }
 
-func (h *mcpQueryLatestExchangeRatesRequestToolHandler) createNewMCPQueryExchangeRatesResponse(currencies string, exchangeRatesResp *models.LatestExchangeRateResponse) ([]*MCPTextContent, error) {
+func (h *mcpQueryLatestExchangeRatesToolHandler) createNewMCPQueryExchangeRatesResponse(currencies string, exchangeRatesResp *models.LatestExchangeRateResponse) ([]*MCPTextContent, error) {
 	queryCurrencies := make(map[string]bool)
 
 	for _, currency := range strings.Split(currencies, ",") {

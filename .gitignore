@@ -144,3 +144,6 @@ dist/
 # Visual Studio Code
 .vscode/
 *.code-workspace
+
+# Roo Code
+.roo/

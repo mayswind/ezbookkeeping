@@ -22,9 +22,6 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
-const maximumTagsCountOfTransaction = 10
-const maximumPicturesCountOfTransaction = 10
-
 // TransactionsApi represents transaction api
 type TransactionsApi struct {
 	ApiUsingConfig
@@ -682,7 +679,7 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.WebContext) (any, *er
 		return nil, errs.ErrTransactionTagIdInvalid
 	}
 
-	if len(tagIds) > maximumTagsCountOfTransaction {
+	if len(tagIds) > models.MaximumTagsCountOfTransaction {
 		return nil, errs.ErrTransactionHasTooManyTags
 	}
 
@@ -693,7 +690,7 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.WebContext) (any, *er
 		return nil, errs.ErrTransactionPictureIdInvalid
 	}
 
-	if len(pictureIds) > maximumPicturesCountOfTransaction {
+	if len(pictureIds) > models.MaximumPicturesCountOfTransaction {
 		return nil, errs.ErrTransactionHasTooManyPictures
 	}
 
@@ -812,7 +809,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 		return nil, errs.ErrTransactionTagIdInvalid
 	}
 
-	if len(tagIds) > maximumTagsCountOfTransaction {
+	if len(tagIds) > models.MaximumTagsCountOfTransaction {
 		return nil, errs.ErrTransactionHasTooManyTags
 	}
 
@@ -823,7 +820,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 		return nil, errs.ErrTransactionPictureIdInvalid
 	}
 
-	if len(pictureIds) > maximumPicturesCountOfTransaction {
+	if len(pictureIds) > models.MaximumPicturesCountOfTransaction {
 		return nil, errs.ErrTransactionHasTooManyPictures
 	}
 
@@ -1382,7 +1379,7 @@ func (a *TransactionsApi) TransactionImportHandler(c *core.WebContext) (any, *er
 			return nil, errs.ErrTransactionTagIdInvalid
 		}
 
-		if len(tagIds) > maximumTagsCountOfTransaction {
+		if len(tagIds) > models.MaximumTagsCountOfTransaction {
 			return nil, errs.ErrTransactionHasTooManyTags
 		}
 

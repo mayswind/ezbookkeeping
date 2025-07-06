@@ -69,6 +69,8 @@ func InitializeMCPHandlers(config *settings.Config) error {
 		mcpTools:                 make([]*MCPTool, 0),
 	}
 
+	registerMCPTextContentToolHandler(container, MCPAddTransactionToolHandler)
+	registerMCPTextContentToolHandler(container, MCPQueryTransactionsToolHandler)
 	registerMCPTextContentToolHandler(container, MCPQueryAllAccountsToolHandler)
 	registerMCPTextContentToolHandler(container, MCPQueryAllTransactionCategoriesToolHandler)
 	registerMCPTextContentToolHandler(container, MCPQueryAllTransactionTagsToolHandler)

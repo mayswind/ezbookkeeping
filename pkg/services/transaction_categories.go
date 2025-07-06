@@ -514,6 +514,23 @@ func (s *TransactionCategoryService) GetVisibleSubCategoryNameMapByList(categori
 	return expenseCategoryMap, incomeCategoryMap, transferCategoryMap
 }
 
+// GetVisibleCategoryNameMapByList returns visible transaction category map by a list
+func (s *TransactionCategoryService) GetVisibleCategoryNameMapByList(categories []*models.TransactionCategory) map[string]*models.TransactionCategory {
+	categoryMap := make(map[string]*models.TransactionCategory)
+
+	for i := 0; i < len(categories); i++ {
+		category := categories[i]
+
+		if category.Hidden {
+			continue
+		}
+
+		categoryMap[category.Name] = category
+	}
+
+	return categoryMap
+}
+
 // GetCategoryNames returns a list with transaction category names from transaction category models list
 func (s *TransactionCategoryService) GetCategoryNames(categories []*models.TransactionCategory) []string {
 	categoryNames := make([]string, len(categories))

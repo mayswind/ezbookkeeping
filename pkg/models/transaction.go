@@ -8,6 +8,9 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
+const MaximumTagsCountOfTransaction = 10
+const MaximumPicturesCountOfTransaction = 10
+
 // TransactionType represents transaction type
 type TransactionType byte
 

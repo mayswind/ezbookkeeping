@@ -133,6 +133,14 @@ input[type=number] {
     height: 10px;
 }
 
+.bidirectional-switch {
+    cursor: pointer;
+}
+
+.bidirectional-switch.v-input--horizontal .v-input__prepend {
+    margin-right: 10px; /* same as the padding-left of `.v-switch .v-label` */
+}
+
 .code-container {
     background-color: #efefef;
 }
@@ -161,6 +169,17 @@ input[type=number] {
 .always-cursor-pointer.v-input.v-input--readonly .v-field.v-field,
 .always-cursor-pointer.v-input.v-input--readonly .cursor-pointer {
     cursor: pointer !important;
+}
+
+.always-cursor-text,
+.always-cursor-text.v-input.v-input--readonly input,
+.always-cursor-text.v-input.v-input--readonly textarea,
+.always-cursor-text.v-input.v-input--readonly .v-field .v-text-field__prefix,
+.always-cursor-text.v-input.v-input--readonly .v-field .v-text-field__suffix,
+.always-cursor-text.v-input.v-input--readonly .v-field .v-field__input,
+.always-cursor-text.v-input.v-input--readonly .v-field.v-field,
+.always-cursor-text.v-input.v-input--readonly .cursor-pointer {
+    cursor: text !important;
 }
 
 .v-table {

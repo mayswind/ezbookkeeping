@@ -30,7 +30,7 @@
             </template>
 
             <v-card-text class="py-0 w-100 d-flex justify-center">
-                <v-switch class="export-data-display-switch" color="secondary"
+                <v-switch class="bidirectional-switch" color="secondary"
                           :label="tt('Raw Data')"
                           v-model="showRawData"
                           @click="showRawData = !showRawData">
@@ -46,7 +46,7 @@
                     fixed-footer
                     multi-sort
                     density="compact"
-                    height="365"
+                    height="360"
                     :headers="dataTableHeaders"
                     :items="dataTableItems"
                     :hover="true"
@@ -55,8 +55,9 @@
                     :no-data-text="tt('No data')"
                     v-if="!showRawData"
                 ></v-data-table>
-                <div class="w-100 pl-2 code-container" v-if="showRawData">
-                    <textarea class="w-100" style="outline: none; height: 360px" :readonly="true" :value="exportedData"></textarea>
+                <div class="w-100 code-container" v-if="showRawData">
+                    <v-textarea class="w-100 always-cursor-text" style="height: 360px" :readonly="true"
+                                :value="exportedData"></v-textarea>
                 </div>
             </v-card-text>
 
@@ -217,13 +218,3 @@ defineExpose({
     open
 });
 </script>
-
-<style>
-.export-data-display-switch {
-    cursor: pointer;
-}
-
-.export-data-display-switch.v-input--horizontal .v-input__prepend {
-    margin-right: 10px; /* same as the padding-left of `.v-switch .v-label` */
-}
-</style>

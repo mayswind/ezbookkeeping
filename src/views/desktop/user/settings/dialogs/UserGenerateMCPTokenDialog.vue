@@ -8,7 +8,7 @@
             </template>
 
             <v-card-text class="py-0 w-100 d-flex justify-center" v-if="generatedToken && serverUrl">
-                <v-switch class="export-data-display-switch" color="secondary"
+                <v-switch class="bidirectional-switch" color="secondary"
                           :label="tt('Configuration')"
                           v-model="showConfiguration"
                           @click="showConfiguration = !showConfiguration">
@@ -18,24 +18,25 @@
                 </v-switch>
             </v-card-text>
 
-            <v-card-text>
-                <v-row>
-                    <v-col cols="12" md="12" v-if="!generatedToken">
-                        <v-text-field
-                            autocomplete="current-password"
-                            type="password"
-                            :disabled="generating"
-                            :label="tt('Current Password')"
-                            :placeholder="tt('Current Password')"
-                            v-model="currentPassword"
-                            @keyup.enter="generateToken"
-                        />
-                    </v-col>
-                    <v-col cols="12" md="12" v-if="generatedToken">
-                        <v-textarea :readonly="true" :rows="4" :value="generatedToken" v-if="!showConfiguration || !serverUrl" />
-                        <v-textarea :readonly="true" :rows="15" :value="mcpServerConfiguration" v-if="showConfiguration && serverUrl" />
-                    </v-col>
-                </v-row>
+            <v-card-text class="my-md-4 w-100 d-flex justify-center">
+                <div class="w-100" v-if="!generatedToken">
+                    <v-text-field
+                        autocomplete="current-password"
+                        type="password"
+                        :autofocus="true"
+                        :disabled="generating"
+                        :label="tt('Current Password')"
+                        :placeholder="tt('Current Password')"
+                        v-model="currentPassword"
+                        @keyup.enter="generateToken"
+                    />
+                </div>
+                <div class="w-100 code-container" v-if="generatedToken">
+                    <v-textarea class="w-100 always-cursor-text" :readonly="true"
+                                :rows="4" :value="generatedToken" v-if="!showConfiguration || !serverUrl" />
+                    <v-textarea class="w-100 always-cursor-text" :readonly="true"
+                                :rows="15" :value="mcpServerConfiguration" v-if="showConfiguration && serverUrl" />
+                </div>
             </v-card-text>
             <v-card-text class="overflow-y-visible">
                 <div ref="buttonContainer" class="w-100 d-flex justify-center gap-4">
@@ -45,7 +46,7 @@
                     </v-btn>
                     <v-btn color="secondary" variant="tonal" :disabled="generating"
                            @click="cancel" v-if="!generatedToken">{{ tt('Cancel') }}</v-btn>
-                    <v-btn @click="copy" v-if="generatedToken">{{ tt('Copy') }}</v-btn>
+                    <v-btn variant="tonal" @click="copy" v-if="generatedToken">{{ tt('Copy') }}</v-btn>
                     <v-btn color="secondary" variant="tonal" @click="close" v-if="generatedToken">{{ tt('Close') }}</v-btn>
                 </div>
             </v-card-text>

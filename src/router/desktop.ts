@@ -131,6 +131,7 @@ const router = createRouter({
                         initFilterCategoryIds: route.query['filterCategoryIds'],
                         initTagIds: route.query['tagIds'],
                         initTagFilterType: route.query['tagFilterType'],
+                        initKeyword: route.query['keyword'],
                         initSortingType: route.query['sortingType'],
                         initTrendDateAggregationType: route.query['trendDateAggregationType']
                     })

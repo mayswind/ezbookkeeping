@@ -548,6 +548,7 @@ export interface TransactionStatisticRequest {
     readonly endTime: number;
     readonly tagIds: string;
     readonly tagFilterType: number;
+    readonly keyword: string;
     readonly useTransactionTimezone: boolean;
 }
 
@@ -559,6 +560,7 @@ export interface YearMonthRangeRequest {
 export interface TransactionStatisticTrendsRequest extends YearMonthRangeRequest {
     readonly tagIds: string;
     readonly tagFilterType: number;
+    readonly keyword: string;
     readonly useTransactionTimezone: boolean;
 }
 

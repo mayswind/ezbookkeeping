@@ -314,6 +314,10 @@
                 <f7-actions-button @click="filterTags">{{ tt('Filter Transaction Tags') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
+                <f7-actions-label v-if="query.keyword">{{ query.keyword }}</f7-actions-label>
+                <f7-actions-button @click="filterDescription">{{ tt('Filter transaction description') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
                 <f7-actions-button @click="settings">{{ tt('Settings') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
@@ -360,7 +364,7 @@ const props = defineProps<{
 }>();
 
 const { tt, getAllCategoricalChartTypes, formatPercent } = useI18n();
-const { showToast, routeBackOnError } = useI18nUIComponents();
+const { showPrompt, showToast, routeBackOnError } = useI18nUIComponents();
 
 const {
     loading,
@@ -695,6 +699,30 @@ function filterCategories(): void {
 
 function filterTags(): void {
     props.f7router.navigate('/settings/filter/tag?type=statisticsCurrent');
+}
+
+function filterDescription(): void {
+    showPrompt('Filter transaction description', query.value.keyword, value => {
+        if (query.value.keyword === value) {
+            return;
+        }
+
+        let changed = false;
+
+        if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
+            changed = statisticsStore.updateTransactionStatisticsFilter({
+                keyword: value
+            });
+        } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
+            changed = statisticsStore.updateTransactionStatisticsFilter({
+                keyword: value
+            });
+        }
+
+        if (changed) {
+            reload();
+        }
+    });
 }
 
 function settings(): void {

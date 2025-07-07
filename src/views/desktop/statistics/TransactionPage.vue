@@ -113,6 +113,16 @@
                                                 <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                                             </v-btn>
                                             <v-spacer/>
+                                            <div class="transaction-keyword-filter ml-2">
+                                                <v-text-field density="compact" :disabled="loading"
+                                                              :prepend-inner-icon="mdiMagnify"
+                                                              :append-inner-icon="filterKeyword !== query.keyword ? mdiCheck : undefined"
+                                                              :placeholder="tt('Filter transaction description')"
+                                                              v-model="filterKeyword"
+                                                              @click:append-inner="setKeywordFilter(filterKeyword)"
+                                                              @keyup.enter="setKeywordFilter(filterKeyword)"
+                                                />
+                                            </div>
                                             <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                                                    :disabled="loading" :icon="true">
                                                 <v-icon :icon="mdiDotsVertical" />
@@ -383,6 +393,7 @@ import {
     mdiCalendarRangeOutline,
     mdiRefresh,
     mdiSquareRounded,
+    mdiMagnify,
     mdiMenu,
     mdiFilterOutline,
     mdiFilterCogOutline,
@@ -405,6 +416,7 @@ interface TransactionStatisticsProps {
     initFilterCategoryIds?: string,
     initTagIds?: string,
     initTagFilterType?: string,
+    initKeyword?: string;
     initSortingType?: string,
     initTrendDateAggregationType?: string
 }
@@ -454,6 +466,7 @@ const exportDialog = useTemplateRef<ExportDialogType>('exportDialog');
 
 const activeTab = ref<string>('statisticsPage');
 const initing = ref<boolean>(true);
+const filterKeyword = ref<string>('');
 const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
 const showNav = ref<boolean>(display.mdAndUp.value);
 const showCustomDateRangeDialog = ref<boolean>(false);
@@ -551,8 +564,11 @@ function init(initProps: TransactionStatisticsProps): void {
         filterCategoryIds: initProps.initFilterCategoryIds ? arrayItemToObjectField(initProps.initFilterCategoryIds.split(','), true) : {},
         tagIds: initProps.initTagIds,
         tagFilterType: initProps.initTagFilterType && parseInt(initProps.initTagFilterType) >= 0 ? parseInt(initProps.initTagFilterType) : undefined,
+        keyword: initProps.initKeyword,
         sortingType: initProps.initSortingType ? parseInt(initProps.initSortingType) : undefined
     };
+
+    filterKeyword.value = filter.keyword || '';
 
     if (initProps.initAnalysisType === StatisticsAnalysisType.CategoricalAnalysis.toString()) {
         filter.categoricalChartType = initProps.initChartType ? parseInt(initProps.initChartType) : undefined;
@@ -904,6 +920,30 @@ function setTagFilter(changed: boolean): void {
     }
 }
 
+function setKeywordFilter(keyword: string): void {
+    if (query.value.keyword === keyword) {
+        return;
+    }
+
+    let changed = false;
+
+    if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
+        changed = statisticsStore.updateTransactionStatisticsFilter({
+            keyword: keyword
+        });
+    } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
+        changed = statisticsStore.updateTransactionStatisticsFilter({
+            keyword: keyword
+        });
+    }
+
+    if (changed) {
+        loading.value = true;
+        statisticsStore.updateTransactionStatisticsInvalidState(true);
+        router.push(getFilterLinkUrl());
+    }
+}
+
 function exportResults(): void {
     if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis && categoricalAnalysisData.value && categoricalAnalysisData.value.items) {
         exportDialog.value?.open({
@@ -954,6 +994,7 @@ onBeforeRouteUpdate((to) => {
             initFilterCategoryIds: (to.query['filterCategoryIds'] as string | null) || undefined,
             initTagIds: (to.query['tagIds'] as string | null) || undefined,
             initTagFilterType: (to.query['tagFilterType'] as string | null) || undefined,
+            initKeyword: (to.query['keyword'] as string | null) || undefined,
             initSortingType: (to.query['sortingType'] as string | null) || undefined,
             initTrendDateAggregationType: (to.query['trendDateAggregationType'] as string | null) || undefined
         });

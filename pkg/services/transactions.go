@@ -1421,7 +1421,7 @@ func (s *TransactionService) GetAccountsTotalIncomeAndExpense(c core.Context, ui
 }
 
 // GetAccountsAndCategoriesTotalIncomeAndExpense returns the every accounts and categories total income and expense amount by specific date range
-func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(c core.Context, uid int64, startUnixTime int64, endUnixTime int64, tagIds []int64, noTags bool, tagFilterType models.TransactionTagFilterType, utcOffset int16, useTransactionTimezone bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(c core.Context, uid int64, startUnixTime int64, endUnixTime int64, tagIds []int64, noTags bool, tagFilterType models.TransactionTagFilterType, keyword string, utcOffset int16, useTransactionTimezone bool) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -1467,6 +1467,11 @@ func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(c cor
 		if maxTransactionTime > 0 {
 			finalCondition = finalCondition + " AND transaction_time<=?"
 			finalConditionParams = append(finalConditionParams, maxTransactionTime)
+		}
+
+		if keyword != "" {
+			finalCondition = finalCondition + " AND comment LIKE ?"
+			finalConditionParams = append(finalConditionParams, "%%"+keyword+"%%")
 		}
 
 		sess := s.UserDataDB(uid).NewSession(c).Select("category_id, account_id, transaction_time, timezone_utc_offset, amount").Where(finalCondition, finalConditionParams...)
@@ -1530,7 +1535,7 @@ func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(c cor
 }
 
 // GetAccountsAndCategoriesMonthlyIncomeAndExpense returns the every accounts monthly income and expense amount by specific date range
-func (s *TransactionService) GetAccountsAndCategoriesMonthlyIncomeAndExpense(c core.Context, uid int64, startYear int32, startMonth int32, endYear int32, endMonth int32, tagIds []int64, noTags bool, tagFilterType models.TransactionTagFilterType, utcOffset int16, useTransactionTimezone bool) (map[int32][]*models.Transaction, error) {
+func (s *TransactionService) GetAccountsAndCategoriesMonthlyIncomeAndExpense(c core.Context, uid int64, startYear int32, startMonth int32, endYear int32, endMonth int32, tagIds []int64, noTags bool, tagFilterType models.TransactionTagFilterType, keyword string, utcOffset int16, useTransactionTimezone bool) (map[int32][]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -1581,6 +1586,11 @@ func (s *TransactionService) GetAccountsAndCategoriesMonthlyIncomeAndExpense(c c
 		if maxTransactionTime > 0 {
 			finalCondition = finalCondition + " AND transaction_time<=?"
 			finalConditionParams = append(finalConditionParams, maxTransactionTime)
+		}
+
+		if keyword != "" {
+			finalCondition = finalCondition + " AND comment LIKE ?"
+			finalConditionParams = append(finalConditionParams, "%%"+keyword+"%%")
 		}
 
 		sess := s.UserDataDB(uid).NewSession(c).Select("category_id, account_id, transaction_time, timezone_utc_offset, amount").Where(finalCondition, finalConditionParams...)

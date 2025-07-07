@@ -249,6 +249,37 @@ export function useI18nUIComponents() {
         });
     }
 
+    function showPrompt(message: string, currentValue?: string, confirmCallback?: (value: string, dialog: Dialog.Dialog, e: Event) => void, cancelCallback?: (value: string, dialog: Dialog.Dialog, e: Event) => void): void {
+        f7ready((f7) => {
+            f7.dialog.create({
+                title: tt('global.app.title'),
+                text: tt(message),
+                content: `<div class="dialog-input-field input"><input type="text" class="dialog-input" value="${currentValue || ''}"></div>`,
+                animate: isEnableAnimate(),
+                buttons: [
+                    {
+                        text: tt('Cancel'),
+                        onClick: (dialog, event) => {
+                            if (cancelCallback) {
+                                const inputValue = dialog.$el.find('.dialog-input').val();
+                                cancelCallback(inputValue, dialog, event);
+                            }
+                        }
+                    },
+                    {
+                        text: tt('OK'),
+                        onClick: (dialog, event) => {
+                            if (confirmCallback) {
+                                const inputValue = dialog.$el.find('.dialog-input').val();
+                                confirmCallback(inputValue, dialog, event);
+                            }
+                        }
+                    }
+                ]
+            }).open();
+        });
+    }
+
     function showToast(message: string, timeout?: number): void {
         f7ready((f7) => {
             f7.toast.create({
@@ -262,6 +293,7 @@ export function useI18nUIComponents() {
     return {
         showAlert: showAlert,
         showConfirm: showConfirm,
+        showPrompt: showPrompt,
         showToast: showToast,
         routeBackOnError
     }

@@ -157,7 +157,7 @@ import {
     mdiTablet,
     mdiWatch,
     mdiTelevision,
-    mdiMagicStaff,
+    mdiCreationOutline,
     mdiConsole,
     mdiDevices
 } from '@mdi/js';
@@ -238,7 +238,7 @@ function getTokenIcon(deviceType: string): string {
     } else if (deviceType === 'tv') {
         return mdiTelevision;
     } else if (deviceType === 'mcp') {
-        return mdiMagicStaff;
+        return mdiCreationOutline;
     } else if (deviceType === 'cli') {
         return mdiConsole;
     } else {

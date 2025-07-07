@@ -108,7 +108,7 @@ function getTokenIcon(deviceType: string): string {
     } else if (deviceType === 'tv') {
         return 'tv';
     } else if (deviceType === 'mcp') {
-        return 'wand_stars';
+        return 'sparkles';
     } else if (deviceType === 'cli') {
         return 'chevron_left_slash_chevron_right';
     } else {

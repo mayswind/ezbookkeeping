@@ -120,7 +120,7 @@
                     <f7-accordion-content style="height: auto">
                         <f7-list strong inset dividers media-list accordion-list class="transaction-info-list combination-list-content">
                             <f7-list-item link="#" chevron-center class="transaction-info"
-                                          :key="itemIdx" v-for="itemIdx in (blockIdx === 1 ? [ 1, 2, 3, 4, 5, 6, 7 ] : [ 1, 2, 3 ])">
+                                          :key="itemIdx" v-for="itemIdx in (pageType === TransactionListPageType.List.type && blockIdx === 1 ? [ 1, 2, 3, 4, 5, 6, 7 ] : [ 1, 2, 3 ])">
                                 <template #media>
                                     <div class="display-flex flex-direction-column transaction-date">
                                         <span class="transaction-day full-line flex-direction-column">DD</span>

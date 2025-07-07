@@ -1064,8 +1064,9 @@ const paginationCurrentPage = computed<number>({
 
 const skeletonData = computed<number[]>(() => {
     const data: number[] = [];
+    const totalCount = (pageType.value === TransactionListPageType.List.type ? countPerPage.value : 3);
 
-    for (let i = 0; i < countPerPage.value; i++) {
+    for (let i = 0; i < totalCount; i++) {
         data.push(i);
     }
 

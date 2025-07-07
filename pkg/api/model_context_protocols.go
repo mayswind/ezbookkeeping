@@ -9,8 +9,10 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/mcp"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 const mcpServerName = "ezBookkeeping-mcp"
@@ -18,12 +20,12 @@ const mcpServerName = "ezBookkeeping-mcp"
 // ModelContextProtocolAPI represents model context protocol api
 type ModelContextProtocolAPI struct {
 	ApiUsingConfig
-	transactions            *services.TransactionService
-	transactionCategories   *services.TransactionCategoryService
-	transactionTags         *services.TransactionTagService
-	accounts                *services.AccountService
-	users                   *services.UserService
-	userCustomExchangeRates *services.UserCustomExchangeRatesService
+	transactions          *services.TransactionService
+	transactionCategories *services.TransactionCategoryService
+	transactionTags       *services.TransactionTagService
+	accounts              *services.AccountService
+	users                 *services.UserService
+	tokens                *services.TokenService
 }
 
 // Initialize a model context protocol api singleton instance
@@ -32,12 +34,12 @@ var (
 		ApiUsingConfig: ApiUsingConfig{
 			container: settings.Container,
 		},
-		transactions:            services.Transactions,
-		transactionCategories:   services.TransactionCategories,
-		transactionTags:         services.TransactionTags,
-		accounts:                services.Accounts,
-		users:                   services.Users,
-		userCustomExchangeRates: services.UserCustomExchangeRates,
+		transactions:          services.Transactions,
+		transactionCategories: services.TransactionCategories,
+		transactionTags:       services.TransactionTags,
+		accounts:              services.Accounts,
+		users:                 services.Users,
+		tokens:                services.Tokens,
 	}
 )
 
@@ -63,6 +65,27 @@ func (a *ModelContextProtocolAPI) InitializeHandler(c *core.WebContext, jsonRPCR
 
 	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_MCP_ACCESS) {
 		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
+	tokenClaims := c.GetTokenClaims()
+	userTokenId, err := utils.StringToInt64(tokenClaims.UserTokenId)
+
+	if err != nil {
+		log.Warnf(c, "[model_context_protocols.InitializeHandler] parse user token id failed, because %s", err.Error())
+	} else {
+		tokenRecord := &models.TokenRecord{
+			Uid:             tokenClaims.Uid,
+			UserTokenId:     userTokenId,
+			CreatedUnixTime: tokenClaims.IssuedAt,
+		}
+
+		tokenId := a.tokens.GenerateTokenId(tokenRecord)
+
+		err = a.tokens.UpdateTokenLastSeen(c, tokenRecord)
+
+		if err != nil {
+			log.Warnf(c, "[model_context_protocols.InitializeHandler] failed to update last seen of token \"id:%s\" for user \"uid:%d\", because %s", tokenId, uid, err.Error())
+		}
 	}
 
 	protocolVersion := mcp.MCPProtocolVersion(initRequest.ProtocolVersion)
@@ -218,7 +241,7 @@ func (a *ModelContextProtocolAPI) GetTransactionService() *services.TransactionS
 	return a.transactions
 }
 
-// GetUserCustomExchangeRatesService implements the MCPAvailableServices interface
+// GetTransactionCategoryService implements the MCPAvailableServices interface
 func (a *ModelContextProtocolAPI) GetTransactionCategoryService() *services.TransactionCategoryService {
 	return a.transactionCategories
 }
@@ -233,7 +256,7 @@ func (a *ModelContextProtocolAPI) GetAccountService() *services.AccountService {
 	return a.accounts
 }
 
-// GetUserCustomExchangeRatesService implements the MCPAvailableServices interface
+// GetUserService implements the MCPAvailableServices interface
 func (a *ModelContextProtocolAPI) GetUserService() *services.UserService {
 	return a.users
 }

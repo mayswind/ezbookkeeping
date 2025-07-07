@@ -1188,6 +1188,7 @@
         "user custom exchange rate data not found": "User custom exchange rate data is not found",
         "cannot update exchange rate data for base currency": "Cannot update exchange rate data for base currency",
         "cannot delete exchange rate data for base currency": "Cannot delete exchange rate data for base currency",
+        "mcp server is not enabled": "MCP Server is not enabled",
         "query items cannot be blank": "There are no query items",
         "query items too much": "There are too many query items",
         "query items have invalid item": "There is invalid item in query items",

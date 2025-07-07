@@ -83,6 +83,10 @@ func (a *TokensApi) TokenListHandler(c *core.WebContext) (any, *errs.Error) {
 
 // TokenGenerateMCPHandler generates a new MCP token for current user
 func (a *TokensApi) TokenGenerateMCPHandler(c *core.WebContext) (any, *errs.Error) {
+	if !a.CurrentConfig().EnableMCPServer {
+		return nil, errs.ErrMCPServerNotEnabled
+	}
+
 	var generateMCPTokenReq models.TokenGenerateMCPRequest
 	err := c.ShouldBindJSON(&generateMCPTokenReq)
 

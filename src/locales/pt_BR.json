@@ -1188,6 +1188,7 @@
         "user custom exchange rate data not found": "Dados de taxa de câmbio personalizados do usuário não encontrados",
         "cannot update exchange rate data for base currency": "Não é possível atualizar dados de taxa de câmbio para a moeda base",
         "cannot delete exchange rate data for base currency": "Não é possível excluir dados de taxa de câmbio para a moeda base",
+        "mcp server is not enabled": "MCP Server is not enabled",
         "query items cannot be blank": "Não há itens de consulta",
         "query items too much": "Há muitos itens de consulta",
         "query items have invalid item": "Há item inválido nos itens de consulta",

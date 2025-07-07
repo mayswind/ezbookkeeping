@@ -1188,6 +1188,7 @@
         "user custom exchange rate data not found": "User custom exchange rate data is not found",
         "cannot update exchange rate data for base currency": "Cannot update exchange rate data for base currency",
         "cannot delete exchange rate data for base currency": "Cannot delete exchange rate data for base currency",
+        "mcp server is not enabled": "MCP Server is not enabled",
         "query items cannot be blank": "Không có mục truy vấn",
         "query items too much": "Có quá nhiều mục truy vấn",
         "query items have invalid item": "Có mục không hợp lệ trong các mục truy vấn",

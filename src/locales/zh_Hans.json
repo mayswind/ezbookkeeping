@@ -1188,6 +1188,7 @@
         "user custom exchange rate data not found": "用户自定义汇率数据不存在",
         "cannot update exchange rate data for base currency": "不能更新默认货币的汇率数据",
         "cannot delete exchange rate data for base currency": "不能删除默认货币的汇率数据",
+        "mcp server is not enabled": "MCP 服务器没有启用",
         "query items cannot be blank": "请求项目不能为空",
         "query items too much": "请求项目过多",
         "query items have invalid item": "请求项目中有非法项目",

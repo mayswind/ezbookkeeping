@@ -1188,6 +1188,7 @@
         "user custom exchange rate data not found": "使用者自訂匯率資料不存在",
         "cannot update exchange rate data for base currency": "不能更新基準貨幣的匯率資料",
         "cannot delete exchange rate data for base currency": "不能刪除基準貨幣的匯率資料",
+        "mcp server is not enabled": "MCP 伺服器未啟用",
         "query items cannot be blank": "查詢項目不能為空",
         "query items too much": "查詢項目過多",
         "query items have invalid item": "查詢項目中有非法項目",

@@ -1188,6 +1188,7 @@
         "user custom exchange rate data not found": "User custom exchange rate data is not found",
         "cannot update exchange rate data for base currency": "Cannot update exchange rate data for base currency",
         "cannot delete exchange rate data for base currency": "Cannot delete exchange rate data for base currency",
+        "mcp server is not enabled": "MCP Server is not enabled",
         "query items cannot be blank": "Елементи запиту не можуть бути порожніми",
         "query items too much": "Занадто багато елементів запиту",
         "query items have invalid item": "Запит містить недійсний елемент",

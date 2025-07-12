@@ -122,6 +122,8 @@ func (t *mt940TransactionDataRowIterator) parseTransaction(ctx core.Context, use
 		data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = mt940Data.OpeningBalance.Currency
 	} else if mt940Data.ClosingBalance != nil && mt940Data.ClosingBalance.Currency != "" {
 		data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = mt940Data.ClosingBalance.Currency
+	} else {
+		return nil, errs.ErrAccountCurrencyInvalid
 	}
 
 	amountValue := strings.ReplaceAll(statement.Amount, ",", ".") // decimal separator is comma in mt data

@@ -818,7 +818,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_MissingAccountRequiredN
 		DefaultCurrency: "CNY",
 	}
 
-	// Missing Transaction Time Node
+	// Missing Account Currency Node
 	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
 		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"+
 			"<gnc-v2\n"+

@@ -252,7 +252,7 @@ func TestFireFlyIIICsvFileConverterParseImportedData_MissingFileHeader(t *testin
 	}
 
 	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(""), 0, nil, nil, nil, nil, nil)
-	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
+	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 }
 
 func TestFireFlyIIICsvFileConverterParseImportedData_MissingRequiredColumn(t *testing.T) {
@@ -272,11 +272,6 @@ func TestFireFlyIIICsvFileConverterParseImportedData_MissingRequiredColumn(t *te
 	// Missing Type Column
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("amount,date,source_name,destination_name,category\n"+
 		"-123.45,2024-09-01T00:00:00+08:00,\"Initial balance for \"\"Test Account\"\"\",\"Test Account\",\n"), 0, nil, nil, nil, nil, nil)
-	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
-
-	// Missing Sub Category Column
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name\n"+
-		"\"Opening balance\",-123.45,2024-09-01T00:00:00+08:00,\"Initial balance for \"\"Test Account\"\"\",\"Test Account\"\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Account Name Column

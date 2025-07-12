@@ -148,6 +148,10 @@ func (t *ofxTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 		data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = ofxTransaction.DefaultCurrency
 	}
 
+	if data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] == "" {
+		return nil, errs.ErrAccountCurrencyInvalid
+	}
+
 	if ofxTransaction.Amount == "" {
 		return nil, errs.ErrAmountInvalid
 	}

@@ -188,7 +188,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 		accountName := dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME)
 		accountCurrency := user.DefaultCurrency
 
-		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY) {
+		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY) && dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY) != "" {
 			accountCurrency = dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY)
 
 			if _, ok := validators.AllCurrencyNames[accountCurrency]; !ok {
@@ -205,7 +205,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 			accountMap[accountName] = account
 		}
 
-		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY) {
+		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY) && dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY) != "" {
 			if account.Name != "" && account.Currency != accountCurrency {
 				log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] currency \"%s\" in data row \"index:%d\" not equals currency \"%s\" of the account for user \"uid:%d\"", accountCurrency, dataRowIndex, account.Currency, user.Uid)
 				return nil, nil, nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
@@ -230,7 +230,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 			account2Name = dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME)
 			account2Currency = user.DefaultCurrency
 
-			if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY) {
+			if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY) && dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY) != "" {
 				account2Currency = dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY)
 
 				if _, ok := validators.AllCurrencyNames[account2Currency]; !ok {
@@ -247,7 +247,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 				accountMap[account2Name] = account2
 			}
 
-			if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY) {
+			if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY) && dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY) != "" {
 				if account2.Name != "" && account2.Currency != account2Currency {
 					log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] currency \"%s\" in data row \"index:%d\" not equals currency \"%s\" of the account2 for user \"uid:%d\"", account2Currency, dataRowIndex, account2.Currency, user.Uid)
 					return nil, nil, nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid

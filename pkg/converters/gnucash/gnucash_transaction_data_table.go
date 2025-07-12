@@ -177,6 +177,8 @@ func (t *gnucashTransactionDataRowIterator) parseTransaction(ctx core.Context, u
 
 			if toAccount.Commodity != nil && toAccount.Commodity.Space == gnucashCommodityCurrencySpace {
 				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = toAccount.Commodity.Id
+			} else {
+				return nil, false, errs.ErrAccountCurrencyInvalid
 			}
 
 			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = toAmount
@@ -207,6 +209,8 @@ func (t *gnucashTransactionDataRowIterator) parseTransaction(ctx core.Context, u
 
 			if fromAccount.Commodity != nil && fromAccount.Commodity.Space == gnucashCommodityCurrencySpace {
 				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = fromAccount.Commodity.Id
+			} else {
+				return nil, false, errs.ErrAccountCurrencyInvalid
 			}
 
 			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = fromAmount

@@ -224,11 +224,7 @@ func (t *camtStatementTransactionDataRowIterator) parseTransaction(ctx core.Cont
 	}
 
 	if entry.BookingDate != nil && entry.BookingDate.DateTime != "" {
-		if strings.Index(entry.BookingDate.DateTime, "T") <= 0 {
-			return nil, errs.ErrTransactionTimeInvalid
-		}
-
-		dateTime, err := utils.ParseFromLongDateTimeWithTimezone(strings.ReplaceAll(entry.BookingDate.DateTime, "T", " "))
+		dateTime, err := utils.ParseFromLongDateTimeWithTimezoneRFC3339Format(entry.BookingDate.DateTime)
 
 		if err != nil {
 			return nil, errs.ErrTransactionTimeInvalid

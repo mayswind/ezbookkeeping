@@ -81,7 +81,7 @@ func (p *fireflyIIITransactionDataRowParser) Parse(ctx core.Context, user *model
 			return nil, false, errs.ErrAmountInvalid
 		}
 
-		rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
+		rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(amount)
 	}
 
 	if rowData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] != "" {
@@ -92,7 +92,7 @@ func (p *fireflyIIITransactionDataRowParser) Parse(ctx core.Context, user *model
 			return nil, false, errs.ErrAmountInvalid
 		}
 
-		rowData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = utils.FormatAmount(-amount)
+		rowData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = utils.FormatAmount(amount)
 	} else {
 		rowData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT]
 	}

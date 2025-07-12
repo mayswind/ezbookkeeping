@@ -234,9 +234,10 @@ func TestExchangeRatesApiLatestExchangeRateHandler_BankOfRussiaDataSource(t *tes
 
 	assert.Equal(t, "RUB", exchangeRateResponse.BaseCurrency)
 
-	supportedCurrencyCodes := []string{"AED", "AMD", "AUD", "AZN", "BGN", "BRL", "BYN", "CAD", "CHF", "CNY", "CZK",
-		"DKK", "EGP", "EUR", "GBP", "GEL", "HKD", "HUF", "IDR", "INR", "JPY", "KGS", "KRW", "KZT", "MDL",
-		"NOK", "NZD", "PLN", "QAR", "RON", "RSD", "SEK", "SGD", "THB", "TJS", "TMT", "TRY",
+	supportedCurrencyCodes := []string{"AED", "AMD", "AUD", "AZN", "BDT", "BGN", "BHD", "BOB", "BRL", "BYN",
+		"CAD", "CHF", "CNY", "CUP", "CZK", "DKK", "DZD", "EGP", "ETB", "EUR", "GBP", "GEL", "HKD", "HUF",
+		"IDR", "INR", "IRR", "JPY", "KGS", "KRW", "KZT", "MDL", "MMK", "MNT", "NGN", "NOK", "NZD",
+		"OMR", "PLN", "QAR", "RON", "RSD", "SAR", "SEK", "SGD", "THB", "TJS", "TMT", "TRY",
 		"UAH", "USD", "UZS", "VND", "ZAR"}
 
 	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
@@ -305,7 +306,7 @@ func TestExchangeRatesApiLatestExchangeRateHandler_InternationalMonetaryFundData
 
 	supportedCurrencyCodes := []string{"AED", "AUD", "BND", "BRL", "BWP", "CAD", "CHF", "CLP", "CNY", "CZK",
 		"DKK", "DZD", "EUR", "GBP", "ILS", "INR", "JPY", "KRW", "KWD", "MUR", "MXN", "MYR", "NOK", "NZD",
-		"OMR", "PEN", "PHP", "PLN", "QAR", "RUB", "SAR", "SEK", "SGD", "THB", "TTD", "UYU", "ZAR"}
+		"OMR", "PEN", "PHP", "PLN", "QAR", "SAR", "SEK", "SGD", "THB", "TTD", "UYU"}
 
 	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
 }

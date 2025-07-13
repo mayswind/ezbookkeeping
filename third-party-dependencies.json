@@ -245,7 +245,7 @@
         "name": "vue3-perfect-scrollbar",
         "copyright": "Copyright (c) 2018 Adam",
         "url": "https://github.com/mercs600/vue3-perfect-scrollbar",
-        "licenseUrl": "https://github.com/mercs600/vue3-perfect-scrollbar/blob/2.0.0/LICENSE"
+        "licenseUrl": "https://github.com/mercs600/vue3-perfect-scrollbar/blob/master/LICENSE"
     },
     {
         "name": "@vuepic/vue-datepicker",
@@ -311,7 +311,7 @@
         "name": "Materio - Vuetify VueJS 3 Free Admin Template",
         "copyright": "Copyright (c) 2022 ThemeSelection",
         "url": "https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free",
-        "licenseUrl": "https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free/blob/v2.3.1/LICENSE"
+        "licenseUrl": "https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free/blob/v2.3.0/LICENSE"
     },
     {
         "name": "Icons8 Line Awesome",

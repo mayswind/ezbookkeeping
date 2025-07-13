@@ -55,8 +55,10 @@ func (c *fireflyIIITransactionDataCsvFileImporter) ParseImportedData(ctx core.Co
 
 	if !commonDataTable.HasColumn(fireflyIIITransactionTimeColumnName) ||
 		!commonDataTable.HasColumn(fireflyIIITransactionTypeColumnName) ||
-		!commonDataTable.HasColumn(fireflyIIITransactionSourceAccountColumnName) ||
-		!commonDataTable.HasColumn(fireflyIIITransactionDestinationAccountColumnName) ||
+		!commonDataTable.HasColumn(fireflyIIITransactionSourceAccountNameColumnName) ||
+		!commonDataTable.HasColumn(fireflyIIITransactionSourceAccountTypeColumnName) ||
+		!commonDataTable.HasColumn(fireflyIIITransactionDestinationAccountNameColumnName) ||
+		!commonDataTable.HasColumn(fireflyIIITransactionDestinationAccountTypeColumnName) ||
 		!commonDataTable.HasColumn(fireflyIIITransactionAmountColumnName) {
 		log.Errorf(ctx, "[fireflyiii_transaction_data_csv_file_importer.ParseImportedData] cannot parse Firefly III csv data, because missing essential columns in header row")
 		return nil, nil, nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow

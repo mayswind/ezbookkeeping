@@ -117,7 +117,7 @@ check_type_dependencies() {
 
 set_build_parameters() {
     VERSION="$(grep '"version": ' package.json | awk -F ':' '{print $2}' | tr -d ' ' | tr -d ',' | tr -d '"')"
-    COMMIT_HASH="$(git rev-parse --short HEAD)"
+    COMMIT_HASH="$(git rev-parse --short=7 HEAD)"
     BUILD_UNIXTIME="$(date '+%s')"
 }
 

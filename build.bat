@@ -112,7 +112,7 @@ goto :pre_parse_args
     set VERSION=%VERSION: =%
     set VERSION=%VERSION:,=%
     set VERSION=%VERSION:"=%
-    for /f %%x in ('git rev-parse --short HEAD') do set "COMMIT_HASH=%%x"
+    for /f %%x in ('git rev-parse --short^=7 HEAD') do set "COMMIT_HASH=%%x"
     call :set_unixtime BUILD_UNIXTIME
     call :set_date BUILD_DATE
 

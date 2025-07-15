@@ -7,24 +7,21 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/converters/csv"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
-var fireflyIIITransactionSupportedColumns = map[datatable.TransactionDataTableColumn]bool{
-	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME:         true,
-	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE:     true,
-	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE:         true,
-	datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY:             true,
-	datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME:             true,
-	datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY:         true,
-	datatable.TRANSACTION_DATA_TABLE_AMOUNT:                   true,
-	datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME:     true,
-	datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY: true,
-	datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT:           true,
-	datatable.TRANSACTION_DATA_TABLE_TAGS:                     true,
-	datatable.TRANSACTION_DATA_TABLE_DESCRIPTION:              true,
+var fireflyIIITransactionDataColumnNameMapping = map[datatable.TransactionDataTableColumn]string{
+	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME:         "date",
+	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE:         "type",
+	datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY:             "category",
+	datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME:             "source_name",
+	datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY:         "currency_code",
+	datatable.TRANSACTION_DATA_TABLE_AMOUNT:                   "amount",
+	datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME:     "destination_name",
+	datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY: "foreign_currency_code",
+	datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT:           "foreign_amount",
+	datatable.TRANSACTION_DATA_TABLE_TAGS:                     "tags",
+	datatable.TRANSACTION_DATA_TABLE_DESCRIPTION:              "description",
 }
 
 var fireflyIIITransactionTypeNameMapping = map[models.TransactionType]string{
@@ -51,21 +48,8 @@ func (c *fireflyIIITransactionDataCsvFileImporter) ParseImportedData(ctx core.Co
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	commonDataTable := datatable.CreateNewCommonDataTableFromBasicDataTable(dataTable)
-
-	if !commonDataTable.HasColumn(fireflyIIITransactionTimeColumnName) ||
-		!commonDataTable.HasColumn(fireflyIIITransactionTypeColumnName) ||
-		!commonDataTable.HasColumn(fireflyIIITransactionSourceAccountNameColumnName) ||
-		!commonDataTable.HasColumn(fireflyIIITransactionSourceAccountTypeColumnName) ||
-		!commonDataTable.HasColumn(fireflyIIITransactionDestinationAccountNameColumnName) ||
-		!commonDataTable.HasColumn(fireflyIIITransactionDestinationAccountTypeColumnName) ||
-		!commonDataTable.HasColumn(fireflyIIITransactionAmountColumnName) {
-		log.Errorf(ctx, "[fireflyiii_transaction_data_csv_file_importer.ParseImportedData] cannot parse Firefly III csv data, because missing essential columns in header row")
-		return nil, nil, nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow
-	}
-
 	transactionRowParser := createFireflyIIITransactionDataRowParser()
-	transactionDataTable := datatable.CreateNewTransactionDataTableFromCommonDataTable(commonDataTable, fireflyIIITransactionSupportedColumns, transactionRowParser)
+	transactionDataTable := datatable.CreateNewTransactionDataTableFromBasicDataTableWithRowParser(dataTable, fireflyIIITransactionDataColumnNameMapping, transactionRowParser)
 	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(fireflyIIITransactionTypeNameMapping, "", "", ",")
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)

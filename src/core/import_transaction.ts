@@ -325,3 +325,100 @@ export class ImportTransactionDataMapping {
         }
     }
 }
+
+export type ImportTransactionReplaceRuleDataType = 'expenseCategory' | 'incomeCategory' | 'transferCategory' | 'account' | 'tag';
+
+export class ImportTransactionReplaceRule {
+    public dataType: ImportTransactionReplaceRuleDataType;
+    public sourceValue: string;
+    public targetId: string;
+
+    private constructor(dataType: ImportTransactionReplaceRuleDataType, sourceValue: string, targetId: string) {
+        this.dataType = dataType;
+        this.sourceValue = sourceValue;
+        this.targetId = targetId;
+    }
+
+    public toJsonObject(): unknown {
+        return {
+            type: this.dataType,
+            sourceValue: this.sourceValue,
+            targetId: this.targetId
+        };
+    }
+
+    public static of(dataType: ImportTransactionReplaceRuleDataType, sourceValue: string, targetId: string): ImportTransactionReplaceRule {
+        return new ImportTransactionReplaceRule(dataType, sourceValue, targetId);
+    }
+
+    public static parse(data: unknown): ImportTransactionReplaceRule | null {
+        if (!data
+            || typeof(data) !== 'object' || !('type' in data) || !('sourceValue' in data) || !('targetId' in data)
+            || typeof(data.type) !== 'string' || typeof(data.sourceValue) !== 'string' || typeof(data.targetId) !== 'string') {
+            return null;
+        }
+
+        if (data.type !== 'expenseCategory' && data.type !== 'incomeCategory' && data.type !== 'transferCategory' && data.type !== 'account' && data.type !== 'tag') {
+            return null;
+        }
+
+        return new ImportTransactionReplaceRule(data.type as ImportTransactionReplaceRuleDataType, data.sourceValue as string, data.targetId as string);
+    }
+}
+
+export class ImportTransactionReplaceRules {
+    private static readonly JSON_ROOT_FIELD = 'ezBookkeepingImportTransactionReplaceRules';
+
+    private readonly rules: ImportTransactionReplaceRule[];
+
+    private constructor(rules: ImportTransactionReplaceRule[]) {
+        this.rules = rules;
+    }
+
+    public getRules(): ImportTransactionReplaceRule[] {
+        return this.rules;
+    }
+
+    public toJson(): string {
+        const result: unknown[] = [];
+
+        for (let i = 0; i < this.rules.length; i++) {
+            const rule = this.rules[i];
+            result.push(rule.toJsonObject());
+        }
+
+        return JSON.stringify({
+            [ImportTransactionReplaceRules.JSON_ROOT_FIELD]: result
+        });
+    }
+
+    public static of(rules: ImportTransactionReplaceRule[]): ImportTransactionReplaceRules {
+        return new ImportTransactionReplaceRules(rules);
+    }
+
+    public static parseFromJson(json: string): ImportTransactionReplaceRules | null {
+        try {
+            const parsed = JSON.parse(json);
+            const root = parsed[ImportTransactionReplaceRules.JSON_ROOT_FIELD];
+
+            if (!root || !('length' in root)) {
+                return null;
+            }
+
+            const result = new ImportTransactionReplaceRules([]);
+
+            for (let i = 0; i < root.length; i++) {
+                const rule = root[i];
+                const replaceRule = ImportTransactionReplaceRule.parse(rule);
+
+                if (replaceRule) {
+                    result.rules.push(replaceRule);
+                }
+            }
+
+            return result;
+        } catch {
+            return null;
+        }
+    }
+}

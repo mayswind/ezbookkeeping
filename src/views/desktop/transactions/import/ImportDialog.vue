@@ -158,6 +158,11 @@
                                              :title="tt('Replace Invalid Transaction Tags')"
                                              @click="showReplaceInvalidItemDialog('tag', allInvalidTransactionTagNames)"></v-list-item>
                                 <v-divider class="my-2"/>
+                                <v-list-item :prepend-icon="mdiFindReplace"
+                                             :disabled="!!editingTransaction"
+                                             :title="tt('Batch Replace Categories / Accounts / Tags')"
+                                             @click="showReplaceAllTypesDialog()"></v-list-item>
+                                <v-divider class="my-2"/>
                                 <v-list-item :prepend-icon="mdiShapePlusOutline"
                                              :disabled="!!editingTransaction || !allInvalidExpenseCategoryNames || allInvalidExpenseCategoryNames.length < 1"
                                              :title="tt('Create Nonexistent Expense Categories')"
@@ -862,6 +867,7 @@
                                  @dateRange:change="changeCustomDateFilter"
                                  @error="onShowDateRangeError" />
     <batch-replace-dialog ref="batchReplaceDialog" />
+    <batch-replace-all-types-dialog ref="batchReplaceAllTypesDialog" />
     <batch-create-dialog ref="batchCreateDialog" />
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
@@ -874,6 +880,7 @@ import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import BatchReplaceDialog, { type BatchReplaceDialogDataType } from './dialogs/BatchReplaceDialog.vue';
+import BatchReplaceAllTypesDialog from './dialogs/BatchReplaceAllTypesDialog.vue';
 import BatchCreateDialog, { type BatchCreateDialogDataType } from './dialogs/BatchCreateDialog.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
@@ -962,6 +969,7 @@ import {
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type BatchReplaceDialogType = InstanceType<typeof BatchReplaceDialog>;
+type BatchReplaceAllTypesDialogType = InstanceType<typeof BatchReplaceAllTypesDialog>;
 type BatchCreateDialogType = InstanceType<typeof BatchCreateDialog>;
 
 type ImportTransactionDialogStep = 'uploadFile' | 'defineColumn' | 'checkData' | 'finalResult';
@@ -1007,6 +1015,7 @@ const statisticsStore = useStatisticsStore();
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const batchReplaceDialog = useTemplateRef<BatchReplaceDialogType>('batchReplaceDialog');
+const batchReplaceAllTypesDialog = useTemplateRef<BatchReplaceAllTypesDialogType>('batchReplaceAllTypesDialog');
 const batchCreateDialog = useTemplateRef<BatchCreateDialogType>('batchCreateDialog');
 const fileInput = useTemplateRef<HTMLInputElement>('fileInput');
 
@@ -2460,6 +2469,78 @@ function showReplaceInvalidItemDialog(type: BatchReplaceDialogDataType, invalidI
                         if (originalTagName === result.sourceItem && (!tagId || tagId === '0' || !allTagsMap.value[tagId])) {
                             transaction.tagIds[j] = result.targetItem;
                             updated = true;
+                        }
+                    }
+                }
+
+                if (updated) {
+                    updatedCount++;
+                    updateTransactionData(transaction);
+                }
+            }
+        }
+
+        if (updatedCount > 0) {
+            snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
+                count: updatedCount
+            });
+        }
+    });
+}
+
+function showReplaceAllTypesDialog(): void {
+    if (editingTransaction.value) {
+        return;
+    }
+
+    batchReplaceAllTypesDialog.value?.open({
+        expenseCategoryNames: allInvalidExpenseCategoryNames.value,
+        incomeCategoryNames: allInvalidIncomeCategoryNames.value,
+        transferCategoryNames: allInvalidTransferCategoryNames.value,
+        accountNames: allInvalidAccountNames.value,
+        tagNames: allInvalidTransactionTagNames.value
+    }).then(result => {
+        if (!result || !result.rules) {
+            return;
+        }
+
+        let updatedCount = 0;
+
+        if (importTransactions.value) {
+            for (let i = 0; i < importTransactions.value.length; i++) {
+                const transaction: ImportTransaction = importTransactions.value[i];
+                let updated = false;
+
+                for (let j = 0; j < result.rules.length; j++) {
+                    const rule = result.rules[j];
+
+                    if (!rule || !rule.dataType || !rule.sourceValue || !rule.targetId) {
+                        continue;
+                    }
+
+                    if (rule.dataType === 'expenseCategory' || rule.dataType === 'incomeCategory' || rule.dataType === 'transferCategory') {
+                        if (transaction.type !== TransactionType.ModifyBalance && transaction.originalCategoryName === rule.sourceValue) {
+                            transaction.categoryId = rule.targetId;
+                            updated = true;
+                        }
+                    } else if (rule.dataType === 'account') {
+                        if (transaction.originalSourceAccountName === rule.sourceValue) {
+                            transaction.sourceAccountId = rule.targetId;
+                            updated = true;
+                        }
+
+                        if (transaction.type === TransactionType.Transfer && transaction.originalDestinationAccountName === rule.sourceValue) {
+                            transaction.destinationAccountId = rule.targetId;
+                            updated = true;
+                        }
+                    } else if (rule.dataType === 'tag' && transaction.tagIds) {
+                        for (let k = 0; k < transaction.tagIds.length; k++) {
+                            const originalTagName = transaction.originalTagNames ? transaction.originalTagNames[k] : "";
+
+                            if (originalTagName === rule.sourceValue) {
+                                transaction.tagIds[k] = rule.targetId;
+                                updated = true;
+                            }
                         }
                     }
                 }

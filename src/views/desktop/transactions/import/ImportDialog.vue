@@ -862,7 +862,7 @@
                                  @dateRange:change="changeCustomDateFilter"
                                  @error="onShowDateRangeError" />
     <batch-replace-dialog ref="batchReplaceDialog" />
-    <BatchCreateDialog ref="batchCreateDialog" />
+    <batch-create-dialog ref="batchCreateDialog" />
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
     <input ref="fileInput" type="file" style="display: none" :accept="supportedImportFileExtensions" @change="setImportFile($event)" />

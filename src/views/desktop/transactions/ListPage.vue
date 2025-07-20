@@ -146,14 +146,14 @@
                                             </span>
                                             <v-spacer/>
                                             <div class="skeleton-no-margin d-flex align-center" v-if="showTotalAmountInTransactionListPage && currentMonthTotalAmount">
-                                                <span class="ml-2 text-subtitle-1">{{ tt('Total Income') }}</span>
+                                                <span class="ml-2 text-subtitle-1">{{ queryAllFilterAccountIdsCount ? tt('Total Inflows') : tt('Total Income') }}</span>
                                                 <span class="text-income ml-2" v-if="loading">
                                                     <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
                                                 </span>
                                                 <span class="text-income ml-2" v-else-if="!loading">
                                                     {{ currentMonthTotalAmount.income }}
                                                 </span>
-                                                <span class="text-subtitle-1 ml-3">{{ tt('Total Expense') }}</span>
+                                                <span class="text-subtitle-1 ml-3">{{ queryAllFilterAccountIdsCount ? tt('Total Outflows') : tt('Total Expense') }}</span>
                                                 <span class="text-expense ml-2" v-if="loading">
                                                     <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
                                                 </span>

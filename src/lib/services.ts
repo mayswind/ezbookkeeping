@@ -65,6 +65,8 @@ import type {
     TransactionInfoResponse,
     TransactionInfoPageWrapperResponse,
     TransactionInfoPageWrapperResponse2,
+    TransactionReconciliationStatementRequest,
+    TransactionReconciliationStatementResponse,
     TransactionStatisticRequest,
     TransactionStatisticResponse,
     TransactionStatisticTrendsRequest,
@@ -412,6 +414,9 @@ export default {
         const amountFilter = encodeURIComponent(req.amountFilter);
         const keyword = encodeURIComponent(req.keyword);
         return axios.get<ApiResponse<TransactionInfoPageWrapperResponse2>>(`v1/transactions/list/by_month.json?year=${req.year}&month=${req.month}&type=${req.type}&category_ids=${req.categoryIds}&account_ids=${req.accountIds}&tag_ids=${req.tagIds}&tag_filter_type=${req.tagFilterType}&amount_filter=${amountFilter}&keyword=${keyword}&trim_account=true&trim_category=true&trim_tag=true`);
+    },
+    getReconciliationStatements: (req: TransactionReconciliationStatementRequest): ApiResponsePromise<TransactionReconciliationStatementResponse> => {
+        return axios.get<ApiResponse<TransactionReconciliationStatementResponse>>(`v1/transactions/reconciliation_statements.json?account_id=${req.accountId}&start_time=${req.startTime}&end_time=${req.endTime}`);
     },
     getTransactionStatistics: (req: TransactionStatisticRequest): ApiResponsePromise<TransactionStatisticResponse> => {
         const queryParams = [];

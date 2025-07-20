@@ -326,7 +326,7 @@ function getTimerPickerItemStyle(textualValue: string, textualCurrentValue: stri
         }
     }
 
-    let angle = -24 * valueDiff;
+    const angle = -24 * valueDiff;
 
     if (angle > 180) {
         return '';

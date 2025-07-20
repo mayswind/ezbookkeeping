@@ -6,6 +6,7 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 
+import type { WeekDayValue } from '@/core/datetime.ts';
 import { type AccountCategory, AccountType } from '@/core/account.ts';
 import type { Account, CategorizedAccount } from '@/models/account.ts';
 
@@ -27,6 +28,8 @@ export function useAccountListPageBaseBase() {
         set: (value) => settingsStore.setShowAccountBalance(value)
     });
 
+    const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
+    const fiscalYearStart = computed<number>(() => userStore.currentUserFiscalYearStart);
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
     const allAccounts = computed<Account[]>(() => accountsStore.allAccounts);
@@ -86,6 +89,8 @@ export function useAccountListPageBaseBase() {
         displayOrderModified,
         // computed states
         showAccountBalance,
+        firstDayOfWeek,
+        fiscalYearStart,
         defaultCurrency,
         allAccounts,
         allCategorizedAccountsMap,

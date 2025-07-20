@@ -212,6 +212,28 @@
                                                                         {{ tt('Transaction List') }}
                                                                     </v-btn>
                                                                     <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
+                                                                           :disabled="loading" :prepend-icon="mdiInvoiceListOutline"
+                                                                           @click="showReconciliationStatementCustomDateRangeDialog(element.getAccountOrSubAccount(activeSubAccount[element.id]))"
+                                                                           v-if="element.type === AccountType.SingleAccount.type || element.getSubAccount(activeSubAccount[element.id])">
+                                                                        {{ tt('Reconciliation Statement') }}
+                                                                        <v-menu activator="parent" :open-on-hover="true">
+                                                                            <v-list>
+                                                                                <template :key="dateRange.type"
+                                                                                          v-for="dateRange in accountReconciliationStatementDateRangs(element.getAccountOrSubAccount(activeSubAccount[element.id]))">
+                                                                                    <v-list-item class="text-sm" density="compact"
+                                                                                                 :value="dateRange.type">
+                                                                                        <v-list-item-title class="cursor-pointer"
+                                                                                                           @click="showReconciliationStatementCustomDateRangeDialog(element.getAccountOrSubAccount(activeSubAccount[element.id]), dateRange.type)">
+                                                                                            <div class="d-flex align-center">
+                                                                                                <span class="text-sm ml-3">{{ dateRange.displayName }}</span>
+                                                                                            </div>
+                                                                                        </v-list-item-title>
+                                                                                    </v-list-item>
+                                                                                </template>
+                                                                            </v-list>
+                                                                        </v-menu>
+                                                                    </v-btn>
+                                                                    <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading"
                                                                            :prepend-icon="element.isAccountOrSubAccountHidden(activeSubAccount[element.id]) ? mdiEyeOutline : mdiEyeOffOutline"
@@ -258,6 +280,13 @@
     </v-dialog>
 
     <edit-dialog ref="editDialog" />
+    <reconciliation-statement-dialog ref="reconciliationStatementDialog"
+                                     @error="onShowDateRangeError" />
+
+    <date-range-selection-dialog :title="tt('Custom Date Range')"
+                                 v-model:show="showCustomDateRangeDialog"
+                                 @dateRange:change="onCustomDateRangeChanged"
+                                 @error="onShowDateRangeError" />
 
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
@@ -267,6 +296,7 @@
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import EditDialog from './list/dialogs/EditDialog.vue';
+import ReconciliationStatementDialog from './list/dialogs/ReconciliationStatementDialog.vue';
 import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
@@ -277,8 +307,12 @@ import { useAccountListPageBaseBase } from '@/views/base/accounts/AccountListPag
 
 import { useAccountsStore } from '@/stores/account.ts';
 
+import { DateRange, DateRangeScene, type LocalizedDateRange, type TimeRangeAndDateType } from '@/core/datetime.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import type { Account } from '@/models/account.ts';
+
+import { isNumber } from '@/lib/common.ts';
+import { getDateRangeByDateType, getDateRangeByBillingCycleDateType } from '@/lib/datetime.ts';
 
 import {
     mdiEyeOutline,
@@ -290,6 +324,7 @@ import {
     mdiPencilOutline,
     mdiDeleteOutline,
     mdiListBoxOutline,
+    mdiInvoiceListOutline,
     mdiDrag,
     mdiDotsVertical
 } from '@mdi/js';
@@ -297,16 +332,19 @@ import {
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type EditDialogType = InstanceType<typeof EditDialog>;
+type ReconciliationStatementDialogType = InstanceType<typeof ReconciliationStatementDialog>;
 
 const display = useDisplay();
 
-const { tt, getCurrencyName, joinMultiText } = useI18n();
+const { tt, getAllDateRanges, getCurrencyName, joinMultiText } = useI18n();
 
 const {
     loading,
     showHidden,
     displayOrderModified,
     showAccountBalance,
+    firstDayOfWeek,
+    fiscalYearStart,
     allAccounts,
     allCategorizedAccountsMap,
     allAccountCount,
@@ -322,13 +360,16 @@ const accountsStore = useAccountsStore();
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
+const reconciliationStatementDialog = useTemplateRef<ReconciliationStatementDialogType>('reconciliationStatementDialog');
 
 const activeAccountCategoryType = ref<number>(AccountCategory.Default.type);
 const activeTab = ref<string>('accountPage');
 const activeSubAccount = ref<Record<string, string>>({});
+const accountToShowReconciliationStatement = ref<Account | null>(null);
 const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
 const showNav = ref<boolean>(display.mdAndUp.value);
 const showAccountsIncludedInTotalDialog = ref<boolean>(false);
+const showCustomDateRangeDialog = ref<boolean>(false);
 
 const hasAnyVisibleAccount = computed<boolean>(() => accountsStore.allVisibleAccountsCount > 0);
 const activeAccountCategory = computed<AccountCategory | undefined>(() => AccountCategory.valueOf(activeAccountCategoryType.value));
@@ -407,6 +448,10 @@ function accountCurrency(account: Account): string | null {
     }
 }
 
+function accountReconciliationStatementDateRangs(account: Account): LocalizedDateRange[] {
+    return getAllDateRanges(DateRangeScene.Normal, true, !!accountsStore.getAccountStatementDate(account.id));
+}
+
 function add(): void {
     editDialog.value?.open({
         category: activeAccountCategoryType.value
@@ -437,6 +482,32 @@ function edit(account: Account): void {
         if (error) {
             snackbar.value?.showError(error);
         }
+    });
+}
+
+function showReconciliationStatementCustomDateRangeDialog(account: Account, dateRangeType?: number): void {
+    if (!isNumber(dateRangeType) || dateRangeType === DateRange.Custom.type) {
+        accountToShowReconciliationStatement.value = account;
+        showCustomDateRangeDialog.value = true;
+        return;
+    }
+
+    let dateRange: TimeRangeAndDateType | null = null;
+
+    if (DateRange.isBillingCycle(dateRangeType)) {
+        dateRange = getDateRangeByBillingCycleDateType(dateRangeType, firstDayOfWeek.value, fiscalYearStart.value, accountsStore.getAccountStatementDate(account.id));
+    } else {
+        dateRange = getDateRangeByDateType(dateRangeType, firstDayOfWeek.value, fiscalYearStart.value);
+    }
+
+    if (!dateRange) {
+        return;
+    }
+
+    reconciliationStatementDialog.value?.open({
+        accountId: account.id,
+        startTime: dateRange.minTime,
+        endTime: dateRange.maxTime
     });
 }
 
@@ -546,6 +617,27 @@ function onMove(event: { moved: { element: { id: string }, oldIndex: number, new
     }).catch(error => {
         snackbar.value?.showError(error);
     });
+}
+
+function onCustomDateRangeChanged(minUnixTime: number, maxUnixTime: number): void {
+    if (!accountToShowReconciliationStatement.value) {
+        snackbar.value?.showMessage('An error occurred');
+        return;
+    }
+
+    showCustomDateRangeDialog.value = false;
+
+    reconciliationStatementDialog.value?.open({
+        accountId: accountToShowReconciliationStatement.value.id,
+        startTime: minUnixTime,
+        endTime: maxUnixTime
+    });
+
+    accountToShowReconciliationStatement.value = null;
+}
+
+function onShowDateRangeError(message: string): void {
+    snackbar.value?.showError(message);
 }
 
 watch(() => display.mdAndUp.value, (newValue) => {

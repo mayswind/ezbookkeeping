@@ -22,6 +22,8 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
+const pageCountForAccountStatement = 1000
+
 // TransactionsApi represents transaction api
 type TransactionsApi struct {
 	ApiUsingConfig
@@ -284,6 +286,107 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.WebContext) (any, 
 	}
 
 	return transactionResps, nil
+}
+
+// TransactionReconciliationStatementHandler returns transaction reconciliation statement list of current user
+func (a *TransactionsApi) TransactionReconciliationStatementHandler(c *core.WebContext) (any, *errs.Error) {
+	var reconciliationStatementRequest models.TransactionReconciliationStatementRequest
+	err := c.ShouldBindQuery(&reconciliationStatementRequest)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionReconciliationStatementHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	utcOffset, err := c.GetClientTimezoneOffset()
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionReconciliationStatementHandler] cannot get client timezone offset, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Errorf(c, "[transactions.TransactionReconciliationStatementHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	account, err := a.accounts.GetAccountByAccountId(c, uid, reconciliationStatementRequest.AccountId)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionReconciliationStatementHandler] failed to get account \"id:%d\" for user \"uid:%d\", because %s", reconciliationStatementRequest.AccountId, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	if account.Type != models.ACCOUNT_TYPE_SINGLE_ACCOUNT {
+		log.Errorf(c, "[transactions.TransactionReconciliationStatementHandler] account \"id:%d\" for user \"uid:%d\" is not a single account", reconciliationStatementRequest.AccountId, uid)
+		return nil, errs.ErrAccountTypeInvalid
+	}
+
+	maxTransactionTime := int64(0)
+
+	if reconciliationStatementRequest.EndTime > 0 {
+		maxTransactionTime = utils.GetMaxTransactionTimeFromUnixTime(reconciliationStatementRequest.EndTime)
+	}
+
+	minTransactionTime := int64(0)
+
+	if reconciliationStatementRequest.StartTime > 0 {
+		minTransactionTime = utils.GetMinTransactionTimeFromUnixTime(reconciliationStatementRequest.StartTime)
+	}
+
+	transactionsWithAccountBalance, err := a.transactions.GetAllTransactionsWithAccountBalanceByMaxTime(c, uid, pageCountForAccountStatement, maxTransactionTime, minTransactionTime, reconciliationStatementRequest.AccountId)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionReconciliationStatementHandler] failed to get transactions from \"%d\" to \"%d\" for user \"uid:%d\", because %s", reconciliationStatementRequest.StartTime, reconciliationStatementRequest.EndTime, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	transactions := make([]*models.Transaction, len(transactionsWithAccountBalance))
+	transactionAccountBalanceMap := make(map[int64]*models.TransactionWithAccountBalance, len(transactionsWithAccountBalance))
+
+	for i := 0; i < len(transactionsWithAccountBalance); i++ {
+		transactionWithBalance := transactionsWithAccountBalance[i]
+		transactions[i] = transactionWithBalance.Transaction
+		transactionAccountBalanceMap[transactionWithBalance.TransactionId] = transactionWithBalance
+		transactionAccountBalanceMap[transactionWithBalance.RelatedId] = transactionWithBalance
+	}
+
+	transactionResult, err := a.getTransactionResponseListResult(c, user, transactions, utcOffset, false, true, true, true)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionReconciliationStatementHandler] failed to assemble transaction result for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	responseItems := make([]*models.TransactionReconciliationStatementResponseItem, len(transactionResult))
+
+	for i := 0; i < len(transactionResult); i++ {
+		transactionResult := transactionResult[i]
+		accountBalance := int64(0)
+
+		if transactionWithBalance, exists := transactionAccountBalanceMap[transactionResult.Id]; exists {
+			accountBalance = transactionWithBalance.AccountBalance
+		} else {
+			log.Warnf(c, "[transactions.TransactionReconciliationStatementHandler] missing account balance for transaction \"id:%d\" of user \"uid:%d\"", transactionResult.Id, uid)
+		}
+
+		responseItems[i] = &models.TransactionReconciliationStatementResponseItem{
+			TransactionInfoResponse: transactionResult,
+			AccountBalance:          accountBalance,
+		}
+	}
+
+	reconciliationStatementResp := &models.TransactionReconciliationStatementResponse{
+		Transactions: responseItems,
+	}
+
+	return reconciliationStatementResp, nil
 }
 
 // TransactionStatisticsHandler returns transaction statistics of current user

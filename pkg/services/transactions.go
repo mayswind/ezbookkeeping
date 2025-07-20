@@ -107,6 +107,72 @@ func (s *TransactionService) GetAllSpecifiedTransactions(c core.Context, uid int
 	return allTransactions, nil
 }
 
+// GetAllTransactionsWithAccountBalanceByMaxTime returns account statement within time range
+func (s *TransactionService) GetAllTransactionsWithAccountBalanceByMaxTime(c core.Context, uid int64, pageCount int32, maxTransactionTime int64, minTransactionTime int64, accountId int64) ([]*models.TransactionWithAccountBalance, error) {
+	if maxTransactionTime <= 0 {
+		maxTransactionTime = utils.GetMaxTransactionTimeFromUnixTime(time.Now().Unix())
+	}
+
+	var allTransactions []*models.Transaction
+
+	for maxTransactionTime > 0 {
+		transactions, err := s.GetTransactionsByMaxTime(c, uid, maxTransactionTime, 0, 0, nil, []int64{accountId}, nil, false, models.TRANSACTION_TAG_FILTER_HAS_ANY, "", "", 1, pageCount, false, true)
+
+		if err != nil {
+			return nil, err
+		}
+
+		allTransactions = append(allTransactions, transactions...)
+
+		if len(transactions) < int(pageCount) {
+			maxTransactionTime = 0
+			break
+		}
+
+		maxTransactionTime = transactions[len(transactions)-1].TransactionTime - 1
+	}
+
+	allTransactionsAndAccountBalance := make([]*models.TransactionWithAccountBalance, 0, len(allTransactions))
+
+	if len(allTransactions) < 1 {
+		return allTransactionsAndAccountBalance, nil
+	}
+
+	accumulatedBalance := int64(0)
+
+	for i := len(allTransactions) - 1; i >= 0; i-- {
+		transaction := allTransactions[i]
+
+		if transaction.Type == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+			accumulatedBalance = accumulatedBalance + transaction.RelatedAccountAmount
+		} else if transaction.Type == models.TRANSACTION_DB_TYPE_INCOME {
+			accumulatedBalance = accumulatedBalance + transaction.Amount
+		} else if transaction.Type == models.TRANSACTION_DB_TYPE_EXPENSE {
+			accumulatedBalance = accumulatedBalance - transaction.Amount
+		} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+			accumulatedBalance = accumulatedBalance - transaction.Amount
+		} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+			accumulatedBalance = accumulatedBalance + transaction.Amount
+		} else {
+			log.Errorf(c, "[transactions.GetAllTransactionsWithAccountBalanceByMaxTime] trasaction type (%d) is invalid (id:%d)", transaction.TransactionId, transaction.Type)
+			return nil, errs.ErrTransactionTypeInvalid
+		}
+
+		if transaction.TransactionTime < minTransactionTime {
+			continue
+		}
+
+		transactionsAndAccountBalance := &models.TransactionWithAccountBalance{
+			Transaction:    transaction,
+			AccountBalance: accumulatedBalance,
+		}
+
+		allTransactionsAndAccountBalance = append(allTransactionsAndAccountBalance, transactionsAndAccountBalance)
+	}
+
+	return allTransactionsAndAccountBalance, nil
+}
+
 // GetTransactionsByMaxTime returns transactions before given time
 func (s *TransactionService) GetTransactionsByMaxTime(c core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionType, categoryIds []int64, accountIds []int64, tagIds []int64, noTags bool, tagFilterType models.TransactionTagFilterType, amountFilter string, keyword string, page int32, count int32, needOneMoreItem bool, noDuplicated bool) ([]*models.Transaction, error) {
 	if uid <= 0 {

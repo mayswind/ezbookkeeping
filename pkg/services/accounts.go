@@ -56,6 +56,28 @@ func (s *AccountService) GetAllAccountsByUid(c core.Context, uid int64) ([]*mode
 	return accounts, err
 }
 
+// GetAccountByAccountId returns account model according to account id
+func (s *AccountService) GetAccountByAccountId(c core.Context, uid int64, accountId int64) (*models.Account, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	if accountId <= 0 {
+		return nil, errs.ErrAccountIdInvalid
+	}
+
+	account := &models.Account{}
+	has, err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=? AND account_id=?", uid, false, accountId).Get(account)
+
+	if err != nil {
+		return nil, err
+	} else if !has {
+		return nil, errs.ErrAccountNotFound
+	}
+
+	return account, err
+}
+
 // GetAccountAndSubAccountsByAccountId returns account model and sub-account models according to account id
 func (s *AccountService) GetAccountAndSubAccountsByAccountId(c core.Context, uid int64, accountId int64) ([]*models.Account, error) {
 	if uid <= 0 {

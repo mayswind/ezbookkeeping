@@ -1,0 +1,281 @@
+<template>
+    <v-dialog :min-height="loading ? 600 : 400" :persistent="loading" v-model="showState">
+        <v-card class="pa-6 pa-sm-10 pa-md-12">
+            <template #title>
+                <div class="d-flex align-center justify-center">
+                    <div class="d-flex w-100 align-center justify-center">
+                        <h4 class="text-h4">{{ tt('Reconciliation Statement') }}</h4>
+                        <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
+                    </div>
+                </div>
+            </template>
+            <template #subtitle>
+                <div class="text-body-1 text-center text-wrap mt-2">
+                    <span>{{ displayStartDateTime }}</span>
+                    <span> - </span>
+                    <span>{{ displayEndDateTime }}</span>
+                </div>
+            </template>
+
+            <v-data-table
+                fixed-header
+                fixed-footer
+                multi-sort
+                density="compact"
+                item-value="index"
+                :class="{ 'disabled': loading }"
+                :headers="dataTableHeaders"
+                :items="reconciliationStatements"
+                :no-data-text="loading ? '' : tt('No transaction data')"
+                v-model:items-per-page="countPerPage"
+                v-model:page="currentPage"
+            >
+                <template #item.time="{ item }">
+                    <span>{{ getDisplayDateTime(item) }}</span>
+                    <v-chip class="ml-1" variant="flat" color="secondary" size="x-small"
+                            v-if="item.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimezone(item) }}</v-chip>
+                </template>
+                <template #item.type="{ item }">
+                    <v-chip label color="secondary" variant="outlined" size="x-small" v-if="item.type === TransactionType.ModifyBalance">{{ tt('Modify Balance') }}</v-chip>
+                    <v-chip label class="text-income" variant="outlined" size="x-small" v-else-if="item.type === TransactionType.Income">{{ tt('Income') }}</v-chip>
+                    <v-chip label class="text-expense" variant="outlined" size="x-small" v-else-if="item.type === TransactionType.Expense">{{ tt('Expense') }}</v-chip>
+                    <v-chip label color="primary" variant="outlined" size="x-small" v-else-if="item.type === TransactionType.Transfer && item.destinationAccountId === accountId">{{ tt('Transfer In') }}</v-chip>
+                    <v-chip label color="primary" variant="outlined" size="x-small" v-else-if="item.type === TransactionType.Transfer && item.sourceAccountId === accountId">{{ tt('Transfer Out') }}</v-chip>
+                    <v-chip label color="primary" variant="outlined" size="x-small" v-else-if="item.type === TransactionType.Transfer">{{ tt('Transfer') }}</v-chip>
+                    <v-chip label color="default" variant="outlined" size="x-small" v-else>{{ tt('Unknown') }}</v-chip>
+                </template>
+                <template #item.categoryId="{ item }">
+                    <div class="d-flex align-center">
+                        <span v-if="item.type === TransactionType.ModifyBalance">-</span>
+                        <ItemIcon size="24px" icon-type="category"
+                                  :icon-id="allCategoriesMap[item.categoryId].icon"
+                                  :color="allCategoriesMap[item.categoryId].color"
+                                  v-if="item.type !== TransactionType.ModifyBalance && allCategoriesMap[item.categoryId]"></ItemIcon>
+                        <span class="ml-2" v-if="item.type !== TransactionType.ModifyBalance && allCategoriesMap[item.categoryId]">
+                            {{ allCategoriesMap[item.categoryId].name }}
+                        </span>
+                    </div>
+                </template>
+                <template #item.sourceAmount="{ item }">
+                    <span>{{ getDisplaySourceAmount(item) }}</span>
+                    <v-icon class="mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId && getDisplaySourceAmount(item) !== getDisplayDestinationAmount(item)"></v-icon>
+                    <span v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId && getDisplaySourceAmount(item) !== getDisplayDestinationAmount(item)">{{ getDisplayDestinationAmount(item) }}</span>
+                </template>
+                <template #item.sourceAccountId="{ item }">
+                    <div class="d-flex align-center">
+                        <span v-if="item.sourceAccountId && allAccountsMap[item.sourceAccountId]">{{ allAccountsMap[item.sourceAccountId].name }}</span>
+                        <v-icon class="mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
+                        <span v-if="item.type === TransactionType.Transfer && item.destinationAccountId && allAccountsMap[item.destinationAccountId]">{{ allAccountsMap[item.destinationAccountId].name }}</span>
+                    </div>
+                </template>
+                <template #item.accountBalance="{ item }">
+                    <span>{{ getDisplayAccountBalance(item) }}</span>
+                </template>
+                <template #bottom>
+                    <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2">
+                        <span class="ml-2">{{ tt('Total Inflows') }}</span>
+                        <span class="text-income" v-if="loading">
+                            <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                        </span>
+                        <span class="text-income ml-2" v-else-if="!loading">
+                            {{ displayTotalInflows }}
+                        </span>
+                        <span class="ml-3">{{ tt('Total Outflows') }}</span>
+                        <span class="text-expense" v-if="loading">
+                            <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                        </span>
+                        <span class="text-expense ml-2" v-else-if="!loading">
+                            {{ displayTotalOutflows }}
+                        </span>
+                        <v-spacer/>
+                        <span v-if="reconciliationStatements && reconciliationStatements.length > 10">
+                            {{ tt('Transactions Per Page') }}
+                        </span>
+                        <v-select class="ml-2" density="compact" max-width="100"
+                                  item-title="title"
+                                  item-value="value"
+                                  :disabled="loading"
+                                  :items="reconciliationStatementsTablePageOptions"
+                                  v-model="countPerPage"
+                                  v-if="reconciliationStatements && reconciliationStatements.length > 10"
+                        />
+                        <pagination-buttons density="compact"
+                                            :disabled="loading"
+                                            :totalPageCount="totalPageCount"
+                                            v-model="currentPage"
+                                            v-if="reconciliationStatements && reconciliationStatements.length > 10">
+                        </pagination-buttons>
+                    </div>
+                </template>
+            </v-data-table>
+
+            <v-card-text class="overflow-y-visible">
+                <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
+                    <v-btn color="secondary" variant="tonal"
+                           :disabled="loading" @click="close">{{ tt('Close') }}</v-btn>
+                </div>
+            </v-card-text>
+        </v-card>
+    </v-dialog>
+</template>
+
+<script setup lang="ts">
+import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
+
+import { ref, computed } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+import { useReconciliationStatementPageBase } from '@/views/base/transactions/ReconciliationStatementPageBase.ts';
+
+import { useAccountsStore } from '@/stores/account.ts';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
+import { useTransactionsStore } from '@/stores/transaction.ts';
+
+import { TransactionType } from '@/core/transaction.ts';
+
+import {
+    mdiArrowRight
+} from '@mdi/js';
+
+interface ReconciliationStatementDialogTablePageOption {
+    value: number;
+    title: string;
+}
+
+const emit = defineEmits<{
+    (e: 'error', message: string): void;
+}>();
+
+const { tt } = useI18n();
+
+const {
+    accountId,
+    startTime,
+    endTime,
+    reconciliationStatements,
+    currentTimezoneOffsetMinutes,
+    allAccountsMap,
+    allCategoriesMap,
+    displayStartDateTime,
+    displayEndDateTime,
+    displayTotalOutflows,
+    displayTotalInflows,
+    getDisplayDateTime,
+    getDisplayTimezone,
+    getDisplaySourceAmount,
+    getDisplayDestinationAmount,
+    getDisplayAccountBalance
+} = useReconciliationStatementPageBase();
+
+const accountsStore = useAccountsStore();
+const transactionCategoriesStore = useTransactionCategoriesStore();
+const transactionsStore = useTransactionsStore();
+
+const showState = ref<boolean>(false);
+const loading = ref<boolean>(false);
+const currentPage = ref<number>(1);
+const countPerPage = ref<number>(10);
+
+let rejectFunc: ((reason?: unknown) => void) | null = null;
+
+const account = computed(() => allAccountsMap.value[accountId.value]);
+const reconciliationStatementsTablePageOptions = computed<ReconciliationStatementDialogTablePageOption[]>(() => getTablePageOptions(reconciliationStatements.value?.length));
+
+const totalPageCount = computed<number>(() => {
+    if (!reconciliationStatements.value || reconciliationStatements.value.length < 1) {
+        return 1;
+    }
+
+    let count = 0;
+
+    for (let i = 0; i < reconciliationStatements.value.length; i++) {
+        count++;
+    }
+
+    return Math.ceil(count / countPerPage.value);
+});
+
+const dataTableHeaders = computed<object[]>(() => {
+    const headers: object[] = [];
+    const accountBalanceName = account.value?.isLiability ? 'Account Outstanding Balance' : 'Account Balance';
+
+    headers.push({ key: 'time', value: 'time', title: tt('Transaction Time'), sortable: true, nowrap: true });
+    headers.push({ key: 'type', value: 'type', title: tt('Type'), sortable: true, nowrap: true });
+    headers.push({ key: 'categoryId', value: 'categoryId', title: tt('Category'), sortable: true, nowrap: true });
+    headers.push({ key: 'sourceAmount', value: 'sourceAmount', title: tt('Amount'), sortable: true, nowrap: true });
+    headers.push({ key: 'sourceAccountId', value: 'sourceAccountId', title: tt('Account'), sortable: true, nowrap: true });
+    headers.push({ key: 'accountBalance', value: 'accountBalance', title: tt(accountBalanceName), sortable: true, nowrap: true });
+    headers.push({ key: 'comment', value: 'comment', title: tt('Description'), sortable: true, nowrap: true });
+    return headers;
+});
+
+function getTablePageOptions(linesCount?: number): ReconciliationStatementDialogTablePageOption[] {
+    const pageOptions: ReconciliationStatementDialogTablePageOption[] = [];
+
+    if (!linesCount || linesCount < 1) {
+        pageOptions.push({ value: -1, title: tt('All') });
+        return pageOptions;
+    }
+
+    const availableCountPerPage = [ 5, 10, 15, 20, 25, 30, 50 ];
+
+    for (let i = 0; i < availableCountPerPage.length; i++) {
+        const count = availableCountPerPage[i];
+
+        if (linesCount < count) {
+            break;
+        }
+
+        pageOptions.push({ value: count, title: count.toString() });
+    }
+
+    pageOptions.push({ value: -1, title: tt('All') });
+
+    return pageOptions;
+}
+
+function open(options: { accountId: string, startTime: number, endTime: number }): Promise<void> {
+    accountId.value = options.accountId;
+    startTime.value = options.startTime;
+    endTime.value = options.endTime;
+    reconciliationStatements.value = [];
+    currentPage.value = 1;
+    countPerPage.value = 10;
+    showState.value = true;
+    loading.value = true;
+
+    Promise.all([
+        accountsStore.loadAllAccounts({ force: false }),
+        transactionCategoriesStore.loadAllCategories({ force: false })
+    ]).then(() => {
+        return transactionsStore.getReconciliationStatements({
+            accountId: options.accountId,
+            startTime: options.startTime,
+            endTime: options.endTime
+        });
+    }).then(result => {
+        reconciliationStatements.value = result.transactions;
+        loading.value = false;
+    }).catch(error => {
+        loading.value = false;
+
+        if (!error.processed) {
+            emit('error', error);
+            showState.value = false;
+        }
+    })
+
+    return new Promise<void>((resolve, reject) => {
+        rejectFunc = reject;
+    });
+}
+
+function close(): void {
+    rejectFunc?.();
+    showState.value = false;
+}
+
+defineExpose({
+    open
+});
+</script>

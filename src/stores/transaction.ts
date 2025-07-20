@@ -19,6 +19,7 @@ import {
     type TransactionCreateRequest,
     type TransactionInfoResponse,
     type TransactionPageWrapper,
+    type TransactionReconciliationStatementResponse,
     Transaction,
     EMPTY_TRANSACTION_RESULT
 } from '@/models/transaction.ts';
@@ -961,6 +962,35 @@ export const useTransactionsStore = defineStore('transactions', () => {
         });
     }
 
+    function getReconciliationStatements({ accountId, startTime, endTime }: { accountId: string, startTime: number, endTime: number }): Promise<TransactionReconciliationStatementResponse> {
+        return new Promise((resolve, reject) => {
+            services.getReconciliationStatements({
+                accountId: accountId,
+                startTime: startTime,
+                endTime: endTime
+            }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to retrieve reconciliation statements' });
+                    return;
+                }
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to load reconciliation statements', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to retrieve reconciliation statements' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
     function getTransaction({ transactionId, withPictures }: { transactionId: string, withPictures?: boolean }): Promise<Transaction> {
         return new Promise((resolve, reject) => {
             if (!isDefined(withPictures)) {
@@ -1328,6 +1358,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         getExportTransactionDataRequestByTransactionFilter,
         loadTransactions,
         loadMonthlyAllTransactions,
+        getReconciliationStatements,
         getTransaction,
         saveTransaction,
         deleteTransaction,

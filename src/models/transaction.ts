@@ -518,6 +518,12 @@ export interface TransactionListInMonthByPageRequest {
     readonly keyword: string;
 }
 
+export interface TransactionReconciliationStatementRequest {
+    readonly accountId: string;
+    readonly startTime: number;
+    readonly endTime: number;
+}
+
 export type TransactionGeoLocationResponse = Coordinate;
 
 export interface TransactionInfoResponse {
@@ -653,6 +659,14 @@ export interface TransactionInfoPageWrapperResponse {
 export interface TransactionInfoPageWrapperResponse2 {
     readonly items: TransactionInfoResponse[];
     readonly totalCount: number;
+}
+
+export interface TransactionReconciliationStatementResponseItem extends TransactionInfoResponse {
+    readonly accountBalance: number;
+}
+
+export interface TransactionReconciliationStatementResponse {
+    readonly transactions: TransactionReconciliationStatementResponseItem[];
 }
 
 export interface TransactionPageWrapper {

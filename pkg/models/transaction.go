@@ -120,6 +120,12 @@ type Transaction struct {
 	DeletedUnixTime      int64
 }
 
+// TransactionWithAccountBalance represents a transaction item with account balance
+type TransactionWithAccountBalance struct {
+	*Transaction
+	AccountBalance int64
+}
+
 // TransactionGeoLocationRequest represents all parameters of transaction geographic location info update request
 type TransactionGeoLocationRequest struct {
 	Latitude  float64 `json:"latitude" binding:"required"`
@@ -222,6 +228,13 @@ type TransactionListInMonthByPageRequest struct {
 	TrimTag       bool                     `form:"trim_tag"`
 }
 
+// TransactionReconciliationStatementRequest represents all parameters of transaction reconciliation statement request
+type TransactionReconciliationStatementRequest struct {
+	AccountId int64 `form:"account_id,string" binding:"required,min=1"`
+	StartTime int64 `form:"start_time"`
+	EndTime   int64 `form:"end_time"`
+}
+
 // TransactionStatisticRequest represents all parameters of transaction statistic request
 type TransactionStatisticRequest struct {
 	StartTime              int64                    `form:"start_time" binding:"min=0"`
@@ -320,6 +333,17 @@ type TransactionInfoPageWrapperResponse struct {
 type TransactionInfoPageWrapperResponse2 struct {
 	Items      TransactionInfoResponseSlice `json:"items"`
 	TotalCount int64                        `json:"totalCount"`
+}
+
+// TransactionReconciliationStatementResponseItem represents a transaction reconciliation statement response
+type TransactionReconciliationStatementResponseItem struct {
+	*TransactionInfoResponse
+	AccountBalance int64 `json:"accountBalance"`
+}
+
+// TransactionReconciliationStatementResponse represents the response of all transaction reconciliation statement response
+type TransactionReconciliationStatementResponse struct {
+	Transactions []*TransactionReconciliationStatementResponseItem `json:"transactions"`
 }
 
 // TransactionStatisticResponse represents transaction statistic response

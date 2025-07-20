@@ -923,8 +923,8 @@ export function getFullMonthDateRange(minTime: number, maxTime: number, firstDay
 export function getCombinedDateAndTimeValues(date: Date, hour: string, minute: string, second: string, meridiemIndicator: string, is24Hour: boolean): Date {
     const newDateTime = new Date(date.valueOf());
     let hours = parseInt(hour);
-    let minutes = parseInt(minute);
-    let seconds = parseInt(second);
+    const minutes = parseInt(minute);
+    const seconds = parseInt(second);
 
     if (!is24Hour) {
         if (hours === 12) {

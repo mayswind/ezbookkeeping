@@ -2,14 +2,13 @@ import { useI18n as useVueI18n } from 'vue-i18n';
 import moment from 'moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
-import type { PartialRecord, TypeAndName, TypeAndDisplayName, LocalizedSwitchOption } from '@/core/base.ts';
+import type { PartialRecord, NameValue, TypeAndName, TypeAndDisplayName, LocalizedSwitchOption } from '@/core/base.ts';
 
 import { type LanguageInfo, type LanguageOption, ALL_LANGUAGES, DEFAULT_LANGUAGE } from '@/locales/index.ts';
 
 import {
     type DateFormat,
     type TimeFormat,
-    type LocalizedMeridiemIndicator,
     type LocalizedDateTimeFormat,
     type LocalizedDateRange,
     type LocalizedRecentMonthDateRange,
@@ -756,22 +755,20 @@ export function useI18n() {
         return allCurrencies;
     }
 
-    function getAllMeridiemIndicators(): LocalizedMeridiemIndicator {
+    function getAllMeridiemIndicators(): NameValue[] {
         const allMeridiemIndicators = MeridiemIndicator.values();
-        const meridiemIndicatorNames = [];
         const localizedMeridiemIndicatorNames = [];
 
         for (let i = 0; i < allMeridiemIndicators.length; i++) {
             const indicator = allMeridiemIndicators[i];
 
-            meridiemIndicatorNames.push(indicator.name);
-            localizedMeridiemIndicatorNames.push(t(`datetime.${indicator.name}.content`));
+            localizedMeridiemIndicatorNames.push({
+                name: t(`datetime.${indicator.name}.content`),
+                value: indicator.name
+            });
         }
 
-        return {
-            values: meridiemIndicatorNames,
-            displayValues: localizedMeridiemIndicatorNames
-        };
+        return localizedMeridiemIndicatorNames;
     }
 
     function getAllLongMonthNames(): string[] {

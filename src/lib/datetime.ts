@@ -920,47 +920,13 @@ export function getFullMonthDateRange(minTime: number, maxTime: number, firstDay
     return dateRange;
 }
 
-export function getTimeValues(date: Date, is24Hour: boolean, isMeridiemIndicatorFirst: boolean): string[] {
-    const hourMinuteSeconds = [
-        getTwoDigitsString(is24Hour ? date.getHours() : getHourIn12HourFormat(date.getHours())),
-        getTwoDigitsString(date.getMinutes()),
-        getTwoDigitsString(date.getSeconds())
-    ];
-
-    if (is24Hour) {
-        return hourMinuteSeconds;
-    } else if (/*!is24Hour && */isMeridiemIndicatorFirst) {
-        return [getAMOrPM(date.getHours())].concat(hourMinuteSeconds);
-    } else /* !is24Hour && !isMeridiemIndicatorFirst */ {
-        return hourMinuteSeconds.concat([getAMOrPM(date.getHours())]);
-    }
-}
-
-export function getCombinedDateAndTimeValues(date: Date, timeValues: string[], is24Hour: boolean, isMeridiemIndicatorFirst: boolean): Date {
+export function getCombinedDateAndTimeValues(date: Date, hour: string, minute: string, second: string, meridiemIndicator: string, is24Hour: boolean): Date {
     const newDateTime = new Date(date.valueOf());
-    let hours = 0;
-    let minutes = 0;
-    let seconds = 0;
+    let hours = parseInt(hour);
+    let minutes = parseInt(minute);
+    let seconds = parseInt(second);
 
-    if (is24Hour) {
-        hours = parseInt(timeValues[0]);
-        minutes = parseInt(timeValues[1]);
-        seconds = parseInt(timeValues[2]);
-    } else {
-        let meridiemIndicator;
-
-        if (/*!is24Hour && */isMeridiemIndicatorFirst) {
-            meridiemIndicator = timeValues[0];
-            hours = parseInt(timeValues[1]);
-            minutes = parseInt(timeValues[2]);
-            seconds = parseInt(timeValues[3]);
-        } else /* !is24Hour && !isMeridiemIndicatorFirst */ {
-            hours = parseInt(timeValues[0]);
-            minutes = parseInt(timeValues[1]);
-            seconds = parseInt(timeValues[2]);
-            meridiemIndicator = timeValues[3];
-        }
-
+    if (!is24Hour) {
         if (hours === 12) {
             hours = 0;
         }

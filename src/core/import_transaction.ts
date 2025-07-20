@@ -228,7 +228,7 @@ export class ImportTransactionDataMapping {
     }
 
     public parseFileAutoDetectedAmountFormat(fileData: string[][] | undefined): string | undefined {
-        if (!fileData || !fileData.length || !this.isColumnMappingSet(ImportTransactionColumnType.TransactionTimezone)) {
+        if (!fileData || !fileData.length || !this.isColumnMappingSet(ImportTransactionColumnType.Amount)) {
             return undefined;
         }
 

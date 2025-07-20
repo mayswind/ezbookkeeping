@@ -218,10 +218,6 @@ interface AccountEditResponse {
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 
-defineProps<{
-    show?: boolean;
-}>();
-
 const { tt } = useI18n();
 const {
     editAccountId,

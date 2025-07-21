@@ -9,13 +9,60 @@
                     </div>
                 </div>
             </template>
+
             <template #subtitle>
-                <div class="text-body-1 text-center text-wrap mt-2">
+                <div class="text-body-1 text-center text-wrap mt-2" v-if="!startTime && !endTime">
+                    <span>{{ tt('All') }}</span>
+                </div>
+                <div class="text-body-1 text-center text-wrap mt-2" v-if="startTime || endTime">
                     <span>{{ displayStartDateTime }}</span>
                     <span> - </span>
                     <span>{{ displayEndDateTime }}</span>
                 </div>
             </template>
+
+            <div class="d-flex align-center" :class="{'mb-4': !loading}">
+                <div class="d-flex align-center text-body-1">
+                    <span class="ml-2">{{ tt('Opening Balance') }}</span>
+                    <span class="text-primary" v-if="loading">
+                        <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                    </span>
+                    <span class="text-primary ml-2" v-else-if="!loading">
+                        {{ displayOpeningBalance }}
+                    </span>
+                    <span class="ml-3">{{ tt('Closing Balance') }}</span>
+                    <span class="text-primary" v-if="loading">
+                        <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                    </span>
+                    <span class="text-primary ml-2" v-else-if="!loading">
+                        {{ displayClosingBalance }}
+                    </span>
+                </div>
+                <v-spacer/>
+                <div class="d-flex align-center text-body-1">
+                    <span class="ml-2">{{ tt('Total Inflows') }}</span>
+                    <span class="text-income" v-if="loading">
+                        <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                    </span>
+                    <span class="text-income ml-2" v-else-if="!loading">
+                        {{ displayTotalInflows }}
+                    </span>
+                    <span class="ml-3">{{ tt('Total Outflows') }}</span>
+                    <span class="text-expense" v-if="loading">
+                        <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                    </span>
+                    <span class="text-expense ml-2" v-else-if="!loading">
+                        {{ displayTotalOutflows }}
+                    </span>
+                    <span class="ml-3">{{ tt('Total Balance') }}</span>
+                    <span class="text-primary" v-if="loading">
+                        <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                    </span>
+                    <span class="text-primary ml-2" v-else-if="!loading">
+                        {{ displayTotalBalance }}
+                    </span>
+                </div>
+            </div>
 
             <v-data-table
                 fixed-header
@@ -72,20 +119,13 @@
                     <span>{{ getDisplayAccountBalance(item) }}</span>
                 </template>
                 <template #bottom>
-                    <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2">
-                        <span class="ml-2">{{ tt('Total Inflows') }}</span>
-                        <span class="text-income" v-if="loading">
+                    <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2" v-if="loading || reconciliationStatements.length">
+                        <span class="ml-2">{{ tt('Total Transactions') }}</span>
+                        <span v-if="loading">
                             <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                         </span>
-                        <span class="text-income ml-2" v-else-if="!loading">
-                            {{ displayTotalInflows }}
-                        </span>
-                        <span class="ml-3">{{ tt('Total Outflows') }}</span>
-                        <span class="text-expense" v-if="loading">
-                            <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
-                        </span>
-                        <span class="text-expense ml-2" v-else-if="!loading">
-                            {{ displayTotalOutflows }}
+                        <span class="ml-2" v-else-if="!loading">
+                            {{ reconciliationStatements.length }}
                         </span>
                         <v-spacer/>
                         <span v-if="reconciliationStatements && reconciliationStatements.length > 10">
@@ -153,6 +193,8 @@ const {
     startTime,
     endTime,
     reconciliationStatements,
+    openingBalance,
+    closingBalance,
     currentTimezoneOffsetMinutes,
     allAccountsMap,
     allCategoriesMap,
@@ -160,6 +202,9 @@ const {
     displayEndDateTime,
     displayTotalOutflows,
     displayTotalInflows,
+    displayTotalBalance,
+    displayOpeningBalance,
+    displayClosingBalance,
     getDisplayDateTime,
     getDisplayTimezone,
     getDisplaySourceAmount,
@@ -255,6 +300,8 @@ function open(options: { accountId: string, startTime: number, endTime: number }
         });
     }).then(result => {
         reconciliationStatements.value = result.transactions;
+        openingBalance.value = result.openingBalance;
+        closingBalance.value = result.closingBalance;
         loading.value = false;
     }).catch(error => {
         loading.value = false;

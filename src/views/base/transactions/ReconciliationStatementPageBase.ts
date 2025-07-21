@@ -34,6 +34,8 @@ export function useReconciliationStatementPageBase() {
     const startTime = ref<number>(0);
     const endTime = ref<number>(0);
     const reconciliationStatements = ref<TransactionReconciliationStatementResponseItem[]>([]);
+    const openingBalance = ref<number>(0);
+    const closingBalance = ref<number>(0);
 
     const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
@@ -41,15 +43,17 @@ export function useReconciliationStatementPageBase() {
     const allAccountsMap = computed<Record<string, Account>>(() => accountsStore.allAccountsMap);
     const allCategoriesMap = computed<Record<string, TransactionCategory>>(() => transactionCategoriesStore.allTransactionCategoriesMap);
 
-    const displayStartDateTime = computed<string>(() => {
-        return formatUnixTimeToLongDateTime(startTime.value);
+    const accountCurrency = computed<string>(() => {
+        let currency = defaultCurrency.value;
+
+        if (allAccountsMap.value[accountId.value]) {
+            currency = allAccountsMap.value[accountId.value].currency;
+        }
+
+        return currency;
     });
 
-    const displayEndDateTime = computed<string>(() => {
-        return formatUnixTimeToLongDateTime(endTime.value);
-    });
-
-    const displayTotalOutflows = computed<string>(() => {
+    const totalOutflows = computed<number>(() => {
         let totalOutflows = 0;
 
         for (let i = 0; i < reconciliationStatements.value.length; i++) {
@@ -62,16 +66,10 @@ export function useReconciliationStatementPageBase() {
             }
         }
 
-        let currency = defaultCurrency.value;
-
-        if (allAccountsMap.value[accountId.value]) {
-            currency = allAccountsMap.value[accountId.value].currency;
-        }
-
-        return formatAmountWithCurrency(totalOutflows, currency);
+        return totalOutflows;
     });
 
-    const displayTotalInflows = computed<string>(() => {
+    const totalInflows = computed<number>(() => {
         let totalInflows = 0;
 
         for (let i = 0; i < reconciliationStatements.value.length; i++) {
@@ -84,13 +82,55 @@ export function useReconciliationStatementPageBase() {
             }
         }
 
-        let currency = defaultCurrency.value;
+        return totalInflows;
+    });
+
+    const displayStartDateTime = computed<string>(() => {
+        return formatUnixTimeToLongDateTime(startTime.value);
+    });
+
+    const displayEndDateTime = computed<string>(() => {
+        return formatUnixTimeToLongDateTime(endTime.value);
+    });
+
+    const displayTotalOutflows = computed<string>(() => {
+        return formatAmountWithCurrency(totalOutflows.value, accountCurrency.value);
+    });
+
+    const displayTotalInflows = computed<string>(() => {
+        return formatAmountWithCurrency(totalInflows.value, accountCurrency.value);
+    });
+
+    const displayTotalBalance = computed<string>(() => {
+        return formatAmountWithCurrency(totalInflows.value - totalOutflows.value, accountCurrency.value);
+    });
+
+    const displayOpeningBalance = computed<string>(() => {
+        let isLiabilityAccount = false;
 
         if (allAccountsMap.value[accountId.value]) {
-            currency = allAccountsMap.value[accountId.value].currency;
+            isLiabilityAccount = allAccountsMap.value[accountId.value].isLiability;
         }
 
-        return formatAmountWithCurrency(totalInflows, currency);
+        if (isLiabilityAccount) {
+            return formatAmountWithCurrency(-openingBalance.value, accountCurrency.value);
+        } else {
+            return formatAmountWithCurrency(openingBalance.value, accountCurrency.value);
+        }
+    });
+
+    const displayClosingBalance = computed<string>(() => {
+        let isLiabilityAccount = false;
+
+        if (allAccountsMap.value[accountId.value]) {
+            isLiabilityAccount = allAccountsMap.value[accountId.value].isLiability;
+        }
+
+        if (isLiabilityAccount) {
+            return formatAmountWithCurrency(-closingBalance.value, accountCurrency.value);
+        } else {
+            return formatAmountWithCurrency(closingBalance.value, accountCurrency.value);
+        }
     });
 
     function getDisplayDateTime(transaction: TransactionReconciliationStatementResponseItem): string {
@@ -149,6 +189,8 @@ export function useReconciliationStatementPageBase() {
         startTime,
         endTime,
         reconciliationStatements,
+        openingBalance,
+        closingBalance,
         // computed states
         currentTimezoneOffsetMinutes,
         defaultCurrency,
@@ -158,6 +200,9 @@ export function useReconciliationStatementPageBase() {
         displayEndDateTime,
         displayTotalOutflows,
         displayTotalInflows,
+        displayTotalBalance,
+        displayOpeningBalance,
+        displayClosingBalance,
         // functions
         getDisplayDateTime,
         getDisplayTimezone,

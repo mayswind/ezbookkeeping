@@ -667,6 +667,8 @@ export interface TransactionReconciliationStatementResponseItem extends Transact
 
 export interface TransactionReconciliationStatementResponse {
     readonly transactions: TransactionReconciliationStatementResponseItem[];
+    readonly openingBalance: number;
+    readonly closingBalance: number;
 }
 
 export interface TransactionPageWrapper {

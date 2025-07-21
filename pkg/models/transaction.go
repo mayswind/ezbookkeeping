@@ -343,7 +343,9 @@ type TransactionReconciliationStatementResponseItem struct {
 
 // TransactionReconciliationStatementResponse represents the response of all transaction reconciliation statement response
 type TransactionReconciliationStatementResponse struct {
-	Transactions []*TransactionReconciliationStatementResponseItem `json:"transactions"`
+	Transactions   []*TransactionReconciliationStatementResponseItem `json:"transactions"`
+	OpeningBalance int64                                             `json:"openingBalance"`
+	ClosingBalance int64                                             `json:"closingBalance"`
 }
 
 // TransactionStatisticResponse represents transaction statistic response

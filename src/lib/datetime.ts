@@ -85,14 +85,6 @@ export function getYearMonthStringFromYear0BasedMonthObject(yearMonth: Year0Base
     return `${yearMonth.year}-${yearMonth.month0base + 1}`;
 }
 
-export function getTwoDigitsString(value: number): string {
-    if (value < 10) {
-        return '0' + value;
-    } else {
-        return value.toString();
-    }
-}
-
 export function getHourIn12HourFormat(hour: number): number {
     hour = hour % 12;
 

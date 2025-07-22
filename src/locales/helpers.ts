@@ -1451,6 +1451,19 @@ export function useI18n() {
         return getLocalizedDateTimeType(ShortTimeFormat.all(), ShortTimeFormat.values(), userStore.currentUserShortTimeFormat, 'shortTimeFormat', ShortTimeFormat.Default).isMeridiemIndicatorFirst || false;
     }
 
+    function isLongTimeHourTwoDigits(): boolean {
+        const longTimeFormat = getLocalizedLongTimeFormat();
+        return longTimeFormat.indexOf('HH') >= 0 || longTimeFormat.indexOf('hh') >= 0;
+    }
+
+    function isLongTimeMinuteTwoDigits(): boolean {
+        return getLocalizedLongTimeFormat().indexOf('mm') >= 0;
+    }
+
+    function isLongTimeSecondTwoDigits(): boolean {
+        return getLocalizedLongTimeFormat().indexOf('ss') >= 0;
+    }
+
     function formatDateToLongDate(date: string): string {
         return formatDate(date, getLocalizedLongDateFormat());
     }
@@ -1928,6 +1941,9 @@ export function useI18n() {
         isLongTimeMeridiemIndicatorFirst,
         isShortTime24HourFormat,
         isShortTimeMeridiemIndicatorFirst,
+        isLongTimeHourTwoDigits,
+        isLongTimeMinuteTwoDigits,
+        isLongTimeSecondTwoDigits,
         // format functions
         formatUnixTimeToLongDateTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongDateFormat() + ' ' + getLocalizedLongTimeFormat(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortDateTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDateFormat() + ' ' + getLocalizedShortTimeFormat(), utcOffset, currentUtcOffset),

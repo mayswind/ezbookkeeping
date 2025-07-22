@@ -54,7 +54,7 @@
                     <span class="text-expense ml-2" v-else-if="!loading">
                         {{ displayTotalOutflows }}
                     </span>
-                    <span class="ml-3">{{ tt('Total Balance') }}</span>
+                    <span class="ml-3">{{ tt('Net Cash Flow') }}</span>
                     <span class="text-primary" v-if="loading">
                         <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                     </span>

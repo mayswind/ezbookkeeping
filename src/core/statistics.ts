@@ -66,7 +66,7 @@ export class ChartDataType implements TypeAndName {
     public static readonly AccountTotalLiabilities = new ChartDataType(7, 'Account Total Liabilities', StatisticsAnalysisType.CategoricalAnalysis);
     public static readonly TotalExpense = new ChartDataType(8, 'Total Expense', StatisticsAnalysisType.TrendAnalysis);
     public static readonly TotalIncome = new ChartDataType(9, 'Total Income', StatisticsAnalysisType.TrendAnalysis);
-    public static readonly TotalBalance = new ChartDataType(10, 'Total Balance', StatisticsAnalysisType.TrendAnalysis);
+    public static readonly TotalBalance = new ChartDataType(10, 'Net Income', StatisticsAnalysisType.TrendAnalysis);
 
     public static readonly Default = ChartDataType.ExpenseByPrimaryCategory;
 

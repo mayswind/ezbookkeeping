@@ -1,5 +1,5 @@
 <template>
-    <v-dialog :min-height="loading ? 600 : 400" :persistent="loading" v-model="showState">
+    <v-dialog :min-height="400" :persistent="loading" v-model="showState">
         <v-card class="pa-6 pa-sm-10 pa-md-12">
             <template #title>
                 <div class="d-flex align-center justify-center">
@@ -7,6 +7,17 @@
                         <h4 class="text-h4">{{ tt('Reconciliation Statement') }}</h4>
                         <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
                     </div>
+                    <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                           :icon="true" :disabled="loading">
+                        <v-icon :icon="mdiDotsVertical" />
+                        <v-menu activator="parent">
+                            <v-list>
+                                <v-list-item :prepend-icon="mdiReceiptTextPlusOutline"
+                                             :title="tt('Add Transaction')"
+                                             @click="addTransaction()"></v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </v-btn>
                 </div>
             </template>
 
@@ -118,6 +129,12 @@
                 <template #item.accountBalance="{ item }">
                     <span>{{ getDisplayAccountBalance(item) }}</span>
                 </template>
+                <template #item.operation="{ item }">
+                    <v-btn density="compact" variant="text" color="default" :disabled="loading"
+                           @click="showTransaction(item)">
+                        {{ tt('View') }}
+                    </v-btn>
+                </template>
                 <template #bottom>
                     <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2" v-if="loading || reconciliationStatements.length">
                         <span class="ml-2">{{ tt('Total Transactions') }}</span>
@@ -157,12 +174,19 @@
             </v-card-text>
         </v-card>
     </v-dialog>
+
+    <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
+
+    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
+import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
+import { TransactionEditPageType } from '@/views/base/transactions/TransactionEditPageBase.ts';
 
-import { ref, computed } from 'vue';
+import { ref, computed, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useReconciliationStatementPageBase } from '@/views/base/transactions/ReconciliationStatementPageBase.ts';
@@ -172,10 +196,16 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 
 import { TransactionType } from '@/core/transaction.ts';
+import { Transaction, type TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
 
 import {
-    mdiArrowRight
+    mdiArrowRight,
+    mdiDotsVertical,
+    mdiReceiptTextPlusOutline
 } from '@mdi/js';
+
+type SnackBarType = InstanceType<typeof SnackBar>;
+type EditDialogType = InstanceType<typeof EditDialog>;
 
 interface ReconciliationStatementDialogTablePageOption {
     value: number;
@@ -216,6 +246,9 @@ const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionsStore = useTransactionsStore();
 
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const editDialog = useTemplateRef<EditDialogType>('editDialog');
+
 const showState = ref<boolean>(false);
 const loading = ref<boolean>(false);
 const currentPage = ref<number>(1);
@@ -251,6 +284,7 @@ const dataTableHeaders = computed<object[]>(() => {
     headers.push({ key: 'sourceAccountId', value: 'sourceAccountId', title: tt('Account'), sortable: true, nowrap: true });
     headers.push({ key: 'accountBalance', value: 'accountBalance', title: tt(accountBalanceName), sortable: true, nowrap: true });
     headers.push({ key: 'comment', value: 'comment', title: tt('Description'), sortable: true, nowrap: true });
+    headers.push({ key: 'operation', title: tt('Operation'), sortable: false, nowrap: true, align: 'end' });
     return headers;
 });
 
@@ -310,10 +344,68 @@ function open(options: { accountId: string, startTime: number, endTime: number }
             emit('error', error);
             showState.value = false;
         }
-    })
+    });
 
     return new Promise<void>((resolve, reject) => {
         rejectFunc = reject;
+    });
+}
+
+function reload(): void {
+    loading.value = true;
+
+    transactionsStore.getReconciliationStatements({
+        accountId: accountId.value,
+        startTime: startTime.value,
+        endTime: endTime.value
+    }).then(result => {
+        reconciliationStatements.value = result.transactions;
+        openingBalance.value = result.openingBalance;
+        closingBalance.value = result.closingBalance;
+        loading.value = false;
+    }).catch(error => {
+        loading.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    })
+}
+
+function addTransaction(): void {
+    editDialog.value?.open({
+        accountId: accountId.value
+    }).then(result => {
+        if (result && result.message) {
+            snackbar.value?.showMessage(result.message);
+        }
+
+        reload();
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function showTransaction(transaction: TransactionReconciliationStatementResponseItem): void {
+    if (transaction.type === TransactionType.ModifyBalance) {
+        return;
+    }
+
+    editDialog.value?.open({
+        id: transaction.id,
+        currentTransaction: Transaction.of(transaction)
+    }).then(result => {
+        if (result && result.message) {
+            snackbar.value?.showMessage(result.message);
+        }
+
+        reload();
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
     });
 }
 

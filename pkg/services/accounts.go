@@ -849,7 +849,7 @@ func (s *AccountService) GetAccountNames(accounts []*models.Account) []string {
 }
 
 // GetAccountOrSubAccountIds returns a list of account ids or sub-account ids according to given account ids
-func (s *AccountService) GetAccountOrSubAccountIds(c *core.WebContext, accountIds string, uid int64) ([]int64, error) {
+func (s *AccountService) GetAccountOrSubAccountIds(c core.Context, accountIds string, uid int64) ([]int64, error) {
 	if accountIds == "" || accountIds == "0" {
 		return nil, nil
 	}

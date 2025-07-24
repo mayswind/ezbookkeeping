@@ -543,7 +543,7 @@ func (s *TransactionCategoryService) GetCategoryNames(categories []*models.Trans
 }
 
 // GetCategoryOrSubCategoryIds returns all category ids and sub-category ids according to given category ids
-func (s *TransactionCategoryService) GetCategoryOrSubCategoryIds(c *core.WebContext, categoryIds string, uid int64) ([]int64, error) {
+func (s *TransactionCategoryService) GetCategoryOrSubCategoryIds(c core.Context, categoryIds string, uid int64) ([]int64, error) {
 	if categoryIds == "" || categoryIds == "0" {
 		return nil, nil
 	}

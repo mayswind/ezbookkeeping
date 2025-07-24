@@ -20,8 +20,6 @@ const (
 	TOKEN_SOURCE_TYPE_COOKIE   TokenSourceType = 3
 )
 
-const tokenQueryStringParam = "token"
-
 // JWTAuthorization verifies whether current request is valid by jwt token in header
 func JWTAuthorization(c *core.WebContext) {
 	jwtAuthorization(c, TOKEN_SOURCE_TYPE_HEADER)
@@ -159,11 +157,19 @@ func getTokenClaims(c *core.WebContext, source TokenSourceType) (*core.UserToken
 }
 
 func parseToken(c *core.WebContext, source TokenSourceType) (*jwt.Token, *core.UserTokenClaims, error) {
+	tokenString := ""
+
 	if source == TOKEN_SOURCE_TYPE_ARGUMENT {
-		return services.Tokens.ParseTokenByArgument(c, tokenQueryStringParam)
+		tokenString = c.GetTokenStringFromQueryString()
 	} else if source == TOKEN_SOURCE_TYPE_COOKIE {
-		return services.Tokens.ParseTokenByCookie(c, tokenCookieParam)
+		tokenString = c.GetTokenStringFromCookie()
+	} else { // if source == TOKEN_SOURCE_TYPE_HEADER
+		tokenString = c.GetTokenStringFromHeader()
 	}
 
-	return services.Tokens.ParseTokenByHeader(c)
+	if tokenString == "" {
+		return nil, nil, errs.ErrTokenIsEmpty
+	}
+
+	return services.Tokens.ParseToken(c, tokenString)
 }

@@ -130,7 +130,13 @@ func (a *TokensApi) TokenGenerateMCPHandler(c *core.WebContext) (any, *errs.Erro
 
 // TokenRevokeCurrentHandler revokes current token of current user
 func (a *TokensApi) TokenRevokeCurrentHandler(c *core.WebContext) (any, *errs.Error) {
-	_, claims, err := a.tokens.ParseTokenByHeader(c)
+	tokenString := c.GetTokenStringFromHeader()
+
+	if tokenString == "" {
+		return false, errs.ErrTokenIsEmpty
+	}
+
+	_, claims, err := a.tokens.ParseToken(c, tokenString)
 
 	if err != nil {
 		return nil, errs.Or(err, errs.NewIncompleteOrIncorrectSubmissionError(err))

@@ -3,6 +3,7 @@ package core
 import (
 	"net"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -22,6 +23,11 @@ const RemoteClientPortHeader = "X-Real-Port"
 
 // ClientTimezoneOffsetHeaderName represents the header name of client timezone offset
 const ClientTimezoneOffsetHeaderName = "X-Timezone-Offset"
+
+const tokenHeaderName = "Authorization"
+const tokenHeaderValuePrefix = "bearer "
+const tokenQueryStringParam = "token"
+const tokenCookieParam = "ebk_auth_token"
 
 // WebContext represents the request and response context
 type WebContext struct {
@@ -116,6 +122,41 @@ func (c *WebContext) GetCurrentUid() int64 {
 	}
 
 	return claims.Uid
+}
+
+// GetTokenStringFromHeader returns the token string from the request header
+func (c *WebContext) GetTokenStringFromHeader() string {
+	tokenHeader := c.GetHeader(tokenHeaderName)
+
+	if len(tokenHeader) < 7 || !strings.EqualFold(tokenHeader[:7], tokenHeaderValuePrefix) {
+		return ""
+	}
+
+	return tokenHeader[7:]
+}
+
+// GetTokenStringFromQueryString returns the token string from the request query string
+func (c *WebContext) GetTokenStringFromQueryString() string {
+	return c.Query(tokenQueryStringParam)
+}
+
+// GetTokenStringFromCookie returns the token string from the request cookie
+func (c *WebContext) GetTokenStringFromCookie() string {
+	tokenCookie, err := c.Cookie(tokenCookieParam)
+
+	if err != nil {
+		return ""
+	}
+
+	return tokenCookie
+}
+
+func (c *WebContext) SetTokenStringToCookie(token string, tokenExpiredTime int, path string) {
+	if token != "" {
+		c.SetCookie(tokenCookieParam, token, tokenExpiredTime, path, "", false, true)
+	} else {
+		c.SetCookie(tokenCookieParam, "", -1, path, "", false, true)
+	}
 }
 
 // GetClientLocale returns the client locale name

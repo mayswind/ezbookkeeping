@@ -269,6 +269,19 @@ var UserData = &cli.Command{
 			},
 		},
 		{
+			Name:   "user-session-revoke",
+			Usage:  "Revoke the specified user session",
+			Action: bindAction(revokeUserToken),
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "token",
+					Aliases:  []string{"t"},
+					Required: false,
+					Usage:    "Specific token content",
+				},
+			},
+		},
+		{
 			Name:   "user-session-clear",
 			Usage:  "Clear user all sessions",
 			Action: bindAction(clearUserTokens),
@@ -728,6 +741,26 @@ func createNewUserToken(c *core.CliContext) error {
 
 	printTokenInfo(token)
 	fmt.Printf("[NewToken] %s\n", tokenString)
+
+	return nil
+}
+
+func revokeUserToken(c *core.CliContext) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	token := c.String("token")
+	err = clis.UserData.RevokeUserToken(c, token)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.revokeUserToken] error occurs when revoking user token")
+		return err
+	}
+
+	log.CliInfof(c, "[user_data.revokeUserToken] the specified user token has been revoked successfully")
 
 	return nil
 }

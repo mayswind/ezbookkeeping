@@ -445,6 +445,39 @@ func (l *UserDataCli) CreateNewUserToken(c *core.CliContext, username string, to
 	return tokenRecord, token, nil
 }
 
+// RevokeUserToken revokes the specified token of the user
+func (l *UserDataCli) RevokeUserToken(c *core.CliContext, token string) error {
+	_, claims, err := l.tokens.ParseToken(c, token)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.RevokeUserToken] failed to parse token, because %s", err.Error())
+		return err
+	}
+
+	userTokenId, err := utils.StringToInt64(claims.UserTokenId)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.RevokeUserToken] failed to get user token id, because %s", err.Error())
+		return err
+	}
+
+	tokenRecord := &models.TokenRecord{
+		Uid:             claims.Uid,
+		UserTokenId:     userTokenId,
+		CreatedUnixTime: claims.IssuedAt,
+	}
+
+	tokenId := l.tokens.GenerateTokenId(tokenRecord)
+	err = l.tokens.DeleteToken(c, tokenRecord)
+
+	if err != nil {
+		log.Errorf(c, "[user_data.RevokeUserToken] failed to revoke token \"id:%s\" for user \"uid:%d\", because %s", tokenId, claims.Uid, err.Error())
+		return err
+	}
+
+	return nil
+}
+
 // ClearUserTokens clears all tokens of the specified user
 func (l *UserDataCli) ClearUserTokens(c *core.CliContext, username string) error {
 	if username == "" {

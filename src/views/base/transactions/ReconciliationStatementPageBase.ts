@@ -7,21 +7,32 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
+import { KnownDateTimeFormat } from '@/core/datetime.ts';
 import { TransactionType } from '@/core/transaction.ts';
+import { KnownFileType } from '@/core/file.ts';
 import type { Account } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 import type { TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
 
 import {
+    replaceAll,
+    removeAll
+} from '@/lib/common.ts';
+
+import {
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffsetMinutes,
     parseDateFromUnixTime,
+    formatUnixTime,
     getUnixTime
 } from '@/lib/datetime.ts';
 
 export function useReconciliationStatementPageBase() {
     const {
+        tt,
+        getCurrentDigitGroupingSymbol,
         formatUnixTimeToLongDateTime,
+        formatAmount,
         formatAmountWithCurrency
     } = useI18n();
 
@@ -39,6 +50,18 @@ export function useReconciliationStatementPageBase() {
 
     const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
+
+    const exportFileName = computed<string>(() => {
+        const nickname = userStore.currentUserNickname;
+
+        if (nickname) {
+            return tt('dataExport.exportReconciliationStatementsFileName', {
+                nickname: nickname
+            });
+        }
+
+        return tt('dataExport.defaultExportReconciliationStatementsFileName');
+    });
 
     const allAccountsMap = computed<Record<string, Account>>(() => accountsStore.allAccountsMap);
     const allCategoriesMap = computed<Record<string, TransactionCategory>>(() => transactionCategoriesStore.allTransactionCategoriesMap);
@@ -183,6 +206,91 @@ export function useReconciliationStatementPageBase() {
         }
     }
 
+    function getExportedData(fileType: KnownFileType): string {
+        let separator = ',';
+
+        if (fileType === KnownFileType.TSV) {
+            separator = '\t';
+        }
+
+        let isLiabilityAccount = false;
+
+        if (allAccountsMap.value[accountId.value]) {
+            isLiabilityAccount = allAccountsMap.value[accountId.value].isLiability;
+        }
+
+        const digitGroupingSymbol = getCurrentDigitGroupingSymbol();
+        const accountBalanceName = isLiabilityAccount ? 'Account Outstanding Balance' : 'Account Balance';
+
+        const header = [
+            tt('Transaction Time'),
+            tt('Type'),
+            tt('Category'),
+            tt('Amount'),
+            tt('Account'),
+            tt(accountBalanceName),
+            tt('Description')
+        ].join(separator) + '\n';
+
+        const rows = reconciliationStatements.value.map(transaction => {
+            const transactionTime = getUnixTime(parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value));
+            let type = '';
+            let categoryName = allCategoriesMap.value[transaction.categoryId]?.name || '';
+            let displayAmount = removeAll(formatAmount(transaction.sourceAmount), digitGroupingSymbol);
+            let displayAccountName = allAccountsMap.value[transaction.sourceAccountId]?.name || '';
+
+            if (transaction.type === TransactionType.ModifyBalance) {
+                type = tt('Modify Balance');
+                categoryName = '-';
+            } else if (transaction.type === TransactionType.Income) {
+                type = tt('Income');
+            } else if (transaction.type === TransactionType.Expense) {
+                type = tt('Expense');
+            } else if (transaction.type === TransactionType.Transfer && transaction.destinationAccountId === accountId.value) {
+                type = tt('Transfer In');
+                displayAmount = removeAll(formatAmount(transaction.destinationAmount), digitGroupingSymbol);
+            } else if (transaction.type === TransactionType.Transfer && transaction.sourceAccountId === accountId.value) {
+                type = tt('Transfer Out');
+            } else if (transaction.type === TransactionType.Transfer) {
+                type = tt('Transfer');
+            } else {
+                type = tt('Unknown');
+            }
+
+            if (transaction.type === TransactionType.Transfer && allAccountsMap.value[transaction.destinationAccountId]) {
+                displayAccountName = displayAccountName + ' → ' + (allAccountsMap.value[transaction.destinationAccountId]?.name || '');
+            }
+
+            let displayAccountBalance = '';
+
+            if (isLiabilityAccount) {
+                displayAccountBalance = removeAll(formatAmount(-transaction.accountBalance), digitGroupingSymbol);
+            } else {
+                displayAccountBalance = removeAll(formatAmount(transaction.accountBalance), digitGroupingSymbol);
+            }
+
+            let description = transaction.comment || '';
+
+            if (fileType === KnownFileType.CSV) {
+                description = replaceAll(description, ',', ' ');
+            } else if (fileType === KnownFileType.TSV) {
+                description = replaceAll(description, '\t', ' ');
+            }
+
+            return [
+                formatUnixTime(transactionTime, KnownDateTimeFormat.DefaultDateTime.format),
+                type,
+                categoryName,
+                displayAmount,
+                displayAccountName,
+                displayAccountBalance,
+                description
+            ].join(separator);
+        });
+
+        return header + rows.join('\n');
+    }
+
     return {
         // states
         accountId,
@@ -194,6 +302,7 @@ export function useReconciliationStatementPageBase() {
         // computed states
         currentTimezoneOffsetMinutes,
         defaultCurrency,
+        exportFileName,
         allAccountsMap,
         allCategoriesMap,
         displayStartDateTime,
@@ -208,6 +317,7 @@ export function useReconciliationStatementPageBase() {
         getDisplayTimezone,
         getDisplaySourceAmount,
         getDisplayDestinationAmount,
-        getDisplayAccountBalance
+        getDisplayAccountBalance,
+        getExportedData
     };
 }

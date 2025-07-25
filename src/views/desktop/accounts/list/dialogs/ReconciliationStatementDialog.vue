@@ -15,6 +15,17 @@
                                 <v-list-item :prepend-icon="mdiReceiptTextPlusOutline"
                                              :title="tt('Add Transaction')"
                                              @click="addTransaction()"></v-list-item>
+                                <v-divider class="my-2"/>
+                                <v-list-item :prepend-icon="mdiComma"
+                                             :disabled="!reconciliationStatements || reconciliationStatements.length < 1"
+                                             @click="exportReconciliationStatements(KnownFileType.CSV)">
+                                    <v-list-item-title>{{ tt('Export to CSV (Comma-separated values) File') }}</v-list-item-title>
+                                </v-list-item>
+                                <v-list-item :prepend-icon="mdiKeyboardTab"
+                                             :disabled="!reconciliationStatements || reconciliationStatements.length < 1"
+                                             @click="exportReconciliationStatements(KnownFileType.TSV)">
+                                    <v-list-item-title>{{ tt('Export to TSV (Tab-separated values) File') }}</v-list-item-title>
+                                </v-list-item>
                             </v-list>
                         </v-menu>
                     </v-btn>
@@ -196,12 +207,17 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 
 import { TransactionType } from '@/core/transaction.ts';
+import { KnownFileType } from '@/core/file.ts';
 import { Transaction, type TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
+
+import { startDownloadFile } from '@/lib/ui/common.ts';
 
 import {
     mdiArrowRight,
     mdiDotsVertical,
-    mdiReceiptTextPlusOutline
+    mdiReceiptTextPlusOutline,
+    mdiComma,
+    mdiKeyboardTab
 } from '@mdi/js';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
@@ -228,6 +244,7 @@ const {
     currentTimezoneOffsetMinutes,
     allAccountsMap,
     allCategoriesMap,
+    exportFileName,
     displayStartDateTime,
     displayEndDateTime,
     displayTotalOutflows,
@@ -239,7 +256,8 @@ const {
     getDisplayTimezone,
     getDisplaySourceAmount,
     getDisplayDestinationAmount,
-    getDisplayAccountBalance
+    getDisplayAccountBalance,
+    getExportedData
 } = useReconciliationStatementPageBase();
 
 const accountsStore = useAccountsStore();
@@ -386,6 +404,15 @@ function addTransaction(): void {
             snackbar.value?.showError(error);
         }
     });
+}
+
+function exportReconciliationStatements(fileType: KnownFileType): void {
+    if (!reconciliationStatements.value || reconciliationStatements.value.length < 1) {
+        return;
+    }
+
+    const exportedData = getExportedData(fileType);
+    startDownloadFile(fileType.formatFileName(exportFileName.value), fileType.createBlob(exportedData));
 }
 
 function showTransaction(transaction: TransactionReconciliationStatementResponseItem): void {

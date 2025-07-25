@@ -122,6 +122,8 @@
         "exportFilename": "ezBookkeeping_{nickname}_匯出資料",
         "defaultExportStatisticsFileName": "ezBookkeeping_統計資料",
         "exportStatisticsFileName": "ezBookkeeping_{nickname}_統計資料",
+        "defaultExportReconciliationStatementsFileName": "ezBookkeeping_對帳單",
+        "exportReconciliationStatementsFileName": "ezBookkeeping_{nickname}_對帳單",
         "defaultImportDataMappingFileName": "ezBookkeeping_匯入資料對應檔案",
         "defaultImportReplaceRuleFileName": "ezBookkeeping_匯入替換規則檔案"
     },

@@ -219,7 +219,7 @@
                                                                         <v-menu activator="parent" :open-on-hover="true">
                                                                             <v-list>
                                                                                 <template :key="dateRange.type"
-                                                                                          v-for="dateRange in accountReconciliationStatementDateRangs(element.getAccountOrSubAccount(activeSubAccount[element.id]))">
+                                                                                          v-for="dateRange in accountReconciliationStatementDateRanges(element.getAccountOrSubAccount(activeSubAccount[element.id]))">
                                                                                     <v-list-item class="text-sm" density="compact"
                                                                                                  :value="dateRange.type">
                                                                                         <v-list-item-title class="cursor-pointer"
@@ -448,7 +448,7 @@ function accountCurrency(account: Account): string | null {
     }
 }
 
-function accountReconciliationStatementDateRangs(account: Account): LocalizedDateRange[] {
+function accountReconciliationStatementDateRanges(account: Account): LocalizedDateRange[] {
     return getAllDateRanges(DateRangeScene.Normal, true, !!accountsStore.getAccountStatementDate(account.id));
 }
 

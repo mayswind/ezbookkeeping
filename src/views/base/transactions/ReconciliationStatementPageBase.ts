@@ -217,7 +217,7 @@ export function useReconciliationStatementPageBase() {
 
             if (transaction.type === TransactionType.ModifyBalance) {
                 type = tt('Modify Balance');
-                categoryName = '-';
+                categoryName = tt('Modify Balance');
             } else if (transaction.type === TransactionType.Income) {
                 type = tt('Income');
             } else if (transaction.type === TransactionType.Expense) {

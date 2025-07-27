@@ -115,12 +115,15 @@
                 </template>
                 <template #item.categoryId="{ item }">
                     <div class="d-flex align-center">
-                        <span v-if="item.type === TransactionType.ModifyBalance">-</span>
                         <ItemIcon size="24px" icon-type="category"
                                   :icon-id="allCategoriesMap[item.categoryId].icon"
                                   :color="allCategoriesMap[item.categoryId].color"
-                                  v-if="item.type !== TransactionType.ModifyBalance && allCategoriesMap[item.categoryId]"></ItemIcon>
-                        <span class="ml-2" v-if="item.type !== TransactionType.ModifyBalance && allCategoriesMap[item.categoryId]">
+                                  v-if="allCategoriesMap[item.categoryId] && allCategoriesMap[item.categoryId]?.color"></ItemIcon>
+                        <v-icon size="24" :icon="mdiPencilBoxOutline" v-else-if="!allCategoriesMap[item.categoryId] || !allCategoriesMap[item.categoryId]?.color" />
+                        <span class="ml-2" v-if="item.type === TransactionType.ModifyBalance">
+                            {{ tt('Modify Balance') }}
+                        </span>
+                        <span class="ml-2" v-else-if="item.type !== TransactionType.ModifyBalance && allCategoriesMap[item.categoryId]">
                             {{ allCategoriesMap[item.categoryId].name }}
                         </span>
                     </div>
@@ -217,7 +220,8 @@ import {
     mdiDotsVertical,
     mdiReceiptTextPlusOutline,
     mdiComma,
-    mdiKeyboardTab
+    mdiKeyboardTab,
+    mdiPencilBoxOutline
 } from '@mdi/js';
 
 type SnackBarType = InstanceType<typeof SnackBar>;

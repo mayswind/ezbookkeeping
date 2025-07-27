@@ -7,7 +7,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
-import { KnownDateTimeFormat } from '@/core/datetime.ts';
+import { type WeekDayValue, KnownDateTimeFormat } from '@/core/datetime.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { KnownFileType } from '@/core/file.ts';
 import type { Account } from '@/models/account.ts';
@@ -32,6 +32,8 @@ export function useReconciliationStatementPageBase() {
         tt,
         getCurrentDigitGroupingSymbol,
         formatUnixTimeToLongDateTime,
+        formatUnixTimeToLongDate,
+        formatUnixTimeToShortTime,
         formatAmount,
         formatAmountWithCurrency
     } = useI18n();
@@ -48,6 +50,8 @@ export function useReconciliationStatementPageBase() {
     const openingBalance = ref<number>(0);
     const closingBalance = ref<number>(0);
 
+    const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
+    const fiscalYearStart = computed<number>(() => userStore.currentUserFiscalYearStart);
     const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
@@ -141,6 +145,14 @@ export function useReconciliationStatementPageBase() {
     function getDisplayDateTime(transaction: TransactionReconciliationStatementResponseItem): string {
         const transactionTime = getUnixTime(parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value));
         return formatUnixTimeToLongDateTime(transactionTime);
+    }
+
+    function getDisplayDate(transaction: TransactionReconciliationStatementResponseItem): string {
+        return formatUnixTimeToLongDate(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value);
+    }
+
+    function getDisplayTime(transaction: TransactionReconciliationStatementResponseItem): string {
+        return formatUnixTimeToShortTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value);
     }
 
     function getDisplayTimezone(transaction: TransactionReconciliationStatementResponseItem): string {
@@ -276,6 +288,8 @@ export function useReconciliationStatementPageBase() {
         openingBalance,
         closingBalance,
         // computed states
+        firstDayOfWeek,
+        fiscalYearStart,
         currentTimezoneOffsetMinutes,
         defaultCurrency,
         currentAccount,
@@ -293,6 +307,8 @@ export function useReconciliationStatementPageBase() {
         displayClosingBalance,
         // functions
         getDisplayDateTime,
+        getDisplayDate,
+        getDisplayTime,
         getDisplayTimezone,
         getDisplaySourceAmount,
         getDisplayDestinationAmount,

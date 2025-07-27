@@ -1577,6 +1577,7 @@
     "Savings Account": "储蓄账户",
     "Certificate of Deposit": "定期存款",
     "Balance": "余额",
+    "Outstanding Balance": "未清余额",
     "Unable to retrieve account list": "无法获取账户列表",
     "Account list is up to date": "账户列表已是最新",
     "Account list has been updated": "账户列表已更新",

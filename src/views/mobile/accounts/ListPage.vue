@@ -145,6 +145,7 @@
                     </f7-swipeout-actions>
                     <f7-swipeout-actions right v-if="!sortable">
                         <f7-swipeout-button color="orange" close :text="tt('Edit')" @click="edit(account)"></f7-swipeout-button>
+                        <f7-swipeout-button color="deeporange" close :text="tt('More')" @click="showMoreActionSheetForAccount(account)"></f7-swipeout-button>
                         <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(account, false)">
                             <f7-icon f7="trash"></f7-icon>
                         </f7-swipeout-button>
@@ -152,6 +153,23 @@
                 </f7-list-item>
             </f7-list>
         </div>
+
+        <f7-actions close-by-outside-click close-on-escape :opened="showAccountMoreActionSheet" @actions:closed="showAccountMoreActionSheet = false">
+            <f7-actions-group v-if="accountForMoreActionSheet && accountForMoreActionSheet.type === AccountType.SingleAccount.type">
+                <f7-actions-button @click="showReconciliationStatement(accountForMoreActionSheet)">{{ tt('Reconciliation Statement') }}</f7-actions-button>
+            </f7-actions-group>
+            <template v-if="accountForMoreActionSheet && accountForMoreActionSheet.type === AccountType.MultiSubAccounts.type">
+                <f7-actions-group :key="subAccount.id"
+                                  v-for="subAccount in accountForMoreActionSheet.subAccounts"
+                                  v-show="showHidden || !subAccount.hidden">
+                    <f7-actions-label>{{ subAccount.name }}</f7-actions-label>
+                    <f7-actions-button @click="showReconciliationStatement(subAccount)">{{ tt('Reconciliation Statement') }}</f7-actions-button>
+                </f7-actions-group>
+            </template>
+            <f7-actions-group>
+                <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
+            </f7-actions-group>
+        </f7-actions>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
@@ -219,7 +237,9 @@ const accountsStore = useAccountsStore();
 
 const loadingError = ref<unknown | null>(null);
 const sortable = ref<boolean>(false);
+const accountForMoreActionSheet = ref<Account | null>(null);
 const accountToDelete = ref<Account | null>(null);
+const showAccountMoreActionSheet = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
 const displayOrderSaving = ref<boolean>(false);
@@ -299,6 +319,22 @@ function reload(done?: () => void): void {
 
 function edit(account: Account): void {
     props.f7router.navigate('/account/edit?id=' + account.id);
+}
+
+function showMoreActionSheetForAccount(account: Account): void {
+    accountForMoreActionSheet.value = account;
+    showAccountMoreActionSheet.value = true;
+}
+
+function showReconciliationStatement(account: Account | null): void {
+    if (!account) {
+        showAlert('An error occurred');
+        return;
+    }
+
+    props.f7router.navigate('/account/reconciliation_statements?accountId=' + account.id);
+    showAccountMoreActionSheet.value = false;
+    accountForMoreActionSheet.value = null;
 }
 
 function hide(account: Account, hidden: boolean): void {

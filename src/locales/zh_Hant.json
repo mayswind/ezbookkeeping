@@ -1577,6 +1577,7 @@
     "Savings Account": "儲蓄帳戶",
     "Certificate of Deposit": "定期存款",
     "Balance": "餘額",
+    "Outstanding Balance": "未清餘額",
     "Unable to retrieve account list": "無法取得帳戶清單",
     "Account list is up to date": "帳戶清單已是最新",
     "Account list has been updated": "帳戶清單已更新",

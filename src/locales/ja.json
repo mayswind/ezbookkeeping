@@ -1577,6 +1577,7 @@
     "Savings Account": "普通預金口座",
     "Certificate of Deposit": "預金証書",
     "Balance": "残高",
+    "Outstanding Balance": "Outstanding Balance",
     "Unable to retrieve account list": "口座リストを取得できません",
     "Account list is up to date": "口座リストは最新です",
     "Account list has been updated": "口座リストが更新されました",

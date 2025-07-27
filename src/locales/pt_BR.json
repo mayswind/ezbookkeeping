@@ -1577,6 +1577,7 @@
     "Savings Account": "Conta Poupança",
     "Certificate of Deposit": "Certificado de Depósito",
     "Balance": "Saldo",
+    "Outstanding Balance": "Outstanding Balance",
     "Unable to retrieve account list": "Não foi possível recuperar a lista de contas",
     "Account list is up to date": "A lista de contas está atualizada",
     "Account list has been updated": "A lista de contas foi atualizada",

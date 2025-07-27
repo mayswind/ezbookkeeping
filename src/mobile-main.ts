@@ -34,6 +34,7 @@ import Framework7Skeleton from 'framework7/components/skeleton';
 import Framework7Treeview from 'framework7/components/treeview';
 import Framework7Typography from 'framework7/components/typography';
 import Framework7Swiper from 'framework7/components/swiper';
+import Framework7VirtualList from 'framework7/components/virtual-list';
 import Framework7PhotoBrowser from 'framework7/components/photo-browser';
 // @ts-expect-error there is a function called "registerComponents" in the framework7-vue package, but it is not declared in the type definition file
 import Framework7Vue, { registerComponents } from 'framework7-vue/bundle';
@@ -155,6 +156,7 @@ Framework7.use([
     Framework7Treeview,
     Framework7Typography,
     Framework7Swiper,
+    Framework7VirtualList,
     Framework7PhotoBrowser,
     Framework7Vue
 ]);

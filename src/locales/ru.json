@@ -1577,6 +1577,7 @@
     "Savings Account": "Сберегательный счет",
     "Certificate of Deposit": "Депозитный сертификат",
     "Balance": "Баланс",
+    "Outstanding Balance": "Outstanding Balance",
     "Unable to retrieve account list": "Не удается получить список счетов",
     "Account list is up to date": "Список счетов актуален",
     "Account list has been updated": "Список счетов обновлен",

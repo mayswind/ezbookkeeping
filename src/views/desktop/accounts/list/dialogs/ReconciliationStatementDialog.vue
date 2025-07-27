@@ -244,6 +244,7 @@ const {
     currentTimezoneOffsetMinutes,
     allAccountsMap,
     allCategoriesMap,
+    isCurrentLiabilityAccount,
     exportFileName,
     displayStartDateTime,
     displayEndDateTime,
@@ -274,7 +275,6 @@ const countPerPage = ref<number>(10);
 
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
-const account = computed(() => allAccountsMap.value[accountId.value]);
 const reconciliationStatementsTablePageOptions = computed<ReconciliationStatementDialogTablePageOption[]>(() => getTablePageOptions(reconciliationStatements.value?.length));
 
 const totalPageCount = computed<number>(() => {
@@ -293,7 +293,7 @@ const totalPageCount = computed<number>(() => {
 
 const dataTableHeaders = computed<object[]>(() => {
     const headers: object[] = [];
-    const accountBalanceName = account.value?.isLiability ? 'Account Outstanding Balance' : 'Account Balance';
+    const accountBalanceName = isCurrentLiabilityAccount.value ? 'Account Outstanding Balance' : 'Account Balance';
 
     headers.push({ key: 'time', value: 'time', title: tt('Transaction Time'), sortable: true, nowrap: true });
     headers.push({ key: 'type', value: 'type', title: tt('Type'), sortable: true, nowrap: true });

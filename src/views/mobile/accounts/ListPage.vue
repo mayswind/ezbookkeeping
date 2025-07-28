@@ -495,7 +495,6 @@ init();
 }
 
 .account-list {
-    --f7-list-group-title-height: var(--ebk-account-list-group-title-height);
     --f7-list-item-footer-font-size: var(--ebk-large-footer-font-size);
 }
 

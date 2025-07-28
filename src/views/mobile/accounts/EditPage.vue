@@ -763,10 +763,6 @@ init();
     text-overflow: ellipsis;
 }
 
-.subaccount-edit-list {
-    --f7-list-group-title-height: 40px;
-}
-
 .subaccount-delete-button {
     margin-left: auto;
 }

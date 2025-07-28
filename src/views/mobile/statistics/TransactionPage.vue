@@ -18,7 +18,9 @@
                     @popover:open="scrollPopoverToSelectedItem">
             <f7-list dividers>
                 <f7-list-group>
-                    <f7-list-item group-title :title="tt('Categorical Analysis')" />
+                    <f7-list-item group-title>
+                        <small>{{ tt('Categorical Analysis') }}</small>
+                    </f7-list-item>
                     <f7-list-item :title="tt(dataType.name)"
                                   :class="{ 'list-item-selected': analysisType === StatisticsAnalysisType.CategoricalAnalysis && query.chartDataType === dataType.type }"
                                   :key="dataType.type"
@@ -30,7 +32,9 @@
                     </f7-list-item>
                 </f7-list-group>
                 <f7-list-group>
-                    <f7-list-item group-title :title="tt('Trend Analysis')" />
+                    <f7-list-item group-title>
+                        <small>{{ tt('Trend Analysis') }}</small>
+                    </f7-list-item>
                     <f7-list-item :title="tt(dataType.name)"
                                   :class="{ 'list-item-selected': analysisType === StatisticsAnalysisType.TrendAnalysis && query.chartDataType === dataType.type }"
                                   :key="dataType.type"

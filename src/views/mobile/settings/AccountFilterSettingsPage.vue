@@ -15,13 +15,11 @@
                 <f7-accordion-item>
                     <f7-block-title>
                         <f7-accordion-toggle>
-                            <f7-list strong inset dividers media-list
+                            <f7-list strong inset dividers
                                      class="combination-list-header combination-list-opened">
-                                <f7-list-item>
-                                    <template #title>
-                                        <span>Account Category</span>
-                                        <f7-icon class="combination-list-chevron-icon" f7="chevron_up"></f7-icon>
-                                    </template>
+                                <f7-list-item group-title>
+                                    <small>Account Category</small>
+                                    <f7-icon class="combination-list-chevron-icon" f7="chevron_up"></f7-icon>
                                 </f7-list-item>
                             </f7-list>
                         </f7-accordion-toggle>
@@ -54,14 +52,12 @@
                                    @accordion:close="collapseStates[accountCategory.category].opened = false">
                     <f7-block-title>
                         <f7-accordion-toggle>
-                            <f7-list strong inset dividers media-list
+                            <f7-list strong inset dividers
                                      class="combination-list-header"
                                      :class="collapseStates[accountCategory.category].opened ? 'combination-list-opened' : 'combination-list-closed'">
-                                <f7-list-item>
-                                    <template #title>
-                                        <span>{{ tt(accountCategory.name) }}</span>
-                                        <f7-icon class="combination-list-chevron-icon" :f7="collapseStates[accountCategory.category].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
-                                    </template>
+                                <f7-list-item group-title>
+                                    <small>{{ tt(accountCategory.name) }}</small>
+                                    <f7-icon class="combination-list-chevron-icon" :f7="collapseStates[accountCategory.category].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
                                 </f7-list-item>
                             </f7-list>
                         </f7-accordion-toggle>

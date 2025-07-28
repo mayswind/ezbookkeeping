@@ -477,7 +477,9 @@
         <f7-popover class="more-popover-menu"
                     v-model:opened="showMorePopover">
             <f7-list dividers>
-                <f7-list-item group-title :title="tt('Type')" />
+                <f7-list-item group-title>
+                    <small>{{ tt('Type') }}</small>
+                </f7-list-item>
                 <f7-list-item :class="{ 'list-item-selected': query.type === 0 }" :title="tt('All')" @click="changeTypeFilter(0)">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 0"></f7-icon>
@@ -504,7 +506,9 @@
                     </template>
                 </f7-list-item>
 
-                <f7-list-item group-title :title="tt('Amount')" />
+                <f7-list-item group-title>
+                    <small>{{ tt('Amount') }}</small>
+                </f7-list-item>
                 <f7-list-item :class="{ 'list-item-selected': !query.amountFilter }" :title="tt('All')" @click="changeAmountFilter('')">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.amountFilter"></f7-icon>
@@ -521,7 +525,9 @@
                     </template>
                 </f7-list-item>
 
-                <f7-list-item group-title :title="tt('Tags')" />
+                <f7-list-item group-title>
+                    <small>{{ tt('Tags') }}</small>
+                </f7-list-item>
                 <f7-list-item :class="{ 'list-item-selected': !query.tagIds }" :title="tt('All')" @click="changeTagFilter('')">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.tagIds"></f7-icon>

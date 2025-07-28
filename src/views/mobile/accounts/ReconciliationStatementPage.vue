@@ -471,8 +471,8 @@ init();
     align-content: center;
     padding-top: 0;
     padding-bottom: 0;
-    height: var(--ebk-reconciliation-statement-list-group-title-height);
-    line-height: var(--ebk-reconciliation-statement-list-group-title-height);
+    height: var(--f7-list-group-title-height);
+    line-height: var(--f7-list-group-title-height);
     background-color: var(--f7-list-group-title-bg-color);
 }
 

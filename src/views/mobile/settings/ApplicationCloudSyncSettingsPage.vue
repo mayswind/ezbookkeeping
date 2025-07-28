@@ -192,10 +192,6 @@ init();
 </script>
 
 <style>
-.synchronized-settings-list {
-    --f7-list-group-title-height: var(--ebk-synchronized-settings-list-group-title-height);
-}
-
 .synchronized-settings-device-icon {
     font-size: var(--ebk-synchronized-settings-list-device-icon-font-size);
 }

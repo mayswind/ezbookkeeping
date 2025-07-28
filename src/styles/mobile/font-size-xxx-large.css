@@ -58,6 +58,7 @@
     --ebk-smaller-font-size: 16px;
     --ebk-large-footer-font-size: 18px;
     --ebk-sheet-title-font-size: 24px;
+    --ebk-popover-list-group-title-height: 36px;
     --ebk-numpad-value-height: 60px;
     --ebk-numpad-value-small-font-size: 24px;
     --ebk-numpad-value-normal-font-size: 28px;
@@ -72,9 +73,6 @@
     --ebk-pie-chart-toolbox-text-font-size: 22px;
     --ebk-trends-bar-chart-legend-icon-font-size: 24px;
     --ebk-trends-bar-chart-legend-text-font-size: 20px;
-    --ebk-account-list-group-title-height: 42px;
-    --ebk-reconciliation-statement-list-group-title-height: 42px;
-    --ebk-synchronized-settings-list-group-title-height: 42px;
     --ebk-synchronized-settings-list-device-icon-font-size: 24px;
     --ebk-category-separate-icon-font-size: 20px;
     --ebk-transaction-date-width: 36px;

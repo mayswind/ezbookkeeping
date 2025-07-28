@@ -144,7 +144,7 @@
                     <span>{{ getDisplayAccountBalance(item) }}</span>
                 </template>
                 <template #item.operation="{ item }">
-                    <v-btn density="compact" variant="text" color="default" :disabled="loading"
+                    <v-btn density="compact" variant="text" color="default" :disabled="loading || item.type === TransactionType.ModifyBalance"
                            @click="showTransaction(item)">
                         {{ tt('View') }}
                     </v-btn>

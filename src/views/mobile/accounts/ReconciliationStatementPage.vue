@@ -12,6 +12,9 @@
         </f7-navbar>
 
         <f7-list form strong inset dividers class="margin-vertical" v-if="!finishQuery">
+            <f7-list-item group-title>
+                <small>{{ tt('Date Range') }}</small>
+            </f7-list-item>
             <f7-list-item :key="dateRange.type"
                           :title="dateRange.displayName"
                           :disabled="!validQuery"
@@ -36,13 +39,8 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" v-if="finishQuery && (startTime || endTime)">
-            <f7-list-item :title="tt('Start Date')" :after="displayStartDateTime"></f7-list-item>
-            <f7-list-item :title="tt('End Date')" :after="displayEndDateTime"></f7-list-item>
-        </f7-list>
-
-        <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="finishQuery && loading">
-            <f7-list-item :title="tt('Opening Balance')" after="Count"></f7-list-item>
-            <f7-list-item :title="tt('Closing Balance')" after="Count"></f7-list-item>
+            <f7-list-item :title="tt('Start Time')" :after="displayStartDateTime"></f7-list-item>
+            <f7-list-item :title="tt('End Time')" :after="displayEndDateTime"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="finishQuery && loading">
@@ -53,15 +51,20 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" v-if="finishQuery && !loading">
-            <f7-list-item :title="tt('Opening Balance')" :after="displayOpeningBalance"></f7-list-item>
-            <f7-list-item :title="tt('Closing Balance')" :after="displayClosingBalance"></f7-list-item>
-        </f7-list>
-
-        <f7-list strong inset dividers class="margin-vertical" v-if="finishQuery && !loading">
             <f7-list-item :title="tt('Total Transactions')" :after="reconciliationStatements.length || '0'"></f7-list-item>
             <f7-list-item :title="tt('Total Inflows')" :after="displayTotalInflows"></f7-list-item>
             <f7-list-item :title="tt('Total Outflows')" :after="displayTotalOutflows"></f7-list-item>
             <f7-list-item :title="tt('Net Cash Flow')" :after="displayTotalBalance"></f7-list-item>
+        </f7-list>
+
+        <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="finishQuery && loading">
+            <f7-list-item :title="tt('Opening Balance')" after="Count"></f7-list-item>
+            <f7-list-item :title="tt('Closing Balance')" after="Count"></f7-list-item>
+        </f7-list>
+
+        <f7-list strong inset dividers class="margin-vertical" v-if="finishQuery && !loading">
+            <f7-list-item :title="tt('Opening Balance')" :after="displayOpeningBalance"></f7-list-item>
+            <f7-list-item :title="tt('Closing Balance')" :after="displayClosingBalance"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers media-list
@@ -463,6 +466,13 @@ init();
 }
 
 .list.reconciliation-statement-list li.reconciliation-statement-transaction-date {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    padding-top: 0;
+    padding-bottom: 0;
+    height: var(--ebk-reconciliation-statement-list-group-title-height);
+    line-height: var(--ebk-reconciliation-statement-list-group-title-height);
     background-color: var(--f7-list-group-title-bg-color);
 }
 

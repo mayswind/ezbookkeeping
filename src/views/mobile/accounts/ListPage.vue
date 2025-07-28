@@ -145,7 +145,7 @@
                     </f7-swipeout-actions>
                     <f7-swipeout-actions right v-if="!sortable">
                         <f7-swipeout-button color="orange" close :text="tt('Edit')" @click="edit(account)"></f7-swipeout-button>
-                        <f7-swipeout-button color="deeporange" close :text="tt('More')" @click="showMoreActionSheetForAccount(account)"></f7-swipeout-button>
+                        <f7-swipeout-button color="primary" close :text="tt('More')" @click="showMoreActionSheetForAccount(account)"></f7-swipeout-button>
                         <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(account, false)">
                             <f7-icon f7="trash"></f7-icon>
                         </f7-swipeout-button>

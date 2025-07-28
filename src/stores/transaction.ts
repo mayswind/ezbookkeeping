@@ -135,6 +135,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
     const transactions = ref<TransactionMonthList[]>([]);
     const transactionsNextTimeId = ref<number>(0);
     const transactionListStateInvalid = ref<boolean>(true);
+    const transactionReconciliationStatementStateInvalid = ref<boolean>(true);
 
     const allFilterCategoryIds = computed<Record<string, boolean>>(() => splitItemsToMap(transactionsFilter.value.categoryIds, ','));
     const allFilterAccountIds = computed<Record<string, boolean>>(() => splitItemsToMap(transactionsFilter.value.accountIds, ','));
@@ -596,6 +597,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
         transactionListStateInvalid.value = invalidState;
     }
 
+    function updateTransactionReconciliationStatementInvalidState(invalidState: boolean): void {
+        transactionReconciliationStatementStateInvalid.value = invalidState;
+    }
+
     function resetTransactions(): void {
         transactionsFilter.value.dateType = DateRange.All.type;
         transactionsFilter.value.maxTime = 0;
@@ -610,6 +615,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         transactions.value = [];
         transactionsNextTimeId.value = 0;
         transactionListStateInvalid.value = true;
+        transactionReconciliationStatementStateInvalid.value = true;
     }
 
     function clearTransactions(): void {
@@ -972,13 +978,25 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
+                    if (!transactionReconciliationStatementStateInvalid.value) {
+                        updateTransactionReconciliationStatementInvalidState(true);
+                    }
+
                     reject({ message: 'Unable to retrieve reconciliation statements' });
                     return;
+                }
+
+                if (transactionReconciliationStatementStateInvalid.value) {
+                    updateTransactionReconciliationStatementInvalidState(false);
                 }
 
                 resolve(data.result);
             }).catch(error => {
                 logger.error('failed to load reconciliation statements', error);
+
+                if (!transactionReconciliationStatementStateInvalid.value) {
+                    updateTransactionReconciliationStatementInvalidState(true);
+                }
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     reject({ error: error.response.data });
@@ -1067,6 +1085,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     });
                 }
 
+                if (!transactionReconciliationStatementStateInvalid.value) {
+                    updateTransactionReconciliationStatementInvalidState(true);
+                }
+
                 if (!accountsStore.accountListStateInvalid) {
                     accountsStore.updateAccountListInvalidState(true);
                 }
@@ -1122,6 +1144,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
                         transaction: transaction,
                         defaultCurrency: defaultCurrency
                     });
+                }
+
+                if (!transactionReconciliationStatementStateInvalid.value) {
+                    updateTransactionReconciliationStatementInvalidState(true);
                 }
 
                 if (!accountsStore.accountListStateInvalid) {
@@ -1334,6 +1360,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         transactions,
         transactionsNextTimeId,
         transactionListStateInvalid,
+        transactionReconciliationStatementStateInvalid,
         // computed states
         allFilterCategoryIds,
         allFilterAccountIds,
@@ -1350,6 +1377,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         clearTransactionDraft,
         setTransactionSuitableDestinationAmount,
         updateTransactionListInvalidState,
+        updateTransactionReconciliationStatementInvalidState,
         resetTransactions,
         clearTransactions,
         initTransactionListFilter,

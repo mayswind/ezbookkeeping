@@ -452,6 +452,10 @@ function renderExternal(vl: unknown, vlData: ReconciliationStatementVirtualListD
 }
 
 function onPageAfterIn(): void {
+    if (finishQuery.value && transactionsStore.transactionReconciliationStatementStateInvalid) {
+        reload(false);
+    }
+
     routeBackOnError(props.f7router, loadingError);
 }
 

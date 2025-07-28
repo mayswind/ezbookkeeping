@@ -361,6 +361,8 @@ function close(): void {
 
 function onSheetOpen(): void {
     currentValue.value = getInitedStringValue(props.modelValue, props.flipNegative);
+    previousValue.value = '';
+    currentSymbol.value = '';
 }
 
 function onSheetClosed(): void {

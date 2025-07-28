@@ -667,6 +667,8 @@ export interface TransactionReconciliationStatementResponseItem extends Transact
 
 export interface TransactionReconciliationStatementResponse {
     readonly transactions: TransactionReconciliationStatementResponseItem[];
+    readonly totalInflows: number;
+    readonly totalOutflows: number;
     readonly openingBalance: number;
     readonly closingBalance: number;
 }

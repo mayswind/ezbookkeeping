@@ -17,12 +17,12 @@
                                              @click="addTransaction()"></v-list-item>
                                 <v-divider class="my-2"/>
                                 <v-list-item :prepend-icon="mdiComma"
-                                             :disabled="!reconciliationStatements || reconciliationStatements.length < 1"
+                                             :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1"
                                              @click="exportReconciliationStatements(KnownFileType.CSV)">
                                     <v-list-item-title>{{ tt('Export to CSV (Comma-separated values) File') }}</v-list-item-title>
                                 </v-list-item>
                                 <v-list-item :prepend-icon="mdiKeyboardTab"
-                                             :disabled="!reconciliationStatements || reconciliationStatements.length < 1"
+                                             :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1"
                                              @click="exportReconciliationStatements(KnownFileType.TSV)">
                                     <v-list-item-title>{{ tt('Export to TSV (Tab-separated values) File') }}</v-list-item-title>
                                 </v-list-item>
@@ -94,7 +94,7 @@
                 item-value="index"
                 :class="{ 'disabled': loading }"
                 :headers="dataTableHeaders"
-                :items="reconciliationStatements"
+                :items="reconciliationStatements?.transactions ?? []"
                 :no-data-text="loading ? '' : tt('No transaction data')"
                 v-model:items-per-page="countPerPage"
                 v-model:page="currentPage"
@@ -150,16 +150,16 @@
                     </v-btn>
                 </template>
                 <template #bottom>
-                    <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2" v-if="loading || reconciliationStatements.length">
+                    <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2" v-if="loading || (reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length)">
                         <span class="ml-2">{{ tt('Total Transactions') }}</span>
                         <span v-if="loading">
                             <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                         </span>
                         <span class="ml-2" v-else-if="!loading">
-                            {{ reconciliationStatements.length }}
+                            {{ reconciliationStatements?.transactions.length ?? 0 }}
                         </span>
                         <v-spacer/>
-                        <span v-if="reconciliationStatements && reconciliationStatements.length > 10">
+                        <span v-if="reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length > 10">
                             {{ tt('Transactions Per Page') }}
                         </span>
                         <v-select class="ml-2" density="compact" max-width="100"
@@ -168,13 +168,13 @@
                                   :disabled="loading"
                                   :items="reconciliationStatementsTablePageOptions"
                                   v-model="countPerPage"
-                                  v-if="reconciliationStatements && reconciliationStatements.length > 10"
+                                  v-if="reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length > 10"
                         />
                         <pagination-buttons density="compact"
                                             :disabled="loading"
                                             :totalPageCount="totalPageCount"
                                             v-model="currentPage"
-                                            v-if="reconciliationStatements && reconciliationStatements.length > 10">
+                                            v-if="reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length > 10">
                         </pagination-buttons>
                     </div>
                 </template>
@@ -243,8 +243,6 @@ const {
     startTime,
     endTime,
     reconciliationStatements,
-    openingBalance,
-    closingBalance,
     currentTimezoneOffsetMinutes,
     allAccountsMap,
     allCategoriesMap,
@@ -252,8 +250,8 @@ const {
     exportFileName,
     displayStartDateTime,
     displayEndDateTime,
-    displayTotalOutflows,
     displayTotalInflows,
+    displayTotalOutflows,
     displayTotalBalance,
     displayOpeningBalance,
     displayClosingBalance,
@@ -279,16 +277,16 @@ const countPerPage = ref<number>(10);
 
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
-const reconciliationStatementsTablePageOptions = computed<ReconciliationStatementDialogTablePageOption[]>(() => getTablePageOptions(reconciliationStatements.value?.length));
+const reconciliationStatementsTablePageOptions = computed<ReconciliationStatementDialogTablePageOption[]>(() => getTablePageOptions(reconciliationStatements.value?.transactions.length));
 
 const totalPageCount = computed<number>(() => {
-    if (!reconciliationStatements.value || reconciliationStatements.value.length < 1) {
+    if (!reconciliationStatements.value || !reconciliationStatements.value.transactions || reconciliationStatements.value.transactions.length < 1) {
         return 1;
     }
 
     let count = 0;
 
-    for (let i = 0; i < reconciliationStatements.value.length; i++) {
+    for (let i = 0; i < reconciliationStatements.value.transactions.length; i++) {
         count++;
     }
 
@@ -339,7 +337,7 @@ function open(options: { accountId: string, startTime: number, endTime: number }
     accountId.value = options.accountId;
     startTime.value = options.startTime;
     endTime.value = options.endTime;
-    reconciliationStatements.value = [];
+    reconciliationStatements.value = undefined;
     currentPage.value = 1;
     countPerPage.value = 10;
     showState.value = true;
@@ -355,9 +353,7 @@ function open(options: { accountId: string, startTime: number, endTime: number }
             endTime: options.endTime
         });
     }).then(result => {
-        reconciliationStatements.value = result.transactions;
-        openingBalance.value = result.openingBalance;
-        closingBalance.value = result.closingBalance;
+        reconciliationStatements.value = result;
         loading.value = false;
     }).catch(error => {
         loading.value = false;
@@ -381,9 +377,7 @@ function reload(): void {
         startTime: startTime.value,
         endTime: endTime.value
     }).then(result => {
-        reconciliationStatements.value = result.transactions;
-        openingBalance.value = result.openingBalance;
-        closingBalance.value = result.closingBalance;
+        reconciliationStatements.value = result;
         loading.value = false;
     }).catch(error => {
         loading.value = false;
@@ -411,7 +405,7 @@ function addTransaction(): void {
 }
 
 function exportReconciliationStatements(fileType: KnownFileType): void {
-    if (!reconciliationStatements.value || reconciliationStatements.value.length < 1) {
+    if (!reconciliationStatements.value || !reconciliationStatements.value.transactions || reconciliationStatements.value.transactions.length < 1) {
         return;
     }
 

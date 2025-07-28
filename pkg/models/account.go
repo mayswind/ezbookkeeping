@@ -45,6 +45,16 @@ var liabilityAccountCategory = map[AccountCategory]bool{
 	ACCOUNT_CATEGORY_CERTIFICATE_OF_DEPOSIT: false,
 }
 
+// IsAsset returns whether the account category is an asset category
+func (c AccountCategory) IsAsset() bool {
+	return assetAccountCategory[c]
+}
+
+// IsLiability returns whether the account category is a liability category
+func (c AccountCategory) IsLiability() bool {
+	return liabilityAccountCategory[c]
+}
+
 // AccountType represents account type
 type AccountType byte
 

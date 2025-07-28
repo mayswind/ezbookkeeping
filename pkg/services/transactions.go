@@ -108,7 +108,7 @@ func (s *TransactionService) GetAllSpecifiedTransactions(c core.Context, uid int
 }
 
 // GetAllTransactionsWithAccountBalanceByMaxTime returns account statement within time range
-func (s *TransactionService) GetAllTransactionsWithAccountBalanceByMaxTime(c core.Context, uid int64, pageCount int32, maxTransactionTime int64, minTransactionTime int64, accountId int64) ([]*models.TransactionWithAccountBalance, int64, int64, error) {
+func (s *TransactionService) GetAllTransactionsWithAccountBalanceByMaxTime(c core.Context, uid int64, pageCount int32, maxTransactionTime int64, minTransactionTime int64, accountId int64, accountCategory models.AccountCategory) ([]*models.TransactionWithAccountBalance, int64, int64, int64, int64, error) {
 	if maxTransactionTime <= 0 {
 		maxTransactionTime = utils.GetMaxTransactionTimeFromUnixTime(time.Now().Unix())
 	}
@@ -119,7 +119,7 @@ func (s *TransactionService) GetAllTransactionsWithAccountBalanceByMaxTime(c cor
 		transactions, err := s.GetTransactionsByMaxTime(c, uid, maxTransactionTime, 0, 0, nil, []int64{accountId}, nil, false, models.TRANSACTION_TAG_FILTER_HAS_ANY, "", "", 1, pageCount, false, true)
 
 		if err != nil {
-			return nil, 0, 0, err
+			return nil, 0, 0, 0, 0, err
 		}
 
 		allTransactions = append(allTransactions, transactions...)
@@ -135,9 +135,11 @@ func (s *TransactionService) GetAllTransactionsWithAccountBalanceByMaxTime(c cor
 	allTransactionsAndAccountBalance := make([]*models.TransactionWithAccountBalance, 0, len(allTransactions))
 
 	if len(allTransactions) < 1 {
-		return allTransactionsAndAccountBalance, 0, 0, nil
+		return allTransactionsAndAccountBalance, 0, 0, 0, 0, nil
 	}
 
+	totalInflows := int64(0)
+	totalOutflows := int64(0)
 	openingBalance := int64(0)
 	accumulatedBalance := int64(0)
 
@@ -156,12 +158,28 @@ func (s *TransactionService) GetAllTransactionsWithAccountBalanceByMaxTime(c cor
 			accumulatedBalance = accumulatedBalance + transaction.Amount
 		} else {
 			log.Errorf(c, "[transactions.GetAllTransactionsWithAccountBalanceByMaxTime] trasaction type (%d) is invalid (id:%d)", transaction.TransactionId, transaction.Type)
-			return nil, 0, 0, errs.ErrTransactionTypeInvalid
+			return nil, 0, 0, 0, 0, errs.ErrTransactionTypeInvalid
 		}
 
 		if transaction.TransactionTime < minTransactionTime {
 			openingBalance = accumulatedBalance
 			continue
+		}
+
+		if transaction.Type == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+			if accountCategory.IsAsset() {
+				totalInflows = totalInflows + transaction.RelatedAccountAmount
+			} else if accountCategory.IsLiability() {
+				totalOutflows = totalOutflows - transaction.RelatedAccountAmount
+			}
+		} else if transaction.Type == models.TRANSACTION_DB_TYPE_INCOME {
+			totalInflows = totalInflows + transaction.Amount
+		} else if transaction.Type == models.TRANSACTION_DB_TYPE_EXPENSE {
+			totalOutflows = totalOutflows + transaction.Amount
+		} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+			totalOutflows = totalOutflows + transaction.Amount
+		} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+			totalInflows = totalInflows + transaction.Amount
 		}
 
 		transactionsAndAccountBalance := &models.TransactionWithAccountBalance{
@@ -172,7 +190,7 @@ func (s *TransactionService) GetAllTransactionsWithAccountBalanceByMaxTime(c cor
 		allTransactionsAndAccountBalance = append(allTransactionsAndAccountBalance, transactionsAndAccountBalance)
 	}
 
-	return allTransactionsAndAccountBalance, openingBalance, accumulatedBalance, nil
+	return allTransactionsAndAccountBalance, totalInflows, totalOutflows, openingBalance, accumulatedBalance, nil
 }
 
 // GetTransactionsByMaxTime returns transactions before given time

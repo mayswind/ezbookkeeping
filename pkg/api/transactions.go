@@ -340,7 +340,7 @@ func (a *TransactionsApi) TransactionReconciliationStatementHandler(c *core.WebC
 		minTransactionTime = utils.GetMinTransactionTimeFromUnixTime(reconciliationStatementRequest.StartTime)
 	}
 
-	transactionsWithAccountBalance, openingBalance, closingBalance, err := a.transactions.GetAllTransactionsWithAccountBalanceByMaxTime(c, uid, pageCountForAccountStatement, maxTransactionTime, minTransactionTime, reconciliationStatementRequest.AccountId)
+	transactionsWithAccountBalance, totalInflows, totalOutflows, openingBalance, closingBalance, err := a.transactions.GetAllTransactionsWithAccountBalanceByMaxTime(c, uid, pageCountForAccountStatement, maxTransactionTime, minTransactionTime, reconciliationStatementRequest.AccountId, account.Category)
 
 	if err != nil {
 		log.Errorf(c, "[transactions.TransactionReconciliationStatementHandler] failed to get transactions from \"%d\" to \"%d\" for user \"uid:%d\", because %s", reconciliationStatementRequest.StartTime, reconciliationStatementRequest.EndTime, uid, err.Error())
@@ -384,6 +384,8 @@ func (a *TransactionsApi) TransactionReconciliationStatementHandler(c *core.WebC
 
 	reconciliationStatementResp := &models.TransactionReconciliationStatementResponse{
 		Transactions:   responseItems,
+		TotalInflows:   totalInflows,
+		TotalOutflows:  totalOutflows,
 		OpeningBalance: openingBalance,
 		ClosingBalance: closingBalance,
 	}

@@ -12,7 +12,10 @@ import { TransactionType } from '@/core/transaction.ts';
 import { KnownFileType } from '@/core/file.ts';
 import type { Account } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
-import type { TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
+import type {
+    TransactionReconciliationStatementResponse,
+    TransactionReconciliationStatementResponseItem
+} from '@/models/transaction.ts';
 
 import {
     replaceAll,
@@ -46,9 +49,7 @@ export function useReconciliationStatementPageBase() {
     const accountId = ref<string>('');
     const startTime = ref<number>(0);
     const endTime = ref<number>(0);
-    const reconciliationStatements = ref<TransactionReconciliationStatementResponseItem[]>([]);
-    const openingBalance = ref<number>(0);
-    const closingBalance = ref<number>(0);
+    const reconciliationStatements = ref<TransactionReconciliationStatementResponse | undefined>(undefined);
 
     const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
     const fiscalYearStart = computed<number>(() => userStore.currentUserFiscalYearStart);
@@ -74,38 +75,6 @@ export function useReconciliationStatementPageBase() {
     const allAccountsMap = computed<Record<string, Account>>(() => accountsStore.allAccountsMap);
     const allCategoriesMap = computed<Record<string, TransactionCategory>>(() => transactionCategoriesStore.allTransactionCategoriesMap);
 
-    const totalOutflows = computed<number>(() => {
-        let totalOutflows = 0;
-
-        for (let i = 0; i < reconciliationStatements.value.length; i++) {
-            const transaction = reconciliationStatements.value[i];
-
-            if (transaction.type === TransactionType.Expense) {
-                totalOutflows += transaction.sourceAmount;
-            } else if (transaction.type === TransactionType.Transfer && transaction.sourceAccountId === accountId.value) {
-                totalOutflows += transaction.sourceAmount;
-            }
-        }
-
-        return totalOutflows;
-    });
-
-    const totalInflows = computed<number>(() => {
-        let totalInflows = 0;
-
-        for (let i = 0; i < reconciliationStatements.value.length; i++) {
-            const transaction = reconciliationStatements.value[i];
-
-            if (transaction.type === TransactionType.Income) {
-                totalInflows += transaction.sourceAmount;
-            } else if (transaction.type === TransactionType.Transfer && transaction.destinationAccountId === accountId.value) {
-                totalInflows += transaction.destinationAmount;
-            }
-        }
-
-        return totalInflows;
-    });
-
     const displayStartDateTime = computed<string>(() => {
         return formatUnixTimeToLongDateTime(startTime.value);
     });
@@ -114,31 +83,31 @@ export function useReconciliationStatementPageBase() {
         return formatUnixTimeToLongDateTime(endTime.value);
     });
 
-    const displayTotalOutflows = computed<string>(() => {
-        return formatAmountWithCurrency(totalOutflows.value, currentAccountCurrency.value);
+    const displayTotalInflows = computed<string>(() => {
+        return formatAmountWithCurrency(reconciliationStatements.value?.totalInflows ?? 0, currentAccountCurrency.value);
     });
 
-    const displayTotalInflows = computed<string>(() => {
-        return formatAmountWithCurrency(totalInflows.value, currentAccountCurrency.value);
+    const displayTotalOutflows = computed<string>(() => {
+        return formatAmountWithCurrency(reconciliationStatements.value?.totalOutflows ?? 0, currentAccountCurrency.value);
     });
 
     const displayTotalBalance = computed<string>(() => {
-        return formatAmountWithCurrency(totalInflows.value - totalOutflows.value, currentAccountCurrency.value);
+        return formatAmountWithCurrency((reconciliationStatements?.value?.totalInflows ?? 0) - (reconciliationStatements.value?.totalOutflows ?? 0), currentAccountCurrency.value);
     });
 
     const displayOpeningBalance = computed<string>(() => {
         if (isCurrentLiabilityAccount.value) {
-            return formatAmountWithCurrency(-openingBalance.value, currentAccountCurrency.value);
+            return formatAmountWithCurrency(-(reconciliationStatements?.value?.openingBalance ?? 0), currentAccountCurrency.value);
         } else {
-            return formatAmountWithCurrency(openingBalance.value, currentAccountCurrency.value);
+            return formatAmountWithCurrency(reconciliationStatements?.value?.openingBalance ?? 0, currentAccountCurrency.value);
         }
     });
 
     const displayClosingBalance = computed<string>(() => {
         if (isCurrentLiabilityAccount.value) {
-            return formatAmountWithCurrency(-closingBalance.value, currentAccountCurrency.value);
+            return formatAmountWithCurrency(-(reconciliationStatements?.value?.closingBalance ?? 0), currentAccountCurrency.value);
         } else {
-            return formatAmountWithCurrency(closingBalance.value, currentAccountCurrency.value);
+            return formatAmountWithCurrency(reconciliationStatements?.value?.closingBalance ?? 0, currentAccountCurrency.value);
         }
     });
 
@@ -220,7 +189,8 @@ export function useReconciliationStatementPageBase() {
             tt('Description')
         ].join(separator) + '\n';
 
-        const rows = reconciliationStatements.value.map(transaction => {
+        const transactions = reconciliationStatements.value?.transactions ?? [];
+        const rows = transactions.map(transaction => {
             const transactionTime = getUnixTime(parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value));
             let type = '';
             let categoryName = allCategoriesMap.value[transaction.categoryId]?.name || '';
@@ -285,8 +255,6 @@ export function useReconciliationStatementPageBase() {
         startTime,
         endTime,
         reconciliationStatements,
-        openingBalance,
-        closingBalance,
         // computed states
         firstDayOfWeek,
         fiscalYearStart,
@@ -300,8 +268,8 @@ export function useReconciliationStatementPageBase() {
         allCategoriesMap,
         displayStartDateTime,
         displayEndDateTime,
-        displayTotalOutflows,
         displayTotalInflows,
+        displayTotalOutflows,
         displayTotalBalance,
         displayOpeningBalance,
         displayClosingBalance,

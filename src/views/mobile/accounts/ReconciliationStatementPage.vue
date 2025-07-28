@@ -51,7 +51,9 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" v-if="finishQuery && !loading">
-            <f7-list-item :title="tt('Total Transactions')" :after="reconciliationStatements.length || '0'"></f7-list-item>
+            <f7-list-item :title="tt('Total Transactions')"
+                          :after="reconciliationStatements?.transactions.length"
+                          v-if="reconciliationStatements?.transactions.length"></f7-list-item>
             <f7-list-item :title="tt('Total Inflows')" :after="displayTotalInflows"></f7-list-item>
             <f7-list-item :title="tt('Total Outflows')" :after="displayTotalOutflows"></f7-list-item>
             <f7-list-item :title="tt('Net Cash Flow')" :after="displayTotalBalance"></f7-list-item>
@@ -283,8 +285,6 @@ const {
     startTime,
     endTime,
     reconciliationStatements,
-    openingBalance,
-    closingBalance,
     firstDayOfWeek,
     fiscalYearStart,
     currentTimezoneOffsetMinutes,
@@ -293,8 +293,8 @@ const {
     currentAccount,
     displayStartDateTime,
     displayEndDateTime,
-    displayTotalOutflows,
     displayTotalInflows,
+    displayTotalOutflows,
     displayTotalBalance,
     displayOpeningBalance,
     displayClosingBalance,
@@ -329,15 +329,15 @@ const displayEndTime = computed<string>(() => formatUnixTimeToLongDateTime(endTi
 const allReconciliationStatementVirtualListItems = computed<ReconciliationStatementVirtualListItem[]>(() => {
     const ret: ReconciliationStatementVirtualListItem[] = [];
 
-    if (!reconciliationStatements.value || reconciliationStatements.value.length < 1) {
+    if (!reconciliationStatements.value || !reconciliationStatements.value.transactions || reconciliationStatements.value.transactions.length < 1) {
         return ret;
     }
 
     let index = 0;
     let lastDisplayDate: string | null = null;
 
-    for (let i = 0; i < reconciliationStatements.value.length; i++) {
-        const transaction = reconciliationStatements.value[i];
+    for (let i = 0; i < reconciliationStatements.value.transactions.length; i++) {
+        const transaction = reconciliationStatements.value.transactions[i];
         const displayDate = getDisplayDate(transaction);
 
         if (lastDisplayDate !== displayDate) {
@@ -368,7 +368,7 @@ function init(): void {
     accountId.value = query['accountId'] || '';
     startTime.value = defaultDateRange?.minTime || 0;
     endTime.value = defaultDateRange?.maxTime || 0;
-    reconciliationStatements.value = [];
+    reconciliationStatements.value = undefined;
 
     Promise.all([
         accountsStore.loadAllAccounts({ force: false }),
@@ -433,9 +433,7 @@ function reload(force: boolean): void {
         }
 
         loading.value = false;
-        reconciliationStatements.value = result.transactions;
-        openingBalance.value = result.openingBalance;
-        closingBalance.value = result.closingBalance;
+        reconciliationStatements.value = result;
     }).catch(error => {
         loading.value = false;
 

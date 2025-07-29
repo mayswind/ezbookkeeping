@@ -43,18 +43,18 @@
                 </div>
             </template>
 
-            <div class="d-flex align-center" :class="{'mb-4': !loading}">
+            <div class="d-flex align-center mb-4">
                 <div class="d-flex align-center text-body-1">
                     <span class="ml-2">{{ tt('Opening Balance') }}</span>
                     <span class="text-primary" v-if="loading">
-                        <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                        <v-skeleton-loader class="skeleton-no-margin ml-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                     </span>
                     <span class="text-primary ml-2" v-else-if="!loading">
                         {{ displayOpeningBalance }}
                     </span>
                     <span class="ml-3">{{ tt('Closing Balance') }}</span>
                     <span class="text-primary" v-if="loading">
-                        <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                        <v-skeleton-loader class="skeleton-no-margin ml-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                     </span>
                     <span class="text-primary ml-2" v-else-if="!loading">
                         {{ displayClosingBalance }}
@@ -64,21 +64,21 @@
                 <div class="d-flex align-center text-body-1">
                     <span class="ml-2">{{ tt('Total Inflows') }}</span>
                     <span class="text-income" v-if="loading">
-                        <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                        <v-skeleton-loader class="skeleton-no-margin ml-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                     </span>
                     <span class="text-income ml-2" v-else-if="!loading">
                         {{ displayTotalInflows }}
                     </span>
                     <span class="ml-3">{{ tt('Total Outflows') }}</span>
                     <span class="text-expense" v-if="loading">
-                        <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                        <v-skeleton-loader class="skeleton-no-margin ml-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                     </span>
                     <span class="text-expense ml-2" v-else-if="!loading">
                         {{ displayTotalOutflows }}
                     </span>
                     <span class="ml-3">{{ tt('Net Cash Flow') }}</span>
                     <span class="text-primary" v-if="loading">
-                        <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                        <v-skeleton-loader class="skeleton-no-margin ml-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                     </span>
                     <span class="text-primary ml-2" v-else-if="!loading">
                         {{ displayTotalBalance }}
@@ -153,7 +153,7 @@
                     <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2" v-if="loading || (reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length)">
                         <span class="ml-2">{{ tt('Total Transactions') }}</span>
                         <span v-if="loading">
-                            <v-skeleton-loader type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                            <v-skeleton-loader class="skeleton-no-margin ml-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                         </span>
                         <span class="ml-2" v-else-if="!loading">
                             {{ reconciliationStatements?.transactions.length ?? 0 }}

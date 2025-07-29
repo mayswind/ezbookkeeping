@@ -497,6 +497,7 @@ import { TransactionTemplate } from '@/models/transaction_template.ts';
 import type { TransactionPictureInfoBasicResponse } from '@/models/transaction_picture_info.ts';
 import { Transaction } from '@/models/transaction.ts';
 
+import { isDefined } from '@/lib/common.ts';
 import {
     getTimezoneOffsetMinutes,
     getCurrentUnixTime
@@ -537,6 +538,9 @@ export interface TransactionEditOptions extends SetTransactionOptions {
     template?: TransactionTemplate;
     currentTransaction?: Transaction;
     currentTemplate?: TransactionTemplate;
+    time?: number;
+    setAmount?: boolean;
+    setTransactionTime?: boolean;
 }
 
 interface TransactionEditResponse {
@@ -816,6 +820,14 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
             (transaction.value as TransactionTemplate).fillFrom(template);
         } else {
             setTransaction(null, options, true, true);
+
+            if (options.setAmount && isDefined(options.amount)) {
+                transaction.value.sourceAmount = options.amount;
+            }
+
+            if (options.setTransactionTime && isDefined(options.time)) {
+                transaction.value.time = options.time;
+            }
         }
 
         loading.value = false;

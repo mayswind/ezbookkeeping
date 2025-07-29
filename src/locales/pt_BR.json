@@ -1634,6 +1634,8 @@
     "Unable to delete this account": "Não foi possível deletar esta conta",
     "Unable to delete this sub-account": "Não foi possível deletar esta subconta",
     "Reconciliation Statement": "Reconciliation Statement",
+    "Update Closing Balance": "Update Closing Balance",
+    "Please enter the new closing balance for the account": "Please enter the new closing balance for the account",
     "Transaction": "Transação",
     "Transactions": "Transações",
     "Transaction Pictures": "Imagens das Transações",

@@ -12,9 +12,13 @@
                         <v-icon :icon="mdiDotsVertical" />
                         <v-menu activator="parent">
                             <v-list>
-                                <v-list-item :prepend-icon="mdiReceiptTextPlusOutline"
+                                <v-list-item :prepend-icon="mdiInvoiceTextPlusOutline"
                                              :title="tt('Add Transaction')"
                                              @click="addTransaction()"></v-list-item>
+                                <v-divider class="my-2"/>
+                                <v-list-item :prepend-icon="mdiInvoiceTextEditOutline"
+                                             :title="tt('Update Closing Balance')"
+                                             @click="updateClosingBalance()"></v-list-item>
                                 <v-divider class="my-2"/>
                                 <v-list-item :prepend-icon="mdiComma"
                                              :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1"
@@ -189,6 +193,7 @@
         </v-card>
     </v-dialog>
 
+    <amount-input-dialog ref="amountInputDialog" />
     <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
 
     <snack-bar ref="snackbar" />
@@ -197,6 +202,7 @@
 <script setup lang="ts">
 import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
+import AmountInputDialog from '@/components/desktop/AmountInputDialog.vue';
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
 import { TransactionEditPageType } from '@/views/base/transactions/TransactionEditPageBase.ts';
 
@@ -213,18 +219,21 @@ import { TransactionType } from '@/core/transaction.ts';
 import { KnownFileType } from '@/core/file.ts';
 import { Transaction, type TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
 
+import { getCurrentUnixTime } from '@/lib/datetime.ts';
 import { startDownloadFile } from '@/lib/ui/common.ts';
 
 import {
     mdiArrowRight,
     mdiDotsVertical,
-    mdiReceiptTextPlusOutline,
+    mdiInvoiceTextPlusOutline,
+    mdiInvoiceTextEditOutline,
     mdiComma,
     mdiKeyboardTab,
     mdiPencilBoxOutline
 } from '@mdi/js';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
+type AmountInputDialogType = InstanceType<typeof AmountInputDialog>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 
 interface ReconciliationStatementDialogTablePageOption {
@@ -246,6 +255,7 @@ const {
     currentTimezoneOffsetMinutes,
     allAccountsMap,
     allCategoriesMap,
+    currentAccountCurrency,
     isCurrentLiabilityAccount,
     exportFileName,
     displayStartDateTime,
@@ -267,6 +277,7 @@ const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionsStore = useTransactionsStore();
 
+const amountInputDialog = useTemplateRef<AmountInputDialogType>('amountInputDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
@@ -401,6 +412,65 @@ function addTransaction(): void {
         if (error) {
             snackbar.value?.showError(error);
         }
+    });
+}
+
+function updateClosingBalance(): void {
+    let currentClosingBalance = reconciliationStatements.value?.closingBalance ?? 0;
+
+    if (isCurrentLiabilityAccount.value) {
+        currentClosingBalance = -currentClosingBalance;
+    }
+
+    amountInputDialog.value?.open({
+        text: tt('Please enter the new closing balance for the account'),
+        inputLabel: tt('Closing Balance'),
+        inputPlaceholder: tt('Closing Balance'),
+        currency: currentAccountCurrency.value,
+        initAmount: currentClosingBalance
+    }).then(newClosingBalance => {
+        if (!newClosingBalance) {
+            return;
+        }
+
+        const currentUnixTime = getCurrentUnixTime();
+        let setTransactionTime = false;
+        let newTransactionTime: number | undefined = undefined;
+
+        if (endTime.value < currentUnixTime) {
+            setTransactionTime = true;
+            newTransactionTime = endTime.value;
+        } else if (currentUnixTime < startTime.value) {
+            setTransactionTime = true;
+            newTransactionTime = startTime.value;
+        }
+
+        let newTransactionType: TransactionType = isCurrentLiabilityAccount.value ? TransactionType.Expense : TransactionType.Income;
+        let newTransactionAmount: number = newClosingBalance - currentClosingBalance;
+
+        if (newTransactionAmount < 0) {
+            newTransactionType = isCurrentLiabilityAccount.value ? TransactionType.Income : TransactionType.Expense;
+            newTransactionAmount = -newTransactionAmount;
+        }
+
+        editDialog.value?.open({
+            time: newTransactionTime,
+            type: newTransactionType,
+            amount: newTransactionAmount,
+            accountId: accountId.value,
+            setAmount: true,
+            setTransactionTime: setTransactionTime
+        }).then(result => {
+            if (result && result.message) {
+                snackbar.value?.showMessage(result.message);
+            }
+
+            reload();
+        }).catch(error => {
+            if (error) {
+                snackbar.value?.showError(error);
+            }
+        });
     });
 }
 

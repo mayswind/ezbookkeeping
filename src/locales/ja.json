@@ -1634,6 +1634,8 @@
     "Unable to delete this account": "この口座を削除できません",
     "Unable to delete this sub-account": "Unable to delete this sub-account",
     "Reconciliation Statement": "Reconciliation Statement",
+    "Update Closing Balance": "Update Closing Balance",
+    "Please enter the new closing balance for the account": "Please enter the new closing balance for the account",
     "Transaction": "取引",
     "Transactions": "取引",
     "Transaction Pictures": "取引の写真",

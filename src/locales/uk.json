@@ -1634,6 +1634,8 @@
     "Unable to delete this account": "Не вдалося видалити цей рахунок",
     "Unable to delete this sub-account": "Не вдалося видалити цей субрахунок",
     "Reconciliation Statement": "Reconciliation Statement",
+    "Update Closing Balance": "Update Closing Balance",
+    "Please enter the new closing balance for the account": "Please enter the new closing balance for the account",
     "Transaction": "Транзакція",
     "Transactions": "Транзакції",
     "Transaction Pictures": "Зображення транзакцій",

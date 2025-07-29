@@ -1634,6 +1634,8 @@
     "Unable to delete this account": "無法刪除此帳戶",
     "Unable to delete this sub-account": "無法刪除此子帳戶",
     "Reconciliation Statement": "對帳單",
+    "Update Closing Balance": "更新期末餘額",
+    "Please enter the new closing balance for the account": "請輸入帳戶的新期末餘額",
     "Transaction": "交易",
     "Transactions": "交易",
     "Transaction Pictures": "交易圖片",

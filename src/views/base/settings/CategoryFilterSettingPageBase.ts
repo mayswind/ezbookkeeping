@@ -135,6 +135,10 @@ export function useCategoryFilterSettingPageBase(type?: string, allowCategoryTyp
 
             const category = transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
 
+            if (!category) {
+                continue;
+            }
+
             if (!isCategoryOrSubCategoriesAllChecked(category, filterCategoryIds.value)) {
                 filteredCategoryIds[categoryId] = true;
                 isAllSelected = false;

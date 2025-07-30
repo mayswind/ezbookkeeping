@@ -120,6 +120,10 @@ export function useAccountFilterSettingPageBase(type?: string) {
 
             const account = accountsStore.allAccountsMap[accountId];
 
+            if (!account) {
+                continue;
+            }
+
             if (!allowHiddenAccount.value && account.hidden) {
                 continue;
             }

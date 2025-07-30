@@ -98,6 +98,10 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
 
             const transactionTag = transactionTagsStore.allTransactionTagsMap[transactionTagId];
 
+            if (!transactionTag) {
+                continue;
+            }
+
             if (filterTagIds.value[transactionTag.id]) {
                 filteredTagIds[transactionTag.id] = true;
             } else {

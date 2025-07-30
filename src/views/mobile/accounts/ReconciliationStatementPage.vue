@@ -145,8 +145,8 @@
                               :class="{ 'transaction-info': item.type == 'transaction', 'last-transaction-of-day': allReconciliationStatementVirtualListItems[item.index + 1] && allReconciliationStatementVirtualListItems[item.index + 1].type === 'date', 'reconciliation-statement-transaction-date': item.type == 'date' }"
                               :style="`top: ${virtualDataItems.topPosition}px`"
                               :virtual-list-index="item.index"
-                              :swipeout="item.type == 'transaction' && item.transaction"
-                              :accordion-item="item.type == 'transaction' && item.transaction"
+                              :swipeout="item.type === 'transaction' && !!item.transaction"
+                              :accordion-item="item.type === 'transaction' && !!item.transaction"
                               :link="item.type == 'transaction' && item.transaction && item.transaction.type !== TransactionType.ModifyBalance ? `/transaction/detail?id=${item.transaction?.id}&type=${item.transaction.type}` : null"
                               v-for="item in virtualDataItems.items"
                 >

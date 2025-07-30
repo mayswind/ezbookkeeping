@@ -5,7 +5,14 @@
                 <div class="d-flex align-center justify-center">
                     <div class="d-flex w-100 align-center justify-center">
                         <h4 class="text-h4">{{ tt('Reconciliation Statement') }}</h4>
-                        <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
+                        <v-btn density="compact" color="default" variant="text" size="24"
+                               class="ml-2" :icon="true" :loading="loading" @click="reload()">
+                            <template #loader>
+                                <v-progress-circular indeterminate size="20"/>
+                            </template>
+                            <v-icon :icon="mdiRefresh" size="24" />
+                            <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
+                        </v-btn>
                     </div>
                     <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                            :icon="true" :disabled="loading">
@@ -223,6 +230,7 @@ import { getCurrentUnixTime } from '@/lib/datetime.ts';
 import { startDownloadFile } from '@/lib/ui/common.ts';
 
 import {
+    mdiRefresh,
     mdiArrowRight,
     mdiDotsVertical,
     mdiInvoiceTextPlusOutline,

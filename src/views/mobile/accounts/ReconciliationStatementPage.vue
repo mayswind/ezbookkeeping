@@ -238,9 +238,21 @@
                                     @dateRange:change="changeCustomDateFilter">
         </date-range-selection-sheet>
 
+        <number-pad-sheet :min-value="TRANSACTION_MIN_AMOUNT"
+                          :max-value="TRANSACTION_MAX_AMOUNT"
+                          :currency="currentAccountCurrency"
+                          :hint="tt('Please enter the new closing balance for the account')"
+                          v-model:show="showNewClosingBalanceSheet"
+                          v-model="newClosingBalance"
+                          @update:model-value="updateClosingBalance"
+        ></number-pad-sheet>
+
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
                 <f7-actions-button :class="{ 'disabled': loading }" @click="addTransaction()">{{ tt('Add Transaction') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button :class="{ 'disabled': loading }" @click="updateClosingBalance(undefined)">{{ tt('Update Closing Balance') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button :class="{ 'disabled': loading }" @click="reload(true)">{{ tt('Refresh') }}</f7-actions-button>
@@ -277,9 +289,12 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 import { type TimeRangeAndDateType, DateRange, DateRangeScene } from '@/core/datetime.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
+import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import { type TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
 
+import { isDefined } from '@/lib/common.ts';
 import {
+    getCurrentUnixTime,
     getDateTypeByDateRange,
     getDateTypeByBillingCycleDateRange,
     getDateRangeByDateType,
@@ -344,7 +359,9 @@ const loading = ref<boolean>(false);
 const loadingError = ref<unknown | null>(null);
 const queryDateRangeType = ref<number>(DateRange.ThisMonth.type);
 const transactionToDelete = ref<TransactionReconciliationStatementResponseItem | null>(null);
+const newClosingBalance = ref<number>(0);
 const showCustomDateRangeSheet = ref<boolean>(false);
+const showNewClosingBalanceSheet = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
 const virtualDataItems = ref<ReconciliationStatementVirtualListData>({
@@ -488,6 +505,46 @@ function duplicateTransaction(transaction: TransactionReconciliationStatementRes
 
 function editTransaction(transaction: TransactionReconciliationStatementResponseItem): void {
     props.f7router.navigate(`/transaction/edit?id=${transaction.id}&type=${transaction.type}`);
+}
+
+function updateClosingBalance(balance?: number): void {
+    let currentClosingBalance = reconciliationStatements.value?.closingBalance ?? 0;
+
+    if (isCurrentLiabilityAccount.value) {
+        currentClosingBalance = -currentClosingBalance;
+    }
+
+    if (!isDefined(balance)) {
+        newClosingBalance.value = currentClosingBalance;
+        showNewClosingBalanceSheet.value = true;
+        return;
+    }
+
+    const currentUnixTime = getCurrentUnixTime();
+    let setTransactionTime = false;
+    let newTransactionTime: number | undefined = undefined;
+
+    if (endTime.value < currentUnixTime) {
+        setTransactionTime = true;
+        newTransactionTime = endTime.value;
+    } else if (currentUnixTime < startTime.value) {
+        setTransactionTime = true;
+        newTransactionTime = startTime.value;
+    }
+
+    let newTransactionType: TransactionType = isCurrentLiabilityAccount.value ? TransactionType.Expense : TransactionType.Income;
+    let newTransactionAmount: number = balance - currentClosingBalance;
+
+    if (newTransactionAmount < 0) {
+        newTransactionType = isCurrentLiabilityAccount.value ? TransactionType.Income : TransactionType.Expense;
+        newTransactionAmount = -newTransactionAmount;
+    }
+
+    if (setTransactionTime) {
+        props.f7router.navigate(`/transaction/add?time=${newTransactionTime}&type=${newTransactionType}&amount=${newTransactionAmount}&accountId=${accountId.value}&withAmount=true&withTime=true`);
+    } else {
+        props.f7router.navigate(`/transaction/add?type=${newTransactionType}&amount=${newTransactionAmount}&accountId=${accountId.value}&withAmount=true`);
+    }
 }
 
 function removeTransaction(transaction: TransactionReconciliationStatementResponseItem | null, confirm: boolean): void {

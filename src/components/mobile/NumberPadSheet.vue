@@ -3,6 +3,9 @@
               :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <div class="swipe-handler" style="z-index: 10"></div>
         <f7-page-content class="margin-top no-padding-top">
+            <div class="margin-top padding-horizontal" v-if="hint">
+                <span>{{ hint }}</span>
+            </div>
             <div class="numpad-values">
                 <span class="numpad-value" :class="currentDisplayNumClass">{{ currentDisplay }}</span>
             </div>
@@ -80,6 +83,7 @@ const props = defineProps<{
     maxValue?: number;
     currency?: string;
     flipNegative?: boolean;
+    hint?: string;
     show: boolean;
 }>();
 

@@ -509,6 +509,7 @@ import { TransactionTemplate } from '@/models/transaction_template.ts';
 import type { TransactionPictureInfoBasicResponse } from '@/models/transaction_picture_info.ts';
 import { Transaction } from '@/models/transaction.ts';
 
+import { isDefined } from '@/lib/common.ts';
 import {
     getActualUnixTimeForStore,
     getBrowserTimezoneOffsetMinutes,
@@ -962,6 +963,14 @@ function init(): void {
             }
 
             (transaction.value as TransactionTemplate).fillFrom(template);
+        } else {
+            if (query['withAmount'] && query['withAmount'] === 'true' && isDefined(query['amount']) && parseInt(query['amount'])) {
+                transaction.value.sourceAmount = parseInt(query['amount']);
+            }
+
+            if (query['withTime'] && query['withTime'] === 'true' && isDefined(query['time']) && parseInt(query['time'])) {
+                transaction.value.time = parseInt(query['time']);
+            }
         }
 
         loading.value = false;

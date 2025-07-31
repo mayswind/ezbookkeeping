@@ -25,7 +25,7 @@
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Default Language" title="Language" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Default Currency" title="Currency" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="First Day of Week" title="Week Day" link="#"></f7-list-item>
-            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Fiscal Year Start Date" title="January 1" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Fiscal Year Start Date" title="January 1"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
@@ -206,7 +206,7 @@
             </f7-list-item>
 
             <f7-list-item
-                link="#"
+                link="#" no-chevron
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Fiscal Year Start Date')"
                 :title="formatFiscalYearStartToLongDay(newProfile.fiscalYearStart)"

@@ -120,13 +120,11 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
+import { type TimePickerValue, useDateTimeSelectionBase } from '@/components/base/DateTimeSelectionBase.ts';
 
 import { useEnvironmentsStore } from '@/stores/environment.ts';
-import { useUserStore } from '@/stores/user.ts';
 
-import { type NameValue } from '@/core/base.ts';
-import { type WeekDayValue } from '@/core/datetime.ts';
-import { isDefined, arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
+import { isDefined } from '@/lib/common.ts';
 import {
     getHourIn12HourFormat,
     getTimezoneOffsetMinutes,
@@ -134,18 +132,12 @@ import {
     getLocalDatetimeFromUnixTime,
     getActualUnixTimeForStore,
     getCurrentUnixTime,
-    getCurrentYear,
     getUnixTime,
     getAMOrPM,
     getCombinedDateAndTimeValues
 } from '@/lib/datetime.ts';
 
 type VueDatePickerType = InstanceType<typeof VueDatePicker>;
-
-interface TimePickerValue {
-    value: string;
-    itemsIndex: number;
-}
 
 const props = defineProps<{
     modelValue: number;
@@ -160,85 +152,79 @@ const emit = defineEmits<{
 
 const {
     tt,
-    getAllMinWeekdayNames,
-    getAllMeridiemIndicators,
     getMonthShortName,
-    formatUnixTimeToLongDateTime,
-    isLongDateMonthAfterYear,
-    isLongTime24HourFormat,
-    isLongTimeMeridiemIndicatorFirst,
-    isLongTimeHourTwoDigits,
-    isLongTimeMinuteTwoDigits,
-    isLongTimeSecondTwoDigits
+    formatUnixTimeToLongDateTime
 } = useI18n();
 const { showToast } = useI18nUIComponents();
 
-const environmentsStore = useEnvironmentsStore();
-const userStore = useUserStore();
+const {
+    is24Hour,
+    isHourTwoDigits,
+    isMinuteTwoDigits,
+    isSecondTwoDigits,
+    isMeridiemIndicatorFirst,
+    yearRange,
+    meridiemItems,
+    firstDayOfWeek,
+    dayNames,
+    isYearFirst,
+    getDisplayTimeValue,
+    generateAllHours,
+    generateAllMinutesOrSeconds
+} = useDateTimeSelectionBase();
 
-const is24Hour: boolean = isLongTime24HourFormat();
-const isHourTwoDigits: boolean = isLongTimeHourTwoDigits();
-const isMinuteTwoDigits: boolean = isLongTimeMinuteTwoDigits();
-const isSecondTwoDigits: boolean = isLongTimeSecondTwoDigits();
-const isMeridiemIndicatorFirst: boolean = isLongTimeMeridiemIndicatorFirst() || false;
+const environmentsStore = useEnvironmentsStore();
+
+const datetimepicker = useTemplateRef<VueDatePickerType>('datetimepicker');
+
 let resetTimePickerItemPositionItemsClass: string | undefined = undefined;
 let resetTimePickerItemPositionItemClass: string | undefined = undefined;
 let resetTimePickerItemPositionItemsLastOffsetTop: number | undefined = undefined;
 let resetTimePickerItemPositionCheckedFrames: number | undefined = undefined;
 
 const mode = ref<string>(props.initMode || 'time');
-const yearRange = ref<number[]>([
-    2000,
-    getCurrentYear() + 1
-]);
 const dateTime = ref<Date>(getLocalDatetimeFromUnixTime(props.modelValue || getCurrentUnixTime()));
 const timePickerContainerHeight = ref<number | undefined>(undefined);
 const timePickerItemHeight = ref<number | undefined>(undefined);
 
-const datetimepicker = useTemplateRef<VueDatePickerType>('datetimepicker');
+const hourItems = computed<TimePickerValue[]>(() => generateAllHours(3, isHourTwoDigits.value));
+const minuteItems = computed<TimePickerValue[]>(() => generateAllMinutesOrSeconds(3, isMinuteTwoDigits.value));
+const secondItems = computed<TimePickerValue[]>(() => generateAllMinutesOrSeconds(3, isSecondTwoDigits.value));
 
 const currentMeridiemIndicator = computed<string>({
     get: () => {
         return getAMOrPM(dateTime.value.getHours())
     },
     set: (value: string) => {
-        dateTime.value = getCombinedDateAndTimeValues(dateTime.value, currentHour.value, currentMinute.value, currentSecond.value, value, is24Hour);
+        dateTime.value = getCombinedDateAndTimeValues(dateTime.value, currentHour.value, currentMinute.value, currentSecond.value, value, is24Hour.value);
     }
 });
 const currentHour = computed<string>({
     get: () => {
-        return getDisplayTimeValue(is24Hour ? dateTime.value.getHours() : getHourIn12HourFormat(dateTime.value.getHours()), isHourTwoDigits);
+        return getDisplayTimeValue(is24Hour.value ? dateTime.value.getHours() : getHourIn12HourFormat(dateTime.value.getHours()), isHourTwoDigits.value);
     },
     set: (value: string) => {
-        dateTime.value = getCombinedDateAndTimeValues(dateTime.value, value, currentMinute.value, currentSecond.value, currentMeridiemIndicator.value, is24Hour);
+        dateTime.value = getCombinedDateAndTimeValues(dateTime.value, value, currentMinute.value, currentSecond.value, currentMeridiemIndicator.value, is24Hour.value);
     }
 });
 const currentMinute = computed<string>({
     get: () => {
-        return getDisplayTimeValue(dateTime.value.getMinutes(), isMinuteTwoDigits);
+        return getDisplayTimeValue(dateTime.value.getMinutes(), isMinuteTwoDigits.value);
     },
     set: (value: string) => {
-        dateTime.value = getCombinedDateAndTimeValues(dateTime.value, currentHour.value, value, currentSecond.value, currentMeridiemIndicator.value, is24Hour);
+        dateTime.value = getCombinedDateAndTimeValues(dateTime.value, currentHour.value, value, currentSecond.value, currentMeridiemIndicator.value, is24Hour.value);
     }
 });
 const currentSecond = computed<string>({
     get: () => {
-        return getDisplayTimeValue(dateTime.value.getSeconds(), isSecondTwoDigits);
+        return getDisplayTimeValue(dateTime.value.getSeconds(), isSecondTwoDigits.value);
     },
     set: (value: string) => {
-        dateTime.value = getCombinedDateAndTimeValues(dateTime.value, currentHour.value, currentMinute.value, value, currentMeridiemIndicator.value, is24Hour);
+        dateTime.value = getCombinedDateAndTimeValues(dateTime.value, currentHour.value, currentMinute.value, value, currentMeridiemIndicator.value, is24Hour.value);
     }
 });
 
-const hourItems = computed<TimePickerValue[]>(() => generateAllHours(3, isHourTwoDigits));
-const minuteItems = computed<TimePickerValue[]>(() => generateAllMinutesOrSeconds(3, isMinuteTwoDigits));
-const secondItems = computed<TimePickerValue[]>(() => generateAllMinutesOrSeconds(3, isSecondTwoDigits));
-const meridiemItems = computed<NameValue[]>(() => getAllMeridiemIndicators());
-
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
-const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
-const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllMinWeekdayNames(), firstDayOfWeek.value));
-const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
 const displayTime = computed<string>(() => formatUnixTimeToLongDateTime(getActualUnixTimeForStore(getUnixTime(dateTime.value), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())));
 const switchButtonTitle = computed<string>(() => mode.value === 'time' ? 'Date' : 'Time');
 
@@ -272,53 +258,6 @@ function confirm(): void {
 
     emit('update:modelValue', unixTime);
     emit('update:show', false);
-}
-
-function getDisplayTimeValue(value: number, forceTwoDigits: boolean): string {
-    if (forceTwoDigits && value < 10) {
-        return `0${value}`;
-    } else {
-        return value.toString();
-    }
-}
-
-function generateAllHours(count: number, forceTwoDigits: boolean): TimePickerValue[] {
-    const ret: TimePickerValue[] = [];
-    const startHour = is24Hour ? 0 : 1;
-    const endHour = is24Hour ? 23 : 11;
-
-    for (let i = 0; i < count; i++) {
-        if (!is24Hour) {
-            ret.push({
-                value: '12',
-                itemsIndex: i
-            });
-        }
-
-        for (let j = startHour; j <= endHour; j++) {
-            ret.push({
-                value: getDisplayTimeValue(j, forceTwoDigits),
-                itemsIndex: i
-            });
-        }
-    }
-
-    return ret;
-}
-
-function generateAllMinutesOrSeconds(count: number, forceTwoDigits: boolean): TimePickerValue[] {
-    const ret: TimePickerValue[] = [];
-
-    for (let i = 0; i < count; i++) {
-        for (let j = 0; j < 60; j++) {
-            ret.push({
-                value: getDisplayTimeValue(j, forceTwoDigits),
-                itemsIndex: i
-            });
-        }
-    }
-
-    return ret;
 }
 
 function getTimerPickerItemStyle(textualValue: string, textualCurrentValue: string, itemsIndex: number, values: TimePickerValue[]): string {

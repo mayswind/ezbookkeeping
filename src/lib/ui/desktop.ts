@@ -48,6 +48,22 @@ export function getCssValue(element: HTMLElement | null, name: string): string {
     return computedStyle.getPropertyValue(name);
 }
 
+export function setChildInputFocus(parentEl: HTMLElement | undefined, childSelector: string): void {
+    if (!parentEl) {
+        return;
+    }
+
+    const childElement = parentEl.querySelector(childSelector);
+
+    if (!childElement || !(childElement as HTMLInputElement)) {
+        return;
+    }
+
+    const childInput = (childElement as HTMLInputElement);
+    childInput.focus();
+    childInput.select();
+}
+
 export function scrollToSelectedItem(parentEl: HTMLElement | null | undefined, containerSelector: string | null, selectedItemSelector: string): void {
     if (!parentEl) {
         return;

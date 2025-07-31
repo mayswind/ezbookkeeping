@@ -16,7 +16,7 @@
                 </f7-link>
             </f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
-                <f7-link icon-f7="plus" :class="{ 'disabled': !canAddTransaction }" :href="`/transaction/add?type=${query.type}&categoryId=${queryAllFilterCategoryIdsCount === 1 ? query.categoryIds : ''}&accountId=${queryAllFilterAccountIdsCount === 1 ? query.accountIds : ''}&tagIds=${query.tagIds || ''}`"></f7-link>
+                <f7-link icon-f7="plus" :class="{ 'disabled': !canAddTransaction }" @click="add"></f7-link>
             </f7-nav-right>
 
             <f7-subnavbar :inner="false">
@@ -1372,6 +1372,48 @@ function changeAmountFilter(filterType: string): void {
     if (changed) {
         reload();
     }
+}
+
+function add(): void {
+    const currentUnixTime = getCurrentUnixTime();
+
+    let setTransactionTime = false;
+    let newTransactionTime: number | undefined = undefined;
+
+    if (query.value.maxTime && query.value.minTime) {
+        if (query.value.maxTime < currentUnixTime) {
+            setTransactionTime = true;
+            newTransactionTime = query.value.maxTime;
+        } else if (currentUnixTime < query.value.minTime) {
+            setTransactionTime = true;
+            newTransactionTime = query.value.minTime;
+        }
+    }
+
+    const params: string[] = [];
+
+    if (setTransactionTime) {
+        params.push(`time=${newTransactionTime}`);
+        params.push('withTime=true');
+    }
+
+    if (query.value.type !== TransactionType.ModifyBalance) {
+        params.push(`type=${query.value.type}`);
+    }
+
+    if (queryAllFilterCategoryIdsCount.value === 1) {
+        params.push(`categoryId=${query.value.categoryIds}`);
+    }
+
+    if (queryAllFilterAccountIdsCount.value === 1) {
+        params.push(`accountId=${query.value.accountIds}`);
+    }
+
+    if (query.value.tagIds) {
+        params.push(`tagIds=${query.value.tagIds}`);
+    }
+
+    props.f7router.navigate(`/transaction/add?${params.join('&')}`);
 }
 
 function duplicate(transaction: Transaction): void {

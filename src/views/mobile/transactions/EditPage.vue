@@ -912,7 +912,7 @@ function init(): void {
                 if (fromTransaction) {
                     addByTemplateId.value = fromTransaction.id;
                 }
-            } else if ((settingsStore.appSettings.autoSaveTransactionDraft === 'enabled' || settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') && transactionsStore.transactionDraft) {
+            } else if (query['noTransactionDraft'] !== 'true' && (settingsStore.appSettings.autoSaveTransactionDraft === 'enabled' || settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') && transactionsStore.transactionDraft) {
                 fromTransaction = Transaction.ofDraft(transactionsStore.transactionDraft);
             }
         } else if (pageTypeAndMode.type === TransactionEditPageType.Template && responses[4] instanceof TransactionTemplate) {
@@ -1020,7 +1020,7 @@ function save(): void {
                     showToast('You have saved this transaction');
                 }
 
-                if (mode.value === TransactionEditPageMode.Add && !addByTemplateId.value && !duplicateFromId.value) {
+                if (mode.value === TransactionEditPageMode.Add && query['noTransactionDraft'] !== 'true' && !addByTemplateId.value && !duplicateFromId.value) {
                     transactionsStore.clearTransactionDraft();
                 }
 
@@ -1230,14 +1230,16 @@ function onPageAfterIn(): void {
 }
 
 function onPageBeforeOut(): void {
-    if (submitted.value || pageTypeAndMode?.type !== TransactionEditPageType.Transaction || mode.value !== TransactionEditPageMode.Add || addByTemplateId.value || duplicateFromId.value) {
+    if (submitted.value || pageTypeAndMode?.type !== TransactionEditPageType.Transaction || mode.value !== TransactionEditPageMode.Add || query['noTransactionDraft'] === 'true' || addByTemplateId.value || duplicateFromId.value) {
         return;
     }
 
+    const initAmount: number | undefined = query['withAmount'] && query['withAmount'] === 'true' && query['amount'] ? parseInt(query['amount']) : undefined;
+
     if (settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') {
-        if (transactionsStore.isTransactionDraftModified(transaction.value, query['categoryId'], query['accountId'], query['tagIds'])) {
+        if (transactionsStore.isTransactionDraftModified(transaction.value, initAmount, query['categoryId'], query['accountId'], query['tagIds'])) {
             showConfirm('Do you want to save this transaction draft?', () => {
-                transactionsStore.saveTransactionDraft(transaction.value, query['categoryId'], query['accountId'], query['tagIds']);
+                transactionsStore.saveTransactionDraft(transaction.value, initAmount, query['categoryId'], query['accountId'], query['tagIds']);
             }, () => {
                 transactionsStore.clearTransactionDraft();
             });
@@ -1245,7 +1247,7 @@ function onPageBeforeOut(): void {
             transactionsStore.clearTransactionDraft();
         }
     } else if (settingsStore.appSettings.autoSaveTransactionDraft === 'enabled') {
-        transactionsStore.saveTransactionDraft(transaction.value, query['categoryId'], query['accountId'], query['tagIds']);
+        transactionsStore.saveTransactionDraft(transaction.value, initAmount, query['categoryId'], query['accountId'], query['tagIds']);
     }
 }
 

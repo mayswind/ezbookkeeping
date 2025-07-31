@@ -541,6 +541,7 @@ export interface TransactionEditOptions extends SetTransactionOptions {
     time?: number;
     setAmount?: boolean;
     setTransactionTime?: boolean;
+    noTransactionDraft?: boolean;
 }
 
 interface TransactionEditResponse {
@@ -624,10 +625,12 @@ const pictureInput = useTemplateRef<HTMLInputElement>('pictureInput');
 const showState = ref<boolean>(false);
 const activeTab = ref<string>('basicInfo');
 const originalTransactionEditable = ref<boolean>(false);
+const noTransactionDraft = ref<boolean>(false);
 const geoMenuState = ref<boolean>(false);
 const tagSearchContent = ref<string>('');
 const removingPictureId = ref<string>('');
 
+const initAmount = ref<number | undefined>(undefined);
 const initCategoryId = ref<string | undefined>(undefined);
 const initAccountId = ref<string | undefined>(undefined);
 const initTagIds = ref<string | undefined>(undefined);
@@ -666,7 +669,7 @@ const isAllFilteredTagHidden = computed<boolean>(() => {
 
 const isTransactionModified = computed<boolean>(() => {
     if (mode.value === TransactionEditPageMode.Add) {
-        return transactionsStore.isTransactionDraftModified(transaction.value, initCategoryId.value, initAccountId.value, initTagIds.value);
+        return transactionsStore.isTransactionDraftModified(transaction.value, initAmount.value, initCategoryId.value, initAccountId.value, initTagIds.value);
     } else if (mode.value === TransactionEditPageMode.Edit) {
         return true;
     } else {
@@ -709,6 +712,11 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
     geoLocationStatus.value = null;
     setGeoLocationByClickMap.value = false;
     originalTransactionEditable.value = false;
+    noTransactionDraft.value = options.noTransactionDraft || false;
+
+    if (options.setAmount) {
+        initAmount.value = options.amount;
+    }
 
     initCategoryId.value = options.categoryId;
     initAccountId.value = options.accountId;
@@ -740,7 +748,7 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
             if (options.template) {
                 setTransaction(options.template, options, false, false);
                 addByTemplateId.value = options.template.id;
-            } else if ((settingsStore.appSettings.autoSaveTransactionDraft === 'enabled' || settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') && transactionsStore.transactionDraft) {
+            } else if (!options.noTransactionDraft && (settingsStore.appSettings.autoSaveTransactionDraft === 'enabled' || settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') && transactionsStore.transactionDraft) {
                 setTransaction(Transaction.ofDraft(transactionsStore.transactionDraft), options, false, false);
             }
 
@@ -882,7 +890,7 @@ function save(): void {
                     }
                 }
 
-                if (mode.value === TransactionEditPageMode.Add && !addByTemplateId.value && !duplicateFromId.value) {
+                if (mode.value === TransactionEditPageMode.Add && !noTransactionDraft.value && !addByTemplateId.value && !duplicateFromId.value) {
                     transactionsStore.clearTransactionDraft();
                 }
 
@@ -1024,15 +1032,15 @@ function cancel(): void {
         showState.value = false;
     };
 
-    if (props.type !== TransactionEditPageType.Transaction || mode.value !== TransactionEditPageMode.Add || addByTemplateId.value || duplicateFromId.value) {
+    if (props.type !== TransactionEditPageType.Transaction || mode.value !== TransactionEditPageMode.Add || noTransactionDraft.value || addByTemplateId.value || duplicateFromId.value) {
         doClose();
         return;
     }
 
     if (settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') {
-        if (transactionsStore.isTransactionDraftModified(transaction.value, initCategoryId.value, initAccountId.value, initTagIds.value)) {
+        if (transactionsStore.isTransactionDraftModified(transaction.value, initAmount.value, initCategoryId.value, initAccountId.value, initTagIds.value)) {
             confirmDialog.value?.open('Do you want to save this transaction draft?').then(() => {
-                transactionsStore.saveTransactionDraft(transaction.value, initCategoryId.value, initAccountId.value, initTagIds.value);
+                transactionsStore.saveTransactionDraft(transaction.value, initAmount.value, initCategoryId.value, initAccountId.value, initTagIds.value);
                 doClose();
             }).catch(() => {
                 transactionsStore.clearTransactionDraft();
@@ -1043,7 +1051,7 @@ function cancel(): void {
             doClose();
         }
     } else if (settingsStore.appSettings.autoSaveTransactionDraft === 'enabled') {
-        transactionsStore.saveTransactionDraft(transaction.value, initCategoryId.value, initAccountId.value, initTagIds.value);
+        transactionsStore.saveTransactionDraft(transaction.value, initAmount.value, initCategoryId.value, initAccountId.value, initTagIds.value);
         doClose();
     } else {
         doClose();

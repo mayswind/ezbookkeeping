@@ -474,12 +474,12 @@ export const useTransactionsStore = defineStore('transactions', () => {
         }
     }
 
-    function isTransactionDraftModified(transaction?: Transaction, initCategoryId?: string, initAccountId?: string, initTagIds?: string): boolean {
+    function isTransactionDraftModified(transaction?: Transaction, initAmount?: number, initCategoryId?: string, initAccountId?: string, initTagIds?: string): boolean {
         if (!transaction) {
             return false;
         }
 
-        if (transaction.sourceAmount !== 0) {
+        if (transaction.sourceAmount !== 0 && transaction.sourceAmount !== initAmount) {
             return true;
         }
 
@@ -538,14 +538,14 @@ export const useTransactionsStore = defineStore('transactions', () => {
         return false;
     }
 
-    function saveTransactionDraft(transaction?: Transaction, initCategoryId?: string, initAccountId?: string, initTagIds?: string): void {
+    function saveTransactionDraft(transaction?: Transaction, initAmount?: number, initCategoryId?: string, initAccountId?: string, initTagIds?: string): void {
         if (settingsStore.appSettings.autoSaveTransactionDraft !== 'enabled' && settingsStore.appSettings.autoSaveTransactionDraft !== 'confirmation') {
             clearTransactionDraft();
             return;
         }
 
         if (transaction) {
-            if (!isTransactionDraftModified(transaction, initCategoryId, initAccountId, initTagIds)) {
+            if (!isTransactionDraftModified(transaction, initAmount, initCategoryId, initAccountId, initTagIds)) {
                 clearTransactionDraft();
                 return;
             }

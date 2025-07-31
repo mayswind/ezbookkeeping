@@ -467,7 +467,8 @@ function updateClosingBalance(): void {
             amount: newTransactionAmount,
             accountId: accountId.value,
             setAmount: true,
-            setTransactionTime: setTransactionTime
+            setTransactionTime: setTransactionTime,
+            noTransactionDraft: true
         }).then(result => {
             if (result && result.message) {
                 snackbar.value?.showMessage(result.message);

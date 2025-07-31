@@ -540,11 +540,20 @@ function updateClosingBalance(balance?: number): void {
         newTransactionAmount = -newTransactionAmount;
     }
 
+    const params: string[] = [];
+
     if (setTransactionTime) {
-        props.f7router.navigate(`/transaction/add?time=${newTransactionTime}&type=${newTransactionType}&amount=${newTransactionAmount}&accountId=${accountId.value}&withAmount=true&withTime=true`);
-    } else {
-        props.f7router.navigate(`/transaction/add?type=${newTransactionType}&amount=${newTransactionAmount}&accountId=${accountId.value}&withAmount=true`);
+        params.push(`time=${newTransactionTime}`);
+        params.push('withTime=true');
     }
+
+    params.push(`type=${newTransactionType}`);
+    params.push(`amount=${newTransactionAmount}`);
+    params.push(`withAmount=true`);
+    params.push(`accountId=${accountId.value}`);
+    params.push(`noTransactionDraft=true`);
+
+    props.f7router.navigate(`/transaction/add?${params.join('&')}`);
 }
 
 function removeTransaction(transaction: TransactionReconciliationStatementResponseItem | null, confirm: boolean): void {

@@ -442,14 +442,11 @@ function updateClosingBalance(): void {
         }
 
         const currentUnixTime = getCurrentUnixTime();
-        let setTransactionTime = false;
         let newTransactionTime: number | undefined = undefined;
 
         if (endTime.value < currentUnixTime) {
-            setTransactionTime = true;
             newTransactionTime = endTime.value;
         } else if (currentUnixTime < startTime.value) {
-            setTransactionTime = true;
             newTransactionTime = startTime.value;
         }
 
@@ -466,8 +463,6 @@ function updateClosingBalance(): void {
             type: newTransactionType,
             amount: newTransactionAmount,
             accountId: accountId.value,
-            setAmount: true,
-            setTransactionTime: setTransactionTime,
             noTransactionDraft: true
         }).then(result => {
             if (result && result.message) {

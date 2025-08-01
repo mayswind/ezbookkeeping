@@ -7,6 +7,7 @@ import { TransactionPicture } from '@/models/transaction_picture_info.ts';
 import { Transaction } from '@/models/transaction.ts';
 
 import {
+    isDefined,
     isNumber
 } from './common.ts';
 import {
@@ -21,6 +22,7 @@ import {
 } from './category.ts';
 
 export interface SetTransactionOptions {
+    time?: number;
     type?: number;
     categoryId?: string;
     accountId?: string;
@@ -32,6 +34,10 @@ export interface SetTransactionOptions {
 }
 
 export function setTransactionModelByTransaction(transaction: Transaction, transaction2: Transaction | null | undefined, allCategories: Record<number, TransactionCategory[]>, allCategoriesMap: Record<string, TransactionCategory>, allVisibleAccounts: Account[], allAccountsMap: Record<string, Account>, allTagsMap: Record<string, TransactionTag>, defaultAccountId: string, options: SetTransactionOptions, setContextData: boolean, convertContextTime: boolean): void {
+    if (isDefined(options.time)) {
+        transaction.time = options.time;
+    }
+
     if (!options.type && options.categoryId && options.categoryId !== '0' && allCategoriesMap[options.categoryId]) {
         const category = allCategoriesMap[options.categoryId];
         const type = categoryTypeToTransactionType(category.type);
@@ -39,6 +45,14 @@ export function setTransactionModelByTransaction(transaction: Transaction, trans
         if (isNumber(type)) {
             transaction.type = type;
         }
+    }
+
+    if (isDefined(options.amount)) {
+        transaction.sourceAmount = options.amount;
+    }
+
+    if (isDefined(options.destinationAmount)) {
+        transaction.destinationAmount = options.destinationAmount;
     }
 
     if (allCategories[CategoryType.Expense] &&

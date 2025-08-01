@@ -1394,7 +1394,6 @@ function add(): void {
 
     if (setTransactionTime) {
         params.push(`time=${newTransactionTime}`);
-        params.push('withTime=true');
     }
 
     if (query.value.type !== TransactionType.ModifyBalance) {

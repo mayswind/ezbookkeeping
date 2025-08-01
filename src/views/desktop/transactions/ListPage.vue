@@ -1580,15 +1580,12 @@ function changeAmountFilter(filterType: string): void {
 function add(template?: TransactionTemplate): void {
     const currentUnixTime = getCurrentUnixTime();
 
-    let setTransactionTime = false;
     let newTransactionTime: number | undefined = undefined;
 
     if (query.value.maxTime && query.value.minTime) {
         if (query.value.maxTime < currentUnixTime) {
-            setTransactionTime = true;
             newTransactionTime = query.value.maxTime;
         } else if (currentUnixTime < query.value.minTime) {
-            setTransactionTime = true;
             newTransactionTime = query.value.minTime;
         }
     }
@@ -1599,8 +1596,7 @@ function add(template?: TransactionTemplate): void {
         categoryId: queryAllFilterCategoryIdsCount.value === 1 ? query.value.categoryIds : '',
         accountId: queryAllFilterAccountIdsCount.value === 1 ? query.value.accountIds : '',
         tagIds: query.value.tagIds || '',
-        template: template,
-        setTransactionTime: setTransactionTime
+        template: template
     }).then(result => {
         if (result && result.message) {
             snackbar.value?.showMessage(result.message);

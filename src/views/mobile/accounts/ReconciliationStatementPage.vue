@@ -544,12 +544,10 @@ function updateClosingBalance(balance?: number): void {
 
     if (setTransactionTime) {
         params.push(`time=${newTransactionTime}`);
-        params.push('withTime=true');
     }
 
     params.push(`type=${newTransactionType}`);
     params.push(`amount=${newTransactionAmount}`);
-    params.push(`withAmount=true`);
     params.push(`accountId=${accountId.value}`);
     params.push(`noTransactionDraft=true`);
 

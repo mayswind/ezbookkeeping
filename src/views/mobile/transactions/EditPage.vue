@@ -509,7 +509,6 @@ import { TransactionTemplate } from '@/models/transaction_template.ts';
 import type { TransactionPictureInfoBasicResponse } from '@/models/transaction_picture_info.ts';
 import { Transaction } from '@/models/transaction.ts';
 
-import { isDefined } from '@/lib/common.ts';
 import {
     getActualUnixTimeForStore,
     getBrowserTimezoneOffsetMinutes,
@@ -931,6 +930,7 @@ function init(): void {
             allTagsMap.value,
             defaultAccountId.value,
             {
+                time: query['time'] ? parseInt(query['time']) : undefined,
                 type: queryType,
                 categoryId: query['categoryId'],
                 accountId: query['accountId'],
@@ -963,14 +963,6 @@ function init(): void {
             }
 
             (transaction.value as TransactionTemplate).fillFrom(template);
-        } else {
-            if (query['withAmount'] && query['withAmount'] === 'true' && isDefined(query['amount']) && parseInt(query['amount'])) {
-                transaction.value.sourceAmount = parseInt(query['amount']);
-            }
-
-            if (query['withTime'] && query['withTime'] === 'true' && isDefined(query['time']) && parseInt(query['time'])) {
-                transaction.value.time = parseInt(query['time']);
-            }
         }
 
         loading.value = false;
@@ -1234,7 +1226,7 @@ function onPageBeforeOut(): void {
         return;
     }
 
-    const initAmount: number | undefined = query['withAmount'] && query['withAmount'] === 'true' && query['amount'] ? parseInt(query['amount']) : undefined;
+    const initAmount: number | undefined = query['amount'] ? parseInt(query['amount']) : undefined;
 
     if (settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') {
         if (transactionsStore.isTransactionDraftModified(transaction.value, initAmount, query['categoryId'], query['accountId'], query['tagIds'])) {

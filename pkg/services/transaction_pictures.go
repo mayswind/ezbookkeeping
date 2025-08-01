@@ -159,7 +159,7 @@ func (s *TransactionPictureService) GetPictureByPictureId(c core.Context, uid in
 		return nil, errs.ErrTransactionPictureExtensionInvalid
 	}
 
-	pictureFile, err := s.ReadTransactionPicture(pictureInfo.Uid, pictureInfo.PictureId, pictureInfo.PictureExtension)
+	pictureFile, err := s.ReadTransactionPicture(c, pictureInfo.Uid, pictureInfo.PictureId, pictureInfo.PictureExtension)
 
 	if os.IsNotExist(err) {
 		return nil, errs.ErrTransactionPictureNoExists
@@ -199,7 +199,7 @@ func (s *TransactionPictureService) UploadPicture(c core.Context, pictureInfo *m
 	pictureInfo.CreatedUnixTime = time.Now().Unix()
 	pictureInfo.UpdatedUnixTime = time.Now().Unix()
 
-	err := s.SaveTransactionPicture(pictureInfo.Uid, pictureInfo.PictureId, pictureFile, pictureInfo.PictureExtension)
+	err := s.SaveTransactionPicture(c, pictureInfo.Uid, pictureInfo.PictureId, pictureFile, pictureInfo.PictureExtension)
 
 	if err != nil {
 		return err

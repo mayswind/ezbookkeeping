@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/mail"
@@ -98,43 +99,43 @@ type ServiceUsingStorage struct {
 }
 
 // ExistsAvatar returns whether the user avatar exists from the current avatar object storage
-func (s *ServiceUsingStorage) ExistsAvatar(uid int64, fileExtension string) (bool, error) {
-	return s.container.ExistsAvatar(s.getUserAvatarPath(uid, fileExtension))
+func (s *ServiceUsingStorage) ExistsAvatar(ctx core.Context, uid int64, fileExtension string) (bool, error) {
+	return s.container.ExistsAvatar(ctx, s.getUserAvatarPath(uid, fileExtension))
 }
 
 // ReadAvatar returns the user avatar from the current avatar object storage
-func (s *ServiceUsingStorage) ReadAvatar(uid int64, fileExtension string) (storage.ObjectInStorage, error) {
-	return s.container.ReadAvatar(s.getUserAvatarPath(uid, fileExtension))
+func (s *ServiceUsingStorage) ReadAvatar(ctx core.Context, uid int64, fileExtension string) (storage.ObjectInStorage, error) {
+	return s.container.ReadAvatar(ctx, s.getUserAvatarPath(uid, fileExtension))
 }
 
 // SaveAvatar returns whether save the user avatar into the current avatar object storage successfully
-func (s *ServiceUsingStorage) SaveAvatar(uid int64, object storage.ObjectInStorage, fileExtension string) error {
-	return s.container.SaveAvatar(s.getUserAvatarPath(uid, fileExtension), object)
+func (s *ServiceUsingStorage) SaveAvatar(ctx core.Context, uid int64, object storage.ObjectInStorage, fileExtension string) error {
+	return s.container.SaveAvatar(ctx, s.getUserAvatarPath(uid, fileExtension), object)
 }
 
 // DeleteAvatar returns whether delete the user avatar from the current avatar object storage successfully
-func (s *ServiceUsingStorage) DeleteAvatar(uid int64, fileExtension string) error {
-	return s.container.DeleteAvatar(s.getUserAvatarPath(uid, fileExtension))
+func (s *ServiceUsingStorage) DeleteAvatar(ctx core.Context, uid int64, fileExtension string) error {
+	return s.container.DeleteAvatar(ctx, s.getUserAvatarPath(uid, fileExtension))
 }
 
 // ExistsTransactionPicture returns whether the transaction picture exists from the current transaction picture object storage
-func (s *ServiceUsingStorage) ExistsTransactionPicture(uid int64, pictureId int64, fileExtension string) (bool, error) {
-	return s.container.ExistsTransactionPicture(s.getTransactionPicturePath(uid, pictureId, fileExtension))
+func (s *ServiceUsingStorage) ExistsTransactionPicture(ctx core.Context, uid int64, pictureId int64, fileExtension string) (bool, error) {
+	return s.container.ExistsTransactionPicture(ctx, s.getTransactionPicturePath(uid, pictureId, fileExtension))
 }
 
 // ReadTransactionPicture returns the transaction picture from the current transaction picture object storage
-func (s *ServiceUsingStorage) ReadTransactionPicture(uid int64, pictureId int64, fileExtension string) (storage.ObjectInStorage, error) {
-	return s.container.ReadTransactionPicture(s.getTransactionPicturePath(uid, pictureId, fileExtension))
+func (s *ServiceUsingStorage) ReadTransactionPicture(ctx core.Context, uid int64, pictureId int64, fileExtension string) (storage.ObjectInStorage, error) {
+	return s.container.ReadTransactionPicture(ctx, s.getTransactionPicturePath(uid, pictureId, fileExtension))
 }
 
 // SaveTransactionPicture returns whether save the transaction picture into the current transaction picture object storage successfully
-func (s *ServiceUsingStorage) SaveTransactionPicture(uid int64, pictureId int64, object storage.ObjectInStorage, fileExtension string) error {
-	return s.container.SaveTransactionPicture(s.getTransactionPicturePath(uid, pictureId, fileExtension), object)
+func (s *ServiceUsingStorage) SaveTransactionPicture(ctx core.Context, uid int64, pictureId int64, object storage.ObjectInStorage, fileExtension string) error {
+	return s.container.SaveTransactionPicture(ctx, s.getTransactionPicturePath(uid, pictureId, fileExtension), object)
 }
 
 // DeleteTransactionPicture returns whether delete the transaction picture from the current transaction picture object storage successfully
-func (s *ServiceUsingStorage) DeleteTransactionPicture(uid int64, pictureId int64, fileExtension string) error {
-	return s.container.DeleteTransactionPicture(s.getTransactionPicturePath(uid, pictureId, fileExtension))
+func (s *ServiceUsingStorage) DeleteTransactionPicture(ctx core.Context, uid int64, pictureId int64, fileExtension string) error {
+	return s.container.DeleteTransactionPicture(ctx, s.getTransactionPicturePath(uid, pictureId, fileExtension))
 }
 
 func (s *ServiceUsingStorage) getUserAvatarPath(uid int64, fileExtension string) string {

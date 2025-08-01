@@ -162,7 +162,7 @@ func (s *UserService) GetUserAvatar(c core.Context, uid int64, fileExtension str
 		return nil, errs.ErrUserAvatarExtensionInvalid
 	}
 
-	avatarFile, err := s.ReadAvatar(user.Uid, user.CustomAvatarType)
+	avatarFile, err := s.ReadAvatar(c, user.Uid, user.CustomAvatarType)
 
 	if os.IsNotExist(err) {
 		return nil, errs.ErrUserAvatarNoExists
@@ -371,7 +371,7 @@ func (s *UserService) UpdateUserAvatar(c core.Context, uid int64, avatarFile mul
 
 	defer avatarFile.Close()
 
-	err := s.SaveAvatar(uid, avatarFile, fileExtension)
+	err := s.SaveAvatar(c, uid, avatarFile, fileExtension)
 
 	if err != nil {
 		return err
@@ -394,7 +394,7 @@ func (s *UserService) UpdateUserAvatar(c core.Context, uid int64, avatarFile mul
 	}
 
 	if fileExtension != oldFileExtension && oldFileExtension != "" {
-		err = s.DeleteAvatar(uid, oldFileExtension)
+		err = s.DeleteAvatar(c, uid, oldFileExtension)
 
 		if err != nil {
 			log.Warnf(c, "[users.UpdateUserAvatar] failed to delete old avatar with extension \"%s\" for user \"uid:%d\", because %s", oldFileExtension, uid, err.Error())
@@ -410,7 +410,7 @@ func (s *UserService) RemoveUserAvatar(c core.Context, uid int64, fileExtension 
 		return errs.ErrUserIdInvalid
 	}
 
-	err := s.DeleteAvatar(uid, fileExtension)
+	err := s.DeleteAvatar(c, uid, fileExtension)
 
 	if err != nil && !os.IsNotExist(err) {
 		return err

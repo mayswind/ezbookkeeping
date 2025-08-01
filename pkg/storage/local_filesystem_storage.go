@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
@@ -28,17 +29,17 @@ func NewLocalFileSystemObjectStorage(config *settings.Config, pathPrefix string)
 }
 
 // Exists returns whether the file exists
-func (s *LocalFileSystemObjectStorage) Exists(path string) (bool, error) {
+func (s *LocalFileSystemObjectStorage) Exists(ctx core.Context, path string) (bool, error) {
 	return utils.IsExists(s.getFinalPath(path))
 }
 
 // Read returns the object instance according to specified the file path
-func (s *LocalFileSystemObjectStorage) Read(path string) (ObjectInStorage, error) {
+func (s *LocalFileSystemObjectStorage) Read(ctx core.Context, path string) (ObjectInStorage, error) {
 	return os.Open(s.getFinalPath(path))
 }
 
 // Save returns whether save the object instance successfully
-func (s *LocalFileSystemObjectStorage) Save(path string, object ObjectInStorage) error {
+func (s *LocalFileSystemObjectStorage) Save(ctx core.Context, path string, object ObjectInStorage) error {
 	finalPath := s.getFinalPath(path)
 
 	if err := os.MkdirAll(filepath.Dir(finalPath), os.ModePerm); err != nil {
@@ -59,7 +60,7 @@ func (s *LocalFileSystemObjectStorage) Save(path string, object ObjectInStorage)
 }
 
 // Delete returns whether delete the object according to specified the file path successfully
-func (s *LocalFileSystemObjectStorage) Delete(path string) error {
+func (s *LocalFileSystemObjectStorage) Delete(ctx core.Context, path string) error {
 	return os.Remove(s.getFinalPath(path))
 }
 

@@ -9,6 +9,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
@@ -64,8 +65,7 @@ func NewMinIOObjectStorage(config *settings.Config, pathPrefix string) (*MinIOOb
 }
 
 // Exists returns whether the file exists
-func (s *MinIOObjectStorage) Exists(path string) (bool, error) {
-	ctx := context.Background()
+func (s *MinIOObjectStorage) Exists(ctx core.Context, path string) (bool, error) {
 	objectInfo, err := s.minIOClient.StatObject(ctx, s.minIOConfig.Bucket, s.getFinalPath(path), minio.StatObjectOptions{})
 
 	if err == nil && !objectInfo.IsDeleteMarker {
@@ -76,22 +76,19 @@ func (s *MinIOObjectStorage) Exists(path string) (bool, error) {
 }
 
 // Read returns the object instance according to specified the file path
-func (s *MinIOObjectStorage) Read(path string) (ObjectInStorage, error) {
-	ctx := context.Background()
+func (s *MinIOObjectStorage) Read(ctx core.Context, path string) (ObjectInStorage, error) {
 	return s.minIOClient.GetObject(ctx, s.minIOConfig.Bucket, s.getFinalPath(path), minio.GetObjectOptions{})
 }
 
 // Save returns whether save the object instance successfully
-func (s *MinIOObjectStorage) Save(path string, object ObjectInStorage) error {
-	ctx := context.Background()
+func (s *MinIOObjectStorage) Save(ctx core.Context, path string, object ObjectInStorage) error {
 	_, err := s.minIOClient.PutObject(ctx, s.minIOConfig.Bucket, s.getFinalPath(path), object, -1, minio.PutObjectOptions{})
 
 	return err
 }
 
 // Delete returns whether delete the object according to specified the file path successfully
-func (s *MinIOObjectStorage) Delete(path string) error {
-	ctx := context.Background()
+func (s *MinIOObjectStorage) Delete(ctx core.Context, path string) error {
 	return s.minIOClient.RemoveObject(ctx, s.minIOConfig.Bucket, s.getFinalPath(path), minio.RemoveObjectOptions{})
 }
 

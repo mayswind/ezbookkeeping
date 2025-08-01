@@ -127,7 +127,7 @@ export function useAppSettingPageBase() {
                 continue;
             }
 
-            if (excludeAccountIds[accountId]) {
+            if (excludeAccountIds[accountId] && accountsStore.allAccountsMap[accountId]) {
                 hasExcludeAccount = true;
                 break;
             }

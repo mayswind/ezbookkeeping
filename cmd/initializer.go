@@ -158,5 +158,9 @@ func getConfigWithoutSensitiveData(config *settings.Config) *settings.Config {
 	clonedConfig.SecretKey = "****"
 	clonedConfig.AmapApplicationSecret = "****"
 
+	if clonedConfig.WebDAVConfig != nil {
+		clonedConfig.WebDAVConfig.Password = "****"
+	}
+
 	return clonedConfig
 }

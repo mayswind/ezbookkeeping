@@ -63,6 +63,7 @@ const (
 const (
 	LocalFileSystemObjectStorageType string = "local_filesystem"
 	MinIOStorageType                 string = "minio"
+	WebDAVStorageType                string = "webdav"
 )
 
 // Uuid generator types
@@ -137,6 +138,8 @@ const (
 	defaultLogFileMaxSize uint32 = 104857600 // 100 MB
 	defaultLogFileMaxDays uint32 = 7         // days
 
+	defaultWebDAVRequestTimeout uint32 = 10000 // 10 seconds
+
 	defaultInMemoryDuplicateCheckerCleanupInterval uint32 = 60  // 1 minutes
 	defaultDuplicateSubmissionsInterval            uint32 = 300 // 5 minutes
 
@@ -193,6 +196,17 @@ type MinIOConfig struct {
 	SkipTLSVerify   bool
 	Bucket          string
 	RootPath        string
+}
+
+// WebDAVConfig represents the WebDAV setting config
+type WebDAVConfig struct {
+	Url            string
+	Username       string
+	Password       string
+	RootPath       string
+	RequestTimeout uint32
+	Proxy          string
+	SkipTLSVerify  bool
 }
 
 // TipConfig represents a tip setting config
@@ -264,6 +278,7 @@ type Config struct {
 	StorageType         string
 	LocalFileSystemPath string
 	MinIOConfig         *MinIOConfig
+	WebDAVConfig        *WebDAVConfig
 
 	// Uuid
 	UuidGeneratorType string
@@ -697,6 +712,8 @@ func loadStorageConfiguration(config *Config, configFile *ini.File, sectionName 
 		config.StorageType = LocalFileSystemObjectStorageType
 	} else if getConfigItemStringValue(configFile, sectionName, "type") == MinIOStorageType {
 		config.StorageType = MinIOStorageType
+	} else if getConfigItemStringValue(configFile, sectionName, "type") == WebDAVStorageType {
+		config.StorageType = WebDAVStorageType
 	} else {
 		return errs.ErrInvalidStorageType
 	}
@@ -718,8 +735,17 @@ func loadStorageConfiguration(config *Config, configFile *ini.File, sectionName 
 	minIOConfig.SkipTLSVerify = getConfigItemBoolValue(configFile, sectionName, "minio_skip_tls_verify", false)
 	minIOConfig.Bucket = getConfigItemStringValue(configFile, sectionName, "minio_bucket")
 	minIOConfig.RootPath = getConfigItemStringValue(configFile, sectionName, "minio_root_path")
-
 	config.MinIOConfig = minIOConfig
+
+	webDAVConfig := &WebDAVConfig{}
+	webDAVConfig.Url = getConfigItemStringValue(configFile, sectionName, "webdav_url")
+	webDAVConfig.Username = getConfigItemStringValue(configFile, sectionName, "webdav_username")
+	webDAVConfig.Password = getConfigItemStringValue(configFile, sectionName, "webdav_password")
+	webDAVConfig.RootPath = getConfigItemStringValue(configFile, sectionName, "webdav_root_path")
+	webDAVConfig.RequestTimeout = getConfigItemUint32Value(configFile, sectionName, "webdav_request_timeout", defaultWebDAVRequestTimeout)
+	webDAVConfig.Proxy = getConfigItemStringValue(configFile, sectionName, "webdav_proxy", "system")
+	webDAVConfig.SkipTLSVerify = getConfigItemBoolValue(configFile, sectionName, "webdav_skip_tls_verify", false)
+	config.WebDAVConfig = webDAVConfig
 
 	return nil
 }

@@ -86,6 +86,8 @@ func newObjectStorage(config *settings.Config, pathPrefix string) (ObjectStorage
 		return NewLocalFileSystemObjectStorage(config, pathPrefix)
 	} else if config.StorageType == settings.MinIOStorageType {
 		return NewMinIOObjectStorage(config, pathPrefix)
+	} else if config.StorageType == settings.WebDAVStorageType {
+		return NewWebDAVObjectStorage(config, pathPrefix)
 	}
 
 	return nil, errs.ErrInvalidStorageType

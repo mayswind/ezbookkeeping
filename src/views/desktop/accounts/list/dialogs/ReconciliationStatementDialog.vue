@@ -6,7 +6,7 @@
                     <div class="d-flex w-100 align-center justify-center">
                         <h4 class="text-h4">{{ tt('Reconciliation Statement') }}</h4>
                         <v-btn density="compact" color="default" variant="text" size="24"
-                               class="ml-2" :icon="true" :loading="loading" @click="reload()">
+                               class="ml-2" :icon="true" :loading="loading" @click="reload(true)">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
@@ -226,6 +226,7 @@ import { TransactionType } from '@/core/transaction.ts';
 import { KnownFileType } from '@/core/file.ts';
 import { Transaction, type TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
 
+import { isEquals } from '@/lib/common.ts';
 import { getCurrentUnixTime } from '@/lib/datetime.ts';
 import { startDownloadFile } from '@/lib/ui/common.ts';
 
@@ -388,7 +389,7 @@ function open(options: { accountId: string, startTime: number, endTime: number }
     });
 }
 
-function reload(): void {
+function reload(force: boolean): void {
     loading.value = true;
 
     transactionsStore.getReconciliationStatements({
@@ -396,6 +397,14 @@ function reload(): void {
         startTime: startTime.value,
         endTime: endTime.value
     }).then(result => {
+        if (force) {
+            if (isEquals(reconciliationStatements.value, result)) {
+                snackbar.value?.showMessage('Data is up to date');
+            } else {
+                snackbar.value?.showMessage('Data has been updated');
+            }
+        }
+
         reconciliationStatements.value = result;
         loading.value = false;
     }).catch(error => {
@@ -415,7 +424,7 @@ function addTransaction(): void {
             snackbar.value?.showMessage(result.message);
         }
 
-        reload();
+        reload(false);
     }).catch(error => {
         if (error) {
             snackbar.value?.showError(error);
@@ -469,7 +478,7 @@ function updateClosingBalance(): void {
                 snackbar.value?.showMessage(result.message);
             }
 
-            reload();
+            reload(false);
         }).catch(error => {
             if (error) {
                 snackbar.value?.showError(error);
@@ -500,7 +509,7 @@ function showTransaction(transaction: TransactionReconciliationStatementResponse
             snackbar.value?.showMessage(result.message);
         }
 
-        reload();
+        reload(false);
     }).catch(error => {
         if (error) {
             snackbar.value?.showError(error);

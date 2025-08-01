@@ -292,7 +292,7 @@ import { TransactionType } from '@/core/transaction.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import { type TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
 
-import { isDefined } from '@/lib/common.ts';
+import { isDefined, isEquals } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
     getDateTypeByDateRange,
@@ -481,7 +481,11 @@ function reload(force: boolean): void {
         endTime: endTime.value
     }).then(result => {
         if (force) {
-            showToast('Data has been updated');
+            if (isEquals(reconciliationStatements.value, result)) {
+                showToast('Data is up to date');
+            } else {
+                showToast('Data has been updated');
+            }
         }
 
         loading.value = false;

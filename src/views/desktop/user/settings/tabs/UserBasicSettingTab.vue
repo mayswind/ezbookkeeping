@@ -91,7 +91,7 @@
                                                    :label="tt('Default Account')"
                                                    :placeholder="tt('Default Account')"
                                                    :items="allVisibleCategorizedAccounts"
-                                                   :no-item-text="tt('Unspecified')"
+                                                   :no-item-text="Account.findAccountNameById(allAccounts, newProfile.defaultAccountId, tt('Unspecified'))"
                                                    v-model="newProfile.defaultAccountId">
                                 </two-column-select>
                             </v-col>
@@ -370,6 +370,7 @@ import { useAccountsStore } from '@/stores/account.ts';
 
 import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
 import type { UserProfileResponse } from '@/models/user.ts';
+import { Account } from '@/models/account.ts';
 
 import { generateRandomUUID } from '@/lib/misc.ts';
 import { isUserVerifyEmailEnabled } from '@/lib/server_settings.ts';
@@ -391,6 +392,7 @@ const {
     loading,
     resending,
     saving,
+    allAccounts,
     allVisibleAccounts,
     allVisibleCategorizedAccounts,
     allWeekDays,

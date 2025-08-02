@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import { createI18n } from 'vue-i18n';
+import { type I18n, type Composer, createI18n } from 'vue-i18n';
 
 import { createVuetify } from 'vuetify';
 import { VAlert } from 'vuetify/components/VAlert';
@@ -45,6 +45,7 @@ import { VTextField } from 'vuetify/components/VTextField';
 import { VToolbar } from 'vuetify/components/VToolbar';
 import { VTooltip } from 'vuetify/components/VTooltip';
 import { VWindow, VWindowItem } from 'vuetify/components/VWindow';
+import type { LocaleInstance } from 'vuetify/lib/framework.d.ts';
 
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg';
 import 'vuetify/styles';
@@ -113,7 +114,7 @@ import App from './DesktopApp.vue';
 
 const app = createApp(App);
 const pinia = createPinia();
-const i18n = createI18n(getI18nOptions());
+const i18n = createI18n(getI18nOptions()) as I18n<Record<string, unknown>, Record<string, unknown>, Record<string, unknown>, string, false>;
 const vuetify = createVuetify({
     components: {
         VAlert,
@@ -428,8 +429,55 @@ const vuetify = createVuetify({
                 }
             }
         }
+    },
+    locale: {
+        adapter: ((i18nGlobal: Composer) => {
+            const instance: LocaleInstance = {
+                name: 'ezBookkeeping i18n',
+                messages: i18nGlobal.messages,
+                current: i18nGlobal.locale,
+                fallback: i18nGlobal.locale, // no need to let vuetify know what fallback locale is
+                t: (key: string, ...params: unknown[]): string => {
+                    if (!key) {
+                        return '';
+                    }
+
+                    if (!key.startsWith('$vuetify.')) {
+                        return key;
+                    }
+
+                    key = key.substring(9); // remove '$vuetify.' prefix
+                    const mappedTextKey = vuetifyI18nTextKeyMap[key];
+
+                    if (!mappedTextKey) {
+                        return key;
+                    }
+
+                    if (params && params.length > 0) {
+                        // @ts-expect-error the arguments passed in are compatible with vue-i18n method arguments
+                        return i18nGlobal.t(mappedTextKey, ...params);
+                    } else {
+                        return i18nGlobal.t(mappedTextKey);
+                    }
+                },
+                n: (value: number): string => {
+                    return i18nGlobal.n(value);
+                },
+                provide: (): LocaleInstance => {
+                    return instance;
+                }
+            };
+
+            return instance;
+        })(i18n.global) as LocaleInstance,
     }
 });
+
+// key is in the original i18n text of vuetify (in vuetify/lib/locale/en.js), value is the text in the ezBookkeeping i18n files
+const vuetifyI18nTextKeyMap: Record<string, string> = {
+    'open': 'Open',
+    'close': 'Close'
+}
 
 echarts.use([
     CanvasRenderer,

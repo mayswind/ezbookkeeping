@@ -91,6 +91,11 @@ export const useAccountsStore = defineStore('accounts', () => {
                 if (account.subAccounts) {
                     for (let j = 0; j < account.subAccounts.length; j++) {
                         const subAccount = account.subAccounts[j];
+
+                        if (subAccount.hidden) {
+                            continue;
+                        }
+
                         allVisibleAccounts.push(subAccount);
                     }
                 }

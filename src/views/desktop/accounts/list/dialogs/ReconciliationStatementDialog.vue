@@ -116,13 +116,9 @@
                             v-if="item.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimezone(item) }}</v-chip>
                 </template>
                 <template #item.type="{ item }">
-                    <v-chip label color="secondary" variant="outlined" size="x-small" v-if="item.type === TransactionType.ModifyBalance">{{ tt('Modify Balance') }}</v-chip>
-                    <v-chip label class="text-income" variant="outlined" size="x-small" v-else-if="item.type === TransactionType.Income">{{ tt('Income') }}</v-chip>
-                    <v-chip label class="text-expense" variant="outlined" size="x-small" v-else-if="item.type === TransactionType.Expense">{{ tt('Expense') }}</v-chip>
-                    <v-chip label color="primary" variant="outlined" size="x-small" v-else-if="item.type === TransactionType.Transfer && item.destinationAccountId === accountId">{{ tt('Transfer In') }}</v-chip>
-                    <v-chip label color="primary" variant="outlined" size="x-small" v-else-if="item.type === TransactionType.Transfer && item.sourceAccountId === accountId">{{ tt('Transfer Out') }}</v-chip>
-                    <v-chip label color="primary" variant="outlined" size="x-small" v-else-if="item.type === TransactionType.Transfer">{{ tt('Transfer') }}</v-chip>
-                    <v-chip label color="default" variant="outlined" size="x-small" v-else>{{ tt('Unknown') }}</v-chip>
+                    <v-chip label variant="outlined" size="x-small"
+                            :class="{ 'text-income' : item.type === TransactionType.Income, 'text-expense': item.type === TransactionType.Expense }"
+                            :color="getTransactionTypeColor(item)">{{ getDisplayTransactionType(item) }}</v-chip>
                 </template>
                 <template #item.categoryId="{ item }">
                     <div class="d-flex align-center">
@@ -274,6 +270,7 @@ const {
     displayTotalBalance,
     displayOpeningBalance,
     displayClosingBalance,
+    getDisplayTransactionType,
     getDisplayDateTime,
     getDisplayTimezone,
     getDisplaySourceAmount,
@@ -351,6 +348,20 @@ function getTablePageOptions(linesCount?: number): ReconciliationStatementDialog
     pageOptions.push({ value: -1, title: tt('All') });
 
     return pageOptions;
+}
+
+function getTransactionTypeColor(transaction: TransactionReconciliationStatementResponseItem): string | undefined {
+    if (transaction.type === TransactionType.ModifyBalance) {
+        return 'secondary';
+    } else if (transaction.type === TransactionType.Income) {
+        return undefined;
+    } else if (transaction.type === TransactionType.Expense) {
+        return undefined;
+    } else if (transaction.type === TransactionType.Transfer) {
+        return 'primary';
+    } else {
+        return 'default';
+    }
 }
 
 function open(options: { accountId: string, startTime: number, endTime: number }): Promise<void> {

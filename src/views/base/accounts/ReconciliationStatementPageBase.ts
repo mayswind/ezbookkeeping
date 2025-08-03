@@ -111,6 +111,24 @@ export function useReconciliationStatementPageBase() {
         }
     });
 
+    function getDisplayTransactionType(transaction: TransactionReconciliationStatementResponseItem): string {
+        if (transaction.type === TransactionType.ModifyBalance) {
+            return tt('Modify Balance');
+        } else if (transaction.type === TransactionType.Income) {
+            return tt('Income');
+        } else if (transaction.type === TransactionType.Expense) {
+            return tt('Expense');
+        } else if (transaction.type === TransactionType.Transfer && transaction.destinationAccountId === accountId.value) {
+            return tt('Transfer In');
+        } else if (transaction.type === TransactionType.Transfer && transaction.sourceAccountId === accountId.value) {
+            return tt('Transfer Out');
+        } else if (transaction.type === TransactionType.Transfer) {
+            return tt('Transfer');
+        } else {
+            return tt('Unknown');
+        }
+    }
+
     function getDisplayDateTime(transaction: TransactionReconciliationStatementResponseItem): string {
         const transactionTime = getUnixTime(parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value));
         return formatUnixTimeToLongDateTime(transactionTime);
@@ -192,27 +210,15 @@ export function useReconciliationStatementPageBase() {
         const transactions = reconciliationStatements.value?.transactions ?? [];
         const rows = transactions.map(transaction => {
             const transactionTime = getUnixTime(parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value));
-            let type = '';
+            let type = getDisplayTransactionType(transaction);
             let categoryName = allCategoriesMap.value[transaction.categoryId]?.name || '';
             let displayAmount = removeAll(formatAmount(transaction.sourceAmount), digitGroupingSymbol);
             let displayAccountName = allAccountsMap.value[transaction.sourceAccountId]?.name || '';
 
             if (transaction.type === TransactionType.ModifyBalance) {
-                type = tt('Modify Balance');
                 categoryName = tt('Modify Balance');
-            } else if (transaction.type === TransactionType.Income) {
-                type = tt('Income');
-            } else if (transaction.type === TransactionType.Expense) {
-                type = tt('Expense');
             } else if (transaction.type === TransactionType.Transfer && transaction.destinationAccountId === accountId.value) {
-                type = tt('Transfer In');
                 displayAmount = removeAll(formatAmount(transaction.destinationAmount), digitGroupingSymbol);
-            } else if (transaction.type === TransactionType.Transfer && transaction.sourceAccountId === accountId.value) {
-                type = tt('Transfer Out');
-            } else if (transaction.type === TransactionType.Transfer) {
-                type = tt('Transfer');
-            } else {
-                type = tt('Unknown');
             }
 
             if (transaction.type === TransactionType.Transfer && allAccountsMap.value[transaction.destinationAccountId]) {
@@ -274,6 +280,7 @@ export function useReconciliationStatementPageBase() {
         displayOpeningBalance,
         displayClosingBalance,
         // functions
+        getDisplayTransactionType,
         getDisplayDateTime,
         getDisplayDate,
         getDisplayTime,

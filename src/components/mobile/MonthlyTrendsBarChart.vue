@@ -1,6 +1,6 @@
 <template>
-    <f7-list class="statistics-list-item skeleton-text" v-if="loading">
-        <f7-list-item link="#" :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ]">
+    <f7-list class="skeleton-text" v-if="loading">
+        <f7-list-item class="statistics-list-item" link="#" :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ]">
             <template #media>
                 <div class="display-flex no-padding-horizontal">
                     <div class="display-flex align-items-center statistics-icon">

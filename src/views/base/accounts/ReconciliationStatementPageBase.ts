@@ -216,7 +216,7 @@ export function useReconciliationStatementPageBase() {
         const transactions = reconciliationStatements.value?.transactions ?? [];
         const rows = transactions.map(transaction => {
             const transactionTime = getUnixTime(parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value));
-            let type = getDisplayTransactionType(transaction);
+            const type = getDisplayTransactionType(transaction);
             let categoryName = allCategoriesMap.value[transaction.categoryId]?.name || '';
             let displayAmount = removeAll(formatAmount(transaction.sourceAmount), digitGroupingSymbol);
             let displayAccountName = allAccountsMap.value[transaction.sourceAccountId]?.name || '';

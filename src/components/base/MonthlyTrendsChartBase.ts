@@ -16,7 +16,7 @@ import type { YearMonthItems } from '@/models/transaction.ts';
 
 import { getAllDateRanges } from '@/lib/statistics.ts';
 
-export interface CommonTrendsChartProps<T extends Year1BasedMonth> {
+export interface CommonMonthlyTrendsChartProps<T extends Year1BasedMonth> {
     items: YearMonthItems<T>[];
     startYearMonth: string;
     endYearMonth: string;
@@ -34,12 +34,12 @@ export interface CommonTrendsChartProps<T extends Year1BasedMonth> {
     enableClickItem?: boolean;
 }
 
-export interface TrendsBarChartClickEvent {
+export interface MonthlyTrendsBarChartClickEvent {
     itemId: string;
     dateRange: TimeRangeAndDateType;
 }
 
-export function useTrendsChartBase<T extends Year1BasedMonth>(props: CommonTrendsChartProps<T>) {
+export function useMonthlyTrendsChartBase<T extends Year1BasedMonth>(props: CommonMonthlyTrendsChartProps<T>) {
     const { tt } = useI18n();
 
     const allDateRanges = computed<YearUnixTime[] | FiscalYearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[]>(() => getAllDateRanges(props.items, props.startYearMonth, props.endYearMonth, props.fiscalYearStart, props.dateAggregationType));

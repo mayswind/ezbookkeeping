@@ -202,7 +202,7 @@
                 </div>
             </f7-card-header>
             <f7-card-content style="margin-top: -14px" :padding="false">
-                <trends-bar-chart
+                <monthly-trends-bar-chart
                     :loading="loading || reloading"
                     :start-year-month="query.trendChartStartYearMonth"
                     :end-year-month="query.trendChartEndYearMonth"

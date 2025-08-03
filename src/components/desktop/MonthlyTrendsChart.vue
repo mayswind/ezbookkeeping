@@ -1,5 +1,5 @@
 <template>
-    <v-chart autoresize class="trends-chart-container" :class="{ 'transition-in': skeleton }" :option="chartOptions"
+    <v-chart autoresize class="monthly-trends-chart-container" :class="{ 'transition-in': skeleton }" :option="chartOptions"
              @click="clickItem" @legendselectchanged="onLegendSelectChanged" />
 </template>
 
@@ -10,7 +10,7 @@ import type { ECElementEvent } from 'echarts/core';
 import type { CallbackDataParams } from 'echarts/types/dist/shared';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { type CommonTrendsChartProps, type TrendsBarChartClickEvent, useTrendsChartBase } from '@/components/base/TrendsChartBase.ts'
+import { type CommonMonthlyTrendsChartProps, type MonthlyTrendsBarChartClickEvent, useMonthlyTrendsChartBase } from '@/components/base/MonthlyTrendsChartBase.ts'
 
 import { useUserStore } from '@/stores/user.ts';
 
@@ -38,14 +38,14 @@ import {
     sortStatisticsItems
 } from '@/lib/statistics.ts';
 
-interface DesktopTrendsChartProps<T extends Year1BasedMonth> extends CommonTrendsChartProps<T> {
+interface DesktopMonthlyTrendsChartProps<T extends Year1BasedMonth> extends CommonMonthlyTrendsChartProps<T> {
     skeleton?: boolean;
     type?: number;
     showValue?: boolean;
     showTotalAmountInTooltip?: boolean;
 }
 
-interface TrendsChartDataItem {
+interface MonthlyTrendsChartDataItem {
     id: string;
     name: string;
     itemStyle: {
@@ -59,22 +59,22 @@ interface TrendsChartDataItem {
     data: number[];
 }
 
-interface TrendsChartTooltipItem extends SortableTransactionStatisticDataItem {
+interface MonthlyTrendsChartTooltipItem extends SortableTransactionStatisticDataItem {
     readonly name: string;
     readonly color: unknown;
     readonly displayOrders: number[];
     readonly totalAmount: number;
 }
 
-const props = defineProps<DesktopTrendsChartProps<YearMonthDataItem>>();
+const props = defineProps<DesktopMonthlyTrendsChartProps<YearMonthDataItem>>();
 
 const emit = defineEmits<{
-    (e: 'click', value: TrendsBarChartClickEvent): void;
+    (e: 'click', value: MonthlyTrendsBarChartClickEvent): void;
 }>();
 
 const theme = useTheme();
 const { tt, formatUnixTimeToShortYear, formatYearQuarter, formatUnixTimeToShortYearMonth, formatUnixTimeToFiscalYear, formatAmountWithCurrency } = useI18n();
-const { allDateRanges, getItemName, getColor } = useTrendsChartBase(props);
+const { allDateRanges, getItemName, getColor } = useMonthlyTrendsChartBase(props);
 
 const userStore = useUserStore();
 
@@ -137,8 +137,8 @@ const allDisplayDateRanges = computed<string[]>(() => {
     return allDisplayDateRanges;
 });
 
-const allSeries = computed<TrendsChartDataItem[]>(() => {
-    const allSeries: TrendsChartDataItem[] = [];
+const allSeries = computed<MonthlyTrendsChartDataItem[]>(() => {
+    const allSeries: MonthlyTrendsChartDataItem[] = [];
 
     for (let i = 0; i < props.items.length; i++) {
         const item = props.items[i];
@@ -204,7 +204,7 @@ const allSeries = computed<TrendsChartDataItem[]>(() => {
             allAmounts.push(amount);
         }
 
-        const finalItem: TrendsChartDataItem = {
+        const finalItem: MonthlyTrendsChartDataItem = {
             id: (props.idField && item[props.idField]) ? item[props.idField] as string : getItemName(item[props.nameField] as string),
             name: (props.idField && item[props.idField]) ? item[props.idField] as string : getItemName(item[props.nameField] as string),
             itemStyle: {
@@ -294,7 +294,7 @@ const chartOptions = computed<object>(() => {
             formatter: (params: CallbackDataParams[]) => {
                 let tooltip = '';
                 let totalAmount = 0;
-                const displayItems: TrendsChartTooltipItem[] = [];
+                const displayItems: MonthlyTrendsChartTooltipItem[] = [];
 
                 for (let i = 0; i < params.length; i++) {
                     const id = params[i].seriesId as string;
@@ -458,15 +458,15 @@ defineExpose({
 </script>
 
 <style scoped>
-.trends-chart-container {
+.monthly-trends-chart-container {
     width: 100%;
     height: 560px;
     margin-top: 10px;
 }
 
 @media (min-width: 600px) {
-    .pie-chart-container {
-        height: 500px;
+    .monthly-trends-chart-container {
+        height: 600px;
     }
 }
 </style>

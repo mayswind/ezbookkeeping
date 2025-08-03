@@ -257,7 +257,7 @@
                                     </v-card-text>
 
                                     <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis">
-                                        <trends-chart
+                                        <monthly-trends-chart
                                             :type="queryChartType"
                                             :start-year-month="query.trendChartStartYearMonth"
                                             :end-year-month="query.trendChartEndYearMonth"
@@ -271,8 +271,8 @@
                                             value-field="value"
                                             color-field="color"
                                             v-if="initing"
-                                        ></trends-chart>
-                                        <trends-chart
+                                        />
+                                        <monthly-trends-chart
                                             :type="queryChartType"
                                             :start-year-month="query.trendChartStartYearMonth"
                                             :end-year-month="query.trendChartEndYearMonth"
@@ -285,7 +285,7 @@
                                             :enable-click-item="true"
                                             :default-currency="defaultCurrency"
                                             :show-total-amount-in-tooltip="showTotalAmountInTrendsChart"
-                                            ref="trendsChart"
+                                            ref="monthlyTrendsChart"
                                             id-field="id"
                                             name-field="name"
                                             value-field="totalAmount"
@@ -340,7 +340,7 @@
 
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
-import TrendsChart from '@/components/desktop/TrendsChart.vue';
+import MonthlyTrendsChart from '@/components/desktop/MonthlyTrendsChart.vue';
 import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
 import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
 import TransactionTagFilterSettingsCard from '@/views/desktop/common/cards/TransactionTagFilterSettingsCard.vue';
@@ -402,7 +402,7 @@ import {
 } from '@mdi/js';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
-type TrendsChartType = InstanceType<typeof TrendsChart>;
+type MonthlyTrendsChartType = InstanceType<typeof MonthlyTrendsChart>;
 type ExportDialogType = InstanceType<typeof ExportDialog>;
 
 interface TransactionStatisticsProps {
@@ -461,7 +461,7 @@ const transactionCategoriesStore = useTransactionCategoriesStore();
 const statisticsStore = useStatisticsStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
-const trendsChart = useTemplateRef<TrendsChartType>('trendsChart');
+const monthlyTrendsChart = useTemplateRef<MonthlyTrendsChartType>('monthlyTrendsChart');
 const exportDialog = useTemplateRef<ExportDialogType>('exportDialog');
 
 const activeTab = ref<string>('statisticsPage');
@@ -481,7 +481,7 @@ const statisticsDataHasData = computed<boolean>(() => {
     if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
         return !!categoricalAnalysisData.value && !!categoricalAnalysisData.value.items && categoricalAnalysisData.value.items.length > 0;
     } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
-        return !!trendsAnalysisData.value && !!trendsAnalysisData.value.items && trendsAnalysisData.value.items.length > 0 && !!trendsChart.value;
+        return !!trendsAnalysisData.value && !!trendsAnalysisData.value.items && trendsAnalysisData.value.items.length > 0 && !!monthlyTrendsChart.value;
     }
 
     return false;
@@ -960,8 +960,8 @@ function exportResults(): void {
                     item.percent.toFixed(4)
                 ])
         });
-    } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis && trendsAnalysisData.value && trendsAnalysisData.value.items && trendsChart.value) {
-        const exportData = trendsChart.value.exportData();
+    } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis && trendsAnalysisData.value && trendsAnalysisData.value.items && monthlyTrendsChart.value) {
+        const exportData = monthlyTrendsChart.value.exportData();
         exportDialog.value?.open({
             headers: exportData.headers || [],
             data: exportData.data || []

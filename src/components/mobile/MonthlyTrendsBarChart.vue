@@ -33,13 +33,13 @@
     <f7-list v-else-if="!loading && allDisplayDataItems && allDisplayDataItems.data && allDisplayDataItems.data.length">
         <f7-list-item v-if="allDisplayDataItems.legends && allDisplayDataItems.legends.length > 1">
             <div class="display-flex" style="flex-wrap: wrap">
-                <div class="trends-bar-chart-legend display-flex align-items-center"
-                     :class="{ 'trends-bar-chart-legend-unselected': !!unselectedLegends[legend.id] }"
+                <div class="monthly-trends-bar-chart-legend display-flex align-items-center"
+                     :class="{ 'monthly-trends-bar-chart-legend-unselected': !!unselectedLegends[legend.id] }"
                      :key="idx"
                      v-for="(legend, idx) in allDisplayDataItems.legends"
                      @click="toggleLegend(legend)">
-                    <f7-icon f7="app_fill" class="trends-bar-chart-legend-icon" :style="{ 'color': unselectedLegends[legend.id] ? '' : legend.color }"></f7-icon>
-                    <span class="trends-bar-chart-legend-text">{{ legend.name }}</span>
+                    <f7-icon f7="app_fill" class="monthly-trends-bar-chart-legend-icon" :style="{ 'color': unselectedLegends[legend.id] ? '' : legend.color }"></f7-icon>
+                    <span class="monthly-trends-bar-chart-legend-text">{{ legend.name }}</span>
                 </div>
             </div>
         </f7-list-item>
@@ -91,7 +91,7 @@
 import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { type CommonTrendsChartProps, type TrendsBarChartClickEvent, useTrendsChartBase } from '@/components/base/TrendsChartBase.ts'
+import { type CommonMonthlyTrendsChartProps, type MonthlyTrendsBarChartClickEvent, useMonthlyTrendsChartBase } from '@/components/base/MonthlyTrendsChartBase.ts'
 
 import { useUserStore } from '@/stores/user.ts';
 
@@ -120,43 +120,43 @@ interface TrendsBarChartLegend {
     readonly displayOrders: number[];
 }
 
-interface TrendsBarChartDataAmount extends SortableTransactionStatisticDataItem, TrendsBarChartLegend {
+interface MonthlyTrendsBarChartDataAmount extends SortableTransactionStatisticDataItem, TrendsBarChartLegend {
     totalAmount: number;
 }
 
-interface TrendsBarChartDataItem {
+interface MonthlyTrendsBarChartDataItem {
     dateRange: UnixTimeRange;
     displayDateRange: string;
-    items: TrendsBarChartDataAmount[];
+    items: MonthlyTrendsBarChartDataAmount[];
     totalAmount: number;
     totalPositiveAmount: number;
     percent: number;
 }
 
-interface TrendsBarChartData {
-    readonly data: TrendsBarChartDataItem[];
+interface MonthlyTrendsBarChartData {
+    readonly data: MonthlyTrendsBarChartDataItem[];
     readonly legends: TrendsBarChartLegend[];
 }
 
-interface MobileTrendsChartProps<T extends Year1BasedMonth> extends CommonTrendsChartProps<T> {
+interface MobileMonthlyTrendsChartProps<T extends Year1BasedMonth> extends CommonMonthlyTrendsChartProps<T> {
     loading?: boolean;
 }
 
-const props = defineProps<MobileTrendsChartProps<YearMonthDataItem>>();
+const props = defineProps<MobileMonthlyTrendsChartProps<YearMonthDataItem>>();
 
 const emit = defineEmits<{
-    (e: 'click', value: TrendsBarChartClickEvent): void;
+    (e: 'click', value: MonthlyTrendsBarChartClickEvent): void;
 }>();
 
 const { tt, formatUnixTimeToShortYear, formatYearQuarter, formatUnixTimeToShortYearMonth, formatUnixTimeToFiscalYear, formatAmountWithCurrency } = useI18n();
-const { allDateRanges, getItemName, getColor } = useTrendsChartBase(props);
+const { allDateRanges, getItemName, getColor } = useMonthlyTrendsChartBase(props);
 
 const userStore = useUserStore();
 
 const unselectedLegends = ref<Record<string, boolean>>({});
 
-const allDisplayDataItems = computed<TrendsBarChartData>(() => {
-    const allDateRangeItemsMap: Record<string, TrendsBarChartDataAmount[]> = {};
+const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
+    const allDateRangeItemsMap: Record<string, MonthlyTrendsBarChartDataAmount[]> = {};
     const legends: TrendsBarChartLegend[] = [];
 
     for (let i = 0; i < props.items.length; i++) {
@@ -181,7 +181,7 @@ const allDisplayDataItems = computed<TrendsBarChartData>(() => {
             continue;
         }
 
-        const dateRangeItemMap: Record<string, TrendsBarChartDataAmount> = {};
+        const dateRangeItemMap: Record<string, MonthlyTrendsBarChartDataAmount> = {};
 
         for (let j = 0; j < item.items.length; j++) {
             const dataItem = item.items[j];
@@ -204,8 +204,8 @@ const allDisplayDataItems = computed<TrendsBarChartData>(() => {
             if (dateRangeItemMap[dateRangeKey]) {
                 dateRangeItemMap[dateRangeKey].totalAmount += (props.valueField && isNumber(dataItem[props.valueField])) ? dataItem[props.valueField] as number : 0;
             } else {
-                const allDataItems: TrendsBarChartDataAmount[] = allDateRangeItemsMap[dateRangeKey] || [];
-                const finalDataItem: TrendsBarChartDataAmount = Object.assign({}, legend, {
+                const allDataItems: MonthlyTrendsBarChartDataAmount[] = allDateRangeItemsMap[dateRangeKey] || [];
+                const finalDataItem: MonthlyTrendsBarChartDataAmount = Object.assign({}, legend, {
                     totalAmount: (props.valueField && isNumber(dataItem[props.valueField])) ? dataItem[props.valueField] as number : 0
                 });
 
@@ -216,7 +216,7 @@ const allDisplayDataItems = computed<TrendsBarChartData>(() => {
         }
     }
 
-    const finalDataItems: TrendsBarChartDataItem[] = [];
+    const finalDataItems: MonthlyTrendsBarChartDataItem[] = [];
     let maxTotalAmount = 0;
 
     for (let i = 0; i < allDateRanges.value.length; i++) {
@@ -263,7 +263,7 @@ const allDisplayDataItems = computed<TrendsBarChartData>(() => {
             maxTotalAmount = totalAmount;
         }
 
-        const finalDataItem: TrendsBarChartDataItem = {
+        const finalDataItem: MonthlyTrendsBarChartDataItem = {
             dateRange: dateRange,
             displayDateRange: displayDateRange,
             items: dataItems,
@@ -289,7 +289,7 @@ const allDisplayDataItems = computed<TrendsBarChartData>(() => {
     };
 });
 
-function clickItem(item: TrendsBarChartDataItem): void {
+function clickItem(item: MonthlyTrendsBarChartDataItem): void {
     let itemId = '';
 
     for (let i = 0; i < props.items.length; i++) {
@@ -354,25 +354,25 @@ function toggleLegend(legend: TrendsBarChartLegend): void {
 </script>
 
 <style>
-.trends-bar-chart-legend {
+.monthly-trends-bar-chart-legend {
     margin-right: 4px;
     cursor: pointer;
 }
 
-.trends-bar-chart-legend-icon.f7-icons {
+.monthly-trends-bar-chart-legend-icon.f7-icons {
     font-size: var(--ebk-trends-bar-chart-legend-icon-font-size);
     margin-right: 2px;
 }
 
-.trends-bar-chart-legend-unselected .trends-bar-chart-legend-icon.f7-icons {
+.monthly-trends-bar-chart-legend-unselected .monthly-trends-bar-chart-legend-icon.f7-icons {
     color: #cccccc;
 }
 
-.trends-bar-chart-legend-text {
+.monthly-trends-bar-chart-legend-text {
     font-size: var(--ebk-trends-bar-chart-legend-text-font-size);
 }
 
-.trends-bar-chart-legend-unselected .trends-bar-chart-legend-text {
+.monthly-trends-bar-chart-legend-unselected .monthly-trends-bar-chart-legend-text {
     color: #cccccc;
 }
 </style>

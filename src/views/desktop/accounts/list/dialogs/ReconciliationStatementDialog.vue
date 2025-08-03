@@ -15,6 +15,34 @@
                         </v-btn>
                     </div>
                     <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                           :icon="true" :disabled="loading"
+                           v-if="showAccountBalanceTrendsCharts">
+                        <v-icon :icon="mdiTuneVertical" />
+                        <v-menu activator="parent">
+                            <v-list>
+                                <v-list-subheader :title="tt('Chart Type')"/>
+                                <v-list-item :key="type.type"
+                                             :prepend-icon="chartTypeIconMap[type.type]"
+                                             :append-icon="chartType === type.type ? mdiCheck : undefined"
+                                             :title="type.displayName"
+                                             @click="chartType = type.type"
+                                             v-for="type in allChartTypes"></v-list-item>
+                                <v-divider class="my-2"/>
+                                <v-list-subheader :title="tt('Time Granularity')"/>
+                                <v-list-item :prepend-icon="mdiCalendarTodayOutline"
+                                             :append-icon="chartDataDateAggregationType === undefined ? mdiCheck : undefined"
+                                             :title="tt('granularity.Daily')"
+                                             @click="chartDataDateAggregationType = undefined"></v-list-item>
+                                <v-list-item :key="dateAggregationType.type"
+                                             :prepend-icon="chartDataDateAggregationTypeIconMap[dateAggregationType.type]"
+                                             :append-icon="chartDataDateAggregationType === dateAggregationType.type ? mdiCheck : undefined"
+                                             :title="dateAggregationType.displayName"
+                                             @click="chartDataDateAggregationType = dateAggregationType.type"
+                                             v-for="dateAggregationType in allDateAggregationTypes"></v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </v-btn>
+                    <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                            :icon="true" :disabled="loading">
                         <v-icon :icon="mdiDotsVertical" />
                         <v-menu activator="parent">
@@ -26,6 +54,15 @@
                                 <v-list-item :prepend-icon="mdiInvoiceTextEditOutline"
                                              :title="tt('Update Closing Balance')"
                                              @click="updateClosingBalance()"></v-list-item>
+                                <v-divider class="my-2"/>
+                                <v-list-item :prepend-icon="mdiChartBoxOutline"
+                                             :title="tt('Show Account Balance Trends')"
+                                             @click="showAccountBalanceTrendsCharts = true"
+                                             v-if="!showAccountBalanceTrendsCharts"></v-list-item>
+                                <v-list-item :prepend-icon="mdiListBoxOutline"
+                                             :title="tt('Show Transaction List')"
+                                             @click="showAccountBalanceTrendsCharts = false"
+                                             v-if="showAccountBalanceTrendsCharts"></v-list-item>
                                 <v-divider class="my-2"/>
                                 <v-list-item :prepend-icon="mdiComma"
                                              :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1"
@@ -109,6 +146,7 @@
                 :no-data-text="loading ? '' : tt('No transaction data')"
                 v-model:items-per-page="countPerPage"
                 v-model:page="currentPage"
+                v-if="!showAccountBalanceTrendsCharts"
             >
                 <template #item.time="{ item }">
                     <span>{{ getDisplayDateTime(item) }}</span>
@@ -187,6 +225,27 @@
                 </template>
             </v-data-table>
 
+            <account-balance-trends-chart
+                :type="chartType"
+                :date-aggregation-type="chartDataDateAggregationType"
+                :fiscal-year-start="fiscalYearStart"
+                :items="[]"
+                :legend-name="isCurrentLiabilityAccount ? tt('Account Outstanding Balance') : tt('Account Balance')"
+                :account-currency="currentAccountCurrency"
+                :skeleton="true"
+                v-if="showAccountBalanceTrendsCharts && loading"
+            />
+
+            <account-balance-trends-chart
+                :type="chartType"
+                :date-aggregation-type="chartDataDateAggregationType"
+                :fiscal-year-start="fiscalYearStart"
+                :items="reconciliationStatements?.transactions"
+                :legend-name="isCurrentLiabilityAccount ? tt('Account Outstanding Balance') : tt('Account Balance')"
+                :account-currency="currentAccountCurrency"
+                v-if="showAccountBalanceTrendsCharts && !loading"
+            />
+
             <v-card-text class="overflow-y-visible">
                 <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
                     <v-btn color="secondary" variant="tonal"
@@ -219,6 +278,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 
 import { TransactionType } from '@/core/transaction.ts';
+import { TrendChartType, ChartDateAggregationType } from '@/core/statistics.ts';
 import { KnownFileType } from '@/core/file.ts';
 import { Transaction, type TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
 
@@ -229,7 +289,16 @@ import { startDownloadFile } from '@/lib/ui/common.ts';
 import {
     mdiRefresh,
     mdiArrowRight,
+    mdiTuneVertical,
     mdiDotsVertical,
+    mdiCheck,
+    mdiChartBoxOutline,
+    mdiListBoxOutline,
+    mdiChartBar,
+    mdiChartAreasplineVariant,
+    mdiCalendarTodayOutline,
+    mdiCalendarMonthOutline,
+    mdiLayersTripleOutline,
     mdiInvoiceTextPlusOutline,
     mdiInvoiceTextEditOutline,
     mdiComma,
@@ -258,10 +327,13 @@ const {
     endTime,
     reconciliationStatements,
     currentTimezoneOffsetMinutes,
-    allAccountsMap,
-    allCategoriesMap,
+    fiscalYearStart,
+    allChartTypes,
+    allDateAggregationTypes,
     currentAccountCurrency,
     isCurrentLiabilityAccount,
+    allAccountsMap,
+    allCategoriesMap,
     exportFileName,
     displayStartDateTime,
     displayEndDateTime,
@@ -283,6 +355,18 @@ const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionsStore = useTransactionsStore();
 
+const chartTypeIconMap = {
+    [TrendChartType.Column.type]: mdiChartBar,
+    [TrendChartType.Area.type]: mdiChartAreasplineVariant,
+};
+
+const chartDataDateAggregationTypeIconMap = {
+    [ChartDateAggregationType.Month.type]: mdiCalendarMonthOutline,
+    [ChartDateAggregationType.Quarter.type]: mdiLayersTripleOutline,
+    [ChartDateAggregationType.Year.type]: mdiLayersTripleOutline,
+    [ChartDateAggregationType.FiscalYear.type]: mdiLayersTripleOutline,
+};
+
 const amountInputDialog = useTemplateRef<AmountInputDialogType>('amountInputDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
@@ -291,6 +375,9 @@ const showState = ref<boolean>(false);
 const loading = ref<boolean>(false);
 const currentPage = ref<number>(1);
 const countPerPage = ref<number>(10);
+const showAccountBalanceTrendsCharts = ref<boolean>(false);
+const chartType = ref<number>(TrendChartType.Default.type);
+const chartDataDateAggregationType = ref<number | undefined>(undefined);
 
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
@@ -371,6 +458,9 @@ function open(options: { accountId: string, startTime: number, endTime: number }
     reconciliationStatements.value = undefined;
     currentPage.value = 1;
     countPerPage.value = 10;
+    showAccountBalanceTrendsCharts.value = false;
+    chartType.value = TrendChartType.Default.type;
+    chartDataDateAggregationType.value = undefined;
     showState.value = true;
     loading.value = true;
 

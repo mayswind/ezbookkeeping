@@ -147,6 +147,7 @@ import {
     getTimezoneOffset,
     getTimezoneOffsetMinutes,
     getYear,
+    getQuarter,
     isDateRangeMatchFullMonths,
     isDateRangeMatchFullYears,
     isPM,
@@ -490,6 +491,22 @@ export function useI18n() {
                 type: type.type,
                 symbol: type.symbol,
                 displayName: `${t('numeral.' + type.name)} (${type.symbol})`
+            });
+        }
+
+        return ret;
+    }
+
+    function getLocalizedChartDateAggregationTypeAndDisplayName(fullName: boolean): TypeAndDisplayName[] {
+        const ret: TypeAndDisplayName[] = [];
+        const allTypes: ChartDateAggregationType[] = ChartDateAggregationType.values();
+
+        for (let i = 0; i < allTypes.length; i++) {
+            const type = allTypes[i];
+
+            ret.push({
+                type: type.type,
+                displayName: t(fullName ? type.fullName : `granularity.${type.shortName}`)
             });
         }
 
@@ -1472,6 +1489,13 @@ export function useI18n() {
         return formatMonthDay(monthDay, getLocalizedLongMonthDayFormat());
     }
 
+    function formatUnixTimeToYearQuarter(unixTime: number): string {
+        const date = parseDateFromUnixTime(unixTime);
+        const year = getYear(date);
+        const quarter = getQuarter(date);
+        return formatYearQuarter(year, quarter);
+    }
+
     function formatYearQuarter(year: number, quarter: number): string {
         if (1 <= quarter && quarter <= 4) {
             return t('format.yearQuarter.q' + quarter, {
@@ -1912,7 +1936,8 @@ export function useI18n() {
         getAllTrendChartTypes: () => getLocalizedDisplayNameAndType(TrendChartType.values()),
         getAllStatisticsChartDataTypes: (analysisType: StatisticsAnalysisType) => getLocalizedDisplayNameAndType(ChartDataType.values(analysisType)),
         getAllStatisticsSortingTypes: () => getLocalizedDisplayNameAndType(ChartSortingType.values()),
-        getAllStatisticsDateAggregationTypes: () => getLocalizedDisplayNameAndType(ChartDateAggregationType.values()),
+        getAllStatisticsDateAggregationTypes: () => getLocalizedChartDateAggregationTypeAndDisplayName(true),
+        getAllStatisticsDateAggregationTypesWithShortName: () => getLocalizedChartDateAggregationTypeAndDisplayName(false),
         getAllTransactionEditScopeTypes: () => getLocalizedDisplayNameAndType(TransactionEditScopeType.values()),
         getAllTransactionTagFilterTypes: () => getLocalizedDisplayNameAndType(TransactionTagFilterType.values()),
         getAllTransactionScheduledFrequencyTypes: () => getLocalizedDisplayNameAndType(ScheduledTemplateFrequencyType.values()),
@@ -1961,6 +1986,7 @@ export function useI18n() {
         formatUnixTimeToShortTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortTimeFormat(), utcOffset, currentUtcOffset),
         formatDateToLongDate,
         formatMonthDayToLongDay,
+        formatUnixTimeToYearQuarter,
         formatYearQuarter,
         formatDateRange,
         formatFiscalYearStartToLongDay,

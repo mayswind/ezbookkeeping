@@ -17,6 +17,7 @@ import {
     type TimeFormat,
     YearQuarterUnixTime,
     YearMonthUnixTime,
+    YearMonthDayUnixTime,
     Month,
     WeekDay,
     MeridiemIndicator,
@@ -222,6 +223,10 @@ export function getYear(date: SupportedDate): number {
     return moment(date).year();
 }
 
+export function getQuarter(date: SupportedDate): number {
+    return moment(date).quarter();
+}
+
 export function getMonth(date: SupportedDate): number {
     return moment(date).month() + 1;
 }
@@ -323,15 +328,6 @@ export function getThisMonthLastUnixTime(): number {
     return moment.unix(getThisMonthFirstUnixTime()).add(1, 'months').subtract(1, 'seconds').unix();
 }
 
-export function getMonthFirstUnixTimeBySpecifiedUnixTime(unixTime: number): number {
-    const date = moment.unix(unixTime).set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
-    return date.subtract(date.date() - 1, 'days').unix();
-}
-
-export function getMonthLastUnixTimeBySpecifiedUnixTime(unixTime: number): number {
-    return moment.unix(getMonthFirstUnixTimeBySpecifiedUnixTime(unixTime)).add(1, 'months').subtract(1, 'seconds').unix();
-}
-
 export function getThisMonthSpecifiedDayFirstUnixTime(date: number): number {
     return moment().set({ date: date, hour: 0, minute: 0, second: 0, millisecond: 0 }).unix();
 }
@@ -349,8 +345,41 @@ export function getThisYearLastUnixTime(): number {
     return moment.unix(getThisYearFirstUnixTime()).add(1, 'years').subtract(1, 'seconds').unix();
 }
 
-export function getSpecifiedDayFirstUnixTime(unixTime: number): number {
+export function getYearFirstUnixTimeBySpecifiedUnixTime(unixTime: number): number {
+    const date = moment.unix(unixTime).set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+    return date.subtract(date.dayOfYear() - 1, 'days').unix();
+}
+
+export function getYearLastUnixTimeBySpecifiedUnixTime(unixTime: number): number {
+    return moment.unix(getYearFirstUnixTimeBySpecifiedUnixTime(unixTime)).add(1, 'years').subtract(1, 'seconds').unix();
+}
+
+export function getQuarterFirstUnixTimeBySpecifiedUnixTime(unixTime: number): number {
+    const date = moment.unix(unixTime).set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+    const month = date.month();
+    const quarterStartMonth = Math.floor(month / 3) * 3;
+    return date.set({ month: quarterStartMonth, date: 1 }).unix();
+}
+
+export function getQuarterLastUnixTimeBySpecifiedUnixTime(unixTime: number): number {
+    return moment.unix(getQuarterFirstUnixTimeBySpecifiedUnixTime(unixTime)).add(3, 'months').subtract(1, 'seconds').unix();
+}
+
+export function getMonthFirstUnixTimeBySpecifiedUnixTime(unixTime: number): number {
+    const date = moment.unix(unixTime).set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+    return date.subtract(date.date() - 1, 'days').unix();
+}
+
+export function getMonthLastUnixTimeBySpecifiedUnixTime(unixTime: number): number {
+    return moment.unix(getMonthFirstUnixTimeBySpecifiedUnixTime(unixTime)).add(1, 'months').subtract(1, 'seconds').unix();
+}
+
+export function getDayFirstUnixTimeBySpecifiedUnixTime(unixTime: number): number {
     return moment.unix(unixTime).set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).unix();
+}
+
+export function getDayLastUnixTimeBySpecifiedUnixTime(unixTime: number): number {
+    return moment.unix(unixTime).set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).add(1, 'days').subtract(1, 'seconds').unix();
 }
 
 export function getYearFirstUnixTime(year: number): number {
@@ -579,6 +608,32 @@ export function getAllMonthsStartAndEndUnixTimes(startYearMonth: Year0BasedMonth
     }
 
     return allYearMonthTimes;
+}
+
+export function getAllDaysStartAndEndUnixTimes(startUnixTime: number, endUnixTime: number): YearMonthDayUnixTime[] {
+    const allYearMonthDayTimes: YearMonthDayUnixTime[] = [];
+
+    if (!startUnixTime || !endUnixTime) {
+        return allYearMonthDayTimes;
+    }
+
+    let unixTime: number = startUnixTime;
+
+    while (unixTime <= endUnixTime) {
+        const currentDay = parseDateFromUnixTime(unixTime);
+        const currentDayMinUnixTime = getDayFirstUnixTimeBySpecifiedUnixTime(unixTime);
+        const currentDayMaxUnixTime = getDayLastUnixTimeBySpecifiedUnixTime(unixTime);
+
+        allYearMonthDayTimes.push(YearMonthDayUnixTime.of({
+            year: currentDay.year(),
+            month: currentDay.month() + 1,
+            day: currentDay.date()
+        }, currentDayMinUnixTime, currentDayMaxUnixTime));
+
+        unixTime = currentDayMaxUnixTime + 1;
+    }
+
+    return allYearMonthDayTimes;
 }
 
 export function getDateTimeFormatType<T extends DateFormat | TimeFormat>(allFormatMap: Record<string, T>, allFormatArray: T[], formatTypeValue: number, languageDefaultTypeName: string, systemDefaultFormatType: T): T {

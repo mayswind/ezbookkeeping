@@ -638,7 +638,7 @@ import {
     getActualUnixTimeForStore,
     getYear,
     getMonth,
-    getSpecifiedDayFirstUnixTime,
+    getDayFirstUnixTimeBySpecifiedUnixTime,
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
     getShiftedDateRangeAndDateType,
@@ -1066,7 +1066,7 @@ function changeDateFilter(dateType: number): void {
     if (dateType === DateRange.Custom.type) { // Custom
         if (!query.value.minTime || !query.value.maxTime) {
             customMaxDatetime.value = getActualUnixTimeForStore(getCurrentUnixTime(), currentTimezoneOffsetMinutes.value, getBrowserTimezoneOffsetMinutes());
-            customMinDatetime.value = getSpecifiedDayFirstUnixTime(customMaxDatetime.value);
+            customMinDatetime.value = getDayFirstUnixTimeBySpecifiedUnixTime(customMaxDatetime.value);
         } else {
             customMaxDatetime.value = query.value.maxTime;
             customMinDatetime.value = query.value.minTime;

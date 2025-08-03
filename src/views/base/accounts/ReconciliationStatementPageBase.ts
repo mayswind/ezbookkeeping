@@ -7,6 +7,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
+import type { TypeAndDisplayName } from '@/core/base.ts';
 import { type WeekDayValue, KnownDateTimeFormat } from '@/core/datetime.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { KnownFileType } from '@/core/file.ts';
@@ -33,6 +34,8 @@ import {
 export function useReconciliationStatementPageBase() {
     const {
         tt,
+        getAllTrendChartTypes,
+        getAllStatisticsDateAggregationTypesWithShortName,
         getCurrentDigitGroupingSymbol,
         formatUnixTimeToLongDateTime,
         formatUnixTimeToLongDate,
@@ -55,6 +58,9 @@ export function useReconciliationStatementPageBase() {
     const fiscalYearStart = computed<number>(() => userStore.currentUserFiscalYearStart);
     const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
+
+    const allChartTypes = computed<TypeAndDisplayName[]>(() => getAllTrendChartTypes());
+    const allDateAggregationTypes = computed<TypeAndDisplayName[]>(() => getAllStatisticsDateAggregationTypesWithShortName());
 
     const currentAccount = computed(() => allAccountsMap.value[accountId.value]);
     const currentAccountCurrency = computed<string>(() => currentAccount.value?.currency ?? defaultCurrency.value);
@@ -266,6 +272,8 @@ export function useReconciliationStatementPageBase() {
         fiscalYearStart,
         currentTimezoneOffsetMinutes,
         defaultCurrency,
+        allChartTypes,
+        allDateAggregationTypes,
         currentAccount,
         currentAccountCurrency,
         isCurrentLiabilityAccount,

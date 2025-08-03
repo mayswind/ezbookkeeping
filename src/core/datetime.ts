@@ -20,6 +20,12 @@ export interface YearMonthRange {
     readonly endYearMonth: Year0BasedMonth;
 }
 
+export interface YearMonthDay {
+    readonly year: number;
+    readonly month: number; // 1-based (1 = January, 12 = December)
+    readonly day: number;
+}
+
 export interface TimeRange {
     readonly minTime: number;
     readonly maxTime: number;
@@ -133,6 +139,26 @@ export class YearMonthUnixTime implements Year0BasedMonth, UnixTimeRange {
 
     public static of(yearMonth: Year0BasedMonth, minUnixTime: number, maxUnixTime: number): YearMonthUnixTime {
         return new YearMonthUnixTime(yearMonth.year, yearMonth.month0base, minUnixTime, maxUnixTime);
+    }
+}
+
+export class YearMonthDayUnixTime implements YearMonthDay, UnixTimeRange {
+    public readonly year: number;
+    public readonly month: number;
+    public readonly day: number;
+    public readonly minUnixTime: number;
+    public readonly maxUnixTime: number;
+
+    private constructor(year: number, month: number, day: number, minUnixTime: number, maxUnixTime: number) {
+        this.year = year;
+        this.month = month;
+        this.day = day
+        this.minUnixTime = minUnixTime;
+        this.maxUnixTime = maxUnixTime;
+    }
+
+    public static of(yearMonthDay: YearMonthDay, minUnixTime: number, maxUnixTime: number): YearMonthDayUnixTime {
+        return new YearMonthDayUnixTime(yearMonthDay.year, yearMonthDay.month, yearMonthDay.day, minUnixTime, maxUnixTime);
     }
 }
 

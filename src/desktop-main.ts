@@ -99,6 +99,7 @@ import MonthlyTrendsChart from '@/components/desktop/MonthlyTrendsChart.vue';
 import DateRangeSelectionDialog from '@/components/desktop/DateRangeSelectionDialog.vue';
 import MonthSelectionDialog from '@/components/desktop/MonthSelectionDialog.vue';
 import MonthRangeSelectionDialog from '@/components/desktop/MonthRangeSelectionDialog.vue';
+import AccountBalanceTrendsChart from '@/components/desktop/AccountBalanceTrendsChart.vue';
 import SwitchToMobileDialog from '@/components/desktop/SwitchToMobileDialog.vue';
 
 import '@/styles/desktop/template/vuetify/index.scss';
@@ -525,6 +526,7 @@ app.component('MonthlyTrendsChart', MonthlyTrendsChart);
 app.component('DateRangeSelectionDialog', DateRangeSelectionDialog);
 app.component('MonthSelectionDialog', MonthSelectionDialog);
 app.component('MonthRangeSelectionDialog', MonthRangeSelectionDialog);
+app.component('AccountBalanceTrendsChart', AccountBalanceTrendsChart);
 app.component('SwitchToMobileDialog', SwitchToMobileDialog);
 
 app.mount('#app');

@@ -251,6 +251,13 @@
             "31": "Ngày 31"
         }
     },
+    "granularity": {
+        "FiscalYearly": "Fiscal Yearly",
+        "Yearly": "Yearly",
+        "Quarterly": "Quarterly",
+        "Monthly": "Monthly",
+        "Daily": "Daily"
+    },
     "numeral": {
         "Dot": "Dấu chấm",
         "Comma": "Dấu phẩy",
@@ -1635,6 +1642,8 @@
     "Unable to delete this account": "Không thể xóa tài khoản này",
     "Unable to delete this sub-account": "Unable to delete this sub-account",
     "Reconciliation Statement": "Reconciliation Statement",
+    "Show Account Balance Trends": "Show Account Balance Trends",
+    "Show Transaction List": "Show Transaction List",
     "Update Closing Balance": "Update Closing Balance",
     "Please enter the new closing balance for the account": "Please enter the new closing balance for the account",
     "Transaction": "Giao dịch",
@@ -1873,6 +1882,7 @@
     "Sort by Amount": "Sắp xếp theo số tiền",
     "Sort by Display Order": "Sắp xếp theo thứ tự hiển thị",
     "Sort by Name": "Sắp xếp theo tên",
+    "Time Granularity": "Time Granularity",
     "Aggregate by Month": "Tổng hợp theo tháng",
     "Aggregate by Quarter": "Tổng hợp theo quý",
     "Aggregate by Year": "Tổng hợp theo năm",

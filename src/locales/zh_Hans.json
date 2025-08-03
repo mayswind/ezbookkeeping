@@ -251,6 +251,13 @@
             "31": "31"
         }
     },
+    "granularity": {
+        "FiscalYearly": "按财年",
+        "Yearly": "按年",
+        "Quarterly": "按季度",
+        "Monthly": "按月",
+        "Daily": "按天"
+    },
     "numeral": {
         "Dot": "句点",
         "Comma": "逗号",
@@ -1635,6 +1642,8 @@
     "Unable to delete this account": "无法删除该账户",
     "Unable to delete this sub-account": "无法删除该子账户",
     "Reconciliation Statement": "对账单",
+    "Show Account Balance Trends": "显示账户余额趋势",
+    "Show Transaction List": "显示交易列表",
     "Update Closing Balance": "更新期末余额",
     "Please enter the new closing balance for the account": "请输入账户的新期末余额",
     "Transaction": "交易",
@@ -1873,6 +1882,7 @@
     "Sort by Amount": "按金额排序",
     "Sort by Display Order": "按显示顺序排序",
     "Sort by Name": "按名称排序",
+    "Time Granularity": "时间粒度",
     "Aggregate by Month": "按月聚合",
     "Aggregate by Quarter": "按季度聚合",
     "Aggregate by Year": "按年聚合",

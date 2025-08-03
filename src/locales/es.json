@@ -251,6 +251,13 @@
             "31": "31"
         }
     },
+    "granularity": {
+        "FiscalYearly": "Fiscal Yearly",
+        "Yearly": "Yearly",
+        "Quarterly": "Quarterly",
+        "Monthly": "Monthly",
+        "Daily": "Daily"
+    },
     "numeral": {
         "Dot": "Punto",
         "Comma": "Coma",
@@ -1635,6 +1642,8 @@
     "Unable to delete this account": "No se puede eliminar esta cuenta",
     "Unable to delete this sub-account": "Unable to delete this sub-account",
     "Reconciliation Statement": "Reconciliation Statement",
+    "Show Account Balance Trends": "Show Account Balance Trends",
+    "Show Transaction List": "Show Transaction List",
     "Update Closing Balance": "Update Closing Balance",
     "Please enter the new closing balance for the account": "Please enter the new closing balance for the account",
     "Transaction": "Transacción",
@@ -1873,6 +1882,7 @@
     "Sort by Amount": "Ordenar por Importe",
     "Sort by Display Order": "Ordenar por orden de visualización",
     "Sort by Name": "Ordenar por Nombre",
+    "Time Granularity": "Time Granularity",
     "Aggregate by Month": "Agregado por mes",
     "Aggregate by Quarter": "Agregado por trimestre",
     "Aggregate by Year": "Agregado por año",

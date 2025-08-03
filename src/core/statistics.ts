@@ -151,23 +151,25 @@ export class ChartSortingType implements TypeAndName {
     }
 }
 
-export class ChartDateAggregationType implements TypeAndName {
+export class ChartDateAggregationType {
     private static readonly allInstances: ChartDateAggregationType[] = [];
     private static readonly allInstancesByType: Record<number, ChartDateAggregationType> = {};
 
-    public static readonly Month = new ChartDateAggregationType(0, 'Aggregate by Month');
-    public static readonly Quarter = new ChartDateAggregationType(1, 'Aggregate by Quarter');
-    public static readonly Year = new ChartDateAggregationType(2, 'Aggregate by Year');
-    public static readonly FiscalYear = new ChartDateAggregationType(3, 'Aggregate by Fiscal Year');
+    public static readonly Month = new ChartDateAggregationType(0, 'Monthly', 'Aggregate by Month');
+    public static readonly Quarter = new ChartDateAggregationType(1, 'Quarterly', 'Aggregate by Quarter');
+    public static readonly Year = new ChartDateAggregationType(2, 'Yearly', 'Aggregate by Year');
+    public static readonly FiscalYear = new ChartDateAggregationType(3, 'FiscalYearly', 'Aggregate by Fiscal Year');
 
     public static readonly Default = ChartDateAggregationType.Month;
 
     public readonly type: number;
-    public readonly name: string;
+    public readonly shortName: string;
+    public readonly fullName: string;
 
-    private constructor(type: number, name: string) {
+    private constructor(type: number, shortName: string, fullName: string) {
         this.type = type;
-        this.name = name;
+        this.shortName = shortName;
+        this.fullName = fullName;
 
         ChartDateAggregationType.allInstances.push(this);
         ChartDateAggregationType.allInstancesByType[type] = this;

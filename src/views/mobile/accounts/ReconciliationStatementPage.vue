@@ -71,7 +71,7 @@
 
         <f7-list strong inset dividers media-list
                  class="skeleton-text margin-vertical transaction-info-list reconciliation-statement-list"
-                 v-if="finishQuery && loading">
+                 v-if="finishQuery && !showAccountBalanceTrendsCharts && loading">
             <ul>
                 <f7-list-item chevron-center
                     :key="index"
@@ -130,14 +130,14 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical"
-                 v-if="finishQuery && !loading && (!allReconciliationStatementVirtualListItems || !allReconciliationStatementVirtualListItems.length)">
+                 v-if="finishQuery && !showAccountBalanceTrendsCharts && !loading && (!allReconciliationStatementVirtualListItems || !allReconciliationStatementVirtualListItems.length)">
             <f7-list-item :title="tt('No transaction data')"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers media-list virtual-list
                  class="margin-vertical transaction-info-list reconciliation-statement-list"
                  :virtual-list-params="{ items: allReconciliationStatementVirtualListItems, renderExternal, height: 'auto' }"
-                 v-if="finishQuery && !loading && allReconciliationStatementVirtualListItems && allReconciliationStatementVirtualListItems.length">
+                 v-if="finishQuery && !showAccountBalanceTrendsCharts && !loading && allReconciliationStatementVirtualListItems && allReconciliationStatementVirtualListItems.length">
             <ul>
                 <f7-list-item chevron-center
                               :key="item.index"
@@ -231,6 +231,50 @@
             </ul>
         </f7-list>
 
+        <f7-card v-if="finishQuery && showAccountBalanceTrendsCharts">
+            <f7-card-header class="no-border display-block">
+                <div class="statistics-chart-header display-flex full-line justify-content-space-between">
+                    <div></div>
+                    <div class="align-self-flex-end">
+                        <span style="margin-right: 4px;">{{ tt('Time Granularity') }}</span>
+                        <f7-link :class="{ 'disabled': loading }" href="#" popover-open=".chart-data-date-aggregation-type-popover-menu">{{ chartDataDateAggregationTypeDisplayName }}</f7-link>
+                    </div>
+                </div>
+            </f7-card-header>
+            <f7-card-content style="margin-top: -14px" :padding="false">
+                <account-balance-trends-bar-chart
+                    :loading="loading"
+                    :date-aggregation-type="chartDataDateAggregationType"
+                    :fiscal-year-start="fiscalYearStart"
+                    :items="reconciliationStatements?.transactions"
+                    :account-currency="currentAccountCurrency"
+                />
+            </f7-card-content>
+        </f7-card>
+
+        <f7-popover class="chart-data-date-aggregation-type-popover-menu"
+                    v-model:opened="showChartDataDateAggregationTypePopover">
+            <f7-list dividers>
+                <f7-list-item :title="tt('granularity.Daily')"
+                              :class="{ 'list-item-selected': chartDataDateAggregationType === undefined }"
+                              key="daily"
+                              @click="setChartDataDateAggregationType(undefined)">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="chartDataDateAggregationType === undefined"></f7-icon>
+                    </template>
+                </f7-list-item>
+                <f7-list-item :title="dateAggregationType.displayName"
+                              :class="{ 'list-item-selected': chartDataDateAggregationType === dateAggregationType.type }"
+                              :key="dateAggregationType.type"
+                              v-for="dateAggregationType in allDateAggregationTypes"
+                              @click="setChartDataDateAggregationType(dateAggregationType.type)">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="chartDataDateAggregationType === dateAggregationType.type"></f7-icon>
+                    </template>
+                </f7-list-item>
+            </f7-list>
+        </f7-popover>
+
         <date-range-selection-sheet :title="tt('Custom Date Range')"
                                     :min-time="startTime"
                                     :max-time="endTime"
@@ -256,6 +300,8 @@
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button :class="{ 'disabled': loading }" @click="reload(true)">{{ tt('Refresh') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': loading }" @click="showAccountBalanceTrendsCharts = true" v-if="!showAccountBalanceTrendsCharts">{{ tt('Show Account Balance Trends') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': loading }" @click="showAccountBalanceTrendsCharts = false" v-if="showAccountBalanceTrendsCharts">{{ tt('Show Transaction List') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
@@ -292,7 +338,7 @@ import { TransactionType } from '@/core/transaction.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import { type TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
 
-import { isDefined, isEquals } from '@/lib/common.ts';
+import { isDefined, isEquals, findDisplayNameByType } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
     getDateTypeByDateRange,
@@ -330,6 +376,7 @@ const {
     reconciliationStatements,
     firstDayOfWeek,
     fiscalYearStart,
+    allDateAggregationTypes,
     currentTimezoneOffsetMinutes,
     isCurrentLiabilityAccount,
     allCategoriesMap,
@@ -358,12 +405,15 @@ const finishQuery = ref<boolean>(false);
 const loading = ref<boolean>(false);
 const loadingError = ref<unknown | null>(null);
 const queryDateRangeType = ref<number>(DateRange.ThisMonth.type);
+const showAccountBalanceTrendsCharts = ref<boolean>(false);
+const chartDataDateAggregationType = ref<number | undefined>(undefined);
 const transactionToDelete = ref<TransactionReconciliationStatementResponseItem | null>(null);
 const newClosingBalance = ref<number>(0);
 const showCustomDateRangeSheet = ref<boolean>(false);
 const showNewClosingBalanceSheet = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
+const showChartDataDateAggregationTypePopover = ref<boolean>(false);
 const virtualDataItems = ref<ReconciliationStatementVirtualListData>({
     items: [],
     topPosition: 0
@@ -405,6 +455,14 @@ const allReconciliationStatementVirtualListItems = computed<ReconciliationStatem
     }
 
     return ret;
+});
+
+const chartDataDateAggregationTypeDisplayName = computed<string>(() => {
+    if (chartDataDateAggregationType.value === undefined) {
+        return tt('granularity.Daily');
+    }
+
+    return findDisplayNameByType(allDateAggregationTypes.value, chartDataDateAggregationType.value) || tt('Unknown');
 });
 
 function getTransactionDomId(transaction: TransactionReconciliationStatementResponseItem): string {
@@ -590,6 +648,11 @@ function removeTransaction(transaction: TransactionReconciliationStatementRespon
             showToast(error.message || error);
         }
     });
+}
+
+function setChartDataDateAggregationType(type: number | undefined): void {
+    chartDataDateAggregationType.value = type;
+    showChartDataDateAggregationTypePopover.value = false;
 }
 
 function renderExternal(vl: unknown, vlData: ReconciliationStatementVirtualListData): void {

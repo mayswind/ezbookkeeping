@@ -74,6 +74,10 @@ export function getAllDateRanges<T extends Year1BasedMonth>(items: YearMonthItem
         endYearMonth = `${maxYear}-${maxMonth}`;
     }
 
+    return getAllDateRangesByYearMonthRange(startYearMonth, endYearMonth, fiscalYearStart, dateAggregationType);
+}
+
+export function getAllDateRangesByYearMonthRange(startYearMonth: Year1BasedMonth | string, endYearMonth: Year1BasedMonth | string, fiscalYearStart: number, dateAggregationType: number): YearUnixTime[] | FiscalYearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] {
     if (!startYearMonth || !endYearMonth) {
         return [];
     }

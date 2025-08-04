@@ -22,7 +22,7 @@ func (j *CronJob) doRun() {
 	start := time.Now()
 	c := core.NewCronJobContext(j.Name, j.Period.GetInterval())
 
-	if duplicatechecker.Container.Current != nil {
+	if duplicatechecker.Container.IsEnabled() {
 		localAddr, err := utils.GetLocalIPAddressesString()
 
 		if err != nil {

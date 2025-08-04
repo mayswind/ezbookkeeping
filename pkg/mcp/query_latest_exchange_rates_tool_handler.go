@@ -68,13 +68,7 @@ func (h *mcpQueryLatestExchangeRatesToolHandler) Handle(c *core.WebContext, call
 		return nil, nil, errs.ErrIncompleteOrIncorrectSubmission
 	}
 
-	dataSource := exchangerates.Container.Current
-
-	if dataSource == nil {
-		return nil, nil, errs.ErrInvalidExchangeRatesDataSource
-	}
-
-	exchangeRateResponse, err := dataSource.GetLatestExchangeRates(c, user.Uid, currentConfig)
+	exchangeRateResponse, err := exchangerates.Container.GetLatestExchangeRates(c, user.Uid, currentConfig)
 
 	if err != nil {
 		return nil, nil, err

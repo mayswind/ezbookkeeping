@@ -9,7 +9,7 @@ import (
 
 // AvatarProviderContainer contains the current user avatar provider
 type AvatarProviderContainer struct {
-	Current AvatarProvider
+	current AvatarProvider
 }
 
 // Initialize a user avatar provider container singleton instance
@@ -20,13 +20,13 @@ var (
 // InitializeAvatarProvider initializes the current user avatar provider according to the config
 func InitializeAvatarProvider(config *settings.Config) error {
 	if config.AvatarProvider == core.USER_AVATAR_PROVIDER_INTERNAL {
-		Container.Current = NewInternalStorageAvatarProvider(config)
+		Container.current = NewInternalStorageAvatarProvider(config)
 		return nil
 	} else if config.AvatarProvider == core.USER_AVATAR_PROVIDER_GRAVATAR {
-		Container.Current = NewGravatarAvatarProvider()
+		Container.current = NewGravatarAvatarProvider()
 		return nil
 	} else if config.AvatarProvider == "" {
-		Container.Current = NewNullAvatarProvider()
+		Container.current = NewNullAvatarProvider()
 		return nil
 	}
 
@@ -35,5 +35,9 @@ func InitializeAvatarProvider(config *settings.Config) error {
 
 // GetAvatarUrl returns the avatar url by the current user avatar provider
 func (p *AvatarProviderContainer) GetAvatarUrl(user *models.User) string {
-	return p.Current.GetAvatarUrl(user)
+	if p.current == nil {
+		return ""
+	}
+
+	return p.current.GetAvatarUrl(user)
 }

@@ -81,13 +81,13 @@ func sendTestMail(c *core.CliContext) error {
 		return err
 	}
 
-	if !config.EnableSMTP || mail.Container.Current == nil {
+	if !config.EnableSMTP {
 		return errs.ErrSMTPServerNotEnabled
 	}
 
 	toAddress := c.String("to")
 
-	err = mail.Container.Current.SendMail(&mail.MailMessage{
+	err = mail.Container.SendMail(&mail.MailMessage{
 		To:      toAddress,
 		Subject: "ezBookkeeping test e-mail",
 		Body:    "This is a test e-mail",

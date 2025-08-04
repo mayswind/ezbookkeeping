@@ -1,12 +1,13 @@
 package mail
 
 import (
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 // MailerContainer contains the current mailer
 type MailerContainer struct {
-	Current Mailer
+	current Mailer
 }
 
 // Initialize a mailer container singleton instance
@@ -17,7 +18,7 @@ var (
 // InitializeMailer initializes the current mailer according to the config
 func InitializeMailer(config *settings.Config) error {
 	if !config.EnableSMTP {
-		Container.Current = nil
+		Container.current = nil
 		return nil
 	}
 
@@ -27,11 +28,15 @@ func InitializeMailer(config *settings.Config) error {
 		return err
 	}
 
-	Container.Current = mailer
+	Container.current = mailer
 	return nil
 }
 
 // SendMail sends an email according to argument
-func (u *MailerContainer) SendMail(message *MailMessage) error {
-	return u.Current.SendMail(message)
+func (m *MailerContainer) SendMail(message *MailMessage) error {
+	if m.current == nil {
+		return errs.ErrSMTPServerNotEnabled
+	}
+
+	return m.current.SendMail(message)
 }

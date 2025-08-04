@@ -9,5 +9,5 @@ type CliUsingConfig struct {
 
 // CurrentConfig returns the current config
 func (l *CliUsingConfig) CurrentConfig() *settings.Config {
-	return l.container.Current
+	return l.container.GetCurrentConfig()
 }

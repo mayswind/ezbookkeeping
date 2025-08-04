@@ -326,15 +326,12 @@ func executeLatestExchangeRateHandler(t *testing.T, dataSourceType string) *mode
 	err := InitializeExchangeRatesDataSource(config)
 	assert.Nil(t, err)
 
-	dataSource := Container.Current
-	assert.NotNil(t, dataSource)
-
 	ginContext, _ := gin.CreateTestContext(httptest.NewRecorder())
 	context := &core.WebContext{
 		Context: ginContext,
 	}
 
-	exchangeRateResponse, err := dataSource.GetLatestExchangeRates(context, context.GetCurrentUid(), config)
+	exchangeRateResponse, err := Container.GetLatestExchangeRates(context, context.GetCurrentUid(), config)
 	assert.Nil(t, err)
 	assert.NotNil(t, exchangeRateResponse)
 

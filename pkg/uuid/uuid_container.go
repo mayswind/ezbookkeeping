@@ -7,7 +7,7 @@ import (
 
 // UuidContainer contains the current uuid generator
 type UuidContainer struct {
-	Current UuidGenerator
+	current UuidGenerator
 }
 
 // Initialize a uuid container singleton instance
@@ -19,7 +19,7 @@ var (
 func InitializeUuidGenerator(config *settings.Config) error {
 	if config.UuidGeneratorType == settings.InternalUuidGeneratorType {
 		generator, err := NewInternalUuidGenerator(config)
-		Container.Current = generator
+		Container.current = generator
 
 		return err
 	}
@@ -29,10 +29,18 @@ func InitializeUuidGenerator(config *settings.Config) error {
 
 // GenerateUuid returns a new uuid by the current uuid generator
 func (u *UuidContainer) GenerateUuid(uuidType UuidType) int64 {
-	return u.Current.GenerateUuid(uuidType)
+	if u.current == nil {
+		return 0
+	}
+
+	return u.current.GenerateUuid(uuidType)
 }
 
 // GenerateUuids returns new uuids by the current uuid generator
 func (u *UuidContainer) GenerateUuids(uuidType UuidType, count uint16) []int64 {
-	return u.Current.GenerateUuids(uuidType, count)
+	if u.current == nil {
+		return nil
+	}
+
+	return u.current.GenerateUuids(uuidType, count)
 }

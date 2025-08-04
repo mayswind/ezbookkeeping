@@ -95,7 +95,7 @@ func TestCronJobSchedulerContainerRepeatRun(t *testing.T) {
 		InMemoryDuplicateCheckerCleanupIntervalDuration: 60 * time.Second,
 	})
 
-	duplicatechecker.Container.Current = checker
+	duplicatechecker.SetDuplicateChecker(checker)
 
 	container := &CronJobSchedulerContainer{
 		allJobsMap:       make(map[string]*CronJob),

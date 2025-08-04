@@ -7,7 +7,7 @@ import (
 
 // RequestIdContainer contains the current request id generator
 type RequestIdContainer struct {
-	Current RequestIdGenerator
+	current RequestIdGenerator
 }
 
 // Initialize a request id container singleton instance
@@ -23,11 +23,33 @@ func InitializeRequestIdGenerator(c core.Context, config *settings.Config) error
 		return err
 	}
 
-	Container.Current = generator
+	Container.current = generator
 	return nil
 }
 
 // GenerateRequestId returns a new request id by the current request id generator
-func (u *RequestIdContainer) GenerateRequestId(clientIpAddr string, clientPort uint16) string {
-	return u.Current.GenerateRequestId(clientIpAddr, clientPort)
+func (r *RequestIdContainer) GenerateRequestId(clientIpAddr string, clientPort uint16) string {
+	if r.current == nil {
+		return ""
+	}
+
+	return r.current.GenerateRequestId(clientIpAddr, clientPort)
+}
+
+// GetCurrentServerUniqId returns current server unique id
+func (r *RequestIdContainer) GetCurrentServerUniqId() uint16 {
+	if r.current == nil {
+		return 0
+	}
+
+	return r.current.GetCurrentServerUniqId()
+}
+
+// GetCurrentInstanceUniqId returns current application instance unique id
+func (r *RequestIdContainer) GetCurrentInstanceUniqId() uint16 {
+	if r.current == nil {
+		return 0
+	}
+
+	return r.current.GetCurrentInstanceUniqId()
 }

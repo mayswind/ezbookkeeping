@@ -23,7 +23,7 @@ type ApiUsingConfig struct {
 
 // CurrentConfig returns the current config
 func (a *ApiUsingConfig) CurrentConfig() *settings.Config {
-	return a.container.Current
+	return a.container.GetCurrentConfig()
 }
 
 // GetTransactionPictureInfoResponse returns the view-object of transaction picture basic info according to the transaction picture model
@@ -53,15 +53,15 @@ func (a *ApiUsingConfig) GetAfterRegisterNotificationContent(userLanguage string
 		language = clientLanguage
 	}
 
-	if !a.container.Current.AfterRegisterNotification.Enabled {
+	if !a.CurrentConfig().AfterRegisterNotification.Enabled {
 		return ""
 	}
 
-	if multiLanguageContent, exists := a.container.Current.AfterRegisterNotification.MultiLanguageContent[language]; exists {
+	if multiLanguageContent, exists := a.CurrentConfig().AfterRegisterNotification.MultiLanguageContent[language]; exists {
 		return multiLanguageContent
 	}
 
-	return a.container.Current.AfterRegisterNotification.DefaultContent
+	return a.CurrentConfig().AfterRegisterNotification.DefaultContent
 }
 
 // GetAfterLoginNotificationContent returns the notification content displayed each time users log in
@@ -72,15 +72,15 @@ func (a *ApiUsingConfig) GetAfterLoginNotificationContent(userLanguage string, c
 		language = clientLanguage
 	}
 
-	if !a.container.Current.AfterLoginNotification.Enabled {
+	if !a.CurrentConfig().AfterLoginNotification.Enabled {
 		return ""
 	}
 
-	if multiLanguageContent, exists := a.container.Current.AfterLoginNotification.MultiLanguageContent[language]; exists {
+	if multiLanguageContent, exists := a.CurrentConfig().AfterLoginNotification.MultiLanguageContent[language]; exists {
 		return multiLanguageContent
 	}
 
-	return a.container.Current.AfterLoginNotification.DefaultContent
+	return a.CurrentConfig().AfterLoginNotification.DefaultContent
 }
 
 // GetAfterOpenNotificationContent returns the notification content displayed each time users open the app
@@ -91,15 +91,15 @@ func (a *ApiUsingConfig) GetAfterOpenNotificationContent(userLanguage string, cl
 		language = clientLanguage
 	}
 
-	if !a.container.Current.AfterOpenNotification.Enabled {
+	if !a.CurrentConfig().AfterOpenNotification.Enabled {
 		return ""
 	}
 
-	if multiLanguageContent, exists := a.container.Current.AfterOpenNotification.MultiLanguageContent[language]; exists {
+	if multiLanguageContent, exists := a.CurrentConfig().AfterOpenNotification.MultiLanguageContent[language]; exists {
 		return multiLanguageContent
 	}
 
-	return a.container.Current.AfterOpenNotification.DefaultContent
+	return a.CurrentConfig().AfterOpenNotification.DefaultContent
 }
 
 // ApiUsingDuplicateChecker represents an api that need to use duplicate checker

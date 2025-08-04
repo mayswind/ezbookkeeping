@@ -30,13 +30,7 @@ var (
 
 // LatestExchangeRateHandler returns latest exchange rate data
 func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.WebContext) (any, *errs.Error) {
-	dataSource := exchangerates.Container.Current
-
-	if dataSource == nil {
-		return nil, errs.ErrInvalidExchangeRatesDataSource
-	}
-
-	exchangeRateResponse, err := dataSource.GetLatestExchangeRates(c, c.GetCurrentUid(), a.container.Current)
+	exchangeRateResponse, err := exchangerates.Container.GetLatestExchangeRates(c, c.GetCurrentUid(), a.CurrentConfig())
 
 	if err != nil {
 		return nil, errs.Or(err, errs.ErrOperationFailed)

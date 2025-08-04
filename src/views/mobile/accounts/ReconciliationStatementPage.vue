@@ -294,8 +294,6 @@
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
                 <f7-actions-button :class="{ 'disabled': loading }" @click="addTransaction()">{{ tt('Add Transaction') }}</f7-actions-button>
-            </f7-actions-group>
-            <f7-actions-group>
                 <f7-actions-button :class="{ 'disabled': loading }" @click="updateClosingBalance(undefined)">{{ tt('Update Closing Balance') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>

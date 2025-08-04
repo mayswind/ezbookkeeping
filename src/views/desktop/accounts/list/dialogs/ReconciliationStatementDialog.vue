@@ -50,7 +50,6 @@
                                 <v-list-item :prepend-icon="mdiInvoiceTextPlusOutline"
                                              :title="tt('Add Transaction')"
                                              @click="addTransaction()"></v-list-item>
-                                <v-divider class="my-2"/>
                                 <v-list-item :prepend-icon="mdiInvoiceTextEditOutline"
                                              :title="tt('Update Closing Balance')"
                                              @click="updateClosingBalance()"></v-list-item>

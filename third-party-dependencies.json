@@ -9,7 +9,7 @@
         "name": "Cache gin's middleware",
         "copyright": "Copyright (c) 2016 Gin-Gonic",
         "url": "https://github.com/gin-contrib/cache",
-        "licenseUrl": "https://github.com/gin-contrib/cache/blob/v1.4.0/LICENSE"
+        "licenseUrl": "https://github.com/gin-contrib/cache/blob/v1.4.1/LICENSE"
     },
     {
         "name": "GZIP gin's middleware",
@@ -21,7 +21,7 @@
         "name": "xorm",
         "copyright": "Copyright (c) 2013 - 2015 The Xorm Authors",
         "url": "https://xorm.io/xorm",
-        "licenseUrl": "https://gitea.com/xorm/xorm/src/tag/v1.3.9/LICENSE"
+        "licenseUrl": "https://gitea.com/xorm/xorm/src/tag/v1.3.10/LICENSE"
     },
     {
         "name": "SQL builder",
@@ -39,7 +39,7 @@
         "name": "cli",
         "copyright": "Copyright (c) 2023 urfave/cli maintainers",
         "url": "https://github.com/urfave/cli",
-        "licenseUrl": "https://github.com/urfave/cli/blob/v3.3.3/LICENSE"
+        "licenseUrl": "https://github.com/urfave/cli/blob/v3.3.8/LICENSE"
     },
     {
         "name": "INI",
@@ -51,13 +51,13 @@
         "name": "Package validator",
         "copyright": "Copyright (c) 2015 Dean Karn",
         "url": "https://github.com/go-playground/validator",
-        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.26.0/LICENSE"
+        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.27.0/LICENSE"
     },
     {
         "name": "jwt-go",
         "copyright": "Copyright (c) 2012 Dave Grijalva, Copyright (c) 2021 golang-jwt maintainers",
         "url": "https://github.com/golang-jwt/jwt",
-        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/v5.2.2/LICENSE"
+        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/v5.3.0/LICENSE"
     },
     {
         "name": "otp",
@@ -67,7 +67,7 @@
     {
         "name": "Go-MySQL-Driver",
         "url": "https://github.com/go-sql-driver/mysql",
-        "licenseUrl": "https://github.com/go-sql-driver/mysql/blob/v1.9.2/LICENSE"
+        "licenseUrl": "https://github.com/go-sql-driver/mysql/blob/v1.9.3/LICENSE"
     },
     {
         "name": "pq",
@@ -79,25 +79,25 @@
         "name": "go-sqlite3",
         "copyright": "Copyright (c) 2014 Yasuhiro Matsumoto",
         "url": "https://github.com/mattn/go-sqlite3",
-        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.28/LICENSE"
+        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.30/LICENSE"
     },
     {
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.38.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.40.0:LICENSE"
     },
     {
         "name": "Go Networking",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/net",
-        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.40.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.42.0:LICENSE"
     },
     {
         "name": "Go Text",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/text",
-        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.25.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.27.0:LICENSE"
     },
     {
         "name": "Gomail",
@@ -109,19 +109,19 @@
         "name": "MinIO Go Client SDK",
         "copyright": "MinIO Cloud Storage, (C) 2014-2020 MinIO, Inc.",
         "url": "https://github.com/minio/minio-go",
-        "licenseUrl": "https://github.com/minio/minio-go/blob/v7.0.92/LICENSE"
+        "licenseUrl": "https://github.com/minio/minio-go/blob/v7.0.95/LICENSE"
     },
     {
         "name": "gocron",
         "copyright": "Copyright (c) 2014, 辣椒面",
         "url": "https://github.com/go-co-op/gocron",
-        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.16.2/LICENSE"
+        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.16.3/LICENSE"
     },
     {
         "name": "barcode",
         "copyright": "Copyright (c) 2014 Florian Sundermann",
         "url": "https://github.com/boombuler/barcode",
-        "licenseUrl": "https://github.com/boombuler/barcode/blob/v1.0.2/LICENSE"
+        "licenseUrl": "https://github.com/boombuler/barcode/blob/v1.1.0/LICENSE"
     },
     {
         "name": "Excelize",
@@ -161,13 +161,13 @@
         "name": "vuejs/core",
         "copyright": "Copyright (c) 2018-present, Yuxi (Evan) You and Vue contributors",
         "url": "https://github.com/vuejs/core",
-        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.16/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.18/LICENSE"
     },
     {
         "name": "Pinia",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/pinia",
-        "licenseUrl": "https://github.com/vuejs/pinia/blob/v3.0.2/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/pinia/blob/v3.0.3/LICENSE"
     },
     {
         "name": "vue-router",
@@ -179,13 +179,13 @@
         "name": "vue-i18n",
         "copyright": "Copyright (c) 2016 kazuya kawaguchi",
         "url": "https://github.com/intlify/vue-i18n-next",
-        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v11.1.5/LICENSE"
+        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v11.1.11/LICENSE"
     },
     {
         "name": "vuetify",
-        "copyright": "Copyright (c) 2016-2023 John Jeremy Leider",
+        "copyright": "Copyright (c) 2016-now Vuetify, LLC",
         "url": "https://vuetifyjs.com",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.8.7/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.9.3/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -233,7 +233,7 @@
         "name": "Apache ECharts",
         "copyright": "Copyright © 2017-2025, The Apache Software Foundation Apache ECharts, ECharts, Apache, the Apache feather, and the Apache ECharts project logo are either registered trademarks or trademarks of the Apache Software Foundation.",
         "url": "https://echarts.apache.org/",
-        "licenseUrl": "https://github.com/apache/echarts/blob/5.6.0/LICENSE"
+        "licenseUrl": "https://github.com/apache/echarts/blob/5.5.1/LICENSE"
     },
     {
         "name": "vue-echarts",
@@ -257,7 +257,7 @@
         "name": "axios",
         "copyright": "Copyright (c) 2014-present Matt Zabriskie & Collaborators",
         "url": "https://axios-http.com",
-        "licenseUrl": "https://github.com/axios/axios/blob/v1.9.0/LICENSE"
+        "licenseUrl": "https://github.com/axios/axios/blob/v1.11.0/LICENSE"
     },
     {
         "name": "Moment.js",

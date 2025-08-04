@@ -1,4 +1,4 @@
-import { createApp } from 'vue';
+import { createApp, ref } from 'vue';
 import { createPinia } from 'pinia';
 import { type I18n, type Composer, createI18n } from 'vue-i18n';
 
@@ -71,6 +71,7 @@ import draggable from 'vuedraggable';
 
 import router from '@/router/desktop.ts';
 
+import { DecimalSeparator } from '@/core/numeral.ts';
 import { getI18nOptions } from '@/locales/helpers.ts';
 
 import PinCodeInput from '@/components/common/PinCodeInput.vue';
@@ -435,6 +436,7 @@ const vuetify = createVuetify({
         adapter: ((i18nGlobal: Composer) => {
             const instance: LocaleInstance = {
                 name: 'ezBookkeeping i18n',
+                decimalSeparator: ref<string>(DecimalSeparator.Default.symbol), // should never use vuetify to format numbers
                 messages: i18nGlobal.messages,
                 current: i18nGlobal.locale,
                 fallback: i18nGlobal.locale, // no need to let vuetify know what fallback locale is

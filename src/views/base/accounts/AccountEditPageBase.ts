@@ -44,6 +44,28 @@ export function useAccountEditPageBaseBase() {
         }
     });
 
+    const inputEmptyProblemMessage = computed<string | null>(() => {
+        let problemMessage = getInputEmptyProblemMessage(account.value, false);
+
+        if (problemMessage) {
+            return problemMessage;
+        }
+
+        if (account.value.type === AccountType.MultiSubAccounts.type) {
+            for (let i = 0; i < subAccounts.value.length; i++) {
+                problemMessage = getInputEmptyProblemMessage(subAccounts.value[i], true);
+
+                if (problemMessage) {
+                    return problemMessage;
+                }
+            }
+        }
+
+        return null;
+    });
+
+    const inputIsEmpty = computed<boolean>(() => !!inputEmptyProblemMessage.value);
+
     const allAccountCategories = computed<LocalizedAccountCategory[]>(() => getAllAccountCategories());
     const allAccountTypes = computed<TypeAndDisplayName[]>(() => getAllAccountTypes());
 
@@ -95,42 +117,6 @@ export function useAccountEditPageBaseBase() {
         return account.id === '' || account.id === '0';
     }
 
-    function isInputEmpty(): boolean {
-        const isAccountEmpty = !!getInputEmptyProblemMessage(account.value, false);
-
-        if (isAccountEmpty) {
-            return true;
-        }
-
-        if (account.value.type === AccountType.MultiSubAccounts.type) {
-            for (let i = 0; i < subAccounts.value.length; i++) {
-                const isSubAccountEmpty = !!getInputEmptyProblemMessage(subAccounts.value[i], true);
-
-                if (isSubAccountEmpty) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    function getAccountOrSubAccountProblemMessage(): string | null {
-        let problemMessage = getInputEmptyProblemMessage(account.value, false);
-
-        if (!problemMessage && account.value.type === AccountType.MultiSubAccounts.type) {
-            for (let i = 0; i < subAccounts.value.length; i++) {
-                problemMessage = getInputEmptyProblemMessage(subAccounts.value[i], true);
-
-                if (problemMessage) {
-                    break;
-                }
-            }
-        }
-
-        return problemMessage;
-    }
-
     function addSubAccount(): boolean {
         if (account.value.type !== AccountType.MultiSubAccounts.type) {
             return false;
@@ -170,6 +156,8 @@ export function useAccountEditPageBaseBase() {
         // computed states
         title,
         saveButtonTitle,
+        inputEmptyProblemMessage,
+        inputIsEmpty,
         allAccountCategories,
         allAccountTypes,
         allAvailableMonthDays,
@@ -177,8 +165,6 @@ export function useAccountEditPageBaseBase() {
         // functions
         getAccountCreditCardStatementDate,
         isNewAccount,
-        isInputEmpty,
-        getAccountOrSubAccountProblemMessage,
         addSubAccount,
         setAccount
     };

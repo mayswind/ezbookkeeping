@@ -169,10 +169,16 @@
             </v-card-text>
             <v-card-text class="overflow-y-visible">
                 <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
-                    <v-btn :disabled="isInputEmpty() || loading || submitting" @click="save">
-                        {{ tt(saveButtonTitle) }}
-                        <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
-                    </v-btn>
+                    <v-tooltip :disabled="!inputIsEmpty" :text="inputEmptyProblemMessage ? tt(inputEmptyProblemMessage) : ''">
+                        <template v-slot:activator="{ props }">
+                            <div v-bind="props" class="d-inline-block">
+                                <v-btn :disabled="inputIsEmpty || loading || submitting" @click="save">
+                                    {{ tt(saveButtonTitle) }}
+                                    <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
+                                </v-btn>
+                            </div>
+                        </template>
+                    </v-tooltip>
                     <v-btn color="secondary" variant="tonal"
                            :disabled="loading || submitting" @click="cancel">{{ tt('Cancel') }}</v-btn>
                 </div>
@@ -228,13 +234,13 @@ const {
     subAccounts,
     title,
     saveButtonTitle,
+    inputEmptyProblemMessage,
+    inputIsEmpty,
     allAccountCategories,
     allAccountTypes,
     allAvailableMonthDays,
     isAccountSupportCreditCardStatementDate,
     isNewAccount,
-    isInputEmpty,
-    getAccountOrSubAccountProblemMessage,
     addSubAccount,
     setAccount
 } = useAccountEditPageBaseBase();
@@ -325,7 +331,7 @@ function open(options?: { id?: string, currentAccount?: Account, category?: numb
 }
 
 function save(): void {
-    const problemMessage = getAccountOrSubAccountProblemMessage();
+    const problemMessage = inputEmptyProblemMessage.value;
 
     if (problemMessage) {
         snackbar.value?.showMessage(problemMessage);

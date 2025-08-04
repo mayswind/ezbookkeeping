@@ -5,7 +5,7 @@
             <f7-nav-title :title="tt(title)"></f7-nav-title>
             <f7-nav-right>
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': account.type !== AccountType.MultiSubAccounts.type }" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link :class="{ 'disabled': isInputEmpty() || submitting }" :text="tt(saveButtonTitle)" @click="save"></f7-link>
+                <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" :text="tt(saveButtonTitle)" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -567,14 +567,14 @@ const {
     subAccounts,
     title,
     saveButtonTitle,
+    inputEmptyProblemMessage,
+    inputIsEmpty,
     allAccountCategories,
     allAccountTypes,
     allAvailableMonthDays,
     isAccountSupportCreditCardStatementDate,
     getAccountCreditCardStatementDate,
     isNewAccount,
-    isInputEmpty,
-    getAccountOrSubAccountProblemMessage,
     addSubAccount,
     setAccount
 } = useAccountEditPageBaseBase();
@@ -658,7 +658,7 @@ function init(): void {
 
 function save(): void {
     const router = props.f7router;
-    const problemMessage = getAccountOrSubAccountProblemMessage();
+    const problemMessage = inputEmptyProblemMessage.value;
 
     if (problemMessage) {
         showAlert(problemMessage);

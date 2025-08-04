@@ -418,10 +418,17 @@
             </v-card-text>
             <v-card-text class="overflow-y-visible">
                 <div class="w-100 d-flex justify-center flex-wrap mt-2 mt-sm-4 mt-md-6 gap-4">
-                    <v-btn :disabled="inputIsEmpty || loading || submitting" v-if="mode !== TransactionEditPageMode.View" @click="save">
-                        {{ tt(saveButtonTitle) }}
-                        <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
-                    </v-btn>
+                    <v-tooltip :disabled="!inputIsEmpty" :text="inputEmptyProblemMessage ? tt(inputEmptyProblemMessage) : ''">
+                        <template v-slot:activator="{ props }">
+                            <div v-bind="props" class="d-inline-block">
+                                <v-btn :disabled="inputIsEmpty || loading || submitting"
+                                       v-if="mode !== TransactionEditPageMode.View" @click="save">
+                                    {{ tt(saveButtonTitle) }}
+                                    <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
+                                </v-btn>
+                            </div>
+                        </template>
+                    </v-tooltip>
                     <v-btn-group variant="tonal" density="comfortable"
                                  v-if="mode === TransactionEditPageMode.View && transaction.type !== TransactionType.ModifyBalance">
                         <v-btn :disabled="loading || submitting"

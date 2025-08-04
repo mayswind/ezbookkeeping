@@ -513,22 +513,10 @@ export function getAllFiscalYearsStartAndEndUnixTimes(startYearMonth: Year0Based
         const fiscalYear = getFiscalYearFromUnixTime(fiscalStartTime, fiscalYearStart.value);
 
         if (fiscalStartTime <= inputEndUnixTime && fiscalEndTime >= inputStartUnixTime) {
-            let minUnixTime = fiscalStartTime;
-            let maxUnixTime = fiscalEndTime;
-
-            // Cap the min and max unix times to the input date range
-            if (minUnixTime < inputStartUnixTime) {
-                minUnixTime = inputStartUnixTime;
-            }
-
-            if (maxUnixTime > inputEndUnixTime) {
-                maxUnixTime = inputEndUnixTime;
-            }
-
             const fiscalYearTime: FiscalYearUnixTime = {
                 year: fiscalYear,
-                minUnixTime: minUnixTime,
-                maxUnixTime: maxUnixTime,
+                minUnixTime: fiscalStartTime,
+                maxUnixTime: fiscalEndTime,
             };
 
             allFiscalYearTimes.push(fiscalYearTime);

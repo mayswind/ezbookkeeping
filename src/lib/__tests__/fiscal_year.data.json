@@ -1504,7 +1504,7 @@
             "expected": [
                 {
                     "year": 2024,
-                    "minUnixTime": 1704067200,
+                    "minUnixTime": 1688169600,
                     "maxUnixTime": 1719791999
                 },
                 {
@@ -1520,7 +1520,7 @@
                 {
                     "year": 2027,
                     "minUnixTime": 1782864000,
-                    "maxUnixTime": 1798761599
+                    "maxUnixTime": 1814399999
                 }
             ]
         },
@@ -1532,13 +1532,13 @@
             "expected": [
                 {
                     "year": 2024,
-                    "minUnixTime": 1704067200,
+                    "minUnixTime": 1688169600,
                     "maxUnixTime": 1719791999
                 },
                 {
                     "year": 2025,
                     "minUnixTime": 1719792000,
-                    "maxUnixTime": 1735689599
+                    "maxUnixTime": 1751327999
                 }
             ]
         },

@@ -54,15 +54,6 @@
                                              :title="tt('Update Closing Balance')"
                                              @click="updateClosingBalance()"></v-list-item>
                                 <v-divider class="my-2"/>
-                                <v-list-item :prepend-icon="mdiChartBoxOutline"
-                                             :title="tt('Show Account Balance Trends')"
-                                             @click="showAccountBalanceTrendsCharts = true"
-                                             v-if="!showAccountBalanceTrendsCharts"></v-list-item>
-                                <v-list-item :prepend-icon="mdiListBoxOutline"
-                                             :title="tt('Show Transaction List')"
-                                             @click="showAccountBalanceTrendsCharts = false"
-                                             v-if="showAccountBalanceTrendsCharts"></v-list-item>
-                                <v-divider class="my-2"/>
                                 <v-list-item :prepend-icon="mdiComma"
                                              :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1"
                                              @click="exportReconciliationStatements(KnownFileType.CSV)">
@@ -89,6 +80,17 @@
                     <span>{{ displayEndDateTime }}</span>
                 </div>
             </template>
+
+            <v-card-text class="py-0 w-100 d-flex justify-center mt-n4">
+                <v-switch class="bidirectional-switch" color="secondary"
+                          :label="tt('Account Balance Trends')"
+                          v-model="showAccountBalanceTrendsCharts"
+                          @click="showAccountBalanceTrendsCharts = !showAccountBalanceTrendsCharts">
+                    <template #prepend>
+                        <span>{{ tt('Transaction List') }}</span>
+                    </template>
+                </v-switch>
+            </v-card-text>
 
             <div class="d-flex align-center mb-4">
                 <div class="d-flex align-center text-body-1">
@@ -291,8 +293,6 @@ import {
     mdiTuneVertical,
     mdiDotsVertical,
     mdiCheck,
-    mdiChartBoxOutline,
-    mdiListBoxOutline,
     mdiChartBar,
     mdiChartAreasplineVariant,
     mdiCalendarTodayOutline,

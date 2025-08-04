@@ -2,14 +2,38 @@
     <f7-page @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
-            <f7-nav-title :title="tt('Reconciliation Statement')"></f7-nav-title>
+            <f7-nav-title>
+                <span style="color: var(--f7-text-color)" v-if="!finishQuery">{{ tt('Reconciliation Statement') }}</span>
+                <f7-link popover-open=".display-mode-popover-menu" v-if="finishQuery">
+                    <span style="color: var(--f7-text-color)">{{ tt('Reconciliation Statement') }}</span>
+                    <f7-icon class="page-title-bar-icon" color="gray" style="opacity: 0.5" f7="chevron_down_circle_fill"></f7-icon>
+                </f7-link>
+            </f7-nav-title>
             <f7-nav-right>
-                <f7-link icon-f7="" v-if="!finishQuery"></f7-link>
                 <f7-link :class="{ 'disabled': !validQuery }" :text="tt('Next')" @click="reload(false)" v-if="!finishQuery"></f7-link>
-                <f7-link style="color: transparent" :text="tt('Next')" v-if="finishQuery"></f7-link>
                 <f7-link :class="{ 'disabled': loading }" icon-f7="ellipsis" v-if="finishQuery" @click="showMoreActionSheet = true"></f7-link>
             </f7-nav-right>
         </f7-navbar>
+
+        <f7-popover class="display-mode-popover-menu"
+                    v-model:opened="showDisplayModePopover">
+            <f7-list dividers>
+                <f7-list-item :title="tt('Transaction List')"
+                              :class="{ 'list-item-selected': !showAccountBalanceTrendsCharts }"
+                              @click="showAccountBalanceTrendsCharts = false; showDisplayModePopover = false">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!showAccountBalanceTrendsCharts"></f7-icon>
+                    </template>
+                </f7-list-item>
+                <f7-list-item :title="tt('Account Balance Trends')"
+                              :class="{ 'list-item-selected': showAccountBalanceTrendsCharts }"
+                              @click="showAccountBalanceTrendsCharts = true; showDisplayModePopover = false">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="showAccountBalanceTrendsCharts"></f7-icon>
+                    </template>
+                </f7-list-item>
+            </f7-list>
+        </f7-popover>
 
         <f7-list form strong inset dividers class="margin-vertical" v-if="!finishQuery">
             <f7-list-item group-title>
@@ -298,8 +322,6 @@
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button :class="{ 'disabled': loading }" @click="reload(true)">{{ tt('Refresh') }}</f7-actions-button>
-                <f7-actions-button :class="{ 'disabled': loading }" @click="showAccountBalanceTrendsCharts = true" v-if="!showAccountBalanceTrendsCharts">{{ tt('Show Account Balance Trends') }}</f7-actions-button>
-                <f7-actions-button :class="{ 'disabled': loading }" @click="showAccountBalanceTrendsCharts = false" v-if="showAccountBalanceTrendsCharts">{{ tt('Show Transaction List') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
@@ -407,6 +429,7 @@ const showAccountBalanceTrendsCharts = ref<boolean>(false);
 const chartDataDateAggregationType = ref<number | undefined>(undefined);
 const transactionToDelete = ref<TransactionReconciliationStatementResponseItem | null>(null);
 const newClosingBalance = ref<number>(0);
+const showDisplayModePopover = ref<boolean>(false);
 const showCustomDateRangeSheet = ref<boolean>(false);
 const showNewClosingBalanceSheet = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);

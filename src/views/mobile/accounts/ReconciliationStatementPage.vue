@@ -247,7 +247,7 @@
                     :date-aggregation-type="chartDataDateAggregationType"
                     :fiscal-year-start="fiscalYearStart"
                     :items="reconciliationStatements?.transactions"
-                    :account-currency="currentAccountCurrency"
+                    :account="currentAccount"
                 />
             </f7-card-content>
         </f7-card>

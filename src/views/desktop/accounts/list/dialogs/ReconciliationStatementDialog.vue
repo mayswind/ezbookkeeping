@@ -230,7 +230,7 @@
                 :fiscal-year-start="fiscalYearStart"
                 :items="[]"
                 :legend-name="isCurrentLiabilityAccount ? tt('Account Outstanding Balance') : tt('Account Balance')"
-                :account-currency="currentAccountCurrency"
+                :account="currentAccount"
                 :skeleton="true"
                 v-if="showAccountBalanceTrendsCharts && loading"
             />
@@ -241,7 +241,7 @@
                 :fiscal-year-start="fiscalYearStart"
                 :items="reconciliationStatements?.transactions"
                 :legend-name="isCurrentLiabilityAccount ? tt('Account Outstanding Balance') : tt('Account Balance')"
-                :account-currency="currentAccountCurrency"
+                :account="currentAccount"
                 v-if="showAccountBalanceTrendsCharts && !loading"
             />
 
@@ -329,6 +329,7 @@ const {
     fiscalYearStart,
     allChartTypes,
     allDateAggregationTypes,
+    currentAccount,
     currentAccountCurrency,
     isCurrentLiabilityAccount,
     allAccountsMap,

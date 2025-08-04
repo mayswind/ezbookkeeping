@@ -11,6 +11,7 @@ import {
 } from '@/core/datetime.ts';
 import type { FiscalYearUnixTime } from '@/core/fiscalyear.ts';
 import { ChartDateAggregationType } from '@/core/statistics.ts';
+import type { AccountInfoResponse } from '@/models/account.ts';
 import type { TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
 
 import { isDefined, isArray } from '@/lib/common.ts';
@@ -39,7 +40,7 @@ export interface CommonAccountBalanceTrendsChartProps {
     items: TransactionReconciliationStatementResponseItem[] | undefined;
     dateAggregationType?: number;
     fiscalYearStart: number;
-    accountCurrency: string;
+    account: AccountInfoResponse;
 }
 
 export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTrendsChartProps) {
@@ -152,7 +153,14 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
 
                     if (dataItem.time >= lastUnixTime) {
                         lastUnixTime = dataItem.time;
-                        lastAmount = dataItem.accountBalance;
+
+                        if (props.account.isAsset) {
+                            lastAmount = dataItem.accountBalance;
+                        } else if (props.account.isLiability) {
+                            lastAmount = -dataItem.accountBalance;
+                        } else {
+                            lastAmount = dataItem.accountBalance;
+                        }
                     }
                 }
             }

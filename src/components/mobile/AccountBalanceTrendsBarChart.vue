@@ -28,7 +28,7 @@
                           :style="`top: ${virtualDataItems.topPosition}px`"
                           :virtual-list-index="item.index"
                           :title="item.displayDate"
-                          :after="formatAmountWithCurrency(item.amount, accountCurrency)"
+                          :after="formatAmountWithCurrency(item.amount, account.currency)"
                           v-for="item in virtualDataItems.items"
             >
                 <template #media>

@@ -94,8 +94,8 @@ const yAxisWidth = computed<number>(() => {
         }
     }
 
-    const maxValueText = formatAmountWithCurrency(maxValue, props.accountCurrency);
-    const minValueText = formatAmountWithCurrency(minValue, props.accountCurrency);
+    const maxValueText = formatAmountWithCurrency(maxValue, props.account.currency);
+    const minValueText = formatAmountWithCurrency(minValue, props.account.currency);
     const maxLengthText = maxValueText.length > minValueText.length ? maxValueText : minValueText;
 
     const canvas = document.createElement('canvas');
@@ -135,7 +135,7 @@ const chartOptions = computed<object>(() => {
             },
             formatter: (params: CallbackDataParams[]) => {
                 const amount = params[0].data as number;
-                const value = formatAmountWithCurrency(amount, props.accountCurrency);
+                const value = formatAmountWithCurrency(amount, props.account.currency);
 
                 return `${params[0].name}<br/>`
                     + '<div><span class="chart-pointer" style="background-color: #' + DEFAULT_CHART_COLORS[0] + '"></span>'
@@ -158,13 +158,13 @@ const chartOptions = computed<object>(() => {
                 type: 'value',
                 axisLabel: {
                     formatter: (value: string) => {
-                        return formatAmountWithCurrency(value, props.accountCurrency);
+                        return formatAmountWithCurrency(value, props.account.currency);
                     }
                 },
                 axisPointer: {
                     label: {
                         formatter: (params: CallbackDataParams) => {
-                            return formatAmountWithCurrency(Math.floor(params.value as number), props.accountCurrency);
+                            return formatAmountWithCurrency(Math.floor(params.value as number), props.account.currency);
                         }
                     }
                 }

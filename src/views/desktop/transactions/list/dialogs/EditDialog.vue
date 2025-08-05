@@ -123,96 +123,126 @@
                                                   v-model="transaction.destinationAmount"/>
                                 </v-col>
                                 <v-col cols="12" md="12" v-if="transaction.type === TransactionType.Expense">
-                                    <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                                       primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                                       primary-hidden-field="hidden" primary-sub-items-field="subCategories"
-                                                       secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                                       secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                                       secondary-hidden-field="hidden"
-                                                       :readonly="mode === TransactionEditPageMode.View"
-                                                       :disabled="loading || submitting || !hasAvailableExpenseCategories"
-                                                       :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
-                                                       :show-selection-primary-text="true"
-                                                       :custom-selection-primary-text="getTransactionPrimaryCategoryName(transaction.expenseCategoryId, allCategories[CategoryType.Expense])"
-                                                       :custom-selection-secondary-text="getTransactionSecondaryCategoryName(transaction.expenseCategoryId, allCategories[CategoryType.Expense])"
-                                                       :label="tt('Category')" :placeholder="tt('Category')"
-                                                       :items="allCategories[CategoryType.Expense] || []"
-                                                       v-model="transaction.expenseCategoryId">
-                                    </two-column-select>
+                                    <v-tooltip :disabled="hasAvailableExpenseCategories" :text="hasAvailableExpenseCategories ? '' : tt('No secondary expense categories are available')">
+                                        <template v-slot:activator="{ props }">
+                                            <div v-bind="props" class="d-block">
+                                                <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                                   primary-hidden-field="hidden" primary-sub-items-field="subCategories"
+                                                                   secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                                   secondary-hidden-field="hidden"
+                                                                   :readonly="mode === TransactionEditPageMode.View"
+                                                                   :disabled="loading || submitting || !hasAvailableExpenseCategories"
+                                                                   :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
+                                                                   :show-selection-primary-text="true"
+                                                                   :custom-selection-primary-text="getTransactionPrimaryCategoryName(transaction.expenseCategoryId, allCategories[CategoryType.Expense])"
+                                                                   :custom-selection-secondary-text="getTransactionSecondaryCategoryName(transaction.expenseCategoryId, allCategories[CategoryType.Expense])"
+                                                                   :label="tt('Category')" :placeholder="tt('Category')"
+                                                                   :items="allCategories[CategoryType.Expense] || []"
+                                                                   v-model="transaction.expenseCategoryId">
+                                                </two-column-select>
+                                            </div>
+                                        </template>
+                                    </v-tooltip>
                                 </v-col>
                                 <v-col cols="12" md="12" v-if="transaction.type === TransactionType.Income">
-                                    <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                                       primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                                       primary-hidden-field="hidden" primary-sub-items-field="subCategories"
-                                                       secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                                       secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                                       secondary-hidden-field="hidden"
-                                                       :readonly="mode === TransactionEditPageMode.View"
-                                                       :disabled="loading || submitting || !hasAvailableIncomeCategories"
-                                                       :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
-                                                       :show-selection-primary-text="true"
-                                                       :custom-selection-primary-text="getTransactionPrimaryCategoryName(transaction.incomeCategoryId, allCategories[CategoryType.Income])"
-                                                       :custom-selection-secondary-text="getTransactionSecondaryCategoryName(transaction.incomeCategoryId, allCategories[CategoryType.Income])"
-                                                       :label="tt('Category')" :placeholder="tt('Category')"
-                                                       :items="allCategories[CategoryType.Income] || []"
-                                                       v-model="transaction.incomeCategoryId">
-                                    </two-column-select>
+                                    <v-tooltip :disabled="hasAvailableIncomeCategories" :text="hasAvailableIncomeCategories ? '' : tt('No secondary income categories are available')">
+                                        <template v-slot:activator="{ props }">
+                                            <div v-bind="props" class="d-block">
+                                                <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                                   primary-hidden-field="hidden" primary-sub-items-field="subCategories"
+                                                                   secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                                   secondary-hidden-field="hidden"
+                                                                   :readonly="mode === TransactionEditPageMode.View"
+                                                                   :disabled="loading || submitting || !hasAvailableIncomeCategories"
+                                                                   :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
+                                                                   :show-selection-primary-text="true"
+                                                                   :custom-selection-primary-text="getTransactionPrimaryCategoryName(transaction.incomeCategoryId, allCategories[CategoryType.Income])"
+                                                                   :custom-selection-secondary-text="getTransactionSecondaryCategoryName(transaction.incomeCategoryId, allCategories[CategoryType.Income])"
+                                                                   :label="tt('Category')" :placeholder="tt('Category')"
+                                                                   :items="allCategories[CategoryType.Income] || []"
+                                                                   v-model="transaction.incomeCategoryId">
+                                                </two-column-select>
+                                            </div>
+                                        </template>
+                                    </v-tooltip>
                                 </v-col>
                                 <v-col cols="12" md="12" v-if="transaction.type === TransactionType.Transfer">
-                                    <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                                       primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                                       primary-hidden-field="hidden" primary-sub-items-field="subCategories"
-                                                       secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                                       secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                                       secondary-hidden-field="hidden"
-                                                       :readonly="mode === TransactionEditPageMode.View"
-                                                       :disabled="loading || submitting || !hasAvailableTransferCategories"
-                                                       :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
-                                                       :show-selection-primary-text="true"
-                                                       :custom-selection-primary-text="getTransactionPrimaryCategoryName(transaction.transferCategoryId, allCategories[CategoryType.Transfer])"
-                                                       :custom-selection-secondary-text="getTransactionSecondaryCategoryName(transaction.transferCategoryId, allCategories[CategoryType.Transfer])"
-                                                       :label="tt('Category')" :placeholder="tt('Category')"
-                                                       :items="allCategories[CategoryType.Transfer] || []"
-                                                       v-model="transaction.transferCategoryId">
-                                    </two-column-select>
+                                    <v-tooltip :disabled="hasAvailableTransferCategories" :text="hasAvailableTransferCategories ? '' : tt('No secondary transfer categories are available')">
+                                        <template v-slot:activator="{ props }">
+                                            <div v-bind="props" class="d-block">
+                                                <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                                   primary-hidden-field="hidden" primary-sub-items-field="subCategories"
+                                                                   secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                                   secondary-hidden-field="hidden"
+                                                                   :readonly="mode === TransactionEditPageMode.View"
+                                                                   :disabled="loading || submitting || !hasAvailableTransferCategories"
+                                                                   :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
+                                                                   :show-selection-primary-text="true"
+                                                                   :custom-selection-primary-text="getTransactionPrimaryCategoryName(transaction.transferCategoryId, allCategories[CategoryType.Transfer])"
+                                                                   :custom-selection-secondary-text="getTransactionSecondaryCategoryName(transaction.transferCategoryId, allCategories[CategoryType.Transfer])"
+                                                                   :label="tt('Category')" :placeholder="tt('Category')"
+                                                                   :items="allCategories[CategoryType.Transfer] || []"
+                                                                   v-model="transaction.transferCategoryId">
+                                                </two-column-select>
+                                            </div>
+                                        </template>
+                                    </v-tooltip>
                                 </v-col>
                                 <v-col cols="12" :md="transaction.type === TransactionType.Transfer ? 6 : 12">
-                                    <two-column-select primary-key-field="id" primary-value-field="category"
-                                                       primary-title-field="name" primary-footer-field="displayBalance"
-                                                       primary-icon-field="icon" primary-icon-type="account"
-                                                       primary-sub-items-field="accounts"
-                                                       :primary-title-i18n="true"
-                                                       secondary-key-field="id" secondary-value-field="id"
-                                                       secondary-title-field="name" secondary-footer-field="displayBalance"
-                                                       secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                                       :readonly="mode === TransactionEditPageMode.View"
-                                                       :disabled="loading || submitting || !allVisibleAccounts.length"
-                                                       :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
-                                                       :custom-selection-primary-text="sourceAccountName"
-                                                       :label="tt(sourceAccountTitle)"
-                                                       :placeholder="tt(sourceAccountTitle)"
-                                                       :items="allVisibleCategorizedAccounts"
-                                                       v-model="transaction.sourceAccountId">
-                                    </two-column-select>
+                                    <v-tooltip :disabled="!!allVisibleAccounts.length" :text="allVisibleAccounts.length ? '' : tt('No available account')">
+                                        <template v-slot:activator="{ props }">
+                                            <div v-bind="props" class="d-block">
+                                                <two-column-select primary-key-field="id" primary-value-field="category"
+                                                                   primary-title-field="name" primary-footer-field="displayBalance"
+                                                                   primary-icon-field="icon" primary-icon-type="account"
+                                                                   primary-sub-items-field="accounts"
+                                                                   :primary-title-i18n="true"
+                                                                   secondary-key-field="id" secondary-value-field="id"
+                                                                   secondary-title-field="name" secondary-footer-field="displayBalance"
+                                                                   secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                                   :readonly="mode === TransactionEditPageMode.View"
+                                                                   :disabled="loading || submitting || !allVisibleAccounts.length"
+                                                                   :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
+                                                                   :custom-selection-primary-text="sourceAccountName"
+                                                                   :label="tt(sourceAccountTitle)"
+                                                                   :placeholder="tt(sourceAccountTitle)"
+                                                                   :items="allVisibleCategorizedAccounts"
+                                                                   v-model="transaction.sourceAccountId">
+                                                </two-column-select>
+                                            </div>
+                                        </template>
+                                    </v-tooltip>
                                 </v-col>
                                 <v-col cols="12" md="6" v-if="transaction.type === TransactionType.Transfer">
-                                    <two-column-select primary-key-field="id" primary-value-field="category"
-                                                       primary-title-field="name" primary-footer-field="displayBalance"
-                                                       primary-icon-field="icon" primary-icon-type="account"
-                                                       primary-sub-items-field="accounts"
-                                                       :primary-title-i18n="true"
-                                                       secondary-key-field="id" secondary-value-field="id"
-                                                       secondary-title-field="name" secondary-footer-field="displayBalance"
-                                                       secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                                       :readonly="mode === TransactionEditPageMode.View"
-                                                       :disabled="loading || submitting || !allVisibleAccounts.length"
-                                                       :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
-                                                       :custom-selection-primary-text="destinationAccountName"
-                                                       :label="tt('Destination Account')"
-                                                       :placeholder="tt('Destination Account')"
-                                                       :items="allVisibleCategorizedAccounts"
-                                                       v-model="transaction.destinationAccountId">
-                                    </two-column-select>
+                                    <v-tooltip :disabled="!!allVisibleAccounts.length" :text="allVisibleAccounts.length ? '' : tt('No available account')">
+                                        <template v-slot:activator="{ props }">
+                                            <div v-bind="props" class="d-block">
+                                                <two-column-select primary-key-field="id" primary-value-field="category"
+                                                                   primary-title-field="name" primary-footer-field="displayBalance"
+                                                                   primary-icon-field="icon" primary-icon-type="account"
+                                                                   primary-sub-items-field="accounts"
+                                                                   :primary-title-i18n="true"
+                                                                   secondary-key-field="id" secondary-value-field="id"
+                                                                   secondary-title-field="name" secondary-footer-field="displayBalance"
+                                                                   secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                                   :readonly="mode === TransactionEditPageMode.View"
+                                                                   :disabled="loading || submitting || !allVisibleAccounts.length"
+                                                                   :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
+                                                                   :custom-selection-primary-text="destinationAccountName"
+                                                                   :label="tt('Destination Account')"
+                                                                   :placeholder="tt('Destination Account')"
+                                                                   :items="allVisibleCategorizedAccounts"
+                                                                   v-model="transaction.destinationAccountId">
+                                                </two-column-select>
+                                            </div>
+                                        </template>
+                                    </v-tooltip>
                                 </v-col>
                                 <v-col cols="12" md="6" v-if="type === TransactionEditPageType.Transaction">
                                     <date-time-select

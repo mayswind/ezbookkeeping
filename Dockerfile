@@ -15,7 +15,7 @@ RUN apk add git gcc g++ libc-dev
 RUN ./build.sh backend
 
 # Build frontend files
-FROM --platform=$BUILDPLATFORM node:22.17.0-alpine3.22 AS fe-builder
+FROM --platform=$BUILDPLATFORM node:22.18.0-alpine3.22 AS fe-builder
 ARG RELEASE_BUILD
 ARG BUILD_PIPELINE
 ENV RELEASE_BUILD=$RELEASE_BUILD

@@ -10,10 +10,16 @@ import type { CallbackDataParams } from 'echarts/types/dist/shared';
 import { useI18n } from '@/locales/helpers.ts';
 import { type CommonAccountBalanceTrendsChartProps, useAccountBalanceTrendsChartBase } from '@/components/base/AccountBalanceTrendsChartBase.ts'
 
+import { useUserStore } from '@/stores/user.ts';
+
+import type { NameValue } from '@/core/base.ts';
 import type { ColorValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { TrendChartType } from '@/core/statistics.ts';
+import { AccountBalanceTrendChartType } from '@/core/statistics.ts';
 import { DEFAULT_CHART_COLORS } from '@/consts/color.ts';
+
+import { isArray } from '@/lib/common.ts';
+import { getExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 interface DesktopAccountBalanceTrendsChartProps extends CommonAccountBalanceTrendsChartProps {
     legendName: string;
@@ -26,20 +32,25 @@ interface AccountBalanceTrendsChartDataItem {
     name: string;
     itemStyle: {
         color: ColorValue;
+        color0?: string;
+        borderColor?: string;
+        borderColor0?: string;
     };
     selected: boolean;
     type: string;
     areaStyle?: object;
     stack: string;
     animation: boolean;
-    data: number[];
+    data: (number | number[])[];
 }
 
 const props = defineProps<DesktopAccountBalanceTrendsChartProps>();
 
 const theme = useTheme();
-const { formatAmountWithCurrency } = useI18n();
+const { tt, formatAmountWithCurrency } = useI18n();
 const { allDataItems, allDisplayDateRanges } = useAccountBalanceTrendsChartBase(props);
+
+const userStore = useUserStore();
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 
@@ -57,15 +68,32 @@ const allSeries = computed<AccountBalanceTrendsChartDataItem[]>(() => {
         data: []
     };
 
-    if (props.type === TrendChartType.Area.type) {
+    if (props.type === AccountBalanceTrendChartType.Area.type) {
         series.areaStyle = {};
-    } else if (props.type === TrendChartType.Column.type) {
+    } else if (props.type === AccountBalanceTrendChartType.Column.type) {
         series.type = 'bar';
+    } else if (props.type === AccountBalanceTrendChartType.Candlestick.type) {
+        const expenseIncomeAmountColor = getExpenseAndIncomeAmountColor(userStore.currentUserExpenseAmountColor, userStore.currentUserIncomeAmountColor, isDarkMode.value);
+        series.type = 'candlestick';
+        series.itemStyle.color = expenseIncomeAmountColor.incomeAmountColor;
+        series.itemStyle.color0 = expenseIncomeAmountColor.expenseAmountColor;
+        series.itemStyle.borderColor = expenseIncomeAmountColor.incomeAmountColor;
+        series.itemStyle.borderColor0 = expenseIncomeAmountColor.expenseAmountColor;
     }
 
     for (let i = 0; i < allDataItems.value.length; i++) {
         const item = allDataItems.value[i];
-        series.data.push(item.amount);
+
+        if (props.type === AccountBalanceTrendChartType.Candlestick.type) {
+            series.data.push([
+                item.openingBalance,
+                item.closingBalance,
+                item.minimumBalance,
+                item.maximumBalance
+            ]);
+        } else {
+            series.data.push(item.closingBalance);
+        }
     }
 
     return [series];
@@ -82,7 +110,14 @@ const yAxisWidth = computed<number>(() => {
 
     for (let i = 0; i < allSeries.value.length; i++) {
         for (let j = 0; j < allSeries.value[i].data.length; j++) {
-            const value = allSeries.value[i].data[j];
+            const data = allSeries.value[i].data[j];
+            let value: number;
+
+            if (isArray(data)) {
+                value = data[1]; // for candlestick, use closing balance
+            } else {
+                value = data as number; // for line or bar chart
+            }
 
             if (value > maxValue) {
                 maxValue = value;
@@ -134,13 +169,54 @@ const chartOptions = computed<object>(() => {
                 color: isDarkMode.value ? '#eee' : '#333'
             },
             formatter: (params: CallbackDataParams[]) => {
-                const amount = params[0].data as number;
-                const value = formatAmountWithCurrency(amount, props.account.currency);
+                if (props.type === AccountBalanceTrendChartType.Candlestick.type) {
+                    const dataIndex = params[0].dataIndex;
+                    const dataItem = allDataItems.value[dataIndex];
+                    const displayItems: NameValue[] = [
+                        {
+                            name: tt('Opening Balance'),
+                            value: formatAmountWithCurrency(dataItem.openingBalance, props.account.currency)
+                        },
+                        {
+                            name: tt('Closing Balance'),
+                            value: formatAmountWithCurrency(dataItem.closingBalance, props.account.currency)
+                        },
+                        {
+                            name: tt('Minimum Balance'),
+                            value: formatAmountWithCurrency(dataItem.minimumBalance, props.account.currency)
+                        },
+                        {
+                            name: tt('Maximum Balance'),
+                            value: formatAmountWithCurrency(dataItem.maximumBalance, props.account.currency)
+                        },
+                        {
+                            name: tt('Median Balance'),
+                            value: formatAmountWithCurrency(dataItem.medianBalance, props.account.currency)
+                        },
+                        {
+                            name: tt('Average Balance'),
+                            value: formatAmountWithCurrency(dataItem.averageBalance, props.account.currency)
+                        }
+                    ];
 
-                return `${params[0].name}<br/>`
-                    + '<div><span class="chart-pointer" style="background-color: #' + DEFAULT_CHART_COLORS[0] + '"></span>'
-                    + `<span>${props.legendName}</span><span style="margin-left: 20px; float: right">${value}</span><br/>`
-                    + '</div>';
+                    let tooltip = `${params[0].name} ${props.legendName}<br/>`;
+
+                    for (let i = 0; i < displayItems.length; i++) {
+                        tooltip += `<div><span class="chart-pointer" style="background-color: #${DEFAULT_CHART_COLORS[i]}"></span>`
+                            + `<span>${displayItems[i].name}</span><span style="margin-left: 20px; float: right">${displayItems[i].value}</span><br/>`
+                            + `</div>`;
+                    }
+
+                    return tooltip;
+                } else {
+                    const amount = params[0].data as number;
+                    const value = formatAmountWithCurrency(amount, props.account.currency);
+
+                    return `${params[0].name}<br/>`
+                        + '<div><span class="chart-pointer" style="background-color: #' + DEFAULT_CHART_COLORS[0] + '"></span>'
+                        + `<span>${props.legendName}</span><span style="margin-left: 20px; float: right">${value}</span><br/>`
+                        + '</div>';
+                }
             }
         },
         grid: {

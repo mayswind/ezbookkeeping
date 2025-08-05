@@ -52,6 +52,30 @@ export class TrendChartType implements TypeAndName {
     }
 }
 
+export class AccountBalanceTrendChartType implements TypeAndName {
+    private static readonly allInstances: AccountBalanceTrendChartType[] = [];
+
+    public static readonly Area = new AccountBalanceTrendChartType(0, 'Area Chart');
+    public static readonly Column = new AccountBalanceTrendChartType(1, 'Column Chart');
+    public static readonly Candlestick = new AccountBalanceTrendChartType(2, 'Candlestick Chart');
+
+    public static readonly Default = TrendChartType.Column;
+
+    public readonly type: number;
+    public readonly name: string;
+
+    private constructor(type: number, name: string) {
+        this.type = type;
+        this.name = name;
+
+        AccountBalanceTrendChartType.allInstances.push(this);
+    }
+
+    public static values(): TrendChartType[] {
+        return AccountBalanceTrendChartType.allInstances;
+    }
+}
+
 export class ChartDataType implements TypeAndName {
     private static readonly allInstances: ChartDataType[] = [];
     private static readonly allInstancesByType: Record<number, ChartDataType> = {};

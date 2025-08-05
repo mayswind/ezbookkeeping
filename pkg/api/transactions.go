@@ -368,17 +368,20 @@ func (a *TransactionsApi) TransactionReconciliationStatementHandler(c *core.WebC
 
 	for i := 0; i < len(transactionResult); i++ {
 		transactionResult := transactionResult[i]
-		accountBalance := int64(0)
+		accountOpeningBalance := int64(0)
+		accountClosingBalance := int64(0)
 
 		if transactionWithBalance, exists := transactionAccountBalanceMap[transactionResult.Id]; exists {
-			accountBalance = transactionWithBalance.AccountBalance
+			accountOpeningBalance = transactionWithBalance.AccountOpeningBalance
+			accountClosingBalance = transactionWithBalance.AccountClosingBalance
 		} else {
 			log.Warnf(c, "[transactions.TransactionReconciliationStatementHandler] missing account balance for transaction \"id:%d\" of user \"uid:%d\"", transactionResult.Id, uid)
 		}
 
 		responseItems[i] = &models.TransactionReconciliationStatementResponseItem{
 			TransactionInfoResponse: transactionResult,
-			AccountBalance:          accountBalance,
+			AccountOpeningBalance:   accountOpeningBalance,
+			AccountClosingBalance:   accountClosingBalance,
 		}
 	}
 

@@ -1,7 +1,17 @@
 import { type NumberFormatOptions, DecimalSeparator, DigitGroupingSymbol, DigitGroupingType } from '@/core/numeral.ts';
 import { DEFAULT_DECIMAL_NUMBER_COUNT, MAX_SUPPORTED_DECIMAL_NUMBER_COUNT } from '@/consts/numeral.ts';
 
-import {isString, isNumber, replaceAll, removeAll } from './common.ts';
+import { isString, isNumber, replaceAll, removeAll } from './common.ts';
+
+export function sumAmounts(amounts: number[]): number {
+    let sum = 0;
+
+    for (let i = 0; i < amounts.length; i++) {
+        sum += amounts[i];
+    }
+
+    return sum;
+}
 
 export function appendDigitGroupingSymbol(value: number | string, options: NumberFormatOptions): string {
     let textualValue = '';

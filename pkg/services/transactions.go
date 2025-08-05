@@ -142,6 +142,7 @@ func (s *TransactionService) GetAllTransactionsWithAccountBalanceByMaxTime(c cor
 	totalOutflows := int64(0)
 	openingBalance := int64(0)
 	accumulatedBalance := int64(0)
+	lastAccumulatedBalance := int64(0)
 
 	for i := len(allTransactions) - 1; i >= 0; i-- {
 		transaction := allTransactions[i]
@@ -163,6 +164,7 @@ func (s *TransactionService) GetAllTransactionsWithAccountBalanceByMaxTime(c cor
 
 		if transaction.TransactionTime < minTransactionTime {
 			openingBalance = accumulatedBalance
+			lastAccumulatedBalance = accumulatedBalance
 			continue
 		}
 
@@ -183,10 +185,12 @@ func (s *TransactionService) GetAllTransactionsWithAccountBalanceByMaxTime(c cor
 		}
 
 		transactionsAndAccountBalance := &models.TransactionWithAccountBalance{
-			Transaction:    transaction,
-			AccountBalance: accumulatedBalance,
+			Transaction:           transaction,
+			AccountOpeningBalance: lastAccumulatedBalance,
+			AccountClosingBalance: accumulatedBalance,
 		}
 
+		lastAccumulatedBalance = accumulatedBalance
 		allTransactionsAndAccountBalance = append(allTransactionsAndAccountBalance, transactionsAndAccountBalance)
 	}
 

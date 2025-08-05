@@ -123,7 +123,8 @@ type Transaction struct {
 // TransactionWithAccountBalance represents a transaction item with account balance
 type TransactionWithAccountBalance struct {
 	*Transaction
-	AccountBalance int64
+	AccountOpeningBalance int64
+	AccountClosingBalance int64
 }
 
 // TransactionGeoLocationRequest represents all parameters of transaction geographic location info update request
@@ -338,7 +339,8 @@ type TransactionInfoPageWrapperResponse2 struct {
 // TransactionReconciliationStatementResponseItem represents a transaction reconciliation statement response
 type TransactionReconciliationStatementResponseItem struct {
 	*TransactionInfoResponse
-	AccountBalance int64 `json:"accountBalance"`
+	AccountOpeningBalance int64 `json:"accountOpeningBalance"`
+	AccountClosingBalance int64 `json:"accountClosingBalance"`
 }
 
 // TransactionReconciliationStatementResponse represents the response of all transaction reconciliation statement response

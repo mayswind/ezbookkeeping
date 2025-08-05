@@ -94,6 +94,7 @@ import {
     StatisticsAnalysisType,
     CategoricalChartType,
     TrendChartType,
+    AccountBalanceTrendChartType,
     ChartDataType,
     ChartSortingType,
     ChartDateAggregationType
@@ -1934,6 +1935,7 @@ export function useI18n() {
         getAllAccountTypes: () => getLocalizedDisplayNameAndType(AccountType.values()),
         getAllCategoricalChartTypes: () => getLocalizedDisplayNameAndType(CategoricalChartType.values()),
         getAllTrendChartTypes: () => getLocalizedDisplayNameAndType(TrendChartType.values()),
+        getAllAccountBalanceTrendChartTypes: () => getLocalizedDisplayNameAndType(AccountBalanceTrendChartType.values()),
         getAllStatisticsChartDataTypes: (analysisType: StatisticsAnalysisType) => getLocalizedDisplayNameAndType(ChartDataType.values(analysisType)),
         getAllStatisticsSortingTypes: () => getLocalizedDisplayNameAndType(ChartSortingType.values()),
         getAllStatisticsDateAggregationTypes: () => getLocalizedChartDateAggregationTypeAndDisplayName(true),

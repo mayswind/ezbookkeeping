@@ -279,7 +279,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 
 import { TransactionType } from '@/core/transaction.ts';
-import { TrendChartType, ChartDateAggregationType } from '@/core/statistics.ts';
+import { AccountBalanceTrendChartType, ChartDateAggregationType } from '@/core/statistics.ts';
 import { KnownFileType } from '@/core/file.ts';
 import { Transaction, type TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
 
@@ -295,6 +295,7 @@ import {
     mdiCheck,
     mdiChartBar,
     mdiChartAreasplineVariant,
+    mdiChartWaterfall,
     mdiCalendarTodayOutline,
     mdiCalendarMonthOutline,
     mdiLayersTripleOutline,
@@ -356,8 +357,9 @@ const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionsStore = useTransactionsStore();
 
 const chartTypeIconMap = {
-    [TrendChartType.Column.type]: mdiChartBar,
-    [TrendChartType.Area.type]: mdiChartAreasplineVariant,
+    [AccountBalanceTrendChartType.Column.type]: mdiChartBar,
+    [AccountBalanceTrendChartType.Area.type]: mdiChartAreasplineVariant,
+    [AccountBalanceTrendChartType.Candlestick.type]: mdiChartWaterfall,
 };
 
 const chartDataDateAggregationTypeIconMap = {
@@ -376,7 +378,7 @@ const loading = ref<boolean>(false);
 const currentPage = ref<number>(1);
 const countPerPage = ref<number>(10);
 const showAccountBalanceTrendsCharts = ref<boolean>(false);
-const chartType = ref<number>(TrendChartType.Default.type);
+const chartType = ref<number>(AccountBalanceTrendChartType.Default.type);
 const chartDataDateAggregationType = ref<number | undefined>(undefined);
 
 let rejectFunc: ((reason?: unknown) => void) | null = null;
@@ -459,7 +461,7 @@ function open(options: { accountId: string, startTime: number, endTime: number }
     currentPage.value = 1;
     countPerPage.value = 10;
     showAccountBalanceTrendsCharts.value = false;
-    chartType.value = TrendChartType.Default.type;
+    chartType.value = AccountBalanceTrendChartType.Default.type;
     chartDataDateAggregationType.value = undefined;
     showState.value = true;
     loading.value = true;

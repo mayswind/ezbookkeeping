@@ -34,7 +34,7 @@ import {
 export function useReconciliationStatementPageBase() {
     const {
         tt,
-        getAllTrendChartTypes,
+        getAllAccountBalanceTrendChartTypes,
         getAllStatisticsDateAggregationTypesWithShortName,
         getCurrentDigitGroupingSymbol,
         formatUnixTimeToLongDateTime,
@@ -59,7 +59,7 @@ export function useReconciliationStatementPageBase() {
     const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
-    const allChartTypes = computed<TypeAndDisplayName[]>(() => getAllTrendChartTypes());
+    const allChartTypes = computed<TypeAndDisplayName[]>(() => getAllAccountBalanceTrendChartTypes());
     const allDateAggregationTypes = computed<TypeAndDisplayName[]>(() => getAllStatisticsDateAggregationTypesWithShortName());
 
     const currentAccount = computed(() => allAccountsMap.value[accountId.value]);
@@ -187,9 +187,9 @@ export function useReconciliationStatementPageBase() {
         }
 
         if (isLiabilityAccount) {
-            return formatAmountWithCurrency(-transaction.accountBalance, currency);
+            return formatAmountWithCurrency(-transaction.accountClosingBalance, currency);
         } else {
-            return formatAmountWithCurrency(transaction.accountBalance, currency);
+            return formatAmountWithCurrency(transaction.accountClosingBalance, currency);
         }
     }
 
@@ -234,9 +234,9 @@ export function useReconciliationStatementPageBase() {
             let displayAccountBalance = '';
 
             if (isCurrentLiabilityAccount.value) {
-                displayAccountBalance = removeAll(formatAmount(-transaction.accountBalance), digitGroupingSymbol);
+                displayAccountBalance = removeAll(formatAmount(-transaction.accountClosingBalance), digitGroupingSymbol);
             } else {
-                displayAccountBalance = removeAll(formatAmount(transaction.accountBalance), digitGroupingSymbol);
+                displayAccountBalance = removeAll(formatAmount(transaction.accountClosingBalance), digitGroupingSymbol);
             }
 
             let description = transaction.comment || '';

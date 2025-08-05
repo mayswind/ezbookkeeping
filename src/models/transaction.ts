@@ -662,7 +662,8 @@ export interface TransactionInfoPageWrapperResponse2 {
 }
 
 export interface TransactionReconciliationStatementResponseItem extends TransactionInfoResponse {
-    readonly accountBalance: number;
+    readonly accountOpeningBalance: number;
+    readonly accountClosingBalance: number;
 }
 
 export interface TransactionReconciliationStatementResponse {

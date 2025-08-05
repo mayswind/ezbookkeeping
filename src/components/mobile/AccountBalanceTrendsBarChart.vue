@@ -28,7 +28,7 @@
                           :style="`top: ${virtualDataItems.topPosition}px`"
                           :virtual-list-index="item.index"
                           :title="item.displayDate"
-                          :after="formatAmountWithCurrency(item.amount, account.currency)"
+                          :after="formatAmountWithCurrency(item.closingBalance, account.currency)"
                           v-for="item in virtualDataItems.items"
             >
                 <template #media>
@@ -90,19 +90,24 @@ const virtualDataItems = ref<MobileAccountBalanceTrendsChartVirtualListData>({
 
 const allVirtualListItems = computed<MobileAccountBalanceTrendsChartItem[]>(() => {
     const ret: MobileAccountBalanceTrendsChartItem[] = [];
-    let maxAmount = 0;
+    let maxClosingBalance = 0;
 
     for (let i = 0; i < allDataItems.value.length; i++) {
         const dataItem = allDataItems.value[i];
 
-        if (dataItem.amount > maxAmount) {
-            maxAmount = dataItem.amount;
+        if (dataItem.closingBalance > maxClosingBalance) {
+            maxClosingBalance = dataItem.closingBalance;
         }
 
         const finalDataItem: MobileAccountBalanceTrendsChartItem = {
             index: i,
             displayDate: dataItem.displayDate,
-            amount: dataItem.amount,
+            openingBalance: dataItem.openingBalance,
+            closingBalance: dataItem.closingBalance,
+            medianBalance: dataItem.medianBalance,
+            averageBalance: dataItem.averageBalance,
+            minimumBalance: dataItem.minimumBalance,
+            maximumBalance: dataItem.maximumBalance,
             color: `#${DEFAULT_CHART_COLORS[0]}`,
             percent: 0.0
         };
@@ -111,8 +116,8 @@ const allVirtualListItems = computed<MobileAccountBalanceTrendsChartItem[]>(() =
     }
 
     for (let i = 0; i < ret.length; i++) {
-        if (maxAmount > 0 && ret[i].amount > 0) {
-            ret[i].percent = 100.0 * ret[i].amount / maxAmount;
+        if (maxClosingBalance > 0 && ret[i].closingBalance > 0) {
+            ret[i].percent = 100.0 * ret[i].closingBalance / maxClosingBalance;
         } else {
             ret[i].percent = 0.0;
         }

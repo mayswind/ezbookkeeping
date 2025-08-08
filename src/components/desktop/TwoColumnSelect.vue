@@ -29,10 +29,12 @@
 
         <template #no-data>
             <div class="mx-2 mt-2" v-if="enableFilter">
-                <v-text-field density="compact"
+                <v-text-field eager ref="filterInput" density="compact"
                               :prepend-inner-icon="mdiMagnify"
                               :placeholder="filterPlaceholder"
-                              v-model="filterContent"></v-text-field>
+                              v-model="filterContent"
+                              @click:control="onInputFocused(filterInput, true)"
+                              @update:focused="onInputFocused(filterInput, $event)"></v-text-field>
             </div>
             <div class="mx-4 my-3" v-show="!filteredItems || !filteredItems.length">
                 {{ filterNoItemsText }}
@@ -81,6 +83,8 @@
 </template>
 
 <script setup lang="ts">
+import { VTextField } from 'vuetify/components/VTextField';
+
 import { ref, computed, useTemplateRef, nextTick } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -91,7 +95,7 @@ import {
     getItemByKeyValue,
     getNameByKeyValue
 } from '@/lib/common.ts';
-import { type ComponentDensity, type InputVariant, scrollToSelectedItem } from '@/lib/ui/desktop.ts';
+import { type ComponentDensity, type InputVariant, setChildInputFocus, scrollToSelectedItem } from '@/lib/ui/desktop.ts';
 
 import {
     mdiChevronRight,
@@ -131,6 +135,7 @@ const {
     updateCurrentSecondaryValue
 } = useTwoColumnListItemSelectionBase(props);
 
+const filterInput = useTemplateRef<VTextField>('filterInput');
 const dropdownMenu = useTemplateRef<HTMLElement>('dropdownMenu');
 
 const menuState = ref<boolean>(false);
@@ -216,6 +221,14 @@ function onMenuStateChanged(state: boolean): void {
                 scrollToSelectedItem(dropdownMenu.value.parentElement, '.primary-list-container', '.primary-list-item-selected');
                 scrollToSelectedItem(dropdownMenu.value.parentElement, '.secondary-list-container', '.secondary-list-item-selected');
             }
+        });
+    }
+}
+
+function onInputFocused(input: VTextField | null | undefined, focused: boolean): void {
+    if (input && focused) {
+        nextTick(() => {
+            setChildInputFocus(input?.$el, 'input');
         });
     }
 }

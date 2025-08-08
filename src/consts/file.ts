@@ -241,9 +241,21 @@ export const SUPPORTED_IMPORT_FILE_TYPES: ImportFileType[] = [
         }
     },
     {
-        type: 'wechat_pay_app_csv',
+        type: 'wechat_pay_app',
         name: 'WeChat Pay Billing File',
-        extensions: '.csv',
+        extensions: '.xlsx,.csv',
+        subTypes: [
+            {
+                type: 'wechat_pay_app_xlsx',
+                name: 'Excel Workbook File',
+                extensions: '.xlsx',
+            },
+            {
+                type: 'wechat_pay_app_csv',
+                name: 'CSV (Comma-separated values) File',
+                extensions: '.csv',
+            }
+        ],
         document: {
             supportMultiLanguages: 'zh-Hans',
             anchor: '如何获取微信支付账单文件'

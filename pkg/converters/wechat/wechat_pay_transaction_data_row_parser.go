@@ -29,6 +29,22 @@ const wechatPayTransactionDataCategoryTransferFromWeChatWallet = "零钱提现"
 
 const wechatPayTransactionDataStatusRefundName = "退款"
 
+var wechatPayTransactionSupportedColumns = map[datatable.TransactionDataTableColumn]bool{
+	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME:     true,
+	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE:     true,
+	datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY:         true,
+	datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME:         true,
+	datatable.TRANSACTION_DATA_TABLE_AMOUNT:               true,
+	datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME: true,
+	datatable.TRANSACTION_DATA_TABLE_DESCRIPTION:          true,
+}
+
+var wechatPayTransactionTypeNameMapping = map[models.TransactionType]string{
+	models.TRANSACTION_TYPE_INCOME:   "收入",
+	models.TRANSACTION_TYPE_EXPENSE:  "支出",
+	models.TRANSACTION_TYPE_TRANSFER: "/",
+}
+
 // weChatPayTransactionDataRowParser defines the structure of wechat pay transaction data row parser
 type weChatPayTransactionDataRowParser struct {
 	existedOriginalDataColumns map[string]bool

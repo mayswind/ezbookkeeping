@@ -69,6 +69,8 @@ func GetTransactionDataImporter(fileType string) (converter.TransactionDataImpor
 		return alipay.AlipayAppTransactionDataCsvFileImporter, nil
 	} else if fileType == "alipay_web_csv" {
 		return alipay.AlipayWebTransactionDataCsvFileImporter, nil
+	} else if fileType == "wechat_pay_app_xlsx" {
+		return wechat.WeChatPayTransactionDataXlsxFileImporter, nil
 	} else if fileType == "wechat_pay_app_csv" {
 		return wechat.WeChatPayTransactionDataCsvFileImporter, nil
 	} else {

@@ -2,21 +2,17 @@ package alipay
 
 import (
 	"bytes"
-	"encoding/csv"
-	"io"
-	"strings"
 
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
-	csvdatatable "github.com/mayswind/ezbookkeeping/pkg/converters/csv"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/csv"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 var alipayTransactionSupportedColumns = map[datatable.TransactionDataTableColumn]bool{
@@ -61,7 +57,13 @@ func (c *alipayTransactionDataCsvFileImporter) ParseImportedData(ctx core.Contex
 	enc := simplifiedchinese.GB18030
 	reader := transform.NewReader(bytes.NewReader(data), enc.NewDecoder())
 
-	dataTable, err := c.createNewAlipayBasicDataTable(ctx, reader, c.fileHeaderLine, c.dataHeaderStartContent, c.dataBottomEndLineRune)
+	csvDataTable, err := csv.CreateNewCsvBasicDataTable(ctx, reader, false)
+
+	if err != nil {
+		return nil, nil, nil, nil, nil, nil, err
+	}
+
+	dataTable, err := createNewAlipayTransactionBasicDataTable(ctx, csvDataTable, c.fileHeaderLine, c.dataHeaderStartContent, c.dataBottomEndLineRune)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
@@ -82,81 +84,4 @@ func (c *alipayTransactionDataCsvFileImporter) ParseImportedData(ctx core.Contex
 	dataTableImporter := converter.CreateNewSimpleImporterWithTypeNameMapping(alipayTransactionTypeNameMapping)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
-}
-
-func (c *alipayTransactionDataCsvFileImporter) createNewAlipayBasicDataTable(ctx core.Context, reader io.Reader, fileHeaderLine string, dataHeaderStartContent string, dataBottomEndLineRune rune) (datatable.BasicDataTable, error) {
-	csvReader := csv.NewReader(reader)
-	csvReader.FieldsPerRecord = -1
-
-	allOriginalLines := make([][]string, 0)
-	hasFileHeader := false
-	foundContentBeforeDataHeaderLine := false
-
-	for {
-		items, err := csvReader.Read()
-
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			log.Errorf(ctx, "[alipay_transaction_data_csv_file_importer.createNewAlipayBasicDataTable] cannot parse alipay csv data, because %s", err.Error())
-			return nil, errs.ErrInvalidCSVFile
-		}
-
-		if !hasFileHeader {
-			if len(items) <= 0 {
-				continue
-			} else if strings.Index(items[0], fileHeaderLine) == 0 {
-				hasFileHeader = true
-				continue
-			} else {
-				log.Warnf(ctx, "[alipay_transaction_data_csv_file_importer.createNewAlipayBasicDataTable] read unexpected line before read file header, line content is %s", strings.Join(items, ","))
-				continue
-			}
-		}
-
-		if !foundContentBeforeDataHeaderLine {
-			if len(items) <= 0 {
-				continue
-			} else if strings.Index(items[0], dataHeaderStartContent) >= 0 {
-				foundContentBeforeDataHeaderLine = true
-				continue
-			} else {
-				continue
-			}
-		}
-
-		if foundContentBeforeDataHeaderLine {
-			if len(items) <= 0 {
-				continue
-			} else if len(items) == 1 && dataBottomEndLineRune > 0 && utils.ContainsOnlyOneRune(items[0], dataBottomEndLineRune) {
-				break
-			}
-
-			for i := 0; i < len(items); i++ {
-				items[i] = strings.Trim(items[i], " ")
-			}
-
-			if len(allOriginalLines) > 0 && len(items) < len(allOriginalLines[0]) {
-				log.Errorf(ctx, "[alipay_transaction_data_csv_file_importer.createNewAlipayBasicDataTable] cannot parse row \"index:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", len(allOriginalLines), len(items), len(allOriginalLines[0]))
-				return nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
-			}
-
-			allOriginalLines = append(allOriginalLines, items)
-		}
-	}
-
-	if !hasFileHeader || !foundContentBeforeDataHeaderLine {
-		return nil, errs.ErrInvalidFileHeader
-	}
-
-	if len(allOriginalLines) < 2 {
-		log.Errorf(ctx, "[alipay_transaction_data_csv_file_importer.createNewAlipayBasicDataTable] cannot parse import data, because data table row count is less 1")
-		return nil, errs.ErrNotFoundTransactionDataInFile
-	}
-
-	dataTable := csvdatatable.CreateNewCustomCsvBasicDataTable(allOriginalLines, true)
-
-	return dataTable, nil
 }

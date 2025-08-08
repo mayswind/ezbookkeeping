@@ -2,14 +2,13 @@ package feidee
 
 import (
 	"bytes"
-	"encoding/csv"
-	"golang.org/x/text/encoding/unicode"
-	"golang.org/x/text/transform"
-	"io"
 	"strings"
 
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/transform"
+
 	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
-	csvdatatable "github.com/mayswind/ezbookkeeping/pkg/converters/csv"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/csv"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -60,7 +59,13 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) ParseImportedData(ctx c
 	fallback := unicode.UTF8.NewDecoder()
 	reader := transform.NewReader(bytes.NewReader(data), unicode.BOMOverride(fallback))
 
-	dataTable, err := c.createNewFeideeMymoneyAppBasicDataTable(ctx, reader)
+	csvDataTable, err := csv.CreateNewCsvBasicDataTable(ctx, reader, false)
+
+	if err != nil {
+		return nil, nil, nil, nil, nil, nil, err
+	}
+
+	dataTable, err := createNewFeideeMymoneyAppTransactionBasicDataTable(ctx, csvDataTable)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
@@ -87,54 +92,6 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) ParseImportedData(ctx c
 	dataTableImporter := converter.CreateNewSimpleImporterWithTypeNameMapping(feideeMymoneyTransactionTypeNameMapping)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
-}
-
-func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyAppBasicDataTable(ctx core.Context, reader io.Reader) (datatable.BasicDataTable, error) {
-	csvReader := csv.NewReader(reader)
-	csvReader.FieldsPerRecord = -1
-
-	allOriginalLines := make([][]string, 0)
-	hasFileHeader := false
-
-	for {
-		items, err := csvReader.Read()
-
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] cannot parse feidee mymoney csv data, because %s", err.Error())
-			return nil, errs.ErrInvalidCSVFile
-		}
-
-		if !hasFileHeader {
-			if len(items) <= 0 {
-				continue
-			} else if strings.Index(items[0], feideeMymoneyAppTransactionDataCsvFileHeader) == 0 {
-				hasFileHeader = true
-				continue
-			} else {
-				log.Warnf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] read unexpected line before read file header, line content is %s", strings.Join(items, ","))
-				continue
-			}
-		}
-
-		allOriginalLines = append(allOriginalLines, items)
-	}
-
-	if !hasFileHeader {
-		return nil, errs.ErrInvalidFileHeader
-	}
-
-	if len(allOriginalLines) < 2 {
-		log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] cannot parse import data, because data table row count is less 1")
-		return nil, errs.ErrNotFoundTransactionDataInFile
-	}
-
-	dataTable := csvdatatable.CreateNewCustomCsvBasicDataTable(allOriginalLines, true)
-
-	return dataTable, nil
 }
 
 func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyAppTransactionDataTable(ctx core.Context, commonDataTable datatable.CommonDataTable) (datatable.TransactionDataTable, error) {

@@ -20,6 +20,7 @@ type excelOOXMLSheet struct {
 type ExcelOOXMLFileBasicDataTable struct {
 	sheets                []*excelOOXMLSheet
 	headerLineColumnNames []string
+	hasTitleLine          bool
 }
 
 // ExcelOOXMLFileBasicDataTableRow defines the structure of excel (Office Open XML) file data table row
@@ -47,7 +48,11 @@ func (t *ExcelOOXMLFileBasicDataTable) DataRowCount() int {
 			continue
 		}
 
-		totalDataRowCount += len(sheet.allData) - 1
+		if t.hasTitleLine {
+			totalDataRowCount += len(sheet.allData) - 1
+		} else {
+			totalDataRowCount += len(sheet.allData)
+		}
 	}
 
 	return totalDataRowCount
@@ -55,15 +60,25 @@ func (t *ExcelOOXMLFileBasicDataTable) DataRowCount() int {
 
 // HeaderColumnNames returns the header column name list
 func (t *ExcelOOXMLFileBasicDataTable) HeaderColumnNames() []string {
+	if !t.hasTitleLine {
+		return nil
+	}
+
 	return t.headerLineColumnNames
 }
 
 // DataRowIterator returns the iterator of data row
 func (t *ExcelOOXMLFileBasicDataTable) DataRowIterator() datatable.BasicDataTableRowIterator {
+	startIndex := -1
+
+	if t.hasTitleLine {
+		startIndex = 0
+	}
+
 	return &ExcelOOXMLFileBasicDataTableRowIterator{
 		dataTable:              t,
 		currentSheetIndex:      0,
-		currentRowIndexInSheet: 0,
+		currentRowIndexInSheet: startIndex,
 	}
 }
 
@@ -98,8 +113,14 @@ func (t *ExcelOOXMLFileBasicDataTableRowIterator) HasNext() bool {
 	for i := t.currentSheetIndex + 1; i < len(sheets); i++ {
 		sheet := sheets[i]
 
-		if len(sheet.allData) <= 1 {
-			continue
+		if t.dataTable.hasTitleLine {
+			if len(sheet.allData) <= 1 {
+				continue
+			}
+		} else {
+			if len(sheet.allData) <= 0 {
+				continue
+			}
 		}
 
 		return true
@@ -116,20 +137,22 @@ func (t *ExcelOOXMLFileBasicDataTableRowIterator) CurrentRowId() string {
 // Next returns the next basic data row
 func (t *ExcelOOXMLFileBasicDataTableRowIterator) Next() datatable.BasicDataTableRow {
 	sheets := t.dataTable.sheets
-	currentRowIndexInTable := t.currentRowIndexInSheet
 
 	for i := t.currentSheetIndex; i < len(sheets); i++ {
 		sheet := sheets[i]
 
-		if currentRowIndexInTable+1 < len(sheet.allData) {
+		if t.currentRowIndexInSheet+1 < len(sheet.allData) {
 			t.currentRowIndexInSheet++
-			currentRowIndexInTable = t.currentRowIndexInSheet
 			break
 		}
 
 		t.currentSheetIndex++
-		t.currentRowIndexInSheet = 0
-		currentRowIndexInTable = 0
+
+		if t.dataTable.hasTitleLine {
+			t.currentRowIndexInSheet = 0
+		} else {
+			t.currentRowIndexInSheet = -1
+		}
 	}
 
 	if t.currentSheetIndex >= len(sheets) {
@@ -150,7 +173,7 @@ func (t *ExcelOOXMLFileBasicDataTableRowIterator) Next() datatable.BasicDataTabl
 }
 
 // CreateNewExcelOOXMLFileBasicDataTable returns excel (Office Open XML) data table by file binary data
-func CreateNewExcelOOXMLFileBasicDataTable(data []byte) (datatable.BasicDataTable, error) {
+func CreateNewExcelOOXMLFileBasicDataTable(data []byte, hasTitleLine bool) (datatable.BasicDataTable, error) {
 	reader := bytes.NewReader(data)
 	file, err := excelize.OpenReader(reader)
 
@@ -161,7 +184,7 @@ func CreateNewExcelOOXMLFileBasicDataTable(data []byte) (datatable.BasicDataTabl
 	}
 
 	sheetNames := file.GetSheetList()
-	var headerRowItems []string
+	var firstRowItems []string
 	var sheets []*excelOOXMLSheet
 
 	for i := 0; i < len(sheetNames); i++ {
@@ -186,13 +209,13 @@ func CreateNewExcelOOXMLFileBasicDataTable(data []byte) (datatable.BasicDataTabl
 					break
 				}
 
-				headerRowItems = append(headerRowItems, headerItem)
+				firstRowItems = append(firstRowItems, headerItem)
 			}
 		} else {
-			for j := 0; j < min(len(row), len(headerRowItems)); j++ {
+			for j := 0; j < min(len(row), len(firstRowItems)); j++ {
 				headerItem := row[j]
 
-				if headerItem != headerRowItems[j] {
+				if headerItem != firstRowItems[j] {
 					return nil, errs.ErrFieldsInMultiTableAreDifferent
 				}
 			}
@@ -204,8 +227,15 @@ func CreateNewExcelOOXMLFileBasicDataTable(data []byte) (datatable.BasicDataTabl
 		})
 	}
 
+	var headerLineColumnNames []string = nil
+
+	if hasTitleLine {
+		headerLineColumnNames = firstRowItems
+	}
+
 	return &ExcelOOXMLFileBasicDataTable{
 		sheets:                sheets,
-		headerLineColumnNames: headerRowItems,
+		headerLineColumnNames: headerLineColumnNames,
+		hasTitleLine:          hasTitleLine,
 	}, nil
 }

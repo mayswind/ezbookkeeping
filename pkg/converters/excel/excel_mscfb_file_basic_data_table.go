@@ -14,6 +14,7 @@ import (
 type ExcelMSCFBFileBasicDataTable struct {
 	workbook              *xls.WorkBook
 	headerLineColumnNames []string
+	hasTitleLine          bool
 }
 
 // ExcelMSCFBFileBasicDataTableRow defines the structure of excel (microsoft compound file binary) file data table row
@@ -26,7 +27,7 @@ type ExcelMSCFBFileBasicDataTableRow struct {
 type ExcelMSCFBFileBasicDataTableRowIterator struct {
 	dataTable              *ExcelMSCFBFileBasicDataTable
 	currentSheetIndex      int
-	currentRowIndexInSheet uint16
+	currentRowIndexInSheet int
 }
 
 // DataRowCount returns the total count of data row
@@ -36,11 +37,23 @@ func (t *ExcelMSCFBFileBasicDataTable) DataRowCount() int {
 	for i := 0; i < t.workbook.NumSheets(); i++ {
 		sheet := t.workbook.GetSheet(i)
 
-		if sheet.MaxRow < 1 {
+		if sheet == nil {
 			continue
 		}
 
-		totalDataRowCount += int(sheet.MaxRow)
+		if t.hasTitleLine {
+			if sheet.MaxRow < 1 {
+				continue
+			}
+
+			totalDataRowCount += int(sheet.MaxRow)
+		} else {
+			if sheet.MaxRow <= 0 && sheet.Row(0) == nil {
+				continue
+			}
+
+			totalDataRowCount += int(sheet.MaxRow) + 1
+		}
 	}
 
 	return totalDataRowCount
@@ -48,15 +61,25 @@ func (t *ExcelMSCFBFileBasicDataTable) DataRowCount() int {
 
 // HeaderColumnNames returns the header column name list
 func (t *ExcelMSCFBFileBasicDataTable) HeaderColumnNames() []string {
+	if !t.hasTitleLine {
+		return nil
+	}
+
 	return t.headerLineColumnNames
 }
 
 // DataRowIterator returns the iterator of data row
 func (t *ExcelMSCFBFileBasicDataTable) DataRowIterator() datatable.BasicDataTableRowIterator {
+	startIndex := -1
+
+	if t.hasTitleLine {
+		startIndex = 0
+	}
+
 	return &ExcelMSCFBFileBasicDataTableRowIterator{
 		dataTable:              t,
 		currentSheetIndex:      0,
-		currentRowIndexInSheet: 0,
+		currentRowIndexInSheet: startIndex,
 	}
 }
 
@@ -82,15 +105,21 @@ func (t *ExcelMSCFBFileBasicDataTableRowIterator) HasNext() bool {
 
 	currentSheet := workbook.GetSheet(t.currentSheetIndex)
 
-	if t.currentRowIndexInSheet+1 <= currentSheet.MaxRow {
+	if t.currentRowIndexInSheet+1 <= int(currentSheet.MaxRow) && currentSheet.Row(t.currentRowIndexInSheet+1) != nil {
 		return true
 	}
 
 	for i := t.currentSheetIndex + 1; i < workbook.NumSheets(); i++ {
 		sheet := workbook.GetSheet(i)
 
-		if sheet.MaxRow < 1 {
-			continue
+		if t.dataTable.hasTitleLine {
+			if sheet.MaxRow < 1 {
+				continue
+			}
+		} else {
+			if sheet.MaxRow <= 0 && sheet.Row(0) == nil {
+				continue
+			}
 		}
 
 		return true
@@ -107,20 +136,22 @@ func (t *ExcelMSCFBFileBasicDataTableRowIterator) CurrentRowId() string {
 // Next returns the next basic data row
 func (t *ExcelMSCFBFileBasicDataTableRowIterator) Next() datatable.BasicDataTableRow {
 	workbook := t.dataTable.workbook
-	currentRowIndexInTable := t.currentRowIndexInSheet
 
 	for i := t.currentSheetIndex; i < workbook.NumSheets(); i++ {
 		sheet := workbook.GetSheet(i)
 
-		if currentRowIndexInTable+1 <= sheet.MaxRow {
+		if t.currentRowIndexInSheet+1 <= int(sheet.MaxRow) && sheet.Row(t.currentRowIndexInSheet+1) != nil {
 			t.currentRowIndexInSheet++
-			currentRowIndexInTable = t.currentRowIndexInSheet
 			break
 		}
 
 		t.currentSheetIndex++
-		t.currentRowIndexInSheet = 0
-		currentRowIndexInTable = 0
+
+		if t.dataTable.hasTitleLine {
+			t.currentRowIndexInSheet = 0
+		} else {
+			t.currentRowIndexInSheet = -1
+		}
 	}
 
 	if t.currentSheetIndex >= workbook.NumSheets() {
@@ -129,7 +160,7 @@ func (t *ExcelMSCFBFileBasicDataTableRowIterator) Next() datatable.BasicDataTabl
 
 	currentSheet := workbook.GetSheet(t.currentSheetIndex)
 
-	if t.currentRowIndexInSheet > currentSheet.MaxRow {
+	if t.currentRowIndexInSheet > int(currentSheet.MaxRow) || currentSheet.Row(t.currentRowIndexInSheet) == nil {
 		return nil
 	}
 
@@ -140,7 +171,7 @@ func (t *ExcelMSCFBFileBasicDataTableRowIterator) Next() datatable.BasicDataTabl
 }
 
 // CreateNewExcelMSCFBFileBasicDataTable returns excel (microsoft compound file binary) data table by file binary data
-func CreateNewExcelMSCFBFileBasicDataTable(data []byte) (datatable.BasicDataTable, error) {
+func CreateNewExcelMSCFBFileBasicDataTable(data []byte, hasTitleLine bool) (datatable.BasicDataTable, error) {
 	reader := bytes.NewReader(data)
 	workbook, err := xls.OpenReader(reader, "")
 
@@ -148,12 +179,12 @@ func CreateNewExcelMSCFBFileBasicDataTable(data []byte) (datatable.BasicDataTabl
 		return nil, err
 	}
 
-	var headerRowItems []string
+	var firstRowItems []string
 
 	for i := 0; i < workbook.NumSheets(); i++ {
 		sheet := workbook.GetSheet(i)
 
-		if sheet.MaxRow < 0 {
+		if sheet.MaxRow <= 0 && sheet.Row(0) == nil {
 			continue
 		}
 
@@ -171,21 +202,28 @@ func CreateNewExcelMSCFBFileBasicDataTable(data []byte) (datatable.BasicDataTabl
 					break
 				}
 
-				headerRowItems = append(headerRowItems, headerItem)
+				firstRowItems = append(firstRowItems, headerItem)
 			}
 		} else {
-			for j := 0; j <= min(row.LastCol(), len(headerRowItems)-1); j++ {
+			for j := 0; j <= min(row.LastCol(), len(firstRowItems)-1); j++ {
 				headerItem := row.Col(j)
 
-				if headerItem != headerRowItems[j] {
+				if headerItem != firstRowItems[j] {
 					return nil, errs.ErrFieldsInMultiTableAreDifferent
 				}
 			}
 		}
 	}
 
+	var headerLineColumnNames []string = nil
+
+	if hasTitleLine {
+		headerLineColumnNames = firstRowItems
+	}
+
 	return &ExcelMSCFBFileBasicDataTable{
 		workbook:              workbook,
-		headerLineColumnNames: headerRowItems,
+		headerLineColumnNames: headerLineColumnNames,
+		hasTitleLine:          hasTitleLine,
 	}, nil
 }

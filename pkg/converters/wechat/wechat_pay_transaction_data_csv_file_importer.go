@@ -143,7 +143,7 @@ func (c *wechatPayTransactionDataCsvFileImporter) createNewWeChatPayBasicDataTab
 		return nil, errs.ErrNotFoundTransactionDataInFile
 	}
 
-	dataTable := csvdatatable.CreateNewCustomCsvBasicDataTable(allOriginalLines)
+	dataTable := csvdatatable.CreateNewCustomCsvBasicDataTable(allOriginalLines, true)
 
 	return dataTable, nil
 }

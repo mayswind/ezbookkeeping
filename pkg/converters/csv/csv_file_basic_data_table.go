@@ -13,7 +13,8 @@ import (
 
 // CsvFileBasicDataTable defines the structure of csv data table
 type CsvFileBasicDataTable struct {
-	allLines [][]string
+	allLines     [][]string
+	hasTitleLine bool
 }
 
 // CsvFileBasicDataTableRow defines the structure of csv data table row
@@ -34,7 +35,11 @@ func (t *CsvFileBasicDataTable) DataRowCount() int {
 		return 0
 	}
 
-	return len(t.allLines) - 1
+	if t.hasTitleLine {
+		return len(t.allLines) - 1
+	} else {
+		return len(t.allLines)
+	}
 }
 
 // HeaderColumnNames returns the header column name list
@@ -43,14 +48,24 @@ func (t *CsvFileBasicDataTable) HeaderColumnNames() []string {
 		return nil
 	}
 
-	return t.allLines[0]
+	if t.hasTitleLine {
+		return t.allLines[0]
+	} else {
+		return nil
+	}
 }
 
 // DataRowIterator returns the iterator of data row
 func (t *CsvFileBasicDataTable) DataRowIterator() datatable.BasicDataTableRowIterator {
+	startIndex := -1
+
+	if t.hasTitleLine {
+		startIndex = 0
+	}
+
 	return &CsvFileBasicDataTableRowIterator{
 		dataTable:    t,
-		currentIndex: 0,
+		currentIndex: startIndex,
 	}
 }
 
@@ -95,18 +110,19 @@ func (t *CsvFileBasicDataTableRowIterator) Next() datatable.BasicDataTableRow {
 }
 
 // CreateNewCsvBasicDataTable returns comma separated values data table by io readers
-func CreateNewCsvBasicDataTable(ctx core.Context, reader io.Reader) (datatable.BasicDataTable, error) {
-	return createNewCsvFileBasicDataTable(ctx, reader, ',')
+func CreateNewCsvBasicDataTable(ctx core.Context, reader io.Reader, hasTitleLine bool) (datatable.BasicDataTable, error) {
+	return createNewCsvFileBasicDataTable(ctx, reader, ',', hasTitleLine)
 }
 
 // CreateNewCustomCsvBasicDataTable returns character separated values data table by io readers
-func CreateNewCustomCsvBasicDataTable(allLines [][]string) datatable.BasicDataTable {
+func CreateNewCustomCsvBasicDataTable(allLines [][]string, hasTitleLine bool) datatable.BasicDataTable {
 	return &CsvFileBasicDataTable{
-		allLines: allLines,
+		allLines:     allLines,
+		hasTitleLine: hasTitleLine,
 	}
 }
 
-func createNewCsvFileBasicDataTable(ctx core.Context, reader io.Reader, separator rune) (*CsvFileBasicDataTable, error) {
+func createNewCsvFileBasicDataTable(ctx core.Context, reader io.Reader, separator rune, hasTitleLine bool) (*CsvFileBasicDataTable, error) {
 	csvReader := csv.NewReader(reader)
 	csvReader.Comma = separator
 	csvReader.FieldsPerRecord = -1
@@ -133,6 +149,7 @@ func createNewCsvFileBasicDataTable(ctx core.Context, reader io.Reader, separato
 	}
 
 	return &CsvFileBasicDataTable{
-		allLines: allLines,
+		allLines:     allLines,
+		hasTitleLine: hasTitleLine,
 	}, nil
 }

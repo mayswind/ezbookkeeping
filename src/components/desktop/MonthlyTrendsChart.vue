@@ -376,6 +376,11 @@ const chartOptions = computed<object>(() => {
                             return formatAmountWithCurrency(Math.floor(params.value as number), props.defaultCurrency);
                         }
                     }
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: isDarkMode.value ? '#4f4f4f' : '#e1e6f2',
+                    }
                 }
             }
         ],

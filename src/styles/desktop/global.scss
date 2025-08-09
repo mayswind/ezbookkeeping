@@ -59,6 +59,10 @@ input[type=number] {
     --v-card-title-bg: rgba(var(--v-theme-on-surface), var(--v-hover-opacity));
 }
 
+.v-theme--dark .nav-link {
+    --v-hover-opacity: 0.1;
+}
+
 .pin-codes-input {
     --ebk-pin-code-input-height: 56px;
     --ebk-pin-code-input-gap: 12px;

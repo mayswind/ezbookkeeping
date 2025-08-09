@@ -124,7 +124,10 @@ const chartOptions = computed<object>(() => {
         tooltip: {
             trigger: 'axis',
             axisPointer: {
-                type: 'shadow'
+                type: 'shadow',
+                shadowStyle: {
+                    color: props.isDarkMode ? 'rgba(210, 210, 210, 0.05)' : 'rgba(120, 120, 120, 0.05)'
+                }
             },
             backgroundColor: props.isDarkMode ? '#333' : '#fff',
             borderColor: props.isDarkMode ? '#333' : '#fff',

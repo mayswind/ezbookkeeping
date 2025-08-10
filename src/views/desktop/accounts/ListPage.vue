@@ -91,7 +91,7 @@
                                     </template>
 
                                     <v-card-text class="accounts-overview-title text-truncate pt-0">
-                                        <span class="accounts-overview-subtitle">{{ tt('Balance') }}</span>
+                                        <span class="accounts-overview-subtitle">{{ activeAccountCategory?.isLiability ? tt('Outstanding Balance') : tt('Balance') }}</span>
                                         <v-skeleton-loader class="skeleton-no-margin ml-3 mb-2" width="120px" type="text" :loading="true" v-if="loading && activeAccountCategory && !hasAccount(activeAccountCategory)"></v-skeleton-loader>
                                         <span class="accounts-overview-amount ml-3" v-else-if="!loading || !activeAccountCategory || hasAccount(activeAccountCategory)">{{ activeAccountCategoryTotalBalance }}</span>
                                         <v-btn class="ml-2" density="compact" color="default" variant="text"

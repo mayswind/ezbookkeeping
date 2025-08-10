@@ -1002,7 +1002,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 				return errs.ErrBalanceModificationTransactionCannotChangeAccountId
 			}
 
-			if transaction.RelatedAccountAmount != oldTransaction.RelatedAccountAmount {
+			if transaction.Amount != oldTransaction.Amount && transaction.RelatedAccountAmount != oldTransaction.RelatedAccountAmount {
 				sourceAccount.UpdatedUnixTime = time.Now().Unix()
 				updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)+(%d)", oldTransaction.RelatedAccountAmount, transaction.RelatedAccountAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
 

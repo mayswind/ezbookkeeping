@@ -480,7 +480,7 @@
                         </v-btn>
                     </v-btn-group>
                     <v-btn color="warning" variant="tonal" :disabled="loading || submitting"
-                           v-if="mode === TransactionEditPageMode.View && originalTransactionEditable && transaction.type !== TransactionType.ModifyBalance"
+                           v-if="mode === TransactionEditPageMode.View && originalTransactionEditable"
                            @click="edit">{{ tt('Edit') }}</v-btn>
                     <v-btn color="error" variant="tonal" :disabled="loading || submitting"
                            v-if="mode === TransactionEditPageMode.View && originalTransactionEditable" @click="remove">

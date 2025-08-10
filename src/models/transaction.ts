@@ -246,9 +246,15 @@ export class Transaction implements TransactionInfoResponse {
     }
 
     public toModifyRequest(actualTime?: number): TransactionModifyRequest {
+        let categoryId = this.getCategoryId();
+
+        if (this.type === TransactionType.ModifyBalance) {
+            categoryId = '0';
+        }
+
         return {
             id: this.id,
-            categoryId: this.getCategoryId(),
+            categoryId: categoryId,
             time: actualTime ? actualTime : this.time,
             utcOffset: this.utcOffset,
             sourceAccountId: this.sourceAccountId,

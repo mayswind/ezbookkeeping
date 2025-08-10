@@ -299,7 +299,7 @@
                                                     @click="duplicate(transaction)"></f7-swipeout-button>
                                 <f7-swipeout-button color="orange" close
                                                     :text="tt('Edit')"
-                                                    v-if="transaction.editable && transaction.type !== TransactionType.ModifyBalance"
+                                                    v-if="transaction.editable"
                                                     @click="edit(transaction)"></f7-swipeout-button>
                                 <f7-swipeout-button color="red" class="padding-left padding-right"
                                                     v-if="transaction.editable"

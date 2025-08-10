@@ -809,7 +809,7 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.WebContext) (any, *er
 		return nil, errs.ErrTransactionTypeInvalid
 	}
 
-	if transactionCreateReq.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE && transactionCreateReq.CategoryId > 0 {
+	if transactionCreateReq.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE && transactionCreateReq.CategoryId != 0 {
 		log.Warnf(c, "[transactions.TransactionCreateHandler] balance modification transaction cannot set category id")
 		return nil, errs.ErrBalanceModificationTransactionCannotSetCategory
 	}
@@ -955,6 +955,14 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
 		log.Warnf(c, "[transactions.TransactionModifyHandler] cannot modify transaction \"id:%d\" for user \"uid:%d\", because transaction type is transfer in", transactionModifyReq.Id, uid)
 		return nil, errs.ErrTransactionTypeInvalid
+	}
+
+	if transaction.Type == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE && transactionModifyReq.CategoryId != 0 {
+		log.Warnf(c, "[transactions.TransactionModifyHandler] balance modification transaction cannot set category id")
+		return nil, errs.ErrBalanceModificationTransactionCannotSetCategory
+	} else if transaction.Type != models.TRANSACTION_DB_TYPE_MODIFY_BALANCE && transactionModifyReq.CategoryId == 0 {
+		log.Warnf(c, "[transactions.TransactionModifyHandler] non-balance modification transaction must set category id")
+		return nil, errs.ErrIncompleteOrIncorrectSubmission
 	}
 
 	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(c, uid, []int64{transaction.TransactionId})
@@ -1498,7 +1506,7 @@ func (a *TransactionsApi) TransactionImportHandler(c *core.WebContext) (any, *er
 			return nil, errs.ErrTransactionTypeInvalid
 		}
 
-		if transactionCreateReq.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE && transactionCreateReq.CategoryId > 0 {
+		if transactionCreateReq.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE && transactionCreateReq.CategoryId != 0 {
 			log.Warnf(c, "[transactions.TransactionImportHandler] balance modification transaction \"index:%d\" cannot set category id", i)
 			return nil, errs.ErrBalanceModificationTransactionCannotSetCategory
 		}

@@ -556,8 +556,7 @@
                                                     </div>
                                                 </td>
                                             </tr>
-                                            <tr class="transaction-table-row-data text-sm"
-                                                :class="{ 'cursor-pointer': transaction.type !== TransactionType.ModifyBalance }"
+                                            <tr class="transaction-table-row-data text-sm cursor-pointer"
                                                 @click="show(transaction)">
                                                 <td class="transaction-table-column-time">
                                                     <div class="d-flex flex-column">
@@ -1653,10 +1652,6 @@ function exportTransactions(fileExtension: string): void {
 }
 
 function show(transaction: Transaction): void {
-    if (transaction.type === TransactionType.ModifyBalance) {
-        return;
-    }
-
     editDialog.value?.open({
         id: transaction.id,
         currentTransaction: transaction

@@ -492,7 +492,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         }
 
         const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, account =>
-            !settingsStore.appSettings.totalAmountExcludeAccountIds[account.id]
+            !(account.type === AccountType.SingleAccount.type && settingsStore.appSettings.totalAmountExcludeAccountIds[account.id])
         );
         let netAssets = 0;
         let hasUnCalculatedAmount = false;
@@ -525,7 +525,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         }
 
         const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, account =>
-            !settingsStore.appSettings.totalAmountExcludeAccountIds[account.id] && (account.isAsset || false)
+            (account.isAsset || false) && !(account.type === AccountType.SingleAccount.type && settingsStore.appSettings.totalAmountExcludeAccountIds[account.id])
         );
         let totalAssets = 0;
         let hasUnCalculatedAmount = false;
@@ -558,7 +558,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         }
 
         const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, account =>
-            !settingsStore.appSettings.totalAmountExcludeAccountIds[account.id] && (account.isLiability || false)
+            (account.isLiability || false) && !(account.type === AccountType.SingleAccount.type && settingsStore.appSettings.totalAmountExcludeAccountIds[account.id])
         );
         let totalLiabilities = 0;
         let hasUnCalculatedAmount = false;

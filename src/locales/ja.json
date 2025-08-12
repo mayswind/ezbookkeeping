@@ -15,7 +15,8 @@
         "Ukrainian": "ウクライナ語",
         "Vietnamese": "ベトナム語",
         "Chinese (Simplified)": "中国語 (簡体字)",
-        "Chinese (Traditional)": "中国語 (繁体字)"
+        "Chinese (Traditional)": "中国語 (繁体字)",
+        "Dutch": "オランダ語"
     },
     "default": {
         "currency": "JPY",

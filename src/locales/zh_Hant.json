@@ -15,7 +15,8 @@
         "Ukrainian": "烏克蘭語",
         "Vietnamese": "越南語",
         "Chinese (Simplified)": "中文 (簡體)",
-        "Chinese (Traditional)": "中文 (繁體)"
+        "Chinese (Traditional)": "中文 (繁體)",
+        "Dutch": "荷蘭語"
     },
     "default": {
         "currency": "TWD",

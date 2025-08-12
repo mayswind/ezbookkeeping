@@ -60,11 +60,11 @@ Visit [Docker Hub](https://hub.docker.com/r/mayswind/ezbookkeeping) to see all i
 
 **Latest Release:**
 
-    $ docker run -p8080:8080 mayswind/ezbookkeeping
+    $ docker run -p 8080:8080 mayswind/ezbookkeeping
 
 **Latest Daily Build:**
 
-    $ docker run -p8080:8080 mayswind/ezbookkeeping:latest-snapshot
+    $ docker run -p 8080:8080 mayswind/ezbookkeeping:latest-snapshot
 
 ### Install from Binary
 Download the latest release: [https://github.com/mayswind/ezbookkeeping/releases](https://github.com/mayswind/ezbookkeeping/releases)

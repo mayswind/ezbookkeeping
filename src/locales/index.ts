@@ -3,6 +3,7 @@ import en from './en.json';
 import es from './es.json';
 import it from './it.json';
 import ja from './ja.json';
+import nl from './nl.json';
 import ru from './ru.json';
 import uk from './uk.json';
 import vi from './vi.json';
@@ -58,6 +59,12 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         displayName: '日本語',
         alternativeLanguageTag: 'ja-JP',
         content: ja
+    },
+    'nl': {
+        name: 'Dutch',
+        displayName: 'Nederlands',
+        alternativeLanguageTag: 'nl-NL',
+        content: nl
     },
     'pt-BR': {
         name: 'Portuguese (Brazil)',

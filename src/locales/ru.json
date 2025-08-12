@@ -15,7 +15,8 @@
         "Ukrainian": "Украинский",
         "Vietnamese": "Вьетнамский",
         "Chinese (Simplified)": "Китайский (Упрощенный)",
-        "Chinese (Traditional)": "Китайский (Традиционный)"
+        "Chinese (Traditional)": "Китайский (Традиционный)",
+        "Dutch": "Нидерландский"
     },
     "default": {
         "currency": "RUB",

@@ -123,6 +123,7 @@ Currently available translations:
 | es | Español | [@Miguelonlonlon](https://github.com/Miguelonlonlon) |
 | it | Italiano | [@waron97](https://github.com/waron97) |
 | ja | 日本語 | [@tkymmm](https://github.com/tkymmm) |
+| nl | Nederlands | [@automagic](https://github.com/automagics) |
 | pt-BR | Português (Brasil) | [@thecodergus](https://github.com/thecodergus) |
 | ru | Русский | [@artegoser](https://github.com/artegoser) |
 | uk | Українська | [@nktlitvinenko](https://github.com/nktlitvinenko) |

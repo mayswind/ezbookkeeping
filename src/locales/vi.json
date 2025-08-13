@@ -10,13 +10,13 @@
         "Spanish": "Tiếng Tây Ban Nha",
         "Italian": "Tiếng Ý",
         "Japanese": "Tiếng Nhật",
+        "Dutch": "Tiếng Hà Lan",
         "Portuguese (Brazil)": "Tiếng Bồ Đào Nha (Brazil)",
         "Russian": "Tiếng Nga",
         "Ukrainian": "Tiếng Ukraina",
         "Vietnamese": "Tiếng Việt",
         "Chinese (Simplified)": "Tiếng Trung (Giản Thể)",
-        "Chinese (Traditional)": "Tiếng Trung (Phồn Thể)",
-        "Dutch": "Tiếng Hà Lan"
+        "Chinese (Traditional)": "Tiếng Trung (Phồn Thể)"
     },
     "default": {
         "currency": "VND",

@@ -10,13 +10,13 @@
         "Spanish": "Іспанська",
         "Italian": "Італійська",
         "Japanese": "Японська",
+        "Dutch": "Нідерландська",
         "Portuguese (Brazil)": "Португальська (Бразилія)",
         "Russian": "Російська",
         "Ukrainian": "Українська",
         "Vietnamese": "В'єтнамська",
         "Chinese (Simplified)": "Китайська (Спрощена)",
-        "Chinese (Traditional)": "Китайська (Традиційна)",
-        "Dutch": "Нідерландська"
+        "Chinese (Traditional)": "Китайська (Традиційна)"
     },
     "default": {
         "currency": "UAH",

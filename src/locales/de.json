@@ -10,13 +10,13 @@
         "Spanish": "Spanisch",
         "Italian": "Italienisch",
         "Japanese": "Japanisch",
+        "Dutch": "Niederländisch",
         "Portuguese (Brazil)": "Portugiesisch (Brasilien)",
         "Russian": "Russisch",
         "Ukrainian": "Ukrainisch",
         "Vietnamese": "Vietnamesisch",
         "Chinese (Simplified)": "Chinesisch (Vereinfacht)",
-        "Chinese (Traditional)": "Chinesisch (Traditionell)",
-        "Dutch": "Niederländisch"
+        "Chinese (Traditional)": "Chinesisch (Traditionell)"
     },
     "default": {
         "currency": "EUR",

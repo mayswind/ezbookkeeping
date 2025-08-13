@@ -10,13 +10,13 @@
         "Spanish": "Испанский",
         "Italian": "Итальянский",
         "Japanese": "Японский",
+        "Dutch": "Нидерландский",
         "Portuguese (Brazil)": "Португальский (Бразилия)",
         "Russian": "Русский",
         "Ukrainian": "Украинский",
         "Vietnamese": "Вьетнамский",
         "Chinese (Simplified)": "Китайский (Упрощенный)",
-        "Chinese (Traditional)": "Китайский (Традиционный)",
-        "Dutch": "Нидерландский"
+        "Chinese (Traditional)": "Китайский (Традиционный)"
     },
     "default": {
         "currency": "RUB",

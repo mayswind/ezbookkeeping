@@ -10,13 +10,13 @@
         "Spanish": "Espanhol",
         "Italian": "Italiano",
         "Japanese": "Japonês",
+        "Dutch": "Holandês",
         "Portuguese (Brazil)": "Português (Brasil)",
         "Russian": "Russo",
         "Ukrainian": "Ucraniano",
         "Vietnamese": "Vietnamita",
         "Chinese (Simplified)": "Chinês (Simplificado)",
-        "Chinese (Traditional)": "Chinês (Tradicional)",
-        "Dutch": "Holandês"
+        "Chinese (Traditional)": "Chinês (Tradicional)"
     },
     "default": {
         "currency": "BRL",

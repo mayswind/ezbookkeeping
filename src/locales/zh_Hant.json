@@ -265,7 +265,8 @@
         "Space": "空格",
         "Apostrophe": "撇號",
         "None": "無",
-        "Thousands Separator": "千位分隔符"
+        "Thousands Separator": "千位分隔符",
+        "Indian Number Grouping": "印度數字分組"
     },
     "color": {
         "amount": {

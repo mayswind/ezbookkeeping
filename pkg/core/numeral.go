@@ -69,10 +69,11 @@ type DigitGroupingType byte
 
 // Digit Grouping Type
 const (
-	DIGIT_GROUPING_TYPE_DEFAULT             DigitGroupingType = 0
-	DIGIT_GROUPING_TYPE_NONE                DigitGroupingType = 1
-	DIGIT_GROUPING_TYPE_THOUSANDS_SEPARATOR DigitGroupingType = 2
-	DIGIT_GROUPING_TYPE_INVALID             DigitGroupingType = 255
+	DIGIT_GROUPING_TYPE_DEFAULT                DigitGroupingType = 0
+	DIGIT_GROUPING_TYPE_NONE                   DigitGroupingType = 1
+	DIGIT_GROUPING_TYPE_THOUSANDS_SEPARATOR    DigitGroupingType = 2
+	DIGIT_GROUPING_TYPE_INDIAN_NUMBER_GROUPING DigitGroupingType = 3
+	DIGIT_GROUPING_TYPE_INVALID                DigitGroupingType = 255
 )
 
 // String returns a textual representation of the digit grouping type enum
@@ -84,6 +85,8 @@ func (d DigitGroupingType) String() string {
 		return "None"
 	case DIGIT_GROUPING_TYPE_THOUSANDS_SEPARATOR:
 		return "Thousands Separator"
+	case DIGIT_GROUPING_TYPE_INDIAN_NUMBER_GROUPING:
+		return "Indian Number Grouping"
 	case DIGIT_GROUPING_TYPE_INVALID:
 		return "Invalid"
 	default:

@@ -8,7 +8,7 @@ import { useOverviewStore } from '@/stores/overview.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { WeekDay } from '@/core/datetime.ts';
-import type { LocalizedDigitGroupingType } from '@/core/numeral.ts';
+import { type LocalizedDigitGroupingType, DigitGroupingSymbol } from '@/core/numeral.ts';
 
 import { type UserBasicInfo, User } from '@/models/user.ts';
 import { type CategorizedAccount, Account} from '@/models/account.ts';
@@ -64,7 +64,7 @@ export function useUserProfilePageBase() {
     const allFiscalYearFormats = computed<TypeAndDisplayName[]>(() => getAllFiscalYearFormats());
     const allDecimalSeparators = computed<TypeAndDisplayName[]>(() => getAllDecimalSeparators());
     const allDigitGroupingSymbols = computed<TypeAndDisplayName[]>(() => getAllDigitGroupingSymbols());
-    const allDigitGroupingTypes = computed<LocalizedDigitGroupingType[]>(() => getAllDigitGroupingTypes());
+    const allDigitGroupingTypes = computed<LocalizedDigitGroupingType[]>(() => getAllDigitGroupingTypes(DigitGroupingSymbol.valueOf(newProfile.value.digitGroupingSymbol)?.symbol || DigitGroupingSymbol.Default.symbol));
     const allCurrencyDisplayTypes = computed<TypeAndDisplayName[]>(() => getAllCurrencyDisplayTypes());
     const allCoordinateDisplayTypes = computed<TypeAndDisplayName[]>(() => getAllCoordinateDisplayTypes());
     const allExpenseAmountColorTypes = computed<TypeAndDisplayName[]>(() => getAllExpenseAmountColors());

@@ -321,7 +321,7 @@ func (s *UserService) UpdateUser(c core.Context, user *models.User, modifyUserLa
 		updateCols = append(updateCols, "digit_grouping_symbol")
 	}
 
-	if core.DIGIT_GROUPING_TYPE_DEFAULT <= user.DigitGrouping && user.DigitGrouping <= core.DIGIT_GROUPING_TYPE_THOUSANDS_SEPARATOR {
+	if core.DIGIT_GROUPING_TYPE_DEFAULT <= user.DigitGrouping && user.DigitGrouping <= core.DIGIT_GROUPING_TYPE_INDIAN_NUMBER_GROUPING {
 		updateCols = append(updateCols, "digit_grouping")
 	}
 

@@ -265,7 +265,8 @@
         "Space": "Khoảng trắng",
         "Apostrophe": "Dấu nháy đơn",
         "None": "Không có",
-        "Thousands Separator": "Dấu phân cách hàng nghìn"
+        "Thousands Separator": "Dấu phân cách hàng nghìn",
+        "Indian Number Grouping": "Indian Number Grouping"
     },
     "color": {
         "amount": {

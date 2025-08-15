@@ -265,7 +265,8 @@
         "Space": "スペース",
         "Apostrophe": "アポストロフィ",
         "None": "なし",
-        "Thousands Separator": "千の桁区切り"
+        "Thousands Separator": "千の桁区切り",
+        "Indian Number Grouping": "Indian Number Grouping"
     },
     "color": {
         "amount": {

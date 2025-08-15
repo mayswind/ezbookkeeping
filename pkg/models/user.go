@@ -200,7 +200,7 @@ type UserProfileUpdateRequest struct {
 	FiscalYearFormat      *core.FiscalYearFormat      `json:"fiscalYearFormat" binding:"omitempty,min=0,max=5"`
 	DecimalSeparator      *core.DecimalSeparator      `json:"decimalSeparator" binding:"omitempty,min=0,max=3"`
 	DigitGroupingSymbol   *core.DigitGroupingSymbol   `json:"digitGroupingSymbol" binding:"omitempty,min=0,max=4"`
-	DigitGrouping         *core.DigitGroupingType     `json:"digitGrouping" binding:"omitempty,min=0,max=2"`
+	DigitGrouping         *core.DigitGroupingType     `json:"digitGrouping" binding:"omitempty,min=0,max=3"`
 	CurrencyDisplayType   *core.CurrencyDisplayType   `json:"currencyDisplayType" binding:"omitempty,min=0,max=11"`
 	CoordinateDisplayType *core.CoordinateDisplayType `json:"coordinateDisplayType" binding:"omitempty,min=0,max=6"`
 	ExpenseAmountColor    *AmountColorType            `json:"expenseAmountColor" binding:"omitempty,min=0,max=4"`

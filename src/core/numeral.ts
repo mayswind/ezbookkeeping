@@ -110,8 +110,52 @@ export class DigitGroupingType implements TypeAndName {
     private static readonly allInstancesByTypeName: Record<string, DigitGroupingType> = {};
 
     public static readonly LanguageDefaultType: number = 0;
-    public static readonly None = new DigitGroupingType(1, 'None', 'None', false);
-    public static readonly ThousandsSeparator = new DigitGroupingType(2, 'ThousandsSeparator', 'Thousands Separator', true);
+    public static readonly None = new DigitGroupingType(1, 'None', 'None', false,
+        (numericChars: string[]) => {
+            return numericChars.join('');
+        }
+    );
+    public static readonly ThousandsSeparator = new DigitGroupingType(2, 'ThousandsSeparator', 'Thousands Separator', true,
+        (numericChars: string[], digitGroupingSymbol: string) => {
+            if (numericChars.length <= 3) {
+                return numericChars.join('');
+            }
+
+            let ret = '';
+
+            for (let i = numericChars.length - 1, j = 0; i >= 0; i--, j++) {
+                if (j > 0 && j % 3 === 0) {
+                    ret = digitGroupingSymbol + ret;
+                }
+
+                ret = numericChars[i] + ret;
+            }
+
+            return ret;
+        }
+    );
+    public static readonly IndianNumberGrouping = new DigitGroupingType(3, 'IndianNumberGrouping', 'Indian Number Grouping', true,
+        (numericChars: string[], digitGroupingSymbol: string) => {
+            if (numericChars.length <= 3) {
+                return numericChars.join('');
+            }
+
+            let ret = '';
+            const length = numericChars.length;
+
+            for (let i = length - 1, j = 0; i >= 0; i--, j++) {
+                if (j === 3) {
+                    ret = digitGroupingSymbol + ret;
+                } else if (j > 3 && (j - 3) % 2 === 0) {
+                    ret = digitGroupingSymbol + ret;
+                }
+
+                ret = numericChars[i] + ret;
+            }
+
+            return ret;
+        }
+    );
 
     public static readonly Default = DigitGroupingType.ThousandsSeparator;
 
@@ -119,12 +163,14 @@ export class DigitGroupingType implements TypeAndName {
     public readonly typeName: string;
     public readonly name: string;
     public readonly enabled: boolean;
+    public readonly format: (numericChars: string[], digitGroupingSymbol: string) => string;
 
-    private constructor(type: number, typeName: string, name: string, enabled: boolean) {
+    private constructor(type: number, typeName: string, name: string, enabled: boolean, format: (numericChars: string[], digitGroupingSymbol: string) => string) {
         this.type = type;
         this.typeName = typeName;
         this.name = name;
         this.enabled = enabled;
+        this.format = format;
 
         DigitGroupingType.allInstances.push(this);
         DigitGroupingType.allInstancesByType[type] = this;

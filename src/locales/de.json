@@ -265,7 +265,8 @@
         "Space": "Leerzeichen",
         "Apostrophe": "Apostroph",
         "None": "Keine",
-        "Thousands Separator": "Tausender Trennzeichen"
+        "Thousands Separator": "Tausender Trennzeichen",
+        "Indian Number Grouping": "Indian Number Grouping"
     },
     "color": {
         "amount": {

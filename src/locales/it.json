@@ -265,7 +265,8 @@
         "Space": "Spazio",
         "Apostrophe": "Apostrofo",
         "None": "Nulla",
-        "Thousands Separator": "Separatore migliaia"
+        "Thousands Separator": "Separatore migliaia",
+        "Indian Number Grouping": "Indian Number Grouping"
     },
     "color": {
         "amount": {

@@ -1030,7 +1030,7 @@ export function useI18n() {
         return ret;
     }
 
-    function getAllDigitGroupingTypes(): LocalizedDigitGroupingType[] {
+    function getAllDigitGroupingTypes(digitGroupingSymbol: string): LocalizedDigitGroupingType[] {
         const defaultDigitGroupingTypeName = t('default.digitGrouping');
         let defaultDigitGroupingType = DigitGroupingType.parse(defaultDigitGroupingTypeName);
 
@@ -1050,11 +1050,12 @@ export function useI18n() {
 
         for (let i = 0; i < allDigitGroupingTypes.length; i++) {
             const type = allDigitGroupingTypes[i];
+            const sampleValue = type.format('123456789'.split(''), digitGroupingSymbol);
 
             ret.push({
                 type: type.type,
                 enabled: type.enabled,
-                displayName: t('numeral.' + type.name)
+                displayName: `${t('numeral.' + type.name)} (${sampleValue})`
             });
         }
 

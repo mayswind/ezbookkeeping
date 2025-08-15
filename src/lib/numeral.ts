@@ -30,11 +30,17 @@ export function appendDigitGroupingSymbol(value: number | string, options: Numbe
         options = {};
     }
 
-    if (!isNumber(options.digitGrouping) || options.digitGrouping === DigitGroupingType.None.type) {
+    if (!isNumber(options.digitGrouping)) {
         return textualValue;
     }
 
-    if (textualValue.length <= 3) {
+    const digitGroupingType = DigitGroupingType.valueOf(options.digitGrouping);
+
+    if (!digitGroupingType || !digitGroupingType.enabled) {
+        return textualValue;
+    }
+
+    if (textualValue.length <= 1) {
         return textualValue;
     }
 
@@ -42,6 +48,10 @@ export function appendDigitGroupingSymbol(value: number | string, options: Numbe
 
     if (negative) {
         textualValue = textualValue.substring(1);
+    }
+
+    if (textualValue.length <= 1) {
+        return textualValue;
     }
 
     const digitGroupingSymbol = options.digitGroupingSymbol || DigitGroupingSymbol.Default.symbol;
@@ -63,17 +73,7 @@ export function appendDigitGroupingSymbol(value: number | string, options: Numbe
         }
     }
 
-    let newInteger = '';
-
-    if (options.digitGrouping === DigitGroupingType.ThousandsSeparator.type) {
-        for (let i = integerChars.length - 1, j = 0; i >= 0; i--, j++) {
-            if (j % 3 === 0 && j > 0) {
-                newInteger = digitGroupingSymbol + newInteger;
-            }
-
-            newInteger = integerChars[i] + newInteger;
-        }
-    }
+    let newInteger = digitGroupingType.format(integerChars, digitGroupingSymbol);
 
     if (negative) {
         newInteger = `-${newInteger}`;

@@ -265,7 +265,8 @@
         "Space": "Пробел",
         "Apostrophe": "Апостроф",
         "None": "Нет",
-        "Thousands Separator": "Разделитель тысяч"
+        "Thousands Separator": "Разделитель тысяч",
+        "Indian Number Grouping": "Indian Number Grouping"
     },
     "color": {
         "amount": {

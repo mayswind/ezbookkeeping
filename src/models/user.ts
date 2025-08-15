@@ -17,21 +17,21 @@ export class User {
     public defaultCurrency: string;
     public firstDayOfWeek: number;
 
-    public defaultAccountId: string = '';
-    public transactionEditScope: number = 1;
-    public fiscalYearStart: number = 0;
-    public fiscalYearFormat: number = 0;
-    public longDateFormat: number = 0;
-    public shortDateFormat: number = 0;
-    public longTimeFormat: number = 0;
-    public shortTimeFormat: number = 0;
-    public decimalSeparator: number = 0;
-    public digitGroupingSymbol: number = 0;
-    public digitGrouping: number = 0;
-    public currencyDisplayType: number = 0;
-    public coordinateDisplayType: number = 0;
-    public expenseAmountColor: number = 0;
-    public incomeAmountColor: number = 0;
+    public defaultAccountId: string = EMPTY_USER_BASIC_INFO.defaultAccountId;
+    public transactionEditScope: number = EMPTY_USER_BASIC_INFO.transactionEditScope;
+    public fiscalYearStart: number = EMPTY_USER_BASIC_INFO.fiscalYearStart;
+    public longDateFormat: number = EMPTY_USER_BASIC_INFO.longDateFormat;
+    public shortDateFormat: number = EMPTY_USER_BASIC_INFO.shortDateFormat;
+    public longTimeFormat: number = EMPTY_USER_BASIC_INFO.longTimeFormat;
+    public shortTimeFormat: number = EMPTY_USER_BASIC_INFO.shortTimeFormat;
+    public fiscalYearFormat: number = EMPTY_USER_BASIC_INFO.fiscalYearFormat;
+    public decimalSeparator: number = EMPTY_USER_BASIC_INFO.decimalSeparator;
+    public digitGroupingSymbol: number = EMPTY_USER_BASIC_INFO.digitGroupingSymbol;
+    public digitGrouping: number = EMPTY_USER_BASIC_INFO.digitGrouping;
+    public currencyDisplayType: number = EMPTY_USER_BASIC_INFO.currencyDisplayType;
+    public coordinateDisplayType: number = EMPTY_USER_BASIC_INFO.coordinateDisplayType;
+    public expenseAmountColor: number = EMPTY_USER_BASIC_INFO.expenseAmountColor;
+    public incomeAmountColor: number = EMPTY_USER_BASIC_INFO.incomeAmountColor;
 
     private constructor(language: string, defaultCurrency: string, firstDayOfWeek: number) {
         this.language = language;

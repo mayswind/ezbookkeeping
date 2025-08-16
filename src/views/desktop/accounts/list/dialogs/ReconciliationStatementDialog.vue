@@ -543,9 +543,9 @@ function updateClosingBalance(): void {
     }
 
     amountInputDialog.value?.open({
-        text: tt('Please enter the new closing balance for the account'),
-        inputLabel: tt('Closing Balance'),
-        inputPlaceholder: tt('Closing Balance'),
+        text: 'Please enter the new closing balance for the account',
+        inputLabel: 'Closing Balance',
+        inputPlaceholder: 'Closing Balance',
         currency: currentAccountCurrency.value,
         initAmount: currentClosingBalance
     }).then(newClosingBalance => {

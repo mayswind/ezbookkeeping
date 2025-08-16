@@ -64,7 +64,7 @@
             </template>
 
             <template #after>
-                <span>{{ formatAmountWithCurrency(item.totalAmount, defaultCurrency) }}</span>
+                <span>{{ formatAmountToLocalizedNumeralsWithCurrency(item.totalAmount, defaultCurrency) }}</span>
             </template>
 
             <template #inner-end>
@@ -148,7 +148,15 @@ const emit = defineEmits<{
     (e: 'click', value: MonthlyTrendsBarChartClickEvent): void;
 }>();
 
-const { tt, formatUnixTimeToShortYear, formatYearQuarter, formatUnixTimeToShortYearMonth, formatUnixTimeToFiscalYear, formatAmountWithCurrency } = useI18n();
+const {
+    tt,
+    formatUnixTimeToShortYear,
+    formatYearQuarter,
+    formatUnixTimeToShortYearMonth,
+    formatUnixTimeToFiscalYear,
+    formatAmountToLocalizedNumeralsWithCurrency
+} = useI18n();
+
 const { allDateRanges, getItemName, getColor } = useMonthlyTrendsChartBase(props);
 
 const userStore = useUserStore();

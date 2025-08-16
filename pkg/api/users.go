@@ -404,6 +404,24 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 		userNew.FiscalYearFormat = core.FISCAL_YEAR_FORMAT_INVALID
 	}
 
+	if userUpdateReq.CurrencyDisplayType != nil && *userUpdateReq.CurrencyDisplayType != user.CurrencyDisplayType {
+		user.CurrencyDisplayType = *userUpdateReq.CurrencyDisplayType
+		userNew.CurrencyDisplayType = *userUpdateReq.CurrencyDisplayType
+		modifyProfileBasicInfo = true
+		anythingUpdate = true
+	} else {
+		userNew.CurrencyDisplayType = core.CURRENCY_DISPLAY_TYPE_INVALID
+	}
+
+	if userUpdateReq.NumeralSystem != nil && *userUpdateReq.NumeralSystem != user.NumeralSystem {
+		user.NumeralSystem = *userUpdateReq.NumeralSystem
+		userNew.NumeralSystem = *userUpdateReq.NumeralSystem
+		modifyProfileBasicInfo = true
+		anythingUpdate = true
+	} else {
+		userNew.NumeralSystem = core.NUMERAL_SYSTEM_INVALID
+	}
+
 	if userUpdateReq.DecimalSeparator != nil && *userUpdateReq.DecimalSeparator != user.DecimalSeparator {
 		user.DecimalSeparator = *userUpdateReq.DecimalSeparator
 		userNew.DecimalSeparator = *userUpdateReq.DecimalSeparator
@@ -429,15 +447,6 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 		anythingUpdate = true
 	} else {
 		userNew.DigitGrouping = core.DIGIT_GROUPING_TYPE_INVALID
-	}
-
-	if userUpdateReq.CurrencyDisplayType != nil && *userUpdateReq.CurrencyDisplayType != user.CurrencyDisplayType {
-		user.CurrencyDisplayType = *userUpdateReq.CurrencyDisplayType
-		userNew.CurrencyDisplayType = *userUpdateReq.CurrencyDisplayType
-		modifyProfileBasicInfo = true
-		anythingUpdate = true
-	} else {
-		userNew.CurrencyDisplayType = core.CURRENCY_DISPLAY_TYPE_INVALID
 	}
 
 	if userUpdateReq.CoordinateDisplayType != nil && *userUpdateReq.CoordinateDisplayType != user.CoordinateDisplayType {

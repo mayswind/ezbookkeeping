@@ -76,8 +76,8 @@
 
         <f7-list strong inset dividers class="margin-vertical" v-if="finishQuery && !loading">
             <f7-list-item :title="tt('Total Transactions')"
-                          :after="reconciliationStatements?.transactions.length"
-                          v-if="reconciliationStatements?.transactions.length"></f7-list-item>
+                          :after="formatNumberToLocalizedNumerals(reconciliationStatements.transactions.length)"
+                          v-if="reconciliationStatements && reconciliationStatements.transactions"></f7-list-item>
             <f7-list-item :title="tt('Total Inflows')" :after="displayTotalInflows"></f7-list-item>
             <f7-list-item :title="tt('Total Outflows')" :after="displayTotalOutflows"></f7-list-item>
             <f7-list-item :title="tt('Net Cash Flow')" :after="displayTotalBalance"></f7-list-item>
@@ -386,7 +386,7 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getAllDateRanges, formatUnixTimeToLongDateTime } = useI18n();
+const { tt, getAllDateRanges, formatUnixTimeToLongDateTime, formatNumberToLocalizedNumerals } = useI18n();
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
 const {

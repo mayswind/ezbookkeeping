@@ -118,7 +118,7 @@
                                                            density="comfortable" variant="text"
                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                            v-if="exchangeRate.currencyCode !== baseCurrency"
-                                                           @click="setAsBaseline(exchangeRate.currencyCode, getFinalConvertedAmount(exchangeRate))">
+                                                           @click="setAsBaseline(exchangeRate.currencyCode, getFinalConvertedAmount(exchangeRate, false))">
                                                         {{ tt('Set as Base') }}
                                                     </v-btn>
                                                     <v-btn class="px-2" color="default"
@@ -134,7 +134,7 @@
                                                         </template>
                                                         {{ tt('Delete') }}
                                                     </v-btn>
-                                                    <span class="ml-3">{{ getFinalConvertedAmount(exchangeRate) }}</span>
+                                                    <span class="ml-3">{{ getFinalConvertedAmount(exchangeRate, true) }}</span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -168,6 +168,8 @@ import { useExchangeRatesPageBase } from '@/views/base/ExchangeRatesPageBase.ts'
 
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
+import { NumeralSystem } from '@/core/numeral.ts';
+
 import type { LocalizedLatestExchangeRate } from '@/models/exchange_rate.ts';
 
 import logger from '@/lib/logger.ts';
@@ -184,7 +186,7 @@ type UpdateDialogType = InstanceType<typeof UpdateDialog>;
 
 const { mdAndUp } = useDisplay();
 
-const { tt, formatExchangeRateAmount } = useI18n();
+const { tt, getCurrentNumeralSystemType, formatExchangeRateAmountToWesternArabicNumerals } = useI18n();
 const {
     baseCurrency,
     baseAmount,
@@ -283,9 +285,15 @@ function remove(currency: string): void {
     });
 }
 
-function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate): string {
+function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate, displayLocalizedDigits: boolean): string {
+    const numeralSystem = getCurrentNumeralSystemType();
+
     if (!baseCurrency.value) {
-        return '0';
+        if (displayLocalizedDigits) {
+            return numeralSystem.digitZero;
+        } else {
+            return NumeralSystem.WesternArabicNumerals.digitZero;
+        }
     }
 
     const fromExchangeRate = exchangeRatesStore.latestExchangeRateMap[baseCurrency.value];
@@ -299,10 +307,20 @@ function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate): s
     }
 
     if (!exchangeRateAmount) {
-        return '0';
+        if (displayLocalizedDigits) {
+            return numeralSystem.digitZero;
+        } else {
+            return NumeralSystem.WesternArabicNumerals.digitZero;
+        }
     }
 
-    return formatExchangeRateAmount(exchangeRateAmount);
+    let ret = formatExchangeRateAmountToWesternArabicNumerals(exchangeRateAmount);
+
+    if (displayLocalizedDigits) {
+        ret = numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(ret);
+    }
+
+    return ret;
 }
 
 watch(mdAndUp, (newValue) => {

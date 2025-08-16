@@ -13,7 +13,7 @@
                 class="ebk-small-amount"
                 link="#" no-chevron
                 :header="amount1Header"
-                :title="formatAmountWithCurrency(amount1)"
+                :title="formatAmountToLocalizedNumeralsWithCurrency(amount1)"
                 @click="showAmount1Sheet = true"
             >
                 <number-pad-sheet :min-value="TRANSACTION_MIN_AMOUNT"
@@ -27,7 +27,7 @@
                 class="ebk-small-amount"
                 link="#" no-chevron
                 :header="amount2Header"
-                :title="formatAmountWithCurrency(amount2)"
+                :title="formatAmountToLocalizedNumeralsWithCurrency(amount2)"
                 @click="showAmount2Sheet = true"
                 v-if="amountCount === 2"
             >
@@ -76,7 +76,7 @@ const amount2 = ref<number>(0);
 const showAmount1Sheet = ref<boolean>(false);
 const showAmount2Sheet = ref<boolean>(false);
 
-const { tt, formatAmountWithCurrency } = useI18n();
+const { tt, formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
 const { showToast } = useI18nUIComponents();
 
 const transactionsStore = useTransactionsStore();

@@ -57,7 +57,7 @@
         <f7-list strong inset dividers class="margin-vertical" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
             <f7-list-item swipeout
                           :id="getExchangeRateDomId(exchangeRate)"
-                          :after="getFinalConvertedAmount(exchangeRate)"
+                          :after="getFinalConvertedAmount(exchangeRate, true)"
                           :key="baseCurrencyChangedTime + '_' + exchangeRate.currencyCode" v-for="exchangeRate in availableExchangeRates"
                           @swipeout:closed="onExchangeRateSwipeoutClosed()">
                 <template #title>
@@ -70,7 +70,7 @@
                     <f7-swipeout-button color="primary" close
                                         :text="tt('Set as Base')"
                                         :class="{ 'disabled': exchangeRate.currencyCode === baseCurrency }"
-                                        @click="setAsBaseline(exchangeRate.currencyCode, getFinalConvertedAmount(exchangeRate)); settingBaseLine = true"
+                                        @click="setAsBaseline(exchangeRate.currencyCode, getFinalConvertedAmount(exchangeRate, false)); settingBaseLine = true"
                                         v-if="settingBaseLine || exchangeRate.currencyCode !== baseCurrency"></f7-swipeout-button>
                     <f7-swipeout-button color="red" class="padding-left padding-right"
                                         @click="remove(exchangeRate, false)"
@@ -134,6 +134,7 @@ import { useExchangeRatesPageBase } from '@/views/base/ExchangeRatesPageBase.ts'
 
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
+import { NumeralSystem } from '@/core/numeral.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 
 import type { LocalizedLatestExchangeRate } from '@/models/exchange_rate.ts';
@@ -146,8 +147,16 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getCurrencyName, formatAmount, formatExchangeRateAmount } = useI18n();
+const {
+    tt,
+    getCurrentNumeralSystemType,
+    getCurrencyName,
+    formatAmountToLocalizedNumerals,
+    formatExchangeRateAmountToWesternArabicNumerals
+} = useI18n();
+
 const { showAlert, showToast } = useI18nUIComponents();
+
 const {
     baseCurrency,
     baseAmount,
@@ -171,7 +180,7 @@ const showBaseAmountSheet = ref<boolean>(false);
 const customExchangeRateToDelete = ref<LocalizedLatestExchangeRate | null>(null);
 const showDeleteActionSheet = ref<boolean>(false);
 
-const displayBaseAmount = computed<string>(() => formatAmount(baseAmount.value, baseCurrency.value));
+const displayBaseAmount = computed<string>(() => formatAmountToLocalizedNumerals(baseAmount.value, baseCurrency.value));
 const baseAmountFontSizeClass = computed<string>(() => {
     if (baseAmount.value >= 100000000 || baseAmount.value <= -100000000) {
         return 'ebk-small-amount';
@@ -260,15 +269,26 @@ function remove(customExchangeRate: LocalizedLatestExchangeRate | null, confirm:
     });
 }
 
-function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate): string {
+function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate, displayLocalizedDigits: boolean): string {
+    const numeralSystem = getCurrentNumeralSystemType();
     const fromExchangeRate = exchangeRatesStore.latestExchangeRateMap[baseCurrency.value];
     const exchangeRateAmount = getConvertedAmount(baseAmount.value / 100, fromExchangeRate, toExchangeRate);
 
     if (!exchangeRateAmount) {
-        return '0';
+        if (displayLocalizedDigits) {
+            return numeralSystem.digitZero;
+        } else {
+            return NumeralSystem.WesternArabicNumerals.digitZero;
+        }
     }
 
-    return formatExchangeRateAmount(exchangeRateAmount);
+    let ret = formatExchangeRateAmountToWesternArabicNumerals(exchangeRateAmount);
+
+    if (displayLocalizedDigits) {
+        ret = numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(ret);
+    }
+
+    return ret;
 }
 
 function onExchangeRateSwipeoutClosed(): void {

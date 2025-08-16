@@ -8,7 +8,7 @@ import { useOverviewStore } from '@/stores/overview.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { WeekDay } from '@/core/datetime.ts';
-import { type LocalizedDigitGroupingType, DigitGroupingSymbol } from '@/core/numeral.ts';
+import { type LocalizedDigitGroupingType, NumeralSystem, DecimalSeparator, DigitGroupingSymbol } from '@/core/numeral.ts';
 
 import { type UserBasicInfo, User } from '@/models/user.ts';
 import { type CategorizedAccount, Account} from '@/models/account.ts';
@@ -27,10 +27,11 @@ export function useUserProfilePageBase() {
         getAllLongTimeFormats,
         getAllShortTimeFormats,
         getAllFiscalYearFormats,
+        getAllCurrencyDisplayTypes,
+        getAllNumeralSystemTypes,
         getAllDecimalSeparators,
         getAllDigitGroupingSymbols,
         getAllDigitGroupingTypes,
-        getAllCurrencyDisplayTypes,
         getAllCoordinateDisplayTypes,
         getAllExpenseAmountColors,
         getAllIncomeAmountColors,
@@ -62,10 +63,11 @@ export function useUserProfilePageBase() {
     const allLongTimeFormats = computed<TypeAndDisplayName[]>(() => getAllLongTimeFormats());
     const allShortTimeFormats = computed<TypeAndDisplayName[]>(() => getAllShortTimeFormats());
     const allFiscalYearFormats = computed<TypeAndDisplayName[]>(() => getAllFiscalYearFormats());
+    const allCurrencyDisplayTypes = computed<TypeAndDisplayName[]>(() => getAllCurrencyDisplayTypes(NumeralSystem.valueOf(newProfile.value.numeralSystem) ?? NumeralSystem.Default, DecimalSeparator.valueOf(newProfile.value.decimalSeparator)?.symbol || DecimalSeparator.Default.symbol));
+    const allNumeralSystemTypes = computed<TypeAndDisplayName[]>(() => getAllNumeralSystemTypes());
     const allDecimalSeparators = computed<TypeAndDisplayName[]>(() => getAllDecimalSeparators());
     const allDigitGroupingSymbols = computed<TypeAndDisplayName[]>(() => getAllDigitGroupingSymbols());
-    const allDigitGroupingTypes = computed<LocalizedDigitGroupingType[]>(() => getAllDigitGroupingTypes(DigitGroupingSymbol.valueOf(newProfile.value.digitGroupingSymbol)?.symbol || DigitGroupingSymbol.Default.symbol));
-    const allCurrencyDisplayTypes = computed<TypeAndDisplayName[]>(() => getAllCurrencyDisplayTypes());
+    const allDigitGroupingTypes = computed<LocalizedDigitGroupingType[]>(() => getAllDigitGroupingTypes(NumeralSystem.valueOf(newProfile.value.numeralSystem) ?? NumeralSystem.Default, DigitGroupingSymbol.valueOf(newProfile.value.digitGroupingSymbol)?.symbol || DigitGroupingSymbol.Default.symbol));
     const allCoordinateDisplayTypes = computed<TypeAndDisplayName[]>(() => getAllCoordinateDisplayTypes());
     const allExpenseAmountColorTypes = computed<TypeAndDisplayName[]>(() => getAllExpenseAmountColors());
     const allIncomeAmountColorTypes = computed<TypeAndDisplayName[]>(() => getAllIncomeAmountColors());
@@ -108,10 +110,11 @@ export function useUserProfilePageBase() {
             newProfile.value.longTimeFormat === oldProfile.value.longTimeFormat &&
             newProfile.value.shortTimeFormat === oldProfile.value.shortTimeFormat &&
             newProfile.value.fiscalYearFormat === oldProfile.value.fiscalYearFormat &&
+            newProfile.value.currencyDisplayType === oldProfile.value.currencyDisplayType &&
+            newProfile.value.numeralSystem === oldProfile.value.numeralSystem &&
             newProfile.value.decimalSeparator === oldProfile.value.decimalSeparator &&
             newProfile.value.digitGroupingSymbol === oldProfile.value.digitGroupingSymbol &&
             newProfile.value.digitGrouping === oldProfile.value.digitGrouping &&
-            newProfile.value.currencyDisplayType === oldProfile.value.currencyDisplayType &&
             newProfile.value.coordinateDisplayType === oldProfile.value.coordinateDisplayType &&
             newProfile.value.expenseAmountColor === oldProfile.value.expenseAmountColor &&
             newProfile.value.incomeAmountColor === oldProfile.value.incomeAmountColor) {
@@ -199,10 +202,11 @@ export function useUserProfilePageBase() {
         allLongTimeFormats,
         allShortTimeFormats,
         allFiscalYearFormats,
+        allCurrencyDisplayTypes,
+        allNumeralSystemTypes,
         allDecimalSeparators,
         allDigitGroupingSymbols,
         allDigitGroupingTypes,
-        allCurrencyDisplayTypes,
         allCoordinateDisplayTypes,
         allExpenseAmountColorTypes,
         allIncomeAmountColorTypes,

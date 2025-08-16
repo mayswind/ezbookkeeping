@@ -28,7 +28,7 @@
                           :style="`top: ${virtualDataItems.topPosition}px`"
                           :virtual-list-index="item.index"
                           :title="item.displayDate"
-                          :after="formatAmountWithCurrency(item.closingBalance, account.currency)"
+                          :after="formatAmountToLocalizedNumeralsWithCurrency(item.closingBalance, account.currency)"
                           v-for="item in virtualDataItems.items"
             >
                 <template #media>
@@ -80,7 +80,7 @@ interface MobileAccountBalanceTrendsChartVirtualListData {
 
 const props = defineProps<MobileAccountBalanceTrendsChartProps>();
 
-const { tt, formatAmountWithCurrency } = useI18n();
+const { tt, formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
 const { allDataItems } = useAccountBalanceTrendsChartBase(props);
 
 const virtualDataItems = ref<MobileAccountBalanceTrendsChartVirtualListData>({

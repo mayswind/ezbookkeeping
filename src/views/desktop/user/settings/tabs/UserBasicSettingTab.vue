@@ -249,6 +249,19 @@
                                     item-value="type"
                                     persistent-placeholder
                                     :disabled="loading || saving"
+                                    :label="tt('Numeral System')"
+                                    :placeholder="tt('Numeral System')"
+                                    :items="allNumeralSystemTypes"
+                                    v-model="newProfile.numeralSystem"
+                                />
+                            </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :disabled="loading || saving"
                                     :label="tt('Digit Grouping')"
                                     :placeholder="tt('Digit Grouping')"
                                     :items="allDigitGroupingTypes"
@@ -401,10 +414,11 @@ const {
     allLongTimeFormats,
     allShortTimeFormats,
     allFiscalYearFormats,
+    allCurrencyDisplayTypes,
+    allNumeralSystemTypes,
     allDecimalSeparators,
     allDigitGroupingSymbols,
     allDigitGroupingTypes,
-    allCurrencyDisplayTypes,
     allCoordinateDisplayTypes,
     allExpenseAmountColorTypes,
     allIncomeAmountColorTypes,

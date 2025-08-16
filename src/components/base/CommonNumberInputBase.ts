@@ -2,6 +2,8 @@ import { ref } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import { NumeralSystem } from '@/core/numeral.ts';
+
 import { removeAll } from '@/lib/common.ts';
 import logger from '@/lib/logger.ts';
 
@@ -19,6 +21,7 @@ export type GetValidFormattedValueFunction = (value: number, textualValue: strin
 
 export function useCommonNumberInputBase(props: CommonNumberInputProps, maxDecimalCount: number, initValue: string, parseNumber: ParseNumberFunction, formatNumber: FormatNumberFunction, getValidFormattedValue: GetValidFormattedValueFunction) {
     const {
+        getCurrentNumeralSystemType,
         getCurrentDecimalSeparator,
         getCurrentDigitGroupingSymbol
     } = useI18n();
@@ -38,10 +41,11 @@ export function useCommonNumberInputBase(props: CommonNumberInputProps, maxDecim
             return;
         }
 
+        const numeralSystem = getCurrentNumeralSystemType();
         const digitGroupingSymbol = getCurrentDigitGroupingSymbol();
         const decimalSeparator = getCurrentDecimalSeparator();
 
-        if (!('0' <= e.key && e.key <= '9') && e.key !== '-' && e.key !== decimalSeparator) {
+        if (!NumeralSystem.WesternArabicNumerals.isDigit(e.key) && !numeralSystem.isDigit(e.key) && e.key !== '-' && e.key !== decimalSeparator) {
             e.preventDefault();
             return;
         }
@@ -86,7 +90,7 @@ export function useCommonNumberInputBase(props: CommonNumberInputProps, maxDecim
                 str = str.substring(1);
             }
 
-            str = (negative ? '-0' : '0') + str;
+            str = (negative ? `-${numeralSystem.digitZero}` : numeralSystem.digitZero) + str;
             target.value = str;
             currentValue.value = target.value;
             e.preventDefault();
@@ -98,14 +102,14 @@ export function useCommonNumberInputBase(props: CommonNumberInputProps, maxDecim
 
         if (decimalIndex >= 0) {
             decimalLength = str.length - str.indexOf(decimalSeparator) - 1;
-        } else if ((str.startsWith('0') && str.length >= 2) || (str.startsWith('-0') && str.length >= 3)) {
+        } else if ((str.startsWith(numeralSystem.digitZero) && str.length >= 2) || (str.startsWith(`-${numeralSystem.digitZero}`) && str.length >= 3)) {
             const negative = str.charAt(0) === '-';
 
             if (negative) {
                 str = str.substring(1);
             }
 
-            while (str.charAt(0) === '0' && (str.length >= 2 || e.key !== '0')) {
+            while (str.charAt(0) === numeralSystem.digitZero && (str.length >= 2 || e.key !== numeralSystem.digitZero)) {
                 str = str.substring(1);
             }
 
@@ -138,7 +142,7 @@ export function useCommonNumberInputBase(props: CommonNumberInputProps, maxDecim
             }
         } catch (ex) {
             logger.warn('cannot parse input number, original value is ' + str, ex);
-            target.value = '0';
+            target.value = numeralSystem.digitZero;
         }
     }
 

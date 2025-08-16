@@ -9,6 +9,7 @@ import { type TransactionStatisticsFilter, useStatisticsStore } from '@/stores/s
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { type LocalizedDateRange, type WeekDayValue, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { StatisticsAnalysisType, ChartDataType, ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
+import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
 import type { TransactionCategoricalAnalysisData, TransactionTrendsAnalysisData } from '@/models/transaction.ts';
 
 import { limitText, findNameByType, findDisplayNameByType } from '@/lib/common.ts';
@@ -23,7 +24,7 @@ export function useStatisticsTransactionPageBase() {
         formatUnixTimeToLongDateTime,
         formatUnixTimeToLongYearMonth,
         formatDateRange,
-        formatAmountWithCurrency
+        formatAmountToLocalizedNumeralsWithCurrency
     } = useI18n();
 
     const settingsStore = useSettingsStore();
@@ -200,13 +201,13 @@ export function useStatisticsTransactionPageBase() {
     const trendsAnalysisData = computed<TransactionTrendsAnalysisData | null>(() => statisticsStore.trendsAnalysisData);
 
     function getDisplayAmount(amount: number, currency: string, textLimit?: number): string {
-        const finalAmount = formatAmountWithCurrency(amount, currency);
+        const finalAmount = formatAmountToLocalizedNumeralsWithCurrency(amount, currency);
 
         if (!showAccountBalance.value
             && (query.value.chartDataType === ChartDataType.AccountTotalAssets.type
                 || query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type)
         ) {
-            return '***';
+            return DISPLAY_HIDDEN_AMOUNT;
         }
 
         if (textLimit) {

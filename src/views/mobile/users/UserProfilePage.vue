@@ -346,6 +346,26 @@
             <f7-list-item
                 link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
+                :header="tt('Numeral System')"
+                :title="findDisplayNameByType(allNumeralSystemTypes, newProfile.numeralSystem)"
+                @click="showNumberSystemPopup = true"
+            >
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Numeral System')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Numeral System')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allNumeralSystemTypes"
+                                           v-model:show="showNumberSystemPopup"
+                                           v-model="newProfile.numeralSystem">
+                </list-item-selection-popup>
+            </f7-list-item>
+
+            <f7-list-item
+                link="#"
+                class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Digit Grouping')"
                 :title="findDisplayNameByType(allDigitGroupingTypes, newProfile.digitGrouping)"
                 @click="showDigitGroupingPopup = true"
@@ -536,10 +556,11 @@ const {
     allLongTimeFormats,
     allShortTimeFormats,
     allFiscalYearFormats,
+    allCurrencyDisplayTypes,
+    allNumeralSystemTypes,
     allDecimalSeparators,
     allDigitGroupingSymbols,
     allDigitGroupingTypes,
-    allCurrencyDisplayTypes,
     allCoordinateDisplayTypes,
     allExpenseAmountColorTypes,
     allIncomeAmountColorTypes,
@@ -577,6 +598,7 @@ const showLongTimeFormatPopup = ref<boolean>(false);
 const showShortTimeFormatPopup = ref<boolean>(false);
 const showFiscalYearFormatPopup = ref<boolean>(false);
 const showCurrencyDisplayTypePopup = ref<boolean>(false);
+const showNumberSystemPopup = ref<boolean>(false);
 const showDigitGroupingPopup = ref<boolean>(false);
 const showDigitGroupingSymbolPopup = ref<boolean>(false);
 const showDecimalSeparatorPopup = ref<boolean>(false);

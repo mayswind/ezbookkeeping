@@ -238,7 +238,7 @@
                                                         <div class="d-flex flex-column ml-2">
                                                             <div class="d-flex">
                                                                 <span>{{ item.name }}</span>
-                                                                <small class="statistics-percent" v-if="item.percent >= 0">{{ formatPercent(item.percent, 2, '&lt;0.01') }}</small>
+                                                                <small class="statistics-percent" v-if="item.percent >= 0">{{ formatPercentToLocalizedNumerals(item.percent, 2, '&lt;0.01') }}</small>
                                                                 <v-spacer/>
                                                                 <span class="statistics-amount">{{ getDisplayAmount(item.totalAmount, defaultCurrency) }}</span>
                                                             </div>
@@ -375,9 +375,6 @@ import {
     arrayItemToObjectField
 } from '@/lib/common.ts';
 import {
-    formatAmount
-} from '@/lib/numeral.ts';
-import {
     getYearAndMonthFromUnixTime,
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
@@ -426,7 +423,14 @@ const props = defineProps<TransactionStatisticsProps>();
 const router = useRouter();
 const display = useDisplay();
 const theme = useTheme();
-const { tt, getAllCategoricalChartTypes, getAllTrendChartTypes, formatPercent } = useI18n();
+
+const {
+    tt,
+    getAllCategoricalChartTypes,
+    getAllTrendChartTypes,
+    formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
+    formatPercentToLocalizedNumerals
+} = useI18n();
 
 const {
     loading,
@@ -956,7 +960,7 @@ function exportResults(): void {
                 .filter(item => !item.hidden)
                 .map(item => [
                     item.name,
-                    formatAmount(item.totalAmount, {}),
+                    formatAmountToWesternArabicNumeralsWithoutDigitGrouping(item.totalAmount),
                     item.percent.toFixed(4)
                 ])
         });

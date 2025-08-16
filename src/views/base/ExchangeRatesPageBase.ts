@@ -14,7 +14,7 @@ import type {
 import { getExchangedAmountByRate } from '@/lib/numeral.ts';
 
 export function useExchangeRatesPageBase() {
-    const { getAllDisplayExchangeRates, formatUnixTimeToLongDate, parseAmount } = useI18n();
+    const { getAllDisplayExchangeRates, formatUnixTimeToLongDate, parseAmountFromWesternArabicNumerals } = useI18n();
 
     const userStore = useUserStore();
     const exchangeRatesStore = useExchangeRatesStore();
@@ -49,7 +49,7 @@ export function useExchangeRatesPageBase() {
 
     function setAsBaseline(currency: string, amount: string): void {
         baseCurrency.value = currency;
-        baseAmount.value = parseAmount(amount);
+        baseAmount.value = parseAmountFromWesternArabicNumerals(amount);
     }
 
     return {

@@ -1,11 +1,19 @@
 import type { TypeAndName, TypeAndDisplayName } from '@/core/base.ts';
 
+export type HiddenAmount = '***';
+
 export interface NumberFormatOptions {
-    readonly digitGrouping?: number;
-    readonly digitGroupingSymbol?: string;
+    readonly numeralSystem: NumeralSystem;
+    readonly digitGrouping: DigitGroupingType;
+    readonly digitGroupingSymbol: string;
+    readonly decimalSeparator: string;
     readonly decimalNumberCount?: number;
-    readonly decimalSeparator?: string;
     readonly trimTailZero?: boolean;
+}
+
+export interface NumberWithSuffix {
+    readonly value: number;
+    readonly suffix: string;
 }
 
 export interface NumeralSymbolType {
@@ -24,6 +32,163 @@ export interface LocalizedDigitGroupingType extends TypeAndDisplayName {
     readonly type: number;
     readonly enabled: boolean;
     readonly displayName: string;
+}
+
+export class NumeralSystem implements TypeAndName {
+    private static readonly allInstances: NumeralSystem[] = [];
+    private static readonly allInstancesByType: Record<number, NumeralSystem> = {};
+    private static readonly allInstancesByTypeName: Record<string, NumeralSystem> = {};
+    private static readonly allDigitsToWesternArabic: Record<string, number> = {};
+    private static readonly allDigitsToNumeralSystem: Record<string, NumeralSystem> = {};
+
+    public static readonly LanguageDefaultType: number = 0;
+    public static readonly WesternArabicNumerals = new NumeralSystem(1, 'WesternArabicNumerals', 'Western Arabic Numerals', '\u0030');
+    public static readonly EasternArabicNumerals = new NumeralSystem(2, 'EasternArabicNumerals', 'Eastern Arabic Numerals', '\u0660');
+    public static readonly PersianDigits = new NumeralSystem(3, 'PersianDigits', 'Persian Digits', '\u06F0');
+    public static readonly BurmeseNumerals = new NumeralSystem(4, 'BurmeseNumerals', 'Burmese Numerals', '\u1040');
+    public static readonly DevanagariNumerals = new NumeralSystem(5, 'DevanagariNumerals', 'Devanagari Numerals', '\u0966');
+
+    public static readonly Default = NumeralSystem.WesternArabicNumerals;
+
+    public readonly type: number;
+    public readonly typeName: string;
+    public readonly name: string;
+    public readonly digitZero: string;
+    public readonly doubleDigitZero: string;
+    public readonly textualAllDigits: string;
+    private readonly allDigits: string[];
+    private readonly digitsToWesternArabic: Record<string, number> = {};
+
+    private constructor(type: number, typeName: string, name: string, digitZero: string) {
+        this.type = type;
+        this.typeName = typeName;
+        this.name = name;
+        this.digitZero = digitZero;
+        this.doubleDigitZero = digitZero + digitZero;
+        this.allDigits = [];
+        this.digitsToWesternArabic = {};
+
+        for (let i = 0; i < 10; i++) {
+            const digit = String.fromCharCode(this.digitZero.charCodeAt(0) + i);
+            this.allDigits.push(digit);
+            this.digitsToWesternArabic[digit] = i;
+            NumeralSystem.allDigitsToWesternArabic[digit] = i;
+            NumeralSystem.allDigitsToNumeralSystem[digit] = this;
+        }
+
+        this.textualAllDigits = this.allDigits.join('');
+
+        NumeralSystem.allInstances.push(this);
+        NumeralSystem.allInstancesByType[type] = this;
+        NumeralSystem.allInstancesByTypeName[typeName] = this;
+    }
+
+    public getAllDigits(): string[] {
+        return this.allDigits.slice();
+    }
+
+    public isDigit(digit: string): boolean {
+        return this.digitsToWesternArabic.hasOwnProperty(digit);
+    }
+
+    public getLocalizedDigit(digit: number): string {
+        if (digit < 0 || digit > 9) {
+            return '';
+        }
+
+        return this.allDigits[digit];
+    }
+
+    public parseInt(value: string): number {
+        if (!value) {
+            return Number.NaN;
+        }
+
+        if (this.type === NumeralSystem.WesternArabicNumerals.type) {
+            return parseInt(value, 10);
+        } else {
+            const westernArabicValue = this.replaceLocalizedDigitsToWesternArabicDigits(value);
+            return parseInt(westernArabicValue, 10);
+        }
+    }
+
+    public formatNumber(value: number): string {
+        if (Number.isNaN(value) || !Number.isFinite(value)) {
+            return value.toString();
+        }
+
+        if (this.type === NumeralSystem.WesternArabicNumerals.type) {
+            return value.toString(10);
+        }
+
+        if (value === 0) {
+            return this.digitZero;
+        }
+
+        return this.replaceWesternArabicDigitsToLocalizedDigits(value.toString(10));
+    }
+
+    public replaceWesternArabicDigitsToLocalizedDigits(value: string): string {
+        if (!value) {
+            return '';
+        }
+
+        let result = '';
+
+        for (let i = 0; i < value.length; i++) {
+            const ch = value[i];
+
+            if (NumeralSystem.WesternArabicNumerals.isDigit(ch)) {
+                const digit = NumeralSystem.WesternArabicNumerals.digitsToWesternArabic[ch];
+                result += this.allDigits[digit];
+            } else {
+                result += ch;
+            }
+        }
+
+        return result;
+    }
+
+    public replaceLocalizedDigitsToWesternArabicDigits(value: string): string {
+        if (!value) {
+            return '';
+        }
+
+        let result = '';
+
+        for (let i = 0; i < value.length; i++) {
+            const ch = value[i];
+
+            if (this.isDigit(ch)) {
+                const digit = this.digitsToWesternArabic[ch];
+                result += NumeralSystem.WesternArabicNumerals.allDigits[digit];
+            } else {
+                result += ch;
+            }
+        }
+
+        return result;
+    }
+
+    public static values(): NumeralSystem[] {
+        return NumeralSystem.allInstances;
+    }
+
+    public static valueOf(type: number): NumeralSystem | undefined {
+        return NumeralSystem.allInstancesByType[type];
+    }
+
+    public static parse(typeName: string): NumeralSystem | undefined {
+        return NumeralSystem.allInstancesByTypeName[typeName];
+    }
+
+    public static detect(digit: string): NumeralSystem | undefined {
+        return NumeralSystem.allDigitsToNumeralSystem[digit];
+    }
+
+    public static toNumber(digit: string): number | undefined {
+        return NumeralSystem.allDigitsToWesternArabic[digit];
+    }
 }
 
 export class DecimalSeparator implements TypeAndName, NumeralSymbolType {

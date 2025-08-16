@@ -47,7 +47,7 @@ interface AccountBalanceTrendsChartDataItem {
 const props = defineProps<DesktopAccountBalanceTrendsChartProps>();
 
 const theme = useTheme();
-const { tt, formatAmountWithCurrency } = useI18n();
+const { tt, formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
 const { allDataItems, allDisplayDateRanges } = useAccountBalanceTrendsChartBase(props);
 
 const userStore = useUserStore();
@@ -129,8 +129,8 @@ const yAxisWidth = computed<number>(() => {
         }
     }
 
-    const maxValueText = formatAmountWithCurrency(maxValue, props.account.currency);
-    const minValueText = formatAmountWithCurrency(minValue, props.account.currency);
+    const maxValueText = formatAmountToLocalizedNumeralsWithCurrency(maxValue, props.account.currency);
+    const minValueText = formatAmountToLocalizedNumeralsWithCurrency(minValue, props.account.currency);
     const maxLengthText = maxValueText.length > minValueText.length ? maxValueText : minValueText;
 
     const canvas = document.createElement('canvas');
@@ -175,27 +175,27 @@ const chartOptions = computed<object>(() => {
                     const displayItems: NameValue[] = [
                         {
                             name: tt('Opening Balance'),
-                            value: formatAmountWithCurrency(dataItem.openingBalance, props.account.currency)
+                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.openingBalance, props.account.currency)
                         },
                         {
                             name: tt('Closing Balance'),
-                            value: formatAmountWithCurrency(dataItem.closingBalance, props.account.currency)
+                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.closingBalance, props.account.currency)
                         },
                         {
                             name: tt('Minimum Balance'),
-                            value: formatAmountWithCurrency(dataItem.minimumBalance, props.account.currency)
+                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.minimumBalance, props.account.currency)
                         },
                         {
                             name: tt('Maximum Balance'),
-                            value: formatAmountWithCurrency(dataItem.maximumBalance, props.account.currency)
+                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.maximumBalance, props.account.currency)
                         },
                         {
                             name: tt('Median Balance'),
-                            value: formatAmountWithCurrency(dataItem.medianBalance, props.account.currency)
+                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.medianBalance, props.account.currency)
                         },
                         {
                             name: tt('Average Balance'),
-                            value: formatAmountWithCurrency(dataItem.averageBalance, props.account.currency)
+                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.averageBalance, props.account.currency)
                         }
                     ];
 
@@ -210,7 +210,7 @@ const chartOptions = computed<object>(() => {
                     return tooltip;
                 } else {
                     const amount = params[0].data as number;
-                    const value = formatAmountWithCurrency(amount, props.account.currency);
+                    const value = formatAmountToLocalizedNumeralsWithCurrency(amount, props.account.currency);
 
                     return `${params[0].name}<br/>`
                         + '<div><span class="chart-pointer" style="background-color: #' + DEFAULT_CHART_COLORS[0] + '"></span>'
@@ -234,13 +234,13 @@ const chartOptions = computed<object>(() => {
                 type: 'value',
                 axisLabel: {
                     formatter: (value: string) => {
-                        return formatAmountWithCurrency(value, props.account.currency);
+                        return formatAmountToLocalizedNumeralsWithCurrency(parseInt(value), props.account.currency);
                     }
                 },
                 axisPointer: {
                     label: {
                         formatter: (params: CallbackDataParams) => {
-                            return formatAmountWithCurrency(Math.floor(params.value as number), props.account.currency);
+                            return formatAmountToLocalizedNumeralsWithCurrency(Math.floor(params.value as number), props.account.currency);
                         }
                     }
                 },

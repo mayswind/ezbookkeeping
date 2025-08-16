@@ -1,3 +1,4 @@
+import type { HiddenAmount, NumberWithSuffix } from '@/core/numeral.ts';
 import type { ColorValue } from '@/core/color.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import { PARENT_ACCOUNT_CURRENCY_PLACEHOLDER } from '@/consts/currency.ts';
@@ -638,7 +639,7 @@ export interface AccountBalance {
 }
 
 export interface AccountDisplayBalance {
-    readonly balance: string;
+    readonly balance: number | HiddenAmount | NumberWithSuffix;
     readonly currency: string;
 }
 

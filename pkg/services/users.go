@@ -313,6 +313,14 @@ func (s *UserService) UpdateUser(c core.Context, user *models.User, modifyUserLa
 		updateCols = append(updateCols, "fiscal_year_format")
 	}
 
+	if core.CURRENCY_DISPLAY_TYPE_DEFAULT <= user.CurrencyDisplayType && user.CurrencyDisplayType <= core.CURRENCY_DISPLAY_TYPE_NAME_AFTER_AMOUNT {
+		updateCols = append(updateCols, "currency_display_type")
+	}
+
+	if core.NUMERAL_SYSTEM_DEFAULT <= user.NumeralSystem && user.NumeralSystem <= core.NUMERAL_SYSTEM_DEVANAGARI_NUMERALS {
+		updateCols = append(updateCols, "numeral_system")
+	}
+
 	if core.DECIMAL_SEPARATOR_DEFAULT <= user.DecimalSeparator && user.DecimalSeparator <= core.DECIMAL_SEPARATOR_COMMA {
 		updateCols = append(updateCols, "decimal_separator")
 	}
@@ -323,10 +331,6 @@ func (s *UserService) UpdateUser(c core.Context, user *models.User, modifyUserLa
 
 	if core.DIGIT_GROUPING_TYPE_DEFAULT <= user.DigitGrouping && user.DigitGrouping <= core.DIGIT_GROUPING_TYPE_INDIAN_NUMBER_GROUPING {
 		updateCols = append(updateCols, "digit_grouping")
-	}
-
-	if core.CURRENCY_DISPLAY_TYPE_DEFAULT <= user.CurrencyDisplayType && user.CurrencyDisplayType <= core.CURRENCY_DISPLAY_TYPE_NAME_AFTER_AMOUNT {
-		updateCols = append(updateCols, "currency_display_type")
 	}
 
 	if core.COORDINATE_DISPLAY_TYPE_DEFAULT <= user.CoordinateDisplayType && user.CoordinateDisplayType <= core.COORDINATE_DISPLAY_TYPE_LONGITUDE_LATITUDE_DEGREES_MINUTES_SECONDS {

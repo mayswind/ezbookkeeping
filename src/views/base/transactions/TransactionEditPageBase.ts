@@ -10,6 +10,7 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
+import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
 import type { WeekDayValue } from '@/core/datetime.ts';
 import type { LocalizedTimezoneInfo } from '@/core/timezone.ts';
 import { TransactionType } from '@/core/transaction.ts';
@@ -59,7 +60,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         tt,
         getAllTimezones,
         getTimezoneDifferenceDisplayText,
-        formatAmountWithCurrency,
+        formatAmountToLocalizedNumeralsWithCurrency,
         getAdaptiveAmountRate,
         getCategorizedAccountsWithDisplayBalance
     } = useI18n();
@@ -360,12 +361,12 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         }
     }
 
-    function getDisplayAmount(amount: number | string, hideAmount: boolean, currencyCode: string): string {
+    function getDisplayAmount(amount: number, hideAmount: boolean, currencyCode: string): string {
         if (hideAmount) {
-            return formatAmountWithCurrency('***', currencyCode);
+            return formatAmountToLocalizedNumeralsWithCurrency(DISPLAY_HIDDEN_AMOUNT, currencyCode);
         }
 
-        return formatAmountWithCurrency(amount, currencyCode);
+        return formatAmountToLocalizedNumeralsWithCurrency(amount, currencyCode);
     }
 
     function getTransactionPictureUrl(pictureInfo?: TransactionPictureInfoBasicResponse | null): string | undefined {

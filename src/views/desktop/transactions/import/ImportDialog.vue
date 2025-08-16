@@ -824,7 +824,7 @@
                 <v-btn color="teal" :disabled="submitting || !!editingTransaction || selectedImportTransactionCount < 1 || selectedInvalidTransactionCount > 0"
                        :append-icon="!submitting ? mdiArrowRight : undefined" @click="submit"
                        v-if="currentStep === 'checkData'">
-                    {{ (submitting && importProcess > 0 ? tt('format.misc.importingTransactions', { process: formatNumber(importProcess, 2) }) : tt('Import')) }}
+                    {{ (submitting && importProcess > 0 ? tt('format.misc.importingTransactions', { process: formatNumberToLocalizedNumerals(importProcess, 2) }) : tt('Import')) }}
                     <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
                 <v-btn color="secondary" variant="tonal"
@@ -998,8 +998,8 @@ const {
     getAllImportTransactionColumnTypes,
     getAllSupportedImportFileTypes,
     formatUnixTimeToLongDateTime,
-    formatAmountWithCurrency,
-    formatNumber,
+    formatAmountToLocalizedNumeralsWithCurrency,
+    formatNumberToLocalizedNumerals,
     getCategorizedAccountsWithDisplayBalance
 } = useI18n();
 
@@ -1680,7 +1680,7 @@ function getDisplayTimezone(transaction: ImportTransaction): string {
 }
 
 function getDisplayCurrency(value: number, currencyCode: string): string {
-    return formatAmountWithCurrency(value, currencyCode);
+    return formatAmountToLocalizedNumeralsWithCurrency(value, currencyCode);
 }
 
 function getTransactionDisplayAmount(transaction: ImportTransaction): string {

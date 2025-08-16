@@ -26,6 +26,7 @@
         "shortDateFormat": "DDMMYYYY",
         "longTimeFormat": "HHMMSS",
         "shortTimeFormat": "HHMM",
+        "numeralSystem": "WesternArabicNumerals",
         "decimalSeparator": "Comma",
         "digitGroupingSymbol": "Space",
         "digitGrouping": "ThousandsSeparator",
@@ -260,6 +261,11 @@
         "Daily": "Daily"
     },
     "numeral": {
+        "Western Arabic Numerals": "Western Arabic Numerals",
+        "Eastern Arabic Numerals": "Eastern Arabic Numerals",
+        "Persian Digits": "Persian Digits",
+        "Burmese Numerals": "Burmese Numerals",
+        "Devanagari Numerals": "Devanagari Numerals",
         "Dot": "Точка",
         "Comma": "Запятая",
         "Space": "Пробел",
@@ -1497,6 +1503,7 @@
     "Long Time Format": "Длинный формат времени",
     "Short Time Format": "Короткий формат времени",
     "Fiscal Year Format": "Fiscal Year Format",
+    "Numeral System": "Numeral System",
     "Decimal Separator": "Разделитель десятичных",
     "Digit Grouping Symbol": "Символ группировки цифр",
     "Digit Grouping": "Группировка цифр",

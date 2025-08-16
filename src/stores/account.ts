@@ -6,8 +6,10 @@ import { useUserStore } from './user.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import type { BeforeResolveFunction } from '@/core/base.ts';
-
+import type { HiddenAmount, NumberWithSuffix } from '@/core/numeral.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
+import { DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
+
 import {
     type AccountNewDisplayOrderRequest,
     type AccountDisplayBalance,
@@ -486,9 +488,9 @@ export const useAccountsStore = defineStore('accounts', () => {
         return null;
     }
 
-    function getNetAssets(showAccountBalance: boolean): string {
+    function getNetAssets(showAccountBalance: boolean): number | HiddenAmount | NumberWithSuffix {
         if (!showAccountBalance) {
-            return '***';
+            return DISPLAY_HIDDEN_AMOUNT;
         }
 
         const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, account =>
@@ -513,15 +515,18 @@ export const useAccountsStore = defineStore('accounts', () => {
         }
 
         if (hasUnCalculatedAmount) {
-            return netAssets + '+';
+            return {
+                value: netAssets,
+                suffix: INCOMPLETE_AMOUNT_SUFFIX
+            };
         } else {
-            return netAssets.toString();
+            return netAssets;
         }
     }
 
-    function getTotalAssets(showAccountBalance: boolean): string {
+    function getTotalAssets(showAccountBalance: boolean): number | HiddenAmount | NumberWithSuffix {
         if (!showAccountBalance) {
-            return '***';
+            return DISPLAY_HIDDEN_AMOUNT;
         }
 
         const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, account =>
@@ -546,15 +551,18 @@ export const useAccountsStore = defineStore('accounts', () => {
         }
 
         if (hasUnCalculatedAmount) {
-            return totalAssets + '+';
+            return {
+                value: totalAssets,
+                suffix: INCOMPLETE_AMOUNT_SUFFIX
+            };
         } else {
-            return totalAssets.toString();
+            return totalAssets;
         }
     }
 
-    function getTotalLiabilities(showAccountBalance: boolean): string {
+    function getTotalLiabilities(showAccountBalance: boolean): number | HiddenAmount | NumberWithSuffix {
         if (!showAccountBalance) {
-            return '***';
+            return DISPLAY_HIDDEN_AMOUNT;
         }
 
         const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, account =>
@@ -579,15 +587,18 @@ export const useAccountsStore = defineStore('accounts', () => {
         }
 
         if (hasUnCalculatedAmount) {
-            return totalLiabilities + '+';
+            return {
+                value: totalLiabilities,
+                suffix: INCOMPLETE_AMOUNT_SUFFIX
+            };
         } else {
-            return totalLiabilities.toString();
+            return totalLiabilities;
         }
     }
 
-    function getAccountCategoryTotalBalance(showAccountBalance: boolean, accountCategory: AccountCategory): string {
+    function getAccountCategoryTotalBalance(showAccountBalance: boolean, accountCategory: AccountCategory): number | HiddenAmount | NumberWithSuffix {
         if (!showAccountBalance) {
-            return '***';
+            return DISPLAY_HIDDEN_AMOUNT;
         }
 
         const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, account => account.category === accountCategory.type);
@@ -622,27 +633,30 @@ export const useAccountsStore = defineStore('accounts', () => {
         }
 
         if (hasUnCalculatedAmount) {
-            return totalBalance + '+';
+            return {
+                value: totalBalance,
+                suffix: INCOMPLETE_AMOUNT_SUFFIX
+            };
         } else {
-            return totalBalance.toString();
+            return totalBalance;
         }
     }
 
-    function getAccountBalance(showAccountBalance: boolean, account: Account): string | null {
+    function getAccountBalance(showAccountBalance: boolean, account: Account): number | HiddenAmount | null {
         if (account.type !== AccountType.SingleAccount.type) {
             return null;
         }
 
         if (showAccountBalance) {
             if (account.isAsset) {
-                return account.balance.toString();
+                return account.balance;
             } else if (account.isLiability) {
-                return (-account.balance).toString();
+                return -account.balance;
             } else {
-                return account.balance.toString();
+                return account.balance;
             }
         } else {
-            return '***';
+            return DISPLAY_HIDDEN_AMOUNT;
         }
     }
 
@@ -655,7 +669,7 @@ export const useAccountsStore = defineStore('accounts', () => {
 
         if (!account.subAccounts || !account.subAccounts.length) {
             return {
-                balance: showAccountBalance ? '0' : '***',
+                balance: showAccountBalance ? 0 : DISPLAY_HIDDEN_AMOUNT,
                 currency: resultCurrency
             };
         }
@@ -679,7 +693,7 @@ export const useAccountsStore = defineStore('accounts', () => {
 
         if (allSubAccountCurrencies.length === 0) {
             return {
-                balance: showAccountBalance ? '0' : '***',
+                balance: showAccountBalance ? 0 : DISPLAY_HIDDEN_AMOUNT,
                 currency: resultCurrency
             };
         }
@@ -700,7 +714,7 @@ export const useAccountsStore = defineStore('accounts', () => {
             if (subAccountId) {
                 if (subAccountId === subAccount.id) {
                     return {
-                        balance: showAccountBalance ? getAccountBalance(showAccountBalance, subAccount) as string : '***',
+                        balance: showAccountBalance ? getAccountBalance(showAccountBalance, subAccount) as number : DISPLAY_HIDDEN_AMOUNT,
                         currency: subAccount.currency
                     };
                 }
@@ -736,14 +750,13 @@ export const useAccountsStore = defineStore('accounts', () => {
             return null;
         }
 
-        let displayTotalBalance = totalBalance.toString();
-
-        if (hasUnCalculatedAmount) {
-            displayTotalBalance += '+';
-        }
+        const displayTotalBalance: NumberWithSuffix = {
+            value: totalBalance,
+            suffix: hasUnCalculatedAmount ? INCOMPLETE_AMOUNT_SUFFIX : ''
+        };
 
         return {
-            balance: showAccountBalance ? displayTotalBalance : '***',
+            balance: showAccountBalance ? displayTotalBalance : DISPLAY_HIDDEN_AMOUNT,
             currency: resultCurrency
         };
     }

@@ -100,10 +100,11 @@ type User struct {
 	LongTimeFormat        core.LongTimeFormat        `xorm:"TINYINT"`
 	ShortTimeFormat       core.ShortTimeFormat       `xorm:"TINYINT"`
 	FiscalYearFormat      core.FiscalYearFormat      `xorm:"TINYINT"`
+	CurrencyDisplayType   core.CurrencyDisplayType   `xorm:"TINYINT"`
+	NumeralSystem         core.NumeralSystem         `xorm:"TINYINT"`
 	DecimalSeparator      core.DecimalSeparator      `xorm:"TINYINT"`
 	DigitGroupingSymbol   core.DigitGroupingSymbol   `xorm:"TINYINT"`
 	DigitGrouping         core.DigitGroupingType     `xorm:"TINYINT"`
-	CurrencyDisplayType   core.CurrencyDisplayType   `xorm:"TINYINT"`
 	CoordinateDisplayType core.CoordinateDisplayType `xorm:"TINYINT"`
 	ExpenseAmountColor    AmountColorType            `xorm:"TINYINT"`
 	IncomeAmountColor     AmountColorType            `xorm:"TINYINT"`
@@ -135,10 +136,11 @@ type UserBasicInfo struct {
 	LongTimeFormat        core.LongTimeFormat        `json:"longTimeFormat"`
 	ShortTimeFormat       core.ShortTimeFormat       `json:"shortTimeFormat"`
 	FiscalYearFormat      core.FiscalYearFormat      `json:"fiscalYearFormat"`
+	CurrencyDisplayType   core.CurrencyDisplayType   `json:"currencyDisplayType"`
+	NumeralSystem         core.NumeralSystem         `json:"numeralSystem"`
 	DecimalSeparator      core.DecimalSeparator      `json:"decimalSeparator"`
 	DigitGroupingSymbol   core.DigitGroupingSymbol   `json:"digitGroupingSymbol"`
 	DigitGrouping         core.DigitGroupingType     `json:"digitGrouping"`
-	CurrencyDisplayType   core.CurrencyDisplayType   `json:"currencyDisplayType"`
 	CoordinateDisplayType core.CoordinateDisplayType `json:"coordinateDisplayType"`
 	ExpenseAmountColor    AmountColorType            `json:"expenseAmountColor"`
 	IncomeAmountColor     AmountColorType            `json:"incomeAmountColor"`
@@ -198,10 +200,11 @@ type UserProfileUpdateRequest struct {
 	LongTimeFormat        *core.LongTimeFormat        `json:"longTimeFormat" binding:"omitempty,min=0,max=3"`
 	ShortTimeFormat       *core.ShortTimeFormat       `json:"shortTimeFormat" binding:"omitempty,min=0,max=3"`
 	FiscalYearFormat      *core.FiscalYearFormat      `json:"fiscalYearFormat" binding:"omitempty,min=0,max=5"`
+	CurrencyDisplayType   *core.CurrencyDisplayType   `json:"currencyDisplayType" binding:"omitempty,min=0,max=11"`
+	NumeralSystem         *core.NumeralSystem         `json:"numeralSystem" binding:"omitempty,min=0,max=5"`
 	DecimalSeparator      *core.DecimalSeparator      `json:"decimalSeparator" binding:"omitempty,min=0,max=3"`
 	DigitGroupingSymbol   *core.DigitGroupingSymbol   `json:"digitGroupingSymbol" binding:"omitempty,min=0,max=4"`
 	DigitGrouping         *core.DigitGroupingType     `json:"digitGrouping" binding:"omitempty,min=0,max=3"`
-	CurrencyDisplayType   *core.CurrencyDisplayType   `json:"currencyDisplayType" binding:"omitempty,min=0,max=11"`
 	CoordinateDisplayType *core.CoordinateDisplayType `json:"coordinateDisplayType" binding:"omitempty,min=0,max=6"`
 	ExpenseAmountColor    *AmountColorType            `json:"expenseAmountColor" binding:"omitempty,min=0,max=4"`
 	IncomeAmountColor     *AmountColorType            `json:"incomeAmountColor" binding:"omitempty,min=0,max=4"`
@@ -287,9 +290,10 @@ func (u *User) ToUserBasicInfo(avatarProvider core.UserAvatarProviderType, avata
 		ShortTimeFormat:       u.ShortTimeFormat,
 		DecimalSeparator:      u.DecimalSeparator,
 		FiscalYearFormat:      u.FiscalYearFormat,
+		CurrencyDisplayType:   u.CurrencyDisplayType,
+		NumeralSystem:         u.NumeralSystem,
 		DigitGroupingSymbol:   u.DigitGroupingSymbol,
 		DigitGrouping:         u.DigitGrouping,
-		CurrencyDisplayType:   u.CurrencyDisplayType,
 		CoordinateDisplayType: u.CoordinateDisplayType,
 		ExpenseAmountColor:    u.ExpenseAmountColor,
 		IncomeAmountColor:     u.IncomeAmountColor,

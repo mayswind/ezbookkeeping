@@ -556,8 +556,17 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getAllCurrencies, getCurrencyName, formatUnixTimeToLongDate, formatUnixTimeToLongTime, formatAmountWithCurrency } = useI18n();
+const {
+    tt,
+    getAllCurrencies,
+    getCurrencyName,
+    formatUnixTimeToLongDate,
+    formatUnixTimeToLongTime,
+    formatAmountToLocalizedNumeralsWithCurrency
+} = useI18n();
+
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
+
 const {
     editAccountId,
     clientSessionId,
@@ -604,7 +613,7 @@ const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies()
 
 function formatAccountDisplayBalance(selectedAccount: Account): string {
     const balance = account.value.isLiability ? -selectedAccount.balance : selectedAccount.balance;
-    return formatAmountWithCurrency(balance, selectedAccount.currency);
+    return formatAmountToLocalizedNumeralsWithCurrency(balance, selectedAccount.currency);
 }
 
 function formatAccountBalanceDate(account: Account): string {

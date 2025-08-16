@@ -26,6 +26,7 @@
         "shortDateFormat": "YYYYMMDD",
         "longTimeFormat": "AHHMMSS",
         "shortTimeFormat": "AHHMM",
+        "numeralSystem": "WesternArabicNumerals",
         "decimalSeparator": "Dot",
         "digitGroupingSymbol": "Comma",
         "digitGrouping": "ThousandsSeparator",
@@ -260,6 +261,11 @@
         "Daily": "依日期"
     },
     "numeral": {
+        "Western Arabic Numerals": "阿拉伯數字",
+        "Eastern Arabic Numerals": "東阿拉伯數字",
+        "Persian Digits": "波斯數字",
+        "Burmese Numerals": "緬甸數字",
+        "Devanagari Numerals": "天城文數字",
         "Dot": "句點",
         "Comma": "逗號",
         "Space": "空格",
@@ -1497,6 +1503,7 @@
     "Long Time Format": "長時間格式",
     "Short Time Format": "短時間格式",
     "Fiscal Year Format": "財政年度格式",
+    "Numeral System": "數字系統",
     "Decimal Separator": "小數點",
     "Digit Grouping Symbol": "數字分組符號",
     "Digit Grouping": "數字分組",

@@ -11,37 +11,37 @@
             </div>
             <div class="numpad-buttons">
                 <f7-button class="numpad-button numpad-button-num" @click="inputNum(7)">
-                    <span class="numpad-button-text numpad-button-text-normal">7</span>
+                    <span class="numpad-button-text numpad-button-text-normal">{{ digits[7] }}</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-num" @click="inputNum(8)">
-                    <span class="numpad-button-text numpad-button-text-normal">8</span>
+                    <span class="numpad-button-text numpad-button-text-normal">{{ digits[8] }}</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-num" @click="inputNum(9)">
-                    <span class="numpad-button-text numpad-button-text-normal">9</span>
+                    <span class="numpad-button-text numpad-button-text-normal">{{ digits[9] }}</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-function no-right-border" @click="setSymbol('×')">
                     <span class="numpad-button-text numpad-button-text-normal">&times;</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-num" @click="inputNum(4)">
-                    <span class="numpad-button-text numpad-button-text-normal">4</span>
+                    <span class="numpad-button-text numpad-button-text-normal">{{ digits[4] }}</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-num" @click="inputNum(5)">
-                    <span class="numpad-button-text numpad-button-text-normal">5</span>
+                    <span class="numpad-button-text numpad-button-text-normal">{{ digits[5] }}</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-num" @click="inputNum(6)">
-                    <span class="numpad-button-text numpad-button-text-normal">6</span>
+                    <span class="numpad-button-text numpad-button-text-normal">{{ digits[6] }}</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-function no-right-border" @click="setSymbol('−')">
                     <span class="numpad-button-text numpad-button-text-normal">&minus;</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-num" @click="inputNum(1)">
-                    <span class="numpad-button-text numpad-button-text-normal">1</span>
+                    <span class="numpad-button-text numpad-button-text-normal">{{ digits[1] }}</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-num" @click="inputNum(2)">
-                    <span class="numpad-button-text numpad-button-text-normal">2</span>
+                    <span class="numpad-button-text numpad-button-text-normal">{{ digits[2] }}</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-num" @click="inputNum(3)">
-                    <span class="numpad-button-text numpad-button-text-normal">3</span>
+                    <span class="numpad-button-text numpad-button-text-normal">{{ digits[3] }}</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-function no-right-border" @click="setSymbol('+')">
                     <span class="numpad-button-text numpad-button-text-normal">&plus;</span>
@@ -50,10 +50,10 @@
                     <span class="numpad-button-text numpad-button-text-normal">{{ decimalSeparator }}</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-num" v-if="!supportDecimalSeparator" @click="inputDoubleNum(0)">
-                    <span class="numpad-button-text numpad-button-text-normal">00</span>
+                    <span class="numpad-button-text numpad-button-text-normal">{{ digits[0] + digits[0] }}</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-num" @click="inputNum(0)">
-                    <span class="numpad-button-text numpad-button-text-normal">0</span>
+                    <span class="numpad-button-text numpad-button-text-normal">{{ digits[0] }}</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-num" @click="backspace" @taphold="clear()">
                 <span class="numpad-button-text numpad-button-text-normal">
@@ -74,8 +74,9 @@ import { ref, computed, watch } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
 
+import { NumeralSystem } from '@/core/numeral.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
-import { isString, isNumber, removeAll } from '@/lib/common.ts';
+import { isNumber } from '@/lib/common.ts';
 
 const props = defineProps<{
     modelValue: number;
@@ -94,11 +95,12 @@ const emit = defineEmits<{
 
 const {
     tt,
+    getAllLocalizedDigits,
+    getCurrentNumeralSystemType,
     getCurrentDecimalSeparator,
-    getCurrentDigitGroupingSymbol,
-    appendDigitGroupingSymbol,
-    parseAmount,
-    formatAmount
+    parseAmountFromWesternArabicNumerals,
+    formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
+    appendDigitGroupingSymbolAndDecimalSeparator
 } = useI18n();
 const { showToast } = useI18nUIComponents();
 
@@ -106,6 +108,7 @@ const previousValue = ref<string>('');
 const currentSymbol = ref<string>('');
 const currentValue = ref<string>(getInitedStringValue(props.modelValue, props.flipNegative));
 
+const digits = computed<string[]>(() => getAllLocalizedDigits());
 const decimalSeparator = computed<string>(() => getCurrentDecimalSeparator());
 
 const supportDecimalSeparator = computed<boolean>(() => {
@@ -117,8 +120,21 @@ const supportDecimalSeparator = computed<boolean>(() => {
 });
 
 const currentDisplay = computed<string>(() => {
-    const finalPreviousValue = appendDigitGroupingSymbol(previousValue.value);
-    const finalCurrentValue = appendDigitGroupingSymbol(currentValue.value);
+    const numeralSystem = getCurrentNumeralSystemType();
+    const finalPreviousValue = appendDigitGroupingSymbolAndDecimalSeparator(numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(previousValue.value));
+    let finalCurrentValue = currentValue.value;
+    let currentValueSuffix = '';
+
+    if (finalCurrentValue && finalCurrentValue[finalCurrentValue.length - 1] === decimalSeparator.value) {
+        finalCurrentValue = finalCurrentValue.substring(0, finalCurrentValue.length - 1);
+        currentValueSuffix = decimalSeparator.value;
+    }
+
+    finalCurrentValue = appendDigitGroupingSymbolAndDecimalSeparator(numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(finalCurrentValue));
+
+    if (currentValueSuffix) {
+        finalCurrentValue += currentValueSuffix;
+    }
 
     if (currentSymbol.value) {
         return `${finalPreviousValue} ${currentSymbol.value} ${finalCurrentValue}`;
@@ -150,45 +166,39 @@ function getInitedStringValue(value: number, flipNegative?: boolean): string {
         value = -value;
     }
 
-    return getStringValue(value);
+    return getStringValue(value, true);
 }
 
-function getStringValue(value: number | string): string {
-    if (!isNumber(value) && !isString(value)) {
+function getStringValue(value: number, hideZero: boolean): string {
+    if (!isNumber(value)) {
         return '';
     }
 
-    let str = formatAmount(value, props.currency);
-
-    const digitGroupingSymbol = getCurrentDigitGroupingSymbol();
-
-    if (str.indexOf(digitGroupingSymbol) >= 0) {
-        str = removeAll(str, digitGroupingSymbol);
-    }
+    const textualNumber = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(value, props.currency);
 
     const decimalSeparator = getCurrentDecimalSeparator();
-    const decimalSeparatorPos = str.indexOf(decimalSeparator);
+    const decimalSeparatorPos = textualNumber.indexOf(decimalSeparator);
 
     if (decimalSeparatorPos < 0) {
-        if (str === '0') {
+        if (hideZero && textualNumber === NumeralSystem.WesternArabicNumerals.digitZero) {
             return '';
         }
 
-        return str;
+        return textualNumber;
     }
 
-    const integer = str.substring(0, decimalSeparatorPos);
-    const decimals = str.substring(decimalSeparatorPos + 1, str.length);
+    const integer = textualNumber.substring(0, decimalSeparatorPos);
+    const decimals = textualNumber.substring(decimalSeparatorPos + 1, textualNumber.length);
     let newDecimals = '';
 
     for (let i = decimals.length - 1; i >= 0; i--) {
-        if (decimals[i] !== '0' || newDecimals.length > 0) {
+        if (decimals[i] !== NumeralSystem.WesternArabicNumerals.digitZero || newDecimals.length > 0) {
             newDecimals = decimals[i] + newDecimals;
         }
     }
 
     if (newDecimals.length < 1) {
-        if (integer === '0') {
+        if (hideZero && integer === NumeralSystem.WesternArabicNumerals.digitZero) {
             return '';
         }
 
@@ -204,10 +214,10 @@ function inputNum(num: number): void {
         currentSymbol.value = '';
     }
 
-    if (currentValue.value === '0') {
+    if (currentValue.value === NumeralSystem.WesternArabicNumerals.digitZero) {
         currentValue.value = num.toString();
         return;
-    } else if (currentValue.value === '-0') {
+    } else if (currentValue.value === `-${NumeralSystem.WesternArabicNumerals.digitZero}`) {
         currentValue.value = '-' + num.toString();
         return;
     }
@@ -221,7 +231,7 @@ function inputNum(num: number): void {
     const newValue = currentValue.value + num.toString();
 
     if (isNumber(props.minValue)) {
-        const current = parseAmount(newValue);
+        const current = parseAmountFromWesternArabicNumerals(newValue);
 
         if (current < (props.minValue)) {
             return;
@@ -229,7 +239,7 @@ function inputNum(num: number): void {
     }
 
     if (isNumber(props.maxValue)) {
-        const current = parseAmount(newValue);
+        const current = parseAmountFromWesternArabicNumerals(newValue);
 
         if (current > (props.maxValue)) {
             return;
@@ -255,9 +265,9 @@ function inputDecimalSeparator(): void {
     }
 
     if (currentValue.value.length < 1) {
-        currentValue.value = '0';
+        currentValue.value = NumeralSystem.WesternArabicNumerals.digitZero;
     } else if (currentValue.value === '-') {
-        currentValue.value = '-0';
+        currentValue.value = '-' + NumeralSystem.WesternArabicNumerals.digitZero;
     }
 
     currentValue.value = currentValue.value + decimalSeparator.value;
@@ -302,8 +312,8 @@ function clear(): void {
 
 function confirm(): boolean {
     if (currentSymbol.value && currentValue.value.length >= 1) {
-        const previous = parseAmount(previousValue.value);
-        const current = parseAmount(currentValue.value);
+        const previous = parseAmountFromWesternArabicNumerals(previousValue.value);
+        const current = parseAmountFromWesternArabicNumerals(currentValue.value);
         let finalValue = 0;
 
         switch (currentSymbol.value) {
@@ -334,7 +344,7 @@ function confirm(): boolean {
             }
         }
 
-        currentValue.value = getStringValue(finalValue);
+        currentValue.value = getStringValue(finalValue, false);
         previousValue.value = '';
         currentSymbol.value = '';
 
@@ -346,7 +356,7 @@ function confirm(): boolean {
 
         return true;
     } else {
-        let value: number = parseAmount(currentValue.value);
+        let value: number = parseAmountFromWesternArabicNumerals(currentValue.value);
 
         if (props.flipNegative) {
             value = -value;

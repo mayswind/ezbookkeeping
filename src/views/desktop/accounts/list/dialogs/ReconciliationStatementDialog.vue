@@ -202,7 +202,7 @@
                             <v-skeleton-loader class="skeleton-no-margin ml-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                         </span>
                         <span class="ml-2" v-else-if="!loading">
-                            {{ reconciliationStatements?.transactions.length ?? 0 }}
+                            {{ formatNumberToLocalizedNumerals(reconciliationStatements?.transactions.length ?? 0) }}
                         </span>
                         <v-spacer/>
                         <span v-if="reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length > 10">
@@ -319,7 +319,7 @@ const emit = defineEmits<{
     (e: 'error', message: string): void;
 }>();
 
-const { tt } = useI18n();
+const { tt, formatNumberToLocalizedNumerals } = useI18n();
 
 const {
     accountId,

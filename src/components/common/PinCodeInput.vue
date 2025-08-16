@@ -21,6 +21,10 @@
 <script setup lang="ts">
 import { ref, computed, watch, useTemplateRef } from 'vue';
 
+import { useI18n } from '@/locales/helpers.ts';
+
+import { NumeralSystem } from '@/core/numeral.ts';
+
 interface PinCode {
     value: string;
     inputType: string;
@@ -41,6 +45,8 @@ const emit = defineEmits<{
     (e: 'update:modelValue', value: string): void;
     (e: 'pincode:confirm', value: string): void;
 }>();
+
+const { getCurrentNumeralSystemType } = useI18n();
 
 const codes = ref<PinCode[]>([]);
 const pinCodeInputs = useTemplateRef<HTMLInputElement[]>('pin-code-input');
@@ -148,6 +154,8 @@ function setNextFocus(index: number): void {
 }
 
 function onKeydown(index: number, event: KeyboardEvent): void {
+    const numeralSystem = getCurrentNumeralSystemType();
+
     if (event.altKey || (event.key.indexOf('F') === 0 && (event.key.length === 2 || event.key.length === 3))) {
         return;
     }
@@ -208,13 +216,23 @@ function onKeydown(index: number, event: KeyboardEvent): void {
         return;
     }
 
-    if (event.key.length === 1 && '0' <= event.key && event.key <= '9') {
-        codes.value[index].value = event.key;
-        setInputType(index);
-        setNextFocus(index);
+    if (event.key.length === 1) {
+        let digit = '';
 
-        if (props.autoConfirm && finalPinCode.value.length === props.length) {
-            emit('pincode:confirm', finalPinCode.value);
+        if (NumeralSystem.WesternArabicNumerals.isDigit(event.key)) {
+            digit = event.key;
+        } else if (numeralSystem.isDigit(event.key)) {
+            digit = numeralSystem.replaceLocalizedDigitsToWesternArabicDigits(event.key);
+        }
+
+        if (digit) {
+            codes.value[index].value = digit;
+            setInputType(index);
+            setNextFocus(index);
+
+            if (props.autoConfirm && finalPinCode.value.length === props.length) {
+                emit('pincode:confirm', finalPinCode.value);
+            }
         }
     }
 

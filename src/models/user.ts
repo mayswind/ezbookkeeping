@@ -1,5 +1,5 @@
 import { LongDateFormat, ShortDateFormat, LongTimeFormat, ShortTimeFormat } from '@/core/datetime.ts';
-import { DecimalSeparator, DigitGroupingSymbol, DigitGroupingType } from '@/core/numeral.ts';
+import { NumeralSystem, DecimalSeparator, DigitGroupingSymbol, DigitGroupingType } from '@/core/numeral.ts';
 import { CurrencyDisplayType } from '@/core/currency.ts';
 import { CoordinateDisplayType } from '@/core/coordinate.ts';
 import { PresetAmountColor } from '@/core/color.ts';
@@ -25,10 +25,11 @@ export class User {
     public longTimeFormat: number = EMPTY_USER_BASIC_INFO.longTimeFormat;
     public shortTimeFormat: number = EMPTY_USER_BASIC_INFO.shortTimeFormat;
     public fiscalYearFormat: number = EMPTY_USER_BASIC_INFO.fiscalYearFormat;
+    public currencyDisplayType: number = EMPTY_USER_BASIC_INFO.currencyDisplayType;
+    public numeralSystem: number = EMPTY_USER_BASIC_INFO.numeralSystem;
     public decimalSeparator: number = EMPTY_USER_BASIC_INFO.decimalSeparator;
     public digitGroupingSymbol: number = EMPTY_USER_BASIC_INFO.digitGroupingSymbol;
     public digitGrouping: number = EMPTY_USER_BASIC_INFO.digitGrouping;
-    public currencyDisplayType: number = EMPTY_USER_BASIC_INFO.currencyDisplayType;
     public coordinateDisplayType: number = EMPTY_USER_BASIC_INFO.coordinateDisplayType;
     public expenseAmountColor: number = EMPTY_USER_BASIC_INFO.expenseAmountColor;
     public incomeAmountColor: number = EMPTY_USER_BASIC_INFO.incomeAmountColor;
@@ -54,10 +55,11 @@ export class User {
         this.longTimeFormat = user.longTimeFormat;
         this.shortTimeFormat = user.shortTimeFormat;
         this.fiscalYearFormat = user.fiscalYearFormat;
+        this.currencyDisplayType = user.currencyDisplayType;
+        this.numeralSystem = user.numeralSystem;
         this.decimalSeparator = user.decimalSeparator;
         this.digitGroupingSymbol = user.digitGroupingSymbol;
         this.digitGrouping = user.digitGrouping;
-        this.currencyDisplayType = user.currencyDisplayType;
         this.coordinateDisplayType = user.coordinateDisplayType;
         this.expenseAmountColor = user.expenseAmountColor;
         this.incomeAmountColor = user.incomeAmountColor;
@@ -93,10 +95,11 @@ export class User {
             longTimeFormat: this.longTimeFormat,
             shortTimeFormat: this.shortTimeFormat,
             fiscalYearFormat: this.fiscalYearFormat,
+            currencyDisplayType: this.currencyDisplayType,
+            numeralSystem: this.numeralSystem,
             decimalSeparator: this.decimalSeparator,
             digitGroupingSymbol: this.digitGroupingSymbol,
             digitGrouping: this.digitGrouping,
-            currencyDisplayType: this.currencyDisplayType,
             coordinateDisplayType: this.coordinateDisplayType,
             expenseAmountColor: this.expenseAmountColor,
             incomeAmountColor: this.incomeAmountColor
@@ -113,10 +116,11 @@ export class User {
         user.longTimeFormat = userInfo.longTimeFormat;
         user.shortTimeFormat = userInfo.shortTimeFormat;
         user.fiscalYearFormat = userInfo.fiscalYearFormat;
+        user.currencyDisplayType = userInfo.currencyDisplayType;
+        user.numeralSystem = userInfo.numeralSystem;
         user.decimalSeparator = userInfo.decimalSeparator;
         user.digitGroupingSymbol = userInfo.digitGroupingSymbol;
         user.digitGrouping = userInfo.digitGrouping;
-        user.currencyDisplayType = userInfo.currencyDisplayType;
         user.coordinateDisplayType = userInfo.coordinateDisplayType;
         user.expenseAmountColor = userInfo.expenseAmountColor;
         user.incomeAmountColor = userInfo.incomeAmountColor;
@@ -146,10 +150,11 @@ export interface UserBasicInfo {
     readonly longTimeFormat: number;
     readonly shortTimeFormat: number;
     readonly fiscalYearFormat: number;
+    readonly currencyDisplayType: number;
+    readonly numeralSystem: number;
     readonly decimalSeparator: number;
     readonly digitGroupingSymbol: number;
     readonly digitGrouping: number;
-    readonly currencyDisplayType: number;
     readonly coordinateDisplayType: number;
     readonly expenseAmountColor: number;
     readonly incomeAmountColor: number;
@@ -199,10 +204,11 @@ export interface UserProfileUpdateRequest {
     readonly longTimeFormat?: number;
     readonly shortTimeFormat?: number;
     readonly fiscalYearFormat?: number;
+    readonly currencyDisplayType?: number;
+    readonly numeralSystem?: number;
     readonly decimalSeparator?: number;
     readonly digitGroupingSymbol?: number;
     readonly digitGrouping?: number;
-    readonly currencyDisplayType?: number;
     readonly coordinateDisplayType?: number;
     readonly expenseAmountColor?: number;
     readonly incomeAmountColor?: number;
@@ -234,10 +240,11 @@ export const EMPTY_USER_BASIC_INFO: UserBasicInfo = {
     longTimeFormat: LongTimeFormat.Default.type,
     shortTimeFormat: ShortTimeFormat.Default.type,
     fiscalYearFormat: FiscalYearFormat.Default.type,
+    currencyDisplayType: CurrencyDisplayType.Default.type,
+    numeralSystem: NumeralSystem.Default.type,
     decimalSeparator: DecimalSeparator.LanguageDefaultType,
     digitGroupingSymbol: DigitGroupingSymbol.LanguageDefaultType,
     digitGrouping: DigitGroupingType.LanguageDefaultType,
-    currencyDisplayType: CurrencyDisplayType.Default.type,
     coordinateDisplayType: CoordinateDisplayType.Default.type,
     expenseAmountColor: PresetAmountColor.DefaultExpenseColor.type,
     incomeAmountColor: PresetAmountColor.DefaultIncomeColor.type,

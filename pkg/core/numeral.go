@@ -4,6 +4,40 @@ import (
 	"fmt"
 )
 
+// NumeralSystem represents the type of numeral system
+type NumeralSystem byte
+
+// Numeral System
+const (
+	NUMERAL_SYSTEM_DEFAULT                 NumeralSystem = 0
+	NUMERAL_SYSTEM_WESTERN_ARABIC_NUMERALS NumeralSystem = 1
+	NUMERAL_SYSTEM_EASTERN_ARABIC_NUMERALS NumeralSystem = 2
+	NUMERAL_SYSTEM_PERSIAN_DIGITS          NumeralSystem = 3
+	NUMERAL_SYSTEM_BURMESE_NUMERALS        NumeralSystem = 4
+	NUMERAL_SYSTEM_DEVANAGARI_NUMERALS     NumeralSystem = 5
+	NUMERAL_SYSTEM_INVALID                 NumeralSystem = 255
+)
+
+// String returns a textual representation of the decimal separator enum
+func (f NumeralSystem) String() string {
+	switch f {
+	case NUMERAL_SYSTEM_DEFAULT:
+		return "Default"
+	case NUMERAL_SYSTEM_WESTERN_ARABIC_NUMERALS:
+		return "Western Arabic Numerals"
+	case NUMERAL_SYSTEM_EASTERN_ARABIC_NUMERALS:
+		return "Eastern Arabic Numerals"
+	case NUMERAL_SYSTEM_PERSIAN_DIGITS:
+		return "Persian Digits"
+	case NUMERAL_SYSTEM_BURMESE_NUMERALS:
+		return "Burmese Numerals"
+	case NUMERAL_SYSTEM_DEVANAGARI_NUMERALS:
+		return "Devanagari Numerals"
+	default:
+		return fmt.Sprintf("Invalid(%d)", int(f))
+	}
+}
+
 // DecimalSeparator represents the type of decimal separator
 type DecimalSeparator byte
 

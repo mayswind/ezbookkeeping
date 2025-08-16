@@ -171,7 +171,7 @@
                         <template #title>
                             <div class="statistics-list-item-text">
                                 <span>{{ item.name }}</span>
-                                <small class="statistics-percent" v-if="item.percent >= 0">{{ formatPercent(item.percent, 2, '&lt;0.01') }}</small>
+                                <small class="statistics-percent" v-if="item.percent >= 0">{{ formatPercentToLocalizedNumerals(item.percent, 2, '&lt;0.01') }}</small>
                             </div>
                         </template>
 
@@ -367,7 +367,7 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getAllCategoricalChartTypes, formatPercent } = useI18n();
+const { tt, getAllCategoricalChartTypes, formatPercentToLocalizedNumerals } = useI18n();
 const { showPrompt, showToast, routeBackOnError } = useI18nUIComponents();
 
 const {

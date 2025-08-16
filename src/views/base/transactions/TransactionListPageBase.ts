@@ -13,6 +13,7 @@ import type { TypeAndName } from '@/core/base.ts';
 import { type LocalizedDateRange, type WeekDayValue, DateRange, DateRangeScene } from '@/core/datetime.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
+import { DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
 
 import type { Account } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
@@ -84,7 +85,7 @@ export function useTransactionListPageBase() {
         formatUnixTimeToLongYearMonth,
         formatUnixTimeToShortTime,
         formatDateRange,
-        formatAmountWithCurrency
+        formatAmountToLocalizedNumeralsWithCurrency
     } = useI18n();
 
     const settingsStore = useSettingsStore();
@@ -231,7 +232,7 @@ export function useTransactionListPageBase() {
         const displayAmount: string[] = [];
 
         for (let i = 1; i < amountFilterItems.length; i++) {
-            displayAmount.push(formatAmountWithCurrency(amountFilterItems[i], false));
+            displayAmount.push(formatAmountToLocalizedNumeralsWithCurrency(parseInt(amountFilterItems[i]), false));
         }
 
         return displayAmount.join(' ~ ');
@@ -279,10 +280,10 @@ export function useTransactionListPageBase() {
 
     function formatAmount(amount: number, hideAmount: boolean, currencyCode: string): string {
         if (hideAmount) {
-            return formatAmountWithCurrency('***', currencyCode);
+            return formatAmountToLocalizedNumeralsWithCurrency(DISPLAY_HIDDEN_AMOUNT, currencyCode);
         }
 
-        return formatAmountWithCurrency(amount, currencyCode);
+        return formatAmountToLocalizedNumeralsWithCurrency(amount, currencyCode);
     }
 
     function getDisplayTime(transaction: Transaction): string {
@@ -337,8 +338,8 @@ export function useTransactionListPageBase() {
     }
 
     function getDisplayMonthTotalAmount(amount: number, currency: string | false, symbol: string, incomplete: boolean): string {
-        const displayAmount = formatAmountWithCurrency(amount, currency);
-        return symbol + displayAmount + (incomplete ? '+' : '');
+        const displayAmount = formatAmountToLocalizedNumeralsWithCurrency(amount, currency);
+        return symbol + displayAmount + (incomplete ? INCOMPLETE_AMOUNT_SUFFIX : '');
     }
 
     function getTransactionTypeName(type: number | null, defaultName: string): string {

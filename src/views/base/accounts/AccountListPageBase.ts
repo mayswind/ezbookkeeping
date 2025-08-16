@@ -6,14 +6,15 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 
+import type { HiddenAmount, NumberWithSuffix } from '@/core/numeral.ts';
 import type { WeekDayValue } from '@/core/datetime.ts';
 import { type AccountCategory, AccountType } from '@/core/account.ts';
 import type { Account, CategorizedAccount } from '@/models/account.ts';
 
-import { isObject, isString } from '@/lib/common.ts';
+import { isObject, isNumber, isString } from '@/lib/common.ts';
 
 export function useAccountListPageBaseBase() {
-    const { formatAmountWithCurrency } = useI18n();
+    const { formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
 
     const settingsStore = useSettingsStore();
     const userStore = useUserStore();
@@ -37,18 +38,18 @@ export function useAccountListPageBaseBase() {
     const allAccountCount = computed<number>(() => accountsStore.allAvailableAccountsCount);
 
     const netAssets = computed<string>(() => {
-        const netAssets = accountsStore.getNetAssets(showAccountBalance.value);
-        return formatAmountWithCurrency(netAssets, defaultCurrency.value);
+        const netAssets: number | HiddenAmount | NumberWithSuffix = accountsStore.getNetAssets(showAccountBalance.value);
+        return formatAmountToLocalizedNumeralsWithCurrency(netAssets, defaultCurrency.value);
     });
 
     const totalAssets = computed<string>(() => {
-        const totalAssets = accountsStore.getTotalAssets(showAccountBalance.value);
-        return formatAmountWithCurrency(totalAssets, defaultCurrency.value);
+        const totalAssets: number | HiddenAmount | NumberWithSuffix = accountsStore.getTotalAssets(showAccountBalance.value);
+        return formatAmountToLocalizedNumeralsWithCurrency(totalAssets, defaultCurrency.value);
     });
 
     const totalLiabilities = computed<string>(() => {
-        const totalLiabilities = accountsStore.getTotalLiabilities(showAccountBalance.value);
-        return formatAmountWithCurrency(totalLiabilities, defaultCurrency.value);
+        const totalLiabilities: number | HiddenAmount | NumberWithSuffix = accountsStore.getTotalLiabilities(showAccountBalance.value);
+        return formatAmountToLocalizedNumeralsWithCurrency(totalLiabilities, defaultCurrency.value);
     });
 
     function accountCategoryTotalBalance(accountCategory?: AccountCategory): string {
@@ -56,19 +57,19 @@ export function useAccountListPageBaseBase() {
             return '';
         }
 
-        const totalBalance = accountsStore.getAccountCategoryTotalBalance(showAccountBalance.value, accountCategory);
-        return formatAmountWithCurrency(totalBalance, defaultCurrency.value);
+        const totalBalance: number | HiddenAmount | NumberWithSuffix = accountsStore.getAccountCategoryTotalBalance(showAccountBalance.value, accountCategory);
+        return formatAmountToLocalizedNumeralsWithCurrency(totalBalance, defaultCurrency.value);
     }
 
     function accountBalance(account: Account, currentSubAccountId?: string): string | null {
         if (account.type === AccountType.SingleAccount.type) {
-            const balance = accountsStore.getAccountBalance(showAccountBalance.value, account);
+            const balance: number| HiddenAmount | null = accountsStore.getAccountBalance(showAccountBalance.value, account);
 
-            if (!isString(balance)) {
+            if (!isNumber(balance) && !isString(balance)) {
                 return '';
             }
 
-            return formatAmountWithCurrency(balance, account.currency);
+            return formatAmountToLocalizedNumeralsWithCurrency(balance, account.currency);
         } else if (account.type === AccountType.MultiSubAccounts.type) {
             const balanceResult = accountsStore.getAccountSubAccountBalance(showAccountBalance.value, showHidden.value, account, currentSubAccountId);
 
@@ -76,7 +77,7 @@ export function useAccountListPageBaseBase() {
                 return '';
             }
 
-            return formatAmountWithCurrency(balanceResult.balance, balanceResult.currency);
+            return formatAmountToLocalizedNumeralsWithCurrency(balanceResult.balance, balanceResult.currency);
         } else {
             return null;
         }

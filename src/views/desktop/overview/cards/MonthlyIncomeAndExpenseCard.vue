@@ -34,8 +34,12 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 
+import type { HiddenAmount } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
+import { DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
+
 import { type TransactionMonthlyIncomeAndExpenseData } from '@/models/transaction.ts';
+
 import {
     parseDateFromUnixTime,
     getMonthName
@@ -59,7 +63,7 @@ const emit = defineEmits<{
     (e: 'click', event: MonthlyIncomeAndExpenseCardClickEvent): void;
 }>();
 
-const { tt, getMonthShortName, formatAmountWithCurrency } = useI18n();
+const { tt, getMonthShortName, formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
 
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
@@ -275,16 +279,16 @@ const chartOptions = computed<object>(() => {
     };
 });
 
-function getDisplayCurrency(value: number | string, currencyCode: string): string {
-    return formatAmountWithCurrency(value, currencyCode);
+function getDisplayCurrency(value: number | HiddenAmount, currencyCode: string): string {
+    return formatAmountToLocalizedNumeralsWithCurrency(value, currencyCode);
 }
 
 function getDisplayAmount(amount: number, incomplete: boolean): string {
     if (!showAmountInHomePage.value) {
-        return getDisplayCurrency('***', defaultCurrency.value);
+        return getDisplayCurrency(DISPLAY_HIDDEN_AMOUNT, defaultCurrency.value);
     }
 
-    return getDisplayCurrency(amount, defaultCurrency.value) + (incomplete ? '+' : '');
+    return getDisplayCurrency(amount, defaultCurrency.value) + (incomplete ? INCOMPLETE_AMOUNT_SUFFIX : '');
 }
 
 function getDisplayIncomeAmount(data: TransactionMonthlyIncomeAndExpenseData): string {

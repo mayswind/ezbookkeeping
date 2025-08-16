@@ -74,11 +74,11 @@ import { ref, computed, useTemplateRef, watch } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 import { type CommonNumberInputProps, useCommonNumberInputBase } from '@/components/base/CommonNumberInputBase.ts';
 
-import { DecimalSeparator } from '@/core/numeral.ts';
+import { NumeralSystem, DecimalSeparator } from '@/core/numeral.ts';
 import type { CurrencyPrependAndAppendText } from '@/core/currency.ts';
 import { DEFAULT_DECIMAL_NUMBER_COUNT } from '@/consts/numeral.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
-import { isNumber, replaceAll, removeAll } from '@/lib/common.ts';
+import { isNumber, replaceAll } from '@/lib/common.ts';
 import { evaluateExpression } from '@/lib/evaluator.ts';
 import type { ComponentDensity } from '@/lib/ui/desktop.ts';
 import logger from '@/lib/logger.ts';
@@ -112,11 +112,11 @@ const emit = defineEmits<{
 
 const {
     tt,
+    getCurrentNumeralSystemType,
     getCurrentDecimalSeparator,
-    getCurrentDigitGroupingSymbol,
-    parseAmount,
-    formatAmount,
-    formatNumber,
+    parseAmountFromLocalizedNumerals,
+    formatAmountToLocalizedNumeralsWithoutDigitGrouping,
+    formatNumberToLocalizedNumerals,
     getAmountPrependAndAppendText
 } = useI18n();
 
@@ -124,7 +124,7 @@ const {
     currentValue,
     onKeyUpDown,
     onPaste
-} = useCommonNumberInputBase(props, DEFAULT_DECIMAL_NUMBER_COUNT, getInitedFormattedValue(props.modelValue, props.flipNegative), parseAmount, getFormattedValue, getValidFormattedValue);
+} = useCommonNumberInputBase(props, DEFAULT_DECIMAL_NUMBER_COUNT, getInitedFormattedValue(props.modelValue, props.flipNegative), parseAmountFromLocalizedNumerals, getFormattedValue, getValidFormattedValue);
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
@@ -135,7 +135,7 @@ const rules = [
         }
 
         try {
-            const val = parseAmount(v);
+            const val = parseAmountFromLocalizedNumerals(v);
 
             if (Number.isNaN(val) || !Number.isFinite(val)) {
                 return tt('Amount value is not number');
@@ -205,6 +205,7 @@ function enterFormulaMode(): void {
 
 function calculateFormula(): void {
     const systemDecimalSeparator = DecimalSeparator.Dot.symbol;
+    const numeralSystem = getCurrentNumeralSystemType();
     const decimalSeparator = getCurrentDecimalSeparator();
     let finalFormula = currentFormula.value;
 
@@ -215,12 +216,13 @@ function calculateFormula(): void {
         finalFormula = replaceAll(currentFormula.value, decimalSeparator, systemDecimalSeparator);
     }
 
+    finalFormula = numeralSystem.replaceLocalizedDigitsToWesternArabicDigits(finalFormula);
     const calculatedValue = evaluateExpression(finalFormula);
 
     if (isNumber(calculatedValue)) {
-        const textualValue = formatNumber(calculatedValue, 2);
+        const textualValue = formatNumberToLocalizedNumerals(calculatedValue, 2);
         const hasDecimalSeparator = textualValue.indexOf(decimalSeparator) >= 0;
-        currentValue.value = getValidFormattedValue(calculatedValue, textualValue, hasDecimalSeparator);
+        currentValue.value = getValidFormattedValue(calculatedValue * 100, textualValue, hasDecimalSeparator);
         formulaMode.value = false;
     } else {
         snackbar.value?.showMessage('Formula is invalid');
@@ -273,33 +275,36 @@ function getInitedFormattedValue(value: number, flipNegative?: boolean): string 
 }
 
 function getFormattedValue(value: number): string {
+    const numeralSystem = getCurrentNumeralSystemType();
+
     if (!Number.isNaN(value) && Number.isFinite(value)) {
-        const digitGroupingSymbol = getCurrentDigitGroupingSymbol();
-        return removeAll(formatAmount(value, props.currency), digitGroupingSymbol);
+        return formatAmountToLocalizedNumeralsWithoutDigitGrouping(value, props.currency);
     }
 
-    return '0';
+    return numeralSystem.digitZero;
 }
 
 function getDisplayCurrencyPrependAndAppendText(): CurrencyPrependAndAppendText | null {
-    const numericCurrentValue = parseAmount(currentValue.value);
+    const numericCurrentValue = parseAmountFromLocalizedNumerals(currentValue.value);
     const isPlural = numericCurrentValue !== 100 && numericCurrentValue !== -100;
 
     return getAmountPrependAndAppendText(props.currency, isPlural);
 }
 
 watch(() => props.currency, () => {
+    const numeralSystem = getCurrentNumeralSystemType();
     const newStringValue = getInitedFormattedValue(props.modelValue, props.flipNegative);
 
-    if (!(newStringValue === '0' && currentValue.value === '')) {
+    if (!(newStringValue === numeralSystem.digitZero && currentValue.value === '')) {
         currentValue.value = newStringValue;
     }
 });
 
 watch(() => props.flipNegative, (newValue) => {
+    const numeralSystem = getCurrentNumeralSystemType();
     const newStringValue = getInitedFormattedValue(props.modelValue, newValue);
 
-    if (!(newStringValue === '0' && currentValue.value === '')) {
+    if (!(newStringValue === numeralSystem.digitZero && currentValue.value === '')) {
         currentValue.value = newStringValue;
     }
 });
@@ -309,36 +314,55 @@ watch(() => props.modelValue, (newValue) => {
         newValue = -newValue;
     }
 
-    const numericCurrentValue = parseAmount(currentValue.value);
+    const numeralSystem = getCurrentNumeralSystemType();
+    const numericCurrentValue = parseAmountFromLocalizedNumerals(currentValue.value);
 
     if (newValue !== numericCurrentValue) {
         const newStringValue = getFormattedValue(newValue);
 
-        if (!(newStringValue === '0' && currentValue.value === '')) {
+        if (!(newStringValue === numeralSystem.digitZero && currentValue.value === '')) {
             currentValue.value = newStringValue;
         }
     }
 });
 
 watch(currentValue, (newValue) => {
+    const numeralSystem = getCurrentNumeralSystemType();
+    let actualNumeralSystem: NumeralSystem | undefined = undefined;
     let finalValue = '';
 
     if (newValue) {
         const decimalSeparator = getCurrentDecimalSeparator();
 
-        for (let i = 0; i < newValue.length; i++) {
-            if (!('0' <= newValue[i] && newValue[i] <= '9') && newValue[i] !== '-' && newValue[i] !== decimalSeparator) {
-                break;
+        if (newValue[0] === '-' || newValue[0] === decimalSeparator) {
+            actualNumeralSystem = NumeralSystem.detect(newValue[1]);
+        } else {
+            actualNumeralSystem = NumeralSystem.detect(newValue[0]);
+        }
+
+        if (actualNumeralSystem && (actualNumeralSystem.type === NumeralSystem.WesternArabicNumerals.type || actualNumeralSystem.type === numeralSystem.type)) {
+            for (let i = 0; i < newValue.length; i++) {
+                if (!NumeralSystem.WesternArabicNumerals.isDigit(newValue[i]) && !numeralSystem.isDigit(newValue[i]) && newValue[i] !== '-' && newValue[i] !== decimalSeparator) {
+                    break;
+                }
+
+                finalValue += newValue[i];
             }
 
-            finalValue += newValue[i];
+            finalValue = numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(finalValue);
+        } else if (newValue === '-' || newValue === decimalSeparator || newValue === `-${decimalSeparator}`) {
+            finalValue = newValue;
         }
     }
 
     if (finalValue !== newValue) {
         currentValue.value = finalValue;
     } else {
-        let value: number = parseAmount(finalValue);
+        let value: number = parseAmountFromLocalizedNumerals(finalValue);
+
+        if (Number.isNaN(value) || !Number.isFinite(value)) {
+            value = 0;
+        }
 
         if (props.flipNegative) {
             value = -value;

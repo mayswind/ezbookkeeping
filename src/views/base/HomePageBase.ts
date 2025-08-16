@@ -7,6 +7,9 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
+import type { HiddenAmount, NumberWithSuffix } from '@/core/numeral.ts';
+import { DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
+
 import { Account } from '@/models/account.ts';
 import type {
     TransactionOverviewResponse,
@@ -20,7 +23,7 @@ export function useHomePageBase() {
         formatUnixTimeToLongYear,
         formatUnixTimeToLongMonth,
         formatUnixTimeToLongMonthDay,
-        formatAmountWithCurrency
+        formatAmountToLocalizedNumeralsWithCurrency
     } = useI18n();
 
     const settingsStore = useSettingsStore();
@@ -37,18 +40,18 @@ export function useHomePageBase() {
     const allAccounts = computed<Account[]>(() => accountsStore.allAccounts);
 
     const netAssets = computed<string>(() => {
-        const netAssets = accountsStore.getNetAssets(showAmountInHomePage.value);
-        return formatAmountWithCurrency(netAssets, defaultCurrency.value);
+        const netAssets: number | HiddenAmount | NumberWithSuffix = accountsStore.getNetAssets(showAmountInHomePage.value);
+        return formatAmountToLocalizedNumeralsWithCurrency(netAssets, defaultCurrency.value);
     });
 
     const totalAssets = computed<string>(() => {
-        const totalAssets = accountsStore.getTotalAssets(showAmountInHomePage.value);
-        return formatAmountWithCurrency(totalAssets, defaultCurrency.value);
+        const totalAssets: number | HiddenAmount | NumberWithSuffix = accountsStore.getTotalAssets(showAmountInHomePage.value);
+        return formatAmountToLocalizedNumeralsWithCurrency(totalAssets, defaultCurrency.value);
     });
 
     const totalLiabilities = computed<string>(() => {
-        const totalLiabilities = accountsStore.getTotalLiabilities(showAmountInHomePage.value);
-        return formatAmountWithCurrency(totalLiabilities, defaultCurrency.value);
+        const totalLiabilities: number | HiddenAmount | NumberWithSuffix = accountsStore.getTotalLiabilities(showAmountInHomePage.value);
+        return formatAmountToLocalizedNumeralsWithCurrency(totalLiabilities, defaultCurrency.value);
     });
 
     const displayDateRange = computed<TransactionOverviewDisplayTime>(() => {
@@ -75,10 +78,10 @@ export function useHomePageBase() {
 
     function getDisplayAmount(amount: number, incomplete: boolean): string {
         if (!showAmountInHomePage.value) {
-            return formatAmountWithCurrency('***', defaultCurrency.value);
+            return formatAmountToLocalizedNumeralsWithCurrency(DISPLAY_HIDDEN_AMOUNT, defaultCurrency.value);
         }
 
-        return formatAmountWithCurrency(amount, defaultCurrency.value) + (incomplete ? '+' : '');
+        return formatAmountToLocalizedNumeralsWithCurrency(amount, defaultCurrency.value) + (incomplete ? INCOMPLETE_AMOUNT_SUFFIX : '');
     }
 
     function getDisplayIncomeAmount(category: TransactionOverviewResponseItem): string {

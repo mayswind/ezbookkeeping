@@ -35,7 +35,7 @@ export interface CommonPieChartProps {
 }
 
 export function usePieChartBase(props: CommonPieChartProps) {
-    const { formatAmountWithCurrency, formatPercent } = useI18n();
+    const { formatAmountToLocalizedNumeralsWithCurrency, formatPercentToLocalizedNumerals } = useI18n();
 
     const selectedIndex = ref<number>(0);
 
@@ -72,8 +72,8 @@ export function usePieChartBase(props: CommonPieChartProps) {
                     sourceItem: item
                 };
 
-                finalItem.displayPercent = formatPercent(finalItem.percent, 2, '&lt;0.01');
-                finalItem.displayValue = formatAmountWithCurrency(finalItem.value, props.defaultCurrency);
+                finalItem.displayPercent = formatPercentToLocalizedNumerals(finalItem.percent, 2, '&lt;0.01');
+                finalItem.displayValue = formatAmountToLocalizedNumeralsWithCurrency(finalItem.value, props.defaultCurrency);
 
                 validItems.push(finalItem);
             }

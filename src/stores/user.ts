@@ -99,6 +99,16 @@ export const useUserStore = defineStore('user', () => {
         return userInfo.fiscalYearFormat;
     });
 
+    const currentUserCurrencyDisplayType = computed<number>(() => {
+        const userInfo = currentUserBasicInfo.value || EMPTY_USER_BASIC_INFO;
+        return userInfo.currencyDisplayType;
+    });
+
+    const currentUserNumeralSystem = computed<number>(() => {
+        const userInfo = currentUserBasicInfo.value || EMPTY_USER_BASIC_INFO;
+        return userInfo.numeralSystem;
+    });
+
     const currentUserDecimalSeparator = computed<number>(() => {
         const userInfo = currentUserBasicInfo.value || EMPTY_USER_BASIC_INFO;
         return userInfo.decimalSeparator;
@@ -112,11 +122,6 @@ export const useUserStore = defineStore('user', () => {
     const currentUserDigitGrouping = computed<number>(() => {
         const userInfo = currentUserBasicInfo.value || EMPTY_USER_BASIC_INFO;
         return userInfo.digitGrouping;
-    });
-
-    const currentUserCurrencyDisplayType = computed<number>(() => {
-        const userInfo = currentUserBasicInfo.value || EMPTY_USER_BASIC_INFO;
-        return userInfo.currencyDisplayType;
     });
 
     const currentUserCoordinateDisplayType = computed<number>(() => {
@@ -422,10 +427,11 @@ export const useUserStore = defineStore('user', () => {
         currentUserLongTimeFormat,
         currentUserShortTimeFormat,
         currentUserFiscalYearFormat,
+        currentUserCurrencyDisplayType,
+        currentUserNumeralSystem,
         currentUserDecimalSeparator,
         currentUserDigitGroupingSymbol,
         currentUserDigitGrouping,
-        currentUserCurrencyDisplayType,
         currentUserCoordinateDisplayType,
         currentUserExpenseAmountColor,
         currentUserIncomeAmountColor,

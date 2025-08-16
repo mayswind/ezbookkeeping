@@ -32,7 +32,7 @@ const emit = defineEmits<{
 
 const theme = useTheme();
 
-const { formatAmountWithCurrency } = useI18n();
+const { formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
 const { selectedIndex, validItems } = usePieChartBase(props);
 
 const selectedLegends = ref<Record<string, boolean> | null>(null);
@@ -133,7 +133,7 @@ const chartOptions = computed<object>(() => {
             formatter: (params: CallbackDataParams) => {
                 const dataItem = params.data as DesktopPieChartDataItem;
                 const name = dataItem ? dataItem.displayName : '';
-                const value = dataItem ? dataItem.displayValue : formatAmountWithCurrency(params.value as number);
+                const value = dataItem ? dataItem.displayValue : formatAmountToLocalizedNumeralsWithCurrency(params.value as number);
                 let percent = dataItem ? dataItem.displayPercent : (params.percent + '%');
 
                 if (hasUnselectedItem.value) {

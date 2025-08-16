@@ -7,7 +7,7 @@ import { useUserStore } from '@/stores/user.ts';
 import type { DataStatisticsResponse, DisplayDataStatistics } from '@/models/data_management.ts';
 
 export function useDataManagementPageBase() {
-    const { tt, appendDigitGroupingSymbol } = useI18n();
+    const { tt, formatNumberToLocalizedNumerals } = useI18n();
 
     const userStore = useUserStore();
 
@@ -19,13 +19,13 @@ export function useDataManagementPageBase() {
         }
 
         return {
-            totalTransactionCount: appendDigitGroupingSymbol(dataStatistics.value.totalTransactionCount),
-            totalAccountCount: appendDigitGroupingSymbol(dataStatistics.value.totalAccountCount),
-            totalTransactionCategoryCount: appendDigitGroupingSymbol(dataStatistics.value.totalTransactionCategoryCount),
-            totalTransactionTagCount: appendDigitGroupingSymbol(dataStatistics.value.totalTransactionTagCount),
-            totalTransactionPictureCount: appendDigitGroupingSymbol(dataStatistics.value.totalTransactionPictureCount),
-            totalTransactionTemplateCount: appendDigitGroupingSymbol(dataStatistics.value.totalTransactionTemplateCount),
-            totalScheduledTransactionCount: appendDigitGroupingSymbol(dataStatistics.value.totalScheduledTransactionCount)
+            totalTransactionCount: formatNumberToLocalizedNumerals(parseInt(dataStatistics.value.totalTransactionCount)),
+            totalAccountCount: formatNumberToLocalizedNumerals(parseInt(dataStatistics.value.totalAccountCount)),
+            totalTransactionCategoryCount: formatNumberToLocalizedNumerals(parseInt(dataStatistics.value.totalTransactionCategoryCount)),
+            totalTransactionTagCount: formatNumberToLocalizedNumerals(parseInt(dataStatistics.value.totalTransactionTagCount)),
+            totalTransactionPictureCount: formatNumberToLocalizedNumerals(parseInt(dataStatistics.value.totalTransactionPictureCount)),
+            totalTransactionTemplateCount: formatNumberToLocalizedNumerals(parseInt(dataStatistics.value.totalTransactionTemplateCount)),
+            totalScheduledTransactionCount: formatNumberToLocalizedNumerals(parseInt(dataStatistics.value.totalScheduledTransactionCount))
         };
     });
 

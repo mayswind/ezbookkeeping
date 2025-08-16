@@ -26,9 +26,6 @@ import {
     isNumber
 } from '@/lib/common.ts';
 import {
-    formatAmount
-} from '@/lib/numeral.ts';
-import {
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
     getDateTypeByDateRange,
@@ -73,7 +70,16 @@ const emit = defineEmits<{
 }>();
 
 const theme = useTheme();
-const { tt, formatUnixTimeToShortYear, formatYearQuarter, formatUnixTimeToShortYearMonth, formatUnixTimeToFiscalYear, formatAmountWithCurrency } = useI18n();
+
+const { tt,
+    formatUnixTimeToShortYear,
+    formatYearQuarter,
+    formatUnixTimeToShortYearMonth,
+    formatUnixTimeToFiscalYear,
+    formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
+    formatAmountToLocalizedNumeralsWithCurrency
+} = useI18n();
+
 const { allDateRanges, getItemName, getColor } = useMonthlyTrendsChartBase(props);
 
 const userStore = useUserStore();
@@ -252,8 +258,8 @@ const yAxisWidth = computed<number>(() => {
         }
     }
 
-    const maxValueText = formatAmountWithCurrency(maxValue, props.defaultCurrency);
-    const minValueText = formatAmountWithCurrency(minValue, props.defaultCurrency);
+    const maxValueText = formatAmountToLocalizedNumeralsWithCurrency(maxValue, props.defaultCurrency);
+    const minValueText = formatAmountToLocalizedNumeralsWithCurrency(minValue, props.defaultCurrency);
     const maxLengthText = maxValueText.length > minValueText.length ? maxValueText : minValueText;
 
     const canvas = document.createElement('canvas');
@@ -319,7 +325,7 @@ const chartOptions = computed<object>(() => {
                     const item = displayItems[i];
 
                     if (displayItems.length === 1 || item.totalAmount !== 0) {
-                        const value = formatAmountWithCurrency(item.totalAmount, props.defaultCurrency);
+                        const value = formatAmountToLocalizedNumeralsWithCurrency(item.totalAmount, props.defaultCurrency);
                         tooltip += '<div><span class="chart-pointer" style="background-color: ' + item.color + '"></span>';
                         tooltip += `<span>${item.name}</span><span style="margin-left: 20px; float: right">${value}</span><br/>`;
                         tooltip += '</div>';
@@ -327,7 +333,7 @@ const chartOptions = computed<object>(() => {
                 }
 
                 if (props.showTotalAmountInTooltip) {
-                    const displayTotalAmount = formatAmountWithCurrency(totalAmount, props.defaultCurrency);
+                    const displayTotalAmount = formatAmountToLocalizedNumeralsWithCurrency(totalAmount, props.defaultCurrency);
                     tooltip = '<div style="border-bottom: ' + (isDarkMode.value ? '#eee' : '#333') + ' dashed 1px">'
                         + '<span class="chart-pointer" style="background-color: ' + (isDarkMode.value ? '#eee' : '#333') + '"></span>'
                         + `<span>${tt('Total Amount')}</span><span style="margin-left: 20px; float: right">${displayTotalAmount}</span><br/>`
@@ -367,13 +373,13 @@ const chartOptions = computed<object>(() => {
                 type: 'value',
                 axisLabel: {
                     formatter: (value: string) => {
-                        return formatAmountWithCurrency(value, props.defaultCurrency);
+                        return formatAmountToLocalizedNumeralsWithCurrency(parseInt(value), props.defaultCurrency);
                     }
                 },
                 axisPointer: {
                     label: {
                         formatter: (params: CallbackDataParams) => {
-                            return formatAmountWithCurrency(Math.floor(params.value as number), props.defaultCurrency);
+                            return formatAmountToLocalizedNumeralsWithCurrency(Math.floor(params.value as number), props.defaultCurrency);
                         }
                     }
                 },
@@ -443,7 +449,7 @@ function exportData(): { headers: string[], data: string[][] } {
     for (let i = 0; i < allDisplayDateRanges.value.length; i++) {
         const row: string[] = [];
         row.push(allDisplayDateRanges.value[i]);
-        row.push(...allSeries.value.map(item => formatAmount(item.data[i], {})));
+        row.push(...allSeries.value.map(item => formatAmountToWesternArabicNumeralsWithoutDigitGrouping(item.data[i])));
         data.push(row);
     }
 

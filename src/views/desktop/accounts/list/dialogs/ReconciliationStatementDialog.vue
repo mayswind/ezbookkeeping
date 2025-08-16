@@ -556,7 +556,7 @@ function updateClosingBalance(): void {
         const currentUnixTime = getCurrentUnixTime();
         let newTransactionTime: number | undefined = undefined;
 
-        if (endTime.value < currentUnixTime) {
+        if (endTime.value > 0 && endTime.value < currentUnixTime) {
             newTransactionTime = endTime.value;
         } else if (currentUnixTime < startTime.value) {
             newTransactionTime = startTime.value;

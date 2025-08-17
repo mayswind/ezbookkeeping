@@ -11,14 +11,12 @@ import zhHans from './zh_Hans.json';
 import zhHant from './zh_Hant.json';
 import ptBR from './pt_BR.json';
 
-import { TextDirection } from '@/core/text.ts';
-
 export interface LanguageInfo {
     readonly name: string;
     readonly displayName: string;
     readonly alternativeLanguageTag: string;
     readonly aliases?: string[];
-    readonly textDirection: TextDirection;
+    readonly textDirection: 'ltr' | 'rtl';
     readonly content: object;
 }
 
@@ -36,70 +34,70 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         name: 'German',
         displayName: 'Deutsch',
         alternativeLanguageTag: 'de-DE',
-        textDirection: TextDirection.LTR,
+        textDirection: 'ltr',
         content: de
     },
     'en': {
         name: 'English',
         displayName: 'English',
         alternativeLanguageTag: 'en-US',
-        textDirection: TextDirection.LTR,
+        textDirection: 'ltr',
         content: en
     },
     'es': {
         name: 'Spanish',
         displayName: 'Español',
         alternativeLanguageTag: 'es-ES',
-        textDirection: TextDirection.LTR,
+        textDirection: 'ltr',
         content: es
     },
     'it': {
         name: 'Italian',
         displayName: 'Italiano',
         alternativeLanguageTag: 'it-IT',
-        textDirection: TextDirection.LTR,
+        textDirection: 'ltr',
         content: it
     },
     'ja': {
         name: 'Japanese',
         displayName: '日本語',
         alternativeLanguageTag: 'ja-JP',
-        textDirection: TextDirection.LTR,
+        textDirection: 'ltr',
         content: ja
     },
     'nl': {
         name: 'Dutch',
         displayName: 'Nederlands',
         alternativeLanguageTag: 'nl-NL',
-        textDirection: TextDirection.LTR,
+        textDirection: 'ltr',
         content: nl
     },
     'pt-BR': {
         name: 'Portuguese (Brazil)',
         displayName: 'Português (Brasil)',
         alternativeLanguageTag: 'pt-BR',
-        textDirection: TextDirection.LTR,
+        textDirection: 'ltr',
         content: ptBR
     },
     'ru': {
         name: 'Russian',
         displayName: 'Русский',
         alternativeLanguageTag: 'ru-RU',
-        textDirection: TextDirection.LTR,
+        textDirection: 'ltr',
         content: ru
     },
     'uk': {
         name: 'Ukrainian',
         displayName: 'Українська',
         alternativeLanguageTag: 'uk-UA',
-        textDirection: TextDirection.LTR,
+        textDirection: 'ltr',
         content: uk
     },
     'vi': {
         name: 'Vietnamese',
         displayName: 'Tiếng Việt',
         alternativeLanguageTag: 'vi-VN',
-        textDirection: TextDirection.LTR,
+        textDirection: 'ltr',
         content: vi
     },
     'zh-Hans': {
@@ -107,7 +105,7 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         displayName: '中文 (简体)',
         alternativeLanguageTag: 'zh-CN',
         aliases: ['zh-CHS', 'zh-CN', 'zh-SG'],
-        textDirection: TextDirection.LTR,
+        textDirection: 'ltr',
         content: zhHans
     },
     'zh-Hant': {
@@ -115,7 +113,7 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         displayName: '中文 (繁體)',
         alternativeLanguageTag: 'zh-TW',
         aliases: ['zh-CHT', 'zh-TW', 'zh-HK', 'zh-MO'],
-        textDirection: TextDirection.LTR,
+        textDirection: 'ltr',
         content: zhHant
     },
 };

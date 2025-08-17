@@ -241,7 +241,7 @@ export function getRtlLocales(): Record<string, boolean> {
 
         const languageInfo = ALL_LANGUAGES[languageKey];
 
-        if (languageInfo.textDirection === TextDirection.RTL) {
+        if (languageInfo.textDirection === 'rtl') {
             rtlLocales[languageKey] = true;
         }
     }
@@ -750,7 +750,12 @@ export function useI18n() {
 
     function getCurrentLanguageTextDirection(): TextDirection {
         const currentLanguageInfo = getCurrentLanguageInfo();
-        return currentLanguageInfo.textDirection;
+
+        if (currentLanguageInfo.textDirection === 'rtl') {
+            return TextDirection.RTL;
+        } else {
+            return TextDirection.LTR;
+        }
     }
 
     function getDefaultCurrency(): string {

@@ -56,7 +56,7 @@
                     <v-card-text class="d-flex flex-wrap gap-4">
                         <v-btn :disabled="!currentPassword || !newPassword || !confirmPassword || updatingPassword" @click="updatePassword">
                             {{ tt('Save Changes') }}
-                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="updatingPassword"></v-progress-circular>
+                            <v-progress-circular indeterminate size="22" class="ms-2" v-if="updatingPassword"></v-progress-circular>
                         </v-btn>
                     </v-card-text>
                 </v-form>
@@ -68,10 +68,10 @@
                 <template #title>
                     <div class="d-flex align-center">
                         <span>{{ tt('Device & Sessions') }}</span>
-                        <v-btn class="ml-3" density="compact" color="default" variant="outlined"
+                        <v-btn class="ms-3" density="compact" color="default" variant="outlined"
                                @click="generateMCPToken" v-if="isMCPServerEnabled()">{{ tt('Generate MCP token') }}</v-btn>
                         <v-btn density="compact" color="default" variant="text" size="24"
-                               class="ml-2" :icon="true" :loading="loadingSession" @click="reloadSessions(false)">
+                               class="ms-2" :icon="true" :loading="loadingSession" @click="reloadSessions(false)">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>

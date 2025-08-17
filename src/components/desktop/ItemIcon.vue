@@ -2,9 +2,9 @@
     <i class="item-icon" :class="classes" :style="style" v-if="!hiddenStatus">
         <slot></slot>
     </i>
-    <v-badge class="right-bottom-icon" color="secondary"
-             location="bottom right" offset-y="4" :icon="mdiEyeOffOutline"
-             v-if="hiddenStatus">
+    <v-badge class="right-bottom-icon" color="secondary" offset-y="4"
+             :location="`bottom ${textDirection === TextDirection.LTR ? 'right' : 'left'}`"
+             :icon="mdiEyeOffOutline" v-if="hiddenStatus">
         <i class="item-icon" :class="classes" :style="style">
             <slot></slot>
         </i>
@@ -14,6 +14,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { type CommonIconProps, useItemIconBase } from '@/components/base/ItemIconBase.ts';
+
+import { useI18n } from '@/locales/helpers.ts';
+
+import { TextDirection } from '@/core/text.ts';
 
 import {
     mdiEyeOffOutline
@@ -25,7 +29,11 @@ interface DesktopItemIconProps extends CommonIconProps {
 }
 
 const props = defineProps<DesktopItemIconProps>();
+
+const { getCurrentLanguageTextDirection } = useI18n();
 const { style, getAccountIcon, getCategoryIcon } = useItemIconBase(props);
+
+const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 
 const classes = computed<string>(() => {
     let allClasses = props.class ? (props.class + ' ') : '';

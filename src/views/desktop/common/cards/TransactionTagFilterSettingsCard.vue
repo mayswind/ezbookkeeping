@@ -5,7 +5,7 @@
                 <div class="w-100 text-center">
                     <h4 class="text-h4">{{ tt(title) }}</h4>
                 </div>
-                <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                        :disabled="loading || !hasAnyAvailableTag" :icon="true">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent">
@@ -36,7 +36,7 @@
             <div class="d-flex align-center" v-else-if="!dialogMode">
                 <span>{{ tt(title) }}</span>
                 <v-spacer/>
-                <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                        :disabled="loading" :icon="true">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent">
@@ -90,7 +90,7 @@
             <v-expansion-panels class="tag-categories" multiple v-model="expandTagCategories">
                 <v-expansion-panel class="border" key="default" value="default">
                     <v-expansion-panel-title class="expand-panel-title-with-bg py-0">
-                        <span class="ml-3">{{ tt('Tags') }}</span>
+                        <span class="ms-3">{{ tt('Tags') }}</span>
                     </v-expansion-panel-title>
                     <v-expansion-panel-text>
                         <v-list rounded density="comfortable" class="pa-0">
@@ -107,7 +107,7 @@
                                                     <v-icon size="24" :icon="mdiPound"/>
                                                 </v-badge>
                                                 <v-icon size="24" :icon="mdiPound" v-else-if="!transactionTag.hidden"/>
-                                                <span class="ml-3">{{ transactionTag.name }}</span>
+                                                <span class="ms-3">{{ transactionTag.name }}</span>
                                             </template>
                                         </v-checkbox>
                                     </template>
@@ -269,7 +269,8 @@ init();
 }
 
 .tag-categories .v-expansion-panel-text__wrapper {
-    padding: 0 0 0 20px;
+    padding: 0 0 0 0;
+    padding-inline-start: 20px;
 }
 
 .tag-categories .v-expansion-panel--active:not(:first-child),

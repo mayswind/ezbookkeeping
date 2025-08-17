@@ -5,9 +5,9 @@
                 <div class="d-flex align-center justify-center">
                     <div class="d-flex w-100 align-center justify-center">
                         <h4 class="text-h4">{{ tt('Import Transactions') }}</h4>
-                        <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
+                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="loading"></v-progress-circular>
                     </div>
-                    <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                    <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                            :icon="true" :disabled="loading || submitting"
                            v-if="currentStep === 'defineColumn'">
                         <v-icon :icon="mdiDotsVertical" />
@@ -22,7 +22,7 @@
                             </v-list>
                         </v-menu>
                     </v-btn>
-                    <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                    <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                            :icon="true" :disabled="loading || submitting"
                            v-if="currentStep === 'checkData'">
                         <v-icon :icon="mdiFilterOutline" />
@@ -110,7 +110,7 @@
                             </v-list>
                         </v-menu>
                     </v-btn>
-                    <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                    <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                            :icon="true" :disabled="loading || submitting"
                            v-if="currentStep === 'checkData'">
                         <v-icon :icon="mdiDotsVertical" />
@@ -281,9 +281,9 @@
                         <v-col cols="12" md="12" class="mb-0 pb-0" v-if="exportFileGuideDocumentUrl">
                             <a :href="exportFileGuideDocumentUrl" :class="{ 'disabled': submitting }" target="_blank">
                                 <v-icon :icon="mdiHelpCircleOutline" size="16" />
-                                <span class="ml-1" v-if="fileType === 'dsv' || fileType === 'dsv_data'">{{ tt('How to import this file?') }}</span>
-                                <span class="ml-1" v-if="fileType !== 'dsv' && fileType !== 'dsv_data'">{{ tt('How to export this file?') }}</span>
-                                <span class="ml-1" v-if="exportFileGuideDocumentLanguageName">[{{ exportFileGuideDocumentLanguageName }}]</span>
+                                <span class="ms-1" v-if="fileType === 'dsv' || fileType === 'dsv_data'">{{ tt('How to import this file?') }}</span>
+                                <span class="ms-1" v-if="fileType !== 'dsv' && fileType !== 'dsv_data'">{{ tt('How to export this file?') }}</span>
+                                <span class="ms-1" v-if="exportFileGuideDocumentLanguageName">[{{ exportFileGuideDocumentLanguageName }}]</span>
                             </a>
                         </v-col>
                     </v-row>
@@ -332,10 +332,10 @@
                                 <v-btn color="secondary" density="compact" variant="outlined"
                                        :append-icon="parsedFileDataColumnMapping.includeHeader ? mdiCheck : mdiClose"
                                        @click="parsedFileDataColumnMapping.toggleIncludeHeader()">{{ tt('Include Header Line') }}</v-btn>
-                                <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
+                                <v-btn class="ms-2" color="secondary" density="compact" variant="outlined"
                                        :disabled="!parsedFileDataColumnMapping || !parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionType) || !parsedFileAllTransactionTypes">
                                     <span>{{ tt('Transaction Type Mapping') }}</span>
-                                    <span class="ml-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionType) && parsedFileAllTransactionTypes">({{ getObjectOwnFieldCount(parsedFileValidMappedTransactionTypes) || tt('None') }})</span>
+                                    <span class="ms-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionType) && parsedFileAllTransactionTypes">({{ getObjectOwnFieldCount(parsedFileValidMappedTransactionTypes) || tt('None') }})</span>
                                     <v-menu eager activator="parent" location="bottom" max-height="500"
                                             :close-on-content-click="false">
                                         <v-list class="pa-0">
@@ -363,10 +363,10 @@
                                         </v-list>
                                     </v-menu>
                                 </v-btn>
-                                <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
+                                <v-btn class="ms-2" color="secondary" density="compact" variant="outlined"
                                        :disabled="!parsedFileDataColumnMapping || !parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTime)">
                                     <span>{{ tt('Time Format') }}</span>
-                                    <span class="ml-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTime)">({{ parsedFileDataColumnMapping.timeFormat || parsedFileAutoDetectedTimeFormat || tt('Unknown') }})</span>
+                                    <span class="ms-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTime)">({{ parsedFileDataColumnMapping.timeFormat || parsedFileAutoDetectedTimeFormat || tt('Unknown') }})</span>
                                     <v-menu eager activator="parent" location="bottom" max-height="500">
                                         <v-list>
                                             <v-list-item key="auto"
@@ -374,8 +374,8 @@
                                                          @click="parsedFileDataColumnMapping.timeFormat = ''">
                                                 <v-list-item-title class="cursor-pointer">
                                                     <span>{{ tt('Auto detect') }}</span>
-                                                    <span class="ml-1" v-if="parsedFileAutoDetectedTimeFormat">({{ parsedFileAutoDetectedTimeFormat }})</span>
-                                                    <span class="ml-1" v-if="!parsedFileAutoDetectedTimeFormat">({{ tt('Unknown') }})</span>
+                                                    <span class="ms-1" v-if="parsedFileAutoDetectedTimeFormat">({{ parsedFileAutoDetectedTimeFormat }})</span>
+                                                    <span class="ms-1" v-if="!parsedFileAutoDetectedTimeFormat">({{ tt('Unknown') }})</span>
                                                 </v-list-item-title>
                                             </v-list-item>
                                             <v-list-item :key="dateTimeFormat.format"
@@ -389,10 +389,10 @@
                                         </v-list>
                                     </v-menu>
                                 </v-btn>
-                                <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
+                                <v-btn class="ms-2" color="secondary" density="compact" variant="outlined"
                                        v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTimezone)">
                                     <span>{{ tt('Timezone Format') }}</span>
-                                    <span class="ml-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTimezone)">({{ KnownDateTimezoneFormat.valueOf(parsedFileDataColumnMapping.timezoneFormat || parsedFileAutoDetectedTimezoneFormat || '')?.name || tt('Unknown') }})</span>
+                                    <span class="ms-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTimezone)">({{ KnownDateTimezoneFormat.valueOf(parsedFileDataColumnMapping.timezoneFormat || parsedFileAutoDetectedTimezoneFormat || '')?.name || tt('Unknown') }})</span>
                                     <v-menu eager activator="parent" location="bottom" max-height="500">
                                         <v-list>
                                             <v-list-item key="auto"
@@ -400,8 +400,8 @@
                                                          @click="parsedFileDataColumnMapping.timezoneFormat = ''">
                                                 <v-list-item-title class="cursor-pointer">
                                                     <span>{{ tt('Auto detect') }}</span>
-                                                    <span class="ml-1" v-if="parsedFileAutoDetectedTimezoneFormat && KnownDateTimezoneFormat.valueOf(parsedFileAutoDetectedTimezoneFormat || '')">({{ KnownDateTimezoneFormat.valueOf(parsedFileAutoDetectedTimezoneFormat || '')?.name }})</span>
-                                                    <span class="ml-1" v-if="!parsedFileAutoDetectedTimezoneFormat || !KnownDateTimezoneFormat.valueOf(parsedFileAutoDetectedTimezoneFormat || '')">({{ tt('Unknown') }})</span>
+                                                    <span class="ms-1" v-if="parsedFileAutoDetectedTimezoneFormat && KnownDateTimezoneFormat.valueOf(parsedFileAutoDetectedTimezoneFormat || '')">({{ KnownDateTimezoneFormat.valueOf(parsedFileAutoDetectedTimezoneFormat || '')?.name }})</span>
+                                                    <span class="ms-1" v-if="!parsedFileAutoDetectedTimezoneFormat || !KnownDateTimezoneFormat.valueOf(parsedFileAutoDetectedTimezoneFormat || '')">({{ tt('Unknown') }})</span>
                                                 </v-list-item-title>
                                             </v-list-item>
                                             <v-list-item :key="timezoneFormat.value"
@@ -415,10 +415,10 @@
                                         </v-list>
                                     </v-menu>
                                 </v-btn>
-                                <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
+                                <v-btn class="ms-2" color="secondary" density="compact" variant="outlined"
                                        :disabled="!parsedFileDataColumnMapping || !parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.Amount)">
                                     <span>{{ tt('Amount Format') }}</span>
-                                    <span class="ml-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.Amount)">({{ KnownAmountFormat.valueOf(parsedFileDataColumnMapping.amountFormat || parsedFileAutoDetectedAmountFormat || '')?.format || tt('Unknown') }})</span>
+                                    <span class="ms-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.Amount)">({{ KnownAmountFormat.valueOf(parsedFileDataColumnMapping.amountFormat || parsedFileAutoDetectedAmountFormat || '')?.format || tt('Unknown') }})</span>
                                     <v-menu eager activator="parent" location="bottom" max-height="500">
                                         <v-list>
                                             <v-list-item key="auto"
@@ -426,8 +426,8 @@
                                                          @click="parsedFileDataColumnMapping.amountFormat = ''">
                                                 <v-list-item-title class="cursor-pointer">
                                                     <span>{{ tt('Auto detect') }}</span>
-                                                    <span class="ml-1" v-if="parsedFileAutoDetectedAmountFormat && KnownAmountFormat.valueOf(parsedFileAutoDetectedAmountFormat || '')">({{ KnownAmountFormat.valueOf(parsedFileAutoDetectedAmountFormat || '')?.format }})</span>
-                                                    <span class="ml-1" v-if="!parsedFileAutoDetectedAmountFormat || !KnownAmountFormat.valueOf(parsedFileAutoDetectedAmountFormat || '')">({{ tt('Unknown') }})</span>
+                                                    <span class="ms-1" v-if="parsedFileAutoDetectedAmountFormat && KnownAmountFormat.valueOf(parsedFileAutoDetectedAmountFormat || '')">({{ KnownAmountFormat.valueOf(parsedFileAutoDetectedAmountFormat || '')?.format }})</span>
+                                                    <span class="ms-1" v-if="!parsedFileAutoDetectedAmountFormat || !KnownAmountFormat.valueOf(parsedFileAutoDetectedAmountFormat || '')">({{ tt('Unknown') }})</span>
                                                 </v-list-item-title>
                                             </v-list-item>
                                             <v-list-item :key="amountFormat.type"
@@ -441,10 +441,10 @@
                                         </v-list>
                                     </v-menu>
                                 </v-btn>
-                                <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
+                                <v-btn class="ms-2" color="secondary" density="compact" variant="outlined"
                                        v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.GeographicLocation)">
                                     <span>{{ tt('Geographic Location Separator') }}</span>
-                                    <span class="ml-1" v-if="parsedFileDataColumnMapping.geoLocationOrder">({{ parsedFileDataColumnMapping.formatGeoLocation(tt('Latitude'), tt('Longitude')) }})</span>
+                                    <span class="ms-1" v-if="parsedFileDataColumnMapping.geoLocationOrder">({{ parsedFileDataColumnMapping.formatGeoLocation(tt('Latitude'), tt('Longitude')) }})</span>
                                     <v-menu eager activator="parent" location="bottom" max-height="500"
                                             :close-on-content-click="false">
                                         <v-list class="pa-0">
@@ -475,10 +475,10 @@
                                         </v-list>
                                     </v-menu>
                                 </v-btn>
-                                <v-btn class="ml-2" color="secondary" density="compact" variant="outlined"
+                                <v-btn class="ms-2" color="secondary" density="compact" variant="outlined"
                                        v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.Tags)">
                                     <span>{{ tt('Transaction Tags Separator') }}</span>
-                                    <span class="ml-1" v-if="parsedFileDataColumnMapping.tagSeparator">({{ parsedFileDataColumnMapping.tagSeparator }})</span>
+                                    <span class="ms-1" v-if="parsedFileDataColumnMapping.tagSeparator">({{ parsedFileDataColumnMapping.tagSeparator }})</span>
                                     <v-menu eager activator="parent" location="bottom" max-height="500">
                                         <v-list>
                                             <v-list-item :key="separator.value"
@@ -494,7 +494,7 @@
                                 </v-btn>
                                 <v-spacer/>
                                 <span>{{ tt('Lines Per Page') }}</span>
-                                <v-select class="ml-2" density="compact" max-width="100"
+                                <v-select class="ms-2" density="compact" max-width="100"
                                           item-title="title"
                                           item-value="value"
                                           :disabled="loading || submitting"
@@ -590,7 +590,7 @@
                         </template>
                         <template #item.time="{ item }">
                             <span>{{ getDisplayDateTime(item) }}</span>
-                            <v-chip class="ml-1" variant="flat" color="secondary" size="x-small"
+                            <v-chip class="ms-1" variant="flat" color="secondary" size="x-small"
                                     v-if="item.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimezone(item) }}</v-chip>
                         </template>
                         <template #item.type="{ value }">
@@ -607,11 +607,11 @@
                                           :icon-id="allCategoriesMap[item.categoryId].icon"
                                           :color="allCategoriesMap[item.categoryId].color"
                                           v-if="item.type !== TransactionType.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]"></ItemIcon>
-                                <span class="ml-2" v-if="item.type !== TransactionType.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]">
+                                <span class="ms-2" v-if="item.type !== TransactionType.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]">
                                     {{ allCategoriesMap[item.categoryId].name }}
                                 </span>
                                 <div class="text-error font-italic" v-else-if="item.type !== TransactionType.ModifyBalance && (!item.categoryId || item.categoryId === '0' || !allCategoriesMap[item.categoryId])">
-                                    <v-icon class="mr-1" :icon="mdiAlertOutline"/>
+                                    <v-icon class="me-1" :icon="mdiAlertOutline"/>
                                     <span>{{ item.originalCategoryName }}</span>
                                 </div>
                             </div>
@@ -672,20 +672,20 @@
                         </template>
                         <template #item.sourceAmount="{ item }">
                             <span>{{ getTransactionDisplayAmount(item) }}</span>
-                            <v-icon class="mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
+                            <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
                             <span v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId">{{ getTransactionDisplayDestinationAmount(item) }}</span>
                         </template>
                         <template #item.actualSourceAccountName="{ item }">
                             <div class="d-flex align-center" v-if="editingTransaction !== item">
                                 <span v-if="item.sourceAccountId && item.sourceAccountId !== '0' && allAccountsMap[item.sourceAccountId]">{{ allAccountsMap[item.sourceAccountId].name }}</span>
                                 <div class="text-error font-italic" v-else>
-                                    <v-icon class="mr-1" :icon="mdiAlertOutline"/>
+                                    <v-icon class="me-1" :icon="mdiAlertOutline"/>
                                     <span>{{ item.originalSourceAccountName }}</span>
                                 </div>
-                                <v-icon class="mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
+                                <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
                                 <span v-if="item.type === TransactionType.Transfer && item.destinationAccountId && item.destinationAccountId !== '0' && allAccountsMap[item.destinationAccountId]">{{allAccountsMap[item.destinationAccountId].name }}</span>
                                 <div class="text-error font-italic" v-else-if="item.type === TransactionType.Transfer && (!item.destinationAccountId || item.destinationAccountId === '0' || !allAccountsMap[item.destinationAccountId])">
-                                    <v-icon class="mr-1" :icon="mdiAlertOutline"/>
+                                    <v-icon class="me-1" :icon="mdiAlertOutline"/>
                                     <span>{{ item.originalDestinationAccountName }}</span>
                                 </div>
                             </div>
@@ -706,7 +706,7 @@
                                                    :items="allVisibleCategorizedAccounts"
                                                    v-model="item.sourceAccountId">
                                 </two-column-select>
-                                <v-icon class="mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
+                                <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
                                 <two-column-select density="compact" variant="plain"
                                                    primary-key-field="id" primary-value-field="category"
                                                    primary-title-field="name" primary-footer-field="displayBalance"
@@ -790,7 +790,7 @@
                                 </span>
                                 <v-spacer/>
                                 <span>{{ tt('Transactions Per Page') }}</span>
-                                <v-select class="ml-2" density="compact" max-width="100"
+                                <v-select class="ms-2" density="compact" max-width="100"
                                           item-title="title"
                                           item-value="value"
                                           :disabled="loading || submitting"
@@ -815,17 +815,19 @@
                 <v-btn color="secondary" variant="tonal" :disabled="loading || submitting"
                        :prepend-icon="mdiClose" @click="close(false)"
                        v-if="currentStep !== 'finalResult'">{{ tt('Cancel') }}</v-btn>
-                <v-btn color="primary" :disabled="loading || submitting || (!isImportDataFromTextbox && !importFile) || (isImportDataFromTextbox && !importData)"
+                <v-btn class="button-icon-with-direction" color="primary"
+                       :disabled="loading || submitting || (!isImportDataFromTextbox && !importFile) || (isImportDataFromTextbox && !importData)"
                        :append-icon="!submitting ? mdiArrowRight : undefined" @click="parseData"
                        v-if="currentStep === 'defineColumn' || currentStep === 'uploadFile'">
                     {{ tt('Next') }}
-                    <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
+                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
-                <v-btn color="teal" :disabled="submitting || !!editingTransaction || selectedImportTransactionCount < 1 || selectedInvalidTransactionCount > 0"
+                <v-btn class="button-icon-with-direction" color="teal"
+                       :disabled="submitting || !!editingTransaction || selectedImportTransactionCount < 1 || selectedInvalidTransactionCount > 0"
                        :append-icon="!submitting ? mdiArrowRight : undefined" @click="submit"
                        v-if="currentStep === 'checkData'">
                     {{ (submitting && importProcess > 0 ? tt('format.misc.importingTransactions', { process: formatNumberToLocalizedNumerals(importProcess, 2) }) : tt('Import')) }}
-                    <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
+                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
                 <v-btn color="secondary" variant="tonal"
                        :append-icon="mdiCheck"
@@ -2748,7 +2750,7 @@ defineExpose({
 }
 
 .import-transaction-table .v-chip.transaction-tag {
-    margin-right: 4px;
+    margin-inline-end: 4px;
     margin-top: 2px;
     margin-bottom: 2px;
 }

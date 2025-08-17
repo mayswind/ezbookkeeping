@@ -72,7 +72,7 @@ import draggable from 'vuedraggable';
 import router from '@/router/desktop.ts';
 
 import { DecimalSeparator } from '@/core/numeral.ts';
-import { getI18nOptions } from '@/locales/helpers.ts';
+import { getI18nOptions, getRtlLocales } from '@/locales/helpers.ts';
 
 import PinCodeInput from '@/components/common/PinCodeInput.vue';
 import MapView from '@/components/common/MapView.vue';
@@ -433,6 +433,7 @@ const vuetify = createVuetify({
         }
     },
     locale: {
+        rtl: getRtlLocales(),
         adapter: ((i18nGlobal: Composer) => {
             const instance: LocaleInstance = {
                 name: 'ezBookkeeping i18n',

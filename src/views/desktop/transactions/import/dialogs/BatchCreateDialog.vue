@@ -9,7 +9,7 @@
                         <h4 class="text-h4" v-if="type === 'transferCategory'">{{ tt('Create Nonexistent Transfer Categories') }}</h4>
                         <h4 class="text-h4" v-if="type === 'tag'">{{ tt('Create Nonexistent Transaction Tags') }}</h4>
                     </div>
-                    <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                    <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                            :disabled="submitting || !invalidItems || !invalidItems.length" :icon="true">
                         <v-icon :icon="mdiDotsVertical" />
                         <v-menu activator="parent">
@@ -53,7 +53,7 @@
                 <div class="w-100 d-flex justify-center gap-4">
                     <v-btn :disabled="submitting || !selectedNames || !selectedNames.length" @click="confirm">
                         {{ tt('OK') }}
-                        <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
+                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                     </v-btn>
                     <v-btn color="secondary" variant="tonal" :disabled="submitting" @click="cancel">{{ tt('Cancel') }}</v-btn>
                 </div>

@@ -4,9 +4,9 @@
             <v-avatar color="secondary" size="38">
                 <v-icon size="24" :icon="icon" />
             </v-avatar>
-            <span class="font-weight-bold ml-3">{{ title }}</span>
+            <span class="font-weight-bold ms-3">{{ title }}</span>
             <v-spacer/>
-            <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true">
+            <v-btn density="comfortable" color="default" variant="text" class="ms-2" :icon="true">
                 <v-icon :icon="mdiDotsVertical" />
                 <v-menu activator="parent">
                     <v-list>

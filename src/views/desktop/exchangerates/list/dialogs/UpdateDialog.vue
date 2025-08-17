@@ -51,7 +51,7 @@
                 <div class="w-100 d-flex justify-center gap-4">
                     <v-btn :disabled="submitting || !defaultCurrencyAmount || !currency || !targetCurrencyAmount" @click="confirm">
                         {{ tt('OK') }}
-                        <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
+                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                     </v-btn>
                     <v-btn color="secondary" variant="tonal" :disabled="submitting" @click="cancel">{{ tt('Cancel') }}</v-btn>
                 </div>

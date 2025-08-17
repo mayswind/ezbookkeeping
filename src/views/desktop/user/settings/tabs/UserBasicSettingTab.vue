@@ -4,7 +4,7 @@
             <v-card :class="{ 'disabled': loading || saving }">
                 <template #title>
                     <span>{{ tt('Basic Settings') }}</span>
-                    <v-progress-circular indeterminate size="20" class="ml-3" v-if="loading"></v-progress-circular>
+                    <v-progress-circular indeterminate size="20" class="ms-3" v-if="loading"></v-progress-circular>
                 </template>
 
                 <v-card-text class="d-flex">
@@ -38,10 +38,10 @@
                         <div class="d-flex text-body-1 align-center" style="height: 40px;">
                             <span v-if="!loading && emailVerified">{{ tt('Email address is verified') }}</span>
                             <span v-if="!loading && !emailVerified">{{ tt('Email address is not verified') }}</span>
-                            <v-btn class="ml-2 px-2" size="small" variant="text" :disabled="loading || resending"
+                            <v-btn class="ms-2 px-2" size="small" variant="text" :disabled="loading || resending"
                                    @click="resendVerifyEmail" v-if="isUserVerifyEmailEnabled() && !loading && !emailVerified">
                                 {{ tt('Resend Validation Email') }}
-                                <v-progress-circular indeterminate size="18" class="ml-2" v-if="resending"></v-progress-circular>
+                                <v-progress-circular indeterminate size="18" class="ms-2" v-if="resending"></v-progress-circular>
                             </v-btn>
                             <v-skeleton-loader class="skeleton-no-margin mt-2 mb-1" type="text" style="width: 160px" :loading="true" v-if="loading"></v-skeleton-loader>
                         </div>
@@ -351,7 +351,7 @@
                     <v-card-text class="d-flex flex-wrap gap-4">
                         <v-btn :disabled="inputIsNotChanged || inputIsInvalid || saving" @click="save">
                             {{ tt('Save Changes') }}
-                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="saving"></v-progress-circular>
+                            <v-progress-circular indeterminate size="22" class="ms-2" v-if="saving"></v-progress-circular>
                         </v-btn>
 
                         <v-btn color="default" variant="tonal" @click="reset">

@@ -5,7 +5,7 @@
                 <div class="w-100 text-center">
                     <h4 class="text-h4">{{ tt(title) }}</h4>
                 </div>
-                <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                        :disabled="loading || !hasAnyAvailableAccount" :icon="true">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent">
@@ -36,7 +36,7 @@
             <div class="d-flex align-center" v-else-if="!dialogMode">
                 <span>{{ tt(title) }}</span>
                 <v-spacer/>
-                <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                        :disabled="loading" :icon="true">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent">
@@ -83,7 +83,7 @@
                                    v-for="accountCategory in allCategorizedAccounts"
                                    v-show="showHidden || accountCategory.allVisibleAccountCount > 0">
                     <v-expansion-panel-title class="expand-panel-title-with-bg py-0">
-                        <span class="ml-3">{{ tt(accountCategory.name) }}</span>
+                        <span class="ms-3">{{ tt(accountCategory.name) }}</span>
                     </v-expansion-panel-title>
                     <v-expansion-panel-text>
                         <v-list rounded density="comfortable" class="pa-0">
@@ -99,7 +99,7 @@
                                             <template #label>
                                                 <ItemIcon class="d-flex" icon-type="account" :icon-id="account.icon"
                                                           :color="account.color" :hidden-status="account.hidden"></ItemIcon>
-                                                <span class="ml-3">{{ account.name }}</span>
+                                                <span class="ms-3">{{ account.name }}</span>
                                             </template>
                                         </v-checkbox>
                                     </template>
@@ -107,7 +107,7 @@
 
                                 <v-divider v-if="(showHidden || !account.hidden) && account.type === AccountType.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])"/>
 
-                                <v-list rounded density="comfortable" class="pa-0 ml-4"
+                                <v-list rounded density="comfortable" class="pa-0 ms-4"
                                         v-if="(showHidden || !account.hidden) && account.type === AccountType.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])">
                                     <template :key="subAccount.id"
                                               v-for="(subAccount, subIdx) in accountCategory.allSubAccounts[account.id]">
@@ -120,7 +120,7 @@
                                                     <template #label>
                                                         <ItemIcon class="d-flex" icon-type="account" :icon-id="subAccount.icon"
                                                                   :color="subAccount.color" :hidden-status="subAccount.hidden"></ItemIcon>
-                                                        <span class="ml-3">{{ subAccount.name }}</span>
+                                                        <span class="ms-3">{{ subAccount.name }}</span>
                                                     </template>
                                                 </v-checkbox>
                                             </template>

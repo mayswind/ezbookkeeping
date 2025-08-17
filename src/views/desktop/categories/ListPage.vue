@@ -35,18 +35,18 @@
                                 <v-card variant="flat" :min-height="cardMinHeight">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
-                                            <v-btn class="mr-3 d-md-none" density="compact" color="default" variant="plain"
+                                            <v-btn class="me-3 d-md-none" density="compact" color="default" variant="plain"
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
                                                 <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
                                             <span>{{ tt('Transaction Categories') }}</span>
-                                            <v-btn class="ml-3" color="default" variant="outlined"
+                                            <v-btn class="ms-3" color="default" variant="outlined"
                                                    :disabled="loading || updating" @click="add">{{ tt('Add') }}</v-btn>
-                                            <v-btn class="ml-3" color="primary" variant="tonal"
+                                            <v-btn class="ms-3" color="primary" variant="tonal"
                                                    :disabled="loading || updating" @click="saveSortResult"
                                                    v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
                                             <v-btn density="compact" color="default" variant="text" size="24"
-                                                   class="ml-2" :icon="true" :loading="loading || updating" @click="reload(true)">
+                                                   class="ms-2" :icon="true" :loading="loading || updating" @click="reload(true)">
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
                                                 </template>
@@ -54,7 +54,7 @@
                                                 <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                                             </v-btn>
                                             <v-spacer/>
-                                            <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                                            <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                                                    :disabled="loading || updating" :icon="true">
                                                 <v-icon :icon="mdiDotsVertical" />
                                                 <v-menu activator="parent">
@@ -97,7 +97,7 @@
                                             <td>
                                                 <div class="d-flex align-center">
                                                     <span>{{ tt('No available category') }}</span>
-                                                    <v-btn class="ml-3" color="default" variant="outlined"
+                                                    <v-btn class="ms-3" color="default" variant="outlined"
                                                            @click="showPresetDialog = true"
                                                            v-if="hasSubCategories && noCategory">
                                                         {{ tt('Add Default Categories') }}
@@ -124,14 +124,14 @@
                                                                           :icon-id="element.icon" :color="element.color"
                                                                           :hidden-status="element.hidden" />
                                                                 <div class="d-flex flex-column py-2">
-                                                                    <span class="ml-2">{{ element.name }}</span>
-                                                                    <span class="transaction-category-comment ml-2">{{ element.comment }}</span>
+                                                                    <span class="ms-2">{{ element.name }}</span>
+                                                                    <span class="transaction-category-comment ms-2">{{ element.comment }}</span>
                                                                 </div>
                                                             </div>
 
                                                             <v-spacer/>
 
-                                                            <v-btn class="px-2 ml-2" color="default"
+                                                            <v-btn class="px-2 ms-2" color="default"
                                                                    density="comfortable" variant="text"
                                                                    :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                    :prepend-icon="element.hidden ? mdiEyeOutline : mdiEyeOffOutline"
@@ -163,7 +163,7 @@
                                                                 </template>
                                                                 {{ tt('Delete') }}
                                                             </v-btn>
-                                                            <span class="ml-2">
+                                                            <span class="ms-2">
                                                                 <v-icon :class="!loading && !updating && availableCategoryCount > 1 ? 'drag-handle' : 'disabled'"
                                                                         :icon="mdiDrag"/>
                                                                 <v-tooltip activator="parent" v-if="!loading && !updating && availableCategoryCount > 1">{{ tt('Drag to Reorder') }}</v-tooltip>

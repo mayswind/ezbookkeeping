@@ -42,7 +42,7 @@
                 <div ref="buttonContainer" class="w-100 d-flex justify-center gap-4">
                     <v-btn :disabled="generating || !currentPassword" @click="generateToken" v-if="!generatedToken">
                         {{ tt('Generate') }}
-                        <v-progress-circular indeterminate size="22" class="ml-2" v-if="generating"></v-progress-circular>
+                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="generating"></v-progress-circular>
                     </v-btn>
                     <v-btn color="secondary" variant="tonal" :disabled="generating"
                            @click="cancel" v-if="!generatedToken">{{ tt('Cancel') }}</v-btn>

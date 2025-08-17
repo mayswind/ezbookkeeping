@@ -13,6 +13,7 @@ import { type CommonAccountBalanceTrendsChartProps, useAccountBalanceTrendsChart
 import { useUserStore } from '@/stores/user.ts';
 
 import type { NameValue } from '@/core/base.ts';
+import { TextDirection } from '@/core/text.ts';
 import type { ColorValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { AccountBalanceTrendChartType } from '@/core/statistics.ts';
@@ -47,11 +48,12 @@ interface AccountBalanceTrendsChartDataItem {
 const props = defineProps<DesktopAccountBalanceTrendsChartProps>();
 
 const theme = useTheme();
-const { tt, formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
+const { tt, getCurrentLanguageTextDirection, formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
 const { allDataItems, allDisplayDateRanges } = useAccountBalanceTrendsChartBase(props);
 
 const userStore = useUserStore();
 
+const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 
 const allSeries = computed<AccountBalanceTrendsChartDataItem[]>(() => {
@@ -203,7 +205,7 @@ const chartOptions = computed<object>(() => {
 
                     for (let i = 0; i < displayItems.length; i++) {
                         tooltip += `<div><span class="chart-pointer" style="background-color: #${DEFAULT_CHART_COLORS[i]}"></span>`
-                            + `<span>${displayItems[i].name}</span><span style="margin-left: 20px; float: right">${displayItems[i].value}</span><br/>`
+                            + `<span>${displayItems[i].name}</span><span class="ms-5" style="float: inline-end">${displayItems[i].value}</span><br/>`
                             + `</div>`;
                     }
 
@@ -214,7 +216,7 @@ const chartOptions = computed<object>(() => {
 
                     return `${params[0].name}<br/>`
                         + '<div><span class="chart-pointer" style="background-color: #' + DEFAULT_CHART_COLORS[0] + '"></span>'
-                        + `<span>${props.legendName}</span><span style="margin-left: 20px; float: right">${value}</span><br/>`
+                        + `<span>${props.legendName}</span><span class="ms-5" style="float: inline-end">${value}</span><br/>`
                         + '</div>';
                 }
             }
@@ -226,7 +228,8 @@ const chartOptions = computed<object>(() => {
         xAxis: [
             {
                 type: 'category',
-                data: allDisplayDateRanges.value
+                data: allDisplayDateRanges.value,
+                inverse: textDirection.value === TextDirection.RTL
             }
         ],
         yAxis: [

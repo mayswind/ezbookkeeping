@@ -33,13 +33,13 @@
                             <v-tab class="tab-text-truncate" :key="accountCategory.type" :value="accountCategory.type"
                                    v-for="accountCategory in AccountCategory.values()">
                                 <ItemIcon icon-type="account" :icon-id="accountCategory.defaultAccountIconId" />
-                                <div class="d-flex flex-column text-truncate ml-2">
-                                    <small class="text-truncate text-left smaller" v-if="!loading || allAccountCount > 0">{{ accountCategoryTotalBalance(accountCategory) }}</small>
-                                    <small class="text-truncate text-left smaller my-1" v-else-if="loading && allAccountCount <= 0">
+                                <div class="d-flex flex-column text-truncate ms-2">
+                                    <small class="text-truncate text-start smaller" v-if="!loading || allAccountCount > 0">{{ accountCategoryTotalBalance(accountCategory) }}</small>
+                                    <small class="text-truncate text-start smaller my-1" v-else-if="loading && allAccountCount <= 0">
                                         <v-skeleton-loader class="skeleton-no-margin"
                                                            width="100px" height="16" type="text" :loading="true"></v-skeleton-loader>
                                     </small>
-                                    <span class="text-truncate text-left">{{ tt(accountCategory.name) }}</span>
+                                    <span class="text-truncate text-start">{{ tt(accountCategory.name) }}</span>
                                 </div>
                             </v-tab>
                         </v-tabs>
@@ -50,18 +50,18 @@
                                 <v-card variant="flat" min-height="780">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
-                                            <v-btn class="mr-3 d-md-none" density="compact" color="default" variant="plain"
+                                            <v-btn class="me-3 d-md-none" density="compact" color="default" variant="plain"
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
                                                 <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
                                             <span>{{ tt('Account List') }}</span>
-                                            <v-btn class="ml-3" color="default" variant="outlined"
+                                            <v-btn class="ms-3" color="default" variant="outlined"
                                                    :disabled="loading" @click="add">{{ tt('Add') }}</v-btn>
-                                            <v-btn class="ml-3" color="primary" variant="tonal"
+                                            <v-btn class="ms-3" color="primary" variant="tonal"
                                                    :disabled="loading" @click="saveSortResult"
                                                    v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
                                             <v-btn density="compact" color="default" variant="text" size="24"
-                                                   class="ml-2" :icon="true" :loading="loading" @click="reload(true)">
+                                                   class="ms-2" :icon="true" :loading="loading" @click="reload(true)">
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
                                                 </template>
@@ -69,7 +69,7 @@
                                                 <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                                             </v-btn>
                                             <v-spacer/>
-                                            <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                                            <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                                                    :disabled="loading" :icon="true">
                                                 <v-icon :icon="mdiDotsVertical" />
                                                 <v-menu activator="parent">
@@ -92,9 +92,9 @@
 
                                     <v-card-text class="accounts-overview-title text-truncate pt-0">
                                         <span class="accounts-overview-subtitle">{{ activeAccountCategory?.isLiability ? tt('Outstanding Balance') : tt('Balance') }}</span>
-                                        <v-skeleton-loader class="skeleton-no-margin ml-3 mb-2" width="120px" type="text" :loading="true" v-if="loading && activeAccountCategory && !hasAccount(activeAccountCategory)"></v-skeleton-loader>
-                                        <span class="accounts-overview-amount ml-3" v-else-if="!loading || !activeAccountCategory || hasAccount(activeAccountCategory)">{{ activeAccountCategoryTotalBalance }}</span>
-                                        <v-btn class="ml-2" density="compact" color="default" variant="text"
+                                        <v-skeleton-loader class="skeleton-no-margin ms-3 mb-2" width="120px" type="text" :loading="true" v-if="loading && activeAccountCategory && !hasAccount(activeAccountCategory)"></v-skeleton-loader>
+                                        <span class="accounts-overview-amount ms-3" v-else-if="!loading || !activeAccountCategory || hasAccount(activeAccountCategory)">{{ activeAccountCategoryTotalBalance }}</span>
+                                        <v-btn class="ms-2" density="compact" color="default" variant="text"
                                                :icon="true" :disabled="loading"
                                                @click="showAccountBalance = !showAccountBalance">
                                             <v-icon :icon="showAccountBalance ? mdiEyeOffOutline : mdiEyeOutline" size="20" />
@@ -102,13 +102,13 @@
                                         </v-btn>
                                     </v-card-text>
 
-                                    <v-row class="pl-6 pr-6 pr-md-8" v-if="loading && activeAccountCategory && !hasAccount(activeAccountCategory)">
+                                    <v-row class="ps-6 pe-6 pe-md-8" v-if="loading && activeAccountCategory && !hasAccount(activeAccountCategory)">
                                         <v-col cols="12">
                                             <v-card border class="card-title-with-bg account-card mb-8 h-auto">
                                                 <template #title>
                                                     <div class="account-title d-flex align-center">
-                                                        <v-icon class="disabled mr-0" size="28px" :icon="mdiSquareRounded" />
-                                                        <span class="account-name text-truncate ml-2">
+                                                        <v-icon class="disabled me-0" size="28px" :icon="mdiSquareRounded" />
+                                                        <span class="account-name text-truncate ms-2">
                                                             <v-skeleton-loader class="skeleton-no-margin my-1"
                                                                                width="120px" type="text" :loading="true"></v-skeleton-loader>
                                                         </span>
@@ -126,7 +126,7 @@
                                                             {{ tt('Transaction List') }}
                                                         </v-btn>
                                                         <v-spacer/>
-                                                        <span class="account-balance ml-2">
+                                                        <span class="account-balance ms-2">
                                                             <v-skeleton-loader class="skeleton-no-margin"
                                                                                width="100px" type="text" :loading="true"></v-skeleton-loader>
                                                         </span>
@@ -136,13 +136,13 @@
                                         </v-col>
                                     </v-row>
 
-                                    <v-row class="pl-5 pr-2 pr-md-4" v-if="!loading && activeAccountCategory && !hasAccount(activeAccountCategory)">
+                                    <v-row class="ps-5 pe-2 pe-md-4" v-if="!loading && activeAccountCategory && !hasAccount(activeAccountCategory)">
                                         <v-col cols="12">
                                             {{ tt('No available account') }}
                                         </v-col>
                                     </v-row>
 
-                                    <v-row class="pl-6 pr-6 pr-md-8">
+                                    <v-row class="ps-6 pe-6 pe-md-8">
                                         <v-col cols="12">
                                             <draggable-list
                                                 class="list-group"
@@ -161,8 +161,8 @@
                                                                 <div class="account-title d-flex align-baseline">
                                                                     <ItemIcon size="1.5rem" icon-type="account" :icon-id="element.icon"
                                                                               :color="element.color" :hidden-status="element.hidden" />
-                                                                    <span class="account-name text-truncate ml-2">{{ element.name }}</span>
-                                                                    <small class="account-currency text-truncate ml-2">
+                                                                    <span class="account-name text-truncate ms-2">{{ element.name }}</span>
+                                                                    <small class="account-currency text-truncate ms-2">
                                                                         {{ accountCurrency(element) }}
                                                                     </small>
                                                                     <v-spacer/>
@@ -192,7 +192,7 @@
                                                                                v-show="showHidden || !subAccount.hidden">
                                                                             <ItemIcon size="1.5rem" icon-type="account" :icon-id="subAccount.icon"
                                                                                       :color="subAccount.color" :hidden-status="subAccount.hidden" />
-                                                                            <span class="ml-2">{{ subAccount.name }}</span>
+                                                                            <span class="ms-2">{{ subAccount.name }}</span>
                                                                         </v-btn>
                                                                     </v-btn-toggle>
                                                                 </div>
@@ -211,7 +211,7 @@
                                                                            :to="`/transaction/list?accountIds=${element.getAccountOrSubAccountId(activeSubAccount[element.id])}`">
                                                                         {{ tt('Transaction List') }}
                                                                     </v-btn>
-                                                                    <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
+                                                                    <v-btn class="px-2 ms-1" density="comfortable" color="default" variant="text"
                                                                            :disabled="loading" :prepend-icon="mdiInvoiceListOutline"
                                                                            @click="showReconciliationStatementCustomDateRangeDialog(element.getAccountOrSubAccount(activeSubAccount[element.id]))"
                                                                            v-if="element.type === AccountType.SingleAccount.type || element.getSubAccount(activeSubAccount[element.id])">
@@ -225,7 +225,7 @@
                                                                                         <v-list-item-title class="cursor-pointer"
                                                                                                            @click="showReconciliationStatementCustomDateRangeDialog(element.getAccountOrSubAccount(activeSubAccount[element.id]), dateRange.type)">
                                                                                             <div class="d-flex align-center">
-                                                                                                <span class="text-sm ml-3">{{ dateRange.displayName }}</span>
+                                                                                                <span class="text-sm ms-3">{{ dateRange.displayName }}</span>
                                                                                             </div>
                                                                                         </v-list-item-title>
                                                                                     </v-list-item>
@@ -233,7 +233,7 @@
                                                                             </v-list>
                                                                         </v-menu>
                                                                     </v-btn>
-                                                                    <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
+                                                                    <v-btn class="px-2 ms-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading"
                                                                            :prepend-icon="element.isAccountOrSubAccountHidden(activeSubAccount[element.id]) ? mdiEyeOutline : mdiEyeOffOutline"
@@ -241,14 +241,14 @@
                                                                            @click="hide(element, element.getAccountOrSubAccount(activeSubAccount[element.id]), !element.isAccountOrSubAccountHidden(activeSubAccount[element.id]))">
                                                                         {{ element.isAccountOrSubAccountHidden(activeSubAccount[element.id]) ? tt('Show') : tt('Hide') }}
                                                                     </v-btn>
-                                                                    <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
+                                                                    <v-btn class="px-2 ms-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading" :prepend-icon="mdiPencilOutline"
                                                                            v-if="!activeSubAccount[element.id] || element.getSubAccount(activeSubAccount[element.id])"
                                                                            @click="edit(element)">
                                                                         {{ tt('Edit') }}
                                                                     </v-btn>
-                                                                    <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
+                                                                    <v-btn class="px-2 ms-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading" :prepend-icon="mdiDeleteOutline"
                                                                            v-if="!activeSubAccount[element.id] || element.getSubAccount(activeSubAccount[element.id])"
@@ -256,7 +256,7 @@
                                                                         {{ tt('Delete') }}
                                                                     </v-btn>
                                                                     <v-spacer/>
-                                                                    <span class="account-balance ml-2">{{ accountBalance(element, activeSubAccount[element.id]) }}</span>
+                                                                    <span class="account-balance ms-2">{{ accountBalance(element, activeSubAccount[element.id]) }}</span>
                                                                 </div>
                                                             </v-card-text>
                                                         </v-card>

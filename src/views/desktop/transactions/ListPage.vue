@@ -52,12 +52,12 @@
                                 <v-card variant="flat" min-height="920">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center text-no-wrap">
-                                            <v-btn class="mr-3 d-md-none" density="compact" color="default" variant="plain"
+                                            <v-btn class="me-3 d-md-none" density="compact" color="default" variant="plain"
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
                                                 <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
                                             <span>{{ tt('Transaction List') }}</span>
-                                            <v-btn class="ml-3" color="default" variant="outlined"
+                                            <v-btn class="ms-3" color="default" variant="outlined"
                                                    :disabled="loading || !canAddTransaction" @click="add()">
                                                 {{ tt('Add') }}
                                                 <v-menu activator="parent" :open-on-hover="true" v-if="allTransactionTemplates && allTransactionTemplates.length">
@@ -70,7 +70,7 @@
                                                     </v-list>
                                                 </v-menu>
                                             </v-btn>
-                                            <v-btn class="ml-3" color="default" variant="outlined"
+                                            <v-btn class="ms-3" color="default" variant="outlined"
                                                    :disabled="loading" @click="importTransaction"
                                                    v-if="isDataImportingEnabled()">
                                                 {{ tt('Import') }}
@@ -87,7 +87,7 @@
                                                     </v-list>
                                                 </v-menu>
                                             </v-btn>
-                                            <v-btn class="ml-3" color="default" variant="outlined"
+                                            <v-btn class="ms-3" color="default" variant="outlined"
                                                    :disabled="loading || exportingData || !transactions || !transactions.length || transactions.length < 1" v-if="!isDataImportingEnabled() && isDataExportingEnabled()">
                                                 {{ tt('Export') }}
                                                 <v-menu activator="parent">
@@ -104,7 +104,7 @@
                                                 </v-menu>
                                             </v-btn>
                                             <v-btn density="compact" color="default" variant="text" size="24"
-                                                   class="ml-2" :icon="true" :loading="loading" @click="reload(true, false)">
+                                                   class="ms-2" :icon="true" :loading="loading" @click="reload(true, false)">
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
                                                 </template>
@@ -112,7 +112,7 @@
                                                 <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                                             </v-btn>
                                             <v-spacer/>
-                                            <div class="transaction-keyword-filter ml-2">
+                                            <div class="transaction-keyword-filter ms-2">
                                                 <v-text-field density="compact" :disabled="loading"
                                                               :prepend-inner-icon="mdiMagnify"
                                                               :append-inner-icon="searchKeyword !== query.keyword ? mdiCheck : undefined"
@@ -128,36 +128,36 @@
                                     <v-card-text class="pt-0">
                                         <div class="transaction-list-datetime-range d-flex align-center">
                                             <span class="text-body-1">{{ tt('Date Range') }}</span>
-                                            <span class="text-body-1 transaction-list-datetime-range-text ml-2"
+                                            <span class="text-body-1 transaction-list-datetime-range-text ms-2"
                                                   v-if="!query.minTime && !query.maxTime">
                                                 <span class="text-sm">{{ tt('All') }}</span>
                                             </span>
-                                            <span class="text-body-1 transaction-list-datetime-range-text ml-2"
+                                            <span class="text-body-1 transaction-list-datetime-range-text ms-2"
                                                   v-else-if="query.minTime || query.maxTime">
-                                                <v-btn class="mr-1" size="x-small"
+                                                <v-btn class="button-icon-with-direction me-1" size="x-small"
                                                        density="compact" color="default" variant="outlined"
                                                        :icon="mdiArrowLeft" :disabled="loading"
                                                        @click="shiftDateRange(query.minTime, query.maxTime, -1)"/>
                                                 <span class="text-sm">{{ `${queryMinTime} - ${queryMaxTime}` }}</span>
-                                                <v-btn class="ml-1" size="x-small"
+                                                <v-btn class="button-icon-with-direction ms-1" size="x-small"
                                                        density="compact" color="default" variant="outlined"
                                                        :icon="mdiArrowRight" :disabled="loading"
                                                        @click="shiftDateRange(query.minTime, query.maxTime, 1)"/>
                                             </span>
                                             <v-spacer/>
                                             <div class="skeleton-no-margin d-flex align-center" v-if="showTotalAmountInTransactionListPage && currentMonthTotalAmount">
-                                                <span class="ml-2 text-subtitle-1">{{ queryAllFilterAccountIdsCount ? tt('Total Inflows') : tt('Total Income') }}</span>
-                                                <span class="text-income ml-2" v-if="loading">
+                                                <span class="ms-2 text-subtitle-1">{{ queryAllFilterAccountIdsCount ? tt('Total Inflows') : tt('Total Income') }}</span>
+                                                <span class="text-income ms-2" v-if="loading">
                                                     <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
                                                 </span>
-                                                <span class="text-income ml-2" v-else-if="!loading">
+                                                <span class="text-income ms-2" v-else-if="!loading">
                                                     {{ currentMonthTotalAmount.income }}
                                                 </span>
-                                                <span class="text-subtitle-1 ml-3">{{ queryAllFilterAccountIdsCount ? tt('Total Outflows') : tt('Total Expense') }}</span>
-                                                <span class="text-expense ml-2" v-if="loading">
+                                                <span class="text-subtitle-1 ms-3">{{ queryAllFilterAccountIdsCount ? tt('Total Outflows') : tt('Total Expense') }}</span>
+                                                <span class="text-expense ms-2" v-if="loading">
                                                     <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
                                                 </span>
-                                                <span class="text-expense ml-2" v-else-if="!loading">
+                                                <span class="text-expense ms-2" v-else-if="!loading">
                                                     {{ currentMonthTotalAmount.expense }}
                                                 </span>
                                             </div>
@@ -217,10 +217,10 @@
                                                                 <v-list-item-title class="cursor-pointer"
                                                                                    @click="changeDateFilter(dateRange.type)">
                                                                     <div class="d-flex align-center">
-                                                                        <span class="text-sm ml-3">{{ dateRange.displayName }}</span>
+                                                                        <span class="text-sm ms-3">{{ dateRange.displayName }}</span>
                                                                     </div>
                                                                 </v-list-item-title>
-                                                                <div class="ml-3 smaller" v-if="((dateRange.isBillingCycle || dateRange.type === DateRange.Custom.type) && query.dateType === dateRange.type) && query.minTime && query.maxTime">
+                                                                <div class="ms-3 smaller" v-if="((dateRange.isBillingCycle || dateRange.type === DateRange.Custom.type) && query.dateType === dateRange.type) && query.minTime && query.maxTime">
                                                                     <span>{{ queryMinTime }}</span>
                                                                     <span>&nbsp;-&nbsp;</span>
                                                                     <br/>
@@ -253,7 +253,7 @@
                                                                                @click="changeCategoryFilter('')">
                                                                 <div class="d-flex align-center">
                                                                     <v-icon :icon="mdiViewGridOutline" />
-                                                                    <span class="text-sm ml-3">{{ tt('All') }}</span>
+                                                                    <span class="text-sm ms-3">{{ tt('All') }}</span>
                                                                 </div>
                                                             </v-list-item-title>
                                                         </v-list-item>
@@ -265,7 +265,7 @@
                                                                                @click="showFilterCategoryDialog = true">
                                                                 <div class="d-flex align-center">
                                                                     <v-icon :icon="mdiVectorArrangeBelow" />
-                                                                    <span class="text-sm ml-3">{{ tt('Multiple Categories') }}</span>
+                                                                    <span class="text-sm ms-3">{{ tt('Multiple Categories') }}</span>
                                                                 </div>
                                                             </v-list-item-title>
                                                         </v-list-item>
@@ -287,7 +287,7 @@
                                                                         <v-list-item-title>
                                                                             <div class="d-flex align-center">
                                                                                 <ItemIcon icon-type="category" size="24px" :icon-id="category.icon" :color="category.color"></ItemIcon>
-                                                                                <span class="text-sm ml-3">{{ category.name }}</span>
+                                                                                <span class="text-sm ms-3">{{ category.name }}</span>
                                                                             </div>
                                                                         </v-list-item-title>
                                                                     </v-list-item>
@@ -302,7 +302,7 @@
                                                                                        @click="changeCategoryFilter(category.id)">
                                                                         <div class="d-flex align-center">
                                                                             <v-icon :icon="mdiViewGridOutline" />
-                                                                            <span class="text-sm ml-3">{{ tt('All') }}</span>
+                                                                            <span class="text-sm ms-3">{{ tt('All') }}</span>
                                                                         </div>
                                                                     </v-list-item-title>
                                                                 </v-list-item>
@@ -319,7 +319,7 @@
                                                                                            @click="changeCategoryFilter(subCategory.id)">
                                                                             <div class="d-flex align-center">
                                                                                 <ItemIcon icon-type="category" size="24px" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
-                                                                                <span class="text-sm ml-3">{{ subCategory.name }}</span>
+                                                                                <span class="text-sm ms-3">{{ subCategory.name }}</span>
                                                                             </div>
                                                                         </v-list-item-title>
                                                                     </v-list-item>
@@ -349,7 +349,7 @@
                                                             <v-list-item-title class="cursor-pointer"
                                                                                @click="changeAmountFilter('')">
                                                                 <div class="d-flex align-center">
-                                                                    <span class="text-sm ml-3">{{ tt('All') }}</span>
+                                                                    <span class="text-sm ms-3">{{ tt('All') }}</span>
                                                                 </div>
                                                             </v-list-item-title>
                                                         </v-list-item>
@@ -362,18 +362,18 @@
                                                                 <v-list-item-title class="cursor-pointer"
                                                                                    @click="currentAmountFilterType = filterType.type">
                                                                     <div class="d-flex align-center">
-                                                                        <span class="text-sm ml-3">{{ tt(filterType.name) }}</span>
-                                                                        <span class="text-sm ml-4" v-if="query.amountFilter && query.amountFilter.startsWith(`${filterType.type}:`) && currentAmountFilterType !== filterType.type">{{ queryAmount }}</span>
-                                                                        <amount-input class="transaction-amount-filter-value ml-4" density="compact"
+                                                                        <span class="text-sm ms-3">{{ tt(filterType.name) }}</span>
+                                                                        <span class="text-sm ms-4" v-if="query.amountFilter && query.amountFilter.startsWith(`${filterType.type}:`) && currentAmountFilterType !== filterType.type">{{ queryAmount }}</span>
+                                                                        <amount-input class="transaction-amount-filter-value ms-4" density="compact"
                                                                                       :currency="defaultCurrency"
                                                                                       v-model="currentAmountFilterValue1"
                                                                                       v-if="currentAmountFilterType === filterType.type"/>
-                                                                        <span class="ml-2 mr-2" v-if="currentAmountFilterType === filterType.type && filterType.paramCount === 2">~</span>
+                                                                        <span class="ms-2 me-2" v-if="currentAmountFilterType === filterType.type && filterType.paramCount === 2">~</span>
                                                                         <amount-input class="transaction-amount-filter-value" density="compact"
                                                                                       :currency="defaultCurrency"
                                                                                       v-model="currentAmountFilterValue2"
                                                                                       v-if="currentAmountFilterType === filterType.type && filterType.paramCount === 2"/>
-                                                                        <v-btn class="ml-2" density="compact" color="primary" variant="tonal"
+                                                                        <v-btn class="ms-2" density="compact" color="primary" variant="tonal"
                                                                                @click="changeAmountFilter(filterType.type)"
                                                                                v-if="currentAmountFilterType === filterType.type">{{ tt('Apply') }}</v-btn>
                                                                     </div>
@@ -402,7 +402,7 @@
                                                                                @click="changeAccountFilter('')">
                                                                 <div class="d-flex align-center">
                                                                     <v-icon :icon="mdiViewGridOutline" />
-                                                                    <span class="text-sm ml-3">{{ tt('All') }}</span>
+                                                                    <span class="text-sm ms-3">{{ tt('All') }}</span>
                                                                 </div>
                                                             </v-list-item-title>
                                                         </v-list-item>
@@ -414,7 +414,7 @@
                                                                                @click="showFilterAccountDialog = true">
                                                                 <div class="d-flex align-center">
                                                                     <v-icon :icon="mdiVectorArrangeBelow" />
-                                                                    <span class="text-sm ml-3">{{ tt('Multiple Accounts') }}</span>
+                                                                    <span class="text-sm ms-3">{{ tt('Multiple Accounts') }}</span>
                                                                 </div>
                                                             </v-list-item-title>
                                                         </v-list-item>
@@ -430,7 +430,7 @@
                                                                                    @click="changeAccountFilter(account.id)">
                                                                     <div class="d-flex align-center">
                                                                         <ItemIcon icon-type="account" size="24px" :icon-id="account.icon" :color="account.color"></ItemIcon>
-                                                                        <span class="text-sm ml-3">{{ account.name }}</span>
+                                                                        <span class="text-sm ms-3">{{ account.name }}</span>
                                                                     </div>
                                                                 </v-list-item-title>
                                                             </v-list-item>
@@ -457,7 +457,7 @@
                                                                                @click="changeTagFilter('')">
                                                                 <div class="d-flex align-center">
                                                                     <v-icon :icon="mdiViewGridOutline" />
-                                                                    <span class="text-sm ml-3">{{ tt('All') }}</span>
+                                                                    <span class="text-sm ms-3">{{ tt('All') }}</span>
                                                                 </div>
                                                             </v-list-item-title>
                                                         </v-list-item>
@@ -468,7 +468,7 @@
                                                                                @click="changeTagFilter('none')">
                                                                 <div class="d-flex align-center">
                                                                     <v-icon :icon="mdiBorderNoneVariant" />
-                                                                    <span class="text-sm ml-3">{{ tt('Without Tags') }}</span>
+                                                                    <span class="text-sm ms-3">{{ tt('Without Tags') }}</span>
                                                                 </div>
                                                             </v-list-item-title>
                                                         </v-list-item>
@@ -480,7 +480,7 @@
                                                                                @click="showFilterTagDialog = true">
                                                                 <div class="d-flex align-center">
                                                                     <v-icon :icon="mdiVectorArrangeBelow" />
-                                                                    <span class="text-sm ml-3">{{ tt('Multiple Tags') }}</span>
+                                                                    <span class="text-sm ms-3">{{ tt('Multiple Tags') }}</span>
                                                                 </div>
                                                             </v-list-item-title>
                                                         </v-list-item>
@@ -497,7 +497,7 @@
                                                                                    @click="changeTagFilterType(filterType.type)">
                                                                     <div class="d-flex align-center">
                                                                         <v-icon size="24" :icon="filterType.icon"/>
-                                                                        <span class="text-sm ml-3">{{ filterType.displayName }}</span>
+                                                                        <span class="text-sm ms-3">{{ filterType.displayName }}</span>
                                                                     </div>
                                                                 </v-list-item-title>
                                                             </v-list-item>
@@ -515,7 +515,7 @@
                                                                                    @click="changeTagFilter(transactionTag.id)">
                                                                     <div class="d-flex align-center">
                                                                         <v-icon size="24" :icon="mdiPound"/>
-                                                                        <span class="text-sm ml-3">{{ transactionTag.name }}</span>
+                                                                        <span class="text-sm ms-3">{{ transactionTag.name }}</span>
                                                                     </div>
                                                                 </v-list-item-title>
                                                             </v-list-item>
@@ -549,7 +549,7 @@
                                                 <td :colspan="showTagInTransactionListPage ? 6 : 5" class="font-weight-bold">
                                                     <div class="d-flex align-center">
                                                         <span>{{ getDisplayLongDate(transaction) }}</span>
-                                                        <v-chip class="ml-1" color="default" size="x-small"
+                                                        <v-chip class="ms-1" color="default" size="x-small"
                                                                 v-if="transaction.dayOfWeek">
                                                             {{ getWeekdayLongName(transaction.dayOfWeek) }}
                                                         </v-chip>
@@ -572,13 +572,13 @@
                                                                   :color="transaction.category.color"
                                                                   v-if="transaction.category && transaction.category.color"></ItemIcon>
                                                         <v-icon size="24" :icon="mdiPencilBoxOutline" v-else-if="!transaction.category || !transaction.category.color" />
-                                                        <span class="ml-2" v-if="transaction.type === TransactionType.ModifyBalance">
+                                                        <span class="ms-2" v-if="transaction.type === TransactionType.ModifyBalance">
                                                             {{ tt('Modify Balance') }}
                                                         </span>
-                                                        <span class="ml-2" v-else-if="transaction.type !== TransactionType.ModifyBalance && transaction.category">
+                                                        <span class="ms-2" v-else-if="transaction.type !== TransactionType.ModifyBalance && transaction.category">
                                                             {{ transaction.category.name }}
                                                         </span>
-                                                        <span class="ml-2" v-else-if="transaction.type !== TransactionType.ModifyBalance && !transaction.category">
+                                                        <span class="ms-2" v-else-if="transaction.type !== TransactionType.ModifyBalance && !transaction.category">
                                                             {{ getTransactionTypeName(transaction.type, 'Transaction') }}
                                                         </span>
                                                     </div>
@@ -591,7 +591,7 @@
                                                 <td class="transaction-table-column-account">
                                                     <div class="d-flex align-center">
                                                         <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
-                                                        <v-icon class="mx-1" size="13" :icon="mdiArrowRight" v-if="transaction.sourceAccount && transaction.type === TransactionType.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id"></v-icon>
+                                                        <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="transaction.sourceAccount && transaction.type === TransactionType.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id"></v-icon>
                                                         <span v-if="transaction.sourceAccount && transaction.type === TransactionType.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">{{ transaction.destinationAccount.name }}</span>
                                                     </div>
                                                 </td>
@@ -1828,11 +1828,11 @@ init(props);
 
 .transaction-table .transaction-table-column-category .v-btn .v-btn__append,
 .transaction-table .transaction-table-column-account .v-btn .v-btn__append {
-    margin-left: 0in;
+    margin-inline-start: 0in;
 }
 
 .transaction-table .transaction-table-column-tags .v-chip.transaction-tag {
-    margin-right: 4px;
+    margin-inline-end: 4px;
     margin-top: 2px;
     margin-bottom: 2px;
 }

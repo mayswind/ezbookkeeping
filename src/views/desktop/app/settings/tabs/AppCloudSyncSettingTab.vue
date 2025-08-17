@@ -4,7 +4,7 @@
             <v-card>
                 <template #title>
                     <span>{{ tt('Settings Sync') }}</span>
-                    <v-progress-circular indeterminate size="20" class="ml-3" v-if="loading"></v-progress-circular>
+                    <v-progress-circular indeterminate size="20" class="ms-3" v-if="loading"></v-progress-circular>
                 </template>
 
                 <v-card-text class="pb-0">
@@ -28,7 +28,7 @@
                                     <div class="w-100">
                                         <span>{{ tt('Synchronized Settings') }}</span>
                                     </div>
-                                    <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                                    <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                                            :disabled="loading || enabling || disabling" :icon="true">
                                         <v-icon :icon="mdiDotsVertical" />
                                         <v-menu activator="parent">
@@ -73,7 +73,7 @@
 
                                         <v-divider/>
 
-                                        <v-list rounded density="comfortable" class="pa-0 ml-4">
+                                        <v-list rounded density="comfortable" class="pa-0 ms-4">
                                             <template :key="settingItem.settingKey"
                                                       v-for="(settingItem, itemIdx) in categorizedItems.items">
                                                 <v-divider v-if="itemIdx > 0"/>
@@ -85,8 +85,8 @@
                                                                     @update:model-value="enabledApplicationCloudSettings[settingItem.settingKey] = !!$event">
                                                             <template #label>
                                                                 <span>{{ tt(settingItem.settingName) }}</span>
-                                                                <v-icon class="ml-2 mr-0" start size="16" :icon="mdiCellphone" v-if="settingItem.mobile"/>
-                                                                <v-icon class="ml-2 mr-0" start size="16" :icon="mdiMonitor" v-if="settingItem.desktop"/>
+                                                                <v-icon class="ms-2 me-0" start size="16" :icon="mdiCellphone" v-if="settingItem.mobile"/>
+                                                                <v-icon class="ms-2 me-0" start size="16" :icon="mdiMonitor" v-if="settingItem.desktop"/>
                                                             </template>
                                                         </v-checkbox>
                                                     </template>
@@ -105,15 +105,15 @@
                         <v-col cols="12" class="d-flex flex-wrap gap-4">
                             <v-btn :disabled="loading || enabling || disabling || !hasEnabledApplicationCloudSettings" v-if="!isEnableCloudSync" @click="enable(false)">
                                 {{ tt('Enable Settings Sync') }}
-                                <v-progress-circular indeterminate size="22" class="ml-2" v-if="enabling"></v-progress-circular>
+                                <v-progress-circular indeterminate size="22" class="ms-2" v-if="enabling"></v-progress-circular>
                             </v-btn>
                             <v-btn :disabled="loading || enabling || disabling || !hasEnabledApplicationCloudSettings" v-if="isEnableCloudSync" @click="enable(true)">
                                 {{ tt('Update Synchronized Settings') }}
-                                <v-progress-circular indeterminate size="22" class="ml-2" v-if="enabling"></v-progress-circular>
+                                <v-progress-circular indeterminate size="22" class="ms-2" v-if="enabling"></v-progress-circular>
                             </v-btn>
                             <v-btn :disabled="loading || enabling || disabling" v-if="isEnableCloudSync" @click="disable">
                                 {{ tt('Disable Settings Sync') }}
-                                <v-progress-circular indeterminate size="22" class="ml-2" v-if="disabling"></v-progress-circular>
+                                <v-progress-circular indeterminate size="22" class="ms-2" v-if="disabling"></v-progress-circular>
                             </v-btn>
                         </v-col>
                     </v-row>

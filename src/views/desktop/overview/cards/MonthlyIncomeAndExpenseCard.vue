@@ -34,6 +34,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 
+import { TextDirection } from '@/core/text.ts';
 import type { HiddenAmount } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
@@ -63,11 +64,12 @@ const emit = defineEmits<{
     (e: 'click', event: MonthlyIncomeAndExpenseCardClickEvent): void;
 }>();
 
-const { tt, getMonthShortName, formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
+const { tt, getCurrentLanguageTextDirection, getMonthShortName, formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
 
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
 
+const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 const showAmountInHomePage = computed<boolean>(() => settingsStore.appSettings.showAmountInHomePage);
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 const hasAnyData = computed<boolean>(() => {
@@ -157,21 +159,21 @@ const chartOptions = computed<object>(() => {
                 return `<table>` +
                     `<thead>` +
                     `<tr>` +
-                    `<td colspan="2" class="text-left">${params[0].name}</td>` +
+                    `<td colspan="2" class="text-start">${params[0].name}</td>` +
                     `</tr>` +
                     `</thead>` +
                     `<tbody>` +
                     (
                         incomeAmount !== null ?
                         `<tr>` +
-                        `<td><span class="overview-monthly-chart-tooltip-indicator bg-income mr-1"></span><span class="mr-4">${tt('Income')}</span></td>` +
+                        `<td><span class="overview-monthly-chart-tooltip-indicator bg-income me-1"></span><span class="me-4">${tt('Income')}</span></td>` +
                         `<td><strong>${incomeAmount}</strong></td>` +
                         `</tr>` : ''
                     )+
                     (
                         expenseAmount !== null ?
                         `<tr>` +
-                        `<td><span class="overview-monthly-chart-tooltip-indicator bg-expense mr-1"></span><span class="mr-4">${tt('Expense')}</span></td>` +
+                        `<td><span class="overview-monthly-chart-tooltip-indicator bg-expense me-1"></span><span class="me-4">${tt('Expense')}</span></td>` +
                         `<td><strong>${expenseAmount}</strong></td>` +
                         `</tr>` : ''
                     ) +
@@ -199,6 +201,7 @@ const chartOptions = computed<object>(() => {
             {
                 type: 'category',
                 data: monthNames,
+                inverse: textDirection.value === TextDirection.RTL,
                 axisLine: {
                     show: false
                 },

@@ -51,13 +51,13 @@
                                 <v-card variant="flat" min-height="680">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
-                                            <v-btn class="mr-3 d-md-none" density="compact" color="default" variant="plain"
+                                            <v-btn class="me-3 d-md-none" density="compact" color="default" variant="plain"
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
                                                 <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
                                             <span>{{ tt('Statistics & Analysis') }}</span>
-                                            <v-btn-group class="ml-4" color="default" density="comfortable" variant="outlined" divided>
-                                                <v-btn :icon="mdiArrowLeft"
+                                            <v-btn-group class="ms-4" color="default" density="comfortable" variant="outlined" divided>
+                                                <v-btn class="button-icon-with-direction" :icon="mdiArrowLeft"
                                                        :disabled="loading || !canShiftDateRange"
                                                        @click="shiftDateRange(-1)"/>
                                                 <v-menu location="bottom">
@@ -83,14 +83,14 @@
                                                         </v-list-item>
                                                     </v-list>
                                                 </v-menu>
-                                                <v-btn :icon="mdiArrowRight"
+                                                <v-btn class="button-icon-with-direction" :icon="mdiArrowRight"
                                                        :disabled="loading || !canShiftDateRange"
                                                        @click="shiftDateRange(1)"/>
                                             </v-btn-group>
 
                                             <v-menu location="bottom" v-if="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis">
                                                 <template #activator="{ props }">
-                                                    <v-btn class="ml-3" color="default" variant="outlined"
+                                                    <v-btn class="ms-3" color="default" variant="outlined"
                                                            :prepend-icon="mdiCalendarRangeOutline" :disabled="loading"
                                                            v-bind="props">{{ queryTrendDateAggregationTypeName }}</v-btn>
                                                 </template>
@@ -105,7 +105,7 @@
                                             </v-menu>
 
                                             <v-btn density="compact" color="default" variant="text" size="24"
-                                                   class="ml-2" :icon="true" :loading="loading" @click="reload(true)">
+                                                   class="ms-2" :icon="true" :loading="loading" @click="reload(true)">
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
                                                 </template>
@@ -113,7 +113,7 @@
                                                 <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                                             </v-btn>
                                             <v-spacer/>
-                                            <div class="transaction-keyword-filter ml-2">
+                                            <div class="transaction-keyword-filter ms-2">
                                                 <v-text-field density="compact" :disabled="loading"
                                                               :prepend-inner-icon="mdiMagnify"
                                                               :append-inner-icon="filterKeyword !== query.keyword ? mdiCheck : undefined"
@@ -123,7 +123,7 @@
                                                               @keyup.enter="setKeywordFilter(filterKeyword)"
                                                 />
                                             </div>
-                                            <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                                            <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                                                    :disabled="loading" :icon="true">
                                                 <v-icon :icon="mdiDotsVertical" />
                                                 <v-menu activator="parent">
@@ -155,12 +155,12 @@
                                     <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"
                                                  v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && (initing || (categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length))">
                                         <span class="statistics-subtitle">{{ totalAmountName }}</span>
-                                        <span class="statistics-overview-amount ml-3"
+                                        <span class="statistics-overview-amount ms-3"
                                               :class="statisticsTextColor"
                                               v-if="!initing && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length">
                                             {{ getDisplayAmount(categoricalAnalysisData.totalAmount, defaultCurrency) }}
                                         </span>
-                                        <v-skeleton-loader class="skeleton-no-margin ml-3 mb-2"
+                                        <v-skeleton-loader class="skeleton-no-margin ms-3 mb-2"
                                                            width="120px" type="text" :loading="true"
                                                            v-else-if="initing"></v-skeleton-loader>
                                     </v-card-text>
@@ -204,13 +204,13 @@
                                     <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && query.categoricalChartType === CategoricalChartType.Bar.type">
                                         <v-list rounded lines="two" v-if="initing">
                                             <template :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
-                                                <v-list-item class="pl-0">
+                                                <v-list-item class="ps-0">
                                                     <template #prepend>
                                                         <div>
-                                                            <v-icon class="disabled mr-0" size="34" :icon="mdiSquareRounded" />
+                                                            <v-icon class="disabled me-0" size="34" :icon="mdiSquareRounded" />
                                                         </div>
                                                     </template>
-                                                    <div class="d-flex flex-column ml-2">
+                                                    <div class="d-flex flex-column ms-2">
                                                         <div class="d-flex">
                                                             <v-skeleton-loader class="skeleton-no-margin my-2"
                                                                                width="120px" type="text" :loading="true"></v-skeleton-loader>
@@ -226,7 +226,7 @@
                                         <v-list class="py-0" rounded lines="two" v-else-if="!initing && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length">
                                             <template :key="idx"
                                                       v-for="(item, idx) in categoricalAnalysisData.items">
-                                                <v-list-item class="pl-0" v-if="!item.hidden">
+                                                <v-list-item class="ps-0" v-if="!item.hidden">
                                                     <template #prepend>
                                                         <router-link class="statistics-list-item" :to="getTransactionItemLinkUrl(item.id)">
                                                             <ItemIcon :icon-type="queryChartDataCategory" size="34px"
@@ -235,7 +235,7 @@
                                                         </router-link>
                                                     </template>
                                                     <router-link class="statistics-list-item" :to="getTransactionItemLinkUrl(item.id)">
-                                                        <div class="d-flex flex-column ml-2">
+                                                        <div class="d-flex flex-column ms-2">
                                                             <div class="d-flex">
                                                                 <span>{{ item.name }}</span>
                                                                 <small class="statistics-percent" v-if="item.percent >= 0">{{ formatPercentToLocalizedNumerals(item.percent, 2, '&lt;0.01') }}</small>
@@ -1058,7 +1058,7 @@ init(props);
 .statistics-list-item .statistics-percent {
     font-size: 0.75rem;
     opacity: 0.7;
-    margin-left: 6px;
+    margin-inline-start: 6px;
 }
 
 .statistics-list-item .statistics-amount {

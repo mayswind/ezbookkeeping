@@ -5,7 +5,7 @@
                 <div class="w-100 text-center">
                     <h4 class="text-h4">{{ tt(title) }}</h4>
                 </div>
-                <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                        :disabled="loading || !hasAnyAvailableCategory" :icon="true">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent">
@@ -36,7 +36,7 @@
             <div class="d-flex align-center" v-else-if="!dialogMode">
                 <span>{{ tt(title) }}</span>
                 <v-spacer/>
-                <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                        :disabled="loading" :icon="true">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent">
@@ -78,7 +78,7 @@
                                    class="border"
                                    v-for="transactionType in allTransactionCategories">
                     <v-expansion-panel-title class="expand-panel-title-with-bg py-0">
-                        <span class="ml-3">{{ getCategoryTypeName(transactionType.type) }}</span>
+                        <span class="ms-3">{{ getCategoryTypeName(transactionType.type) }}</span>
                     </v-expansion-panel-title>
                     <v-expansion-panel-text>
                         <v-list rounded density="comfortable" class="pa-0">
@@ -96,7 +96,7 @@
                                             <template #label>
                                                 <ItemIcon class="d-flex" icon-type="category" :icon-id="category.icon"
                                                           :color="category.color" :hidden-status="category.hidden"></ItemIcon>
-                                                <span class="ml-3">{{ category.name }}</span>
+                                                <span class="ms-3">{{ category.name }}</span>
                                             </template>
                                         </v-checkbox>
                                     </template>
@@ -104,7 +104,7 @@
 
                                 <v-divider v-if="(showHidden || !category.hidden) && ((showHidden && transactionType.allSubCategories[category.id]) || transactionType.allVisibleSubCategoryCounts[category.id])"/>
 
-                                <v-list rounded density="comfortable" class="pa-0 ml-4"
+                                <v-list rounded density="comfortable" class="pa-0 ms-4"
                                         v-if="(showHidden || !category.hidden) && ((showHidden && transactionType.allSubCategories[category.id]) || transactionType.allVisibleSubCategoryCounts[category.id])">
                                     <template :key="subCategory.id"
                                               v-for="(subCategory, subIdx) in transactionType.allSubCategories[category.id]">
@@ -117,7 +117,7 @@
                                                     <template #label>
                                                         <ItemIcon class="d-flex" icon-type="category" :icon-id="subCategory.icon"
                                                                   :color="subCategory.color" :hidden-status="subCategory.hidden"></ItemIcon>
-                                                        <span class="ml-3">{{ subCategory.name }}</span>
+                                                        <span class="ms-3">{{ subCategory.name }}</span>
                                                     </template>
                                                 </v-checkbox>
                                             </template>

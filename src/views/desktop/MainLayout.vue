@@ -31,7 +31,7 @@
                         <v-icon class="nav-item-icon" :icon="mdiListBoxOutline"/>
                         <span class="nav-item-title d-inline-block">{{ tt('Transaction Details') }}</span>
                         <v-btn density="compact" color="secondary" variant="text" size="22"
-                               class="ml-1" :icon="true" v-if="showAddTransactionButtonInDesktopNavbar"
+                               class="ms-1" :icon="true" v-if="showAddTransactionButtonInDesktopNavbar"
                                @click="showAddDialogInTransactionListPage">
                             <v-icon :icon="mdiPlusCircle" size="22" />
                             <v-tooltip activator="parent">{{ tt('Add Transaction') }}</v-tooltip>
@@ -109,7 +109,7 @@
             <div class="layout-navbar navbar-blur">
                 <div class="navbar-content-container">
                     <div class="d-flex h-100 align-center">
-                        <v-btn class="ms-n3 mr-2 d-lg-none" color="default" variant="text"
+                        <v-btn class="ms-n3 me-2 d-lg-none" color="default" variant="text"
                                :icon="true" @click="showVerticalOverlayMenu = true">
                             <v-icon :icon="mdiMenu" size="24" />
                         </v-btn>
@@ -152,7 +152,7 @@
                                                 </v-avatar>
                                             </v-list-item-action>
                                         </template>
-                                        <v-list-item-title class="ml-2 font-weight-semibold">
+                                        <v-list-item-title class="ms-2 font-weight-semibold">
                                             {{ currentNickName }}
                                         </v-list-item-title>
                                     </v-list-item>

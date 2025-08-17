@@ -9,13 +9,13 @@
         <v-row no-gutters class="auth-wrapper">
             <v-col cols="12" md="8" class="d-none d-md-flex align-center justify-center position-relative">
                 <div class="d-flex auth-img-footer" v-if="!isDarkMode">
-                    <v-img src="img/desktop/background.svg"/>
+                    <v-img class="img-with-direction" src="img/desktop/background.svg"/>
                 </div>
                 <div class="d-flex auth-img-footer" v-if="isDarkMode">
-                    <v-img src="img/desktop/background-dark.svg"/>
+                    <v-img class="img-with-direction" src="img/desktop/background-dark.svg"/>
                 </div>
                 <div class="d-flex align-center justify-center w-100 pt-10">
-                    <v-img max-width="600px" src="img/desktop/people1.svg"/>
+                    <v-img class="img-with-direction" max-width="600px" src="img/desktop/people1.svg"/>
                 </div>
             </v-col>
             <v-col cols="12" md="4" class="auth-card d-flex flex-column">
@@ -102,12 +102,12 @@
                                         <v-btn block :disabled="inputIsEmpty || logining || verifying"
                                                @click="login" v-if="!show2faInput">
                                             {{ tt('Log In') }}
-                                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="logining"></v-progress-circular>
+                                            <v-progress-circular indeterminate size="22" class="ms-2" v-if="logining"></v-progress-circular>
                                         </v-btn>
                                         <v-btn block :disabled="twoFAInputIsEmpty || logining || verifying"
                                                @click="verify" v-else-if="show2faInput">
                                             {{ tt('Continue') }}
-                                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="verifying"></v-progress-circular>
+                                            <v-progress-circular indeterminate size="22" class="ms-2" v-if="verifying"></v-progress-circular>
                                         </v-btn>
                                     </v-col>
 
@@ -165,9 +165,10 @@ import { useLoginPageBase } from '@/views/base/LoginPageBase.ts';
 
 import { useRootStore } from '@/stores/index.ts';
 
+import { ThemeType } from '@/core/theme.ts';
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
-import { ThemeType } from '@/core/theme.ts';
+
 import { isUserRegistrationEnabled, isUserForgetPasswordEnabled, isUserVerifyEmailEnabled } from '@/lib/server_settings.ts';
 
 import {

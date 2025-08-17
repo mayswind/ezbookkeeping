@@ -34,7 +34,7 @@
                                      :class="{ 'frequency-value-selected v-list-item--active text-primary': isFrequencyValueSelected(weekDay.type) }"
                                      v-for="weekDay in allWeekDays">
                             <template #prepend="{ isActive }">
-                                <v-checkbox density="compact" class="mr-1" :model-value="isActive"></v-checkbox>
+                                <v-checkbox density="compact" class="me-1" :model-value="isActive"></v-checkbox>
                             </template>
                         </v-list-item>
                     </v-list>
@@ -44,7 +44,7 @@
                                      :class="{ 'frequency-value-selected v-list-item--active text-primary': isFrequencyValueSelected(monthDay.day) }"
                                      v-for="monthDay in allAvailableMonthDays">
                             <template #prepend="{ isActive }">
-                                <v-checkbox density="compact" class="mr-1" :model-value="isActive"></v-checkbox>
+                                <v-checkbox density="compact" class="me-1" :model-value="isActive"></v-checkbox>
                             </template>
                         </v-list-item>
                     </v-list>

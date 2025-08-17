@@ -4,7 +4,7 @@
             <v-card :class="{ 'disabled': loading }">
                 <template #title>
                     <span>{{ tt('Two-Factor Authentication') }}</span>
-                    <v-progress-circular indeterminate size="20" class="ml-3" v-if="loading"></v-progress-circular>
+                    <v-progress-circular indeterminate size="20" class="ms-3" v-if="loading"></v-progress-circular>
                 </template>
 
                 <v-card-text class="pb-0">
@@ -57,19 +57,19 @@
                         <v-col cols="12" class="d-flex flex-wrap gap-4">
                             <v-btn :disabled="!currentPassword || loading || disabling " v-if="status === true" @click="disable">
                                 {{ tt('Disable Two-Factor Authentication') }}
-                                <v-progress-circular indeterminate size="22" class="ml-2" v-if="disabling"></v-progress-circular>
+                                <v-progress-circular indeterminate size="22" class="ms-2" v-if="disabling"></v-progress-circular>
                             </v-btn>
                             <v-btn :disabled="!currentPassword || loading || regenerating" v-if="status === true" @click="regenerateBackupCode()">
                                 {{ tt('Regenerate Backup Codes') }}
-                                <v-progress-circular indeterminate size="22" class="ml-2" v-if="regenerating"></v-progress-circular>
+                                <v-progress-circular indeterminate size="22" class="ms-2" v-if="regenerating"></v-progress-circular>
                             </v-btn>
                             <v-btn :disabled="loading || enabling" v-if="status === false && !new2FAQRCode" @click="enable">
                                 {{ tt('Enable Two-Factor Authentication') }}
-                                <v-progress-circular indeterminate size="22" class="ml-2" v-if="enabling"></v-progress-circular>
+                                <v-progress-circular indeterminate size="22" class="ms-2" v-if="enabling"></v-progress-circular>
                             </v-btn>
                             <v-btn :disabled="!currentPasscode || loading || enableConfirming" v-if="status === false && new2FAQRCode" @click="enableConfirm">
                                 {{ tt('Continue') }}
-                                <v-progress-circular indeterminate size="22" class="ml-2" v-if="enableConfirming"></v-progress-circular>
+                                <v-progress-circular indeterminate size="22" class="ms-2" v-if="enableConfirming"></v-progress-circular>
                             </v-btn>
                         </v-col>
                     </v-row>
@@ -82,7 +82,7 @@
                 <template #title>
                     <span>{{ tt('Backup Code') }}</span>
                     <v-btn density="compact" color="default" variant="text" size="24"
-                           class="ml-2" :icon="true" @click="copyBackupCodes">
+                           class="ms-2" :icon="true" @click="copyBackupCodes">
                         <v-icon :icon="mdiContentCopy" size="20" />
                         <v-tooltip activator="parent">{{ tt('Copy') }}</v-tooltip>
                     </v-btn>

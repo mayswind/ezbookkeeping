@@ -350,10 +350,10 @@ function onKeyDown(type: string, e: KeyboardEvent): void {
 }
 
 .date-time-select-time-picker-container .v-autocomplete.v-input--density-compact .v-field__append-inner .v-autocomplete__menu-icon {
-    margin-left: 0;
+    margin-inline-start: 0;
 }
 
 .date-time-select-time-picker-container .v-autocomplete .v-field--appended {
-    padding-right: 8px;
+    padding-inline-end: 8px;
 }
 </style>

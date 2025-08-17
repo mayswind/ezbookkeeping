@@ -143,13 +143,13 @@ const chartOptions = computed<object>(() => {
                 let tooltip = `<div><span class="chart-pointer" style="background-color: ${params.color}"></span>`;
 
                 if (name) {
-                    tooltip += `<span>${name}</span><br/>`;
+                    tooltip += `<div class="d-inline-flex">${name}</div><br/>`;
                 }
 
                 if (props.showValue) {
-                    tooltip += `<span>${value} (${percent})</span>`;
+                    tooltip += `<div class="d-inline-flex"><span>${value}</span><span class="ms-1">(${percent})</span></div>`;
                 } else {
-                    tooltip += `<span>${percent}</span>`;
+                    tooltip += `<div class="d-inline-flex">${percent}</div>`;
                 }
 
                 tooltip += '</div>';

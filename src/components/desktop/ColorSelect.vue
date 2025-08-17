@@ -16,7 +16,7 @@
         </template>
 
         <template #no-data>
-            <div class="color-select-dropdown" ref="dropdownMenu">
+            <div class="color-select-dropdown px-2" ref="dropdownMenu">
                 <div class="color-item" :class="{ 'row-has-selected-item': hasSelectedIcon(row) }"
                      :style="`grid-template-columns: repeat(${itemPerRow}, minmax(0, 1fr));`"
                      :key="idx" v-for="(row, idx) in allColorRows">
@@ -26,7 +26,9 @@
                                     :icon="mdiSquareRounded" :color="getFinalColor(colorInfo.color)"
                                     v-if="!modelValue || modelValue !== colorInfo.color" />
                             <v-badge class="right-bottom-icon" color="primary"
-                                     location="bottom right" offset-x="8" offset-y="8" :icon="mdiCheck"
+                                     offset-x="8" offset-y="8"
+                                     :location="`bottom ${textDirection === TextDirection.LTR ? 'right' : 'left'}`"
+                                     :icon="mdiCheck"
                                      v-if="modelValue && modelValue === colorInfo.color">
                                 <v-icon class="ma-2" size="28" :icon="mdiSquareRounded" :color="getFinalColor(colorInfo.color)" />
                             </v-badge>
@@ -41,6 +43,9 @@
 <script setup lang="ts">
 import { ref, computed, useTemplateRef, nextTick } from 'vue';
 
+import { useI18n } from '@/locales/helpers.ts';
+
+import { TextDirection } from '@/core/text.ts';
 import type { ColorValue, ColorInfo } from '@/core/color.ts';
 import { DEFAULT_ICON_COLOR } from '@/consts/color.ts';
 import { arrayContainsFieldValue } from '@/lib/common.ts';
@@ -64,9 +69,12 @@ const emit = defineEmits<{
     (e: 'update:modelValue', value: ColorValue): void;
 }>();
 
+const { getCurrentLanguageTextDirection } = useI18n();
+
 const dropdownMenu = useTemplateRef<HTMLElement>('dropdownMenu');
 const itemPerRow = ref<number>(props.columnCount || 7);
 
+const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 const allColorRows = computed<ColorInfo[][]>(() => getColorsInRows(props.allColorInfos, itemPerRow.value));
 
 const color = computed<ColorValue>({
@@ -98,11 +106,6 @@ function onMenuStateChanged(state: boolean): void {
 </script>
 
 <style>
-.color-select-dropdown {
-    padding-left: 8px;
-    padding-right: 8px;
-}
-
 .color-select-dropdown .color-item {
     display: grid;
 }

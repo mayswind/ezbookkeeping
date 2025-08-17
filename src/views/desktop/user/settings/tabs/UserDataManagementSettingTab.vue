@@ -6,7 +6,7 @@
                     <div class="d-flex align-center">
                         <span>{{ tt('Data Management') }}</span>
                         <v-btn density="compact" color="default" variant="text" size="24"
-                               class="ml-2" :icon="true" :loading="loadingDataStatistics" @click="reloadUserDataStatistics(true)">
+                               class="ms-2" :icon="true" :loading="loadingDataStatistics" @click="reloadUserDataStatistics(true)">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
@@ -91,7 +91,7 @@
                     <v-btn-group variant="elevated" density="comfortable" color="primary">
                         <v-btn :disabled="loadingDataStatistics || exportingData || !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0'">
                             {{ tt('Export Data') }}
-                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="exportingData"></v-progress-circular>
+                            <v-progress-circular indeterminate size="22" class="ms-2" v-if="exportingData"></v-progress-circular>
                             <v-menu activator="parent">
                                 <v-list :disabled="loadingDataStatistics || exportingData || !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0'">
                                     <v-list-item @click="exportData('csv')">
@@ -143,7 +143,7 @@
                     <v-card-text class="d-flex flex-wrap gap-4">
                         <v-btn color="error" :disabled="loadingDataStatistics || !currentPasswordForClearData || clearingData" @click="clearData">
                             {{ tt('Clear User Data') }}
-                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="clearingData"></v-progress-circular>
+                            <v-progress-circular indeterminate size="22" class="ms-2" v-if="clearingData"></v-progress-circular>
                         </v-btn>
                     </v-card-text>
                 </v-form>

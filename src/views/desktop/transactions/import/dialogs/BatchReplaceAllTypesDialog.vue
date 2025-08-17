@@ -6,7 +6,7 @@
                     <div class="d-flex w-100 align-center justify-center">
                         <h4 class="text-h4">{{ tt('Batch Replace Categories / Accounts / Tags') }}</h4>
                         <v-btn density="compact" color="default" variant="text" size="24"
-                               class="ml-2" :icon="true" :disabled="loading"
+                               class="ms-2" :icon="true" :disabled="loading"
                                :loading="loading" @click="reload">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
@@ -15,7 +15,7 @@
                             <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                         </v-btn>
                     </div>
-                    <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                    <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                            :icon="true" :disabled="loading">
                         <v-icon :icon="mdiDotsVertical" />
                         <v-menu activator="parent" max-height="500">

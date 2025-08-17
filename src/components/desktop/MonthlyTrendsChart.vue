@@ -14,6 +14,7 @@ import { type CommonMonthlyTrendsChartProps, type MonthlyTrendsBarChartClickEven
 
 import { useUserStore } from '@/stores/user.ts';
 
+import { TextDirection } from '@/core/text.ts';
 import { type Year1BasedMonth, DateRangeScene } from '@/core/datetime.ts';
 import type { ColorValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
@@ -71,7 +72,9 @@ const emit = defineEmits<{
 
 const theme = useTheme();
 
-const { tt,
+const {
+    tt,
+    getCurrentLanguageTextDirection,
     formatUnixTimeToShortYear,
     formatYearQuarter,
     formatUnixTimeToShortYearMonth,
@@ -86,6 +89,7 @@ const userStore = useUserStore();
 
 const selectedLegends = ref<Record<string, boolean>>({});
 
+const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 
 const itemsMap = computed<Record<string, Record<string, unknown>>>(() => {
@@ -327,7 +331,7 @@ const chartOptions = computed<object>(() => {
                     if (displayItems.length === 1 || item.totalAmount !== 0) {
                         const value = formatAmountToLocalizedNumeralsWithCurrency(item.totalAmount, props.defaultCurrency);
                         tooltip += '<div><span class="chart-pointer" style="background-color: ' + item.color + '"></span>';
-                        tooltip += `<span>${item.name}</span><span style="margin-left: 20px; float: right">${value}</span><br/>`;
+                        tooltip += `<span>${item.name}</span><span class="ms-5" style="float: inline-end">${value}</span><br/>`;
                         tooltip += '</div>';
                     }
                 }
@@ -336,7 +340,7 @@ const chartOptions = computed<object>(() => {
                     const displayTotalAmount = formatAmountToLocalizedNumeralsWithCurrency(totalAmount, props.defaultCurrency);
                     tooltip = '<div style="border-bottom: ' + (isDarkMode.value ? '#eee' : '#333') + ' dashed 1px">'
                         + '<span class="chart-pointer" style="background-color: ' + (isDarkMode.value ? '#eee' : '#333') + '"></span>'
-                        + `<span>${tt('Total Amount')}</span><span style="margin-left: 20px; float: right">${displayTotalAmount}</span><br/>`
+                        + `<span>${tt('Total Amount')}</span><span class="ms-5" style="float: inline-end">${displayTotalAmount}</span><br/>`
                         + '</div>' + tooltip;
                 }
 
@@ -365,7 +369,8 @@ const chartOptions = computed<object>(() => {
         xAxis: [
             {
                 type: 'category',
-                data: allDisplayDateRanges.value
+                data: allDisplayDateRanges.value,
+                inverse: textDirection.value === TextDirection.RTL
             }
         ],
         yAxis: [

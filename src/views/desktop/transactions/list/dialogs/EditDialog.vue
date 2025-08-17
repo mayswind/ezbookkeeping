@@ -5,9 +5,9 @@
                 <div class="d-flex align-center justify-center">
                     <div class="d-flex w-100 align-center justify-center">
                         <h4 class="text-h4">{{ tt(title) }}</h4>
-                        <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
+                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="loading"></v-progress-circular>
                     </div>
-                    <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true"
+                    <v-btn density="comfortable" color="default" variant="text" class="ms-2" :icon="true"
                            :disabled="loading || submitting" v-if="mode !== TransactionEditPageMode.View && (activeTab === 'basicInfo' || (activeTab === 'map' && isSupportGetGeoLocationByClick()))">
                         <v-icon :icon="mdiDotsVertical" />
                         <v-menu activator="parent">
@@ -80,7 +80,7 @@
                     </v-tabs>
                 </div>
 
-                <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container ml-md-5"
+                <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container ms-md-5"
                           v-model="activeTab">
                     <v-window-item value="basicInfo">
                         <v-form class="mt-2">
@@ -454,7 +454,7 @@
                                 <v-btn :disabled="inputIsEmpty || loading || submitting"
                                        v-if="mode !== TransactionEditPageMode.View" @click="save">
                                     {{ tt(saveButtonTitle) }}
-                                    <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
+                                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                                 </v-btn>
                             </div>
                         </template>
@@ -485,7 +485,7 @@
                     <v-btn color="error" variant="tonal" :disabled="loading || submitting"
                            v-if="mode === TransactionEditPageMode.View && originalTransactionEditable" @click="remove">
                         {{ tt('Delete') }}
-                        <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
+                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                     </v-btn>
                     <v-btn color="secondary" variant="tonal" :disabled="loading || submitting"
                            @click="cancel">{{ tt(cancelButtonTitle) }}</v-btn>

@@ -5,13 +5,13 @@
                 <template #title>
                     <div class="title-and-toolbar d-flex align-center">
                         <span>{{ tt('Transaction Tags') }}</span>
-                        <v-btn class="ml-3" color="default" variant="outlined"
+                        <v-btn class="ms-3" color="default" variant="outlined"
                                :disabled="loading || updating || hasEditingTag" @click="add">{{ tt('Add') }}</v-btn>
-                        <v-btn class="ml-3" color="primary" variant="tonal"
+                        <v-btn class="ms-3" color="primary" variant="tonal"
                                :disabled="loading || updating || hasEditingTag" @click="saveSortResult"
                                v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
                         <v-btn density="compact" color="default" variant="text" size="24"
-                               class="ml-2" :icon="true" :disabled="loading || updating || hasEditingTag"
+                               class="ms-2" :icon="true" :disabled="loading || updating || hasEditingTag"
                                :loading="loading" @click="reload">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
@@ -20,7 +20,7 @@
                             <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                         </v-btn>
                         <v-spacer/>
-                        <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                        <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                                :disabled="loading || updating || hasEditingTag" :icon="true">
                             <v-icon :icon="mdiDotsVertical" />
                             <v-menu activator="parent">
@@ -86,7 +86,7 @@
                                             <span class="transaction-tag-name">{{ element.name }}</span>
                                         </div>
 
-                                        <v-text-field class="w-100 mr-2" type="text"
+                                        <v-text-field class="w-100 me-2" type="text"
                                             density="compact" variant="underlined"
                                             :disabled="loading || updating"
                                             :placeholder="tt('Tag Title')"
@@ -106,7 +106,7 @@
 
                                         <v-spacer/>
 
-                                        <v-btn class="px-2 ml-2" color="default"
+                                        <v-btn class="px-2 ms-2" color="default"
                                                density="comfortable" variant="text"
                                                :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                :prepend-icon="element.hidden ? mdiEyeOutline : mdiEyeOffOutline"
@@ -163,7 +163,7 @@
                                                v-if="editingTag.id === element.id" @click="cancelSave(editingTag)">
                                             {{ tt('Cancel') }}
                                         </v-btn>
-                                        <span class="ml-2">
+                                        <span class="ms-2">
                                             <v-icon :class="!loading && !updating && !hasEditingTag && availableTagCount > 1 ? 'drag-handle' : 'disabled'"
                                                     :icon="mdiDrag"/>
                                             <v-tooltip activator="parent" v-if="!loading && !updating && !hasEditingTag && availableTagCount > 1">{{ tt('Drag to Reorder') }}</v-tooltip>
@@ -178,7 +178,7 @@
                     <tr class="text-sm" :class="{ 'even-row': (availableTagCount & 1) === 1}">
                         <td>
                             <div class="d-flex align-center">
-                                <v-text-field class="w-100 mr-2" type="text" color="primary"
+                                <v-text-field class="w-100 me-2" type="text" color="primary"
                                               density="compact" variant="underlined"
                                               :disabled="loading || updating" :placeholder="tt('Tag Title')"
                                               v-model="newTag.name" @keyup.enter="save(newTag)">
@@ -206,7 +206,7 @@
                                        @click="cancelSave(newTag)">
                                     {{ tt('Cancel') }}
                                 </v-btn>
-                                <span class="ml-2">
+                                <span class="ms-2">
                                     <v-icon class="disabled" :icon="mdiDrag"/>
                                 </span>
                             </div>
@@ -474,7 +474,7 @@ transactionTagsStore.loadAllTags({
 }
 
 .transaction-tags-table .v-text-field .v-input__prepend {
-    margin-right: 0;
+    margin-inline-end: 0;
     color: rgba(var(--v-theme-on-surface));
 }
 

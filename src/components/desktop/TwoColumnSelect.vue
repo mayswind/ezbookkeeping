@@ -14,12 +14,12 @@
         <template #selection>
             <div class="d-flex align-center text-truncate cursor-pointer">
                 <span class="text-truncate" v-if="customSelectionPrimaryText">{{ customSelectionPrimaryText }}</span>
-                <v-icon class="disabled" :icon="mdiChevronRight" size="23" v-if="customSelectionPrimaryText && customSelectionSecondaryText" />
+                <v-icon class="icon-with-direction disabled" :icon="mdiChevronRight" size="23" v-if="customSelectionPrimaryText && customSelectionSecondaryText" />
                 <span class="text-truncate" v-if="customSelectionPrimaryText && customSelectionSecondaryText">{{ customSelectionSecondaryText }}</span>
                 <span class="text-truncate" v-if="!customSelectionPrimaryText && !selectedPrimaryItem && !selectedSecondaryItem">{{ noSelectionText }}</span>
                 <span class="text-truncate" v-if="!customSelectionPrimaryText && showSelectionPrimaryText && selectedPrimaryItem">{{ selectionPrimaryItemText }}</span>
-                <v-icon class="disabled" :icon="mdiChevronRight" size="23" v-if="!customSelectionPrimaryText && showSelectionPrimaryText && selectedPrimaryItem && selectedSecondaryItem" />
-                <ItemIcon class="mr-2" icon-type="account" size="21.5px"
+                <v-icon class="icon-with-direction disabled" :icon="mdiChevronRight" size="23" v-if="!customSelectionPrimaryText && showSelectionPrimaryText && selectedPrimaryItem && selectedSecondaryItem" />
+                <ItemIcon class="me-2" icon-type="account" size="21.5px"
                           :icon-id="selectedSecondaryItem && secondaryIconField ? (selectedSecondaryItem as Record<string, unknown>)[secondaryIconField] : null"
                           :color="selectedSecondaryItem && secondaryColorField ? (selectedSecondaryItem as Record<string, unknown>)[secondaryColorField] : null"
                           v-if="!customSelectionPrimaryText && selectedSecondaryItem && showSelectionSecondaryIcon" />
@@ -47,7 +47,7 @@
                                      v-for="item in filteredItems"
                                      @click="onPrimaryItemClicked(item)">
                             <template #prepend>
-                                <ItemIcon class="mr-2" :icon-type="primaryIconType"
+                                <ItemIcon class="me-2" :icon-type="primaryIconType"
                                           :icon-id="primaryIconField ? (item as Record<string, unknown>)[primaryIconField] : undefined" :color="primaryColorField ? (item as Record<string, unknown>)[primaryColorField] : undefined"></ItemIcon>
                             </template>
                             <template #title>
@@ -66,7 +66,7 @@
                                      v-for="subItem in filteredSubItems"
                                      @click="onSecondaryItemClicked(subItem)">
                             <template #prepend>
-                                <ItemIcon class="mr-2" :icon-type="secondaryIconType"
+                                <ItemIcon class="me-2" :icon-type="secondaryIconType"
                                           :icon-id="secondaryIconField ? subItem[secondaryIconField] : undefined" :color="secondaryColorField ? subItem[secondaryColorField] : undefined"></ItemIcon>
                             </template>
                             <template #title>

@@ -14,7 +14,7 @@
                     <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'account'">{{ tt('Replace Invalid Accounts') }}</h4>
                     <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'tag'">{{ tt('Replace Invalid Transaction Tags') }}</h4>
                     <v-btn density="compact" color="default" variant="text" size="24"
-                           class="ml-2" :icon="true" :disabled="loading"
+                           class="ms-2" :icon="true" :disabled="loading"
                            :loading="loading" @click="reload">
                         <template #loader>
                             <v-progress-circular indeterminate size="20"/>

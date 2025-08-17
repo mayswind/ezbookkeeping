@@ -9,13 +9,13 @@
         <v-row no-gutters class="auth-wrapper">
             <v-col cols="12" md="8" class="d-none d-md-flex align-center justify-center position-relative">
                 <div class="d-flex auth-img-footer" v-if="!isDarkMode">
-                    <v-img src="img/desktop/background.svg"/>
+                    <v-img class="img-with-direction" src="img/desktop/background.svg"/>
                 </div>
                 <div class="d-flex auth-img-footer" v-if="isDarkMode">
-                    <v-img src="img/desktop/background-dark.svg"/>
+                    <v-img class="img-with-direction" src="img/desktop/background-dark.svg"/>
                 </div>
                 <div class="d-flex align-center justify-center w-100 pt-10">
-                    <v-img max-width="320px" src="img/desktop/people2.svg"/>
+                    <v-img class="img-with-direction" max-width="320px" src="img/desktop/people2.svg"/>
                 </div>
             </v-col>
             <v-col cols="12" md="4" class="auth-card d-flex flex-column">
@@ -48,14 +48,14 @@
                                     <v-col cols="12" v-if="!loading && !token && email && isUserVerifyEmailEnabled()">
                                         <v-btn block type="submit" :disabled="loading || resending || !password" @click="resendEmail">
                                             {{ tt('Resend Validation Email') }}
-                                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="resending"></v-progress-circular>
+                                            <v-progress-circular indeterminate size="22" class="ms-2" v-if="resending"></v-progress-circular>
                                         </v-btn>
                                     </v-col>
 
                                     <v-col cols="12">
                                         <router-link class="d-flex align-center justify-center" :to="verified ? '/' : '/login'"
                                                      :class="{ 'disabled': loading || resending }">
-                                            <v-icon :icon="mdiChevronLeft"/>
+                                            <v-icon class="icon-with-direction" :icon="mdiChevronLeft"/>
                                             <span v-if="!verified">{{ tt('Back to login page') }}</span>
                                             <span v-else-if="verified">{{ tt('Back to home page') }}</span>
                                         </router-link>
@@ -106,8 +106,9 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useRootStore } from '@/stores/index.ts';
 
-import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
+import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
+
 import { isUserVerifyEmailEnabled } from '@/lib/server_settings.ts';
 import { isUserLogined } from '@/lib/userstate.ts';
 import { getClientDisplayVersion } from '@/lib/version.ts';

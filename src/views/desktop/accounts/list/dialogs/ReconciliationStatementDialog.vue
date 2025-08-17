@@ -6,7 +6,7 @@
                     <div class="d-flex w-100 align-center justify-center">
                         <h4 class="text-h4">{{ tt('Reconciliation Statement') }}</h4>
                         <v-btn density="compact" color="default" variant="text" size="24"
-                               class="ml-2" :icon="true" :loading="loading" @click="reload(true)">
+                               class="ms-2" :icon="true" :loading="loading" @click="reload(true)">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
@@ -14,7 +14,7 @@
                             <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                         </v-btn>
                     </div>
-                    <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                    <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                            :icon="true" :disabled="loading"
                            v-if="showAccountBalanceTrendsCharts">
                         <v-icon :icon="mdiTuneVertical" />
@@ -42,7 +42,7 @@
                             </v-list>
                         </v-menu>
                     </v-btn>
-                    <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                    <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                            :icon="true" :disabled="loading">
                         <v-icon :icon="mdiDotsVertical" />
                         <v-menu activator="parent">
@@ -94,42 +94,42 @@
 
             <div class="d-flex align-center mb-4">
                 <div class="d-flex align-center text-body-1">
-                    <span class="ml-2">{{ tt('Opening Balance') }}</span>
+                    <span class="ms-2">{{ tt('Opening Balance') }}</span>
                     <span class="text-primary" v-if="loading">
-                        <v-skeleton-loader class="skeleton-no-margin ml-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                        <v-skeleton-loader class="skeleton-no-margin ms-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                     </span>
-                    <span class="text-primary ml-2" v-else-if="!loading">
+                    <span class="text-primary ms-2" v-else-if="!loading">
                         {{ displayOpeningBalance }}
                     </span>
-                    <span class="ml-3">{{ tt('Closing Balance') }}</span>
+                    <span class="ms-3">{{ tt('Closing Balance') }}</span>
                     <span class="text-primary" v-if="loading">
-                        <v-skeleton-loader class="skeleton-no-margin ml-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                        <v-skeleton-loader class="skeleton-no-margin ms-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                     </span>
-                    <span class="text-primary ml-2" v-else-if="!loading">
+                    <span class="text-primary ms-2" v-else-if="!loading">
                         {{ displayClosingBalance }}
                     </span>
                 </div>
                 <v-spacer/>
                 <div class="d-flex align-center text-body-1">
-                    <span class="ml-2">{{ tt('Total Inflows') }}</span>
+                    <span class="ms-2">{{ tt('Total Inflows') }}</span>
                     <span class="text-income" v-if="loading">
-                        <v-skeleton-loader class="skeleton-no-margin ml-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                        <v-skeleton-loader class="skeleton-no-margin ms-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                     </span>
-                    <span class="text-income ml-2" v-else-if="!loading">
+                    <span class="text-income ms-2" v-else-if="!loading">
                         {{ displayTotalInflows }}
                     </span>
-                    <span class="ml-3">{{ tt('Total Outflows') }}</span>
+                    <span class="ms-3">{{ tt('Total Outflows') }}</span>
                     <span class="text-expense" v-if="loading">
-                        <v-skeleton-loader class="skeleton-no-margin ml-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                        <v-skeleton-loader class="skeleton-no-margin ms-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                     </span>
-                    <span class="text-expense ml-2" v-else-if="!loading">
+                    <span class="text-expense ms-2" v-else-if="!loading">
                         {{ displayTotalOutflows }}
                     </span>
-                    <span class="ml-3">{{ tt('Net Cash Flow') }}</span>
+                    <span class="ms-3">{{ tt('Net Cash Flow') }}</span>
                     <span class="text-primary" v-if="loading">
-                        <v-skeleton-loader class="skeleton-no-margin ml-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                        <v-skeleton-loader class="skeleton-no-margin ms-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                     </span>
-                    <span class="text-primary ml-2" v-else-if="!loading">
+                    <span class="text-primary ms-2" v-else-if="!loading">
                         {{ displayTotalBalance }}
                     </span>
                 </div>
@@ -151,7 +151,7 @@
             >
                 <template #item.time="{ item }">
                     <span>{{ getDisplayDateTime(item) }}</span>
-                    <v-chip class="ml-1" variant="flat" color="secondary" size="x-small"
+                    <v-chip class="ms-1" variant="flat" color="secondary" size="x-small"
                             v-if="item.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimezone(item) }}</v-chip>
                 </template>
                 <template #item.type="{ item }">
@@ -166,23 +166,23 @@
                                   :color="allCategoriesMap[item.categoryId].color"
                                   v-if="allCategoriesMap[item.categoryId] && allCategoriesMap[item.categoryId]?.color"></ItemIcon>
                         <v-icon size="24" :icon="mdiPencilBoxOutline" v-else-if="!allCategoriesMap[item.categoryId] || !allCategoriesMap[item.categoryId]?.color" />
-                        <span class="ml-2" v-if="item.type === TransactionType.ModifyBalance">
+                        <span class="ms-2" v-if="item.type === TransactionType.ModifyBalance">
                             {{ tt('Modify Balance') }}
                         </span>
-                        <span class="ml-2" v-else-if="item.type !== TransactionType.ModifyBalance && allCategoriesMap[item.categoryId]">
+                        <span class="ms-2" v-else-if="item.type !== TransactionType.ModifyBalance && allCategoriesMap[item.categoryId]">
                             {{ allCategoriesMap[item.categoryId].name }}
                         </span>
                     </div>
                 </template>
                 <template #item.sourceAmount="{ item }">
                     <span :class="{ 'text-expense': item.type === TransactionType.Expense, 'text-income': item.type === TransactionType.Income }">{{ getDisplaySourceAmount(item) }}</span>
-                    <v-icon class="mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId && getDisplaySourceAmount(item) !== getDisplayDestinationAmount(item)"></v-icon>
+                    <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId && getDisplaySourceAmount(item) !== getDisplayDestinationAmount(item)"></v-icon>
                     <span v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId && getDisplaySourceAmount(item) !== getDisplayDestinationAmount(item)">{{ getDisplayDestinationAmount(item) }}</span>
                 </template>
                 <template #item.sourceAccountId="{ item }">
                     <div class="d-flex align-center">
                         <span v-if="item.sourceAccountId && allAccountsMap[item.sourceAccountId]">{{ allAccountsMap[item.sourceAccountId].name }}</span>
-                        <v-icon class="mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
+                        <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
                         <span v-if="item.type === TransactionType.Transfer && item.destinationAccountId && allAccountsMap[item.destinationAccountId]">{{ allAccountsMap[item.destinationAccountId].name }}</span>
                     </div>
                 </template>
@@ -197,18 +197,18 @@
                 </template>
                 <template #bottom>
                     <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2" v-if="loading || (reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length)">
-                        <span class="ml-2">{{ tt('Total Transactions') }}</span>
+                        <span class="ms-2">{{ tt('Total Transactions') }}</span>
                         <span v-if="loading">
-                            <v-skeleton-loader class="skeleton-no-margin ml-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                            <v-skeleton-loader class="skeleton-no-margin ms-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                         </span>
-                        <span class="ml-2" v-else-if="!loading">
+                        <span class="ms-2" v-else-if="!loading">
                             {{ formatNumberToLocalizedNumerals(reconciliationStatements?.transactions.length ?? 0) }}
                         </span>
                         <v-spacer/>
                         <span v-if="reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length > 10">
                             {{ tt('Transactions Per Page') }}
                         </span>
-                        <v-select class="ml-2" density="compact" max-width="100"
+                        <v-select class="ms-2" density="compact" max-width="100"
                                   item-title="title"
                                   item-value="value"
                                   :disabled="loading"

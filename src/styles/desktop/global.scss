@@ -40,8 +40,8 @@ input[type=number] {
 }
 
 @media (min-width: 600px) {
-    .text-right-sm {
-        text-align: right !important;
+    .text-end-sm {
+        text-align: end !important;
     }
 }
 
@@ -131,7 +131,7 @@ input[type=number] {
 
 .chart-pointer {
     display: inline-block;
-    margin-right: 5px;
+    margin-inline-end: 5px;
     border-radius: 10px;
     width: 10px;
     height: 10px;
@@ -142,7 +142,11 @@ input[type=number] {
 }
 
 .bidirectional-switch.v-input--horizontal .v-input__prepend {
-    margin-right: 10px; /* same as the padding-left of `.v-switch .v-label` */
+    margin-inline-end: 10px; /* same as the padding-left of `.v-switch .v-label` */
+}
+
+html[dir="rtl"] .bidirectional-switch {
+    transform: scaleX(-1);
 }
 
 .code-container {
@@ -274,6 +278,20 @@ input[type=number] {
 
 .skeleton-no-margin .v-skeleton-loader__text {
     margin: 0;
+}
+
+html[dir="rtl"] .v-btn.button-icon-with-direction > .v-btn__content > .v-icon > .v-icon__svg,
+html[dir="rtl"] .v-btn.button-icon-with-direction > .v-btn__prepend > .v-icon > .v-icon__svg,
+html[dir="rtl"] .v-btn.button-icon-with-direction > .v-btn__append > .v-icon > .v-icon__svg {
+    transform: scaleX(-1);
+}
+
+html[dir="rtl"] .v-icon.icon-with-direction > .v-icon__svg {
+    transform: scaleX(-1);
+}
+
+html[dir="rtl"] .v-img.img-with-direction > img {
+    transform: scaleX(-1);
 }
 
 /** Common class for replacing the default style of Materio **/
@@ -414,4 +432,8 @@ body .v-btn-group {
 
 .dp__main .dp__calendar .dp__calendar_item > .dp__cell_inner {
     width: 100%;
+}
+
+html[dir="rtl"] .dp__main .dp__btn.dp--arrow-btn-nav {
+    transform: scaleX(-1);
 }

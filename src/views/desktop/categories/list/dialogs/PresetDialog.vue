@@ -19,7 +19,7 @@
                         <v-expansion-panel :key="idx" v-for="(category, idx) in categories">
                             <v-expansion-panel-title class="py-0">
                                 <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
-                                <span class="ml-3">{{ category.name }}</span>
+                                <span class="ms-3">{{ category.name }}</span>
                             </v-expansion-panel-title>
                             <v-expansion-panel-text v-if="category.subCategories.length">
                                 <v-list rounded density="comfortable" class="pa-0">
@@ -29,7 +29,7 @@
                                             <template #prepend>
                                                 <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
                                             </template>
-                                            <span class="ml-3">{{ subCategory.name }}</span>
+                                            <span class="ms-3">{{ subCategory.name }}</span>
                                         </v-list-item>
                                         <v-divider v-if="subIdx !== category.subCategories.length - 1"/>
                                     </template>
@@ -43,7 +43,7 @@
                 <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
                     <v-btn :disabled="submitting" @click="save">
                         {{ tt('Save') }}
-                        <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
+                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                     </v-btn>
                     <v-btn color="secondary" density="default" variant="tonal"
                            :disabled="submitting" @click="showState = false">{{ tt('Cancel') }}</v-btn>
@@ -137,6 +137,7 @@ function save(): void {
 
 <style>
 .preset-transaction-categories .v-expansion-panel-text__wrapper {
-    padding: 0 0 0 20px;
+    padding: 0 0 0 0;
+    padding-inline-start: 20px;
 }
 </style>

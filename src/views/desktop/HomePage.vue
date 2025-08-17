@@ -10,7 +10,7 @@
                             <span style="font-size: 1rem">{{ tt('Expense') }}</span>
                         </div>
                         <v-btn density="compact" color="default" variant="text" size="24"
-                               class="ml-2" :icon="true" :loading="loadingOverview" @click="reload(true)">
+                               class="ms-2" :icon="true" :loading="loadingOverview" @click="reload(true)">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
@@ -24,19 +24,21 @@
                     <h4 class="text-2xl font-weight-medium text-primary">
                         <span v-if="!loadingOverview || (transactionOverview && transactionOverview.thisMonth && transactionOverview.thisMonth.valid)">{{ transactionOverview && transactionOverview.thisMonth ? getDisplayExpenseAmount(transactionOverview.thisMonth) : '-' }}</span>
                         <v-skeleton-loader class="d-inline-block skeleton-no-margin mt-3 pb-1" width="120px" type="text" :loading="true" v-else-if="loadingOverview && (!transactionOverview || !transactionOverview.thisMonth || !transactionOverview.thisMonth.valid)"></v-skeleton-loader>
-                        <v-btn class="ml-1" density="compact" color="default" variant="text"
+                        <v-btn class="ms-1" density="compact" color="default" variant="text"
                                :icon="true" @click="showAmountInHomePage = !showAmountInHomePage">
                             <v-icon :icon="showAmountInHomePage ? mdiEyeOffOutline : mdiEyeOutline" size="20" />
                         </v-btn>
                     </h4>
                     <div class="mt-1 mb-3">
-                        <span class="mr-2">{{ tt('Monthly income') }}</span>
+                        <span class="me-2">{{ tt('Monthly income') }}</span>
                         <span v-if="!loadingOverview || (transactionOverview && transactionOverview.thisMonth && transactionOverview.thisMonth.valid)">{{ transactionOverview && transactionOverview.thisMonth ? getDisplayIncomeAmount(transactionOverview.thisMonth) : '-' }}</span>
                         <v-skeleton-loader class="d-inline-block skeleton-no-margin mt-2" width="120px" type="text" :loading="true" v-else-if="loadingOverview && (!transactionOverview || !transactionOverview.thisMonth || !transactionOverview.thisMonth.valid)"></v-skeleton-loader>
                     </div>
                     <v-btn size="small" to="/transaction/list?dateType=7">{{ tt('View Details') }}</v-btn>
-                    <v-img class="overview-card-background" src="img/desktop/card-background.png"/>
-                    <v-img class="overview-card-background-image" width="116px" src="img/desktop/document.svg"/>
+                    <v-img class="overview-card-background img-with-direction"
+                           src="img/desktop/card-background.png"/>
+                    <v-img class="overview-card-background-image img-with-direction"
+                           width="116px" src="img/desktop/document.svg"/>
                 </v-card-text>
             </v-card>
         </v-col>

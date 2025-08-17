@@ -5,9 +5,9 @@
                 <div class="d-flex align-center justify-center">
                     <div class="d-flex w-100 align-center justify-center">
                         <h4 class="text-h4">{{ tt(title) }}</h4>
-                        <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
+                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="loading"></v-progress-circular>
                     </div>
-                    <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true"
+                    <v-btn density="comfortable" color="default" variant="text" class="ms-2" :icon="true"
                            :disabled="loading || submitting || account.type !== AccountType.MultiSubAccounts.type">
                         <v-icon :icon="mdiDotsVertical" />
                         <v-menu activator="parent">
@@ -29,7 +29,7 @@
                         <template v-if="account.type === AccountType.MultiSubAccounts.type">
                             <v-tab :key="idx" :value="idx" v-for="(subAccount, idx) in subAccounts">
                                 <span>{{ tt('Sub Account') + ' #' + (idx + 1) }}</span>
-                                <v-btn class="ml-2" color="error" size="24" variant="text"
+                                <v-btn class="ms-2" color="error" size="24" variant="text"
                                        :icon="mdiDeleteOutline"
                                        @click="removeSubAccount(subAccount)"></v-btn>
                             </v-tab>
@@ -38,7 +38,7 @@
                 </div>
 
                 <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container"
-                          :class="{ 'ml-md-5': account.type === AccountType.MultiSubAccounts.type }"
+                          :class="{ 'ms-md-5': account.type === AccountType.MultiSubAccounts.type }"
                           v-model="activeTab">
                     <v-window-item value="account">
                         <v-form class="mt-2">
@@ -63,7 +63,7 @@
                                                             <ItemIcon icon-type="account"
                                                                       :icon-id="item.raw.defaultAccountIconId"
                                                                       v-if="item.raw" />
-                                                            <span class="ml-2">{{ item.title }}</span>
+                                                            <span class="ms-2">{{ item.title }}</span>
                                                         </div>
                                                     </v-list-item-title>
                                                 </template>
@@ -174,7 +174,7 @@
                             <div v-bind="props" class="d-inline-block">
                                 <v-btn :disabled="inputIsEmpty || loading || submitting" @click="save">
                                     {{ tt(saveButtonTitle) }}
-                                    <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
+                                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                                 </v-btn>
                             </div>
                         </template>

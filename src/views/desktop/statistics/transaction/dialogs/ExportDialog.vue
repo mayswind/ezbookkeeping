@@ -6,7 +6,7 @@
                     <div class="d-flex w-100 align-center justify-center">
                         <h4 class="text-h4">{{ tt('Export Results') }}</h4>
                     </div>
-                    <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true">
+                    <v-btn density="comfortable" color="default" variant="text" class="ms-2" :icon="true">
                         <v-icon :icon="mdiDotsVertical" />
                         <v-menu activator="parent">
                             <v-list>

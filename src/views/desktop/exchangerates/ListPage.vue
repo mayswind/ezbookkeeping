@@ -39,9 +39,9 @@
                                 v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
                             <v-tab class="tab-text-truncate" :key="exchangeRate.currencyCode" :value="exchangeRate.currencyCode"
                                    v-for="exchangeRate in availableExchangeRates">
-                                <div class="text-truncate">
-                                    <span>{{ exchangeRate.currencyDisplayName }}</span>
-                                    <small class="smaller ml-1">{{ exchangeRate.currencyCode }}</small>
+                                <div class="d-flex w-100">
+                                    <span class="d-block text-truncate">{{ exchangeRate.currencyDisplayName }}</span>
+                                    <small class="smaller ms-1">{{ exchangeRate.currencyCode }}</small>
                                 </div>
                             </v-tab>
                         </v-tabs>
@@ -61,16 +61,16 @@
                                 <v-card variant="flat" min-height="680">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
-                                            <v-btn class="mr-3 d-md-none" density="compact" color="default" variant="plain"
+                                            <v-btn class="me-3 d-md-none" density="compact" color="default" variant="plain"
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
                                                 <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
                                             <span>{{ tt('Exchange Rates Data') }}</span>
-                                            <v-btn class="ml-3" color="default" variant="outlined"
+                                            <v-btn class="ms-3" color="default" variant="outlined"
                                                    :disabled="loading" @click="update"
                                                    v-if="isUserCustomExchangeRates">{{ tt('Update') }}</v-btn>
                                             <v-btn density="compact" color="default" variant="text" size="24"
-                                                   class="ml-2" :icon="true" :loading="loading" @click="reload(true)">
+                                                   class="ms-2" :icon="true" :loading="loading" @click="reload(true)">
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
                                                 </template>
@@ -110,11 +110,11 @@
                                             <td>
                                                 <div class="d-flex align-center">
                                                     <span class="text-sm">{{ exchangeRate.currencyDisplayName }}</span>
-                                                    <span class="text-caption ml-1">{{ exchangeRate.currencyCode }}</span>
+                                                    <span class="text-caption ms-1">{{ exchangeRate.currencyCode }}</span>
 
                                                     <v-spacer/>
 
-                                                    <v-btn class="px-2 ml-2" color="default"
+                                                    <v-btn class="px-2 ms-2" color="default"
                                                            density="comfortable" variant="text"
                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                            v-if="exchangeRate.currencyCode !== baseCurrency"
@@ -134,7 +134,7 @@
                                                         </template>
                                                         {{ tt('Delete') }}
                                                     </v-btn>
-                                                    <span class="ml-3">{{ getFinalConvertedAmount(exchangeRate, true) }}</span>
+                                                    <span class="ms-3">{{ getFinalConvertedAmount(exchangeRate, true) }}</span>
                                                 </div>
                                             </td>
                                         </tr>

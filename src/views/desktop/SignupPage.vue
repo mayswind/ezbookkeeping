@@ -9,13 +9,13 @@
         <v-row no-gutters class="auth-wrapper">
             <v-col cols="12" md="4" class="d-none d-md-flex align-center justify-center position-relative">
                 <div class="d-flex auth-img-footer" v-if="!isDarkMode">
-                    <v-img src="img/desktop/background.svg"/>
+                    <v-img class="img-with-direction" src="img/desktop/background.svg"/>
                 </div>
                 <div class="d-flex auth-img-footer" v-if="isDarkMode">
-                    <v-img src="img/desktop/background-dark.svg"/>
+                    <v-img class="img-with-direction" src="img/desktop/background-dark.svg"/>
                 </div>
                 <div class="d-flex align-center justify-center w-100 pt-10">
-                    <v-img max-width="320px" src="img/desktop/people2.svg"/>
+                    <v-img class="img-with-direction" max-width="320px" src="img/desktop/people2.svg"/>
                 </div>
             </v-col>
             <v-col cols="12" md="8" class="auth-card d-flex align-center justify-center pa-10">
@@ -28,7 +28,7 @@
                                 <h4 class="text-h4 mb-1">{{ tt('Basic Information') }}</h4>
                                 <p class="text-sm mt-2 mb-5">
                                     <span>{{ tt('Already have an account?') }}</span>
-                                    <router-link class="ml-1" to="/login">{{ tt('Click here to log in') }}</router-link>
+                                    <router-link class="ms-1" to="/login">{{ tt('Click here to log in') }}</router-link>
                                 </p>
                                 <v-row>
                                     <v-col cols="12" md="6">
@@ -129,7 +129,7 @@
                                                   :label="tt('Use Preset Transaction Categories')"
                                                   v-model="usePresetCategories"/>
                                     </v-col>
-                                    <v-col cols="12" sm="6" class="text-right-sm">
+                                    <v-col cols="12" sm="6" class="text-end-sm">
                                         <language-select-button :disabled="submitting || navigateToHomePage"
                                                                 :use-model-value="true" v-model="currentLocale" />
                                     </v-col>
@@ -144,7 +144,7 @@
                                                 <v-expansion-panel :key="idx" v-for="(category, idx) in categories">
                                                     <v-expansion-panel-title class="py-0">
                                                         <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
-                                                        <span class="ml-3">{{ category.name }}</span>
+                                                        <span class="ms-3">{{ category.name }}</span>
                                                     </v-expansion-panel-title>
                                                     <v-expansion-panel-text v-if="category.subCategories.length">
                                                         <v-list rounded density="comfortable" class="pa-0">
@@ -154,7 +154,7 @@
                                                                     <template #prepend>
                                                                         <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
                                                                     </template>
-                                                                    <span class="ml-3">{{ subCategory.name }}</span>
+                                                                    <span class="ms-3">{{ subCategory.name }}</span>
                                                                 </v-list-item>
                                                                 <v-divider v-if="subIdx !== category.subCategories.length - 1"/>
                                                             </template>
@@ -175,11 +175,12 @@
                     </v-window>
 
                     <div class="d-flex justify-sm-space-between gap-4 flex-wrap justify-center mt-5">
-                        <v-btn :color="(currentStep === 'basicSetting' || currentStep === 'finalResult') ? 'default' : 'primary'"
+                        <v-btn class="button-icon-with-direction"
+                               :color="(currentStep === 'basicSetting' || currentStep === 'finalResult') ? 'default' : 'primary'"
                                :disabled="currentStep === 'basicSetting' || currentStep === 'finalResult' || submitting || navigateToHomePage"
                                :prepend-icon="mdiArrowLeft"
                                @click="switchToPreviousTab">{{ tt('Previous') }}</v-btn>
-                        <v-btn color="primary"
+                        <v-btn class="button-icon-with-direction" color="primary"
                                :disabled="submitting || navigateToHomePage"
                                :append-icon="mdiArrowRight"
                                @click="switchToNextTab"
@@ -190,9 +191,10 @@
                                @click="submit"
                                v-if="currentStep === 'presetCategories'">
                             {{ tt('Submit') }}
-                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
+                            <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                         </v-btn>
-                        <v-btn :append-icon="mdiArrowRight"
+                        <v-btn class="button-icon-with-direction"
+                               :append-icon="mdiArrowRight"
                                @click="navigateToLogin"
                                v-if="currentStep === 'finalResult'">{{ tt('Continue') }}</v-btn>
                     </div>
@@ -385,6 +387,7 @@ function onSnackbarShowStateChanged(newValue: boolean): void {
 
 <style>
 .signup-preset-categories .v-expansion-panel-text__wrapper {
-    padding: 0 0 0 20px;
+    padding: 0 0 0 0;
+    padding-inline-start: 20px;
 }
 </style>

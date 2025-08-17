@@ -307,8 +307,8 @@ init(props.length, props.modelValue);
 
 .pin-code-input input {
     text-align: center;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-inline-start: 10px;
+    padding-inline-end: 10px;
     width: 100%;
     height: var(--ebk-pin-code-input-height) !important;
 }

@@ -5,13 +5,13 @@
                 <template #title>
                     <div class="title-and-toolbar d-flex align-center">
                         <span>{{ templateType === TemplateType.Schedule.type ? tt('Scheduled Transactions') : tt('Transaction Templates') }}</span>
-                        <v-btn class="ml-3" color="default" variant="outlined"
+                        <v-btn class="ms-3" color="default" variant="outlined"
                                :disabled="loading || updating" @click="add">{{ tt('Add') }}</v-btn>
-                        <v-btn class="ml-3" color="primary" variant="tonal"
+                        <v-btn class="ms-3" color="primary" variant="tonal"
                                :disabled="loading || updating" @click="saveSortResult"
                                v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
                         <v-btn density="compact" color="default" variant="text" size="24"
-                               class="ml-2" :icon="true" :disabled="loading || updating"
+                               class="ms-2" :icon="true" :disabled="loading || updating"
                                :loading="loading" @click="reload">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
@@ -20,7 +20,7 @@
                             <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                         </v-btn>
                         <v-spacer/>
-                        <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                        <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                                :disabled="loading || updating" :icon="true">
                             <v-icon :icon="mdiDotsVertical" />
                             <v-menu activator="parent">
@@ -89,7 +89,7 @@
 
                                         <v-spacer/>
 
-                                        <v-btn class="px-2 ml-2" color="default"
+                                        <v-btn class="px-2 ms-2" color="default"
                                                density="comfortable" variant="text"
                                                :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                :prepend-icon="element.hidden ? mdiEyeOutline : mdiEyeOffOutline"
@@ -124,7 +124,7 @@
                                             </template>
                                             {{ tt('Delete') }}
                                         </v-btn>
-                                        <span class="ml-2">
+                                        <span class="ms-2">
                                             <v-icon :class="!loading && !updating && availableTemplateCount > 1 ? 'drag-handle' : 'disabled'"
                                                     :icon="mdiDrag"/>
                                             <v-tooltip activator="parent" v-if="!loading && !updating && availableTemplateCount > 1">{{ tt('Drag to Reorder') }}</v-tooltip>
@@ -387,7 +387,7 @@ init();
 }
 
 .transaction-templates-table .v-text-field .v-input__prepend {
-    margin-right: 0;
+    margin-inline-end: 0;
     color: rgba(var(--v-theme-on-surface));
 }
 

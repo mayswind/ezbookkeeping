@@ -4,7 +4,7 @@
             <template #title>
                 <div class="d-flex align-center justify-center">
                     <h4 class="text-h4">{{ tt(title) }}</h4>
-                    <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
+                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="loading"></v-progress-circular>
                 </div>
             </template>
             <v-card-text class="pt-0">
@@ -35,7 +35,7 @@
                                 <template #item="{ props, item }">
                                     <v-list-item v-bind="props">
                                         <template #prepend>
-                                            <ItemIcon class="mr-2" icon-type="category"
+                                            <ItemIcon class="me-2" icon-type="category"
                                                       :icon-id="item.raw.icon" :color="item.raw.color"></ItemIcon>
                                         </template>
                                         <template #title>
@@ -84,7 +84,7 @@
                             <div v-bind="props" class="d-inline-block">
                                 <v-btn :disabled="inputIsEmpty || loading || submitting" @click="save">
                                     {{ tt(saveButtonTitle) }}
-                                    <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
+                                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                                 </v-btn>
                             </div>
                         </template>

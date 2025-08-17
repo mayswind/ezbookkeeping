@@ -4,7 +4,16 @@ import 'moment-timezone/moment-timezone-utils';
 
 import type { PartialRecord, NameValue, TypeAndName, TypeAndDisplayName, LocalizedSwitchOption } from '@/core/base.ts';
 
-import { type LanguageInfo, type LanguageOption, ALL_LANGUAGES, DEFAULT_LANGUAGE } from '@/locales/index.ts';
+import {
+    type LanguageInfo,
+    type LanguageOption,
+    ALL_LANGUAGES,
+    DEFAULT_LANGUAGE
+} from '@/locales/index.ts';
+
+import {
+    TextDirection
+} from '@/core/text.ts';
 
 import {
     type DateFormat,
@@ -220,6 +229,24 @@ export function getI18nOptions(): object {
             return messages;
         })()
     };
+}
+
+export function getRtlLocales(): Record<string, boolean> {
+    const rtlLocales: Record<string, boolean> = {};
+
+    for (const languageKey in ALL_LANGUAGES) {
+        if (!Object.prototype.hasOwnProperty.call(ALL_LANGUAGES, languageKey)) {
+            continue;
+        }
+
+        const languageInfo = ALL_LANGUAGES[languageKey];
+
+        if (languageInfo.textDirection === TextDirection.RTL) {
+            rtlLocales[languageKey] = true;
+        }
+    }
+
+    return rtlLocales;
 }
 
 export function useI18n() {
@@ -719,6 +746,11 @@ export function useI18n() {
     function getCurrentLanguageDisplayName(): string {
         const currentLanguageInfo = getCurrentLanguageInfo();
         return currentLanguageInfo.displayName;
+    }
+
+    function getCurrentLanguageTextDirection(): TextDirection {
+        const currentLanguageInfo = getCurrentLanguageInfo();
+        return currentLanguageInfo.textDirection;
     }
 
     function getDefaultCurrency(): string {
@@ -1894,7 +1926,9 @@ export function useI18n() {
             logger.info(`No specified language, use browser default language ${languageKey}`);
         }
 
-        if (!getLanguageInfo(languageKey)) {
+        const languageInfo = getLanguageInfo(languageKey);
+
+        if (!languageInfo) {
             languageKey = getDefaultLanguage();
             logger.warn(`Not found language ${languageKey}, use browser default language ${languageKey}`);
         }
@@ -1925,6 +1959,12 @@ export function useI18n() {
         services.setLocale(languageKey);
         document.querySelector('html')?.setAttribute('lang', languageKey);
 
+        if (languageInfo && languageInfo.textDirection === TextDirection.LTR) {
+            document.querySelector('html')?.removeAttribute('dir');
+        } else if (languageInfo && languageInfo.textDirection === TextDirection.RTL) {
+            document.querySelector('html')?.setAttribute('dir', 'rtl');
+        }
+
         const defaultCurrency = getDefaultCurrency();
         const defaultFirstDayOfWeekName = getDefaultFirstDayOfWeek();
         let defaultFirstDayOfWeek = WeekDay.DefaultFirstDay.type;
@@ -1933,10 +1973,12 @@ export function useI18n() {
             defaultFirstDayOfWeek = (WeekDay.parse(defaultFirstDayOfWeekName) as WeekDay).type;
         }
 
-        return {
+        const localeDefaultSettings: LocaleDefaultSettings = {
             currency: defaultCurrency,
             firstDayOfWeek: defaultFirstDayOfWeek
         };
+
+        return localeDefaultSettings;
     }
 
     function setTimeZone(timezone: string): void {
@@ -1987,6 +2029,7 @@ export function useI18n() {
         getCurrentLanguageTag,
         getCurrentLanguageInfo,
         getCurrentLanguageDisplayName,
+        getCurrentLanguageTextDirection,
         // get localization default type
         getDefaultCurrency,
         getDefaultFirstDayOfWeek,

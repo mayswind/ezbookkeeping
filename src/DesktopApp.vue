@@ -7,7 +7,7 @@
         <v-tooltip activator="parent">{{ tt('Click to close') }}</v-tooltip>
         <div class="d-inline-flex">
             <img alt="logo" class="notification-logo" :src="APPLICATION_LOGO_PATH" />
-            <span class="ml-2">{{ tt('global.app.title') }}</span>
+            <span class="ms-2">{{ tt('global.app.title') }}</span>
         </div>
         <div>
             {{ currentNotificationContent }}

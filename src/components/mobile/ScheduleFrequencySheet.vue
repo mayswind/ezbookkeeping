@@ -21,7 +21,7 @@
                                           v-for="type in allTransactionScheduledFrequencyTypes"
                                           @click="changeFrequencyType(type.type)">
                                 <template #after>
-                                    <f7-icon class="list-item-showing" f7="chevron_right" v-if="currentFrequencyType === type.type"></f7-icon>
+                                    <f7-icon class="list-item-showing icon-with-direction" f7="chevron_right" v-if="currentFrequencyType === type.type"></f7-icon>
                                 </template>
                             </f7-list-item>
                         </f7-list>
@@ -165,10 +165,10 @@ function onSheetClosed(): void {
 }
 
 .schedule-frequency-type-list.list .item-inner {
-    padding-right: 6px;
+    padding-inline-end: 6px;
 }
 
 .schedule-frequency-value-list-list.list .item-content {
-    padding-left: 0;
+    padding-inline-start: 0;
 }
 </style>

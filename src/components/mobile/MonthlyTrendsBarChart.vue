@@ -363,13 +363,13 @@ function toggleLegend(legend: TrendsBarChartLegend): void {
 
 <style>
 .monthly-trends-bar-chart-legend {
-    margin-right: 4px;
+    margin-inline-end: 4px;
     cursor: pointer;
 }
 
 .monthly-trends-bar-chart-legend-icon.f7-icons {
     font-size: var(--ebk-trends-bar-chart-legend-icon-font-size);
-    margin-right: 2px;
+    margin-inline-end: 2px;
 }
 
 .monthly-trends-bar-chart-legend-unselected .monthly-trends-bar-chart-legend-icon.f7-icons {

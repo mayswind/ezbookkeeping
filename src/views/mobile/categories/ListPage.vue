@@ -48,15 +48,19 @@
                         </f7-badge>
                     </ItemIcon>
                 </template>
-                <f7-swipeout-actions left v-if="sortable">
-                    <f7-swipeout-button :color="category.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
+                <f7-swipeout-actions :left="textDirection === TextDirection.LTR"
+                                     :right="textDirection === TextDirection.RTL"
+                                     v-if="sortable">
+                    <f7-swipeout-button :color="category.hidden ? 'blue' : 'gray'" class="padding-horizontal"
                                         overswipe close @click="hide(category, !category.hidden)">
                         <f7-icon :f7="category.hidden ? 'eye' : 'eye_slash'"></f7-icon>
                     </f7-swipeout-button>
                 </f7-swipeout-actions>
-                <f7-swipeout-actions right v-if="!sortable">
+                <f7-swipeout-actions :left="textDirection === TextDirection.RTL"
+                                     :right="textDirection === TextDirection.LTR"
+                                     v-if="!sortable">
                     <f7-swipeout-button color="orange" close :text="tt('Edit')" @click="edit(category)"></f7-swipeout-button>
-                    <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(category, false)">
+                    <f7-swipeout-button color="red" class="padding-horizontal" @click="remove(category, false)">
                         <f7-icon f7="trash"></f7-icon>
                     </f7-swipeout-button>
                 </f7-swipeout-actions>
@@ -96,6 +100,7 @@ import { useCategoryListPageBase } from '@/views/base/categories/CategoryListPag
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
+import { TextDirection } from '@/core/text.ts';
 import { CategoryType } from '@/core/category.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 
@@ -110,7 +115,7 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt } = useI18n();
+const { tt, getCurrentLanguageTextDirection } = useI18n();
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 const { loading, primaryCategoryId, currentPrimaryCategory } = useCategoryListPageBase();
 
@@ -126,6 +131,8 @@ const showMoreActionSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
 const displayOrderModified = ref<boolean>(false);
 const displayOrderSaving = ref<boolean>(false);
+
+const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 
 const categories = computed<TransactionCategory[]>(() => {
     if (!primaryCategoryId.value || primaryCategoryId.value === '' || primaryCategoryId.value === '0') {

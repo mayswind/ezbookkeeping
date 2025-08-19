@@ -143,7 +143,7 @@
                                     </div>
                                     <div class="account-balance flex-shrink-1">
                                         <span>Balance</span>
-                                        <span style="margin-left: 4px">0.00 USD</span>
+                                        <span style="margin-inline-start: 4px">0.00 USD</span>
                                     </div>
                                 </div>
                             </div>
@@ -229,14 +229,16 @@
                                         </div>
                                         <div class="account-balance flex-shrink-1">
                                             <span>{{ isCurrentLiabilityAccount ? tt('Outstanding Balance') : tt('Balance') }}</span>
-                                            <span style="margin-left: 4px">{{ getDisplayAccountBalance(item.transaction) }}</span>
+                                            <span style="margin-inline-start: 4px">{{ getDisplayAccountBalance(item.transaction) }}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </template>
-                    <f7-swipeout-actions right v-if="item.type == 'transaction' && item.transaction">
+                    <f7-swipeout-actions :left="textDirection === TextDirection.RTL"
+                                         :right="textDirection === TextDirection.LTR"
+                                         v-if="item.type == 'transaction' && item.transaction">
                         <f7-swipeout-button color="primary" close
                                             :text="tt('Duplicate')"
                                             v-if="item.transaction.type !== TransactionType.ModifyBalance"
@@ -245,7 +247,7 @@
                                             :text="tt('Edit')"
                                             v-if="item.transaction.editable && item.transaction.type !== TransactionType.ModifyBalance"
                                             @click="editTransaction(item.transaction)"></f7-swipeout-button>
-                        <f7-swipeout-button color="red" class="padding-left padding-right"
+                        <f7-swipeout-button color="red" class="padding-horizontal"
                                             v-if="item.transaction.editable"
                                             @click="removeTransaction(item.transaction, false)">
                             <f7-icon f7="trash"></f7-icon>
@@ -260,7 +262,7 @@
                 <div class="statistics-chart-header display-flex full-line justify-content-space-between">
                     <div></div>
                     <div class="align-self-flex-end">
-                        <span style="margin-right: 4px;">{{ tt('Time Granularity') }}</span>
+                        <span style="margin-inline-end: 4px;">{{ tt('Time Granularity') }}</span>
                         <f7-link :class="{ 'disabled': loading }" href="#" popover-open=".chart-data-date-aggregation-type-popover-menu">{{ chartDataDateAggregationTypeDisplayName }}</f7-link>
                     </div>
                 </div>
@@ -352,6 +354,7 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 
+import { TextDirection } from '@/core/text.ts';
 import { type TimeRangeAndDateType, DateRange, DateRangeScene } from '@/core/datetime.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
@@ -386,7 +389,14 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getAllDateRanges, formatUnixTimeToLongDateTime, formatNumberToLocalizedNumerals } = useI18n();
+const {
+    tt,
+    getCurrentLanguageTextDirection,
+    getAllDateRanges,
+    formatUnixTimeToLongDateTime,
+    formatNumberToLocalizedNumerals
+} = useI18n();
+
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
 const {
@@ -440,6 +450,7 @@ const virtualDataItems = ref<ReconciliationStatementVirtualListData>({
     topPosition: 0
 });
 
+const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 const validQuery = computed(() => currentAccount.value && currentAccount.value.type === AccountType.SingleAccount.type);
 const allAvailableDateRanges = computed(() => getAllDateRanges(DateRangeScene.Normal, true, !!accountsStore.getAccountStatementDate(accountId.value)));
 const displayStartTime = computed<string>(() => formatUnixTimeToLongDateTime(startTime.value));
@@ -708,11 +719,11 @@ init();
 }
 
 .list.reconciliation-statement-list li.reconciliation-statement-transaction-date > .item-content {
-    padding-left: 0 !important;
+    padding-inline-start: 0 !important;
 }
 
 .list.reconciliation-statement-list li.reconciliation-statement-transaction-date > .item-content > .item-inner {
-    padding-left: calc(var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-left));
+    padding-inline-start: calc(var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-left));
 }
 
 .list.reconciliation-statement-list li.reconciliation-statement-transaction-date > .item-content > .item-inner:after {
@@ -725,7 +736,7 @@ init();
 }
 
 .list.reconciliation-statement-list li.transaction-info .account-balance {
-    margin-left: 4px;
+    margin-inline-start: 4px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

@@ -83,7 +83,7 @@
                                 </template>
 
                                 <template #root>
-                                    <ul class="padding-left"
+                                    <ul class="padding-inline-start"
                                         v-if="account.type === AccountType.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])">
                                         <f7-list-item checkbox
                                                       :title="subAccount.name"

@@ -82,13 +82,13 @@ watch(() => props.modelValue, (newValue) => {
 
 <style>
 .list-item-pincode-input .item-content {
-    padding-left: 0;
-    padding-right: 0;
+    padding-inline-start: 0;
+    padding-inline-end: 0;
 }
 
 .list-item-pincode-input .item-content .item-inner {
-    padding-left: 0;
-    padding-right: 0;
+    padding-inline-start: 0;
+    padding-inline-end: 0;
     justify-content: center;
 }
 </style>

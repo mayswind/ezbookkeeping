@@ -19,7 +19,7 @@
                 <p class="no-margin">
                     <span class="net-assets" v-if="loading">0.00 USD</span>
                     <span class="net-assets" v-else-if="!loading">{{ netAssets }}</span>
-                    <f7-link class="margin-left-half" @click="showAccountBalance = !showAccountBalance">
+                    <f7-link class="margin-inline-start-half" @click="showAccountBalance = !showAccountBalance">
                         <f7-icon class="ebk-hide-icon" :f7="showAccountBalance ? 'eye_slash_fill' : 'eye_fill'"></f7-icon>
                     </f7-link>
                 </p>
@@ -44,7 +44,7 @@
                 <f7-list-item group-title :sortable="false">
                     <small>
                         <span>Account Category</span>
-                        <span style="margin-left: 10px">0.00 USD</span>
+                        <span style="margin-inline-start: 10px">0.00 USD</span>
                     </small>
                 </f7-list-item>
                 <f7-list-item class="nested-list-item" after="0.00 USD" link="#"
@@ -77,7 +77,7 @@
                 <f7-list-item group-title :sortable="false">
                     <small>
                         <span>{{ tt(accountCategory.name) }}</span>
-                        <span style="margin-left: 10px">{{ accountCategoryTotalBalance(accountCategory) }}</span>
+                        <span style="margin-inline-start: 10px">{{ accountCategoryTotalBalance(accountCategory) }}</span>
                     </small>
                 </f7-list-item>
                 <f7-list-item swipeout
@@ -137,16 +137,20 @@
                             </ul>
                         </li>
                     </template>
-                    <f7-swipeout-actions left v-if="sortable">
-                        <f7-swipeout-button :color="account.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
+                    <f7-swipeout-actions :left="textDirection === TextDirection.LTR"
+                                         :right="textDirection === TextDirection.RTL"
+                                         v-if="sortable">
+                        <f7-swipeout-button :color="account.hidden ? 'blue' : 'gray'" class="padding-horizontal"
                                             overswipe close @click="hide(account, !account.hidden)">
                             <f7-icon :f7="account.hidden ? 'eye' : 'eye_slash'"></f7-icon>
                         </f7-swipeout-button>
                     </f7-swipeout-actions>
-                    <f7-swipeout-actions right v-if="!sortable">
+                    <f7-swipeout-actions :left="textDirection === TextDirection.RTL"
+                                         :right="textDirection === TextDirection.LTR"
+                                         v-if="!sortable">
                         <f7-swipeout-button color="orange" close :text="tt('Edit')" @click="edit(account)"></f7-swipeout-button>
                         <f7-swipeout-button color="primary" close :text="tt('More')" @click="showMoreActionSheetForAccount(account)"></f7-swipeout-button>
-                        <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(account, false)">
+                        <f7-swipeout-button color="red" class="padding-horizontal" @click="remove(account, false)">
                             <f7-icon f7="trash"></f7-icon>
                         </f7-swipeout-button>
                     </f7-swipeout-actions>
@@ -207,6 +211,7 @@ import { useAccountListPageBaseBase } from '@/views/base/accounts/AccountListPag
 
 import { useAccountsStore } from '@/stores/account.ts';
 
+import { TextDirection } from '@/core/text.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import type { Account, AccountShowingIds } from '@/models/account.ts';
 
@@ -216,7 +221,7 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt } = useI18n();
+const { tt, getCurrentLanguageTextDirection } = useI18n();
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
 const {
@@ -244,6 +249,7 @@ const showMoreActionSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
 const displayOrderSaving = ref<boolean>(false);
 
+const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 const firstShowingIds = computed<AccountShowingIds>(() => accountsStore.getFirstShowingIds(showHidden.value));
 const lastShowingIds = computed<AccountShowingIds>(() => accountsStore.getLastShowingIds(showHidden.value));
 const hasAnyVisibleAccount = computed<boolean>(() => accountsStore.allVisibleAccountsCount > 0);
@@ -487,11 +493,11 @@ init();
 }
 
 .account-overview-info > span {
-    margin-right: 4px;
+    margin-inline-end: 4px;
 }
 
 .account-overview-info > span:last-child {
-    margin-right: 0;
+    margin-inline-end: 0;
 }
 
 .account-list {

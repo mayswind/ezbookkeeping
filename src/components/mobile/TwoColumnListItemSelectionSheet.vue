@@ -34,7 +34,7 @@
                                     <ItemIcon :icon-type="primaryIconType" :icon-id="primaryIconField ? item[primaryIconField] : undefined" :color="primaryColorField ? item[primaryColorField] : undefined"></ItemIcon>
                                 </template>
                                 <template #after>
-                                    <f7-icon class="list-item-showing" f7="chevron_right" v-if="item === selectedPrimaryItem"></f7-icon>
+                                    <f7-icon class="list-item-showing icon-with-direction" f7="chevron_right" v-if="item === selectedPrimaryItem"></f7-icon>
                                 </template>
                             </f7-list-item>
                             <f7-list-item v-if="!filteredItems || !filteredItems.length"
@@ -160,10 +160,10 @@ function onSheetClosed(): void {
 }
 
 .primary-list.list .item-inner {
-    padding-right: 6px;
+    padding-inline-end: 6px;
 }
 
 .secondary-list.list .item-content {
-    padding-left: 0;
+    padding-inline-start: 0;
 }
 </style>

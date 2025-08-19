@@ -37,7 +37,7 @@
                         <f7-block class="no-padding no-margin">
                             <div class="display-flex">
                                 <f7-icon class="transaction-tag-icon" f7="number"></f7-icon>
-                                <div class="tag-selection-list-item list-item-valign-middle padding-left-half">
+                                <div class="tag-selection-list-item list-item-valign-middle padding-inline-start-half">
                                     {{ tag.name }}
                                 </div>
                             </div>
@@ -55,7 +55,7 @@
                     </template>
                     <template #title>
                         <div class="display-flex">
-                            <f7-input class="list-title-input padding-left-half"
+                            <f7-input class="list-title-input padding-inline-start-half"
                                       type="text"
                                       :placeholder="tt('Tag Title')"
                                       v-model:value="newTag.name"
@@ -70,7 +70,7 @@
                                    color="blue"
                                    @click="saveNewTag()">
                         </f7-button>
-                        <f7-button class="no-padding margin-left-half"
+                        <f7-button class="no-padding margin-inline-start-half"
                                    raised fill
                                    icon-f7="xmark"
                                    color="gray"
@@ -261,7 +261,7 @@ function onSheetClosed(): void {
 }
 
 .tag-selection-list.list .item-media + .item-inner {
-    margin-left: 0;
+    margin-inline-start: 0;
 }
 
 .tag-selection-list-item {

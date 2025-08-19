@@ -47,13 +47,13 @@
 
         <f7-toolbar tabbar bottom class="toolbar-item-auto-size transaction-list-toolbar">
             <f7-link :class="{ 'disabled': loading || query.dateType === DateRange.All.type }" @click="shiftDateRange(query.minTime, query.maxTime, -1)">
-                <f7-icon f7="arrow_left_square"></f7-icon>
+                <f7-icon class="icon-with-direction" f7="arrow_left_square"></f7-icon>
             </f7-link>
             <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': loading }" popover-open=".date-popover-menu">
                 <span :class="{ 'tabbar-item-changed': query.dateType !== DateRange.All.type }">{{ queryDateRangeName }}</span>
             </f7-link>
             <f7-link :class="{ 'disabled': loading || query.dateType === DateRange.All.type }" @click="shiftDateRange(query.minTime, query.maxTime, 1)">
-                <f7-icon f7="arrow_right_square"></f7-icon>
+                <f7-icon class="icon-with-direction" f7="arrow_right_square"></f7-icon>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".category-popover-menu" :class="{ 'disabled': query.type === 1 }">
                 <span :class="{ 'tabbar-item-changed': query.categoryIds }">{{ queryCategoryName }}</span>
@@ -285,14 +285,15 @@
                                                 <span v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ `(${getDisplayTimezone(transaction)})` }}</span>
                                                 <span v-if="transaction.sourceAccount">·</span>
                                                 <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
-                                                <f7-icon f7="arrow_right" class="transaction-account-arrow" v-if="transaction.sourceAccount && transaction.type === TransactionType.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id"></f7-icon>
+                                                <f7-icon class="transaction-account-arrow icon-with-direction" f7="arrow_right" v-if="transaction.sourceAccount && transaction.type === TransactionType.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id"></f7-icon>
                                                 <span v-if="transaction.sourceAccount && transaction.type === TransactionType.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">{{ transaction.destinationAccount.name }}</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </template>
-                            <f7-swipeout-actions right>
+                            <f7-swipeout-actions :left="textDirection === TextDirection.RTL"
+                                                 :right="textDirection === TextDirection.LTR">
                                 <f7-swipeout-button color="primary" close
                                                     :text="tt('Duplicate')"
                                                     v-if="transaction.type !== TransactionType.ModifyBalance"
@@ -301,7 +302,7 @@
                                                     :text="tt('Edit')"
                                                     v-if="transaction.editable"
                                                     @click="edit(transaction)"></f7-swipeout-button>
-                                <f7-swipeout-button color="red" class="padding-left padding-right"
+                                <f7-swipeout-button color="red" class="padding-horizontal"
                                                     v-if="transaction.editable"
                                                     @click="remove(transaction, false)">
                                     <f7-icon f7="trash"></f7-icon>
@@ -398,7 +399,7 @@
                         <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
                     </template>
                     <f7-accordion-content>
-                        <f7-list dividers class="padding-left">
+                        <f7-list dividers class="padding-inline-start">
                             <f7-list-item :class="{ 'list-item-selected': query.categoryIds === category.id, 'item-in-multiple-selection': queryAllFilterCategoryIdsCount > 1 && queryAllFilterCategoryIds[category.id] }"
                                           :title="tt('All')" @click="changeCategoryFilter(category.id)">
                                 <template #media>
@@ -520,7 +521,7 @@
                               v-for="filterType in AmountFilterType.values()"
                               @click="changeAmountFilter(filterType.type)">
                     <template #after>
-                        <span class="margin-right-half" v-if="query.amountFilter && query.amountFilter.startsWith(`${filterType.type}:`)">{{ queryAmount }}</span>
+                        <span class="margin-inline-end-half" v-if="query.amountFilter && query.amountFilter.startsWith(`${filterType.type}:`)">{{ queryAmount }}</span>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.amountFilter && query.amountFilter.startsWith(`${filterType.type}:`)"></f7-icon>
                     </template>
                 </f7-list-item>
@@ -617,6 +618,7 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { type TransactionMonthList, useTransactionsStore } from '@/stores/transaction.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
+import { TextDirection } from '@/core/text.ts';
 import {
     type TimeRangeAndDateType,
     DateRangeScene,
@@ -662,6 +664,7 @@ const props = defineProps<{
 
 const {
     tt,
+    getCurrentLanguageTextDirection,
     getAllShortWeekdayNames,
     getAllTransactionTagFilterTypes,
     getWeekdayShortName
@@ -739,6 +742,7 @@ const showCustomDateRangeSheet = ref<boolean>(false);
 const showCustomMonthSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
 
+const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
 const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllShortWeekdayNames(), firstDayOfWeek.value));
 
@@ -1511,7 +1515,7 @@ init();
 
 <style>
 .transaction-list-toolbar .toolbar-inner {
-    padding-right: 8px;
+    padding-inline-end: 8px;
 }
 
 .list.transaction-amount-list .transaction-amount-statistics {
@@ -1520,17 +1524,17 @@ init();
 }
 
 .list.transaction-amount-list .transaction-amount-statistics > span {
-    margin-left: 8px;
+    margin-inline-start: 8px;
     font-weight: normal;
 }
 
 .list.transaction-info-list li.transaction-info .item-media + .item-inner {
-    margin-left: 0;
+    margin-inline-start: 0;
 }
 
 .list.transaction-info-list li.transaction-info .actual-item-inner {
     width: 100%;
-    margin-left: 10px;
+    margin-inline-start: 10px;
     overflow: hidden;
 }
 
@@ -1540,7 +1544,7 @@ init();
 
 .list.transaction-info-list li.transaction-info .transaction-date {
     width: var(--ebk-transaction-date-width);
-    margin-right: 6px;
+    margin-inline-end: 6px;
 }
 
 .list.transaction-info-list li.transaction-info .transaction-day {
@@ -1548,6 +1552,10 @@ init();
     font-size: var(--ebk-transaction-day-font-size);
     font-weight: bold;
     text-align: left;
+}
+
+html[dir="rtl"] .list.transaction-info-list li.transaction-info .transaction-day {
+    text-align: right;
 }
 
 .list.transaction-info-list li.transaction-info .transaction-day-of-week {
@@ -1569,14 +1577,14 @@ init();
     --f7-chip-height: var(--ebk-transaction-tag-chip-height);
     --f7-chip-text-color: var(--f7-list-item-footer-text-color);
     --f7-chip-bg-color: var(--ebk-transaction-tag-chip-bg-color);
-    margin-right: 4px;
+    margin-inline-end: 4px;
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .list.transaction-info-list li.transaction-info .chip.transaction-tag .chip-media+.chip-label {
-    margin-left: 0;
+    margin-inline-start: 0;
 }
 
 .list.transaction-info-list li.transaction-info .transaction-footer {
@@ -1588,13 +1596,19 @@ init();
 }
 
 .list.transaction-info-list li.transaction-info .transaction-footer > span {
-    margin-right: 4px;
+    unicode-bidi: isolate;
+    margin-inline-end: 4px;
 }
 
 .list.transaction-info-list li.transaction-info .transaction-footer .transaction-account-arrow {
     font-size: var(--ebk-transaction-account-arrow-font-size);
-    margin-right: 4px;
+    margin-inline-end: 4px;
     margin-top: var(--ebk-transaction-account-arrow-margin-top);
+}
+
+html[dir="rtl"] .list.transaction-info-list li.transaction-info .transaction-footer .transaction-account-arrow {
+    margin-inline-end: 0;
+    margin-inline-start: 4px;
 }
 
 .list.transaction-info-list li.transaction-info .transaction-amount {
@@ -1613,7 +1627,7 @@ init();
 }
 
 .more-popover-menu .transaction-tag-name {
-    padding-right: 4px;
+    padding-inline-end: 4px;
     font-size: var(--f7-list-item-title-font-size);
 }
 

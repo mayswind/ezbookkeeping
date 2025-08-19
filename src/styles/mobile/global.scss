@@ -21,6 +21,38 @@ input[type=number] {
 }
 
 /** Common class **/
+.margin-inline-start {
+    margin-inline-start: var(--f7-typography-margin) !important;
+}
+
+.margin-inline-start-half {
+    margin-inline-start: calc(var(--f7-typography-margin) / 2) !important;
+}
+
+.margin-inline-end {
+    margin-inline-end: var(--f7-typography-margin) !important;
+}
+
+.margin-inline-end-half {
+    margin-inline-end: calc(var(--f7-typography-margin) / 2) !important;
+}
+
+.padding-inline-start {
+    padding-inline-start: var(--f7-typography-padding) !important;
+}
+
+.padding-inline-start-half {
+    padding-inline-start: calc(var(--f7-typography-padding) / 2) !important;
+}
+
+.padding-inline-end {
+    padding-inline-end: var(--f7-typography-padding) !important;
+}
+
+.padding-inline-end-half {
+    padding-inline-end: calc(var(--f7-typography-padding) / 2) !important;
+}
+
 .no-right-border {
     border-right: 0;
 }
@@ -234,6 +266,10 @@ i.icon.la, i.icon.las, i.icon.lab {
     }
 }
 
+html[dir="rtl"] i.icon.icon-with-direction {
+    transform: scaleX(-1);
+}
+
 /** Replacing the default style of @vuepic/vue-datepicker **/
 .dp__theme_light {
     --dp-primary-color: #c67e48;
@@ -245,12 +281,12 @@ i.icon.la, i.icon.las, i.icon.lab {
 
 /** Common class for replacing the default style of framework7 **/
 .navbar .navbar-compact-icons.right a + a {
-    margin-left: 0;
+    margin-inline-start: 0;
 }
 
 .toolbar-item-auto-size .toolbar-inner {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-inline-start: 16px;
+    padding-inline-end: 16px;
     gap: 4px;
 }
 
@@ -402,11 +438,22 @@ i.icon.la, i.icon.las, i.icon.lab {
 .list .item-content .list-item-checked-icon {
     font-size: var(--ebk-list-item-checked-icon-font-size);
     color: var(--f7-radio-active-color, var(--f7-theme-color));
-    margin-right: calc(var(--f7-list-item-media-margin) + var(--f7-checkbox-extra-margin));
+}
+
+html:not([dir="rtl"]) .list .item-content .list-item-checked-icon {
+    margin-inline-end: calc(var(--f7-list-item-media-margin) + var(--f7-checkbox-extra-margin));
+}
+
+html[dir="rtl"] .list .item-content .list-item-checked-icon {
+    margin-inline-start: calc(var(--f7-list-item-media-margin) + var(--f7-checkbox-extra-margin));
 }
 
 .list .item-content > .item-inner > .item-after .list-item-checked-icon {
-    margin-right: 0;
+    margin-inline-end: 0;
+}
+
+html[dir="rtl"] .list .item-content > .item-inner > .item-after .list-item-checked-icon {
+    margin-inline-start: 0;
 }
 
 .list li.no-margin .item-content.item-input {
@@ -435,7 +482,7 @@ i.icon.la, i.icon.las, i.icon.lab {
 }
 
 .icon-after-text {
-    margin-left: 6px;
+    margin-inline-start: 6px;
 }
 
 .icon-after-text i.icon {
@@ -443,10 +490,20 @@ i.icon.la, i.icon.las, i.icon.lab {
 }
 
 .badge.right-bottom-icon {
-    margin-left: -12px;
+    margin-inline-start: -12px;
     margin-top: 14px;
     width: 16px;
     height: 16px;
+}
+
+html[dir="rtl"] .badge.right-bottom-icon {
+    left: unset;
+    right: 50%;
+}
+
+html[dir="rtl"] .icon.las .badge.right-bottom-icon {
+    right: 100%;
+    margin-inline-start: -14px;
 }
 
 .badge.right-bottom-icon > .icon {
@@ -472,7 +529,7 @@ i.icon.la, i.icon.las, i.icon.lab {
     position: absolute;
     left: 50%;
     top: 50%;
-    margin-left: -18px;
+    margin-inline-start: -18px;
     margin-top: -8px;
     border-radius: 3px;
     background: #666
@@ -493,19 +550,19 @@ i.icon.la, i.icon.las, i.icon.lab {
 }
 
 .list-item-with-multi-item .list-item-subitem:first-child .item-content {
-    padding-left: calc(var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-left));
+    padding-inline-start: calc(var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-left));
 }
 
 .list-item-with-multi-item .list-item-subitem .item-inner {
     display: block;
     width: 100%;
-    padding-left: calc(var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-left));
+    padding-inline-start: calc(var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-left));
     padding-top: var(--f7-list-item-padding-vertical);
     padding-bottom: var(--f7-list-item-padding-vertical);
 }
 
 .list-item-with-multi-item .list-item-subitem:first-child .item-inner {
-    padding-left: 0;
+    padding-inline-start: 0;
 }
 
 /** Combination list for framework7 **/
@@ -544,8 +601,12 @@ i.icon.la, i.icon.las, i.icon.lab {
     border-radius: var(--f7-list-inset-border-radius);
 }
 
-.combination-list-wrapper .list.combination-list-header .combination-list-chevron-icon {
-    margin-left: auto;
+html:not([dir="rtl"]) .combination-list-wrapper .list.combination-list-header .combination-list-chevron-icon {
+    margin-inline-start: auto;
+}
+
+html[dir="rtl"] .combination-list-wrapper .list.combination-list-header .combination-list-chevron-icon {
+    margin-inline-end: auto;
 }
 
 .combination-list-wrapper .list.combination-list-content.inset > ul {
@@ -576,7 +637,7 @@ i.icon.la, i.icon.las, i.icon.lab {
 }
 
 .nested-list-item.has-child-list-item .item-link .item-inner {
-    padding-right: 0;
+    padding-inline-end: 0;
 }
 
 .nested-list-item.has-child-list-item .item-link .item-inner:before {
@@ -589,7 +650,7 @@ i.icon.la, i.icon.las, i.icon.lab {
 
 .nested-list-item.has-child-list-item .item-link .item-inner .nested-list-item-child .item-link .item-inner,
 .nested-list-item.has-child-list-item .item-link .item-inner .nested-list-item-inner {
-    padding-right: calc(var(--f7-list-chevron-icon-area) + var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-right));
+    padding-inline-end: calc(var(--f7-list-chevron-icon-area) + var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-right));
 }
 
 .nested-list-item.has-child-list-item .item-link .item-inner .nested-list-item-child .item-link .item-inner:before {
@@ -603,13 +664,13 @@ i.icon.la, i.icon.las, i.icon.lab {
 .nested-list-item .nested-list-item-title {
     width: 100%;
     flex-shrink: 1;
-    margin-right: var(--f7-list-item-media-margin);
+    margin-inline-end: var(--f7-list-item-media-margin);
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .nested-list-item.has-child-list-item .nested-list-item-title {
-    margin-left: var(--f7-list-item-media-margin);
+    margin-inline-start: var(--f7-list-item-media-margin);
 }
 
 .nested-list-item .nested-list-item-after {
@@ -618,8 +679,8 @@ i.icon.la, i.icon.las, i.icon.lab {
     display: flex;
     font-size: var(--f7-list-item-after-font-size);
     color: var(--f7-list-item-after-text-color);
-    margin-left: auto;
-    padding-left: var(--f7-list-item-after-padding);
+    margin-inline-start: auto;
+    padding-inline-start: var(--f7-list-item-after-padding);
 }
 
 .nested-list-item.has-child-list-item > .swipeout-content > .item-content > .item-inner:after,
@@ -654,7 +715,7 @@ i.icon.la, i.icon.las, i.icon.lab {
 }
 
 .sortable-enabled .nested-list-item .nested-list-item-child .item-inner {
-    padding-right: var(--f7-safe-area-right) !important;
+    padding-inline-end: var(--f7-safe-area-right) !important;
 }
 
 /** Fix @vuepic/vue-datepicker style issue **/
@@ -683,6 +744,10 @@ i.icon.la, i.icon.las, i.icon.lab {
     width: 100%;
 }
 
+html[dir="rtl"] .dp__main .dp__btn.dp--arrow-btn-nav {
+    transform: scaleX(-1);
+}
+
 /* statistics-list */
 .statistics-list-item-overview-amount {
     margin-top: 2px;
@@ -709,7 +774,7 @@ i.icon.la, i.icon.las, i.icon.lab {
 .statistics-percent {
     font-size: 0.7em;
     opacity: 0.6;
-    margin-left: 6px;
+    margin-inline-start: 6px;
 }
 
 .statistics-item-end {
@@ -719,7 +784,7 @@ i.icon.la, i.icon.las, i.icon.lab {
 }
 
 .statistics-percent-line {
-    margin-right: calc(var(--f7-list-chevron-icon-area) + var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-right));
+    margin-inline-end: calc(var(--f7-list-chevron-icon-area) + var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-right));
 }
 
 .statistics-percent-line .progressbar {

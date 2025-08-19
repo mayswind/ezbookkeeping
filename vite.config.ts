@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { resolve } from 'path';
 
-import { type UserConfig, defineConfig } from 'vite'
+import { type UserConfig, type Plugin, defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue';
 import vuetify from 'vite-plugin-vuetify';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -14,6 +14,53 @@ import thirdPartyLicenseFile from './third-party-dependencies.json';
 const SRC_DIR = resolve(__dirname, './src');
 const PUBLIC_DIR = resolve(__dirname, './public');
 const BUILD_DIR = resolve(__dirname, './dist',);
+
+function injectFramework7CssFile({ htmlFileName, placeHolders }: { htmlFileName: string, placeHolders: { name: string, srcFileName: string, distFileNamePrefix: string }[] }): Plugin[] {
+    return [
+        {
+            name: 'inject-framework7-css-file:serve',
+            apply: 'serve',
+            enforce: 'post',
+            transformIndexHtml(html: string): string {
+                for (const placeholder of placeHolders) {
+                    html = html.replace(`{{${placeholder.name}}}`, `${placeholder.srcFileName}`);
+                }
+                return html;
+            }
+        },
+        {
+            name: 'inject-framework7-css-file:build',
+            apply: 'build',
+            enforce: 'post',
+            generateBundle(_, bundle): void {
+                const placeholderCssFilePathMap: Record<string, string> = {};
+
+                for (const fileName of Object.keys(bundle)) {
+                    for (const placeholder of placeHolders) {
+                        if (fileName.startsWith(placeholder.distFileNamePrefix)) {
+                            placeholderCssFilePathMap[placeholder.name] = fileName;
+                            break;
+                        }
+                    }
+                }
+
+                const htmlAsset = bundle[htmlFileName];
+
+                if (!htmlAsset || htmlAsset.type !== 'asset') {
+                    return;
+                }
+
+                let html = htmlAsset.source as string;
+
+                for (const [placeholder, filePath] of Object.entries(placeholderCssFilePathMap)) {
+                    html = html.replace(`{{${placeholder}}}`, `./${filePath}`);
+                }
+
+                htmlAsset.source = html;
+            }
+        }
+    ];
+}
 
 export default defineConfig(() => {
     const licenseContent = fs.readFileSync('./LICENSE', { encoding: 'utf-8' });
@@ -43,6 +90,21 @@ export default defineConfig(() => {
                 styles: {
                     configFile: 'styles/desktop/configured-variables/_vuetify.scss'
                 }
+            }),
+            injectFramework7CssFile({
+                htmlFileName: 'mobile.html',
+                placeHolders: [
+                    {
+                        name: 'framework7-ltr-css-filepath',
+                        srcFileName: 'mobile-ltr.scss',
+                        distFileNamePrefix: 'css/vendor-framework7-ltr'
+                    },
+                    {
+                        name: 'framework7-rtl-css-filepath',
+                        srcFileName: 'mobile-rtl.scss',
+                        distFileNamePrefix: 'css/vendor-framework7-rtl'
+                    }
+                ]
             }),
             Checker({
                 vueTsc: true
@@ -141,7 +203,9 @@ export default defineConfig(() => {
                 input: {
                     index: resolve(SRC_DIR, 'index.html'),
                     desktop: resolve(SRC_DIR, 'desktop.html'),
-                    mobile: resolve(SRC_DIR, 'mobile.html')
+                    mobile: resolve(SRC_DIR, 'mobile.html'),
+                    'vendor-framework7-ltr': resolve(SRC_DIR, 'mobile-ltr.scss'),
+                    'vendor-framework7-rtl': resolve(SRC_DIR, 'mobile-rtl.scss')
                 },
                 output: {
                     assetFileNames: assetInfo => {

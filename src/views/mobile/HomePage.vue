@@ -21,7 +21,7 @@
                 <p class="no-margin">
                     <span class="month-expense" v-if="loading">0.00 USD</span>
                     <span class="month-expense" v-else-if="!loading">{{ transactionOverview && transactionOverview.thisMonth ? getDisplayExpenseAmount(transactionOverview.thisMonth) : '-' }}</span>
-                    <f7-link class="margin-left-half" @click="showAmountInHomePage = !showAmountInHomePage">
+                    <f7-link class="margin-inline-start-half" @click="showAmountInHomePage = !showAmountInHomePage">
                         <f7-icon class="ebk-hide-icon" :f7="showAmountInHomePage ? 'eye_slash_fill' : 'eye_fill'"></f7-icon>
                     </f7-link>
                 </p>
@@ -314,11 +314,11 @@ init();
 }
 
 .home-summary-misc > span {
-    margin-right: 4px;
+    margin-inline-end: 4px;
 }
 
 .home-summary-misc > span:last-child {
-    margin-right: 0;
+    margin-inline-end: 0;
 }
 
 .dark .home-summary-card {
@@ -348,7 +348,7 @@ init();
 }
 
 .overview-transaction-list .overview-transaction-footer > span {
-    margin-right: 4px;
+    margin-inline-end: 4px;
 }
 
 .overview-transaction-list .overview-transaction-amount {

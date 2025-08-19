@@ -190,6 +190,11 @@ import {
     getAllFilteredAccountsBalance
 } from '@/lib/account.ts';
 
+import {
+    getSessionCurrentLanguageKey,
+    setSessionCurrentLanguageKey
+} from '@/lib/settings.ts';
+
 import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 
@@ -1961,13 +1966,30 @@ export function useI18n() {
             }
         });
 
+        setSessionCurrentLanguageKey(languageKey);
         services.setLocale(languageKey);
         document.querySelector('html')?.setAttribute('lang', languageKey);
 
-        if (languageInfo && languageInfo.textDirection === TextDirection.LTR) {
-            document.querySelector('html')?.removeAttribute('dir');
-        } else if (languageInfo && languageInfo.textDirection === TextDirection.RTL) {
-            document.querySelector('html')?.setAttribute('dir', 'rtl');
+        if (document.querySelector('html')?.getAttribute('data-dir-mode') === 'isolate') {
+            if (languageInfo && languageInfo.textDirection === TextDirection.LTR) {
+                if (location.search.includes('rtl')) {
+                    const url = new URL(window.location.href);
+                    url.search = '';
+                    window.location.replace(url.toString());
+                }
+            } else if (languageInfo && languageInfo.textDirection === TextDirection.RTL) {
+                if (!location.search.includes('rtl')) {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('rtl', '');
+                    window.location.replace(url.toString());
+                }
+            }
+        } else {
+            if (languageInfo && languageInfo.textDirection === TextDirection.LTR) {
+                document.querySelector('html')?.removeAttribute('dir');
+            } else if (languageInfo && languageInfo.textDirection === TextDirection.RTL) {
+                document.querySelector('html')?.setAttribute('dir', 'rtl');
+            }
         }
 
         const defaultCurrency = getDefaultCurrency();
@@ -2003,11 +2025,15 @@ export function useI18n() {
     }
 
     function initLocale(lastUserLanguage?: string, timezone?: string): LocaleDefaultSettings | null {
+        const sessionLanguageKey: string = getSessionCurrentLanguageKey();
         let localeDefaultSettings: LocaleDefaultSettings | null = null;
 
         if (lastUserLanguage && getLanguageInfo(lastUserLanguage)) {
             logger.info(`Last user language is ${lastUserLanguage}`);
             localeDefaultSettings = setLanguage(lastUserLanguage, true);
+        } else if (sessionLanguageKey && getLanguageInfo(sessionLanguageKey)) {
+            logger.info(`Session language is ${sessionLanguageKey}`);
+            localeDefaultSettings = setLanguage(sessionLanguageKey, true);
         } else {
             localeDefaultSettings = setLanguage(null, true);
         }

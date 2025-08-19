@@ -57,7 +57,7 @@
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-num" @click="backspace" @taphold="clear()">
                 <span class="numpad-button-text numpad-button-text-normal">
-                    <f7-icon f7="delete_left"></f7-icon>
+                    <f7-icon class="icon-with-direction" f7="delete_left"></f7-icon>
                 </span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-confirm no-right-border no-bottom-border" fill @click="confirm()">
@@ -400,7 +400,7 @@ watch(() => props.flipNegative, (newValue) => {
 .numpad-value {
     display: flex;
     position: relative;
-    padding-left: 16px;
+    padding-inline-start: 16px;
     line-height: 1;
     height: var(--ebk-numpad-value-height);
     align-items: center;

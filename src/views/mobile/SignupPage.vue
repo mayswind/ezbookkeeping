@@ -156,7 +156,7 @@
                                 <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
                             </template>
 
-                            <f7-accordion-content v-if="category.subCategories.length" class="padding-left">
+                            <f7-accordion-content v-if="category.subCategories.length" class="padding-inline-start-half">
                                 <f7-list>
                                     <f7-list-item :title="subCategory.name"
                                                   :key="subIdx"

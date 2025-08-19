@@ -17,7 +17,7 @@
                 </template>
                 <template #title>
                     <div class="display-flex">
-                        <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name</div>
+                        <div class="transaction-tag-list-item-content list-item-valign-middle padding-inline-start-half">Tag Name</div>
                     </div>
                 </template>
             </f7-list-item>
@@ -46,11 +46,11 @@
                 </template>
                 <template #title>
                     <div class="display-flex">
-                        <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half"
+                        <div class="transaction-tag-list-item-content list-item-valign-middle padding-inline-start-half"
                              v-if="editingTag.id !== tag.id">
                             {{ tag.name }}
                         </div>
-                        <f7-input class="list-title-input padding-left-half"
+                        <f7-input class="list-title-input padding-inline-start-half"
                                   type="text"
                                   :placeholder="tt('Tag Title')"
                                   v-else-if="editingTag.id === tag.id"
@@ -67,7 +67,7 @@
                                v-if="editingTag.id === tag.id"
                                @click="save(editingTag)">
                     </f7-button>
-                    <f7-button class="no-padding margin-left-half"
+                    <f7-button class="no-padding margin-inline-start-half"
                                raised fill
                                icon-f7="xmark"
                                color="gray"
@@ -75,15 +75,19 @@
                                @click="cancelSave(editingTag)">
                     </f7-button>
                 </template>
-                <f7-swipeout-actions left v-if="sortable && editingTag.id !== tag.id">
-                    <f7-swipeout-button :color="tag.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
+                <f7-swipeout-actions :left="textDirection === TextDirection.LTR"
+                                     :right="textDirection === TextDirection.RTL"
+                                     v-if="sortable && editingTag.id !== tag.id">
+                    <f7-swipeout-button :color="tag.hidden ? 'blue' : 'gray'" class="padding-horizontal"
                                         overswipe close @click="hide(tag, !tag.hidden)">
                         <f7-icon :f7="tag.hidden ? 'eye' : 'eye_slash'"></f7-icon>
                     </f7-swipeout-button>
                 </f7-swipeout-actions>
-                <f7-swipeout-actions right v-if="!sortable && editingTag.id !== tag.id">
+                <f7-swipeout-actions :left="textDirection === TextDirection.RTL"
+                                     :right="textDirection === TextDirection.LTR"
+                                     v-if="!sortable && editingTag.id !== tag.id">
                     <f7-swipeout-button color="orange" close :text="tt('Edit')" @click="edit(tag)"></f7-swipeout-button>
-                    <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(tag, false)">
+                    <f7-swipeout-button color="red" class="padding-horizontal" @click="remove(tag, false)">
                         <f7-icon f7="trash"></f7-icon>
                     </f7-swipeout-button>
                 </f7-swipeout-actions>
@@ -95,7 +99,7 @@
                 </template>
                 <template #title>
                     <div class="display-flex">
-                        <f7-input class="list-title-input padding-left-half"
+                        <f7-input class="list-title-input padding-inline-start-half"
                                   type="text"
                                   :placeholder="tt('Tag Title')"
                                   v-model:value="newTag.name"
@@ -110,7 +114,7 @@
                                color="blue"
                                @click="save(newTag)">
                     </f7-button>
-                    <f7-button class="no-padding margin-left-half"
+                    <f7-button class="no-padding margin-inline-start-half"
                                raised fill
                                icon-f7="xmark"
                                color="gray"
@@ -152,6 +156,7 @@ import { useI18nUIComponents, showLoading, hideLoading, onSwipeoutDeleted } from
 
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
+import { TextDirection } from '@/core/text.ts';
 import { TransactionTag } from '@/models/transaction_tag.ts';
 
 import {
@@ -164,7 +169,7 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt } = useI18n();
+const { tt, getCurrentLanguageTextDirection } = useI18n();
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
 const transactionTagsStore = useTransactionTagsStore();
@@ -181,6 +186,7 @@ const showDeleteActionSheet = ref<boolean>(false);
 const displayOrderModified = ref<boolean>(false);
 const displayOrderSaving = ref<boolean>(false);
 
+const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 const tags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
 const firstShowingId = computed<string | null>(() => getFirstShowingId(tags.value, showHidden.value));
 const lastShowingId = computed<string | null>(() => getLastShowingId(tags.value, showHidden.value));
@@ -413,7 +419,7 @@ init();
 
 <style>
 .tag-item-list.list .item-media + .item-inner {
-    margin-left: 5px;
+    margin-inline-start: 5px;
 }
 
 .transaction-tag-list-item-content {

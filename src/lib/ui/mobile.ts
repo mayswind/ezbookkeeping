@@ -4,6 +4,7 @@ import type { Dialog, Picker, Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import { TextDirection } from '@/core/text.ts';
 import { FontSize, FONT_SIZE_PREVIEW_CLASSNAME_PREFIX } from '@/core/font.ts';
 import { getNumberValue } from '../common.ts';
 import { isEnableAnimate } from '../settings.ts';
@@ -195,7 +196,7 @@ export function onInfiniteScrolling(callback: (e: Event) => void): void {
 }
 
 export function useI18nUIComponents() {
-    const { tt, te } = useI18n();
+    const { tt, te, getCurrentLanguageTextDirection } = useI18n();
 
     function routeBackOnError<T>(f7router: Router.Router, errorRef: Ref<T>): void {
         const unwatch = watch(errorRef, (newValue) => {
@@ -230,52 +231,58 @@ export function useI18nUIComponents() {
     }
 
     function showConfirm(message: string, confirmCallback?: (dialog: Dialog.Dialog, e: Event) => void, cancelCallback?: (dialog: Dialog.Dialog, e: Event) => void): void {
+        const textDirection = getCurrentLanguageTextDirection();
+
+        const cancelButton: Dialog.DialogButton = {
+            text: tt('Cancel'),
+            onClick: cancelCallback
+        };
+
+        const confirmButton: Dialog.DialogButton = {
+            text: tt('OK'),
+            onClick: confirmCallback
+        };
+
         f7ready((f7) => {
             f7.dialog.create({
                 title: tt('global.app.title'),
                 text: tt(message),
                 animate: isEnableAnimate(),
-                buttons: [
-                    {
-                        text: tt('Cancel'),
-                        onClick: cancelCallback
-                    },
-                    {
-                        text: tt('OK'),
-                        onClick: confirmCallback
-                    }
-                ]
+                buttons: textDirection == TextDirection.RTL ? [confirmButton, cancelButton] : [cancelButton, confirmButton]
             }).open();
         });
     }
 
     function showPrompt(message: string, currentValue?: string, confirmCallback?: (value: string, dialog: Dialog.Dialog, e: Event) => void, cancelCallback?: (value: string, dialog: Dialog.Dialog, e: Event) => void): void {
+        const textDirection = getCurrentLanguageTextDirection();
+
+        const cancelButton: Dialog.DialogButton = {
+            text: tt('Cancel'),
+            onClick: (dialog, event) => {
+                if (cancelCallback) {
+                    const inputValue = dialog.$el.find('.dialog-input').val();
+                    cancelCallback(inputValue, dialog, event);
+                }
+            }
+        };
+
+        const confirmButton: Dialog.DialogButton = {
+            text: tt('OK'),
+            onClick: (dialog, event) => {
+                if (confirmCallback) {
+                    const inputValue = dialog.$el.find('.dialog-input').val();
+                    confirmCallback(inputValue, dialog, event);
+                }
+            }
+        };
+
         f7ready((f7) => {
             f7.dialog.create({
                 title: tt('global.app.title'),
                 text: tt(message),
                 content: `<div class="dialog-input-field input"><input type="text" class="dialog-input" value="${currentValue || ''}"></div>`,
                 animate: isEnableAnimate(),
-                buttons: [
-                    {
-                        text: tt('Cancel'),
-                        onClick: (dialog, event) => {
-                            if (cancelCallback) {
-                                const inputValue = dialog.$el.find('.dialog-input').val();
-                                cancelCallback(inputValue, dialog, event);
-                            }
-                        }
-                    },
-                    {
-                        text: tt('OK'),
-                        onClick: (dialog, event) => {
-                            if (confirmCallback) {
-                                const inputValue = dialog.$el.find('.dialog-input').val();
-                                confirmCallback(inputValue, dialog, event);
-                            }
-                        }
-                    }
-                ]
+                buttons: textDirection == TextDirection.RTL ? [confirmButton, cancelButton] : [cancelButton, confirmButton]
             }).open();
         });
     }

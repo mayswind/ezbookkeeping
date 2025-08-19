@@ -93,7 +93,10 @@
                     <div class="display-flex justify-content-space-between">
                         <div class="fontsize-minimum">A</div>
                         <div class="fontsize-maximum">A</div>
-                        <div class="fontsize-default" :style="`left: calc(${100 / FontSize.MaximumFontSize.type}% - 6px)`">{{ tt('Default') }}</div>
+                        <div class="fontsize-default"
+                             :style="textDirection === TextDirection.LTR ? `left: calc(${100 / FontSize.MaximumFontSize.type}% - 6px)` :  `right: calc(${100 / FontSize.MaximumFontSize.type}% - 6px)`">
+                            {{ tt('Default') }}
+                        </div>
                     </div>
                     <f7-range
                         :min="FontSize.MinimumFontSize.type"
@@ -120,6 +123,7 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 
+import { TextDirection } from '@/core/text.ts';
 import { FontSize } from '@/core/font.ts';
 import { getLocalDatetimeFromUnixTime, getCurrentUnixTime, getDay, getDayOfWeekName } from '@/lib/datetime.ts';
 import { setAppFontSize, getFontSizePreviewClassName } from '@/lib/ui/mobile.ts';
@@ -128,13 +132,21 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getWeekdayShortName, formatUnixTimeToLongYearMonth, formatUnixTimeToShortTime, formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
+const {
+    tt,
+    getCurrentLanguageTextDirection,
+    getWeekdayShortName,
+    formatUnixTimeToLongYearMonth,
+    formatUnixTimeToShortTime,
+    formatAmountToLocalizedNumeralsWithCurrency
+} = useI18n();
 
 const settingsStore = useSettingsStore();
 
 const currentUnixTime = ref<number>(getCurrentUnixTime());
 const fontSize = ref<number>(settingsStore.appSettings.fontSize);
 
+const textDirection = computed<string>(() => getCurrentLanguageTextDirection());
 const fontSizePreviewClassName = computed<string>(() => getFontSizePreviewClassName(fontSize.value));
 const currentLongYearMonth = computed<string>(() => formatUnixTimeToLongYearMonth(currentUnixTime.value));
 const currentDayOfMonth = computed<number>(() => getDay(getLocalDatetimeFromUnixTime(currentUnixTime.value)));

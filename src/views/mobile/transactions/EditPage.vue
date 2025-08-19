@@ -105,7 +105,7 @@
                 <template #title>
                     <div class="list-item-custom-title" v-if="hasAvailableExpenseCategories">
                         <span>{{ getTransactionPrimaryCategoryName(transaction.expenseCategoryId, allCategories[CategoryType.Expense]) }}</span>
-                        <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
+                        <f7-icon class="category-separate-icon icon-with-direction" f7="chevron_right"></f7-icon>
                         <span>{{ getTransactionSecondaryCategoryName(transaction.expenseCategoryId, allCategories[CategoryType.Expense]) }}</span>
                     </div>
                     <div class="list-item-custom-title" v-else-if="!hasAvailableExpenseCategories">
@@ -137,7 +137,7 @@
                 <template #title>
                     <div class="list-item-custom-title" v-if="hasAvailableIncomeCategories">
                         <span>{{ getTransactionPrimaryCategoryName(transaction.incomeCategoryId, allCategories[CategoryType.Income]) }}</span>
-                        <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
+                        <f7-icon class="category-separate-icon icon-with-direction" f7="chevron_right"></f7-icon>
                         <span>{{ getTransactionSecondaryCategoryName(transaction.incomeCategoryId, allCategories[CategoryType.Income]) }}</span>
                     </div>
                     <div class="list-item-custom-title" v-else-if="!hasAvailableIncomeCategories">
@@ -169,7 +169,7 @@
                 <template #title>
                     <div class="list-item-custom-title" v-if="hasAvailableTransferCategories">
                         <span>{{ getTransactionPrimaryCategoryName(transaction.transferCategoryId, allCategories[CategoryType.Transfer]) }}</span>
-                        <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
+                        <f7-icon class="category-separate-icon icon-with-direction" f7="chevron_right"></f7-icon>
                         <span>{{ getTransactionSecondaryCategoryName(transaction.transferCategoryId, allCategories[CategoryType.Transfer]) }}</span>
                     </div>
                     <div class="list-item-custom-title" v-else-if="!hasAvailableTransferCategories">
@@ -1252,8 +1252,8 @@ init();
 
 <style>
 .category-separate-icon.icon {
-    margin-left: 5px;
-    margin-right: 5px;
+    margin-inline-start: 5px;
+    margin-inline-end: 5px;
     font-size: var(--ebk-category-separate-icon-font-size);
     line-height: 16px;
     color: var(--f7-color-gray-tint);
@@ -1292,19 +1292,19 @@ init();
 }
 
 .transaction-edit-timezone-name {
-    padding-left: 4px;
+    padding-inline-start: 4px;
 }
 
 .transaction-edit-tag {
     --f7-chip-bg-color: var(--ebk-transaction-tag-chip-bg-color);
-    margin-right: 4px;
+    margin-inline-end: 4px;
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .chip.transaction-edit-tag .chip-media+.chip-label {
-    margin-left: 0;
+    margin-inline-start: 0;
 }
 
 .chip.transaction-edit-tag .chip-media i.icon {

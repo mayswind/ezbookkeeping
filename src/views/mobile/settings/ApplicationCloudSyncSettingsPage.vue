@@ -30,7 +30,7 @@
                           v-for="categorizedItems in ALL_APPLICATION_CLOUD_SETTINGS"
                           @change="updateSettingsSelected(categorizedItems, $event.target.checked)">
                 <template #root>
-                    <ul class="padding-left">
+                    <ul class="padding-inline-start">
                         <f7-list-item checkbox
                                       :disabled="loading || enabling || disabling"
                                       :title="tt(settingItem.settingName)"

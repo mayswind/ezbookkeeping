@@ -184,6 +184,6 @@ reloadUserDataStatistics();
 
 <style>
 .export-file-type-list.list > ul > li > .item-content {
-    padding-left: 0;
+    padding-inline-start: 0;
 }
 </style>

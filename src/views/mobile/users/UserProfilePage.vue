@@ -526,6 +526,7 @@ import { useRootStore } from '@/stores/index.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 
+import { TextDirection } from '@/core/text.ts';
 import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
 
 import type { UserProfileResponse } from '@/models/user.ts';
@@ -538,7 +539,15 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getAllLanguageOptions, getAllCurrencies, getCurrencyName, formatFiscalYearStartToLongDay } = useI18n();
+const {
+    tt,
+    getCurrentLanguageTextDirection,
+    getAllLanguageOptions,
+    getAllCurrencies,
+    getCurrencyName,
+    formatFiscalYearStartToLongDay
+} = useI18n();
+
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
 const {
@@ -661,6 +670,8 @@ function save(): void {
         return;
     }
 
+    const oldTextDirection: TextDirection = getCurrentLanguageTextDirection();
+
     saving.value = true;
     showLoading(() => saving.value);
 
@@ -671,7 +682,10 @@ function save(): void {
 
         doAfterProfileUpdate(response.user);
         showToast('Your profile has been successfully updated');
-        router.back();
+
+        if (oldTextDirection === getCurrentLanguageTextDirection()) {
+            router.back(); // if text direction is changed, the page will be reloaded, so it don't need to go back
+        }
     }).catch(error => {
         saving.value = false;
         hideLoading();

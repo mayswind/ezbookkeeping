@@ -34,7 +34,9 @@
                 <template #after>
                     <small>{{ session.lastSeenDateTime }}</small>
                 </template>
-                <f7-swipeout-actions right v-if="!session.isCurrent">
+                <f7-swipeout-actions :left="textDirection === TextDirection.RTL"
+                                     :right="textDirection === TextDirection.LTR"
+                                     v-if="!session.isCurrent">
                     <f7-swipeout-button color="red" :text="tt('Log Out')" @click="revoke(session)"></f7-swipeout-button>
                 </f7-swipeout-actions>
             </f7-list-item>
@@ -51,6 +53,7 @@ import { useI18nUIComponents, showLoading, hideLoading, onSwipeoutDeleted } from
 
 import { useTokensStore } from '@/stores/token.ts';
 
+import { TextDirection } from '@/core/text.ts';
 import { type TokenInfoResponse, SessionInfo } from '@/models/token.ts';
 
 import { isEquals } from '@/lib/common.ts';
@@ -73,7 +76,7 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, formatUnixTimeToLongDateTime } = useI18n();
+const { tt, getCurrentLanguageTextDirection, formatUnixTimeToLongDateTime } = useI18n();
 const { showConfirm, showToast, routeBackOnError } = useI18nUIComponents();
 
 const tokensStore = useTokensStore();
@@ -81,6 +84,8 @@ const tokensStore = useTokensStore();
 const tokens = ref<TokenInfoResponse[]>([]);
 const loading = ref<boolean>(true);
 const loadingError = ref<unknown | null>(null);
+
+const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 
 const sessions = computed<MobilePageSessionInfo[]>(() => {
     const sessions: MobilePageSessionInfo[] = [];

@@ -13,6 +13,7 @@ import {
 } from '@/core/setting.ts';
 
 const settingsLocalStorageKey: string = 'ebk_app_settings';
+const currentLanguageSessionStorageKey: string = 'ebk_current_language';
 
 function getStoredApplicationSettings(): BaseApplicationSetting {
     try {
@@ -100,4 +101,17 @@ export function isEnableAnimate(): boolean {
 
 export function clearSettings(): void {
     localStorage.removeItem(settingsLocalStorageKey);
+}
+
+export function getSessionCurrentLanguageKey(): string {
+    return sessionStorage.getItem(currentLanguageSessionStorageKey) || '';
+}
+
+export function setSessionCurrentLanguageKey(languageKey: string): void {
+    if (!languageKey) {
+        sessionStorage.removeItem(currentLanguageSessionStorageKey);
+        return;
+    }
+
+    sessionStorage.setItem(currentLanguageSessionStorageKey, languageKey);
 }

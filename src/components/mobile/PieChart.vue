@@ -40,7 +40,7 @@
         <div class="pie-chart-toolbox-container padding-horizontal" v-if="showSelectedItemInfo">
             <div class="pie-chart-toolbox">
                 <f7-link class="pie-chart-toolbox-button" :class="{ 'disabled': !!skeleton || !validItems || validItems.length <= 1 }" @click="switchSelectedItem(1)">
-                    <f7-icon f7="arrow_left"></f7-icon>
+                    <f7-icon class="icon-with-direction" f7="arrow_left"></f7-icon>
                 </f7-link>
 
                 <div class="pie-chart-toolbox-info">
@@ -61,7 +61,7 @@
                         <span v-else-if="!skeleton && selectedItem.displayName">{{ selectedItem.displayName }}</span>
                         <span class="skeleton-text" v-if="skeleton">Value</span>
                         <span v-else-if="!skeleton && showValue" :style="getColorStyle(selectedItem ? selectedItem.color : '')">{{ selectedItem.displayValue }}</span>
-                        <f7-icon class="item-navigate-icon" f7="chevron_right" v-if="enableClickItem"></f7-icon>
+                        <f7-icon class="item-navigate-icon icon-with-direction" f7="chevron_right" v-if="enableClickItem"></f7-icon>
                     </f7-link>
                     <f7-link :no-link-class="true" v-else-if="!validItems || !validItems.length">
                         {{ tt('No transaction data') }}
@@ -69,7 +69,7 @@
                 </div>
 
                 <f7-link class="pie-chart-toolbox-button" :class="{ 'disabled': !!skeleton || !validItems || validItems.length <= 1 }" @click="switchSelectedItem(-1)">
-                    <f7-icon f7="arrow_right"></f7-icon>
+                    <f7-icon class="icon-with-direction" f7="arrow_right"></f7-icon>
                 </f7-link>
             </div>
         </div>
@@ -264,14 +264,14 @@ function clickItem(item: CommonPieChartDataItem): void {
 }
 
 .pie-chart-toolbox-info a > span + span {
-    padding-left: 8px;
+    padding-inline-start: 8px;
 }
 
 .pie-chart-toolbox-info .item-navigate-icon {
     color: rgba(0, 0, 0, 0.2);
     font-size: 18px;
     font-weight: bold;
-    padding-left: 4px;
+    padding-inline-start: 4px;
 }
 
 .pie-chart-toolbox-button {

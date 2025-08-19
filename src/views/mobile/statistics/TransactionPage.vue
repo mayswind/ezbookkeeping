@@ -50,8 +50,8 @@
 
         <f7-card v-if="analysisType === StatisticsAnalysisType.CategoricalAnalysis && query.categoricalChartType === CategoricalChartType.Pie.type">
             <f7-card-header class="no-border display-block">
-                <div class="statistics-chart-header full-line text-align-right">
-                    <span style="margin-right: 4px;">{{ tt('Sort by') }}</span>
+                <div :class="{ 'statistics-chart-header': true, 'full-line': true, 'text-align-right': textDirection === TextDirection.LTR, 'text-align-left': textDirection === TextDirection.RTL}">
+                    <span style="margin-inline-end: 4px;">{{ tt('Sort by') }}</span>
                     <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ querySortingTypeName }}</f7-link>
                 </div>
             </f7-card-header>
@@ -104,7 +104,7 @@
                         {{ totalAmountName }}
                     </div>
                     <div class="align-self-flex-end">
-                        <span style="margin-right: 4px;">{{ tt('Sort by') }}</span>
+                        <span style="margin-inline-end: 4px;">{{ tt('Sort by') }}</span>
                         <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ querySortingTypeName }}</f7-link>
                     </div>
                 </div>
@@ -196,7 +196,7 @@
                 <div class="statistics-chart-header display-flex full-line justify-content-space-between">
                     <div></div>
                     <div class="align-self-flex-end">
-                        <span style="margin-right: 4px;">{{ tt('Sort by') }}</span>
+                        <span style="margin-inline-end: 4px;">{{ tt('Sort by') }}</span>
                         <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ querySortingTypeName }}</f7-link>
                     </div>
                 </div>
@@ -239,13 +239,13 @@
 
         <f7-toolbar tabbar bottom class="toolbar-item-auto-size">
             <f7-link :class="{ 'disabled': reloading || !canShiftDateRange }" @click="shiftDateRange(-1)">
-                <f7-icon f7="arrow_left_square"></f7-icon>
+                <f7-icon class="icon-with-direction" f7="arrow_left_square"></f7-icon>
             </f7-link>
             <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': reloading || query.chartDataType === ChartDataType.AccountTotalAssets.type || query.chartDataType === ChartDataType.AccountTotalLiabilities.type }" popover-open=".date-popover-menu">
                 <span :class="{ 'tabbar-item-changed': isQueryDateRangeChanged }">{{ queryDateRangeName }}</span>
             </f7-link>
             <f7-link :class="{ 'disabled': reloading || !canShiftDateRange }" @click="shiftDateRange(1)">
-                <f7-icon f7="arrow_right_square"></f7-icon>
+                <f7-icon class="icon-with-direction" f7="arrow_right_square"></f7-icon>
             </f7-link>
             <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': reloading }" popover-open=".date-aggregation-popover-menu"
                      v-if="analysisType === StatisticsAnalysisType.TrendAnalysis">
@@ -343,6 +343,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
+import { TextDirection } from '@/core/text.ts';
 import { type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import {
     StatisticsAnalysisType,
@@ -367,7 +368,13 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getAllCategoricalChartTypes, formatPercentToLocalizedNumerals } = useI18n();
+const {
+    tt,
+    getCurrentLanguageTextDirection,
+    getAllCategoricalChartTypes,
+    formatPercentToLocalizedNumerals
+} = useI18n();
+
 const { showPrompt, showToast, routeBackOnError } = useI18nUIComponents();
 
 const {
@@ -413,6 +420,8 @@ const showDateAggregationPopover = ref<boolean>(false);
 const showCustomDateRangeSheet = ref<boolean>(false);
 const showCustomMonthRangeSheet = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
+
+const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 
 const allChartTypes = computed<TypeAndDisplayName[]>(() => {
     if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {

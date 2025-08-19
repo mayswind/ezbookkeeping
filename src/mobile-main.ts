@@ -39,40 +39,6 @@ import Framework7PhotoBrowser from 'framework7/components/photo-browser';
 // @ts-expect-error there is a function called "registerComponents" in the framework7-vue package, but it is not declared in the type definition file
 import Framework7Vue, { registerComponents } from 'framework7-vue/bundle';
 
-import 'framework7/css';
-import 'framework7/components/dialog/css';
-import 'framework7/components/popup/css';
-import 'framework7/components/login-screen/css';
-import 'framework7/components/popover/css';
-import 'framework7/components/actions/css';
-import 'framework7/components/sheet/css';
-import 'framework7/components/notification/css';
-import 'framework7/components/toast/css';
-import 'framework7/components/preloader/css';
-import 'framework7/components/progressbar/css';
-import 'framework7/components/sortable/css';
-import 'framework7/components/swipeout/css';
-import 'framework7/components/accordion/css';
-import 'framework7/components/card/css';
-import 'framework7/components/chip/css';
-import 'framework7/components/form/css';
-import 'framework7/components/input/css';
-import 'framework7/components/checkbox/css';
-import 'framework7/components/radio/css';
-import 'framework7/components/toggle/css';
-import 'framework7/components/range/css';
-import 'framework7/components/grid/css';
-import 'framework7/components/picker/css';
-import 'framework7/components/infinite-scroll/css';
-import 'framework7/components/pull-to-refresh/css';
-import 'framework7/components/searchbar/css';
-import 'framework7/components/tooltip/css';
-import 'framework7/components/skeleton/css';
-import 'framework7/components/treeview/css';
-import 'framework7/components/typography/css';
-import 'framework7/components/swiper/css';
-import 'framework7/components/photo-browser/css';
-
 import 'framework7-icons';
 import 'line-awesome/dist/line-awesome/css/line-awesome.css';
 
@@ -113,15 +79,15 @@ import AccountBalanceTrendsBarChart from '@/components/mobile/AccountBalanceTren
 
 import TextareaAutoSize from '@/directives/mobile/textareaAutoSize.ts';
 
-import '@/styles/mobile/global.css';
-import '@/styles/mobile/font-size-default.css';
-import '@/styles/mobile/font-size-small.css';
-import '@/styles/mobile/font-size-large.css';
-import '@/styles/mobile/font-size-x-large.css';
-import '@/styles/mobile/font-size-xx-large.css';
-import '@/styles/mobile/font-size-xxx-large.css';
-import '@/styles/mobile/font-size-xxxx-large.css';
-import '@/styles/mobile/amount-color.css';
+import '@/styles/mobile/global.scss';
+import '@/styles/mobile/font-size-default.scss';
+import '@/styles/mobile/font-size-small.scss';
+import '@/styles/mobile/font-size-large.scss';
+import '@/styles/mobile/font-size-x-large.scss';
+import '@/styles/mobile/font-size-xx-large.scss';
+import '@/styles/mobile/font-size-xxx-large.scss';
+import '@/styles/mobile/font-size-xxxx-large.scss';
+import '@/styles/mobile/amount-color.scss';
 
 import App from '@/MobileApp.vue';
 

@@ -62,17 +62,19 @@
                           @swipeout:closed="onExchangeRateSwipeoutClosed()">
                 <template #title>
                     <div class="no-padding no-margin">
-                        <span style="margin-right: 5px">{{ exchangeRate.currencyDisplayName }}</span>
+                        <span style="margin-inline-end: 5px">{{ exchangeRate.currencyDisplayName }}</span>
                         <small class="smaller">{{ exchangeRate.currencyCode }}</small>
                     </div>
                 </template>
-                <f7-swipeout-actions right v-if="exchangeRate.currencyCode !== baseCurrency || (exchangeRate.currencyCode !== defaultCurrency && isUserCustomExchangeRates)">
+                <f7-swipeout-actions :left="textDirection === TextDirection.RTL"
+                                     :right="textDirection === TextDirection.LTR"
+                                     v-if="exchangeRate.currencyCode !== baseCurrency || (exchangeRate.currencyCode !== defaultCurrency && isUserCustomExchangeRates)">
                     <f7-swipeout-button color="primary" close
                                         :text="tt('Set as Base')"
                                         :class="{ 'disabled': exchangeRate.currencyCode === baseCurrency }"
                                         @click="setAsBaseline(exchangeRate.currencyCode, getFinalConvertedAmount(exchangeRate, false)); settingBaseLine = true"
                                         v-if="settingBaseLine || exchangeRate.currencyCode !== baseCurrency"></f7-swipeout-button>
-                    <f7-swipeout-button color="red" class="padding-left padding-right"
+                    <f7-swipeout-button color="red" class="padding-horizontal"
                                         @click="remove(exchangeRate, false)"
                                         v-if="exchangeRate.currencyCode !== defaultCurrency && isUserCustomExchangeRates">
                         <f7-icon f7="trash"></f7-icon>
@@ -134,6 +136,7 @@ import { useExchangeRatesPageBase } from '@/views/base/ExchangeRatesPageBase.ts'
 
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
+import { TextDirection } from '@/core/text.ts';
 import { NumeralSystem } from '@/core/numeral.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 
@@ -149,6 +152,7 @@ const props = defineProps<{
 
 const {
     tt,
+    getCurrentLanguageTextDirection,
     getCurrentNumeralSystemType,
     getCurrencyName,
     formatAmountToLocalizedNumerals,
@@ -180,6 +184,7 @@ const showBaseAmountSheet = ref<boolean>(false);
 const customExchangeRateToDelete = ref<LocalizedLatestExchangeRate | null>(null);
 const showDeleteActionSheet = ref<boolean>(false);
 
+const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 const displayBaseAmount = computed<string>(() => formatAmountToLocalizedNumerals(baseAmount.value, baseCurrency.value));
 const baseAmountFontSizeClass = computed<string>(() => {
     if (baseAmount.value >= 100000000 || baseAmount.value <= -100000000) {

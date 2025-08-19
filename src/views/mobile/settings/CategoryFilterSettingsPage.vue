@@ -32,7 +32,7 @@
                                     <f7-icon f7="app_fill"></f7-icon>
                                 </template>
                                 <template #root>
-                                    <ul class="padding-left">
+                                    <ul class="padding-inline-start">
                                         <f7-list-item checkbox class="disabled" title="Sub Category Name"
                                                       :key="subItemIdx" v-for="subItemIdx in [ 1, 2, 3 ]">
                                             <template #media>
@@ -91,7 +91,7 @@
                             </template>
 
                             <template #root>
-                                <ul class="padding-left"
+                                <ul class="padding-inline-start"
                                     v-if="(showHidden && categoryType.allSubCategories[category.id]) || categoryType.allVisibleSubCategoryCounts[category.id]">
                                     <f7-list-item checkbox
                                                   :title="subCategory.name"

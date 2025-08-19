@@ -46,15 +46,19 @@
                         </f7-badge>
                     </f7-icon>
                 </template>
-                <f7-swipeout-actions left v-if="sortable">
-                    <f7-swipeout-button :color="template.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
+                <f7-swipeout-actions :left="textDirection === TextDirection.LTR"
+                                     :right="textDirection === TextDirection.RTL"
+                                     v-if="sortable">
+                    <f7-swipeout-button :color="template.hidden ? 'blue' : 'gray'" class="padding-horizontal"
                                         overswipe close @click="hide(template, !template.hidden)">
                         <f7-icon :f7="template.hidden ? 'eye' : 'eye_slash'"></f7-icon>
                     </f7-swipeout-button>
                 </f7-swipeout-actions>
-                <f7-swipeout-actions right v-if="!sortable">
+                <f7-swipeout-actions :left="textDirection === TextDirection.RTL"
+                                     :right="textDirection === TextDirection.LTR"
+                                     v-if="!sortable">
                     <f7-swipeout-button color="orange" close :text="tt('Edit')" @click="edit(template)"></f7-swipeout-button>
-                    <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(template, false)">
+                    <f7-swipeout-button color="red" class="padding-horizontal" @click="remove(template, false)">
                         <f7-icon f7="trash"></f7-icon>
                     </f7-swipeout-button>
                 </f7-swipeout-actions>
@@ -93,6 +97,7 @@ import { useI18nUIComponents, showLoading, hideLoading, onSwipeoutDeleted } from
 
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 
+import { TextDirection } from '@/core/text.ts';
 import { TemplateType } from '@/core/template.ts';
 import { TransactionTemplate } from '@/models/transaction_template.ts';
 
@@ -108,7 +113,7 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt } = useI18n();
+const { tt, getCurrentLanguageTextDirection } = useI18n();
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
 const transactionTemplatesStore = useTransactionTemplatesStore();
@@ -124,6 +129,7 @@ const showDeleteActionSheet = ref<boolean>(false);
 const displayOrderModified = ref<boolean>(false);
 const displayOrderSaving = ref<boolean>(false);
 
+const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 const templates = computed<TransactionTemplate[]>(() => transactionTemplatesStore.allTransactionTemplates[templateType.value] || []);
 const firstShowingId = computed<string | null>(() => getFirstShowingId(templates.value, showHidden.value));
 const lastShowingId = computed<string | null>(() => getLastShowingId(templates.value, showHidden.value));

@@ -124,13 +124,13 @@ func (a *DataManagementsApi) DataStatisticsHandler(c *core.WebContext) (any, *er
 	return dataStatisticsResp, nil
 }
 
-// ClearDataHandler deletes all user data
-func (a *DataManagementsApi) ClearDataHandler(c *core.WebContext) (any, *errs.Error) {
+// ClearAllDataHandler deletes all user data
+func (a *DataManagementsApi) ClearAllDataHandler(c *core.WebContext) (any, *errs.Error) {
 	var clearDataReq models.ClearDataRequest
 	err := c.ShouldBindJSON(&clearDataReq)
 
 	if err != nil {
-		log.Warnf(c, "[data_managements.ClearDataHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[data_managements.ClearAllDataHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -139,7 +139,7 @@ func (a *DataManagementsApi) ClearDataHandler(c *core.WebContext) (any, *errs.Er
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
-			log.Warnf(c, "[data_managements.ClearDataHandler] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
+			log.Warnf(c, "[data_managements.ClearAllDataHandler] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
 		}
 
 		return nil, errs.ErrUserNotFound
@@ -156,39 +156,79 @@ func (a *DataManagementsApi) ClearDataHandler(c *core.WebContext) (any, *errs.Er
 	err = a.templates.DeleteAllTemplates(c, uid)
 
 	if err != nil {
-		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all transaction templates, because %s", err.Error())
+		log.Errorf(c, "[data_managements.ClearAllDataHandler] failed to delete all transaction templates, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	err = a.transactions.DeleteAllTransactions(c, uid)
+	err = a.transactions.DeleteAllTransactions(c, uid, true)
 
 	if err != nil {
-		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all transactions, because %s", err.Error())
+		log.Errorf(c, "[data_managements.ClearAllDataHandler] failed to delete all transactions, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	err = a.categories.DeleteAllCategories(c, uid)
 
 	if err != nil {
-		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all transaction categories, because %s", err.Error())
+		log.Errorf(c, "[data_managements.ClearAllDataHandler] failed to delete all transaction categories, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	err = a.tags.DeleteAllTags(c, uid)
 
 	if err != nil {
-		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all transaction tags, because %s", err.Error())
+		log.Errorf(c, "[data_managements.ClearAllDataHandler] failed to delete all transaction tags, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	err = a.userCustomExchangeRates.DeleteAllCustomExchangeRates(c, uid)
 
 	if err != nil {
-		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all user custom exchange rates, because %s", err.Error())
+		log.Errorf(c, "[data_managements.ClearAllDataHandler] failed to delete all user custom exchange rates, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.Infof(c, "[data_managements.ClearDataHandler] user \"uid:%d\" has cleared all data", uid)
+	log.Infof(c, "[data_managements.ClearAllDataHandler] user \"uid:%d\" has cleared all data", uid)
+	return true, nil
+}
+
+// ClearAllTransactionsHandler deletes all transactions
+func (a *DataManagementsApi) ClearAllTransactionsHandler(c *core.WebContext) (any, *errs.Error) {
+	var clearDataReq models.ClearDataRequest
+	err := c.ShouldBindJSON(&clearDataReq)
+
+	if err != nil {
+		log.Warnf(c, "[data_managements.ClearAllTransactionsHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Warnf(c, "[data_managements.ClearAllTransactionsHandler] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	if !a.users.IsPasswordEqualsUserPassword(clearDataReq.Password, user) {
+		return nil, errs.ErrUserPasswordWrong
+	}
+
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_CLEAR_ALL_DATA) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
+	err = a.transactions.DeleteAllTransactions(c, uid, false)
+
+	if err != nil {
+		log.Errorf(c, "[data_managements.ClearAllTransactionsHandler] failed to delete all transactions, because %s", err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.Infof(c, "[data_managements.ClearAllTransactionsHandler] user \"uid:%d\" has cleared all transactions", uid)
 	return true, nil
 }
 

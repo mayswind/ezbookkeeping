@@ -1320,7 +1320,7 @@ func (s *TransactionService) DeleteTransaction(c core.Context, uid int64, transa
 }
 
 // DeleteAllTransactions deletes all existed transactions from database
-func (s *TransactionService) DeleteAllTransactions(c core.Context, uid int64) error {
+func (s *TransactionService) DeleteAllTransactions(c core.Context, uid int64, deleteAccount bool) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -1344,12 +1344,12 @@ func (s *TransactionService) DeleteAllTransactions(c core.Context, uid int64) er
 
 	accountUpdateModel := &models.Account{
 		Balance:         0,
-		Deleted:         true,
+		Deleted:         deleteAccount,
 		DeletedUnixTime: now,
 	}
 
 	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
-		// Update all transaction to deleted
+		// Update all transactions to deleted
 		_, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(updateModel)
 
 		if err != nil {
@@ -1363,14 +1363,14 @@ func (s *TransactionService) DeleteAllTransactions(c core.Context, uid int64) er
 			return err
 		}
 
-		// Update all transaction picture to deleted
+		// Update all transaction pictures to deleted
 		_, err = sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(pictureUpdateModel)
 
 		if err != nil {
 			return err
 		}
 
-		// Update all account table to deleted
+		// Update all accounts to deleted or set amount to zero
 		_, err = sess.Cols("balance", "deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(accountUpdateModel)
 
 		if err != nil {

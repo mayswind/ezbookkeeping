@@ -323,7 +323,8 @@ func startWebServer(c *core.CliContext) error {
 
 			// Data
 			apiV1Route.GET("/data/statistics.json", bindApi(api.DataManagements.DataStatisticsHandler))
-			apiV1Route.POST("/data/clear.json", bindApi(api.DataManagements.ClearDataHandler))
+			apiV1Route.POST("/data/clear/all.json", bindApi(api.DataManagements.ClearAllDataHandler))
+			apiV1Route.POST("/data/clear/transactions.json", bindApi(api.DataManagements.ClearAllTransactionsHandler))
 
 			if config.EnableDataExport {
 				apiV1Route.GET("/data/export.csv", bindCsv(api.DataManagements.ExportDataToEzbookkeepingCSVHandler))

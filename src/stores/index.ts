@@ -457,9 +457,48 @@ export const useRootStore = defineStore('root', () => {
         });
     }
 
-    function clearUserData({ password }: { password: string }): Promise<boolean> {
+    function clearAllUserTransactions({ password }: { password: string }): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            services.clearData({
+            services.clearAllTransactions({
+                password: password
+            }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to clear user data' });
+                    return;
+                }
+
+                if (!accountsStore.accountListStateInvalid) {
+                    accountsStore.updateAccountListInvalidState(true);
+                }
+
+                if (!overviewStore.transactionOverviewStateInvalid) {
+                    overviewStore.updateTransactionOverviewInvalidState(true);
+                }
+
+                if (!statisticsStore.transactionStatisticsStateInvalid) {
+                    statisticsStore.updateTransactionStatisticsInvalidState(true);
+                }
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to clear user data', error);
+
+                if (error && error.processed) {
+                    reject(error);
+                } else if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else {
+                    reject({ message: 'Unable to clear user data' });
+                }
+            });
+        });
+    }
+
+    function clearAllUserData({ password }: { password: string }): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            services.clearAllData({
                 password: password
             }).then(response => {
                 const data = response.data;
@@ -521,6 +560,7 @@ export const useRootStore = defineStore('root', () => {
         resetPassword,
         updateUserProfile,
         resendVerifyEmailByLoginedUser,
-        clearUserData
+        clearAllUserData,
+        clearAllUserTransactions
     };
 });

@@ -26,7 +26,11 @@
             <f7-list-button :class="{ 'disabled': !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0' }"
                             v-if="isDataExportingEnabled()"
                             @click="exportedData = null; showExportDataSheet = true">{{ tt('Export Data') }}</f7-list-button>
-            <f7-list-button color="red" @click="clearData(null)">{{ tt('Clear User Data') }}</f7-list-button>
+        </f7-list>
+
+        <f7-list strong inset dividers class="margin-vertical" :class="{ 'disabled': loading }">
+            <f7-list-button color="red" @click="clearAllTransactions(null)">{{ tt('Clear All Transactions') }}</f7-list-button>
+            <f7-list-button color="red" @click="clearAllData(null)">{{ tt('Clear All Data') }}</f7-list-button>
         </f7-list>
 
         <f7-sheet swipe-handler=".swipe-handler" style="height:auto"
@@ -61,14 +65,24 @@
             </f7-page-content>
         </f7-sheet>
 
+        <password-input-sheet :title="tt('Are you sure you want to clear all transactions?')"
+                              :hint="tt('You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.')"
+                              :confirm-disabled="clearingData"
+                              :cancel-disabled="clearingData"
+                              color="red"
+                              v-model:show="showInputPasswordSheetForClearAllTransactions"
+                              v-model="currentPasswordForClearData"
+                              @password:confirm="clearAllTransactions">
+        </password-input-sheet>
+
         <password-input-sheet :title="tt('Are you sure you want to clear all data?')"
                               :hint="tt('You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.')"
                               :confirm-disabled="clearingData"
                               :cancel-disabled="clearingData"
                               color="red"
-                              v-model:show="showInputPasswordSheetForClearData"
+                              v-model:show="showInputPasswordSheetForClearAllData"
                               v-model="currentPasswordForClearData"
-                              @password:confirm="clearData">
+                              @password:confirm="clearAllData">
         </password-input-sheet>
     </f7-page>
 </template>
@@ -105,7 +119,8 @@ const exportedData = ref<string | null>(null);
 const currentPasswordForClearData = ref<string>('');
 const clearingData = ref<boolean>(false);
 const showExportDataSheet = ref<boolean>(false);
-const showInputPasswordSheetForClearData = ref<boolean>(false);
+const showInputPasswordSheetForClearAllTransactions = ref<boolean>(false);
+const showInputPasswordSheetForClearAllData = ref<boolean>(false);
 
 const exportFileName = computed<string>(() => getExportFileName(exportFileType.value));
 
@@ -144,24 +159,55 @@ function exportData(): void {
     });
 }
 
-function clearData(password: string | null): void {
+function clearAllTransactions(password: string | null): void {
     if (!password) {
         currentPasswordForClearData.value = '';
-        showInputPasswordSheetForClearData.value = true;
+        showInputPasswordSheetForClearAllTransactions.value = true;
         return;
     }
 
     clearingData.value = true;
     showLoading(() => clearingData.value);
 
-    rootStore.clearUserData({
+    rootStore.clearAllUserTransactions({
         password: password
     }).then(() => {
         clearingData.value = false;
         currentPasswordForClearData.value = '';
         hideLoading();
 
-        showInputPasswordSheetForClearData.value = false;
+        showInputPasswordSheetForClearAllTransactions.value = false;
+        showToast('All transactions has been cleared');
+
+        reloadUserDataStatistics();
+    }).catch(error => {
+        clearingData.value = false;
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function clearAllData(password: string | null): void {
+    if (!password) {
+        currentPasswordForClearData.value = '';
+        showInputPasswordSheetForClearAllData.value = true;
+        return;
+    }
+
+    clearingData.value = true;
+    showLoading(() => clearingData.value);
+
+    rootStore.clearAllUserData({
+        password: password
+    }).then(() => {
+        clearingData.value = false;
+        currentPasswordForClearData.value = '';
+        hideLoading();
+
+        showInputPasswordSheetForClearAllData.value = false;
         showToast('All user data has been cleared');
 
         reloadUserDataStatistics();

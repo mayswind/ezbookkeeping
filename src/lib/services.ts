@@ -378,8 +378,11 @@ export default {
             return Promise.reject('Parameter Invalid');
         }
     },
-    clearData: (req: ClearDataRequest): ApiResponsePromise<boolean> => {
-        return axios.post<ApiResponse<boolean>>('v1/data/clear.json', req);
+    clearAllData: (req: ClearDataRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/data/clear/all.json', req);
+    },
+    clearAllTransactions: (req: ClearDataRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/data/clear/transactions.json', req);
     },
     getAllAccounts: ({ visibleOnly }: { visibleOnly: boolean }): ApiResponsePromise<AccountInfoResponse[]> => {
         return axios.get<ApiResponse<AccountInfoResponse[]>>('v1/accounts/list.json?visible_only=' + visibleOnly);

@@ -114,39 +114,46 @@
                     <span class="text-error">{{ tt('Danger Zone') }}</span>
                 </template>
 
-                <v-form>
-                    <v-card-text class="py-0">
+                <v-card-text class="py-0">
                     <span class="text-body-1 text-error">
-                        <v-icon :icon="mdiAlert"/>
-                        {{ tt('You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.') }}
+                        <v-icon class="mt-n1" :icon="mdiAlert"/>
+                        {{ tt('You CANNOT undo this action. "Clear All Transactions" will clear all your transactions data, and "Clear All Data" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.') }}
                     </span>
-                    </v-card-text>
+                </v-card-text>
 
-                    <v-card-text class="pb-0">
-                        <v-row class="mb-3">
-                            <v-col cols="12" md="6">
-                                <v-text-field
-                                    autocomplete="current-password"
-                                    ref="currentPasswordInput"
-                                    type="password"
-                                    variant="underlined"
-                                    color="error"
-                                    :disabled="loadingDataStatistics || clearingData"
-                                    :placeholder="tt('Current Password')"
-                                    v-model="currentPasswordForClearData"
-                                    @keyup.enter="clearData"
-                                />
-                            </v-col>
-                        </v-row>
-                    </v-card-text>
+                <v-card-text class="pb-0">
+                    <v-row class="mb-3">
+                        <v-col cols="12" md="6">
+                            <v-text-field
+                                autocomplete="current-password"
+                                ref="currentPasswordInput"
+                                type="password"
+                                variant="underlined"
+                                color="error"
+                                :disabled="loadingDataStatistics || clearingData"
+                                :placeholder="tt('Current Password')"
+                                v-model="currentPasswordForClearData"
+                            />
+                        </v-col>
+                    </v-row>
+                </v-card-text>
 
-                    <v-card-text class="d-flex flex-wrap gap-4">
-                        <v-btn color="error" :disabled="loadingDataStatistics || !currentPasswordForClearData || clearingData" @click="clearData">
-                            {{ tt('Clear User Data') }}
-                            <v-progress-circular indeterminate size="22" class="ms-2" v-if="clearingData"></v-progress-circular>
-                        </v-btn>
-                    </v-card-text>
-                </v-form>
+                <v-card-text class="d-flex flex-wrap gap-4">
+                    <v-btn color="error" :disabled="loadingDataStatistics || !currentPasswordForClearData || clearingData">
+                        {{ tt('Clear User Data') }}
+                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="clearingData"></v-progress-circular>
+                        <v-menu activator="parent">
+                            <v-list :disabled="loadingDataStatistics || !currentPasswordForClearData || clearingData">
+                                <v-list-item @click="clearAllTransactions">
+                                    <v-list-item-title>{{ tt('Clear All Transactions') }}</v-list-item-title>
+                                </v-list-item>
+                                <v-list-item @click="clearAllData">
+                                    <v-list-item-title>{{ tt('Clear All Data') }}</v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </v-btn>
+                </v-card-text>
             </v-card>
         </v-col>
     </v-row>
@@ -242,7 +249,38 @@ function exportData(fileType: string): void {
     });
 }
 
-function clearData(): void {
+function clearAllTransactions(): void {
+    if (!currentPasswordForClearData.value) {
+        snackbar.value?.showMessage('Current password cannot be blank');
+        return;
+    }
+
+    if (clearingData.value) {
+        return;
+    }
+
+    confirmDialog.value?.open('Are you sure you want to clear all transactions?', { color: 'error' }).then(() => {
+        clearingData.value = true;
+
+        rootStore.clearAllUserTransactions({
+            password: currentPasswordForClearData.value
+        }).then(() => {
+            clearingData.value = false;
+            currentPasswordForClearData.value = '';
+
+            snackbar.value?.showMessage('All transactions has been cleared');
+            reloadUserDataStatistics(false);
+        }).catch(error => {
+            clearingData.value = false;
+
+            if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+        });
+    });
+}
+
+function clearAllData(): void {
     if (!currentPasswordForClearData.value) {
         snackbar.value?.showMessage('Current password cannot be blank');
         return;
@@ -255,7 +293,7 @@ function clearData(): void {
     confirmDialog.value?.open('Are you sure you want to clear all data?', { color: 'error' }).then(() => {
         clearingData.value = true;
 
-        rootStore.clearUserData({
+        rootStore.clearAllUserData({
             password: currentPasswordForClearData.value
         }).then(() => {
             clearingData.value = false;

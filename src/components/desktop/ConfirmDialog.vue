@@ -64,7 +64,9 @@ function open(titleOrText: string, textOrOptions?: string | Record<string, unkno
         }
     }
 
-    if (options && isString(options['color'])) {
+    if (textOrOptions && isObject(textOrOptions) && isString(textOrOptions['color'])){
+        finalColor.value = (textOrOptions['color'] as string) || 'primary';
+    } else if (options && isString(options['color'])) {
         finalColor.value = (options['color'] as string) || 'primary';
     }
 

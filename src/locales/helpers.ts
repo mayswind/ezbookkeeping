@@ -1970,17 +1970,19 @@ export function useI18n() {
         services.setLocale(languageKey);
         document.querySelector('html')?.setAttribute('lang', languageKey);
 
-        if (document.querySelector('html')?.getAttribute('data-dir-mode') === 'isolate') {
+        if (document.querySelector('html')?.getAttribute('data-dir-mode') === 'static') {
             if (languageInfo && languageInfo.textDirection === TextDirection.LTR) {
                 if (location.search.includes('rtl')) {
                     const url = new URL(window.location.href);
                     url.search = '';
+                    url.hash = '#/';
                     window.location.replace(url.toString());
                 }
             } else if (languageInfo && languageInfo.textDirection === TextDirection.RTL) {
                 if (!location.search.includes('rtl')) {
                     const url = new URL(window.location.href);
                     url.searchParams.set('rtl', '');
+                    url.hash = '#/';
                     window.location.replace(url.toString());
                 }
             }

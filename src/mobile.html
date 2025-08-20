@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-dir-mode="static">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
@@ -60,8 +60,6 @@
     <link rel="manifest" href="manifest.json">
     <link id="framework7-css" rel="stylesheet" crossorigin>
     <script>
-        document.querySelector('html').setAttribute('data-dir-mode', 'isolate');
-
         if (location.search.includes('rtl')) {
             document.querySelector('html').setAttribute('dir', 'rtl');
             document.getElementById('framework7-css').href = '{{framework7-rtl-css-filepath}}';

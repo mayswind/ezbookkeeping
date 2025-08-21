@@ -9,6 +9,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
@@ -45,7 +46,7 @@ func (s *UserApplicationCloudSettingsService) GetUserApplicationCloudSettingsByU
 }
 
 // UpdateUserApplicationCloudSettings updates user application cloud settings
-func (s *UserApplicationCloudSettingsService) UpdateUserApplicationCloudSettings(c core.Context, uid int64, settings models.ApplicationCloudSettingSlice) error {
+func (s *UserApplicationCloudSettingsService) UpdateUserApplicationCloudSettings(c core.Context, uid int64, settings models.ApplicationCloudSettingSlice, forceUpdate bool, lastUpdateTime int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -65,14 +66,21 @@ func (s *UserApplicationCloudSettingsService) UpdateUserApplicationCloudSettings
 			return err
 		}
 
+		updatedRows := int64(0)
+
 		if !exists {
-			_, err = sess.Insert(userApplicationCloudSetting)
+			updatedRows, err = sess.Insert(userApplicationCloudSetting)
+		} else if forceUpdate || lastUpdateTime <= 0 {
+			updatedRows, err = sess.ID(uid).Cols("settings", "updated_unix_time").Update(userApplicationCloudSetting)
 		} else {
-			_, err = sess.ID(uid).Cols("settings", "updated_unix_time").Update(userApplicationCloudSetting)
+			updatedRows, err = sess.ID(uid).Cols("settings", "updated_unix_time").Where("updated_unix_time=?", lastUpdateTime).Update(userApplicationCloudSetting)
 		}
 
 		if err != nil {
 			return err
+		} else if updatedRows < 1 {
+			log.Errorf(c, "[user_app_cloud_settings.UpdateUserApplicationCloudSettings] failed to update user application cloud settings")
+			return errs.ErrDatabaseOperationFailed
 		}
 
 		return nil

@@ -1,5 +1,6 @@
 <template>
     <v-select
+        class="two-column-main-select"
         persistent-placeholder
         :density="density"
         :variant="variant"
@@ -19,7 +20,8 @@
                 <span class="text-truncate" v-if="!customSelectionPrimaryText && !selectedPrimaryItem && !selectedSecondaryItem">{{ noSelectionText }}</span>
                 <span class="text-truncate" v-if="!customSelectionPrimaryText && showSelectionPrimaryText && selectedPrimaryItem">{{ selectionPrimaryItemText }}</span>
                 <v-icon class="icon-with-direction disabled" :icon="mdiChevronRight" size="23" v-if="!customSelectionPrimaryText && showSelectionPrimaryText && selectedPrimaryItem && selectedSecondaryItem" />
-                <ItemIcon class="me-2" icon-type="account" size="21.5px"
+                <ItemIcon class="me-2" size="21.5px"
+                          :icon-type="secondaryIconType"
                           :icon-id="selectedSecondaryItem && secondaryIconField ? (selectedSecondaryItem as Record<string, unknown>)[secondaryIconField] : null"
                           :color="selectedSecondaryItem && secondaryColorField ? (selectedSecondaryItem as Record<string, unknown>)[secondaryColorField] : null"
                           v-if="!customSelectionPrimaryText && selectedSecondaryItem && showSelectionSecondaryIcon" />
@@ -48,7 +50,9 @@
                                      @click="onPrimaryItemClicked(item)">
                             <template #prepend>
                                 <ItemIcon class="me-2" :icon-type="primaryIconType"
-                                          :icon-id="primaryIconField ? (item as Record<string, unknown>)[primaryIconField] : undefined" :color="primaryColorField ? (item as Record<string, unknown>)[primaryColorField] : undefined"></ItemIcon>
+                                          :icon-id="primaryIconField ? (item as Record<string, unknown>)[primaryIconField] : undefined"
+                                          :color="primaryColorField ? (item as Record<string, unknown>)[primaryColorField] : undefined"
+                                          v-if="primaryIconField"></ItemIcon>
                             </template>
                             <template #title>
                                 <div class="list-item-header text-truncate" v-if="primaryHeaderField">{{ primaryHeaderField ? ti(item[primaryHeaderField] as string, !!primaryHeaderI18n) : '' }}</div>
@@ -67,7 +71,9 @@
                                      @click="onSecondaryItemClicked(subItem)">
                             <template #prepend>
                                 <ItemIcon class="me-2" :icon-type="secondaryIconType"
-                                          :icon-id="secondaryIconField ? subItem[secondaryIconField] : undefined" :color="secondaryColorField ? subItem[secondaryColorField] : undefined"></ItemIcon>
+                                          :icon-id="secondaryIconField ? subItem[secondaryIconField] : undefined"
+                                          :color="secondaryColorField ? subItem[secondaryColorField] : undefined"
+                                          v-if="secondaryIconField"></ItemIcon>
                             </template>
                             <template #title>
                                 <div class="list-item-header text-truncate" v-if="secondaryHeaderField">{{ secondaryHeaderField ? ti(subItem[secondaryHeaderField] as string, !!secondaryHeaderI18n) : '' }}</div>
@@ -113,6 +119,7 @@ interface DesktopTwoColumnListItemSelectionProps extends CommonTwoColumnListItem
     customSelectionPrimaryText?: string;
     customSelectionSecondaryText?: string;
     noItemText?: string;
+    autoUpdateMenuPosition?: boolean;
 }
 
 const props = defineProps<DesktopTwoColumnListItemSelectionProps>();
@@ -208,6 +215,23 @@ function isSecondarySelected(subItem: unknown): boolean {
 
 function onPrimaryItemClicked(item: unknown): void {
     updateCurrentPrimaryValue(currentPrimaryValue, item);
+
+    if (props.autoUpdateMenuPosition) {
+        nextTick(() => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const mainSelectRect = document.querySelector('.two-column-main-select')?.getBoundingClientRect();
+            const selectMenu = document.querySelector('.two-column-select-menu') as (HTMLElement | null);
+            const selectMenuRect = selectMenu?.getBoundingClientRect();
+
+            if (mainSelectRect && selectMenu && selectMenuRect) {
+                const newTop = scrollTop + mainSelectRect.top + mainSelectRect.height + 0.5;
+
+                if (newTop + selectMenuRect.height < document.documentElement.scrollHeight) {
+                    selectMenu.style.top = newTop + 'px';
+                }
+            }
+        });
+    }
 }
 
 function onSecondaryItemClicked(subItem: unknown): void {

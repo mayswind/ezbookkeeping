@@ -40,6 +40,11 @@ export interface ImportFileTypeAndExtensions {
     readonly extensions?: string;
 }
 
+export interface ImportFileCategoryAndTypes {
+    readonly categoryName: string;
+    readonly fileTypes: ImportFileType[];
+}
+
 export interface ImportFileType extends ImportFileTypeAndExtensions {
     readonly type: string;
     readonly name: string;
@@ -57,6 +62,11 @@ export interface ImportFileTypeSubType extends ImportFileTypeAndExtensions {
     readonly type: string;
     readonly name: string;
     readonly extensions?: string;
+}
+
+export interface LocalizedImportFileCategoryAndTypes {
+    readonly displayCategoryName: string;
+    readonly fileTypes: LocalizedImportFileType[];
 }
 
 export interface LocalizedImportFileType extends ImportFileTypeAndExtensions {

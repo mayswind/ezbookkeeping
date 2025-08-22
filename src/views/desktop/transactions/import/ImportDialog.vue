@@ -218,15 +218,23 @@
                 <v-window-item value="uploadFile">
                     <v-row>
                         <v-col cols="12" md="12">
-                            <v-select
-                                item-title="displayName"
-                                item-value="type"
-                                :disabled="submitting"
-                                :label="tt('File Type')"
-                                :placeholder="tt('File Type')"
-                                :items="allSupportedImportFileTypes"
-                                v-model="fileType"
-                            />
+                            <two-column-select primary-key-field="displayCategoryName"
+                                               primary-value-field="displayCategoryName"
+                                               primary-title-field="displayCategoryName"
+                                               primary-sub-items-field="fileTypes"
+                                               secondary-key-field="type"
+                                               secondary-value-field="type"
+                                               secondary-title-field="displayName"
+                                               :disabled="submitting"
+                                               :enable-filter="true"
+                                               :filter-placeholder="tt('Find file type')"
+                                               :filter-no-items-text="tt('No available file type')"
+                                               :label="tt('File Type')"
+                                               :placeholder="tt('File Type')"
+                                               :items="allSupportedImportFileCategoryAndTypes"
+                                               :auto-update-menu-position="true"
+                                               v-model="fileType">
+                            </two-column-select>
                         </v-col>
 
                         <v-col cols="12" md="12" v-if="allFileSubTypes">
@@ -907,7 +915,7 @@ import { TransactionType } from '@/core/transaction.ts';
 import { ImportTransactionColumnType, ImportTransactionDataMapping } from '@/core/import_transaction.ts';
 import { KnownFileType } from '@/core/file.ts';
 
-import type { LocalizedImportFileType, LocalizedImportFileTypeSubType, LocalizedImportFileTypeSupportedEncodings } from '@/core/file.ts';
+import type { LocalizedImportFileCategoryAndTypes, LocalizedImportFileType, LocalizedImportFileTypeSubType, LocalizedImportFileTypeSupportedEncodings } from '@/core/file.ts';
 import { Account, type CategorizedAccountWithDisplayBalance } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 import type { TransactionTag } from '@/models/transaction_tag.ts';
@@ -998,7 +1006,7 @@ defineProps<{
 const {
     tt,
     getAllImportTransactionColumnTypes,
-    getAllSupportedImportFileTypes,
+    getAllSupportedImportFileCagtegoryAndTypes,
     formatUnixTimeToLongDateTime,
     formatAmountToLocalizedNumeralsWithCurrency,
     formatNumberToLocalizedNumerals,
@@ -1097,7 +1105,22 @@ const allSteps = computed<StepBarItem[]>(() => {
 });
 
 const allImportTransactionColumnTypes = computed<TypeAndDisplayName[]>(() => getAllImportTransactionColumnTypes());
-const allSupportedImportFileTypes = computed<LocalizedImportFileType[]>(() => getAllSupportedImportFileTypes());
+const allSupportedImportFileCategoryAndTypes = computed<LocalizedImportFileCategoryAndTypes[]>(() => getAllSupportedImportFileCagtegoryAndTypes());
+
+const allSupportedImportFileTypesMap = computed<Record<string, LocalizedImportFileType>>(() => {
+    const ret: Record<string, LocalizedImportFileType> = {};
+
+    for (let i = 0; i < allSupportedImportFileCategoryAndTypes.value.length; i++) {
+        const importFileCategoryAndTypes = allSupportedImportFileCategoryAndTypes.value[i];
+
+        for (let j = 0; j < importFileCategoryAndTypes.fileTypes.length; j++) {
+            const importFileType = importFileCategoryAndTypes.fileTypes[j];
+            ret[importFileType.type] = importFileType;
+        }
+    }
+
+    return ret;
+});
 
 const allSeparators = computed<NameValue[]>(() => {
     const separators: NameValue[] = [
@@ -1126,35 +1149,9 @@ const allSeparators = computed<NameValue[]>(() => {
     return separators;
 });
 
-const isImportDataFromTextbox = computed<boolean>(() => {
-    for (const importFileType of allSupportedImportFileTypes.value) {
-        if (importFileType.type === fileType.value) {
-            return !!importFileType.dataFromTextbox;
-        }
-    }
-
-    return false;
-});
-
-const allFileSubTypes = computed<LocalizedImportFileTypeSubType[] | undefined>(() => {
-    for (const importFileType of allSupportedImportFileTypes.value) {
-        if (importFileType.type === fileType.value) {
-            return importFileType.subTypes;
-        }
-    }
-
-    return undefined;
-});
-
-const allSupportedEncodings = computed<LocalizedImportFileTypeSupportedEncodings[] | undefined>(() => {
-    for (const importFileType of allSupportedImportFileTypes.value) {
-        if (importFileType.type === fileType.value) {
-            return importFileType.supportedEncodings;
-        }
-    }
-
-    return undefined;
-});
+const isImportDataFromTextbox = computed<boolean>(() => allSupportedImportFileTypesMap.value[fileType.value]?.dataFromTextbox ?? false);
+const allFileSubTypes = computed<LocalizedImportFileTypeSubType[] | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.subTypes);
+const allSupportedEncodings = computed<LocalizedImportFileTypeSupportedEncodings[] | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.supportedEncodings);
 
 const allAccounts = computed<Account[]>(() => accountsStore.allPlainAccounts);
 const allVisibleAccounts = computed<Account[]>(() => accountsStore.allVisiblePlainAccounts);
@@ -1179,37 +1176,22 @@ const supportedImportFileExtensions = computed<string | undefined>(() => {
         }
     }
 
-    return findExtensionByType(allSupportedImportFileTypes.value, fileType.value);
+    return allSupportedImportFileTypesMap.value[fileType.value]?.extensions;
 });
 
 const exportFileGuideDocumentUrl = computed<string | undefined>(() => {
-    for (const importFileType of allSupportedImportFileTypes.value) {
-        if (importFileType.type === fileType.value) {
-            const document = importFileType.document;
+    const document = allSupportedImportFileTypesMap.value[fileType.value]?.document;
 
-            if (!document) {
-                return undefined;
-            }
-
-            const language = document.language ? document.language + '/' : '';
-            const anchor = document.anchor ? '#' + document.anchor : '';
-            return `https://ezbookkeeping.mayswind.net/${language}export_and_import${anchor}`;
-        }
+    if (!document) {
+        return undefined;
     }
 
-    return undefined;
+    const language = document.language ? document.language + '/' : '';
+    const anchor = document.anchor ? '#' + document.anchor : '';
+    return `https://ezbookkeeping.mayswind.net/${language}export_and_import${anchor}`;
 });
 
-const exportFileGuideDocumentLanguageName = computed<string | undefined>(() => {
-    for (const importFileType of allSupportedImportFileTypes.value) {
-        if (importFileType.type === fileType.value) {
-            const document = importFileType.document;
-            return document?.displayLanguageName;
-        }
-    }
-
-    return undefined;
-});
+const exportFileGuideDocumentLanguageName = computed<string | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.document?.displayLanguageName);
 
 const fileName = computed<string>(() => importFile.value?.name || '');
 
@@ -2695,7 +2677,7 @@ watch(fileSubType, (newValue) => {
     let supportedExtensions: string | undefined = findExtensionByType(allFileSubTypes.value, newValue);
 
     if (!supportedExtensions) {
-        supportedExtensions = findExtensionByType(allSupportedImportFileTypes.value, fileType.value);
+        supportedExtensions = allSupportedImportFileTypesMap.value[fileType.value]?.extensions;
     }
 
     if (importFile.value && importFile.value.name && !isFileExtensionSupported(importFile.value.name, supportedExtensions || '')) {

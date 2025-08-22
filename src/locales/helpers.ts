@@ -113,10 +113,11 @@ import {
 } from '@/core/statistics.ts';
 
 import {
+    type LocalizedImportFileCategoryAndTypes,
     type LocalizedImportFileType,
     type LocalizedImportFileTypeSubType,
     type LocalizedImportFileTypeSupportedEncodings,
-    type LocalizedImportFileDocument,
+    type LocalizedImportFileDocument
 } from '@/core/file.ts';
 
 import type { LocaleDefaultSettings } from '@/core/setting.ts';
@@ -127,7 +128,7 @@ import { UTC_TIMEZONE, ALL_TIMEZONES } from '@/consts/timezone.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { DEFAULT_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES, DEFAULT_TRANSFER_CATEGORIES } from '@/consts/category.ts';
 import { KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS } from '@/consts/api.ts';
-import { DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE, SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE, SUPPORTED_IMPORT_FILE_TYPES } from '@/consts/file.ts';
+import { DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE, SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE, SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES } from '@/consts/file.ts';
 
 import {
     type CategorizedAccount,
@@ -1305,102 +1306,114 @@ export function useI18n() {
         return availableExchangeRates;
     }
 
-    function getAllSupportedImportFileTypes(): LocalizedImportFileType[] {
-        const allSupportedImportFileTypes: LocalizedImportFileType[] = [];
+    function getAllSupportedImportFileCagtegoryAndTypes(): LocalizedImportFileCategoryAndTypes[] {
+        const allSupportedImportFileCategoryAndTypes: LocalizedImportFileCategoryAndTypes[] = [];
 
-        for (let i = 0; i < SUPPORTED_IMPORT_FILE_TYPES.length; i++) {
-            const fileType = SUPPORTED_IMPORT_FILE_TYPES[i];
-            let document: LocalizedImportFileDocument | undefined;
+        for (let i = 0; i < SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES.length; i++) {
+            const categoryAndTypes = SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES[i];
 
-            if (fileType.document) {
-                let documentLanguage = '';
-                let documentDisplayLanguageName = '';
-                let documentAnchor = '';
-
-                if (fileType.document.supportMultiLanguages === true) {
-                    documentLanguage = getCurrentLanguageTag();
-
-                    if (SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE[documentLanguage] === documentLanguage) {
-                        documentAnchor = t(`document.anchor.export_and_import.${fileType.document.anchor}`);
-                    } else if (SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE[documentLanguage]) {
-                        documentLanguage = SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE[documentLanguage];
-                        documentAnchor = t(`document.anchor.export_and_import.${fileType.document.anchor}`, {}, { locale: documentLanguage });
-                    } else {
-                        documentLanguage = DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE;
-                        documentAnchor = t(`document.anchor.export_and_import.${fileType.document.anchor}`, {}, { locale: documentLanguage });
-                    }
-                } else if (isString(fileType.document.supportMultiLanguages) && ALL_LANGUAGES[fileType.document.supportMultiLanguages]) {
-                    documentLanguage = fileType.document.supportMultiLanguages;
-                    documentAnchor = fileType.document.anchor;
-                }
-
-                if (documentLanguage && documentLanguage !== getCurrentLanguageTag()) {
-                    documentDisplayLanguageName = getLanguageDisplayName(ALL_LANGUAGES[documentLanguage].name);
-                }
-
-                if (documentLanguage) {
-                    documentLanguage = documentLanguage.replace(/-/g, '_');
-                }
-
-                if (documentAnchor) {
-                    documentAnchor = documentAnchor.toLowerCase().replace(/ /g, '-');
-                }
-
-                if (documentLanguage === DEFAULT_LANGUAGE) {
-                    documentLanguage = '';
-                }
-
-                document = {
-                    language: documentLanguage,
-                    displayLanguageName: documentDisplayLanguageName,
-                    anchor: documentAnchor
-                };
-            } else {
-                document = undefined;
-            }
-
-            const subTypes: LocalizedImportFileTypeSubType[] = [];
-
-            if (fileType.subTypes) {
-                for (let i = 0; i < fileType.subTypes.length; i++) {
-                    const subType = fileType.subTypes[i];
-                    const localizedSubType: LocalizedImportFileTypeSubType = {
-                        type: subType.type,
-                        displayName: t(subType.name),
-                        extensions: subType.extensions
-                    };
-
-                    subTypes.push(localizedSubType);
-                }
-            }
-
-            const supportedEncodings: LocalizedImportFileTypeSupportedEncodings[] = [];
-
-            if (fileType.supportedEncodings) {
-                for (let i = 0; i < fileType.supportedEncodings.length; i++) {
-                    const encoding = fileType.supportedEncodings[i];
-                    const localizedEncoding: LocalizedImportFileTypeSupportedEncodings = {
-                        encoding: encoding,
-                        displayName: t(`encoding.${encoding}`)
-                    };
-
-                    supportedEncodings.push(localizedEncoding);
-                }
-            }
-
-            const localizedFileType: LocalizedImportFileType = {
-                type: fileType.type,
-                displayName: t(fileType.name),
-                extensions: fileType.extensions,
-                subTypes: subTypes.length ? subTypes : undefined,
-                supportedEncodings: supportedEncodings.length ? supportedEncodings : undefined,
-                dataFromTextbox: fileType.dataFromTextbox,
-                document: document
+            const localizedCategoryAndTypes: LocalizedImportFileCategoryAndTypes = {
+                displayCategoryName: t(categoryAndTypes.categoryName),
+                fileTypes: []
             };
-            allSupportedImportFileTypes.push(localizedFileType);
+
+            for (let j = 0; j < categoryAndTypes.fileTypes.length; j++) {
+                const fileType = categoryAndTypes.fileTypes[j];
+                let document: LocalizedImportFileDocument | undefined;
+
+                if (fileType.document) {
+                    let documentLanguage = '';
+                    let documentDisplayLanguageName = '';
+                    let documentAnchor = '';
+
+                    if (fileType.document.supportMultiLanguages === true) {
+                        documentLanguage = getCurrentLanguageTag();
+
+                        if (SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE[documentLanguage] === documentLanguage) {
+                            documentAnchor = t(`document.anchor.export_and_import.${fileType.document.anchor}`);
+                        } else if (SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE[documentLanguage]) {
+                            documentLanguage = SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE[documentLanguage];
+                            documentAnchor = t(`document.anchor.export_and_import.${fileType.document.anchor}`, {}, { locale: documentLanguage });
+                        } else {
+                            documentLanguage = DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE;
+                            documentAnchor = t(`document.anchor.export_and_import.${fileType.document.anchor}`, {}, { locale: documentLanguage });
+                        }
+                    } else if (isString(fileType.document.supportMultiLanguages) && ALL_LANGUAGES[fileType.document.supportMultiLanguages]) {
+                        documentLanguage = fileType.document.supportMultiLanguages;
+                        documentAnchor = fileType.document.anchor;
+                    }
+
+                    if (documentLanguage && documentLanguage !== getCurrentLanguageTag()) {
+                        documentDisplayLanguageName = getLanguageDisplayName(ALL_LANGUAGES[documentLanguage].name);
+                    }
+
+                    if (documentLanguage) {
+                        documentLanguage = documentLanguage.replace(/-/g, '_');
+                    }
+
+                    if (documentAnchor) {
+                        documentAnchor = documentAnchor.toLowerCase().replace(/ /g, '-');
+                    }
+
+                    if (documentLanguage === DEFAULT_LANGUAGE) {
+                        documentLanguage = '';
+                    }
+
+                    document = {
+                        language: documentLanguage,
+                        displayLanguageName: documentDisplayLanguageName,
+                        anchor: documentAnchor
+                    };
+                } else {
+                    document = undefined;
+                }
+
+                const subTypes: LocalizedImportFileTypeSubType[] = [];
+
+                if (fileType.subTypes) {
+                    for (let k = 0; k < fileType.subTypes.length; k++) {
+                        const subType = fileType.subTypes[k];
+                        const localizedSubType: LocalizedImportFileTypeSubType = {
+                            type: subType.type,
+                            displayName: t(subType.name),
+                            extensions: subType.extensions
+                        };
+
+                        subTypes.push(localizedSubType);
+                    }
+                }
+
+                const supportedEncodings: LocalizedImportFileTypeSupportedEncodings[] = [];
+
+                if (fileType.supportedEncodings) {
+                    for (let k = 0; k < fileType.supportedEncodings.length; k++) {
+                        const encoding = fileType.supportedEncodings[k];
+                        const localizedEncoding: LocalizedImportFileTypeSupportedEncodings = {
+                            encoding: encoding,
+                            displayName: t(`encoding.${encoding}`)
+                        };
+
+                        supportedEncodings.push(localizedEncoding);
+                    }
+                }
+
+                const localizedFileType: LocalizedImportFileType = {
+                    type: fileType.type,
+                    displayName: t(fileType.name),
+                    extensions: fileType.extensions,
+                    subTypes: subTypes.length ? subTypes : undefined,
+                    supportedEncodings: supportedEncodings.length ? supportedEncodings : undefined,
+                    dataFromTextbox: fileType.dataFromTextbox,
+                    document: document
+                };
+
+                localizedCategoryAndTypes.fileTypes.push(localizedFileType);
+            }
+
+            allSupportedImportFileCategoryAndTypes.push(localizedCategoryAndTypes);
         }
 
-        return allSupportedImportFileTypes;
+        return allSupportedImportFileCategoryAndTypes;
     }
 
     function getLanguageInfo(languageKey: string): LanguageInfo | undefined {
@@ -2110,7 +2123,7 @@ export function useI18n() {
         getAllImportTransactionColumnTypes: () => getLocalizedDisplayNameAndType(ImportTransactionColumnType.values()),
         getAllTransactionDefaultCategories,
         getAllDisplayExchangeRates,
-        getAllSupportedImportFileTypes,
+        getAllSupportedImportFileCagtegoryAndTypes,
         // get localized info
         getLanguageInfo,
         getMonthShortName,

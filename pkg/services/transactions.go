@@ -670,7 +670,7 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 			log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" has created a new trasaction \"id:%d\"", template.TemplateId, transaction.TransactionId)
 		} else {
 			failedCount++
-			log.Errorf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" failed to create new trasaction", template.TemplateId)
+			log.Errorf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" failed to create new trasaction, because %s", template.TemplateId, err.Error())
 		}
 	}
 

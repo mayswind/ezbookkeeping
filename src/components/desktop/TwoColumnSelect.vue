@@ -218,13 +218,12 @@ function onPrimaryItemClicked(item: unknown): void {
 
     if (props.autoUpdateMenuPosition) {
         nextTick(() => {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             const mainSelectRect = document.querySelector('.two-column-main-select')?.getBoundingClientRect();
             const selectMenu = document.querySelector('.two-column-select-menu') as (HTMLElement | null);
             const selectMenuRect = selectMenu?.getBoundingClientRect();
 
             if (mainSelectRect && selectMenu && selectMenuRect) {
-                const newTop = scrollTop + mainSelectRect.top + mainSelectRect.height + 0.5;
+                const newTop = Math.round(mainSelectRect.top + mainSelectRect.height);
 
                 if (newTop + selectMenuRect.height < document.documentElement.scrollHeight) {
                     selectMenu.style.top = newTop + 'px';

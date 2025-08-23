@@ -397,6 +397,14 @@ func (s *TransactionCategoryService) DeleteCategory(c core.Context, uid int64, c
 			return errs.ErrTransactionCategoryInUseCannotBeDeleted
 		}
 
+		exists, err = sess.Cols("uid", "deleted", "category_id", "template_type", "scheduled_frequency_type", "scheduled_end_time").Where("uid=? AND deleted=? AND (template_type=? || (template_type=? && scheduled_frequency_type<>? && (scheduled_end_time IS NULL OR scheduled_end_time>=?)))", uid, false, models.TRANSACTION_TEMPLATE_TYPE_NORMAL, models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DISABLED, now).In("category_id", categoryAndSubCategoryIds).Limit(1).Exist(&models.TransactionTemplate{})
+
+		if err != nil {
+			return err
+		} else if exists {
+			return errs.ErrTransactionCategoryInUseCannotBeDeleted
+		}
+
 		deletedRows, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).In("category_id", categoryAndSubCategoryIds).Update(updateModel)
 
 		if err != nil {

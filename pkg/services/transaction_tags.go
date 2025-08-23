@@ -396,6 +396,28 @@ func (s *TransactionTagService) DeleteTag(c core.Context, uid int64, tagId int64
 			return errs.ErrTransactionTagInUseCannotBeDeleted
 		}
 
+		var relatedTransactionTemplatesByTag []*models.TransactionTemplate
+		err = sess.Cols("uid", "deleted", "tag_ids", "template_type", "scheduled_frequency_type", "scheduled_end_time").Where("uid=? AND deleted=? AND (template_type=? || (template_type=? && scheduled_frequency_type<>? && (scheduled_end_time IS NULL OR scheduled_end_time>=?))) && tag_ids LIKE ?", uid, false, models.TRANSACTION_TEMPLATE_TYPE_NORMAL, models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DISABLED, now, "%%"+utils.Int64ToString(tagId)+"%%").Find(&relatedTransactionTemplatesByTag)
+
+		if err != nil {
+			return err
+		}
+
+		for i := 0; i < len(relatedTransactionTemplatesByTag); i++ {
+			template := relatedTransactionTemplatesByTag[i]
+			tagIds, err := s.GetTagIds(template.TagIds)
+
+			if err != nil {
+				return err
+			}
+
+			for j := 0; j < len(tagIds); j++ {
+				if tagIds[j] == tagId {
+					return errs.ErrTransactionTagInUseCannotBeDeleted
+				}
+			}
+		}
+
 		deletedRows, err := sess.ID(tagId).Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(updateModel)
 
 		if err != nil {

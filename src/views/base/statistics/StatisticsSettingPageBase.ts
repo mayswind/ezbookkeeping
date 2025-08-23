@@ -25,7 +25,7 @@ export function useStatisticsSettingPageBase() {
     const allSortingTypes = computed<TypeAndDisplayName[]>(() => getAllStatisticsSortingTypes());
     const allCategoricalChartTypes = computed<TypeAndDisplayName[]>(() => getAllCategoricalChartTypes());
     const allCategoricalChartDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.Normal, false));
-    const allTrendChartTypes = computed<LocalizedDateRange[]>(() => getAllTrendChartTypes());
+    const allTrendChartTypes = computed<TypeAndDisplayName[]>(() => getAllTrendChartTypes());
     const allTrendChartDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.TrendAnalysis, false));
 
     const defaultChartDataType = computed<number>({

@@ -77,7 +77,8 @@ export interface LocalizedDateTimeFormat extends TypeAndDisplayName {
 export interface LocalizedDateRange extends TypeAndDisplayName {
     readonly type: number;
     readonly displayName: string;
-    readonly isBillingCycle?: boolean;
+    readonly isBillingCycle: boolean;
+    readonly isUserCustomRange: boolean;
 }
 
 export interface LocalizedRecentMonthDateRange extends TimeRangeAndDateType {
@@ -527,48 +528,50 @@ export class DateRange implements TypeAndName {
     private static readonly allInstancesByType: Record<number, DateRange> = {};
 
     // All date range
-    public static readonly All = new DateRange(0, 'All', false, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
+    public static readonly All = new DateRange(0, 'All', false, false, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
 
     // Date ranges for normal scene only
-    public static readonly Today = new DateRange(1, 'Today', false, DateRangeScene.Normal);
-    public static readonly Yesterday = new DateRange(2, 'Yesterday', false, DateRangeScene.Normal);
-    public static readonly LastSevenDays = new DateRange(3, 'Recent 7 days', false, DateRangeScene.Normal);
-    public static readonly LastThirtyDays = new DateRange(4, 'Recent 30 days', false, DateRangeScene.Normal);
-    public static readonly ThisWeek = new DateRange(5, 'This week', false, DateRangeScene.Normal);
-    public static readonly LastWeek = new DateRange(6, 'Last week', false, DateRangeScene.Normal);
-    public static readonly ThisMonth = new DateRange(7, 'This month', false, DateRangeScene.Normal);
-    public static readonly LastMonth = new DateRange(8, 'Last month', false, DateRangeScene.Normal);
+    public static readonly Today = new DateRange(1, 'Today', false, false, DateRangeScene.Normal);
+    public static readonly Yesterday = new DateRange(2, 'Yesterday', false, false, DateRangeScene.Normal);
+    public static readonly LastSevenDays = new DateRange(3, 'Recent 7 days', false, false, DateRangeScene.Normal);
+    public static readonly LastThirtyDays = new DateRange(4, 'Recent 30 days', false, false, DateRangeScene.Normal);
+    public static readonly ThisWeek = new DateRange(5, 'This week', false, false, DateRangeScene.Normal);
+    public static readonly LastWeek = new DateRange(6, 'Last week', false, false, DateRangeScene.Normal);
+    public static readonly ThisMonth = new DateRange(7, 'This month', false, false, DateRangeScene.Normal);
+    public static readonly LastMonth = new DateRange(8, 'Last month', false, false, DateRangeScene.Normal);
 
     // Date ranges for normal and trend analysis scene
-    public static readonly ThisYear = new DateRange(9, 'This year', false, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
-    public static readonly LastYear = new DateRange(10, 'Last year', false, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
-    public static readonly ThisFiscalYear = new DateRange(11, 'This fiscal year', false, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
-    public static readonly LastFiscalYear = new DateRange(12, 'Last fiscal year', false, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
+    public static readonly ThisYear = new DateRange(9, 'This year', false, false, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
+    public static readonly LastYear = new DateRange(10, 'Last year', false, false, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
+    public static readonly ThisFiscalYear = new DateRange(11, 'This fiscal year', false, true, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
+    public static readonly LastFiscalYear = new DateRange(12, 'Last fiscal year', false, true, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
 
     // Billing cycle date ranges for normal scene only
-    public static readonly PreviousBillingCycle = new DateRange(51, 'Previous Billing Cycle', true, DateRangeScene.Normal);
-    public static readonly CurrentBillingCycle = new DateRange(52, 'Current Billing Cycle', true, DateRangeScene.Normal);
+    public static readonly PreviousBillingCycle = new DateRange(51, 'Previous Billing Cycle', true, true, DateRangeScene.Normal);
+    public static readonly CurrentBillingCycle = new DateRange(52, 'Current Billing Cycle', true, true, DateRangeScene.Normal);
 
     // Date ranges for trend analysis scene only
-    public static readonly RecentTwelveMonths = new DateRange(101, 'Recent 12 months', false, DateRangeScene.TrendAnalysis);
-    public static readonly RecentTwentyFourMonths = new DateRange(102, 'Recent 24 months', false, DateRangeScene.TrendAnalysis);
-    public static readonly RecentThirtySixMonths = new DateRange(103, 'Recent 36 months', false, DateRangeScene.TrendAnalysis);
-    public static readonly RecentTwoYears = new DateRange(104, 'Recent 2 years', false, DateRangeScene.TrendAnalysis);
-    public static readonly RecentThreeYears = new DateRange(105, 'Recent 3 years', false, DateRangeScene.TrendAnalysis);
-    public static readonly RecentFiveYears = new DateRange(106, 'Recent 5 years', false, DateRangeScene.TrendAnalysis);
+    public static readonly RecentTwelveMonths = new DateRange(101, 'Recent 12 months', false, false, DateRangeScene.TrendAnalysis);
+    public static readonly RecentTwentyFourMonths = new DateRange(102, 'Recent 24 months', false, false, DateRangeScene.TrendAnalysis);
+    public static readonly RecentThirtySixMonths = new DateRange(103, 'Recent 36 months', false, false, DateRangeScene.TrendAnalysis);
+    public static readonly RecentTwoYears = new DateRange(104, 'Recent 2 years', false, false, DateRangeScene.TrendAnalysis);
+    public static readonly RecentThreeYears = new DateRange(105, 'Recent 3 years', false, false, DateRangeScene.TrendAnalysis);
+    public static readonly RecentFiveYears = new DateRange(106, 'Recent 5 years', false, false, DateRangeScene.TrendAnalysis);
 
     // Custom date range
-    public static readonly Custom = new DateRange(255, 'Custom Date', false, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
+    public static readonly Custom = new DateRange(255, 'Custom Date', false, true, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
 
     public readonly type: number;
     public readonly name: string;
     public readonly isBillingCycle: boolean;
+    public readonly isUserCustomRange: boolean;
     private readonly availableScenes: Record<number, boolean>;
 
-    private constructor(type: number, name: string, isBillingCycle: boolean, ...availableScenes: DateRangeScene[]) {
+    private constructor(type: number, name: string, isBillingCycle: boolean, isUserCustomRange: boolean, ...availableScenes: DateRangeScene[]) {
         this.type = type;
         this.name = name;
         this.isBillingCycle = isBillingCycle;
+        this.isUserCustomRange = isUserCustomRange;
         this.availableScenes = {};
 
         if (availableScenes) {

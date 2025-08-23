@@ -333,7 +333,7 @@
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
                     </template>
                     <template #footer>
-                        <div v-if="((dateRange.isBillingCycle || dateRange.type === DateRange.Custom.type) && query.dateType === dateRange.type) && query.minTime && query.maxTime">
+                        <div v-if="dateRange.isUserCustomRange && query.dateType === dateRange.type && query.minTime && query.maxTime">
                             <span>{{ queryMinTime }}</span>
                             <span>&nbsp;-&nbsp;</span>
                             <br/>

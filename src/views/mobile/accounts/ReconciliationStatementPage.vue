@@ -48,7 +48,7 @@
                     <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="queryDateRangeType === dateRange.type"></f7-icon>
                 </template>
                 <template #footer>
-                    <div v-if="((dateRange.isBillingCycle || dateRange.type === DateRange.Custom.type) && queryDateRangeType === dateRange.type) && startTime && endTime">
+                    <div v-if="dateRange.isUserCustomRange && queryDateRangeType === dateRange.type && startTime && endTime">
                         <span>{{ displayStartTime }}</span>
                         <span>&nbsp;-&nbsp;</span>
                         <br/>

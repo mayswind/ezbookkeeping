@@ -270,7 +270,7 @@
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="queryDateType === dateRange.type"></f7-icon>
                     </template>
                     <template #footer>
-                        <div v-if="dateRange.type === DateRange.Custom.type && showCustomDateRange">
+                        <div v-if="dateRange.isUserCustomRange && canShowCustomDateRange(dateRange.type)">
                             <span>{{ queryStartTime }}</span>
                             <span>&nbsp;-&nbsp;</span>
                             <br/>
@@ -398,12 +398,12 @@ const {
     queryTrendDateAggregationTypeName,
     isQueryDateRangeChanged,
     canShiftDateRange,
-    showCustomDateRange,
     showAmountInChart,
     totalAmountName,
     translateNameInTrendsChart,
     categoricalAnalysisData,
     trendsAnalysisData,
+    canShowCustomDateRange,
     getDisplayAmount
 } = useStatisticsTransactionPageBase();
 

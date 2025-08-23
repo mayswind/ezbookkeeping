@@ -220,7 +220,7 @@
                                                                         <span class="text-sm ms-3">{{ dateRange.displayName }}</span>
                                                                     </div>
                                                                 </v-list-item-title>
-                                                                <div class="ms-3 smaller" v-if="((dateRange.isBillingCycle || dateRange.type === DateRange.Custom.type) && query.dateType === dateRange.type) && query.minTime && query.maxTime">
+                                                                <div class="ms-3 smaller" v-if="dateRange.isUserCustomRange && query.dateType === dateRange.type && query.minTime && query.maxTime">
                                                                     <span>{{ queryMinTime }}</span>
                                                                     <span>&nbsp;-&nbsp;</span>
                                                                     <br/>

@@ -73,7 +73,7 @@
                                                                 class="cursor-pointer"
                                                                 @click="setDateFilter(dateRange.type)">
                                                                 {{ dateRange.displayName }}
-                                                                <div class="statistics-custom-datetime-range" v-if="dateRange.type === DateRange.Custom.type && showCustomDateRange">
+                                                                <div class="statistics-custom-datetime-range" v-if="dateRange.isUserCustomRange && canShowCustomDateRange(dateRange.type)">
                                                                     <span>{{ queryStartTime }}</span>
                                                                     <span>&nbsp;-&nbsp;</span>
                                                                     <br/>
@@ -450,13 +450,13 @@ const {
     queryDateRangeName,
     queryTrendDateAggregationTypeName,
     canShiftDateRange,
-    showCustomDateRange,
     showAmountInChart,
     totalAmountName,
     showTotalAmountInTrendsChart,
     translateNameInTrendsChart,
     categoricalAnalysisData,
     trendsAnalysisData,
+    canShowCustomDateRange,
     getDisplayAmount
 } = useStatisticsTransactionPageBase();
 

@@ -148,16 +148,6 @@ export function useStatisticsTransactionPageBase() {
         }
     });
 
-    const showCustomDateRange = computed<boolean>(() => {
-        if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
-            return query.value.categoricalChartDateType === DateRange.Custom.type && !!query.value.categoricalChartStartTime && !!query.value.categoricalChartEndTime;
-        } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
-            return query.value.trendChartDateType === DateRange.Custom.type && !!query.value.trendChartStartYearMonth && !!query.value.trendChartEndYearMonth;
-        } else {
-            return false;
-        }
-    });
-
     const showAmountInChart = computed<boolean>(() => {
         if (!showAccountBalance.value
             && (query.value.chartDataType === ChartDataType.AccountTotalAssets.type || query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type)) {
@@ -200,6 +190,16 @@ export function useStatisticsTransactionPageBase() {
     const categoricalAnalysisData = computed<TransactionCategoricalAnalysisData>(() => statisticsStore.categoricalAnalysisData);
     const trendsAnalysisData = computed<TransactionTrendsAnalysisData | null>(() => statisticsStore.trendsAnalysisData);
 
+    function canShowCustomDateRange(dateRangeType: number): boolean {
+        if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
+            return query.value.categoricalChartDateType === dateRangeType && !!query.value.categoricalChartStartTime && !!query.value.categoricalChartEndTime;
+        } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
+            return query.value.trendChartDateType === dateRangeType && !!query.value.trendChartStartYearMonth && !!query.value.trendChartEndYearMonth;
+        } else {
+            return false;
+        }
+    }
+
     function getDisplayAmount(amount: number, currency: string, textLimit?: number): string {
         const finalAmount = formatAmountToLocalizedNumeralsWithCurrency(amount, currency);
 
@@ -241,7 +241,6 @@ export function useStatisticsTransactionPageBase() {
         queryTrendDateAggregationTypeName,
         isQueryDateRangeChanged,
         canShiftDateRange,
-        showCustomDateRange,
         showAmountInChart,
         totalAmountName,
         showTotalAmountInTrendsChart,
@@ -249,6 +248,7 @@ export function useStatisticsTransactionPageBase() {
         categoricalAnalysisData,
         trendsAnalysisData,
         // functions
+        canShowCustomDateRange,
         getDisplayAmount
     };
 }

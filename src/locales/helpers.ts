@@ -944,7 +944,8 @@ export function useI18n() {
                     ret.push({
                         type: dateRange.type,
                         displayName: t(dateRange.name),
-                        isBillingCycle: dateRange.isBillingCycle
+                        isBillingCycle: dateRange.isBillingCycle,
+                        isUserCustomRange: dateRange.isUserCustomRange
                     });
                 }
 
@@ -954,7 +955,9 @@ export function useI18n() {
             if (includeCustom || dateRange.type !== DateRange.Custom.type) {
                 ret.push({
                     type: dateRange.type,
-                    displayName: t(dateRange.name)
+                    displayName: t(dateRange.name),
+                    isBillingCycle: dateRange.isBillingCycle,
+                    isUserCustomRange: dateRange.isUserCustomRange
                 });
             }
         }

@@ -547,8 +547,8 @@ export class DateRange implements TypeAndName {
     public static readonly LastFiscalYear = new DateRange(12, 'Last fiscal year', false, true, DateRangeScene.Normal, DateRangeScene.TrendAnalysis);
 
     // Billing cycle date ranges for normal scene only
-    public static readonly PreviousBillingCycle = new DateRange(51, 'Previous Billing Cycle', true, true, DateRangeScene.Normal);
-    public static readonly CurrentBillingCycle = new DateRange(52, 'Current Billing Cycle', true, true, DateRangeScene.Normal);
+    public static readonly CurrentBillingCycle = new DateRange(51, 'Current Billing Cycle', true, true, DateRangeScene.Normal);
+    public static readonly PreviousBillingCycle = new DateRange(52, 'Previous Billing Cycle', true, true, DateRangeScene.Normal);
 
     // Date ranges for trend analysis scene only
     public static readonly RecentTwelveMonths = new DateRange(101, 'Recent 12 months', false, false, DateRangeScene.TrendAnalysis);

@@ -653,6 +653,18 @@ export function getShiftedDateRange(minTime: number, maxTime: number, scale: num
         };
     }
 
+    // check whether the date range matches one full year
+    if (minDateTime.clone().add(1, 'years').subtract(1, 'seconds').unix() === maxDateTime.unix() ||
+        maxDateTime.clone().subtract(1, 'years').add(1, 'seconds').unix() === minDateTime.unix()) {
+        const newMinDateTime = minDateTime.add(1 * scale, 'years');
+        const newMaxDateTime = maxDateTime.add(1 * scale, 'years');
+
+        return {
+            minTime: newMinDateTime.unix(),
+            maxTime: newMaxDateTime.unix()
+        };
+    }
+
     // check whether the date range matches one full month
     if (minDateTime.clone().add(1, 'months').subtract(1, 'seconds').unix() === maxDateTime.unix() ||
         maxDateTime.clone().subtract(1, 'months').add(1, 'seconds').unix() === minDateTime.unix()) {

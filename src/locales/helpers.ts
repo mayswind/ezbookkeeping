@@ -16,6 +16,8 @@ import {
 } from '@/core/text.ts';
 
 import {
+    type TextualYearMonth,
+    type TextualYearMonthDay,
     type DateFormat,
     type TimeFormat,
     type LocalizedDateTimeFormat,
@@ -148,12 +150,13 @@ import {
 
 import {
     formatCurrentTime,
-    formatDate,
-    formatMonthDay,
+    formatGregorianCalendarYearDashMonthDashDay,
+    formatGregorianCalendarMonthDashDay,
     formatUnixTime,
     getBrowserTimezoneOffset,
     getBrowserTimezoneOffsetMinutes,
     getCurrentUnixTime,
+    parseDateTimeFromUnixTime,
     getDateTimeFormatType,
     getFiscalYearTimeRangeFromUnixTime,
     getFiscalYearTimeRangeFromYear,
@@ -161,12 +164,9 @@ import {
     getTimeDifferenceHoursAndMinutes,
     getTimezoneOffset,
     getTimezoneOffsetMinutes,
-    getYear,
-    getQuarter,
     isDateRangeMatchFullMonths,
     isDateRangeMatchFullYears,
-    isPM,
-    parseDateFromUnixTime,
+    isPM
 } from '@/lib/datetime.ts';
 
 import {
@@ -1441,12 +1441,12 @@ export function useI18n() {
         });
     }
 
-    function getWeekdayShortName(weekDayName: string): string {
-        return t(`datetime.${weekDayName}.short`);
+    function getWeekdayShortName(weekDay: WeekDay): string {
+        return t(`datetime.${weekDay.name}.short`);
     }
 
-    function getWeekdayLongName(weekDayName: string): string {
-        return t(`datetime.${weekDayName}.long`);
+    function getWeekdayLongName(weekDay: WeekDay): string {
+        return t(`datetime.${weekDay.name}.long`);
     }
 
     function getMultiMonthdayShortNames(monthDays: number[]): string {
@@ -1618,18 +1618,18 @@ export function useI18n() {
         return getLocalizedLongTimeFormat().indexOf('ss') >= 0;
     }
 
-    function formatDateToLongDate(date: string): string {
-        return formatDate(date, getLocalizedLongDateFormat());
+    function formatGregorianCalendarYearDashMonthDashDayToLongDate(date: TextualYearMonthDay): string {
+        return formatGregorianCalendarYearDashMonthDashDay(date, getLocalizedLongDateFormat());
     }
 
-    function formatMonthDayToLongDay(monthDay: string): string {
-        return formatMonthDay(monthDay, getLocalizedLongMonthDayFormat());
+    function formatGregorianCalendarMonthDashDayToLongMonthDay(monthDay: TextualYearMonth): string {
+        return formatGregorianCalendarMonthDashDay(monthDay, getLocalizedLongMonthDayFormat());
     }
 
     function formatUnixTimeToYearQuarter(unixTime: number): string {
-        const date = parseDateFromUnixTime(unixTime);
-        const year = getYear(date);
-        const quarter = getQuarter(date);
+        const date = parseDateTimeFromUnixTime(unixTime);
+        const year = date.getLocalizedCalendarYear();
+        const quarter = date.getLocalizedCalendarQuarter();
         return formatYearQuarter(year, quarter);
     }
 
@@ -1675,8 +1675,8 @@ export function useI18n() {
             return displayStartTime !== displayEndTime ? `${displayStartTime} ~ ${displayEndTime}` : displayStartTime;
         }
 
-        const startTimeYear = getYear(parseDateFromUnixTime(startTime));
-        const endTimeYear = getYear(parseDateFromUnixTime(endTime));
+        const startTimeYear = parseDateTimeFromUnixTime(startTime).getLocalizedCalendarYear();
+        const endTimeYear = parseDateTimeFromUnixTime(endTime).getLocalizedCalendarYear();
 
         const format = getLocalizedShortDateFormat();
         const displayStartTime = formatUnixTime(startTime, format);
@@ -1734,7 +1734,7 @@ export function useI18n() {
             fiscalYearStart = FiscalYearStart.Default;
         }
 
-        return formatMonthDayToLongDay(fiscalYearStart.toMonthDashDayString());
+        return formatGregorianCalendarMonthDashDayToLongMonthDay(fiscalYearStart.toMonthDashDayString());
     }
 
     function getTimezoneDifferenceDisplayText(utcOffset: number): string {
@@ -2168,8 +2168,8 @@ export function useI18n() {
         formatUnixTimeToShortMonthDay: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortMonthDayFormat(), utcOffset, currentUtcOffset),
         formatUnixTimeToLongTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongTimeFormat(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortTimeFormat(), utcOffset, currentUtcOffset),
-        formatDateToLongDate,
-        formatMonthDayToLongDay,
+        formatGregorianCalendarYearDashMonthDashDayToLongDate,
+        formatGregorianCalendarMonthDashDayToLongMonthDay,
         formatUnixTimeToYearQuarter,
         formatYearQuarter,
         formatDateRange,

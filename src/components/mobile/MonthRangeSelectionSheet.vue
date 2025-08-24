@@ -52,10 +52,12 @@ import { type CommonMonthRangeSelectionProps, useMonthRangeSelectionBase } from 
 
 import { useEnvironmentsStore } from '@/stores/environment.ts';
 
+import { type TextualYearMonth } from '@/core/datetime.ts';
+
 const props = defineProps<CommonMonthRangeSelectionProps>();
 const emit = defineEmits<{
     (e: 'update:show', value: boolean): void;
-    (e: 'dateRange:change', minYearMonth: string, maxYearMonth: string): void;
+    (e: 'dateRange:change', minYearMonth: TextualYearMonth | '', maxYearMonth: TextualYearMonth | ''): void;
 }>();
 
 const { tt, getMonthShortName } = useI18n();

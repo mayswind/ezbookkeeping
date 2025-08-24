@@ -1,13 +1,13 @@
 import { ref, computed } from 'vue';
 
-import type { Year0BasedMonth } from '@/core/datetime.ts';
+import type { TextualYearMonth, Year0BasedMonth } from '@/core/datetime.ts';
 
 import {
     getYear0BasedMonthObjectFromUnixTime,
     getYear0BasedMonthObjectFromString,
     getYearMonthStringFromYear0BasedMonthObject,
     getCurrentUnixTime,
-    getCurrentYear,
+    getAllowedYearRange,
     getThisYearFirstUnixTime,
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime
@@ -21,8 +21,8 @@ export interface MonthSelectionValue {
 }
 
 export interface CommonMonthRangeSelectionProps {
-    minTime?: string;
-    maxTime?: string;
+    minTime?: TextualYearMonth;
+    maxTime?: TextualYearMonth;
     title?: string;
     hint?: string;
     show: boolean;
@@ -64,11 +64,7 @@ export function useMonthRangeSelectionBase(props: CommonMonthRangeSelectionProps
     const { formatUnixTimeToLongYearMonth, isLongDateMonthAfterYear } = useI18n();
     const { minDate, maxDate } = getMonthRangeFromProps(props);
 
-    const yearRange = ref<number[]>([
-        2000,
-        getCurrentYear() + 1
-    ]);
-
+    const yearRange = ref<number[]>(getAllowedYearRange());
     const dateRange = ref<MonthSelectionValue[]>([
         minDate,
         maxDate
@@ -84,7 +80,7 @@ export function useMonthRangeSelectionBase(props: CommonMonthRangeSelectionProps
         month0base: dateRange.value[1].month
     })));
 
-    function getMonthSelectionValue(yearMonth: string): MonthSelectionValue | null {
+    function getMonthSelectionValue(yearMonth: TextualYearMonth): MonthSelectionValue | null {
         const yearMonthObj = getYear0BasedMonthObjectFromString(yearMonth);
 
         if (!yearMonthObj) {
@@ -97,7 +93,7 @@ export function useMonthRangeSelectionBase(props: CommonMonthRangeSelectionProps
         };
     }
 
-    function getFinalMonthRange(): { minYearMonth: string, maxYearMonth: string } | null {
+    function getFinalMonthRange(): { minYearMonth: TextualYearMonth | '', maxYearMonth: TextualYearMonth | '' } | null {
         if (!dateRange.value[0] || !dateRange.value[1]) {
             return null;
         }

@@ -7,7 +7,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { type NameValue } from '@/core/base.ts';
 import { type WeekDayValue } from '@/core/datetime.ts';
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
-import { getCurrentYear } from '@/lib/datetime.ts';
+import { getAllowedYearRange } from '@/lib/datetime.ts';
 
 export interface TimePickerValue {
     value: string;
@@ -34,10 +34,7 @@ export function useDateTimeSelectionBase() {
     const isSecondTwoDigits = ref<boolean>(isLongTimeSecondTwoDigits());
     const isMeridiemIndicatorFirst = ref<boolean>(isLongTimeMeridiemIndicatorFirst() || false);
 
-    const yearRange = ref<number[]>([
-        2000,
-        getCurrentYear() + 1
-    ]);
+    const yearRange = ref<number[]>(getAllowedYearRange());
 
     const meridiemItems = computed<NameValue[]>(() => getAllMeridiemIndicators());
 

@@ -7,7 +7,7 @@ import { useAccountsStore } from './account.ts';
 import { useTransactionCategoriesStore } from './transactionCategory.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
-import { type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
+import { type TextualYearMonth, type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionTagFilterType } from '@/core/transaction.ts';
@@ -50,7 +50,7 @@ import {
     isObjectEmpty,
     objectFieldToArrayItem
 } from '@/lib/common.ts';
-import { getYearAndMonthFromUnixTime, getDateRangeByDateType } from '@/lib/datetime.ts';
+import { getGregorianCalendarYearAndMonthFromUnixTime, getDateRangeByDateType } from '@/lib/datetime.ts';
 import { getFinalAccountIdsByFilteredAccountIds } from '@/lib/account.ts';
 import { getFinalCategoryIdsByFilteredCategoryIds } from '@/lib/category.ts';
 import { sortStatisticsItems } from '@/lib/statistics.ts';
@@ -118,8 +118,8 @@ export interface TransactionStatisticsPartialFilter {
     categoricalChartEndTime?: number;
     trendChartType?: number;
     trendChartDateType?: number;
-    trendChartStartYearMonth?: string;
-    trendChartEndYearMonth?: string;
+    trendChartStartYearMonth?: TextualYearMonth | '';
+    trendChartEndYearMonth?: TextualYearMonth | '';
     filterAccountIds?: Record<string, boolean>;
     filterCategoryIds?: Record<string, boolean>;
     tagIds?: string;
@@ -136,8 +136,8 @@ export interface TransactionStatisticsFilter extends TransactionStatisticsPartia
     categoricalChartEndTime: number;
     trendChartType: number;
     trendChartDateType: number;
-    trendChartStartYearMonth: string;
-    trendChartEndYearMonth: string;
+    trendChartStartYearMonth: TextualYearMonth | '';
+    trendChartEndYearMonth: TextualYearMonth | '';
     filterAccountIds: Record<string, boolean>;
     filterCategoryIds: Record<string, boolean>;
     tagIds: string;
@@ -800,8 +800,8 @@ export const useStatisticsStore = defineStore('statistics', () => {
 
             if (trendChartDateRange) {
                 transactionStatisticsFilter.value.trendChartDateType = trendChartDateRange.dateType;
-                transactionStatisticsFilter.value.trendChartStartYearMonth = getYearAndMonthFromUnixTime(trendChartDateRange.minTime);
-                transactionStatisticsFilter.value.trendChartEndYearMonth = getYearAndMonthFromUnixTime(trendChartDateRange.maxTime);
+                transactionStatisticsFilter.value.trendChartStartYearMonth = getGregorianCalendarYearAndMonthFromUnixTime(trendChartDateRange.minTime);
+                transactionStatisticsFilter.value.trendChartEndYearMonth = getGregorianCalendarYearAndMonthFromUnixTime(trendChartDateRange.maxTime);
             }
         }
 

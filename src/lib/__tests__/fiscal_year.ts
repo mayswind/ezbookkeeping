@@ -5,6 +5,7 @@ import { describe, expect, test, beforeAll } from '@jest/globals';
 import moment from 'moment-timezone';
 
 // Import all the fiscal year functions from the lib
+import type { TextualYearMonth } from '@/core/datetime.ts';
 import { FiscalYearStart, FiscalYearUnixTime } from '@/core/fiscalyear.ts';
 
 import {
@@ -230,8 +231,8 @@ describe('getFiscalYearTimeRangeFromUnixTime', () => {
 
 // GET ALL FISCAL YEAR START AND END UNIX TIMES
 type TestCase_getAllFiscalYearsStartAndEndUnixTimes = {
-    startYearMonth: string;
-    endYearMonth: string;
+    startYearMonth: TextualYearMonth;
+    endYearMonth: TextualYearMonth;
     fiscalYearStart: string;
     fiscalYearStartId: string;
     expected: FiscalYearUnixTime[]

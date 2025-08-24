@@ -165,7 +165,7 @@
                                     </v-card-text>
 
                                     <v-card-text class="transaction-calendar-container pt-0" v-if="pageType === TransactionListPageType.Calendar.type">
-                                        <vue-date-picker inline auto-apply model-type="yyyy-M-d"
+                                        <vue-date-picker inline auto-apply model-type="yyyy-MM-dd"
                                                          month-name-format="long"
                                                          :config="{ noSwipe: true }"
                                                          :readonly="loading"
@@ -545,13 +545,13 @@
                                                :class="{ 'disabled': loading, 'has-bottom-border': idx < transactions.length - 1 }"
                                                v-for="(transaction, idx) in transactions">
                                             <tr class="transaction-list-row-date no-hover text-sm"
-                                                v-if="pageType === TransactionListPageType.List.type && (idx === 0 || (idx > 0 && (transaction.date !== transactions[idx - 1].date)))">
+                                                v-if="pageType === TransactionListPageType.List.type && (idx === 0 || (idx > 0 && (transaction.gregorianCalendarYearDashMonthDashDay !== transactions[idx - 1].gregorianCalendarYearDashMonthDashDay)))">
                                                 <td :colspan="showTagInTransactionListPage ? 6 : 5" class="font-weight-bold">
                                                     <div class="d-flex align-center">
                                                         <span>{{ getDisplayLongDate(transaction) }}</span>
                                                         <v-chip class="ms-1" color="default" size="x-small"
-                                                                v-if="transaction.dayOfWeek">
-                                                            {{ getWeekdayLongName(transaction.dayOfWeek) }}
+                                                                v-if="transaction.displayDayOfWeek">
+                                                            {{ getWeekdayLongName(transaction.displayDayOfWeek) }}
                                                         </v-chip>
                                                     </div>
                                                 </td>
@@ -689,6 +689,7 @@ import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import {
+    type Year0BasedMonth,
     type LocalizedRecentMonthDateRange,
     type TimeRangeAndDateType,
     DateRangeScene,
@@ -710,9 +711,7 @@ import {
 } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
-    parseDateFromUnixTime,
-    getYear,
-    getMonth,
+    parseDateTimeFromUnixTime,
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
     getDayFirstUnixTimeBySpecifiedUnixTime,
@@ -960,7 +959,7 @@ const transactions = computed<Transaction[]>(() => {
             for (let i = 0; i < transactionData.items.length; i++) {
                 const transaction = transactionData.items[i];
 
-                if (transaction.date === currentCalendarDate.value) {
+                if (transaction.gregorianCalendarYearDashMonthDashDay === currentCalendarDate.value) {
                     transactions.push(transaction);
                 }
             }
@@ -1208,9 +1207,9 @@ function reload(force: boolean, init: boolean): void {
         }
 
         if (queryMonthlyData.value) {
-            const currentMonthMinDate = parseDateFromUnixTime(query.value.minTime);
-            const currentYear = getYear(currentMonthMinDate);
-            const currentMonth = getMonth(currentMonthMinDate);
+            const currentMonthMinDate = parseDateTimeFromUnixTime(query.value.minTime);
+            const currentYear = currentMonthMinDate.getGregorianCalendarYear();
+            const currentMonth = currentMonthMinDate.getGregorianCalendarMonth();
 
             return transactionsStore.loadMonthlyAllTransactions({
                 year: currentYear,
@@ -1362,7 +1361,7 @@ function changeCustomDateFilter(minTime: number, maxTime: number): void {
     updateUrlWhenChanged(changed);
 }
 
-function changeCustomMonthDateFilter(yearMonth: string): void {
+function changeCustomMonthDateFilter(yearMonth: Year0BasedMonth): void {
     if (!yearMonth) {
         return;
     }

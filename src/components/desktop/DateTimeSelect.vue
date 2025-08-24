@@ -105,7 +105,7 @@ import {
     getBrowserTimezoneOffsetMinutes,
     getLocalDatetimeFromUnixTime,
     getActualUnixTimeForStore,
-    getUnixTime,
+    getUnixTimeFromLocalDatetime,
     getAMOrPM,
     getCombinedDateAndTimeValues
 } from '@/lib/datetime.ts';
@@ -154,7 +154,7 @@ const dateTime = computed<Date>({
         return getLocalDatetimeFromUnixTime(props.modelValue);
     },
     set: (value: Date) => {
-        const unixTime = getUnixTime(value);
+        const unixTime = getUnixTimeFromLocalDatetime(value);
 
         if (unixTime < 0) {
             emit('error', 'Date is too early');
@@ -225,7 +225,7 @@ const currentSecond = computed<string>({
 });
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
-const displayTime = computed<string>(() => formatUnixTimeToLongDateTime(getActualUnixTimeForStore(getUnixTime(dateTime.value), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())));
+const displayTime = computed<string>(() => formatUnixTimeToLongDateTime(getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(dateTime.value), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())));
 
 function toggleMeridiemIndicator(): void {
     if (currentMeridiemIndicator.value === MeridiemIndicator.AM.name) {

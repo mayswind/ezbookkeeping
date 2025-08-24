@@ -44,17 +44,18 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
 import { type CommonMonthSelectionProps, useMonthSelectionBase } from '@/components/base/MonthSelectionBase.ts';
 
+import type { Year0BasedMonth } from '@/core/datetime.ts';
 import { useEnvironmentsStore } from '@/stores/environment.ts';
 
 const props = defineProps<CommonMonthSelectionProps>();
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: string): void;
+    (e: 'update:modelValue', value: Year0BasedMonth): void;
     (e: 'update:show', value: boolean): void;
 }>();
 
 const { tt, getMonthShortName } = useI18n();
 const { showToast } = useI18nUIComponents();
-const { yearRange, monthValue, isYearFirst, getMonthSelectionValue, getTextualYearMonth } = useMonthSelectionBase(props);
+const { yearRange, monthValue, isYearFirst, getMonthSelectionValue, getYear0BasedMonth } = useMonthSelectionBase(props);
 
 const environmentsStore = useEnvironmentsStore();
 
@@ -62,7 +63,7 @@ const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode 
 
 function confirm(): void {
     try {
-        const finalMonthRange = getTextualYearMonth();
+        const finalMonthRange = getYear0BasedMonth();
 
         if (!finalMonthRange) {
             return;

@@ -2,11 +2,15 @@ import moment from 'moment-timezone';
 import { type unitOfTime } from 'moment/moment';
 
 import {
+    type DateTime,
+    type TextualYearMonth,
+    type TextualYearMonthDay,
     type YearUnixTime,
     type YearQuarter,
     type Year0BasedMonth,
     type Year1BasedMonth,
     type YearMonthRange,
+    type YearMonthDay,
     type TimeRange,
     type TimeRangeAndDateType,
     type TimeDifference,
@@ -35,7 +39,120 @@ import {
     isNumber
 } from './common.ts';
 
-type SupportedDate = Date | moment.Moment;
+class MomentDateTime implements DateTime {
+    private instance: moment.Moment;
+
+    private constructor(instance: moment.Moment) {
+        this.instance = instance;
+    }
+
+    public getUnixTime(): number {
+        return this.instance.unix();
+    }
+
+    public getLocalizedCalendarYear(): number {
+        return this.instance.year();
+    }
+
+    public getGregorianCalendarYear(): number {
+        return this.instance.year();
+    }
+
+    public getGregorianCalendarQuarter(): number {
+        return this.instance.quarter();
+    }
+
+    public getLocalizedCalendarQuarter(): number {
+        return this.instance.quarter();
+    }
+
+    public getGregorianCalendarMonth(): number {
+        return this.instance.month() + 1;
+    }
+
+    public getGregorianCalendarMonthName(): string {
+        return (Month.valueOf(this.instance.month() + 1) as Month).name;
+    }
+
+    public getLocalizedCalendarMonth(): number {
+        return this.instance.month() + 1;
+    }
+
+    public getGregorianCalendarDay(): number {
+        return this.instance.date();
+    }
+
+    public getLocalizedCalendarDay(): number {
+        return this.instance.date();
+    }
+
+    public getGregorianCalendarYearDashMonthDashDay(): TextualYearMonthDay {
+        return (this.instance.year() + '-' + (this.instance.month() + 1).toString().padStart(2, '0') + '-' + this.instance.date().toString().padStart(2, '0')) as TextualYearMonthDay;
+    }
+
+    public getGregorianCalendarYearDashMonth(): TextualYearMonth {
+        return (this.instance.year() + '-' + (this.instance.month() + 1).toString().padStart(2, '0')) as TextualYearMonth;
+    }
+
+    public getWeekDay(): WeekDay {
+        return WeekDay.valueOf(this.instance.days()) as WeekDay;
+    }
+
+    public toGregorianCalendarYearMonthDay(): YearMonthDay {
+        return {
+            year: this.instance.year(),
+            month: this.instance.month() + 1,
+            day: this.instance.date()
+        };
+    }
+
+    public toGregorianCalendarYear0BasedMonth(): Year0BasedMonth {
+        return {
+            year: this.instance.year(),
+            month0base: this.instance.month()
+        };
+    }
+
+    public format(format: string): string {
+        return this.instance.format(format);
+    }
+
+    public static of(instance: moment.Moment): DateTime {
+        return new MomentDateTime(instance);
+    }
+
+    public static now(): DateTime {
+        return new MomentDateTime(moment());
+    }
+
+    static isYearFirstTime(dateTime: MomentDateTime): boolean {
+        const currentUnixTime = dateTime.instance.clone().set({ millisecond: 0 }).unix();
+        const expectedUnxTime = dateTime.instance.clone().set({ millisecond: 0 }).startOf('year').unix();
+        return currentUnixTime === expectedUnxTime;
+    }
+
+    static isYearLastTime(dateTime: MomentDateTime): boolean {
+        const currentUnixTime = dateTime.instance.clone().set({ millisecond: 999 }).unix();
+        const expectedUnxTime = dateTime.instance.clone().set({ millisecond: 999 }).endOf('year').unix();
+        return currentUnixTime === expectedUnxTime;
+    }
+
+    static isMonthFirstTime(dateTime: MomentDateTime): boolean {
+        const currentUnixTime = dateTime.instance.clone().set({ millisecond: 0 }).unix();
+        const expectedUnxTime = dateTime.instance.clone().set({ millisecond: 0 }).startOf('month').unix();
+        return currentUnixTime === expectedUnxTime;
+    }
+
+    static isMonthLastTime(dateTime: MomentDateTime): boolean {
+        const currentUnixTime = dateTime.instance.clone().set({ millisecond: 999 }).unix();
+        const expectedUnxTime = dateTime.instance.clone().set({ millisecond: 999 }).endOf('month').unix();
+        return currentUnixTime === expectedUnxTime;
+    }
+}
+
+export function getAllowedYearRange(): number[] {
+    return [2000, moment().year() + 1];
+}
 
 export function isYear0BasedMonthValid(year: number, month0base: number): boolean {
     if (!isNumber(year) || !isNumber(month0base)) {
@@ -54,7 +171,7 @@ export function getYear0BasedMonthObjectFromUnixTime(unixTime: number): Year0Bas
     };
 }
 
-export function getYear0BasedMonthObjectFromString(yearMonth: string): Year0BasedMonth | null {
+export function getYear0BasedMonthObjectFromString(yearMonth: TextualYearMonth | ''): Year0BasedMonth | null {
     if (!isString(yearMonth)) {
         return null;
     }
@@ -78,12 +195,12 @@ export function getYear0BasedMonthObjectFromString(yearMonth: string): Year0Base
     };
 }
 
-export function getYearMonthStringFromYear0BasedMonthObject(yearMonth: Year0BasedMonth | null): string {
+export function getYearMonthStringFromYear0BasedMonthObject(yearMonth: Year0BasedMonth | null): TextualYearMonth | '' {
     if (!yearMonth || !isYear0BasedMonthValid(yearMonth.year, yearMonth.month0base)) {
         return '';
     }
 
-    return `${yearMonth.year}-${yearMonth.month0base + 1}`;
+    return (`${yearMonth.year}-${yearMonth.month0base + 1}`) as TextualYearMonth;
 }
 
 export function getHourIn12HourFormat(hour: number): number {
@@ -122,16 +239,8 @@ export function getUtcOffsetByUtcOffsetMinutes(utcOffsetMinutes: number): string
     const offsetHours = Math.trunc(Math.abs(utcOffsetMinutes) / 60);
     const offsetMinutes = Math.abs(utcOffsetMinutes) - offsetHours * 60;
 
-    let finalOffsetHours = offsetHours.toString();
-    let finalOffsetMinutes = offsetMinutes.toString();
-
-    if (offsetHours < 10) {
-        finalOffsetHours = '0' + offsetHours;
-    }
-
-    if (offsetMinutes < 10) {
-        finalOffsetMinutes = '0' + offsetMinutes;
-    }
+    const finalOffsetHours = offsetHours.toString().padStart(2, '0');
+    const finalOffsetMinutes = offsetMinutes.toString().padStart(2, '0');
 
     if (utcOffsetMinutes >= 0) {
         return `+${finalOffsetHours}:${finalOffsetMinutes}`;
@@ -180,23 +289,15 @@ export function getDummyUnixTimeForLocalUsage(unixTime: number, utcOffset: numbe
     return unixTime + (utcOffset - currentUtcOffset) * 60;
 }
 
+export function getCurrentDateTime(): DateTime {
+    return MomentDateTime.now();
+}
+
 export function getCurrentUnixTime(): number {
     return moment().unix();
 }
 
-export function getCurrentYear(): number {
-    return moment().year();
-}
-
-export function getCurrentYearAndMonth(): string {
-    return getYearAndMonth(moment());
-}
-
-export function getCurrentDay(): number {
-    return moment().date();
-}
-
-export function parseDateFromUnixTime(unixTime: number, utcOffset?: number, currentUtcOffset?: number): moment.Moment {
+export function parseDateTimeFromUnixTime(unixTime: number, utcOffset?: number, currentUtcOffset?: number): DateTime {
     if (isNumber(utcOffset)) {
         if (!isNumber(currentUtcOffset)) {
             currentUtcOffset = getTimezoneOffsetMinutes();
@@ -205,73 +306,31 @@ export function parseDateFromUnixTime(unixTime: number, utcOffset?: number, curr
         unixTime = getDummyUnixTimeForLocalUsage(unixTime, utcOffset, currentUtcOffset);
     }
 
-    return moment.unix(unixTime);
+    return MomentDateTime.of(moment.unix(unixTime));
 }
 
-export function formatUnixTime(unixTime: number, format: string, utcOffset?: number, currentUtcOffset?: number) {
-    return parseDateFromUnixTime(unixTime, utcOffset, currentUtcOffset).format(format);
+export function formatUnixTime(unixTime: number, format: string, utcOffset?: number, currentUtcOffset?: number): string {
+    return parseDateTimeFromUnixTime(unixTime, utcOffset, currentUtcOffset).format(format);
 }
 
 export function formatCurrentTime(format: string): string {
     return moment().format(format);
 }
 
-export function formatDate(date: string, format: string): string {
+export function formatGregorianCalendarYearDashMonthDashDay(date: TextualYearMonthDay, format: string): string {
     return moment(date, 'YYYY-MM-DD').format(format);
 }
 
-export function formatMonthDay(monthDay: string, format: string): string {
+export function formatGregorianCalendarMonthDashDay(monthDay: TextualYearMonth, format: string): string {
     return moment(monthDay, 'MM-DD').format(format);
 }
 
-export function getUnixTime(date: SupportedDate): number {
-    return moment(date).unix();
-}
-
-export function getShortDate(date: SupportedDate): string {
-    date = moment(date);
-    return date.year() + '-' + (date.month() + 1) + '-' + date.date();
-}
-
-export function getYear(date: SupportedDate): number {
-    return moment(date).year();
-}
-
-export function getQuarter(date: SupportedDate): number {
-    return moment(date).quarter();
-}
-
-export function getMonth(date: SupportedDate): number {
-    return moment(date).month() + 1;
-}
-
-export function getYearAndMonth(date: SupportedDate): string {
-    const year = getYear(date);
-    const month = getMonth(date);
-
-    return `${year}-${month}`;
-}
-
-export function getYearAndMonthFromUnixTime(unixTime: number): string {
+export function getGregorianCalendarYearAndMonthFromUnixTime(unixTime: number): TextualYearMonth | '' {
     if (!unixTime) {
         return '';
     }
 
-    return getYearAndMonth(parseDateFromUnixTime(unixTime));
-}
-
-export function getDay(date: SupportedDate): number {
-    return moment(date).date();
-}
-
-export function getDayOfWeekName(date: SupportedDate): string {
-    const dayOfWeek = moment(date).days();
-    return (WeekDay.valueOf(dayOfWeek) as WeekDay).name;
-}
-
-export function getMonthName(date: SupportedDate): string {
-    const month = moment(date).month();
-    return (Month.valueOf(month + 1) as Month).name;
+    return parseDateTimeFromUnixTime(unixTime).getGregorianCalendarYearDashMonth();
 }
 
 export function getAMOrPM(hour: number): string {
@@ -294,15 +353,6 @@ export function getTimeDifferenceHoursAndMinutes(timeDifferenceInMinutes: number
         offsetHours: offsetHours,
         offsetMinutes: offsetMinutes,
     };
-}
-
-export function getMinuteFirstUnixTime(date: SupportedDate): number {
-    const datetime = moment(date);
-    return datetime.set({ second: 0, millisecond: 0 }).unix();
-}
-
-export function getMinuteLastUnixTime(date: SupportedDate): number {
-    return moment.unix(getMinuteFirstUnixTime(date)).add(1, 'minutes').subtract(1, 'seconds').unix();
 }
 
 export function getTodayFirstUnixTime(): number {
@@ -412,7 +462,7 @@ export function getQuarterLastUnixTime(yearQuarter: YearQuarter): number {
     return moment.unix(getQuarterFirstUnixTime(yearQuarter)).add(3, 'months').subtract(1, 'seconds').unix();
 }
 
-export function getYearMonthFirstUnixTime(yearMonth: Year0BasedMonth | Year1BasedMonth | string): number {
+export function getYearMonthFirstUnixTime(yearMonth: Year0BasedMonth | Year1BasedMonth | TextualYearMonth | ''): number {
     let yearMonthObj: Year0BasedMonth | null = null;
 
     if (isString(yearMonth)) {
@@ -433,11 +483,11 @@ export function getYearMonthFirstUnixTime(yearMonth: Year0BasedMonth | Year1Base
     return moment().set({ year: yearMonthObj.year, month: yearMonthObj.month0base, date: 1, hour: 0, minute: 0, second: 0, millisecond: 0 }).unix();
 }
 
-export function getYearMonthLastUnixTime(yearMonth: Year0BasedMonth | Year1BasedMonth | string): number {
+export function getYearMonthLastUnixTime(yearMonth: Year0BasedMonth | Year1BasedMonth | TextualYearMonth | ''): number {
     return moment.unix(getYearMonthFirstUnixTime(yearMonth)).add(1, 'months').subtract(1, 'seconds').unix();
 }
 
-export function getStartEndYearMonthRange(startYearMonth: Year0BasedMonth | Year1BasedMonth | string, endYearMonth: Year0BasedMonth | Year1BasedMonth | string): YearMonthRange | null {
+export function getStartEndYearMonthRange(startYearMonth: Year0BasedMonth | Year1BasedMonth | TextualYearMonth | '', endYearMonth: Year0BasedMonth | Year1BasedMonth | TextualYearMonth | ''): YearMonthRange | null {
     let startYearMonthObj: Year0BasedMonth | null = null;
     let endYearMonthObj: Year0BasedMonth | null = null;
 
@@ -473,7 +523,7 @@ export function getStartEndYearMonthRange(startYearMonth: Year0BasedMonth | Year
     };
 }
 
-export function getAllYearsStartAndEndUnixTimes(startYearMonth: Year0BasedMonth | Year1BasedMonth | string, endYearMonth: Year0BasedMonth | Year1BasedMonth | string): YearUnixTime[] {
+export function getAllYearsStartAndEndUnixTimes(startYearMonth: Year0BasedMonth | Year1BasedMonth | TextualYearMonth | '', endYearMonth: Year0BasedMonth | Year1BasedMonth | TextualYearMonth | ''): YearUnixTime[] {
     const allYearTimes: YearUnixTime[] = [];
     const range = getStartEndYearMonthRange(startYearMonth, endYearMonth);
 
@@ -494,7 +544,7 @@ export function getAllYearsStartAndEndUnixTimes(startYearMonth: Year0BasedMonth 
     return allYearTimes;
 }
 
-export function getAllFiscalYearsStartAndEndUnixTimes(startYearMonth: Year0BasedMonth | Year1BasedMonth | string, endYearMonth: Year0BasedMonth | Year1BasedMonth | string, fiscalYearStartValue: number): FiscalYearUnixTime[] {
+export function getAllFiscalYearsStartAndEndUnixTimes(startYearMonth: Year0BasedMonth | Year1BasedMonth | TextualYearMonth | '', endYearMonth: Year0BasedMonth | Year1BasedMonth | TextualYearMonth | '', fiscalYearStartValue: number): FiscalYearUnixTime[] {
     // user selects date range: start=2024-01 and end=2026-12
     // result should be 4x FiscalYearUnixTime made up of:
     // - 2024-01->2024-06 (FY 24) - input start year-month->end of fiscal year in which the input start year-month falls
@@ -544,7 +594,7 @@ export function getAllFiscalYearsStartAndEndUnixTimes(startYearMonth: Year0Based
     return allFiscalYearTimes;
 }
 
-export function getAllQuartersStartAndEndUnixTimes(startYearMonth: Year0BasedMonth | Year1BasedMonth | string, endYearMonth: Year0BasedMonth | Year1BasedMonth | string): YearQuarterUnixTime[] {
+export function getAllQuartersStartAndEndUnixTimes(startYearMonth: Year0BasedMonth | Year1BasedMonth | TextualYearMonth | '', endYearMonth: Year0BasedMonth | Year1BasedMonth | TextualYearMonth | ''): YearQuarterUnixTime[] {
     const allYearQuarterTimes: YearQuarterUnixTime[] = [];
     const range = getStartEndYearMonthRange(startYearMonth, endYearMonth);
 
@@ -578,7 +628,7 @@ export function getAllQuartersStartAndEndUnixTimes(startYearMonth: Year0BasedMon
     return allYearQuarterTimes;
 }
 
-export function getAllMonthsStartAndEndUnixTimes(startYearMonth: Year0BasedMonth | Year1BasedMonth | string, endYearMonth: Year0BasedMonth | Year1BasedMonth | string): YearMonthUnixTime[] {
+export function getAllMonthsStartAndEndUnixTimes(startYearMonth: Year0BasedMonth | Year1BasedMonth | TextualYearMonth | '', endYearMonth: Year0BasedMonth | Year1BasedMonth | TextualYearMonth | ''): YearMonthUnixTime[] {
     const allYearMonthTimes: YearMonthUnixTime[] = [];
     const range = getStartEndYearMonthRange(startYearMonth, endYearMonth);
 
@@ -622,16 +672,11 @@ export function getAllDaysStartAndEndUnixTimes(startUnixTime: number, endUnixTim
     let unixTime: number = startUnixTime;
 
     while (unixTime <= endUnixTime) {
-        const currentDay = parseDateFromUnixTime(unixTime);
+        const currentDateTime = parseDateTimeFromUnixTime(unixTime);
         const currentDayMinUnixTime = getDayFirstUnixTimeBySpecifiedUnixTime(unixTime);
         const currentDayMaxUnixTime = getDayLastUnixTimeBySpecifiedUnixTime(unixTime);
 
-        allYearMonthDayTimes.push(YearMonthDayUnixTime.of({
-            year: currentDay.year(),
-            month: currentDay.month() + 1,
-            day: currentDay.date()
-        }, currentDayMinUnixTime, currentDayMaxUnixTime));
-
+        allYearMonthDayTimes.push(YearMonthDayUnixTime.of(currentDateTime.toGregorianCalendarYearMonthDay(), currentDayMinUnixTime, currentDayMaxUnixTime));
         unixTime = currentDayMaxUnixTime + 1;
     }
 
@@ -649,15 +694,15 @@ export function getDateTimeFormatType<T extends DateFormat | TimeFormat>(allForm
 }
 
 export function getShiftedDateRange(minTime: number, maxTime: number, scale: number): TimeRange {
-    const minDateTime = parseDateFromUnixTime(minTime).set({ millisecond: 0 });
-    const maxDateTime = parseDateFromUnixTime(maxTime).set({ millisecond: 999 });
+    const minDateTime = moment.unix(parseDateTimeFromUnixTime(minTime).getUnixTime()).set({ millisecond: 0 });
+    const maxDateTime = moment.unix(parseDateTimeFromUnixTime(maxTime).getUnixTime()).set({ millisecond: 999 });
 
     const firstDayOfMonth = minDateTime.clone().startOf('month');
     const lastDayOfMonth = maxDateTime.clone().endOf('month');
 
     // check whether the date range matches full months
     if (firstDayOfMonth.unix() === minDateTime.unix() && lastDayOfMonth.unix() === maxDateTime.unix()) {
-        const months = getYear(maxDateTime) * 12 + getMonth(maxDateTime) - getYear(minDateTime) * 12 - getMonth(minDateTime) + 1;
+        const months = maxDateTime.year() * 12 + (maxDateTime.month() + 1) - minDateTime.year() * 12 - (minDateTime.month() + 1) + 1;
         const newMinDateTime = minDateTime.add(months * scale, 'months');
         const newMaxDateTime = newMinDateTime.clone().add(months, 'months').subtract(1, 'seconds');
 
@@ -848,7 +893,7 @@ export function getDateRangeByBillingCycleDateType(dateType: number, firstDayOfW
 
     if (dateType === DateRange.PreviousBillingCycle.type || dateType === DateRange.CurrentBillingCycle.type) { // Previous Billing Cycle | Current Billing Cycle
         if (statementDate) {
-            if (getCurrentDay() <= statementDate) {
+            if (getCurrentDateTime().getGregorianCalendarDay() <= statementDate) {
                 maxTime = getThisMonthSpecifiedDayLastUnixTime(statementDate);
                 minTime = getUnixTimeBeforeUnixTime(getUnixTimeAfterUnixTime(getThisMonthSpecifiedDayFirstUnixTime(statementDate), 1, 'days'), 1, 'months');
             } else {
@@ -898,8 +943,8 @@ export function getRecentMonthDateRanges(monthCount: number): RecentMonthDateRan
 
         const maxTime = getUnixTimeBeforeUnixTime(getUnixTimeAfterUnixTime(minTime, 1, 'months'), 1, 'seconds');
         let dateType = DateRange.Custom.type;
-        const year = getYear(parseDateFromUnixTime(minTime));
-        const month = getMonth(parseDateFromUnixTime(minTime));
+        const year = parseDateTimeFromUnixTime(minTime).getGregorianCalendarYear();
+        const month = parseDateTimeFromUnixTime(minTime).getGregorianCalendarMonth();
 
         if (i === 0) {
             dateType = DateRange.ThisMonth.type;
@@ -1004,7 +1049,7 @@ export function getCombinedDateAndTimeValues(date: Date, hour: string, minute: s
     return newDateTime;
 }
 
-export function getValidMonthDayOrCurrentDayShortDate(unixTime: number, currentShortDate: string): string {
+export function getValidMonthDayOrCurrentDayShortDate(unixTime: number, currentShortDate: string): TextualYearMonthDay {
     const currentTime = moment();
     const monthLastTime = moment.unix(getMonthLastUnixTimeBySpecifiedUnixTime(unixTime));
 
@@ -1015,43 +1060,35 @@ export function getValidMonthDayOrCurrentDayShortDate(unixTime: number, currentS
             const currentDay = parseInt(yearMonthDay[2]);
 
             if (currentDay < monthLastTime.date()) {
-                return getShortDate(monthLastTime.set({ date: currentDay }));
+                return MomentDateTime.of(monthLastTime.set({ date: currentDay })).getGregorianCalendarYearDashMonthDashDay();
             }
         }
     }
 
     if (monthLastTime.year() === currentTime.year() && monthLastTime.month() === currentTime.month()) {
-        return getShortDate(currentTime);
+        return MomentDateTime.of(currentTime).getGregorianCalendarYearDashMonthDashDay();
     }
 
-    return getShortDate(monthLastTime);
+    return MomentDateTime.of(monthLastTime).getGregorianCalendarYearDashMonthDashDay();
 }
 
 export function isDateRangeMatchFullYears(minTime: number, maxTime: number): boolean {
-    const minDateTime = parseDateFromUnixTime(minTime).set({ millisecond: 0 });
-    const maxDateTime = parseDateFromUnixTime(maxTime).set({ millisecond: 999 });
-
-    const firstDayOfYear = minDateTime.clone().startOf('year');
-    const lastDayOfYear = maxDateTime.clone().endOf('year');
-
-    return firstDayOfYear.unix() === minDateTime.unix() && lastDayOfYear.unix() === maxDateTime.unix();
+    const minDateTime = parseDateTimeFromUnixTime(minTime);
+    const maxDateTime = parseDateTimeFromUnixTime(maxTime);
+    return MomentDateTime.isYearFirstTime(minDateTime as MomentDateTime) && MomentDateTime.isYearLastTime(maxDateTime as MomentDateTime);
 }
 
 export function isDateRangeMatchFullMonths(minTime: number, maxTime: number): boolean {
-    const minDateTime = parseDateFromUnixTime(minTime).set({ millisecond: 0 });
-    const maxDateTime = parseDateFromUnixTime(maxTime).set({ millisecond: 999 });
-
-    const firstDayOfMonth = minDateTime.clone().startOf('month');
-    const lastDayOfMonth = maxDateTime.clone().endOf('month');
-
-    return firstDayOfMonth.unix() === minDateTime.unix() && lastDayOfMonth.unix() === maxDateTime.unix();
+    const minDateTime = parseDateTimeFromUnixTime(minTime);
+    const maxDateTime = parseDateTimeFromUnixTime(maxTime);
+    return MomentDateTime.isMonthFirstTime(minDateTime as MomentDateTime) && MomentDateTime.isMonthLastTime(maxDateTime as MomentDateTime);
 }
 
 export function isDateRangeMatchOneMonth(minTime: number, maxTime: number): boolean {
-    const minDateTime = parseDateFromUnixTime(minTime);
-    const maxDateTime = parseDateFromUnixTime(maxTime);
+    const minDateTime = parseDateTimeFromUnixTime(minTime);
+    const maxDateTime = parseDateTimeFromUnixTime(maxTime);
 
-    if (getYear(minDateTime) !== getYear(maxDateTime) || getMonth(minDateTime) !== getMonth(maxDateTime)) {
+    if (minDateTime.getGregorianCalendarYear() !== maxDateTime.getGregorianCalendarYear() || minDateTime.getGregorianCalendarMonth() !== maxDateTime.getGregorianCalendarMonth()) {
         return false;
     }
 

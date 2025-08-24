@@ -1,5 +1,27 @@
 import type { TypeAndName, TypeAndDisplayName } from '@/core/base.ts';
 
+export interface DateTime {
+    getUnixTime(): number;
+    getLocalizedCalendarYear(): number;
+    getGregorianCalendarYear(): number;
+    getGregorianCalendarQuarter(): number;
+    getLocalizedCalendarQuarter(): number;
+    getGregorianCalendarMonth(): number;
+    getGregorianCalendarMonthName(): string;
+    getLocalizedCalendarMonth(): number;
+    getGregorianCalendarDay(): number;
+    getLocalizedCalendarDay(): number;
+    getGregorianCalendarYearDashMonthDashDay(): TextualYearMonthDay;
+    getGregorianCalendarYearDashMonth(): TextualYearMonth;
+    getWeekDay(): WeekDay;
+    toGregorianCalendarYearMonthDay(): YearMonthDay;
+    toGregorianCalendarYear0BasedMonth(): Year0BasedMonth;
+    format(format: string): string;
+}
+
+export type TextualYearMonth = `${number}-${number}`;
+export type TextualYearMonthDay = `${number}-${number}-${number}`;
+
 export interface YearQuarter {
     readonly year: number;
     readonly quarter: number;

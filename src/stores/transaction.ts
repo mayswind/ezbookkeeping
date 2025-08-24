@@ -10,7 +10,7 @@ import { useStatisticsStore } from './statistics.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import type { BeforeResolveFunction } from '@/core/base.ts';
-import { DateRange } from '@/core/datetime.ts';
+import { type TextualYearMonth, DateRange } from '@/core/datetime.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
@@ -51,13 +51,7 @@ import {
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
-    parseDateFromUnixTime,
-    getShortDate,
-    getYear,
-    getMonth,
-    getYearAndMonth,
-    getDay,
-    getDayOfWeekName
+    parseDateTimeFromUnixTime
 } from '@/lib/datetime.ts';
 import { getAmountWithDecimalNumberCount } from '@/lib/numeral.ts';
 import { getCurrencyFraction } from '@/lib/currency.ts';
@@ -101,7 +95,7 @@ export interface TransactionTotalAmount {
 export interface TransactionMonthList {
     readonly year: number;
     readonly month: number; // 1-based (1 = January, 12 = December)
-    readonly yearMonth: string;
+    readonly yearDashMonth: TextualYearMonth;
     opened: boolean;
     readonly items: Transaction[];
     readonly totalAmount: TransactionTotalAmount;
@@ -177,10 +171,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 const item = transactionPageWrapper.items[i];
                 fillTransactionObject(item, currentUtcOffset);
 
-                const transactionTime = parseDateFromUnixTime(item.time, item.utcOffset, currentUtcOffset);
-                const transactionYear = getYear(transactionTime);
-                const transactionMonth = getMonth(transactionTime);
-                const transactionYearMonth = getYearAndMonth(transactionTime);
+                const transactionTime = parseDateTimeFromUnixTime(item.time, item.utcOffset, currentUtcOffset);
+                const transactionYear = transactionTime.getGregorianCalendarYear();
+                const transactionMonth = transactionTime.getGregorianCalendarMonth();
+                const transactionYearDashMonth = transactionTime.getGregorianCalendarYearDashMonth();
 
                 if (i === 0 && transactions.value.length > 0) {
                     const lastMonthList = transactions.value[transactions.value.length - 1];
@@ -216,7 +210,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     const monthList: TransactionMonthList = {
                         year: transactionYear,
                         month: transactionMonth,
-                        yearMonth: transactionYearMonth,
+                        yearDashMonth: transactionYearDashMonth,
                         opened: autoExpand,
                         items: [],
                         totalAmount: {
@@ -250,9 +244,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
     function updateTransactionInTransactionList({ transaction, defaultCurrency }: { transaction: Transaction, defaultCurrency: string }): void {
         const currentUtcOffset = getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone);
-        const transactionTime = parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentUtcOffset);
-        const transactionYear = getYear(transactionTime);
-        const transactionMonth = getMonth(transactionTime);
+        const transactionTime = parseDateTimeFromUnixTime(transaction.time, transaction.utcOffset, currentUtcOffset);
+        const transactionYear = transactionTime.getGregorianCalendarYear();
+        const transactionMonth = transactionTime.getGregorianCalendarMonth();
 
         for (let i = 0; i < transactions.value.length; i++) {
             const transactionMonthList = transactions.value[i];
@@ -267,7 +261,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
                     if (transactionYear !== transactionMonthList.year ||
                         transactionMonth !== transactionMonthList.month ||
-                        transaction.day !== transactionMonthList.items[j].day) {
+                        transaction.gregorianCalendarDayOfMonth !== transactionMonthList.items[j].gregorianCalendarDayOfMonth) {
                         transactionListStateInvalid.value = true;
                         return;
                     }
@@ -346,7 +340,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
         for (let i = 0; i < transactionMonthList.items.length; i++) {
             const transaction = transactionMonthList.items[i];
-            const transactionDay = isNumber(transaction.day) ? transaction.day.toString() : '0';
+            const transactionDay = isNumber(transaction.gregorianCalendarDayOfMonth) ? transaction.gregorianCalendarDayOfMonth.toString() : '0';
             let dailyTotalAmount = dailyTotalAmounts[transactionDay];
 
             if (!dailyTotalAmount) {
@@ -450,8 +444,8 @@ export const useTransactionsStore = defineStore('transactions', () => {
             return;
         }
 
-        const transactionTime = parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentUtcOffset);
-        transaction.setDisplayDate(getShortDate(transactionTime), getDay(transactionTime), getDayOfWeekName(transactionTime));
+        const transactionTime = parseDateTimeFromUnixTime(transaction.time, transaction.utcOffset, currentUtcOffset);
+        transaction.setDisplayDate(transactionTime.getGregorianCalendarYearDashMonthDashDay(), transactionTime.getGregorianCalendarDay(), transactionTime.getWeekDay());
 
         if (transaction.sourceAccountId) {
             transaction.setSourceAccount(accountsStore.allAccountsMap[transaction.sourceAccountId]);

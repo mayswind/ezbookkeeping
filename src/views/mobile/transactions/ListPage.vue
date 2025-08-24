@@ -67,7 +67,7 @@
         </f7-toolbar>
 
         <f7-block class="transaction-calendar-container margin-vertical" v-if="pageType === TransactionListPageType.Calendar.type">
-            <vue-date-picker inline auto-apply model-type="yyyy-M-d"
+            <vue-date-picker inline auto-apply model-type="yyyy-MM-dd"
                              month-name-format="long"
                              class="justify-content-center"
                              :config="{ noSwipe: true }"
@@ -174,13 +174,13 @@
         </f7-list>
 
         <f7-block class="combination-list-wrapper margin-vertical" :class="{ 'no-accordion-toggle': pageType !== TransactionListPageType.List.type }"
-                  :key="transactionMonthList.yearMonth" v-for="(transactionMonthList) in transactions">
+                  :key="transactionMonthList.yearDashMonth" v-for="(transactionMonthList) in transactions">
             <f7-accordion-item :opened="transactionMonthList.opened"
                                @accordion:open="collapseTransactionMonthList(transactionMonthList, false)"
                                @accordion:opened="onTransactionMonthListCollapseStateChanged"
                                @accordion:close="collapseTransactionMonthList(transactionMonthList, true)"
                                @accordion:closed="onTransactionMonthListCollapseStateChanged">
-                <f7-block-title :id="getTransactionMonthTitleDomId(transactionMonthList.yearMonth)" v-if="pageType === TransactionListPageType.List.type">
+                <f7-block-title :id="getTransactionMonthTitleDomId(transactionMonthList.yearDashMonth)" v-if="pageType === TransactionListPageType.List.type">
                     <f7-accordion-toggle>
                         <f7-list strong inset dividers media-list
                                  class="transaction-amount-list combination-list-header"
@@ -209,7 +209,7 @@
                               v-if="isTransactionMonthListInvisible(transactionMonthList)" />
                     <f7-list strong inset dividers media-list accordion-list
                              class="transaction-info-list transaction-month-list combination-list-content"
-                             :id="getTransactionMonthListDomId(transactionMonthList.yearMonth)"
+                             :id="getTransactionMonthListDomId(transactionMonthList.yearDashMonth)"
                              v-if="!isTransactionMonthListInvisible(transactionMonthList)"
                     >
                         <f7-list-item swipeout chevron-center accordion-item
@@ -222,10 +222,10 @@
                             <template #media>
                                 <div class="display-flex flex-direction-column transaction-date" :style="getTransactionDateStyle(transaction, idx > 0 ? transactionMonthList.items[idx - 1] : null)">
                                     <span class="transaction-day full-line flex-direction-column">
-                                        {{ transaction.day }}
+                                        {{ transaction.gregorianCalendarDayOfMonth }}
                                     </span>
-                                    <span class="transaction-day-of-week full-line flex-direction-column" v-if="transaction.dayOfWeek">
-                                        {{ getWeekdayShortName(transaction.dayOfWeek) }}
+                                    <span class="transaction-day-of-week full-line flex-direction-column" v-if="transaction.displayDayOfWeek">
+                                        {{ getWeekdayShortName(transaction.displayDayOfWeek) }}
                                     </span>
                                 </div>
                             </template>
@@ -620,9 +620,11 @@ import { type TransactionMonthList, useTransactionsStore } from '@/stores/transa
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { TextDirection } from '@/core/text.ts';
 import {
+    type TextualYearMonth,
+    type Year0BasedMonth,
     type TimeRangeAndDateType,
     DateRangeScene,
-    DateRange,
+    DateRange
 } from '@/core/datetime.ts';
 import { AmountFilterType } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
@@ -635,11 +637,9 @@ import {
 } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
-    parseDateFromUnixTime,
+    parseDateTimeFromUnixTime,
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
-    getYear,
-    getMonth,
     getDayFirstUnixTimeBySpecifiedUnixTime,
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
@@ -731,8 +731,8 @@ const transactionsStore = useTransactionsStore();
 const loadingError = ref<unknown | null>(null);
 const loadingMore = ref<boolean>(false);
 const transactionToDelete = ref<Transaction | null>(null);
-const transactionInvisibleYearMonths = ref<Record<string, boolean>>({});
-const transactionYearMonthListHeights = ref<Record<string, number>>({});
+const transactionInvisibleYearMonths = ref<Record<TextualYearMonth, boolean>>({});
+const transactionYearMonthListHeights = ref<Record<TextualYearMonth, number>>({});
 const showTransactionListPageTypePopover = ref<boolean>(false);
 const showDatePopover = ref<boolean>(false);
 const showCategoryPopover = ref<boolean>(false);
@@ -768,7 +768,7 @@ const transactions = computed<TransactionMonthList[]>(() => {
             for (let i = 0; i < transactionData.items.length; i++) {
                 const transaction = transactionData.items[i];
 
-                if (transaction.date === currentCalendarDate.value) {
+                if (transaction.gregorianCalendarYearDashMonthDashDay === currentCalendarDate.value) {
                     transactions.push(transaction);
                 }
             }
@@ -776,7 +776,7 @@ const transactions = computed<TransactionMonthList[]>(() => {
             const dailyTransactionList: TransactionMonthList = {
                 year: currentMonthTransactionData.value.year,
                 month: currentMonthTransactionData.value.month,
-                yearMonth: currentMonthTransactionData.value.yearMonth,
+                yearDashMonth: currentMonthTransactionData.value.yearDashMonth,
                 opened: true,
                 items: transactions,
                 totalAmount: {
@@ -809,11 +809,11 @@ const noTransaction = computed<boolean>(() => {
 
 const hasMoreTransaction = computed<boolean>(() => transactionsStore.hasMoreTransaction);
 
-function getTransactionMonthTitleDomId(yearMonth: string): string {
+function getTransactionMonthTitleDomId(yearMonth: TextualYearMonth): string {
     return 'transaction_month_title_' + yearMonth;
 }
 
-function getTransactionMonthListDomId(yearMonth: string): string {
+function getTransactionMonthListDomId(yearMonth: TextualYearMonth): string {
     return 'transaction_month_list_' + yearMonth;
 }
 
@@ -822,7 +822,7 @@ function getTransactionDomId(transaction: Transaction): string {
 }
 
 function isTransactionMonthListInvisible(transactionMonthList: TransactionMonthList): boolean {
-    if (!transactionYearMonthListHeights.value[transactionMonthList.yearMonth]) {
+    if (!transactionYearMonthListHeights.value[transactionMonthList.yearDashMonth]) {
         return false;
     }
 
@@ -830,7 +830,7 @@ function isTransactionMonthListInvisible(transactionMonthList: TransactionMonthL
         return true;
     }
 
-    if (transactionInvisibleYearMonths.value[transactionMonthList.yearMonth]) {
+    if (transactionInvisibleYearMonths.value[transactionMonthList.yearDashMonth]) {
         return true;
     }
 
@@ -839,7 +839,7 @@ function isTransactionMonthListInvisible(transactionMonthList: TransactionMonthL
 
 function getTransactionMonthListHeight(transactionMonthList: TransactionMonthList): string {
     if (isTransactionMonthListInvisible(transactionMonthList)) {
-        return transactionYearMonthListHeights.value[transactionMonthList.yearMonth] + 'px';
+        return transactionYearMonthListHeights.value[transactionMonthList.yearDashMonth] + 'px';
     }
 
     return 'auto';
@@ -857,12 +857,12 @@ function setTransactionMonthListHeights(reset: boolean): Promise<unknown> {
 
             for (let i = 0; i < transactions.value.length - 1; i++) {
                 const transactionMonthList = transactions.value[i];
-                const yearMonth = transactionMonthList.yearMonth;
-                const domId = getTransactionMonthListDomId(yearMonth);
+                const yearDashMonth = transactionMonthList.yearDashMonth;
+                const domId = getTransactionMonthListDomId(yearDashMonth);
                 const height = heights[domId];
 
-                if (!transactionYearMonthListHeights.value[yearMonth] && isNumber(height)) {
-                    transactionYearMonthListHeights.value[yearMonth] = height;
+                if (!transactionYearMonthListHeights.value[yearDashMonth] && isNumber(height)) {
+                    transactionYearMonthListHeights.value[yearDashMonth] = height;
                 }
             }
         }
@@ -876,30 +876,30 @@ function setTransactionInvisibleYearMonthList(): void {
 
     for (let i = 0; i < transactions.value.length - 1; i++) {
         const transactionMonthList = transactions.value[i];
-        const yearMonth = transactionMonthList.yearMonth;
+        const yearDashMonth = transactionMonthList.yearDashMonth;
 
-        const titleDomId = getTransactionMonthTitleDomId(yearMonth);
+        const titleDomId = getTransactionMonthTitleDomId(yearDashMonth);
         const titleRect = getElementBoundingRect(`#${titleDomId}`);
 
         if (!titleRect) {
             continue;
         }
 
-        const listHeight = transactionYearMonthListHeights.value[yearMonth] || 0;
+        const listHeight = transactionYearMonthListHeights.value[yearDashMonth] || 0;
         const listRectTop = titleRect.top + titleRect.height;
         const listRectBottom = listRectTop + listHeight;
         const invisible = listRectTop > 2 * window.innerHeight || listRectBottom < -2 * window.innerHeight;
 
         if (invisible) {
-            transactionInvisibleYearMonths.value[yearMonth] = true;
+            transactionInvisibleYearMonths.value[yearDashMonth] = true;
         } else {
-            delete transactionInvisibleYearMonths.value[yearMonth];
+            delete transactionInvisibleYearMonths.value[yearDashMonth];
         }
     }
 }
 
 function getTransactionDateStyle(transaction: Transaction, previousTransaction: Transaction | null): Record<string, string> {
-    if (!previousTransaction || transaction.day !== previousTransaction.day) {
+    if (!previousTransaction || transaction.gregorianCalendarDayOfMonth !== previousTransaction.gregorianCalendarDayOfMonth) {
         return {};
     }
 
@@ -974,9 +974,9 @@ function reload(done?: () => void): void {
         transactionTagsStore.loadAllTags({ force: false })
     ]).then(() => {
         if (queryMonthlyData.value) {
-            const currentMonthMinDate = parseDateFromUnixTime(query.value.minTime);
-            const currentYear = getYear(currentMonthMinDate);
-            const currentMonth = getMonth(currentMonthMinDate);
+            const currentMonthMinDate = parseDateTimeFromUnixTime(query.value.minTime);
+            const currentYear = currentMonthMinDate.getGregorianCalendarYear();
+            const currentMonth = currentMonthMinDate.getGregorianCalendarMonth();
 
             return transactionsStore.loadMonthlyAllTransactions({
                 year: currentYear,
@@ -1159,7 +1159,7 @@ function changeCustomDateFilter(minTime: number, maxTime: number): void {
     }
 }
 
-function changeCustomMonthDateFilter(yearMonth: string): void {
+function changeCustomMonthDateFilter(yearMonth: Year0BasedMonth): void {
     if (!yearMonth) {
         return;
     }
@@ -1466,8 +1466,8 @@ function collapseTransactionMonthList(monthList: TransactionMonthList, collapse:
         collapse: collapse
     });
 
-    if (!collapse && transactionInvisibleYearMonths.value[monthList.yearMonth]) {
-        delete transactionInvisibleYearMonths.value[monthList.yearMonth];
+    if (!collapse && transactionInvisibleYearMonths.value[monthList.yearDashMonth]) {
+        delete transactionInvisibleYearMonths.value[monthList.yearDashMonth];
     }
 }
 

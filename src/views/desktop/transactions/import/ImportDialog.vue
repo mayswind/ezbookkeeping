@@ -936,8 +936,6 @@ import {
 import { generateRandomUUID } from '@/lib/misc.ts';
 import logger from '@/lib/logger.ts';
 import {
-    parseDateFromUnixTime,
-    getUnixTime,
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffsetMinutes
 } from '@/lib/datetime.ts';
@@ -1655,8 +1653,7 @@ function isTagValid(tagIds: string[], tagIndex: number): boolean {
 }
 
 function getDisplayDateTime(transaction: ImportTransaction): string {
-    const transactionTime = getUnixTime(parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value));
-    return formatUnixTimeToLongDateTime(transactionTime);
+    return formatUnixTimeToLongDateTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value);
 }
 
 function getDisplayTimezone(transaction: ImportTransaction): string {

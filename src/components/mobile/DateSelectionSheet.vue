@@ -45,17 +45,17 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useEnvironmentsStore } from '@/stores/environment.ts';
 import { useUserStore } from '@/stores/user.ts';
 
-import { type WeekDayValue } from '@/core/datetime.ts';
+import { type TextualYearMonthDay, type WeekDayValue } from '@/core/datetime.ts';
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
-import { getCurrentYear } from '@/lib/datetime.ts';
+import { getAllowedYearRange } from '@/lib/datetime.ts';
 
 const props = defineProps<{
-    modelValue?: string;
+    modelValue?: TextualYearMonthDay;
     show: boolean;
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: string): void;
+    (e: 'update:modelValue', value: TextualYearMonthDay): void;
     (e: 'update:show', value: boolean): void;
 }>();
 
@@ -64,10 +64,7 @@ const { tt, getAllMinWeekdayNames, getMonthShortName, isLongDateMonthAfterYear }
 const environmentsStore = useEnvironmentsStore();
 const userStore = useUserStore();
 
-const yearRange = ref<number[]>([
-    2000,
-    getCurrentYear() + 1
-]);
+const yearRange = ref<number[]>(getAllowedYearRange());
 const dateTime = ref<string>('');
 
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
@@ -81,7 +78,7 @@ function clear(): void {
 }
 
 function confirm(): void {
-    emit('update:modelValue', dateTime.value);
+    emit('update:modelValue', dateTime.value as TextualYearMonthDay);
     emit('update:show', false);
 }
 

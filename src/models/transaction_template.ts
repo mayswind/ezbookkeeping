@@ -1,3 +1,4 @@
+import { type TextualYearMonthDay } from '@/core/datetime.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { TemplateType } from '@/core/template.ts';
 
@@ -8,13 +9,13 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
     public name: string;
     public scheduledFrequencyType?: number;
     public scheduledFrequency?: string;
-    public scheduledStartDate?: string;
-    public scheduledEndDate?: string;
+    public scheduledStartDate?: TextualYearMonthDay;
+    public scheduledEndDate?: TextualYearMonthDay;
     public scheduledAt?: number;
     public displayOrder: number;
     public hidden: boolean;
 
-    private constructor(id: string, templateType: number, name: string, type: number, categoryId: string, timeZone: string | undefined, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, scheduledFrequencyType: number | undefined, scheduledFrequency: string | undefined, scheduledStartDate: string | undefined, scheduledEndDate: string | undefined, scheduledAt: number | undefined, tagIds: string[], comment: string, editable: boolean, displayOrder: number, hidden: boolean) {
+    private constructor(id: string, templateType: number, name: string, type: number, categoryId: string, timeZone: string | undefined, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, scheduledFrequencyType: number | undefined, scheduledFrequency: string | undefined, scheduledStartDate: TextualYearMonthDay | undefined, scheduledEndDate: TextualYearMonthDay | undefined, scheduledAt: number | undefined, tagIds: string[], comment: string, editable: boolean, displayOrder: number, hidden: boolean) {
         super(id, '', type, categoryId, 0, timeZone, utcOffset, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, editable);
         this.templateType = templateType;
         this.name = name;
@@ -211,8 +212,8 @@ export interface TransactionTemplateInfoResponse extends TransactionInfoResponse
     readonly name: string;
     readonly scheduledFrequencyType?: number;
     readonly scheduledFrequency?: string;
-    readonly scheduledStartDate?: string;
-    readonly scheduledEndDate?: string;
+    readonly scheduledStartDate?: TextualYearMonthDay;
+    readonly scheduledEndDate?: TextualYearMonthDay;
     readonly scheduledAt?: number;
     readonly displayOrder: number;
     readonly hidden: boolean;

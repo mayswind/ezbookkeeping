@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 
 import type {
+    TextualYearMonth,
     Year1BasedMonth,
     TimeRangeAndDateType,
     YearUnixTime,
@@ -18,8 +19,8 @@ import { getAllDateRangesFromItems } from '@/lib/statistics.ts';
 
 export interface CommonMonthlyTrendsChartProps<T extends Year1BasedMonth> {
     items: YearMonthItems<T>[];
-    startYearMonth: string;
-    endYearMonth: string;
+    startYearMonth: TextualYearMonth | '';
+    endYearMonth: TextualYearMonth | '';
     fiscalYearStart: number;
     sortingType: number;
     dateAggregationType: number;

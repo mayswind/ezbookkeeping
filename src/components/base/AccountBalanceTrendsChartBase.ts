@@ -17,7 +17,7 @@ import type { TransactionReconciliationStatementResponseItem } from '@/models/tr
 import { isDefined, isArray } from '@/lib/common.ts';
 import { sumAmounts } from '@/lib/numeral.ts';
 import {
-    getYearAndMonthFromUnixTime,
+    getGregorianCalendarYearAndMonthFromUnixTime,
     getYearFirstUnixTimeBySpecifiedUnixTime,
     getQuarterFirstUnixTimeBySpecifiedUnixTime,
     getMonthFirstUnixTimeBySpecifiedUnixTime,
@@ -99,8 +99,8 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
         if (!isDefined(props.dateAggregationType)) {
             return getAllDaysStartAndEndUnixTimes(dataDateRange.value.minUnixTime, dataDateRange.value.maxUnixTime);
         } else {
-            const startYearMonth = getYearAndMonthFromUnixTime(dataDateRange.value.minUnixTime);
-            const endYearMonth = getYearAndMonthFromUnixTime(dataDateRange.value.maxUnixTime);
+            const startYearMonth = getGregorianCalendarYearAndMonthFromUnixTime(dataDateRange.value.minUnixTime);
+            const endYearMonth = getGregorianCalendarYearAndMonthFromUnixTime(dataDateRange.value.maxUnixTime);
             return getAllDateRangesByYearMonthRange(startYearMonth, endYearMonth, props.fiscalYearStart, props.dateAggregationType);
         }
     });

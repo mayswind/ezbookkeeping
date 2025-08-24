@@ -44,13 +44,13 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useUserStore } from '@/stores/user.ts';
 
-import { type WeekDayValue } from '@/core/datetime.ts';
+import { type TextualYearMonthDay, type WeekDayValue } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
-import { getCurrentYear } from '@/lib/datetime.ts';
+import { getAllowedYearRange } from '@/lib/datetime.ts';
 
 const props = defineProps<{
-    modelValue?: string;
+    modelValue?: TextualYearMonthDay;
     disabled?: boolean;
     readonly?: boolean;
     clearable?: boolean;
@@ -59,22 +59,19 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: string): void;
+    (e: 'update:modelValue', value: TextualYearMonthDay): void;
 }>();
 
 const theme = useTheme();
-const { tt, getAllMinWeekdayNames, getMonthShortName, formatDateToLongDate, isLongDateMonthAfterYear } = useI18n();
+const { tt, getAllMinWeekdayNames, getMonthShortName, formatGregorianCalendarYearDashMonthDashDayToLongDate, isLongDateMonthAfterYear } = useI18n();
 
 const userStore = useUserStore();
 
-const yearRange = ref<number[]>([
-    2000,
-    getCurrentYear() + 1
-]);
+const yearRange = ref<number[]>(getAllowedYearRange());
 
 const dateTime = computed<string>({
     get: () => props.modelValue ?? '',
-    set: (value: string) => emit('update:modelValue', value)
+    set: (value: string) => emit('update:modelValue', value as TextualYearMonthDay)
 });
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
@@ -83,7 +80,7 @@ const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllMi
 const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
 const displayTime = computed<string>(() => {
     if (props.modelValue) {
-        return formatDateToLongDate(props.modelValue);
+        return formatGregorianCalendarYearDashMonthDashDayToLongDate(props.modelValue);
     } else if (props.noDataText) {
         return props.noDataText;
     } else {

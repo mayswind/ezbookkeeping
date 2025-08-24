@@ -23,9 +23,8 @@ import { replaceAll } from '@/lib/common.ts';
 import {
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffsetMinutes,
-    parseDateFromUnixTime,
-    formatUnixTime,
-    getUnixTime
+    parseDateTimeFromUnixTime,
+    formatUnixTime
 } from '@/lib/datetime.ts';
 
 export function useReconciliationStatementPageBase() {
@@ -132,8 +131,7 @@ export function useReconciliationStatementPageBase() {
     }
 
     function getDisplayDateTime(transaction: TransactionReconciliationStatementResponseItem): string {
-        const transactionTime = getUnixTime(parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value));
-        return formatUnixTimeToLongDateTime(transactionTime);
+        return formatUnixTimeToLongDateTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value);
     }
 
     function getDisplayDate(transaction: TransactionReconciliationStatementResponseItem): string {
@@ -210,7 +208,7 @@ export function useReconciliationStatementPageBase() {
 
         const transactions = reconciliationStatements.value?.transactions ?? [];
         const rows = transactions.map(transaction => {
-            const transactionTime = getUnixTime(parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value));
+            const transactionTime = parseDateTimeFromUnixTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value).getUnixTime();
             const type = getDisplayTransactionType(transaction);
             let categoryName = allCategoriesMap.value[transaction.categoryId]?.name || '';
             let displayAmount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.sourceAmount);

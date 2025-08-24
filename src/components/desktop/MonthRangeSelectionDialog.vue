@@ -71,6 +71,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { type CommonMonthRangeSelectionProps, useMonthRangeSelectionBase } from '@/components/base/MonthRangeSelectionBase.ts';
 
 import { ThemeType } from '@/core/theme.ts';
+import { type TextualYearMonth } from '@/core/datetime.ts';
 
 interface DesktopMonthRangeSelectionProps extends CommonMonthRangeSelectionProps {
     persistent?: boolean;
@@ -79,7 +80,7 @@ interface DesktopMonthRangeSelectionProps extends CommonMonthRangeSelectionProps
 const props = defineProps<DesktopMonthRangeSelectionProps>();
 const emit = defineEmits<{
     (e: 'update:show', value: boolean): void;
-    (e: 'dateRange:change', minYearMonth: string, maxYearMonth: string): void;
+    (e: 'dateRange:change', minYearMonth: TextualYearMonth | '', maxYearMonth: TextualYearMonth | ''): void;
     (e: 'error', message: string): void;
 }>();
 

@@ -125,7 +125,7 @@ import { useSettingsStore } from '@/stores/setting.ts';
 
 import { TextDirection } from '@/core/text.ts';
 import { FontSize } from '@/core/font.ts';
-import { getLocalDatetimeFromUnixTime, getCurrentUnixTime, getDay, getDayOfWeekName } from '@/lib/datetime.ts';
+import { parseDateTimeFromUnixTime, getCurrentUnixTime } from '@/lib/datetime.ts';
 import { setAppFontSize, getFontSizePreviewClassName } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{
@@ -149,8 +149,8 @@ const fontSize = ref<number>(settingsStore.appSettings.fontSize);
 const textDirection = computed<string>(() => getCurrentLanguageTextDirection());
 const fontSizePreviewClassName = computed<string>(() => getFontSizePreviewClassName(fontSize.value));
 const currentLongYearMonth = computed<string>(() => formatUnixTimeToLongYearMonth(currentUnixTime.value));
-const currentDayOfMonth = computed<number>(() => getDay(getLocalDatetimeFromUnixTime(currentUnixTime.value)));
-const currentDayOfWeek = computed<string>(() => getWeekdayShortName(getDayOfWeekName(getLocalDatetimeFromUnixTime(currentUnixTime.value))));
+const currentDayOfMonth = computed<number>(() => parseDateTimeFromUnixTime(currentUnixTime.value).getLocalizedCalendarDay());
+const currentDayOfWeek = computed<string>(() => getWeekdayShortName(parseDateTimeFromUnixTime(currentUnixTime.value).getWeekDay()));
 const currentShortTime = computed<string>(() => formatUnixTimeToShortTime(currentUnixTime.value));
 
 function getFontSizeName(): string {

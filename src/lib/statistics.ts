@@ -1,4 +1,4 @@
-import type { Year1BasedMonth, YearUnixTime, YearQuarterUnixTime, YearMonthUnixTime } from '@/core/datetime.ts';
+import type { TextualYearMonth, Year1BasedMonth, YearUnixTime, YearQuarterUnixTime, YearMonthUnixTime } from '@/core/datetime.ts';
 import type { FiscalYearUnixTime } from '@/core/fiscalyear.ts';
 import { ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
 import type {
@@ -48,7 +48,7 @@ export function sortStatisticsItems<T extends SortableTransactionStatisticDataIt
     }
 }
 
-export function getAllDateRangesFromItems<T extends Year1BasedMonth>(items: YearMonthItems<T>[], startYearMonth: Year1BasedMonth | string, endYearMonth: Year1BasedMonth | string, fiscalYearStart: number, dateAggregationType: number): YearUnixTime[] | FiscalYearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] {
+export function getAllDateRangesFromItems<T extends Year1BasedMonth>(items: YearMonthItems<T>[], startYearMonth: Year1BasedMonth | TextualYearMonth | '', endYearMonth: Year1BasedMonth | TextualYearMonth | '', fiscalYearStart: number, dateAggregationType: number): YearUnixTime[] | FiscalYearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] {
     if ((!startYearMonth || !endYearMonth) && items && items.length) {
         let minYear = Number.MAX_SAFE_INTEGER, minMonth = Number.MAX_SAFE_INTEGER, maxYear = 0, maxMonth = 0;
 
@@ -70,14 +70,14 @@ export function getAllDateRangesFromItems<T extends Year1BasedMonth>(items: Year
             }
         }
 
-        startYearMonth = `${minYear}-${minMonth}`;
-        endYearMonth = `${maxYear}-${maxMonth}`;
+        startYearMonth = `${minYear}-${minMonth}` as TextualYearMonth;
+        endYearMonth = `${maxYear}-${maxMonth}` as TextualYearMonth;
     }
 
     return getAllDateRangesByYearMonthRange(startYearMonth, endYearMonth, fiscalYearStart, dateAggregationType);
 }
 
-export function getAllDateRangesByYearMonthRange(startYearMonth: Year1BasedMonth | string, endYearMonth: Year1BasedMonth | string, fiscalYearStart: number, dateAggregationType: number): YearUnixTime[] | FiscalYearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] {
+export function getAllDateRangesByYearMonthRange(startYearMonth: Year1BasedMonth | TextualYearMonth | '', endYearMonth: Year1BasedMonth | TextualYearMonth | '', fiscalYearStart: number, dateAggregationType: number): YearUnixTime[] | FiscalYearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] {
     if (!startYearMonth || !endYearMonth) {
         return [];
     }

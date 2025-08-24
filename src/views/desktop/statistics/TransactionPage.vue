@@ -358,7 +358,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { type TransactionStatisticsPartialFilter, useStatisticsStore } from '@/stores/statistics.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
-import { type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
+import { type TextualYearMonth, type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
 import {
     StatisticsAnalysisType,
@@ -375,7 +375,7 @@ import {
     arrayItemToObjectField
 } from '@/lib/common.ts';
 import {
-    getYearAndMonthFromUnixTime,
+    getGregorianCalendarYearAndMonthFromUnixTime,
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
     getShiftedDateRangeAndDateType,
@@ -407,8 +407,8 @@ interface TransactionStatisticsProps {
     initChartDataType?: string,
     initChartType?: string,
     initChartDateType?: string,
-    initStartTime?: string,
-    initEndTime?: string,
+    initStartTime?: TextualYearMonth | '',
+    initEndTime?: TextualYearMonth | '',
     initFilterAccountIds?: string,
     initFilterCategoryIds?: string,
     initTagIds?: string,
@@ -814,8 +814,8 @@ function setDateFilter(dateType: number): void {
     } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
         changed = statisticsStore.updateTransactionStatisticsFilter({
             trendChartDateType: dateRange.dateType,
-            trendChartStartYearMonth: getYearAndMonthFromUnixTime(dateRange.minTime),
-            trendChartEndYearMonth: getYearAndMonthFromUnixTime(dateRange.maxTime)
+            trendChartStartYearMonth: getGregorianCalendarYearAndMonthFromUnixTime(dateRange.minTime),
+            trendChartEndYearMonth: getGregorianCalendarYearAndMonthFromUnixTime(dateRange.maxTime)
         });
     }
 
@@ -826,7 +826,7 @@ function setDateFilter(dateType: number): void {
     }
 }
 
-function setCustomDateFilter(startTime: number | string, endTime: number | string): void {
+function setCustomDateFilter(startTime: number | TextualYearMonth, endTime: number | TextualYearMonth): void {
     if (!startTime || !endTime) {
         return;
     }
@@ -882,8 +882,8 @@ function shiftDateRange(scale: number): void {
 
         changed = statisticsStore.updateTransactionStatisticsFilter({
             trendChartDateType: newDateRange.dateType,
-            trendChartStartYearMonth: getYearAndMonthFromUnixTime(newDateRange.minTime),
-            trendChartEndYearMonth: getYearAndMonthFromUnixTime(newDateRange.maxTime)
+            trendChartStartYearMonth: getGregorianCalendarYearAndMonthFromUnixTime(newDateRange.minTime),
+            trendChartEndYearMonth: getGregorianCalendarYearAndMonthFromUnixTime(newDateRange.maxTime)
         });
     }
 
@@ -992,8 +992,8 @@ onBeforeRouteUpdate((to) => {
             initChartDataType: (to.query['chartDataType'] as string | null) || undefined,
             initChartType: (to.query['chartType'] as string | null) || undefined,
             initChartDateType: (to.query['chartDateType'] as string | null) || undefined,
-            initStartTime: (to.query['startTime'] as string | null) || undefined,
-            initEndTime: (to.query['endTime'] as string | null) || undefined,
+            initStartTime: (to.query['startTime'] as TextualYearMonth | null) || undefined,
+            initEndTime: (to.query['endTime'] as TextualYearMonth | null) || undefined,
             initFilterAccountIds: (to.query['filterAccountIds'] as string | null) || undefined,
             initFilterCategoryIds: (to.query['filterCategoryIds'] as string | null) || undefined,
             initTagIds: (to.query['tagIds'] as string | null) || undefined,

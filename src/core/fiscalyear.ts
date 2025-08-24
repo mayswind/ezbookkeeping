@@ -1,4 +1,4 @@
-import type { UnixTimeRange } from './datetime.ts';
+import type { TextualYearMonth, UnixTimeRange } from './datetime.ts';
 
 export class FiscalYearStart {
     public static readonly JanuaryFirstDay = new FiscalYearStart(1, 1);
@@ -75,8 +75,8 @@ export class FiscalYearStart {
         return FiscalYearStart.of(month, day);
     }
 
-    public toMonthDashDayString(): string {
-        return `${this.month.toString().padStart(2, '0')}-${this.day.toString().padStart(2, '0')}`;
+    public toMonthDashDayString(): TextualYearMonth {
+        return `${this.month.toString().padStart(2, '0')}-${this.day.toString().padStart(2, '0')}` as TextualYearMonth;
     }
 
     private static isValidFiscalYearMonthDay(month: number, day: number): boolean {

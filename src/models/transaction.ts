@@ -1,5 +1,5 @@
 import type { PartialRecord } from '@/core/base.ts';
-import type { Year1BasedMonth, StartEndTime } from '@/core/datetime.ts';
+import type { Year1BasedMonth, TextualYearMonthDay, StartEndTime, WeekDay } from '@/core/datetime.ts';
 import { type Coordinate, getNormalizedCoordinate } from '@/core/coordinate.ts';
 import { TransactionType } from '@/core/transaction.ts';
 
@@ -35,9 +35,9 @@ export class Transaction implements TransactionInfoResponse {
     private _destinationAccount?: Account; // only for displaying transaction
     private _tags?: TransactionTag[]; // only for displaying transaction
 
-    private _date?: string = undefined; // only for displaying transaction in transaction list
-    private _day?: number = undefined; // only for displaying transaction in transaction list
-    private _dayOfWeek?: string = undefined; // only for displaying transaction in transaction list
+    private _gregorianCalendarYearDashMonthDashDay?: TextualYearMonthDay = undefined; // only for displaying transaction in transaction list
+    private _gregorianCalendarDayOfMonth?: number = undefined; // only for displaying transaction in transaction list
+    private _displayDayOfWeek?: WeekDay = undefined; // only for displaying transaction in transaction list
 
     protected constructor(id: string, timeSequenceId: string, type: number, categoryId: string, time: number, timeZone: string | undefined, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, tagIds: string[], comment: string, editable: boolean) {
         this.id = id;
@@ -106,16 +106,16 @@ export class Transaction implements TransactionInfoResponse {
         return ret;
     }
 
-    public get date(): string | undefined {
-        return this._date;
+    public get gregorianCalendarYearDashMonthDashDay(): TextualYearMonthDay | undefined {
+        return this._gregorianCalendarYearDashMonthDashDay;
     }
 
-    public get day(): number | undefined {
-        return this._day;
+    public get gregorianCalendarDayOfMonth(): number | undefined {
+        return this._gregorianCalendarDayOfMonth;
     }
 
-    public get dayOfWeek(): string | undefined {
-        return this._dayOfWeek;
+    public get displayDayOfWeek(): WeekDay | undefined {
+        return this._displayDayOfWeek;
     }
 
     public getCategoryId(): string {
@@ -220,10 +220,10 @@ export class Transaction implements TransactionInfoResponse {
         this._geoLocation = undefined;
     }
 
-    public setDisplayDate(date: string, day: number, dayOfWeek: string): void {
-        this._date = date;
-        this._day = day;
-        this._dayOfWeek = dayOfWeek;
+    public setDisplayDate(gregorianCalendarYearDashMonthDashDay: TextualYearMonthDay, gregorianCalendarDayOfMonth: number, displayDayOfWeek: WeekDay): void {
+        this._gregorianCalendarYearDashMonthDashDay = gregorianCalendarYearDashMonthDashDay;
+        this._gregorianCalendarDayOfMonth = gregorianCalendarDayOfMonth;
+        this._displayDayOfWeek = displayDayOfWeek;
     }
 
     public toCreateRequest(clientSessionId: string, actualTime?: number): TransactionCreateRequest {

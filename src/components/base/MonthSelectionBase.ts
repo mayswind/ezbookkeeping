@@ -4,9 +4,7 @@ import type { Year0BasedMonth } from '@/core/datetime.ts';
 
 import {
     getYear0BasedMonthObjectFromUnixTime,
-    getYear0BasedMonthObjectFromString,
-    getYearMonthStringFromYear0BasedMonthObject,
-    getCurrentYear,
+    getAllowedYearRange,
     getThisMonthFirstUnixTime
 } from '@/lib/datetime.ts';
 
@@ -18,7 +16,7 @@ export interface MonthSelectionValue {
 }
 
 export interface CommonMonthSelectionProps {
-    modelValue?: string;
+    modelValue?: Year0BasedMonth;
     title?: string;
     hint?: string;
     show: boolean;
@@ -28,11 +26,7 @@ function getYearMonthValueFromProps(props: CommonMonthSelectionProps): MonthSele
     let value: Year0BasedMonth = getYear0BasedMonthObjectFromUnixTime(getThisMonthFirstUnixTime());
 
     if (props.modelValue) {
-        const yearMonth = getYear0BasedMonthObjectFromString(props.modelValue);
-
-        if (yearMonth) {
-            value = yearMonth;
-        }
+        value = props.modelValue;
     }
 
     return {
@@ -44,29 +38,23 @@ function getYearMonthValueFromProps(props: CommonMonthSelectionProps): MonthSele
 export function useMonthSelectionBase(props: CommonMonthSelectionProps) {
     const { isLongDateMonthAfterYear } = useI18n();
 
-    const yearRange = ref<number[]>([
-        2000,
-        getCurrentYear() + 1
-    ]);
-
+    const yearRange = ref<number[]>(getAllowedYearRange());
     const monthValue = ref<MonthSelectionValue>(getYearMonthValueFromProps(props));
 
     const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
 
-    function getMonthSelectionValue(yearMonth: string): MonthSelectionValue | null {
-        const yearMonthObj = getYear0BasedMonthObjectFromString(yearMonth);
-
-        if (!yearMonthObj) {
+    function getMonthSelectionValue(yearMonth: Year0BasedMonth): MonthSelectionValue | null {
+        if (!yearMonth) {
             return null;
         }
 
         return {
-            year: yearMonthObj.year,
-            month: yearMonthObj.month0base
+            year: yearMonth.year,
+            month: yearMonth.month0base
         };
     }
 
-    function getTextualYearMonth(): string | null {
+    function getYear0BasedMonth(): Year0BasedMonth | null {
         if (!monthValue.value) {
             return null;
         }
@@ -75,10 +63,10 @@ export function useMonthSelectionBase(props: CommonMonthSelectionProps) {
             throw new Error('Date is too early');
         }
 
-        return getYearMonthStringFromYear0BasedMonthObject({
+        return {
             year: monthValue.value.year,
             month0base: monthValue.value.month
-        });
+        };
     }
 
     return {
@@ -89,6 +77,6 @@ export function useMonthSelectionBase(props: CommonMonthSelectionProps) {
         isYearFirst,
         // functions
         getMonthSelectionValue,
-        getTextualYearMonth
+        getYear0BasedMonth
     };
 }

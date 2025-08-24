@@ -344,7 +344,7 @@ import { useStatisticsStore } from '@/stores/statistics.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { TextDirection } from '@/core/text.ts';
-import { type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
+import { type TextualYearMonth, type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import {
     StatisticsAnalysisType,
     CategoricalChartType,
@@ -355,7 +355,7 @@ import {
 
 import { isString, isNumber } from '@/lib/common.ts';
 import {
-    getYearAndMonthFromUnixTime,
+    getGregorianCalendarYearAndMonthFromUnixTime,
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
     getShiftedDateRangeAndDateType,
@@ -626,8 +626,8 @@ function setDateFilter(dateType: number): void {
     } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
         changed = statisticsStore.updateTransactionStatisticsFilter({
             trendChartDateType: dateRange.dateType,
-            trendChartStartYearMonth: getYearAndMonthFromUnixTime(dateRange.minTime),
-            trendChartEndYearMonth: getYearAndMonthFromUnixTime(dateRange.maxTime)
+            trendChartStartYearMonth: getGregorianCalendarYearAndMonthFromUnixTime(dateRange.minTime),
+            trendChartEndYearMonth: getGregorianCalendarYearAndMonthFromUnixTime(dateRange.maxTime)
         });
     }
 
@@ -638,7 +638,7 @@ function setDateFilter(dateType: number): void {
     }
 }
 
-function setCustomDateFilter(startTime: number | string, endTime: number | string): void {
+function setCustomDateFilter(startTime: number | TextualYearMonth, endTime: number | TextualYearMonth): void {
     if (!startTime || !endTime) {
         return;
     }
@@ -692,8 +692,8 @@ function shiftDateRange(scale: number): void {
 
         changed = statisticsStore.updateTransactionStatisticsFilter({
             trendChartDateType: newDateRange.dateType,
-            trendChartStartYearMonth: getYearAndMonthFromUnixTime(newDateRange.minTime),
-            trendChartEndYearMonth: getYearAndMonthFromUnixTime(newDateRange.maxTime)
+            trendChartStartYearMonth: getGregorianCalendarYearAndMonthFromUnixTime(newDateRange.minTime),
+            trendChartEndYearMonth: getGregorianCalendarYearAndMonthFromUnixTime(newDateRange.maxTime)
         });
     }
 

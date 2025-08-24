@@ -41,7 +41,7 @@ function getFiscalYearStartFromProps(props: CommonFiscalYearStartSelectionProps)
 export function useFiscalYearStartSelectionBase(props: CommonFiscalYearStartSelectionProps) {
     const {
         getAllMinWeekdayNames,
-        formatMonthDayToLongDay
+        formatGregorianCalendarMonthDashDayToLongMonthDay
     } = useI18n();
 
     const userStore = useUserStore();
@@ -81,7 +81,7 @@ export function useFiscalYearStartSelectionBase(props: CommonFiscalYearStartSele
             fiscalYearStart = FiscalYearStart.Default;
         }
 
-        return formatMonthDayToLongDay(fiscalYearStart.toMonthDashDayString());
+        return formatGregorianCalendarMonthDashDayToLongMonthDay(fiscalYearStart.toMonthDashDayString());
     });
 
     const allowedMinDate = computed<Date>(() => getLocalDatetimeFromUnixTime(getThisYearFirstUnixTime()));

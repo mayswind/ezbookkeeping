@@ -10,7 +10,7 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { type TransactionListFilter, type TransactionMonthList, useTransactionsStore } from '@/stores/transaction.ts';
 
 import type { TypeAndName } from '@/core/base.ts';
-import { type LocalizedDateRange, type WeekDayValue, DateRange, DateRangeScene } from '@/core/datetime.ts';
+import { type TextualYearMonthDay, type Year0BasedMonth, type LocalizedDateRange, type WeekDayValue, DateRange, DateRangeScene } from '@/core/datetime.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
@@ -28,14 +28,10 @@ import {
     getLocalDatetimeFromUnixTime,
     getActualUnixTimeForStore,
     getDummyUnixTimeForLocalUsage,
-    getCurrentYearAndMonth,
-    parseDateFromUnixTime,
-    getYearAndMonth,
-    getYear,
-    getMonth,
+    getCurrentDateTime,
+    parseDateTimeFromUnixTime,
     getYearMonthFirstUnixTime,
-    getDay,
-    getUnixTime,
+    getUnixTimeFromLocalDatetime,
     isDateRangeMatchOneMonth
 } from '@/lib/datetime.ts';
 
@@ -99,7 +95,7 @@ export function useTransactionListPageBase() {
     const loading = ref<boolean>(true);
     const customMinDatetime = ref<number>(0);
     const customMaxDatetime = ref<number>(0);
-    const currentCalendarDate = ref<string>('');
+    const currentCalendarDate = ref<TextualYearMonthDay | ''>('');
 
     const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
     const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
@@ -175,12 +171,12 @@ export function useTransactionListPageBase() {
     const queryMinTime = computed<string>(() => formatUnixTimeToLongDateTime(query.value.minTime));
     const queryMaxTime = computed<string>(() => formatUnixTimeToLongDateTime(query.value.maxTime));
     const queryMonthlyData = computed<boolean>(() => isDateRangeMatchOneMonth(query.value.minTime, query.value.maxTime));
-    const queryMonth = computed<string>(() => {
+    const queryMonth = computed<Year0BasedMonth>(() => {
         if (!query.value.minTime || !query.value.maxTime) {
-            return getCurrentYearAndMonth();
+            return getCurrentDateTime().toGregorianCalendarYear0BasedMonth();
         }
 
-        return getYearAndMonth(parseDateFromUnixTime(query.value.minTime));
+        return parseDateTimeFromUnixTime(query.value.minTime).toGregorianCalendarYear0BasedMonth();
     });
 
     const queryAllFilterCategoryIds = computed<Record<string, boolean>>(() => transactionsStore.allFilterCategoryIds);
@@ -248,9 +244,9 @@ export function useTransactionListPageBase() {
             return null;
         }
 
-        const currentMonthMinDate = parseDateFromUnixTime(query.value.minTime);
-        const currentYear = getYear(currentMonthMinDate);
-        const currentMonth = getMonth(currentMonthMinDate);
+        const currentMonthMinDate = parseDateTimeFromUnixTime(query.value.minTime);
+        const currentYear = currentMonthMinDate.getGregorianCalendarYear();
+        const currentMonth = currentMonthMinDate.getGregorianCalendarMonth();
 
         for (let i = 0; i < allTransactions.length; i++) {
             if (allTransactions[i].year === currentYear && allTransactions[i].month === currentMonth) {
@@ -262,8 +258,8 @@ export function useTransactionListPageBase() {
     });
 
     function noTransactionInMonthDay(date: Date): boolean {
-        const dateTime = parseDateFromUnixTime(getActualUnixTimeForStore(getUnixTime(date), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
-        return !currentMonthTransactionData.value || !currentMonthTransactionData.value.dailyTotalAmounts || !currentMonthTransactionData.value.dailyTotalAmounts[getDay(dateTime)];
+        const dateTime = parseDateTimeFromUnixTime(getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(date), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+        return !currentMonthTransactionData.value || !currentMonthTransactionData.value.dailyTotalAmounts || !currentMonthTransactionData.value.dailyTotalAmounts[dateTime.getGregorianCalendarDay()];
     }
 
     const canAddTransaction = computed<boolean>(() => {
@@ -291,12 +287,11 @@ export function useTransactionListPageBase() {
     }
 
     function getDisplayLongDate(transaction: Transaction): string {
-        const transactionTime = getUnixTime(parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value));
-        return formatUnixTimeToLongDate(transactionTime);
+        return formatUnixTimeToLongDate(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value);
     }
 
     function getDisplayLongYearMonth(transactionMonthList: TransactionMonthList): string {
-        return formatUnixTimeToLongYearMonth(getYearMonthFirstUnixTime(transactionMonthList.yearMonth));
+        return formatUnixTimeToLongYearMonth(getYearMonthFirstUnixTime(transactionMonthList.yearDashMonth));
     }
 
     function getDisplayTimezone(transaction: Transaction): string {

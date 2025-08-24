@@ -4,9 +4,9 @@ import { type TimeRangeAndDateType, type PresetDateRange, type UnixTimeRange, ty
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
-    getCurrentYear,
-    getUnixTime,
+    getAllowedYearRange,
     getLocalDatetimeFromUnixTime,
+    getUnixTimeFromLocalDatetime,
     getTodayFirstUnixTime,
     getDummyUnixTimeForLocalUsage,
     getActualUnixTimeForStore,
@@ -50,10 +50,7 @@ export function useDateRangeSelectionBase(props: CommonDateRangeSelectionProps) 
     const userStore = useUserStore();
     const { minDate, maxDate } = getDateRangeFromProps(props);
 
-    const yearRange = ref<number[]>([
-        2000,
-        getCurrentYear() + 1
-    ]);
+    const yearRange = ref<number[]>(getAllowedYearRange());
 
     const dateRange = ref<Date[]>([
         getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(minDate, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())),
@@ -65,11 +62,11 @@ export function useDateRangeSelectionBase(props: CommonDateRangeSelectionProps) 
     const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
     const is24Hour = computed<boolean>(() => isLongTime24HourFormat());
     const beginDateTime = computed<string>(() => {
-        const actualBeginUnixTime = getActualUnixTimeForStore(getUnixTime(dateRange.value[0]), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
+        const actualBeginUnixTime = getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(dateRange.value[0]), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
         return formatUnixTimeToLongDateTime(actualBeginUnixTime);
     });
     const endDateTime = computed<string>(() => {
-        const actualEndUnixTime = getActualUnixTimeForStore(getUnixTime(dateRange.value[1]), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
+        const actualEndUnixTime = getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(dateRange.value[1]), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
         return formatUnixTimeToLongDateTime(actualEndUnixTime);
     });
     const presetRanges = computed<PresetDateRange[]>(() => {
@@ -108,8 +105,8 @@ export function useDateRangeSelectionBase(props: CommonDateRangeSelectionProps) 
         const currentMinDate = dateRange.value[0];
         const currentMaxDate = dateRange.value[1];
 
-        let minUnixTime = getUnixTime(currentMinDate);
-        let maxUnixTime = getUnixTime(currentMaxDate);
+        let minUnixTime = getUnixTimeFromLocalDatetime(currentMinDate);
+        let maxUnixTime = getUnixTimeFromLocalDatetime(currentMaxDate);
 
         if (minUnixTime < 0 || maxUnixTime < 0) {
             throw new Error('Date is too early');

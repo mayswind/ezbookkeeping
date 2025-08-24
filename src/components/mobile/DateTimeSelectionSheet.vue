@@ -132,7 +132,7 @@ import {
     getLocalDatetimeFromUnixTime,
     getActualUnixTimeForStore,
     getCurrentUnixTime,
-    getUnixTime,
+    getUnixTimeFromLocalDatetime,
     getAMOrPM,
     getCombinedDateAndTimeValues
 } from '@/lib/datetime.ts';
@@ -225,7 +225,7 @@ const currentSecond = computed<string>({
 });
 
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
-const displayTime = computed<string>(() => formatUnixTimeToLongDateTime(getActualUnixTimeForStore(getUnixTime(dateTime.value), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())));
+const displayTime = computed<string>(() => formatUnixTimeToLongDateTime(getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(dateTime.value), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())));
 const switchButtonTitle = computed<string>(() => mode.value === 'time' ? 'Date' : 'Time');
 
 function switchMode(): void {
@@ -249,7 +249,7 @@ function confirm(): void {
         return;
     }
 
-    const unixTime = getUnixTime(dateTime.value);
+    const unixTime = getUnixTimeFromLocalDatetime(dateTime.value);
 
     if (unixTime < 0) {
         showToast('Date is too early');

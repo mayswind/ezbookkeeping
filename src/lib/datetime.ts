@@ -104,6 +104,20 @@ export function isPM(hour: number): boolean {
     }
 }
 
+export function isUnixTimeYearMonthDayEquals(unixTime1: number, unixTime2: number): boolean {
+    const date1 = moment.unix(unixTime1);
+    const date2 = moment.unix(unixTime2);
+
+    return date1.year() === date2.year() && date1.month() === date2.month() && date1.date() === date2.date();
+}
+
+export function isUnixTimeYearMonthDayHourEquals(unixTime1: number, unixTime2: number): boolean {
+    const date1 = moment.unix(unixTime1);
+    const date2 = moment.unix(unixTime2);
+
+    return date1.year() === date2.year() && date1.month() === date2.month() && date1.date() === date2.date() && date1.hour() === date2.hour();
+}
+
 export function getUtcOffsetByUtcOffsetMinutes(utcOffsetMinutes: number): string {
     const offsetHours = Math.trunc(Math.abs(utcOffsetMinutes) / 60);
     const offsetMinutes = Math.abs(utcOffsetMinutes) - offsetHours * 60;

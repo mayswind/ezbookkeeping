@@ -10,7 +10,11 @@ import type {
 } from '@/models/exchange_rate.ts';
 
 import { isEquals } from '@/lib/common.ts';
-import { getCurrentUnixTime, formatUnixTime } from '@/lib/datetime.ts';
+import {
+    isUnixTimeYearMonthDayEquals,
+    isUnixTimeYearMonthDayHourEquals,
+    getCurrentUnixTime
+} from '@/lib/datetime.ts';
 import { getExchangedAmountByRate } from '@/lib/numeral.ts';
 
 import logger from '@/lib/logger.ts';
@@ -128,13 +132,11 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
         const now = getCurrentUnixTime();
 
         if (!force) {
-            if (currentExchangeRateData && currentExchangeRateData.time && currentExchangeRateData.data &&
-                formatUnixTime(currentExchangeRateData.data.updateTime, 'YYYY-MM-DD') === formatUnixTime(now, 'YYYY-MM-DD')) {
+            if (currentExchangeRateData && currentExchangeRateData.time && currentExchangeRateData.data && isUnixTimeYearMonthDayEquals(currentExchangeRateData.data.updateTime, now)) {
                 return Promise.resolve(currentExchangeRateData.data);
             }
 
-            if (currentExchangeRateData && currentExchangeRateData.time && currentExchangeRateData.data &&
-                formatUnixTime(currentExchangeRateData.time, 'YYYY-MM-DD HH') === formatUnixTime(now, 'YYYY-MM-DD HH')) {
+            if (currentExchangeRateData && currentExchangeRateData.time && currentExchangeRateData.data && isUnixTimeYearMonthDayHourEquals(currentExchangeRateData.time, now)) {
                 return Promise.resolve(currentExchangeRateData.data);
             }
         }

@@ -7,13 +7,24 @@ export interface DateTime {
     getGregorianCalendarQuarter(): number;
     getLocalizedCalendarQuarter(): number;
     getGregorianCalendarMonth(): number;
-    getGregorianCalendarMonthName(): string;
+    getGregorianCalendarMonthDisplayName(): string;
+    getGregorianCalendarMonthDisplayShortName(): string;
     getLocalizedCalendarMonth(): number;
+    getLocalizedCalendarMonthDisplayName(): string;
+    getLocalizedCalendarMonthDisplayShortName(): string;
     getGregorianCalendarDay(): number;
     getLocalizedCalendarDay(): number;
     getGregorianCalendarYearDashMonthDashDay(): TextualYearMonthDay;
     getGregorianCalendarYearDashMonth(): TextualYearMonth;
     getWeekDay(): WeekDay;
+    getWeekDayDisplayName(): string
+    getWeekDayDisplayShortName(): string;
+    getWeekDayDisplayMinName(): string;
+    getHour(): number;
+    getMinute(): number;
+    getSecond(): number;
+    getDisplayAMPM(): string;
+    getTimezoneUtcOffsetMinutes(): number;
     toGregorianCalendarYearMonthDay(): YearMonthDay;
     toGregorianCalendarYear0BasedMonth(): Year0BasedMonth;
     format(format: string): string;

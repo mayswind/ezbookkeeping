@@ -61,7 +61,7 @@ const emit = defineEmits<{
     (e: 'click', event: MonthlyIncomeAndExpenseCardClickEvent): void;
 }>();
 
-const { tt, getCurrentLanguageTextDirection, getMonthShortName, formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
+const { tt, getCurrentLanguageTextDirection, formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
 
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
@@ -97,9 +97,9 @@ const chartOptions = computed<object>(() => {
     if (props.data) {
         for (let i = 0; i < props.data.length; i++) {
             const item = props.data[i];
-            const month = parseDateTimeFromUnixTime(item.monthStartTime).getGregorianCalendarMonthName();
+            const monthShortName = parseDateTimeFromUnixTime(item.monthStartTime).getGregorianCalendarMonthDisplayShortName();
 
-            monthNames.push(getMonthShortName(month));
+            monthNames.push(monthShortName);
             incomeAmounts.push(item.incomeAmount);
             expenseAmounts.push(-item.expenseAmount);
 

@@ -35,7 +35,7 @@ function importTestData(datasetName: string): unknown[] {
 }
 
 function formatUnixTimeISO(unixTime: number): string {
-    return formatUnixTime(unixTime, 'YYYY-MM-DD[T]HH:mm:ss[Z]');
+    return formatUnixTime(unixTime, 'YYYY-MM-DDTHH:mm:ssZ');
 }
 
 function getTestTitleFormatDate(testFiscalYearStartId: string, testCaseDateString: string): string {

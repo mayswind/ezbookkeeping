@@ -22,7 +22,6 @@ import {
     YearQuarterUnixTime,
     YearMonthUnixTime,
     YearMonthDayUnixTime,
-    Month,
     WeekDay,
     MeridiemIndicator,
     DateRangeScene,
@@ -34,13 +33,40 @@ import {
     FiscalYearStart
 } from '@/core/fiscalyear.ts';
 import {
+    isFunction,
     isObject,
     isString,
     isNumber
 } from './common.ts';
 
+type DateTimeTokenFormatFunction = (d: MomentDateTime) => string;
+
 class MomentDateTime implements DateTime {
-    private instance: moment.Moment;
+    private static readonly tokenFormatFuncs: Record<string, DateTimeTokenFormatFunction> = {
+        'YY': (d: MomentDateTime) => (d.getLocalizedCalendarYear() % 100).toString().padStart(2, '0'),
+        'YYYY': (d: MomentDateTime) => d.getLocalizedCalendarYear().toString().padStart(4, '0'),
+        'M': (d: MomentDateTime) => d.getLocalizedCalendarMonth().toString(),
+        'MM': (d: MomentDateTime) => d.getLocalizedCalendarMonth().toString().padStart(2, '0'),
+        'MMM': (d: MomentDateTime) => d.getLocalizedCalendarMonthDisplayShortName(),
+        'MMMM': (d: MomentDateTime) => d.getLocalizedCalendarMonthDisplayName(),
+        'D': (d: MomentDateTime) => d.getLocalizedCalendarDay().toString(),
+        'DD': (d: MomentDateTime) => d.getLocalizedCalendarDay().toString().padStart(2, '0'),
+        'dd': (d: MomentDateTime) => d.getWeekDayDisplayMinName(),
+        'ddd': (d: MomentDateTime) => d.getWeekDayDisplayShortName(),
+        'dddd': (d: MomentDateTime) => d.getWeekDayDisplayName(),
+        'H': (d: MomentDateTime) => d.getHour().toString(),
+        'HH': (d: MomentDateTime) => d.getHour().toString().padStart(2, '0'),
+        'h': (d: MomentDateTime) => getHourIn12HourFormat(d.getHour()).toString(),
+        'hh': (d: MomentDateTime) => getHourIn12HourFormat(d.getHour()).toString().padStart(2, '0'),
+        'm': (d: MomentDateTime) => d.getMinute().toString(),
+        'mm': (d: MomentDateTime) => d.getMinute().toString().padStart(2, '0'),
+        's': (d: MomentDateTime) => d.getSecond().toString(),
+        'ss': (d: MomentDateTime) => d.getSecond().toString().padStart(2, '0'),
+        'A': (d: MomentDateTime) => d.getDisplayAMPM(),
+        'Z': (d: MomentDateTime) => getUtcOffsetByUtcOffsetMinutes(d.getTimezoneUtcOffsetMinutes())
+    };
+
+    private readonly instance: moment.Moment;
 
     private constructor(instance: moment.Moment) {
         this.instance = instance;
@@ -70,12 +96,28 @@ class MomentDateTime implements DateTime {
         return this.instance.month() + 1;
     }
 
-    public getGregorianCalendarMonthName(): string {
-        return (Month.valueOf(this.instance.month() + 1) as Month).name;
+    public getGregorianCalendarMonthDisplayName(): string {
+        const names = this.instance.localeData().months();
+        return names[this.getGregorianCalendarMonth() - 1] || '';
+    }
+
+    public getGregorianCalendarMonthDisplayShortName(): string {
+        const names = this.instance.localeData().monthsShort();
+        return names[this.getGregorianCalendarMonth() - 1] || '';
     }
 
     public getLocalizedCalendarMonth(): number {
         return this.instance.month() + 1;
+    }
+
+    public getLocalizedCalendarMonthDisplayName(): string {
+        const names = this.instance.localeData().months();
+        return names[this.getLocalizedCalendarMonth() - 1] || '';
+    }
+
+    public getLocalizedCalendarMonthDisplayShortName(): string {
+        const names = this.instance.localeData().monthsShort();
+        return names[this.getLocalizedCalendarMonth() - 1] || '';
     }
 
     public getGregorianCalendarDay(): number {
@@ -95,7 +137,42 @@ class MomentDateTime implements DateTime {
     }
 
     public getWeekDay(): WeekDay {
-        return WeekDay.valueOf(this.instance.days()) as WeekDay;
+        return WeekDay.valueOf(this.instance.day()) as WeekDay;
+    }
+
+    public getWeekDayDisplayName(): string {
+        const names = this.instance.localeData().weekdays();
+        return names[this.instance.day()] || '';
+    }
+
+    public getWeekDayDisplayShortName(): string {
+        const names = this.instance.localeData().weekdaysShort();
+        return names[this.instance.day()] || '';
+    }
+
+    public getWeekDayDisplayMinName(): string {
+        const names = this.instance.localeData().weekdaysMin();
+        return names[this.instance.day()] || '';
+    }
+
+    public getHour(): number {
+        return this.instance.hour();
+    }
+
+    public getMinute(): number {
+        return this.instance.minute();
+    }
+
+    public getSecond(): number {
+        return this.instance.second();
+    }
+
+    public getDisplayAMPM(): string {
+        return this.instance.localeData().meridiem(this.getHour(), this.getMinute(), false);
+    }
+
+    public getTimezoneUtcOffsetMinutes(): number {
+        return this.instance.utcOffset();
     }
 
     public toGregorianCalendarYearMonthDay(): YearMonthDay {
@@ -114,7 +191,30 @@ class MomentDateTime implements DateTime {
     }
 
     public format(format: string): string {
-        return this.instance.format(format);
+        let result = '';
+        let i = 0;
+
+        while (i < format.length) {
+            let matched = false;
+            for (let len = 4; len > 0; len--) {
+                const token = format.substring(i, i + len);
+                const formatFunc = MomentDateTime.tokenFormatFuncs[token];
+
+                if (isFunction(formatFunc)) {
+                    result += formatFunc(this);
+                    i += len;
+                    matched = true;
+                    break;
+                }
+            }
+
+            if (!matched) {
+                result += format[i];
+                i++;
+            }
+        }
+
+        return result;
     }
 
     public static of(instance: moment.Moment): DateTime {
@@ -250,11 +350,7 @@ export function getUtcOffsetByUtcOffsetMinutes(utcOffsetMinutes: number): string
 }
 
 export function getTimezoneOffset(timezone?: string): string {
-    if (timezone) {
-        return moment().tz(timezone).format('Z');
-    } else {
-        return moment().format('Z');
-    }
+    return getUtcOffsetByUtcOffsetMinutes(getTimezoneOffsetMinutes(timezone));
 }
 
 export function getTimezoneOffsetMinutes(timezone?: string): number {
@@ -314,15 +410,15 @@ export function formatUnixTime(unixTime: number, format: string, utcOffset?: num
 }
 
 export function formatCurrentTime(format: string): string {
-    return moment().format(format);
+    return MomentDateTime.now().format(format);
 }
 
 export function formatGregorianCalendarYearDashMonthDashDay(date: TextualYearMonthDay, format: string): string {
-    return moment(date, 'YYYY-MM-DD').format(format);
+    return MomentDateTime.of(moment(date, 'YYYY-MM-DD')).format(format);
 }
 
 export function formatGregorianCalendarMonthDashDay(monthDay: TextualYearMonth, format: string): string {
-    return moment(monthDay, 'MM-DD').format(format);
+    return MomentDateTime.of(moment(monthDay, 'MM-DD')).format(format);
 }
 
 export function getGregorianCalendarYearAndMonthFromUnixTime(unixTime: number): TextualYearMonth | '' {

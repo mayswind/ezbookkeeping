@@ -36,7 +36,7 @@
         "longDate": {
             "yyyy_mm_dd": "YYYY MMMM DD",
             "mm_dd_yyyy": "MMMM D, YYYY",
-            "dd_mm_yyyy": "D [de] MMMM [de] YYYY"
+            "dd_mm_yyyy": "D de MMMM de YYYY"
         },
         "shortDate": {
             "yyyy_mm_dd": "YYYY/MM/DD",
@@ -56,7 +56,7 @@
         "longYearMonth": {
             "yyyy_mm_dd": "YYYY MMMM",
             "mm_dd_yyyy": "MMMM, YYYY",
-            "dd_mm_yyyy": "MMMM [de] YYYY"
+            "dd_mm_yyyy": "MMMM de YYYY"
         },
         "shortYearMonth": {
             "yyyy_mm_dd": "YYYY/MM",
@@ -66,7 +66,7 @@
         "longMonthDay": {
             "yyyy_mm_dd": "MMMM DD",
             "mm_dd_yyyy": "MMMM D",
-            "dd_mm_yyyy": "D [de] MMMM"
+            "dd_mm_yyyy": "D de MMMM"
         },
         "shortMonthDay": {
             "yyyy_mm_dd": "MM/DD",

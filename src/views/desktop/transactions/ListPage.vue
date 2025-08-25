@@ -208,26 +208,24 @@
                                                         </div>
                                                     </template>
                                                     <v-list :selected="[query.dateType]">
-                                                        <template :key="dateRange.type"
-                                                                  v-for="dateRange in allDateRanges">
-                                                            <v-list-item class="text-sm" density="compact"
-                                                                         :value="dateRange.type"
-                                                                         :class="{ 'list-item-selected': query.dateType === dateRange.type }"
-                                                                         :append-icon="(query.dateType === dateRange.type ? mdiCheck : undefined)">
-                                                                <v-list-item-title class="cursor-pointer"
-                                                                                   @click="changeDateFilter(dateRange.type)">
-                                                                    <div class="d-flex align-center">
-                                                                        <span class="text-sm ms-3">{{ dateRange.displayName }}</span>
-                                                                    </div>
-                                                                </v-list-item-title>
-                                                                <div class="ms-3 smaller" v-if="dateRange.isUserCustomRange && query.dateType === dateRange.type && query.minTime && query.maxTime">
+                                                        <v-list-item class="text-sm" density="compact"
+                                                                     :key="dateRange.type" :value="dateRange.type"
+                                                                     :class="{ 'list-item-selected': query.dateType === dateRange.type }"
+                                                                     :append-icon="(query.dateType === dateRange.type ? mdiCheck : undefined)"
+                                                                     v-for="dateRange in allDateRanges">
+                                                            <v-list-item-title class="cursor-pointer"
+                                                                               @click="changeDateFilter(dateRange.type)">
+                                                                <div class="d-flex align-center">
+                                                                    <span class="text-sm ms-3">{{ dateRange.displayName }}</span>
+                                                                </div>
+                                                                <div class="transaction-list-custom-datetime-range ms-3 smaller" v-if="dateRange.isUserCustomRange && query.dateType === dateRange.type && query.minTime && query.maxTime">
                                                                     <span>{{ queryMinTime }}</span>
                                                                     <span>&nbsp;-&nbsp;</span>
                                                                     <br/>
                                                                     <span>{{ queryMaxTime }}</span>
                                                                 </div>
-                                                            </v-list-item>
-                                                        </template>
+                                                            </v-list-item-title>
+                                                        </v-list-item>
                                                     </v-list>
                                                 </v-menu>
                                             </th>
@@ -1782,6 +1780,11 @@ init(props);
     flex-wrap: wrap;
     row-gap: 1rem;
 }
+
+.transaction-list-custom-datetime-range {
+    line-height: 1rem;
+}
+
 
 .transaction-list-datetime-range .transaction-list-datetime-range-text {
     color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity)) !important;

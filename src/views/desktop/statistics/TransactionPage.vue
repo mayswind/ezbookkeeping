@@ -69,11 +69,12 @@
                                                         <v-list-item :key="dateRange.type" :value="dateRange.type"
                                                                      :append-icon="(queryDateType === dateRange.type ? mdiCheck : undefined)"
                                                                      v-for="dateRange in allDateRanges">
-                                                            <v-list-item-title
-                                                                class="cursor-pointer"
-                                                                @click="setDateFilter(dateRange.type)">
-                                                                {{ dateRange.displayName }}
-                                                                <div class="statistics-custom-datetime-range" v-if="dateRange.isUserCustomRange && canShowCustomDateRange(dateRange.type)">
+                                                            <v-list-item-title class="cursor-pointer"
+                                                                               @click="setDateFilter(dateRange.type)">
+                                                                <div class="d-flex align-center">
+                                                                    <span>{{ dateRange.displayName }}</span>
+                                                                </div>
+                                                                <div class="statistics-custom-datetime-range smaller" v-if="dateRange.isUserCustomRange && canShowCustomDateRange(dateRange.type)">
                                                                     <span>{{ queryStartTime }}</span>
                                                                     <span>&nbsp;-&nbsp;</span>
                                                                     <br/>
@@ -1020,9 +1021,7 @@ init(props);
 
 <style>
 .statistics-custom-datetime-range {
-    font-size: 0.7rem;
     line-height: 1rem;
-    color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity)) !important;
 }
 
 .statistics-overview-title {

@@ -293,6 +293,14 @@ func (s *UserService) UpdateUser(c core.Context, user *models.User, modifyUserLa
 		updateCols = append(updateCols, "fiscal_year_start")
 	}
 
+	if core.CALENDAR_DISPLAY_TYPE_DEFAULT <= user.CalendarDisplayType && user.CalendarDisplayType <= core.CALENDAR_DISPLAY_TYPE_GREGORAIN {
+		updateCols = append(updateCols, "calendar_type")
+	}
+
+	if core.DATE_DISPLAY_TYPE_DEFAULT <= user.DateDisplayType && user.DateDisplayType <= core.DATE_DISPLAY_TYPE_BUDDHIST {
+		updateCols = append(updateCols, "date_display_type")
+	}
+
 	if core.LONG_DATE_FORMAT_DEFAULT <= user.LongDateFormat && user.LongDateFormat <= core.LONG_DATE_FORMAT_D_M_YYYY {
 		updateCols = append(updateCols, "long_date_format")
 	}

@@ -7,6 +7,7 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
+import { DateDisplayType } from '@/core/calendar.ts';
 import { WeekDay } from '@/core/datetime.ts';
 import { type LocalizedDigitGroupingType, NumeralSystem, DecimalSeparator, DigitGroupingSymbol } from '@/core/numeral.ts';
 
@@ -22,6 +23,8 @@ export function useUserProfilePageBase() {
         getDefaultCurrency,
         getDefaultFirstDayOfWeek,
         getAllWeekDays,
+        getAllCalendarDisplayTypes,
+        getAllDateDisplayTypes,
         getAllLongDateFormats,
         getAllShortDateFormats,
         getAllLongTimeFormats,
@@ -58,8 +61,10 @@ export function useUserProfilePageBase() {
     const allVisibleAccounts = computed<Account[]>(() => accountsStore.allVisiblePlainAccounts);
     const allVisibleCategorizedAccounts = computed<CategorizedAccount[]>(() => getCategorizedAccounts(allVisibleAccounts.value));
     const allWeekDays = computed<TypeAndDisplayName[]>(() => getAllWeekDays());
-    const allLongDateFormats = computed<TypeAndDisplayName[]>(() => getAllLongDateFormats());
-    const allShortDateFormats = computed<TypeAndDisplayName[]>(() => getAllShortDateFormats());
+    const allCalendarDisplayTypes = computed<TypeAndDisplayName[]>(() => getAllCalendarDisplayTypes());
+    const allDateDisplayTypes = computed<TypeAndDisplayName[]>(() => getAllDateDisplayTypes());
+    const allLongDateFormats = computed<TypeAndDisplayName[]>(() => getAllLongDateFormats(DateDisplayType.valueOf(newProfile.value.dateDisplayType)?.calendarType));
+    const allShortDateFormats = computed<TypeAndDisplayName[]>(() => getAllShortDateFormats(DateDisplayType.valueOf(newProfile.value.dateDisplayType)?.calendarType));
     const allLongTimeFormats = computed<TypeAndDisplayName[]>(() => getAllLongTimeFormats());
     const allShortTimeFormats = computed<TypeAndDisplayName[]>(() => getAllShortTimeFormats());
     const allFiscalYearFormats = computed<TypeAndDisplayName[]>(() => getAllFiscalYearFormats());
@@ -105,6 +110,8 @@ export function useUserProfilePageBase() {
             newProfile.value.defaultCurrency === oldProfile.value.defaultCurrency &&
             newProfile.value.fiscalYearStart === oldProfile.value.fiscalYearStart &&
             newProfile.value.firstDayOfWeek === oldProfile.value.firstDayOfWeek &&
+            newProfile.value.calendarDisplayType === oldProfile.value.calendarDisplayType &&
+            newProfile.value.dateDisplayType === oldProfile.value.dateDisplayType &&
             newProfile.value.longDateFormat === oldProfile.value.longDateFormat &&
             newProfile.value.shortDateFormat === oldProfile.value.shortDateFormat &&
             newProfile.value.longTimeFormat === oldProfile.value.longTimeFormat &&
@@ -197,6 +204,8 @@ export function useUserProfilePageBase() {
         allVisibleAccounts,
         allVisibleCategorizedAccounts,
         allWeekDays,
+        allCalendarDisplayTypes,
+        allDateDisplayTypes,
         allLongDateFormats,
         allShortDateFormats,
         allLongTimeFormats,

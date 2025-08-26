@@ -8,7 +8,7 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
-import { type WeekDayValue, KnownDateTimeFormat } from '@/core/datetime.ts';
+import type { WeekDayValue } from '@/core/datetime.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { KnownFileType } from '@/core/file.ts';
 import type { Account } from '@/models/account.ts';
@@ -23,8 +23,7 @@ import { replaceAll } from '@/lib/common.ts';
 import {
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffsetMinutes,
-    parseDateTimeFromUnixTime,
-    formatUnixTime
+    parseDateTimeFromUnixTime
 } from '@/lib/datetime.ts';
 
 export function useReconciliationStatementPageBase() {
@@ -32,6 +31,7 @@ export function useReconciliationStatementPageBase() {
         tt,
         getAllAccountBalanceTrendChartTypes,
         getAllStatisticsDateAggregationTypesWithShortName,
+        formatUnixTimeToDefaultDateTimeWithoutLocaleOptions,
         formatUnixTimeToLongDateTime,
         formatUnixTimeToLongDate,
         formatUnixTimeToShortTime,
@@ -241,7 +241,7 @@ export function useReconciliationStatementPageBase() {
             }
 
             return [
-                formatUnixTime(transactionTime, KnownDateTimeFormat.DefaultDateTime.format),
+                formatUnixTimeToDefaultDateTimeWithoutLocaleOptions(transactionTime),
                 type,
                 categoryName,
                 displayAmount,

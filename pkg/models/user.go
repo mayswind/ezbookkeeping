@@ -95,6 +95,8 @@ type User struct {
 	DefaultCurrency       string                     `xorm:"VARCHAR(3) NOT NULL"`
 	FirstDayOfWeek        core.WeekDay               `xorm:"TINYINT NOT NULL"`
 	FiscalYearStart       core.FiscalYearStart       `xorm:"SMALLINT"`
+	CalendarDisplayType   core.CalendarDisplayType   `xorm:"TINYINT"`
+	DateDisplayType       core.DateDisplayType       `xorm:"TINYINT"`
 	LongDateFormat        core.LongDateFormat        `xorm:"TINYINT"`
 	ShortDateFormat       core.ShortDateFormat       `xorm:"TINYINT"`
 	LongTimeFormat        core.LongTimeFormat        `xorm:"TINYINT"`
@@ -131,6 +133,8 @@ type UserBasicInfo struct {
 	DefaultCurrency       string                     `json:"defaultCurrency"`
 	FirstDayOfWeek        core.WeekDay               `json:"firstDayOfWeek"`
 	FiscalYearStart       core.FiscalYearStart       `json:"fiscalYearStart"`
+	CalendarDisplayType   core.CalendarDisplayType   `json:"calendarDisplayType"`
+	DateDisplayType       core.DateDisplayType       `json:"dateDisplayType"`
 	LongDateFormat        core.LongDateFormat        `json:"longDateFormat"`
 	ShortDateFormat       core.ShortDateFormat       `json:"shortDateFormat"`
 	LongTimeFormat        core.LongTimeFormat        `json:"longTimeFormat"`
@@ -195,6 +199,8 @@ type UserProfileUpdateRequest struct {
 	DefaultCurrency       string                      `json:"defaultCurrency" binding:"omitempty,len=3,validCurrency"`
 	FirstDayOfWeek        *core.WeekDay               `json:"firstDayOfWeek" binding:"omitempty,min=0,max=6"`
 	FiscalYearStart       *core.FiscalYearStart       `json:"fiscalYearStart" binding:"omitempty,validFiscalYearStart"`
+	CalendarDisplayType   *core.CalendarDisplayType   `json:"calendarDisplayType" binding:"omitempty,min=0,max=1"`
+	DateDisplayType       *core.DateDisplayType       `json:"dateDisplayType" binding:"omitempty,min=0,max=2"`
 	LongDateFormat        *core.LongDateFormat        `json:"longDateFormat" binding:"omitempty,min=0,max=3"`
 	ShortDateFormat       *core.ShortDateFormat       `json:"shortDateFormat" binding:"omitempty,min=0,max=3"`
 	LongTimeFormat        *core.LongTimeFormat        `json:"longTimeFormat" binding:"omitempty,min=0,max=3"`
@@ -284,6 +290,8 @@ func (u *User) ToUserBasicInfo(avatarProvider core.UserAvatarProviderType, avata
 		DefaultCurrency:       u.DefaultCurrency,
 		FirstDayOfWeek:        u.FirstDayOfWeek,
 		FiscalYearStart:       fiscalYearStart,
+		CalendarDisplayType:   u.CalendarDisplayType,
+		DateDisplayType:       u.DateDisplayType,
 		LongDateFormat:        u.LongDateFormat,
 		ShortDateFormat:       u.ShortDateFormat,
 		LongTimeFormat:        u.LongTimeFormat,

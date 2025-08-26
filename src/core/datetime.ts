@@ -1,33 +1,50 @@
 import type { TypeAndName, TypeAndDisplayName } from '@/core/base.ts';
+import type { CalendarType } from '@/core/calendar.ts';
+import type { NumeralSystem } from '@/core/numeral.ts';
 
 export interface DateTime {
     getUnixTime(): number;
-    getLocalizedCalendarYear(): number;
+    getLocalizedCalendarYear(options: DateTimeFormatOptions): number;
     getGregorianCalendarYear(): number;
     getGregorianCalendarQuarter(): number;
-    getLocalizedCalendarQuarter(): number;
+    getLocalizedCalendarQuarter(options: DateTimeFormatOptions): number;
     getGregorianCalendarMonth(): number;
-    getGregorianCalendarMonthDisplayName(): string;
-    getGregorianCalendarMonthDisplayShortName(): string;
-    getLocalizedCalendarMonth(): number;
-    getLocalizedCalendarMonthDisplayName(): string;
-    getLocalizedCalendarMonthDisplayShortName(): string;
+    getGregorianCalendarMonthDisplayName(options: DateTimeFormatOptions): string;
+    getGregorianCalendarMonthDisplayShortName(options: DateTimeFormatOptions): string;
+    getLocalizedCalendarMonth(options: DateTimeFormatOptions): number;
+    getLocalizedCalendarMonthDisplayName(options: DateTimeFormatOptions): string;
+    getLocalizedCalendarMonthDisplayShortName(options: DateTimeFormatOptions): string;
     getGregorianCalendarDay(): number;
-    getLocalizedCalendarDay(): number;
+    getLocalizedCalendarDay(options: DateTimeFormatOptions): number;
     getGregorianCalendarYearDashMonthDashDay(): TextualYearMonthDay;
     getGregorianCalendarYearDashMonth(): TextualYearMonth;
     getWeekDay(): WeekDay;
-    getWeekDayDisplayName(): string
-    getWeekDayDisplayShortName(): string;
-    getWeekDayDisplayMinName(): string;
+    getWeekDayDisplayName(options: DateTimeFormatOptions): string
+    getWeekDayDisplayShortName(options: DateTimeFormatOptions): string;
+    getWeekDayDisplayMinName(options: DateTimeFormatOptions): string;
     getHour(): number;
     getMinute(): number;
     getSecond(): number;
-    getDisplayAMPM(): string;
+    getDisplayAMPM(options: DateTimeFormatOptions): string;
     getTimezoneUtcOffsetMinutes(): number;
     toGregorianCalendarYearMonthDay(): YearMonthDay;
     toGregorianCalendarYear0BasedMonth(): Year0BasedMonth;
-    format(format: string): string;
+    format(format: string, options: DateTimeFormatOptions): string;
+}
+
+export interface DateTimeFormatOptions {
+    calendarType: CalendarType;
+    numeralSystem: NumeralSystem;
+    localeData: DateTimeLocaleData;
+}
+
+export interface DateTimeLocaleData {
+    months: () => string[];
+    monthsShort: () => string[];
+    weekdays: () => string[];
+    weekdaysShort: () => string[];
+    weekdaysMin: () => string[];
+    meridiem: (hour: number, minute: number, isLower: boolean) => string;
 }
 
 export type TextualYearMonth = `${number}-${number}`;

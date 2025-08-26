@@ -29,6 +29,8 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Calendar Display Type" title="Calendar" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Date Display Type" title="Calendar" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Long Date Format" title="YYYY-MM-DD" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Short Date Format" title="YYYY-MM-DD" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Long Time Format" title="HH:mm:ss" link="#"></f7-list-item>
@@ -221,6 +223,46 @@
         </f7-list>
 
         <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
+            <f7-list-item
+                link="#"
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="tt('Calendar')"
+                :title="findDisplayNameByType(allCalendarDisplayTypes, newProfile.calendarDisplayType)"
+                @click="showCalendarDisplayTypePopup = true"
+            >
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Calendar Display Type')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Calendar Display Type')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allCalendarDisplayTypes"
+                                           v-model:show="showCalendarDisplayTypePopup"
+                                           v-model="newProfile.calendarDisplayType">
+                </list-item-selection-popup>
+            </f7-list-item>
+
+            <f7-list-item
+                link="#"
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="tt('Date Display Type')"
+                :title="findDisplayNameByType(allDateDisplayTypes, newProfile.dateDisplayType)"
+                @click="showDateDisplayTypePopup = true"
+            >
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Date Display Type')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Date Display Type')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allDateDisplayTypes"
+                                           v-model:show="showDateDisplayTypePopup"
+                                           v-model="newProfile.dateDisplayType">
+                </list-item-selection-popup>
+            </f7-list-item>
+
             <f7-list-item
                 link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
@@ -560,6 +602,8 @@ const {
     allVisibleAccounts,
     allVisibleCategorizedAccounts,
     allWeekDays,
+    allCalendarDisplayTypes,
+    allDateDisplayTypes,
     allLongDateFormats,
     allShortDateFormats,
     allLongTimeFormats,
@@ -601,6 +645,8 @@ const showLanguagePopup = ref<boolean>(false);
 const showDefaultCurrencyPopup = ref<boolean>(false);
 const showFirstDayOfWeekPopup = ref<boolean>(false);
 const showFiscalYearStartSheet = ref<boolean>(false);
+const showCalendarDisplayTypePopup = ref<boolean>(false);
+const showDateDisplayTypePopup = ref<boolean>(false);
 const showLongDateFormatPopup = ref<boolean>(false);
 const showShortDateFormatPopup = ref<boolean>(false);
 const showLongTimeFormatPopup = ref<boolean>(false);

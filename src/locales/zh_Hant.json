@@ -22,6 +22,8 @@
         "currency": "TWD",
         "firstDayOfWeek": "Sunday",
         "fiscalYearFormat": "EndYYYY",
+        "calendarDisplayType": "Gregorian",
+        "dateDisplayType": "Gregorian",
         "longDateFormat": "YYYYMMDD",
         "shortDateFormat": "YYYYMMDD",
         "longTimeFormat": "AHHMMSS",
@@ -72,6 +74,11 @@
             "yyyy_mm_dd": "M-D",
             "mm_dd_yyyy": "M/D",
             "dd_mm_yyyy": "D/M"
+        },
+        "shortDay": {
+            "yyyy_mm_dd": "D",
+            "mm_dd_yyyy": "D",
+            "dd_mm_yyyy": "D"
         },
         "longTime": {
             "hh_mm_ss": "HH:mm:ss",
@@ -128,6 +135,11 @@
         "exportReconciliationStatementsFileName": "ezBookkeeping_{nickname}_對帳單",
         "defaultImportDataMappingFileName": "ezBookkeeping_匯入資料對應檔案",
         "defaultImportReplaceRuleFileName": "ezBookkeeping_匯入替換規則檔案"
+    },
+    "calendar": {
+        "Gregorian": "公曆",
+        "Buddhist": "佛曆",
+        "Gregorian (with Chinese Calendar)": "公曆（含農曆）"
     },
     "datetime": {
         "AM": {
@@ -1498,6 +1510,8 @@
     "Default Account": "預設帳戶",
     "First Day of Week": "每週第一天",
     "Fiscal Year Start Date": "財政年度起始日",
+    "Calendar Display Type": "日曆顯示類型",
+    "Date Display Type": "日期顯示類型",
     "Long Date Format": "長日期格式",
     "Short Date Format": "短日期格式",
     "Long Time Format": "長時間格式",

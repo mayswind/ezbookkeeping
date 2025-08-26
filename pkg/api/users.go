@@ -359,6 +359,24 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 		userNew.FiscalYearStart = core.FISCAL_YEAR_START_INVALID
 	}
 
+	if userUpdateReq.CalendarDisplayType != nil && *userUpdateReq.CalendarDisplayType != user.CalendarDisplayType {
+		user.CalendarDisplayType = *userUpdateReq.CalendarDisplayType
+		userNew.CalendarDisplayType = *userUpdateReq.CalendarDisplayType
+		modifyProfileBasicInfo = true
+		anythingUpdate = true
+	} else {
+		userNew.CalendarDisplayType = core.CALENDAR_DISPLAY_TYPE_INVALID
+	}
+
+	if userUpdateReq.DateDisplayType != nil && *userUpdateReq.DateDisplayType != user.DateDisplayType {
+		user.DateDisplayType = *userUpdateReq.DateDisplayType
+		userNew.DateDisplayType = *userUpdateReq.DateDisplayType
+		modifyProfileBasicInfo = true
+		anythingUpdate = true
+	} else {
+		userNew.DateDisplayType = core.DATE_DISPLAY_TYPE_INVALID
+	}
+
 	if userUpdateReq.LongDateFormat != nil && *userUpdateReq.LongDateFormat != user.LongDateFormat {
 		user.LongDateFormat = *userUpdateReq.LongDateFormat
 		userNew.LongDateFormat = *userUpdateReq.LongDateFormat

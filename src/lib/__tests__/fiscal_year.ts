@@ -14,8 +14,7 @@ import {
     getFiscalYearEndUnixTime,
     getFiscalYearTimeRangeFromUnixTime,
     getAllFiscalYearsStartAndEndUnixTimes,
-    getFiscalYearTimeRangeFromYear,
-    formatUnixTime
+    getFiscalYearTimeRangeFromYear
 } from '@/lib/datetime.ts';
 
 // Set test environment timezone to UTC, since the test data constants are in UTC
@@ -35,7 +34,7 @@ function importTestData(datasetName: string): unknown[] {
 }
 
 function formatUnixTimeISO(unixTime: number): string {
-    return formatUnixTime(unixTime, 'YYYY-MM-DDTHH:mm:ssZ');
+    return moment.unix(unixTime).format('YYYY-MM-DDTHH:mm:ssZ');
 }
 
 function getTestTitleFormatDate(testFiscalYearStartId: string, testCaseDateString: string): string {

@@ -156,6 +156,10 @@ export function isObjectEmpty(obj: object): boolean {
     return true;
 }
 
+export function ofObject<T>(object: T): T {
+    return object;
+}
+
 export function getNumberValue(value: unknown, defaultValue: number): number {
     if (isString(value)) {
         return parseInt(value, 10);

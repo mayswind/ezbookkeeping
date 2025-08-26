@@ -22,6 +22,8 @@
         "currency": "BRL",
         "firstDayOfWeek": "Monday",
         "fiscalYearFormat": "EndYYYY",
+        "calendarDisplayType": "Gregorian",
+        "dateDisplayType": "Gregorian",
         "longDateFormat": "DDMMYYYY",
         "shortDateFormat": "DDMMYYYY",
         "longTimeFormat": "HHMMSS",
@@ -72,6 +74,11 @@
             "yyyy_mm_dd": "MM/DD",
             "mm_dd_yyyy": "MM/DD",
             "dd_mm_yyyy": "DD/MM"
+        },
+        "shortDay": {
+            "yyyy_mm_dd": "DD",
+            "mm_dd_yyyy": "DD",
+            "dd_mm_yyyy": "DD"
         },
         "longTime": {
             "hh_mm_ss": "HH:mm:ss",
@@ -128,6 +135,11 @@
         "exportReconciliationStatementsFileName": "ezBookkeeping_{nickname}_reconciliation_statements",
         "defaultImportDataMappingFileName": "ezBookkeeping_import_data_mapping",
         "defaultImportReplaceRuleFileName": "ezBookkeeping_import_replace_rule"
+    },
+    "calendar": {
+        "Gregorian": "Gregorian",
+        "Buddhist": "Buddhist",
+        "Gregorian (with Chinese Calendar)": "Gregorian (with Chinese Calendar)"
     },
     "datetime": {
         "AM": {
@@ -1498,6 +1510,8 @@
     "Default Account": "Conta Padrão",
     "First Day of Week": "Primeiro Dia da Semana",
     "Fiscal Year Start Date": "Data de Início do Ano Fiscal",
+    "Calendar Display Type": "Calendar Display Type",
+    "Date Display Type": "Date Display Type",
     "Long Date Format": "Formato de Data Longa",
     "Short Date Format": "Formato de Data Curta",
     "Long Time Format": "Formato de Hora Longa",

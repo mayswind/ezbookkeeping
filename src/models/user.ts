@@ -1,3 +1,4 @@
+import { CalendarDisplayType, DateDisplayType } from '@/core/calendar.ts';
 import { LongDateFormat, ShortDateFormat, LongTimeFormat, ShortTimeFormat } from '@/core/datetime.ts';
 import { NumeralSystem, DecimalSeparator, DigitGroupingSymbol, DigitGroupingType } from '@/core/numeral.ts';
 import { CurrencyDisplayType } from '@/core/currency.ts';
@@ -20,6 +21,8 @@ export class User {
     public defaultAccountId: string = EMPTY_USER_BASIC_INFO.defaultAccountId;
     public transactionEditScope: number = EMPTY_USER_BASIC_INFO.transactionEditScope;
     public fiscalYearStart: number = EMPTY_USER_BASIC_INFO.fiscalYearStart;
+    public calendarDisplayType: number = EMPTY_USER_BASIC_INFO.calendarDisplayType;
+    public dateDisplayType: number = EMPTY_USER_BASIC_INFO.dateDisplayType;
     public longDateFormat: number = EMPTY_USER_BASIC_INFO.longDateFormat;
     public shortDateFormat: number = EMPTY_USER_BASIC_INFO.shortDateFormat;
     public longTimeFormat: number = EMPTY_USER_BASIC_INFO.longTimeFormat;
@@ -44,12 +47,14 @@ export class User {
         this.username = user.username;
         this.email = user.email;
         this.nickname = user.nickname;
+        this.defaultAccountId = user.defaultAccountId;
+        this.transactionEditScope = user.transactionEditScope;
         this.language = user.language;
         this.defaultCurrency = user.defaultCurrency;
         this.firstDayOfWeek = user.firstDayOfWeek;
-        this.defaultAccountId = user.defaultAccountId;
-        this.transactionEditScope = user.transactionEditScope;
         this.fiscalYearStart = user.fiscalYearStart;
+        this.calendarDisplayType = user.calendarDisplayType;
+        this.dateDisplayType = user.dateDisplayType;
         this.longDateFormat = user.longDateFormat;
         this.shortDateFormat = user.shortDateFormat;
         this.longTimeFormat = user.longTimeFormat;
@@ -90,6 +95,8 @@ export class User {
             defaultCurrency: this.defaultCurrency,
             firstDayOfWeek: this.firstDayOfWeek,
             fiscalYearStart: this.fiscalYearStart,
+            calendarDisplayType: this.calendarDisplayType,
+            dateDisplayType: this.dateDisplayType,
             longDateFormat: this.longDateFormat,
             shortDateFormat: this.shortDateFormat,
             longTimeFormat: this.longTimeFormat,
@@ -111,6 +118,8 @@ export class User {
         user.defaultAccountId = userInfo.defaultAccountId;
         user.transactionEditScope = userInfo.transactionEditScope;
         user.fiscalYearStart = userInfo.fiscalYearStart;
+        user.calendarDisplayType = userInfo.calendarDisplayType;
+        user.dateDisplayType = userInfo.dateDisplayType;
         user.longDateFormat = userInfo.longDateFormat;
         user.shortDateFormat = userInfo.shortDateFormat;
         user.longTimeFormat = userInfo.longTimeFormat;
@@ -143,8 +152,10 @@ export interface UserBasicInfo {
     readonly transactionEditScope: number;
     readonly language: string;
     readonly defaultCurrency: string;
-    readonly fiscalYearStart: number;
     readonly firstDayOfWeek: number;
+    readonly fiscalYearStart: number;
+    readonly calendarDisplayType: number;
+    readonly dateDisplayType: number;
     readonly longDateFormat: number;
     readonly shortDateFormat: number;
     readonly longTimeFormat: number;
@@ -199,6 +210,8 @@ export interface UserProfileUpdateRequest {
     readonly defaultCurrency?: string;
     readonly firstDayOfWeek?: number;
     readonly fiscalYearStart?: number;
+    readonly calendarDisplayType?: number;
+    readonly dateDisplayType?: number;
     readonly longDateFormat?: number;
     readonly shortDateFormat?: number;
     readonly longTimeFormat?: number;
@@ -235,6 +248,8 @@ export const EMPTY_USER_BASIC_INFO: UserBasicInfo = {
     defaultCurrency: '',
     firstDayOfWeek: -1,
     fiscalYearStart: FiscalYearStart.Default.value,
+    calendarDisplayType: CalendarDisplayType.Default.type,
+    dateDisplayType: DateDisplayType.Default.type,
     longDateFormat: LongDateFormat.Default.type,
     shortDateFormat: ShortDateFormat.Default.type,
     longTimeFormat: LongTimeFormat.Default.type,

@@ -165,6 +165,32 @@
                                     item-value="type"
                                     persistent-placeholder
                                     :disabled="loading || saving"
+                                    :label="tt('Calendar Display Type')"
+                                    :placeholder="tt('Calendar Display Type')"
+                                    :items="allCalendarDisplayTypes"
+                                    v-model="newProfile.calendarDisplayType"
+                                />
+                            </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :disabled="loading || saving"
+                                    :label="tt('Date Display Type')"
+                                    :placeholder="tt('Date Display Type')"
+                                    :items="allDateDisplayTypes"
+                                    v-model="newProfile.dateDisplayType"
+                                />
+                            </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :disabled="loading || saving"
                                     :label="tt('Long Date Format')"
                                     :placeholder="tt('Long Date Format')"
                                     :items="allLongDateFormats"
@@ -409,6 +435,8 @@ const {
     allVisibleAccounts,
     allVisibleCategorizedAccounts,
     allWeekDays,
+    allCalendarDisplayTypes,
+    allDateDisplayTypes,
     allLongDateFormats,
     allShortDateFormats,
     allLongTimeFormats,

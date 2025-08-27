@@ -165,32 +165,13 @@
                                     </v-card-text>
 
                                     <v-card-text class="transaction-calendar-container pt-0" v-if="pageType === TransactionListPageType.Calendar.type">
-                                        <vue-date-picker inline auto-apply model-type="yyyy-MM-dd"
-                                                         month-name-format="long"
-                                                         :config="{ noSwipe: true }"
-                                                         :readonly="loading"
-                                                         :disable-month-year-select="true"
-                                                         :month-change-on-scroll="false"
-                                                         :month-change-on-arrows="false"
-                                                         :enable-time-picker="false"
-                                                         :hide-offset-dates="true"
-                                                         :min-date="transactionCalendarMinDate"
-                                                         :max-date="transactionCalendarMaxDate"
-                                                         :disabled-dates="noTransactionInMonthDay"
-                                                         :prevent-min-max-navigation="true"
-                                                         :clearable="false"
-                                                         :dark="isDarkMode"
-                                                         :week-start="firstDayOfWeek"
-                                                         :day-names="dayNames"
-                                                         v-model="currentCalendarDate">
-                                            <template #day="{ day }">
-                                                <div class="transaction-calendar-daily-amounts d-flex flex-column align-center justify-center w-100">
-                                                    <span :class="{ 'font-weight-bold': currentMonthTransactionData && currentMonthTransactionData.dailyTotalAmounts[day] }">{{ day }}</span>
-                                                    <span class="text-income" v-if="currentMonthTransactionData && currentMonthTransactionData.dailyTotalAmounts[day] && currentMonthTransactionData.dailyTotalAmounts[day].income">{{ getDisplayMonthTotalAmount(currentMonthTransactionData.dailyTotalAmounts[day].income, defaultCurrency, '', currentMonthTransactionData.dailyTotalAmounts[day].incompleteIncome) }}</span>
-                                                    <span class="text-expense" v-if="currentMonthTransactionData && currentMonthTransactionData.dailyTotalAmounts[day] && currentMonthTransactionData.dailyTotalAmounts[day].expense">{{ getDisplayMonthTotalAmount(currentMonthTransactionData.dailyTotalAmounts[day].expense, defaultCurrency, '', currentMonthTransactionData.dailyTotalAmounts[day].incompleteExpense) }}</span>
-                                                </div>
-                                            </template>
-                                        </vue-date-picker>
+                                        <transaction-calendar day-has-transaction-class="font-weight-bold"
+                                                              :readonly="loading" :is-dark-mode="isDarkMode"
+                                                              :default-currency="defaultCurrency"
+                                                              :min-date="transactionCalendarMinDate"
+                                                              :max-date="transactionCalendarMaxDate"
+                                                              :dailyTotalAmounts="currentMonthTransactionData?.dailyTotalAmounts"
+                                                              v-model="currentCalendarDate"></transaction-calendar>
                                     </v-card-text>
 
                                     <v-table class="transaction-table" :hover="!loading">
@@ -629,7 +610,7 @@
                                  @dateRange:change="changeCustomDateFilter"
                                  @error="onShowDateRangeError" />
 
-    <month-selection-dialog :title="tt('Custom Date Range')"
+    <month-selection-dialog :title="tt('Select Month')"
                             :model-value="queryMonth"
                             v-model:show="showCustomMonthDialog"
                             @update:modelValue="changeCustomMonthDateFilter"
@@ -704,8 +685,7 @@ import type { TransactionTemplate } from '@/models/transaction_template.ts';
 import {
     isObject,
     isString,
-    isNumber,
-    arrangeArrayWithNewStartIndex
+    isNumber
 } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
@@ -792,7 +772,6 @@ const theme = useTheme();
 
 const {
     tt,
-    getAllLongWeekdayNames,
     getAllRecentMonthDateRanges,
     getAllTransactionTagFilterTypes,
     getWeekdayLongName
@@ -837,7 +816,6 @@ const {
     transactionCalendarMinDate,
     transactionCalendarMaxDate,
     currentMonthTransactionData,
-    noTransactionInMonthDay,
     canAddTransaction,
     getDisplayTime,
     getDisplayLongDate,
@@ -896,7 +874,6 @@ const showFilterCategoryDialog = ref<boolean>(false);
 const showFilterTagDialog = ref<boolean>(false);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
-const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllLongWeekdayNames(), firstDayOfWeek.value));
 
 const recentMonthDateRanges = computed<LocalizedRecentMonthDateRange[]>(() => getAllRecentMonthDateRanges(pageType.value === TransactionListPageType.List.type, true));
 
@@ -1888,13 +1865,5 @@ init(props);
 
 .transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item {
     overflow: hidden;
-}
-
-.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > span {
-    display: block;
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 </style>

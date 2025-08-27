@@ -76,6 +76,9 @@ import { getI18nOptions, getRtlLocales } from '@/locales/helpers.ts';
 
 import PinCodeInput from '@/components/common/PinCodeInput.vue';
 import MapView from '@/components/common/MapView.vue';
+import DateTimePicker from '@/components/common/DateTimePicker.vue';
+import MonthPicker from '@/components/common/MonthPicker.vue';
+import TransactionCalendar from '@/components/common/TransactionCalendar.vue';
 
 import ItemIcon from '@/components/desktop/ItemIcon.vue';
 import BtnVerticalGroup from '@/components/desktop/BtnVerticalGroup.vue';
@@ -506,6 +509,9 @@ app.component('DraggableList', draggable);
 
 app.component('PinCodeInput', PinCodeInput);
 app.component('MapView', MapView);
+app.component('DateTimePicker', DateTimePicker);
+app.component('MonthPicker', MonthPicker);
+app.component('TransactionCalendar', TransactionCalendar);
 
 app.component('ItemIcon', ItemIcon);
 app.component('BtnVerticalGroup', BtnVerticalGroup);

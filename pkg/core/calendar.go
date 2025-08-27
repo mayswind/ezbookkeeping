@@ -9,6 +9,7 @@ type CalendarDisplayType byte
 const (
 	CALENDAR_DISPLAY_TYPE_DEFAULT   CalendarDisplayType = 0
 	CALENDAR_DISPLAY_TYPE_GREGORAIN CalendarDisplayType = 1
+	CALENDAR_DISPLAY_TYPE_BUDDHIST  CalendarDisplayType = 2
 	CALENDAR_DISPLAY_TYPE_INVALID   CalendarDisplayType = 255
 )
 
@@ -19,6 +20,8 @@ func (f CalendarDisplayType) String() string {
 		return "Default"
 	case CALENDAR_DISPLAY_TYPE_GREGORAIN:
 		return "Gregorian"
+	case CALENDAR_DISPLAY_TYPE_BUDDHIST:
+		return "Buddhist"
 	case CALENDAR_DISPLAY_TYPE_INVALID:
 		return "Invalid"
 	default:

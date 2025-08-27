@@ -20,36 +20,10 @@
             <v-card-text class="mb-md-4 w-100 d-flex justify-center">
                 <v-row class="match-height">
                     <v-col cols="12" md="6">
-                        <vue-date-picker inline month-picker auto-apply
-                                         month-name-format="long"
-                                         :clearable="false"
-                                         :dark="isDarkMode"
-                                         :year-range="yearRange"
-                                         :year-first="isYearFirst"
-                                         v-model="dateRange[0]">
-                            <template #month="{ text }">
-                                {{ getMonthShortName(text) }}
-                            </template>
-                            <template #month-overlay-value="{ text }">
-                                {{ getMonthShortName(text) }}
-                            </template>
-                        </vue-date-picker>
+                        <month-picker :is-dark-mode="isDarkMode" v-model="dateRange[0]"></month-picker>
                     </v-col>
                     <v-col cols="12" md="6">
-                        <vue-date-picker inline month-picker auto-apply
-                                         month-name-format="long"
-                                         :clearable="false"
-                                         :dark="isDarkMode"
-                                         :year-range="yearRange"
-                                         :year-first="isYearFirst"
-                                         v-model="dateRange[1]">
-                            <template #month="{ text }">
-                                {{ getMonthShortName(text) }}
-                            </template>
-                            <template #month-overlay-value="{ text }">
-                                {{ getMonthShortName(text) }}
-                            </template>
-                        </vue-date-picker>
+                        <month-picker :is-dark-mode="isDarkMode" v-model="dateRange[1]"></month-picker>
                     </v-col>
                 </v-row>
             </v-card-text>
@@ -73,6 +47,8 @@ import { type CommonMonthRangeSelectionProps, useMonthRangeSelectionBase } from 
 import { ThemeType } from '@/core/theme.ts';
 import { type TextualYearMonth } from '@/core/datetime.ts';
 
+import { getYear0BasedMonthObjectFromString } from '@/lib/datetime.ts';
+
 interface DesktopMonthRangeSelectionProps extends CommonMonthRangeSelectionProps {
     persistent?: boolean;
 }
@@ -86,8 +62,8 @@ const emit = defineEmits<{
 
 const theme = useTheme();
 
-const { tt, getMonthShortName } = useI18n();
-const { yearRange, dateRange, isYearFirst, beginDateTime, endDateTime, getMonthSelectionValue, getFinalMonthRange } = useMonthRangeSelectionBase(props);
+const { tt } = useI18n();
+const { dateRange, beginDateTime, endDateTime, getFinalMonthRange } = useMonthRangeSelectionBase(props);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 const showState = computed<boolean>({
@@ -117,7 +93,7 @@ function cancel(): void {
 
 watch(() => props.minTime, (newValue) => {
     if (newValue) {
-        const yearMonth = getMonthSelectionValue(newValue);
+        const yearMonth = getYear0BasedMonthObjectFromString(newValue);
 
         if (yearMonth) {
             dateRange.value[0] = yearMonth;
@@ -127,7 +103,7 @@ watch(() => props.minTime, (newValue) => {
 
 watch(() => props.maxTime, (newValue) => {
     if (newValue) {
-        const yearMonth = getMonthSelectionValue(newValue);
+        const yearMonth = getYear0BasedMonthObjectFromString(newValue);
 
         if (yearMonth) {
             dateRange.value[1] = yearMonth;

@@ -26,12 +26,10 @@ import {
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
     getLocalDatetimeFromUnixTime,
-    getActualUnixTimeForStore,
     getDummyUnixTimeForLocalUsage,
     getCurrentDateTime,
     parseDateTimeFromUnixTime,
     getYearMonthFirstUnixTime,
-    getUnixTimeFromLocalDatetime,
     isDateRangeMatchOneMonth
 } from '@/lib/datetime.ts';
 
@@ -257,11 +255,6 @@ export function useTransactionListPageBase() {
         return null;
     });
 
-    function noTransactionInMonthDay(date: Date): boolean {
-        const dateTime = parseDateTimeFromUnixTime(getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(date), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
-        return !currentMonthTransactionData.value || !currentMonthTransactionData.value.dailyTotalAmounts || !currentMonthTransactionData.value.dailyTotalAmounts[dateTime.getGregorianCalendarDay()];
-    }
-
     const canAddTransaction = computed<boolean>(() => {
         if (query.value.accountIds && queryAllFilterAccountIdsCount.value === 1) {
             const account = allAccountsMap.value[query.value.accountIds];
@@ -395,7 +388,6 @@ export function useTransactionListPageBase() {
         transactionCalendarMinDate,
         transactionCalendarMaxDate,
         currentMonthTransactionData,
-        noTransactionInMonthDay,
         canAddTransaction,
         // functions
         getDisplayTime,

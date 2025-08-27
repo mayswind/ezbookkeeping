@@ -9,21 +9,8 @@
             <div class="padding-horizontal padding-bottom">
                 <p class="no-margin-top" v-if="hint">{{ hint }}</p>
                 <slot></slot>
-                <vue-date-picker inline month-picker auto-apply
-                                 month-name-format="long"
-                                 class="justify-content-center margin-bottom"
-                                 :clearable="false"
-                                 :dark="isDarkMode"
-                                 :year-range="yearRange"
-                                 :year-first="isYearFirst"
-                                 v-model="monthValue">
-                    <template #month="{ text }">
-                        {{ getMonthShortName(text) }}
-                    </template>
-                    <template #month-overlay-value="{ text }">
-                        {{ getMonthShortName(text) }}
-                    </template>
-                </vue-date-picker>
+                <month-picker month-picker-class="justify-content-center margin-bottom"
+                              :is-dark-mode="isDarkMode" v-model="monthValue"></month-picker>
                 <f7-button large fill
                            :class="{ 'disabled': !monthValue }"
                            :text="tt('Continue')"
@@ -38,43 +25,43 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
-import { type CommonMonthSelectionProps, useMonthSelectionBase } from '@/components/base/MonthSelectionBase.ts';
 
 import type { Year0BasedMonth } from '@/core/datetime.ts';
 import { useEnvironmentsStore } from '@/stores/environment.ts';
 
-const props = defineProps<CommonMonthSelectionProps>();
+import { getYear0BasedMonthObjectFromUnixTime, getThisMonthFirstUnixTime } from '@/lib/datetime.ts';
+
+const props = defineProps<{
+    modelValue?: Year0BasedMonth;
+    title?: string;
+    hint?: string;
+    show: boolean;
+}>();
+
 const emit = defineEmits<{
     (e: 'update:modelValue', value: Year0BasedMonth): void;
     (e: 'update:show', value: boolean): void;
 }>();
 
-const { tt, getMonthShortName } = useI18n();
+const { tt } = useI18n();
 const { showToast } = useI18nUIComponents();
-const { yearRange, monthValue, isYearFirst, getMonthSelectionValue, getYear0BasedMonth } = useMonthSelectionBase(props);
 
 const environmentsStore = useEnvironmentsStore();
 
+const monthValue = ref<Year0BasedMonth>(getYear0BasedMonthObjectFromUnixTime(getThisMonthFirstUnixTime()));
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
 
 function confirm(): void {
-    try {
-        const finalMonthRange = getYear0BasedMonth();
-
-        if (!finalMonthRange) {
-            return;
-        }
-
-        emit('update:modelValue', finalMonthRange);
-    } catch (ex: unknown) {
-        if (ex instanceof Error) {
-            showToast(ex.message);
-        }
+    if (monthValue.value.year <= 0 || monthValue.value.month0base < 0) {
+        showToast('Date is too early');
+        return;
     }
+
+    emit('update:modelValue', monthValue.value);
 }
 
 function cancel(): void {
@@ -83,11 +70,7 @@ function cancel(): void {
 
 function onSheetOpen(): void {
     if (props.modelValue) {
-        const yearMonth = getMonthSelectionValue(props.modelValue);
-
-        if (yearMonth) {
-            monthValue.value = yearMonth;
-        }
+        monthValue.value = props.modelValue;
     }
 }
 

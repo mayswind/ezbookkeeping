@@ -76,9 +76,9 @@
             "dd_mm_yyyy": "DD.MM"
         },
         "shortDay": {
-            "yyyy_mm_dd": "DD",
-            "mm_dd_yyyy": "DD",
-            "dd_mm_yyyy": "DD"
+            "yyyy_mm_dd": "D",
+            "mm_dd_yyyy": "D",
+            "dd_mm_yyyy": "D"
         },
         "longTime": {
             "hh_mm_ss": "HH:mm:ss",
@@ -138,8 +138,7 @@
     },
     "calendar": {
         "Gregorian": "Gregorian",
-        "Buddhist": "Buddhist",
-        "Gregorian (with Chinese Calendar)": "Gregorian (with Chinese Calendar)"
+        "Buddhist": "Buddhist"
     },
     "datetime": {
         "AM": {
@@ -1857,6 +1856,7 @@
     "Unable to retrieve transaction list": "Не вдалося отримати список транзакцій",
     "Unable to retrieve reconciliation statements": "Unable to retrieve reconciliation statements",
     "Custom Date Range": "Користувацький діапазон дат",
+    "Select Month": "Select Month",
     "Transaction Detail": "Деталі транзакції",
     "No transaction data": "Немає даних про транзакції",
     "Are you sure you want to delete this transaction?": "Ви впевнені, що хочете видалити цю транзакцію?",

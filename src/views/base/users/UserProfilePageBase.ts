@@ -63,11 +63,11 @@ export function useUserProfilePageBase() {
     const allWeekDays = computed<TypeAndDisplayName[]>(() => getAllWeekDays());
     const allCalendarDisplayTypes = computed<TypeAndDisplayName[]>(() => getAllCalendarDisplayTypes());
     const allDateDisplayTypes = computed<TypeAndDisplayName[]>(() => getAllDateDisplayTypes());
-    const allLongDateFormats = computed<TypeAndDisplayName[]>(() => getAllLongDateFormats(DateDisplayType.valueOf(newProfile.value.dateDisplayType)?.calendarType));
-    const allShortDateFormats = computed<TypeAndDisplayName[]>(() => getAllShortDateFormats(DateDisplayType.valueOf(newProfile.value.dateDisplayType)?.calendarType));
-    const allLongTimeFormats = computed<TypeAndDisplayName[]>(() => getAllLongTimeFormats());
-    const allShortTimeFormats = computed<TypeAndDisplayName[]>(() => getAllShortTimeFormats());
-    const allFiscalYearFormats = computed<TypeAndDisplayName[]>(() => getAllFiscalYearFormats());
+    const allLongDateFormats = computed<TypeAndDisplayName[]>(() => getAllLongDateFormats(NumeralSystem.valueOf(newProfile.value.numeralSystem) ?? NumeralSystem.Default, DateDisplayType.valueOf(newProfile.value.dateDisplayType)?.calendarType || DateDisplayType.Default.calendarType));
+    const allShortDateFormats = computed<TypeAndDisplayName[]>(() => getAllShortDateFormats(NumeralSystem.valueOf(newProfile.value.numeralSystem) ?? NumeralSystem.Default, DateDisplayType.valueOf(newProfile.value.dateDisplayType)?.calendarType || DateDisplayType.Default.calendarType));
+    const allLongTimeFormats = computed<TypeAndDisplayName[]>(() => getAllLongTimeFormats(NumeralSystem.valueOf(newProfile.value.numeralSystem) ?? NumeralSystem.Default));
+    const allShortTimeFormats = computed<TypeAndDisplayName[]>(() => getAllShortTimeFormats(NumeralSystem.valueOf(newProfile.value.numeralSystem) ?? NumeralSystem.Default));
+    const allFiscalYearFormats = computed<TypeAndDisplayName[]>(() => getAllFiscalYearFormats(NumeralSystem.valueOf(newProfile.value.numeralSystem) ?? NumeralSystem.Default, DateDisplayType.valueOf(newProfile.value.dateDisplayType)?.calendarType || DateDisplayType.Default.calendarType));
     const allCurrencyDisplayTypes = computed<TypeAndDisplayName[]>(() => getAllCurrencyDisplayTypes(NumeralSystem.valueOf(newProfile.value.numeralSystem) ?? NumeralSystem.Default, DecimalSeparator.valueOf(newProfile.value.decimalSeparator)?.symbol || DecimalSeparator.Default.symbol));
     const allNumeralSystemTypes = computed<TypeAndDisplayName[]>(() => getAllNumeralSystemTypes());
     const allDecimalSeparators = computed<TypeAndDisplayName[]>(() => getAllDecimalSeparators());

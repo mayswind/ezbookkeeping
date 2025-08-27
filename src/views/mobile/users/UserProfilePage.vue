@@ -226,7 +226,7 @@
             <f7-list-item
                 link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="tt('Calendar')"
+                :header="tt('Calendar Display Type')"
                 :title="findDisplayNameByType(allCalendarDisplayTypes, newProfile.calendarDisplayType)"
                 @click="showCalendarDisplayTypePopup = true"
             >

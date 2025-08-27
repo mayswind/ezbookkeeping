@@ -1,10 +1,9 @@
 import { ref, computed } from 'vue';
 
 import { type TimeRangeAndDateType, type PresetDateRange, type UnixTimeRange, type WeekDayValue, DateRange } from '@/core/datetime.ts';
-import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
+
 import {
     getCurrentUnixTime,
-    getAllowedYearRange,
     getLocalDatetimeFromUnixTime,
     getUnixTimeFromLocalDatetime,
     getTodayFirstUnixTime,
@@ -46,11 +45,9 @@ function getDateRangeFromProps(props: CommonDateRangeSelectionProps): { minDate:
 }
 
 export function useDateRangeSelectionBase(props: CommonDateRangeSelectionProps) {
-    const { tt, getAllMinWeekdayNames, formatUnixTimeToLongDateTime, isLongDateMonthAfterYear, isLongTime24HourFormat } = useI18n();
+    const { tt, formatUnixTimeToLongDateTime } = useI18n();
     const userStore = useUserStore();
     const { minDate, maxDate } = getDateRangeFromProps(props);
-
-    const yearRange = ref<number[]>(getAllowedYearRange());
 
     const dateRange = ref<Date[]>([
         getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(minDate, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())),
@@ -58,9 +55,6 @@ export function useDateRangeSelectionBase(props: CommonDateRangeSelectionProps) 
     ]);
 
     const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
-    const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllMinWeekdayNames(), firstDayOfWeek.value));
-    const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
-    const is24Hour = computed<boolean>(() => isLongTime24HourFormat());
     const beginDateTime = computed<string>(() => {
         const actualBeginUnixTime = getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(dateRange.value[0]), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
         return formatUnixTimeToLongDateTime(actualBeginUnixTime);
@@ -123,12 +117,8 @@ export function useDateRangeSelectionBase(props: CommonDateRangeSelectionProps) 
 
     return {
         // states
-        yearRange,
         dateRange,
         // computed states
-        dayNames,
-        isYearFirst,
-        is24Hour,
         beginDateTime,
         endDateTime,
         presetRanges,

@@ -12,28 +12,11 @@
         </template>
 
         <template #no-data>
-            <vue-date-picker inline vertical enable-seconds auto-apply
-                             ref="datepicker"
-                             month-name-format="long"
-                             :clearable="false"
-                             :enable-time-picker="false"
-                             :dark="isDarkMode"
-                             :week-start="firstDayOfWeek"
-                             :year-range="yearRange"
-                             :day-names="dayNames"
-                             :year-first="isYearFirst"
-                             :is24="is24Hour"
-                             v-model="dateTime">
-                <template #month="{ text }">
-                    {{ getMonthShortName(text) }}
-                </template>
-                <template #month-overlay-value="{ text }">
-                    {{ getMonthShortName(text) }}
-                </template>
-                <template #am-pm-button="{ toggle, value }">
-                    <button class="dp__pm_am_button" tabindex="0" @click="toggle">{{ tt(`datetime.${value}.content`) }}</button>
-                </template>
-            </vue-date-picker>
+            <date-time-picker :is-dark-mode="isDarkMode"
+                              :enable-time-picker="false"
+                              :vertical="true"
+                              v-model="dateTime">
+            </date-time-picker>
             <div class="date-time-select-time-picker-container">
                 <v-btn class="px-3" color="primary" variant="flat"
                        v-if="!is24Hour && isMeridiemIndicatorFirst"
@@ -50,6 +33,7 @@
                                 :hide-no-data="true"
                                 v-model="currentHour"
                                 @update:focused="onFocused(hourInput, $event)"
+                                @click="onFocused(hourInput, true)"
                                 @keydown="onKeyDown('hour', $event)"
                 />
                 <span>:</span>
@@ -63,6 +47,7 @@
                                 :hide-no-data="true"
                                 v-model="currentMinute"
                                 @update:focused="onFocused(minuteInput, $event)"
+                                @click="onFocused(minuteInput, true)"
                                 @keydown="onKeyDown('minute', $event)"
                 />
                 <span>:</span>
@@ -76,6 +61,7 @@
                                 :hide-no-data="true"
                                 v-model="currentSecond"
                                 @update:focused="onFocused(secondInput, $event)"
+                                @click="onFocused(secondInput, true)"
                                 @keydown="onKeyDown('second', $event)"
                 />
                 <v-btn class="px-3" color="primary" variant="flat"
@@ -124,11 +110,7 @@ const emit = defineEmits<{
 }>();
 
 const theme = useTheme();
-const {
-    tt,
-    getMonthShortName,
-    formatUnixTimeToLongDateTime
-} = useI18n();
+const { tt, formatUnixTimeToLongDateTime } = useI18n();
 
 const {
     is24Hour,
@@ -136,10 +118,6 @@ const {
     isMinuteTwoDigits,
     isSecondTwoDigits,
     isMeridiemIndicatorFirst,
-    yearRange,
-    firstDayOfWeek,
-    dayNames,
-    isYearFirst,
     getDisplayTimeValue,
     generateAllHours,
     generateAllMinutesOrSeconds

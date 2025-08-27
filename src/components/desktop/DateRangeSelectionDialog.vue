@@ -18,29 +18,12 @@
                 </div>
             </template>
             <v-card-text class="mb-md-4 w-100 d-flex justify-center">
-                <vue-date-picker inline enable-seconds auto-apply
-                                 month-name-format="long"
-                                 six-weeks="center"
-                                 :clearable="false"
-                                 :dark="isDarkMode"
-                                 :week-start="firstDayOfWeek"
-                                 :year-range="yearRange"
-                                 :day-names="dayNames"
-                                 :year-first="isYearFirst"
-                                 :is24="is24Hour"
-                                 :range="{ partialRange: false }"
-                                 :preset-dates="presetRanges"
-                                 v-model="dateRange">
-                    <template #month="{ text }">
-                        {{ getMonthShortName(text) }}
-                    </template>
-                    <template #month-overlay-value="{ text }">
-                        {{ getMonthShortName(text) }}
-                    </template>
-                    <template #am-pm-button="{ toggle, value }">
-                        <button class="dp__pm_am_button" tabindex="0" @click="toggle">{{ tt(`datetime.${value}.content`) }}</button>
-                    </template>
-                </vue-date-picker>
+                <date-time-picker :is-dark-mode="isDarkMode"
+                                  :enable-time-picker="true"
+                                  :vertical="true"
+                                  :preset-dates="presetRanges"
+                                  v-model="dateRange">
+                </date-time-picker>
             </v-card-text>
             <v-card-text class="overflow-y-visible">
                 <div class="w-100 d-flex justify-center gap-4">
@@ -59,9 +42,6 @@ import { useTheme } from 'vuetify';
 import { useI18n } from '@/locales/helpers.ts';
 import { type CommonDateRangeSelectionProps, useDateRangeSelectionBase } from '@/components/base/DateRangeSelectionBase.ts';
 
-import { useUserStore } from '@/stores/user.ts';
-
-import { type WeekDayValue } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
 
 import {
@@ -84,13 +64,10 @@ const emit = defineEmits<{
 
 const theme = useTheme();
 
-const { tt, getMonthShortName } = useI18n();
-const { yearRange, dateRange, dayNames, isYearFirst, is24Hour, beginDateTime, endDateTime, presetRanges, getFinalDateRange } = useDateRangeSelectionBase(props);
-
-const userStore = useUserStore();
+const { tt } = useI18n();
+const { dateRange, beginDateTime, endDateTime, presetRanges, getFinalDateRange } = useDateRangeSelectionBase(props);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
-const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
 const showState = computed<boolean>({
     get: () => props.show || false,
     set: (value) => emit('update:show', value)

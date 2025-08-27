@@ -37,6 +37,10 @@ import {
     FiscalYearStart
 } from '@/core/fiscalyear.ts';
 import {
+    NumeralSystem
+} from '@/core/numeral.ts';
+
+import {
     isFunction,
     isDefined,
     isObject,
@@ -47,7 +51,8 @@ import {
 
 interface DateTimeFormatResult {
     value: number | string;
-    numeralLength?: number;
+    minNumeralLength?: number;
+    maxLength?: number;
     hasNumeral?: boolean;
 }
 
@@ -55,25 +60,25 @@ type DateTimeTokenFormatFunction = (d: MomentDateTime, options: DateTimeFormatOp
 
 class MomentDateTime implements DateTime {
     private static readonly tokenFormatFuncs: Record<string, DateTimeTokenFormatFunction> = {
-        'YY': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarYear(options) % 100, numeralLength: 2 }),
-        'YYYY': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarYear(options), numeralLength: 4 }),
+        'YY': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarYear(options), minNumeralLength: 2, maxLength: 2 }),
+        'YYYY': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarYear(options), minNumeralLength: 4 }),
         'M': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarMonth(options) }),
-        'MM': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarMonth(options), numeralLength: 2 }),
+        'MM': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarMonth(options), minNumeralLength: 2 }),
         'MMM': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarMonthDisplayShortName(options) }),
         'MMMM': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarMonthDisplayName(options) }),
         'D': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarDay(options) }),
-        'DD': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarDay(options), numeralLength: 2 }),
+        'DD': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarDay(options), minNumeralLength: 2 }),
         'dd': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getWeekDayDisplayMinName(options) }),
         'ddd': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getWeekDayDisplayShortName(options) }),
         'dddd': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getWeekDayDisplayName(options) }),
         'H': (d: MomentDateTime) => ofObject<DateTimeFormatResult>({ value: d.getHour() }),
-        'HH': (d: MomentDateTime) => ofObject<DateTimeFormatResult>({ value: d.getHour(), numeralLength: 2 }),
+        'HH': (d: MomentDateTime) => ofObject<DateTimeFormatResult>({ value: d.getHour(), minNumeralLength: 2 }),
         'h': (d: MomentDateTime) => ofObject<DateTimeFormatResult>({ value: getHourIn12HourFormat(d.getHour()) }),
-        'hh': (d: MomentDateTime) => ofObject<DateTimeFormatResult>({ value: getHourIn12HourFormat(d.getHour()), numeralLength: 2 }),
+        'hh': (d: MomentDateTime) => ofObject<DateTimeFormatResult>({ value: getHourIn12HourFormat(d.getHour()), minNumeralLength: 2 }),
         'm': (d: MomentDateTime) => ofObject<DateTimeFormatResult>({ value: d.getMinute() }),
-        'mm': (d: MomentDateTime) => ofObject<DateTimeFormatResult>({ value: d.getMinute(), numeralLength: 2 }),
+        'mm': (d: MomentDateTime) => ofObject<DateTimeFormatResult>({ value: d.getMinute(), minNumeralLength: 2 }),
         's': (d: MomentDateTime) => ofObject<DateTimeFormatResult>({ value: d.getSecond() }),
-        'ss': (d: MomentDateTime) => ofObject<DateTimeFormatResult>({ value: d.getSecond(), numeralLength: 2 }),
+        'ss': (d: MomentDateTime) => ofObject<DateTimeFormatResult>({ value: d.getSecond(), minNumeralLength: 2 }),
         'A': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getDisplayAMPM(options) }),
         'Z': (d: MomentDateTime) => ofObject<DateTimeFormatResult>({ value: getUtcOffsetByUtcOffsetMinutes(d.getTimezoneUtcOffsetMinutes()), hasNumeral: true }),
     };
@@ -88,12 +93,12 @@ class MomentDateTime implements DateTime {
         return this.instance.unix();
     }
 
-    public getLocalizedCalendarYear(options: DateTimeFormatOptions): number {
+    public getLocalizedCalendarYear(options: DateTimeFormatOptions): string {
         if (options && options.calendarType === CalendarType.Buddhist) {
-            return this.instance.year() + 543;
+            return (this.instance.year() + 543).toString();
         }
 
-        return this.instance.year();
+        return this.instance.year().toString();
     }
 
     public getGregorianCalendarYear(): number {
@@ -132,8 +137,13 @@ class MomentDateTime implements DateTime {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    public getLocalizedCalendarMonth(options: DateTimeFormatOptions): number {
-        return this.instance.month() + 1;
+    public getLocalizedCalendarMonth(options: DateTimeFormatOptions): string {
+        return (this.instance.month() + 1).toString();
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    public getLocalizedCalendarMonthIndex(options: DateTimeFormatOptions): number {
+        return this.instance.month();
     }
 
     public getLocalizedCalendarMonthDisplayName(options: DateTimeFormatOptions): string {
@@ -142,7 +152,7 @@ class MomentDateTime implements DateTime {
         }
 
         const names = options.localeData.months();
-        return names[this.getLocalizedCalendarMonth(options) - 1] || '';
+        return names[this.getLocalizedCalendarMonthIndex(options)] || '';
     }
 
     public getLocalizedCalendarMonthDisplayShortName(options: DateTimeFormatOptions): string {
@@ -151,7 +161,7 @@ class MomentDateTime implements DateTime {
         }
 
         const names = options.localeData.monthsShort();
-        return names[this.getLocalizedCalendarMonth(options) - 1] || '';
+        return names[this.getLocalizedCalendarMonthIndex(options)] || '';
     }
 
     public getGregorianCalendarDay(): number {
@@ -159,16 +169,16 @@ class MomentDateTime implements DateTime {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    public getLocalizedCalendarDay(options: DateTimeFormatOptions): number {
-        return this.instance.date();
+    public getLocalizedCalendarDay(options: DateTimeFormatOptions): string {
+        return this.instance.date().toString();
     }
 
     public getGregorianCalendarYearDashMonthDashDay(): TextualYearMonthDay {
-        return (this.instance.year() + '-' + (this.instance.month() + 1).toString().padStart(2, '0') + '-' + this.instance.date().toString().padStart(2, '0')) as TextualYearMonthDay;
+        return (this.instance.year() + '-' + (this.instance.month() + 1).toString().padStart(2, NumeralSystem.WesternArabicNumerals.digitZero) + '-' + this.instance.date().toString().padStart(2, NumeralSystem.WesternArabicNumerals.digitZero)) as TextualYearMonthDay;
     }
 
     public getGregorianCalendarYearDashMonth(): TextualYearMonth {
-        return (this.instance.year() + '-' + (this.instance.month() + 1).toString().padStart(2, '0')) as TextualYearMonth;
+        return (this.instance.year() + '-' + (this.instance.month() + 1).toString().padStart(2, NumeralSystem.WesternArabicNumerals.digitZero)) as TextualYearMonth;
     }
 
     public getWeekDay(): WeekDay {
@@ -255,11 +265,15 @@ class MomentDateTime implements DateTime {
                     const formattedResult: DateTimeFormatResult = formatFunc(this, options);
                     let formattedValue: string = formattedResult.value.toString();
 
-                    if (isNumber(formattedResult.value)) {
-                        if (isDefined(formattedResult.numeralLength)) {
-                            formattedValue = formattedValue.padStart(formattedResult.numeralLength, '0');
-                        }
+                    if (isDefined(formattedResult.minNumeralLength)) {
+                        formattedValue = formattedValue.padStart(formattedResult.minNumeralLength, NumeralSystem.WesternArabicNumerals.digitZero);
+                    }
 
+                    if (isDefined(formattedResult.maxLength) && formattedValue.length > formattedResult.maxLength) {
+                        formattedValue = formattedValue.substring(formattedValue.length - formattedResult.maxLength);
+                    }
+
+                    if (isNumber(formattedResult.value)) {
                         if (options && options.numeralSystem) {
                             formattedValue = options.numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(formattedValue);
                         }
@@ -407,8 +421,8 @@ export function getUtcOffsetByUtcOffsetMinutes(utcOffsetMinutes: number): string
     const offsetHours = Math.trunc(Math.abs(utcOffsetMinutes) / 60);
     const offsetMinutes = Math.abs(utcOffsetMinutes) - offsetHours * 60;
 
-    const finalOffsetHours = offsetHours.toString().padStart(2, '0');
-    const finalOffsetMinutes = offsetMinutes.toString().padStart(2, '0');
+    const finalOffsetHours = offsetHours.toString().padStart(2, NumeralSystem.WesternArabicNumerals.digitZero);
+    const finalOffsetMinutes = offsetMinutes.toString().padStart(2, NumeralSystem.WesternArabicNumerals.digitZero);
 
     if (utcOffsetMinutes >= 0) {
         return `+${finalOffsetHours}:${finalOffsetMinutes}`;
@@ -442,7 +456,7 @@ export function getLocalDatetimeFromUnixTime(unixTime: number): Date {
 }
 
 export function getUnixTimeFromLocalDatetime(datetime: Date): number {
-    return datetime.getTime() / 1000;
+    return Math.floor(datetime.getTime() / 1000);
 }
 
 export function getActualUnixTimeForStore(unixTime: number, utcOffset: number, currentUtcOffset: number): number {
@@ -459,6 +473,11 @@ export function getCurrentDateTime(): DateTime {
 
 export function getCurrentUnixTime(): number {
     return moment().unix();
+}
+
+export function getYearMonthDayDateTime(year: number, month: number, day: number): DateTime {
+    const date = moment().set({ year: year, month: month - 1, date: day, hour: 0, minute: 0, second: 0, millisecond: 0 });
+    return MomentDateTime.of(date);
 }
 
 export function parseDateTimeFromUnixTime(unixTime: number, utcOffset?: number, currentUtcOffset?: number): DateTime {
@@ -487,6 +506,50 @@ export function formatGregorianCalendarYearDashMonthDashDay(date: TextualYearMon
 
 export function formatGregorianCalendarMonthDashDay(monthDay: TextualYearMonth, format: string, options: DateTimeFormatOptions): string {
     return MomentDateTime.of(moment(monthDay, 'MM-DD')).format(format, options);
+}
+
+export function getLocalDateFromYearDashMonthDashDay(date: TextualYearMonthDay): Date | null {
+    if (!isString(date)) {
+        return null;
+    }
+
+    const items = date.split('-');
+
+    if (items.length !== 3) {
+        return null;
+    }
+
+    const year = parseInt(items[0]);
+    const month = parseInt(items[1]);
+    const day = parseInt(items[2]);
+
+    if (!isNumber(year) || !isNumber(month) || !isNumber(day)) {
+        return null;
+    }
+
+    if (year < 1000 || year > 9999 || month < 1 || month > 12 || day < 1 || day > 31) {
+        return null;
+    }
+
+    const dateObj = new Date(year, month - 1, day);
+
+    if (dateObj.getFullYear() !== year || dateObj.getMonth() !== (month - 1) || dateObj.getDate() !== day) {
+        return null;
+    }
+
+    return dateObj;
+}
+
+export function getGregorianCalendarYearAndMonthFromLocalDate(date: Date): TextualYearMonthDay | '' {
+    if (!date) {
+        return '';
+    }
+
+    const year = date.getFullYear().toString().padStart(4, NumeralSystem.WesternArabicNumerals.digitZero);
+    const month = (date.getMonth() + 1).toString().padStart(2, NumeralSystem.WesternArabicNumerals.digitZero);
+    const day = (date.getDate()).toString().padStart(2, NumeralSystem.WesternArabicNumerals.digitZero);
+
+    return (`${year}-${month}-${day}`) as TextualYearMonthDay;
 }
 
 export function getGregorianCalendarYearAndMonthFromUnixTime(unixTime: number): TextualYearMonth | '' {

@@ -138,8 +138,7 @@
     },
     "calendar": {
         "Gregorian": "Gregorian",
-        "Buddhist": "Buddhist",
-        "Gregorian (with Chinese Calendar)": "Gregorian (with Chinese Calendar)"
+        "Buddhist": "Buddhist"
     },
     "datetime": {
         "AM": {
@@ -1857,6 +1856,7 @@
     "Unable to retrieve transaction list": "Unable to retrieve transaction list",
     "Unable to retrieve reconciliation statements": "Unable to retrieve reconciliation statements",
     "Custom Date Range": "Custom Date Range",
+    "Select Month": "Select Month",
     "Transaction Detail": "Transaction Detail",
     "No transaction data": "No transaction data",
     "Are you sure you want to delete this transaction?": "Are you sure you want to delete this transaction?",

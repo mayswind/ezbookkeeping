@@ -14,22 +14,8 @@
                     <span>{{ endDateTime }}</span>
                 </p>
                 <slot></slot>
-                <vue-date-picker inline month-picker auto-apply
-                                 month-name-format="long"
-                                 class="justify-content-center margin-bottom"
-                                 :clearable="false"
-                                 :dark="isDarkMode"
-                                 :year-range="yearRange"
-                                 :year-first="isYearFirst"
-                                 :range="{ partialRange: false }"
-                                 v-model="dateRange">
-                    <template #month="{ text }">
-                        {{ getMonthShortName(text) }}
-                    </template>
-                    <template #month-overlay-value="{ text }">
-                        {{ getMonthShortName(text) }}
-                    </template>
-                </vue-date-picker>
+                <month-picker month-picker-class="justify-content-center margin-bottom"
+                              :is-dark-mode="isDarkMode" v-model="dateRange"></month-picker>
                 <f7-button large fill
                            :class="{ 'disabled': !dateRange[0] || !dateRange[1] }"
                            :text="tt('Continue')"
@@ -54,15 +40,17 @@ import { useEnvironmentsStore } from '@/stores/environment.ts';
 
 import { type TextualYearMonth } from '@/core/datetime.ts';
 
+import { getYear0BasedMonthObjectFromString } from '@/lib/datetime.ts';
+
 const props = defineProps<CommonMonthRangeSelectionProps>();
 const emit = defineEmits<{
     (e: 'update:show', value: boolean): void;
     (e: 'dateRange:change', minYearMonth: TextualYearMonth | '', maxYearMonth: TextualYearMonth | ''): void;
 }>();
 
-const { tt, getMonthShortName } = useI18n();
+const { tt } = useI18n();
 const { showToast } = useI18nUIComponents();
-const { yearRange, dateRange, isYearFirst, beginDateTime, endDateTime, getMonthSelectionValue, getFinalMonthRange } = useMonthRangeSelectionBase(props);
+const { dateRange, beginDateTime, endDateTime, getFinalMonthRange } = useMonthRangeSelectionBase(props);
 
 const environmentsStore = useEnvironmentsStore();
 
@@ -90,7 +78,7 @@ function cancel(): void {
 
 function onSheetOpen(): void {
     if (props.minTime) {
-        const yearMonth = getMonthSelectionValue(props.minTime);
+        const yearMonth = getYear0BasedMonthObjectFromString(props.minTime);
 
         if (yearMonth) {
             dateRange.value[0] = yearMonth;
@@ -98,7 +86,7 @@ function onSheetOpen(): void {
     }
 
     if (props.maxTime) {
-        const yearMonth = getMonthSelectionValue(props.maxTime);
+        const yearMonth = getYear0BasedMonthObjectFromString(props.maxTime);
 
         if (yearMonth) {
             dateRange.value[1] = yearMonth;

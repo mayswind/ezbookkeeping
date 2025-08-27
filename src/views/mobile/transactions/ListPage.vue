@@ -67,33 +67,13 @@
         </f7-toolbar>
 
         <f7-block class="transaction-calendar-container margin-vertical" v-if="pageType === TransactionListPageType.Calendar.type">
-            <vue-date-picker inline auto-apply model-type="yyyy-MM-dd"
-                             month-name-format="long"
-                             class="justify-content-center"
-                             :config="{ noSwipe: true }"
-                             :readonly="loading"
-                             :disable-month-year-select="true"
-                             :month-change-on-scroll="false"
-                             :month-change-on-arrows="false"
-                             :enable-time-picker="false"
-                             :hide-offset-dates="true"
-                             :min-date="transactionCalendarMinDate"
-                             :max-date="transactionCalendarMaxDate"
-                             :disabled-dates="noTransactionInMonthDay"
-                             :prevent-min-max-navigation="true"
-                             :clearable="false"
-                             :dark="isDarkMode"
-                             :week-start="firstDayOfWeek"
-                             :day-names="dayNames"
-                             v-model="currentCalendarDate">
-                <template #day="{ day }">
-                    <div class="transaction-calendar-daily-amounts display-flex flex-direction-column align-items-center justify-content-center">
-                        <span>{{ day }}</span>
-                        <small class="text-income" v-if="currentMonthTransactionData && currentMonthTransactionData.dailyTotalAmounts[day] && currentMonthTransactionData.dailyTotalAmounts[day].income">{{ getDisplayMonthTotalAmount(currentMonthTransactionData.dailyTotalAmounts[day].income, false, '', currentMonthTransactionData.dailyTotalAmounts[day].incompleteIncome) }}</small>
-                        <small class="text-expense" v-if="currentMonthTransactionData && currentMonthTransactionData.dailyTotalAmounts[day] && currentMonthTransactionData.dailyTotalAmounts[day].expense">{{ getDisplayMonthTotalAmount(currentMonthTransactionData.dailyTotalAmounts[day].expense, false, '', currentMonthTransactionData.dailyTotalAmounts[day].incompleteExpense) }}</small>
-                    </div>
-                </template>
-            </vue-date-picker>
+            <transaction-calendar calendar-class="justify-content-center" week-day-name-type="short"
+                                  :readonly="loading" :is-dark-mode="isDarkMode"
+                                  :default-currency="false"
+                                  :min-date="transactionCalendarMinDate"
+                                  :max-date="transactionCalendarMaxDate"
+                                  :dailyTotalAmounts="currentMonthTransactionData?.dailyTotalAmounts"
+                                  v-model="currentCalendarDate"></transaction-calendar>
         </f7-block>
 
         <div class="skeleton-text" v-if="loading">
@@ -351,7 +331,7 @@
                                     @dateRange:change="changeCustomDateFilter">
         </date-range-selection-sheet>
 
-        <month-selection-sheet :title="tt('Custom Date Range')"
+        <month-selection-sheet :title="tt('Select Month')"
                                :model-value="queryMonth"
                                v-model:show="showCustomMonthSheet"
                                @update:modelValue="changeCustomMonthDateFilter">
@@ -632,8 +612,7 @@ import type { TransactionCategory } from '@/models/transaction_category.ts';
 import type { Transaction } from '@/models/transaction.ts';
 
 import {
-    isNumber,
-    arrangeArrayWithNewStartIndex
+    isNumber
 } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
@@ -665,7 +644,6 @@ const props = defineProps<{
 const {
     tt,
     getCurrentLanguageTextDirection,
-    getAllShortWeekdayNames,
     getAllTransactionTagFilterTypes,
     getWeekdayShortName,
     formatUnixTimeToDayOfMonth
@@ -713,7 +691,6 @@ const {
     transactionCalendarMinDate,
     transactionCalendarMaxDate,
     currentMonthTransactionData,
-    noTransactionInMonthDay,
     canAddTransaction,
     getDisplayTime,
     getDisplayLongYearMonth,
@@ -745,7 +722,6 @@ const showDeleteActionSheet = ref<boolean>(false);
 
 const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
-const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllShortWeekdayNames(), firstDayOfWeek.value));
 
 const allTransactionTagFilterTypes = computed<TypeAndDisplayName[]>(() => getAllTransactionTagFilterTypes());
 
@@ -1697,12 +1673,7 @@ html[dir="rtl"] .list.transaction-info-list li.transaction-info .transaction-foo
     white-space: nowrap;
 }
 
-.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > small {
-    display: block;
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > span.transaction-calendar-daily-amount {
     font-size: var(--ebk-transaction-calendar-amount-font-size);
 }
 </style>

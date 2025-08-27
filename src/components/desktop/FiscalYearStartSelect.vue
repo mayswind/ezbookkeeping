@@ -12,29 +12,16 @@
         </template>
 
         <template #no-data>
-            <vue-date-picker inline auto-apply disable-year-select
-                             month-name-format="long"
-                             model-type="MM-dd"
-                             six-weeks="center"
-                             :config="{ noSwipe: true }"
-                             :month-change-on-scroll="false"
-                             :enable-time-picker="false"
-                             :min-date="allowedMinDate"
-                             :max-date="allowedMaxDate"
-                             :disabled-dates="disabledDates"
-                             :clearable="false"
-                             :dark="isDarkMode"
-                             :week-start="firstDayOfWeek"
-                             :day-names="dayNames"
-                             v-model="selectedFiscalYearStartValue"
-                             >
-                <template #month="{ text }">
-                    {{ getMonthShortName(text) }}
-                </template>
-                <template #month-overlay-value="{ text }">
-                    {{ getMonthShortName(text) }}
-                </template>
-            </vue-date-picker>
+            <date-time-picker :is-dark-mode="isDarkMode"
+                              :vertical="true"
+                              :enable-time-picker="false"
+                              :disable-year-select="true"
+                              :no-swipe-and-scroll="true"
+                              :min-date="allowedMinDate"
+                              :max-date="allowedMaxDate"
+                              :disabled-dates="disabledDates"
+                              v-model="selectedFiscalYearStartValue">
+            </date-time-picker>
         </template>
     </v-select>
 </template>
@@ -42,8 +29,6 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue';
 import { useTheme } from 'vuetify';
-
-import { useI18n } from '@/locales/helpers.ts';
 
 import {
     type CommonFiscalYearStartSelectionProps,
@@ -56,8 +41,6 @@ import { ThemeType } from '@/core/theme.ts';
 const props = defineProps<CommonFiscalYearStartSelectionProps>();
 const emit = defineEmits<CommonFiscalYearStartSelectionEmits>();
 
-const { getMonthShortName } = useI18n();
-
 const theme = useTheme();
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
@@ -69,8 +52,6 @@ const {
     displayFiscalYearStartDate,
     allowedMinDate,
     allowedMaxDate,
-    firstDayOfWeek,
-    dayNames
 } = useFiscalYearStartSelectionBase(props);
 
 watch(() => props.modelValue, (newValue) => {

@@ -12,29 +12,16 @@
         </f7-toolbar>
         <f7-page-content>
             <div class="block block-outline no-margin no-padding">
-                <vue-date-picker inline auto-apply disable-year-select
-                                 month-name-format="long"
-                                 model-type="MM-dd"
-                                 six-weeks="center"
-                                 class="justify-content-center"
-                                 :config="{ noSwipe: true }"
-                                 :month-change-on-scroll="false"
-                                 :enable-time-picker="false"
-                                 :min-date="allowedMinDate"
-                                 :max-date="allowedMaxDate"
-                                 :disabled-dates="disabledDates"
-                                 :clearable="false"
-                                 :dark="isDarkMode"
-                                 :week-start="firstDayOfWeek"
-                                 :day-names="dayNames"
-                                 v-model="selectedFiscalYearStartValue">
-                    <template #month="{ text }">
-                        {{ getMonthShortName(text) }}
-                    </template>
-                    <template #month-overlay-value="{ text }">
-                        {{ getMonthShortName(text) }}
-                    </template>
-                </vue-date-picker>
+                <date-time-picker datetime-picker-class="justify-content-center"
+                                  :is-dark-mode="isDarkMode"
+                                  :enable-time-picker="false"
+                                  :disable-year-select="true"
+                                  :no-swipe-and-scroll="true"
+                                  :min-date="allowedMinDate"
+                                  :max-date="allowedMaxDate"
+                                  :disabled-dates="disabledDates"
+                                  v-model="selectedFiscalYearStartValue">
+                </date-time-picker>
             </div>
         </f7-page-content>
     </f7-sheet>
@@ -67,7 +54,7 @@ interface MobileFiscalYearStartSelectionSheetEmits extends CommonFiscalYearStart
 const props = defineProps<MobileFiscalYearStartSelectionSheetProps>();
 const emit = defineEmits<MobileFiscalYearStartSelectionSheetEmits>();
 
-const { tt, getMonthShortName } = useI18n();
+const { tt } = useI18n();
 
 const environmentsStore = useEnvironmentsStore();
 const userStore = useUserStore();
@@ -78,8 +65,6 @@ const {
     selectedFiscalYearStartValue,
     allowedMinDate,
     allowedMaxDate,
-    firstDayOfWeek,
-    dayNames
 } = useFiscalYearStartSelectionBase(props);
 
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);

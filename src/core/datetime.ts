@@ -4,18 +4,19 @@ import type { NumeralSystem } from '@/core/numeral.ts';
 
 export interface DateTime {
     getUnixTime(): number;
-    getLocalizedCalendarYear(options: DateTimeFormatOptions): number;
+    getLocalizedCalendarYear(options: DateTimeFormatOptions): string;
     getGregorianCalendarYear(): number;
     getGregorianCalendarQuarter(): number;
     getLocalizedCalendarQuarter(options: DateTimeFormatOptions): number;
     getGregorianCalendarMonth(): number;
     getGregorianCalendarMonthDisplayName(options: DateTimeFormatOptions): string;
     getGregorianCalendarMonthDisplayShortName(options: DateTimeFormatOptions): string;
-    getLocalizedCalendarMonth(options: DateTimeFormatOptions): number;
+    getLocalizedCalendarMonth(options: DateTimeFormatOptions): string;
+    getLocalizedCalendarMonthIndex(options: DateTimeFormatOptions): number;
     getLocalizedCalendarMonthDisplayName(options: DateTimeFormatOptions): string;
     getLocalizedCalendarMonthDisplayShortName(options: DateTimeFormatOptions): string;
     getGregorianCalendarDay(): number;
-    getLocalizedCalendarDay(options: DateTimeFormatOptions): number;
+    getLocalizedCalendarDay(options: DateTimeFormatOptions): string;
     getGregorianCalendarYearDashMonthDashDay(): TextualYearMonthDay;
     getGregorianCalendarYearDashMonth(): TextualYearMonth;
     getWeekDay(): WeekDay;
@@ -33,8 +34,8 @@ export interface DateTime {
 }
 
 export interface DateTimeFormatOptions {
-    calendarType: CalendarType;
     numeralSystem: NumeralSystem;
+    calendarType: CalendarType;
     localeData: DateTimeLocaleData;
 }
 
@@ -70,9 +71,14 @@ export interface YearMonthRange {
     readonly endYearMonth: Year0BasedMonth;
 }
 
-export interface YearMonthDay {
+export interface YearMonthDay extends MonthDay {
     readonly year: number;
     readonly month: number; // 1-based (1 = January, 12 = December)
+    readonly day: number;
+}
+
+export interface MonthDay {
+    readonly month: number; // 1-based (1 = January, 12 = December
     readonly day: number;
 }
 

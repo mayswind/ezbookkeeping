@@ -15,20 +15,7 @@
             <v-card-text class="mb-md-4 w-100 d-flex justify-center">
                 <v-row class="match-height">
                     <v-col>
-                        <vue-date-picker inline month-picker auto-apply
-                                         month-name-format="long"
-                                         :clearable="false"
-                                         :dark="isDarkMode"
-                                         :year-range="yearRange"
-                                         :year-first="isYearFirst"
-                                         v-model="monthValue">
-                            <template #month="{ text }">
-                                {{ getMonthShortName(text) }}
-                            </template>
-                            <template #month-overlay-value="{ text }">
-                                {{ getMonthShortName(text) }}
-                            </template>
-                        </vue-date-picker>
+                        <month-picker :is-dark-mode="isDarkMode" v-model="monthValue"></month-picker>
                     </v-col>
                 </v-row>
             </v-card-text>
@@ -43,20 +30,24 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useTheme } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { type CommonMonthSelectionProps, useMonthSelectionBase } from '@/components/base/MonthSelectionBase.ts';
 
 import { ThemeType } from '@/core/theme.ts';
 import type { Year0BasedMonth } from '@/core/datetime.ts';
 
-interface DesktopMonthSelectionProps extends CommonMonthSelectionProps {
-    persistent?: boolean;
-}
+import { getYear0BasedMonthObjectFromUnixTime, getThisMonthFirstUnixTime } from '@/lib/datetime.ts';
 
-const props = defineProps<DesktopMonthSelectionProps>();
+const props = defineProps<{
+    modelValue?: Year0BasedMonth;
+    title?: string;
+    hint?: string;
+    show: boolean;
+    persistent?: boolean;
+}>();
+
 const emit = defineEmits<{
     (e: 'update:modelValue', value: Year0BasedMonth): void;
     (e: 'update:show', value: boolean): void;
@@ -65,8 +56,9 @@ const emit = defineEmits<{
 
 const theme = useTheme();
 
-const { tt, getMonthShortName } = useI18n();
-const { yearRange, monthValue, isYearFirst, getMonthSelectionValue, getYear0BasedMonth } = useMonthSelectionBase(props);
+const { tt } = useI18n();
+
+const monthValue = ref<Year0BasedMonth>(getYear0BasedMonthObjectFromUnixTime(getThisMonthFirstUnixTime()));
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 const showState = computed<boolean>({
@@ -75,19 +67,12 @@ const showState = computed<boolean>({
 });
 
 function confirm(): void {
-    try {
-        const finalMonthRange = getYear0BasedMonth();
-
-        if (!finalMonthRange) {
-            return;
-        }
-
-        emit('update:modelValue', finalMonthRange);
-    } catch (ex: unknown) {
-        if (ex instanceof Error) {
-            emit('error', ex.message);
-        }
+    if (monthValue.value.year <= 0 || monthValue.value.month0base < 0) {
+        emit('error', 'Date is too early');
+        return;
     }
+
+    emit('update:modelValue', monthValue.value);
 }
 
 function cancel(): void {
@@ -96,21 +81,13 @@ function cancel(): void {
 
 watch(() => props.modelValue, (newValue) => {
     if (newValue) {
-        const yearMonth = getMonthSelectionValue(newValue);
-
-        if (yearMonth) {
-            monthValue.value = yearMonth;
-        }
+        monthValue.value = newValue;
     }
 });
 
 watch(() => props.show, (newValue) => {
     if (newValue && props.modelValue) {
-        const yearMonth = getMonthSelectionValue(props.modelValue);
-
-        if (yearMonth) {
-            monthValue.value = yearMonth;
-        }
+        monthValue.value = props.modelValue;
     }
 });
 </script>

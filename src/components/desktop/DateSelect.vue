@@ -6,48 +6,35 @@
         :clearable="modelValue ? clearable : false"
         :label="label"
         :menu-props="{ contentClass: 'date-select-menu' }"
-        v-model="dateTime"
+        v-model="displayTime"
     >
         <template #selection>
             <span class="text-truncate cursor-pointer">{{ displayTime }}</span>
         </template>
 
         <template #no-data>
-            <vue-date-picker inline vertical auto-apply
-                             ref="datepicker"
-                             month-name-format="long"
-                             model-type="yyyy-MM-dd"
-                             :clearable="true"
-                             :enable-time-picker="false"
-                             :dark="isDarkMode"
-                             :week-start="firstDayOfWeek"
-                             :year-range="yearRange"
-                             :day-names="dayNames"
-                             :year-first="isYearFirst"
-                             v-model="dateTime">
-                <template #month="{ text }">
-                    {{ getMonthShortName(text) }}
-                </template>
-                <template #month-overlay-value="{ text }">
-                    {{ getMonthShortName(text) }}
-                </template>
-            </vue-date-picker>
+            <date-time-picker :is-dark-mode="isDarkMode"
+                              :enable-time-picker="false"
+                              :clearable="true"
+                              v-model="dateTime">
+            </date-time-picker>
         </template>
     </v-select>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { useTheme } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-import { useUserStore } from '@/stores/user.ts';
-
-import { type TextualYearMonthDay, type WeekDayValue } from '@/core/datetime.ts';
+import { type TextualYearMonthDay } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
-import { getAllowedYearRange } from '@/lib/datetime.ts';
+
+import {
+    getLocalDateFromYearDashMonthDashDay,
+    getGregorianCalendarYearAndMonthFromLocalDate
+} from '@/lib/datetime.ts';
 
 const props = defineProps<{
     modelValue?: TextualYearMonthDay;
@@ -59,32 +46,32 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: TextualYearMonthDay): void;
+    (e: 'update:modelValue', value: TextualYearMonthDay | ''): void;
 }>();
 
 const theme = useTheme();
-const { tt, getAllMinWeekdayNames, getMonthShortName, formatGregorianCalendarYearDashMonthDashDayToLongDate, isLongDateMonthAfterYear } = useI18n();
+const { tt, formatGregorianCalendarYearDashMonthDashDayToLongDate } = useI18n();
 
-const userStore = useUserStore();
-
-const yearRange = ref<number[]>(getAllowedYearRange());
-
-const dateTime = computed<string>({
-    get: () => props.modelValue ?? '',
-    set: (value: string) => emit('update:modelValue', value as TextualYearMonthDay)
+const dateTime = computed<Date | null>({
+    get: () => props.modelValue ? getLocalDateFromYearDashMonthDashDay(props.modelValue) : null,
+    set: (value: Date | null) => emit('update:modelValue', value ? getGregorianCalendarYearAndMonthFromLocalDate(value) : '')
 });
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
-const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
-const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllMinWeekdayNames(), firstDayOfWeek.value));
-const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
-const displayTime = computed<string>(() => {
-    if (props.modelValue) {
-        return formatGregorianCalendarYearDashMonthDashDayToLongDate(props.modelValue);
-    } else if (props.noDataText) {
-        return props.noDataText;
-    } else {
-        return tt('Unspecified');
+const displayTime = computed<string>({
+    get: () => {
+        if (props.modelValue) {
+            return formatGregorianCalendarYearDashMonthDashDayToLongDate(props.modelValue);
+        } else if (props.noDataText) {
+            return props.noDataText;
+        } else {
+            return tt('Unspecified');
+        }
+    },
+    set: (value: string) => {
+        if (!value) {
+            dateTime.value = null;
+        }
     }
 });
 </script>

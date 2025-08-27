@@ -2,8 +2,7 @@ import type { TypeAndName } from '@/core/base.ts';
 
 export enum CalendarType {
     Gregorian = 0,
-    Buddhist = 1,
-    Chinese = 2
+    Buddhist = 1
 }
 
 export class CalendarDisplayType implements TypeAndName {
@@ -13,6 +12,7 @@ export class CalendarDisplayType implements TypeAndName {
 
     public static readonly LanguageDefaultType: number = 0;
     public static readonly Gregorian = new CalendarDisplayType(1, 'Gregorian', 'Gregorian', CalendarType.Gregorian);
+    public static readonly Buddhist = new CalendarDisplayType(2, 'Buddhist', 'Buddhist', CalendarType.Buddhist);
 
     public static readonly Default = CalendarDisplayType.Gregorian;
 

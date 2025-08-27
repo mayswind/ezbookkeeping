@@ -12,26 +12,12 @@
         </f7-toolbar>
         <f7-page-content>
             <div class="block block-outline no-margin no-padding">
-                <vue-date-picker inline auto-apply
-                                 month-name-format="long"
-                                 model-type="yyyy-MM-dd"
-                                 six-weeks="center"
-                                 class="justify-content-center"
-                                 :enable-time-picker="false"
-                                 :clearable="true"
-                                 :dark="isDarkMode"
-                                 :week-start="firstDayOfWeek"
-                                 :year-range="yearRange"
-                                 :day-names="dayNames"
-                                 :year-first="isYearFirst"
-                                 v-model="dateTime">
-                    <template #month="{ text }">
-                        {{ getMonthShortName(text) }}
-                    </template>
-                    <template #month-overlay-value="{ text }">
-                        {{ getMonthShortName(text) }}
-                    </template>
-                </vue-date-picker>
+                <date-time-picker datetime-picker-class="justify-content-center"
+                                  :is-dark-mode="isDarkMode"
+                                  :enable-time-picker="false"
+                                  :clearable="true"
+                                  v-model="dateTime">
+                </date-time-picker>
             </div>
         </f7-page-content>
     </f7-sheet>
@@ -43,11 +29,13 @@ import { ref, computed } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useEnvironmentsStore } from '@/stores/environment.ts';
-import { useUserStore } from '@/stores/user.ts';
 
-import { type TextualYearMonthDay, type WeekDayValue } from '@/core/datetime.ts';
-import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
-import { getAllowedYearRange } from '@/lib/datetime.ts';
+import { type TextualYearMonthDay } from '@/core/datetime.ts';
+
+import {
+    getLocalDateFromYearDashMonthDashDay,
+    getGregorianCalendarYearAndMonthFromLocalDate
+} from '@/lib/datetime.ts';
 
 const props = defineProps<{
     modelValue?: TextualYearMonthDay;
@@ -55,35 +43,30 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: TextualYearMonthDay): void;
+    (e: 'update:modelValue', value: TextualYearMonthDay | ''): void;
     (e: 'update:show', value: boolean): void;
 }>();
 
-const { tt, getAllMinWeekdayNames, getMonthShortName, isLongDateMonthAfterYear } = useI18n();
+const { tt } = useI18n();
 
 const environmentsStore = useEnvironmentsStore();
-const userStore = useUserStore();
 
-const yearRange = ref<number[]>(getAllowedYearRange());
-const dateTime = ref<string>('');
+const dateTime = ref<Date | null>(null);
 
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
-const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
-const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllMinWeekdayNames(), firstDayOfWeek.value));
-const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
 
 function clear(): void {
-    dateTime.value = '';
+    dateTime.value = null;
     confirm();
 }
 
 function confirm(): void {
-    emit('update:modelValue', dateTime.value as TextualYearMonthDay);
+    emit('update:modelValue', dateTime.value ? getGregorianCalendarYearAndMonthFromLocalDate(dateTime.value) : '');
     emit('update:show', false);
 }
 
 function onSheetOpen(): void {
-    dateTime.value = props.modelValue ?? '';
+    dateTime.value = props.modelValue ? getLocalDateFromYearDashMonthDashDay(props.modelValue) : null;
 }
 
 function onSheetClosed(): void {

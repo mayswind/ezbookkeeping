@@ -138,8 +138,7 @@
     },
     "calendar": {
         "Gregorian": "公历",
-        "Buddhist": "佛教日历",
-        "Gregorian (with Chinese Calendar)": "公历（含农历）"
+        "Buddhist": "佛教日历"
     },
     "datetime": {
         "AM": {
@@ -1857,6 +1856,7 @@
     "Unable to retrieve transaction list": "无法获取交易列表",
     "Unable to retrieve reconciliation statements": "无法获取对账单",
     "Custom Date Range": "自定义日期范围",
+    "Select Month": "选择月份",
     "Transaction Detail": "交易详情",
     "No transaction data": "没有交易数据",
     "Are you sure you want to delete this transaction?": "您确定要删除该交易？",

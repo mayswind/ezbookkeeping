@@ -49,6 +49,9 @@ import { getI18nOptions } from '@/locales/helpers.ts';
 
 import PinCodeInput from '@/components/common/PinCodeInput.vue';
 import MapView from '@/components/common/MapView.vue';
+import DateTimePicker from '@/components/common/DateTimePicker.vue';
+import MonthPicker from '@/components/common/MonthPicker.vue';
+import TransactionCalendar from '@/components/common/TransactionCalendar.vue';
 
 import ItemIcon from '@/components/mobile/ItemIcon.vue';
 import LanguageSelectButton from '@/components/mobile/LanguageSelectButton.vue';
@@ -139,6 +142,9 @@ app.component('VueDatePicker', VueDatePicker);
 
 app.component('PinCodeInput', PinCodeInput);
 app.component('MapView', MapView);
+app.component('DateTimePicker', DateTimePicker);
+app.component('MonthPicker', MonthPicker);
+app.component('TransactionCalendar', TransactionCalendar);
 
 app.component('ItemIcon', ItemIcon);
 app.component('LanguageSelectButton', LanguageSelectButton);

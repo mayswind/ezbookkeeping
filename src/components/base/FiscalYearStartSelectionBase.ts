@@ -2,11 +2,9 @@ import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-import { useUserStore } from '@/stores/user.ts';
-
-import { type WeekDayValue } from '@/core/datetime.ts';
+import type { MonthDay } from '@/core/datetime.ts';
 import { FiscalYearStart } from '@/core/fiscalyear.ts';
-import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
+
 import {
     getLocalDatetimeFromUnixTime,
     getThisYearFirstUnixTime,
@@ -39,12 +37,7 @@ function getFiscalYearStartFromProps(props: CommonFiscalYearStartSelectionProps)
 }
 
 export function useFiscalYearStartSelectionBase(props: CommonFiscalYearStartSelectionProps) {
-    const {
-        getAllMinWeekdayNames,
-        formatGregorianCalendarMonthDashDayToLongMonthDay
-    } = useI18n();
-
-    const userStore = useUserStore();
+    const { formatGregorianCalendarMonthDashDayToLongMonthDay } = useI18n();
 
     const disabledDates = (date: Date) => {
         // Disable February 29 (leap day)
@@ -53,18 +46,15 @@ export function useFiscalYearStartSelectionBase(props: CommonFiscalYearStartSele
 
     const selectedFiscalYearStart = ref<number>(getFiscalYearStartFromProps(props));
 
-    const selectedFiscalYearStartValue = computed<string>({
+    const selectedFiscalYearStartValue = computed<Date>({
         get: () => {
             const fiscalYearStart = FiscalYearStart.valueOf(selectedFiscalYearStart.value);
+            const monthDay: MonthDay = fiscalYearStart?.toMonthDay() ?? FiscalYearStart.Default.toMonthDay();
 
-            if (fiscalYearStart) {
-                return fiscalYearStart.toMonthDashDayString();
-            } else {
-                return FiscalYearStart.Default.toMonthDashDayString();
-            }
+            return new Date(new Date().getFullYear(), monthDay.month - 1, monthDay.day);
         },
-        set: (value: string) => {
-            const fiscalYearStart = FiscalYearStart.parse(value);
+        set: (value: Date) => {
+            const fiscalYearStart = FiscalYearStart.of(value.getMonth() + 1, value.getDate());
 
             if (fiscalYearStart) {
                 selectedFiscalYearStart.value = fiscalYearStart.value;
@@ -87,9 +77,6 @@ export function useFiscalYearStartSelectionBase(props: CommonFiscalYearStartSele
     const allowedMinDate = computed<Date>(() => getLocalDatetimeFromUnixTime(getThisYearFirstUnixTime()));
     const allowedMaxDate = computed<Date>(() => getLocalDatetimeFromUnixTime(getThisYearLastUnixTime()));
 
-    const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
-    const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllMinWeekdayNames(), firstDayOfWeek.value));
-
     return {
         // constants
         disabledDates,
@@ -99,8 +86,6 @@ export function useFiscalYearStartSelectionBase(props: CommonFiscalYearStartSele
         selectedFiscalYearStartValue,
         displayFiscalYearStartDate,
         allowedMinDate,
-        allowedMaxDate,
-        firstDayOfWeek,
-        dayNames
+        allowedMaxDate
     };
 }

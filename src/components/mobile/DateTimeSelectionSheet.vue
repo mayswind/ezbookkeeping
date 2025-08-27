@@ -12,27 +12,13 @@
         </f7-toolbar>
         <f7-page-content class="padding-bottom">
             <div class="block block-outline no-margin no-padding">
-                <vue-date-picker inline enable-seconds auto-apply
-                                 ref="datetimepicker"
-                                 month-name-format="long"
-                                 six-weeks="center"
-                                 class="justify-content-center"
-                                 :enable-time-picker="false"
-                                 :clearable="false"
-                                 :dark="isDarkMode"
-                                 :week-start="firstDayOfWeek"
-                                 :year-range="yearRange"
-                                 :day-names="dayNames"
-                                 :year-first="isYearFirst"
-                                 v-model="dateTime"
-                                 v-show="mode === 'date'">
-                    <template #month="{ text }">
-                        {{ getMonthShortName(text) }}
-                    </template>
-                    <template #month-overlay-value="{ text }">
-                        {{ getMonthShortName(text) }}
-                    </template>
-                </vue-date-picker>
+                <date-time-picker ref="datetimepicker"
+                                  datetime-picker-class="justify-content-center"
+                                  :is-dark-mode="isDarkMode"
+                                  :enable-time-picker="false"
+                                  v-model="dateTime"
+                                  v-show="mode === 'date'">
+                </date-time-picker>
             </div>
             <div class="block block-outline no-margin no-padding padding-vertical-half" v-show="mode === 'time'">
                 <div id="time-picker-container" class="time-picker-container">
@@ -115,8 +101,8 @@
 </template>
 
 <script setup lang="ts">
+import DateTimePicker from '@/components/common/DateTimePicker.vue';
 import { ref, computed, nextTick, useTemplateRef, watch } from 'vue';
-import VueDatePicker from '@vuepic/vue-datepicker';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
@@ -137,7 +123,7 @@ import {
     getCombinedDateAndTimeValues
 } from '@/lib/datetime.ts';
 
-type VueDatePickerType = InstanceType<typeof VueDatePicker>;
+type DateTimePickerType = InstanceType<typeof DateTimePicker>;
 
 const props = defineProps<{
     modelValue: number;
@@ -150,11 +136,7 @@ const emit = defineEmits<{
     (e: 'update:show', value: boolean): void;
 }>();
 
-const {
-    tt,
-    getMonthShortName,
-    formatUnixTimeToLongDateTime
-} = useI18n();
+const { tt, formatUnixTimeToLongDateTime } = useI18n();
 const { showToast } = useI18nUIComponents();
 
 const {
@@ -163,11 +145,7 @@ const {
     isMinuteTwoDigits,
     isSecondTwoDigits,
     isMeridiemIndicatorFirst,
-    yearRange,
     meridiemItems,
-    firstDayOfWeek,
-    dayNames,
-    isYearFirst,
     getDisplayTimeValue,
     generateAllHours,
     generateAllMinutesOrSeconds
@@ -175,7 +153,7 @@ const {
 
 const environmentsStore = useEnvironmentsStore();
 
-const datetimepicker = useTemplateRef<VueDatePickerType>('datetimepicker');
+const datetimepicker = useTemplateRef<DateTimePickerType>('datetimepicker');
 
 let resetTimePickerItemPositionItemsClass: string | undefined = undefined;
 let resetTimePickerItemPositionItemClass: string | undefined = undefined;
@@ -455,9 +433,7 @@ function onSheetOpen(): void {
         });
     }
 
-    if (datetimepicker.value) {
-        datetimepicker.value.switchView('calendar');
-    }
+    datetimepicker.value?.switchView('calendar');
 }
 
 function onSheetClosed(): void {
@@ -465,8 +441,8 @@ function onSheetClosed(): void {
 }
 
 watch(mode, (newValue) => {
-    if (newValue === 'date' && datetimepicker.value) {
-        datetimepicker.value.switchView('calendar');
+    if (newValue === 'date') {
+        datetimepicker.value?.switchView('calendar');
     } else if (newValue === 'time') {
         nextTick(() => {
             initTimePickerStyle();

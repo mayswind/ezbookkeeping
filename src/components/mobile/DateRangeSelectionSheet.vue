@@ -14,31 +14,13 @@
                     <span>{{ endDateTime }}</span>
                 </p>
                 <slot></slot>
-                <vue-date-picker inline enable-seconds auto-apply
-                                 ref="datetimepicker"
-                                 month-name-format="long"
-                                 six-weeks="center"
-                                 class="justify-content-center margin-bottom"
-                                 :clearable="false"
-                                 :dark="isDarkMode"
-                                 :week-start="firstDayOfWeek"
-                                 :year-range="yearRange"
-                                 :day-names="dayNames"
-                                 :year-first="isYearFirst"
-                                 :is24="is24Hour"
-                                 :range="{ partialRange: false }"
-                                 :preset-dates="presetRanges"
-                                 v-model="dateRange">
-                    <template #month="{ text }">
-                        {{ getMonthShortName(text) }}
-                    </template>
-                    <template #month-overlay-value="{ text }">
-                        {{ getMonthShortName(text) }}
-                    </template>
-                    <template #am-pm-button="{ toggle, value }">
-                        <button class="dp__pm_am_button" tabindex="0" @click="toggle">{{ tt(`datetime.${value}.content`) }}</button>
-                    </template>
-                </vue-date-picker>
+                <date-time-picker ref="datetimepicker"
+                                  datetime-picker-class="justify-content-center margin-bottom"
+                                  :is-dark-mode="isDarkMode"
+                                  :enable-time-picker="true"
+                                  :preset-dates="presetRanges"
+                                  v-model="dateRange">
+                </date-time-picker>
                 <f7-button large fill
                            :class="{ 'disabled': !dateRange[0] || !dateRange[1] }"
                            :text="tt('Continue')"
@@ -53,17 +35,14 @@
 </template>
 
 <script setup lang="ts">
+import DateTimePicker from '@/components/common/DateTimePicker.vue';
 import { computed, useTemplateRef } from 'vue';
-import VueDatePicker from '@vuepic/vue-datepicker';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
 import { type CommonDateRangeSelectionProps, useDateRangeSelectionBase } from '@/components/base/DateRangeSelectionBase.ts';
 
 import { useEnvironmentsStore } from '@/stores/environment.ts';
-import { useUserStore } from '@/stores/user.ts';
-
-import { type WeekDayValue } from '@/core/datetime.ts';
 
 import {
     getLocalDatetimeFromUnixTime,
@@ -72,7 +51,7 @@ import {
     getBrowserTimezoneOffsetMinutes
 } from '@/lib/datetime.ts';
 
-type VueDatePickerType = InstanceType<typeof VueDatePicker>;
+type DateTimePickerType = InstanceType<typeof DateTimePicker>;
 
 const props = defineProps<CommonDateRangeSelectionProps>();
 const emit = defineEmits<{
@@ -80,16 +59,14 @@ const emit = defineEmits<{
     (e: 'dateRange:change', minUnixTime: number, maxUnixTime: number): void;
 }>();
 
-const { tt, getMonthShortName } = useI18n();
+const { tt } = useI18n();
 const { showToast } = useI18nUIComponents();
-const { yearRange, dateRange, dayNames, isYearFirst, is24Hour, beginDateTime, endDateTime, presetRanges, getFinalDateRange } = useDateRangeSelectionBase(props);
+const { dateRange, beginDateTime, endDateTime, presetRanges, getFinalDateRange } = useDateRangeSelectionBase(props);
 
 const environmentsStore = useEnvironmentsStore();
-const userStore = useUserStore();
 
-const datetimepicker = useTemplateRef<VueDatePickerType>('datetimepicker');
+const datetimepicker = useTemplateRef<DateTimePickerType>('datetimepicker');
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
-const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
 
 function confirm(): void {
     try {
@@ -121,10 +98,7 @@ function onSheetOpen(): void {
     }
 
     window.dispatchEvent(new Event('resize')); // fix vue-datepicker preset max-width
-
-    if (datetimepicker.value) {
-        datetimepicker.value.switchView('calendar');
-    }
+    datetimepicker.value?.switchView('calendar');
 }
 
 function onSheetClosed(): void {

@@ -1,4 +1,4 @@
-import { watch } from 'vue';
+import { computed, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { type CommonNumberInputProps, useCommonNumberInputBase } from '@/components/base/CommonNumberInputBase.ts';
@@ -29,24 +29,25 @@ export function useNumberInputBase(props: NumberInputProps, emit: NumberInputEmi
         onPaste
     } = useCommonNumberInputBase(props, props.maxDecimalCount ?? -1, getFormattedValue(props.modelValue), parseNumber, getFormattedValue, getValidFormattedValue);
 
+    const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
+
     function parseNumber(value: string): number {
         if (!value) {
             return 0;
         }
 
-        const numeralSystem = getCurrentNumeralSystemType();
         const decimalSeparator = getCurrentDecimalSeparator();
 
         let finalValue = '';
         for (let i = 0; i < value.length; i++) {
-            if (!NumeralSystem.WesternArabicNumerals.isDigit(value[i]) && !numeralSystem.isDigit(value[i]) && value[i] !== '-' && value[i] !== decimalSeparator) {
+            if (!NumeralSystem.WesternArabicNumerals.isDigit(value[i]) && !numeralSystem.value.isDigit(value[i]) && value[i] !== '-' && value[i] !== decimalSeparator) {
                 break;
             }
 
             finalValue += value[i];
         }
 
-        finalValue = numeralSystem.replaceLocalizedDigitsToWesternArabicDigits(finalValue);
+        finalValue = numeralSystem.value.replaceLocalizedDigitsToWesternArabicDigits(finalValue);
 
         if (decimalSeparator !== '.') {
             finalValue = replaceAll(finalValue, decimalSeparator, '.');
@@ -70,36 +71,32 @@ export function useNumberInputBase(props: NumberInputProps, emit: NumberInputEmi
     }
 
     function getFormattedValue(value: number): string {
-        const numeralSystem = getCurrentNumeralSystemType();
-
         if (!Number.isNaN(value) && Number.isFinite(value)) {
             const decimalSeparator = getCurrentDecimalSeparator();
 
             if (isNumber(props.maxDecimalCount) && props.maxDecimalCount >= 0) {
-                return replaceAll(numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(value.toFixed(props.maxDecimalCount)), '.', decimalSeparator);
+                return replaceAll(numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(value.toFixed(props.maxDecimalCount)), '.', decimalSeparator);
             } else {
-                return replaceAll(numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(value.toString(10)), '.', decimalSeparator);
+                return replaceAll(numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(value.toString(10)), '.', decimalSeparator);
             }
         }
 
-        return numeralSystem.digitZero;
+        return numeralSystem.value.digitZero;
     }
 
     watch(() => props.modelValue, (newValue) => {
-        const numeralSystem = getCurrentNumeralSystemType();
         const numericCurrentValue = parseNumber(currentValue.value);
 
         if (newValue !== numericCurrentValue) {
             const newStringValue = getFormattedValue(newValue);
 
-            if (!(newStringValue === numeralSystem.digitZero && currentValue.value === '')) {
+            if (!(newStringValue === numeralSystem.value.digitZero && currentValue.value === '')) {
                 currentValue.value = newStringValue;
             }
         }
     });
 
     watch(currentValue, (newValue) => {
-        const numeralSystem = getCurrentNumeralSystemType();
         let actualNumeralSystem: NumeralSystem | undefined = undefined;
         let finalValue = '';
 
@@ -112,16 +109,16 @@ export function useNumberInputBase(props: NumberInputProps, emit: NumberInputEmi
                 actualNumeralSystem = NumeralSystem.detect(newValue[0]);
             }
 
-            if (actualNumeralSystem && (actualNumeralSystem.type === NumeralSystem.WesternArabicNumerals.type || actualNumeralSystem.type === numeralSystem.type)) {
+            if (actualNumeralSystem && (actualNumeralSystem.type === NumeralSystem.WesternArabicNumerals.type || actualNumeralSystem.type === numeralSystem.value.type)) {
                 for (let i = 0; i < newValue.length; i++) {
-                    if (!NumeralSystem.WesternArabicNumerals.isDigit(newValue[i]) && !numeralSystem.isDigit(newValue[i]) && newValue[i] !== '-' && newValue[i] !== decimalSeparator) {
+                    if (!NumeralSystem.WesternArabicNumerals.isDigit(newValue[i]) && !numeralSystem.value.isDigit(newValue[i]) && newValue[i] !== '-' && newValue[i] !== decimalSeparator) {
                         break;
                     }
 
                     finalValue += newValue[i];
                 }
 
-                finalValue = numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(finalValue);
+                finalValue = numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(finalValue);
             } else if (newValue === '-' || newValue === decimalSeparator || newValue === `-${decimalSeparator}`) {
                 finalValue = newValue;
             }

@@ -185,6 +185,7 @@ const customExchangeRateToDelete = ref<LocalizedLatestExchangeRate | null>(null)
 const showDeleteActionSheet = ref<boolean>(false);
 
 const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
+const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 const displayBaseAmount = computed<string>(() => formatAmountToLocalizedNumerals(baseAmount.value, baseCurrency.value));
 const baseAmountFontSizeClass = computed<string>(() => {
     if (baseAmount.value >= 100000000 || baseAmount.value <= -100000000) {
@@ -275,13 +276,12 @@ function remove(customExchangeRate: LocalizedLatestExchangeRate | null, confirm:
 }
 
 function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate, displayLocalizedDigits: boolean): string {
-    const numeralSystem = getCurrentNumeralSystemType();
     const fromExchangeRate = exchangeRatesStore.latestExchangeRateMap[baseCurrency.value];
     const exchangeRateAmount = getConvertedAmount(baseAmount.value / 100, fromExchangeRate, toExchangeRate);
 
     if (!exchangeRateAmount) {
         if (displayLocalizedDigits) {
-            return numeralSystem.digitZero;
+            return numeralSystem.value.digitZero;
         } else {
             return NumeralSystem.WesternArabicNumerals.digitZero;
         }
@@ -290,7 +290,7 @@ function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate, di
     let ret = formatExchangeRateAmountToWesternArabicNumerals(exchangeRateAmount);
 
     if (displayLocalizedDigits) {
-        ret = numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(ret);
+        ret = numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(ret);
     }
 
     return ret;

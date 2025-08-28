@@ -152,6 +152,8 @@ const rules = [
 const currentFormula = ref<string>('');
 const formulaMode = ref<boolean>(false);
 
+const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
+
 const prependText = computed<string | undefined>(() => {
     if (!props.currency || !props.showCurrency) {
         return '';
@@ -205,7 +207,6 @@ function enterFormulaMode(): void {
 
 function calculateFormula(): void {
     const systemDecimalSeparator = DecimalSeparator.Dot.symbol;
-    const numeralSystem = getCurrentNumeralSystemType();
     const decimalSeparator = getCurrentDecimalSeparator();
     let finalFormula = currentFormula.value;
 
@@ -216,7 +217,7 @@ function calculateFormula(): void {
         finalFormula = replaceAll(currentFormula.value, decimalSeparator, systemDecimalSeparator);
     }
 
-    finalFormula = numeralSystem.replaceLocalizedDigitsToWesternArabicDigits(finalFormula);
+    finalFormula = numeralSystem.value.replaceLocalizedDigitsToWesternArabicDigits(finalFormula);
     const calculatedValue = evaluateExpression(finalFormula);
 
     if (isNumber(calculatedValue)) {
@@ -275,13 +276,11 @@ function getInitedFormattedValue(value: number, flipNegative?: boolean): string 
 }
 
 function getFormattedValue(value: number): string {
-    const numeralSystem = getCurrentNumeralSystemType();
-
     if (!Number.isNaN(value) && Number.isFinite(value)) {
         return formatAmountToLocalizedNumeralsWithoutDigitGrouping(value, props.currency);
     }
 
-    return numeralSystem.digitZero;
+    return numeralSystem.value.digitZero;
 }
 
 function getDisplayCurrencyPrependAndAppendText(): CurrencyPrependAndAppendText | null {
@@ -292,19 +291,17 @@ function getDisplayCurrencyPrependAndAppendText(): CurrencyPrependAndAppendText 
 }
 
 watch(() => props.currency, () => {
-    const numeralSystem = getCurrentNumeralSystemType();
     const newStringValue = getInitedFormattedValue(props.modelValue, props.flipNegative);
 
-    if (!(newStringValue === numeralSystem.digitZero && currentValue.value === '')) {
+    if (!(newStringValue === numeralSystem.value.digitZero && currentValue.value === '')) {
         currentValue.value = newStringValue;
     }
 });
 
 watch(() => props.flipNegative, (newValue) => {
-    const numeralSystem = getCurrentNumeralSystemType();
     const newStringValue = getInitedFormattedValue(props.modelValue, newValue);
 
-    if (!(newStringValue === numeralSystem.digitZero && currentValue.value === '')) {
+    if (!(newStringValue === numeralSystem.value.digitZero && currentValue.value === '')) {
         currentValue.value = newStringValue;
     }
 });
@@ -314,20 +311,18 @@ watch(() => props.modelValue, (newValue) => {
         newValue = -newValue;
     }
 
-    const numeralSystem = getCurrentNumeralSystemType();
     const numericCurrentValue = parseAmountFromLocalizedNumerals(currentValue.value);
 
     if (newValue !== numericCurrentValue) {
         const newStringValue = getFormattedValue(newValue);
 
-        if (!(newStringValue === numeralSystem.digitZero && currentValue.value === '')) {
+        if (!(newStringValue === numeralSystem.value.digitZero && currentValue.value === '')) {
             currentValue.value = newStringValue;
         }
     }
 });
 
 watch(currentValue, (newValue) => {
-    const numeralSystem = getCurrentNumeralSystemType();
     let actualNumeralSystem: NumeralSystem | undefined = undefined;
     let finalValue = '';
 
@@ -340,16 +335,16 @@ watch(currentValue, (newValue) => {
             actualNumeralSystem = NumeralSystem.detect(newValue[0]);
         }
 
-        if (actualNumeralSystem && (actualNumeralSystem.type === NumeralSystem.WesternArabicNumerals.type || actualNumeralSystem.type === numeralSystem.type)) {
+        if (actualNumeralSystem && (actualNumeralSystem.type === NumeralSystem.WesternArabicNumerals.type || actualNumeralSystem.type === numeralSystem.value.type)) {
             for (let i = 0; i < newValue.length; i++) {
-                if (!NumeralSystem.WesternArabicNumerals.isDigit(newValue[i]) && !numeralSystem.isDigit(newValue[i]) && newValue[i] !== '-' && newValue[i] !== decimalSeparator) {
+                if (!NumeralSystem.WesternArabicNumerals.isDigit(newValue[i]) && !numeralSystem.value.isDigit(newValue[i]) && newValue[i] !== '-' && newValue[i] !== decimalSeparator) {
                     break;
                 }
 
                 finalValue += newValue[i];
             }
 
-            finalValue = numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(finalValue);
+            finalValue = numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(finalValue);
         } else if (newValue === '-' || newValue === decimalSeparator || newValue === `-${decimalSeparator}`) {
             finalValue = newValue;
         }

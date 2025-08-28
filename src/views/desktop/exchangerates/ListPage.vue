@@ -160,7 +160,7 @@ import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import UpdateDialog from './list/dialogs/UpdateDialog.vue';
 
-import { ref, useTemplateRef, watch } from 'vue';
+import { ref, computed, useTemplateRef, watch } from 'vue';
 import { useDisplay } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -211,6 +211,8 @@ const updating = ref<boolean>(false);
 const customExchangeRateRemoving = ref<Record<string, boolean>>({});
 const alwaysShowNav = ref<boolean>(mdAndUp.value);
 const showNav = ref<boolean>(mdAndUp.value);
+
+const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 
 function reload(force: boolean): void {
     loading.value = true;
@@ -286,11 +288,9 @@ function remove(currency: string): void {
 }
 
 function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate, displayLocalizedDigits: boolean): string {
-    const numeralSystem = getCurrentNumeralSystemType();
-
     if (!baseCurrency.value) {
         if (displayLocalizedDigits) {
-            return numeralSystem.digitZero;
+            return numeralSystem.value.digitZero;
         } else {
             return NumeralSystem.WesternArabicNumerals.digitZero;
         }
@@ -308,7 +308,7 @@ function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate, di
 
     if (!exchangeRateAmount) {
         if (displayLocalizedDigits) {
-            return numeralSystem.digitZero;
+            return numeralSystem.value.digitZero;
         } else {
             return NumeralSystem.WesternArabicNumerals.digitZero;
         }
@@ -317,7 +317,7 @@ function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate, di
     let ret = formatExchangeRateAmountToWesternArabicNumerals(exchangeRateAmount);
 
     if (displayLocalizedDigits) {
-        ret = numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(ret);
+        ret = numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(ret);
     }
 
     return ret;

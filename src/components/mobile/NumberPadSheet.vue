@@ -108,6 +108,8 @@ const previousValue = ref<string>('');
 const currentSymbol = ref<string>('');
 const currentValue = ref<string>(getInitedStringValue(props.modelValue, props.flipNegative));
 
+const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
+
 const digits = computed<string[]>(() => getAllLocalizedDigits());
 const decimalSeparator = computed<string>(() => getCurrentDecimalSeparator());
 
@@ -120,8 +122,7 @@ const supportDecimalSeparator = computed<boolean>(() => {
 });
 
 const currentDisplay = computed<string>(() => {
-    const numeralSystem = getCurrentNumeralSystemType();
-    const finalPreviousValue = appendDigitGroupingSymbolAndDecimalSeparator(numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(previousValue.value));
+    const finalPreviousValue = appendDigitGroupingSymbolAndDecimalSeparator(numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(previousValue.value));
     let finalCurrentValue = currentValue.value;
     let currentValueSuffix = '';
 
@@ -130,7 +131,7 @@ const currentDisplay = computed<string>(() => {
         currentValueSuffix = decimalSeparator.value;
     }
 
-    finalCurrentValue = appendDigitGroupingSymbolAndDecimalSeparator(numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(finalCurrentValue));
+    finalCurrentValue = appendDigitGroupingSymbolAndDecimalSeparator(numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(finalCurrentValue));
 
     if (currentValueSuffix) {
         finalCurrentValue += currentValueSuffix;

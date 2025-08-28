@@ -48,8 +48,11 @@ const emit = defineEmits<{
 
 const { getCurrentNumeralSystemType } = useI18n();
 
-const codes = ref<PinCode[]>([]);
 const pinCodeInputs = useTemplateRef<HTMLInputElement[]>('pin-code-input');
+
+const codes = ref<PinCode[]>([]);
+
+const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 
 const finalPinCode = computed<string>(() => {
     let ret = '';
@@ -154,8 +157,6 @@ function setNextFocus(index: number): void {
 }
 
 function onKeydown(index: number, event: KeyboardEvent): void {
-    const numeralSystem = getCurrentNumeralSystemType();
-
     if (event.altKey || (event.key.indexOf('F') === 0 && (event.key.length === 2 || event.key.length === 3))) {
         return;
     }
@@ -221,8 +222,8 @@ function onKeydown(index: number, event: KeyboardEvent): void {
 
         if (NumeralSystem.WesternArabicNumerals.isDigit(event.key)) {
             digit = event.key;
-        } else if (numeralSystem.isDigit(event.key)) {
-            digit = numeralSystem.replaceLocalizedDigitsToWesternArabicDigits(event.key);
+        } else if (numeralSystem.value.isDigit(event.key)) {
+            digit = numeralSystem.value.replaceLocalizedDigitsToWesternArabicDigits(event.key);
         }
 
         if (digit) {

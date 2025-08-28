@@ -105,7 +105,7 @@ function getDisplayDay(date: Date): string {
     justify-content: center;
 }
 
-.transaction-calendar .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > span {
+.transaction-calendar.dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > span.transaction-calendar-daily-amount {
     display: block;
     width: 100%;
     overflow: hidden;

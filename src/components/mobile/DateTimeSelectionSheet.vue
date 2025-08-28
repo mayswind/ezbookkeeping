@@ -110,6 +110,8 @@ import { type TimePickerValue, useDateTimeSelectionBase } from '@/components/bas
 
 import { useEnvironmentsStore } from '@/stores/environment.ts';
 
+import { NumeralSystem } from '@/core/numeral.ts';
+
 import { isDefined } from '@/lib/common.ts';
 import {
     getHourIn12HourFormat,
@@ -136,7 +138,11 @@ const emit = defineEmits<{
     (e: 'update:show', value: boolean): void;
 }>();
 
-const { tt, formatUnixTimeToLongDateTime } = useI18n();
+const {
+    tt,
+    getCurrentNumeralSystemType,
+    formatUnixTimeToLongDateTime
+} = useI18n();
 const { showToast } = useI18nUIComponents();
 
 const {
@@ -165,6 +171,12 @@ const dateTime = ref<Date>(getLocalDatetimeFromUnixTime(props.modelValue || getC
 const timePickerContainerHeight = ref<number | undefined>(undefined);
 const timePickerItemHeight = ref<number | undefined>(undefined);
 
+const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
+const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
+
+const displayTime = computed<string>(() => formatUnixTimeToLongDateTime(getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(dateTime.value), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())));
+const switchButtonTitle = computed<string>(() => mode.value === 'time' ? 'Date' : 'Time');
+
 const hourItems = computed<TimePickerValue[]>(() => generateAllHours(3, isHourTwoDigits.value));
 const minuteItems = computed<TimePickerValue[]>(() => generateAllMinutesOrSeconds(3, isMinuteTwoDigits.value));
 const secondItems = computed<TimePickerValue[]>(() => generateAllMinutesOrSeconds(3, isSecondTwoDigits.value));
@@ -174,7 +186,7 @@ const currentMeridiemIndicator = computed<string>({
         return getAMOrPM(dateTime.value.getHours())
     },
     set: (value: string) => {
-        dateTime.value = getCombinedDateAndTimeValues(dateTime.value, currentHour.value, currentMinute.value, currentSecond.value, value, is24Hour.value);
+        dateTime.value = getCombinedDateAndTimeValues(dateTime.value, numeralSystem.value, currentHour.value, currentMinute.value, currentSecond.value, value, is24Hour.value);
     }
 });
 const currentHour = computed<string>({
@@ -182,7 +194,7 @@ const currentHour = computed<string>({
         return getDisplayTimeValue(is24Hour.value ? dateTime.value.getHours() : getHourIn12HourFormat(dateTime.value.getHours()), isHourTwoDigits.value);
     },
     set: (value: string) => {
-        dateTime.value = getCombinedDateAndTimeValues(dateTime.value, value, currentMinute.value, currentSecond.value, currentMeridiemIndicator.value, is24Hour.value);
+        dateTime.value = getCombinedDateAndTimeValues(dateTime.value, numeralSystem.value, value, currentMinute.value, currentSecond.value, currentMeridiemIndicator.value, is24Hour.value);
     }
 });
 const currentMinute = computed<string>({
@@ -190,7 +202,7 @@ const currentMinute = computed<string>({
         return getDisplayTimeValue(dateTime.value.getMinutes(), isMinuteTwoDigits.value);
     },
     set: (value: string) => {
-        dateTime.value = getCombinedDateAndTimeValues(dateTime.value, currentHour.value, value, currentSecond.value, currentMeridiemIndicator.value, is24Hour.value);
+        dateTime.value = getCombinedDateAndTimeValues(dateTime.value, numeralSystem.value, currentHour.value, value, currentSecond.value, currentMeridiemIndicator.value, is24Hour.value);
     }
 });
 const currentSecond = computed<string>({
@@ -198,13 +210,9 @@ const currentSecond = computed<string>({
         return getDisplayTimeValue(dateTime.value.getSeconds(), isSecondTwoDigits.value);
     },
     set: (value: string) => {
-        dateTime.value = getCombinedDateAndTimeValues(dateTime.value, currentHour.value, currentMinute.value, value, currentMeridiemIndicator.value, is24Hour.value);
+        dateTime.value = getCombinedDateAndTimeValues(dateTime.value, numeralSystem.value, currentHour.value, currentMinute.value, value, currentMeridiemIndicator.value, is24Hour.value);
     }
 });
-
-const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
-const displayTime = computed<string>(() => formatUnixTimeToLongDateTime(getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(dateTime.value), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())));
-const switchButtonTitle = computed<string>(() => mode.value === 'time' ? 'Date' : 'Time');
 
 function switchMode(): void {
     if (mode.value === 'time') {

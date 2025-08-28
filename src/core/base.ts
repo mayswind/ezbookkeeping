@@ -8,6 +8,11 @@ export interface NameValue {
     readonly value: string;
 }
 
+export interface NameNumeralValue {
+    readonly name: string;
+    readonly value: number;
+}
+
 export interface TypeAndName {
     readonly type: number;
     readonly name: string;

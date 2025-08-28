@@ -33,8 +33,11 @@
                         </div>
                         <div class="mx-6 mt-4" v-if="pageType === TransactionListPageType.List.type">
                             <span class="text-subtitle-2">{{ tt('Transactions Per Page') }}</span>
-                            <v-select class="mt-2" density="compact" :disabled="loading"
-                                      :items="[ 5, 10, 15, 20, 25, 30, 50 ]"
+                            <v-select class="mt-2" density="compact"
+                                      item-title="name"
+                                      item-value="value"
+                                      :disabled="loading"
+                                      :items="allPageCounts"
                                       v-model="countPerPage"
                             />
                         </div>
@@ -666,7 +669,7 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
-import type { TypeAndDisplayName } from '@/core/base.ts';
+import type { NameNumeralValue, TypeAndDisplayName } from '@/core/base.ts';
 import {
     type Year0BasedMonth,
     type LocalizedRecentMonthDateRange,
@@ -674,7 +677,7 @@ import {
     DateRangeScene,
     DateRange
 } from '@/core/datetime.ts';
-import { AmountFilterType } from '@/core/numeral.ts';
+import { type NumeralSystem, AmountFilterType } from '@/core/numeral.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts';
 import { TemplateType }  from '@/core/template.ts';
@@ -774,7 +777,8 @@ const {
     tt,
     getAllRecentMonthDateRanges,
     getAllTransactionTagFilterTypes,
-    getWeekdayLongName
+    getWeekdayLongName,
+    getCurrentNumeralSystemType
 } = useI18n();
 
 const {
@@ -874,6 +878,19 @@ const showFilterCategoryDialog = ref<boolean>(false);
 const showFilterTagDialog = ref<boolean>(false);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
+
+const allPageCounts = computed<NameNumeralValue[]>(() => {
+    const pageCounts: NameNumeralValue[] = [];
+    const availableCountPerPage: number[] = [ 5, 10, 15, 20, 25, 30, 50 ];
+
+    for (let i = 0; i < availableCountPerPage.length; i++) {
+        const count = availableCountPerPage[i];
+        pageCounts.push({ value: count, name: numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(count.toString()) });
+    }
+
+    return pageCounts;
+});
 
 const recentMonthDateRanges = computed<LocalizedRecentMonthDateRange[]>(() => getAllRecentMonthDateRanges(pageType.value === TransactionListPageType.List.type, true));
 

@@ -503,7 +503,7 @@
                                 <v-spacer/>
                                 <span>{{ tt('Lines Per Page') }}</span>
                                 <v-select class="ms-2" density="compact" max-width="100"
-                                          item-title="title"
+                                          item-title="name"
                                           item-value="value"
                                           :disabled="loading || submitting"
                                           :items="parsedFileLinesTablePageOptions"
@@ -794,12 +794,12 @@
                             <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2"
                                  v-if="importTransactions && importTransactions.length > 10">
                                 <span :class="{ 'text-error': selectedInvalidTransactionCount > 0 }">
-                                    {{ tt('format.misc.selectedCount', { count: selectedImportTransactionCount, totalCount: importTransactions.length }) }}
+                                    {{ tt('format.misc.selectedCount', { count: getDisplayCount(selectedImportTransactionCount), totalCount: getDisplayCount(importTransactions.length) }) }}
                                 </span>
                                 <v-spacer/>
                                 <span>{{ tt('Transactions Per Page') }}</span>
                                 <v-select class="ms-2" density="compact" max-width="100"
-                                          item-title="title"
+                                          item-title="name"
                                           item-value="value"
                                           :disabled="loading || submitting"
                                           :items="importTransactionsTablePageOptions"
@@ -815,7 +815,7 @@
                 </v-window-item>
                 <v-window-item value="finalResult">
                     <h4 class="text-h4 mb-1">{{ tt('Data Import Completed') }}</h4>
-                    <p class="my-5">{{ tt('format.misc.importTransactionResult', { count: importedCount }) }}</p>
+                    <p class="my-5">{{ tt('format.misc.importTransactionResult', { count: getDisplayCount(importedCount || 0) }) }}</p>
                 </v-window-item>
             </v-window>
 
@@ -906,8 +906,8 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 
-import type { NameValue, TypeAndDisplayName } from '@/core/base.ts';
-import { KnownAmountFormat } from '@/core/numeral.ts';
+import type { NameValue, NameNumeralValue, TypeAndDisplayName } from '@/core/base.ts';
+import { type NumeralSystem, KnownAmountFormat } from '@/core/numeral.ts';
 import { KnownDateTimeFormat } from '@/core/datetime.ts';
 import { KnownDateTimezoneFormat } from '@/core/timezone.ts';
 import { CategoryType } from '@/core/category.ts';
@@ -992,11 +992,6 @@ interface ImportTransactionDialogFilter {
     description: string | null; // null for 'All Description'
 }
 
-interface ImportTransactionsDialogTablePageOption {
-    value: number;
-    title: string;
-}
-
 defineProps<{
     persistent?: boolean;
 }>();
@@ -1005,6 +1000,7 @@ const {
     tt,
     getAllImportTransactionColumnTypes,
     getAllSupportedImportFileCagtegoryAndTypes,
+    getCurrentNumeralSystemType,
     formatUnixTimeToLongDateTime,
     formatAmountToLocalizedNumeralsWithCurrency,
     formatNumberToLocalizedNumerals,
@@ -1063,6 +1059,7 @@ const submitting = ref<boolean>(false);
 let resolveFunc: (() => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
+const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 const showAccountBalance = computed<boolean>(() => settingsStore.appSettings.showAccountBalance);
 const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
 
@@ -1252,7 +1249,7 @@ const parsedFileLinesHeaders = computed<object[]>(() => {
     return headers;
 });
 
-const parsedFileLinesTablePageOptions = computed<ImportTransactionsDialogTablePageOption[]>(() => getTablePageOptions(parsedFileLines.value?.length));
+const parsedFileLinesTablePageOptions = computed<NameNumeralValue[]>(() => getTablePageOptions(parsedFileLines.value?.length));
 
 const parsedFileAllTransactionTypes = computed<string[]>(() => parsedFileDataColumnMapping.value.parseFileAllTransactionTypes(parsedFileData.value));
 const parsedFileValidMappedTransactionTypes = computed<Record<string, TransactionType>>(() => parsedFileDataColumnMapping.value.parseFileValidMappedTransactionTypes(parsedFileData.value));
@@ -1282,7 +1279,7 @@ const importTransactionHeaders = computed<object[]>(() => {
     ];
 });
 
-const importTransactionsTablePageOptions = computed<ImportTransactionsDialogTablePageOption[]>(() => getTablePageOptions(importTransactions.value?.length));
+const importTransactionsTablePageOptions = computed<NameNumeralValue[]>(() => getTablePageOptions(importTransactions.value?.length));
 
 const totalPageCount = computed<number>(() => {
     if (!importTransactions.value || importTransactions.value.length < 1) {
@@ -1490,11 +1487,15 @@ const displayFilterCustomDateRange = computed<string>(() => {
     return `${minDisplayTime} - ${maxDisplayTime}`
 });
 
-function getTablePageOptions(linesCount?: number): ImportTransactionsDialogTablePageOption[] {
-    const pageOptions: ImportTransactionsDialogTablePageOption[] = [];
+function getDisplayCount(count: number): string {
+    return numeralSystem.value.formatNumber(count);
+}
+
+function getTablePageOptions(linesCount?: number): NameNumeralValue[] {
+    const pageOptions: NameNumeralValue[] = [];
 
     if (!linesCount || linesCount < 1) {
-        pageOptions.push({ value: -1, title: tt('All') });
+        pageOptions.push({ value: -1, name: tt('All') });
         return pageOptions;
     }
 
@@ -1507,10 +1508,10 @@ function getTablePageOptions(linesCount?: number): ImportTransactionsDialogTable
             break;
         }
 
-        pageOptions.push({ value: count, title: count.toString() });
+        pageOptions.push({ value: count, name: getDisplayCount(count) });
     }
 
-    pageOptions.push({ value: -1, title: tt('All') });
+    pageOptions.push({ value: -1, name: tt('All') });
 
     return pageOptions;
 }
@@ -2110,7 +2111,7 @@ function submit(): void {
     }
 
     confirmDialog.value?.open('format.misc.confirmImportTransactions', {
-        count: transactions.length
+        count: getDisplayCount(transactions.length)
     }).then(() => {
         editingTransaction.value = null;
         editingTags.value = [];
@@ -2379,7 +2380,7 @@ function showBatchReplaceDialog(type: BatchReplaceDialogDataType): void {
 
         if (updatedCount > 0) {
             snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
-                count: updatedCount
+                count: getDisplayCount(updatedCount)
             });
         }
     });
@@ -2463,7 +2464,7 @@ function showReplaceInvalidItemDialog(type: BatchReplaceDialogDataType, invalidI
 
         if (updatedCount > 0) {
             snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
-                count: updatedCount
+                count: getDisplayCount(updatedCount)
             });
         }
     });
@@ -2535,7 +2536,7 @@ function showReplaceAllTypesDialog(): void {
 
         if (updatedCount > 0) {
             snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
-                count: updatedCount
+                count: getDisplayCount(updatedCount)
             });
         }
     });
@@ -2607,7 +2608,7 @@ function showBatchCreateInvalidItemDialog(type: BatchCreateDialogDataType, inval
 
         if (updatedCount > 0) {
             snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
-                count: updatedCount
+                count: getDisplayCount(updatedCount)
             });
         }
     });

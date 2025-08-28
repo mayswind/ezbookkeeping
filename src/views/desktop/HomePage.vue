@@ -51,7 +51,7 @@
 
                 <v-card-text>
                     <div class="mb-8">
-                        <span class="text-body-1" v-if="!loadingOverview || (allAccounts && allAccounts.length)">{{ tt('format.misc.youHaveAccounts', { count: allAccounts.length }) }}</span>
+                        <span class="text-body-1" v-if="!loadingOverview || (allAccounts && allAccounts.length)">{{ tt('format.misc.youHaveAccounts', { count: displayAccountCount }) }}</span>
                         <v-skeleton-loader class="skeleton-no-margin mt-1 mb-2 pb-1" width="200px" type="text" :loading="true" v-else-if="loadingOverview && (!allAccounts || !allAccounts.length)"></v-skeleton-loader>
                     </div>
 
@@ -201,6 +201,7 @@ import { useHomePageBase } from '@/views/base/HomePageBase.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
+import { type NumeralSystem } from '@/core/numeral.ts';
 import { DateRange } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { type TransactionMonthlyIncomeAndExpenseData, LATEST_12MONTHS_TRANSACTION_AMOUNTS_REQUEST_TYPES } from '@/models/transaction.ts';
@@ -227,7 +228,7 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 const router = useRouter();
 const theme = useTheme();
 
-const { tt } = useI18n();
+const { tt, getCurrentNumeralSystemType } = useI18n();
 const {
     showAmountInHomePage,
     allAccounts,
@@ -248,6 +249,9 @@ const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const loadingOverview = ref<boolean>(true);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
+
+const displayAccountCount = computed<string>(() => allAccounts.value ? numeralSystem.value.formatNumber(allAccounts.value.length) : numeralSystem.value.digitZero);
 
 function clickMonthlyIncomeOrExpense(e: MonthlyIncomeAndExpenseCardClickEvent): void {
     const minTime = e.monthStartTime;

@@ -553,6 +553,7 @@ const {
     geoLocationStatus,
     setGeoLocationByClickMap,
     transaction,
+    numeralSystem,
     currentTimezoneOffsetMinutes,
     defaultCurrency,
     defaultAccountId,
@@ -662,7 +663,8 @@ const transactionDisplayTime = computed<string>(() => {
         return formatUnixTimeToLongTime(getActualUnixTimeForStore(transaction.value.time, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
     }
 
-    return `${formatUnixTimeToLongTime(getActualUnixTimeForStore(transaction.value.time, transaction.value.utcOffset, getBrowserTimezoneOffsetMinutes()))} (UTC${getTimezoneOffset(settingsStore.appSettings.timeZone)})`;
+    const utcOffset = numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(getTimezoneOffset(settingsStore.appSettings.timeZone));
+    return `${formatUnixTimeToLongTime(getActualUnixTimeForStore(transaction.value.time, transaction.value.utcOffset, getBrowserTimezoneOffsetMinutes()))} (UTC${utcOffset})`;
 });
 
 const transactionDisplayTimezoneName = computed<string>(() => {

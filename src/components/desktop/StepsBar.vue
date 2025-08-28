@@ -10,7 +10,7 @@
                         <div class="d-flex align-center justify-center" style="block-size: 24px; inline-size: 24px;">
                             <div class="slide-group-stepper-indicator"></div>
                         </div>
-                        <h4 class="text-h4 step-number">{{ `0${idx + 1}` }}</h4>
+                        <h4 class="text-h4 step-number">{{ getDisplayStep(idx + 1) }}</h4>
                     </div>
                     <div style="line-height: 0;">
                         <h6 class="text-sm font-weight-medium step-title">{{ step.title }}</h6>
@@ -31,7 +31,7 @@
                         <div class="d-flex align-center justify-center" style="block-size: 24px; inline-size: 24px;">
                             <div class="slide-group-stepper-indicator"></div>
                         </div>
-                        <h4 class="text-h4 step-number">{{ `0${idx + 1}` }}</h4>
+                        <h4 class="text-h4 step-number">{{ getDisplayStep(idx + 1) }}</h4>
                     </div>
                     <div style="line-height: 0;">
                         <h6 class="text-sm font-weight-medium step-title">{{ step.title }}</h6>
@@ -45,6 +45,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+
+import { NumeralSystem } from '@/core/numeral.ts';
 
 export interface StepBarItem {
     name: string;
@@ -63,7 +67,14 @@ const emit = defineEmits<{
     (e: 'step:change', stepName: string): void;
 }>();
 
+const { getCurrentNumeralSystemType } = useI18n();
+
+const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 const isClickable = computed<boolean>(() => props.clickable !== 'false' && props.clickable !== false);
+
+function getDisplayStep(index: number): string {
+    return numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(index.toString().padStart(2, NumeralSystem.WesternArabicNumerals.digitZero));
+}
 
 function changeStep(step: StepBarItem): void {
     if (isClickable.value) {

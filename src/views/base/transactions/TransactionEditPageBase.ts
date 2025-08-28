@@ -10,11 +10,12 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
-import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
+import type { NumeralSystem } from '@/core/numeral.ts';
 import type { WeekDayValue } from '@/core/datetime.ts';
 import type { LocalizedTimezoneInfo } from '@/core/timezone.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { TemplateType } from '@/core/template.ts';
+import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
 import { TRANSACTION_MAX_PICTURE_COUNT } from '@/consts/transaction.ts';
 
 import { Account, type CategorizedAccountWithDisplayBalance } from '@/models/account.ts';
@@ -59,6 +60,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
     const {
         tt,
         getAllTimezones,
+        getCurrentNumeralSystemType,
         getTimezoneDifferenceDisplayText,
         formatAmountToLocalizedNumeralsWithCurrency,
         getAdaptiveAmountRate,
@@ -89,6 +91,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
 
     const transaction = ref<Transaction | TransactionTemplate>(createNewTransactionModel(transactionDefaultType));
 
+    const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
     const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
     const showAccountBalance = computed<boolean>(() => settingsStore.appSettings.showAccountBalance);
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
@@ -265,7 +268,8 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
     });
 
     const transactionDisplayTimezone = computed<string>(() => {
-        return `UTC${getUtcOffsetByUtcOffsetMinutes(transaction.value.utcOffset)}`;
+        const utcOffset = numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(getUtcOffsetByUtcOffsetMinutes(transaction.value.utcOffset));
+        return `UTC${utcOffset}`;
     });
 
     const transactionTimezoneTimeDifference = computed<string>(() => {
@@ -416,6 +420,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         setGeoLocationByClickMap,
         transaction,
         // computed states
+        numeralSystem,
         currentTimezoneOffsetMinutes,
         showAccountBalance,
         defaultCurrency,

@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 
 import { type NameValue } from '@/core/base.ts';
+import { NumeralSystem } from '@/core/numeral.ts';
 
 export interface TimePickerValue {
     value: string;
@@ -12,6 +13,7 @@ export interface TimePickerValue {
 export function useDateTimeSelectionBase() {
     const {
         getAllMeridiemIndicators,
+        getCurrentNumeralSystemType,
         isLongTime24HourFormat,
         isLongTimeMeridiemIndicatorFirst,
         isLongTimeHourTwoDigits,
@@ -25,14 +27,17 @@ export function useDateTimeSelectionBase() {
     const isSecondTwoDigits = ref<boolean>(isLongTimeSecondTwoDigits());
     const isMeridiemIndicatorFirst = ref<boolean>(isLongTimeMeridiemIndicatorFirst() || false);
 
+    const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
     const meridiemItems = computed<NameValue[]>(() => getAllMeridiemIndicators());
 
     function getDisplayTimeValue(value: number, forceTwoDigits: boolean): string {
-        if (forceTwoDigits && value < 10) {
-            return `0${value}`;
-        } else {
-            return value.toString();
+        let textualValue = value.toString();
+
+        if (forceTwoDigits) {
+            textualValue = textualValue.padStart(2, NumeralSystem.WesternArabicNumerals.digitZero);
         }
+
+        return numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(textualValue);
     }
 
     function generateAllHours(count: number, forceTwoDigits: boolean): TimePickerValue[] {
@@ -43,7 +48,7 @@ export function useDateTimeSelectionBase() {
         for (let i = 0; i < count; i++) {
             if (!is24Hour.value) {
                 ret.push({
-                    value: '12',
+                    value: getDisplayTimeValue(12, forceTwoDigits),
                     itemsIndex: i
                 });
             }

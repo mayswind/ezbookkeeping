@@ -209,7 +209,7 @@
                             {{ tt('Transactions Per Page') }}
                         </span>
                         <v-select class="ms-2" density="compact" max-width="100"
-                                  item-title="title"
+                                  item-title="name"
                                   item-value="value"
                                   :disabled="loading"
                                   :items="reconciliationStatementsTablePageOptions"
@@ -278,6 +278,8 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 
+import type { NameNumeralValue } from '@/core/base.ts';
+import type { NumeralSystem } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { AccountBalanceTrendChartType, ChartDateAggregationType } from '@/core/statistics.ts';
 import { KnownFileType } from '@/core/file.ts';
@@ -310,16 +312,11 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 type AmountInputDialogType = InstanceType<typeof AmountInputDialog>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 
-interface ReconciliationStatementDialogTablePageOption {
-    value: number;
-    title: string;
-}
-
 const emit = defineEmits<{
     (e: 'error', message: string): void;
 }>();
 
-const { tt, formatNumberToLocalizedNumerals } = useI18n();
+const { tt, getCurrentNumeralSystemType, formatNumberToLocalizedNumerals } = useI18n();
 
 const {
     accountId,
@@ -383,7 +380,8 @@ const chartDataDateAggregationType = ref<number | undefined>(undefined);
 
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
-const reconciliationStatementsTablePageOptions = computed<ReconciliationStatementDialogTablePageOption[]>(() => getTablePageOptions(reconciliationStatements.value?.transactions.length));
+const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
+const reconciliationStatementsTablePageOptions = computed<NameNumeralValue[]>(() => getTablePageOptions(reconciliationStatements.value?.transactions.length));
 
 const totalPageCount = computed<number>(() => {
     if (!reconciliationStatements.value || !reconciliationStatements.value.transactions || reconciliationStatements.value.transactions.length < 1) {
@@ -414,11 +412,11 @@ const dataTableHeaders = computed<object[]>(() => {
     return headers;
 });
 
-function getTablePageOptions(linesCount?: number): ReconciliationStatementDialogTablePageOption[] {
-    const pageOptions: ReconciliationStatementDialogTablePageOption[] = [];
+function getTablePageOptions(linesCount?: number): NameNumeralValue[] {
+    const pageOptions: NameNumeralValue[] = [];
 
     if (!linesCount || linesCount < 1) {
-        pageOptions.push({ value: -1, title: tt('All') });
+        pageOptions.push({ value: -1, name: tt('All') });
         return pageOptions;
     }
 
@@ -431,10 +429,10 @@ function getTablePageOptions(linesCount?: number): ReconciliationStatementDialog
             break;
         }
 
-        pageOptions.push({ value: count, title: count.toString() });
+        pageOptions.push({ value: count, name: numeralSystem.value.formatNumber(count) });
     }
 
-    pageOptions.push({ value: -1, title: tt('All') });
+    pageOptions.push({ value: -1, name: tt('All') });
 
     return pageOptions;
 }

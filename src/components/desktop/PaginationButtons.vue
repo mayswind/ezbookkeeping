@@ -13,7 +13,7 @@
                    @click="currentPage = parseInt(page)"
                    v-if="page !== '...'"
             >
-                <span>{{ page }}</span>
+                <span>{{ getDisplayPage(page) }}</span>
             </v-btn>
             <v-btn variant="text"
                    color="default"
@@ -31,8 +31,8 @@
                         <v-list-item class="text-sm" :density="density">
                             <v-list-item-title class="cursor-pointer">
                                 <v-autocomplete width="100"
-                                                item-title="page"
-                                                item-value="page"
+                                                item-title="name"
+                                                item-value="value"
                                                 auto-select-first="exact"
                                                 :density="density"
                                                 :items="allPages"
@@ -52,6 +52,8 @@ import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import type { NameNumeralValue } from '@/core/base.ts';
+import type { NumeralSystem } from '@/core/numeral.ts';
 import type { ComponentDensity } from '@/lib/ui/desktop.ts';
 
 const props = defineProps<{
@@ -66,17 +68,21 @@ const emit = defineEmits<{
     (e: 'update:modelValue', value: number): void;
 }>();
 
-const { tt } = useI18n();
+const { tt, getCurrentNumeralSystemType } = useI18n();
 
 const showMenus = ref<Record<string, boolean>>({});
 
-const allPages = computed<{ page: number }[]>(() => {
-    const pages = [];
+const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
+
+function getDisplayPage(page: number | string): string {
+    return numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(page.toString());
+}
+
+const allPages = computed<NameNumeralValue[]>(() => {
+    const pages: NameNumeralValue[] = [];
 
     for (let i = 1; i <= props.totalPageCount; i++) {
-        pages.push({
-            page: i
-        });
+        pages.push({ value: i, name: getDisplayPage(i) });
     }
 
     return pages;

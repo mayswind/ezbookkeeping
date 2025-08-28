@@ -1069,12 +1069,13 @@ export function useI18n() {
     }
 
     function getAllTimezones(includeSystemDefault?: boolean): LocalizedTimezoneInfo[] {
-        const defaultTimezoneOffset = getBrowserTimezoneOffset();
+        const numeralSystem = getCurrentNumeralSystemType();
+        const defaultTimezoneOffset = numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(getBrowserTimezoneOffset());
         const defaultTimezoneOffsetMinutes = getBrowserTimezoneOffsetMinutes();
         const allTimezoneInfos: LocalizedTimezoneInfo[] = [];
 
         for (let i = 0; i < ALL_TIMEZONES.length; i++) {
-            const utcOffset = (ALL_TIMEZONES[i].timezoneName !== UTC_TIMEZONE.timezoneName ? getTimezoneOffset(ALL_TIMEZONES[i].timezoneName) : '');
+            const utcOffset = (ALL_TIMEZONES[i].timezoneName !== UTC_TIMEZONE.timezoneName ? numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(getTimezoneOffset(ALL_TIMEZONES[i].timezoneName)) : '');
             const displayName = t(`timezone.${ALL_TIMEZONES[i].displayName}`);
 
             allTimezoneInfos.push({
@@ -1099,11 +1100,11 @@ export function useI18n() {
         }
 
         allTimezoneInfos.sort(function (c1, c2) {
-            const utcOffset1 = parseInt(c1.utcOffset.replace(':', ''));
-            const utcOffset2 = parseInt(c2.utcOffset.replace(':', ''));
+            const utcOffsetMinutes1 = c1.utcOffsetMinutes;
+            const utcOffsetMinutes2 = c2.utcOffsetMinutes;
 
-            if (utcOffset1 !== utcOffset2) {
-                return utcOffset1 - utcOffset2;
+            if (utcOffsetMinutes1 !== utcOffsetMinutes2) {
+                return utcOffsetMinutes1 - utcOffsetMinutes2;
             }
 
             return c1.displayName.localeCompare(c2.displayName);
@@ -1113,7 +1114,8 @@ export function useI18n() {
     }
 
     function getAllTimezoneTypesUsedForStatistics(currentTimezone?: string): TypeAndDisplayName[] {
-        const currentTimezoneOffset = getTimezoneOffset(currentTimezone);
+        const numeralSystem = getCurrentNumeralSystemType();
+        const currentTimezoneOffset = numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(getTimezoneOffset(currentTimezone));
 
         return [
             {
@@ -1836,29 +1838,30 @@ export function useI18n() {
     }
 
     function getTimezoneDifferenceDisplayText(utcOffset: number): string {
+        const numeralSystem = getCurrentNumeralSystemType();
         const defaultTimezoneOffset = getTimezoneOffsetMinutes();
         const offsetTime = getTimeDifferenceHoursAndMinutes(utcOffset - defaultTimezoneOffset);
 
         if (utcOffset > defaultTimezoneOffset) {
             if (offsetTime.offsetMinutes) {
                 return t('format.misc.hoursMinutesAheadOfDefaultTimezone', {
-                    hours: offsetTime.offsetHours,
-                    minutes: offsetTime.offsetMinutes
+                    hours: numeralSystem.formatNumber(offsetTime.offsetHours),
+                    minutes: numeralSystem.formatNumber(offsetTime.offsetMinutes)
                 });
             } else {
                 return t('format.misc.hoursAheadOfDefaultTimezone', {
-                    hours: offsetTime.offsetHours
+                    hours: numeralSystem.formatNumber(offsetTime.offsetHours)
                 });
             }
         } else if (utcOffset < defaultTimezoneOffset) {
             if (offsetTime.offsetMinutes) {
                 return t('format.misc.hoursMinutesBehindDefaultTimezone', {
-                    hours: offsetTime.offsetHours,
-                    minutes: offsetTime.offsetMinutes
+                    hours: numeralSystem.formatNumber(offsetTime.offsetHours),
+                    minutes: numeralSystem.formatNumber(offsetTime.offsetMinutes)
                 });
             } else {
                 return t('format.misc.hoursBehindDefaultTimezone', {
-                    hours: offsetTime.offsetHours
+                    hours: numeralSystem.formatNumber(offsetTime.offsetHours)
                 });
             }
         } else {

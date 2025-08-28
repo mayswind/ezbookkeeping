@@ -60,14 +60,14 @@ type DateTimeTokenFormatFunction = (d: MomentDateTime, options: DateTimeFormatOp
 
 class MomentDateTime implements DateTime {
     private static readonly tokenFormatFuncs: Record<string, DateTimeTokenFormatFunction> = {
-        'YY': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarYear(options), minNumeralLength: 2, maxLength: 2 }),
-        'YYYY': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarYear(options), minNumeralLength: 4 }),
-        'M': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarMonth(options) }),
-        'MM': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarMonth(options), minNumeralLength: 2 }),
+        'YY': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarYear(options), hasNumeral: true, minNumeralLength: 2, maxLength: 2 }),
+        'YYYY': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarYear(options), hasNumeral: true, minNumeralLength: 4 }),
+        'M': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarMonth(options), hasNumeral: true }),
+        'MM': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarMonth(options), hasNumeral: true, minNumeralLength: 2 }),
         'MMM': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarMonthDisplayShortName(options) }),
         'MMMM': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarMonthDisplayName(options) }),
-        'D': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarDay(options) }),
-        'DD': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarDay(options), minNumeralLength: 2 }),
+        'D': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarDay(options), hasNumeral: true }),
+        'DD': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getLocalizedCalendarDay(options), hasNumeral: true, minNumeralLength: 2 }),
         'dd': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getWeekDayDisplayMinName(options) }),
         'ddd': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getWeekDayDisplayShortName(options) }),
         'dddd': (d: MomentDateTime, options: DateTimeFormatOptions) => ofObject<DateTimeFormatResult>({ value: d.getWeekDayDisplayName(options) }),

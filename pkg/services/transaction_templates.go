@@ -2,6 +2,7 @@ package services
 
 import (
 	"time"
+
 	"xorm.io/xorm"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -122,7 +123,13 @@ func (s *TransactionTemplateService) CreateTemplate(c core.Context, template *mo
 	template.UpdatedUnixTime = time.Now().Unix()
 
 	return s.UserDataDB(template.Uid).DoTransaction(c, func(sess *xorm.Session) error {
-		_, err := sess.Insert(template)
+		err := s.isTemplateValid(sess, template)
+
+		if err != nil {
+			return err
+		}
+
+		_, err = sess.Insert(template)
 		return err
 	})
 }
@@ -136,6 +143,12 @@ func (s *TransactionTemplateService) ModifyTemplate(c core.Context, template *mo
 	template.UpdatedUnixTime = time.Now().Unix()
 
 	return s.UserDataDB(template.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+		err := s.isTemplateValid(sess, template)
+
+		if err != nil {
+			return err
+		}
+
 		updatedRows, err := sess.ID(template.TemplateId).Cols("name", "type", "category_id", "account_id", "scheduled_frequency_type", "scheduled_frequency", "scheduled_start_time", "scheduled_end_time", "scheduled_at", "scheduled_timezone_utc_offset", "tag_ids", "amount", "related_account_id", "related_account_amount", "hide_amount", "comment", "updated_unix_time").Where("uid=? AND deleted=?", template.Uid, false).Update(template)
 
 		if err != nil {
@@ -248,4 +261,86 @@ func (s *TransactionTemplateService) DeleteAllTemplates(c core.Context, uid int6
 
 		return nil
 	})
+}
+
+func (s *TransactionTemplateService) isTemplateValid(sess *xorm.Session, template *models.TransactionTemplate) error {
+	// check accounts are valid
+	sourceAccount := &models.Account{}
+	destinationAccount := &models.Account{}
+	has, err := sess.ID(template.AccountId).Where("uid=? AND deleted=?", template.Uid, false).Get(sourceAccount)
+
+	if err != nil {
+		return err
+	} else if !has {
+		return errs.ErrSourceAccountNotFound
+	}
+
+	if sourceAccount.Hidden {
+		return errs.ErrCannotUseHiddenAccount
+	}
+
+	if template.Type == models.TRANSACTION_TYPE_TRANSFER {
+		if template.RelatedAccountId <= 0 {
+			return errs.ErrAccountIdInvalid
+		} else {
+			has, err = sess.ID(template.RelatedAccountId).Where("uid=? AND deleted=?", template.Uid, false).Get(destinationAccount)
+
+			if err != nil {
+				return err
+			} else if !has {
+				return errs.ErrDestinationAccountNotFound
+			}
+
+			if destinationAccount.Hidden {
+				return errs.ErrCannotUseHiddenAccount
+			}
+		}
+	}
+
+	if sourceAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS || (destinationAccount != nil && destinationAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS) {
+		return errs.ErrCannotAddTransactionToParentAccount
+	}
+
+	// check category is valid
+	category := &models.TransactionCategory{}
+	has, err = sess.ID(template.CategoryId).Where("uid=? AND deleted=?", template.Uid, false).Get(category)
+
+	if err != nil {
+		return err
+	} else if !has {
+		return errs.ErrTransactionCategoryNotFound
+	}
+
+	if category.Hidden {
+		return errs.ErrCannotUseHiddenTransactionCategory
+	}
+
+	if category.ParentCategoryId == models.LevelOneTransactionCategoryParentId {
+		return errs.ErrCannotUsePrimaryCategoryForTransaction
+	}
+
+	if (template.Type == models.TRANSACTION_TYPE_INCOME && category.Type != models.CATEGORY_TYPE_INCOME) ||
+		(template.Type == models.TRANSACTION_TYPE_EXPENSE && category.Type != models.CATEGORY_TYPE_EXPENSE) ||
+		(template.Type == models.TRANSACTION_TYPE_TRANSFER && category.Type != models.CATEGORY_TYPE_TRANSFER) {
+		return errs.ErrTransactionCategoryTypeInvalid
+	}
+
+	// check tags are valid
+	tagIds := template.GetTagIds()
+	var tags []*models.TransactionTag
+	err = sess.Where("uid=? AND deleted=?", template.Uid, false).In("tag_id", tagIds).Find(&tags)
+
+	if err != nil {
+		return err
+	} else if len(tags) < len(tagIds) {
+		return errs.ErrTransactionTagNotFound
+	}
+
+	for i := 0; i < len(tags); i++ {
+		if tags[i].Hidden {
+			return errs.ErrCannotUseHiddenTransactionTag
+		}
+	}
+
+	return nil
 }

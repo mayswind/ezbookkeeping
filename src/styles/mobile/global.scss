@@ -792,6 +792,10 @@ html[dir="rtl"] .dp__main .dp__btn.dp--arrow-btn-nav {
     --f7-progressbar-bg-color: #f8f8f8;
 }
 
+.dark .statistics-percent-line .progressbar {
+    --f7-progressbar-bg-color: #444444;
+}
+
 .statistics-multi-percent-line > div > .progressbar {
     border-radius: unset;
 }

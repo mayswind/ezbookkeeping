@@ -182,7 +182,7 @@
                         <template #inner-end>
                             <div class="statistics-item-end">
                                 <div class="statistics-percent-line">
-                                    <f7-progressbar :progress="item.percent >= 0 ? item.percent : 0" :style="{ '--f7-progressbar-progress-color': (item.color ? '#' + item.color : '') } "></f7-progressbar>
+                                    <f7-progressbar :progress="item.percent >= 0 ? item.percent : 0" :style="{ '--f7-progressbar-progress-color': (item.color ? getTransactionCategoricalAnalysisDataItemColor(item) : '') } "></f7-progressbar>
                                 </div>
                             </div>
                         </template>
@@ -404,6 +404,7 @@ const {
     categoricalAnalysisData,
     trendsAnalysisData,
     canShowCustomDateRange,
+    getTransactionCategoricalAnalysisDataItemColor,
     getDisplayAmount
 } = useStatisticsTransactionPageBase();
 
@@ -798,10 +799,6 @@ init();
     -ms-transform: translateY(1.5em);
     -webkit-transform: translateY(1.5em);
     transform: translateY(1.5em);
-}
-
-.dark .statistics-percent-line .progressbar {
-    --f7-progressbar-bg-color: #161616;
 }
 
 .chart-data-type-popover-menu .popover-inner{

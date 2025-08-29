@@ -9,8 +9,13 @@ import { type TransactionStatisticsFilter, useStatisticsStore } from '@/stores/s
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { type LocalizedDateRange, type WeekDayValue, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { StatisticsAnalysisType, ChartDataType, ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
+import { DEFAULT_ACCOUNT_COLOR, DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
 import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
-import type { TransactionCategoricalAnalysisData, TransactionTrendsAnalysisData } from '@/models/transaction.ts';
+import type {
+    TransactionCategoricalAnalysisData,
+    TransactionCategoricalAnalysisDataItem,
+    TransactionTrendsAnalysisData
+} from '@/models/transaction.ts';
 
 import { limitText, findNameByType, findDisplayNameByType } from '@/lib/common.ts';
 import { getYearMonthFirstUnixTime, getYearMonthLastUnixTime } from '@/lib/datetime.ts';
@@ -200,6 +205,24 @@ export function useStatisticsTransactionPageBase() {
         }
     }
 
+    function getTransactionCategoricalAnalysisDataItemColor(item: TransactionCategoricalAnalysisDataItem): string {
+        if (item.type === 'category') {
+            if (item.color === DEFAULT_CATEGORY_COLOR) {
+                return 'var(--default-icon-color)';
+            } else {
+                return '#' + item.color;
+            }
+        } else if (item.type === 'account') {
+            if (item.color === DEFAULT_ACCOUNT_COLOR) {
+                return 'var(--default-icon-color)';
+            } else {
+                return '#' + item.color;
+            }
+        } else {
+            return item.color;
+        }
+    }
+
     function getDisplayAmount(amount: number, currency: string, textLimit?: number): string {
         const finalAmount = formatAmountToLocalizedNumeralsWithCurrency(amount, currency);
 
@@ -249,6 +272,7 @@ export function useStatisticsTransactionPageBase() {
         trendsAnalysisData,
         // functions
         canShowCustomDateRange,
+        getTransactionCategoricalAnalysisDataItemColor,
         getDisplayAmount
     };
 }

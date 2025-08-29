@@ -244,8 +244,8 @@
                                                                 <span class="statistics-amount">{{ getDisplayAmount(item.totalAmount, defaultCurrency) }}</span>
                                                             </div>
                                                             <div>
-                                                                <v-progress-linear :color="item.color ? '#' + item.color : 'primary'"
-                                                                                   :bg-color="isDarkMode ? '#161616' : '#f8f8f8'" :bg-opacity="1"
+                                                                <v-progress-linear :color="item.color ? getTransactionCategoricalAnalysisDataItemColor(item) : 'primary'"
+                                                                                   :bg-color="isDarkMode ? '#444444' : '#f8f8f8'" :bg-opacity="1"
                                                                                    :model-value="item.percent >= 0 ? item.percent : 0"
                                                                                    :height="4"></v-progress-linear>
                                                             </div>
@@ -458,6 +458,7 @@ const {
     categoricalAnalysisData,
     trendsAnalysisData,
     canShowCustomDateRange,
+    getTransactionCategoricalAnalysisDataItemColor,
     getDisplayAmount
 } = useStatisticsTransactionPageBase();
 

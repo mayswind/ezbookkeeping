@@ -7,7 +7,7 @@
             </template>
             <template #inner>
                 <div class="display-flex padding-top-half">
-                    <div class="account-balance-percent-line width-100">
+                    <div class="statistics-percent-line width-100 no-margin-horizontal">
                         <f7-progressbar :progress="0"></f7-progressbar>
                     </div>
                 </div>
@@ -36,12 +36,8 @@
                 </template>
                 <template #inner>
                     <div class="display-flex padding-top-half">
-                        <div class="account-balance-percent-line" :style="{ 'width': item.percent + '%' }">
-                            <f7-progressbar :progress="100" :style="{ '--f7-progressbar-progress-color': (item.color ? item.color : '') } "></f7-progressbar>
-                        </div>
-                        <div class="account-balance-percent-line" :style="{ 'width': (100.0 - item.percent) + '%' }"
-                             v-if="item.percent < 100.0">
-                            <f7-progressbar :progress="0"></f7-progressbar>
+                        <div class="statistics-percent-line width-100 no-margin-horizontal">
+                            <f7-progressbar :progress="item.percent >= 0 ? item.percent : 0" :style="{ '--f7-progressbar-progress-color': (item.color ? '#' + item.color : '') } "></f7-progressbar>
                         </div>
                     </div>
                 </template>
@@ -108,7 +104,7 @@ const allVirtualListItems = computed<MobileAccountBalanceTrendsChartItem[]>(() =
             averageBalance: dataItem.averageBalance,
             minimumBalance: dataItem.minimumBalance,
             maximumBalance: dataItem.maximumBalance,
-            color: `#${DEFAULT_CHART_COLORS[0]}`,
+            color: DEFAULT_CHART_COLORS[0],
             percent: 0.0
         };
 
@@ -130,9 +126,3 @@ function renderExternal(vl: unknown, vlData: MobileAccountBalanceTrendsChartVirt
     virtualDataItems.value = vlData;
 }
 </script>
-
-<style>
-.account-balance-trends-list-item .account-balance-percent-line {
-    --f7-progressbar-bg-color: #f8f8f8;
-}
-</style>

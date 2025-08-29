@@ -96,8 +96,11 @@ import { type CommonMonthlyTrendsChartProps, type MonthlyTrendsBarChartClickEven
 import { useUserStore } from '@/stores/user.ts';
 
 import { type Year1BasedMonth, type UnixTimeRange, DateRangeScene } from '@/core/datetime.ts';
+import type { ColorStyleValue } from '@/core/color.ts';
 import { ChartDateAggregationType } from '@/core/statistics.ts';
+
 import { DEFAULT_CHART_COLORS } from '@/consts/color.ts';
+
 import type { YearMonthDataItem, SortableTransactionStatisticDataItem } from '@/models/transaction.ts';
 
 import {
@@ -110,13 +113,16 @@ import {
     getFiscalYearFromUnixTime
 } from '@/lib/datetime.ts';
 import {
+    getDisplayColor
+} from '@/lib/color.ts';
+import {
     sortStatisticsItems
 } from '@/lib/statistics.ts';
 
 interface TrendsBarChartLegend {
     readonly id: string;
     readonly name: string;
-    readonly color: string;
+    readonly color: ColorStyleValue;
     readonly displayOrders: number[];
 }
 
@@ -157,7 +163,7 @@ const {
     formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
 
-const { allDateRanges, getItemName, getColor } = useMonthlyTrendsChartBase(props);
+const { allDateRanges, getItemName } = useMonthlyTrendsChartBase(props);
 
 const userStore = useUserStore();
 
@@ -179,7 +185,7 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
         const legend: TrendsBarChartLegend = {
             id: id,
             name: (props.nameField && item[props.nameField]) ? getItemName(item[props.nameField] as string) : id,
-            color: getColor(props.colorField && item[props.colorField] ? item[props.colorField] as string : DEFAULT_CHART_COLORS[i % DEFAULT_CHART_COLORS.length]),
+            color: getDisplayColor(props.colorField && item[props.colorField] ? item[props.colorField] as string : DEFAULT_CHART_COLORS[i % DEFAULT_CHART_COLORS.length]),
             displayOrders: (props.displayOrdersField && item[props.displayOrdersField]) ? item[props.displayOrdersField] as number[] : [0]
         };
 

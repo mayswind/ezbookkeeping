@@ -37,7 +37,7 @@
                 <template #inner>
                     <div class="display-flex padding-top-half">
                         <div class="statistics-percent-line width-100 no-margin-horizontal">
-                            <f7-progressbar :progress="item.percent >= 0 ? item.percent : 0" :style="{ '--f7-progressbar-progress-color': (item.color ? '#' + item.color : '') } "></f7-progressbar>
+                            <f7-progressbar :progress="item.percent >= 0 ? item.percent : 0" :style="{ '--f7-progressbar-progress-color': item.color } "></f7-progressbar>
                         </div>
                     </div>
                 </template>
@@ -56,13 +56,13 @@ import {
     useAccountBalanceTrendsChartBase
 } from '@/components/base/AccountBalanceTrendsChartBase.ts'
 
-import type { ColorValue } from '@/core/color.ts';
+import type { ColorStyleValue } from '@/core/color.ts';
 import { DEFAULT_CHART_COLORS } from '@/consts/color.ts';
 
 interface MobileAccountBalanceTrendsChartItem extends AccountBalanceTrendsChartItem {
     index: number;
     percent: number;
-    color: ColorValue;
+    color: ColorStyleValue;
 }
 
 interface MobileAccountBalanceTrendsChartProps extends CommonAccountBalanceTrendsChartProps {
@@ -104,7 +104,7 @@ const allVirtualListItems = computed<MobileAccountBalanceTrendsChartItem[]>(() =
             averageBalance: dataItem.averageBalance,
             minimumBalance: dataItem.minimumBalance,
             maximumBalance: dataItem.maximumBalance,
-            color: DEFAULT_CHART_COLORS[0],
+            color: `#${DEFAULT_CHART_COLORS[0]}`,
             percent: 0.0
         };
 

@@ -2,13 +2,15 @@ import type { TypeAndName } from './base.ts';
 
 export type ColorValue = string;
 
+export type ColorStyleValue = `#${ColorValue}` | 'var(--default-icon-color)';
+
 export interface ColorInfo extends Record<string, unknown> {
     readonly color: ColorValue;
 }
 
 export interface AmountColor {
-    readonly expenseAmountColor: ColorValue;
-    readonly incomeAmountColor: ColorValue;
+    readonly expenseAmountColor: ColorStyleValue;
+    readonly incomeAmountColor: ColorStyleValue;
 }
 
 export class PresetAmountColor implements TypeAndName {
@@ -26,12 +28,12 @@ export class PresetAmountColor implements TypeAndName {
 
     public readonly type: number;
     public readonly name: string;
-    public readonly lightThemeColor: string;
-    public readonly darkThemeColor: string;
+    public readonly lightThemeColor: ColorStyleValue;
+    public readonly darkThemeColor: ColorStyleValue;
     public readonly expenseClassName: string;
     public readonly incomeClassName: string;
 
-    private constructor(type: number, name: string, lightThemeColor: string, darkThemeColor: string, expenseClassName: string, incomeClassName: string) {
+    private constructor(type: number, name: string, lightThemeColor: ColorStyleValue, darkThemeColor: ColorStyleValue, expenseClassName: string, incomeClassName: string) {
         this.type = type;
         this.name = name;
         this.lightThemeColor = lightThemeColor;

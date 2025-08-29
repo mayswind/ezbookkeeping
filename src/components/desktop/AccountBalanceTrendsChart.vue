@@ -14,7 +14,7 @@ import { useUserStore } from '@/stores/user.ts';
 
 import type { NameValue } from '@/core/base.ts';
 import { TextDirection } from '@/core/text.ts';
-import type { ColorValue } from '@/core/color.ts';
+import type { ColorStyleValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { AccountBalanceTrendChartType } from '@/core/statistics.ts';
 import { DEFAULT_CHART_COLORS } from '@/consts/color.ts';
@@ -32,10 +32,10 @@ interface AccountBalanceTrendsChartDataItem {
     id: string;
     name: string;
     itemStyle: {
-        color: ColorValue;
-        color0?: string;
-        borderColor?: string;
-        borderColor0?: string;
+        color: ColorStyleValue;
+        color0?: ColorStyleValue;
+        borderColor?: ColorStyleValue;
+        borderColor0?: ColorStyleValue;
     };
     selected: boolean;
     type: string;

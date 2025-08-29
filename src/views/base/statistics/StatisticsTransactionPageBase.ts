@@ -8,9 +8,11 @@ import { type TransactionStatisticsFilter, useStatisticsStore } from '@/stores/s
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { type LocalizedDateRange, type WeekDayValue, DateRangeScene, DateRange } from '@/core/datetime.ts';
+import type { ColorStyleValue } from '@/core/color.ts';
 import { StatisticsAnalysisType, ChartDataType, ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
-import { DEFAULT_ACCOUNT_COLOR, DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
+
 import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
+
 import type {
     TransactionCategoricalAnalysisData,
     TransactionCategoricalAnalysisDataItem,
@@ -19,6 +21,7 @@ import type {
 
 import { limitText, findNameByType, findDisplayNameByType } from '@/lib/common.ts';
 import { getYearMonthFirstUnixTime, getYearMonthLastUnixTime } from '@/lib/datetime.ts';
+import { getDisplayColor, getCategoryDisplayColor, getAccountDisplayColor } from '@/lib/color.ts';
 
 export function useStatisticsTransactionPageBase() {
     const {
@@ -205,21 +208,13 @@ export function useStatisticsTransactionPageBase() {
         }
     }
 
-    function getTransactionCategoricalAnalysisDataItemColor(item: TransactionCategoricalAnalysisDataItem): string {
+    function getTransactionCategoricalAnalysisDataItemDisplayColor(item: TransactionCategoricalAnalysisDataItem): ColorStyleValue {
         if (item.type === 'category') {
-            if (item.color === DEFAULT_CATEGORY_COLOR) {
-                return 'var(--default-icon-color)';
-            } else {
-                return '#' + item.color;
-            }
+            return getCategoryDisplayColor(item.color);
         } else if (item.type === 'account') {
-            if (item.color === DEFAULT_ACCOUNT_COLOR) {
-                return 'var(--default-icon-color)';
-            } else {
-                return '#' + item.color;
-            }
+            return getAccountDisplayColor(item.color);
         } else {
-            return item.color;
+            return getDisplayColor(item.color);
         }
     }
 
@@ -272,7 +267,7 @@ export function useStatisticsTransactionPageBase() {
         trendsAnalysisData,
         // functions
         canShowCustomDateRange,
-        getTransactionCategoricalAnalysisDataItemColor,
+        getTransactionCategoricalAnalysisDataItemDisplayColor,
         getDisplayAmount
     };
 }

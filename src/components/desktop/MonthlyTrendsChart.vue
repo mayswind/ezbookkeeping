@@ -16,10 +16,12 @@ import { useUserStore } from '@/stores/user.ts';
 
 import { TextDirection } from '@/core/text.ts';
 import { type Year1BasedMonth, DateRangeScene } from '@/core/datetime.ts';
-import type { ColorValue } from '@/core/color.ts';
+import type { ColorStyleValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { TrendChartType, ChartDateAggregationType } from '@/core/statistics.ts';
+
 import { DEFAULT_CHART_COLORS } from '@/consts/color.ts';
+
 import type { YearMonthDataItem, SortableTransactionStatisticDataItem } from '@/models/transaction.ts';
 
 import {
@@ -32,6 +34,9 @@ import {
     getDateTypeByDateRange,
     getFiscalYearFromUnixTime
 } from '@/lib/datetime.ts';
+import {
+    getDisplayColor
+} from '@/lib/color.ts';
 import {
     sortStatisticsItems
 } from '@/lib/statistics.ts';
@@ -47,7 +52,7 @@ interface MonthlyTrendsChartDataItem {
     id: string;
     name: string;
     itemStyle: {
-        color: ColorValue;
+        color: ColorStyleValue;
     };
     selected: boolean;
     type: string;
@@ -83,7 +88,7 @@ const {
     formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
 
-const { allDateRanges, getItemName, getColor } = useMonthlyTrendsChartBase(props);
+const { allDateRanges, getItemName } = useMonthlyTrendsChartBase(props);
 
 const userStore = useUserStore();
 
@@ -218,7 +223,7 @@ const allSeries = computed<MonthlyTrendsChartDataItem[]>(() => {
             id: (props.idField && item[props.idField]) ? item[props.idField] as string : getItemName(item[props.nameField] as string),
             name: (props.idField && item[props.idField]) ? item[props.idField] as string : getItemName(item[props.nameField] as string),
             itemStyle: {
-                color: getColor(props.colorField && item[props.colorField] ? item[props.colorField] as string : DEFAULT_CHART_COLORS[i % DEFAULT_CHART_COLORS.length]),
+                color: getDisplayColor(props.colorField && item[props.colorField] ? item[props.colorField] as string : DEFAULT_CHART_COLORS[i % DEFAULT_CHART_COLORS.length]),
             },
             selected: true,
             type: 'line',

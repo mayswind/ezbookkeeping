@@ -11,8 +11,6 @@ import type {
     YearMonthUnixTime
 } from '@/core/datetime.ts';
 import type { FiscalYearUnixTime } from '@/core/fiscalyear.ts';
-import type { ColorValue } from '@/core/color.ts';
-import { DEFAULT_ICON_COLOR } from '@/consts/color.ts';
 import type { YearMonthItems } from '@/models/transaction.ts';
 
 import { getAllDateRangesFromItems } from '@/lib/statistics.ts';
@@ -49,19 +47,10 @@ export function useMonthlyTrendsChartBase<T extends Year1BasedMonth>(props: Comm
         return props.translateName ? tt(name) : name;
     }
 
-    function getColor(color: string): ColorValue {
-        if (color && color !== DEFAULT_ICON_COLOR) {
-            color = '#' + color;
-        }
-
-        return color;
-    }
-
     return {
         // computed states
         allDateRanges,
         // functions
-        getItemName,
-        getColor
+        getItemName
     }
 }

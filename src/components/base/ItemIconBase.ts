@@ -1,8 +1,9 @@
 import { computed } from 'vue';
 
-import type { ColorValue } from '@/core/color.ts';
+import type {ColorStyleValue, ColorValue} from '@/core/color.ts';
 import { ALL_ACCOUNT_ICONS, DEFAULT_ACCOUNT_ICON, ALL_CATEGORY_ICONS, DEFAULT_CATEGORY_ICON } from '@/consts/icon.ts';
-import { DEFAULT_ICON_COLOR, DEFAULT_ACCOUNT_COLOR, DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
+import { DEFAULT_ICON_COLOR, DEFAULT_ACCOUNT_COLOR, DEFAULT_CATEGORY_COLOR, DEFAULT_COLOR_STYLE_VARIABLE } from '@/consts/color.ts';
+
 import { isNumber } from '@/lib/common.ts';
 
 type IconItemStyleName = string;
@@ -14,14 +15,14 @@ export interface CommonIconProps {
     iconType: CommonIconItemType | MobileIconItemType;
     iconId: string | number;
     color?: ColorValue;
-    defaultColor?: ColorValue;
+    defaultColor?: ColorStyleValue;
     additionalColorAttr?: string;
     size?: string | number;
 }
 
 export function useItemIconBase(props: CommonIconProps) {
     const style = computed<Record<IconItemStyleName, IconItemStyleValue>>(() => {
-        let defaultColor = 'var(--default-icon-color)';
+        let defaultColor: ColorStyleValue = DEFAULT_COLOR_STYLE_VARIABLE;
 
         if (props.defaultColor) {
             defaultColor = props.defaultColor;
@@ -60,15 +61,15 @@ export function useItemIconBase(props: CommonIconProps) {
         return ALL_CATEGORY_ICONS[iconId].icon;
     }
 
-    function getAccountIconStyle(color?: ColorValue | string, defaultColor?: ColorValue | string, additionalColorAttr?: string): Record<IconItemStyleName, IconItemStyleValue> {
+    function getAccountIconStyle(color?: ColorValue, defaultColor?: ColorStyleValue, additionalColorAttr?: string): Record<IconItemStyleName, IconItemStyleValue> {
+        let displayColor: ColorStyleValue | undefined = defaultColor;
+
         if (color && color !== DEFAULT_ACCOUNT_COLOR) {
-            color = '#' + color;
-        } else {
-            color = defaultColor;
+            displayColor = `#${color}`;
         }
 
         const ret: Record<IconItemStyleName, IconItemStyleValue> = {
-            color: color
+            color: displayColor
         };
 
         if (additionalColorAttr) {
@@ -82,15 +83,15 @@ export function useItemIconBase(props: CommonIconProps) {
         return ret;
     }
 
-    function getCategoryIconStyle(color?: ColorValue | string, defaultColor?: ColorValue | string, additionalColorAttr?: string): Record<IconItemStyleName, IconItemStyleValue> {
+    function getCategoryIconStyle(color?: ColorValue, defaultColor?: ColorStyleValue, additionalColorAttr?: string): Record<IconItemStyleName, IconItemStyleValue> {
+        let displayColor: ColorStyleValue | undefined = defaultColor;
+
         if (color && color !== DEFAULT_CATEGORY_COLOR) {
-            color = '#' + color;
-        } else {
-            color = defaultColor;
+            displayColor = `#${color}`;
         }
 
         const ret: Record<IconItemStyleName, IconItemStyleValue> = {
-            color: color
+            color: displayColor
         };
 
         if (additionalColorAttr) {
@@ -104,15 +105,15 @@ export function useItemIconBase(props: CommonIconProps) {
         return ret;
     }
 
-    function getDefaultIconStyle(color?: ColorValue | string, defaultColor?: ColorValue | string, additionalColorAttr?: string): Record<IconItemStyleName, IconItemStyleValue> {
+    function getDefaultIconStyle(color?: ColorValue, defaultColor?: ColorStyleValue, additionalColorAttr?: string): Record<IconItemStyleName, IconItemStyleValue> {
+        let displayColor: ColorStyleValue | undefined = defaultColor;
+
         if (color && color !== DEFAULT_ICON_COLOR) {
-            color = '#' + color;
-        } else {
-            color = defaultColor;
+            displayColor = `#${color}`;
         }
 
         const ret: Record<IconItemStyleName, IconItemStyleValue> = {
-            color: color
+            color: displayColor
         };
 
         if (additionalColorAttr) {

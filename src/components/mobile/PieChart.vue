@@ -7,7 +7,7 @@
                     fill="transparent"
                     cx="0" cy="0"
                     :r="diameter / 2"
-                    :stroke="getColor(item.color)"
+                    :stroke="item.color"
                     :stroke-width="diameter"
                     :stroke-dasharray="getItemStrokeDash(item)"
                     :stroke-dashoffset="getItemDashOffset(item, validItems, itemCommonDashOffset)"
@@ -50,7 +50,7 @@
                         </f7-chip>
                         <f7-chip outline
                                  :text="selectedItem.displayPercent"
-                                 :style="getColorStyle(selectedItem ? selectedItem.color : '', '--f7-chip-outline-border-color')"
+                                 :style="getColorStyle(selectedItem?.color, '--f7-chip-outline-border-color')"
                                  v-else-if="!skeleton"></f7-chip>
                     </p>
                     <p v-else-if="!validItems || !validItems.length">
@@ -60,7 +60,7 @@
                         <span class="skeleton-text" v-if="skeleton">Name</span>
                         <span v-else-if="!skeleton && selectedItem.displayName">{{ selectedItem.displayName }}</span>
                         <span class="skeleton-text" v-if="skeleton">Value</span>
-                        <span v-else-if="!skeleton && showValue" :style="getColorStyle(selectedItem ? selectedItem.color : '')">{{ selectedItem.displayValue }}</span>
+                        <span v-else-if="!skeleton && showValue" :style="getColorStyle(selectedItem?.color)">{{ selectedItem.displayValue }}</span>
                         <f7-icon class="item-navigate-icon icon-with-direction" f7="chevron_right" v-if="enableClickItem"></f7-icon>
                     </f7-link>
                     <f7-link :no-link-class="true" v-else-if="!validItems || !validItems.length">
@@ -82,13 +82,12 @@ import { computed } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 import { type CommonPieChartDataItem, type CommonPieChartProps, usePieChartBase } from '@/components/base/PieChartBase.ts'
 
-import type { ColorValue } from '@/core/color.ts';
-import { DEFAULT_ICON_COLOR } from '@/consts/color.ts';
+import type { ColorStyleValue } from '@/core/color.ts';
 
 interface MobilePieChartProps extends CommonPieChartProps {
     showCenterText?: boolean;
     showSelectedItemInfo?: boolean;
-    centerTextBackground?: ColorValue;
+    centerTextBackground?: ColorStyleValue;
 }
 
 const props = defineProps<MobilePieChartProps>();
@@ -135,25 +134,13 @@ const itemCommonDashOffset = computed<number>(() => {
     return offset;
 });
 
-function getColor(color: ColorValue): ColorValue {
-    if (color && color !== DEFAULT_ICON_COLOR) {
-        color = '#' + color;
-    } else {
-        color = 'var(--default-icon-color)';
-    }
-
-    return color;
-}
-
-function getColorStyle(color: ColorValue, additionalFieldName?: string): Record<string, string> {
-    const finalColor = getColor(color);
-
+function getColorStyle(color: ColorStyleValue, additionalFieldName?: string): Record<string, string> {
     const ret: Record<string, string> = {
-        color: finalColor
+        color: color
     };
 
     if (additionalFieldName) {
-        ret[additionalFieldName] = finalColor;
+        ret[additionalFieldName] = color;
     }
 
     return ret;

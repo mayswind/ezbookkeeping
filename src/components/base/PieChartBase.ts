@@ -2,9 +2,11 @@ import { ref, computed, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import type { ColorValue, ColorStyleValue } from '@/core/color.ts';
 import { DEFAULT_CHART_COLORS } from '@/consts/color.ts';
 
 import { isNumber } from '@/lib/common.ts';
+import { getDisplayColor } from '@/lib/color.ts';
 
 export interface CommonPieChartDataItem {
     id: string;
@@ -13,7 +15,7 @@ export interface CommonPieChartDataItem {
     value: number;
     percent: number;
     actualPercent: number;
-    color: string;
+    color: ColorStyleValue;
     sourceItem: Record<string, unknown>;
     displayPercent?: string;
     displayValue?: string;
@@ -68,7 +70,7 @@ export function usePieChartBase(props: CommonPieChartProps) {
                     value: value,
                     percent: (isNumber(percent) && percent >= 0) ? percent : (value / totalValidValue * 100),
                     actualPercent: value / totalValidValue,
-                    color: (props.colorField && item[props.colorField]) ? item[props.colorField] as string : DEFAULT_CHART_COLORS[validItems.length % DEFAULT_CHART_COLORS.length],
+                    color: getDisplayColor((props.colorField && item[props.colorField]) ? item[props.colorField] as ColorValue : DEFAULT_CHART_COLORS[validItems.length % DEFAULT_CHART_COLORS.length]),
                     sourceItem: item
                 };
 

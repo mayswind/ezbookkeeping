@@ -13,13 +13,12 @@ import type { CallbackDataParams } from 'echarts/types/dist/shared';
 import { useI18n } from '@/locales/helpers.ts';
 import { type CommonPieChartDataItem, type CommonPieChartProps, usePieChartBase } from '@/components/base/PieChartBase.ts'
 
-import type { ColorValue } from '@/core/color.ts';
+import type { ColorStyleValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { DEFAULT_ICON_COLOR } from '@/consts/color.ts';
 
 interface DesktopPieChartDataItem extends CommonPieChartDataItem {
     itemStyle: {
-        color: ColorValue;
+        color: ColorStyleValue;
     };
     selected: boolean;
 }
@@ -66,7 +65,7 @@ const seriesData = computed<DesktopPieChartDataItem[]>(() => {
         ret.push({
             ...item,
             itemStyle: {
-                color: getColor(item.color),
+                color: item.color,
             },
             selected: true
         });
@@ -213,14 +212,6 @@ const chartOptions = computed<object>(() => {
         ]
     };
 });
-
-function getColor(color: string): ColorValue {
-    if (color && color !== DEFAULT_ICON_COLOR) {
-        color = '#' + color;
-    }
-
-    return color;
-}
 
 function clickItem(e: ECElementEvent): void {
     if (!props.enableClickItem || e.componentType !== 'series' || e.seriesType !=='pie') {

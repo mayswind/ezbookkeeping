@@ -1,10 +1,12 @@
-import type { ColorValue } from '@/core/color.ts';
+import type { ColorValue, ColorStyleValue } from '@/core/color.ts';
 
 const defaultColor: ColorValue = '000000';
 
 export const DEFAULT_ICON_COLOR: ColorValue = defaultColor;
 export const DEFAULT_ACCOUNT_COLOR: ColorValue = defaultColor;
 export const DEFAULT_CATEGORY_COLOR: ColorValue = defaultColor;
+
+export const DEFAULT_COLOR_STYLE_VARIABLE: ColorStyleValue = 'var(--default-icon-color)';
 
 const allAvailableColors: ColorValue[] = [
     '000000', // black

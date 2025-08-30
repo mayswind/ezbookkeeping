@@ -1,7 +1,7 @@
 <template>
     <v-card :class="{ 'disabled': disabled }">
         <v-card-text class="d-flex align-center">
-            <v-avatar color="secondary" size="38">
+            <v-avatar color="grey" size="38">
                 <v-icon size="24" :icon="icon" />
             </v-avatar>
             <span class="font-weight-bold ms-3">{{ title }}</span>

@@ -41,7 +41,7 @@
                                 title: 'Transaction Tags',
                                 count: displayDataStatistics ? displayDataStatistics.totalTransactionTagCount : '-',
                                 icon: mdiTagOutline,
-                                color: 'secondary'
+                                color: 'grey'
                             },
                             {
                                 title: 'Transaction Pictures',

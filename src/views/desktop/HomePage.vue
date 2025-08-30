@@ -59,7 +59,7 @@
                         <v-col cols="12" md="4">
                             <div class="d-flex align-center">
                                 <div class="me-3">
-                                    <v-avatar rounded color="secondary" size="42" class="elevation-1">
+                                    <v-avatar rounded color="grey" size="42" class="elevation-1">
                                         <v-icon size="24" :icon="mdiBankOutline"/>
                                     </v-avatar>
                                 </div>

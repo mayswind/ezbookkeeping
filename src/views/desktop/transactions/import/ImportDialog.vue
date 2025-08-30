@@ -598,7 +598,7 @@
                         </template>
                         <template #item.time="{ item }">
                             <span>{{ getDisplayDateTime(item) }}</span>
-                            <v-chip class="ms-1" variant="flat" color="secondary" size="x-small"
+                            <v-chip class="ms-1" variant="flat" color="grey" size="x-small"
                                     v-if="item.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimezone(item) }}</v-chip>
                         </template>
                         <template #item.type="{ value }">

@@ -103,6 +103,12 @@ input[type=number] {
     min-block-size: calc(var(--vh, 1vh) * 100);
 }
 
+.v-theme--dark {
+    .auth-image-background {
+        background-color: #202122;
+    }
+}
+
 .auth-card {
     background-color: rgb(var(--v-theme-surface));
 }
@@ -253,6 +259,15 @@ html[dir="rtl"] .bidirectional-switch {
     }
 }
 
+.v-theme--dark {
+    .v-btn--variant-elevated,
+    .v-btn--variant-flat {
+        &.v-btn--disabled .v-btn__overlay {
+            opacity: 0.35;
+        }
+    }
+}
+
 .v-btn {
     .v-btn__prepend,
     .v-btn__append {
@@ -346,6 +361,22 @@ html[dir="rtl"] .v-img.img-with-direction > img {
 
 .text-field-with-colored-label.v-text-field.text-income .v-field-label.v-label {
     color: rgba(var(--v-theme-income), var(--v-medium-emphasis-opacity)) !important;
+}
+
+.v-tooltip {
+    .v-overlay__content {
+        color: rgb(var(--v-tooltip-color));
+    }
+}
+
+.v-snackbar {
+    .v-snackbar__content {
+        color: rgb(var(--v-tooltip-color));
+    }
+
+    .bg-notification-background .v-snackbar__content {
+        color: rgb(var(--v-theme-on-notification-background)) !important;
+    }
 }
 
 .v-switch.v-switch--inset {

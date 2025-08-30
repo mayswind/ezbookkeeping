@@ -7,7 +7,7 @@
             </div>
         </router-link>
         <v-row no-gutters class="auth-wrapper">
-            <v-col cols="12" md="8" class="d-none d-md-flex align-center justify-center position-relative">
+            <v-col cols="12" md="8" class="auth-image-background d-none d-md-flex align-center justify-center position-relative">
                 <div class="d-flex auth-img-footer" v-if="!isDarkMode">
                     <v-img class="img-with-direction" src="img/desktop/background.svg"/>
                 </div>
@@ -15,7 +15,8 @@
                     <v-img class="img-with-direction" src="img/desktop/background-dark.svg"/>
                 </div>
                 <div class="d-flex align-center justify-center w-100 pt-10">
-                    <v-img class="img-with-direction" max-width="320px" src="img/desktop/people2.svg"/>
+                    <v-img class="img-with-direction" max-width="320px" src="img/desktop/people2.svg" v-if="!isDarkMode"/>
+                    <v-img class="img-with-direction" max-width="320px" src="img/desktop/people2-dark.svg" v-else-if="isDarkMode"/>
                 </div>
             </v-col>
             <v-col cols="12" md="4" class="auth-card d-flex flex-column">

@@ -1,6 +1,7 @@
 package beancount
 
 import (
+	"math/big"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -97,23 +98,23 @@ func TestEvaluatePostfixExpr_ValidExpression(t *testing.T) {
 
 	result, err := evaluatePostfixExpr(context, []string{"1", "2", "+"})
 	assert.Nil(t, err)
-	assert.Equal(t, float64(3), result)
+	assert.Equal(t, big.NewInt(3000000), result)
 
 	result, err = evaluatePostfixExpr(context, []string{"5", "3", "-"})
 	assert.Nil(t, err)
-	assert.Equal(t, float64(2), result)
+	assert.Equal(t, big.NewInt(2000000), result)
 
 	result, err = evaluatePostfixExpr(context, []string{"4", "3", "*"})
 	assert.Nil(t, err)
-	assert.Equal(t, float64(12), result)
+	assert.Equal(t, big.NewInt(12000000), result)
 
 	result, err = evaluatePostfixExpr(context, []string{"6", "2", "/"})
 	assert.Nil(t, err)
-	assert.Equal(t, float64(3), result)
+	assert.Equal(t, big.NewInt(3000000), result)
 
 	result, err = evaluatePostfixExpr(context, []string{"1", "2", "3", "*", "+", "4", "2", "/", "-"})
 	assert.Nil(t, err)
-	assert.Equal(t, float64(5), result)
+	assert.Equal(t, big.NewInt(5000000), result)
 }
 
 func TestEvaluatePostfixExpr_InvalidExpression(t *testing.T) {
@@ -179,6 +180,18 @@ func TestEvaluateBeancountAmountExpression_ValidExpression(t *testing.T) {
 	result, err = evaluateBeancountAmountExpression(context, "(((2+3)))*(((((-5+7)))))")
 	assert.Nil(t, err)
 	assert.Equal(t, "10.00", result)
+
+	result, err = evaluateBeancountAmountExpression(context, "3.5+0.1")
+	assert.Nil(t, err)
+	assert.Equal(t, "3.60", result)
+
+	result, err = evaluateBeancountAmountExpression(context, "3.55+0.11")
+	assert.Nil(t, err)
+	assert.Equal(t, "3.66", result)
+
+	result, err = evaluateBeancountAmountExpression(context, "3.555+0.111")
+	assert.Nil(t, err)
+	assert.Equal(t, "3.66", result)
 }
 
 func TestEvaluateBeancountAmountExpression_InvalidExpression(t *testing.T) {
@@ -212,5 +225,11 @@ func TestEvaluateBeancountAmountExpression_InvalidExpression(t *testing.T) {
 	assert.Equal(t, errs.ErrInvalidAmountExpression, err)
 
 	_, err = evaluateBeancountAmountExpression(context, "1)*(2")
+	assert.Equal(t, errs.ErrInvalidAmountExpression, err)
+
+	_, err = evaluateBeancountAmountExpression(context, "0.abcd+1")
+	assert.Equal(t, errs.ErrInvalidAmountExpression, err)
+
+	_, err = evaluateBeancountAmountExpression(context, "0.1234567+1")
 	assert.Equal(t, errs.ErrInvalidAmountExpression, err)
 }

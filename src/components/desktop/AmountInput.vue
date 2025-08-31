@@ -79,7 +79,7 @@ import type { CurrencyPrependAndAppendText } from '@/core/currency.ts';
 import { DEFAULT_DECIMAL_NUMBER_COUNT } from '@/consts/numeral.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import { isNumber, replaceAll } from '@/lib/common.ts';
-import { evaluateExpression } from '@/lib/evaluator.ts';
+import { evaluateExpressionToAmount } from '@/lib/evaluator.ts';
 import type { ComponentDensity } from '@/lib/ui/desktop.ts';
 import logger from '@/lib/logger.ts';
 
@@ -116,7 +116,6 @@ const {
     getCurrentDecimalSeparator,
     parseAmountFromLocalizedNumerals,
     formatAmountToLocalizedNumeralsWithoutDigitGrouping,
-    formatNumberToLocalizedNumerals,
     getAmountPrependAndAppendText
 } = useI18n();
 
@@ -218,15 +217,24 @@ function calculateFormula(): void {
     }
 
     finalFormula = numeralSystem.value.replaceLocalizedDigitsToWesternArabicDigits(finalFormula);
-    const calculatedValue = evaluateExpression(finalFormula);
 
-    if (isNumber(calculatedValue)) {
-        const textualValue = formatNumberToLocalizedNumerals(calculatedValue, 2);
-        const hasDecimalSeparator = textualValue.indexOf(decimalSeparator) >= 0;
-        currentValue.value = getValidFormattedValue(calculatedValue * 100, textualValue, hasDecimalSeparator);
-        formulaMode.value = false;
-    } else {
-        snackbar.value?.showMessage('Formula is invalid');
+    try {
+        const calculatedAmount = evaluateExpressionToAmount(finalFormula);
+
+        if (isNumber(calculatedAmount)) {
+            const textualValue = getFormattedValue(calculatedAmount);
+            const hasDecimalSeparator = textualValue.indexOf(decimalSeparator) >= 0;
+            currentValue.value = getValidFormattedValue(calculatedAmount, textualValue, hasDecimalSeparator);
+            formulaMode.value = false;
+        } else {
+            snackbar.value?.showMessage('Formula is invalid');
+        }
+    } catch (ex) {
+        logger.error('cannot evaluate formula in amount input, original formula is ' + finalFormula, ex);
+
+        if (ex instanceof Error) {
+            snackbar.value?.showMessage(ex.message);
+        }
     }
 }
 

@@ -34,7 +34,8 @@
                                      :class="{ 'frequency-value-selected v-list-item--active text-primary': isFrequencyValueSelected(weekDay.type) }"
                                      v-for="weekDay in allWeekDays">
                             <template #prepend="{ isActive }">
-                                <v-checkbox density="compact" class="me-1" :model-value="isActive"></v-checkbox>
+                                <v-checkbox density="compact" class="me-1" :model-value="isActive"
+                                            @update:model-value="updateFrequencyValue(weekDay.type, $event)"></v-checkbox>
                             </template>
                         </v-list-item>
                     </v-list>
@@ -44,7 +45,8 @@
                                      :class="{ 'frequency-value-selected v-list-item--active text-primary': isFrequencyValueSelected(monthDay.day) }"
                                      v-for="monthDay in allAvailableMonthDays">
                             <template #prepend="{ isActive }">
-                                <v-checkbox density="compact" class="me-1" :model-value="isActive"></v-checkbox>
+                                <v-checkbox density="compact" class="me-1" :model-value="isActive"
+                                            @update:model-value="updateFrequencyValue(monthDay.day, $event)"></v-checkbox>
                             </template>
                         </v-list-item>
                     </v-list>
@@ -131,6 +133,23 @@ const displayFrequency = computed<string>(() => {
         return '';
     }
 });
+
+function updateFrequencyValue(value: number, selected: boolean | null): void {
+    const currentFrequencyValues = frequencyValue.value;
+    const newFrequencyValues: number[] = [];
+
+    for (let i = 0; i < currentFrequencyValues.length; i++) {
+        if (currentFrequencyValues[i] !== value || selected) {
+            newFrequencyValues.push(currentFrequencyValues[i]);
+        }
+    }
+
+    if (selected) {
+        newFrequencyValues.push(value);
+    }
+
+    frequencyValue.value = sortNumbersArray(newFrequencyValues);
+}
 
 function isFrequencyValueSelected(value: number): boolean {
     for (let i = 0; i < frequencyValue.value.length; i++) {

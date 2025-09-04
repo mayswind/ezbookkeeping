@@ -1,5 +1,5 @@
 # Build backend binary file
-FROM golang:1.24.5-alpine3.22 AS be-builder
+FROM golang:1.25.1-alpine3.22 AS be-builder
 ARG RELEASE_BUILD
 ARG BUILD_PIPELINE
 ARG CHECK_3RD_API
@@ -15,7 +15,7 @@ RUN apk add git gcc g++ libc-dev
 RUN ./build.sh backend
 
 # Build frontend files
-FROM --platform=$BUILDPLATFORM node:22.18.0-alpine3.22 AS fe-builder
+FROM --platform=$BUILDPLATFORM node:24.7.0-alpine3.22 AS fe-builder
 ARG RELEASE_BUILD
 ARG BUILD_PIPELINE
 ENV RELEASE_BUILD=$RELEASE_BUILD

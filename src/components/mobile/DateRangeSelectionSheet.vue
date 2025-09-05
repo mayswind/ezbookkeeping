@@ -19,6 +19,7 @@
                                   :is-dark-mode="isDarkMode"
                                   :enable-time-picker="true"
                                   :preset-dates="presetRanges"
+                                  :show-alternate-dates="true"
                                   v-model="dateRange">
                 </date-time-picker>
                 <f7-button large fill

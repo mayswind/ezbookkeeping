@@ -65,6 +65,7 @@
     --ebk-numpad-value-large-font-size: 30px;
     --ebk-numpad-normal-button-font-size: 32px;
     --ebk-numpad-confirm-button-font-size: 24px;
+    --ebk-datetime-picker-alternate-date-font-size: 17px;
     --ebk-amount-small-font-size: 34px;
     --ebk-amount-normal-font-size: 38px;
     --ebk-amount-large-font-size: 42px;
@@ -78,8 +79,10 @@
     --ebk-transaction-date-width: 36px;
     --ebk-transaction-day-font-size: 22px;
     --ebk-transaction-day-of-week-font-size: 17px;
+    --ebk-transaction-calendar-alternate-date-font-size: 17px;
     --ebk-transaction-calendar-amount-font-size: 17px;
     --ebk-transaction-calendar-daily-amounts-height: 80px;
+    --ebk-transaction-calendar-with-alternate-date-daily-amounts-height: 105px;
     --ebk-transaction-account-arrow-font-size: 17px;
     --ebk-transaction-account-arrow-margin-top: -4px;
     --ebk-transaction-tag-icon-font-size: 30px;

@@ -12,10 +12,16 @@ import {
 } from '@/locales/index.ts';
 
 import {
+    ALL_LANGUAGES as CHINESE_CALENDAR_ALL_LANGUAGES,
+    DEFAULT_CONTENT as CHINESE_CALENDAR_DEFAULT_CONTENT
+} from '@/locales/calendar/chinese/index.ts';
+
+import {
     TextDirection
 } from '@/core/text.ts';
 
 import {
+    type ChineseCalendarLocaleData,
     CalendarType,
     CalendarDisplayType,
     DateDisplayType
@@ -26,6 +32,9 @@ import {
     type DateTimeLocaleData,
     type TextualYearMonth,
     type TextualYearMonthDay,
+    type Year1BasedMonth,
+    type YearMonthDay,
+    type CalendarAlternateDate,
     type DateFormat,
     type TimeFormat,
     type LocalizedDateTimeFormat,
@@ -177,6 +186,13 @@ import {
     isDateRangeMatchFullYears,
     isPM
 } from '@/lib/datetime.ts';
+
+import {
+    type ChineseYearMonthDayInfo,
+    getChineseYearMonthAllDayInfos,
+    getChineseYearMonthDayInfo,
+    getChineseCalendarAlternateDisplayDate
+} from '@/lib/calendar/chinese_calendar.ts';
 
 import {
     appendDigitGroupingSymbolAndDecimalSeparator,
@@ -452,6 +468,19 @@ export function useI18n() {
         return moment.localeData();
     }
 
+    function getChineseCalendarLocaleData(): ChineseCalendarLocaleData {
+        const localeData = CHINESE_CALENDAR_ALL_LANGUAGES[locale.value] ?? CHINESE_CALENDAR_DEFAULT_CONTENT;
+        const chineseCalendarLocaleData: ChineseCalendarLocaleData = {
+            numerals: localeData['numerals'],
+            monthNames: localeData['monthNames'],
+            dayNames: localeData['dayNames'],
+            leapMonthPrefix: localeData['leapMonthPrefix'],
+            solarTermNames: localeData['solarTermNames']
+        };
+
+        return chineseCalendarLocaleData;
+    }
+
     function getAllCurrencyDisplayTypes(numeralSystem: NumeralSystem, decimalSeparator: string): TypeAndDisplayName[] {
         const defaultCurrencyDisplayTypeName = t('default.currencyDisplayType');
         let defaultCurrencyDisplayType = CurrencyDisplayType.parse(defaultCurrencyDisplayTypeName);
@@ -683,7 +712,8 @@ export function useI18n() {
         return {
             numeralSystem: numeralSystem,
             calendarType: calendarType,
-            localeData: getDateTimeLocaleData()
+            localeData: getDateTimeLocaleData(),
+            chineseCalendarLocaleData: getChineseCalendarLocaleData()
         };
     }
 
@@ -1869,6 +1899,56 @@ export function useI18n() {
         }
     }
 
+    function getCalendarAlternateDates(yearMonth: Year1BasedMonth): CalendarAlternateDate[] | undefined {
+        const calendarDisplayType = getCurrentCalendarDisplayType().secondaryCalendarType;
+
+        if (!calendarDisplayType) {
+            return undefined;
+        }
+
+        if (calendarDisplayType === CalendarType.Chinese) {
+            const chineseCalendarLocaleData = getChineseCalendarLocaleData();
+            const chineseDates: ChineseYearMonthDayInfo[] | undefined = getChineseYearMonthAllDayInfos(yearMonth, chineseCalendarLocaleData);
+
+            if (!chineseDates) {
+                return undefined;
+            }
+
+            const ret: CalendarAlternateDate[] = [];
+
+            for (let i = 0; i < chineseDates.length; i++) {
+                const chineseDate = chineseDates[i];
+                const alternateDate = getChineseCalendarAlternateDisplayDate(chineseDate);
+                ret.push(alternateDate);
+            }
+
+            return ret;
+        }
+
+        return undefined;
+    }
+
+    function getCalendarAlternateDate(yearMonthDay: YearMonthDay): CalendarAlternateDate | undefined {
+        const calendarDisplayType = getCurrentCalendarDisplayType().secondaryCalendarType;
+
+        if (!calendarDisplayType) {
+            return undefined;
+        }
+
+        if (calendarDisplayType === CalendarType.Chinese) {
+            const chineseCalendarLocaleData = getChineseCalendarLocaleData();
+            const chineseDate: ChineseYearMonthDayInfo | undefined = getChineseYearMonthDayInfo(yearMonthDay, chineseCalendarLocaleData);
+
+            if (!chineseDate) {
+                return undefined;
+            }
+
+            return getChineseCalendarAlternateDisplayDate(chineseDate);
+        }
+
+        return undefined;
+    }
+
     function getParsedAmountNumber(value: string, numeralSystem?: NumeralSystem): number {
         const numberFormatOptions = getNumberFormatOptions({ numeralSystem });
         return parseAmount(value, numberFormatOptions);
@@ -2288,6 +2368,8 @@ export function useI18n() {
         formatUnixTimeToFiscalYear,
         formatYearToFiscalYear,
         getTimezoneDifferenceDisplayText,
+        getCalendarAlternateDates,
+        getCalendarAlternateDate,
         parseAmountFromLocalizedNumerals: (value: string) => getParsedAmountNumber(value),
         parseAmountFromWesternArabicNumerals: (value: string) => getParsedAmountNumber(value, NumeralSystem.WesternArabicNumerals),
         formatAmountToLocalizedNumerals: (value: number, currencyCode?: string) => getFormattedAmount(value, undefined, undefined, currencyCode),

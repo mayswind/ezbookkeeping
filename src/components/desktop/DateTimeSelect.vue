@@ -15,6 +15,7 @@
             <date-time-picker :is-dark-mode="isDarkMode"
                               :enable-time-picker="false"
                               :vertical="true"
+                              :show-alternate-dates="true"
                               v-model="dateTime">
             </date-time-picker>
             <div class="date-time-select-time-picker-container">

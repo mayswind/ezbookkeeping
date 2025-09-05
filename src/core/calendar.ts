@@ -2,7 +2,16 @@ import type { TypeAndName } from '@/core/base.ts';
 
 export enum CalendarType {
     Gregorian = 0,
-    Buddhist = 1
+    Buddhist = 1,
+    Chinese = 2
+}
+
+export interface ChineseCalendarLocaleData {
+    readonly numerals: string[];
+    readonly monthNames: string[];
+    readonly dayNames: string[];
+    readonly leapMonthPrefix: string;
+    readonly solarTermNames: string[];
 }
 
 export class CalendarDisplayType implements TypeAndName {
@@ -13,6 +22,7 @@ export class CalendarDisplayType implements TypeAndName {
     public static readonly LanguageDefaultType: number = 0;
     public static readonly Gregorian = new CalendarDisplayType(1, 'Gregorian', 'Gregorian', CalendarType.Gregorian);
     public static readonly Buddhist = new CalendarDisplayType(2, 'Buddhist', 'Buddhist', CalendarType.Buddhist);
+    public static readonly GregorianWithChinese = new CalendarDisplayType(3, 'GregorianWithChinese', 'Gregorian with Chinese', CalendarType.Gregorian, CalendarType.Chinese);
 
     public static readonly Default = CalendarDisplayType.Gregorian;
 

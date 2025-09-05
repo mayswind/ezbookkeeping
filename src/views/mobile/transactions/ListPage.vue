@@ -1632,6 +1632,10 @@ html[dir="rtl"] .list.transaction-info-list li.transaction-info .transaction-foo
     --dp-primary-text-color: var(--f7-theme-color);
 }
 
+.transaction-calendar-container .dp__main.transaction-calendar-with-alternate-date .dp__calendar .dp__calendar_row {
+    --dp-cell-size: var(--ebk-transaction-calendar-with-alternate-date-daily-amounts-height);
+}
+
 .transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts {
     width: 100%;
     height: 100%;
@@ -1671,6 +1675,10 @@ html[dir="rtl"] .list.transaction-info-list li.transaction-info .transaction-foo
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > span.transaction-calendar-alternate-date {
+    font-size: var(--ebk-transaction-calendar-alternate-date-font-size);
 }
 
 .transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > span.transaction-calendar-daily-amount {

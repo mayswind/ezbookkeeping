@@ -1880,7 +1880,19 @@ init(props);
     --dp-primary-text-color: rgb(var(--v-theme-primary));
 }
 
+.transaction-calendar-container .dp__main.transaction-calendar-with-alternate-date .dp__calendar .dp__calendar_row {
+    --dp-cell-size: 100px;
+}
+
 .transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item {
     overflow: hidden;
+}
+
+.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > span.transaction-calendar-alternate-date {
+    font-size: 0.9rem;
+}
+
+.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > span.transaction-calendar-daily-amount {
+    font-size: 0.95rem;
 }
 </style>

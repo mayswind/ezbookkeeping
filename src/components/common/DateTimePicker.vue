@@ -3,7 +3,7 @@
                      inline auto-apply
                      enable-seconds
                      six-weeks="center"
-                     :class="datetimePickerClass"
+                     :class="`datetime-picker ${showAlternateDates && alternateCalendarType ? 'datetime-picker-with-alternate-date' : ''} ${datetimePickerClass}`"
                      :config="noSwipeAndScroll ? { noSwipe: true } : undefined"
                      :dark="isDarkMode"
                      :vertical="vertical"
@@ -35,7 +35,10 @@
             {{ getDisplayMonth(value) }}
         </template>
         <template #day="{ date }">
-            {{ getDisplayDay(date) }}
+            <div class="datetime-picker-display-dates">
+                <span>{{ getDisplayDay(date) }}</span>
+                <span class="datetime-picker-alternate-date" v-if="showAlternateDates && alternateCalendarType && getAlternateDate(date)">{{ getAlternateDate(date) }}</span>
+            </div>
         </template>
         <template #am-pm-button="{ toggle, value }">
             <button class="dp__pm_am_button" tabindex="0" @click="toggle">{{ tt(`datetime.${value}.content`) }}</button>
@@ -51,7 +54,8 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useUserStore } from '@/stores/user.ts';
 
-import { type PresetDateRange, type WeekDayValue } from '@/core/datetime.ts';
+import type { CalendarType } from '@/core/calendar.ts';
+import type { PresetDateRange, WeekDayValue } from '@/core/datetime.ts';
 import { isArray, arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
 import { getAllowedYearRange, getYearMonthDayDateTime } from '@/lib/datetime.ts';
 
@@ -70,6 +74,7 @@ const props = defineProps<{
     minDate?: Date;
     maxDate?: Date;
     disabledDates?: (date: Date) => boolean;
+    showAlternateDates?: boolean;
     presetRanges?: PresetDateRange[];
 }>();
 
@@ -80,11 +85,13 @@ const emit = defineEmits<{
 const {
     tt,
     getAllMinWeekdayNames,
+    getCurrentCalendarDisplayType,
     isLongDateMonthAfterYear,
     isLongTime24HourFormat,
     getCalendarShortYearFromUnixTime,
     getCalendarShortMonthFromUnixTime,
-    getCalendarDayOfMonthFromUnixTime
+    getCalendarDayOfMonthFromUnixTime,
+    getCalendarAlternateDate
 } = useI18n();
 
 const userStore = useUserStore();
@@ -97,6 +104,7 @@ const dayNames = computed<string[]>(() => arrangeArrayWithNewStartIndex(getAllMi
 const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
 const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
 const is24Hour = computed<boolean>(() => isLongTime24HourFormat());
+const alternateCalendarType = computed<CalendarType | undefined>(() => getCurrentCalendarDisplayType().secondaryCalendarType);
 
 const dateTime = computed<SupportedModelValue>({
     get: () => props.modelValue,
@@ -104,6 +112,18 @@ const dateTime = computed<SupportedModelValue>({
 });
 
 const isDateRange = computed<boolean>(() => isArray(props.modelValue));
+
+function getAlternateDate(date: Date): string | undefined {
+    if (!props.showAlternateDates) {
+        return undefined;
+    }
+
+    return getCalendarAlternateDate({
+        year: date.getFullYear(),
+        month: date.getMonth() + 1,
+        day: date.getDate()
+    })?.displayDate;
+};
 
 function switchView(viewType: MenuView): void {
     datetimepicker.value?.switchView(viewType);
@@ -131,3 +151,35 @@ defineExpose({
     switchView
 });
 </script>
+
+<style>
+.datetime-picker-display-dates {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.datetime-picker-alternate-date {
+    margin-top: -2px;
+    opacity: 0.5;
+    font-size: 0.8rem;
+}
+
+.dp__cell_disabled .datetime-picker-alternate-date,
+.dp__cell_offset .datetime-picker-alternate-date {
+    opacity: 0.8;
+}
+
+.dp__main.datetime-picker .dp__calendar .dp__calendar_row > .dp__calendar_item .datetime-picker-display-dates > span.datetime-picker-alternate-date {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dp__main.datetime-picker.datetime-picker-with-alternate-date .dp__calendar .dp__calendar_row {
+    --dp-cell-size: 45px;
+}
+</style>

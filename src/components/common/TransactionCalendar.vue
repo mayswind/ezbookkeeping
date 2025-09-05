@@ -1,7 +1,7 @@
 <template>
     <vue-date-picker inline auto-apply
                      model-type="yyyy-MM-dd"
-                     :class="`transaction-calendar ${calendarClass}`"
+                     :class="`transaction-calendar ${alternateDates ? 'transaction-calendar-with-alternate-date' : ''} ${calendarClass}`"
                      :config="{ noSwipe: true }"
                      :readonly="readonly"
                      :dark="isDarkMode"
@@ -21,6 +21,7 @@
         <template #day="{ day, date }">
             <div class="transaction-calendar-daily-amounts">
                 <span :class="dayHasTransactionClass && dailyTotalAmounts && dailyTotalAmounts[day] ? dayHasTransactionClass : undefined">{{ getDisplayDay(date) }}</span>
+                <span class="transaction-calendar-alternate-date" v-if="alternateDates && alternateDates[`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`]">{{ alternateDates[`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`] }}</span>
                 <span class="transaction-calendar-daily-amount text-income" v-if="dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].income">{{ getDisplayMonthTotalAmount(dailyTotalAmounts[day].income, defaultCurrency, '', dailyTotalAmounts[day].incompleteIncome) }}</span>
                 <span class="transaction-calendar-daily-amount text-expense" v-if="dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].expense">{{ getDisplayMonthTotalAmount(dailyTotalAmounts[day].expense, defaultCurrency, '', dailyTotalAmounts[day].incompleteExpense) }}</span>
             </div>
@@ -35,7 +36,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useUserStore } from '@/stores/user.ts';
 import type { TransactionTotalAmount } from '@/stores/transaction.ts';
 
-import { type TextualYearMonthDay, type WeekDayValue } from '@/core/datetime.ts';
+import type { CalendarAlternateDate, TextualYearMonthDay, WeekDayValue } from '@/core/datetime.ts';
 import { INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
 
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
@@ -69,6 +70,7 @@ const {
     getAllLongWeekdayNames,
     getAllShortWeekdayNames,
     getCalendarDayOfMonthFromUnixTime,
+    getCalendarAlternateDates,
     formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
 
@@ -80,6 +82,28 @@ const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDa
 const dateTime = computed<TextualYearMonthDay | ''>({
     get: () => props.modelValue,
     set: (value: TextualYearMonthDay | '') => emit('update:modelValue', value)
+});
+
+const alternateDates = computed<Record<TextualYearMonthDay, string> | undefined>(() => {
+    const yearMonthDay = props.modelValue ? props.modelValue.split('-') : null;
+
+    if (!yearMonthDay || yearMonthDay.length !== 3) {
+        return undefined;
+    }
+
+    const allDates: CalendarAlternateDate[] | undefined = getCalendarAlternateDates({ year: parseInt(yearMonthDay[0]), month1base: parseInt(yearMonthDay[1]) })
+
+    if (!allDates) {
+        return undefined;
+    }
+
+    const ret: Record<TextualYearMonthDay, string> = {};
+
+    for (const alternateDate of allDates) {
+        ret[`${alternateDate.year}-${alternateDate.month}-${alternateDate.day}`] = alternateDate.displayDate;
+    }
+
+    return ret;
 });
 
 function noTransactionInMonthDay(date: Date): boolean {
@@ -105,7 +129,17 @@ function getDisplayDay(date: Date): string {
     justify-content: center;
 }
 
-.transaction-calendar.dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > span.transaction-calendar-daily-amount {
+.transaction-calendar-alternate-date {
+    margin-top: -3px;
+    opacity: 0.5;
+}
+
+.dp__cell_disabled .transaction-calendar-alternate-date {
+    opacity: 0.8;
+}
+
+.dp__main.transaction-calendar .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > span.transaction-calendar-alternate-date,
+.dp__main.transaction-calendar .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > span.transaction-calendar-daily-amount {
     display: block;
     width: 100%;
     overflow: hidden;

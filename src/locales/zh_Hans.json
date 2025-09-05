@@ -22,7 +22,7 @@
         "currency": "CNY",
         "firstDayOfWeek": "Monday",
         "fiscalYearFormat": "EndYYYY",
-        "calendarDisplayType": "Gregorian",
+        "calendarDisplayType": "GregorianWithChinese",
         "dateDisplayType": "Gregorian",
         "longDateFormat": "YYYYMMDD",
         "shortDateFormat": "YYYYMMDD",
@@ -138,7 +138,8 @@
     },
     "calendar": {
         "Gregorian": "公历",
-        "Buddhist": "佛教日历"
+        "Buddhist": "佛教日历",
+        "Gregorian with Chinese": "公历+农历"
     },
     "datetime": {
         "AM": {

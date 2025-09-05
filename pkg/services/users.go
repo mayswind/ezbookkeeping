@@ -293,7 +293,7 @@ func (s *UserService) UpdateUser(c core.Context, user *models.User, modifyUserLa
 		updateCols = append(updateCols, "fiscal_year_start")
 	}
 
-	if core.CALENDAR_DISPLAY_TYPE_DEFAULT <= user.CalendarDisplayType && user.CalendarDisplayType <= core.CALENDAR_DISPLAY_TYPE_BUDDHIST {
+	if core.CALENDAR_DISPLAY_TYPE_DEFAULT <= user.CalendarDisplayType && user.CalendarDisplayType <= core.CALENDAR_DISPLAY_TYPE_GREGORAIN_WITH_CHINESE {
 		updateCols = append(updateCols, "calendar_display_type")
 	}
 

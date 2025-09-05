@@ -22,6 +22,7 @@
                                   :enable-time-picker="true"
                                   :vertical="true"
                                   :preset-dates="presetRanges"
+                                  :show-alternate-dates="true"
                                   v-model="dateRange">
                 </date-time-picker>
             </v-card-text>

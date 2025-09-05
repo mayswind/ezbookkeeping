@@ -1,5 +1,5 @@
 import type { TypeAndName, TypeAndDisplayName } from '@/core/base.ts';
-import type { CalendarType } from '@/core/calendar.ts';
+import type { CalendarType, ChineseCalendarLocaleData } from '@/core/calendar.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
 
 export interface DateTime {
@@ -12,7 +12,6 @@ export interface DateTime {
     getGregorianCalendarMonthDisplayName(options: DateTimeFormatOptions): string;
     getGregorianCalendarMonthDisplayShortName(options: DateTimeFormatOptions): string;
     getLocalizedCalendarMonth(options: DateTimeFormatOptions): string;
-    getLocalizedCalendarMonthIndex(options: DateTimeFormatOptions): number;
     getLocalizedCalendarMonthDisplayName(options: DateTimeFormatOptions): string;
     getLocalizedCalendarMonthDisplayShortName(options: DateTimeFormatOptions): string;
     getGregorianCalendarDay(): number;
@@ -37,6 +36,7 @@ export interface DateTimeFormatOptions {
     numeralSystem: NumeralSystem;
     calendarType: CalendarType;
     localeData: DateTimeLocaleData;
+    chineseCalendarLocaleData: ChineseCalendarLocaleData;
 }
 
 export interface DateTimeLocaleData {
@@ -80,6 +80,10 @@ export interface YearMonthDay extends MonthDay {
 export interface MonthDay {
     readonly month: number; // 1-based (1 = January, 12 = December
     readonly day: number;
+}
+
+export interface CalendarAlternateDate extends YearMonthDay {
+    readonly displayDate: string;
 }
 
 export interface TimeRange {

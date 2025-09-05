@@ -7,10 +7,11 @@ type CalendarDisplayType byte
 
 // Calendar Display Type
 const (
-	CALENDAR_DISPLAY_TYPE_DEFAULT   CalendarDisplayType = 0
-	CALENDAR_DISPLAY_TYPE_GREGORAIN CalendarDisplayType = 1
-	CALENDAR_DISPLAY_TYPE_BUDDHIST  CalendarDisplayType = 2
-	CALENDAR_DISPLAY_TYPE_INVALID   CalendarDisplayType = 255
+	CALENDAR_DISPLAY_TYPE_DEFAULT                CalendarDisplayType = 0
+	CALENDAR_DISPLAY_TYPE_GREGORAIN              CalendarDisplayType = 1
+	CALENDAR_DISPLAY_TYPE_BUDDHIST               CalendarDisplayType = 2
+	CALENDAR_DISPLAY_TYPE_GREGORAIN_WITH_CHINESE CalendarDisplayType = 3
+	CALENDAR_DISPLAY_TYPE_INVALID                CalendarDisplayType = 255
 )
 
 // String returns a textual representation of the calendar display type enum
@@ -22,6 +23,8 @@ func (f CalendarDisplayType) String() string {
 		return "Gregorian"
 	case CALENDAR_DISPLAY_TYPE_BUDDHIST:
 		return "Buddhist"
+	case CALENDAR_DISPLAY_TYPE_GREGORAIN_WITH_CHINESE:
+		return "Gregorian with Chinese"
 	case CALENDAR_DISPLAY_TYPE_INVALID:
 		return "Invalid"
 	default:

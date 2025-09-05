@@ -16,6 +16,7 @@
                                   :is-dark-mode="isDarkMode"
                                   :enable-time-picker="false"
                                   :clearable="true"
+                                  :show-alternate-dates="true"
                                   v-model="dateTime">
                 </date-time-picker>
             </div>

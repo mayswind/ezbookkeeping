@@ -270,6 +270,10 @@ html[dir="rtl"] i.icon.icon-with-direction {
     transform: scaleX(-1);
 }
 
+.datetime-picker-alternate-date {
+    font-size: var(--ebk-datetime-picker-alternate-date-font-size);
+}
+
 /** Replacing the default style of @vuepic/vue-datepicker **/
 .dp__theme_light {
     --dp-primary-color: #c67e48;

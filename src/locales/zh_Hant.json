@@ -22,7 +22,7 @@
         "currency": "TWD",
         "firstDayOfWeek": "Sunday",
         "fiscalYearFormat": "EndYYYY",
-        "calendarDisplayType": "Gregorian",
+        "calendarDisplayType": "GregorianWithChinese",
         "dateDisplayType": "Gregorian",
         "longDateFormat": "YYYYMMDD",
         "shortDateFormat": "YYYYMMDD",
@@ -138,7 +138,8 @@
     },
     "calendar": {
         "Gregorian": "公曆",
-        "Buddhist": "佛曆"
+        "Buddhist": "佛曆",
+        "Gregorian with Chinese": "公曆+農曆"
     },
     "datetime": {
         "AM": {

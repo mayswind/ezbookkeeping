@@ -2,6 +2,7 @@ import moment from 'moment-timezone';
 import { type unitOfTime } from 'moment/moment';
 
 import {
+    type ChineseCalendarLocaleData,
     CalendarType
 } from '@/core/calendar.ts';
 import {
@@ -49,6 +50,11 @@ import {
     ofObject
 } from './common.ts';
 
+import {
+    type ChineseYearMonthDayInfo,
+    getChineseYearMonthDayInfo
+} from '@/lib/calendar/chinese_calendar.ts';
+
 interface DateTimeFormatResult {
     value: number | string;
     minNumeralLength?: number;
@@ -84,6 +90,7 @@ class MomentDateTime implements DateTime {
     };
 
     private readonly instance: moment.Moment;
+    private chineseDateInfo?: ChineseYearMonthDayInfo | undefined = undefined;
 
     private constructor(instance: moment.Moment) {
         this.instance = instance;
@@ -96,6 +103,8 @@ class MomentDateTime implements DateTime {
     public getLocalizedCalendarYear(options: DateTimeFormatOptions): string {
         if (options && options.calendarType === CalendarType.Buddhist) {
             return (this.instance.year() + 543).toString();
+        } else if (options && options.calendarType === CalendarType.Chinese) {
+            return this.getChineseDateInfo(options.chineseCalendarLocaleData)?.displayYear ?? '';
         }
 
         return this.instance.year().toString();
@@ -136,14 +145,12 @@ class MomentDateTime implements DateTime {
         return names[this.getGregorianCalendarMonth() - 1] || '';
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public getLocalizedCalendarMonth(options: DateTimeFormatOptions): string {
-        return (this.instance.month() + 1).toString();
-    }
+        if (options && options.calendarType === CalendarType.Chinese) {
+            return this.getChineseDateInfo(options.chineseCalendarLocaleData)?.displayMonth ?? '';
+        }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    public getLocalizedCalendarMonthIndex(options: DateTimeFormatOptions): number {
-        return this.instance.month();
+        return (this.instance.month() + 1).toString();
     }
 
     public getLocalizedCalendarMonthDisplayName(options: DateTimeFormatOptions): string {
@@ -151,8 +158,12 @@ class MomentDateTime implements DateTime {
             return '';
         }
 
+        if (options && options.calendarType === CalendarType.Chinese) {
+            return this.getChineseDateInfo(options.chineseCalendarLocaleData)?.displayMonth ?? '';
+        }
+
         const names = options.localeData.months();
-        return names[this.getLocalizedCalendarMonthIndex(options)] || '';
+        return names[this.instance.month()] || '';
     }
 
     public getLocalizedCalendarMonthDisplayShortName(options: DateTimeFormatOptions): string {
@@ -160,16 +171,23 @@ class MomentDateTime implements DateTime {
             return '';
         }
 
+        if (options && options.calendarType === CalendarType.Chinese) {
+            return this.getChineseDateInfo(options.chineseCalendarLocaleData)?.displayMonth ?? '';
+        }
+
         const names = options.localeData.monthsShort();
-        return names[this.getLocalizedCalendarMonthIndex(options)] || '';
+        return names[this.instance.month()] || '';
     }
 
     public getGregorianCalendarDay(): number {
         return this.instance.date();
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public getLocalizedCalendarDay(options: DateTimeFormatOptions): string {
+        if (options && options.calendarType === CalendarType.Chinese) {
+            return this.getChineseDateInfo(options.chineseCalendarLocaleData)?.displayDay ?? '';
+        }
+
         return this.instance.date().toString();
     }
 
@@ -305,6 +323,18 @@ class MomentDateTime implements DateTime {
 
     public static now(): DateTime {
         return new MomentDateTime(moment());
+    }
+
+    private getChineseDateInfo(localeData: ChineseCalendarLocaleData): ChineseYearMonthDayInfo | undefined {
+        if (!this.chineseDateInfo) {
+            this.chineseDateInfo = getChineseYearMonthDayInfo({
+                year: this.instance.year(),
+                month: this.instance.month() + 1,
+                day: this.instance.date()
+            }, localeData);
+        }
+
+        return this.chineseDateInfo;
     }
 
     static isYearFirstTime(dateTime: MomentDateTime): boolean {
@@ -560,6 +590,10 @@ export function getGregorianCalendarYearAndMonthFromUnixTime(unixTime: number): 
     return parseDateTimeFromUnixTime(unixTime).getGregorianCalendarYearDashMonth();
 }
 
+export function getGregorianCalendarYearMonthDays(yearMonth: Year1BasedMonth): number {
+    return moment().set({ year: yearMonth.year, month: yearMonth.month1base - 1 }).daysInMonth();
+}
+
 export function getAMOrPM(hour: number): string {
     return isPM(hour) ? MeridiemIndicator.PM.name : MeridiemIndicator.AM.name;
 }
@@ -570,6 +604,12 @@ export function getUnixTimeBeforeUnixTime(unixTime: number, amount: number, unit
 
 export function getUnixTimeAfterUnixTime(unixTime: number, amount: number, unit: unitOfTime.DurationConstructor): number {
     return moment.unix(unixTime).add(amount, unit).unix();
+}
+
+export function getDayDifference(yearMonthDay1: YearMonthDay, yearMonthDay2: YearMonthDay): number {
+    const date1 = moment().set({ year: yearMonthDay1.year, month: yearMonthDay1.month - 1, date: yearMonthDay1.day, hour: 0, minute: 0, second: 0, millisecond: 0 });
+    const date2 = moment().set({ year: yearMonthDay2.year, month: yearMonthDay2.month - 1, date: yearMonthDay2.day, hour: 0, minute: 0, second: 0, millisecond: 0 });
+    return date2.diff(date1, 'days');
 }
 
 export function getTimeDifferenceHoursAndMinutes(timeDifferenceInMinutes: number): TimeDifference {

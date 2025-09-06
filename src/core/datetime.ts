@@ -1,5 +1,5 @@
 import type { TypeAndName, TypeAndDisplayName } from '@/core/base.ts';
-import type { CalendarType, ChineseCalendarLocaleData } from '@/core/calendar.ts';
+import type { CalendarType, ChineseCalendarLocaleData, PersianCalendarLocaleData } from '@/core/calendar.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
 
 export interface DateTime {
@@ -16,6 +16,7 @@ export interface DateTime {
     getLocalizedCalendarMonthDisplayShortName(options: DateTimeFormatOptions): string;
     getGregorianCalendarDay(): number;
     getLocalizedCalendarDay(options: DateTimeFormatOptions): string;
+    isLocalizedCalendarFirstDayOfMonth(options: DateTimeFormatOptions): boolean;
     getGregorianCalendarYearDashMonthDashDay(): TextualYearMonthDay;
     getGregorianCalendarYearDashMonth(): TextualYearMonth;
     getWeekDay(): WeekDay;
@@ -37,6 +38,7 @@ export interface DateTimeFormatOptions {
     calendarType: CalendarType;
     localeData: DateTimeLocaleData;
     chineseCalendarLocaleData: ChineseCalendarLocaleData;
+    persianCalendarLocaleData: PersianCalendarLocaleData;
 }
 
 export interface DateTimeLocaleData {

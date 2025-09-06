@@ -308,6 +308,12 @@
         "licenseUrl": "https://github.com/faisalman/ua-parser-js/blob/1.0.39/license.md"
     },
     {
+        "name": "Jalaali JavaScript",
+        "copyright": "Copyright (c) 2020 Behrang Norouzinia",
+        "url": "https://github.com/jalaali/jalaali-js",
+        "licenseUrl": "https://github.com/jalaali/jalaali-js/blob/v1.2.8/LICENSE"
+    },
+    {
         "name": "Materio - Vuetify VueJS 3 Free Admin Template",
         "copyright": "Copyright (c) 2022 ThemeSelection",
         "url": "https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free",

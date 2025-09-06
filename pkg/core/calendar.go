@@ -11,6 +11,7 @@ const (
 	CALENDAR_DISPLAY_TYPE_GREGORAIN              CalendarDisplayType = 1
 	CALENDAR_DISPLAY_TYPE_BUDDHIST               CalendarDisplayType = 2
 	CALENDAR_DISPLAY_TYPE_GREGORAIN_WITH_CHINESE CalendarDisplayType = 3
+	CALENDAR_DISPLAY_TYPE_GREGORAIN_WITH_PERSIAN CalendarDisplayType = 4
 	CALENDAR_DISPLAY_TYPE_INVALID                CalendarDisplayType = 255
 )
 
@@ -25,6 +26,8 @@ func (f CalendarDisplayType) String() string {
 		return "Buddhist"
 	case CALENDAR_DISPLAY_TYPE_GREGORAIN_WITH_CHINESE:
 		return "Gregorian with Chinese"
+	case CALENDAR_DISPLAY_TYPE_GREGORAIN_WITH_PERSIAN:
+		return "Gregorian with Persian"
 	case CALENDAR_DISPLAY_TYPE_INVALID:
 		return "Invalid"
 	default:
@@ -40,6 +43,7 @@ const (
 	DATE_DISPLAY_TYPE_DEFAULT   DateDisplayType = 0
 	DATE_DISPLAY_TYPE_GREGORAIN DateDisplayType = 1
 	DATE_DISPLAY_TYPE_BUDDHIST  DateDisplayType = 2
+	DATE_DISPLAY_TYPE_PERSIAN   DateDisplayType = 3
 	DATE_DISPLAY_TYPE_INVALID   DateDisplayType = 255
 )
 
@@ -52,6 +56,8 @@ func (f DateDisplayType) String() string {
 		return "Gregorian"
 	case DATE_DISPLAY_TYPE_BUDDHIST:
 		return "Buddhist"
+	case DATE_DISPLAY_TYPE_PERSIAN:
+		return "Persian"
 	case DATE_DISPLAY_TYPE_INVALID:
 		return "Invalid"
 	default:

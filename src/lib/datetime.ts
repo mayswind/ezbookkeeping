@@ -1,6 +1,8 @@
 import moment from 'moment-timezone';
 import { type unitOfTime } from 'moment/moment';
 
+import jalaali, { type JalaaliDateObject } from 'jalaali-js';
+
 import {
     type ChineseCalendarLocaleData,
     CalendarType
@@ -91,6 +93,7 @@ class MomentDateTime implements DateTime {
 
     private readonly instance: moment.Moment;
     private chineseDateInfo?: ChineseYearMonthDayInfo | undefined = undefined;
+    private persianDateInfo?: JalaaliDateObject | undefined = undefined;
 
     private constructor(instance: moment.Moment) {
         this.instance = instance;
@@ -105,6 +108,8 @@ class MomentDateTime implements DateTime {
             return (this.instance.year() + 543).toString();
         } else if (options && options.calendarType === CalendarType.Chinese) {
             return this.getChineseDateInfo(options.chineseCalendarLocaleData)?.displayYear ?? '';
+        } else if (options && options.calendarType === CalendarType.Persian) {
+            return this.getPersianDateInfo().jy.toString();
         }
 
         return this.instance.year().toString();
@@ -148,6 +153,8 @@ class MomentDateTime implements DateTime {
     public getLocalizedCalendarMonth(options: DateTimeFormatOptions): string {
         if (options && options.calendarType === CalendarType.Chinese) {
             return this.getChineseDateInfo(options.chineseCalendarLocaleData)?.displayMonth ?? '';
+        } else if (options && options.calendarType === CalendarType.Persian) {
+            return this.getPersianDateInfo().jm.toString();
         }
 
         return (this.instance.month() + 1).toString();
@@ -160,6 +167,8 @@ class MomentDateTime implements DateTime {
 
         if (options && options.calendarType === CalendarType.Chinese) {
             return this.getChineseDateInfo(options.chineseCalendarLocaleData)?.displayMonth ?? '';
+        } else if (options && options.calendarType === CalendarType.Persian) {
+            return options.persianCalendarLocaleData.monthNames[this.getPersianDateInfo().jm - 1] ?? '';
         }
 
         const names = options.localeData.months();
@@ -173,6 +182,8 @@ class MomentDateTime implements DateTime {
 
         if (options && options.calendarType === CalendarType.Chinese) {
             return this.getChineseDateInfo(options.chineseCalendarLocaleData)?.displayMonth ?? '';
+        } else if (options && options.calendarType === CalendarType.Persian) {
+            return options.persianCalendarLocaleData.monthShortNames[this.getPersianDateInfo().jm - 1] ?? '';
         }
 
         const names = options.localeData.monthsShort();
@@ -186,9 +197,21 @@ class MomentDateTime implements DateTime {
     public getLocalizedCalendarDay(options: DateTimeFormatOptions): string {
         if (options && options.calendarType === CalendarType.Chinese) {
             return this.getChineseDateInfo(options.chineseCalendarLocaleData)?.displayDay ?? '';
+        } else if (options && options.calendarType === CalendarType.Persian) {
+            return this.getPersianDateInfo().jd.toString();
         }
 
         return this.instance.date().toString();
+    }
+
+    public isLocalizedCalendarFirstDayOfMonth(options: DateTimeFormatOptions): boolean {
+        if (options && options.calendarType === CalendarType.Chinese) {
+            return this.getChineseDateInfo(options.chineseCalendarLocaleData)?.day === 1;
+        } else if (options && options.calendarType === CalendarType.Persian) {
+            return this.getPersianDateInfo().jd === 1;
+        }
+
+        return this.instance.date() === 1;
     }
 
     public getGregorianCalendarYearDashMonthDashDay(): TextualYearMonthDay {
@@ -335,6 +358,14 @@ class MomentDateTime implements DateTime {
         }
 
         return this.chineseDateInfo;
+    }
+
+    private getPersianDateInfo(): JalaaliDateObject {
+        if (!this.persianDateInfo) {
+            this.persianDateInfo = jalaali.toJalaali(this.instance.year(), this.instance.month() + 1, this.instance.date());
+        }
+
+        return this.persianDateInfo;
     }
 
     static isYearFirstTime(dateTime: MomentDateTime): boolean {

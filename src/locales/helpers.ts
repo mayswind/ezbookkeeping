@@ -17,17 +17,24 @@ import {
 } from '@/locales/calendar/chinese/index.ts';
 
 import {
+    ALL_LANGUAGES as PERSIAN_CALENDAR_ALL_LANGUAGES,
+    DEFAULT_CONTENT as PERSIAN_CALENDAR_DEFAULT_CONTENT
+} from '@/locales/calendar/persian/index.ts';
+
+import {
     TextDirection
 } from '@/core/text.ts';
 
 import {
     type ChineseCalendarLocaleData,
+    type PersianCalendarLocaleData,
     CalendarType,
     CalendarDisplayType,
     DateDisplayType
 } from '@/core/calendar.ts';
 
 import {
+    type DateTime,
     type DateTimeFormatOptions,
     type DateTimeLocaleData,
     type TextualYearMonth,
@@ -174,7 +181,9 @@ import {
     getBrowserTimezoneOffset,
     getBrowserTimezoneOffsetMinutes,
     getCurrentUnixTime,
+    getYearMonthDayDateTime,
     parseDateTimeFromUnixTime,
+    getGregorianCalendarYearMonthDays,
     getDateTimeFormatType,
     getFiscalYearTimeRangeFromUnixTime,
     getFiscalYearTimeRangeFromYear,
@@ -481,6 +490,16 @@ export function useI18n() {
         return chineseCalendarLocaleData;
     }
 
+    function getPersianCalendarLocaleData(): PersianCalendarLocaleData {
+        const localeData = PERSIAN_CALENDAR_ALL_LANGUAGES[locale.value] ?? PERSIAN_CALENDAR_DEFAULT_CONTENT;
+        const persianCalendarLocaleData: PersianCalendarLocaleData = {
+            monthNames: localeData['monthNames'],
+            monthShortNames: localeData['monthShortNames']
+        };
+
+        return persianCalendarLocaleData;
+    }
+
     function getAllCurrencyDisplayTypes(numeralSystem: NumeralSystem, decimalSeparator: string): TypeAndDisplayName[] {
         const defaultCurrencyDisplayTypeName = t('default.currencyDisplayType');
         let defaultCurrencyDisplayType = CurrencyDisplayType.parse(defaultCurrencyDisplayTypeName);
@@ -713,7 +732,8 @@ export function useI18n() {
             numeralSystem: numeralSystem,
             calendarType: calendarType,
             localeData: getDateTimeLocaleData(),
-            chineseCalendarLocaleData: getChineseCalendarLocaleData()
+            chineseCalendarLocaleData: getChineseCalendarLocaleData(),
+            persianCalendarLocaleData: getPersianCalendarLocaleData()
         };
     }
 
@@ -771,6 +791,24 @@ export function useI18n() {
         }
 
         return currencyDisplayType;
+    }
+
+    function getCalendarAlternateDisplayDate(dateTime: DateTime, dateTimeFormatOptions: DateTimeFormatOptions): CalendarAlternateDate {
+        const numeralSystem = getCurrentNumeralSystemType();
+        let displayDate = numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(dateTime.getLocalizedCalendarDay(dateTimeFormatOptions));
+
+        if (dateTime.isLocalizedCalendarFirstDayOfMonth(dateTimeFormatOptions)) {
+            displayDate = dateTime.getLocalizedCalendarMonthDisplayShortName(dateTimeFormatOptions);
+        }
+
+        const alternateDate: CalendarAlternateDate = {
+            year: dateTime.getGregorianCalendarYear(),
+            month: dateTime.getGregorianCalendarMonth(),
+            day: dateTime.getGregorianCalendarDay(),
+            displayDate: displayDate
+        };
+
+        return alternateDate;
     }
 
     // public functions
@@ -1923,6 +1961,17 @@ export function useI18n() {
             }
 
             return ret;
+        } else if (calendarDisplayType === CalendarType.Persian) {
+            const dateTimeFormatOptions = getDateTimeFormatOptions();
+            const monthDays: number = getGregorianCalendarYearMonthDays(yearMonth);
+            const ret: CalendarAlternateDate[] = [];
+
+            for (let i = 1; i <= monthDays; i++) {
+                const dateTime = getYearMonthDayDateTime(yearMonth.year, yearMonth.month1base, i);
+                ret.push(getCalendarAlternateDisplayDate(dateTime, dateTimeFormatOptions));
+            }
+
+            return ret;
         }
 
         return undefined;
@@ -1944,6 +1993,10 @@ export function useI18n() {
             }
 
             return getChineseCalendarAlternateDisplayDate(chineseDate);
+        } else if (calendarDisplayType === CalendarType.Persian) {
+            const dateTimeFormatOptions = getDateTimeFormatOptions();
+            const dateTime = getYearMonthDayDateTime(yearMonthDay.year, yearMonthDay.month, yearMonthDay.day);
+            return getCalendarAlternateDisplayDate(dateTime, dateTimeFormatOptions);
         }
 
         return undefined;

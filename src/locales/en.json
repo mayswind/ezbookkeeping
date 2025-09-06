@@ -139,7 +139,9 @@
     "calendar": {
         "Gregorian": "Gregorian",
         "Buddhist": "Buddhist",
-        "Gregorian with Chinese": "Gregorian with Chinese"
+        "Persian": "Persian",
+        "Gregorian with Chinese": "Gregorian with Chinese",
+        "Gregorian with Persian": "Gregorian with Persian"
     },
     "datetime": {
         "AM": {

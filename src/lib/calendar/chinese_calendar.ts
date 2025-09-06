@@ -409,7 +409,7 @@ export function getChineseYearMonthDayInfo(yearMonthDay: YearMonthDay, localeDat
     return buildChineseYearMonthDayInfo(yearMonthDay, chineseDate, localeData);
 }
 
-export function getChineseCalendarAlternateDisplayDate(chineseDate: ChineseYearMonthDayInfo):  CalendarAlternateDate {
+export function getChineseCalendarAlternateDisplayDate(chineseDate: ChineseYearMonthDayInfo): CalendarAlternateDate {
     let displayDate = chineseDate.displayDay;
 
     if (chineseDate.day === 1) {

@@ -62,19 +62,19 @@ watch(currentNotificationContent, (newValue) => {
 });
 
 if (settingsStore.appSettings.theme === ThemeType.Light) {
-    theme.global.name.value = ThemeType.Light;
+    theme.change(ThemeType.Light);
 } else if (settingsStore.appSettings.theme === ThemeType.Dark) {
-    theme.global.name.value = ThemeType.Dark;
+    theme.change(ThemeType.Dark);
 } else {
-    theme.global.name.value = getSystemTheme();
+    theme.change(getSystemTheme());
 }
 
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
     if (settingsStore.appSettings.theme === 'auto') {
         if (e.matches) {
-            theme.global.name.value = ThemeType.Dark;
+            theme.change(ThemeType.Dark);
         } else {
-            theme.global.name.value = ThemeType.Light;
+            theme.change(ThemeType.Light);
         }
     }
 });

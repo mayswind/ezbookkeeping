@@ -363,9 +363,9 @@ const currentTheme = computed<string>({
             settingsStore.setTheme(value);
 
             if (value === ThemeType.Light || value === ThemeType.Dark) {
-                theme.global.name.value = value;
+                theme.change(value);
             } else {
-                theme.global.name.value = getSystemTheme();
+                theme.change(getSystemTheme());
             }
         }
     }

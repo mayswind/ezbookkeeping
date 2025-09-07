@@ -39,7 +39,7 @@
         "name": "cli",
         "copyright": "Copyright (c) 2023 urfave/cli maintainers",
         "url": "https://github.com/urfave/cli",
-        "licenseUrl": "https://github.com/urfave/cli/blob/v3.3.8/LICENSE"
+        "licenseUrl": "https://github.com/urfave/cli/blob/v3.4.1/LICENSE"
     },
     {
         "name": "INI",
@@ -79,25 +79,25 @@
         "name": "go-sqlite3",
         "copyright": "Copyright (c) 2014 Yasuhiro Matsumoto",
         "url": "https://github.com/mattn/go-sqlite3",
-        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.30/LICENSE"
+        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.32/LICENSE"
     },
     {
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.40.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.41.0:LICENSE"
     },
     {
         "name": "Go Networking",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/net",
-        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.42.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.43.0:LICENSE"
     },
     {
         "name": "Go Text",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/text",
-        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.27.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.28.0:LICENSE"
     },
     {
         "name": "Gomail",
@@ -115,7 +115,7 @@
         "name": "gocron",
         "copyright": "Copyright (c) 2014, 辣椒面",
         "url": "https://github.com/go-co-op/gocron",
-        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.16.3/LICENSE"
+        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.16.5/LICENSE"
     },
     {
         "name": "barcode",
@@ -155,13 +155,13 @@
         "name": "Testify",
         "copyright": "Copyright (c) 2012-2020 Mat Ryer, Tyler Bunnell and contributors.",
         "url": "https://github.com/stretchr/testify",
-        "licenseUrl": "https://github.com/stretchr/testify/blob/v1.10.0/LICENSE"
+        "licenseUrl": "https://github.com/stretchr/testify/blob/v1.11.1/LICENSE"
     },
     {
         "name": "vuejs/core",
         "copyright": "Copyright (c) 2018-present, Yuxi (Evan) You and Vue contributors",
         "url": "https://github.com/vuejs/core",
-        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.18/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.21/LICENSE"
     },
     {
         "name": "Pinia",
@@ -179,13 +179,13 @@
         "name": "vue-i18n",
         "copyright": "Copyright (c) 2016 kazuya kawaguchi",
         "url": "https://github.com/intlify/vue-i18n-next",
-        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v11.1.11/LICENSE"
+        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v11.1.12/LICENSE"
     },
     {
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-now Vuetify, LLC",
         "url": "https://vuetifyjs.com",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.9.3/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.9.7/LICENSE.md"
     },
     {
         "name": "register-service-worker",

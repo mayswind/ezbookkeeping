@@ -368,25 +368,25 @@ class MomentDateTime implements DateTime {
         return this.persianDateInfo;
     }
 
-    static isYearFirstTime(dateTime: MomentDateTime): boolean {
+    static isGregorianCalendarYearFirstTime(dateTime: MomentDateTime): boolean {
         const currentUnixTime = dateTime.instance.clone().set({ millisecond: 0 }).unix();
         const expectedUnxTime = dateTime.instance.clone().set({ millisecond: 0 }).startOf('year').unix();
         return currentUnixTime === expectedUnxTime;
     }
 
-    static isYearLastTime(dateTime: MomentDateTime): boolean {
+    static isGregorianCalendarYearLastTime(dateTime: MomentDateTime): boolean {
         const currentUnixTime = dateTime.instance.clone().set({ millisecond: 999 }).unix();
         const expectedUnxTime = dateTime.instance.clone().set({ millisecond: 999 }).endOf('year').unix();
         return currentUnixTime === expectedUnxTime;
     }
 
-    static isMonthFirstTime(dateTime: MomentDateTime): boolean {
+    static isGregorianCalendarMonthFirstTime(dateTime: MomentDateTime): boolean {
         const currentUnixTime = dateTime.instance.clone().set({ millisecond: 0 }).unix();
         const expectedUnxTime = dateTime.instance.clone().set({ millisecond: 0 }).startOf('month').unix();
         return currentUnixTime === expectedUnxTime;
     }
 
-    static isMonthLastTime(dateTime: MomentDateTime): boolean {
+    static isGregorianCalendarMonthLastTime(dateTime: MomentDateTime): boolean {
         const currentUnixTime = dateTime.instance.clone().set({ millisecond: 999 }).unix();
         const expectedUnxTime = dateTime.instance.clone().set({ millisecond: 999 }).endOf('month').unix();
         return currentUnixTime === expectedUnxTime;
@@ -1373,13 +1373,13 @@ export function getValidMonthDayOrCurrentDayShortDate(unixTime: number, currentS
 export function isDateRangeMatchFullYears(minTime: number, maxTime: number): boolean {
     const minDateTime = parseDateTimeFromUnixTime(minTime);
     const maxDateTime = parseDateTimeFromUnixTime(maxTime);
-    return MomentDateTime.isYearFirstTime(minDateTime as MomentDateTime) && MomentDateTime.isYearLastTime(maxDateTime as MomentDateTime);
+    return MomentDateTime.isGregorianCalendarYearFirstTime(minDateTime as MomentDateTime) && MomentDateTime.isGregorianCalendarYearLastTime(maxDateTime as MomentDateTime);
 }
 
 export function isDateRangeMatchFullMonths(minTime: number, maxTime: number): boolean {
     const minDateTime = parseDateTimeFromUnixTime(minTime);
     const maxDateTime = parseDateTimeFromUnixTime(maxTime);
-    return MomentDateTime.isMonthFirstTime(minDateTime as MomentDateTime) && MomentDateTime.isMonthLastTime(maxDateTime as MomentDateTime);
+    return MomentDateTime.isGregorianCalendarMonthFirstTime(minDateTime as MomentDateTime) && MomentDateTime.isGregorianCalendarMonthLastTime(maxDateTime as MomentDateTime);
 }
 
 export function isDateRangeMatchOneMonth(minTime: number, maxTime: number): boolean {

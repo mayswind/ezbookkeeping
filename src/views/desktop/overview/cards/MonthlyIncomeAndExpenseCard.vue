@@ -60,7 +60,12 @@ const emit = defineEmits<{
     (e: 'click', event: MonthlyIncomeAndExpenseCardClickEvent): void;
 }>();
 
-const { tt, getCurrentLanguageTextDirection, formatUnixTimeToShortMonth, formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
+const {
+    tt,
+    getCurrentLanguageTextDirection,
+    getCalendarShortMonthFromUnixTime,
+    formatAmountToLocalizedNumeralsWithCurrency
+} = useI18n();
 
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
@@ -96,7 +101,7 @@ const chartOptions = computed<object>(() => {
     if (props.data) {
         for (let i = 0; i < props.data.length; i++) {
             const item = props.data[i];
-            const monthShortName = formatUnixTimeToShortMonth(item.monthStartTime);
+            const monthShortName = getCalendarShortMonthFromUnixTime(item.monthStartTime);
 
             monthNames.push(monthShortName);
             incomeAmounts.push(item.incomeAmount);

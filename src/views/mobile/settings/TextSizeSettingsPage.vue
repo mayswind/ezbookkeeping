@@ -136,9 +136,9 @@ const {
     tt,
     getCurrentLanguageTextDirection,
     getWeekdayShortName,
-    formatUnixTimeToLongYearMonth,
+    getCalendarLongYearMonthFromUnixTime,
     formatUnixTimeToShortTime,
-    formatUnixTimeToDayOfMonth,
+    getCalendarDayOfMonthFromUnixTime,
     formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
 
@@ -149,8 +149,8 @@ const fontSize = ref<number>(settingsStore.appSettings.fontSize);
 
 const textDirection = computed<string>(() => getCurrentLanguageTextDirection());
 const fontSizePreviewClassName = computed<string>(() => getFontSizePreviewClassName(fontSize.value));
-const currentLongYearMonth = computed<string>(() => formatUnixTimeToLongYearMonth(currentUnixTime.value));
-const currentDayOfMonth = computed<string>(() => formatUnixTimeToDayOfMonth(currentUnixTime.value));
+const currentLongYearMonth = computed<string>(() => getCalendarLongYearMonthFromUnixTime(currentUnixTime.value));
+const currentDayOfMonth = computed<string>(() => getCalendarDayOfMonthFromUnixTime(currentUnixTime.value));
 const currentDayOfWeek = computed<string>(() => getWeekdayShortName(parseDateTimeFromUnixTime(currentUnixTime.value).getWeekDay()));
 const currentShortTime = computed<string>(() => formatUnixTimeToShortTime(currentUnixTime.value));
 

@@ -20,9 +20,9 @@ import type {
 export function useHomePageBase() {
     const {
         formatUnixTimeToLongDate,
-        formatUnixTimeToLongYear,
-        formatUnixTimeToLongMonth,
-        formatUnixTimeToLongMonthDay,
+        getCalendarLongYearFromUnixTime,
+        getCalendarLongMonthFromUnixTime,
+        getCalendarLongMonthDayFromUnixTime,
         formatAmountToLocalizedNumeralsWithCurrency
     } = useI18n();
 
@@ -60,16 +60,16 @@ export function useHomePageBase() {
                 displayTime: formatUnixTimeToLongDate(overviewStore.transactionDataRange.today.startTime),
             },
             thisWeek: {
-                startTime: formatUnixTimeToLongMonthDay(overviewStore.transactionDataRange.thisWeek.startTime),
-                endTime: formatUnixTimeToLongMonthDay(overviewStore.transactionDataRange.thisWeek.endTime)
+                startTime: getCalendarLongMonthDayFromUnixTime(overviewStore.transactionDataRange.thisWeek.startTime),
+                endTime: getCalendarLongMonthDayFromUnixTime(overviewStore.transactionDataRange.thisWeek.endTime)
             },
             thisMonth: {
-                displayTime: formatUnixTimeToLongMonth(overviewStore.transactionDataRange.thisMonth.startTime),
-                startTime: formatUnixTimeToLongMonthDay(overviewStore.transactionDataRange.thisMonth.startTime),
-                endTime: formatUnixTimeToLongMonthDay(overviewStore.transactionDataRange.thisMonth.endTime)
+                displayTime: getCalendarLongMonthFromUnixTime(overviewStore.transactionDataRange.thisMonth.startTime),
+                startTime: getCalendarLongMonthDayFromUnixTime(overviewStore.transactionDataRange.thisMonth.startTime),
+                endTime: getCalendarLongMonthDayFromUnixTime(overviewStore.transactionDataRange.thisMonth.endTime)
             },
             thisYear: {
-                displayTime: formatUnixTimeToLongYear(overviewStore.transactionDataRange.thisYear.startTime)
+                displayTime: getCalendarLongYearFromUnixTime(overviewStore.transactionDataRange.thisYear.startTime)
             }
         };
     });

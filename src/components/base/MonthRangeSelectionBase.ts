@@ -49,7 +49,7 @@ function getMonthRangeFromProps(props: CommonMonthRangeSelectionProps): { minDat
 }
 
 export function useMonthRangeSelectionBase(props: CommonMonthRangeSelectionProps) {
-    const { formatUnixTimeToLongYearMonth } = useI18n();
+    const { getCalendarLongYearMonthFromUnixTime } = useI18n();
     const { minDate, maxDate } = getMonthRangeFromProps(props);
 
     const dateRange = ref<Year0BasedMonth[]>([
@@ -57,8 +57,8 @@ export function useMonthRangeSelectionBase(props: CommonMonthRangeSelectionProps
         maxDate
     ]);
 
-    const beginDateTime = computed<string>(() => formatUnixTimeToLongYearMonth(getYearMonthFirstUnixTime(dateRange.value[0])));
-    const endDateTime = computed<string>(() => formatUnixTimeToLongYearMonth(getYearMonthLastUnixTime(dateRange.value[1])));
+    const beginDateTime = computed<string>(() => getCalendarLongYearMonthFromUnixTime(getYearMonthFirstUnixTime(dateRange.value[0])));
+    const endDateTime = computed<string>(() => getCalendarLongYearMonthFromUnixTime(getYearMonthLastUnixTime(dateRange.value[1])));
 
     function getFinalMonthRange(): { minYearMonth: TextualYearMonth | '', maxYearMonth: TextualYearMonth | '' } | null {
         if (!dateRange.value[0] || !dateRange.value[1]) {

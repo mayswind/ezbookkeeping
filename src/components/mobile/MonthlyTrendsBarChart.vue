@@ -156,10 +156,10 @@ const emit = defineEmits<{
 
 const {
     tt,
-    formatUnixTimeToShortYear,
-    formatYearQuarter,
-    formatUnixTimeToShortYearMonth,
-    formatUnixTimeToFiscalYear,
+    getCalendarShortYearFromUnixTime,
+    getCalendarShortYearMonthFromUnixTime,
+    getCalendarYearQuarterFromYearQuarter,
+    getCalendarFiscalYearFromUnixTime,
     formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
 
@@ -250,13 +250,13 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
         let displayDateRange = '';
 
         if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
-            displayDateRange = formatUnixTimeToShortYear(dateRange.minUnixTime);
+            displayDateRange = getCalendarShortYearFromUnixTime(dateRange.minUnixTime);
         } else if (props.dateAggregationType === ChartDateAggregationType.FiscalYear.type) {
-            displayDateRange = formatUnixTimeToFiscalYear(dateRange.minUnixTime);
+            displayDateRange = getCalendarFiscalYearFromUnixTime(dateRange.minUnixTime);
         } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type && 'quarter' in dateRange) {
-            displayDateRange = formatYearQuarter(dateRange.year, dateRange.quarter);
+            displayDateRange = getCalendarYearQuarterFromYearQuarter(dateRange.year, dateRange.quarter);
         } else { // if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
-            displayDateRange = formatUnixTimeToShortYearMonth(dateRange.minUnixTime);
+            displayDateRange = getCalendarShortYearMonthFromUnixTime(dateRange.minUnixTime);
         }
 
         const dataItems = allDateRangeItemsMap[dateRangeKey] || [];

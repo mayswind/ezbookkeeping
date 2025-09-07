@@ -51,7 +51,13 @@ export interface CommonAccountBalanceTrendsChartProps {
 }
 
 export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTrendsChartProps) {
-    const { formatUnixTimeToShortDate, formatUnixTimeToShortYear, formatUnixTimeToShortYearMonth, formatUnixTimeToYearQuarter, formatUnixTimeToFiscalYear } = useI18n();
+    const {
+        getCalendarShortYearFromUnixTime,
+        getCalendarShortYearMonthFromUnixTime,
+        getCalendarYearQuarterFromUnixTime,
+        getCalendarFiscalYearFromUnixTime,
+        formatUnixTimeToShortDate
+    } = useI18n();
 
     const dataDateRange = computed<AccountBalanceUnixTimeAndBalanceRange | null>(() => {
         if (!props.items || props.items.length < 1) {
@@ -150,13 +156,13 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
             let displayDate = '';
 
             if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
-                displayDate = formatUnixTimeToShortYear(dateRange.minUnixTime);
+                displayDate = getCalendarShortYearFromUnixTime(dateRange.minUnixTime);
             } else if (props.dateAggregationType === ChartDateAggregationType.FiscalYear.type) {
-                displayDate = formatUnixTimeToFiscalYear(dateRange.minUnixTime);
+                displayDate = getCalendarFiscalYearFromUnixTime(dateRange.minUnixTime);
             } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type) {
-                displayDate = formatUnixTimeToYearQuarter(dateRange.minUnixTime);
+                displayDate = getCalendarYearQuarterFromUnixTime(dateRange.minUnixTime);
             } else if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
-                displayDate = formatUnixTimeToShortYearMonth(dateRange.minUnixTime);
+                displayDate = getCalendarShortYearMonthFromUnixTime(dateRange.minUnixTime);
             } else {
                 displayDate = formatUnixTimeToShortDate(dateRange.minUnixTime);
             }

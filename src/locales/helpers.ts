@@ -778,6 +778,30 @@ export function useI18n() {
         return '';
     }
 
+    function formatTimeRangeToFiscalYearFormat(format: FiscalYearFormat, timeRange: FiscalYearUnixTime | UnixTimeRange, numeralSystem?: NumeralSystem, calendarType?: CalendarType): string {
+        if (!format) {
+            format = FiscalYearFormat.Default;
+        }
+
+        const currentCalendarDisplayType = getCurrentCalendarDisplayType();
+
+        if (!isDefined(calendarType)) {
+            calendarType = currentCalendarDisplayType.primaryCalendarType;
+        }
+
+        const dateTimeFormatOptions = getDateTimeFormatOptions({
+            calendarType: calendarType,
+            numeralSystem: numeralSystem
+        });
+
+        return t('format.fiscalYear.' + format.typeName, {
+            StartYYYY: formatUnixTime(timeRange.minUnixTime, 'YYYY', dateTimeFormatOptions),
+            StartYY: formatUnixTime(timeRange.minUnixTime, 'YY', dateTimeFormatOptions),
+            EndYYYY: formatUnixTime(timeRange.maxUnixTime, 'YYYY', dateTimeFormatOptions),
+            EndYY: formatUnixTime(timeRange.maxUnixTime, 'YY', dateTimeFormatOptions),
+        });
+    }
+
     function getCurrentCurrencyDisplayType(): CurrencyDisplayType {
         let currencyDisplayType = CurrencyDisplayType.valueOf(userStore.currentUserCurrencyDisplayType);
 
@@ -1099,7 +1123,8 @@ export function useI18n() {
     function getAllRecentMonthDateRanges(includeAll: boolean, includeCustom: boolean): LocalizedRecentMonthDateRange[] {
         const allRecentMonthDateRanges: LocalizedRecentMonthDateRange[] = [];
         const recentDateRanges = getRecentMonthDateRanges(12);
-        const dateTimeFormatOptions = getDateTimeFormatOptions();
+        const currentCalendarDisplayType = getCurrentCalendarDisplayType();
+        const dateTimeFormatOptions = getDateTimeFormatOptions({ calendarType: currentCalendarDisplayType.primaryCalendarType });
 
         if (includeAll) {
             allRecentMonthDateRanges.push({
@@ -1782,23 +1807,21 @@ export function useI18n() {
         return getLocalizedLongTimeFormat().indexOf('ss') >= 0;
     }
 
-    function formatGregorianCalendarYearDashMonthDashDayToLongDate(date: TextualYearMonthDay): string {
-        return formatGregorianCalendarYearDashMonthDashDay(date, getLocalizedLongDateFormat(), getDateTimeFormatOptions());
+    function getCalendarLongMonthDayFromGregorianCalendarTextualMonthDay(monthDay: TextualYearMonth): string {
+        const currentCalendarDisplayType = getCurrentCalendarDisplayType();
+        return formatGregorianCalendarMonthDashDay(monthDay, getLocalizedLongMonthDayFormat(), getDateTimeFormatOptions({ calendarType: currentCalendarDisplayType.primaryCalendarType }));
     }
 
-    function formatGregorianCalendarMonthDashDayToLongMonthDay(monthDay: TextualYearMonth): string {
-        return formatGregorianCalendarMonthDashDay(monthDay, getLocalizedLongMonthDayFormat(), getDateTimeFormatOptions());
-    }
-
-    function formatUnixTimeToYearQuarter(unixTime: number): string {
-        const dateTimeFormatOptions = getDateTimeFormatOptions();
+    function getCalendarYearQuarterFromUnixTime(unixTime: number): string {
+        const currentCalendarDisplayType = getCurrentCalendarDisplayType();
+        const dateTimeFormatOptions = getDateTimeFormatOptions({ calendarType: currentCalendarDisplayType.primaryCalendarType });
         const date = parseDateTimeFromUnixTime(unixTime);
         const year = date.getLocalizedCalendarYear(dateTimeFormatOptions);
         const quarter = date.getLocalizedCalendarQuarter(dateTimeFormatOptions);
-        return formatYearQuarter(year, quarter);
+        return getCalendarYearQuarterFromYearQuarter(year, quarter);
     }
 
-    function formatYearQuarter(year: number | string, quarter: number): string {
+    function getCalendarYearQuarterFromYearQuarter(year: number | string, quarter: number): string {
         if (1 <= quarter && quarter <= 4) {
             return t('format.yearQuarter.q' + quarter, {
                 year: year,
@@ -1815,7 +1838,8 @@ export function useI18n() {
         }
 
         const allDateRanges = DateRange.values();
-        const dateTimeFormatOptions = getDateTimeFormatOptions();
+        const currentCalendarDisplayType = getCurrentCalendarDisplayType();
+        const dateTimeFormatOptions = getDateTimeFormatOptions({ calendarType: currentCalendarDisplayType.primaryCalendarType });
 
         for (let i = 0; i < allDateRanges.length; i++) {
             const dateRange = allDateRanges[i];
@@ -1858,22 +1882,7 @@ export function useI18n() {
         return `${displayStartTime} ~ ${displayEndTime}`;
     }
 
-    function formatTimeRangeToFiscalYearFormat(format: FiscalYearFormat, timeRange: FiscalYearUnixTime | UnixTimeRange, numeralSystem?: NumeralSystem, calendarType?: CalendarType): string {
-        if (!format) {
-            format = FiscalYearFormat.Default;
-        }
-
-        const dateTimeFormatOptions = getDateTimeFormatOptions({ numeralSystem, calendarType });
-
-        return t('format.fiscalYear.' + format.typeName, {
-            StartYYYY: formatUnixTime(timeRange.minUnixTime, 'YYYY', dateTimeFormatOptions),
-            StartYY: formatUnixTime(timeRange.minUnixTime, 'YY', dateTimeFormatOptions),
-            EndYYYY: formatUnixTime(timeRange.maxUnixTime, 'YYYY', dateTimeFormatOptions),
-            EndYY: formatUnixTime(timeRange.maxUnixTime, 'YY', dateTimeFormatOptions),
-        });
-    }
-
-    function formatUnixTimeToFiscalYear(unixTime: number): string {
+    function getCalendarFiscalYearFromUnixTime(unixTime: number): string {
         let fiscalYearFormat = FiscalYearFormat.valueOf(getCurrentFiscalYearFormatType());
 
         if (!fiscalYearFormat) {
@@ -1884,7 +1893,7 @@ export function useI18n() {
         return formatTimeRangeToFiscalYearFormat(fiscalYearFormat, timeRange);
     }
 
-    function formatYearToFiscalYear(year: number) {
+    function getCalendarFiscalYearGregorianCalendarYear(year: number) {
         let fiscalYearFormat = FiscalYearFormat.valueOf(getCurrentFiscalYearFormatType());
 
         if (!fiscalYearFormat) {
@@ -1895,14 +1904,14 @@ export function useI18n() {
         return formatTimeRangeToFiscalYearFormat(fiscalYearFormat, timeRange);
     }
 
-    function formatFiscalYearStartToLongDay(fiscalYearStartValue: number) {
+    function getCalendarLongMonthDayFromFiscalYearStart(fiscalYearStartValue: number) {
         let fiscalYearStart = FiscalYearStart.valueOf(fiscalYearStartValue);
 
         if (!fiscalYearStart) {
             fiscalYearStart = FiscalYearStart.Default;
         }
 
-        return formatGregorianCalendarMonthDashDayToLongMonthDay(fiscalYearStart.toMonthDashDayString());
+        return getCalendarLongMonthDayFromGregorianCalendarTextualMonthDay(fiscalYearStart.toMonthDashDayString());
     }
 
     function getTimezoneDifferenceDisplayText(utcOffset: number): string {
@@ -2392,34 +2401,30 @@ export function useI18n() {
         isLongTimeMinuteTwoDigits,
         isLongTimeSecondTwoDigits,
         // format functions
+        getCalendarLongYearFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongYearFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
         getCalendarShortYearFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortYearFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
+        getCalendarLongMonthFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, 'MMMM', getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
         getCalendarShortMonthFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, 'MMM', getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
         getCalendarDayOfMonthFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDayFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
+        getCalendarLongYearMonthFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongYearMonthFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
+        getCalendarShortYearMonthFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortYearMonthFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
+        getCalendarLongMonthDayFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongMonthDayFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
+        getCalendarShortMonthDayFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortMonthDayFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
+        getCalendarYearQuarterFromUnixTime,
+        getCalendarYearQuarterFromYearQuarter,
+        getCalendarFiscalYearFromUnixTime,
+        getCalendarFiscalYearGregorianCalendarYear,
+        getCalendarLongMonthDayFromGregorianCalendarTextualMonthDay,
+        getCalendarLongMonthDayFromFiscalYearStart,
         formatUnixTimeToDefaultDateTimeWithoutLocaleOptions: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, KnownDateTimeFormat.DefaultDateTime.format, getDateTimeFormatOptions({ numeralSystem: NumeralSystem.WesternArabicNumerals, calendarType: CalendarType.Gregorian }), utcOffset, currentUtcOffset),
         formatUnixTimeToLongDateTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongDateFormat() + ' ' + getLocalizedLongTimeFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortDateTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDateFormat() + ' ' + getLocalizedShortTimeFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
         formatUnixTimeToLongDate: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongDateFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortDate: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDateFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
-        formatUnixTimeToLongYear: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongYearFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
-        formatUnixTimeToShortYear: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortYearFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
-        formatUnixTimeToLongMonth: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, 'MMMM', getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
-        formatUnixTimeToShortMonth: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, 'MMM', getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
-        formatUnixTimeToLongYearMonth: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongYearMonthFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
-        formatUnixTimeToShortYearMonth: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortYearMonthFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
-        formatUnixTimeToLongMonthDay: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongMonthDayFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
-        formatUnixTimeToShortMonthDay: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortMonthDayFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
         formatUnixTimeToLongTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongTimeFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortTimeFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
-        formatUnixTimeToDayOfMonth: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDayFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
-        formatGregorianCalendarYearDashMonthDashDayToLongDate,
-        formatGregorianCalendarMonthDashDayToLongMonthDay,
-        formatUnixTimeToYearQuarter,
-        formatYearQuarter,
+        formatGregorianCalendarYearDashMonthDashDayToLongDate: (date: TextualYearMonthDay) => formatGregorianCalendarYearDashMonthDashDay(date, getLocalizedLongDateFormat(), getDateTimeFormatOptions()),
         formatDateRange,
-        formatFiscalYearStartToLongDay,
-        formatTimeRangeToFiscalYearFormat,
-        formatUnixTimeToFiscalYear,
-        formatYearToFiscalYear,
         getTimezoneDifferenceDisplayText,
         getCalendarAlternateDates,
         getCalendarAlternateDate,

@@ -37,7 +37,7 @@ function getFiscalYearStartFromProps(props: CommonFiscalYearStartSelectionProps)
 }
 
 export function useFiscalYearStartSelectionBase(props: CommonFiscalYearStartSelectionProps) {
-    const { formatGregorianCalendarMonthDashDayToLongMonthDay } = useI18n();
+    const { getCalendarLongMonthDayFromGregorianCalendarTextualMonthDay } = useI18n();
 
     const disabledDates = (date: Date) => {
         // Disable February 29 (leap day)
@@ -71,7 +71,7 @@ export function useFiscalYearStartSelectionBase(props: CommonFiscalYearStartSele
             fiscalYearStart = FiscalYearStart.Default;
         }
 
-        return formatGregorianCalendarMonthDashDayToLongMonthDay(fiscalYearStart.toMonthDashDayString());
+        return getCalendarLongMonthDayFromGregorianCalendarTextualMonthDay(fiscalYearStart.toMonthDashDayString());
     });
 
     const allowedMinDate = computed<Date>(() => getLocalDatetimeFromUnixTime(getThisYearFirstUnixTime()));

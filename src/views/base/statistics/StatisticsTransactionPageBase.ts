@@ -30,7 +30,7 @@ export function useStatisticsTransactionPageBase() {
         getAllStatisticsSortingTypes,
         getAllStatisticsDateAggregationTypes,
         formatUnixTimeToLongDateTime,
-        formatUnixTimeToLongYearMonth,
+        getCalendarLongYearMonthFromUnixTime,
         formatDateRange,
         formatAmountToLocalizedNumeralsWithCurrency
     } = useI18n();
@@ -76,7 +76,7 @@ export function useStatisticsTransactionPageBase() {
         if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
             return formatUnixTimeToLongDateTime(query.value.categoricalChartStartTime);
         } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
-            return formatUnixTimeToLongYearMonth(getYearMonthFirstUnixTime(query.value.trendChartStartYearMonth));
+            return getCalendarLongYearMonthFromUnixTime(getYearMonthFirstUnixTime(query.value.trendChartStartYearMonth));
         } else {
             return '';
         }
@@ -86,7 +86,7 @@ export function useStatisticsTransactionPageBase() {
         if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
             return formatUnixTimeToLongDateTime(query.value.categoricalChartEndTime);
         } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
-            return formatUnixTimeToLongYearMonth(getYearMonthLastUnixTime(query.value.trendChartEndYearMonth));
+            return getCalendarLongYearMonthFromUnixTime(getYearMonthLastUnixTime(query.value.trendChartEndYearMonth));
         } else {
             return '';
         }

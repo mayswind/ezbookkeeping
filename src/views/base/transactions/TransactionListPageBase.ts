@@ -78,7 +78,7 @@ export function useTransactionListPageBase() {
         getCurrentNumeralSystemType,
         formatUnixTimeToLongDateTime,
         formatUnixTimeToLongDate,
-        formatUnixTimeToLongYearMonth,
+        getCalendarLongYearMonthFromUnixTime,
         formatUnixTimeToShortTime,
         formatDateRange,
         formatAmountToLocalizedNumeralsWithCurrency
@@ -287,7 +287,7 @@ export function useTransactionListPageBase() {
     }
 
     function getDisplayLongYearMonth(transactionMonthList: TransactionMonthList): string {
-        return formatUnixTimeToLongYearMonth(getYearMonthFirstUnixTime(transactionMonthList.yearDashMonth));
+        return getCalendarLongYearMonthFromUnixTime(getYearMonthFirstUnixTime(transactionMonthList.yearDashMonth));
     }
 
     function getDisplayTimezone(transaction: Transaction): string {

@@ -1422,7 +1422,7 @@ func (s *TransactionService) GetRelatedTransferTransaction(originalTransaction *
 }
 
 // GetAccountsTotalIncomeAndExpense returns the every accounts total income and expense amount by specific date range
-func (s *TransactionService) GetAccountsTotalIncomeAndExpense(c core.Context, uid int64, startUnixTime int64, endUnixTime int64, utcOffset int16, useTransactionTimezone bool) (map[int64]int64, map[int64]int64, error) {
+func (s *TransactionService) GetAccountsTotalIncomeAndExpense(c core.Context, uid int64, startUnixTime int64, endUnixTime int64, excludeAccountIds []int64, excludeCategoryIds []int64, utcOffset int16, useTransactionTimezone bool) (map[int64]int64, map[int64]int64, error) {
 	if uid <= 0 {
 		return nil, nil, errs.ErrUserIdInvalid
 	}
@@ -1437,12 +1437,48 @@ func (s *TransactionService) GetAccountsTotalIncomeAndExpense(c core.Context, ui
 	startTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startUnixTime)
 	endTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(endUnixTime)
 
-	condition := "uid=? AND deleted=? AND (type=? OR type=?) AND transaction_time>=? AND transaction_time<=?"
-	conditionParams := make([]any, 0, 4)
+	condition := "uid=? AND deleted=? AND (type=? OR type=?)"
+	conditionParams := make([]any, 0, 4+len(excludeAccountIds)+len(excludeCategoryIds))
 	conditionParams = append(conditionParams, uid)
 	conditionParams = append(conditionParams, false)
 	conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
 	conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_EXPENSE)
+
+	if len(excludeAccountIds) > 0 {
+		var accountIdsCondition strings.Builder
+		accountIdConditionParams := make([]any, 0, len(excludeAccountIds))
+
+		for i := 0; i < len(excludeAccountIds); i++ {
+			if i > 0 {
+				accountIdsCondition.WriteString(",")
+			}
+
+			accountIdsCondition.WriteString("?")
+			accountIdConditionParams = append(accountIdConditionParams, excludeAccountIds[i])
+		}
+
+		condition = condition + " AND account_id NOT IN (" + accountIdsCondition.String() + ")"
+		conditionParams = append(conditionParams, accountIdConditionParams...)
+	}
+
+	if len(excludeCategoryIds) > 0 {
+		var categoryIdsCondition strings.Builder
+		categoryIdConditionParams := make([]any, 0, len(excludeCategoryIds))
+
+		for i := 0; i < len(excludeCategoryIds); i++ {
+			if i > 0 {
+				categoryIdsCondition.WriteString(",")
+			}
+
+			categoryIdsCondition.WriteString("?")
+			categoryIdConditionParams = append(categoryIdConditionParams, excludeCategoryIds[i])
+		}
+
+		condition = condition + " AND category_id NOT IN (" + categoryIdsCondition.String() + ")"
+		conditionParams = append(conditionParams, categoryIdConditionParams...)
+	}
+
+	condition = condition + " AND transaction_time>=? AND transaction_time<=?"
 
 	minTransactionTime := startTransactionTime
 	maxTransactionTime := endTransactionTime

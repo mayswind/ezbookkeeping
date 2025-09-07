@@ -3,10 +3,14 @@ import { defineStore } from 'pinia';
 
 import { useSettingsStore } from './setting.ts';
 import { useUserStore } from './user.ts';
+import { useAccountsStore } from './account.ts';
+import { useTransactionCategoriesStore } from './transactionCategory.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
-import type { WritableStartEndTime } from '@/core/datetime.ts';
+import { type WritableStartEndTime, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
+import type { TransactionType } from '@/core/transaction.ts';
+
 import type {
     TransactionAmountsRequestType,
     TransactionAmountsRequestParams,
@@ -15,7 +19,13 @@ import type {
 } from '@/models/transaction.ts';
 import { ALL_TRANSACTION_AMOUNTS_REQUEST_TYPE } from '@/models/transaction.ts';
 
-import { isNumber, isEquals } from '@/lib/common.ts';
+import {
+    isDefined,
+    isNumber,
+    isEquals,
+    isObjectEmpty,
+    objectFieldWithValueToArrayItem
+} from '@/lib/common.ts';
 import {
     getUnixTimeBeforeUnixTime,
     getTodayFirstUnixTime,
@@ -27,6 +37,8 @@ import {
     getThisYearFirstUnixTime,
     getThisYearLastUnixTime
 } from '@/lib/datetime.ts';
+import { getFinalAccountIdsByFilteredAccountIds } from '@/lib/account.ts';
+import { getFinalCategoryIdsByFilteredCategoryIds } from '@/lib/category.ts';
 import logger from '@/lib/logger.ts';
 import services from '@/lib/services.ts';
 
@@ -100,6 +112,8 @@ interface TransactionOverviewOptions {
 export const useOverviewStore = defineStore('overview', () => {
     const settingsStore = useSettingsStore();
     const userStore = useUserStore();
+    const accountsStore = useAccountsStore();
+    const transactionCategoriesStore = useTransactionCategoriesStore();
     const exchangeRatesStore = useExchangeRatesStore();
 
     const transactionDataRange = ref<TransactionDataRange>(getTransactionDateRange());
@@ -287,8 +301,11 @@ export const useOverviewStore = defineStore('overview', () => {
             requestParams.monthBeforeLast10Months = transactionDataRange.value.monthBeforeLast10Months;
         }
 
+        const excludeAccountIds: string[] = objectFieldWithValueToArrayItem(settingsStore.appSettings.overviewAccountFilterInHomePage, true);
+        const excludeCategoryIds: string[] = objectFieldWithValueToArrayItem(settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage, true);
+
         return new Promise((resolve, reject) => {
-            services.getTransactionAmounts(requestParams).then(response => {
+            services.getTransactionAmounts(requestParams, excludeAccountIds, excludeCategoryIds).then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
@@ -327,6 +344,38 @@ export const useOverviewStore = defineStore('overview', () => {
         });
     }
 
+    function getTransactionListPageParams({ type, dateType, minTime, maxTime }: { type?: TransactionType, dateType?: number, minTime?: number, maxTime?: number }): string {
+        const querys: string[] = [];
+
+        if (isDefined(type)) {
+            querys.push('type=' + type);
+        }
+
+        if (isDefined(dateType)) {
+            querys.push('dateType=' + dateType);
+
+            if (dateType === DateRange.Custom.type) {
+                if (isNumber(minTime) && minTime > 0) {
+                    querys.push('minTime=' + minTime);
+                }
+
+                if (isNumber(maxTime) && maxTime > 0) {
+                    querys.push('maxTime=' + maxTime);
+                }
+            }
+        }
+
+        if (!isObjectEmpty(settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage)) {
+            querys.push('categoryIds=' + getFinalCategoryIdsByFilteredCategoryIds(transactionCategoriesStore.allTransactionCategoriesMap, settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage));
+        }
+
+        if (!isObjectEmpty(settingsStore.appSettings.overviewAccountFilterInHomePage)) {
+            querys.push('accountIds=' + getFinalAccountIdsByFilteredAccountIds(accountsStore.allAccountsMap, settingsStore.appSettings.overviewAccountFilterInHomePage));
+        }
+
+        return querys.join('&');
+    }
+
     return {
         // states
         transactionDataRange,
@@ -338,6 +387,7 @@ export const useOverviewStore = defineStore('overview', () => {
         // functions
         updateTransactionOverviewInvalidState,
         resetTransactionOverview,
-        loadTransactionOverview
+        loadTransactionOverview,
+        getTransactionListPageParams
     };
 });

@@ -110,6 +110,38 @@
                                     v-model="timezoneUsedForStatisticsInHomePage"
                                 />
                             </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    class="always-cursor-pointer"
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :loading="loadingAccounts"
+                                    :readonly="true"
+                                    :disabled="!hasAnyAccount"
+                                    :label="tt('Accounts Included in Overview Statistics')"
+                                    :placeholder="tt('Accounts Included in Overview Statistics')"
+                                    :model-value="accountsIncludedInHomePageOverviewDisplayContent"
+                                    @click="showAccountsIncludedInHomePageOverviewDialog = true"
+                                />
+                            </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    class="always-cursor-pointer"
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :loading="loadingTransactionCategories"
+                                    :readonly="true"
+                                    :disabled="!hasAnyTransactionCategory"
+                                    :label="tt('Transaction Categories Included in Overview Statistics')"
+                                    :placeholder="tt('Transaction Categories Included in Overview Statistics')"
+                                    :model-value="transactionCategoriesIncludedInHomePageOverviewDisplayContent"
+                                    @click="showTransactionCategoriesIncludedInHomePageOverviewDialog = true"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-form>
@@ -241,6 +273,16 @@
         </v-col>
     </v-row>
 
+    <v-dialog width="800" v-model="showAccountsIncludedInHomePageOverviewDialog">
+        <account-filter-settings-card type="homePageOverview" :dialog-mode="true"
+                                      @settings:change="showAccountsIncludedInHomePageOverviewDialog = false" />
+    </v-dialog>
+
+    <v-dialog width="800" v-model="showTransactionCategoriesIncludedInHomePageOverviewDialog">
+        <category-filter-settings-card type="homePageOverview" :dialog-mode="true" :category-types="`${CategoryType.Income},${CategoryType.Expense}`"
+                                       @settings:change="showTransactionCategoriesIncludedInHomePageOverviewDialog = false" />
+    </v-dialog>
+
     <v-dialog width="800" v-model="showAccountsIncludedInTotalDialog">
         <account-filter-settings-card type="accountListTotalAmount" :dialog-mode="true"
                                       @settings:change="showAccountsIncludedInTotalDialog = false" />
@@ -252,6 +294,7 @@
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
+import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
 
 import { ref, computed, useTemplateRef } from 'vue';
 import { useTheme } from 'vuetify';
@@ -261,9 +304,12 @@ import { useAppSettingPageBase } from '@/views/base/settings/AppSettingsPageBase
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 import type { LocalizedSwitchOption } from '@/core/base.ts';
 import { ThemeType } from '@/core/theme.ts';
+import { CategoryType } from '@/core/category.ts';
+
 import { getSystemTheme } from '@/lib/ui/common.ts';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
@@ -273,12 +319,15 @@ const theme = useTheme();
 const { tt, getAllEnableDisableOptions } = useI18n();
 const {
     loadingAccounts,
+    loadingTransactionCategories,
     allThemes,
     allTimezones,
     allTimezoneTypesUsedForStatistics,
     allCurrencySortingTypes,
     allAutoSaveTransactionDraftTypes,
+    hasAnyAccount,
     hasAnyVisibleAccount,
+    hasAnyTransactionCategory,
     timeZone,
     isAutoUpdateExchangeRatesData,
     showAccountBalance,
@@ -290,14 +339,19 @@ const {
     autoSaveTransactionDraft,
     isAutoGetCurrentGeoLocation,
     currencySortByInExchangeRatesPage,
-    accountsIncludedInTotalDisplayContent
+    accountsIncludedInHomePageOverviewDisplayContent,
+    accountsIncludedInTotalDisplayContent,
+    transactionCategoriesIncludedInHomePageOverviewDisplayContent
 } = useAppSettingPageBase();
 
 const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
+const transactionCategoriesStore = useTransactionCategoriesStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
+const showAccountsIncludedInHomePageOverviewDialog = ref<boolean>(false);
+const showTransactionCategoriesIncludedInHomePageOverviewDialog = ref<boolean>(false);
 const showAccountsIncludedInTotalDialog = ref<boolean>(false);
 
 const enableDisableOptions = computed<LocalizedSwitchOption[]>(() => getAllEnableDisableOptions());
@@ -331,6 +385,18 @@ function init(): void {
         loadingAccounts.value = false;
     }).catch(error => {
         loadingAccounts.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+
+    transactionCategoriesStore.loadAllCategories({
+        force: false
+    }).then(() => {
+        loadingTransactionCategories.value = false;
+    }).catch(error => {
+        loadingTransactionCategories.value = false;
 
         if (!error.processed) {
             snackbar.value?.showError(error);

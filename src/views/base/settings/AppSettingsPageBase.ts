@@ -5,11 +5,16 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 
 import type { NameValue, TypeAndDisplayName } from '@/core/base.ts';
 import type { LocalizedTimezoneInfo } from '@/core/timezone.ts';
+import { CategoryType } from '@/core/category.ts';
+import type { Account } from '@/models/account.ts';
+
+import { isObjectEmpty } from '@/lib/common.ts';
 
 export function useAppSettingPageBase() {
     const { tt, getAllTimezones, getAllTimezoneTypesUsedForStatistics, getAllCurrencySortingTypes, setTimeZone } = useI18n();
@@ -17,10 +22,12 @@ export function useAppSettingPageBase() {
     const settingsStore = useSettingsStore();
     const accountsStore = useAccountsStore();
     const transactionsStore = useTransactionsStore();
+    const transactionCategoriesStore = useTransactionCategoriesStore();
     const overviewStore = useOverviewStore();
     const statisticsStore = useStatisticsStore();
 
     const loadingAccounts = ref<boolean>(false);
+    const loadingTransactionCategories = ref<boolean>(false);
 
     const allThemes = computed<NameValue[]>(() => {
         return [
@@ -42,7 +49,9 @@ export function useAppSettingPageBase() {
         ];
     });
 
+    const hasAnyAccount = computed<boolean>(() => accountsStore.allPlainAccounts.length > 0);
     const hasAnyVisibleAccount = computed<boolean>(() => accountsStore.allVisibleAccountsCount > 0);
+    const hasAnyTransactionCategory = computed<boolean>(() => !isObjectEmpty(transactionCategoriesStore.allTransactionCategoriesMap));
 
     const timeZone = computed<string>({
         get: () => settingsStore.appSettings.timeZone,
@@ -114,12 +123,26 @@ export function useAppSettingPageBase() {
         set: (value: number) => settingsStore.setCurrencySortByInExchangeRatesPage(value)
     });
 
+    const accountsIncludedInHomePageOverviewDisplayContent = computed<string>(() => {
+        const excludeAccountIds = settingsStore.appSettings.overviewAccountFilterInHomePage;
+        return getIncludedAccountsDisplayContent(excludeAccountIds, accountsStore.allPlainAccounts);
+    });
+
     const accountsIncludedInTotalDisplayContent = computed<string>(() => {
-        if (loadingAccounts.value || !accountsStore.allVisiblePlainAccounts || !accountsStore.allVisiblePlainAccounts.length) {
+        const excludeAccountIds = settingsStore.appSettings.totalAmountExcludeAccountIds;
+        return getIncludedAccountsDisplayContent(excludeAccountIds, accountsStore.allVisiblePlainAccounts);
+    });
+
+    const transactionCategoriesIncludedInHomePageOverviewDisplayContent = computed<string>(() => {
+        const excludeAccountIds = settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage;
+        return getIncludedTransactionCategoriesDisplayContent(excludeAccountIds);
+    });
+
+    function getIncludedAccountsDisplayContent(excludeAccountIds: Record<string, boolean>, allAccounts: Account[]): string {
+        if (loadingAccounts.value || !allAccounts || !allAccounts.length) {
             return '';
         }
 
-        const excludeAccountIds = settingsStore.appSettings.totalAmountExcludeAccountIds;
         let hasExcludeAccount = false;
 
         for (const accountId in excludeAccountIds) {
@@ -137,27 +160,76 @@ export function useAppSettingPageBase() {
             return tt('All');
         }
 
-        let allVisibleAccountExcluded = true;
+        let allAccountExcluded = true;
 
-        for (let i = 0; i < accountsStore.allVisiblePlainAccounts.length; i++) {
-            const account = accountsStore.allVisiblePlainAccounts[i];
+        for (let i = 0; i < allAccounts.length; i++) {
+            const account = allAccounts[i];
 
             if (!excludeAccountIds[account.id]) {
-                allVisibleAccountExcluded = false;
+                allAccountExcluded = false;
                 break;
             }
         }
 
-        if (allVisibleAccountExcluded) {
+        if (allAccountExcluded) {
             return tt('None');
         }
 
         return tt('Partial');
-    });
+    }
+
+    function getIncludedTransactionCategoriesDisplayContent(excludeTransactionCategoryIds: Record<string, boolean>): string {
+        if (loadingTransactionCategories.value || !transactionCategoriesStore.allTransactionCategoriesMap) {
+            return '';
+        }
+
+        let hasExcludeTransactionCategory = false;
+
+        for (const transactionCategoryId in excludeTransactionCategoryIds) {
+            if (!Object.prototype.hasOwnProperty.call(excludeTransactionCategoryIds, transactionCategoryId)) {
+                continue;
+            }
+
+            if (excludeTransactionCategoryIds[transactionCategoryId] && transactionCategoriesStore.allTransactionCategoriesMap[transactionCategoryId]) {
+                hasExcludeTransactionCategory = true;
+                break;
+            }
+        }
+
+        if (!hasExcludeTransactionCategory) {
+            return tt('All');
+        }
+
+        let allTransactionCategoryExcluded = true;
+
+        for (const transactionCategoryId in transactionCategoriesStore.allTransactionCategoriesMap) {
+            if (!Object.prototype.hasOwnProperty.call(transactionCategoriesStore.allTransactionCategoriesMap, transactionCategoryId)) {
+                continue;
+            }
+
+            const transactionCategory = transactionCategoriesStore.allTransactionCategoriesMap[transactionCategoryId];
+
+            if (transactionCategory.type !== CategoryType.Income && transactionCategory.type !== CategoryType.Expense) {
+                continue;
+            }
+
+            if (!excludeTransactionCategoryIds[transactionCategory.id]) {
+                allTransactionCategoryExcluded = false;
+                break;
+            }
+        }
+
+        if (allTransactionCategoryExcluded) {
+            return tt('None');
+        }
+
+        return tt('Partial');
+    }
 
     return {
         // states
         loadingAccounts,
+        loadingTransactionCategories,
         // computed states
         allThemes,
         allTimezones,
@@ -165,7 +237,9 @@ export function useAppSettingPageBase() {
         allCurrencySortingTypes,
         allAutoSaveTransactionDraftTypes,
         timeZone,
+        hasAnyAccount,
         hasAnyVisibleAccount,
+        hasAnyTransactionCategory,
         isAutoUpdateExchangeRatesData,
         showAccountBalance,
         showAmountInHomePage,
@@ -176,6 +250,8 @@ export function useAppSettingPageBase() {
         autoSaveTransactionDraft,
         isAutoGetCurrentGeoLocation,
         currencySortByInExchangeRatesPage,
-        accountsIncludedInTotalDisplayContent
+        accountsIncludedInHomePageOverviewDisplayContent,
+        accountsIncludedInTotalDisplayContent,
+        transactionCategoriesIncludedInHomePageOverviewDisplayContent
     };
 }

@@ -148,7 +148,10 @@ import SnackBar from '@/components/desktop/SnackBar.vue';
 import { ref, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { useCategoryFilterSettingPageBase } from '@/views/base/settings/CategoryFilterSettingPageBase.ts';
+import {
+    type CategoryFilterType,
+    useCategoryFilterSettingPageBase
+} from '@/views/base/settings/CategoryFilterSettingPageBase.ts';
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
@@ -176,7 +179,7 @@ import {
 type SnackBarType = InstanceType<typeof SnackBar>;
 
 const props = defineProps<{
-    type: string;
+    type: CategoryFilterType;
     dialogMode?: boolean;
     autoSave?: boolean;
     categoryTypes?: string;

@@ -258,6 +258,8 @@ type TransactionStatisticTrendsRequest struct {
 // TransactionAmountsRequest represents all parameters of transaction amounts request
 type TransactionAmountsRequest struct {
 	Query                  string `form:"query"`
+	ExcludeAccountIds      string `form:"exclude_account_ids"`
+	ExcludeCategoryIds     string `form:"exclude_category_ids"`
 	UseTransactionTimezone bool   `form:"use_transaction_timezone"`
 }
 

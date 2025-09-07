@@ -1962,6 +1962,8 @@
     "Show Add Transaction Button": "Mostrar Botão de Adicionar Transação",
     "Overview Page": "Página de Visão Geral",
     "Timezone Used for Statistics": "Fuso Horário Usado para Estatísticas",
+    "Accounts Included in Overview Statistics": "Accounts Included in Overview Statistics",
+    "Transaction Categories Included in Overview Statistics": "Transaction Categories Included in Overview Statistics",
     "Timezone Type": "Tipo de Fuso Horário",
     "Application Timezone": "Fuso Horário do Aplicativo",
     "Transaction List Page": "Página de Lista de Transações",

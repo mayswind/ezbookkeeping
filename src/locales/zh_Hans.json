@@ -1962,6 +1962,8 @@
     "Show Add Transaction Button": "显示添加交易按钮",
     "Overview Page": "总览页面",
     "Timezone Used for Statistics": "统计时使用的时区",
+    "Accounts Included in Overview Statistics": "总览统计中包含的账户",
+    "Transaction Categories Included in Overview Statistics": "总览统计中包含的交易分类",
     "Timezone Type": "时区类型",
     "Application Timezone": "应用时区",
     "Transaction List Page": "交易列表页面",

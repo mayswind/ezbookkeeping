@@ -549,6 +549,25 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.WebContext) (any, *e
 		return nil, errs.ErrQueryItemsTooMuch
 	}
 
+	excludeAccountIds := make([]int64, 0)
+	excludeCategoryIds := make([]int64, 0)
+
+	if transactionAmountsReq.ExcludeAccountIds != "" {
+		excludeAccountIds, err = utils.StringArrayToInt64Array(strings.Split(transactionAmountsReq.ExcludeAccountIds, ","))
+
+		if err != nil {
+			return nil, errs.ErrAccountIdInvalid
+		}
+	}
+
+	if transactionAmountsReq.ExcludeCategoryIds != "" {
+		excludeCategoryIds, err = utils.StringArrayToInt64Array(strings.Split(transactionAmountsReq.ExcludeCategoryIds, ","))
+
+		if err != nil {
+			return nil, errs.ErrTransactionCategoryIdInvalid
+		}
+	}
+
 	utcOffset, err := c.GetClientTimezoneOffset()
 
 	if err != nil {
@@ -571,7 +590,7 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.WebContext) (any, *e
 	for i := 0; i < len(requestItems); i++ {
 		requestItem := requestItems[i]
 
-		incomeAmounts, expenseAmounts, err := a.transactions.GetAccountsTotalIncomeAndExpense(c, uid, requestItem.StartTime, requestItem.EndTime, utcOffset, transactionAmountsReq.UseTransactionTimezone)
+		incomeAmounts, expenseAmounts, err := a.transactions.GetAccountsTotalIncomeAndExpense(c, uid, requestItem.StartTime, requestItem.EndTime, excludeAccountIds, excludeCategoryIds, utcOffset, transactionAmountsReq.UseTransactionTimezone)
 
 		if err != nil {
 			log.Errorf(c, "[transactions.TransactionAmountsHandler] failed to get transaction amounts item for user \"uid:%d\", because %s", uid, err.Error())

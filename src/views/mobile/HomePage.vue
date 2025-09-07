@@ -36,7 +36,7 @@
         </f7-card>
 
         <f7-list strong inset dividers class="margin-top overview-transaction-list" :class="{ 'skeleton-text': loading }">
-            <f7-list-item :link="'/transaction/list?dateType=' + DateRange.Today.type" chevron-center>
+            <f7-list-item :link="`/transaction/list?${overviewStore.getTransactionListPageParams({ dateType: DateRange.Today.type })}`" chevron-center>
                 <template #media>
                     <f7-icon f7="calendar_today"></f7-icon>
                 </template>
@@ -66,7 +66,7 @@
                 </template>
             </f7-list-item>
 
-            <f7-list-item :link="'/transaction/list?dateType=' + DateRange.ThisWeek.type" chevron-center>
+            <f7-list-item :link="`/transaction/list?${overviewStore.getTransactionListPageParams({ dateType: DateRange.ThisWeek.type })}`" chevron-center>
                 <template #media>
                     <f7-icon f7="calendar"></f7-icon>
                 </template>
@@ -99,7 +99,7 @@
                 </template>
             </f7-list-item>
 
-            <f7-list-item :link="'/transaction/list?dateType=' + DateRange.ThisMonth.type" chevron-center>
+            <f7-list-item :link="`/transaction/list?${overviewStore.getTransactionListPageParams({ dateType: DateRange.ThisMonth.type })}`" chevron-center>
                 <template #media>
                     <f7-icon f7="calendar"></f7-icon>
                 </template>
@@ -132,7 +132,7 @@
                 </template>
             </f7-list-item>
 
-            <f7-list-item :link="'/transaction/list?dateType=' + DateRange.ThisYear.type" chevron-center>
+            <f7-list-item :link="`/transaction/list?${overviewStore.getTransactionListPageParams({ dateType: DateRange.ThisYear.type })}`" chevron-center>
                 <template #media>
                     <f7-icon f7="square_stack_3d_up"></f7-icon>
                 </template>
@@ -207,6 +207,8 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
 import { useHomePageBase } from '@/views/base/HomePageBase.ts';
 
+import { useAccountsStore } from '@/stores/account.ts';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
@@ -227,6 +229,8 @@ const {
     getDisplayExpenseAmount
 } = useHomePageBase();
 
+const accountsStore = useAccountsStore();
+const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTemplatesStore = useTransactionTemplatesStore();
 const overviewStore = useOverviewStore();
 
@@ -248,9 +252,14 @@ function init(): void {
     if (isUserLogined() && isUserUnlocked()) {
         loading.value = true;
 
-        overviewStore.loadTransactionOverview({
-            force: false
-        }).then(() => {
+        const promises = [
+            accountsStore.loadAllAccounts({ force: false }),
+            transactionCategoriesStore.loadAllCategories({ force: false }),
+            transactionTemplatesStore.loadAllTemplates({ templateType: TemplateType.Normal.type,  force: false }),
+            overviewStore.loadTransactionOverview({ force: false })
+        ];
+
+        Promise.all(promises).then(() => {
             loading.value = false;
         }).catch(error => {
             loading.value = false;
@@ -258,11 +267,6 @@ function init(): void {
             if (!error.processed) {
                 showToast(error.message || error);
             }
-        });
-
-        transactionTemplatesStore.loadAllTemplates({
-            templateType: TemplateType.Normal.type,
-            force: false
         });
     }
 }

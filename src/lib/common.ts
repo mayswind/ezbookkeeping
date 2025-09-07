@@ -415,6 +415,22 @@ export function objectFieldToArrayItem(object: object): string[] {
     return ret;
 }
 
+export function objectFieldWithValueToArrayItem<T>(object: Record<string, T>, value: T): string[] {
+    const ret: string[] = [];
+
+    for (const field in object) {
+        if (!Object.prototype.hasOwnProperty.call(object, field)) {
+            continue;
+        }
+
+        if (object[field] === value) {
+            ret.push(field);
+        }
+    }
+
+    return ret;
+}
+
 export function arrayItemToObjectField<T>(array: string[], value: T): Record<string, T> {
     const ret: Record<string, T> = {};
 

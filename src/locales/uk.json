@@ -1962,6 +1962,8 @@
     "Show Add Transaction Button": "Показати кнопку додавання транзакції",
     "Overview Page": "Сторінка огляду",
     "Timezone Used for Statistics": "Часовий пояс для статистики",
+    "Accounts Included in Overview Statistics": "Accounts Included in Overview Statistics",
+    "Transaction Categories Included in Overview Statistics": "Transaction Categories Included in Overview Statistics",
     "Timezone Type": "Тип часового поясу",
     "Application Timezone": "Часовий пояс застосунку",
     "Transaction List Page": "Сторінка списку транзакцій",

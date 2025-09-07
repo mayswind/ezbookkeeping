@@ -1962,6 +1962,8 @@
     "Show Add Transaction Button": "Show Add Transaction Button",
     "Overview Page": "概要ページ",
     "Timezone Used for Statistics": "統計に使用されるタイムゾーン",
+    "Accounts Included in Overview Statistics": "Accounts Included in Overview Statistics",
+    "Transaction Categories Included in Overview Statistics": "Transaction Categories Included in Overview Statistics",
     "Timezone Type": "タイムゾーンタイプ",
     "Application Timezone": "アプリのタイムゾーン",
     "Transaction List Page": "取引リストページ",

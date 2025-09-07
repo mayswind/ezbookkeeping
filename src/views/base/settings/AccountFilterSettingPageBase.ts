@@ -4,6 +4,7 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
+import { useOverviewStore } from '@/stores/overview.ts';
 
 import type { Account, AccountCategoriesWithVisibleCount } from '@/models/account.ts';
 
@@ -13,11 +14,14 @@ import {
     isAccountOrSubAccountsAllChecked
 } from '@/lib/account.ts';
 
-export function useAccountFilterSettingPageBase(type?: string) {
+export type AccountFilterType = 'statisticsDefault' | 'statisticsCurrent' | 'homePageOverview' | 'transactionListCurrent' | 'accountListTotalAmount';
+
+export function useAccountFilterSettingPageBase(type?: AccountFilterType) {
     const settingsStore = useSettingsStore();
     const accountsStore = useAccountsStore();
     const transactionsStore = useTransactionsStore();
     const statisticsStore = useStatisticsStore();
+    const overviewStore = useOverviewStore();
 
     const loading = ref<boolean>(true);
     const showHidden = ref<boolean>(false);
@@ -40,7 +44,7 @@ export function useAccountFilterSettingPageBase(type?: string) {
     });
 
     const allowHiddenAccount = computed<boolean>(() => {
-        return type === 'statisticsDefault' || type === 'statisticsCurrent' || type === 'transactionListCurrent';
+        return type === 'statisticsDefault' || type === 'statisticsCurrent' || type === 'homePageOverview' || type === 'transactionListCurrent';
     });
 
     const allCategorizedAccounts = computed<AccountCategoriesWithVisibleCount[]>(() => getCategorizedAccountsWithVisibleCount(accountsStore.allCategorizedAccountsMap));
@@ -84,6 +88,9 @@ export function useAccountFilterSettingPageBase(type?: string) {
             return true;
         } else if (type === 'statisticsCurrent') {
             filterAccountIds.value = Object.assign(allAccountIds, statisticsStore.transactionStatisticsFilter.filterAccountIds);
+            return true;
+        } else if (type === 'homePageOverview') {
+            filterAccountIds.value = Object.assign(allAccountIds, settingsStore.appSettings.overviewAccountFilterInHomePage);
             return true;
         } else if (type === 'transactionListCurrent') {
             for (const accountId in transactionsStore.allFilterAccountIds) {
@@ -146,6 +153,9 @@ export function useAccountFilterSettingPageBase(type?: string) {
             changed = statisticsStore.updateTransactionStatisticsFilter({
                 filterAccountIds: filteredAccountIds
             });
+        } else if (type === 'homePageOverview') {
+            settingsStore.setOverviewAccountFilterInHomePage(filteredAccountIds);
+            overviewStore.updateTransactionOverviewInvalidState(true);
         } else if (type === 'transactionListCurrent') {
             changed = transactionsStore.updateTransactionListFilter({
                 accountIds: isAllSelected ? '' : finalAccountIds

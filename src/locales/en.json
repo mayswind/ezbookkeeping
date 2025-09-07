@@ -1962,6 +1962,8 @@
     "Show Add Transaction Button": "Show Add Transaction Button",
     "Overview Page": "Overview Page",
     "Timezone Used for Statistics": "Timezone Used for Statistics",
+    "Accounts Included in Overview Statistics": "Accounts Included in Overview Statistics",
+    "Transaction Categories Included in Overview Statistics": "Transaction Categories Included in Overview Statistics",
     "Timezone Type": "Timezone Type",
     "Application Timezone": "Application Timezone",
     "Transaction List Page": "Transaction List Page",

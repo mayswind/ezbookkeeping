@@ -1962,6 +1962,8 @@
     "Show Add Transaction Button": "Knop ‘Transactie toevoegen’ tonen",
     "Overview Page": "Overzichtspagina",
     "Timezone Used for Statistics": "Tijdzone gebruikt voor statistieken",
+    "Accounts Included in Overview Statistics": "Accounts Included in Overview Statistics",
+    "Transaction Categories Included in Overview Statistics": "Transaction Categories Included in Overview Statistics",
     "Timezone Type": "Tijdzonetype",
     "Application Timezone": "Applicatietijdzone",
     "Transaction List Page": "Transactielijstpagina",

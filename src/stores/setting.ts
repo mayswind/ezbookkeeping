@@ -182,6 +182,18 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('timezoneUsedForStatisticsInHomePage', value);
     }
 
+    function setOverviewAccountFilterInHomePage(value: Record<string, boolean>): void {
+        updateApplicationSettingsValue('overviewAccountFilterInHomePage', value);
+        appSettings.value.overviewAccountFilterInHomePage = value;
+        updateUserApplicationCloudSettingValue('overviewAccountFilterInHomePage', value);
+    }
+
+    function setOverviewTransactionCategoryFilterInHomePage(value: Record<string, boolean>): void {
+        updateApplicationSettingsValue('overviewTransactionCategoryFilterInHomePage', value);
+        appSettings.value.overviewTransactionCategoryFilterInHomePage = value;
+        updateUserApplicationCloudSettingValue('overviewTransactionCategoryFilterInHomePage', value);
+    }
+
     // Transaction List Page
     function setItemsCountInTransactionListPage(value: number): void {
         updateApplicationSettingsValue('itemsCountInTransactionListPage', value);
@@ -428,6 +440,8 @@ export const useSettingsStore = defineStore('settings', () => {
         // -- Overview Page
         setShowAmountInHomePage,
         setTimezoneUsedForStatisticsInHomePage,
+        setOverviewAccountFilterInHomePage,
+        setOverviewTransactionCategoryFilterInHomePage,
         // -- Transaction List Page
         setItemsCountInTransactionListPage,
         setShowTotalAmountInTransactionListPage,

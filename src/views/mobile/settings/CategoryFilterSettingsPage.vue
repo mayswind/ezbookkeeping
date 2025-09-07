@@ -140,7 +140,10 @@ import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
-import { useCategoryFilterSettingPageBase } from '@/views/base/settings/CategoryFilterSettingPageBase.ts';
+import {
+    type CategoryFilterType,
+    useCategoryFilterSettingPageBase
+} from '@/views/base/settings/CategoryFilterSettingPageBase.ts';
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
@@ -183,7 +186,7 @@ const {
     getCategoryTypeName,
     loadFilterCategoryIds,
     saveFilterCategoryIds
-} = useCategoryFilterSettingPageBase(query['type'], query['allowCategoryTypes']);
+} = useCategoryFilterSettingPageBase(query['type'] as CategoryFilterType, query['allowCategoryTypes']);
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
 

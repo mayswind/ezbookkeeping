@@ -34,7 +34,7 @@
                         <span v-if="!loadingOverview || (transactionOverview && transactionOverview.thisMonth && transactionOverview.thisMonth.valid)">{{ transactionOverview && transactionOverview.thisMonth ? getDisplayIncomeAmount(transactionOverview.thisMonth) : '-' }}</span>
                         <v-skeleton-loader class="d-inline-block skeleton-no-margin mt-2" width="120px" type="text" :loading="true" v-else-if="loadingOverview && (!transactionOverview || !transactionOverview.thisMonth || !transactionOverview.thisMonth.valid)"></v-skeleton-loader>
                     </div>
-                    <v-btn size="small" to="/transaction/list?dateType=7">{{ tt('View Details') }}</v-btn>
+                    <v-btn size="small" :to="`/transaction/list?${overviewStore.getTransactionListPageParams({ dateType: DateRange.ThisMonth.type })}`">{{ tt('View Details') }}</v-btn>
                     <v-img class="overview-card-background img-with-direction"
                            src="img/desktop/card-background.png"/>
                     <v-img class="overview-card-background-image img-with-direction"
@@ -119,7 +119,7 @@
                         :datetime="displayDateRange?.today?.displayTime || ''"
                     >
                         <template #menus>
-                            <v-list-item :prepend-icon="mdiListBoxOutline" :to="'/transaction/list?dateType=' + DateRange.Today.type">
+                            <v-list-item :prepend-icon="mdiListBoxOutline" :to="`/transaction/list?${overviewStore.getTransactionListPageParams({ dateType: DateRange.Today.type })}`">
                                 <v-list-item-title>{{ tt('View Details') }}</v-list-item-title>
                             </v-list-item>
                         </template>
@@ -135,7 +135,7 @@
                         :datetime="displayDateRange?.thisWeek?.startTime + '-' + displayDateRange?.thisWeek?.endTime"
                     >
                         <template #menus>
-                            <v-list-item :prepend-icon="mdiListBoxOutline" :to="'/transaction/list?dateType=' + DateRange.ThisWeek.type">
+                            <v-list-item :prepend-icon="mdiListBoxOutline" :to="`/transaction/list?${overviewStore.getTransactionListPageParams({ dateType: DateRange.ThisWeek.type })}`">
                                 <v-list-item-title>{{ tt('View Details') }}</v-list-item-title>
                             </v-list-item>
                         </template>
@@ -151,7 +151,7 @@
                         :datetime="displayDateRange?.thisMonth?.startTime + '-' + displayDateRange?.thisMonth?.endTime"
                     >
                         <template #menus>
-                            <v-list-item :prepend-icon="mdiListBoxOutline" :to="'/transaction/list?dateType=' + DateRange.ThisMonth.type">
+                            <v-list-item :prepend-icon="mdiListBoxOutline" :to="`/transaction/list?${overviewStore.getTransactionListPageParams({ dateType: DateRange.ThisMonth.type })}`">
                                 <v-list-item-title>{{ tt('View Details') }}</v-list-item-title>
                             </v-list-item>
                         </template>
@@ -167,7 +167,7 @@
                         :datetime="displayDateRange?.thisYear?.displayTime || ''"
                     >
                         <template #menus>
-                            <v-list-item :prepend-icon="mdiListBoxOutline" :to="'/transaction/list?dateType=' + DateRange.ThisYear.type">
+                            <v-list-item :prepend-icon="mdiListBoxOutline" :to="`/transaction/list?${overviewStore.getTransactionListPageParams({ dateType: DateRange.ThisYear.type })}`">
                                 <v-list-item-title>{{ tt('View Details') }}</v-list-item-title>
                             </v-list-item>
                         </template>
@@ -199,6 +199,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useHomePageBase } from '@/views/base/HomePageBase.ts';
 
 import { useAccountsStore } from '@/stores/account.ts';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
 import { type NumeralSystem } from '@/core/numeral.ts';
@@ -242,6 +243,7 @@ const {
 } = useHomePageBase();
 
 const accountsStore = useAccountsStore();
+const transactionCategoriesStore = useTransactionCategoriesStore();
 const overviewStore = useOverviewStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
@@ -258,7 +260,12 @@ function clickMonthlyIncomeOrExpense(e: MonthlyIncomeAndExpenseCardClickEvent): 
     const maxTime = getUnixTimeBeforeUnixTime(getUnixTimeAfterUnixTime(minTime, 1, 'months'), 1, 'seconds');
     const type = e.transactionType;
 
-    router.push(`/transaction/list?type=${type}&dateType=${DateRange.Custom.type}&maxTime=${maxTime}&minTime=${minTime}`);
+    router.push(`/transaction/list?${overviewStore.getTransactionListPageParams({
+        type: type,
+        dateType: DateRange.Custom.type,
+        minTime: minTime,
+        maxTime: maxTime
+    })}`);
 }
 
 const monthlyIncomeAndExpenseData = computed<TransactionMonthlyIncomeAndExpenseData[]>(() => {
@@ -298,6 +305,7 @@ function reload(force: boolean): void {
 
     const promises = [
         accountsStore.loadAllAccounts({ force: false }),
+        transactionCategoriesStore.loadAllCategories({ force: false }),
         overviewStore.loadTransactionOverview({ force: force, loadLast11Months: true })
     ];
 

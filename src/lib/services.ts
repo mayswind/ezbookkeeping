@@ -471,9 +471,19 @@ export default {
 
         return axios.get<ApiResponse<TransactionStatisticTrendsResponseItem[]>>(`v1/transactions/statistics/trends.json?use_transaction_timezone=${req.useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));
     },
-    getTransactionAmounts: (params: TransactionAmountsRequestParams): ApiResponsePromise<TransactionAmountsResponse> => {
+    getTransactionAmounts: (params: TransactionAmountsRequestParams, excludeAccountIds: string[], excludeCategoryIds: string[]): ApiResponsePromise<TransactionAmountsResponse> => {
         const req = TransactionAmountsRequest.of(params);
-        return axios.get<ApiResponse<TransactionAmountsResponse>>(`v1/transactions/amounts.json?${req.buildQuery()}`);
+        let queryParams = req.buildQuery();
+
+        if (excludeAccountIds && excludeAccountIds.length) {
+            queryParams = queryParams + `&exclude_account_ids=${excludeAccountIds.join(',')}`;
+        }
+
+        if (excludeCategoryIds && excludeCategoryIds.length) {
+            queryParams = queryParams + `&exclude_category_ids=${excludeCategoryIds.join(',')}`;
+        }
+
+        return axios.get<ApiResponse<TransactionAmountsResponse>>(`v1/transactions/amounts.json?${queryParams}`);
     },
     getTransaction: ({ id, withPictures }: { id: string, withPictures: boolean | undefined }): ApiResponsePromise<TransactionInfoResponse> => {
         if (!isDefined(withPictures)) {

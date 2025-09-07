@@ -1962,6 +1962,8 @@
     "Show Add Transaction Button": "Show Add Transaction Button",
     "Overview Page": "Trang tổng quan",
     "Timezone Used for Statistics": "Múi giờ được sử dụng cho thống kê",
+    "Accounts Included in Overview Statistics": "Accounts Included in Overview Statistics",
+    "Transaction Categories Included in Overview Statistics": "Transaction Categories Included in Overview Statistics",
     "Timezone Type": "Loại múi giờ",
     "Application Timezone": "Múi giờ ứng dụng",
     "Transaction List Page": "Trang danh sách giao dịch",

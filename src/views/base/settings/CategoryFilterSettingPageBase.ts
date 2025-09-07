@@ -6,6 +6,7 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
+import { useOverviewStore } from '@/stores/overview.ts';
 
 import { CategoryType } from '@/core/category.ts';
 import type { TransactionCategory, TransactionCategoriesWithVisibleCount } from '@/models/transaction_category.ts';
@@ -21,13 +22,16 @@ import {
     isCategoryOrSubCategoriesAllChecked
 } from '@/lib/category.ts';
 
-export function useCategoryFilterSettingPageBase(type?: string, allowCategoryTypesStr?: string) {
+export type CategoryFilterType = 'statisticsDefault' | 'statisticsCurrent' | 'homePageOverview' | 'transactionListCurrent';
+
+export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allowCategoryTypesStr?: string) {
     const { tt } = useI18n();
 
     const settingsStore = useSettingsStore();
     const transactionCategoriesStore = useTransactionCategoriesStore();
     const transactionsStore = useTransactionsStore();
     const statisticsStore = useStatisticsStore();
+    const overviewStore = useOverviewStore();
 
     const allowCategoryTypes: Record<string, boolean> | undefined = allowCategoryTypesStr ? arrayItemToObjectField(allowCategoryTypesStr.split(','), true) : undefined;
 
@@ -100,6 +104,9 @@ export function useCategoryFilterSettingPageBase(type?: string, allowCategoryTyp
         } else if (type === 'statisticsCurrent') {
             filterCategoryIds.value = Object.assign(allCategoryIds, statisticsStore.transactionStatisticsFilter.filterCategoryIds);
             return true;
+        } else if (type === 'homePageOverview') {
+            filterCategoryIds.value = Object.assign(allCategoryIds, settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage);
+            return true;
         } else if (type === 'transactionListCurrent') {
             for (const categoryId in transactionsStore.allFilterCategoryIds) {
                 if (!Object.prototype.hasOwnProperty.call(transactionsStore.allFilterCategoryIds, categoryId)) {
@@ -157,6 +164,9 @@ export function useCategoryFilterSettingPageBase(type?: string, allowCategoryTyp
             changed = statisticsStore.updateTransactionStatisticsFilter({
                 filterCategoryIds: filteredCategoryIds
             });
+        } else if (type === 'homePageOverview') {
+            settingsStore.setOverviewTransactionCategoryFilterInHomePage(filteredCategoryIds);
+            overviewStore.updateTransactionOverviewInvalidState(true);
         } else if (type === 'transactionListCurrent') {
             changed = transactionsStore.updateTransactionListFilter({
                 categoryIds: isAllSelected ? '' : finalCategoryIds

@@ -151,7 +151,10 @@ import SnackBar from '@/components/desktop/SnackBar.vue';
 import { ref, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { useAccountFilterSettingPageBase } from '@/views/base/settings/AccountFilterSettingPageBase.ts';
+import {
+    type AccountFilterType,
+    useAccountFilterSettingPageBase
+} from '@/views/base/settings/AccountFilterSettingPageBase.ts';
 
 import { useAccountsStore } from '@/stores/account.ts';
 
@@ -179,7 +182,7 @@ import {
 type SnackBarType = InstanceType<typeof SnackBar>;
 
 const props = defineProps<{
-    type: string;
+    type: AccountFilterType;
     dialogMode?: boolean;
     autoSave?: boolean;
 }>();

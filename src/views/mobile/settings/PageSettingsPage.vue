@@ -27,6 +27,24 @@
                                            v-model="timezoneUsedForStatisticsInHomePage">
                 </list-item-selection-popup>
             </f7-list-item>
+
+            <f7-list-item :disabled="!hasAnyAccount"
+                          :title="tt('Accounts Included in Overview Statistics')"
+                          link="/settings/filter/account?type=homePageOverview">
+                <template #after>
+                    <f7-preloader v-if="loadingAccounts" />
+                    <span v-else-if="!loadingAccounts">{{ accountsIncludedInHomePageOverviewDisplayContent }}</span>
+                </template>
+            </f7-list-item>
+
+            <f7-list-item :disabled="!hasAnyTransactionCategory"
+                          :title="tt('Transaction Categories Included in Overview Statistics')"
+                          :link="`/settings/filter/category?type=homePageOverview&allowCategoryTypes=${CategoryType.Income},${CategoryType.Expense}`">
+                <template #after>
+                    <f7-preloader v-if="loadingTransactionCategories" />
+                    <span v-else-if="!loadingTransactionCategories">{{ transactionCategoriesIncludedInHomePageOverviewDisplayContent }}</span>
+                </template>
+            </f7-list-item>
         </f7-list>
 
         <f7-block-title>{{ tt('Transaction List Page') }}</f7-block-title>
@@ -118,6 +136,9 @@ import { useAppSettingPageBase } from '@/views/base/settings/AppSettingsPageBase
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
+
+import { CategoryType } from '@/core/category.ts';
 
 import { findNameByValue, findDisplayNameByType } from '@/lib/common.ts';
 
@@ -125,7 +146,10 @@ const { tt } = useI18n();
 const { showToast } = useI18nUIComponents();
 const {
     loadingAccounts,
+    loadingTransactionCategories,
+    hasAnyAccount,
     hasAnyVisibleAccount,
+    hasAnyTransactionCategory,
     allTimezoneTypesUsedForStatistics,
     allCurrencySortingTypes,
     allAutoSaveTransactionDraftTypes,
@@ -136,11 +160,14 @@ const {
     autoSaveTransactionDraft,
     isAutoGetCurrentGeoLocation,
     currencySortByInExchangeRatesPage,
-    accountsIncludedInTotalDisplayContent
+    accountsIncludedInHomePageOverviewDisplayContent,
+    accountsIncludedInTotalDisplayContent,
+    transactionCategoriesIncludedInHomePageOverviewDisplayContent
 } = useAppSettingPageBase();
 
 const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
+const transactionCategoriesStore = useTransactionCategoriesStore();
 
 const showTimezoneUsedForStatisticsInHomePagePopup = ref<boolean>(false);
 const showAutoSaveTransactionDraftPopup = ref<boolean>(false);
@@ -160,6 +187,18 @@ function init(): void {
         loadingAccounts.value = false;
     }).catch(error => {
         loadingAccounts.value = false;
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+
+    transactionCategoriesStore.loadAllCategories({
+        force: false
+    }).then(() => {
+        loadingTransactionCategories.value = false;
+    }).catch(error => {
+        loadingTransactionCategories.value = false;
 
         if (!error.processed) {
             showToast(error.message || error);

@@ -133,7 +133,10 @@ import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
-import { useAccountFilterSettingPageBase } from '@/views/base/settings/AccountFilterSettingPageBase.ts';
+import {
+    type AccountFilterType,
+    useAccountFilterSettingPageBase
+} from '@/views/base/settings/AccountFilterSettingPageBase.ts';
 
 import { useAccountsStore } from '@/stores/account.ts';
 
@@ -174,7 +177,7 @@ const {
     isAccountChecked,
     loadFilterAccountIds,
     saveFilterAccountIds
-} = useAccountFilterSettingPageBase(query['type']);
+} = useAccountFilterSettingPageBase(query['type'] as AccountFilterType);
 
 const accountsStore = useAccountsStore();
 

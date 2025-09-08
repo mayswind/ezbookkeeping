@@ -80,10 +80,10 @@ const theme = useTheme();
 const {
     tt,
     getCurrentLanguageTextDirection,
-    getCalendarShortYearFromUnixTime,
-    getCalendarShortYearMonthFromUnixTime,
-    getCalendarYearQuarterFromYearQuarter,
-    getCalendarFiscalYearFromUnixTime,
+    formatUnixTimeToGregorianLikeShortYear,
+    formatUnixTimeToGregorianLikeShortYearMonth,
+    formatYearQuarterToGregorianLikeYearQuarter,
+    formatUnixTimeToGregorianLikeFiscalYear,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
     formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
@@ -139,13 +139,13 @@ const allDisplayDateRanges = computed<string[]>(() => {
         const dateRange = allDateRanges.value[i];
 
         if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
-            allDisplayDateRanges.push(getCalendarShortYearFromUnixTime(dateRange.minUnixTime));
+            allDisplayDateRanges.push(formatUnixTimeToGregorianLikeShortYear(dateRange.minUnixTime));
         } else if (props.dateAggregationType === ChartDateAggregationType.FiscalYear.type && 'year' in dateRange) {
-            allDisplayDateRanges.push(getCalendarFiscalYearFromUnixTime(dateRange.minUnixTime));
+            allDisplayDateRanges.push(formatUnixTimeToGregorianLikeFiscalYear(dateRange.minUnixTime));
         } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type && 'quarter' in dateRange) {
-            allDisplayDateRanges.push(getCalendarYearQuarterFromYearQuarter(dateRange.year, dateRange.quarter));
+            allDisplayDateRanges.push(formatYearQuarterToGregorianLikeYearQuarter(dateRange.year, dateRange.quarter));
         } else { // if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
-            allDisplayDateRanges.push(getCalendarShortYearMonthFromUnixTime(dateRange.minUnixTime));
+            allDisplayDateRanges.push(formatUnixTimeToGregorianLikeShortYearMonth(dateRange.minUnixTime));
         }
     }
 

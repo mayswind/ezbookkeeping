@@ -55,8 +55,8 @@ const emit = defineEmits<{
 
 const {
     isLongDateMonthAfterYear,
-    getCalendarShortYearFromUnixTime,
-    getCalendarShortMonthFromUnixTime
+    getCalendarDisplayShortYearFromUnixTime,
+    getCalendarDisplayShortMonthFromUnixTime
 } = useI18n();
 
 const yearRange = getAllowedYearRange();
@@ -97,14 +97,14 @@ function getYear0BasedMonthFromMonthSelectionValue(value: MonthSelectionValue): 
 }
 
 function getDisplayYear(year: number): string {
-    return getCalendarShortYearFromUnixTime(getYearMonthDayDateTime(year, 1, 1).getUnixTime());
+    return getCalendarDisplayShortYearFromUnixTime(getYearMonthDayDateTime(year, 1, 1).getUnixTime());
 }
 
 function getDisplayMonth(month: number): string {
     if (isArray(dateTime.value)) {
-        return getCalendarShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value[0].year, month + 1, 1).getUnixTime());
+        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value[0].year, month + 1, 1).getUnixTime());
     } else {
-        return getCalendarShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value.year, month + 1, 1).getUnixTime());
+        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value.year, month + 1, 1).getUnixTime());
     }
 }
 </script>

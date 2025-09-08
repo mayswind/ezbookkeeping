@@ -51,6 +51,7 @@ export interface DateTimeLocaleData {
 }
 
 export type TextualYearMonth = `${number}-${number}`;
+export type TextualMonthDay = `${number}-${number}`;
 export type TextualYearMonthDay = `${number}-${number}-${number}`;
 
 export interface YearQuarter {

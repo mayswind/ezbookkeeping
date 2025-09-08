@@ -69,7 +69,7 @@ const emit = defineEmits<{
 const {
     getAllLongWeekdayNames,
     getAllShortWeekdayNames,
-    getCalendarDayOfMonthFromUnixTime,
+    getCalendarDisplayDayOfMonthFromUnixTime,
     getCalendarAlternateDates,
     formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
@@ -117,7 +117,7 @@ function getDisplayMonthTotalAmount(amount: number, currency: string | false, sy
 }
 
 function getDisplayDay(date: Date): string {
-    return getCalendarDayOfMonthFromUnixTime(getYearMonthDayDateTime(date.getFullYear(), date.getMonth() + 1, date.getDate()).getUnixTime());
+    return getCalendarDisplayDayOfMonthFromUnixTime(getYearMonthDayDateTime(date.getFullYear(), date.getMonth() + 1, date.getDate()).getUnixTime());
 }
 </script>
 

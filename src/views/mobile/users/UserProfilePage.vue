@@ -211,7 +211,7 @@
                 link="#" no-chevron
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Fiscal Year Start Date')"
-                :title="getCalendarLongMonthDayFromFiscalYearStart(newProfile.fiscalYearStart)"
+                :title="formatFiscalYearStartToGregorianLikeLongMonth(newProfile.fiscalYearStart)"
                 @click="showFiscalYearStartSheet = true"
             >
                 <fiscal-year-start-selection-sheet
@@ -587,7 +587,7 @@ const {
     getAllLanguageOptions,
     getAllCurrencies,
     getCurrencyName,
-    getCalendarLongMonthDayFromFiscalYearStart
+    formatFiscalYearStartToGregorianLikeLongMonth
 } = useI18n();
 
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();

@@ -202,7 +202,7 @@
                             <template #media>
                                 <div class="display-flex flex-direction-column transaction-date" :style="getTransactionDateStyle(transaction, idx > 0 ? transactionMonthList.items[idx - 1] : null)">
                                     <span class="transaction-day full-line flex-direction-column">
-                                        {{ getCalendarDayOfMonthFromUnixTime(transaction.time) }}
+                                        {{ getCalendarDisplayDayOfMonthFromUnixTime(transaction.time) }}
                                     </span>
                                     <span class="transaction-day-of-week full-line flex-direction-column" v-if="transaction.displayDayOfWeek">
                                         {{ getWeekdayShortName(transaction.displayDayOfWeek) }}
@@ -646,7 +646,7 @@ const {
     getCurrentLanguageTextDirection,
     getAllTransactionTagFilterTypes,
     getWeekdayShortName,
-    getCalendarDayOfMonthFromUnixTime
+    getCalendarDisplayDayOfMonthFromUnixTime
 } = useI18n();
 
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();

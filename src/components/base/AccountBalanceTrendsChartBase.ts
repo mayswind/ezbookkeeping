@@ -52,11 +52,11 @@ export interface CommonAccountBalanceTrendsChartProps {
 
 export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTrendsChartProps) {
     const {
-        getCalendarShortYearFromUnixTime,
-        getCalendarShortYearMonthFromUnixTime,
-        getCalendarYearQuarterFromUnixTime,
-        getCalendarFiscalYearFromUnixTime,
-        formatUnixTimeToShortDate
+        formatUnixTimeToShortDate,
+        formatUnixTimeToGregorianLikeShortYear,
+        formatUnixTimeToGregorianLikeShortYearMonth,
+        formatUnixTimeToGregorianLikeYearQuarter,
+        formatUnixTimeToGregorianLikeFiscalYear
     } = useI18n();
 
     const dataDateRange = computed<AccountBalanceUnixTimeAndBalanceRange | null>(() => {
@@ -156,13 +156,13 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
             let displayDate = '';
 
             if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
-                displayDate = getCalendarShortYearFromUnixTime(dateRange.minUnixTime);
+                displayDate = formatUnixTimeToGregorianLikeShortYear(dateRange.minUnixTime);
             } else if (props.dateAggregationType === ChartDateAggregationType.FiscalYear.type) {
-                displayDate = getCalendarFiscalYearFromUnixTime(dateRange.minUnixTime);
+                displayDate = formatUnixTimeToGregorianLikeFiscalYear(dateRange.minUnixTime);
             } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type) {
-                displayDate = getCalendarYearQuarterFromUnixTime(dateRange.minUnixTime);
+                displayDate = formatUnixTimeToGregorianLikeYearQuarter(dateRange.minUnixTime);
             } else if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
-                displayDate = getCalendarShortYearMonthFromUnixTime(dateRange.minUnixTime);
+                displayDate = formatUnixTimeToGregorianLikeShortYearMonth(dateRange.minUnixTime);
             } else {
                 displayDate = formatUnixTimeToShortDate(dateRange.minUnixTime);
             }

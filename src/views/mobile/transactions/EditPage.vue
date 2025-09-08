@@ -536,7 +536,7 @@ const {
     getMultiWeekdayLongNames,
     formatUnixTimeToLongDate,
     formatUnixTimeToLongTime,
-    formatGregorianCalendarYearDashMonthDashDayToLongDate
+    formatGregorianTextualYearMonthDayToLongDate
 } = useI18n();
 const { showAlert, showConfirm, showToast, routeBackOnError } = useI18nUIComponents();
 
@@ -756,7 +756,7 @@ const transactionDisplayScheduledStartDate = computed<string>(() => {
     const template = transaction.value as TransactionTemplate;
 
     if (template.scheduledStartDate) {
-        return formatGregorianCalendarYearDashMonthDashDayToLongDate(template.scheduledStartDate);
+        return formatGregorianTextualYearMonthDayToLongDate(template.scheduledStartDate);
     } else {
         return tt('No limit');
     }
@@ -770,7 +770,7 @@ const transactionDisplayScheduledEndDate = computed<string>(() => {
     const template = transaction.value as TransactionTemplate;
 
     if (template.scheduledEndDate) {
-        return formatGregorianCalendarYearDashMonthDashDayToLongDate(template.scheduledEndDate);
+        return formatGregorianTextualYearMonthDayToLongDate(template.scheduledEndDate);
     } else {
         return tt('No limit');
     }

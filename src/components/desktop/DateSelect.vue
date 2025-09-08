@@ -51,7 +51,7 @@ const emit = defineEmits<{
 }>();
 
 const theme = useTheme();
-const { tt, formatGregorianCalendarYearDashMonthDashDayToLongDate } = useI18n();
+const { tt, formatGregorianTextualYearMonthDayToLongDate } = useI18n();
 
 const dateTime = computed<Date | null>({
     get: () => props.modelValue ? getLocalDateFromYearDashMonthDashDay(props.modelValue) : null,
@@ -62,7 +62,7 @@ const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType
 const displayTime = computed<string>({
     get: () => {
         if (props.modelValue) {
-            return formatGregorianCalendarYearDashMonthDashDayToLongDate(props.modelValue);
+            return formatGregorianTextualYearMonthDayToLongDate(props.modelValue);
         } else if (props.noDataText) {
             return props.noDataText;
         } else {

@@ -11,6 +11,7 @@ import {
     type DateTime,
     type DateTimeFormatOptions,
     type TextualYearMonth,
+    type TextualMonthDay,
     type TextualYearMonthDay,
     type YearUnixTime,
     type YearQuarter,
@@ -565,7 +566,7 @@ export function formatGregorianCalendarYearDashMonthDashDay(date: TextualYearMon
     return MomentDateTime.of(moment(date, 'YYYY-MM-DD')).format(format, options);
 }
 
-export function formatGregorianCalendarMonthDashDay(monthDay: TextualYearMonth, format: string, options: DateTimeFormatOptions): string {
+export function formatGregorianCalendarMonthDashDay(monthDay: TextualMonthDay, format: string, options: DateTimeFormatOptions): string {
     return MomentDateTime.of(moment(monthDay, 'MM-DD')).format(format, options);
 }
 

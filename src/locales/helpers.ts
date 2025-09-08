@@ -37,7 +37,7 @@ import {
     type DateTime,
     type DateTimeFormatOptions,
     type DateTimeLocaleData,
-    type TextualYearMonth,
+    type TextualMonthDay,
     type TextualYearMonthDay,
     type Year1BasedMonth,
     type YearMonthDay,
@@ -778,15 +778,38 @@ export function useI18n() {
         return '';
     }
 
-    function formatTimeRangeToFiscalYearFormat(format: FiscalYearFormat, timeRange: FiscalYearUnixTime | UnixTimeRange, numeralSystem?: NumeralSystem, calendarType?: CalendarType): string {
+    function isGregorianLikeCalendarType(calendarType: CalendarType): boolean {
+        return calendarType === CalendarType.Gregorian || calendarType === CalendarType.Buddhist;
+    }
+
+    function getGregorianLikeCalendarType(): CalendarType {
+        const currentDateDisplayType = getCurrentDateDisplayType();
+
+        if (isGregorianLikeCalendarType(currentDateDisplayType.calendarType)) {
+            return currentDateDisplayType.calendarType;
+        }
+
+        return CalendarType.Gregorian;
+    }
+
+    function formatYearQuarter(year: string, quarter: number): string {
+        if (1 <= quarter && quarter <= 4) {
+            return t('format.yearQuarter.q' + quarter, {
+                year: year,
+                quarter: quarter
+            });
+        } else {
+            return '';
+        }
+    }
+
+    function formatTimeRangeToGregorianLikeFiscalYearFormat(format: FiscalYearFormat, timeRange: FiscalYearUnixTime | UnixTimeRange, numeralSystem?: NumeralSystem, calendarType?: CalendarType): string {
         if (!format) {
             format = FiscalYearFormat.Default;
         }
 
-        const currentCalendarDisplayType = getCurrentCalendarDisplayType();
-
-        if (!isDefined(calendarType)) {
-            calendarType = currentCalendarDisplayType.primaryCalendarType;
+        if (!isDefined(calendarType) || !isGregorianLikeCalendarType(calendarType)) {
+            calendarType = getGregorianLikeCalendarType();
         }
 
         const dateTimeFormatOptions = getDateTimeFormatOptions({
@@ -1241,7 +1264,7 @@ export function useI18n() {
 
         ret.push({
             type: LANGUAGE_DEFAULT_FISCAL_YEAR_FORMAT_VALUE,
-            displayName: `${t('Language Default')} (${formatTimeRangeToFiscalYearFormat(defaultFiscalYearFormat, currentFiscalYearRange, numeralSystem, calendarType)})`
+            displayName: `${t('Language Default')} (${formatTimeRangeToGregorianLikeFiscalYearFormat(defaultFiscalYearFormat, currentFiscalYearRange, numeralSystem, calendarType)})`
         });
 
         const allFiscalYearFormats = FiscalYearFormat.values();
@@ -1251,7 +1274,7 @@ export function useI18n() {
 
             ret.push({
                 type: fiscalYearFormat.type,
-                displayName: formatTimeRangeToFiscalYearFormat(fiscalYearFormat, currentFiscalYearRange, numeralSystem, calendarType),
+                displayName: formatTimeRangeToGregorianLikeFiscalYearFormat(fiscalYearFormat, currentFiscalYearRange, numeralSystem, calendarType),
             });
         }
 
@@ -1807,29 +1830,58 @@ export function useI18n() {
         return getLocalizedLongTimeFormat().indexOf('ss') >= 0;
     }
 
-    function getCalendarLongMonthDayFromGregorianCalendarTextualMonthDay(monthDay: TextualYearMonth): string {
-        const currentCalendarDisplayType = getCurrentCalendarDisplayType();
-        return formatGregorianCalendarMonthDashDay(monthDay, getLocalizedLongMonthDayFormat(), getDateTimeFormatOptions({ calendarType: currentCalendarDisplayType.primaryCalendarType }));
+    function formatGregorianTextualMonthDayToGregorianLikeLongMonthDay(monthDay: TextualMonthDay): string {
+        const gregorianLikeCalendarType = getGregorianLikeCalendarType();
+        return formatGregorianCalendarMonthDashDay(monthDay, getLocalizedLongMonthDayFormat(), getDateTimeFormatOptions({ calendarType: gregorianLikeCalendarType }));
     }
 
-    function getCalendarYearQuarterFromUnixTime(unixTime: number): string {
-        const currentCalendarDisplayType = getCurrentCalendarDisplayType();
-        const dateTimeFormatOptions = getDateTimeFormatOptions({ calendarType: currentCalendarDisplayType.primaryCalendarType });
+    function formatUnixTimeToGregorianLikeYearQuarter(unixTime: number): string {
+        const gregorianLikeCalendarType = getGregorianLikeCalendarType();
+        const dateTimeFormatOptions = getDateTimeFormatOptions({ calendarType: gregorianLikeCalendarType });
         const date = parseDateTimeFromUnixTime(unixTime);
         const year = date.getLocalizedCalendarYear(dateTimeFormatOptions);
         const quarter = date.getLocalizedCalendarQuarter(dateTimeFormatOptions);
-        return getCalendarYearQuarterFromYearQuarter(year, quarter);
+        return formatYearQuarter(year, quarter);
     }
 
-    function getCalendarYearQuarterFromYearQuarter(year: number | string, quarter: number): string {
-        if (1 <= quarter && quarter <= 4) {
-            return t('format.yearQuarter.q' + quarter, {
-                year: year,
-                quarter: quarter
-            });
-        } else {
-            return '';
+    function formatYearQuarterToGregorianLikeYearQuarter(year: number, quarter: number): string {
+        const gregorianLikeCalendarType = getGregorianLikeCalendarType();
+        const dateTimeFormatOptions = getDateTimeFormatOptions({ calendarType: gregorianLikeCalendarType });
+        const date = getYearMonthDayDateTime(year, 1, 1);
+        const textualYear = date.getLocalizedCalendarYear(dateTimeFormatOptions);
+        return formatYearQuarter(textualYear, quarter);
+    }
+
+    function formatUnixTimeToGregorianLikeFiscalYear(unixTime: number): string {
+        let fiscalYearFormat = FiscalYearFormat.valueOf(getCurrentFiscalYearFormatType());
+
+        if (!fiscalYearFormat) {
+            fiscalYearFormat = FiscalYearFormat.Default;
         }
+
+        const timeRange = getFiscalYearTimeRangeFromUnixTime(unixTime, userStore.currentUserFiscalYearStart);
+        return formatTimeRangeToGregorianLikeFiscalYearFormat(fiscalYearFormat, timeRange);
+    }
+
+    function formatGregorianYearToGregorianLikeFiscalYear(year: number) {
+        let fiscalYearFormat = FiscalYearFormat.valueOf(getCurrentFiscalYearFormatType());
+
+        if (!fiscalYearFormat) {
+            fiscalYearFormat = FiscalYearFormat.Default;
+        }
+
+        const timeRange = getFiscalYearTimeRangeFromYear(year, userStore.currentUserFiscalYearStart);
+        return formatTimeRangeToGregorianLikeFiscalYearFormat(fiscalYearFormat, timeRange);
+    }
+
+    function formatFiscalYearStartToGregorianLikeLongMonth(fiscalYearStartValue: number) {
+        let fiscalYearStart = FiscalYearStart.valueOf(fiscalYearStartValue);
+
+        if (!fiscalYearStart) {
+            fiscalYearStart = FiscalYearStart.Default;
+        }
+
+        return formatGregorianTextualMonthDayToGregorianLikeLongMonthDay(fiscalYearStart.toMonthDashDayString());
     }
 
     function formatDateRange(dateType: number, startTime: number, endTime: number): string {
@@ -1838,8 +1890,9 @@ export function useI18n() {
         }
 
         const allDateRanges = DateRange.values();
-        const currentCalendarDisplayType = getCurrentCalendarDisplayType();
-        const dateTimeFormatOptions = getDateTimeFormatOptions({ calendarType: currentCalendarDisplayType.primaryCalendarType });
+        const gregorianLikeCalendarType = getGregorianLikeCalendarType();
+        const dateTimeFormatOptions = getDateTimeFormatOptions();
+        const gregorianLikeDateTimeFormatOptions = getDateTimeFormatOptions({ calendarType: gregorianLikeCalendarType });
 
         for (let i = 0; i < allDateRanges.length; i++) {
             const dateRange = allDateRanges[i];
@@ -1851,22 +1904,22 @@ export function useI18n() {
 
         if (isDateRangeMatchFullYears(startTime, endTime)) {
             const format = getLocalizedShortYearFormat();
-            const displayStartTime = formatUnixTime(startTime, format, dateTimeFormatOptions);
-            const displayEndTime = formatUnixTime(endTime, format, dateTimeFormatOptions);
+            const displayStartTime = formatUnixTime(startTime, format, gregorianLikeDateTimeFormatOptions);
+            const displayEndTime = formatUnixTime(endTime, format, gregorianLikeDateTimeFormatOptions);
 
             return displayStartTime !== displayEndTime ? `${displayStartTime} ~ ${displayEndTime}` : displayStartTime;
         }
 
         if (isDateRangeMatchFullMonths(startTime, endTime)) {
             const format = getLocalizedShortYearMonthFormat();
-            const displayStartTime = formatUnixTime(startTime, format, dateTimeFormatOptions);
-            const displayEndTime = formatUnixTime(endTime, format, dateTimeFormatOptions);
+            const displayStartTime = formatUnixTime(startTime, format, gregorianLikeDateTimeFormatOptions);
+            const displayEndTime = formatUnixTime(endTime, format, gregorianLikeDateTimeFormatOptions);
 
             return displayStartTime !== displayEndTime ? `${displayStartTime} ~ ${displayEndTime}` : displayStartTime;
         }
 
-        const startTimeYear = parseDateTimeFromUnixTime(startTime).getLocalizedCalendarYear(dateTimeFormatOptions);
-        const endTimeYear = parseDateTimeFromUnixTime(endTime).getLocalizedCalendarYear(dateTimeFormatOptions);
+        const startTimeYear = parseDateTimeFromUnixTime(startTime).getLocalizedCalendarYear(gregorianLikeDateTimeFormatOptions);
+        const endTimeYear = parseDateTimeFromUnixTime(endTime).getLocalizedCalendarYear(gregorianLikeDateTimeFormatOptions);
 
         const format = getLocalizedShortDateFormat();
         const displayStartTime = formatUnixTime(startTime, format, dateTimeFormatOptions);
@@ -1875,43 +1928,11 @@ export function useI18n() {
         if (displayStartTime === displayEndTime) {
             return displayStartTime;
         } else if (startTimeYear === endTimeYear) {
-            const displayShortEndTime = formatUnixTime(endTime, getLocalizedShortMonthDayFormat(), dateTimeFormatOptions);
+            const displayShortEndTime = formatUnixTime(endTime, getLocalizedShortMonthDayFormat(), gregorianLikeDateTimeFormatOptions);
             return `${displayStartTime} ~ ${displayShortEndTime}`;
         }
 
         return `${displayStartTime} ~ ${displayEndTime}`;
-    }
-
-    function getCalendarFiscalYearFromUnixTime(unixTime: number): string {
-        let fiscalYearFormat = FiscalYearFormat.valueOf(getCurrentFiscalYearFormatType());
-
-        if (!fiscalYearFormat) {
-            fiscalYearFormat = FiscalYearFormat.Default;
-        }
-
-        const timeRange = getFiscalYearTimeRangeFromUnixTime(unixTime, userStore.currentUserFiscalYearStart);
-        return formatTimeRangeToFiscalYearFormat(fiscalYearFormat, timeRange);
-    }
-
-    function getCalendarFiscalYearGregorianCalendarYear(year: number) {
-        let fiscalYearFormat = FiscalYearFormat.valueOf(getCurrentFiscalYearFormatType());
-
-        if (!fiscalYearFormat) {
-            fiscalYearFormat = FiscalYearFormat.Default;
-        }
-
-        const timeRange = getFiscalYearTimeRangeFromYear(year, userStore.currentUserFiscalYearStart);
-        return formatTimeRangeToFiscalYearFormat(fiscalYearFormat, timeRange);
-    }
-
-    function getCalendarLongMonthDayFromFiscalYearStart(fiscalYearStartValue: number) {
-        let fiscalYearStart = FiscalYearStart.valueOf(fiscalYearStartValue);
-
-        if (!fiscalYearStart) {
-            fiscalYearStart = FiscalYearStart.Default;
-        }
-
-        return getCalendarLongMonthDayFromGregorianCalendarTextualMonthDay(fiscalYearStart.toMonthDashDayString());
     }
 
     function getTimezoneDifferenceDisplayText(utcOffset: number): string {
@@ -2400,34 +2421,41 @@ export function useI18n() {
         isLongTimeHourTwoDigits,
         isLongTimeMinuteTwoDigits,
         isLongTimeSecondTwoDigits,
-        // format functions
-        getCalendarLongYearFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongYearFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
-        getCalendarShortYearFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortYearFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
-        getCalendarLongMonthFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, 'MMMM', getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
-        getCalendarShortMonthFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, 'MMM', getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
-        getCalendarDayOfMonthFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDayFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
-        getCalendarLongYearMonthFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongYearMonthFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
-        getCalendarShortYearMonthFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortYearMonthFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
-        getCalendarLongMonthDayFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongMonthDayFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
-        getCalendarShortMonthDayFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortMonthDayFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
-        getCalendarYearQuarterFromUnixTime,
-        getCalendarYearQuarterFromYearQuarter,
-        getCalendarFiscalYearFromUnixTime,
-        getCalendarFiscalYearGregorianCalendarYear,
-        getCalendarLongMonthDayFromGregorianCalendarTextualMonthDay,
-        getCalendarLongMonthDayFromFiscalYearStart,
-        formatUnixTimeToDefaultDateTimeWithoutLocaleOptions: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, KnownDateTimeFormat.DefaultDateTime.format, getDateTimeFormatOptions({ numeralSystem: NumeralSystem.WesternArabicNumerals, calendarType: CalendarType.Gregorian }), utcOffset, currentUtcOffset),
+        // format date time (by calendar display type) functions
+        getCalendarDisplayShortYearFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortYearFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
+        getCalendarDisplayShortMonthFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, 'MMM', getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
+        getCalendarDisplayDayOfMonthFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDayFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
+        // format date time (by date display type) functions
         formatUnixTimeToLongDateTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongDateFormat() + ' ' + getLocalizedLongTimeFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortDateTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDateFormat() + ' ' + getLocalizedShortTimeFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
         formatUnixTimeToLongDate: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongDateFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortDate: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDateFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
+        formatUnixTimeToLongMonthDay: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongMonthDayFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
+        formatUnixTimeToShortMonthDay: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortMonthDayFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
         formatUnixTimeToLongTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongTimeFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortTimeFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
-        formatGregorianCalendarYearDashMonthDashDayToLongDate: (date: TextualYearMonthDay) => formatGregorianCalendarYearDashMonthDashDay(date, getLocalizedLongDateFormat(), getDateTimeFormatOptions()),
+        formatGregorianTextualYearMonthDayToLongDate: (date: TextualYearMonthDay) => formatGregorianCalendarYearDashMonthDashDay(date, getLocalizedLongDateFormat(), getDateTimeFormatOptions()),
+        // format date time (Gregorian calendar and Gregorian-like calendar) functions
+        formatUnixTimeToGregorianLikeLongYear: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongYearFormat(), getDateTimeFormatOptions({ calendarType: getGregorianLikeCalendarType() }), utcOffset, currentUtcOffset),
+        formatUnixTimeToGregorianLikeShortYear: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortYearFormat(), getDateTimeFormatOptions({ calendarType: getGregorianLikeCalendarType() }), utcOffset, currentUtcOffset),
+        formatUnixTimeToGregorianLikeLongYearMonth: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongYearMonthFormat(), getDateTimeFormatOptions({ calendarType: getGregorianLikeCalendarType() }), utcOffset, currentUtcOffset),
+        formatUnixTimeToGregorianLikeShortYearMonth: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortYearMonthFormat(), getDateTimeFormatOptions({ calendarType: getGregorianLikeCalendarType() }), utcOffset, currentUtcOffset),
+        formatUnixTimeToGregorianLikeLongMonth: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, 'MMMM', getDateTimeFormatOptions({ calendarType: getGregorianLikeCalendarType() }), utcOffset, currentUtcOffset),
+        formatUnixTimeToGregorianLikeShortMonth: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, 'MMM', getDateTimeFormatOptions({ calendarType: getGregorianLikeCalendarType() }), utcOffset, currentUtcOffset),
+        formatGregorianTextualMonthDayToGregorianLikeLongMonthDay,
+        formatUnixTimeToGregorianLikeYearQuarter,
+        formatYearQuarterToGregorianLikeYearQuarter,
+        formatUnixTimeToGregorianLikeFiscalYear,
+        formatGregorianYearToGregorianLikeFiscalYear,
+        formatFiscalYearStartToGregorianLikeLongMonth,
+        // format date time (Gregorian calendar) functions
+        formatUnixTimeToGregorianDefaultDateTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, KnownDateTimeFormat.DefaultDateTime.format, getDateTimeFormatOptions({ numeralSystem: NumeralSystem.WesternArabicNumerals, calendarType: CalendarType.Gregorian }), utcOffset, currentUtcOffset),
+        // other format date time functions
         formatDateRange,
         getTimezoneDifferenceDisplayText,
         getCalendarAlternateDates,
         getCalendarAlternateDate,
+        // format amount/number functions
         parseAmountFromLocalizedNumerals: (value: string) => getParsedAmountNumber(value),
         parseAmountFromWesternArabicNumerals: (value: string) => getParsedAmountNumber(value, NumeralSystem.WesternArabicNumerals),
         formatAmountToLocalizedNumerals: (value: number, currencyCode?: string) => getFormattedAmount(value, undefined, undefined, currencyCode),

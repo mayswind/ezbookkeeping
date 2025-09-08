@@ -63,7 +63,7 @@ const emit = defineEmits<{
 const {
     tt,
     getCurrentLanguageTextDirection,
-    getCalendarShortMonthFromUnixTime,
+    formatUnixTimeToGregorianLikeShortMonth,
     formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
 
@@ -101,7 +101,7 @@ const chartOptions = computed<object>(() => {
     if (props.data) {
         for (let i = 0; i < props.data.length; i++) {
             const item = props.data[i];
-            const monthShortName = getCalendarShortMonthFromUnixTime(item.monthStartTime);
+            const monthShortName = formatUnixTimeToGregorianLikeShortMonth(item.monthStartTime);
 
             monthNames.push(monthShortName);
             incomeAmounts.push(item.incomeAmount);

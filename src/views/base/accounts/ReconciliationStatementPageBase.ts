@@ -31,10 +31,10 @@ export function useReconciliationStatementPageBase() {
         tt,
         getAllAccountBalanceTrendChartTypes,
         getAllStatisticsDateAggregationTypesWithShortName,
-        formatUnixTimeToDefaultDateTimeWithoutLocaleOptions,
         formatUnixTimeToLongDateTime,
         formatUnixTimeToLongDate,
         formatUnixTimeToShortTime,
+        formatUnixTimeToGregorianDefaultDateTime,
         formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
         formatAmountToLocalizedNumeralsWithCurrency
     } = useI18n();
@@ -241,7 +241,7 @@ export function useReconciliationStatementPageBase() {
             }
 
             return [
-                formatUnixTimeToDefaultDateTimeWithoutLocaleOptions(transactionTime),
+                formatUnixTimeToGregorianDefaultDateTime(transactionTime),
                 type,
                 categoryName,
                 displayAmount,

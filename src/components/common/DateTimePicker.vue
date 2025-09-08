@@ -88,9 +88,9 @@ const {
     getCurrentCalendarDisplayType,
     isLongDateMonthAfterYear,
     isLongTime24HourFormat,
-    getCalendarShortYearFromUnixTime,
-    getCalendarShortMonthFromUnixTime,
-    getCalendarDayOfMonthFromUnixTime,
+    getCalendarDisplayShortYearFromUnixTime,
+    getCalendarDisplayShortMonthFromUnixTime,
+    getCalendarDisplayDayOfMonthFromUnixTime,
     getCalendarAlternateDate
 } = useI18n();
 
@@ -130,21 +130,21 @@ function switchView(viewType: MenuView): void {
 }
 
 function getDisplayYear(year: number): string {
-    return getCalendarShortYearFromUnixTime(getYearMonthDayDateTime(year, 1, 1).getUnixTime());
+    return getCalendarDisplayShortYearFromUnixTime(getYearMonthDayDateTime(year, 1, 1).getUnixTime());
 }
 
 function getDisplayMonth(month: number): string {
     if (isArray(dateTime.value)) {
-        return getCalendarShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value[0].getFullYear(), month + 1, 1).getUnixTime());
+        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value[0].getFullYear(), month + 1, 1).getUnixTime());
     } else if (dateTime.value) {
-        return getCalendarShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value.getFullYear(), month + 1, 1).getUnixTime());
+        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value.getFullYear(), month + 1, 1).getUnixTime());
     } else {
-        return getCalendarShortMonthFromUnixTime(getYearMonthDayDateTime(new Date().getFullYear(), month + 1, 1).getUnixTime());
+        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(new Date().getFullYear(), month + 1, 1).getUnixTime());
     }
 }
 
 function getDisplayDay(date: Date): string {
-    return getCalendarDayOfMonthFromUnixTime(getYearMonthDayDateTime(date.getFullYear(), date.getMonth() + 1, date.getDate()).getUnixTime());
+    return getCalendarDisplayDayOfMonthFromUnixTime(getYearMonthDayDateTime(date.getFullYear(), date.getMonth() + 1, date.getDate()).getUnixTime());
 }
 
 defineExpose({

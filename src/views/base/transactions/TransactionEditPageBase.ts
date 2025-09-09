@@ -196,7 +196,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
             return amountName;
         }
 
-        amountInDefaultCurrency = Math.floor(amountInDefaultCurrency);
+        amountInDefaultCurrency = Math.trunc(amountInDefaultCurrency);
 
         const displayAmountInDefaultCurrency = getDisplayAmount(amountInDefaultCurrency, transaction.value.hideAmount, defaultCurrency.value);
         return amountName + ` (${displayAmountInDefaultCurrency})`;

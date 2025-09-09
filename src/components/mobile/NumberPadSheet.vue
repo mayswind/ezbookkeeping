@@ -325,7 +325,7 @@ function confirm(): boolean {
                 finalValue = previous - current;
                 break;
             case '×':
-                finalValue = Math.round(previous * current / 100);
+                finalValue = Math.trunc(previous * current / 100);
                 break;
             default:
                 finalValue = previous;

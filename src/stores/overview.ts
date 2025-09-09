@@ -164,13 +164,13 @@ export const useOverviewStore = defineStore('overview', () => {
                         const expenseAmount = exchangeRatesStore.getExchangedAmount(amount.expenseAmount, amount.currency, defaultCurrency);
 
                         if (isNumber(incomeAmount)) {
-                            totalIncomeAmount += Math.floor(incomeAmount);
+                            totalIncomeAmount += Math.trunc(incomeAmount);
                         } else {
                             hasUnCalculatedTotalIncome = true;
                         }
 
                         if (isNumber(expenseAmount)) {
-                            totalExpenseAmount += Math.floor(expenseAmount);
+                            totalExpenseAmount += Math.trunc(expenseAmount);
                         } else {
                             hasUnCalculatedTotalExpense = true;
                         }

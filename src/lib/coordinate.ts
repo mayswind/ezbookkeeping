@@ -42,12 +42,12 @@ function formatCoordinateValue(value: number, positiveDirectionName: string, neg
     if (displayFormat === CoordinateDisplayFormat.DecimalDegrees) {
         return `${prefix}${value.toFixed(6)}${suffix}`;
     } else if (displayFormat === CoordinateDisplayFormat.DecimalMinutes) {
-        const degrees = Math.floor(value);
+        const degrees = Math.trunc(value);
         const minutes = (value - degrees) * 60;
         return `${prefix}${degrees}°${minutes.toFixed(5)}'${suffix}`;
     } else if (displayFormat === CoordinateDisplayFormat.DegreesMinutesSeconds) {
-        const degrees = Math.floor(value);
-        const minutes = Math.floor((value - degrees) * 60);
+        const degrees = Math.trunc(value);
+        const minutes = Math.trunc((value - degrees) * 60);
         const seconds = (value - degrees - minutes / 60) * 3600;
         return `${prefix}${degrees}°${minutes}'${seconds.toFixed(4)}"${suffix}`;
     } else {

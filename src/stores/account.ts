@@ -510,7 +510,7 @@ export const useAccountsStore = defineStore('accounts', () => {
                     continue;
                 }
 
-                netAssets += Math.floor(balance);
+                netAssets += Math.trunc(balance);
             }
         }
 
@@ -546,7 +546,7 @@ export const useAccountsStore = defineStore('accounts', () => {
                     continue;
                 }
 
-                totalAssets += Math.floor(balance);
+                totalAssets += Math.trunc(balance);
             }
         }
 
@@ -582,7 +582,7 @@ export const useAccountsStore = defineStore('accounts', () => {
                     continue;
                 }
 
-                totalLiabilities -= Math.floor(balance);
+                totalLiabilities -= Math.trunc(balance);
             }
         }
 
@@ -623,11 +623,11 @@ export const useAccountsStore = defineStore('accounts', () => {
                 }
 
                 if (accountsBalance[i].isAsset) {
-                    totalBalance += Math.floor(balance);
+                    totalBalance += Math.trunc(balance);
                 } else if (accountsBalance[i].isLiability) {
-                    totalBalance -= Math.floor(balance);
+                    totalBalance -= Math.trunc(balance);
                 } else {
-                    totalBalance += Math.floor(balance);
+                    totalBalance += Math.trunc(balance);
                 }
             }
         }
@@ -737,11 +737,11 @@ export const useAccountsStore = defineStore('accounts', () => {
                 }
 
                 if (subAccount.isAsset) {
-                    totalBalance += Math.floor(balance);
+                    totalBalance += Math.trunc(balance);
                 } else if (subAccount.isLiability) {
-                    totalBalance -= Math.floor(balance);
+                    totalBalance -= Math.trunc(balance);
                 } else {
-                    totalBalance += Math.floor(balance);
+                    totalBalance += Math.trunc(balance);
                 }
             }
         }

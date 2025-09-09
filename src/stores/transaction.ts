@@ -410,9 +410,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
             }
         }
 
-        transactionMonthList.totalAmount.expense = Math.floor(totalExpense);
+        transactionMonthList.totalAmount.expense = Math.trunc(totalExpense);
         transactionMonthList.totalAmount.incompleteExpense = incomplete || hasUnCalculatedTotalExpense;
-        transactionMonthList.totalAmount.income = Math.floor(totalIncome);
+        transactionMonthList.totalAmount.income = Math.trunc(totalIncome);
         transactionMonthList.totalAmount.incompleteIncome = incomplete || hasUnCalculatedTotalIncome;
 
         for (const day in transactionMonthList.dailyTotalAmounts) {
@@ -431,9 +431,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
             const dailyTotalAmount = dailyTotalAmounts[day];
 
             transactionMonthList.dailyTotalAmounts[day] = {
-                expense: Math.floor(dailyTotalAmount.expense),
+                expense: Math.trunc(dailyTotalAmount.expense),
                 incompleteExpense: incomplete || dailyTotalAmount.incompleteExpense,
-                income: Math.floor(dailyTotalAmount.income),
+                income: Math.trunc(dailyTotalAmount.income),
                 incompleteIncome: incomplete || dailyTotalAmount.incompleteIncome
             };
         }
@@ -568,12 +568,12 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 const exchangedNewValue = exchangeRatesStore.getExchangedAmount(newValue, sourceAccount.currency, destinationAccount.currency);
 
                 if (isNumber(decimalNumberCount) && isNumber(exchangedOldValue)) {
-                    oldValue = Math.floor(exchangedOldValue);
+                    oldValue = Math.trunc(exchangedOldValue);
                     oldValue = getAmountWithDecimalNumberCount(oldValue, decimalNumberCount);
                 }
 
                 if (isNumber(decimalNumberCount) && isNumber(exchangedNewValue)) {
-                    newValue = Math.floor(exchangedNewValue);
+                    newValue = Math.trunc(exchangedNewValue);
                     newValue = getAmountWithDecimalNumberCount(newValue, decimalNumberCount);
                 } else {
                     return;

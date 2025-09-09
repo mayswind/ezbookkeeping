@@ -243,7 +243,7 @@ const chartOptions = computed<object>(() => {
                 axisPointer: {
                     label: {
                         formatter: (params: CallbackDataParams) => {
-                            return formatAmountToLocalizedNumeralsWithCurrency(Math.floor(params.value as number), props.account.currency);
+                            return formatAmountToLocalizedNumeralsWithCurrency(Math.trunc(params.value as number), props.account.currency);
                         }
                     }
                 },

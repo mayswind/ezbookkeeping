@@ -230,7 +230,7 @@ export function formatNumber(value: number, options: NumberFormatOptions, precis
 
     if (isDefined(precision)) {
         const ratio = Math.pow(10, precision);
-        const normalizedValue = Math.floor(value * ratio);
+        const normalizedValue = Math.trunc(value * ratio);
         const textualValue = numeralSystem.formatNumber(normalizedValue / ratio);
         return appendDigitGroupingSymbolAndDecimalSeparator(textualValue, options);
     } else {
@@ -242,7 +242,7 @@ export function formatNumber(value: number, options: NumberFormatOptions, precis
 export function formatPercent(value: number, precision: number, lowPrecisionValue: string, options: NumberFormatOptions): string {
     const numeralSystem = options.numeralSystem || NumeralSystem.Default;
     const ratio = Math.pow(10, precision);
-    const normalizedValue = Math.floor(value * ratio);
+    const normalizedValue = Math.trunc(value * ratio);
 
     if (value > 0 && normalizedValue < 1 && lowPrecisionValue) {
         const systemDecimalSeparator = DecimalSeparator.Dot.symbol;
@@ -262,9 +262,9 @@ export function formatPercent(value: number, precision: number, lowPrecisionValu
 
 export function getAmountWithDecimalNumberCount(amount: number, decimalNumberCount: number): number {
     if (decimalNumberCount === 0) {
-        return Math.floor(amount / 100) * 100;
+        return Math.trunc(amount / 100) * 100;
     } else if (decimalNumberCount === 1) {
-        return Math.floor(amount / 10) * 10;
+        return Math.trunc(amount / 10) * 10;
     }
 
     return amount;

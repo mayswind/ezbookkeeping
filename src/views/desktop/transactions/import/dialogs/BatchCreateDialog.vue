@@ -41,7 +41,8 @@
                                          v-for="item in invalidItems">
                                 <template #prepend="{ isActive }">
                                     <v-list-item-action start>
-                                        <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                                        <v-checkbox-btn :model-value="isActive"
+                                                        @update:model-value="updateSelectedNames(item.name, $event)"></v-checkbox-btn>
                                     </v-list-item-action>
                                 </template>
                             </v-list-item>
@@ -114,6 +115,22 @@ const selectedNames = ref<string[]>([]);
 
 let resolveFunc: ((response: BatchCreateDialogResponse) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
+
+function updateSelectedNames(value: string, selected: boolean | null): void {
+    const newSelectedNames: string[] = [];
+
+    for (const name of selectedNames.value) {
+        if (name !== value || selected) {
+            newSelectedNames.push(name);
+        }
+    }
+
+    if (selected) {
+        newSelectedNames.push(value);
+    }
+
+    selectedNames.value = newSelectedNames;
+}
 
 function buildBatchCreateCategoryResponse(createdCategories: Record<number, TransactionCategory[]>): BatchCreateDialogResponse {
     const displayNameSourceItemMap: Record<string, string> = {};

@@ -96,7 +96,7 @@ export class NumeralSystem implements TypeAndName {
             return '';
         }
 
-        return this.allDigits[digit];
+        return this.allDigits[digit] as string;
     }
 
     public parseInt(value: string): number {
@@ -136,11 +136,11 @@ export class NumeralSystem implements TypeAndName {
         let result = '';
 
         for (let i = 0; i < value.length; i++) {
-            const ch = value[i];
+            const ch = value.charAt(i);
 
             if (NumeralSystem.WesternArabicNumerals.isDigit(ch)) {
-                const digit = NumeralSystem.WesternArabicNumerals.digitsToWesternArabic[ch];
-                result += this.allDigits[digit];
+                const digit = NumeralSystem.WesternArabicNumerals.digitsToWesternArabic[ch] as number;
+                result += this.allDigits[digit] as string;
             } else {
                 result += ch;
             }
@@ -157,11 +157,11 @@ export class NumeralSystem implements TypeAndName {
         let result = '';
 
         for (let i = 0; i < value.length; i++) {
-            const ch = value[i];
+            const ch = value.charAt(i);
 
             if (this.isDigit(ch)) {
-                const digit = this.digitsToWesternArabic[ch];
-                result += NumeralSystem.WesternArabicNumerals.allDigits[digit];
+                const digit = this.digitsToWesternArabic[ch] as number;
+                result += NumeralSystem.WesternArabicNumerals.allDigits[digit] as string;
             } else {
                 result += ch;
             }

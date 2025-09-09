@@ -177,9 +177,9 @@ function getSolarTermName(gregorianDate: YearMonthDay, localeData: ChineseCalend
     const [firstTermDay, firstTermIndex, secondTermDay, secondTermIndex] = getSolarTermDays(gregorianDate.year, gregorianDate.month);
 
     if (firstTermDay > 0 && firstTermDay === gregorianDate.day) {
-        return localeData.solarTermNames[firstTermIndex];
+        return localeData.solarTermNames[firstTermIndex] ?? '';
     } else if (secondTermDay > 0 && secondTermDay === gregorianDate.day) {
-        return localeData.solarTermNames[secondTermIndex];
+        return localeData.solarTermNames[secondTermIndex] ?? '';
     } else {
         return '';
     }
@@ -317,7 +317,7 @@ function buildChineseYearMonthDayInfo(gregorianDate: YearMonthDay, chineseDate: 
         day: chineseDate.day,
         displayYear: getChineseNumber(chineseDate.year, localeData),
         displayMonth: (chineseDate.isLeapMonth ? localeData.leapMonthPrefix : '') + localeData.monthNames[chineseDate.month - 1],
-        displayDay: localeData.dayNames[chineseDate.day - 1],
+        displayDay: localeData.dayNames[chineseDate.day - 1] ?? '',
         isLeapMonth: chineseDate.isLeapMonth,
         solarTermName: getSolarTermName(gregorianDate, localeData)
     };

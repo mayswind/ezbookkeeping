@@ -8,7 +8,7 @@ export function getFileExtension(filename: string): string {
     }
 
     const parts = filename.split('.');
-    return parts[parts.length - 1];
+    return parts[parts.length - 1] as string;
 }
 
 export function findExtensionByType(items: ImportFileTypeAndExtensions[] | undefined, type: string): string | undefined {
@@ -33,10 +33,8 @@ export function isFileExtensionSupported(filename: string, supportedExtensions: 
     const supportedExtensionsArray = supportedExtensions.split(',');
     const fileExtension = getFileExtension(filename).toLowerCase();
 
-    for (let i = 0; i < supportedExtensionsArray.length; i++) {
-        const supportedExtension = getFileExtension(supportedExtensionsArray[i]).toLowerCase();
-
-        if (supportedExtension === fileExtension) {
+    for (const supportedExtension of supportedExtensionsArray) {
+        if (getFileExtension(supportedExtension).toLowerCase() === fileExtension) {
             return true;
         }
     }

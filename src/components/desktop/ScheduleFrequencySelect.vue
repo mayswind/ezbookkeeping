@@ -138,9 +138,9 @@ function updateFrequencyValue(value: number, selected: boolean | null): void {
     const currentFrequencyValues = frequencyValue.value;
     const newFrequencyValues: number[] = [];
 
-    for (let i = 0; i < currentFrequencyValues.length; i++) {
-        if (currentFrequencyValues[i] !== value || selected) {
-            newFrequencyValues.push(currentFrequencyValues[i]);
+    for (const currentFrequencyValue of currentFrequencyValues) {
+        if (currentFrequencyValue !== value || selected) {
+            newFrequencyValues.push(currentFrequencyValue);
         }
     }
 

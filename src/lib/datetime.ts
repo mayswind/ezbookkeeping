@@ -4,6 +4,9 @@ import { type unitOfTime } from 'moment/moment';
 import jalaali, { type JalaaliDateObject } from 'jalaali-js';
 
 import {
+    itemAndIndex
+} from '@/core/base.ts';
+import {
     type ChineseCalendarLocaleData,
     CalendarType
 } from '@/core/calendar.ts';
@@ -426,8 +429,8 @@ export function getYear0BasedMonthObjectFromString(yearMonth: TextualYearMonth |
         return null;
     }
 
-    const year = parseInt(items[0]);
-    const month0base = parseInt(items[1]) - 1;
+    const year = parseInt(items[0] as string);
+    const month0base = parseInt(items[1] as string) - 1;
 
     if (!isYear0BasedMonthValid(year, month0base)) {
         return null;
@@ -581,9 +584,9 @@ export function getLocalDateFromYearDashMonthDashDay(date: TextualYearMonthDay):
         return null;
     }
 
-    const year = parseInt(items[0]);
-    const month = parseInt(items[1]);
-    const day = parseInt(items[2]);
+    const year = parseInt(items[0] as string);
+    const month = parseInt(items[1] as string);
+    const day = parseInt(items[2] as string);
 
     if (!isNumber(year) || !isNumber(month) || !isNumber(day)) {
         return null;
@@ -983,8 +986,8 @@ export function getAllDaysStartAndEndUnixTimes(startUnixTime: number, endUnixTim
 }
 
 export function getDateTimeFormatType<T extends DateFormat | TimeFormat>(allFormatMap: Record<string, T>, allFormatArray: T[], formatTypeValue: number, languageDefaultTypeName: string, systemDefaultFormatType: T): T {
-    if (formatTypeValue > LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE && allFormatArray[formatTypeValue - 1] && allFormatArray[formatTypeValue - 1].key) {
-        return allFormatArray[formatTypeValue - 1];
+    if (formatTypeValue > LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE && allFormatArray[formatTypeValue - 1] && allFormatArray[formatTypeValue - 1]!.key) {
+        return allFormatArray[formatTypeValue - 1] as T;
     } else if (formatTypeValue === LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE && allFormatMap[languageDefaultTypeName] && allFormatMap[languageDefaultTypeName].key) {
         return allFormatMap[languageDefaultTypeName];
     } else {
@@ -1079,9 +1082,7 @@ export function getDateTypeByDateRange(minTime: number, maxTime: number, firstDa
     const allDateRanges = DateRange.values();
     let newDateType = DateRange.Custom.type;
 
-    for (let i = 0; i < allDateRanges.length; i++) {
-        const dateRange = allDateRanges[i];
-
+    for (const dateRange of allDateRanges) {
         if (!dateRange.isAvailableForScene(scene)) {
             continue;
         }
@@ -1264,9 +1265,9 @@ export function getRecentMonthDateRanges(monthCount: number): RecentMonthDateRan
 }
 
 export function getRecentDateRangeIndexByDateType(allRecentMonthDateRanges: LocalizedRecentMonthDateRange[], dateType: number): number {
-    for (let i = 0; i < allRecentMonthDateRanges.length; i++) {
-        if (!allRecentMonthDateRanges[i].isPreset && allRecentMonthDateRanges[i].dateType === dateType) {
-            return i;
+    for (const [recentDateRange, index] of itemAndIndex(allRecentMonthDateRanges)) {
+        if (!recentDateRange.isPreset && recentDateRange.dateType === dateType) {
+            return index;
         }
     }
 
@@ -1292,11 +1293,9 @@ export function getRecentDateRangeIndex(allRecentMonthDateRanges: LocalizedRecen
         };
     }
 
-    for (let i = 0; i < allRecentMonthDateRanges.length; i++) {
-        const recentDateRange = allRecentMonthDateRanges[i];
-
+    for (const [recentDateRange, index] of itemAndIndex(allRecentMonthDateRanges)) {
         if (recentDateRange.isPreset && recentDateRange.minTime === dateRange.minTime && recentDateRange.maxTime === dateRange.maxTime) {
-            return i;
+            return index;
         }
     }
 
@@ -1356,7 +1355,7 @@ export function getValidMonthDayOrCurrentDayShortDate(unixTime: number, currentS
         const yearMonthDay = currentShortDate.split('-');
 
         if (yearMonthDay.length === 3) {
-            const currentDay = parseInt(yearMonthDay[2]);
+            const currentDay = parseInt(yearMonthDay[2] as string);
 
             if (currentDay < monthLastTime.date()) {
                 return MomentDateTime.of(monthLastTime.set({ date: currentDay })).getGregorianCalendarYearDashMonthDashDay();

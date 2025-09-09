@@ -74,9 +74,7 @@ export function setAppFontSize(type: number): void {
     const htmlElement = f7.$('html');
     const allFontSizes = FontSize.values();
 
-    for (let i = 0; i < allFontSizes.length; i++) {
-        const fontSizeType = allFontSizes[i];
-
+    for (const fontSizeType of allFontSizes) {
         if (fontSizeType.type === type) {
             if (!htmlElement.hasClass(fontSizeType.className)) {
                 htmlElement.addClass(fontSizeType.className);
@@ -90,9 +88,7 @@ export function setAppFontSize(type: number): void {
 export function getFontSizePreviewClassName(type: number): string {
     const allFontSizes = FontSize.values();
 
-    for (let i = 0; i < allFontSizes.length; i++) {
-        const fontSizeType = allFontSizes[i];
-
+    for (const fontSizeType of allFontSizes) {
         if (fontSizeType.type === type) {
             return FONT_SIZE_PREVIEW_CLASSNAME_PREFIX + fontSizeType.className;
         }
@@ -109,8 +105,7 @@ export function getElementActualHeights(selector: string): Record<string, number
         return heights;
     }
 
-    for (let i = 0; i < elements.length; i++) {
-        const el = elements[i];
+    for (const el of elements) {
         const rect = el.getBoundingClientRect();
         heights[el.id] = rect.height;
     }

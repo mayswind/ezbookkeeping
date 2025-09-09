@@ -75,7 +75,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
-import type { NameValue } from '@/core/base.ts';
+import { type NameValue, values } from '@/core/base.ts';
 import { CategoryType } from '@/core/category.ts';
 import { AUTOMATICALLY_CREATED_CATEGORY_ICON_ID } from '@/consts/icon.ts';
 import { DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
@@ -140,9 +140,7 @@ function buildBatchCreateCategoryResponse(createdCategories: Record<number, Tran
         displayNameSourceItemMap[item.name] = item.value;
     }
 
-    for (const categoryType in createdCategories) {
-        const categories = createdCategories[categoryType];
-
+    for (const categories of values(createdCategories)) {
         for (const category of categories) {
             if (!category.subCategories || category.subCategories.length < 1) {
                 continue;

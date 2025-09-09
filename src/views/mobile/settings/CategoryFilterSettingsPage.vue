@@ -52,22 +52,22 @@
                   :key="categoryType.type"
                   v-for="categoryType in allTransactionCategories"
                   v-else-if="!loading">
-            <f7-accordion-item :opened="collapseStates[categoryType.type].opened"
-                               @accordion:open="collapseStates[categoryType.type].opened = true"
-                               @accordion:close="collapseStates[categoryType.type].opened = false">
+            <f7-accordion-item :opened="collapseStates[categoryType.type]!.opened"
+                               @accordion:open="collapseStates[categoryType.type]!.opened = true"
+                               @accordion:close="collapseStates[categoryType.type]!.opened = false">
                 <f7-block-title>
                     <f7-accordion-toggle>
                         <f7-list strong inset dividers
                                  class="combination-list-header"
-                                 :class="collapseStates[categoryType.type].opened ? 'combination-list-opened' : 'combination-list-closed'">
+                                 :class="collapseStates[categoryType.type]!.opened ? 'combination-list-opened' : 'combination-list-closed'">
                             <f7-list-item group-title>
                                 <small>{{ getCategoryTypeName(categoryType.type) }}</small>
-                                <f7-icon class="combination-list-chevron-icon" :f7="collapseStates[categoryType.type].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
+                                <f7-icon class="combination-list-chevron-icon" :f7="collapseStates[categoryType.type]!.opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
                             </f7-list-item>
                         </f7-list>
                     </f7-accordion-toggle>
                 </f7-block-title>
-                <f7-accordion-content :style="{ height: collapseStates[categoryType.type].opened ? 'auto' : '' }">
+                <f7-accordion-content :style="{ height: collapseStates[categoryType.type]!.opened ? 'auto' : '' }">
                     <f7-list strong inset dividers accordion-list class="combination-list-content" v-if="!hasAvailableCategory[categoryType.type]">
                         <f7-list-item :title="tt('No available category')"></f7-list-item>
                     </f7-list>
@@ -242,7 +242,7 @@ function updateAllSubCategoriesSelected(e: Event): void {
     const categoryId = target.value;
     const category = transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
 
-    selectAllSubCategories(filterCategoryIds.value, category, !target.checked);
+    selectAllSubCategories(filterCategoryIds.value, !target.checked, category);
 }
 
 function selectAllCategories(): void {

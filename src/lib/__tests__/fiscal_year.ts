@@ -168,7 +168,7 @@ describe('getFiscalYearStartUnixTime', () => {
                 const expected = testCase.expected[testFiscalYearStart.id];
                 const unixTimeISO = formatUnixTimeISO(startUnixTime);
 
-                expect({ unixTime: startUnixTime, ISO: unixTimeISO }).toStrictEqual({ unixTime: expected.unixTime, ISO: expected.unixTimeISO });
+                expect({ unixTime: startUnixTime, ISO: unixTimeISO }).toStrictEqual({ unixTime: expected!.unixTime, ISO: expected!.unixTimeISO });
             });
         });
     });
@@ -198,7 +198,7 @@ describe('getFiscalYearEndUnixTime', () => {
                 const expected = testCase.expected[testFiscalYearStart.id];
                 const unixTimeISO = formatUnixTimeISO(endUnixTime);
 
-                expect({ unixTime: endUnixTime, ISO: unixTimeISO }).toStrictEqual({ unixTime: expected.unixTime, ISO: expected.unixTimeISO });
+                expect({ unixTime: endUnixTime, ISO: unixTimeISO }).toStrictEqual({ unixTime: expected!.unixTime, ISO: expected!.unixTimeISO });
 
             });
         });

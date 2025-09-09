@@ -44,8 +44,7 @@ export function usePieChartBase(props: CommonPieChartProps) {
     const validItems = computed<CommonPieChartDataItem[]>(() => {
         let totalValidValue = 0;
 
-        for (let i = 0; i < props.items.length; i++) {
-            const item = props.items[i];
+        for (const item of props.items) {
             const value = item[props.valueField];
 
             if (isNumber(value) && value > 0 && (!props.hiddenField || !item[props.hiddenField])) {
@@ -55,8 +54,7 @@ export function usePieChartBase(props: CommonPieChartProps) {
 
         const validItems: CommonPieChartDataItem[] = [];
 
-        for (let i = 0; i < props.items.length; i++) {
-            const item = props.items[i];
+        for (const item of props.items) {
             const value = item[props.valueField];
             const percent = props.percentField ? item[props.percentField] : -1;
 

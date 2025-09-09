@@ -52,7 +52,7 @@ import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-import type { NameNumeralValue } from '@/core/base.ts';
+import { type NameNumeralValue, keys } from '@/core/base.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
 import type { ComponentDensity } from '@/lib/ui/desktop.ts';
 
@@ -94,11 +94,7 @@ const currentPage = computed<number>({
         if (value && value >= 1 && value <= props.totalPageCount) {
             emit('update:modelValue', value);
 
-            for (const key in showMenus.value) {
-                if (!Object.prototype.hasOwnProperty.call(showMenus.value, key)) {
-                    continue;
-                }
-
+            for (const key of keys(showMenus.value)) {
                 showMenus.value[key] = false;
             }
         }

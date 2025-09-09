@@ -87,7 +87,7 @@
                               :after="account.type === AccountType.SingleAccount.type ? accountBalance(account) : ''"
                               :link="!sortable ? '/transaction/list?accountIds=' + account.id : null"
                               :key="account.id"
-                              v-for="account in allCategorizedAccountsMap[accountCategory.type].accounts"
+                              v-for="account in allCategorizedAccountsMap[accountCategory.type]!.accounts"
                               v-show="showHidden || !account.hidden"
                               @taphold="setSortable()"
                 >

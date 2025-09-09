@@ -60,12 +60,12 @@ describe('getChineseYearMonthAllDayInfos', () => {
         }
 
         const items = line.split('\t');
-        const gregorianDate = items[0];
+        const gregorianDate = items[0] as string;
         const gregorianDateItems = gregorianDate.split('/');
-        const gregorianYear = parseInt(gregorianDateItems[0], 10);
-        const gregorianMonth = parseInt(gregorianDateItems[1], 10);
-        const chineseDay = items[1];
-        const solarTermName = items.length > 3 ? items[3] : '';
+        const gregorianYear = parseInt(gregorianDateItems[0] as string, 10);
+        const gregorianMonth = parseInt(gregorianDateItems[1] as string, 10);
+        const chineseDay = items[1] as string;
+        const solarTermName = items.length > 3 ? items[3] as string : '';
 
         if (currentYear > 0 && currentMonth > 0 && (gregorianYear !== currentYear || gregorianMonth !== currentMonth)) {
             allMonthChineseDays[`${currentYear}-${currentMonth}`] = currentMonthChineseDays;
@@ -93,10 +93,10 @@ describe('getChineseYearMonthAllDayInfos', () => {
     for (const yearMonth in allMonthChineseDays) {
         test(`returns correct chinese all dates in month for ${yearMonth}`, () => {
             const [yearStr, monthStr] = yearMonth.split('-');
-            const year = parseInt(yearStr);
-            const month = parseInt(monthStr);
-            const expectedChineseMonthOrDays = allMonthChineseDays[yearMonth];
-            const expectedSolarTermNames = allMonthSolarTermNames[yearMonth];
+            const year = parseInt(yearStr as string);
+            const month = parseInt(monthStr as string);
+            const expectedChineseMonthOrDays = allMonthChineseDays[yearMonth] as string[];
+            const expectedSolarTermNames = allMonthSolarTermNames[yearMonth] as string[];
 
             const actualChineseDates: ChineseYearMonthDayInfo[] | undefined = getChineseYearMonthAllDayInfos({
                 year: year,
@@ -128,13 +128,13 @@ describe('getChineseYearMonthDayInfo', () => {
         }
 
         const items = line.split('\t');
-        const gregorianDate = items[0];
+        const gregorianDate = items[0] as string;
         const gregorianDateItems = gregorianDate.split('/');
-        const gregorianYear = parseInt(gregorianDateItems[0]);
-        const gregorianMonth = parseInt(gregorianDateItems[1]);
-        const gregorianDay = parseInt(gregorianDateItems[2]);
-        const expectedChineseMonthOrDay = items[1];
-        const expectedSolarTermName = items.length > 3 ? items[3] : '';
+        const gregorianYear = parseInt(gregorianDateItems[0] as string);
+        const gregorianMonth = parseInt(gregorianDateItems[1] as string);
+        const gregorianDay = parseInt(gregorianDateItems[2] as string);
+        const expectedChineseMonthOrDay = items[1] as string;
+        const expectedSolarTermName = items.length > 3 ? items[3] as string : '';
 
         test(`returns correct chinese date for ${gregorianDate}`, () => {
             const actualChineseDate: ChineseYearMonthDayInfo | undefined = getChineseYearMonthDayInfo({

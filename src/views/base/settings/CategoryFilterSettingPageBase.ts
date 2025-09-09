@@ -8,6 +8,7 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
+import { keys, keysIfValueEquals, values } from '@/core/base.ts';
 import { CategoryType } from '@/core/category.ts';
 import type { TransactionCategory, TransactionCategoriesWithVisibleCount } from '@/models/transaction_category.ts';
 
@@ -80,13 +81,7 @@ export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allo
     function loadFilterCategoryIds(): boolean {
         const allCategoryIds: Record<string, boolean> = {};
 
-        for (const categoryId in transactionCategoriesStore.allTransactionCategoriesMap) {
-            if (!Object.prototype.hasOwnProperty.call(transactionCategoriesStore.allTransactionCategoriesMap, categoryId)) {
-                continue;
-            }
-
-            const category = transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
-
+        for (const category of values(transactionCategoriesStore.allTransactionCategoriesMap)) {
             if (allowCategoryTypes && !allowCategoryTypes[category.type]) {
                 continue;
             }
@@ -108,17 +103,13 @@ export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allo
             filterCategoryIds.value = Object.assign(allCategoryIds, settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage);
             return true;
         } else if (type === 'transactionListCurrent') {
-            for (const categoryId in transactionsStore.allFilterCategoryIds) {
-                if (!Object.prototype.hasOwnProperty.call(transactionsStore.allFilterCategoryIds, categoryId)) {
-                    continue;
-                }
-
+            for (const categoryId of keysIfValueEquals(transactionsStore.allFilterCategoryIds, true)) {
                 const category = transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
 
                 if (category && (!category.subCategories || !category.subCategories.length)) {
                     allCategoryIds[category.id] = false;
                 } else if (category) {
-                    selectAllSubCategories(allCategoryIds, category, false);
+                    selectAllSubCategories(allCategoryIds, false, category);
                 }
             }
 
@@ -135,11 +126,7 @@ export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allo
         let finalCategoryIds = '';
         let changed = true;
 
-        for (const categoryId in filterCategoryIds.value) {
-            if (!Object.prototype.hasOwnProperty.call(filterCategoryIds.value, categoryId)) {
-                continue;
-            }
-
+        for (const categoryId of keys(filterCategoryIds.value)) {
             const category = transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
 
             if (!category) {

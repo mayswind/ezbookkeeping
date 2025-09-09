@@ -248,7 +248,7 @@ function updateCategorySelected(category: TransactionCategory, value: boolean | 
 }
 
 function updateAllSubCategoriesSelected(category: TransactionCategory, value: boolean | null): void {
-    selectAllSubCategories(filterCategoryIds.value, category, !value);
+    selectAllSubCategories(filterCategoryIds.value, !value, category);
 
     if (props.autoSave) {
         save();

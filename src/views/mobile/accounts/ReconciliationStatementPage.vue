@@ -166,7 +166,7 @@
                 <f7-list-item chevron-center
                               :key="item.index"
                               :id="item.transaction ? getTransactionDomId(item.transaction) : undefined"
-                              :class="{ 'transaction-info': item.type == 'transaction', 'last-transaction-of-day': allReconciliationStatementVirtualListItems[item.index + 1] && allReconciliationStatementVirtualListItems[item.index + 1].type === 'date', 'reconciliation-statement-transaction-date': item.type == 'date' }"
+                              :class="{ 'transaction-info': item.type == 'transaction', 'last-transaction-of-day': allReconciliationStatementVirtualListItems[item.index + 1] && allReconciliationStatementVirtualListItems[item.index + 1]!.type === 'date', 'reconciliation-statement-transaction-date': item.type == 'date' }"
                               :style="`top: ${virtualDataItems.topPosition}px`"
                               :virtual-list-index="item.index"
                               :swipeout="item.type === 'transaction' && !!item.transaction"
@@ -204,7 +204,7 @@
                                             {{ tt('Modify Balance') }}
                                         </span>
                                             <span v-else-if="item.transaction.type !== TransactionType.ModifyBalance && allCategoriesMap[item.transaction.categoryId]">
-                                            {{ allCategoriesMap[item.transaction.categoryId].name }}
+                                            {{ allCategoriesMap[item.transaction.categoryId]!.name }}
                                         </span>
                                         </div>
                                     </div>
@@ -466,8 +466,7 @@ const allReconciliationStatementVirtualListItems = computed<ReconciliationStatem
     let index = 0;
     let lastDisplayDate: string | null = null;
 
-    for (let i = 0; i < reconciliationStatements.value.transactions.length; i++) {
-        const transaction = reconciliationStatements.value.transactions[i];
+    for (const transaction of reconciliationStatements.value.transactions) {
         const displayDate = getDisplayDate(transaction);
 
         if (lastDisplayDate !== displayDate) {

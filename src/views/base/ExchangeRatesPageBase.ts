@@ -35,7 +35,7 @@ export function useExchangeRatesPageBase() {
         return getAllDisplayExchangeRates(exchangeRatesData.value);
     });
 
-    function getConvertedAmount(baseAmount: number | '', fromExchangeRate: LatestExchangeRate | LocalizedLatestExchangeRate, toExchangeRate: LatestExchangeRate | LocalizedLatestExchangeRate): number | '' | null {
+    function getConvertedAmount(baseAmount: number | '', fromExchangeRate?: LatestExchangeRate | LocalizedLatestExchangeRate, toExchangeRate?: LatestExchangeRate | LocalizedLatestExchangeRate): number | '' | null {
         if (!fromExchangeRate || !toExchangeRate) {
             return '';
         }

@@ -59,9 +59,7 @@ export function setExpenseAndIncomeAmountColor(expenseAmountColorType: number, i
 
     const allPresetAmountColors = PresetAmountColor.values();
 
-    for (let i = 0; i < allPresetAmountColors.length; i++) {
-        const amountColor = allPresetAmountColors[i];
-
+    for (const amountColor of allPresetAmountColors) {
         if (amountColor.type === expenseAmountColor.type) {
             if (!htmlElement.classList.contains(amountColor.expenseClassName)) {
                 htmlElement.classList.add(amountColor.expenseClassName);
@@ -97,8 +95,8 @@ export function openTextFileContent({ allowedExtensions }: { allowedExtensions: 
         fileInput.onchange = (event) => {
             const el = event.target as HTMLInputElement;
 
-            if (el.files && el.files.length > 0) {
-                const file = el.files[0];
+            if (el.files && el.files.length > 0 && el.files[0]) {
+                const file = el.files[0] as File;
                 const reader = new FileReader();
 
                 reader.onload = (e) => {
@@ -146,8 +144,7 @@ export function clearBrowserCaches(): Promise<void> {
         window.caches.keys().then(cacheNames => {
             const promises = [];
 
-            for (let i = 0; i < cacheNames.length; i++) {
-                const cacheName = cacheNames[i];
+            for (const cacheName of cacheNames) {
                 promises.push(window.caches.delete(cacheName).then(success => {
                     if (success) {
                         logger.info(`cache "${cacheName}" cleared successfully`);

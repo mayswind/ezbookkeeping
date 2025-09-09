@@ -1,15 +1,15 @@
 <template>
     <div class="pin-codes-input" :style="`grid-template-columns: repeat(${length}, minmax(0, 1fr))`">
         <div class="pin-code-input pin-code-input-outline"
-             :class="{ 'pin-code-input-focued': codes[index].focused }" :key="index"
+             :class="{ 'pin-code-input-focued': codes[index]!.focused }" :key="index"
              v-for="(_, index) in codes">
             <input ref="pin-code-input" min="0" maxlength="1" pattern="[0-9]*"
-                   :value="codes[index].value"
-                   :type="codes[index].inputType"
+                   :value="codes[index]!.value"
+                   :type="codes[index]!.inputType"
                    :disabled="disabled ? true : undefined"
                    :autofocus="autofocus && index === 0 ? true : undefined"
-                   @focus="codes[index].focused = true"
-                   @blur="codes[index].focused = false"
+                   @focus="codes[index]!.focused = true"
+                   @blur="codes[index]!.focused = false"
                    @keydown="onKeydown(index, $event)"
                    @paste="onPaste(index, $event)"
                    @change="onInput(index, $event)"
@@ -57,9 +57,9 @@ const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType(
 const finalPinCode = computed<string>(() => {
     let ret = '';
 
-    for (let i = 0; i < codes.value.length; i++) {
-        if (codes.value[i].value) {
-            ret += codes.value[i].value;
+    for (const code of codes.value) {
+        if (code.value) {
+            ret += code.value;
         } else {
             break;
         }
@@ -80,7 +80,7 @@ function init(length: number, value: string): void {
         };
 
         if (value && value[i]) {
-            code.value = value[i];
+            code.value = value.charAt(i);
 
             if (props.secure) {
                 code.inputType = 'password';
@@ -95,12 +95,14 @@ function autoFillText(index: number, text: string): void {
     let lastIndex = index;
 
     for (let i = index, j = 0; i < codes.value.length && j < text.length; i++, j++) {
-        if (text[j] < '0' || text[j] > '9') {
-            codes.value[i].value = '';
+        const ch = text.charAt(j);
+
+        if (ch < '0' || ch > '9') {
+            codes.value[i]!.value = '';
             break;
         }
 
-        codes.value[i].value = text[j];
+        codes.value[i]!.value = ch;
         setInputType(i);
         lastIndex = i;
     }
@@ -117,23 +119,29 @@ function setInputType(index: number): void {
         return;
     }
 
-    if (!codes.value[index].value) {
-        codes.value[index].inputType = 'tel';
+    const code = codes.value[index];
+
+    if (!code) {
         return;
     }
 
-    if (codes.value[index].inputTimer) {
+    if (!code.value) {
+        code.inputType = 'tel';
         return;
     }
 
-    codes.value[index].inputTimer = setTimeout(() => {
-        if (codes.value[index].value) {
-            codes.value[index].inputType = 'password';
+    if (code.inputTimer) {
+        return;
+    }
+
+    code.inputTimer = setTimeout(() => {
+        if (code.value) {
+            code.inputType = 'password';
         } else {
-            codes.value[index].inputType = 'tel';
+            code.inputType = 'tel';
         }
 
-        codes.value[index].inputTimer = null;
+        code.inputTimer = null;
     }, 300);
 }
 
@@ -205,7 +213,7 @@ function onKeydown(index: number, event: KeyboardEvent): void {
 
     if (event.key === 'Backspace' || event.key === 'Delete' || event.key === 'Del') {
         for (let i = index; i < codes.value.length; i++) {
-            codes.value[i].value = '';
+            codes.value[i]!.value = '';
             setInputType(i);
         }
 
@@ -227,7 +235,7 @@ function onKeydown(index: number, event: KeyboardEvent): void {
         }
 
         if (digit) {
-            codes.value[index].value = digit;
+            codes.value[index]!.value = digit;
             setInputType(index);
             setNextFocus(index);
 

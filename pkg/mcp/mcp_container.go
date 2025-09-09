@@ -122,7 +122,7 @@ func handleTool[T MCPTextContent | MCPImageContent | MCPAudioContent | MCPResour
 		IsError: false,
 	}
 
-	if ctx.GetHeader(MCPProtocolVersionHeaderName) > string(ToolResultStructuredContentMinVersion) {
+	if ctx.GetHeader(MCPProtocolVersionHeaderName) >= string(ToolResultStructuredContentMinVersion) {
 		callToolResp.StructuredContent = structuredResponse
 	}
 

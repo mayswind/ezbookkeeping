@@ -666,9 +666,9 @@ const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(true
 const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies());
 
 const currentLanguageName = computed<string>(() => {
-    for (let i = 0; i < allLanguages.value.length; i++) {
-        if (allLanguages.value[i].languageTag === newProfile.value.language) {
-            return allLanguages.value[i].nativeDisplayName;
+    for (const lang of allLanguages.value) {
+        if (lang.languageTag === newProfile.value.language) {
+            return lang.nativeDisplayName;
         }
     }
 

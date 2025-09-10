@@ -150,7 +150,7 @@ export function useReconciliationStatementPageBase() {
         let currency = defaultCurrency.value;
 
         if (allAccountsMap.value[transaction.sourceAccountId]) {
-            currency = allAccountsMap.value[transaction.sourceAccountId].currency;
+            currency = allAccountsMap.value[transaction.sourceAccountId]!.currency;
         }
 
         return formatAmountToLocalizedNumeralsWithCurrency(transaction.sourceAmount, currency);
@@ -160,7 +160,7 @@ export function useReconciliationStatementPageBase() {
         let currency = defaultCurrency.value;
 
         if (allAccountsMap.value[transaction.destinationAccountId]) {
-            currency = allAccountsMap.value[transaction.destinationAccountId].currency;
+            currency = allAccountsMap.value[transaction.destinationAccountId]!.currency;
         }
 
         return formatAmountToLocalizedNumeralsWithCurrency(transaction.destinationAmount, currency);
@@ -172,12 +172,12 @@ export function useReconciliationStatementPageBase() {
 
         if (transaction.type === TransactionType.Transfer && transaction.destinationAccountId === accountId.value) {
             if (allAccountsMap.value[transaction.destinationAccountId]) {
-                currency = allAccountsMap.value[transaction.destinationAccountId].currency;
-                isLiabilityAccount = allAccountsMap.value[transaction.destinationAccountId].isLiability;
+                currency = allAccountsMap.value[transaction.destinationAccountId]!.currency;
+                isLiabilityAccount = allAccountsMap.value[transaction.destinationAccountId]!.isLiability;
             }
         } else if (allAccountsMap.value[transaction.sourceAccountId]) {
-            currency = allAccountsMap.value[transaction.sourceAccountId].currency;
-            isLiabilityAccount = allAccountsMap.value[transaction.sourceAccountId].isLiability;
+            currency = allAccountsMap.value[transaction.sourceAccountId]!.currency;
+            isLiabilityAccount = allAccountsMap.value[transaction.sourceAccountId]!.isLiability;
         }
 
         if (isLiabilityAccount) {

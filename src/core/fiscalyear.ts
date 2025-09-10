@@ -69,8 +69,8 @@ export class FiscalYearStart {
             return undefined;
         }
 
-        const month = parseInt(parts[0], 10);
-        const day = parseInt(parts[1], 10);
+        const month = parseInt(parts[0] as string, 10);
+        const day = parseInt(parts[1] as string, 10);
 
         return FiscalYearStart.of(month, day);
     }
@@ -87,7 +87,7 @@ export class FiscalYearStart {
     }
 
     private static isValidFiscalYearMonthDay(month: number, day: number): boolean {
-        return 1 <= month && month <= 12 && 1 <= day && day <= FiscalYearStart.MONTH_MAX_DAYS[month - 1];
+        return 1 <= month && month <= 12 && 1 <= day && day <= (FiscalYearStart.MONTH_MAX_DAYS[month - 1] as number);
     }
 }
 

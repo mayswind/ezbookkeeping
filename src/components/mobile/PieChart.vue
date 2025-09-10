@@ -105,8 +105,8 @@ const circumference: number = diameter * Math.PI;
 const totalValidValue = computed<number>(() => {
     let totalValidValue = 0;
 
-    for (let i = 0; i < validItems.value.length; i++) {
-        totalValidValue += validItems.value[i].value;
+    for (const item of validItems.value) {
+        totalValidValue += item.value;
     }
 
     return totalValidValue;
@@ -120,7 +120,7 @@ const itemCommonDashOffset = computed<number>(() => {
     let offset = 0;
 
     for (let i = 0; i < Math.min(selectedIndex.value + 1, validItems.value.length); i++) {
-        const item = validItems.value[i];
+        const item = validItems.value[i] as CommonPieChartDataItem;
 
         if (item.actualPercent > 0) {
             if (i === selectedIndex.value) {
@@ -154,9 +154,7 @@ function getItemStrokeDash(item: CommonPieChartDataItem): string {
 function getItemDashOffset(item: CommonPieChartDataItem, items: CommonPieChartDataItem[], offset?: number): number {
     let allPreviousPercent = 0;
 
-    for (let i = 0; i < items.length; i++) {
-        const curItem = items[i];
-
+    for (const curItem of items) {
         if (curItem === item) {
             break;
         }
@@ -189,7 +187,7 @@ const selectedItem = computed<CommonPieChartDataItem | null>(() => {
         index = 0;
     }
 
-    return validItems.value[index];
+    return validItems.value[index] ?? null;
 });
 
 function switchSelectedIndex(index: number): void {

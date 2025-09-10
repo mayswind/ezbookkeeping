@@ -180,7 +180,7 @@ export function verifyWebAuthnCredential(userInfo: UserBasicInfo, credentialId: 
     }) as PublicKeyCredentialRequestOptions;
 
     if (publicKeyCredentialRequestOptions.allowCredentials && publicKeyCredentialRequestOptions.allowCredentials.length > 0) {
-        publicKeyCredentialRequestOptions.allowCredentials[0].id = stringToArrayBuffer(base64decode(credentialId));
+        publicKeyCredentialRequestOptions.allowCredentials[0]!.id = stringToArrayBuffer(base64decode(credentialId));
     }
 
     logger.debug('webauthn get options', publicKeyCredentialRequestOptions);
@@ -199,8 +199,8 @@ export function verifyWebAuthnCredential(userInfo: UserBasicInfo, credentialId: 
             userIdParts && userIdParts.length === 2 && userIdParts[0] === userInfo.username) {
             const ret: WebAuthnVerifyResponse = {
                 id: base64encode(rawCredential.rawId),
-                userName: userIdParts[0],
-                userSecret: userIdParts[1],
+                userName: userIdParts[0] as string,
+                userSecret: userIdParts[1] as string,
                 clientData: clientData,
                 rawCredential: rawCredential
             };

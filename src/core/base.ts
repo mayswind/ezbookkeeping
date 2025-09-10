@@ -3,6 +3,68 @@ export type PartialRecord<K extends keyof any, T> = {
     [P in K]?: T;
 }
 
+export function* itemAndIndex<T>(arr: T[]): Iterable<[T, number]> {
+    for (let i = 0; i < arr.length; i++) {
+        yield [arr[i], i] as [T, number];
+    }
+}
+
+export function* reversed<T>(arr: T[]): Iterable<T> {
+    for (let i = arr.length - 1; i >= 0; i--) {
+        yield arr[i] as T;
+    }
+}
+
+export function* reversedItemAndIndex<T>(arr: T[]): Iterable<[T, number]> {
+    for (let i = arr.length - 1; i >= 0; i--) {
+        yield [arr[i], i] as [T, number];
+    }
+}
+
+export function* entries<K extends string | number | symbol, V>(obj: Record<K, V>): Iterable<[K, V]> {
+    for (const key in obj) {
+        if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+            continue;
+        }
+
+        yield [key, obj[key]] as [K, V];
+    }
+}
+
+export function* keys<K extends string | number | symbol, V>(obj: Record<K, V>): Iterable<K> {
+    for (const key in obj) {
+        if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+            continue;
+        }
+
+        yield key as K;
+    }
+}
+
+export function* keysIfValueEquals<K extends string | number | symbol, V>(obj: Record<K, V>, value: V): Iterable<K> {
+    for (const key in obj) {
+        if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+            continue;
+        }
+
+        if (obj[key] !== value) {
+            continue;
+        }
+
+        yield key as K;
+    }
+}
+
+export function* values<K extends string | number | symbol, V>(obj: Record<K, V>): Iterable<V> {
+    for (const key in obj) {
+        if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+            continue;
+        }
+
+        yield obj[key] as V;
+    }
+}
+
 export interface NameValue {
     readonly name: string;
     readonly value: string;

@@ -18,7 +18,7 @@ export function sortStatisticsItems<T extends SortableTransactionStatisticDataIt
         items.sort(function (data1, data2) {
             for (let i = 0; i < Math.min(data1.displayOrders.length, data2.displayOrders.length); i++) {
                 if (data1.displayOrders[i] !== data2.displayOrders[i]) {
-                    return data1.displayOrders[i] - data2.displayOrders[i]; // asc
+                    return (data1.displayOrders[i] as number) - (data2.displayOrders[i] as number); // asc
                 }
             }
 
@@ -52,12 +52,8 @@ export function getAllDateRangesFromItems<T extends Year1BasedMonth>(items: Year
     if ((!startYearMonth || !endYearMonth) && items && items.length) {
         let minYear = Number.MAX_SAFE_INTEGER, minMonth = Number.MAX_SAFE_INTEGER, maxYear = 0, maxMonth = 0;
 
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-
-            for (let j = 0; j < item.items.length; j++) {
-                const dataItem = item.items[j];
-
+        for (const item of items) {
+            for (const dataItem of item.items) {
                 if (dataItem.year < minYear || (dataItem.year === minYear && dataItem.month1base < minMonth)) {
                     minYear = dataItem.year;
                     minMonth = dataItem.month1base;

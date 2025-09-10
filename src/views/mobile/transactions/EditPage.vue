@@ -721,9 +721,9 @@ const transactionDisplayScheduledFrequency = computed<string>(() => {
     const items = (template.scheduledFrequency || '').split(',');
     const scheduledFrequencyValues: number[] = [];
 
-    for (let i = 0; i < items.length; i++) {
-        if (items[i]) {
-            scheduledFrequencyValues.push(parseInt(items[i]));
+    for (const item of items) {
+        if (item) {
+            scheduledFrequencyValues.push(parseInt(item));
         }
     }
 
@@ -912,7 +912,7 @@ function init(): void {
             if (query['id'] && responses[4] instanceof Transaction) {
                 fromTransaction = responses[4];
             } else if (query['templateId'] && transactionTemplatesStore.allTransactionTemplatesMap && transactionTemplatesStore.allTransactionTemplatesMap[TemplateType.Normal.type]) {
-                fromTransaction = transactionTemplatesStore.allTransactionTemplatesMap[TemplateType.Normal.type][query['templateId']];
+                fromTransaction = (transactionTemplatesStore.allTransactionTemplatesMap[TemplateType.Normal.type] as Record<string, TransactionTemplate>)[query['templateId']] ?? null;
 
                 if (fromTransaction) {
                     addByTemplateId.value = fromTransaction.id;
@@ -1163,7 +1163,7 @@ function uploadPicture(event: Event): void {
         return;
     }
 
-    const pictureFile = el.files[0];
+    const pictureFile = el.files[0] as File;
 
     el.value = '';
 

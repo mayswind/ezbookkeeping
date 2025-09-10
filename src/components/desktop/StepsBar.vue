@@ -48,6 +48,7 @@ import { computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import { itemAndIndex } from '@/core/base.ts';
 import { NumeralSystem } from '@/core/numeral.ts';
 
 export interface StepBarItem {
@@ -87,9 +88,9 @@ function isStepActive(step: StepBarItem): boolean {
 }
 
 function isStepCompleted(stepIndex: number): boolean {
-    for (let i = 0; i < props.steps.length; i++) {
-        if (props.steps[i].name === props.currentStep) {
-            return stepIndex < i;
+    for (const [step, index] of itemAndIndex(props.steps)) {
+        if (step.name === props.currentStep) {
+            return stepIndex < index;
         }
     }
 

@@ -91,7 +91,7 @@ const alternateDates = computed<Record<TextualYearMonthDay, string> | undefined>
         return undefined;
     }
 
-    const allDates: CalendarAlternateDate[] | undefined = getCalendarAlternateDates({ year: parseInt(yearMonthDay[0]), month1base: parseInt(yearMonthDay[1]) })
+    const allDates: CalendarAlternateDate[] | undefined = getCalendarAlternateDates({ year: parseInt(yearMonthDay[0] as string), month1base: parseInt(yearMonthDay[1] as string) })
 
     if (!allDates) {
         return undefined;

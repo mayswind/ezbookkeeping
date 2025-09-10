@@ -35,7 +35,7 @@ function normalizeNumber(textualNumber: string): number {
 }
 
 function denormalizeNumberToAmount(num: number): number {
-    return Math.floor(num / normalizedNumberToAmountFactor);
+    return Math.trunc(num / normalizedNumberToAmountFactor);
 }
 
 function checkNumberRange(num: number): void {
@@ -180,14 +180,14 @@ function evaluatePostfixExpr(tokens: string[]): number | null {
                         result = a - b;
                         break;
                     case '*':
-                        result = Math.floor(a * b / normalizeFactor);
+                        result = Math.trunc(a * b / normalizeFactor);
                         break;
                     case '/':
                         if (b === 0) {
                             logger.warn(`cannot evaluate expression "${tokens.join(' ')}", because division by zero`);
                             return null;
                         }
-                        result = Math.floor(a * normalizeFactor / b);
+                        result = Math.trunc(a * normalizeFactor / b);
                         break;
                     default:
                         return null;

@@ -196,7 +196,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
             return amountName;
         }
 
-        amountInDefaultCurrency = Math.floor(amountInDefaultCurrency);
+        amountInDefaultCurrency = Math.trunc(amountInDefaultCurrency);
 
         const displayAmountInDefaultCurrency = getDisplayAmount(amountInDefaultCurrency, transaction.value.hideAmount, defaultCurrency.value);
         return amountName + ` (${displayAmountInDefaultCurrency})`;
@@ -396,9 +396,9 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
     });
 
     watch(() => transaction.value.timeZone, (newValue) => {
-        for (let i = 0; i < allTimezones.value.length; i++) {
-            if (allTimezones.value[i].name === newValue) {
-                transaction.value.utcOffset = allTimezones.value[i].utcOffsetMinutes;
+        for (const timezone of allTimezones.value) {
+            if (timezone.name === newValue) {
+                transaction.value.utcOffset = timezone.utcOffsetMinutes;
                 break;
             }
         }

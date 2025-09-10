@@ -51,22 +51,22 @@
                 </f7-list-item>
             </f7-list>
 
-            <f7-accordion-item :opened="collapseStates['default'].opened"
-                               @accordion:open="collapseStates['default'].opened = true"
-                               @accordion:close="collapseStates['default'].opened = false">
+            <f7-accordion-item :opened="collapseStates['default']!.opened"
+                               @accordion:open="collapseStates['default']!.opened = true"
+                               @accordion:close="collapseStates['default']!.opened = false">
                 <f7-block-title>
                     <f7-accordion-toggle>
                         <f7-list strong inset dividers
                                  class="combination-list-header"
-                                 :class="collapseStates['default'].opened ? 'combination-list-opened' : 'combination-list-closed'">
+                                 :class="collapseStates['default']!.opened ? 'combination-list-opened' : 'combination-list-closed'">
                             <f7-list-item group-title>
                                 <small>{{ tt('Tags') }}</small>
-                                <f7-icon class="combination-list-chevron-icon" :f7="collapseStates['default'].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
+                                <f7-icon class="combination-list-chevron-icon" :f7="collapseStates['default']!.opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
                             </f7-list-item>
                         </f7-list>
                     </f7-accordion-toggle>
                 </f7-block-title>
-                <f7-accordion-content :style="{ height: collapseStates['default'].opened ? 'auto' : '' }">
+                <f7-accordion-content :style="{ height: collapseStates['default']!.opened ? 'auto' : '' }">
                     <f7-list strong inset dividers accordion-list class="combination-list-content">
                         <f7-list-item checkbox
                                       :title="transactionTag.name"

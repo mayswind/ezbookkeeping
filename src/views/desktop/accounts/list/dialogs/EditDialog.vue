@@ -260,7 +260,7 @@ const selectedAccount = computed<Account>(() => {
         return account.value;
     }
 
-    return subAccounts.value[currentAccountIndex.value];
+    return subAccounts.value[currentAccountIndex.value] as Account;
 });
 
 const accountAmountTitle = computed<string>(() => {

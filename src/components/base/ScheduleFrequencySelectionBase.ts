@@ -44,9 +44,9 @@ export function useScheduleFrequencySelectionBase() {
         const values = value.split(',');
         const ret: number[] = [];
 
-        for (let i = 0; i < values.length; i++) {
-            if (values[i]) {
-                ret.push(parseInt(values[i]));
+        for (const value of values) {
+            if (value) {
+                ret.push(parseInt(value));
             }
         }
 

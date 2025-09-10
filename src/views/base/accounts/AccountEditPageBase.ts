@@ -52,8 +52,8 @@ export function useAccountEditPageBaseBase() {
         }
 
         if (account.value.type === AccountType.MultiSubAccounts.type) {
-            for (let i = 0; i < subAccounts.value.length; i++) {
-                problemMessage = getInputEmptyProblemMessage(subAccounts.value[i], true);
+            for (const subAccount of subAccounts.value) {
+                problemMessage = getInputEmptyProblemMessage(subAccount, true);
 
                 if (problemMessage) {
                     return problemMessage;
@@ -132,9 +132,9 @@ export function useAccountEditPageBaseBase() {
         subAccounts.value = [];
 
         if (newAccount.subAccounts && newAccount.subAccounts.length > 0) {
-            for (let i = 0; i < newAccount.subAccounts.length; i++) {
+            for (const oldSubAccount of newAccount.subAccounts) {
                 const subAccount: Account = account.value.createNewSubAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTime());
-                subAccount.fillFrom(newAccount.subAccounts[i]);
+                subAccount.fillFrom(oldSubAccount);
 
                 subAccounts.value.push(subAccount);
             }

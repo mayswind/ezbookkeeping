@@ -13,6 +13,7 @@ import type { CallbackDataParams } from 'echarts/types/dist/shared';
 import { useI18n } from '@/locales/helpers.ts';
 import { type CommonPieChartDataItem, type CommonPieChartProps, usePieChartBase } from '@/components/base/PieChartBase.ts'
 
+import { itemAndIndex } from '@/core/base.ts';
 import type { ColorStyleValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
 
@@ -41,8 +42,7 @@ const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType
 const itemsMap = computed<Record<string, Record<string, unknown>>>(() => {
     const map: Record<string, Record<string, unknown>> = {};
 
-    for (let i = 0; i < props.items.length; i++) {
-        const item = props.items[i];
+    for (const item of props.items) {
         let id = '';
 
         if (props.idField && item[props.idField]) {
@@ -60,8 +60,7 @@ const itemsMap = computed<Record<string, Record<string, unknown>>>(() => {
 const seriesData = computed<DesktopPieChartDataItem[]>(() => {
     const ret: DesktopPieChartDataItem[] = [];
 
-    for (let i = 0; i < validItems.value.length; i++) {
-        const item = validItems.value[i];
+    for (const item of validItems.value) {
         ret.push({
             ...item,
             itemStyle: {
@@ -75,9 +74,7 @@ const seriesData = computed<DesktopPieChartDataItem[]>(() => {
 });
 
 const hasUnselectedItem = computed<boolean>(() => {
-    for (let i = 0; i < validItems.value.length; i++) {
-        const item = validItems.value[i];
-
+    for (const item of validItems.value) {
         if (selectedLegends.value && !selectedLegends.value[item.id]) {
             return true;
         }
@@ -91,9 +88,7 @@ const firstItemAndHalfCurrentItemTotalPercent = computed<number>(() => {
     let firstValue = null;
     let firstToCurrentTotalValue = 0;
 
-    for (let i = 0; i < validItems.value.length; i++) {
-        const item = validItems.value[i];
-
+    for (const [item, index] of itemAndIndex(validItems.value)) {
         if (selectedLegends.value && !selectedLegends.value[item.id]) {
             continue;
         }
@@ -103,9 +98,9 @@ const firstItemAndHalfCurrentItemTotalPercent = computed<number>(() => {
         }
 
         if (firstValue !== null) {
-            if (i < selectedIndex.value) {
+            if (index < selectedIndex.value) {
                 firstToCurrentTotalValue += item.value;
-            } else if (i === selectedIndex.value) {
+            } else if (index === selectedIndex.value) {
                 firstToCurrentTotalValue += item.value / 2;
             }
         }
@@ -241,11 +236,9 @@ function onLegendSelectChanged(e: { selected: Record<string, boolean> }): void {
     if (!selectedItem || !selectedLegends.value[selectedItem.id]) {
         let newSelectedIndex = 0;
 
-        for (let i = 0; i < validItems.value.length; i++) {
-            const item = validItems.value[i];
-
+        for (const [item, index] of itemAndIndex(validItems.value)) {
             if (selectedLegends.value[item.id]) {
-                newSelectedIndex = i;
+                newSelectedIndex = index;
                 break;
             }
         }

@@ -53,6 +53,7 @@ import { useI18nUIComponents, showLoading, hideLoading, onSwipeoutDeleted } from
 
 import { useTokensStore } from '@/stores/token.ts';
 
+import { itemAndIndex, reversedItemAndIndex } from '@/core/base.ts';
 import { TextDirection } from '@/core/text.ts';
 import { type TokenInfoResponse, SessionInfo } from '@/models/token.ts';
 
@@ -94,8 +95,7 @@ const sessions = computed<MobilePageSessionInfo[]>(() => {
         return sessions;
     }
 
-    for (let i = 0; i < tokens.value.length; i++) {
-        const token = tokens.value[i];
+    for (const token of tokens.value) {
         const sessionInfo = parseSessionInfo(token);
         sessions.push(new MobilePageSessionInfo(sessionInfo));
     }
@@ -171,9 +171,9 @@ function revoke(session: SessionInfo): void {
             hideLoading();
 
             onSwipeoutDeleted(getTokenDomId(session.tokenId), () => {
-                for (let i = 0; i < tokens.value.length; i++) {
-                    if (tokens.value[i].tokenId === session.tokenId) {
-                        tokens.value.splice(i, 1);
+                for (const [ token, index ] of itemAndIndex(tokens.value)) {
+                    if (token.tokenId === session.tokenId) {
+                        tokens.value.splice(index, 1);
                     }
                 }
             });
@@ -198,9 +198,9 @@ function revokeAll(): void {
         tokensStore.revokeAllTokens().then(() => {
             hideLoading();
 
-            for (let i = tokens.value.length - 1; i >= 0; i--) {
-                if (!tokens.value[i].isCurrent) {
-                    tokens.value.splice(i, 1);
+            for (const [ token, index ] of reversedItemAndIndex(tokens.value)) {
+                if (!token.isCurrent) {
+                    tokens.value.splice(index, 1);
                 }
             }
 

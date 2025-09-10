@@ -1,3 +1,4 @@
+import { keys, keysIfValueEquals, values } from '@/core/base.ts';
 import type { NameValue, TypeAndName, TypeAndDisplayName} from '@/core/base.ts';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
@@ -48,7 +49,7 @@ export function isYearMonth(val: unknown): val is string {
         return false;
     }
 
-    return !!parseInt(items[0]) && !!parseInt(items[1]);
+    return !!parseInt(items[0] as string) && !!parseInt(items[1] as string);
 }
 
 export function isEquals(obj1: unknown, obj2: unknown): boolean {
@@ -82,13 +83,13 @@ export function isEquals(obj1: unknown, obj2: unknown): boolean {
         const keyExistsMap2 = new Map<string, boolean>();
 
         for (let i = 0; i < keys2.length; i++) {
-            const key = keys2[i];
+            const key = keys2[i] as string;
 
             keyExistsMap2.set(key, true);
         }
 
         for (let i = 0; i < keys1.length; i++) {
-            const key = keys1[i];
+            const key = keys1[i] as string;
 
             if (!keyExistsMap2.get(key)) {
                 return false;
@@ -117,7 +118,7 @@ export function isYearMonthEquals(val1: unknown, val2: unknown): boolean {
         return false;
     }
 
-    return (!!parseInt(items1[0]) && !!parseInt(items1[1])) && (parseInt(items1[0]) === parseInt(items2[0])) && (parseInt(items1[1]) === parseInt(items2[1]));
+    return (!!parseInt(items1[0] as string) && !!parseInt(items1[1] as string)) && (parseInt(items1[0] as string) === parseInt(items2[0] as string)) && (parseInt(items1[1] as string) === parseInt(items2[1] as string));
 }
 
 export function isArray1SubsetOfArray2<T>(array1: T[], array2: T[]): boolean {
@@ -128,11 +129,11 @@ export function isArray1SubsetOfArray2<T>(array1: T[], array2: T[]): boolean {
     const array2ValuesMap: Map<T, boolean> = new Map<T, boolean>();
 
     for (let i = 0; i < array2.length; i++) {
-        array2ValuesMap.set(array2[i], true);
+        array2ValuesMap.set(array2[i] as T, true);
     }
 
     for (let i = 0; i < array1.length; i++) {
-        if (!array2ValuesMap.get(array1[i])) {
+        if (!array2ValuesMap.get(array1[i] as T)) {
             return false;
         }
     }
@@ -145,11 +146,7 @@ export function isObjectEmpty(obj: object): boolean {
         return true;
     }
 
-    for (const field in obj) {
-        if (!Object.prototype.hasOwnProperty.call(obj, field)) {
-            continue;
-        }
-
+    for (const _ of keys(obj)) {
         return false;
     }
 
@@ -183,11 +180,8 @@ export function getObjectOwnFieldCount(object: object): number {
         return count;
     }
 
-    for (const field in object) {
-        if (!Object.prototype.hasOwnProperty.call(object, field)) {
-            continue;
-        }
-
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    for (const _ of keys(object)) {
         count++;
     }
 
@@ -251,26 +245,22 @@ export function getFirstVisibleItem<T>(items: Record<string, T>[] | Record<strin
     if (isArray(items) && items.length > 0) {
         const arr = items as Record<string, T>[];
 
-        for (let i = 0; i < arr.length; i++) {
-            if (hiddenField && arr[i][hiddenField]) {
+        for (const item of arr) {
+            if (hiddenField && item[hiddenField]) {
                 continue;
             }
 
-            return arr[i];
+            return item;
         }
     } else if (isObject(items)) {
         const obj = items as Record<string, Record<string, T>>;
 
-        for (const field in obj) {
-            if (!Object.prototype.hasOwnProperty.call(obj, field)) {
+        for (const item of values(obj)) {
+            if (hiddenField && item[hiddenField]) {
                 continue;
             }
 
-            if (hiddenField && obj[field][hiddenField]) {
-                continue;
-            }
-
-            return obj[field];
+            return item;
         }
     }
 
@@ -281,9 +271,7 @@ export function getItemByKeyValue<T>(src: Record<string, T>[] | Record<string, R
     if (isArray(src)) {
         const arr = src as Record<string, T>[];
 
-        for (let i = 0; i < arr.length; i++) {
-            const item = arr[i];
-
+        for (const item of arr) {
             if (item[keyField] === value) {
                 return item;
             }
@@ -291,13 +279,7 @@ export function getItemByKeyValue<T>(src: Record<string, T>[] | Record<string, R
     } else if (isObject(src)) {
         const obj = src as Record<string, Record<string, T>>;
 
-        for (const field in obj) {
-            if (!Object.prototype.hasOwnProperty.call(src, field)) {
-                continue;
-            }
-
-            const item = obj[field];
-
+        for (const item of values(obj)) {
             if (item[keyField] === value) {
                 return item;
             }
@@ -342,9 +324,7 @@ export function getNameByKeyValue<V, N>(src: Record<string, N | V>[] | Record<st
         const arr = src as Record<string, N | V>[];
 
         if (keyField) {
-            for (let i = 0; i < arr.length; i++) {
-                const option = arr[i];
-
+            for (const option of arr) {
                 if (option[keyField] === value) {
                     return option[nameField] as N;
                 }
@@ -362,13 +342,7 @@ export function getNameByKeyValue<V, N>(src: Record<string, N | V>[] | Record<st
         const obj = src as Record<string, Record<string, N | V>>;
 
         if (keyField) {
-            for (const key in obj) {
-                if (!Object.prototype.hasOwnProperty.call(src, key)) {
-                    continue;
-                }
-
-                const option = obj[key];
-
+            for (const option of values(obj)) {
                 if (option[keyField] === value) {
                     return option[nameField] as N;
                 }
@@ -392,8 +366,8 @@ export function arrayContainsFieldValue<T>(array: Record<string, T>[], fieldName
         return false;
     }
 
-    for (let i = 0; i < array.length; i++) {
-        if (array[i][fieldName] === value) {
+    for (const item of array) {
+        if (item[fieldName] === value) {
             return true;
         }
     }
@@ -404,11 +378,7 @@ export function arrayContainsFieldValue<T>(array: Record<string, T>[], fieldName
 export function objectFieldToArrayItem(object: object): string[] {
     const ret: string[] = [];
 
-    for (const field in object) {
-        if (!Object.prototype.hasOwnProperty.call(object, field)) {
-            continue;
-        }
-
+    for (const field of keys(object)) {
         ret.push(field);
     }
 
@@ -418,14 +388,8 @@ export function objectFieldToArrayItem(object: object): string[] {
 export function objectFieldWithValueToArrayItem<T>(object: Record<string, T>, value: T): string[] {
     const ret: string[] = [];
 
-    for (const field in object) {
-        if (!Object.prototype.hasOwnProperty.call(object, field)) {
-            continue;
-        }
-
-        if (object[field] === value) {
-            ret.push(field);
-        }
+    for (const field of keysIfValueEquals(object, value)) {
+        ret.push(field);
     }
 
     return ret;
@@ -434,8 +398,8 @@ export function objectFieldWithValueToArrayItem<T>(object: Record<string, T>, va
 export function arrayItemToObjectField<T>(array: string[], value: T): Record<string, T> {
     const ret: Record<string, T> = {};
 
-    for (let i = 0; i < array.length; i++) {
-        ret[array[i]] = value;
+    for (const item of array) {
+        ret[item] = value;
     }
 
     return ret;
@@ -450,9 +414,9 @@ export function splitItemsToMap(str: string | undefined | null, separator: strin
 
     const items = str.split(separator);
 
-    for (let i = 0; i < items.length; i++) {
-        if (items[i]) {
-            ret[items[i]] = true;
+    for (const item of items) {
+        if (item) {
+            ret[item] = true;
         }
     }
 
@@ -479,15 +443,9 @@ export function countSplitItems(str: string | undefined | null, separator: strin
 export function categorizedArrayToPlainArray<T>(object: Record<string, T[]>): T[] {
     const ret: T[] = [];
 
-    for (const field in object) {
-        if (!Object.prototype.hasOwnProperty.call(object, field)) {
-            continue;
-        }
-
-        const array = object[field];
-
-        for (let i = 0; i < array.length; i++) {
-            ret.push(array[i]);
+    for (const array of values(object)) {
+        for (const item of array) {
+            ret.push(item);
         }
     }
 
@@ -495,11 +453,7 @@ export function categorizedArrayToPlainArray<T>(object: Record<string, T[]>): T[
 }
 
 export function selectAll(filterItemIds: Record<string, boolean>, allItemsMap: { [key: string]: { id: string } }): void {
-    for (const itemId in filterItemIds) {
-        if (!Object.prototype.hasOwnProperty.call(filterItemIds, itemId)) {
-            continue;
-        }
-
+    for (const itemId of keys(filterItemIds)) {
         const item = allItemsMap[itemId];
 
         if (item) {
@@ -509,11 +463,7 @@ export function selectAll(filterItemIds: Record<string, boolean>, allItemsMap: {
 }
 
 export function selectNone(filterItemIds: Record<string, boolean>, allItemsMap: { [key: string]: { id: string } }): void {
-    for (const itemId in filterItemIds) {
-        if (!Object.prototype.hasOwnProperty.call(filterItemIds, itemId)) {
-            continue;
-        }
-
+    for (const itemId of keys(filterItemIds)) {
         const item = allItemsMap[itemId];
 
         if (item) {
@@ -523,11 +473,7 @@ export function selectNone(filterItemIds: Record<string, boolean>, allItemsMap: 
 }
 
 export function selectInvert(filterItemIds: Record<string, boolean>, allItemsMap: { [key: string]: { id: string } }): void {
-    for (const itemId in filterItemIds) {
-        if (!Object.prototype.hasOwnProperty.call(filterItemIds, itemId)) {
-            continue;
-        }
-
+    for (const itemId of keys(filterItemIds)) {
         const item = allItemsMap[itemId];
 
         if (item) {
@@ -610,11 +556,11 @@ export function arrangeArrayWithNewStartIndex<T>(array: T[], startIndex: number)
     const newArray: T[] = [];
 
     for (let i = startIndex; i < array.length; i++) {
-        newArray.push(array[i]);
+        newArray.push(array[i] as T);
     }
 
     for (let i = 0; i < startIndex; i++) {
-        newArray.push(array[i]);
+        newArray.push(array[i] as T);
     }
 
     return newArray;

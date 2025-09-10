@@ -260,7 +260,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                     continue;
                 }
 
-                amount = Math.floor(finalAmount);
+                amount = Math.trunc(finalAmount);
             }
 
             if (account.isLiability) {
@@ -481,7 +481,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 const amount = exchangeRatesStore.getExchangedAmount(item.amount, item.account.currency, defaultCurrency);
 
                 if (isNumber(amount)) {
-                    item.amountInDefaultCurrency = Math.floor(amount);
+                    item.amountInDefaultCurrency = Math.trunc(amount);
                 }
             } else if (item.account && item.account.currency === defaultCurrency) {
                 item.amountInDefaultCurrency = item.amount;

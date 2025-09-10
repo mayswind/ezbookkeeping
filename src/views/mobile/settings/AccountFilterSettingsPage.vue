@@ -47,22 +47,22 @@
                       :key="accountCategory.category"
                       v-for="accountCategory in allCategorizedAccounts"
                       v-show="showHidden || accountCategory.allVisibleAccountCount > 0">
-                <f7-accordion-item :opened="collapseStates[accountCategory.category].opened"
-                                   @accordion:open="collapseStates[accountCategory.category].opened = true"
-                                   @accordion:close="collapseStates[accountCategory.category].opened = false">
+                <f7-accordion-item :opened="collapseStates[accountCategory.category]!.opened"
+                                   @accordion:open="collapseStates[accountCategory.category]!.opened = true"
+                                   @accordion:close="collapseStates[accountCategory.category]!.opened = false">
                     <f7-block-title>
                         <f7-accordion-toggle>
                             <f7-list strong inset dividers
                                      class="combination-list-header"
-                                     :class="collapseStates[accountCategory.category].opened ? 'combination-list-opened' : 'combination-list-closed'">
+                                     :class="collapseStates[accountCategory.category]!.opened ? 'combination-list-opened' : 'combination-list-closed'">
                                 <f7-list-item group-title>
                                     <small>{{ tt(accountCategory.name) }}</small>
-                                    <f7-icon class="combination-list-chevron-icon" :f7="collapseStates[accountCategory.category].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
+                                    <f7-icon class="combination-list-chevron-icon" :f7="collapseStates[accountCategory.category]!.opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
                                 </f7-list-item>
                             </f7-list>
                         </f7-accordion-toggle>
                     </f7-block-title>
-                    <f7-accordion-content :style="{ height: collapseStates[accountCategory.category].opened ? 'auto' : '' }">
+                    <f7-accordion-content :style="{ height: collapseStates[accountCategory.category]!.opened ? 'auto' : '' }">
                         <f7-list strong inset dividers accordion-list class="combination-list-content">
                             <f7-list-item checkbox
                                           :class="{ 'has-child-list-item': account.type === AccountType.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id]) }"
@@ -189,9 +189,7 @@ function getCollapseStates(): Record<number, CollapseState> {
     const collapseStates: Record<number, CollapseState> = {};
     const allCategories = AccountCategory.values();
 
-    for (let i = 0; i < allCategories.length; i++) {
-        const accountCategory = allCategories[i];
-
+    for (const accountCategory of allCategories) {
         collapseStates[accountCategory.type] = {
             opened: true
         };

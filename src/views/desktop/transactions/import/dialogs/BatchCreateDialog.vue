@@ -41,7 +41,8 @@
                                          v-for="item in invalidItems">
                                 <template #prepend="{ isActive }">
                                     <v-list-item-action start>
-                                        <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                                        <v-checkbox-btn :model-value="isActive"
+                                                        @update:model-value="updateSelectedNames(item.name, $event)"></v-checkbox-btn>
                                     </v-list-item-action>
                                 </template>
                             </v-list-item>
@@ -74,7 +75,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
-import type { NameValue } from '@/core/base.ts';
+import { type NameValue, values } from '@/core/base.ts';
 import { CategoryType } from '@/core/category.ts';
 import { AUTOMATICALLY_CREATED_CATEGORY_ICON_ID } from '@/consts/icon.ts';
 import { DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
@@ -115,6 +116,22 @@ const selectedNames = ref<string[]>([]);
 let resolveFunc: ((response: BatchCreateDialogResponse) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
+function updateSelectedNames(value: string, selected: boolean | null): void {
+    const newSelectedNames: string[] = [];
+
+    for (const name of selectedNames.value) {
+        if (name !== value || selected) {
+            newSelectedNames.push(name);
+        }
+    }
+
+    if (selected) {
+        newSelectedNames.push(value);
+    }
+
+    selectedNames.value = newSelectedNames;
+}
+
 function buildBatchCreateCategoryResponse(createdCategories: Record<number, TransactionCategory[]>): BatchCreateDialogResponse {
     const displayNameSourceItemMap: Record<string, string> = {};
     const sourceTargetMap: Record<string, string> = {};
@@ -123,9 +140,7 @@ function buildBatchCreateCategoryResponse(createdCategories: Record<number, Tran
         displayNameSourceItemMap[item.name] = item.value;
     }
 
-    for (const categoryType in createdCategories) {
-        const categories = createdCategories[categoryType];
-
+    for (const categories of values(createdCategories)) {
         for (const category of categories) {
             if (!category.subCategories || category.subCategories.length < 1) {
                 continue;

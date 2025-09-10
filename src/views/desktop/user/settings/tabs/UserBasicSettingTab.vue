@@ -536,11 +536,11 @@ function updateAvatar(event: Event): void {
 
     const el = event.target as HTMLInputElement;
 
-    if (!el.files || !el.files.length) {
+    if (!el.files || !el.files.length || !el.files[0]) {
         return;
     }
 
-    const avatarFile = el.files[0];
+    const avatarFile = el.files[0] as File;
 
     el.value = '';
 

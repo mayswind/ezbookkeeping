@@ -119,13 +119,13 @@ function init(): void {
     if (isString(query['value'])) {
         try {
             const filterItems = query['value'].split(':');
-            const amountCount = getAmountFilterParameterCount(filterItems[0]);
+            const amountCount = getAmountFilterParameterCount(filterItems[0] as string);
 
             if (filterItems.length === 2 && amountCount === 1) {
-                queryAmount1 = parseInt(filterItems[1]);
+                queryAmount1 = parseInt(filterItems[1] as string);
             } else if (filterItems.length === 3 && amountCount === 2) {
-                queryAmount1 = parseInt(filterItems[1]);
-                queryAmount2 = parseInt(filterItems[2]);
+                queryAmount1 = parseInt(filterItems[1] as string);
+                queryAmount2 = parseInt(filterItems[2] as string);
             }
         } catch (ex) {
             logger.warn('cannot parse amount from filter value, original value is ' + query['value'], ex);

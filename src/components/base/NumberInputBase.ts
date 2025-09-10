@@ -40,11 +40,13 @@ export function useNumberInputBase(props: NumberInputProps, emit: NumberInputEmi
 
         let finalValue = '';
         for (let i = 0; i < value.length; i++) {
-            if (!NumeralSystem.WesternArabicNumerals.isDigit(value[i]) && !numeralSystem.value.isDigit(value[i]) && value[i] !== '-' && value[i] !== decimalSeparator) {
+            const ch = value.charAt(i);
+
+            if (!NumeralSystem.WesternArabicNumerals.isDigit(ch) && !numeralSystem.value.isDigit(ch) && ch !== '-' && ch !== decimalSeparator) {
                 break;
             }
 
-            finalValue += value[i];
+            finalValue += ch;
         }
 
         finalValue = numeralSystem.value.replaceLocalizedDigitsToWesternArabicDigits(finalValue);
@@ -104,14 +106,16 @@ export function useNumberInputBase(props: NumberInputProps, emit: NumberInputEmi
             const decimalSeparator = getCurrentDecimalSeparator();
 
             if (newValue[0] === '-' || newValue[0] === decimalSeparator) {
-                actualNumeralSystem = NumeralSystem.detect(newValue[1]);
+                actualNumeralSystem = NumeralSystem.detect(newValue.charAt(1));
             } else {
-                actualNumeralSystem = NumeralSystem.detect(newValue[0]);
+                actualNumeralSystem = NumeralSystem.detect(newValue.charAt(0));
             }
 
             if (actualNumeralSystem && (actualNumeralSystem.type === NumeralSystem.WesternArabicNumerals.type || actualNumeralSystem.type === numeralSystem.value.type)) {
                 for (let i = 0; i < newValue.length; i++) {
-                    if (!NumeralSystem.WesternArabicNumerals.isDigit(newValue[i]) && !numeralSystem.value.isDigit(newValue[i]) && newValue[i] !== '-' && newValue[i] !== decimalSeparator) {
+                    const ch = newValue.charAt(i);
+
+                    if (!NumeralSystem.WesternArabicNumerals.isDigit(ch) && !numeralSystem.value.isDigit(ch) && ch !== '-' && ch !== decimalSeparator) {
                         break;
                     }
 

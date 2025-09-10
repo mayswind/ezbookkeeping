@@ -181,7 +181,7 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
                 const minimumBalance = Math.min(...dataItems.map(item => item.accountClosingBalance));
                 const maximumBalance = Math.max(...dataItems.map(item => item.accountClosingBalance));
                 const medianBalance = dataItems[Math.floor(dataItems.length / 2)].accountClosingBalance;
-                const averageBalance = Math.floor(sumAmounts(dataItems.map(item => item.accountClosingBalance)) / dataItems.length);
+                const averageBalance = Math.trunc(sumAmounts(dataItems.map(item => item.accountClosingBalance)) / dataItems.length);
 
                 if (props.account.isAsset) {
                     lastOpeningBalance = openingBalance;

@@ -2187,9 +2187,9 @@ export function useI18n() {
                         }
 
                         if (accountsBalance[i].isAsset) {
-                            totalBalance += Math.floor(balance);
+                            totalBalance += Math.trunc(balance);
                         } else if (accountsBalance[i].isLiability) {
-                            totalBalance -= Math.floor(balance);
+                            totalBalance -= Math.trunc(balance);
                         }
                     }
                 }

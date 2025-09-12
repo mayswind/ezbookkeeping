@@ -12,6 +12,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/converters/fireflyIII"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/gnucash"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/iif"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/jdcom"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/mt"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/ofx"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/qif"
@@ -73,6 +74,8 @@ func GetTransactionDataImporter(fileType string) (converter.TransactionDataImpor
 		return wechat.WeChatPayTransactionDataXlsxFileImporter, nil
 	} else if fileType == "wechat_pay_app_csv" {
 		return wechat.WeChatPayTransactionDataCsvFileImporter, nil
+	} else if fileType == "jdcom_finance_app_csv" {
+		return jdcom.JDComFinanceTransactionDataCsvFileImporter, nil
 	} else {
 		return nil, errs.ErrImportFileTypeNotSupported
 	}

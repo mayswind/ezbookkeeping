@@ -2,8 +2,13 @@ import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import { NumeralSystem } from '@/core/numeral.ts';
 import type { MonthDay } from '@/core/datetime.ts';
 import { FiscalYearStart } from '@/core/fiscalyear.ts';
+
+import {
+    isDefined
+} from '@/lib/common.ts';
 
 import {
     getLocalDatetimeFromUnixTime,
@@ -16,6 +21,7 @@ export interface CommonFiscalYearStartSelectionProps {
     disabled?: boolean;
     readonly?: boolean;
     label?: string;
+    numeralSystem?: number;
 }
 
 export interface CommonFiscalYearStartSelectionEmits {
@@ -37,7 +43,7 @@ function getFiscalYearStartFromProps(props: CommonFiscalYearStartSelectionProps)
 }
 
 export function useFiscalYearStartSelectionBase(props: CommonFiscalYearStartSelectionProps) {
-    const { formatGregorianTextualMonthDayToGregorianLikeLongMonthDay } = useI18n();
+    const { getCurrentNumeralSystemType, formatGregorianTextualMonthDayToGregorianLikeLongMonthDay } = useI18n();
 
     const disabledDates = (date: Date) => {
         // Disable February 29 (leap day)
@@ -45,6 +51,14 @@ export function useFiscalYearStartSelectionBase(props: CommonFiscalYearStartSele
     };
 
     const selectedFiscalYearStart = ref<number>(getFiscalYearStartFromProps(props));
+
+    const actualNumeralSystem = computed<NumeralSystem>(() => {
+        if (isDefined(props.numeralSystem)) {
+            return NumeralSystem.valueOf(props.numeralSystem) ?? NumeralSystem.Default;
+        } else {
+            return getCurrentNumeralSystemType();
+        }
+    });
 
     const selectedFiscalYearStartValue = computed<Date>({
         get: () => {
@@ -71,7 +85,7 @@ export function useFiscalYearStartSelectionBase(props: CommonFiscalYearStartSele
             fiscalYearStart = FiscalYearStart.Default;
         }
 
-        return formatGregorianTextualMonthDayToGregorianLikeLongMonthDay(fiscalYearStart.toMonthDashDayString());
+        return formatGregorianTextualMonthDayToGregorianLikeLongMonthDay(fiscalYearStart.toMonthDashDayString(), actualNumeralSystem.value);
     });
 
     const allowedMinDate = computed<Date>(() => getLocalDatetimeFromUnixTime(getThisYearFirstUnixTime()));

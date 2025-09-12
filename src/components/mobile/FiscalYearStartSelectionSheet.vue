@@ -14,6 +14,7 @@
             <div class="block block-outline no-margin no-padding">
                 <date-time-picker datetime-picker-class="justify-content-center"
                                   :is-dark-mode="isDarkMode"
+                                  :numeral-system="numeralSystem"
                                   :enable-time-picker="false"
                                   :disable-year-select="true"
                                   :no-swipe-and-scroll="true"

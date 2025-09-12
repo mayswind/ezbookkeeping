@@ -211,10 +211,11 @@
                 link="#" no-chevron
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="tt('Fiscal Year Start Date')"
-                :title="formatFiscalYearStartToGregorianLikeLongMonth(newProfile.fiscalYearStart)"
+                :title="formatFiscalYearStartToGregorianLikeLongMonth(newProfile.fiscalYearStart, NumeralSystem.valueOf(newProfile.numeralSystem) ?? NumeralSystem.Default)"
                 @click="showFiscalYearStartSheet = true"
             >
                 <fiscal-year-start-selection-sheet
+                    :numeral-system="newProfile.numeralSystem"
                     v-model:show="showFiscalYearStartSheet"
                     v-model="newProfile.fiscalYearStart">
                 </fiscal-year-start-selection-sheet>
@@ -569,6 +570,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 
 import { TextDirection } from '@/core/text.ts';
+import { NumeralSystem } from '@/core/numeral.ts';
 import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
 
 import type { UserProfileResponse } from '@/models/user.ts';

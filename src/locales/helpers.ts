@@ -1830,9 +1830,9 @@ export function useI18n() {
         return getLocalizedLongTimeFormat().indexOf('ss') >= 0;
     }
 
-    function formatGregorianTextualMonthDayToGregorianLikeLongMonthDay(monthDay: TextualMonthDay): string {
+    function formatGregorianTextualMonthDayToGregorianLikeLongMonthDay(monthDay: TextualMonthDay, numeralSystem?: NumeralSystem): string {
         const gregorianLikeCalendarType = getGregorianLikeCalendarType();
-        return formatGregorianCalendarMonthDashDay(monthDay, getLocalizedLongMonthDayFormat(), getDateTimeFormatOptions({ calendarType: gregorianLikeCalendarType }));
+        return formatGregorianCalendarMonthDashDay(monthDay, getLocalizedLongMonthDayFormat(), getDateTimeFormatOptions({ calendarType: gregorianLikeCalendarType, numeralSystem: numeralSystem }));
     }
 
     function formatUnixTimeToGregorianLikeYearQuarter(unixTime: number): string {
@@ -1874,14 +1874,14 @@ export function useI18n() {
         return formatTimeRangeToGregorianLikeFiscalYearFormat(fiscalYearFormat, timeRange);
     }
 
-    function formatFiscalYearStartToGregorianLikeLongMonth(fiscalYearStartValue: number) {
+    function formatFiscalYearStartToGregorianLikeLongMonth(fiscalYearStartValue: number, numeralSystem?: NumeralSystem): string {
         let fiscalYearStart = FiscalYearStart.valueOf(fiscalYearStartValue);
 
         if (!fiscalYearStart) {
             fiscalYearStart = FiscalYearStart.Default;
         }
 
-        return formatGregorianTextualMonthDayToGregorianLikeLongMonthDay(fiscalYearStart.toMonthDashDayString());
+        return formatGregorianTextualMonthDayToGregorianLikeLongMonthDay(fiscalYearStart.toMonthDashDayString(), numeralSystem);
     }
 
     function formatDateRange(dateType: number, startTime: number, endTime: number): string {
@@ -2422,9 +2422,9 @@ export function useI18n() {
         isLongTimeMinuteTwoDigits,
         isLongTimeSecondTwoDigits,
         // format date time (by calendar display type) functions
-        getCalendarDisplayShortYearFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortYearFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
-        getCalendarDisplayShortMonthFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, 'MMM', getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
-        getCalendarDisplayDayOfMonthFromUnixTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDayFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType }), utcOffset, currentUtcOffset),
+        getCalendarDisplayShortYearFromUnixTime: (unixTime: number, numeralSystem?: NumeralSystem, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortYearFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType, numeralSystem: numeralSystem }), utcOffset, currentUtcOffset),
+        getCalendarDisplayShortMonthFromUnixTime: (unixTime: number, numeralSystem?: NumeralSystem, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, 'MMM', getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType, numeralSystem: numeralSystem }), utcOffset, currentUtcOffset),
+        getCalendarDisplayDayOfMonthFromUnixTime: (unixTime: number, numeralSystem?: NumeralSystem, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDayFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType, numeralSystem: numeralSystem }), utcOffset, currentUtcOffset),
         // format date time (by date display type) functions
         formatUnixTimeToLongDateTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongDateFormat() + ' ' + getLocalizedLongTimeFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortDateTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDateFormat() + ' ' + getLocalizedShortTimeFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),

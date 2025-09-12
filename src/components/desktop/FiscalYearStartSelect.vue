@@ -13,6 +13,7 @@
 
         <template #no-data>
             <date-time-picker :is-dark-mode="isDarkMode"
+                              :numeral-system="numeralSystem"
                               :vertical="true"
                               :enable-time-picker="false"
                               :disable-year-select="true"

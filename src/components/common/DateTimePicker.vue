@@ -55,8 +55,9 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 import type { CalendarType } from '@/core/calendar.ts';
+import { NumeralSystem } from '@/core/numeral.ts';
 import type { PresetDateRange, WeekDayValue } from '@/core/datetime.ts';
-import { isArray, arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
+import { isDefined, isArray, arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
 import { getAllowedYearRange, getYearMonthDayDateTime } from '@/lib/datetime.ts';
 
 type VueDatePickerType = InstanceType<typeof VueDatePicker>;
@@ -66,6 +67,7 @@ const props = defineProps<{
     modelValue: SupportedModelValue;
     datetimePickerClass?: string;
     isDarkMode: boolean;
+    numeralSystem?: number;
     enableTimePicker: boolean;
     disableYearSelect?: boolean;
     vertical?: boolean;
@@ -86,6 +88,7 @@ const {
     tt,
     getAllMinWeekdayNames,
     getCurrentCalendarDisplayType,
+    getCurrentNumeralSystemType,
     isLongDateMonthAfterYear,
     isLongTime24HourFormat,
     getCalendarDisplayShortYearFromUnixTime,
@@ -105,6 +108,14 @@ const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDa
 const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
 const is24Hour = computed<boolean>(() => isLongTime24HourFormat());
 const alternateCalendarType = computed<CalendarType | undefined>(() => getCurrentCalendarDisplayType().secondaryCalendarType);
+
+const actualNumeralSystem = computed<NumeralSystem>(() => {
+    if (isDefined(props.numeralSystem)) {
+        return NumeralSystem.valueOf(props.numeralSystem) ?? NumeralSystem.Default;
+    } else {
+        return getCurrentNumeralSystemType();
+    }
+});
 
 const dateTime = computed<SupportedModelValue>({
     get: () => props.modelValue,
@@ -130,21 +141,21 @@ function switchView(viewType: MenuView): void {
 }
 
 function getDisplayYear(year: number): string {
-    return getCalendarDisplayShortYearFromUnixTime(getYearMonthDayDateTime(year, 1, 1).getUnixTime());
+    return getCalendarDisplayShortYearFromUnixTime(getYearMonthDayDateTime(year, 1, 1).getUnixTime(), actualNumeralSystem.value);
 }
 
 function getDisplayMonth(month: number): string {
     if (isArray(dateTime.value)) {
-        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value[0].getFullYear(), month + 1, 1).getUnixTime());
+        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value[0].getFullYear(), month + 1, 1).getUnixTime(), actualNumeralSystem.value);
     } else if (dateTime.value) {
-        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value.getFullYear(), month + 1, 1).getUnixTime());
+        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value.getFullYear(), month + 1, 1).getUnixTime(), actualNumeralSystem.value);
     } else {
-        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(new Date().getFullYear(), month + 1, 1).getUnixTime());
+        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(new Date().getFullYear(), month + 1, 1).getUnixTime(), actualNumeralSystem.value);
     }
 }
 
 function getDisplayDay(date: Date): string {
-    return getCalendarDisplayDayOfMonthFromUnixTime(getYearMonthDayDateTime(date.getFullYear(), date.getMonth() + 1, date.getDate()).getUnixTime());
+    return getCalendarDisplayDayOfMonthFromUnixTime(getYearMonthDayDateTime(date.getFullYear(), date.getMonth() + 1, date.getDate()).getUnixTime(), actualNumeralSystem.value);
 }
 
 defineExpose({

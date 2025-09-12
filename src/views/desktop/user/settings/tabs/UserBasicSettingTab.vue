@@ -149,6 +149,7 @@
                                     :disabled="loading || saving"
                                     :label="tt('Fiscal Year Start Date')"
                                     :placeholder="tt('Fiscal Year Start Date')"
+                                    :numeral-system="newProfile.numeralSystem"
                                     v-model="newProfile.fiscalYearStart"
                                 />
                             </v-col>

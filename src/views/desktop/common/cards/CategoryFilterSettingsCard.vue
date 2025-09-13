@@ -82,7 +82,7 @@
                     </v-expansion-panel-title>
                     <v-expansion-panel-text>
                         <v-list rounded density="comfortable" class="pa-0">
-                            <div class="py-3" v-if="!hasAvailableCategory[transactionType.type]">{{ tt('No available category') }}</div>
+                            <div class="ms-5 py-3" v-if="!hasAvailableCategory[transactionType.type]">{{ tt('No available category') }}</div>
 
                             <template :key="category.id"
                                       v-for="(category, idx) in transactionType.allCategories">

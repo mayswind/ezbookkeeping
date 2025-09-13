@@ -339,6 +339,10 @@ html[dir="rtl"] i.icon.icon-with-direction {
 .list .item-content .input.list-title-input {
     margin-top: calc(-1 * var(--f7-list-item-padding-vertical));
     margin-bottom: calc(-1 * var(--f7-list-item-padding-vertical));
+
+    > input.input-with-value {
+        font-size: var(--f7-list-item-title-font-size);
+    }
 }
 
 .list .item-content .list-item-valign-middle {

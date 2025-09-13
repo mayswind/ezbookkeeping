@@ -39,7 +39,7 @@ export function setTransactionModelByTransaction(transaction: Transaction, trans
     }
 
     if (!options.type && options.categoryId && options.categoryId !== '0' && allCategoriesMap[options.categoryId]) {
-        const category = allCategoriesMap[options.categoryId];
+        const category = allCategoriesMap[options.categoryId] as TransactionCategory;
         const type = categoryTypeToTransactionType(category.type);
 
         if (isNumber(type)) {
@@ -102,8 +102,8 @@ export function setTransactionModelByTransaction(transaction: Transaction, trans
 
     if (allVisibleAccounts.length) {
         if (options.accountId && options.accountId !== '0') {
-            for (let i = 0; i < allVisibleAccounts.length; i++) {
-                if (allVisibleAccounts[i].id === options.accountId) {
+            for (const account of allVisibleAccounts) {
+                if (account.id === options.accountId) {
                     transaction.sourceAccountId = options.accountId;
                     transaction.destinationAccountId = options.accountId;
                     break;
@@ -115,7 +115,7 @@ export function setTransactionModelByTransaction(transaction: Transaction, trans
             if (defaultAccountId && allAccountsMap[defaultAccountId] && !allAccountsMap[defaultAccountId].hidden) {
                 transaction.sourceAccountId = defaultAccountId;
             } else {
-                transaction.sourceAccountId = allVisibleAccounts[0].id;
+                transaction.sourceAccountId = allVisibleAccounts[0]!.id;
             }
         }
 
@@ -123,7 +123,7 @@ export function setTransactionModelByTransaction(transaction: Transaction, trans
             if (defaultAccountId && allAccountsMap[defaultAccountId] && !allAccountsMap[defaultAccountId].hidden) {
                 transaction.destinationAccountId = defaultAccountId;
             } else {
-                transaction.destinationAccountId = allVisibleAccounts[0].id;
+                transaction.destinationAccountId = allVisibleAccounts[0]!.id;
             }
         }
     }
@@ -132,8 +132,7 @@ export function setTransactionModelByTransaction(transaction: Transaction, trans
         const tagIds = options.tagIds.split(',');
         const finalTagIds = [];
 
-        for (let i = 0; i < tagIds.length; i++) {
-            const tagId = tagIds[i];
+        for (const tagId of tagIds) {
             const tag = allTagsMap[tagId];
 
             if (tag && !tag.hidden) {

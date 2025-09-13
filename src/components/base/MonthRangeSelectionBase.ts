@@ -57,8 +57,8 @@ export function useMonthRangeSelectionBase(props: CommonMonthRangeSelectionProps
         maxDate
     ]);
 
-    const beginDateTime = computed<string>(() => formatUnixTimeToGregorianLikeLongYearMonth(getYearMonthFirstUnixTime(dateRange.value[0])));
-    const endDateTime = computed<string>(() => formatUnixTimeToGregorianLikeLongYearMonth(getYearMonthLastUnixTime(dateRange.value[1])));
+    const beginDateTime = computed<string>(() => formatUnixTimeToGregorianLikeLongYearMonth(getYearMonthFirstUnixTime(dateRange.value[0] as Year0BasedMonth)));
+    const endDateTime = computed<string>(() => formatUnixTimeToGregorianLikeLongYearMonth(getYearMonthLastUnixTime(dateRange.value[1] as Year0BasedMonth)));
 
     function getFinalMonthRange(): { minYearMonth: TextualYearMonth | '', maxYearMonth: TextualYearMonth | '' } | null {
         if (!dateRange.value[0] || !dateRange.value[1]) {
@@ -69,8 +69,8 @@ export function useMonthRangeSelectionBase(props: CommonMonthRangeSelectionProps
             throw new Error('Date is too early');
         }
 
-        const minYearMonth = getYearMonthStringFromYear0BasedMonthObject(dateRange.value[0]);
-        const maxYearMonth = getYearMonthStringFromYear0BasedMonthObject(dateRange.value[1]);
+        const minYearMonth = getYearMonthStringFromYear0BasedMonthObject(dateRange.value[0] as Year0BasedMonth);
+        const maxYearMonth = getYearMonthStringFromYear0BasedMonthObject(dateRange.value[1] as Year0BasedMonth);
 
         return {
             minYearMonth,

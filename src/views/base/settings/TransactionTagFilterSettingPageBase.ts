@@ -6,7 +6,7 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 
-import type { TypeAndDisplayName } from '@/core/base.ts';
+import { type TypeAndDisplayName, keys, keysIfValueEquals, values } from '@/core/base.ts';
 import { TransactionTagFilterType } from '@/core/transaction.ts';
 import type { TransactionTag } from '@/models/transaction_tag.ts';
 
@@ -44,20 +44,14 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
     function loadFilterTagIds(): boolean {
         const allTransactionTagIds: Record<string, boolean> = {};
 
-        for (const transactionTagId in transactionTagsStore.allTransactionTagsMap) {
-            if (!Object.prototype.hasOwnProperty.call(transactionTagsStore.allTransactionTagsMap, transactionTagId)) {
-                continue;
-            }
-
-            const transactionTag = transactionTagsStore.allTransactionTagsMap[transactionTagId];
+        for (const transactionTag of values(transactionTagsStore.allTransactionTagsMap)) {
             allTransactionTagIds[transactionTag.id] = true;
         }
 
         if (type === 'statisticsCurrent') {
             const transactionTagIds = statisticsStore.transactionStatisticsFilter.tagIds ? statisticsStore.transactionStatisticsFilter.tagIds.split(',') : [];
 
-            for (let i = 0; i < transactionTagIds.length; i++) {
-                const transactionTagId = transactionTagIds[i];
+            for (const transactionTagId of transactionTagIds) {
                 const transactionTag = transactionTagsStore.allTransactionTagsMap[transactionTagId];
 
                 if (transactionTag) {
@@ -68,11 +62,7 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
             tagFilterType.value = statisticsStore.transactionStatisticsFilter.tagFilterType;
             return true;
         } else if (type === 'transactionListCurrent') {
-            for (const transactionTagId in transactionsStore.allFilterTagIds) {
-                if (!Object.prototype.hasOwnProperty.call(transactionsStore.allFilterTagIds, transactionTagId)) {
-                    continue;
-                }
-
+            for (const transactionTagId of keysIfValueEquals(transactionsStore.allFilterTagIds, true)) {
                 const transactionTag = transactionTagsStore.allTransactionTagsMap[transactionTagId];
 
                 if (transactionTag) {
@@ -91,11 +81,7 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
         let finalTagIds = '';
         let changed = true;
 
-        for (const transactionTagId in filterTagIds.value) {
-            if (!Object.prototype.hasOwnProperty.call(filterTagIds.value, transactionTagId)) {
-                continue;
-            }
-
+        for (const transactionTagId of keys(filterTagIds.value)) {
             const transactionTag = transactionTagsStore.allTransactionTagsMap[transactionTagId];
 
             if (!transactionTag) {

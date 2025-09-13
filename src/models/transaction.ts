@@ -1,4 +1,4 @@
-import type { PartialRecord } from '@/core/base.ts';
+import { type PartialRecord, itemAndIndex } from '@/core/base.ts';
 import type { Year1BasedMonth, TextualYearMonthDay, StartEndTime, WeekDay } from '@/core/datetime.ts';
 import { type Coordinate, getNormalizedCoordinate } from '@/core/coordinate.ts';
 import { TransactionType } from '@/core/transaction.ts';
@@ -185,9 +185,9 @@ export class Transaction implements TransactionInfoResponse {
             return;
         }
 
-        for (let i = 0; i < this._pictures.length; i++) {
-            if (this._pictures[i].pictureId === pictureInfo.pictureId) {
-                this._pictures.splice(i, 1);
+        for (const [picture, index] of itemAndIndex(this._pictures)) {
+            if (picture.pictureId === pictureInfo.pictureId) {
+                this._pictures.splice(index, 1);
             }
         }
     }

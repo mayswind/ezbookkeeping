@@ -13,8 +13,8 @@ import { isDefined, isString, isNumber, replaceAll, removeAll } from './common.t
 export function sumAmounts(amounts: number[]): number {
     let sum = 0;
 
-    for (let i = 0; i < amounts.length; i++) {
-        sum += amounts[i];
+    for (const amount of amounts) {
+        sum += amount;
     }
 
     return sum;
@@ -292,7 +292,7 @@ export function formatExchangeRateAmount(exchangeRateAmount: number, options: Nu
     }
 }
 
-export function getAdaptiveDisplayAmountRate(amount1: number, amount2: number, fromExchangeRate: { rate: string }, toExchangeRate: { rate: string }, options: NumberFormatOptions): string | null {
+export function getAdaptiveDisplayAmountRate(amount1: number, amount2: number, options: NumberFormatOptions, fromExchangeRate?: { rate: string }, toExchangeRate?: { rate: string }): string | null {
     const numeralSystem = options.numeralSystem || NumeralSystem.Default;
 
     if (!amount1 || !amount2 || amount1 === amount2) {

@@ -252,8 +252,8 @@ function getTimerPickerItemStyle(textualValue: string, textualCurrentValue: stri
         return '';
     }
 
-    const minValue = parseInt(values[0].value);
-    const maxValue = parseInt(values[values.length - 1].value);
+    const minValue = parseInt(values[0]!.value);
+    const maxValue = parseInt(values[values.length - 1]!.value);
     const value = parseInt(textualValue, 10);
     const currentValue = parseInt(textualCurrentValue, 10);
     let valueDiff = value - currentValue;
@@ -327,7 +327,7 @@ function scrollToSelectedItem(itemsClass: string, itemClass: string, value: stri
     }
 
     for (let i = 0; i < itemElements.length; i++) {
-        const itemElement = itemElements[i];
+        const itemElement = itemElements[i] as HTMLElement;
 
         if ('offsetHeight' in itemsElement && 'offsetTop' in itemElement && 'offsetHeight' in itemElement
             && (!itemElement.hasAttribute('data-items-index') || itemElement.getAttribute('data-items-index') === '1')

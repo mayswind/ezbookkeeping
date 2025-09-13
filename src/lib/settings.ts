@@ -1,3 +1,5 @@
+import { keys } from '@/core/base.ts';
+
 import type {
     ApplicationSettingKey,
     ApplicationSettingValue,
@@ -28,11 +30,7 @@ function getStoredApplicationSettings(): BaseApplicationSetting {
 export function getApplicationSettings(): ApplicationSettings {
     const storedApplicationSettings = getStoredApplicationSettings();
 
-    for (const key in storedApplicationSettings) {
-        if (!Object.prototype.hasOwnProperty.call(storedApplicationSettings, key)) {
-            continue;
-        }
-
+    for (const key of keys(storedApplicationSettings)) {
         if (typeof(DEFAULT_APPLICATION_SETTINGS[key]) === 'object') {
             storedApplicationSettings[key] = Object.assign({}, DEFAULT_APPLICATION_SETTINGS[key], storedApplicationSettings[key]);
         }

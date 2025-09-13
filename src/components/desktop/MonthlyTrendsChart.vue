@@ -14,6 +14,7 @@ import { type CommonMonthlyTrendsChartProps, type MonthlyTrendsBarChartClickEven
 
 import { useUserStore } from '@/stores/user.ts';
 
+import { itemAndIndex } from '@/core/base.ts';
 import { TextDirection } from '@/core/text.ts';
 import { type Year1BasedMonth, DateRangeScene } from '@/core/datetime.ts';
 import type { ColorStyleValue } from '@/core/color.ts';
@@ -100,8 +101,7 @@ const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType
 const itemsMap = computed<Record<string, Record<string, unknown>>>(() => {
     const map: Record<string, Record<string, unknown>> = {};
 
-    for (let i = 0; i < props.items.length; i++) {
-        const item = props.items[i];
+    for (const item of props.items) {
         let id: string = '';
 
         if (props.idField && item[props.idField]) {
@@ -135,9 +135,7 @@ const itemsMap = computed<Record<string, Record<string, unknown>>>(() => {
 const allDisplayDateRanges = computed<string[]>(() => {
     const allDisplayDateRanges: string[] = [];
 
-    for (let i = 0; i < allDateRanges.value.length; i++) {
-        const dateRange = allDateRanges.value[i];
-
+    for (const dateRange of allDateRanges.value) {
         if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
             allDisplayDateRanges.push(formatUnixTimeToGregorianLikeShortYear(dateRange.minUnixTime));
         } else if (props.dateAggregationType === ChartDateAggregationType.FiscalYear.type && 'year' in dateRange) {
@@ -155,9 +153,7 @@ const allDisplayDateRanges = computed<string[]>(() => {
 const allSeries = computed<MonthlyTrendsChartDataItem[]>(() => {
     const allSeries: MonthlyTrendsChartDataItem[] = [];
 
-    for (let i = 0; i < props.items.length; i++) {
-        const item = props.items[i];
-
+    for (const [item, index] of itemAndIndex(props.items)) {
         if (props.hiddenField && item[props.hiddenField]) {
             continue;
         }
@@ -165,8 +161,7 @@ const allSeries = computed<MonthlyTrendsChartDataItem[]>(() => {
         const allAmounts: number[] = [];
         const dateRangeAmountMap: Record<string, YearMonthDataItem[]> = {};
 
-        for (let j = 0; j < item.items.length; j++) {
-            const dataItem = item.items[j];
+        for (const dataItem of item.items) {
             let dateRangeKey = '';
 
             if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
@@ -189,8 +184,7 @@ const allSeries = computed<MonthlyTrendsChartDataItem[]>(() => {
             dateRangeAmountMap[dateRangeKey] = dataItems;
         }
 
-        for (let j = 0; j < allDateRanges.value.length; j++) {
-            const dateRange = allDateRanges.value[j];
+        for (const dateRange of allDateRanges.value) {
             let dateRangeKey = '';
 
             if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
@@ -207,9 +201,7 @@ const allSeries = computed<MonthlyTrendsChartDataItem[]>(() => {
             const dataItems = dateRangeAmountMap[dateRangeKey];
 
             if (isArray(dataItems)) {
-                for (let i = 0; i < dataItems.length; i++) {
-                    const dataItem = dataItems[i];
-
+                for (const dataItem of dataItems) {
                     if (isNumber(dataItem[props.valueField])) {
                         amount += dataItem[props.valueField] as number;
                     }
@@ -223,7 +215,7 @@ const allSeries = computed<MonthlyTrendsChartDataItem[]>(() => {
             id: (props.idField && item[props.idField]) ? item[props.idField] as string : getItemName(item[props.nameField] as string),
             name: (props.idField && item[props.idField]) ? item[props.idField] as string : getItemName(item[props.nameField] as string),
             itemStyle: {
-                color: getDisplayColor(props.colorField && item[props.colorField] ? item[props.colorField] as string : DEFAULT_CHART_COLORS[i % DEFAULT_CHART_COLORS.length]),
+                color: getDisplayColor(props.colorField && item[props.colorField] ? item[props.colorField] as string : DEFAULT_CHART_COLORS[index % DEFAULT_CHART_COLORS.length]),
             },
             selected: true,
             type: 'line',
@@ -253,10 +245,9 @@ const yAxisWidth = computed<number>(() => {
         return width;
     }
 
-    for (let i = 0; i < allSeries.value.length; i++) {
-        for (let j = 0; j < allSeries.value[i].data.length; j++) {
-            const value = allSeries.value[i].data[j];
 
+    for (const series of allSeries.value) {
+        for (const value of series.data) {
             if (value > maxValue) {
                 maxValue = value;
             }
@@ -311,12 +302,12 @@ const chartOptions = computed<object>(() => {
                 let totalAmount = 0;
                 const displayItems: MonthlyTrendsChartTooltipItem[] = [];
 
-                for (let i = 0; i < params.length; i++) {
-                    const id = params[i].seriesId as string;
+                for (const param of params) {
+                    const id = param.seriesId as string;
                     const name = itemsMap.value[id] && props.nameField && itemsMap.value[id][props.nameField] ? getItemName(itemsMap.value[id][props.nameField] as string) : id;
-                    const color = params[i].color;
+                    const color = param.color;
                     const displayOrders = itemsMap.value[id] && props.displayOrdersField && itemsMap.value[id][props.displayOrdersField] ? itemsMap.value[id][props.displayOrdersField] as number[] : [0];
-                    const amount = params[i].data as number;
+                    const amount = param.data as number;
 
                     displayItems.push({
                         name: name,
@@ -330,9 +321,7 @@ const chartOptions = computed<object>(() => {
 
                 sortStatisticsItems(displayItems, props.sortingType);
 
-                for (let i = 0; i < displayItems.length; i++) {
-                    const item = displayItems[i];
-
+                for (const item of displayItems) {
                     if (displayItems.length === 1 || item.totalAmount !== 0) {
                         const value = formatAmountToLocalizedNumeralsWithCurrency(item.totalAmount, props.defaultCurrency);
                         tooltip += '<div><span class="chart-pointer" style="background-color: ' + item.color + '"></span>';
@@ -349,7 +338,7 @@ const chartOptions = computed<object>(() => {
                         + '</div>' + tooltip;
                 }
 
-                if (params.length && params[0].name) {
+                if (params.length && params[0] && params[0].name) {
                     tooltip = `${params[0].name}<br/>` + tooltip;
                 }
 
@@ -410,9 +399,14 @@ function clickItem(e: ECElementEvent): void {
     }
 
     const id = e.seriesId as string;
-    const item = itemsMap.value[id];
+    const item = itemsMap.value[id] as Record<string, unknown>;
     const itemId = props.idField ? item[props.idField] as string : '';
     const dateRange = allDateRanges.value[e.dataIndex];
+
+    if (!dateRange) {
+        return;
+    }
+
     let minUnixTime = dateRange.minUnixTime;
     let maxUnixTime = dateRange.maxUnixTime;
 
@@ -450,16 +444,16 @@ function exportData(): { headers: string[], data: string[][] } {
 
     headers.push(tt('Date'));
 
-    for (let i = 0; i < allSeries.value.length; i++) {
-        const id = allSeries.value[i].id;
+    for (const series of allSeries.value) {
+        const id = series.id;
         const name = itemsMap.value[id] && props.nameField && itemsMap.value[id][props.nameField] ? getItemName(itemsMap.value[id][props.nameField] as string) : id;
         headers.push(name);
     }
 
-    for (let i = 0; i < allDisplayDateRanges.value.length; i++) {
+    for (const [displayDateRange, index] of itemAndIndex(allDisplayDateRanges.value)) {
         const row: string[] = [];
-        row.push(allDisplayDateRanges.value[i]);
-        row.push(...allSeries.value.map(item => formatAmountToWesternArabicNumeralsWithoutDigitGrouping(item.data[i])));
+        row.push(displayDateRange);
+        row.push(...allSeries.value.map(item => formatAmountToWesternArabicNumeralsWithoutDigitGrouping(item.data[index] ?? 0)));
         data.push(row);
     }
 

@@ -22,6 +22,11 @@ import {
 } from '@/locales/calendar/persian/index.ts';
 
 import {
+    entries,
+    keys
+} from '@/core/base.ts';
+
+import {
     TextDirection
 } from '@/core/text.ts';
 
@@ -257,12 +262,7 @@ export function getI18nOptions(): object {
         messages: (function () {
             const messages: Record<string, object> = {};
 
-            for (const languageKey in ALL_LANGUAGES) {
-                if (!Object.prototype.hasOwnProperty.call(ALL_LANGUAGES, languageKey)) {
-                    continue;
-                }
-
-                const languageInfo = ALL_LANGUAGES[languageKey];
+            for (const [languageKey, languageInfo] of entries(ALL_LANGUAGES)) {
                 messages[languageKey] = languageInfo.content;
             }
 
@@ -274,13 +274,7 @@ export function getI18nOptions(): object {
 export function getRtlLocales(): Record<string, boolean> {
     const rtlLocales: Record<string, boolean> = {};
 
-    for (const languageKey in ALL_LANGUAGES) {
-        if (!Object.prototype.hasOwnProperty.call(ALL_LANGUAGES, languageKey)) {
-            continue;
-        }
-
-        const languageInfo = ALL_LANGUAGES[languageKey];
-
+    for (const [languageKey, languageInfo] of entries(ALL_LANGUAGES)) {
         if (languageInfo.textDirection === 'rtl') {
             rtlLocales[languageKey] = true;
         }
@@ -346,7 +340,7 @@ export function useI18n() {
 
         // fallback to use marco language tag
         if (languageTagParts.length > 1) {
-            browserLanguage = languageTagParts[0];
+            browserLanguage = languageTagParts[0] as string;
 
             // try to match marco language tag with full language tag in i18n file
             if (ALL_LANGUAGES[browserLanguage]) {
@@ -373,24 +367,19 @@ export function useI18n() {
     }
 
     function getLanguageKeyFromLanguageAlias(alias: string): string | null {
-        for (const languageKey in ALL_LANGUAGES) {
-            if (!Object.prototype.hasOwnProperty.call(ALL_LANGUAGES, languageKey)) {
-                continue;
-            }
-
+        for (const [languageKey, languageInfo] of entries(ALL_LANGUAGES)) {
             if (languageKey.toLowerCase() === alias.toLowerCase()) {
                 return languageKey;
             }
 
-            const langInfo = ALL_LANGUAGES[languageKey];
-            const aliases = langInfo.aliases;
+            const aliases = languageInfo.aliases;
 
             if (!aliases || aliases.length < 1) {
                 continue;
             }
 
-            for (let i = 0; i < aliases.length; i++) {
-                if (aliases[i].toLowerCase() === alias.toLowerCase()) {
+            for (const aliasName of aliases) {
+                if (aliasName.toLowerCase() === alias.toLowerCase()) {
                     return languageKey;
                 }
             }
@@ -400,16 +389,12 @@ export function useI18n() {
     }
 
     function getLanguageKeyFromMarcoLanguageTag(languageTag: string): string | null {
-        for (const languageKey in ALL_LANGUAGES) {
-            if (!Object.prototype.hasOwnProperty.call(ALL_LANGUAGES, languageKey)) {
-                continue;
-            }
-
+        for (const languageKey of keys(ALL_LANGUAGES)) {
             if (languageKey.indexOf('-') < 0) {
                 continue;
             }
 
-            const marcoLanguageTag = languageKey.split('-')[0];
+            const marcoLanguageTag = languageKey.split('-')[0] as string;
 
             if (marcoLanguageTag.toLowerCase() === languageTag.toLowerCase()) {
                 return languageKey;
@@ -422,7 +407,7 @@ export function useI18n() {
     function getLocalizedError(error: ErrorResponse): LocalizedError {
         if (error.errorCode === KnownErrorCode.ApiNotFound && SPECIFIED_API_NOT_FOUND_ERRORS[error.path]) {
             return {
-                message: `${SPECIFIED_API_NOT_FOUND_ERRORS[error.path].message}`
+                message: `${SPECIFIED_API_NOT_FOUND_ERRORS[error.path]!.message}`
             };
         }
 
@@ -432,8 +417,7 @@ export function useI18n() {
             };
         }
 
-        for (let i = 0; i < PARAMETERIZED_ERRORS.length; i++) {
-            const errorInfo = PARAMETERIZED_ERRORS[i];
+        for (const errorInfo of PARAMETERIZED_ERRORS) {
             const matches = error.errorMessage.match(errorInfo.regex);
 
             if (matches && matches.length === errorInfo.parameters.length + 1) {
@@ -443,7 +427,7 @@ export function useI18n() {
                         return {
                             key: param.field,
                             localized: param.localized,
-                            value: matches[index + 1]
+                            value: matches[index + 1] as string
                         }
                     })
                 };
@@ -459,9 +443,7 @@ export function useI18n() {
         const localizedParameters: Record<string, string> = {};
 
         if (parameters) {
-            for (let i = 0; i < parameters.length; i++) {
-                const parameter = parameters[i];
-
+            for (const parameter of parameters) {
                 if (parameter.localized) {
                     localizedParameters[parameter.key] = t(`parameter.${parameter.value}`);
                 } else {
@@ -520,8 +502,7 @@ export function useI18n() {
 
         const allCurrencyDisplayTypes = CurrencyDisplayType.values();
 
-        for (let i = 0; i < allCurrencyDisplayTypes.length; i++) {
-            const type = allCurrencyDisplayTypes[i];
+        for (const type of allCurrencyDisplayTypes) {
             const sampleValue = getFormattedAmountWithCurrency(12345, defaultCurrency, type, numeralSystem, decimalSeparator);
             const displayName = `${t(type.name)} (${sampleValue})`
 
@@ -534,7 +515,7 @@ export function useI18n() {
         return ret;
     }
 
-    function getAllLocalizedCalendarTypes(allTypeAndNameArray: CalendarDisplayType[] | DateDisplayType[], localeDefaultType: CalendarDisplayType | DateDisplayType | undefined, systemDefaultType: CalendarDisplayType | DateDisplayType, languageDefaultValue: number): TypeAndDisplayName[] {
+    function getAllLocalizedCalendarTypes(allCalendarDisplayTypeArray: CalendarDisplayType[] | DateDisplayType[], localeDefaultType: CalendarDisplayType | DateDisplayType | undefined, systemDefaultType: CalendarDisplayType | DateDisplayType, languageDefaultValue: number): TypeAndDisplayName[] {
         let defaultType: TypeAndName | undefined = localeDefaultType;
 
         if (!defaultType) {
@@ -548,12 +529,10 @@ export function useI18n() {
             displayName: `${t('Language Default')} (${t('calendar.' + defaultType.name)})`
         });
 
-        for (let i = 0; i < allTypeAndNameArray.length; i++) {
-            const type = allTypeAndNameArray[i];
-
+        for (const calendarDisplayType of allCalendarDisplayTypeArray) {
             ret.push({
-                type: type.type,
-                displayName: t('calendar.' + type.name)
+                type: calendarDisplayType.type,
+                displayName: t('calendar.' + calendarDisplayType.name)
             });
         }
 
@@ -563,12 +542,10 @@ export function useI18n() {
     function getLocalizedDisplayNameAndType(typeAndNames: TypeAndName[]): TypeAndDisplayName[] {
         const ret: TypeAndDisplayName[] = [];
 
-        for (let i = 0; i < typeAndNames.length; i++) {
-            const nameAndType = typeAndNames[i];
-
+        for (const typeAndName of typeAndNames) {
             ret.push({
-                type: nameAndType.type,
-                displayName: t(nameAndType.name)
+                type: typeAndName.type,
+                displayName: t(typeAndName.name)
             });
         }
 
@@ -583,12 +560,10 @@ export function useI18n() {
             displayName: t('System Default') + (defaultType.name ? ` (${t(defaultType.name)})` : '')
         });
 
-        for (let i = 0; i < typeAndNames.length; i++) {
-            const nameAndType = typeAndNames[i];
-
+        for (const typeAndName of typeAndNames) {
             ret.push({
-                type: nameAndType.type,
-                displayName: t(nameAndType.name)
+                type: typeAndName.type,
+                displayName: t(typeAndName.name)
             });
         }
 
@@ -610,13 +585,11 @@ export function useI18n() {
             displayName: `${t('Language Default')} (${defaultSeparatorType.symbol})`
         });
 
-        for (let i = 0; i < allSeparatorArray.length; i++) {
-            const type = allSeparatorArray[i];
-
+        for (const separator of allSeparatorArray) {
             ret.push({
-                type: type.type,
-                symbol: type.symbol,
-                displayName: `${t('numeral.' + type.name)} (${type.symbol})`
+                type: separator.type,
+                symbol: separator.symbol,
+                displayName: `${t('numeral.' + separator.name)} (${separator.symbol})`
             });
         }
 
@@ -627,9 +600,7 @@ export function useI18n() {
         const ret: TypeAndDisplayName[] = [];
         const allTypes: ChartDateAggregationType[] = ChartDateAggregationType.values();
 
-        for (let i = 0; i < allTypes.length; i++) {
-            const type = allTypes[i];
-
+        for (const type of allTypes) {
             ret.push({
                 type: type.type,
                 displayName: t(fullName ? type.fullName : `granularity.${type.shortName}`)
@@ -643,8 +614,7 @@ export function useI18n() {
         const ret = [];
         const allMonths = Month.values();
 
-        for (let i = 0; i < allMonths.length; i++) {
-            const month = allMonths[i];
+        for (const month of allMonths) {
             ret.push(t(`datetime.${month.name}.${type}`));
         }
 
@@ -655,8 +625,7 @@ export function useI18n() {
         const ret = [];
         const allWeekDays = WeekDay.values();
 
-        for (let i = 0; i < allWeekDays.length; i++) {
-            const weekDay = allWeekDays[i];
+        for (const weekDay of allWeekDays) {
             ret.push(t(`datetime.${weekDay.name}.${type}`));
         }
 
@@ -952,17 +921,12 @@ export function useI18n() {
     function getAllLanguageOptions(includeSystemDefault: boolean): LanguageOption[] {
         const ret: LanguageOption[] = [];
 
-        for (const languageTag in ALL_LANGUAGES) {
-            if (!Object.prototype.hasOwnProperty.call(ALL_LANGUAGES, languageTag)) {
-                continue;
-            }
-
-            const languageInfo = ALL_LANGUAGES[languageTag];
+        for (const [languageKey, languageInfo] of entries(ALL_LANGUAGES)) {
             const displayName = languageInfo.displayName;
             const languageNameInCurrentLanguage = getLanguageDisplayName(languageInfo.name);
 
             ret.push({
-                languageTag: languageTag,
+                languageTag: languageKey,
                 displayName: languageNameInCurrentLanguage,
                 nativeDisplayName: displayName
             });
@@ -996,11 +960,7 @@ export function useI18n() {
     function getAllCurrencies(): LocalizedCurrencyInfo[] {
         const allCurrencies: LocalizedCurrencyInfo[] = [];
 
-        for (const currencyCode in ALL_CURRENCIES) {
-            if (!Object.prototype.hasOwnProperty.call(ALL_CURRENCIES, currencyCode)) {
-                continue;
-            }
-
+        for (const currencyCode of keys(ALL_CURRENCIES)) {
             const localizedCurrencyInfo: LocalizedCurrencyInfo = {
                 currencyCode: currencyCode,
                 displayName: getCurrencyName(currencyCode)
@@ -1020,9 +980,7 @@ export function useI18n() {
         const allMeridiemIndicators = MeridiemIndicator.values();
         const localizedMeridiemIndicatorNames = [];
 
-        for (let i = 0; i < allMeridiemIndicators.length; i++) {
-            const indicator = allMeridiemIndicators[i];
-
+        for (const indicator of allMeridiemIndicators) {
             localizedMeridiemIndicatorNames.push({
                 name: t(`datetime.${indicator.name}.content`),
                 value: indicator.name
@@ -1061,7 +1019,7 @@ export function useI18n() {
         }
 
         for (let i = firstDayOfWeek; i < allWeekDays.length; i++) {
-            const weekDay = allWeekDays[i];
+            const weekDay = allWeekDays[i] as WeekDay;
 
             ret.push({
                 type: weekDay.type,
@@ -1070,7 +1028,7 @@ export function useI18n() {
         }
 
         for (let i = 0; i < firstDayOfWeek; i++) {
-            const weekDay = allWeekDays[i];
+            const weekDay = allWeekDays[i] as WeekDay;
 
             ret.push({
                 type: weekDay.type,
@@ -1092,8 +1050,7 @@ export function useI18n() {
             displayName: `${t('Language Default')} (${formatCurrentTime(defaultFormat, dateTimeFormatOptions)})`
         });
 
-        for (let i = 0; i < allFormatArray.length; i++) {
-            const formatType = allFormatArray[i];
+        for (const formatType of allFormatArray) {
             const format = t(`format.${type}.${formatType.key}`);
 
             ret.push({
@@ -1110,9 +1067,7 @@ export function useI18n() {
         const ret: LocalizedDateRange[] = [];
         const allDateRanges = DateRange.values();
 
-        for (let i = 0; i < allDateRanges.length; i++) {
-            const dateRange = allDateRanges[i];
-
+        for (const dateRange of allDateRanges) {
             if (!dateRange.isAvailableForScene(scene)) {
                 continue;
             }
@@ -1158,9 +1113,7 @@ export function useI18n() {
             });
         }
 
-        for (let i = 0; i < recentDateRanges.length; i++) {
-            const recentDateRange = recentDateRanges[i];
-
+        for (const recentDateRange of recentDateRanges) {
             allRecentMonthDateRanges.push({
                 dateType: recentDateRange.dateType,
                 minTime: recentDateRange.minTime,
@@ -1190,14 +1143,14 @@ export function useI18n() {
         const defaultTimezoneOffsetMinutes = getBrowserTimezoneOffsetMinutes();
         const allTimezoneInfos: LocalizedTimezoneInfo[] = [];
 
-        for (let i = 0; i < ALL_TIMEZONES.length; i++) {
-            const utcOffset = (ALL_TIMEZONES[i].timezoneName !== UTC_TIMEZONE.timezoneName ? numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(getTimezoneOffset(ALL_TIMEZONES[i].timezoneName)) : '');
-            const displayName = t(`timezone.${ALL_TIMEZONES[i].displayName}`);
+        for (const timezoneInfo of ALL_TIMEZONES) {
+            const utcOffset = (timezoneInfo.timezoneName !== UTC_TIMEZONE.timezoneName ? numeralSystem.replaceWesternArabicDigitsToLocalizedDigits(getTimezoneOffset(timezoneInfo.timezoneName)) : '');
+            const displayName = t(`timezone.${timezoneInfo.displayName}`);
 
             allTimezoneInfos.push({
-                name: ALL_TIMEZONES[i].timezoneName,
+                name: timezoneInfo.timezoneName,
                 utcOffset: utcOffset,
-                utcOffsetMinutes: getTimezoneOffsetMinutes(ALL_TIMEZONES[i].timezoneName),
+                utcOffsetMinutes: getTimezoneOffsetMinutes(timezoneInfo.timezoneName),
                 displayName: displayName,
                 displayNameWithUtcOffset: `(UTC${utcOffset}) ${displayName}`
             });
@@ -1269,9 +1222,7 @@ export function useI18n() {
 
         const allFiscalYearFormats = FiscalYearFormat.values();
 
-        for (let i = 0; i < allFiscalYearFormats.length; i++) {
-            const fiscalYearFormat = allFiscalYearFormats[i];
-
+        for (const fiscalYearFormat of allFiscalYearFormats) {
             ret.push({
                 type: fiscalYearFormat.type,
                 displayName: formatTimeRangeToGregorianLikeFiscalYearFormat(fiscalYearFormat, currentFiscalYearRange, numeralSystem, calendarType),
@@ -1298,9 +1249,7 @@ export function useI18n() {
 
         const allNumeralSystemTypes = NumeralSystem.values();
 
-        for (let i = 0; i < allNumeralSystemTypes.length; i++) {
-            const type = allNumeralSystemTypes[i];
-
+        for (const type of allNumeralSystemTypes) {
             ret.push({
                 type: type.type,
                 displayName: `${t('numeral.' + type.name)} (${type.textualAllDigits})`
@@ -1329,8 +1278,7 @@ export function useI18n() {
         const allDigitGroupingTypes = DigitGroupingType.values();
         const numberCharacters = numeralSystem.replaceWesternArabicDigitsToLocalizedDigits('123456789').split('');
 
-        for (let i = 0; i < allDigitGroupingTypes.length; i++) {
-            const type = allDigitGroupingTypes[i];
+        for (const type of allDigitGroupingTypes) {
             const sampleValue = type.format(numberCharacters, digitGroupingSymbol);
 
             ret.push({
@@ -1364,9 +1312,7 @@ export function useI18n() {
 
         const allPresetAmountColors = PresetAmountColor.values();
 
-        for (let i = 0; i < allPresetAmountColors.length; i++) {
-            const amountColor = allPresetAmountColors[i];
-
+        for (const amountColor of allPresetAmountColors) {
             ret.push({
                 type: amountColor.type,
                 displayName: t('color.amount.' + amountColor.name)
@@ -1380,9 +1326,7 @@ export function useI18n() {
         const ret: LocalizedAccountCategory[] = [];
         const allCategories = AccountCategory.values();
 
-        for (let i = 0; i < allCategories.length; i++) {
-            const accountCategory = allCategories[i];
-
+        for (const accountCategory of allCategories) {
             ret.push({
                 type: accountCategory.type,
                 displayName: t(accountCategory.name),
@@ -1403,9 +1347,8 @@ export function useI18n() {
             categoryTypes.push(categoryType);
         }
 
-        for (let i = 0; i < categoryTypes.length; i++) {
+        for (const categoryType of categoryTypes) {
             const categories: LocalizedPresetCategory[] = [];
-            const categoryType = categoryTypes[i];
             let defaultCategories: PresetCategory[] = [];
 
             if (categoryType === CategoryType.Income) {
@@ -1416,9 +1359,7 @@ export function useI18n() {
                 defaultCategories = DEFAULT_TRANSFER_CATEGORIES;
             }
 
-            for (let j = 0; j < defaultCategories.length; j++) {
-                const category = defaultCategories[j];
-
+            for (const category of defaultCategories) {
                 const submitCategory: LocalizedPresetCategory = {
                     name: t('category.' + category.name, {}, { locale: locale }),
                     type: categoryType,
@@ -1427,8 +1368,7 @@ export function useI18n() {
                     subCategories: []
                 };
 
-                for (let k = 0; k < category.subCategories.length; k++) {
-                    const subCategory = category.subCategories[k];
+                for (const subCategory of category.subCategories) {
                     const submitSubCategory: LocalizedPresetSubCategory = {
                         name: t('category.' + subCategory.name, {}, { locale: locale }),
                         type: categoryType,
@@ -1455,9 +1395,7 @@ export function useI18n() {
             return availableExchangeRates;
         }
 
-        for (let i = 0; i < exchangeRatesData.exchangeRates.length; i++) {
-            const exchangeRate = exchangeRatesData.exchangeRates[i];
-
+        for (const exchangeRate of exchangeRatesData.exchangeRates) {
             availableExchangeRates.push({
                 currencyCode: exchangeRate.currency,
                 currencyDisplayName: getCurrencyName(exchangeRate.currency),
@@ -1494,16 +1432,13 @@ export function useI18n() {
     function getAllSupportedImportFileCagtegoryAndTypes(): LocalizedImportFileCategoryAndTypes[] {
         const allSupportedImportFileCategoryAndTypes: LocalizedImportFileCategoryAndTypes[] = [];
 
-        for (let i = 0; i < SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES.length; i++) {
-            const categoryAndTypes = SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES[i];
-
+        for (const categoryAndTypes of SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES) {
             const localizedCategoryAndTypes: LocalizedImportFileCategoryAndTypes = {
                 displayCategoryName: t(categoryAndTypes.categoryName),
                 fileTypes: []
             };
 
-            for (let j = 0; j < categoryAndTypes.fileTypes.length; j++) {
-                const fileType = categoryAndTypes.fileTypes[j];
+            for (const fileType of categoryAndTypes.fileTypes) {
                 let document: LocalizedImportFileDocument | undefined;
 
                 if (fileType.document) {
@@ -1517,7 +1452,7 @@ export function useI18n() {
                         if (SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE[documentLanguage] === documentLanguage) {
                             documentAnchor = t(`document.anchor.export_and_import.${fileType.document.anchor}`);
                         } else if (SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE[documentLanguage]) {
-                            documentLanguage = SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE[documentLanguage];
+                            documentLanguage = SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE[documentLanguage] as string;
                             documentAnchor = t(`document.anchor.export_and_import.${fileType.document.anchor}`, {}, { locale: documentLanguage });
                         } else {
                             documentLanguage = DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE;
@@ -1528,8 +1463,8 @@ export function useI18n() {
                         documentAnchor = fileType.document.anchor;
                     }
 
-                    if (documentLanguage && documentLanguage !== getCurrentLanguageTag()) {
-                        documentDisplayLanguageName = getLanguageDisplayName(ALL_LANGUAGES[documentLanguage].name);
+                    if (documentLanguage && documentLanguage !== getCurrentLanguageTag() && ALL_LANGUAGES[documentLanguage]) {
+                        documentDisplayLanguageName = getLanguageDisplayName((ALL_LANGUAGES[documentLanguage] as LanguageInfo).name);
                     }
 
                     if (documentLanguage) {
@@ -1556,8 +1491,7 @@ export function useI18n() {
                 const subTypes: LocalizedImportFileTypeSubType[] = [];
 
                 if (fileType.subTypes) {
-                    for (let k = 0; k < fileType.subTypes.length; k++) {
-                        const subType = fileType.subTypes[k];
+                    for (const subType of fileType.subTypes) {
                         const localizedSubType: LocalizedImportFileTypeSubType = {
                             type: subType.type,
                             displayName: t(subType.name),
@@ -1571,8 +1505,7 @@ export function useI18n() {
                 const supportedEncodings: LocalizedImportFileTypeSupportedEncodings[] = [];
 
                 if (fileType.supportedEncodings) {
-                    for (let k = 0; k < fileType.supportedEncodings.length; k++) {
-                        const encoding = fileType.supportedEncodings[k];
+                    for (const encoding of fileType.supportedEncodings) {
                         const localizedEncoding: LocalizedImportFileTypeSupportedEncodings = {
                             encoding: encoding,
                             displayName: t(`encoding.${encoding}`)
@@ -1638,7 +1571,7 @@ export function useI18n() {
 
         if (monthDays.length === 1) {
             return t('format.misc.monthDay', {
-                ordinal: getMonthdayOrdinal(monthDays[0])
+                ordinal: getMonthdayOrdinal(monthDays[0] as number)
             });
         } else {
             return t('format.misc.monthDays', {
@@ -1657,16 +1590,14 @@ export function useI18n() {
             firstDayOfWeek = WeekDay.DefaultFirstDay.type;
         }
 
-        for (let i = 0; i < weekdayTypes.length; i++) {
-            weekdayTypesMap[weekdayTypes[i]] = true;
+        for (const weekdayType of weekdayTypes) {
+            weekdayTypesMap[weekdayType] = true;
         }
 
         const allWeekDays = getAllWeekDays(firstDayOfWeek);
         const finalWeekdayNames = [];
 
-        for (let i = 0; i < allWeekDays.length; i++) {
-            const weekDay = allWeekDays[i];
-
+        for (const weekDay of allWeekDays) {
             if (weekdayTypesMap[weekDay.type]) {
                 finalWeekdayNames.push(weekDay.displayName);
             }
@@ -1894,9 +1825,7 @@ export function useI18n() {
         const dateTimeFormatOptions = getDateTimeFormatOptions();
         const gregorianLikeDateTimeFormatOptions = getDateTimeFormatOptions({ calendarType: gregorianLikeCalendarType });
 
-        for (let i = 0; i < allDateRanges.length; i++) {
-            const dateRange = allDateRanges[i];
-
+        for (const dateRange of allDateRanges) {
             if (dateRange && dateRange.type !== DateRange.Custom.type && dateRange.type === dateType && dateRange.name) {
                 return t(dateRange.name);
             }
@@ -1984,8 +1913,7 @@ export function useI18n() {
 
             const ret: CalendarAlternateDate[] = [];
 
-            for (let i = 0; i < chineseDates.length; i++) {
-                const chineseDate = chineseDates[i];
+            for (const chineseDate of chineseDates) {
                 const alternateDate = getChineseCalendarAlternateDisplayDate(chineseDate);
                 ret.push(alternateDate);
             }
@@ -2117,11 +2045,9 @@ export function useI18n() {
         return formatExchangeRateAmount(value, numberFormatOptions);
     }
 
-    function getAdaptiveAmountRate(amount1: number, amount2: number, fromExchangeRate: {
-        rate: string
-    }, toExchangeRate: { rate: string }): string | null {
+    function getAdaptiveAmountRate(amount1: number, amount2: number, fromExchangeRate?: { rate: string }, toExchangeRate?: { rate: string }): string | null {
         const numberFormatOptions = getNumberFormatOptions({});
-        return getAdaptiveDisplayAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, numberFormatOptions);
+        return getAdaptiveDisplayAmountRate(amount1, amount2, numberFormatOptions, fromExchangeRate, toExchangeRate);
     }
 
     function getAmountPrependAndAppendText(currencyCode: string, isPlural: boolean): CurrencyPrependAndAppendText | null {
@@ -2137,19 +2063,17 @@ export function useI18n() {
         const allCategories = AccountCategory.values();
         const categorizedAccounts: Record<number, CategorizedAccount> = getCategorizedAccountsMap(Account.cloneAccounts(allVisibleAccounts));
 
-        for (let i = 0; i < allCategories.length; i++) {
-            const category = allCategories[i];
+        for (const category of allCategories) {
+            const accountCategory = categorizedAccounts[category.type];
 
-            if (!categorizedAccounts[category.type]) {
+            if (!accountCategory) {
                 continue;
             }
 
-            const accountCategory = categorizedAccounts[category.type];
             const accountsWithDisplayBalance: AccountWithDisplayBalance[] = [];
 
             if (accountCategory.accounts) {
-                for (let i = 0; i < accountCategory.accounts.length; i++) {
-                    const account = accountCategory.accounts[i];
+                for (const account of accountCategory.accounts) {
                     let accountWithDisplaceBalance: AccountWithDisplayBalance;
 
                     if (showAccountBalance && account.isAsset) {
@@ -2171,24 +2095,24 @@ export function useI18n() {
                 let totalBalance = 0;
                 let hasUnCalculatedAmount = false;
 
-                for (let i = 0; i < accountsBalance.length; i++) {
-                    if (accountsBalance[i].currency === defaultCurrency) {
-                        if (accountsBalance[i].isAsset) {
-                            totalBalance += accountsBalance[i].balance;
-                        } else if (accountsBalance[i].isLiability) {
-                            totalBalance -= accountsBalance[i].balance;
+                for (const accountBalance of accountsBalance) {
+                    if (accountBalance.currency === defaultCurrency) {
+                        if (accountBalance.isAsset) {
+                            totalBalance += accountBalance.balance;
+                        } else if (accountBalance.isLiability) {
+                            totalBalance -= accountBalance.balance;
                         }
                     } else {
-                        const balance = exchangeRatesStore.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, defaultCurrency);
+                        const balance = exchangeRatesStore.getExchangedAmount(accountBalance.balance, accountBalance.currency, defaultCurrency);
 
                         if (!isNumber(balance)) {
                             hasUnCalculatedAmount = true;
                             continue;
                         }
 
-                        if (accountsBalance[i].isAsset) {
+                        if (accountBalance.isAsset) {
                             totalBalance += Math.trunc(balance);
-                        } else if (accountsBalance[i].isLiability) {
+                        } else if (accountBalance.isLiability) {
                             totalBalance -= Math.trunc(balance);
                         }
                     }

@@ -140,11 +140,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
     const allFilterTagIdsCount = computed<number>(() => countSplitItems(transactionsFilter.value.tagIds, ','));
 
     const noTransaction = computed<boolean>(() => {
-        for (let i = 0; i < transactions.value.length; i++) {
-            const transactionMonthList = transactions.value[i];
-
-            for (let j = 0; j < transactionMonthList.items.length; j++) {
-                if (transactionMonthList.items[j]) {
+        for (const transactionMonthList of transactions.value) {
+            for (const transaction of transactionMonthList.items) {
+                if (transaction) {
                     return false;
                 }
             }

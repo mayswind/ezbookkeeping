@@ -2,6 +2,10 @@ import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 
 import {
+    values
+} from '@/core/base.ts';
+
+import {
     type ApplicationSettingValue,
     type ApplicationSettingSubValue,
     type ApplicationSettings,
@@ -39,13 +43,15 @@ export const useSettingsStore = defineStore('settings', () => {
 
     function updateApplicationSettingsValueAndAppSettingsFromCloudSetting(key: string, value: string | number | boolean | Record<string, boolean>): void {
         const keyItems = key.split('.');
+        const keyFirstPart = keyItems[0] as string;
 
         if (keyItems.length === 1) {
-            updateApplicationSettingsValue(keyItems[0], value);
-            appSettings.value[keyItems[0]] = value;
+            updateApplicationSettingsValue(keyFirstPart, value);
+            appSettings.value[keyFirstPart] = value;
         } else if (keyItems.length === 2) {
-            updateApplicationSettingsSubValue(keyItems[0], keyItems[1], value);
-            (appSettings.value[keyItems[0]] as Record<string, ApplicationSettingSubValue>)[keyItems[1]] = value;
+            const subKey = keyItems[1] as string;
+            updateApplicationSettingsSubValue(keyFirstPart, subKey, value);
+            (appSettings.value[keyFirstPart] as Record<string, ApplicationSettingSubValue>)[subKey] = value;
         } else {
             logger.warn(`cannot load application cloud setting "${key}", because it has invalid key format`);
         }
@@ -60,10 +66,12 @@ export const useSettingsStore = defineStore('settings', () => {
         }
 
         const keyItems = key.split('.');
-        let value: ApplicationSettingValue | ApplicationSettingSubValue = appSettings.value[key];
+        let value: ApplicationSettingValue | ApplicationSettingSubValue = appSettings.value[key] as (ApplicationSettingValue | ApplicationSettingSubValue);
 
         if (keyItems.length === 2) {
-            value = (appSettings.value[keyItems[0]] as Record<string, ApplicationSettingSubValue>)[keyItems[1]];
+            const primaryKey = keyItems[0] as string;
+            const subKey = keyItems[1] as string;
+            value = (appSettings.value[primaryKey] as Record<string, ApplicationSettingSubValue>)[subKey] as ApplicationSettingSubValue;
         } else if (keyItems.length > 2) {
             logger.warn(`cannot get application cloud setting "${key}", because it has invalid key format`);
             return null;
@@ -313,8 +321,7 @@ export const useSettingsStore = defineStore('settings', () => {
 
         const settings: ApplicationCloudSetting[] = [];
 
-        for (let i = 0; i < applicationSettingKeys.length; i++) {
-            const settingKey = applicationSettingKeys[i];
+        for (const settingKey of applicationSettingKeys) {
             const cloudSetting = createUserApplicationCloudSetting(settingKey);
 
             if (cloudSetting) {
@@ -333,9 +340,7 @@ export const useSettingsStore = defineStore('settings', () => {
 
         syncedAppSettings.value = arrayItemToObjectField(cloudSettings.map(item => item.settingKey), true);
 
-        for (let i = 0; i < cloudSettings.length; i++) {
-            const setting = cloudSettings[i];
-
+        for (const setting of cloudSettings) {
             if (!setting || !setting.settingKey) {
                 continue;
             }
@@ -371,13 +376,7 @@ export const useSettingsStore = defineStore('settings', () => {
                     let isValid = isObject(map);
 
                     if (isValid) {
-                        for (const key in map) {
-                            if (!Object.prototype.hasOwnProperty.call(map, key)) {
-                                continue;
-                            }
-
-                            const value = map[key];
-
+                        for (const value of values(map)) {
                             if (!isBoolean(value)) {
                                 isValid = false;
                                 break;

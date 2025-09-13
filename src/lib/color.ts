@@ -20,8 +20,8 @@ export function getColorsInRows(allColorValues: ColorValue[], itemPerRow: number
             ret[++rowCount] = [];
         }
 
-        ret[rowCount].push({
-            color: allColorValues[i]
+        ret[rowCount]!.push({
+            color: allColorValues[i] as ColorValue
         });
     }
 

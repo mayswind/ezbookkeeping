@@ -42,11 +42,13 @@ export function useItemIconBase(props: CommonIconProps) {
             iconId = iconId.toString();
         }
 
-        if (!ALL_ACCOUNT_ICONS[iconId]) {
+        const iconInfo = ALL_ACCOUNT_ICONS[iconId];
+
+        if (!iconInfo) {
             return DEFAULT_ACCOUNT_ICON.icon;
         }
 
-        return ALL_ACCOUNT_ICONS[iconId].icon;
+        return iconInfo.icon;
     }
 
     function getCategoryIcon(iconId: string | number): string {
@@ -54,11 +56,13 @@ export function useItemIconBase(props: CommonIconProps) {
             iconId = iconId.toString();
         }
 
-        if (!ALL_CATEGORY_ICONS[iconId]) {
+        const iconInfo = ALL_CATEGORY_ICONS[iconId];
+
+        if (!iconInfo) {
             return DEFAULT_CATEGORY_ICON.icon;
         }
 
-        return ALL_CATEGORY_ICONS[iconId].icon;
+        return iconInfo.icon;
     }
 
     function getAccountIconStyle(color?: ColorValue, defaultColor?: ColorStyleValue, additionalColorAttr?: string): Record<IconItemStyleName, IconItemStyleValue> {

@@ -2,6 +2,7 @@ import { ref, computed } from 'vue';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 
+import { keysIfValueEquals } from '@/core/base.ts';
 import type { ApplicationCloudSetting } from '@/core/setting.ts';
 
 export interface CategorizedApplicationCloudSettingItems {
@@ -101,14 +102,8 @@ export function useAppCloudSyncBase() {
     const isEnableCloudSync = computed<boolean>(() => settingsStore.enableApplicationCloudSync);
 
     const hasEnabledApplicationCloudSettings = computed<boolean>(() => {
-        for (const key in enabledApplicationCloudSettings.value) {
-            if (!Object.prototype.hasOwnProperty.call(enabledApplicationCloudSettings.value, key)) {
-                continue;
-            }
-
-            if (enabledApplicationCloudSettings.value[key]) {
-                return true;
-            }
+        for (const _ of keysIfValueEquals(enabledApplicationCloudSettings.value, true)) {
+            return true;
         }
 
         return false;
@@ -117,22 +112,15 @@ export function useAppCloudSyncBase() {
     const enabledApplicationCloudSettingKeys = computed<string[]>(() => {
         const keys: string[] = [];
 
-        for (const key in enabledApplicationCloudSettings.value) {
-            if (!Object.prototype.hasOwnProperty.call(enabledApplicationCloudSettings.value, key)) {
-                continue;
-            }
-
-            if (enabledApplicationCloudSettings.value[key]) {
-                keys.push(key);
-            }
+        for (const key of keysIfValueEquals(enabledApplicationCloudSettings.value, true)) {
+            keys.push(key);
         }
 
         return keys;
     });
 
     function isAllSettingsSelected(categorizedItems: CategorizedApplicationCloudSettingItems): boolean {
-        for (let i = 0; i < categorizedItems.items.length; i++) {
-            const item = categorizedItems.items[i];
+        for (const item of categorizedItems.items) {
             if (!enabledApplicationCloudSettings.value[item.settingKey]) {
                 return false;
             }
@@ -144,8 +132,7 @@ export function useAppCloudSyncBase() {
     function hasSettingSelectedButNotAllChecked(categorizedItems: CategorizedApplicationCloudSettingItems): boolean {
         let checkedCount = 0;
 
-        for (let i = 0; i < categorizedItems.items.length; i++) {
-            const item = categorizedItems.items[i];
+        for (const item of categorizedItems.items) {
             if (!enabledApplicationCloudSettings.value[item.settingKey]) {
                 checkedCount++;
             }
@@ -155,40 +142,30 @@ export function useAppCloudSyncBase() {
     }
 
     function updateSettingsSelected(categorizedItems: CategorizedApplicationCloudSettingItems, value: boolean): void {
-        for (let i = 0; i < categorizedItems.items.length; i++) {
-            const item = categorizedItems.items[i];
+        for (const item of categorizedItems.items) {
             enabledApplicationCloudSettings.value[item.settingKey] = value;
         }
     }
 
     function selectAllSettings(): void {
-        for (let i = 0; i < ALL_APPLICATION_CLOUD_SETTINGS.length; i++) {
-            const categorizedItems = ALL_APPLICATION_CLOUD_SETTINGS[i];
-
-            for (let j = 0; j < categorizedItems.items.length; j++) {
-                const item = categorizedItems.items[j];
+        for (const categorizedItems of ALL_APPLICATION_CLOUD_SETTINGS) {
+            for (const item of categorizedItems.items) {
                 enabledApplicationCloudSettings.value[item.settingKey] = true;
             }
         }
     }
 
     function selectNoneSettings(): void {
-        for (let i = 0; i < ALL_APPLICATION_CLOUD_SETTINGS.length; i++) {
-            const categorizedItems = ALL_APPLICATION_CLOUD_SETTINGS[i];
-
-            for (let j = 0; j < categorizedItems.items.length; j++) {
-                const item = categorizedItems.items[j];
+        for (const categorizedItems of ALL_APPLICATION_CLOUD_SETTINGS) {
+            for (const item of categorizedItems.items) {
                 enabledApplicationCloudSettings.value[item.settingKey] = false;
             }
         }
     }
 
     function selectInvertSettings(): void {
-        for (let i = 0; i < ALL_APPLICATION_CLOUD_SETTINGS.length; i++) {
-            const categorizedItems = ALL_APPLICATION_CLOUD_SETTINGS[i];
-
-            for (let j = 0; j < categorizedItems.items.length; j++) {
-                const item = categorizedItems.items[j];
+        for (const categorizedItems of ALL_APPLICATION_CLOUD_SETTINGS) {
+            for (const item of categorizedItems.items) {
                 enabledApplicationCloudSettings.value[item.settingKey] = !enabledApplicationCloudSettings.value[item.settingKey];
             }
         }

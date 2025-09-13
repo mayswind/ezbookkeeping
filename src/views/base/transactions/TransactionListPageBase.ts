@@ -9,7 +9,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { type TransactionListFilter, type TransactionMonthList, useTransactionsStore } from '@/stores/transaction.ts';
 
-import type { TypeAndName } from '@/core/base.ts';
+import { type TypeAndName, entries } from '@/core/base.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
 import { type TextualYearMonthDay, type Year0BasedMonth, type LocalizedDateRange, type WeekDayValue, DateRange, DateRangeScene } from '@/core/datetime.ts';
 import { AccountType } from '@/core/account.ts';
@@ -113,16 +113,12 @@ export function useTransactionListPageBase() {
     const allPrimaryCategories = computed<Record<string, TransactionCategory[]>>(() => {
         const primaryCategories: Record<string, TransactionCategory[]> = {};
 
-        for (const categoryType in transactionCategoriesStore.allTransactionCategories) {
-            if (!Object.prototype.hasOwnProperty.call(transactionCategoriesStore.allTransactionCategories, categoryType)) {
-                continue;
-            }
-
+        for (const [categoryType, categories] of entries(transactionCategoriesStore.allTransactionCategories)) {
             if (query.value.type && categoryTypeToTransactionType(parseInt(categoryType)) !== query.value.type) {
                 continue;
             }
 
-            primaryCategories[categoryType] = transactionCategoriesStore.allTransactionCategories[categoryType];
+            primaryCategories[categoryType] = categories;
         }
 
         return primaryCategories;
@@ -131,17 +127,13 @@ export function useTransactionListPageBase() {
     const allAvailableCategoriesCount = computed<number>(() => {
         let totalCount = 0;
 
-        for (const categoryType in transactionCategoriesStore.allTransactionCategories) {
-            if (!Object.prototype.hasOwnProperty.call(transactionCategoriesStore.allTransactionCategories, categoryType)) {
-                continue;
-            }
-
+        for (const [categoryType, categories] of entries(transactionCategoriesStore.allTransactionCategories)) {
             if (query.value.type && categoryTypeToTransactionType(parseInt(categoryType)) !== query.value.type) {
                 continue;
             }
 
-            if (transactionCategoriesStore.allTransactionCategories[categoryType]) {
-                totalCount += transactionCategoriesStore.allTransactionCategories[categoryType].length;
+            if (categories) {
+                totalCount += categories.length;
             }
         }
 
@@ -229,7 +221,7 @@ export function useTransactionListPageBase() {
         const displayAmount: string[] = [];
 
         for (let i = 1; i < amountFilterItems.length; i++) {
-            displayAmount.push(formatAmountToLocalizedNumeralsWithCurrency(parseInt(amountFilterItems[i]), false));
+            displayAmount.push(formatAmountToLocalizedNumeralsWithCurrency(parseInt(amountFilterItems[i] as string), false));
         }
 
         return displayAmount.join(' ~ ');
@@ -249,9 +241,9 @@ export function useTransactionListPageBase() {
         const currentYear = currentMonthMinDate.getGregorianCalendarYear();
         const currentMonth = currentMonthMinDate.getGregorianCalendarMonth();
 
-        for (let i = 0; i < allTransactions.length; i++) {
-            if (allTransactions[i].year === currentYear && allTransactions[i].month === currentMonth) {
-                return allTransactions[i];
+        for (const transactionMonth of allTransactions) {
+            if (transactionMonth.year === currentYear && transactionMonth.month === currentMonth) {
+                return transactionMonth;
             }
         }
 

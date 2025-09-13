@@ -111,7 +111,7 @@
                                         v-if="(showHidden || !account.hidden) && account.type === AccountType.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])">
                                     <template :key="subAccount.id"
                                               v-for="(subAccount, subIdx) in accountCategory.allSubAccounts[account.id]">
-                                        <v-divider v-if="showHidden ? subIdx > 0 : (!subAccount.hidden ? subIdx > accountCategory.allFirstVisibleSubAccountIndexes[account.id] : false)"/>
+                                        <v-divider v-if="showHidden ? subIdx > 0 : (!subAccount.hidden ? subIdx > (accountCategory.allFirstVisibleSubAccountIndexes[account.id] as number) : false)"/>
 
                                         <v-list-item v-if="showHidden || !subAccount.hidden">
                                             <template #prepend>

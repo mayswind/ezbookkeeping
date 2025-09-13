@@ -146,7 +146,7 @@ function getDisplayYear(year: number): string {
 
 function getDisplayMonth(month: number): string {
     if (isArray(dateTime.value)) {
-        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value[0].getFullYear(), month + 1, 1).getUnixTime(), actualNumeralSystem.value);
+        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value[0]!.getFullYear(), month + 1, 1).getUnixTime(), actualNumeralSystem.value);
     } else if (dateTime.value) {
         return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value.getFullYear(), month + 1, 1).getUnixTime(), actualNumeralSystem.value);
     } else {

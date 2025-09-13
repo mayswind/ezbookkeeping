@@ -1,8 +1,9 @@
+import { reversed } from '@/core/base.ts';
 import { TransactionTemplate } from '@/models/transaction_template.ts';
 
 export function isNoAvailableTemplate(templates: TransactionTemplate[], showHidden: boolean): boolean {
-    for (let i = 0; i < templates.length; i++) {
-        if (showHidden || !templates[i].hidden) {
+    for (const template of templates) {
+        if (showHidden || !template.hidden) {
             return false;
         }
     }
@@ -13,8 +14,8 @@ export function isNoAvailableTemplate(templates: TransactionTemplate[], showHidd
 export function getAvailableTemplateCount(templates: TransactionTemplate[], showHidden: boolean): number {
     let count = 0;
 
-    for (let i = 0; i < templates.length; i++) {
-        if (showHidden || !templates[i].hidden) {
+    for (const template of templates) {
+        if (showHidden || !template.hidden) {
             count++;
         }
     }
@@ -23,9 +24,9 @@ export function getAvailableTemplateCount(templates: TransactionTemplate[], show
 }
 
 export function getFirstShowingId(templates: TransactionTemplate[], showHidden: boolean): string | null {
-    for (let i = 0; i < templates.length; i++) {
-        if (showHidden || !templates[i].hidden) {
-            return templates[i].id;
+    for (const template of templates) {
+        if (showHidden || !template.hidden) {
+            return template.id;
         }
     }
 
@@ -33,9 +34,9 @@ export function getFirstShowingId(templates: TransactionTemplate[], showHidden: 
 }
 
 export function getLastShowingId(templates: TransactionTemplate[], showHidden: boolean): string | null {
-    for (let i = templates.length - 1; i >= 0; i--) {
-        if (showHidden || !templates[i].hidden) {
-            return templates[i].id;
+    for (const template of reversed(templates)) {
+        if (showHidden || !template.hidden) {
+            return template.id;
         }
     }
 

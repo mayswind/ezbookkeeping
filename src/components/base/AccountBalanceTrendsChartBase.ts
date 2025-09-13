@@ -69,9 +69,7 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
         let minUnixTimeClosingBalance = 0;
         let maxUnixTimeClosingBalance = 0;
 
-        for (let i = 0; i < props.items.length; i++) {
-            const item = props.items[i];
-
+        for (const item of props.items) {
             if (item.time < minUnixTime) {
                 minUnixTime = item.time;
                 minUnixTimeOpeningBalance = item.accountOpeningBalance;
@@ -120,8 +118,7 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
 
         const dayDataItemsMap: Record<number, TransactionReconciliationStatementResponseItem[]> = {};
 
-        for (let i = 0; i < props.items.length; i++) {
-            const dateItem = props.items[i];
+        for (const dateItem of props.items) {
             let dateRangeMinUnixTime = 0;
 
             if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
@@ -149,8 +146,7 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
         let lastMedianBalance = lastClosingBalance;
         let lastAverageBalance = lastClosingBalance;
 
-        for (let i = 0; i < allDateRanges.value.length; i++) {
-            const dateRange = allDateRanges.value[i];
+        for (const dateRange of allDateRanges.value) {
             const dataItems = dayDataItemsMap[dateRange.minUnixTime];
 
             let displayDate = '';
@@ -176,11 +172,11 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
                     return data1.time - data2.time;
                 });
 
-                const openingBalance = dataItems[0].accountOpeningBalance;
-                const closingBalance = dataItems[dataItems.length - 1].accountClosingBalance;
+                const openingBalance = dataItems[0]!.accountOpeningBalance;
+                const closingBalance = dataItems[dataItems.length - 1]!.accountClosingBalance;
                 const minimumBalance = Math.min(...dataItems.map(item => item.accountClosingBalance));
                 const maximumBalance = Math.max(...dataItems.map(item => item.accountClosingBalance));
-                const medianBalance = dataItems[Math.floor(dataItems.length / 2)].accountClosingBalance;
+                const medianBalance = dataItems[Math.floor(dataItems.length / 2)]!.accountClosingBalance;
                 const averageBalance = Math.trunc(sumAmounts(dataItems.map(item => item.accountClosingBalance)) / dataItems.length);
 
                 if (props.account.isAsset) {

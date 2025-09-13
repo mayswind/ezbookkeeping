@@ -4,12 +4,15 @@ import { replaceAll } from './common.ts';
 
 import logger from './logger.ts';
 
+type Operator = '+' | '-' | '*' | '/';
+type OperatorAndParenthesis = Operator | '(' | ')';
+
 const maxAllowedDecimalCount = 6;
 const normalizeFactor: number = 1000000;
 const normalizedDecimalsMaxZeroString: string = '000000';
 const normalizedNumberToAmountFactor: number = 10000; // 1000000 / 100
 
-const operatorPriority: Record<string, number> = {
+const operatorPriority: Record<Operator, number> = {
     '+': 1,
     '-': 1,
     '*': 2,
@@ -48,20 +51,20 @@ function checkNumberRange(num: number): void {
 
 function toPostfixExprTokens(expr: string): string[] | null {
     const finalTokens: string[] = [];
-    const operatorStack: string[] = [];
+    const operatorStack: OperatorAndParenthesis[] = [];
     let currentNumberBuilder = '';
     let isLastTokenOperator = true;
 
     expr = replaceAll(expr, ' ', '');
 
     for (let i = 0; i < expr.length; i++) {
-        const ch = expr[i];
+        const ch = expr[i] as string;
 
         // number
         if ('0' <= ch && ch <= '9' || ch === '.') {
             currentNumberBuilder += ch;
             continue
-        } else if (ch === '-' && i + 1 < expr.length && '0' <= expr[i + 1] && expr[i + 1] <= '9' && currentNumberBuilder.length === 0 && isLastTokenOperator) {
+        } else if (ch === '-' && i + 1 < expr.length && '0' <= (expr[i + 1] as string) && (expr[i + 1] as string) <= '9' && currentNumberBuilder.length === 0 && isLastTokenOperator) {
             currentNumberBuilder += ch;
             continue
         }
@@ -84,13 +87,15 @@ function toPostfixExprTokens(expr: string): string[] | null {
                 }
 
                 while (operatorStack.length > 0) {
-                    const topOperator = operatorStack[operatorStack.length - 1];
+                    const topOperator = operatorStack[operatorStack.length - 1] as OperatorAndParenthesis;
 
                     if (topOperator === '(') {
                         break;
                     }
 
-                    if (operatorPriority[topOperator] >= operatorPriority[ch]) {
+                    const isCurrentOperator = topOperator === '+' || topOperator === '-' || topOperator === '*' || topOperator === '/';
+
+                    if (isCurrentOperator && operatorPriority[topOperator] >= operatorPriority[ch]) {
                         finalTokens.push(topOperator);
                         operatorStack.pop();
                     } else {
@@ -154,7 +159,7 @@ function evaluatePostfixExpr(tokens: string[]): number | null {
     const stack: number[] = [];
 
     for (let i = 0; i < tokens.length; i++) {
-        const token = tokens[i];
+        const token = tokens[i] as string;
 
         switch (token) {
             case '+':
@@ -211,7 +216,7 @@ function evaluatePostfixExpr(tokens: string[]): number | null {
         return null;
     }
 
-    return stack[0];
+    return stack[0] as number;
 }
 export function evaluateExpressionToAmount(expr: string): number | undefined {
     if (!expr) {

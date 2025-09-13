@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 
-import type { BeforeResolveFunction } from '@/core/base.ts';
+import { type BeforeResolveFunction, itemAndIndex } from '@/core/base.ts';
 
 import type {
     UserCustomExchangeRateUpdateResponse,
@@ -65,15 +65,14 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
             return exchangeRateMap;
         }
 
-        for (let i = 0; i < latestExchangeRates.value.data.exchangeRates.length; i++) {
-            const exchangeRate = latestExchangeRates.value.data.exchangeRates[i];
+        for (const exchangeRate of latestExchangeRates.value.data.exchangeRates) {
             exchangeRateMap[exchangeRate.currency] = exchangeRate;
         }
 
         return exchangeRateMap;
     });
 
-    function updateExchangeRateToLatestExchangeRateList(exchangeRate: LatestExchangeRate, updateTime: number): void {
+    function updateExchangeRateToLatestExchangeRateList(latestExchangeRate: LatestExchangeRate, updateTime: number): void {
         if (!latestExchangeRates.value || !latestExchangeRates.value.data || !latestExchangeRates.value.data.exchangeRates) {
             return;
         }
@@ -81,16 +80,16 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
         const exchangeRates = latestExchangeRates.value.data.exchangeRates;
         let changed = false;
 
-        for (let i = 0; i < exchangeRates.length; i++) {
-            if (exchangeRates[i].currency === exchangeRate.currency) {
-                exchangeRates.splice(i, 1, exchangeRate);
+        for (const [exchangeRate, index] of itemAndIndex(exchangeRates)) {
+            if (exchangeRate.currency === latestExchangeRate.currency) {
+                exchangeRates.splice(index, 1, latestExchangeRate);
                 changed = true;
                 break;
             }
         }
 
         if (!changed) {
-            exchangeRates.push(exchangeRate);
+            exchangeRates.push(latestExchangeRate);
             changed = true;
         }
 
@@ -109,9 +108,9 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
         const exchangeRates = latestExchangeRates.value.data.exchangeRates;
         let changed = false;
 
-        for (let i = 0; i < exchangeRates.length; i++) {
-            if (exchangeRates[i].currency === currency) {
-                exchangeRates.splice(i, 1);
+        for (const [exchangeRate, index] of itemAndIndex(exchangeRates)) {
+            if (exchangeRate.currency === currency) {
+                exchangeRates.splice(index, 1);
                 changed = true;
                 break;
             }
@@ -262,8 +261,7 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
         const exchangeRates = latestExchangeRates.value.data.exchangeRates;
         const exchangeRateMap: Record<string, LatestExchangeRate> = {};
 
-        for (let i = 0; i < exchangeRates.length; i++) {
-            const exchangeRate = exchangeRates[i];
+        for (const exchangeRate of exchangeRates) {
             exchangeRateMap[exchangeRate.currency] = exchangeRate;
         }
 

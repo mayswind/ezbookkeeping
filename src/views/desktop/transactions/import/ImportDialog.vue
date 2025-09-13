@@ -696,7 +696,7 @@ function close(completed: boolean): void {
 
 watch(fileType, () => {
     if (allFileSubTypes.value && allFileSubTypes.value.length) {
-        fileSubType.value = allFileSubTypes.value[0].type;
+        fileSubType.value = allFileSubTypes.value[0]!.type;
     }
 
     importFile.value = null;

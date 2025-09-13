@@ -143,8 +143,8 @@ const allTags = computed<TransactionTag[]>(() => {
 
 const noAvailableTag = computed<boolean>(() => {
     if (transactionTagsStore.allTransactionTags) {
-        for (let i = 0; i < transactionTagsStore.allTransactionTags.length; i++) {
-            if (!transactionTagsStore.allTransactionTags[i].hidden) {
+        for (const transactionTag of transactionTagsStore.allTransactionTags) {
+            if (!transactionTag.hidden) {
                 return false;
             }
         }

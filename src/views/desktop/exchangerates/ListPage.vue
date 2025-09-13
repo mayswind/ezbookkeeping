@@ -227,8 +227,7 @@ function reload(force: boolean): void {
             const exchangeRates = exchangeRatesData.value.exchangeRates;
             let foundDefaultCurrency = false;
 
-            for (let i = 0; i < exchangeRates.length; i++) {
-                const exchangeRate = exchangeRates[i];
+            for (const exchangeRate of exchangeRates) {
                 if (exchangeRate.currency === baseCurrency.value) {
                     foundDefaultCurrency = true;
                     break;

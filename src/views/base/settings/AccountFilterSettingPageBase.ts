@@ -6,6 +6,7 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
+import { keys, keysIfValueEquals, values } from '@/core/base.ts';
 import type { Account, AccountCategoriesWithVisibleCount } from '@/models/account.ts';
 
 import {
@@ -65,13 +66,7 @@ export function useAccountFilterSettingPageBase(type?: AccountFilterType) {
     function loadFilterAccountIds(): boolean {
         const allAccountIds: Record<string, boolean> = {};
 
-        for (const accountId in accountsStore.allAccountsMap) {
-            if (!Object.prototype.hasOwnProperty.call(accountsStore.allAccountsMap, accountId)) {
-                continue;
-            }
-
-            const account = accountsStore.allAccountsMap[accountId];
-
+        for (const account of values(accountsStore.allAccountsMap)) {
             if (!allowHiddenAccount.value && account.hidden) {
                 continue;
             }
@@ -93,11 +88,7 @@ export function useAccountFilterSettingPageBase(type?: AccountFilterType) {
             filterAccountIds.value = Object.assign(allAccountIds, settingsStore.appSettings.overviewAccountFilterInHomePage);
             return true;
         } else if (type === 'transactionListCurrent') {
-            for (const accountId in transactionsStore.allFilterAccountIds) {
-                if (!Object.prototype.hasOwnProperty.call(transactionsStore.allFilterAccountIds, accountId)) {
-                    continue;
-                }
-
+            for (const accountId of keysIfValueEquals(transactionsStore.allFilterAccountIds, true)) {
                 const account = accountsStore.allAccountsMap[accountId];
 
                 if (account) {
@@ -120,11 +111,7 @@ export function useAccountFilterSettingPageBase(type?: AccountFilterType) {
         let finalAccountIds = '';
         let changed = true;
 
-        for (const accountId in filterAccountIds.value) {
-            if (!Object.prototype.hasOwnProperty.call(filterAccountIds.value, accountId)) {
-                continue;
-            }
-
+        for (const accountId of keys(filterAccountIds.value)) {
             const account = accountsStore.allAccountsMap[accountId];
 
             if (!account) {

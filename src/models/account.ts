@@ -108,7 +108,7 @@ export class Account implements AccountInfoResponse {
             }
 
             for (let i = 0; i < this.subAccounts.length; i++) {
-                if (!this.subAccounts[i].equals(other.subAccounts[i])) {
+                if (!(this.subAccounts[i] as Account).equals(other.subAccounts[i] as Account)) {
                     return false;
                 }
             }
@@ -137,9 +137,9 @@ export class Account implements AccountInfoResponse {
     public setSuitableIcon(oldCategory: number, newCategory: number): void {
         const allCategories = AccountCategory.values();
 
-        for (let i = 0; i < allCategories.length; i++) {
-            if (allCategories[i].type === oldCategory) {
-                if (this.icon !== allCategories[i].defaultAccountIconId) {
+        for (const category of allCategories) {
+            if (category.type === oldCategory) {
+                if (this.icon !== category.defaultAccountIconId) {
                     return;
                 } else {
                     break;
@@ -147,9 +147,9 @@ export class Account implements AccountInfoResponse {
             }
         }
 
-        for (let i = 0; i < allCategories.length; i++) {
-            if (allCategories[i].type === newCategory) {
-                this.icon = allCategories[i].defaultAccountIconId;
+        for (const category of allCategories) {
+            if (category.type === newCategory) {
+                this.icon = category.defaultAccountIconId;
             }
         }
     }
@@ -231,9 +231,7 @@ export class Account implements AccountInfoResponse {
                 return null;
             }
 
-            for (let i = 0; i < this.subAccounts.length; i++) {
-                const subAccount = this.subAccounts[i];
-
+            for (const subAccount of this.subAccounts) {
                 if (subAccountId && subAccountId === subAccount.id) {
                     return subAccount.id;
                 }
@@ -255,9 +253,7 @@ export class Account implements AccountInfoResponse {
                 return false;
             }
 
-            for (let i = 0; i < this.subAccounts.length; i++) {
-                const subAccount = this.subAccounts[i];
-
+            for (const subAccount of this.subAccounts) {
                 if (subAccountId && subAccountId === subAccount.id) {
                     return subAccount.hidden;
                 }
@@ -279,9 +275,7 @@ export class Account implements AccountInfoResponse {
                 return null;
             }
 
-            for (let i = 0; i < this.subAccounts.length; i++) {
-                const subAccount = this.subAccounts[i];
-
+            for (const subAccount of this.subAccounts) {
                 if (subAccountId && subAccountId === subAccount.id) {
                     return subAccount.comment;
                 }
@@ -303,9 +297,7 @@ export class Account implements AccountInfoResponse {
                 return null;
             }
 
-            for (let i = 0; i < this.subAccounts.length; i++) {
-                const subAccount = this.subAccounts[i];
-
+            for (const subAccount of this.subAccounts) {
                 if (subAccountId && subAccountId === subAccount.id) {
                     return subAccount;
                 }
@@ -322,9 +314,7 @@ export class Account implements AccountInfoResponse {
             return null;
         }
 
-        for (let i = 0; i < this.subAccounts.length; i++) {
-            const subAccount = this.subAccounts[i];
-
+        for (const subAccount of this.subAccounts) {
             if (subAccountId && subAccountId === subAccount.id) {
                 return subAccount;
             }
@@ -341,9 +331,7 @@ export class Account implements AccountInfoResponse {
         const subAccountCurrenciesMap: Record<string, boolean> = {};
         const subAccountCurrencies: string[] = [];
 
-        for (let i = 0; i < this.subAccounts.length; i++) {
-            const subAccount = this.subAccounts[i];
-
+        for (const subAccount of this.subAccounts) {
             if (!showHidden && subAccount.hidden) {
                 continue;
             }
@@ -508,7 +496,7 @@ export class Account implements AccountInfoResponse {
 
             if (account1.parentId && account1.parentId !== '0') {
                 if (allAccountsMap && allAccountsMap[account1.parentId]) {
-                    account1DisplayOrder = allAccountsMap[account1.parentId].displayOrder;
+                    account1DisplayOrder = (allAccountsMap[account1.parentId] as Account).displayOrder;
                 } else {
                     account1DisplayOrder = null;
                 }
@@ -516,7 +504,7 @@ export class Account implements AccountInfoResponse {
 
             if (account2.parentId && account2.parentId !== '0') {
                 if (allAccountsMap && allAccountsMap[account2.parentId]) {
-                    account2DisplayOrder = allAccountsMap[account2.parentId].displayOrder;
+                    account2DisplayOrder = (allAccountsMap[account2.parentId] as Account).displayOrder;
                 } else {
                     account2DisplayOrder = null;
                 }

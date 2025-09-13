@@ -95,6 +95,7 @@ import { type CommonMonthlyTrendsChartProps, type MonthlyTrendsBarChartClickEven
 
 import { useUserStore } from '@/stores/user.ts';
 
+import { itemAndIndex } from '@/core/base.ts';
 import { type Year1BasedMonth, type UnixTimeRange, DateRangeScene } from '@/core/datetime.ts';
 import type { ColorStyleValue } from '@/core/color.ts';
 import { ChartDateAggregationType } from '@/core/statistics.ts';
@@ -173,9 +174,7 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
     const allDateRangeItemsMap: Record<string, MonthlyTrendsBarChartDataAmount[]> = {};
     const legends: TrendsBarChartLegend[] = [];
 
-    for (let i = 0; i < props.items.length; i++) {
-        const item = props.items[i];
-
+    for (const [item, index] of itemAndIndex(props.items)) {
         if (props.hiddenField && item[props.hiddenField]) {
             continue;
         }
@@ -185,7 +184,7 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
         const legend: TrendsBarChartLegend = {
             id: id,
             name: (props.nameField && item[props.nameField]) ? getItemName(item[props.nameField] as string) : id,
-            color: getDisplayColor(props.colorField && item[props.colorField] ? item[props.colorField] as string : DEFAULT_CHART_COLORS[i % DEFAULT_CHART_COLORS.length]),
+            color: getDisplayColor(props.colorField && item[props.colorField] ? item[props.colorField] as string : DEFAULT_CHART_COLORS[index % DEFAULT_CHART_COLORS.length]),
             displayOrders: (props.displayOrdersField && item[props.displayOrdersField]) ? item[props.displayOrdersField] as number[] : [0]
         };
 
@@ -197,8 +196,7 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
 
         const dateRangeItemMap: Record<string, MonthlyTrendsBarChartDataAmount> = {};
 
-        for (let j = 0; j < item.items.length; j++) {
-            const dataItem = item.items[j];
+        for (const dataItem of item.items) {
             let dateRangeKey = '';
 
             if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
@@ -216,7 +214,7 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
             }
 
             if (dateRangeItemMap[dateRangeKey]) {
-                dateRangeItemMap[dateRangeKey].totalAmount += (props.valueField && isNumber(dataItem[props.valueField])) ? dataItem[props.valueField] as number : 0;
+                dateRangeItemMap[dateRangeKey]!.totalAmount += (props.valueField && isNumber(dataItem[props.valueField])) ? dataItem[props.valueField] as number : 0;
             } else {
                 const allDataItems: MonthlyTrendsBarChartDataAmount[] = allDateRangeItemsMap[dateRangeKey] || [];
                 const finalDataItem: MonthlyTrendsBarChartDataAmount = Object.assign({}, legend, {
@@ -233,8 +231,7 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
     const finalDataItems: MonthlyTrendsBarChartDataItem[] = [];
     let maxTotalAmount = 0;
 
-    for (let i = 0; i < allDateRanges.value.length; i++) {
-        const dateRange = allDateRanges.value[i];
+    for (const dateRange of allDateRanges.value) {
         let dateRangeKey = '';
 
         if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
@@ -265,12 +262,12 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
 
         sortStatisticsItems(dataItems, props.sortingType);
 
-        for (let j = 0; j < dataItems.length; j++) {
-            if (dataItems[j].totalAmount > 0) {
-                totalPositiveAmount += dataItems[j].totalAmount;
+        for (const dataItem of dataItems) {
+            if (dataItem.totalAmount > 0) {
+                totalPositiveAmount += dataItem.totalAmount;
             }
 
-            totalAmount += dataItems[j].totalAmount;
+            totalAmount += dataItem.totalAmount;
         }
 
         if (totalAmount > maxTotalAmount) {
@@ -289,11 +286,11 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
         finalDataItems.push(finalDataItem);
     }
 
-    for (let i = 0; i < finalDataItems.length; i++) {
-        if (maxTotalAmount > 0 && finalDataItems[i].totalAmount > 0) {
-            finalDataItems[i].percent = 100.0 * finalDataItems[i].totalAmount / maxTotalAmount;
+    for (const finalDataItem of finalDataItems) {
+        if (maxTotalAmount > 0 && finalDataItem.totalAmount > 0) {
+            finalDataItem.percent = 100.0 * finalDataItem.totalAmount / maxTotalAmount;
         } else {
-            finalDataItems[i].percent = 0.0;
+            finalDataItem.percent = 0.0;
         }
     }
 
@@ -306,9 +303,7 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
 function clickItem(item: MonthlyTrendsBarChartDataItem): void {
     let itemId = '';
 
-    for (let i = 0; i < props.items.length; i++) {
-        const item = props.items[i];
-
+    for (const item of props.items) {
         if (!props.hiddenField || item[props.hiddenField]) {
             continue;
         }

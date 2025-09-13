@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 
-import type { BeforeResolveFunction } from '@/core/base.ts';
+import { type BeforeResolveFunction, itemAndIndex } from '@/core/base.ts';
 
 import {
     type TransactionTagCreateBatchRequest,
@@ -49,37 +49,37 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
         allTransactionTagsMap.value[tag.id] = tag;
     }
 
-    function updateTagInTransactionTagList(tag: TransactionTag): void {
-        for (let i = 0; i < allTransactionTags.value.length; i++) {
-            if (allTransactionTags.value[i].id === tag.id) {
-                allTransactionTags.value.splice(i, 1, tag);
+    function updateTagInTransactionTagList(currentTag: TransactionTag): void {
+        for (const [transactionTag, index] of itemAndIndex(allTransactionTags.value)) {
+            if (transactionTag.id === currentTag.id) {
+                allTransactionTags.value.splice(index, 1, currentTag);
                 break;
             }
         }
 
-        allTransactionTagsMap.value[tag.id] = tag;
+        allTransactionTagsMap.value[currentTag.id] = currentTag;
     }
 
     function updateTagDisplayOrderInTransactionTagList({ from, to }: { from: number, to: number }): void {
-        allTransactionTags.value.splice(to, 0, allTransactionTags.value.splice(from, 1)[0]);
+        allTransactionTags.value.splice(to, 0, allTransactionTags.value.splice(from, 1)[0] as TransactionTag);
     }
 
     function updateTagVisibilityInTransactionTagList({ tag, hidden }: { tag: TransactionTag, hidden: boolean }): void {
         if (allTransactionTagsMap.value[tag.id]) {
-            allTransactionTagsMap.value[tag.id].hidden = hidden;
+            allTransactionTagsMap.value[tag.id]!.hidden = hidden;
         }
     }
 
-    function removeTagFromTransactionTagList(tag: TransactionTag): void {
-        for (let i = 0; i < allTransactionTags.value.length; i++) {
-            if (allTransactionTags.value[i].id === tag.id) {
-                allTransactionTags.value.splice(i, 1);
+    function removeTagFromTransactionTagList(currentTag: TransactionTag): void {
+        for (const [transactionTag, index] of itemAndIndex(allTransactionTags.value)) {
+            if (transactionTag.id === currentTag.id) {
+                allTransactionTags.value.splice(index, 1);
                 break;
             }
         }
 
-        if (allTransactionTagsMap.value[tag.id]) {
-            delete allTransactionTagsMap.value[tag.id];
+        if (allTransactionTagsMap.value[currentTag.id]) {
+            delete allTransactionTagsMap.value[currentTag.id];
         }
     }
 
@@ -223,16 +223,16 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
 
     function changeTagDisplayOrder({ tagId, from, to }: { tagId: string, from: number, to: number }): Promise<void> {
         return new Promise((resolve, reject) => {
-            let tag: TransactionTag | null = null;
+            let currentTag: TransactionTag | null = null;
 
-            for (let i = 0; i < allTransactionTags.value.length; i++) {
-                if (allTransactionTags.value[i].id === tagId) {
-                    tag = allTransactionTags.value[i];
+            for (const transactionTag of allTransactionTags.value) {
+                if (transactionTag.id === tagId) {
+                    currentTag = transactionTag;
                     break;
                 }
             }
 
-            if (!tag || !allTransactionTags.value[to]) {
+            if (!currentTag || !allTransactionTags.value[to]) {
                 reject({ message: 'Unable to move tag' });
                 return;
             }
@@ -250,10 +250,10 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
     function updateTagDisplayOrders(): Promise<boolean> {
         const newDisplayOrders: TransactionTagNewDisplayOrderRequest[] = [];
 
-        for (let i = 0; i < allTransactionTags.value.length; i++) {
+        for (const [transactionTag, index] of itemAndIndex(allTransactionTags.value)) {
             newDisplayOrders.push({
-                id: allTransactionTags.value[i].id,
-                displayOrder: i + 1
+                id: transactionTag.id,
+                displayOrder: index + 1
             });
         }
 

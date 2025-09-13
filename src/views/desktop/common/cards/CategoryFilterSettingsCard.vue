@@ -108,7 +108,7 @@
                                         v-if="(showHidden || !category.hidden) && ((showHidden && transactionType.allSubCategories[category.id]) || transactionType.allVisibleSubCategoryCounts[category.id])">
                                     <template :key="subCategory.id"
                                               v-for="(subCategory, subIdx) in transactionType.allSubCategories[category.id]">
-                                        <v-divider v-if="showHidden ? subIdx > 0 : (!subCategory.hidden ? subIdx > transactionType.allFirstVisibleSubCategoryIndexes[category.id] : false)"/>
+                                        <v-divider v-if="showHidden ? subIdx > 0 : (!subCategory.hidden ? subIdx > (transactionType.allFirstVisibleSubCategoryIndexes[category.id] as number) : false)"/>
 
                                         <v-list-item v-if="showHidden || !subCategory.hidden">
                                             <template #prepend>

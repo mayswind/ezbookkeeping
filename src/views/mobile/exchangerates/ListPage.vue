@@ -309,8 +309,7 @@ exchangeRatesStore.getLatestExchangeRates({
         const exchangeRates = exchangeRatesData.value.exchangeRates;
         let hasBaseCurrency = false;
 
-        for (let i = 0; i < exchangeRates.length; i++) {
-            const exchangeRate = exchangeRates[i];
+        for (const exchangeRate of exchangeRates) {
             if (exchangeRate.currency === baseCurrency.value) {
                 hasBaseCurrency = true;
                 break;

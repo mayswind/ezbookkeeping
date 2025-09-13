@@ -8,11 +8,15 @@ import { useTheme } from 'vuetify';
 import type { CallbackDataParams } from 'echarts/types/dist/shared';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { type CommonAccountBalanceTrendsChartProps, useAccountBalanceTrendsChartBase } from '@/components/base/AccountBalanceTrendsChartBase.ts'
+import {
+    type AccountBalanceTrendsChartItem,
+    type CommonAccountBalanceTrendsChartProps,
+    useAccountBalanceTrendsChartBase
+} from '@/components/base/AccountBalanceTrendsChartBase.ts'
 
 import { useUserStore } from '@/stores/user.ts';
 
-import type { NameValue } from '@/core/base.ts';
+import { type NameValue, itemAndIndex } from '@/core/base.ts';
 import { TextDirection } from '@/core/text.ts';
 import type { ColorStyleValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
@@ -83,9 +87,7 @@ const allSeries = computed<AccountBalanceTrendsChartDataItem[]>(() => {
         series.itemStyle.borderColor0 = expenseIncomeAmountColor.expenseAmountColor;
     }
 
-    for (let i = 0; i < allDataItems.value.length; i++) {
-        const item = allDataItems.value[i];
-
+    for (const item of allDataItems.value) {
         if (props.type === AccountBalanceTrendChartType.Candlestick.type) {
             series.data.push([
                 item.openingBalance,
@@ -110,13 +112,12 @@ const yAxisWidth = computed<number>(() => {
         return width;
     }
 
-    for (let i = 0; i < allSeries.value.length; i++) {
-        for (let j = 0; j < allSeries.value[i].data.length; j++) {
-            const data = allSeries.value[i].data[j];
+    for (const series of allSeries.value) {
+        for (const data of series.data) {
             let value: number;
 
             if (isArray(data)) {
-                value = data[1]; // for candlestick, use closing balance
+                value = data[1] as number; // for candlestick, use closing balance
             } else {
                 value = data as number; // for line or bar chart
             }
@@ -172,8 +173,8 @@ const chartOptions = computed<object>(() => {
             },
             formatter: (params: CallbackDataParams[]) => {
                 if (props.type === AccountBalanceTrendChartType.Candlestick.type) {
-                    const dataIndex = params[0].dataIndex;
-                    const dataItem = allDataItems.value[dataIndex];
+                    const dataIndex = params[0]!.dataIndex;
+                    const dataItem = allDataItems.value[dataIndex] as AccountBalanceTrendsChartItem;
                     const displayItems: NameValue[] = [
                         {
                             name: tt('Opening Balance'),
@@ -201,20 +202,20 @@ const chartOptions = computed<object>(() => {
                         }
                     ];
 
-                    let tooltip = `${params[0].name} ${props.legendName}<br/>`;
+                    let tooltip = `${params[0]!.name} ${props.legendName}<br/>`;
 
-                    for (let i = 0; i < displayItems.length; i++) {
-                        tooltip += `<div><span class="chart-pointer" style="background-color: #${DEFAULT_CHART_COLORS[i]}"></span>`
-                            + `<span>${displayItems[i].name}</span><span class="ms-5" style="float: inline-end">${displayItems[i].value}</span><br/>`
+                    for (const [displayItem, index] of itemAndIndex(displayItems)) {
+                        tooltip += `<div><span class="chart-pointer" style="background-color: #${DEFAULT_CHART_COLORS[index]}"></span>`
+                            + `<span>${displayItem.name}</span><span class="ms-5" style="float: inline-end">${displayItem.value}</span><br/>`
                             + `</div>`;
                     }
 
                     return tooltip;
                 } else {
-                    const amount = params[0].data as number;
+                    const amount = params[0]!.data as number;
                     const value = formatAmountToLocalizedNumeralsWithCurrency(amount, props.account.currency);
 
-                    return `${params[0].name}<br/>`
+                    return `${params[0]!.name}<br/>`
                         + '<div><span class="chart-pointer" style="background-color: #' + DEFAULT_CHART_COLORS[0] + '"></span>'
                         + `<span>${props.legendName}</span><span class="ms-5" style="float: inline-end">${value}</span><br/>`
                         + '</div>';

@@ -1,3 +1,4 @@
+import { entries } from '@/core/base.ts';
 import type { ColorValue } from '@/core/color.ts';
 import { CategoryType } from '@/core/category.ts';
 import { DEFAULT_CATEGORY_ICON_ID } from '@/consts/icon.ts';
@@ -58,7 +59,7 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
             }
 
             for (let i = 0; i < this.subCategories.length; i++) {
-                if (!this.subCategories[i].equals(other.subCategories[i])) {
+                if (!(this.subCategories[i] as TransactionCategory).equals(other.subCategories[i] as TransactionCategory)) {
                     return false;
                 }
             }
@@ -132,12 +133,8 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
     public static ofMap(categoriesByType: Record<number, TransactionCategoryInfoResponse[]>): Record<number, TransactionCategory[]> {
         const ret: Record<number, TransactionCategory[]> = {};
 
-        for (const categoryType in categoriesByType) {
-            if (!Object.prototype.hasOwnProperty.call(categoriesByType, categoryType)) {
-                continue;
-            }
-
-            ret[categoryType] = TransactionCategory.ofMulti(categoriesByType[categoryType]);
+        for (const [categoryType, categories] of entries(categoriesByType)) {
+            ret[parseInt(categoryType)] = TransactionCategory.ofMulti(categories);
         }
 
         return ret;

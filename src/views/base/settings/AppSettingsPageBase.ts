@@ -9,7 +9,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 
-import type { NameValue, TypeAndDisplayName } from '@/core/base.ts';
+import { type NameValue, type TypeAndDisplayName, keysIfValueEquals, values } from '@/core/base.ts';
 import type { LocalizedTimezoneInfo } from '@/core/timezone.ts';
 import { CategoryType } from '@/core/category.ts';
 import type { Account } from '@/models/account.ts';
@@ -145,12 +145,8 @@ export function useAppSettingPageBase() {
 
         let hasExcludeAccount = false;
 
-        for (const accountId in excludeAccountIds) {
-            if (!Object.prototype.hasOwnProperty.call(excludeAccountIds, accountId)) {
-                continue;
-            }
-
-            if (excludeAccountIds[accountId] && accountsStore.allAccountsMap[accountId]) {
+        for (const accountId of keysIfValueEquals(excludeAccountIds, true)) {
+            if (accountsStore.allAccountsMap[accountId]) {
                 hasExcludeAccount = true;
                 break;
             }
@@ -162,9 +158,7 @@ export function useAppSettingPageBase() {
 
         let allAccountExcluded = true;
 
-        for (let i = 0; i < allAccounts.length; i++) {
-            const account = allAccounts[i];
-
+        for (const account of allAccounts) {
             if (!excludeAccountIds[account.id]) {
                 allAccountExcluded = false;
                 break;
@@ -185,12 +179,8 @@ export function useAppSettingPageBase() {
 
         let hasExcludeTransactionCategory = false;
 
-        for (const transactionCategoryId in excludeTransactionCategoryIds) {
-            if (!Object.prototype.hasOwnProperty.call(excludeTransactionCategoryIds, transactionCategoryId)) {
-                continue;
-            }
-
-            if (excludeTransactionCategoryIds[transactionCategoryId] && transactionCategoriesStore.allTransactionCategoriesMap[transactionCategoryId]) {
+        for (const transactionCategoryId of keysIfValueEquals(excludeTransactionCategoryIds, true)) {
+            if (transactionCategoriesStore.allTransactionCategoriesMap[transactionCategoryId]) {
                 hasExcludeTransactionCategory = true;
                 break;
             }
@@ -202,13 +192,7 @@ export function useAppSettingPageBase() {
 
         let allTransactionCategoryExcluded = true;
 
-        for (const transactionCategoryId in transactionCategoriesStore.allTransactionCategoriesMap) {
-            if (!Object.prototype.hasOwnProperty.call(transactionCategoriesStore.allTransactionCategoriesMap, transactionCategoryId)) {
-                continue;
-            }
-
-            const transactionCategory = transactionCategoriesStore.allTransactionCategoriesMap[transactionCategoryId];
-
+        for (const transactionCategory of values(transactionCategoriesStore.allTransactionCategoriesMap)) {
             if (transactionCategory.type !== CategoryType.Income && transactionCategory.type !== CategoryType.Expense) {
                 continue;
             }

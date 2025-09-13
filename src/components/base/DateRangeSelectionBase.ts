@@ -56,11 +56,11 @@ export function useDateRangeSelectionBase(props: CommonDateRangeSelectionProps) 
 
     const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
     const beginDateTime = computed<string>(() => {
-        const actualBeginUnixTime = getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(dateRange.value[0]), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
+        const actualBeginUnixTime = getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(dateRange.value[0] as Date), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
         return formatUnixTimeToLongDateTime(actualBeginUnixTime);
     });
     const endDateTime = computed<string>(() => {
-        const actualEndUnixTime = getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(dateRange.value[1]), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
+        const actualEndUnixTime = getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(dateRange.value[1] as Date), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
         return formatUnixTimeToLongDateTime(actualEndUnixTime);
     });
     const presetRanges = computed<PresetDateRange[]>(() => {

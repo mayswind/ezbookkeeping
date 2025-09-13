@@ -102,7 +102,7 @@ function getDisplayYear(year: number): string {
 
 function getDisplayMonth(month: number): string {
     if (isArray(dateTime.value)) {
-        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value[0].year, month + 1, 1).getUnixTime());
+        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value[0]!.year, month + 1, 1).getUnixTime());
     } else {
         return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value.year, month + 1, 1).getUnixTime());
     }

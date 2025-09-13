@@ -21,27 +21,27 @@ export function* reversedItemAndIndex<T>(arr: T[]): Iterable<[T, number]> {
     }
 }
 
-export function* entries<K extends string | number | symbol, V>(obj: Record<K, V>): Iterable<[K, V]> {
+export function* entries<K extends string | number | symbol, V>(obj: Record<K, V>): Iterable<[string, V]> {
     for (const key in obj) {
         if (!Object.prototype.hasOwnProperty.call(obj, key)) {
             continue;
         }
 
-        yield [key, obj[key]] as [K, V];
+        yield [key, obj[key]] as [string, V];
     }
 }
 
-export function* keys<K extends string | number | symbol, V>(obj: Record<K, V>): Iterable<K> {
+export function* keys<K extends string | number | symbol, V>(obj: Record<K, V>): Iterable<string> {
     for (const key in obj) {
         if (!Object.prototype.hasOwnProperty.call(obj, key)) {
             continue;
         }
 
-        yield key as K;
+        yield key;
     }
 }
 
-export function* keysIfValueEquals<K extends string | number | symbol, V>(obj: Record<K, V>, value: V): Iterable<K> {
+export function* keysIfValueEquals<K extends string | number | symbol, V>(obj: Record<K, V>, value: V): Iterable<string> {
     for (const key in obj) {
         if (!Object.prototype.hasOwnProperty.call(obj, key)) {
             continue;
@@ -51,7 +51,7 @@ export function* keysIfValueEquals<K extends string | number | symbol, V>(obj: R
             continue;
         }
 
-        yield key as K;
+        yield key;
     }
 }
 

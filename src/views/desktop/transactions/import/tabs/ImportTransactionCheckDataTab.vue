@@ -348,7 +348,7 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
-import { type NameValue, type NameNumeralValue, itemAndIndex, keys } from '@/core/base.ts';
+import { type NameValue, type NameNumeralValue, itemAndIndex, reversed, keys } from '@/core/base.ts';
 import { type NumeralSystem } from '@/core/numeral.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionType } from '@/core/transaction.ts';
@@ -664,6 +664,12 @@ const toolMenus = computed<ImportTransactionCheckDataMenu[]>(() => [
         title: tt('Batch Replace Selected Destination Accounts'),
         disabled: isEditing.value || selectedTransferTransactionCount.value < 1,
         onClick: () => showBatchReplaceDialog('destinationAccount')
+    },
+    {
+        prependIcon: mdiFindReplace,
+        title: tt('Batch Replace Selected Transaction Tags'),
+        disabled: isEditing.value || selectedImportTransactionCount.value < 1,
+        onClick: () => showBatchReplaceDialog('tag', allOriginalTransactionTagNames.value)
     },
     {
         prependIcon: mdiFindReplace,
@@ -984,6 +990,7 @@ const allInvalidIncomeCategoryNames = computed<NameValue[]>(() => getCurrentInva
 const allInvalidTransferCategoryNames = computed<NameValue[]>(() => getCurrentInvalidCategoryNames(TransactionType.Transfer));
 const allInvalidAccountNames = computed<NameValue[]>(() => getCurrentInvalidAccountNames());
 const allInvalidTransactionTagNames = computed<NameValue[]>(() => getCurrentInvalidTagNames());
+const allOriginalTransactionTagNames = computed<NameValue[]>(() => getAllOriginalTagNames());
 
 const displayFilterCustomDateRange = computed<string>(() => {
     if (filters.value.minDatetime === null || filters.value.maxDatetime === null) {
@@ -1279,6 +1286,34 @@ function getCurrentInvalidTagNames(): NameValue[] {
     return invalidTags;
 }
 
+function getAllOriginalTagNames(): NameValue[] {
+    const allOriginalTagNames: Record<string, boolean> = {};
+    const allOriginalTags: NameValue[] = [];
+
+    if (!props.importTransactions || props.importTransactions.length < 1) {
+        return allOriginalTags;
+    }
+
+    for (const importTransaction of props.importTransactions) {
+        if (!importTransaction.originalTagNames) {
+            continue;
+        }
+
+        for (const tagName of importTransaction.originalTagNames) {
+            allOriginalTagNames[tagName] = true;
+        }
+    }
+
+    for (const name of keys(allOriginalTagNames)) {
+        allOriginalTags.push({
+            name: name || tt('(Empty)'),
+            value: name
+        });
+    }
+
+    return allOriginalTags;
+}
+
 function importTransactionsFilter(value: string, query: string, item?: { value: unknown, raw: ImportTransaction }): boolean {
     if (!item || !item.raw) {
         return false;
@@ -1396,17 +1431,24 @@ function updateTransactionData(transaction: ImportTransaction): void {
     }
 }
 
-function showBatchReplaceDialog(type: BatchReplaceDialogDataType): void {
+function showBatchReplaceDialog(type: BatchReplaceDialogDataType, allSourceTagItems?: NameValue[]): void {
     if (isEditing.value) {
         return;
     }
 
     batchReplaceDialog.value?.open({
         mode: 'batchReplace',
-        type: type
+        type: type,
+        allSourceTagItems: allSourceTagItems
     }).then(result => {
-        if (!result || !result.targetItem) {
+        if (!result) {
             return;
+        }
+
+        if (type !== 'tag') {
+            if (!result.targetItem) {
+                return;
+            }
         }
 
         let updatedCount = 0;
@@ -1421,26 +1463,47 @@ function showBatchReplaceDialog(type: BatchReplaceDialogDataType): void {
 
                 if (type === 'expenseCategory') {
                     if (importTransaction.type === TransactionType.Expense) {
-                        importTransaction.categoryId = result.targetItem;
+                        importTransaction.categoryId = result.targetItem as string;
                         updated = true;
                     }
                 } else if (type === 'incomeCategory') {
                     if (importTransaction.type === TransactionType.Income) {
-                        importTransaction.categoryId = result.targetItem;
+                        importTransaction.categoryId = result.targetItem as string;
                         updated = true;
                     }
                 } else if (type === 'transferCategory') {
                     if (importTransaction.type === TransactionType.Transfer) {
-                        importTransaction.categoryId = result.targetItem;
+                        importTransaction.categoryId = result.targetItem as string;
                         updated = true;
                     }
                 } else if (type === 'account') {
-                    importTransaction.sourceAccountId = result.targetItem;
+                    importTransaction.sourceAccountId = result.targetItem as string;
                     updated = true;
                 } else if (type === 'destinationAccount') {
                     if (importTransaction.type === TransactionType.Transfer) {
-                        importTransaction.destinationAccountId = result.targetItem;
+                        importTransaction.destinationAccountId = result.targetItem as string;
                         updated = true;
+                    }
+                } else if (type === 'tag') {
+                    let removeIndex: number[] = [];
+
+                    for (let tagIndex = 0; tagIndex < importTransaction.originalTagNames.length; tagIndex++) {
+                        const originalTagName = importTransaction.originalTagNames ? (importTransaction.originalTagNames[tagIndex] ?? '') : '';
+
+                        if (originalTagName === result.sourceItem) {
+                            if (result.targetItem) {
+                                importTransaction.tagIds[tagIndex] = result.targetItem;
+                                importTransaction.originalTagNames[tagIndex] = allTagsMap.value[result.targetItem]?.name || '';
+                            } else {
+                                removeIndex.push(tagIndex);
+                            }
+                            updated = true;
+                        }
+                    }
+
+                    for (const tagIndex of reversed(removeIndex)) {
+                        importTransaction.tagIds.splice(tagIndex, 1);
+                        importTransaction.originalTagNames.splice(tagIndex, 1);
                     }
                 }
 
@@ -1469,8 +1532,14 @@ function showReplaceInvalidItemDialog(type: BatchReplaceDialogDataType, invalidI
         type: type,
         invalidItems: invalidItems
     }).then(result => {
-        if (!result || (!result.sourceItem && result.sourceItem !== '') || !result.targetItem) {
+        if (!result || (!result.sourceItem && result.sourceItem !== '')) {
             return;
+        }
+
+        if (type !== 'tag') {
+            if (!result.targetItem) {
+                return;
+            }
         }
 
         let updatedCount = 0;
@@ -1489,13 +1558,13 @@ function showReplaceInvalidItemDialog(type: BatchReplaceDialogDataType, invalidI
 
                     if (importTransaction.type !== TransactionType.ModifyBalance && originalCategoryName === result.sourceItem && (!categoryId || categoryId === '0' || !allCategoriesMap.value[categoryId])) {
                         if (type === 'expenseCategory' && importTransaction.type === TransactionType.Expense) {
-                            importTransaction.categoryId = result.targetItem;
+                            importTransaction.categoryId = result.targetItem as string;
                             updated = true;
                         } else if (type === 'incomeCategory' && importTransaction.type === TransactionType.Income) {
-                            importTransaction.categoryId = result.targetItem;
+                            importTransaction.categoryId = result.targetItem as string;
                             updated = true;
                         } else if (type === 'transferCategory' && importTransaction.type === TransactionType.Transfer) {
-                            importTransaction.categoryId = result.targetItem;
+                            importTransaction.categoryId = result.targetItem as string;
                             updated = true;
                         }
                     }
@@ -1506,23 +1575,35 @@ function showReplaceInvalidItemDialog(type: BatchReplaceDialogDataType, invalidI
                     const originalDestinationAccountName = importTransaction.originalDestinationAccountName;
 
                     if (originalSourceAccountName === result.sourceItem && (!sourceAccountId || sourceAccountId === '0' || !allAccountsMap.value[sourceAccountId])) {
-                        importTransaction.sourceAccountId = result.targetItem;
+                        importTransaction.sourceAccountId = result.targetItem as string;
                         updated = true;
                     }
 
                     if (importTransaction.type === TransactionType.Transfer && originalDestinationAccountName === result.sourceItem && (!destinationAccountId || destinationAccountId === '0' || !allAccountsMap.value[destinationAccountId])) {
-                        importTransaction.destinationAccountId = result.targetItem;
+                        importTransaction.destinationAccountId = result.targetItem as string;
                         updated = true;
                     }
                 } else if (type === 'tag' && importTransaction.tagIds) {
+                    let removeIndex: number[] = [];
+
                     for (let tagIndex = 0; tagIndex < importTransaction.tagIds.length; tagIndex++) {
                         const tagId = importTransaction.tagIds[tagIndex] as string;
                         const originalTagName = importTransaction.originalTagNames ? (importTransaction.originalTagNames[tagIndex] ?? '') : '';
 
                         if (originalTagName === result.sourceItem && (!tagId || tagId === '0' || !allTagsMap.value[tagId])) {
-                            importTransaction.tagIds[tagIndex] = result.targetItem;
+                            if (result.targetItem) {
+                                importTransaction.tagIds[tagIndex] = result.targetItem;
+                                importTransaction.originalTagNames[tagIndex] = allTagsMap.value[result.targetItem]?.name || '';
+                            } else {
+                                removeIndex.push(tagIndex);
+                            }
                             updated = true;
                         }
+                    }
+
+                    for (const tagIndex of reversed(removeIndex)) {
+                        importTransaction.tagIds.splice(tagIndex, 1);
+                        importTransaction.originalTagNames.splice(tagIndex, 1);
                     }
                 }
 

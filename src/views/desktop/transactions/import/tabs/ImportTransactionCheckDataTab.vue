@@ -673,6 +673,12 @@ const toolMenus = computed<ImportTransactionCheckDataMenu[]>(() => [
     },
     {
         prependIcon: mdiFindReplace,
+        title: tt('Batch Add Transaction Tags'),
+        disabled: isEditing.value || selectedImportTransactionCount.value < 1,
+        onClick: () => showBatchAddDialog('tag')
+    },
+    {
+        prependIcon: mdiFindReplace,
         title: tt('Replace Invalid Expense Categories'),
         disabled: isEditing.value || !allInvalidExpenseCategoryNames.value || allInvalidExpenseCategoryNames.value.length < 1,
         divider: true,
@@ -1485,7 +1491,7 @@ function showBatchReplaceDialog(type: BatchReplaceDialogDataType, allSourceTagIt
                         updated = true;
                     }
                 } else if (type === 'tag') {
-                    let removeIndex: number[] = [];
+                    const removeIndex: number[] = [];
 
                     for (let tagIndex = 0; tagIndex < importTransaction.originalTagNames.length; tagIndex++) {
                         const originalTagName = importTransaction.originalTagNames ? (importTransaction.originalTagNames[tagIndex] ?? '') : '';
@@ -1504,6 +1510,69 @@ function showBatchReplaceDialog(type: BatchReplaceDialogDataType, allSourceTagIt
                     for (const tagIndex of reversed(removeIndex)) {
                         importTransaction.tagIds.splice(tagIndex, 1);
                         importTransaction.originalTagNames.splice(tagIndex, 1);
+                    }
+                }
+
+                if (updated) {
+                    updatedCount++;
+                    updateTransactionData(importTransaction);
+                }
+            }
+        }
+
+        if (updatedCount > 0) {
+            snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
+                count: getDisplayCount(updatedCount)
+            });
+        }
+    });
+}
+
+function showBatchAddDialog(type: BatchReplaceDialogDataType): void {
+    if (isEditing.value) {
+        return;
+    }
+
+    batchReplaceDialog.value?.open({
+        mode: 'batchAdd',
+        type: type
+    }).then(result => {
+        if (!result || !result.targetItem) {
+            return;
+        }
+
+        let updatedCount = 0;
+
+        if (props.importTransactions) {
+            for (const importTransaction of props.importTransactions) {
+                if (!importTransaction.selected) {
+                    continue;
+                }
+
+                let updated = false;
+
+                if (type === 'tag') {
+                    let containsTag = false;
+
+                    for (const tagName of importTransaction.originalTagNames) {
+                        if (tagName === result.targetItem) {
+                            containsTag = true;
+                            break;
+                        }
+                    }
+
+                    if (!containsTag) {
+                        if (!importTransaction.tagIds) {
+                            importTransaction.tagIds = [];
+                        }
+
+                        if (!importTransaction.originalTagNames) {
+                            importTransaction.originalTagNames = [];
+                        }
+
+                        importTransaction.tagIds.push(result.targetItem);
+                        importTransaction.originalTagNames.push(allTagsMap.value[result.targetItem]?.name ?? '');
+                        updated = true;
                     }
                 }
 
@@ -1584,7 +1653,7 @@ function showReplaceInvalidItemDialog(type: BatchReplaceDialogDataType, invalidI
                         updated = true;
                     }
                 } else if (type === 'tag' && importTransaction.tagIds) {
-                    let removeIndex: number[] = [];
+                    const removeIndex: number[] = [];
 
                     for (let tagIndex = 0; tagIndex < importTransaction.tagIds.length; tagIndex++) {
                         const tagId = importTransaction.tagIds[tagIndex] as string;

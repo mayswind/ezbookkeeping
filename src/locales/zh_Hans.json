@@ -1805,6 +1805,7 @@
     "Batch Replace Selected Accounts": "批量替换选中的账户",
     "Batch Replace Selected Destination Accounts": "批量替换选中的目标账户",
     "Batch Replace Selected Transaction Tags": "批量替换选中的交易标签",
+    "Batch Add Transaction Tags": "批量添加交易标签",
     "Replace Invalid Expense Categories": "替换无效的支出分类",
     "Replace Invalid Income Categories": "替换无效的收入分类",
     "Replace Invalid Transfer Categories": "替换无效的转账分类",

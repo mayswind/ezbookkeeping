@@ -42,8 +42,8 @@ export class ImportTransaction implements ImportTransactionResponse {
         this.originalDestinationAccountCurrency = response.originalDestinationAccountCurrency;
         this.sourceAmount = response.sourceAmount;
         this.destinationAmount = response.destinationAmount || 0;
-        this.tagIds = response.tagIds;
-        this.originalTagNames = response.originalTagNames;
+        this.tagIds = response.tagIds || [];
+        this.originalTagNames = response.originalTagNames || [];
         this.comment = response.comment;
         this.geoLocation = response.geoLocation;
 

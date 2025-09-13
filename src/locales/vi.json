@@ -1805,6 +1805,7 @@
     "Batch Replace Selected Accounts": "Thay thế hàng loạt các tài khoản đã chọn",
     "Batch Replace Selected Destination Accounts": "Thay thế hàng loạt các tài khoản đích đã chọn",
     "Batch Replace Selected Transaction Tags": "Batch Replace Selected Transaction Tags",
+    "Batch Add Transaction Tags": "Batch Add Transaction Tags",
     "Replace Invalid Expense Categories": "Thay thế các danh mục chi phí không hợp lệ",
     "Replace Invalid Income Categories": "Thay thế các danh mục thu nhập không hợp lệ",
     "Replace Invalid Transfer Categories": "Thay thế các danh mục chuyển khoản không hợp lệ",

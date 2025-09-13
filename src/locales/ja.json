@@ -1805,6 +1805,7 @@
     "Batch Replace Selected Accounts": "バッチ選択した口座を置き換えます",
     "Batch Replace Selected Destination Accounts": "バッチは選択した宛先口座を置き換えます",
     "Batch Replace Selected Transaction Tags": "Batch Replace Selected Transaction Tags",
+    "Batch Add Transaction Tags": "Batch Add Transaction Tags",
     "Replace Invalid Expense Categories": "無効な支出カテゴリを置き換えます",
     "Replace Invalid Income Categories": "無効な収入カテゴリを置き換えます",
     "Replace Invalid Transfer Categories": "無効な振替カテゴリを置き換えます",

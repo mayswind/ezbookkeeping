@@ -1805,6 +1805,7 @@
     "Batch Replace Selected Accounts": "Пакетная замена выбранных счетов",
     "Batch Replace Selected Destination Accounts": "Пакетная замена выбранных целевых счетов",
     "Batch Replace Selected Transaction Tags": "Batch Replace Selected Transaction Tags",
+    "Batch Add Transaction Tags": "Batch Add Transaction Tags",
     "Replace Invalid Expense Categories": "Заменить недействительные категории расходов",
     "Replace Invalid Income Categories": "Заменить недействительные категории доходов",
     "Replace Invalid Transfer Categories": "Заменить недействительные категории переводов",

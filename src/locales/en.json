@@ -1805,6 +1805,7 @@
     "Batch Replace Selected Accounts": "Batch Replace Selected Accounts",
     "Batch Replace Selected Destination Accounts": "Batch Replace Selected Destination Accounts",
     "Batch Replace Selected Transaction Tags": "Batch Replace Selected Transaction Tags",
+    "Batch Add Transaction Tags": "Batch Add Transaction Tags",
     "Replace Invalid Expense Categories": "Replace Invalid Expense Categories",
     "Replace Invalid Income Categories": "Replace Invalid Income Categories",
     "Replace Invalid Transfer Categories": "Replace Invalid Transfer Categories",

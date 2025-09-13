@@ -1805,6 +1805,7 @@
     "Batch Replace Selected Accounts": "Geselecteerde rekeningen batchgewijs vervangen",
     "Batch Replace Selected Destination Accounts": "Geselecteerde bestemmingsrekeningen batchgewijs vervangen",
     "Batch Replace Selected Transaction Tags": "Batch Replace Selected Transaction Tags",
+    "Batch Add Transaction Tags": "Batch Add Transaction Tags",
     "Replace Invalid Expense Categories": "Ongeldige uitgavecategorieën vervangen",
     "Replace Invalid Income Categories": "Ongeldige inkomencategorieën vervangen",
     "Replace Invalid Transfer Categories": "Ongeldige overboekingscategorieën vervangen",

@@ -9,6 +9,7 @@
                     <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'account'">{{ tt('Batch Replace Selected Accounts') }}</h4>
                     <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'destinationAccount'">{{ tt('Batch Replace Selected Destination Accounts') }}</h4>
                     <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'tag'">{{ tt('Batch Replace Selected Transaction Tags') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'batchAdd' && type === 'tag'">{{ tt('Batch Add Transaction Tags') }}</h4>
                     <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'expenseCategory'">{{ tt('Replace Invalid Expense Categories') }}</h4>
                     <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'incomeCategory'">{{ tt('Replace Invalid Income Categories') }}</h4>
                     <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'transferCategory'">{{ tt('Replace Invalid Transfer Categories') }}</h4>
@@ -189,7 +190,7 @@
                             </template>
                         </v-autocomplete>
                     </v-col>
-                    <v-col cols="12" class="pt-0">
+                    <v-col cols="12" class="pt-0" v-if="mode === 'batchReplace' || mode === 'replaceInvalidItems'">
                         <v-switch :disabled="loading"
                                   :label="tt('Remove Tag')" v-model="removeTag"/>
                     </v-col>
@@ -235,7 +236,7 @@ import {
     mdiPound
 } from '@mdi/js';
 
-export type BatchReplaceDialogMode = 'batchReplace' | 'replaceInvalidItems';
+export type BatchReplaceDialogMode = 'batchReplace' | 'batchAdd' | 'replaceInvalidItems';
 export type BatchReplaceDialogDataType = 'expenseCategory' | 'incomeCategory' | 'transferCategory' | 'account' | 'destinationAccount' | 'tag';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
@@ -291,10 +292,10 @@ function open(options: { mode: BatchReplaceDialogMode; type: BatchReplaceDialogD
     type.value = options.type;
     sourceItem.value = undefined;
 
-    if (mode.value === 'batchReplace') {
-        invalidItems.value = undefined;
-    } else if (mode.value === 'replaceInvalidItems') {
+    if (mode.value === 'replaceInvalidItems') {
         invalidItems.value = options.invalidItems;
+    } else {
+        invalidItems.value = undefined;
     }
 
     if (type.value === 'tag' && mode.value === 'batchReplace') {
@@ -367,6 +368,10 @@ function confirm(): void {
     } else if (mode.value === 'batchReplace' && type.value === 'tag') {
         resolveFunc?.({
             sourceItem: sourceItem.value,
+            targetItem: targetItemValue
+        });
+    } else if (mode.value === 'batchAdd') {
+        resolveFunc?.({
             targetItem: targetItemValue
         });
     } else if (mode.value === 'replaceInvalidItems') {

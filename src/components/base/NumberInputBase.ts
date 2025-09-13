@@ -3,7 +3,7 @@ import { computed, watch } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 import { type CommonNumberInputProps, useCommonNumberInputBase } from '@/components/base/CommonNumberInputBase.ts';
 
-import { isNumber, replaceAll, removeAll } from '@/lib/common.ts';
+import { isDefined, isNumber, replaceAll, removeAll } from '@/lib/common.ts';
 import { NumeralSystem } from '@/core/numeral.ts';
 
 export interface NumberInputProps extends CommonNumberInputProps {
@@ -60,11 +60,11 @@ export function useNumberInputBase(props: NumberInputProps, emit: NumberInputEmi
 
     function getValidFormattedValue(value: number, textualValue: string): string {
         if (isNumber(props.minValue) && value < props.minValue) {
-            return getFormattedValue(props.minValue);
+            return getFormattedValue(props.minValue, numeralSystem.value);
         }
 
         if (isNumber(props.maxValue) && value > props.maxValue) {
-            return getFormattedValue(props.maxValue);
+            return getFormattedValue(props.maxValue, numeralSystem.value);
         }
 
         const decimalSeparator = getCurrentDecimalSeparator();
@@ -72,25 +72,29 @@ export function useNumberInputBase(props: NumberInputProps, emit: NumberInputEmi
         return replaceAll(removeAll(textualValue, digitGroupingSymbol), '.', decimalSeparator);
     }
 
-    function getFormattedValue(value: number): string {
+    function getFormattedValue(value: number, customNumeralSystem?: NumeralSystem): string {
+        if (!isDefined(customNumeralSystem)) {
+            customNumeralSystem = getCurrentNumeralSystemType();
+        }
+
         if (!Number.isNaN(value) && Number.isFinite(value)) {
             const decimalSeparator = getCurrentDecimalSeparator();
 
             if (isNumber(props.maxDecimalCount) && props.maxDecimalCount >= 0) {
-                return replaceAll(numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(value.toFixed(props.maxDecimalCount)), '.', decimalSeparator);
+                return replaceAll(customNumeralSystem.replaceWesternArabicDigitsToLocalizedDigits(value.toFixed(props.maxDecimalCount)), '.', decimalSeparator);
             } else {
-                return replaceAll(numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(value.toString(10)), '.', decimalSeparator);
+                return replaceAll(customNumeralSystem.replaceWesternArabicDigitsToLocalizedDigits(value.toString(10)), '.', decimalSeparator);
             }
         }
 
-        return numeralSystem.value.digitZero;
+        return customNumeralSystem.digitZero;
     }
 
     watch(() => props.modelValue, (newValue) => {
         const numericCurrentValue = parseNumber(currentValue.value);
 
         if (newValue !== numericCurrentValue) {
-            const newStringValue = getFormattedValue(newValue);
+            const newStringValue = getFormattedValue(newValue, numeralSystem.value);
 
             if (!(newStringValue === numeralSystem.value.digitZero && currentValue.value === '')) {
                 currentValue.value = newStringValue;

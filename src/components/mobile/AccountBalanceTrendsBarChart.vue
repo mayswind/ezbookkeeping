@@ -56,6 +56,7 @@ import {
     useAccountBalanceTrendsChartBase
 } from '@/components/base/AccountBalanceTrendsChartBase.ts'
 
+import { itemAndIndex } from '@/core/base.ts';
 import type { ColorStyleValue } from '@/core/color.ts';
 import { DEFAULT_CHART_COLORS } from '@/consts/color.ts';
 
@@ -88,15 +89,13 @@ const allVirtualListItems = computed<MobileAccountBalanceTrendsChartItem[]>(() =
     const ret: MobileAccountBalanceTrendsChartItem[] = [];
     let maxClosingBalance = 0;
 
-    for (let i = 0; i < allDataItems.value.length; i++) {
-        const dataItem = allDataItems.value[i];
-
+    for (const [dataItem, index] of itemAndIndex(allDataItems.value)) {
         if (dataItem.closingBalance > maxClosingBalance) {
             maxClosingBalance = dataItem.closingBalance;
         }
 
         const finalDataItem: MobileAccountBalanceTrendsChartItem = {
-            index: i,
+            index: index,
             displayDate: dataItem.displayDate,
             openingBalance: dataItem.openingBalance,
             closingBalance: dataItem.closingBalance,
@@ -104,18 +103,18 @@ const allVirtualListItems = computed<MobileAccountBalanceTrendsChartItem[]>(() =
             averageBalance: dataItem.averageBalance,
             minimumBalance: dataItem.minimumBalance,
             maximumBalance: dataItem.maximumBalance,
-            color: `#${DEFAULT_CHART_COLORS[0]}`,
+            color: `#${DEFAULT_CHART_COLORS[0] as string}`,
             percent: 0.0
         };
 
         ret.push(finalDataItem);
     }
 
-    for (let i = 0; i < ret.length; i++) {
-        if (maxClosingBalance > 0 && ret[i].closingBalance > 0) {
-            ret[i].percent = 100.0 * ret[i].closingBalance / maxClosingBalance;
+    for (const item of ret) {
+        if (maxClosingBalance > 0 && item.closingBalance > 0) {
+            item.percent = 100.0 * item.closingBalance / maxClosingBalance;
         } else {
-            ret[i].percent = 0.0;
+            item.percent = 0.0;
         }
     }
 

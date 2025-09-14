@@ -72,6 +72,7 @@ import { type CommonScheduleFrequencySelectionProps, useScheduleFrequencySelecti
 
 import { useUserStore } from '@/stores/user.ts';
 
+import { itemAndIndex } from '@/core/base.ts';
 import { type WeekDayValue } from '@/core/datetime.ts';
 import { ScheduledTemplateFrequencyType } from '@/core/template.ts';
 import { sortNumbersArray } from '@/lib/common.ts';
@@ -117,20 +118,20 @@ function changeFrequencyType(value: number): void {
 }
 
 function changeFrequencyValue(e: Event): void {
-    const value = parseInt((e.target as HTMLInputElement).value);
+    const currentValue = parseInt((e.target as HTMLInputElement).value);
 
     if ((e.target as HTMLInputElement).checked) {
-        for (let i = 0; i < currentFrequencyValue.value.length; i++) {
-            if (currentFrequencyValue.value[i] === value) {
+        for (const value of currentFrequencyValue.value) {
+            if (value === currentValue) {
                 return;
             }
         }
 
-        currentFrequencyValue.value.push(value);
+        currentFrequencyValue.value.push(currentValue);
     } else {
-        for (let i = 0; i < currentFrequencyValue.value.length; i++) {
-            if (currentFrequencyValue.value[i] === value) {
-                currentFrequencyValue.value.splice(i, 1);
+        for (const [value, index] of itemAndIndex(currentFrequencyValue.value)) {
+            if (value === currentValue) {
+                currentFrequencyValue.value.splice(index, 1);
                 break;
             }
         }

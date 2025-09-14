@@ -684,9 +684,9 @@ const transactionPictures = computed<Record<string, string | undefined>[]>(() =>
         return thumbs;
     }
 
-    for (let i = 0; i < transaction.value.pictures.length; i++) {
+    for (const picture of transaction.value.pictures) {
         thumbs.push({
-            url: getTransactionPictureUrl(transaction.value.pictures[i])
+            url: getTransactionPictureUrl(picture)
         });
     }
 
@@ -700,8 +700,8 @@ const transactionThumbs = computed<(string | undefined)[]>(() => {
         return thumbs;
     }
 
-    for (let i = 0; i < transaction.value.pictures.length; i++) {
-        thumbs.push(getTransactionPictureUrl(transaction.value.pictures[i]));
+    for (const picture of transaction.value.pictures) {
+        thumbs.push(getTransactionPictureUrl(picture));
     }
 
     return thumbs;

@@ -7,6 +7,7 @@ import { useAccountsStore } from './account.ts';
 import { useTransactionCategoriesStore } from './transactionCategory.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
+import { entries, values } from '@/core/base.ts';
 import { type TextualYearMonth, type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { CategoryType } from '@/core/category.ts';
@@ -228,9 +229,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
         let totalAmount = 0;
         let totalNonNegativeAmount = 0;
 
-        for (let i = 0; i < accountsStore.allPlainAccounts.length; i++) {
-            const account = accountsStore.allPlainAccounts[i];
-
+        for (const account of accountsStore.allPlainAccounts) {
             if (transactionStatisticsFilter.value.chartDataType === ChartDataType.AccountTotalAssets.type) {
                 if (!account.isAsset) {
                     continue;
@@ -312,12 +311,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
         const allStatisticsItems: TransactionCategoricalAnalysisDataItem[] = [];
 
         if (combinedData && combinedData.items) {
-            for (const id in combinedData.items) {
-                if (!Object.prototype.hasOwnProperty.call(combinedData.items, id)) {
-                    continue;
-                }
-
-                const dataItem = combinedData.items[id];
+            for (const dataItem of values(combinedData.items)) {
                 let percent = 0;
 
                 if (dataItem.totalAmount > 0) {
@@ -361,8 +355,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
         const finalTrendsData: TransactionStatisticTrendsResponseItemWithInfo[] = [];
 
         if (trendsData && trendsData.length) {
-            for (let i = 0; i < trendsData.length; i++) {
-                const trendItem = trendsData[i];
+            for (const trendItem of trendsData) {
                 const finalTrendItem: TransactionStatisticTrendsResponseItemWithInfo = {
                     year: trendItem.year,
                     month: trendItem.month,
@@ -387,16 +380,10 @@ export const useStatisticsStore = defineStore('statistics', () => {
 
         const combinedDataMap: Record<string, WritableTransactionTrendsAnalysisDataItem> = {};
 
-        for (let i = 0; i < transactionCategoryTrendsDataWithCategoryAndAccountInfo.value.length; i++) {
-            const trendItem = transactionCategoryTrendsDataWithCategoryAndAccountInfo.value[i];
+        for (const trendItem of transactionCategoryTrendsDataWithCategoryAndAccountInfo.value) {
             const totalAmountItems = getCategoryTotalAmountItems(trendItem.items, transactionStatisticsFilter.value);
 
-            for (const id in totalAmountItems.items) {
-                if (!Object.prototype.hasOwnProperty.call(totalAmountItems.items, id)) {
-                    continue;
-                }
-
-                const item = totalAmountItems.items[id];
+            for (const [id, item] of entries(totalAmountItems.items)) {
                 let combinedData = combinedDataMap[id];
 
                 if (!combinedData) {
@@ -426,12 +413,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
 
         const totalAmountsTrends: TransactionTrendsAnalysisDataItem[] = [];
 
-        for (const id in combinedDataMap) {
-            if (!Object.prototype.hasOwnProperty.call(combinedDataMap, id)) {
-                continue;
-            }
-
-            const trendData = combinedDataMap[id];
+        for (const trendData of values(combinedDataMap)) {
             totalAmountsTrends.push(trendData);
         }
 
@@ -448,8 +430,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
         const finalItems: TransactionStatisticResponseItemWithInfo[] = [];
         const defaultCurrency = userStore.currentUserDefaultCurrency;
 
-        for (let i = 0; i < items.length; i++) {
-            const dataItem = items[i];
+        for (const dataItem of items) {
             const item: TransactionStatisticResponseItemWithInfo = {
                 categoryId: dataItem.categoryId,
                 accountId: dataItem.accountId,
@@ -500,9 +481,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
         let totalAmount = 0;
         let totalNonNegativeAmount = 0;
 
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-
+        for (const item of items) {
             if (!item.primaryAccount || !item.account || !item.primaryCategory || !item.category) {
                 continue;
             }

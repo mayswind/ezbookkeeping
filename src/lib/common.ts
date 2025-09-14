@@ -431,8 +431,8 @@ export function countSplitItems(str: string | undefined | null, separator: strin
     const items = str.split(separator);
     let count = 0;
 
-    for (let i = 0; i < items.length; i++) {
-        if (items[i]) {
+    for (const item of items) {
+        if (item) {
             count++;
         }
     }
@@ -483,9 +483,13 @@ export function selectInvert(filterItemIds: Record<string, boolean>, allItemsMap
 }
 
 export function isPrimaryItemHasSecondaryValue(primaryItem: Record<string, Record<string, unknown>[]>, primarySubItemsField: string, secondaryValueField: string | undefined, secondaryHiddenField: string | undefined, secondaryValue: unknown): boolean {
-    for (let i = 0; i < primaryItem[primarySubItemsField].length; i++) {
-        const secondaryItem = primaryItem[primarySubItemsField][i];
+    const secondaryItems = primaryItem[primarySubItemsField];
 
+    if (!secondaryItems || secondaryItems.length < 1) {
+        return false;
+    }
+
+    for (const secondaryItem of secondaryItems) {
         if (secondaryHiddenField && secondaryItem[secondaryHiddenField]) {
             continue;
         }
@@ -500,14 +504,12 @@ export function isPrimaryItemHasSecondaryValue(primaryItem: Record<string, Recor
     return false;
 }
 
-export function getPrimaryValueBySecondaryValue<T>(items: Record<string, Record<string, T>[]>[] | Record<string, Record<string, Record<string, T>[]>>, primarySubItemsField: string | undefined, primaryValueField: string | undefined, primaryHiddenField: string | undefined, secondaryValueField: string | undefined, secondaryHiddenField: string | undefined, secondaryValue: T): Record<string, T>[] | Record<string, Record<string, T>[]> | null {
+export function getPrimaryValueBySecondaryValue<T>(items: Record<string, Record<string, T>[]>[] | Record<string, Record<string, Record<string, T>[]>>, primarySubItemsField: string | undefined, primaryValueField: string | undefined, primaryHiddenField: string | undefined, secondaryValueField: string | undefined, secondaryHiddenField: string | undefined, secondaryValue: T): Record<string, T>[] | Record<string, Record<string, T>[]> | null | undefined {
     if (primarySubItemsField) {
         if (isArray(items)) {
             const arr = items as Record<string, Record<string, T>[]>[];
 
-            for (let i = 0; i < arr.length; i++) {
-                const primaryItem = arr[i];
-
+            for (const primaryItem of arr) {
                 if (primaryHiddenField && primaryItem[primaryHiddenField]) {
                     continue;
                 }
@@ -523,13 +525,7 @@ export function getPrimaryValueBySecondaryValue<T>(items: Record<string, Record<
         } else {
             const obj = items as Record<string, Record<string, Record<string, T>[]>>;
 
-            for (const field in obj) {
-                if (!Object.prototype.hasOwnProperty.call(obj, field)) {
-                    continue;
-                }
-
-                const primaryItem = obj[field];
-
+            for (const primaryItem of values(obj)) {
                 if (primaryHiddenField && primaryItem[primaryHiddenField]) {
                     continue;
                 }

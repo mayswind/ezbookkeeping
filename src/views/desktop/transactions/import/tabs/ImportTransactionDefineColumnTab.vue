@@ -358,15 +358,16 @@ const parsedFileLinesHeaders = computed<object[]>(() => {
         }
     }
 
-    const headers: object[] = [];
+    const firstLine: string[] = props.parsedFileData && props.parsedFileData.length > 0 ? (props.parsedFileData[0] as string[]) : [];
 
+    const headers: object[] = [];
     headers.push({ key: 'index', value: 'index', title: '#', sortable: true, nowrap: true });
 
     for (let i = 0; i < maxColumnCount; i++) {
         let title = `#${i + 1}`;
 
-        if (parsedFileDataColumnMapping.value.includeHeader && props.parsedFileData && props.parsedFileData[0][i]) {
-            title = props.parsedFileData[0][i] as string;
+        if (parsedFileDataColumnMapping.value.includeHeader && firstLine && firstLine[i]) {
+            title = firstLine[i] as string;
         }
 
         headers.push({ key: i.toString(), value: `column${i + 1}`, title: title, sortable: true, nowrap: true });

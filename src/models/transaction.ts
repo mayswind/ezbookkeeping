@@ -140,15 +140,15 @@ export class Transaction implements TransactionInfoResponse {
         }
     }
 
-    public setCategory(category: TransactionCategory): void {
+    public setCategory(category?: TransactionCategory): void {
         this._category = category;
     }
 
-    public setSourceAccount(sourceAccount: Account): void {
+    public setSourceAccount(sourceAccount?: Account): void {
         this._sourceAccount = sourceAccount;
     }
 
-    public setDestinationAccount(destinationAccount: Account): void {
+    public setDestinationAccount(destinationAccount?: Account): void {
         this._destinationAccount = destinationAccount;
     }
 

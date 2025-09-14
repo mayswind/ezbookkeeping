@@ -151,14 +151,8 @@ function updateFrequencyValue(value: number, selected: boolean | null): void {
     frequencyValue.value = sortNumbersArray(newFrequencyValues);
 }
 
-function isFrequencyValueSelected(value: number): boolean {
-    for (let i = 0; i < frequencyValue.value.length; i++) {
-        if (frequencyValue.value[i] === value) {
-            return true;
-        }
-    }
-
-    return false;
+function isFrequencyValueSelected(currentValue: number): boolean {
+    return frequencyValue.value.indexOf(currentValue) >= 0;
 }
 
 function onMenuStateChanged(state: boolean): void {

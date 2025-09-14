@@ -150,8 +150,8 @@
                                                 handle=".drag-handle"
                                                 ghost-class="dragging-item"
                                                 :disabled="activeAccountCategoryVisibleAccountCount <= 1"
-                                                :list="allCategorizedAccountsMap[activeAccountCategory.type].accounts"
-                                                v-if="activeAccountCategory && allCategorizedAccountsMap[activeAccountCategory.type] && allCategorizedAccountsMap[activeAccountCategory.type].accounts && allCategorizedAccountsMap[activeAccountCategory.type].accounts.length"
+                                                :list="allCategorizedAccountsMap[activeAccountCategory.type]!.accounts"
+                                                v-if="activeAccountCategory && allCategorizedAccountsMap[activeAccountCategory.type] && allCategorizedAccountsMap[activeAccountCategory.type]!.accounts && allCategorizedAccountsMap[activeAccountCategory.type]!.accounts.length"
                                                 @change="onMove"
                                             >
                                                 <template #item="{ element }">
@@ -376,20 +376,24 @@ const activeAccountCategory = computed<AccountCategory | undefined>(() => Accoun
 const activeAccountCategoryTotalBalance = computed<string>(() => accountCategoryTotalBalance(activeAccountCategory.value));
 
 const activeAccountCategoryVisibleAccountCount = computed<number>(() => {
-    if (!activeAccountCategory.value || !allCategorizedAccountsMap.value[activeAccountCategory.value.type] || !allCategorizedAccountsMap.value[activeAccountCategory.value.type].accounts) {
+    if (!activeAccountCategory.value) {
         return 0;
     }
 
-    const accounts = allCategorizedAccountsMap.value[activeAccountCategory.value.type].accounts;
+    const categorizedAccounts = allCategorizedAccountsMap.value[activeAccountCategory.value.type];
+
+    if (!categorizedAccounts || !categorizedAccounts.accounts || !categorizedAccounts.accounts.length) {
+        return 0;
+    }
 
     if (showHidden.value) {
-        return accounts.length;
+        return categorizedAccounts.accounts.length;
     }
 
     let visibleCount = 0;
 
-    for (let i = 0; i < accounts.length; i++) {
-        if (!accounts[i].hidden) {
+    for (const account of categorizedAccounts.accounts) {
+        if (!account.hidden) {
             visibleCount++;
         }
     }
@@ -407,9 +411,7 @@ function reload(force: boolean): void {
         displayOrderModified.value = false;
 
         if (allAccounts.value) {
-            for (let i = 0; i < allAccounts.value.length; i++) {
-                const account = allAccounts.value[i];
-
+            for (const account of allAccounts.value) {
                 if (account.type === AccountType.MultiSubAccounts.type && !activeSubAccount.value[account.id]) {
                     activeSubAccount.value[account.id] = '';
                 }

@@ -202,6 +202,7 @@ import { useAccountEditPageBaseBase } from '@/views/base/accounts/AccountEditPag
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 
+import { itemAndIndex } from '@/core/base.ts';
 import { AccountType } from '@/core/account.ts';
 import { ALL_ACCOUNT_ICONS } from '@/consts/icon.ts';
 import { ALL_ACCOUNT_COLORS } from '@/consts/color.ts';
@@ -365,11 +366,11 @@ function save(): void {
     });
 }
 
-function removeSubAccount(subAccount: Account): void {
+function removeSubAccount(currentSubAccount: Account): void {
     confirmDialog.value?.open('Are you sure you want to remove this sub-account?').then(() => {
-        for (let i = 0; i < subAccounts.value.length; i++) {
-            if (subAccounts.value[i] === subAccount) {
-                subAccounts.value.splice(i, 1);
+        for (const [subAccount, index] of itemAndIndex(subAccounts.value)) {
+            if (subAccount === currentSubAccount) {
+                subAccounts.value.splice(index, 1);
 
                 if (currentAccountIndex.value >= subAccounts.value.length) {
                     currentAccountIndex.value = subAccounts.value.length - 1;

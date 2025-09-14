@@ -9,7 +9,7 @@ import { useOverviewStore } from './overview.ts';
 import { useStatisticsStore } from './statistics.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
-import type { BeforeResolveFunction } from '@/core/base.ts';
+import { type BeforeResolveFunction, itemAndIndex, entries, keys } from '@/core/base.ts';
 import { type TextualYearMonth, DateRange } from '@/core/datetime.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts';
@@ -165,8 +165,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
             let currentMonthListIndex = -1;
             let currentMonthList: TransactionMonthList | null = null;
 
-            for (let i = 0; i < transactionPageWrapper.items.length; i++) {
-                const item = transactionPageWrapper.items[i];
+            for (const [item, index] of itemAndIndex(transactionPageWrapper.items)) {
                 fillTransactionObject(item, currentUtcOffset);
 
                 const transactionTime = parseDateTimeFromUnixTime(item.time, item.utcOffset, currentUtcOffset);
@@ -174,8 +173,8 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 const transactionMonth = transactionTime.getGregorianCalendarMonth();
                 const transactionYearDashMonth = transactionTime.getGregorianCalendarYearDashMonth();
 
-                if (i === 0 && transactions.value.length > 0) {
-                    const lastMonthList = transactions.value[transactions.value.length - 1];
+                if (index === 0 && transactions.value.length > 0) {
+                    const lastMonthList = transactions.value[transactions.value.length - 1] as TransactionMonthList;
 
                     if (lastMonthList.totalAmount.incompleteExpense || lastMonthList.totalAmount.incompleteIncome) {
                         // calculate the total amount of last month which has incomplete total amount before starting to process a new request
@@ -186,7 +185,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 if (currentMonthList && currentMonthList.year === transactionYear && currentMonthList.month === transactionMonth) {
                     currentMonthList.items.push(Object.freeze(item));
 
-                    if (i === transactionPageWrapper.items.length - 1) {
+                    if (index === transactionPageWrapper.items.length - 1) {
                         // calculate the total amount of current month when processing the last transaction item of this request
                         calculateMonthTotalAmount(currentMonthList, defaultCurrency, transactionsFilter.value.accountIds, true);
                     }
@@ -194,9 +193,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 }
 
                 for (let j = currentMonthListIndex + 1; j < transactions.value.length; j++) {
-                    if (transactions.value[j].year === transactionYear && transactions.value[j].month === transactionMonth) {
+                    if (transactions.value[j]!.year === transactionYear && transactions.value[j]!.month === transactionMonth) {
                         currentMonthListIndex = j;
-                        currentMonthList = transactions.value[j];
+                        currentMonthList = transactions.value[j] as TransactionMonthList;
                         break;
                     }
                 }
@@ -223,7 +222,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     transactions.value.push(monthList);
 
                     currentMonthListIndex = transactions.value.length - 1;
-                    currentMonthList = transactions.value[transactions.value.length - 1];
+                    currentMonthList = transactions.value[transactions.value.length - 1] as TransactionMonthList;
                 }
 
                 currentMonthList.items.push(Object.freeze(item));
@@ -235,50 +234,48 @@ export const useTransactionsStore = defineStore('transactions', () => {
         if (nextTimeSequenceId) {
             transactionsNextTimeId.value = nextTimeSequenceId;
         } else {
-            calculateMonthTotalAmount(transactions.value[transactions.value.length - 1], defaultCurrency, transactionsFilter.value.accountIds, false);
+            calculateMonthTotalAmount(transactions.value[transactions.value.length - 1] as TransactionMonthList, defaultCurrency, transactionsFilter.value.accountIds, false);
             transactionsNextTimeId.value = -1;
         }
     }
 
-    function updateTransactionInTransactionList({ transaction, defaultCurrency }: { transaction: Transaction, defaultCurrency: string }): void {
+    function updateTransactionInTransactionList({ currentTransaction, defaultCurrency }: { currentTransaction: Transaction, defaultCurrency: string }): void {
         const currentUtcOffset = getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone);
-        const transactionTime = parseDateTimeFromUnixTime(transaction.time, transaction.utcOffset, currentUtcOffset);
+        const transactionTime = parseDateTimeFromUnixTime(currentTransaction.time, currentTransaction.utcOffset, currentUtcOffset);
         const transactionYear = transactionTime.getGregorianCalendarYear();
         const transactionMonth = transactionTime.getGregorianCalendarMonth();
 
-        for (let i = 0; i < transactions.value.length; i++) {
-            const transactionMonthList = transactions.value[i];
-
+        for (const [transactionMonthList, monthIndex] of itemAndIndex(transactions.value)) {
             if (!transactionMonthList.items) {
                 continue;
             }
 
-            for (let j = 0; j < transactionMonthList.items.length; j++) {
-                if (transactionMonthList.items[j].id === transaction.id) {
-                    fillTransactionObject(transaction, currentUtcOffset);
+            for (const [transaction, transactionIndex] of itemAndIndex(transactionMonthList.items)) {
+                if (transaction.id === currentTransaction.id) {
+                    fillTransactionObject(currentTransaction, currentUtcOffset);
 
                     if (transactionYear !== transactionMonthList.year ||
                         transactionMonth !== transactionMonthList.month ||
-                        transaction.gregorianCalendarDayOfMonth !== transactionMonthList.items[j].gregorianCalendarDayOfMonth) {
+                        currentTransaction.gregorianCalendarDayOfMonth !== transaction.gregorianCalendarDayOfMonth) {
                         transactionListStateInvalid.value = true;
                         return;
                     }
 
-                    if ((transactionsFilter.value.categoryIds && !allFilterCategoryIds.value[transaction.categoryId]) ||
-                        (transactionsFilter.value.accountIds && !allFilterAccountIds.value[transaction.sourceAccountId] && !allFilterAccountIds.value[transaction.destinationAccountId] &&
-                            (!transaction.sourceAccount || !allFilterAccountIds.value[transaction.sourceAccount.parentId]) &&
-                            (!transaction.destinationAccount || !allFilterAccountIds.value[transaction.destinationAccount.parentId])
+                    if ((transactionsFilter.value.categoryIds && !allFilterCategoryIds.value[currentTransaction.categoryId]) ||
+                        (transactionsFilter.value.accountIds && !allFilterAccountIds.value[currentTransaction.sourceAccountId] && !allFilterAccountIds.value[currentTransaction.destinationAccountId] &&
+                            (!currentTransaction.sourceAccount || !allFilterAccountIds.value[currentTransaction.sourceAccount.parentId]) &&
+                            (!currentTransaction.destinationAccount || !allFilterAccountIds.value[currentTransaction.destinationAccount.parentId])
                         )
                     ) {
-                        transactionMonthList.items.splice(j, 1);
+                        transactionMonthList.items.splice(transactionIndex, 1);
                     } else {
-                        transactionMonthList.items.splice(j, 1, transaction);
+                        transactionMonthList.items.splice(transactionIndex, 1, currentTransaction);
                     }
 
                     if (transactionMonthList.items.length < 1) {
-                        transactions.value.splice(i, 1);
+                        transactions.value.splice(monthIndex, 1);
                     } else {
-                        calculateMonthTotalAmount(transactionMonthList, defaultCurrency, transactionsFilter.value.accountIds, i >= transactions.value.length - 1 && transactionsNextTimeId.value > 0);
+                        calculateMonthTotalAmount(transactionMonthList, defaultCurrency, transactionsFilter.value.accountIds, monthIndex >= transactions.value.length - 1 && transactionsNextTimeId.value > 0);
                     }
 
                     return;
@@ -287,26 +284,24 @@ export const useTransactionsStore = defineStore('transactions', () => {
         }
     }
 
-    function removeTransactionFromTransactionList({ transaction, defaultCurrency }: { transaction: TransactionInfoResponse, defaultCurrency: string }): void {
-        for (let i = 0; i <transactions.value.length; i++) {
-            const transactionMonthList = transactions.value[i];
-
+    function removeTransactionFromTransactionList({ currentTransaction, defaultCurrency }: { currentTransaction: TransactionInfoResponse, defaultCurrency: string }): void {
+        for (const [transactionMonthList, monthIndex] of itemAndIndex(transactions.value)) {
             if (!transactionMonthList.items ||
-                transactionMonthList.items[0].time < transaction.time ||
-                transactionMonthList.items[transactionMonthList.items.length - 1].time > transaction.time) {
+                transactionMonthList.items[0]!.time < currentTransaction.time ||
+                transactionMonthList.items[transactionMonthList.items.length - 1]!.time > currentTransaction.time) {
                 continue;
             }
 
-            for (let j = 0; j < transactionMonthList.items.length; j++) {
-                if (transactionMonthList.items[j].id === transaction.id) {
-                    transactionMonthList.items.splice(j, 1);
+            for (const [transaction, transactionIndex] of itemAndIndex(transactionMonthList.items)) {
+                if (transaction.id === currentTransaction.id) {
+                    transactionMonthList.items.splice(transactionIndex, 1);
                 }
             }
 
             if (transactionMonthList.items.length < 1) {
-                transactions.value.splice(i, 1);
+                transactions.value.splice(monthIndex, 1);
             } else {
-                calculateMonthTotalAmount(transactionMonthList, defaultCurrency, transactionsFilter.value.accountIds, i >= transactions.value.length - 1 && transactionsNextTimeId.value > 0);
+                calculateMonthTotalAmount(transactionMonthList, defaultCurrency, transactionsFilter.value.accountIds, monthIndex >= transactions.value.length - 1 && transactionsNextTimeId.value > 0);
             }
         }
     }
@@ -328,16 +323,15 @@ export const useTransactionsStore = defineStore('transactions', () => {
         if (accountIds && accountIds !== '0') {
             const allAccountIdsArray = accountIds.split(',');
 
-            for (let i = 0; i < allAccountIdsArray.length; i++) {
-                if (allAccountIdsArray[i]) {
-                    allAccountIdsMap[allAccountIdsArray[i]] = true;
+            for (const accountId of allAccountIdsArray) {
+                if (accountId) {
+                    allAccountIdsMap[accountId] = true;
                     totalAccountIdsCount++;
                 }
             }
         }
 
-        for (let i = 0; i < transactionMonthList.items.length; i++) {
-            const transaction = transactionMonthList.items[i];
+        for (const transaction of transactionMonthList.items) {
             const transactionDay = isNumber(transaction.gregorianCalendarDayOfMonth) ? transaction.gregorianCalendarDayOfMonth.toString() : '0';
             let dailyTotalAmount = dailyTotalAmounts[transactionDay];
 
@@ -413,21 +407,11 @@ export const useTransactionsStore = defineStore('transactions', () => {
         transactionMonthList.totalAmount.income = Math.trunc(totalIncome);
         transactionMonthList.totalAmount.incompleteIncome = incomplete || hasUnCalculatedTotalIncome;
 
-        for (const day in transactionMonthList.dailyTotalAmounts) {
-            if (!Object.prototype.hasOwnProperty.call(transactionMonthList.dailyTotalAmounts, day)) {
-                continue;
-            }
-
+        for (const day of keys(transactionMonthList.dailyTotalAmounts)) {
             delete transactionMonthList.dailyTotalAmounts[day];
         }
 
-        for (const day in dailyTotalAmounts) {
-            if (!Object.prototype.hasOwnProperty.call(dailyTotalAmounts, day)) {
-                continue;
-            }
-
-            const dailyTotalAmount = dailyTotalAmounts[day];
-
+        for (const [day, dailyTotalAmount] of entries(dailyTotalAmounts)) {
             transactionMonthList.dailyTotalAmounts[day] = {
                 expense: Math.trunc(dailyTotalAmount.expense),
                 incompleteExpense: incomplete || dailyTotalAmount.incompleteExpense,
@@ -1076,7 +1060,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     }
                 } else {
                     updateTransactionInTransactionList({
-                        transaction: transaction,
+                        currentTransaction: transaction,
                         defaultCurrency: defaultCurrency
                     });
                 }
@@ -1131,13 +1115,13 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 if (beforeResolve) {
                     beforeResolve(() => {
                         removeTransactionFromTransactionList({
-                            transaction: transaction,
+                            currentTransaction: transaction,
                             defaultCurrency: defaultCurrency
                         });
                     });
                 } else {
                     removeTransactionFromTransactionList({
-                        transaction: transaction,
+                        currentTransaction: transaction,
                         defaultCurrency: defaultCurrency
                     });
                 }

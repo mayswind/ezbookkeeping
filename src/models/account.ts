@@ -221,7 +221,7 @@ export class Account implements AccountInfoResponse {
         };
     }
 
-    public getAccountOrSubAccountId(subAccountId: string): string | null {
+    public getAccountOrSubAccountId(subAccountId?: string): string | null {
         if (this.type === AccountType.SingleAccount.type) {
             return this.id;
         } else if (this.type === AccountType.MultiSubAccounts.type && !subAccountId) {
@@ -243,7 +243,7 @@ export class Account implements AccountInfoResponse {
         }
     }
 
-    public isAccountOrSubAccountHidden(subAccountId: string): boolean {
+    public isAccountOrSubAccountHidden(subAccountId?: string): boolean {
         if (this.type === AccountType.SingleAccount.type) {
             return this.hidden;
         } else if (this.type === AccountType.MultiSubAccounts.type && !subAccountId) {
@@ -265,7 +265,7 @@ export class Account implements AccountInfoResponse {
         }
     }
 
-    public getAccountOrSubAccountComment(subAccountId: string): string | null {
+    public getAccountOrSubAccountComment(subAccountId?: string): string | null {
         if (this.type === AccountType.SingleAccount.type) {
             return this.comment;
         } else if (this.type === AccountType.MultiSubAccounts.type && !subAccountId) {
@@ -287,7 +287,7 @@ export class Account implements AccountInfoResponse {
         }
     }
 
-    public getAccountOrSubAccount(subAccountId: string): Account | null {
+    public getAccountOrSubAccount(subAccountId?: string): Account | null {
         if (this.type === AccountType.SingleAccount.type) {
             return this;
         } else if (this.type === AccountType.MultiSubAccounts.type && !subAccountId) {
@@ -309,7 +309,7 @@ export class Account implements AccountInfoResponse {
         }
     }
 
-    public getSubAccount(subAccountId: string): Account | null {
+    public getSubAccount(subAccountId?: string): Account | null {
         if (!this.subAccounts || !this.subAccounts.length) {
             return null;
         }
@@ -323,7 +323,7 @@ export class Account implements AccountInfoResponse {
         return null;
     }
 
-    public getSubAccountCurrencies(showHidden: boolean, subAccountId: string): string[] {
+    public getSubAccountCurrencies(showHidden: boolean, subAccountId?: string): string[] {
         if (!this.subAccounts || !this.subAccounts.length) {
             return [];
         }

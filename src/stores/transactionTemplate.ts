@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 
-import type { BeforeResolveFunction } from '@/core/base.ts';
+import { type BeforeResolveFunction, itemAndIndex, entries } from '@/core/base.ts';
 
 import { TransactionType } from '@/core/transaction.ts';
 
@@ -24,23 +24,16 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
     const allVisibleTemplates = computed<Record<number, TransactionTemplate[]>>(() => {
         const allVisibleTemplates: Record<number, TransactionTemplate[]> = {};
 
-        for (const templateType in allTransactionTemplates.value) {
-            if (!Object.prototype.hasOwnProperty.call(allTransactionTemplates.value, templateType)) {
-                continue;
-            }
-
-            const allTemplates = allTransactionTemplates.value[templateType];
+        for (const [templateType, allTemplates] of entries(allTransactionTemplates.value)) {
             const visibleTemplates: TransactionTemplate[] = [];
 
-            for (let i = 0; i < allTemplates.length; i++) {
-                const template = allTemplates[i];
-
+            for (const template of allTemplates) {
                 if (!template.hidden) {
                     visibleTemplates.push(template);
                 }
             }
 
-            allVisibleTemplates[templateType] = visibleTemplates;
+            allVisibleTemplates[parseInt(templateType)] = visibleTemplates;
         }
 
         return allVisibleTemplates;
@@ -49,12 +42,8 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
     const allAvailableTemplatesCount = computed<Record<number, number>>(() => {
         const allAvailableTemplateCounts: Record<number, number> = {};
 
-        for (const templateType in allTransactionTemplates.value) {
-            if (!Object.prototype.hasOwnProperty.call(allTransactionTemplates.value, templateType)) {
-                continue;
-            }
-
-            allAvailableTemplateCounts[templateType] = allTransactionTemplates.value[templateType].length;
+        for (const [templateType, allTemplates] of entries(allTransactionTemplates.value)) {
+            allAvailableTemplateCounts[parseInt(templateType)] = allTemplates.length;
         }
 
         return allAvailableTemplateCounts;
@@ -63,12 +52,8 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
     const allVisibleTemplatesCount = computed<Record<number, number>>(() => {
         const allVisibleTemplateCounts: Record<number, number> = {};
 
-        for (const templateType in allVisibleTemplates.value) {
-            if (!Object.prototype.hasOwnProperty.call(allVisibleTemplates.value, templateType)) {
-                continue;
-            }
-
-            allVisibleTemplateCounts[templateType] = allVisibleTemplates.value[templateType].length;
+        for (const [templateType, allTemplates] of entries(allVisibleTemplates.value)) {
+            allVisibleTemplateCounts[parseInt(templateType)] = allTemplates.length;
         }
 
         return allVisibleTemplateCounts;
@@ -78,8 +63,7 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
         allTransactionTemplates.value[templateType] = templates;
         allTransactionTemplatesMap.value[templateType] = {};
 
-        for (let i = 0; i < templates.length; i++) {
-            const template = templates[i];
+        for (const template of templates) {
             allTransactionTemplatesMap.value[templateType][template.id] = template;
         }
     }
@@ -102,9 +86,9 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
         const templateMap = allTransactionTemplatesMap.value[templateType];
 
         if (isArray(templates)) {
-            for (let i = 0; i < templates.length; i++) {
-                if (templates[i].id === template.id) {
-                    templates.splice(i, 1, template);
+            for (const [template, index] of itemAndIndex(templates)) {
+                if (template.id === template.id) {
+                    templates.splice(index, 1, template);
                     break;
                 }
             }
@@ -119,7 +103,7 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
         const templates = allTransactionTemplates.value[templateType];
 
         if (isArray(templates)) {
-            templates.splice(to, 0, templates.splice(from, 1)[0]);
+            templates.splice(to, 0, templates.splice(from, 1)[0] as TransactionTemplate);
         }
     }
 
@@ -128,27 +112,27 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
 
         if (isObject(templateMap)) {
             if (templateMap[template.id]) {
-                templateMap[template.id].hidden = hidden;
+                templateMap[template.id]!.hidden = hidden;
             }
         }
     }
 
-    function removeTemplateFromTransactionTemplateList(templateType: number, template: TransactionTemplate): void {
+    function removeTemplateFromTransactionTemplateList(templateType: number, currentTemplate: TransactionTemplate): void {
         const templates = allTransactionTemplates.value[templateType];
         const templateMap = allTransactionTemplatesMap.value[templateType];
 
         if (isArray(templates)) {
-            for (let i = 0; i < templates.length; i++) {
-                if (templates[i].id === template.id) {
-                    templates.splice(i, 1);
+            for (const [template, index] of itemAndIndex(templates)) {
+                if (template.id === currentTemplate.id) {
+                    templates.splice(index, 1);
                     break;
                 }
             }
         }
 
         if (isObject(templateMap)) {
-            if (templateMap[template.id]) {
-                delete templateMap[template.id];
+            if (templateMap[currentTemplate.id]) {
+                delete templateMap[currentTemplate.id];
             }
         }
     }
@@ -298,21 +282,21 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
 
     function changeTemplateDisplayOrder({ templateType, templateId, from, to }: { templateType: number, templateId: string, from: number, to: number }): Promise<void> {
         return new Promise((resolve, reject) => {
-            let template: TransactionTemplate | null = null;
+            let currentTemplate: TransactionTemplate | null = null;
 
             if (!isArray(allTransactionTemplates.value[templateType])) {
                 reject({ message: 'Unable to move template' });
                 return;
             }
 
-            for (let i = 0; i < allTransactionTemplates.value[templateType].length; i++) {
-                if (allTransactionTemplates.value[templateType][i].id === templateId) {
-                    template = allTransactionTemplates.value[templateType][i];
+            for (const template of allTransactionTemplates.value[templateType]) {
+                if (template.id === templateId) {
+                    currentTemplate = template;
                     break;
                 }
             }
 
-            if (!template || !allTransactionTemplates.value[templateType][to]) {
+            if (!currentTemplate || !allTransactionTemplates.value[templateType][to]) {
                 reject({ message: 'Unable to move template' });
                 return;
             }
@@ -331,10 +315,10 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
         const newDisplayOrders: TransactionTemplateNewDisplayOrderRequest[] = [];
 
         if (isArray(allTransactionTemplates.value[templateType])) {
-            for (let i = 0; i < allTransactionTemplates.value[templateType].length; i++) {
+            for (const [template, index] of itemAndIndex(allTransactionTemplates.value[templateType])) {
                 newDisplayOrders.push({
-                    id: allTransactionTemplates.value[templateType][i].id,
-                    displayOrder: i + 1
+                    id: template.id,
+                    displayOrder: index + 1
                 });
             }
         }

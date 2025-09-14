@@ -261,7 +261,7 @@
                                                             </v-list-item>
 
                                                             <v-list-group :key="category.id" v-for="category in categories">
-                                                                <template #activator="{ props }" v-if="!category.hidden || query.categoryIds === category.id || (allCategories[query.categoryIds] && allCategories[query.categoryIds].parentId === category.id)">
+                                                                <template #activator="{ props }" v-if="!category.hidden || query.categoryIds === category.id || (allCategories[query.categoryIds] && allCategories[query.categoryIds]!.parentId === category.id)">
                                                                     <v-divider />
                                                                     <v-list-item class="text-sm" density="compact"
                                                                                  :class="getCategoryListItemCheckedClass(category, queryAllFilterCategoryIds)"
@@ -402,12 +402,12 @@
                                                         </v-list-item>
                                                         <template :key="account.id"
                                                                   v-for="account in allAccounts">
-                                                            <v-divider v-if="(!account.hidden && (!allAccountsMap[account.parentId] || !allAccountsMap[account.parentId].hidden)) || query.accountIds === account.id" />
+                                                            <v-divider v-if="(!account.hidden && (!allAccountsMap[account.parentId] || !allAccountsMap[account.parentId]!.hidden)) || query.accountIds === account.id" />
                                                             <v-list-item class="text-sm" density="compact"
                                                                          :value="account.id"
                                                                          :class="{ 'list-item-selected': query.accountIds === account.id, 'item-in-multiple-selection': queryAllFilterAccountIdsCount > 1 && queryAllFilterAccountIds[account.id] }"
                                                                          :append-icon="(query.accountIds === account.id ? mdiCheck : undefined)"
-                                                                         v-if="(!account.hidden && (!allAccountsMap[account.parentId] || !allAccountsMap[account.parentId].hidden)) || query.accountIds === account.id">
+                                                                         v-if="(!account.hidden && (!allAccountsMap[account.parentId] || !allAccountsMap[account.parentId]!.hidden)) || query.accountIds === account.id">
                                                                 <v-list-item-title class="cursor-pointer"
                                                                                    @click="changeAccountFilter(account.id)">
                                                                     <div class="d-flex align-center">
@@ -527,7 +527,7 @@
                                                :class="{ 'disabled': loading, 'has-bottom-border': idx < transactions.length - 1 }"
                                                v-for="(transaction, idx) in transactions">
                                             <tr class="transaction-list-row-date no-hover text-sm"
-                                                v-if="pageType === TransactionListPageType.List.type && (idx === 0 || (idx > 0 && (transaction.gregorianCalendarYearDashMonthDashDay !== transactions[idx - 1].gregorianCalendarYearDashMonthDashDay)))">
+                                                v-if="pageType === TransactionListPageType.List.type && (idx === 0 || (idx > 0 && (transaction.gregorianCalendarYearDashMonthDashDay !== transactions[idx - 1]!.gregorianCalendarYearDashMonthDashDay)))">
                                                 <td :colspan="showTagInTransactionListPage ? 6 : 5" class="font-weight-bold">
                                                     <div class="d-flex align-center">
                                                         <span>{{ getDisplayLongDate(transaction) }}</span>
@@ -579,7 +579,7 @@
                                                 </td>
                                                 <td class="transaction-table-column-tags" v-if="showTagInTransactionListPage">
                                                     <v-chip class="transaction-tag" size="small" :prepend-icon="mdiPound"
-                                                            :text="allTransactionTags[tagId].name"
+                                                            :text="allTransactionTags[tagId]?.name"
                                                             :key="tagId"
                                                             v-for="tagId in transaction.tagIds"/>
                                                     <v-chip class="transaction-tag" size="small"
@@ -669,7 +669,11 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
-import type { NameNumeralValue, TypeAndDisplayName } from '@/core/base.ts';
+import {
+    type NameNumeralValue,
+    type TypeAndDisplayName,
+    keys
+} from '@/core/base.ts';
 import {
     type Year0BasedMonth,
     type LocalizedRecentMonthDateRange,
@@ -884,8 +888,7 @@ const allPageCounts = computed<NameNumeralValue[]>(() => {
     const pageCounts: NameNumeralValue[] = [];
     const availableCountPerPage: number[] = [ 5, 10, 15, 20, 25, 30, 50 ];
 
-    for (let i = 0; i < availableCountPerPage.length; i++) {
-        const count = availableCountPerPage[i];
+    for (const count of availableCountPerPage) {
         pageCounts.push({ value: count, name: numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(count.toString()) });
     }
 
@@ -903,11 +906,11 @@ const allTransactionTagFilterTypes = computed<TransactionTemplateWithIcon[]>(() 
     const allTagFilterTypes: TypeAndDisplayName[] = getAllTransactionTagFilterTypes();
     const allTagFilterTypesWithIcon: TransactionTemplateWithIcon[] = [];
 
-    for (let i = 0; i < allTagFilterTypes.length; i++) {
+    for (const tagFilterType of allTagFilterTypes) {
         allTagFilterTypesWithIcon.push({
-            type: allTagFilterTypes[i].type,
-            displayName: allTagFilterTypes[i].displayName,
-            icon: tagFilterIconMap[allTagFilterTypes[i].type]
+            type: tagFilterType.type,
+            displayName: tagFilterType.displayName,
+            icon: tagFilterIconMap[tagFilterType.type] ?? ''
         });
     }
 
@@ -948,9 +951,7 @@ const transactions = computed<Transaction[]>(() => {
 
             const transactions :Transaction[] = [];
 
-            for (let i = 0; i < transactionData.items.length; i++) {
-                const transaction = transactionData.items[i];
-
+            for (const transaction of transactionData.items) {
                 if (transaction.gregorianCalendarYearDashMonthDashDay === currentCalendarDate.value) {
                     transactions.push(transaction);
                 }
@@ -972,7 +973,7 @@ const recentDateRangeIndex = computed<number>({
             value = 0;
         }
 
-        changeDateFilter(recentMonthDateRanges.value[value]);
+        changeDateFilter(recentMonthDateRanges.value[value] as LocalizedRecentMonthDateRange);
     }
 });
 
@@ -1089,8 +1090,8 @@ function getCategoryListItemCheckedClass(category: TransactionCategory, queryCat
     }
 
     if (category.subCategories) {
-        for (let i = 0; i < category.subCategories.length; i++) {
-            if (queryCategoryIds && queryCategoryIds[category.subCategories[i].id]) {
+        for (const subCategory of category.subCategories) {
+            if (queryCategoryIds && queryCategoryIds[subCategory.id]) {
                 return {
                     'list-item-selected': true,
                     'has-children-item-selected': true
@@ -1382,7 +1383,7 @@ function changeCustomMonthDateFilter(yearMonth: Year0BasedMonth): void {
 }
 
 function shiftDateRange(startTime: number, endTime: number, scale: number): void {
-    if (recentMonthDateRanges.value[recentDateRangeIndex.value].dateType === DateRange.All.type) {
+    if (recentMonthDateRanges.value[recentDateRangeIndex.value]?.dateType === DateRange.All.type) {
         return;
     }
 
@@ -1421,11 +1422,7 @@ function changeTypeFilter(type: number): void {
     if (type && query.value.categoryIds) {
         newCategoryFilter = '';
 
-        for (const categoryId in queryAllFilterCategoryIds.value) {
-            if (!Object.prototype.hasOwnProperty.call(queryAllFilterCategoryIds.value, categoryId)) {
-                continue;
-            }
-
+        for (const categoryId of keys(queryAllFilterCategoryIds.value)) {
             const category = allCategories.value[categoryId];
 
             if (category && category.type === transactionTypeToCategoryType(type)) {
@@ -1680,13 +1677,13 @@ function scrollAmountMenuToSelectedItem(opened: boolean): void {
         if (isString(query.value.amountFilter)) {
             try {
                 const filterItems = query.value.amountFilter.split(':');
-                const amountCount = getAmountFilterParameterCount(filterItems[0]);
+                const amountCount = getAmountFilterParameterCount(filterItems[0] as string);
 
                 if (filterItems.length === 2 && amountCount === 1) {
-                    amount1 = parseInt(filterItems[1]);
+                    amount1 = parseInt(filterItems[1] as string);
                 } else if (filterItems.length === 3 && amountCount === 2) {
-                    amount1 = parseInt(filterItems[1]);
-                    amount2 = parseInt(filterItems[2]);
+                    amount1 = parseInt(filterItems[1] as string);
+                    amount2 = parseInt(filterItems[2] as string);
                 }
             } catch (ex) {
                 logger.warn('cannot parse amount from filter value, original value is ' + query.value.amountFilter, ex);

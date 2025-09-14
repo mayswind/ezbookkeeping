@@ -175,8 +175,7 @@ export function useAppCloudSyncBase() {
         if (settings && settings.length > 0) {
             settingsStore.setApplicationSettingsFromCloudSettings(settings);
 
-            for (let i = 0; i < settings.length; i++) {
-                const setting = settings[i];
+            for (const setting of settings) {
                 if (setting && setting.settingKey) {
                     enabledApplicationCloudSettings.value[setting.settingKey] = true;
                 }

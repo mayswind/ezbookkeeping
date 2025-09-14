@@ -93,11 +93,11 @@
             <div class="d-flex align-center" v-if="editingTransaction !== item || item.type === TransactionType.ModifyBalance">
                 <span v-if="item.type === TransactionType.ModifyBalance">-</span>
                 <ItemIcon size="24px" icon-type="category"
-                          :icon-id="allCategoriesMap[item.categoryId].icon"
-                          :color="allCategoriesMap[item.categoryId].color"
+                          :icon-id="allCategoriesMap[item.categoryId]?.icon ?? ''"
+                          :color="allCategoriesMap[item.categoryId]?.color ?? ''"
                           v-if="item.type !== TransactionType.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]"></ItemIcon>
                 <span class="ms-2" v-if="item.type !== TransactionType.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]">
-                                    {{ allCategoriesMap[item.categoryId].name }}
+                                    {{ allCategoriesMap[item.categoryId]?.name }}
                                 </span>
                 <div class="text-error font-italic" v-else-if="item.type !== TransactionType.ModifyBalance && (!item.categoryId || item.categoryId === '0' || !allCategoriesMap[item.categoryId])">
                     <v-icon class="me-1" :icon="mdiAlertOutline"/>
@@ -166,13 +166,13 @@
         </template>
         <template #item.actualSourceAccountName="{ item }">
             <div class="d-flex align-center" v-if="editingTransaction !== item">
-                <span v-if="item.sourceAccountId && item.sourceAccountId !== '0' && allAccountsMap[item.sourceAccountId]">{{ allAccountsMap[item.sourceAccountId].name }}</span>
+                <span v-if="item.sourceAccountId && item.sourceAccountId !== '0' && allAccountsMap[item.sourceAccountId]">{{ allAccountsMap[item.sourceAccountId]?.name }}</span>
                 <div class="text-error font-italic" v-else>
                     <v-icon class="me-1" :icon="mdiAlertOutline"/>
                     <span>{{ item.originalSourceAccountName }}</span>
                 </div>
                 <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
-                <span v-if="item.type === TransactionType.Transfer && item.destinationAccountId && item.destinationAccountId !== '0' && allAccountsMap[item.destinationAccountId]">{{allAccountsMap[item.destinationAccountId].name }}</span>
+                <span v-if="item.type === TransactionType.Transfer && item.destinationAccountId && item.destinationAccountId !== '0' && allAccountsMap[item.destinationAccountId]">{{allAccountsMap[item.destinationAccountId]?.name }}</span>
                 <div class="text-error font-italic" v-else-if="item.type === TransactionType.Transfer && (!item.destinationAccountId || item.destinationAccountId === '0' || !allAccountsMap[item.destinationAccountId])">
                     <v-icon class="me-1" :icon="mdiAlertOutline"/>
                     <span>{{ item.originalDestinationAccountName }}</span>
@@ -252,7 +252,7 @@
                         <v-chip :class="{ 'font-italic': !isTagValid(editingTags, index) }"
                                 :prepend-icon="isTagValid(editingTags, index) ? mdiPound : mdiAlertOutline"
                                 :color="isTagValid(editingTags, index) ? 'default' : 'error'"
-                                :text="isTagValid(editingTags, index) ? allTagsMap[editingTags[index]].name : item.originalTagNames[index]"
+                                :text="isTagValid(editingTags, index) ? allTagsMap[editingTags[index] as string]?.name : item.originalTagNames[index]"
                                 v-bind="props"/>
                     </template>
 
@@ -1153,7 +1153,7 @@ function getTransactionDisplayAmount(transaction: ImportTransaction): string {
     let currency = transaction.originalSourceAccountCurrency || defaultCurrency.value;
 
     if (transaction.sourceAccountId && transaction.sourceAccountId !== '0' && allAccountsMap.value[transaction.sourceAccountId]) {
-        currency = allAccountsMap.value[transaction.sourceAccountId].currency;
+        currency = allAccountsMap.value[transaction.sourceAccountId]!.currency;
     }
 
     return getDisplayCurrency(transaction.sourceAmount, currency);
@@ -1167,7 +1167,7 @@ function getTransactionDisplayDestinationAmount(transaction: ImportTransaction):
     let currency = transaction.originalDestinationAccountCurrency || defaultCurrency.value;
 
     if (transaction.destinationAccountId && transaction.destinationAccountId !== '0' && allAccountsMap.value[transaction.destinationAccountId]) {
-        currency = allAccountsMap.value[transaction.destinationAccountId].currency;
+        currency = allAccountsMap.value[transaction.destinationAccountId]!.currency;
     }
 
     return getDisplayCurrency(transaction.destinationAmount, currency);
@@ -1425,15 +1425,15 @@ function updateTransactionData(transaction: ImportTransaction): void {
     transaction.valid = transaction.isTransactionValid();
 
     if (transaction.categoryId && allCategoriesMap.value[transaction.categoryId]) {
-        transaction.actualCategoryName = allCategoriesMap.value[transaction.categoryId].name;
+        transaction.actualCategoryName = allCategoriesMap.value[transaction.categoryId]!.name;
     }
 
     if (transaction.sourceAccountId && allAccountsMap.value[transaction.sourceAccountId]) {
-        transaction.actualSourceAccountName = allAccountsMap.value[transaction.sourceAccountId].name;
+        transaction.actualSourceAccountName = allAccountsMap.value[transaction.sourceAccountId]!.name;
     }
 
     if (transaction.destinationAccountId && allAccountsMap.value[transaction.destinationAccountId]) {
-        transaction.actualDestinationAccountName = allAccountsMap.value[transaction.destinationAccountId].name;
+        transaction.actualDestinationAccountName = allAccountsMap.value[transaction.destinationAccountId]!.name;
     }
 }
 

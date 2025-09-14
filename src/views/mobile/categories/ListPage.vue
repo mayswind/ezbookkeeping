@@ -140,13 +140,13 @@ const categories = computed<TransactionCategory[]>(() => {
             return [];
         }
 
-        return transactionCategoriesStore.allTransactionCategories[categoryType.value];
+        return transactionCategoriesStore.allTransactionCategories[categoryType.value] ?? [];
     } else if (primaryCategoryId.value && primaryCategoryId.value !== '' && primaryCategoryId.value !== '0') {
         if (!transactionCategoriesStore.allTransactionCategoriesMap || !transactionCategoriesStore.allTransactionCategoriesMap[primaryCategoryId.value]) {
             return [];
         }
 
-        return transactionCategoriesStore.allTransactionCategoriesMap[primaryCategoryId.value].subCategories || [];
+        return transactionCategoriesStore.allTransactionCategoriesMap[primaryCategoryId.value]?.subCategories ?? [];
     } else {
         return [];
     }

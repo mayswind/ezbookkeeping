@@ -103,9 +103,7 @@ function isPrimaryItemHasSecondaryValue(primaryItem: Record<string, unknown>): b
 
     const lowerCaseFilterContent = filterContent.value?.toLowerCase() ?? '';
 
-    for (let i = 0; i < subItems.length; i++) {
-        const secondaryItem = subItems[i];
-
+    for (const secondaryItem of subItems) {
         if (props.secondaryHiddenField && (secondaryItem as Record<string, unknown>)[props.secondaryHiddenField]) {
             continue;
         }

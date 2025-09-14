@@ -224,9 +224,7 @@ export class LeafletMapInstance implements MapInstance {
     private getFinalUrlFormat(urlFormat: string, urlExtraParams: LeafletTileSourceExtraParam[], options: MapInstanceInitOptions) {
         const params: string[] = [];
 
-        for (let i = 0; i < urlExtraParams.length; i++) {
-            const param = urlExtraParams[i];
-
+        for (const param of urlExtraParams) {
             if (param.paramValueType === 'tomtom_key') {
                 params.push(param.paramName + '=' + getTomTomMapAPIKey());
             } else if (param.paramValueType === 'tianditu_key') {

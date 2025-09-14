@@ -3,6 +3,8 @@ import path from 'path';
 import { describe, expect, test } from '@jest/globals';
 
 import { DEFAULT_CONTENT } from '@/locales/calendar/chinese/index.ts';
+
+import { itemAndIndex, entries } from '@/core/base.ts';
 import type { ChineseCalendarLocaleData } from '@/core/calendar.ts';
 import {
     type ChineseYearMonthDayInfo,
@@ -90,12 +92,12 @@ describe('getChineseYearMonthAllDayInfos', () => {
     allMonthChineseDays[`${currentYear}-${currentMonth}`] = currentMonthChineseDays;
     allMonthSolarTermNames[`${currentYear}-${currentMonth}`] = currentMonthSolarTermNames;
 
-    for (const yearMonth in allMonthChineseDays) {
+    for (const [yearMonth, monthChineseDays] of entries(allMonthChineseDays)) {
         test(`returns correct chinese all dates in month for ${yearMonth}`, () => {
             const [yearStr, monthStr] = yearMonth.split('-');
             const year = parseInt(yearStr as string);
             const month = parseInt(monthStr as string);
-            const expectedChineseMonthOrDays = allMonthChineseDays[yearMonth] as string[];
+            const expectedChineseMonthOrDays = monthChineseDays;
             const expectedSolarTermNames = allMonthSolarTermNames[yearMonth] as string[];
 
             const actualChineseDates: ChineseYearMonthDayInfo[] | undefined = getChineseYearMonthAllDayInfos({
@@ -106,13 +108,12 @@ describe('getChineseYearMonthAllDayInfos', () => {
             expect(actualChineseDates).toBeDefined();
 
             if (actualChineseDates) {
-                for (let i = 0; i < actualChineseDates.length; i++) {
-                    const actualChineseDate = actualChineseDates[i];
+                for (const [actualChineseDate, index] of itemAndIndex(actualChineseDates)) {
                     const chineseMonthOrDay: string | undefined = actualChineseDate?.day === 1 ? `${actualChineseDate?.month}${ordinalSuffix[actualChineseDate?.month - 1] ?? 'th'} Lunar Month`.toLowerCase() : actualChineseDate?.day.toString();
 
                     expect(actualChineseDate).toBeDefined();
-                    expect(chineseMonthOrDay).toBe(expectedChineseMonthOrDays[i]);
-                    expect(actualChineseDate?.solarTermName).toBe(expectedSolarTermNames[i]);
+                    expect(chineseMonthOrDay).toBe(expectedChineseMonthOrDays[index]);
+                    expect(actualChineseDate?.solarTermName).toBe(expectedSolarTermNames[index]);
                 }
             }
         });

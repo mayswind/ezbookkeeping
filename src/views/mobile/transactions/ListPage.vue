@@ -200,7 +200,7 @@
                                       v-for="(transaction, idx) in transactionMonthList.items"
                         >
                             <template #media>
-                                <div class="display-flex flex-direction-column transaction-date" :style="getTransactionDateStyle(transaction, idx > 0 ? transactionMonthList.items[idx - 1] : null)">
+                                <div class="display-flex flex-direction-column transaction-date" :style="getTransactionDateStyle(transaction, idx > 0 ? transactionMonthList.items[idx - 1] : undefined)">
                                     <span class="transaction-day full-line flex-direction-column">
                                         {{ getCalendarDisplayDayOfMonthFromUnixTime(transaction.time) }}
                                     </span>
@@ -252,7 +252,7 @@
                                         <div class="item-footer">
                                             <div class="transaction-tags" v-if="showTagInTransactionListPage && transaction.tagIds && transaction.tagIds.length">
                                                 <f7-chip media-text-color="var(--f7-chip-text-color)" class="transaction-tag"
-                                                         :text="allTransactionTags[tagId].name"
+                                                         :text="allTransactionTags[tagId]?.name"
                                                          :key="tagId"
                                                          v-for="tagId in transaction.tagIds">
                                                     <template #media>
@@ -373,7 +373,7 @@
                               :class="getCategoryListItemCheckedClass(category, queryAllFilterCategoryIds)"
                               :key="category.id"
                               v-for="category in categories"
-                              v-show="!category.hidden || query.categoryIds === category.id || (allCategories[query.categoryIds] && allCategories[query.categoryIds].parentId === category.id)"
+                              v-show="!category.hidden || query.categoryIds === category.id || (allCategories[query.categoryIds] && allCategories[query.categoryIds]?.parentId === category.id)"
                 >
                     <template #media>
                         <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
@@ -439,7 +439,7 @@
                               :class="{ 'list-item-selected': query.accountIds === account.id, 'item-in-multiple-selection': queryAllFilterAccountIdsCount > 1 && queryAllFilterAccountIds[account.id] }"
                               :key="account.id"
                               v-for="account in allAccounts"
-                              v-show="(!account.hidden && (!allAccountsMap[account.parentId] || !allAccountsMap[account.parentId].hidden)) || query.accountIds === account.id"
+                              v-show="(!account.hidden && (!allAccountsMap[account.parentId] || !allAccountsMap[account.parentId]!.hidden)) || query.accountIds === account.id"
                               @click="changeAccountFilter(account.id)"
                 >
                     <template #media>
@@ -597,7 +597,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { type TransactionMonthList, useTransactionsStore } from '@/stores/transaction.ts';
 
-import type { TypeAndDisplayName } from '@/core/base.ts';
+import { type TypeAndDisplayName, keys } from '@/core/base.ts';
 import { TextDirection } from '@/core/text.ts';
 import {
     type TextualYearMonth,
@@ -742,9 +742,7 @@ const transactions = computed<TransactionMonthList[]>(() => {
 
             const transactions :Transaction[] = [];
 
-            for (let i = 0; i < transactionData.items.length; i++) {
-                const transaction = transactionData.items[i];
-
+            for (const transaction of transactionData.items) {
                 if (transaction.gregorianCalendarYearDashMonthDashDay === currentCalendarDate.value) {
                     transactions.push(transaction);
                 }
@@ -778,7 +776,7 @@ const noTransaction = computed<boolean>(() => {
     if (pageType.value === TransactionListPageType.List.type) {
         return transactionsStore.noTransaction;
     } else if (pageType.value === TransactionListPageType.Calendar.type) {
-        return !transactions.value || !transactions.value.length || !transactions.value[0].items || !transactions.value[0].items.length;
+        return !transactions.value || !transactions.value.length || !transactions.value[0]!.items || !transactions.value[0]!.items.length;
     } else {
         return true;
     }
@@ -832,8 +830,7 @@ function setTransactionMonthListHeights(reset: boolean): Promise<unknown> {
         if (transactions.value && transactions.value.length) {
             const heights: Record<string, number> = getElementActualHeights('.transaction-month-list');
 
-            for (let i = 0; i < transactions.value.length - 1; i++) {
-                const transactionMonthList = transactions.value[i];
+            for (const transactionMonthList of transactions.value) {
                 const yearDashMonth = transactionMonthList.yearDashMonth;
                 const domId = getTransactionMonthListDomId(yearDashMonth);
                 const height = heights[domId];
@@ -851,8 +848,7 @@ function setTransactionInvisibleYearMonthList(): void {
         return;
     }
 
-    for (let i = 0; i < transactions.value.length - 1; i++) {
-        const transactionMonthList = transactions.value[i];
+    for (const transactionMonthList of transactions.value) {
         const yearDashMonth = transactionMonthList.yearDashMonth;
 
         const titleDomId = getTransactionMonthTitleDomId(yearDashMonth);
@@ -875,7 +871,7 @@ function setTransactionInvisibleYearMonthList(): void {
     }
 }
 
-function getTransactionDateStyle(transaction: Transaction, previousTransaction: Transaction | null): Record<string, string> {
+function getTransactionDateStyle(transaction: Transaction, previousTransaction: Transaction | undefined): Record<string, string> {
     if (!previousTransaction || transaction.gregorianCalendarDayOfMonth !== previousTransaction.gregorianCalendarDayOfMonth) {
         return {};
     }
@@ -893,8 +889,8 @@ function getCategoryListItemCheckedClass(category: TransactionCategory, queryCat
     }
 
     if (category.subCategories) {
-        for (let i = 0; i < category.subCategories.length; i++) {
-            if (queryCategoryIds && queryCategoryIds[category.subCategories[i].id]) {
+        for (const subCategory of category.subCategories) {
+            if (queryCategoryIds && queryCategoryIds[subCategory.id]) {
                 return {
                     'list-item-checked': true
                 };
@@ -1208,11 +1204,7 @@ function changeTypeFilter(type: number): void {
     if (type && query.value.categoryIds) {
         newCategoryFilter = '';
 
-        for (const categoryId in queryAllFilterCategoryIds.value) {
-            if (!Object.prototype.hasOwnProperty.call(queryAllFilterCategoryIds.value, categoryId)) {
-                continue;
-            }
-
+        for (const categoryId of keys(queryAllFilterCategoryIds.value)) {
             const category = allCategories.value[categoryId];
 
             if (category && category.type === transactionTypeToCategoryType(type)) {

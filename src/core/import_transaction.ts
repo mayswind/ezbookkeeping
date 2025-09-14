@@ -1,4 +1,4 @@
-import type { TypeAndName, TypeAndDisplayName } from './base.ts';
+import { type TypeAndName, type TypeAndDisplayName, entries, keys } from './base.ts';
 import { KnownAmountFormat } from './numeral.ts';
 import { KnownDateTimeFormat } from './datetime.ts';
 import { KnownDateTimezoneFormat } from './timezone.ts';
@@ -92,9 +92,9 @@ export class ImportTransactionDataMapping {
             this.dataColumnMapping[columnType] = columnIndex;
         }
 
-        for (const otherColumnType in this.dataColumnMapping) {
-            if (otherColumnType !== columnType.toString() && this.dataColumnMapping[otherColumnType] === columnIndex) {
-                delete this.dataColumnMapping[otherColumnType];
+        for (const otherColumnType of keys(this.dataColumnMapping)) {
+            if (otherColumnType !== columnType.toString() && this.dataColumnMapping[parseInt(otherColumnType)] === columnIndex) {
+                delete this.dataColumnMapping[parseInt(otherColumnType)];
             }
         }
     }
@@ -119,16 +119,22 @@ export class ImportTransactionDataMapping {
 
         const allTypeMap: Record<string, boolean> = {};
         const allTypes: string[] = [];
-        const typeColumnIndex = this.dataColumnMapping[ImportTransactionColumnType.TransactionType.type];
+        const typeColumnIndex = this.dataColumnMapping[ImportTransactionColumnType.TransactionType.type] as number;
 
         const startIndex = this.includeHeader ? 1 : 0;
 
         for (let i = startIndex; i < fileData.length; i++) {
-            if (fileData[i].length <= typeColumnIndex) {
+            const items = fileData[i];
+
+            if (!items) {
                 continue;
             }
 
-            const type = fileData[i][typeColumnIndex];
+            if (items.length <= typeColumnIndex) {
+                continue;
+            }
+
+            const type = items[typeColumnIndex];
 
             if (type && !allTypeMap[type]) {
                 allTypes.push(type);
@@ -150,13 +156,7 @@ export class ImportTransactionDataMapping {
             return result;
         }
 
-        for (const name in this.transactionTypeMapping) {
-            if (!Object.prototype.hasOwnProperty.call(this.transactionTypeMapping, name)) {
-                continue;
-            }
-
-            const type = this.transactionTypeMapping[name];
-
+        for (const [name, type] of entries(this.transactionTypeMapping)) {
             if (TransactionType.ModifyBalance <= type && type <= TransactionType.Transfer) {
                 result[name] = type;
             }
@@ -171,16 +171,22 @@ export class ImportTransactionDataMapping {
         }
 
         const allDateTimes: string[] = [];
-        const dateTimeColumnIndex = this.dataColumnMapping[ImportTransactionColumnType.TransactionTime.type];
+        const dateTimeColumnIndex = this.dataColumnMapping[ImportTransactionColumnType.TransactionTime.type] as number;
 
         const startIndex = this.includeHeader ? 1 : 0;
 
         for (let i = startIndex; i < fileData.length; i++) {
-            if (fileData[i].length <= dateTimeColumnIndex) {
+            const items = fileData[i];
+
+            if (!items) {
                 continue;
             }
 
-            const dateTime = fileData[i][dateTimeColumnIndex];
+            if (items.length <= dateTimeColumnIndex) {
+                continue;
+            }
+
+            const dateTime = items[dateTimeColumnIndex];
 
             if (dateTime) {
                 allDateTimes.push(dateTime);
@@ -193,7 +199,7 @@ export class ImportTransactionDataMapping {
             return undefined;
         }
 
-        return detectedFormats[0].format;
+        return detectedFormats[0]!.format;
     }
 
     public parseFileAutoDetectedTimezoneFormat(fileData: string[][] | undefined): string | undefined {
@@ -202,16 +208,22 @@ export class ImportTransactionDataMapping {
         }
 
         const allTimezones: string[] = [];
-        const timezoneColumnIndex = this.dataColumnMapping[ImportTransactionColumnType.TransactionTimezone.type];
+        const timezoneColumnIndex = this.dataColumnMapping[ImportTransactionColumnType.TransactionTimezone.type] as number;
 
         const startIndex = this.includeHeader ? 1 : 0;
 
         for (let i = startIndex; i < fileData.length; i++) {
-            if (fileData[i].length <= timezoneColumnIndex) {
+            const items = fileData[i];
+
+            if (!items) {
                 continue;
             }
 
-            const timezone = fileData[i][timezoneColumnIndex];
+            if (items.length <= timezoneColumnIndex) {
+                continue;
+            }
+
+            const timezone = items[timezoneColumnIndex];
 
             if (timezone) {
                 allTimezones.push(timezone);
@@ -224,7 +236,7 @@ export class ImportTransactionDataMapping {
             return undefined;
         }
 
-        return detectedFormats[0].value;
+        return detectedFormats[0]!.value;
     }
 
     public parseFileAutoDetectedAmountFormat(fileData: string[][] | undefined): string | undefined {
@@ -233,16 +245,22 @@ export class ImportTransactionDataMapping {
         }
 
         const allAmounts: string[] = [];
-        const amountColumnIndex = this.dataColumnMapping[ImportTransactionColumnType.Amount.type];
+        const amountColumnIndex = this.dataColumnMapping[ImportTransactionColumnType.Amount.type] as number;
 
         const startIndex = this.includeHeader ? 1 : 0;
 
         for (let i = startIndex; i < fileData.length; i++) {
-            if (fileData[i].length <= amountColumnIndex) {
+            const items = fileData[i];
+
+            if (!items) {
                 continue;
             }
 
-            const amount = fileData[i][amountColumnIndex];
+            if (items.length <= amountColumnIndex) {
+                continue;
+            }
+
+            const amount = items[amountColumnIndex];
 
             if (amount) {
                 allAmounts.push(amount);
@@ -255,7 +273,7 @@ export class ImportTransactionDataMapping {
             return undefined;
         }
 
-        return detectedFormats[0].type;
+        return detectedFormats[0]!.type;
     }
 
     public reset(): void {
@@ -382,8 +400,7 @@ export class ImportTransactionReplaceRules {
     public toJson(): string {
         const result: unknown[] = [];
 
-        for (let i = 0; i < this.rules.length; i++) {
-            const rule = this.rules[i];
+        for (const rule of this.rules) {
             result.push(rule.toJsonObject());
         }
 
@@ -407,8 +424,7 @@ export class ImportTransactionReplaceRules {
 
             const result = new ImportTransactionReplaceRules([]);
 
-            for (let i = 0; i < root.length; i++) {
-                const rule = root[i];
+            for (const rule of root) {
                 const replaceRule = ImportTransactionReplaceRule.parse(rule);
 
                 if (replaceRule) {

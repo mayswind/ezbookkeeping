@@ -162,15 +162,15 @@
                 <template #item.categoryId="{ item }">
                     <div class="d-flex align-center">
                         <ItemIcon size="24px" icon-type="category"
-                                  :icon-id="allCategoriesMap[item.categoryId].icon"
-                                  :color="allCategoriesMap[item.categoryId].color"
+                                  :icon-id="allCategoriesMap[item.categoryId]?.icon ?? ''"
+                                  :color="allCategoriesMap[item.categoryId]?.color ?? ''"
                                   v-if="allCategoriesMap[item.categoryId] && allCategoriesMap[item.categoryId]?.color"></ItemIcon>
                         <v-icon size="24" :icon="mdiPencilBoxOutline" v-else-if="!allCategoriesMap[item.categoryId] || !allCategoriesMap[item.categoryId]?.color" />
                         <span class="ms-2" v-if="item.type === TransactionType.ModifyBalance">
                             {{ tt('Modify Balance') }}
                         </span>
                         <span class="ms-2" v-else-if="item.type !== TransactionType.ModifyBalance && allCategoriesMap[item.categoryId]">
-                            {{ allCategoriesMap[item.categoryId].name }}
+                            {{ allCategoriesMap[item.categoryId]?.name }}
                         </span>
                     </div>
                 </template>
@@ -181,9 +181,9 @@
                 </template>
                 <template #item.sourceAccountId="{ item }">
                     <div class="d-flex align-center">
-                        <span v-if="item.sourceAccountId && allAccountsMap[item.sourceAccountId]">{{ allAccountsMap[item.sourceAccountId].name }}</span>
+                        <span v-if="item.sourceAccountId && allAccountsMap[item.sourceAccountId]">{{ allAccountsMap[item.sourceAccountId]?.name }}</span>
                         <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
-                        <span v-if="item.type === TransactionType.Transfer && item.destinationAccountId && allAccountsMap[item.destinationAccountId]">{{ allAccountsMap[item.destinationAccountId].name }}</span>
+                        <span v-if="item.type === TransactionType.Transfer && item.destinationAccountId && allAccountsMap[item.destinationAccountId]">{{ allAccountsMap[item.destinationAccountId]?.name }}</span>
                     </div>
                 </template>
                 <template #item.accountBalance="{ item }">
@@ -388,12 +388,7 @@ const totalPageCount = computed<number>(() => {
         return 1;
     }
 
-    let count = 0;
-
-    for (let i = 0; i < reconciliationStatements.value.transactions.length; i++) {
-        count++;
-    }
-
+    const count = reconciliationStatements.value.transactions.length;
     return Math.ceil(count / countPerPage.value);
 });
 
@@ -422,9 +417,7 @@ function getTablePageOptions(linesCount?: number): NameNumeralValue[] {
 
     const availableCountPerPage = [ 5, 10, 15, 20, 25, 30, 50 ];
 
-    for (let i = 0; i < availableCountPerPage.length; i++) {
-        const count = availableCountPerPage[i];
-
+    for (const count of availableCountPerPage) {
         if (linesCount < count) {
             break;
         }

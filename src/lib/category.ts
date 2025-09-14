@@ -71,7 +71,7 @@ export function localizedPresetCategoriesToTransactionCategoryCreateWithSubCateg
     return categories;
 }
 
-export function getSecondaryTransactionMapByName(allCategories: TransactionCategory[]): Record<string, TransactionCategory> {
+export function getSecondaryTransactionMapByName(allCategories?: TransactionCategory[]): Record<string, TransactionCategory> {
     const ret: Record<string, TransactionCategory> = {};
 
     if (!allCategories) {
@@ -274,7 +274,7 @@ export function isSubCategoryIdAvailable(categories: TransactionCategory[], cate
     return false;
 }
 
-export function getFirstAvailableCategoryId(categories: TransactionCategory[]): string {
+export function getFirstAvailableCategoryId(categories?: TransactionCategory[]): string {
     if (!categories || !categories.length) {
         return '';
     }

@@ -14,6 +14,26 @@ type ImportTransaction struct {
 	OriginalTagNames                   []string
 }
 
+// ImportTransactionRequest represents all parameters of the imported transaction data
+type ImportTransactionRequest struct {
+	Transactions []*ImportTransactionRequestItem
+}
+
+// ImportTransactionRequestItem represents a single item of the imported transaction data
+type ImportTransactionRequestItem struct {
+	Time                   string `json:"time"`
+	UtcOffset              string `json:"utcOffset"`
+	Type                   string `json:"type"`
+	CategoryName           string `json:"categoryName,omitempty"`
+	SourceAccountName      string `json:"sourceAccountName,omitempty"`
+	DestinationAccountName string `json:"destinationAccountName,omitempty"`
+	SourceAmount           string `json:"sourceAmount"`
+	DestinationAmount      string `json:"destinationAmount,omitempty"`
+	GeoLocation            string `json:"geoLocation,omitempty"`
+	TagNames               string `json:"tagNames,omitempty"`
+	Comment                string `json:"comment,omitempty"`
+}
+
 // ImportTransactionResponse represents a view-object of the imported transaction data
 type ImportTransactionResponse struct {
 	Type                               TransactionType                 `json:"type"`

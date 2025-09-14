@@ -117,6 +117,7 @@
             "youHaveAccounts": "您已经记录了 {count} 个账户",
             "addNewTag": "添加新标签 \"{tag}\"",
             "clickToSelectedFile": "点击选择导入文件 ({extensions})",
+            "previewCount": "预览数量: {count}",
             "selectedCount": "已选择 {count} / {totalCount}",
             "youHaveUpdatedTransactions": "您已经更新 {count} 个交易",
             "confirmImportTransactions": "您确定要导入 {count} 个交易？",
@@ -134,6 +135,7 @@
         "defaultExportReconciliationStatementsFileName": "ezBookkeeping_对账单",
         "exportReconciliationStatementsFileName": "ezBookkeeping_{nickname}_对账单",
         "defaultImportDataMappingFileName": "ezBookkeeping_导入数据映射文件",
+        "defaultImportHandlingScript": "ezBookkeeping_导入处理脚本",
         "defaultImportReplaceRuleFileName": "ezBookkeeping_导入替换规则文件"
     },
     "calendar": {
@@ -1217,6 +1219,7 @@
         "invalid amount expression": "金额表达式无效",
         "invalid xml file": "无效的 XML 文件",
         "invalid mt940 file": "无效的 MT940 文件",
+        "invalid json file": "无效的 JSON 文件",
         "user custom exchange rate data not found": "用户自定义汇率数据不存在",
         "cannot update exchange rate data for base currency": "不能更新默认货币的汇率数据",
         "cannot delete exchange rate data for base currency": "不能删除默认货币的汇率数据",
@@ -1347,6 +1350,26 @@
                 "how-to-get-gnucash-xml-database-file": "如何获取-gnucash-xml-数据库文件",
                 "how-to-get-firefly-iii-data-export-file": "如何获取-firefly-iii-数据导出文件"
             }
+        }
+    },
+    "sample": {
+        "importTransactionCustomScript": {
+            "headerComment": "示例脚本：",
+            "functionDescription": "解析函数会在解析文件数据的每一行调用，函数名必须为 'parse'",
+            "functionParamRowDescription": "字符串数组，每个元素为一列的值",
+            "functionParamIndexDescription": "行索引 (从0开始)",
+            "functionReturnDescription": "表示一笔交易的对象 (包含下面定义的字段)，返回 null 时跳过此行",
+            "fieldTimeDescription": "[必填] 交易时间，格式：YYYY-MM-DD HH:mm:ss",
+            "fieldUtcOffsetDescription": "[必填] 交易时区的分钟偏移量，例如：'480' 表示 UTC+8，'-300' 表示 UTC-5",
+            "fieldTypeDescription": "[必填] 交易类型，必须为 'TransactionType.Income' (收入)、'TransactionType.Expense' (支出) 或 'TransactionType.Transfer' (转账)",
+            "fieldCategoryNameDescription": "[可选] 分类名称",
+            "fieldSourceAccountNameDescription": "[可选] 来源账户名称",
+            "fieldDestinationAccountNameDescription": "[可选] 目标账户名称 (仅用于转账类型)",
+            "fieldSourceAmountDescription": "[必填] 来源金额",
+            "fieldDestinationAmountDescription": "[可选] 目标金额 (仅用于转账类型)",
+            "fieldGeoLocationDescription": "[可选] 地理位置，格式：'经度 纬度'，例如：'116.3912972 39.9057136'",
+            "fieldTagNamesDescription": "[可选] 以分号分隔的标签名称，例如：'标签1;标签2;标签3'",
+            "fieldCommentDescription": "[可选] 描述"
         }
     },
     "OK": "确定",
@@ -1777,6 +1800,11 @@
     "Alipay (Web) Statement File": "支付宝 (网页版) 交易流水文件",
     "WeChat Pay Statement File": "微信支付账单文件",
     "JD.com Finance Statement File": "京东金融账单文件",
+    "Handling Method": "处理方法",
+    "Column Mapping": "列映射",
+    "Custom Script": "自定义脚本",
+    "Execute Custom Script": "执行自定义脚本",
+    "Execute Custom Script to Parse Data": "执行自定义脚本解析数据",
     "Data File": "数据文件",
     "Data to import": "要导入的数据",
     "Please select a file to import": "请选择要导入的文件",
@@ -1799,6 +1827,14 @@
     "Load Data Mapping File": "加载数据映射文件",
     "Save Data Mapping File": "保存数据映射文件",
     "Data mapping file is invalid": "数据映射文件无效",
+    "Load Script File": "加载脚本文件",
+    "Save Script File": "保存脚本文件",
+    "Cannot load script file": "无法加载脚本文件",
+    "No Preview Result": "没有预览结果",
+    "Please execute the custom script first": "请先执行自定义脚本",
+    "Executing Script...": "正在执行脚本...",
+    "No parse function defined": "没有定义解析函数 parse",
+    "Failed to execute custom script": "执行自定义脚本失败",
     "Batch Replace Selected Expense Categories": "批量替换选中的支出分类",
     "Batch Replace Selected Income Categories": "批量替换选中的收入分类",
     "Batch Replace Selected Transfer Categories": "批量替换选中的转账分类",

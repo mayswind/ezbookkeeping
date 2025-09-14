@@ -24,6 +24,21 @@
                     </v-btn>
                     <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                            :icon="true" :disabled="loading || submitting"
+                           v-if="currentStep === 'executeCustomScript' && importTransactionExecuteCustomScriptTab?.menus">
+                        <v-icon :icon="mdiDotsVertical" />
+                        <v-menu activator="parent" max-height="500">
+                            <v-list>
+                                <v-list-item :key="index"
+                                             :prepend-icon="menu.prependIcon"
+                                             :title="menu.title"
+                                             :disabled="menu.disabled"
+                                             @click="menu.onClick()"
+                                             v-for="(menu, index) in importTransactionExecuteCustomScriptTab.menus"/>
+                            </v-list>
+                        </v-menu>
+                    </v-btn>
+                    <v-btn density="comfortable" color="default" variant="text" class="ms-2"
+                           :icon="true" :disabled="loading || submitting"
                            v-if="currentStep === 'checkData' && importTransactionCheckDataTab?.filterMenus">
                         <v-icon :icon="mdiFilterOutline" />
                         <v-menu activator="parent" max-height="500">
@@ -115,6 +130,21 @@
                             />
                         </v-col>
 
+                        <v-col cols="12" md="12" v-if="fileType === 'dsv' || fileType === 'dsv_data'">
+                            <v-select
+                                item-title="displayName"
+                                item-value="type"
+                                :disabled="submitting"
+                                :label="tt('Handling Method')"
+                                :placeholder="tt('Handling Method')"
+                                :items="[
+                                    { displayName: tt('Column Mapping'), type: ImportDSVProcessMethod.ColumnMapping },
+                                    { displayName: tt('Custom Script'), type: ImportDSVProcessMethod.CustomScript }
+                                 ]"
+                                v-model="processDSVMethod"
+                            />
+                        </v-col>
+
                         <v-col cols="12" md="12" v-if="!isImportDataFromTextbox">
                             <v-text-field
                                 readonly
@@ -157,6 +187,13 @@
                         :disabled="loading || submitting"
                     />
                 </v-window-item>
+                <v-window-item value="executeCustomScript">
+                    <import-transaction-execute-custom-script-tab
+                        ref="importTransactionExecuteCustomScriptTab"
+                        :parsed-file-data="parsedFileData"
+                        :disabled="loading || submitting"
+                    />
+                </v-window-item>
                 <v-window-item value="checkData">
                     <import-transaction-check-data-tab
                         ref="importTransactionCheckDataTab"
@@ -177,7 +214,7 @@
                 <v-btn class="button-icon-with-direction" color="primary"
                        :disabled="loading || submitting || (!isImportDataFromTextbox && !importFile) || (isImportDataFromTextbox && !importData)"
                        :append-icon="!submitting ? mdiArrowRight : undefined" @click="parseData"
-                       v-if="currentStep === 'defineColumn' || currentStep === 'uploadFile'">
+                       v-if="currentStep === 'defineColumn' || currentStep === 'executeCustomScript' || currentStep === 'uploadFile'">
                     {{ tt('Next') }}
                     <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
@@ -206,6 +243,7 @@ import type { StepBarItem } from '@/components/desktop/StepsBar.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import ImportTransactionDefineColumnTab from './tabs/ImportTransactionDefineColumnTab.vue';
+import ImportTransactionExecuteCustomScriptTab from './tabs/ImportTransactionExecuteCustomScriptTab.vue';
 import ImportTransactionCheckDataTab from './tabs/ImportTransactionCheckDataTab.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
@@ -222,6 +260,7 @@ import { useStatisticsStore } from '@/stores/statistics.ts';
 import { itemAndIndex } from '@/core/base.ts';
 import { type NumeralSystem } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
+import { KnownFileType } from '@/core/file.ts';
 
 import type { LocalizedImportFileCategoryAndTypes, LocalizedImportFileType, LocalizedImportFileTypeSubType, LocalizedImportFileTypeSupportedEncodings } from '@/core/file.ts';
 import { ImportTransaction } from '@/models/imported_transaction.ts';
@@ -243,9 +282,14 @@ import {
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type ImportTransactionDefineColumnTabType = InstanceType<typeof ImportTransactionDefineColumnTab>;
+type ImportTransactionExecuteCustomScriptTabType = InstanceType<typeof ImportTransactionExecuteCustomScriptTab>;
 type ImportTransactionCheckDataTabType = InstanceType<typeof ImportTransactionCheckDataTab>;
 
-type ImportTransactionDialogStep = 'uploadFile' | 'defineColumn' | 'checkData' | 'finalResult';
+type ImportTransactionDialogStep = 'uploadFile' | 'defineColumn' | 'executeCustomScript' | 'checkData' | 'finalResult';
+enum ImportDSVProcessMethod {
+    ColumnMapping,
+    CustomScript
+};
 
 defineProps<{
     persistent?: boolean;
@@ -268,6 +312,7 @@ const statisticsStore = useStatisticsStore();
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const importTransactionDefineColumnTab = useTemplateRef<ImportTransactionDefineColumnTabType>('importTransactionDefineColumnTab');
+const importTransactionExecuteCustomScriptTab = useTemplateRef<ImportTransactionExecuteCustomScriptTabType>('importTransactionExecuteCustomScriptTab');
 const importTransactionCheckDataTab = useTemplateRef<ImportTransactionCheckDataTabType>('importTransactionCheckDataTab');
 const fileInput = useTemplateRef<HTMLInputElement>('fileInput');
 
@@ -278,6 +323,7 @@ const importProcess = ref<number>(0);
 const fileType = ref<string>('ezbookkeeping');
 const fileSubType = ref<string>('ezbookkeeping_csv');
 const fileEncoding = ref<string>('utf-8');
+const processDSVMethod = ref<ImportDSVProcessMethod>(ImportDSVProcessMethod.ColumnMapping);
 const importFile = ref<File | null>(null);
 const importData = ref<string>('');
 const parsedFileData = ref<string[][] | undefined>(undefined);
@@ -307,11 +353,19 @@ const allSteps = computed<StepBarItem[]>(() => {
     ];
 
     if (fileType.value === 'dsv' || fileType.value === 'dsv_data') {
-        steps.push({
-            name: 'defineColumn',
-            title: tt('Define Column'),
-            subTitle: tt('Define and Check Column Mapping')
-        });
+        if (processDSVMethod.value === ImportDSVProcessMethod.CustomScript) {
+            steps.push({
+                name: 'executeCustomScript',
+                title: tt('Execute Custom Script'),
+                subTitle: tt('Execute Custom Script to Parse Data')
+            });
+        } else {
+            steps.push({
+                name: 'defineColumn',
+                title: tt('Define Column'),
+                subTitle: tt('Define and Check Column Mapping')
+            });
+        }
     }
 
     steps.push(...[
@@ -378,12 +432,14 @@ function open(): Promise<void> {
     fileType.value = 'ezbookkeeping';
     fileSubType.value = 'ezbookkeeping_csv';
     fileEncoding.value = 'utf-8';
+    processDSVMethod.value = ImportDSVProcessMethod.ColumnMapping;
     currentStep.value = 'uploadFile';
     importProcess.value = 0;
     importFile.value = null;
     importData.value = '';
     parsedFileData.value = undefined;
     importTransactionDefineColumnTab.value?.reset();
+    importTransactionExecuteCustomScriptTab.value?.reset();
     importTransactions.value = undefined;
     importTransactionCheckDataTab.value?.reset();
     showState.value = true;
@@ -466,9 +522,9 @@ function parseData(): void {
         }
 
         if (type === 'custom_csv') {
-            uploadFile = new File([importData.value], 'import.csv', { type: 'text/csv' });
+            uploadFile = KnownFileType.CSV.createFile(importData.value, 'import');
         } else if (type === 'custom_tsv') {
-            uploadFile = new File([importData.value], 'import.tsv', { type: 'text/tab-separated-values' });
+            uploadFile = KnownFileType.TSV.createFile(importData.value, 'import');
         } else {
             snackbar.value?.showError('Parameter Invalid');
             return;
@@ -491,9 +547,15 @@ function parseData(): void {
             importFile: uploadFile
         }).then(response => {
             if (response && response.length) {
-                importTransactionDefineColumnTab.value?.reset();
-                parsedFileData.value = response;
-                currentStep.value = 'defineColumn';
+                if (processDSVMethod.value === ImportDSVProcessMethod.CustomScript) {
+                    importTransactionExecuteCustomScriptTab.value?.reset();
+                    parsedFileData.value = response;
+                    currentStep.value = 'executeCustomScript';
+                } else {
+                    importTransactionDefineColumnTab.value?.reset();
+                    parsedFileData.value = response;
+                    currentStep.value = 'defineColumn';
+                }
             } else {
                 parsedFileData.value = undefined;
                 snackbar.value?.showError('No data to import');
@@ -519,7 +581,7 @@ function parseData(): void {
         let geoLocationOrder: string | undefined = undefined;
         let tagSeparator: string | undefined = undefined;
 
-        if (isDsvFileType) {
+        if (isDsvFileType && processDSVMethod.value === ImportDSVProcessMethod.ColumnMapping) {
             const defineColumnResult = importTransactionDefineColumnTab.value?.generateResult();
 
             if (!defineColumnResult) {
@@ -536,6 +598,16 @@ function parseData(): void {
             geoLocationSeparator = defineColumnResult.geoLocationSeparator;
             geoLocationOrder = defineColumnResult.geoLocationOrder;
             tagSeparator = defineColumnResult.tagSeparator;
+        } else if (isDsvFileType && processDSVMethod.value === ImportDSVProcessMethod.CustomScript) {
+            const executeCustomScriptResult = importTransactionExecuteCustomScriptTab.value?.generateResult();
+
+            if (!executeCustomScriptResult) {
+                return;
+            }
+
+            type = 'ezbookkeeping_json';
+            encoding = undefined;
+            uploadFile = KnownFileType.JSON.createFile(executeCustomScriptResult, 'import');
         }
 
         submitting.value = true;

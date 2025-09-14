@@ -117,6 +117,7 @@
             "youHaveAccounts": "Hai registrato {count} profili",
             "addNewTag": "Aggiungi nuovo giorno \"{tag}\"",
             "clickToSelectedFile": "Carica un file ({extensions})",
+            "previewCount": "Preview Count: {count}",
             "selectedCount": "{count} selezionati su {totalCount}",
             "youHaveUpdatedTransactions": "Hai aggiornato {count} transazioni",
             "confirmImportTransactions": "Sei sicuro di voler importare {count} transazioni?",
@@ -134,6 +135,7 @@
         "defaultExportReconciliationStatementsFileName": "ezBookkeeping_reconciliation_statements",
         "exportReconciliationStatementsFileName": "ezBookkeeping_{nickname}_reconciliation_statements",
         "defaultImportDataMappingFileName": "ezBookkeeping_import_data_mapping",
+        "defaultImportHandlingScript": "ezBookkeeping_handling_script",
         "defaultImportReplaceRuleFileName": "ezBookkeeping_import_replace_rule"
     },
     "calendar": {
@@ -1217,6 +1219,7 @@
         "invalid amount expression": "Espressione dell'importo non valida",
         "invalid xml file": "Invalid XML file",
         "invalid mt940 file": "Invalid MT940 file",
+        "invalid json file": "Invalid JSON file",
         "user custom exchange rate data not found": "User custom exchange rate data is not found",
         "cannot update exchange rate data for base currency": "Cannot update exchange rate data for base currency",
         "cannot delete exchange rate data for base currency": "Cannot delete exchange rate data for base currency",
@@ -1347,6 +1350,26 @@
                 "how-to-get-gnucash-xml-database-file": "how-to-get-gnucash-xml-database-file",
                 "how-to-get-firefly-iii-data-export-file": "how-to-get-firefly-iii-data-export-file"
             }
+        }
+    },
+    "sample": {
+        "importTransactionCustomScript": {
+            "headerComment": "Example script:",
+            "functionDescription": "The parse function will be called for each row of the parsed file data, and the function name must be 'parse'",
+            "functionParamRowDescription": "An array of string, each element is a column value",
+            "functionParamIndexDescription": "The row index (0-based)",
+            "functionReturnDescription": "An object representing a transaction (with the fields defined below), or null to skip this row",
+            "fieldTimeDescription": "[required] Transaction time, format: YYYY-MM-DD HH:mm:ss",
+            "fieldUtcOffsetDescription": "[required] Transaction timezone offset in minutes, e.g. '480' for UTC+8, '-300' for UTC-5",
+            "fieldTypeDescription": "[required] Transaction type, must be one of 'TransactionType.Income', 'TransactionType.Expense' or 'TransactionType.Transfer'",
+            "fieldCategoryNameDescription": "[optional] Category name",
+            "fieldSourceAccountNameDescription": "[optional] Source account name",
+            "fieldDestinationAccountNameDescription": "[optional] Destination account name (for transfer type only)",
+            "fieldSourceAmountDescription": "[required] Source amount",
+            "fieldDestinationAmountDescription": "[optional] Destination amount (for transfer type only)",
+            "fieldGeoLocationDescription": "[optional] Geolocation, format: 'longitude latitude', e.g. '116.3912972 39.9057136'",
+            "fieldTagNamesDescription": "[optional] Comma separated tag names, e.g. 'tag1;tag2;tag3'",
+            "fieldCommentDescription": "[optional] Description"
         }
     },
     "OK": "OK",
@@ -1777,6 +1800,11 @@
     "Alipay (Web) Statement File": "Alipay (Web) Statement File",
     "WeChat Pay Statement File": "WeChat Pay Statement File",
     "JD.com Finance Statement File": "JD.com Finance Statement File",
+    "Handling Method": "Handling Method",
+    "Column Mapping": "Column Mapping",
+    "Custom Script": "Custom Script",
+    "Execute Custom Script": "Execute Custom Script",
+    "Execute Custom Script to Parse Data": "Execute Custom Script to Parse Data",
     "Data File": "File dati",
     "Data to import": "Dati da importare",
     "Please select a file to import": "Seleziona un file da importare",
@@ -1799,6 +1827,14 @@
     "Load Data Mapping File": "Load Data Mapping File",
     "Save Data Mapping File": "Save Data Mapping File",
     "Data mapping file is invalid": "Data mapping file is invalid",
+    "Load Script File": "Load Script File",
+    "Save Script File": "Save Script File",
+    "Cannot load script file": "Cannot load script file",
+    "No Preview Result": "No Preview Result",
+    "Please execute the custom script first": "Please execute the custom script first",
+    "Executing Script...": "Executing Script...",
+    "No parse function defined": "No parse function defined",
+    "Failed to execute custom script": "Failed to execute custom script",
     "Batch Replace Selected Expense Categories": "Sostituisci in blocco categorie di spesa selezionate",
     "Batch Replace Selected Income Categories": "Sostituisci in blocco categorie di entrata selezionate",
     "Batch Replace Selected Transfer Categories": "Sostituisci in blocco categorie di trasferimento selezionate",

@@ -103,6 +103,24 @@ export class ImportTransaction implements ImportTransactionResponse {
     }
 }
 
+export interface ImportTransactionRequest {
+    readonly transactions: ImportTransactionRequestItem[];
+}
+
+export interface ImportTransactionRequestItem {
+    readonly time: string;
+    readonly utcOffset: string;
+    readonly type: string;
+    readonly categoryName?: string;
+    readonly sourceAccountName?: string;
+    readonly destinationAccountName?: string;
+    readonly sourceAmount: string;
+    readonly destinationAmount?: string;
+    readonly geoLocation?: string;
+    readonly tagNames?: string;
+    readonly comment?: string;
+}
+
 export interface ImportTransactionResponse {
     readonly type: number;
     readonly categoryId: string;

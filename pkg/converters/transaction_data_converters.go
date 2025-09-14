@@ -38,6 +38,8 @@ func GetTransactionDataImporter(fileType string) (converter.TransactionDataImpor
 		return _default.DefaultTransactionDataCSVFileConverter, nil
 	} else if fileType == "ezbookkeeping_tsv" {
 		return _default.DefaultTransactionDataTSVFileConverter, nil
+	} else if fileType == "ezbookkeeping_json" {
+		return _default.DefaultTransactionDataJsonFileImporter, nil
 	} else if fileType == "ofx" {
 		return ofx.OFXTransactionDataImporter, nil
 	} else if fileType == "qfx" {

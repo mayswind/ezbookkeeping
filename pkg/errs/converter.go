@@ -30,4 +30,5 @@ var (
 	ErrInvalidAmountExpression             = NewNormalError(NormalSubcategoryConverter, 23, http.StatusBadRequest, "invalid amount expression")
 	ErrInvalidXmlFile                      = NewNormalError(NormalSubcategoryConverter, 24, http.StatusBadRequest, "invalid xml file")
 	ErrInvalidMT940File                    = NewNormalError(NormalSubcategoryConverter, 25, http.StatusBadRequest, "invalid mt940 file")
+	ErrInvalidJSONFile                     = NewNormalError(NormalSubcategoryConverter, 26, http.StatusBadRequest, "invalid json file")
 )

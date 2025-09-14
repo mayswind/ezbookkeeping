@@ -111,6 +111,15 @@ export function setTransactionModelByTransaction(transaction: Transaction, trans
             }
         }
 
+        if (options.destinationAccountId && options.destinationAccountId !== '0') {
+            for (const account of allVisibleAccounts) {
+                if (account.id === options.destinationAccountId) {
+                    transaction.destinationAccountId = options.destinationAccountId;
+                    break;
+                }
+            }
+        }
+
         if (!transaction.sourceAccountId) {
             if (defaultAccountId && allAccountsMap[defaultAccountId] && !allAccountsMap[defaultAccountId].hidden) {
                 transaction.sourceAccountId = defaultAccountId;
@@ -141,6 +150,10 @@ export function setTransactionModelByTransaction(transaction: Transaction, trans
         }
 
         transaction.tagIds = finalTagIds;
+    }
+
+    if (options.comment) {
+        transaction.comment = options.comment;
     }
 
     if (transaction2) {

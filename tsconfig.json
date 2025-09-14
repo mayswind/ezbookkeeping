@@ -10,6 +10,7 @@
         "noUnusedLocals": true,
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true,
+        "noUncheckedIndexedAccess": true,
         "paths": {
             "@/*": ["./src/*"]
         }

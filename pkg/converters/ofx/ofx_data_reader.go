@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/xml"
+	"io"
 	"regexp"
 	"strings"
 
@@ -269,18 +270,26 @@ func readOFX1FileHeader(ctx core.Context, data []byte) (fileHeader *ofxFileHeade
 
 func readOFX2FileHeader(ctx core.Context, data []byte) (fileHeader *ofxFileHeader, err error) {
 	reader := bytes.NewReader(data)
-	scanner := bufio.NewScanner(reader)
+	bufReader := bufio.NewReader(reader)
 	fileHeader = &ofxFileHeader{}
 	headerLine := ""
 
-	for scanner.Scan() {
-		line := scanner.Text()
-
+	for {
+		line, err := bufReader.ReadString('\n')
 		ofxHeaderStartIndex := strings.Index(line, "<?OFX ")
 
 		if ofxHeaderStartIndex >= 0 {
 			headerLine = ofx2HeaderPattern.FindString(line)
 			break
+		}
+
+		if err != nil {
+			if err == io.EOF {
+				break
+			} else {
+				log.Errorf(ctx, "[ofx_data_reader.readOFX2FileHeader] cannot read ofx 2.x file, because %s", err.Error())
+				return nil, errs.ErrInvalidOFXFile
+			}
 		}
 	}
 

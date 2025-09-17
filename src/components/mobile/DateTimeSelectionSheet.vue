@@ -469,4 +469,10 @@ watch(mode, (newValue) => {
 .date-time-selection-sheet .time-picker-container .picker-columns {
     justify-content: space-evenly;
 }
+
+.picker-hour,
+.picker-minute,
+.picker-second {
+    font-variant-numeric: tabular-nums;
+}
 </style>

@@ -245,8 +245,9 @@ type Config struct {
 
 	StaticRootPath string
 
-	EnableGZip       bool
-	EnableRequestLog bool
+	EnableGZip            bool
+	EnableRequestLog      bool
+	EnableRequestIdHeader bool
 
 	// MCP
 	EnableMCPServer     bool
@@ -299,7 +300,6 @@ type Config struct {
 	// Secret
 	SecretKeyNoSet                        bool
 	SecretKey                             string
-	EnableTwoFactor                       bool
 	TokenExpiredTime                      uint32
 	TokenExpiredTimeDuration              time.Duration
 	TokenMinRefreshInterval               uint32
@@ -311,7 +311,6 @@ type Config struct {
 	PasswordResetTokenExpiredTimeDuration time.Duration
 	MaxFailuresPerIpPerMinute             uint32
 	MaxFailuresPerUserPerMinute           uint32
-	EnableRequestIdHeader                 bool
 
 	// User
 	EnableUserRegister               bool
@@ -319,6 +318,7 @@ type Config struct {
 	EnableUserForceVerifyEmail       bool
 	EnableUserForgetPassword         bool
 	ForgetPasswordRequireVerifyEmail bool
+	EnableTwoFactor                  bool
 	EnableTransactionPictures        bool
 	MaxTransactionPictureFileSize    uint32
 	EnableScheduledTransaction       bool
@@ -561,6 +561,7 @@ func loadServerConfiguration(config *Config, configFile *ini.File, sectionName s
 
 	config.EnableGZip = getConfigItemBoolValue(configFile, sectionName, "enable_gzip", false)
 	config.EnableRequestLog = getConfigItemBoolValue(configFile, sectionName, "log_request", false)
+	config.EnableRequestIdHeader = getConfigItemBoolValue(configFile, sectionName, "request_id_header", true)
 
 	return nil
 }
@@ -801,7 +802,6 @@ func loadCronConfiguration(config *Config, configFile *ini.File, sectionName str
 func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	config.SecretKeyNoSet = !getConfigItemIsSet(configFile, sectionName, "secret_key")
 	config.SecretKey = getConfigItemStringValue(configFile, sectionName, "secret_key", defaultSecretKey)
-	config.EnableTwoFactor = getConfigItemBoolValue(configFile, sectionName, "enable_two_factor", true)
 
 	config.TokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "token_expired_time", defaultTokenExpiredTime)
 
@@ -844,8 +844,6 @@ func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName
 	config.MaxFailuresPerIpPerMinute = getConfigItemUint32Value(configFile, sectionName, "max_failures_per_ip_per_minute", defaultMaxFailuresPerIpPerMinute)
 	config.MaxFailuresPerUserPerMinute = getConfigItemUint32Value(configFile, sectionName, "max_failures_per_user_per_minute", defaultMaxFailuresPerUserPerMinute)
 
-	config.EnableRequestIdHeader = getConfigItemBoolValue(configFile, sectionName, "request_id_header", true)
-
 	return nil
 }
 
@@ -855,6 +853,7 @@ func loadUserConfiguration(config *Config, configFile *ini.File, sectionName str
 	config.EnableUserForceVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "enable_force_email_verify", false)
 	config.EnableUserForgetPassword = getConfigItemBoolValue(configFile, sectionName, "enable_forget_password", false)
 	config.ForgetPasswordRequireVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "forget_password_require_email_verify", false)
+	config.EnableTwoFactor = getConfigItemBoolValue(configFile, sectionName, "enable_two_factor", true)
 	config.EnableTransactionPictures = getConfigItemBoolValue(configFile, sectionName, "enable_transaction_picture", false)
 	config.MaxTransactionPictureFileSize = getConfigItemUint32Value(configFile, sectionName, "max_transaction_picture_size", defaultTransactionPictureFileMaxSize)
 	config.EnableScheduledTransaction = getConfigItemBoolValue(configFile, sectionName, "enable_scheduled_transaction", false)

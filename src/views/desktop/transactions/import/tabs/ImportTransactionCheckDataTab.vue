@@ -1720,8 +1720,16 @@ function showReplaceAllTypesDialog(): void {
 
                     if (rule.dataType === 'expenseCategory' || rule.dataType === 'incomeCategory' || rule.dataType === 'transferCategory') {
                         if (importTransaction.type !== TransactionType.ModifyBalance && importTransaction.originalCategoryName === rule.sourceValue) {
-                            importTransaction.categoryId = rule.targetId;
-                            updated = true;
+                            if (rule.dataType === 'expenseCategory' && importTransaction.type === TransactionType.Expense) {
+                                importTransaction.categoryId = rule.targetId;
+                                updated = true;
+                            } else if (rule.dataType === 'incomeCategory' && importTransaction.type === TransactionType.Income) {
+                                importTransaction.categoryId = rule.targetId;
+                                updated = true;
+                            } else if (rule.dataType === 'transferCategory' && importTransaction.type === TransactionType.Transfer) {
+                                importTransaction.categoryId = rule.targetId;
+                                updated = true;
+                            }
                         }
                     } else if (rule.dataType === 'account') {
                         if (importTransaction.originalSourceAccountName === rule.sourceValue) {

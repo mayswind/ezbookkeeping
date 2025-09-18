@@ -1714,7 +1714,7 @@ function showReplaceAllTypesDialog(): void {
                 let updated = false;
 
                 for (const rule of result.rules) {
-                    if (!rule || !rule.dataType || !rule.sourceValue || !rule.targetId) {
+                    if (!rule || !rule.dataType || !rule.targetId) {
                         continue;
                     }
 

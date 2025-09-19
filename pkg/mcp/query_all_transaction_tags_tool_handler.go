@@ -49,10 +49,14 @@ func (h *mcpQueryAllTransactionTagsToolHandler) Handle(c *core.WebContext, callT
 		return nil, nil, err
 	}
 
-	tagNames := make([]string, len(tags))
+	tagNames := make([]string, 0, len(tags))
 
 	for i := 0; i < len(tags); i++ {
-		tagNames[i] = tags[i].Name
+		if tags[i].Hidden {
+			continue
+		}
+
+		tagNames = append(tagNames, tags[i].Name)
 	}
 
 	response := MCPAllQueryTransactionTagsResponse{

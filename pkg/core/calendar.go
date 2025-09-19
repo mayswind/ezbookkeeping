@@ -25,9 +25,9 @@ func (f CalendarDisplayType) String() string {
 	case CALENDAR_DISPLAY_TYPE_BUDDHIST:
 		return "Buddhist"
 	case CALENDAR_DISPLAY_TYPE_GREGORAIN_WITH_CHINESE:
-		return "Gregorian with Chinese"
+		return "Gregorian with Chinese Calendar"
 	case CALENDAR_DISPLAY_TYPE_GREGORAIN_WITH_PERSIAN:
-		return "Gregorian with Persian"
+		return "Gregorian with Persian Calendar"
 	case CALENDAR_DISPLAY_TYPE_INVALID:
 		return "Invalid"
 	default:

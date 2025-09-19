@@ -142,8 +142,8 @@
         "Gregorian": "公曆",
         "Buddhist": "佛曆",
         "Persian": "伊朗曆",
-        "Gregorian with Chinese": "公曆+農曆",
-        "Gregorian with Persian": "公曆+伊朗曆"
+        "Gregorian with Chinese Calendar": "公曆+農曆",
+        "Gregorian with Persian Calendar": "公曆+伊朗曆"
     },
     "datetime": {
         "AM": {

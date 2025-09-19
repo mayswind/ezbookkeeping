@@ -28,8 +28,8 @@ export class CalendarDisplayType implements TypeAndName {
     public static readonly LanguageDefaultType: number = 0;
     public static readonly Gregorian = new CalendarDisplayType(1, 'Gregorian', 'Gregorian', CalendarType.Gregorian);
     public static readonly Buddhist = new CalendarDisplayType(2, 'Buddhist', 'Buddhist', CalendarType.Buddhist);
-    public static readonly GregorianWithChinese = new CalendarDisplayType(3, 'GregorianWithChinese', 'Gregorian with Chinese', CalendarType.Gregorian, CalendarType.Chinese);
-    public static readonly GregorianWithPersian = new CalendarDisplayType(4, 'GregorianWithPersian', 'Gregorian with Persian', CalendarType.Gregorian, CalendarType.Persian);
+    public static readonly GregorianWithChinese = new CalendarDisplayType(3, 'GregorianWithChinese', 'Gregorian with Chinese Calendar', CalendarType.Gregorian, CalendarType.Chinese);
+    public static readonly GregorianWithPersian = new CalendarDisplayType(4, 'GregorianWithPersian', 'Gregorian with Persian Calendar', CalendarType.Gregorian, CalendarType.Persian);
 
     public static readonly Default = CalendarDisplayType.Gregorian;
 

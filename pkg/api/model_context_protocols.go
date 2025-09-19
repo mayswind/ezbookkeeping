@@ -3,8 +3,6 @@ package api
 import (
 	"encoding/json"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
@@ -233,7 +231,7 @@ func (a *ModelContextProtocolAPI) CallToolHandler(c *core.WebContext, jsonRPCReq
 
 // PingHandler return the ping response for model context protocol
 func (a *ModelContextProtocolAPI) PingHandler(c *core.WebContext, jsonRPCRequest *core.JSONRPCRequest) (any, *errs.Error) {
-	return gin.H{}, nil
+	return core.O{}, nil
 }
 
 // GetTransactionService implements the MCPAvailableServices interface

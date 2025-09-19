@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -14,7 +13,7 @@ import (
 
 // PrintJsonSuccessResult writes success response in json format to current http context
 func PrintJsonSuccessResult(c *core.WebContext, result any) {
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusOK, core.O{
 		"success": true,
 		"result":  result,
 	})
@@ -46,7 +45,7 @@ func PrintJsonErrorResult(c *core.WebContext, err *errs.Error) {
 		}
 	}
 
-	result := gin.H{
+	result := core.O{
 		"success":      false,
 		"errorCode":    err.Code(),
 		"errorMessage": errorMessage,
@@ -163,7 +162,7 @@ func WriteEventStreamJsonErrorResult(c *core.WebContext, originalErr *errs.Error
 		}
 	}
 
-	result := gin.H{
+	result := core.O{
 		"success":      false,
 		"errorCode":    originalErr.Code(),
 		"errorMessage": errorMessage,

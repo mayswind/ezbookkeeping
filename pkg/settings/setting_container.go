@@ -1,5 +1,7 @@
 package settings
 
+import "fmt"
+
 // ConfigContainer contains the current setting config
 type ConfigContainer struct {
 	current *Config
@@ -21,4 +23,8 @@ func SetCurrentConfig(config *Config) {
 // GetCurrentConfig returns the current config
 func (c *ConfigContainer) GetCurrentConfig() *Config {
 	return c.current
+}
+
+func GetUserAgent() string {
+	return fmt.Sprintf("ezBookkeeping/%s", Version)
 }

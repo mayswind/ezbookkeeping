@@ -2,7 +2,6 @@ package exchangerates
 
 import (
 	"crypto/tls"
-	"fmt"
 	"io"
 	"net/http"
 	"sort"
@@ -59,7 +58,7 @@ func (e *CommonHttpExchangeRatesDataSource) GetLatestExchangeRates(c core.Contex
 		req := requests[i]
 
 		if len(req.Header.Values("User-Agent")) < 1 {
-			req.Header.Set("User-Agent", fmt.Sprintf("ezBookkeeping/%s", settings.Version))
+			req.Header.Set("User-Agent", settings.GetUserAgent())
 		} else if req.Header.Get("User-Agent") == "" {
 			req.Header.Del("User-Agent")
 		}
@@ -71,15 +70,15 @@ func (e *CommonHttpExchangeRatesDataSource) GetLatestExchangeRates(c core.Contex
 			return nil, errs.ErrFailedToRequestRemoteApi
 		}
 
-		if resp.StatusCode != 200 {
-			log.Errorf(c, "[http_exchange_rates_datasource.GetLatestExchangeRates] failed to get latest exchange rate data response for user \"uid:%d\", because response code is not 200", uid)
-			return nil, errs.ErrFailedToRequestRemoteApi
-		}
-
 		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
 
 		log.Debugf(c, "[http_exchange_rates_datasource.GetLatestExchangeRates] response#%d is %s", i, body)
+
+		if resp.StatusCode != 200 {
+			log.Errorf(c, "[http_exchange_rates_datasource.GetLatestExchangeRates] failed to get latest exchange rate data response for user \"uid:%d\", because response code is not %d", uid, resp.StatusCode)
+			return nil, errs.ErrFailedToRequestRemoteApi
+		}
 
 		exchangeRateResp, err := e.dataSource.Parse(c, body)
 

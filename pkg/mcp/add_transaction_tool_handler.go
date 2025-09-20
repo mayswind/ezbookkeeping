@@ -121,10 +121,30 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 		return nil, nil, err
 	}
 
-	categoriesMap := services.GetTransactionCategoryService().GetVisibleCategoryNameMapByList(allCategories)
-	category, exists := categoriesMap[addTransactionRequest.SecondaryCategoryName]
+	var transactionCategory *models.TransactionCategory = nil
 
-	if !exists {
+	for i := 0; i < len(allCategories); i++ {
+		category := allCategories[i]
+
+		if category.Hidden || category.ParentCategoryId == models.LevelOneTransactionCategoryParentId {
+			continue
+		}
+
+		if category.Name == addTransactionRequest.SecondaryCategoryName {
+			if category.Type == models.CATEGORY_TYPE_INCOME && addTransactionRequest.Type == transactionTypeIncome {
+				transactionCategory = category
+				break
+			} else if category.Type == models.CATEGORY_TYPE_EXPENSE && addTransactionRequest.Type == transactionTypeExpense {
+				transactionCategory = category
+				break
+			} else if category.Type == models.CATEGORY_TYPE_TRANSFER && addTransactionRequest.Type == transactionTypeTransfer {
+				transactionCategory = category
+				break
+			}
+		}
+	}
+
+	if transactionCategory == nil {
 		log.Warnf(c, "[add_transaction.Handle] secondary category \"%s\" not found for user \"uid:%d\"", addTransactionRequest.SecondaryCategoryName, uid)
 		return nil, nil, errs.ErrTransactionCategoryNotFound
 	}
@@ -151,7 +171,12 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 		}
 	}
 
-	transaction := h.createNewTransactionModel(uid, &addTransactionRequest, category.CategoryId, sourceAccount.AccountId, destinationAccountId, c.ClientIP())
+	transaction, err := h.createNewTransactionModel(uid, &addTransactionRequest, transactionCategory.CategoryId, sourceAccount.AccountId, destinationAccountId, c.ClientIP())
+
+	if err != nil {
+		return nil, nil, err
+	}
+
 	transactionEditable := user.CanEditTransactionByTransactionTime(transaction.TransactionTime, transaction.TimezoneUtcOffset)
 
 	if !transactionEditable {
@@ -212,7 +237,7 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 	}
 }
 
-func (h *mcpAddTransactionToolHandler) createNewTransactionModel(uid int64, addTransactionRequest *MCPAddTransactionRequest, categoryId int64, sourceAccountId int64, destinationAccountId int64, clientIp string) *models.Transaction {
+func (h *mcpAddTransactionToolHandler) createNewTransactionModel(uid int64, addTransactionRequest *MCPAddTransactionRequest, categoryId int64, sourceAccountId int64, destinationAccountId int64, clientIp string) (*models.Transaction, error) {
 	var transactionDbType models.TransactionDbType
 
 	if addTransactionRequest.Type == transactionTypeExpense {
@@ -226,13 +251,13 @@ func (h *mcpAddTransactionToolHandler) createNewTransactionModel(uid int64, addT
 	transactionTime, err := utils.ParseFromLongDateTimeWithTimezoneRFC3339Format(addTransactionRequest.Time)
 
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	amount, err := utils.ParseAmount(addTransactionRequest.Amount)
 
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	transaction := &models.Transaction{
@@ -254,13 +279,13 @@ func (h *mcpAddTransactionToolHandler) createNewTransactionModel(uid int64, addT
 		destinationAmount, err := utils.ParseAmount(addTransactionRequest.DestinationAmount)
 
 		if err != nil {
-			return nil
+			return nil, err
 		}
 
 		transaction.RelatedAccountAmount = destinationAmount
 	}
 
-	return transaction
+	return transaction, nil
 }
 
 func (h *mcpAddTransactionToolHandler) createNewMCPAddTransactionResponse(c *core.WebContext, transaction *models.Transaction, accountsMap map[int64]*models.Account, dryRun bool) (any, []*MCPTextContent, error) {

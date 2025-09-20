@@ -508,14 +508,20 @@ func (s *TransactionTagService) GetTagMapByList(tags []*models.TransactionTag) m
 	return tagMap
 }
 
-// GetTagNameMapByList returns a transaction tag map by a list
-func (s *TransactionTagService) GetTagNameMapByList(tags []*models.TransactionTag) map[string]*models.TransactionTag {
+// GetVisibleTagNameMapByList returns a visible transaction tag map by a list
+func (s *TransactionTagService) GetVisibleTagNameMapByList(tags []*models.TransactionTag) map[string]*models.TransactionTag {
 	tagMap := make(map[string]*models.TransactionTag)
 
 	for i := 0; i < len(tags); i++ {
 		tag := tags[i]
+
+		if tag.Hidden {
+			continue
+		}
+
 		tagMap[tag.Name] = tag
 	}
+
 	return tagMap
 }
 

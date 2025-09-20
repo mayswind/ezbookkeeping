@@ -957,7 +957,7 @@ func (l *UserDataCli) getUserEssentialDataForImport(c *core.CliContext, uid int6
 		return nil, nil, nil, nil, nil, err
 	}
 
-	tagMap = l.tags.GetTagNameMapByList(tags)
+	tagMap = l.tags.GetVisibleTagNameMapByList(tags)
 
 	return accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap, nil
 }

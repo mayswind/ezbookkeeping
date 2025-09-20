@@ -1447,7 +1447,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	tagMap := a.transactionTags.GetTagNameMapByList(tags)
+	tagMap := a.transactionTags.GetVisibleTagNameMapByList(tags)
 
 	parsedTransactions, _, _, _, _, _, err := dataImporter.ParseImportedData(c, user, fileData, utcOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 

@@ -159,7 +159,7 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 			return nil, nil, err
 		}
 
-		tagMaps := services.GetTransactionTagService().GetTagNameMapByList(allTags)
+		tagMaps := services.GetTransactionTagService().GetVisibleTagNameMapByList(allTags)
 		tagIds = make([]int64, 0, len(addTransactionRequest.Tags))
 
 		for _, tagName := range addTransactionRequest.Tags {

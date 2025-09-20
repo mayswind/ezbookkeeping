@@ -940,3 +940,44 @@ func (s *AccountService) GetAccountOrSubAccountIds(c core.Context, accountIds st
 
 	return allAccountIds, nil
 }
+
+// GetAccountOrSubAccountIdsByAccountName returns a list of account ids or sub-account ids according to given account name
+func (s *AccountService) GetAccountOrSubAccountIdsByAccountName(accounts []*models.Account, accountName string) []int64 {
+	accountIds := make([]int64, 0)
+	parentAccountIds := make([]int64, 0)
+	childAccountByParentAccountId := make(map[int64][]*models.Account)
+
+	for i := 0; i < len(accounts); i++ {
+		account := accounts[i]
+
+		if account.Name == accountName {
+			if account.Type == models.ACCOUNT_TYPE_SINGLE_ACCOUNT {
+				accountIds = append(accountIds, account.AccountId)
+			} else if account.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
+				parentAccountIds = append(parentAccountIds, account.AccountId)
+			}
+		} else if account.ParentAccountId > 0 {
+			childAccounts, exists := childAccountByParentAccountId[account.ParentAccountId]
+
+			if !exists {
+				childAccounts = make([]*models.Account, 0)
+			}
+
+			childAccounts = append(childAccounts, account)
+			childAccountByParentAccountId[account.ParentAccountId] = childAccounts
+		}
+	}
+
+	for i := 0; i < len(parentAccountIds); i++ {
+		parentAccountId := parentAccountIds[i]
+
+		if childAccounts, exists := childAccountByParentAccountId[parentAccountId]; exists {
+			for j := 0; j < len(childAccounts); j++ {
+				childAccount := childAccounts[j]
+				accountIds = append(accountIds, childAccount.AccountId)
+			}
+		}
+	}
+
+	return accountIds
+}

@@ -602,3 +602,44 @@ func (s *TransactionCategoryService) GetCategoryOrSubCategoryIds(c core.Context,
 
 	return allCategoryIds, nil
 }
+
+// GetCategoryOrSubCategoryIdsByCategoryName returns a list of transaction category ids or sub-category ids according to given category name
+func (s *TransactionCategoryService) GetCategoryOrSubCategoryIdsByCategoryName(categories []*models.TransactionCategory, categoryName string) []int64 {
+	categoryIds := make([]int64, 0)
+	parentCategoryIds := make([]int64, 0)
+	childCategoryByParentCategoryId := make(map[int64][]*models.TransactionCategory)
+
+	for i := 0; i < len(categories); i++ {
+		category := categories[i]
+
+		if category.Name == categoryName {
+			if category.ParentCategoryId != models.LevelOneTransactionCategoryParentId {
+				categoryIds = append(categoryIds, category.CategoryId)
+			} else if category.ParentCategoryId == models.LevelOneTransactionCategoryParentId {
+				parentCategoryIds = append(parentCategoryIds, category.CategoryId)
+			}
+		} else if category.ParentCategoryId != models.LevelOneTransactionCategoryParentId {
+			childCategories, exists := childCategoryByParentCategoryId[category.ParentCategoryId]
+
+			if !exists {
+				childCategories = make([]*models.TransactionCategory, 0)
+			}
+
+			childCategories = append(childCategories, category)
+			childCategoryByParentCategoryId[category.ParentCategoryId] = childCategories
+		}
+	}
+
+	for i := 0; i < len(parentCategoryIds); i++ {
+		parentCategoryId := parentCategoryIds[i]
+
+		if childCategories, exists := childCategoryByParentCategoryId[parentCategoryId]; exists {
+			for j := 0; j < len(childCategories); j++ {
+				childCategory := childCategories[j]
+				categoryIds = append(categoryIds, childCategory.CategoryId)
+			}
+		}
+	}
+
+	return categoryIds
+}

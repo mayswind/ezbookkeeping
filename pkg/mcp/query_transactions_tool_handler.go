@@ -126,13 +126,12 @@ func (h *mcpQueryTransactionsToolHandler) Handle(c *core.WebContext, callToolReq
 		return nil, nil, err
 	}
 
-	accountsMap := services.GetAccountService().GetVisibleAccountNameMapByList(allAccounts)
 	filterAccountIds := make([]int64, 0)
 
 	if queryTransactionsRequest.AccountName != "" {
-		if account, exists := accountsMap[queryTransactionsRequest.AccountName]; exists {
-			filterAccountIds = append(filterAccountIds, account.AccountId)
-		} else {
+		filterAccountIds = services.GetAccountService().GetAccountOrSubAccountIdsByAccountName(allAccounts, queryTransactionsRequest.AccountName)
+
+		if len(filterAccountIds) < 1 {
 			return nil, nil, errs.ErrAccountNotFound
 		}
 	}
@@ -144,13 +143,12 @@ func (h *mcpQueryTransactionsToolHandler) Handle(c *core.WebContext, callToolReq
 		return nil, nil, err
 	}
 
-	categoriesMap := services.GetTransactionCategoryService().GetVisibleCategoryNameMapByList(allCategories)
 	filterCategoryIds := make([]int64, 0)
 
 	if queryTransactionsRequest.SecondaryCategoryName != "" {
-		if category, exists := categoriesMap[queryTransactionsRequest.SecondaryCategoryName]; exists {
-			filterCategoryIds = append(filterCategoryIds, category.CategoryId)
-		} else {
+		filterCategoryIds = services.GetTransactionCategoryService().GetCategoryOrSubCategoryIdsByCategoryName(allCategories, queryTransactionsRequest.SecondaryCategoryName)
+
+		if len(filterCategoryIds) < 1 {
 			return nil, nil, errs.ErrTransactionCategoryNotFound
 		}
 	}

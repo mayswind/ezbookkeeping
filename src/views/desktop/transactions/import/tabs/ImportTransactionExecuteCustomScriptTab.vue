@@ -31,7 +31,7 @@
             </div>
             <div class="w-100 code-container">
                 <v-textarea class="w-100 always-cursor-text" style="height: 360px" :readonly="true"
-                            :value="displayPreviewResult"></v-textarea>
+                            :color="executionError ? 'error': undefined" :value="displayPreviewResult"></v-textarea>
             </div>
         </v-col>
     </v-row>
@@ -101,6 +101,7 @@ const sandboxLoaded = ref<boolean>(false);
 const customScript = ref<string>('');
 const previewResult = ref<ImportTransactionRequestItem[] | undefined>(undefined);
 const executingScript = ref<boolean>(false);
+const executionError = ref<string>('');
 const previewCount = ref<number>(10);
 
 const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
@@ -136,6 +137,8 @@ function parse(row, index) {
 const displayPreviewResult = computed<string>(() => {
     if (executingScript.value) {
         return tt('Executing Script...');
+    } else if (executionError.value) {
+        return executionError.value;
     } else if (previewResult.value) {
         const rows = previewResult.value.slice(0, previewCount.value);
         return JSON.stringify(rows, null, 2);
@@ -244,7 +247,7 @@ function executeCustomScript(): void {
 
     const sandboxRequest: SandboxRequest = {
         parsedFileData: props.parsedFileData || [],
-        code: customScript.value + '\n\n;window.parse = parse;'
+        code: customScript.value + `\n\n;if (typeof parse !== 'undefined') { window.parse = parse; }`
     };
 
     sandbox.value?.contentWindow?.postMessage(JSON.stringify(sandboxRequest), '*');
@@ -266,6 +269,7 @@ function generateResult(): string | undefined {
 function reset(): void {
     customScript.value = sampleScript.value;
     previewResult.value = undefined;
+    executionError.value = '';
     executingScript.value = false;
     previewCount.value = 10;
 }
@@ -298,10 +302,12 @@ function onMessage(event: MessageEvent<SandboxResponse>): void {
     if (data.knownError) {
         snackbar.value?.showError(data.knownError);
         previewResult.value = undefined;
+        executionError.value = tt(data.knownError);
     } else if (data.error) {
         logger.error('Failed to execute custom script: ' + data.error);
         snackbar.value?.showError('Failed to execute custom script');
         previewResult.value = undefined;
+        executionError.value = data.error;
     } else if (data.result) {
         const originalResult = JSON.parse(data.result) as Record<string, unknown>[];
         const finalResult: ImportTransactionRequestItem[] = [];
@@ -324,6 +330,7 @@ function onMessage(event: MessageEvent<SandboxResponse>): void {
         }
 
         previewResult.value = finalResult;
+        executionError.value = '';
     }
 
     reloadSandbox();

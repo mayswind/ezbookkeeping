@@ -47,6 +47,12 @@ func (a *ServerSettingsApi) ServerSettingsJavascriptHandler(c *core.WebContext) 
 		a.appendBooleanSetting(builder, "mcp", config.EnableMCPServer)
 	}
 
+	if config.LLMProvider != "" {
+		if config.TransactionFromAIImageRecognition {
+			a.appendBooleanSetting(builder, "llmt", config.TransactionFromAIImageRecognition)
+		}
+	}
+
 	if config.LoginPageTips.Enabled {
 		a.appendMultiLanguageTipSetting(builder, "lpt", config.LoginPageTips)
 	}

@@ -1,0 +1,208 @@
+<template>
+    <v-dialog width="800" :persistent="loading || recognizing || !!imageFile" v-model="showState">
+        <v-card class="pa-2 pa-sm-4 pa-md-4">
+            <template #title>
+                <div class="d-flex align-center justify-center">
+                    <h4 class="text-h4">{{ tt('AI Image Recognition') }}</h4>
+                </div>
+            </template>
+
+            <v-card-text class="d-flex justify-center w-100 my-md-4 pt-0">
+                <div class="w-100 border position-relative"
+                     @dragenter.prevent="onDragEnter"
+                     @dragover.prevent
+                     @dragleave.prevent="onDragLeave"
+                     @drop.prevent="onDrop">
+                    <div class="d-flex w-100 fill-height justify-center align-center justify-content-center"
+                         :class="{ 'dropzone': true, 'dropzone-dragover': isDragOver }" style="height: 480px">
+                        <h3 v-if="!imageFile && !isDragOver">{{ tt('Drag and drop a receipt or transaction image here, or click to select one') }}</h3>
+                        <h3 v-if="isDragOver">{{ tt('Release to load image') }}</h3>
+                    </div>
+                    <v-img height="480px" :class="{ 'cursor-pointer': !loading || !recognizing || !isDragOver }"
+                           :src="imageSrc" @click="showOpenImageDialog">
+                        <template #placeholder>
+                            <div class="w-100 fill-height bg-grey-200"></div>
+                        </template>
+                    </v-img>
+                </div>
+            </v-card-text>
+
+            <v-card-text class="overflow-y-visible">
+                <div ref="buttonContainer" class="w-100 d-flex justify-center gap-4">
+                    <v-btn :disabled="loading || recognizing || !imageFile" @click="recognize">
+                        {{ tt('Recognize') }}
+                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="recognizing"></v-progress-circular>
+                    </v-btn>
+                    <v-btn color="secondary" variant="tonal" :disabled="loading || recognizing"
+                           @click="cancel">{{ tt('Cancel') }}</v-btn>
+                </div>
+            </v-card-text>
+        </v-card>
+    </v-dialog>
+
+    <snack-bar ref="snackbar" />
+    <input ref="imageInput" type="file" style="display: none" :accept="SUPPORTED_IMAGE_EXTENSIONS" @change="openImage($event)" />
+</template>
+
+<script setup lang="ts">
+import SnackBar from '@/components/desktop/SnackBar.vue';
+
+import { ref, useTemplateRef } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+
+import { useTransactionsStore } from '@/stores/transaction.ts';
+
+import { KnownFileType } from '@/core/file.ts';
+import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
+
+import type { RecognizedReceiptImageResponse } from '@/models/large_language_model.ts';
+
+import { compressJpgImage } from '@/lib/ui/common.ts';
+import logger from '@/lib/logger.ts';
+
+type SnackBarType = InstanceType<typeof SnackBar>;
+
+const { tt } = useI18n();
+
+const transactionsStore = useTransactionsStore();
+
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const imageInput = useTemplateRef<HTMLInputElement>('imageInput');
+
+let resolveFunc: ((response: RecognizedReceiptImageResponse) => void) | null = null;
+let rejectFunc: ((reason?: unknown) => void) | null = null;
+
+const showState = ref<boolean>(false);
+const loading = ref<boolean>(false);
+const recognizing = ref<boolean>(false);
+const imageFile = ref<File | null>(null);
+const imageSrc = ref<string | undefined>(undefined);
+const isDragOver = ref<boolean>(false);
+
+function loadImage(file: File): void {
+    compressJpgImage(file, 1280, 1280, 0.8).then(blob => {
+        imageFile.value = KnownFileType.JPG.createFileFromBlob(blob, "image");
+        imageSrc.value = URL.createObjectURL(blob);
+    }).catch(error => {
+        imageFile.value = null;
+        imageSrc.value = undefined;
+        logger.error('failed to compress image', error);
+        snackbar.value?.showError('Unable to load image');
+    });
+}
+
+function open(): Promise<RecognizedReceiptImageResponse> {
+    showState.value = true;
+    loading.value = false;
+    recognizing.value = false;
+    imageFile.value = null;
+    imageSrc.value = undefined;
+
+    return new Promise((resolve, reject) => {
+        resolveFunc = resolve;
+        rejectFunc = reject;
+    });
+}
+
+function showOpenImageDialog(): void {
+    if (loading.value || recognizing.value || isDragOver.value) {
+        return;
+    }
+
+    imageInput.value?.click();
+}
+
+function openImage(event: Event): void {
+    if (!event || !event.target) {
+        return;
+    }
+
+    const el = event.target as HTMLInputElement;
+
+    if (!el.files || !el.files.length || !el.files[0]) {
+        return;
+    }
+
+    const image = el.files[0] as File;
+
+    el.value = '';
+
+    loadImage(image);
+}
+
+function recognize(): void {
+    if (loading.value || recognizing.value || !imageFile.value) {
+        return;
+    }
+
+    recognizing.value = true;
+
+    transactionsStore.recognizeReceiptImage({
+        imageFile: imageFile.value
+    }).then(response => {
+        resolveFunc?.(response);
+        showState.value = false;
+        recognizing.value = false;
+    }).catch(error => {
+        recognizing.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function cancel(): void {
+    rejectFunc?.();
+    showState.value = false;
+    loading.value = false;
+    recognizing.value = false;
+    imageFile.value = null;
+    imageSrc.value = undefined;
+}
+
+function onDragEnter(): void {
+    if (loading.value || recognizing.value) {
+        return;
+    }
+
+    isDragOver.value = true;
+}
+
+function onDragLeave(): void {
+    isDragOver.value = false;
+}
+
+function onDrop(event: DragEvent): void {
+    if (loading.value || recognizing.value) {
+        return;
+    }
+
+    isDragOver.value = false;
+
+    if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length && event.dataTransfer.files[0]) {
+        loadImage(event.dataTransfer.files[0] as File);
+    }
+}
+
+defineExpose({
+    open
+});
+</script>
+
+<style>
+.dropzone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    pointer-events: none;
+    border-radius: 8px;
+    z-index: 10;
+}
+
+.dropzone-dragover {
+    border: 6px dashed rgba(var(--v-border-color),var(--v-border-opacity));
+}
+</style>

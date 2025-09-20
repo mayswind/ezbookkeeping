@@ -7,6 +7,7 @@ export const DEFAULT_API_TIMEOUT: number = 10000; // 10s
 export const DEFAULT_UPLOAD_API_TIMEOUT: number = 30000; // 30s
 export const DEFAULT_EXPORT_API_TIMEOUT: number = 180000; // 180s
 export const DEFAULT_IMPORT_API_TIMEOUT: number = 1800000; // 1800s
+export const DEFAULT_LLM_API_TIMEOUT: number = 600000; // 600s
 
 export const GOOGLE_MAP_JAVASCRIPT_URL: string = 'https://maps.googleapis.com/maps/api/js';
 export const BAIDU_MAP_JAVASCRIPT_URL: string = 'https://api.map.baidu.com/api?v=3.0';

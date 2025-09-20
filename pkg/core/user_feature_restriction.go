@@ -76,19 +76,20 @@ type UserFeatureRestrictionType uint64
 
 // User Feature Restriction Type
 const (
-	USER_FEATURE_RESTRICTION_TYPE_UPDATE_PASSWORD           UserFeatureRestrictionType = 1
-	USER_FEATURE_RESTRICTION_TYPE_UPDATE_EMAIL              UserFeatureRestrictionType = 2
-	USER_FEATURE_RESTRICTION_TYPE_UPDATE_PROFILE_BASIC_INFO UserFeatureRestrictionType = 3
-	USER_FEATURE_RESTRICTION_TYPE_UPDATE_AVATAR             UserFeatureRestrictionType = 4
-	USER_FEATURE_RESTRICTION_TYPE_REVOKE_OTHER_SESSION      UserFeatureRestrictionType = 5
-	USER_FEATURE_RESTRICTION_TYPE_ENABLE_2FA                UserFeatureRestrictionType = 6
-	USER_FEATURE_RESTRICTION_TYPE_DISABLE_2FA               UserFeatureRestrictionType = 7
-	USER_FEATURE_RESTRICTION_TYPE_FORGET_PASSWORD           UserFeatureRestrictionType = 8
-	USER_FEATURE_RESTRICTION_TYPE_IMPORT_TRANSACTION        UserFeatureRestrictionType = 9
-	USER_FEATURE_RESTRICTION_TYPE_EXPORT_TRANSACTION        UserFeatureRestrictionType = 10
-	USER_FEATURE_RESTRICTION_TYPE_CLEAR_ALL_DATA            UserFeatureRestrictionType = 11
-	USER_FEATURE_RESTRICTION_TYPE_SYNC_APPLICATION_SETTINGS UserFeatureRestrictionType = 12
-	USER_FEATURE_RESTRICTION_TYPE_MCP_ACCESS                UserFeatureRestrictionType = 13
+	USER_FEATURE_RESTRICTION_TYPE_UPDATE_PASSWORD                              UserFeatureRestrictionType = 1
+	USER_FEATURE_RESTRICTION_TYPE_UPDATE_EMAIL                                 UserFeatureRestrictionType = 2
+	USER_FEATURE_RESTRICTION_TYPE_UPDATE_PROFILE_BASIC_INFO                    UserFeatureRestrictionType = 3
+	USER_FEATURE_RESTRICTION_TYPE_UPDATE_AVATAR                                UserFeatureRestrictionType = 4
+	USER_FEATURE_RESTRICTION_TYPE_REVOKE_OTHER_SESSION                         UserFeatureRestrictionType = 5
+	USER_FEATURE_RESTRICTION_TYPE_ENABLE_2FA                                   UserFeatureRestrictionType = 6
+	USER_FEATURE_RESTRICTION_TYPE_DISABLE_2FA                                  UserFeatureRestrictionType = 7
+	USER_FEATURE_RESTRICTION_TYPE_FORGET_PASSWORD                              UserFeatureRestrictionType = 8
+	USER_FEATURE_RESTRICTION_TYPE_IMPORT_TRANSACTION                           UserFeatureRestrictionType = 9
+	USER_FEATURE_RESTRICTION_TYPE_EXPORT_TRANSACTION                           UserFeatureRestrictionType = 10
+	USER_FEATURE_RESTRICTION_TYPE_CLEAR_ALL_DATA                               UserFeatureRestrictionType = 11
+	USER_FEATURE_RESTRICTION_TYPE_SYNC_APPLICATION_SETTINGS                    UserFeatureRestrictionType = 12
+	USER_FEATURE_RESTRICTION_TYPE_MCP_ACCESS                                   UserFeatureRestrictionType = 13
+	USER_FEATURE_RESTRICTION_TYPE_CREATE_TRANSACTION_FROM_AI_IMAGE_RECOGNITION UserFeatureRestrictionType = 14
 )
 
 const userFeatureRestrictionTypeMinValue UserFeatureRestrictionType = USER_FEATURE_RESTRICTION_TYPE_UPDATE_PASSWORD

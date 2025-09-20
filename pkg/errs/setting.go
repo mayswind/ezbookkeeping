@@ -24,4 +24,6 @@ var (
 	ErrInvalidPasswordResetTokenExpiredTime           = NewSystemError(SystemSubcategorySetting, 17, http.StatusInternalServerError, "invalid password reset token expired time")
 	ErrInvalidExchangeRatesDataSource                 = NewSystemError(SystemSubcategorySetting, 18, http.StatusInternalServerError, "invalid exchange rates data source")
 	ErrInvalidIpAddressPattern                        = NewSystemError(SystemSubcategorySetting, 19, http.StatusInternalServerError, "invalid ip address pattern")
+	ErrInvalidLLMProvider                             = NewSystemError(SystemSubcategorySetting, 20, http.StatusInternalServerError, "invalid llm provider")
+	ErrInvalidLLMModelId                              = NewSystemError(SystemSubcategorySetting, 21, http.StatusInternalServerError, "invalid llm model id")
 )

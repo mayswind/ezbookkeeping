@@ -9,6 +9,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
 	"github.com/mayswind/ezbookkeeping/pkg/exchangerates"
+	"github.com/mayswind/ezbookkeeping/pkg/llm"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/mail"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
@@ -90,6 +91,15 @@ func initializeSystem(c *core.CliContext) (*settings.Config, error) {
 		return nil, err
 	}
 
+	err = llm.InitializeLargeLanguageModelProvider(config)
+
+	if err != nil {
+		if !isDisableBootLog {
+			log.BootErrorf(c, "[initializer.initializeSystem] initializes large language model provider failed, because %s", err.Error())
+		}
+		return nil, err
+	}
+
 	err = uuid.InitializeUuidGenerator(config)
 
 	if err != nil {
@@ -155,6 +165,9 @@ func getConfigWithoutSensitiveData(config *settings.Config) *settings.Config {
 	clonedConfig.DatabaseConfig.DatabasePassword = "****"
 	clonedConfig.SMTPConfig.SMTPPasswd = "****"
 	clonedConfig.MinIOConfig.SecretAccessKey = "****"
+	clonedConfig.OpenAIAPIKey = "****"
+	clonedConfig.OpenAICompatibleAPIKey = "****"
+	clonedConfig.OpenRouterAPIKey = "****"
 	clonedConfig.SecretKey = "****"
 	clonedConfig.AmapApplicationSecret = "****"
 

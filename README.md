@@ -30,6 +30,7 @@ Live Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-demo.
     - PWA support for native-like mobile experience
     - Dark mode
 - **AI-Powered Features**
+    - Receipt image recognition
     - Supports MCP (Model Context Protocol) for AI integration
 - **Powerful Bookkeeping**
     - Two-level accounts and categories

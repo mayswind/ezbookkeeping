@@ -63,11 +63,16 @@
                                             <v-btn class="ms-3" color="default" variant="outlined"
                                                    :disabled="loading || !canAddTransaction" @click="add()">
                                                 {{ tt('Add') }}
-                                                <v-menu activator="parent" :open-on-hover="true" v-if="allTransactionTemplates && allTransactionTemplates.length">
+                                                <v-menu activator="parent" :open-on-hover="true" v-if="isTransactionFromAIImageRecognitionEnabled() || (allTransactionTemplates && allTransactionTemplates.length)">
                                                     <v-list>
-                                                        <v-list-item :title="template.name"
+                                                        <v-list-item key="AIImageRecognition"
+                                                                     :title="tt('AI Image Recognition')"
+                                                                     :prepend-icon="mdiMagicStaff"
+                                                                     v-if="isTransactionFromAIImageRecognitionEnabled()"
+                                                                     @click="addByRecognizingImage"></v-list-item>
+                                                        <v-list-item :key="template.id"
+                                                                     :title="template.name"
                                                                      :prepend-icon="mdiTextBoxOutline"
-                                                                     :key="template.id"
                                                                      v-for="template in allTransactionTemplates"
                                                                      @click="add(template)"></v-list-item>
                                                     </v-list>
@@ -620,6 +625,7 @@
                             @error="onShowDateRangeError" />
 
     <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
+    <a-i-image-recognition-dialog ref="aiImageRecognitionDialog" />
     <import-dialog ref="importDialog" :persistent="true" />
 
     <v-dialog width="800" v-model="showFilterAccountDialog">
@@ -647,6 +653,7 @@ import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import EditDialog from './list/dialogs/EditDialog.vue';
+import AIImageRecognitionDialog from './list/dialogs/AIImageRecognitionDialog.vue';
 import ImportDialog from './import/ImportDialog.vue';
 import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
 import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
@@ -716,7 +723,7 @@ import {
     categoryTypeToTransactionType,
     transactionTypeToCategoryType
 } from '@/lib/category.ts';
-import { isDataExportingEnabled, isDataImportingEnabled } from '@/lib/server_settings.ts';
+import { isDataExportingEnabled, isDataImportingEnabled, isTransactionFromAIImageRecognitionEnabled } from '@/lib/server_settings.ts';
 import { startDownloadFile } from '@/lib/ui/common.ts';
 import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';
 import logger from '@/lib/logger.ts';
@@ -738,6 +745,7 @@ import {
     mdiMinusBoxMultipleOutline,
     mdiCloseBoxMultipleOutline,
     mdiPound,
+    mdiMagicStaff,
     mdiTextBoxOutline
 } from '@mdi/js';
 
@@ -760,6 +768,7 @@ const props = defineProps<TransactionListProps>();
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type EditDialogType = InstanceType<typeof EditDialog>;
+type AIImageRecognitionDialogType = InstanceType<typeof AIImageRecognitionDialog>;
 type ImportDialogType = InstanceType<typeof ImportDialog>;
 
 interface TransactionTemplateWithIcon {
@@ -859,6 +868,7 @@ const tagFilterMenu = useTemplateRef<VMenu>('tagFilterMenu');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
+const aiImageRecognitionDialog = useTemplateRef<AIImageRecognitionDialogType>('aiImageRecognitionDialog');
 const importDialog = useTemplateRef<ImportDialogType>('importDialog');
 
 const activeTab = ref<string>('transactionPage');
@@ -1594,6 +1604,33 @@ function add(template?: TransactionTemplate): void {
         if (error) {
             snackbar.value?.showError(error);
         }
+    });
+}
+
+function addByRecognizingImage(): void {
+    aiImageRecognitionDialog.value?.open().then(result => {
+        editDialog.value?.open({
+            time: result.time,
+            type: result.type,
+            categoryId: result.categoryId,
+            accountId: result.sourceAccountId,
+            destinationAccountId: result.destinationAccountId,
+            amount: result.sourceAmount,
+            destinationAmount: result.destinationAmount,
+            tagIds: result.tagIds ? result.tagIds.join(',') : undefined,
+            comment: result.comment,
+            noTransactionDraft: true
+        }).then(result => {
+            if (result && result.message) {
+                snackbar.value?.showMessage(result.message);
+            }
+
+            reload(false, false);
+        }).catch(error => {
+            if (error) {
+                snackbar.value?.showError(error);
+            }
+        });
     });
 }
 

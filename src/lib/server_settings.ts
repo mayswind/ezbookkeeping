@@ -35,6 +35,10 @@ export function isMCPServerEnabled(): boolean {
     return getServerSetting('mcp') === 1;
 }
 
+export function isTransactionFromAIImageRecognitionEnabled(): boolean {
+    return getServerSetting('llmt') === 1;
+}
+
 export function getLoginPageTips(): Record<string, string>{
     return getServerSetting('lpt') as Record<string, string>;
 }

@@ -3,6 +3,7 @@ import Clipboard from 'clipboard';
 import { ThemeType } from '@/core/theme.ts';
 
 import { type AmountColor, PresetAmountColor } from '@/core/color.ts';
+import { KnownFileType } from '@/core/file.ts';
 
 import logger from '../logger.ts';
 
@@ -132,6 +133,64 @@ export function startDownloadFile(fileName: string, fileData: Blob): void {
     document.body.appendChild(dataLink);
 
     dataLink.click();
+}
+
+export function compressJpgImage(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+            const img = new Image();
+
+            img.onload = () => {
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxWidth || height > maxHeight) {
+                    const scale = Math.min(maxWidth / width, maxHeight / height);
+                    width = Math.floor(width * scale);
+                    height = Math.floor(height * scale);
+                }
+
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                if (!ctx) {
+                    reject(new Error('failed to get canvas context'));
+                    return;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                ctx.drawImage(img, 0, 0, width, height);
+
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        resolve(blob);
+                    } else {
+                        reject(new Error('failed to compress image'));
+                    }
+                }, KnownFileType.JPG.contentType, quality);
+            };
+
+            img.onerror = (error) => {
+                reject(error);
+            };
+
+            if (event.target && event.target.result) {
+                img.src = event.target.result as string;
+            } else {
+                reject(new Error('failed to read file'));
+            }
+        };
+
+        reader.onerror = (error) => {
+            reject(error);
+        };
+
+        reader.readAsDataURL(file);
+    });
 }
 
 export function clearBrowserCaches(): Promise<void> {

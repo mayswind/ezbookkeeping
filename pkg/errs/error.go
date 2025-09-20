@@ -40,6 +40,7 @@ const (
 	NormalSubcategoryConverter              = 12
 	NormalSubcategoryUserCustomExchangeRate = 13
 	NormalSubcategoryModelContextProtocol   = 14
+	NormalSubcategoryLargeLanguageModel     = 15
 )
 
 // Error represents the specific error returned to user

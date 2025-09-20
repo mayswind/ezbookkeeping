@@ -6,6 +6,7 @@ export class KnownFileType {
     public static readonly TSV = new KnownFileType('tsv', 'text/tab-separated-values');
     public static readonly MARKDOWN = new KnownFileType('md', 'text/markdown');
     public static readonly JS = new KnownFileType('js', 'application/javascript');
+    public static readonly JPG = new KnownFileType('jpg', 'image/jpeg');
 
     public readonly extension: string;
     public readonly contentType: string;
@@ -33,6 +34,12 @@ export class KnownFileType {
 
     public createFile(content: string, fileName: string): File {
         return new File([content], this.formatFileName(fileName), {
+            type: this.contentType,
+        });
+    }
+
+    public createFileFromBlob(blob: Blob, fileName: string): File {
+        return new File([blob], this.formatFileName(fileName), {
             type: this.contentType,
         });
     }

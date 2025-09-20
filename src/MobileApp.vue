@@ -23,7 +23,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { isProduction } from '@/lib/version.ts';
-import { getTheme, isEnableAnimate } from '@/lib/settings.ts';
+import { getTheme, isEnableSwipeBack, isEnableAnimate } from '@/lib/settings.ts';
 import { initMapProvider } from '@/lib/map/index.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
@@ -98,7 +98,9 @@ const f7params = ref<Framework7Parameters>({
         browserHistory: !isiOSHomeScreenMode(),
         browserHistoryInitialMatch: true,
         browserHistoryAnimate: false,
+        iosSwipeBack: isEnableSwipeBack(),
         iosSwipeBackAnimateShadow: false,
+        mdSwipeBack: isEnableSwipeBack(),
         mdSwipeBackAnimateShadow: false
     }
 });

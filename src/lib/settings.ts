@@ -93,6 +93,10 @@ export function isEnableApplicationLock(): boolean {
     return getApplicationSettings().applicationLock;
 }
 
+export function isEnableSwipeBack(): boolean {
+    return getApplicationSettings().swipeBack;
+}
+
 export function isEnableAnimate(): boolean {
     return getApplicationSettings().animate;
 }

@@ -28,6 +28,7 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     timeZone: string;
     autoUpdateExchangeRatesData: boolean;
     showAccountBalance: boolean;
+    swipeBack: boolean;
     animate: boolean;
     // Application Lock
     applicationLock: boolean;
@@ -132,6 +133,7 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     timeZone: '',
     autoUpdateExchangeRatesData: true,
     showAccountBalance: true,
+    swipeBack: true,
     animate: true,
     // Application Lock
     applicationLock: false,

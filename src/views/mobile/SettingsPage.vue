@@ -76,6 +76,11 @@
             <f7-list-item :title="tt('Settings Sync')" link="/settings/sync"></f7-list-item>
 
             <f7-list-item>
+                <span>{{ tt('Enable Swipe Back') }}</span>
+                <f7-toggle :checked="isEnableSwipeBack" @toggle:change="isEnableSwipeBack = $event"></f7-toggle>
+            </f7-list-item>
+
+            <f7-list-item>
                 <span>{{ tt('Enable Animation') }}</span>
                 <f7-toggle :checked="isEnableAnimate" @toggle:change="isEnableAnimate = $event"></f7-toggle>
             </f7-list-item>
@@ -144,6 +149,16 @@ const currentTimezoneName = computed<string>(() => {
     }
 
     return '';
+});
+
+const isEnableSwipeBack = computed<boolean>({
+    get: () => settingsStore.appSettings.swipeBack,
+    set: value => {
+        if (value !== settingsStore.appSettings.swipeBack) {
+            settingsStore.setEnableSwipeBack(value);
+            location.reload();
+        }
+    }
 });
 
 const isEnableAnimate = computed<boolean>({

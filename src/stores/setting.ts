@@ -155,6 +155,11 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('showAccountBalance', value);
     }
 
+    function setEnableSwipeBack(value: boolean): void {
+        updateApplicationSettingsValue('swipeBack', value);
+        appSettings.value.swipeBack = value;
+    }
+
     function setEnableAnimate(value: boolean): void {
         updateApplicationSettingsValue('animate', value);
         appSettings.value.animate = value;
@@ -430,6 +435,7 @@ export const useSettingsStore = defineStore('settings', () => {
         setTimeZone,
         setAutoUpdateExchangeRatesData,
         setShowAccountBalance,
+        setEnableSwipeBack,
         setEnableAnimate,
         // -- Application Lock
         setEnableApplicationLock,

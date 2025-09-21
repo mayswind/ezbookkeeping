@@ -128,16 +128,16 @@ func getMysqlConnectionString(dbConfig *settings.DatabaseConfig) (string, error)
 }
 
 func getPostgresConnectionString(dbConfig *settings.DatabaseConfig) (string, error) {
-	host, port, err := net.SplitHostPort(dbConfig.DatabaseHost)
-
-	if err != nil {
-		return "", errs.ErrDatabaseHostInvalid
-	}
-
 	if strings.HasPrefix(dbConfig.DatabaseHost, "/") { // unix socket path
-		return fmt.Sprintf("postgres://%s:%s@:%s/%s?sslmode=%s&host=%s",
-			url.QueryEscape(dbConfig.DatabaseUser), url.QueryEscape(dbConfig.DatabasePassword), port, dbConfig.DatabaseName, dbConfig.DatabaseSSLMode, host), nil
+		return fmt.Sprintf("postgres:///%s?sslmode=%s&host=%s&user=%s&password=%s",
+			dbConfig.DatabaseName, dbConfig.DatabaseSSLMode, dbConfig.DatabaseHost, url.QueryEscape(dbConfig.DatabaseUser), url.QueryEscape(dbConfig.DatabasePassword)), nil
 	} else {
+		host, port, err := net.SplitHostPort(dbConfig.DatabaseHost)
+
+		if err != nil {
+			return "", errs.ErrDatabaseHostInvalid
+		}
+
 		return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
 			url.QueryEscape(dbConfig.DatabaseUser), url.QueryEscape(dbConfig.DatabasePassword), host, port, dbConfig.DatabaseName, dbConfig.DatabaseSSLMode), nil
 	}

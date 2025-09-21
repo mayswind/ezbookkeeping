@@ -14,7 +14,7 @@
             <div class="image-container display-flex justify-content-center"
                  style="height: 400px" @click="showOpenImage">
                 <img height="400px" :src="imageSrc" v-if="imageSrc" />
-                <div class="image-container-background display-flex justify-content-center align-items-center" v-if="!imageSrc">
+                <div class="image-container-background display-flex justify-content-center align-items-center padding-horizontal" v-if="!imageSrc">
                     <span>{{ tt('Click here to select a receipt or transaction image') }}</span>
                 </div>
             </div>

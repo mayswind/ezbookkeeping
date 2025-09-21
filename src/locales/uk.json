@@ -16,7 +16,8 @@
         "Ukrainian": "Українська",
         "Vietnamese": "В'єтнамська",
         "Chinese (Simplified)": "Китайська (Спрощена)",
-        "Chinese (Traditional)": "Китайська (Традиційна)"
+        "Chinese (Traditional)": "Китайська (Традиційна)",
+        "French": "Французська"
     },
     "default": {
         "currency": "UAH",

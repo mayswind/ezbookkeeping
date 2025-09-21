@@ -124,6 +124,7 @@ Currently available translations:
 | de | Deutsch | [@chrgm](https://github.com/chrgm) |
 | en | English | / |
 | es | Español | [@Miguelonlonlon](https://github.com/Miguelonlonlon) |
+| fr | Français | [@brieucdlf](https://github.com/brieucdlf) |
 | it | Italiano | [@waron97](https://github.com/waron97) |
 | ja | 日本語 | [@tkymmm](https://github.com/tkymmm) |
 | nl | Nederlands | [@automagic](https://github.com/automagics) |

@@ -10,7 +10,7 @@
                 <f7-link :class="{ 'disabled': loading || recognizing || !imageFile }" :text="tt('Recognize')" @click="confirm"></f7-link>
             </div>
         </f7-toolbar>
-        <f7-page-content>
+        <f7-page-content class="no-margin-vertical no-padding-vertical">
             <div class="image-container display-flex justify-content-center"
                  style="height: 400px" @click="showOpenImage">
                 <img height="400px" :src="imageSrc" v-if="imageSrc" />

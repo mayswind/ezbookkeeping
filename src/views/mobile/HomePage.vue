@@ -348,6 +348,8 @@ function onReceiptRecognitionChanged(result: RecognizedReceiptImageResponse): vo
         params.push(`comment=${encodeURIComponent(result.comment)}`);
     }
 
+    params.push(`noTransactionDraft=true`);
+
     props.f7router.navigate(`/transaction/add?${params.join('&')}`);
 }
 

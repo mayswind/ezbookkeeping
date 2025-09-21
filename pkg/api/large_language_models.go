@@ -219,6 +219,10 @@ func (a *LargeLanguageModelsApi) RecognizeReceiptImageHandler(c *core.WebContext
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
+	if llmResponse == nil || len(llmResponse.Content) == 0 || strings.HasPrefix(llmResponse.Content, "{}") {
+		return nil, errs.ErrNoTransactionInformationInImage
+	}
+
 	var result *models.RecognizedReceiptImageResult
 
 	if err := json.Unmarshal([]byte(llmResponse.Content), &result); err != nil {
@@ -236,7 +240,7 @@ func (a *LargeLanguageModelsApi) parseRecognizedReceiptImageResponse(c *core.Web
 
 	if recognizedResult == nil {
 		log.Errorf(c, "[large_language_models.parseRecognizedReceiptImageResponse] recoginzed result is null")
-		return nil, errs.ErrOperationFailed
+		return nil, errs.ErrNoTransactionInformationInImage
 	}
 
 	if recognizedResult.Type == "income" {
@@ -269,6 +273,8 @@ func (a *LargeLanguageModelsApi) parseRecognizedReceiptImageResponse(c *core.Web
 				recognizedReceiptImageResponse.CategoryId = category.CategoryId
 			}
 		}
+	} else if len(recognizedResult.Type) == 0 {
+		return nil, errs.ErrNoTransactionInformationInImage
 	} else {
 		log.Errorf(c, "[large_language_models.parseRecognizedReceiptImageResponse] recoginzed transaction type \"%s\" is invalid", recognizedResult.Type)
 		return nil, errs.ErrOperationFailed

@@ -25,7 +25,8 @@ Your task is to extract structured transaction data from images provided by the 
 1. Only include fields you can confidently identify.
 2. If unsure about a value, omit the field (do not guess).
 3. If the image contains multiple items, please combine them into a single transaction.
-4. Always return valid JSON.
+4. If the image contains no transaction information, simply return an empty JSON object.
+5. Always return valid JSON.
 
 ## Options
 ### Expense categories:

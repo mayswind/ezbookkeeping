@@ -1228,6 +1228,7 @@
         "no image for AI recognition": "There is no image for AI recognition",
         "image for AI recognition is empty": "Image for AI recognition file is empty",
         "exceed the maximum size of image file for AI recognition": "The uploaded image for AI recognition exceeds the maximum allowed file size",
+        "no transaction information detected": "No transaction information detected",
         "query items cannot be blank": "Елементи запиту не можуть бути порожніми",
         "query items too much": "Занадто багато елементів запиту",
         "query items have invalid item": "Запит містить недійсний елемент",

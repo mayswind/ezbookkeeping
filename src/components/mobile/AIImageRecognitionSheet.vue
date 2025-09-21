@@ -4,33 +4,23 @@
         <f7-toolbar>
             <div class="swipe-handler"></div>
             <div class="left">
-                <f7-link :class="{ 'disabled': loading || recognizing }" :text="tt('Choose from Library')" @click="showOpenImage"></f7-link>
+                <f7-link :class="{ 'disabled': loading || recognizing }" :text="tt('Cancel')" @click="cancel"></f7-link>
             </div>
             <div class="right">
-                <f7-link :class="{ 'disabled': loading || recognizing }" :text="tt('Take Photo')" @click="showCamera"></f7-link>
+                <f7-link :class="{ 'disabled': loading || recognizing || !imageFile }" :text="tt('Recognize')" @click="confirm"></f7-link>
             </div>
         </f7-toolbar>
-        <f7-page-content class="margin-top no-padding-top">
-            <div class="padding-horizontal padding-bottom">
-                <div class="image-container display-flex justify-content-center width-100 margin-bottom" style="height: 240px">
-                    <img height="240px" :src="imageSrc" v-if="imageSrc" />
-                    <div class="image-container-background display-flex justify-content-center align-items-center" v-if="!imageSrc">
-                        <span>{{ tt('Please select a receipt or transaction image first') }}</span>
-                    </div>
-                </div>
-                <f7-button large fill color="primary"
-                           :class="{ 'disabled': loading || recognizing || !imageFile }"
-                           :text="tt('Recognize')"
-                           @click="confirm">
-                </f7-button>
-                <div class="margin-top text-align-center">
-                    <f7-link :class="{ 'disabled': loading || recognizing }" @click="cancel" :text="tt('Cancel')"></f7-link>
+        <f7-page-content>
+            <div class="image-container display-flex justify-content-center"
+                 style="height: 400px" @click="showOpenImage">
+                <img height="400px" :src="imageSrc" v-if="imageSrc" />
+                <div class="image-container-background display-flex justify-content-center align-items-center" v-if="!imageSrc">
+                    <span>{{ tt('Click here to select a receipt or transaction image') }}</span>
                 </div>
             </div>
         </f7-page-content>
 
-        <input ref="imageInput" type="file" style="display: none" :accept="SUPPORTED_IMAGE_EXTENSIONS" @change="openImage($event)" />
-        <input ref="cameraInput" type="file" style="display: none" :accept="SUPPORTED_IMAGE_EXTENSIONS" capture="environment" @change="openImage($event)" />
+        <input ref="imageInput" type="file" style="display: none" :accept="`${SUPPORTED_IMAGE_EXTENSIONS};capture=camera`" @change="openImage($event)" />
     </f7-sheet>
 </template>
 
@@ -66,7 +56,6 @@ const { showToast } = useI18nUIComponents();
 const transactionsStore = useTransactionsStore();
 
 const imageInput = useTemplateRef<HTMLInputElement>('imageInput');
-const cameraInput = useTemplateRef<HTMLInputElement>('cameraInput');
 
 const loading = ref<boolean>(false);
 const recognizing = ref<boolean>(false);
@@ -91,14 +80,6 @@ function showOpenImage(): void {
     }
 
     imageInput.value?.click();
-}
-
-function showCamera(): void {
-    if (loading.value || recognizing.value) {
-        return;
-    }
-
-    cameraInput.value?.click();
 }
 
 function openImage(event: Event): void {
@@ -176,6 +157,9 @@ function onSheetClosed(): void {
 .image-container-background {
     width: 100%;
     height: 100%;
-    background-color: var(--f7-page-bg-color);
+
+    > span {
+        font-size: var(--f7-input-font-size);
+    }
 }
 </style>

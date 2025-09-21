@@ -8,6 +8,7 @@
         "German": "德語",
         "English": "英語",
         "Spanish": "西班牙語",
+        "French": "法語",
         "Italian": "義大利語",
         "Japanese": "日語",
         "Dutch": "荷蘭語",
@@ -16,8 +17,7 @@
         "Ukrainian": "烏克蘭語",
         "Vietnamese": "越南語",
         "Chinese (Simplified)": "中文 (簡體)",
-        "Chinese (Traditional)": "中文 (繁體)",
-        "French": "法语"
+        "Chinese (Traditional)": "中文 (繁體)"
     },
     "default": {
         "currency": "TWD",

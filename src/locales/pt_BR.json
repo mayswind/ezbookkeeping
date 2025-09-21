@@ -8,6 +8,7 @@
         "German": "Alemão",
         "English": "Inglês",
         "Spanish": "Espanhol",
+        "French": "Francês",
         "Italian": "Italiano",
         "Japanese": "Japonês",
         "Dutch": "Holandês",
@@ -16,8 +17,7 @@
         "Ukrainian": "Ucraniano",
         "Vietnamese": "Vietnamita",
         "Chinese (Simplified)": "Chinês (Simplificado)",
-        "Chinese (Traditional)": "Chinês (Tradicional)",
-        "French": "Francês"
+        "Chinese (Traditional)": "Chinês (Tradicional)"
     },
     "default": {
         "currency": "BRL",

@@ -8,6 +8,7 @@
         "German": "Duits",
         "English": "Engels",
         "Spanish": "Spaans",
+        "French": "Frans",
         "Italian": "Italiaans",
         "Japanese": "Japans",
         "Dutch": "Nederlands",
@@ -16,8 +17,7 @@
         "Ukrainian": "Oekraïens",
         "Vietnamese": "Vietnamees",
         "Chinese (Simplified)": "Chinees (Vereenvoudigd)",
-        "Chinese (Traditional)": "Chinees (Traditioneel)",
-        "French": "Frans"
+        "Chinese (Traditional)": "Chinees (Traditioneel)"
     },
     "default": {
         "currency": "EUR",

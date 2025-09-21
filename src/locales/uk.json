@@ -8,6 +8,7 @@
         "German": "Німецька",
         "English": "Англійська",
         "Spanish": "Іспанська",
+        "French": "Французська",
         "Italian": "Італійська",
         "Japanese": "Японська",
         "Dutch": "Нідерландська",
@@ -16,8 +17,7 @@
         "Ukrainian": "Українська",
         "Vietnamese": "В'єтнамська",
         "Chinese (Simplified)": "Китайська (Спрощена)",
-        "Chinese (Traditional)": "Китайська (Традиційна)",
-        "French": "Французська"
+        "Chinese (Traditional)": "Китайська (Традиційна)"
     },
     "default": {
         "currency": "UAH",

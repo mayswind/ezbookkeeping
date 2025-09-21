@@ -8,6 +8,7 @@
         "German": "Tiếng Đức",
         "English": "Tiếng Anh",
         "Spanish": "Tiếng Tây Ban Nha",
+        "French": "Tiếng Pháp",
         "Italian": "Tiếng Ý",
         "Japanese": "Tiếng Nhật",
         "Dutch": "Tiếng Hà Lan",
@@ -16,8 +17,7 @@
         "Ukrainian": "Tiếng Ukraina",
         "Vietnamese": "Tiếng Việt",
         "Chinese (Simplified)": "Tiếng Trung (Giản Thể)",
-        "Chinese (Traditional)": "Tiếng Trung (Phồn Thể)",
-        "French": "Tiếng Pháp"
+        "Chinese (Traditional)": "Tiếng Trung (Phồn Thể)"
     },
     "default": {
         "currency": "VND",

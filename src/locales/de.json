@@ -8,6 +8,7 @@
         "German": "Deutsch",
         "English": "Englisch",
         "Spanish": "Spanisch",
+        "French": "Französisch",
         "Italian": "Italienisch",
         "Japanese": "Japanisch",
         "Dutch": "Niederländisch",
@@ -16,8 +17,7 @@
         "Ukrainian": "Ukrainisch",
         "Vietnamese": "Vietnamesisch",
         "Chinese (Simplified)": "Chinesisch (Vereinfacht)",
-        "Chinese (Traditional)": "Chinesisch (Traditionell)",
-        "French": "Französisch"
+        "Chinese (Traditional)": "Chinesisch (Traditionell)"
     },
     "default": {
         "currency": "EUR",

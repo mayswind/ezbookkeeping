@@ -30,6 +30,9 @@ func InitializeLargeLanguageModelProvider(config *settings.Config) error {
 	} else if config.LLMProvider == settings.OllamaLLMProvider {
 		Container.current = NewOllamaLargeLanguageModelProvider(config)
 		return nil
+	} else if config.LLMProvider == "" {
+		Container.current = nil
+		return nil
 	}
 
 	return errs.ErrInvalidLLMProvider

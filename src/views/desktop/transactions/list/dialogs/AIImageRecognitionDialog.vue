@@ -18,7 +18,7 @@
                         <h3 v-if="!imageFile && !isDragOver">{{ tt('Drag and drop a receipt or transaction image here, or click to select one') }}</h3>
                         <h3 v-if="isDragOver">{{ tt('Release to load image') }}</h3>
                     </div>
-                    <v-img height="480px" :class="{ 'cursor-pointer': !loading || !recognizing || !isDragOver }"
+                    <v-img height="480px" :class="{ 'cursor-pointer': !loading && !recognizing && !isDragOver }"
                            :src="imageSrc" @click="showOpenImageDialog">
                         <template #placeholder>
                             <div class="w-100 fill-height bg-grey-200"></div>

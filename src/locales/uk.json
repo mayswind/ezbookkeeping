@@ -124,6 +124,7 @@
             "confirmImportTransactions": "Ви впевнені, що хочете імпортувати {count} транзакцій?",
             "importingTransactions": "Importing ({process}%)",
             "importTransactionResult": "Ви успішно імпортували {count} транзакцій.",
+            "clearTransactionsInAccountTip": "You CANNOT undo this action. This will clear your transactions data in {account}. Please enter your current password to confirm.",
             "accountActivationAndResendValidationEmailTip": "Посилання для активації облікового запису було надіслано на вашу електронну адресу: {email}. Якщо ви не отримали лист, введіть пароль ще раз і натисніть кнопку нижче, щоб надіслати лист повторно.",
             "resendValidationEmailTip": "Якщо ви не отримали лист, введіть пароль ще раз і натисніть кнопку нижче, щоб надіслати лист повторно на адресу: {email}"
         }
@@ -1409,6 +1410,7 @@
     "Continue": "Продовжити",
     "Previous": "Назад",
     "Next": "Далі",
+    "Confirm": "Confirm",
     "Status": "Статус",
     "Enable": "Увімкнути",
     "Enabled": "Увімкнено",
@@ -2098,6 +2100,7 @@
     "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.": "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.",
     "You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "Цю дію не можна скасувати. Будуть видалені рахунки, категорії, теги та транзакції. Введіть поточний пароль для підтвердження.",
     "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.",
+    "All transactions in this account has been cleared": "All transactions in this account has been cleared",
     "All transactions has been cleared": "All transactions has been cleared",
     "All user data has been cleared": "Усі дані користувача очищено",
     "Unable to clear user data": "Не вдалося очистити дані",

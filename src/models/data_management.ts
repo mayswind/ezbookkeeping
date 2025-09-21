@@ -14,6 +14,11 @@ export interface ClearDataRequest {
     readonly password: string;
 }
 
+export interface ClearAccountTransactionsRequest {
+    readonly accountId: string;
+    readonly password: string;
+}
+
 export interface DataStatisticsResponse {
     readonly totalAccountCount: string;
     readonly totalTransactionCategoryCount: string;

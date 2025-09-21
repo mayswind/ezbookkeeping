@@ -26,7 +26,7 @@
                 <f7-button large fill
                            :class="{ 'disabled': !currentPassword || confirmDisabled }"
                            :color="color || 'primary'"
-                           :text="tt('Continue')"
+                           :text="tt('Confirm')"
                            @click="confirm">
                 </f7-button>
                 <div class="margin-top text-align-center">

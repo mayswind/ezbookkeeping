@@ -124,6 +124,7 @@
             "confirmImportTransactions": "Bạn có chắc chắn muốn nhập {count} giao dịch không?",
             "importingTransactions": "Importing ({process}%)",
             "importTransactionResult": "Bạn đã nhập thành công {count} giao dịch.",
+            "clearTransactionsInAccountTip": "You CANNOT undo this action. This will clear your transactions data in {account}. Please enter your current password to confirm.",
             "accountActivationAndResendValidationEmailTip": "Liên kết kích hoạt tài khoản đã được gửi tới email của bạn: {email}. Nếu bạn không nhận được email, vui lòng nhập lại mật khẩu và nhấp nút bên dưới để gửi lại email xác nhận.",
             "resendValidationEmailTip": "Nếu bạn không nhận được email, vui lòng nhập lại mật khẩu và nhấp nút bên dưới để gửi lại email xác nhận tới: {email}"
         }
@@ -1409,6 +1410,7 @@
     "Continue": "Tiếp tục",
     "Previous": "Trước",
     "Next": "Tiếp theo",
+    "Confirm": "Confirm",
     "Status": "Trạng thái",
     "Enable": "Bật",
     "Enabled": "Đã bật",
@@ -2098,6 +2100,7 @@
     "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.": "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.",
     "You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "Bạn KHÔNG THỂ hoàn tác hành động này. Thao tác này sẽ xóa dữ liệu tài khoản, danh mục, thẻ và giao dịch của bạn. Vui lòng nhập mật khẩu hiện tại của bạn để xác nhận.",
     "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.",
+    "All transactions in this account has been cleared": "All transactions in this account has been cleared",
     "All transactions has been cleared": "All transactions has been cleared",
     "All user data has been cleared": "Tất cả dữ liệu người dùng đã bị xóa",
     "Unable to clear user data": "Không thể xóa dữ liệu người dùng",

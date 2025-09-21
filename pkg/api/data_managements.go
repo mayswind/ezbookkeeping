@@ -15,6 +15,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
+const pageCountForClearTransactions = 1000
 const pageCountForDataExport = 1000
 
 // DataManagementsApi represents data management api
@@ -229,6 +230,61 @@ func (a *DataManagementsApi) ClearAllTransactionsHandler(c *core.WebContext) (an
 	}
 
 	log.Infof(c, "[data_managements.ClearAllTransactionsHandler] user \"uid:%d\" has cleared all transactions", uid)
+	return true, nil
+}
+
+// ClearAllTransactionsByAccountHandler deletes all transactions of specified account
+func (a *DataManagementsApi) ClearAllTransactionsByAccountHandler(c *core.WebContext) (any, *errs.Error) {
+	var clearDataReq models.ClearAccountTransactionsRequest
+	err := c.ShouldBindJSON(&clearDataReq)
+
+	if err != nil {
+		log.Warnf(c, "[data_managements.ClearAllTransactionsByAccountHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Warnf(c, "[data_managements.ClearAllTransactionsByAccountHandler] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	if !a.users.IsPasswordEqualsUserPassword(clearDataReq.Password, user) {
+		return nil, errs.ErrUserPasswordWrong
+	}
+
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_CLEAR_ALL_DATA) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
+	account, err := a.accounts.GetAccountByAccountId(c, uid, clearDataReq.AccountId)
+
+	if err != nil {
+		log.Errorf(c, "[data_managements.ClearAllTransactionsByAccountHandler] failed to get account \"id:%d\" for user \"uid:%d\", because %s", uid, clearDataReq.AccountId, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	if account.Hidden {
+		return nil, errs.ErrCannotDeleteTransactionInHiddenAccount
+	}
+
+	if account.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
+		return nil, errs.ErrCannotDeleteTransactionInParentAccount
+	}
+
+	err = a.transactions.DeleteAllTransactionsOfAccount(c, uid, account.AccountId, pageCountForClearTransactions)
+
+	if err != nil {
+		log.Errorf(c, "[data_managements.ClearAllTransactionsByAccountHandler] failed to delete all transactions in account \"id:%d\", because %s", account.AccountId, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.Infof(c, "[data_managements.ClearAllTransactionsByAccountHandler] user \"uid:%d\" has cleared all transactions in account \"id:%d\"", uid, account.AccountId)
 	return true, nil
 }
 

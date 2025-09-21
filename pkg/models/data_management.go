@@ -5,6 +5,12 @@ type ClearDataRequest struct {
 	Password string `json:"password" binding:"omitempty,min=6,max=128"`
 }
 
+// ClearAccountTransactionsRequest represents all parameters of clear transaction data of a specific account request
+type ClearAccountTransactionsRequest struct {
+	AccountId int64  `json:"accountId,string" binding:"required,min=1"`
+	Password  string `json:"password" binding:"omitempty,min=6,max=128"`
+}
+
 // DataStatisticsResponse represents a view-object of user data statistic
 type DataStatisticsResponse struct {
 	TotalAccountCount              int64 `json:"totalAccountCount,string"`

@@ -457,6 +457,46 @@ export const useRootStore = defineStore('root', () => {
         });
     }
 
+    function clearAllUserTransactionsOfAccount({ accountId, password }: { accountId: string, password: string }): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            services.clearAllTransactionsOfAccount({
+                accountId: accountId,
+                password: password
+            }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to clear user data' });
+                    return;
+                }
+
+                if (!accountsStore.accountListStateInvalid) {
+                    accountsStore.updateAccountListInvalidState(true);
+                }
+
+                if (!overviewStore.transactionOverviewStateInvalid) {
+                    overviewStore.updateTransactionOverviewInvalidState(true);
+                }
+
+                if (!statisticsStore.transactionStatisticsStateInvalid) {
+                    statisticsStore.updateTransactionStatisticsInvalidState(true);
+                }
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to clear user data', error);
+
+                if (error && error.processed) {
+                    reject(error);
+                } else if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else {
+                    reject({ message: 'Unable to clear user data' });
+                }
+            });
+        });
+    }
+
     function clearAllUserTransactions({ password }: { password: string }): Promise<boolean> {
         return new Promise((resolve, reject) => {
             services.clearAllTransactions({
@@ -560,7 +600,8 @@ export const useRootStore = defineStore('root', () => {
         resetPassword,
         updateUserProfile,
         resendVerifyEmailByLoginedUser,
-        clearAllUserData,
-        clearAllUserTransactions
+        clearAllUserTransactionsOfAccount,
+        clearAllUserTransactions,
+        clearAllUserData
     };
 });

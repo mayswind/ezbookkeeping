@@ -124,6 +124,7 @@
             "confirmImportTransactions": "您確定要匯入 {count} 個交易？",
             "importingTransactions": "正在匯入 ({process}%)",
             "importTransactionResult": "您已經成功匯入 {count} 個交易。",
+            "clearTransactionsInAccountTip": "您不能還原此操作。此操作將會清除您在 {account} 帳戶中的交易資料。請輸入您目前的密碼以確認。",
             "accountActivationAndResendValidationEmailTip": "帳號啟用連結已經傳送到您的信箱地址：{email}，如果您沒有收到郵件，請再次輸入密碼並點擊下方的按鈕重新發送驗證郵件。",
             "resendValidationEmailTip": "如果您沒有收到郵件，請再次輸入密碼並點擊下方的按鈕重新發送驗證郵件到：{email}"
         }
@@ -1409,6 +1410,7 @@
     "Continue": "繼續",
     "Previous": "上一步",
     "Next": "下一步",
+    "Confirm": "確認",
     "Status": "狀態",
     "Enable": "啟用",
     "Enabled": "啟用",
@@ -2098,6 +2100,7 @@
     "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.": "您不能還原此操作。此操作將會清除您的交易資料。請輸入您目前的密碼以確認。",
     "You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "您不能還原此操作。此操作將會清除您的帳戶、分類、標籤以及交易資料。請輸入您目前的密碼以確認。",
     "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "您不能還原此操作。\"清除所有交易\" 將會清除您的所有交易資料，以及 \"清除所有資料\" 將會清除您的帳戶、分類、標籤以及交易資料。請輸入您目前的密碼以確認。",
+    "All transactions in this account has been cleared": "此帳戶中的所有交易已經清空",
     "All transactions has been cleared": "所有交易已經清空",
     "All user data has been cleared": "使用者所有資料已經清空",
     "Unable to clear user data": "無法清除使用者資料",

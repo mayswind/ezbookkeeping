@@ -124,6 +124,7 @@
             "confirmImportTransactions": "Tem certeza de que deseja importar {count} transações?",
             "importingTransactions": "Importando ({process}%)",
             "importTransactionResult": "Você importou {count} transações com sucesso.",
+            "clearTransactionsInAccountTip": "You CANNOT undo this action. This will clear your transactions data in {account}. Please enter your current password to confirm.",
             "accountActivationAndResendValidationEmailTip": "O link de ativação da conta foi enviado para seu endereço de e-mail: {email}. Se você não receber o e-mail, por favor preencha a senha novamente e clique no botão abaixo para reenviar o e-mail de validação.",
             "resendValidationEmailTip": "Se você não receber o e-mail, por favor preencha a senha novamente e clique no botão abaixo para reenviar o e-mail de validação para: {email}"
         }
@@ -1409,6 +1410,7 @@
     "Continue": "Continuar",
     "Previous": "Anterior",
     "Next": "Próximo",
+    "Confirm": "Confirm",
     "Status": "Status",
     "Enable": "Habilitar",
     "Enabled": "Habilitado",
@@ -2098,6 +2100,7 @@
     "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.": "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.",
     "You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "Você NÃO PODE desfazer esta ação. Isto apagará seus dados de contas, categorias, tags e transações. Por favor, insira sua senha atual para confirmar.",
     "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.",
+    "All transactions in this account has been cleared": "All transactions in this account has been cleared",
     "All transactions has been cleared": "All transactions has been cleared",
     "All user data has been cleared": "Todos os dados de usuário foram apagados",
     "Unable to clear user data": "Não foi possível limpar os dados de usuário",

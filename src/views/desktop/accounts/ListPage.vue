@@ -250,6 +250,13 @@
                                                                     </v-btn>
                                                                     <v-btn class="px-2 ms-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
+                                                                           :disabled="loading" :prepend-icon="mdiEraser"
+                                                                           v-if="element.type === AccountType.SingleAccount.type || element.getSubAccount(activeSubAccount[element.id])"
+                                                                           @click="clearAllTransactions(element)">
+                                                                        {{ tt('Clear All Transactions') }}
+                                                                    </v-btn>
+                                                                    <v-btn class="px-2 ms-1" density="comfortable" color="default" variant="text"
+                                                                           :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading" :prepend-icon="mdiDeleteOutline"
                                                                            v-if="!activeSubAccount[element.id] || element.getSubAccount(activeSubAccount[element.id])"
                                                                            @click="remove(element)">
@@ -282,6 +289,7 @@
     <edit-dialog ref="editDialog" />
     <reconciliation-statement-dialog ref="reconciliationStatementDialog"
                                      @error="onShowDateRangeError" />
+    <clear-all-transactions-dialog ref="clearAllTransactionsDialog" />
 
     <date-range-selection-dialog :title="tt('Custom Date Range')"
                                  v-model:show="showCustomDateRangeDialog"
@@ -297,6 +305,7 @@ import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import EditDialog from './list/dialogs/EditDialog.vue';
 import ReconciliationStatementDialog from './list/dialogs/ReconciliationStatementDialog.vue';
+import ClearAllTransactionsDialog from '@/views/desktop/accounts/list/dialogs/ClearAllTransactionsDialog.vue';
 import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
@@ -322,6 +331,7 @@ import {
     mdiSquareRounded,
     mdiMenu,
     mdiPencilOutline,
+    mdiEraser,
     mdiDeleteOutline,
     mdiListBoxOutline,
     mdiInvoiceListOutline,
@@ -333,6 +343,7 @@ type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 type ReconciliationStatementDialogType = InstanceType<typeof ReconciliationStatementDialog>;
+type ClearAllTransactionsDialogType = InstanceType<typeof ClearAllTransactionsDialog>;
 
 const display = useDisplay();
 
@@ -361,6 +372,7 @@ const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 const reconciliationStatementDialog = useTemplateRef<ReconciliationStatementDialogType>('reconciliationStatementDialog');
+const clearAllTransactionsDialog = useTemplateRef<ClearAllTransactionsDialogType>('clearAllTransactionsDialog');
 
 const activeAccountCategoryType = ref<number>(AccountCategory.Default.type);
 const activeTab = ref<string>('accountPage');
@@ -510,6 +522,16 @@ function showReconciliationStatementCustomDateRangeDialog(account: Account, date
         accountId: account.id,
         startTime: dateRange.minTime,
         endTime: dateRange.maxTime
+    });
+}
+
+function clearAllTransactions(account: Account): void {
+    clearAllTransactionsDialog.value?.open(account).then(() => {
+        snackbar.value?.showMessage('All transactions in this account has been cleared');
+
+        if (accountsStore.accountListStateInvalid && !loading.value) {
+            reload(false);
+        }
     });
 }
 

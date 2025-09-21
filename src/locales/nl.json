@@ -124,6 +124,7 @@
             "confirmImportTransactions": "Weet je zeker dat je {count} transacties wilt importeren?",
             "importingTransactions": "Bezig met importeren ({process}%)",
             "importTransactionResult": "Je hebt {count} transacties succesvol geïmporteerd.",
+            "clearTransactionsInAccountTip": "You CANNOT undo this action. This will clear your transactions data in {account}. Please enter your current password to confirm.",
             "accountActivationAndResendValidationEmailTip": "Een activatielink is verzonden naar je e-mailadres: {email}. Als je de e-mail niet ontvangt, vul dan je wachtwoord opnieuw in en klik op de knop hieronder om de validatiemail opnieuw te verzenden.",
             "resendValidationEmailTip": "Als je de e-mail niet ontvangt, vul dan je wachtwoord opnieuw in en klik op de knop hieronder om de validatiemail opnieuw te verzenden naar: {email}"
         }
@@ -1409,6 +1410,7 @@
     "Continue": "Doorgaan",
     "Previous": "Vorige",
     "Next": "Volgende",
+    "Confirm": "Confirm",
     "Status": "Status",
     "Enable": "Inschakelen",
     "Enabled": "Ingeschakeld",
@@ -2098,6 +2100,7 @@
     "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.": "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.",
     "You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "Dit kan NIET ongedaan worden gemaakt. Je rekeningen, categorieën, tags en transacties worden gewist. Voer je huidige wachtwoord in ter bevestiging.",
     "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.",
+    "All transactions in this account has been cleared": "All transactions in this account has been cleared",
     "All transactions has been cleared": "All transactions has been cleared",
     "All user data has been cleared": "Alle gebruikersgegevens zijn gewist",
     "Unable to clear user data": "Kan gebruikersgegevens niet wissen",

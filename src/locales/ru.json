@@ -124,6 +124,7 @@
             "confirmImportTransactions": "Вы уверены, что хотите импортировать {count} транзакций?",
             "importingTransactions": "Importing ({process}%)",
             "importTransactionResult": "Вы успешно импортировали {count} транзакций.",
+            "clearTransactionsInAccountTip": "You CANNOT undo this action. This will clear your transactions data in {account}. Please enter your current password to confirm.",
             "accountActivationAndResendValidationEmailTip": "Ссылка для активации учетной записи была отправлена на ваш электронный адрес: {email}. Если вы не получили письмо, заполните пароль снова и нажмите кнопку ниже, чтобы отправить письмо повторно.",
             "resendValidationEmailTip": "Если вы не получили письмо, заполните пароль снова и нажмите кнопку ниже, чтобы отправить письмо повторно на: {email}"
         }
@@ -1409,6 +1410,7 @@
     "Continue": "Продолжить",
     "Previous": "Предыдущий",
     "Next": "Следующий",
+    "Confirm": "Confirm",
     "Status": "Статус",
     "Enable": "Включить",
     "Enabled": "Включено",
@@ -2098,6 +2100,7 @@
     "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.": "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.",
     "You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "Вы НЕ сможете отменить это действие. Это очистит данные ваших счетов, категорий, тегов и транзакций. Пожалуйста, введите текущий пароль для подтверждения.",
     "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.",
+    "All transactions in this account has been cleared": "All transactions in this account has been cleared",
     "All transactions has been cleared": "All transactions has been cleared",
     "All user data has been cleared": "Все данные пользователя были очищены",
     "Unable to clear user data": "Не удалось очистить данные пользователя",

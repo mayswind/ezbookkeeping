@@ -124,6 +124,7 @@
             "confirmImportTransactions": "Are you sure you want to import {count} transactions?",
             "importingTransactions": "Importing ({process}%)",
             "importTransactionResult": "You have imported {count} transactions successfully.",
+            "clearTransactionsInAccountTip": "You CANNOT undo this action. This will clear your transactions data in {account}. Please enter your current password to confirm.",
             "accountActivationAndResendValidationEmailTip": "Account activation link has been sent to your email address: {email}, If you don't receive the mail, please fill password again and click the button below to resend the validation mail.",
             "resendValidationEmailTip": "If you don't receive the mail, please fill password again and click the button below to resend the validation mail to: {email}"
         }
@@ -1409,6 +1410,7 @@
     "Continue": "Continue",
     "Previous": "Previous",
     "Next": "Next",
+    "Confirm": "Confirm",
     "Status": "Status",
     "Enable": "Enable",
     "Enabled": "Enabled",
@@ -2098,6 +2100,7 @@
     "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.": "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.",
     "You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.",
     "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.",
+    "All transactions in this account has been cleared": "All transactions in this account has been cleared",
     "All transactions has been cleared": "All transactions has been cleared",
     "All user data has been cleared": "All user data has been cleared",
     "Unable to clear user data": "Unable to clear user data",

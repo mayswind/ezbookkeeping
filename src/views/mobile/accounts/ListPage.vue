@@ -162,12 +162,16 @@
             <f7-actions-group v-if="accountForMoreActionSheet && accountForMoreActionSheet.type === AccountType.SingleAccount.type">
                 <f7-actions-button @click="showReconciliationStatement(accountForMoreActionSheet)">{{ tt('Reconciliation Statement') }}</f7-actions-button>
             </f7-actions-group>
+            <f7-actions-group v-if="accountForMoreActionSheet && accountForMoreActionSheet.type === AccountType.SingleAccount.type">
+                <f7-actions-button color="red" @click="showPasswordSheetForClearAllTransaction(accountForMoreActionSheet)">{{ tt('Clear All Transactions') }}</f7-actions-button>
+            </f7-actions-group>
             <template v-if="accountForMoreActionSheet && accountForMoreActionSheet.type === AccountType.MultiSubAccounts.type">
                 <f7-actions-group :key="subAccount.id"
                                   v-for="subAccount in accountForMoreActionSheet.subAccounts"
                                   v-show="showHidden || !subAccount.hidden">
                     <f7-actions-label>{{ subAccount.name }}</f7-actions-label>
                     <f7-actions-button @click="showReconciliationStatement(subAccount)">{{ tt('Reconciliation Statement') }}</f7-actions-button>
+                    <f7-actions-button color="red" @click="showPasswordSheetForClearAllTransaction(subAccount)">{{ tt('Clear All Transactions') }}</f7-actions-button>
                 </f7-actions-group>
             </template>
             <f7-actions-group>
@@ -198,6 +202,16 @@
                 <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
             </f7-actions-group>
         </f7-actions>
+
+        <password-input-sheet :title="tt('Are you sure you want to clear all transactions?')"
+                              :hint="tt('format.misc.clearTransactionsInAccountTip', { account: accountToClearTransactions?.name ?? 'undefined' })"
+                              :confirm-disabled="clearingData"
+                              :cancel-disabled="clearingData"
+                              color="red"
+                              v-model:show="showInputPasswordSheetForClearAllTransactions"
+                              v-model="currentPasswordForClearData"
+                              @password:confirm="clearAllTransactions">
+        </password-input-sheet>
     </f7-page>
 </template>
 
@@ -209,6 +223,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
 import { useAccountListPageBaseBase } from '@/views/base/accounts/AccountListPageBase.ts';
 
+import { useRootStore } from '@/stores/index.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 
 import { TextDirection } from '@/core/text.ts';
@@ -238,15 +253,20 @@ const {
     accountBalance
 } = useAccountListPageBaseBase();
 
+const rootStore = useRootStore();
 const accountsStore = useAccountsStore();
 
 const loadingError = ref<unknown | null>(null);
 const sortable = ref<boolean>(false);
 const accountForMoreActionSheet = ref<Account | null>(null);
 const accountToDelete = ref<Account | null>(null);
+const accountToClearTransactions = ref<Account | null>(null);
+const currentPasswordForClearData = ref<string>('');
+const clearingData = ref<boolean>(false);
 const showAccountMoreActionSheet = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
+const showInputPasswordSheetForClearAllTransactions = ref<boolean>(false);
 const displayOrderSaving = ref<boolean>(false);
 
 const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
@@ -341,6 +361,48 @@ function showReconciliationStatement(account: Account | null): void {
     props.f7router.navigate('/account/reconciliation_statements?accountId=' + account.id);
     showAccountMoreActionSheet.value = false;
     accountForMoreActionSheet.value = null;
+}
+
+function showPasswordSheetForClearAllTransaction(account: Account | null): void {
+    if (!account) {
+        showAlert('An error occurred');
+        return;
+    }
+
+    accountToClearTransactions.value = account;
+    currentPasswordForClearData.value = '';
+    showInputPasswordSheetForClearAllTransactions.value = true;
+    showAccountMoreActionSheet.value = false;
+    accountForMoreActionSheet.value = null;
+}
+
+function clearAllTransactions(password: string): void {
+    if (!accountToClearTransactions.value) {
+        showAlert('An error occurred');
+        return;
+    }
+
+    clearingData.value = true;
+    showLoading(() => clearingData.value);
+
+    rootStore.clearAllUserTransactionsOfAccount({
+        accountId: accountToClearTransactions.value.id,
+        password: password
+    }).then(() => {
+        clearingData.value = false;
+        currentPasswordForClearData.value = '';
+        hideLoading();
+
+        showInputPasswordSheetForClearAllTransactions.value = false;
+        showToast('All transactions in this account has been cleared');
+    }).catch(error => {
+        clearingData.value = false;
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
 }
 
 function hide(account: Account, hidden: boolean): void {

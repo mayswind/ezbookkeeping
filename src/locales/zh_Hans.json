@@ -124,6 +124,7 @@
             "confirmImportTransactions": "您确定要导入 {count} 个交易？",
             "importingTransactions": "正在导入 ({process}%)",
             "importTransactionResult": "您已经成功导入 {count} 个交易。",
+            "clearTransactionsInAccountTip": "您不能撤销该操作。该操作将会清除您在 {account} 账户中的交易数据。请输入您当前的密码以确认。",
             "accountActivationAndResendValidationEmailTip": "账号激活链接已经发送到您的邮箱地址：{email}，如果您没有收到邮件，请再次输入密码并点击下方的按钮重新发送验证邮件。",
             "resendValidationEmailTip": "如果您没有收到邮件，请再次输入密码并点击下方的按钮重新发送验证邮件到：{email}"
         }
@@ -1409,6 +1410,7 @@
     "Continue": "继续",
     "Previous": "上一步",
     "Next": "下一步",
+    "Confirm": "确认",
     "Status": "状态",
     "Enable": "启用",
     "Enabled": "启用",
@@ -2098,6 +2100,7 @@
     "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.": "您不能撤销该操作。该操作将会清除您的交易数据。请输入您当前的密码以确认。",
     "You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "您不能撤销该操作。该操作将会清除您的账户、分类、标签以及交易数据。请输入您当前的密码以确认。",
     "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "您不能撤销该操作。\"清除所有交易\" 将会清除您的所有交易数据，以及 \"清除所有数据\" 将会清除您的账户、分类、标签以及交易数据。请输入您当前的密码以确认。",
+    "All transactions in this account has been cleared": "该账户中的所有交易已经清空",
     "All transactions has been cleared": "所有交易已经清空",
     "All user data has been cleared": "用户所有数据已经清空",
     "Unable to clear user data": "无法清除用户数据",

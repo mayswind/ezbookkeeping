@@ -21,6 +21,7 @@ import {
     DEFAULT_UPLOAD_API_TIMEOUT,
     DEFAULT_EXPORT_API_TIMEOUT,
     DEFAULT_IMPORT_API_TIMEOUT,
+    DEFAULT_CLEAR_ALL_TRANSACTIONS_API_TIMEOUT,
     DEFAULT_LLM_API_TIMEOUT,
     GOOGLE_MAP_JAVASCRIPT_URL,
     BAIDU_MAP_JAVASCRIPT_URL,
@@ -42,6 +43,7 @@ import type {
 import type {
     ExportTransactionDataRequest,
     ClearDataRequest,
+    ClearAccountTransactionsRequest,
     DataStatisticsResponse
 } from '@/models/data_management.ts';
 import type {
@@ -383,10 +385,19 @@ export default {
         }
     },
     clearAllData: (req: ClearDataRequest): ApiResponsePromise<boolean> => {
-        return axios.post<ApiResponse<boolean>>('v1/data/clear/all.json', req);
+        return axios.post<ApiResponse<boolean>>('v1/data/clear/all.json', req, {
+            timeout: DEFAULT_CLEAR_ALL_TRANSACTIONS_API_TIMEOUT
+        } as ApiRequestConfig);
     },
     clearAllTransactions: (req: ClearDataRequest): ApiResponsePromise<boolean> => {
-        return axios.post<ApiResponse<boolean>>('v1/data/clear/transactions.json', req);
+        return axios.post<ApiResponse<boolean>>('v1/data/clear/transactions.json', req, {
+            timeout: DEFAULT_CLEAR_ALL_TRANSACTIONS_API_TIMEOUT
+        } as ApiRequestConfig);
+    },
+    clearAllTransactionsOfAccount: (req: ClearAccountTransactionsRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/data/clear/transactions/by_account.json', req, {
+            timeout: DEFAULT_CLEAR_ALL_TRANSACTIONS_API_TIMEOUT
+        } as ApiRequestConfig);
     },
     getAllAccounts: ({ visibleOnly }: { visibleOnly: boolean }): ApiResponsePromise<AccountInfoResponse[]> => {
         return axios.get<ApiResponse<AccountInfoResponse[]>>('v1/accounts/list.json?visible_only=' + visibleOnly);

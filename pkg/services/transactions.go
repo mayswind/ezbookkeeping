@@ -1381,6 +1381,43 @@ func (s *TransactionService) DeleteAllTransactions(c core.Context, uid int64, de
 	})
 }
 
+// DeleteAllTransactionsOfAccount deletes all existed transactions of specific account from database
+func (s *TransactionService) DeleteAllTransactionsOfAccount(c core.Context, uid int64, accountId int64, pageCount int32) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	if accountId <= 0 {
+		return errs.ErrAccountIdInvalid
+	}
+
+	transactions, err := s.GetAllSpecifiedTransactions(c, uid, 0, 0, 0, nil, []int64{accountId}, nil, false, models.TRANSACTION_TAG_FILTER_HAS_ANY, "", "", pageCount, true)
+
+	if err != nil {
+		return err
+	}
+
+	if len(transactions) < 1 {
+		return nil
+	}
+
+	for i := 0; i < len(transactions); i++ {
+		transaction := transactions[i]
+
+		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+			err = s.DeleteTransaction(c, uid, transaction.RelatedId)
+		} else {
+			err = s.DeleteTransaction(c, uid, transaction.TransactionId)
+		}
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // GetRelatedTransferTransaction returns the related transaction for transfer transaction
 func (s *TransactionService) GetRelatedTransferTransaction(originalTransaction *models.Transaction) *models.Transaction {
 	var relatedType models.TransactionDbType

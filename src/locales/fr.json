@@ -124,6 +124,7 @@
             "confirmImportTransactions": "Êtes-vous sûr de vouloir importer {count} transactions ?",
             "importingTransactions": "Importation ({process}%)",
             "importTransactionResult": "Vous avez importé {count} transactions avec succès.",
+            "clearTransactionsInAccountTip": "You CANNOT undo this action. This will clear your transactions data in {account}. Please enter your current password to confirm.",
             "accountActivationAndResendValidationEmailTip": "Le lien d'activation du compte a été envoyé à votre adresse e-mail : {email}, Si vous ne recevez pas le mail, veuillez remplir à nouveau le mot de passe et cliquer sur le bouton ci-dessous pour renvoyer l'e-mail de validation.",
             "resendValidationEmailTip": "Si vous ne recevez pas le mail, veuillez remplir à nouveau le mot de passe et cliquer sur le bouton ci-dessous pour renvoyer l'e-mail de validation à : {email}"
         }
@@ -1409,6 +1410,7 @@
     "Continue": "Continuer",
     "Previous": "Précédent",
     "Next": "Suivant",
+    "Confirm": "Confirm",
     "Status": "État",
     "Enable": "Activer",
     "Enabled": "Activé",
@@ -2098,6 +2100,7 @@
     "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.": "Vous NE POUVEZ PAS annuler cette action. Ceci effacera vos données de transactions. Veuillez entrer votre mot de passe actuel pour confirmer.",
     "You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "Vous NE POUVEZ PAS annuler cette action. Ceci effacera vos comptes, catégories, étiquettes et données de transactions. Veuillez entrer votre mot de passe actuel pour confirmer.",
     "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "Vous NE POUVEZ PAS annuler cette action. \"Effacer toutes les transactions\" effacera toutes vos données de transactions, et \"Effacer toutes les données\" effacera vos comptes, catégories, étiquettes et données de transactions. Veuillez entrer votre mot de passe actuel pour confirmer.",
+    "All transactions in this account has been cleared": "All transactions in this account has been cleared",
     "All transactions has been cleared": "Toutes les transactions ont été effacées",
     "All user data has been cleared": "Toutes les données utilisateur ont été effacées",
     "Unable to clear user data": "Impossible d'effacer les données utilisateur",

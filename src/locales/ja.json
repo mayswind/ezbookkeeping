@@ -124,6 +124,7 @@
             "confirmImportTransactions": "本当に{count}件の取引をインポートしますか？",
             "importingTransactions": "Importing ({process}%)",
             "importTransactionResult": "{count}件の取引を正常にインポートしました。",
+            "clearTransactionsInAccountTip": "You CANNOT undo this action. This will clear your transactions data in {account}. Please enter your current password to confirm.",
             "accountActivationAndResendValidationEmailTip": "アカウントの有効化リンクがメールアドレスに送信されました:{email}、メールが届かない場合はパスワードをもう一度入力して下のボタンをクリックして認証メールを再送信してください。",
             "resendValidationEmailTip": "メールが届かない場合は、パスワードをもう一度入力の上、以下のボタンをクリックして検証メールを再送信してください: {email}"
         }
@@ -1409,6 +1410,7 @@
     "Continue": "続ける",
     "Previous": "前",
     "Next": "次",
+    "Confirm": "Confirm",
     "Status": "ステータス",
     "Enable": "有効",
     "Enabled": "有効になっています",
@@ -2098,6 +2100,7 @@
     "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.": "You CANNOT undo this action. This will clear your transactions data. Please enter your current password to confirm.",
     "You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "このアクションを元に戻すことはできません。これにより、口座、カテゴリ、タグ、および取引データがクリアされます。確認のため現在のパスワードを入力してください。",
     "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.": "You CANNOT undo this action. \"Clear All Transactions\" will clear all your transactions data, and \"Clear All Data\" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.",
+    "All transactions in this account has been cleared": "All transactions in this account has been cleared",
     "All transactions has been cleared": "All transactions has been cleared",
     "All user data has been cleared": "ユーザーデータがすべてクリアされました",
     "Unable to clear user data": "ユーザーデータをクリアできません",

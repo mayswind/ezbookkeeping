@@ -1,6 +1,7 @@
 import de from './de.json';
 import en from './en.json';
 import es from './es.json';
+import fr from './fr.json';
 import it from './it.json';
 import ja from './ja.json';
 import nl from './nl.json';
@@ -50,6 +51,13 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         alternativeLanguageTag: 'es-ES',
         textDirection: 'ltr',
         content: es
+    },
+    'fr': {
+        name: "French",
+        displayName: "Français",
+        alternativeLanguageTag: "fr-FR",
+        textDirection: "ltr",
+        content: fr,
     },
     'it': {
         name: 'Italian',

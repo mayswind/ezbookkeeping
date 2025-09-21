@@ -16,7 +16,8 @@
         "Ukrainian": "Tiếng Ukraina",
         "Vietnamese": "Tiếng Việt",
         "Chinese (Simplified)": "Tiếng Trung (Giản Thể)",
-        "Chinese (Traditional)": "Tiếng Trung (Phồn Thể)"
+        "Chinese (Traditional)": "Tiếng Trung (Phồn Thể)",
+        "French": "Tiếng Pháp"
     },
     "default": {
         "currency": "VND",

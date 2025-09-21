@@ -16,7 +16,8 @@
         "Ukrainian": "Ucraino",
         "Vietnamese": "Vietnamese",
         "Chinese (Simplified)": "Cinese (Semplificato)",
-        "Chinese (Traditional)": "Cinese (Tradizionale)"
+        "Chinese (Traditional)": "Cinese (Tradizionale)",
+        "French": "Francese"
     },
     "default": {
         "currency": "EUR",

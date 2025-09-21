@@ -10,14 +10,16 @@ import (
 )
 
 func TestOllamaLargeLanguageModelProvider_buildJsonRequestBody_TextualUserPrompt(t *testing.T) {
-	provider := &OllamaLargeLanguageModelProvider{}
+	provider := &OllamaLargeLanguageModelProvider{
+		OllamaModelID: "test",
+	}
 
 	request := &LargeLanguageModelRequest{
 		SystemPrompt: "You are a helpful assistant.",
 		UserPrompt:   []byte("Hello, how are you?"),
 	}
 
-	bodyBytes, err := provider.buildJsonRequestBody(core.NewNullContext(), 0, request, "test", LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+	bodyBytes, err := provider.buildJsonRequestBody(core.NewNullContext(), 0, request, LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
 	assert.Nil(t, err)
 
 	var body map[string]interface{}
@@ -28,7 +30,9 @@ func TestOllamaLargeLanguageModelProvider_buildJsonRequestBody_TextualUserPrompt
 }
 
 func TestOllamaLargeLanguageModelProvider_buildJsonRequestBody_ImageUserPrompt(t *testing.T) {
-	provider := &OllamaLargeLanguageModelProvider{}
+	provider := &OllamaLargeLanguageModelProvider{
+		OllamaModelID: "test",
+	}
 
 	request := &LargeLanguageModelRequest{
 		SystemPrompt:   "What's in this image?",
@@ -36,7 +40,7 @@ func TestOllamaLargeLanguageModelProvider_buildJsonRequestBody_ImageUserPrompt(t
 		UserPromptType: LARGE_LANGUAGE_MODEL_REQUEST_PROMPT_TYPE_IMAGE_URL,
 	}
 
-	bodyBytes, err := provider.buildJsonRequestBody(core.NewNullContext(), 0, request, "test", LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+	bodyBytes, err := provider.buildJsonRequestBody(core.NewNullContext(), 0, request, LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
 	assert.Nil(t, err)
 
 	var body map[string]interface{}

@@ -10,8 +10,8 @@ import (
 // OpenRouterLargeLanguageModelProvider defines the structure of OpenRouter large language model provider
 type OpenRouterLargeLanguageModelProvider struct {
 	OpenAIChatCompletionsLargeLanguageModelProvider
-	OpenRouterAPIKey               string
-	ReceiptImageRecognitionModelID string
+	OpenRouterAPIKey  string
+	OpenRouterModelID string
 }
 
 const openRouterChatCompletionsUrl = "https://openrouter.ai/api/v1/chat/completions"
@@ -31,15 +31,15 @@ func (p *OpenRouterLargeLanguageModelProvider) BuildChatCompletionsHttpRequest(c
 	return req, nil
 }
 
-// GetReceiptImageRecognitionModelID returns the receipt image recognition model id of OpenRouter provider
-func (p *OpenRouterLargeLanguageModelProvider) GetReceiptImageRecognitionModelID() string {
-	return p.ReceiptImageRecognitionModelID
+// GetModelID returns the model id of OpenRouter provider
+func (p *OpenRouterLargeLanguageModelProvider) GetModelID() string {
+	return p.OpenRouterModelID
 }
 
 // NewOpenRouterLargeLanguageModelProvider creates a new OpenRouter large language model provider instance
-func NewOpenRouterLargeLanguageModelProvider(config *settings.Config) LargeLanguageModelProvider {
+func NewOpenRouterLargeLanguageModelProvider(llmConfig *settings.LLMConfig) LargeLanguageModelProvider {
 	return newOpenAICommonChatCompletionsHttpLargeLanguageModelProvider(&OpenRouterLargeLanguageModelProvider{
-		OpenRouterAPIKey:               config.OpenRouterAPIKey,
-		ReceiptImageRecognitionModelID: config.OpenRouterReceiptImageRecognitionModelID,
+		OpenRouterAPIKey:  llmConfig.OpenRouterAPIKey,
+		OpenRouterModelID: llmConfig.OpenRouterModelID,
 	})
 }

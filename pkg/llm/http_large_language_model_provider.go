@@ -16,13 +16,10 @@ import (
 // HttpLargeLanguageModelProvider defines the structure of http large language model provider
 type HttpLargeLanguageModelProvider interface {
 	// BuildTextualRequest returns the http request by the provider api definition
-	BuildTextualRequest(c core.Context, uid int64, request *LargeLanguageModelRequest, modelId string, responseType LargeLanguageModelResponseFormat) (*http.Request, error)
+	BuildTextualRequest(c core.Context, uid int64, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) (*http.Request, error)
 
 	// ParseTextualResponse returns the textual response entity by the provider api definition
 	ParseTextualResponse(c core.Context, uid int64, body []byte, responseType LargeLanguageModelResponseFormat) (*LargeLanguageModelTextualResponse, error)
-
-	// GetReceiptImageRecognitionModelID returns the receipt image recognition model id if supported, otherwise returns empty string
-	GetReceiptImageRecognitionModelID() string
 }
 
 // CommonHttpLargeLanguageModelProvider defines the structure of common http large language model provider
@@ -31,20 +28,16 @@ type CommonHttpLargeLanguageModelProvider struct {
 	provider HttpLargeLanguageModelProvider
 }
 
-// GetJsonResponseByReceiptImageRecognitionModel returns the json response from the OpenAI common compatible large language model provider
-func (p *CommonHttpLargeLanguageModelProvider) GetJsonResponseByReceiptImageRecognitionModel(c core.Context, uid int64, currentConfig *settings.Config, request *LargeLanguageModelRequest) (*LargeLanguageModelTextualResponse, error) {
-	return p.getTextualResponse(c, uid, currentConfig, request, p.provider.GetReceiptImageRecognitionModelID(), LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+// GetJsonResponse returns the json response from the OpenAI common compatible large language model provider
+func (p *CommonHttpLargeLanguageModelProvider) GetJsonResponse(c core.Context, uid int64, currentLLMConfig *settings.LLMConfig, request *LargeLanguageModelRequest) (*LargeLanguageModelTextualResponse, error) {
+	return p.getTextualResponse(c, uid, currentLLMConfig, request, LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
 }
 
-func (p *CommonHttpLargeLanguageModelProvider) getTextualResponse(c core.Context, uid int64, currentConfig *settings.Config, request *LargeLanguageModelRequest, modelId string, responseType LargeLanguageModelResponseFormat) (*LargeLanguageModelTextualResponse, error) {
-	if modelId == "" {
-		return nil, errs.ErrInvalidLLMModelId
-	}
-
+func (p *CommonHttpLargeLanguageModelProvider) getTextualResponse(c core.Context, uid int64, currentLLMConfig *settings.LLMConfig, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) (*LargeLanguageModelTextualResponse, error) {
 	transport := http.DefaultTransport.(*http.Transport).Clone()
-	utils.SetProxyUrl(transport, currentConfig.LargeLanguageModelAPIProxy)
+	utils.SetProxyUrl(transport, currentLLMConfig.LargeLanguageModelAPIProxy)
 
-	if currentConfig.LargeLanguageModelAPISkipTLSVerify {
+	if currentLLMConfig.LargeLanguageModelAPISkipTLSVerify {
 		transport.TLSClientConfig = &tls.Config{
 			InsecureSkipVerify: true,
 		}
@@ -52,10 +45,10 @@ func (p *CommonHttpLargeLanguageModelProvider) getTextualResponse(c core.Context
 
 	client := &http.Client{
 		Transport: transport,
-		Timeout:   time.Duration(currentConfig.LargeLanguageModelAPIRequestTimeout) * time.Millisecond,
+		Timeout:   time.Duration(currentLLMConfig.LargeLanguageModelAPIRequestTimeout) * time.Millisecond,
 	}
 
-	httpRequest, err := p.provider.BuildTextualRequest(c, uid, request, modelId, responseType)
+	httpRequest, err := p.provider.BuildTextualRequest(c, uid, request, responseType)
 
 	if err != nil {
 		log.Errorf(c, "[http_large_language_model_provider.getTextualResponse] failed to build requests for user \"uid:%d\", because %s", uid, err.Error())

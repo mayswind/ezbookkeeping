@@ -11,7 +11,9 @@ import (
 
 func TestOpenAICommonChatCompletionsHttpLargeLanguageModelProvider_buildJsonRequestBody_TextualUserPrompt(t *testing.T) {
 	provider := &OpenAICommonChatCompletionsHttpLargeLanguageModelProvider{
-		provider: &OpenAILargeLanguageModelProvider{},
+		provider: &OpenAILargeLanguageModelProvider{
+			OpenAIModelID: "test",
+		},
 	}
 
 	request := &LargeLanguageModelRequest{
@@ -19,7 +21,7 @@ func TestOpenAICommonChatCompletionsHttpLargeLanguageModelProvider_buildJsonRequ
 		UserPrompt:   []byte("Hello, how are you?"),
 	}
 
-	bodyBytes, err := provider.buildJsonRequestBody(core.NewNullContext(), 0, request, "test", LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+	bodyBytes, err := provider.buildJsonRequestBody(core.NewNullContext(), 0, request, LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
 	assert.Nil(t, err)
 
 	var body map[string]interface{}
@@ -31,7 +33,9 @@ func TestOpenAICommonChatCompletionsHttpLargeLanguageModelProvider_buildJsonRequ
 
 func TestOpenAICommonChatCompletionsHttpLargeLanguageModelProvider_buildJsonRequestBody_ImageUserPrompt(t *testing.T) {
 	provider := &OpenAICommonChatCompletionsHttpLargeLanguageModelProvider{
-		provider: &OpenAILargeLanguageModelProvider{},
+		provider: &OpenAILargeLanguageModelProvider{
+			OpenAIModelID: "test",
+		},
 	}
 
 	request := &LargeLanguageModelRequest{
@@ -40,7 +44,7 @@ func TestOpenAICommonChatCompletionsHttpLargeLanguageModelProvider_buildJsonRequ
 		UserPromptType: LARGE_LANGUAGE_MODEL_REQUEST_PROMPT_TYPE_IMAGE_URL,
 	}
 
-	bodyBytes, err := provider.buildJsonRequestBody(core.NewNullContext(), 0, request, "test", LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+	bodyBytes, err := provider.buildJsonRequestBody(core.NewNullContext(), 0, request, LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
 	assert.Nil(t, err)
 
 	var body map[string]interface{}

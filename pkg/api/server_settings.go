@@ -47,7 +47,7 @@ func (a *ServerSettingsApi) ServerSettingsJavascriptHandler(c *core.WebContext) 
 		a.appendBooleanSetting(builder, "mcp", config.EnableMCPServer)
 	}
 
-	if config.LLMProvider != "" {
+	if config.ReceiptImageRecognitionLLMConfig != nil && config.ReceiptImageRecognitionLLMConfig.LLMProvider != "" {
 		if config.TransactionFromAIImageRecognition {
 			a.appendBooleanSetting(builder, "llmt", config.TransactionFromAIImageRecognition)
 		}

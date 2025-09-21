@@ -20,8 +20,8 @@ type OpenAIChatCompletionsLargeLanguageModelProvider interface {
 	// BuildChatCompletionsHttpRequest returns the chat completions http request
 	BuildChatCompletionsHttpRequest(c core.Context, uid int64) (*http.Request, error)
 
-	// GetReceiptImageRecognitionModelID returns the receipt image recognition model id if supported, otherwise returns empty string
-	GetReceiptImageRecognitionModelID() string
+	// GetModelID returns the model id if supported, otherwise returns empty string
+	GetModelID() string
 }
 
 // OpenAICommonChatCompletionsHttpLargeLanguageModelProvider defines the structure of OpenAI common compatible large language model provider based on chat completions api
@@ -31,8 +31,8 @@ type OpenAICommonChatCompletionsHttpLargeLanguageModelProvider struct {
 }
 
 // BuildTextualRequest returns the http request by OpenAI common compatible provider
-func (p *OpenAICommonChatCompletionsHttpLargeLanguageModelProvider) BuildTextualRequest(c core.Context, uid int64, request *LargeLanguageModelRequest, modelId string, responseType LargeLanguageModelResponseFormat) (*http.Request, error) {
-	requestBody, err := p.buildJsonRequestBody(c, uid, request, modelId, responseType)
+func (p *OpenAICommonChatCompletionsHttpLargeLanguageModelProvider) BuildTextualRequest(c core.Context, uid int64, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) (*http.Request, error) {
+	requestBody, err := p.buildJsonRequestBody(c, uid, request, responseType)
 
 	if err != nil {
 		return nil, err
@@ -105,12 +105,11 @@ func (p *OpenAICommonChatCompletionsHttpLargeLanguageModelProvider) ParseTextual
 	return textualResponse, nil
 }
 
-// GetReceiptImageRecognitionModelID returns the receipt image recognition model id of OpenAI common compatible provider
-func (p *OpenAICommonChatCompletionsHttpLargeLanguageModelProvider) GetReceiptImageRecognitionModelID() string {
-	return p.provider.GetReceiptImageRecognitionModelID()
-}
+func (p *OpenAICommonChatCompletionsHttpLargeLanguageModelProvider) buildJsonRequestBody(c core.Context, uid int64, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) ([]byte, error) {
+	if p.provider.GetModelID() == "" {
+		return nil, errs.ErrInvalidLLMModelId
+	}
 
-func (p *OpenAICommonChatCompletionsHttpLargeLanguageModelProvider) buildJsonRequestBody(c core.Context, uid int64, request *LargeLanguageModelRequest, modelId string, responseType LargeLanguageModelResponseFormat) ([]byte, error) {
 	requestMessages := make([]any, 0)
 
 	if request.SystemPrompt != "" {
@@ -143,7 +142,7 @@ func (p *OpenAICommonChatCompletionsHttpLargeLanguageModelProvider) buildJsonReq
 	}
 
 	requestBody := make(map[string]any)
-	requestBody["model"] = modelId
+	requestBody["model"] = p.provider.GetModelID()
 	requestBody["stream"] = request.Stream
 	requestBody["messages"] = requestMessages
 

@@ -7,6 +7,6 @@ import (
 
 // LargeLanguageModelProvider defines the structure of large language model provider
 type LargeLanguageModelProvider interface {
-	// GetJsonResponseByReceiptImageRecognitionModel returns the json response from the large language model provider by receipt image recognition model
-	GetJsonResponseByReceiptImageRecognitionModel(c core.Context, uid int64, currentConfig *settings.Config, request *LargeLanguageModelRequest) (*LargeLanguageModelTextualResponse, error)
+	// GetJsonResponse returns the json response from the large language model provider
+	GetJsonResponse(c core.Context, uid int64, currentLLMConfig *settings.LLMConfig, request *LargeLanguageModelRequest) (*LargeLanguageModelTextualResponse, error)
 }

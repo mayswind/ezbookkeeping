@@ -41,7 +41,7 @@ var (
 
 // RecognizeReceiptImageHandler returns the recognized receipt image result
 func (a *LargeLanguageModelsApi) RecognizeReceiptImageHandler(c *core.WebContext) (any, *errs.Error) {
-	if a.CurrentConfig().LLMProvider == "" || !a.CurrentConfig().TransactionFromAIImageRecognition {
+	if a.CurrentConfig().ReceiptImageRecognitionLLMConfig == nil || a.CurrentConfig().ReceiptImageRecognitionLLMConfig.LLMProvider == "" || !a.CurrentConfig().TransactionFromAIImageRecognition {
 		return nil, errs.ErrLargeLanguageModelProviderNotEnabled
 	}
 

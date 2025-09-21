@@ -12,9 +12,9 @@ const openAICompatibleChatCompletionsPath = "chat/completions"
 // OpenAICompatibleLargeLanguageModelProvider defines the structure of OpenAI compatible large language model provider
 type OpenAICompatibleLargeLanguageModelProvider struct {
 	OpenAIChatCompletionsLargeLanguageModelProvider
-	OpenAICompatibleBaseURL        string
-	OpenAICompatibleAPIKey         string
-	ReceiptImageRecognitionModelID string
+	OpenAICompatibleBaseURL string
+	OpenAICompatibleAPIKey  string
+	OpenAICompatibleModelID string
 }
 
 // BuildChatCompletionsHttpRequest returns the chat completions http request by OpenAI compatible provider
@@ -32,9 +32,9 @@ func (p *OpenAICompatibleLargeLanguageModelProvider) BuildChatCompletionsHttpReq
 	return req, nil
 }
 
-// GetReceiptImageRecognitionModelID returns the receipt image recognition model id of OpenAI compatible provider
-func (p *OpenAICompatibleLargeLanguageModelProvider) GetReceiptImageRecognitionModelID() string {
-	return p.ReceiptImageRecognitionModelID
+// GetModelID returns the model id of OpenAI compatible provider
+func (p *OpenAICompatibleLargeLanguageModelProvider) GetModelID() string {
+	return p.OpenAICompatibleModelID
 }
 
 func (p *OpenAICompatibleLargeLanguageModelProvider) getFinalChatCompletionsRequestUrl() string {
@@ -49,10 +49,10 @@ func (p *OpenAICompatibleLargeLanguageModelProvider) getFinalChatCompletionsRequ
 }
 
 // NewOpenAICompatibleLargeLanguageModelProvider creates a new OpenAI compatible large language model provider instance
-func NewOpenAICompatibleLargeLanguageModelProvider(config *settings.Config) LargeLanguageModelProvider {
+func NewOpenAICompatibleLargeLanguageModelProvider(llmConfig *settings.LLMConfig) LargeLanguageModelProvider {
 	return newOpenAICommonChatCompletionsHttpLargeLanguageModelProvider(&OpenAICompatibleLargeLanguageModelProvider{
-		OpenAICompatibleBaseURL:        config.OpenAICompatibleBaseURL,
-		OpenAICompatibleAPIKey:         config.OpenAICompatibleAPIKey,
-		ReceiptImageRecognitionModelID: config.OpenAICompatibleReceiptImageRecognitionModelID,
+		OpenAICompatibleBaseURL: llmConfig.OpenAICompatibleBaseURL,
+		OpenAICompatibleAPIKey:  llmConfig.OpenAICompatibleAPIKey,
+		OpenAICompatibleModelID: llmConfig.OpenAICompatibleModelID,
 	})
 }

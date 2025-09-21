@@ -10,8 +10,8 @@ import (
 // OpenAILargeLanguageModelProvider defines the structure of OpenAI large language model provider
 type OpenAILargeLanguageModelProvider struct {
 	OpenAIChatCompletionsLargeLanguageModelProvider
-	OpenAIAPIKey                   string
-	ReceiptImageRecognitionModelID string
+	OpenAIAPIKey  string
+	OpenAIModelID string
 }
 
 const openAIChatCompletionsUrl = "https://api.openai.com/v1/chat/completions"
@@ -29,15 +29,15 @@ func (p *OpenAILargeLanguageModelProvider) BuildChatCompletionsHttpRequest(c cor
 	return req, nil
 }
 
-// GetReceiptImageRecognitionModelID returns the receipt image recognition model id of OpenAI provider
-func (p *OpenAILargeLanguageModelProvider) GetReceiptImageRecognitionModelID() string {
-	return p.ReceiptImageRecognitionModelID
+// GetModelID returns the model id of OpenAI provider
+func (p *OpenAILargeLanguageModelProvider) GetModelID() string {
+	return p.OpenAIModelID
 }
 
 // NewOpenAILargeLanguageModelProvider creates a new OpenAI large language model provider instance
-func NewOpenAILargeLanguageModelProvider(config *settings.Config) LargeLanguageModelProvider {
+func NewOpenAILargeLanguageModelProvider(llmConfig *settings.LLMConfig) LargeLanguageModelProvider {
 	return newOpenAICommonChatCompletionsHttpLargeLanguageModelProvider(&OpenAILargeLanguageModelProvider{
-		OpenAIAPIKey:                   config.OpenAIAPIKey,
-		ReceiptImageRecognitionModelID: config.OpenAIReceiptImageRecognitionModelID,
+		OpenAIAPIKey:  llmConfig.OpenAIAPIKey,
+		OpenAIModelID: llmConfig.OpenAIModelID,
 	})
 }

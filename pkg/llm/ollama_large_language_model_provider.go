@@ -18,13 +18,13 @@ const ollamaChatCompletionsPath = "api/chat"
 // OllamaLargeLanguageModelProvider defines the structure of Ollama large language model provider
 type OllamaLargeLanguageModelProvider struct {
 	CommonHttpLargeLanguageModelProvider
-	OllamaServerURL                string
-	ReceiptImageRecognitionModelID string
+	OllamaServerURL string
+	OllamaModelID   string
 }
 
 // BuildTextualRequest returns the http request by Ollama provider
-func (p *OllamaLargeLanguageModelProvider) BuildTextualRequest(c core.Context, uid int64, request *LargeLanguageModelRequest, modelId string, responseType LargeLanguageModelResponseFormat) (*http.Request, error) {
-	requestBody, err := p.buildJsonRequestBody(c, uid, request, modelId, responseType)
+func (p *OllamaLargeLanguageModelProvider) BuildTextualRequest(c core.Context, uid int64, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) (*http.Request, error) {
+	requestBody, err := p.buildJsonRequestBody(c, uid, request, responseType)
 
 	if err != nil {
 		return nil, err
@@ -82,12 +82,16 @@ func (p *OllamaLargeLanguageModelProvider) ParseTextualResponse(c core.Context, 
 	return textualResponse, nil
 }
 
-// GetReceiptImageRecognitionModelID returns the receipt image recognition model id of Ollama provider
-func (p *OllamaLargeLanguageModelProvider) GetReceiptImageRecognitionModelID() string {
-	return p.ReceiptImageRecognitionModelID
+// GetModelID returns the model id of Ollama provider
+func (p *OllamaLargeLanguageModelProvider) GetModelID() string {
+	return p.OllamaModelID
 }
 
-func (p *OllamaLargeLanguageModelProvider) buildJsonRequestBody(c core.Context, uid int64, request *LargeLanguageModelRequest, modelId string, responseType LargeLanguageModelResponseFormat) ([]byte, error) {
+func (p *OllamaLargeLanguageModelProvider) buildJsonRequestBody(c core.Context, uid int64, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) ([]byte, error) {
+	if p.OllamaModelID == "" {
+		return nil, errs.ErrInvalidLLMModelId
+	}
+
 	requestMessages := make([]any, 0)
 
 	if request.SystemPrompt != "" {
@@ -114,7 +118,7 @@ func (p *OllamaLargeLanguageModelProvider) buildJsonRequestBody(c core.Context, 
 	}
 
 	requestBody := make(map[string]any)
-	requestBody["model"] = modelId
+	requestBody["model"] = p.OllamaModelID
 	requestBody["stream"] = request.Stream
 	requestBody["messages"] = requestMessages
 
@@ -145,9 +149,9 @@ func (p *OllamaLargeLanguageModelProvider) getOllamaRequestUrl() string {
 }
 
 // NewOllamaLargeLanguageModelProvider creates a new Ollama large language model provider instance
-func NewOllamaLargeLanguageModelProvider(config *settings.Config) LargeLanguageModelProvider {
+func NewOllamaLargeLanguageModelProvider(llmConfig *settings.LLMConfig) LargeLanguageModelProvider {
 	return newCommonHttpLargeLanguageModelProvider(&OllamaLargeLanguageModelProvider{
-		OllamaServerURL:                config.OllamaServerURL,
-		ReceiptImageRecognitionModelID: config.OllamaReceiptImageRecognitionModelID,
+		OllamaServerURL: llmConfig.OllamaServerURL,
+		OllamaModelID:   llmConfig.OllamaModelID,
 	})
 }

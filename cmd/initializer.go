@@ -165,14 +165,17 @@ func getConfigWithoutSensitiveData(config *settings.Config) *settings.Config {
 	clonedConfig.DatabaseConfig.DatabasePassword = "****"
 	clonedConfig.SMTPConfig.SMTPPasswd = "****"
 	clonedConfig.MinIOConfig.SecretAccessKey = "****"
-	clonedConfig.OpenAIAPIKey = "****"
-	clonedConfig.OpenAICompatibleAPIKey = "****"
-	clonedConfig.OpenRouterAPIKey = "****"
 	clonedConfig.SecretKey = "****"
 	clonedConfig.AmapApplicationSecret = "****"
 
 	if clonedConfig.WebDAVConfig != nil {
 		clonedConfig.WebDAVConfig.Password = "****"
+	}
+
+	if clonedConfig.ReceiptImageRecognitionLLMConfig != nil {
+		clonedConfig.ReceiptImageRecognitionLLMConfig.OpenAIAPIKey = "****"
+		clonedConfig.ReceiptImageRecognitionLLMConfig.OpenAICompatibleAPIKey = "****"
+		clonedConfig.ReceiptImageRecognitionLLMConfig.OpenRouterAPIKey = "****"
 	}
 
 	return clonedConfig

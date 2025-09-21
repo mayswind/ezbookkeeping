@@ -567,6 +567,7 @@ const {
     allCategoriesMap,
     allTags,
     allTagsMap,
+    firstVisibleAccountId,
     hasAvailableExpenseCategories,
     hasAvailableIncomeCategories,
     hasAvailableTransferCategories,
@@ -1235,9 +1236,9 @@ function onPageBeforeOut(): void {
     const initAmount: number | undefined = query['amount'] ? parseInt(query['amount']) : undefined;
 
     if (settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') {
-        if (transactionsStore.isTransactionDraftModified(transaction.value, initAmount, query['categoryId'], query['accountId'], query['tagIds'])) {
+        if (transactionsStore.isTransactionDraftModified(transaction.value, initAmount, query['categoryId'], query['accountId'], query['tagIds'], firstVisibleAccountId.value)) {
             showConfirm('Do you want to save this transaction draft?', () => {
-                transactionsStore.saveTransactionDraft(transaction.value, initAmount, query['categoryId'], query['accountId'], query['tagIds']);
+                transactionsStore.saveTransactionDraft(transaction.value, initAmount, query['categoryId'], query['accountId'], query['tagIds'], firstVisibleAccountId.value);
             }, () => {
                 transactionsStore.clearTransactionDraft();
             });
@@ -1245,7 +1246,7 @@ function onPageBeforeOut(): void {
             transactionsStore.clearTransactionDraft();
         }
     } else if (settingsStore.appSettings.autoSaveTransactionDraft === 'enabled') {
-        transactionsStore.saveTransactionDraft(transaction.value, initAmount, query['categoryId'], query['accountId'], query['tagIds']);
+        transactionsStore.saveTransactionDraft(transaction.value, initAmount, query['categoryId'], query['accountId'], query['tagIds'], firstVisibleAccountId.value);
     }
 }
 

@@ -108,6 +108,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
     const allCategoriesMap = computed<Record<string, TransactionCategory>>(() => transactionCategoriesStore.allTransactionCategoriesMap);
     const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
     const allTagsMap = computed<Record<string, TransactionTag>>(() => transactionTagsStore.allTransactionTagsMap);
+    const firstVisibleAccountId = computed<string | undefined>(() => allVisibleAccounts.value && allVisibleAccounts.value[0] ? allVisibleAccounts.value[0].id : undefined);
 
     const hasAvailableExpenseCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableExpenseCategories);
     const hasAvailableIncomeCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableIncomeCategories);
@@ -436,6 +437,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         allCategoriesMap,
         allTags,
         allTagsMap,
+        firstVisibleAccountId,
         hasAvailableExpenseCategories,
         hasAvailableIncomeCategories,
         hasAvailableTransferCategories,

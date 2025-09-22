@@ -5,7 +5,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/llm/data"
 	"github.com/mayswind/ezbookkeeping/pkg/llm/provider"
-	"github.com/mayswind/ezbookkeeping/pkg/llm/provider/google_ai"
+	"github.com/mayswind/ezbookkeeping/pkg/llm/provider/googleai"
 	"github.com/mayswind/ezbookkeeping/pkg/llm/provider/ollama"
 	"github.com/mayswind/ezbookkeeping/pkg/llm/provider/openai"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
@@ -46,7 +46,7 @@ func initializeLargeLanguageModelProvider(llmConfig *settings.LLMConfig) (provid
 	} else if llmConfig.LLMProvider == settings.OllamaLLMProvider {
 		return ollama.NewOllamaLargeLanguageModelProvider(llmConfig), nil
 	} else if llmConfig.LLMProvider == settings.GoogleAILLMProvider {
-		return google_ai.NewGoogleAILargeLanguageModelProvider(llmConfig), nil
+		return googleai.NewGoogleAILargeLanguageModelProvider(llmConfig), nil
 	} else if llmConfig.LLMProvider == "" {
 		return nil, nil
 	}

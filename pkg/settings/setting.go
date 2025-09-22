@@ -71,6 +71,7 @@ const (
 	OpenAICompatibleLLMProvider string = "openai_compatible"
 	OpenRouterLLMProvider       string = "openrouter"
 	OllamaLLMProvider           string = "ollama"
+	GoogleAILLMProvider         string = "google_ai"
 )
 
 // Uuid generator types
@@ -231,6 +232,8 @@ type LLMConfig struct {
 	OpenRouterModelID                   string
 	OllamaServerURL                     string
 	OllamaModelID                       string
+	GoogleAIAPIKey                      string
+	GoogleAIModelID                     string
 	LargeLanguageModelAPIRequestTimeout uint32
 	LargeLanguageModelAPIProxy          string
 	LargeLanguageModelAPISkipTLSVerify  bool
@@ -818,6 +821,8 @@ func loadLLMConfiguration(configFile *ini.File, sectionName string) (*LLMConfig,
 		llmConfig.LLMProvider = OpenRouterLLMProvider
 	} else if llmProvider == OllamaLLMProvider {
 		llmConfig.LLMProvider = OllamaLLMProvider
+	} else if llmProvider == GoogleAILLMProvider {
+		llmConfig.LLMProvider = GoogleAILLMProvider
 	} else {
 		return nil, errs.ErrInvalidLLMProvider
 	}
@@ -834,6 +839,9 @@ func loadLLMConfiguration(configFile *ini.File, sectionName string) (*LLMConfig,
 
 	llmConfig.OllamaServerURL = getConfigItemStringValue(configFile, sectionName, "ollama_server_url")
 	llmConfig.OllamaModelID = getConfigItemStringValue(configFile, sectionName, "ollama_model_id")
+
+	llmConfig.GoogleAIAPIKey = getConfigItemStringValue(configFile, sectionName, "google_ai_api_key")
+	llmConfig.GoogleAIModelID = getConfigItemStringValue(configFile, sectionName, "google_ai_model_id")
 
 	llmConfig.LargeLanguageModelAPIProxy = getConfigItemStringValue(configFile, sectionName, "proxy", "system")
 	llmConfig.LargeLanguageModelAPIRequestTimeout = getConfigItemUint32Value(configFile, sectionName, "request_timeout", defaultLargeLanguageModelAPIRequestTimeout)

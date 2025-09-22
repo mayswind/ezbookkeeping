@@ -1,13 +1,16 @@
-package llm
+package common
 
 import (
 	"crypto/tls"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/llm/data"
+	"github.com/mayswind/ezbookkeeping/pkg/llm/provider"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
@@ -16,24 +19,38 @@ import (
 // HttpLargeLanguageModelAdapter defines the structure of http large language model adapter
 type HttpLargeLanguageModelAdapter interface {
 	// BuildTextualRequest returns the http request by the provider api definition
-	BuildTextualRequest(c core.Context, uid int64, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) (*http.Request, error)
+	BuildTextualRequest(c core.Context, uid int64, request *data.LargeLanguageModelRequest, responseType data.LargeLanguageModelResponseFormat) (*http.Request, error)
 
 	// ParseTextualResponse returns the textual response entity by the provider api definition
-	ParseTextualResponse(c core.Context, uid int64, body []byte, responseType LargeLanguageModelResponseFormat) (*LargeLanguageModelTextualResponse, error)
+	ParseTextualResponse(c core.Context, uid int64, body []byte, responseType data.LargeLanguageModelResponseFormat) (*data.LargeLanguageModelTextualResponse, error)
 }
 
 // CommonHttpLargeLanguageModelProvider defines the structure of common http large language model provider
 type CommonHttpLargeLanguageModelProvider struct {
-	LargeLanguageModelProvider
+	provider.LargeLanguageModelProvider
 	adapter HttpLargeLanguageModelAdapter
 }
 
 // GetJsonResponse returns the json response from the OpenAI common compatible large language model provider
-func (p *CommonHttpLargeLanguageModelProvider) GetJsonResponse(c core.Context, uid int64, currentLLMConfig *settings.LLMConfig, request *LargeLanguageModelRequest) (*LargeLanguageModelTextualResponse, error) {
-	return p.getTextualResponse(c, uid, currentLLMConfig, request, LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+func (p *CommonHttpLargeLanguageModelProvider) GetJsonResponse(c core.Context, uid int64, currentLLMConfig *settings.LLMConfig, request *data.LargeLanguageModelRequest) (*data.LargeLanguageModelTextualResponse, error) {
+	response, err := p.getTextualResponse(c, uid, currentLLMConfig, request, data.LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if strings.HasPrefix(response.Content, "```json") && strings.HasSuffix(response.Content, "```") {
+		response.Content = strings.TrimPrefix(response.Content, "```json")
+		response.Content = strings.TrimSuffix(response.Content, "```")
+	} else if strings.HasPrefix(response.Content, "```") && strings.HasSuffix(response.Content, "```") {
+		response.Content = strings.TrimPrefix(response.Content, "```")
+		response.Content = strings.TrimSuffix(response.Content, "```")
+	}
+
+	return response, nil
 }
 
-func (p *CommonHttpLargeLanguageModelProvider) getTextualResponse(c core.Context, uid int64, currentLLMConfig *settings.LLMConfig, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) (*LargeLanguageModelTextualResponse, error) {
+func (p *CommonHttpLargeLanguageModelProvider) getTextualResponse(c core.Context, uid int64, currentLLMConfig *settings.LLMConfig, request *data.LargeLanguageModelRequest, responseType data.LargeLanguageModelResponseFormat) (*data.LargeLanguageModelTextualResponse, error) {
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	utils.SetProxyUrl(transport, currentLLMConfig.LargeLanguageModelAPIProxy)
 
@@ -77,7 +94,8 @@ func (p *CommonHttpLargeLanguageModelProvider) getTextualResponse(c core.Context
 	return p.adapter.ParseTextualResponse(c, uid, body, responseType)
 }
 
-func newCommonHttpLargeLanguageModelProvider(adapter HttpLargeLanguageModelAdapter) *CommonHttpLargeLanguageModelProvider {
+// NewCommonHttpLargeLanguageModelProvider creates a http adapter based large language model provider instance
+func NewCommonHttpLargeLanguageModelProvider(adapter HttpLargeLanguageModelAdapter) *CommonHttpLargeLanguageModelProvider {
 	return &CommonHttpLargeLanguageModelProvider{
 		adapter: adapter,
 	}

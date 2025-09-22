@@ -1,9 +1,10 @@
-package llm
+package ollama
 
 import (
 	"encoding/json"
 	"testing"
 
+	"github.com/mayswind/ezbookkeeping/pkg/llm/data"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -14,19 +15,19 @@ func TestOllamaLargeLanguageModelAdapter_buildJsonRequestBody_TextualUserPrompt(
 		OllamaModelID: "test",
 	}
 
-	request := &LargeLanguageModelRequest{
+	request := &data.LargeLanguageModelRequest{
 		SystemPrompt: "You are a helpful assistant.",
 		UserPrompt:   []byte("Hello, how are you?"),
 	}
 
-	bodyBytes, err := adapter.buildJsonRequestBody(core.NewNullContext(), 0, request, LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+	bodyBytes, err := adapter.buildJsonRequestBody(core.NewNullContext(), 0, request, data.LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
 	assert.Nil(t, err)
 
 	var body map[string]interface{}
 	err = json.Unmarshal(bodyBytes, &body)
 	assert.Nil(t, err)
 
-	assert.Equal(t, "{\"format\":\"json\",\"messages\":[{\"content\":\"You are a helpful assistant.\",\"role\":\"system\"},{\"content\":\"Hello, how are you?\",\"role\":\"user\"}],\"model\":\"test\",\"stream\":false}", string(bodyBytes))
+	assert.Equal(t, "{\"model\":\"test\",\"stream\":false,\"messages\":[{\"role\":\"system\",\"content\":\"You are a helpful assistant.\"},{\"role\":\"user\",\"content\":\"Hello, how are you?\"}],\"format\":\"json\"}", string(bodyBytes))
 }
 
 func TestOllamaLargeLanguageModelAdapter_buildJsonRequestBody_ImageUserPrompt(t *testing.T) {
@@ -34,20 +35,20 @@ func TestOllamaLargeLanguageModelAdapter_buildJsonRequestBody_ImageUserPrompt(t 
 		OllamaModelID: "test",
 	}
 
-	request := &LargeLanguageModelRequest{
+	request := &data.LargeLanguageModelRequest{
 		SystemPrompt:   "What's in this image?",
 		UserPrompt:     []byte("fakedata"),
-		UserPromptType: LARGE_LANGUAGE_MODEL_REQUEST_PROMPT_TYPE_IMAGE_URL,
+		UserPromptType: data.LARGE_LANGUAGE_MODEL_REQUEST_PROMPT_TYPE_IMAGE_URL,
 	}
 
-	bodyBytes, err := adapter.buildJsonRequestBody(core.NewNullContext(), 0, request, LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+	bodyBytes, err := adapter.buildJsonRequestBody(core.NewNullContext(), 0, request, data.LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
 	assert.Nil(t, err)
 
 	var body map[string]interface{}
 	err = json.Unmarshal(bodyBytes, &body)
 	assert.Nil(t, err)
 
-	assert.Equal(t, "{\"format\":\"json\",\"messages\":[{\"content\":\"What's in this image?\",\"role\":\"system\"},{\"content\":\"\",\"images\":[\"ZmFrZWRhdGE=\"],\"role\":\"user\"}],\"model\":\"test\",\"stream\":false}", string(bodyBytes))
+	assert.Equal(t, "{\"model\":\"test\",\"stream\":false,\"messages\":[{\"role\":\"system\",\"content\":\"What's in this image?\"},{\"role\":\"user\",\"content\":\"\",\"images\":[\"ZmFrZWRhdGE=\"]}],\"format\":\"json\"}", string(bodyBytes))
 }
 
 func TestOllamaLargeLanguageModelAdapter_ParseTextualResponse_ValidJsonResponse(t *testing.T) {
@@ -62,7 +63,7 @@ func TestOllamaLargeLanguageModelAdapter_ParseTextualResponse_ValidJsonResponse(
 		}
 	}`
 
-	result, err := adapter.ParseTextualResponse(core.NewNullContext(), 0, []byte(response), LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+	result, err := adapter.ParseTextualResponse(core.NewNullContext(), 0, []byte(response), data.LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
 	assert.Nil(t, err)
 	assert.Equal(t, "This is a test response", result.Content)
 }
@@ -79,12 +80,12 @@ func TestOllamaLargeLanguageModelAdapter_ParseTextualResponse_EmptyResponse(t *t
 		}
 	}`
 
-	result, err := adapter.ParseTextualResponse(core.NewNullContext(), 0, []byte(response), LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+	result, err := adapter.ParseTextualResponse(core.NewNullContext(), 0, []byte(response), data.LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
 	assert.Nil(t, err)
 	assert.Equal(t, "", result.Content)
 }
 
-func TestOllamaLargeLanguageModelAdapter_ParseTextualResponse_EmptyChoices(t *testing.T) {
+func TestOllamaLargeLanguageModelAdapter_ParseTextualResponse_EmptyMessage(t *testing.T) {
 	adapter := &OllamaLargeLanguageModelAdapter{}
 
 	response := `{
@@ -93,11 +94,11 @@ func TestOllamaLargeLanguageModelAdapter_ParseTextualResponse_EmptyChoices(t *te
 		"message": {}
 	}`
 
-	_, err := adapter.ParseTextualResponse(core.NewNullContext(), 0, []byte(response), LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+	_, err := adapter.ParseTextualResponse(core.NewNullContext(), 0, []byte(response), data.LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
 	assert.EqualError(t, err, "failed to request third party api")
 }
 
-func TestOllamaLargeLanguageModelAdapter_ParseTextualResponse_NoChoiceContent(t *testing.T) {
+func TestOllamaLargeLanguageModelAdapter_ParseTextualResponse_NoContentFieldInMessage(t *testing.T) {
 	adapter := &OllamaLargeLanguageModelAdapter{}
 
 	response := `{
@@ -108,7 +109,7 @@ func TestOllamaLargeLanguageModelAdapter_ParseTextualResponse_NoChoiceContent(t 
 		}
 	}`
 
-	_, err := adapter.ParseTextualResponse(core.NewNullContext(), 0, []byte(response), LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+	_, err := adapter.ParseTextualResponse(core.NewNullContext(), 0, []byte(response), data.LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
 	assert.EqualError(t, err, "failed to request third party api")
 }
 
@@ -117,7 +118,7 @@ func TestOllamaLargeLanguageModelAdapter_ParseTextualResponse_InvalidJson(t *tes
 
 	response := "error"
 
-	_, err := adapter.ParseTextualResponse(core.NewNullContext(), 0, []byte(response), LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+	_, err := adapter.ParseTextualResponse(core.NewNullContext(), 0, []byte(response), data.LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
 	assert.EqualError(t, err, "failed to request third party api")
 }
 

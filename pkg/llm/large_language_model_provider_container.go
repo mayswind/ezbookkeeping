@@ -3,12 +3,17 @@ package llm
 import (
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/llm/data"
+	"github.com/mayswind/ezbookkeeping/pkg/llm/provider"
+	"github.com/mayswind/ezbookkeeping/pkg/llm/provider/google_ai"
+	"github.com/mayswind/ezbookkeeping/pkg/llm/provider/ollama"
+	"github.com/mayswind/ezbookkeeping/pkg/llm/provider/openai"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 // LargeLanguageModelProviderContainer contains the current large language model provider
 type LargeLanguageModelProviderContainer struct {
-	receiptImageRecognitionCurrentProvider LargeLanguageModelProvider
+	receiptImageRecognitionCurrentProvider provider.LargeLanguageModelProvider
 }
 
 // Initialize a large language model provider container singleton instance
@@ -31,15 +36,17 @@ func InitializeLargeLanguageModelProvider(config *settings.Config) error {
 	return nil
 }
 
-func initializeLargeLanguageModelProvider(llmConfig *settings.LLMConfig) (LargeLanguageModelProvider, error) {
+func initializeLargeLanguageModelProvider(llmConfig *settings.LLMConfig) (provider.LargeLanguageModelProvider, error) {
 	if llmConfig.LLMProvider == settings.OpenAILLMProvider {
-		return NewOpenAILargeLanguageModelProvider(llmConfig), nil
+		return openai.NewOpenAILargeLanguageModelProvider(llmConfig), nil
 	} else if llmConfig.LLMProvider == settings.OpenAICompatibleLLMProvider {
-		return NewOpenAICompatibleLargeLanguageModelProvider(llmConfig), nil
+		return openai.NewOpenAICompatibleLargeLanguageModelProvider(llmConfig), nil
 	} else if llmConfig.LLMProvider == settings.OpenRouterLLMProvider {
-		return NewOpenRouterLargeLanguageModelProvider(llmConfig), nil
+		return openai.NewOpenRouterLargeLanguageModelProvider(llmConfig), nil
 	} else if llmConfig.LLMProvider == settings.OllamaLLMProvider {
-		return NewOllamaLargeLanguageModelProvider(llmConfig), nil
+		return ollama.NewOllamaLargeLanguageModelProvider(llmConfig), nil
+	} else if llmConfig.LLMProvider == settings.GoogleAILLMProvider {
+		return google_ai.NewGoogleAILargeLanguageModelProvider(llmConfig), nil
 	} else if llmConfig.LLMProvider == "" {
 		return nil, nil
 	}
@@ -48,7 +55,7 @@ func initializeLargeLanguageModelProvider(llmConfig *settings.LLMConfig) (LargeL
 }
 
 // GetJsonResponseByReceiptImageRecognitionModel returns the json response from the current large language model provider by receipt image recognition model
-func (l *LargeLanguageModelProviderContainer) GetJsonResponseByReceiptImageRecognitionModel(c core.Context, uid int64, currentConfig *settings.Config, request *LargeLanguageModelRequest) (*LargeLanguageModelTextualResponse, error) {
+func (l *LargeLanguageModelProviderContainer) GetJsonResponseByReceiptImageRecognitionModel(c core.Context, uid int64, currentConfig *settings.Config, request *data.LargeLanguageModelRequest) (*data.LargeLanguageModelTextualResponse, error) {
 	if currentConfig.ReceiptImageRecognitionLLMConfig == nil || Container.receiptImageRecognitionCurrentProvider == nil {
 		return nil, errs.ErrInvalidLLMProvider
 	}

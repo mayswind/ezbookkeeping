@@ -1,4 +1,4 @@
-package llm
+package data
 
 import "reflect"
 
@@ -24,6 +24,7 @@ type LargeLanguageModelRequest struct {
 	SystemPrompt           string
 	UserPrompt             []byte
 	UserPromptType         LargeLanguageModelRequestPromptType
+	UserPromptContentType  string
 	ResponseJsonObjectType reflect.Type
 }
 

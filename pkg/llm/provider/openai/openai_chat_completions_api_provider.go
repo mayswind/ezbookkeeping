@@ -1,9 +1,10 @@
-package llm
+package openai
 
 import (
 	"net/http"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/llm/provider"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
@@ -35,7 +36,7 @@ func (p *OpenAIOfficialChatCompletionsAPIProvider) GetModelID() string {
 }
 
 // NewOpenAILargeLanguageModelProvider creates a new OpenAI large language model provider instance
-func NewOpenAILargeLanguageModelProvider(llmConfig *settings.LLMConfig) LargeLanguageModelProvider {
+func NewOpenAILargeLanguageModelProvider(llmConfig *settings.LLMConfig) provider.LargeLanguageModelProvider {
 	return newCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter(&OpenAIOfficialChatCompletionsAPIProvider{
 		OpenAIAPIKey:  llmConfig.OpenAIAPIKey,
 		OpenAIModelID: llmConfig.OpenAIModelID,

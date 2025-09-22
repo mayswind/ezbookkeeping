@@ -1,4 +1,4 @@
-package llm
+package openai
 
 import (
 	"testing"

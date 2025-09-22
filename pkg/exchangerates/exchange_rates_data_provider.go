@@ -6,8 +6,8 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
-// ExchangeRatesDataSource defines the structure of exchange rates data source
-type ExchangeRatesDataSource interface {
+// ExchangeRatesDataProvider defines the structure of exchange rates data provider
+type ExchangeRatesDataProvider interface {
 	// GetLatestExchangeRates returns the common response entities
 	GetLatestExchangeRates(c core.Context, uid int64, currentConfig *settings.Config) (*models.LatestExchangeRateResponse, error)
 }

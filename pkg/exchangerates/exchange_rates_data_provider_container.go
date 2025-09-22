@@ -7,71 +7,71 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
-// ExchangeRatesDataSourceContainer contains the current exchange rates data source
-type ExchangeRatesDataSourceContainer struct {
-	current ExchangeRatesDataSource
+// ExchangeRatesDataProviderContainer contains the current exchange rates data provider
+type ExchangeRatesDataProviderContainer struct {
+	current ExchangeRatesDataProvider
 }
 
-// Initialize a exchange rates data source container singleton instance
+// Initialize a exchange rates data provider container singleton instance
 var (
-	Container = &ExchangeRatesDataSourceContainer{}
+	Container = &ExchangeRatesDataProviderContainer{}
 )
 
 // InitializeExchangeRatesDataSource initializes the current exchange rates data source according to the config
 func InitializeExchangeRatesDataSource(config *settings.Config) error {
 	if config.ExchangeRatesDataSource == settings.ReserveBankOfAustraliaDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&ReserveBankOfAustraliaDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&ReserveBankOfAustraliaDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.BankOfCanadaDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&BankOfCanadaDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&BankOfCanadaDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.CzechNationalBankDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&CzechNationalBankDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&CzechNationalBankDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.DanmarksNationalbankDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&DanmarksNationalbankDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&DanmarksNationalbankDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.EuroCentralBankDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&EuroCentralBankDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&EuroCentralBankDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.NationalBankOfGeorgiaDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&NationalBankOfGeorgiaDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&NationalBankOfGeorgiaDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.CentralBankOfHungaryDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&CentralBankOfHungaryDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&CentralBankOfHungaryDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.BankOfIsraelDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&BankOfIsraelDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&BankOfIsraelDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.CentralBankOfMyanmarDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&CentralBankOfMyanmarDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&CentralBankOfMyanmarDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.NorgesBankDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&NorgesBankDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&NorgesBankDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.NationalBankOfPolandDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&NationalBankOfPolandDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&NationalBankOfPolandDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.NationalBankOfRomaniaDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&NationalBankOfRomaniaDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&NationalBankOfRomaniaDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.BankOfRussiaDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&BankOfRussiaDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&BankOfRussiaDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.SwissNationalBankDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&SwissNationalBankDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&SwissNationalBankDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.NationalBankOfUkraineDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&NationalBankOfUkraineDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&NationalBankOfUkraineDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.CentralBankOfUzbekistanDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&CentralBankOfUzbekistanDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&CentralBankOfUzbekistanDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.InternationalMonetaryFundDataSource {
-		Container.current = newCommonHttpExchangeRatesDataSource(&InternationalMonetaryFundDataSource{})
+		Container.current = newCommonHttpExchangeRatesDataProvider(&InternationalMonetaryFundDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.UserCustomExchangeRatesDataSource {
-		Container.current = newUserCustomExchangeRatesDataSource()
+		Container.current = newUserCustomExchangeRatesDataProvider()
 		return nil
 	}
 
@@ -79,7 +79,7 @@ func InitializeExchangeRatesDataSource(config *settings.Config) error {
 }
 
 // GetLatestExchangeRates returns the latest exchange rates data from the current exchange rates data source
-func (e *ExchangeRatesDataSourceContainer) GetLatestExchangeRates(c core.Context, uid int64, currentConfig *settings.Config) (*models.LatestExchangeRateResponse, error) {
+func (e *ExchangeRatesDataProviderContainer) GetLatestExchangeRates(c core.Context, uid int64, currentConfig *settings.Config) (*models.LatestExchangeRateResponse, error) {
 	if Container.current == nil {
 		return nil, errs.ErrInvalidExchangeRatesDataSource
 	}

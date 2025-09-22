@@ -24,13 +24,13 @@ type HttpExchangeRatesDataSource interface {
 	Parse(c core.Context, content []byte) (*models.LatestExchangeRateResponse, error)
 }
 
-// CommonHttpExchangeRatesDataSource defines the structure of common http exchange rates data source
-type CommonHttpExchangeRatesDataSource struct {
-	ExchangeRatesDataSource
+// CommonHttpExchangeRatesDataProvider defines the structure of common http exchange rates data provider
+type CommonHttpExchangeRatesDataProvider struct {
+	ExchangeRatesDataProvider
 	dataSource HttpExchangeRatesDataSource
 }
 
-func (e *CommonHttpExchangeRatesDataSource) GetLatestExchangeRates(c core.Context, uid int64, currentConfig *settings.Config) (*models.LatestExchangeRateResponse, error) {
+func (e *CommonHttpExchangeRatesDataProvider) GetLatestExchangeRates(c core.Context, uid int64, currentConfig *settings.Config) (*models.LatestExchangeRateResponse, error) {
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	utils.SetProxyUrl(transport, currentConfig.ExchangeRatesProxy)
 
@@ -48,7 +48,7 @@ func (e *CommonHttpExchangeRatesDataSource) GetLatestExchangeRates(c core.Contex
 	requests, err := e.dataSource.BuildRequests()
 
 	if err != nil {
-		log.Errorf(c, "[http_exchange_rates_datasource.GetLatestExchangeRates] failed to build requests for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[common_http_exchange_rates_data_provider.GetLatestExchangeRates] failed to build requests for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
@@ -66,24 +66,24 @@ func (e *CommonHttpExchangeRatesDataSource) GetLatestExchangeRates(c core.Contex
 		resp, err := client.Do(req)
 
 		if err != nil {
-			log.Errorf(c, "[http_exchange_rates_datasource.GetLatestExchangeRates] failed to request latest exchange rate data for user \"uid:%d\", because %s", uid, err.Error())
+			log.Errorf(c, "[common_http_exchange_rates_data_provider.GetLatestExchangeRates] failed to request latest exchange rate data for user \"uid:%d\", because %s", uid, err.Error())
 			return nil, errs.ErrFailedToRequestRemoteApi
 		}
 
 		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
 
-		log.Debugf(c, "[http_exchange_rates_datasource.GetLatestExchangeRates] response#%d is %s", i, body)
+		log.Debugf(c, "[common_http_exchange_rates_data_provider.GetLatestExchangeRates] response#%d is %s", i, body)
 
 		if resp.StatusCode != 200 {
-			log.Errorf(c, "[http_exchange_rates_datasource.GetLatestExchangeRates] failed to get latest exchange rate data response for user \"uid:%d\", because response code is not %d", uid, resp.StatusCode)
+			log.Errorf(c, "[common_http_exchange_rates_data_provider.GetLatestExchangeRates] failed to get latest exchange rate data response for user \"uid:%d\", because response code is not %d", uid, resp.StatusCode)
 			return nil, errs.ErrFailedToRequestRemoteApi
 		}
 
 		exchangeRateResp, err := e.dataSource.Parse(c, body)
 
 		if err != nil {
-			log.Errorf(c, "[http_exchange_rates_datasource.GetLatestExchangeRates] failed to parse response for user \"uid:%d\", because %s", uid, err.Error())
+			log.Errorf(c, "[common_http_exchange_rates_data_provider.GetLatestExchangeRates] failed to parse response for user \"uid:%d\", because %s", uid, err.Error())
 			return nil, errs.Or(err, errs.ErrFailedToRequestRemoteApi)
 		}
 
@@ -125,8 +125,8 @@ func (e *CommonHttpExchangeRatesDataSource) GetLatestExchangeRates(c core.Contex
 	return finalExchangeRateResponse, nil
 }
 
-func newCommonHttpExchangeRatesDataSource(dataSource HttpExchangeRatesDataSource) *CommonHttpExchangeRatesDataSource {
-	return &CommonHttpExchangeRatesDataSource{
+func newCommonHttpExchangeRatesDataProvider(dataSource HttpExchangeRatesDataSource) *CommonHttpExchangeRatesDataProvider {
+	return &CommonHttpExchangeRatesDataProvider{
 		dataSource: dataSource,
 	}
 }

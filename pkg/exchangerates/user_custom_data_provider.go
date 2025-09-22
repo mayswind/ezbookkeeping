@@ -15,25 +15,25 @@ import (
 
 const userDataSourceType = "user_custom"
 
-// UserCustomExchangeRatesDataSource defines the structure of user custom exchange rates data source
-type UserCustomExchangeRatesDataSource struct {
-	ExchangeRatesDataSource
+// UserCustomExchangeRatesDataProvider defines the structure of user custom exchange rates data provider
+type UserCustomExchangeRatesDataProvider struct {
+	ExchangeRatesDataProvider
 	users                   *services.UserService
 	userCustomExchangeRates *services.UserCustomExchangeRatesService
 }
 
-func (e *UserCustomExchangeRatesDataSource) GetLatestExchangeRates(c core.Context, uid int64, currentConfig *settings.Config) (*models.LatestExchangeRateResponse, error) {
+func (e *UserCustomExchangeRatesDataProvider) GetLatestExchangeRates(c core.Context, uid int64, currentConfig *settings.Config) (*models.LatestExchangeRateResponse, error) {
 	user, err := e.users.GetUserById(c, uid)
 
 	if err != nil {
-		log.Errorf(c, "[user_custom_datasource.GetLatestExchangeRates] failed to get user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[user_custom_data_provider.GetLatestExchangeRates] failed to get user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	customExchangeRates, err := e.userCustomExchangeRates.GetAllCustomExchangeRatesByUid(c, uid)
 
 	if err != nil {
-		log.Errorf(c, "[user_custom_datasource.GetLatestExchangeRates] failed to get user custom exchange rates for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[user_custom_data_provider.GetLatestExchangeRates] failed to get user custom exchange rates for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -93,8 +93,8 @@ func (e *UserCustomExchangeRatesDataSource) GetLatestExchangeRates(c core.Contex
 	return finalExchangeRateResponse, nil
 }
 
-func newUserCustomExchangeRatesDataSource() *UserCustomExchangeRatesDataSource {
-	return &UserCustomExchangeRatesDataSource{
+func newUserCustomExchangeRatesDataProvider() *UserCustomExchangeRatesDataProvider {
+	return &UserCustomExchangeRatesDataProvider{
 		users:                   services.Users,
 		userCustomExchangeRates: services.UserCustomExchangeRates,
 	}

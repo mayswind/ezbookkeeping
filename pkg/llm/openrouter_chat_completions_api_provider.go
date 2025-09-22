@@ -7,17 +7,17 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
-// OpenRouterLargeLanguageModelProvider defines the structure of OpenRouter large language model provider
-type OpenRouterLargeLanguageModelProvider struct {
-	OpenAIChatCompletionsLargeLanguageModelProvider
+// OpenRouterChatCompletionsAPIProvider defines the structure of OpenRouter chat completions API provider
+type OpenRouterChatCompletionsAPIProvider struct {
+	OpenAIChatCompletionsAPIProvider
 	OpenRouterAPIKey  string
 	OpenRouterModelID string
 }
 
 const openRouterChatCompletionsUrl = "https://openrouter.ai/api/v1/chat/completions"
 
-// BuildChatCompletionsHttpRequest returns the chat completions http request by OpenRouter provider
-func (p *OpenRouterLargeLanguageModelProvider) BuildChatCompletionsHttpRequest(c core.Context, uid int64) (*http.Request, error) {
+// BuildChatCompletionsHttpRequest returns the chat completions http request by OpenRouter chat completions API provider
+func (p *OpenRouterChatCompletionsAPIProvider) BuildChatCompletionsHttpRequest(c core.Context, uid int64) (*http.Request, error) {
 	req, err := http.NewRequest("POST", openRouterChatCompletionsUrl, nil)
 
 	if err != nil {
@@ -31,14 +31,14 @@ func (p *OpenRouterLargeLanguageModelProvider) BuildChatCompletionsHttpRequest(c
 	return req, nil
 }
 
-// GetModelID returns the model id of OpenRouter provider
-func (p *OpenRouterLargeLanguageModelProvider) GetModelID() string {
+// GetModelID returns the model id of OpenRouter chat completions API provider
+func (p *OpenRouterChatCompletionsAPIProvider) GetModelID() string {
 	return p.OpenRouterModelID
 }
 
 // NewOpenRouterLargeLanguageModelProvider creates a new OpenRouter large language model provider instance
 func NewOpenRouterLargeLanguageModelProvider(llmConfig *settings.LLMConfig) LargeLanguageModelProvider {
-	return newOpenAICommonChatCompletionsHttpLargeLanguageModelProvider(&OpenRouterLargeLanguageModelProvider{
+	return newCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter(&OpenRouterChatCompletionsAPIProvider{
 		OpenRouterAPIKey:  llmConfig.OpenRouterAPIKey,
 		OpenRouterModelID: llmConfig.OpenRouterModelID,
 	})

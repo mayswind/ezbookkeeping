@@ -15,15 +15,15 @@ import (
 
 const ollamaChatCompletionsPath = "api/chat"
 
-// OllamaLargeLanguageModelProvider defines the structure of Ollama large language model provider
-type OllamaLargeLanguageModelProvider struct {
-	CommonHttpLargeLanguageModelProvider
+// OllamaLargeLanguageModelAdapter defines the structure of Ollama large language model adapter
+type OllamaLargeLanguageModelAdapter struct {
+	HttpLargeLanguageModelAdapter
 	OllamaServerURL string
 	OllamaModelID   string
 }
 
-// BuildTextualRequest returns the http request by Ollama provider
-func (p *OllamaLargeLanguageModelProvider) BuildTextualRequest(c core.Context, uid int64, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) (*http.Request, error) {
+// BuildTextualRequest returns the http request by Ollama large language model adapter
+func (p *OllamaLargeLanguageModelAdapter) BuildTextualRequest(c core.Context, uid int64, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) (*http.Request, error) {
 	requestBody, err := p.buildJsonRequestBody(c, uid, request, responseType)
 
 	if err != nil {
@@ -41,27 +41,27 @@ func (p *OllamaLargeLanguageModelProvider) BuildTextualRequest(c core.Context, u
 	return httpRequest, nil
 }
 
-// ParseTextualResponse returns the textual response by Ollama provider
-func (p *OllamaLargeLanguageModelProvider) ParseTextualResponse(c core.Context, uid int64, body []byte, responseType LargeLanguageModelResponseFormat) (*LargeLanguageModelTextualResponse, error) {
+// ParseTextualResponse returns the textual response by Ollama large language model adapter
+func (p *OllamaLargeLanguageModelAdapter) ParseTextualResponse(c core.Context, uid int64, body []byte, responseType LargeLanguageModelResponseFormat) (*LargeLanguageModelTextualResponse, error) {
 	responseBody := make(map[string]any)
 	err := json.Unmarshal(body, &responseBody)
 
 	if err != nil {
-		log.Errorf(c, "[ollama_large_language_model_provider.ParseTextualResponse] failed to parse response for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[ollama_large_language_model_adapter.ParseTextualResponse] failed to parse response for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
 	message, ok := responseBody["message"].(map[string]any)
 
 	if !ok {
-		log.Errorf(c, "[ollama_large_language_model_provider.ParseTextualResponse] no message found in response for user \"uid:%d\"", uid)
+		log.Errorf(c, "[ollama_large_language_model_adapter.ParseTextualResponse] no message found in response for user \"uid:%d\"", uid)
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
 	content, ok := message["content"].(string)
 
 	if !ok {
-		log.Errorf(c, "[ollama_large_language_model_provider.ParseTextualResponse] no content found in message for user \"uid:%d\"", uid)
+		log.Errorf(c, "[ollama_large_language_model_adapter.ParseTextualResponse] no content found in message for user \"uid:%d\"", uid)
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
@@ -82,12 +82,7 @@ func (p *OllamaLargeLanguageModelProvider) ParseTextualResponse(c core.Context, 
 	return textualResponse, nil
 }
 
-// GetModelID returns the model id of Ollama provider
-func (p *OllamaLargeLanguageModelProvider) GetModelID() string {
-	return p.OllamaModelID
-}
-
-func (p *OllamaLargeLanguageModelProvider) buildJsonRequestBody(c core.Context, uid int64, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) ([]byte, error) {
+func (p *OllamaLargeLanguageModelAdapter) buildJsonRequestBody(c core.Context, uid int64, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) ([]byte, error) {
 	if p.OllamaModelID == "" {
 		return nil, errs.ErrInvalidLLMModelId
 	}
@@ -102,8 +97,8 @@ func (p *OllamaLargeLanguageModelProvider) buildJsonRequestBody(c core.Context, 
 	}
 
 	if len(request.UserPrompt) > 0 {
-		imageBase64Data := base64.StdEncoding.EncodeToString(request.UserPrompt)
 		if request.UserPromptType == LARGE_LANGUAGE_MODEL_REQUEST_PROMPT_TYPE_IMAGE_URL {
+			imageBase64Data := base64.StdEncoding.EncodeToString(request.UserPrompt)
 			requestMessages = append(requestMessages, map[string]any{
 				"role":    "user",
 				"content": "",
@@ -129,15 +124,15 @@ func (p *OllamaLargeLanguageModelProvider) buildJsonRequestBody(c core.Context, 
 	requestBodyBytes, err := json.Marshal(requestBody)
 
 	if err != nil {
-		log.Errorf(c, "[ollama_large_language_model_provider.buildJsonRequestBody] failed to marshal request body for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[ollama_large_language_model_adapter.buildJsonRequestBody] failed to marshal request body for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrOperationFailed
 	}
 
-	log.Debugf(c, "[ollama_large_language_model_provider.buildJsonRequestBody] request body is %s", requestBodyBytes)
+	log.Debugf(c, "[ollama_large_language_model_adapter.buildJsonRequestBody] request body is %s", requestBodyBytes)
 	return requestBodyBytes, nil
 }
 
-func (p *OllamaLargeLanguageModelProvider) getOllamaRequestUrl() string {
+func (p *OllamaLargeLanguageModelAdapter) getOllamaRequestUrl() string {
 	url := p.OllamaServerURL
 
 	if url[len(url)-1] != '/' {
@@ -150,7 +145,7 @@ func (p *OllamaLargeLanguageModelProvider) getOllamaRequestUrl() string {
 
 // NewOllamaLargeLanguageModelProvider creates a new Ollama large language model provider instance
 func NewOllamaLargeLanguageModelProvider(llmConfig *settings.LLMConfig) LargeLanguageModelProvider {
-	return newCommonHttpLargeLanguageModelProvider(&OllamaLargeLanguageModelProvider{
+	return newCommonHttpLargeLanguageModelProvider(&OllamaLargeLanguageModelAdapter{
 		OllamaServerURL: llmConfig.OllamaServerURL,
 		OllamaModelID:   llmConfig.OllamaModelID,
 	})

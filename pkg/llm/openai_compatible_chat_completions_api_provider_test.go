@@ -6,22 +6,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestOpenAICompatibleLargeLanguageModelProvider_GetFinalRequestUrl(t *testing.T) {
-	provider := &OpenAICompatibleLargeLanguageModelProvider{
+func TestOpenAICompatibleChatCompletionsAPIProvider_GetFinalRequestUrl(t *testing.T) {
+	apiProvider := &OpenAICompatibleChatCompletionsAPIProvider{
 		OpenAICompatibleBaseURL: "https://api.example.com/v1/",
 	}
-	url := provider.getFinalChatCompletionsRequestUrl()
+	url := apiProvider.getFinalChatCompletionsRequestUrl()
 	assert.Equal(t, "https://api.example.com/v1/chat/completions", url)
 
-	provider = &OpenAICompatibleLargeLanguageModelProvider{
+	apiProvider = &OpenAICompatibleChatCompletionsAPIProvider{
 		OpenAICompatibleBaseURL: "https://api.example.com/v1",
 	}
-	url = provider.getFinalChatCompletionsRequestUrl()
+	url = apiProvider.getFinalChatCompletionsRequestUrl()
 	assert.Equal(t, "https://api.example.com/v1/chat/completions", url)
 
-	provider = &OpenAICompatibleLargeLanguageModelProvider{
+	apiProvider = &OpenAICompatibleChatCompletionsAPIProvider{
 		OpenAICompatibleBaseURL: "https://example.com/api",
 	}
-	url = provider.getFinalChatCompletionsRequestUrl()
+	url = apiProvider.getFinalChatCompletionsRequestUrl()
 	assert.Equal(t, "https://example.com/api/chat/completions", url)
 }

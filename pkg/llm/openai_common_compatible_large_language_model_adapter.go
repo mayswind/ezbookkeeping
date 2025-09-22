@@ -15,8 +15,8 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 )
 
-// OpenAIChatCompletionsLargeLanguageModelProvider defines the structure of OpenAI chat completions compatible large language model provider
-type OpenAIChatCompletionsLargeLanguageModelProvider interface {
+// OpenAIChatCompletionsAPIProvider defines the structure of OpenAI chat completions API provider
+type OpenAIChatCompletionsAPIProvider interface {
 	// BuildChatCompletionsHttpRequest returns the chat completions http request
 	BuildChatCompletionsHttpRequest(c core.Context, uid int64) (*http.Request, error)
 
@@ -24,21 +24,21 @@ type OpenAIChatCompletionsLargeLanguageModelProvider interface {
 	GetModelID() string
 }
 
-// OpenAICommonChatCompletionsHttpLargeLanguageModelProvider defines the structure of OpenAI common compatible large language model provider based on chat completions api
-type OpenAICommonChatCompletionsHttpLargeLanguageModelProvider struct {
-	CommonHttpLargeLanguageModelProvider
-	provider OpenAIChatCompletionsLargeLanguageModelProvider
+// CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter defines the structure of OpenAI common compatible large language model adapter based on chat completions api
+type CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter struct {
+	HttpLargeLanguageModelAdapter
+	apiProvider OpenAIChatCompletionsAPIProvider
 }
 
-// BuildTextualRequest returns the http request by OpenAI common compatible provider
-func (p *OpenAICommonChatCompletionsHttpLargeLanguageModelProvider) BuildTextualRequest(c core.Context, uid int64, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) (*http.Request, error) {
+// BuildTextualRequest returns the http request by OpenAI common compatible adapter
+func (p *CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter) BuildTextualRequest(c core.Context, uid int64, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) (*http.Request, error) {
 	requestBody, err := p.buildJsonRequestBody(c, uid, request, responseType)
 
 	if err != nil {
 		return nil, err
 	}
 
-	httpRequest, err := p.provider.BuildChatCompletionsHttpRequest(c, uid)
+	httpRequest, err := p.apiProvider.BuildChatCompletionsHttpRequest(c, uid)
 
 	if err != nil {
 		return nil, err
@@ -50,41 +50,41 @@ func (p *OpenAICommonChatCompletionsHttpLargeLanguageModelProvider) BuildTextual
 	return httpRequest, nil
 }
 
-// ParseTextualResponse returns the textual response by OpenAI common compatible provider
-func (p *OpenAICommonChatCompletionsHttpLargeLanguageModelProvider) ParseTextualResponse(c core.Context, uid int64, body []byte, responseType LargeLanguageModelResponseFormat) (*LargeLanguageModelTextualResponse, error) {
+// ParseTextualResponse returns the textual response by OpenAI common compatible adapter
+func (p *CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter) ParseTextualResponse(c core.Context, uid int64, body []byte, responseType LargeLanguageModelResponseFormat) (*LargeLanguageModelTextualResponse, error) {
 	responseBody := make(map[string]any)
 	err := json.Unmarshal(body, &responseBody)
 
 	if err != nil {
-		log.Errorf(c, "[openai_common_compatible_large_language_model_provider.ParseTextualResponse] failed to parse response for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[openai_common_compatible_large_language_model_adapter.ParseTextualResponse] failed to parse response for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
 	choices, ok := responseBody["choices"].([]any)
 
 	if !ok || len(choices) < 1 {
-		log.Errorf(c, "[openai_common_compatible_large_language_model_provider.ParseTextualResponse] no choices found in response for user \"uid:%d\"", uid)
+		log.Errorf(c, "[openai_common_compatible_large_language_model_adapter.ParseTextualResponse] no choices found in response for user \"uid:%d\"", uid)
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
 	firstChoice, ok := choices[0].(map[string]any)
 
 	if !ok {
-		log.Errorf(c, "[openai_common_compatible_large_language_model_provider.ParseTextualResponse] invalid choice format in response for user \"uid:%d\"", uid)
+		log.Errorf(c, "[openai_common_compatible_large_language_model_adapter.ParseTextualResponse] invalid choice format in response for user \"uid:%d\"", uid)
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
 	message, ok := firstChoice["message"].(map[string]any)
 
 	if !ok {
-		log.Errorf(c, "[openai_common_compatible_large_language_model_provider.ParseTextualResponse] no message found in choice for user \"uid:%d\"", uid)
+		log.Errorf(c, "[openai_common_compatible_large_language_model_adapter.ParseTextualResponse] no message found in choice for user \"uid:%d\"", uid)
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
 	content, ok := message["content"].(string)
 
 	if !ok {
-		log.Errorf(c, "[openai_common_compatible_large_language_model_provider.ParseTextualResponse] no content found in message for user \"uid:%d\"", uid)
+		log.Errorf(c, "[openai_common_compatible_large_language_model_adapter.ParseTextualResponse] no content found in message for user \"uid:%d\"", uid)
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
@@ -105,8 +105,8 @@ func (p *OpenAICommonChatCompletionsHttpLargeLanguageModelProvider) ParseTextual
 	return textualResponse, nil
 }
 
-func (p *OpenAICommonChatCompletionsHttpLargeLanguageModelProvider) buildJsonRequestBody(c core.Context, uid int64, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) ([]byte, error) {
-	if p.provider.GetModelID() == "" {
+func (p *CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter) buildJsonRequestBody(c core.Context, uid int64, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) ([]byte, error) {
+	if p.apiProvider.GetModelID() == "" {
 		return nil, errs.ErrInvalidLLMModelId
 	}
 
@@ -142,7 +142,7 @@ func (p *OpenAICommonChatCompletionsHttpLargeLanguageModelProvider) buildJsonReq
 	}
 
 	requestBody := make(map[string]any)
-	requestBody["model"] = p.provider.GetModelID()
+	requestBody["model"] = p.apiProvider.GetModelID()
 	requestBody["stream"] = request.Stream
 	requestBody["messages"] = requestMessages
 
@@ -171,16 +171,16 @@ func (p *OpenAICommonChatCompletionsHttpLargeLanguageModelProvider) buildJsonReq
 	requestBodyBytes, err := json.Marshal(requestBody)
 
 	if err != nil {
-		log.Errorf(c, "[openai_common_compatible_large_language_model_provider.buildJsonRequestBody] failed to marshal request body for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[openai_common_compatible_large_language_model_adapter.buildJsonRequestBody] failed to marshal request body for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrOperationFailed
 	}
 
-	log.Debugf(c, "[openai_common_compatible_large_language_model_provider.buildJsonRequestBody] request body is %s", requestBodyBytes)
+	log.Debugf(c, "[openai_common_compatible_large_language_model_adapter.buildJsonRequestBody] request body is %s", requestBodyBytes)
 	return requestBodyBytes, nil
 }
 
-func newOpenAICommonChatCompletionsHttpLargeLanguageModelProvider(provider OpenAIChatCompletionsLargeLanguageModelProvider) LargeLanguageModelProvider {
-	return newCommonHttpLargeLanguageModelProvider(&OpenAICommonChatCompletionsHttpLargeLanguageModelProvider{
-		provider: provider,
+func newCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter(apiProvider OpenAIChatCompletionsAPIProvider) LargeLanguageModelProvider {
+	return newCommonHttpLargeLanguageModelProvider(&CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter{
+		apiProvider: apiProvider,
 	})
 }

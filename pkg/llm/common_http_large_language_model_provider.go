@@ -13,8 +13,8 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
-// HttpLargeLanguageModelProvider defines the structure of http large language model provider
-type HttpLargeLanguageModelProvider interface {
+// HttpLargeLanguageModelAdapter defines the structure of http large language model adapter
+type HttpLargeLanguageModelAdapter interface {
 	// BuildTextualRequest returns the http request by the provider api definition
 	BuildTextualRequest(c core.Context, uid int64, request *LargeLanguageModelRequest, responseType LargeLanguageModelResponseFormat) (*http.Request, error)
 
@@ -25,7 +25,7 @@ type HttpLargeLanguageModelProvider interface {
 // CommonHttpLargeLanguageModelProvider defines the structure of common http large language model provider
 type CommonHttpLargeLanguageModelProvider struct {
 	LargeLanguageModelProvider
-	provider HttpLargeLanguageModelProvider
+	adapter HttpLargeLanguageModelAdapter
 }
 
 // GetJsonResponse returns the json response from the OpenAI common compatible large language model provider
@@ -48,10 +48,10 @@ func (p *CommonHttpLargeLanguageModelProvider) getTextualResponse(c core.Context
 		Timeout:   time.Duration(currentLLMConfig.LargeLanguageModelAPIRequestTimeout) * time.Millisecond,
 	}
 
-	httpRequest, err := p.provider.BuildTextualRequest(c, uid, request, responseType)
+	httpRequest, err := p.adapter.BuildTextualRequest(c, uid, request, responseType)
 
 	if err != nil {
-		log.Errorf(c, "[http_large_language_model_provider.getTextualResponse] failed to build requests for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[common_http_large_language_model_provider.getTextualResponse] failed to build requests for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
@@ -60,25 +60,25 @@ func (p *CommonHttpLargeLanguageModelProvider) getTextualResponse(c core.Context
 	resp, err := client.Do(httpRequest)
 
 	if err != nil {
-		log.Errorf(c, "[http_large_language_model_provider.getTextualResponse] failed to request large language model api for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[common_http_large_language_model_provider.getTextualResponse] failed to request large language model api for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 
-	log.Debugf(c, "[http_large_language_model_provider.getTextualResponse] response is %s", body)
+	log.Debugf(c, "[common_http_large_language_model_provider.getTextualResponse] response is %s", body)
 
 	if resp.StatusCode != 200 {
-		log.Errorf(c, "[http_large_language_model_provider.getTextualResponse] failed to get large language model api response for user \"uid:%d\", because response code is %d", uid, resp.StatusCode)
+		log.Errorf(c, "[common_http_large_language_model_provider.getTextualResponse] failed to get large language model api response for user \"uid:%d\", because response code is %d", uid, resp.StatusCode)
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
-	return p.provider.ParseTextualResponse(c, uid, body, responseType)
+	return p.adapter.ParseTextualResponse(c, uid, body, responseType)
 }
 
-func newCommonHttpLargeLanguageModelProvider(provider HttpLargeLanguageModelProvider) *CommonHttpLargeLanguageModelProvider {
+func newCommonHttpLargeLanguageModelProvider(adapter HttpLargeLanguageModelAdapter) *CommonHttpLargeLanguageModelProvider {
 	return &CommonHttpLargeLanguageModelProvider{
-		provider: provider,
+		adapter: adapter,
 	}
 }

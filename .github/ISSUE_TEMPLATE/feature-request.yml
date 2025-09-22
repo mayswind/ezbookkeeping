@@ -1,0 +1,26 @@
+name: Feature Request
+description: Request a feature or enhancement for ezBookkeeping
+labels: enhancement
+body:
+  - type: checkboxes
+    id: checkboxes
+    attributes:
+      label: Before You Submit
+      description: Please check whether the following items have been completed.
+      options:
+        - label: I've already checked this request hasn't been raised in [issues](https://github.com/mayswind/ezbookkeeping/issues)
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: Please describe your feature request.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional information
+      description: If you can, provide any other context or screenshots about this feature request here.

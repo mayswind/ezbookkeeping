@@ -1,0 +1,70 @@
+name: Bug Report
+description: Report a bug in ezBookkeeping
+labels: bug
+body:
+  - type: checkboxes
+    id: checkboxes
+    attributes:
+      label: Before You Submit
+      description: Please check whether the following items have been completed.
+      options:
+        - label: I've already checked this bug hasn't been raised in [issues](https://github.com/mayswind/ezbookkeeping/issues)
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please provide a brief description of this bug.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to reproduce
+      description: Please describe the steps to reproduce this bug.
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: input
+    id: ezbookkeeping-version
+    attributes:
+      label: ezBookkeeping Version
+      description: ezBookkeeping version and commit hash of your instance, e.g. "v1.0.0 (20e2444)"
+    validations:
+      required: true
+
+  - type: input
+    id: server-os
+    attributes:
+      label: Server Operating System
+      description: The operating system information you are using to deploy ezBookkeeping, e.g "Debian GNU/Linux 11 amd64"
+
+  - type: input
+    id: server-database
+    attributes:
+      label: Database
+      description: The database system you are using, e.g. "MariaDB v11.7.2"
+
+  - type: dropdown
+    id: reproduce-on-demo-site
+    attributes:
+      label: Can you reproduce this bug on the ezBookkeeping demo site?
+      description: |
+        ezBookkeeping demo site: https://ezbookkeeping-demo.mayswind.net/
+      options:
+        - "No"
+        - "Yes"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional information
+      description: If you can, provide any related screenshots or logs here.

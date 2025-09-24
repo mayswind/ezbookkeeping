@@ -130,6 +130,7 @@ Currently available translations:
 | nl | Nederlands | [@automagic](https://github.com/automagics) |
 | pt-BR | Português (Brasil) | [@thecodergus](https://github.com/thecodergus) |
 | ru | Русский | [@artegoser](https://github.com/artegoser) |
+| th | ไทย | [@natthavat28](https://github.com/natthavat28) |
 | uk | Українська | [@nktlitvinenko](https://github.com/nktlitvinenko) |
 | vi | Tiếng Việt | [@f97](https://github.com/f97) |
 | zh-Hans | 中文 (简体) | / |

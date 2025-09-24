@@ -6,6 +6,7 @@ import it from './it.json';
 import ja from './ja.json';
 import nl from './nl.json';
 import ru from './ru.json';
+import th from './th.json';
 import uk from './uk.json';
 import vi from './vi.json';
 import zhHans from './zh_Hans.json';
@@ -93,6 +94,13 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         alternativeLanguageTag: 'ru-RU',
         textDirection: 'ltr',
         content: ru
+    },
+    'th': {
+        name: 'Thai',
+        displayName: 'ภาษาไทย',
+        alternativeLanguageTag: 'th-TH',
+        textDirection: 'ltr',
+        content: th
     },
     'uk': {
         name: 'Ukrainian',

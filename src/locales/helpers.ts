@@ -777,8 +777,10 @@ export function useI18n() {
             format = FiscalYearFormat.Default;
         }
 
-        if (!isDefined(calendarType) || !isGregorianLikeCalendarType(calendarType)) {
+        if (!isDefined(calendarType)) {
             calendarType = getGregorianLikeCalendarType();
+        } else if (!isGregorianLikeCalendarType(calendarType)) {
+            calendarType = CalendarType.Gregorian;
         }
 
         const dateTimeFormatOptions = getDateTimeFormatOptions({
@@ -1611,109 +1613,109 @@ export function useI18n() {
         return numeralSystem.getAllDigits();
     }
 
-    function getCurrentCalendarDisplayType(): CalendarDisplayType {
-        let calendarDisplayType = CalendarDisplayType.valueOf(userStore.currentUserCalendarDisplayType);
+    function getLocaleDefaultCalendarDisplayType(): CalendarDisplayType {
+        const defaultCalendarDisplayTypeName = t('default.calendarDisplayType');
+        let calendarDisplayType = CalendarDisplayType.parse(defaultCalendarDisplayTypeName);
 
         if (!calendarDisplayType) {
-            const defaultCalendarDisplayTypeName = t('default.calendarDisplayType');
-            calendarDisplayType = CalendarDisplayType.parse(defaultCalendarDisplayTypeName);
-
-            if (!calendarDisplayType) {
-                calendarDisplayType = CalendarDisplayType.Default;
-            }
+            calendarDisplayType = CalendarDisplayType.Default;
         }
 
         return calendarDisplayType;
     }
 
-    function getCurrentDateDisplayType(): DateDisplayType {
-        let dateDisplayType = DateDisplayType.valueOf(userStore.currentUserDateDisplayType);
+    function getLocaleDefaultDateDisplayType(): DateDisplayType {
+        const defaultDateDisplayTypeName = t('default.dateDisplayType');
+        let dateDisplayType = DateDisplayType.parse(defaultDateDisplayTypeName);
 
         if (!dateDisplayType) {
-            const defaultDateDisplayTypeName = t('default.dateDisplayType');
-            dateDisplayType = DateDisplayType.parse(defaultDateDisplayTypeName);
-
-            if (!dateDisplayType) {
-                dateDisplayType = DateDisplayType.Default;
-            }
+            dateDisplayType = DateDisplayType.Default;
         }
 
         return dateDisplayType;
     }
 
-    function getCurrentNumeralSystemType(): NumeralSystem {
-        let numeralSystemType = NumeralSystem.valueOf(userStore.currentUserNumeralSystem);
+    function getLocaleDefaultNumeralSystemType(): NumeralSystem {
+        const defaultNumeralSystemTypeName = t('default.numeralSystem');
+        let numeralSystemType = NumeralSystem.parse(defaultNumeralSystemTypeName);
 
         if (!numeralSystemType) {
-            const defaultNumeralSystemTypeName = t('default.numeralSystem');
-            numeralSystemType = NumeralSystem.parse(defaultNumeralSystemTypeName);
-
-            if (!numeralSystemType) {
-                numeralSystemType = NumeralSystem.Default;
-            }
+            numeralSystemType = NumeralSystem.Default;
         }
 
         return numeralSystemType;
     }
 
-    function getCurrentDecimalSeparator(): string {
-        let decimalSeparatorType = DecimalSeparator.valueOf(userStore.currentUserDecimalSeparator);
+    function getLocaleDefaultDecimalSeparator(): DecimalSeparator {
+        const defaultDecimalSeparatorTypeName = t('default.decimalSeparator');
+        let decimalSeparatorType = DecimalSeparator.parse(defaultDecimalSeparatorTypeName);
 
         if (!decimalSeparatorType) {
-            const defaultDecimalSeparatorTypeName = t('default.decimalSeparator');
-            decimalSeparatorType = DecimalSeparator.parse(defaultDecimalSeparatorTypeName);
-
-            if (!decimalSeparatorType) {
-                decimalSeparatorType = DecimalSeparator.Default;
-            }
+            decimalSeparatorType = DecimalSeparator.Default;
         }
 
-        return decimalSeparatorType.symbol;
+        return decimalSeparatorType;
     }
 
-    function getCurrentDigitGroupingSymbol(): string {
-        let digitGroupingSymbolType = DigitGroupingSymbol.valueOf(userStore.currentUserDigitGroupingSymbol);
+    function getLocaleDefaultDigitGroupingSymbol(): DigitGroupingSymbol {
+        const defaultDigitGroupingSymbolTypeName = t('default.digitGroupingSymbol');
+        let digitGroupingSymbolType = DigitGroupingSymbol.parse(defaultDigitGroupingSymbolTypeName);
 
         if (!digitGroupingSymbolType) {
-            const defaultDigitGroupingSymbolTypeName = t('default.digitGroupingSymbol');
-            digitGroupingSymbolType = DigitGroupingSymbol.parse(defaultDigitGroupingSymbolTypeName);
-
-            if (!digitGroupingSymbolType) {
-                digitGroupingSymbolType = DigitGroupingSymbol.Default;
-            }
+            digitGroupingSymbolType = DigitGroupingSymbol.Default;
         }
 
-        return digitGroupingSymbolType.symbol;
+        return digitGroupingSymbolType;
     }
 
-    function getCurrentDigitGroupingType(): DigitGroupingType {
-        let digitGroupingType = DigitGroupingType.valueOf(userStore.currentUserDigitGrouping);
+    function getLocaleDefaultDigitGroupingType(): DigitGroupingType {
+        const defaultDigitGroupingTypeName = t('default.digitGrouping');
+        let digitGroupingType = DigitGroupingType.parse(defaultDigitGroupingTypeName);
 
         if (!digitGroupingType) {
-            const defaultDigitGroupingTypeName = t('default.digitGrouping');
-            digitGroupingType = DigitGroupingType.parse(defaultDigitGroupingTypeName);
-
-            if (!digitGroupingType) {
-                digitGroupingType = DigitGroupingType.Default;
-            }
+            digitGroupingType = DigitGroupingType.Default;
         }
 
         return digitGroupingType;
     }
 
-    function getCurrentFiscalYearFormatType(): number {
-        let fiscalYearFormat = FiscalYearFormat.valueOf(userStore.currentUserFiscalYearFormat);
+    function getLocaleFiscalYearFormatType(): FiscalYearFormat {
+        const defaultFiscalYearFormatTypeName = t('default.fiscalYearFormat');
+        let fiscalYearFormat = FiscalYearFormat.parse(defaultFiscalYearFormatTypeName);
 
         if (!fiscalYearFormat) {
-            const defaultFiscalYearFormatTypeName = t('default.fiscalYearFormat');
-            fiscalYearFormat = FiscalYearFormat.parse(defaultFiscalYearFormatTypeName);
-
-            if (!fiscalYearFormat) {
-                fiscalYearFormat = FiscalYearFormat.Default;
-            }
+            fiscalYearFormat = FiscalYearFormat.Default;
         }
 
-        return fiscalYearFormat.type;
+        return fiscalYearFormat;
+    }
+
+    function getCurrentCalendarDisplayType(): CalendarDisplayType {
+        return CalendarDisplayType.valueOf(userStore.currentUserCalendarDisplayType) ?? getLocaleDefaultCalendarDisplayType();
+    }
+
+    function getCurrentDateDisplayType(): DateDisplayType {
+        return DateDisplayType.valueOf(userStore.currentUserDateDisplayType) ?? getLocaleDefaultDateDisplayType();
+    }
+
+    function getCurrentNumeralSystemType(): NumeralSystem {
+        return NumeralSystem.valueOf(userStore.currentUserNumeralSystem) ?? getLocaleDefaultNumeralSystemType();
+    }
+
+    function getCurrentDecimalSeparator(): string {
+        return DecimalSeparator.valueOf(userStore.currentUserDecimalSeparator)?.symbol ?? getLocaleDefaultDecimalSeparator().symbol;
+    }
+
+    function getCurrentDigitGroupingSymbol(): string {
+        return DigitGroupingSymbol.valueOf(userStore.currentUserDigitGroupingSymbol)?.symbol ?? getLocaleDefaultDigitGroupingSymbol().symbol;
+    }
+
+    function getCurrentDigitGroupingType(): DigitGroupingType {
+        return DigitGroupingType.valueOf(userStore.currentUserDigitGrouping) ?? getLocaleDefaultDigitGroupingType();
+    }
+
+    function getCurrentFiscalYearFormatType(): number {
+        return FiscalYearFormat.valueOf(userStore.currentUserFiscalYearFormat)?.type ?? getLocaleFiscalYearFormatType().type;
     }
 
     function getCurrencyName(currencyCode: string): string {
@@ -2328,6 +2330,13 @@ export function useI18n() {
         getMultiMonthdayShortNames,
         getMultiWeekdayLongNames,
         getAllLocalizedDigits,
+        getLocaleDefaultCalendarDisplayType,
+        getLocaleDefaultDateDisplayType,
+        getLocaleDefaultNumeralSystemType,
+        getLocaleDefaultDecimalSeparator,
+        getLocaleDefaultDigitGroupingSymbol,
+        getLocaleDefaultDigitGroupingType,
+        getLocaleFiscalYearFormatType,
         getCurrentCalendarDisplayType,
         getCurrentDateDisplayType,
         getCurrentNumeralSystemType,

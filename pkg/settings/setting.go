@@ -349,19 +349,21 @@ type Config struct {
 	MaxFailuresPerIpPerMinute             uint32
 	MaxFailuresPerUserPerMinute           uint32
 
-	// User
-	EnableUserRegister               bool
-	EnableUserVerifyEmail            bool
-	EnableUserForceVerifyEmail       bool
+	// Auth
+	EnableTwoFactor                  bool
 	EnableUserForgetPassword         bool
 	ForgetPasswordRequireVerifyEmail bool
-	EnableTwoFactor                  bool
-	EnableTransactionPictures        bool
-	MaxTransactionPictureFileSize    uint32
-	EnableScheduledTransaction       bool
-	AvatarProvider                   core.UserAvatarProviderType
-	MaxAvatarFileSize                uint32
-	DefaultFeatureRestrictions       core.UserFeatureRestrictions
+
+	// User
+	EnableUserRegister            bool
+	EnableUserVerifyEmail         bool
+	EnableUserForceVerifyEmail    bool
+	EnableTransactionPictures     bool
+	MaxTransactionPictureFileSize uint32
+	EnableScheduledTransaction    bool
+	AvatarProvider                core.UserAvatarProviderType
+	MaxAvatarFileSize             uint32
+	DefaultFeatureRestrictions    core.UserFeatureRestrictions
 
 	// Data
 	EnableDataExport  bool
@@ -494,6 +496,12 @@ func LoadConfiguration(configFilePath string) (*Config, error) {
 	}
 
 	err = loadSecurityConfiguration(config, cfgFile, "security")
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = loadAuthConfiguration(config, cfgFile, "auth")
 
 	if err != nil {
 		return nil, err
@@ -946,13 +954,18 @@ func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName
 	return nil
 }
 
+func loadAuthConfiguration(config *Config, configFile *ini.File, sectionName string) error {
+	config.EnableTwoFactor = getConfigItemBoolValue(configFile, sectionName, "enable_two_factor", true)
+	config.EnableUserForgetPassword = getConfigItemBoolValue(configFile, sectionName, "enable_forget_password", false)
+	config.ForgetPasswordRequireVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "forget_password_require_email_verify", false)
+
+	return nil
+}
+
 func loadUserConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	config.EnableUserRegister = getConfigItemBoolValue(configFile, sectionName, "enable_register", false)
 	config.EnableUserVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "enable_email_verify", false)
 	config.EnableUserForceVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "enable_force_email_verify", false)
-	config.EnableUserForgetPassword = getConfigItemBoolValue(configFile, sectionName, "enable_forget_password", false)
-	config.ForgetPasswordRequireVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "forget_password_require_email_verify", false)
-	config.EnableTwoFactor = getConfigItemBoolValue(configFile, sectionName, "enable_two_factor", true)
 	config.EnableTransactionPictures = getConfigItemBoolValue(configFile, sectionName, "enable_transaction_picture", false)
 	config.MaxTransactionPictureFileSize = getConfigItemUint32Value(configFile, sectionName, "max_transaction_picture_size", defaultTransactionPictureFileMaxSize)
 	config.EnableScheduledTransaction = getConfigItemBoolValue(configFile, sectionName, "enable_scheduled_transaction", false)

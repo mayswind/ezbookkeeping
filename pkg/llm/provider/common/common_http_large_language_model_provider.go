@@ -31,7 +31,7 @@ type CommonHttpLargeLanguageModelProvider struct {
 	adapter HttpLargeLanguageModelAdapter
 }
 
-// GetJsonResponse returns the json response from the OpenAI common compatible large language model provider
+// GetJsonResponse returns the json response from common http large language model provider
 func (p *CommonHttpLargeLanguageModelProvider) GetJsonResponse(c core.Context, uid int64, currentLLMConfig *settings.LLMConfig, request *data.LargeLanguageModelRequest) (*data.LargeLanguageModelTextualResponse, error) {
 	response, err := p.getTextualResponse(c, uid, currentLLMConfig, request, data.LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
 

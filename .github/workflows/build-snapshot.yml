@@ -1,0 +1,109 @@
+name: Build Snapshot
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.meta.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DOCKER_USERNAME }}/ezbookkeeping
+          tags: |
+            type=raw,value=SNAPSHOT-{{date 'YYYYMMDD'}}.${{ github.run_id }}
+            type=raw,value=SNAPSHOT-{{date 'YYYYMMDD'}}
+            type=raw,value=latest-snapshot
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          image: tonistiigi/binfmt:qemu-v8.1.5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          file: Dockerfile
+          context: .
+          platforms: |
+            linux/amd64
+            linux/arm64/v8
+            linux/arm/v7
+            linux/arm/v6
+          push: true
+          build-args: |
+            BUILD_PIPELINE=1
+            CHECK_3RD_API=${{ vars.CHECK_3RD_API }}
+            SKIP_TESTS=${{ vars.SKIP_TESTS }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  upload-artifact:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - arch: linux/amd64
+            arch_alias: linux-amd64
+          - arch: linux/arm64/v8
+            arch_alias: linux-arm64
+          - arch: linux/arm/v7
+            arch_alias: linux-armv7
+          - arch: linux/arm/v6
+            arch_alias: linux-armv6
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          image: tonistiigi/binfmt:qemu-v8.1.5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Pull and save packaged files for ${{ matrix.arch }}
+        run: |
+          TAG=${{ needs.build-and-push.outputs.image-tag }}
+          IMAGE=${{ secrets.DOCKER_USERNAME }}/ezbookkeeping:${TAG}
+          docker pull --platform ${{ matrix.arch }} ${IMAGE}
+          cid=$(docker create "${IMAGE}")
+          docker cp ${cid}:/ezbookkeeping ./ezbookkeeping
+          docker rm ${cid}
+          cd ezbookkeeping
+          tar -czf ../ezbookkeeping-dev-${{ github.run_id }}-${{ matrix.arch_alias }}.tar.gz *
+          cd ..
+          rm -rf ezbookkeeping
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ezbookkeeping-dev-package
+          path: ezbookkeeping-dev-*.tar.gz

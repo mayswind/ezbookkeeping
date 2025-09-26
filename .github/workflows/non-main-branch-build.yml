@@ -1,4 +1,4 @@
-name: Docker Snapshot
+name: Build for Non-Main Branches
 
 on:
   push:

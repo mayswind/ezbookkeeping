@@ -159,6 +159,7 @@ import {
 import { getTimezoneOffsetMinutes } from './datetime.ts';
 import { generateRandomUUID } from './misc.ts';
 import { getBasePath } from './web.ts';
+import logger from './logger.ts';
 
 interface ApiRequestConfig extends AxiosRequestConfig {
     readonly headers: AxiosRequestHeaders;
@@ -166,12 +167,14 @@ interface ApiRequestConfig extends AxiosRequestConfig {
     readonly ignoreBlocked?: boolean;
     readonly ignoreError?: boolean;
     readonly timeout?: number;
+    readonly cancelableUuid?: string;
 }
 
 export type ApiResponsePromise<T> = Promise<AxiosResponse<ApiResponse<T>>>;
 
 let needBlockRequest = false;
 const blockedRequests: ((token: string | undefined) => void)[] = [];
+const cancelableRequests: Record<string, boolean> = {};
 
 axios.defaults.baseURL = getBasePath() + BASE_API_URL_PATH;
 axios.defaults.timeout = DEFAULT_API_TIMEOUT;
@@ -202,8 +205,20 @@ axios.interceptors.request.use((config: ApiRequestConfig) => {
 });
 
 axios.interceptors.response.use(response => {
+    if ('cancelableUuid' in response.config && response.config.cancelableUuid && cancelableRequests[response.config.cancelableUuid as string]) {
+        logger.debug('Response canceled by user request, url: ' + response.config.url + ', cancelableUuid: ' + response.config.cancelableUuid);
+        delete cancelableRequests[response.config.cancelableUuid as string];
+        return Promise.reject({ canceled: true });
+    }
+
     return response;
 }, error => {
+    if ('cancelableUuid' in error.response.config && error.response.config.cancelableUuid && cancelableRequests[error.response.config.cancelableUuid]) {
+        logger.debug('Response canceled by user request, url: ' + error.response.config.url + ', cancelableUuid: ' + error.response.config.cancelableUuid);
+        delete cancelableRequests[error.response.config.cancelableUuid];
+        return Promise.reject({ canceled: true });
+    }
+
     if (error.response && !error.response.config.ignoreError && error.response.data && error.response.data.errorCode) {
         const errorCode = error.response.data.errorCode;
 
@@ -650,12 +665,13 @@ export default {
     deleteTransactionTemplate: (req: TransactionTemplateDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transaction/templates/delete.json', req);
     },
-    recognizeReceiptImage: ({ imageFile }: { imageFile: File }): ApiResponsePromise<RecognizedReceiptImageResponse> => {
+    recognizeReceiptImage: ({ imageFile, cancelableUuid }: { imageFile: File, cancelableUuid?: string }): ApiResponsePromise<RecognizedReceiptImageResponse> => {
         return axios.postForm<ApiResponse<RecognizedReceiptImageResponse>>('v1/llm/transactions/recognize_receipt_image.json', {
             image: imageFile
         }, {
-            timeout: DEFAULT_LLM_API_TIMEOUT
-        });
+            timeout: DEFAULT_LLM_API_TIMEOUT,
+            cancelableUuid: cancelableUuid
+        } as ApiRequestConfig);
     },
     getLatestExchangeRates: (param: { ignoreError?: boolean }): ApiResponsePromise<LatestExchangeRateResponse> => {
         return axios.get<ApiResponse<LatestExchangeRateResponse>>('v1/exchange_rates/latest.json', {
@@ -671,6 +687,9 @@ export default {
     },
     getServerVersion: (): ApiResponsePromise<VersionInfo> => {
         return axios.get<ApiResponse<VersionInfo>>('v1/systems/version.json');
+    },
+    cancelRequest: (cancelableUuid: string) => {
+        cancelableRequests[cancelableUuid] = true;
     },
     generateQrCodeUrl: (qrCodeName: string): string => {
         return `${getBasePath()}${BASE_QRCODE_PATH}/${qrCodeName}.png`;

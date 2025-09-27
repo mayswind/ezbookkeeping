@@ -29,7 +29,7 @@
 import { ref, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
+import { useI18nUIComponents, closeAllDialog } from '@/lib/ui/mobile.ts';
 
 import { useTransactionsStore } from '@/stores/transaction.ts';
 
@@ -38,6 +38,7 @@ import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
 
 import type { RecognizedReceiptImageResponse } from '@/models/large_language_model.ts';
 
+import { generateRandomUUID } from '@/lib/misc.ts';
 import { compressJpgImage } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
@@ -51,7 +52,7 @@ const emit = defineEmits<{
 }>();
 
 const { tt } = useI18n();
-const { showToast } = useI18nUIComponents();
+const { showCancelableLoading, showToast } = useI18nUIComponents();
 
 const transactionsStore = useTransactionsStore();
 
@@ -59,6 +60,7 @@ const imageInput = useTemplateRef<HTMLInputElement>('imageInput');
 
 const loading = ref<boolean>(false);
 const recognizing = ref<boolean>(false);
+const cancelRecognizingUuid = ref<string | undefined>(undefined);
 const imageFile = ref<File | null>(null);
 const imageSrc = ref<string | undefined>(undefined);
 
@@ -105,24 +107,45 @@ function confirm(): void {
         return;
     }
 
+    cancelRecognizingUuid.value = generateRandomUUID();
     recognizing.value = true;
-    showLoading(() => recognizing.value);
+    showCancelableLoading('Recognizing...', 'Cancel Recognition', cancelRecognize);
 
     transactionsStore.recognizeReceiptImage({
-        imageFile: imageFile.value
+        imageFile: imageFile.value,
+        cancelableUuid: cancelRecognizingUuid.value
     }).then(response => {
         recognizing.value = false;
-        hideLoading();
+        cancelRecognizingUuid.value = undefined;
+        closeAllDialog();
         emit('update:show', false);
         emit('recognition:change', response);
     }).catch(error => {
+        if (error.canceled) {
+            return;
+        }
+
         recognizing.value = false;
-        hideLoading();
+        cancelRecognizingUuid.value = undefined;
+        closeAllDialog();
 
         if (!error.processed) {
             showToast(error.message || error);
         }
     });
+}
+
+function cancelRecognize(): void {
+    if (!cancelRecognizingUuid.value) {
+        return;
+    }
+
+    transactionsStore.cancelRecognizeReceiptImage(cancelRecognizingUuid.value);
+    recognizing.value = false;
+    cancelRecognizingUuid.value = undefined;
+    closeAllDialog();
+
+    showToast('User Canceled');
 }
 
 function cancel(): void {
@@ -133,6 +156,7 @@ function close(): void {
     emit('update:show', false);
     loading.value = false;
     recognizing.value = false;
+    cancelRecognizingUuid.value = undefined;
     imageFile.value = null;
     imageSrc.value = undefined;
 }
@@ -140,6 +164,7 @@ function close(): void {
 function onSheetOpen(): void {
     loading.value = false;
     recognizing.value = false;
+    cancelRecognizingUuid.value = undefined;
     imageFile.value = null;
     imageSrc.value = undefined;
 }

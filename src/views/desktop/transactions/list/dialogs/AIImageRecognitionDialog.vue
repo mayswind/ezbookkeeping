@@ -33,8 +33,10 @@
                         {{ tt('Recognize') }}
                         <v-progress-circular indeterminate size="22" class="ms-2" v-if="recognizing"></v-progress-circular>
                     </v-btn>
+                    <v-btn color="secondary" variant="tonal" :disabled="loading"
+                           @click="cancelRecognize" v-if="recognizing && cancelRecognizingUuid">{{ tt('Cancel Recognition') }}</v-btn>
                     <v-btn color="secondary" variant="tonal" :disabled="loading || recognizing"
-                           @click="cancel">{{ tt('Cancel') }}</v-btn>
+                           @click="cancel" v-if="!recognizing || !cancelRecognizingUuid">{{ tt('Cancel') }}</v-btn>
                 </div>
             </v-card-text>
         </v-card>
@@ -58,6 +60,7 @@ import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
 
 import type { RecognizedReceiptImageResponse } from '@/models/large_language_model.ts';
 
+import { generateRandomUUID } from '@/lib/misc.ts';
 import { compressJpgImage } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
@@ -76,6 +79,7 @@ let rejectFunc: ((reason?: unknown) => void) | null = null;
 const showState = ref<boolean>(false);
 const loading = ref<boolean>(false);
 const recognizing = ref<boolean>(false);
+const cancelRecognizingUuid = ref<string | undefined>(undefined);
 const imageFile = ref<File | null>(null);
 const imageSrc = ref<string | undefined>(undefined);
 const isDragOver = ref<boolean>(false);
@@ -96,6 +100,7 @@ function open(): Promise<RecognizedReceiptImageResponse> {
     showState.value = true;
     loading.value = false;
     recognizing.value = false;
+    cancelRecognizingUuid.value = undefined;
     imageFile.value = null;
     imageSrc.value = undefined;
 
@@ -136,16 +141,24 @@ function recognize(): void {
         return;
     }
 
+    cancelRecognizingUuid.value = generateRandomUUID();
     recognizing.value = true;
 
     transactionsStore.recognizeReceiptImage({
-        imageFile: imageFile.value
+        imageFile: imageFile.value,
+        cancelableUuid: cancelRecognizingUuid.value
     }).then(response => {
         resolveFunc?.(response);
         showState.value = false;
         recognizing.value = false;
+        cancelRecognizingUuid.value = undefined;
     }).catch(error => {
+        if (error.canceled) {
+            return;
+        }
+
         recognizing.value = false;
+        cancelRecognizingUuid.value = undefined;
 
         if (!error.processed) {
             snackbar.value?.showError(error);
@@ -153,11 +166,24 @@ function recognize(): void {
     });
 }
 
+function cancelRecognize(): void {
+    if (!cancelRecognizingUuid.value) {
+        return;
+    }
+
+    transactionsStore.cancelRecognizeReceiptImage(cancelRecognizingUuid.value);
+    recognizing.value = false;
+    cancelRecognizingUuid.value = undefined;
+
+    snackbar.value?.showMessage('User Canceled');
+}
+
 function cancel(): void {
     rejectFunc?.();
     showState.value = false;
     loading.value = false;
     recognizing.value = false;
+    cancelRecognizingUuid.value = undefined;
     imageFile.value = null;
     imageSrc.value = undefined;
 }

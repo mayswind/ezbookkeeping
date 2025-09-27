@@ -42,6 +42,12 @@ export function hideLoading(): void {
     });
 }
 
+export function closeAllDialog(): void {
+    f7ready((f7) => {
+        return f7.dialog.close();
+    });
+}
+
 export function createInlinePicker(containerEl: string, inputEl: string, cols: Picker.ColumnParameters[], value: string[], events?: { change: (picker: Picker.Picker, value: unknown, displayValue: unknown) => void }): Picker.Picker {
     return f7.picker.create({
         containerEl: containerEl,
@@ -282,6 +288,27 @@ export function useI18nUIComponents() {
         });
     }
 
+    function showCancelableLoading(message: string, cancelButtonText: string, cancelCallback?: (dialog: Dialog.Dialog, e: Event) => void): void {
+        const cancelButton: Dialog.DialogButton = {
+            text: tt(cancelButtonText),
+            onClick: (dialog, event) => {
+                if (cancelCallback) {
+                    cancelCallback(dialog, event);
+                }
+            }
+        };
+
+        f7ready((f7) => {
+            f7.dialog.create({
+                title: tt(message),
+                content: `<div class="preloader"><span class="preloader-inner">${[0, 1, 2, 3, 4, 5, 6, 7].map(() => '<span class="preloader-inner-line"></span>').join('')}</span></div>`,
+                cssClass: 'dialog-preloader',
+                animate: isEnableAnimate(),
+                buttons: [cancelButton]
+            }).open();
+        });
+    }
+
     function showToast(message: string, timeout?: number): void {
         f7ready((f7) => {
             f7.toast.create({
@@ -296,6 +323,7 @@ export function useI18nUIComponents() {
         showAlert: showAlert,
         showConfirm: showConfirm,
         showPrompt: showPrompt,
+        showCancelableLoading: showCancelableLoading,
         showToast: showToast,
         routeBackOnError
     }

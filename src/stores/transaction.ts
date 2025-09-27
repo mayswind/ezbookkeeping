@@ -1160,9 +1160,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
         });
     }
 
-    function recognizeReceiptImage({ imageFile }: { imageFile: File }): Promise<RecognizedReceiptImageResponse> {
+    function recognizeReceiptImage({ imageFile, cancelableUuid }: { imageFile: File, cancelableUuid?: string }): Promise<RecognizedReceiptImageResponse> {
         return new Promise((resolve, reject) => {
-            services.recognizeReceiptImage({ imageFile }).then(response => {
+            services.recognizeReceiptImage({ imageFile, cancelableUuid }).then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
@@ -1172,6 +1172,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
                 resolve(data.result);
             }).catch(error => {
+                if (error.canceled) {
+                    reject(error);
+                }
+
                 logger.error('failed to recognize image', error);
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
@@ -1183,6 +1187,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 }
             });
         });
+    }
+
+    function cancelRecognizeReceiptImage(cancelableUuid: string): void {
+        services.cancelRequest(cancelableUuid);
     }
 
     function parseImportDsvFile({ fileType, fileEncoding, importFile }: { fileType: string, fileEncoding?: string, importFile: File }): Promise<string[][]> {
@@ -1399,6 +1407,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         saveTransaction,
         deleteTransaction,
         recognizeReceiptImage,
+        cancelRecognizeReceiptImage,
         parseImportDsvFile,
         parseImportTransaction,
         importTransactions,

@@ -122,7 +122,7 @@ jobs:
       - name: Extract frontend files from linux-amd64 package
         run: |
           New-Item -ItemType Directory -Path package
-          tar -xzf (Get-ChildItem artifacts\ezbookkeeping-v*-linux-amd64.tar.gz) -C package
+          tar -xzf (Get-ChildItem artifacts\ezbookkeeping-${{ github.ref_name }}-linux-amd64.tar.gz) -C package
 
       - name: Set up Go
         uses: actions/setup-go@v6
@@ -176,7 +176,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ezbookkeeping-${{ github.ref_name }}-windows-x64
-          path: ezbookkeeping-v*-windows-x64.zip
+          path: ezbookkeeping-${{ github.ref_name }}-windows-x64.zip
+          if-no-files-found: error
 
   publish-release:
     runs-on: ubuntu-latest

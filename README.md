@@ -97,6 +97,10 @@ All the files will be packaged in `ezbookkeeping.tar.gz`.
 
     > .\build.bat package -o ezbookkeeping.zip
 
+or
+
+    PS > .\build.ps1 package -Output ezbookkeeping.zip
+
 All the files will be packaged in `ezbookkeeping.zip`.
 
 You can also build a Docker image. Make sure you have [Docker](https://www.docker.com/) installed, then follow these steps:
@@ -114,7 +118,7 @@ Want to contribute code? Feel free to fork and send a pull request.
 
 Contributions of all kinds — bug reports, feature suggestions, documentation improvements, or code — are highly appreciated.
 
-Check out our [Contributor Graph](https://github.com/mayswind/ezbookkeeping/graphs/contributors) to see the amazing people who’ve already helped.
+Check out our [Contributor Graph](https://github.com/mayswind/ezbookkeeping/graphs/contributors) to see the amazing people who've already helped.
 
 ## Translating
 Help make ezBookkeeping accessible to users around the world. If you want to contribute a translation, please refer to our [translation guide](https://ezbookkeeping.mayswind.net/translating).

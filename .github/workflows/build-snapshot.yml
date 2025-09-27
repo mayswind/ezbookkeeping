@@ -21,7 +21,7 @@ jobs:
           images: |
             ${{ secrets.DOCKER_USERNAME }}/ezbookkeeping
           tags: |
-            type=raw,value=SNAPSHOT-{{date 'YYYYMMDD'}}.${{ github.run_id }}
+            type=raw,value=SNAPSHOT-{{date 'YYYYMMDD'}}-${{ github.run_id }}
             type=raw,value=SNAPSHOT-{{date 'YYYYMMDD'}}
             type=raw,value=latest-snapshot
 

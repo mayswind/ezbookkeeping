@@ -4,6 +4,7 @@ export class KnownFileType {
     public static readonly JSON = new KnownFileType('json', 'application/json');
     public static readonly CSV = new KnownFileType('csv', 'text/csv');
     public static readonly TSV = new KnownFileType('tsv', 'text/tab-separated-values');
+    public static readonly TXT = new KnownFileType('txt', 'text/text');
     public static readonly MARKDOWN = new KnownFileType('md', 'text/markdown');
     public static readonly JS = new KnownFileType('js', 'application/javascript');
     public static readonly JPG = new KnownFileType('jpg', 'image/jpeg');
@@ -16,6 +17,14 @@ export class KnownFileType {
         this.contentType = contentType;
 
         KnownFileType.allInstancesByExtension[extension] = this;
+    }
+
+    public isSameType(contentType: string): boolean {
+        if (!contentType) {
+            return false;
+        }
+
+        return this.contentType === contentType || contentType.indexOf(this.contentType) === 0;
     }
 
     public formatFileName(fileName: string): string {

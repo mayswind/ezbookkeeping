@@ -5,6 +5,7 @@ import { useSettingsStore } from './setting.ts';
 
 import { type WeekDayValue, WeekDay } from '@/core/datetime.ts';
 import { FiscalYearStart } from '@/core/fiscalyear.ts';
+import { KnownFileType } from '@/core/file.ts';
 import type { ApplicationCloudSetting } from '@/core/setting.ts';
 
 import {
@@ -380,10 +381,12 @@ export const useUserStore = defineStore('user', () => {
         return new Promise((resolve, reject) => {
             services.getExportedUserData(fileType, req).then(response => {
                 if (response && response.headers) {
-                    if (fileType === 'csv' && response.headers['content-type'] !== 'text/csv') {
+                    const contentType = response.headers['content-type']?.toString() || '';
+
+                    if (fileType === 'csv' && !KnownFileType.CSV.isSameType(contentType)) {
                         reject({ message: 'Unable to retrieve exported user data' });
                         return;
-                    } else if (fileType === 'tsv' && response.headers['content-type'] !== 'text/tab-separated-values') {
+                    } else if (fileType === 'tsv' && !KnownFileType.TSV.isSameType(contentType)) {
                         reject({ message: 'Unable to retrieve exported user data' });
                         return;
                     }
@@ -394,7 +397,7 @@ export const useUserStore = defineStore('user', () => {
             }).catch(error => {
                 logger.error('failed to retrieve user statistics data', error);
 
-                if (error.response && error.response.headers['content-type'] === 'text/text' && error.response && error.response.data) {
+                if (error.response && KnownFileType.TXT.isSameType(error.response.headers['content-type']) && error.response && error.response.data) {
                     reject({ message: 'error.' + error.response.data });
                 } else if (!error.processed) {
                     reject({ message: 'Unable to retrieve exported user data' });

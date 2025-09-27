@@ -531,7 +531,7 @@ func bindCachedJs(fn core.DataHandlerFunc, store persistence.CacheStore) gin.Han
 		if err != nil {
 			utils.PrintDataErrorResult(c, "text/javascript", err)
 		} else {
-			utils.PrintDataSuccessResult(c, "text/javascript", "", result)
+			utils.PrintDataSuccessResult(c, "text/javascript; charset=utf-8", "", result)
 		}
 	})
 }
@@ -544,7 +544,7 @@ func bindCsv(fn core.DataHandlerFunc) gin.HandlerFunc {
 		if err != nil {
 			utils.PrintDataErrorResult(c, "text/text", err)
 		} else {
-			utils.PrintDataSuccessResult(c, "text/csv", fileName, result)
+			utils.PrintDataSuccessResult(c, "text/csv; charset=utf-8", fileName, result)
 		}
 	}
 }
@@ -557,7 +557,7 @@ func bindTsv(fn core.DataHandlerFunc) gin.HandlerFunc {
 		if err != nil {
 			utils.PrintDataErrorResult(c, "text/text", err)
 		} else {
-			utils.PrintDataSuccessResult(c, "text/tab-separated-values", fileName, result)
+			utils.PrintDataSuccessResult(c, "text/tab-separated-values; charset=utf-8", fileName, result)
 		}
 	}
 }

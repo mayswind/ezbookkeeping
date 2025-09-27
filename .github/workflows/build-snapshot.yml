@@ -83,7 +83,7 @@ jobs:
 
       - name: Pull and save packaged files for ${{ matrix.arch }}
         run: |
-          TAG=${{ needs.build-and-push.outputs.image-tag }}
+          TAG=${{ needs.build-linux-docker.outputs.image-tag }}
           IMAGE=${{ secrets.DOCKER_USERNAME }}/ezbookkeeping:${TAG}
           docker pull --platform ${{ matrix.arch }} ${IMAGE}
           cid=$(docker create "${IMAGE}")

@@ -179,10 +179,10 @@ export class ChartDateAggregationType {
     private static readonly allInstances: ChartDateAggregationType[] = [];
     private static readonly allInstancesByType: Record<number, ChartDateAggregationType> = {};
 
-    public static readonly Month = new ChartDateAggregationType(0, 'Monthly', 'Aggregate by Month');
-    public static readonly Quarter = new ChartDateAggregationType(1, 'Quarterly', 'Aggregate by Quarter');
-    public static readonly Year = new ChartDateAggregationType(2, 'Yearly', 'Aggregate by Year');
-    public static readonly FiscalYear = new ChartDateAggregationType(3, 'FiscalYearly', 'Aggregate by Fiscal Year');
+    public static readonly Month = new ChartDateAggregationType(1, 'Monthly', 'Aggregate by Month');
+    public static readonly Quarter = new ChartDateAggregationType(2, 'Quarterly', 'Aggregate by Quarter');
+    public static readonly Year = new ChartDateAggregationType(3, 'Yearly', 'Aggregate by Year');
+    public static readonly FiscalYear = new ChartDateAggregationType(4, 'FiscalYearly', 'Aggregate by Fiscal Year');
 
     public static readonly Default = ChartDateAggregationType.Month;
 

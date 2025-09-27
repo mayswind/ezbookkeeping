@@ -305,6 +305,31 @@
         </v-col>
     </v-row>
 
+    <!-- Calendar Heatmap Row -->
+    <v-row class="match-height">
+        <v-col cols="12">
+            <v-card>
+                <v-card-text>
+                    <div class="heatmap-wrapper">
+                        <v-skeleton-loader
+                            v-if="heatmapLoading"
+                            type="image"
+                            height="200"
+                            class="mx-auto"
+                        />
+                        <calendar-heatmap
+                            v-else
+                            :data="heatmapData"
+                            :default-currency="defaultCurrency"
+                            :enable-click="true"
+                            @dayClick="onDayClick"
+                        />
+                    </div>
+                </v-card-text>
+            </v-card>
+        </v-col>
+    </v-row>
+
     <date-range-selection-dialog :title="tt('Custom Date Range')"
                                   :min-time="query.categoricalChartStartTime"
                                   :max-time="query.categoricalChartEndTime"
@@ -342,6 +367,7 @@
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import MonthlyTrendsChart from '@/components/desktop/MonthlyTrendsChart.vue';
+import CalendarHeatmap from '@/components/desktop/CalendarHeatmap.vue';
 import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
 import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
 import TransactionTagFilterSettingsCard from '@/views/desktop/common/cards/TransactionTagFilterSettingsCard.vue';
@@ -353,10 +379,12 @@ import { useDisplay, useTheme } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useStatisticsTransactionPageBase } from '@/views/base/statistics/StatisticsTransactionPageBase.ts';
+import services from '@/lib/services.ts';
 
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { type TransactionStatisticsPartialFilter, useStatisticsStore } from '@/stores/statistics.ts';
+import { useOverviewStore } from '@/stores/overview.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { type TextualYearMonth, type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
@@ -465,6 +493,7 @@ const {
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const statisticsStore = useStatisticsStore();
+const overviewStore = useOverviewStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const monthlyTrendsChart = useTemplateRef<MonthlyTrendsChartType>('monthlyTrendsChart');
@@ -1016,6 +1045,141 @@ watch(() => display.mdAndUp.value, (newValue) => {
         showNav.value = newValue;
     }
 });
+
+// Calendar heatmap data and methods
+const dailyTransactionData = ref<Record<string, { value: number; count: number; income: number; expense: number }>>({});
+const heatmapLoading = ref(false);
+
+// Cache key based on date to avoid unnecessary reloads
+const lastLoadDate = ref<string>('');
+const getCurrentDateKey = () => new Date().toDateString();
+
+async function loadDailyTransactionData() {
+    const currentDateKey = getCurrentDateKey();
+
+    // Skip loading if data was already loaded today
+    if (lastLoadDate.value === currentDateKey && Object.keys(dailyTransactionData.value).length > 0) {
+        return;
+    }
+
+    heatmapLoading.value = true;
+    try {
+        const data: Record<string, { value: number; count: number; income: number; expense: number }> = {};
+
+        // Calculate date range: 365 days ending today
+        const today = new Date();
+        const startDate = new Date(today);
+        startDate.setDate(startDate.getDate() - 364); // 365 days including today
+
+        // Get unique year-month combinations to query
+        const monthsToQuery = new Set<string>();
+        const current = new Date(startDate);
+        while (current <= today) {
+            const yearMonth = `${current.getFullYear()}-${current.getMonth() + 1}`;
+            monthsToQuery.add(yearMonth);
+            current.setMonth(current.getMonth() + 1);
+            current.setDate(1);
+        }
+
+        // Load transactions for each month in our date range
+        for (const yearMonth of monthsToQuery) {
+            const [year, month] = yearMonth.split('-').map(Number);
+            if (!year || !month) continue;
+
+            const response = await services.getAllTransactionsByMonth({
+                year: year,
+                month: month,
+                type: 0, // All transaction types
+                categoryIds: '',
+                accountIds: '',
+                tagIds: '',
+                tagFilterType: 0,
+                amountFilter: '',
+                keyword: ''
+            });
+
+            if (response && response.data && response.data.result && response.data.result.items) {
+                const transactions = response.data.result.items;
+
+                // Group by date, only include dates in our 365-day window
+                for (const transaction of transactions) {
+                    const date = new Date(transaction.time * 1000);
+
+                    // Only include transactions within our 365-day window
+                    if (date >= startDate && date <= today) {
+                        // Use local date string instead of UTC to avoid timezone issues
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const dateStr = `${year}-${month}-${day}`;
+
+                        if (!data[dateStr]) {
+                            data[dateStr] = { value: 0, count: 0, income: 0, expense: 0 };
+                        }
+
+                        const amount = Math.abs(transaction.sourceAmount);
+                        data[dateStr]!.value += amount;
+                        data[dateStr]!.count += 1;
+
+                        // Distinguish between income and expense based on transaction type
+                        if (transaction.type === 2) { // Income
+                            data[dateStr]!.income += amount;
+                        } else if (transaction.type === 3) { // Expense
+                            data[dateStr]!.expense += amount;
+                        }
+                    }
+                }
+            }
+        }
+
+        dailyTransactionData.value = data;
+        lastLoadDate.value = currentDateKey;
+    } catch (error) {
+        console.error('Failed to load daily transaction data:', error);
+        dailyTransactionData.value = {};
+    } finally {
+        heatmapLoading.value = false;
+    }
+}
+
+const heatmapData = computed(() => dailyTransactionData.value);
+
+function onDayClick(day: any) {
+    const clickedDate = new Date(day.date);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+
+    // Don't allow clicks on future dates
+    if (clickedDate > today) {
+        return;
+    }
+
+    if (day.count > 0) {
+        // Calculate start and end timestamps for the clicked date
+        const startOfDay = new Date(clickedDate);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(clickedDate);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        // Convert to Unix timestamps (seconds)
+        const minTime = Math.floor(startOfDay.getTime() / 1000);
+        const maxTime = Math.floor(endOfDay.getTime() / 1000);
+
+        // Navigate to transaction list filtered by this date
+        router.push(`/transaction/list?${overviewStore.getTransactionListPageParams({
+            dateType: DateRange.Custom.type,
+            minTime: minTime,
+            maxTime: maxTime
+        })}`);
+    } else {
+        // For empty days, navigate to add transaction page with pre-filled date
+        const dateTimestamp = Math.floor(clickedDate.getTime() / 1000);
+        router.push(`/transaction/add?time=${dateTimestamp}`);
+    }
+}
+
+// Load daily transaction data when component is initialized
+loadDailyTransactionData();
 
 init(props);
 </script>

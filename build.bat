@@ -261,7 +261,7 @@ goto :pre_parse_args
         goto :end
     )
 
-    call 7z a -r -tzip -mx9 ..\%package_file_name% package *
+    call 7z a -r -tzip -mx9 ..\%package_file_name% *
 
     cd ..
     endlocal

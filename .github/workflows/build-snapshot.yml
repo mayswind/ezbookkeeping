@@ -100,3 +100,78 @@ jobs:
           name: ezbookkeeping-dev-${{ github.run_id }}-${{ matrix.arch_alias }}
           path: ezbookkeeping-dev-${{ github.run_id }}-${{ matrix.arch_alias }}.tar.gz
           if-no-files-found: error
+
+  build-and-upload-windows-package:
+    needs: upload-linux-artifact
+    runs-on: windows-latest
+    env:
+      GO_VERSION: "1.25.1"
+      MINGW_VERSION: "14.2.0"
+      MINGW_REVISION: "v12-rev2"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download linux-amd64 packaged files
+        uses: actions/download-artifact@v4
+        with:
+          name: ezbookkeeping-dev-${{ github.run_id }}-linux-amd64
+          path: artifacts
+
+      - name: Extract frontend files from linux-amd64 package
+        run: |
+          New-Item -ItemType Directory -Path package
+          tar -xzf (Get-ChildItem artifacts\ezbookkeeping-dev-*-linux-amd64.tar.gz) -C package
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install MinGW
+        run: |
+          $mingwVersion = "${{ env.MINGW_VERSION }}"
+          $mingwRevision = "${{ env.MINGW_REVISION }}"
+          $url = "https://github.com/niXman/mingw-builds-binaries/releases/download/${mingwVersion}-rt_${mingwRevision}/x86_64-${mingwVersion}-release-posix-seh-ucrt-rt_${mingwRevision}.7z"
+          $archive = "C:\mingw.7z"
+          $mingwDir = "C:\mingw64"
+
+          Write-Host "Downloading MinGW from ${url}"
+          Invoke-WebRequest -Uri ${url} -OutFile ${archive}
+
+          Remove-Item -Recurse -Force ${mingwDir}
+          New-Item -ItemType Directory -Path ${mingwDir}
+
+          Write-Host "Extracting MinGW to ${mingwDir}"
+          7z x ${archive} -oC:\
+          "${mingwDir}\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Build backend for windows-x64
+        env:
+          BUILD_PIPELINE: "1"
+          CHECK_3RD_API: ${{ vars.CHECK_3RD_API }}
+          SKIP_TESTS: ${{ vars.SKIP_TESTS }}
+        run: |
+          .\build.ps1 backend
+
+      - name: Package Windows build
+        run: |
+          New-Item -ItemType Directory -Path "ezbookkeeping"
+          New-Item -ItemType Directory -Path "ezbookkeeping\data"
+          New-Item -ItemType Directory -Path "ezbookkeeping\storage"
+          New-Item -ItemType Directory -Path "ezbookkeeping\log"
+          Copy-Item ezbookkeeping.exe -Destination ezbookkeeping\
+          Copy-Item -Recurse -Force package\public -Destination ezbookkeeping\public
+          Copy-Item -Recurse -Force conf -Destination ezbookkeeping\conf
+          Copy-Item -Recurse -Force templates -Destination ezbookkeeping\templates
+          Copy-Item .\LICENSE -Destination ezbookkeeping\
+          Push-Location ezbookkeeping
+          7z a -r -tzip -mx9 ..\ezbookkeeping-dev-${{ github.run_id }}-windows-x64.zip *
+          Pop-Location
+          Remove-Item -Recurse -Force ezbookkeeping
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ezbookkeeping-dev-${{ github.run_id }}-windows-x64
+          path: ezbookkeeping-dev-*-windows-x64.zip

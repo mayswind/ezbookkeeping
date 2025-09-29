@@ -1,5 +1,5 @@
 <template>
-    <v-dialog width="800" :persistent="loading || recognizing || !!imageFile" v-model="showState">
+    <v-dialog width="800" :persistent="loading || recognizing || !!imageFile" v-model="showState" @paste="onPaste">
         <v-card class="pa-2 pa-sm-4 pa-md-4">
             <template #title>
                 <div class="d-flex align-center justify-center">
@@ -15,7 +15,7 @@
                      @drop.prevent="onDrop">
                     <div class="d-flex w-100 fill-height justify-center align-center justify-content-center px-4"
                          :class="{ 'dropzone': true, 'dropzone-dragover': isDragOver }" style="height: 480px">
-                        <h3 class="pa-2 bg-grey-200" v-if="!loading && !imageFile && !isDragOver">{{ tt('Drag and drop a receipt or transaction image here, or click to select one') }}</h3>
+                        <h3 class="pa-2 bg-grey-200" v-if="!loading && !imageFile && !isDragOver">{{ tt('You can drag and drop, paste or click to select a receipt or transaction image') }}</h3>
                         <h3 class="pa-2 bg-grey-200" v-if="!loading && isDragOver">{{ tt('Release to load image') }}</h3>
                         <h3 class="pa-2" v-if="loading">{{ tt('Loading image...') }}</h3>
                     </div>
@@ -216,6 +216,27 @@ function onDrop(event: DragEvent): void {
 
     if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length && event.dataTransfer.files[0]) {
         loadImage(event.dataTransfer.files[0] as File);
+    }
+}
+
+function onPaste(event: ClipboardEvent) {
+    if (!event.clipboardData) {
+        event.preventDefault();
+        return;
+    }
+
+    for (let i = 0; i < event.clipboardData.items.length; i++) {
+        const item = event.clipboardData.items[i];
+
+        if (item && item.type.startsWith('image/')) {
+            const file = item.getAsFile();
+
+            if (file) {
+                loadImage(file);
+                event.preventDefault();
+                return;
+            }
+        }
     }
 }
 

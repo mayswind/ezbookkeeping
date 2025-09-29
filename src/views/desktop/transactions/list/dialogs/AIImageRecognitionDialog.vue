@@ -15,8 +15,9 @@
                      @drop.prevent="onDrop">
                     <div class="d-flex w-100 fill-height justify-center align-center justify-content-center px-4"
                          :class="{ 'dropzone': true, 'dropzone-dragover': isDragOver }" style="height: 480px">
-                        <h3 class="pa-2 bg-grey-200" v-if="!imageFile && !isDragOver">{{ tt('Drag and drop a receipt or transaction image here, or click to select one') }}</h3>
-                        <h3 class="pa-2 bg-grey-200" v-if="isDragOver">{{ tt('Release to load image') }}</h3>
+                        <h3 class="pa-2 bg-grey-200" v-if="!loading && !imageFile && !isDragOver">{{ tt('Drag and drop a receipt or transaction image here, or click to select one') }}</h3>
+                        <h3 class="pa-2 bg-grey-200" v-if="!loading && isDragOver">{{ tt('Release to load image') }}</h3>
+                        <h3 class="pa-2" v-if="loading">{{ tt('Loading image...') }}</h3>
                     </div>
                     <v-img height="480px" :class="{ 'cursor-pointer': !loading && !recognizing && !isDragOver }"
                            :src="imageSrc" @click="showOpenImageDialog">
@@ -85,12 +86,18 @@ const imageSrc = ref<string | undefined>(undefined);
 const isDragOver = ref<boolean>(false);
 
 function loadImage(file: File): void {
+    loading.value = true;
+    imageFile.value = null;
+    imageSrc.value = undefined;
+
     compressJpgImage(file, 1280, 1280, 0.8).then(blob => {
         imageFile.value = KnownFileType.JPG.createFileFromBlob(blob, "image");
         imageSrc.value = URL.createObjectURL(blob);
+        loading.value = false;
     }).catch(error => {
         imageFile.value = null;
         imageSrc.value = undefined;
+        loading.value = false;
         logger.error('failed to compress image', error);
         snackbar.value?.showError('Unable to load image');
     });

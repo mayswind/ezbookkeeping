@@ -15,7 +15,8 @@
                  style="height: 400px" @click="showOpenImage">
                 <img height="400px" :src="imageSrc" v-if="imageSrc" />
                 <div class="image-container-background display-flex justify-content-center align-items-center padding-horizontal" v-if="!imageSrc">
-                    <span>{{ tt('Click here to select a receipt or transaction image') }}</span>
+                    <span v-if=!loading>{{ tt('Click here to select a receipt or transaction image') }}</span>
+                    <span v-else-if="loading">{{ tt('Loading image...') }}</span>
                 </div>
             </div>
         </f7-page-content>
@@ -65,12 +66,18 @@ const imageFile = ref<File | null>(null);
 const imageSrc = ref<string | undefined>(undefined);
 
 function loadImage(file: File): void {
+    loading.value = true;
+    imageFile.value = null;
+    imageSrc.value = undefined;
+
     compressJpgImage(file, 1280, 1280, 0.8).then(blob => {
         imageFile.value = KnownFileType.JPG.createFileFromBlob(blob, "image");
         imageSrc.value = URL.createObjectURL(blob);
+        loading.value = false;
     }).catch(error => {
         imageFile.value = null;
         imageSrc.value = undefined;
+        loading.value = false;
         logger.error('failed to compress image', error);
         showToast('Unable to load image');
     });

@@ -1737,6 +1737,7 @@
     "Unable to recognize image": "无法识别图片",
     "Drag and drop a receipt or transaction image here, or click to select one": "拖拽收据或交易图片到此处，或点击选择图片",
     "Release to load image": "释放以加载图片",
+    "Loading image...": "正在加载图片...",
     "Click here to select a receipt or transaction image": "点击这里选择收据或交易图片",
     "Category": "分类",
     "Secondary Category": "二级分类",

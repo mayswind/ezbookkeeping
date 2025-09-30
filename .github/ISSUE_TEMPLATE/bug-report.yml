@@ -1,6 +1,5 @@
 name: Bug Report
 description: Report a bug in ezBookkeeping
-labels: bug
 body:
   - type: checkboxes
     id: checkboxes

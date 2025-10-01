@@ -1,1 +1,5 @@
 blank_issues_enabled: false
+contact_links:
+  - name: Usage Questions
+    url: https://github.com/mayswind/ezbookkeeping/discussions/categories/q-a
+    about: Questions about using ezBookkeeping can be discussed in GitHub Discussions.

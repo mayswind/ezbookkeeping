@@ -830,7 +830,8 @@ function setTransactionMonthListHeights(reset: boolean): Promise<unknown> {
         if (transactions.value && transactions.value.length) {
             const heights: Record<string, number> = getElementActualHeights('.transaction-month-list');
 
-            for (const transactionMonthList of transactions.value) {
+            for (let i = 0; i < transactions.value.length - 1; i++) {
+                const transactionMonthList = transactions.value[i] as TransactionMonthList;
                 const yearDashMonth = transactionMonthList.yearDashMonth;
                 const domId = getTransactionMonthListDomId(yearDashMonth);
                 const height = heights[domId];
@@ -848,7 +849,8 @@ function setTransactionInvisibleYearMonthList(): void {
         return;
     }
 
-    for (const transactionMonthList of transactions.value) {
+    for (let i = 0; i < transactions.value.length - 1; i++) {
+        const transactionMonthList = transactions.value[i] as TransactionMonthList;
         const yearDashMonth = transactionMonthList.yearDashMonth;
 
         const titleDomId = getTransactionMonthTitleDomId(yearDashMonth);

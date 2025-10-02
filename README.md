@@ -133,6 +133,7 @@ Currently available translations:
 | fr | Français | [@brieucdlf](https://github.com/brieucdlf) |
 | it | Italiano | [@waron97](https://github.com/waron97) |
 | ja | 日本語 | [@tkymmm](https://github.com/tkymmm) |
+| ko | 한국어 | [@overworks](https://github.com/overworks) |
 | nl | Nederlands | [@automagic](https://github.com/automagics) |
 | pt-BR | Português (Brasil) | [@thecodergus](https://github.com/thecodergus) |
 | ru | Русский | [@artegoser](https://github.com/artegoser) |

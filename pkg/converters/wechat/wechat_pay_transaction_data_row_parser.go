@@ -26,6 +26,7 @@ const wechatPayTransactionDescriptionColumnName = "备注"
 
 const wechatPayTransactionDataCategoryTransferToWeChatWallet = "零钱充值"
 const wechatPayTransactionDataCategoryTransferFromWeChatWallet = "零钱提现"
+const wechatPayTransactionDataCategoryCreditCardRepayment = "信用卡还款"
 
 const wechatPayTransactionDataStatusRefundName = "退款"
 
@@ -125,6 +126,9 @@ func (p *weChatPayTransactionDataRowParser) Parse(ctx core.Context, user *models
 			} else if data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] == wechatPayTransactionDataCategoryTransferFromWeChatWallet {
 				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = localeTextItems.DataConverterTextItems.WeChatWallet
 				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = relatedAccountName
+			} else if data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] == wechatPayTransactionDataCategoryCreditCardRepayment {
+				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = relatedAccountName
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
 			} else {
 				log.Warnf(ctx, "[wechat_pay_transaction_data_row_parser.Parse] skip parsing transaction in row \"%s\", because unknown transfer transaction category \"%s\"", rowId, data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY])
 				return nil, false, nil

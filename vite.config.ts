@@ -195,6 +195,12 @@ export default defineConfig(() => {
             })
         ],
         build: {
+            target: [
+                'chrome91',
+                'edge91',
+                'firefox91',
+                'safari15.4'
+            ],
             outDir: BUILD_DIR,
             sourcemap: false,
             assetsInlineLimit: 0,

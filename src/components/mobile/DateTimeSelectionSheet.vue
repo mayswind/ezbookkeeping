@@ -22,7 +22,7 @@
                 </date-time-picker>
             </div>
             <div class="block block-outline no-margin no-padding padding-vertical-half" v-show="mode === 'time'">
-                <div id="time-picker-container" class="time-picker-container">
+                <div class="time-picker-container" ref="timePickerContainer">
                     <div class="picker picker-inline picker-3d">
                         <div class="picker-columns">
                             <div class="picker-column" v-if="!is24Hour && isMeridiemIndicatorFirst">
@@ -161,6 +161,7 @@ const {
 const environmentsStore = useEnvironmentsStore();
 
 const datetimepicker = useTemplateRef<DateTimePickerType>('datetimepicker');
+const timePickerContainer = useTemplateRef<HTMLDivElement>('timePickerContainer');
 
 let resetTimePickerItemPositionItemsClass: string | undefined = undefined;
 let resetTimePickerItemPositionItemClass: string | undefined = undefined;
@@ -279,20 +280,19 @@ function getTimerPickerItemStyle(textualValue: string, textualCurrentValue: stri
 }
 
 function initTimePickerStyle(): void {
-    const timePickerContainerElement = document.getElementById('time-picker-container');
-    const pickerItems = timePickerContainerElement?.querySelectorAll('.picker-item');
+    const pickerItems = timePickerContainer.value?.querySelectorAll('.picker-item');
     const firstPickerItem = pickerItems ? pickerItems[0] : null;
 
-    if (timePickerContainerElement) {
-        timePickerContainerHeight.value = timePickerContainerElement.offsetHeight as number;
+    if (timePickerContainer.value) {
+        timePickerContainerHeight.value = timePickerContainer.value.offsetHeight as number;
     }
 
     if (firstPickerItem && 'offsetHeight' in firstPickerItem) {
         timePickerItemHeight.value = firstPickerItem.offsetHeight as number;
     }
 
-    if (timePickerContainerElement && firstPickerItem && 'offsetHeight' in firstPickerItem) {
-        timePickerContainerElement.style.setProperty('--f7-picker-scroll-padding', `${(timePickerContainerElement.offsetHeight - (firstPickerItem.offsetHeight as number)) / 2}px`);
+    if (timePickerContainer.value && firstPickerItem && 'offsetHeight' in firstPickerItem) {
+        timePickerContainer.value.style.setProperty('--f7-picker-scroll-padding', `${(timePickerContainer.value.offsetHeight - (firstPickerItem.offsetHeight as number)) / 2}px`);
     }
 }
 
@@ -319,7 +319,7 @@ function scrollTimeSelectedItems(itemsClass: string, itemClass: string): void {
 }
 
 function scrollToSelectedItem(itemsClass: string, itemClass: string, value: string): void {
-    const itemsElement = document.querySelector(`.${itemsClass}`);
+    const itemsElement = timePickerContainer.value?.querySelector(`.${itemsClass}`);
     const itemElements = itemsElement?.querySelectorAll(`.${itemClass}`);
 
     if (!itemsElement || !itemElements || !itemElements.length) {
@@ -339,7 +339,7 @@ function scrollToSelectedItem(itemsClass: string, itemClass: string, value: stri
 }
 
 function onPickerColumnScroll(itemsClass: string, itemClass: string, scrollEnd: boolean): void {
-    const itemsElement = document.querySelector(`.${itemsClass}`);
+    const itemsElement = timePickerContainer.value?.querySelector(`.${itemsClass}`);
     const itemElements = itemsElement?.querySelectorAll(`.${itemClass}`);
     const firstPickerElement = itemElements ? itemElements[0] : null;
 
@@ -403,7 +403,7 @@ function delayCheckAndResetTimePickerItemPosition(): void {
         return;
     }
 
-    const itemsElement = document.querySelector(`.${resetTimePickerItemPositionItemsClass}`);
+    const itemsElement = timePickerContainer.value?.querySelector(`.${resetTimePickerItemPositionItemsClass}`);
 
     if (!itemsElement) {
         return;

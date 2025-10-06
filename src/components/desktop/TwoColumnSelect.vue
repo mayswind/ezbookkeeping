@@ -1,6 +1,6 @@
 <template>
     <v-select
-        class="two-column-main-select"
+        ref="twoColumnMainSelect"
         persistent-placeholder
         :density="density"
         :variant="variant"
@@ -89,6 +89,7 @@
 </template>
 
 <script setup lang="ts">
+import { VSelect } from 'vuetify/components/VSelect';
 import { VTextField } from 'vuetify/components/VTextField';
 
 import { ref, computed, useTemplateRef, nextTick } from 'vue';
@@ -142,6 +143,7 @@ const {
     updateCurrentSecondaryValue
 } = useTwoColumnListItemSelectionBase(props);
 
+const twoColumnMainSelect = useTemplateRef<VSelect>('twoColumnMainSelect');
 const filterInput = useTemplateRef<VTextField>('filterInput');
 const dropdownMenu = useTemplateRef<HTMLElement>('dropdownMenu');
 
@@ -216,8 +218,8 @@ function isSecondarySelected(subItem: unknown): boolean {
 function updateMenuPosition(): void {
     if (props.autoUpdateMenuPosition) {
         nextTick(() => {
-            const mainSelectRect = document.querySelector('.two-column-main-select')?.getBoundingClientRect();
-            const selectMenu = document.querySelector('.two-column-select-menu') as (HTMLElement | null);
+            const mainSelectRect = twoColumnMainSelect.value?.$el.getBoundingClientRect();
+            const selectMenu = dropdownMenu.value?.parentElement?.parentElement;
             const selectMenuRect = selectMenu?.getBoundingClientRect();
 
             if (mainSelectRect && selectMenu && selectMenuRect) {

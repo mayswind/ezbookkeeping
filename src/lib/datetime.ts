@@ -35,6 +35,7 @@ import {
     YearMonthDayUnixTime,
     WeekDay,
     MeridiemIndicator,
+    KnownDateTimeFormat,
     DateRangeScene,
     DateRange,
     LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE
@@ -555,6 +556,10 @@ export function parseDateTimeFromUnixTime(unixTime: number, utcOffset?: number, 
     }
 
     return MomentDateTime.of(moment.unix(unixTime));
+}
+
+export function parseDateTimeFromKnownDateTimeFormat(dateTime: string, format: KnownDateTimeFormat): DateTime {
+    return MomentDateTime.of(moment(dateTime, format.format));
 }
 
 export function formatUnixTime(unixTime: number, format: string, options: DateTimeFormatOptions, utcOffset?: number, currentUtcOffset?: number): string {

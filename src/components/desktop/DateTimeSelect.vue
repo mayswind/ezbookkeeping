@@ -6,6 +6,7 @@
         :label="label"
         :menu-props="{ contentClass: 'date-time-select-menu' }"
         v-model="dateTime"
+        @paste="onPaste"
     >
         <template #selection>
             <span class="text-truncate cursor-pointer">{{ displayTime }}</span>
@@ -86,14 +87,19 @@ import { type TimePickerValue, useDateTimeSelectionBase } from '@/components/bas
 
 import { ThemeType } from '@/core/theme.ts';
 import { NumeralSystem } from '@/core/numeral.ts';
-import { MeridiemIndicator } from '@/core/datetime.ts';
+import {
+    MeridiemIndicator,
+    KnownDateTimeFormat
+} from '@/core/datetime.ts';
 import {
     getHourIn12HourFormat,
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
     getLocalDatetimeFromUnixTime,
-    getActualUnixTimeForStore,
     getUnixTimeFromLocalDatetime,
+    getActualUnixTimeForStore,
+    getDummyUnixTimeForLocalUsage,
+    parseDateTimeFromKnownDateTimeFormat,
     getAMOrPM,
     getCombinedDateAndTimeValues
 } from '@/lib/datetime.ts';
@@ -219,6 +225,29 @@ function toggleMeridiemIndicator(): void {
     } else {
         currentMeridiemIndicator.value = MeridiemIndicator.AM.name;
     }
+}
+
+function onPaste(event: ClipboardEvent): void {
+    if (!event.clipboardData || props.readonly || props.disabled) {
+        event.preventDefault();
+        return;
+    }
+
+    const text = event.clipboardData.getData('Text');
+
+    if (!text) {
+        event.preventDefault();
+        return;
+    }
+
+    const formats = KnownDateTimeFormat.detect(text);
+
+    if (!formats || formats.length !== 1) {
+        event.preventDefault();
+        return;
+    }
+
+    dateTime.value = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(parseDateTimeFromKnownDateTimeFormat(text, formats[0] as KnownDateTimeFormat).getUnixTime(), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
 }
 
 function onFocused(input: VAutocomplete | null | undefined, focused: boolean): void {

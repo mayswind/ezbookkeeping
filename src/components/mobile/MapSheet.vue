@@ -4,8 +4,8 @@
         <f7-toolbar>
             <div class="swipe-handler"></div>
             <div class="left">
-                <f7-link :text="tt('Disable Click to Set Location')" @click="switchSetGeoLocationByClickMap(false)" v-if="isSupportGetGeoLocationByClick() && props.setGeoLocationByClickMap"></f7-link>
-                <f7-link :text="tt('Enable Click to Set Location')" @click="switchSetGeoLocationByClickMap(true)" v-if="isSupportGetGeoLocationByClick() && !props.setGeoLocationByClickMap"></f7-link>
+                <f7-link :text="tt('Disable Click to Set Location')" @click="switchSetGeoLocationByClickMap(false)" v-if="!readonly && isSupportGetGeoLocationByClick() && props.setGeoLocationByClickMap"></f7-link>
+                <f7-link :text="tt('Enable Click to Set Location')" @click="switchSetGeoLocationByClickMap(true)" v-if="!readonly && isSupportGetGeoLocationByClick() && !props.setGeoLocationByClickMap"></f7-link>
             </div>
             <div class="right">
                 <f7-link :text="tt('Done')" @click="save"></f7-link>
@@ -47,6 +47,7 @@ type MapViewType = InstanceType<typeof MapView>;
 
 const props = defineProps<{
     modelValue?: Coordinate;
+    readonly?: boolean;
     setGeoLocationByClickMap?: boolean;
     show: boolean;
 }>();
@@ -71,7 +72,7 @@ const geoLocation = computed<Coordinate | undefined>({
 });
 
 function updateSpecifiedGeoLocation(coordinate: Coordinate): void {
-    if (isSupportGetGeoLocationByClick() && props.setGeoLocationByClickMap) {
+    if (!props.readonly && isSupportGetGeoLocationByClick() && props.setGeoLocationByClickMap) {
         geoLocation.value = coordinate;
         map.value?.setMarkerPosition(coordinate);
     }

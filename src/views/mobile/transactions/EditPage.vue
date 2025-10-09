@@ -343,7 +343,8 @@
                     </f7-block>
                 </template>
 
-                <map-sheet v-model="transaction.geoLocation"
+                <map-sheet :readonly="mode === TransactionEditPageMode.View"
+                           v-model="transaction.geoLocation"
                            v-model:set-geo-location-by-click-map="setGeoLocationByClickMap"
                            v-model:show="showGeoLocationMapSheet">
                 </map-sheet>

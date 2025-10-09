@@ -47,7 +47,7 @@ type alipayTransactionColumnNames struct {
 // alipayTransactionDataCsvFileImporter defines the structure of alipay csv importer for transaction data
 type alipayTransactionDataCsvFileImporter struct {
 	fileHeaderLine         string
-	dataHeaderStartContent string
+	dataHeaderStartContent []string
 	dataBottomEndLineRune  rune
 	originalColumnNames    alipayTransactionColumnNames
 }

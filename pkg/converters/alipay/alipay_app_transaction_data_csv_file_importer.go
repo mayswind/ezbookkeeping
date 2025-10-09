@@ -10,7 +10,7 @@ var (
 	AlipayAppTransactionDataCsvFileImporter = &alipayAppTransactionDataCsvFileImporter{
 		alipayTransactionDataCsvFileImporter{
 			fileHeaderLine:         "------------------------------------------------------------------------------------",
-			dataHeaderStartContent: "支付宝（中国）网络技术有限公司  电子客户回单",
+			dataHeaderStartContent: []string{"支付宝（中国）网络技术有限公司  电子客户回单", "支付宝支付科技有限公司  电子客户回单"},
 			originalColumnNames: alipayTransactionColumnNames{
 				timeColumnName:           "交易时间",
 				categoryColumnName:       "交易分类",

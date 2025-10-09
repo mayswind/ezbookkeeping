@@ -11,7 +11,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
-func createNewAlipayTransactionBasicDataTable(ctx core.Context, originalDataTable datatable.BasicDataTable, fileHeaderLine string, dataHeaderStartContent string, dataBottomEndLineRune rune) (datatable.BasicDataTable, error) {
+func createNewAlipayTransactionBasicDataTable(ctx core.Context, originalDataTable datatable.BasicDataTable, fileHeaderLine string, dataHeaderStartContent []string, dataBottomEndLineRune rune) (datatable.BasicDataTable, error) {
 	iterator := originalDataTable.DataRowIterator()
 	allOriginalLines := make([][]string, 0)
 	hasFileHeader := false
@@ -35,7 +35,7 @@ func createNewAlipayTransactionBasicDataTable(ctx core.Context, originalDataTabl
 		if !foundContentBeforeDataHeaderLine {
 			if row.ColumnCount() <= 0 {
 				continue
-			} else if strings.Index(row.GetData(0), dataHeaderStartContent) >= 0 {
+			} else if utils.ContainsAnyString(row.GetData(0), dataHeaderStartContent) {
 				foundContentBeforeDataHeaderLine = true
 				continue
 			} else {

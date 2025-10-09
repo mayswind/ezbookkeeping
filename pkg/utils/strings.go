@@ -60,6 +60,17 @@ func SubString(str string, start int, length int) string {
 	return string(chars[start:end])
 }
 
+// ContainsAnyString returns whether the specified string contains any string of sub string slice
+func ContainsAnyString(s string, substrs []string) bool {
+	for i := 0; i < len(substrs); i++ {
+		if strings.Index(s, substrs[i]) >= 0 {
+			return true
+		}
+	}
+
+	return false
+}
+
 // GetFirstLowerCharString returns the source string parameter, but makes the first character lower case
 func GetFirstLowerCharString(s string) string {
 	if s == "" {

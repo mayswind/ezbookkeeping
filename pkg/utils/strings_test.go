@@ -72,6 +72,20 @@ func TestSubString_OverBoundary(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
+func TestContainsAnyString(t *testing.T) {
+	actualValue := ContainsAnyString("test", []string{"test"})
+	assert.Equal(t, true, actualValue)
+
+	actualValue = ContainsAnyString("test", []string{"st"})
+	assert.Equal(t, true, actualValue)
+
+	actualValue = ContainsAnyString("test", []string{"tt", "tet", "tst", "est"})
+	assert.Equal(t, true, actualValue)
+
+	actualValue = ContainsAnyString("test", []string{"tt", "tet", "tst"})
+	assert.Equal(t, false, actualValue)
+}
+
 func TestGetFirstLowerCharString(t *testing.T) {
 	expectedValue := "fooBar"
 	actualValue := GetFirstLowerCharString("fooBar")

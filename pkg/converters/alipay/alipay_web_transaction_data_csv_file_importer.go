@@ -10,7 +10,7 @@ var (
 	AlipayWebTransactionDataCsvFileImporter = &alipayWebTransactionDataCsvFileImporter{
 		alipayTransactionDataCsvFileImporter{
 			fileHeaderLine:         "支付宝交易记录明细查询",
-			dataHeaderStartContent: "交易记录明细列表",
+			dataHeaderStartContent: []string{"交易记录明细列表"},
 			dataBottomEndLineRune:  '-',
 			originalColumnNames: alipayTransactionColumnNames{
 				timeColumnName:           "交易创建时间",

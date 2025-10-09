@@ -160,9 +160,29 @@
             </div>
         </template>
         <template #item.sourceAmount="{ item }">
-            <span>{{ getTransactionDisplayAmount(item) }}</span>
-            <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
-            <span v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId">{{ getTransactionDisplayDestinationAmount(item) }}</span>
+            <div class="d-flex align-center" v-if="editingTransaction !== item">
+                <span>{{ getTransactionDisplayAmount(item) }}</span>
+                <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
+                <span v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId">{{ getTransactionDisplayDestinationAmount(item) }}</span>
+            </div>
+            <div class="d-flex align-center" :style="`width: ${item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId ? 250 : 100}px`" v-if="editingTransaction === item">
+                <amount-input density="compact" variant="plain"
+                              persistent-placeholder
+                              :currency="item.originalSourceAccountCurrency || defaultCurrency"
+                              :show-currency="true"
+                              :disabled="!!disabled"
+                              :placeholder="tt('Amount')"
+                              v-model="item.sourceAmount"/>
+                <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
+                <amount-input density="compact" variant="plain"
+                              persistent-placeholder
+                              :currency="item.originalDestinationAccountCurrency || defaultCurrency"
+                              :show-currency="true"
+                              :disabled="!!disabled"
+                              :placeholder="tt('Transfer In Amount')"
+                              v-model="item.destinationAmount"
+                              v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"/>
+            </div>
         </template>
         <template #item.actualSourceAccountName="{ item }">
             <div class="d-flex align-center" v-if="editingTransaction !== item">
@@ -178,7 +198,7 @@
                     <span>{{ item.originalDestinationAccountName }}</span>
                 </div>
             </div>
-            <div class="d-flex align-center" style="width: 200px" v-if="editingTransaction === item">
+            <div class="d-flex align-center" :style="`width: ${item.type === TransactionType.Transfer ? 450 : 200}px`"  v-if="editingTransaction === item">
                 <two-column-select density="compact" variant="plain"
                                    primary-key-field="id" primary-value-field="category"
                                    primary-title-field="name" primary-footer-field="displayBalance"
@@ -269,6 +289,17 @@
                         </v-list-item>
                     </template>
                 </v-autocomplete>
+            </div>
+        </template>
+        <template #item.comment="{ item }">
+            <span v-if="editingTransaction !== item">{{ item.comment || '' }}</span>
+            <div v-if="editingTransaction === item">
+                <v-text-field style="width: 200px" type="text"
+                              density="compact" variant="plain"
+                              persistent-placeholder
+                              :placeholder="tt('Description')"
+                              :disabled="!!disabled"
+                              v-model="item.comment" />
             </div>
         </template>
         <template #bottom>
@@ -1933,5 +1964,9 @@ defineExpose({
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.import-transaction-table .v-text-field.v-input.v-input--density-compact .v-field__input {
+    padding-top: 0;
 }
 </style>

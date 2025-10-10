@@ -16,10 +16,11 @@ import (
 )
 
 const (
-	ebkWorkDirEnvName     = "EBK_WORK_DIR"
-	ebkEnvNamePrefix      = "EBK"
-	defaultConfigPath     = "/conf/ezbookkeeping.ini"
-	defaultStaticRootPath = "public"
+	ebkWorkDirEnvName                  = "EBK_WORK_DIR"
+	ebkConfigItemValueEnvNamePrefix    = "EBK"
+	ebkConfigItemFilePathEnvNamePrefix = "EBKCFP"
+	defaultConfigPath                  = "/conf/ezbookkeeping.ini"
+	defaultStaticRootPath              = "public"
 )
 
 // SystemMode represents running mode of system
@@ -1183,8 +1184,7 @@ func getNotificationConfiguration(configFile *ini.File, sectionName string, enab
 }
 
 func getConfigItemIsSet(configFile *ini.File, sectionName string, itemName string) bool {
-	environmentKey := getEnvironmentKey(sectionName, itemName)
-	environmentValue := os.Getenv(environmentKey)
+	environmentValue := getConfigItemValueFromEnvironment(sectionName, itemName)
 
 	if len(environmentValue) > 0 {
 		return true
@@ -1200,8 +1200,7 @@ func getConfigItemIsSet(configFile *ini.File, sectionName string, itemName strin
 }
 
 func getConfigItemStringValue(configFile *ini.File, sectionName string, itemName string, defaultValue ...string) string {
-	environmentKey := getEnvironmentKey(sectionName, itemName)
-	environmentValue := os.Getenv(environmentKey)
+	environmentValue := getConfigItemValueFromEnvironment(sectionName, itemName)
 
 	if len(environmentValue) > 0 {
 		return environmentValue
@@ -1217,8 +1216,7 @@ func getConfigItemStringValue(configFile *ini.File, sectionName string, itemName
 }
 
 func getConfigItemUint8Value(configFile *ini.File, sectionName string, itemName string, defaultValue uint8) uint8 {
-	environmentKey := getEnvironmentKey(sectionName, itemName)
-	environmentValue := os.Getenv(environmentKey)
+	environmentValue := getConfigItemValueFromEnvironment(sectionName, itemName)
 
 	if len(environmentValue) > 0 {
 		value, err := strconv.ParseUint(environmentValue, 10, 8)
@@ -1239,8 +1237,7 @@ func getConfigItemUint8Value(configFile *ini.File, sectionName string, itemName 
 }
 
 func getConfigItemUint16Value(configFile *ini.File, sectionName string, itemName string, defaultValue uint16) uint16 {
-	environmentKey := getEnvironmentKey(sectionName, itemName)
-	environmentValue := os.Getenv(environmentKey)
+	environmentValue := getConfigItemValueFromEnvironment(sectionName, itemName)
 
 	if len(environmentValue) > 0 {
 		value, err := strconv.ParseUint(environmentValue, 10, 16)
@@ -1261,8 +1258,7 @@ func getConfigItemUint16Value(configFile *ini.File, sectionName string, itemName
 }
 
 func getConfigItemUint32Value(configFile *ini.File, sectionName string, itemName string, defaultValue uint32) uint32 {
-	environmentKey := getEnvironmentKey(sectionName, itemName)
-	environmentValue := os.Getenv(environmentKey)
+	environmentValue := getConfigItemValueFromEnvironment(sectionName, itemName)
 
 	if len(environmentValue) > 0 {
 		value, err := strconv.ParseUint(environmentValue, 10, 32)
@@ -1283,8 +1279,7 @@ func getConfigItemUint32Value(configFile *ini.File, sectionName string, itemName
 }
 
 func getConfigItemBoolValue(configFile *ini.File, sectionName string, itemName string, defaultValue bool) bool {
-	environmentKey := getEnvironmentKey(sectionName, itemName)
-	environmentValue := os.Getenv(environmentKey)
+	environmentValue := getConfigItemValueFromEnvironment(sectionName, itemName)
 
 	if len(environmentValue) > 0 {
 		value, err := strconv.ParseBool(environmentValue)
@@ -1298,8 +1293,30 @@ func getConfigItemBoolValue(configFile *ini.File, sectionName string, itemName s
 	return section.Key(itemName).MustBool(defaultValue)
 }
 
-func getEnvironmentKey(sectionName string, itemName string) string {
-	return fmt.Sprintf("%s_%s_%s", ebkEnvNamePrefix, strings.ToUpper(sectionName), strings.ToUpper(itemName))
+func getConfigItemValueFromEnvironment(sectionName string, itemName string) string {
+	itemFilePathEnvironmentKey := getConfigItemFilePathEnvironmentKey(sectionName, itemName)
+	itemFilePath := os.Getenv(itemFilePathEnvironmentKey)
+
+	if itemFilePath != "" {
+		content, err := os.ReadFile(itemFilePath)
+
+		if err == nil {
+			return string(content)
+		}
+	}
+
+	itemValueEnvironmentKey := getConfigItemValueEnvironmentKey(sectionName, itemName)
+	itemValueEnvironmentValue := os.Getenv(itemValueEnvironmentKey)
+
+	return itemValueEnvironmentValue
+}
+
+func getConfigItemFilePathEnvironmentKey(sectionName string, itemName string) string {
+	return fmt.Sprintf("%s_%s_%s", ebkConfigItemFilePathEnvNamePrefix, strings.ToUpper(sectionName), strings.ToUpper(itemName))
+}
+
+func getConfigItemValueEnvironmentKey(sectionName string, itemName string) string {
+	return fmt.Sprintf("%s_%s_%s", ebkConfigItemValueEnvNamePrefix, strings.ToUpper(sectionName), strings.ToUpper(itemName))
 }
 
 func getLogLevel(logLevelStr string) (Level, error) {

@@ -197,7 +197,7 @@ import SnackBar from '@/components/desktop/SnackBar.vue';
 import { ref, computed, useTemplateRef, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { useAccountEditPageBaseBase } from '@/views/base/accounts/AccountEditPageBase.ts';
+import { useAccountEditPageBase } from '@/views/base/accounts/AccountEditPageBase.ts';
 
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
@@ -244,7 +244,7 @@ const {
     isNewAccount,
     addSubAccount,
     setAccount
-} = useAccountEditPageBaseBase();
+} = useAccountEditPageBase();
 
 const userStore = useUserStore();
 const accountsStore = useAccountsStore();

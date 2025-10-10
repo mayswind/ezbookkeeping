@@ -16,7 +16,7 @@ export interface DayAndDisplayName {
     readonly displayName: string;
 }
 
-export function useAccountEditPageBaseBase() {
+export function useAccountEditPageBase() {
     const { tt, getAllAccountCategories, getAllAccountTypes, getMonthdayShortName } = useI18n();
 
     const userStore = useUserStore();

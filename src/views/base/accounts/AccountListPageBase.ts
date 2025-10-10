@@ -13,7 +13,7 @@ import type { Account, CategorizedAccount } from '@/models/account.ts';
 
 import { isObject, isNumber, isString } from '@/lib/common.ts';
 
-export function useAccountListPageBaseBase() {
+export function useAccountListPageBase() {
     const { formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
 
     const settingsStore = useSettingsStore();

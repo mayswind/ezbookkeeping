@@ -221,7 +221,7 @@ import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
-import { useAccountListPageBaseBase } from '@/views/base/accounts/AccountListPageBase.ts';
+import { useAccountListPageBase } from '@/views/base/accounts/AccountListPageBase.ts';
 
 import { useRootStore } from '@/stores/index.ts';
 import { useAccountsStore } from '@/stores/account.ts';
@@ -251,7 +251,7 @@ const {
     totalLiabilities,
     accountCategoryTotalBalance,
     accountBalance
-} = useAccountListPageBaseBase();
+} = useAccountListPageBase();
 
 const rootStore = useRootStore();
 const accountsStore = useAccountsStore();

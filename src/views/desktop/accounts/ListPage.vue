@@ -312,7 +312,7 @@ import { ref, computed, useTemplateRef, watch } from 'vue';
 import { useDisplay } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { useAccountListPageBaseBase } from '@/views/base/accounts/AccountListPageBase.ts';
+import { useAccountListPageBase } from '@/views/base/accounts/AccountListPageBase.ts';
 
 import { useAccountsStore } from '@/stores/account.ts';
 
@@ -364,7 +364,7 @@ const {
     totalLiabilities,
     accountCategoryTotalBalance,
     accountBalance
-} = useAccountListPageBaseBase();
+} = useAccountListPageBase();
 
 const accountsStore = useAccountsStore();
 

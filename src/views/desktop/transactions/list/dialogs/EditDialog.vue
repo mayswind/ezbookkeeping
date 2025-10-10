@@ -207,7 +207,7 @@
                                                                    secondary-title-field="name" secondary-footer-field="displayBalance"
                                                                    secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
                                                                    :readonly="mode === TransactionEditPageMode.View"
-                                                                   :disabled="loading || submitting || !allVisibleAccounts.length"
+                                                                   :disabled="loading || submitting || !allVisibleAccounts.length || (mode === TransactionEditPageMode.Edit && transaction.type === TransactionType.ModifyBalance)"
                                                                    :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
                                                                    :custom-selection-primary-text="sourceAccountName"
                                                                    :label="tt(sourceAccountTitle)"
@@ -247,7 +247,7 @@
                                 <v-col cols="12" md="6" v-if="type === TransactionEditPageType.Transaction">
                                     <date-time-select
                                         :readonly="mode === TransactionEditPageMode.View"
-                                        :disabled="loading || submitting"
+                                        :disabled="loading || submitting || (mode === TransactionEditPageMode.Edit && transaction.type === TransactionType.ModifyBalance)"
                                         :label="tt('Transaction Time')"
                                         v-model="transaction.time"
                                         @error="onShowDateTimeError" />
@@ -268,7 +268,7 @@
                                         auto-select-first
                                         persistent-placeholder
                                         :readonly="mode === TransactionEditPageMode.View"
-                                        :disabled="loading || submitting"
+                                        :disabled="loading || submitting || (mode === TransactionEditPageMode.Edit && transaction.type === TransactionType.ModifyBalance)"
                                         :label="tt('Transaction Timezone')"
                                         :placeholder="!transaction.timeZone && transaction.timeZone !== '' ? `(${transactionDisplayTimezone}) ${transactionTimezoneTimeDifference}` : tt('Timezone')"
                                         :items="allTimezones"

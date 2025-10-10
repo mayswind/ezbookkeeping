@@ -279,6 +279,12 @@ type TransactionGetRequest struct {
 	TrimTag      bool  `form:"trim_tag"`
 }
 
+// TransactionMoveBetweenAccountsRequest represents all parameters of moving all transactions between accounts request
+type TransactionMoveBetweenAccountsRequest struct {
+	FromAccountId int64 `json:"fromAccountId,string" binding:"required,min=1"`
+	ToAccountId   int64 `json:"toAccountId,string" binding:"required,min=1"`
+}
+
 // TransactionDeleteRequest represents all parameters of transaction deleting request
 type TransactionDeleteRequest struct {
 	Id int64 `json:"id,string" binding:"required,min=1"`

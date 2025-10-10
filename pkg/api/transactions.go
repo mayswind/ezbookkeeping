@@ -1114,6 +1114,63 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 	return newTransactionResp, nil
 }
 
+// TransactionMoveAllBetweenAccountsHandler moves all transactions from one account to another account for current user
+func (a *TransactionsApi) TransactionMoveAllBetweenAccountsHandler(c *core.WebContext) (any, *errs.Error) {
+	var transactionMoveReq models.TransactionMoveBetweenAccountsRequest
+	err := c.ShouldBindJSON(&transactionMoveReq)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionMoveAllBetweenAccountsHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	if transactionMoveReq.FromAccountId == transactionMoveReq.ToAccountId {
+		return nil, errs.ErrCannotMoveTransactionToSameAccount
+	}
+
+	uid := c.GetCurrentUid()
+	accountMap, err := a.accounts.GetAccountsByAccountIds(c, uid, []int64{transactionMoveReq.FromAccountId, transactionMoveReq.ToAccountId})
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionMoveAllBetweenAccountsHandler] failed to get accounts for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	fromAccount, exists := accountMap[transactionMoveReq.FromAccountId]
+
+	if !exists {
+		return nil, errs.ErrSourceAccountNotFound
+	}
+
+	toAccount, exists := accountMap[transactionMoveReq.ToAccountId]
+
+	if !exists {
+		return nil, errs.ErrDestinationAccountNotFound
+	}
+
+	if fromAccount.Hidden || toAccount.Hidden {
+		return nil, errs.ErrCannotMoveTransactionFromOrToHiddenAccount
+	}
+
+	if fromAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS || toAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
+		return nil, errs.ErrCannotMoveTransactionFromOrToParentAccount
+	}
+
+	if fromAccount.Currency != toAccount.Currency {
+		return nil, errs.ErrCannotMoveTransactionBetweenAccountsWithDifferentCurrencies
+	}
+
+	err = a.transactions.MoveAllTransactionsBetweenAccounts(c, uid, transactionMoveReq.FromAccountId, transactionMoveReq.ToAccountId)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionMoveAllBetweenAccountsHandler] failed to move all transactions from account \"id:%d\" to account \"id:%d\" for user \"uid:%d\", because %s", transactionMoveReq.FromAccountId, transactionMoveReq.ToAccountId, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.Infof(c, "[transactions.TransactionMoveAllBetweenAccountsHandler] user \"uid:%d\" has moved all transactions from account \"id:%d\" to account \"id:%d\" successfully", uid, transactionMoveReq.FromAccountId, transactionMoveReq.ToAccountId)
+	return true, nil
+}
+
 // TransactionDeleteHandler deletes an existed transaction by request parameters for current user
 func (a *TransactionsApi) TransactionDeleteHandler(c *core.WebContext) (any, *errs.Error) {
 	var transactionDeleteReq models.TransactionDeleteRequest

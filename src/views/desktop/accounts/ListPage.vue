@@ -250,10 +250,21 @@
                                                                     </v-btn>
                                                                     <v-btn class="px-2 ms-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
-                                                                           :disabled="loading" :prepend-icon="mdiEraser"
-                                                                           v-if="element.type === AccountType.SingleAccount.type || element.getSubAccount(activeSubAccount[element.id])"
-                                                                           @click="clearAllTransactions(element)">
-                                                                        {{ tt('Clear All Transactions') }}
+                                                                           :disabled="loading" :prepend-icon="mdiDotsHorizontalCircleOutline"
+                                                                           v-if="element.type === AccountType.SingleAccount.type || element.getSubAccount(activeSubAccount[element.id])">
+                                                                        {{ tt('More') }}
+                                                                        <v-menu activator="parent" :open-on-hover="true">
+                                                                            <v-list>
+                                                                                <v-list-item class="text-sm" density="compact"
+                                                                                             :title="tt('Move All Transactions')"
+                                                                                             :prepend-icon="mdiSwapHorizontal"
+                                                                                             @click="moveAllTransactions(element)"></v-list-item>
+                                                                                <v-list-item class="text-sm" density="compact"
+                                                                                             :title="tt('Clear All Transactions')"
+                                                                                             :prepend-icon="mdiEraser"
+                                                                                             @click="clearAllTransactions(element)"></v-list-item>
+                                                                            </v-list>
+                                                                        </v-menu>
                                                                     </v-btn>
                                                                     <v-btn class="px-2 ms-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
@@ -289,6 +300,7 @@
     <edit-dialog ref="editDialog" />
     <reconciliation-statement-dialog ref="reconciliationStatementDialog"
                                      @error="onShowDateRangeError" />
+    <move-all-transactions-dialog ref="moveAllTransactionsDialog" />
     <clear-all-transactions-dialog ref="clearAllTransactionsDialog" />
 
     <date-range-selection-dialog :title="tt('Custom Date Range')"
@@ -305,6 +317,7 @@ import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import EditDialog from './list/dialogs/EditDialog.vue';
 import ReconciliationStatementDialog from './list/dialogs/ReconciliationStatementDialog.vue';
+import MoveAllTransactionsDialog from '@/views/desktop/accounts/list/dialogs/MoveAllTransactionsDialog.vue';
 import ClearAllTransactionsDialog from '@/views/desktop/accounts/list/dialogs/ClearAllTransactionsDialog.vue';
 import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
 
@@ -331,6 +344,8 @@ import {
     mdiSquareRounded,
     mdiMenu,
     mdiPencilOutline,
+    mdiDotsHorizontalCircleOutline,
+    mdiSwapHorizontal,
     mdiEraser,
     mdiDeleteOutline,
     mdiListBoxOutline,
@@ -343,6 +358,7 @@ type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 type ReconciliationStatementDialogType = InstanceType<typeof ReconciliationStatementDialog>;
+type MoveAllTransactionsDialogType = InstanceType<typeof MoveAllTransactionsDialog>;
 type ClearAllTransactionsDialogType = InstanceType<typeof ClearAllTransactionsDialog>;
 
 const display = useDisplay();
@@ -372,6 +388,7 @@ const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 const reconciliationStatementDialog = useTemplateRef<ReconciliationStatementDialogType>('reconciliationStatementDialog');
+const moveAllTransactionsDialog = useTemplateRef<MoveAllTransactionsDialogType>('moveAllTransactionsDialog');
 const clearAllTransactionsDialog = useTemplateRef<ClearAllTransactionsDialogType>('clearAllTransactionsDialog');
 
 const activeAccountCategoryType = ref<number>(AccountCategory.Default.type);
@@ -522,6 +539,16 @@ function showReconciliationStatementCustomDateRangeDialog(account: Account, date
         accountId: account.id,
         startTime: dateRange.minTime,
         endTime: dateRange.maxTime
+    });
+}
+
+function moveAllTransactions(account: Account): void {
+    moveAllTransactionsDialog.value?.open(account).then(() => {
+        snackbar.value?.showMessage('All transactions in this account has been moved.');
+
+        if (accountsStore.accountListStateInvalid && !loading.value) {
+            reload(false);
+        }
     });
 }
 

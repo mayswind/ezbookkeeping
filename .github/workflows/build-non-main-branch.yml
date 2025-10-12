@@ -6,27 +6,69 @@ on:
       - main
 
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      docker-tags: ${{ steps.meta.outputs.tags }}
+      docker-labels: ${{ steps.meta.outputs.labels }}
+      ezbookkeeping-docker-bake-meta-file-path: ${{ steps.variable.outputs.ezbookkeeping_docker_bake_meta_file_path }}
+      ezbookkeeping-docker-bake-meta-artifact-name: ${{ steps.variable.outputs.ezbookkeeping_docker_bake_meta_artifact_name }}
+      ezbookkeeping-docker-digests-file-path: ${{ steps.variable.outputs.ezbookkeeping_docker_digests_file_path }}
+      ezbookkeeping-docker-digests-artifact-name-prefix: ${{ steps.variable.outputs.ezbookkeeping_docker_digests_artifact_name_prefix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ vars.DOCKER_IMAGE_NAME }}
+          tags: |
+            type=raw,value=dev-${{ github.run_id }}
+
+      - name: Set up variables
+        id: variable
+        run: |
+          echo "ezbookkeeping_docker_bake_meta_file_path=${{ runner.temp }}/bake-meta.json" >> "$GITHUB_OUTPUT"
+          echo "ezbookkeeping_docker_bake_meta_artifact_name=ezbookkeeping-build-dev-docker-bake-meta-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          echo "ezbookkeeping_docker_digests_file_path=${{ runner.temp }}/digests" >> "$GITHUB_OUTPUT"
+          echo "ezbookkeeping_docker_digests_artifact_name_prefix=ezbookkeeping-dev-digests-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+
+      - name: Rename docker bake meta file
+        run: |
+          mv "${{ steps.meta.outputs.bake-file }}" "${{ steps.variable.outputs.ezbookkeeping_docker_bake_meta_file_path }}"
+
+      - name: Upload docker bake meta artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.variable.outputs.ezbookkeeping_docker_bake_meta_artifact_name }}
+          path: ${{ steps.variable.outputs.ezbookkeeping_docker_bake_meta_file_path }}
+          if-no-files-found: error
+
   build-linux-docker:
     runs-on: ubuntu-latest
+    needs:
+      - setup
+    strategy:
+      matrix:
+        include:
+          - platform: linux/amd64
+            platform-name: linux-amd64
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-      -
-        name: Login to DockerHub
-        uses: docker/login-action@v3
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - uses: ./.github/actions/build-linux-docker
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      -
-        name: Build
-        uses: docker/build-push-action@v6
-        with:
-          file: Dockerfile
-          context: .
-          platforms: linux/amd64
-          push: false
-          build-args: |
-            BUILD_PIPELINE=1
-            CHECK_3RD_API=${{ vars.CHECK_3RD_API }}
-            SKIP_TESTS=${{ vars.SKIP_TESTS }}
+          check-3rd-api: ${{ vars.CHECK_3RD_API }}
+          skip-tests: ${{ vars.SKIP_TESTS }}
+          platform: ${{ matrix.platform }}
+          platform-name: ${{ matrix.platform-name }}
+          docker-push: false
+          docker-image-name: ${{ vars.DOCKER_IMAGE_NAME }}
+          docker-bake-meta-file-path: ${{ needs.setup.outputs.ezbookkeeping-docker-bake-meta-file-path }}
+          docker-bake-meta-artifact-name: ${{ needs.setup.outputs.ezbookkeeping-docker-bake-meta-artifact-name }}
+          docker-bake-digests-file-path: ${{ needs.setup.outputs.ezbookkeeping-docker-digests-file-path }}
+          docker-bake-digests-artifact-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-docker-digests-artifact-name-prefix }}

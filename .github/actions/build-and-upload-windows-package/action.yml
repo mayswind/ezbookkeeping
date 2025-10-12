@@ -1,0 +1,57 @@
+name: Build packages for windows and upload to artifact
+
+inputs:
+  package-file-name-prefix:
+    required: true
+    type: string
+  package-artifact-name-prefix:
+    required: true
+    type: string
+  backend-artifact-name-prefix:
+    required: true
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download windows-x64 backend file
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ inputs.backend-artifact-name-prefix }}-windows-x64
+        path: ${{ runner.temp }}\backend
+
+    - name: Download linux-amd64 packaged files
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ inputs.package-artifact-name-prefix }}-linux-amd64
+        path: ${{ runner.temp }}\package
+
+    - name: Extract frontend files from linux-amd64 package
+      shell: pwsh
+      run: |
+        New-Item -ItemType Directory -Path package
+        tar -xzf (Get-ChildItem ${{ runner.temp }}\package\${{ inputs.package-file-name-prefix }}-linux-amd64.tar.gz) -C package
+
+    - name: Package windows-x64 package
+      shell: pwsh
+      run: |
+        New-Item -ItemType Directory -Path "ezbookkeeping"
+        New-Item -ItemType Directory -Path "ezbookkeeping\data"
+        New-Item -ItemType Directory -Path "ezbookkeeping\storage"
+        New-Item -ItemType Directory -Path "ezbookkeeping\log"
+        Copy-Item ${{ runner.temp }}\backend\ezbookkeeping.exe -Destination ezbookkeeping\
+        Copy-Item -Recurse -Force package\public -Destination ezbookkeeping\public
+        Copy-Item -Recurse -Force conf -Destination ezbookkeeping\conf
+        Copy-Item -Recurse -Force templates -Destination ezbookkeeping\templates
+        Copy-Item .\LICENSE -Destination ezbookkeeping\
+        Push-Location ezbookkeeping
+        7z a -r -tzip -mx9 ..\${{ inputs.package-file-name-prefix }}-windows-x64.zip *
+        Pop-Location
+        Remove-Item -Recurse -Force ezbookkeeping
+
+    - name: Upload windows artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.package-artifact-name-prefix }}-windows-x64
+        path: ${{ inputs.package-file-name-prefix }}-windows-x64.zip
+        if-no-files-found: error

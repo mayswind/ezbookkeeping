@@ -1,0 +1,68 @@
+name: Build backend file for windows
+
+inputs:
+  go-version:
+    required: false
+    default: "1.25.1"
+  mingw-version:
+    required: false
+    default: "14.2.0"
+  mingw-revison:
+    required: false
+    default: "v12-rev2"
+  release-build:
+    required: false
+    type: string
+  check-3rd-api:
+    required: false
+    type: string
+  skip-tests:
+    required: false
+    type: string
+  backend-artifact-name-prefix:
+    required: true
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Go
+      uses: actions/setup-go@v6
+      with:
+        go-version: ${{ inputs.go-version }}
+
+    - name: Install MinGW
+      shell: pwsh
+      run: |
+        $mingwVersion = "${{ inputs.mingw-version }}"
+        $mingwRevision = "${{ inputs.mingw-revison }}"
+        $url = "https://github.com/niXman/mingw-builds-binaries/releases/download/${mingwVersion}-rt_${mingwRevision}/x86_64-${mingwVersion}-release-posix-seh-ucrt-rt_${mingwRevision}.7z"
+        $archive = "C:\mingw.7z"
+        $mingwDir = "C:\mingw64"
+
+        Write-Host "Downloading MinGW from ${url}"
+        Invoke-WebRequest -Uri ${url} -OutFile ${archive}
+
+        Remove-Item -Recurse -Force ${mingwDir}
+        New-Item -ItemType Directory -Path ${mingwDir}
+
+        Write-Host "Extracting MinGW to ${mingwDir}"
+        7z x ${archive} -oC:\
+        "${mingwDir}\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+    - name: Build backend for windows-x64
+      shell: pwsh
+      env:
+        RELEASE_BUILD: "${{ inputs.release-build }}"
+        BUILD_PIPELINE: "1"
+        CHECK_3RD_API: "${{ inputs.check-3rd-api }}"
+        SKIP_TESTS: "${{ inputs.skip-tests }}"
+      run: |
+        .\build.ps1 backend
+
+    - name: Upload windows backend artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.backend-artifact-name-prefix }}-windows-x64
+        path: ezbookkeeping.exe
+        if-no-files-found: error

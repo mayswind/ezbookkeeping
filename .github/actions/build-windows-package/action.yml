@@ -1,4 +1,4 @@
-name: Build packages for windows and upload to artifact
+name: Build packages for windows
 
 inputs:
   package-file-name-prefix:

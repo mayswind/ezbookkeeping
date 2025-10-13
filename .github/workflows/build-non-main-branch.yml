@@ -15,6 +15,9 @@ jobs:
       ezbookkeeping-docker-bake-meta-artifact-name: ${{ steps.variable.outputs.ezbookkeeping_docker_bake_meta_artifact_name }}
       ezbookkeeping-docker-digests-file-path: ${{ steps.variable.outputs.ezbookkeeping_docker_digests_file_path }}
       ezbookkeeping-docker-digests-artifact-name-prefix: ${{ steps.variable.outputs.ezbookkeeping_docker_digests_artifact_name_prefix }}
+      ezbookkeeping-package-file-name-prefix: ${{ steps.variable.outputs.ezbookkeeping_package_file_name_prefix }}
+      ezbookkeeping-package-artifact-name-prefix: ${{ steps.variable.outputs.ezbookkeeping_package_artifact_name_prefix }}
+      ezbookkeeping-backend-artifact-name-prefix: ${{ steps.variable.outputs.ezbookkeeping_backend_artifact_name_prefix }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -34,7 +37,10 @@ jobs:
           echo "ezbookkeeping_docker_bake_meta_file_path=${{ runner.temp }}/bake-meta.json" >> "$GITHUB_OUTPUT"
           echo "ezbookkeeping_docker_bake_meta_artifact_name=ezbookkeeping-build-dev-docker-bake-meta-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
           echo "ezbookkeeping_docker_digests_file_path=${{ runner.temp }}/digests" >> "$GITHUB_OUTPUT"
-          echo "ezbookkeeping_docker_digests_artifact_name_prefix=ezbookkeeping-dev-digests-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          echo "ezbookkeeping_docker_digests_artifact_name_prefix=ezbookkeeping-build-dev-digests-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          echo "ezbookkeeping_package_file_name_prefix=ezbookkeeping-dev-package-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          echo "ezbookkeeping_package_artifact_name_prefix=ezbookkeeping-build-dev-package-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          echo "ezbookkeeping_backend_artifact_name_prefix=ezbookkeeping-build-dev-backend-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
 
       - name: Rename docker bake meta file
         run: |
@@ -47,20 +53,47 @@ jobs:
           path: ${{ steps.variable.outputs.ezbookkeeping_docker_bake_meta_file_path }}
           if-no-files-found: error
 
-  build-linux-docker:
-    runs-on: ubuntu-latest
+  build-linux-docker-and-package-x86:
+    runs-on: ubuntu-24.04
+    needs:
+      - setup
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - uses: ./.github/actions/build-linux-docker-and-package
+        with:
+          check-3rd-api: ${{ vars.CHECK_3RD_API }}
+          skip-tests: ${{ vars.SKIP_TESTS }}
+          platform: linux/amd64
+          platform-name: linux-amd64
+          docker-push: false
+          docker-image-name: ${{ vars.DOCKER_IMAGE_NAME }}
+          docker-bake-meta-file-path: ${{ needs.setup.outputs.ezbookkeeping-docker-bake-meta-file-path }}
+          docker-bake-meta-artifact-name: ${{ needs.setup.outputs.ezbookkeeping-docker-bake-meta-artifact-name }}
+          docker-bake-digests-file-path: ${{ needs.setup.outputs.ezbookkeeping-docker-digests-file-path }}
+          docker-bake-digests-artifact-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-docker-digests-artifact-name-prefix }}
+          package-file-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-package-file-name-prefix }}
+          package-artifact-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-package-artifact-name-prefix }}
+
+  build-linux-docker-and-package-arm:
+    runs-on: ubuntu-24.04-arm
     needs:
       - setup
     strategy:
       matrix:
         include:
-          - platform: linux/amd64
-            platform-name: linux-amd64
+          - platform: linux/arm64/v8
+            platform-name: linux-arm64
+          - platform: linux/arm/v7
+            platform-name: linux-armv7
+          - platform: linux/arm/v6
+            platform-name: linux-armv6
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - uses: ./.github/actions/build-linux-docker
+      - uses: ./.github/actions/build-linux-docker-and-package
         with:
           check-3rd-api: ${{ vars.CHECK_3RD_API }}
           skip-tests: ${{ vars.SKIP_TESTS }}
@@ -72,3 +105,35 @@ jobs:
           docker-bake-meta-artifact-name: ${{ needs.setup.outputs.ezbookkeeping-docker-bake-meta-artifact-name }}
           docker-bake-digests-file-path: ${{ needs.setup.outputs.ezbookkeeping-docker-digests-file-path }}
           docker-bake-digests-artifact-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-docker-digests-artifact-name-prefix }}
+          package-file-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-package-file-name-prefix }}
+          package-artifact-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-package-artifact-name-prefix }}
+
+  build-windows-backend:
+    needs:
+      - setup
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - uses: ./.github/actions/build-windows-backend
+        with:
+          check-3rd-api: ${{ vars.CHECK_3RD_API }}
+          skip-tests: ${{ vars.SKIP_TESTS }}
+          backend-artifact-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-backend-artifact-name-prefix }}
+
+  build-windows-package:
+    needs:
+      - setup
+      - build-windows-backend
+      - build-linux-docker-and-package-x86
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - uses: ./.github/actions/build-windows-package
+        with:
+          package-file-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-package-file-name-prefix }}
+          package-artifact-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-package-artifact-name-prefix }}
+          backend-artifact-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-backend-artifact-name-prefix }}

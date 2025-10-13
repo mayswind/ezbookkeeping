@@ -1,4 +1,4 @@
-name: Build docker image for linux
+name: Build docker image and package for linux
 
 inputs:
   release-build:
@@ -40,6 +40,12 @@ inputs:
   docker-bake-digests-artifact-name-prefix:
     required: true
     type: string
+  package-file-name-prefix:
+    required: true
+    type: string
+  package-artifact-name-prefix:
+    required: true
+    type: string
 
 runs:
   using: "composite"
@@ -71,7 +77,6 @@ runs:
           ./docker-bake.hcl
           cwd://${{ inputs.docker-bake-meta-file-path }}
         source: .
-        load: true
         targets: image
         set: |
           *.tags=${{ inputs.docker-image-name }}
@@ -80,8 +85,8 @@ runs:
           *.args.BUILD_PIPELINE=1
           *.args.CHECK_3RD_API=${{ inputs.check-3rd-api }}
           *.args.SKIP_TESTS=${{ inputs.skip-tests }}
-          *.output=type=image,push-by-digest=${{ inputs.docker-push }},name-canonical=true,push=${{ inputs.docker-push }}
-          *.output+=type=tar,dest=${{ runner.temp }}/docker-image.tar
+          *.output=type=image,push-by-digest=true,name-canonical=true,push=${{ inputs.docker-push }}
+          *.output+=type=local,dest=${{ runner.temp }}/package
 
     - name: Export digests file for ${{ inputs.platform-name }}
       shell: bash
@@ -90,9 +95,22 @@ runs:
         mkdir -p ${{ inputs.docker-bake-digests-file-path }}
         touch "${{ inputs.docker-bake-digests-file-path }}/${digest#sha256:}"
 
+    - name: Build package file for ${{ inputs.platform-name }}
+      shell: bash
+      run: |
+        cd ${{ runner.temp }}/package/ezbookkeeping
+        tar -czf ${{ runner.temp }}/${{ inputs.package-file-name-prefix }}-${{ inputs.platform-name }}.tar.gz *
+
     - name: Upload ${{ inputs.platform-name }} digests artifact
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.docker-bake-digests-artifact-name-prefix }}-${{ inputs.platform-name }}
         path: ${{ inputs.docker-bake-digests-file-path }}/*
+        if-no-files-found: error
+
+    - name: Upload artifact for ${{ inputs.platform-name }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.package-artifact-name-prefix }}-${{ inputs.platform-name }}
+        path: ${{ runner.temp }}/${{ inputs.package-file-name-prefix }}-${{ inputs.platform-name }}.tar.gz
         if-no-files-found: error

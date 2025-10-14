@@ -598,6 +598,7 @@ function remove(account: Account): void {
             accountsStore.deleteSubAccount({
                 subAccount: subAccount
             }).then(() => {
+                activeSubAccount.value[account.id] = '';
                 loading.value = false;
             }).catch(error => {
                 loading.value = false;

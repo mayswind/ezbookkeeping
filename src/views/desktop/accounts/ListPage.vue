@@ -258,11 +258,11 @@
                                                                                 <v-list-item class="text-sm" density="compact"
                                                                                              :title="tt('Move All Transactions')"
                                                                                              :prepend-icon="mdiSwapHorizontal"
-                                                                                             @click="moveAllTransactions(element)"></v-list-item>
+                                                                                             @click="moveAllTransactions(element.getAccountOrSubAccount(activeSubAccount[element.id]))"></v-list-item>
                                                                                 <v-list-item class="text-sm" density="compact"
                                                                                              :title="tt('Clear All Transactions')"
                                                                                              :prepend-icon="mdiEraser"
-                                                                                             @click="clearAllTransactions(element)"></v-list-item>
+                                                                                             @click="clearAllTransactions(element.getAccountOrSubAccount(activeSubAccount[element.id]))"></v-list-item>
                                                                             </v-list>
                                                                         </v-menu>
                                                                     </v-btn>

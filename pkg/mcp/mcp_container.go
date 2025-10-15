@@ -73,6 +73,7 @@ func InitializeMCPHandlers(config *settings.Config) error {
 	registerMCPTextContentToolHandler(container, MCPAddTransactionToolHandler)
 	registerMCPTextContentToolHandler(container, MCPQueryTransactionsToolHandler)
 	registerMCPTextContentToolHandler(container, MCPQueryAllAccountsToolHandler)
+	registerMCPTextContentToolHandler(container, MCPQueryAllAccountsBalanceToolHandler)
 	registerMCPTextContentToolHandler(container, MCPQueryAllTransactionCategoriesToolHandler)
 	registerMCPTextContentToolHandler(container, MCPQueryAllTransactionTagsToolHandler)
 	registerMCPTextContentToolHandler(container, MCPQueryLatestExchangeRatesToolHandler)

@@ -1905,6 +1905,8 @@ export function useI18n() {
             return undefined;
         }
 
+        const dateTimeFormatOptions = getDateTimeFormatOptions({ calendarType: calendarDisplayType });
+
         if (calendarDisplayType === CalendarType.Chinese) {
             const chineseCalendarLocaleData = getChineseCalendarLocaleData();
             const chineseDates: ChineseYearMonthDayInfo[] | undefined = getChineseYearMonthAllDayInfos(yearMonth, chineseCalendarLocaleData);
@@ -1922,7 +1924,6 @@ export function useI18n() {
 
             return ret;
         } else if (calendarDisplayType === CalendarType.Persian) {
-            const dateTimeFormatOptions = getDateTimeFormatOptions();
             const monthDays: number = getGregorianCalendarYearMonthDays(yearMonth);
             const ret: CalendarAlternateDate[] = [];
 
@@ -1944,6 +1945,8 @@ export function useI18n() {
             return undefined;
         }
 
+        const dateTimeFormatOptions = getDateTimeFormatOptions({ calendarType: calendarDisplayType });
+
         if (calendarDisplayType === CalendarType.Chinese) {
             const chineseCalendarLocaleData = getChineseCalendarLocaleData();
             const chineseDate: ChineseYearMonthDayInfo | undefined = getChineseYearMonthDayInfo(yearMonthDay, chineseCalendarLocaleData);
@@ -1954,7 +1957,6 @@ export function useI18n() {
 
             return getChineseCalendarAlternateDisplayDate(chineseDate);
         } else if (calendarDisplayType === CalendarType.Persian) {
-            const dateTimeFormatOptions = getDateTimeFormatOptions();
             const dateTime = getYearMonthDayDateTime(yearMonthDay.year, yearMonthDay.month, yearMonthDay.day);
             return getCalendarAlternateDisplayDate(dateTime, dateTimeFormatOptions);
         }

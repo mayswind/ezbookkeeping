@@ -2221,6 +2221,7 @@
     "Hide Hidden Transaction Templates": "Ocultar plantillas de transacciones ocultas",
     "Template name cannot be blank": "El nombre de la plantilla no puede estar en blanco",
     "Generate MCP token": "Generate MCP token",
+    "Your MCP token does not expire, please keep it secure. When connecting to third-party apps, be aware that they and any large language models they use may access your private data.": "Your MCP token does not expire, please keep it secure. When connecting to third-party apps, be aware that they and any large language models they use may access your private data.",
     "Unable to generate token": "Unable to generate token",
     "Are you sure you want to logout from this session?": "¿Está seguro de que desea cerrar sesión en esta sesión?",
     "Unable to logout from this session": "No se puede cerrar sesión en esta sesión",

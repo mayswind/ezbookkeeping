@@ -2221,6 +2221,7 @@
     "Hide Hidden Transaction Templates": "숨겨진 거래 템플릿 숨기기",
     "Template name cannot be blank": "템플릿 이름은 비워둘 수 없습니다.",
     "Generate MCP token": "MCP 토큰 생성",
+    "Your MCP token does not expire, please keep it secure. When connecting to third-party apps, be aware that they and any large language models they use may access your private data.": "Your MCP token does not expire, please keep it secure. When connecting to third-party apps, be aware that they and any large language models they use may access your private data.",
     "Unable to generate token": "토큰을 생성할 수 없습니다.",
     "Are you sure you want to logout from this session?": "이 세션에서 로그아웃하시겠습니까?",
     "Unable to logout from this session": "이 세션에서 로그아웃할 수 없습니다.",

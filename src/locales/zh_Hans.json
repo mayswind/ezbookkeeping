@@ -2221,6 +2221,7 @@
     "Hide Hidden Transaction Templates": "不显示隐藏的模板",
     "Template name cannot be blank": "模板名不能为空",
     "Generate MCP token": "生成 MCP 令牌",
+    "Your MCP token does not expire, please keep it secure. When connecting to third-party apps, be aware that they and any large language models they use may access your private data.": "您的 MCP 令牌不会过期，请妥善保管。当连接到第三方应用时，请注意它们及其使用的大语言模型（LLM）可能获取到您的隐私数据。",
     "Unable to generate token": "无法生成令牌",
     "Are you sure you want to logout from this session?": "您确定要退出该会话？",
     "Unable to logout from this session": "无法退出该会话",

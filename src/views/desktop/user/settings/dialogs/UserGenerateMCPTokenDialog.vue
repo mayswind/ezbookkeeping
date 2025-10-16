@@ -18,7 +18,7 @@
                 </v-switch>
             </v-card-text>
 
-            <v-card-text class="my-md-4 w-100 d-flex justify-center">
+            <v-card-text class="mt-md-4 w-100 d-flex justify-center">
                 <div class="w-100" v-if="!generatedToken">
                     <v-text-field
                         autocomplete="current-password"
@@ -38,6 +38,13 @@
                                 :rows="15" :value="mcpServerConfiguration" v-if="showConfiguration && serverUrl" />
                 </div>
             </v-card-text>
+
+            <v-card-text class="w-100">
+                <v-alert type="warning" variant="tonal">
+                    {{ tt('Your MCP token does not expire, please keep it secure. When connecting to third-party apps, be aware that they and any large language models they use may access your private data.') }}
+                </v-alert>
+            </v-card-text>
+
             <v-card-text class="overflow-y-visible">
                 <div ref="buttonContainer" class="w-100 d-flex justify-center gap-4">
                     <v-btn :disabled="generating || !currentPassword" @click="generateToken" v-if="!generatedToken">

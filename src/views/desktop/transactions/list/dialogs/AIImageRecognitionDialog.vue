@@ -13,9 +13,12 @@
                      @dragover.prevent
                      @dragleave.prevent="onDragLeave"
                      @drop.prevent="onDrop">
-                    <div class="d-flex w-100 fill-height justify-center align-center justify-content-center px-4"
+                    <div class="d-flex w-100 fill-height justify-center align-center justify-content-center text-center px-4"
                          :class="{ 'dropzone': true, 'dropzone-dragover': isDragOver }" style="height: 480px">
-                        <h3 :class="{ 'pa-2': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }" v-if="!loading && !imageFile && !isDragOver">{{ tt('You can drag and drop, paste or click to select a receipt or transaction image') }}</h3>
+                        <div class="d-inline-flex flex-column" v-if="!loading && !imageFile && !isDragOver">
+                            <h3 :class="{ 'pa-2': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }">{{ tt('You can drag and drop, paste or click to select a receipt or transaction image') }}</h3>
+                            <span :class="{ 'pa-2': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }">{{ tt('Uploaded image and personal data may be sent to the large language model, please be aware of potential privacy risks.') }}</span>
+                        </div>
                         <h3 :class="{ 'pa-2': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }" v-else-if="!loading && isDragOver">{{ tt('Release to load image') }}</h3>
                         <h3 class="pa-2" v-else-if="loading">{{ tt('Loading image...') }}</h3>
                         <h3 :class="{ 'pa-2': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }" v-else-if="recognizing">{{ tt('AI can make mistakes. Check important info.') }}</h3>

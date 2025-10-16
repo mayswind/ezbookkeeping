@@ -14,8 +14,11 @@
             <div class="image-container display-flex justify-content-center"
                  style="height: 400px" @click="showOpenImage">
                 <img height="400px" :src="imageSrc" v-if="imageSrc" />
-                <div class="image-container-background display-flex justify-content-center align-items-center padding-horizontal" v-if="!imageSrc">
-                    <span v-if=!loading>{{ tt('Click here to select a receipt or transaction image') }}</span>
+                <div class="image-container-background display-flex justify-content-center align-items-center text-align-center padding-horizontal" v-if="!imageSrc">
+                    <div class="display-inline-flex flex-direction-column" v-if="!loading">
+                        <span>{{ tt('Click here to select a receipt or transaction image') }}</span>
+                        <small class="margin-top-half">{{ tt('Uploaded image and personal data may be sent to the large language model, please be aware of potential privacy risks.') }}</small>
+                    </div>
                     <span v-else-if="loading">{{ tt('Loading image...') }}</span>
                 </div>
             </div>
@@ -190,7 +193,7 @@ function onSheetClosed(): void {
     width: 100%;
     height: 100%;
 
-    > span {
+    > div {
         font-size: var(--f7-input-font-size);
     }
 }

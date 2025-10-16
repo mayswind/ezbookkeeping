@@ -1749,6 +1749,7 @@
     "Release to load image": "放開以載入圖片",
     "Loading image...": "正在載入圖片...",
     "Click here to select a receipt or transaction image": "點擊這裡選擇收據或交易圖片",
+    "Uploaded image and personal data may be sent to the large language model, please be aware of potential privacy risks.": "上傳的圖片和個人資料可能會被發送到大型語言模型（LLM），請注意潛在的隱私風險。",
     "AI can make mistakes. Check important info.": "AI 可能會出錯。請檢查重要資訊。",
     "Category": "分類",
     "Secondary Category": "次分類",

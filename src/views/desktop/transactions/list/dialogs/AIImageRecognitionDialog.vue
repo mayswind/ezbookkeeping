@@ -15,14 +15,15 @@
                      @drop.prevent="onDrop">
                     <div class="d-flex w-100 fill-height justify-center align-center justify-content-center px-4"
                          :class="{ 'dropzone': true, 'dropzone-dragover': isDragOver }" style="height: 480px">
-                        <h3 class="pa-2 bg-grey-200" v-if="!loading && !imageFile && !isDragOver">{{ tt('You can drag and drop, paste or click to select a receipt or transaction image') }}</h3>
-                        <h3 class="pa-2 bg-grey-200" v-if="!loading && isDragOver">{{ tt('Release to load image') }}</h3>
-                        <h3 class="pa-2" v-if="loading">{{ tt('Loading image...') }}</h3>
+                        <h3 :class="{ 'pa-2': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }" v-if="!loading && !imageFile && !isDragOver">{{ tt('You can drag and drop, paste or click to select a receipt or transaction image') }}</h3>
+                        <h3 :class="{ 'pa-2': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }" v-else-if="!loading && isDragOver">{{ tt('Release to load image') }}</h3>
+                        <h3 class="pa-2" v-else-if="loading">{{ tt('Loading image...') }}</h3>
+                        <h3 :class="{ 'pa-2': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }" v-else-if="recognizing">{{ tt('AI can make mistakes. Check important info.') }}</h3>
                     </div>
                     <v-img height="480px" :class="{ 'cursor-pointer': !loading && !recognizing && !isDragOver }"
                            :src="imageSrc" @click="showOpenImageDialog">
                         <template #placeholder>
-                            <div class="w-100 fill-height bg-grey-200"></div>
+                            <div :class="{ 'w-100 fill-height': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }"></div>
                         </template>
                     </v-img>
                 </div>
@@ -50,13 +51,15 @@
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { ref, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef } from 'vue';
+import { useTheme } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useTransactionsStore } from '@/stores/transaction.ts';
 
 import { KnownFileType } from '@/core/file.ts';
+import { ThemeType } from '@/core/theme.ts';
 import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
 
 import type { RecognizedReceiptImageResponse } from '@/models/large_language_model.ts';
@@ -66,6 +69,8 @@ import { compressJpgImage } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
+
+const theme = useTheme();
 
 const { tt } = useI18n();
 
@@ -84,6 +89,8 @@ const cancelRecognizingUuid = ref<string | undefined>(undefined);
 const imageFile = ref<File | null>(null);
 const imageSrc = ref<string | undefined>(undefined);
 const isDragOver = ref<boolean>(false);
+
+const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 
 function loadImage(file: File): void {
     loading.value = true;

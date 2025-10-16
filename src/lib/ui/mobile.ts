@@ -288,7 +288,7 @@ export function useI18nUIComponents() {
         });
     }
 
-    function showCancelableLoading(message: string, cancelButtonText: string, cancelCallback?: (dialog: Dialog.Dialog, e: Event) => void): void {
+    function showCancelableLoading(title: string, message: string, cancelButtonText: string, cancelCallback?: (dialog: Dialog.Dialog, e: Event) => void): void {
         const cancelButton: Dialog.DialogButton = {
             text: tt(cancelButtonText),
             onClick: (dialog, event) => {
@@ -300,8 +300,8 @@ export function useI18nUIComponents() {
 
         f7ready((f7) => {
             f7.dialog.create({
-                title: tt(message),
-                content: `<div class="preloader"><span class="preloader-inner">${[0, 1, 2, 3, 4, 5, 6, 7].map(() => '<span class="preloader-inner-line"></span>').join('')}</span></div>`,
+                title: tt(title),
+                content: `<div class="preloader"><span class="preloader-inner">${[0, 1, 2, 3, 4, 5, 6, 7].map(() => '<span class="preloader-inner-line"></span>').join('')}</span></div>` + (message ? `<br/><div class="margin-top">${tt(message)}</div>` : ''),
                 cssClass: 'dialog-preloader',
                 animate: isEnableAnimate(),
                 buttons: [cancelButton]

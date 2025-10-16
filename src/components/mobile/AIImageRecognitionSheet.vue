@@ -116,7 +116,7 @@ function confirm(): void {
 
     cancelRecognizingUuid.value = generateRandomUUID();
     recognizing.value = true;
-    showCancelableLoading('Recognizing', 'Cancel Recognition', cancelRecognize);
+    showCancelableLoading('Recognizing', 'AI can make mistakes. Check important info.', 'Cancel Recognition', cancelRecognize);
 
     transactionsStore.recognizeReceiptImage({
         imageFile: imageFile.value,

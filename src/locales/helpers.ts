@@ -188,6 +188,7 @@ import {
     getCurrentUnixTime,
     getYearMonthDayDateTime,
     parseDateTimeFromUnixTime,
+    parseDateTimeFromString,
     getGregorianCalendarYearMonthDays,
     getDateTimeFormatType,
     getFiscalYearTimeRangeFromUnixTime,
@@ -2361,6 +2362,8 @@ export function useI18n() {
         getCalendarDisplayShortMonthFromUnixTime: (unixTime: number, numeralSystem?: NumeralSystem, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, 'MMM', getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType, numeralSystem: numeralSystem }), utcOffset, currentUtcOffset),
         getCalendarDisplayDayOfMonthFromUnixTime: (unixTime: number, numeralSystem?: NumeralSystem, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDayFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType, numeralSystem: numeralSystem }), utcOffset, currentUtcOffset),
         // format date time (by date display type) functions
+        parseDateTimeFromLongDateTime: (dateTime: string) => parseDateTimeFromString(dateTime, getLocalizedLongDateFormat() + ' ' + getLocalizedLongTimeFormat()),
+        parseDateTimeFromShortDateTime: (dateTime: string) => parseDateTimeFromString(dateTime, getLocalizedShortDateFormat() + ' ' + getLocalizedShortTimeFormat()),
         formatUnixTimeToLongDateTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongDateFormat() + ' ' + getLocalizedLongTimeFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
         formatUnixTimeToShortDateTime: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedShortDateFormat() + ' ' + getLocalizedShortTimeFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),
         formatUnixTimeToLongDate: (unixTime: number, utcOffset?: number, currentUtcOffset?: number) => formatUnixTime(unixTime, getLocalizedLongDateFormat(), getDateTimeFormatOptions(), utcOffset, currentUtcOffset),

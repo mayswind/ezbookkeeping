@@ -88,6 +88,7 @@ import { type TimePickerValue, useDateTimeSelectionBase } from '@/components/bas
 import { ThemeType } from '@/core/theme.ts';
 import { NumeralSystem } from '@/core/numeral.ts';
 import {
+    type DateTime,
     MeridiemIndicator,
     KnownDateTimeFormat
 } from '@/core/datetime.ts';
@@ -121,6 +122,8 @@ const theme = useTheme();
 const {
     tt,
     getCurrentNumeralSystemType,
+    parseDateTimeFromLongDateTime,
+    parseDateTimeFromShortDateTime,
     formatUnixTimeToLongDateTime
 } = useI18n();
 
@@ -233,21 +236,42 @@ function onPaste(event: ClipboardEvent): void {
         return;
     }
 
-    const text = event.clipboardData.getData('Text');
+    let text = event.clipboardData.getData('Text');
 
     if (!text) {
         event.preventDefault();
         return;
     }
 
-    const formats = KnownDateTimeFormat.detect(text);
+    text = text.trim();
 
-    if (!formats || formats.length !== 1) {
-        event.preventDefault();
+    const formats = KnownDateTimeFormat.detect(text);
+    let dt: DateTime | undefined = undefined;
+
+    if (formats && formats.length === 1) {
+        dt = parseDateTimeFromKnownDateTimeFormat(text, formats[0] as KnownDateTimeFormat);
+
+        if (dt) {
+            dateTime.value = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(dt.getUnixTime(), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+            return;
+        }
+    }
+
+    dt = parseDateTimeFromLongDateTime(text);
+
+    if (dt) {
+        dateTime.value = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(dt.getUnixTime(), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
         return;
     }
 
-    dateTime.value = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(parseDateTimeFromKnownDateTimeFormat(text, formats[0] as KnownDateTimeFormat).getUnixTime(), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+    dt = parseDateTimeFromShortDateTime(text);
+
+    if (dt) {
+        dateTime.value = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(dt.getUnixTime(), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+        return;
+    }
+
+    event.preventDefault();
 }
 
 function onFocused(input: VAutocomplete | null | undefined, focused: boolean): void {

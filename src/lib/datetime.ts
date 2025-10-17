@@ -558,8 +558,24 @@ export function parseDateTimeFromUnixTime(unixTime: number, utcOffset?: number, 
     return MomentDateTime.of(moment.unix(unixTime));
 }
 
-export function parseDateTimeFromKnownDateTimeFormat(dateTime: string, format: KnownDateTimeFormat): DateTime {
-    return MomentDateTime.of(moment(dateTime, format.format));
+export function parseDateTimeFromKnownDateTimeFormat(dateTime: string, format: KnownDateTimeFormat): DateTime | undefined {
+    const m = moment(dateTime, format.format);
+
+    if (!m.isValid()) {
+        return undefined;
+    }
+
+    return MomentDateTime.of(m);
+}
+
+export function parseDateTimeFromString(dateTime: string, format: string): DateTime | undefined {
+    const m = moment(dateTime, format);
+
+    if (!m.isValid()) {
+        return undefined;
+    }
+
+    return MomentDateTime.of(m);
 }
 
 export function formatUnixTime(unixTime: number, format: string, options: DateTimeFormatOptions, utcOffset?: number, currentUtcOffset?: number): string {

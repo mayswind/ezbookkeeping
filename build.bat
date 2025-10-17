@@ -8,8 +8,8 @@ set "RELEASE=%RELEASE_BUILD%"
 set "RELEASE_TYPE=unknown"
 set "VERSION="
 set "COMMIT_HASH="
-set "BUILD_UNIXTIME="
-set "BUILD_DATE="
+set "BUILD_UNIXTIME=%BUILD_UNIXTIME%"
+set "BUILD_DATE=%BUILD_DATE%"
 set "PACKAGE_FILENAME="
 for /f %%a in ('"prompt $E$S & echo on & for %%b in (1) do rem"') do set "ESC=%%a"
 
@@ -113,8 +113,14 @@ goto :pre_parse_args
     set VERSION=%VERSION:,=%
     set VERSION=%VERSION:"=%
     for /f %%x in ('git rev-parse --short^=7 HEAD') do set "COMMIT_HASH=%%x"
-    call :set_unixtime BUILD_UNIXTIME
-    call :set_date BUILD_DATE
+
+    if "%BUILD_UNIXTIME%"=="" (
+        call :set_unixtime BUILD_UNIXTIME
+    )
+
+    if "%BUILD_DATE%"=="" (
+        call :set_date BUILD_DATE
+    )
 
 :main
     if "%TYPE%"=="backend"  call :build_backend & goto :end

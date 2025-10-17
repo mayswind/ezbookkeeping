@@ -11,8 +11,8 @@ $script:SkipTests = $env:SKIP_TESTS
 $script:ReleaseType = "unknown"
 $script:Version = ""
 $script:CommitHash = ""
-$script:BuildUnixTime = ""
-$script:BuildDate = ""
+$script:BuildUnixTime = $env:BUILD_UNIXTIME
+$script:BuildDate = $env:BUILD_DATE
 
 function Write-Red($msg) {
     Write-Host $msg -ForegroundColor Red
@@ -79,8 +79,14 @@ function Check-Type-Dependencies {
 function Set-Build-Parameters {
     $script:Version = (Get-Content package.json | ConvertFrom-Json).version
     $script:CommitHash = git rev-parse --short=7 HEAD
-    $script:BuildUnixTime = [int][double]::Parse((Get-Date -UFormat %s))
-    $script:BuildDate = Get-Date -Format "yyyyMMdd"
+
+    if (-not $BuildUnixTime) {
+        $script:BuildUnixTime = [int][double]::Parse((Get-Date -UFormat %s))
+    }
+
+    if (-not $BuildDate) {
+        $script:BuildDate = Get-Date -Format "yyyyMMdd"
+    }
 }
 
 function Build-Backend {

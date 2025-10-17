@@ -13,6 +13,12 @@ inputs:
   release-build:
     required: false
     type: string
+  build-unix-time:
+    required: false
+    type: string
+  build-date:
+    required: false
+    type: string
   check-3rd-api:
     required: false
     type: string
@@ -55,6 +61,8 @@ runs:
       env:
         RELEASE_BUILD: "${{ inputs.release-build }}"
         BUILD_PIPELINE: "1"
+        BUILD_UNIXTIME: "${{ inputs.build-unix-time }}"
+        BUILD_DATE: "${{ inputs.build-date }}"
         CHECK_3RD_API: "${{ inputs.check-3rd-api }}"
         SKIP_TESTS: "${{ inputs.skip-tests }}"
       run: |

@@ -4,6 +4,12 @@ inputs:
   release-build:
     required: false
     type: string
+  build-unix-time:
+    required: false
+    type: string
+  build-date:
+    required: false
+    type: string
   check-3rd-api:
     required: false
     type: string
@@ -83,6 +89,8 @@ runs:
           *.platform=${{ inputs.platform }}
           *.args.RELEASE_BUILD=${{ inputs.release-build }}
           *.args.BUILD_PIPELINE=1
+          *.args.BUILD_UNIXTIME=${{ inputs.build-unix-time }}
+          *.args.BUILD_DATE=${{ inputs.build-date }}
           *.args.CHECK_3RD_API=${{ inputs.check-3rd-api }}
           *.args.SKIP_TESTS=${{ inputs.skip-tests }}
           *.output=type=image,push-by-digest=true,name-canonical=true,push=${{ inputs.docker-push }}

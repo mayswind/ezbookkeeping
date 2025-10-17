@@ -9,6 +9,8 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     outputs:
+      build-unix-time: ${{ steps.variable.outputs.build_unix_time }}
+      build-date: ${{ steps.variable.outputs.build_date }}
       docker-version: ${{ steps.meta.outputs.version }}
       docker-tags: ${{ steps.meta.outputs.tags }}
       docker-labels: ${{ steps.meta.outputs.labels }}
@@ -37,6 +39,8 @@ jobs:
       - name: Set up variables
         id: variable
         run: |
+          echo "build_unix_time=$(date '+%s')" >> "$GITHUB_OUTPUT"
+          echo "build_date=$(date '+%Y%m%d')" >> "$GITHUB_OUTPUT"
           echo "ezbookkeeping_docker_bake_meta_file_path=${{ runner.temp }}/bake-meta.json" >> "$GITHUB_OUTPUT"
           echo "ezbookkeeping_docker_bake_meta_artifact_name=ezbookkeeping-build-dev-docker-bake-meta-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
           echo "ezbookkeeping_docker_digests_file_path=${{ runner.temp }}/digests" >> "$GITHUB_OUTPUT"
@@ -66,6 +70,8 @@ jobs:
 
       - uses: ./.github/actions/build-linux-docker-and-package
         with:
+          build-unix-time: ${{ needs.setup.outputs.build-unix-time }}
+          build-date: ${{ needs.setup.outputs.build-date }}
           check-3rd-api: ${{ vars.CHECK_3RD_API }}
           skip-tests: ${{ vars.SKIP_TESTS }}
           platform: linux/amd64
@@ -100,6 +106,8 @@ jobs:
 
       - uses: ./.github/actions/build-linux-docker-and-package
         with:
+          build-unix-time: ${{ needs.setup.outputs.build-unix-time }}
+          build-date: ${{ needs.setup.outputs.build-date }}
           check-3rd-api: ${{ vars.CHECK_3RD_API }}
           skip-tests: ${{ vars.SKIP_TESTS }}
           platform: ${{ matrix.platform }}
@@ -146,6 +154,8 @@ jobs:
 
       - uses: ./.github/actions/build-windows-backend
         with:
+          build-unix-time: ${{ needs.setup.outputs.build-unix-time }}
+          build-date: ${{ needs.setup.outputs.build-date }}
           check-3rd-api: ${{ vars.CHECK_3RD_API }}
           skip-tests: ${{ vars.SKIP_TESTS }}
           backend-artifact-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-backend-artifact-name-prefix }}

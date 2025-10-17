@@ -30,7 +30,10 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Set up the environment
+        id: setup
         run: |
+          echo "build_unix_time=$(date '+%s')" >> "$GITHUB_OUTPUT"
+          echo "build_date=$(date '+%Y%m%d')" >> "$GITHUB_OUTPUT"
           sed -r -i 's#FROM( --.*)? (.*:.*)?#FROM\1 ${{ secrets.DOCKER_REPO }}/mirrors/\2#g' Dockerfile
           cat >> docker/custom-backend-pre-setup.sh <<EOF
           #!/bin/sh
@@ -52,6 +55,8 @@ jobs:
           push: true
           build-args: |
             BUILD_PIPELINE=1
+            BUILD_UNIXTIME=${{ steps.setup.outputs.build_unix_time }}
+            BUILD_DATE=${{ steps.setup.outputs.build_date }}
             CHECK_3RD_API=${{ vars.CHECK_3RD_API }}
             SKIP_TESTS=${{ vars.SKIP_TESTS }}
           tags: ${{ steps.meta.outputs.tags }}

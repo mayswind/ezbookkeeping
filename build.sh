@@ -8,7 +8,8 @@ RELEASE=${RELEASE_BUILD:-"0"}
 RELEASE_TYPE="unknown"
 VERSION=""
 COMMIT_HASH=""
-BUILD_UNIXTIME=""
+BUILD_UNIXTIME="${BUILD_UNIXTIME}"
+BUILD_DATE="${BUILD_DATE}"
 PACKAGE_FILENAME=""
 DOCKER_TAG=""
 
@@ -118,7 +119,14 @@ check_type_dependencies() {
 set_build_parameters() {
     VERSION="$(grep '"version": ' package.json | awk -F ':' '{print $2}' | tr -d ' ' | tr -d ',' | tr -d '"')"
     COMMIT_HASH="$(git rev-parse --short=7 HEAD)"
-    BUILD_UNIXTIME="$(date '+%s')"
+
+    if [ -z "$BUILD_UNIXTIME" ]; then
+        BUILD_UNIXTIME="$(date '+%s')"
+    fi
+
+    if [ -z "$BUILD_DATE" ]; then
+        BUILD_DATE="$(date '+%Y%m%d')"
+    fi
 }
 
 build_backend() {
@@ -203,7 +211,7 @@ build_package() {
     package_file_name="$VERSION";
 
     if [ "$RELEASE" = "0" ]; then
-        package_file_name="$package_file_name-$(date '+%Y%m%d')"
+        package_file_name="$package_file_name-$BUILD_DATE"
     fi
 
     package_file_name="ezbookkeeping-$package_file_name-$(arch).tar.gz"
@@ -237,7 +245,7 @@ build_docker() {
     docker_tag="$VERSION"
 
     if [ "$RELEASE" = "0" ]; then
-        docker_tag="SNAPSHOT-$(date '+%Y%m%d')";
+        docker_tag="SNAPSHOT-$BUILD_DATE";
     fi
 
     docker_tag="ezbookkeeping:$docker_tag"

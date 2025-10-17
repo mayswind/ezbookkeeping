@@ -120,6 +120,7 @@
                                                               :append-inner-icon="filterKeyword !== query.keyword ? mdiCheck : undefined"
                                                               :placeholder="tt('Filter transaction description')"
                                                               v-model="filterKeyword"
+                                                              v-if="canUseKeywordFilter"
                                                               @click:append-inner="setKeywordFilter(filterKeyword)"
                                                               @keyup.enter="setKeywordFilter(filterKeyword)"
                                                 />
@@ -129,15 +130,20 @@
                                                 <v-icon :icon="mdiDotsVertical" />
                                                 <v-menu activator="parent">
                                                     <v-list>
-                                                        <v-list-item :prepend-icon="mdiFilterOutline"
+                                                        <v-list-item :disabled="loading"
+                                                                     :prepend-icon="mdiFilterOutline"
                                                                      :title="tt('Filter Accounts')"
                                                                      @click="showFilterAccountDialog = true"></v-list-item>
-                                                        <v-list-item :prepend-icon="mdiFilterOutline"
+                                                        <v-list-item :disabled="loading"
+                                                                     :prepend-icon="mdiFilterOutline"
                                                                      :title="tt('Filter Transaction Categories')"
-                                                                     @click="showFilterCategoryDialog = true"></v-list-item>
-                                                        <v-list-item :prepend-icon="mdiFilterOutline"
+                                                                     @click="showFilterCategoryDialog = true"
+                                                                     v-if="canUseCategoryFilter"></v-list-item>
+                                                        <v-list-item :disabled="loading"
+                                                                     :prepend-icon="mdiFilterOutline"
                                                                      :title="tt('Filter Transaction Tags')"
-                                                                     @click="showFilterTagDialog = true"></v-list-item>
+                                                                     @click="showFilterTagDialog = true"
+                                                                     v-if="canUseTagFilter"></v-list-item>
                                                         <v-divider class="my-2"/>
                                                         <v-list-item :prepend-icon="mdiExport"
                                                                      :title="tt('Export Results')"
@@ -451,6 +457,9 @@ const {
     queryDateRangeName,
     queryTrendDateAggregationTypeName,
     canShiftDateRange,
+    canUseCategoryFilter,
+    canUseTagFilter,
+    canUseKeywordFilter,
     showAmountInChart,
     totalAmountName,
     showTotalAmountInTrendsChart,

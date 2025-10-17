@@ -156,6 +156,30 @@ export function useStatisticsTransactionPageBase() {
         }
     });
 
+    const canUseCategoryFilter = computed<boolean>(() => {
+        if (query.value.chartDataType === ChartDataType.AccountTotalAssets.type || query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type) {
+            return false;
+        }
+
+        return true;
+    });
+
+    const canUseTagFilter = computed<boolean>(() => {
+        if (query.value.chartDataType === ChartDataType.AccountTotalAssets.type || query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type) {
+            return false;
+        }
+
+        return true;
+    });
+
+    const canUseKeywordFilter = computed<boolean>(() => {
+        if (query.value.chartDataType === ChartDataType.AccountTotalAssets.type || query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type) {
+            return false;
+        }
+
+        return true;
+    });
+
     const showAmountInChart = computed<boolean>(() => {
         if (!showAccountBalance.value
             && (query.value.chartDataType === ChartDataType.AccountTotalAssets.type || query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type)) {
@@ -259,6 +283,9 @@ export function useStatisticsTransactionPageBase() {
         queryTrendDateAggregationTypeName,
         isQueryDateRangeChanged,
         canShiftDateRange,
+        canUseCategoryFilter,
+        canUseTagFilter,
+        canUseKeywordFilter,
         showAmountInChart,
         totalAmountName,
         showTotalAmountInTrendsChart,

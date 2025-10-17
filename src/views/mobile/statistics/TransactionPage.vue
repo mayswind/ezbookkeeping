@@ -313,13 +313,13 @@
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
-                <f7-actions-button @click="filterAccounts">{{ tt('Filter Accounts') }}</f7-actions-button>
-                <f7-actions-button @click="filterCategories">{{ tt('Filter Transaction Categories') }}</f7-actions-button>
-                <f7-actions-button @click="filterTags">{{ tt('Filter Transaction Tags') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': reloading }" @click="filterAccounts">{{ tt('Filter Accounts') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': reloading }" @click="filterCategories" v-if="canUseCategoryFilter">{{ tt('Filter Transaction Categories') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': reloading }" @click="filterTags" v-if="canUseTagFilter">{{ tt('Filter Transaction Tags') }}</f7-actions-button>
             </f7-actions-group>
-            <f7-actions-group>
+            <f7-actions-group v-if="canUseKeywordFilter">
                 <f7-actions-label v-if="query.keyword">{{ query.keyword }}</f7-actions-label>
-                <f7-actions-button @click="filterDescription">{{ tt('Filter transaction description') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': reloading }" @click="filterDescription">{{ tt('Filter transaction description') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button @click="settings">{{ tt('Settings') }}</f7-actions-button>
@@ -398,6 +398,9 @@ const {
     queryTrendDateAggregationTypeName,
     isQueryDateRangeChanged,
     canShiftDateRange,
+    canUseCategoryFilter,
+    canUseTagFilter,
+    canUseKeywordFilter,
     showAmountInChart,
     totalAmountName,
     translateNameInTrendsChart,

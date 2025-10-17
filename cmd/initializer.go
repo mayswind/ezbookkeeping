@@ -162,20 +162,42 @@ func getConfigWithoutSensitiveData(config *settings.Config) *settings.Config {
 		return config
 	}
 
-	clonedConfig.DatabaseConfig.DatabasePassword = "****"
-	clonedConfig.SMTPConfig.SMTPPasswd = "****"
-	clonedConfig.MinIOConfig.SecretAccessKey = "****"
-	clonedConfig.SecretKey = "****"
-	clonedConfig.AmapApplicationSecret = "****"
+	if clonedConfig.DatabaseConfig.DatabasePassword != "" {
+		clonedConfig.DatabaseConfig.DatabasePassword = "****"
+	}
 
-	if clonedConfig.WebDAVConfig != nil {
+	if clonedConfig.SMTPConfig.SMTPPasswd != "" {
+		clonedConfig.SMTPConfig.SMTPPasswd = "****"
+	}
+
+	if clonedConfig.MinIOConfig.SecretAccessKey != "" {
+		clonedConfig.MinIOConfig.SecretAccessKey = "****"
+	}
+
+	if clonedConfig.SecretKey != "" {
+		clonedConfig.SecretKey = "****"
+	}
+
+	if clonedConfig.AmapApplicationSecret != "" {
+		clonedConfig.AmapApplicationSecret = "****"
+	}
+
+	if clonedConfig.WebDAVConfig != nil && clonedConfig.WebDAVConfig.Password != "" {
 		clonedConfig.WebDAVConfig.Password = "****"
 	}
 
 	if clonedConfig.ReceiptImageRecognitionLLMConfig != nil {
-		clonedConfig.ReceiptImageRecognitionLLMConfig.OpenAIAPIKey = "****"
-		clonedConfig.ReceiptImageRecognitionLLMConfig.OpenAICompatibleAPIKey = "****"
-		clonedConfig.ReceiptImageRecognitionLLMConfig.OpenRouterAPIKey = "****"
+		if clonedConfig.ReceiptImageRecognitionLLMConfig.OpenAIAPIKey != "" {
+			clonedConfig.ReceiptImageRecognitionLLMConfig.OpenAIAPIKey = "****"
+		}
+
+		if clonedConfig.ReceiptImageRecognitionLLMConfig.OpenAICompatibleAPIKey != "" {
+			clonedConfig.ReceiptImageRecognitionLLMConfig.OpenAICompatibleAPIKey = "****"
+		}
+
+		if clonedConfig.ReceiptImageRecognitionLLMConfig.OpenRouterAPIKey != "" {
+			clonedConfig.ReceiptImageRecognitionLLMConfig.OpenRouterAPIKey = "****"
+		}
 	}
 
 	return clonedConfig

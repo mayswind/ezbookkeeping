@@ -85,7 +85,7 @@ Download the latest release: [https://github.com/mayswind/ezbookkeeping/releases
 By default, ezBookkeeping listens on port 8080. You can then visit `http://{YOUR_HOST_ADDRESS}:8080/` .
 
 ### Build from Source
-Make sure you have [Golang](https://golang.org/), [GCC](http://gcc.gnu.org/), [Node.js](https://nodejs.org/) and [NPM](https://www.npmjs.com/) installed. Then download the source code, and follow these steps:
+Make sure you have [Golang](https://golang.org/), [GCC](https://gcc.gnu.org/), [Node.js](https://nodejs.org/) and [NPM](https://www.npmjs.com/) installed. Then download the source code, and follow these steps:
 
 **Linux / macOS**
 
@@ -146,8 +146,8 @@ Currently available translations:
 Don't see your language? Help us add it.
 
 ## Documentation
-1. [English](http://ezbookkeeping.mayswind.net)
-1. [中文 (简体)](http://ezbookkeeping.mayswind.net/zh_Hans)
+1. [English](https://ezbookkeeping.mayswind.net)
+1. [中文 (简体)](https://ezbookkeeping.mayswind.net/zh_Hans)
 
 ## License
 [MIT](https://github.com/mayswind/ezbookkeeping/blob/master/LICENSE)

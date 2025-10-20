@@ -42,6 +42,11 @@ func (c *InMemoryDuplicateChecker) SetSubmissionRemark(checkerType DuplicateChec
 	c.cache.Set(c.getCacheKey(checkerType, uid, identification), remark, cache.DefaultExpiration)
 }
 
+// SetSubmissionRemarkWithCustomExpiration saves the identification and remark to in-memory cache with custom expiration time
+func (c *InMemoryDuplicateChecker) SetSubmissionRemarkWithCustomExpiration(checkerType DuplicateCheckerType, uid int64, identification string, remark string, expiration time.Duration) {
+	c.cache.Set(c.getCacheKey(checkerType, uid, identification), remark, expiration)
+}
+
 // RemoveSubmissionRemark removes the identification and remark in in-memory cache
 func (c *InMemoryDuplicateChecker) RemoveSubmissionRemark(checkerType DuplicateCheckerType, uid int64, identification string) {
 	c.cache.Delete(c.getCacheKey(checkerType, uid, identification))

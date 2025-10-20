@@ -9,7 +9,7 @@
             <f7-block-footer>{{ tips }}</f7-block-footer>
         </f7-list>
 
-        <f7-list form dividers class="margin-bottom-half">
+        <f7-list form dividers class="margin-bottom-half" v-if="isInternalAuthEnabled()">
             <f7-list-input
                 type="text"
                 autocomplete="username"
@@ -47,8 +47,14 @@
         </f7-list>
 
         <f7-list class="margin-vertical-half">
-            <f7-list-button :class="{ 'disabled': inputIsEmpty || logining }" :text="tt('Log In')" @click="login"></f7-list-button>
-            <f7-block-footer>
+            <f7-list-button :class="{ 'disabled': inputIsEmpty || logining }" :text="tt('Log In')" @click="login" v-if="isInternalAuthEnabled()"></f7-list-button>
+            <f7-list-item class="login-divider display-flex align-items-center" v-if="isInternalAuthEnabled() && isOAuth2Enabled()">
+                <hr class="margin-inline-end-half" />
+                <small>{{ tt('or') }}</small>
+                <hr class="margin-inline-start-half" />
+            </f7-list-item>
+            <f7-list-button external :class="{ 'disabled': logining }" :href="oauth2LoginUrl" :text="oauth2LoginDisplayName" v-if="isOAuth2Enabled()"></f7-list-button>
+            <f7-block-footer v-if="isInternalAuthEnabled()">
                 <span>{{ tt('Don\'t have an account?') }}</span>&nbsp;
                 <f7-link :class="{'disabled': !isUserRegistrationEnabled()}" href="/signup" :text="tt('Create an account')"></f7-link>
             </f7-block-footer>
@@ -176,7 +182,15 @@ import { useRootStore } from '@/stores/index.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
-import { isUserRegistrationEnabled, isUserForgetPasswordEnabled, isUserVerifyEmailEnabled } from '@/lib/server_settings.ts';
+
+import { generateRandomUUID } from '@/lib/misc.ts';
+import {
+    isUserRegistrationEnabled,
+    isUserForgetPasswordEnabled,
+    isUserVerifyEmailEnabled,
+    isInternalAuthEnabled,
+    isOAuth2Enabled
+} from '@/lib/server_settings.ts';
 import { getDesktopVersionPath } from '@/lib/version.ts';
 import { useI18nUIComponents, showLoading, hideLoading, isModalShowing } from '@/lib/ui/mobile.ts';
 
@@ -197,13 +211,16 @@ const {
     backupCode,
     tempToken,
     twoFAVerifyType,
+    oauth2ClientSessionId,
     logining,
     verifying,
     inputIsEmpty,
     twoFAInputIsEmpty,
+    oauth2LoginUrl,
+    oauth2LoginDisplayName,
     tips,
     doAfterLogin
-} = useLoginPageBase();
+} = useLoginPageBase('mobile');
 
 const forgetPasswordEmail = ref<string>('');
 const resendVerifyEmail = ref<string>('');
@@ -389,4 +406,33 @@ function switch2FAVerifyType(): void {
         twoFAVerifyType.value = 'passcode';
     }
 }
+
+oauth2ClientSessionId.value = generateRandomUUID();
 </script>
+
+<style>
+.login-divider > .item-content {
+    width: 100%;
+    min-height: 0;
+
+    > .item-inner {
+        padding-top: 0;
+        padding-bottom: 0;
+        min-height: 0;
+
+        > small {
+            opacity: 0.7;
+        }
+
+        > hr {display: block;
+            flex: 1 1 100%;
+            height: 0;
+            max-height: 0;
+            border-style: solid;
+            border-width: thin 0 0 0;
+            opacity: 0.12;
+            transition: inherit;
+        }
+    }
+}
+</style>

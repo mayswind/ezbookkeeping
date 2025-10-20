@@ -26,4 +26,8 @@ var (
 	ErrInvalidIpAddressPattern                        = NewSystemError(SystemSubcategorySetting, 19, http.StatusInternalServerError, "invalid ip address pattern")
 	ErrInvalidLLMProvider                             = NewSystemError(SystemSubcategorySetting, 20, http.StatusInternalServerError, "invalid llm provider")
 	ErrInvalidLLMModelId                              = NewSystemError(SystemSubcategorySetting, 21, http.StatusInternalServerError, "invalid llm model id")
+	ErrInvalidOAuth2Config                            = NewSystemError(SystemSubcategorySetting, 22, http.StatusInternalServerError, "invalid oauth 2.0 config")
+	ErrInvalidOAuth2UserIdentifier                    = NewSystemError(SystemSubcategorySetting, 23, http.StatusInternalServerError, "invalid oauth 2.0 user identifier")
+	ErrInvalidOAuth2Provider                          = NewSystemError(SystemSubcategorySetting, 24, http.StatusInternalServerError, "invalid oauth 2.0 provider")
+	ErrInvalidOAuth2StateExpiredTime                  = NewSystemError(SystemSubcategorySetting, 25, http.StatusInternalServerError, "invalid oauth 2.0 state expired time")
 )

@@ -133,6 +133,18 @@ func (s *TokenService) CreateMCPTokenViaCli(c *core.CliContext, user *models.Use
 	return token, tokenRecord, err
 }
 
+// CreateOAuth2CallbackRequireVerifyToken generates a new OAuth 2.0 callback token requiring user to verify and saves to database
+func (s *TokenService) CreateOAuth2CallbackRequireVerifyToken(c *core.WebContext, user *models.User) (string, *core.UserTokenClaims, error) {
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_OAUTH2_CALLBACK_REQUIRE_VERIFY, s.getUserAgent(c), s.CurrentConfig().TemporaryTokenExpiredTimeDuration)
+	return token, claims, err
+}
+
+// CreateOAuth2CallbackToken generates a new OAuth 2.0 callback token and saves to database
+func (s *TokenService) CreateOAuth2CallbackToken(c *core.WebContext, user *models.User) (string, *core.UserTokenClaims, error) {
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_OAUTH2_CALLBACK, s.getUserAgent(c), s.CurrentConfig().TemporaryTokenExpiredTimeDuration)
+	return token, claims, err
+}
+
 // UpdateTokenLastSeen updates the last seen time of specified token
 func (s *TokenService) UpdateTokenLastSeen(c core.Context, tokenRecord *models.TokenRecord) error {
 	if tokenRecord.Uid <= 0 {

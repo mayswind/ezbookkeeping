@@ -1,11 +1,9 @@
 package common
 
 import (
-	"crypto/tls"
 	"io"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -28,7 +26,8 @@ type HttpLargeLanguageModelAdapter interface {
 // CommonHttpLargeLanguageModelProvider defines the structure of common http large language model provider
 type CommonHttpLargeLanguageModelProvider struct {
 	provider.LargeLanguageModelProvider
-	adapter HttpLargeLanguageModelAdapter
+	adapter    HttpLargeLanguageModelAdapter
+	httpClient *http.Client
 }
 
 // GetJsonResponse returns the json response from common http large language model provider
@@ -51,20 +50,6 @@ func (p *CommonHttpLargeLanguageModelProvider) GetJsonResponse(c core.Context, u
 }
 
 func (p *CommonHttpLargeLanguageModelProvider) getTextualResponse(c core.Context, uid int64, currentLLMConfig *settings.LLMConfig, request *data.LargeLanguageModelRequest, responseType data.LargeLanguageModelResponseFormat) (*data.LargeLanguageModelTextualResponse, error) {
-	transport := http.DefaultTransport.(*http.Transport).Clone()
-	utils.SetProxyUrl(transport, currentLLMConfig.LargeLanguageModelAPIProxy)
-
-	if currentLLMConfig.LargeLanguageModelAPISkipTLSVerify {
-		transport.TLSClientConfig = &tls.Config{
-			InsecureSkipVerify: true,
-		}
-	}
-
-	client := &http.Client{
-		Transport: transport,
-		Timeout:   time.Duration(currentLLMConfig.LargeLanguageModelAPIRequestTimeout) * time.Millisecond,
-	}
-
 	httpRequest, err := p.adapter.BuildTextualRequest(c, uid, request, responseType)
 
 	if err != nil {
@@ -72,9 +57,7 @@ func (p *CommonHttpLargeLanguageModelProvider) getTextualResponse(c core.Context
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
-	httpRequest.Header.Set("User-Agent", settings.GetUserAgent())
-
-	resp, err := client.Do(httpRequest)
+	resp, err := p.httpClient.Do(httpRequest)
 
 	if err != nil {
 		log.Errorf(c, "[common_http_large_language_model_provider.getTextualResponse] failed to request large language model api for user \"uid:%d\", because %s", uid, err.Error())
@@ -95,8 +78,9 @@ func (p *CommonHttpLargeLanguageModelProvider) getTextualResponse(c core.Context
 }
 
 // NewCommonHttpLargeLanguageModelProvider creates a http adapter based large language model provider instance
-func NewCommonHttpLargeLanguageModelProvider(adapter HttpLargeLanguageModelAdapter) *CommonHttpLargeLanguageModelProvider {
+func NewCommonHttpLargeLanguageModelProvider(llmConfig *settings.LLMConfig, adapter HttpLargeLanguageModelAdapter) *CommonHttpLargeLanguageModelProvider {
 	return &CommonHttpLargeLanguageModelProvider{
-		adapter: adapter,
+		adapter:    adapter,
+		httpClient: utils.NewHttpClient(llmConfig.LargeLanguageModelAPIRequestTimeout, llmConfig.LargeLanguageModelAPIProxy, llmConfig.LargeLanguageModelAPISkipTLSVerify, settings.GetUserAgent()),
 	}
 }

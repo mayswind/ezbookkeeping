@@ -51,7 +51,7 @@ func (p *OpenAICompatibleChatCompletionsAPIProvider) getFinalChatCompletionsRequ
 
 // NewOpenAICompatibleLargeLanguageModelProvider creates a new OpenAI compatible large language model provider instance
 func NewOpenAICompatibleLargeLanguageModelProvider(llmConfig *settings.LLMConfig) provider.LargeLanguageModelProvider {
-	return newCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter(&OpenAICompatibleChatCompletionsAPIProvider{
+	return newCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter(llmConfig, &OpenAICompatibleChatCompletionsAPIProvider{
 		OpenAICompatibleBaseURL: llmConfig.OpenAICompatibleBaseURL,
 		OpenAICompatibleAPIKey:  llmConfig.OpenAICompatibleAPIKey,
 		OpenAICompatibleModelID: llmConfig.OpenAICompatibleModelID,

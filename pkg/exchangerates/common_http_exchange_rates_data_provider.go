@@ -1,11 +1,9 @@
 package exchangerates
 
 import (
-	"crypto/tls"
 	"io"
 	"net/http"
 	"sort"
-	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -28,23 +26,10 @@ type HttpExchangeRatesDataSource interface {
 type CommonHttpExchangeRatesDataProvider struct {
 	ExchangeRatesDataProvider
 	dataSource HttpExchangeRatesDataSource
+	httpClient *http.Client
 }
 
 func (e *CommonHttpExchangeRatesDataProvider) GetLatestExchangeRates(c core.Context, uid int64, currentConfig *settings.Config) (*models.LatestExchangeRateResponse, error) {
-	transport := http.DefaultTransport.(*http.Transport).Clone()
-	utils.SetProxyUrl(transport, currentConfig.ExchangeRatesProxy)
-
-	if currentConfig.ExchangeRatesSkipTLSVerify {
-		transport.TLSClientConfig = &tls.Config{
-			InsecureSkipVerify: true,
-		}
-	}
-
-	client := &http.Client{
-		Transport: transport,
-		Timeout:   time.Duration(currentConfig.ExchangeRatesRequestTimeout) * time.Millisecond,
-	}
-
 	requests, err := e.dataSource.BuildRequests()
 
 	if err != nil {
@@ -56,14 +41,7 @@ func (e *CommonHttpExchangeRatesDataProvider) GetLatestExchangeRates(c core.Cont
 
 	for i := 0; i < len(requests); i++ {
 		req := requests[i]
-
-		if len(req.Header.Values("User-Agent")) < 1 {
-			req.Header.Set("User-Agent", settings.GetUserAgent())
-		} else if req.Header.Get("User-Agent") == "" {
-			req.Header.Del("User-Agent")
-		}
-
-		resp, err := client.Do(req)
+		resp, err := e.httpClient.Do(req)
 
 		if err != nil {
 			log.Errorf(c, "[common_http_exchange_rates_data_provider.GetLatestExchangeRates] failed to request latest exchange rate data for user \"uid:%d\", because %s", uid, err.Error())
@@ -76,7 +54,7 @@ func (e *CommonHttpExchangeRatesDataProvider) GetLatestExchangeRates(c core.Cont
 		log.Debugf(c, "[common_http_exchange_rates_data_provider.GetLatestExchangeRates] response#%d is %s", i, body)
 
 		if resp.StatusCode != 200 {
-			log.Errorf(c, "[common_http_exchange_rates_data_provider.GetLatestExchangeRates] failed to get latest exchange rate data response for user \"uid:%d\", because response code is not %d", uid, resp.StatusCode)
+			log.Errorf(c, "[common_http_exchange_rates_data_provider.GetLatestExchangeRates] failed to get latest exchange rate data response for user \"uid:%d\", because response code is %d", uid, resp.StatusCode)
 			return nil, errs.ErrFailedToRequestRemoteApi
 		}
 
@@ -125,8 +103,9 @@ func (e *CommonHttpExchangeRatesDataProvider) GetLatestExchangeRates(c core.Cont
 	return finalExchangeRateResponse, nil
 }
 
-func newCommonHttpExchangeRatesDataProvider(dataSource HttpExchangeRatesDataSource) *CommonHttpExchangeRatesDataProvider {
+func newCommonHttpExchangeRatesDataProvider(config *settings.Config, dataSource HttpExchangeRatesDataSource) *CommonHttpExchangeRatesDataProvider {
 	return &CommonHttpExchangeRatesDataProvider{
 		dataSource: dataSource,
+		httpClient: utils.NewHttpClient(config.ExchangeRatesRequestTimeout, config.ExchangeRatesProxy, config.ExchangeRatesSkipTLSVerify, settings.GetUserAgent()),
 	}
 }

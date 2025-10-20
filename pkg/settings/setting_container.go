@@ -26,5 +26,9 @@ func (c *ConfigContainer) GetCurrentConfig() *Config {
 }
 
 func GetUserAgent() string {
+	if Version == "" {
+		return "ezBookkeeping"
+	}
+
 	return fmt.Sprintf("ezBookkeeping/%s", Version)
 }

@@ -1,0 +1,10 @@
+package errs
+
+import (
+	"net/http"
+)
+
+// Error codes related to user external authentication
+var (
+	ErrUserExternalAuthNotFound = NewNormalError(NormalSubcategoryUserExternalAuth, 0, http.StatusBadRequest, "user external auth is not found")
+)

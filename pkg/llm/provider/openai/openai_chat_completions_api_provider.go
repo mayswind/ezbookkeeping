@@ -37,7 +37,7 @@ func (p *OpenAIOfficialChatCompletionsAPIProvider) GetModelID() string {
 
 // NewOpenAILargeLanguageModelProvider creates a new OpenAI large language model provider instance
 func NewOpenAILargeLanguageModelProvider(llmConfig *settings.LLMConfig) provider.LargeLanguageModelProvider {
-	return newCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter(&OpenAIOfficialChatCompletionsAPIProvider{
+	return newCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter(llmConfig, &OpenAIOfficialChatCompletionsAPIProvider{
 		OpenAIAPIKey:  llmConfig.OpenAIAPIKey,
 		OpenAIModelID: llmConfig.OpenAIModelID,
 	})

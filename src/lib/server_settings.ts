@@ -3,6 +3,14 @@ function getServerSetting(key: string): string | number | boolean | Record<strin
     return settings[key];
 }
 
+export function isInternalAuthEnabled(): boolean {
+    return getServerSetting('a') !== 0;
+}
+
+export function isOAuth2Enabled(): boolean {
+    return getServerSetting('o') === 1;
+}
+
 export function isUserRegistrationEnabled(): boolean {
     return getServerSetting('r') === 1;
 }
@@ -29,6 +37,14 @@ export function isDataExportingEnabled(): boolean {
 
 export function isDataImportingEnabled(): boolean {
     return getServerSetting('i') === 1;
+}
+
+export function getOAuth2Provider(): string {
+    return getServerSetting('op') as string;
+}
+
+export function getOIDCCustomDisplayNames(): Record<string, string>{
+    return getServerSetting('ocn') as Record<string, string>;
 }
 
 export function isMCPServerEnabled(): boolean {

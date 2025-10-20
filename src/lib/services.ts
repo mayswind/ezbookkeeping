@@ -136,6 +136,9 @@ import type {
     UserProfileUpdateResponse
 } from '@/models/user.ts';
 import type {
+    OAuth2CallbackLoginRequest
+} from '@/models/oauth2.ts';
+import type {
     UserApplicationCloudSettingsUpdateRequest
 } from '@/models/user_app_cloud_setting.ts';
 import type {
@@ -260,6 +263,13 @@ export default {
         return axios.post<ApiResponse<AuthResponse>>('2fa/recovery.json', {
             recoveryCode: recoveryCode
         }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+    },
+    authorizeOAuth2: ({ req, token }: { req: OAuth2CallbackLoginRequest, token: string }): ApiResponsePromise<AuthResponse> => {
+        return axios.post<ApiResponse<AuthResponse>>('oauth2/authorize.json', req, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -694,6 +704,9 @@ export default {
     },
     cancelRequest: (cancelableUuid: string) => {
         cancelableRequests[cancelableUuid] = true;
+    },
+    generateOAuth2LoginUrl: (platform: 'mobile' | 'desktop', clientSessionId: string): string => {
+        return `${getBasePath()}/oauth2/login?platform=${platform}&client_session_id=${clientSessionId}`;
     },
     generateQrCodeUrl: (qrCodeName: string): string => {
         return `${getBasePath()}${BASE_QRCODE_PATH}/${qrCodeName}.png`;

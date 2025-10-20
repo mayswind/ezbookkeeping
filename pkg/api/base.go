@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/avatars"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -117,6 +118,13 @@ func (a *ApiUsingDuplicateChecker) GetSubmissionRemark(checkerType duplicatechec
 func (a *ApiUsingDuplicateChecker) SetSubmissionRemarkIfEnable(checkerType duplicatechecker.DuplicateCheckerType, uid int64, identification string, remark string) {
 	if a.CurrentConfig().EnableDuplicateSubmissionsCheck {
 		a.container.SetSubmissionRemark(checkerType, uid, identification, remark)
+	}
+}
+
+// SetSubmissionRemarkWithCustomExpirationIfEnable saves the identification and remark by the current duplicate checker with custom expiration time if the duplicate submission check is enabled
+func (a *ApiUsingDuplicateChecker) SetSubmissionRemarkWithCustomExpirationIfEnable(checkerType duplicatechecker.DuplicateCheckerType, uid int64, identification string, remark string, expiration time.Duration) {
+	if a.CurrentConfig().EnableDuplicateSubmissionsCheck {
+		a.container.SetSubmissionRemarkWithCustomExpiration(checkerType, uid, identification, remark, expiration)
 	}
 }
 

@@ -111,6 +111,25 @@ func JWTMCPAuthorization(c *core.WebContext) {
 	c.Next()
 }
 
+// JWTOAuth2CallbackAuthorization verifies whether current request is OAuth 2.0 callback
+func JWTOAuth2CallbackAuthorization(c *core.WebContext) {
+	claims, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
+
+	if err != nil {
+		utils.PrintJsonErrorResult(c, errs.ErrTokenExpired)
+		return
+	}
+
+	if claims.Type != core.USER_TOKEN_TYPE_OAUTH2_CALLBACK && claims.Type != core.USER_TOKEN_TYPE_OAUTH2_CALLBACK_REQUIRE_VERIFY {
+		log.Warnf(c, "[authorization.JWTOAuth2CallbackAuthorization] user \"uid:%d\" token is not for oauth 2.0 callback request", claims.Uid)
+		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidToken)
+		return
+	}
+
+	c.SetTokenClaims(claims)
+	c.Next()
+}
+
 func jwtAuthorization(c *core.WebContext, source TokenSourceType) {
 	claims, err := getTokenClaims(c, source)
 

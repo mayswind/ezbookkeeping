@@ -14,6 +14,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/llm/provider"
 	"github.com/mayswind/ezbookkeeping/pkg/llm/provider/common"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 // OpenAIChatCompletionsAPIProvider defines the structure of OpenAI chat completions API provider
@@ -212,8 +213,8 @@ func (p *CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter) buildJsonReque
 	return requestBodyBytes, nil
 }
 
-func newCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter(apiProvider OpenAIChatCompletionsAPIProvider) provider.LargeLanguageModelProvider {
-	return common.NewCommonHttpLargeLanguageModelProvider(&CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter{
+func newCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter(llmConfig *settings.LLMConfig, apiProvider OpenAIChatCompletionsAPIProvider) provider.LargeLanguageModelProvider {
+	return common.NewCommonHttpLargeLanguageModelProvider(llmConfig, &CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter{
 		apiProvider: apiProvider,
 	})
 }

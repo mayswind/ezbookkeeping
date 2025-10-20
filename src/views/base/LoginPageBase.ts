@@ -8,12 +8,12 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import type { AuthResponse } from '@/models/auth_response.ts';
 
-import { getLoginPageTips } from '@/lib/server_settings.ts';
+import { getOAuth2Provider, getOIDCCustomDisplayNames, getLoginPageTips } from '@/lib/server_settings.ts';
 import { getClientDisplayVersion } from '@/lib/version.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
-export function useLoginPageBase() {
-    const { getServerTipContent, setLanguage } = useI18n();
+export function useLoginPageBase(platform: 'mobile' | 'desktop') {
+    const { getServerMultiLanguageConfigContent, getLocalizedOAuth2LoginText, setLanguage } = useI18n();
 
     const rootStore = useRootStore();
     const settingsStore = useSettingsStore();
@@ -27,6 +27,7 @@ export function useLoginPageBase() {
     const backupCode = ref<string>('');
     const tempToken = ref<string>('');
     const twoFAVerifyType = ref<string>('passcode');
+    const oauth2ClientSessionId = ref<string>('');
 
     const logining = ref<boolean>(false);
     const verifying = ref<boolean>(false);
@@ -40,7 +41,9 @@ export function useLoginPageBase() {
         }
     });
 
-    const tips = computed<string>(() => getServerTipContent(getLoginPageTips()));
+    const oauth2LoginUrl = computed<string>(() => rootStore.generateOAuth2LoginUrl(platform, oauth2ClientSessionId.value));
+    const oauth2LoginDisplayName = computed<string>(() => getLocalizedOAuth2LoginText(getOAuth2Provider(), getOIDCCustomDisplayNames()));
+    const tips = computed<string>(() => getServerMultiLanguageConfigContent(getLoginPageTips()));
 
     function doAfterLogin(authResponse: AuthResponse): void {
         if (authResponse.user) {
@@ -69,11 +72,14 @@ export function useLoginPageBase() {
         backupCode,
         tempToken,
         twoFAVerifyType,
+        oauth2ClientSessionId,
         logining,
         verifying,
         // computed states
         inputIsEmpty,
         twoFAInputIsEmpty,
+        oauth2LoginUrl,
+        oauth2LoginDisplayName,
         tips,
         // functions
         doAfterLogin

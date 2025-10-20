@@ -57,6 +57,15 @@ func (c *DuplicateCheckerContainer) SetSubmissionRemark(checkerType DuplicateChe
 	c.current.SetSubmissionRemark(checkerType, uid, identification, remark)
 }
 
+// SetSubmissionRemarkWithCustomExpiration saves the identification and remark by the current duplicate checker with custom expiration time
+func (c *DuplicateCheckerContainer) SetSubmissionRemarkWithCustomExpiration(checkerType DuplicateCheckerType, uid int64, identification string, remark string, expiration time.Duration) {
+	if c.current == nil {
+		return
+	}
+
+	c.current.SetSubmissionRemarkWithCustomExpiration(checkerType, uid, identification, remark, expiration)
+}
+
 // RemoveSubmissionRemark removes the identification and remark by the current duplicate checker
 func (c *DuplicateCheckerContainer) RemoveSubmissionRemark(checkerType DuplicateCheckerType, uid int64, identification string) {
 	if c.current == nil {

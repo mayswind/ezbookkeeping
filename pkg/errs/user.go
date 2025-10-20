@@ -38,4 +38,5 @@ var (
 	ErrUserAvatarExtensionInvalid                          = NewNormalError(NormalSubcategoryUser, 29, http.StatusNotFound, "user avatar file extension invalid")
 	ErrExceedMaxUserAvatarFileSize                         = NewNormalError(NormalSubcategoryUser, 30, http.StatusBadRequest, "exceed the maximum size of user avatar file")
 	ErrNotPermittedToPerformThisAction                     = NewNormalError(NormalSubcategoryUser, 31, http.StatusBadRequest, "not permitted to perform this action")
+	ErrCannotLoginByPassword                               = NewNormalError(NormalSubcategoryUser, 32, http.StatusBadRequest, "cannot login by password")
 )

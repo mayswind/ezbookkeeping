@@ -41,6 +41,8 @@ const (
 	NormalSubcategoryUserCustomExchangeRate = 13
 	NormalSubcategoryModelContextProtocol   = 14
 	NormalSubcategoryLargeLanguageModel     = 15
+	NormalSubcategoryUserExternalAuth       = 16
+	NormalSubcategoryOAuth2                 = 17
 )
 
 // Error represents the specific error returned to user

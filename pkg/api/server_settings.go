@@ -35,13 +35,17 @@ func (a *ServerSettingsApi) ServerSettingsJavascriptHandler(c *core.WebContext) 
 	builder := &strings.Builder{}
 	builder.WriteString(ezbookkeepingServerSettingsJavascriptFileHeader)
 
-	a.appendBooleanSetting(builder, "r", config.EnableUserRegister)
-	a.appendBooleanSetting(builder, "f", config.EnableUserForgetPassword)
+	a.appendBooleanSetting(builder, "a", config.EnableInternalAuth)
+	a.appendBooleanSetting(builder, "o", config.EnableOAuth2Login)
+	a.appendBooleanSetting(builder, "r", config.EnableInternalAuth && config.EnableUserRegister)
+	a.appendBooleanSetting(builder, "f", config.EnableInternalAuth && config.EnableUserForgetPassword)
 	a.appendBooleanSetting(builder, "v", config.EnableUserVerifyEmail)
 	a.appendBooleanSetting(builder, "p", config.EnableTransactionPictures)
 	a.appendBooleanSetting(builder, "s", config.EnableScheduledTransaction)
 	a.appendBooleanSetting(builder, "e", config.EnableDataExport)
 	a.appendBooleanSetting(builder, "i", config.EnableDataImport)
+
+	a.appendStringSetting(builder, "op", config.OAuth2Provider)
 
 	if config.EnableMCPServer {
 		a.appendBooleanSetting(builder, "mcp", config.EnableMCPServer)
@@ -138,7 +142,7 @@ func (a *ServerSettingsApi) appendStringSetting(builder *strings.Builder, key st
 	builder.WriteString(";\n")
 }
 
-func (a *ServerSettingsApi) appendMultiLanguageTipSetting(builder *strings.Builder, key string, value settings.TipConfig) {
+func (a *ServerSettingsApi) appendMultiLanguageTipSetting(builder *strings.Builder, key string, value settings.MultiLanguageContentConfig) {
 	builder.WriteString(ezbookkeepingServerSettingsGlobalVariableFullName)
 	builder.WriteString("[")
 	a.appendEncodedString(builder, key)

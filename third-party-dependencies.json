@@ -100,6 +100,12 @@
         "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.28.0:LICENSE"
     },
     {
+        "name": "Go OAuth2",
+        "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
+        "url": "https://golang.org/x/oauth2",
+        "licenseUrl": "https://cs.opensource.google/go/x/oauth2/+/refs/tags/v0.31.0:LICENSE"
+    },
+    {
         "name": "Gomail",
         "copyright": "Copyright (c) 2014 Alexandre Cesaro",
         "url": "https://github.com/go-mail/mail",

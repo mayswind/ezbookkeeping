@@ -85,6 +85,17 @@ const (
 	InMemoryDuplicateCheckerType string = "in_memory"
 )
 
+// OAuth 2.0 user identifier types
+const (
+	OAuth2UserIdentifierEmail    string = "email"
+	OAuth2UserIdentifierUsername string = "username"
+)
+
+// OAuth 2.0 rovider types
+const (
+	OAuth2ProviderNextcloud string = "nextcloud"
+)
+
 // Map provider types
 const (
 	OpenStreetMapProvider                  string = "openstreetmap"
@@ -164,6 +175,9 @@ const (
 	defaultMaxFailuresPerIpPerMinute     uint32 = 5
 	defaultMaxFailuresPerUserPerMinute   uint32 = 5
 
+	defaultOAuth2StateExpiredTime uint32 = 300   // 5 minutes
+	defaultOAuth2RequestTimeout   uint32 = 10000 // 10 seconds
+
 	defaultTransactionPictureFileMaxSize uint32 = 10485760 // 10MB
 	defaultUserAvatarFileMaxSize         uint32 = 1048576  // 1MB
 
@@ -240,15 +254,8 @@ type LLMConfig struct {
 	LargeLanguageModelAPISkipTLSVerify  bool
 }
 
-// TipConfig represents a tip setting config
-type TipConfig struct {
-	Enabled              bool
-	DefaultContent       string
-	MultiLanguageContent map[string]string
-}
-
-// NotificationConfig represents a notification setting config
-type NotificationConfig struct {
+// MultiLanguageContentConfig represents a multi-language content setting config
+type MultiLanguageContentConfig struct {
 	Enabled              bool
 	DefaultContent       string
 	MultiLanguageContent map[string]string
@@ -351,9 +358,22 @@ type Config struct {
 	MaxFailuresPerUserPerMinute           uint32
 
 	// Auth
+	EnableInternalAuth               bool
+	EnableOAuth2Login                bool
 	EnableTwoFactor                  bool
 	EnableUserForgetPassword         bool
 	ForgetPasswordRequireVerifyEmail bool
+	OAuth2ClientID                   string
+	OAuth2ClientSecret               string
+	OAuth2UserIdentifier             string
+	OAuth2AutoRegister               bool
+	OAuth2Provider                   string
+	OAuth2StateExpiredTime           uint32
+	OAuth2StateExpiredTimeDuration   time.Duration
+	OAuth2RequestTimeout             uint32
+	OAuth2Proxy                      string
+	OAuth2SkipTLSVerify              bool
+	OAuth2NextcloudBaseUrl           string
 
 	// User
 	EnableUserRegister            bool
@@ -372,12 +392,12 @@ type Config struct {
 	MaxImportFileSize uint32
 
 	// Tip
-	LoginPageTips TipConfig
+	LoginPageTips MultiLanguageContentConfig
 
 	// Notification
-	AfterRegisterNotification NotificationConfig
-	AfterLoginNotification    NotificationConfig
-	AfterOpenNotification     NotificationConfig
+	AfterRegisterNotification MultiLanguageContentConfig
+	AfterLoginNotification    MultiLanguageContentConfig
+	AfterOpenNotification     MultiLanguageContentConfig
 
 	// Map
 	MapProvider                           string
@@ -956,9 +976,47 @@ func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName
 }
 
 func loadAuthConfiguration(config *Config, configFile *ini.File, sectionName string) error {
+	config.EnableInternalAuth = getConfigItemBoolValue(configFile, sectionName, "enable_internal_auth", true)
+	config.EnableOAuth2Login = getConfigItemBoolValue(configFile, sectionName, "enable_oauth2_auth", false)
 	config.EnableTwoFactor = getConfigItemBoolValue(configFile, sectionName, "enable_two_factor", true)
 	config.EnableUserForgetPassword = getConfigItemBoolValue(configFile, sectionName, "enable_forget_password", false)
 	config.ForgetPasswordRequireVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "forget_password_require_email_verify", false)
+	config.OAuth2ClientID = getConfigItemStringValue(configFile, sectionName, "oauth2_client_id")
+	config.OAuth2ClientSecret = getConfigItemStringValue(configFile, sectionName, "oauth2_client_secret")
+
+	oauth2UserIdentifier := getConfigItemStringValue(configFile, sectionName, "oauth2_user_identifier")
+
+	if oauth2UserIdentifier == OAuth2UserIdentifierEmail {
+		config.OAuth2UserIdentifier = OAuth2UserIdentifierEmail
+	} else if oauth2UserIdentifier == OAuth2UserIdentifierUsername {
+		config.OAuth2UserIdentifier = OAuth2UserIdentifierUsername
+	} else {
+		return errs.ErrInvalidOAuth2UserIdentifier
+	}
+
+	config.OAuth2AutoRegister = getConfigItemBoolValue(configFile, sectionName, "oauth2_auto_register", true)
+
+	oauth2Provider := getConfigItemStringValue(configFile, sectionName, "oauth2_provider")
+
+	if oauth2Provider == OAuth2ProviderNextcloud {
+		config.OAuth2Provider = OAuth2ProviderNextcloud
+	} else {
+		return errs.ErrInvalidOAuth2Provider
+	}
+
+	config.OAuth2StateExpiredTime = getConfigItemUint32Value(configFile, sectionName, "oauth2_state_expired_time", defaultOAuth2StateExpiredTime)
+
+	if config.OAuth2StateExpiredTime < 60 {
+		return errs.ErrInvalidOAuth2StateExpiredTime
+	}
+
+	config.OAuth2StateExpiredTimeDuration = time.Duration(config.OAuth2StateExpiredTime) * time.Second
+
+	config.OAuth2Proxy = getConfigItemStringValue(configFile, sectionName, "oauth2_proxy", "system")
+	config.OAuth2RequestTimeout = getConfigItemUint32Value(configFile, sectionName, "oauth2_request_timeout", defaultOAuth2RequestTimeout)
+	config.OAuth2SkipTLSVerify = getConfigItemBoolValue(configFile, sectionName, "oauth2_skip_tls_verify", false)
+
+	config.OAuth2NextcloudBaseUrl = getConfigItemStringValue(configFile, sectionName, "nextcloud_base_url")
 
 	return nil
 }
@@ -996,15 +1054,15 @@ func loadDataConfiguration(config *Config, configFile *ini.File, sectionName str
 }
 
 func loadTipConfiguration(config *Config, configFile *ini.File, sectionName string) error {
-	config.LoginPageTips = getTipConfiguration(configFile, sectionName, "enable_tips_in_login_page", "login_page_tips_content")
+	config.LoginPageTips = getMultiLanguageContentConfig(configFile, sectionName, "enable_tips_in_login_page", "login_page_tips_content")
 
 	return nil
 }
 
 func loadNotificationConfiguration(config *Config, configFile *ini.File, sectionName string) error {
-	config.AfterRegisterNotification = getNotificationConfiguration(configFile, sectionName, "enable_notification_after_register", "after_register_notification_content")
-	config.AfterLoginNotification = getNotificationConfiguration(configFile, sectionName, "enable_notification_after_login", "after_login_notification_content")
-	config.AfterOpenNotification = getNotificationConfiguration(configFile, sectionName, "enable_notification_after_open", "after_open_notification_content")
+	config.AfterRegisterNotification = getMultiLanguageContentConfig(configFile, sectionName, "enable_notification_after_register", "after_register_notification_content")
+	config.AfterLoginNotification = getMultiLanguageContentConfig(configFile, sectionName, "enable_notification_after_login", "after_login_notification_content")
+	config.AfterOpenNotification = getMultiLanguageContentConfig(configFile, sectionName, "enable_notification_after_open", "after_open_notification_content")
 
 	return nil
 }
@@ -1141,29 +1199,8 @@ func getFinalPath(workingPath, p string) (string, error) {
 	return p, err
 }
 
-func getTipConfiguration(configFile *ini.File, sectionName string, enableKey string, contentKey string) TipConfig {
-	config := TipConfig{
-		Enabled:              getConfigItemBoolValue(configFile, sectionName, enableKey, false),
-		DefaultContent:       getConfigItemStringValue(configFile, sectionName, contentKey, ""),
-		MultiLanguageContent: make(map[string]string),
-	}
-
-	for languageTag := range locales.AllLanguages {
-		multiLanguageContentKey := strings.ToLower(languageTag)
-		multiLanguageContentKey = strings.Replace(multiLanguageContentKey, "-", "_", -1)
-		multiLanguageContentKey = contentKey + "_" + multiLanguageContentKey
-		content := getConfigItemStringValue(configFile, sectionName, multiLanguageContentKey, "")
-
-		if content != "" {
-			config.MultiLanguageContent[languageTag] = content
-		}
-	}
-
-	return config
-}
-
-func getNotificationConfiguration(configFile *ini.File, sectionName string, enableKey string, contentKey string) NotificationConfig {
-	config := NotificationConfig{
+func getMultiLanguageContentConfig(configFile *ini.File, sectionName string, enableKey string, contentKey string) MultiLanguageContentConfig {
+	config := MultiLanguageContentConfig{
 		Enabled:              getConfigItemBoolValue(configFile, sectionName, enableKey, false),
 		DefaultContent:       getConfigItemStringValue(configFile, sectionName, contentKey, ""),
 		MultiLanguageContent: make(map[string]string),

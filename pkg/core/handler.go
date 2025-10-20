@@ -12,6 +12,9 @@ type CliHandlerFunc func(*CliContext) error
 // MiddlewareHandlerFunc represents the middleware handler function
 type MiddlewareHandlerFunc func(*WebContext)
 
+// RedirectHandlerFunc represents the redirect handler function
+type RedirectHandlerFunc func(*WebContext) (string, *errs.Error)
+
 // ApiHandlerFunc represents the api handler function
 type ApiHandlerFunc func(*WebContext) (any, *errs.Error)
 

@@ -21,8 +21,8 @@ import type {
     UserProfileUpdateRequest,
     UserProfileUpdateResponse
 } from '@/models/user.ts';
-import type { LocalizedPresetCategory } from '@/core/category.ts';
 import type { ForgetPasswordRequest } from '@/models/forget_password.ts';
+import type { LocalizedPresetCategory } from '@/core/category.ts';
 
 import {
     isObject,
@@ -75,6 +75,10 @@ export const useRootStore = defineStore('root', () => {
 
     function setNotificationContent(content: string | null): void {
         currentNotification.value = content;
+    }
+
+    function generateOAuth2LoginUrl(platform: 'mobile' | 'desktop', clientSessionId: string): string {
+        return services.generateOAuth2LoginUrl(platform, clientSessionId);
     }
 
     function authorize(req: UserLoginRequest): Promise<AuthResponse> {
@@ -182,6 +186,56 @@ export const useRootStore = defineStore('root', () => {
                     reject({ error: error.response.data });
                 } else {
                     reject({ message: 'Unable to verify' });
+                }
+            });
+        });
+    }
+
+    function authorizeOAuth2({ provider, password, token }: { provider: string, password?: string, token: string }): Promise<AuthResponse> {
+        return new Promise((resolve, reject) => {
+            services.authorizeOAuth2({
+                req: {
+                    provider,
+                    password
+                },
+                token
+            }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result || !data.result.token) {
+                    reject({ message: 'Unable to log in' });
+                    return;
+                }
+
+                if (settingsStore.appSettings.applicationLock || hasUserAppLockState()) {
+                    const appLockState = getUserAppLockState();
+
+                    if (!appLockState || appLockState.username !== data.result.user?.username) {
+                        clearCurrentTokenAndUserInfo(true);
+                        settingsStore.setEnableApplicationLock(false);
+                        settingsStore.setEnableApplicationLockWebAuthn(false);
+                        clearWebAuthnConfig();
+                    }
+                }
+
+                settingsStore.setApplicationSettingsFromCloudSettings(data.result.applicationCloudSettings);
+
+                updateCurrentToken(data.result.token);
+
+                if (data.result.user && isObject(data.result.user)) {
+                    userStore.storeUserBasicInfo(data.result.user);
+                }
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to login', error);
+
+                if (error && error.processed) {
+                    reject(error);
+                } else if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else {
+                    reject({ message: 'Unable to log in' });
                 }
             });
         });
@@ -588,8 +642,10 @@ export const useRootStore = defineStore('root', () => {
         currentNotification,
         // functions
         setNotificationContent,
+        generateOAuth2LoginUrl,
         authorize,
         authorize2FA,
+        authorizeOAuth2,
         register,
         lock,
         logout,

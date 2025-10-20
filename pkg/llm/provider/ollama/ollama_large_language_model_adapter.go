@@ -159,7 +159,7 @@ func (p *OllamaLargeLanguageModelAdapter) getOllamaRequestUrl() string {
 
 // NewOllamaLargeLanguageModelProvider creates a new Ollama large language model provider instance
 func NewOllamaLargeLanguageModelProvider(llmConfig *settings.LLMConfig) provider.LargeLanguageModelProvider {
-	return common.NewCommonHttpLargeLanguageModelProvider(&OllamaLargeLanguageModelAdapter{
+	return common.NewCommonHttpLargeLanguageModelProvider(llmConfig, &OllamaLargeLanguageModelAdapter{
 		OllamaServerURL: llmConfig.OllamaServerURL,
 		OllamaModelID:   llmConfig.OllamaModelID,
 	})

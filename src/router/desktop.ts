@@ -9,6 +9,7 @@ import SignUpPage from '@/views/desktop/SignupPage.vue';
 import VerifyEmailPage from '@/views/desktop/VerifyEmailPage.vue';
 import ForgetPasswordPage from '@/views/desktop/ForgetPasswordPage.vue';
 import ResetPasswordPage from '@/views/desktop/ResetPasswordPage.vue';
+import OAuth2CallbackPage from '@/views/desktop/OAuth2CallbackPage.vue';
 import UnlockPage from '@/views/desktop/UnlockPage.vue';
 
 import HomePage from '@/views/desktop/HomePage.vue';
@@ -224,6 +225,17 @@ const router = createRouter({
             component: ResetPasswordPage,
             props: route => ({
                 token: route.query['token']
+            })
+        },
+        {
+            path: '/oauth2_callback',
+            component: OAuth2CallbackPage,
+            props: route => ({
+                token: route.query['token'],
+                provider: route.query['provider'],
+                platform: route.query['platform'],
+                userName: route.query['userName'],
+                error: route.query['error']
             })
         },
         {

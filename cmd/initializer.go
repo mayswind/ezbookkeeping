@@ -200,5 +200,9 @@ func getConfigWithoutSensitiveData(config *settings.Config) *settings.Config {
 		}
 	}
 
+	if clonedConfig.OAuth2ClientSecret != "" {
+		clonedConfig.OAuth2ClientSecret = "****"
+	}
+
 	return clonedConfig
 }

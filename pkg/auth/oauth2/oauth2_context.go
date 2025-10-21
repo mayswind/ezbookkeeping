@@ -15,12 +15,12 @@ type OAuth2Context struct {
 }
 
 // Value returns the value associated with key
-func (o *OAuth2Context) Value(key any) any {
+func (c *OAuth2Context) Value(key any) any {
 	if key == oauth2.HTTPClient {
-		return o.httpClient
+		return c.httpClient
 	}
 
-	return o.Context.Value(key)
+	return c.Context.Value(key)
 }
 
 func wrapOAuth2Context(ctx core.Context, httpClient *http.Client) core.Context {

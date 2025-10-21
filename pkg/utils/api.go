@@ -28,6 +28,16 @@ func GetDisplayErrorMessage(err *errs.Error) string {
 	return err.Error()
 }
 
+// GetJsonErrorResult returns error response in json format
+func GetJsonErrorResult(err *errs.Error, path string) map[string]any {
+	return core.O{
+		"success":      false,
+		"errorCode":    err.Code(),
+		"errorMessage": GetDisplayErrorMessage(err),
+		"path":         path,
+	}
+}
+
 // PrintJsonSuccessResult writes success response in json format to current http context
 func PrintJsonSuccessResult(c *core.WebContext, result any) {
 	c.JSON(http.StatusOK, core.O{
@@ -49,12 +59,7 @@ func PrintDataSuccessResult(c *core.WebContext, contentType string, fileName str
 func PrintJsonErrorResult(c *core.WebContext, err *errs.Error) {
 	c.SetResponseError(err)
 
-	result := core.O{
-		"success":      false,
-		"errorCode":    err.Code(),
-		"errorMessage": GetDisplayErrorMessage(err),
-		"path":         c.Request.URL.Path,
-	}
+	result := GetJsonErrorResult(err, c.Request.URL.Path)
 
 	if err.Context != nil {
 		result["context"] = err.Context
@@ -126,12 +131,7 @@ func WriteEventStreamJsonSuccessResult(c *core.WebContext, result any) {
 func WriteEventStreamJsonErrorResult(c *core.WebContext, originalErr *errs.Error) {
 	c.SetResponseError(originalErr)
 
-	result := core.O{
-		"success":      false,
-		"errorCode":    originalErr.Code(),
-		"errorMessage": GetDisplayErrorMessage(originalErr),
-		"path":         c.Request.URL.Path,
-	}
+	result := GetJsonErrorResult(originalErr, c.Request.URL.Path)
 
 	if originalErr.Context != nil {
 		result["context"] = originalErr.Context

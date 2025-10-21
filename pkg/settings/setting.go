@@ -91,7 +91,7 @@ const (
 	OAuth2UserIdentifierUsername string = "username"
 )
 
-// OAuth 2.0 rovider types
+// OAuth 2.0 provider types
 const (
 	OAuth2ProviderNextcloud string = "nextcloud"
 )
@@ -998,7 +998,9 @@ func loadAuthConfiguration(config *Config, configFile *ini.File, sectionName str
 
 	oauth2Provider := getConfigItemStringValue(configFile, sectionName, "oauth2_provider")
 
-	if oauth2Provider == OAuth2ProviderNextcloud {
+	if oauth2Provider == "" {
+		config.OAuth2Provider = ""
+	} else if oauth2Provider == OAuth2ProviderNextcloud {
 		config.OAuth2Provider = OAuth2ProviderNextcloud
 	} else {
 		return errs.ErrInvalidOAuth2Provider

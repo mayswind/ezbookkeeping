@@ -13,6 +13,7 @@ import (
 const webContextRequestIdFieldKey = "REQUEST_ID"
 const webContextTextualTokenFieldKey = "TOKEN_STRING"
 const webContextTokenClaimsFieldKey = "TOKEN_CLAIMS"
+const webContextTokenContextFieldKey = "TOKEN_CONTEXT"
 const webContextResponseErrorFieldKey = "RESPONSE_ERROR"
 
 // AcceptLanguageHeaderName represents the header name of accept language
@@ -111,6 +112,22 @@ func (c *WebContext) GetTokenClaims() *UserTokenClaims {
 	}
 
 	return claims.(*UserTokenClaims)
+}
+
+// SetTokenContext sets the given user token context to context
+func (c *WebContext) SetTokenContext(context string) {
+	c.Set(webContextTokenContextFieldKey, context)
+}
+
+// GetTokenContext returns the current user token context
+func (c *WebContext) GetTokenContext() string {
+	context, exists := c.Get(webContextTokenContextFieldKey)
+
+	if !exists {
+		return ""
+	}
+
+	return context.(string)
 }
 
 // GetCurrentUid returns the current user uid by the current user token

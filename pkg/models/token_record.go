@@ -12,9 +12,17 @@ type TokenRecord struct {
 	TokenType        core.TokenType `xorm:"INDEX(IDX_token_record_uid_type_expired_time) TINYINT NOT NULL"`
 	Secret           string         `xorm:"VARCHAR(10) NOT NULL"`
 	UserAgent        string         `xorm:"VARCHAR(255)"`
+	Context          string         `xorm:"BLOB"`
 	CreatedUnixTime  int64          `xorm:"PK"`
 	ExpiredUnixTime  int64          `xorm:"INDEX(IDX_token_record_uid_type_expired_time) INDEX(IDX_token_record_expired_time)"`
 	LastSeenUnixTime int64
+}
+
+// OAuth2CallbackTokenContext represents the context data of oauth 2.0 callback token
+type OAuth2CallbackTokenContext struct {
+	ExternalAuthType core.UserExternalAuthType `json:"externalAuthType"`
+	ExternalUsername string                    `json:"externalUsername"`
+	ExternalEmail    string                    `json:"externalEmail"`
 }
 
 // TokenGenerateMCPRequest represents all parameters of mcp token generation request

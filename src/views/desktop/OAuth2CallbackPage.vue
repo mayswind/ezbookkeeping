@@ -24,7 +24,7 @@
                     <v-card variant="flat" class="w-100 mt-0 px-4 pt-12" max-width="500">
                         <v-card-text>
                             <h4 class="text-h4 mb-2">{{ oauth2LoginDisplayName }}</h4>
-                            <p class="mb-0" v-if="!error && platform && provider && token && !userName">{{ tt('Logging in...') }}</p>
+                            <p class="mb-0" v-if="!error && platform && token && !userName">{{ tt('Logging in...') }}</p>
                             <p class="mb-0" v-else-if="!error && userName">{{ tt('format.misc.oauth2bindTip', { providerName: oauth2ProviderDisplayName, userName: userName }) }}</p>
                             <p class="mb-0" v-else-if="error">{{ te({ error }) }}</p>
                             <p class="mb-0" v-else>{{ tt('An error occurred') }}</p>
@@ -113,7 +113,6 @@ import { KnownErrorCode } from '@/consts/api.ts';
 import { navigateToHomePage } from '@/lib/web.ts';
 import {
     isUserVerifyEmailEnabled,
-    getOAuth2Provider,
     getOIDCCustomDisplayNames
 } from '@/lib/server_settings.ts';
 
@@ -135,7 +134,12 @@ const props = defineProps<{
 const router = useRouter();
 const theme = useTheme();
 
-const { tt, te, getLocalizedOAuth2ProviderName, getLocalizedOAuth2LoginText } = useI18n();
+const {
+    tt,
+    te,
+    getLocalizedOAuth2ProviderName,
+    getLocalizedOAuth2LoginText
+} = useI18n();
 
 const rootStore = useRootStore();
 
@@ -149,8 +153,8 @@ const {
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
-const oauth2ProviderDisplayName = computed<string>(() => getLocalizedOAuth2ProviderName(getOAuth2Provider(), getOIDCCustomDisplayNames()));
-const oauth2LoginDisplayName = computed<string>(() => getLocalizedOAuth2LoginText(getOAuth2Provider(), getOIDCCustomDisplayNames()));
+const oauth2ProviderDisplayName = computed<string>(() => getLocalizedOAuth2ProviderName(props.provider ?? '', getOIDCCustomDisplayNames()));
+const oauth2LoginDisplayName = computed<string>(() => getLocalizedOAuth2LoginText(props.provider ?? '', getOIDCCustomDisplayNames()));
 
 const error = computed<ErrorResponse | undefined>(() => {
     if (props.errorCode && props.errorMessage) {
@@ -196,7 +200,6 @@ function verifyAndLogin(): void  {
     logining.value = true;
 
     rootStore.authorizeOAuth2({
-        provider: props.provider || '',
         password: password.value,
         token: props.token || ''
     }).then(authResponse => {
@@ -217,11 +220,10 @@ function verifyAndLogin(): void  {
     });
 }
 
-if (!error.value && props.platform && props.provider && props.token && !props.userName) {
+if (!error.value && props.platform && props.token && !props.userName) {
     logining.value = true;
 
     rootStore.authorizeOAuth2({
-        provider: props.provider,
         token: props.token
     }).then(authResponse => {
         logining.value = false;

@@ -73,75 +73,75 @@ func (s *TokenService) GetAllUnexpiredNormalAndMCPTokensByUid(c core.Context, ui
 }
 
 // ParseToken returns the token model according to token content
-func (s *TokenService) ParseToken(c core.Context, token string) (*jwt.Token, *core.UserTokenClaims, error) {
+func (s *TokenService) ParseToken(c core.Context, token string) (*jwt.Token, *core.UserTokenClaims, string, error) {
 	return s.parseToken(c, token)
 }
 
 // CreateTokenViaCli generates a new normal token and saves to database
 func (s *TokenService) CreateTokenViaCli(c *core.CliContext, user *models.User) (string, *models.TokenRecord, error) {
-	token, _, tokenRecord, err := s.createToken(c, user, core.USER_TOKEN_TYPE_NORMAL, TokenUserAgentCreatedViaCli, s.CurrentConfig().TokenExpiredTimeDuration)
+	token, _, tokenRecord, err := s.createToken(c, user, core.USER_TOKEN_TYPE_NORMAL, TokenUserAgentCreatedViaCli, "", s.CurrentConfig().TokenExpiredTimeDuration)
 	return token, tokenRecord, err
 }
 
 // CreateToken generates a new normal token and saves to database
 func (s *TokenService) CreateToken(c *core.WebContext, user *models.User) (string, *core.UserTokenClaims, error) {
-	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_NORMAL, s.getUserAgent(c), s.CurrentConfig().TokenExpiredTimeDuration)
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_NORMAL, s.getUserAgent(c), "", s.CurrentConfig().TokenExpiredTimeDuration)
 	return token, claims, err
 }
 
 // CreateRequire2FAToken generates a new token requiring user to verify 2fa passcode and saves to database
 func (s *TokenService) CreateRequire2FAToken(c *core.WebContext, user *models.User) (string, *core.UserTokenClaims, error) {
-	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_REQUIRE_2FA, s.getUserAgent(c), s.CurrentConfig().TemporaryTokenExpiredTimeDuration)
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_REQUIRE_2FA, s.getUserAgent(c), "", s.CurrentConfig().TemporaryTokenExpiredTimeDuration)
 	return token, claims, err
 }
 
 // CreateEmailVerifyToken generates a new email verify token and saves to database
 func (s *TokenService) CreateEmailVerifyToken(c *core.WebContext, user *models.User) (string, *core.UserTokenClaims, error) {
-	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_EMAIL_VERIFY, s.getUserAgent(c), s.CurrentConfig().EmailVerifyTokenExpiredTimeDuration)
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_EMAIL_VERIFY, s.getUserAgent(c), "", s.CurrentConfig().EmailVerifyTokenExpiredTimeDuration)
 	return token, claims, err
 }
 
 // CreateEmailVerifyTokenWithoutUserAgent generates a new email verify token and saves to database
 func (s *TokenService) CreateEmailVerifyTokenWithoutUserAgent(c core.Context, user *models.User) (string, *core.UserTokenClaims, error) {
-	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_EMAIL_VERIFY, "", s.CurrentConfig().EmailVerifyTokenExpiredTimeDuration)
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_EMAIL_VERIFY, "", "", s.CurrentConfig().EmailVerifyTokenExpiredTimeDuration)
 	return token, claims, err
 }
 
 // CreatePasswordResetToken generates a new password reset token and saves to database
 func (s *TokenService) CreatePasswordResetToken(c *core.WebContext, user *models.User) (string, *core.UserTokenClaims, error) {
-	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_PASSWORD_RESET, s.getUserAgent(c), s.CurrentConfig().PasswordResetTokenExpiredTimeDuration)
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_PASSWORD_RESET, s.getUserAgent(c), "", s.CurrentConfig().PasswordResetTokenExpiredTimeDuration)
 	return token, claims, err
 }
 
 // CreatePasswordResetTokenWithoutUserAgent generates a new password reset token and saves to database
 func (s *TokenService) CreatePasswordResetTokenWithoutUserAgent(c core.Context, user *models.User) (string, *core.UserTokenClaims, error) {
-	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_PASSWORD_RESET, "", s.CurrentConfig().PasswordResetTokenExpiredTimeDuration)
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_PASSWORD_RESET, "", "", s.CurrentConfig().PasswordResetTokenExpiredTimeDuration)
 	return token, claims, err
 }
 
 // CreateMCPToken generates a new MCP token and saves to database
 func (s *TokenService) CreateMCPToken(c *core.WebContext, user *models.User) (string, *core.UserTokenClaims, error) {
 	tokenExpiredTimeDuration := time.Unix(tokenMaxExpiredAtUnixTime, 0).Sub(time.Now())
-	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_MCP, s.getUserAgent(c), tokenExpiredTimeDuration)
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_MCP, s.getUserAgent(c), "", tokenExpiredTimeDuration)
 	return token, claims, err
 }
 
 // CreateMCPTokenViaCli generates a new MCP token and saves to database
 func (s *TokenService) CreateMCPTokenViaCli(c *core.CliContext, user *models.User) (string, *models.TokenRecord, error) {
 	tokenExpiredTimeDuration := time.Unix(tokenMaxExpiredAtUnixTime, 0).Sub(time.Now())
-	token, _, tokenRecord, err := s.createToken(c, user, core.USER_TOKEN_TYPE_MCP, TokenUserAgentCreatedViaCli, tokenExpiredTimeDuration)
+	token, _, tokenRecord, err := s.createToken(c, user, core.USER_TOKEN_TYPE_MCP, TokenUserAgentCreatedViaCli, "", tokenExpiredTimeDuration)
 	return token, tokenRecord, err
 }
 
 // CreateOAuth2CallbackRequireVerifyToken generates a new OAuth 2.0 callback token requiring user to verify and saves to database
-func (s *TokenService) CreateOAuth2CallbackRequireVerifyToken(c *core.WebContext, user *models.User) (string, *core.UserTokenClaims, error) {
-	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_OAUTH2_CALLBACK_REQUIRE_VERIFY, s.getUserAgent(c), s.CurrentConfig().TemporaryTokenExpiredTimeDuration)
+func (s *TokenService) CreateOAuth2CallbackRequireVerifyToken(c *core.WebContext, user *models.User, context string) (string, *core.UserTokenClaims, error) {
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_OAUTH2_CALLBACK_REQUIRE_VERIFY, s.getUserAgent(c), context, s.CurrentConfig().TemporaryTokenExpiredTimeDuration)
 	return token, claims, err
 }
 
 // CreateOAuth2CallbackToken generates a new OAuth 2.0 callback token and saves to database
-func (s *TokenService) CreateOAuth2CallbackToken(c *core.WebContext, user *models.User) (string, *core.UserTokenClaims, error) {
-	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_OAUTH2_CALLBACK, s.getUserAgent(c), s.CurrentConfig().TemporaryTokenExpiredTimeDuration)
+func (s *TokenService) CreateOAuth2CallbackToken(c *core.WebContext, user *models.User, context string) (string, *core.UserTokenClaims, error) {
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_OAUTH2_CALLBACK, s.getUserAgent(c), context, s.CurrentConfig().TemporaryTokenExpiredTimeDuration)
 	return token, claims, err
 }
 
@@ -331,8 +331,9 @@ func (s *TokenService) GenerateTokenId(tokenRecord *models.TokenRecord) string {
 	return fmt.Sprintf("%d:%d:%d", tokenRecord.Uid, tokenRecord.CreatedUnixTime, tokenRecord.UserTokenId)
 }
 
-func (s *TokenService) parseToken(c core.Context, tokenString string) (*jwt.Token, *core.UserTokenClaims, error) {
+func (s *TokenService) parseToken(c core.Context, tokenString string) (*jwt.Token, *core.UserTokenClaims, string, error) {
 	claims := &core.UserTokenClaims{}
+	tokenContext := ""
 
 	token, err := jwt.ParseWithClaims(tokenString, claims,
 		func(token *jwt.Token) (any, error) {
@@ -356,6 +357,7 @@ func (s *TokenService) parseToken(c core.Context, tokenString string) (*jwt.Toke
 				return nil, errs.ErrTokenExpired
 			}
 
+			tokenContext = tokenRecord.Context
 			return []byte(tokenRecord.Secret), nil
 		},
 		jwt.WithIssuedAt(),
@@ -363,30 +365,30 @@ func (s *TokenService) parseToken(c core.Context, tokenString string) (*jwt.Toke
 
 	if err != nil {
 		if errors.Is(err, request.ErrNoTokenInRequest) {
-			return nil, nil, errs.ErrTokenIsEmpty
+			return nil, nil, "", errs.ErrTokenIsEmpty
 		}
 
 		if errors.Is(err, jwt.ErrTokenMalformed) || errors.Is(err, jwt.ErrTokenUnverifiable) || errors.Is(err, jwt.ErrTokenSignatureInvalid) {
 			log.Warnf(c, "[tokens.parseToken] token is invalid, because %s", err.Error())
-			return nil, nil, errs.ErrCurrentInvalidToken
+			return nil, nil, "", errs.ErrCurrentInvalidToken
 		}
 
 		if errors.Is(err, jwt.ErrTokenExpired) {
-			return nil, nil, errs.ErrCurrentTokenExpired
+			return nil, nil, "", errs.ErrCurrentTokenExpired
 		}
 
 		if errors.Is(err, jwt.ErrTokenUsedBeforeIssued) {
 			log.Warnf(c, "[tokens.parseToken] token is invalid, because issue time is later than now")
-			return nil, nil, errs.ErrCurrentInvalidToken
+			return nil, nil, "", errs.ErrCurrentInvalidToken
 		}
 
-		return nil, nil, err
+		return nil, nil, "", err
 	}
 
-	return token, claims, err
+	return token, claims, tokenContext, err
 }
 
-func (s *TokenService) createToken(c core.Context, user *models.User, tokenType core.TokenType, userAgent string, expiryDate time.Duration) (string, *core.UserTokenClaims, *models.TokenRecord, error) {
+func (s *TokenService) createToken(c core.Context, user *models.User, tokenType core.TokenType, userAgent string, context string, expiryDate time.Duration) (string, *core.UserTokenClaims, *models.TokenRecord, error) {
 	var err error
 	now := time.Now()
 
@@ -395,6 +397,7 @@ func (s *TokenService) createToken(c core.Context, user *models.User, tokenType 
 		UserTokenId:      s.getUserTokenId(),
 		TokenType:        tokenType,
 		UserAgent:        userAgent,
+		Context:          context,
 		CreatedUnixTime:  now.Unix(),
 		ExpiredUnixTime:  now.Add(expiryDate).Unix(),
 		LastSeenUnixTime: now.Unix(),

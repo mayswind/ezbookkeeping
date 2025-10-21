@@ -92,7 +92,15 @@ func (s *UserExternalAuthService) CreateUserExternalAuth(c core.Context, userExt
 	userExternalAuth.CreatedUnixTime = time.Now().Unix()
 
 	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
-		_, err := sess.Insert(userExternalAuth)
+		exists, err := sess.Where("uid=? AND external_auth_type=?", userExternalAuth.Uid, userExternalAuth.ExternalAuthType).Limit(1).Exist(&models.UserExternalAuth{})
+
+		if err != nil {
+			return err
+		} else if exists {
+			return errs.ErrUserExternalAuthAlreadyExists
+		}
+
+		_, err = sess.Insert(userExternalAuth)
 		return err
 	})
 }

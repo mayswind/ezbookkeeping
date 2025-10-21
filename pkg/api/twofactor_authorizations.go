@@ -205,6 +205,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableConfirmHandler(c *core.WebCo
 
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
+	c.SetTokenContext("")
 
 	log.Infof(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)
 

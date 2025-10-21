@@ -1,6 +1,8 @@
 package api
 
 import (
+	"encoding/json"
+
 	"github.com/pquerna/otp/totp"
 
 	"github.com/mayswind/ezbookkeeping/pkg/avatars"
@@ -147,6 +149,7 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.WebContext) (any, *errs.Err
 	}
 
 	c.SetTokenClaims(claims)
+	c.SetTokenContext("")
 
 	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, user.Uid)
 	var applicationCloudSettingSlice *models.ApplicationCloudSettingSlice = nil
@@ -238,6 +241,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.WebContext) (any, 
 
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
+	c.SetTokenContext("")
 
 	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, user.Uid)
 	var applicationCloudSettingSlice *models.ApplicationCloudSettingSlice = nil
@@ -336,6 +340,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.WebC
 
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
+	c.SetTokenContext("")
 
 	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, user.Uid)
 	var applicationCloudSettingSlice *models.ApplicationCloudSettingSlice = nil
@@ -366,10 +371,16 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	userExternalAuthType := core.UserExternalAuthType(credential.Provider)
+	var tokenContext models.OAuth2CallbackTokenContext
+	err = json.Unmarshal([]byte(c.GetTokenContext()), &tokenContext)
 
-	if !userExternalAuthType.IsValid() {
-		log.Warnf(c, "[authorizations.OAuth2CallbackAuthorizeHandler] provider \"%s\" is invalid", credential.Provider)
+	if err != nil {
+		log.Warnf(c, "[authorizations.OAuth2CallbackAuthorizeHandler] parse token context failed, because %s", err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	if !tokenContext.ExternalAuthType.IsValid() {
+		log.Warnf(c, "[authorizations.OAuth2CallbackAuthorizeHandler] external auth type \"%s\" is invalid", tokenContext.ExternalAuthType)
 		return nil, errs.ErrInvalidOAuth2Provider
 	}
 
@@ -418,13 +429,9 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 
 		userExternalAuth := &models.UserExternalAuth{
 			Uid:              user.Uid,
-			ExternalAuthType: userExternalAuthType,
-		}
-
-		if a.CurrentConfig().OAuth2UserIdentifier == settings.OAuth2UserIdentifierEmail {
-			userExternalAuth.ExternalEmail = user.Email
-		} else if a.CurrentConfig().OAuth2UserIdentifier == settings.OAuth2UserIdentifierUsername {
-			userExternalAuth.ExternalUsername = user.Username
+			ExternalAuthType: tokenContext.ExternalAuthType,
+			ExternalUsername: tokenContext.ExternalUsername,
+			ExternalEmail:    tokenContext.ExternalEmail,
 		}
 
 		err = a.userExternalAuths.CreateUserExternalAuth(c, userExternalAuth)
@@ -436,7 +443,7 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 
 		log.Infof(c, "[authorizations.OAuth2CallbackAuthorizeHandler] user external auth has been created for user \"uid:%d\"", user.Uid)
 	} else if oldTokenClaims.Type == core.USER_TOKEN_TYPE_OAUTH2_CALLBACK {
-		_, err = a.userExternalAuths.GetUserExternalAuthByUid(c, uid, userExternalAuthType)
+		_, err = a.userExternalAuths.GetUserExternalAuthByUid(c, uid, tokenContext.ExternalAuthType)
 
 		if err != nil {
 			log.Errorf(c, "[authorizations.OAuth2CallbackAuthorizeHandler] failed to get user external auth for user \"uid:%d\", because %s", uid, err.Error())
@@ -461,6 +468,7 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
+	c.SetTokenContext("")
 
 	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, user.Uid)
 	var applicationCloudSettingSlice *models.ApplicationCloudSettingSlice = nil

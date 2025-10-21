@@ -37,7 +37,7 @@ func JWTAuthorizationByCookie(c *core.WebContext) {
 
 // JWTTwoFactorAuthorization verifies whether current request is valid by 2fa passcode
 func JWTTwoFactorAuthorization(c *core.WebContext) {
-	claims, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
+	claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
 
 	if err != nil {
 		utils.PrintJsonErrorResult(c, err)
@@ -51,12 +51,13 @@ func JWTTwoFactorAuthorization(c *core.WebContext) {
 	}
 
 	c.SetTokenClaims(claims)
+	c.SetTokenContext(tokenContext)
 	c.Next()
 }
 
 // JWTEmailVerifyAuthorization verifies whether current request is email verification
 func JWTEmailVerifyAuthorization(c *core.WebContext) {
-	claims, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
+	claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
 
 	if err != nil {
 		utils.PrintJsonErrorResult(c, errs.ErrEmailVerifyTokenIsInvalidOrExpired)
@@ -70,12 +71,13 @@ func JWTEmailVerifyAuthorization(c *core.WebContext) {
 	}
 
 	c.SetTokenClaims(claims)
+	c.SetTokenContext(tokenContext)
 	c.Next()
 }
 
 // JWTResetPasswordAuthorization verifies whether current request is password reset
 func JWTResetPasswordAuthorization(c *core.WebContext) {
-	claims, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
+	claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
 
 	if err != nil {
 		utils.PrintJsonErrorResult(c, errs.ErrPasswordResetTokenIsInvalidOrExpired)
@@ -89,12 +91,13 @@ func JWTResetPasswordAuthorization(c *core.WebContext) {
 	}
 
 	c.SetTokenClaims(claims)
+	c.SetTokenContext(tokenContext)
 	c.Next()
 }
 
 // JWTMCPAuthorization verifies whether current request is valid by jwt mcp token in header
 func JWTMCPAuthorization(c *core.WebContext) {
-	claims, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
+	claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
 
 	if err != nil {
 		utils.PrintJsonErrorResult(c, err)
@@ -108,12 +111,13 @@ func JWTMCPAuthorization(c *core.WebContext) {
 	}
 
 	c.SetTokenClaims(claims)
+	c.SetTokenContext(tokenContext)
 	c.Next()
 }
 
 // JWTOAuth2CallbackAuthorization verifies whether current request is OAuth 2.0 callback
 func JWTOAuth2CallbackAuthorization(c *core.WebContext) {
-	claims, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
+	claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
 
 	if err != nil {
 		utils.PrintJsonErrorResult(c, errs.ErrTokenExpired)
@@ -127,11 +131,12 @@ func JWTOAuth2CallbackAuthorization(c *core.WebContext) {
 	}
 
 	c.SetTokenClaims(claims)
+	c.SetTokenContext(tokenContext)
 	c.Next()
 }
 
 func jwtAuthorization(c *core.WebContext, source TokenSourceType) {
-	claims, err := getTokenClaims(c, source)
+	claims, tokenContext, err := getTokenClaims(c, source)
 
 	if err != nil {
 		utils.PrintJsonErrorResult(c, err)
@@ -151,31 +156,32 @@ func jwtAuthorization(c *core.WebContext, source TokenSourceType) {
 	}
 
 	c.SetTokenClaims(claims)
+	c.SetTokenContext(tokenContext)
 	c.Next()
 }
 
-func getTokenClaims(c *core.WebContext, source TokenSourceType) (*core.UserTokenClaims, *errs.Error) {
-	token, claims, err := parseToken(c, source)
+func getTokenClaims(c *core.WebContext, source TokenSourceType) (*core.UserTokenClaims, string, *errs.Error) {
+	token, claims, tokenContext, err := parseToken(c, source)
 
 	if err != nil {
 		log.Warnf(c, "[authorization.getTokenClaims] failed to parse token, because %s", err.Error())
-		return nil, errs.Or(err, errs.ErrUnauthorizedAccess)
+		return nil, "", errs.Or(err, errs.ErrUnauthorizedAccess)
 	}
 
 	if !token.Valid {
 		log.Warnf(c, "[authorization.getTokenClaims] token is invalid")
-		return nil, errs.ErrCurrentInvalidToken
+		return nil, "", errs.ErrCurrentInvalidToken
 	}
 
 	if claims.Uid <= 0 {
 		log.Warnf(c, "[authorization.getTokenClaims] user id in token is invalid")
-		return nil, errs.ErrCurrentInvalidToken
+		return nil, "", errs.ErrCurrentInvalidToken
 	}
 
-	return claims, nil
+	return claims, tokenContext, nil
 }
 
-func parseToken(c *core.WebContext, source TokenSourceType) (*jwt.Token, *core.UserTokenClaims, error) {
+func parseToken(c *core.WebContext, source TokenSourceType) (*jwt.Token, *core.UserTokenClaims, string, error) {
 	tokenString := ""
 
 	if source == TOKEN_SOURCE_TYPE_ARGUMENT {
@@ -187,7 +193,7 @@ func parseToken(c *core.WebContext, source TokenSourceType) (*jwt.Token, *core.U
 	}
 
 	if tokenString == "" {
-		return nil, nil, errs.ErrTokenIsEmpty
+		return nil, nil, "", errs.ErrTokenIsEmpty
 	}
 
 	return services.Tokens.ParseToken(c, tokenString)

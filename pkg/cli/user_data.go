@@ -447,7 +447,7 @@ func (l *UserDataCli) CreateNewUserToken(c *core.CliContext, username string, to
 
 // RevokeUserToken revokes the specified token of the user
 func (l *UserDataCli) RevokeUserToken(c *core.CliContext, token string) error {
-	_, claims, err := l.tokens.ParseToken(c, token)
+	_, claims, _, err := l.tokens.ParseToken(c, token)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.RevokeUserToken] failed to parse token, because %s", err.Error())

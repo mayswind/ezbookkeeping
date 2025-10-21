@@ -14,6 +14,5 @@ type OAuth2CallbackRequest struct {
 
 // OAuth2CallbackLoginRequest represents all parameters of OAuth 2.0 callback login request
 type OAuth2CallbackLoginRequest struct {
-	Provider string `json:"provider" binding:"required,notBlank"`
 	Password string `json:"password" binding:"omitempty,min=6,max=128"`
 }

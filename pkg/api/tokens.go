@@ -136,7 +136,7 @@ func (a *TokensApi) TokenRevokeCurrentHandler(c *core.WebContext) (any, *errs.Er
 		return false, errs.ErrTokenIsEmpty
 	}
 
-	_, claims, err := a.tokens.ParseToken(c, tokenString)
+	_, claims, _, err := a.tokens.ParseToken(c, tokenString)
 
 	if err != nil {
 		return nil, errs.Or(err, errs.NewIncompleteOrIncorrectSubmissionError(err))
@@ -344,6 +344,7 @@ func (a *TokensApi) TokenRefreshHandler(c *core.WebContext) (any, *errs.Error) {
 
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
+	c.SetTokenContext("")
 
 	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, user.Uid)
 	var applicationCloudSettingSlice *models.ApplicationCloudSettingSlice = nil

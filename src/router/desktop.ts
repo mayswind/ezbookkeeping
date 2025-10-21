@@ -235,7 +235,8 @@ const router = createRouter({
                 provider: route.query['provider'],
                 platform: route.query['platform'],
                 userName: route.query['userName'],
-                error: route.query['error']
+                errorCode: route.query['errorCode'],
+                errorMessage: route.query['errorMessage']
             })
         },
         {

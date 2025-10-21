@@ -26,7 +26,7 @@
                             <h4 class="text-h4 mb-2">{{ oauth2LoginDisplayName }}</h4>
                             <p class="mb-0" v-if="!error && platform && provider && token && !userName">{{ tt('Logging in...') }}</p>
                             <p class="mb-0" v-else-if="!error && userName">{{ tt('format.misc.oauth2bindTip', { providerName: oauth2ProviderDisplayName, userName: userName }) }}</p>
-                            <p class="mb-0" v-else-if="error">{{ tt(error) }}</p>
+                            <p class="mb-0" v-else-if="error">{{ te({ error }) }}</p>
                             <p class="mb-0" v-else>{{ tt('An error occurred') }}</p>
                         </v-card-text>
 
@@ -106,6 +106,7 @@ import { useLoginPageBase } from '@/views/base/LoginPageBase.ts';
 import { useRootStore } from '@/stores/index.ts';
 
 import { ThemeType } from '@/core/theme.ts';
+import { type ErrorResponse } from '@/core/api.ts';
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
 
@@ -127,13 +128,14 @@ const props = defineProps<{
     provider?: string;
     platform?: string;
     userName?: string;
-    error?: string;
+    errorCode?: string;
+    errorMessage?: string;
 }>();
 
 const router = useRouter();
 const theme = useTheme();
 
-const { tt, getLocalizedOAuth2ProviderName, getLocalizedOAuth2LoginText } = useI18n();
+const { tt, te, getLocalizedOAuth2ProviderName, getLocalizedOAuth2LoginText } = useI18n();
 
 const rootStore = useRootStore();
 
@@ -149,6 +151,21 @@ const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 const oauth2ProviderDisplayName = computed<string>(() => getLocalizedOAuth2ProviderName(getOAuth2Provider(), getOIDCCustomDisplayNames()));
 const oauth2LoginDisplayName = computed<string>(() => getLocalizedOAuth2LoginText(getOAuth2Provider(), getOIDCCustomDisplayNames()));
+
+const error = computed<ErrorResponse | undefined>(() => {
+    if (props.errorCode && props.errorMessage) {
+        const errorResponse: ErrorResponse = {
+            success: false,
+            errorCode: parseInt(props.errorCode),
+            errorMessage: props.errorMessage,
+            path: ''
+        };
+
+        return errorResponse;
+    } else {
+        return undefined;
+    }
+});
 
 const inputProblemMessage = computed<string | null>(() => {
     if (!password.value) {
@@ -200,7 +217,7 @@ function verifyAndLogin(): void  {
     });
 }
 
-if (!props.error && props.platform && props.provider && props.token && !props.userName) {
+if (!error.value && props.platform && props.provider && props.token && !props.userName) {
     logining.value = true;
 
     rootStore.authorizeOAuth2({

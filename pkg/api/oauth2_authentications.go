@@ -21,7 +21,7 @@ import (
 
 const oauth2CallbackPageUrlSuccessFormat = "%sdesktop/#/oauth2_callback?platform=%s&provider=%s&token=%s"
 const oauth2CallbackPageUrlNeedVerifyFormat = "%sdesktop/#/oauth2_callback?platform=%s&provider=%s&userName=%s&token=%s"
-const oauth2CallbackPageUrlFailedFormat = "%sdesktop/#/oauth2_callback?error=%s"
+const oauth2CallbackPageUrlFailedFormat = "%sdesktop/#/oauth2_callback?errorCode=%d&errorMessage=%s"
 
 // OAuth2AuthenticationApi represents OAuth 2.0 authorization api
 type OAuth2AuthenticationApi struct {
@@ -309,5 +309,5 @@ func (a *OAuth2AuthenticationApi) redirectToVerifyCallbackPage(c *core.WebContex
 }
 
 func (a *OAuth2AuthenticationApi) redirectToFailedCallbackPage(c *core.WebContext, err *errs.Error) (string, *errs.Error) {
-	return fmt.Sprintf(oauth2CallbackPageUrlFailedFormat, a.CurrentConfig().RootUrl, url.QueryEscape(utils.GetDisplayErrorMessage(err))), nil
+	return fmt.Sprintf(oauth2CallbackPageUrlFailedFormat, a.CurrentConfig().RootUrl, err.Code(), url.QueryEscape(utils.GetDisplayErrorMessage(err))), nil
 }

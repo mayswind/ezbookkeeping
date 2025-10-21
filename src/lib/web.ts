@@ -8,3 +8,11 @@ export function getBasePath(): string {
 
     return path.substring(0, lastSlashIndex);
 }
+
+export function navigateToHomePage(type: 'desktop' | 'mobile'): void {
+    if (__EZBOOKKEEPING_IS_PRODUCTION__) {
+        window.location.replace(`${type}#/`);
+    } else {
+        window.location.replace(`${type}.html#/`);
+    }
+}

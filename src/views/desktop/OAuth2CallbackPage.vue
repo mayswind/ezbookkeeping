@@ -24,7 +24,7 @@
                     <v-card variant="flat" class="w-100 mt-0 px-4 pt-12" max-width="500">
                         <v-card-text>
                             <h4 class="text-h4 mb-2">{{ oauth2LoginDisplayName }}</h4>
-                            <p class="mb-0" v-if="!error && platform && token && !userName">{{ tt('Logging in...') }}</p>
+                            <p class="mb-0" v-if="!error && platform && provider && token && !userName">{{ tt('Logging in...') }}</p>
                             <p class="mb-0" v-else-if="!error && userName">{{ tt('format.misc.oauth2bindTip', { providerName: oauth2ProviderDisplayName, userName: userName }) }}</p>
                             <p class="mb-0" v-else-if="error">{{ tt(error) }}</p>
                             <p class="mb-0" v-else>{{ tt('An error occurred') }}</p>
@@ -42,12 +42,12 @@
                                             :label="tt('Password')"
                                             :placeholder="tt('Your password')"
                                             v-model="password"
-                                            @keyup.enter="verify"
+                                            @keyup.enter="verifyAndLogin"
                                         />
                                     </v-col>
 
                                     <v-col cols="12">
-                                        <v-btn block type="submit" :disabled="!password || logining" @click="verify">
+                                        <v-btn block type="submit" :disabled="!password || logining" @click="verifyAndLogin">
                                             {{ tt('Continue') }}
                                             <v-progress-circular indeterminate size="22" class="ms-2" v-if="logining"></v-progress-circular>
                                         </v-btn>
@@ -109,6 +109,7 @@ import { ThemeType } from '@/core/theme.ts';
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
 
+import { navigateToHomePage } from '@/lib/web.ts';
 import {
     isUserVerifyEmailEnabled,
     getOAuth2Provider,
@@ -157,7 +158,17 @@ const inputProblemMessage = computed<string | null>(() => {
     }
 });
 
-function verify(): void  {
+function navigateToHome(): void {
+    if (props.platform === 'desktop') {
+        navigateToHomePage('desktop');
+    } else if (props.platform === 'mobile') {
+        navigateToHomePage('mobile');
+    } else {
+        router.replace('/');
+    }
+}
+
+function verifyAndLogin(): void  {
     const problemMessage = inputProblemMessage.value;
 
     if (problemMessage) {
@@ -174,7 +185,7 @@ function verify(): void  {
     }).then(authResponse => {
         logining.value = false;
         doAfterLogin(authResponse);
-        router.replace('/');
+        navigateToHome();
     }).catch(error => {
         logining.value = false;
 
@@ -189,16 +200,16 @@ function verify(): void  {
     });
 }
 
-if (!props.error && props.platform && props.token && !props.userName) {
+if (!props.error && props.platform && props.provider && props.token && !props.userName) {
     logining.value = true;
 
     rootStore.authorizeOAuth2({
-        provider: props.provider || '',
-        token: props.token || ''
+        provider: props.provider,
+        token: props.token
     }).then(authResponse => {
         logining.value = false;
         doAfterLogin(authResponse);
-        router.replace('/');
+        navigateToHome();
     }).catch(error => {
         logining.value = false;
 

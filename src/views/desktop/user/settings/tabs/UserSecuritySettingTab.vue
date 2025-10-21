@@ -54,7 +54,7 @@
                     </v-card-text>
 
                     <v-card-text class="d-flex flex-wrap gap-4">
-                        <v-btn :disabled="!currentPassword || !newPassword || !confirmPassword || updatingPassword" @click="updatePassword">
+                        <v-btn :disabled="!newPassword || !confirmPassword || updatingPassword" @click="updatePassword">
                             {{ tt('Save Changes') }}
                             <v-progress-circular indeterminate size="22" class="ms-2" v-if="updatingPassword"></v-progress-circular>
                         </v-btn>
@@ -213,9 +213,7 @@ const sessions = computed<DesktopPageSessionInfo[]>(() => {
 });
 
 const inputProblemMessage = computed<string | null>(() => {
-    if (!currentPassword.value) {
-        return 'Current password cannot be blank';
-    } else if (!newPassword.value && !confirmPassword.value) {
+    if (!newPassword.value && !confirmPassword.value) {
         return 'Nothing has been modified';
     } else if (!newPassword.value && confirmPassword.value) {
         return 'New password cannot be blank';

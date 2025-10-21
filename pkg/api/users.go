@@ -277,7 +277,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 			return nil, errs.ErrNotPermittedToPerformThisAction
 		}
 
-		if !a.users.IsPasswordEqualsUserPassword(userUpdateReq.OldPassword, user) {
+		if user.Password != "" && !a.users.IsPasswordEqualsUserPassword(userUpdateReq.OldPassword, user) {
 			return nil, errs.ErrUserPasswordWrong
 		}
 

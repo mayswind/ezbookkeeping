@@ -233,6 +233,7 @@ export interface UserProfileUpdateResponse {
 }
 
 export interface UserProfileResponse extends UserBasicInfo {
+    readonly noPassword?: boolean;
     readonly lastLoginAt: number;
 }
 

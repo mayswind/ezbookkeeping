@@ -5,7 +5,7 @@
             <f7-nav-title :title="tt('User Profile')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': !isUserVerifyEmailEnabled() || loading || emailVerified }" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link :class="{ 'disabled': inputIsNotChanged || inputIsInvalid || saving }" :text="tt('Save')" @click="save"></f7-link>
+                <f7-link :class="{ 'disabled': inputIsNotChanged || inputIsInvalid || saving }" :text="tt('Save')" @click="save(currentNoPassword)"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -551,7 +551,7 @@
                               :cancel-disabled="saving"
                               v-model:show="showInputPasswordSheet"
                               v-model="currentPassword"
-                              @password:confirm="save()">
+                              @password:confirm="save(true)">
         </password-input-sheet>
     </f7-page>
 </template>
@@ -639,6 +639,7 @@ const userStore = useUserStore();
 const accountsStore = useAccountsStore();
 
 const currentPassword = ref<string>('');
+const currentNoPassword = ref<boolean>(false);
 const loadingError = ref<unknown | null>(null);
 const showInputPasswordSheet = ref<boolean>(false);
 const showAccountSheet = ref<boolean>(false);
@@ -690,6 +691,7 @@ function init(): void {
     Promise.all(promises).then(responses => {
         const profile = responses[1] as UserProfileResponse;
         setCurrentUserProfile(profile);
+        currentNoPassword.value = !!profile.noPassword;
         loading.value = false;
     }).catch(error => {
         if (error.processed) {
@@ -701,7 +703,7 @@ function init(): void {
     });
 }
 
-function save(): void {
+function save(confirm?: boolean): void {
     const router = props.f7router;
 
     showInputPasswordSheet.value = false;
@@ -713,7 +715,7 @@ function save(): void {
         return;
     }
 
-    if (newProfile.value.password && !currentPassword.value) {
+    if (newProfile.value.password && !confirm) {
         showInputPasswordSheet.value = true;
         return;
     }

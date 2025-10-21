@@ -225,6 +225,7 @@ type UserProfileUpdateResponse struct {
 // UserProfileResponse represents a view-object of user profile
 type UserProfileResponse struct {
 	*UserBasicInfo
+	NoPassword  bool  `json:"noPassword,omitempty"`
 	LastLoginAt int64 `json:"lastLoginAt"`
 }
 
@@ -313,6 +314,7 @@ func (u *User) ToUserBasicInfo(avatarProvider core.UserAvatarProviderType, avata
 func (u *User) ToUserProfileResponse(basicInfo *UserBasicInfo) *UserProfileResponse {
 	return &UserProfileResponse{
 		UserBasicInfo: basicInfo,
+		NoPassword:    u.Password == "",
 		LastLoginAt:   u.LastLoginUnixTime,
 	}
 }

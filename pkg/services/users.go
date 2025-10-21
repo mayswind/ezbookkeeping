@@ -184,7 +184,7 @@ func (s *UserService) GetUserAvatar(c core.Context, uid int64, fileExtension str
 }
 
 // CreateUser saves a new user model to database
-func (s *UserService) CreateUser(c core.Context, user *models.User) error {
+func (s *UserService) CreateUser(c core.Context, user *models.User, noPassword bool) error {
 	exists, err := s.ExistsUsername(c, user.Username)
 
 	if err != nil {
@@ -201,7 +201,7 @@ func (s *UserService) CreateUser(c core.Context, user *models.User) error {
 		return errs.ErrUserEmailAlreadyExists
 	}
 
-	if user.Password == "" {
+	if !noPassword && user.Password == "" {
 		return errs.ErrPasswordIsEmpty
 	}
 
@@ -215,7 +215,11 @@ func (s *UserService) CreateUser(c core.Context, user *models.User) error {
 		return errs.ErrSystemIsBusy
 	}
 
-	user.Password = utils.EncodePassword(user.Password, user.Salt)
+	if !noPassword {
+		user.Password = utils.EncodePassword(user.Password, user.Salt)
+	} else {
+		user.Password = ""
+	}
 
 	user.Deleted = false
 

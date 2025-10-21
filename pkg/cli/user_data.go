@@ -91,7 +91,7 @@ func (l *UserDataCli) AddNewUser(c *core.CliContext, username string, email stri
 		FeatureRestriction:   l.CurrentConfig().DefaultFeatureRestrictions,
 	}
 
-	err := l.users.CreateUser(c, user)
+	err := l.users.CreateUser(c, user, false)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.AddNewUser] failed to create user \"%s\", because %s", user.Username, err.Error())

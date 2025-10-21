@@ -242,7 +242,6 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 				Username:             userName,
 				Email:                email,
 				Nickname:             nickName,
-				Password:             "",
 				Language:             languageCode,
 				DefaultCurrency:      currencyCode,
 				FirstDayOfWeek:       oauth2UserInfo.FirstDayOfWeek,
@@ -251,7 +250,7 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 				FeatureRestriction:   a.CurrentConfig().DefaultFeatureRestrictions,
 			}
 
-			err = a.users.CreateUser(c, user)
+			err = a.users.CreateUser(c, user, true)
 
 			if err != nil {
 				log.Errorf(c, "[oauth2_authentications.CallbackHandler] failed to create user \"%s\", because %s", user.Username, err.Error())
@@ -260,7 +259,7 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 
 			log.Infof(c, "[oauth2_authentications.CallbackHandler] user \"%s\" has registered successfully, uid is %d", user.Username, user.Uid)
 
-			userExternalAuth := &models.UserExternalAuth{
+			userExternalAuth = &models.UserExternalAuth{
 				Uid:              user.Uid,
 				ExternalAuthType: userExternalAuthType,
 				ExternalUsername: oauth2UserInfo.UserName,

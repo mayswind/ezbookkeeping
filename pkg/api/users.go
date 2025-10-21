@@ -83,7 +83,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.WebContext) (any, *errs.Error) {
 		FeatureRestriction:   a.CurrentConfig().DefaultFeatureRestrictions,
 	}
 
-	err = a.users.CreateUser(c, user)
+	err = a.users.CreateUser(c, user, false)
 
 	if err != nil {
 		log.Errorf(c, "[users.UserRegisterHandler] failed to create user \"%s\", because %s", user.Username, err.Error())

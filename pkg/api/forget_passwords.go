@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -14,6 +15,7 @@ import (
 // ForgetPasswordsApi represents user forget password api
 type ForgetPasswordsApi struct {
 	ApiUsingConfig
+	ApiUsingDuplicateChecker
 	users           *services.UserService
 	tokens          *services.TokenService
 	forgetPasswords *services.ForgetPasswordService
@@ -24,6 +26,12 @@ var (
 	ForgetPasswords = &ForgetPasswordsApi{
 		ApiUsingConfig: ApiUsingConfig{
 			container: settings.Container,
+		},
+		ApiUsingDuplicateChecker: ApiUsingDuplicateChecker{
+			ApiUsingConfig: ApiUsingConfig{
+				container: settings.Container,
+			},
+			container: duplicatechecker.Container,
 		},
 		users:           services.Users,
 		tokens:          services.Tokens,
@@ -41,11 +49,25 @@ func (a *ForgetPasswordsApi) UserForgetPasswordRequestHandler(c *core.WebContext
 		return nil, errs.ErrEmailIsEmptyOrInvalid
 	}
 
+	err = a.CheckFailureCount(c, 0)
+
+	if err != nil {
+		log.Warnf(c, "[forget_passwords.UserForgetPasswordRequestHandler] cannot send forget password mail to \"%s\", because %s", request.Email, err.Error())
+		return nil, errs.Or(err, errs.ErrFailureCountLimitReached)
+	}
+
 	user, err := a.users.GetUserByEmail(c, request.Email)
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
 			log.Errorf(c, "[forget_passwords.UserForgetPasswordRequestHandler] failed to get user, because %s", err.Error())
+		}
+
+		failureCheckErr := a.CheckAndIncreaseFailureCount(c, 0)
+
+		if failureCheckErr != nil {
+			log.Warnf(c, "[forget_passwords.UserForgetPasswordRequestHandler] cannot send forget password mail to \"%s\", because %s", request.Email, failureCheckErr.Error())
+			return nil, errs.Or(failureCheckErr, errs.ErrFailureCountLimitReached)
 		}
 
 		return nil, errs.ErrUserNotFound

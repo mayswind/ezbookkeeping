@@ -56,11 +56,12 @@ func (s *NextcloudOAuth2DataSource) GetUserInfoRequest() (*http.Request, error) 
 }
 
 // GetScopes returns the scopes required by the Nextcloud provider
-func (p *NextcloudOAuth2DataSource) GetScopes() []string {
+func (s *NextcloudOAuth2DataSource) GetScopes() []string {
 	return []string{}
 }
 
-func (p *NextcloudOAuth2DataSource) ParseUserInfo(c core.Context, body []byte) (*OAuth2UserInfo, error) {
+// ParseUserInfo returns the user info by parsing the response body
+func (s *NextcloudOAuth2DataSource) ParseUserInfo(c core.Context, body []byte) (*OAuth2UserInfo, error) {
 	userInfoResp := &nextcloudUserInfoResponse{}
 	err := json.Unmarshal(body, &userInfoResp)
 

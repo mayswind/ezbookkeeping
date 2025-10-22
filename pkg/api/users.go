@@ -144,7 +144,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.WebContext) (any, *errs.Error) {
 	c.SetTokenClaims(claims)
 	c.SetTokenContext("")
 
-	log.Infof(c, "[users.UserRegisterHandler] user \"uid:%d\" has logined, token will be expired at %d", user.Uid, claims.ExpiresAt)
+	log.Infof(c, "[users.UserRegisterHandler] user \"uid:%d\" has logged in, token will be expired at %d", user.Uid, claims.ExpiresAt)
 
 	return authResp, nil
 }

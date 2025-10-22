@@ -94,6 +94,7 @@ const (
 // OAuth 2.0 provider types
 const (
 	OAuth2ProviderNextcloud string = "nextcloud"
+	OAuth2ProviderGithub    string = "github"
 )
 
 // Map provider types
@@ -1002,6 +1003,8 @@ func loadAuthConfiguration(config *Config, configFile *ini.File, sectionName str
 		config.OAuth2Provider = ""
 	} else if oauth2Provider == OAuth2ProviderNextcloud {
 		config.OAuth2Provider = OAuth2ProviderNextcloud
+	} else if oauth2Provider == OAuth2ProviderGithub {
+		config.OAuth2Provider = OAuth2ProviderGithub
 	} else {
 		return errs.ErrInvalidOAuth2Provider
 	}

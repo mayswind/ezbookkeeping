@@ -29,7 +29,8 @@ export function useLoginPageBase(platform: 'mobile' | 'desktop') {
     const twoFAVerifyType = ref<string>('passcode');
     const oauth2ClientSessionId = ref<string>('');
 
-    const logining = ref<boolean>(false);
+    const loggingInByPassword = ref<boolean>(false);
+    const loggingInByOAuth2 = ref<boolean>(false);
     const verifying = ref<boolean>(false);
 
     const inputIsEmpty = computed<boolean>(() => !username.value || !password.value);
@@ -73,7 +74,8 @@ export function useLoginPageBase(platform: 'mobile' | 'desktop') {
         tempToken,
         twoFAVerifyType,
         oauth2ClientSessionId,
-        logining,
+        loggingInByPassword,
+        loggingInByOAuth2,
         verifying,
         // computed states
         inputIsEmpty,

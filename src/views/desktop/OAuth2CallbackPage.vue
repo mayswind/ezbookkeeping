@@ -38,7 +38,7 @@
                                             type="password"
                                             autocomplete="password"
                                             :autofocus="true"
-                                            :disabled="logining"
+                                            :disabled="loggingInByOAuth2"
                                             :label="tt('Password')"
                                             :placeholder="tt('Your password')"
                                             v-model="password"
@@ -47,15 +47,15 @@
                                     </v-col>
 
                                     <v-col cols="12">
-                                        <v-btn block type="submit" :disabled="!password || logining" @click="verifyAndLogin">
+                                        <v-btn block type="submit" :disabled="!password || loggingInByOAuth2" @click="verifyAndLogin">
                                             {{ tt('Continue') }}
-                                            <v-progress-circular indeterminate size="22" class="ms-2" v-if="logining"></v-progress-circular>
+                                            <v-progress-circular indeterminate size="22" class="ms-2" v-if="loggingInByOAuth2"></v-progress-circular>
                                         </v-btn>
                                     </v-col>
 
                                     <v-col cols="12">
                                         <router-link class="d-flex align-center justify-center" to="/login"
-                                                     :class="{ 'disabled': logining }">
+                                                     :class="{ 'disabled': loggingInByOAuth2 }">
                                             <v-icon class="icon-with-direction" :icon="mdiChevronLeft"/>
                                             <span>{{ tt('Back to login page') }}</span>
                                         </router-link>
@@ -71,7 +71,7 @@
                         <v-card-text class="pt-0">
                             <v-row>
                                 <v-col cols="12" class="text-center">
-                                    <language-select-button :disabled="logining" />
+                                    <language-select-button :disabled="loggingInByOAuth2" />
                                 </v-col>
 
                                 <v-col cols="12" class="d-flex align-center pt-0">
@@ -146,7 +146,7 @@ const rootStore = useRootStore();
 const {
     version,
     password,
-    logining,
+    loggingInByOAuth2,
     doAfterLogin
 } = useLoginPageBase('desktop');
 
@@ -197,17 +197,17 @@ function verifyAndLogin(): void  {
         return;
     }
 
-    logining.value = true;
+    loggingInByOAuth2.value = true;
 
     rootStore.authorizeOAuth2({
         password: password.value,
         token: props.token || ''
     }).then(authResponse => {
-        logining.value = false;
+        loggingInByOAuth2.value = false;
         doAfterLogin(authResponse);
         navigateToHome();
     }).catch(error => {
-        logining.value = false;
+        loggingInByOAuth2.value = false;
 
         if (isUserVerifyEmailEnabled() && error.error && error.error.errorCode === KnownErrorCode.UserEmailNotVerified && error.error.context && error.error.context.email) {
             router.push(`/verify_email?email=${encodeURIComponent(error.error.context.email)}&emailSent=${error.error.context.hasValidEmailVerifyToken || false}`);
@@ -221,16 +221,16 @@ function verifyAndLogin(): void  {
 }
 
 if (!error.value && props.platform && props.token && !props.userName) {
-    logining.value = true;
+    loggingInByOAuth2.value = true;
 
     rootStore.authorizeOAuth2({
         token: props.token
     }).then(authResponse => {
-        logining.value = false;
+        loggingInByOAuth2.value = false;
         doAfterLogin(authResponse);
         navigateToHome();
     }).catch(error => {
-        logining.value = false;
+        loggingInByOAuth2.value = false;
 
         if (isUserVerifyEmailEnabled() && error.error && error.error.errorCode === KnownErrorCode.UserEmailNotVerified && error.error.context && error.error.context.email) {
             router.push(`/verify_email?email=${encodeURIComponent(error.error.context.email)}&emailSent=${error.error.context.hasValidEmailVerifyToken || false}`);

@@ -230,6 +230,10 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 			languageCode := ""
 			currencyCode := "USD"
 
+			if nickName == "" {
+				nickName = userName
+			}
+
 			if _, exists := locales.AllLanguages[oauth2UserInfo.LanguageCode]; exists {
 				languageCode = oauth2UserInfo.LanguageCode
 			}

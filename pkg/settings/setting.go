@@ -94,6 +94,7 @@ const (
 // OAuth 2.0 provider types
 const (
 	OAuth2ProviderNextcloud string = "nextcloud"
+	OAuth2ProviderGitea     string = "gitea"
 	OAuth2ProviderGithub    string = "github"
 )
 
@@ -375,6 +376,7 @@ type Config struct {
 	OAuth2Proxy                      string
 	OAuth2SkipTLSVerify              bool
 	OAuth2NextcloudBaseUrl           string
+	OAuth2GiteaBaseUrl               string
 
 	// User
 	EnableUserRegister            bool
@@ -1003,6 +1005,8 @@ func loadAuthConfiguration(config *Config, configFile *ini.File, sectionName str
 		config.OAuth2Provider = ""
 	} else if oauth2Provider == OAuth2ProviderNextcloud {
 		config.OAuth2Provider = OAuth2ProviderNextcloud
+	} else if oauth2Provider == OAuth2ProviderGitea {
+		config.OAuth2Provider = OAuth2ProviderGitea
 	} else if oauth2Provider == OAuth2ProviderGithub {
 		config.OAuth2Provider = OAuth2ProviderGithub
 	} else {
@@ -1022,6 +1026,7 @@ func loadAuthConfiguration(config *Config, configFile *ini.File, sectionName str
 	config.OAuth2SkipTLSVerify = getConfigItemBoolValue(configFile, sectionName, "oauth2_skip_tls_verify", false)
 
 	config.OAuth2NextcloudBaseUrl = getConfigItemStringValue(configFile, sectionName, "nextcloud_base_url")
+	config.OAuth2GiteaBaseUrl = getConfigItemStringValue(configFile, sectionName, "gitea_base_url")
 
 	return nil
 }

@@ -40,6 +40,9 @@ func InitializeOAuth2Provider(config *settings.Config) error {
 	if config.OAuth2Provider == settings.OAuth2ProviderNextcloud {
 		oauth2Provider = NewNextcloudOAuth2Provider(config.OAuth2NextcloudBaseUrl)
 		externalUserAuthType = core.USER_EXTERNAL_AUTH_TYPE_OAUTH2_NEXTCLOUD
+	} else if config.OAuth2Provider == settings.OAuth2ProviderGitea {
+		oauth2Provider = NewGiteaOAuth2Provider(config.OAuth2GiteaBaseUrl)
+		externalUserAuthType = core.USER_EXTERNAL_AUTH_TYPE_OAUTH2_GITEA
 	} else if config.OAuth2Provider == settings.OAuth2ProviderGithub {
 		oauth2Provider = NewGithubOAuth2Provider()
 		externalUserAuthType = core.USER_EXTERNAL_AUTH_TYPE_OAUTH2_GITHUB

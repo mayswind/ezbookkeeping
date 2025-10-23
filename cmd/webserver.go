@@ -112,6 +112,7 @@ func startWebServer(c *core.CliContext) error {
 		_ = v.RegisterValidation("notBlank", validators.NotBlank)
 		_ = v.RegisterValidation("validUsername", validators.ValidUsername)
 		_ = v.RegisterValidation("validEmail", validators.ValidEmail)
+		_ = v.RegisterValidation("validNickname", validators.ValidNickname)
 		_ = v.RegisterValidation("validCurrency", validators.ValidCurrency)
 		_ = v.RegisterValidation("validHexRGBColor", validators.ValidHexRGBColor)
 		_ = v.RegisterValidation("validAmountFilter", validators.ValidAmountFilter)

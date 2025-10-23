@@ -234,6 +234,18 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 				nickName = userName
 			}
 
+			if !utils.IsValidUsername(userName) {
+				return a.redirectToFailedCallbackPage(c, errs.ErrUserNameIsInvalid)
+			}
+
+			if !utils.IsValidEmail(email) {
+				return a.redirectToFailedCallbackPage(c, errs.ErrEmailIsInvalid)
+			}
+
+			if !utils.IsValidNickName(nickName) {
+				return a.redirectToFailedCallbackPage(c, errs.ErrNickNameIsInvalid)
+			}
+
 			if _, exists := locales.AllLanguages[oauth2UserInfo.LanguageCode]; exists {
 				languageCode = oauth2UserInfo.LanguageCode
 			}

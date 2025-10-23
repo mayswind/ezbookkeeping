@@ -1089,6 +1089,8 @@
         "exceed the maximum size of user avatar file": "アップロードされたユーザーアバターは最大ファイルサイズを超えています",
         "not permitted to perform this action": "このアクションを実行は許可されていません",
         "cannot login by password": "You cannot login by password",
+        "user name is invalid": "User name is invalid",
+        "nick name is invalid": "User nickname is invalid",
         "unauthorized access": "不正アクセス",
         "current token is invalid": "現在のトークンは無効です",
         "current token is expired": "現在のトークンの有効期限が切れています",

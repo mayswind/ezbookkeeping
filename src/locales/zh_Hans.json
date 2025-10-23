@@ -1089,6 +1089,8 @@
         "exceed the maximum size of user avatar file": "上传的用户头像超出了允许的最大文件大小",
         "not permitted to perform this action": "您不能执行该操作",
         "cannot login by password": "您不能使用密码登录",
+        "user name is invalid": "用户名无效",
+        "nick name is invalid": "用户昵称无效",
         "unauthorized access": "未授权的登录",
         "current token is invalid": "当前认证令牌无效",
         "current token is expired": "当前认证令牌已过期",

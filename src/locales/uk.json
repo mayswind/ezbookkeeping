@@ -1089,6 +1089,8 @@
         "exceed the maximum size of user avatar file": "Завантажений аватар перевищує максимально допустимий розмір",
         "not permitted to perform this action": "Вам не дозволено виконувати цю дію",
         "cannot login by password": "You cannot login by password",
+        "user name is invalid": "User name is invalid",
+        "nick name is invalid": "User nickname is invalid",
         "unauthorized access": "Несанкціонований доступ",
         "current token is invalid": "Поточний токен недійсний",
         "current token is expired": "Поточний токен прострочений",

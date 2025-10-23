@@ -161,7 +161,7 @@ type UserLoginRequest struct {
 type UserRegisterRequest struct {
 	Username        string       `json:"username" binding:"required,notBlank,max=32,validUsername"`
 	Email           string       `json:"email" binding:"required,notBlank,max=100,validEmail"`
-	Nickname        string       `json:"nickname" binding:"required,notBlank,max=64"`
+	Nickname        string       `json:"nickname" binding:"required,notBlank,max=64,validNickname"`
 	Password        string       `json:"password" binding:"required,min=6,max=128"`
 	Language        string       `json:"language" binding:"required,min=2,max=16"`
 	DefaultCurrency string       `json:"defaultCurrency" binding:"required,len=3,validCurrency"`
@@ -190,7 +190,7 @@ type UserResendVerifyEmailRequest struct {
 // UserProfileUpdateRequest represents all parameters of user updating profile request
 type UserProfileUpdateRequest struct {
 	Email                 string                      `json:"email" binding:"omitempty,notBlank,max=100,validEmail"`
-	Nickname              string                      `json:"nickname" binding:"omitempty,notBlank,max=64"`
+	Nickname              string                      `json:"nickname" binding:"omitempty,notBlank,max=64,validNickname"`
 	Password              string                      `json:"password" binding:"omitempty,min=6,max=128"`
 	OldPassword           string                      `json:"oldPassword" binding:"omitempty,min=6,max=128"`
 	DefaultAccountId      int64                       `json:"defaultAccountId,string" binding:"omitempty,min=1"`

@@ -1089,6 +1089,8 @@
         "exceed the maximum size of user avatar file": "업로드된 사용자 아바타가 허용된 최대 파일 크기를 초과합니다",
         "not permitted to perform this action": "이 작업을 수행할 수 있는 권한이 없습니다",
         "cannot login by password": "You cannot login by password",
+        "user name is invalid": "User name is invalid",
+        "nick name is invalid": "User nickname is invalid",
         "unauthorized access": "권한이 없는 접근입니다",
         "current token is invalid": "현재 토큰이 유효하지 않습니다",
         "current token is expired": "현재 토큰이 만료되었습니다",

@@ -1089,6 +1089,8 @@
         "exceed the maximum size of user avatar file": "El avatar de usuario subido supera el tamaño de archivo máximo permitido",
         "not permitted to perform this action": "No tienes permiso para realizar esta acción.",
         "cannot login by password": "You cannot login by password",
+        "user name is invalid": "User name is invalid",
+        "nick name is invalid": "User nickname is invalid",
         "unauthorized access": "Acceso no autorizado",
         "current token is invalid": "El token actual no es válido",
         "current token is expired": "El token actual ha caducado",

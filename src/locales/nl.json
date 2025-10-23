@@ -1089,6 +1089,8 @@
         "exceed the maximum size of user avatar file": "Geüploade avatar overschrijdt de maximaal toegestane bestandsgrootte",
         "not permitted to perform this action": "Je hebt geen toestemming om deze actie uit te voeren",
         "cannot login by password": "You cannot login by password",
+        "user name is invalid": "User name is invalid",
+        "nick name is invalid": "User nickname is invalid",
         "unauthorized access": "Ongeautoriseerde toegang",
         "current token is invalid": "Huidige token is ongeldig",
         "current token is expired": "Huidige token is verlopen",

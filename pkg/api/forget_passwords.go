@@ -146,7 +146,7 @@ func (a *ForgetPasswordsApi) UserResetPasswordHandler(c *core.WebContext) (any, 
 
 	if user.Email != request.Email {
 		log.Warnf(c, "[forget_passwords.UserResetPasswordHandler] request email not equals the user email")
-		return nil, errs.ErrEmptyIsInvalid
+		return nil, errs.ErrEmailIsInvalid
 	}
 
 	if a.users.IsPasswordEqualsUserPassword(request.Password, user) {

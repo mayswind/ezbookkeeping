@@ -16,12 +16,17 @@ var (
 
 // IsValidUsername reports whether username is valid
 func IsValidUsername(username string) bool {
-	return usernamePattern.MatchString(username)
+	return len(username) <= 32 && usernamePattern.MatchString(username)
 }
 
 // IsValidEmail reports whether email is valid
 func IsValidEmail(email string) bool {
-	return emailPattern.MatchString(email)
+	return len(email) <= 100 && emailPattern.MatchString(email)
+}
+
+// IsValidNickName reports whether user nick name is valid
+func IsValidNickName(nickname string) bool {
+	return len(nickname) <= 64
 }
 
 // IsValidHexRGBColor reports whether color is valid

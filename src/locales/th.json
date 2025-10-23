@@ -1089,6 +1089,8 @@
         "exceed the maximum size of user avatar file": "ขนาดไฟล์รูปประจำตัวผู้ใช้เกินขนาดสูงสุดที่อนุญาต",
         "not permitted to perform this action": "คุณไม่ได้รับอนุญาตให้ดำเนินการนี้",
         "cannot login by password": "You cannot login by password",
+        "user name is invalid": "User name is invalid",
+        "nick name is invalid": "User nickname is invalid",
         "unauthorized access": "การเข้าถึงไม่ได้รับอนุญาต",
         "current token is invalid": "โทเค็นปัจจุบันไม่ถูกต้อง",
         "current token is expired": "โทเค็นปัจจุบันหมดอายุ",

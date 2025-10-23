@@ -1089,6 +1089,8 @@
         "exceed the maximum size of user avatar file": "上傳的使用者頭像超過允許的最大檔案大小",
         "not permitted to perform this action": "您不能執行該操作",
         "cannot login by password": "您不能使用密碼登入",
+        "user name is invalid": "使用者名稱無效",
+        "nick name is invalid": "使用者暱稱無效",
         "unauthorized access": "未授權的登入",
         "current token is invalid": "目前認證令牌無效",
         "current token is expired": "目前認證令牌已過期",

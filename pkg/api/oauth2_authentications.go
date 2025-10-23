@@ -23,6 +23,7 @@ import (
 const oauth2CallbackPageUrlSuccessFormat = "%sdesktop/#/oauth2_callback?platform=%s&provider=%s&token=%s"
 const oauth2CallbackPageUrlNeedVerifyFormat = "%sdesktop/#/oauth2_callback?platform=%s&provider=%s&userName=%s&token=%s"
 const oauth2CallbackPageUrlFailedFormat = "%sdesktop/#/oauth2_callback?errorCode=%d&errorMessage=%s"
+const oauth2CallbackPageUrlErrorMessageFormat = "%sdesktop/#/oauth2_callback?errorMessage=%s"
 
 // OAuth2AuthenticationApi represents OAuth 2.0 authorization api
 type OAuth2AuthenticationApi struct {
@@ -65,37 +66,31 @@ func (a *OAuth2AuthenticationApi) LoginHandler(c *core.WebContext) (string, *err
 		return "", errs.ErrInvalidOAuth2LoginRequest
 	}
 
-	state := fmt.Sprintf("%s|%s", oauth2LoginReq.Platform, oauth2LoginReq.ClientSessionId)
-	remark := ""
+	found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_OAUTH2_REDIRECT, 0, oauth2LoginReq.ClientSessionId)
 
-	if a.CurrentConfig().EnableDuplicateSubmissionsCheck {
-		found := false
-		found, remark = a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_OAUTH2_REDIRECT, 0, oauth2LoginReq.ClientSessionId)
-
-		if found {
-			log.Errorf(c, "[oauth2_authentications.LoginHandler] another oauth 2.0 state \"%s\" has been processing for client session id \"%s\"", remark, oauth2LoginReq.ClientSessionId)
-			return "", errs.ErrRepeatedRequest
-		}
-
-		randomString, err := utils.GetRandomNumberOrLowercaseLetter(32)
-
-		if err != nil {
-			log.Errorf(c, "[oauth2_authentications.LoginHandler] failed to generate random string for oauth 2.0 state, because %s", err.Error())
-			return "", errs.ErrSystemError
-		}
-
-		remark = fmt.Sprintf("%s|%s|%s", oauth2LoginReq.Platform, oauth2LoginReq.ClientSessionId, randomString)
-		state = fmt.Sprintf("%s|%s|%s", oauth2LoginReq.Platform, oauth2LoginReq.ClientSessionId, utils.MD5EncodeToString([]byte(remark)))
+	if found {
+		log.Errorf(c, "[oauth2_authentications.LoginHandler] another oauth 2.0 state \"%s\" has been processing for client session id \"%s\"", remark, oauth2LoginReq.ClientSessionId)
+		return "", errs.ErrRepeatedRequest
 	}
 
-	redirectUrl, err := oauth2.GetOAuth2AuthUrl(c, state)
+	verifier, err := utils.GetRandomNumberOrLowercaseLetter(64)
+
+	if err != nil {
+		log.Errorf(c, "[oauth2_authentications.LoginHandler] failed to generate random string for oauth 2.0 state, because %s", err.Error())
+		return "", errs.ErrSystemError
+	}
+
+	remark = fmt.Sprintf("%s|%s|%s", oauth2LoginReq.Platform, oauth2LoginReq.ClientSessionId, verifier)
+	state := fmt.Sprintf("%s|%s|%s", oauth2LoginReq.Platform, oauth2LoginReq.ClientSessionId, utils.MD5EncodeToString([]byte(remark)))
+
+	redirectUrl, err := oauth2.GetOAuth2AuthUrl(c, state, verifier)
 
 	if err != nil {
 		log.Errorf(c, "[oauth2_authentications.LoginHandler] failed to get oauth 2.0 auth url, because %s", err.Error())
 		return "", errs.Or(err, errs.ErrSystemError)
 	}
 
-	a.SetSubmissionRemarkWithCustomExpirationIfEnable(duplicatechecker.DUPLICATE_CHECKER_TYPE_OAUTH2_REDIRECT, 0, oauth2LoginReq.ClientSessionId, remark, a.CurrentConfig().OAuth2StateExpiredTimeDuration)
+	a.SetSubmissionRemarkWithCustomExpiration(duplicatechecker.DUPLICATE_CHECKER_TYPE_OAUTH2_REDIRECT, 0, oauth2LoginReq.ClientSessionId, remark, a.CurrentConfig().OAuth2StateExpiredTimeDuration)
 
 	return redirectUrl, nil
 }
@@ -115,6 +110,11 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 	}
 
 	if oauth2CallbackReq.Code == "" {
+		if oauth2CallbackReq.ErrorDescription != "" {
+			log.Errorf(c, "[oauth2_authentications.CallbackHandler] oauth 2.0 provider returned error: %s, description: %s", oauth2CallbackReq.Error, oauth2CallbackReq.ErrorDescription)
+			return a.redirectToErrorMessageCallbackPage(c, oauth2CallbackReq.ErrorDescription)
+		}
+
 		return a.redirectToFailedCallbackPage(c, errs.ErrMissingOAuth2Code)
 	}
 
@@ -134,33 +134,32 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 		return a.redirectToFailedCallbackPage(c, errs.ErrInvalidOAuth2LoginRequest)
 	}
 
-	if a.CurrentConfig().EnableDuplicateSubmissionsCheck {
-		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_OAUTH2_REDIRECT, 0, clientSessionId)
+	found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_OAUTH2_REDIRECT, 0, clientSessionId)
 
-		if !found {
-			log.Errorf(c, "[oauth2_authentications.CallbackHandler] cannot find oauth 2.0 state in duplicate checker for client session id \"%s\"", clientSessionId)
-			return a.redirectToFailedCallbackPage(c, errs.ErrInvalidOAuth2Callback)
-		}
-
-		remarkParts := strings.Split(remark, "|")
-
-		if len(remarkParts) != 3 || remarkParts[0] != platform || remarkParts[1] != clientSessionId {
-			log.Errorf(c, "[oauth2_authentications.CallbackHandler] invalid oauth 2.0 state \"%s\" in duplicate checker for client session id \"%s\"", remark, clientSessionId)
-			return a.redirectToFailedCallbackPage(c, errs.ErrInvalidOAuth2State)
-		}
-
-		expectedState := fmt.Sprintf("%s|%s|%s", platform, clientSessionId, remarkParts[2])
-		expectedState = fmt.Sprintf("%s|%s|%s", platform, clientSessionId, utils.MD5EncodeToString([]byte(expectedState)))
-
-		if oauth2CallbackReq.State != expectedState {
-			log.Errorf(c, "[oauth2_authentications.CallbackHandler] mismatched random string in oauth 2.0 state, expected \"%s\", got \"%s\"", expectedState, oauth2CallbackReq.State)
-			return a.redirectToFailedCallbackPage(c, errs.ErrInvalidOAuth2State)
-		}
-
-		a.RemoveSubmissionRemarkIfEnable(duplicatechecker.DUPLICATE_CHECKER_TYPE_OAUTH2_REDIRECT, 0, clientSessionId)
+	if !found {
+		log.Errorf(c, "[oauth2_authentications.CallbackHandler] cannot find oauth 2.0 state in duplicate checker for client session id \"%s\"", clientSessionId)
+		return a.redirectToFailedCallbackPage(c, errs.ErrInvalidOAuth2Callback)
 	}
 
-	oauth2Token, err := oauth2.GetOAuth2Token(c, oauth2CallbackReq.Code)
+	remarkParts := strings.Split(remark, "|")
+
+	if len(remarkParts) != 3 || remarkParts[0] != platform || remarkParts[1] != clientSessionId {
+		log.Errorf(c, "[oauth2_authentications.CallbackHandler] invalid oauth 2.0 state \"%s\" in duplicate checker for client session id \"%s\"", remark, clientSessionId)
+		return a.redirectToFailedCallbackPage(c, errs.ErrInvalidOAuth2State)
+	}
+
+	verifier := remarkParts[2]
+	expectedState := fmt.Sprintf("%s|%s|%s", platform, clientSessionId, verifier)
+	expectedState = fmt.Sprintf("%s|%s|%s", platform, clientSessionId, utils.MD5EncodeToString([]byte(expectedState)))
+
+	if oauth2CallbackReq.State != expectedState {
+		log.Errorf(c, "[oauth2_authentications.CallbackHandler] mismatched random string in oauth 2.0 state, expected \"%s\", got \"%s\"", expectedState, oauth2CallbackReq.State)
+		return a.redirectToFailedCallbackPage(c, errs.ErrInvalidOAuth2State)
+	}
+
+	a.RemoveSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_OAUTH2_REDIRECT, 0, clientSessionId)
+
+	oauth2Token, err := oauth2.GetOAuth2Token(c, oauth2CallbackReq.Code, verifier)
 
 	if err != nil {
 		log.Errorf(c, "[oauth2_authentications.CallbackHandler] failed to retrieve oauth 2.0 token, because %s", err.Error())
@@ -346,4 +345,8 @@ func (a *OAuth2AuthenticationApi) redirectToVerifyCallbackPage(c *core.WebContex
 
 func (a *OAuth2AuthenticationApi) redirectToFailedCallbackPage(c *core.WebContext, err *errs.Error) (string, *errs.Error) {
 	return fmt.Sprintf(oauth2CallbackPageUrlFailedFormat, a.CurrentConfig().RootUrl, err.Code(), url.QueryEscape(utils.GetDisplayErrorMessage(err))), nil
+}
+
+func (a *OAuth2AuthenticationApi) redirectToErrorMessageCallbackPage(c *core.WebContext, message string) (string, *errs.Error) {
+	return fmt.Sprintf(oauth2CallbackPageUrlErrorMessageFormat, a.CurrentConfig().RootUrl, url.QueryEscape(message)), nil
 }

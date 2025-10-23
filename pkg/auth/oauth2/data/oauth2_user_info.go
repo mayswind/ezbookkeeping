@@ -1,4 +1,4 @@
-package oauth2
+package data
 
 import "github.com/mayswind/ezbookkeeping/pkg/core"
 

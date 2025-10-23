@@ -1,22 +1,33 @@
-package oauth2
+package gitea
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/mayswind/ezbookkeeping/pkg/auth/oauth2/provider/common"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 func TestNewGiteaOAuth2Provider(t *testing.T) {
-	datasource := NewGiteaOAuth2Provider("https://example.com/")
-	assert.Equal(t, "https://example.com/login/oauth/authorize", datasource.GetAuthUrl())
-	assert.Equal(t, "https://example.com/login/oauth/access_token", datasource.GetTokenUrl())
+	provider, err := NewGiteaOAuth2Provider(&settings.Config{
+		OAuth2GiteaBaseUrl: "https://example.com/",
+	}, "")
+	assert.Nil(t, err)
+	assert.Equal(t, "https://example.com/login/oauth/authorize", provider.(*common.CommonOAuth2Provider).GetDataSource().GetAuthUrl())
+	assert.Equal(t, "https://example.com/login/oauth/access_token", provider.(*common.CommonOAuth2Provider).GetDataSource().GetTokenUrl())
 
-	datasource = NewGiteaOAuth2Provider("https://example.com")
-	assert.Equal(t, "https://example.com/login/oauth/authorize", datasource.GetAuthUrl())
-	assert.Equal(t, "https://example.com/login/oauth/access_token", datasource.GetTokenUrl())
+	provider, err = NewGiteaOAuth2Provider(&settings.Config{
+		OAuth2GiteaBaseUrl: "https://example.com",
+	}, "")
+	assert.Nil(t, err)
+	assert.Equal(t, "https://example.com/login/oauth/authorize", provider.(*common.CommonOAuth2Provider).GetDataSource().GetAuthUrl())
+	assert.Equal(t, "https://example.com/login/oauth/access_token", provider.(*common.CommonOAuth2Provider).GetDataSource().GetTokenUrl())
+
+	provider, err = NewGiteaOAuth2Provider(&settings.Config{}, "")
+	assert.Equal(t, errs.ErrInvalidOAuth2Config, err)
 }
 
 func TestGiteaOAuth2Datasource_GetUserInfoRequest(t *testing.T) {

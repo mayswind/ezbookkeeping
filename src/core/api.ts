@@ -9,3 +9,14 @@ export interface ErrorResponse {
     readonly errorMessage: string;
     readonly path: string;
 }
+
+export function buildErrorResponse(errorCode: number, errorMessage: string): ErrorResponse {
+    const errorResponse: ErrorResponse = {
+        success: false,
+        errorCode: errorCode,
+        errorMessage: errorMessage,
+        path: ''
+    };
+
+    return errorResponse;
+}

@@ -1,12 +1,16 @@
-package oauth2
+package github
 
 import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/mayswind/ezbookkeeping/pkg/auth/oauth2/data"
+	"github.com/mayswind/ezbookkeeping/pkg/auth/oauth2/provider"
+	"github.com/mayswind/ezbookkeeping/pkg/auth/oauth2/provider/common"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 type githubUserProfileResponse struct {
@@ -17,7 +21,7 @@ type githubUserProfileResponse struct {
 
 // GithubOAuth2DataSource represents Github OAuth 2.0 data source
 type GithubOAuth2DataSource struct {
-	CommonOAuth2DataSource
+	common.CommonOAuth2DataSource
 }
 
 // GetAuthUrl returns the authentication url of the Github data source
@@ -51,7 +55,7 @@ func (p *GithubOAuth2DataSource) GetScopes() []string {
 }
 
 // ParseUserInfo returns the user info by parsing the response body
-func (p *GithubOAuth2DataSource) ParseUserInfo(c core.Context, body []byte) (*OAuth2UserInfo, error) {
+func (p *GithubOAuth2DataSource) ParseUserInfo(c core.Context, body []byte) (*data.OAuth2UserInfo, error) {
 	userInfoResp := &githubUserProfileResponse{}
 	err := json.Unmarshal(body, &userInfoResp)
 
@@ -65,7 +69,7 @@ func (p *GithubOAuth2DataSource) ParseUserInfo(c core.Context, body []byte) (*OA
 		return nil, errs.ErrCannotRetrieveUserInfo
 	}
 
-	return &OAuth2UserInfo{
+	return &data.OAuth2UserInfo{
 		UserName: userInfoResp.Login,
 		Email:    userInfoResp.Email,
 		NickName: userInfoResp.Name,
@@ -73,8 +77,6 @@ func (p *GithubOAuth2DataSource) ParseUserInfo(c core.Context, body []byte) (*OA
 }
 
 // NewGithubOAuth2Provider creates a new Github OAuth 2.0 provider instance
-func NewGithubOAuth2Provider() OAuth2Provider {
-	return &CommonOAuth2Provider{
-		dataSource: &GithubOAuth2DataSource{},
-	}
+func NewGithubOAuth2Provider(config *settings.Config, redirectUrl string) (provider.OAuth2Provider, error) {
+	return common.NewCommonOAuth2Provider(config, redirectUrl, &GithubOAuth2DataSource{}), nil
 }

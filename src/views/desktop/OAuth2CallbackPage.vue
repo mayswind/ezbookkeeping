@@ -24,9 +24,10 @@
                     <v-card variant="flat" class="w-100 mt-0 px-4 pt-12" max-width="500">
                         <v-card-text>
                             <h4 class="text-h4 mb-2">{{ oauth2LoginDisplayName }}</h4>
-                            <p class="mb-0" v-if="!error && platform && token && !userName">{{ tt('Logging in...') }}</p>
-                            <p class="mb-0" v-else-if="!error && userName">{{ tt('format.misc.oauth2bindTip', { providerName: oauth2ProviderDisplayName, userName: userName }) }}</p>
+                            <p class="mb-0" v-if="!error && !errorMessage && platform && token && !userName">{{ tt('Logging in...') }}</p>
+                            <p class="mb-0" v-else-if="!error && !errorMessage && userName">{{ tt('format.misc.oauth2bindTip', { providerName: oauth2ProviderDisplayName, userName: userName }) }}</p>
                             <p class="mb-0" v-else-if="error">{{ te({ error }) }}</p>
+                            <p class="mb-0" v-else-if="errorMessage">{{ errorMessage }}</p>
                             <p class="mb-0" v-else>{{ tt('An error occurred') }}</p>
                         </v-card-text>
 
@@ -106,7 +107,7 @@ import { useLoginPageBase } from '@/views/base/LoginPageBase.ts';
 import { useRootStore } from '@/stores/index.ts';
 
 import { ThemeType } from '@/core/theme.ts';
-import { type ErrorResponse } from '@/core/api.ts';
+import { type ErrorResponse, buildErrorResponse } from '@/core/api.ts';
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
 
@@ -158,14 +159,7 @@ const oauth2LoginDisplayName = computed<string>(() => getLocalizedOAuth2LoginTex
 
 const error = computed<ErrorResponse | undefined>(() => {
     if (props.errorCode && props.errorMessage) {
-        const errorResponse: ErrorResponse = {
-            success: false,
-            errorCode: parseInt(props.errorCode),
-            errorMessage: props.errorMessage,
-            path: ''
-        };
-
-        return errorResponse;
+        return buildErrorResponse(parseInt(props.errorCode), props.errorMessage);
     } else {
         return undefined;
     }

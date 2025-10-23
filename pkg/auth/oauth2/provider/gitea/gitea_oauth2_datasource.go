@@ -1,12 +1,16 @@
-package oauth2
+package gitea
 
 import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/mayswind/ezbookkeeping/pkg/auth/oauth2/data"
+	"github.com/mayswind/ezbookkeeping/pkg/auth/oauth2/provider"
+	"github.com/mayswind/ezbookkeeping/pkg/auth/oauth2/provider/common"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 type giteaUserInfoResponse struct {
@@ -17,7 +21,7 @@ type giteaUserInfoResponse struct {
 
 // GiteaOAuth2DataSource represents Gitea OAuth 2.0 data source
 type GiteaOAuth2DataSource struct {
-	CommonOAuth2DataSource
+	common.CommonOAuth2DataSource
 	baseUrl string
 }
 
@@ -52,7 +56,7 @@ func (s *GiteaOAuth2DataSource) GetScopes() []string {
 }
 
 // ParseUserInfo returns the user info by parsing the response body
-func (s *GiteaOAuth2DataSource) ParseUserInfo(c core.Context, body []byte) (*OAuth2UserInfo, error) {
+func (s *GiteaOAuth2DataSource) ParseUserInfo(c core.Context, body []byte) (*data.OAuth2UserInfo, error) {
 	userInfoResp := &giteaUserInfoResponse{}
 	err := json.Unmarshal(body, &userInfoResp)
 
@@ -66,7 +70,7 @@ func (s *GiteaOAuth2DataSource) ParseUserInfo(c core.Context, body []byte) (*OAu
 		return nil, errs.ErrCannotRetrieveUserInfo
 	}
 
-	return &OAuth2UserInfo{
+	return &data.OAuth2UserInfo{
 		UserName: userInfoResp.Login,
 		Email:    userInfoResp.Email,
 		NickName: userInfoResp.FullName,
@@ -74,14 +78,18 @@ func (s *GiteaOAuth2DataSource) ParseUserInfo(c core.Context, body []byte) (*OAu
 }
 
 // NewGiteaOAuth2Provider creates a new Gitea OAuth 2.0 provider instance
-func NewGiteaOAuth2Provider(baseUrl string) OAuth2Provider {
+func NewGiteaOAuth2Provider(config *settings.Config, redirectUrl string) (provider.OAuth2Provider, error) {
+	if len(config.OAuth2GiteaBaseUrl) < 1 {
+		return nil, errs.ErrInvalidOAuth2Config
+	}
+
+	baseUrl := config.OAuth2GiteaBaseUrl
+
 	if baseUrl[len(baseUrl)-1] != '/' {
 		baseUrl += "/"
 	}
 
-	return &CommonOAuth2Provider{
-		dataSource: &GiteaOAuth2DataSource{
-			baseUrl: baseUrl,
-		},
-	}
+	return common.NewCommonOAuth2Provider(config, redirectUrl, &GiteaOAuth2DataSource{
+		baseUrl: baseUrl,
+	}), nil
 }

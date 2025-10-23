@@ -47,6 +47,10 @@ func (a *ServerSettingsApi) ServerSettingsJavascriptHandler(c *core.WebContext) 
 
 	a.appendStringSetting(builder, "op", config.OAuth2Provider)
 
+	if config.OAuth2Provider == settings.OAuth2ProviderOIDC && config.OAuth2OIDCCustomDisplayNameConfig.Enabled {
+		a.appendMultiLanguageTipSetting(builder, "ocn", config.OAuth2OIDCCustomDisplayNameConfig)
+	}
+
 	if config.EnableMCPServer {
 		a.appendBooleanSetting(builder, "mcp", config.EnableMCPServer)
 	}

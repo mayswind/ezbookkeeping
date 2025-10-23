@@ -106,6 +106,12 @@
         "licenseUrl": "https://cs.opensource.google/go/x/oauth2/+/refs/tags/v0.31.0:LICENSE"
     },
     {
+        "name": "go-oidc",
+        "copyright": "Copyright 2014 CoreOS, Inc",
+        "url": "https://github.com/coreos/go-oidc",
+        "licenseUrl": "https://github.com/coreos/go-oidc/blob/v3.16.0/LICENSE"
+    },
+    {
         "name": "Gomail",
         "copyright": "Copyright (c) 2014 Alexandre Cesaro",
         "url": "https://github.com/go-mail/mail",

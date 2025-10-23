@@ -8,8 +8,10 @@ type OAuth2LoginRequest struct {
 
 // OAuth2CallbackRequest represents all parameters of OAuth 2.0 callback request
 type OAuth2CallbackRequest struct {
-	State string `form:"state"`
-	Code  string `form:"code"`
+	State            string `form:"state"`
+	Code             string `form:"code"`
+	Error            string `form:"error"`
+	ErrorDescription string `form:"error_description"`
 }
 
 // OAuth2CallbackLoginRequest represents all parameters of OAuth 2.0 callback login request

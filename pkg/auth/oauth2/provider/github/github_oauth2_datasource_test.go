@@ -9,18 +9,8 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
 
-func TestGithubOAuth2Datasource_GetUserInfoRequest(t *testing.T) {
-	datasource := &GithubOAuth2DataSource{}
-	req, err := datasource.GetUserInfoRequest()
-
-	assert.Nil(t, err)
-	assert.Equal(t, "GET", req.Method)
-	assert.Equal(t, "https://api.github.com/user", req.URL.String())
-	assert.Equal(t, "application/vnd.github+json", req.Header.Get("Accept"))
-}
-
-func TestGithubOAuth2Datasource_ParseUserInfo_Success(t *testing.T) {
-	datasource := &GithubOAuth2DataSource{}
+func TestGithubOAuth2Datasource_ParseUserProfile_Success(t *testing.T) {
+	datasource := &GithubOAuth2Provider{}
 	responseContent := `{
 		"login": "octocat",
 		"id": 1,
@@ -67,25 +57,39 @@ func TestGithubOAuth2Datasource_ParseUserInfo_Success(t *testing.T) {
 			"collaborators": 0
 		}
 	}`
-	info, err := datasource.ParseUserInfo(core.NewNullContext(), []byte(responseContent))
+	info, err := datasource.parseUserProfile(core.NewNullContext(), []byte(responseContent))
 
 	assert.Nil(t, err)
-	assert.Equal(t, "octocat", info.UserName)
-	assert.Equal(t, "octocat@github.com", info.Email)
-	assert.Equal(t, "monalisa octocat", info.NickName)
+	assert.Equal(t, "octocat", info.Login)
+	assert.Equal(t, "monalisa octocat", info.Name)
 }
 
-func TestGithubOAuth2Datasource_ParseUserInfo_InvalidJson(t *testing.T) {
-	datasource := &GithubOAuth2DataSource{}
-	_, err := datasource.ParseUserInfo(core.NewNullContext(), []byte("invalid"))
-
-	assert.Equal(t, errs.ErrCannotRetrieveUserInfo, err)
-}
-
-func TestGithubOAuth2Datasource_ParseUserInfo_EmptyLogin(t *testing.T) {
-	datasource := &GithubOAuth2DataSource{}
+func TestGithubOAuth2Datasource_ParseUserProfile_EmptyLogin(t *testing.T) {
+	datasource := &GithubOAuth2Provider{}
 	responseContent := `{"login": ""}`
-	_, err := datasource.ParseUserInfo(core.NewNullContext(), []byte(responseContent))
+	_, err := datasource.parseUserProfile(core.NewNullContext(), []byte(responseContent))
 
 	assert.Equal(t, errs.ErrCannotRetrieveUserInfo, err)
+}
+
+func TestGithubOAuth2Datasource_ParsePrimaryEmail(t *testing.T) {
+	datasource := &GithubOAuth2Provider{}
+	responseContent := `[
+	    {
+			"email": "foo@bar.com",
+			"primary": false,
+			"verified": true,
+			"visibility": null
+		},
+	    {
+			"email": "octocat@github.com",
+			"primary": true,
+			"verified": true,
+			"visibility": "public"
+	    }
+	]`
+	email, err := datasource.parsePrimaryEmail(core.NewNullContext(), []byte(responseContent))
+
+	assert.Nil(t, err)
+	assert.Equal(t, "octocat@github.com", email)
 }

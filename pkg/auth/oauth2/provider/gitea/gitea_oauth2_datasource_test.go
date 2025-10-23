@@ -1,6 +1,7 @@
 package gitea
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -47,7 +48,7 @@ func TestGiteaOAuth2Datasource_ParseUserInfo_Success(t *testing.T) {
 		"full_name": "User",
 		"email": "user1@example.com"
 	}`
-	info, err := datasource.ParseUserInfo(core.NewNullContext(), []byte(responseContent))
+	info, err := datasource.ParseUserInfo(core.NewNullContext(), []byte(responseContent), &http.Client{})
 
 	assert.Nil(t, err)
 	assert.Equal(t, "user1", info.UserName)
@@ -57,7 +58,7 @@ func TestGiteaOAuth2Datasource_ParseUserInfo_Success(t *testing.T) {
 
 func TestGiteaOAuth2Datasource_ParseUserInfo_InvalidJson(t *testing.T) {
 	datasource := &GiteaOAuth2DataSource{}
-	_, err := datasource.ParseUserInfo(core.NewNullContext(), []byte("invalid"))
+	_, err := datasource.ParseUserInfo(core.NewNullContext(), []byte("invalid"), &http.Client{})
 
 	assert.Equal(t, errs.ErrCannotRetrieveUserInfo, err)
 }
@@ -65,7 +66,7 @@ func TestGiteaOAuth2Datasource_ParseUserInfo_InvalidJson(t *testing.T) {
 func TestGiteaOAuth2Datasource_ParseUserInfo_EmptyLogin(t *testing.T) {
 	datasource := &GiteaOAuth2DataSource{}
 	responseContent := `{"login": ""}`
-	_, err := datasource.ParseUserInfo(core.NewNullContext(), []byte(responseContent))
+	_, err := datasource.ParseUserInfo(core.NewNullContext(), []byte(responseContent), &http.Client{})
 
 	assert.Equal(t, errs.ErrCannotRetrieveUserInfo, err)
 }

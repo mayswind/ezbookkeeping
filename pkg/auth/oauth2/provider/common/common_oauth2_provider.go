@@ -36,7 +36,7 @@ type CommonOAuth2DataSource interface {
 	GetScopes() []string
 
 	// ParseUserInfo returns the user info by parsing the response body
-	ParseUserInfo(c core.Context, body []byte) (*data.OAuth2UserInfo, error)
+	ParseUserInfo(c core.Context, body []byte, oauth2Client *http.Client) (*data.OAuth2UserInfo, error)
 }
 
 // GetOAuth2AuthUrl returns the authentication url of the common OAuth 2.0 provider
@@ -76,7 +76,7 @@ func (p *CommonOAuth2Provider) GetUserInfo(c core.Context, oauth2Token *oauth2.T
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
-	return p.dataSource.ParseUserInfo(c, body)
+	return p.dataSource.ParseUserInfo(c, body, oauth2Client)
 }
 
 // GetDataSource returns the data source of the common OAuth 2.0 provider

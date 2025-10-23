@@ -1,6 +1,7 @@
 package nextcloud
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -56,7 +57,7 @@ func TestNextcloudOAuth2Datasource_ParseUserInfo_Success(t *testing.T) {
 			}
 		}
 	}`
-	info, err := datasource.ParseUserInfo(core.NewNullContext(), []byte(responseContent))
+	info, err := datasource.ParseUserInfo(core.NewNullContext(), []byte(responseContent), &http.Client{})
 
 	assert.Nil(t, err)
 	assert.Equal(t, "user1", info.UserName)
@@ -66,7 +67,7 @@ func TestNextcloudOAuth2Datasource_ParseUserInfo_Success(t *testing.T) {
 
 func TestNextcloudOAuth2Datasource_ParseUserInfo_InvalidJson(t *testing.T) {
 	datasource := &NextcloudOAuth2DataSource{}
-	_, err := datasource.ParseUserInfo(core.NewNullContext(), []byte("invalid"))
+	_, err := datasource.ParseUserInfo(core.NewNullContext(), []byte("invalid"), &http.Client{})
 
 	assert.Equal(t, errs.ErrCannotRetrieveUserInfo, err)
 }
@@ -74,7 +75,7 @@ func TestNextcloudOAuth2Datasource_ParseUserInfo_InvalidJson(t *testing.T) {
 func TestNextcloudOAuth2Datasource_ParseUserInfo_MissingFields(t *testing.T) {
 	datasource := &NextcloudOAuth2DataSource{}
 	responseContent := `{"ocs": {}}`
-	_, err := datasource.ParseUserInfo(core.NewNullContext(), []byte(responseContent))
+	_, err := datasource.ParseUserInfo(core.NewNullContext(), []byte(responseContent), &http.Client{})
 
 	assert.Equal(t, errs.ErrCannotRetrieveUserInfo, err)
 }
@@ -90,7 +91,7 @@ func TestNextcloudOAuth2Datasource_ParseUserInfo_Non200StatusCode(t *testing.T) 
 			"data": {}
 		}
 	}`
-	_, err := datasource.ParseUserInfo(core.NewNullContext(), []byte(responseContent))
+	_, err := datasource.ParseUserInfo(core.NewNullContext(), []byte(responseContent), &http.Client{})
 
 	assert.Equal(t, errs.ErrCannotRetrieveUserInfo, err)
 }
@@ -110,7 +111,7 @@ func TestNextcloudOAuth2Datasource_ParseUserInfo_EmptyID(t *testing.T) {
 			}
 		}
 	}`
-	_, err := datasource.ParseUserInfo(core.NewNullContext(), []byte(responseContent))
+	_, err := datasource.ParseUserInfo(core.NewNullContext(), []byte(responseContent), &http.Client{})
 
 	assert.Equal(t, errs.ErrCannotRetrieveUserInfo, err)
 }

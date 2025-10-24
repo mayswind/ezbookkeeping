@@ -57,7 +57,7 @@
                 <hr class="margin-inline-start-half" />
             </f7-list-item>
             <f7-list-button external :class="{ 'disabled': loggingInByPassword || loggingInByOAuth2 }" :href="oauth2LoginUrl" :text="oauth2LoginDisplayName"
-                            @click="loggingInByOAuth2 = true" v-if="isOAuth2Enabled()"></f7-list-button>
+                            @click="loginByOAuth2" v-if="isOAuth2Enabled()"></f7-list-button>
             <f7-block-footer v-if="isInternalAuthEnabled()">
                 <span>{{ tt('Don\'t have an account?') }}</span>&nbsp;
                 <f7-link :class="{ 'disabled': !isUserRegistrationEnabled() || loggingInByPassword || loggingInByOAuth2 }" href="/signup" :text="tt('Create an account')"></f7-link>
@@ -308,6 +308,11 @@ function loginByPressEnter(): void {
     }
 
     return login();
+}
+
+function loginByOAuth2(): void {
+    loggingInByOAuth2.value = true;
+    showLoading();
 }
 
 function verify(): void {

@@ -336,6 +336,10 @@ func startWebServer(c *core.CliContext) error {
 				apiV1Route.POST("/users/verify_email/resend.json", bindApi(api.Users.UserSendVerifyEmailByLoginedUserHandler))
 			}
 
+			// External Authentications
+			apiV1Route.GET("/users/external_auth/list.json", bindApi(api.UserExternalAuths.ExternalAuthListHanlder))
+			apiV1Route.POST("/users/external_auth/unlink.json", bindApi(api.UserExternalAuths.UnlinkExternalAuthHandler))
+
 			// Application Cloud Settings
 			apiV1Route.GET("/users/settings/cloud/get.json", bindApi(api.UserApplicationCloudSettings.ApplicationSettingsGetHandler))
 			apiV1Route.POST("/users/settings/cloud/update.json", bindApi(api.UserApplicationCloudSettings.ApplicationSettingsUpdateHandler))

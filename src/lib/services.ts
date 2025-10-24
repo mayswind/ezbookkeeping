@@ -136,6 +136,10 @@ import type {
     UserProfileUpdateResponse
 } from '@/models/user.ts';
 import type {
+    UserExternalAuthUnlinkRequest,
+    UserExternalAuthInfoResponse
+} from '@/models/user_external_auth.ts';
+import type {
     OAuth2CallbackLoginRequest
 } from '@/models/oauth2.ts';
 import type {
@@ -322,6 +326,12 @@ export default {
                 blockedRequests.length = 0;
             });
         });
+    },
+    getExternalAuths: (): ApiResponsePromise<UserExternalAuthInfoResponse[]> => {
+        return axios.get<ApiResponse<UserExternalAuthInfoResponse[]>>('v1/users/external_auth/list.json');
+    },
+    unlinkExternalAuth: (req: UserExternalAuthUnlinkRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/users/external_auth/unlink.json', req);
     },
     getTokens: (): ApiResponsePromise<TokenInfoResponse[]> => {
         return axios.get<ApiResponse<TokenInfoResponse[]>>('v1/tokens/list.json');

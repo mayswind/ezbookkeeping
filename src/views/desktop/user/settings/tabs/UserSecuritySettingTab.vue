@@ -64,6 +64,61 @@
         </v-col>
 
         <v-col cols="12">
+            <v-card :class="{ 'disabled': loadingExternalAuth }">
+                <template #title>
+                    <div class="d-flex align-center">
+                        <span>{{ tt('Third-Party Logins') }}</span>
+                        <v-btn density="compact" color="default" variant="text" size="24"
+                               class="ms-2" :icon="true" :loading="loadingExternalAuth" @click="reloadExternalAuth(false)">
+                            <template #loader>
+                                <v-progress-circular indeterminate size="20"/>
+                            </template>
+                            <v-icon :icon="mdiRefresh" size="24" />
+                            <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
+                        </v-btn>
+                    </div>
+                </template>
+
+                <v-table class="table-striped text-no-wrap" :hover="!loadingExternalAuth">
+                    <thead>
+                    <tr>
+                        <th>{{ tt('Type') }}</th>
+                        <th>{{ tt('Username') }}</th>
+                        <th>{{ tt('Linked Time') }}</th>
+                        <th class="text-right">{{ tt('Operation') }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr :key="itemIdx"
+                        v-for="itemIdx in (loadingExternalAuth && (!externalAuths || externalAuths.length < 1) ? [ 1 ] : [])">
+                        <td class="px-0" colspan="4">
+                            <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
+                        </td>
+                    </tr>
+
+                    <tr :key="thirdPartyLogin.externalAuthType"
+                        v-for="thirdPartyLogin in thirdPartyLogins">
+                        <td class="text-sm">
+                            <v-icon start :icon="thirdPartyLogin.icon"/>
+                            {{ thirdPartyLogin.displayName }}
+                        </td>
+                        <td class="text-sm">{{ thirdPartyLogin.externalUsername }}</td>
+                        <td class="text-sm">{{ thirdPartyLogin.createdAt }}</td>
+                        <td class="text-sm text-right">
+                            <v-btn density="comfortable" color="error" variant="tonal"
+                                   :disabled="loadingExternalAuth"
+                                   @click="unlinkExternalAuth(thirdPartyLogin)"
+                                   v-if="thirdPartyLogin.linked">
+                                {{ tt('Unlink') }}
+                            </v-btn>
+                        </td>
+                    </tr>
+                    </tbody>
+                </v-table>
+            </v-card>
+        </v-col>
+
+        <v-col cols="12">
             <v-card :class="{ 'disabled': loadingSession }">
                 <template #title>
                     <div class="d-flex align-center">
@@ -126,6 +181,7 @@
         </v-col>
     </v-row>
 
+    <unlink-third-party-login-dialog ref="unlinkThirdPartyLoginDialog" />
     <user-generate-m-c-p-token-dialog ref="generateMCPTokenDialog" />
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
@@ -133,6 +189,7 @@
 
 <script setup lang="ts">
 import { VTextField } from 'vuetify/components/VTextField';
+import UnlinkThirdPartyLoginDialog from '@/views/desktop/user/settings/dialogs/UnlinkThirdPartyLoginDialog.vue';
 import UserGenerateMCPTokenDialog from '@/views/desktop/user/settings/dialogs/UserGenerateMCPTokenDialog.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
@@ -143,17 +200,21 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useRootStore } from '@/stores/index.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
+import { useUserExternalAuthStore } from '@/stores/userExternalAuth.ts';
 import { useTokensStore } from '@/stores/token.ts';
 
 import { itemAndIndex, reversedItemAndIndex } from '@/core/base.ts';
+import { type UserExternalAuthInfoResponse } from '@/models/user_external_auth.ts';
 import { type TokenInfoResponse, SessionInfo } from '@/models/token.ts';
 
 import { isEquals } from '@/lib/common.ts';
 import { parseSessionInfo } from '@/lib/session.ts';
-import { isMCPServerEnabled } from '@/lib/server_settings.ts';
+import { getOIDCCustomDisplayNames, isMCPServerEnabled } from '@/lib/server_settings.ts';
 
 import {
     mdiRefresh,
+    mdiLinkVariant,
+    mdiGithub,
     mdiCellphone,
     mdiTablet,
     mdiWatch,
@@ -163,39 +224,110 @@ import {
     mdiDevices
 } from '@mdi/js';
 
+class DesktopPageLinkedThirdPartyLogin {
+    public readonly externalAuthType: string;
+    public readonly icon: string;
+    public readonly displayName: string;
+    public readonly linked: boolean;
+    public readonly externalUsername: string;
+    public readonly createdAt: string;
+
+    public constructor(externalAuthInfoResponse: UserExternalAuthInfoResponse) {
+        this.externalAuthType = externalAuthInfoResponse.externalAuthType;
+        this.linked = externalAuthInfoResponse.linked;
+        this.externalUsername = externalAuthInfoResponse.externalUsername ? externalAuthInfoResponse.externalUsername : '-';
+        this.createdAt = externalAuthInfoResponse.createdAt ? formatUnixTimeToLongDateTime(externalAuthInfoResponse.createdAt) : '-';
+
+        if (externalAuthInfoResponse.externalAuthCategory === 'oauth2') {
+            this.displayName = getLocalizedOAuth2ProviderName(externalAuthInfoResponse.externalAuthType, getOIDCCustomDisplayNames());
+
+            if (externalAuthInfoResponse.externalAuthType === 'github') {
+                this.icon = mdiGithub;
+            } else {
+                this.icon = mdiLinkVariant;
+            }
+        } else {
+            this.displayName = externalAuthInfoResponse.externalAuthType;
+            this.icon = mdiLinkVariant;
+        }
+    }
+}
+
 class DesktopPageSessionInfo extends SessionInfo {
     public readonly icon: string;
     public readonly lastSeenDateTime: string;
 
     public constructor(sessionInfo: SessionInfo) {
         super(sessionInfo.tokenId, sessionInfo.isCurrent, sessionInfo.deviceType, sessionInfo.deviceInfo, sessionInfo.createdByCli, sessionInfo.lastSeen);
-        this.icon = getTokenIcon(sessionInfo.deviceType);
+        this.icon = this.getTokenIcon(sessionInfo.deviceType);
         this.lastSeenDateTime = sessionInfo.lastSeen ? formatUnixTimeToLongDateTime(sessionInfo.lastSeen) : '-';
+    }
+
+    private getTokenIcon(deviceType: string): string {
+        if (deviceType === 'phone') {
+            return mdiCellphone;
+        } else if (deviceType === 'wearable') {
+            return mdiWatch;
+        } else if (deviceType === 'tablet') {
+            return mdiTablet;
+        } else if (deviceType === 'tv') {
+            return mdiTelevision;
+        } else if (deviceType === 'mcp') {
+            return mdiCreationOutline;
+        } else if (deviceType === 'cli') {
+            return mdiConsole;
+        } else {
+            return mdiDevices;
+        }
     }
 }
 
+type UnlinkThirdPartyLoginDialogType = InstanceType<typeof UnlinkThirdPartyLoginDialog>;
 type UserGenerateMCPTokenDialogType = InstanceType<typeof UserGenerateMCPTokenDialog>;
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 
-const { tt, formatUnixTimeToLongDateTime, setLanguage } = useI18n();
+const {
+    tt,
+    formatUnixTimeToLongDateTime,
+    getLocalizedOAuth2ProviderName,
+    setLanguage
+} = useI18n();
 
 const rootStore = useRootStore();
 const settingsStore = useSettingsStore();
+const userExternalAuthStore = useUserExternalAuthStore();
 const tokensStore = useTokensStore();
 
 const newPasswordInput = useTemplateRef<VTextField>('newPasswordInput');
 const confirmPasswordInput = useTemplateRef<VTextField>('confirmPasswordInput');
+const unlinkThirdPartyLoginDialog = useTemplateRef<UnlinkThirdPartyLoginDialogType>('unlinkThirdPartyLoginDialog');
 const generateMCPTokenDialog = useTemplateRef<UserGenerateMCPTokenDialogType>('generateMCPTokenDialog');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
+const externalAuths = ref<UserExternalAuthInfoResponse[]>([]);
 const tokens = ref<TokenInfoResponse[]>([]);
 const currentPassword = ref<string>('');
 const newPassword = ref<string>('');
 const confirmPassword = ref<string>('');
 const updatingPassword = ref<boolean>(false);
+const loadingExternalAuth = ref<boolean>(true);
 const loadingSession = ref<boolean>(true);
+
+const thirdPartyLogins = computed<DesktopPageLinkedThirdPartyLogin[]>(() => {
+    const logins: DesktopPageLinkedThirdPartyLogin[] = [];
+
+    if (!externalAuths.value) {
+        return logins;
+    }
+
+    for (const externalAuth of externalAuths.value) {
+        logins.push(new DesktopPageLinkedThirdPartyLogin(externalAuth));
+    }
+
+    return logins;
+});
 
 const sessions = computed<DesktopPageSessionInfo[]>(() => {
     const sessions: DesktopPageSessionInfo[] = [];
@@ -226,37 +358,11 @@ const inputProblemMessage = computed<string | null>(() => {
     }
 });
 
-function getTokenIcon(deviceType: string): string {
-    if (deviceType === 'phone') {
-        return mdiCellphone;
-    } else if (deviceType === 'wearable') {
-        return mdiWatch;
-    } else if (deviceType === 'tablet') {
-        return mdiTablet;
-    } else if (deviceType === 'tv') {
-        return mdiTelevision;
-    } else if (deviceType === 'mcp') {
-        return mdiCreationOutline;
-    } else if (deviceType === 'cli') {
-        return mdiConsole;
-    } else {
-        return mdiDevices;
-    }
-}
-
 function init(): void {
+    loadingExternalAuth.value = true;
     loadingSession.value = true;
-
-    tokensStore.getAllTokens().then(response => {
-        tokens.value = response;
-        loadingSession.value = false;
-    }).catch(error => {
-        loadingSession.value = false;
-
-        if (!error.processed) {
-            snackbar.value?.showError(error);
-        }
-    });
+    reloadExternalAuth(true);
+    reloadSessions(true);
 }
 
 function updatePassword(): void {
@@ -293,6 +399,35 @@ function updatePassword(): void {
         if (!error.processed) {
             snackbar.value?.showError(error);
         }
+    });
+}
+
+function reloadExternalAuth(silent?: boolean): void {
+    loadingExternalAuth.value = true;
+
+    userExternalAuthStore.getExternalAuths().then(response => {
+        if (!silent) {
+            if (isEquals(externalAuths.value, response)) {
+                snackbar.value?.showMessage('Third-party logins list is up to date');
+            } else {
+                snackbar.value?.showMessage('Third-party logins list has been updated');
+            }
+        }
+
+        externalAuths.value = response;
+        loadingExternalAuth.value = false;
+    }).catch(error => {
+        loadingExternalAuth.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function unlinkExternalAuth(thirdPartyLogin: DesktopPageLinkedThirdPartyLogin): void {
+    unlinkThirdPartyLoginDialog.value?.open(thirdPartyLogin.externalAuthType).then(() => {
+        reloadExternalAuth(true);
     });
 }
 

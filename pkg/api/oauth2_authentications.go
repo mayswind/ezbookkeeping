@@ -59,25 +59,25 @@ func (a *OAuth2AuthenticationApi) LoginHandler(c *core.WebContext) (string, *err
 
 	if err != nil {
 		log.Warnf(c, "[oauth2_authentications.LoginHandler] parse request failed, because %s", err.Error())
-		return "", errs.NewIncompleteOrIncorrectSubmissionError(err)
+		return a.redirectToFailedCallbackPage(c, errs.NewIncompleteOrIncorrectSubmissionError(err))
 	}
 
 	if oauth2LoginReq.Platform != "mobile" && oauth2LoginReq.Platform != "desktop" {
-		return "", errs.ErrInvalidOAuth2LoginRequest
+		return a.redirectToFailedCallbackPage(c, errs.ErrInvalidOAuth2LoginRequest)
 	}
 
 	found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_OAUTH2_REDIRECT, 0, oauth2LoginReq.ClientSessionId)
 
 	if found {
 		log.Errorf(c, "[oauth2_authentications.LoginHandler] another oauth 2.0 state \"%s\" has been processing for client session id \"%s\"", remark, oauth2LoginReq.ClientSessionId)
-		return "", errs.ErrRepeatedRequest
+		return a.redirectToFailedCallbackPage(c, errs.ErrRepeatedRequest)
 	}
 
 	verifier, err := utils.GetRandomNumberOrLowercaseLetter(64)
 
 	if err != nil {
 		log.Errorf(c, "[oauth2_authentications.LoginHandler] failed to generate random string for oauth 2.0 state, because %s", err.Error())
-		return "", errs.ErrSystemError
+		return a.redirectToFailedCallbackPage(c, errs.ErrSystemError)
 	}
 
 	remark = fmt.Sprintf("%s|%s|%s", oauth2LoginReq.Platform, oauth2LoginReq.ClientSessionId, verifier)
@@ -87,7 +87,7 @@ func (a *OAuth2AuthenticationApi) LoginHandler(c *core.WebContext) (string, *err
 
 	if err != nil {
 		log.Errorf(c, "[oauth2_authentications.LoginHandler] failed to get oauth 2.0 auth url, because %s", err.Error())
-		return "", errs.Or(err, errs.ErrSystemError)
+		return a.redirectToFailedCallbackPage(c, errs.Or(err, errs.ErrSystemError))
 	}
 
 	a.SetSubmissionRemarkWithCustomExpiration(duplicatechecker.DUPLICATE_CHECKER_TYPE_OAUTH2_REDIRECT, 0, oauth2LoginReq.ClientSessionId, remark, a.CurrentConfig().OAuth2StateExpiredTimeDuration)

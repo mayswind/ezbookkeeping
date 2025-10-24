@@ -14,6 +14,7 @@
                 type="text"
                 autocomplete="username"
                 clear-button
+                :disabled="loggingInByPassword || loggingInByOAuth2"
                 :label="tt('Username')"
                 :placeholder="tt('Your username or email')"
                 v-model:value="username"
@@ -23,6 +24,7 @@
                 type="password"
                 autocomplete="current-password"
                 clear-button
+                :disabled="loggingInByPassword || loggingInByOAuth2"
                 :label="tt('Password')"
                 :placeholder="tt('Your password')"
                 v-model:value="password"
@@ -35,12 +37,12 @@
             <f7-list-item>
                 <template #title>
                     <small>
-                        <f7-link external :href="getDesktopVersionPath()">{{ tt('Switch to Desktop Version') }}</f7-link>
+                        <f7-link external :class="{ 'disabled': loggingInByPassword || loggingInByOAuth2 }" :href="getDesktopVersionPath()">{{ tt('Switch to Desktop Version') }}</f7-link>
                     </small>
                 </template>
                 <template #after>
                     <small>
-                        <f7-link :class="{'disabled': !isUserForgetPasswordEnabled()}" @click="forgetPasswordEmail = ''; showForgetPasswordSheet = true">{{ tt('Forget Password?') }}</f7-link>
+                        <f7-link :class="{ 'disabled': !isUserForgetPasswordEnabled() || loggingInByPassword || loggingInByOAuth2 }" @click="forgetPasswordEmail = ''; showForgetPasswordSheet = true">{{ tt('Forget Password?') }}</f7-link>
                     </small>
                 </template>
             </f7-list-item>
@@ -58,13 +60,13 @@
                             @click="loggingInByOAuth2 = true" v-if="isOAuth2Enabled()"></f7-list-button>
             <f7-block-footer v-if="isInternalAuthEnabled()">
                 <span>{{ tt('Don\'t have an account?') }}</span>&nbsp;
-                <f7-link :class="{'disabled': !isUserRegistrationEnabled()}" href="/signup" :text="tt('Create an account')"></f7-link>
+                <f7-link :class="{ 'disabled': !isUserRegistrationEnabled() || loggingInByPassword || loggingInByOAuth2 }" href="/signup" :text="tt('Create an account')"></f7-link>
             </f7-block-footer>
             <f7-block-footer class="padding-bottom">
             </f7-block-footer>
         </f7-list>
 
-        <language-select-button />
+        <language-select-button :disabled="loggingInByPassword || loggingInByOAuth2" />
 
         <f7-list class="login-page-bottom">
             <f7-block-footer>

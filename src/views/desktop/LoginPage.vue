@@ -88,12 +88,14 @@
 
                                     <v-col cols="12" class="py-0 mt-1 mb-4">
                                         <div class="d-flex align-center justify-space-between flex-wrap">
-                                            <a href="javascript:void(0);" @click="showMobileQrCode = true">
+                                            <a href="javascript:void(0);"
+                                               :class="{ 'disabled': loggingInByPassword || loggingInByOAuth2 || verifying }"
+                                               @click="showMobileQrCode = true">
                                                 <span class="nav-item-title">{{ tt('Use on Mobile Device') }}</span>
                                             </a>
                                             <v-spacer/>
                                             <router-link class="text-primary" to="/forgetpassword"
-                                                         :class="{'disabled': !isUserForgetPasswordEnabled()}">
+                                                         :class="{ 'disabled': !isUserForgetPasswordEnabled() || loggingInByPassword || loggingInByOAuth2 || verifying }">
                                                 {{ tt('Forget Password?') }}
                                             </router-link>
                                         </div>
@@ -127,7 +129,7 @@
                                     <v-col cols="12" class="text-center text-base" v-if="isInternalAuthEnabled()">
                                         <span class="me-1">{{ tt('Don\'t have an account?') }}</span>
                                         <router-link class="text-primary" to="/signup"
-                                                     :class="{'disabled': !isUserRegistrationEnabled()}">
+                                                     :class="{ 'disabled': !isUserRegistrationEnabled() || loggingInByPassword || loggingInByOAuth2 || verifying }">
                                             {{ tt('Create an account') }}
                                         </router-link>
                                     </v-col>

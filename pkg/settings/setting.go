@@ -368,6 +368,7 @@ type Config struct {
 	ForgetPasswordRequireVerifyEmail  bool
 	OAuth2ClientID                    string
 	OAuth2ClientSecret                string
+	OAuth2UsePKCE                     bool
 	OAuth2UserIdentifier              string
 	OAuth2AutoRegister                bool
 	OAuth2Provider                    string
@@ -989,6 +990,7 @@ func loadAuthConfiguration(config *Config, configFile *ini.File, sectionName str
 	config.ForgetPasswordRequireVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "forget_password_require_email_verify", false)
 	config.OAuth2ClientID = getConfigItemStringValue(configFile, sectionName, "oauth2_client_id")
 	config.OAuth2ClientSecret = getConfigItemStringValue(configFile, sectionName, "oauth2_client_secret")
+	config.OAuth2UsePKCE = getConfigItemBoolValue(configFile, sectionName, "oauth2_use_pkce", false)
 
 	oauth2UserIdentifier := getConfigItemStringValue(configFile, sectionName, "oauth2_user_identifier")
 

@@ -41,13 +41,13 @@ type GithubOAuth2Provider struct {
 }
 
 // GetOAuth2AuthUrl returns the authentication url of the GitHub OAuth 2.0 provider
-func (p *GithubOAuth2Provider) GetOAuth2AuthUrl(c core.Context, state string, challenge string) (string, error) {
-	return p.oauth2Config.AuthCodeURL(state), nil
+func (p *GithubOAuth2Provider) GetOAuth2AuthUrl(c core.Context, state string, opts ...oauth2.AuthCodeOption) (string, error) {
+	return p.oauth2Config.AuthCodeURL(state, opts...), nil
 }
 
 // GetOAuth2Token returns the OAuth 2.0 token of the GitHub OAuth 2.0 provider
-func (p *GithubOAuth2Provider) GetOAuth2Token(c core.Context, code string, verifier string) (*oauth2.Token, error) {
-	return p.oauth2Config.Exchange(c, code)
+func (p *GithubOAuth2Provider) GetOAuth2Token(c core.Context, code string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error) {
+	return p.oauth2Config.Exchange(c, code, opts...)
 }
 
 // GetUserInfo returns the user info by the Github OAuth 2.0 provider
@@ -56,7 +56,7 @@ func (p *GithubOAuth2Provider) GetUserInfo(c core.Context, oauth2Token *oauth2.T
 	req, err := p.buildAPIRequest(githubUserProfileApiUrl)
 
 	if err != nil {
-		log.Errorf(c, "[github_oauth2_datasource_test.GetUserInfo] failed to get user info request, because %s", err.Error())
+		log.Errorf(c, "[github_oauth2_provider.GetUserInfo] failed to get user info request, because %s", err.Error())
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
@@ -64,17 +64,17 @@ func (p *GithubOAuth2Provider) GetUserInfo(c core.Context, oauth2Token *oauth2.T
 	resp, err := oauth2Client.Do(req)
 
 	if err != nil {
-		log.Errorf(c, "[github_oauth2_datasource_test.GetUserInfo] failed to get user info response, because %s", err.Error())
+		log.Errorf(c, "[github_oauth2_provider.GetUserInfo] failed to get user info response, because %s", err.Error())
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 
-	log.Debugf(c, "[github_oauth2_datasource_test.GetUserInfo] user profile response is %s", body)
+	log.Debugf(c, "[github_oauth2_provider.GetUserInfo] user profile response is %s", body)
 
 	if resp.StatusCode != 200 {
-		log.Errorf(c, "[github_oauth2_datasource_test.GetUserInfo] failed to get user info response, because response code is %d", resp.StatusCode)
+		log.Errorf(c, "[github_oauth2_provider.GetUserInfo] failed to get user info response, because response code is %d", resp.StatusCode)
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
@@ -88,24 +88,24 @@ func (p *GithubOAuth2Provider) GetUserInfo(c core.Context, oauth2Token *oauth2.T
 	req, err = p.buildAPIRequest(githubUserEmailApiUrl)
 
 	if err != nil {
-		log.Errorf(c, "[github_oauth2_datasource_test.GetUserInfo] failed to get user emails request, because %s", err.Error())
+		log.Errorf(c, "[github_oauth2_provider.GetUserInfo] failed to get user emails request, because %s", err.Error())
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
 	resp, err = oauth2Client.Do(req)
 
 	if err != nil {
-		log.Errorf(c, "[github_oauth2_datasource_test.GetUserInfo] failed to get user emails response, because %s", err.Error())
+		log.Errorf(c, "[github_oauth2_provider.GetUserInfo] failed to get user emails response, because %s", err.Error())
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
 	defer resp.Body.Close()
 	body, err = io.ReadAll(resp.Body)
 
-	log.Debugf(c, "[github_oauth2_datasource_test.GetUserInfo] user emails response is %s", body)
+	log.Debugf(c, "[github_oauth2_provider.GetUserInfo] user emails response is %s", body)
 
 	if resp.StatusCode != 200 {
-		log.Errorf(c, "[github_oauth2_datasource_test.GetUserInfo] failed to get user emails response, because response code is %d", resp.StatusCode)
+		log.Errorf(c, "[github_oauth2_provider.GetUserInfo] failed to get user emails response, because response code is %d", resp.StatusCode)
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
@@ -127,12 +127,12 @@ func (p *GithubOAuth2Provider) parseUserProfile(c core.Context, body []byte) (*g
 	err := json.Unmarshal(body, &userProfileResp)
 
 	if err != nil {
-		log.Warnf(c, "[github_oauth2_datasource.parseUserProfile] failed to parse user profile response body, because %s", err.Error())
+		log.Warnf(c, "[github_oauth2_provider.parseUserProfile] failed to parse user profile response body, because %s", err.Error())
 		return nil, errs.ErrCannotRetrieveUserInfo
 	}
 
 	if userProfileResp.Login == "" {
-		log.Warnf(c, "[github_oauth2_datasource.parseUserProfile] invalid user profile response body")
+		log.Warnf(c, "[github_oauth2_provider.parseUserProfile] invalid user profile response body")
 		return nil, errs.ErrCannotRetrieveUserInfo
 	}
 
@@ -144,7 +144,7 @@ func (p *GithubOAuth2Provider) parsePrimaryEmail(c core.Context, body []byte) (s
 	err := json.Unmarshal(body, &emailsResp)
 
 	if err != nil {
-		log.Warnf(c, "[github_oauth2_datasource.parsePrimaryEmail] failed to parse user emails response body, because %s", err.Error())
+		log.Warnf(c, "[github_oauth2_provider.parsePrimaryEmail] failed to parse user emails response body, because %s", err.Error())
 		return "", errs.ErrCannotRetrieveUserInfo
 	}
 

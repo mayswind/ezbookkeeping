@@ -36,17 +36,17 @@ type CommonOAuth2DataSource interface {
 	GetScopes() []string
 
 	// ParseUserInfo returns the user info by parsing the response body
-	ParseUserInfo(c core.Context, body []byte, oauth2Client *http.Client) (*data.OAuth2UserInfo, error)
+	ParseUserInfo(c core.Context, body []byte) (*data.OAuth2UserInfo, error)
 }
 
 // GetOAuth2AuthUrl returns the authentication url of the common OAuth 2.0 provider
-func (p *CommonOAuth2Provider) GetOAuth2AuthUrl(c core.Context, state string, challenge string) (string, error) {
-	return p.oauth2Config.AuthCodeURL(state), nil
+func (p *CommonOAuth2Provider) GetOAuth2AuthUrl(c core.Context, state string, opts ...oauth2.AuthCodeOption) (string, error) {
+	return p.oauth2Config.AuthCodeURL(state, opts...), nil
 }
 
 // GetOAuth2Token returns the OAuth 2.0 token of the common OAuth 2.0 provider
-func (p *CommonOAuth2Provider) GetOAuth2Token(c core.Context, code string, verifier string) (*oauth2.Token, error) {
-	return p.oauth2Config.Exchange(c, code)
+func (p *CommonOAuth2Provider) GetOAuth2Token(c core.Context, code string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error) {
+	return p.oauth2Config.Exchange(c, code, opts...)
 }
 
 // GetUserInfo returns the user info by the common OAuth 2.0 provider
@@ -76,7 +76,7 @@ func (p *CommonOAuth2Provider) GetUserInfo(c core.Context, oauth2Token *oauth2.T
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
-	return p.dataSource.ParseUserInfo(c, body, oauth2Client)
+	return p.dataSource.ParseUserInfo(c, body)
 }
 
 // GetDataSource returns the data source of the common OAuth 2.0 provider

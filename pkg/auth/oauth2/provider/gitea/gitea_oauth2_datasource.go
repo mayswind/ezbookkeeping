@@ -56,7 +56,7 @@ func (s *GiteaOAuth2DataSource) GetScopes() []string {
 }
 
 // ParseUserInfo returns the user info by parsing the response body
-func (s *GiteaOAuth2DataSource) ParseUserInfo(c core.Context, body []byte, oauth2Client *http.Client) (*data.OAuth2UserInfo, error) {
+func (s *GiteaOAuth2DataSource) ParseUserInfo(c core.Context, body []byte) (*data.OAuth2UserInfo, error) {
 	userInfoResp := &giteaUserInfoResponse{}
 	err := json.Unmarshal(body, &userInfoResp)
 

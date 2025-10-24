@@ -1,8 +1,6 @@
 package oauth2
 
 import (
-	"crypto/sha256"
-	"encoding/base64"
 	"net/http"
 
 	"golang.org/x/oauth2"
@@ -22,6 +20,7 @@ import (
 // OAuth2Container contains the current OAuth 2.0 authentication provider
 type OAuth2Container struct {
 	current              provider.OAuth2Provider
+	usePKCE              bool
 	oauth2HttpClient     *http.Client
 	externalUserAuthType core.UserExternalAuthType
 }
@@ -67,6 +66,7 @@ func InitializeOAuth2Provider(config *settings.Config) error {
 	}
 
 	Container.current = oauth2Provider
+	Container.usePKCE = config.OAuth2UsePKCE
 	Container.oauth2HttpClient = utils.NewHttpClient(config.OAuth2RequestTimeout, config.OAuth2Proxy, config.OAuth2SkipTLSVerify, settings.GetUserAgent())
 	Container.externalUserAuthType = externalUserAuthType
 
@@ -79,10 +79,13 @@ func GetOAuth2AuthUrl(c core.Context, state string, verifier string) (string, er
 		return "", errs.ErrOAuth2NotEnabled
 	}
 
-	sha256Hash := sha256.New()
-	sha256Hash.Write([]byte(verifier))
-	challenge := base64.RawURLEncoding.EncodeToString(sha256Hash.Sum(nil))
-	return Container.current.GetOAuth2AuthUrl(wrapOAuth2Context(c, Container.oauth2HttpClient), state, challenge)
+	var opts []oauth2.AuthCodeOption
+
+	if Container.usePKCE {
+		opts = append(opts, oauth2.S256ChallengeOption(verifier))
+	}
+
+	return Container.current.GetOAuth2AuthUrl(wrapOAuth2Context(c, Container.oauth2HttpClient), state, opts...)
 }
 
 // GetOAuth2Token exchanges the authorization code for an OAuth 2.0 token
@@ -91,7 +94,13 @@ func GetOAuth2Token(c core.Context, code string, verifier string) (*oauth2.Token
 		return nil, errs.ErrOAuth2NotEnabled
 	}
 
-	return Container.current.GetOAuth2Token(wrapOAuth2Context(c, Container.oauth2HttpClient), code, verifier)
+	var opts []oauth2.AuthCodeOption
+
+	if Container.usePKCE {
+		opts = append(opts, oauth2.VerifierOption(verifier))
+	}
+
+	return Container.current.GetOAuth2Token(wrapOAuth2Context(c, Container.oauth2HttpClient), code, opts...)
 }
 
 // GetOAuth2UserInfo retrieves the OAuth 2.0 user info using the provided OAuth 2.0 token

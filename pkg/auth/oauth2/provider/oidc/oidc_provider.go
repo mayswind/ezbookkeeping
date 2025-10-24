@@ -35,27 +35,25 @@ type OIDCProvider struct {
 }
 
 // GetOAuth2AuthUrl returns the authentication url of the OIDC provider
-func (p *OIDCProvider) GetOAuth2AuthUrl(c core.Context, state string, challenge string) (string, error) {
+func (p *OIDCProvider) GetOAuth2AuthUrl(c core.Context, state string, opts ...oauth2.AuthCodeOption) (string, error) {
 	oauth2Config, err := p.getOAuth2Config(c)
 
 	if err != nil {
 		return "", err
 	}
 
-	return oauth2Config.AuthCodeURL(state,
-		oauth2.SetAuthURLParam("code_challenge", challenge),
-		oauth2.SetAuthURLParam("code_challenge_method", "S256")), nil
+	return oauth2Config.AuthCodeURL(state, opts...), nil
 }
 
 // GetOAuth2Token returns the OAuth 2.0 token of the OIDC provider
-func (p *OIDCProvider) GetOAuth2Token(c core.Context, code string, verifier string) (*oauth2.Token, error) {
+func (p *OIDCProvider) GetOAuth2Token(c core.Context, code string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error) {
 	oauth2Config, err := p.getOAuth2Config(c)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return oauth2Config.Exchange(c, code, oauth2.SetAuthURLParam("code_verifier", verifier))
+	return oauth2Config.Exchange(c, code, opts...)
 }
 
 // GetUserInfo returns the user info by the OIDC provider

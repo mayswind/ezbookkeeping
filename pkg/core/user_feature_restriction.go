@@ -90,10 +90,12 @@ const (
 	USER_FEATURE_RESTRICTION_TYPE_SYNC_APPLICATION_SETTINGS                    UserFeatureRestrictionType = 12
 	USER_FEATURE_RESTRICTION_TYPE_MCP_ACCESS                                   UserFeatureRestrictionType = 13
 	USER_FEATURE_RESTRICTION_TYPE_CREATE_TRANSACTION_FROM_AI_IMAGE_RECOGNITION UserFeatureRestrictionType = 14
+	USER_FEATURE_RESTRICTION_TYPE_OAUTH2_LOGIN                                 UserFeatureRestrictionType = 15
+	USER_FEATURE_RESTRICTION_TYPE_UNLINK_THIRD_PARTY_LOGIN                     UserFeatureRestrictionType = 16
 )
 
 const userFeatureRestrictionTypeMinValue UserFeatureRestrictionType = USER_FEATURE_RESTRICTION_TYPE_UPDATE_PASSWORD
-const userFeatureRestrictionTypeMaxValue UserFeatureRestrictionType = USER_FEATURE_RESTRICTION_TYPE_CREATE_TRANSACTION_FROM_AI_IMAGE_RECOGNITION
+const userFeatureRestrictionTypeMaxValue UserFeatureRestrictionType = USER_FEATURE_RESTRICTION_TYPE_UNLINK_THIRD_PARTY_LOGIN
 
 // String returns a textual representation of the restriction type of user features
 func (t UserFeatureRestrictionType) String() string {
@@ -126,6 +128,10 @@ func (t UserFeatureRestrictionType) String() string {
 		return "MCP (Model Context Protocol) Access"
 	case USER_FEATURE_RESTRICTION_TYPE_CREATE_TRANSACTION_FROM_AI_IMAGE_RECOGNITION:
 		return "Create Transaction from AI Image Recognition"
+	case USER_FEATURE_RESTRICTION_TYPE_OAUTH2_LOGIN:
+		return "OAuth 2.0 Login"
+	case USER_FEATURE_RESTRICTION_TYPE_UNLINK_THIRD_PARTY_LOGIN:
+		return "Unlink Third-Party Login"
 	default:
 		return fmt.Sprintf("Invalid(%d)", int(t))
 	}

@@ -87,6 +87,10 @@ func (a *UserExternalAuthsApi) UnlinkExternalAuthHandler(c *core.WebContext) (an
 		return nil, errs.ErrUserPasswordWrong
 	}
 
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_UNLINK_THIRD_PARTY_LOGIN) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
 	externalAuthType := core.UserExternalAuthType(externalAuthLinkReq.ExternalAuthType)
 
 	if !externalAuthType.IsValid() {

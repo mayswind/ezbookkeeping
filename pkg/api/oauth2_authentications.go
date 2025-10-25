@@ -265,6 +265,10 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 				FeatureRestriction:   a.CurrentConfig().DefaultFeatureRestrictions,
 			}
 
+			if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_OAUTH2_LOGIN) {
+				return a.redirectToFailedCallbackPage(c, errs.ErrNotPermittedToPerformThisAction)
+			}
+
 			err = a.users.CreateUser(c, user, true)
 
 			if err != nil {
@@ -292,6 +296,10 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 		} else if user == nil {
 			return a.redirectToFailedCallbackPage(c, errs.ErrOAuth2AutoRegistrationNotEnabled)
 		}
+	}
+
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_OAUTH2_LOGIN) {
+		return a.redirectToFailedCallbackPage(c, errs.ErrNotPermittedToPerformThisAction)
 	}
 
 	if userExternalAuth == nil {

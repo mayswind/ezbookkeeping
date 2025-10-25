@@ -3,7 +3,7 @@
         "name": "Gin",
         "copyright": "Copyright (c) 2014 Manuel Martínez-Almeida",
         "url": "https://github.com/gin-gonic/gin",
-        "licenseUrl": "https://github.com/gin-gonic/gin/blob/v1.10.1/LICENSE"
+        "licenseUrl": "https://github.com/gin-gonic/gin/blob/v1.11.0/LICENSE"
     },
     {
         "name": "Cache gin's middleware",
@@ -15,13 +15,13 @@
         "name": "GZIP gin's middleware",
         "copyright": "Copyright (c) 2017 Gin-Gonic",
         "url": "https://github.com/gin-contrib/gzip",
-        "licenseUrl": "https://github.com/gin-contrib/gzip/blob/v1.2.3/LICENSE"
+        "licenseUrl": "https://github.com/gin-contrib/gzip/blob/v1.2.4/LICENSE"
     },
     {
         "name": "xorm",
         "copyright": "Copyright (c) 2013 - 2015 The Xorm Authors",
         "url": "https://xorm.io/xorm",
-        "licenseUrl": "https://gitea.com/xorm/xorm/src/tag/v1.3.10/LICENSE"
+        "licenseUrl": "https://gitea.com/xorm/xorm/src/tag/v1.3.11/LICENSE"
     },
     {
         "name": "SQL builder",
@@ -39,7 +39,7 @@
         "name": "cli",
         "copyright": "Copyright (c) 2023 urfave/cli maintainers",
         "url": "https://github.com/urfave/cli",
-        "licenseUrl": "https://github.com/urfave/cli/blob/v3.4.1/LICENSE"
+        "licenseUrl": "https://github.com/urfave/cli/blob/v3.5.0/LICENSE"
     },
     {
         "name": "INI",
@@ -51,7 +51,7 @@
         "name": "Package validator",
         "copyright": "Copyright (c) 2015 Dean Karn",
         "url": "https://github.com/go-playground/validator",
-        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.27.0/LICENSE"
+        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.28.0/LICENSE"
     },
     {
         "name": "jwt-go",
@@ -85,25 +85,25 @@
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.41.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.43.0:LICENSE"
     },
     {
         "name": "Go Networking",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/net",
-        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.43.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.46.0:LICENSE"
     },
     {
         "name": "Go Text",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/text",
-        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.28.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.30.0:LICENSE"
     },
     {
         "name": "Go OAuth2",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/oauth2",
-        "licenseUrl": "https://cs.opensource.google/go/x/oauth2/+/refs/tags/v0.31.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/oauth2/+/refs/tags/v0.32.0:LICENSE"
     },
     {
         "name": "go-oidc",
@@ -127,7 +127,7 @@
         "name": "gocron",
         "copyright": "Copyright (c) 2014, 辣椒面",
         "url": "https://github.com/go-co-op/gocron",
-        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.16.5/LICENSE"
+        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.17.0/LICENSE"
     },
     {
         "name": "barcode",
@@ -139,7 +139,7 @@
         "name": "Excelize",
         "copyright": "Copyright (c) 2016-2025 The excelize Authors. Copyright (c) 2011-2017 Geoffrey J. Teale",
         "url": "https://github.com/qax-os/excelize",
-        "licenseUrl": "https://github.com/qax-os/excelize/blob/v2.9.0/LICENSE"
+        "licenseUrl": "https://github.com/qax-os/excelize/blob/v2.10.0/LICENSE"
     },
     {
         "name": "xls",

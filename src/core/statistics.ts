@@ -7,25 +7,37 @@ export enum StatisticsAnalysisType {
 }
 
 export class CategoricalChartType implements TypeAndName {
-    private static readonly allInstances: CategoricalChartType[] = [];
+    private static readonly allInstancesForAll: CategoricalChartType[] = [];
+    private static readonly allInstancesForDesktop: CategoricalChartType[] = [];
 
-    public static readonly Pie = new CategoricalChartType(0, 'Pie Chart');
-    public static readonly Bar = new CategoricalChartType(1, 'Bar Chart');
+    public static readonly Pie = new CategoricalChartType(0, 'Pie Chart', false);
+    public static readonly Bar = new CategoricalChartType(1, 'Bar Chart', false);
+    public static readonly Radar = new CategoricalChartType(2, 'Radar Chart', true);
 
     public static readonly Default = CategoricalChartType.Pie;
 
     public readonly type: number;
     public readonly name: string;
+    public readonly desktopOnly: boolean = false;
 
-    private constructor(type: number, name: string) {
+    private constructor(type: number, name: string, desktopOnly: boolean) {
         this.type = type;
         this.name = name;
+        this.desktopOnly = desktopOnly;
 
-        CategoricalChartType.allInstances.push(this);
+        if (!desktopOnly) {
+            CategoricalChartType.allInstancesForAll.push(this);
+        }
+
+        CategoricalChartType.allInstancesForDesktop.push(this);
     }
 
-    public static values(): CategoricalChartType[] {
-        return CategoricalChartType.allInstances;
+    public static values(withDesktopOnlyChart: boolean): CategoricalChartType[] {
+        if (withDesktopOnlyChart) {
+            return CategoricalChartType.allInstancesForDesktop;
+        } else {
+            return CategoricalChartType.allInstancesForAll;
+        }
     }
 }
 

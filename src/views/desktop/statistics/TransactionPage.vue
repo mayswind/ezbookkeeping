@@ -263,6 +263,32 @@
                                         </v-list>
                                     </v-card-text>
 
+                                    <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && query.categoricalChartType === CategoricalChartType.Radar.type">
+                                        <radar-chart
+                                            :items="[
+                                                {id: '1', name: '---', value: 60, color: '7c7c7f'},
+                                                {id: '2', name: '---', value: 20, color: 'a5a5aa'},
+                                                {id: '3', name: '---', value: 20, color: 'c5c5c9'}
+                                            ]"
+                                            :skeleton="true"
+                                            name-field="name"
+                                            value-field="value"
+                                            color-field="color"
+                                            v-if="initing"
+                                        ></radar-chart>
+                                        <radar-chart
+                                            :items="categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length ? categoricalAnalysisData.items : []"
+                                            :min-valid-percent="0.0001"
+                                            :show-value="showAmountInChart"
+                                            :default-currency="defaultCurrency"
+                                            name-field="name"
+                                            value-field="totalAmount"
+                                            percent-field="percent"
+                                            hidden-field="hidden"
+                                            v-else-if="!initing"
+                                        />
+                                    </v-card-text>
+
                                     <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis">
                                         <monthly-trends-chart
                                             :type="queryChartType"
@@ -504,7 +530,7 @@ const statisticsDataHasData = computed<boolean>(() => {
 
 const allChartTypes = computed<TypeAndDisplayName[]>(() => {
     if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
-        return getAllCategoricalChartTypes();
+        return getAllCategoricalChartTypes(true);
     } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
         return getAllTrendChartTypes();
     } else {

@@ -700,7 +700,9 @@ export const useStatisticsStore = defineStore('statistics', () => {
             transactionStatisticsFilter.value.categoricalChartType = settingsStore.appSettings.statistics.defaultCategoricalChartType;
         }
 
-        if (transactionStatisticsFilter.value.categoricalChartType !== CategoricalChartType.Pie.type && transactionStatisticsFilter.value.categoricalChartType !== CategoricalChartType.Bar.type) {
+        if (transactionStatisticsFilter.value.categoricalChartType !== CategoricalChartType.Pie.type &&
+            transactionStatisticsFilter.value.categoricalChartType !== CategoricalChartType.Bar.type &&
+            transactionStatisticsFilter.value.categoricalChartType !== CategoricalChartType.Radar.type) {
             transactionStatisticsFilter.value.categoricalChartType = CategoricalChartType.Default.type;
         }
 

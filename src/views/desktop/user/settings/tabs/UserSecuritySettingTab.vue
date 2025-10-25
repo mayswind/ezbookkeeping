@@ -63,7 +63,7 @@
             </v-card>
         </v-col>
 
-        <v-col cols="12">
+        <v-col cols="12" v-if="isOAuth2Enabled() && (loadingExternalAuth || (thirdPartyLogins && thirdPartyLogins.length))">
             <v-card :class="{ 'disabled': loadingExternalAuth }">
                 <template #title>
                     <div class="d-flex align-center">
@@ -209,7 +209,7 @@ import { type TokenInfoResponse, SessionInfo } from '@/models/token.ts';
 
 import { isEquals } from '@/lib/common.ts';
 import { parseSessionInfo } from '@/lib/session.ts';
-import { getOIDCCustomDisplayNames, isMCPServerEnabled } from '@/lib/server_settings.ts';
+import { isOAuth2Enabled, getOIDCCustomDisplayNames, isMCPServerEnabled } from '@/lib/server_settings.ts';
 
 import {
     mdiRefresh,
@@ -359,8 +359,6 @@ const inputProblemMessage = computed<string | null>(() => {
 });
 
 function init(): void {
-    loadingExternalAuth.value = true;
-    loadingSession.value = true;
     reloadExternalAuth(true);
     reloadSessions(true);
 }
@@ -403,6 +401,10 @@ function updatePassword(): void {
 }
 
 function reloadExternalAuth(silent?: boolean): void {
+    if (!isOAuth2Enabled()) {
+        return;
+    }
+
     loadingExternalAuth.value = true;
 
     userExternalAuthStore.getExternalAuths().then(response => {
@@ -426,6 +428,10 @@ function reloadExternalAuth(silent?: boolean): void {
 }
 
 function unlinkExternalAuth(thirdPartyLogin: DesktopPageLinkedThirdPartyLogin): void {
+    if (!isOAuth2Enabled()) {
+        return;
+    }
+
     unlinkThirdPartyLoginDialog.value?.open(thirdPartyLogin.externalAuthType).then(() => {
         reloadExternalAuth(true);
     });

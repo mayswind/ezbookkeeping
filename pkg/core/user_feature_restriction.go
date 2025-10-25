@@ -124,6 +124,8 @@ func (t UserFeatureRestrictionType) String() string {
 		return "Sync Application Settings"
 	case USER_FEATURE_RESTRICTION_TYPE_MCP_ACCESS:
 		return "MCP (Model Context Protocol) Access"
+	case USER_FEATURE_RESTRICTION_TYPE_CREATE_TRANSACTION_FROM_AI_IMAGE_RECOGNITION:
+		return "Create Transaction from AI Image Recognition"
 	default:
 		return fmt.Sprintf("Invalid(%d)", int(t))
 	}

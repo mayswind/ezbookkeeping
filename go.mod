@@ -7,7 +7,7 @@ require (
 	github.com/coreos/go-oidc/v3 v3.16.0
 	github.com/extrame/xls v0.0.2-0.20200426124601-4a6cf263071b
 	github.com/gin-contrib/cache v1.4.1
-	github.com/gin-contrib/gzip v1.2.4
+	github.com/gin-contrib/gzip v1.2.3
 	github.com/gin-gonic/gin v1.11.0
 	github.com/go-co-op/gocron/v2 v2.17.0
 	github.com/go-playground/validator/v10 v10.28.0

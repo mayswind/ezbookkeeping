@@ -15,7 +15,7 @@
         "name": "GZIP gin's middleware",
         "copyright": "Copyright (c) 2017 Gin-Gonic",
         "url": "https://github.com/gin-contrib/gzip",
-        "licenseUrl": "https://github.com/gin-contrib/gzip/blob/v1.2.4/LICENSE"
+        "licenseUrl": "https://github.com/gin-contrib/gzip/blob/v1.2.3/LICENSE"
     },
     {
         "name": "xorm",

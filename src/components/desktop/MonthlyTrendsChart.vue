@@ -347,6 +347,8 @@ const chartOptions = computed<object>(() => {
         },
         legend: {
             orient: 'horizontal',
+            type: 'scroll',
+            top: 0,
             data: allSeries.value.map(item => item.name),
             selected: selectedLegends.value,
             textStyle: {
@@ -358,19 +360,24 @@ const chartOptions = computed<object>(() => {
         },
         grid: {
             left: yAxisWidth.value,
-            right: 20
+            right: 20,
+            bottom: 40
         },
         xAxis: [
             {
                 type: 'category',
                 data: allDisplayDateRanges.value,
-                inverse: textDirection.value === TextDirection.RTL
+                inverse: textDirection.value === TextDirection.RTL,
+                axisLabel: {
+                    color: isDarkMode.value ? '#888' : '#666'
+                }
             }
         ],
         yAxis: [
             {
                 type: 'value',
                 axisLabel: {
+                    color: isDarkMode.value ? '#888' : '#666',
                     formatter: (value: string) => {
                         return formatAmountToLocalizedNumeralsWithCurrency(parseInt(value), props.defaultCurrency);
                     }

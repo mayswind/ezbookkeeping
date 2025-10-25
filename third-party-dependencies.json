@@ -173,7 +173,7 @@
         "name": "vuejs/core",
         "copyright": "Copyright (c) 2018-present, Yuxi (Evan) You and Vue contributors",
         "url": "https://github.com/vuejs/core",
-        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.21/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.22/LICENSE"
     },
     {
         "name": "Pinia",
@@ -185,7 +185,7 @@
         "name": "vue-router",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/router",
-        "licenseUrl": "https://github.com/vuejs/router/blob/v4.5.1/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/router/blob/v4.6.3/LICENSE"
     },
     {
         "name": "vue-i18n",
@@ -197,7 +197,7 @@
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-now Vuetify, LLC",
         "url": "https://vuetifyjs.com",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.9.7/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.10.7/packages/vuetify/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -245,13 +245,13 @@
         "name": "Apache ECharts",
         "copyright": "Copyright © 2017-2025, The Apache Software Foundation Apache ECharts, ECharts, Apache, the Apache feather, and the Apache ECharts project logo are either registered trademarks or trademarks of the Apache Software Foundation.",
         "url": "https://echarts.apache.org/",
-        "licenseUrl": "https://github.com/apache/echarts/blob/5.5.1/LICENSE"
+        "licenseUrl": "https://github.com/apache/echarts/blob/6.0.0/LICENSE"
     },
     {
         "name": "vue-echarts",
         "copyright": "Copyright (c) 2016-present GU Yiling & ECOMFE",
         "url": "https://github.com/ecomfe/vue-echarts",
-        "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v7.0.3/LICENSE"
+        "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v8.0.1/LICENSE"
     },
     {
         "name": "vue3-perfect-scrollbar",
@@ -263,13 +263,13 @@
         "name": "@vuepic/vue-datepicker",
         "copyright": "Copyright (c) 2021-present Vuepic",
         "url": "https://vue3datepicker.com/",
-        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v11.0.2/LICENSE"
+        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v11.0.3/LICENSE"
     },
     {
         "name": "axios",
         "copyright": "Copyright (c) 2014-present Matt Zabriskie & Collaborators",
         "url": "https://axios-http.com",
-        "licenseUrl": "https://github.com/axios/axios/blob/v1.11.0/LICENSE"
+        "licenseUrl": "https://github.com/axios/axios/blob/v1.12.2/LICENSE"
     },
     {
         "name": "Moment.js",

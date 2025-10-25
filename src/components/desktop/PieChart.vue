@@ -17,6 +17,8 @@ import { itemAndIndex } from '@/core/base.ts';
 import type { ColorStyleValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
 
+import { getObjectOwnFieldCount } from '@/lib/common.ts';
+
 interface DesktopPieChartDataItem extends CommonPieChartDataItem {
     itemStyle: {
         color: ColorStyleValue;
@@ -35,7 +37,7 @@ const theme = useTheme();
 const { formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
 const { selectedIndex, validItems } = usePieChartBase(props);
 
-const selectedLegends = ref<Record<string, boolean> | null>(null);
+const selectedLegends = ref<Record<string, boolean>>({});
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 
@@ -48,7 +50,7 @@ const itemsMap = computed<Record<string, Record<string, unknown>>>(() => {
         if (props.idField && item[props.idField]) {
             id = item[props.idField] as string;
         } else {
-            id = item[props.nameField] as string;;
+            id = item[props.nameField] as string;
         }
 
         map[id] = item;
@@ -75,7 +77,7 @@ const seriesData = computed<DesktopPieChartDataItem[]>(() => {
 
 const hasUnselectedItem = computed<boolean>(() => {
     for (const item of validItems.value) {
-        if (selectedLegends.value && !selectedLegends.value[item.id]) {
+        if (getObjectOwnFieldCount(selectedLegends.value) && !selectedLegends.value[item.id]) {
             return true;
         }
     }
@@ -89,7 +91,7 @@ const firstItemAndHalfCurrentItemTotalPercent = computed<number>(() => {
     let firstToCurrentTotalValue = 0;
 
     for (const [item, index] of itemAndIndex(validItems.value)) {
-        if (selectedLegends.value && !selectedLegends.value[item.id]) {
+        if (getObjectOwnFieldCount(selectedLegends.value) && !selectedLegends.value[item.id]) {
             continue;
         }
 
@@ -153,6 +155,8 @@ const chartOptions = computed<object>(() => {
         },
         legend: {
             orient: 'horizontal',
+            type: 'scroll',
+            top: 0,
             data: validItems.value.map(item => item.name),
             selected: selectedLegends.value,
             textStyle: {
@@ -169,6 +173,7 @@ const chartOptions = computed<object>(() => {
                 data: seriesData.value,
                 top: 50,
                 startAngle: -90 + firstItemAndHalfCurrentItemTotalPercent.value * 360,
+                radius: [0, '75%'],
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
@@ -251,12 +256,12 @@ function onLegendSelectChanged(e: { selected: Record<string, boolean> }): void {
 <style scoped>
 .pie-chart-container {
     width: 100%;
-    height: 400px;
+    height: 460px;
 }
 
 @media (min-width: 600px) {
     .pie-chart-container {
-        height: 500px;
+        height: 560px;
     }
 }
 

@@ -24,9 +24,9 @@ interface RadarChartData {
 }
 
 interface RadarChartDataItem {
-    name: string,
-    max: number,
-    color: string
+    name: string;
+    max: number;
+    color: string;
 }
 
 const props = defineProps<{

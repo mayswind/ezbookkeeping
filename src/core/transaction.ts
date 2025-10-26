@@ -7,6 +7,11 @@ export enum TransactionType {
     Transfer = 4
 }
 
+export enum TransactionRelatedAccountType {
+    TransferFrom = 1,
+    TransferTo = 2
+}
+
 export class TransactionEditScopeType implements TypeAndName {
     private static readonly allInstances: TransactionEditScopeType[] = [];
 

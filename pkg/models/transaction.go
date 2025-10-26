@@ -37,6 +37,15 @@ func (t TransactionType) ToTransactionDbType() (TransactionDbType, error) {
 	}
 }
 
+// TransactionRelatedAccountType represents related account type in transaction
+type TransactionRelatedAccountType byte
+
+// Transaction relation types
+const (
+	TRANSACTION_RELATED_ACCOUNT_TYPE_TRANSFER_FROM TransactionRelatedAccountType = 1
+	TRANSACTION_RELATED_ACCOUNT_TYPE_TRANSFER_TO   TransactionRelatedAccountType = 2
+)
+
 // TransactionDbType represents transaction type in database
 type TransactionDbType byte
 
@@ -79,6 +88,17 @@ func (t TransactionDbType) ToTransactionType() (TransactionType, error) {
 		return TRANSACTION_TYPE_TRANSFER, nil
 	} else if t == TRANSACTION_DB_TYPE_TRANSFER_IN {
 		return TRANSACTION_TYPE_TRANSFER, nil
+	} else {
+		return 0, errs.ErrTransactionTypeInvalid
+	}
+}
+
+// ToTransactionRelatedAccountType returns the related account type for this db enum
+func (t TransactionDbType) ToTransactionRelatedAccountType() (TransactionRelatedAccountType, error) {
+	if t == TRANSACTION_DB_TYPE_TRANSFER_OUT {
+		return TRANSACTION_RELATED_ACCOUNT_TYPE_TRANSFER_TO, nil
+	} else if t == TRANSACTION_DB_TYPE_TRANSFER_IN {
+		return TRANSACTION_RELATED_ACCOUNT_TYPE_TRANSFER_FROM, nil
 	} else {
 		return 0, errs.ErrTransactionTypeInvalid
 	}
@@ -369,9 +389,11 @@ type TransactionStatisticResponse struct {
 
 // TransactionStatisticResponseItem represents total amount item for a response
 type TransactionStatisticResponseItem struct {
-	CategoryId  int64 `json:"categoryId,string"`
-	AccountId   int64 `json:"accountId,string"`
-	TotalAmount int64 `json:"amount"`
+	CategoryId         int64                         `json:"categoryId,string"`
+	AccountId          int64                         `json:"accountId,string"`
+	RelatedAccountId   int64                         `json:"relatedAccountId,string,omitempty"`
+	RelatedAccountType TransactionRelatedAccountType `json:"relatedAccountType,omitempty"`
+	TotalAmount        int64                         `json:"amount"`
 }
 
 // TransactionStatisticTrendsResponseItem represents the data within each statistic interval

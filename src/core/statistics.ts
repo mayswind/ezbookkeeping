@@ -92,17 +92,22 @@ export class ChartDataType implements TypeAndName {
     private static readonly allInstances: ChartDataType[] = [];
     private static readonly allInstancesByType: Record<number, ChartDataType> = {};
 
+    public static readonly OutflowsByAccount = new ChartDataType(11, 'Outflows By Account', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
     public static readonly ExpenseByAccount = new ChartDataType(0, 'Expense By Account', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
     public static readonly ExpenseByPrimaryCategory = new ChartDataType(1, 'Expense By Primary Category', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
     public static readonly ExpenseBySecondaryCategory = new ChartDataType(2, 'Expense By Secondary Category', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
+    public static readonly InflowsByAccount = new ChartDataType(12, 'Inflows By Account', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
     public static readonly IncomeByAccount = new ChartDataType(3, 'Income By Account', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
     public static readonly IncomeByPrimaryCategory = new ChartDataType(4, 'Income By Primary Category', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
     public static readonly IncomeBySecondaryCategory = new ChartDataType(5, 'Income By Secondary Category', StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
     public static readonly AccountTotalAssets = new ChartDataType(6, 'Account Total Assets', StatisticsAnalysisType.CategoricalAnalysis);
     public static readonly AccountTotalLiabilities = new ChartDataType(7, 'Account Total Liabilities', StatisticsAnalysisType.CategoricalAnalysis);
+    public static readonly TotalOutflows = new ChartDataType(13, 'Total Outflows', StatisticsAnalysisType.TrendAnalysis);
     public static readonly TotalExpense = new ChartDataType(8, 'Total Expense', StatisticsAnalysisType.TrendAnalysis);
+    public static readonly TotalInflows = new ChartDataType(14, 'Total Inflows', StatisticsAnalysisType.TrendAnalysis);
     public static readonly TotalIncome = new ChartDataType(9, 'Total Income', StatisticsAnalysisType.TrendAnalysis);
-    public static readonly TotalBalance = new ChartDataType(10, 'Net Income', StatisticsAnalysisType.TrendAnalysis);
+    public static readonly NetCashFlow = new ChartDataType(15, 'Net Cash Flow', StatisticsAnalysisType.TrendAnalysis);
+    public static readonly NetIncome = new ChartDataType(10, 'Net Income', StatisticsAnalysisType.TrendAnalysis);
 
     public static readonly Default = ChartDataType.ExpenseByPrimaryCategory;
 

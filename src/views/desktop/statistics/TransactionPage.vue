@@ -48,7 +48,7 @@
                     <v-main>
                         <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
                             <v-window-item value="statisticsPage">
-                                <v-card variant="flat" min-height="680">
+                                <v-card variant="flat" :min-height="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis ? '860' : '700'">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
                                             <v-btn class="me-3 d-md-none" density="compact" color="default" variant="plain"
@@ -577,11 +577,13 @@ const querySortingType = computed<number>({
 });
 
 const statisticsTextColor = computed<string>(() => {
-    if (query.value.chartDataType === ChartDataType.ExpenseByAccount.type ||
+    if (query.value.chartDataType === ChartDataType.OutflowsByAccount.type ||
+        query.value.chartDataType === ChartDataType.ExpenseByAccount.type ||
         query.value.chartDataType === ChartDataType.ExpenseByPrimaryCategory.type ||
         query.value.chartDataType === ChartDataType.ExpenseBySecondaryCategory.type) {
         return 'text-expense';
-    } else if (query.value.chartDataType === ChartDataType.IncomeByAccount.type ||
+    } else if (query.value.chartDataType === ChartDataType.InflowsByAccount.type ||
+        query.value.chartDataType === ChartDataType.IncomeByAccount.type ||
         query.value.chartDataType === ChartDataType.IncomeByPrimaryCategory.type ||
         query.value.chartDataType === ChartDataType.IncomeBySecondaryCategory.type) {
         return 'text-income';
@@ -703,15 +705,20 @@ function reload(force: boolean): Promise<unknown> | null {
 
     loading.value = true;
 
-    if (query.value.chartDataType === ChartDataType.ExpenseByAccount.type ||
+    if (query.value.chartDataType === ChartDataType.OutflowsByAccount.type ||
+        query.value.chartDataType === ChartDataType.ExpenseByAccount.type ||
         query.value.chartDataType === ChartDataType.ExpenseByPrimaryCategory.type ||
         query.value.chartDataType === ChartDataType.ExpenseBySecondaryCategory.type ||
+        query.value.chartDataType === ChartDataType.InflowsByAccount.type ||
         query.value.chartDataType === ChartDataType.IncomeByAccount.type ||
         query.value.chartDataType === ChartDataType.IncomeByPrimaryCategory.type ||
         query.value.chartDataType === ChartDataType.IncomeBySecondaryCategory.type ||
+        query.value.chartDataType === ChartDataType.TotalOutflows.type ||
         query.value.chartDataType === ChartDataType.TotalExpense.type ||
+        query.value.chartDataType === ChartDataType.TotalInflows.type ||
         query.value.chartDataType === ChartDataType.TotalIncome.type ||
-        query.value.chartDataType === ChartDataType.TotalBalance.type) {
+        query.value.chartDataType === ChartDataType.NetCashFlow.type ||
+        query.value.chartDataType === ChartDataType.NetIncome.type) {
         if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
             dispatchPromise = statisticsStore.loadCategoricalAnalysis({
                 force: force

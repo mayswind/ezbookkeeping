@@ -11,7 +11,10 @@ import { entries, values } from '@/core/base.ts';
 import { type TextualYearMonth, type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { CategoryType } from '@/core/category.ts';
-import { TransactionTagFilterType } from '@/core/transaction.ts';
+import {
+    TransactionRelatedAccountType,
+    TransactionTagFilterType
+} from '@/core/transaction.ts';
 import {
     StatisticsAnalysisType,
     CategoricalChartType,
@@ -61,9 +64,13 @@ import services from '@/lib/services.ts';
 interface TransactionStatisticResponseItemWithInfo extends TransactionStatisticResponseItem {
     categoryId: string;
     accountId: string;
+    relatedAccountId?: string;
     amount: number;
     account?: Account;
     primaryAccount?: Account;
+    relatedAccount?: Account;
+    relatedPrimaryAccount?: Account;
+    relatedAccountType?: number;
     category?: TransactionCategory;
     primaryCategory?: TransactionCategory;
     amountInDefaultCurrency: number | null;
@@ -177,7 +184,9 @@ export const useStatisticsStore = defineStore('statistics', () => {
     const transactionStatisticsStateInvalid = ref<boolean>(true);
 
     const categoricalAnalysisChartDataCategory = computed<string>(() => {
-        if (transactionStatisticsFilter.value.chartDataType === ChartDataType.ExpenseByAccount.type ||
+        if (transactionStatisticsFilter.value.chartDataType === ChartDataType.OutflowsByAccount.type ||
+            transactionStatisticsFilter.value.chartDataType === ChartDataType.ExpenseByAccount.type ||
+            transactionStatisticsFilter.value.chartDataType === ChartDataType.InflowsByAccount.type ||
             transactionStatisticsFilter.value.chartDataType === ChartDataType.IncomeByAccount.type ||
             transactionStatisticsFilter.value.chartDataType === ChartDataType.AccountTotalAssets.type ||
             transactionStatisticsFilter.value.chartDataType === ChartDataType.AccountTotalLiabilities.type) {
@@ -296,9 +305,11 @@ export const useStatisticsStore = defineStore('statistics', () => {
     const categoricalAnalysisData = computed<TransactionCategoricalAnalysisData>(() => {
         let combinedData: WritableTransactionCategoricalAnalysisData | null = null;
 
-        if (transactionStatisticsFilter.value.chartDataType === ChartDataType.ExpenseByAccount.type ||
+        if (transactionStatisticsFilter.value.chartDataType === ChartDataType.OutflowsByAccount.type ||
+            transactionStatisticsFilter.value.chartDataType === ChartDataType.ExpenseByAccount.type ||
             transactionStatisticsFilter.value.chartDataType === ChartDataType.ExpenseByPrimaryCategory.type ||
             transactionStatisticsFilter.value.chartDataType === ChartDataType.ExpenseBySecondaryCategory.type ||
+            transactionStatisticsFilter.value.chartDataType === ChartDataType.InflowsByAccount.type ||
             transactionStatisticsFilter.value.chartDataType === ChartDataType.IncomeByAccount.type ||
             transactionStatisticsFilter.value.chartDataType === ChartDataType.IncomeByPrimaryCategory.type ||
             transactionStatisticsFilter.value.chartDataType === ChartDataType.IncomeBySecondaryCategory.type) {
@@ -434,6 +445,8 @@ export const useStatisticsStore = defineStore('statistics', () => {
             const item: TransactionStatisticResponseItemWithInfo = {
                 categoryId: dataItem.categoryId,
                 accountId: dataItem.accountId,
+                relatedAccountId: dataItem.relatedAccountId,
+                relatedAccountType: dataItem.relatedAccountType,
                 amount: dataItem.amount,
                 amountInDefaultCurrency: null
             };
@@ -446,6 +459,16 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 item.primaryAccount = accountsStore.allAccountsMap[item.account.parentId];
             } else {
                 item.primaryAccount = item.account;
+            }
+
+            if (item.relatedAccountId) {
+                item.relatedAccount = accountsStore.allAccountsMap[item.relatedAccountId];
+            }
+
+            if (item.relatedAccount && item.relatedAccount.parentId !== '0') {
+                item.relatedPrimaryAccount = accountsStore.allAccountsMap[item.relatedAccount.parentId];
+            } else {
+                item.relatedPrimaryAccount = item.relatedAccount;
             }
 
             if (item.categoryId) {
@@ -486,11 +509,29 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 continue;
             }
 
-            if (transactionStatisticsFilter.chartDataType === ChartDataType.ExpenseByAccount.type ||
+            if (transactionStatisticsFilter.chartDataType === ChartDataType.OutflowsByAccount.type ||
+                transactionStatisticsFilter.chartDataType === ChartDataType.TotalOutflows.type) {
+                if (item.category.type === CategoryType.Transfer) {
+                    if (item.relatedAccountType !== TransactionRelatedAccountType.TransferTo) {
+                        continue;
+                    }
+                } else if (item.category.type !== CategoryType.Expense) {
+                    continue;
+                }
+            } else if (transactionStatisticsFilter.chartDataType === ChartDataType.ExpenseByAccount.type ||
                 transactionStatisticsFilter.chartDataType === ChartDataType.ExpenseByPrimaryCategory.type ||
                 transactionStatisticsFilter.chartDataType === ChartDataType.ExpenseBySecondaryCategory.type ||
                 transactionStatisticsFilter.chartDataType === ChartDataType.TotalExpense.type) {
                 if (item.category.type !== CategoryType.Expense) {
+                    continue;
+                }
+            } else if (transactionStatisticsFilter.chartDataType === ChartDataType.InflowsByAccount.type ||
+                transactionStatisticsFilter.chartDataType === ChartDataType.TotalInflows.type) {
+                if (item.category.type === CategoryType.Transfer) {
+                    if (item.relatedAccountType !== TransactionRelatedAccountType.TransferFrom) {
+                        continue;
+                    }
+                } else if (item.category.type !== CategoryType.Income) {
                     continue;
                 }
             } else if (transactionStatisticsFilter.chartDataType === ChartDataType.IncomeByAccount.type ||
@@ -500,8 +541,12 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 if (item.category.type !== CategoryType.Income) {
                     continue;
                 }
-            } else if (transactionStatisticsFilter.chartDataType === ChartDataType.TotalBalance.type) {
+            } else if (transactionStatisticsFilter.chartDataType === ChartDataType.NetCashFlow.type) {
                 // Do Nothing
+            } else if (transactionStatisticsFilter.chartDataType === ChartDataType.NetIncome.type) {
+                if (item.category.type === CategoryType.Transfer) {
+                    continue;
+                }
             } else {
                 continue;
             }
@@ -514,7 +559,9 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 continue;
             }
 
-            if (transactionStatisticsFilter.chartDataType === ChartDataType.ExpenseByAccount.type ||
+            if (transactionStatisticsFilter.chartDataType === ChartDataType.OutflowsByAccount.type ||
+                transactionStatisticsFilter.chartDataType === ChartDataType.ExpenseByAccount.type ||
+                transactionStatisticsFilter.chartDataType === ChartDataType.InflowsByAccount.type ||
                 transactionStatisticsFilter.chartDataType === ChartDataType.IncomeByAccount.type) {
                 if (isNumber(item.amountInDefaultCurrency)) {
                     let data = allDataItems[item.account.id];
@@ -598,14 +645,20 @@ export const useStatisticsStore = defineStore('statistics', () => {
 
                     allDataItems[item.category.id] = data;
                 }
-            } else if (transactionStatisticsFilter.chartDataType === ChartDataType.TotalExpense.type ||
+            } else if (transactionStatisticsFilter.chartDataType === ChartDataType.TotalOutflows.type ||
+                transactionStatisticsFilter.chartDataType === ChartDataType.TotalExpense.type ||
+                transactionStatisticsFilter.chartDataType === ChartDataType.TotalInflows.type ||
                 transactionStatisticsFilter.chartDataType === ChartDataType.TotalIncome.type ||
-                transactionStatisticsFilter.chartDataType === ChartDataType.TotalBalance.type) {
+                transactionStatisticsFilter.chartDataType === ChartDataType.NetCashFlow.type ||
+                transactionStatisticsFilter.chartDataType === ChartDataType.NetIncome.type) {
                 if (isNumber(item.amountInDefaultCurrency)) {
                     let data = allDataItems['total'];
                     let amount = item.amountInDefaultCurrency;
 
-                    if (transactionStatisticsFilter.chartDataType === ChartDataType.TotalBalance.type &&
+                    if (transactionStatisticsFilter.chartDataType === ChartDataType.NetCashFlow.type &&
+                        (item.category.type === CategoryType.Expense || (item.category.type === CategoryType.Transfer && item.relatedAccountType === TransactionRelatedAccountType.TransferTo))) {
+                        amount = -amount;
+                    } else if (transactionStatisticsFilter.chartDataType === ChartDataType.NetIncome.type &&
                         item.category.type === CategoryType.Expense) {
                         amount = -amount;
                     }
@@ -615,12 +668,18 @@ export const useStatisticsStore = defineStore('statistics', () => {
                     } else {
                         let name = '';
 
-                        if (transactionStatisticsFilter.chartDataType === ChartDataType.TotalExpense.type) {
+                        if (transactionStatisticsFilter.chartDataType === ChartDataType.TotalOutflows.type) {
+                            name = ChartDataType.TotalOutflows.name;
+                        } else if (transactionStatisticsFilter.chartDataType === ChartDataType.TotalExpense.type) {
                             name = ChartDataType.TotalExpense.name;
+                        } else if (transactionStatisticsFilter.chartDataType === ChartDataType.TotalInflows.type) {
+                            name = ChartDataType.TotalInflows.name;
                         } else if (transactionStatisticsFilter.chartDataType === ChartDataType.TotalIncome.type) {
                             name = ChartDataType.TotalIncome.name;
-                        } else if (transactionStatisticsFilter.chartDataType === ChartDataType.TotalBalance.type) {
-                            name = ChartDataType.TotalBalance.name;
+                        } else if (transactionStatisticsFilter.chartDataType === ChartDataType.NetCashFlow.type) {
+                            name = ChartDataType.NetCashFlow.name;
+                        } else if (transactionStatisticsFilter.chartDataType === ChartDataType.NetIncome.type) {
+                            name = ChartDataType.NetIncome.name;
                         }
 
                         data = {
@@ -984,7 +1043,9 @@ export const useStatisticsStore = defineStore('statistics', () => {
             querys.push('type=3');
         }
 
-        if (itemId && (transactionStatisticsFilter.value.chartDataType === ChartDataType.IncomeByAccount.type
+        if (itemId && (transactionStatisticsFilter.value.chartDataType === ChartDataType.InflowsByAccount.type
+            || transactionStatisticsFilter.value.chartDataType === ChartDataType.IncomeByAccount.type
+            || transactionStatisticsFilter.value.chartDataType === ChartDataType.OutflowsByAccount.type
             || transactionStatisticsFilter.value.chartDataType === ChartDataType.ExpenseByAccount.type
             || transactionStatisticsFilter.value.chartDataType === ChartDataType.AccountTotalAssets.type
             || transactionStatisticsFilter.value.chartDataType === ChartDataType.AccountTotalLiabilities.type)) {

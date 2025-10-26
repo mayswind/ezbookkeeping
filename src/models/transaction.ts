@@ -699,6 +699,8 @@ export interface TransactionStatisticResponse {
 export interface TransactionStatisticResponseItem {
     readonly categoryId: string;
     readonly accountId: string;
+    readonly relatedAccountId?: string;
+    readonly relatedAccountType?: number;
     readonly amount: number;
 }
 

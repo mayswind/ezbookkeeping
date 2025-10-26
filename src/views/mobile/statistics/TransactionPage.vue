@@ -109,7 +109,7 @@
                     </div>
                 </div>
                 <div class="display-flex full-line">
-                    <div :class="{ 'statistics-list-item-overview-amount': true, 'text-expense': query.chartDataType === ChartDataType.ExpenseByAccount.type || query.chartDataType === ChartDataType.ExpenseByPrimaryCategory.type || query.chartDataType === ChartDataType.ExpenseBySecondaryCategory.type, 'text-income': query.chartDataType === ChartDataType.IncomeByAccount.type || query.chartDataType === ChartDataType.IncomeByPrimaryCategory.type || query.chartDataType === ChartDataType.IncomeBySecondaryCategory.type }">
+                    <div :class="{ 'statistics-list-item-overview-amount': true, 'text-expense': query.chartDataType === ChartDataType.OutflowsByAccount.type || query.chartDataType === ChartDataType.ExpenseByAccount.type || query.chartDataType === ChartDataType.ExpenseByPrimaryCategory.type || query.chartDataType === ChartDataType.ExpenseBySecondaryCategory.type, 'text-income': query.chartDataType === ChartDataType.InflowsByAccount.type || query.chartDataType === ChartDataType.IncomeByAccount.type || query.chartDataType === ChartDataType.IncomeByPrimaryCategory.type || query.chartDataType === ChartDataType.IncomeBySecondaryCategory.type }">
                         <span v-if="!loading && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length">
                             {{ getDisplayAmount(categoricalAnalysisData.totalAmount, defaultCurrency) }}
                         </span>
@@ -490,15 +490,20 @@ function reload(done?: () => void): void {
 
     reloading.value = true;
 
-    if (query.value.chartDataType === ChartDataType.ExpenseByAccount.type ||
+    if (query.value.chartDataType === ChartDataType.OutflowsByAccount.type ||
+        query.value.chartDataType === ChartDataType.ExpenseByAccount.type ||
         query.value.chartDataType === ChartDataType.ExpenseByPrimaryCategory.type ||
         query.value.chartDataType === ChartDataType.ExpenseBySecondaryCategory.type ||
+        query.value.chartDataType === ChartDataType.InflowsByAccount.type ||
         query.value.chartDataType === ChartDataType.IncomeByAccount.type ||
         query.value.chartDataType === ChartDataType.IncomeByPrimaryCategory.type ||
         query.value.chartDataType === ChartDataType.IncomeBySecondaryCategory.type ||
+        query.value.chartDataType === ChartDataType.TotalOutflows.type ||
         query.value.chartDataType === ChartDataType.TotalExpense.type ||
+        query.value.chartDataType === ChartDataType.TotalInflows.type ||
         query.value.chartDataType === ChartDataType.TotalIncome.type ||
-        query.value.chartDataType === ChartDataType.TotalBalance.type) {
+        query.value.chartDataType === ChartDataType.NetCashFlow.type ||
+        query.value.chartDataType === ChartDataType.NetIncome.type) {
         if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
             dispatchPromise = statisticsStore.loadCategoricalAnalysis({
                 force: force

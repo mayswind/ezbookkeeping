@@ -190,7 +190,11 @@ export function useStatisticsTransactionPageBase() {
     });
 
     const totalAmountName = computed<string>(() => {
-        if (query.value.chartDataType === ChartDataType.IncomeByAccount.type
+        if (query.value.chartDataType === ChartDataType.InflowsByAccount.type) {
+            return tt('Total Inflows');
+        } else if (query.value.chartDataType === ChartDataType.OutflowsByAccount.type) {
+            return tt('Total Outflows');
+        } else if (query.value.chartDataType === ChartDataType.IncomeByAccount.type
             || query.value.chartDataType === ChartDataType.IncomeByPrimaryCategory.type
             || query.value.chartDataType === ChartDataType.IncomeBySecondaryCategory.type) {
             return tt('Total Income');
@@ -208,15 +212,21 @@ export function useStatisticsTransactionPageBase() {
     });
 
     const showTotalAmountInTrendsChart = computed<boolean>(() => {
-        return query.value.chartDataType !== ChartDataType.TotalExpense.type &&
+        return query.value.chartDataType !== ChartDataType.TotalOutflows.type &&
+            query.value.chartDataType !== ChartDataType.TotalExpense.type &&
+            query.value.chartDataType !== ChartDataType.TotalInflows.type &&
             query.value.chartDataType !== ChartDataType.TotalIncome.type &&
-            query.value.chartDataType !== ChartDataType.TotalBalance.type;
+            query.value.chartDataType !== ChartDataType.NetCashFlow.type &&
+            query.value.chartDataType !== ChartDataType.NetIncome.type;
     });
 
     const translateNameInTrendsChart = computed<boolean>(() => {
-        return query.value.chartDataType === ChartDataType.TotalExpense.type ||
+        return query.value.chartDataType === ChartDataType.TotalOutflows.type ||
+            query.value.chartDataType === ChartDataType.TotalExpense.type ||
+            query.value.chartDataType === ChartDataType.TotalInflows.type ||
             query.value.chartDataType === ChartDataType.TotalIncome.type ||
-            query.value.chartDataType === ChartDataType.TotalBalance.type;
+            query.value.chartDataType === ChartDataType.NetCashFlow.type ||
+            query.value.chartDataType === ChartDataType.NetIncome.type;
     });
 
     const categoricalAnalysisData = computed<TransactionCategoricalAnalysisData>(() => statisticsStore.categoricalAnalysisData);

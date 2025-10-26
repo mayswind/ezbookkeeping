@@ -14,6 +14,7 @@ import { StatisticsAnalysisType, ChartDataType, ChartSortingType, ChartDateAggre
 import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
 
 import type {
+    TransactionStatisticResponseWithInfo,
     TransactionCategoricalAnalysisData,
     TransactionCategoricalAnalysisDataItem,
     TransactionTrendsAnalysisData
@@ -230,6 +231,7 @@ export function useStatisticsTransactionPageBase() {
     });
 
     const categoricalAnalysisData = computed<TransactionCategoricalAnalysisData>(() => statisticsStore.categoricalAnalysisData);
+    const categoricalAllAnalysisData = computed<TransactionStatisticResponseWithInfo | null>(() => statisticsStore.categoricalAllAnalysisData);
     const trendsAnalysisData = computed<TransactionTrendsAnalysisData | null>(() => statisticsStore.trendsAnalysisData);
 
     function canShowCustomDateRange(dateRangeType: number): boolean {
@@ -301,6 +303,7 @@ export function useStatisticsTransactionPageBase() {
         showTotalAmountInTrendsChart,
         translateNameInTrendsChart,
         categoricalAnalysisData,
+        categoricalAllAnalysisData,
         trendsAnalysisData,
         // functions
         canShowCustomDateRange,

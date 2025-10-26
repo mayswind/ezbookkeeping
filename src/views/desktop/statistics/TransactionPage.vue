@@ -21,6 +21,17 @@
                                 :disabled="loading"
                                 :items="allChartTypes"
                                 v-model="queryChartType"
+                                v-show="!isQuerySpecialChartType"
+                            />
+                            <v-select
+                                item-title="displayName"
+                                item-value="type"
+                                class="mt-2"
+                                density="compact"
+                                :disabled="true"
+                                :items="[{ displayName: tt('Sankey Chart'), type: 0 }]"
+                                :model-value="0"
+                                v-show="isQuerySpecialChartType && queryChartDataType === ChartDataType.Overview.type"
                             />
                         </div>
                         <div class="mx-6 mt-4">
@@ -38,7 +49,7 @@
                         <v-tabs show-arrows class="my-4" direction="vertical"
                                 :disabled="loading" v-model="queryChartDataType">
                             <v-tab class="tab-text-truncate" :key="dataType.type" :value="dataType.type"
-                                   v-for="dataType in ChartDataType.values()"
+                                   v-for="dataType in ChartDataType.values(undefined, true)"
                                    v-show="dataType.isAvailableAnalysisType(queryAnalysisType)">
                                 <span class="text-truncate">{{ tt(dataType.name) }}</span>
                                 <v-tooltip activator="parent" location="right">{{ tt(dataType.name) }}</v-tooltip>
@@ -48,7 +59,7 @@
                     <v-main>
                         <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
                             <v-window-item value="statisticsPage">
-                                <v-card variant="flat" :min-height="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis ? '860' : '700'">
+                                <v-card variant="flat" :min-height="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis ? '860' : '760'">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
                                             <v-btn class="me-3 d-md-none" density="compact" color="default" variant="plain"
@@ -160,7 +171,7 @@
                                     </template>
 
                                     <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"
-                                                 v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && (initing || (categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length))">
+                                                 v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && (initing || (categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length))">
                                         <span class="statistics-subtitle">{{ totalAmountName }}</span>
                                         <span class="statistics-overview-amount ms-3"
                                               :class="statisticsTextColor"
@@ -173,12 +184,29 @@
                                     </v-card-text>
 
                                     <v-card-text class="statistics-overview-title pt-0"
-                                                 v-else-if="!initing && ((queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && (!categoricalAnalysisData || !categoricalAnalysisData.items || !categoricalAnalysisData.items.length))
+                                                 v-else-if="!initing && ((queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && (!categoricalAnalysisData || !categoricalAnalysisData.items || !categoricalAnalysisData.items.length))
                                                   || (queryAnalysisType === StatisticsAnalysisType.TrendAnalysis && (!trendsAnalysisData || !trendsAnalysisData.items || !trendsAnalysisData.items.length)))">
                                         <span class="statistics-subtitle statistics-overview-empty-tip">{{ tt('No transaction data') }}</span>
                                     </v-card-text>
 
-                                    <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && query.categoricalChartType === CategoricalChartType.Pie.type">
+                                    <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && queryChartDataType === ChartDataType.Overview.type">
+                                        <account-and-category-sankey-chart
+                                            :items="[]"
+                                            :sorting-type="querySortingType"
+                                            :skeleton="true"
+                                            v-if="initing"
+                                        />
+                                        <account-and-category-sankey-chart
+                                            :items="categoricalAllAnalysisData && categoricalAllAnalysisData.items && categoricalAllAnalysisData.items.length ? categoricalAllAnalysisData.items : []"
+                                            :sorting-type="querySortingType"
+                                            :enable-click-item="true"
+                                            :default-currency="defaultCurrency"
+                                            v-else-if="!initing"
+                                            @click="onClickSankeyChartItem"
+                                        />
+                                    </v-card-text>
+
+                                    <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Pie.type">
                                         <pie-chart
                                             :items="[
                                                 {id: '1', name: '---', value: 60, color: '7c7c7f'},
@@ -191,7 +219,7 @@
                                             value-field="value"
                                             color-field="color"
                                             v-if="initing"
-                                        ></pie-chart>
+                                        />
                                         <pie-chart
                                             :items="categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length ? categoricalAnalysisData.items : []"
                                             :min-valid-percent="0.0001"
@@ -208,7 +236,7 @@
                                         />
                                     </v-card-text>
 
-                                    <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && query.categoricalChartType === CategoricalChartType.Bar.type">
+                                    <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Bar.type">
                                         <v-list rounded lines="two" v-if="initing">
                                             <template :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
                                                 <v-list-item class="ps-0">
@@ -263,7 +291,7 @@
                                         </v-list>
                                     </v-card-text>
 
-                                    <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && query.categoricalChartType === CategoricalChartType.Radar.type">
+                                    <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Radar.type">
                                         <radar-chart
                                             :items="[
                                                 {name: '---', value: 10},
@@ -277,7 +305,7 @@
                                             name-field="name"
                                             value-field="value"
                                             v-if="initing"
-                                        ></radar-chart>
+                                        />
                                         <radar-chart
                                             :items="categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length ? categoricalAnalysisData.items : []"
                                             :min-valid-percent="0.0001"
@@ -493,6 +521,7 @@ const {
     showTotalAmountInTrendsChart,
     translateNameInTrendsChart,
     categoricalAnalysisData,
+    categoricalAllAnalysisData,
     trendsAnalysisData,
     canShowCustomDateRange,
     getTransactionCategoricalAnalysisDataItemDisplayColor,
@@ -574,6 +603,10 @@ const querySortingType = computed<number>({
     set: (value: number) => {
         setSortingType(value);
     }
+});
+
+const isQuerySpecialChartType = computed<boolean>(() => {
+    return ChartDataType.valueOf(queryChartDataType.value)?.specialChart ?? false;
 });
 
 const statisticsTextColor = computed<string>(() => {
@@ -705,7 +738,8 @@ function reload(force: boolean): Promise<unknown> | null {
 
     loading.value = true;
 
-    if (query.value.chartDataType === ChartDataType.OutflowsByAccount.type ||
+    if (query.value.chartDataType === ChartDataType.Overview.type ||
+        query.value.chartDataType === ChartDataType.OutflowsByAccount.type ||
         query.value.chartDataType === ChartDataType.ExpenseByAccount.type ||
         query.value.chartDataType === ChartDataType.ExpenseByPrimaryCategory.type ||
         query.value.chartDataType === ChartDataType.ExpenseBySecondaryCategory.type ||
@@ -1017,6 +1051,23 @@ function exportResults(): void {
             data: exportData.data || []
         });
     }
+}
+
+function onClickSankeyChartItem(sourceItemType: 'account' | 'category', sourceItemId: string, targetItemType?: 'account' | 'category', targetItemId?: string): void {
+    if (sourceItemType === 'category' && targetItemType === 'category' && sourceItemId && targetItemId) {
+        const sourceCategory = transactionCategoriesStore.allTransactionCategoriesMap[sourceItemId];
+        const targetCategory = transactionCategoriesStore.allTransactionCategoriesMap[targetItemId];
+
+        if (sourceCategory?.parentId === targetCategory?.id) {
+            router.push(getTransactionItemLinkUrl(`${sourceItemType}:${sourceItemId}`));
+            return;
+        } else if (targetCategory?.parentId === sourceCategory?.id) {
+            router.push(getTransactionItemLinkUrl(`${targetItemType}:${targetItemId}`));
+            return;
+        }
+    }
+
+    router.push(getTransactionItemLinkUrl(`${sourceItemType}:${sourceItemId}` + (targetItemType && targetItemId ? `-${targetItemType}:${targetItemId}` : '')));
 }
 
 function onClickPieChartItem(item: Record<string, unknown>): void {

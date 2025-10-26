@@ -1517,6 +1517,7 @@
     "Area Chart": "Vlakdiagram",
     "Column Chart": "Kolomdiagram",
     "Candlestick Chart": "Candlestickdiagram",
+    "Sankey Chart": "Sankey Chart",
     "Sort by": "Sorteren op",
     "Map": "Kaart",
     "Provider": "Provider",

@@ -722,6 +722,33 @@ export interface SortableTransactionStatisticDataItem {
     readonly totalAmount: number;
 }
 
+export interface TransactionStatisticResponseItemWithInfo extends TransactionStatisticResponseItem {
+    categoryId: string;
+    accountId: string;
+    relatedAccountId?: string;
+    amount: number;
+    account?: Account;
+    primaryAccount?: Account;
+    relatedAccount?: Account;
+    relatedPrimaryAccount?: Account;
+    relatedAccountType?: number;
+    category?: TransactionCategory;
+    primaryCategory?: TransactionCategory;
+    amountInDefaultCurrency: number | null;
+}
+
+export interface TransactionStatisticResponseWithInfo {
+    readonly startTime: number;
+    readonly endTime: number;
+    readonly items: TransactionStatisticResponseItemWithInfo[];
+}
+
+export interface TransactionStatisticTrendsResponseItemWithInfo {
+    readonly year: number;
+    readonly month: number; // 1-based (1 = January, 12 = December)
+    readonly items: TransactionStatisticResponseItemWithInfo[];
+}
+
 export type TransactionStatisticDataItemType = 'category' | 'account' | 'total';
 
 export interface TransactionStatisticDataItemBase extends SortableTransactionStatisticDataItem {

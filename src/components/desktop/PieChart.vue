@@ -261,7 +261,7 @@ function onLegendSelectChanged(e: { selected: Record<string, boolean> }): void {
 
 @media (min-width: 600px) {
     .pie-chart-container {
-        height: 560px;
+        height: 610px;
     }
 }
 

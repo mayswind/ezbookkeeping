@@ -28,12 +28,13 @@ import {
 import { DEFAULT_ACCOUNT_ICON, DEFAULT_CATEGORY_ICON } from '@/consts/icon.ts';
 import { DEFAULT_ACCOUNT_COLOR, DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
 
-import type { Account } from '@/models/account.ts';
-import type { TransactionCategory } from '@/models/transaction_category.ts';
 import type {
     TransactionStatisticResponse,
     TransactionStatisticResponseItem,
     TransactionStatisticTrendsResponseItem,
+    TransactionStatisticResponseItemWithInfo,
+    TransactionStatisticResponseWithInfo,
+    TransactionStatisticTrendsResponseItemWithInfo,
     TransactionStatisticDataItemType,
     TransactionStatisticDataItemBase,
     TransactionCategoricalAnalysisData,
@@ -60,33 +61,6 @@ import { getFinalCategoryIdsByFilteredCategoryIds } from '@/lib/category.ts';
 import { sortStatisticsItems } from '@/lib/statistics.ts';
 import logger from '@/lib/logger.ts';
 import services from '@/lib/services.ts';
-
-interface TransactionStatisticResponseItemWithInfo extends TransactionStatisticResponseItem {
-    categoryId: string;
-    accountId: string;
-    relatedAccountId?: string;
-    amount: number;
-    account?: Account;
-    primaryAccount?: Account;
-    relatedAccount?: Account;
-    relatedPrimaryAccount?: Account;
-    relatedAccountType?: number;
-    category?: TransactionCategory;
-    primaryCategory?: TransactionCategory;
-    amountInDefaultCurrency: number | null;
-}
-
-interface TransactionStatisticResponseWithInfo {
-    readonly startTime: number;
-    readonly endTime: number;
-    readonly items: TransactionStatisticResponseItemWithInfo[];
-}
-
-interface TransactionStatisticTrendsResponseItemWithInfo {
-    readonly year: number;
-    readonly month: number; // 1-based (1 = January, 12 = December)
-    readonly items: TransactionStatisticResponseItemWithInfo[];
-}
 
 interface WritableTransactionCategoricalAnalysisData {
     totalAmount: number;
@@ -227,6 +201,36 @@ export const useStatisticsStore = defineStore('statistics', () => {
         }
 
         return getCategoryTotalAmountItems(transactionCategoryStatisticsDataWithCategoryAndAccountInfo.value.items, transactionStatisticsFilter.value);
+    });
+
+    const categoricalAllAnalysisData = computed<TransactionStatisticResponseWithInfo | null>(() => {
+        if (!transactionCategoryStatisticsDataWithCategoryAndAccountInfo.value || !transactionCategoryStatisticsDataWithCategoryAndAccountInfo.value.items) {
+            return null;
+        }
+
+        const allDataItems: TransactionStatisticResponseItemWithInfo[] = [];
+
+        for (const item of transactionCategoryStatisticsDataWithCategoryAndAccountInfo.value.items) {
+            if (!item.primaryAccount || !item.account || !item.primaryCategory || !item.category) {
+                continue;
+            }
+
+            if (transactionStatisticsFilter.value.filterAccountIds && transactionStatisticsFilter.value.filterAccountIds[item.account.id]) {
+                continue;
+            }
+
+            if (transactionStatisticsFilter.value.filterCategoryIds && transactionStatisticsFilter.value.filterCategoryIds[item.category.id]) {
+                continue;
+            }
+
+            allDataItems.push(item);
+        }
+
+        return {
+            startTime: transactionCategoryStatisticsDataWithCategoryAndAccountInfo.value.startTime,
+            endTime: transactionCategoryStatisticsDataWithCategoryAndAccountInfo.value.endTime,
+            items: allDataItems
+        };
     });
 
     const accountTotalAmountAnalysisData = computed<WritableTransactionCategoricalAnalysisData | null>(() => {
@@ -1043,7 +1047,48 @@ export const useStatisticsStore = defineStore('statistics', () => {
             querys.push('type=3');
         }
 
-        if (itemId && (transactionStatisticsFilter.value.chartDataType === ChartDataType.InflowsByAccount.type
+        if (itemId && transactionStatisticsFilter.value.chartDataType === ChartDataType.Overview.type) {
+            const items = itemId.split('-');
+            const sourceItems = (items[0] || '').split(':');
+            const queryAccountIds: string[] = [];
+            const queryCategoryIds: string[] = [];
+
+            if (sourceItems.length === 2) {
+                if (sourceItems[0] === 'account') {
+                    queryAccountIds.push(sourceItems[1] as string);
+                } else if (sourceItems[0] === 'category') {
+                    queryCategoryIds.push(sourceItems[1] as string);
+                }
+            }
+
+            if (items.length === 2) {
+                const targetItems = (items[1] || '').split(':');
+
+                if (targetItems.length === 2) {
+                    if (targetItems[0] === 'account') {
+                        queryAccountIds.push(targetItems[1] as string);
+                    } else if (targetItems[0] === 'category') {
+                        queryCategoryIds.push(targetItems[1] as string);
+                    }
+                }
+            }
+
+            if (queryAccountIds.length) {
+                if (queryAccountIds.length === 2) {
+                    querys.push('type=4');
+                }
+
+                querys.push('accountIds=' + queryAccountIds.join(','));
+            } else {
+                querys.push('accountIds=' + getFinalAccountIdsByFilteredAccountIds(accountsStore.allAccountsMap, transactionStatisticsFilter.value.filterAccountIds));
+            }
+
+            if (queryCategoryIds.length) {
+                querys.push('categoryIds=' + queryCategoryIds.join(','));
+            } else {
+                querys.push('categoryIds=' + getFinalCategoryIdsByFilteredCategoryIds(transactionCategoriesStore.allTransactionCategoriesMap, transactionStatisticsFilter.value.filterCategoryIds));
+            }
+        } else if (itemId && (transactionStatisticsFilter.value.chartDataType === ChartDataType.InflowsByAccount.type
             || transactionStatisticsFilter.value.chartDataType === ChartDataType.IncomeByAccount.type
             || transactionStatisticsFilter.value.chartDataType === ChartDataType.OutflowsByAccount.type
             || transactionStatisticsFilter.value.chartDataType === ChartDataType.ExpenseByAccount.type
@@ -1197,6 +1242,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
         transactionStatisticsStateInvalid,
         // computed states
         categoricalAnalysisChartDataCategory,
+        categoricalAllAnalysisData,
         categoricalAnalysisData,
         trendsAnalysisData,
         // functions

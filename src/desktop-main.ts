@@ -52,7 +52,7 @@ import 'vuetify/styles';
 
 import * as echarts from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
-import { LineChart, BarChart, PieChart, CandlestickChart, RadarChart } from 'echarts/charts';
+import { LineChart, BarChart, PieChart, CandlestickChart, RadarChart, SankeyChart } from 'echarts/charts';
 import {
     GridComponent,
     TooltipComponent,
@@ -105,6 +105,7 @@ import DateRangeSelectionDialog from '@/components/desktop/DateRangeSelectionDia
 import MonthSelectionDialog from '@/components/desktop/MonthSelectionDialog.vue';
 import MonthRangeSelectionDialog from '@/components/desktop/MonthRangeSelectionDialog.vue';
 import AccountBalanceTrendsChart from '@/components/desktop/AccountBalanceTrendsChart.vue';
+import AccountAndCategorySankeyChart from '@/components/desktop/AccountAndCategorySankeyChart.vue';
 import SwitchToMobileDialog from '@/components/desktop/SwitchToMobileDialog.vue';
 
 import '@/styles/desktop/template/vuetify/index.scss';
@@ -498,6 +499,7 @@ echarts.use([
     PieChart,
     CandlestickChart,
     RadarChart,
+    SankeyChart,
     GridComponent,
     TooltipComponent,
     LegendComponent
@@ -544,6 +546,7 @@ app.component('DateRangeSelectionDialog', DateRangeSelectionDialog);
 app.component('MonthSelectionDialog', MonthSelectionDialog);
 app.component('MonthRangeSelectionDialog', MonthRangeSelectionDialog);
 app.component('AccountBalanceTrendsChart', AccountBalanceTrendsChart);
+app.component('AccountAndCategorySankeyChart', AccountAndCategorySankeyChart);
 app.component('SwitchToMobileDialog', SwitchToMobileDialog);
 
 app.mount('#app');

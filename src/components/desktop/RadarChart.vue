@@ -188,7 +188,7 @@ const chartOptions = computed<object>(() => {
 
 @media (min-width: 600px) {
     .radar-chart-container {
-        height: 560px;
+        height: 610px;
     }
 }
 

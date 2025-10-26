@@ -909,13 +909,13 @@ function setCustomDateFilter(startTime: number | TextualYearMonth, endTime: numb
 }
 
 function shiftDateRange(scale: number): void {
-    if (query.value.categoricalChartDateType === DateRange.All.type) {
-        return;
-    }
-
     let changed = false;
 
     if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
+        if (query.value.categoricalChartDateType === DateRange.All.type) {
+            return;
+        }
+
         const newDateRange = getShiftedDateRangeAndDateType(query.value.categoricalChartStartTime, query.value.categoricalChartEndTime, scale, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.Normal);
 
         changed = statisticsStore.updateTransactionStatisticsFilter({

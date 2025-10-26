@@ -1110,6 +1110,7 @@
         "two-factor is not enabled": "两步验证没有启用",
         "two-factor has already been enabled": "两步验证已经启用",
         "two-factor backup code does not exist": "两步验证备用码不存在",
+        "passcode is empty": "验证码为空",
         "account id is invalid": "账户ID无效",
         "account not found": "账户不存在",
         "account type is invalid": "账户类型无效",

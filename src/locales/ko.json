@@ -1110,6 +1110,7 @@
         "two-factor is not enabled": "2단계 인증이 활성화되지 않았습니다",
         "two-factor has already been enabled": "2단계 인증이 이미 활성화되었습니다",
         "two-factor backup code does not exist": "2단계 백업 코드가 존재하지 않습니다",
+        "passcode is empty": "Passcode is empty",
         "account id is invalid": "계좌 ID가 유효하지 않습니다",
         "account not found": "계좌를 찾을 수 없습니다",
         "account type is invalid": "계좌 유형이 유효하지 않습니다",

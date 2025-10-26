@@ -1110,6 +1110,7 @@
         "two-factor is not enabled": "Two-factor is not enabled",
         "two-factor has already been enabled": "Two-factor has already been enabled",
         "two-factor backup code does not exist": "Two-factor backup code does not exist",
+        "passcode is empty": "Passcode is empty",
         "account id is invalid": "Account ID is invalid",
         "account not found": "Account is not found",
         "account type is invalid": "Account type is invalid",

@@ -1110,6 +1110,7 @@
         "two-factor is not enabled": "ยังไม่ได้เปิดใช้งานการยืนยันสองขั้นตอน",
         "two-factor has already been enabled": "การยืนยันสองขั้นตอนถูกเปิดใช้งานแล้ว",
         "two-factor backup code does not exist": "รหัสสำรองสองขั้นตอนไม่พบ",
+        "passcode is empty": "Passcode is empty",
         "account id is invalid": "รหัสบัญชีไม่ถูกต้อง",
         "account not found": "ไม่พบบัญชี",
         "account type is invalid": "ประเภทบัญชีไม่ถูกต้อง",

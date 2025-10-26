@@ -39,10 +39,23 @@
                                             type="password"
                                             autocomplete="password"
                                             :autofocus="true"
-                                            :disabled="loggingInByOAuth2"
+                                            :disabled="show2faInput || loggingInByOAuth2"
                                             :label="tt('Password')"
                                             :placeholder="tt('Your password')"
                                             v-model="password"
+                                            @keyup.enter="verifyAndLogin"
+                                        />
+                                    </v-col>
+
+                                    <v-col cols="12" v-show="show2faInput">
+                                        <v-text-field
+                                            type="number"
+                                            autocomplete="one-time-code"
+                                            ref="passcodeInput"
+                                            :disabled="loggingInByOAuth2"
+                                            :label="tt('Passcode')"
+                                            :placeholder="tt('Passcode')"
+                                            v-model="passcode"
                                             @keyup.enter="verifyAndLogin"
                                         />
                                     </v-col>
@@ -97,7 +110,7 @@
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { computed, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef } from 'vue';
 import { useRouter } from 'vue-router';
 import { useTheme } from 'vuetify';
 
@@ -153,6 +166,9 @@ const {
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
+const passcode = ref<string>('');
+const show2faInput = ref<boolean>(false);
+
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 const oauth2ProviderDisplayName = computed<string>(() => getLocalizedOAuth2ProviderName(props.provider ?? '', getOIDCCustomDisplayNames()));
 const oauth2LoginDisplayName = computed<string>(() => getLocalizedOAuth2LoginText(props.provider ?? '', getOIDCCustomDisplayNames()));
@@ -195,6 +211,7 @@ function verifyAndLogin(): void  {
 
     rootStore.authorizeOAuth2({
         password: password.value,
+        passcode: passcode.value,
         token: props.token || ''
     }).then(authResponse => {
         loggingInByOAuth2.value = false;
@@ -205,6 +222,9 @@ function verifyAndLogin(): void  {
 
         if (isUserVerifyEmailEnabled() && error.error && error.error.errorCode === KnownErrorCode.UserEmailNotVerified && error.error.context && error.error.context.email) {
             router.push(`/verify_email?email=${encodeURIComponent(error.error.context.email)}&emailSent=${error.error.context.hasValidEmailVerifyToken || false}`);
+            return;
+        } else if (error.error && error.error.errorCode === KnownErrorCode.TwoFactorAuthorizationPasscodeEmpty) {
+            show2faInput.value = true;
             return;
         }
 

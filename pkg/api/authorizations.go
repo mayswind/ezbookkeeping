@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/pquerna/otp/totp"
 
@@ -425,6 +426,34 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 			}
 
 			return nil, errs.ErrUserPasswordWrong
+		}
+
+		if a.CurrentConfig().EnableTwoFactor {
+			twoFactorSetting, err := a.twoFactorAuthorizations.GetUserTwoFactorSettingByUid(c, uid)
+
+			if err != nil && !errors.Is(err, errs.ErrTwoFactorIsNotEnabled) {
+				log.Errorf(c, "[authorizations.OAuth2CallbackAuthorizeHandler] failed to check two-factor setting for user \"uid:%d\", because %s", user.Uid, err.Error())
+				return nil, errs.Or(err, errs.ErrSystemError)
+			}
+
+			if twoFactorSetting != nil {
+				if credential.Passcode == "" {
+					return nil, errs.ErrPasscodeEmpty
+				}
+
+				if !totp.Validate(credential.Passcode, twoFactorSetting.Secret) {
+					log.Warnf(c, "[authorizations.OAuth2CallbackAuthorizeHandler] passcode is invalid for user \"uid:%d\"", uid)
+
+					err = a.CheckAndIncreaseFailureCount(c, uid)
+
+					if err != nil {
+						log.Warnf(c, "[authorizations.OAuth2CallbackAuthorizeHandler] cannot auth for user \"uid:%d\", because %s", uid, err.Error())
+						return nil, errs.Or(err, errs.ErrFailureCountLimitReached)
+					}
+
+					return nil, errs.ErrPasscodeInvalid
+				}
+			}
 		}
 
 		userExternalAuth := &models.UserExternalAuth{

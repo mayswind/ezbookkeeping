@@ -9,4 +9,5 @@ var (
 	ErrTwoFactorRecoveryCodeNotExist = NewNormalError(NormalSubcategoryTwofactor, 2, http.StatusUnauthorized, "two-factor backup code does not exist")
 	ErrTwoFactorIsNotEnabled         = NewNormalError(NormalSubcategoryTwofactor, 3, http.StatusBadRequest, "two-factor is not enabled")
 	ErrTwoFactorAlreadyEnabled       = NewNormalError(NormalSubcategoryTwofactor, 4, http.StatusBadRequest, "two-factor has already been enabled")
+	ErrPasscodeEmpty                 = NewNormalError(NormalSubcategoryTwofactor, 5, http.StatusUnauthorized, "passcode is empty")
 )

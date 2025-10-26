@@ -1110,6 +1110,7 @@
         "two-factor is not enabled": "Двухфакторная аутентификация не включена",
         "two-factor has already been enabled": "Двухфакторная аутентификация уже включена",
         "two-factor backup code does not exist": "Резервный код двухфакторной аутентификации не существует",
+        "passcode is empty": "Passcode is empty",
         "account id is invalid": "ID счета недействителен",
         "account not found": "Счет не найден",
         "account type is invalid": "Тип счета недействителен",

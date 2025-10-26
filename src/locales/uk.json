@@ -1110,6 +1110,7 @@
         "two-factor is not enabled": "Двофакторна автентифікація не увімкнена",
         "two-factor has already been enabled": "Двофакторна автентифікація вже увімкнена",
         "two-factor backup code does not exist": "Резервного коду двофакторної автентифікації не існує",
+        "passcode is empty": "Passcode is empty",
         "account id is invalid": "ID рахунку недійсний",
         "account not found": "Рахунок не знайдено",
         "account type is invalid": "Тип рахунку недійсний",

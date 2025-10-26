@@ -18,6 +18,7 @@ export enum KnownErrorCode {
     ApiNotFound = 100001,
     ValidatorError = 200000,
     UserEmailNotVerified = 201020,
+    TwoFactorAuthorizationPasscodeEmpty = 203005,
     TransactionCannotCreateInThisTime = 205017,
     TransactionCannotModifyInThisTime = 205018,
     TransactionPictureNotFound = 211001

@@ -1110,6 +1110,7 @@
         "two-factor is not enabled": "L'authentification à deux facteurs n'est pas activée",
         "two-factor has already been enabled": "L'authentification à deux facteurs a déjà été activée",
         "two-factor backup code does not exist": "Le code de sauvegarde à deux facteurs n'existe pas",
+        "passcode is empty": "Passcode is empty",
         "account id is invalid": "L'ID du compte est invalide",
         "account not found": "Compte non trouvé",
         "account type is invalid": "Le type de compte est invalide",

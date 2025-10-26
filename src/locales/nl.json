@@ -1110,6 +1110,7 @@
         "two-factor is not enabled": "Twee-stapsverificatie is niet ingeschakeld",
         "two-factor has already been enabled": "Twee-stapsverificatie is al ingeschakeld",
         "two-factor backup code does not exist": "Back-upcode voor twee-stapsverificatie bestaat niet",
+        "passcode is empty": "Passcode is empty",
         "account id is invalid": "Rekening-ID is ongeldig",
         "account not found": "Rekening niet gevonden",
         "account type is invalid": "Rekeningtype is ongeldig",

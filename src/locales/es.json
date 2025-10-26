@@ -1110,6 +1110,7 @@
         "two-factor is not enabled": "El doble factor no está habilitado",
         "two-factor has already been enabled": "Ya se ha habilitado el doble factor",
         "two-factor backup code does not exist": "El código de respaldo de dos factores no existe",
+        "passcode is empty": "Passcode is empty",
         "account id is invalid": "El ID de cuenta no es válido",
         "account not found": "No se encuentra la cuenta",
         "account type is invalid": "El tipo de cuenta no es válido",

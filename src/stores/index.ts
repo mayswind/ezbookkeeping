@@ -191,11 +191,12 @@ export const useRootStore = defineStore('root', () => {
         });
     }
 
-    function authorizeOAuth2({ password, token }: { password?: string, token: string }): Promise<AuthResponse> {
+    function authorizeOAuth2({ password, passcode, token }: { password?: string, passcode?: string, token: string }): Promise<AuthResponse> {
         return new Promise((resolve, reject) => {
             services.authorizeOAuth2({
                 req: {
-                    password
+                    password,
+                    passcode
                 },
                 token
             }).then(response => {

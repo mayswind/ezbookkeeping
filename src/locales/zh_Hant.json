@@ -1110,6 +1110,7 @@
         "two-factor is not enabled": "二步驟驗證沒有啟用",
         "two-factor has already been enabled": "二步驟驗證已經啟用",
         "two-factor backup code does not exist": "二步驟驗證備用碼不存在",
+        "passcode is empty": "驗證碼為空",
         "account id is invalid": "帳戶ID無效",
         "account not found": "帳戶不存在",
         "account type is invalid": "帳戶類型無效",

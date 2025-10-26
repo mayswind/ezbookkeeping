@@ -1110,6 +1110,7 @@
         "two-factor is not enabled": "Xác thực hai yếu tố chưa được bật",
         "two-factor has already been enabled": "Xác thực hai yếu tố đã được bật",
         "two-factor backup code does not exist": "Mã sao lưu hai yếu tố không tồn tại",
+        "passcode is empty": "Passcode is empty",
         "account id is invalid": "ID tài khoản không hợp lệ",
         "account not found": "Không tìm thấy tài khoản",
         "account type is invalid": "Loại tài khoản không hợp lệ",

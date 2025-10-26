@@ -1110,6 +1110,7 @@
         "two-factor is not enabled": "二要素が有効になっていません",
         "two-factor has already been enabled": "二要素はすでに有効になっています",
         "two-factor backup code does not exist": "二要素バックアップコードが存在しません",
+        "passcode is empty": "Passcode is empty",
         "account id is invalid": "口座IDは無効です",
         "account not found": "口座が見つかりません",
         "account type is invalid": "口座タイプは無効です",

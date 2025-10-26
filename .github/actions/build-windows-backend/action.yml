@@ -3,7 +3,7 @@ name: Build backend file for windows
 inputs:
   go-version:
     required: false
-    default: "1.25.1"
+    default: "1.25.3"
   mingw-version:
     required: false
     default: "14.2.0"

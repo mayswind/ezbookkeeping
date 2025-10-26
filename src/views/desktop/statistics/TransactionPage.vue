@@ -266,14 +266,16 @@
                                     <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && query.categoricalChartType === CategoricalChartType.Radar.type">
                                         <radar-chart
                                             :items="[
-                                                {id: '1', name: '---', value: 60, color: '7c7c7f'},
-                                                {id: '2', name: '---', value: 20, color: 'a5a5aa'},
-                                                {id: '3', name: '---', value: 20, color: 'c5c5c9'}
+                                                {name: '---', value: 10},
+                                                {name: '---', value: 10},
+                                                {name: '---', value: 10},
+                                                {name: '---', value: 10},
+                                                {name: '---', value: 10},
+                                                {name: '---', value: 10}
                                             ]"
                                             :skeleton="true"
                                             name-field="name"
                                             value-field="value"
-                                            color-field="color"
                                             v-if="initing"
                                         ></radar-chart>
                                         <radar-chart

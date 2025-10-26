@@ -55,48 +55,59 @@ const radarData = computed<RadarChartData>(() => {
     const values: number[] = [];
     let tooltip = '';
 
-    for (const item of props.items) {
-        const value = item[props.valueField];
+    if (props.items.length) {
+        for (const item of props.items) {
+            const value = item[props.valueField];
 
-        if (isNumber(value) && value > 0 && (!props.hiddenField || !item[props.hiddenField])) {
-            totalValidValue += value;
+            if (isNumber(value) && value > 0 && (!props.hiddenField || !item[props.hiddenField])) {
+                totalValidValue += value;
 
-            if (value > maxValue) {
-                maxValue = value;
+                if (value > maxValue) {
+                    maxValue = value;
+                }
             }
         }
-    }
 
-    for (const item of props.items) {
-        const value = item[props.valueField];
-        const percent = props.percentField ? item[props.percentField] : -1;
+        for (const item of props.items) {
+            const value = item[props.valueField];
+            const percent = props.percentField ? item[props.percentField] : -1;
 
-        if (isNumber(value) && value > 0 &&
-            (!props.hiddenField || !item[props.hiddenField]) &&
-            (!props.minValidPercent || value / totalValidValue > props.minValidPercent)) {
-            const name = item[props.nameField] as string;
-            const color = getDisplayColor((props.colorField && item[props.colorField]) ? item[props.colorField] as ColorValue : DEFAULT_CHART_COLORS[indicators.length % DEFAULT_CHART_COLORS.length]);
+            if (isNumber(value) && value > 0 &&
+                (!props.hiddenField || !item[props.hiddenField]) &&
+                (!props.minValidPercent || value / totalValidValue > props.minValidPercent)) {
+                const name = item[props.nameField] as string;
+                const color = getDisplayColor((props.colorField && item[props.colorField]) ? item[props.colorField] as ColorValue : DEFAULT_CHART_COLORS[indicators.length % DEFAULT_CHART_COLORS.length]);
 
-            const finalPercent = (isNumber(percent) && percent >= 0) ? percent : (value / totalValidValue * 100);
-            const displayPercent = formatPercentToLocalizedNumerals(finalPercent, 2, '&lt;0.01');
-            const displayValue = formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency);
+                const finalPercent = (isNumber(percent) && percent >= 0) ? percent : (value / totalValidValue * 100);
+                const displayPercent = formatPercentToLocalizedNumerals(finalPercent, 2, '&lt;0.01');
+                const displayValue = formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency);
 
+                indicators.push({
+                    name: name,
+                    max: maxValue,
+                    color: isDarkMode.value ? '#ccc' : '#333'
+                });
+
+                values.push(value);
+
+                tooltip += '<div><span class="chart-pointer" style="background-color: ' + color + '"></span>';
+                tooltip += `<span>${name}</span>`;
+                if (props.showValue) {
+                    tooltip += `<span class="ms-1" style="float: inline-end">(${displayPercent})</span><span class="ms-5" style="float: inline-end">${displayValue}</span>`;
+                } else {
+                    tooltip += `<span class="ms-5" style="float: inline-end">${displayPercent}</span>`;
+                }
+                tooltip += '</div>';
+            }
+        }
+    } else {
+        for (let i = 0; i < 6; i++) {
             indicators.push({
-                name: name,
-                max: maxValue,
+                name: '',
+                max: 0,
                 color: isDarkMode.value ? '#ccc' : '#333'
             });
-
-            values.push(value);
-
-            tooltip += '<div><span class="chart-pointer" style="background-color: ' + color + '"></span>';
-            tooltip += `<span>${name}</span>`;
-            if (props.showValue) {
-                tooltip += `<span class="ms-1" style="float: inline-end">(${displayPercent})</span><span class="ms-5" style="float: inline-end">${displayValue}</span>`;
-            } else {
-                tooltip += `<span class="ms-5" style="float: inline-end">${displayPercent}</span>`;
-            }
-            tooltip += '</div>';
+            values.push(0);
         }
     }
 
@@ -124,14 +135,34 @@ const chartOptions = computed<object>(() => {
         },
         radar: {
             radius: '75%',
+            splitNumber: (!props.skeleton && props.items.length) ? 5 : 1,
+            splitLine: {
+                lineStyle: {
+                    color: (!props.skeleton && props.items.length) ? '#e8e8e7' : '#d3d3d3'
+                }
+            },
+            splitArea: {
+                areaStyle: {
+                    color: (!props.skeleton && props.items.length) ? (isDarkMode.value ? ['#363534', '#1a1a1a'] : ['#faf8f4', '#fff']) : ['#d3d3d3', '#d3d3d3']
+                }
+            },
             indicator: radarData.value.indicators
         },
-        series: [
+        series: (!props.skeleton && props.items.length) ? [
             {
                 type: 'radar',
                 data: [
                     {
-                        value: radarData.value.values
+                        value: radarData.value.values,
+                        itemStyle: {
+                            color: '#c07d43'
+                        },
+                        lineStyle: {
+                            color: '#c07d43'
+                        },
+                        areaStyle: {
+                            color: isDarkMode.value ? '#c07d4380' : '#c07d4340'
+                        }
                     }
                 ],
                 top: 0,
@@ -144,7 +175,7 @@ const chartOptions = computed<object>(() => {
                 },
                 animation: !props.skeleton
             }
-        ]
+        ] : []
     };
 });
 </script>

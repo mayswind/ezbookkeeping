@@ -219,6 +219,10 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 continue;
             }
 
+            if (transactionStatisticsFilter.value.filterAccountIds && item.relatedAccount && transactionStatisticsFilter.value.filterAccountIds[item.relatedAccount.id]) {
+                continue;
+            }
+
             if (transactionStatisticsFilter.value.filterCategoryIds && transactionStatisticsFilter.value.filterCategoryIds[item.category.id]) {
                 continue;
             }
@@ -577,6 +581,10 @@ export const useStatisticsStore = defineStore('statistics', () => {
             }
 
             if (transactionStatisticsFilter.filterAccountIds && transactionStatisticsFilter.filterAccountIds[item.account.id]) {
+                continue;
+            }
+
+            if (transactionStatisticsFilter.filterAccountIds && item.relatedAccount && transactionStatisticsFilter.filterAccountIds[item.relatedAccount.id]) {
                 continue;
             }
 

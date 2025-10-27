@@ -315,6 +315,7 @@ const chartOptions = computed<object>(() => {
                 left: 10,
                 top: 10,
                 bottom: 10,
+                roam: true,
                 label: {
                     formatter: (params: CallbackDataParams) => {
                         const dataItem = params.data as SankeyChartNodeItem;

@@ -349,6 +349,7 @@
                                             :show-value="showAmountInChart"
                                             :enable-click-item="true"
                                             :default-currency="defaultCurrency"
+                                            :stacked="showStackedInTrendsChart"
                                             :show-total-amount-in-tooltip="showTotalAmountInTrendsChart"
                                             ref="monthlyTrendsChart"
                                             id-field="id"
@@ -522,6 +523,7 @@ const {
     totalAmountName,
     showPercentInCategoricalChart,
     showTotalAmountInTrendsChart,
+    showStackedInTrendsChart,
     translateNameInTrendsChart,
     categoricalAnalysisData,
     categoricalAllAnalysisData,

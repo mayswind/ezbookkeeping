@@ -58,7 +58,7 @@ interface MonthlyTrendsChartDataItem {
     selected: boolean;
     type: string;
     areaStyle?: object;
-    stack: string;
+    stack?: string;
     animation: boolean;
     data: number[];
 }
@@ -219,10 +219,15 @@ const allSeries = computed<MonthlyTrendsChartDataItem[]>(() => {
             },
             selected: true,
             type: 'line',
-            stack: 'a',
             animation: !props.skeleton,
             data: allAmounts
         };
+
+        if (props.stacked) {
+            finalItem.stack = 'a';
+        } else if (props.idField && item[props.idField]) {
+            finalItem.stack = item[props.idField] as string;
+        }
 
         if (props.type === TrendChartType.Area.type) {
             finalItem.areaStyle = {};

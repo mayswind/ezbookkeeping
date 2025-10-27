@@ -17,6 +17,7 @@ import { getAllDateRangesFromItems } from '@/lib/statistics.ts';
 
 export interface CommonMonthlyTrendsChartProps<T extends Year1BasedMonth> {
     items: YearMonthItems<T>[];
+    stacked?: boolean;
     startYearMonth: TextualYearMonth | '';
     endYearMonth: TextualYearMonth | '';
     fiscalYearStart: number;

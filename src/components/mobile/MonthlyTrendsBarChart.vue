@@ -43,9 +43,9 @@
                 </div>
             </div>
         </f7-list-item>
-        <f7-list-item class="statistics-list-item"
-                      link="#"
+        <f7-list-item link="#"
                       :key="idx"
+                      :class="{ 'statistics-list-item': true, 'statistics-list-item-stacked': stacked, 'statistics-list-item-non-stacked': !stacked }"
                       v-for="(item, idx) in allDisplayDataItems.data"
                       @click="clickItem(item)"
         >
@@ -61,14 +61,31 @@
                 <div class="statistics-list-item-text">
                     <span>{{ item.displayDateRange }}</span>
                 </div>
+                <div class="full-line statistics-percent-line statistics-multi-percent-line display-flex flex-direction-column" v-if="!stacked">
+                    <div class="display-flex flex-direction-column"
+                         style="margin-top: 4px"
+                         :key="dataIdx"
+                         v-for="(data, dataIdx) in item.items"
+                         v-show="data.totalAmount > 0">
+                        <div class="full-line display-flex flex-direction-row">
+                            <div class="display-inline-flex" :style="{ 'width': (item.percent * data.totalAmount / item.maxAmount) + '%' }">
+                                <f7-progressbar :progress="100" :style="{ '--f7-progressbar-progress-color': (data.color ? data.color : '') } "></f7-progressbar>
+                            </div>
+                            <div class="display-inline-flex" :style="{ 'width': (100.0 - item.percent * data.totalAmount / item.maxAmount) + '%' }"
+                                 v-if="item.percent * data.totalAmount / item.maxAmount < 100.0">
+                                <f7-progressbar :progress="0"></f7-progressbar>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </template>
 
             <template #after>
-                <span>{{ formatAmountToLocalizedNumeralsWithCurrency(item.totalAmount, defaultCurrency) }}</span>
+                <span v-if="stacked">{{ formatAmountToLocalizedNumeralsWithCurrency(item.totalAmount, defaultCurrency) }}</span>
             </template>
 
             <template #inner-end>
-                <div class="statistics-item-end">
+                <div class="statistics-item-end" v-if="stacked">
                     <div class="statistics-percent-line statistics-multi-percent-line display-flex">
                         <div class="display-inline-flex" :style="{ 'width': (item.percent * data.totalAmount / item.totalPositiveAmount) + '%' }"
                              :key="dataIdx"
@@ -137,6 +154,7 @@ interface MonthlyTrendsBarChartDataItem {
     items: MonthlyTrendsBarChartDataAmount[];
     totalAmount: number;
     totalPositiveAmount: number;
+    maxAmount: number;
     percent: number;
 }
 
@@ -259,6 +277,7 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
         const dataItems = allDateRangeItemsMap[dateRangeKey] || [];
         let totalAmount = 0;
         let totalPositiveAmount = 0;
+        let maxAmount = 0;
 
         sortStatisticsItems(dataItems, props.sortingType);
 
@@ -268,6 +287,10 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
             }
 
             totalAmount += dataItem.totalAmount;
+
+            if (dataItem.totalAmount > maxAmount) {
+                maxAmount = dataItem.totalAmount;
+            }
         }
 
         if (totalAmount > maxTotalAmount) {
@@ -280,6 +303,7 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
             items: dataItems,
             totalAmount: totalAmount,
             totalPositiveAmount: totalPositiveAmount,
+            maxAmount: maxAmount,
             percent: 0.0
         };
 

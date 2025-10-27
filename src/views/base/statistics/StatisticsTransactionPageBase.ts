@@ -218,12 +218,19 @@ export function useStatisticsTransactionPageBase() {
     });
 
     const showTotalAmountInTrendsChart = computed<boolean>(() => {
-        return query.value.chartDataType !== ChartDataType.TotalOutflows.type &&
+        return query.value.chartDataType !== ChartDataType.OutflowsByAccount.type &&
+            query.value.chartDataType !== ChartDataType.InflowsByAccount.type &&
+            query.value.chartDataType !== ChartDataType.TotalOutflows.type &&
             query.value.chartDataType !== ChartDataType.TotalExpense.type &&
             query.value.chartDataType !== ChartDataType.TotalInflows.type &&
             query.value.chartDataType !== ChartDataType.TotalIncome.type &&
             query.value.chartDataType !== ChartDataType.NetCashFlow.type &&
             query.value.chartDataType !== ChartDataType.NetIncome.type;
+    });
+
+    const showStackedInTrendsChart = computed<boolean>(() => {
+        return query.value.chartDataType !== ChartDataType.OutflowsByAccount.type &&
+            query.value.chartDataType !== ChartDataType.InflowsByAccount.type;
     });
 
     const translateNameInTrendsChart = computed<boolean>(() => {
@@ -307,6 +314,7 @@ export function useStatisticsTransactionPageBase() {
         totalAmountName,
         showPercentInCategoricalChart,
         showTotalAmountInTrendsChart,
+        showStackedInTrendsChart,
         translateNameInTrendsChart,
         categoricalAnalysisData,
         categoricalAllAnalysisData,

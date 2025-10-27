@@ -211,6 +211,7 @@
                     :date-aggregation-type="trendDateAggregationType"
                     :fiscal-year-start="fiscalYearStart"
                     :items="trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length ? trendsAnalysisData.items : []"
+                    :stacked="showStackedInTrendsChart"
                     :translate-name="translateNameInTrendsChart"
                     :default-currency="defaultCurrency"
                     id-field="id"
@@ -405,6 +406,7 @@ const {
     showAmountInChart,
     totalAmountName,
     showPercentInCategoricalChart,
+    showStackedInTrendsChart,
     translateNameInTrendsChart,
     categoricalAnalysisData,
     trendsAnalysisData,

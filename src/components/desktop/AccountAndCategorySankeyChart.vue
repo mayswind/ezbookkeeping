@@ -18,6 +18,7 @@ import type {
     SortableTransactionStatisticDataItem,
     TransactionStatisticResponseItemWithInfo
 } from '@/models/transaction.ts';
+import type { Account } from '@/models/account.ts';
 
 import { values } from '@/core/base.ts';
 import { ThemeType } from '@/core/theme.ts';
@@ -27,6 +28,15 @@ import { TransactionRelatedAccountType } from '@/core/transaction.ts';
 import { isNumber } from '@/lib/common.ts';
 import { sortStatisticsItems } from '@/lib/statistics.ts';
 import { getExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
+
+enum SankeyChartDepth {
+    PrimaryIncomeCategory = 0,
+    SecondaryIncomeCategory = 1,
+    Account = 2,
+    AccountWithTransfer = 3,
+    SecondaryExpenseCategory = 4,
+    PrimaryExpenseCategory = 5
+}
 
 enum SankeyChartNodeItemType {
     Account = 'account',
@@ -89,6 +99,7 @@ const sankeyData = computed<SankeyChartData>(() => {
     const secondaryExpenseCategoryNodesMap: Record<string, SankeyChartNodeItem> = {};
     const primaryExpenseCategoryNodesMap: Record<string, SankeyChartNodeItem> = {};
     const linksMap: Record<string, SankeyChartLinkItem> = {};
+    const accountsMap: Record<string, Account> = {};
 
     for (const item of props.items) {
         if (!item.primaryAccount || !item.account || !item.primaryCategory || !item.category || !item.amountInDefaultCurrency) {
@@ -105,6 +116,7 @@ const sankeyData = computed<SankeyChartData>(() => {
 
         const incomeAccountNameId = `income_account:${item.account.id}`;
         const expenseAccountNameId = `expense_account:${item.account.id}`;
+        accountsMap[item.account.id] = item.account;
 
         updateNodeItem(incomeAccountNodesMap, {
             itemType: SankeyChartNodeItemType.Account,
@@ -112,8 +124,8 @@ const sankeyData = computed<SankeyChartData>(() => {
             name: item.account.name,
             nameId: incomeAccountNameId,
             displayOrders: [item.account.displayOrder],
-            amount: (item.primaryCategory.type == CategoryType.Income || item.primaryCategory.type == CategoryType.Transfer) ? item.amountInDefaultCurrency : 0,
-            depth: 2
+            amount: item.primaryCategory.type == CategoryType.Income ? item.amountInDefaultCurrency : 0,
+            depth: SankeyChartDepth.Account
         });
 
         updateNodeItem(expenseAccountNodesMap, {
@@ -123,7 +135,7 @@ const sankeyData = computed<SankeyChartData>(() => {
             nameId: expenseAccountNameId,
             displayOrders: [item.account.displayOrder],
             amount: item.primaryCategory.type == CategoryType.Expense ? item.amountInDefaultCurrency : 0,
-            depth: 3
+            depth: SankeyChartDepth.AccountWithTransfer
         });
 
         if (item.primaryCategory.type == CategoryType.Income) {
@@ -134,7 +146,7 @@ const sankeyData = computed<SankeyChartData>(() => {
                 nameId: item.primaryCategory.id,
                 displayOrders: [item.primaryCategory.displayOrder],
                 amount: item.amountInDefaultCurrency,
-                depth: 0
+                depth: SankeyChartDepth.PrimaryIncomeCategory
             });
 
             updateNodeItem(secondaryIncomeCategoryNodesMap, {
@@ -144,7 +156,7 @@ const sankeyData = computed<SankeyChartData>(() => {
                 nameId: item.category.id,
                 displayOrders: [item.primaryCategory.displayOrder, item.category.displayOrder],
                 amount: item.amountInDefaultCurrency,
-                depth: 1
+                depth: SankeyChartDepth.SecondaryIncomeCategory
             });
 
             updateLinkItem(linksMap, {
@@ -178,7 +190,7 @@ const sankeyData = computed<SankeyChartData>(() => {
                 nameId: item.category.id,
                 displayOrders: [item.primaryCategory.displayOrder, item.category.displayOrder],
                 amount: item.amountInDefaultCurrency,
-                depth: 4
+                depth: SankeyChartDepth.SecondaryExpenseCategory
             });
 
             updateNodeItem(primaryExpenseCategoryNodesMap, {
@@ -188,7 +200,7 @@ const sankeyData = computed<SankeyChartData>(() => {
                 nameId: item.primaryCategory.id,
                 displayOrders: [item.primaryCategory.displayOrder],
                 amount: item.amountInDefaultCurrency,
-                depth: 5
+                depth: SankeyChartDepth.PrimaryExpenseCategory
             });
 
             updateLinkItem(linksMap, {
@@ -216,6 +228,7 @@ const sankeyData = computed<SankeyChartData>(() => {
             });
         } else if (item.primaryCategory.type == CategoryType.Transfer && item.relatedAccount) {
             const relatedAccountNameId = `expense_account:${item.relatedAccount.id}`;
+            accountsMap[item.relatedAccount.id] = item.relatedAccount;
             updateLinkItem(linksMap, {
                 sourceItemType: SankeyChartNodeItemType.Account,
                 sourceItemId: item.account.id,
@@ -230,20 +243,17 @@ const sankeyData = computed<SankeyChartData>(() => {
         }
     }
 
-    for (const expenseAccountNode of values(expenseAccountNodesMap)) {
-        const incomeAccountNode = incomeAccountNodesMap[`income_account:${expenseAccountNode.itemId}`];
-
-        if (!incomeAccountNode) {
-            continue;
-        }
+    for (const account of values(accountsMap)) {
+        const incomeAccountNameId = `income_account:${account.id}`;
+        const expenseAccountNameId = `expense_account:${account.id}`;
 
         let totalOutflowAmount = 0;
         let totalInflowAmount = 0;
 
         for (const link of values(linksMap)) {
-            if (link.sourceItemType === SankeyChartNodeItemType.Account && link.sourceItemId === expenseAccountNode.itemId) {
+            if (link.sourceItemType === SankeyChartNodeItemType.Account && link.sourceItemId === account.id) {
                 totalOutflowAmount += link.value;
-            } else if (link.targetItemType === SankeyChartNodeItemType.Account && link.targetItemId === expenseAccountNode.itemId) {
+            } else if (link.targetItemType === SankeyChartNodeItemType.Account && link.targetItemId === account.id) {
                 totalInflowAmount += link.value;
             }
         }
@@ -251,16 +261,38 @@ const sankeyData = computed<SankeyChartData>(() => {
         const amountDifference = totalOutflowAmount - totalInflowAmount;
 
         if (amountDifference > 0) {
+            updateNodeItem(incomeAccountNodesMap, {
+                itemType: SankeyChartNodeItemType.Account,
+                id: account.id,
+                name: account.name,
+                nameId: incomeAccountNameId,
+                displayOrders: [account.displayOrder],
+                amount: amountDifference,
+                depth: SankeyChartDepth.AccountWithTransfer
+            });
+        } else if (amountDifference < 0) {
+            updateNodeItem(expenseAccountNodesMap, {
+                itemType: SankeyChartNodeItemType.Account,
+                id: account.id,
+                name: account.name,
+                nameId: expenseAccountNameId,
+                displayOrders: [account.displayOrder],
+                amount: -amountDifference,
+                depth: SankeyChartDepth.AccountWithTransfer
+            });
+        }
+
+        if (Math.abs(amountDifference) > 0) {
             updateLinkItem(linksMap, {
                 sourceItemType: SankeyChartNodeItemType.Account,
-                sourceItemId: incomeAccountNode.itemId,
-                source: incomeAccountNode.nameId,
-                sourceName: incomeAccountNode.displayName,
+                sourceItemId: account.id,
+                source: incomeAccountNameId,
+                sourceName: account.name,
                 targetItemType: SankeyChartNodeItemType.Account,
-                targetItemId: expenseAccountNode.itemId,
-                target: expenseAccountNode.nameId,
-                targetName: expenseAccountNode.displayName,
-                value: amountDifference
+                targetItemId: account.id,
+                target: expenseAccountNameId,
+                targetName: account.name,
+                value: Math.abs(amountDifference)
             });
         }
     }
@@ -295,14 +327,15 @@ const chartOptions = computed<object>(() => {
                 color: isDarkMode.value ? '#eee' : '#333'
             },
             formatter: (params: CallbackDataParams) => {
-                const value = isNumber(params.value) ? params.value as number : 0;
-                const displayValue = formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency);
-
                 if (params.dataType === 'node') {
                     const dataItem = params.data as SankeyChartNodeItem;
+                    const value = dataItem.totalAmount;
+                    const displayValue = formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency);
                     return `<div><span>${dataItem.displayName}</span><span class="ms-5" style="float: inline-end">${displayValue}</span></div>`;
                 } else if (params.dataType === 'edge') {
                     const dataItem = params.data as SankeyChartLinkItem;
+                    const value = isNumber(params.value) ? params.value as number : 0;
+                    const displayValue = formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency);
                     return `<div><span>${dataItem.sourceDisplayName} → ${dataItem.targetDisplayName}</span><span class="ms-5" style="float: inline-end">${displayValue}</span></div>`;
                 } else {
                     return '';
@@ -316,6 +349,7 @@ const chartOptions = computed<object>(() => {
                 top: 10,
                 bottom: 10,
                 roam: true,
+                layoutIterations: 0,
                 label: {
                     formatter: (params: CallbackDataParams) => {
                         const dataItem = params.data as SankeyChartNodeItem;
@@ -324,7 +358,7 @@ const chartOptions = computed<object>(() => {
                 },
                 levels: [
                     {
-                        depth: 0,
+                        depth: SankeyChartDepth.PrimaryIncomeCategory,
                         itemStyle: {
                             color: expenseIncomeAmountColor.incomeAmountColor,
                             opacity: 0.6
@@ -335,7 +369,7 @@ const chartOptions = computed<object>(() => {
                         }
                     },
                     {
-                        depth: 1,
+                        depth: SankeyChartDepth.SecondaryIncomeCategory,
                         itemStyle: {
                             color: expenseIncomeAmountColor.incomeAmountColor,
                             opacity: 0.4
@@ -346,7 +380,7 @@ const chartOptions = computed<object>(() => {
                         }
                     },
                     {
-                        depth: 2,
+                        depth: SankeyChartDepth.Account,
                         itemStyle: {
                             color: '#c07d43',
                             opacity: 0.5
@@ -357,7 +391,7 @@ const chartOptions = computed<object>(() => {
                         }
                     },
                     {
-                        depth: 3,
+                        depth: SankeyChartDepth.AccountWithTransfer,
                         itemStyle: {
                             color: '#c07d43',
                             opacity: 0.5
@@ -368,7 +402,7 @@ const chartOptions = computed<object>(() => {
                         }
                     },
                     {
-                        depth: 4,
+                        depth: SankeyChartDepth.SecondaryExpenseCategory,
                         itemStyle: {
                             color: expenseIncomeAmountColor.expenseAmountColor,
                             opacity: 0.4
@@ -379,7 +413,7 @@ const chartOptions = computed<object>(() => {
                         }
                     },
                     {
-                        depth: 5,
+                        depth: SankeyChartDepth.PrimaryExpenseCategory,
                         itemStyle: {
                             color: expenseIncomeAmountColor.expenseAmountColor,
                             opacity: 0.6

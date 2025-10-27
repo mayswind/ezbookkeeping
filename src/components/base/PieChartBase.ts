@@ -33,6 +33,7 @@ export interface CommonPieChartProps {
     minValidPercent?: number;
     defaultCurrency?: string;
     showValue?: boolean;
+    showPercent?: boolean;
     enableClickItem?: boolean;
 }
 

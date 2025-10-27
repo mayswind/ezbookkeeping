@@ -44,7 +44,7 @@
                 </f7-link>
 
                 <div class="pie-chart-toolbox-info">
-                    <p v-if="selectedItem">
+                    <p v-if="showPercent && selectedItem">
                         <f7-chip class="chip-placeholder" outline v-if="skeleton">
                             <span class="skeleton-text">Percent</span>
                         </f7-chip>
@@ -53,7 +53,7 @@
                                  :style="getColorStyle(selectedItem?.color, '--f7-chip-outline-border-color')"
                                  v-else-if="!skeleton"></f7-chip>
                     </p>
-                    <p v-else-if="!validItems || !validItems.length">
+                    <p v-else-if="showPercent && (!validItems || !validItems.length)">
                         <f7-chip outline text="---"></f7-chip>
                     </p>
                     <f7-link class="pie-chart-selected-item-info" :no-link-class="!enableClickItem" v-if="selectedItem" @click="clickItem(selectedItem)">

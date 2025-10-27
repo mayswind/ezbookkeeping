@@ -212,6 +212,11 @@ export function useStatisticsTransactionPageBase() {
         return tt('Total Amount');
     });
 
+    const showPercentInCategoricalChart = computed<boolean>(() => {
+        return query.value.chartDataType !== ChartDataType.OutflowsByAccount.type &&
+            query.value.chartDataType !== ChartDataType.InflowsByAccount.type;
+    });
+
     const showTotalAmountInTrendsChart = computed<boolean>(() => {
         return query.value.chartDataType !== ChartDataType.TotalOutflows.type &&
             query.value.chartDataType !== ChartDataType.TotalExpense.type &&
@@ -300,6 +305,7 @@ export function useStatisticsTransactionPageBase() {
         canUseKeywordFilter,
         showAmountInChart,
         totalAmountName,
+        showPercentInCategoricalChart,
         showTotalAmountInTrendsChart,
         translateNameInTrendsChart,
         categoricalAnalysisData,

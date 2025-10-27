@@ -326,17 +326,38 @@ export const useStatisticsStore = defineStore('statistics', () => {
         const allStatisticsItems: TransactionCategoricalAnalysisDataItem[] = [];
 
         if (combinedData && combinedData.items) {
+            let maxTotalAmount = 0;
+
+            for (const dataItem of values(combinedData.items)) {
+                if (dataItem.totalAmount > maxTotalAmount) {
+                    maxTotalAmount = dataItem.totalAmount;
+                }
+            }
+
             for (const dataItem of values(combinedData.items)) {
                 let percent = 0;
 
-                if (dataItem.totalAmount > 0) {
-                    percent = dataItem.totalAmount * 100 / combinedData.totalNonNegativeAmount;
-                } else {
-                    percent = 0;
-                }
+                if (transactionStatisticsFilter.value.chartDataType === ChartDataType.OutflowsByAccount.type ||
+                    transactionStatisticsFilter.value.chartDataType === ChartDataType.InflowsByAccount.type) {
+                    if (maxTotalAmount > 0) {
+                        percent = dataItem.totalAmount * 100 / maxTotalAmount;
+                    } else {
+                        percent = 0;
+                    }
 
-                if (percent < 0) {
-                    percent = 0;
+                    if (percent < 0) {
+                        percent = 0;
+                    }
+                } else {
+                    if (dataItem.totalAmount > 0) {
+                        percent = dataItem.totalAmount * 100 / combinedData.totalNonNegativeAmount;
+                    } else {
+                        percent = 0;
+                    }
+
+                    if (percent < 0) {
+                        percent = 0;
+                    }
                 }
 
                 const statisticDataItem: TransactionCategoricalAnalysisDataItem = {

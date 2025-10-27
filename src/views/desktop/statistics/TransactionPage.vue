@@ -224,6 +224,7 @@
                                             :items="categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length ? categoricalAnalysisData.items : []"
                                             :min-valid-percent="0.0001"
                                             :show-value="showAmountInChart"
+                                            :show-percent="showPercentInCategoricalChart"
                                             :enable-click-item="true"
                                             :default-currency="defaultCurrency"
                                             id-field="id"
@@ -273,7 +274,7 @@
                                                         <div class="d-flex flex-column ms-2">
                                                             <div class="d-flex">
                                                                 <span>{{ item.name }}</span>
-                                                                <small class="statistics-percent" v-if="item.percent >= 0">{{ formatPercentToLocalizedNumerals(item.percent, 2, '&lt;0.01') }}</small>
+                                                                <small class="statistics-percent" v-if="showPercentInCategoricalChart && item.percent >= 0">{{ formatPercentToLocalizedNumerals(item.percent, 2, '&lt;0.01') }}</small>
                                                                 <v-spacer/>
                                                                 <span class="statistics-amount">{{ getDisplayAmount(item.totalAmount, defaultCurrency) }}</span>
                                                             </div>
@@ -310,6 +311,7 @@
                                             :items="categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length ? categoricalAnalysisData.items : []"
                                             :min-valid-percent="0.0001"
                                             :show-value="showAmountInChart"
+                                            :show-percent="showPercentInCategoricalChart"
                                             :default-currency="defaultCurrency"
                                             name-field="name"
                                             value-field="totalAmount"
@@ -518,6 +520,7 @@ const {
     canUseKeywordFilter,
     showAmountInChart,
     totalAmountName,
+    showPercentInCategoricalChart,
     showTotalAmountInTrendsChart,
     translateNameInTrendsChart,
     categoricalAnalysisData,

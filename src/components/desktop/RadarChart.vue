@@ -40,6 +40,7 @@ const props = defineProps<{
     minValidPercent?: number;
     defaultCurrency?: string;
     showValue?: boolean;
+    showPercent?: boolean;
 }>();
 
 const theme = useTheme();
@@ -92,11 +93,15 @@ const radarData = computed<RadarChartData>(() => {
 
                 tooltip += '<div><span class="chart-pointer" style="background-color: ' + color + '"></span>';
                 tooltip += `<span>${name}</span>`;
-                if (props.showValue) {
+
+                if (props.showValue && props.showPercent) {
                     tooltip += `<span class="ms-1" style="float: inline-end">(${displayPercent})</span><span class="ms-5" style="float: inline-end">${displayValue}</span>`;
-                } else {
+                } else if (props.showValue && !props.showPercent) {
+                    tooltip += `<span class="ms-5" style="float: inline-end">${displayValue}</span>`;
+                } else if (!props.showValue && props.showPercent) {
                     tooltip += `<span class="ms-5" style="float: inline-end">${displayPercent}</span>`;
                 }
+
                 tooltip += '</div>';
             }
         }

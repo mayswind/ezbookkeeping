@@ -585,10 +585,22 @@ export const useStatisticsStore = defineStore('statistics', () => {
                         };
                     }
 
-                    totalAmount += item.amountInDefaultCurrency;
+                    let includeInTotal: boolean = true;
 
-                    if (item.amountInDefaultCurrency > 0) {
-                        totalNonNegativeAmount += item.amountInDefaultCurrency;
+                    // total outflows / inflows do not include transfer transactions between unfiltered accounts
+                    if (transactionStatisticsFilter.chartDataType === ChartDataType.OutflowsByAccount.type ||
+                        transactionStatisticsFilter.chartDataType === ChartDataType.InflowsByAccount.type) {
+                        if (item.relatedAccount && (!transactionStatisticsFilter.filterAccountIds || !transactionStatisticsFilter.filterAccountIds[item.relatedAccount.id])) {
+                            includeInTotal = false;
+                        }
+                    }
+
+                    if (includeInTotal) {
+                        totalAmount += item.amountInDefaultCurrency;
+
+                        if (item.amountInDefaultCurrency > 0) {
+                            totalNonNegativeAmount += item.amountInDefaultCurrency;
+                        }
                     }
 
                     allDataItems[item.account.id] = data;

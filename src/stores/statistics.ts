@@ -584,10 +584,6 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 continue;
             }
 
-            if (transactionStatisticsFilter.filterAccountIds && item.relatedAccount && transactionStatisticsFilter.filterAccountIds[item.relatedAccount.id]) {
-                continue;
-            }
-
             if (transactionStatisticsFilter.filterCategoryIds && transactionStatisticsFilter.filterCategoryIds[item.category.id]) {
                 continue;
             }
@@ -699,6 +695,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 if (isNumber(item.amountInDefaultCurrency)) {
                     let data = allDataItems['total'];
                     let amount = item.amountInDefaultCurrency;
+                    let includeInTotal: boolean = true;
 
                     if (transactionStatisticsFilter.chartDataType === ChartDataType.NetCashFlow.type &&
                         (item.category.type === CategoryType.Expense || (item.category.type === CategoryType.Transfer && item.relatedAccountType === TransactionRelatedAccountType.TransferTo))) {
@@ -708,9 +705,16 @@ export const useStatisticsStore = defineStore('statistics', () => {
                         amount = -amount;
                     }
 
-                    if (data) {
-                        data.totalAmount += amount;
-                    } else {
+                    // total outflows / inflows do not include transfer transactions between unfiltered accounts
+                    if (transactionStatisticsFilter.chartDataType === ChartDataType.TotalOutflows.type ||
+                        transactionStatisticsFilter.chartDataType === ChartDataType.TotalInflows.type ||
+                        transactionStatisticsFilter.chartDataType === ChartDataType.NetCashFlow.type) {
+                        if (item.relatedAccount && (!transactionStatisticsFilter.filterAccountIds || !transactionStatisticsFilter.filterAccountIds[item.relatedAccount.id])) {
+                            includeInTotal = false;
+                        }
+                    }
+
+                    if (!data) {
                         let name = '';
 
                         if (transactionStatisticsFilter.chartDataType === ChartDataType.TotalOutflows.type) {
@@ -735,14 +739,18 @@ export const useStatisticsStore = defineStore('statistics', () => {
                             color: '',
                             hidden: false,
                             displayOrders: [1],
-                            totalAmount: amount
+                            totalAmount: 0
                         };
                     }
 
-                    totalAmount += amount;
+                    if (includeInTotal) {
+                        data.totalAmount += amount;
 
-                    if (item.amountInDefaultCurrency > 0) {
-                        totalNonNegativeAmount += amount;
+                        totalAmount += amount;
+
+                        if (item.amountInDefaultCurrency > 0) {
+                            totalNonNegativeAmount += amount;
+                        }
                     }
 
                     allDataItems['total'] = data;

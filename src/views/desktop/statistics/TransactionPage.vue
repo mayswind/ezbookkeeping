@@ -155,11 +155,12 @@
                                                                      :title="tt('Filter Transaction Tags')"
                                                                      @click="showFilterTagDialog = true"
                                                                      v-if="canUseTagFilter"></v-list-item>
-                                                        <v-divider class="my-2"/>
+                                                        <v-divider class="my-2" v-if="!isQuerySpecialChartType" />
                                                         <v-list-item :prepend-icon="mdiExport"
                                                                      :title="tt('Export Results')"
                                                                      :disabled="!statisticsDataHasData"
-                                                                     @click="exportResults"></v-list-item>
+                                                                     @click="exportResults"
+                                                                     v-if="!isQuerySpecialChartType"></v-list-item>
                                                         <v-divider class="my-2"/>
                                                         <v-list-item to="/app/settings?tab=statisticsSetting"
                                                                      :prepend-icon="mdiFilterCogOutline"

@@ -23,6 +23,11 @@
                                          :disabled="!hasAnyVisibleCategory"
                                          @click="selectInvertCategories"></v-list-item>
                             <v-divider class="my-2"/>
+                            <v-list-item :prepend-icon="mdiSelectAll"
+                                         :title="tt('Select All Visible')"
+                                         :disabled="!hasAnyVisibleCategory"
+                                         @click="selectAllVisibleCategories"></v-list-item>
+                            <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="mdiEyeOutline"
                                          :title="tt('Show Hidden Transaction Categories')"
                                          v-if="!showHidden" @click="showHidden = true"></v-list-item>
@@ -53,6 +58,11 @@
                                          :title="tt('Invert Selection')"
                                          :disabled="!hasAnyVisibleCategory"
                                          @click="selectInvertCategories"></v-list-item>
+                            <v-divider class="my-2"/>
+                            <v-list-item :prepend-icon="mdiSelectAll"
+                                         :title="tt('Select All Visible')"
+                                         :disabled="!hasAnyVisibleCategory"
+                                         @click="selectAllVisibleCategories"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="mdiEyeOutline"
                                          :title="tt('Show Hidden Transaction Categories')"
@@ -160,6 +170,7 @@ import type { TransactionCategory } from '@/models/transaction_category.ts';
 
 import {
     selectAllSubCategories,
+    selectAllVisible,
     selectAll,
     selectNone,
     selectInvert,
@@ -273,6 +284,14 @@ function selectNoneCategories(): void {
 
 function selectInvertCategories(): void {
     selectInvert(filterCategoryIds.value, transactionCategoriesStore.allTransactionCategoriesMap);
+
+    if (props.autoSave) {
+        save();
+    }
+}
+
+function selectAllVisibleCategories(): void {
+    selectAllVisible(filterCategoryIds.value, transactionCategoriesStore.allTransactionCategoriesMap);
 
     if (props.autoSave) {
         save();

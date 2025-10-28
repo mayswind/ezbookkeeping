@@ -96,6 +96,9 @@
                 <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="selectInvertTransactionTags">{{ tt('Invert Selection') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="selectAllVisibleTransactionTags">{{ tt('Select All Visible') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
                 <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ tt('Show Hidden Transaction Tags') }}</f7-actions-button>
                 <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ tt('Hide Hidden Transaction Tags') }}</f7-actions-button>
             </f7-actions-group>
@@ -117,6 +120,7 @@ import { useTransactionTagFilterSettingPageBase } from '@/views/base/settings/Tr
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
 import {
+    selectAllVisible,
     selectAll,
     selectNone,
     selectInvert
@@ -204,6 +208,10 @@ function selectNoneTransactionTags(): void {
 
 function selectInvertTransactionTags(): void {
     selectInvert(filterTagIds.value, transactionTagsStore.allTransactionTagsMap);
+}
+
+function selectAllVisibleTransactionTags(): void {
+    selectAllVisible(filterTagIds.value, transactionTagsStore.allTransactionTagsMap);
 }
 
 function save(): void {

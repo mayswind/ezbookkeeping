@@ -23,6 +23,12 @@
                                          :disabled="!hasAnyVisibleAccount"
                                          @click="selectInvertAccounts"></v-list-item>
                             <v-divider class="my-2" v-if="allowHiddenAccount"/>
+                            <v-list-item :prepend-icon="mdiSelectAll"
+                                         :title="tt('Select All Visible')"
+                                         :disabled="!hasAnyVisibleAccount"
+                                         @click="selectAllVisibleAccounts"
+                                         v-if="allowHiddenAccount"></v-list-item>
+                            <v-divider class="my-2" v-if="allowHiddenAccount"/>
                             <v-list-item :prepend-icon="mdiEyeOutline"
                                          :title="tt('Show Hidden Accounts')"
                                          v-if="allowHiddenAccount && !showHidden" @click="showHidden = true"></v-list-item>
@@ -53,6 +59,12 @@
                                          :title="tt('Invert Selection')"
                                          :disabled="!hasAnyVisibleAccount"
                                          @click="selectInvertAccounts"></v-list-item>
+                            <v-divider class="my-2" v-if="allowHiddenAccount"/>
+                            <v-list-item :prepend-icon="mdiSelectAll"
+                                         :title="tt('Select All Visible')"
+                                         :disabled="!hasAnyVisibleAccount"
+                                         @click="selectAllVisibleAccounts"
+                                         v-if="allowHiddenAccount"></v-list-item>
                             <v-divider class="my-2" v-if="allowHiddenAccount"/>
                             <v-list-item :prepend-icon="mdiEyeOutline"
                                          :title="tt('Show Hidden Accounts')"
@@ -163,6 +175,7 @@ import type { Account } from '@/models/account.ts';
 
 import {
     selectAccountOrSubAccounts,
+    selectAllVisible,
     selectAll,
     selectNone,
     selectInvert,
@@ -266,6 +279,14 @@ function selectNoneAccounts(): void {
 
 function selectInvertAccounts(): void {
     selectInvert(filterAccountIds.value, accountsStore.allAccountsMap, !allowHiddenAccount.value);
+
+    if (props.autoSave) {
+        save();
+    }
+}
+
+function selectAllVisibleAccounts(): void {
+    selectAllVisible(filterAccountIds.value, accountsStore.allAccountsMap);
 
     if (props.autoSave) {
         save();

@@ -482,6 +482,16 @@ export function selectInvert(filterItemIds: Record<string, boolean>, allItemsMap
     }
 }
 
+export function selectAllVisible(filterItemIds: Record<string, boolean>, allItemsMap: { [key: string]: { id: string, hidden?: boolean } }): void {
+    for (const itemId of keys(filterItemIds)) {
+        const item = allItemsMap[itemId];
+
+        if (item && !item.hidden) {
+            filterItemIds[item.id] = false;
+        }
+    }
+}
+
 export function isPrimaryItemHasSecondaryValue(primaryItem: Record<string, Record<string, unknown>[]>, primarySubItemsField: string, secondaryValueField: string | undefined, secondaryHiddenField: string | undefined, secondaryValue: unknown): boolean {
     const secondaryItems = primaryItem[primarySubItemsField];
 

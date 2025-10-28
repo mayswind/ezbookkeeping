@@ -23,6 +23,11 @@
                                          :disabled="!hasAnyVisibleTag"
                                          @click="selectInvertTransactionTags"></v-list-item>
                             <v-divider class="my-2"/>
+                            <v-list-item :prepend-icon="mdiSelectAll"
+                                         :title="tt('Select All Visible')"
+                                         :disabled="!hasAnyVisibleTag"
+                                         @click="selectAllVisibleTransactionTags"></v-list-item>
+                            <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="mdiEyeOutline"
                                          :title="tt('Show Hidden Transaction Tags')"
                                          v-if="!showHidden" @click="showHidden = true"></v-list-item>
@@ -53,6 +58,11 @@
                                          :title="tt('Invert Selection')"
                                          :disabled="!hasAnyVisibleTag"
                                          @click="selectInvertTransactionTags"></v-list-item>
+                            <v-divider class="my-2"/>
+                            <v-list-item :prepend-icon="mdiSelectAll"
+                                         :title="tt('Select All Visible')"
+                                         :disabled="!hasAnyVisibleTag"
+                                         @click="selectAllVisibleTransactionTags"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="mdiEyeOutline"
                                          :title="tt('Show Hidden Transaction Tags')"
@@ -143,6 +153,7 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import type { TransactionTag } from '@/models/transaction_tag.ts';
 
 import {
+    selectAllVisible,
     selectAll,
     selectNone,
     selectInvert
@@ -238,6 +249,14 @@ function selectNoneTransactionTags(): void {
 
 function selectInvertTransactionTags(): void {
     selectInvert(filterTagIds.value, transactionTagsStore.allTransactionTagsMap);
+
+    if (props.autoSave) {
+        save();
+    }
+}
+
+function selectAllVisibleTransactionTags(): void {
+    selectAllVisible(filterTagIds.value, transactionTagsStore.allTransactionTagsMap);
 
     if (props.autoSave) {
         save();

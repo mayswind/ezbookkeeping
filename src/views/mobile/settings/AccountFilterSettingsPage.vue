@@ -117,6 +117,9 @@
                 <f7-actions-button :class="{ 'disabled': !hasAnyVisibleAccount }" @click="selectInvertAccounts">{{ tt('Invert Selection') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group v-if="allowHiddenAccount">
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleAccount }" @click="selectAllVisibleAccounts">{{ tt('Select All Visible') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group v-if="allowHiddenAccount">
                 <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ tt('Show Hidden Accounts') }}</f7-actions-button>
                 <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ tt('Hide Hidden Accounts') }}</f7-actions-button>
             </f7-actions-group>
@@ -143,6 +146,7 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import {
     selectAccountOrSubAccounts,
+    selectAllVisible,
     selectAll,
     selectNone,
     selectInvert,
@@ -252,6 +256,10 @@ function selectNoneAccounts(): void {
 
 function selectInvertAccounts(): void {
     selectInvert(filterAccountIds.value, accountsStore.allAccountsMap, !allowHiddenAccount.value);
+}
+
+function selectAllVisibleAccounts(): void {
+    selectAllVisible(filterAccountIds.value, accountsStore.allAccountsMap);
 }
 
 function save(): void {

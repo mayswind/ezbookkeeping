@@ -414,6 +414,24 @@ export function selectAllSubCategories(filterCategoryIds: Record<string, boolean
     }
 }
 
+export function selectAllVisible(filterCategoryIds: Record<string, boolean>, allTransactionCategoriesMap: Record<string, TransactionCategory>): void {
+    for (const categoryId of keys(filterCategoryIds)) {
+        const category = allTransactionCategoriesMap[categoryId];
+
+        if (category) {
+            if (category.hidden) {
+                continue;
+            }
+
+            if (category.parentId && allTransactionCategoriesMap[category.parentId] && allTransactionCategoriesMap[category.parentId]!.hidden) {
+                continue;
+            }
+
+            filterCategoryIds[category.id] = false;
+        }
+    }
+}
+
 export function selectAll(filterCategoryIds: Record<string, boolean>, allTransactionCategoriesMap: Record<string, TransactionCategory>): void {
     for (const categoryId of keys(filterCategoryIds)) {
         const category = allTransactionCategoriesMap[categoryId];

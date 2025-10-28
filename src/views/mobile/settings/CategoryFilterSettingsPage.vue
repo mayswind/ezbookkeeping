@@ -124,6 +124,9 @@
                 <f7-actions-button :class="{ 'disabled': !hasAnyVisibleCategory }" @click="selectInvertCategories">{{ tt('Invert Selection') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleCategory }" @click="selectAllVisibleCategories">{{ tt('Select All Visible') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
                 <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ tt('Show Hidden Transaction Categories') }}</f7-actions-button>
                 <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ tt('Hide Hidden Transaction Categories') }}</f7-actions-button>
             </f7-actions-group>
@@ -151,6 +154,7 @@ import { CategoryType } from '@/core/category.ts';
 
 import {
     selectAllSubCategories,
+    selectAllVisible,
     selectAll,
     selectNone,
     selectInvert,
@@ -255,6 +259,10 @@ function selectNoneCategories(): void {
 
 function selectInvertCategories(): void {
     selectInvert(filterCategoryIds.value, transactionCategoriesStore.allTransactionCategoriesMap);
+}
+
+function selectAllVisibleCategories(): void {
+    selectAllVisible(filterCategoryIds.value, transactionCategoriesStore.allTransactionCategoriesMap);
 }
 
 function save(): void {

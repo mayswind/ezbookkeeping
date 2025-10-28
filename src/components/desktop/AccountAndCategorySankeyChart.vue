@@ -56,6 +56,7 @@ interface SankeyChartNodeItem extends SortableTransactionStatisticDataItem {
     displayName: string;
     displayOrders: number[];
     totalAmount: number;
+    percent?: number;
     depth: number;
 }
 
@@ -85,7 +86,10 @@ const emit = defineEmits<{
 
 const theme = useTheme();
 
-const { formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
+const {
+    formatAmountToLocalizedNumeralsWithCurrency,
+    formatPercentToLocalizedNumerals
+} = useI18n();
 
 const userStore = useUserStore();
 
@@ -331,7 +335,16 @@ const chartOptions = computed<object>(() => {
                     const dataItem = params.data as SankeyChartNodeItem;
                     const value = dataItem.totalAmount;
                     const displayValue = formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency);
-                    return `<div><span>${dataItem.displayName}</span><span class="ms-5" style="float: inline-end">${displayValue}</span></div>`;
+
+                    let tooltip = `<div><span>${dataItem.displayName}</span>`;
+
+                    if (isNumber(dataItem.percent)) {
+                        const displayPercent = formatPercentToLocalizedNumerals(dataItem.percent, 2, '&lt;0.01');
+                        tooltip += `<span class="ms-1" style="float: inline-end">(${displayPercent})</span>`;
+                    }
+
+                    tooltip += `<span class="ms-5" style="float: inline-end">${displayValue}</span></div>`;
+                    return tooltip;
                 } else if (params.dataType === 'edge') {
                     const dataItem = params.data as SankeyChartLinkItem;
                     const value = isNumber(params.value) ? params.value as number : 0;
@@ -477,8 +490,13 @@ function updateLinkItem(linksMap: Record<string, SankeyChartLinkItem>, { sourceI
 
 function addFinalSortedNodeItems(nodesMap: Record<string, SankeyChartNodeItem>, allNodesArray: SankeyChartNodeItem[]): void {
     const nodesArray: SankeyChartNodeItem[] = [];
+    let totalAmount = 0;
 
     for (const node of values(nodesMap)) {
+        if (node.totalAmount > 0) {
+            totalAmount += node.totalAmount;
+        }
+
         nodesArray.push(node);
     }
 
@@ -486,6 +504,7 @@ function addFinalSortedNodeItems(nodesMap: Record<string, SankeyChartNodeItem>, 
 
     for (const node of nodesArray) {
         node.name = node.nameId;
+        node.percent = node.totalAmount > 0 && totalAmount > 0 ? (node.totalAmount / totalAmount) * 100 : undefined;
     }
 
     allNodesArray.push(...nodesArray);

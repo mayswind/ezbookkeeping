@@ -812,9 +812,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
             transactionStatisticsFilter.value.categoricalChartType = settingsStore.appSettings.statistics.defaultCategoricalChartType;
         }
 
-        if (transactionStatisticsFilter.value.categoricalChartType !== CategoricalChartType.Pie.type &&
-            transactionStatisticsFilter.value.categoricalChartType !== CategoricalChartType.Bar.type &&
-            transactionStatisticsFilter.value.categoricalChartType !== CategoricalChartType.Radar.type) {
+        if (!CategoricalChartType.isValidType(transactionStatisticsFilter.value.categoricalChartType)) {
             transactionStatisticsFilter.value.categoricalChartType = CategoricalChartType.Default.type;
         }
 
@@ -859,7 +857,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
             transactionStatisticsFilter.value.trendChartType = settingsStore.appSettings.statistics.defaultTrendChartType;
         }
 
-        if (transactionStatisticsFilter.value.trendChartType !== TrendChartType.Area.type && transactionStatisticsFilter.value.trendChartType !== TrendChartType.Column.type) {
+        if (!TrendChartType.isValidType(transactionStatisticsFilter.value.trendChartType)) {
             transactionStatisticsFilter.value.trendChartType = TrendChartType.Default.type;
         }
 

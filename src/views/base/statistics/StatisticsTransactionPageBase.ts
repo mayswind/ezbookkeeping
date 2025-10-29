@@ -9,7 +9,13 @@ import { type TransactionStatisticsFilter, useStatisticsStore } from '@/stores/s
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { type LocalizedDateRange, type WeekDayValue, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import type { ColorStyleValue } from '@/core/color.ts';
-import { StatisticsAnalysisType, ChartDataType, ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
+import {
+    StatisticsAnalysisType,
+    ChartDataType,
+    ChartSortingType,
+    ChartDateAggregationType,
+    TrendChartType
+} from '@/core/statistics.ts';
 
 import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
 
@@ -229,7 +235,8 @@ export function useStatisticsTransactionPageBase() {
     });
 
     const showStackedInTrendsChart = computed<boolean>(() => {
-        return query.value.chartDataType !== ChartDataType.OutflowsByAccount.type &&
+        return (query.value.trendChartType === TrendChartType.Area.type || query.value.trendChartType === TrendChartType.Column.type) &&
+            query.value.chartDataType !== ChartDataType.OutflowsByAccount.type &&
             query.value.chartDataType !== ChartDataType.InflowsByAccount.type;
     });
 

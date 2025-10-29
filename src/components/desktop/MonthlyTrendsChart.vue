@@ -59,6 +59,7 @@ interface MonthlyTrendsChartDataItem {
     type: string;
     areaStyle?: object;
     stack?: string;
+    symbolSize?: (data: number) => number;
     animation: boolean;
     data: number[];
 }
@@ -152,6 +153,7 @@ const allDisplayDateRanges = computed<string[]>(() => {
 
 const allSeries = computed<MonthlyTrendsChartDataItem[]>(() => {
     const allSeries: MonthlyTrendsChartDataItem[] = [];
+    let maxAmount: number = 0;
 
     for (const [item, index] of itemAndIndex(props.items)) {
         if (props.hiddenField && item[props.hiddenField]) {
@@ -208,6 +210,10 @@ const allSeries = computed<MonthlyTrendsChartDataItem[]>(() => {
                 }
             }
 
+            if (amount > maxAmount) {
+                maxAmount = amount;
+            }
+
             allAmounts.push(amount);
         }
 
@@ -233,6 +239,11 @@ const allSeries = computed<MonthlyTrendsChartDataItem[]>(() => {
             finalItem.areaStyle = {};
         } else if (props.type === TrendChartType.Column.type) {
             finalItem.type = 'bar';
+        } else if (props.type === TrendChartType.Bubble.type) {
+            finalItem.type = 'scatter';
+            finalItem.symbolSize = (data: number): number => {
+                return Math.sqrt(data) / Math.sqrt(maxAmount) * 80 + 5;
+            }
         }
 
         allSeries.push(finalItem);

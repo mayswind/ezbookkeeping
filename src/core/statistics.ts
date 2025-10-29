@@ -9,6 +9,7 @@ export enum StatisticsAnalysisType {
 export class CategoricalChartType implements TypeAndName {
     private static readonly allInstancesForAll: CategoricalChartType[] = [];
     private static readonly allInstancesForDesktop: CategoricalChartType[] = [];
+    private static readonly allInstancesByType: Record<number, CategoricalChartType> = {};
 
     public static readonly Pie = new CategoricalChartType(0, 'Pie Chart', false);
     public static readonly Bar = new CategoricalChartType(1, 'Bar Chart', false);
@@ -30,6 +31,11 @@ export class CategoricalChartType implements TypeAndName {
         }
 
         CategoricalChartType.allInstancesForDesktop.push(this);
+        CategoricalChartType.allInstancesByType[type] = this;
+    }
+
+    public static isValidType(type: number): boolean {
+        return !!CategoricalChartType.allInstancesByType[type];
     }
 
     public static values(withDesktopOnlyChart: boolean): CategoricalChartType[] {
@@ -43,9 +49,11 @@ export class CategoricalChartType implements TypeAndName {
 
 export class TrendChartType implements TypeAndName {
     private static readonly allInstances: TrendChartType[] = [];
+    private static readonly allInstancesByType: Record<number, TrendChartType> = {};
 
     public static readonly Area = new TrendChartType(0, 'Area Chart');
     public static readonly Column = new TrendChartType(1, 'Column Chart');
+    public static readonly Bubble = new TrendChartType(2, 'Bubble Chart');
 
     public static readonly Default = TrendChartType.Column;
 
@@ -57,6 +65,11 @@ export class TrendChartType implements TypeAndName {
         this.name = name;
 
         TrendChartType.allInstances.push(this);
+        TrendChartType.allInstancesByType[type] = this;
+    }
+
+    public static isValidType(type: number): boolean {
+        return !!TrendChartType.allInstancesByType[type];
     }
 
     public static values(): TrendChartType[] {

@@ -41,7 +41,7 @@
 
             <v-card-text class="w-100">
                 <v-alert type="warning" variant="tonal">
-                    {{ tt('Your MCP token does not expire, please keep it secure. When connecting to third-party apps, be aware that they and any large language models they use may access your private data.') }}
+                    {{ tt('Your MCP token does not expire, please keep it secure. When connecting to third-party apps, be aware that they and any large language models they use can access your private data.') }}
                 </v-alert>
             </v-card-text>
 

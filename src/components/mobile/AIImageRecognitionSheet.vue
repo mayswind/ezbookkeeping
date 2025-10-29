@@ -17,7 +17,7 @@
                 <div class="image-container-background display-flex justify-content-center align-items-center text-align-center padding-horizontal" v-if="!imageSrc">
                     <div class="display-inline-flex flex-direction-column" v-if="!loading">
                         <span>{{ tt('Click here to select a receipt or transaction image') }}</span>
-                        <small class="margin-top-half">{{ tt('Uploaded image and personal data may be sent to the large language model, please be aware of potential privacy risks.') }}</small>
+                        <small class="margin-top-half">{{ tt('Uploaded image and personal data will be sent to the large language model, please be aware of potential privacy risks.') }}</small>
                     </div>
                     <span v-else-if="loading">{{ tt('Loading image...') }}</span>
                 </div>

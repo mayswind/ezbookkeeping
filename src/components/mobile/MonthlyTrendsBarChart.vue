@@ -61,7 +61,7 @@
                 <div class="statistics-list-item-text">
                     <span>{{ item.displayDateRange }}</span>
                 </div>
-                <div class="full-line statistics-percent-line statistics-multi-percent-line display-flex flex-direction-column" v-if="!stacked">
+                <div class="full-line statistics-percent-line statistics-multi-percent-line display-flex flex-direction-column" v-if="!stacked && item.items.length > 1">
                     <div class="display-flex flex-direction-column"
                          style="margin-top: 4px"
                          :key="dataIdx"
@@ -81,11 +81,11 @@
             </template>
 
             <template #after>
-                <span v-if="stacked">{{ formatAmountToLocalizedNumeralsWithCurrency(item.totalAmount, defaultCurrency) }}</span>
+                <span v-if="stacked || item.items.length <= 1">{{ formatAmountToLocalizedNumeralsWithCurrency(item.totalAmount, defaultCurrency) }}</span>
             </template>
 
             <template #inner-end>
-                <div class="statistics-item-end" v-if="stacked">
+                <div class="statistics-item-end" v-if="stacked || item.items.length <= 1">
                     <div class="statistics-percent-line statistics-multi-percent-line display-flex">
                         <div class="display-inline-flex" :style="{ 'width': (item.percent * data.totalAmount / item.totalPositiveAmount) + '%' }"
                              :key="dataIdx"

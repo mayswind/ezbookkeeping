@@ -212,7 +212,7 @@ function verifyAndLogin(): void  {
     rootStore.authorizeOAuth2({
         password: password.value,
         passcode: passcode.value,
-        token: props.token || ''
+        callbackToken: props.token || ''
     }).then(authResponse => {
         loggingInByOAuth2.value = false;
         doAfterLogin(authResponse);
@@ -238,7 +238,7 @@ if (!error.value && props.platform && props.token && !props.userName) {
     loggingInByOAuth2.value = true;
 
     rootStore.authorizeOAuth2({
-        token: props.token
+        callbackToken: props.token
     }).then(authResponse => {
         loggingInByOAuth2.value = false;
         doAfterLogin(authResponse);

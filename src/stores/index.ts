@@ -81,6 +81,10 @@ export const useRootStore = defineStore('root', () => {
         return services.generateOAuth2LoginUrl(platform, clientSessionId);
     }
 
+    function generateOAuth2LinkUrl(platform: 'mobile' | 'desktop', clientSessionId: string): string {
+        return services.generateOAuth2LinkUrl(platform, clientSessionId);
+    }
+
     function authorize(req: UserLoginRequest): Promise<AuthResponse> {
         return new Promise((resolve, reject) => {
             services.authorize(req).then(response => {
@@ -191,14 +195,12 @@ export const useRootStore = defineStore('root', () => {
         });
     }
 
-    function authorizeOAuth2({ password, passcode, token }: { password?: string, passcode?: string, token: string }): Promise<AuthResponse> {
+    function authorizeOAuth2({ password, passcode, callbackToken }: { password?: string, passcode?: string, callbackToken: string }): Promise<AuthResponse> {
         return new Promise((resolve, reject) => {
             services.authorizeOAuth2({
-                req: {
-                    password,
-                    passcode
-                },
-                token
+                password,
+                passcode,
+                callbackToken
             }).then(response => {
                 const data = response.data;
 
@@ -643,6 +645,7 @@ export const useRootStore = defineStore('root', () => {
         // functions
         setNotificationContent,
         generateOAuth2LoginUrl,
+        generateOAuth2LinkUrl,
         authorize,
         authorize2FA,
         authorizeOAuth2,

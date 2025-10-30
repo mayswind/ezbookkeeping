@@ -258,26 +258,35 @@ export default {
         return axios.post<ApiResponse<AuthResponse>>('2fa/authorize.json', {
             passcode: passcode
         }, {
+            noAuth: true,
             headers: {
                 Authorization: `Bearer ${token}`
             }
-        });
+        } as ApiRequestConfig);
     },
     authorize2FAByBackupCode: ({ recoveryCode, token }: { recoveryCode: string, token: string }): ApiResponsePromise<AuthResponse> => {
         return axios.post<ApiResponse<AuthResponse>>('2fa/recovery.json', {
             recoveryCode: recoveryCode
         }, {
+            noAuth: true,
             headers: {
                 Authorization: `Bearer ${token}`
             }
-        });
+        } as ApiRequestConfig);
     },
-    authorizeOAuth2: ({ req, token }: { req: OAuth2CallbackLoginRequest, token: string }): ApiResponsePromise<AuthResponse> => {
+    authorizeOAuth2: ({ password, passcode, callbackToken }: { password?: string, passcode?: string, callbackToken: string }): ApiResponsePromise<AuthResponse> => {
+        const req: OAuth2CallbackLoginRequest = {
+            password,
+            passcode,
+            token: getCurrentToken() || undefined
+        };
+
         return axios.post<ApiResponse<AuthResponse>>('oauth2/authorize.json', req, {
+            noAuth: true,
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${callbackToken}`
             }
-        });
+        } as ApiRequestConfig);
     },
     register: (req: UserRegisterRequest): ApiResponsePromise<RegisterResponse> => {
         return axios.post<ApiResponse<RegisterResponse>>('register.json', req);
@@ -717,6 +726,9 @@ export default {
     },
     generateOAuth2LoginUrl: (platform: 'mobile' | 'desktop', clientSessionId: string): string => {
         return `${getBasePath()}/oauth2/login?platform=${platform}&client_session_id=${clientSessionId}`;
+    },
+    generateOAuth2LinkUrl: (platform: 'mobile' | 'desktop', clientSessionId: string): string => {
+        return `${getBasePath()}/oauth2/login?platform=${platform}&client_session_id=${clientSessionId}&token=${getCurrentToken()}`;
     },
     generateQrCodeUrl: (qrCodeName: string): string => {
         return `${getBasePath()}${BASE_QRCODE_PATH}/${qrCodeName}.png`;

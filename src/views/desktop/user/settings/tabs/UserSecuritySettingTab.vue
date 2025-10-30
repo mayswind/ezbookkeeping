@@ -105,6 +105,14 @@
                         <td class="text-sm">{{ thirdPartyLogin.externalUsername }}</td>
                         <td class="text-sm">{{ thirdPartyLogin.createdAt }}</td>
                         <td class="text-sm text-right">
+                            <v-btn density="comfortable" variant="tonal"
+                                   :disabled="loggingInByOAuth2"
+                                   :href="oauth2LinkUrl"
+                                   @click="loggingInByOAuth2 = true"
+                                   v-if="!thirdPartyLogin.linked && isOAuth2Enabled() && getOAuth2Provider() === thirdPartyLogin.externalAuthType">
+                                {{ tt('Link') }}
+                                <v-progress-circular indeterminate size="22" class="ms-2" v-if="loggingInByOAuth2"></v-progress-circular>
+                            </v-btn>
                             <v-btn density="comfortable" color="error" variant="tonal"
                                    :disabled="loadingExternalAuth"
                                    @click="unlinkExternalAuth(thirdPartyLogin)"
@@ -209,7 +217,8 @@ import { type TokenInfoResponse, SessionInfo } from '@/models/token.ts';
 
 import { isEquals } from '@/lib/common.ts';
 import { parseSessionInfo } from '@/lib/session.ts';
-import { isOAuth2Enabled, getOIDCCustomDisplayNames, isMCPServerEnabled } from '@/lib/server_settings.ts';
+import { isOAuth2Enabled, getOAuth2Provider, getOIDCCustomDisplayNames, isMCPServerEnabled } from '@/lib/server_settings.ts';
+import { generateRandomUUID } from '@/lib/misc.ts';
 
 import {
     mdiRefresh,
@@ -314,6 +323,10 @@ const confirmPassword = ref<string>('');
 const updatingPassword = ref<boolean>(false);
 const loadingExternalAuth = ref<boolean>(true);
 const loadingSession = ref<boolean>(true);
+const loggingInByOAuth2 = ref<boolean>(false);
+const oauth2ClientSessionId = ref<string>(generateRandomUUID());
+
+const oauth2LinkUrl = computed<string>(() => rootStore.generateOAuth2LinkUrl('desktop', oauth2ClientSessionId.value));
 
 const thirdPartyLogins = computed<DesktopPageLinkedThirdPartyLogin[]>(() => {
     const logins: DesktopPageLinkedThirdPartyLogin[] = [];

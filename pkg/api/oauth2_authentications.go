@@ -73,6 +73,29 @@ func (a *OAuth2AuthenticationApi) LoginHandler(c *core.WebContext) (string, *err
 		return a.redirectToFailedCallbackPage(c, errs.ErrRepeatedRequest)
 	}
 
+	uid := int64(0)
+
+	if oauth2LoginReq.Token != "" {
+		_, claims, _, err := a.tokens.ParseToken(c, oauth2LoginReq.Token)
+
+		if err != nil {
+			log.Errorf(c, "[oauth2_authentications.LoginHandler] failed to parse token, because %s", err.Error())
+			return a.redirectToFailedCallbackPage(c, errs.ErrInvalidToken)
+		}
+
+		uid = claims.Uid
+		user, err := a.users.GetUserById(c, uid)
+
+		if err != nil && !errors.Is(err, errs.ErrUserNotFound) {
+			log.Errorf(c, "[oauth2_authentications.LoginHandler] failed to get user by id %d, because %s", uid, err.Error())
+			return a.redirectToFailedCallbackPage(c, errs.Or(err, errs.ErrOperationFailed))
+		}
+
+		if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_OAUTH2_LOGIN) {
+			return a.redirectToFailedCallbackPage(c, errs.ErrNotPermittedToPerformThisAction)
+		}
+	}
+
 	verifier, err := utils.GetRandomNumberOrLowercaseLetter(64)
 
 	if err != nil {
@@ -80,7 +103,7 @@ func (a *OAuth2AuthenticationApi) LoginHandler(c *core.WebContext) (string, *err
 		return a.redirectToFailedCallbackPage(c, errs.ErrSystemError)
 	}
 
-	remark = fmt.Sprintf("%s|%s|%s", oauth2LoginReq.Platform, oauth2LoginReq.ClientSessionId, verifier)
+	remark = fmt.Sprintf("%s|%s|%d|%s", oauth2LoginReq.Platform, oauth2LoginReq.ClientSessionId, uid, verifier)
 	state := fmt.Sprintf("%s|%s|%s", oauth2LoginReq.Platform, oauth2LoginReq.ClientSessionId, utils.MD5EncodeToString([]byte(remark)))
 
 	redirectUrl, err := oauth2.GetOAuth2AuthUrl(c, state, verifier)
@@ -123,7 +146,7 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 
 	stateParts := strings.Split(oauth2CallbackReq.State, "|")
 
-	if len(stateParts) >= 2 {
+	if len(stateParts) == 3 {
 		platform = stateParts[0]
 		clientSessionId = stateParts[1]
 	} else {
@@ -143,14 +166,21 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 
 	remarkParts := strings.Split(remark, "|")
 
-	if len(remarkParts) != 3 || remarkParts[0] != platform || remarkParts[1] != clientSessionId {
+	if len(remarkParts) != 4 || remarkParts[0] != platform || remarkParts[1] != clientSessionId {
 		log.Errorf(c, "[oauth2_authentications.CallbackHandler] invalid oauth 2.0 state \"%s\" in duplicate checker for client session id \"%s\"", remark, clientSessionId)
 		return a.redirectToFailedCallbackPage(c, errs.ErrInvalidOAuth2State)
 	}
 
-	verifier := remarkParts[2]
-	expectedState := fmt.Sprintf("%s|%s|%s", platform, clientSessionId, verifier)
-	expectedState = fmt.Sprintf("%s|%s|%s", platform, clientSessionId, utils.MD5EncodeToString([]byte(expectedState)))
+	uid, err := utils.StringToInt64(remarkParts[2])
+
+	if err != nil {
+		log.Errorf(c, "[oauth2_authentications.CallbackHandler] invalid uid \"%s\" in oauth 2.0 state \"%s\"", remarkParts[2], remark)
+		return a.redirectToFailedCallbackPage(c, errs.ErrInvalidOAuth2State)
+	}
+
+	verifier := remarkParts[3]
+	expectedRemark := fmt.Sprintf("%s|%s|%d|%s", platform, clientSessionId, uid, verifier)
+	expectedState := fmt.Sprintf("%s|%s|%s", platform, clientSessionId, utils.MD5EncodeToString([]byte(expectedRemark)))
 
 	if oauth2CallbackReq.State != expectedState {
 		log.Errorf(c, "[oauth2_authentications.CallbackHandler] mismatched random string in oauth 2.0 state, expected \"%s\", got \"%s\"", expectedState, oauth2CallbackReq.State)
@@ -199,6 +229,11 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 		return a.redirectToFailedCallbackPage(c, errs.Or(err, errs.ErrOperationFailed))
 	}
 
+	if uid != 0 && userExternalAuth != nil && userExternalAuth.Uid != uid {
+		log.Errorf(c, "[oauth2_authentications.CallbackHandler] oauth 2.0 external auth has been bound to another user \"uid:%d\", current user \"uid:%d\"", userExternalAuth.Uid, uid)
+		return a.redirectToFailedCallbackPage(c, errs.ErrOAuth2UserAlreadyBoundToAnotherUser)
+	}
+
 	var user *models.User
 
 	if err == nil { // user already bound to external auth, redirect to success page
@@ -209,17 +244,26 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 			return a.redirectToFailedCallbackPage(c, errs.Or(err, errs.ErrOperationFailed))
 		}
 	} else { // errors.Is(err, errs.ErrUserExternalAuthNotFound) // user not bound to external auth, try to bind or register new user
-		if a.CurrentConfig().OAuth2UserIdentifier == settings.OAuth2UserIdentifierEmail {
-			user, err = a.users.GetUserByEmail(c, oauth2UserInfo.Email)
-		} else if a.CurrentConfig().OAuth2UserIdentifier == settings.OAuth2UserIdentifierUsername {
-			user, err = a.users.GetUserByUsername(c, oauth2UserInfo.UserName)
-		} else {
-			user, err = a.users.GetUserByEmail(c, oauth2UserInfo.Email)
-		}
+		if uid != 0 {
+			user, err = a.users.GetUserById(c, uid)
 
-		if err != nil && !errors.Is(err, errs.ErrUserNotFound) {
-			log.Errorf(c, "[oauth2_authentications.CallbackHandler] failed to get user, because %s", err.Error())
-			return a.redirectToFailedCallbackPage(c, errs.Or(err, errs.ErrOperationFailed))
+			if err != nil && !errors.Is(err, errs.ErrUserNotFound) {
+				log.Errorf(c, "[oauth2_authentications.CallbackHandler] failed to get user by id %d, because %s", uid, err.Error())
+				return a.redirectToFailedCallbackPage(c, errs.Or(err, errs.ErrOperationFailed))
+			}
+		} else {
+			if a.CurrentConfig().OAuth2UserIdentifier == settings.OAuth2UserIdentifierEmail {
+				user, err = a.users.GetUserByEmail(c, oauth2UserInfo.Email)
+			} else if a.CurrentConfig().OAuth2UserIdentifier == settings.OAuth2UserIdentifierUsername {
+				user, err = a.users.GetUserByUsername(c, oauth2UserInfo.UserName)
+			} else {
+				user, err = a.users.GetUserByEmail(c, oauth2UserInfo.Email)
+			}
+
+			if err != nil && !errors.Is(err, errs.ErrUserNotFound) {
+				log.Errorf(c, "[oauth2_authentications.CallbackHandler] failed to get user, because %s", err.Error())
+				return a.redirectToFailedCallbackPage(c, errs.Or(err, errs.ErrOperationFailed))
+			}
 		}
 
 		if user == nil && a.CurrentConfig().EnableUserRegister && a.CurrentConfig().OAuth2AutoRegister {

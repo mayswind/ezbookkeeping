@@ -1,7 +1,7 @@
 package oidc
 
 import (
-	"strings"
+	"context"
 
 	"golang.org/x/oauth2"
 
@@ -25,7 +25,8 @@ type OIDCClaims struct {
 // OIDCProvider represents OIDC provider
 type OIDCProvider struct {
 	provider.OAuth2Provider
-	oidcBaseUrl        string
+	oidcIssuerURL      string
+	oidcCheckIssuerURL bool
 	redirectUrl        string
 	oauth2ClientID     string
 	oauth2ClientSecret string
@@ -130,14 +131,23 @@ func (p *OIDCProvider) getOAuth2Config(c core.Context) (*oauth2.Config, error) {
 		return p.oauth2Config, nil
 	}
 
-	oidcProvider, err := oidc.NewProvider(c, p.oidcBaseUrl)
+	var ctx context.Context = c
+
+	if !p.oidcCheckIssuerURL {
+		ctx = oidc.InsecureIssuerURLContext(c, p.oidcIssuerURL)
+	}
+
+	oidcProvider, err := oidc.NewProvider(ctx, p.oidcIssuerURL)
 
 	if err != nil {
 		log.Errorf(c, "[oidc_provider.getOAuth2Config] failed to create oidc provider, because %s", err.Error())
 		return nil, err
 	}
 
-	oidcVerifier := oidcProvider.Verifier(&oidc.Config{ClientID: p.oauth2ClientID})
+	oidcVerifier := oidcProvider.Verifier(&oidc.Config{
+		ClientID:        p.oauth2ClientID,
+		SkipIssuerCheck: !p.oidcCheckIssuerURL,
+	})
 
 	oauth2Config := &oauth2.Config{
 		ClientID:     p.oauth2ClientID,
@@ -155,14 +165,13 @@ func (p *OIDCProvider) getOAuth2Config(c core.Context) (*oauth2.Config, error) {
 
 // NewOIDCProvider returns a new OIDC provider
 func NewOIDCProvider(config *settings.Config, redirectUrl string) (*OIDCProvider, error) {
-	if len(config.OAuth2OIDCProviderBaseUrl) < 1 {
+	if len(config.OAuth2OIDCProviderIssuerURL) < 1 {
 		return nil, errs.ErrInvalidOAuth2Config
 	}
 
-	baseUrl := strings.TrimSuffix(config.OAuth2OIDCProviderBaseUrl, "/")
-
 	return &OIDCProvider{
-		oidcBaseUrl:        baseUrl,
+		oidcIssuerURL:      config.OAuth2OIDCProviderIssuerURL,
+		oidcCheckIssuerURL: config.OAuth2OIDCProviderCheckIssuerURL,
 		redirectUrl:        redirectUrl,
 		oauth2ClientID:     config.OAuth2ClientID,
 		oauth2ClientSecret: config.OAuth2ClientSecret,

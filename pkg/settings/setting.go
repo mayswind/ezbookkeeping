@@ -377,7 +377,8 @@ type Config struct {
 	OAuth2RequestTimeout              uint32
 	OAuth2Proxy                       string
 	OAuth2SkipTLSVerify               bool
-	OAuth2OIDCProviderBaseUrl         string
+	OAuth2OIDCProviderIssuerURL       string
+	OAuth2OIDCProviderCheckIssuerURL  bool
 	OAuth2OIDCCustomDisplayNameConfig MultiLanguageContentConfig
 	OAuth2NextcloudBaseUrl            string
 	OAuth2GiteaBaseUrl                string
@@ -1032,7 +1033,8 @@ func loadAuthConfiguration(config *Config, configFile *ini.File, sectionName str
 	config.OAuth2RequestTimeout = getConfigItemUint32Value(configFile, sectionName, "oauth2_request_timeout", defaultOAuth2RequestTimeout)
 	config.OAuth2SkipTLSVerify = getConfigItemBoolValue(configFile, sectionName, "oauth2_skip_tls_verify", false)
 
-	config.OAuth2OIDCProviderBaseUrl = getConfigItemStringValue(configFile, sectionName, "oidc_provider_base_url")
+	config.OAuth2OIDCProviderIssuerURL = getConfigItemStringValue(configFile, sectionName, "oidc_provider_base_url")
+	config.OAuth2OIDCProviderCheckIssuerURL = getConfigItemBoolValue(configFile, sectionName, "oidc_provider_check_issuer_url", true)
 	config.OAuth2OIDCCustomDisplayNameConfig = getMultiLanguageContentConfig(configFile, sectionName, "enable_oidc_display_name", "oidc_custom_display_name")
 	config.OAuth2NextcloudBaseUrl = getConfigItemStringValue(configFile, sectionName, "nextcloud_base_url")
 	config.OAuth2GiteaBaseUrl = getConfigItemStringValue(configFile, sectionName, "gitea_base_url")

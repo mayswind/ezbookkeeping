@@ -172,7 +172,27 @@
                                     </template>
 
                                     <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"
-                                                 v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && (initing || (categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length))">
+                                                 v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && isQuerySpecialChartType && queryChartDataType === ChartDataType.Overview.type && (initing || categoricalOverviewAnalysisData && categoricalOverviewAnalysisData.items && categoricalOverviewAnalysisData.items.length)">
+                                        <span class="statistics-subtitle">{{ tt('Total Income') }}</span>
+                                        <span class="statistics-overview-amount ms-3 text-income"
+                                              v-if="!initing && categoricalOverviewAnalysisData && categoricalOverviewAnalysisData.items && categoricalOverviewAnalysisData.items.length">
+                                            {{ getDisplayAmount(categoricalOverviewAnalysisData.totalIncome, defaultCurrency) }}
+                                        </span>
+                                        <v-skeleton-loader class="skeleton-no-margin ms-3 mb-2"
+                                                           width="120px" type="text" :loading="true"
+                                                           v-else-if="initing"></v-skeleton-loader>
+                                        <span class="statistics-subtitle ms-3">{{ tt('Total Expense') }}</span>
+                                        <span class="statistics-overview-amount ms-3 text-expense"
+                                              v-if="!initing && categoricalOverviewAnalysisData && categoricalOverviewAnalysisData.items && categoricalOverviewAnalysisData.items.length">
+                                            {{ getDisplayAmount(categoricalOverviewAnalysisData.totalExpense, defaultCurrency) }}
+                                        </span>
+                                        <v-skeleton-loader class="skeleton-no-margin ms-3 mb-2"
+                                                           width="120px" type="text" :loading="true"
+                                                           v-else-if="initing"></v-skeleton-loader>
+                                    </v-card-text>
+
+                                    <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"
+                                                 v-else-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && (initing || (categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length))">
                                         <span class="statistics-subtitle">{{ totalAmountName }}</span>
                                         <span class="statistics-overview-amount ms-3"
                                               :class="statisticsTextColor"
@@ -185,8 +205,11 @@
                                     </v-card-text>
 
                                     <v-card-text class="statistics-overview-title pt-0"
-                                                 v-else-if="!initing && ((queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && (!categoricalAnalysisData || !categoricalAnalysisData.items || !categoricalAnalysisData.items.length))
-                                                  || (queryAnalysisType === StatisticsAnalysisType.TrendAnalysis && (!trendsAnalysisData || !trendsAnalysisData.items || !trendsAnalysisData.items.length)))">
+                                                 v-else-if="!initing && (
+                                                     (queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && isQuerySpecialChartType && queryChartDataType === ChartDataType.Overview.type && (!categoricalOverviewAnalysisData || !categoricalOverviewAnalysisData.items || !categoricalOverviewAnalysisData.items.length))
+                                                  || (queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && (!categoricalAnalysisData || !categoricalAnalysisData.items || !categoricalAnalysisData.items.length))
+                                                  || (queryAnalysisType === StatisticsAnalysisType.TrendAnalysis && (!trendsAnalysisData || !trendsAnalysisData.items || !trendsAnalysisData.items.length))
+                                                  )">
                                         <span class="statistics-subtitle statistics-overview-empty-tip">{{ tt('No transaction data') }}</span>
                                     </v-card-text>
 
@@ -198,8 +221,7 @@
                                             v-if="initing"
                                         />
                                         <account-and-category-sankey-chart
-                                            :items="categoricalAllAnalysisData && categoricalAllAnalysisData.items && categoricalAllAnalysisData.items.length ? categoricalAllAnalysisData.items : []"
-                                            :sorting-type="querySortingType"
+                                            :items="categoricalOverviewAnalysisData && categoricalOverviewAnalysisData.items && categoricalOverviewAnalysisData.items.length ? categoricalOverviewAnalysisData.items : []"
                                             :enable-click-item="true"
                                             :default-currency="defaultCurrency"
                                             v-else-if="!initing"
@@ -526,8 +548,8 @@ const {
     showTotalAmountInTrendsChart,
     showStackedInTrendsChart,
     translateNameInTrendsChart,
+    categoricalOverviewAnalysisData,
     categoricalAnalysisData,
-    categoricalAllAnalysisData,
     trendsAnalysisData,
     canShowCustomDateRange,
     getTransactionCategoricalAnalysisDataItemDisplayColor,

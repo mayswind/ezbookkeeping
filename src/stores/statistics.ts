@@ -28,20 +28,23 @@ import {
 import { DEFAULT_ACCOUNT_ICON, DEFAULT_CATEGORY_ICON } from '@/consts/icon.ts';
 import { DEFAULT_ACCOUNT_COLOR, DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
 
-import type {
-    TransactionStatisticResponse,
-    TransactionStatisticResponseItem,
-    TransactionStatisticTrendsResponseItem,
-    TransactionStatisticResponseItemWithInfo,
-    TransactionStatisticResponseWithInfo,
-    TransactionStatisticTrendsResponseItemWithInfo,
-    TransactionStatisticDataItemType,
-    TransactionStatisticDataItemBase,
-    TransactionCategoricalAnalysisData,
-    TransactionCategoricalAnalysisDataItem,
-    TransactionTrendsAnalysisData,
-    TransactionTrendsAnalysisDataItem,
-    TransactionTrendsAnalysisDataAmount
+import {
+    type TransactionStatisticResponse,
+    type TransactionStatisticResponseItem,
+    type TransactionStatisticTrendsResponseItem,
+    type TransactionStatisticResponseItemWithInfo,
+    type TransactionStatisticResponseWithInfo,
+    type TransactionStatisticTrendsResponseItemWithInfo,
+    type TransactionStatisticDataItemType,
+    type TransactionStatisticDataItemBase,
+    type TransactionCategoricalOverviewAnalysisData,
+    type TransactionCategoricalOverviewAnalysisDataItem,
+    type TransactionCategoricalAnalysisData,
+    type TransactionCategoricalAnalysisDataItem,
+    type TransactionTrendsAnalysisData,
+    type TransactionTrendsAnalysisDataItem,
+    type TransactionTrendsAnalysisDataAmount,
+    TransactionCategoricalOverviewAnalysisDataItemType
 } from '@/models/transaction.ts';
 
 import {
@@ -203,15 +206,34 @@ export const useStatisticsStore = defineStore('statistics', () => {
         return getCategoryTotalAmountItems(transactionCategoryStatisticsDataWithCategoryAndAccountInfo.value.items, transactionStatisticsFilter.value);
     });
 
-    const categoricalAllAnalysisData = computed<TransactionStatisticResponseWithInfo | null>(() => {
+    const categoricalOverviewAnalysisData = computed<TransactionCategoricalOverviewAnalysisData | null>(() => {
         if (!transactionCategoryStatisticsDataWithCategoryAndAccountInfo.value || !transactionCategoryStatisticsDataWithCategoryAndAccountInfo.value.items) {
             return null;
         }
 
-        const allDataItems: TransactionStatisticResponseItemWithInfo[] = [];
+        const allDataItemsMap: Record<string, TransactionCategoricalOverviewAnalysisDataItem> = {};
+        const allIncomeByPrimaryCategoryDataItems: TransactionCategoricalOverviewAnalysisDataItem[] = [];
+        const allIncomeBySecondaryCategoryDataItems: TransactionCategoricalOverviewAnalysisDataItem[] = [];
+        const allIncomeByAccountDataItems: TransactionCategoricalOverviewAnalysisDataItem[] = [];
+        const allExpenseByAccountDataItems: TransactionCategoricalOverviewAnalysisDataItem[] = [];
+        const allExpenseBySecondaryCategoryDataItems: TransactionCategoricalOverviewAnalysisDataItem[] = [];
+        const allExpenseByPrimaryCategoryDataItems: TransactionCategoricalOverviewAnalysisDataItem[] = [];
+        const allOpeningBalanceDataItems: TransactionCategoricalOverviewAnalysisDataItem[] = [];
+        const allNetCashFlowDataItems: TransactionCategoricalOverviewAnalysisDataItem[] = [];
+
+        let totalIncome: number = 0;
+        let totalExpense: number = 0;
 
         for (const item of transactionCategoryStatisticsDataWithCategoryAndAccountInfo.value.items) {
             if (!item.primaryAccount || !item.account || !item.primaryCategory || !item.category) {
+                continue;
+            }
+
+            if (item.relatedAccount && item.relatedAccountType === TransactionRelatedAccountType.TransferFrom) {
+                continue;
+            }
+
+            if (!isNumber(item.amountInDefaultCurrency)) {
                 continue;
             }
 
@@ -219,20 +241,241 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 continue;
             }
 
-            if (transactionStatisticsFilter.value.filterAccountIds && item.relatedAccount && transactionStatisticsFilter.value.filterAccountIds[item.relatedAccount.id]) {
-                continue;
-            }
-
             if (transactionStatisticsFilter.value.filterCategoryIds && transactionStatisticsFilter.value.filterCategoryIds[item.category.id]) {
                 continue;
             }
 
-            allDataItems.push(item);
+            if (item.category.type === CategoryType.Income) {
+                totalIncome += item.amountInDefaultCurrency;
+            } else if (item.category.type === CategoryType.Expense) {
+                totalExpense += item.amountInDefaultCurrency;
+            }
+
+            const incomeByAccountKey = `${TransactionCategoricalOverviewAnalysisDataItemType.IncomeByAccount}:${item.account.id}`;
+            const expenseByAccountKey = `${TransactionCategoricalOverviewAnalysisDataItemType.ExpenseByAccount}:${item.account.id}`;
+            let incomeByAccountItem: TransactionCategoricalOverviewAnalysisDataItem | undefined = allDataItemsMap[incomeByAccountKey];
+            let expenseByAccountItem: TransactionCategoricalOverviewAnalysisDataItem | undefined = allDataItemsMap[expenseByAccountKey];
+
+            if (!incomeByAccountItem) {
+                incomeByAccountItem = createNewTransactionCategoricalOverviewAnalysisDataItem(
+                    item.account.id,
+                    item.account.name,
+                    TransactionCategoricalOverviewAnalysisDataItemType.IncomeByAccount,
+                    [item.primaryAccount.category, item.primaryAccount.displayOrder, item.account.displayOrder],
+                    item.primaryAccount.hidden || item.account.hidden);
+                allDataItemsMap[incomeByAccountKey] = incomeByAccountItem;
+                allIncomeByAccountDataItems.push(incomeByAccountItem);
+            }
+
+            if (!expenseByAccountItem) {
+                expenseByAccountItem = createNewTransactionCategoricalOverviewAnalysisDataItem(
+                    item.account.id,
+                    item.account.name,
+                    TransactionCategoricalOverviewAnalysisDataItemType.ExpenseByAccount,
+                    [item.primaryAccount.category, item.primaryAccount.displayOrder, item.account.displayOrder],
+                    item.primaryAccount.hidden || item.account.hidden);
+                allDataItemsMap[expenseByAccountKey] = expenseByAccountItem;
+                allExpenseByAccountDataItems.push(expenseByAccountItem);
+            }
+
+            if (item.category.type === CategoryType.Income) {
+                const primaryCategoryItemKey = `${TransactionCategoricalOverviewAnalysisDataItemType.IncomeByPrimaryCategory}:${item.primaryCategory.id}`;
+                const secondaryCategoryItemKey = `${TransactionCategoricalOverviewAnalysisDataItemType.IncomeBySecondaryCategory}:${item.category.id}`;
+
+                let primaryCategoryDataItem: TransactionCategoricalOverviewAnalysisDataItem | undefined = allDataItemsMap[primaryCategoryItemKey];
+                let secondaryCategoryDataItem: TransactionCategoricalOverviewAnalysisDataItem | undefined = allDataItemsMap[secondaryCategoryItemKey];
+
+                if (!primaryCategoryDataItem) {
+                    primaryCategoryDataItem = createNewTransactionCategoricalOverviewAnalysisDataItem(
+                        item.primaryCategory.id,
+                        item.primaryCategory.name,
+                        TransactionCategoricalOverviewAnalysisDataItemType.IncomeByPrimaryCategory,
+                        [item.primaryCategory.displayOrder],
+                        item.primaryCategory.hidden);
+                    allDataItemsMap[primaryCategoryItemKey] = primaryCategoryDataItem;
+                    allIncomeByPrimaryCategoryDataItems.push(primaryCategoryDataItem);
+                }
+
+                if (!secondaryCategoryDataItem) {
+                    secondaryCategoryDataItem = createNewTransactionCategoricalOverviewAnalysisDataItem(
+                        item.category.id,
+                        item.category.name,
+                        TransactionCategoricalOverviewAnalysisDataItemType.IncomeBySecondaryCategory,
+                        [item.primaryCategory.displayOrder, item.category.displayOrder],
+                        item.primaryCategory.hidden || item.category.hidden);
+                    allDataItemsMap[secondaryCategoryItemKey] = secondaryCategoryDataItem;
+                    allIncomeBySecondaryCategoryDataItems.push(secondaryCategoryDataItem);
+                }
+
+                primaryCategoryDataItem.totalAmount += item.amountInDefaultCurrency;
+                primaryCategoryDataItem.totalNonNegativeAmount += item.amountInDefaultCurrency > 0 ? item.amountInDefaultCurrency : 0;
+                primaryCategoryDataItem.includeInPercent = true;
+                primaryCategoryDataItem.outflows.push({ amount: item.amountInDefaultCurrency, relatedItem: secondaryCategoryDataItem });
+
+                secondaryCategoryDataItem.totalAmount += item.amountInDefaultCurrency;
+                secondaryCategoryDataItem.totalNonNegativeAmount += item.amountInDefaultCurrency > 0 ? item.amountInDefaultCurrency : 0;
+                secondaryCategoryDataItem.includeInPercent = true;
+                secondaryCategoryDataItem.inflows.push({ amount: item.amountInDefaultCurrency, relatedItem: primaryCategoryDataItem });
+                secondaryCategoryDataItem.outflows.push({ amount: item.amountInDefaultCurrency, relatedItem: incomeByAccountItem });
+
+                incomeByAccountItem.totalAmount += item.amountInDefaultCurrency;
+                incomeByAccountItem.totalNonNegativeAmount += item.amountInDefaultCurrency > 0 ? item.amountInDefaultCurrency : 0;
+                incomeByAccountItem.includeInPercent = true;
+                incomeByAccountItem.inflows.push({ amount: item.amountInDefaultCurrency, relatedItem: secondaryCategoryDataItem });
+            } else if (item.category.type === CategoryType.Expense) {
+                const primaryCategoryItemKey = `${TransactionCategoricalOverviewAnalysisDataItemType.ExpenseByPrimaryCategory}:${item.primaryCategory.id}`;
+                const secondaryCategoryItemKey = `${TransactionCategoricalOverviewAnalysisDataItemType.ExpenseBySecondaryCategory}:${item.category.id}`;
+
+                let primaryCategoryDataItem: TransactionCategoricalOverviewAnalysisDataItem | undefined = allDataItemsMap[primaryCategoryItemKey];
+                let secondaryCategoryDataItem: TransactionCategoricalOverviewAnalysisDataItem | undefined = allDataItemsMap[secondaryCategoryItemKey];
+
+                if (!primaryCategoryDataItem) {
+                    primaryCategoryDataItem = createNewTransactionCategoricalOverviewAnalysisDataItem(
+                        item.primaryCategory.id,
+                        item.primaryCategory.name,
+                        TransactionCategoricalOverviewAnalysisDataItemType.ExpenseByPrimaryCategory,
+                        [item.primaryCategory.displayOrder],
+                        item.primaryCategory.hidden);
+                    allDataItemsMap[primaryCategoryItemKey] = primaryCategoryDataItem;
+                    allExpenseByPrimaryCategoryDataItems.push(primaryCategoryDataItem);
+                }
+
+                if (!secondaryCategoryDataItem) {
+                    secondaryCategoryDataItem = createNewTransactionCategoricalOverviewAnalysisDataItem(
+                        item.category.id,
+                        item.category.name,
+                        TransactionCategoricalOverviewAnalysisDataItemType.ExpenseBySecondaryCategory,
+                        [item.primaryCategory.displayOrder, item.category.displayOrder],
+                        item.primaryCategory.hidden || item.category.hidden);
+                    allDataItemsMap[secondaryCategoryItemKey] = secondaryCategoryDataItem;
+                    allExpenseBySecondaryCategoryDataItems.push(secondaryCategoryDataItem);
+                }
+
+                expenseByAccountItem.totalAmount += item.amountInDefaultCurrency;
+                expenseByAccountItem.totalNonNegativeAmount += item.amountInDefaultCurrency > 0 ? item.amountInDefaultCurrency : 0;
+                expenseByAccountItem.includeInPercent = true;
+                expenseByAccountItem.outflows.push({ amount: item.amountInDefaultCurrency, relatedItem: secondaryCategoryDataItem });
+
+                secondaryCategoryDataItem.totalAmount += item.amountInDefaultCurrency;
+                secondaryCategoryDataItem.totalNonNegativeAmount += item.amountInDefaultCurrency > 0 ? item.amountInDefaultCurrency : 0
+                secondaryCategoryDataItem.includeInPercent = true;
+                secondaryCategoryDataItem.inflows.push({ amount: item.amountInDefaultCurrency, relatedItem: expenseByAccountItem });
+                secondaryCategoryDataItem.outflows.push({ amount: item.amountInDefaultCurrency, relatedItem: primaryCategoryDataItem });
+
+                primaryCategoryDataItem.totalAmount += item.amountInDefaultCurrency;
+                primaryCategoryDataItem.totalNonNegativeAmount += item.amountInDefaultCurrency > 0 ? item.amountInDefaultCurrency : 0;
+                primaryCategoryDataItem.includeInPercent = true;
+                primaryCategoryDataItem.inflows.push({ amount: item.amountInDefaultCurrency, relatedItem: secondaryCategoryDataItem });
+            } else if (item.category.type === CategoryType.Transfer && item.relatedPrimaryAccount && item.relatedAccount) {
+                const transferToAccountKey = `${TransactionCategoricalOverviewAnalysisDataItemType.ExpenseByAccount}:${item.relatedAccount.id}`;
+                let transferToAccountItem: TransactionCategoricalOverviewAnalysisDataItem | undefined = allDataItemsMap[transferToAccountKey];
+
+                if (!transferToAccountItem) {
+                    transferToAccountItem = createNewTransactionCategoricalOverviewAnalysisDataItem(
+                        item.relatedAccount.id,
+                        item.relatedAccount.name,
+                        TransactionCategoricalOverviewAnalysisDataItemType.ExpenseByAccount,
+                        [item.relatedPrimaryAccount.category, item.relatedPrimaryAccount.displayOrder, item.relatedAccount.displayOrder],
+                        item.relatedPrimaryAccount.hidden || item.relatedAccount.hidden);
+                    allDataItemsMap[transferToAccountKey] = transferToAccountItem;
+                    allExpenseByAccountDataItems.push(transferToAccountItem);
+                }
+
+                incomeByAccountItem.outflows.push({ amount: item.amountInDefaultCurrency, relatedItem: transferToAccountItem });
+                transferToAccountItem.inflows.push({ amount: item.amountInDefaultCurrency, relatedItem: incomeByAccountItem });
+            }
         }
 
+        sortCategoricalOverviewAnalysisDataItems(allIncomeByPrimaryCategoryDataItems, transactionStatisticsFilter.value);
+        sortCategoricalOverviewAnalysisDataItems(allIncomeBySecondaryCategoryDataItems, transactionStatisticsFilter.value);
+        sortCategoricalOverviewAnalysisDataItems(allIncomeByAccountDataItems, transactionStatisticsFilter.value);
+        sortCategoricalOverviewAnalysisDataItems(allExpenseByAccountDataItems, transactionStatisticsFilter.value);
+        sortCategoricalOverviewAnalysisDataItems(allExpenseBySecondaryCategoryDataItems, transactionStatisticsFilter.value);
+        sortCategoricalOverviewAnalysisDataItems(allExpenseByPrimaryCategoryDataItems, transactionStatisticsFilter.value);
+
+        for (const item of allExpenseByAccountDataItems) {
+            const incomeByAccountKey = `${TransactionCategoricalOverviewAnalysisDataItemType.IncomeByAccount}:${item.id}`;
+            const incomeByAccountItem: TransactionCategoricalOverviewAnalysisDataItem | undefined = allDataItemsMap[incomeByAccountKey];
+
+            let accountTotalInflowsAmount: number = 0;
+            let accountTotalIncomeAmount: number = 0;
+            let accountTotalTransferAmount: number = 0;
+            let accountTotalOutflowsAmount: number = 0;
+
+            if (incomeByAccountItem) {
+                for (const inflow of incomeByAccountItem.inflows) {
+                    accountTotalInflowsAmount += inflow.amount;
+                    accountTotalIncomeAmount += inflow.amount;
+                }
+
+                for (const outflow of incomeByAccountItem.outflows) {
+                    accountTotalTransferAmount += outflow.amount;
+                }
+            }
+
+            for (const inflow of item.inflows) {
+                if (inflow.relatedItem.type === item.type && inflow.relatedItem.id === item.id) {
+                    continue;
+                }
+
+                accountTotalInflowsAmount += inflow.amount;
+            }
+
+            for (const outflow of item.outflows) {
+                accountTotalOutflowsAmount += outflow.amount;
+            }
+
+            const accountBalance: number = accountTotalIncomeAmount - accountTotalTransferAmount - accountTotalOutflowsAmount;
+            const accountNetCashFlow: number = accountTotalInflowsAmount - accountTotalTransferAmount - accountTotalOutflowsAmount;
+
+            if (incomeByAccountItem && accountsStore.allAccountsMap[item.id]?.isAsset) {
+                if (accountBalance > 0) { // has positive balance, transfer the amount from income account to expense account
+                    incomeByAccountItem.outflows.push({ amount: accountBalance + accountTotalOutflowsAmount, relatedItem: item });
+                    item.inflows.push({ amount: accountBalance + accountTotalOutflowsAmount, relatedItem: incomeByAccountItem });
+                } else if (accountNetCashFlow < 0) { // has negative net cash flow, add the difference to income account
+                    incomeByAccountItem.totalAmount += -accountNetCashFlow;
+                    incomeByAccountItem.totalNonNegativeAmount += -accountNetCashFlow > 0 ? -accountNetCashFlow : 0;
+                    incomeByAccountItem.outflows.push({ amount: -accountNetCashFlow, relatedItem: item });
+                    item.inflows.push({ amount: -accountNetCashFlow, relatedItem: incomeByAccountItem });
+                }
+            }
+
+            if (accountNetCashFlow > 0) {
+                let netCashFlowItem: TransactionCategoricalOverviewAnalysisDataItem | undefined = allDataItemsMap[TransactionCategoricalOverviewAnalysisDataItemType.NetCashFlow];
+
+                if (!netCashFlowItem) {
+                    netCashFlowItem = createNewTransactionCategoricalOverviewAnalysisDataItem(
+                        TransactionCategoricalOverviewAnalysisDataItemType.NetCashFlow,
+                        'Net Cash Flow',
+                        TransactionCategoricalOverviewAnalysisDataItemType.NetCashFlow,
+                        [Number.MAX_SAFE_INTEGER],
+                        false);
+                    allDataItemsMap[TransactionCategoricalOverviewAnalysisDataItemType.NetCashFlow] = netCashFlowItem;
+                    allNetCashFlowDataItems.push(netCashFlowItem);
+                }
+
+                item.outflows.push({ amount: accountNetCashFlow, relatedItem: netCashFlowItem });
+
+                netCashFlowItem.totalAmount += accountNetCashFlow;
+                netCashFlowItem.totalNonNegativeAmount += accountNetCashFlow > 0 ? accountNetCashFlow : 0;
+                netCashFlowItem.inflows.push({ amount: accountNetCashFlow, relatedItem: item });
+            }
+        }
+
+        const allDataItems: TransactionCategoricalOverviewAnalysisDataItem[] = [
+            ...allIncomeByPrimaryCategoryDataItems,
+            ...allIncomeBySecondaryCategoryDataItems,
+            ...allIncomeByAccountDataItems,
+            ...allOpeningBalanceDataItems,
+            ...allExpenseByAccountDataItems,
+            ...allExpenseBySecondaryCategoryDataItems,
+            ...allNetCashFlowDataItems,
+            ...allExpenseByPrimaryCategoryDataItems
+        ];
+
         return {
-            startTime: transactionCategoryStatisticsDataWithCategoryAndAccountInfo.value.startTime,
-            endTime: transactionCategoryStatisticsDataWithCategoryAndAccountInfo.value.endTime,
+            totalIncome: totalIncome,
+            totalExpense: totalExpense,
             items: allDataItems
         };
     });
@@ -465,6 +708,42 @@ export const useStatisticsStore = defineStore('statistics', () => {
 
         return trendsData;
     });
+
+    function createNewTransactionCategoricalOverviewAnalysisDataItem(id: string, name: string, type: TransactionCategoricalOverviewAnalysisDataItemType, displayOrders: number[], hidden: boolean): TransactionCategoricalOverviewAnalysisDataItem {
+        const dataItem: TransactionCategoricalOverviewAnalysisDataItem = {
+            id: id,
+            name: name,
+            type: type,
+            displayOrders: displayOrders,
+            hidden: hidden,
+            inflows: [],
+            outflows: [],
+            totalAmount: 0,
+            totalNonNegativeAmount: 0
+        };
+
+        return dataItem;
+    }
+
+    function sortCategoricalOverviewAnalysisDataItems(items: TransactionCategoricalOverviewAnalysisDataItem[], transactionStatisticsFilter: TransactionStatisticsFilter): void {
+        let totalNonNegativeAmount: number = 0;
+
+        for (const item of items) {
+            totalNonNegativeAmount += item.totalNonNegativeAmount;
+        }
+
+        if (totalNonNegativeAmount > 0) {
+            for (const item of items) {
+                if (!item.includeInPercent) {
+                    continue;
+                }
+
+                item.percent = item.totalAmount * 100 / totalNonNegativeAmount;
+            }
+        }
+
+        sortStatisticsItems(items, transactionStatisticsFilter.sortingType);
+    }
 
     function assembleAccountAndCategoryInfo(items: TransactionStatisticResponseItem[]): TransactionStatisticResponseItemWithInfo[] {
         const finalItems: TransactionStatisticResponseItemWithInfo[] = [];
@@ -1289,7 +1568,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
         transactionStatisticsStateInvalid,
         // computed states
         categoricalAnalysisChartDataCategory,
-        categoricalAllAnalysisData,
+        categoricalOverviewAnalysisData,
         categoricalAnalysisData,
         trendsAnalysisData,
         // functions

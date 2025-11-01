@@ -20,7 +20,7 @@ import {
 import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
 
 import type {
-    TransactionStatisticResponseWithInfo,
+    TransactionCategoricalOverviewAnalysisData,
     TransactionCategoricalAnalysisData,
     TransactionCategoricalAnalysisDataItem,
     TransactionTrendsAnalysisData
@@ -249,8 +249,8 @@ export function useStatisticsTransactionPageBase() {
             query.value.chartDataType === ChartDataType.NetIncome.type;
     });
 
+    const categoricalOverviewAnalysisData = computed<TransactionCategoricalOverviewAnalysisData | null>(() => statisticsStore.categoricalOverviewAnalysisData);
     const categoricalAnalysisData = computed<TransactionCategoricalAnalysisData>(() => statisticsStore.categoricalAnalysisData);
-    const categoricalAllAnalysisData = computed<TransactionStatisticResponseWithInfo | null>(() => statisticsStore.categoricalAllAnalysisData);
     const trendsAnalysisData = computed<TransactionTrendsAnalysisData | null>(() => statisticsStore.trendsAnalysisData);
 
     function canShowCustomDateRange(dateRangeType: number): boolean {
@@ -323,8 +323,8 @@ export function useStatisticsTransactionPageBase() {
         showTotalAmountInTrendsChart,
         showStackedInTrendsChart,
         translateNameInTrendsChart,
+        categoricalOverviewAnalysisData,
         categoricalAnalysisData,
-        categoricalAllAnalysisData,
         trendsAnalysisData,
         // functions
         canShowCustomDateRange,

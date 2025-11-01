@@ -762,6 +762,41 @@ export interface TransactionStatisticDataItemBase extends SortableTransactionSta
     readonly totalAmount: number;
 }
 
+export interface TransactionCategoricalOverviewAnalysisData {
+    readonly totalIncome: number;
+    readonly totalExpense: number;
+    readonly items: TransactionCategoricalOverviewAnalysisDataItem[];
+}
+
+export enum TransactionCategoricalOverviewAnalysisDataItemType {
+    IncomeByPrimaryCategory = 'incomeByPrimaryCategory',
+    IncomeBySecondaryCategory = 'incomeBySecondaryCategory',
+    IncomeByAccount = 'incomeByAccount',
+    ExpenseByAccount = 'expenseByAccount',
+    NetCashFlow = 'netCashFlow',
+    ExpenseBySecondaryCategory = 'expenseBySecondaryCategory',
+    ExpenseByPrimaryCategory = 'expenseByPrimaryCategory'
+}
+
+export interface TransactionCategoricalOverviewAnalysisDataItem extends SortableTransactionStatisticDataItem {
+    readonly id: string;
+    readonly name: string;
+    readonly type: TransactionCategoricalOverviewAnalysisDataItemType;
+    readonly displayOrders: number[];
+    readonly hidden: boolean;
+    readonly inflows: TransactionCategoricalOverviewAnalysisDataItemOutflowItem[];
+    readonly outflows: TransactionCategoricalOverviewAnalysisDataItemOutflowItem[];
+    totalAmount: number;
+    totalNonNegativeAmount: number;
+    includeInPercent?: boolean;
+    percent?: number;
+}
+
+export interface TransactionCategoricalOverviewAnalysisDataItemOutflowItem {
+    readonly relatedItem: TransactionCategoricalOverviewAnalysisDataItem;
+    amount: number;
+}
+
 export interface TransactionCategoricalAnalysisData {
     readonly totalAmount: number;
     readonly items: TransactionCategoricalAnalysisDataItem[];

@@ -14,33 +14,31 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useUserStore } from '@/stores/user.ts';
 
-import type {
-    SortableTransactionStatisticDataItem,
-    TransactionStatisticResponseItemWithInfo
+import {
+    type TransactionCategoricalOverviewAnalysisDataItem,
+    type TransactionCategoricalOverviewAnalysisDataItemOutflowItem,
+    TransactionCategoricalOverviewAnalysisDataItemType
 } from '@/models/transaction.ts';
-import type { Account } from '@/models/account.ts';
 
 import { values } from '@/core/base.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { CategoryType } from '@/core/category.ts';
-import { TransactionRelatedAccountType } from '@/core/transaction.ts';
 
 import { isNumber } from '@/lib/common.ts';
-import { sortStatisticsItems } from '@/lib/statistics.ts';
 import { getExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 enum SankeyChartDepth {
     PrimaryIncomeCategory = 0,
     SecondaryIncomeCategory = 1,
-    Account = 2,
-    AccountWithTransfer = 3,
+    AccountForIncome = 2,
+    AccountForExpense = 3,
     SecondaryExpenseCategory = 4,
     PrimaryExpenseCategory = 5
 }
 
 enum SankeyChartNodeItemType {
     Account = 'account',
-    Category = 'category'
+    Category = 'category',
+    NetCashFlow = 'netCashFlow'
 }
 
 interface SankeyChartData {
@@ -48,16 +46,20 @@ interface SankeyChartData {
     links: SankeyChartLinkItem[];
 }
 
-interface SankeyChartNodeItem extends SortableTransactionStatisticDataItem {
+interface SankeyChartNodeItem {
+    dateItemType: TransactionCategoricalOverviewAnalysisDataItemType;
     itemType: SankeyChartNodeItemType;
     itemId: string;
     name: string;
-    nameId: string;
     displayName: string;
-    displayOrders: number[];
     totalAmount: number;
+    accountNetCashFlow?: number;
     percent?: number;
     depth: number;
+    itemStyle?: {
+        color?: string;
+        opacity?: number;
+    }
 }
 
 interface SankeyChartLinkItem {
@@ -74,8 +76,7 @@ interface SankeyChartLinkItem {
 
 const props = defineProps<{
     skeleton?: boolean;
-    items: TransactionStatisticResponseItemWithInfo[];
-    sortingType: number;
+    items: TransactionCategoricalOverviewAnalysisDataItem[];
     defaultCurrency?: string;
     enableClickItem?: boolean;
 }>();
@@ -87,229 +88,133 @@ const emit = defineEmits<{
 const theme = useTheme();
 
 const {
+    tt,
     formatAmountToLocalizedNumeralsWithCurrency,
     formatPercentToLocalizedNumerals
 } = useI18n();
 
 const userStore = useUserStore();
 
+const overviewDataItemTypeSankeyChartNodeItemTypeMap: Record<TransactionCategoricalOverviewAnalysisDataItemType, SankeyChartNodeItemType> = {
+    [TransactionCategoricalOverviewAnalysisDataItemType.IncomeByPrimaryCategory]: SankeyChartNodeItemType.Category,
+    [TransactionCategoricalOverviewAnalysisDataItemType.IncomeBySecondaryCategory]: SankeyChartNodeItemType.Category,
+    [TransactionCategoricalOverviewAnalysisDataItemType.IncomeByAccount]: SankeyChartNodeItemType.Account,
+    [TransactionCategoricalOverviewAnalysisDataItemType.ExpenseByAccount]: SankeyChartNodeItemType.Account,
+    [TransactionCategoricalOverviewAnalysisDataItemType.NetCashFlow]: SankeyChartNodeItemType.NetCashFlow,
+    [TransactionCategoricalOverviewAnalysisDataItemType.ExpenseBySecondaryCategory]: SankeyChartNodeItemType.Category,
+    [TransactionCategoricalOverviewAnalysisDataItemType.ExpenseByPrimaryCategory]: SankeyChartNodeItemType.Category
+};
+
+const overviewDataItemTypeSankeyChartNodeItemDepthMap: Record<TransactionCategoricalOverviewAnalysisDataItemType, number> = {
+    [TransactionCategoricalOverviewAnalysisDataItemType.IncomeByPrimaryCategory]: SankeyChartDepth.PrimaryIncomeCategory,
+    [TransactionCategoricalOverviewAnalysisDataItemType.IncomeBySecondaryCategory]: SankeyChartDepth.SecondaryIncomeCategory,
+    [TransactionCategoricalOverviewAnalysisDataItemType.IncomeByAccount]: SankeyChartDepth.AccountForIncome,
+    [TransactionCategoricalOverviewAnalysisDataItemType.ExpenseByAccount]: SankeyChartDepth.AccountForExpense,
+    [TransactionCategoricalOverviewAnalysisDataItemType.NetCashFlow]: SankeyChartDepth.SecondaryExpenseCategory,
+    [TransactionCategoricalOverviewAnalysisDataItemType.ExpenseBySecondaryCategory]: SankeyChartDepth.SecondaryExpenseCategory,
+    [TransactionCategoricalOverviewAnalysisDataItemType.ExpenseByPrimaryCategory]: SankeyChartDepth.PrimaryExpenseCategory
+};
+
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 
 const sankeyData = computed<SankeyChartData>(() => {
-    const primaryIncomeCategoryNodesMap: Record<string, SankeyChartNodeItem> = {};
-    const secondaryIncomeCategoryNodesMap: Record<string, SankeyChartNodeItem> = {};
-    const incomeAccountNodesMap: Record<string, SankeyChartNodeItem> = {};
-    const expenseAccountNodesMap: Record<string, SankeyChartNodeItem> = {};
-    const secondaryExpenseCategoryNodesMap: Record<string, SankeyChartNodeItem> = {};
-    const primaryExpenseCategoryNodesMap: Record<string, SankeyChartNodeItem> = {};
-    const linksMap: Record<string, SankeyChartLinkItem> = {};
-    const accountsMap: Record<string, Account> = {};
+    const nodes: SankeyChartNodeItem[] = [];
+    const links: SankeyChartLinkItem[] = [];
 
     for (const item of props.items) {
-        if (!item.primaryAccount || !item.account || !item.primaryCategory || !item.category || !item.amountInDefaultCurrency) {
+        if (item.hidden) {
             continue;
         }
 
-        if (item.account.hidden || item.primaryAccount.hidden || item.category.hidden || item.primaryCategory.hidden) {
+        const itemType = overviewDataItemTypeSankeyChartNodeItemTypeMap[item.type];
+        const depth = overviewDataItemTypeSankeyChartNodeItemDepthMap[item.type];
+
+        if (!itemType || itemType === SankeyChartNodeItemType.NetCashFlow || depth === undefined) {
             continue;
         }
 
-        if (item.relatedAccount && (item.relatedAccountType === TransactionRelatedAccountType.TransferFrom || item.relatedAccount.hidden || !item.relatedPrimaryAccount || item.relatedPrimaryAccount.hidden)) {
+        if (item.totalAmount === 0 && item.outflows.length === 0) {
             continue;
         }
 
-        const incomeAccountNameId = `income_account:${item.account.id}`;
-        const expenseAccountNameId = `expense_account:${item.account.id}`;
-        accountsMap[item.account.id] = item.account;
+        const nodeItem: SankeyChartNodeItem = {
+            dateItemType: item.type,
+            itemType: itemType,
+            itemId: item.id,
+            name: `${item.type}:${item.id}`,
+            displayName: item.name,
+            totalAmount: item.totalAmount,
+            percent: item.percent,
+            depth: depth
+        };
 
-        updateNodeItem(incomeAccountNodesMap, {
-            itemType: SankeyChartNodeItemType.Account,
-            id: item.account.id,
-            name: item.account.name,
-            nameId: incomeAccountNameId,
-            displayOrders: [item.account.displayOrder],
-            amount: item.primaryCategory.type == CategoryType.Income ? item.amountInDefaultCurrency : 0,
-            depth: SankeyChartDepth.Account
-        });
-
-        updateNodeItem(expenseAccountNodesMap, {
-            itemType: SankeyChartNodeItemType.Account,
-            id: item.account.id,
-            name: item.account.name,
-            nameId: expenseAccountNameId,
-            displayOrders: [item.account.displayOrder],
-            amount: item.primaryCategory.type == CategoryType.Expense ? item.amountInDefaultCurrency : 0,
-            depth: SankeyChartDepth.AccountWithTransfer
-        });
-
-        if (item.primaryCategory.type == CategoryType.Income) {
-            updateNodeItem(primaryIncomeCategoryNodesMap, {
-                itemType: SankeyChartNodeItemType.Category,
-                id: item.primaryCategory.id,
-                name: item.primaryCategory.name,
-                nameId: item.primaryCategory.id,
-                displayOrders: [item.primaryCategory.displayOrder],
-                amount: item.amountInDefaultCurrency,
-                depth: SankeyChartDepth.PrimaryIncomeCategory
-            });
-
-            updateNodeItem(secondaryIncomeCategoryNodesMap, {
-                itemType: SankeyChartNodeItemType.Category,
-                id: item.category.id,
-                name: item.category.name,
-                nameId: item.category.id,
-                displayOrders: [item.primaryCategory.displayOrder, item.category.displayOrder],
-                amount: item.amountInDefaultCurrency,
-                depth: SankeyChartDepth.SecondaryIncomeCategory
-            });
-
-            updateLinkItem(linksMap, {
-                sourceItemType: SankeyChartNodeItemType.Category,
-                sourceItemId: item.primaryCategory.id,
-                source: item.primaryCategory.id,
-                sourceName: item.primaryCategory.name,
-                targetItemType: SankeyChartNodeItemType.Category,
-                targetItemId: item.category.id,
-                target: item.category.id,
-                targetName: item.category.name,
-                value: item.amountInDefaultCurrency
-            });
-
-            updateLinkItem(linksMap, {
-                sourceItemType: SankeyChartNodeItemType.Category,
-                sourceItemId: item.category.id,
-                source: item.category.id,
-                sourceName: item.category.name,
-                targetItemType: SankeyChartNodeItemType.Account,
-                targetItemId: item.account.id,
-                target: incomeAccountNameId,
-                targetName: item.account.name,
-                value: item.amountInDefaultCurrency
-            });
-        } else if (item.primaryCategory.type == CategoryType.Expense) {
-            updateNodeItem(secondaryExpenseCategoryNodesMap, {
-                itemType: SankeyChartNodeItemType.Category,
-                id: item.category.id,
-                name: item.category.name,
-                nameId: item.category.id,
-                displayOrders: [item.primaryCategory.displayOrder, item.category.displayOrder],
-                amount: item.amountInDefaultCurrency,
-                depth: SankeyChartDepth.SecondaryExpenseCategory
-            });
-
-            updateNodeItem(primaryExpenseCategoryNodesMap, {
-                itemType: SankeyChartNodeItemType.Category,
-                id: item.primaryCategory.id,
-                name: item.primaryCategory.name,
-                nameId: item.primaryCategory.id,
-                displayOrders: [item.primaryCategory.displayOrder],
-                amount: item.amountInDefaultCurrency,
-                depth: SankeyChartDepth.PrimaryExpenseCategory
-            });
-
-            updateLinkItem(linksMap, {
-                sourceItemType: SankeyChartNodeItemType.Account,
-                sourceItemId: item.account.id,
-                source: expenseAccountNameId,
-                sourceName: item.account.name,
-                targetItemType: SankeyChartNodeItemType.Category,
-                targetItemId: item.category.id,
-                target: item.category.id,
-                targetName: item.category.name,
-                value: item.amountInDefaultCurrency
-            });
-
-            updateLinkItem(linksMap, {
-                sourceItemType: SankeyChartNodeItemType.Category,
-                sourceItemId: item.category.id,
-                source: item.category.id,
-                sourceName: item.category.name,
-                targetItemType: SankeyChartNodeItemType.Category,
-                targetItemId: item.primaryCategory.id,
-                target: item.primaryCategory.id,
-                targetName: item.primaryCategory.name,
-                value: item.amountInDefaultCurrency
-            });
-        } else if (item.primaryCategory.type == CategoryType.Transfer && item.relatedAccount) {
-            const relatedAccountNameId = `expense_account:${item.relatedAccount.id}`;
-            accountsMap[item.relatedAccount.id] = item.relatedAccount;
-            updateLinkItem(linksMap, {
-                sourceItemType: SankeyChartNodeItemType.Account,
-                sourceItemId: item.account.id,
-                source: incomeAccountNameId,
-                sourceName: item.account.name,
-                targetItemType: SankeyChartNodeItemType.Account,
-                targetItemId: item.relatedAccount.id,
-                target: relatedAccountNameId,
-                targetName: item.relatedAccount.name,
-                value: item.amountInDefaultCurrency
-            });
+        if (!isNumber(nodeItem.percent) && nodeItem.dateItemType === TransactionCategoricalOverviewAnalysisDataItemType.IncomeByAccount) {
+            nodeItem.itemStyle = {
+                color: '#aaa',
+                opacity: 0.5
+            };
         }
-    }
 
-    for (const account of values(accountsMap)) {
-        const incomeAccountNameId = `income_account:${account.id}`;
-        const expenseAccountNameId = `expense_account:${account.id}`;
+        if (nodeItem.dateItemType === TransactionCategoricalOverviewAnalysisDataItemType.ExpenseByAccount) {
+            for (const outflowItem of item.outflows) {
+                if (outflowItem.relatedItem.type !== TransactionCategoricalOverviewAnalysisDataItemType.NetCashFlow) {
+                    continue;
+                }
 
-        let totalOutflowAmount = 0;
-        let totalInflowAmount = 0;
-
-        for (const link of values(linksMap)) {
-            if (link.sourceItemType === SankeyChartNodeItemType.Account && link.sourceItemId === account.id) {
-                totalOutflowAmount += link.value;
-            } else if (link.targetItemType === SankeyChartNodeItemType.Account && link.targetItemId === account.id) {
-                totalInflowAmount += link.value;
+                nodeItem.accountNetCashFlow = (nodeItem.accountNetCashFlow ?? 0) + outflowItem.amount;
             }
         }
 
-        const amountDifference = totalOutflowAmount - totalInflowAmount;
+        nodes.push(nodeItem);
 
-        if (amountDifference > 0) {
-            updateNodeItem(incomeAccountNodesMap, {
-                itemType: SankeyChartNodeItemType.Account,
-                id: account.id,
-                name: account.name,
-                nameId: incomeAccountNameId,
-                displayOrders: [account.displayOrder],
-                amount: amountDifference,
-                depth: SankeyChartDepth.AccountWithTransfer
-            });
-        } else if (amountDifference < 0) {
-            updateNodeItem(expenseAccountNodesMap, {
-                itemType: SankeyChartNodeItemType.Account,
-                id: account.id,
-                name: account.name,
-                nameId: expenseAccountNameId,
-                displayOrders: [account.displayOrder],
-                amount: -amountDifference,
-                depth: SankeyChartDepth.AccountWithTransfer
-            });
+        const combinedOutflows: Record<string, TransactionCategoricalOverviewAnalysisDataItemOutflowItem> = {};
+
+        for (const outflowItem of item.outflows) {
+            const relatedItem = outflowItem.relatedItem;
+
+            if (!relatedItem) {
+                continue;
+            }
+
+            if (outflowItem.relatedItem) {
+                const key = `${item.type}:${item.id}-${outflowItem.relatedItem.type}:${outflowItem.relatedItem.id}`;
+                let combinedOutflow: TransactionCategoricalOverviewAnalysisDataItemOutflowItem | undefined = combinedOutflows[key];
+
+                if (!combinedOutflow) {
+                    combinedOutflow = {
+                        relatedItem: outflowItem.relatedItem,
+                        amount: 0
+                    };
+                    combinedOutflows[key] = combinedOutflow;
+                }
+
+                combinedOutflow.amount += outflowItem.amount;
+            }
         }
 
-        if (Math.abs(amountDifference) > 0) {
-            updateLinkItem(linksMap, {
-                sourceItemType: SankeyChartNodeItemType.Account,
-                sourceItemId: account.id,
-                source: incomeAccountNameId,
-                sourceName: account.name,
-                targetItemType: SankeyChartNodeItemType.Account,
-                targetItemId: account.id,
-                target: expenseAccountNameId,
-                targetName: account.name,
-                value: Math.abs(amountDifference)
-            });
+        for (const outflowItem of values(combinedOutflows)) {
+            const relatedItem = outflowItem.relatedItem;
+            const transferItemType = overviewDataItemTypeSankeyChartNodeItemTypeMap[relatedItem.type];
+
+            if (!transferItemType) {
+                continue;
+            }
+
+            const linkItem: SankeyChartLinkItem = {
+                sourceItemType: itemType,
+                sourceItemId: item.id,
+                source: `${item.type}:${item.id}`,
+                sourceDisplayName: item.name,
+                targetItemType: transferItemType,
+                targetItemId: relatedItem.id,
+                target: `${relatedItem.type}:${relatedItem.id}`,
+                targetDisplayName: relatedItem.name,
+                value: outflowItem.amount
+            };
+
+            links.push(linkItem);
         }
     }
-
-    const nodes: SankeyChartNodeItem[] = [];
-    const links: SankeyChartLinkItem[] = [];
-    addFinalSortedNodeItems(primaryIncomeCategoryNodesMap, nodes);
-    addFinalSortedNodeItems(secondaryIncomeCategoryNodesMap, nodes);
-    addFinalSortedNodeItems(incomeAccountNodesMap, nodes);
-    addFinalSortedNodeItems(expenseAccountNodesMap, nodes);
-    addFinalSortedNodeItems(secondaryExpenseCategoryNodesMap, nodes);
-    addFinalSortedNodeItems(primaryExpenseCategoryNodesMap, nodes);
-    addFinalLinkItems(linksMap, links);
 
     const ret: SankeyChartData = {
         nodes: nodes,
@@ -335,15 +240,44 @@ const chartOptions = computed<object>(() => {
                     const dataItem = params.data as SankeyChartNodeItem;
                     const value = dataItem.totalAmount;
                     const displayValue = formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency);
+                    let displayTypeName = '';
+
+                    if (dataItem.dateItemType === TransactionCategoricalOverviewAnalysisDataItemType.IncomeByPrimaryCategory) {
+                        displayTypeName = tt('Income By Primary Category');
+                    } else if (dataItem.dateItemType === TransactionCategoricalOverviewAnalysisDataItemType.IncomeBySecondaryCategory) {
+                        displayTypeName = tt('Income By Secondary Category');
+                    } else if (dataItem.dateItemType === TransactionCategoricalOverviewAnalysisDataItemType.IncomeByAccount) {
+                        displayTypeName = tt('Income By Account');
+                    } else if (dataItem.dateItemType === TransactionCategoricalOverviewAnalysisDataItemType.ExpenseByAccount) {
+                        displayTypeName = tt('Expense By Account');
+                    } else if (dataItem.dateItemType === TransactionCategoricalOverviewAnalysisDataItemType.NetCashFlow) {
+                        displayTypeName = tt('Net Cash Flow');
+                    } else if (dataItem.dateItemType === TransactionCategoricalOverviewAnalysisDataItemType.ExpenseBySecondaryCategory) {
+                        displayTypeName = tt('Expense By Secondary Category');
+                    } else if (dataItem.dateItemType === TransactionCategoricalOverviewAnalysisDataItemType.ExpenseByPrimaryCategory) {
+                        displayTypeName = tt('Expense By Primary Category');
+                    }
 
                     let tooltip = `<div><span>${dataItem.displayName}</span>`;
 
-                    if (isNumber(dataItem.percent)) {
+                    if (displayTypeName && (dataItem.dateItemType !== TransactionCategoricalOverviewAnalysisDataItemType.IncomeByAccount || isNumber(dataItem.percent))) {
+                        tooltip = `<div class="mb-1">${displayTypeName}</div>` + tooltip;
+                    } else if (dataItem.dateItemType === TransactionCategoricalOverviewAnalysisDataItemType.IncomeByAccount) {
+                        tooltip = `<div class="mb-1">${tt('Account Balance')}</div>` + tooltip;
+                    }
+
+                    if (isNumber(dataItem.percent) && dataItem.percent > 0) {
                         const displayPercent = formatPercentToLocalizedNumerals(dataItem.percent, 2, '&lt;0.01');
                         tooltip += `<span class="ms-1" style="float: inline-end">(${displayPercent})</span>`;
                     }
 
                     tooltip += `<span class="ms-5" style="float: inline-end">${displayValue}</span></div>`;
+
+                    if (isNumber(dataItem.accountNetCashFlow) && dataItem.accountNetCashFlow !== 0) {
+                        const displayAccountNetCashFlow = formatAmountToLocalizedNumeralsWithCurrency(dataItem.accountNetCashFlow, props.defaultCurrency);
+                        tooltip += `<div class="mt-1"><span>${tt('Net Cash Flow')}</span><span class="ms-5" style="float: inline-end">${displayAccountNetCashFlow}</span></div>`;
+                    }
+
                     return tooltip;
                 } else if (params.dataType === 'edge') {
                     const dataItem = params.data as SankeyChartLinkItem;
@@ -359,7 +293,7 @@ const chartOptions = computed<object>(() => {
             {
                 type: 'sankey',
                 left: 10,
-                top: 10,
+                top: 0,
                 bottom: 10,
                 roam: true,
                 layoutIterations: 0,
@@ -393,7 +327,7 @@ const chartOptions = computed<object>(() => {
                         }
                     },
                     {
-                        depth: SankeyChartDepth.Account,
+                        depth: SankeyChartDepth.AccountForIncome,
                         itemStyle: {
                             color: '#c07d43',
                             opacity: 0.5
@@ -404,7 +338,7 @@ const chartOptions = computed<object>(() => {
                         }
                     },
                     {
-                        depth: SankeyChartDepth.AccountWithTransfer,
+                        depth: SankeyChartDepth.AccountForExpense,
                         itemStyle: {
                             color: '#c07d43',
                             opacity: 0.5
@@ -448,78 +382,6 @@ const chartOptions = computed<object>(() => {
     };
 });
 
-function updateNodeItem(nodesMap: Record<string, SankeyChartNodeItem>, { itemType, id, name, nameId, displayOrders, amount, depth }: { itemType: SankeyChartNodeItemType, id: string, name: string, nameId: string, displayOrders: number[], amount: number, depth: number }) {
-    const node: SankeyChartNodeItem | undefined = nodesMap[nameId];
-
-    if (!node) {
-        nodesMap[nameId] = {
-            itemType: itemType,
-            itemId: id,
-            name: name,
-            nameId: nameId,
-            displayName: name,
-            displayOrders: displayOrders,
-            totalAmount: amount,
-            depth: depth
-        };
-    } else {
-        node.totalAmount += amount;
-    }
-}
-
-function updateLinkItem(linksMap: Record<string, SankeyChartLinkItem>, { sourceItemType, sourceItemId, source, sourceName, targetItemType, targetItemId, target, targetName, value }: { sourceItemType: SankeyChartNodeItemType, sourceItemId: string, source: string, sourceName: string, targetItemType: SankeyChartNodeItemType, targetItemId: string, target: string, targetName: string, value: number }) {
-    const key = `${source}:${target}`;
-    const link: SankeyChartLinkItem | undefined = linksMap[key];
-
-    if (!link) {
-        linksMap[key] = {
-            sourceItemType: sourceItemType,
-            sourceItemId: sourceItemId,
-            source: source,
-            sourceDisplayName: sourceName,
-            targetItemType: targetItemType,
-            targetItemId: targetItemId,
-            target: target,
-            targetDisplayName: targetName,
-            value: value
-        };
-    } else {
-        link.value += value;
-    }
-}
-
-function addFinalSortedNodeItems(nodesMap: Record<string, SankeyChartNodeItem>, allNodesArray: SankeyChartNodeItem[]): void {
-    const nodesArray: SankeyChartNodeItem[] = [];
-    let totalAmount = 0;
-
-    for (const node of values(nodesMap)) {
-        if (node.totalAmount > 0) {
-            totalAmount += node.totalAmount;
-        }
-
-        nodesArray.push(node);
-    }
-
-    sortStatisticsItems(nodesArray, props.sortingType);
-
-    for (const node of nodesArray) {
-        node.name = node.nameId;
-        node.percent = node.totalAmount > 0 && totalAmount > 0 ? (node.totalAmount / totalAmount) * 100 : undefined;
-    }
-
-    allNodesArray.push(...nodesArray);
-}
-
-function addFinalLinkItems(linksMap: Record<string, SankeyChartLinkItem>, allLinksArray: SankeyChartLinkItem[]): void {
-    const linksArray: SankeyChartLinkItem[] = [];
-
-    for (const link of values(linksMap)) {
-        linksArray.push(link);
-    }
-
-    allLinksArray.push(...linksArray);
-}
-
 function clickItem(e: ECElementEvent): void {
     if (!props.enableClickItem || e.componentType !== 'series' || e.seriesType !=='sankey') {
         return;
@@ -531,13 +393,22 @@ function clickItem(e: ECElementEvent): void {
 
     if (e.dataType === 'node') {
         const dataItem = e.data as SankeyChartNodeItem;
+
+        if (dataItem.itemType === SankeyChartNodeItemType.NetCashFlow) {
+            return;
+        }
+
         emit('click', dataItem.itemType, dataItem.itemId);
     } else if (e.dataType === 'edge') {
         const dataItem = e.data as SankeyChartLinkItem;
 
+        if (dataItem.sourceItemType === SankeyChartNodeItemType.NetCashFlow) {
+            return;
+        }
+
         if (dataItem.sourceItemType === dataItem.targetItemType && dataItem.sourceItemId === dataItem.targetItemId) {
             emit('click', dataItem.sourceItemType, dataItem.sourceItemId);
-        } else {
+        } else if (dataItem.targetItemType !== SankeyChartNodeItemType.NetCashFlow) {
             emit('click', dataItem.sourceItemType, dataItem.sourceItemId, dataItem.targetItemType, dataItem.targetItemId);
         }
     }

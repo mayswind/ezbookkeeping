@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"math"
 	"strings"
 	"time"
 
@@ -383,7 +384,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 		}
 	}
 
-	maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(time.Now().Unix())
+	maxTransactionTime := int64(math.MaxInt64)
 	minTransactionTime := int64(0)
 
 	if exportTransactionDataReq.MaxTime > 0 {

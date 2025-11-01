@@ -316,6 +316,7 @@ const chartOptions = computed<object>(() => {
             formatter: (params: CallbackDataParams[]) => {
                 let tooltip = '';
                 let totalAmount = 0;
+                let actualDisplayItemCount = 0;
                 const displayItems: MonthlyTrendsChartTooltipItem[] = [];
 
                 for (const param of params) {
@@ -343,12 +344,13 @@ const chartOptions = computed<object>(() => {
                         tooltip += '<div><span class="chart-pointer" style="background-color: ' + item.color + '"></span>';
                         tooltip += `<span>${item.name}</span><span class="ms-5" style="float: inline-end">${value}</span><br/>`;
                         tooltip += '</div>';
+                        actualDisplayItemCount++;
                     }
                 }
 
                 if (props.showTotalAmountInTooltip) {
                     const displayTotalAmount = formatAmountToLocalizedNumeralsWithCurrency(totalAmount, props.defaultCurrency);
-                    tooltip = '<div style="border-bottom: ' + (isDarkMode.value ? '#eee' : '#333') + ' dashed 1px">'
+                    tooltip = (actualDisplayItemCount > 0 ? '<div style="border-bottom: ' + (isDarkMode.value ? '#eee' : '#333') + ' dashed 1px">' : '<div></div>')
                         + '<span class="chart-pointer" style="background-color: ' + (isDarkMode.value ? '#eee' : '#333') + '"></span>'
                         + `<span>${tt('Total Amount')}</span><span class="ms-5" style="float: inline-end">${displayTotalAmount}</span><br/>`
                         + '</div>' + tooltip;

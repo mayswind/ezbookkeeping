@@ -318,6 +318,7 @@ func startWebServer(c *core.CliContext) error {
 		{
 			// Tokens
 			apiV1Route.GET("/tokens/list.json", bindApi(api.Tokens.TokenListHandler))
+			apiV1Route.POST("/tokens/generate/api.json", bindApi(api.Tokens.TokenGenerateAPIHandler))
 			apiV1Route.POST("/tokens/generate/mcp.json", bindApi(api.Tokens.TokenGenerateMCPHandler))
 			apiV1Route.POST("/tokens/revoke.json", bindApi(api.Tokens.TokenRevokeHandler))
 			apiV1Route.POST("/tokens/revoke_all.json", bindApi(api.Tokens.TokenRevokeAllHandler))

@@ -107,6 +107,10 @@
             "EndYY": "{EndYY}財政年度"
         },
         "misc": {
+            "nHour": "{n} 小時",
+            "nHours": "{n} 小時",
+            "nDay": "{n} 天",
+            "nDays": "{n} 天",
             "multiTextJoinSeparator": "、",
             "loginWithCustomProvider": "使用 {name} 登入",
             "hoursBehindDefaultTimezone": "比預設時區晚{hours}小時",
@@ -1105,6 +1109,7 @@
         "token is empty": "驗證令牌為空",
         "email verify token is invalid or expired": "電子郵件驗證令牌無效或已過期",
         "password reset token is invalid or expired": "密碼重設令牌無效或已過期",
+        "not allowed to generate api token": "不允許產生 API 認證令牌",
         "passcode is invalid": "驗證碼無效",
         "two-factor backup code is invalid": "二步驟驗證備用碼無效",
         "two-factor is not enabled": "二步驟驗證沒有啟用",
@@ -1307,7 +1312,8 @@
         "page": "頁面索引",
         "count": "數量",
         "templateType": "範本類型",
-        "comment": "描述"
+        "comment": "描述",
+        "expiredInSeconds": "到期時間（秒）"
     },
     "parameterizedError": {
         "parameter invalid": "{parameter}無效",
@@ -2261,8 +2267,15 @@
     "Show Hidden Transaction Templates": "顯示隱藏的範本",
     "Hide Hidden Transaction Templates": "不顯示隱藏的範本",
     "Template name cannot be blank": "範本名稱不能為空",
-    "Generate MCP token": "產生 MCP 令牌",
-    "Your MCP token does not expire, please keep it secure. When connecting to third-party apps, be aware that they and any large language models they use can access your private data.": "您的 MCP 令牌不會過期，請妥善保管。當連接至第三方應用程式時，請留意它們及其使用的大型語言模型（LLM）可以存取您的隱私資料。",
+    "Generate Token": "產生令牌",
+    "Token Type": "令牌類型",
+    "Expiration Time (Seconds)": "到期時間（秒）",
+    "Custom Expiration Time (Seconds)": "自訂到期時間（秒）",
+    "No Expiration": "永不過期",
+    "API Token": "API 令牌",
+    "MCP Token": "MCP 令牌",
+    "Your token does not expire, please keep it secure.": "您的令牌不會過期，請妥善保管。",
+    "When connecting to third-party apps, be aware that they and any large language models they use can access your private data.": "當連接至第三方應用程式時，請留意它們及其使用的大型語言模型（LLM）可以存取您的隱私資料。",
     "Unable to generate token": "無法產生令牌",
     "Are you sure you want to logout from this session?": "您確定要登出此會話？",
     "Unable to logout from this session": "無法登出此會話",

@@ -32,6 +32,11 @@ func (c *CliContext) Int(name string) int {
 	return c.command.Int(name)
 }
 
+// Int64 returns the long integer value of parameter
+func (c *CliContext) Int64(name string) int64 {
+	return c.command.Int64(name)
+}
+
 // String returns the string value of parameter
 func (c *CliContext) String(name string) string {
 	return c.command.String(name)

@@ -132,7 +132,7 @@
                     <div class="d-flex align-center">
                         <span>{{ tt('Device & Sessions') }}</span>
                         <v-btn class="ms-3" density="compact" color="default" variant="outlined"
-                               @click="generateMCPToken" v-if="isMCPServerEnabled()">{{ tt('Generate MCP token') }}</v-btn>
+                               @click="generateToken" v-if="isGenerateAPITokenEnabled() || isMCPServerEnabled()">{{ tt('Generate Token') }}</v-btn>
                         <v-btn density="compact" color="default" variant="text" size="24"
                                class="ms-2" :icon="true" :loading="loadingSession" @click="reloadSessions(false)">
                             <template #loader>
@@ -171,7 +171,7 @@
                         v-for="session in sessions">
                         <td class="text-sm">
                             <v-icon start :icon="session.icon"/>
-                            {{ session.deviceType === 'mcp' ? 'MCP' : (tt(session.isCurrent ? 'Current' : 'Other Device')) }}
+                            {{ tt(session.deviceName) }}
                         </td>
                         <td class="text-sm">{{ session.deviceInfo }}</td>
                         <td class="text-sm">{{ session.lastSeenDateTime }}</td>
@@ -190,7 +190,7 @@
     </v-row>
 
     <unlink-third-party-login-dialog ref="unlinkThirdPartyLoginDialog" />
-    <user-generate-m-c-p-token-dialog ref="generateMCPTokenDialog" />
+    <user-generate-token-dialog ref="generateTokenDialog" />
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
 </template>
@@ -198,7 +198,7 @@
 <script setup lang="ts">
 import { VTextField } from 'vuetify/components/VTextField';
 import UnlinkThirdPartyLoginDialog from '@/views/desktop/user/settings/dialogs/UnlinkThirdPartyLoginDialog.vue';
-import UserGenerateMCPTokenDialog from '@/views/desktop/user/settings/dialogs/UserGenerateMCPTokenDialog.vue';
+import UserGenerateTokenDialog from '@/views/desktop/user/settings/dialogs/UserGenerateTokenDialog.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
@@ -213,11 +213,17 @@ import { useTokensStore } from '@/stores/token.ts';
 
 import { itemAndIndex, reversedItemAndIndex } from '@/core/base.ts';
 import { type UserExternalAuthInfoResponse } from '@/models/user_external_auth.ts';
-import { type TokenInfoResponse, SessionInfo } from '@/models/token.ts';
+import { type TokenInfoResponse, SessionDeviceType, SessionInfo } from '@/models/token.ts';
 
 import { isEquals } from '@/lib/common.ts';
 import { parseSessionInfo } from '@/lib/session.ts';
-import { isOAuth2Enabled, getOAuth2Provider, getOIDCCustomDisplayNames, isMCPServerEnabled } from '@/lib/server_settings.ts';
+import {
+    isGenerateAPITokenEnabled,
+    isOAuth2Enabled,
+    getOAuth2Provider,
+    getOIDCCustomDisplayNames,
+    isMCPServerEnabled
+} from '@/lib/server_settings.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 
 import {
@@ -228,8 +234,8 @@ import {
     mdiTablet,
     mdiWatch,
     mdiTelevision,
-    mdiCreationOutline,
     mdiConsole,
+    mdiCreationOutline,
     mdiDevices
 } from '@mdi/js';
 
@@ -267,24 +273,24 @@ class DesktopPageSessionInfo extends SessionInfo {
     public readonly lastSeenDateTime: string;
 
     public constructor(sessionInfo: SessionInfo) {
-        super(sessionInfo.tokenId, sessionInfo.isCurrent, sessionInfo.deviceType, sessionInfo.deviceInfo, sessionInfo.createdByCli, sessionInfo.lastSeen);
+        super(sessionInfo.tokenId, sessionInfo.isCurrent, sessionInfo.deviceType, sessionInfo.deviceInfo, sessionInfo.deviceName, sessionInfo.lastSeen);
         this.icon = this.getTokenIcon(sessionInfo.deviceType);
         this.lastSeenDateTime = sessionInfo.lastSeen ? formatUnixTimeToLongDateTime(sessionInfo.lastSeen) : '-';
     }
 
-    private getTokenIcon(deviceType: string): string {
-        if (deviceType === 'phone') {
+    private getTokenIcon(deviceType: SessionDeviceType): string {
+        if (deviceType === SessionDeviceType.Phone) {
             return mdiCellphone;
-        } else if (deviceType === 'wearable') {
+        } else if (deviceType === SessionDeviceType.Wearable) {
             return mdiWatch;
-        } else if (deviceType === 'tablet') {
+        } else if (deviceType === SessionDeviceType.Tablet) {
             return mdiTablet;
-        } else if (deviceType === 'tv') {
+        } else if (deviceType === SessionDeviceType.TV) {
             return mdiTelevision;
-        } else if (deviceType === 'mcp') {
-            return mdiCreationOutline;
-        } else if (deviceType === 'cli') {
+        } else if (deviceType === SessionDeviceType.Api) {
             return mdiConsole;
+        } else if (deviceType === SessionDeviceType.MCP) {
+            return mdiCreationOutline;
         } else {
             return mdiDevices;
         }
@@ -292,7 +298,7 @@ class DesktopPageSessionInfo extends SessionInfo {
 }
 
 type UnlinkThirdPartyLoginDialogType = InstanceType<typeof UnlinkThirdPartyLoginDialog>;
-type UserGenerateMCPTokenDialogType = InstanceType<typeof UserGenerateMCPTokenDialog>;
+type UserGenerateTokenDialogType = InstanceType<typeof UserGenerateTokenDialog>;
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 
@@ -311,7 +317,7 @@ const tokensStore = useTokensStore();
 const newPasswordInput = useTemplateRef<VTextField>('newPasswordInput');
 const confirmPasswordInput = useTemplateRef<VTextField>('confirmPasswordInput');
 const unlinkThirdPartyLoginDialog = useTemplateRef<UnlinkThirdPartyLoginDialogType>('unlinkThirdPartyLoginDialog');
-const generateMCPTokenDialog = useTemplateRef<UserGenerateMCPTokenDialogType>('generateMCPTokenDialog');
+const generateTokenDialog = useTemplateRef<UserGenerateTokenDialogType>('generateTokenDialog');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
@@ -450,8 +456,8 @@ function unlinkExternalAuth(thirdPartyLogin: DesktopPageLinkedThirdPartyLogin): 
     });
 }
 
-function generateMCPToken(): void {
-    generateMCPTokenDialog.value?.open().then(() => {
+function generateToken(): void {
+    generateTokenDialog.value?.open().then(() => {
         reloadSessions(true);
     });
 }

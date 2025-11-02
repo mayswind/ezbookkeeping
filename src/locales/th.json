@@ -107,6 +107,10 @@
             "EndYY": "ปีงบประมาณ {EndYY}"
         },
         "misc": {
+            "nHour": "{n} Hour",
+            "nHours": "{n} Hours",
+            "nDay": "{n} Day",
+            "nDays": "{n} Days",
             "multiTextJoinSeparator": ", ",
             "loginWithCustomProvider": "Log in with {name}",
             "hoursBehindDefaultTimezone": "ช้ากว่าเขตเวลาเริ่มต้น {hours} ชั่วโมง",
@@ -1105,6 +1109,7 @@
         "token is empty": "โทเค็นว่างเปล่า",
         "email verify token is invalid or expired": "โทเค็นยืนยันอีเมลไม่ถูกต้องหรือหมดอายุ",
         "password reset token is invalid or expired": "โทเค็นรีเซ็ตรหัสผ่านไม่ถูกต้องหรือหมดอายุ",
+        "not allowed to generate api token": "Not allowed to generate API token",
         "passcode is invalid": "รหัสผ่านชั่วคราวไม่ถูกต้อง",
         "two-factor backup code is invalid": "รหัสสำรองสองขั้นตอนไม่ถูกต้อง",
         "two-factor is not enabled": "ยังไม่ได้เปิดใช้งานการยืนยันสองขั้นตอน",
@@ -1307,7 +1312,8 @@
         "page": "ดัชนีหน้า",
         "count": "จำนวน",
         "templateType": "ประเภทแม่แบบ",
-        "comment": "คำอธิบาย"
+        "comment": "คำอธิบาย",
+        "expiredInSeconds": "Expiration Time (Seconds)"
     },
     "parameterizedError": {
         "parameter invalid": "{parameter} ไม่ถูกต้อง",
@@ -2261,8 +2267,15 @@
     "Show Hidden Transaction Templates": "แสดงแม่แบบรายการที่ซ่อนอยู่",
     "Hide Hidden Transaction Templates": "ซ่อนแม่แบบรายการที่ซ่อนอยู่",
     "Template name cannot be blank": "ชื่อแม่แบบไม่สามารถเว้นว่างได้",
-    "Generate MCP token": "สร้างโทเคน MCP",
-    "Your MCP token does not expire, please keep it secure. When connecting to third-party apps, be aware that they and any large language models they use can access your private data.": "Your MCP token does not expire, please keep it secure. When connecting to third-party apps, be aware that they and any large language models they use can access your private data.",
+    "Generate Token": "Generate Token",
+    "Token Type": "Token Type",
+    "Expiration Time (Seconds)": "Expiration Time (Seconds)",
+    "Custom Expiration Time (Seconds)": "Custom Expiration Time (Seconds)",
+    "No Expiration": "No Expiration",
+    "API Token": "API Token",
+    "MCP Token": "MCP Token",
+    "Your token does not expire, please keep it secure.": "Your token does not expire, please keep it secure.",
+    "When connecting to third-party apps, be aware that they and any large language models they use can access your private data.": "When connecting to third-party apps, be aware that they and any large language models they use can access your private data.",
     "Unable to generate token": "ไม่สามารถสร้างโทเคนได้",
     "Are you sure you want to logout from this session?": "คุณแน่ใจหรือว่าต้องการออกจากระบบเซสชันนี้?",
     "Unable to logout from this session": "ไม่สามารถออกจากระบบเซสชันนี้ได้",

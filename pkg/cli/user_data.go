@@ -405,7 +405,7 @@ func (l *UserDataCli) ListUserTokens(c *core.CliContext, username string) ([]*mo
 }
 
 // CreateNewUserToken returns a new token for the specified user
-func (l *UserDataCli) CreateNewUserToken(c *core.CliContext, username string, tokenType string) (*models.TokenRecord, string, error) {
+func (l *UserDataCli) CreateNewUserToken(c *core.CliContext, username string, tokenType string, expiresInSeconds int64) (*models.TokenRecord, string, error) {
 	if username == "" {
 		log.CliErrorf(c, "[user_data.CreateNewUserToken] user name is empty")
 		return nil, "", errs.ErrUsernameIsEmpty
@@ -421,7 +421,17 @@ func (l *UserDataCli) CreateNewUserToken(c *core.CliContext, username string, to
 	var token string
 	var tokenRecord *models.TokenRecord
 
-	if tokenType == "mcp" {
+	if tokenType == "api" {
+		if !l.CurrentConfig().EnableGenerateAPIToken {
+			return nil, "", errs.ErrNotAllowedToGenerateAPIToken
+		}
+
+		if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_GENERATE_API_TOKEN) {
+			return nil, "", errs.ErrNotPermittedToPerformThisAction
+		}
+
+		token, tokenRecord, err = l.tokens.CreateAPITokenViaCli(c, user, expiresInSeconds)
+	} else if tokenType == "mcp" {
 		if !l.CurrentConfig().EnableMCPServer {
 			return nil, "", errs.ErrMCPServerNotEnabled
 		}
@@ -430,9 +440,7 @@ func (l *UserDataCli) CreateNewUserToken(c *core.CliContext, username string, to
 			return nil, "", errs.ErrNotPermittedToPerformThisAction
 		}
 
-		token, tokenRecord, err = l.tokens.CreateMCPTokenViaCli(c, user)
-	} else if tokenType == "normal" {
-		token, tokenRecord, err = l.tokens.CreateTokenViaCli(c, user)
+		token, tokenRecord, err = l.tokens.CreateMCPTokenViaCli(c, user, expiresInSeconds)
 	} else {
 		return nil, "", errs.ErrParameterInvalid
 	}

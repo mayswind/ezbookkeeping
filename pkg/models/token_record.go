@@ -25,14 +25,26 @@ type OAuth2CallbackTokenContext struct {
 	ExternalEmail    string                    `json:"externalEmail"`
 }
 
+// TokenGenerateAPIRequest represents all parameters of api token generation request
+type TokenGenerateAPIRequest struct {
+	ExpiredInSeconds int64  `json:"expiresInSeconds" binding:"omitempty,min=0,max=4294967295"`
+	Password         string `json:"password" binding:"omitempty,min=6,max=128"`
+}
+
 // TokenGenerateMCPRequest represents all parameters of mcp token generation request
 type TokenGenerateMCPRequest struct {
-	Password string `json:"password" binding:"omitempty,min=6,max=128"`
+	ExpiredInSeconds int64  `json:"expiresInSeconds" binding:"omitempty,min=0,max=4294967295"`
+	Password         string `json:"password" binding:"omitempty,min=6,max=128"`
 }
 
 // TokenRevokeRequest represents all parameters of token revoking request
 type TokenRevokeRequest struct {
 	TokenId string `json:"tokenId" binding:"required,notBlank"`
+}
+
+// TokenGenerateAPIResponse represents all response parameters of generated api token
+type TokenGenerateAPIResponse struct {
+	Token string `json:"token"`
 }
 
 // TokenGenerateMCPResponse represents all response parameters of generated mcp token

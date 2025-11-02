@@ -1,9 +1,10 @@
 import uaParser from 'ua-parser-js';
 
 import {
-    TOKEN_TYPE_MCP,
-    TOKEN_CLI_USER_AGENT,
     type TokenInfoResponse,
+    TOKEN_TYPE_API,
+    TOKEN_TYPE_MCP,
+    SessionDeviceType,
     SessionInfo
 } from '@/models/token.ts';
 
@@ -41,10 +42,6 @@ function parseUserAgent(ua: string): UserAgentInfo {
             version: uaParseRet.browser.version
         }
     };
-}
-
-function isSessionUserAgentCreatedByCli(ua: string): boolean {
-    return ua === TOKEN_CLI_USER_AGENT;
 }
 
 function parseDeviceInfo(uaInfo: UserAgentInfo): string {
@@ -86,30 +83,39 @@ function parseDeviceInfo(uaInfo: UserAgentInfo): string {
 }
 
 export function parseSessionInfo(token: TokenInfoResponse): SessionInfo {
+    const isCreateForAPI = token.tokenType === TOKEN_TYPE_API;
     const isCreateForMCP = token.tokenType === TOKEN_TYPE_MCP;
-    const isCreatedByCli = isSessionUserAgentCreatedByCli(token.userAgent);
     const uaInfo = parseUserAgent(token.userAgent);
-    let deviceType = '';
+    let deviceType: SessionDeviceType = SessionDeviceType.Default;
+    let deviceName: string = 'Other Device';
 
-    if (isCreateForMCP) {
-        deviceType = 'mcp';
-    } else if (isCreatedByCli) {
-        deviceType = 'cli';
+    if (isCreateForAPI) {
+        deviceType = SessionDeviceType.Api;
+        deviceName = 'API Token';
+    } else if (isCreateForMCP) {
+        deviceType = SessionDeviceType.MCP;
+        deviceName = 'MCP Token';
     } else {
         if (uaInfo && uaInfo.device) {
             if (uaInfo.device.type === 'mobile') {
-                deviceType = 'phone';
+                deviceType = SessionDeviceType.Phone;
             } else if (uaInfo.device.type === 'wearable') {
-                deviceType = 'wearable';
+                deviceType = SessionDeviceType.Wearable;
             } else if (uaInfo.device.type === 'tablet') {
-                deviceType = 'tablet';
+                deviceType = SessionDeviceType.Tablet;
             } else if (uaInfo.device.type === 'smarttv') {
-                deviceType = 'tv';
+                deviceType = SessionDeviceType.TV;
             } else {
-                deviceType = 'default';
+                deviceType = SessionDeviceType.Default;
             }
         } else {
-            deviceType = 'default';
+            deviceType = SessionDeviceType.Default;
+        }
+
+        if (token.isCurrent) {
+            deviceName = 'Current';
+        } else {
+            deviceName = 'Other Device';
         }
     }
 
@@ -117,8 +123,8 @@ export function parseSessionInfo(token: TokenInfoResponse): SessionInfo {
         token.tokenId,
         token.isCurrent,
         deviceType,
-        isCreateForMCP || isCreatedByCli ? token.userAgent : parseDeviceInfo(uaInfo),
-        isCreatedByCli,
+        isCreateForAPI || isCreateForMCP ? token.userAgent : parseDeviceInfo(uaInfo),
+        deviceName,
         token.lastSeen
     );
 }

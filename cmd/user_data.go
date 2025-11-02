@@ -264,7 +264,13 @@ var UserData = &cli.Command{
 					Name:     "type",
 					Aliases:  []string{"t"},
 					Required: false,
-					Usage:    "Specific token type, supports \"normal\" and \"mcp\", default is \"normal\"",
+					Usage:    "Specific token type, supports \"api\" and \"mcp\", default is \"api\"",
+				},
+				&cli.Int64Flag{
+					Name:     "expiresInSeconds",
+					Aliases:  []string{"e"},
+					Required: true,
+					Usage:    "Token expiration time in seconds (0 - 4294967295, 0 means no expiration).",
 				},
 			},
 		},
@@ -722,17 +728,23 @@ func createNewUserToken(c *core.CliContext) error {
 
 	username := c.String("username")
 	tokenType := c.String("type")
+	expiresInSeconds := c.Int64("expiresInSeconds")
 
 	if tokenType == "" {
-		tokenType = "normal"
+		tokenType = "api"
 	}
 
-	if tokenType != "normal" && tokenType != "mcp" {
+	if tokenType != "api" && tokenType != "mcp" {
 		log.CliErrorf(c, "[user_data.createNewUserToken] token type is invalid")
 		return nil
 	}
 
-	token, tokenString, err := clis.UserData.CreateNewUserToken(c, username, tokenType)
+	if expiresInSeconds < 0 || expiresInSeconds > 4294967295 {
+		log.CliErrorf(c, "[user_data.createNewUserToken] expiresInSeconds is out of range (0 - 4294967295)")
+		return nil
+	}
+
+	token, tokenString, err := clis.UserData.CreateNewUserToken(c, username, tokenType, expiresInSeconds)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.createNewUserToken] error occurs when creating user token")

@@ -107,6 +107,10 @@
             "EndYY": "{EndYY} фінансовий рік"
         },
         "misc": {
+            "nHour": "{n} Hour",
+            "nHours": "{n} Hours",
+            "nDay": "{n} Day",
+            "nDays": "{n} Days",
             "multiTextJoinSeparator": ", ",
             "loginWithCustomProvider": "Log in with {name}",
             "hoursBehindDefaultTimezone": "{hours} год позаду часового поясу за замовчуванням",
@@ -1105,6 +1109,7 @@
         "token is empty": "Токен порожній",
         "email verify token is invalid or expired": "Токен підтвердження електронної пошти недійсний або прострочений",
         "password reset token is invalid or expired": "Токен скидання пароля недійсний або прострочений",
+        "not allowed to generate api token": "Not allowed to generate API token",
         "passcode is invalid": "Код доступу недійсний",
         "two-factor backup code is invalid": "Резервний код двофакторної автентифікації недійсний",
         "two-factor is not enabled": "Двофакторна автентифікація не увімкнена",
@@ -1307,7 +1312,8 @@
         "page": "Номер сторінки",
         "count": "Кількість",
         "templateType": "Тип шаблону",
-        "comment": "Опис"
+        "comment": "Опис",
+        "expiredInSeconds": "Expiration Time (Seconds)"
     },
     "parameterizedError": {
         "parameter invalid": "{parameter} недійсний",
@@ -2261,8 +2267,15 @@
     "Show Hidden Transaction Templates": "Показати приховані шаблони транзакцій",
     "Hide Hidden Transaction Templates": "Приховати приховані шаблони транзакцій",
     "Template name cannot be blank": "Назва шаблону не може бути порожньою",
-    "Generate MCP token": "Generate MCP token",
-    "Your MCP token does not expire, please keep it secure. When connecting to third-party apps, be aware that they and any large language models they use can access your private data.": "Your MCP token does not expire, please keep it secure. When connecting to third-party apps, be aware that they and any large language models they use can access your private data.",
+    "Generate Token": "Generate Token",
+    "Token Type": "Token Type",
+    "Expiration Time (Seconds)": "Expiration Time (Seconds)",
+    "Custom Expiration Time (Seconds)": "Custom Expiration Time (Seconds)",
+    "No Expiration": "No Expiration",
+    "API Token": "API Token",
+    "MCP Token": "MCP Token",
+    "Your token does not expire, please keep it secure.": "Your token does not expire, please keep it secure.",
+    "When connecting to third-party apps, be aware that they and any large language models they use can access your private data.": "When connecting to third-party apps, be aware that they and any large language models they use can access your private data.",
     "Unable to generate token": "Unable to generate token",
     "Are you sure you want to logout from this session?": "Ви впевнені, що хочете вийти з цієї сесії?",
     "Unable to logout from this session": "Не вдалося вийти з цієї сесії",

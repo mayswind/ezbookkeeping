@@ -23,6 +23,9 @@ import (
 // TokenUserAgentCreatedViaCli is the user agent of token created via cli
 const TokenUserAgentCreatedViaCli = "ezbookkeeping Cli"
 
+// TokenUserAgentForAPI is the user agent for API token
+const TokenUserAgentForAPI = "ezbookkeeping API"
+
 // TokenUserAgentForMCP is the user agent for MCP token
 const TokenUserAgentForMCP = "ezbookkeeping MCP"
 
@@ -67,7 +70,7 @@ func (s *TokenService) GetAllUnexpiredNormalAndMCPTokensByUid(c core.Context, ui
 	now := time.Now().Unix()
 
 	var tokenRecords []*models.TokenRecord
-	err := s.TokenDB(uid).NewSession(c).Cols("uid", "user_token_id", "token_type", "user_agent", "created_unix_time", "expired_unix_time", "last_seen_unix_time").Where("uid=? AND (token_type=? OR token_type=?) AND expired_unix_time>?", uid, core.USER_TOKEN_TYPE_NORMAL, core.USER_TOKEN_TYPE_MCP, now).Find(&tokenRecords)
+	err := s.TokenDB(uid).NewSession(c).Cols("uid", "user_token_id", "token_type", "user_agent", "created_unix_time", "expired_unix_time", "last_seen_unix_time").Where("uid=? AND (token_type=? OR token_type=? OR token_type=?) AND expired_unix_time>?", uid, core.USER_TOKEN_TYPE_NORMAL, core.USER_TOKEN_TYPE_MCP, core.USER_TOKEN_TYPE_API, now).Find(&tokenRecords)
 
 	return tokenRecords, err
 }
@@ -75,12 +78,6 @@ func (s *TokenService) GetAllUnexpiredNormalAndMCPTokensByUid(c core.Context, ui
 // ParseToken returns the token model according to token content
 func (s *TokenService) ParseToken(c core.Context, token string) (*jwt.Token, *core.UserTokenClaims, string, error) {
 	return s.parseToken(c, token)
-}
-
-// CreateTokenViaCli generates a new normal token and saves to database
-func (s *TokenService) CreateTokenViaCli(c *core.CliContext, user *models.User) (string, *models.TokenRecord, error) {
-	token, _, tokenRecord, err := s.createToken(c, user, core.USER_TOKEN_TYPE_NORMAL, TokenUserAgentCreatedViaCli, "", s.CurrentConfig().TokenExpiredTimeDuration)
-	return token, tokenRecord, err
 }
 
 // CreateToken generates a new normal token and saves to database
@@ -119,16 +116,58 @@ func (s *TokenService) CreatePasswordResetTokenWithoutUserAgent(c core.Context, 
 	return token, claims, err
 }
 
+// CreateAPIToken generates a new API token and saves to database
+func (s *TokenService) CreateAPIToken(c *core.WebContext, user *models.User, expiresInSeconds int64) (string, *core.UserTokenClaims, error) {
+	var tokenExpiredTimeDuration time.Duration
+
+	if expiresInSeconds > 0 {
+		tokenExpiredTimeDuration = time.Duration(expiresInSeconds) * time.Second
+	} else {
+		tokenExpiredTimeDuration = time.Unix(tokenMaxExpiredAtUnixTime, 0).Sub(time.Now())
+	}
+
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_API, s.getUserAgent(c), "", tokenExpiredTimeDuration)
+	return token, claims, err
+}
+
+// CreateAPITokenViaCli generates a new API token and saves to database
+func (s *TokenService) CreateAPITokenViaCli(c *core.CliContext, user *models.User, expiresInSeconds int64) (string, *models.TokenRecord, error) {
+	var tokenExpiredTimeDuration time.Duration
+
+	if expiresInSeconds > 0 {
+		tokenExpiredTimeDuration = time.Duration(expiresInSeconds) * time.Second
+	} else {
+		tokenExpiredTimeDuration = time.Unix(tokenMaxExpiredAtUnixTime, 0).Sub(time.Now())
+	}
+
+	token, _, tokenRecord, err := s.createToken(c, user, core.USER_TOKEN_TYPE_API, TokenUserAgentCreatedViaCli, "", tokenExpiredTimeDuration)
+	return token, tokenRecord, err
+}
+
 // CreateMCPToken generates a new MCP token and saves to database
-func (s *TokenService) CreateMCPToken(c *core.WebContext, user *models.User) (string, *core.UserTokenClaims, error) {
-	tokenExpiredTimeDuration := time.Unix(tokenMaxExpiredAtUnixTime, 0).Sub(time.Now())
+func (s *TokenService) CreateMCPToken(c *core.WebContext, user *models.User, expiresInSeconds int64) (string, *core.UserTokenClaims, error) {
+	var tokenExpiredTimeDuration time.Duration
+
+	if expiresInSeconds > 0 {
+		tokenExpiredTimeDuration = time.Duration(expiresInSeconds) * time.Second
+	} else {
+		tokenExpiredTimeDuration = time.Unix(tokenMaxExpiredAtUnixTime, 0).Sub(time.Now())
+	}
+
 	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_MCP, s.getUserAgent(c), "", tokenExpiredTimeDuration)
 	return token, claims, err
 }
 
 // CreateMCPTokenViaCli generates a new MCP token and saves to database
-func (s *TokenService) CreateMCPTokenViaCli(c *core.CliContext, user *models.User) (string, *models.TokenRecord, error) {
-	tokenExpiredTimeDuration := time.Unix(tokenMaxExpiredAtUnixTime, 0).Sub(time.Now())
+func (s *TokenService) CreateMCPTokenViaCli(c *core.CliContext, user *models.User, expiresInSeconds int64) (string, *models.TokenRecord, error) {
+	var tokenExpiredTimeDuration time.Duration
+
+	if expiresInSeconds > 0 {
+		tokenExpiredTimeDuration = time.Duration(expiresInSeconds) * time.Second
+	} else {
+		tokenExpiredTimeDuration = time.Unix(tokenMaxExpiredAtUnixTime, 0).Sub(time.Now())
+	}
+
 	token, _, tokenRecord, err := s.createToken(c, user, core.USER_TOKEN_TYPE_MCP, TokenUserAgentCreatedViaCli, "", tokenExpiredTimeDuration)
 	return token, tokenRecord, err
 }

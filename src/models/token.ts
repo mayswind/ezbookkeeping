@@ -2,16 +2,25 @@ import type { ApplicationCloudSetting } from '@/core/setting.ts';
 
 import type { UserBasicInfo } from './user.ts';
 
+export const TOKEN_TYPE_API: number = 8;
 export const TOKEN_TYPE_MCP: number = 5;
 
-export const TOKEN_CLI_USER_AGENT: string = 'ezbookkeeping Cli';
+export interface TokenGenerateAPIRequest {
+    readonly expiresInSeconds: number;
+    readonly password: string;
+}
 
 export interface TokenGenerateMCPRequest {
+    readonly expiresInSeconds: number;
     readonly password: string;
 }
 
 export interface TokenRevokeRequest {
     readonly tokenId: string;
+}
+
+export interface TokenGenerateAPIResponse {
+    readonly token: string;
 }
 
 export interface TokenGenerateMCPResponse {
@@ -35,24 +44,34 @@ export interface TokenInfoResponse {
     readonly isCurrent: boolean;
 }
 
+export enum SessionDeviceType {
+    Api = 'api',
+    MCP = 'mcp',
+    Phone = 'phone',
+    Tablet = 'tablet',
+    TV = 'tv',
+    Wearable = 'wearable',
+    Default = 'default'
+}
+
 export class SessionInfo {
     public readonly tokenId: string;
     public readonly isCurrent: boolean;
-    public readonly deviceType: string;
+    public readonly deviceType: SessionDeviceType;
     public readonly deviceInfo: string;
-    public readonly createdByCli: boolean;
+    public readonly deviceName: string;
     public readonly lastSeen: number;
 
-    protected constructor(tokenId: string, isCurrent: boolean, deviceType: string, deviceInfo: string, createdByCli: boolean, lastSeen: number) {
+    protected constructor(tokenId: string, isCurrent: boolean, deviceType: SessionDeviceType, deviceInfo: string, deviceName: string, lastSeen: number) {
         this.tokenId = tokenId;
         this.isCurrent = isCurrent;
         this.deviceType = deviceType;
         this.deviceInfo = deviceInfo;
-        this.createdByCli = createdByCli;
+        this.deviceName = deviceName;
         this.lastSeen = lastSeen;
     }
 
-    public static of(tokenId: string, isCurrent: boolean, deviceType: string, deviceInfo: string, createdByCli: boolean, lastSeen: number): SessionInfo {
-        return new SessionInfo(tokenId, isCurrent, deviceType, deviceInfo, createdByCli, lastSeen);
+    public static of(tokenId: string, isCurrent: boolean, deviceType: SessionDeviceType, deviceInfo: string, deviceName: string, lastSeen: number): SessionInfo {
+        return new SessionInfo(tokenId, isCurrent, deviceType, deviceInfo, deviceName, lastSeen);
     }
 }

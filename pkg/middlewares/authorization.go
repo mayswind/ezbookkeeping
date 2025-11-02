@@ -149,7 +149,7 @@ func jwtAuthorization(c *core.WebContext, source TokenSourceType) {
 		return
 	}
 
-	if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+	if claims.Type != core.USER_TOKEN_TYPE_NORMAL && claims.Type != core.USER_TOKEN_TYPE_API {
 		log.Warnf(c, "[authorization.jwtAuthorization] user \"uid:%d\" token type (%d) is invalid", claims.Uid, claims.Type)
 		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidTokenType)
 		return

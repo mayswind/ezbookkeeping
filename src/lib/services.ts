@@ -112,8 +112,10 @@ import type {
     TransactionTemplateInfoResponse
 } from '@/models/transaction_template.ts';
 import type {
+    TokenGenerateAPIRequest,
     TokenGenerateMCPRequest,
     TokenRevokeRequest,
+    TokenGenerateAPIResponse,
     TokenGenerateMCPResponse,
     TokenRefreshResponse,
     TokenInfoResponse
@@ -344,6 +346,9 @@ export default {
     },
     getTokens: (): ApiResponsePromise<TokenInfoResponse[]> => {
         return axios.get<ApiResponse<TokenInfoResponse[]>>('v1/tokens/list.json');
+    },
+    generateAPIToken: (req: TokenGenerateAPIRequest): ApiResponsePromise<TokenGenerateAPIResponse> => {
+        return axios.post<ApiResponse<TokenGenerateAPIResponse>>('v1/tokens/generate/api.json', req);
     },
     generateMCPToken: (req: TokenGenerateMCPRequest): ApiResponsePromise<TokenGenerateMCPResponse> => {
         return axios.post<ApiResponse<TokenGenerateMCPResponse>>('v1/tokens/generate/mcp.json', req);

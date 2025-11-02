@@ -107,6 +107,10 @@
             "EndYY": "Exercice {EndYY}"
         },
         "misc": {
+            "nHour": "{n} Hour",
+            "nHours": "{n} Hours",
+            "nDay": "{n} Day",
+            "nDays": "{n} Days",
             "multiTextJoinSeparator": ", ",
             "loginWithCustomProvider": "Log in with {name}",
             "hoursBehindDefaultTimezone": "{hours} heure(s) de retard sur le fuseau horaire par défaut",
@@ -1105,6 +1109,7 @@
         "token is empty": "Le token est vide",
         "email verify token is invalid or expired": "Le token de vérification d'email est invalide ou expiré",
         "password reset token is invalid or expired": "Le token de réinitialisation de mot de passe est invalide ou expiré",
+        "not allowed to generate api token": "Not allowed to generate API token",
         "passcode is invalid": "Le code d'accès est invalide",
         "two-factor backup code is invalid": "Le code de sauvegarde à deux facteurs est invalide",
         "two-factor is not enabled": "L'authentification à deux facteurs n'est pas activée",
@@ -1307,7 +1312,8 @@
         "page": "Index de page",
         "count": "Nombre",
         "templateType": "Type de modèle",
-        "comment": "Description"
+        "comment": "Description",
+        "expiredInSeconds": "Expiration Time (Seconds)"
     },
     "parameterizedError": {
         "parameter invalid": "{parameter} est invalide",
@@ -2261,8 +2267,15 @@
     "Show Hidden Transaction Templates": "Afficher les modèles de transaction masqués",
     "Hide Hidden Transaction Templates": "Masquer les modèles de transaction masqués",
     "Template name cannot be blank": "Le nom du modèle ne peut pas être vide",
-    "Generate MCP token": "Générer un jeton MCP",
-    "Your MCP token does not expire, please keep it secure. When connecting to third-party apps, be aware that they and any large language models they use can access your private data.": "Your MCP token does not expire, please keep it secure. When connecting to third-party apps, be aware that they and any large language models they use can access your private data.",
+    "Generate Token": "Generate Token",
+    "Token Type": "Token Type",
+    "Expiration Time (Seconds)": "Expiration Time (Seconds)",
+    "Custom Expiration Time (Seconds)": "Custom Expiration Time (Seconds)",
+    "No Expiration": "No Expiration",
+    "API Token": "API Token",
+    "MCP Token": "MCP Token",
+    "Your token does not expire, please keep it secure.": "Your token does not expire, please keep it secure.",
+    "When connecting to third-party apps, be aware that they and any large language models they use can access your private data.": "When connecting to third-party apps, be aware that they and any large language models they use can access your private data.",
     "Unable to generate token": "Impossible de générer le jeton",
     "Are you sure you want to logout from this session?": "Êtes-vous sûr de vouloir vous déconnecter de cette session ?",
     "Unable to logout from this session": "Impossible de se déconnecter de cette session",

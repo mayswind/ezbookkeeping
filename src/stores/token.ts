@@ -3,7 +3,12 @@ import { defineStore } from 'pinia';
 import { useSettingsStore } from './setting.ts';
 import { useUserStore } from './user.ts';
 
-import type { TokenGenerateMCPResponse, TokenRefreshResponse, TokenInfoResponse } from '@/models/token.ts';
+import type {
+    TokenGenerateAPIResponse,
+    TokenGenerateMCPResponse,
+    TokenRefreshResponse,
+    TokenInfoResponse
+} from '@/models/token.ts';
 
 import { isObject } from '@/lib/common.ts';
 import { updateCurrentToken } from '@/lib/userstate.ts';
@@ -69,9 +74,20 @@ export const useTokensStore = defineStore('tokens', () => {
         });
     }
 
-    function generateMCPToken({ password }: { password: string }): Promise<TokenGenerateMCPResponse> {
+    function generateToken<T extends 'api' | 'mcp'>({ type, expiresInSeconds, password }: { type: T, expiresInSeconds: number, password: string }): Promise<{ 'api': TokenGenerateAPIResponse, 'mcp': TokenGenerateMCPResponse }[T]> {
         return new Promise((resolve, reject) => {
-            services.generateMCPToken({ password }).then(response => {
+            let promise = null;
+
+            if (type === 'api') {
+                promise = services.generateAPIToken({ expiresInSeconds, password });
+            } else if (type === 'mcp') {
+                promise = services.generateMCPToken({ expiresInSeconds, password });
+            } else {
+                reject({ message: 'An error occurred' });
+                return;
+            }
+
+            promise.then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
@@ -79,7 +95,7 @@ export const useTokensStore = defineStore('tokens', () => {
                     return;
                 }
 
-                resolve(data.result);
+                resolve(data.result as { 'api': TokenGenerateAPIResponse, 'mcp': TokenGenerateMCPResponse }[T]);
             }).catch(error => {
                 logger.error('failed to generate token', error);
 
@@ -148,7 +164,7 @@ export const useTokensStore = defineStore('tokens', () => {
         // functions
         getAllTokens,
         refreshTokenAndRevokeOldToken,
-        generateMCPToken,
+        generateToken,
         revokeToken,
         revokeAllTokens
     };

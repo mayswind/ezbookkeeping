@@ -7,6 +7,17 @@
                 </div>
             </template>
 
+            <v-card-text class="py-0 w-100 d-flex justify-center" v-if="tokenType === 'api' && generatedToken && serverUrl">
+                <v-switch class="bidirectional-switch" color="secondary"
+                          :label="tt('Example')"
+                          v-model="showAPIExample"
+                          @click="showAPIExample = !showAPIExample">
+                    <template #prepend>
+                        <span>{{ tt('Token') }}</span>
+                    </template>
+                </v-switch>
+            </v-card-text>
+
             <v-card-text class="py-0 w-100 d-flex justify-center" v-if="tokenType === 'mcp' && generatedToken && serverUrl">
                 <v-switch class="bidirectional-switch" color="secondary"
                           :label="tt('Configuration')"
@@ -78,11 +89,14 @@
                         </v-col>
                     </v-row>
                 </div>
+
                 <div class="w-100 code-container" v-if="generatedToken">
                     <v-textarea class="w-100 always-cursor-text" :readonly="true"
-                                :rows="4" :value="generatedToken" v-if="!showMCPConfiguration || !serverUrl" />
+                                :rows="4" :value="generatedToken" v-if="(tokenType === 'api' && (!showAPIExample || !serverUrl)) || (tokenType === 'mcp' && (!showMCPConfiguration || !serverUrl))" />
                     <v-textarea class="w-100 always-cursor-text" :readonly="true"
-                                :rows="15" :value="mcpServerConfiguration" v-if="showMCPConfiguration && serverUrl" />
+                                :rows="5" :value="apiExample" v-if="tokenType === 'api' && showAPIExample && serverUrl" />
+                    <v-textarea class="w-100 always-cursor-text" :readonly="true"
+                                :rows="15" :value="mcpServerConfiguration" v-if="tokenType === 'mcp' && showMCPConfiguration && serverUrl" />
                 </div>
             </v-card-text>
 
@@ -121,7 +135,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useTokensStore } from '@/stores/token.ts';
 
 import { type NameValue } from '@/core/base.ts';
-import { type TokenGenerateMCPResponse } from '@/models/token.ts';
+import { type TokenGenerateAPIResponse, type TokenGenerateMCPResponse } from '@/models/token.ts';
 
 import { isAPITokenEnabled, isMCPServerEnabled } from '@/lib/server_settings.ts';
 import { copyTextToClipboard } from '@/lib/ui/common.ts';
@@ -144,6 +158,7 @@ const tokenExpirationTime = ref<number>(86400);
 const tokenCustomExpirationTime = ref<number>(86400);
 const currentPassword = ref<string>('');
 const generating = ref<boolean>(false);
+const showAPIExample = ref<boolean>(false);
 const showMCPConfiguration = ref<boolean>(false);
 const serverUrl = ref<string>('');
 const generatedToken = ref<string>('');
@@ -160,6 +175,10 @@ const tokenTypeOptions = computed<NameValue[]>(() => {
     }
 
     return options;
+});
+
+const apiExample = computed<string>(() => {
+    return `curl -H 'Authorization: Bearer ${generatedToken.value}' '${serverUrl.value}/v1/users/profile/get.json'`;
 });
 
 const mcpServerConfiguration = computed<string>(() => {
@@ -183,6 +202,7 @@ function open(): Promise<void> {
     tokenExpirationTime.value = 86400;
     tokenCustomExpirationTime.value = 86400;
     generating.value = false;
+    showAPIExample.value = false;
     showMCPConfiguration.value = false;
     serverUrl.value = '';
     generatedToken.value = '';
@@ -208,7 +228,9 @@ function generateToken(): void {
         generating.value = false;
         currentPassword.value = '';
 
-        if (tokenType.value === 'mcp') {
+        if (tokenType.value === 'api') {
+            serverUrl.value = (result as TokenGenerateAPIResponse).apiBaseUrl;
+        } else if (tokenType.value === 'mcp') {
             serverUrl.value = (result as TokenGenerateMCPResponse).mcpUrl;
         }
 
@@ -223,7 +245,9 @@ function generateToken(): void {
 }
 
 function copy(): void {
-    if (showMCPConfiguration.value) {
+    if (tokenType.value === 'api' && showAPIExample.value) {
+        copyTextToClipboard(apiExample.value, buttonContainer.value);
+    } else if (tokenType.value === 'mcp' && showMCPConfiguration.value) {
         copyTextToClipboard(mcpServerConfiguration.value, buttonContainer.value);
     } else {
         copyTextToClipboard(generatedToken.value, buttonContainer.value);

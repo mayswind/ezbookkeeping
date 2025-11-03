@@ -44,7 +44,8 @@ type TokenRevokeRequest struct {
 
 // TokenGenerateAPIResponse represents all response parameters of generated api token
 type TokenGenerateAPIResponse struct {
-	Token string `json:"token"`
+	Token      string `json:"token"`
+	APIBaseUrl string `json:"apiBaseUrl"`
 }
 
 // TokenGenerateMCPResponse represents all response parameters of generated mcp token

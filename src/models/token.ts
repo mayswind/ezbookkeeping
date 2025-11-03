@@ -21,6 +21,7 @@ export interface TokenRevokeRequest {
 
 export interface TokenGenerateAPIResponse {
     readonly token: string;
+    readonly apiBaseUrl: string;
 }
 
 export interface TokenGenerateMCPResponse {

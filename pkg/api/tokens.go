@@ -123,7 +123,8 @@ func (a *TokensApi) TokenGenerateAPIHandler(c *core.WebContext) (any, *errs.Erro
 	log.Infof(c, "[tokens.TokenGenerateAPIHandler] user \"uid:%d\" has generated api token, new token will be expired at %d", user.Uid, claims.ExpiresAt)
 
 	generateAPITokenResp := &models.TokenGenerateAPIResponse{
-		Token: token,
+		Token:      token,
+		APIBaseUrl: a.CurrentConfig().RootUrl + "api",
 	}
 
 	return generateAPITokenResp, nil

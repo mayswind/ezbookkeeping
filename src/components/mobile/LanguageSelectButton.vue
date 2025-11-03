@@ -1,5 +1,5 @@
 <template>
-    <f7-button small popover-open=".lang-popover-menu" :disabled="disabled" :text="currentLanguageName"></f7-button>
+    <f7-button class="language-select-button" small popover-open=".lang-popover-menu" :disabled="disabled" :text="currentLanguageName"></f7-button>
 
     <f7-popover class="lang-popover-menu">
         <f7-list dividers>
@@ -30,3 +30,10 @@ const {
     isLanguageSelected
 } = useLanguageSelectButtonBase(props, emit);
 </script>
+
+<style>
+.language-select-button {
+    display: initial;
+    padding: 8px 10px 8px 10px;
+}
+</style>

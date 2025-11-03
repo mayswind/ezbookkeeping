@@ -230,6 +230,7 @@ i.icon.la, i.icon.las, i.icon.lab {
 }
 
 .login-page-fixed-bottom {
+    height: calc(80px + var(--f7-safe-area-bottom));
     background-color: inherit !important;
 }
 

@@ -1109,7 +1109,7 @@
         "token is empty": "トークンを記入してください",
         "email verify token is invalid or expired": "メール認証トークンが無効または期限切れです",
         "password reset token is invalid or expired": "パスワードリセットトークンが無効または期限切れです",
-        "not allowed to generate api token": "Not allowed to generate API token",
+        "api token is not enabled": "API token is not enabled",
         "passcode is invalid": "パスコードが無効です",
         "two-factor backup code is invalid": "二要素バックアップコードが無効です",
         "two-factor is not enabled": "二要素が有効になっていません",

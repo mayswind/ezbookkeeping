@@ -21,5 +21,5 @@ var (
 	ErrTokenIsEmpty                         = NewNormalError(NormalSubcategoryToken, 12, http.StatusBadRequest, "token is empty")
 	ErrEmailVerifyTokenIsInvalidOrExpired   = NewNormalError(NormalSubcategoryToken, 13, http.StatusBadRequest, "email verify token is invalid or expired")
 	ErrPasswordResetTokenIsInvalidOrExpired = NewNormalError(NormalSubcategoryToken, 14, http.StatusBadRequest, "password reset token is invalid or expired")
-	ErrNotAllowedToGenerateAPIToken         = NewNormalError(NormalSubcategoryToken, 15, http.StatusForbidden, "not allowed to generate api token")
+	ErrAPITokenNotEnabled                   = NewNormalError(NormalSubcategoryToken, 15, http.StatusForbidden, "api token is not enabled")
 )

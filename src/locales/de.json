@@ -1109,7 +1109,7 @@
         "token is empty": "Token ist leer",
         "email verify token is invalid or expired": "E-Mail-Verifizierungstoken ist ungültig oder abgelaufen",
         "password reset token is invalid or expired": "Passwort-Zurücksetzungstoken ist ungültig oder abgelaufen",
-        "not allowed to generate api token": "Not allowed to generate API token",
+        "api token is not enabled": "API token is not enabled",
         "passcode is invalid": "Passcode ist ungültig",
         "two-factor backup code is invalid": "Zwei-Faktor-Backup-Code ist ungültig",
         "two-factor is not enabled": "Zwei-Faktor-Authentifizierung ist nicht aktiviert",

@@ -1109,7 +1109,7 @@
         "token is empty": "โทเค็นว่างเปล่า",
         "email verify token is invalid or expired": "โทเค็นยืนยันอีเมลไม่ถูกต้องหรือหมดอายุ",
         "password reset token is invalid or expired": "โทเค็นรีเซ็ตรหัสผ่านไม่ถูกต้องหรือหมดอายุ",
-        "not allowed to generate api token": "Not allowed to generate API token",
+        "api token is not enabled": "API token is not enabled",
         "passcode is invalid": "รหัสผ่านชั่วคราวไม่ถูกต้อง",
         "two-factor backup code is invalid": "รหัสสำรองสองขั้นตอนไม่ถูกต้อง",
         "two-factor is not enabled": "ยังไม่ได้เปิดใช้งานการยืนยันสองขั้นตอน",

@@ -1109,7 +1109,7 @@
         "token is empty": "Mã thông báo trống",
         "email verify token is invalid or expired": "Mã thông báo xác minh email không hợp lệ hoặc đã hết hạn",
         "password reset token is invalid or expired": "Mã thông báo đặt lại mật khẩu không hợp lệ hoặc đã hết hạn",
-        "not allowed to generate api token": "Not allowed to generate API token",
+        "api token is not enabled": "API token is not enabled",
         "passcode is invalid": "Mã số không hợp lệ",
         "two-factor backup code is invalid": "Mã sao lưu hai yếu tố không hợp lệ",
         "two-factor is not enabled": "Xác thực hai yếu tố chưa được bật",

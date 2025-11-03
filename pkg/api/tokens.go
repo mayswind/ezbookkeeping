@@ -85,8 +85,8 @@ func (a *TokensApi) TokenListHandler(c *core.WebContext) (any, *errs.Error) {
 
 // TokenGenerateAPIHandler generates a new API token for current user
 func (a *TokensApi) TokenGenerateAPIHandler(c *core.WebContext) (any, *errs.Error) {
-	if !a.CurrentConfig().EnableGenerateAPIToken {
-		return nil, errs.ErrNotAllowedToGenerateAPIToken
+	if !a.CurrentConfig().EnableAPIToken {
+		return nil, errs.ErrAPITokenNotEnabled
 	}
 
 	var generateAPITokenReq models.TokenGenerateAPIRequest

@@ -1109,7 +1109,7 @@
         "token is empty": "Токен пуст",
         "email verify token is invalid or expired": "Токен подтверждения электронной почты недействителен или истек",
         "password reset token is invalid or expired": "Токен сброса пароля недействителен или истек",
-        "not allowed to generate api token": "Not allowed to generate API token",
+        "api token is not enabled": "API token is not enabled",
         "passcode is invalid": "Код доступа недействителен",
         "two-factor backup code is invalid": "Резервный код двухфакторной аутентификации недействителен",
         "two-factor is not enabled": "Двухфакторная аутентификация не включена",

@@ -19,7 +19,7 @@ export function isUserForgetPasswordEnabled(): boolean {
     return getServerSetting('f') === 1;
 }
 
-export function isGenerateAPITokenEnabled(): boolean {
+export function isAPITokenEnabled(): boolean {
     return getServerSetting('t') === 1;
 }
 

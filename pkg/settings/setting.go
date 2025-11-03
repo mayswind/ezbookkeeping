@@ -357,7 +357,7 @@ type Config struct {
 	EmailVerifyTokenExpiredTimeDuration   time.Duration
 	PasswordResetTokenExpiredTime         uint32
 	PasswordResetTokenExpiredTimeDuration time.Duration
-	EnableGenerateAPIToken                bool
+	EnableAPIToken                        bool
 	MaxFailuresPerIpPerMinute             uint32
 	MaxFailuresPerUserPerMinute           uint32
 
@@ -978,7 +978,7 @@ func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName
 
 	config.PasswordResetTokenExpiredTimeDuration = time.Duration(config.PasswordResetTokenExpiredTime) * time.Second
 
-	config.EnableGenerateAPIToken = getConfigItemBoolValue(configFile, sectionName, "enable_generate_api_token", false)
+	config.EnableAPIToken = getConfigItemBoolValue(configFile, sectionName, "enable_api_token", false)
 
 	config.MaxFailuresPerIpPerMinute = getConfigItemUint32Value(configFile, sectionName, "max_failures_per_ip_per_minute", defaultMaxFailuresPerIpPerMinute)
 	config.MaxFailuresPerUserPerMinute = getConfigItemUint32Value(configFile, sectionName, "max_failures_per_user_per_minute", defaultMaxFailuresPerUserPerMinute)

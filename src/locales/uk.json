@@ -1109,7 +1109,7 @@
         "token is empty": "Токен порожній",
         "email verify token is invalid or expired": "Токен підтвердження електронної пошти недійсний або прострочений",
         "password reset token is invalid or expired": "Токен скидання пароля недійсний або прострочений",
-        "not allowed to generate api token": "Not allowed to generate API token",
+        "api token is not enabled": "API token is not enabled",
         "passcode is invalid": "Код доступу недійсний",
         "two-factor backup code is invalid": "Резервний код двофакторної автентифікації недійсний",
         "two-factor is not enabled": "Двофакторна автентифікація не увімкнена",

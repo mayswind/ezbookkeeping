@@ -132,7 +132,7 @@
                     <div class="d-flex align-center">
                         <span>{{ tt('Device & Sessions') }}</span>
                         <v-btn class="ms-3" density="compact" color="default" variant="outlined"
-                               @click="generateToken" v-if="isGenerateAPITokenEnabled() || isMCPServerEnabled()">{{ tt('Generate Token') }}</v-btn>
+                               @click="generateToken" v-if="isAPITokenEnabled() || isMCPServerEnabled()">{{ tt('Generate Token') }}</v-btn>
                         <v-btn density="compact" color="default" variant="text" size="24"
                                class="ms-2" :icon="true" :loading="loadingSession" @click="reloadSessions(false)">
                             <template #loader>
@@ -218,7 +218,7 @@ import { type TokenInfoResponse, SessionDeviceType, SessionInfo } from '@/models
 import { isEquals } from '@/lib/common.ts';
 import { parseSessionInfo } from '@/lib/session.ts';
 import {
-    isGenerateAPITokenEnabled,
+    isAPITokenEnabled,
     isOAuth2Enabled,
     getOAuth2Provider,
     getOIDCCustomDisplayNames,

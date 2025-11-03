@@ -7,6 +7,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
@@ -21,143 +22,161 @@ const (
 )
 
 // JWTAuthorization verifies whether current request is valid by jwt token in header
-func JWTAuthorization(c *core.WebContext) {
-	jwtAuthorization(c, TOKEN_SOURCE_TYPE_HEADER)
+func JWTAuthorization(config *settings.Config) core.MiddlewareHandlerFunc {
+	return jwtAuthorization(config, TOKEN_SOURCE_TYPE_HEADER)
 }
 
 // JWTAuthorizationByQueryString verifies whether current request is valid by jwt token in query string
-func JWTAuthorizationByQueryString(c *core.WebContext) {
-	jwtAuthorization(c, TOKEN_SOURCE_TYPE_ARGUMENT)
+func JWTAuthorizationByQueryString(config *settings.Config) core.MiddlewareHandlerFunc {
+	return jwtAuthorization(config, TOKEN_SOURCE_TYPE_ARGUMENT)
 }
 
 // JWTAuthorizationByCookie verifies whether current request is valid by jwt token in cookie
-func JWTAuthorizationByCookie(c *core.WebContext) {
-	jwtAuthorization(c, TOKEN_SOURCE_TYPE_COOKIE)
+func JWTAuthorizationByCookie(config *settings.Config) core.MiddlewareHandlerFunc {
+	return jwtAuthorization(config, TOKEN_SOURCE_TYPE_COOKIE)
 }
 
 // JWTTwoFactorAuthorization verifies whether current request is valid by 2fa passcode
-func JWTTwoFactorAuthorization(c *core.WebContext) {
-	claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
+func JWTTwoFactorAuthorization(config *settings.Config) core.MiddlewareHandlerFunc {
+	return func(c *core.WebContext) {
+		claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
 
-	if err != nil {
-		utils.PrintJsonErrorResult(c, err)
-		return
+		if err != nil {
+			utils.PrintJsonErrorResult(c, err)
+			return
+		}
+
+		if claims.Type != core.USER_TOKEN_TYPE_REQUIRE_2FA {
+			log.Warnf(c, "[authorization.JWTTwoFactorAuthorization] user \"uid:%d\" token is not need two-factor authorization", claims.Uid)
+			utils.PrintJsonErrorResult(c, errs.ErrCurrentTokenNotRequire2FA)
+			return
+		}
+
+		c.SetTokenClaims(claims)
+		c.SetTokenContext(tokenContext)
+		c.Next()
 	}
-
-	if claims.Type != core.USER_TOKEN_TYPE_REQUIRE_2FA {
-		log.Warnf(c, "[authorization.JWTTwoFactorAuthorization] user \"uid:%d\" token is not need two-factor authorization", claims.Uid)
-		utils.PrintJsonErrorResult(c, errs.ErrCurrentTokenNotRequire2FA)
-		return
-	}
-
-	c.SetTokenClaims(claims)
-	c.SetTokenContext(tokenContext)
-	c.Next()
 }
 
 // JWTEmailVerifyAuthorization verifies whether current request is email verification
-func JWTEmailVerifyAuthorization(c *core.WebContext) {
-	claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
+func JWTEmailVerifyAuthorization(config *settings.Config) core.MiddlewareHandlerFunc {
+	return func(c *core.WebContext) {
+		claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
 
-	if err != nil {
-		utils.PrintJsonErrorResult(c, errs.ErrEmailVerifyTokenIsInvalidOrExpired)
-		return
+		if err != nil {
+			utils.PrintJsonErrorResult(c, errs.ErrEmailVerifyTokenIsInvalidOrExpired)
+			return
+		}
+
+		if claims.Type != core.USER_TOKEN_TYPE_EMAIL_VERIFY {
+			log.Warnf(c, "[authorization.JWTEmailVerifyAuthorization] user \"uid:%d\" token is not for email verification", claims.Uid)
+			utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidToken)
+			return
+		}
+
+		c.SetTokenClaims(claims)
+		c.SetTokenContext(tokenContext)
+		c.Next()
 	}
-
-	if claims.Type != core.USER_TOKEN_TYPE_EMAIL_VERIFY {
-		log.Warnf(c, "[authorization.JWTEmailVerifyAuthorization] user \"uid:%d\" token is not for email verification", claims.Uid)
-		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidToken)
-		return
-	}
-
-	c.SetTokenClaims(claims)
-	c.SetTokenContext(tokenContext)
-	c.Next()
 }
 
 // JWTResetPasswordAuthorization verifies whether current request is password reset
-func JWTResetPasswordAuthorization(c *core.WebContext) {
-	claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
+func JWTResetPasswordAuthorization(config *settings.Config) core.MiddlewareHandlerFunc {
+	return func(c *core.WebContext) {
+		claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
 
-	if err != nil {
-		utils.PrintJsonErrorResult(c, errs.ErrPasswordResetTokenIsInvalidOrExpired)
-		return
+		if err != nil {
+			utils.PrintJsonErrorResult(c, errs.ErrPasswordResetTokenIsInvalidOrExpired)
+			return
+		}
+
+		if claims.Type != core.USER_TOKEN_TYPE_PASSWORD_RESET {
+			log.Warnf(c, "[authorization.JWTResetPasswordAuthorization] user \"uid:%d\" token is not for password request", claims.Uid)
+			utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidToken)
+			return
+		}
+
+		c.SetTokenClaims(claims)
+		c.SetTokenContext(tokenContext)
+		c.Next()
 	}
-
-	if claims.Type != core.USER_TOKEN_TYPE_PASSWORD_RESET {
-		log.Warnf(c, "[authorization.JWTResetPasswordAuthorization] user \"uid:%d\" token is not for password request", claims.Uid)
-		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidToken)
-		return
-	}
-
-	c.SetTokenClaims(claims)
-	c.SetTokenContext(tokenContext)
-	c.Next()
 }
 
 // JWTMCPAuthorization verifies whether current request is valid by jwt mcp token in header
-func JWTMCPAuthorization(c *core.WebContext) {
-	claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
+func JWTMCPAuthorization(config *settings.Config) core.MiddlewareHandlerFunc {
+	return func(c *core.WebContext) {
+		claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
 
-	if err != nil {
-		utils.PrintJsonErrorResult(c, err)
-		return
+		if err != nil {
+			utils.PrintJsonErrorResult(c, err)
+			return
+		}
+
+		if claims.Type != core.USER_TOKEN_TYPE_MCP {
+			log.Warnf(c, "[authorization.jwtAuthorization] user \"uid:%d\" token type (%d) is not mcp token", claims.Uid, claims.Type)
+			utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidTokenType)
+			return
+		}
+
+		c.SetTokenClaims(claims)
+		c.SetTokenContext(tokenContext)
+		c.Next()
 	}
-
-	if claims.Type != core.USER_TOKEN_TYPE_MCP {
-		log.Warnf(c, "[authorization.jwtAuthorization] user \"uid:%d\" token type (%d) is not mcp token", claims.Uid, claims.Type)
-		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidTokenType)
-		return
-	}
-
-	c.SetTokenClaims(claims)
-	c.SetTokenContext(tokenContext)
-	c.Next()
 }
 
 // JWTOAuth2CallbackAuthorization verifies whether current request is OAuth 2.0 callback
-func JWTOAuth2CallbackAuthorization(c *core.WebContext) {
-	claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
+func JWTOAuth2CallbackAuthorization(config *settings.Config) core.MiddlewareHandlerFunc {
+	return func(c *core.WebContext) {
+		claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
 
-	if err != nil {
-		utils.PrintJsonErrorResult(c, errs.ErrTokenExpired)
-		return
+		if err != nil {
+			utils.PrintJsonErrorResult(c, errs.ErrTokenExpired)
+			return
+		}
+
+		if claims.Type != core.USER_TOKEN_TYPE_OAUTH2_CALLBACK && claims.Type != core.USER_TOKEN_TYPE_OAUTH2_CALLBACK_REQUIRE_VERIFY {
+			log.Warnf(c, "[authorization.JWTOAuth2CallbackAuthorization] user \"uid:%d\" token is not for oauth 2.0 callback request", claims.Uid)
+			utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidToken)
+			return
+		}
+
+		c.SetTokenClaims(claims)
+		c.SetTokenContext(tokenContext)
+		c.Next()
 	}
-
-	if claims.Type != core.USER_TOKEN_TYPE_OAUTH2_CALLBACK && claims.Type != core.USER_TOKEN_TYPE_OAUTH2_CALLBACK_REQUIRE_VERIFY {
-		log.Warnf(c, "[authorization.JWTOAuth2CallbackAuthorization] user \"uid:%d\" token is not for oauth 2.0 callback request", claims.Uid)
-		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidToken)
-		return
-	}
-
-	c.SetTokenClaims(claims)
-	c.SetTokenContext(tokenContext)
-	c.Next()
 }
 
-func jwtAuthorization(c *core.WebContext, source TokenSourceType) {
-	claims, tokenContext, err := getTokenClaims(c, source)
+func jwtAuthorization(config *settings.Config, source TokenSourceType) core.MiddlewareHandlerFunc {
+	return func(c *core.WebContext) {
+		claims, tokenContext, err := getTokenClaims(c, source)
 
-	if err != nil {
-		utils.PrintJsonErrorResult(c, err)
-		return
+		if err != nil {
+			utils.PrintJsonErrorResult(c, err)
+			return
+		}
+
+		if claims.Type == core.USER_TOKEN_TYPE_REQUIRE_2FA {
+			log.Warnf(c, "[authorization.jwtAuthorization] user \"uid:%d\" token requires 2fa", claims.Uid)
+			utils.PrintJsonErrorResult(c, errs.ErrCurrentTokenRequire2FA)
+			return
+		}
+
+		if claims.Type != core.USER_TOKEN_TYPE_NORMAL && claims.Type != core.USER_TOKEN_TYPE_API {
+			log.Warnf(c, "[authorization.jwtAuthorization] user \"uid:%d\" token type (%d) is invalid", claims.Uid, claims.Type)
+			utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidTokenType)
+			return
+		}
+
+		if claims.Type == core.USER_TOKEN_TYPE_API && !config.EnableAPIToken {
+			log.Warnf(c, "[authorization.jwtAuthorization] api token is not enabled")
+			utils.PrintJsonErrorResult(c, errs.ErrAPITokenNotEnabled)
+			return
+		}
+
+		c.SetTokenClaims(claims)
+		c.SetTokenContext(tokenContext)
+		c.Next()
 	}
-
-	if claims.Type == core.USER_TOKEN_TYPE_REQUIRE_2FA {
-		log.Warnf(c, "[authorization.jwtAuthorization] user \"uid:%d\" token requires 2fa", claims.Uid)
-		utils.PrintJsonErrorResult(c, errs.ErrCurrentTokenRequire2FA)
-		return
-	}
-
-	if claims.Type != core.USER_TOKEN_TYPE_NORMAL && claims.Type != core.USER_TOKEN_TYPE_API {
-		log.Warnf(c, "[authorization.jwtAuthorization] user \"uid:%d\" token type (%d) is invalid", claims.Uid, claims.Type)
-		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidTokenType)
-		return
-	}
-
-	c.SetTokenClaims(claims)
-	c.SetTokenContext(tokenContext)
-	c.Next()
 }
 
 func getTokenClaims(c *core.WebContext, source TokenSourceType) (*core.UserTokenClaims, string, *errs.Error) {

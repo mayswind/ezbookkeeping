@@ -422,8 +422,8 @@ func (l *UserDataCli) CreateNewUserToken(c *core.CliContext, username string, to
 	var tokenRecord *models.TokenRecord
 
 	if tokenType == "api" {
-		if !l.CurrentConfig().EnableGenerateAPIToken {
-			return nil, "", errs.ErrNotAllowedToGenerateAPIToken
+		if !l.CurrentConfig().EnableAPIToken {
+			return nil, "", errs.ErrAPITokenNotEnabled
 		}
 
 		if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_GENERATE_API_TOKEN) {

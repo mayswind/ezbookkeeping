@@ -123,7 +123,7 @@ import { useTokensStore } from '@/stores/token.ts';
 import { type NameValue } from '@/core/base.ts';
 import { type TokenGenerateMCPResponse } from '@/models/token.ts';
 
-import { isGenerateAPITokenEnabled, isMCPServerEnabled } from '@/lib/server_settings.ts';
+import { isAPITokenEnabled, isMCPServerEnabled } from '@/lib/server_settings.ts';
 import { copyTextToClipboard } from '@/lib/ui/common.ts';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
@@ -139,7 +139,7 @@ let resolveFunc: (() => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
 const showState = ref<boolean>(false);
-const tokenType = ref<'api' | 'mcp'>(isGenerateAPITokenEnabled() ? 'api' : (isMCPServerEnabled() ? 'mcp' : 'api'));
+const tokenType = ref<'api' | 'mcp'>(isAPITokenEnabled() ? 'api' : (isMCPServerEnabled() ? 'mcp' : 'api'));
 const tokenExpirationTime = ref<number>(86400);
 const tokenCustomExpirationTime = ref<number>(86400);
 const currentPassword = ref<string>('');
@@ -151,7 +151,7 @@ const generatedToken = ref<string>('');
 const tokenTypeOptions = computed<NameValue[]>(() => {
     const options: NameValue[] = [];
 
-    if (isGenerateAPITokenEnabled()) {
+    if (isAPITokenEnabled()) {
         options.push({ name: tt('API Token'), value: 'api' });
     }
 
@@ -179,7 +179,7 @@ const mcpServerConfiguration = computed<string>(() => {
 function open(): Promise<void> {
     showState.value = true;
     currentPassword.value = '';
-    tokenType.value = isGenerateAPITokenEnabled() ? 'api' : (isMCPServerEnabled() ? 'mcp' : 'api');
+    tokenType.value = isAPITokenEnabled() ? 'api' : (isMCPServerEnabled() ? 'mcp' : 'api');
     tokenExpirationTime.value = 86400;
     tokenCustomExpirationTime.value = 86400;
     generating.value = false;

@@ -1109,7 +1109,7 @@
         "token is empty": "认证令牌为空",
         "email verify token is invalid or expired": "邮箱验证令牌无效或已过期",
         "password reset token is invalid or expired": "密码重置令牌无效或已过期",
-        "not allowed to generate api token": "不允许生成 API 认证令牌",
+        "api token is not enabled": "API 令牌没有启用",
         "passcode is invalid": "验证码无效",
         "two-factor backup code is invalid": "两步验证备用码无效",
         "two-factor is not enabled": "两步验证没有启用",

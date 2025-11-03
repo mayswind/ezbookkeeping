@@ -1109,7 +1109,7 @@
         "token is empty": "토큰이 비어 있습니다",
         "email verify token is invalid or expired": "이메일 확인 토큰이 유효하지 않거나 만료되었습니다",
         "password reset token is invalid or expired": "비밀번호 재설정 토큰이 유효하지 않거나 만료되었습니다",
-        "not allowed to generate api token": "Not allowed to generate API token",
+        "api token is not enabled": "API token is not enabled",
         "passcode is invalid": "일회용 비밀번호가 유효하지 않습니다",
         "two-factor backup code is invalid": "2단계 백업 코드가 유효하지 않습니다",
         "two-factor is not enabled": "2단계 인증이 활성화되지 않았습니다",

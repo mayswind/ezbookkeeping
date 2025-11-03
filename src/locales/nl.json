@@ -1109,7 +1109,7 @@
         "token is empty": "Token is leeg",
         "email verify token is invalid or expired": "E-mailverificatietoken is ongeldig of verlopen",
         "password reset token is invalid or expired": "Wachtwoord-resettoken is ongeldig of verlopen",
-        "not allowed to generate api token": "Not allowed to generate API token",
+        "api token is not enabled": "API token is not enabled",
         "passcode is invalid": "Verificatiecode is ongeldig",
         "two-factor backup code is invalid": "Back-upcode voor twee-stapsverificatie is ongeldig",
         "two-factor is not enabled": "Twee-stapsverificatie is niet ingeschakeld",

@@ -46,6 +46,28 @@ const userStore = useUserStore();
 const tokensStore = useTokensStore();
 const exchangeRatesStore = useExchangeRatesStore();
 
+const initialRoutePath: string = (() => {
+    if (!window.location.hash) {
+        return '/';
+    }
+
+    const hash = window.location.hash;
+    const hashIndex = hash.indexOf('#/');
+
+    if (hashIndex < 0) {
+        return '/';
+    }
+
+    const routePath = hash.substring(hashIndex + 1);
+    const queryIndex = routePath.indexOf('?');
+
+    if (queryIndex < 0) {
+        return routePath;
+    }
+
+    return routePath.substring(0, queryIndex);
+})();
+
 const showNotification = ref<boolean>(false);
 
 const currentNotificationContent = computed<string | null>(() => rootStore.currentNotification);
@@ -84,7 +106,7 @@ settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 
 setExpenseAndIncomeAmountColor(userStore.currentUserExpenseAmountColor, userStore.currentUserIncomeAmountColor);
 
-if (isUserLogined()) {
+if (isUserLogined() && initialRoutePath !== '/verify_email' && initialRoutePath !== '/resetpassword' && initialRoutePath !== '/oauth2_callback') {
     if (!settingsStore.appSettings.applicationLock || isUserUnlocked()) {
         // refresh token if user is logined
         tokensStore.refreshTokenAndRevokeOldToken().then(response => {

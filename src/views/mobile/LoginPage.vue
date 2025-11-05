@@ -37,7 +37,7 @@
             <f7-list-item>
                 <template #title>
                     <small>
-                        <f7-link external :class="{ 'disabled': loggingInByPassword || loggingInByOAuth2 }" :href="getDesktopVersionPath()">{{ tt('Switch to Desktop Version') }}</f7-link>
+                        <f7-link :class="{ 'disabled': loggingInByPassword || loggingInByOAuth2 }" @click="switchToDesktopVersion">{{ tt('Switch to Desktop Version') }}</f7-link>
                     </small>
                 </template>
                 <template #after>
@@ -72,7 +72,7 @@
 
                 <div class="login-page-powered-by margin-top-half">
                     <span>Powered by</span>
-                    <f7-link external href="https://github.com/mayswind/ezbookkeeping" target="_blank">ezBookkeeping</f7-link>
+                    <f7-link @click="openExternalUrl('https://github.com/mayswind/ezbookkeeping')" target="_blank">ezBookkeeping</f7-link>
                     <span>{{ version }}</span>
                 </div>
             </f7-block-footer>
@@ -83,7 +83,7 @@
 
             <div class="login-page-powered-by margin-top-half">
                 <span>Powered by</span>
-                <f7-link external href="https://github.com/mayswind/ezbookkeeping" target="_blank">ezBookkeeping</f7-link>
+                <f7-link @click="openExternalUrl('https://github.com/mayswind/ezbookkeeping')" target="_blank">ezBookkeeping</f7-link>
                 <span>{{ version }}</span>
             </div>
         </f7-toolbar>
@@ -205,7 +205,7 @@ const props = defineProps<{
 }>();
 
 const { tt } = useI18n();
-const { showAlert, showToast } = useI18nUIComponents();
+const { showAlert, showConfirm, showToast, openExternalUrl } = useI18nUIComponents();
 
 const rootStore = useRootStore();
 
@@ -246,6 +246,12 @@ const twoFAVerifyTypeSwitchName = computed<string>(() => {
         return 'Use Backup Code';
     }
 });
+
+function switchToDesktopVersion(): void {
+    showConfirm('Are you sure you want to switch to desktop version?', () => {
+        window.location.replace(getDesktopVersionPath());
+    });
+}
 
 function login(): void {
     const router = props.f7router;

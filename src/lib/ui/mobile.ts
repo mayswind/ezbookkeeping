@@ -319,12 +319,38 @@ export function useI18nUIComponents() {
         });
     }
 
+    function openExternalUrl(url: string): void {
+        const textDirection = getCurrentLanguageTextDirection();
+
+        const cancelButton: Dialog.DialogButton = {
+            text: tt('Cancel')
+        };
+
+        const confirmButton: Dialog.DialogButton = {
+            text: tt('OK'),
+            onClick: () => {
+                window.open(url, '_blank');
+            }
+        };
+
+        f7ready((f7) => {
+            f7.dialog.create({
+                title: tt('global.app.title'),
+                text: tt('Are you sure you want to open this link?'),
+                content: `<div style="word-break: break-all">${url}</div>`,
+                animate: isEnableAnimate(),
+                buttons: textDirection == TextDirection.RTL ? [confirmButton, cancelButton] : [cancelButton, confirmButton]
+            }).open();
+        });
+    }
+
     return {
         showAlert: showAlert,
         showConfirm: showConfirm,
         showPrompt: showPrompt,
         showCancelableLoading: showCancelableLoading,
         showToast: showToast,
+        openExternalUrl,
         routeBackOnError
     }
 }

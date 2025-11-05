@@ -91,7 +91,7 @@
             <f7-list-item>
                 <small>{{ tt('Data source') }}</small>
                 <small>
-                    <f7-link external target="_blank" :href="exchangeRatesData.referenceUrl" v-if="!isUserCustomExchangeRates && exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</f7-link>
+                    <f7-link @click="openExternalUrl(exchangeRatesData.referenceUrl)" v-if="!isUserCustomExchangeRates && exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</f7-link>
                     <span v-else-if="!isUserCustomExchangeRates && !exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
                     <span v-else-if="isUserCustomExchangeRates">{{ tt('User Custom') }}</span>
                 </small>
@@ -159,7 +159,7 @@ const {
     formatExchangeRateAmountToWesternArabicNumerals
 } = useI18n();
 
-const { showAlert, showToast } = useI18nUIComponents();
+const { showAlert, showToast, openExternalUrl } = useI18nUIComponents();
 
 const {
     baseCurrency,

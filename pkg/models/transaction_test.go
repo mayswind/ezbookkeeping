@@ -164,6 +164,61 @@ func TestTransactionStatisticTrendsResponseItemSliceLess(t *testing.T) {
 	assert.Equal(t, int32(9), transactionTrendsSlice[4].Month)
 }
 
+func TestTransactionStatisticAssetTrendsResponseItemSliceLess(t *testing.T) {
+	var transactionTrendsSlice TransactionStatisticAssetTrendsResponseItemSlice
+	transactionTrendsSlice = append(transactionTrendsSlice, &TransactionStatisticAssetTrendsResponseItem{
+		Year:  2024,
+		Month: 9,
+		Day:   1,
+	})
+	transactionTrendsSlice = append(transactionTrendsSlice, &TransactionStatisticAssetTrendsResponseItem{
+		Year:  2024,
+		Month: 9,
+		Day:   2,
+	})
+	transactionTrendsSlice = append(transactionTrendsSlice, &TransactionStatisticAssetTrendsResponseItem{
+		Year:  2024,
+		Month: 10,
+		Day:   1,
+	})
+	transactionTrendsSlice = append(transactionTrendsSlice, &TransactionStatisticAssetTrendsResponseItem{
+		Year:  2022,
+		Month: 10,
+		Day:   1,
+	})
+	transactionTrendsSlice = append(transactionTrendsSlice, &TransactionStatisticAssetTrendsResponseItem{
+		Year:  2023,
+		Month: 1,
+		Day:   1,
+	})
+	transactionTrendsSlice = append(transactionTrendsSlice, &TransactionStatisticAssetTrendsResponseItem{
+		Year:  2024,
+		Month: 2,
+		Day:   2,
+	})
+
+	sort.Sort(transactionTrendsSlice)
+
+	assert.Equal(t, int32(2022), transactionTrendsSlice[0].Year)
+	assert.Equal(t, int32(10), transactionTrendsSlice[0].Month)
+	assert.Equal(t, int32(1), transactionTrendsSlice[0].Day)
+	assert.Equal(t, int32(2023), transactionTrendsSlice[1].Year)
+	assert.Equal(t, int32(1), transactionTrendsSlice[1].Month)
+	assert.Equal(t, int32(1), transactionTrendsSlice[1].Day)
+	assert.Equal(t, int32(2024), transactionTrendsSlice[2].Year)
+	assert.Equal(t, int32(2), transactionTrendsSlice[2].Month)
+	assert.Equal(t, int32(2), transactionTrendsSlice[2].Day)
+	assert.Equal(t, int32(2024), transactionTrendsSlice[3].Year)
+	assert.Equal(t, int32(9), transactionTrendsSlice[3].Month)
+	assert.Equal(t, int32(1), transactionTrendsSlice[3].Day)
+	assert.Equal(t, int32(2024), transactionTrendsSlice[4].Year)
+	assert.Equal(t, int32(9), transactionTrendsSlice[4].Month)
+	assert.Equal(t, int32(2), transactionTrendsSlice[4].Day)
+	assert.Equal(t, int32(2024), transactionTrendsSlice[5].Year)
+	assert.Equal(t, int32(10), transactionTrendsSlice[5].Month)
+	assert.Equal(t, int32(1), transactionTrendsSlice[5].Day)
+}
+
 func TestTransactionAmountsResponseItemAmountInfoSliceLess(t *testing.T) {
 	var amountInfoSlice TransactionAmountsResponseItemAmountInfoSlice
 	amountInfoSlice = append(amountInfoSlice, &TransactionAmountsResponseItemAmountInfo{

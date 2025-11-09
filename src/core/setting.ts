@@ -7,7 +7,8 @@ import {
     ChartDataType,
     ChartSortingType,
     DEFAULT_CATEGORICAL_CHART_DATA_RANGE,
-    DEFAULT_TREND_CHART_DATA_RANGE
+    DEFAULT_TREND_CHART_DATA_RANGE,
+    DEFAULT_ASSET_TRENDS_CHART_DATA_RANGE
 } from './statistics.ts';
 import { DEFAULT_CURRENCY_CODE } from '@/consts/currency.ts';
 
@@ -63,6 +64,8 @@ export interface ApplicationSettings extends BaseApplicationSetting {
         defaultCategoricalChartDataRangeType: number;
         defaultTrendChartType: number;
         defaultTrendChartDataRangeType: number;
+        defaultAssetTrendsChartType: number;
+        defaultAssetTrendsChartDataRangeType: number;
     };
 }
 
@@ -122,6 +125,8 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     'statistics.defaultCategoricalChartDataRangeType': UserApplicationCloudSettingType.Number,
     'statistics.defaultTrendChartType': UserApplicationCloudSettingType.Number,
     'statistics.defaultTrendChartDataRangeType': UserApplicationCloudSettingType.Number,
+    'statistics.defaultAssetTrendsChartType': UserApplicationCloudSettingType.Number,
+    'statistics.defaultAssetTrendsChartDataRangeType': UserApplicationCloudSettingType.Number,
 };
 
 export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
@@ -168,6 +173,8 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
         defaultCategoricalChartDataRangeType: DEFAULT_CATEGORICAL_CHART_DATA_RANGE.type,
         defaultTrendChartType: TrendChartType.Default.type,
         defaultTrendChartDataRangeType: DEFAULT_TREND_CHART_DATA_RANGE.type,
+        defaultAssetTrendsChartType: TrendChartType.Default.type,
+        defaultAssetTrendsChartDataRangeType: DEFAULT_ASSET_TRENDS_CHART_DATA_RANGE.type,
     }
 };
 

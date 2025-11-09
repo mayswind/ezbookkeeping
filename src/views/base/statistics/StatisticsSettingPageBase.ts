@@ -27,6 +27,7 @@ export function useStatisticsSettingPageBase() {
     const allCategoricalChartDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.Normal, false));
     const allTrendChartTypes = computed<TypeAndDisplayName[]>(() => getAllTrendChartTypes());
     const allTrendChartDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.TrendAnalysis, false));
+    const allAssetTrendsChartDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.AssetTrends, false));
 
     const defaultChartDataType = computed<number>({
         get: () => settingsStore.appSettings.statistics.defaultChartDataType,
@@ -63,6 +64,16 @@ export function useStatisticsSettingPageBase() {
         set: (value: number) => settingsStore.setStatisticsDefaultTrendChartDateRange(value)
     });
 
+    const defaultAssetTrendsChartType = computed<number>({
+        get: () => settingsStore.appSettings.statistics.defaultAssetTrendsChartType,
+        set: (value: number) => settingsStore.setStatisticsDefaultAssetTrendsChartType(value)
+    });
+
+    const defaultAssetTrendsChartDateRange = computed<number>({
+        get: () => settingsStore.appSettings.statistics.defaultAssetTrendsChartDataRangeType,
+        set: (value: number) => settingsStore.setStatisticsDefaultAssetTrendsChartDateRange(value)
+    });
+
     return {
         // computed states
         allChartDataTypes,
@@ -72,12 +83,15 @@ export function useStatisticsSettingPageBase() {
         allCategoricalChartDateRanges,
         allTrendChartTypes,
         allTrendChartDateRanges,
+        allAssetTrendsChartDateRanges,
         defaultChartDataType,
         defaultTimezoneType,
         defaultSortingType,
         defaultCategoricalChartType,
         defaultCategoricalChartDateRange,
         defaultTrendChartType,
-        defaultTrendChartDateRange
+        defaultTrendChartDateRange,
+        defaultAssetTrendsChartType,
+        defaultAssetTrendsChartDateRange
     };
 }

@@ -340,7 +340,7 @@ func (a *TransactionsApi) TransactionReconciliationStatementHandler(c *core.WebC
 		minTransactionTime = utils.GetMinTransactionTimeFromUnixTime(reconciliationStatementRequest.StartTime)
 	}
 
-	transactionsWithAccountBalance, totalInflows, totalOutflows, openingBalance, closingBalance, err := a.transactions.GetAllTransactionsWithAccountBalanceByMaxTime(c, uid, pageCountForAccountStatement, maxTransactionTime, minTransactionTime, reconciliationStatementRequest.AccountId, account.Category)
+	transactionsWithAccountBalance, totalInflows, totalOutflows, openingBalance, closingBalance, err := a.transactions.GetAllTransactionsInOneAccountWithAccountBalanceByMaxTime(c, uid, pageCountForAccountStatement, maxTransactionTime, minTransactionTime, reconciliationStatementRequest.AccountId, account.Category)
 
 	if err != nil {
 		log.Errorf(c, "[transactions.TransactionReconciliationStatementHandler] failed to get transactions from \"%d\" to \"%d\" for user \"uid:%d\", because %s", reconciliationStatementRequest.StartTime, reconciliationStatementRequest.EndTime, uid, err.Error())
@@ -530,6 +530,71 @@ func (a *TransactionsApi) TransactionStatisticsTrendsHandler(c *core.WebContext)
 	sort.Sort(statisticTrendsResp)
 
 	return statisticTrendsResp, nil
+}
+
+// TransactionStatisticsAssetTrendsHandler returns transaction statistics asset trends of current user
+func (a *TransactionsApi) TransactionStatisticsAssetTrendsHandler(c *core.WebContext) (any, *errs.Error) {
+	var statisticAssetTrendsReq models.TransactionStatisticAssetTrendsRequest
+	err := c.ShouldBindQuery(&statisticAssetTrendsReq)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionStatisticsAssetTrendsHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	utcOffset, err := c.GetClientTimezoneOffset()
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionStatisticsAssetTrendsHandler] cannot get client timezone offset, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
+	uid := c.GetCurrentUid()
+
+	maxTransactionTime := int64(0)
+
+	if statisticAssetTrendsReq.EndTime > 0 {
+		maxTransactionTime = utils.GetMaxTransactionTimeFromUnixTime(statisticAssetTrendsReq.EndTime)
+	}
+
+	minTransactionTime := int64(0)
+
+	if statisticAssetTrendsReq.StartTime > 0 {
+		minTransactionTime = utils.GetMinTransactionTimeFromUnixTime(statisticAssetTrendsReq.StartTime)
+	}
+
+	accountDailyBalances, err := a.transactions.GetAllAccountsDailyOpeningAndClosingBalance(c, uid, maxTransactionTime, minTransactionTime, utcOffset)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionStatisticsAssetTrendsHandler] failed to get transactions from \"%d\" to \"%d\" for user \"uid:%d\", because %s", statisticAssetTrendsReq.StartTime, statisticAssetTrendsReq.EndTime, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	statisticAssetTrendsResp := make(models.TransactionStatisticAssetTrendsResponseItemSlice, 0)
+
+	for yearMonthDay, dailyAccountBalances := range accountDailyBalances {
+		dailyStatisticResp := &models.TransactionStatisticAssetTrendsResponseItem{
+			Year:  yearMonthDay / 10000,
+			Month: (yearMonthDay % 10000) / 100,
+			Day:   yearMonthDay % 100,
+			Items: make([]*models.TransactionStatisticAssetTrendsResponseDataItem, len(dailyAccountBalances)),
+		}
+
+		for i := 0; i < len(dailyAccountBalances); i++ {
+			accountBalance := dailyAccountBalances[i]
+			dailyStatisticResp.Items[i] = &models.TransactionStatisticAssetTrendsResponseDataItem{
+				AccountId:             accountBalance.AccountId,
+				AccountOpeningBalance: accountBalance.AccountOpeningBalance,
+				AccountClosingBalance: accountBalance.AccountClosingBalance,
+			}
+		}
+
+		statisticAssetTrendsResp = append(statisticAssetTrendsResp, dailyStatisticResp)
+	}
+
+	sort.Sort(statisticAssetTrendsResp)
+
+	return statisticAssetTrendsResp, nil
 }
 
 // TransactionAmountsHandler returns transaction amounts of current user

@@ -14,7 +14,7 @@ import { ChartDateAggregationType } from '@/core/statistics.ts';
 import type { AccountInfoResponse } from '@/models/account.ts';
 import type { TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
 
-import { isDefined, isArray } from '@/lib/common.ts';
+import { isArray } from '@/lib/common.ts';
 import { sumAmounts } from '@/lib/numeral.ts';
 import {
     getGregorianCalendarYearAndMonthFromUnixTime,
@@ -45,7 +45,7 @@ export interface AccountBalanceTrendsChartItem {
 
 export interface CommonAccountBalanceTrendsChartProps {
     items: TransactionReconciliationStatementResponseItem[] | undefined;
-    dateAggregationType?: number;
+    dateAggregationType: number;
     fiscalYearStart: number;
     account: AccountInfoResponse;
 }
@@ -100,7 +100,7 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
             return [];
         }
 
-        if (!isDefined(props.dateAggregationType)) {
+        if (props.dateAggregationType === ChartDateAggregationType.Day.type) {
             return getAllDaysStartAndEndUnixTimes(dataDateRange.value.minUnixTime, dataDateRange.value.maxUnixTime);
         } else {
             const startYearMonth = getGregorianCalendarYearAndMonthFromUnixTime(dataDateRange.value.minUnixTime);
@@ -129,8 +129,10 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
                 dateRangeMinUnixTime = getQuarterFirstUnixTimeBySpecifiedUnixTime(dateItem.time);
             } else if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
                 dateRangeMinUnixTime = getMonthFirstUnixTimeBySpecifiedUnixTime(dateItem.time);
-            } else {
+            } else if (props.dateAggregationType === ChartDateAggregationType.Day.type) {
                 dateRangeMinUnixTime = getDayFirstUnixTimeBySpecifiedUnixTime(dateItem.time);
+            } else {
+                return ret;
             }
 
             const dataItems: TransactionReconciliationStatementResponseItem[] = dayDataItemsMap[dateRangeMinUnixTime] || [];
@@ -159,8 +161,10 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
                 displayDate = formatUnixTimeToGregorianLikeYearQuarter(dateRange.minUnixTime);
             } else if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
                 displayDate = formatUnixTimeToGregorianLikeShortYearMonth(dateRange.minUnixTime);
-            } else {
+            } else if (props.dateAggregationType === ChartDateAggregationType.Day.type) {
                 displayDate = formatUnixTimeToShortDate(dateRange.minUnixTime);
+            } else {
+                return ret;
             }
 
             if (isArray(dataItems)) {

@@ -88,6 +88,14 @@ export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingI
             { settingKey: 'statistics.defaultTrendChartType', settingName: 'Default Chart Type', mobile: false, desktop: true },
             { settingKey: 'statistics.defaultTrendChartDataRangeType', settingName: 'Default Date Range', mobile: true, desktop: true }
         ]
+    },
+    {
+        categoryName: 'Statistics Settings',
+        categorySubName: 'Asset Trends Settings',
+        items: [
+            { settingKey: 'statistics.defaultAssetTrendsChartType', settingName: 'Default Chart Type', mobile: false, desktop: true },
+            { settingKey: 'statistics.defaultAssetTrendsChartDataRangeType', settingName: 'Default Date Range', mobile: true, desktop: true }
+        ]
     }
 ];
 

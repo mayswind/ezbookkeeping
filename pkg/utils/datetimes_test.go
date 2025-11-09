@@ -133,6 +133,20 @@ func TestFormatUnixTimeToNumericYearMonth(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
+func TestFormatUnixTimeToNumericYearMonthDay(t *testing.T) {
+	unixTime := int64(1617228083)
+	utcTimezone := time.FixedZone("Test Timezone", 0)      // UTC
+	utc8Timezone := time.FixedZone("Test Timezone", 28800) // UTC+8
+
+	expectedValue := int32(20210331)
+	actualValue := FormatUnixTimeToNumericYearMonthDay(unixTime, utcTimezone)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int32(20210401)
+	actualValue = FormatUnixTimeToNumericYearMonthDay(unixTime, utc8Timezone)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
 func TestFormatUnixTimeToNumericLocalDateTime(t *testing.T) {
 	unixTime := int64(1617228083)
 	utcTimezone := time.FixedZone("Test Timezone", 0)      // UTC

@@ -281,14 +281,6 @@
         <f7-popover class="chart-data-date-aggregation-type-popover-menu"
                     v-model:opened="showChartDataDateAggregationTypePopover">
             <f7-list dividers>
-                <f7-list-item :title="tt('granularity.Daily')"
-                              :class="{ 'list-item-selected': chartDataDateAggregationType === undefined }"
-                              key="daily"
-                              @click="setChartDataDateAggregationType(undefined)">
-                    <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="chartDataDateAggregationType === undefined"></f7-icon>
-                    </template>
-                </f7-list-item>
                 <f7-list-item :title="dateAggregationType.displayName"
                               :class="{ 'list-item-selected': chartDataDateAggregationType === dateAggregationType.type }"
                               :key="dateAggregationType.type"
@@ -358,6 +350,7 @@ import { TextDirection } from '@/core/text.ts';
 import { type TimeRangeAndDateType, DateRange, DateRangeScene } from '@/core/datetime.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
+import { ChartDateAggregationType } from '@/core/statistics.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import { type TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
 
@@ -436,7 +429,7 @@ const loading = ref<boolean>(false);
 const loadingError = ref<unknown | null>(null);
 const queryDateRangeType = ref<number>(DateRange.ThisMonth.type);
 const showAccountBalanceTrendsCharts = ref<boolean>(false);
-const chartDataDateAggregationType = ref<number | undefined>(undefined);
+const chartDataDateAggregationType = ref<number>(ChartDateAggregationType.Day.type);
 const transactionToDelete = ref<TransactionReconciliationStatementResponseItem | null>(null);
 const newClosingBalance = ref<number>(0);
 const showDisplayModePopover = ref<boolean>(false);
@@ -489,10 +482,6 @@ const allReconciliationStatementVirtualListItems = computed<ReconciliationStatem
 });
 
 const chartDataDateAggregationTypeDisplayName = computed<string>(() => {
-    if (chartDataDateAggregationType.value === undefined) {
-        return tt('granularity.Daily');
-    }
-
     return findDisplayNameByType(allDateAggregationTypes.value, chartDataDateAggregationType.value) || tt('Unknown');
 });
 
@@ -681,7 +670,7 @@ function removeTransaction(transaction: TransactionReconciliationStatementRespon
     });
 }
 
-function setChartDataDateAggregationType(type: number | undefined): void {
+function setChartDataDateAggregationType(type: number): void {
     chartDataDateAggregationType.value = type;
     showChartDataDateAggregationTypePopover.value = false;
 }

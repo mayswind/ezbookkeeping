@@ -275,6 +275,12 @@ type TransactionStatisticTrendsRequest struct {
 	UseTransactionTimezone bool                     `form:"use_transaction_timezone"`
 }
 
+// TransactionStatisticAssetTrendsRequest represents all parameters of transaction statistic asset trends request
+type TransactionStatisticAssetTrendsRequest struct {
+	StartTime int64 `form:"start_time"`
+	EndTime   int64 `form:"end_time"`
+}
+
 // TransactionAmountsRequest represents all parameters of transaction amounts request
 type TransactionAmountsRequest struct {
 	Query                  string `form:"query"`
@@ -401,6 +407,21 @@ type TransactionStatisticTrendsResponseItem struct {
 	Year  int32                               `json:"year"`
 	Month int32                               `json:"month"`
 	Items []*TransactionStatisticResponseItem `json:"items"`
+}
+
+// TransactionStatisticAssetTrendsResponseItem represents the data within each statistic interval
+type TransactionStatisticAssetTrendsResponseItem struct {
+	Year  int32                                              `json:"year"`
+	Month int32                                              `json:"month"`
+	Day   int32                                              `json:"day"`
+	Items []*TransactionStatisticAssetTrendsResponseDataItem `json:"items"`
+}
+
+// TransactionStatisticAssetTrendsResponseDataItem represents an asset trends data item
+type TransactionStatisticAssetTrendsResponseDataItem struct {
+	AccountId             int64 `json:"accountId,string"`
+	AccountOpeningBalance int64 `json:"accountOpeningBalance"`
+	AccountClosingBalance int64 `json:"accountClosingBalance"`
 }
 
 // TransactionAmountsResponseItem represents an item of transaction amounts
@@ -598,6 +619,32 @@ func (s TransactionStatisticTrendsResponseItemSlice) Less(i, j int) bool {
 	}
 
 	return s[i].Month < s[j].Month
+}
+
+// TransactionStatisticAssetTrendsResponseItemSlice represents the slice data structure of TransactionStatisticAssetTrendsResponseItem
+type TransactionStatisticAssetTrendsResponseItemSlice []*TransactionStatisticAssetTrendsResponseItem
+
+// Len returns the count of items
+func (s TransactionStatisticAssetTrendsResponseItemSlice) Len() int {
+	return len(s)
+}
+
+// Swap swaps two items
+func (s TransactionStatisticAssetTrendsResponseItemSlice) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+// Less reports whether the first item is less than the second one
+func (s TransactionStatisticAssetTrendsResponseItemSlice) Less(i, j int) bool {
+	if s[i].Year != s[j].Year {
+		return s[i].Year < s[j].Year
+	}
+
+	if s[i].Month != s[j].Month {
+		return s[i].Month < s[j].Month
+	}
+
+	return s[i].Day < s[j].Day
 }
 
 // TransactionAmountsResponseItemAmountInfoSlice represents the slice data structure of TransactionAmountsResponseItemAmountInfo

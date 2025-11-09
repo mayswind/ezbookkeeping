@@ -7,7 +7,8 @@
                         <div class="mx-6 my-4">
                             <btn-vertical-group :disabled="loading" :buttons="[
                                 { name: tt('Categorical Analysis'), value: StatisticsAnalysisType.CategoricalAnalysis },
-                                { name: tt('Trend Analysis'), value: StatisticsAnalysisType.TrendAnalysis }
+                                { name: tt('Trend Analysis'), value: StatisticsAnalysisType.TrendAnalysis },
+                                { name: tt('Asset Trends'), value: StatisticsAnalysisType.AssetTrends }
                             ]" v-model="queryAnalysisType" />
                         </div>
                         <v-divider />
@@ -59,7 +60,7 @@
                     <v-main>
                         <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
                             <v-window-item value="statisticsPage">
-                                <v-card variant="flat" :min-height="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis ? '860' : '760'">
+                                <v-card variant="flat" :min-height="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis || queryAnalysisType === StatisticsAnalysisType.AssetTrends ? '900' : '800'">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
                                             <v-btn class="me-3 d-md-none" density="compact" color="default" variant="plain"
@@ -73,7 +74,7 @@
                                                        @click="shiftDateRange(-1)"/>
                                                 <v-menu location="bottom">
                                                     <template #activator="{ props }">
-                                                        <v-btn :disabled="loading || queryChartDataType === ChartDataType.AccountTotalAssets.type || queryChartDataType === ChartDataType.AccountTotalLiabilities.type"
+                                                        <v-btn :disabled="loading || !canChangeDateRange"
                                                                v-bind="props">{{ queryDateRangeName }}</v-btn>
                                                     </template>
                                                     <v-list :selected="[queryDateType]">
@@ -110,8 +111,24 @@
                                                     <v-list-item class="cursor-pointer" :key="aggregationType.type" :value="aggregationType.type"
                                                                  :append-icon="(trendDateAggregationType === aggregationType.type ? mdiCheck : undefined)"
                                                                  :title="aggregationType.displayName"
-                                                                 v-for="aggregationType in allDateAggregationTypes"
+                                                                 v-for="aggregationType in allTrendAnalysisDateAggregationTypes"
                                                                  @click="setTrendDateAggregationType(aggregationType.type)">
+                                                    </v-list-item>
+                                                </v-list>
+                                            </v-menu>
+
+                                            <v-menu location="bottom" v-if="queryAnalysisType === StatisticsAnalysisType.AssetTrends">
+                                                <template #activator="{ props }">
+                                                    <v-btn class="ms-3" color="default" variant="outlined"
+                                                           :prepend-icon="mdiCalendarRangeOutline" :disabled="loading"
+                                                           v-bind="props">{{ queryAssetTrendsDateAggregationTypeName }}</v-btn>
+                                                </template>
+                                                <v-list>
+                                                    <v-list-item class="cursor-pointer" :key="aggregationType.type" :value="aggregationType.type"
+                                                                 :append-icon="(assetTrendsDateAggregationType === aggregationType.type ? mdiCheck : undefined)"
+                                                                 :title="aggregationType.displayName"
+                                                                 v-for="aggregationType in allAssetTrendsDateAggregationTypes"
+                                                                 @click="setAssetTrendsDateAggregationType(aggregationType.type)">
                                                     </v-list-item>
                                                 </v-list>
                                             </v-menu>
@@ -205,10 +222,11 @@
                                     </v-card-text>
 
                                     <v-card-text class="statistics-overview-title pt-0"
-                                                 v-else-if="!initing && (
+                                                 v-else-if="!loading && (
                                                      (queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && isQuerySpecialChartType && queryChartDataType === ChartDataType.Overview.type && (!categoricalOverviewAnalysisData || !categoricalOverviewAnalysisData.items || !categoricalOverviewAnalysisData.items.length))
                                                   || (queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && (!categoricalAnalysisData || !categoricalAnalysisData.items || !categoricalAnalysisData.items.length))
                                                   || (queryAnalysisType === StatisticsAnalysisType.TrendAnalysis && (!trendsAnalysisData || !trendsAnalysisData.items || !trendsAnalysisData.items.length))
+                                                  || (queryAnalysisType === StatisticsAnalysisType.AssetTrends && (!assetTrendsData || !assetTrendsData.items || !assetTrendsData.items.length))
                                                   )">
                                         <span class="statistics-subtitle statistics-overview-empty-tip">{{ tt('No transaction data') }}</span>
                                     </v-card-text>
@@ -345,11 +363,15 @@
                                     </v-card-text>
 
                                     <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis">
-                                        <monthly-trends-chart
+                                        <trends-chart
+                                            chart-mode="monthly"
                                             :type="queryChartType"
+                                            :start-time="undefined"
+                                            :end-time="undefined"
                                             :start-year-month="query.trendChartStartYearMonth"
                                             :end-year-month="query.trendChartEndYearMonth"
                                             :sorting-type="querySortingType"
+                                            :data-aggregation-type="ChartDataAggregationType.Sum"
                                             :date-aggregation-type="trendDateAggregationType"
                                             :fiscal-year-start="fiscalYearStart"
                                             :items="[]"
@@ -360,11 +382,15 @@
                                             color-field="color"
                                             v-if="initing"
                                         />
-                                        <monthly-trends-chart
+                                        <trends-chart
+                                            chart-mode="monthly"
                                             :type="queryChartType"
+                                            :start-time="undefined"
+                                            :end-time="undefined"
                                             :start-year-month="query.trendChartStartYearMonth"
                                             :end-year-month="query.trendChartEndYearMonth"
                                             :sorting-type="querySortingType"
+                                            :data-aggregation-type="ChartDataAggregationType.Sum"
                                             :date-aggregation-type="trendDateAggregationType"
                                             :fiscal-year-start="fiscalYearStart"
                                             :items="trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length ? trendsAnalysisData.items : []"
@@ -381,6 +407,55 @@
                                             hidden-field="hidden"
                                             display-orders-field="displayOrders"
                                             v-else-if="!initing && trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length"
+                                            @click="onClickTrendChartItem"
+                                        />
+                                    </v-card-text>
+
+                                    <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.AssetTrends">
+                                        <trends-chart
+                                            chart-mode="daily"
+                                            :type="queryChartType"
+                                            :start-time="query.assetTrendsChartStartTime"
+                                            :end-time="query.assetTrendsChartEndTime"
+                                            :start-year-month="undefined"
+                                            :end-year-month="undefined"
+                                            :sorting-type="querySortingType"
+                                            :data-aggregation-type="ChartDataAggregationType.Last"
+                                            :date-aggregation-type="assetTrendsDateAggregationType"
+                                            :fiscal-year-start="fiscalYearStart"
+                                            :items="[]"
+                                            :skeleton="true"
+                                            id-field="id"
+                                            name-field="name"
+                                            value-field="value"
+                                            color-field="color"
+                                            v-if="initing"
+                                        />
+                                        <trends-chart
+                                            chart-mode="daily"
+                                            :type="queryChartType"
+                                            :start-time="query.assetTrendsChartStartTime"
+                                            :end-time="query.assetTrendsChartEndTime"
+                                            :start-year-month="undefined"
+                                            :end-year-month="undefined"
+                                            :sorting-type="querySortingType"
+                                            :data-aggregation-type="ChartDataAggregationType.Last"
+                                            :date-aggregation-type="assetTrendsDateAggregationType"
+                                            :fiscal-year-start="fiscalYearStart"
+                                            :items="assetTrendsData && assetTrendsData.items && assetTrendsData.items.length ? assetTrendsData.items : []"
+                                            :translate-name="translateNameInTrendsChart"
+                                            :show-value="showAmountInChart"
+                                            :enable-click-item="true"
+                                            :default-currency="defaultCurrency"
+                                            :stacked="showStackedInTrendsChart"
+                                            :show-total-amount-in-tooltip="showTotalAmountInTrendsChart"
+                                            ref="dailyTrendsChart"
+                                            id-field="id"
+                                            name-field="name"
+                                            value-field="totalAmount"
+                                            hidden-field="hidden"
+                                            display-orders-field="displayOrders"
+                                            v-else-if="!initing && assetTrendsData && assetTrendsData.items && assetTrendsData.items.length"
                                             @click="onClickTrendChartItem"
                                         />
                                     </v-card-text>
@@ -429,7 +504,7 @@
 
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
-import MonthlyTrendsChart from '@/components/desktop/MonthlyTrendsChart.vue';
+import TrendsChart from '@/components/desktop/TrendsChart.vue';
 import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
 import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
 import TransactionTagFilterSettingsCard from '@/views/desktop/common/cards/TransactionTagFilterSettingsCard.vue';
@@ -450,6 +525,7 @@ import type { TypeAndDisplayName } from '@/core/base.ts';
 import { type TextualYearMonth, type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
 import {
+    ChartDataAggregationType,
     StatisticsAnalysisType,
     CategoricalChartType,
     ChartDataType,
@@ -488,7 +564,7 @@ import {
 } from '@mdi/js';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
-type MonthlyTrendsChartType = InstanceType<typeof MonthlyTrendsChart>;
+type TrendsChartType = InstanceType<typeof TrendsChart>;
 type ExportDialogType = InstanceType<typeof ExportDialog>;
 
 interface TransactionStatisticsProps {
@@ -505,6 +581,7 @@ interface TransactionStatisticsProps {
     initKeyword?: string;
     initSortingType?: string,
     initTrendDateAggregationType?: string
+    initAssetTrendsDateAggregationType?: string
 }
 
 const props = defineProps<TransactionStatisticsProps>();
@@ -525,12 +602,14 @@ const {
     loading,
     analysisType,
     trendDateAggregationType,
+    assetTrendsDateAggregationType,
     defaultCurrency,
     firstDayOfWeek,
     fiscalYearStart,
     allDateRanges,
     allSortingTypes,
-    allDateAggregationTypes,
+    allTrendAnalysisDateAggregationTypes,
+    allAssetTrendsDateAggregationTypes,
     query,
     queryChartDataCategory,
     queryDateType,
@@ -538,6 +617,8 @@ const {
     queryEndTime,
     queryDateRangeName,
     queryTrendDateAggregationTypeName,
+    queryAssetTrendsDateAggregationTypeName,
+    canChangeDateRange,
     canShiftDateRange,
     canUseCategoryFilter,
     canUseTagFilter,
@@ -551,6 +632,7 @@ const {
     categoricalOverviewAnalysisData,
     categoricalAnalysisData,
     trendsAnalysisData,
+    assetTrendsData,
     canShowCustomDateRange,
     getTransactionCategoricalAnalysisDataItemDisplayColor,
     getDisplayAmount
@@ -561,7 +643,8 @@ const transactionCategoriesStore = useTransactionCategoriesStore();
 const statisticsStore = useStatisticsStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
-const monthlyTrendsChart = useTemplateRef<MonthlyTrendsChartType>('monthlyTrendsChart');
+const monthlyTrendsChart = useTemplateRef<TrendsChartType>('monthlyTrendsChart');
+const dailyTrendsChart = useTemplateRef<TrendsChartType>('dailyTrendsChart');
 const exportDialog = useTemplateRef<ExportDialogType>('exportDialog');
 
 const activeTab = ref<string>('statisticsPage');
@@ -582,6 +665,8 @@ const statisticsDataHasData = computed<boolean>(() => {
         return !!categoricalAnalysisData.value && !!categoricalAnalysisData.value.items && categoricalAnalysisData.value.items.length > 0;
     } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
         return !!trendsAnalysisData.value && !!trendsAnalysisData.value.items && trendsAnalysisData.value.items.length > 0 && !!monthlyTrendsChart.value;
+    } else if (analysisType.value === StatisticsAnalysisType.AssetTrends) {
+        return !!assetTrendsData.value && !!assetTrendsData.value.items && assetTrendsData.value.items.length > 0 && !!dailyTrendsChart.value;
     }
 
     return false;
@@ -591,6 +676,8 @@ const allChartTypes = computed<TypeAndDisplayName[]>(() => {
     if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
         return getAllCategoricalChartTypes(true);
     } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
+        return getAllTrendChartTypes();
+    } else if (analysisType.value === StatisticsAnalysisType.AssetTrends) {
         return getAllTrendChartTypes();
     } else {
         return [];
@@ -610,6 +697,8 @@ const queryChartType = computed<number | undefined>({
             return query.value.categoricalChartType;
         } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
             return query.value.trendChartType;
+        } else if (analysisType.value === StatisticsAnalysisType.AssetTrends) {
+            return query.value.assetTrendsChartType;
         } else {
             return undefined;
         }
@@ -654,7 +743,7 @@ const statisticsTextColor = computed<string>(() => {
 });
 
 function getFilterLinkUrl(): string {
-    return `/statistics/transaction?${statisticsStore.getTransactionStatisticsPageParams(analysisType.value, trendDateAggregationType.value)}`;
+    return `/statistics/transaction?${statisticsStore.getTransactionStatisticsPageParams(analysisType.value, trendDateAggregationType.value, assetTrendsDateAggregationType.value)}`;
 }
 
 function getTransactionItemLinkUrl(itemId: string, dateRange?: TimeRangeAndDateType): string {
@@ -718,6 +807,29 @@ function init(initProps: TransactionStatisticsProps): void {
         if (initProps.initTrendDateAggregationType) {
             trendDateAggregationType.value = parseInt(initProps.initTrendDateAggregationType);
         }
+    } else if (initProps.initAnalysisType === StatisticsAnalysisType.AssetTrends.toString()) {
+        filter.assetTrendsChartType = initProps.initChartType ? parseInt(initProps.initChartType) : undefined;
+        filter.assetTrendsChartDateType = initProps.initChartDateType ? parseInt(initProps.initChartDateType) : undefined;
+        filter.assetTrendsChartStartTime = initProps.initStartTime ? parseInt(initProps.initStartTime) : undefined;
+        filter.assetTrendsChartEndTime = initProps.initEndTime ? parseInt(initProps.initEndTime) : undefined;
+
+        if (filter.assetTrendsChartDateType !== query.value.assetTrendsChartDateType) {
+            needReload = true;
+        } else if (filter.assetTrendsChartDateType === DateRange.Custom.type) {
+            if (filter.assetTrendsChartStartTime !== query.value.assetTrendsChartStartTime
+                || filter.assetTrendsChartEndTime !== query.value.assetTrendsChartEndTime) {
+                needReload = true;
+            }
+        }
+
+        if (initProps.initAnalysisType !== analysisType.value.toString()) {
+            analysisType.value = StatisticsAnalysisType.AssetTrends;
+            needReload = true;
+        }
+
+        if (initProps.initAssetTrendsDateAggregationType) {
+            assetTrendsDateAggregationType.value = parseInt(initProps.initAssetTrendsDateAggregationType);
+        }
     }
 
     if (!isDefined(initProps.initAnalysisType)) {
@@ -743,6 +855,10 @@ function init(initProps: TransactionStatisticsProps): void {
             }) as Promise<unknown>;
         } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
             return statisticsStore.loadTrendAnalysis({
+                force: false
+            }) as Promise<unknown>;
+        } else if (analysisType.value === StatisticsAnalysisType.AssetTrends) {
+            return statisticsStore.loadAssetTrends({
                 force: false
             }) as Promise<unknown>;
         } else {
@@ -780,7 +896,8 @@ function reload(force: boolean): Promise<unknown> | null {
         query.value.chartDataType === ChartDataType.TotalInflows.type ||
         query.value.chartDataType === ChartDataType.TotalIncome.type ||
         query.value.chartDataType === ChartDataType.NetCashFlow.type ||
-        query.value.chartDataType === ChartDataType.NetIncome.type) {
+        query.value.chartDataType === ChartDataType.NetIncome.type ||
+        query.value.chartDataType === ChartDataType.NetWorth.type) {
         if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
             dispatchPromise = statisticsStore.loadCategoricalAnalysis({
                 force: force
@@ -789,12 +906,22 @@ function reload(force: boolean): Promise<unknown> | null {
             dispatchPromise = statisticsStore.loadTrendAnalysis({
                 force: force
             });
+        } else if (analysisType.value === StatisticsAnalysisType.AssetTrends) {
+            dispatchPromise = statisticsStore.loadAssetTrends({
+                force: force
+            });
         }
     } else if (query.value.chartDataType === ChartDataType.AccountTotalAssets.type ||
         query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type) {
-        dispatchPromise = accountsStore.loadAllAccounts({
-            force: force
-        });
+        if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
+            dispatchPromise = accountsStore.loadAllAccounts({
+                force: force
+            });
+        } else if (analysisType.value === StatisticsAnalysisType.AssetTrends) {
+            dispatchPromise = statisticsStore.loadAssetTrends({
+                force: force
+            });
+        }
     }
 
     if (dispatchPromise) {
@@ -822,13 +949,21 @@ function setAnalysisType(type: StatisticsAnalysisType): void {
     }
 
     if (!ChartDataType.isAvailableForAnalysisType(query.value.chartDataType, type)) {
+        let defaultChartDataType: ChartDataType = ChartDataType.Default;
+
+        if (type === StatisticsAnalysisType.AssetTrends) {
+            defaultChartDataType = ChartDataType.DefaultForAssetTrends;
+        }
+
         statisticsStore.updateTransactionStatisticsFilter({
-            chartDataType: ChartDataType.Default.type
+            chartDataType: defaultChartDataType.type
         });
     }
 
-    if (analysisType.value !== StatisticsAnalysisType.TrendAnalysis) {
-        trendDateAggregationType.value = ChartDateAggregationType.Month.type;
+    if (analysisType.value !== StatisticsAnalysisType.TrendAnalysis && type === StatisticsAnalysisType.TrendAnalysis) {
+        trendDateAggregationType.value = ChartDateAggregationType.Default.type;
+    } else if (analysisType.value !== StatisticsAnalysisType.AssetTrends && type === StatisticsAnalysisType.AssetTrends) {
+        assetTrendsDateAggregationType.value = ChartDateAggregationType.Default.type;
     }
 
     analysisType.value = type;
@@ -847,6 +982,10 @@ function setChartType(type?: number): void {
     } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
         changed = statisticsStore.updateTransactionStatisticsFilter({
             trendChartType: type
+        });
+    } else if (analysisType.value === StatisticsAnalysisType.AssetTrends) {
+        changed = statisticsStore.updateTransactionStatisticsFilter({
+            assetTrendsChartType: type
         });
     }
 
@@ -888,6 +1027,15 @@ function setTrendDateAggregationType(type: number): void {
     }
 }
 
+function setAssetTrendsDateAggregationType(type: number): void {
+    const changed = assetTrendsDateAggregationType.value !== type;
+    assetTrendsDateAggregationType.value = type;
+
+    if (changed) {
+        router.push(getFilterLinkUrl());
+    }
+}
+
 function setDateFilter(dateType: number): void {
     if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
         if (dateType === DateRange.Custom.type) { // Custom
@@ -901,6 +1049,13 @@ function setDateFilter(dateType: number): void {
             showCustomMonthRangeDialog.value = true;
             return;
         } else if (query.value.trendChartDateType === dateType) {
+            return;
+        }
+    } else if (analysisType.value === StatisticsAnalysisType.AssetTrends) {
+        if (dateType === DateRange.Custom.type) { // Custom
+            showCustomDateRangeDialog.value = true;
+            return;
+        } else if (query.value.assetTrendsChartDateType === dateType) {
             return;
         }
     }
@@ -924,6 +1079,12 @@ function setDateFilter(dateType: number): void {
             trendChartDateType: dateRange.dateType,
             trendChartStartYearMonth: getGregorianCalendarYearAndMonthFromUnixTime(dateRange.minTime),
             trendChartEndYearMonth: getGregorianCalendarYearAndMonthFromUnixTime(dateRange.maxTime)
+        });
+    } else if (analysisType.value === StatisticsAnalysisType.AssetTrends) {
+        changed = statisticsStore.updateTransactionStatisticsFilter({
+            assetTrendsChartDateType: dateRange.dateType,
+            assetTrendsChartStartTime: dateRange.minTime,
+            assetTrendsChartEndTime: dateRange.maxTime
         });
     }
 
@@ -961,6 +1122,16 @@ function setCustomDateFilter(startTime: number | TextualYearMonth, endTime: numb
         });
 
         showCustomMonthRangeDialog.value = false;
+    } else if (analysisType.value === StatisticsAnalysisType.AssetTrends && isNumber(startTime) && isNumber(endTime)) {
+        const chartDateType = getDateTypeByDateRange(startTime, endTime, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.AssetTrends);
+
+        changed = statisticsStore.updateTransactionStatisticsFilter({
+            assetTrendsChartDateType: chartDateType,
+            assetTrendsChartStartTime: startTime,
+            assetTrendsChartEndTime: endTime
+        });
+
+        showCustomDateRangeDialog.value = false;
     }
 
     if (changed) {
@@ -992,6 +1163,18 @@ function shiftDateRange(scale: number): void {
             trendChartDateType: newDateRange.dateType,
             trendChartStartYearMonth: getGregorianCalendarYearAndMonthFromUnixTime(newDateRange.minTime),
             trendChartEndYearMonth: getGregorianCalendarYearAndMonthFromUnixTime(newDateRange.maxTime)
+        });
+    } else if (analysisType.value === StatisticsAnalysisType.AssetTrends) {
+        if (query.value.assetTrendsChartDateType === DateRange.All.type) {
+            return;
+        }
+
+        const newDateRange = getShiftedDateRangeAndDateType(query.value.assetTrendsChartStartTime, query.value.assetTrendsChartEndTime, scale, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.AssetTrends);
+
+        changed = statisticsStore.updateTransactionStatisticsFilter({
+            assetTrendsChartDateType: newDateRange.dateType,
+            assetTrendsChartStartTime: newDateRange.minTime,
+            assetTrendsChartEndTime: newDateRange.maxTime
         });
     }
 
@@ -1033,6 +1216,10 @@ function setTagFilter(changed: boolean): void {
 }
 
 function setKeywordFilter(keyword: string): void {
+    if (analysisType.value === StatisticsAnalysisType.AssetTrends) {
+        return;
+    }
+
     if (query.value.keyword === keyword) {
         return;
     }
@@ -1074,6 +1261,12 @@ function exportResults(): void {
         });
     } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis && trendsAnalysisData.value && trendsAnalysisData.value.items && monthlyTrendsChart.value) {
         const exportData = monthlyTrendsChart.value.exportData();
+        exportDialog.value?.open({
+            headers: exportData.headers || [],
+            data: exportData.data || []
+        });
+    } else if (analysisType.value === StatisticsAnalysisType.AssetTrends && assetTrendsData.value && assetTrendsData.value.items && dailyTrendsChart.value) {
+        const exportData = dailyTrendsChart.value.exportData();
         exportDialog.value?.open({
             headers: exportData.headers || [],
             data: exportData.data || []
@@ -1125,7 +1318,8 @@ onBeforeRouteUpdate((to) => {
             initTagFilterType: (to.query['tagFilterType'] as string | null) || undefined,
             initKeyword: (to.query['keyword'] as string | null) || undefined,
             initSortingType: (to.query['sortingType'] as string | null) || undefined,
-            initTrendDateAggregationType: (to.query['trendDateAggregationType'] as string | null) || undefined
+            initTrendDateAggregationType: (to.query['trendDateAggregationType'] as string | null) || undefined,
+            initAssetTrendsDateAggregationType: (to.query['assetTrendsDateAggregationType'] as string | null) || undefined
         });
     } else {
         init({});

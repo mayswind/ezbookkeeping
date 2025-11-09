@@ -128,6 +128,28 @@
                 </list-item-selection-popup>
             </f7-list-item>
         </f7-list>
+
+        <f7-block-title>{{ tt('Asset Trends Settings') }}</f7-block-title>
+        <f7-list strong inset dividers>
+            <f7-list-item
+                link="#"
+                :title="tt('Default Date Range')"
+                :after="findDisplayNameByType(allAssetTrendsChartDateRanges, defaultAssetTrendsChartDateRange)"
+                @click="showDefaultAssetTrendsChartDateRangePopup = true"
+            >
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Default Date Range')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Date Range')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allAssetTrendsChartDateRanges"
+                                           v-model:show="showDefaultAssetTrendsChartDateRangePopup"
+                                           v-model="defaultAssetTrendsChartDateRange">
+                </list-item-selection-popup>
+            </f7-list-item>
+        </f7-list>
     </f7-page>
 </template>
 
@@ -145,12 +167,14 @@ const {
     allCategoricalChartTypes,
     allCategoricalChartDateRanges,
     allTrendChartDateRanges,
+    allAssetTrendsChartDateRanges,
     defaultChartDataType,
     defaultTimezoneType,
     defaultSortingType,
     defaultCategoricalChartType,
     defaultCategoricalChartDateRange,
-    defaultTrendChartDateRange
+    defaultTrendChartDateRange,
+    defaultAssetTrendsChartDateRange
 } = useStatisticsSettingPageBase();
 
 import { findDisplayNameByType } from '@/lib/common.ts';
@@ -161,4 +185,5 @@ const showDefaultSortingTypePopup = ref<boolean>(false);
 const showDefaultCategoricalChartTypePopup = ref<boolean>(false);
 const showDefaultCategoricalChartDateRangePopup = ref<boolean>(false);
 const showDefaultTrendChartDateRangePopup = ref<boolean>(false);
+const showDefaultAssetTrendsChartDateRangePopup = ref<boolean>(false);
 </script>

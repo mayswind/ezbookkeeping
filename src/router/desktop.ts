@@ -134,7 +134,8 @@ const router = createRouter({
                         initTagFilterType: route.query['tagFilterType'],
                         initKeyword: route.query['keyword'],
                         initSortingType: route.query['sortingType'],
-                        initTrendDateAggregationType: route.query['trendDateAggregationType']
+                        initTrendDateAggregationType: route.query['trendDateAggregationType'],
+                        initAssetTrendsDateAggregationType: route.query['assetTrendsDateAggregationType']
                     })
                 },
                 {

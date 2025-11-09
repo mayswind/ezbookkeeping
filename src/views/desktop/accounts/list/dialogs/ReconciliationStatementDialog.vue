@@ -29,10 +29,6 @@
                                              v-for="type in allChartTypes"></v-list-item>
                                 <v-divider class="my-2"/>
                                 <v-list-subheader :title="tt('Time Granularity')"/>
-                                <v-list-item :prepend-icon="mdiCalendarTodayOutline"
-                                             :append-icon="chartDataDateAggregationType === undefined ? mdiCheck : undefined"
-                                             :title="tt('granularity.Daily')"
-                                             @click="chartDataDateAggregationType = undefined"></v-list-item>
                                 <v-list-item :key="dateAggregationType.type"
                                              :prepend-icon="chartDataDateAggregationTypeIconMap[dateAggregationType.type]"
                                              :append-icon="chartDataDateAggregationType === dateAggregationType.type ? mdiCheck : undefined"
@@ -360,6 +356,7 @@ const chartTypeIconMap = {
 };
 
 const chartDataDateAggregationTypeIconMap = {
+    [ChartDateAggregationType.Day.type]: mdiCalendarTodayOutline,
     [ChartDateAggregationType.Month.type]: mdiCalendarMonthOutline,
     [ChartDateAggregationType.Quarter.type]: mdiLayersTripleOutline,
     [ChartDateAggregationType.Year.type]: mdiLayersTripleOutline,
@@ -376,7 +373,7 @@ const currentPage = ref<number>(1);
 const countPerPage = ref<number>(10);
 const showAccountBalanceTrendsCharts = ref<boolean>(false);
 const chartType = ref<number>(AccountBalanceTrendChartType.Default.type);
-const chartDataDateAggregationType = ref<number | undefined>(undefined);
+const chartDataDateAggregationType = ref<number>(ChartDateAggregationType.Day.type);
 
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
@@ -453,7 +450,7 @@ function open(options: { accountId: string, startTime: number, endTime: number }
     countPerPage.value = 10;
     showAccountBalanceTrendsCharts.value = false;
     chartType.value = AccountBalanceTrendChartType.Default.type;
-    chartDataDateAggregationType.value = undefined;
+    chartDataDateAggregationType.value = ChartDateAggregationType.Day.type;
     showState.value = true;
     loading.value = true;
 

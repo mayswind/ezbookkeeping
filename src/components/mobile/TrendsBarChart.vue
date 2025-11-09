@@ -30,23 +30,31 @@
         <f7-list-item :title="tt('No transaction data')"></f7-list-item>
     </f7-list>
 
-    <f7-list v-else-if="!loading && allDisplayDataItems && allDisplayDataItems.data && allDisplayDataItems.data.length">
+    <f7-list v-if="!loading && allDisplayDataItems && allDisplayDataItems.data && allDisplayDataItems.data.length">
         <f7-list-item v-if="allDisplayDataItems.legends && allDisplayDataItems.legends.length > 1">
             <div class="display-flex" style="flex-wrap: wrap">
-                <div class="monthly-trends-bar-chart-legend display-flex align-items-center"
-                     :class="{ 'monthly-trends-bar-chart-legend-unselected': !!unselectedLegends[legend.id] }"
+                <div class="trends-bar-chart-legend display-flex align-items-center"
+                     :class="{ 'trends-bar-chart-legend-unselected': !!unselectedLegends[legend.id] }"
                      :key="idx"
                      v-for="(legend, idx) in allDisplayDataItems.legends"
                      @click="toggleLegend(legend)">
-                    <f7-icon f7="app_fill" class="monthly-trends-bar-chart-legend-icon" :style="{ 'color': unselectedLegends[legend.id] ? '' : legend.color }"></f7-icon>
-                    <span class="monthly-trends-bar-chart-legend-text">{{ legend.name }}</span>
+                    <f7-icon f7="app_fill" class="trends-bar-chart-legend-icon" :style="{ 'color': unselectedLegends[legend.id] ? '' : legend.color }"></f7-icon>
+                    <span class="trends-bar-chart-legend-text">{{ legend.name }}</span>
                 </div>
             </div>
         </f7-list-item>
+    </f7-list>
+
+    <f7-list :key="`trends-bar-chart-${allDisplayDataItemsVersion}`"
+             :virtual-list="useVirtualList"
+             :virtual-list-params="useVirtualList ? { items: allDisplayDataItems.data, renderExternal, height: 'auto' } : undefined"
+             v-if="!loading && allDisplayDataItems && allDisplayDataItems.data && allDisplayDataItems.data.length">
         <f7-list-item link="#"
-                      :key="idx"
+                      :key="item.index"
                       :class="{ 'statistics-list-item': true, 'statistics-list-item-stacked': stacked, 'statistics-list-item-non-stacked': !stacked }"
-                      v-for="(item, idx) in allDisplayDataItems.data"
+                      :style="useVirtualList ? `top: ${virtualDataItems.topPosition}px` : undefined"
+                      :virtual-list-index="item.index"
+                      v-for="item in (useVirtualList ? virtualDataItems.items : allDisplayDataItems.data)"
                       @click="clickItem(item)"
         >
             <template #media>
@@ -105,21 +113,32 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { type CommonMonthlyTrendsChartProps, type MonthlyTrendsBarChartClickEvent, useMonthlyTrendsChartBase } from '@/components/base/MonthlyTrendsChartBase.ts'
+import {
+    type TrendsChartDateType,
+    type CommonTrendsChartProps,
+    type TrendsBarChartClickEvent,
+    useTrendsChartBase
+} from '@/components/base/TrendsChartBase.ts'
 
 import { useUserStore } from '@/stores/user.ts';
 
 import { itemAndIndex } from '@/core/base.ts';
-import { type Year1BasedMonth, type UnixTimeRange, DateRangeScene } from '@/core/datetime.ts';
+import {
+    type UnixTimeRange,
+    DateRangeScene
+} from '@/core/datetime.ts';
 import type { ColorStyleValue } from '@/core/color.ts';
-import { ChartDateAggregationType } from '@/core/statistics.ts';
+import {
+    ChartDataAggregationType,
+    ChartDateAggregationType
+} from '@/core/statistics.ts';
 
 import { DEFAULT_CHART_COLORS } from '@/consts/color.ts';
 
-import type { YearMonthDataItem, SortableTransactionStatisticDataItem } from '@/models/transaction.ts';
+import type { SortableTransactionStatisticDataItem } from '@/models/transaction.ts';
 
 import {
     isNumber
@@ -144,37 +163,44 @@ interface TrendsBarChartLegend {
     readonly displayOrders: number[];
 }
 
-interface MonthlyTrendsBarChartDataAmount extends SortableTransactionStatisticDataItem, TrendsBarChartLegend {
+interface TrendsBarChartDataAmount extends SortableTransactionStatisticDataItem, TrendsBarChartLegend {
     totalAmount: number;
 }
 
-interface MonthlyTrendsBarChartDataItem {
+interface TrendsBarChartDataItem {
+    index: number;
     dateRange: UnixTimeRange;
     displayDateRange: string;
-    items: MonthlyTrendsBarChartDataAmount[];
+    items: TrendsBarChartDataAmount[];
     totalAmount: number;
     totalPositiveAmount: number;
     maxAmount: number;
     percent: number;
 }
 
-interface MonthlyTrendsBarChartData {
-    readonly data: MonthlyTrendsBarChartDataItem[];
+interface TrendsBarChartVirtualListData {
+    items: TrendsBarChartDataItem[],
+    topPosition: number
+}
+
+interface TrendsBarChartData {
+    readonly data: TrendsBarChartDataItem[];
     readonly legends: TrendsBarChartLegend[];
 }
 
-interface MobileMonthlyTrendsChartProps<T extends Year1BasedMonth> extends CommonMonthlyTrendsChartProps<T> {
+interface MobileTrendsChartProps<T extends TrendsChartDateType> extends CommonTrendsChartProps<T> {
     loading?: boolean;
 }
 
-const props = defineProps<MobileMonthlyTrendsChartProps<YearMonthDataItem>>();
+const props = defineProps<MobileTrendsChartProps<TrendsChartDateType>>();
 
 const emit = defineEmits<{
-    (e: 'click', value: MonthlyTrendsBarChartClickEvent): void;
+    (e: 'click', value: TrendsBarChartClickEvent): void;
 }>();
 
 const {
     tt,
+    formatUnixTimeToShortDate,
     formatUnixTimeToGregorianLikeShortYear,
     formatUnixTimeToGregorianLikeShortYearMonth,
     formatYearQuarterToGregorianLikeYearQuarter,
@@ -182,14 +208,22 @@ const {
     formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
 
-const { allDateRanges, getItemName } = useMonthlyTrendsChartBase(props);
+const { allDateRanges, getItemName } = useTrendsChartBase(props);
 
 const userStore = useUserStore();
 
+const allDisplayDataItemsVersion = ref<number>(0);
 const unselectedLegends = ref<Record<string, boolean>>({});
 
-const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
-    const allDateRangeItemsMap: Record<string, MonthlyTrendsBarChartDataAmount[]> = {};
+const virtualDataItems = ref<TrendsBarChartVirtualListData>({
+    items: [],
+    topPosition: 0
+});
+
+const useVirtualList = computed<boolean>(() => allDisplayDataItems.value.legends.length <= 1 || props.stacked);
+
+const allDisplayDataItems = computed<TrendsBarChartData>(() => {
+    const allDateRangeItemsMap: Record<string, TrendsBarChartDataAmount[]> = {};
     const legends: TrendsBarChartLegend[] = [];
 
     for (const [item, index] of itemAndIndex(props.items)) {
@@ -212,31 +246,57 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
             continue;
         }
 
-        const dateRangeItemMap: Record<string, MonthlyTrendsBarChartDataAmount> = {};
+        const dateRangeItemMap: Record<string, TrendsBarChartDataAmount> = {};
 
         for (const dataItem of item.items) {
             let dateRangeKey = '';
 
-            if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
-                dateRangeKey = dataItem.year.toString();
-            } else if (props.dateAggregationType === ChartDateAggregationType.FiscalYear.type) {
-                const fiscalYear = getFiscalYearFromUnixTime(
-                    getYearMonthFirstUnixTime({ year: dataItem.year, month1base: dataItem.month1base }),
-                    props.fiscalYearStart
-                );
-                dateRangeKey = fiscalYear.toString();
-            } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type) {
-                dateRangeKey = `${dataItem.year}-${Math.floor((dataItem.month1base - 1) / 3) + 1}`;
-            } else { // if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
-                dateRangeKey = `${dataItem.year}-${dataItem.month1base}`;
+            if (props.chartMode === 'daily' && 'month' in dataItem) {
+                if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
+                    dateRangeKey = dataItem.year.toString();
+                } else if (props.dateAggregationType === ChartDateAggregationType.FiscalYear.type) {
+                    const fiscalYear = getFiscalYearFromUnixTime(
+                        getYearMonthFirstUnixTime({ year: dataItem.year, month1base: dataItem.month }),
+                        props.fiscalYearStart
+                    );
+                    dateRangeKey = fiscalYear.toString();
+                } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type) {
+                    dateRangeKey = `${dataItem.year}-${Math.floor((dataItem.month - 1) / 3) + 1}`;
+                } else if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
+                    dateRangeKey = `${dataItem.year}-${dataItem.month}`;
+                } else { // if (props.dateAggregationType === ChartDateAggregationType.Day.type) {
+                    dateRangeKey = `${dataItem.year}-${dataItem.month}-${dataItem.day}`;
+                }
+            } else if (props.chartMode === 'monthly' && 'month1base' in dataItem) {
+                if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
+                    dateRangeKey = dataItem.year.toString();
+                } else if (props.dateAggregationType === ChartDateAggregationType.FiscalYear.type) {
+                    const fiscalYear = getFiscalYearFromUnixTime(
+                        getYearMonthFirstUnixTime({ year: dataItem.year, month1base: dataItem.month1base }),
+                        props.fiscalYearStart
+                    );
+                    dateRangeKey = fiscalYear.toString();
+                } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type) {
+                    dateRangeKey = `${dataItem.year}-${Math.floor((dataItem.month1base - 1) / 3) + 1}`;
+                } else { // if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
+                    dateRangeKey = `${dataItem.year}-${dataItem.month1base}`;
+                }
             }
 
+            const value = (dataItem as unknown as Record<string, unknown>)[props.valueField];
+
             if (dateRangeItemMap[dateRangeKey]) {
-                dateRangeItemMap[dateRangeKey]!.totalAmount += (props.valueField && isNumber(dataItem[props.valueField])) ? dataItem[props.valueField] as number : 0;
+                if (isNumber(value)) {
+                    if (props.dataAggregationType === ChartDataAggregationType.Sum) {
+                        dateRangeItemMap[dateRangeKey]!.totalAmount += value;
+                    } else if (props.dataAggregationType === ChartDataAggregationType.Last) {
+                        dateRangeItemMap[dateRangeKey]!.totalAmount = value;
+                    }
+                }
             } else {
-                const allDataItems: MonthlyTrendsBarChartDataAmount[] = allDateRangeItemsMap[dateRangeKey] || [];
-                const finalDataItem: MonthlyTrendsBarChartDataAmount = Object.assign({}, legend, {
-                    totalAmount: (props.valueField && isNumber(dataItem[props.valueField])) ? dataItem[props.valueField] as number : 0
+                const allDataItems: TrendsBarChartDataAmount[] = allDateRangeItemsMap[dateRangeKey] || [];
+                const finalDataItem: TrendsBarChartDataAmount = Object.assign({}, legend, {
+                    totalAmount: isNumber(value) ? value : 0
                 });
 
                 allDataItems.push(finalDataItem);
@@ -246,7 +306,7 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
         }
     }
 
-    const finalDataItems: MonthlyTrendsBarChartDataItem[] = [];
+    const finalDataItems: TrendsBarChartDataItem[] = [];
     let maxTotalAmount = 0;
 
     for (const dateRange of allDateRanges.value) {
@@ -260,6 +320,8 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
             dateRangeKey = `${dateRange.year}-${dateRange.quarter}`;
         } else if (props.dateAggregationType === ChartDateAggregationType.Month.type && 'month0base' in dateRange) {
             dateRangeKey = `${dateRange.year}-${dateRange.month0base + 1}`;
+        } else if (props.dateAggregationType === ChartDateAggregationType.Day.type && 'day' in dateRange && props.chartMode === 'daily') {
+            dateRangeKey = `${dateRange.year}-${dateRange.month}-${dateRange.day}`;
         }
 
         let displayDateRange = '';
@@ -270,8 +332,10 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
             displayDateRange = formatUnixTimeToGregorianLikeFiscalYear(dateRange.minUnixTime);
         } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type && 'quarter' in dateRange) {
             displayDateRange = formatYearQuarterToGregorianLikeYearQuarter(dateRange.year, dateRange.quarter);
-        } else { // if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
+        } else if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
             displayDateRange = formatUnixTimeToGregorianLikeShortYearMonth(dateRange.minUnixTime);
+        } else if (props.dateAggregationType === ChartDateAggregationType.Day.type && props.chartMode === 'daily') {
+            displayDateRange = formatUnixTimeToShortDate(dateRange.minUnixTime);
         }
 
         const dataItems = allDateRangeItemsMap[dateRangeKey] || [];
@@ -297,7 +361,8 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
             maxTotalAmount = totalAmount;
         }
 
-        const finalDataItem: MonthlyTrendsBarChartDataItem = {
+        const finalDataItem: TrendsBarChartDataItem = {
+            index: finalDataItems.length,
             dateRange: dateRange,
             displayDateRange: displayDateRange,
             items: dataItems,
@@ -324,7 +389,7 @@ const allDisplayDataItems = computed<MonthlyTrendsBarChartData>(() => {
     };
 });
 
-function clickItem(item: MonthlyTrendsBarChartDataItem): void {
+function clickItem(item: TrendsBarChartDataItem): void {
     let itemId = '';
 
     for (const item of props.items) {
@@ -349,19 +414,33 @@ function clickItem(item: MonthlyTrendsBarChartDataItem): void {
     let minUnixTime = dateRange.minUnixTime;
     let maxUnixTime = dateRange.maxUnixTime;
 
-    if (props.startYearMonth) {
-        const startMinUnixTime = getYearMonthFirstUnixTime(props.startYearMonth);
-
-        if (startMinUnixTime > minUnixTime) {
-            minUnixTime = startMinUnixTime;
+    if (props.chartMode === 'daily') {
+        if (props.startTime) {
+            if (props.startTime > minUnixTime) {
+                minUnixTime = props.startTime;
+            }
         }
-    }
 
-    if (props.endYearMonth) {
-        const endMaxUnixTime = getYearMonthLastUnixTime(props.endYearMonth);
+        if (props.endTime) {
+            if (props.endTime < maxUnixTime) {
+                maxUnixTime = props.endTime;
+            }
+        }
+    } else if (props.chartMode === 'monthly') {
+        if (props.startYearMonth) {
+            const startMinUnixTime = getYearMonthFirstUnixTime(props.startYearMonth);
 
-        if (endMaxUnixTime < maxUnixTime) {
-            maxUnixTime = endMaxUnixTime;
+            if (startMinUnixTime > minUnixTime) {
+                minUnixTime = startMinUnixTime;
+            }
+        }
+
+        if (props.endYearMonth) {
+            const endMaxUnixTime = getYearMonthLastUnixTime(props.endYearMonth);
+
+            if (endMaxUnixTime < maxUnixTime) {
+                maxUnixTime = endMaxUnixTime;
+            }
         }
     }
 
@@ -384,28 +463,38 @@ function toggleLegend(legend: TrendsBarChartLegend): void {
         unselectedLegends.value[legend.id] = true;
     }
 }
+
+function renderExternal(vl: unknown, vlData: TrendsBarChartVirtualListData): void {
+    virtualDataItems.value = vlData;
+}
+
+watch(allDisplayDataItems, () => {
+    allDisplayDataItemsVersion.value++;
+}, {
+    deep: true
+});
 </script>
 
 <style>
-.monthly-trends-bar-chart-legend {
+.trends-bar-chart-legend {
     margin-inline-end: 4px;
     cursor: pointer;
 }
 
-.monthly-trends-bar-chart-legend-icon.f7-icons {
+.trends-bar-chart-legend-icon.f7-icons {
     font-size: var(--ebk-trends-bar-chart-legend-icon-font-size);
     margin-inline-end: 2px;
 }
 
-.monthly-trends-bar-chart-legend-unselected .monthly-trends-bar-chart-legend-icon.f7-icons {
+.trends-bar-chart-legend-unselected .trends-bar-chart-legend-icon.f7-icons {
     color: #cccccc;
 }
 
-.monthly-trends-bar-chart-legend-text {
+.trends-bar-chart-legend-text {
     font-size: var(--ebk-trends-bar-chart-legend-text-font-size);
 }
 
-.monthly-trends-bar-chart-legend-unselected .monthly-trends-bar-chart-legend-text {
+.trends-bar-chart-legend-unselected .trends-bar-chart-legend-text {
     color: #cccccc;
 }
 </style>

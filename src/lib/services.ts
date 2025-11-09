@@ -75,6 +75,8 @@ import type {
     TransactionStatisticResponse,
     TransactionStatisticTrendsRequest,
     TransactionStatisticTrendsResponseItem,
+    TransactionStatisticAssetTrendsRequest,
+    TransactionStatisticAssetTrendsResponseItem,
     TransactionAmountsRequestParams,
     TransactionAmountsResponse
 } from '@/models/transaction.ts';
@@ -535,6 +537,19 @@ export default {
         }
 
         return axios.get<ApiResponse<TransactionStatisticTrendsResponseItem[]>>(`v1/transactions/statistics/trends.json?use_transaction_timezone=${req.useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));
+    },
+    getTransactionStatisticsAssetTrends: (req: TransactionStatisticAssetTrendsRequest): ApiResponsePromise<TransactionStatisticAssetTrendsResponseItem[]> => {
+        const queryParams = [];
+
+        if (req.startTime) {
+            queryParams.push(`start_time=${req.startTime}`);
+        }
+
+        if (req.endTime) {
+            queryParams.push(`end_time=${req.endTime}`);
+        }
+
+        return axios.get<ApiResponse<TransactionStatisticAssetTrendsResponseItem[]>>('v1/transactions/statistics/asset_trends.json' + (queryParams.length ? '?' + queryParams.join('&') : ''));
     },
     getTransactionAmounts: (params: TransactionAmountsRequestParams, excludeAccountIds: string[], excludeCategoryIds: string[]): ApiResponsePromise<TransactionAmountsResponse> => {
         const req = TransactionAmountsRequest.of(params);

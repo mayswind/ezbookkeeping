@@ -10,6 +10,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import type { WeekDayValue } from '@/core/datetime.ts';
 import { TransactionType } from '@/core/transaction.ts';
+import { StatisticsAnalysisType } from '@/core/statistics.ts';
 import { KnownFileType } from '@/core/file.ts';
 import type { Account } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
@@ -55,7 +56,7 @@ export function useReconciliationStatementPageBase() {
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
     const allChartTypes = computed<TypeAndDisplayName[]>(() => getAllAccountBalanceTrendChartTypes());
-    const allDateAggregationTypes = computed<TypeAndDisplayName[]>(() => getAllStatisticsDateAggregationTypesWithShortName());
+    const allDateAggregationTypes = computed<TypeAndDisplayName[]>(() => getAllStatisticsDateAggregationTypesWithShortName(StatisticsAnalysisType.AssetTrends));
 
     const currentAccount = computed(() => allAccountsMap.value[accountId.value]);
     const currentAccountCurrency = computed<string>(() => currentAccount.value?.currency ?? defaultCurrency.value);

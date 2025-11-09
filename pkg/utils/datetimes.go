@@ -155,6 +155,17 @@ func FormatUnixTimeToNumericYearMonth(unixTime int64, timezone *time.Location) i
 	return int32(t.Year())*100 + int32(t.Month())
 }
 
+// FormatUnixTimeToNumericYearMonthDay returns numeric year, month and day of specified unix time
+func FormatUnixTimeToNumericYearMonthDay(unixTime int64, timezone *time.Location) int32 {
+	t := parseFromUnixTime(unixTime)
+
+	if timezone != nil {
+		t = t.In(timezone)
+	}
+
+	return int32(t.Year())*10000 + int32(t.Month())*100 + int32(t.Day())
+}
+
 // FormatUnixTimeToNumericLocalDateTime returns numeric year, month, day, hour, minute and second of specified unix time
 func FormatUnixTimeToNumericLocalDateTime(unixTime int64, timezone *time.Location) int64 {
 	t := parseFromUnixTime(unixTime)

@@ -115,6 +115,40 @@
         </v-col>
 
         <v-col cols="12">
+            <v-card :title="tt('Asset Trends Settings')">
+                <v-form>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :label="tt('Default Chart Type')"
+                                    :placeholder="tt('Default Chart Type')"
+                                    :items="allTrendChartTypes"
+                                    v-model="defaultAssetTrendsChartType"
+                                />
+                            </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :label="tt('Default Date Range')"
+                                    :placeholder="tt('Default Date Range')"
+                                    :items="allAssetTrendsChartDateRanges"
+                                    v-model="defaultAssetTrendsChartDateRange"
+                                />
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-form>
+            </v-card>
+        </v-col>
+
+        <v-col cols="12">
             <account-filter-settings-card type="statisticsDefault" :auto-save="true" />
         </v-col>
 
@@ -140,13 +174,16 @@ const {
     allCategoricalChartDateRanges,
     allTrendChartTypes,
     allTrendChartDateRanges,
+    allAssetTrendsChartDateRanges,
     defaultChartDataType,
     defaultTimezoneType,
     defaultSortingType,
     defaultCategoricalChartType,
     defaultCategoricalChartDateRange,
     defaultTrendChartType,
-    defaultTrendChartDateRange
+    defaultTrendChartDateRange,
+    defaultAssetTrendsChartType,
+    defaultAssetTrendsChartDateRange
 } = useStatisticsSettingPageBase();
 </script>
 

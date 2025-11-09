@@ -598,9 +598,9 @@ export function useI18n() {
         return ret;
     }
 
-    function getLocalizedChartDateAggregationTypeAndDisplayName(fullName: boolean): TypeAndDisplayName[] {
+    function getLocalizedChartDateAggregationTypeAndDisplayName(analysisType: StatisticsAnalysisType, fullName: boolean): TypeAndDisplayName[] {
         const ret: TypeAndDisplayName[] = [];
-        const allTypes: ChartDateAggregationType[] = ChartDateAggregationType.values();
+        const allTypes: ChartDateAggregationType[] = ChartDateAggregationType.values(analysisType);
 
         for (const type of allTypes) {
             ret.push({
@@ -2354,8 +2354,8 @@ export function useI18n() {
         getAllAccountBalanceTrendChartTypes: () => getLocalizedDisplayNameAndType(AccountBalanceTrendChartType.values()),
         getAllStatisticsChartDataTypes: (analysisType: StatisticsAnalysisType, withDesktopOnlyChart?: boolean) => getLocalizedDisplayNameAndType(ChartDataType.values(analysisType, withDesktopOnlyChart)),
         getAllStatisticsSortingTypes: () => getLocalizedDisplayNameAndType(ChartSortingType.values()),
-        getAllStatisticsDateAggregationTypes: () => getLocalizedChartDateAggregationTypeAndDisplayName(true),
-        getAllStatisticsDateAggregationTypesWithShortName: () => getLocalizedChartDateAggregationTypeAndDisplayName(false),
+        getAllStatisticsDateAggregationTypes: (analysisType: StatisticsAnalysisType) => getLocalizedChartDateAggregationTypeAndDisplayName(analysisType, true),
+        getAllStatisticsDateAggregationTypesWithShortName: (analysisType: StatisticsAnalysisType) => getLocalizedChartDateAggregationTypeAndDisplayName(analysisType, false),
         getAllTransactionEditScopeTypes: () => getLocalizedDisplayNameAndType(TransactionEditScopeType.values()),
         getAllTransactionTagFilterTypes: () => getLocalizedDisplayNameAndType(TransactionTagFilterType.values()),
         getAllTransactionScheduledFrequencyTypes: () => getLocalizedDisplayNameAndType(ScheduledTemplateFrequencyType.values()),

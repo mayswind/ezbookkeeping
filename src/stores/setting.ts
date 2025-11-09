@@ -314,6 +314,18 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('statistics.defaultTrendChartDataRangeType', value);
     }
 
+    function setStatisticsDefaultAssetTrendsChartType(value: number): void {
+        updateApplicationSettingsSubValue('statistics', 'defaultAssetTrendsChartType', value);
+        appSettings.value.statistics.defaultAssetTrendsChartType = value;
+        updateUserApplicationCloudSettingValue('statistics.defaultAssetTrendsChartType', value);
+    }
+
+    function setStatisticsDefaultAssetTrendsChartDateRange(value: number): void {
+        updateApplicationSettingsSubValue('statistics', 'defaultAssetTrendsChartDataRangeType', value);
+        appSettings.value.statistics.defaultAssetTrendsChartDataRangeType = value;
+        updateUserApplicationCloudSettingValue('statistics.defaultAssetTrendsChartDataRangeType', value);
+    }
+
     function clearAppSettings(): void {
         clearSettings();
         appSettings.value = getApplicationSettings();
@@ -469,6 +481,8 @@ export const useSettingsStore = defineStore('settings', () => {
         setStatisticsDefaultCategoricalChartDateRange,
         setStatisticsDefaultTrendChartType,
         setStatisticsDefaultTrendChartDateRange,
+        setStatisticsDefaultAssetTrendsChartType,
+        setStatisticsDefaultAssetTrendsChartDateRange,
         clearAppSettings,
         createApplicationCloudSettings,
         setApplicationSettingsFromCloudSettings,

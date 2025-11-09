@@ -1795,12 +1795,16 @@ init(props);
 
 <style>
 .transaction-keyword-filter .v-input--density-compact {
-    --v-input-control-height: 36px !important;
+    --v-input-control-height: 38px !important;
     --v-input-padding-top: 5px !important;
     --v-input-padding-bottom: 5px !important;
     --v-input-chips-margin-top: 0px !important;
     --v-input-chips-margin-bottom: 0px !important;
     inline-size: 20rem;
+
+    .v-field__input {
+        min-block-size: 38px !important;
+    }
 }
 
 .transaction-list-datetime-range {

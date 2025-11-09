@@ -8,7 +8,7 @@ import { useTransactionCategoriesStore } from './transactionCategory.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { entries, values } from '@/core/base.ts';
-import { type TextualYearMonth, type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
+import { type DateTime, type TextualYearMonth, type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { CategoryType } from '@/core/category.ts';
 import {
@@ -23,7 +23,8 @@ import {
     ChartSortingType,
     ChartDateAggregationType,
     DEFAULT_CATEGORICAL_CHART_DATA_RANGE,
-    DEFAULT_TREND_CHART_DATA_RANGE
+    DEFAULT_TREND_CHART_DATA_RANGE,
+    DEFAULT_ASSET_TRENDS_CHART_DATA_RANGE
 } from '@/core/statistics.ts';
 import { DEFAULT_ACCOUNT_ICON, DEFAULT_CATEGORY_ICON } from '@/consts/icon.ts';
 import { DEFAULT_ACCOUNT_COLOR, DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
@@ -32,9 +33,12 @@ import {
     type TransactionStatisticResponse,
     type TransactionStatisticResponseItem,
     type TransactionStatisticTrendsResponseItem,
+    type TransactionStatisticAssetTrendsResponseItem,
+    type TransactionStatisticAssetTrendsResponseDataItem,
     type TransactionStatisticResponseItemWithInfo,
     type TransactionStatisticResponseWithInfo,
     type TransactionStatisticTrendsResponseItemWithInfo,
+    type TransactionStatisticAssetTrendsResponseItemWithInfo,
     type TransactionStatisticDataItemType,
     type TransactionStatisticDataItemBase,
     type TransactionCategoricalOverviewAnalysisData,
@@ -44,6 +48,9 @@ import {
     type TransactionTrendsAnalysisData,
     type TransactionTrendsAnalysisDataItem,
     type TransactionTrendsAnalysisDataAmount,
+    type TransactionAssetTrendsAnalysisData,
+    type TransactionAssetTrendsAnalysisDataItem,
+    type TransactionAssetTrendsAnalysisDataAmount,
     TransactionCategoricalOverviewAnalysisDataItemType
 } from '@/models/transaction.ts';
 
@@ -58,7 +65,12 @@ import {
     isObjectEmpty,
     objectFieldToArrayItem
 } from '@/lib/common.ts';
-import { getGregorianCalendarYearAndMonthFromUnixTime, getDateRangeByDateType } from '@/lib/datetime.ts';
+import {
+    getYearMonthDayDateTime,
+    getGregorianCalendarYearAndMonthFromUnixTime,
+    getDayDifference,
+    getDateRangeByDateType
+} from '@/lib/datetime.ts';
 import { getFinalAccountIdsByFilteredAccountIds } from '@/lib/account.ts';
 import { getFinalCategoryIdsByFilteredCategoryIds } from '@/lib/category.ts';
 import { sortStatisticsItems } from '@/lib/statistics.ts';
@@ -83,7 +95,7 @@ interface WritableTransactionCategoricalAnalysisDataItem extends Record<string, 
     percent?: number;
 }
 
-interface WritableTransactionTrendsAnalysisDataItem extends Record<string, unknown> {
+interface WritableTransactionTrendsAnalysisDataItem extends Record<string, unknown>, TransactionTrendsAnalysisDataItem {
     name: string;
     type: TransactionStatisticDataItemType;
     id: string;
@@ -93,6 +105,18 @@ interface WritableTransactionTrendsAnalysisDataItem extends Record<string, unkno
     displayOrders: number[];
     totalAmount: number;
     items: TransactionTrendsAnalysisDataAmount[];
+}
+
+interface WritableTransactionAssetTrendsAnalysisDataItem extends Record<string, unknown>, TransactionAssetTrendsAnalysisDataItem {
+    name: string;
+    type: TransactionStatisticDataItemType;
+    id: string;
+    icon: string;
+    color: string;
+    hidden: boolean;
+    displayOrders: number[];
+    totalAmount: number;
+    items: TransactionAssetTrendsAnalysisDataAmount[];
 }
 
 export interface TransactionStatisticsPartialFilter {
@@ -105,6 +129,10 @@ export interface TransactionStatisticsPartialFilter {
     trendChartDateType?: number;
     trendChartStartYearMonth?: TextualYearMonth | '';
     trendChartEndYearMonth?: TextualYearMonth | '';
+    assetTrendsChartType?: number;
+    assetTrendsChartDateType?: number;
+    assetTrendsChartStartTime?: number;
+    assetTrendsChartEndTime?: number;
     filterAccountIds?: Record<string, boolean>;
     filterCategoryIds?: Record<string, boolean>;
     tagIds?: string;
@@ -123,6 +151,10 @@ export interface TransactionStatisticsFilter extends TransactionStatisticsPartia
     trendChartDateType: number;
     trendChartStartYearMonth: TextualYearMonth | '';
     trendChartEndYearMonth: TextualYearMonth | '';
+    assetTrendsChartType: number;
+    assetTrendsChartDateType: number;
+    assetTrendsChartStartTime: number;
+    assetTrendsChartEndTime: number;
     filterAccountIds: Record<string, boolean>;
     filterCategoryIds: Record<string, boolean>;
     tagIds: string;
@@ -148,6 +180,10 @@ export const useStatisticsStore = defineStore('statistics', () => {
         trendChartDateType: DEFAULT_TREND_CHART_DATA_RANGE.type,
         trendChartStartYearMonth: '',
         trendChartEndYearMonth: '',
+        assetTrendsChartType: TrendChartType.Default.type,
+        assetTrendsChartDateType: DEFAULT_ASSET_TRENDS_CHART_DATA_RANGE.type,
+        assetTrendsChartStartTime: 0,
+        assetTrendsChartEndTime: 0,
         filterAccountIds: {},
         filterCategoryIds: {},
         tagIds: '',
@@ -158,6 +194,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
 
     const transactionCategoryStatisticsData = ref<TransactionStatisticResponse | null>(null);
     const transactionCategoryTrendsData = ref<TransactionStatisticTrendsResponseItem[]>([]);
+    const transactionAssetTrendsData = ref<TransactionStatisticAssetTrendsResponseItem[]>([]);
     const transactionStatisticsStateInvalid = ref<boolean>(true);
 
     const categoricalAnalysisChartDataCategory = computed<string>(() => {
@@ -709,6 +746,227 @@ export const useStatisticsStore = defineStore('statistics', () => {
         return trendsData;
     });
 
+    const assetTrendsDataWithAccountInfo = computed<TransactionStatisticAssetTrendsResponseItemWithInfo[]>(() => {
+        const assetTrendsData = transactionAssetTrendsData.value;
+        const finalAssetTrendsData: TransactionStatisticAssetTrendsResponseItemWithInfo[] = [];
+
+        if (!assetTrendsData || !assetTrendsData.length) {
+            return finalAssetTrendsData;
+        }
+
+        const firstAssetTrendItem: TransactionStatisticAssetTrendsResponseItem | undefined = assetTrendsData[0];
+
+        if (!firstAssetTrendItem) {
+            return finalAssetTrendsData;
+        }
+
+        const lastAssetTrendItemMap: Record<string, TransactionStatisticAssetTrendsResponseDataItem> = {};
+        let lastAssetTrendItem: TransactionStatisticAssetTrendsResponseItem = firstAssetTrendItem;
+
+        for (const item of firstAssetTrendItem.items) {
+            lastAssetTrendItemMap[item.accountId] = item;
+        }
+
+        for (const assetTrendItem of assetTrendsData) {
+            const statisticResponseItems: TransactionStatisticResponseItem[] = [];
+            const existedAccountIds: Record<string, boolean> = {};
+            const missingDays: number = getDayDifference(lastAssetTrendItem, assetTrendItem) - 1;
+            const lastAssetTrendItemDate: DateTime = getYearMonthDayDateTime(lastAssetTrendItem.year, lastAssetTrendItem.month, lastAssetTrendItem.day);
+
+            // fill in missing days with last known balance
+            for (let i = 1; i <= missingDays; i++) {
+                const missingStatisticResponseItems: TransactionStatisticResponseItem[] = [];
+                const dateTime: DateTime = lastAssetTrendItemDate.getDateTimeAfterDays(i);
+
+                for (const item of values(lastAssetTrendItemMap)) {
+                    const statisticResponseItem: TransactionStatisticResponseItem = {
+                        categoryId: '',
+                        accountId: item.accountId,
+                        amount: item.accountClosingBalance
+                    };
+
+                    missingStatisticResponseItems.push(statisticResponseItem);
+                }
+
+                const finalAssetTrendItem: TransactionStatisticAssetTrendsResponseItemWithInfo = {
+                    year: dateTime.getGregorianCalendarYear(),
+                    month: dateTime.getGregorianCalendarMonth(),
+                    day: dateTime.getGregorianCalendarDay(),
+                    items: assembleAccountAndCategoryInfo(missingStatisticResponseItems)
+                };
+
+                lastAssetTrendItem = assetTrendItem;
+                finalAssetTrendsData.push(finalAssetTrendItem);
+            }
+
+            // fill in current day data
+            for (const item of assetTrendItem.items) {
+                const statisticResponseItem: TransactionStatisticResponseItem = {
+                    categoryId: '',
+                    accountId: item.accountId,
+                    amount: item.accountClosingBalance
+                };
+
+                lastAssetTrendItemMap[item.accountId] = item;
+                existedAccountIds[item.accountId] = true;
+                statisticResponseItems.push(statisticResponseItem);
+            }
+
+            // fill in missing accounts with last known balance
+            for (const item of values(lastAssetTrendItemMap)) {
+                if (existedAccountIds[item.accountId]) {
+                    continue;
+                }
+
+                const statisticResponseItem: TransactionStatisticResponseItem = {
+                    categoryId: '',
+                    accountId: item.accountId,
+                    amount: item.accountClosingBalance
+                };
+
+                existedAccountIds[item.accountId] = true;
+                statisticResponseItems.push(statisticResponseItem);
+            }
+
+            const finalAssetTrendItem: TransactionStatisticAssetTrendsResponseItemWithInfo = {
+                year: assetTrendItem.year,
+                month: assetTrendItem.month,
+                day: assetTrendItem.day,
+                items: assembleAccountAndCategoryInfo(statisticResponseItems)
+            };
+
+            lastAssetTrendItem = assetTrendItem;
+            finalAssetTrendsData.push(finalAssetTrendItem);
+        }
+
+        return finalAssetTrendsData;
+    });
+
+    const assetTrendsData = computed<TransactionAssetTrendsAnalysisData | null>(() => {
+        if (!assetTrendsDataWithAccountInfo.value || !assetTrendsDataWithAccountInfo.value.length) {
+            return null;
+        }
+
+        const combinedDataMap: Record<string, WritableTransactionAssetTrendsAnalysisDataItem> = {};
+
+        for (const dailyData of assetTrendsDataWithAccountInfo.value) {
+            let dailyTotalAmount: number = 0;
+
+            for (const item of dailyData.items) {
+                if (!item.primaryAccount || !item.account) {
+                    continue;
+                }
+
+                if (transactionStatisticsFilter.value.filterAccountIds && transactionStatisticsFilter.value.filterAccountIds[item.account.id]) {
+                    continue;
+                }
+
+                if (!isNumber(item.amountInDefaultCurrency)) {
+                    continue;
+                }
+
+                if (transactionStatisticsFilter.value.chartDataType === ChartDataType.AccountTotalAssets.type) {
+                    if (!item.account.isAsset) {
+                        continue;
+                    }
+                } else if (transactionStatisticsFilter.value.chartDataType === ChartDataType.AccountTotalLiabilities.type) {
+                    if (!item.account.isLiability) {
+                        continue;
+                    }
+                } else if (transactionStatisticsFilter.value.chartDataType === ChartDataType.NetWorth.type) {
+                    // Do Nothing
+                } else {
+                    continue;
+                }
+
+                let amount = item.amountInDefaultCurrency;
+
+                if (item.account.isLiability) {
+                    amount = -amount;
+                }
+
+                if (transactionStatisticsFilter.value.chartDataType === ChartDataType.AccountTotalAssets.type ||
+                    transactionStatisticsFilter.value.chartDataType === ChartDataType.AccountTotalLiabilities.type) {
+                    let data = combinedDataMap[item.account.id];
+
+                    if (data) {
+                        data.totalAmount += amount;
+                    } else {
+                        data = {
+                            name: item.account.name,
+                            type: 'account',
+                            id: item.account.id,
+                            icon: item.account.icon || DEFAULT_ACCOUNT_ICON.icon,
+                            color: item.account.color || DEFAULT_ACCOUNT_COLOR,
+                            hidden: item.primaryAccount.hidden || item.account.hidden,
+                            displayOrders: [item.primaryAccount.category, item.primaryAccount.displayOrder, item.account.displayOrder],
+                            totalAmount: amount,
+                            items: []
+                        };
+                    }
+
+                    const amountItem: TransactionAssetTrendsAnalysisDataAmount = {
+                        year: dailyData.year,
+                        month: dailyData.month,
+                        day: dailyData.day,
+                        totalAmount: amount
+                    };
+                    data.items.push(amountItem);
+                    combinedDataMap[item.account.id] = data;
+                }
+
+                if (item.account.isAsset) {
+                    dailyTotalAmount += amount;
+                } else if (item.account.isLiability) {
+                    dailyTotalAmount -= amount;
+                }
+            }
+
+            if (transactionStatisticsFilter.value.chartDataType === ChartDataType.NetWorth.type) {
+                let data = combinedDataMap['total'];
+
+                if (data) {
+                    data.totalAmount += dailyTotalAmount;
+                } else {
+                    data = {
+                        name: ChartDataType.NetWorth.name,
+                        type: 'total',
+                        id: 'total',
+                        icon: '',
+                        color: '',
+                        hidden: false,
+                        displayOrders: [1],
+                        totalAmount: dailyTotalAmount,
+                        items: []
+                    };
+                }
+
+                const amountItem: TransactionAssetTrendsAnalysisDataAmount = {
+                    year: dailyData.year,
+                    month: dailyData.month,
+                    day: dailyData.day,
+                    totalAmount: dailyTotalAmount
+                };
+                data.items.push(amountItem);
+                combinedDataMap['total'] = data;
+            }
+        }
+
+        const allAssetTrendsDataItems: TransactionAssetTrendsAnalysisDataItem[] = [];
+
+        for (const assetTrendsDataItem of values(combinedDataMap)) {
+            allAssetTrendsDataItems.push(assetTrendsDataItem);
+        }
+
+        sortCategoryTotalAmountItems(allAssetTrendsDataItems, transactionStatisticsFilter.value);
+
+        const assetTrendsData: TransactionAssetTrendsAnalysisData = {
+            items: allAssetTrendsDataItems
+        };
+
+        return assetTrendsData;
+    });
+
     function createNewTransactionCategoricalOverviewAnalysisDataItem(id: string, name: string, type: TransactionCategoricalOverviewAnalysisDataItemType, displayOrders: number[], hidden: boolean): TransactionCategoricalOverviewAnalysisDataItem {
         const dataItem: TransactionCategoricalOverviewAnalysisDataItem = {
             id: id,
@@ -1062,6 +1320,10 @@ export const useStatisticsStore = defineStore('statistics', () => {
         transactionStatisticsFilter.value.trendChartDateType = DEFAULT_TREND_CHART_DATA_RANGE.type;
         transactionStatisticsFilter.value.trendChartStartYearMonth = '';
         transactionStatisticsFilter.value.trendChartEndYearMonth = '';
+        transactionStatisticsFilter.value.assetTrendsChartType = TrendChartType.Default.type;
+        transactionStatisticsFilter.value.assetTrendsChartDateType = DEFAULT_ASSET_TRENDS_CHART_DATA_RANGE.type;
+        transactionStatisticsFilter.value.assetTrendsChartStartTime = 0;
+        transactionStatisticsFilter.value.assetTrendsChartEndTime = 0;
         transactionStatisticsFilter.value.filterAccountIds = {};
         transactionStatisticsFilter.value.filterCategoryIds = {};
         transactionStatisticsFilter.value.tagIds = '';
@@ -1083,8 +1345,13 @@ export const useStatisticsStore = defineStore('statistics', () => {
             if (!ChartDataType.isAvailableForAnalysisType(transactionStatisticsFilter.value.chartDataType, analysisType)) {
                 transactionStatisticsFilter.value.chartDataType = ChartDataType.Default.type;
             }
+        } else if (analysisType === StatisticsAnalysisType.AssetTrends) {
+            if (!ChartDataType.isAvailableForAnalysisType(transactionStatisticsFilter.value.chartDataType, analysisType)) {
+                transactionStatisticsFilter.value.chartDataType = ChartDataType.DefaultForAssetTrends.type;
+            }
         }
 
+        // Categorical Analysis filter initialization
         if (filter && isInteger(filter.categoricalChartType)) {
             transactionStatisticsFilter.value.categoricalChartType = filter.categoricalChartType;
         } else {
@@ -1130,6 +1397,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
             }
         }
 
+        // Trend Analysis filter initialization
         if (filter && isInteger(filter.trendChartType)) {
             transactionStatisticsFilter.value.trendChartType = filter.trendChartType;
         } else {
@@ -1175,6 +1443,53 @@ export const useStatisticsStore = defineStore('statistics', () => {
             }
         }
 
+        // Asset Trends filter initialization
+        if (filter && isInteger(filter.assetTrendsChartType)) {
+            transactionStatisticsFilter.value.assetTrendsChartType = filter.assetTrendsChartType;
+        } else {
+            transactionStatisticsFilter.value.assetTrendsChartType = settingsStore.appSettings.statistics.defaultAssetTrendsChartType;
+        }
+
+        if (!TrendChartType.isValidType(transactionStatisticsFilter.value.assetTrendsChartType)) {
+            transactionStatisticsFilter.value.assetTrendsChartType = TrendChartType.Default.type;
+        }
+
+        if (filter && isInteger(filter.assetTrendsChartDateType)) {
+            transactionStatisticsFilter.value.assetTrendsChartDateType = filter.assetTrendsChartDateType;
+        } else {
+            transactionStatisticsFilter.value.assetTrendsChartDateType = settingsStore.appSettings.statistics.defaultAssetTrendsChartDataRangeType;
+        }
+
+        let assetTrendsChartDateTypeValid = true;
+
+        if (!DateRange.isAvailableForScene(transactionStatisticsFilter.value.assetTrendsChartDateType, DateRangeScene.AssetTrends)) {
+            transactionStatisticsFilter.value.assetTrendsChartDateType = DEFAULT_ASSET_TRENDS_CHART_DATA_RANGE.type;
+            assetTrendsChartDateTypeValid = false;
+        }
+
+        if (assetTrendsChartDateTypeValid && transactionStatisticsFilter.value.assetTrendsChartDateType === DateRange.Custom.type) {
+            if (filter && isInteger(filter.assetTrendsChartStartTime)) {
+                transactionStatisticsFilter.value.assetTrendsChartStartTime = filter.assetTrendsChartStartTime;
+            } else {
+                transactionStatisticsFilter.value.assetTrendsChartStartTime = 0;
+            }
+
+            if (filter && isInteger(filter.assetTrendsChartEndTime)) {
+                transactionStatisticsFilter.value.assetTrendsChartEndTime = filter.assetTrendsChartEndTime;
+            } else {
+                transactionStatisticsFilter.value.assetTrendsChartEndTime = 0;
+            }
+        } else {
+            const assetTrendsChartDateRange = getDateRangeByDateType(transactionStatisticsFilter.value.assetTrendsChartDateType, userStore.currentUserFirstDayOfWeek, userStore.currentUserFiscalYearStart);
+
+            if (assetTrendsChartDateRange) {
+                transactionStatisticsFilter.value.assetTrendsChartDateType = assetTrendsChartDateRange.dateType;
+                transactionStatisticsFilter.value.assetTrendsChartStartTime = assetTrendsChartDateRange.minTime;
+                transactionStatisticsFilter.value.assetTrendsChartEndTime = assetTrendsChartDateRange.maxTime;
+            }
+        }
+
+        // Other filter initialization
         if (filter && isObject(filter.filterAccountIds)) {
             transactionStatisticsFilter.value.filterAccountIds = filter.filterAccountIds;
         } else {
@@ -1224,6 +1539,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
             changed = true;
         }
 
+        // Categorical Analysis filter update
         if (filter && isInteger(filter.categoricalChartType) && transactionStatisticsFilter.value.categoricalChartType !== filter.categoricalChartType) {
             transactionStatisticsFilter.value.categoricalChartType = filter.categoricalChartType;
             changed = true;
@@ -1244,6 +1560,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
             changed = true;
         }
 
+        // Trend Analysis filter update
         if (filter && isInteger(filter.trendChartType) && transactionStatisticsFilter.value.trendChartType !== filter.trendChartType) {
             transactionStatisticsFilter.value.trendChartType = filter.trendChartType;
             changed = true;
@@ -1264,6 +1581,28 @@ export const useStatisticsStore = defineStore('statistics', () => {
             changed = true;
         }
 
+        // Asset Trends filter update
+        if (filter && isInteger(filter.assetTrendsChartType) && transactionStatisticsFilter.value.assetTrendsChartType !== filter.assetTrendsChartType) {
+            transactionStatisticsFilter.value.assetTrendsChartType = filter.assetTrendsChartType;
+            changed = true;
+        }
+
+        if (filter && isInteger(filter.assetTrendsChartDateType) && transactionStatisticsFilter.value.assetTrendsChartDateType !== filter.assetTrendsChartDateType) {
+            transactionStatisticsFilter.value.assetTrendsChartDateType = filter.assetTrendsChartDateType;
+            changed = true;
+        }
+
+        if (filter && isInteger(filter.assetTrendsChartStartTime) && transactionStatisticsFilter.value.assetTrendsChartStartTime !== filter.assetTrendsChartStartTime) {
+            transactionStatisticsFilter.value.assetTrendsChartStartTime = filter.assetTrendsChartStartTime;
+            changed = true;
+        }
+
+        if (filter && isInteger(filter.assetTrendsChartEndTime) && transactionStatisticsFilter.value.assetTrendsChartEndTime !== filter.assetTrendsChartEndTime) {
+            transactionStatisticsFilter.value.assetTrendsChartEndTime = filter.assetTrendsChartEndTime;
+            changed = true;
+        }
+
+        // Other filter update
         if (filter && isObject(filter.filterAccountIds) && !isEquals(transactionStatisticsFilter.value.filterAccountIds, filter.filterAccountIds)) {
             transactionStatisticsFilter.value.filterAccountIds = filter.filterAccountIds;
             changed = true;
@@ -1297,7 +1636,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
         return changed;
     }
 
-    function getTransactionStatisticsPageParams(analysisType: StatisticsAnalysisType, trendDateAggregationType: number): string {
+    function getTransactionStatisticsPageParams(analysisType: StatisticsAnalysisType, trendDateAggregationType: number, assetTrendsDateAggregationType: number): string {
         const querys: string[] = [];
 
         querys.push('analysisType=' + analysisType);
@@ -1320,8 +1659,20 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 querys.push('endTime=' + transactionStatisticsFilter.value.trendChartEndYearMonth);
             }
 
-            if (trendDateAggregationType !== ChartDateAggregationType.Month.type) {
+            if (trendDateAggregationType !== ChartDateAggregationType.Default.type) {
                 querys.push('trendDateAggregationType=' + trendDateAggregationType);
+            }
+        } else if (analysisType === StatisticsAnalysisType.AssetTrends) {
+            querys.push('chartType=' + transactionStatisticsFilter.value.assetTrendsChartType);
+            querys.push('chartDateType=' + transactionStatisticsFilter.value.assetTrendsChartDateType);
+
+            if (transactionStatisticsFilter.value.assetTrendsChartDateType === DateRange.Custom.type) {
+                querys.push('startTime=' + transactionStatisticsFilter.value.assetTrendsChartStartTime);
+                querys.push('endTime=' + transactionStatisticsFilter.value.assetTrendsChartEndTime);
+            }
+
+            if (assetTrendsDateAggregationType !== ChartDateAggregationType.Default.type) {
+                querys.push('assetTrendsDateAggregationType=' + assetTrendsDateAggregationType);
             }
         }
 
@@ -1414,21 +1765,23 @@ export const useStatisticsStore = defineStore('statistics', () => {
             } else {
                 querys.push('categoryIds=' + getFinalCategoryIdsByFilteredCategoryIds(transactionCategoriesStore.allTransactionCategoriesMap, transactionStatisticsFilter.value.filterCategoryIds));
             }
-        } else if (itemId && (transactionStatisticsFilter.value.chartDataType === ChartDataType.InflowsByAccount.type
-            || transactionStatisticsFilter.value.chartDataType === ChartDataType.IncomeByAccount.type
-            || transactionStatisticsFilter.value.chartDataType === ChartDataType.OutflowsByAccount.type
-            || transactionStatisticsFilter.value.chartDataType === ChartDataType.ExpenseByAccount.type
-            || transactionStatisticsFilter.value.chartDataType === ChartDataType.AccountTotalAssets.type
-            || transactionStatisticsFilter.value.chartDataType === ChartDataType.AccountTotalLiabilities.type)) {
+        } else if (itemId && (transactionStatisticsFilter.value.chartDataType === ChartDataType.InflowsByAccount.type ||
+            transactionStatisticsFilter.value.chartDataType === ChartDataType.IncomeByAccount.type ||
+            transactionStatisticsFilter.value.chartDataType === ChartDataType.OutflowsByAccount.type ||
+            transactionStatisticsFilter.value.chartDataType === ChartDataType.ExpenseByAccount.type ||
+            transactionStatisticsFilter.value.chartDataType === ChartDataType.AccountTotalAssets.type ||
+            transactionStatisticsFilter.value.chartDataType === ChartDataType.AccountTotalLiabilities.type)
+        ) {
             querys.push('accountIds=' + itemId);
 
-            if (!isObjectEmpty(transactionStatisticsFilter.value.filterCategoryIds)) {
+            if ((analysisType === StatisticsAnalysisType.CategoricalAnalysis || analysisType === StatisticsAnalysisType.TrendAnalysis) && !isObjectEmpty(transactionStatisticsFilter.value.filterCategoryIds)) {
                 querys.push('categoryIds=' + getFinalCategoryIdsByFilteredCategoryIds(transactionCategoriesStore.allTransactionCategoriesMap, transactionStatisticsFilter.value.filterCategoryIds));
             }
-        } else if (itemId && (transactionStatisticsFilter.value.chartDataType === ChartDataType.IncomeByPrimaryCategory.type
-            || transactionStatisticsFilter.value.chartDataType === ChartDataType.IncomeBySecondaryCategory.type
-            || transactionStatisticsFilter.value.chartDataType === ChartDataType.ExpenseByPrimaryCategory.type
-            || transactionStatisticsFilter.value.chartDataType === ChartDataType.ExpenseBySecondaryCategory.type)) {
+        } else if (itemId && (transactionStatisticsFilter.value.chartDataType === ChartDataType.IncomeByPrimaryCategory.type ||
+            transactionStatisticsFilter.value.chartDataType === ChartDataType.IncomeBySecondaryCategory.type ||
+            transactionStatisticsFilter.value.chartDataType === ChartDataType.ExpenseByPrimaryCategory.type ||
+            transactionStatisticsFilter.value.chartDataType === ChartDataType.ExpenseBySecondaryCategory.type)
+        ) {
             querys.push('categoryIds=' + itemId);
 
             if (!isObjectEmpty(transactionStatisticsFilter.value.filterAccountIds)) {
@@ -1444,16 +1797,18 @@ export const useStatisticsStore = defineStore('statistics', () => {
             }
         }
 
-        if (transactionStatisticsFilter.value.tagIds) {
-            querys.push('tagIds=' + transactionStatisticsFilter.value.tagIds);
-        }
+        if (analysisType === StatisticsAnalysisType.CategoricalAnalysis || analysisType === StatisticsAnalysisType.TrendAnalysis) {
+            if (transactionStatisticsFilter.value.tagIds) {
+                querys.push('tagIds=' + transactionStatisticsFilter.value.tagIds);
+            }
 
-        if (transactionStatisticsFilter.value.tagFilterType) {
-            querys.push('tagFilterType=' + transactionStatisticsFilter.value.tagFilterType);
-        }
+            if (transactionStatisticsFilter.value.tagFilterType) {
+                querys.push('tagFilterType=' + transactionStatisticsFilter.value.tagFilterType);
+            }
 
-        if (transactionStatisticsFilter.value.keyword) {
-            querys.push('keyword=' + encodeURIComponent(transactionStatisticsFilter.value.keyword));
+            if (transactionStatisticsFilter.value.keyword) {
+                querys.push('keyword=' + encodeURIComponent(transactionStatisticsFilter.value.keyword));
+            }
         }
 
         if (analysisType === StatisticsAnalysisType.CategoricalAnalysis
@@ -1465,7 +1820,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 querys.push('minTime=' + transactionStatisticsFilter.value.categoricalChartStartTime);
                 querys.push('maxTime=' + transactionStatisticsFilter.value.categoricalChartEndTime);
             }
-        } else if (analysisType === StatisticsAnalysisType.TrendAnalysis && dateRange) {
+        } else if ((analysisType === StatisticsAnalysisType.TrendAnalysis || analysisType === StatisticsAnalysisType.AssetTrends) && dateRange) {
             querys.push('dateType=' + dateRange.dateType);
             querys.push('minTime=' + dateRange.minTime);
             querys.push('maxTime=' + dateRange.maxTime);
@@ -1560,6 +1915,45 @@ export const useStatisticsStore = defineStore('statistics', () => {
         });
     }
 
+    function loadAssetTrends({ force }: { force: boolean }): Promise<TransactionStatisticAssetTrendsResponseItem[]> {
+        return new Promise((resolve, reject) => {
+            services.getTransactionStatisticsAssetTrends({
+                startTime: transactionStatisticsFilter.value.assetTrendsChartStartTime,
+                endTime: transactionStatisticsFilter.value.assetTrendsChartEndTime
+            }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to retrieve transaction statistics' });
+                    return;
+                }
+
+                if (transactionStatisticsStateInvalid.value) {
+                    updateTransactionStatisticsInvalidState(false);
+                }
+
+                if (force && data.result && isEquals(transactionAssetTrendsData.value, data.result)) {
+                    reject({ message: 'Data is up to date', isUpToDate: true });
+                    return;
+                }
+
+                transactionAssetTrendsData.value = data.result;
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to retrieve transaction statistics', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to retrieve transaction statistics' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
     return {
         // states
         transactionStatisticsFilter,
@@ -1571,6 +1965,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
         categoricalOverviewAnalysisData,
         categoricalAnalysisData,
         trendsAnalysisData,
+        assetTrendsData,
         // functions
         updateTransactionStatisticsInvalidState,
         resetTransactionStatistics,
@@ -1579,6 +1974,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
         getTransactionStatisticsPageParams,
         getTransactionListPageParams,
         loadCategoricalAnalysis,
-        loadTrendAnalysis
+        loadTrendAnalysis,
+        loadAssetTrends
     };
 });

@@ -1,5 +1,5 @@
 import { type PartialRecord, itemAndIndex } from '@/core/base.ts';
-import type { Year1BasedMonth, TextualYearMonthDay, StartEndTime, WeekDay } from '@/core/datetime.ts';
+import type { TextualYearMonthDay, Year1BasedMonth, YearMonthDay, StartEndTime, WeekDay } from '@/core/datetime.ts';
 import { type Coordinate, getNormalizedCoordinate } from '@/core/coordinate.ts';
 import { TransactionType } from '@/core/transaction.ts';
 
@@ -581,6 +581,11 @@ export interface TransactionStatisticTrendsRequest extends YearMonthRangeRequest
     readonly useTransactionTimezone: boolean;
 }
 
+export interface TransactionStatisticAssetTrendsRequest {
+    readonly startTime: number;
+    readonly endTime: number;
+}
+
 export const ALL_TRANSACTION_AMOUNTS_REQUEST_TYPE = [
     'today',
     'thisWeek',
@@ -710,9 +715,28 @@ export interface TransactionStatisticTrendsResponseItem {
     readonly items: TransactionStatisticResponseItem[];
 }
 
+export interface TransactionStatisticAssetTrendsResponseItem extends YearMonthDay {
+    readonly year: number;
+    readonly month: number; // 1-based (1 = January, 12 = December)
+    readonly day: number;
+    readonly items: TransactionStatisticAssetTrendsResponseDataItem[];
+}
+
+export interface TransactionStatisticAssetTrendsResponseDataItem {
+    readonly accountId: string;
+    readonly accountOpeningBalance: number;
+    readonly accountClosingBalance: number;
+}
+
 export interface YearMonthDataItem extends Year1BasedMonth, Record<string, unknown> {}
 
+export interface YearMonthDayDataItem extends YearMonthDay, Record<string, unknown> {}
+
 export interface YearMonthItems<T extends Year1BasedMonth> extends Record<string, unknown> {
+    readonly items: T[];
+}
+
+export interface YearMonthDayItems<T extends YearMonthDay> extends Record<string, unknown> {
     readonly items: T[];
 }
 
@@ -746,6 +770,13 @@ export interface TransactionStatisticResponseWithInfo {
 export interface TransactionStatisticTrendsResponseItemWithInfo {
     readonly year: number;
     readonly month: number; // 1-based (1 = January, 12 = December)
+    readonly items: TransactionStatisticResponseItemWithInfo[];
+}
+
+export interface TransactionStatisticAssetTrendsResponseItemWithInfo {
+    readonly year: number;
+    readonly month: number; // 1-based (1 = January, 12 = December)
+    readonly day: number;
     readonly items: TransactionStatisticResponseItemWithInfo[];
 }
 
@@ -817,6 +848,21 @@ export interface TransactionTrendsAnalysisDataItem extends Record<string, unknow
 export interface TransactionTrendsAnalysisDataAmount extends Record<string, unknown>, Year1BasedMonth {
     readonly year: number;
     readonly month1base: number;
+    readonly totalAmount: number;
+}
+
+export interface TransactionAssetTrendsAnalysisData {
+    readonly items: TransactionAssetTrendsAnalysisDataItem[];
+}
+
+export interface TransactionAssetTrendsAnalysisDataItem extends Record<string, unknown>, TransactionStatisticDataItemBase {
+    readonly items: TransactionAssetTrendsAnalysisDataAmount[];
+}
+
+export interface TransactionAssetTrendsAnalysisDataAmount extends Record<string, unknown>, YearMonthDay {
+    readonly year: number;
+    readonly month: number;
+    readonly day: number;
     readonly totalAmount: number;
 }
 

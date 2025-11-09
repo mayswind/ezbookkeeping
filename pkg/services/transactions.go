@@ -107,8 +107,8 @@ func (s *TransactionService) GetAllSpecifiedTransactions(c core.Context, uid int
 	return allTransactions, nil
 }
 
-// GetAllTransactionsWithAccountBalanceByMaxTime returns account statement within time range
-func (s *TransactionService) GetAllTransactionsWithAccountBalanceByMaxTime(c core.Context, uid int64, pageCount int32, maxTransactionTime int64, minTransactionTime int64, accountId int64, accountCategory models.AccountCategory) ([]*models.TransactionWithAccountBalance, int64, int64, int64, int64, error) {
+// GetAllTransactionsInOneAccountWithAccountBalanceByMaxTime returns account statement within time range
+func (s *TransactionService) GetAllTransactionsInOneAccountWithAccountBalanceByMaxTime(c core.Context, uid int64, pageCount int32, maxTransactionTime int64, minTransactionTime int64, accountId int64, accountCategory models.AccountCategory) ([]*models.TransactionWithAccountBalance, int64, int64, int64, int64, error) {
 	if maxTransactionTime <= 0 {
 		maxTransactionTime = utils.GetMaxTransactionTimeFromUnixTime(time.Now().Unix())
 	}
@@ -158,7 +158,7 @@ func (s *TransactionService) GetAllTransactionsWithAccountBalanceByMaxTime(c cor
 		} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
 			accumulatedBalance = accumulatedBalance + transaction.Amount
 		} else {
-			log.Errorf(c, "[transactions.GetAllTransactionsWithAccountBalanceByMaxTime] trasaction type (%d) is invalid (id:%d)", transaction.TransactionId, transaction.Type)
+			log.Errorf(c, "[transactions.GetAllTransactionsInOneAccountWithAccountBalanceByMaxTime] trasaction type (%d) is invalid (id:%d)", transaction.TransactionId, transaction.Type)
 			return nil, 0, 0, 0, 0, errs.ErrTransactionTypeInvalid
 		}
 
@@ -195,6 +195,132 @@ func (s *TransactionService) GetAllTransactionsWithAccountBalanceByMaxTime(c cor
 	}
 
 	return allTransactionsAndAccountBalance, totalInflows, totalOutflows, openingBalance, accumulatedBalance, nil
+}
+
+// GetAllAccountsDailyOpeningAndClosingBalance returns daily opening and closing balance of all accounts within time range
+func (s *TransactionService) GetAllAccountsDailyOpeningAndClosingBalance(c core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, utcOffset int16) (map[int32][]*models.TransactionWithAccountBalance, error) {
+	if maxTransactionTime <= 0 {
+		maxTransactionTime = utils.GetMaxTransactionTimeFromUnixTime(time.Now().Unix())
+	}
+
+	clientLocation := time.FixedZone("Client Timezone", int(utcOffset)*60)
+	var allTransactions []*models.Transaction
+
+	for maxTransactionTime > 0 {
+		transactions, err := s.GetTransactionsByMaxTime(c, uid, maxTransactionTime, 0, 0, nil, nil, nil, false, models.TRANSACTION_TAG_FILTER_HAS_ANY, "", "", 1, pageCountForLoadTransactionAmounts, false, false)
+
+		if err != nil {
+			return nil, err
+		}
+
+		allTransactions = append(allTransactions, transactions...)
+
+		if len(transactions) < pageCountForLoadTransactionAmounts {
+			maxTransactionTime = 0
+			break
+		}
+
+		maxTransactionTime = transactions[len(transactions)-1].TransactionTime - 1
+	}
+
+	accountDailyLastBalances := make(map[string]*models.TransactionWithAccountBalance)
+	accountDailyBalances := make(map[int32][]*models.TransactionWithAccountBalance)
+
+	if len(allTransactions) < 1 {
+		return accountDailyBalances, nil
+	}
+
+	accumulatedBalances := make(map[int64]int64)
+	accumulatedBalancesBeforeStartTime := make(map[int64]int64)
+
+	for i := len(allTransactions) - 1; i >= 0; i-- {
+		transaction := allTransactions[i]
+		accumulatedBalance := accumulatedBalances[transaction.AccountId]
+		lastAccumulatedBalance := accumulatedBalances[transaction.AccountId]
+
+		if transaction.Type == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+			accumulatedBalance = accumulatedBalance + transaction.RelatedAccountAmount
+		} else if transaction.Type == models.TRANSACTION_DB_TYPE_INCOME {
+			accumulatedBalance = accumulatedBalance + transaction.Amount
+		} else if transaction.Type == models.TRANSACTION_DB_TYPE_EXPENSE {
+			accumulatedBalance = accumulatedBalance - transaction.Amount
+		} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+			accumulatedBalance = accumulatedBalance - transaction.Amount
+		} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+			accumulatedBalance = accumulatedBalance + transaction.Amount
+		} else {
+			log.Errorf(c, "[transactions.GetAllTransactionsWithAccountBalanceByMaxTime] trasaction type (%d) is invalid (id:%d)", transaction.TransactionId, transaction.Type)
+			return nil, errs.ErrTransactionTypeInvalid
+		}
+
+		accumulatedBalances[transaction.AccountId] = accumulatedBalance
+
+		if transaction.TransactionTime < minTransactionTime {
+			accumulatedBalancesBeforeStartTime[transaction.AccountId] = accumulatedBalance
+			continue
+		}
+
+		yearMonthDay := utils.FormatUnixTimeToNumericYearMonthDay(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime), clientLocation)
+		groupKey := fmt.Sprintf("%d_%d", yearMonthDay, transaction.AccountId)
+		dailyAccountBalance, exists := accountDailyLastBalances[groupKey]
+
+		if exists {
+			dailyAccountBalance.AccountClosingBalance = accumulatedBalance
+		} else {
+			dailyAccountBalance = &models.TransactionWithAccountBalance{
+				Transaction: &models.Transaction{
+					AccountId: transaction.AccountId,
+				},
+				AccountOpeningBalance: lastAccumulatedBalance,
+				AccountClosingBalance: accumulatedBalance,
+			}
+			accountDailyLastBalances[groupKey] = dailyAccountBalance
+		}
+	}
+
+	firstTransactionTime := allTransactions[len(allTransactions)-1].TransactionTime
+
+	if minTransactionTime > firstTransactionTime {
+		firstTransactionTime = minTransactionTime
+	}
+
+	firstYearMonthDay := utils.FormatUnixTimeToNumericYearMonthDay(utils.GetUnixTimeFromTransactionTime(firstTransactionTime), clientLocation)
+
+	// fill in the opening balance for accounts that do not have transactions on the first day
+	for accountId, accumulatedBalance := range accumulatedBalancesBeforeStartTime {
+		if accumulatedBalance == 0 {
+			continue
+		}
+
+		groupKey := fmt.Sprintf("%d_%d", firstYearMonthDay, accountId)
+
+		if _, exists := accountDailyLastBalances[groupKey]; exists {
+			continue
+		}
+
+		accountDailyLastBalances[groupKey] = &models.TransactionWithAccountBalance{
+			Transaction: &models.Transaction{
+				AccountId: accountId,
+			},
+			AccountOpeningBalance: accumulatedBalance,
+			AccountClosingBalance: accumulatedBalance,
+		}
+	}
+
+	for groupKey, transactionWithAccountBalance := range accountDailyLastBalances {
+		groupKeyParts := strings.Split(groupKey, "_")
+		yearMonthDay, _ := utils.StringToInt32(groupKeyParts[0])
+		dailyAccountBalances, exists := accountDailyBalances[yearMonthDay]
+
+		if !exists {
+			dailyAccountBalances = make([]*models.TransactionWithAccountBalance, 0)
+		}
+
+		dailyAccountBalances = append(dailyAccountBalances, transactionWithAccountBalance)
+		accountDailyBalances[yearMonthDay] = dailyAccountBalances
+	}
+
+	return accountDailyBalances, nil
 }
 
 // GetTransactionsByMaxTime returns transactions before given time

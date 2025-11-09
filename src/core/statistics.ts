@@ -3,7 +3,13 @@ import { DateRange } from '@/core/datetime.ts';
 
 export enum StatisticsAnalysisType {
     CategoricalAnalysis = 0,
-    TrendAnalysis = 1
+    TrendAnalysis = 1,
+    AssetTrends = 2
+}
+
+export enum ChartDataAggregationType {
+    Sum = 0,
+    Last = 1
 }
 
 export class CategoricalChartType implements TypeAndName {
@@ -115,16 +121,18 @@ export class ChartDataType implements TypeAndName {
     public static readonly IncomeByAccount = new ChartDataType(3, 'Income By Account', false, false, StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
     public static readonly IncomeByPrimaryCategory = new ChartDataType(4, 'Income By Primary Category', false, false, StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
     public static readonly IncomeBySecondaryCategory = new ChartDataType(5, 'Income By Secondary Category', false, false, StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
-    public static readonly AccountTotalAssets = new ChartDataType(6, 'Account Total Assets', false, false, StatisticsAnalysisType.CategoricalAnalysis);
-    public static readonly AccountTotalLiabilities = new ChartDataType(7, 'Account Total Liabilities', false, false, StatisticsAnalysisType.CategoricalAnalysis);
+    public static readonly AccountTotalAssets = new ChartDataType(6, 'Account Total Assets', false, false, StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.AssetTrends);
+    public static readonly AccountTotalLiabilities = new ChartDataType(7, 'Account Total Liabilities', false, false, StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.AssetTrends);
     public static readonly TotalOutflows = new ChartDataType(13, 'Total Outflows', false, false, StatisticsAnalysisType.TrendAnalysis);
     public static readonly TotalExpense = new ChartDataType(8, 'Total Expense', false, false, StatisticsAnalysisType.TrendAnalysis);
     public static readonly TotalInflows = new ChartDataType(14, 'Total Inflows', false, false, StatisticsAnalysisType.TrendAnalysis);
     public static readonly TotalIncome = new ChartDataType(9, 'Total Income', false, false, StatisticsAnalysisType.TrendAnalysis);
     public static readonly NetCashFlow = new ChartDataType(15, 'Net Cash Flow', false, false, StatisticsAnalysisType.TrendAnalysis);
     public static readonly NetIncome = new ChartDataType(10, 'Net Income', false, false, StatisticsAnalysisType.TrendAnalysis);
+    public static readonly NetWorth = new ChartDataType(17, 'Net Worth', false, false, StatisticsAnalysisType.AssetTrends);
 
     public static readonly Default = ChartDataType.ExpenseByPrimaryCategory;
+    public static readonly DefaultForAssetTrends = ChartDataType.NetWorth;
 
     public readonly type: number;
     public readonly name: string;
@@ -221,28 +229,55 @@ export class ChartDateAggregationType {
     private static readonly allInstances: ChartDateAggregationType[] = [];
     private static readonly allInstancesByType: Record<number, ChartDateAggregationType> = {};
 
-    public static readonly Month = new ChartDateAggregationType(0, 'Monthly', 'Aggregate by Month');
-    public static readonly Quarter = new ChartDateAggregationType(1, 'Quarterly', 'Aggregate by Quarter');
-    public static readonly Year = new ChartDateAggregationType(2, 'Yearly', 'Aggregate by Year');
-    public static readonly FiscalYear = new ChartDateAggregationType(3, 'FiscalYearly', 'Aggregate by Fiscal Year');
+    public static readonly Day = new ChartDateAggregationType(4, 'Daily', 'Aggregate by Day', StatisticsAnalysisType.AssetTrends);
+    public static readonly Month = new ChartDateAggregationType(0, 'Monthly', 'Aggregate by Month', StatisticsAnalysisType.TrendAnalysis, StatisticsAnalysisType.AssetTrends);
+    public static readonly Quarter = new ChartDateAggregationType(1, 'Quarterly', 'Aggregate by Quarter', StatisticsAnalysisType.TrendAnalysis, StatisticsAnalysisType.AssetTrends);
+    public static readonly Year = new ChartDateAggregationType(2, 'Yearly', 'Aggregate by Year', StatisticsAnalysisType.TrendAnalysis, StatisticsAnalysisType.AssetTrends);
+    public static readonly FiscalYear = new ChartDateAggregationType(3, 'FiscalYearly', 'Aggregate by Fiscal Year', StatisticsAnalysisType.TrendAnalysis, StatisticsAnalysisType.AssetTrends);
 
     public static readonly Default = ChartDateAggregationType.Month;
 
     public readonly type: number;
     public readonly shortName: string;
     public readonly fullName: string;
+    private readonly availableAnalysisTypes: Record<number, boolean>;
 
-    private constructor(type: number, shortName: string, fullName: string) {
+    private constructor(type: number, shortName: string, fullName: string, ...availableAnalysisTypes: StatisticsAnalysisType[]) {
         this.type = type;
         this.shortName = shortName;
         this.fullName = fullName;
+        this.availableAnalysisTypes = {};
+
+        if (availableAnalysisTypes) {
+            for (const analysisType of availableAnalysisTypes) {
+                this.availableAnalysisTypes[analysisType] = true;
+            }
+        }
 
         ChartDateAggregationType.allInstances.push(this);
         ChartDateAggregationType.allInstancesByType[type] = this;
     }
 
-    public static values(): ChartDateAggregationType[] {
-        return ChartDateAggregationType.allInstances;
+    public isAvailableAnalysisType(analysisType: StatisticsAnalysisType): boolean {
+        return this.availableAnalysisTypes[analysisType] || false;
+    }
+
+    public static values(analysisType?: StatisticsAnalysisType): ChartDateAggregationType[] {
+        const availableInstances: ChartDateAggregationType[] = ChartDateAggregationType.allInstances;
+
+        if (analysisType === undefined) {
+            return availableInstances;
+        }
+
+        const ret: ChartDateAggregationType[] = [];
+
+        for (const chartDataType of availableInstances) {
+            if (chartDataType.isAvailableAnalysisType(analysisType)) {
+                ret.push(chartDataType);
+            }
+        }
+
+        return ret;
     }
 
     public static valueOf(type: number): ChartDateAggregationType | undefined {
@@ -252,3 +287,4 @@ export class ChartDateAggregationType {
 
 export const DEFAULT_CATEGORICAL_CHART_DATA_RANGE: DateRange = DateRange.ThisMonth;
 export const DEFAULT_TREND_CHART_DATA_RANGE: DateRange = DateRange.ThisYear;
+export const DEFAULT_ASSET_TRENDS_CHART_DATA_RANGE: DateRange = DateRange.ThisYear;

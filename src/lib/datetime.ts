@@ -282,6 +282,10 @@ class MomentDateTime implements DateTime {
         return this.instance.utcOffset();
     }
 
+    public getDateTimeAfterDays(days: number): DateTime {
+        return MomentDateTime.of(this.instance.clone().add(days, 'days'));
+    }
+
     public toGregorianCalendarYearMonthDay(): YearMonthDay {
         return {
             year: this.instance.year(),

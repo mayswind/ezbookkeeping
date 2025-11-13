@@ -2,7 +2,7 @@ import { useI18n as useVueI18n } from 'vue-i18n';
 import moment from 'moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
-import type { PartialRecord, NameValue, TypeAndName, TypeAndDisplayName, LocalizedSwitchOption } from '@/core/base.ts';
+import type { NameValue, TypeAndName, TypeAndDisplayName, LocalizedSwitchOption } from '@/core/base.ts';
 
 import {
     type LanguageInfo,
@@ -1341,8 +1341,8 @@ export function useI18n() {
         return ret;
     }
 
-    function getAllTransactionDefaultCategories(categoryType: 0 | CategoryType, locale: string): PartialRecord<CategoryType, LocalizedPresetCategory[]> {
-        const allCategories: PartialRecord<CategoryType, LocalizedPresetCategory[]> = {};
+    function getAllTransactionDefaultCategories(categoryType: 0 | CategoryType, locale: string): Record<string, LocalizedPresetCategory[]> {
+        const allCategories: Record<string, LocalizedPresetCategory[]> = {};
         const categoryTypes: CategoryType[] = [];
 
         if (categoryType === 0) {
@@ -1386,7 +1386,7 @@ export function useI18n() {
                 categories.push(submitCategory);
             }
 
-            allCategories[categoryType] = categories;
+            allCategories[`${categoryType}`] = categories;
         }
 
         return allCategories;

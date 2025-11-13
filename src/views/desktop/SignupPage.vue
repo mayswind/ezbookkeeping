@@ -139,7 +139,7 @@
                                 <div class="overflow-y-auto px-3" :class="{ 'disabled': !usePresetCategories || submitting || navigateToHomePage }" style="max-height: 323px">
                                     <v-row :key="categoryType" v-for="(categories, categoryType) in allPresetCategories">
                                         <v-col cols="12" md="12">
-                                            <h4 class="mb-3">{{ getCategoryTypeName(categoryType) }}</h4>
+                                            <h4 class="mb-3">{{ getCategoryTypeName(parseInt(categoryType)) }}</h4>
 
                                             <v-expansion-panels class="border rounded" variant="accordion" multiple>
                                                 <v-expansion-panel :key="idx" v-for="(category, idx) in categories">
@@ -220,8 +220,8 @@ import { useSignupPageBase } from '@/views/base/SignupPageBase.ts';
 
 import { useRootStore } from '@/stores/index.ts';
 
-import type { PartialRecord, TypeAndDisplayName } from '@/core/base.ts';
-import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
+import type { TypeAndDisplayName } from '@/core/base.ts';
+import { type LocalizedPresetCategory } from '@/core/category.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 
@@ -262,7 +262,7 @@ const finalResultMessage = ref<string | null>(null);
 const navigateToHomePage = ref<boolean>(false);
 
 const allWeekDays = computed<TypeAndDisplayName[]>(() => getAllWeekDays());
-const allPresetCategories = computed<PartialRecord<CategoryType, LocalizedPresetCategory[]>>(() => getAllTransactionDefaultCategories(0, currentLocale.value));
+const allPresetCategories = computed<Record<string, LocalizedPresetCategory[]>>(() => getAllTransactionDefaultCategories(0, currentLocale.value));
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 
 const allSteps = computed<StepBarItem[]>(() => {

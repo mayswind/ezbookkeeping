@@ -9,7 +9,7 @@
             <v-card-text class="preset-transaction-categories mt-sm-2 mt-md-4 pt-0">
                 <template :key="categoryType" v-for="(categories, categoryType) in allPresetCategories">
                     <div class="d-flex align-center mb-1">
-                        <h4>{{ getCategoryTypeName(categoryType) }}</h4>
+                        <h4>{{ getCategoryTypeName(parseInt(categoryType)) }}</h4>
                         <v-spacer/>
                         <language-select-button :disabled="submitting"
                                                 :use-model-value="true" v-model="currentLocale" />
@@ -64,7 +64,6 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
-import type { PartialRecord } from '@/core/base.ts';
 import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { categorizedArrayToPlainArray } from '@/lib/common.ts';
 import { localizedPresetCategoriesToTransactionCategoryCreateWithSubCategories } from '@/lib/category.ts';
@@ -90,14 +89,14 @@ const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const currentLocale = ref<string>(getCurrentLanguageTag());
 const submitting = ref<boolean>(false);
 
-const allPresetCategories = computed<PartialRecord<CategoryType, LocalizedPresetCategory[]>>(() => getAllTransactionDefaultCategories(props.categoryType, currentLocale.value));
+const allPresetCategories = computed<Record<string, LocalizedPresetCategory[]>>(() => getAllTransactionDefaultCategories(props.categoryType, currentLocale.value));
 
 const showState = computed<boolean>({
     get: () => props.show,
     set: (value) => emit('update:show', value)
 });
 
-function getCategoryTypeName(categoryType: CategoryType): string {
+function getCategoryTypeName(categoryType: number): string {
     switch (categoryType) {
         case CategoryType.Income:
             return tt('Income Categories');

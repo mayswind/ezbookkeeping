@@ -93,7 +93,7 @@ export function useSignupPageBase() {
     const inputIsEmpty = computed<boolean>(() => !!inputEmptyProblemMessage.value);
     const inputIsInvalid = computed<boolean>(() => !!inputInvalidProblemMessage.value);
 
-    function getCategoryTypeName(categoryType: CategoryType): string {
+    function getCategoryTypeName(categoryType: number): string {
         switch (categoryType) {
             case CategoryType.Income:
                 return tt('Income Categories');

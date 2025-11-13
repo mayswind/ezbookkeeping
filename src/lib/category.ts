@@ -189,7 +189,7 @@ export function allTransactionCategoriesWithVisibleCount(allTransactionCategorie
             }
         }
 
-        ret[categoryType] = {
+        ret[`${categoryType}`] = {
             type: categoryType,
             allCategories: allCategories,
             allVisibleCategoryCount: allVisibleCategoryCount,
@@ -374,7 +374,7 @@ export function getLastShowingId(categories: TransactionCategory[], showHidden: 
     return null;
 }
 
-export function containsAnyAvailableCategory(allTransactionCategories: Record<number, TransactionCategoriesWithVisibleCount>, showHidden: boolean): boolean {
+export function containsAnyAvailableCategory(allTransactionCategories: Record<string, TransactionCategoriesWithVisibleCount>, showHidden: boolean): boolean {
     for (const categoryType of values(allTransactionCategories)) {
         if (showHidden) {
             if (categoryType.allCategories && categoryType.allCategories.length > 0) {
@@ -390,7 +390,7 @@ export function containsAnyAvailableCategory(allTransactionCategories: Record<nu
     return false;
 }
 
-export function containsAvailableCategory(allTransactionCategories: Record<number, TransactionCategoriesWithVisibleCount>, showHidden: boolean): Record<number, boolean> {
+export function containsAvailableCategory(allTransactionCategories: Record<string, TransactionCategoriesWithVisibleCount>, showHidden: boolean): Record<number, boolean> {
     const result: Record<number, boolean> = {};
 
     for (const [type, categoryType] of entries(allTransactionCategories)) {

@@ -10,7 +10,7 @@
         </f7-navbar>
 
         <f7-block class="no-padding no-margin" :key="categoryType" v-for="(categories, categoryType) in allPresetCategories">
-            <f7-block-title class="margin-top margin-horizontal">{{ getCategoryTypeName(categoryType) }}</f7-block-title>
+            <f7-block-title class="margin-top margin-horizontal">{{ getCategoryTypeName(parseInt(categoryType)) }}</f7-block-title>
 
             <f7-list strong inset dividers class="margin-top">
                 <f7-list-item :title="category.name"
@@ -64,7 +64,6 @@ import type { Router } from 'framework7/types';
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
 
-import type { PartialRecord } from '@/core/base.ts';
 import type { LanguageOption } from '@/locales/index.ts';
 import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { getObjectOwnFieldCount, categorizedArrayToPlainArray } from '@/lib/common.ts';
@@ -88,10 +87,10 @@ const showMoreActionSheet = ref<boolean>(false);
 const showChangeLocaleSheet = ref<boolean>(false);
 
 const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
-const allPresetCategories = computed<PartialRecord<CategoryType, LocalizedPresetCategory[]>>(() => getAllTransactionDefaultCategories(categoryType.value, currentLocale.value));
+const allPresetCategories = computed<Record<string, LocalizedPresetCategory[]>>(() => getAllTransactionDefaultCategories(categoryType.value, currentLocale.value));
 const isPresetHasCategories = computed<boolean>(() => getObjectOwnFieldCount(allPresetCategories.value) > 0);
 
-function getCategoryTypeName(categoryType: CategoryType): string {
+function getCategoryTypeName(categoryType: number): string {
     switch (categoryType) {
         case CategoryType.Income:
             return tt('Income Categories');

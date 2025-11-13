@@ -56,7 +56,7 @@ export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allo
         }
     });
 
-    const allTransactionCategories = computed<Record<number, TransactionCategoriesWithVisibleCount>>(() => allTransactionCategoriesWithVisibleCount(transactionCategoriesStore.allTransactionCategories, allowCategoryTypes));
+    const allTransactionCategories = computed<Record<string, TransactionCategoriesWithVisibleCount>>(() => allTransactionCategoriesWithVisibleCount(transactionCategoriesStore.allTransactionCategories, allowCategoryTypes));
     const hasAnyAvailableCategory = computed<boolean>(() => containsAnyAvailableCategory(allTransactionCategories.value, true));
     const hasAnyVisibleCategory = computed<boolean>(() => containsAnyAvailableCategory(allTransactionCategories.value, showHidden.value));
     const hasAvailableCategory = computed<Record<number, boolean>>(() => containsAvailableCategory(allTransactionCategories.value, showHidden.value));
@@ -65,7 +65,7 @@ export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allo
         return !filterCategoryIds[category.id];
     }
 
-    function getCategoryTypeName(categoryType: CategoryType): string {
+    function getCategoryTypeName(categoryType: number): string {
         switch (categoryType) {
             case CategoryType.Income:
                 return tt('Income Categories');

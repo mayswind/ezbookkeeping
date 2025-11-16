@@ -14,7 +14,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/templates"
 )
 
-const passwordResetUrlFormat = "%sdesktop/#/resetpassword?token=%s"
+const passwordResetUrlFormat = "%sdesktop#/resetpassword?token=%s"
 
 // ForgetPasswordService represents forget password service
 type ForgetPasswordService struct {

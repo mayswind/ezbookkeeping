@@ -20,10 +20,10 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
-const oauth2CallbackPageUrlSuccessFormat = "%sdesktop/#/oauth2_callback?platform=%s&provider=%s&token=%s"
-const oauth2CallbackPageUrlNeedVerifyFormat = "%sdesktop/#/oauth2_callback?platform=%s&provider=%s&userName=%s&token=%s"
-const oauth2CallbackPageUrlFailedFormat = "%sdesktop/#/oauth2_callback?errorCode=%d&errorMessage=%s"
-const oauth2CallbackPageUrlErrorMessageFormat = "%sdesktop/#/oauth2_callback?errorMessage=%s"
+const oauth2CallbackPageUrlSuccessFormat = "%sdesktop#/oauth2_callback?platform=%s&provider=%s&token=%s"
+const oauth2CallbackPageUrlNeedVerifyFormat = "%sdesktop#/oauth2_callback?platform=%s&provider=%s&userName=%s&token=%s"
+const oauth2CallbackPageUrlFailedFormat = "%sdesktop#/oauth2_callback?errorCode=%d&errorMessage=%s"
+const oauth2CallbackPageUrlErrorMessageFormat = "%sdesktop#/oauth2_callback?errorMessage=%s"
 
 // OAuth2AuthenticationApi represents OAuth 2.0 authorization api
 type OAuth2AuthenticationApi struct {

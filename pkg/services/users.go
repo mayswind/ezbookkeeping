@@ -25,7 +25,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/uuid"
 )
 
-const verifyEmailUrlFormat = "%sdesktop/#/verify_email?token=%s"
+const verifyEmailUrlFormat = "%sdesktop#/verify_email?token=%s"
 
 // UserService represents user service
 type UserService struct {

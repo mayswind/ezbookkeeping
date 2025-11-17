@@ -298,7 +298,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 	err := c.ShouldBindQuery(&exportTransactionDataReq)
 
 	if err != nil {
-		log.Warnf(c, "[data_managements.ExportDataHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[data_managements.getExportedFileContent] parse request failed, because %s", err.Error())
 		return nil, "", errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -306,7 +306,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 	utcOffset, err := c.GetClientTimezoneOffset()
 
 	if err != nil {
-		log.Warnf(c, "[data_managements.ExportDataHandler] cannot get client timezone offset, because %s", err.Error())
+		log.Warnf(c, "[data_managements.getExportedFileContent] cannot get client timezone offset, because %s", err.Error())
 	} else {
 		timezone = time.FixedZone("Client Timezone", int(utcOffset)*60)
 	}
@@ -316,7 +316,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
-			log.Warnf(c, "[data_managements.ExportDataHandler] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
+			log.Warnf(c, "[data_managements.getExportedFileContent] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
 		}
 
 		return nil, "", errs.ErrUserNotFound
@@ -329,28 +329,28 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 	accounts, err := a.accounts.GetAllAccountsByUid(c, uid)
 
 	if err != nil {
-		log.Errorf(c, "[data_managements.ExportDataHandler] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.getExportedFileContent] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, "", errs.ErrOperationFailed
 	}
 
 	categories, err := a.categories.GetAllCategoriesByUid(c, uid, 0, -1)
 
 	if err != nil {
-		log.Errorf(c, "[data_managements.ExportDataHandler] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.getExportedFileContent] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, "", errs.ErrOperationFailed
 	}
 
 	tags, err := a.tags.GetAllTagsByUid(c, uid)
 
 	if err != nil {
-		log.Errorf(c, "[data_managements.ExportDataHandler] failed to get tags for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.getExportedFileContent] failed to get tags for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, "", errs.ErrOperationFailed
 	}
 
 	tagIndexes, err := a.tags.GetAllTagIdsMapOfAllTransactions(c, uid)
 
 	if err != nil {
-		log.Errorf(c, "[data_managements.ExportDataHandler] failed to get tag index for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.getExportedFileContent] failed to get tag index for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, "", errs.ErrOperationFailed
 	}
 
@@ -361,14 +361,14 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 	allAccountIds, err := a.accounts.GetAccountOrSubAccountIds(c, exportTransactionDataReq.AccountIds, uid)
 
 	if err != nil {
-		log.Warnf(c, "[data_managements.ExportDataHandler] get account error, because %s", err.Error())
+		log.Warnf(c, "[data_managements.getExportedFileContent] get account error, because %s", err.Error())
 		return nil, "", errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	allCategoryIds, err := a.categories.GetCategoryOrSubCategoryIds(c, exportTransactionDataReq.CategoryIds, uid)
 
 	if err != nil {
-		log.Warnf(c, "[data_managements.ExportDataHandler] get transaction category error, because %s", err.Error())
+		log.Warnf(c, "[data_managements.getExportedFileContent] get transaction category error, because %s", err.Error())
 		return nil, "", errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -379,7 +379,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 		allTagIds, err = a.tags.GetTagIds(exportTransactionDataReq.TagIds)
 
 		if err != nil {
-			log.Warnf(c, "[data_managements.ExportDataHandler] get transaction tag ids error, because %s", err.Error())
+			log.Warnf(c, "[data_managements.getExportedFileContent] get transaction tag ids error, because %s", err.Error())
 			return nil, "", errs.Or(err, errs.ErrOperationFailed)
 		}
 	}
@@ -398,7 +398,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 	allTransactions, err := a.transactions.GetAllSpecifiedTransactions(c, uid, maxTransactionTime, minTransactionTime, exportTransactionDataReq.Type, allCategoryIds, allAccountIds, allTagIds, noTags, exportTransactionDataReq.TagFilterType, exportTransactionDataReq.AmountFilter, exportTransactionDataReq.Keyword, pageCountForDataExport, true)
 
 	if err != nil {
-		log.Errorf(c, "[data_managements.ExportDataHandler] failed to all transactions user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.getExportedFileContent] failed to all transactions user \"uid:%d\", because %s", uid, err.Error())
 		return nil, "", errs.ErrOperationFailed
 	}
 
@@ -411,7 +411,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 	result, err := dataExporter.ToExportedContent(c, uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexes)
 
 	if err != nil {
-		log.Errorf(c, "[data_managements.ExportDataHandler] failed to get csv format exported data for \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.getExportedFileContent] failed to get exported data for \"uid:%d\", because %s", uid, err.Error())
 		return nil, "", errs.Or(err, errs.ErrOperationFailed)
 	}
 

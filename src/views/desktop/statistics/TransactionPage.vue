@@ -72,7 +72,7 @@
                                                 <v-btn class="button-icon-with-direction" :icon="mdiArrowLeft"
                                                        :disabled="loading || !canShiftDateRange"
                                                        @click="shiftDateRange(-1)"/>
-                                                <v-menu location="bottom">
+                                                <v-menu location="bottom" max-height="500">
                                                     <template #activator="{ props }">
                                                         <v-btn :disabled="loading || !canChangeDateRange"
                                                                v-bind="props">{{ queryDateRangeName }}</v-btn>
@@ -101,7 +101,7 @@
                                                        @click="shiftDateRange(1)"/>
                                             </v-btn-group>
 
-                                            <v-menu location="bottom" v-if="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis">
+                                            <v-menu location="bottom" max-height="500" v-if="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis">
                                                 <template #activator="{ props }">
                                                     <v-btn class="ms-3" color="default" variant="outlined"
                                                            :prepend-icon="mdiCalendarRangeOutline" :disabled="loading"
@@ -117,7 +117,7 @@
                                                 </v-list>
                                             </v-menu>
 
-                                            <v-menu location="bottom" v-if="queryAnalysisType === StatisticsAnalysisType.AssetTrends">
+                                            <v-menu location="bottom" max-height="500" v-if="queryAnalysisType === StatisticsAnalysisType.AssetTrends">
                                                 <template #activator="{ props }">
                                                     <v-btn class="ms-3" color="default" variant="outlined"
                                                            :prepend-icon="mdiCalendarRangeOutline" :disabled="loading"

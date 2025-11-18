@@ -489,7 +489,7 @@ export default {
         return axios.get<ApiResponse<TransactionReconciliationStatementResponse>>(`v1/transactions/reconciliation_statements.json?account_id=${req.accountId}&start_time=${req.startTime}&end_time=${req.endTime}`);
     },
     getTransactionStatistics: (req: TransactionStatisticRequest): ApiResponsePromise<TransactionStatisticResponse> => {
-        const queryParams = [];
+        const queryParams: string[] = [];
 
         if (req.startTime) {
             queryParams.push(`start_time=${req.startTime}`);
@@ -514,7 +514,7 @@ export default {
         return axios.get<ApiResponse<TransactionStatisticResponse>>(`v1/transactions/statistics.json?use_transaction_timezone=${req.useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));
     },
     getTransactionStatisticsTrends: (req: TransactionStatisticTrendsRequest): ApiResponsePromise<TransactionStatisticTrendsResponseItem[]> => {
-        const queryParams = [];
+        const queryParams: string[] = [];
 
         if (req.startYearMonth) {
             queryParams.push(`start_year_month=${req.startYearMonth}`);
@@ -539,7 +539,7 @@ export default {
         return axios.get<ApiResponse<TransactionStatisticTrendsResponseItem[]>>(`v1/transactions/statistics/trends.json?use_transaction_timezone=${req.useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));
     },
     getTransactionStatisticsAssetTrends: (req: TransactionStatisticAssetTrendsRequest): ApiResponsePromise<TransactionStatisticAssetTrendsResponseItem[]> => {
-        const queryParams = [];
+        const queryParams: string[] = [];
 
         if (req.startTime) {
             queryParams.push(`start_time=${req.startTime}`);
@@ -796,7 +796,7 @@ export default {
             return avatarUrl;
         }
 
-        const params = [];
+        const params: string[] = [];
         params.push('token=' + getCurrentToken());
 
         if (disableBrowserCache) {
@@ -818,7 +818,7 @@ export default {
             return pictureUrl;
         }
 
-        const params = [];
+        const params: string[] = [];
         params.push('token=' + getCurrentToken());
 
         if (disableBrowserCache) {

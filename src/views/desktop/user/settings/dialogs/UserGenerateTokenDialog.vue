@@ -70,6 +70,9 @@
                                 :disabled="generating"
                                 :label="tt('Custom Expiration Time (Seconds)')"
                                 :placeholder="tt('Custom Expiration Time (Seconds)')"
+                                :max-decimal-count="0"
+                                :min-value="0"
+                                :max-value="4294967295"
                                 v-model="tokenCustomExpirationTime"
                             />
                         </v-col>

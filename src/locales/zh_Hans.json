@@ -2274,7 +2274,7 @@
     "Template name cannot be blank": "模板名不能为空",
     "Generate Token": "生成令牌",
     "Token Type": "令牌类型",
-    "Expiration Time (Seconds)": "过期时间（秒）",
+    "Expiration Time": "过期时间",
     "Custom Expiration Time (Seconds)": "自定义过期时间（秒）",
     "No Expiration": "永不过期",
     "API Token": "API 令牌",

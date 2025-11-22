@@ -2274,7 +2274,7 @@
     "Template name cannot be blank": "範本名稱不能為空",
     "Generate Token": "產生令牌",
     "Token Type": "令牌類型",
-    "Expiration Time (Seconds)": "到期時間（秒）",
+    "Expiration Time": "到期時間",
     "Custom Expiration Time (Seconds)": "自訂到期時間（秒）",
     "No Expiration": "永不過期",
     "API Token": "API 令牌",

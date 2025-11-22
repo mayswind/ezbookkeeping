@@ -48,8 +48,8 @@
                                 item-title="displayName"
                                 item-value="value"
                                 :disabled="generating"
-                                :label="tt('Expiration Time (Seconds)')"
-                                :placeholder="tt('Expiration Time (Seconds)')"
+                                :label="tt('Expiration Time')"
+                                :placeholder="tt('Expiration Time')"
                                 :items="[
                                     { displayName: tt('No Expiration'), value: 0 },
                                     { displayName: tt('format.misc.nHour', { n: 1 }), value: 3600 },

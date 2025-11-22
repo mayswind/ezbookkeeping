@@ -2274,7 +2274,7 @@
     "Template name cannot be blank": "템플릿 이름은 비워둘 수 없습니다.",
     "Generate Token": "Generate Token",
     "Token Type": "Token Type",
-    "Expiration Time (Seconds)": "Expiration Time (Seconds)",
+    "Expiration Time": "Expiration Time",
     "Custom Expiration Time (Seconds)": "Custom Expiration Time (Seconds)",
     "No Expiration": "No Expiration",
     "API Token": "API Token",

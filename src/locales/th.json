@@ -2274,7 +2274,7 @@
     "Template name cannot be blank": "ชื่อแม่แบบไม่สามารถเว้นว่างได้",
     "Generate Token": "Generate Token",
     "Token Type": "Token Type",
-    "Expiration Time (Seconds)": "Expiration Time (Seconds)",
+    "Expiration Time": "Expiration Time",
     "Custom Expiration Time (Seconds)": "Custom Expiration Time (Seconds)",
     "No Expiration": "No Expiration",
     "API Token": "API Token",

@@ -9,6 +9,7 @@
         :disable-sort="true"
         :headers="parsedFileLinesHeaders"
         :items="parsedFileLines"
+        :hover="true"
         :no-data-text="tt('No data to import')"
         v-model:items-per-page="countPerPage"
         v-model:page="currentPage"

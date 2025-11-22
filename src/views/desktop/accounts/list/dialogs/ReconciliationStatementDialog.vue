@@ -140,6 +140,7 @@
                 :class="{ 'disabled': loading }"
                 :headers="dataTableHeaders"
                 :items="reconciliationStatements?.transactions ?? []"
+                :hover="true"
                 :no-data-text="loading ? '' : tt('No transaction data')"
                 v-model:items-per-page="countPerPage"
                 v-model:page="currentPage"

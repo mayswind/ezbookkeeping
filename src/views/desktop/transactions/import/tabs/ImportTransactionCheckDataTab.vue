@@ -10,6 +10,7 @@
         :height="importTransactionsTableHeight"
         :headers="importTransactionHeaders"
         :items="importTransactions"
+        :hover="true"
         :search="JSON.stringify(filters)"
         :custom-filter="importTransactionsFilter"
         :no-data-text="tt('No data to import')"

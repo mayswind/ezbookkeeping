@@ -447,8 +447,8 @@
                 <f7-actions-button @click="swapTransactionData(true, true)">{{ tt('Swap Account and Amount') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group v-if="mode !== TransactionEditPageMode.View">
-                <f7-actions-button v-if="isSupportClipboard" @click="pasteAmount('sourceAmount')">{{ tt('Paste Amount') }}</f7-actions-button>
-                <f7-actions-button v-if="isSupportClipboard && transaction.type === TransactionType.Transfer" @click="pasteAmount('destinationAmount')">{{ tt('Paste Destination Amount') }}</f7-actions-button>
+                <f7-actions-button v-if="isSupportClipboard && !isiOS()" @click="pasteAmount('sourceAmount')">{{ tt('Paste Amount') }}</f7-actions-button>
+                <f7-actions-button v-if="isSupportClipboard && !isiOS() && transaction.type === TransactionType.Transfer" @click="pasteAmount('destinationAmount')">{{ tt('Paste Destination Amount') }}</f7-actions-button>
                 <f7-actions-button v-if="transaction.hideAmount" @click="transaction.hideAmount = false">{{ tt('Show Amount') }}</f7-actions-button>
                 <f7-actions-button v-if="!transaction.hideAmount" @click="transaction.hideAmount = true">{{ tt('Hide Amount') }}</f7-actions-button>
             </f7-actions-group>
@@ -484,7 +484,7 @@ import { ref, computed, useTemplateRef } from 'vue';
 import type { PhotoBrowser, Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
+import { useI18nUIComponents, isiOS, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
 import {
     TransactionEditPageMode,
     TransactionEditPageType,

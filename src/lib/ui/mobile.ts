@@ -19,6 +19,14 @@ export interface Framework7Dom {
     css(property: string): string | number;
 }
 
+export function isiOS(): boolean {
+    return ((/iphone|ipod|ipad/gi).test(navigator.platform) && (/Safari/i).test(navigator.appVersion));
+}
+
+export function isiOSHomeScreenMode(): boolean {
+    return isiOS() && !!window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+}
+
 export function showLoading(delayConditionFunc?: () => boolean, delayMills?: number): void {
     if (!delayConditionFunc) {
         f7ready((f7) => {

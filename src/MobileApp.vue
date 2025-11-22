@@ -27,7 +27,7 @@ import { getTheme, isEnableSwipeBack, isEnableAnimate } from '@/lib/settings.ts'
 import { initMapProvider } from '@/lib/map/index.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
-import { isModalShowing, setAppFontSize } from '@/lib/ui/mobile.ts';
+import { isiOSHomeScreenMode, isModalShowing, setAppFontSize } from '@/lib/ui/mobile.ts';
 
 const { tt, getCurrentLanguageInfo, setLanguage, initLocale } = useI18n();
 
@@ -110,16 +110,6 @@ const notification = ref<Notification.Notification | null>(null);
 const hasPushPopupBackdrop = ref<boolean | undefined>(undefined);
 const hasBackdrop = ref<boolean | undefined>(undefined);
 const currentNotificationContent = computed<string | null>(() => rootStore.currentNotification);
-
-function isiOSHomeScreenMode(): boolean {
-    if ((/iphone|ipod|ipad/gi).test(navigator.platform) && (/Safari/i).test(navigator.appVersion) &&
-        window.matchMedia && window.matchMedia('(display-mode: standalone)').matches
-    ) {
-        return true;
-    }
-
-    return false;
-}
 
 function setThemeColorMeta(darkMode: boolean | undefined): void {
     if (hasPushPopupBackdrop.value) {

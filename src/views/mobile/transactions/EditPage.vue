@@ -447,6 +447,8 @@
                 <f7-actions-button @click="swapTransactionData(true, true)">{{ tt('Swap Account and Amount') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group v-if="mode !== TransactionEditPageMode.View">
+                <f7-actions-button v-if="isSupportClipboard" @click="pasteAmount('sourceAmount')">{{ tt('Paste Amount') }}</f7-actions-button>
+                <f7-actions-button v-if="isSupportClipboard && transaction.type === TransactionType.Transfer" @click="pasteAmount('destinationAmount')">{{ tt('Paste Destination Amount') }}</f7-actions-button>
                 <f7-actions-button v-if="transaction.hideAmount" @click="transaction.hideAmount = false">{{ tt('Show Amount') }}</f7-actions-button>
                 <f7-actions-button v-if="!transaction.hideAmount" @click="transaction.hideAmount = true">{{ tt('Hide Amount') }}</f7-actions-button>
             </f7-actions-group>
@@ -537,7 +539,8 @@ const {
     getMultiWeekdayLongNames,
     formatUnixTimeToLongDate,
     formatUnixTimeToLongTime,
-    formatGregorianTextualYearMonthDayToLongDate
+    formatGregorianTextualYearMonthDayToLongDate,
+    parseAmountFromLocalizedNumerals
 } = useI18n();
 const { showAlert, showConfirm, showToast, routeBackOnError } = useI18nUIComponents();
 
@@ -603,6 +606,8 @@ const transactionTemplatesStore = useTransactionTemplatesStore();
 
 const pictureBrowser = useTemplateRef<PhotoBrowser.PhotoBrowser>('pictureBrowser');
 const pictureInput = useTemplateRef<HTMLInputElement>('pictureInput');
+
+const isSupportClipboard = !!navigator.clipboard;
 
 const loadingError = ref<unknown | null>(null);
 const submitted = ref<boolean>(false);
@@ -1093,6 +1098,39 @@ function save(): void {
             }
         });
     }
+}
+
+function pasteAmount(type: 'sourceAmount' | 'destinationAmount'): void {
+    if (mode.value === TransactionEditPageMode.View || !isSupportClipboard) {
+        return;
+    }
+
+    navigator.clipboard.readText().then(text => {
+        if (!text) {
+            return;
+        }
+
+        const parsedAmount = parseAmountFromLocalizedNumerals(text);
+
+        if (Number.isNaN(parsedAmount) || !Number.isFinite(parsedAmount)) {
+            showToast('Cannot parse amount from clipboard');
+            return;
+        }
+
+        if (parsedAmount < TRANSACTION_MIN_AMOUNT || parsedAmount > TRANSACTION_MAX_AMOUNT) {
+            showToast('Numeric Overflow');
+            return;
+        }
+
+        if (type === 'sourceAmount') {
+            transaction.value.sourceAmount = parsedAmount;
+        } else if (type === 'destinationAmount') {
+            transaction.value.destinationAmount = parsedAmount;
+        }
+    }).catch(error => {
+        logger.error('failed to read clipboard text', error);
+        showToast('Unable to read clipboard text');
+    });
 }
 
 function updateGeoLocation(forceUpdate: boolean): void {

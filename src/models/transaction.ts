@@ -690,6 +690,22 @@ export interface TransactionReconciliationStatementResponse {
     readonly closingBalance: number;
 }
 
+export interface TransactionReconciliationStatementResponseItemWithInfo extends TransactionReconciliationStatementResponseItem {
+    readonly sourceAccount?: Account;
+    readonly sourceAccountName: string;
+    readonly destinationAccount?: Account;
+    readonly category?: TransactionCategory;
+    readonly categoryName: string;
+}
+
+export interface TransactionReconciliationStatementResponseWithInfo {
+    readonly transactions: TransactionReconciliationStatementResponseItemWithInfo[];
+    readonly totalInflows: number;
+    readonly totalOutflows: number;
+    readonly openingBalance: number;
+    readonly closingBalance: number;
+}
+
 export interface TransactionPageWrapper {
     readonly items: Transaction[];
     readonly totalCount?: number;

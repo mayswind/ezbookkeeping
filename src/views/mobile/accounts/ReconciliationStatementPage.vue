@@ -188,10 +188,10 @@
                             <div class="item-media">
                                 <div class="transaction-icon display-flex align-items-center">
                                     <ItemIcon icon-type="category"
-                                              :icon-id="allCategoriesMap[item.transaction.categoryId]?.icon"
-                                              :color="allCategoriesMap[item.transaction.categoryId]?.color"
-                                              v-if="allCategoriesMap[item.transaction.categoryId] && allCategoriesMap[item.transaction.categoryId]?.color"></ItemIcon>
-                                    <f7-icon v-else-if="!allCategoriesMap[item.transaction.categoryId] || !allCategoriesMap[item.transaction.categoryId]?.color"
+                                              :icon-id="item.transaction.category?.icon"
+                                              :color="item.transaction.category?.color"
+                                              v-if="item.transaction.category && item.transaction.category?.color"></ItemIcon>
+                                    <f7-icon v-else-if="!item.transaction.category || !item.transaction.category?.color"
                                              f7="pencil_ellipsis_rectangle">
                                     </f7-icon>
                                 </div>
@@ -203,8 +203,8 @@
                                         <span v-if="item.transaction.type === TransactionType.ModifyBalance">
                                             {{ tt('Modify Balance') }}
                                         </span>
-                                            <span v-else-if="item.transaction.type !== TransactionType.ModifyBalance && allCategoriesMap[item.transaction.categoryId]">
-                                            {{ allCategoriesMap[item.transaction.categoryId]!.name }}
+                                            <span v-else-if="item.transaction.type !== TransactionType.ModifyBalance && item.transaction.category">
+                                            {{ item.transaction.category.name }}
                                         </span>
                                         </div>
                                     </div>
@@ -352,7 +352,7 @@ import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { ChartDateAggregationType } from '@/core/statistics.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
-import { type TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
+import { type TransactionReconciliationStatementResponseItemWithInfo } from '@/models/transaction.ts';
 
 import { isDefined, isEquals, findDisplayNameByType } from '@/lib/common.ts';
 import {
@@ -372,7 +372,7 @@ interface ReconciliationStatementVirtualListItem {
     index: number;
     type: ReconciliationStatementVirtualListItemType;
     displayDate?: string;
-    transaction?: TransactionReconciliationStatementResponseItem;
+    transaction?: TransactionReconciliationStatementResponseItemWithInfo;
 }
 
 type ReconciliationStatementVirtualListItemType = 'transaction' | 'date';
@@ -402,7 +402,6 @@ const {
     allDateAggregationTypes,
     currentTimezoneOffsetMinutes,
     isCurrentLiabilityAccount,
-    allCategoriesMap,
     currentAccount,
     currentAccountCurrency,
     displayStartDateTime,
@@ -412,6 +411,7 @@ const {
     displayTotalBalance,
     displayOpeningBalance,
     displayClosingBalance,
+    setReconciliationStatements,
     getDisplayDate,
     getDisplayTime,
     getDisplayTimezone,
@@ -430,7 +430,7 @@ const loadingError = ref<unknown | null>(null);
 const queryDateRangeType = ref<number>(DateRange.ThisMonth.type);
 const showAccountBalanceTrendsCharts = ref<boolean>(false);
 const chartDataDateAggregationType = ref<number>(ChartDateAggregationType.Day.type);
-const transactionToDelete = ref<TransactionReconciliationStatementResponseItem | null>(null);
+const transactionToDelete = ref<TransactionReconciliationStatementResponseItemWithInfo | null>(null);
 const newClosingBalance = ref<number>(0);
 const showDisplayModePopover = ref<boolean>(false);
 const showCustomDateRangeSheet = ref<boolean>(false);
@@ -485,7 +485,7 @@ const chartDataDateAggregationTypeDisplayName = computed<string>(() => {
     return findDisplayNameByType(allDateAggregationTypes.value, chartDataDateAggregationType.value) || tt('Unknown');
 });
 
-function getTransactionDomId(transaction: TransactionReconciliationStatementResponseItem): string {
+function getTransactionDomId(transaction: TransactionReconciliationStatementResponseItemWithInfo): string {
     return 'transaction_' + transaction.id;
 }
 
@@ -567,7 +567,7 @@ function reload(force: boolean): void {
         }
 
         loading.value = false;
-        reconciliationStatements.value = result;
+        setReconciliationStatements(result);
     }).catch(error => {
         loading.value = false;
 
@@ -581,11 +581,11 @@ function addTransaction(): void {
     props.f7router.navigate(`/transaction/add?accountId=${accountId.value}`);
 }
 
-function duplicateTransaction(transaction: TransactionReconciliationStatementResponseItem): void {
+function duplicateTransaction(transaction: TransactionReconciliationStatementResponseItemWithInfo): void {
     props.f7router.navigate(`/transaction/add?id=${transaction.id}&type=${transaction.type}`);
 }
 
-function editTransaction(transaction: TransactionReconciliationStatementResponseItem): void {
+function editTransaction(transaction: TransactionReconciliationStatementResponseItemWithInfo): void {
     props.f7router.navigate(`/transaction/edit?id=${transaction.id}&type=${transaction.type}`);
 }
 
@@ -636,7 +636,7 @@ function updateClosingBalance(balance?: number): void {
     props.f7router.navigate(`/transaction/add?${params.join('&')}`);
 }
 
-function removeTransaction(transaction: TransactionReconciliationStatementResponseItem | null, confirm: boolean): void {
+function removeTransaction(transaction: TransactionReconciliationStatementResponseItemWithInfo | null, confirm: boolean): void {
     if (!transaction) {
         showAlert('An error occurred');
         return;

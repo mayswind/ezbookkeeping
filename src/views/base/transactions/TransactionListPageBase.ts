@@ -9,7 +9,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { type TransactionListFilter, type TransactionMonthList, useTransactionsStore } from '@/stores/transaction.ts';
 
-import { type TypeAndName, entries } from '@/core/base.ts';
+import { type TypeAndName, keys, entries } from '@/core/base.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
 import { type TextualYearMonthDay, type Year0BasedMonth, type LocalizedDateRange, type WeekDayValue, DateRange, DateRangeScene } from '@/core/datetime.ts';
 import { AccountType } from '@/core/account.ts';
@@ -19,7 +19,7 @@ import { DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numera
 import type { Account } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 import type { TransactionTag } from '@/models/transaction_tag.ts';
-import type { Transaction } from '@/models/transaction.ts';
+import { type Transaction, TransactionTagFilter } from '@/models/transaction.ts';
 
 import {
     getUtcOffsetByUtcOffsetMinutes,
@@ -196,7 +196,7 @@ export function useTransactionListPageBase() {
     });
 
     const queryTagName = computed<string>(() => {
-        if (query.value.tagIds === 'none') {
+        if (query.value.tagFilter === TransactionTagFilter.TransactionNoTagFilterValue) {
             return tt('Without Tags');
         }
 
@@ -204,7 +204,15 @@ export function useTransactionListPageBase() {
             return tt('Multiple Tags');
         }
 
-        return allTransactionTags.value[query.value.tagIds]?.name || tt('Tags');
+        for (const tagId of keys(queryAllFilterTagIds.value)) {
+            const tagName = allTransactionTags.value[tagId]?.name;
+
+            if (tagName) {
+                return tagName;
+            }
+        }
+
+        return tt('Tags');
     });
 
     const queryAmount = computed<string>(() => {

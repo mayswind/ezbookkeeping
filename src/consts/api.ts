@@ -162,5 +162,13 @@ export const PARAMETERIZED_ERRORS: ParameterizedError[] = [
             field: 'parameter',
             localized: true
         }]
+    },
+    {
+        localeKey: 'parameter invalid tag filter',
+        regex: /^parameter "(\w+)" is invalid tag filter$/,
+        parameters: [{
+            field: 'parameter',
+            localized: true
+        }]
     }
 ];

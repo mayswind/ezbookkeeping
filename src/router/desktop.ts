@@ -111,8 +111,7 @@ const router = createRouter({
                         initType: route.query['type'],
                         initCategoryIds: route.query['categoryIds'],
                         initAccountIds: route.query['accountIds'],
-                        initTagIds: route.query['tagIds'],
-                        initTagFilterType: route.query['tagFilterType'],
+                        initTagFilter: route.query['tagFilter'],
                         initAmountFilter: route.query['amountFilter'],
                         initKeyword: route.query['keyword']
                     })
@@ -130,8 +129,7 @@ const router = createRouter({
                         initEndTime: route.query['endTime'],
                         initFilterAccountIds: route.query['filterAccountIds'],
                         initFilterCategoryIds: route.query['filterCategoryIds'],
-                        initTagIds: route.query['tagIds'],
-                        initTagFilterType: route.query['tagFilterType'],
+                        initTagFilter: route.query['tagFilter'],
                         initKeyword: route.query['keyword'],
                         initSortingType: route.query['sortingType'],
                         initTrendDateAggregationType: route.query['trendDateAggregationType'],

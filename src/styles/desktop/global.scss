@@ -259,6 +259,33 @@ html[dir="rtl"] .bidirectional-switch {
     }
 }
 
+.toggle-buttons {
+    &.v-btn-toggle {
+        height: auto !important;
+        padding: 0 !important;
+        border: none !important;
+    }
+
+    &.v-btn-toggle > .v-btn:not(:first-child) {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-left: none;
+    }
+
+    &.v-btn-toggle > .v-btn:not(:last-child) {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    &.v-btn-toggle > .v-btn {
+        border: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
+    }
+
+    &.v-btn-toggle button.v-btn {
+        width: auto !important;
+    }
+}
+
 .v-theme--dark {
     .v-btn--variant-elevated,
     .v-btn--variant-flat {

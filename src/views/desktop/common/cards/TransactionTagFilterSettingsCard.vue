@@ -11,22 +11,30 @@
                     <v-menu activator="parent">
                         <v-list>
                             <v-list-item :prepend-icon="mdiSelectAll"
-                                         :title="tt('Select All')"
+                                         :title="tt('Set All to Included')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="selectAllTransactionTags"></v-list-item>
+                                         @click="setAllToState(false, TransactionTagFilterState.Include)"></v-list-item>
                             <v-list-item :prepend-icon="mdiSelect"
-                                         :title="tt('Select None')"
+                                         :title="tt('Set All to Default')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="selectNoneTransactionTags"></v-list-item>
+                                         @click="setAllToState(false, TransactionTagFilterState.Default)"></v-list-item>
                             <v-list-item :prepend-icon="mdiSelectInverse"
-                                         :title="tt('Invert Selection')"
+                                         :title="tt('Set All to Excluded')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="selectInvertTransactionTags"></v-list-item>
+                                         @click="setAllToState(false, TransactionTagFilterState.Exclude)"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="mdiSelectAll"
-                                         :title="tt('Select All Visible')"
+                                         :title="tt('Set All Visible Items to Included')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="selectAllVisibleTransactionTags"></v-list-item>
+                                         @click="setAllToState(true, TransactionTagFilterState.Include)"></v-list-item>
+                            <v-list-item :prepend-icon="mdiSelectAll"
+                                         :title="tt('Set All Visible Items to Default')"
+                                         :disabled="!hasAnyVisibleTag"
+                                         @click="setAllToState(true, TransactionTagFilterState.Default)"></v-list-item>
+                            <v-list-item :prepend-icon="mdiSelectAll"
+                                         :title="tt('Set All Visible Items to Excluded')"
+                                         :disabled="!hasAnyVisibleTag"
+                                         @click="setAllToState(true, TransactionTagFilterState.Exclude)"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="mdiEyeOutline"
                                          :title="tt('Show Hidden Transaction Tags')"
@@ -47,22 +55,30 @@
                     <v-menu activator="parent">
                         <v-list>
                             <v-list-item :prepend-icon="mdiSelectAll"
-                                         :title="tt('Select All')"
+                                         :title="tt('Set All to Included')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="selectAllTransactionTags"></v-list-item>
+                                         @click="setAllToState(false, TransactionTagFilterState.Include)"></v-list-item>
                             <v-list-item :prepend-icon="mdiSelect"
-                                         :title="tt('Select None')"
+                                         :title="tt('Set All to Default')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="selectNoneTransactionTags"></v-list-item>
+                                         @click="setAllToState(false, TransactionTagFilterState.Default)"></v-list-item>
                             <v-list-item :prepend-icon="mdiSelectInverse"
-                                         :title="tt('Invert Selection')"
+                                         :title="tt('Set All to Excluded')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="selectInvertTransactionTags"></v-list-item>
+                                         @click="setAllToState(false, TransactionTagFilterState.Exclude)"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="mdiSelectAll"
-                                         :title="tt('Select All Visible')"
+                                         :title="tt('Set All Visible Items to Included')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="selectAllVisibleTransactionTags"></v-list-item>
+                                         @click="setAllToState(true, TransactionTagFilterState.Include)"></v-list-item>
+                            <v-list-item :prepend-icon="mdiSelectAll"
+                                         :title="tt('Set All Visible Items to Default')"
+                                         :disabled="!hasAnyVisibleTag"
+                                         @click="setAllToState(true, TransactionTagFilterState.Default)"></v-list-item>
+                            <v-list-item :prepend-icon="mdiSelectAll"
+                                         :title="tt('Set All Visible Items to Excluded')"
+                                         :disabled="!hasAnyVisibleTag"
+                                         @click="setAllToState(true, TransactionTagFilterState.Exclude)"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="mdiEyeOutline"
                                          :title="tt('Show Hidden Transaction Tags')"
@@ -86,15 +102,24 @@
         </v-card-text>
 
         <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-else-if="!loading && hasAnyVisibleTag">
-            <div class="tag-filter-types d-flex flex-column mb-4" v-if="type === 'statisticsCurrent'">
-                <v-btn border class="justify-start" :key="filterType.type"
-                       :color="tagFilterType === filterType.type ? 'primary' : 'default'"
-                       :variant="tagFilterType === filterType.type ? 'tonal' : 'outlined'"
-                       :append-icon="(tagFilterType === filterType.type ? mdiCheck : undefined)"
-                       v-for="filterType in allTagFilterTypes"
-                       @click="tagFilterType = filterType.type">
-                    {{ filterType.displayName }}
-                </v-btn>
+            <div class="mb-4" v-if="includeTagsCount > 1">
+                <v-btn-toggle class="toggle-buttons" density="compact" variant="outlined"
+                              mandatory="force" divided
+                              :model-value="includeTagFilterType"
+                              @update:model-value="updateTransactionTagIncludeType($event)">
+                    <v-btn :value="TransactionTagFilterType.HasAny.type">{{ tt(TransactionTagFilterType.HasAny.name) }}</v-btn>
+                    <v-btn :value="TransactionTagFilterType.HasAll.type">{{ tt(TransactionTagFilterType.HasAll.name) }}</v-btn>
+                </v-btn-toggle>
+            </div>
+
+            <div class="mb-4" v-if="excludeTagsCount > 1">
+                <v-btn-toggle class="toggle-buttons" density="compact" variant="outlined"
+                              mandatory="force" divided
+                              :model-value="excludeTagFilterType"
+                              @update:model-value="updateTransactionTagExcludeType($event)">
+                    <v-btn :value="TransactionTagFilterType.NotHasAny.type">{{ tt(TransactionTagFilterType.NotHasAny.name) }}</v-btn>
+                    <v-btn :value="TransactionTagFilterType.NotHasAll.type">{{ tt(TransactionTagFilterType.NotHasAll.name) }}</v-btn>
+                </v-btn-toggle>
             </div>
 
             <v-expansion-panels class="tag-categories" multiple v-model="expandTagCategories">
@@ -108,18 +133,23 @@
                                       v-for="transactionTag in allTags">
                                 <v-list-item v-if="showHidden || !transactionTag.hidden">
                                     <template #prepend>
-                                        <v-checkbox :model-value="!filterTagIds[transactionTag.id]"
-                                                    @update:model-value="updateTransactionTagSelected(transactionTag, $event)">
-                                            <template #label>
-                                                <v-badge class="right-bottom-icon" color="secondary"
-                                                         location="bottom right" offset-x="2" offset-y="2" :icon="mdiEyeOffOutline"
-                                                         v-if="transactionTag.hidden">
-                                                    <v-icon size="24" :icon="mdiPound"/>
-                                                </v-badge>
-                                                <v-icon size="24" :icon="mdiPound" v-else-if="!transactionTag.hidden"/>
-                                                <span class="ms-3">{{ transactionTag.name }}</span>
-                                            </template>
-                                        </v-checkbox>
+                                        <v-badge class="right-bottom-icon" color="secondary"
+                                                 location="bottom right" offset-x="2" offset-y="2" :icon="mdiEyeOffOutline"
+                                                 v-if="transactionTag.hidden">
+                                            <v-icon size="24" :icon="mdiPound"/>
+                                        </v-badge>
+                                        <v-icon size="24" :icon="mdiPound" v-else-if="!transactionTag.hidden"/>
+                                        <span class="ms-3">{{ transactionTag.name }}</span>
+                                    </template>
+                                    <template #append>
+                                        <v-btn-toggle class="toggle-buttons" density="compact" variant="outlined"
+                                                      mandatory="force" divided
+                                                      :model-value="filterTagIds[transactionTag.id]"
+                                                      @update:model-value="updateTransactionTagState(transactionTag, $event)">
+                                            <v-btn :value="TransactionTagFilterState.Include">{{ tt('Included') }}</v-btn>
+                                            <v-btn :value="TransactionTagFilterState.Default">{{ tt('Default') }}</v-btn>
+                                            <v-btn :value="TransactionTagFilterState.Exclude">{{ tt('Excluded') }}</v-btn>
+                                        </v-btn-toggle>
                                     </template>
                                 </v-list-item>
                             </template>
@@ -146,18 +176,15 @@ import SnackBar from '@/components/desktop/SnackBar.vue';
 import { ref, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { useTransactionTagFilterSettingPageBase } from '@/views/base/settings/TransactionTagFilterSettingPageBase.ts';
+import {
+    useTransactionTagFilterSettingPageBase,
+    TransactionTagFilterState
+} from '@/views/base/settings/TransactionTagFilterSettingPageBase.ts';
 
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
+import { TransactionTagFilterType } from '@/core/transaction.ts';
 import type { TransactionTag } from '@/models/transaction_tag.ts';
-
-import {
-    selectAllVisible,
-    selectAll,
-    selectNone,
-    selectInvert
-} from '@/lib/common.ts';
 
 import {
     mdiSelectAll,
@@ -166,7 +193,6 @@ import {
     mdiEyeOutline,
     mdiEyeOffOutline,
     mdiDotsVertical,
-    mdiCheck,
     mdiPound
 } from '@mdi/js';
 
@@ -188,11 +214,13 @@ const {
     loading,
     showHidden,
     filterTagIds,
-    tagFilterType,
+    includeTagFilterType,
+    excludeTagFilterType,
+    includeTagsCount,
+    excludeTagsCount,
     title,
     applyText,
     allTags,
-    allTagFilterTypes,
     hasAnyAvailableTag,
     hasAnyVisibleTag,
     loadFilterTagIds,
@@ -223,40 +251,38 @@ function init(): void {
     });
 }
 
-function updateTransactionTagSelected(transactionTag: TransactionTag, value: boolean | null): void {
-    filterTagIds.value[transactionTag.id] = !value;
+function updateTransactionTagState(transactionTag: TransactionTag, value: TransactionTagFilterState): void {
+    filterTagIds.value[transactionTag.id] = value;
 
     if (props.autoSave) {
         save();
     }
 }
 
-function selectAllTransactionTags(): void {
-    selectAll(filterTagIds.value, transactionTagsStore.allTransactionTagsMap);
+function updateTransactionTagIncludeType(value: number): void {
+    includeTagFilterType.value = value;
 
     if (props.autoSave) {
         save();
     }
 }
 
-function selectNoneTransactionTags(): void {
-    selectNone(filterTagIds.value, transactionTagsStore.allTransactionTagsMap);
+function updateTransactionTagExcludeType(value: number): void {
+    excludeTagFilterType.value = value;
 
     if (props.autoSave) {
         save();
     }
 }
 
-function selectInvertTransactionTags(): void {
-    selectInvert(filterTagIds.value, transactionTagsStore.allTransactionTagsMap);
+function setAllToState(onlyVisible: boolean, value: TransactionTagFilterState): void {
+    for (const tag of allTags.value) {
+        if (onlyVisible && !showHidden.value && tag.hidden) {
+            continue;
+        }
 
-    if (props.autoSave) {
-        save();
+        filterTagIds.value[tag.id] = value;
     }
-}
-
-function selectAllVisibleTransactionTags(): void {
-    selectAllVisible(filterTagIds.value, transactionTagsStore.allTransactionTagsMap);
 
     if (props.autoSave) {
         save();
@@ -276,15 +302,9 @@ init();
 </script>
 
 <style>
-.tag-filter-types .v-btn:not(:first-child) {
-    border-top-left-radius: inherit;
-    border-top-right-radius: inherit;
-}
-
-.tag-filter-types .v-btn:not(:last-child) {
-    border-bottom: 0;
-    border-bottom-left-radius: inherit;
-    border-bottom-right-radius: inherit;
+.tag-categories .tag-filter-state-toggle {
+    overflow-x: auto;
+    white-space: nowrap;
 }
 
 .tag-categories .v-expansion-panel-text__wrapper {

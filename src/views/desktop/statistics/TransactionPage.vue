@@ -576,8 +576,7 @@ interface TransactionStatisticsProps {
     initEndTime?: TextualYearMonth | '',
     initFilterAccountIds?: string,
     initFilterCategoryIds?: string,
-    initTagIds?: string,
-    initTagFilterType?: string,
+    initTagFilter?: string,
     initKeyword?: string;
     initSortingType?: string,
     initTrendDateAggregationType?: string
@@ -757,8 +756,7 @@ function init(initProps: TransactionStatisticsProps): void {
         chartDataType: initProps.initChartDataType ? parseInt(initProps.initChartDataType) : undefined,
         filterAccountIds: initProps.initFilterAccountIds ? arrayItemToObjectField(initProps.initFilterAccountIds.split(','), true) : {},
         filterCategoryIds: initProps.initFilterCategoryIds ? arrayItemToObjectField(initProps.initFilterCategoryIds.split(','), true) : {},
-        tagIds: initProps.initTagIds,
-        tagFilterType: initProps.initTagFilterType && parseInt(initProps.initTagFilterType) >= 0 ? parseInt(initProps.initTagFilterType) : undefined,
+        tagFilter: initProps.initTagFilter,
         keyword: initProps.initKeyword,
         sortingType: initProps.initSortingType ? parseInt(initProps.initSortingType) : undefined
     };
@@ -1314,8 +1312,7 @@ onBeforeRouteUpdate((to) => {
             initEndTime: (to.query['endTime'] as TextualYearMonth | null) || undefined,
             initFilterAccountIds: (to.query['filterAccountIds'] as string | null) || undefined,
             initFilterCategoryIds: (to.query['filterCategoryIds'] as string | null) || undefined,
-            initTagIds: (to.query['tagIds'] as string | null) || undefined,
-            initTagFilterType: (to.query['tagFilterType'] as string | null) || undefined,
+            initTagFilter: (to.query['tagFilter'] as string | null) || undefined,
             initKeyword: (to.query['keyword'] as string | null) || undefined,
             initSortingType: (to.query['sortingType'] as string | null) || undefined,
             initTrendDateAggregationType: (to.query['trendDateAggregationType'] as string | null) || undefined,

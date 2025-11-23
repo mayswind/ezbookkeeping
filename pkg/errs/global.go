@@ -94,3 +94,8 @@ func GetParameterInvalidHexRGBColorMessage(field string) string {
 func GetParameterInvalidAmountFilterMessage(field string) string {
 	return fmt.Sprintf("parameter \"%s\" is invalid amount filter", field)
 }
+
+// GetParameterInvalidTagFilterMessage returns specific error message for invalid tag filter parameter error
+func GetParameterInvalidTagFilterMessage(field string) string {
+	return fmt.Sprintf("parameter \"%s\" is invalid tag filter", field)
+}

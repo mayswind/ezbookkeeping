@@ -40,13 +40,12 @@ export class TransactionEditScopeType implements TypeAndName {
 
 export class TransactionTagFilterType implements TypeAndName {
     private static readonly allInstances: TransactionTagFilterType[] = [];
+    private static readonly allInstancesByType: Record<number, TransactionTagFilterType> = {};
 
-    public static readonly HasAny = new TransactionTagFilterType(0, 'With Any Selected Tags');
-    public static readonly HasAll = new TransactionTagFilterType(1, 'With All Selected Tags');
-    public static readonly NotHasAny = new TransactionTagFilterType(2, 'Without Any Selected Tags');
-    public static readonly NotHasAll = new TransactionTagFilterType(3, 'Without All Selected Tags');
-
-    public static readonly Default = TransactionTagFilterType.HasAny;
+    public static readonly HasAny = new TransactionTagFilterType(0, 'Include Any Selected Tags');
+    public static readonly HasAll = new TransactionTagFilterType(1, 'Include All Selected Tags');
+    public static readonly NotHasAny = new TransactionTagFilterType(2, 'Exclude Any Selected Tags');
+    public static readonly NotHasAll = new TransactionTagFilterType(3, 'Exclude All Selected Tags');
 
     public readonly type: number;
     public readonly name: string;
@@ -56,9 +55,14 @@ export class TransactionTagFilterType implements TypeAndName {
         this.name = name;
 
         TransactionTagFilterType.allInstances.push(this);
+        TransactionTagFilterType.allInstancesByType[type] = this;
     }
 
     public static values(): TransactionTagFilterType[] {
         return TransactionTagFilterType.allInstances;
+    }
+
+    public static parse(type: number): TransactionTagFilterType | undefined {
+        return TransactionTagFilterType.allInstancesByType[type];
     }
 }

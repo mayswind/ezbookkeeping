@@ -1,7 +1,7 @@
 import { type PartialRecord, itemAndIndex } from '@/core/base.ts';
 import type { TextualYearMonthDay, Year1BasedMonth, YearMonthDay, StartEndTime, WeekDay } from '@/core/datetime.ts';
 import { type Coordinate, getNormalizedCoordinate } from '@/core/coordinate.ts';
-import { TransactionType } from '@/core/transaction.ts';
+import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts';
 
 import { Account, type AccountInfoResponse } from './account.ts';
 import { TransactionCategory, type TransactionCategoryInfoResponse } from './transaction_category.ts';
@@ -437,6 +437,76 @@ export class TransactionGeoLocation implements TransactionGeoLocationRequest {
     }
 }
 
+export class TransactionTagFilter {
+    public readonly tagIds: string[]
+    public readonly type: TransactionTagFilterType;
+
+    public static readonly TransactionNoTagFilterValue: string = 'none';
+
+    private constructor(tagIds: string[], type: TransactionTagFilterType) {
+        this.tagIds = tagIds;
+        this.type = type;
+    }
+
+    public static create(type: TransactionTagFilterType): TransactionTagFilter {
+        return new TransactionTagFilter([], type);
+    }
+
+    public static of(tagId: string): TransactionTagFilter {
+        return new TransactionTagFilter([tagId], TransactionTagFilterType.HasAny);
+    }
+
+    public static parse(tagFilter: string): TransactionTagFilter[] {
+        const ret: TransactionTagFilter[] = [];
+
+        if (!tagFilter || tagFilter === TransactionTagFilter.TransactionNoTagFilterValue) {
+            return ret;
+        }
+
+        const filters: string[] = tagFilter.split(';');
+
+        for (const filter of filters) {
+            const tagFilterItem: string[] = filter.split(':');
+
+            if (tagFilterItem.length !== 2) {
+                continue;
+            }
+
+            const tagFilterTypeValue: number = parseInt(tagFilterItem[0] as string, 10);
+
+            if (Number.isNaN(tagFilterTypeValue) || !Number.isFinite(tagFilterTypeValue)) {
+                continue;
+            }
+
+            const tagFilterType: TransactionTagFilterType | undefined = TransactionTagFilterType.parse(tagFilterTypeValue);
+
+            if (!tagFilterType) {
+                continue;
+            }
+
+            const tagIds: string[] = (tagFilterItem[1] as string).split(',');
+            const tagFilter: TransactionTagFilter = new TransactionTagFilter(tagIds, tagFilterType);
+            ret.push(tagFilter);
+        }
+
+        return ret;
+    }
+
+    public static toTextualTagFilters(tagFilters: TransactionTagFilter[]): string {
+        const textualTagFilters: string[] = [];
+
+        for (const tagFilter of tagFilters) {
+            textualTagFilters.push(tagFilter.toTextualTagFilter());
+        }
+
+        return textualTagFilters.join(';');
+    }
+
+    public toTextualTagFilter(): string {
+        return `${this.type.type}:${this.tagIds.join(',')}`;
+    }
+}
+
 export interface TransactionDraft {
     readonly type?: number;
     readonly categoryId?: string;
@@ -511,8 +581,7 @@ export interface TransactionListByMaxTimeRequest {
     readonly type: number;
     readonly categoryIds: string;
     readonly accountIds: string;
-    readonly tagIds: string;
-    readonly tagFilterType: number;
+    readonly tagFilter: string;
     readonly amountFilter: string;
     readonly keyword: string;
 }
@@ -523,8 +592,7 @@ export interface TransactionListInMonthByPageRequest {
     readonly type: number;
     readonly categoryIds: string;
     readonly accountIds: string;
-    readonly tagIds: string;
-    readonly tagFilterType: number;
+    readonly tagFilter: string;
     readonly amountFilter: string;
     readonly keyword: string;
 }
@@ -563,8 +631,7 @@ export interface TransactionInfoResponse {
 export interface TransactionStatisticRequest {
     readonly startTime: number;
     readonly endTime: number;
-    readonly tagIds: string;
-    readonly tagFilterType: number;
+    readonly tagFilter: string;
     readonly keyword: string;
     readonly useTransactionTimezone: boolean;
 }
@@ -575,8 +642,7 @@ export interface YearMonthRangeRequest {
 }
 
 export interface TransactionStatisticTrendsRequest extends YearMonthRangeRequest {
-    readonly tagIds: string;
-    readonly tagFilterType: number;
+    readonly tagFilter: string;
     readonly keyword: string;
     readonly useTransactionTimezone: boolean;
 }

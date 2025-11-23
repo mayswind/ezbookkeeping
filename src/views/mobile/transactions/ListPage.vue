@@ -62,7 +62,7 @@
                 <span :class="{ 'tabbar-item-changed': query.accountIds }">{{ queryAccountName }}</span>
             </f7-link>
             <f7-link popover-open=".more-popover-menu">
-                <f7-icon f7="ellipsis_vertical" :class="{ 'tabbar-item-changed': query.type > 0 || query.amountFilter || query.tagIds }"></f7-icon>
+                <f7-icon f7="ellipsis_vertical" :class="{ 'tabbar-item-changed': query.type > 0 || query.amountFilter || query.tagFilter }"></f7-icon>
             </f7-link>
         </f7-toolbar>
 
@@ -509,52 +509,37 @@
                 <f7-list-item group-title>
                     <small>{{ tt('Tags') }}</small>
                 </f7-list-item>
-                <f7-list-item :class="{ 'list-item-selected': !query.tagIds }" :title="tt('All')" @click="changeTagFilter('')">
+                <f7-list-item :class="{ 'list-item-selected': !query.tagFilter }" :title="tt('All')" @click="changeTagFilter('')">
                     <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.tagIds"></f7-icon>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.tagFilter"></f7-icon>
                     </template>
                 </f7-list-item>
-                <f7-list-item :class="{ 'list-item-selected': query.tagIds === 'none' }" :title="tt('Without Tags')" @click="changeTagFilter('none')">
+                <f7-list-item :class="{ 'list-item-selected': query.tagFilter === TransactionTagFilter.TransactionNoTagFilterValue }" :title="tt('Without Tags')" @click="changeTagFilter(TransactionTagFilter.TransactionNoTagFilterValue)">
                     <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.tagIds === 'none'"></f7-icon>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.tagFilter === TransactionTagFilter.TransactionNoTagFilterValue"></f7-icon>
                     </template>
                 </f7-list-item>
-                <f7-list-item :class="{ 'list-item-selected': query.tagIds && queryAllFilterTagIdsCount > 1 }"
+                <f7-list-item :class="{ 'list-item-selected': query.tagFilter && queryAllFilterTagIdsCount > 1 }"
                               :title="tt('Multiple Tags')" @click="filterMultipleTags()" v-if="allAvailableTagsCount > 0">
                     <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.tagIds && queryAllFilterTagIdsCount > 1"></f7-icon>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.tagFilter && queryAllFilterTagIdsCount > 1"></f7-icon>
                     </template>
                 </f7-list-item>
 
-                <template v-if="query.tagIds && query.tagIds !== 'none'">
-                    <f7-list-item :title="filterType.displayName"
-                                  :key="filterType.type"
-                                  v-for="filterType in allTransactionTagFilterTypes"
-                                  @click="changeTagFilterType(filterType.type)"
-                    >
-                        <template #after>
-                            <f7-icon class="list-item-checked-icon"
-                                     f7="checkmark_alt"
-                                     v-if="query.tagFilterType === filterType.type">
-                            </f7-icon>
-                        </template>
-                    </f7-list-item>
-                </template>
-
                 <f7-list-item :title="transactionTag.name"
-                              :class="{ 'list-item-selected': query.tagIds === transactionTag.id, 'item-in-multiple-selection': queryAllFilterTagIdsCount > 1 && queryAllFilterTagIds[transactionTag.id] }"
+                              :class="{ 'list-item-selected': queryAllFilterTagIdsCount === 1 && isDefined(queryAllFilterTagIds[transactionTag.id]), 'item-in-multiple-selection': queryAllFilterTagIdsCount > 1 && isDefined(queryAllFilterTagIds[transactionTag.id]) }"
                               :key="transactionTag.id"
                               v-for="transactionTag in allTransactionTags"
-                              v-show="!transactionTag.hidden || query.tagIds === transactionTag.id"
-                              @click="changeTagFilter(transactionTag.id)"
+                              v-show="!transactionTag.hidden || isDefined(queryAllFilterTagIds[transactionTag.id])"
+                              @click="changeTagFilter(TransactionTagFilter.of(transactionTag.id).toTextualTagFilter())"
                 >
                     <template #before-title>
                         <f7-icon class="transaction-tag-name transaction-tag-icon" f7="number"></f7-icon>
                     </template>
                     <template #after>
                         <f7-icon class="list-item-checked-icon"
-                                 f7="checkmark_alt"
-                                 v-if="query.tagIds === transactionTag.id">
+                                 :f7="queryAllFilterTagIds[transactionTag.id] === true ? 'checkmark_alt' : (queryAllFilterTagIds[transactionTag.id] === false ? 'multiply' : undefined)"
+                                 v-if="isDefined(queryAllFilterTagIds[transactionTag.id])">
                         </f7-icon>
                     </template>
                 </f7-list-item>
@@ -597,7 +582,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { type TransactionMonthList, useTransactionsStore } from '@/stores/transaction.ts';
 
-import { type TypeAndDisplayName, keys } from '@/core/base.ts';
+import { keys } from '@/core/base.ts';
 import { TextDirection } from '@/core/text.ts';
 import {
     type TextualYearMonth,
@@ -609,10 +594,12 @@ import {
 import { AmountFilterType } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
-import type { Transaction } from '@/models/transaction.ts';
+import { type Transaction, TransactionTagFilter } from '@/models/transaction.ts';
 
 import {
-    isNumber
+    isDefined,
+    isNumber,
+    objectFieldWithValueToArrayItem
 } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
@@ -644,7 +631,6 @@ const props = defineProps<{
 const {
     tt,
     getCurrentLanguageTextDirection,
-    getAllTransactionTagFilterTypes,
     getWeekdayShortName,
     getCalendarDisplayDayOfMonthFromUnixTime
 } = useI18n();
@@ -722,8 +708,6 @@ const showDeleteActionSheet = ref<boolean>(false);
 
 const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
-
-const allTransactionTagFilterTypes = computed<TypeAndDisplayName[]>(() => getAllTransactionTagFilterTypes());
 
 const transactions = computed<TransactionMonthList[]>(() => {
     if (loading.value) {
@@ -925,8 +909,7 @@ function init(): void {
         type: initQuery['type'] && parseInt(initQuery['type']) > 0 ? parseInt(initQuery['type']) : undefined,
         categoryIds: initQuery['categoryIds'],
         accountIds: initQuery['accountIds'],
-        tagIds: initQuery['tagIds'],
-        tagFilterType: initQuery['tagFilterType'] && parseInt(initQuery['tagFilterType']) >= 0 ? parseInt(initQuery['tagFilterType']) : undefined,
+        tagFilter: initQuery['tagFilter'],
         keyword: initQuery['keyword']
     });
 
@@ -1277,13 +1260,13 @@ function filterMultipleAccounts(): void {
     props.f7router.navigate('/settings/filter/account?type=transactionListCurrent');
 }
 
-function changeTagFilter(tagIds: string): void {
-    if (query.value.tagIds === tagIds) {
+function changeTagFilter(tagFilter: string): void {
+    if (query.value.tagFilter === tagFilter) {
         return;
     }
 
     const changed = transactionsStore.updateTransactionListFilter({
-        tagIds: tagIds
+        tagFilter: tagFilter
     });
 
     showMorePopover.value = false;
@@ -1295,22 +1278,6 @@ function changeTagFilter(tagIds: string): void {
 
 function filterMultipleTags(): void {
     props.f7router.navigate('/settings/filter/tag?type=transactionListCurrent');
-}
-
-function changeTagFilterType(filterType: number): void {
-    if (query.value.tagFilterType === filterType) {
-        return;
-    }
-
-    const changed = transactionsStore.updateTransactionListFilter({
-        tagFilterType: filterType
-    });
-
-    showMorePopover.value = false;
-
-    if (changed) {
-        reload();
-    }
 }
 
 function changeKeywordFilter(keyword: string): void {
@@ -1383,8 +1350,8 @@ function add(): void {
         params.push(`accountId=${query.value.accountIds}`);
     }
 
-    if (query.value.tagIds) {
-        params.push(`tagIds=${query.value.tagIds}`);
+    if (query.value.tagFilter) {
+        params.push(`tagIds=${objectFieldWithValueToArrayItem(queryAllFilterTagIds.value, true).join(',') || ''}`);
     }
 
     props.f7router.navigate(`/transaction/add?${params.join('&')}`);

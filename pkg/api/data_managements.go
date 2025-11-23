@@ -372,14 +372,14 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 		return nil, "", errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	var allTagIds []int64
-	noTags := exportTransactionDataReq.TagIds == "none"
+	noTags := exportTransactionDataReq.TagFilter == models.TransactionNoTagFilterValue
+	var tagFilters []*models.TransactionTagFilter
 
 	if !noTags {
-		allTagIds, err = a.tags.GetTagIds(exportTransactionDataReq.TagIds)
+		tagFilters, err = models.ParseTransactionTagFilter(exportTransactionDataReq.TagFilter)
 
 		if err != nil {
-			log.Warnf(c, "[data_managements.getExportedFileContent] get transaction tag ids error, because %s", err.Error())
+			log.Warnf(c, "[data_managements.getExportedFileContent] parse transaction tag filters error, because %s", err.Error())
 			return nil, "", errs.Or(err, errs.ErrOperationFailed)
 		}
 	}
@@ -395,7 +395,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 		minTransactionTime = utils.GetMinTransactionTimeFromUnixTime(exportTransactionDataReq.MinTime)
 	}
 
-	allTransactions, err := a.transactions.GetAllSpecifiedTransactions(c, uid, maxTransactionTime, minTransactionTime, exportTransactionDataReq.Type, allCategoryIds, allAccountIds, allTagIds, noTags, exportTransactionDataReq.TagFilterType, exportTransactionDataReq.AmountFilter, exportTransactionDataReq.Keyword, pageCountForDataExport, true)
+	allTransactions, err := a.transactions.GetAllSpecifiedTransactions(c, uid, maxTransactionTime, minTransactionTime, exportTransactionDataReq.Type, allCategoryIds, allAccountIds, tagFilters, noTags, exportTransactionDataReq.AmountFilter, exportTransactionDataReq.Keyword, pageCountForDataExport, true)
 
 	if err != nil {
 		log.Errorf(c, "[data_managements.getExportedFileContent] failed to all transactions user \"uid:%d\", because %s", uid, err.Error())

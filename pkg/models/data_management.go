@@ -24,13 +24,12 @@ type DataStatisticsResponse struct {
 
 // ExportTransactionDataRequest represents export transaction request
 type ExportTransactionDataRequest struct {
-	Type          TransactionType          `form:"type" binding:"min=0,max=4"`
-	CategoryIds   string                   `form:"category_ids"`
-	AccountIds    string                   `form:"account_ids"`
-	TagIds        string                   `form:"tag_ids"`
-	TagFilterType TransactionTagFilterType `form:"tag_filter_type" binding:"min=0,max=3"`
-	AmountFilter  string                   `form:"amount_filter" binding:"validAmountFilter"`
-	Keyword       string                   `form:"keyword"`
-	MaxTime       int64                    `form:"max_time" binding:"min=0"` // Unix timestamp in seconds
-	MinTime       int64                    `form:"min_time" binding:"min=0"` // Unix timestamp in seconds
+	Type         TransactionType `form:"type" binding:"min=0,max=4"`
+	CategoryIds  string          `form:"category_ids"`
+	AccountIds   string          `form:"account_ids"`
+	TagFilter    string          `form:"tag_filter" binding:"validTagFilter"`
+	AmountFilter string          `form:"amount_filter" binding:"validAmountFilter"`
+	Keyword      string          `form:"keyword"`
+	MaxTime      int64           `form:"max_time" binding:"min=0"` // Unix timestamp in seconds
+	MinTime      int64           `form:"min_time" binding:"min=0"` // Unix timestamp in seconds
 }

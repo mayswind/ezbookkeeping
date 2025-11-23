@@ -431,15 +431,15 @@
                                                         @update:model-value="scrollTagMenuToSelectedItem">
                                                     <template #activator="{ props }">
                                                         <div class="d-flex align-center cursor-pointer"
-                                                             :class="{ 'readonly': loading, 'text-primary': query.tagIds }" v-bind="props">
+                                                             :class="{ 'readonly': loading, 'text-primary': query.tagFilter }" v-bind="props">
                                                             <span>{{ queryTagName }}</span>
                                                             <v-icon :icon="mdiMenuDown" />
                                                         </div>
                                                     </template>
                                                     <v-list :selected="[queryAllSelectedFilterTagIds]">
                                                         <v-list-item key="" value="" class="text-sm" density="compact"
-                                                                     :class="{ 'list-item-selected': !query.tagIds }"
-                                                                     :append-icon="(!query.tagIds ? mdiCheck : undefined)">
+                                                                     :class="{ 'list-item-selected': !query.tagFilter }"
+                                                                     :append-icon="(!query.tagFilter ? mdiCheck : undefined)">
                                                             <v-list-item-title class="cursor-pointer"
                                                                                @click="changeTagFilter('')">
                                                                 <div class="d-flex align-center">
@@ -448,11 +448,13 @@
                                                                 </div>
                                                             </v-list-item-title>
                                                         </v-list-item>
-                                                        <v-list-item key="none" value="none" class="text-sm" density="compact"
-                                                                     :class="{ 'list-item-selected': query.tagIds === 'none' }"
-                                                                     :append-icon="(query.tagIds === 'none' ? mdiCheck : undefined)">
+                                                        <v-list-item class="text-sm" density="compact"
+                                                                     :key="TransactionTagFilter.TransactionNoTagFilterValue"
+                                                                     :value="TransactionTagFilter.TransactionNoTagFilterValue"
+                                                                     :class="{ 'list-item-selected': query.tagFilter === TransactionTagFilter.TransactionNoTagFilterValue }"
+                                                                     :append-icon="(query.tagFilter === TransactionTagFilter.TransactionNoTagFilterValue ? mdiCheck : undefined)">
                                                             <v-list-item-title class="cursor-pointer"
-                                                                               @click="changeTagFilter('none')">
+                                                                               @click="changeTagFilter(TransactionTagFilter.TransactionNoTagFilterValue)">
                                                                 <div class="d-flex align-center">
                                                                     <v-icon :icon="mdiBorderNoneVariant" />
                                                                     <span class="text-sm ms-3">{{ tt('Without Tags') }}</span>
@@ -460,8 +462,8 @@
                                                             </v-list-item-title>
                                                         </v-list-item>
                                                         <v-list-item key="multiple" value="multiple" class="text-sm" density="compact"
-                                                                     :class="{ 'list-item-selected': query.tagIds && queryAllFilterTagIdsCount > 1 }"
-                                                                     :append-icon="(query.tagIds && queryAllFilterTagIdsCount > 1 ? mdiCheck : undefined)"
+                                                                     :class="{ 'list-item-selected': query.tagFilter && queryAllFilterTagIdsCount > 1 }"
+                                                                     :append-icon="(query.tagFilter && queryAllFilterTagIdsCount > 1 ? mdiCheck : undefined)"
                                                                      v-if="allAvailableTagsCount > 0">
                                                             <v-list-item-title class="cursor-pointer"
                                                                                @click="showFilterTagDialog = true">
@@ -472,34 +474,18 @@
                                                             </v-list-item-title>
                                                         </v-list-item>
 
-                                                        <v-divider v-if="query.tagIds && query.tagIds !== 'none'" />
-
-                                                        <template v-if="query.tagIds && query.tagIds !== 'none'">
-                                                            <v-list-item class="text-sm" density="compact"
-                                                                         :key="filterType.type"
-                                                                         :value="filterType.type"
-                                                                         :append-icon="(query.tagFilterType === filterType.type ? mdiCheck : undefined)"
-                                                                         v-for="filterType in allTransactionTagFilterTypes">
-                                                                <v-list-item-title class="cursor-pointer"
-                                                                                   @click="changeTagFilterType(filterType.type)">
-                                                                    <div class="d-flex align-center">
-                                                                        <v-icon size="24" :icon="filterType.icon"/>
-                                                                        <span class="text-sm ms-3">{{ filterType.displayName }}</span>
-                                                                    </div>
-                                                                </v-list-item-title>
-                                                            </v-list-item>
-                                                        </template>
+                                                        <v-divider v-if="query.tagFilter && query.tagFilter !== TransactionTagFilter.TransactionNoTagFilterValue" />
 
                                                         <template :key="transactionTag.id"
                                                                   v-for="transactionTag in allTransactionTags">
-                                                            <v-divider v-if="!transactionTag.hidden || query.tagIds === transactionTag.id" />
+                                                            <v-divider v-if="!transactionTag.hidden || isDefined(queryAllFilterTagIds[transactionTag.id])" />
                                                             <v-list-item class="text-sm" density="compact"
                                                                          :value="transactionTag.id"
-                                                                         :class="{ 'list-item-selected': query.tagIds === transactionTag.id, 'item-in-multiple-selection': queryAllFilterTagIdsCount > 1 && queryAllFilterTagIds[transactionTag.id] }"
-                                                                         :append-icon="(query.tagIds === transactionTag.id ? mdiCheck : undefined)"
-                                                                         v-if="!transactionTag.hidden || query.tagIds === transactionTag.id">
+                                                                         :class="{ 'list-item-selected': queryAllFilterTagIdsCount === 1 && isDefined(queryAllFilterTagIds[transactionTag.id]), 'item-in-multiple-selection': queryAllFilterTagIdsCount > 1 && isDefined(queryAllFilterTagIds[transactionTag.id]) }"
+                                                                         :append-icon="(queryAllFilterTagIds[transactionTag.id] === true ? mdiCheck : (queryAllFilterTagIds[transactionTag.id] === false ? mdiClose : undefined))"
+                                                                         v-if="!transactionTag.hidden || isDefined(queryAllFilterTagIds[transactionTag.id])">
                                                                 <v-list-item-title class="cursor-pointer"
-                                                                                   @click="changeTagFilter(transactionTag.id)">
+                                                                                   @click="changeTagFilter(TransactionTagFilter.of(transactionTag.id).toTextualTagFilter())">
                                                                     <div class="d-flex align-center">
                                                                         <v-icon size="24" :icon="mdiPound"/>
                                                                         <span class="text-sm ms-3">{{ transactionTag.name }}</span>
@@ -678,7 +664,6 @@ import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import {
     type NameNumeralValue,
-    type TypeAndDisplayName,
     keys
 } from '@/core/base.ts';
 import {
@@ -690,16 +675,18 @@ import {
 } from '@/core/datetime.ts';
 import { type NumeralSystem, AmountFilterType } from '@/core/numeral.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts';
+import { TransactionType } from '@/core/transaction.ts';
 import { TemplateType }  from '@/core/template.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
-import type { Transaction } from '@/models/transaction.ts';
+import { type Transaction, TransactionTagFilter } from '@/models/transaction.ts';
 import type { TransactionTemplate } from '@/models/transaction_template.ts';
 
 import {
+    isDefined,
     isObject,
     isString,
-    isNumber
+    isNumber,
+    objectFieldWithValueToArrayItem
 } from '@/lib/common.ts';
 import {
     getCurrentUnixTime,
@@ -731,6 +718,7 @@ import logger from '@/lib/logger.ts';
 import {
     mdiMagnify,
     mdiCheck,
+    mdiClose,
     mdiViewGridOutline,
     mdiBorderNoneVariant,
     mdiVectorArrangeBelow,
@@ -740,10 +728,6 @@ import {
     mdiPencilBoxOutline,
     mdiArrowLeft,
     mdiArrowRight,
-    mdiPlusBoxMultipleOutline,
-    mdiCheckboxMultipleOutline,
-    mdiMinusBoxMultipleOutline,
-    mdiCloseBoxMultipleOutline,
     mdiPound,
     mdiMagicStaff,
     mdiTextBoxOutline
@@ -757,8 +741,7 @@ interface TransactionListProps {
     initType?: string,
     initCategoryIds?: string,
     initAccountIds?: string,
-    initTagIds?: string,
-    initTagFilterType?: string,
+    initTagFilter?: string,
     initAmountFilter?: string,
     initKeyword?: string
 }
@@ -770,12 +753,6 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 type AIImageRecognitionDialogType = InstanceType<typeof AIImageRecognitionDialog>;
 type ImportDialogType = InstanceType<typeof ImportDialog>;
-
-interface TransactionTemplateWithIcon {
-    type: number;
-    displayName: string;
-    icon: string;
-}
 
 interface TransactionListDisplayTotalAmount {
     income: string;
@@ -789,7 +766,6 @@ const theme = useTheme();
 const {
     tt,
     getAllRecentMonthDateRanges,
-    getAllTransactionTagFilterTypes,
     getWeekdayLongName,
     getCurrentNumeralSystemType
 } = useI18n();
@@ -852,13 +828,6 @@ const transactionsStore = useTransactionsStore();
 const transactionTemplatesStore = useTransactionTemplatesStore();
 const desktopPageStore = useDesktopPageStore();
 
-const tagFilterIconMap: Record<number, string> = {
-    [TransactionTagFilterType.HasAny.type]: mdiPlusBoxMultipleOutline,
-    [TransactionTagFilterType.HasAll.type]: mdiCheckboxMultipleOutline,
-    [TransactionTagFilterType.NotHasAny.type]: mdiMinusBoxMultipleOutline,
-    [TransactionTagFilterType.NotHasAll.type]: mdiCloseBoxMultipleOutline
-};
-
 const timeFilterMenu = useTemplateRef<VMenu>('timeFilterMenu');
 const categoryFilterMenu = useTemplateRef<VMenu>('categoryFilterMenu');
 const amountFilterMenu = useTemplateRef<VMenu>('amountFilterMenu');
@@ -910,21 +879,6 @@ const recentMonthDateRanges = computed<LocalizedRecentMonthDateRange[]>(() => ge
 const allTransactionTemplates = computed<TransactionTemplate[]>(() => {
     const allTemplates = transactionTemplatesStore.allVisibleTemplates;
     return allTemplates[TemplateType.Normal.type] || [];
-});
-
-const allTransactionTagFilterTypes = computed<TransactionTemplateWithIcon[]>(() => {
-    const allTagFilterTypes: TypeAndDisplayName[] = getAllTransactionTagFilterTypes();
-    const allTagFilterTypesWithIcon: TransactionTemplateWithIcon[] = [];
-
-    for (const tagFilterType of allTagFilterTypes) {
-        allTagFilterTypesWithIcon.push({
-            type: tagFilterType.type,
-            displayName: tagFilterType.displayName,
-            icon: tagFilterIconMap[tagFilterType.type] ?? ''
-        });
-    }
-
-    return allTagFilterTypesWithIcon;
 });
 
 const allowCategoryTypes = computed<string>(() => {
@@ -1018,10 +972,16 @@ const queryAllSelectedFilterAccountIds = computed<string>(() => {
 });
 
 const queryAllSelectedFilterTagIds = computed<string>(() => {
-    if (queryAllFilterTagIdsCount.value === 0) {
+    if (query.value.tagFilter === TransactionTagFilter.TransactionNoTagFilterValue) {
+        return TransactionTagFilter.TransactionNoTagFilterValue;
+    } else if (queryAllFilterTagIdsCount.value === 0) {
         return '';
     } else if (queryAllFilterTagIdsCount.value === 1) {
-        return query.value.tagIds;
+        for (const tagId of keys(queryAllFilterTagIds.value)) {
+            return tagId;
+        }
+
+        return '';
     } else { // queryAllFilterTagIdsCount.value > 1
         return 'multiple';
     }
@@ -1147,8 +1107,7 @@ function init(initProps: TransactionListProps): void {
         type: initProps.initType && parseInt(initProps.initType) > 0 ? parseInt(initProps.initType) : undefined,
         categoryIds: initProps.initCategoryIds,
         accountIds: initProps.initAccountIds,
-        tagIds: initProps.initTagIds,
-        tagFilterType: initProps.initTagFilterType && parseInt(initProps.initTagFilterType) >= 0 ? parseInt(initProps.initTagFilterType) : undefined,
+        tagFilter: initProps.initTagFilter,
         amountFilter: initProps.initAmountFilter || '',
         keyword: initProps.initKeyword || ''
     });
@@ -1490,13 +1449,13 @@ function changeMultipleAccountsFilter(changed: boolean): void {
     updateUrlWhenChanged(changed);
 }
 
-function changeTagFilter(tagIds: string): void {
-    if (query.value.tagIds === tagIds) {
+function changeTagFilter(tagFilter: string): void {
+    if (query.value.tagFilter === tagFilter) {
         return;
     }
 
     const changed = transactionsStore.updateTransactionListFilter({
-        tagIds: tagIds
+        tagFilter: tagFilter
     });
 
     updateUrlWhenChanged(changed);
@@ -1504,18 +1463,6 @@ function changeTagFilter(tagIds: string): void {
 
 function changeMultipleTagsFilter(changed: boolean): void {
     showFilterTagDialog.value = false;
-
-    updateUrlWhenChanged(changed);
-}
-
-function changeTagFilterType(filterType: number): void {
-    if (query.value.tagFilterType === filterType) {
-        return;
-    }
-
-    const changed = transactionsStore.updateTransactionListFilter({
-        tagFilterType: filterType
-    });
 
     updateUrlWhenChanged(changed);
 }
@@ -1592,7 +1539,7 @@ function add(template?: TransactionTemplate): void {
         type: query.value.type,
         categoryId: queryAllFilterCategoryIdsCount.value === 1 ? query.value.categoryIds : '',
         accountId: queryAllFilterAccountIdsCount.value === 1 ? query.value.accountIds : '',
-        tagIds: query.value.tagIds || '',
+        tagIds: objectFieldWithValueToArrayItem(queryAllFilterTagIds.value, true).join(',') || '',
         template: template
     }).then(result => {
         if (result && result.message) {
@@ -1765,8 +1712,7 @@ onBeforeRouteUpdate((to) => {
             initType: (to.query['type'] as string | null) || undefined,
             initCategoryIds: (to.query['categoryIds'] as string | null) || undefined,
             initAccountIds: (to.query['accountIds'] as string | null) || undefined,
-            initTagIds: (to.query['tagIds'] as string | null) || undefined,
-            initTagFilterType: (to.query['tagFilterType'] as string | null) || undefined,
+            initTagFilter: (to.query['tagFilter'] as string | null) || undefined,
             initAmountFilter: (to.query['amountFilter'] as string | null) || undefined,
             initKeyword: (to.query['keyword'] as string | null) || undefined
         });

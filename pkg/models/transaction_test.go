@@ -9,6 +9,101 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
 
+func TestParseTransactionTagFilter_EmptyTagFilter(t *testing.T) {
+	actualValue, err := ParseTransactionTagFilter("")
+	assert.Nil(t, err)
+	assert.Equal(t, 0, len(actualValue))
+}
+
+func TestParseTransactionTagFilter_NoTag(t *testing.T) {
+	actualValue, err := ParseTransactionTagFilter("none")
+	assert.Nil(t, err)
+	assert.Equal(t, 0, len(actualValue))
+}
+
+func TestParseTransactionTagFilter_NoValidFilter(t *testing.T) {
+	_, err := ParseTransactionTagFilter(";")
+	assert.EqualError(t, err, errs.ErrFormatInvalid.Message)
+
+	_, err = ParseTransactionTagFilter(";;")
+	assert.EqualError(t, err, errs.ErrFormatInvalid.Message)
+}
+
+func TestParseTransactionTagFilter_ValidOneFilterInTagFilters(t *testing.T) {
+	actualValue, err := ParseTransactionTagFilter("0:1")
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(actualValue))
+	assert.Equal(t, TRANSACTION_TAG_FILTER_HAS_ANY, actualValue[0].Type)
+	assert.Equal(t, 1, len(actualValue[0].TagIds))
+	assert.Equal(t, []int64{1}, actualValue[0].TagIds)
+
+	actualValue, err = ParseTransactionTagFilter("0:1,2,3")
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(actualValue))
+	assert.Equal(t, TRANSACTION_TAG_FILTER_HAS_ANY, actualValue[0].Type)
+	assert.Equal(t, 3, len(actualValue[0].TagIds))
+	assert.Equal(t, []int64{1, 2, 3}, actualValue[0].TagIds)
+
+	actualValue, err = ParseTransactionTagFilter("1:1,2,3")
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(actualValue))
+	assert.Equal(t, TRANSACTION_TAG_FILTER_HAS_ALL, actualValue[0].Type)
+	assert.Equal(t, 3, len(actualValue[0].TagIds))
+	assert.Equal(t, []int64{1, 2, 3}, actualValue[0].TagIds)
+
+	actualValue, err = ParseTransactionTagFilter("2:1,2,3")
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(actualValue))
+	assert.Equal(t, TRANSACTION_TAG_FILTER_NOT_HAS_ANY, actualValue[0].Type)
+	assert.Equal(t, 3, len(actualValue[0].TagIds))
+	assert.Equal(t, []int64{1, 2, 3}, actualValue[0].TagIds)
+
+	actualValue, err = ParseTransactionTagFilter("3:1,2,3")
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(actualValue))
+	assert.Equal(t, TRANSACTION_TAG_FILTER_NOT_HAS_ALL, actualValue[0].Type)
+	assert.Equal(t, 3, len(actualValue[0].TagIds))
+	assert.Equal(t, []int64{1, 2, 3}, actualValue[0].TagIds)
+}
+
+func TestParseTransactionTagFilter_InvalidTagFilterType(t *testing.T) {
+	_, err := ParseTransactionTagFilter("a:1,2,3")
+	assert.EqualError(t, err, errs.ErrFormatInvalid.Message)
+
+	_, err = ParseTransactionTagFilter("-1:1,2,3")
+	assert.EqualError(t, err, errs.ErrFormatInvalid.Message)
+
+	_, err = ParseTransactionTagFilter("4:1,2,3")
+	assert.EqualError(t, err, errs.ErrFormatInvalid.Message)
+}
+
+func TestParseTransactionTagFilter_NoTagIdsInFilter(t *testing.T) {
+	_, err := ParseTransactionTagFilter("0")
+	assert.EqualError(t, err, errs.ErrFormatInvalid.Message)
+
+	_, err = ParseTransactionTagFilter("0:")
+	assert.EqualError(t, err, errs.ErrTransactionTagIdInvalid.Message)
+}
+
+func TestParseTransactionTagFilter_InvalidTagIdsInFilter(t *testing.T) {
+	_, err := ParseTransactionTagFilter("0:abc")
+	assert.EqualError(t, err, errs.ErrTransactionTagIdInvalid.Message)
+}
+
+func TestParseTransactionTagFilter_ValidTwoFilterInTagFilters(t *testing.T) {
+	actualValue, err := ParseTransactionTagFilter("0:1,2,3;2:4,5,6")
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(actualValue))
+
+	assert.Equal(t, TRANSACTION_TAG_FILTER_HAS_ANY, actualValue[0].Type)
+	assert.Equal(t, 3, len(actualValue[0].TagIds))
+	assert.Equal(t, []int64{1, 2, 3}, actualValue[0].TagIds)
+
+	assert.Equal(t, TRANSACTION_TAG_FILTER_NOT_HAS_ANY, actualValue[1].Type)
+	assert.Equal(t, 3, len(actualValue[1].TagIds))
+	assert.Equal(t, []int64{4, 5, 6}, actualValue[1].TagIds)
+}
+
 func TestTransactionAmountsRequestGetTransactionAmountsRequestItems(t *testing.T) {
 	transactionAmountsRequest := &TransactionAmountsRequest{
 		Query: "name1_1234567890_1234567891|name2_1234567900_1234567901",

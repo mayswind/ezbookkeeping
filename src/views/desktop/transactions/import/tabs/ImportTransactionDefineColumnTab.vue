@@ -57,7 +57,7 @@
                                         v-for="typeName in parsedFileAllTransactionTypes">
                                         <td>{{ typeName }}</td>
                                         <td>
-                                            <v-btn-toggle class="transaction-types-toggle" density="compact" variant="outlined"
+                                            <v-btn-toggle class="toggle-buttons" density="compact" variant="outlined"
                                                           mandatory="force" divided
                                                           v-model="parsedFileDataColumnMapping.transactionTypeMapping[typeName]">
                                                 <v-btn :value="undefined">{{ tt('None') }}</v-btn>
@@ -166,14 +166,14 @@
                                         v-for="separator in allSeparators">
                                         <td>{{ separator.name }} ({{separator.value}})</td>
                                         <td>
-                                            <v-btn-toggle class="transaction-types-toggle" density="compact" variant="outlined"
+                                            <v-btn-toggle class="toggle-buttons" density="compact" variant="outlined"
                                                           mandatory="force" divided
                                                           v-model="parsedFileDataColumnMapping.geoLocationOrder"
                                                           v-if="parsedFileDataColumnMapping.geoLocationSeparator === separator.value">
                                                 <v-btn value="latlon">{{ `${tt('Latitude')}${separator.value}${tt('Longitude')}` }}</v-btn>
                                                 <v-btn value="lonlat">{{ `${tt('Longitude')}${separator.value}${tt('Latitude')}` }}</v-btn>
                                             </v-btn-toggle>
-                                            <v-btn-group class="transaction-types-toggle" density="compact" variant="outlined"
+                                            <v-btn-group class="toggle-buttons" density="compact" variant="outlined"
                                                          divided v-if="parsedFileDataColumnMapping.geoLocationSeparator !== separator.value">
                                                 <v-btn @click="parsedFileDataColumnMapping.setGeoLocationFormat(separator.value, 'latlon')">{{ `${tt('Latitude')}${separator.value}${tt('Longitude')}` }}</v-btn>
                                                 <v-btn @click="parsedFileDataColumnMapping.setGeoLocationFormat(separator.value, 'lonlat')">{{ `${tt('Longitude')}${separator.value}${tt('Latitude')}` }}</v-btn>
@@ -552,39 +552,3 @@ defineExpose({
     saveColumnMappingFile
 });
 </script>
-
-<style>
-.transaction-types-popup-menu .transaction-types-toggle {
-    overflow-x: auto;
-    white-space: nowrap;
-}
-
-.transaction-types-popup-menu .transaction-types-toggle.v-btn-toggle {
-    height: auto !important;
-    padding: 0;
-    border: none;
-}
-
-.transaction-types-popup-menu .transaction-types-toggle.v-btn-toggle > .v-btn {
-    border-color: rgba(var(--v-border-color), var(--v-border-opacity));
-}
-
-.transaction-types-popup-menu .transaction-types-toggle.v-btn-toggle > .v-btn:not(:first-child) {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-left: none;
-}
-
-.transaction-types-popup-menu .transaction-types-toggle.v-btn-toggle > .v-btn:not(:last-child) {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.transaction-types-popup-menu .transaction-types-toggle.v-btn-toggle > .v-btn {
-    border: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
-}
-
-.transaction-types-popup-menu .transaction-types-toggle.v-btn-toggle button.v-btn {
-    width: auto !important;
-}
-</style>

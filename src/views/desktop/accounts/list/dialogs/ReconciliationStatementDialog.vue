@@ -137,7 +137,7 @@
                 multi-sort
                 density="compact"
                 item-value="index"
-                :class="{ 'disabled': loading }"
+                :class="{ 'reconciliation-statement-table': true, 'disabled': loading }"
                 :headers="dataTableHeaders"
                 :items="reconciliationStatements?.transactions ?? []"
                 :hover="true"
@@ -400,7 +400,7 @@ const dataTableHeaders = computed<object[]>(() => {
     headers.push({ key: 'sourceAccountName', value: 'sourceAccountName', title: tt('Account'), sortable: true, nowrap: true });
     headers.push({ key: 'accountBalance', value: 'accountBalance', title: tt(accountBalanceName), sortable: true, nowrap: true });
     headers.push({ key: 'comment', value: 'comment', title: tt('Description'), sortable: true, nowrap: true });
-    headers.push({ key: 'operation', title: tt('Operation'), sortable: false, nowrap: true, align: 'end' });
+    headers.push({ key: 'operation', title: tt('Operation'), sortable: false, nowrap: true, align: 'center' });
     return headers;
 });
 
@@ -617,3 +617,18 @@ defineExpose({
     open
 });
 </script>
+
+<style>
+.reconciliation-statement-table > .v-table__wrapper > table {
+    th:not(:nth-last-child(2)),
+    td:not(:nth-last-child(2)) {
+        width: auto !important;
+        white-space: nowrap;
+    }
+
+    th:nth-last-child(2),
+    td:nth-last-child(2) {
+        width: 100% !important;
+    }
+}
+</style>

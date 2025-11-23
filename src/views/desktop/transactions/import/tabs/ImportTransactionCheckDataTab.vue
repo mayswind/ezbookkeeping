@@ -1948,6 +1948,19 @@ defineExpose({
 </script>
 
 <style>
+.import-transaction-table > .v-table__wrapper > table {
+    th:not(:last-child),
+    td:not(:last-child) {
+        width: auto !important;
+        white-space: nowrap;
+    }
+
+    th:last-child,
+    td:last-child {
+        width: 100% !important;
+    }
+}
+
 .import-transaction-table .v-autocomplete.v-input.v-input--density-compact:not(.v-textarea) .v-field__input,
 .import-transaction-table .v-select.v-input.v-input--density-compact:not(.v-textarea) .v-field__input {
     min-height: inherit;

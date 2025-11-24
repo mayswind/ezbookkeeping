@@ -326,6 +326,35 @@ func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseDescription(t *testi
 	assert.Equal(t, "Test\nA new line break", allNewTransactions[0].Comment)
 }
 
+func TestFeideeMymoneyCsvFileImporterParseImportedData_WithAdditionalOptions(t *testing.T) {
+	importer := FeideeMymoneyAppTransactionDataCsvFileImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\",\"成员\",\"项目\",\"商家\"\n"+
+		"\"支出\",\"2024-09-01 12:34:56\",\"Test Category\",\"Test Account\",\"123.45\",\"\",\"\",\"test1\",\"test2\",\"test3\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, 0, len(allNewTransactions[0].OriginalTagNames))
+
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\",\"成员\",\"项目\",\"商家\"\n"+
+		"\"支出\",\"2024-09-01 12:34:56\",\"Test Category\",\"Test Account\",\"123.45\",\"\",\"\",\"test1\",\"test2\",\"test3\""), 0, converter.DefaultImporterOptions.WithMemberAsTag().WithProjectAsTag().WithMerchantAsTag(), nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, 3, len(allNewTransactions[0].OriginalTagNames))
+	assert.Contains(t, allNewTransactions[0].OriginalTagNames, "test1")
+	assert.Contains(t, allNewTransactions[0].OriginalTagNames, "test2")
+	assert.Contains(t, allNewTransactions[0].OriginalTagNames, "test3")
+}
+
 func TestFeideeMymoneyCsvFileImporterParseImportedData_InvalidRelatedId(t *testing.T) {
 	importer := FeideeMymoneyAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()

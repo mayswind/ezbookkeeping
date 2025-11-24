@@ -355,6 +355,18 @@ const allSupportedAdditionalOptions: KeyAndName[] = [
     {
         key: 'payeeAsDescription',
         name: 'Parse Payee as Description'
+    },
+    {
+        key: 'memberAsTag',
+        name: 'Parse Member as Tag'
+    },
+    {
+        key: 'projectAsTag',
+        name: 'Parse Project as Tag'
+    },
+    {
+        key: 'merchantAsTag',
+        name: 'Parse Merchant as Tag'
     }
 ];
 

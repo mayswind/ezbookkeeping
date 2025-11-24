@@ -317,45 +317,43 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 			for i := 0; i < len(tagNameItems); i++ {
 				tagName := tagNameItems[i]
 
-				if tagName == "" || tagNamesMap[tagName] {
+				if tagName == "" {
 					continue
 				}
 
-				tag, exists := tagMap[tagName]
-
-				if !exists {
-					tag = c.createNewTransactionTagModel(user.Uid, tagName)
-					allNewTags = append(allNewTags, tag)
-					tagMap[tagName] = tag
-				}
-
-				if tag != nil {
-					tagIds = append(tagIds, utils.Int64ToString(tag.TagId))
-				}
-
-				tagNames = append(tagNames, tagName)
-				tagNamesMap[tagName] = true
+				allNewTags, tagIds, tagNames = c.addTag(user, tagName, tagNamesMap, tagMap, allNewTags, tagIds, tagNames)
 			}
 		}
 
 		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_PAYEE) && additionalOptions.IsPayeeAsTag() {
 			payee := dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_PAYEE)
 
-			if payee != "" && !tagNamesMap[payee] {
-				tag, exists := tagMap[payee]
+			if payee != "" {
+				allNewTags, tagIds, tagNames = c.addTag(user, payee, tagNamesMap, tagMap, allNewTags, tagIds, tagNames)
+			}
+		}
 
-				if !exists {
-					tag = c.createNewTransactionTagModel(user.Uid, payee)
-					allNewTags = append(allNewTags, tag)
-					tagMap[payee] = tag
-				}
+		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_MEMBER) && additionalOptions.IsMemberAsTag() {
+			member := dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_MEMBER)
 
-				if tag != nil {
-					tagIds = append(tagIds, utils.Int64ToString(tag.TagId))
-				}
+			if member != "" {
+				allNewTags, tagIds, tagNames = c.addTag(user, member, tagNamesMap, tagMap, allNewTags, tagIds, tagNames)
+			}
+		}
 
-				tagNames = append(tagNames, payee)
-				tagNamesMap[payee] = true
+		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_PROJECT) && additionalOptions.IsProjectAsTag() {
+			project := dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_PROJECT)
+
+			if project != "" {
+				allNewTags, tagIds, tagNames = c.addTag(user, project, tagNamesMap, tagMap, allNewTags, tagIds, tagNames)
+			}
+		}
+
+		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_MERCHANT) && additionalOptions.IsMerchantAsTag() {
+			merchant := dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_MERCHANT)
+
+			if merchant != "" {
+				allNewTags, tagIds, tagNames = c.addTag(user, merchant, tagNamesMap, tagMap, allNewTags, tagIds, tagNames)
 			}
 		}
 
@@ -484,6 +482,27 @@ func (c *DataTableTransactionDataImporter) getTransactionCategory(categories map
 	}
 
 	return subCategory, exists
+}
+
+func (c *DataTableTransactionDataImporter) addTag(user *models.User, tagName string, tagNamesMap map[string]bool, tagMap map[string]*models.TransactionTag, allNewTags []*models.TransactionTag, tagIds []string, tagNames []string) ([]*models.TransactionTag, []string, []string) {
+	if tagName != "" && !tagNamesMap[tagName] {
+		tag, exists := tagMap[tagName]
+
+		if !exists {
+			tag = c.createNewTransactionTagModel(user.Uid, tagName)
+			allNewTags = append(allNewTags, tag)
+			tagMap[tagName] = tag
+		}
+
+		if tag != nil {
+			tagIds = append(tagIds, utils.Int64ToString(tag.TagId))
+		}
+
+		tagNames = append(tagNames, tagName)
+		tagNamesMap[tagName] = true
+	}
+
+	return allNewTags, tagIds, tagNames
 }
 
 func (c *DataTableTransactionDataImporter) createNewAccountModel(uid int64, accountName string, currency string) *models.Account {

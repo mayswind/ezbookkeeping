@@ -279,6 +279,11 @@ export const SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES: ImportFileCategoryAndType
                 type: 'feidee_mymoney_csv',
                 name: 'Feidee MyMoney (App) Data Export File',
                 extensions: '.csv',
+                supportedAdditionalOptions: {
+                    memberAsTag: false,
+                    projectAsTag: false,
+                    merchantAsTag: false,
+                },
                 document: {
                     supportMultiLanguages: 'zh-Hans',
                     anchor: '如何获取随手记app数据导出文件'
@@ -288,6 +293,11 @@ export const SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES: ImportFileCategoryAndType
                 type: 'feidee_mymoney_xls',
                 name: 'Feidee MyMoney (Web) Data Export File',
                 extensions: '.xls',
+                supportedAdditionalOptions: {
+                    memberAsTag: false,
+                    projectAsTag: false,
+                    merchantAsTag: false,
+                },
                 document: {
                     supportMultiLanguages: 'zh-Hans',
                     anchor: '如何获取随手记web版数据导出文件'
@@ -297,6 +307,11 @@ export const SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES: ImportFileCategoryAndType
                 type: 'feidee_mymoney_elecloud_xlsx',
                 name: 'Feidee MyMoney (Elecloud) Data Export File',
                 extensions: '.xlsx',
+                supportedAdditionalOptions: {
+                    memberAsTag: false,
+                    projectAsTag: false,
+                    merchantAsTag: false,
+                },
                 document: {
                     supportMultiLanguages: 'zh-Hans',
                     anchor: '如何获取随手记神象云账本数据导出文件'

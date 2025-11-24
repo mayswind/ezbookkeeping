@@ -18,6 +18,9 @@ var feideeMymoneyElecloudDataColumnNameMapping = map[datatable.TransactionDataTa
 	datatable.TRANSACTION_DATA_TABLE_AMOUNT:               "金额",
 	datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME: "账户2",
 	datatable.TRANSACTION_DATA_TABLE_DESCRIPTION:          "备注",
+	datatable.TRANSACTION_DATA_TABLE_MEMBER:               "成员",
+	datatable.TRANSACTION_DATA_TABLE_PROJECT:              "项目",
+	datatable.TRANSACTION_DATA_TABLE_MERCHANT:             "商家",
 }
 
 // feideeMymoneyElecloudTransactionDataXlsxFileImporter defines the structure of feidee mymoney (elecloud) xlsx importer for transaction data

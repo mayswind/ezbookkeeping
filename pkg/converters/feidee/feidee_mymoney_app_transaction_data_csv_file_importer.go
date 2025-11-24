@@ -27,6 +27,9 @@ const feideeMymoneyAppTransactionAccountCurrencyColumnName = "账户币种"
 const feideeMymoneyAppTransactionAmountColumnName = "金额"
 const feideeMymoneyAppTransactionDescriptionColumnName = "备注"
 const feideeMymoneyAppTransactionRelatedIdColumnName = "关联Id"
+const feideeMymoneyAppTransactionMemberColumnName = "成员"
+const feideeMymoneyAppTransactionProjectColumnName = "项目"
+const feideeMymoneyAppTransactionMerchantColumnName = "商家"
 
 const feideeMymoneyAppTransactionTypeModifyBalanceText = "余额变更"
 const feideeMymoneyAppTransactionTypeModifyOutstandingBalanceText = "负债变更"
@@ -44,6 +47,9 @@ var feideeMymoneyAppDataColumnNameMapping = map[datatable.TransactionDataTableCo
 	datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY: feideeMymoneyAppTransactionAccountCurrencyColumnName,
 	datatable.TRANSACTION_DATA_TABLE_AMOUNT:           feideeMymoneyAppTransactionAmountColumnName,
 	datatable.TRANSACTION_DATA_TABLE_DESCRIPTION:      feideeMymoneyAppTransactionDescriptionColumnName,
+	datatable.TRANSACTION_DATA_TABLE_MEMBER:           feideeMymoneyAppTransactionMemberColumnName,
+	datatable.TRANSACTION_DATA_TABLE_PROJECT:          feideeMymoneyAppTransactionProjectColumnName,
+	datatable.TRANSACTION_DATA_TABLE_MERCHANT:         feideeMymoneyAppTransactionMerchantColumnName,
 }
 
 // feideeMymoneyAppTransactionDataCsvFileImporter defines the structure of feidee mymoney app csv importer for transaction data
@@ -121,6 +127,18 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyA
 
 	if commonDataTable.HasColumn(feideeMymoneyAppTransactionDescriptionColumnName) {
 		newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_DESCRIPTION)
+	}
+
+	if commonDataTable.HasColumn(feideeMymoneyAppTransactionMemberColumnName) {
+		newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_MEMBER)
+	}
+
+	if commonDataTable.HasColumn(feideeMymoneyAppTransactionProjectColumnName) {
+		newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_PROJECT)
+	}
+
+	if commonDataTable.HasColumn(feideeMymoneyAppTransactionMerchantColumnName) {
+		newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_MERCHANT)
 	}
 
 	transactionRowParser := createFeideeMymoneyTransactionDataRowParser()

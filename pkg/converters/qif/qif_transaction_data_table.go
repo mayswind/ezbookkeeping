@@ -22,6 +22,7 @@ var qifTransactionSupportedColumns = map[datatable.TransactionDataTableColumn]bo
 	datatable.TRANSACTION_DATA_TABLE_AMOUNT:               true,
 	datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME: true,
 	datatable.TRANSACTION_DATA_TABLE_DESCRIPTION:          true,
+	datatable.TRANSACTION_DATA_TABLE_PAYEE:                true,
 }
 
 // qifDateFormatType represents the quicken interchange format (qif) date format type
@@ -184,8 +185,10 @@ func (t *qifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 
 	if qifTransaction.Memo != "" {
 		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = qifTransaction.Memo
-	} else if qifTransaction.Payee != "" && qifTransaction.Payee != qifOpeningBalancePayeeText {
-		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = qifTransaction.Payee
+	}
+
+	if qifTransaction.Payee != "" && qifTransaction.Payee != qifOpeningBalancePayeeText {
+		data[datatable.TRANSACTION_DATA_TABLE_PAYEE] = qifTransaction.Payee
 	}
 
 	return data, nil

@@ -8,6 +8,9 @@ import type {
 import type {
     VersionInfo
 } from '@/core/version.ts';
+import type {
+    ImportFileTypeSupportedAdditionalOptions
+} from '@/core/file.ts';
 import {
     TransactionType
 } from '@/core/transaction.ts';
@@ -160,7 +163,8 @@ import {
 
 import {
     isDefined,
-    isBoolean
+    isBoolean,
+    objectFieldWithValueToArrayItem
 } from './common.ts';
 import {
     getGoogleMapAPIKey,
@@ -588,10 +592,15 @@ export default {
             timeout: DEFAULT_UPLOAD_API_TIMEOUT
         } as ApiRequestConfig);
     },
-    parseImportTransaction: ({ fileType, fileEncoding, importFile, columnMapping, transactionTypeMapping, hasHeaderLine, timeFormat, timezoneFormat, amountDecimalSeparator, amountDigitGroupingSymbol, geoSeparator, geoOrder, tagSeparator }: { fileType: string, fileEncoding?: string, importFile: File, columnMapping?: Record<number, number>, transactionTypeMapping?: Record<string, TransactionType>, hasHeaderLine?: boolean, timeFormat?: string, timezoneFormat?: string, amountDecimalSeparator?: string, amountDigitGroupingSymbol?: string, geoSeparator?: string, geoOrder?: string, tagSeparator?: string }): ApiResponsePromise<ImportTransactionResponsePageWrapper> => {
+    parseImportTransaction: ({ fileType, additionalOptions, fileEncoding, importFile, columnMapping, transactionTypeMapping, hasHeaderLine, timeFormat, timezoneFormat, amountDecimalSeparator, amountDigitGroupingSymbol, geoSeparator, geoOrder, tagSeparator }: { fileType: string, additionalOptions?: ImportFileTypeSupportedAdditionalOptions, fileEncoding?: string, importFile: File, columnMapping?: Record<number, number>, transactionTypeMapping?: Record<string, TransactionType>, hasHeaderLine?: boolean, timeFormat?: string, timezoneFormat?: string, amountDecimalSeparator?: string, amountDigitGroupingSymbol?: string, geoSeparator?: string, geoOrder?: string, tagSeparator?: string }): ApiResponsePromise<ImportTransactionResponsePageWrapper> => {
+        let textualAdditionalOptions: string | undefined = undefined;
         let textualColumnMapping: string | undefined = undefined;
         let textualTransactionTypeMapping: string | undefined = undefined;
         let textualHasHeaderLine: string | undefined = undefined;
+
+        if (additionalOptions) {
+            textualAdditionalOptions = objectFieldWithValueToArrayItem(additionalOptions, true).join(',');
+        }
 
         if (columnMapping) {
             textualColumnMapping = JSON.stringify(columnMapping);
@@ -607,6 +616,7 @@ export default {
 
         return axios.postForm<ApiResponse<ImportTransactionResponsePageWrapper>>('v1/transactions/parse_import.json', {
             fileType: fileType,
+            options: textualAdditionalOptions,
             fileEncoding: fileEncoding,
             file: importFile,
             columnMapping: textualColumnMapping,

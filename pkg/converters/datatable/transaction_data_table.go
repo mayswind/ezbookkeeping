@@ -72,6 +72,10 @@ const (
 	TRANSACTION_DATA_TABLE_GEOGRAPHIC_LOCATION      TransactionDataTableColumn = 12
 	TRANSACTION_DATA_TABLE_TAGS                     TransactionDataTableColumn = 13
 	TRANSACTION_DATA_TABLE_DESCRIPTION              TransactionDataTableColumn = 14
+	TRANSACTION_DATA_TABLE_PAYEE                    TransactionDataTableColumn = 101
+	TRANSACTION_DATA_TABLE_MEMBER                   TransactionDataTableColumn = 102
+	TRANSACTION_DATA_TABLE_PROJECT                  TransactionDataTableColumn = 103
+	TRANSACTION_DATA_TABLE_MERCHANT                 TransactionDataTableColumn = 104
 )
 
 // TRANSACTION_DATA_TABLE_TIMEZONE_NOT_AVAILABLE represents the constant for timezone not available

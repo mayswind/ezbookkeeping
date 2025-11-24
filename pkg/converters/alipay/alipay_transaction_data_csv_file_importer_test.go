@@ -8,6 +8,7 @@ import (
 
 	"golang.org/x/text/encoding/simplifiedchinese"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -15,7 +16,7 @@ import (
 )
 
 func TestAlipayCsvFileImporterParseImportedData_MinimumValidData(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvFileImporter
+	importer := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -35,7 +36,7 @@ func TestAlipayCsvFileImporterParseImportedData_MinimumValidData(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 4, len(allNewTransactions))
@@ -94,7 +95,7 @@ func TestAlipayCsvFileImporterParseImportedData_MinimumValidData(t *testing.T) {
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseRefundTransaction(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvFileImporter
+	importer := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -112,7 +113,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseRefundTransaction(t *testin
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, int64(1234567890), allNewTransactions[0].Uid)
@@ -132,7 +133,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseRefundTransaction(t *testin
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, int64(1234567890), allNewTransactions[0].Uid)
@@ -144,7 +145,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseRefundTransaction(t *testin
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseInvestmentRefundTransaction(t *testing.T) {
-	converter := AlipayAppTransactionDataCsvFileImporter
+	importer := AlipayAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -163,7 +164,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseInvestmentRefundTransaction
 		"2024-09-01 01:00:00,Test Account2,xxx-买入,不计收支,0.01,Test Account,退款成功,\n" +
 		"2024-09-01 02:00:00,Test Account2,xxx-买入退款,不计收支,0.01,Test Account,退款成功,\n")
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 2, len(allNewTransactions))
@@ -184,7 +185,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseInvestmentRefundTransaction
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvFileImporter
+	importer := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -201,7 +202,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
 	data2, err := simplifiedchinese.GB18030.NewEncoder().String("支付宝交易记录明细查询\n" +
@@ -213,12 +214,12 @@ func TestAlipayCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseInvalidType(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvFileImporter
+	importer := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -235,12 +236,12 @@ func TestAlipayCsvFileImporterParseImportedData_ParseInvalidType(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvFileImporter
+	importer := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -258,7 +259,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -274,7 +275,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -290,7 +291,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data3), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data3), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -307,7 +308,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data4), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data4), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -324,7 +325,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data5), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data5), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -341,7 +342,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data6), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data6), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -358,7 +359,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data7), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data7), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -367,7 +368,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseCategory(t *testing.T) {
-	converter := AlipayAppTransactionDataCsvFileImporter
+	importer := AlipayAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -388,7 +389,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseCategory(t *testing.T) {
 		"2024-09-01 23:59:59,Test Category3,充值-普通充值,不计收支,0.05,交易成功,\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, _, err := importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 3, len(allNewTransactions))
@@ -407,7 +408,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseCategory(t *testing.T) {
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseRelatedAccount(t *testing.T) {
-	converter := AlipayAppTransactionDataCsvFileImporter
+	importer := AlipayAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -434,7 +435,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseRelatedAccount(t *testing.T
 		"2024-09-01 08:00:00,Test Account4,信用卡还款,不计收支,0.01,Test Account,还款成功,repayment,\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, allNewAccounts, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, allNewAccounts, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 9, len(allNewTransactions))
@@ -529,7 +530,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseRelatedAccount(t *testing.T
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvFileImporter
+	importer := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -546,7 +547,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -561,7 +562,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -569,7 +570,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
 }
 
 func TestAlipayCsvFileImporterParseImportedData_SkipClosedIncomeOrTransferTransaction(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvFileImporter
+	importer := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -586,12 +587,12 @@ func TestAlipayCsvFileImporterParseImportedData_SkipClosedIncomeOrTransferTransa
 		"2024-09-01 23:59:59 ,充值-普通充值             ,0.05   ,不计收支    ,交易关闭    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
 func TestAlipayCsvFileImporterParseImportedData_SkipUnknownProductTransferTransaction(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvFileImporter
+	importer := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -607,12 +608,12 @@ func TestAlipayCsvFileImporterParseImportedData_SkipUnknownProductTransferTransa
 		"2024-09-01 23:59:59 ,xxxx                ,0.05   ,不计收支    ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
 func TestAlipayCsvFileImporterParseImportedData_SkipUnknownStatusTransaction(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvFileImporter
+	importer := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -628,12 +629,12 @@ func TestAlipayCsvFileImporterParseImportedData_SkipUnknownStatusTransaction(t *
 		"2024-09-01 01:23:45 ,xxxx            ,0.12   ,收入      ,xxxx    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
 func TestAlipayCsvFileImporterParseImportedData_MissingFileHeader(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvFileImporter
+	importer := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -647,15 +648,15 @@ func TestAlipayCsvFileImporterParseImportedData_MissingFileHeader(t *testing.T) 
 			"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidFileHeader.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(""), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidFileHeader.Message)
 }
 
 func TestAlipayCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvFileImporter
+	importer := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -671,7 +672,7 @@ func TestAlipayCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing
 		"金额（元）,收/支     ,交易状态    ,\n" +
 		"0.12   ,收入      ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Amount Column
@@ -682,7 +683,7 @@ func TestAlipayCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing
 		"交易创建时间              ,收/支     ,交易状态    ,\n" +
 		"2024-09-01 12:34:56 ,收入      ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Status Column
@@ -693,7 +694,7 @@ func TestAlipayCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing
 		"交易创建时间              ,金额（元）,收/支     ,\n" +
 		"2024-09-01 12:34:56 ,0.12   ,收入      ,\n" +
 		"------------------------------------------------------------------------------------\n")
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data3), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data3), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Type Column
@@ -704,12 +705,12 @@ func TestAlipayCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing
 		"交易创建时间              ,金额（元）,交易状态    ,\n" +
 		"2024-09-01 12:34:56 ,0.12   ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data4), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data4), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 }
 
 func TestAlipayCsvFileImporterParseImportedData_NoTransactionData(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvFileImporter
+	importer := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -723,6 +724,6 @@ func TestAlipayCsvFileImporterParseImportedData_NoTransactionData(t *testing.T) 
 		"---------------------------------交易记录明细列表------------------------------------\n" +
 		"交易创建时间              ,金额（元）,收/支     ,交易状态    ,\n" +
 		"------------------------------------------------------------------------------------\n")
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }

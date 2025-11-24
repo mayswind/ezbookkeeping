@@ -145,6 +145,31 @@
                             />
                         </v-col>
 
+                        <v-col cols="12" md="12" v-if="supportedAdditionalOptions">
+                            <v-select
+                                :disabled="submitting"
+                                :label="tt('Additional Options')"
+                                :placeholder="tt('Additional Options')"
+                                v-model="fileType"
+                                v-model:menu="additionalOptionsMenuState"
+                            >
+                                <template #selection>
+                                    <span class="cursor-pointer">{{ displaySelectedAdditionalOptions }}</span>
+                                </template>
+
+                                <template #no-data>
+                                    <v-list class="py-0">
+                                        <template v-for="item in allSupportedAdditionalOptions">
+                                            <v-list-item :key="item.key"
+                                                         :append-icon="importAdditionalOptions[item.key] ? mdiCheck : undefined"
+                                                         @click="importAdditionalOptions[item.key] = !importAdditionalOptions[item.key]"
+                                                         v-if="isDefined(supportedAdditionalOptions[item.key])">{{ tt(item.name) }}</v-list-item>
+                                        </template>
+                                    </v-list>
+                                </template>
+                            </v-select>
+                        </v-col>
+
                         <v-col cols="12" md="12" v-if="!isImportDataFromTextbox">
                             <v-text-field
                                 readonly
@@ -257,15 +282,20 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 
-import { itemAndIndex } from '@/core/base.ts';
+import { type KeyAndName, itemAndIndex } from '@/core/base.ts';
 import { type NumeralSystem } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
-import { KnownFileType } from '@/core/file.ts';
-
-import type { LocalizedImportFileCategoryAndTypes, LocalizedImportFileType, LocalizedImportFileTypeSubType, LocalizedImportFileTypeSupportedEncodings } from '@/core/file.ts';
+import {
+    type ImportFileTypeSupportedAdditionalOptions,
+    type LocalizedImportFileCategoryAndTypes,
+    type LocalizedImportFileType,
+    type LocalizedImportFileTypeSubType,
+    type LocalizedImportFileTypeSupportedEncodings,
+    KnownFileType
+} from '@/core/file.ts';
 import { ImportTransaction } from '@/models/imported_transaction.ts';
 
-import { isNumber } from '@/lib/common.ts';
+import { isDefined, isNumber } from '@/lib/common.ts';
 import { findExtensionByType, isFileExtensionSupported } from '@/lib/file.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import logger from '@/lib/logger.ts';
@@ -297,6 +327,7 @@ defineProps<{
 
 const {
     tt,
+    joinMultiText,
     getCurrentNumeralSystemType,
     getAllSupportedImportFileCagtegoryAndTypes,
     formatNumberToLocalizedNumerals
@@ -316,7 +347,19 @@ const importTransactionExecuteCustomScriptTab = useTemplateRef<ImportTransaction
 const importTransactionCheckDataTab = useTemplateRef<ImportTransactionCheckDataTabType>('importTransactionCheckDataTab');
 const fileInput = useTemplateRef<HTMLInputElement>('fileInput');
 
+const allSupportedAdditionalOptions: KeyAndName[] = [
+    {
+        key: 'payeeAsTag',
+        name: 'Parse Payee as Tag'
+    },
+    {
+        key: 'payeeAsDescription',
+        name: 'Parse Payee as Description'
+    }
+];
+
 const showState = ref<boolean>(false);
+const additionalOptionsMenuState = ref<boolean>(false);
 const clientSessionId = ref<string>('');
 const currentStep = ref<ImportTransactionDialogStep>('uploadFile');
 const importProcess = ref<number>(0);
@@ -326,6 +369,7 @@ const fileEncoding = ref<string>('utf-8');
 const processDSVMethod = ref<ImportDSVProcessMethod>(ImportDSVProcessMethod.ColumnMapping);
 const importFile = ref<File | null>(null);
 const importData = ref<string>('');
+const importAdditionalOptions = ref<ImportFileTypeSupportedAdditionalOptions>({});
 const parsedFileData = ref<string[][] | undefined>(undefined);
 const importTransactions = ref<ImportTransaction[] | undefined>(undefined);
 
@@ -342,6 +386,7 @@ const allSupportedImportFileCategoryAndTypes = computed<LocalizedImportFileCateg
 const allFileSubTypes = computed<LocalizedImportFileTypeSubType[] | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.subTypes);
 const allSupportedEncodings = computed<LocalizedImportFileTypeSupportedEncodings[] | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.supportedEncodings);
 const isImportDataFromTextbox = computed<boolean>(() => allSupportedImportFileTypesMap.value[fileType.value]?.dataFromTextbox ?? false);
+const supportedAdditionalOptions = computed<ImportFileTypeSupportedAdditionalOptions | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.supportedAdditionalOptions);
 
 const allSteps = computed<StepBarItem[]>(() => {
     const steps: StepBarItem[] = [
@@ -408,6 +453,26 @@ const supportedImportFileExtensions = computed<string | undefined>(() => {
     return allSupportedImportFileTypesMap.value[fileType.value]?.extensions;
 });
 
+const displaySelectedAdditionalOptions = computed<string>(() => {
+    if (!supportedAdditionalOptions.value) {
+        return tt('None');
+    }
+
+    const selectedOptions: string[] = [];
+
+    for (const option of allSupportedAdditionalOptions) {
+        if (isDefined(supportedAdditionalOptions.value[option.key]) && importAdditionalOptions.value[option.key]) {
+            selectedOptions.push(tt(option.name));
+        }
+    }
+
+    if (selectedOptions.length < 1) {
+        return tt('None');
+    }
+
+    return joinMultiText(selectedOptions);
+});
+
 const exportFileGuideDocumentUrl = computed<string | undefined>(() => {
     const document = allSupportedImportFileTypesMap.value[fileType.value]?.document;
 
@@ -437,6 +502,7 @@ function open(): Promise<void> {
     importProcess.value = 0;
     importFile.value = null;
     importData.value = '';
+    importAdditionalOptions.value = Object.assign({}, supportedAdditionalOptions.value ?? {});
     parsedFileData.value = undefined;
     importTransactionDefineColumnTab.value?.reset();
     importTransactionExecuteCustomScriptTab.value?.reset();
@@ -614,6 +680,7 @@ function parseData(): void {
 
         transactionsStore.parseImportTransaction({
             fileType: type,
+            additionalOptions: importAdditionalOptions.value,
             fileEncoding: encoding,
             importFile: uploadFile,
             columnMapping: columnMapping,
@@ -773,6 +840,7 @@ watch(fileType, () => {
 
     importFile.value = null;
     parsedFileData.value = undefined;
+    importAdditionalOptions.value = Object.assign({}, supportedAdditionalOptions.value ?? {});
     importTransactions.value = undefined;
 });
 

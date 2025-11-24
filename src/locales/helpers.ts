@@ -1525,6 +1525,7 @@ export function useI18n() {
                     subTypes: subTypes.length ? subTypes : undefined,
                     supportedEncodings: supportedEncodings.length ? supportedEncodings : undefined,
                     dataFromTextbox: fileType.dataFromTextbox,
+                    supportedAdditionalOptions: fileType.supportedAdditionalOptions,
                     document: document
                 };
 

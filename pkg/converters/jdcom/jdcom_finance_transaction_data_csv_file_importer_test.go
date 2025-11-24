@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -13,7 +14,7 @@ import (
 )
 
 func TestJDComFinanceCsvFileImporterParseImportedData_MinimumValidData(t *testing.T) {
-	converter := JDComFinanceTransactionDataCsvFileImporter
+	importer := JDComFinanceTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -30,7 +31,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_MinimumValidData(t *testin
 		"2025-09-01 12:34:56,xxx,xxx,123.45,银行卡,交易成功,支出,其他网购\n" +
 		"2025-09-01 23:59:59,xxx,京东钱包余额充值,0.05,银行卡,交易成功,不计收支,余额\n" +
 		"2025-09-02 23:59:59,xxx,京东余额提现,0.03,银行卡,交易成功,不计收支,余额\n"
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 4, len(allNewTransactions))
@@ -93,7 +94,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_MinimumValidData(t *testin
 }
 
 func TestJDComFinanceCsvFileImporterParseImportedData_ParseRefundTransaction(t *testing.T) {
-	converter := JDComFinanceTransactionDataCsvFileImporter
+	importer := JDComFinanceTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -110,7 +111,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseRefundTransaction(t *
 		"2025-09-01 02:34:56,xxx,xxx,0.12(已全额退款),银行卡,交易成功,不计收支\n" +
 		"2025-09-02 01:23:45,xxx,xxx,3.45,银行卡,退款成功,不计收支\n" +
 		"2025-09-02 02:34:56,xxx,xxx,123.45(已退款3.45),银行卡,交易成功,支出\n"
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, int64(1234567890), allNewTransactions[0].Uid)
@@ -139,7 +140,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseRefundTransaction(t *
 }
 
 func TestJDComFinanceCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T) {
-	converter := JDComFinanceTransactionDataCsvFileImporter
+	importer := JDComFinanceTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -153,7 +154,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseInvalidTime(t *testin
 		"\n" +
 		"交易时间,商户名称,交易说明,金额,收/付款方式,交易状态,收/支\n" +
 		"2025-09-01T01:23:45,xxx,xxx,0.12,银行卡,交易成功,支出\n"
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
 	data2 := "导出信息：\n" +
@@ -162,12 +163,12 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseInvalidTime(t *testin
 		"\n" +
 		"交易时间,商户名称,交易说明,金额,收/付款方式,交易状态,收/支\n" +
 		"09/01/2025 01:23:45,xxx,xxx,0.12,银行卡,交易成功,支出\n"
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
 
 func TestJDComFinanceCsvFileImporterParseImportedData_ParseInvalidType(t *testing.T) {
-	converter := JDComFinanceTransactionDataCsvFileImporter
+	importer := JDComFinanceTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -181,12 +182,12 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseInvalidType(t *testin
 		"\n" +
 		"交易时间,商户名称,交易说明,金额,收/付款方式,交易状态,收/支\n" +
 		"2025-09-01 01:23:45,xxx,xxx,0.12,银行卡,交易成功,转账\n"
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
 func TestJDComFinanceCsvFileImporterParseImportedData_ParseInvalidAmount(t *testing.T) {
-	converter := JDComFinanceTransactionDataCsvFileImporter
+	importer := JDComFinanceTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -200,12 +201,12 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseInvalidAmount(t *test
 		"\n" +
 		"交易时间,商户名称,交易说明,金额,收/付款方式,交易状态,收/支\n" +
 		"2025-09-01 01:23:45,xxx,xxx,￥0.12,银行卡,交易成功,支出\n"
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }
 
 func TestJDComFinanceCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
-	converter := JDComFinanceTransactionDataCsvFileImporter
+	importer := JDComFinanceTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -220,7 +221,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseAccountName(t *testin
 		"\n" +
 		"交易时间,商户名称,交易说明,金额,收/付款方式,交易状态,收/支,交易分类\n" +
 		"2025-09-01 01:23:45,xxx,京东钱包余额充值,0.05,银行卡,交易成功,不计收支,余额\n"
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -235,7 +236,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseAccountName(t *testin
 		"\n" +
 		"交易时间,商户名称,交易说明,金额,收/付款方式,交易状态,收/支,交易分类\n" +
 		"2025-09-01 01:23:45,xxx,京东余额提现,0.05,银行卡,交易成功,不计收支,余额\n"
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -252,7 +253,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseAccountName(t *testin
 		"2025-09-01 01:23:45,xxx,京东小金库-转入,0.05,余额,交易成功,不计收支,小金库\n"
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data3), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data3), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -269,7 +270,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseAccountName(t *testin
 		"2025-09-01 01:23:45,xxx,京东小金库-转出,0.05,余额,交易成功,不计收支,小金库\n"
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data4), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data4), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -286,7 +287,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseAccountName(t *testin
 		"2025-09-01 01:23:45,xxx,价保退款,0.05,银行卡,交易成功,不计收支,其他\n"
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data5), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data5), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -302,7 +303,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseAccountName(t *testin
 		"2025-09-01 01:23:45,xxx,白条主动还款,0.05,银行卡,交易成功,不计收支,白条\n"
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data6), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data6), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -312,7 +313,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseAccountName(t *testin
 }
 
 func TestJDComFinanceCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
-	converter := JDComFinanceTransactionDataCsvFileImporter
+	importer := JDComFinanceTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -326,7 +327,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseDescription(t *testin
 		"\n" +
 		"交易时间,商户名称,交易说明,金额,收/付款方式,交易状态,收/支\n" +
 		"2025-09-01 01:23:45,xxx,,0.12,银行卡,交易成功,支出\n"
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -338,7 +339,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseDescription(t *testin
 		"\n" +
 		"交易时间,商户名称,交易说明,交易说明,金额,收/付款方式,交易状态,收/支,备注\n" +
 		"2025-09-01 01:23:45,xxx,xxx,Test,0.12,银行卡,交易成功,支出,\"foo\"\"bar,\ntest\"\n"
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "foo\"bar,\ntest", allNewTransactions[0].Comment)
 
@@ -348,13 +349,13 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseDescription(t *testin
 		"\n" +
 		"交易时间,商户名称,交易说明,交易说明,金额,收/付款方式,交易状态,收/支,备注\n" +
 		"2025-09-01 01:23:45,xxx,xxx,Test,0.12,银行卡,交易成功,支出,\n"
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data3), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data3), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "Test", allNewTransactions[0].Comment)
 }
 
 func TestJDComFinanceCsvFileImporterParseImportedData_SkipUnknownStatusTransaction(t *testing.T) {
-	converter := JDComFinanceTransactionDataCsvFileImporter
+	importer := JDComFinanceTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -368,12 +369,12 @@ func TestJDComFinanceCsvFileImporterParseImportedData_SkipUnknownStatusTransacti
 		"\n" +
 		"交易时间,商户名称,交易说明,金额,收/付款方式,交易状态,收/支\n" +
 		"2025-09-01 01:23:45,xxx,xxx,0.12,银行卡,xxxx,支出\n"
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
 func TestJDComFinanceCsvFileImporterParseImportedData_SkipUnknownMemoTransferTransaction(t *testing.T) {
-	converter := JDComFinanceTransactionDataCsvFileImporter
+	importer := JDComFinanceTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -387,12 +388,12 @@ func TestJDComFinanceCsvFileImporterParseImportedData_SkipUnknownMemoTransferTra
 		"\n" +
 		"交易时间,商户名称,交易说明,金额,收/付款方式,交易状态,收/支\n" +
 		"2025-09-01 01:23:45,xxx,xxx,0.12,银行卡,交易成功,不计收支\n"
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
 func TestJDComFinanceCsvFileImporterParseImportedData_MissingFileHeader(t *testing.T) {
-	converter := JDComFinanceTransactionDataCsvFileImporter
+	importer := JDComFinanceTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -402,15 +403,15 @@ func TestJDComFinanceCsvFileImporterParseImportedData_MissingFileHeader(t *testi
 
 	data := "交易时间,商户名称,交易说明,金额,收/付款方式,交易状态,收/支\n" +
 		"2025-09-01 01:23:45,xxx,xxx,0.12,银行卡,交易成功,支出\n"
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidFileHeader.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(""), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidFileHeader.Message)
 }
 
 func TestJDComFinanceCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing.T) {
-	converter := JDComFinanceTransactionDataCsvFileImporter
+	importer := JDComFinanceTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -425,7 +426,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_MissingRequiredColumn(t *t
 		"\n" +
 		"商户名称,交易说明,金额,收/付款方式,交易状态,收/支\n" +
 		"xxx,xxx,0.12,银行卡,交易成功,支出\n"
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidFileHeader.Message)
 
 	// Missing Merchant Name Column
@@ -435,7 +436,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_MissingRequiredColumn(t *t
 		"\n" +
 		"交易时间,交易说明,金额,收/付款方式,交易状态,收/支\n" +
 		"2025-09-01 01:23:45,xxx,0.12,银行卡,交易成功,支出\n"
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Transaction Memo Column
@@ -445,7 +446,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_MissingRequiredColumn(t *t
 		"\n" +
 		"交易时间,商户名称,金额,收/付款方式,交易状态,收/支\n" +
 		"2025-09-01 01:23:45,xxx,0.12,银行卡,交易成功,支出\n"
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data3), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data3), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Amount Column
@@ -455,7 +456,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_MissingRequiredColumn(t *t
 		"\n" +
 		"交易时间,商户名称,交易说明,收/付款方式,交易状态,收/支\n" +
 		"2025-09-01 01:23:45,xxx,xxx,银行卡,交易成功,支出\n"
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data4), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data4), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Related Account Column
@@ -465,7 +466,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_MissingRequiredColumn(t *t
 		"\n" +
 		"交易时间,商户名称,交易说明,金额,交易状态,收/支\n" +
 		"2025-09-01 01:23:45,xxx,xxx,0.12,交易成功,支出\n"
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data5), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data5), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Status Column
@@ -475,7 +476,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_MissingRequiredColumn(t *t
 		"\n" +
 		"交易时间,商户名称,交易说明,金额,收/付款方式,收/支\n" +
 		"2025-09-01 01:23:45,xxx,xxx,0.12,银行卡,支出\n"
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data6), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data6), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Type Column
@@ -485,12 +486,12 @@ func TestJDComFinanceCsvFileImporterParseImportedData_MissingRequiredColumn(t *t
 		"\n" +
 		"交易时间,商户名称,交易说明,金额,收/付款方式,交易状态\n" +
 		"2025-09-01 01:23:45,xxx,xxx,0.12,银行卡,交易成功\n"
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data7), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data7), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 }
 
 func TestJDComFinanceCsvFileImporterParseImportedData_NoTransactionData(t *testing.T) {
-	converter := JDComFinanceTransactionDataCsvFileImporter
+	importer := JDComFinanceTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -503,6 +504,6 @@ func TestJDComFinanceCsvFileImporterParseImportedData_NoTransactionData(t *testi
 		"日期区间：2025-01-01 至 2025-09-01\n" +
 		"\n" +
 		"交易时间,商户名称,交易说明,金额,收/付款方式,交易状态,收/支\n"
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }

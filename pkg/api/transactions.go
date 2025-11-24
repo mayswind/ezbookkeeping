@@ -1405,6 +1405,15 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 
 	fileType := fileTypes[0]
 
+	textualOptions := form.Value["options"]
+	textualOption := ""
+
+	if len(textualOptions) > 0 {
+		textualOption = textualOptions[0]
+	}
+
+	additionalOptions := converter.ParseImporterOptions(textualOption)
+
 	var dataImporter converter.TransactionDataImporter
 
 	if converters.IsCustomDelimiterSeparatedValuesFileType(fileType) {
@@ -1581,7 +1590,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 
 	tagMap := a.transactionTags.GetVisibleTagNameMapByList(tags)
 
-	parsedTransactions, _, _, _, _, _, err := dataImporter.ParseImportedData(c, user, fileData, utcOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
+	parsedTransactions, _, _, _, _, _, err := dataImporter.ParseImportedData(c, user, fileData, utcOffset, additionalOptions, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 
 	if err != nil {
 		log.Errorf(c, "[transactions.TransactionParseImportFileHandler] failed to parse imported data for user \"uid:%d\", because %s", user.Uid, err.Error())

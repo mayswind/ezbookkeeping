@@ -168,7 +168,11 @@ export const SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES: ImportFileCategoryAndType
                         type: 'qif_dmy',
                         name: 'Day-month-year format',
                     }
-                ]
+                ],
+                supportedAdditionalOptions: {
+                    payeeAsTag: false,
+                    payeeAsDescription: true
+                }
             },
             {
                 type: 'iif',

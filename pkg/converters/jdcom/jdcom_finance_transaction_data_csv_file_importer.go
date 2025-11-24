@@ -27,7 +27,7 @@ var (
 )
 
 // ParseImportedData returns the imported data by parsing the jd.com finance transaction csv data
-func (c *jdComFinanceTransactionDataCsvFileImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
+func (c *jdComFinanceTransactionDataCsvFileImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, additionalOptions converter.TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	fallback := unicode.UTF8.NewDecoder()
 	reader := transform.NewReader(bytes.NewReader(data), unicode.BOMOverride(fallback))
 
@@ -60,5 +60,5 @@ func (c *jdComFinanceTransactionDataCsvFileImporter) ParseImportedData(ctx core.
 	transactionDataTable := datatable.CreateNewTransactionDataTableFromCommonDataTable(commonDataTable, jdComFinanceTransactionSupportedColumns, transactionRowParser)
 	dataTableImporter := converter.CreateNewSimpleImporterWithTypeNameMapping(jdComFinanceTransactionTypeNameMapping)
 
-	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
+	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, additionalOptions, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }

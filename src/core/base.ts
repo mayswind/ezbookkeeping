@@ -75,6 +75,11 @@ export interface NameNumeralValue {
     readonly value: number;
 }
 
+export interface KeyAndName {
+    readonly key: string;
+    readonly name: string;
+}
+
 export interface TypeAndName {
     readonly type: number;
     readonly name: string;

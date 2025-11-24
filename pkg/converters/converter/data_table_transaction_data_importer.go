@@ -29,7 +29,7 @@ type DataTableTransactionDataImporter struct {
 }
 
 // ParseImportedData returns the imported transaction data
-func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, user *models.User, dataTable datatable.TransactionDataTable, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
+func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, user *models.User, dataTable datatable.TransactionDataTable, defaultTimezoneOffset int16, additionalOptions TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	if dataTable.TransactionRowCount() < 1 {
 		log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] cannot parse import data for user \"uid:%d\", because data table row count is less 1", user.Uid)
 		return nil, nil, nil, nil, nil, nil, errs.ErrNotFoundTransactionDataInFile
@@ -303,6 +303,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 
 		var tagIds []string
 		var tagNames []string
+		tagNamesMap := make(map[string]bool)
 
 		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_TAGS) {
 			var tagNameItems []string
@@ -316,7 +317,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 			for i := 0; i < len(tagNameItems); i++ {
 				tagName := tagNameItems[i]
 
-				if tagName == "" {
+				if tagName == "" || tagNamesMap[tagName] {
 					continue
 				}
 
@@ -333,6 +334,28 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 				}
 
 				tagNames = append(tagNames, tagName)
+				tagNamesMap[tagName] = true
+			}
+		}
+
+		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_PAYEE) && additionalOptions.IsPayeeAsTag() {
+			payee := dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_PAYEE)
+
+			if payee != "" && !tagNamesMap[payee] {
+				tag, exists := tagMap[payee]
+
+				if !exists {
+					tag = c.createNewTransactionTagModel(user.Uid, payee)
+					allNewTags = append(allNewTags, tag)
+					tagMap[payee] = tag
+				}
+
+				if tag != nil {
+					tagIds = append(tagIds, utils.Int64ToString(tag.TagId))
+				}
+
+				tagNames = append(tagNames, payee)
+				tagNamesMap[payee] = true
 			}
 		}
 
@@ -340,6 +363,10 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 
 		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_DESCRIPTION) {
 			description = dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_DESCRIPTION)
+		}
+
+		if description == "" && additionalOptions.IsPayeeAsDescription() && dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_PAYEE) {
+			description = dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_PAYEE)
 		}
 
 		transaction := &models.ImportTransaction{

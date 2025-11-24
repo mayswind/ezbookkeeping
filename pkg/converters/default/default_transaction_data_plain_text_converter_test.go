@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -12,7 +13,7 @@ import (
 )
 
 func TestDefaultTransactionDataCSVFileConverterToExportedContent(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	exporter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	transactions := make([]*models.Transaction, 3)
@@ -119,14 +120,14 @@ func TestDefaultTransactionDataCSVFileConverterToExportedContent(t *testing.T) {
 		"2024-09-01 12:34:56,+08:00,Income,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,123.450000 45.670000,Test Tag;Test Tag2,Hello World\n" +
 		"2024-09-01 12:34:56,+00:00,Expense,Test Category2,Test Sub Category2,Test Account,CNY,-0.10,,,,,Test Tag,Foo#Bar\n" +
 		"2024-09-01 12:34:56,-05:00,Transfer,Test Category3,Test Sub Category3,Test Account,CNY,123.45,Test Account2,USD,17.35,,Test Tag2,T\te s t test\n"
-	actualContent, err := converter.ToExportedContent(context, 123, transactions, accountMap, categoryMap, tagMap, allTagIndexes)
+	actualContent, err := exporter.ToExportedContent(context, 123, transactions, accountMap, categoryMap, tagMap, allTagIndexes)
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedContent, string(actualContent))
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_MinimumValidData(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	importer := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -134,11 +135,11 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_MinimumValidDat
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
 		"2024-09-01 00:00:00,Balance Modification,,Test Account,123.45,,\n"+
 		"2024-09-01 01:23:45,Income,Test Category,Test Account,0.12,,\n"+
 		"2024-09-01 12:34:56,Expense,Test Category2,Test Account,1.00,,\n"+
-		"2024-09-01 23:59:59,Transfer,Test Category3,Test Account,0.05,Test Account2,0.05"), 0, nil, nil, nil, nil, nil)
+		"2024-09-01 23:59:59,Transfer,Test Category3,Test Account,0.05,Test Account2,0.05"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -197,7 +198,7 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_MinimumValidDat
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidTime(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	importer := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -205,17 +206,17 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidTim
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
-		"2024-09-01T12:34:56,Expense,Test Category,Test Account,123.45,,"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+		"2024-09-01T12:34:56,Expense,Test Category,Test Account,123.45,,"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
-		"09/01/2024 12:34:56,Expense,Test Category,Test Account,123.45,,"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+		"09/01/2024 12:34:56,Expense,Test Category,Test Account,123.45,,"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidType(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	importer := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -223,13 +224,13 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidTyp
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
-		"2024-09-01 12:34:56,Type,Test Category,Test Account,123.45,,"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+		"2024-09-01 12:34:56,Type,Test Category,Test Account,123.45,,"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTypeInvalid.Message)
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseValidTimezone(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	importer := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -237,27 +238,27 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseValidTimez
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Timezone,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
-		"2024-09-01 12:34:56,-10:00,Expense,Test Category,Test Account,123.45,,"), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("Time,Timezone,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+		"2024-09-01 12:34:56,-10:00,Expense,Test Category,Test Account,123.45,,"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, int64(1725230096), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Timezone,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
-		"2024-09-01 12:34:56,+00:00,Expense,Test Category,Test Account,123.45,,"), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("Time,Timezone,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+		"2024-09-01 12:34:56,+00:00,Expense,Test Category,Test Account,123.45,,"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, int64(1725194096), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Timezone,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
-		"2024-09-01 12:34:56,+12:45,Expense,Test Category,Test Account,123.45,,"), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("Time,Timezone,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+		"2024-09-01 12:34:56,+12:45,Expense,Test Category,Test Account,123.45,,"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, int64(1725148196), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidTimezone(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	importer := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -265,13 +266,13 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidTim
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Timezone,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
-		"2024-09-01 12:34:56,Asia/Shanghai,Expense,Test Category,Test Account,123.45,,"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("Time,Timezone,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+		"2024-09-01 12:34:56,Asia/Shanghai,Expense,Test Category,Test Account,123.45,,"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeZoneInvalid.Message)
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseValidAccountCurrency(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	importer := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -279,9 +280,9 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseValidAccou
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
+	allNewTransactions, allNewAccounts, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
 		"2024-09-01 01:23:45,Balance Modification,,Test Account,USD,123.45,,,\n"+
-		"2024-09-01 12:34:56,Transfer,Test Category2,Test Account,USD,1.23,Test Account2,EUR,1.10"), 0, nil, nil, nil, nil, nil)
+		"2024-09-01 12:34:56,Transfer,Test Category2,Test Account,USD,1.23,Test Account2,EUR,1.10"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -298,7 +299,7 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseValidAccou
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidAccountCurrency(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	importer := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -306,19 +307,19 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidAcc
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
 		"2024-09-01 01:23:45,Balance Modification,,Test Account,USD,123.45,,,\n"+
-		"2024-09-01 12:34:56,Transfer,Test Category3,Test Account,CNY,1.23,Test Account2,EUR,1.10"), 0, nil, nil, nil, nil, nil)
+		"2024-09-01 12:34:56,Transfer,Test Category3,Test Account,CNY,1.23,Test Account2,EUR,1.10"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
 		"2024-09-01 01:23:45,Balance Modification,,Test Account,USD,123.45,,,\n"+
-		"2024-09-01 12:34:56,Transfer,Test Category3,Test Account2,CNY,1.23,Test Account,EUR,1.10"), 0, nil, nil, nil, nil, nil)
+		"2024-09-01 12:34:56,Transfer,Test Category3,Test Account2,CNY,1.23,Test Account,EUR,1.10"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseNotSupportedCurrency(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	importer := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -326,17 +327,17 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseNotSupport
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
-		"2024-09-01 01:23:45,Balance Modification,,Test Account,XXX,123.45,,,"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
+		"2024-09-01 01:23:45,Balance Modification,,Test Account,XXX,123.45,,,"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
-		"2024-09-01 01:23:45,Transfer,Test Category,Test Account,USD,123.45,Test Account2,XXX,123.45"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
+		"2024-09-01 01:23:45,Transfer,Test Category,Test Account,USD,123.45,Test Account2,XXX,123.45"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidAmount(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	importer := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -344,17 +345,17 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidAmo
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
-		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123 45,,"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123 45,,"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
-		"2024-09-01 12:34:56,Transfer,Test Category,Test Account,123.45,Test Account2,123 45"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+		"2024-09-01 12:34:56,Transfer,Test Category,Test Account,123.45,Test Account2,123 45"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseNoAmount2(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	importer := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -362,15 +363,15 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseNoAmount2(
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2\n"+
-		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,"), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2\n"+
+		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, int64(12345), allNewTransactions[0].Amount)
 	assert.Equal(t, int64(0), allNewTransactions[0].RelatedAccountAmount)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2\n"+
-		"2024-09-01 12:34:56,Transfer,Test Category,Test Account,123.45,Test Account2"), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2\n"+
+		"2024-09-01 12:34:56,Transfer,Test Category,Test Account,123.45,Test Account2"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, int64(12345), allNewTransactions[0].Amount)
@@ -378,7 +379,7 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseNoAmount2(
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseValidGeographicLocation(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	importer := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -386,8 +387,8 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseValidGeogr
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Geographic Location\n"+
-		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,,,123.45 45.56"), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Geographic Location\n"+
+		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,,,123.45 45.56"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -396,7 +397,7 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseValidGeogr
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidGeographicLocation(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	importer := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -404,24 +405,24 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidGeo
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Geographic Location\n"+
-		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,,,1"), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Geographic Location\n"+
+		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,,,1"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, float64(0), allNewTransactions[0].GeoLongitude)
 	assert.Equal(t, float64(0), allNewTransactions[0].GeoLatitude)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Geographic Location\n"+
-		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,,,a b"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Geographic Location\n"+
+		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,,,a b"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrGeographicLocationInvalid.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Geographic Location\n"+
-		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,,,1 "), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Geographic Location\n"+
+		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,,,1 "), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrGeographicLocationInvalid.Message)
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseTag(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	importer := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -429,8 +430,8 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseTag(t *tes
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, allNewTags, err := converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Tags\n"+
-		"2024-09-01 00:00:00,Balance Modification,,Test Account,123.45,,,foo;;bar.;#test;hello\tworld;;"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, allNewTags, err := importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Tags\n"+
+		"2024-09-01 00:00:00,Balance Modification,,Test Account,123.45,,,foo;;bar.;#test;hello\tworld;;"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -450,7 +451,7 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseTag(t *tes
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseDescription(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	importer := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -458,8 +459,8 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseDescriptio
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Description\n"+
-		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,,,foo    bar\t#test"), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Description\n"+
+		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,,,foo    bar\t#test"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -467,7 +468,7 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseDescriptio
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_MissingFileHeader(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	importer := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -475,12 +476,12 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_MissingFileHead
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(""), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_MissingRequiredColumn(t *testing.T) {
-	converter := DefaultTransactionDataCSVFileConverter
+	importer := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -489,32 +490,32 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_MissingRequired
 	}
 
 	// Missing Time Column
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
-		"+08:00,Balance Modification,,Test Sub Category,Test Account,CNY,123.45,,,,,,"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
+		"+08:00,Balance Modification,,Test Sub Category,Test Account,CNY,123.45,,,,,,"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Type Column
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
-		"2024-09-01 00:00:00,+08:00,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,,,"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("Time,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
+		"2024-09-01 00:00:00,+08:00,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,,,"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Sub Category Column
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Type,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
-		"2024-09-01 00:00:00,+08:00,Balance Modification,Test Account,CNY,123.45,,,,,,"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("Time,Type,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
+		"2024-09-01 00:00:00,+08:00,Balance Modification,Test Account,CNY,123.45,,,,,,"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Account Name Column
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Timezone,Type,Category,Sub Category,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
-		"2024-09-01 00:00:00,+08:00,Balance Modification,,Test Sub Category,CNY,123.45,,,,,,"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("Time,Timezone,Type,Category,Sub Category,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
+		"2024-09-01 00:00:00,+08:00,Balance Modification,,Test Sub Category,CNY,123.45,,,,,,"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Amount Column
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
-		"2024-09-01 00:00:00,+08:00,Balance Modification,,Test Sub Category,Test Account,CNY,,,,,,"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
+		"2024-09-01 00:00:00,+08:00,Balance Modification,,Test Sub Category,Test Account,CNY,,,,,,"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Account2 Name Column
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
-		"2024-09-01 00:00:00,+08:00,Balance Modification,,Test Sub Category,Test Account,CNY,123.45,,,,,"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
+		"2024-09-01 00:00:00,+08:00,Balance Modification,,Test Sub Category,Test Account,CNY,123.45,,,,,"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 }

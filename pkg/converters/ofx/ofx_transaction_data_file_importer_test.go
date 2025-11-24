@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -12,7 +13,7 @@ import (
 )
 
 func TestOFXTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) {
-	converter := OFXTransactionDataImporter
+	importer := OFXTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -20,7 +21,7 @@ func TestOFXTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) 
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"  <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -76,7 +77,7 @@ func TestOFXTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) 
 			"      </CCSTMTRS>\n"+
 			"    </CCSTMTTRNRS>\n"+
 			"  </CREDITCARDMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -160,7 +161,7 @@ func TestOFXTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) 
 }
 
 func TestOFXTransactionDataFileParseImportedData_ParseAccountTo(t *testing.T) {
-	converter := OFXTransactionDataImporter
+	importer := OFXTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -168,7 +169,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseAccountTo(t *testing.T) {
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, allNewAccounts, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"  <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -210,7 +211,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseAccountTo(t *testing.T) {
 			"      </CCSTMTRS>\n"+
 			"    </CCSTMTTRNRS>\n"+
 			"  </CREDITCARDMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -243,7 +244,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseAccountTo(t *testing.T) {
 }
 
 func TestOFXTransactionDataFileParseImportedData_ParseValidTransactionTime(t *testing.T) {
-	converter := OFXTransactionDataImporter
+	importer := OFXTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -251,7 +252,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseValidTransactionTime(t *te
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"  <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -295,7 +296,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseValidTransactionTime(t *te
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -310,7 +311,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseValidTransactionTime(t *te
 }
 
 func TestOFXTransactionDataFileParseImportedData_ParseInvalidTransactionTime(t *testing.T) {
-	converter := OFXTransactionDataImporter
+	importer := OFXTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -318,7 +319,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseInvalidTransactionTime(t *
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"  <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -337,10 +338,10 @@ func TestOFXTransactionDataFileParseImportedData_ParseInvalidTransactionTime(t *
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"  <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -359,10 +360,10 @@ func TestOFXTransactionDataFileParseImportedData_ParseInvalidTransactionTime(t *
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"  <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -381,10 +382,10 @@ func TestOFXTransactionDataFileParseImportedData_ParseInvalidTransactionTime(t *
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"  <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -403,12 +404,12 @@ func TestOFXTransactionDataFileParseImportedData_ParseInvalidTransactionTime(t *
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
 
 func TestOFXTransactionDataFileParseImportedData_ParseAmount_CommaAsDecimalPoint(t *testing.T) {
-	converter := OFXTransactionDataImporter
+	importer := OFXTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -416,7 +417,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseAmount_CommaAsDecimalPoint
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"  <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -435,7 +436,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseAmount_CommaAsDecimalPoint
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -444,7 +445,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseAmount_CommaAsDecimalPoint
 }
 
 func TestOFXTransactionDataFileParseImportedData_ParseInvalidAmount(t *testing.T) {
-	converter := OFXTransactionDataImporter
+	importer := OFXTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -452,7 +453,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseInvalidAmount(t *testing.T
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"  <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -471,12 +472,12 @@ func TestOFXTransactionDataFileParseImportedData_ParseInvalidAmount(t *testing.T
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }
 
 func TestOFXTransactionDataFileParseImportedData_ParseTransactionCurrency(t *testing.T) {
-	converter := OFXTransactionDataImporter
+	importer := OFXTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -484,7 +485,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseTransactionCurrency(t *tes
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"  <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -504,7 +505,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseTransactionCurrency(t *tes
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -512,7 +513,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseTransactionCurrency(t *tes
 }
 
 func TestOFXTransactionDataFileParseImportedData_ParseDescription(t *testing.T) {
-	converter := OFXTransactionDataImporter
+	importer := OFXTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -520,7 +521,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"  <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -541,13 +542,13 @@ func TestOFXTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "foo    bar\t#test", allNewTransactions[0].Comment)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"  <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -567,13 +568,13 @@ func TestOFXTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "Test", allNewTransactions[0].Comment)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"  <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -595,7 +596,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -603,7 +604,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 }
 
 func TestOFXTransactionDataFileParseImportedData_MissingAccountFromNode(t *testing.T) {
-	converter := OFXTransactionDataImporter
+	importer := OFXTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -612,7 +613,7 @@ func TestOFXTransactionDataFileParseImportedData_MissingAccountFromNode(t *testi
 	}
 
 	// Missing Posted Date Node
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"  <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -628,12 +629,12 @@ func TestOFXTransactionDataFileParseImportedData_MissingAccountFromNode(t *testi
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingAccountData.Message)
 }
 
 func TestOFXTransactionDataFileParseImportedData_MissingCurrencyNode(t *testing.T) {
-	converter := OFXTransactionDataImporter
+	importer := OFXTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -642,7 +643,7 @@ func TestOFXTransactionDataFileParseImportedData_MissingCurrencyNode(t *testing.
 	}
 
 	// Missing Default Currency Node
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"    <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -660,12 +661,12 @@ func TestOFXTransactionDataFileParseImportedData_MissingCurrencyNode(t *testing.
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 }
 
 func TestOFXTransactionDataFileParseImportedData_MissingTransactionRequiredNode(t *testing.T) {
-	converter := OFXTransactionDataImporter
+	importer := OFXTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -674,7 +675,7 @@ func TestOFXTransactionDataFileParseImportedData_MissingTransactionRequiredNode(
 	}
 
 	// Missing Posted Date Node
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"    <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -692,11 +693,11 @@ func TestOFXTransactionDataFileParseImportedData_MissingTransactionRequiredNode(
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingTransactionTime.Message)
 
 	// Missing Transaction Type Node
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"    <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -714,11 +715,11 @@ func TestOFXTransactionDataFileParseImportedData_MissingTransactionRequiredNode(
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTypeInvalid.Message)
 
 	// Missing Amount Node
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"<OFX>\n"+
 			"    <BANKMSGSRSV1>\n"+
 			"    <STMTTRNRS>\n"+
@@ -736,6 +737,6 @@ func TestOFXTransactionDataFileParseImportedData_MissingTransactionRequiredNode(
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, nil, nil, nil, nil, nil)
+			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }

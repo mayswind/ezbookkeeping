@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -12,7 +13,7 @@ import (
 )
 
 func TestQIFTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) {
-	converter := QifYearMonthDayTransactionDataImporter
+	importer := QifYearMonthDayTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -20,7 +21,7 @@ func TestQIFTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) 
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, []byte(
 		"!Type:Bank\n"+
 			"D2024-09-01\n"+
 			"T123.45\n"+
@@ -42,7 +43,7 @@ func TestQIFTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) 
 			"D2024-09-05\n"+
 			"T0.06\n"+
 			"L[Test Account2]\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -113,7 +114,7 @@ func TestQIFTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) 
 }
 
 func TestQIFTransactionDataFileParseImportedData_ParseYearMonthDayDateFormatTime(t *testing.T) {
-	converter := QifYearMonthDayTransactionDataImporter
+	importer := QifYearMonthDayTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -121,7 +122,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseYearMonthDayDateFormatTime
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"!Type:Bank\n"+
 			"D2024-09-01\n"+
 			"T-123.45\n"+
@@ -137,7 +138,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseYearMonthDayDateFormatTime
 			"^\n"+
 			"D2024'9.5\n"+
 			"T-123.45\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -151,7 +152,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseYearMonthDayDateFormatTime
 }
 
 func TestQIFTransactionDataFileParseImportedData_ParseMonthDayYearDateFormatTime(t *testing.T) {
-	converter := QifMonthDayYearTransactionDataImporter
+	importer := QifMonthDayYearTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -159,7 +160,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseMonthDayYearDateFormatTime
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"!Type:Bank\n"+
 			"D09-01-2024\n"+
 			"T-123.45\n"+
@@ -175,7 +176,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseMonthDayYearDateFormatTime
 			"^\n"+
 			"D9.5'2024\n"+
 			"T-123.45\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -189,7 +190,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseMonthDayYearDateFormatTime
 }
 
 func TestQIFTransactionDataFileParseImportedData_ParseDayYearMonthDateFormatTime(t *testing.T) {
-	converter := QifDayMonthYearTransactionDataImporter
+	importer := QifDayMonthYearTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -197,7 +198,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseDayYearMonthDateFormatTime
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"!Type:Bank\n"+
 			"D01-09-2024\n"+
 			"T-123.45\n"+
@@ -213,7 +214,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseDayYearMonthDateFormatTime
 			"^\n"+
 			"D5'9.2024\n"+
 			"T-123.45\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -227,7 +228,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseDayYearMonthDateFormatTime
 }
 
 func TestQIFTransactionDataFileParseImportedData_ParseShortYearMonthDayDateFormatTime(t *testing.T) {
-	converter := QifYearMonthDayTransactionDataImporter
+	importer := QifYearMonthDayTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -235,7 +236,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseShortYearMonthDayDateForma
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"!Type:Bank\n"+
 			"D24-09-01\n"+
 			"T-123.45\n"+
@@ -251,7 +252,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseShortYearMonthDayDateForma
 			"^\n"+
 			"D24'9.5\n"+
 			"T-123.45\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -265,7 +266,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseShortYearMonthDayDateForma
 }
 
 func TestQIFTransactionDataFileParseImportedData_ParseInvalidTime(t *testing.T) {
-	converter := QifYearMonthDayTransactionDataImporter
+	importer := QifYearMonthDayTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -273,16 +274,16 @@ func TestQIFTransactionDataFileParseImportedData_ParseInvalidTime(t *testing.T) 
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"!Type:Bank\n"+
 			"D2024 09 01\n"+
 			"T-123.45\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
 
 func TestQIFTransactionDataFileParseImportedData_ParseAmountWithThousandsSeparator(t *testing.T) {
-	converter := QifYearMonthDayTransactionDataImporter
+	importer := QifYearMonthDayTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -290,11 +291,11 @@ func TestQIFTransactionDataFileParseImportedData_ParseAmountWithThousandsSeparat
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"!Type:Bank\n"+
 			"D2024-09-01\n"+
 			"T-123,456.78\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -304,7 +305,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseAmountWithThousandsSeparat
 }
 
 func TestQIFTransactionDataFileParseImportedData_ParseInvalidAmount(t *testing.T) {
-	converter := QifYearMonthDayTransactionDataImporter
+	importer := QifYearMonthDayTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -312,16 +313,16 @@ func TestQIFTransactionDataFileParseImportedData_ParseInvalidAmount(t *testing.T
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"!Type:Bank\n"+
 			"D2024-09-01\n"+
 			"T-123 45\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }
 
 func TestQIFTransactionDataFileParseImportedData_ParseAccountType(t *testing.T) {
-	converter := QifYearMonthDayTransactionDataImporter
+	importer := QifYearMonthDayTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -329,11 +330,11 @@ func TestQIFTransactionDataFileParseImportedData_ParseAccountType(t *testing.T) 
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"!Type:Cash\n"+
 			"D2024-09-01\n"+
 			"T-123.45\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -342,11 +343,11 @@ func TestQIFTransactionDataFileParseImportedData_ParseAccountType(t *testing.T) 
 	assert.Equal(t, int64(1725148800), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
 	assert.Equal(t, int64(12345), allNewTransactions[0].Amount)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"!Type:CCard\n"+
 			"D2024-09-01\n"+
 			"T-123.45\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -355,11 +356,11 @@ func TestQIFTransactionDataFileParseImportedData_ParseAccountType(t *testing.T) 
 	assert.Equal(t, int64(1725148800), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
 	assert.Equal(t, int64(12345), allNewTransactions[0].Amount)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"!Type:Oth A\n"+
 			"D2024-09-01\n"+
 			"T-123.45\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -368,11 +369,11 @@ func TestQIFTransactionDataFileParseImportedData_ParseAccountType(t *testing.T) 
 	assert.Equal(t, int64(1725148800), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
 	assert.Equal(t, int64(12345), allNewTransactions[0].Amount)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"!Type:Oth L\n"+
 			"D2024-09-01\n"+
 			"T-123.45\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -383,7 +384,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseAccountType(t *testing.T) 
 }
 
 func TestQIFTransactionDataFileParseImportedData_ParseAccount(t *testing.T) {
-	converter := QifYearMonthDayTransactionDataImporter
+	importer := QifYearMonthDayTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -391,14 +392,14 @@ func TestQIFTransactionDataFileParseImportedData_ParseAccount(t *testing.T) {
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, allNewAccounts, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"!Account\n"+
 			"NTest Account\n"+
 			"^\n"+
 			"!Type:Bank\n"+
 			"D2024-09-01\n"+
 			"T-123.45\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -412,7 +413,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseAccount(t *testing.T) {
 }
 
 func TestQIFTransactionDataFileParseImportedData_ParseAmountWithLeadingPlusSign(t *testing.T) {
-	converter := QifYearMonthDayTransactionDataImporter
+	importer := QifYearMonthDayTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -420,11 +421,11 @@ func TestQIFTransactionDataFileParseImportedData_ParseAmountWithLeadingPlusSign(
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"!Type:Bank\n"+
 			"D2024-09-01\n"+
 			"T+123.45\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -432,7 +433,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseAmountWithLeadingPlusSign(
 }
 
 func TestQIFTransactionDataFileParseImportedData_ParseSubCategory(t *testing.T) {
-	converter := QifYearMonthDayTransactionDataImporter
+	importer := QifYearMonthDayTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -440,12 +441,12 @@ func TestQIFTransactionDataFileParseImportedData_ParseSubCategory(t *testing.T) 
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, allNewSubExpenseCategories, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, allNewSubExpenseCategories, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"!Type:Bank\n"+
 			"D2024-09-01\n"+
 			"T-123.45\n"+
 			"LTest Category:Sub Category\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -458,7 +459,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseSubCategory(t *testing.T) 
 }
 
 func TestQIFTransactionDataFileParseImportedData_ParseDescription(t *testing.T) {
-	converter := QifYearMonthDayTransactionDataImporter
+	importer := QifYearMonthDayTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -466,7 +467,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"!Type:Bank\n"+
 			"D2024-09-01\n"+
 			"T-123.45\n"+
@@ -476,7 +477,24 @@ func TestQIFTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 			"D2024-09-02\n"+
 			"T-234.56\n"+
 			"PTest2\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(allNewTransactions))
+	assert.Equal(t, "foo    bar\t#test", allNewTransactions[0].Comment)
+	assert.Equal(t, "", allNewTransactions[1].Comment)
+
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+		"!Type:Bank\n"+
+			"D2024-09-01\n"+
+			"T-123.45\n"+
+			"PTest\n"+
+			"Mfoo    bar\t#test\n"+
+			"^\n"+
+			"D2024-09-02\n"+
+			"T-234.56\n"+
+			"PTest2\n"+
+			"^\n"), 0, converter.DefaultImporterOptions.WithPayeeAsDescription(), nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(allNewTransactions))
@@ -484,8 +502,41 @@ func TestQIFTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 	assert.Equal(t, "Test2", allNewTransactions[1].Comment)
 }
 
+func TestQIFTransactionDataFileParseImportedData_WithAdditionalOptions(t *testing.T) {
+	importer := QifYearMonthDayTransactionDataImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+		"!Type:Bank\n"+
+			"D2024-09-01\n"+
+			"T-123.45\n"+
+			"PTest2\n"+
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, 0, len(allNewTransactions[0].OriginalTagNames))
+
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+		"!Type:Bank\n"+
+			"D2024-09-01\n"+
+			"T-123.45\n"+
+			"PTest2\n"+
+			"^\n"), 0, converter.DefaultImporterOptions.WithPayeeAsTag(), nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, 1, len(allNewTransactions[0].OriginalTagNames))
+	assert.Equal(t, "Test2", allNewTransactions[0].OriginalTagNames[0])
+}
+
 func TestQIFTransactionDataFileParseImportedData_MissingRequiredFields(t *testing.T) {
-	converter := QifYearMonthDayTransactionDataImporter
+	importer := QifYearMonthDayTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -494,16 +545,16 @@ func TestQIFTransactionDataFileParseImportedData_MissingRequiredFields(t *testin
 	}
 
 	// Missing Time Field
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"!Type:Bank\n"+
 			"T-123.45\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingTransactionTime.Message)
 
 	// Missing Amount Field
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"!Type:Bank\n"+
 			"D2024-09-01\n"+
-			"^\n"), 0, nil, nil, nil, nil, nil)
+			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }

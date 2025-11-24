@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -185,7 +186,7 @@ const gnucashCommonValidDataCaseFooter = "</gnc:book>\n" +
 	"</gnc-v2>\n"
 
 func TestGnuCashTransactionDatabaseFileParseImportedData_MinimumValidData(t *testing.T) {
-	converter := GnuCashTransactionDataImporter
+	importer := GnuCashTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -193,14 +194,14 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_MinimumValidData(t *tes
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := converter.ParseImportedData(context, user, []byte(gnucashMinimumValidDataCase), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, []byte(gnucashMinimumValidDataCase), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	checkParsedMinimumValidData(t, allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags)
 }
 
 func TestGnuCashTransactionDatabaseFileParseImportedData_GzippedMinimumValidData(t *testing.T) {
-	converter := GnuCashTransactionDataImporter
+	importer := GnuCashTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -217,14 +218,14 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_GzippedMinimumValidData
 	assert.Nil(t, err)
 
 	gzippedData := buffer.Bytes()
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := converter.ParseImportedData(context, user, gzippedData, 0, nil, nil, nil, nil, nil)
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, gzippedData, 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	checkParsedMinimumValidData(t, allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags)
 }
 
 func TestGnuCashTransactionDatabaseFileParseImportedData_MinimumValidDataWithReversedSplitOrder(t *testing.T) {
-	converter := GnuCashTransactionDataImporter
+	importer := GnuCashTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -232,7 +233,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_MinimumValidDataWithRev
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := converter.ParseImportedData(context, user, []byte("<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"+
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, []byte("<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"+
 		"<gnc-v2\n"+
 		"     xmlns:gnc=\"http://www.gnucash.org/XML/gnc\"\n"+
 		"     xmlns:act=\"http://www.gnucash.org/XML/act\"\n"+
@@ -356,14 +357,14 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_MinimumValidDataWithRev
 		"  </trn:splits>\n"+
 		"</gnc:transaction>\n"+
 		"</gnc:book>\n"+
-		"</gnc-v2>\n"), 0, nil, nil, nil, nil, nil)
+		"</gnc-v2>\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	checkParsedMinimumValidData(t, allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags)
 }
 
 func TestGnuCashTransactionDatabaseFileParseImportedData_ParseInvalidTime(t *testing.T) {
-	converter := GnuCashTransactionDataImporter
+	importer := GnuCashTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -371,7 +372,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseInvalidTime(t *tes
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+
 			"<gnc:transaction version=\"2.0.0\">\n"+
 			"  <trn:date-posted>\n"+
@@ -388,10 +389,10 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseInvalidTime(t *tes
 			"    </trn:split>\n"+
 			"  </trn:splits>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+
 			"<gnc:transaction version=\"2.0.0\">\n"+
 			"  <trn:date-posted>\n"+
@@ -408,12 +409,12 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseInvalidTime(t *tes
 			"    </trn:split>\n"+
 			"  </trn:splits>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
 
 func TestGnuCashTransactionDatabaseFileParseImportedData_ParseValidTimezone(t *testing.T) {
-	converter := GnuCashTransactionDataImporter
+	importer := GnuCashTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -421,7 +422,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseValidTimezone(t *t
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+
 			"<gnc:transaction version=\"2.0.0\">\n"+
 			"  <trn:date-posted>\n"+
@@ -438,12 +439,12 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseValidTimezone(t *t
 			"    </trn:split>\n"+
 			"  </trn:splits>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, int64(1725230096), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+
 			"<gnc:transaction version=\"2.0.0\">\n"+
 			"  <trn:date-posted>\n"+
@@ -460,14 +461,14 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseValidTimezone(t *t
 			"    </trn:split>\n"+
 			"  </trn:splits>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, int64(1725148196), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
 }
 
 func TestGnuCashTransactionDatabaseFileParseImportedData_ParseValidAccountCurrency(t *testing.T) {
-	converter := GnuCashTransactionDataImporter
+	importer := GnuCashTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -475,7 +476,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseValidAccountCurren
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"+
+	allNewTransactions, allNewAccounts, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"+
 		"<gnc-v2\n"+
 		"     xmlns:gnc=\"http://www.gnucash.org/XML/gnc\"\n"+
 		"     xmlns:act=\"http://www.gnucash.org/XML/act\"\n"+
@@ -557,7 +558,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseValidAccountCurren
 		"  </trn:splits>\n"+
 		"</gnc:transaction>\n"+
 		"</gnc:book>\n"+
-		"</gnc-v2>\n"), 0, nil, nil, nil, nil, nil)
+		"</gnc-v2>\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -574,7 +575,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseValidAccountCurren
 }
 
 func TestGnuCashTransactionDatabaseFileParseImportedData_ParseValidAmount(t *testing.T) {
-	converter := GnuCashTransactionDataImporter
+	importer := GnuCashTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -582,7 +583,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseValidAmount(t *tes
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+
 			"<gnc:transaction version=\"2.0.0\">\n"+
 			"  <trn:date-posted>\n"+
@@ -599,13 +600,13 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseValidAmount(t *tes
 			"    </trn:split>\n"+
 			"  </trn:splits>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, int64(1234500), allNewTransactions[0].Amount)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+
 			"<gnc:transaction version=\"2.0.0\">\n"+
 			"  <trn:date-posted>\n"+
@@ -622,7 +623,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseValidAmount(t *tes
 			"    </trn:split>\n"+
 			"  </trn:splits>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -630,7 +631,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseValidAmount(t *tes
 }
 
 func TestGnuCashTransactionDatabaseFileParseImportedData_ParseInvalidAmount(t *testing.T) {
-	converter := GnuCashTransactionDataImporter
+	importer := GnuCashTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -638,7 +639,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseInvalidAmount(t *t
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+
 			"<gnc:transaction version=\"2.0.0\">\n"+
 			"  <trn:date-posted>\n"+
@@ -655,10 +656,10 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseInvalidAmount(t *t
 			"    </trn:split>\n"+
 			"  </trn:splits>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+
 			"<gnc:transaction version=\"2.0.0\">\n"+
 			"  <trn:date-posted>\n"+
@@ -675,10 +676,10 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseInvalidAmount(t *t
 			"    </trn:split>\n"+
 			"  </trn:splits>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+
 			"<gnc:transaction version=\"2.0.0\">\n"+
 			"  <trn:date-posted>\n"+
@@ -695,12 +696,12 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseInvalidAmount(t *t
 			"    </trn:split>\n"+
 			"  </trn:splits>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }
 
 func TestGnuCashTransactionDatabaseFileParseImportedData_ParseDescription(t *testing.T) {
-	converter := GnuCashTransactionDataImporter
+	importer := GnuCashTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -708,7 +709,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseDescription(t *tes
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+
 			"<gnc:transaction version=\"2.0.0\">\n"+
 			"  <trn:date-posted>\n"+
@@ -726,7 +727,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseDescription(t *tes
 			"    </trn:split>\n"+
 			"  </trn:splits>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -734,7 +735,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseDescription(t *tes
 }
 
 func TestGnuCashTransactionDatabaseFileParseImportedData_SkipZeroAmountTransaction(t *testing.T) {
-	converter := GnuCashTransactionDataImporter
+	importer := GnuCashTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -742,7 +743,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_SkipZeroAmountTransacti
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+
 			"<gnc:transaction version=\"2.0.0\">\n"+
 			"  <trn:date-posted>\n"+
@@ -755,12 +756,12 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_SkipZeroAmountTransacti
 			"    </trn:split>\n"+
 			"  </trn:splits>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
 func TestGnuCashTransactionDatabaseFileParseImportedData_NotSupportedToParseSplitTransaction(t *testing.T) {
-	converter := GnuCashTransactionDataImporter
+	importer := GnuCashTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -768,7 +769,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_NotSupportedToParseSpli
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+
 			"<gnc:account version=\"2.0.0\">\n"+
 			"  <act:name>Test Category2</act:name>\n"+
@@ -805,12 +806,12 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_NotSupportedToParseSpli
 			"    </trn:split>\n"+
 			"  </trn:splits>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotSupportedSplitTransactions.Message)
 }
 
 func TestGnuCashTransactionDatabaseFileParseImportedData_MissingAccountRequiredNode(t *testing.T) {
-	converter := GnuCashTransactionDataImporter
+	importer := GnuCashTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -819,7 +820,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_MissingAccountRequiredN
 	}
 
 	// Missing Account Currency Node
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"+
 			"<gnc-v2\n"+
 			"     xmlns:gnc=\"http://www.gnucash.org/XML/gnc\"\n"+
@@ -872,12 +873,12 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_MissingAccountRequiredN
 			"    </trn:split>\n"+
 			"  </trn:splits>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 }
 
 func TestGnuCashTransactionDatabaseFileParseImportedData_MissingTransactionRequiredNode(t *testing.T) {
-	converter := GnuCashTransactionDataImporter
+	importer := GnuCashTransactionDataImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -886,7 +887,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_MissingTransactionRequi
 	}
 
 	// Missing Transaction Time Node
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+
 			"<gnc:transaction version=\"2.0.0\">\n"+
 			"  <trn:splits>\n"+
@@ -900,22 +901,22 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_MissingTransactionRequi
 			"    </trn:split>\n"+
 			"  </trn:splits>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingTransactionTime.Message)
 
 	// Missing Transaction Splits Node
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+
 			"<gnc:transaction version=\"2.0.0\">\n"+
 			"  <trn:date-posted>\n"+
 			"    <ts:date>2024-09-01 00:00:00 +0000</ts:date>\n"+
 			"  </trn:date-posted>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidGnuCashFile.Message)
 
 	// Missing Transaction Split Quantity Node
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+
 			"<gnc:transaction version=\"2.0.0\">\n"+
 			"  <trn:date-posted>\n"+
@@ -930,11 +931,11 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_MissingTransactionRequi
 			"    </trn:split>\n"+
 			"  </trn:splits>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 
 	// Missing Transaction Split Account Node
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+
 			"<gnc:transaction version=\"2.0.0\">\n"+
 			"  <trn:date-posted>\n"+
@@ -950,7 +951,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_MissingTransactionRequi
 			"    </trn:split>\n"+
 			"  </trn:splits>\n"+
 			"</gnc:transaction>\n"+
-			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+			gnucashCommonValidDataCaseFooter), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingAccountData.Message)
 }
 

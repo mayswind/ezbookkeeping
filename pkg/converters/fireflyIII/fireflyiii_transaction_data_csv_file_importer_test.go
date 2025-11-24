@@ -5,14 +5,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
-func TestFireFlyIIICsvFileConverterParseImportedData_MinimumValidData(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvFileImporter
+func TestFireFlyIIICsvFileimporterParseImportedData_MinimumValidData(t *testing.T) {
+	importer := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -20,11 +21,11 @@ func TestFireFlyIIICsvFileConverterParseImportedData_MinimumValidData(t *testing
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := converter.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
 		"\"Opening balance\",123.45,2024-09-01T00:00:00+08:00,\"Initial balance for \"\"Test Account\"\"\",\"Test Account\",\n"+
 		"Deposit,0.12,2024-09-01T01:23:45+08:00,\"A revenue account\",\"Test Account\",\"Test Category\"\n"+
 		"Withdrawal,-1.00,2024-09-01T12:34:56+08:00,\"Test Account\",\"A expense account\",\"Test Category2\"\n"+
-		"Transfer,0.05,2024-09-01T23:59:59+08:00,\"Test Account\",\"Test Account2\",\"Test Category3\""), 0, nil, nil, nil, nil, nil)
+		"Transfer,0.05,2024-09-01T23:59:59+08:00,\"Test Account\",\"Test Account2\",\"Test Category3\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -82,8 +83,8 @@ func TestFireFlyIIICsvFileConverterParseImportedData_MinimumValidData(t *testing
 	assert.Equal(t, "Test Category3", allNewSubTransferCategories[0].Name)
 }
 
-func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidTime(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvFileImporter
+func TestFireFlyIIICsvFileimporterParseImportedData_ParseInvalidTime(t *testing.T) {
+	importer := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -91,17 +92,17 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidTime(t *testing
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
-		"Withdrawal,-1.00,2024-09-01T12:34:56,\"Test Account\",\"A expense account\",\"Test Category\""), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
+		"Withdrawal,-1.00,2024-09-01T12:34:56,\"Test Account\",\"A expense account\",\"Test Category\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
-		"Withdrawal,-1.00,2024-09-01 12:34:56+08:00,\"Test Account\",\"A expense account\",\"Test Category\""), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
+		"Withdrawal,-1.00,2024-09-01 12:34:56+08:00,\"Test Account\",\"A expense account\",\"Test Category\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
 
-func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidType(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvFileImporter
+func TestFireFlyIIICsvFileimporterParseImportedData_ParseInvalidType(t *testing.T) {
+	importer := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -109,13 +110,13 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidType(t *testing
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
-		"Type,123.45,2024-09-01T12:34:56+08:00,\"Test Account\",\"A expense account\",\"Test Category\""), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
+		"Type,123.45,2024-09-01T12:34:56+08:00,\"Test Account\",\"A expense account\",\"Test Category\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTypeInvalid.Message)
 }
 
-func TestFireFlyIIICsvFileConverterParseImportedData_ParseAccountNameAsCategoryName(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvFileImporter
+func TestFireFlyIIICsvFileimporterParseImportedData_ParseAccountNameAsCategoryName(t *testing.T) {
+	importer := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -123,23 +124,23 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseAccountNameAsCategoryN
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
-		"Withdrawal,-1.00,2024-09-01T12:34:56+08:00,\"Test Account\",\"A expense account\",\"\""), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
+		"Withdrawal,-1.00,2024-09-01T12:34:56+08:00,\"Test Account\",\"A expense account\",\"\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "A expense account", allNewTransactions[0].OriginalCategoryName)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
-		"Deposit,10.00,2024-09-01T12:34:56+08:00,\"A revenue account\",\"Test Account\",\"\""), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
+		"Deposit,10.00,2024-09-01T12:34:56+08:00,\"A revenue account\",\"Test Account\",\"\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "A revenue account", allNewTransactions[0].OriginalCategoryName)
 }
 
-func TestFireFlyIIICsvFileConverterParseImportedData_ParseValidTimezone(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvFileImporter
+func TestFireFlyIIICsvFileimporterParseImportedData_ParseValidTimezone(t *testing.T) {
+	importer := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -147,27 +148,27 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseValidTimezone(t *testi
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
-		"Withdrawal,-1.00,2024-09-01T12:34:56-10:00,\"Test Account\",\"A expense account\",\"Test Category\""), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
+		"Withdrawal,-1.00,2024-09-01T12:34:56-10:00,\"Test Account\",\"A expense account\",\"Test Category\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, int64(1725230096), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
-		"Withdrawal,-1.00,2024-09-01T12:34:56+00:00,\"Test Account\",\"A expense account\",\"Test Category\""), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
+		"Withdrawal,-1.00,2024-09-01T12:34:56+00:00,\"Test Account\",\"A expense account\",\"Test Category\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, int64(1725194096), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
-		"Withdrawal,-1.00,2024-09-01T12:34:56+12:45,\"Test Account\",\"A expense account\",\"Test Category\""), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
+		"Withdrawal,-1.00,2024-09-01T12:34:56+12:45,\"Test Account\",\"A expense account\",\"Test Category\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, int64(1725148196), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
 }
 
-func TestFireFlyIIICsvFileConverterParseImportedData_ParseValidAccountCurrency(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvFileImporter
+func TestFireFlyIIICsvFileimporterParseImportedData_ParseValidAccountCurrency(t *testing.T) {
+	importer := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -175,9 +176,9 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseValidAccountCurrency(t
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("type,amount,foreign_amount,date,currency_code,foreign_currency_code,source_name,destination_name,category\n"+
+	allNewTransactions, allNewAccounts, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("type,amount,foreign_amount,date,currency_code,foreign_currency_code,source_name,destination_name,category\n"+
 		"\"Opening balance\",123.45,,2024-09-01T00:00:00+08:00,USD,,\"Initial balance for \"\"Test Account\"\"\",\"Test Account\",\n"+
-		"Transfer,1.23,1.10,2024-09-01T23:59:59+08:00,USD,EUR,\"Test Account\",\"Test Account2\",\"Test Category2\""), 0, nil, nil, nil, nil, nil)
+		"Transfer,1.23,1.10,2024-09-01T23:59:59+08:00,USD,EUR,\"Test Account\",\"Test Account2\",\"Test Category2\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -193,8 +194,8 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseValidAccountCurrency(t
 	assert.Equal(t, "EUR", allNewAccounts[1].Currency)
 }
 
-func TestFireFlyIIICsvFileConverterParseImportedData_ParseValidForeignAmountAndCurrency(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvFileImporter
+func TestFireFlyIIICsvFileimporterParseImportedData_ParseValidForeignAmountAndCurrency(t *testing.T) {
+	importer := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -202,8 +203,8 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseValidForeignAmountAndC
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("type,amount,foreign_amount,date,currency_code,foreign_currency_code,source_name,destination_name,category\n"+
-		"Transfer,10.00,15.00,2024-09-01T12:34:56+08:00,USD,EUR,\"Test Account\",\"Test Account2\",\"Test Category\""), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("type,amount,foreign_amount,date,currency_code,foreign_currency_code,source_name,destination_name,category\n"+
+		"Transfer,10.00,15.00,2024-09-01T12:34:56+08:00,USD,EUR,\"Test Account\",\"Test Account2\",\"Test Category\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -213,8 +214,8 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseValidForeignAmountAndC
 	assert.Equal(t, "USD", allNewTransactions[0].OriginalSourceAccountCurrency)
 	assert.Equal(t, "EUR", allNewTransactions[0].OriginalDestinationAccountCurrency)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("type,amount,date,currency_code,foreign_currency_code,source_name,destination_name,category\n"+
-		"Transfer,10.00,2024-09-01T12:34:56+08:00,USD,EUR,\"Test Account\",\"Test Account2\",\"Test Category\""), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("type,amount,date,currency_code,foreign_currency_code,source_name,destination_name,category\n"+
+		"Transfer,10.00,2024-09-01T12:34:56+08:00,USD,EUR,\"Test Account\",\"Test Account2\",\"Test Category\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -223,8 +224,8 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseValidForeignAmountAndC
 	assert.Equal(t, "USD", allNewTransactions[0].OriginalSourceAccountCurrency)
 	assert.Equal(t, "EUR", allNewTransactions[0].OriginalDestinationAccountCurrency)
 
-	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("type,amount,date,currency_code,foreign_currency_code,source_name,destination_name,category\n"+
-		"Transfer,10.00,2024-09-01T12:34:56+08:00,USD,,\"Test Account\",\"Test Account2\",\"Test Category\""), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("type,amount,date,currency_code,foreign_currency_code,source_name,destination_name,category\n"+
+		"Transfer,10.00,2024-09-01T12:34:56+08:00,USD,,\"Test Account\",\"Test Account2\",\"Test Category\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -232,8 +233,8 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseValidForeignAmountAndC
 	assert.Equal(t, "USD", allNewTransactions[0].OriginalDestinationAccountCurrency)
 }
 
-func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidAccountCurrency(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvFileImporter
+func TestFireFlyIIICsvFileimporterParseImportedData_ParseInvalidAccountCurrency(t *testing.T) {
+	importer := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -241,19 +242,19 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidAccountCurrency
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("type,amount,foreign_amount,date,currency_code,foreign_currency_code,source_name,destination_name,category\n"+
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("type,amount,foreign_amount,date,currency_code,foreign_currency_code,source_name,destination_name,category\n"+
 		"\"Opening balance\",123.45,,2024-09-01T00:00:00+08:00,USD,,\"Initial balance for \"\"Test Account\"\"\",\"Test Account\",\n"+
-		"Transfer,1.23,1.10,2024-09-01T23:59:59+08:00,CNY,EUR,\"Test Account\",\"Test Account2\",\"Test Category3\""), 0, nil, nil, nil, nil, nil)
+		"Transfer,1.23,1.10,2024-09-01T23:59:59+08:00,CNY,EUR,\"Test Account\",\"Test Account2\",\"Test Category3\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("type,amount,foreign_amount,date,currency_code,foreign_currency_code,source_name,destination_name,category\n"+
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("type,amount,foreign_amount,date,currency_code,foreign_currency_code,source_name,destination_name,category\n"+
 		"\"Opening balance\",123.45,,2024-09-01T00:00:00+08:00,USD,,\"Initial balance for \"\"Test Account\"\"\",\"Test Account\",\n"+
-		"Transfer,1.23,1.10,2024-09-01T23:59:59+08:00,CNY,EUR,\"Test Account2\",\"Test Account\",\"Test Category3\""), 0, nil, nil, nil, nil, nil)
+		"Transfer,1.23,1.10,2024-09-01T23:59:59+08:00,CNY,EUR,\"Test Account2\",\"Test Account\",\"Test Category3\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 }
 
-func TestFireFlyIIICsvFileConverterParseImportedData_ParseNotSupportedCurrency(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvFileImporter
+func TestFireFlyIIICsvFileimporterParseImportedData_ParseNotSupportedCurrency(t *testing.T) {
+	importer := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -261,17 +262,17 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseNotSupportedCurrency(t
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("type,amount,foreign_amount,date,currency_code,foreign_currency_code,source_name,destination_name,category\n"+
-		"\"Opening balance\",123.45,,2024-09-01T00:00:00+08:00,XXX,,\"Initial balance for \"\"Test Account\"\"\",\"Test Account\",\n"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("type,amount,foreign_amount,date,currency_code,foreign_currency_code,source_name,destination_name,category\n"+
+		"\"Opening balance\",123.45,,2024-09-01T00:00:00+08:00,XXX,,\"Initial balance for \"\"Test Account\"\"\",\"Test Account\",\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("type,amount,foreign_amount,date,currency_code,foreign_currency_code,source_name,destination_name,category\n"+
-		"Transfer,123.45,123.45,2024-09-01T23:59:59+08:00,USD,XXX,\"Test Account\",\"Test Account2\",\"Test Category2\""), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("type,amount,foreign_amount,date,currency_code,foreign_currency_code,source_name,destination_name,category\n"+
+		"Transfer,123.45,123.45,2024-09-01T23:59:59+08:00,USD,XXX,\"Test Account\",\"Test Account2\",\"Test Category2\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 }
 
-func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidAmount(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvFileImporter
+func TestFireFlyIIICsvFileimporterParseImportedData_ParseInvalidAmount(t *testing.T) {
+	importer := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -279,17 +280,17 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidAmount(t *testi
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
-		"Withdrawal,-123 45,2024-09-01T12:34:56+08:00,\"Test Account\",\"A expense account\",\"Test Category\"\n"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
+		"Withdrawal,-123 45,2024-09-01T12:34:56+08:00,\"Test Account\",\"A expense account\",\"Test Category\"\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("type,amount,foreign_amount,date,source_name,destination_name,category\n"+
-		"Transfer,123.45,123 45,2024-09-01T23:59:59+08:00,\"Test Account\",\"Test Account2\",\"Test Category2\""), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("type,amount,foreign_amount,date,source_name,destination_name,category\n"+
+		"Transfer,123.45,123 45,2024-09-01T23:59:59+08:00,\"Test Account\",\"Test Account2\",\"Test Category2\""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }
 
-func TestFireFlyIIICsvFileConverterParseImportedData_ParseDescription(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvFileImporter
+func TestFireFlyIIICsvFileimporterParseImportedData_ParseDescription(t *testing.T) {
+	importer := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -297,16 +298,16 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseDescription(t *testing
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("type,amount,description,date,source_name,destination_name,category\n"+
-		"Withdrawal,-123.45,\"foo    bar\t#test\",2024-09-01T12:34:56+08:00,\"Test Account\",\"A expense account\",\"Test Category\"\n"), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("type,amount,description,date,source_name,destination_name,category\n"+
+		"Withdrawal,-123.45,\"foo    bar\t#test\",2024-09-01T12:34:56+08:00,\"Test Account\",\"A expense account\",\"Test Category\"\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "foo    bar\t#test", allNewTransactions[0].Comment)
 }
 
-func TestFireFlyIIICsvFileConverterParseImportedData_ParseTags(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvFileImporter
+func TestFireFlyIIICsvFileimporterParseImportedData_ParseTags(t *testing.T) {
+	importer := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -314,8 +315,8 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseTags(t *testing.T) {
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, allNewTags, err := converter.ParseImportedData(context, user, []byte("type,amount,tags,date,source_name,destination_name,category\n"+
-		"Withdrawal,-123.45,\"tag1,tag2,tag3\",2024-09-01T12:34:56+08:00,\"Test Account\",\"A expense account\",\"Test Category\"\n"), 0, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, allNewTags, err := importer.ParseImportedData(context, user, []byte("type,amount,tags,date,source_name,destination_name,category\n"+
+		"Withdrawal,-123.45,\"tag1,tag2,tag3\",2024-09-01T12:34:56+08:00,\"Test Account\",\"A expense account\",\"Test Category\"\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -328,8 +329,8 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseTags(t *testing.T) {
 	assert.Equal(t, "tag3", allNewTags[2].Name)
 }
 
-func TestFireFlyIIICsvFileConverterParseImportedData_MissingFileHeader(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvFileImporter
+func TestFireFlyIIICsvFileimporterParseImportedData_MissingFileHeader(t *testing.T) {
+	importer := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -337,12 +338,12 @@ func TestFireFlyIIICsvFileConverterParseImportedData_MissingFileHeader(t *testin
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(""), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
-func TestFireFlyIIICsvFileConverterParseImportedData_MissingRequiredColumn(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvFileImporter
+func TestFireFlyIIICsvFileimporterParseImportedData_MissingRequiredColumn(t *testing.T) {
+	importer := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -351,32 +352,32 @@ func TestFireFlyIIICsvFileConverterParseImportedData_MissingRequiredColumn(t *te
 	}
 
 	// Missing Time Column
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("type,amount,source_name,destination_name,category\n"+
-		"\"Opening balance\",123.45,\"Initial balance for \"\"Test Account\"\"\",\"Test Account\",\n"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("type,amount,source_name,destination_name,category\n"+
+		"\"Opening balance\",123.45,\"Initial balance for \"\"Test Account\"\"\",\"Test Account\",\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Type Column
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("amount,date,source_name,destination_name,category\n"+
-		"123.45,2024-09-01T00:00:00+08:00,\"Initial balance for \"\"Test Account\"\"\",\"Test Account\",\n"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("amount,date,source_name,destination_name,category\n"+
+		"123.45,2024-09-01T00:00:00+08:00,\"Initial balance for \"\"Test Account\"\"\",\"Test Account\",\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Sub Category Column
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name\n"+
-		"\"Opening balance\",123.45,2024-09-01T00:00:00+08:00,\"Initial balance for \"\"Test Account\"\"\",\"Test Account\"\n"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name\n"+
+		"\"Opening balance\",123.45,2024-09-01T00:00:00+08:00,\"Initial balance for \"\"Test Account\"\"\",\"Test Account\"\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Account Name Column
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("type,amount,date,destination_name,category\n"+
-		"\"Opening balance\",123.45,2024-09-01T00:00:00+08:00,\"Test Account\",\n"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("type,amount,date,destination_name,category\n"+
+		"\"Opening balance\",123.45,2024-09-01T00:00:00+08:00,\"Test Account\",\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Amount Column
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("type,date,source_name,destination_name,category\n"+
-		"\"Opening balance\",2024-09-01T00:00:00+08:00,\"Initial balance for \"\"Test Account\"\"\",\"Test Account\",\n"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("type,date,source_name,destination_name,category\n"+
+		"\"Opening balance\",2024-09-01T00:00:00+08:00,\"Initial balance for \"\"Test Account\"\"\",\"Test Account\",\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Account2 Name Column
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("type,amount,date,source_name,category\n"+
-		"\"Opening balance\",123.45,2024-09-01T00:00:00+08:00,\"Initial balance for \"\"Test Account\"\"\",\n"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte("type,amount,date,source_name,category\n"+
+		"\"Opening balance\",123.45,2024-09-01T00:00:00+08:00,\"Initial balance for \"\"Test Account\"\"\",\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 }

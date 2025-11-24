@@ -68,6 +68,14 @@ export interface ImportFileCategoryAndTypes {
     readonly fileTypes: ImportFileType[];
 }
 
+export interface ImportFileTypeSupportedAdditionalOptions extends Record<string, boolean | undefined> {
+    readonly payeeAsTag?: boolean;
+    readonly payeeAsDescription?: boolean;
+    readonly memberAsTag?: boolean;
+    readonly projectAsTag?: boolean;
+    readonly merchantAsTag?: boolean;
+}
+
 export interface ImportFileType extends ImportFileTypeAndExtensions {
     readonly type: string;
     readonly name: string;
@@ -75,6 +83,7 @@ export interface ImportFileType extends ImportFileTypeAndExtensions {
     readonly subTypes?: ImportFileTypeSubType[];
     readonly supportedEncodings?: string[];
     readonly dataFromTextbox?: boolean;
+    readonly supportedAdditionalOptions?: ImportFileTypeSupportedAdditionalOptions;
     readonly document?: {
         readonly supportMultiLanguages: boolean | string;
         readonly anchor: string;
@@ -99,6 +108,7 @@ export interface LocalizedImportFileType extends ImportFileTypeAndExtensions {
     readonly subTypes?: LocalizedImportFileTypeSubType[];
     readonly supportedEncodings?: LocalizedImportFileTypeSupportedEncodings[];
     readonly dataFromTextbox?: boolean;
+    readonly supportedAdditionalOptions?: ImportFileTypeSupportedAdditionalOptions;
     readonly document?: LocalizedImportFileDocument;
 }
 

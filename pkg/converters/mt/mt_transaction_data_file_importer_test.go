@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -12,7 +13,7 @@ import (
 )
 
 func TestMT940TransactionDataFileParseImportedData_MinimumValidData(t *testing.T) {
-	converter := MT940TransactionDataFileImporter
+	importer := MT940TransactionDataFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -20,7 +21,7 @@ func TestMT940TransactionDataFileParseImportedData_MinimumValidData(t *testing.T
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, []byte(
 		`{1:F01TESTBANK123456789}{2:I940TESTBANK}{4:
 		:20:123456789
 		:25:12345678
@@ -31,7 +32,7 @@ func TestMT940TransactionDataFileParseImportedData_MinimumValidData(t *testing.T
 		:61:2506020603D234,56NTRFFOOBAR
 		:86:Transaction 2
 		:62F:C250601CNY123,45
-		-}`), 0, nil, nil, nil, nil, nil)
+		-}`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -70,7 +71,7 @@ func TestMT940TransactionDataFileParseImportedData_MinimumValidData(t *testing.T
 }
 
 func TestMT940TransactionDataFileParseImportedData_ParseTransactionValidAmountAndCurrency(t *testing.T) {
-	converter := MT940TransactionDataFileImporter
+	importer := MT940TransactionDataFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -78,7 +79,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionValidAmountAn
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`{1:F01TESTBANK123456789}{2:I940TESTBANK}{4:
 		:20:123456789
 		:25:12345678
@@ -91,7 +92,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionValidAmountAn
 		:61:250603C1,NTRFTEST
 		:86:Transaction 3
 		:62F:C250601CNY123,45
-		-}`), 0, nil, nil, nil, nil, nil)
+		-}`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(allNewTransactions))
@@ -101,7 +102,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionValidAmountAn
 }
 
 func TestMT940TransactionDataFileParseImportedData_ParseTransactionInvalidAmountAndCurrency(t *testing.T) {
-	converter := MT940TransactionDataFileImporter
+	importer := MT940TransactionDataFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -109,7 +110,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionInvalidAmount
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`{1:F01TESTBANK123456789}{2:I940TESTBANK}{4:
 		:20:123456789
 		:25:12345678
@@ -117,10 +118,10 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionInvalidAmount
 		:60F:C250601CNY123,45
 		:61:2506010602C123 45NTRFTEST
 		:62F:C250601CNY123,45
-		-}`), 0, nil, nil, nil, nil, nil)
+		-}`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidMT940File.Message)
 
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		`{1:F01TESTBANK123456789}{2:I940TESTBANK}{4:
 		:20:123456789
 		:25:12345678
@@ -128,12 +129,12 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionInvalidAmount
 		:60F:C250601CNY123,45
 		:61:2506010602C12.45NTRFTEST
 		:62F:C250601CNY123,45
-		-}`), 0, nil, nil, nil, nil, nil)
+		-}`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidMT940File.Message)
 }
 
 func TestMT940TransactionDataFileParseImportedData_ParseTransactionType(t *testing.T) {
-	converter := MT940TransactionDataFileImporter
+	importer := MT940TransactionDataFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -141,7 +142,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionType(t *testi
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`{1:F01TESTBANK123456789}{2:I940TESTBANK}{4:
 		:20:123456789
 		:25:12345678
@@ -156,7 +157,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionType(t *testi
 		:61:250604RD123,45NTRFTEST
 		:86:Transaction 4
 		:62F:C250601CNY123,45
-		-}`), 0, nil, nil, nil, nil, nil)
+		-}`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 4, len(allNewTransactions))
@@ -167,7 +168,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionType(t *testi
 }
 
 func TestMT940TransactionDataFileParseImportedData_ParseDescription(t *testing.T) {
-	converter := MT940TransactionDataFileImporter
+	importer := MT940TransactionDataFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -175,7 +176,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseDescription(t *testing.T
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`{1:F01TESTBANK123456789}{2:I940TESTBANK}{4:
 		:20:123456789
 		:25:12345678
@@ -186,7 +187,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseDescription(t *testing.T
 		Part 2
 		Part 3
 		:62F:C250601CNY123,45
-		-}`), 0, nil, nil, nil, nil, nil)
+		-}`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -194,7 +195,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseDescription(t *testing.T
 }
 
 func TestMT940TransactionDataFileParseImportedData_MissingRequiredField(t *testing.T) {
-	converter := MT940TransactionDataFileImporter
+	importer := MT940TransactionDataFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -203,12 +204,12 @@ func TestMT940TransactionDataFileParseImportedData_MissingRequiredField(t *testi
 	}
 
 	// Missing opening balance and closing balance
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`{1:F01TESTBANK123456789}{2:I940TESTBANK}{4:
 		:20:123456789
 		:28C:123/1
 		:61:250601C123,45NTRFTEST
 		:86:Transaction 1
-		-}`), 0, nil, nil, nil, nil, nil)
+		-}`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 }

@@ -40,27 +40,25 @@
         </f7-list>
 
         <f7-block class="combination-list-wrapper margin-vertical" key="default" v-show="!loading && hasAnyVisibleTag">
-            <f7-list class="margin-top-half margin-bottom" strong inset dividers>
+            <f7-list class="margin-top-half margin-bottom" strong inset dividers v-if="includeTagsCount > 1">
                 <f7-list-item radio
                               :title="tt(filterType.name)"
                               :key="filterType.type"
                               :value="filterType.type"
                               :checked="includeTagFilterType === filterType.type"
                               v-for="filterType in [TransactionTagFilterType.HasAny, TransactionTagFilterType.HasAll]"
-                              @change="includeTagFilterType = filterType.type"
-                              v-if="includeTagsCount > 1">
+                              @change="includeTagFilterType = filterType.type">
                 </f7-list-item>
             </f7-list>
 
-            <f7-list class="margin-top-half margin-bottom" strong inset dividers>
+            <f7-list class="margin-top-half margin-bottom" strong inset dividers v-if="excludeTagsCount > 1">
                 <f7-list-item radio
                               :title="tt(filterType.name)"
                               :key="filterType.type"
                               :value="filterType.type"
                               :checked="excludeTagFilterType === filterType.type"
                               v-for="filterType in [TransactionTagFilterType.NotHasAny, TransactionTagFilterType.NotHasAll]"
-                              @change="excludeTagFilterType = filterType.type"
-                              v-if="excludeTagsCount > 1">
+                              @change="excludeTagFilterType = filterType.type">
                 </f7-list-item>
             </f7-list>
 

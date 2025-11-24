@@ -14,11 +14,11 @@
                                          :title="tt('Set All to Included')"
                                          :disabled="!hasAnyVisibleTag"
                                          @click="setAllToState(false, TransactionTagFilterState.Include)"></v-list-item>
-                            <v-list-item :prepend-icon="mdiSelect"
+                            <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Set All to Default')"
                                          :disabled="!hasAnyVisibleTag"
                                          @click="setAllToState(false, TransactionTagFilterState.Default)"></v-list-item>
-                            <v-list-item :prepend-icon="mdiSelectInverse"
+                            <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Set All to Excluded')"
                                          :disabled="!hasAnyVisibleTag"
                                          @click="setAllToState(false, TransactionTagFilterState.Exclude)"></v-list-item>
@@ -58,11 +58,11 @@
                                          :title="tt('Set All to Included')"
                                          :disabled="!hasAnyVisibleTag"
                                          @click="setAllToState(false, TransactionTagFilterState.Include)"></v-list-item>
-                            <v-list-item :prepend-icon="mdiSelect"
+                            <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Set All to Default')"
                                          :disabled="!hasAnyVisibleTag"
                                          @click="setAllToState(false, TransactionTagFilterState.Default)"></v-list-item>
-                            <v-list-item :prepend-icon="mdiSelectInverse"
+                            <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Set All to Excluded')"
                                          :disabled="!hasAnyVisibleTag"
                                          @click="setAllToState(false, TransactionTagFilterState.Exclude)"></v-list-item>
@@ -188,8 +188,6 @@ import type { TransactionTag } from '@/models/transaction_tag.ts';
 
 import {
     mdiSelectAll,
-    mdiSelect,
-    mdiSelectInverse,
     mdiEyeOutline,
     mdiEyeOffOutline,
     mdiDotsVertical,

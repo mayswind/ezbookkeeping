@@ -167,13 +167,12 @@ function getDisplayCount(count: number): string {
 function getTablePageOptions(linesCount?: number): NameNumeralValue[] {
     const pageOptions: NameNumeralValue[] = [];
 
-    if (!linesCount || linesCount < 1) {
-        pageOptions.push({ value: -1, name: tt('All') });
-        return pageOptions;
+    if (!linesCount) {
+        linesCount = 0;
     }
 
     for (const count of [ 10, 50, 100 ]) {
-        if (linesCount < count) {
+        if (count > 10 && count > previewCount.value && linesCount < count) {
             break;
         }
 

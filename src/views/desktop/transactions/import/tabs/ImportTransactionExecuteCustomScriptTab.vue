@@ -140,8 +140,12 @@ const displayPreviewResult = computed<string>(() => {
     } else if (executionError.value) {
         return executionError.value;
     } else if (previewResult.value) {
-        const rows = previewResult.value.slice(0, previewCount.value);
-        return JSON.stringify(rows, null, 2);
+        if (previewCount.value > 0) {
+            const rows = previewResult.value.slice(0, previewCount.value);
+            return JSON.stringify(rows, null, 2);
+        } else {
+            return JSON.stringify(previewResult.value, null, 2);
+        }
     } else {
         return tt('No Preview Result');
     }

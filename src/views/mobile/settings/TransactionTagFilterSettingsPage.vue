@@ -122,14 +122,14 @@
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
-                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllToState(false, TransactionTagFilterState.Include)">{{ tt('Set All to Included') }}</f7-actions-button>
-                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllToState(false, TransactionTagFilterState.Default)">{{ tt('Set All to Default') }}</f7-actions-button>
-                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllToState(false, TransactionTagFilterState.Exclude)">{{ tt('Set All to Excluded') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllTagsState(false, TransactionTagFilterState.Include)">{{ tt('Set All to Included') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllTagsState(false, TransactionTagFilterState.Default)">{{ tt('Set All to Default') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllTagsState(false, TransactionTagFilterState.Exclude)">{{ tt('Set All to Excluded') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
-                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllToState(true, TransactionTagFilterState.Include)">{{ tt('Set All Visible Items to Included') }}</f7-actions-button>
-                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllToState(true, TransactionTagFilterState.Default)">{{ tt('Set All Visible Items to Default') }}</f7-actions-button>
-                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllToState(true, TransactionTagFilterState.Exclude)">{{ tt('Set All Visible Items to Excluded') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllTagsState(true, TransactionTagFilterState.Include)">{{ tt('Set All Visible Items to Included') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllTagsState(true, TransactionTagFilterState.Default)">{{ tt('Set All Visible Items to Default') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllTagsState(true, TransactionTagFilterState.Exclude)">{{ tt('Set All Visible Items to Excluded') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ tt('Show Hidden Transaction Tags') }}</f7-actions-button>
@@ -227,7 +227,7 @@ function updateCurrentTransactionTagState(state: number): void {
     currentTransactionTagId.value = '';
 }
 
-function setAllToState(onlyVisible: boolean, value: TransactionTagFilterState): void {
+function setAllTagsState(onlyVisible: boolean, value: TransactionTagFilterState): void {
     for (const tag of allTags.value) {
         if (onlyVisible && !showHidden.value && tag.hidden) {
             continue;

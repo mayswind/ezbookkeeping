@@ -13,28 +13,28 @@
                             <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Set All to Included')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="setAllToState(false, TransactionTagFilterState.Include)"></v-list-item>
+                                         @click="setAllTagsState(false, TransactionTagFilterState.Include)"></v-list-item>
                             <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Set All to Default')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="setAllToState(false, TransactionTagFilterState.Default)"></v-list-item>
+                                         @click="setAllTagsState(false, TransactionTagFilterState.Default)"></v-list-item>
                             <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Set All to Excluded')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="setAllToState(false, TransactionTagFilterState.Exclude)"></v-list-item>
+                                         @click="setAllTagsState(false, TransactionTagFilterState.Exclude)"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Set All Visible Items to Included')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="setAllToState(true, TransactionTagFilterState.Include)"></v-list-item>
+                                         @click="setAllTagsState(true, TransactionTagFilterState.Include)"></v-list-item>
                             <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Set All Visible Items to Default')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="setAllToState(true, TransactionTagFilterState.Default)"></v-list-item>
+                                         @click="setAllTagsState(true, TransactionTagFilterState.Default)"></v-list-item>
                             <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Set All Visible Items to Excluded')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="setAllToState(true, TransactionTagFilterState.Exclude)"></v-list-item>
+                                         @click="setAllTagsState(true, TransactionTagFilterState.Exclude)"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="mdiEyeOutline"
                                          :title="tt('Show Hidden Transaction Tags')"
@@ -57,28 +57,28 @@
                             <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Set All to Included')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="setAllToState(false, TransactionTagFilterState.Include)"></v-list-item>
+                                         @click="setAllTagsState(false, TransactionTagFilterState.Include)"></v-list-item>
                             <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Set All to Default')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="setAllToState(false, TransactionTagFilterState.Default)"></v-list-item>
+                                         @click="setAllTagsState(false, TransactionTagFilterState.Default)"></v-list-item>
                             <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Set All to Excluded')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="setAllToState(false, TransactionTagFilterState.Exclude)"></v-list-item>
+                                         @click="setAllTagsState(false, TransactionTagFilterState.Exclude)"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Set All Visible Items to Included')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="setAllToState(true, TransactionTagFilterState.Include)"></v-list-item>
+                                         @click="setAllTagsState(true, TransactionTagFilterState.Include)"></v-list-item>
                             <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Set All Visible Items to Default')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="setAllToState(true, TransactionTagFilterState.Default)"></v-list-item>
+                                         @click="setAllTagsState(true, TransactionTagFilterState.Default)"></v-list-item>
                             <v-list-item :prepend-icon="mdiSelectAll"
                                          :title="tt('Set All Visible Items to Excluded')"
                                          :disabled="!hasAnyVisibleTag"
-                                         @click="setAllToState(true, TransactionTagFilterState.Exclude)"></v-list-item>
+                                         @click="setAllTagsState(true, TransactionTagFilterState.Exclude)"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="mdiEyeOutline"
                                          :title="tt('Show Hidden Transaction Tags')"
@@ -273,7 +273,7 @@ function updateTransactionTagExcludeType(value: number): void {
     }
 }
 
-function setAllToState(onlyVisible: boolean, value: TransactionTagFilterState): void {
+function setAllTagsState(onlyVisible: boolean, value: TransactionTagFilterState): void {
     for (const tag of allTags.value) {
         if (onlyVisible && !showHidden.value && tag.hidden) {
             continue;

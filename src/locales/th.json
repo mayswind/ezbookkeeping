@@ -1946,6 +1946,8 @@
     "Batch Convert Income Transaction to Transfer Transaction": "แปลงรายการรายได้เป็นรายการโอนแบบกลุ่ม",
     "Batch Convert Transfer Transaction to Expense Transaction": "แปลงรายการโอนเป็นรายการค่าใช้จ่ายแบบกลุ่ม",
     "Batch Convert Transfer Transaction to Income Transaction": "แปลงรายการโอนเป็นรายการรายได้แบบกลุ่ม",
+    "Batch Convert Selected Amounts to Positive Values": "Batch Convert Selected Amounts to Positive Values",
+    "Batch Convert Selected Amounts to Negative Values": "Batch Convert Selected Amounts to Negative Values",
     "Invalid Category": "หมวดหมู่ไม่ถูกต้อง",
     "Target Category": "หมวดหมู่เป้าหมาย",
     "Default Expense Category": "หมวดค่าใช้จ่ายเริ่มต้น",

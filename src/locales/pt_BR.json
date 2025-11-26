@@ -1946,6 +1946,8 @@
     "Batch Convert Income Transaction to Transfer Transaction": "Converter em Lote Transação de Receita para Transação de Transferência",
     "Batch Convert Transfer Transaction to Expense Transaction": "Converter em Lote Transação de Transferência para Transação de Despesa",
     "Batch Convert Transfer Transaction to Income Transaction": "Converter em Lote Transação de Transferência para Transação de Receita",
+    "Batch Convert Selected Amounts to Positive Values": "Batch Convert Selected Amounts to Positive Values",
+    "Batch Convert Selected Amounts to Negative Values": "Batch Convert Selected Amounts to Negative Values",
     "Invalid Category": "Categoria Inválida",
     "Target Category": "Categoria Alvo",
     "Default Expense Category": "Categoria Padrão de Despesa",

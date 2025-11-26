@@ -1946,6 +1946,8 @@
     "Batch Convert Income Transaction to Transfer Transaction": "収入取引を振替取引に一括変換",
     "Batch Convert Transfer Transaction to Expense Transaction": "振替取引を支出取引に一括変換",
     "Batch Convert Transfer Transaction to Income Transaction": "振替取引を収入取引に一括変換",
+    "Batch Convert Selected Amounts to Positive Values": "Batch Convert Selected Amounts to Positive Values",
+    "Batch Convert Selected Amounts to Negative Values": "Batch Convert Selected Amounts to Negative Values",
     "Invalid Category": "無効なカテゴリ",
     "Target Category": "対象カテゴリ",
     "Default Expense Category": "Default Expense Category",

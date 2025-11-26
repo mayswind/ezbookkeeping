@@ -1946,6 +1946,8 @@
     "Batch Convert Income Transaction to Transfer Transaction": "Batch Convert Income Transaction to Transfer Transaction",
     "Batch Convert Transfer Transaction to Expense Transaction": "Batch Convert Transfer Transaction to Expense Transaction",
     "Batch Convert Transfer Transaction to Income Transaction": "Batch Convert Transfer Transaction to Income Transaction",
+    "Batch Convert Selected Amounts to Positive Values": "Batch Convert Selected Amounts to Positive Values",
+    "Batch Convert Selected Amounts to Negative Values": "Batch Convert Selected Amounts to Negative Values",
     "Invalid Category": "Invalid Category",
     "Target Category": "Target Category",
     "Default Expense Category": "Default Expense Category",

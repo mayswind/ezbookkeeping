@@ -1946,6 +1946,8 @@
     "Batch Convert Income Transaction to Transfer Transaction": "Inkomentransacties batchgewijs omzetten naar overboekingen",
     "Batch Convert Transfer Transaction to Expense Transaction": "Overboekingen batchgewijs omzetten naar uitgaven",
     "Batch Convert Transfer Transaction to Income Transaction": "Overboekingen batchgewijs omzetten naar inkomsten",
+    "Batch Convert Selected Amounts to Positive Values": "Batch Convert Selected Amounts to Positive Values",
+    "Batch Convert Selected Amounts to Negative Values": "Batch Convert Selected Amounts to Negative Values",
     "Invalid Category": "Ongeldige categorie",
     "Target Category": "Doelcategorie",
     "Default Expense Category": "Standaard uitgavecategorie",

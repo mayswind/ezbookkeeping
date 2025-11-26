@@ -451,7 +451,9 @@ import {
     mdiPound,
     mdiFindReplace,
     mdiShapePlusOutline,
-    mdiTransfer
+    mdiTransfer,
+    mdiNumericPositive1,
+    mdiNumericNegative1
 } from '@mdi/js';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
@@ -887,6 +889,19 @@ const toolMenus = computed<ImportTransactionCheckDataMenu[]>(() => [
         title: tt('Batch Convert Transfer Transaction to Income Transaction'),
         disabled: isEditing.value || selectedTransferTransactionCount.value < 1,
         onClick: () => convertTransactionType(TransactionType.Transfer, TransactionType.Income)
+    },
+    {
+        prependIcon: mdiNumericPositive1,
+        title: tt('Batch Convert Selected Amounts to Positive Values'),
+        disabled: isEditing.value || selectedImportTransactionCount.value < 1,
+        divider: true,
+        onClick: () => convertTransactionAmountSign(1)
+    },
+    {
+        prependIcon: mdiNumericNegative1,
+        title: tt('Batch Convert Selected Amounts to Negative Values'),
+        disabled: isEditing.value || selectedImportTransactionCount.value < 1,
+        onClick: () => convertTransactionAmountSign(-1)
     }
 ]);
 
@@ -1989,6 +2004,28 @@ function convertTransactionType(fromType: TransactionType, toType: TransactionTy
 
             importTransaction.destinationAccountId = '0';
             importTransaction.destinationAmount = 0;
+        }
+
+        updateTransactionData(importTransaction);
+    }
+}
+
+function convertTransactionAmountSign(toSign: number): void {
+    if (!props.importTransactions || props.importTransactions.length < 1) {
+        return;
+    }
+
+    for (const importTransaction of props.importTransactions) {
+        if (!importTransaction.selected) {
+            continue;
+        }
+
+        if (toSign > 0) {
+            importTransaction.sourceAmount = Math.abs(importTransaction.sourceAmount);
+            importTransaction.destinationAmount = Math.abs(importTransaction.destinationAmount);
+        } else if (toSign < 0) {
+            importTransaction.sourceAmount = -Math.abs(importTransaction.sourceAmount);
+            importTransaction.destinationAmount = -Math.abs(importTransaction.destinationAmount);
         }
 
         updateTransactionData(importTransaction);

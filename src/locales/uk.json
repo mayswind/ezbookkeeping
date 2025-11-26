@@ -1946,6 +1946,8 @@
     "Batch Convert Income Transaction to Transfer Transaction": "Пакетно змінити дохідні транзакції на перекази",
     "Batch Convert Transfer Transaction to Expense Transaction": "Пакетно змінити перекази на витратні транзакції",
     "Batch Convert Transfer Transaction to Income Transaction": "Пакетно змінити перекази на дохідні транзакції",
+    "Batch Convert Selected Amounts to Positive Values": "Batch Convert Selected Amounts to Positive Values",
+    "Batch Convert Selected Amounts to Negative Values": "Batch Convert Selected Amounts to Negative Values",
     "Invalid Category": "Неприпустима категорія",
     "Target Category": "Цільова категорія",
     "Default Expense Category": "Категорія витрат за замовчуванням",

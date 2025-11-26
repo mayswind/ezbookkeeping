@@ -1946,6 +1946,8 @@
     "Batch Convert Income Transaction to Transfer Transaction": "Convertir en lot les transactions de revenu en transactions de virement",
     "Batch Convert Transfer Transaction to Expense Transaction": "Convertir en lot les transactions de virement en transactions de dépense",
     "Batch Convert Transfer Transaction to Income Transaction": "Convertir en lot les transactions de virement en transactions de revenu",
+    "Batch Convert Selected Amounts to Positive Values": "Batch Convert Selected Amounts to Positive Values",
+    "Batch Convert Selected Amounts to Negative Values": "Batch Convert Selected Amounts to Negative Values",
     "Invalid Category": "Catégorie invalide",
     "Target Category": "Catégorie cible",
     "Default Expense Category": "Catégorie de dépense par défaut",

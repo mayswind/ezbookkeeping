@@ -1946,6 +1946,8 @@
     "Batch Convert Income Transaction to Transfer Transaction": "수입 거래를 이체 거래로 일괄 변환",
     "Batch Convert Transfer Transaction to Expense Transaction": "이체 거래를 비용 거래로 일괄 변환",
     "Batch Convert Transfer Transaction to Income Transaction": "이체 거래를 수입 거래로 일괄 변환",
+    "Batch Convert Selected Amounts to Positive Values": "Batch Convert Selected Amounts to Positive Values",
+    "Batch Convert Selected Amounts to Negative Values": "Batch Convert Selected Amounts to Negative Values",
     "Invalid Category": "유효하지 않은 카테고리",
     "Target Category": "대상 카테고리",
     "Default Expense Category": "기본 비용 카테고리",

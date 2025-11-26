@@ -35,6 +35,8 @@ var supportedFileEncodings = map[string]encoding.Encoding{
 	"utf-8-bom":    unicode.UTF8BOM,                                        // UTF-8 with BOM
 	"utf-16le":     unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM), // UTF-16 Little Endian
 	"utf-16be":     unicode.UTF16(unicode.BigEndian, unicode.IgnoreBOM),    // UTF-16 Big Endian
+	"utf-16le-bom": unicode.UTF16(unicode.LittleEndian, unicode.ExpectBOM), // UTF-16 Little Endian with BOM
+	"utf-16be-bom": unicode.UTF16(unicode.BigEndian, unicode.ExpectBOM),    // UTF-16 Big Endian with BOM
 	"cp437":        charmap.CodePage437,                                    // OEM United States (CP-437)
 	"cp863":        charmap.CodePage863,                                    // OEM Canadian French (CP-863)
 	"cp037":        charmap.CodePage037,                                    // IBM EBCDIC US/Canada (CP-037)

@@ -874,6 +874,62 @@ func TestCustomTransactionDataDsvFileImporter_ParseValidAmount(t *testing.T) {
 	assert.Equal(t, int64(35), allNewTransactions[3].RelatedAccountAmount)
 }
 
+func TestCustomTransactionDataDsvFileImporter_ParseAmountWithSpaceDigitGroupingSymbol(t *testing.T) {
+	columnIndexMapping := map[datatable.TransactionDataTableColumn]int{
+		datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME: 0,
+		datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE: 1,
+		datatable.TRANSACTION_DATA_TABLE_AMOUNT:           2,
+	}
+	transactionTypeMapping := map[string]models.TransactionType{
+		"E": models.TRANSACTION_TYPE_EXPENSE,
+	}
+	importer, err := CreateNewCustomTransactionDataDsvFileImporter("custom_csv", "utf-8", columnIndexMapping, transactionTypeMapping, false, "YYYY-MM-DD HH:mm:ss", "", ".", " ", "", "", "")
+	assert.Nil(t, err)
+
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	// normal space
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+		"2024-09-01 00:00:00,E,1 234,\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, int64(123400), allNewTransactions[0].Amount)
+
+	// no-break space (NBSP)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+		"2024-09-01 00:00:00,E,1 234,\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, int64(123400), allNewTransactions[0].Amount)
+
+	// narrow no-break space (NNBSP)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+		"2024-09-01 00:00:00,E,1 234,\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, int64(123400), allNewTransactions[0].Amount)
+
+	// figure space
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+		"2024-09-01 00:00:00,E,1 234,\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, int64(123400), allNewTransactions[0].Amount)
+}
+
 func TestCustomTransactionDataDsvFileImporter_ParseInvalidAmount(t *testing.T) {
 	columnIndexMapping := map[datatable.TransactionDataTableColumn]int{
 		datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME:     0,

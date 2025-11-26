@@ -215,6 +215,12 @@ func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user
 func (t *customPlainTextDataRowIterator) parseAmount(ctx core.Context, amountValue string) (string, error) {
 	if t.transactionDataTable.amountDigitGroupingSymbol != "" {
 		amountValue = strings.ReplaceAll(amountValue, t.transactionDataTable.amountDigitGroupingSymbol, "")
+
+		if t.transactionDataTable.amountDigitGroupingSymbol == " " {
+			amountValue = strings.ReplaceAll(amountValue, "\u00A0", "") // No-Break Space (NBSP)
+			amountValue = strings.ReplaceAll(amountValue, "\u202F", "") // Narrow No-Break Space (NNBSP)
+			amountValue = strings.ReplaceAll(amountValue, "\u2007", "") // Figure Space
+		}
 	}
 
 	if t.transactionDataTable.amountDecimalSeparator != "" && t.transactionDataTable.amountDecimalSeparator != "." {

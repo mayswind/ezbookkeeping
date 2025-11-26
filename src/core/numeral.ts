@@ -363,8 +363,8 @@ export class KnownAmountFormat {
     public static readonly CommaDecimalSeparator = new KnownAmountFormat('1234,56', DecimalSeparator.Comma, undefined, /^-?[0-9]+(,[0-9]+)?$/);
     public static readonly DotDecimalSeparatorWithCommaGroupingSymbol = new KnownAmountFormat('1,234.56', DecimalSeparator.Dot, DigitGroupingSymbol.Comma, /^-?([0-9]+,)*[0-9]+(\.[0-9]+)?$/);
     public static readonly CommaDecimalSeparatorWithDotGroupingSymbol = new KnownAmountFormat('1.234,56', DecimalSeparator.Comma, DigitGroupingSymbol.Dot, /^-?([0-9]+\.)*[0-9]+(,[0-9]+)?$/);
-    public static readonly DotDecimalSeparatorWithSpaceGroupingSymbol = new KnownAmountFormat('1 234.56', DecimalSeparator.Dot, DigitGroupingSymbol.Space, /^-?([0-9]+ )*[0-9]+(\.[0-9]+)?$/);
-    public static readonly CommaDecimalSeparatorWithSpaceGroupingSymbol = new KnownAmountFormat('1 234,56', DecimalSeparator.Comma, DigitGroupingSymbol.Space, /^-?([0-9]+ )*[0-9]+(,[0-9]+)?$/);
+    public static readonly DotDecimalSeparatorWithSpaceGroupingSymbol = new KnownAmountFormat('1 234.56', DecimalSeparator.Dot, DigitGroupingSymbol.Space, /^-?([0-9]+([    ]))*[0-9]+(\.[0-9]+)?$/);
+    public static readonly CommaDecimalSeparatorWithSpaceGroupingSymbol = new KnownAmountFormat('1 234,56', DecimalSeparator.Comma, DigitGroupingSymbol.Space, /^-?([0-9]+([    ]))*[0-9]+(,[0-9]+)?$/);
     public static readonly DotDecimalSeparatorWithApostropheGroupingSymbol = new KnownAmountFormat('1\'234.56', DecimalSeparator.Dot, DigitGroupingSymbol.Apostrophe, /^-?([0-9]+')*[0-9]+(\.[0-9]+)?$/);
     public static readonly CommaDecimalSeparatorWithApostropheGroupingSymbol = new KnownAmountFormat('1\'234,56', DecimalSeparator.Comma, DigitGroupingSymbol.Apostrophe, /^-?([0-9]+')*[0-9]+(,[0-9]+)?$/);
 

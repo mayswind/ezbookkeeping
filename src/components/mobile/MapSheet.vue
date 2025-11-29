@@ -11,7 +11,7 @@
                 <f7-link :text="tt('Done')" @click="save"></f7-link>
             </div>
         </f7-toolbar>
-        <f7-page-content class="no-margin-vertical no-padding-vertical">
+        <f7-page-content>
             <map-view ref="map" height="400px" :geo-location="geoLocation" @click="updateSpecifiedGeoLocation">
                 <template #error-title="{ mapSupported, mapDependencyLoaded }">
                     <div class="display-flex padding justify-content-space-between align-items-center">

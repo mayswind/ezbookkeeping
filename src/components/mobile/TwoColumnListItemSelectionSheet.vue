@@ -8,15 +8,15 @@
                 <f7-link sheet-close :text="tt('Done')"></f7-link>
             </div>
         </f7-toolbar>
-        <f7-searchbar ref="searchbar" custom-searchs
-                      :value="filterContent"
-                      :placeholder="filterPlaceholder"
-                      :disable-button="false"
-                      v-if="enableFilter"
-                      @input="filterContent = $event.target.value"
-                      @focus="onSearchBarFocus">
-        </f7-searchbar>
-        <f7-page-content class="no-padding-top">
+        <f7-page-content>
+            <f7-searchbar ref="searchbar" custom-searchs
+                          :value="filterContent"
+                          :placeholder="filterPlaceholder"
+                          :disable-button="false"
+                          v-if="enableFilter"
+                          @input="filterContent = $event.target.value"
+                          @focus="onSearchBarFocus">
+            </f7-searchbar>
             <div class="grid grid-gap" :class="{ 'grid-cols-2': filteredItems && filteredItems.length }">
                 <div>
                     <div class="primary-list-container">
@@ -149,13 +149,13 @@ function onSheetClosed(): void {
 
 <style>
 .primary-list-container, .secondary-list-container {
-    height: 260px;
+    height: 310px;
     overflow-y: auto;
 }
 
 @media (max-height: 629px) {
     .primary-list-container, .secondary-list-container {
-        height: 240px;
+        height: 290px;
     }
 }
 

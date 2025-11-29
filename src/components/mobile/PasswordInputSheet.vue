@@ -8,16 +8,14 @@
             </div>
             <div class="padding-horizontal padding-bottom">
                 <p class="no-margin" v-if="hint">{{ hint }}</p>
-                <f7-list strong class="no-margin">
+                <f7-list class="no-margin">
                     <f7-list-input
                         type="password"
                         autocomplete="current-password"
                         outline
-                        floating-label
                         clear-button
                         class="no-margin no-padding-bottom"
                         :class="color ? 'color-' + color : ''"
-                        :label="tt('Current Password')"
                         :placeholder="tt('Current Password')"
                         v-model:value="currentPassword"
                         @keyup.enter="confirm()"

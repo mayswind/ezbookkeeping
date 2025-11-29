@@ -4,7 +4,7 @@
             <f7-nav-title :title="tt('global.app.title')"></f7-nav-title>
         </f7-navbar>
 
-        <f7-card class="home-summary-card" :class="{ 'skeleton-text': loading }">
+        <f7-card class="home-summary-card no-margin-top" :class="{ 'skeleton-text': loading }">
             <f7-card-header class="display-block" style="padding-top: 120px;">
                 <p class="no-margin">
                     <span class="card-header-content" v-if="loading">
@@ -21,7 +21,7 @@
                 <p class="no-margin">
                     <span class="month-expense" v-if="loading">0.00 USD</span>
                     <span class="month-expense" v-else-if="!loading">{{ transactionOverview && transactionOverview.thisMonth ? getDisplayExpenseAmount(transactionOverview.thisMonth) : '-' }}</span>
-                    <f7-link class="margin-inline-start-half" @click="showAmountInHomePage = !showAmountInHomePage">
+                    <f7-link class="display-inline-flex margin-inline-start-half" @click="showAmountInHomePage = !showAmountInHomePage">
                         <f7-icon class="ebk-hide-icon" :f7="showAmountInHomePage ? 'eye_slash_fill' : 'eye_fill'"></f7-icon>
                     </f7-link>
                 </p>
@@ -438,8 +438,11 @@ init();
     line-height: var(--ebk-big-icon-button-size);
 }
 
-.template-popover-menu .popover-inner{
+.template-popover-menu .popover-inner {
     max-height: 400px;
-    overflow-y: auto;
+
+    > .list {
+        overflow-y: auto;
+    }
 }
 </style>

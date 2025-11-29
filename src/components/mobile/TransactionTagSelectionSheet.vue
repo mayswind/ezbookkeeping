@@ -13,15 +13,15 @@
                          :text="tt('Add')" v-if="!allTags || !allTags.length || noAvailableTag" @click="addNewTag"></f7-link>
             </div>
         </f7-toolbar>
-        <f7-searchbar ref="searchbar" custom-searchs
-                      :value="filterContent"
-                      :placeholder="tt('Find tag')"
-                      :disable-button="false"
-                      v-if="enableFilter"
-                      @input="filterContent = $event.target.value"
-                      @focus="onSearchBarFocus">
-        </f7-searchbar>
-        <f7-page-content :class="'no-padding-top ' + heightClass">
+        <f7-page-content :class="heightClass">
+            <f7-searchbar ref="searchbar" custom-searchs
+                          :value="filterContent"
+                          :placeholder="tt('Find tag')"
+                          :disable-button="false"
+                          v-if="enableFilter"
+                          @input="filterContent = $event.target.value"
+                          @focus="onSearchBarFocus">
+            </f7-searchbar>
             <f7-list class="no-margin-top no-margin-bottom" v-if="(!allTags || !allTags.length || noAvailableTag) && !newTag">
                 <f7-list-item :title="tt('No available tag')"></f7-list-item>
             </f7-list>
@@ -49,7 +49,7 @@
                               v-if="allowAddNewTag && !newTag"
                               @click="addNewTag()">
                 </f7-list-item>
-                <f7-list-item checkbox indeterminate disabled v-if="allowAddNewTag && newTag">
+                <f7-list-item class="editing-list-item" checkbox indeterminate disabled v-if="allowAddNewTag && newTag">
                     <template #media>
                         <f7-icon class="transaction-tag-icon" f7="number"></f7-icon>
                     </template>
@@ -154,9 +154,9 @@ const noAvailableTag = computed<boolean>(() => {
 });
 
 function getHeightClass(): string {
-    if (transactionTagsStore.allTransactionTags && transactionTagsStore.allVisibleTagsCount > 8) {
+    if (transactionTagsStore.allTransactionTags && transactionTagsStore.allVisibleTagsCount > 6) {
         return 'tag-selection-huge-sheet';
-    } else if (transactionTagsStore.allTransactionTags && transactionTagsStore.allVisibleTagsCount > 4) {
+    } else if (transactionTagsStore.allTransactionTags && transactionTagsStore.allVisibleTagsCount > 3) {
         return 'tag-selection-large-sheet';
     } else {
         return 'tag-selection-default-sheet';
@@ -240,23 +240,23 @@ function onSheetClosed(): void {
 
 <style>
 .tag-selection-default-sheet {
-    height: 200px;
+    height: 310px;
 }
 
 @media (min-height: 630px) {
     .tag-selection-large-sheet {
-        height: 260px;
+        height: 370px;
     }
 
     .tag-selection-huge-sheet {
-        height: 380px;
+        height: 500px;
     }
 }
 
 @media (max-height: 629px) {
     .tag-selection-large-sheet,
     .tag-selection-huge-sheet {
-        height: 240px;
+        height: 360px;
     }
 }
 

@@ -2,7 +2,6 @@
     <f7-popup push :opened="show" @popup:open="onPopupOpen" @popup:closed="onPopupClosed">
         <f7-page>
             <f7-navbar :outline="false">
-                <f7-nav-left></f7-nav-left>
                 <f7-nav-title :title="title" v-if="title"></f7-nav-title>
                 <f7-nav-right>
                     <f7-link popup-close :text="tt('Done')"></f7-link>

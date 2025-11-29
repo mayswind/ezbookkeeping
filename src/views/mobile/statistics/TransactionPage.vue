@@ -4,7 +4,7 @@
             <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title>
                 <f7-link popover-open=".chart-data-type-popover-menu">
-                    <span style="color: var(--f7-text-color)">{{ queryChartDataTypeName }}</span>
+                    <span class="statistics-page-title">{{ queryChartDataTypeName }}</span>
                     <f7-icon class="page-title-bar-icon" color="gray" style="opacity: 0.5" f7="chevron_down_circle_fill"></f7-icon>
                 </f7-link>
             </f7-nav-title>
@@ -920,6 +920,12 @@ init();
 </script>
 
 <style>
+.statistics-page-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--f7-text-color);
+}
+
 .card-header.no-border:after {
     display: none;
 }
@@ -954,8 +960,11 @@ init();
     transform: translateY(1.5em);
 }
 
-.chart-data-type-popover-menu .popover-inner{
+.chart-data-type-popover-menu .popover-inner {
     max-height: 440px;
-    overflow-y: auto;
+
+    > .list {
+        overflow-y: auto;
+    }
 }
 </style>

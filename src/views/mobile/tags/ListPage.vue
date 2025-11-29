@@ -31,7 +31,7 @@
                  :sortable-enabled="sortable" @sortable:sort="onSort"
                  v-if="!loading">
             <f7-list-item swipeout
-                          :class="{ 'actual-first-child': tag.id === firstShowingId, 'actual-last-child': tag.id === lastShowingId && !newTag }"
+                          :class="{ 'actual-first-child': tag.id === firstShowingId, 'actual-last-child': tag.id === lastShowingId && !newTag, 'editing-list-item': editingTag.id === tag.id }"
                           :id="getTagDomId(tag)"
                           :key="tag.id"
                           v-for="tag in tags"
@@ -55,7 +55,7 @@
                                   :placeholder="tt('Tag Title')"
                                   v-else-if="editingTag.id === tag.id"
                                   v-model:value="editingTag.name"
-                                  @keyup.enter="save(tag)">
+                                  @keyup.enter="save(editingTag)">
                         </f7-input>
                     </div>
                 </template>
@@ -93,7 +93,7 @@
                 </f7-swipeout-actions>
             </f7-list-item>
 
-            <f7-list-item v-if="newTag">
+            <f7-list-item class="editing-list-item" v-if="newTag">
                 <template #media>
                     <f7-icon class="transaction-tag-icon" f7="number"></f7-icon>
                 </template>

@@ -5,11 +5,18 @@
         <f7-block-title class="margin-top">{{ tt('Common Settings') }}</f7-block-title>
         <f7-list strong inset dividers class="settings-list">
             <f7-list-item
+                class="item-truncate-after-text"
                 link="#"
-                :title="tt('Default Chart Data Type')"
-                :after="findDisplayNameByType(allChartDataTypes, defaultChartDataType)"
                 @click="showDefaultChartDataTypePopup = true"
             >
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Default Chart Data Type') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    {{ findDisplayNameByType(allChartDataTypes, defaultChartDataType) }}
+                </template>
                 <list-item-selection-popup value-type="item"
                                            key-field="type" value-field="type"
                                            title-field="displayName"
@@ -24,11 +31,18 @@
             </f7-list-item>
 
             <f7-list-item
+                class="item-truncate-after-text"
                 link="#"
-                :title="tt('Timezone Used for Date Range')"
-                :after="findDisplayNameByType(allTimezoneTypesUsedForStatistics, defaultTimezoneType)"
                 @click="showDefaultTimezoneTypePopup = true"
             >
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Timezone Used for Date Range') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    {{ findDisplayNameByType(allTimezoneTypesUsedForStatistics, defaultTimezoneType) }}
+                </template>
                 <list-item-selection-popup value-type="item"
                                            key-field="type" value-field="type"
                                            title-field="displayName"
@@ -47,11 +61,18 @@
             <f7-list-item :title="tt('Default Transaction Category Filter')" link="/settings/filter/category?type=statisticsDefault"></f7-list-item>
 
             <f7-list-item
+                class="item-truncate-after-text"
                 link="#"
-                :title="tt('Default Sort Order')"
-                :after="findDisplayNameByType(allSortingTypes, defaultSortingType)"
                 @click="showDefaultSortingTypePopup = true"
             >
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Default Sort Order') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    {{ findDisplayNameByType(allSortingTypes, defaultSortingType) }}
+                </template>
                 <list-item-selection-popup value-type="item"
                                            key-field="type" value-field="type"
                                            title-field="displayName"
@@ -67,13 +88,20 @@
         </f7-list>
 
         <f7-block-title>{{ tt('Categorical Analysis Settings') }}</f7-block-title>
-        <f7-list strong inset dividers>
+        <f7-list strong inset dividers class="settings-list">
             <f7-list-item
+                class="item-truncate-after-text"
                 link="#"
-                :title="tt('Default Chart Type')"
-                :after="findDisplayNameByType(allCategoricalChartTypes, defaultCategoricalChartType)"
                 @click="showDefaultCategoricalChartTypePopup = true"
             >
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Default Chart Type') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    {{ findDisplayNameByType(allCategoricalChartTypes, defaultCategoricalChartType) }}
+                </template>
                 <list-item-selection-popup value-type="item"
                                            key-field="type" value-field="type"
                                            title-field="displayName"
@@ -88,11 +116,18 @@
             </f7-list-item>
 
             <f7-list-item
+                class="item-truncate-after-text"
                 link="#"
-                :title="tt('Default Date Range')"
-                :after="findDisplayNameByType(allCategoricalChartDateRanges, defaultCategoricalChartDateRange)"
                 @click="showDefaultCategoricalChartDateRangePopup = true"
             >
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Default Date Range') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    {{ findDisplayNameByType(allCategoricalChartDateRanges, defaultCategoricalChartDateRange) }}
+                </template>
                 <list-item-selection-popup value-type="item"
                                            key-field="type" value-field="type"
                                            title-field="displayName"
@@ -108,13 +143,20 @@
         </f7-list>
 
         <f7-block-title>{{ tt('Trend Analysis Settings') }}</f7-block-title>
-        <f7-list strong inset dividers>
+        <f7-list strong inset dividers class="settings-list">
             <f7-list-item
+                class="item-truncate-after-text"
                 link="#"
-                :title="tt('Default Date Range')"
-                :after="findDisplayNameByType(allTrendChartDateRanges, defaultTrendChartDateRange)"
                 @click="showDefaultTrendChartDateRangePopup = true"
             >
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Default Date Range') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    {{ findDisplayNameByType(allTrendChartDateRanges, defaultTrendChartDateRange) }}
+                </template>
                 <list-item-selection-popup value-type="item"
                                            key-field="type" value-field="type"
                                            title-field="displayName"
@@ -130,13 +172,20 @@
         </f7-list>
 
         <f7-block-title>{{ tt('Asset Trends Settings') }}</f7-block-title>
-        <f7-list strong inset dividers>
+        <f7-list strong inset dividers class="settings-list">
             <f7-list-item
+                class="item-truncate-after-text"
                 link="#"
-                :title="tt('Default Date Range')"
-                :after="findDisplayNameByType(allAssetTrendsChartDateRanges, defaultAssetTrendsChartDateRange)"
                 @click="showDefaultAssetTrendsChartDateRangePopup = true"
             >
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Default Date Range') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    {{ findDisplayNameByType(allAssetTrendsChartDateRanges, defaultAssetTrendsChartDateRange) }}
+                </template>
                 <list-item-selection-popup value-type="item"
                                            key-field="type" value-field="type"
                                            title-field="displayName"

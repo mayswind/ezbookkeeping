@@ -9,15 +9,13 @@
             <div class="padding-horizontal padding-bottom">
                 <p class="no-margin" v-if="hint">{{ hint }}</p>
                 <slot></slot>
-                <f7-list strong class="no-margin">
+                <f7-list class="no-margin">
                     <f7-list-input
                         type="number"
                         autocomplete="one-time-code"
                         outline
-                        floating-label
                         clear-button
                         class="no-margin no-padding-bottom"
-                        :label="tt('Passcode')"
                         :placeholder="tt('Passcode')"
                         v-model:value="currentPasscode"
                         @keyup.enter="confirm()"

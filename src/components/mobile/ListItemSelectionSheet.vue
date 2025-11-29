@@ -4,7 +4,6 @@
               @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
             <div class="swipe-handler"></div>
-            <div class="left"></div>
             <div class="right">
                 <f7-link sheet-close :text="tt('Done')"></f7-link>
             </div>

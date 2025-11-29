@@ -1572,9 +1572,17 @@ html[dir="rtl"] .list.transaction-info-list li.transaction-info .transaction-foo
 .date-popover-menu .popover-inner,
 .category-popover-menu .popover-inner,
 .account-popover-menu .popover-inner,
-.more-popover-menu .popover-inner{
+.more-popover-menu .popover-inner {
     max-height: 400px;
-    overflow-y: auto;
+
+    > .list {
+        overflow-y: auto;
+    }
+}
+
+.transaction-calendar-container .dp__theme_light,
+.transaction-calendar-container .dp__theme_dark {
+    --dp-background-color: var(--f7-list-strong-bg-color);
 }
 
 .transaction-calendar-container .dp__main .dp__menu {

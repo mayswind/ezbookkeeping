@@ -3,7 +3,7 @@
         <f7-navbar>
             <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title :title="tt('About')"></f7-nav-title>
-            <f7-nav-right>
+            <f7-nav-right :class="{ 'navbar-hidden-icon': clientVersionMatchServerVersion && !forceShowRefreshBrowserCacheMenu }">
                 <f7-link icon-f7="" v-if="clientVersionMatchServerVersion && !forceShowRefreshBrowserCacheMenu"/>
                 <f7-link icon-f7="ellipsis" @click="showRefreshBrowserCacheSheet = true"
                          v-else-if="!clientVersionMatchServerVersion || forceShowRefreshBrowserCacheMenu"></f7-link>
@@ -34,13 +34,13 @@
             <f7-list-item :title="tt('Provider')" :after="mapProviderName" v-if="!mapProviderWebsite"></f7-list-item>
         </f7-list>
 
-        <f7-popup push with-subnavbar swipe-to-close swipe-handler=".swipe-handler" class="license-popup">
+        <f7-popup push swipe-to-close swipe-handler=".swipe-handler" class="license-popup">
             <f7-page>
                 <f7-navbar>
                     <div class="swipe-handler" style="z-index: 10"></div>
-                    <f7-subnavbar :title="tt('License') "></f7-subnavbar>
+                    <f7-nav-title class="license-title">{{ tt('License') }}</f7-nav-title>
                 </f7-navbar>
-                <f7-block strong outline class="license-content">
+                <f7-block strong outline class="license-content no-margin-top">
                     <p>
                         <span :key="num" v-for="(line, num) in licenseLines"
                               :style="{ 'display': line ? 'initial' : 'block', 'padding' : line ? '0' : '0 0 1em 0' }">
@@ -120,16 +120,9 @@ init();
 </script>
 
 <style>
-.license-popup .navbar-bg {
-    background-color: rgb(var(--f7-navbar-bg-color-rgb, var(--f7-bars-bg-color-rgb)));
-}
-
-.license-popup .subnavbar {
-    background-color: rgb(var(--f7-subnavbar-bg-color-rgb, var(--f7-bars-bg-color-rgb)));
-}
-
-.license-popup .subnavbar-title {
-    --f7-subnavbar-title-font-size: var(--ebk-license-popup-title-font-size);
+.license-popup .license-title {
+    margin-top: 26px;
+    font-size: var(--ebk-license-popup-title-font-size);
 }
 
 .license-content {

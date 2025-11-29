@@ -19,7 +19,7 @@
                 <p class="no-margin">
                     <span class="net-assets" v-if="loading">0.00 USD</span>
                     <span class="net-assets" v-else-if="!loading">{{ netAssets }}</span>
-                    <f7-link class="margin-inline-start-half" @click="showAccountBalance = !showAccountBalance">
+                    <f7-link class="display-inline-flex margin-inline-start-half" @click="showAccountBalance = !showAccountBalance">
                         <f7-icon class="ebk-hide-icon" :f7="showAccountBalance ? 'eye_slash_fill' : 'eye_fill'"></f7-icon>
                     </f7-link>
                 </p>

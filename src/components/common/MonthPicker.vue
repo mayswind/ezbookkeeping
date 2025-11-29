@@ -2,8 +2,8 @@
     <vue-date-picker inline auto-apply
                      month-picker
                      :class="monthPickerClass"
+                     :input-attrs="{ clearable: !!clearable }"
                      :dark="isDarkMode"
-                     :clearable="!!clearable"
                      :year-range="yearRange"
                      :year-first="isYearFirst"
                      :range="isDateRange ? { partialRange: false } : undefined"
@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import VueDatePicker from '@vuepic/vue-datepicker';
+import { VueDatePicker } from '@vuepic/vue-datepicker';
 
 import { useI18n } from '@/locales/helpers.ts';
 

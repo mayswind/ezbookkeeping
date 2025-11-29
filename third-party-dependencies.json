@@ -173,13 +173,13 @@
         "name": "vuejs/core",
         "copyright": "Copyright (c) 2018-present, Yuxi (Evan) You and Vue contributors",
         "url": "https://github.com/vuejs/core",
-        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.22/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.25/LICENSE"
     },
     {
         "name": "Pinia",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/pinia",
-        "licenseUrl": "https://github.com/vuejs/pinia/blob/v3.0.3/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/pinia/blob/v3.0.4/LICENSE"
     },
     {
         "name": "vue-router",
@@ -191,13 +191,13 @@
         "name": "vue-i18n",
         "copyright": "Copyright (c) 2016 kazuya kawaguchi",
         "url": "https://github.com/intlify/vue-i18n-next",
-        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v11.1.12/LICENSE"
+        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v11.2.2/LICENSE"
     },
     {
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-now Vuetify, LLC",
         "url": "https://vuetifyjs.com",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.10.7/packages/vuetify/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.11.0/packages/vuetify/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -209,13 +209,13 @@
         "name": "Framework7",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.3.4/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.0.1/LICENSE"
     },
     {
         "name": "Framework7-vue",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/vue/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.3.4/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.0.1/LICENSE"
     },
     {
         "name": "Framework7-icons",
@@ -233,7 +233,7 @@
         "name": "Swiper",
         "copyright": "Copyright (c) 2019 Vladimir Kharlampidi",
         "url": "https://swiperjs.com",
-        "licenseUrl": "https://github.com/nolimits4web/swiper/blob/v10.2.0/LICENSE"
+        "licenseUrl": "https://github.com/nolimits4web/swiper/blob/v12.0.3/LICENSE"
     },
     {
         "name": "Skeleton Elements",
@@ -263,13 +263,13 @@
         "name": "@vuepic/vue-datepicker",
         "copyright": "Copyright (c) 2021-present Vuepic",
         "url": "https://vue3datepicker.com/",
-        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v11.0.3/LICENSE"
+        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v12.0.5/LICENSE"
     },
     {
         "name": "axios",
         "copyright": "Copyright (c) 2014-present Matt Zabriskie & Collaborators",
         "url": "https://axios-http.com",
-        "licenseUrl": "https://github.com/axios/axios/blob/v1.12.2/LICENSE"
+        "licenseUrl": "https://github.com/axios/axios/blob/v1.13.2/LICENSE"
     },
     {
         "name": "Moment.js",

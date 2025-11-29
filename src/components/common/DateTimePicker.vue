@@ -1,24 +1,21 @@
 <template>
     <vue-date-picker ref="datetimepicker"
                      inline auto-apply
-                     enable-seconds
                      six-weeks="center"
                      :class="`datetime-picker ${showAlternateDates && alternateCalendarType ? 'datetime-picker-with-alternate-date' : ''} ${datetimePickerClass}`"
-                     :config="noSwipeAndScroll ? { noSwipe: true } : undefined"
+                     :config="{ noSwipe: !!noSwipeAndScroll, monthChangeOnScroll: !noSwipeAndScroll }"
+                     :time-config="{ enableTimePicker: enableTimePicker, enableSeconds: true, is24: is24Hour }"
+                     :input-attrs="{ clearable: !!clearable }"
                      :dark="isDarkMode"
                      :vertical="vertical"
-                     :enable-time-picker="enableTimePicker"
                      :disable-year-select="disableYearSelect"
-                     :clearable="!!clearable"
                      :year-range="yearRange"
                      :day-names="dayNames"
                      :week-start="firstDayOfWeek"
                      :year-first="isYearFirst"
-                     :is24="is24Hour"
                      :min-date="minDate"
                      :max-date="maxDate"
                      :disabled-dates="disabledDates"
-                     :month-change-on-scroll="!noSwipeAndScroll"
                      :range="isDateRange ? { partialRange: false } : undefined"
                      :preset-dates="presetRanges"
                      v-model="dateTime">
@@ -48,7 +45,7 @@
 
 <script setup lang="ts">
 import { computed, useTemplateRef } from 'vue';
-import VueDatePicker, { type MenuView } from '@vuepic/vue-datepicker';
+import { type MenuView, VueDatePicker } from '@vuepic/vue-datepicker';
 
 import { useI18n } from '@/locales/helpers.ts';
 

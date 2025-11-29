@@ -2,11 +2,11 @@
     <vue-date-picker inline auto-apply
                      model-type="yyyy-MM-dd"
                      :class="`transaction-calendar ${alternateDates ? 'transaction-calendar-with-alternate-date' : ''} ${calendarClass}`"
-                     :config="{ noSwipe: true }"
+                     :config="{ noSwipe: true, monthChangeOnArrows: false, monthChangeOnScroll: false }"
+                     :time-config="{ enableTimePicker: false }"
+                     :input-attrs="{ clearable: false }"
                      :readonly="readonly"
                      :dark="isDarkMode"
-                     :enable-time-picker="false"
-                     :clearable="false"
                      :day-names="dayNames"
                      :week-start="firstDayOfWeek"
                      :min-date="minDate"
@@ -14,9 +14,7 @@
                      :disabled-dates="noTransactionInMonthDay"
                      :prevent-min-max-navigation="true"
                      :hide-offset-dates="true"
-                     :disable-month-year-select="true"
-                     :month-change-on-scroll="false"
-                     :month-change-on-arrows="false"
+                     :hide-month-year-select="true"
                      v-model="dateTime">
         <template #day="{ day, date }">
             <div class="transaction-calendar-daily-amounts">

@@ -402,7 +402,7 @@ class MomentDateTime implements DateTime {
     }
 }
 
-export function getAllowedYearRange(): number[] {
+export function getAllowedYearRange(): [number, number] {
     return [2000, moment().year() + 1];
 }
 

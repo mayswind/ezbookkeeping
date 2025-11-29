@@ -64,7 +64,7 @@ import 'line-awesome/dist/line-awesome/css/line-awesome.css';
 
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar';
 
-import VueDatePicker from '@vuepic/vue-datepicker';
+import { VueDatePicker } from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
 import draggable from 'vuedraggable';

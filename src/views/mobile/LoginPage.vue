@@ -135,7 +135,7 @@
             style="height:auto"
             :opened="showForgetPasswordSheet" @sheet:closed="showForgetPasswordSheet = false"
         >
-            <div class="swipe-handler" style="z-index: 10"></div>
+            <div class="swipe-handler"></div>
             <f7-page-content>
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div class="ebk-sheet-title"><b>{{ tt('Forget Password?') }}</b></div>

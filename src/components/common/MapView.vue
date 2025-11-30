@@ -14,6 +14,7 @@ import { ref, computed, useTemplateRef } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 
 import type { Coordinate } from '@/core/coordinate.ts';
+import { isNumber } from '@/lib/common.ts';
 import type { MapInstance } from '@/lib/map/base.ts';
 import { createMapInstance } from '@/lib/map/index.ts';
 
@@ -21,6 +22,7 @@ const props = defineProps<{
     height?: string;
     mapClass?: string;
     mapStyle?: Record<string, string>;
+    enableZoomControl?: boolean;
     geoLocation?: Coordinate;
 }>();
 
@@ -31,7 +33,9 @@ const emit = defineEmits<{
 const { tt, getCurrentLanguageInfo } = useI18n();
 
 const mapContainer = useTemplateRef<HTMLElement>('mapContainer');
-const mapInstance = ref<MapInstance | null>(createMapInstance());
+const mapInstance = ref<MapInstance | null>(createMapInstance({
+    enableZoomControl: props.enableZoomControl
+}));
 const initCenter = ref<Coordinate>({
     latitude: 0,
     longitude: 0
@@ -67,7 +71,7 @@ function initMapView(): void {
         if (initCenter.value.latitude !== props.geoLocation.latitude || initCenter.value.longitude !== props.geoLocation.longitude) {
             initCenter.value.latitude = props.geoLocation.latitude;
             initCenter.value.longitude = props.geoLocation.longitude;
-            zoomLevel.value = mapInstance.value.defaultZoomLevel;
+            zoomLevel.value = mapInstance.value.getDefaultZoomLevel();
 
             centerChanged = true;
         }
@@ -75,7 +79,7 @@ function initMapView(): void {
         if (initCenter.value.latitude || initCenter.value.longitude) {
             initCenter.value.latitude = 0;
             initCenter.value.longitude = 0;
-            zoomLevel.value = mapInstance.value.minZoomLevel;
+            zoomLevel.value = mapInstance.value.getMinZoomLevel();
 
             centerChanged = true;
         }
@@ -94,7 +98,14 @@ function initMapView(): void {
             },
             onClick: (geoLocation: Coordinate) => {
                 emit('click', geoLocation);
-            }
+            },
+            onZoomChange(level: number) {
+                if (isNumber(level)) {
+                    zoomLevel.value = level;
+                } else if (mapInstance.value) {
+                    zoomLevel.value = Math.round(mapInstance.value.getZoomLevel());
+                }
+            },
         });
 
         if (mapInstance.value.inited) {
@@ -106,9 +117,9 @@ function initMapView(): void {
         mapInstance.value.setMapCenterTo(initCenter.value, zoomLevel.value);
     }
 
-    if (centerChanged && zoomLevel.value > mapInstance.value.minZoomLevel) {
+    if (centerChanged && zoomLevel.value > mapInstance.value.getMinZoomLevel()) {
         mapInstance.value.setMapCenterMarker(initCenter.value);
-    } else if (centerChanged && zoomLevel.value <= mapInstance.value.minZoomLevel) {
+    } else if (centerChanged && zoomLevel.value <= mapInstance.value.getMinZoomLevel()) {
         mapInstance.value.removeMapCenterMarker();
     }
 }
@@ -123,8 +134,44 @@ function setMarkerPosition(geoLocation?: Coordinate): void {
     }
 }
 
+function allowZoomIn(): boolean {
+    if (!mapSupported.value || !mapDependencyLoaded.value || !mapInstance.value) {
+        return false;
+    }
+
+    return zoomLevel.value < mapInstance.value.getMaxZoomLevel();
+}
+
+function allowZoomOut(): boolean {
+    if (!mapSupported.value || !mapDependencyLoaded.value || !mapInstance.value) {
+        return false;
+    }
+
+    return zoomLevel.value > mapInstance.value.getMinZoomLevel();
+}
+
+function zoomIn(): void {
+    if (!mapInstance.value) {
+        return;
+    }
+
+    mapInstance.value.zoomIn();
+}
+
+function zoomOut(): void {
+    if (!mapInstance.value) {
+        return;
+    }
+
+    mapInstance.value.zoomOut();
+}
+
 defineExpose({
     initMapView,
-    setMarkerPosition
+    setMarkerPosition,
+    allowZoomIn,
+    allowZoomOut,
+    zoomIn,
+    zoomOut
 });
 </script>

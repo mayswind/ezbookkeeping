@@ -4,7 +4,9 @@
             <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title :title="tt('Move All Transactions')"></f7-nav-title>
             <f7-nav-right>
-                <f7-link :class="{ 'disabled': !fromAccount || !toAccountId || fromAccount?.id === toAccountId || !toAccountName || !isToAccountNameValid || moving }" :text="tt('Confirm')" @click="confirm"></f7-link>
+                <f7-link icon-f7="checkmark_alt"
+                         :class="{ 'disabled': !fromAccount || !toAccountId || fromAccount?.id === toAccountId || !toAccountName || !isToAccountNameValid || moving }"
+                         @click="confirm"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 

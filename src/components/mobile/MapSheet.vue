@@ -1,20 +1,23 @@
 <template>
-    <f7-sheet swipe-to-close swipe-handler=".swipe-handler" style="height:auto"
+    <f7-sheet swipe-to-close swipe-handler=".swipe-handler" class="map-sheet" style="height:auto"
               :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
             <div class="swipe-handler"></div>
             <div class="left">
-                <f7-link :text="tt('Disable Click to Set Location')" @click="switchSetGeoLocationByClickMap(false)" v-if="!readonly && isSupportGetGeoLocationByClick() && props.setGeoLocationByClickMap"></f7-link>
-                <f7-link :text="tt('Enable Click to Set Location')" @click="switchSetGeoLocationByClickMap(true)" v-if="!readonly && isSupportGetGeoLocationByClick() && !props.setGeoLocationByClickMap"></f7-link>
+                <f7-link icon-f7="minus" :class="{ 'disabled': !map?.allowZoomOut() }" @click="map?.zoomOut()"></f7-link>
+                <f7-link icon-f7="plus" :class="{ 'disabled': !map?.allowZoomIn() }" @click="map?.zoomIn()"></f7-link>
             </div>
-            <div class="right">
-                <f7-link :text="tt('Done')" @click="save"></f7-link>
+            <div class="right map-sheet-toolbar-right">
+                <f7-link :text="tt('Disable Click to Set Location')" @click="switchSetGeoLocationByClickMap(false)" v-if="!readonly && isSupportGetGeoLocationByClick() && props.setGeoLocationByClickMap"></f7-link>
+                <f7-link class="map-sheet-toolbar-auto-hidden" :text="tt('Enable Click to Set Location')" @click="switchSetGeoLocationByClickMap(true)" v-if="!readonly && isSupportGetGeoLocationByClick() && !props.setGeoLocationByClickMap"></f7-link>
             </div>
         </f7-toolbar>
-        <f7-page-content>
-            <map-view ref="map" height="400px" :geo-location="geoLocation" @click="updateSpecifiedGeoLocation">
+        <f7-page-content class="no-margin no-padding">
+            <map-view ref="map" height="400px"
+                      :enable-zoom-control="false" :geo-location="geoLocation"
+                      @click="updateSpecifiedGeoLocation">
                 <template #error-title="{ mapSupported, mapDependencyLoaded }">
-                    <div class="display-flex padding justify-content-space-between align-items-center">
+                    <div class="display-flex map-sheet-error-title padding justify-content-space-between align-items-center">
                         <div class="ebk-sheet-title" v-if="!mapSupported"><b>{{ tt('Unsupported Map Provider') }}</b></div>
                         <div class="ebk-sheet-title" v-else-if="!mapDependencyLoaded"><b>{{ tt('Cannot Initialize Map') }}</b></div>
                         <div class="ebk-sheet-title" v-else></div>
@@ -82,10 +85,6 @@ function switchSetGeoLocationByClickMap(value: boolean): void {
     emit('update:setGeoLocationByClickMap', value);
 }
 
-function save(): void {
-    emit('update:show', false);
-}
-
 function close(): void {
     emit('update:show', false);
 }
@@ -100,3 +99,23 @@ function onSheetClosed(): void {
     close();
 }
 </script>
+
+<style>
+.map-sheet .map-sheet-error-title {
+    margin-top: var(--f7-toolbar-height);
+}
+
+.map-sheet .map-sheet-toolbar-right {
+    overflow: hidden;
+
+    .map-sheet-toolbar-auto-hidden {
+        overflow: hidden;
+
+        > span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+}
+</style>

@@ -37,7 +37,7 @@
         <f7-popup push swipe-to-close swipe-handler=".swipe-handler" class="license-popup">
             <f7-page>
                 <f7-navbar>
-                    <div class="swipe-handler" style="z-index: 10"></div>
+                    <div class="swipe-handler"></div>
                     <f7-nav-title class="license-title">{{ tt('License') }}</f7-nav-title>
                 </f7-navbar>
                 <f7-block strong outline class="license-content no-margin-top">

@@ -37,7 +37,7 @@
                   :swipe-to-close="!exportingData" :close-on-escape="!exportingData"
                   :close-by-backdrop-click="!exportingData" :close-by-outside-click="!exportingData"
                   :opened="showExportDataSheet" @sheet:closed="showExportDataSheet = false; exportedData = null;">
-            <div class="swipe-handler" style="z-index: 10"></div>
+            <div class="swipe-handler"></div>
             <f7-page-content class="margin-top no-padding-top">
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div class="ebk-sheet-title"><b>{{ tt('Are you sure you want to export all transaction data to file?') }}</b></div>

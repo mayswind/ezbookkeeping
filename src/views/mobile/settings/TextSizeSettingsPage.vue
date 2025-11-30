@@ -4,7 +4,7 @@
             <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title :title="tt('Text Size')"></f7-nav-title>
             <f7-nav-right>
-                <f7-link :text="tt('Done')" @click="setFontSize"></f7-link>
+                <f7-link icon-f7="checkmark_alt" @click="setFontSize"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 

@@ -4,8 +4,9 @@ import type { Coordinate } from '@/core/coordinate.ts';
 
 import { type LeafletTileSource, type LeafletTileSourceExtraParam, LEAFLET_TILE_SOURCES } from '@/consts/map.ts';
 
-import type { MapProvider, MapInstance, MapInstanceInitOptions } from './base.ts';
+import type { MapProvider, MapInstance, MapCreateOptions, MapInstanceInitOptions } from './base.ts';
 
+import { isFunction, isNumber } from '@/lib/common.ts';
 import {
     isMapDataFetchProxyEnabled,
     getCustomMapTileLayerUrl,
@@ -20,6 +21,7 @@ import {
 import services from '@/lib/services.ts';
 
 export class LeafletMapProvider implements MapProvider {
+    // https://leafletjs.com/reference.html#pan-options
     public static Leaflet: unknown = null;
     private readonly mapProvider: string;
 
@@ -49,14 +51,14 @@ export class LeafletMapProvider implements MapProvider {
         ]);
     }
 
-    public createMapInstance(): MapInstance | null {
+    public createMapInstance(options: MapCreateOptions): MapInstance | null {
         const mapTileSource = LEAFLET_TILE_SOURCES[this.mapProvider];
 
         if (this.mapProvider !== 'custom' && !mapTileSource) {
             return null;
         }
 
-        return new LeafletMapInstance(this.mapProvider, mapTileSource);
+        return new LeafletMapInstance(this.mapProvider, mapTileSource, options);
     }
 }
 
@@ -64,11 +66,13 @@ export class LeafletMapInstance implements MapInstance {
     public dependencyLoaded: boolean = false;
     public inited: boolean = false;
 
-    public readonly defaultZoomLevel: number;
-    public readonly minZoomLevel: number;
+    private readonly defaultZoomLevel: number;
+    private readonly minZoomLevel: number;
+    private readonly maxZoomLevel: number;
 
     private readonly mapProvider: string;
     private readonly presetMapTileSource: LeafletTileSource;
+    private readonly mapCreateOptions: MapCreateOptions;
 
     private leafletInstance: unknown | null;
     private leafletTileLayer: unknown | null;
@@ -77,14 +81,16 @@ export class LeafletMapInstance implements MapInstance {
     private leafletAttribution: unknown | null;
     private leafletCenterMarker: unknown | null;
 
-    public constructor(mapProvider: string, mapTileSource: LeafletTileSource) {
+    public constructor(mapProvider: string, mapTileSource: LeafletTileSource, options: MapCreateOptions) {
         this.dependencyLoaded = !!LeafletMapProvider.Leaflet;
 
         this.mapProvider = mapProvider;
         this.presetMapTileSource = mapTileSource;
+        this.mapCreateOptions = options;
 
         this.defaultZoomLevel = this.presetMapTileSource?.defaultZoomLevel || getCustomMapDefaultZoomLevel();
         this.minZoomLevel = this.presetMapTileSource?.minZoom || getCustomMapMinZoomLevel();
+        this.maxZoomLevel = this.presetMapTileSource?.maxZoom || getCustomMapMaxZoomLevel();
     }
 
     public initMapInstance(mapContainer: HTMLElement, options: MapInstanceInitOptions): void {
@@ -149,11 +155,13 @@ export class LeafletMapInstance implements MapInstance {
             this.leafletAnnotationLayer = annotationLayer;
         }
 
-        const zoomControl = leaflet.control.zoom({
-            zoomInTitle: options.text.zoomIn,
-            zoomOutTitle: options.text.zoomOut
-        });
-        zoomControl.addTo(leafletInstance);
+        if (this.mapCreateOptions.enableZoomControl) {
+            this.leafletZoomControl = leaflet.control.zoom({
+                zoomInTitle: options.text.zoomIn,
+                zoomOutTitle: options.text.zoomOut
+            });
+            this.leafletZoomControl.addTo(leafletInstance);
+        }
 
         if (this.presetMapTileSource && this.presetMapTileSource.attribution) {
             const attribution = leaflet.control.attribution({
@@ -173,10 +181,35 @@ export class LeafletMapInstance implements MapInstance {
             }
         });
 
+        leafletInstance.addEventListener('zoomanim', function(e) {
+            if (options.onZoomChange && 'zoom' in e && isNumber(e.zoom)) {
+                options.onZoomChange(e.zoom);
+            }
+        });
+
         this.leafletInstance = leafletInstance;
         this.leafletTileLayer = tileLayer;
-        this.leafletZoomControl = zoomControl;
         this.inited = true;
+    }
+
+    public getDefaultZoomLevel(): number {
+        return this.defaultZoomLevel;
+    }
+
+    public getMinZoomLevel(): number {
+        return this.minZoomLevel;
+    }
+
+    public getMaxZoomLevel(): number {
+        return this.maxZoomLevel;
+    }
+
+    public getZoomLevel(): number {
+        if (!this.leafletInstance || !isFunction(this.leafletInstance.getZoom)) {
+            return this.defaultZoomLevel;
+        }
+
+        return this.leafletInstance.getZoom() ?? this.defaultZoomLevel;
     }
 
     public setMapCenterTo(center: Coordinate, zoomLevel: number): void {
@@ -219,6 +252,22 @@ export class LeafletMapInstance implements MapInstance {
 
         this.leafletCenterMarker.remove();
         this.leafletCenterMarker = null;
+    }
+
+    public zoomIn(): void {
+        if (!this.leafletInstance) {
+            return;
+        }
+
+        this.leafletInstance.zoomIn();
+    }
+
+    public zoomOut(): void {
+        if (!this.leafletInstance) {
+            return;
+        }
+
+        this.leafletInstance.zoomOut();
     }
 
     private getFinalUrlFormat(urlFormat: string, urlExtraParams: LeafletTileSourceExtraParam[], options: MapInstanceInitOptions) {

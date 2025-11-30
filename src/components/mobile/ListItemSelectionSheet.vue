@@ -4,9 +4,10 @@
               @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
             <div class="swipe-handler"></div>
-            <div class="right">
-                <f7-link sheet-close :text="tt('Done')"></f7-link>
+            <div class="left">
+                <f7-link sheet-close icon-f7="xmark"></f7-link>
             </div>
+            <div class="right"></div>
         </f7-toolbar>
         <f7-page-content>
             <f7-list dividers class="no-margin-vertical">
@@ -60,7 +61,7 @@ const emit = defineEmits<{
     (e: 'update:show', value: boolean): void;
 }>();
 
-const { tt, ti } = useI18n();
+const { ti } = useI18n();
 
 const currentValue = ref<unknown>(props.modelValue);
 

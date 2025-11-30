@@ -4,10 +4,13 @@
         <f7-toolbar>
             <div class="swipe-handler"></div>
             <div class="left">
-                <f7-link :class="{ 'disabled': loading || recognizing }" :text="tt('Cancel')" @click="cancel"></f7-link>
+                <f7-link icon-f7="xmark" :class="{ 'disabled': loading || recognizing }"
+                         @click="cancel"></f7-link>
             </div>
             <div class="right">
-                <f7-link :class="{ 'disabled': loading || recognizing || !imageFile }" :text="tt('Recognize')" @click="confirm"></f7-link>
+                <f7-button round fill icon-f7="checkmark_alt"
+                           :class="{ 'disabled': loading || recognizing || !imageFile }"
+                           @click="confirm"></f7-button>
             </div>
         </f7-toolbar>
         <f7-page-content class="no-margin-vertical no-padding-vertical">

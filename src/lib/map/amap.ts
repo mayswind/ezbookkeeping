@@ -1,8 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import type { Coordinate } from '@/core/coordinate.ts';
-import type { MapProvider, MapInstance, MapInstanceInitOptions } from './base.ts';
+import type { MapProvider, MapInstance, MapCreateOptions, MapInstanceInitOptions } from './base.ts';
 
+import { isFunction, isArray } from '@/lib/common.ts';
 import { asyncLoadAssets } from '@/lib/misc.ts';
 import services from '@/lib/services.ts';
 import {
@@ -13,6 +14,7 @@ import {
 import logger from '@/lib/logger.ts';
 
 export class AmapMapProvider implements MapProvider {
+    // https://lbs.amap.com/api/javascript-api-v2/documentation
     public static AMap: unknown = null;
 
     public getWebsite(): string {
@@ -52,8 +54,8 @@ export class AmapMapProvider implements MapProvider {
         return asyncLoadAssets('js', services.generateAmapJavascriptUrl('onAMapCallback'));
     }
 
-    public createMapInstance(): MapInstance | null {
-        return new AmapMapInstance();
+    public createMapInstance(options: MapCreateOptions): MapInstance | null {
+        return new AmapMapInstance(options);
     }
 }
 
@@ -61,16 +63,19 @@ export class AmapMapInstance implements MapInstance {
     public dependencyLoaded: boolean = false;
     public inited: boolean = false;
 
-    public readonly defaultZoomLevel: number = 14;
-    public readonly minZoomLevel: number = 1;
+    private readonly defaultZoomLevel: number = 14;
+    private readonly minZoomLevel: number = 2;
+    private readonly maxZoomLevel: number = 19;
 
+    private readonly mapCreateOptions: MapCreateOptions;
     private amapInstance: unknown = null;
     private amapToolbar: unknown = null;
     private amapCenterPosition: unknown = null;
     private amapCenterMarker: unknown | null;
 
-    public constructor() {
+    public constructor(options: MapCreateOptions) {
         this.dependencyLoaded = !!AmapMapProvider.AMap;
+        this.mapCreateOptions = options;
     }
 
     public initMapInstance(mapContainer: HTMLElement, options: MapInstanceInitOptions): void {
@@ -86,10 +91,12 @@ export class AmapMapInstance implements MapInstance {
             jogEnable: false
         });
 
-        const amapToolbar = new AMap.ToolBar({
-            position: 'LT'
-        });
-        amapInstance.addControl(amapToolbar);
+        if (this.mapCreateOptions.enableZoomControl) {
+            this.amapToolbar = new AMap.ToolBar({
+                position: 'LT'
+            });
+            amapInstance.addControl(this.amapToolbar);
+        }
 
         amapInstance.on('click', function(e) {
             if (options.onClick) {
@@ -100,9 +107,54 @@ export class AmapMapInstance implements MapInstance {
             }
         });
 
+        amapInstance.on('zoomend', function() {
+            if (options.onZoomChange && isFunction(amapInstance.getZoom)) {
+                options.onZoomChange(amapInstance.getZoom());
+            }
+        });
+
         this.amapInstance = amapInstance;
-        this.amapToolbar = amapToolbar;
         this.inited = true;
+    }
+
+    public getDefaultZoomLevel(): number {
+        return this.defaultZoomLevel;
+    }
+
+    public getMinZoomLevel(): number {
+        if (!this.amapInstance || !isFunction(this.amapInstance.getZooms)) {
+            return this.minZoomLevel;
+        }
+
+        const zooms = this.amapInstance.getZooms();
+
+        if (!zooms || !isArray(zooms) || zooms.length !== 2) {
+            return this.minZoomLevel;
+        }
+
+        return zooms[0];
+    }
+
+    public getMaxZoomLevel(): number {
+        if (!this.amapInstance || !isFunction(this.amapInstance.getZooms)) {
+            return this.maxZoomLevel;
+        }
+
+        const zooms = this.amapInstance.getZooms();
+
+        if (!zooms || !isArray(zooms) || zooms.length !== 2) {
+            return this.maxZoomLevel;
+        }
+
+        return zooms[1];
+    }
+
+    public getZoomLevel(): number {
+        if (!this.amapInstance || !isFunction(this.amapInstance.getZoom)) {
+            return this.defaultZoomLevel;
+        }
+
+        return this.amapInstance?.getZoom() ?? this.defaultZoomLevel;
     }
 
     public setMapCenterTo(center: Coordinate, zoomLevel: number): void {
@@ -185,6 +237,22 @@ export class AmapMapInstance implements MapInstance {
 
         this.amapInstance.remove(this.amapCenterMarker);
         this.amapCenterMarker = null;
+    }
+
+    public zoomIn(): void {
+        if (!this.amapInstance) {
+            return;
+        }
+
+        this.amapInstance.zoomIn();
+    }
+
+    public zoomOut(): void {
+        if (!this.amapInstance) {
+            return;
+        }
+
+        this.amapInstance.zoomOut();
     }
 
     private setMaker(point: unknown): void {

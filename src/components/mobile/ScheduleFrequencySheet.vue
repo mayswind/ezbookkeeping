@@ -4,10 +4,10 @@
         <f7-toolbar>
             <div class="swipe-handler"></div>
             <div class="left">
-                <f7-link sheet-close :text="tt('Cancel')"></f7-link>
+                <f7-link sheet-close icon-f7="xmark"></f7-link>
             </div>
             <div class="right">
-                <f7-link :text="tt('Done')" @click="save"></f7-link>
+                <f7-button round fill icon-f7="checkmark_alt" @click="save"></f7-button>
             </div>
         </f7-toolbar>
         <f7-page-content>

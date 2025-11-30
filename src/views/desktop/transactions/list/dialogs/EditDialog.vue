@@ -393,7 +393,9 @@
                     <v-window-item value="map">
                         <v-row>
                             <v-col cols="12" md="12">
-                                <map-view ref="map" map-class="transaction-edit-map-view" :geo-location="transaction.geoLocation" @click="updateSpecifiedGeoLocation">
+                                <map-view ref="map" map-class="transaction-edit-map-view"
+                                          :enable-zoom-control="true" :geo-location="transaction.geoLocation"
+                                          @click="updateSpecifiedGeoLocation">
                                     <template #error-title="{ mapSupported, mapDependencyLoaded }">
                                         <span class="text-subtitle-1" v-if="!mapSupported"><b>{{ tt('Unsupported Map Provider') }}</b></span>
                                         <span class="text-subtitle-1" v-else-if="!mapDependencyLoaded"><b>{{ tt('Cannot Initialize Map') }}</b></span>

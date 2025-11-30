@@ -5,7 +5,7 @@
             <f7-nav-title :title="tt('User Profile')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': !isUserVerifyEmailEnabled() || loading || emailVerified }" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link :class="{ 'disabled': inputIsNotChanged || inputIsInvalid || saving }" :text="tt('Save')" @click="save(currentNoPassword)"></f7-link>
+                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': inputIsNotChanged || inputIsInvalid || saving }" @click="save(currentNoPassword)"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 

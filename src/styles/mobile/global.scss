@@ -139,6 +139,12 @@ i.icon.la, i.icon.las, i.icon.lab {
     opacity: 0.55 !important;
 }
 
+.item-input.item-input-outline {
+    > .item-inner {
+        min-height: calc(var(--f7-input-height) + 6px);
+    }
+}
+
 /** custom class **/
 :root {
     --default-icon-color: #000;
@@ -298,10 +304,24 @@ html[dir="rtl"] i.icon.icon-with-direction {
 /** Replacing the default style of @vuepic/vue-datepicker **/
 .dp__theme_light {
     --dp-primary-color: #c67e48;
+    --dp-background-color: inherit;
+    --dp-border-color: #aaa;
+    --dp-menu-border-color: #aaa;
+
+    .dp__overlay {
+        --dp-background-color: #e1e1e2;
+    }
 }
 
 .dp__theme_dark {
     --dp-primary-color: #c67e48;
+    --dp-background-color: inherit;
+    --dp-border-color: #555;
+    --dp-menu-border-color: #555;
+
+    .dp__overlay {
+        --dp-background-color: #1f1f1f;
+    }
 }
 
 /** Common class for replacing the default style of framework7 **/
@@ -314,11 +334,12 @@ html[dir="rtl"] i.icon.icon-with-direction {
     background-color: inherit;
 }
 
-.toolbar-inner {
-    gap: 2px !important;
+.toolbar.toolbar-bottom .toolbar-inner {
+    padding-bottom: 0 !important;
+    gap: 2px;
 
     > .link {
-        padding: 0 !important;
+        padding: 0;
     }
 }
 
@@ -326,7 +347,7 @@ html[dir="rtl"] i.icon.icon-with-direction {
     padding-inline-start: 16px;
     padding-inline-end: 16px;
     justify-content: space-between;
-    gap: 4px !important;
+    gap: 4px;
 }
 
 .toolbar-item-auto-size .toolbar-inner > .link {
@@ -566,6 +587,7 @@ html[dir="rtl"] .icon.las .badge.right-bottom-icon {
     width: 100%;
     top: 0;
     cursor: pointer;
+    z-index: 10;
 }
 
 .swipe-handler:after {
@@ -765,18 +787,6 @@ html[dir="rtl"] .combination-list-wrapper .list.combination-list-header .combina
 }
 
 /** Fix @vuepic/vue-datepicker style issue **/
-.dp__theme_light {
-    --dp-background-color: inherit;
-    --dp-border-color: #aaa;
-    --dp-menu-border-color: #aaa;
-}
-
-.dp__theme_dark {
-    --dp-background-color: inherit;
-    --dp-border-color: #555;
-    --dp-menu-border-color: #555;
-}
-
 .dp__main.dp__flex_display {
     flex-direction: column;
 }

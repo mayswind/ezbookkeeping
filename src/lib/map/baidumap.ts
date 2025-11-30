@@ -1,13 +1,15 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import type { Coordinate } from '@/core/coordinate.ts';
-import type { MapProvider, MapInstance, MapInstanceInitOptions } from './base.ts';
+import type { MapProvider, MapInstance, MapCreateOptions, MapInstanceInitOptions } from './base.ts';
 
+import { isFunction } from '@/lib/common.ts';
 import { asyncLoadAssets } from '@/lib/misc.ts';
 import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 
 export class BaiduMapProvider implements MapProvider {
+    // https://mapopen-pub-jsapi.bj.bcebos.com/jsapi/reference/jsapi_reference_3_0.html
     public static BMap: unknown = null;
     public static BMAP_NAVIGATION_CONTROL_ZOOM: unknown = window.BMAP_NAVIGATION_CONTROL_ZOOM || 3;
     public static BMAP_ANCHOR_TOP_LEFT: unknown = window.BMAP_ANCHOR_TOP_LEFT || 0;
@@ -41,8 +43,8 @@ export class BaiduMapProvider implements MapProvider {
         return asyncLoadAssets('js', services.generateBaiduMapJavascriptUrl('onBMapCallback'));
     }
 
-    public createMapInstance(): MapInstance | null {
-        return new BaiduMapInstance();
+    public createMapInstance(options: MapCreateOptions): MapInstance | null {
+        return new BaiduMapInstance(options);
     }
 }
 
@@ -50,17 +52,20 @@ export class BaiduMapInstance implements MapInstance {
     public dependencyLoaded: boolean = false;
     public inited: boolean = false;
 
-    public readonly defaultZoomLevel: number = 15;
-    public readonly minZoomLevel: number = 1;
+    private readonly defaultZoomLevel: number = 15;
+    private readonly minZoomLevel: number = 4;
+    private readonly maxZoomLevel: number = 19;
 
+    private readonly mapCreateOptions: MapCreateOptions;
     private baiduMapInstance: unknown = null;
     private baiduMapConverter: unknown = null;
     private baiduMapNavigationControl: unknown = null;
     private baiduMapCenterPosition: unknown = null;
     private baiduMapCenterMarker: unknown | null;
 
-    public constructor() {
+    public constructor(options: MapCreateOptions) {
         this.dependencyLoaded = !!BaiduMapProvider.BMap;
+        this.mapCreateOptions = options;
     }
 
     public initMapInstance(mapContainer: HTMLElement, options: MapInstanceInitOptions): void {
@@ -74,11 +79,14 @@ export class BaiduMapInstance implements MapInstance {
         });
         baiduMapInstance.enableScrollWheelZoom();
 
-        const baiduMapNavigationControl = new BMap.NavigationControl({
-            type: BaiduMapProvider.BMAP_NAVIGATION_CONTROL_ZOOM,
-            anchor: BaiduMapProvider.BMAP_ANCHOR_TOP_LEFT
-        });
-        baiduMapInstance.addControl(baiduMapNavigationControl);
+        if (this.mapCreateOptions.enableZoomControl) {
+            this.baiduMapNavigationControl = new BMap.NavigationControl({
+                type: BaiduMapProvider.BMAP_NAVIGATION_CONTROL_ZOOM,
+                anchor: BaiduMapProvider.BMAP_ANCHOR_TOP_LEFT
+            });
+            baiduMapInstance.addControl(this.baiduMapNavigationControl);
+        }
+
         baiduMapInstance.centerAndZoom(new BMap.Point(options.initCenter.longitude, options.initCenter.latitude), options.zoomLevel);
 
         baiduMapInstance.addEventListener('click', function(e) {
@@ -90,10 +98,55 @@ export class BaiduMapInstance implements MapInstance {
             }
         });
 
+        baiduMapInstance.addEventListener('zoomend', function() {
+            if (options.onZoomChange && isFunction(baiduMapInstance.getZoom)) {
+                options.onZoomChange(baiduMapInstance.getZoom());
+            }
+        });
+
         this.baiduMapInstance = baiduMapInstance;
         this.baiduMapConverter = new BMap.Convertor();
-        this.baiduMapNavigationControl = baiduMapNavigationControl;
         this.inited = true;
+    }
+
+    public getDefaultZoomLevel(): number {
+        return this.defaultZoomLevel;
+    }
+
+    public getMinZoomLevel(): number {
+        if (!this.baiduMapInstance || !isFunction(this.baiduMapInstance.getMapType)) {
+            return this.minZoomLevel;
+        }
+
+        const mapType = this.baiduMapInstance.getMapType();
+
+        if (!mapType || !isFunction(mapType.getMinZoom)) {
+            return this.minZoomLevel;
+        }
+
+        return mapType.getMinZoom() ?? this.minZoomLevel;
+    }
+
+    public getMaxZoomLevel(): number {
+        if (!this.baiduMapInstance || !isFunction(this.baiduMapInstance.getMapType)) {
+            return this.maxZoomLevel;
+        }
+
+        const mapType = this.baiduMapInstance.getMapType();
+
+        if (!mapType || !isFunction(mapType.getMaxZoom)) {
+            return this.maxZoomLevel;
+        }
+
+        return mapType.getMaxZoom() ?? this.maxZoomLevel;
+    }
+
+    public getZoomLevel(): number {
+        if (!this.baiduMapInstance || !isFunction(this.baiduMapInstance.getZoom)) {
+            return this.defaultZoomLevel;
+        }
+
+        return this.baiduMapInstance.getZoom() ?? this.defaultZoomLevel;
     }
 
     public setMapCenterTo(center: Coordinate, zoomLevel: number): void {
@@ -184,6 +237,22 @@ export class BaiduMapInstance implements MapInstance {
 
         this.baiduMapInstance.removeOverlay(this.baiduMapCenterMarker);
         this.baiduMapCenterMarker = null;
+    }
+
+    public zoomIn(): void {
+        if (!this.baiduMapInstance) {
+            return;
+        }
+
+        this.baiduMapInstance.zoomIn();
+    }
+
+    public zoomOut(): void {
+        if (!this.baiduMapInstance) {
+            return;
+        }
+
+        this.baiduMapInstance.zoomOut();
     }
 
     private setMaker(point: unknown): void {

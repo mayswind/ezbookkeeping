@@ -3,13 +3,7 @@
               style="height: auto" :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
             <div class="swipe-handler"></div>
-            <div class="left"></div>
-            <div class="right">
-                <f7-link sheet-close :text="tt('Done')"></f7-link>
-            </div>
-        </f7-toolbar>
-        <f7-page-content>
-            <f7-searchbar ref="searchbar" custom-searchs
+            <f7-searchbar ref="searchbar" class="margin-top" custom-searchs
                           :value="filterContent"
                           :placeholder="filterPlaceholder"
                           :disable-button="false"
@@ -17,6 +11,8 @@
                           @input="filterContent = $event.target.value"
                           @focus="onSearchBarFocus">
             </f7-searchbar>
+        </f7-toolbar>
+        <f7-page-content class="margin-top">
             <div class="grid grid-gap" :class="{ 'grid-cols-2': filteredItems && filteredItems.length }">
                 <div>
                     <div class="primary-list-container">
@@ -89,7 +85,7 @@ const emit = defineEmits<{
     (e: 'update:show', value: boolean): void;
 }>();
 
-const { tt, ti } = useI18n();
+const { ti } = useI18n();
 
 const {
     filterContent,

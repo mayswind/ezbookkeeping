@@ -1,7 +1,7 @@
 <template>
     <f7-sheet swipe-to-close swipe-handler=".swipe-handler" class="numpad-sheet" style="height: auto"
               :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
-        <div class="swipe-handler" style="z-index: 10"></div>
+        <div class="swipe-handler"></div>
         <f7-page-content class="margin-top no-padding-top">
             <div class="margin-top padding-horizontal" v-if="hint">
                 <span>{{ hint }}</span>
@@ -111,6 +111,7 @@ const isSupportClipboard = !!navigator.clipboard;
 const previousValue = ref<string>('');
 const currentSymbol = ref<string>('');
 const currentValue = ref<string>(getInitedStringValue(props.modelValue, props.flipNegative));
+const pasteingAmount = ref<boolean>(false);
 
 const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 
@@ -316,11 +317,16 @@ function clear(): void {
 }
 
 function paste(): void {
-    if (!isiOS() || !isSupportClipboard) {
+    if (!isiOS() || !isSupportClipboard || pasteingAmount.value) {
+        pasteingAmount.value = false;
         return;
     }
 
+    pasteingAmount.value = true;
+
     navigator.clipboard.readText().then(text => {
+        pasteingAmount.value = false;
+
         if (!text) {
             return;
         }

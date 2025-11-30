@@ -1,7 +1,7 @@
 import { LEAFLET_TILE_SOURCES } from '@/consts/map.ts';
 import { getMapProvider } from '@/lib/server_settings.ts';
 
-import type { MapProvider, MapInstance } from './base.ts';
+import type { MapProvider, MapInstance, MapCreateOptions } from './base.ts';
 import { LeafletMapProvider } from './leaflet.ts';
 import { GoogleMapProvider } from './googlemap.ts';
 import { BaiduMapProvider } from './baidumap.ts';
@@ -35,6 +35,6 @@ export function isSupportGetGeoLocationByClick(): boolean {
     return mapProvider?.isSupportGetGeoLocationByClick() || false;
 }
 
-export function createMapInstance(): MapInstance | null {
-    return mapProvider?.createMapInstance() || null;
+export function createMapInstance(options: MapCreateOptions): MapInstance | null {
+    return mapProvider?.createMapInstance(options) || null;
 }

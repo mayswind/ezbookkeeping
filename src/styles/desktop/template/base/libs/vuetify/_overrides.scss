@@ -240,15 +240,3 @@ body,
 .v-list-item-subtitle {
     color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
 }
-
-// 👉 placeholders
-.v-field__input {
-    @at-root {
-        & input::placeholder,
-        input#{&}::placeholder,
-        textarea#{&}::placeholder {
-            color: rgba(var(--v-theme-on-surface), var(--v-disabled-opacity)) !important;
-            opacity: 1 !important;
-        }
-    }
-}

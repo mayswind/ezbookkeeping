@@ -473,7 +473,7 @@
         </f7-toolbar>
 
         <f7-photo-browser ref="pictureBrowser" type="popup" navbar-of-text="/"
-                          :theme="isDarkMode ? 'dark' : 'light'" :navbar-show-count="true" :exposition="false"
+                          :navbar-show-count="true" :exposition="false"
                           :photos="transactionPictures" :thumbs="transactionThumbs" />
         <input ref="pictureInput" type="file" style="display: none" :accept="`${SUPPORTED_IMAGE_EXTENSIONS};capture=camera`" @change="uploadPicture($event)" />
     </f7-page>
@@ -493,7 +493,6 @@ import {
 } from '@/views/base/transactions/TransactionEditPageBase.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
-import { useEnvironmentsStore } from '@/stores/environment.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
@@ -596,7 +595,6 @@ const {
 } = useTransactionEditPageBase(pageTypeAndMode?.type || TransactionEditPageType.Transaction, pageTypeAndMode?.mode, query['type'] ? parseInt(query['type']) : undefined);
 
 const settingsStore = useSettingsStore();
-const environmentsStore = useEnvironmentsStore();
 const userStore = useUserStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
@@ -631,8 +629,6 @@ const showTransactionTagSheet = ref<boolean>(false);
 const showTransactionPictures = ref<boolean>(pageTypeAndMode?.type === TransactionEditPageType.Transaction
     && (pageTypeAndMode?.mode === TransactionEditPageMode.Add || pageTypeAndMode?.mode === TransactionEditPageMode.Edit)
     && settingsStore.appSettings.alwaysShowTransactionPicturesInMobileTransactionEditPage);
-
-const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
 
 const sourceAmountClass = computed<Record<string, boolean>>(() => {
     const classes: Record<string, boolean> = {

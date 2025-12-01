@@ -126,8 +126,18 @@ i.icon.la, i.icon.las, i.icon.lab {
     font-size: var(--ebk-searchbar-disable-button-font-size);
 }
 
+.ios .toolbar .link {
+    padding: 0 6px;
+}
+
 .chip.chip-placeholder {
     border: 0;
+}
+
+.ios .popover-inner {
+    > :not(.list) {
+        display: none;
+    }
 }
 
 .actions-button.disabled {
@@ -258,6 +268,14 @@ i.icon.la, i.icon.las, i.icon.lab {
 .login-page-fixed-bottom {
     height: calc(80px + var(--f7-safe-area-bottom));
     background-color: inherit !important;
+
+    &::before {
+        display: none !important;
+    }
+
+    &::after {
+        display: none !important;
+    }
 }
 
 .login-page-fixed-bottom > .toolbar-inner {

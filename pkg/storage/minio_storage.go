@@ -95,8 +95,12 @@ func (s *MinIOObjectStorage) Delete(ctx core.Context, path string) error {
 func (s *MinIOObjectStorage) getFinalPath(path string) string {
 	rootPath := s.rootPath
 
-	if len(rootPath) < 1 || rootPath[len(rootPath)-1] != '/' {
+	if len(rootPath) > 0 && rootPath[len(rootPath)-1] != '/' {
 		rootPath = rootPath + "/"
+	}
+
+	if len(rootPath) > 0 && rootPath[0] == '/' {
+		rootPath = rootPath[1:]
 	}
 
 	if len(path) > 0 && path[0] == '/' {

@@ -153,6 +153,9 @@ const currentTheme = computed<string>({
         if (value !== settingsStore.appSettings.theme) {
             settingsStore.setTheme(value);
             location.reload();
+            if (window.AndroidBridge && typeof window.AndroidBridge.updateTheme === 'function') {
+                window.AndroidBridge.updateTheme(value);    
+            }
         }
     }
 });

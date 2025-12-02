@@ -12,10 +12,15 @@ declare interface LicenseInfo {
     licenseUrl?: string;
 }
 
+interface AndroidBridge {
+  updateTheme(theme: string): void;
+}
+
 interface Window {
     EZBOOKKEEPING_SERVER_SETTINGS?: {
         [key: string]: string | number | boolean | undefined | null;
     };
+	AndroidBridge?: AndroidBridge;
 }
 
 interface Navigator {

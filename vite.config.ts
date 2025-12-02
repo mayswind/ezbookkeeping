@@ -298,6 +298,18 @@ export default defineConfig(() => {
                     target: 'http://127.0.0.1:8080/',
                     changeOrigin: true
                 },
+                '/mcp': {
+                    target: 'http://127.0.0.1:8080/',
+                    changeOrigin: true
+                },
+                '/avatar': {
+                    target: 'http://127.0.0.1:8080/',
+                    changeOrigin: true
+                },
+                '/pictures': {
+                    target: 'http://127.0.0.1:8080/',
+                    changeOrigin: true
+                },
                 '/qrcode': {
                     target: 'http://127.0.0.1:8080/',
                     changeOrigin: true

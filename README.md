@@ -148,6 +148,7 @@ Don't see your language? Help us add it.
 ## Documentation
 1. [English](https://ezbookkeeping.mayswind.net)
 1. [中文 (简体)](https://ezbookkeeping.mayswind.net/zh_Hans)
+1. [中文 (繁體) 使用者操作說明書](User_Guide.md)
 
 ## License
 [MIT](https://github.com/mayswind/ezbookkeeping/blob/master/LICENSE)

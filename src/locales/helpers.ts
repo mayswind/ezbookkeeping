@@ -2140,6 +2140,10 @@ export function useI18n() {
         return ret;
     }
 
+    function getLocalizedFileEncodingName(encoding: string): string {
+        return t(`encoding.${encoding}`);
+    }
+
     function getLocalizedOAuth2ProviderName(oauth2Provider: string, oidcDisplayNames: Record<string, string>): string {
         if (oauth2Provider === 'oidc') {
             const providerDisplayName = getServerMultiLanguageConfigContent(oidcDisplayNames);
@@ -2452,6 +2456,7 @@ export function useI18n() {
         getAmountPrependAndAppendText,
         getCategorizedAccountsWithDisplayBalance,
         // other format functions
+        getLocalizedFileEncodingName,
         getLocalizedOAuth2ProviderName,
         getLocalizedOAuth2LoginText,
         // localization setting functions

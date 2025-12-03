@@ -23,6 +23,7 @@
     "@vuepic/vue-datepicker": "^12.0.5",
     "axios": "^1.13.2",
     "cbor-js": "^0.1.0",
+    "chardet": "^2.1.1",
     "clipboard": "^2.0.11",
     "crypto-js": "^4.2.0",
     "dom7": "^4.0.6",

@@ -290,6 +290,12 @@
         "licenseUrl": "https://github.com/Leaflet/Leaflet/blob/v1.9.4/LICENSE"
     },
     {
+        "name": "Chardet",
+        "copyright": "Copyright (C) 2024 Dmitry Shirokov",
+        "url": "https://github.com/runk/node-chardet",
+        "licenseUrl": "https://github.com/runk/node-chardet/blob/v2.1.1/LICENSE"
+    },
+    {
         "name": "crypto-js",
         "copyright": "Copyright (c) 2009-2013 Jeff Mott, Copyright (c) 2013-2016 Evan Vosberg",
         "url": "https://github.com/brix/crypto-js",

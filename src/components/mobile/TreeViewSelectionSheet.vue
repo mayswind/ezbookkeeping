@@ -165,7 +165,7 @@ function onSheetClosed(): void {
 @media (max-height: 629px) {
     .tree-view-selection-large-sheet,
     .tree-view-selection-huge-sheet {
-        height: 360px;
+        height: 320px;
     }
 }
 </style>

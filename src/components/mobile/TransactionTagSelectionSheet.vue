@@ -257,7 +257,7 @@ function onSheetClosed(): void {
 @media (max-height: 629px) {
     .tag-selection-large-sheet,
     .tag-selection-huge-sheet {
-        height: 360px;
+        height: 320px;
     }
 }
 

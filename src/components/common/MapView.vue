@@ -1,5 +1,5 @@
 <template>
-    <div ref="mapContainer" style="width: 100%" :class="mapClass" :style="finalMapStyle"></div>
+    <div ref="mapContainer" :class="'map-view-container' + (mapClass ? ` ${mapClass}` : '')" :style="finalMapStyle"></div>
     <slot name="error-title"
           :mapSupported="mapSupported" :mapDependencyLoaded="mapDependencyLoaded"
           v-if="!mapSupported || !mapDependencyLoaded"></slot>
@@ -175,3 +175,9 @@ defineExpose({
     zoomOut
 });
 </script>
+
+<style>
+.map-view-container {
+    width: 100%;
+}
+</style>

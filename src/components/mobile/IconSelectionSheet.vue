@@ -59,7 +59,7 @@ const heightClass = computed<string>(() => {
     } else if (allIconRows.value.length > 6) {
         return 'icon-selection-large-sheet';
     } else {
-        return '';
+        return 'icon-selection-default-sheet';
     }
 });
 
@@ -82,13 +82,24 @@ function onSheetClosed(): void {
 </script>
 
 <style>
+.icon-selection-default-sheet {
+    height: 310px;
+}
+
 @media (min-height: 630px) {
     .icon-selection-large-sheet {
-        height: 310px;
+        height: 370px;
     }
 
     .icon-selection-huge-sheet {
-        height: 400px;
+        height: 500px;
+    }
+}
+
+@media (max-height: 629px) {
+    .icon-selection-large-sheet,
+    .icon-selection-huge-sheet {
+        height: 320px;
     }
 }
 </style>

@@ -70,7 +70,7 @@ const heightClass = computed<string>(() => {
     } else if (props.items.length > 6) {
         return 'list-item-selection-large-sheet';
     } else {
-        return '';
+        return 'list-item-selection-default-sheet';
     }
 });
 
@@ -126,13 +126,24 @@ function onSheetClosed(): void {
 </script>
 
 <style>
+.list-item-selection-default-sheet {
+    height: 310px;
+}
+
 @media (min-height: 630px) {
     .list-item-selection-large-sheet {
-        height: 310px;
+        height: 370px;
     }
 
     .list-item-selection-huge-sheet {
-        height: 400px;
+        height: 500px;
+    }
+}
+
+@media (max-height: 629px) {
+    .list-item-selection-large-sheet,
+    .list-item-selection-huge-sheet {
+        height: 320px;
     }
 }
 </style>

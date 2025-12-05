@@ -13,7 +13,7 @@
             </div>
         </f7-toolbar>
         <f7-page-content class="no-margin no-padding">
-            <map-view ref="map" height="400px"
+            <map-view ref="map" height="var(--ebk-map-sheet-height)"
                       :enable-zoom-control="false" :geo-location="geoLocation"
                       @click="updateSpecifiedGeoLocation">
                 <template #error-title="{ mapSupported, mapDependencyLoaded }">
@@ -101,6 +101,14 @@ function onSheetClosed(): void {
 </script>
 
 <style>
+.map-sheet .map-view-container {
+    --ebk-map-sheet-height: 310px;
+
+    @media (min-height: 630px) {
+        --ebk-map-sheet-height: 500px;
+    }
+}
+
 .map-sheet .map-sheet-error-title {
     margin-top: var(--f7-toolbar-height);
 }

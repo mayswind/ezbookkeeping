@@ -1,9 +1,12 @@
 <template>
     <f7-sheet ref="sheet" swipe-to-close swipe-handler=".swipe-handler"
               style="height: auto" :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
-        <f7-toolbar>
+        <f7-toolbar class="toolbar-with-swipe-handler">
             <div class="swipe-handler"></div>
-            <f7-searchbar ref="searchbar" class="margin-top" custom-searchs
+            <div class="left">
+                <f7-link sheet-close icon-f7="xmark"></f7-link>
+            </div>
+            <f7-searchbar ref="searchbar" custom-searchs
                           :value="filterContent"
                           :placeholder="filterPlaceholder"
                           :disable-button="false"

@@ -16,19 +16,20 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-popover class="display-mode-popover-menu"
-                    v-model:opened="showDisplayModePopover">
+        <f7-popover class="display-mode-popover-menu">
             <f7-list dividers>
-                <f7-list-item :title="tt('Transaction List')"
+                <f7-list-item link="#" no-chevron popover-close
+                              :title="tt('Transaction List')"
                               :class="{ 'list-item-selected': !showAccountBalanceTrendsCharts }"
-                              @click="showAccountBalanceTrendsCharts = false; showDisplayModePopover = false">
+                              @click="showAccountBalanceTrendsCharts = false">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!showAccountBalanceTrendsCharts"></f7-icon>
                     </template>
                 </f7-list-item>
-                <f7-list-item :title="tt('Account Balance Trends')"
+                <f7-list-item link="#" no-chevron popover-close
+                              :title="tt('Account Balance Trends')"
                               :class="{ 'list-item-selected': showAccountBalanceTrendsCharts }"
-                              @click="showAccountBalanceTrendsCharts = true; showDisplayModePopover = false">
+                              @click="showAccountBalanceTrendsCharts = true">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="showAccountBalanceTrendsCharts"></f7-icon>
                     </template>
@@ -279,10 +280,10 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-popover class="chart-data-date-aggregation-type-popover-menu"
-                    v-model:opened="showChartDataDateAggregationTypePopover">
+        <f7-popover class="chart-data-date-aggregation-type-popover-menu">
             <f7-list dividers>
-                <f7-list-item :title="dateAggregationType.displayName"
+                <f7-list-item link="#" no-chevron popover-close
+                              :title="dateAggregationType.displayName"
                               :class="{ 'list-item-selected': chartDataDateAggregationType === dateAggregationType.type }"
                               :key="dateAggregationType.type"
                               v-for="dateAggregationType in allDateAggregationTypes"
@@ -433,12 +434,10 @@ const showAccountBalanceTrendsCharts = ref<boolean>(false);
 const chartDataDateAggregationType = ref<number>(ChartDateAggregationType.Day.type);
 const transactionToDelete = ref<TransactionReconciliationStatementResponseItemWithInfo | null>(null);
 const newClosingBalance = ref<number>(0);
-const showDisplayModePopover = ref<boolean>(false);
 const showCustomDateRangeSheet = ref<boolean>(false);
 const showNewClosingBalanceSheet = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
-const showChartDataDateAggregationTypePopover = ref<boolean>(false);
 const virtualDataItems = ref<ReconciliationStatementVirtualListData>({
     items: [],
     topPosition: 0
@@ -673,7 +672,6 @@ function removeTransaction(transaction: TransactionReconciliationStatementRespon
 
 function setChartDataDateAggregationType(type: number): void {
     chartDataDateAggregationType.value = type;
-    showChartDataDateAggregationTypePopover.value = false;
 }
 
 function renderExternal(vl: unknown, vlData: ReconciliationStatementVirtualListData): void {

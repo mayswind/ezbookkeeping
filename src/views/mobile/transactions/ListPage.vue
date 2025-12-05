@@ -1,9 +1,9 @@
 <template>
-    <f7-page with-subnavbar
-             ptr
+    <f7-page ptr
              infinite
              :infinite-preloader="loadingMore"
              :infinite-distance="600"
+             :with-subnavbar="showSearchbar"
              @ptr:refresh="reload"
              @page:afterin="onPageAfterIn"
              @infinite="loadMore(true)">
@@ -16,16 +16,19 @@
                 </f7-link>
             </f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
+                <f7-link icon-f7="search" @click="showSearchbar = true"></f7-link>
                 <f7-link icon-f7="plus" :class="{ 'disabled': !canAddTransaction }" @click="add"></f7-link>
             </f7-nav-right>
 
-            <f7-subnavbar :inner="false">
+            <f7-subnavbar :inner="false" v-if="showSearchbar">
                 <f7-searchbar
                     custom-searchs
                     :value="query.keyword"
                     :placeholder="tt('Search transaction description')"
                     :disable-button-text="tt('Cancel')"
                     @change="changeKeywordFilter($event.target.value)"
+                    @click:clear="changeKeywordFilter(''); showSearchbar = false"
+                    @searchbar:disable="changeKeywordFilter(''); showSearchbar = false"
                 ></f7-searchbar>
             </f7-subnavbar>
         </f7-navbar>
@@ -729,6 +732,7 @@ const loadingMore = ref<boolean>(false);
 const transactionToDelete = ref<Transaction | null>(null);
 const transactionInvisibleYearMonths = ref<Record<TextualYearMonth, boolean>>({});
 const transactionYearMonthListHeights = ref<Record<TextualYearMonth, number>>({});
+const showSearchbar = ref<boolean>(false);
 const showCustomDateRangeSheet = ref<boolean>(false);
 const showCustomMonthSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);

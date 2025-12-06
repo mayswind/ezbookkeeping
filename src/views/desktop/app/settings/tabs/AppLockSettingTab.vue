@@ -3,7 +3,7 @@
         <v-col cols="12">
             <v-card :title="tt('Application Lock')">
                 <v-card-text class="pb-0">
-                    <p class="text-body-1 font-weight-semibold" v-if="!isEnableApplicationLock">
+                    <p class="text-body-1" v-if="!isEnableApplicationLock">
                         {{ tt('Application lock is not enabled') }}
                     </p>
                     <p class="text-body-1" v-if="isEnableApplicationLock">
@@ -22,10 +22,10 @@
                 </v-card-text>
 
                 <v-card-text class="pb-0">
-                    <p class="text-body-1 font-weight-semibold" v-if="!isEnableApplicationLock">
+                    <p class="text-body-1" v-if="!isEnableApplicationLock">
                         {{ tt('Please enter a new 6-digit PIN code. The PIN code would encrypt your local data, so you need to enter it every time you open this app. If this PIN code is lost, you will need to log in again.') }}
                     </p>
-                    <p class="text-body-1 font-weight-semibold" v-if="isEnableApplicationLock">
+                    <p class="text-body-1" v-if="isEnableApplicationLock">
                         {{ tt('Your current PIN code is required to disable application lock.') }}
                     </p>
                 </v-card-text>

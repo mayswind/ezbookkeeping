@@ -152,7 +152,7 @@
                                                 </v-avatar>
                                             </v-list-item-action>
                                         </template>
-                                        <v-list-item-title class="ms-2 font-weight-semibold">
+                                        <v-list-item-title class="ms-2">
                                             {{ currentNickName }}
                                         </v-list-item-title>
                                     </v-list-item>

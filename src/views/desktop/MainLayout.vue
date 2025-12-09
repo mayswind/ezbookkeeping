@@ -79,6 +79,12 @@
                         <span class="nav-item-title">{{ tt('Scheduled Transactions') }}</span>
                     </router-link>
                 </li>
+                <li class="nav-link">
+                    <router-link to="/project/list">
+                        <v-icon class="nav-item-icon" :icon="mdiFolderOutline"/>
+                        <span class="nav-item-title">{{ tt('Projects') }}</span>
+                    </router-link>
+                </li>
                 <li class="nav-section-title">
                     <div class="title-wrapper">
                         <span class="title-text">{{ tt('Miscellaneous') }}</span>
@@ -228,6 +234,7 @@ import {
     mdiClipboardTextOutline,
     mdiClipboardTextClockOutline,
     mdiChartPieOutline,
+    mdiFolderOutline,
     mdiSwapHorizontal,
     mdiCogOutline,
     mdiCellphone,

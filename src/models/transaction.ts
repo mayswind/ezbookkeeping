@@ -15,6 +15,11 @@ export class Transaction implements TransactionInfoResponse {
     public expenseCategoryId: string = '';
     public incomeCategoryId: string = '';
     public transferCategoryId: string = '';
+    public name: string;
+    public merchant: string;
+    public projectId: string;
+    public fee: number;
+    public discount: number;
     public time: number;
     public timeZone?: string; // only in new transaction
     public utcOffset: number;
@@ -39,10 +44,15 @@ export class Transaction implements TransactionInfoResponse {
     private _gregorianCalendarDayOfMonth?: number = undefined; // only for displaying transaction in transaction list
     private _displayDayOfWeek?: WeekDay = undefined; // only for displaying transaction in transaction list
 
-    protected constructor(id: string, timeSequenceId: string, type: number, categoryId: string, time: number, timeZone: string | undefined, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, tagIds: string[], comment: string, editable: boolean) {
+    protected constructor(id: string, timeSequenceId: string, type: number, categoryId: string, name: string, merchant: string, projectId: string, fee: number, discount: number, time: number, timeZone: string | undefined, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, tagIds: string[], comment: string, editable: boolean) {
         this.id = id;
         this.timeSequenceId = timeSequenceId;
         this.type = type;
+        this.name = name;
+        this.merchant = merchant;
+        this.projectId = projectId;
+        this.fee = fee;
+        this.discount = discount;
         this.time = time;
         this.timeZone = timeZone;
         this.utcOffset = utcOffset;
@@ -230,6 +240,11 @@ export class Transaction implements TransactionInfoResponse {
         return {
             type: this.type,
             categoryId: this.getCategoryId(),
+            name: this.name,
+            merchant: this.merchant,
+            projectId: this.projectId,
+            fee: this.fee,
+            discount: this.discount,
             time: actualTime ? actualTime : this.time,
             utcOffset: this.utcOffset,
             sourceAccountId: this.sourceAccountId,
@@ -255,6 +270,11 @@ export class Transaction implements TransactionInfoResponse {
         return {
             id: this.id,
             categoryId: categoryId,
+            name: this.name,
+            merchant: this.merchant,
+            projectId: this.projectId,
+            fee: this.fee,
+            discount: this.discount,
             time: actualTime ? actualTime : this.time,
             utcOffset: this.utcOffset,
             sourceAccountId: this.sourceAccountId,
@@ -279,6 +299,11 @@ export class Transaction implements TransactionInfoResponse {
         return {
             type: this.type,
             categoryId: this.getCategoryId(),
+            name: this.name,
+            merchant: this.merchant,
+            projectId: this.projectId,
+            fee: this.fee,
+            discount: this.discount,
             sourceAccountId: this.sourceAccountId,
             sourceAmount: this.sourceAmount,
             destinationAccountId: this.type === TransactionType.Transfer ? this.destinationAccountId : '0',
@@ -296,6 +321,11 @@ export class Transaction implements TransactionInfoResponse {
             '', // timeSequenceId
             type, // type
             '', // categoryId
+            '', // name
+            '', // merchant
+            '', // projectId
+            0, // fee
+            0, // discount
             time, // time
             timeZone, // timeZone
             utcOffset, // utcOffset
@@ -316,6 +346,11 @@ export class Transaction implements TransactionInfoResponse {
             transactionResponse.timeSequenceId,
             transactionResponse.type,
             transactionResponse.categoryId,
+            transactionResponse.name || '',
+            transactionResponse.merchant || '',
+            transactionResponse.projectId || '',
+            transactionResponse.fee || 0,
+            transactionResponse.discount || 0,
             transactionResponse.time,
             undefined, // only in new transaction
             transactionResponse.utcOffset,
@@ -388,6 +423,11 @@ export class Transaction implements TransactionInfoResponse {
             '', // timeSequenceId
             transactionDraft.type, // type
             transactionDraft.categoryId ?? '', // categoryId
+            transactionDraft.name ?? '', // name
+            transactionDraft.merchant ?? '', // merchant
+            transactionDraft.projectId ?? '', // projectId
+            transactionDraft.fee ?? 0, // fee
+            transactionDraft.discount ?? 0, // discount
             0, // time
             undefined, // only in new transaction
             0, // utcOffset
@@ -510,6 +550,11 @@ export class TransactionTagFilter {
 export interface TransactionDraft {
     readonly type?: number;
     readonly categoryId?: string;
+    readonly name?: string;
+    readonly merchant?: string;
+    readonly projectId?: string;
+    readonly fee?: number;
+    readonly discount?: number;
     readonly sourceAccountId?: string;
     readonly sourceAmount?: number;
     readonly destinationAccountId?: string;
@@ -528,6 +573,11 @@ export interface TransactionGeoLocationRequest {
 export interface TransactionCreateRequest {
     readonly type: number;
     readonly categoryId: string;
+    readonly name: string;
+    readonly merchant: string;
+    readonly projectId: string;
+    readonly fee: number;
+    readonly discount: number;
     readonly time: number;
     readonly utcOffset: number;
     readonly sourceAccountId: string;
@@ -545,6 +595,11 @@ export interface TransactionCreateRequest {
 export interface TransactionModifyRequest {
     readonly id: string;
     readonly categoryId: string;
+    readonly name: string;
+    readonly merchant: string;
+    readonly projectId: string;
+    readonly fee: number;
+    readonly discount: number;
     readonly time: number;
     readonly utcOffset: number;
     readonly sourceAccountId: string;
@@ -611,6 +666,11 @@ export interface TransactionInfoResponse {
     readonly type: number;
     readonly categoryId: string;
     readonly category?: TransactionCategoryInfoResponse;
+    readonly name?: string;
+    readonly merchant?: string;
+    readonly projectId?: string;
+    readonly fee?: number;
+    readonly discount?: number;
     readonly time: number;
     readonly utcOffset: number;
     readonly sourceAccountId: string;

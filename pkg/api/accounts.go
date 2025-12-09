@@ -708,6 +708,7 @@ func (a *AccountsApi) createNewAccountModel(uid int64, accountCreateReq *models.
 	return &models.Account{
 		Uid:          uid,
 		Name:         accountCreateReq.Name,
+		Identifier:   accountCreateReq.Identifier,
 		DisplayOrder: order,
 		Category:     accountCreateReq.Category,
 		Type:         accountCreateReq.Type,
@@ -726,6 +727,7 @@ func (a *AccountsApi) createNewSubAccountModelForModify(uid int64, accountType m
 	return &models.Account{
 		Uid:          uid,
 		Name:         accountModifyReq.Name,
+		Identifier:   accountModifyReq.Identifier,
 		DisplayOrder: order,
 		Category:     accountModifyReq.Category,
 		Type:         accountType,
@@ -762,18 +764,20 @@ func (a *AccountsApi) getToUpdateAccount(uid int64, accountModifyReq *models.Acc
 	}
 
 	newAccount := &models.Account{
-		AccountId: oldAccount.AccountId,
-		Uid:       uid,
-		Name:      accountModifyReq.Name,
-		Category:  accountModifyReq.Category,
-		Icon:      accountModifyReq.Icon,
-		Color:     accountModifyReq.Color,
-		Comment:   accountModifyReq.Comment,
-		Extend:    newAccountExtend,
-		Hidden:    accountModifyReq.Hidden,
+		AccountId:  oldAccount.AccountId,
+		Uid:        uid,
+		Name:       accountModifyReq.Name,
+		Identifier: accountModifyReq.Identifier,
+		Category:   accountModifyReq.Category,
+		Icon:       accountModifyReq.Icon,
+		Color:      accountModifyReq.Color,
+		Comment:    accountModifyReq.Comment,
+		Extend:     newAccountExtend,
+		Hidden:     accountModifyReq.Hidden,
 	}
 
 	if newAccount.Name != oldAccount.Name ||
+		newAccount.Identifier != oldAccount.Identifier ||
 		newAccount.Category != oldAccount.Category ||
 		newAccount.Icon != oldAccount.Icon ||
 		newAccount.Color != oldAccount.Color ||

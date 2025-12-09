@@ -75,6 +75,7 @@ type Account struct {
 	Type            AccountType     `xorm:"NOT NULL"`
 	ParentAccountId int64           `xorm:"INDEX(IDX_account_uid_deleted_parent_account_id_order) NOT NULL"`
 	Name            string          `xorm:"VARCHAR(64) NOT NULL"`
+	Identifier      string          `xorm:"VARCHAR(64)"`
 	DisplayOrder    int32           `xorm:"INDEX(IDX_account_uid_deleted_parent_account_id_order) NOT NULL"`
 	Icon            int64           `xorm:"NOT NULL"`
 	Color           string          `xorm:"VARCHAR(6) NOT NULL"`
@@ -96,6 +97,7 @@ type AccountExtend struct {
 // AccountCreateRequest represents all parameters of account creation request
 type AccountCreateRequest struct {
 	Name                    string                  `json:"name" binding:"required,notBlank,max=64"`
+	Identifier              string                  `json:"identifier" binding:"required,notBlank,max=64"`
 	Category                AccountCategory         `json:"category" binding:"required"`
 	Type                    AccountType             `json:"type" binding:"required"`
 	Icon                    int64                   `json:"icon,string" binding:"required,min=1"`
@@ -113,6 +115,7 @@ type AccountCreateRequest struct {
 type AccountModifyRequest struct {
 	Id                      int64                   `json:"id,string" binding:"required,min=0"`
 	Name                    string                  `json:"name" binding:"required,notBlank,max=64"`
+	Identifier              string                  `json:"identifier" binding:"required,notBlank,max=64"`
 	Category                AccountCategory         `json:"category" binding:"required"`
 	Icon                    int64                   `json:"icon,string" binding:"min=1"`
 	Color                   string                  `json:"color" binding:"required,len=6,validHexRGBColor"`
@@ -162,6 +165,7 @@ type AccountDeleteRequest struct {
 type AccountInfoResponse struct {
 	Id                      int64                    `json:"id,string"`
 	Name                    string                   `json:"name"`
+	Identifier              string                   `json:"identifier"`
 	ParentId                int64                    `json:"parentId,string"`
 	Category                AccountCategory          `json:"category"`
 	Type                    AccountType              `json:"type"`
@@ -193,6 +197,7 @@ func (a *Account) ToAccountInfoResponse() *AccountInfoResponse {
 	return &AccountInfoResponse{
 		Id:                      a.AccountId,
 		Name:                    a.Name,
+		Identifier:              a.Identifier,
 		ParentId:                a.ParentAccountId,
 		Category:                a.Category,
 		Type:                    a.Type,

@@ -95,6 +95,16 @@
                                     />
                                 </v-col>
                                 <v-col cols="12" md="6">
+                                    <v-text-field
+                                        type="text"
+                                        persistent-placeholder
+                                        :disabled="loading || submitting"
+                                        :label="currentAccountIndex < 0 ? tt('Account ID') : tt('Sub-account ID')"
+                                        :placeholder="currentAccountIndex < 0 ? tt('Your account ID') : tt('Your sub-account ID')"
+                                        v-model="selectedAccount.identifier"
+                                    />
+                                </v-col>
+                                <v-col cols="12" md="3">
                                     <icon-select icon-type="account"
                                                  :all-icon-infos="ALL_ACCOUNT_ICONS"
                                                  :label="currentAccountIndex < 0 ? tt('Account Icon') : tt('Sub-account Icon')"
@@ -102,7 +112,7 @@
                                                  :disabled="loading || submitting"
                                                  v-model="selectedAccount.icon" />
                                 </v-col>
-                                <v-col cols="12" md="6">
+                                <v-col cols="12" md="3">
                                     <color-select :all-color-infos="ALL_ACCOUNT_COLORS"
                                                   :label="currentAccountIndex < 0 ? tt('Account Color') : tt('Sub-account Color')"
                                                   :disabled="loading || submitting"

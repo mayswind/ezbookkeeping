@@ -8,6 +8,7 @@ import { DEFAULT_ACCOUNT_COLOR } from '@/consts/color.ts';
 export class Account implements AccountInfoResponse {
     public id: string;
     public name: string;
+    public identifier: string;
     public parentId: string;
     public category: number;
     public type: number;
@@ -25,9 +26,29 @@ export class Account implements AccountInfoResponse {
     private readonly _isAsset?: boolean;
     private readonly _isLiability?: boolean;
 
-    protected constructor(id: string, name: string, parentId: string, category: number, type: number, icon: string, color: string, currency: string, balance: number, comment: string, displayOrder: number, visible: boolean, balanceTime?: number, creditCardStatementDate?: number, isAsset?: boolean, isLiability?: boolean, subAccounts?: Account[]) {
+    protected constructor(
+        id: string,
+        name: string,
+        identifier: string,
+        parentId: string,
+        category: number,
+        type: number,
+        icon: string,
+        color: string,
+        currency: string,
+        balance: number,
+        comment: string,
+        displayOrder: number,
+        visible: boolean,
+        balanceTime?: number,
+        creditCardStatementDate?: number,
+        isAsset?: boolean,
+        isLiability?: boolean,
+        subAccounts?: Account[]
+    ) {
         this.id = id;
         this.name = name;
+        this.identifier = identifier;
         this.parentId = parentId;
         this.category = category;
         this.type = type;
@@ -85,6 +106,7 @@ export class Account implements AccountInfoResponse {
     public equals(other: Account): boolean {
         const isEqual = this.id === other.id &&
             this.name === other.name &&
+            this.identifier === other.identifier &&
             this.parentId === other.parentId &&
             this.category === other.category &&
             this.type === other.type &&
@@ -124,6 +146,7 @@ export class Account implements AccountInfoResponse {
         this.category = other.category;
         this.type = other.type;
         this.name = other.name;
+        this.identifier = other.identifier;
         this.icon = other.icon;
         this.color = other.color;
         this.currency = other.currency;
@@ -173,6 +196,7 @@ export class Account implements AccountInfoResponse {
 
         return {
             name: this.name,
+            identifier: this.identifier,
             category: parentAccount ? parentAccount.category : this.category,
             type: parentAccount ? AccountType.SingleAccount.type : this.type,
             icon: this.icon,
@@ -207,6 +231,7 @@ export class Account implements AccountInfoResponse {
         return {
             id: this.id || '0',
             name: this.name,
+            identifier: this.identifier,
             category: parentAccount ? parentAccount.category : this.category,
             icon: this.icon,
             color: this.color,
@@ -353,6 +378,7 @@ export class Account implements AccountInfoResponse {
         return new Account(
             this.id,
             this.name,
+            this.identifier,
             this.parentId,
             this.category,
             this.type,
@@ -374,6 +400,7 @@ export class Account implements AccountInfoResponse {
         return new Account(
             '', // id
             '', // name
+            '', // identifier
             '', // parentId
             0, // category
             0, // type
@@ -393,6 +420,7 @@ export class Account implements AccountInfoResponse {
         return new Account(
             '', // id
             '', // name
+            '', // identifier
             '', // parentId
             AccountCategory.Cash.type, // category
             AccountType.SingleAccount.type, // type
@@ -412,6 +440,7 @@ export class Account implements AccountInfoResponse {
         return new Account(
             accountResponse.id,
             accountResponse.name,
+            accountResponse.identifier,
             accountResponse.parentId,
             accountResponse.category,
             accountResponse.type,
@@ -526,6 +555,7 @@ export class AccountWithDisplayBalance extends Account {
         super(
             account.id,
             account.name,
+            account.identifier,
             account.parentId,
             account.category,
             account.type,
@@ -553,6 +583,7 @@ export class AccountWithDisplayBalance extends Account {
 
 export interface AccountCreateRequest {
     readonly name: string;
+    readonly identifier: string;
     readonly category: number;
     readonly type: number;
     readonly icon: string;
@@ -569,6 +600,7 @@ export interface AccountCreateRequest {
 export interface AccountModifyRequest {
     readonly id: string;
     readonly name: string;
+    readonly identifier: string;
     readonly category: number;
     readonly icon: string;
     readonly color: string;
@@ -585,6 +617,7 @@ export interface AccountModifyRequest {
 export interface AccountInfoResponse {
     readonly id: string;
     readonly name: string;
+    readonly identifier: string;
     readonly parentId: string;
     readonly category: number;
     readonly type: number;

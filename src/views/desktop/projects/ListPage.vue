@@ -182,7 +182,7 @@ const showHidden = ref<boolean>(false);
 
 const projects = computed<Project[]>({
     get: () => projectsStore.allProjects,
-    set: (value) => {
+    set: () => {
         // draggable-list updates v-model
     }
 });

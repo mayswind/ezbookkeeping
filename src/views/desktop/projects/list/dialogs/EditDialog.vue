@@ -114,7 +114,7 @@ function open(options: { id?: string; currentProject?: Project }): Promise<Proje
 
     // Reset
     project.value = new Project('', '', '', '', 0, false);
-    project.value.color = ALL_CATEGORY_COLORS[0].color; // Default color
+    project.value.color = ALL_CATEGORY_COLORS[0] || ''; // Default color
 
     if (options.id) {
         editProjectId.value = options.id;
@@ -169,6 +169,7 @@ function save(): void {
     };
 
     projectsStore.saveProject({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         project: req as any
     }).then(() => {
         submitting.value = false;

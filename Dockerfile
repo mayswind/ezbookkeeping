@@ -16,6 +16,7 @@ WORKDIR /go/src/github.com/mayswind/ezbookkeeping
 COPY . .
 RUN docker/backend-build-pre-setup.sh
 RUN apk add git gcc g++ libc-dev
+# Skip backend tests to avoid network timeouts during build
 RUN sed -i 's/go test/echo "Skipping tests" #/g' build.sh && ./build.sh backend
 
 # Build frontend files

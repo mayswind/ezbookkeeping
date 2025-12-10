@@ -6,6 +6,11 @@ export class ImportTransaction implements ImportTransactionResponse {
     public type: number;
     public categoryId: string;
     public originalCategoryName: string;
+    public name: string;
+    public merchant: string;
+    public projectId: string;
+    public fee: number;
+    public discount: number;
     public time: number;
     public utcOffset: number;
     public sourceAccountId: string;
@@ -32,6 +37,11 @@ export class ImportTransaction implements ImportTransactionResponse {
         this.type = response.type;
         this.categoryId = response.categoryId;
         this.originalCategoryName = response.originalCategoryName;
+        this.name = response.name || '';
+        this.merchant = response.merchant || '';
+        this.projectId = response.projectId || '';
+        this.fee = response.fee || 0;
+        this.discount = response.discount || 0;
         this.time = response.time;
         this.utcOffset = response.utcOffset;
         this.sourceAccountId = response.sourceAccountId;
@@ -59,6 +69,11 @@ export class ImportTransaction implements ImportTransactionResponse {
         return {
             type: this.type,
             categoryId: this.categoryId,
+            name: this.name,
+            merchant: this.merchant,
+            projectId: this.projectId,
+            fee: this.fee,
+            discount: this.discount,
             time: this.time,
             utcOffset: this.utcOffset,
             sourceAccountId: this.sourceAccountId,
@@ -125,6 +140,11 @@ export interface ImportTransactionResponse {
     readonly type: number;
     readonly categoryId: string;
     readonly originalCategoryName: string;
+    readonly name?: string;
+    readonly merchant?: string;
+    readonly projectId?: string;
+    readonly fee?: number;
+    readonly discount?: number;
     readonly time: number;
     readonly utcOffset: number;
     readonly sourceAccountId: string;

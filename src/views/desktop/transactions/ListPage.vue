@@ -566,10 +566,10 @@
                                                     </div>
                                                 </td>
                                                 <td class="transaction-table-column-fee text-right">
-                                                    <span v-if="transaction.fee">{{ formatAmountToLocalizedNumeralsWithCurrency(transaction.fee, transaction.sourceAccount.currency) }}</span>
+                                                    <span v-if="transaction.fee && transaction.sourceAccount">{{ formatAmountToLocalizedNumeralsWithCurrency(transaction.fee, transaction.sourceAccount?.currency) }}</span>
                                                 </td>
                                                 <td class="transaction-table-column-discount text-right">
-                                                    <span v-if="transaction.discount">{{ formatAmountToLocalizedNumeralsWithCurrency(transaction.discount, transaction.sourceAccount.currency) }}</span>
+                                                    <span v-if="transaction.discount && transaction.sourceAccount">{{ formatAmountToLocalizedNumeralsWithCurrency(transaction.discount, transaction.sourceAccount?.currency) }}</span>
                                                 </td>
                                                 <td class="transaction-table-column-account">
                                                     <div class="d-flex align-center">
@@ -777,7 +777,8 @@ const {
     tt,
     getAllRecentMonthDateRanges,
     getWeekdayLongName,
-    getCurrentNumeralSystemType
+    getCurrentNumeralSystemType,
+    formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
 
 const {

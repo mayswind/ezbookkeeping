@@ -2,17 +2,10 @@ import { Project, type ProjectCreateRequest, type ProjectModifyRequest, type Pro
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 
-import { useRootStore } from '@/stores/index.ts';
-import { useUserStore } from '@/stores/user.ts';
-
-import { isDefined } from '@/lib/common.ts';
 import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 
 export const useProjectsStore = defineStore('projects', () => {
-    const rootStore = useRootStore();
-    const userStore = useUserStore();
-
     const allProjects = ref<Project[]>([]);
     const projectsMap = ref<Record<string, Project>>({});
     const projectListLoaded = ref<boolean>(false);
@@ -63,7 +56,8 @@ export const useProjectsStore = defineStore('projects', () => {
                 projectListLoaded.value = true;
 
                 resolve(projects);
-            }).catch(error => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            }).catch((error: any) => {
                 logger.error('failed to load project list', error);
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
@@ -89,16 +83,21 @@ export const useProjectsStore = defineStore('projects', () => {
 
                 if ('id' in project && project.id) { // Modify
                     for (let i = 0; i < allProjects.value.length; i++) {
-                        if (allProjects.value[i].id === savedProject.id) {
+                        const existingProject = allProjects.value[i];
+                        if (existingProject && existingProject.id === savedProject.id) {
                             allProjects.value[i] = savedProject;
                             break;
                         }
                     }
 
-                    projectsMap.value[savedProject.id] = savedProject;
+                    if (projectsMap.value) {
+                        projectsMap.value[savedProject.id] = savedProject;
+                    }
                 } else { // Create
                     allProjects.value.push(savedProject);
-                    projectsMap.value[savedProject.id] = savedProject;
+                    if (projectsMap.value) {
+                        projectsMap.value[savedProject.id] = savedProject;
+                    }
                 }
 
                 allProjects.value.sort((a, b) => {
@@ -110,7 +109,8 @@ export const useProjectsStore = defineStore('projects', () => {
                 });
 
                 resolve(savedProject);
-            }).catch(error => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            }).catch((error: any) => {
                 logger.error('failed to save project', error);
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
@@ -142,7 +142,8 @@ export const useProjectsStore = defineStore('projects', () => {
                 }
 
                 resolve(true);
-            }).catch(error => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            }).catch((error: any) => {
                 logger.error('failed to hide project', error);
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
@@ -182,7 +183,8 @@ export const useProjectsStore = defineStore('projects', () => {
                 }
 
                 resolve(true);
-            }).catch(error => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            }).catch((error: any) => {
                 logger.error('failed to move project', error);
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
@@ -212,7 +214,8 @@ export const useProjectsStore = defineStore('projects', () => {
                 delete projectsMap.value[project.id];
 
                 resolve(true);
-            }).catch(error => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            }).catch((error: any) => {
                 logger.error('failed to delete project', error);
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {

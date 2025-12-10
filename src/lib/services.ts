@@ -150,6 +150,14 @@ import type {
     OAuth2CallbackLoginRequest
 } from '@/models/oauth2.ts';
 import type {
+    ProjectCreateRequest,
+    ProjectModifyRequest,
+    ProjectHideRequest,
+    ProjectMoveRequest,
+    ProjectDeleteRequest,
+    ProjectInfoResponse
+} from '@/models/project.ts';
+import type {
     UserApplicationCloudSettingsUpdateRequest
 } from '@/models/user_app_cloud_setting.ts';
 import type {
@@ -839,5 +847,24 @@ export default {
         } else {
             return pictureUrl + '?' + params.join('&');
         }
+    },
+    getProjects: (): ApiResponsePromise<ProjectInfoResponse[]> => {
+        return axios.get<ApiResponse<ProjectInfoResponse[]>>('v1/projects/list.json');
+    },
+    saveProject: (req: ProjectCreateRequest | ProjectModifyRequest): ApiResponsePromise<ProjectInfoResponse> => {
+        if ('id' in req) {
+            return axios.post<ApiResponse<ProjectInfoResponse>>('v1/projects/modify.json', req);
+        } else {
+            return axios.post<ApiResponse<ProjectInfoResponse>>('v1/projects/add.json', req);
+        }
+    },
+    hideProject: (req: ProjectHideRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/projects/hide.json', req);
+    },
+    moveProject: (req: ProjectMoveRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/projects/move.json', req);
+    },
+    deleteProject: (req: ProjectDeleteRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/projects/delete.json', req);
     }
 };

@@ -9,7 +9,7 @@
 
                 <v-card-text class="pb-0">
                     <v-skeleton-loader class="skeleton-no-margin pt-2 pb-5" type="text" style="width: 150px" :loading="true" v-if="loading"></v-skeleton-loader>
-                    <p class="text-body-1 font-weight-semibold" v-if="!loading && !new2FAQRCode">
+                    <p class="text-body-1" v-if="!loading && !new2FAQRCode">
                         {{ status === true ? tt('Two-factor authentication is already enabled.') : tt('Two-factor authentication is not enabled yet.') }}
                     </p>
                     <p class="text-body-1" v-if="!loading && new2FAQRCode">

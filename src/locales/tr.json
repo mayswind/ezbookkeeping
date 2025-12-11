@@ -1,0 +1,359 @@
+{
+    "global": {
+        "app": {
+            "title": "ezBookkeeping"
+        }
+    },
+    "language": {
+        "German": "Almanca",
+        "English": "İngilizce",
+        "Spanish": "İspanyolca",
+        "French": "Fransızca",
+        "Italian": "İtalyanca",
+        "Japanese": "Japonca",
+        "Dutch": "Flemenkçe",
+        "Kannada": "Kannada",
+        "Korean": "Korece",
+        "Portuguese (Brazil)": "Portekizce (Brezilya)",
+        "Russian": "Rusça",
+        "Thai": "Tayca",
+        "Turkish": "Türkçe",
+        "Ukrainian": "Ukraynaca",
+        "Vietnamese": "Vietnamca",
+        "Chinese (Simplified)": "Çince (Basitleştirilmiş)",
+        "Chinese (Traditional)": "Çince (Geleneksel)"
+    },
+    "default": {
+        "currency": "TRY",
+        "firstDayOfWeek": "Monday",
+        "fiscalYearFormat": "BitişYYYY",
+        "calendarDisplayType": "Gregoryen",
+        "dateDisplayType": "Gregoryen",
+        "longDateFormat": "DDMMYYYY",
+        "shortDateFormat": "DDMMYYYY",
+        "longTimeFormat": "HHMMSS",
+        "shortTimeFormat": "HHMM",
+        "numeralSystem": "WesternArabicNumerals",
+        "decimalSeparator": "Comma",
+        "digitGroupingSymbol": "Dot",
+        "digitGrouping": "ThousandsSeparator",
+        "currencyDisplayType": "SymbolBeforeAmount"
+    },
+    "format": {
+        "longDate": {
+            "yyyy_mm_dd": "DD MMMM YYYY",
+            "mm_dd_yyyy": "D MMMM YYYY",
+            "dd_mm_yyyy": "D MMMM YYYY"
+        },
+        "shortDate": {
+            "yyyy_mm_dd": "D-M-YYYY",
+            "mm_dd_yyyy": "D/M/YYYY",
+            "dd_mm_yyyy": "D/M/YYYY"
+        },
+        "longYear": {
+            "yyyy_mm_dd": "YYYY",
+            "mm_dd_yyyy": "YYYY",
+            "dd_mm_yyyy": "YYYY"
+        },
+        "shortYear": {
+            "yyyy_mm_dd": "YYYY",
+            "mm_dd_yyyy": "YYYY",
+            "dd_mm_yyyy": "YYYY"
+        },
+        "longYearMonth": {
+            "yyyy_mm_dd": "MMMM YYYY",
+            "mm_dd_yyyy": "MMMM, YYYY",
+            "dd_mm_yyyy": "MMMM, YYYY"
+        },
+        "shortYearMonth": {
+            "yyyy_mm_dd": "M-YYYY",
+            "mm_dd_yyyy": "MMM, YYYY",
+            "dd_mm_yyyy": "MMM, YYYY"
+        },
+        "longMonthDay": {
+            "yyyy_mm_dd": "DD MMMM",
+            "mm_dd_yyyy": "D MMMM",
+            "dd_mm_yyyy": "D MMMM"
+        },
+        "shortMonthDay": {
+            "yyyy_mm_dd": "D-M",
+            "mm_dd_yyyy": "D/M",
+            "dd_mm_yyyy": "D/M"
+        },
+        "shortDay": {
+            "yyyy_mm_dd": "D",
+            "mm_dd_yyyy": "D",
+            "dd_mm_yyyy": "D"
+        },
+        "longTime": {
+            "hh_mm_ss": "HH:mm:ss",
+            "a_hh_mm_ss": "HH:mm:ss",
+            "hh_mm_ss_a": "HH:mm:ss"
+        },
+        "shortTime": {
+            "hh_mm": "HH:mm",
+            "a_hh_mm": "HH:mm",
+            "hh_mm_a": "HH:mm"
+        },
+        "yearQuarter": {
+            "q1": "Ç1 {year}",
+            "q2": "Ç2 {year}",
+            "q3": "Ç3 {year}",
+            "q4": "Ç4 {year}"
+        },
+        "fiscalYear": {
+            "StartYYYY_EndYYYY": "MY {StartYYYY}-{EndYYYY}",
+            "StartYYYY_EndYY": "MY {StartYYYY}-{EndYY}",
+            "StartYY_EndYY": "MY {StartYY}-{EndYY}",
+            "EndYYYY": "MY {EndYYYY}",
+            "EndYY": "MY {EndYY}"
+        },
+        "misc": {
+            "nHour": "{n} Saat",
+            "nHours": "{n} Saat",
+            "nDay": "{n} Gün",
+            "nDays": "{n} Gün",
+            "multiTextJoinSeparator": ", ",
+            "loginWithCustomProvider": "{name} ile giriş yap",
+            "hoursBehindDefaultTimezone": "Varsayılan saat diliminden {hours} saat geri",
+            "hoursAheadOfDefaultTimezone": "Varsayılan saat diliminden {hours} saat ileri",
+            "hoursMinutesBehindDefaultTimezone": "Varsayılan saat diliminden {hours} saat {minutes} dakika geri",
+            "hoursMinutesAheadOfDefaultTimezone": "Varsayılan saat diliminden {hours} saat {minutes} dakika ileri",
+            "monthDay": "{ordinal} gün",
+            "eachMonthDayInMonthDays": "{ordinal}",
+            "monthDays": "{multiMonthDays} gün",
+            "everyMultiDaysOfWeek": "Her {days}",
+            "everyMultiDaysOfMonth": "Ayın her {days}",
+            "youHaveAccounts": "{count} hesap kaydınız var",
+            "addNewTag": "\"{tag}\" etiketini ekle",
+            "clickToSelectedFile": "İçe aktarılacak dosyayı seçmek için tıklayın ({extensions})",
+            "previewCount": "Önizleme Sayısı: {count}",
+            "selectedCount": "{totalCount} içinden {count} seçildi",
+            "youHaveUpdatedTransactions": "{count} işlemi güncellediniz",
+            "confirmImportTransactions": "{count} işlemi içe aktarmak istediğinizden emin misiniz?",
+            "importingTransactions": "İçe aktarılıyor (%{process})",
+            "importTransactionResult": "{count} işlem başarıyla içe aktarıldı.",
+            "moveTransactionsInAccountTip": "Bu işlem GERİ ALINAMAZ. Bu, {fromAccount} hesabındaki tüm işlemleri {toAccount} hesabına taşıyacaktır.",
+            "clearTransactionsInAccountTip": "Bu işlem GERİ ALINAMAZ. Bu, {account} hesabındaki işlem verilerinizi temizleyecektir. Onaylamak için lütfen mevcut şifrenizi girin.",
+            "accountActivationAndResendValidationEmailTip": "Hesap aktivasyon bağlantısı e-posta adresinize ({email}) gönderildi. Eğer e-postayı almadıysanız, lütfen şifrenizi tekrar girin ve doğrulama postasını tekrar göndermek için aşağıdaki düğmeye tıklayın.",
+            "resendValidationEmailTip": "Eğer e-postayı almadıysanız, lütfen şifrenizi tekrar girin ve doğrulama postasını {email} adresine tekrar göndermek için aşağıdaki düğmeye tıklayın.",
+            "oauth2bindTip": "{providerName} kullanarak {userName} kullanıcısına giriş yapıyorsunuz. Doğrulamak için lütfen ezBookkeeping şifrenizi girin."
+        }
+    },
+    "dataExport": {
+        "defaultExportFilename": "ezBookkeeping_disa_aktarilan_veri",
+        "exportFilename": "ezBookkeeping_{nickname}_disa_aktarilan_veri",
+        "defaultExportStatisticsFileName": "ezBookkeeping_istatistik_verisi",
+        "exportStatisticsFileName": "ezBookkeeping_{nickname}_istatistik_verisi",
+        "defaultExportReconciliationStatementsFileName": "ezBookkeeping_mutabakat_ekstreleri",
+        "exportReconciliationStatementsFileName": "ezBookkeeping_{nickname}_mutabakat_ekstreleri",
+        "defaultImportDataMappingFileName": "ezBookkeeping_ice_aktarim_veri_eslemesi",
+        "defaultImportHandlingScript": "ezBookkeeping_isleme_betigi",
+        "defaultImportReplaceRuleFileName": "ezBookkeeping_ice_aktarim_degistirme_kurali"
+    },
+    "calendar": {
+        "Gregorian": "Gregoryen",
+        "Buddhist": "Budist",
+        "Persian": "Fars (Hicri Şemsi)",
+        "Gregorian with Chinese Calendar": "Çin Takvimi ile Gregoryen",
+        "Gregorian with Persian Calendar": "Fars Takvimi ile Gregoryen"
+    },
+    "datetime": {
+        "AM": {
+            "content": "ÖÖ"
+        },
+        "PM": {
+            "content": "ÖS"
+        },
+        "Monday": {
+            "min": "Pt",
+            "short": "Pzt",
+            "long": "Pazartesi"
+        },
+        "Tuesday": {
+            "min": "Sa",
+            "short": "Sal",
+            "long": "Salı"
+        },
+        "Wednesday": {
+            "min": "Ça",
+            "short": "Çar",
+            "long": "Çarşamba"
+        },
+        "Thursday": {
+            "min": "Pe",
+            "short": "Per",
+            "long": "Perşembe"
+        },
+        "Friday": {
+            "min": "Cu",
+            "short": "Cum",
+            "long": "Cuma"
+        },
+        "Saturday": {
+            "min": "Ct",
+            "short": "Cmt",
+            "long": "Cumartesi"
+        },
+        "Sunday": {
+            "min": "Pa",
+            "short": "Paz",
+            "long": "Pazar"
+        },
+        "January": {
+            "short": "Oca",
+            "long": "Ocak"
+        },
+        "February": {
+            "short": "Şub",
+            "long": "Şubat"
+        },
+        "March": {
+            "short": "Mar",
+            "long": "Mart"
+        },
+        "April": {
+            "short": "Nis",
+            "long": "Nisan"
+        },
+        "May": {
+            "short": "May",
+            "long": "Mayıs"
+        },
+        "June": {
+            "short": "Haz",
+            "long": "Haziran"
+        },
+        "July": {
+            "short": "Tem",
+            "long": "Temmuz"
+        },
+        "August": {
+            "short": "Ağu",
+            "long": "Ağustos"
+        },
+        "September": {
+            "short": "Eyl",
+            "long": "Eylül"
+        },
+        "October": {
+            "short": "Eki",
+            "long": "Ekim"
+        },
+        "November": {
+            "short": "Kas",
+            "long": "Kasım"
+        },
+        "December": {
+            "short": "Ara",
+            "long": "Aralık"
+        },
+        "monthDayOrdinal": {
+            "1": "1.",
+            "2": "2.",
+            "3": "3.",
+            "4": "4.",
+            "5": "5.",
+            "6": "6.",
+            "7": "7.",
+            "8": "8.",
+            "9": "9.",
+            "10": "10.",
+            "11": "11.",
+            "12": "12.",
+            "13": "13.",
+            "14": "14.",
+            "15": "15.",
+            "16": "16.",
+            "17": "17.",
+            "18": "18.",
+            "19": "19.",
+            "20": "20.",
+            "21": "21.",
+            "22": "22.",
+            "23": "23.",
+            "24": "24.",
+            "25": "25.",
+            "26": "26.",
+            "27": "27.",
+            "28": "28.",
+            "29": "29.",
+            "30": "30.",
+            "31": "31."
+        }
+    },
+    "granularity": {
+        "FiscalYearly": "Mali Yıllık",
+        "Yearly": "Yıllık",
+        "Quarterly": "Üç Aylık",
+        "Monthly": "Aylık",
+        "Daily": "Günlük"
+    },
+    "numeral": {
+        "Western Arabic Numerals": "Batı Arap Rakamları (1,2,3)",
+        "Eastern Arabic Numerals": "Doğu Arap Rakamları (١,٢,٣)",
+        "Persian Digits": "Fars Rakamları",
+        "Burmese Numerals": "Burma Rakamları",
+        "Devanagari Numerals": "Devanagari Rakamları",
+        "Dot": "Nokta",
+        "Comma": "Virgül",
+        "Space": "Boşluk",
+        "Apostrophe": "Kesme İşareti",
+        "None": "Yok",
+        "Thousands Separator": "Binlik Ayırıcı",
+        "Indian Number Grouping": "Hint Sayı Gruplandırması"
+    },
+    "color": {
+        "amount": {
+            "Green": "Yeşil",
+            "Red": "Kırmızı",
+            "Yellow": "Sarı",
+            "Black or White": "Siyah veya Beyaz"
+        }
+    },
+    "timezone": {
+        "International Date Line West": "Uluslararası Tarih Çizgisi Batı",
+        "Coordinated Universal Time-11": "Eşgüdümlü Evrensel Zaman-11",
+        "Aleutian Islands": "Aleut Adaları",
+        "Hawaii": "Hawaii",
+        "Marquesas Islands": "Marquesas Adaları",
+        "Alaska": "Alaska",
+        "Coordinated Universal Time-09": "Eşgüdümlü Evrensel Zaman-09",
+        "Baja California": "Baja California",
+        "Coordinated Universal Time-08": "Eşgüdümlü Evrensel Zaman-08",
+        "Pacific Time (US & Canada)": "Pasifik Saati (ABD & Kanada)",
+        "Arizona": "Arizona",
+        "La Paz, Mazatlan": "La Paz, Mazatlan",
+        "Mountain Time (US & Canada)": "Dağ Saati (ABD & Kanada)",
+        "Yukon": "Yukon",
+        "Central America": "Orta Amerika",
+        "Central Time (US & Canada)": "Merkezi Saat (ABD & Kanada)",
+        "Easter Island": "Paskalya Adası",
+        "Guadalajara, Mexico City, Monterrey": "Guadalajara, Mexico City, Monterrey",
+        "Saskatchewan": "Saskatchewan",
+        "Bogota, Lima, Quito, Rio Branco": "Bogota, Lima, Quito, Rio Branco",
+        "Chetumal": "Chetumal",
+        "Eastern Time (US & Canada)": "Doğu Saati (ABD & Kanada)",
+        "Haiti": "Haiti",
+        "Havana": "Havana",
+        "Indiana (East)": "Indiana (Doğu)",
+        "Turks and Caicos": "Turks ve Caicos",
+        "Asuncion": "Asuncion",
+        "Atlantic Time (Canada)": "Atlantik Saati (Kanada)",
+        "Caracas": "Karakas",
+        "Cuiaba": "Cuiaba",
+        "Georgetown, La Paz, Manaus, San Juan": "Georgetown, La Paz, Manaus, San Juan",
+        "Santiago": "Santiago",
+        "Newfoundland": "Newfoundland",
+        "Araguaina": "Araguaina",
+        "Brasilia": "Brasilia",
+        "Cayenne, Fortaleza": "Cayenne, Fortaleza",
+        "City of Buenos Aires": "Buenos Aires Şehri",
+        "Montevideo": "Montevideo",
+        "Punta Arenas": "Punta Arenas",
+        "Saint Pierre and Miquelon": "Saint Pierre ve Miquelon",
+        "Salvador": "Salvador",
+        "Coordinated Universal Time-02": "Eşgüdümlü Evrensel Zaman-02",
+        "Greenland": "Grönland",
+        "Azores": "Azorlar",
+        "

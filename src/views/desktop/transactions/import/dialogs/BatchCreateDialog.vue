@@ -80,7 +80,7 @@ import { CategoryType } from '@/core/category.ts';
 import { AUTOMATICALLY_CREATED_CATEGORY_ICON_ID } from '@/consts/icon.ts';
 import { DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
 
-import { type TransactionCategoryCreateRequest, type TransactionCategoryCreateWithSubCategories, TransactionCategory } from '@/models/transaction_category.ts';
+import { type TransactionCategoryCreateWithSubCategories, TransactionCategory } from '@/models/transaction_category.ts';
 import { type TransactionTagCreateRequest, TransactionTag } from '@/models/transaction_tag.ts';
 
 import { isDefined, arrayItemToObjectField } from '@/lib/common.ts';
@@ -162,7 +162,10 @@ function buildBatchCreateCategoryResponse(createdCategories: Record<number, Tran
                 } else if (isDefined(displayNameSourceItemMap[subCategory.name])) {
                     // Fallback for just Sub Name (old behavior or when no parent in source)
                     const sourceItem = displayNameSourceItemMap[subCategory.name];
-                    sourceTargetMap[sourceItem] = subCategory.id;
+
+                    if (sourceItem) {
+                        sourceTargetMap[sourceItem] = subCategory.id;
+                    }
                 }
             }
         }
@@ -250,7 +253,6 @@ function confirm(): void {
             primaryCategoryName = tt('Default Transfer Category');
         }
 
-        const allCategories = transactionCategoriesStore.allTransactionCategoriesMap;
         const submitCategories: TransactionCategoryCreateWithSubCategories[] = [];
         const existingParentCategoriesToAdd: { category: TransactionCategory, parentId: string }[] = [];
 
@@ -269,9 +271,12 @@ function confirm(): void {
             }
 
             let existingParentId: string | null = null;
+            const allCategories = transactionCategoriesStore.allTransactionCategories;
 
-            if (transactionCategoriesStore.allTransactionCategories && transactionCategoriesStore.allTransactionCategories[categoryType]) {
-                for (const category of transactionCategoriesStore.allTransactionCategories[categoryType]) {
+            const categories = allCategories?.[categoryType];
+
+            if (categories) {
+                for (const category of categories) {
                     if (category.name === parentCategoryName) {
                         existingParentId = category.id;
                         break;
@@ -298,10 +303,19 @@ function confirm(): void {
                         color: DEFAULT_CATEGORY_COLOR,
                         subCategories: []
                     };
-                    submitCategories.push(newParentCategoryMap[parentCategoryName]);
+
+                    const newCategory = newParentCategoryMap[parentCategoryName];
+
+                    if (newCategory) {
+                        submitCategories.push(newCategory);
+                    }
                 }
 
-                newParentCategoryMap[parentCategoryName].subCategories.push(category.toCreateRequest(''));
+                const parentCategory = newParentCategoryMap[parentCategoryName];
+
+                if (parentCategory) {
+                    parentCategory.subCategories.push(category.toCreateRequest(''));
+                }
             }
         }
 
@@ -323,8 +337,7 @@ function confirm(): void {
             }
         }
 
-        Promise.all(promises).then((responses) => {
-            const batchResponse = responses[0] as Record<number, TransactionCategory[]>; // Assuming first is addCategories, but Promise.all order is preserved.
+        Promise.all(promises).then(() => {
             // If we have both, we need to merge responses.
             // But actually we just reload categories and then return mapped response.
 

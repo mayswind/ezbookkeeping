@@ -454,7 +454,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 				CreatedIp:            "127.0.0.1",
 			},
 			TagIds:                             tagIds,
-			OriginalCategoryName:               subCategoryName,
+			OriginalCategoryName:               c.buildOriginalCategoryName(categoryName, subCategoryName),
 			OriginalSourceAccountName:          accountName,
 			OriginalSourceAccountCurrency:      accountCurrency,
 			OriginalDestinationAccountName:     account2Name,
@@ -642,4 +642,14 @@ func buildTransactionNameTypeMap(transactionTypeMapping map[models.TransactionTy
 	}
 
 	return typeNameMap
+}
+
+func (c *DataTableTransactionDataImporter) buildOriginalCategoryName(categoryName string, subCategoryName string) string {
+	if categoryName != "" && subCategoryName != "" {
+		return categoryName + ":::" + subCategoryName
+	} else if categoryName != "" {
+		return categoryName
+	} else {
+		return subCategoryName
+	}
 }

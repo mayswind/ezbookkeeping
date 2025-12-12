@@ -147,13 +147,23 @@ function buildBatchCreateCategoryResponse(createdCategories: Record<number, Tran
             }
 
             for (const subCategory of category.subCategories) {
-                const sourceItem = displayNameSourceItemMap[subCategory.name];
+                // If the item name in invalidItems contained ':::', we need to reconstruct it to match
+                // or we match by subCategory name if possible?
+                // The invalidItems contains original full names (e.g. "Parent:::Sub" or "Sub").
+                // Here we iterate through ALL categories.
+                // We need to check if "Parent:::Sub" exists in displayNameSourceItemMap.
 
-                if (!isDefined(sourceItem)) {
-                    continue;
+                // Construct potential full name "Parent:::Sub"
+                const potentialFullName = category.name + ':::' + subCategory.name;
+
+                if (isDefined(displayNameSourceItemMap[potentialFullName])) {
+                    const sourceItem = displayNameSourceItemMap[potentialFullName];
+                    sourceTargetMap[sourceItem] = subCategory.id;
+                } else if (isDefined(displayNameSourceItemMap[subCategory.name])) {
+                    // Fallback for just Sub Name (old behavior or when no parent in source)
+                    const sourceItem = displayNameSourceItemMap[subCategory.name];
+                    sourceTargetMap[sourceItem] = subCategory.id;
                 }
-
-                sourceTargetMap[sourceItem] = subCategory.id;
             }
         }
     }
@@ -240,31 +250,91 @@ function confirm(): void {
             primaryCategoryName = tt('Default Transfer Category');
         }
 
-        const subCategories: TransactionCategoryCreateRequest[] = [];
+        const allCategories = transactionCategoriesStore.allTransactionCategoriesMap;
+        const submitCategories: TransactionCategoryCreateWithSubCategories[] = [];
+        const existingParentCategoriesToAdd: { category: TransactionCategory, parentId: string }[] = [];
+
+        const newParentCategoryMap: Record<string, TransactionCategoryCreateWithSubCategories> = {};
 
         for (const item of selectedNames.value) {
+            let parentCategoryName = primaryCategoryName;
+            let subCategoryName = item;
+
+            if (item.includes(':::')) {
+                const parts = item.split(':::');
+                if (parts.length === 2 && parts[0] && parts[1]) {
+                    parentCategoryName = parts[0];
+                    subCategoryName = parts[1];
+                }
+            }
+
+            let existingParentId: string | null = null;
+
+            if (transactionCategoriesStore.allTransactionCategories && transactionCategoriesStore.allTransactionCategories[categoryType]) {
+                for (const category of transactionCategoriesStore.allTransactionCategories[categoryType]) {
+                    if (category.name === parentCategoryName) {
+                        existingParentId = category.id;
+                        break;
+                    }
+                }
+            }
+
             const category: TransactionCategory = TransactionCategory.createNewCategory(categoryType);
-            category.name = item;
+            category.name = subCategoryName;
             category.icon = AUTOMATICALLY_CREATED_CATEGORY_ICON_ID;
-            subCategories.push(category.toCreateRequest(''));
+
+            if (existingParentId) {
+                category.parentId = existingParentId;
+                existingParentCategoriesToAdd.push({
+                    category: category,
+                    parentId: existingParentId
+                });
+            } else {
+                if (!newParentCategoryMap[parentCategoryName]) {
+                    newParentCategoryMap[parentCategoryName] = {
+                        name: parentCategoryName,
+                        type: categoryType,
+                        icon: AUTOMATICALLY_CREATED_CATEGORY_ICON_ID,
+                        color: DEFAULT_CATEGORY_COLOR,
+                        subCategories: []
+                    };
+                    submitCategories.push(newParentCategoryMap[parentCategoryName]);
+                }
+
+                newParentCategoryMap[parentCategoryName].subCategories.push(category.toCreateRequest(''));
+            }
         }
 
-        const submitCategories: TransactionCategoryCreateWithSubCategories[] = [{
-            name: primaryCategoryName,
-            type: categoryType,
-            icon: AUTOMATICALLY_CREATED_CATEGORY_ICON_ID,
-            color: DEFAULT_CATEGORY_COLOR,
-            subCategories: subCategories
-        }];
+        const promises: Promise<unknown>[] = [];
 
-        transactionCategoriesStore.addCategories({
-            categories: submitCategories
-        }).then(response => {
-            transactionCategoriesStore.loadAllCategories({ force: false }).then(() => {
+        if (submitCategories.length > 0) {
+            promises.push(transactionCategoriesStore.addCategories({
+                categories: submitCategories
+            }));
+        }
+
+        if (existingParentCategoriesToAdd.length > 0) {
+            for (const item of existingParentCategoriesToAdd) {
+                promises.push(transactionCategoriesStore.saveCategory({
+                    category: item.category,
+                    isEdit: false,
+                    clientSessionId: ''
+                }));
+            }
+        }
+
+        Promise.all(promises).then((responses) => {
+            const batchResponse = responses[0] as Record<number, TransactionCategory[]>; // Assuming first is addCategories, but Promise.all order is preserved.
+            // If we have both, we need to merge responses.
+            // But actually we just reload categories and then return mapped response.
+
+            transactionCategoriesStore.loadAllCategories({ force: true }).then((allCategories) => {
                 submitting.value = false;
                 showState.value = false;
 
-                resolveFunc?.(buildBatchCreateCategoryResponse(response));
+                // We need to pass back a map of "Source Name" -> "New Category ID"
+                // Reconstruct the response map
+                resolveFunc?.(buildBatchCreateCategoryResponse(allCategories));
             }).catch(error => {
                 submitting.value = false;
 

@@ -39,7 +39,7 @@ export class ImportTransaction implements ImportTransactionResponse {
         this.originalCategoryName = response.originalCategoryName;
         this.name = response.name || '';
         this.merchant = response.merchant || '';
-        this.projectId = response.projectId || '';
+        this.projectId = response.projectId || '0';
         this.fee = response.fee || 0;
         this.discount = response.discount || 0;
         this.time = response.time;

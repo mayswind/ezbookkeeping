@@ -63,6 +63,7 @@ import type { Router } from 'framework7/types';
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
 
+import { KnownErrorCode } from '@/consts/api.ts';
 import { useTwoFactorAuthStore } from '@/stores/twoFactorAuth.ts';
 
 const props = defineProps<{
@@ -100,6 +101,10 @@ function init(): void {
         loading.value = false;
     }).catch(error => {
         if (error.processed) {
+            status.value = null;
+            loading.value = false;
+        } else if (error.error && error.error.errorCode === KnownErrorCode.ApiNotFound) {
+            status.value = null;
             loading.value = false;
         } else {
             loadingError.value = error;

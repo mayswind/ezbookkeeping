@@ -110,6 +110,7 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useTwoFactorAuthStore } from '@/stores/twoFactorAuth.ts';
 
+import { KnownErrorCode } from '@/consts/api.ts';
 import { copyTextToClipboard } from '@/lib/ui/common.ts';
 
 import {
@@ -145,7 +146,10 @@ function init(): void {
     }).catch(error => {
         loading.value = false;
 
-        if (!error.processed) {
+        if (error.error && error.error.errorCode === KnownErrorCode.ApiNotFound) {
+            status.value = null;
+        } else if (!error.processed) {
+            status.value = null;
             snackbar.value?.showError(error);
         }
     });

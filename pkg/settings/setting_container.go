@@ -1,6 +1,10 @@
 package settings
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+)
 
 // ConfigContainer contains the current setting config
 type ConfigContainer struct {
@@ -27,8 +31,8 @@ func (c *ConfigContainer) GetCurrentConfig() *Config {
 
 func GetUserAgent() string {
 	if Version == "" {
-		return "ezBookkeeping"
+		return core.ApplicationName
 	}
 
-	return fmt.Sprintf("ezBookkeeping/%s", Version)
+	return fmt.Sprintf("%s/%s", core.ApplicationName, Version)
 }

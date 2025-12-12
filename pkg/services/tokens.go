@@ -21,13 +21,13 @@ import (
 )
 
 // TokenUserAgentCreatedViaCli is the user agent of token created via cli
-const TokenUserAgentCreatedViaCli = "ezbookkeeping Cli"
+const TokenUserAgentCreatedViaCli = core.ApplicationName + " Cli"
 
 // TokenUserAgentForAPI is the user agent for API token
-const TokenUserAgentForAPI = "ezbookkeeping API"
+const TokenUserAgentForAPI = core.ApplicationName + " API"
 
 // TokenUserAgentForMCP is the user agent for MCP token
-const TokenUserAgentForMCP = "ezbookkeeping MCP"
+const TokenUserAgentForMCP = core.ApplicationName + " MCP"
 
 const tokenMaxExpiredAtUnixTime = int64(253402300799) // 9999-12-31 23:59:59 UTC
 

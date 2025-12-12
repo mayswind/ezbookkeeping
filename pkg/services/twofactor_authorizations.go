@@ -10,6 +10,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/locales"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
@@ -70,13 +71,21 @@ func (s *TwoFactorAuthorizationService) GetUserTwoFactorSettingByUid(c core.Cont
 }
 
 // GenerateTwoFactorSecret generates a new 2fa secret
-func (s *TwoFactorAuthorizationService) GenerateTwoFactorSecret(c core.Context, user *models.User) (*otp.Key, error) {
+func (s *TwoFactorAuthorizationService) GenerateTwoFactorSecret(c core.Context, user *models.User, backupLocale string) (*otp.Key, error) {
 	if user == nil {
 		return nil, errs.ErrUserNotFound
 	}
 
+	locale := user.Language
+
+	if locale == "" {
+		locale = backupLocale
+	}
+
+	localeTextItems := locales.GetLocaleTextItems(locale)
+
 	key, err := totp.Generate(totp.GenerateOpts{
-		Issuer:      s.CurrentConfig().AppName,
+		Issuer:      localeTextItems.GlobalTextItems.AppName,
 		AccountName: user.Username,
 		Period:      twoFactorPeriod,
 		SecretSize:  twoFactorSecretSize,

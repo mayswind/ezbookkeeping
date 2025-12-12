@@ -145,8 +145,6 @@ const (
 )
 
 const (
-	defaultAppName string = "ezBookkeeping"
-
 	defaultHttpAddr string = "0.0.0.0"
 	defaultHttpPort uint16 = 8080
 	defaultDomain   string = "localhost"
@@ -267,7 +265,6 @@ type MultiLanguageContentConfig struct {
 // Config represents the global setting config
 type Config struct {
 	// Global
-	AppName     string
 	Mode        SystemMode
 	WorkingPath string
 
@@ -595,8 +592,6 @@ func GetDefaultConfigFilePath() (string, error) {
 }
 
 func loadGlobalConfiguration(config *Config, configFile *ini.File, sectionName string) error {
-	config.AppName = getConfigItemStringValue(configFile, sectionName, "app_name", defaultAppName)
-
 	if getConfigItemStringValue(configFile, sectionName, "mode") == "production" {
 		config.Mode = MODE_PRODUCTION
 	} else if getConfigItemStringValue(configFile, sectionName, "mode") == "development" {

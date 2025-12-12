@@ -61,8 +61,8 @@ export class ImportTransaction implements ImportTransactionResponse {
         this.actualSourceAccountName = response.originalSourceAccountName;
         this.actualDestinationAccountName = response.originalDestinationAccountName;
         this.index = index;
-        this.selected = false;
         this.valid = this.isTransactionValid();
+        this.selected = this.valid;
     }
 
     public toCreateRequest(): TransactionCreateRequest {

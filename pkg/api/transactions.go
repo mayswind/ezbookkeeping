@@ -1624,6 +1624,16 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 		}
 
 		log.Infof(c, "[transactions.TransactionParseImportFileHandler] user \"uid:%d\" has auto-created %d new accounts", user.Uid, len(newAccounts))
+
+		// Re-fetch accounts to update accountMap with newly created accounts
+		accounts, err = a.accounts.GetAllAccountsByUid(c, user.Uid)
+
+		if err != nil {
+			log.Errorf(c, "[transactions.TransactionParseImportFileHandler] failed to re-fetch accounts for user \"uid:%d\", because %s", user.Uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		accountMap = a.accounts.GetVisibleAccountNameMapByList(accounts)
 	}
 
 	// Auto-create new categories with auto-created parent categories
@@ -1658,20 +1668,6 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 			return nil, errs.Or(err, errs.ErrOperationFailed)
 		}
 
-		// Update categoryId in parsed transactions
-		categoryIdMap := make(map[int64]int64)
-		for _, category := range createdCategories {
-			if category.ParentCategoryId != 0 {
-				categoryIdMap[category.CategoryId] = category.CategoryId
-			}
-		}
-
-		for _, transaction := range parsedTransactions {
-			if newId, exists := categoryIdMap[transaction.CategoryId]; exists {
-				transaction.CategoryId = newId
-			}
-		}
-
 		log.Infof(c, "[transactions.TransactionParseImportFileHandler] user \"uid:%d\" has auto-created %d new categories", user.Uid, len(createdCategories))
 	}
 
@@ -1685,6 +1681,55 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 		}
 
 		log.Infof(c, "[transactions.TransactionParseImportFileHandler] user \"uid:%d\" has auto-created %d new tags", user.Uid, len(newTags))
+	}
+
+	getSubCategoryId := func(categoryMap map[string]map[string]*models.TransactionCategory, subCategoryName string) int64 {
+		if subCategoryName == "" {
+			return 0
+		}
+
+		if subCategories, exists := categoryMap[subCategoryName]; exists {
+			for _, subCategory := range subCategories {
+				if subCategory != nil {
+					return subCategory.CategoryId
+				}
+			}
+		}
+
+		return 0
+	}
+
+	for _, transaction := range parsedTransactions {
+		if account := accountMap[transaction.OriginalSourceAccountName]; account != nil {
+			transaction.AccountId = account.AccountId
+		}
+
+		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+			if account := accountMap[transaction.OriginalDestinationAccountName]; account != nil {
+				transaction.RelatedAccountId = account.AccountId
+			}
+		}
+
+		if transaction.Type != models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+			switch transaction.Type {
+			case models.TRANSACTION_DB_TYPE_EXPENSE:
+				transaction.CategoryId = getSubCategoryId(expenseCategoryMap, transaction.OriginalCategoryName)
+			case models.TRANSACTION_DB_TYPE_INCOME:
+				transaction.CategoryId = getSubCategoryId(incomeCategoryMap, transaction.OriginalCategoryName)
+			case models.TRANSACTION_DB_TYPE_TRANSFER_OUT:
+				transaction.CategoryId = getSubCategoryId(transferCategoryMap, transaction.OriginalCategoryName)
+			}
+		}
+
+		if len(transaction.OriginalTagNames) > 0 {
+			transaction.TagIds = transaction.TagIds[:0]
+
+			for _, tagName := range transaction.OriginalTagNames {
+				if tag := tagMap[tagName]; tag != nil {
+					transaction.TagIds = append(transaction.TagIds, utils.Int64ToString(tag.TagId))
+				}
+			}
+		}
 	}
 
 	parsedTransactionRespsList := parsedTransactions.ToImportTransactionResponseList()

@@ -400,7 +400,7 @@ import BatchReplaceDialog, { type BatchReplaceDialogDataType } from '../dialogs/
 import BatchReplaceAllTypesDialog from '../dialogs/BatchReplaceAllTypesDialog.vue';
 import BatchCreateDialog, { type BatchCreateDialogDataType } from '../dialogs/BatchCreateDialog.vue';
 
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -1556,19 +1556,60 @@ function editTransaction(transaction: ImportTransaction): void {
 }
 
 function updateTransactionData(transaction: ImportTransaction): void {
-    transaction.valid = transaction.isTransactionValid();
-
+    // 先更新實際名稱
     if (transaction.categoryId && allCategoriesMap.value[transaction.categoryId]) {
         transaction.actualCategoryName = allCategoriesMap.value[transaction.categoryId]!.name;
+    } else {
+        transaction.actualCategoryName = transaction.originalCategoryName;
     }
 
     if (transaction.sourceAccountId && allAccountsMap.value[transaction.sourceAccountId]) {
         transaction.actualSourceAccountName = allAccountsMap.value[transaction.sourceAccountId]!.name;
+    } else {
+        transaction.actualSourceAccountName = transaction.originalSourceAccountName;
     }
 
     if (transaction.destinationAccountId && allAccountsMap.value[transaction.destinationAccountId]) {
         transaction.actualDestinationAccountName = allAccountsMap.value[transaction.destinationAccountId]!.name;
+    } else {
+        transaction.actualDestinationAccountName = transaction.originalDestinationAccountName;
     }
+
+    // 然後驗證交易是否有效，檢查 ID 是否對應到實際存在的實體
+    let isValid = transaction.isTransactionValid();
+
+    if (isValid) {
+        // 檢查類別是否存在（非 ModifyBalance 類型需要有效類別）
+        if (transaction.type !== TransactionType.ModifyBalance) {
+            if (!transaction.categoryId || transaction.categoryId === '0' || !allCategoriesMap.value[transaction.categoryId]) {
+                isValid = false;
+            }
+        }
+
+        // 檢查來源帳戶是否存在
+        if (!transaction.sourceAccountId || transaction.sourceAccountId === '0' || !allAccountsMap.value[transaction.sourceAccountId]) {
+            isValid = false;
+        }
+
+        // 檢查目標帳戶是否存在（轉帳類型）
+        if (transaction.type === TransactionType.Transfer) {
+            if (!transaction.destinationAccountId || transaction.destinationAccountId === '0' || !allAccountsMap.value[transaction.destinationAccountId]) {
+                isValid = false;
+            }
+        }
+
+        // 檢查標籤是否都存在
+        if (transaction.tagIds && transaction.tagIds.length) {
+            for (const tagId of transaction.tagIds) {
+                if (!tagId || tagId === '0' || !allTagsMap.value[tagId]) {
+                    isValid = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    transaction.valid = isValid;
 }
 
 function showBatchReplaceDialog(type: BatchReplaceDialogDataType, allSourceTagItems?: NameValue[]): void {
@@ -2059,6 +2100,15 @@ function reset(): void {
 function setCountPerPage(count: number): void {
     countPerPage.value = count;
 }
+
+// 監聽帳戶、類別和標籤的變化，當它們更新時重新驗證所有交易
+watch([allAccountsMap, allCategoriesMap, allTagsMap], () => {
+    if (props.importTransactions && props.importTransactions.length > 0) {
+        for (const transaction of props.importTransactions) {
+            updateTransactionData(transaction);
+        }
+    }
+}, { deep: true });
 
 defineExpose({
     filterMenus,

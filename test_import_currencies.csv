@@ -1,0 +1,4 @@
+Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount
+2024-12-09 10:00:00,Expense,Test Category,Test Account,XXX,100.00,,
+2024-12-09 11:00:00,Income,Test Category,Test Account,YYY,200.00,,
+2024-12-09 12:00:00,Transfer,Test Category,Test Account,XXX,50.00,Test Account 2,ZZZ,50.00

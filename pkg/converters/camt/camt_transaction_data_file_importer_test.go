@@ -21,7 +21,7 @@ func TestCamt053TransactionDataFileParseImportedData_MinimumValidData(t *testing
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, _, err := importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -124,7 +124,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseValidTransactionTime(t
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -177,7 +177,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseInvalidTransactionTime
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -200,7 +200,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseInvalidTransactionTime
 		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -223,7 +223,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseInvalidTransactionTime
 		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -246,7 +246,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseInvalidTransactionTime
 		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -279,7 +279,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseTransactionValidAmount
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -324,7 +324,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseTransactionValidAmount
 	assert.Equal(t, "USD", allNewTransactions[1].OriginalSourceAccountCurrency)
 	assert.Equal(t, int64(10023), allNewTransactions[1].Amount)
 
-	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -375,7 +375,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseTransactionValidAmount
 	assert.Equal(t, "USD", allNewTransactions[1].OriginalSourceAccountCurrency)
 	assert.Equal(t, int64(9999), allNewTransactions[1].Amount)
 
-	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -411,7 +411,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseTransactionValidAmount
 	assert.Equal(t, "USD", allNewTransactions[0].OriginalSourceAccountCurrency)
 	assert.Equal(t, int64(12345), allNewTransactions[0].Amount)
 
-	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -448,7 +448,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseTransactionInvalidAmou
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -471,7 +471,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseTransactionInvalidAmou
 		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -502,7 +502,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseTransactionInvalidAmou
 		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -543,7 +543,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseDescription(t *testing
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -579,7 +579,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseDescription(t *testing
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "Test Transaction", allNewTransactions[0].Comment)
 
-	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -614,7 +614,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseDescription(t *testing
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "Test Line 1\nTest Line 2", allNewTransactions[0].Comment)
 
-	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -651,7 +651,7 @@ func TestCamt053TransactionDataFileParseImportedData_MissingAccountNode(t *testi
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -678,7 +678,7 @@ func TestCamt053TransactionDataFileParseImportedData_MissingTransactionRequiredN
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -698,7 +698,7 @@ func TestCamt053TransactionDataFileParseImportedData_MissingTransactionRequiredN
 		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingTransactionTime.Message)
 
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -720,7 +720,7 @@ func TestCamt053TransactionDataFileParseImportedData_MissingTransactionRequiredN
 		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTypeInvalid.Message)
 
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>
@@ -742,7 +742,7 @@ func TestCamt053TransactionDataFileParseImportedData_MissingTransactionRequiredN
 		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		`<?xml version="1.0" encoding="UTF-8"?>
 		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
 			<BkToCstmrStmt>

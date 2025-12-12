@@ -7,6 +7,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
+import { useProjectsStore } from '@/stores/project.ts';
 import { type TransactionListFilter, type TransactionMonthList, useTransactionsStore } from '@/stores/transaction.ts';
 
 import { type TypeAndName, keys, entries } from '@/core/base.ts';
@@ -19,6 +20,7 @@ import { DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numera
 import type { Account } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 import type { TransactionTag } from '@/models/transaction_tag.ts';
+import type { Project } from '@/models/project.ts';
 import { type Transaction, TransactionTagFilter } from '@/models/transaction.ts';
 
 import {
@@ -89,6 +91,7 @@ export function useTransactionListPageBase() {
     const accountsStore = useAccountsStore();
     const transactionCategoriesStore = useTransactionCategoriesStore();
     const transactionTagsStore = useTransactionTagsStore();
+    const projectsStore = useProjectsStore();
     const transactionsStore = useTransactionsStore();
 
     const pageType = ref<number>(TransactionListPageType.List.type);
@@ -142,6 +145,7 @@ export function useTransactionListPageBase() {
     });
     const allTransactionTags = computed<Record<string, TransactionTag>>(() => transactionTagsStore.allTransactionTagsMap);
     const allAvailableTagsCount = computed<number>(() => transactionTagsStore.allAvailableTagsCount);
+    const allProjects = computed<Record<string, Project>>(() => projectsStore.projectsMap);
 
     const displayPageTypeName = computed<string>(() => {
         const type = TransactionListPageType.valueOf(pageType.value);
@@ -373,6 +377,7 @@ export function useTransactionListPageBase() {
         allAvailableCategoriesCount,
         allTransactionTags,
         allAvailableTagsCount,
+        allProjects,
         displayPageTypeName,
         query,
         queryDateRangeName,

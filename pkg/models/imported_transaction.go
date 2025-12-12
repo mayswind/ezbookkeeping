@@ -39,6 +39,11 @@ type ImportTransactionResponse struct {
 	Type                               TransactionType                 `json:"type"`
 	CategoryId                         int64                           `json:"categoryId,string"`
 	OriginalCategoryName               string                          `json:"originalCategoryName"`
+	Name                               string                          `json:"name,omitempty"`
+	Merchant                           string                          `json:"merchant,omitempty"`
+	ProjectId                          int64                           `json:"projectId,string,omitempty"`
+	Fee                                int64                           `json:"fee,omitempty"`
+	Discount                           int64                           `json:"discount,omitempty"`
 	Time                               int64                           `json:"time"`
 	UtcOffset                          int16                           `json:"utcOffset"`
 	SourceAccountId                    int64                           `json:"sourceAccountId,string"`
@@ -57,8 +62,9 @@ type ImportTransactionResponse struct {
 
 // ImportTransactionResponsePageWrapper represents a response of imported transaction which contains items and count
 type ImportTransactionResponsePageWrapper struct {
-	Items      []*ImportTransactionResponse `json:"items"`
-	TotalCount int64                        `json:"totalCount"`
+	Items         []*ImportTransactionResponse `json:"items"`
+	TotalCount    int64                        `json:"totalCount"`
+	NewCurrencies []string                     `json:"newCurrencies,omitempty"`
 }
 
 // ToImportTransactionResponse returns the a view-objects according to imported transaction data
@@ -82,6 +88,11 @@ func (t ImportTransaction) ToImportTransactionResponse() *ImportTransactionRespo
 		Type:                               transactionType,
 		CategoryId:                         t.CategoryId,
 		OriginalCategoryName:               t.OriginalCategoryName,
+		Name:                               t.Name,
+		Merchant:                           t.Merchant,
+		ProjectId:                          t.ProjectId,
+		Fee:                                t.Fee,
+		Discount:                           t.Discount,
 		Time:                               utils.GetUnixTimeFromTransactionTime(t.TransactionTime),
 		UtcOffset:                          t.TimezoneUtcOffset,
 		SourceAccountId:                    t.AccountId,

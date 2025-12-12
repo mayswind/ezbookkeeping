@@ -164,4 +164,5 @@ export interface ImportTransactionResponse {
 export interface ImportTransactionResponsePageWrapper {
     readonly items: ImportTransactionResponse[];
     readonly totalCount: number;
+    readonly newCurrencies?: string[];
 }

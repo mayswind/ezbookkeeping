@@ -8,6 +8,7 @@ export interface ErrorResponse {
     readonly errorCode: number;
     readonly errorMessage: string;
     readonly path: string;
+    readonly context?: Record<string, unknown>;
 }
 
 export function buildErrorResponse(errorCode: number, errorMessage: string): ErrorResponse {

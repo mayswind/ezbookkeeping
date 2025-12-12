@@ -43,6 +43,7 @@ const (
 	NormalSubcategoryLargeLanguageModel     = 15
 	NormalSubcategoryUserExternalAuth       = 16
 	NormalSubcategoryOAuth2                 = 17
+	NormalSubcategoryProject                = 18
 )
 
 // Error represents the specific error returned to user

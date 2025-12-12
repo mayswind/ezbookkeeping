@@ -53,20 +53,20 @@ type alipayTransactionDataCsvFileImporter struct {
 }
 
 // ParseImportedData returns the imported data by parsing the alipay transaction csv data
-func (c *alipayTransactionDataCsvFileImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, additionalOptions converter.TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
+func (c *alipayTransactionDataCsvFileImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, additionalOptions converter.TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, []string, error) {
 	enc := simplifiedchinese.GB18030
 	reader := transform.NewReader(bytes.NewReader(data), enc.NewDecoder())
 
 	csvDataTable, err := csv.CreateNewCsvBasicDataTable(ctx, reader, false)
 
 	if err != nil {
-		return nil, nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, nil, err
 	}
 
 	dataTable, err := createNewAlipayTransactionBasicDataTable(ctx, csvDataTable, c.fileHeaderLine, c.dataHeaderStartContent, c.dataBottomEndLineRune)
 
 	if err != nil {
-		return nil, nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, nil, err
 	}
 
 	commonDataTable := datatable.CreateNewCommonDataTableFromBasicDataTable(dataTable)
@@ -76,7 +76,7 @@ func (c *alipayTransactionDataCsvFileImporter) ParseImportedData(ctx core.Contex
 		!commonDataTable.HasColumn(c.originalColumnNames.typeColumnName) ||
 		!commonDataTable.HasColumn(c.originalColumnNames.statusColumnName) {
 		log.Errorf(ctx, "[alipay_transaction_data_csv_file_importer.ParseImportedData] cannot parse alipay csv data, because missing essential columns in header row")
-		return nil, nil, nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow
+		return nil, nil, nil, nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow
 	}
 
 	transactionRowParser := createAlipayTransactionDataRowParser(c.originalColumnNames, dataTable.HeaderColumnNames())

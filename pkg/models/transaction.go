@@ -136,7 +136,12 @@ type Transaction struct {
 	Comment              string            `xorm:"VARCHAR(255) NOT NULL"`
 	GeoLongitude         float64           `xorm:"INDEX(IDX_transaction_uid_deleted_time_longitude_latitude)"`
 	GeoLatitude          float64           `xorm:"INDEX(IDX_transaction_uid_deleted_time_longitude_latitude)"`
-	CreatedIp            string            `xorm:"VARCHAR(39)"`
+	Name                 string            `xorm:"VARCHAR(255)"`
+	Fee                  int64
+	Discount             int64
+	Merchant             string `xorm:"VARCHAR(255)"`
+	ProjectId            int64  `xorm:"INDEX(IDX_transaction_uid_deleted_project_id)"`
+	CreatedIp            string `xorm:"VARCHAR(39)"`
 	ScheduledCreated     bool
 	CreatedUnixTime      int64
 	UpdatedUnixTime      int64
@@ -171,6 +176,11 @@ type TransactionCreateRequest struct {
 	PictureIds           []string                       `json:"pictureIds"`
 	Comment              string                         `json:"comment" binding:"max=255"`
 	GeoLocation          *TransactionGeoLocationRequest `json:"geoLocation" binding:"omitempty"`
+	Name                 string                         `json:"name" binding:"max=255"`
+	Fee                  int64                          `json:"fee" binding:"min=-99999999999,max=99999999999"`
+	Discount             int64                          `json:"discount" binding:"min=-99999999999,max=99999999999"`
+	Merchant             string                         `json:"merchant" binding:"max=255"`
+	ProjectId            int64                          `json:"projectId,string"`
 	ClientSessionId      string                         `json:"clientSessionId"`
 }
 
@@ -189,6 +199,11 @@ type TransactionModifyRequest struct {
 	PictureIds           []string                       `json:"pictureIds"`
 	Comment              string                         `json:"comment" binding:"max=255"`
 	GeoLocation          *TransactionGeoLocationRequest `json:"geoLocation" binding:"omitempty"`
+	Name                 string                         `json:"name" binding:"max=255"`
+	Fee                  int64                          `json:"fee" binding:"min=-99999999999,max=99999999999"`
+	Discount             int64                          `json:"discount" binding:"min=-99999999999,max=99999999999"`
+	Merchant             string                         `json:"merchant" binding:"max=255"`
+	ProjectId            int64                          `json:"projectId,string"`
 }
 
 // TransactionImportRequest represents all parameters of transaction import request
@@ -352,6 +367,12 @@ type TransactionInfoResponse struct {
 	Pictures             TransactionPictureInfoBasicResponseSlice `json:"pictures,omitempty"`
 	Comment              string                                   `json:"comment"`
 	GeoLocation          *TransactionGeoLocationResponse          `json:"geoLocation,omitempty"`
+	Name                 string                                   `json:"name"`
+	Fee                  int64                                    `json:"fee"`
+	Discount             int64                                    `json:"discount"`
+	Merchant             string                                   `json:"merchant"`
+	ProjectId            int64                                    `json:"projectId,string"`
+	Project              *ProjectInfoResponse                     `json:"project,omitempty"`
 	Editable             bool                                     `json:"editable"`
 }
 
@@ -562,6 +583,11 @@ func (t *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *
 		TagIds:               utils.Int64ArrayToStringArray(tagIds),
 		Comment:              t.Comment,
 		GeoLocation:          geoLocation,
+		Name:                 t.Name,
+		Fee:                  t.Fee,
+		Discount:             t.Discount,
+		Merchant:             t.Merchant,
+		ProjectId:            t.ProjectId,
 		Editable:             editable,
 	}
 }

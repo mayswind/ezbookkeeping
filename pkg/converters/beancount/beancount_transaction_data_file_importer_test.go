@@ -21,7 +21,7 @@ func TestBeancountTransactionDataFileParseImportedData_MinimumValidData(t *testi
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, _, err := importer.ParseImportedData(context, user, []byte(
 		"2024-09-01 *\n"+
 			"  Equity:Opening-Balances -123.45 CNY\n"+
 			"  Assets:TestAccount 123.45 CNY\n"+
@@ -100,7 +100,7 @@ func TestBeancountTransactionDataFileParseImportedData_MinimumValidData2(t *test
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, _, err := importer.ParseImportedData(context, user, []byte(
 		"2024-09-01 *\n"+
 			"  Assets:TestAccount 123.45 CNY\n"+
 			"  Equity:Opening-Balances -123.45 CNY\n"+
@@ -179,7 +179,7 @@ func TestBeancountTransactionDataFileParseImportedData_ParseInvalidTime(t *testi
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"2024/09/01 *\n"+
 			"  Equity:Opening-Balances -123.45 CNY\n"+
 			"  Assets:TestAccount 123.45 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
@@ -195,7 +195,7 @@ func TestBeancountTransactionDataFileParseImportedData_ParseValidCurrency(t *tes
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, allNewAccounts, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"2024-09-01 * \"Payee Name\" \"Hello\nWorld\"\n"+
 			"  Assets:TestAccount -0.12 USD\n"+
 			"  Assets:TestAccount2 0.84 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
@@ -231,13 +231,13 @@ func TestBeancountTransactionDataFileParseImportedData_ParseInvalidAmount(t *tes
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"2024-09-01 *\n"+
 			"  Equity:Opening-Balances -abc CNY\n"+
 			"  Assets:TestAccount abc CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"2024-09-01 *\n"+
 			"  Equity:Opening-Balances -1/0 CNY\n"+
 			"  Assets:TestAccount 1/0 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
@@ -253,7 +253,7 @@ func TestBeancountTransactionDataFileParseImportedData_ParseDescription(t *testi
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"2024-09-01 * \"foo    bar\t#test\n\"\n"+
 			"  Equity:Opening-Balances -123.45 CNY\n"+
 			"  Assets:TestAccount 123.45 CNY\n"+
@@ -278,25 +278,25 @@ func TestBeancountTransactionDataFileParseImportedData_InvalidTransaction(t *tes
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"2024-09-02 * \"Payee Name\" \"Hello\nWorld\"\n"+
 			"  Assets:TestAccount 0.11 CNY\n"+
 			"  Assets:TestAccount2 0.11 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidBeancountFile.Message)
 
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"2024-09-02 * \"Payee Name\" \"Hello\nWorld\"\n"+
 			"  Expenses:TestCategory -0.11 CNY\n"+
 			"  Expenses:TestCategory2 0.11 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrThereAreNotSupportedTransactionType.Message)
 
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"2024-09-02 * \"Payee Name\" \"Hello\nWorld\"\n"+
 			"  Income:TestCategory -0.11 CNY\n"+
 			"  Income:TestCategory2 0.11 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrThereAreNotSupportedTransactionType.Message)
 
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"2024-09-02 * \"Payee Name\" \"Hello\nWorld\"\n"+
 			"  Equity:TestCategory -0.11 CNY\n"+
 			"  Equity:TestCategory2 0.11 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
@@ -312,7 +312,7 @@ func TestBeancountTransactionDataFileParseImportedData_NotSupportedToParseSplitT
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"2024-09-02 * \"Payee Name\" \"Hello\nWorld\"\n"+
 			"  Assets:TestAccount -0.23 CNY\n"+
 			"  Assets:TestAccount2 0.11 CNY\n"+
@@ -330,28 +330,28 @@ func TestBeancountTransactionDataFileParseImportedData_MissingTransactionRequire
 	}
 
 	// Missing Transaction Time
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"* \"narration\"\n"+
 			"  Equity:Opening-Balances -123.45 CNY\n"+
 			"  Assets:TestAccount 123.45 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 
 	// Missing Account Name
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"2024-09-01 * \"narration\"\n"+
 			"  Equity:Opening-Balances -123.45 CNY\n"+
 			"   123.45 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidBeancountFile.Message)
 
 	// Missing Amount
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"2024-09-01 * \"narration\"\n"+
 			"  Equity:Opening-Balances\n"+
 			"  Assets:TestAccount\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidBeancountFile.Message)
 
 	// Missing Commodity
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"2024-09-01 * \"narration\"\n"+
 			"  Equity:Opening-Balances -123.45\n"+
 			"  Assets:TestAccount 123.45\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)

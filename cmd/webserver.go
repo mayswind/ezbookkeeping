@@ -436,6 +436,15 @@ func startWebServer(c *core.CliContext) error {
 			apiV1Route.POST("/transaction/templates/move.json", bindApi(api.TransactionTemplates.TemplateMoveHandler))
 			apiV1Route.POST("/transaction/templates/delete.json", bindApi(api.TransactionTemplates.TemplateDeleteHandler))
 
+			// Projects
+			apiV1Route.GET("/projects/list.json", bindApi(api.Projects.ProjectListHandler))
+			apiV1Route.GET("/projects/get.json", bindApi(api.Projects.ProjectGetHandler))
+			apiV1Route.POST("/projects/add.json", bindApi(api.Projects.ProjectCreateHandler))
+			apiV1Route.POST("/projects/modify.json", bindApi(api.Projects.ProjectModifyHandler))
+			apiV1Route.POST("/projects/hide.json", bindApi(api.Projects.ProjectHideHandler))
+			apiV1Route.POST("/projects/move.json", bindApi(api.Projects.ProjectMoveHandler))
+			apiV1Route.POST("/projects/delete.json", bindApi(api.Projects.ProjectDeleteHandler))
+
 			// Large Language Models
 			if config.ReceiptImageRecognitionLLMConfig != nil && config.ReceiptImageRecognitionLLMConfig.LLMProvider != "" {
 				if config.TransactionFromAIImageRecognition {

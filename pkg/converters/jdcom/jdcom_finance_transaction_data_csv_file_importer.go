@@ -27,20 +27,20 @@ var (
 )
 
 // ParseImportedData returns the imported data by parsing the jd.com finance transaction csv data
-func (c *jdComFinanceTransactionDataCsvFileImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, additionalOptions converter.TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
+func (c *jdComFinanceTransactionDataCsvFileImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, additionalOptions converter.TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, []string, error) {
 	fallback := unicode.UTF8.NewDecoder()
 	reader := transform.NewReader(bytes.NewReader(data), unicode.BOMOverride(fallback))
 
 	csvDataTable, err := csv.CreateNewCsvBasicDataTable(ctx, reader, false)
 
 	if err != nil {
-		return nil, nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, nil, err
 	}
 
 	dataTable, err := createNewJDComFinanceTransactionBasicDataTable(ctx, csvDataTable)
 
 	if err != nil {
-		return nil, nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, nil, err
 	}
 
 	commonDataTable := datatable.CreateNewCommonDataTableFromBasicDataTable(dataTable)
@@ -53,7 +53,7 @@ func (c *jdComFinanceTransactionDataCsvFileImporter) ParseImportedData(ctx core.
 		!commonDataTable.HasColumn(jdComFinanceTransactionStatusColumnName) ||
 		!commonDataTable.HasColumn(jdComFinanceTransactionTypeColumnName) {
 		log.Errorf(ctx, "[jdcom_finance_transaction_data_csv_file_importer.ParseImportedData] cannot parse jd.com finance csv data, because missing essential columns in header row")
-		return nil, nil, nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow
+		return nil, nil, nil, nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow
 	}
 
 	transactionRowParser := createJDComFinanceTransactionDataRowParser(dataTable.HeaderColumnNames())

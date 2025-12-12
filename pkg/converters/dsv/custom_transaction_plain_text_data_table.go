@@ -18,6 +18,7 @@ type customPlainTextDataTable struct {
 	columnIndexMapping         map[datatable.TransactionDataTableColumn]int
 	transactionTypeNameMapping map[string]models.TransactionType
 	timeFormat                 string
+	timeOnlyFormat             string
 	timezoneFormat             string
 	timeFormatIncludeTimezone  bool
 	amountDecimalSeparator     string
@@ -138,16 +139,49 @@ func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user
 
 	// parse date time
 	if rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] != "" {
-		dateTime, err := time.Parse(t.transactionDataTable.timeFormat, rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME])
+		dateTimeStr := rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME]
+		timeOnlyStr := rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME_ONLY]
 
-		if err != nil {
-			return nil, false, errs.ErrTransactionTimeInvalid
-		}
+		// if both date and time only are provided, merge them
+		if timeOnlyStr != "" && t.transactionDataTable.timeOnlyFormat != "" {
+			// parse date part
+			datePart, err := time.Parse(t.transactionDataTable.timeFormat, dateTimeStr)
+			if err != nil {
+				return nil, false, errs.ErrTransactionTimeInvalid
+			}
 
-		rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = utils.FormatUnixTimeToLongDateTime(dateTime.Unix(), dateTime.Location())
+			// parse time only part
+			timeOnlyFormat := getDateTimeFormat(t.transactionDataTable.timeOnlyFormat)
+			timeOnlyPart, err := time.Parse(timeOnlyFormat, timeOnlyStr)
+			if err != nil {
+				return nil, false, errs.ErrTransactionTimeInvalid
+			}
 
-		if t.transactionDataTable.timeFormatIncludeTimezone {
-			rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = utils.FormatTimezoneOffset(dateTime.Location())
+			// merge date and time
+			dateTime := time.Date(
+				datePart.Year(), datePart.Month(), datePart.Day(),
+				timeOnlyPart.Hour(), timeOnlyPart.Minute(), timeOnlyPart.Second(),
+				timeOnlyPart.Nanosecond(), datePart.Location(),
+			)
+
+			rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = utils.FormatUnixTimeToLongDateTime(dateTime.Unix(), dateTime.Location())
+
+			if t.transactionDataTable.timeFormatIncludeTimezone {
+				rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = utils.FormatTimezoneOffset(dateTime.Location())
+			}
+		} else {
+			// parse full date time
+			dateTime, err := time.Parse(t.transactionDataTable.timeFormat, dateTimeStr)
+
+			if err != nil {
+				return nil, false, errs.ErrTransactionTimeInvalid
+			}
+
+			rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = utils.FormatUnixTimeToLongDateTime(dateTime.Unix(), dateTime.Location())
+
+			if t.transactionDataTable.timeFormatIncludeTimezone {
+				rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = utils.FormatTimezoneOffset(dateTime.Location())
+			}
 		}
 	}
 
@@ -197,6 +231,30 @@ func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user
 		rowData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = amount
 	}
 
+	// parse fee
+	if rowData[datatable.TRANSACTION_DATA_TABLE_FEE] != "" {
+		fee, err := t.parseAmount(ctx, rowData[datatable.TRANSACTION_DATA_TABLE_FEE])
+
+		if err != nil {
+			log.Errorf(ctx, "[custom_transaction_plain_text_data_table.parseTransaction] cannot parsing transaction fee \"%s\", because %s", rowData[datatable.TRANSACTION_DATA_TABLE_FEE], err.Error())
+			return nil, false, err
+		}
+
+		rowData[datatable.TRANSACTION_DATA_TABLE_FEE] = fee
+	}
+
+	// parse discount
+	if rowData[datatable.TRANSACTION_DATA_TABLE_DISCOUNT] != "" {
+		discount, err := t.parseAmount(ctx, rowData[datatable.TRANSACTION_DATA_TABLE_DISCOUNT])
+
+		if err != nil {
+			log.Errorf(ctx, "[custom_transaction_plain_text_data_table.parseTransaction] cannot parsing transaction discount \"%s\", because %s", rowData[datatable.TRANSACTION_DATA_TABLE_DISCOUNT], err.Error())
+			return nil, false, err
+		}
+
+		rowData[datatable.TRANSACTION_DATA_TABLE_DISCOUNT] = discount
+	}
+
 	if _, exists := rowData[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY]; !exists {
 		rowData[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = ""
 	}
@@ -242,7 +300,7 @@ func (t *customPlainTextDataRowIterator) parseAmount(ctx core.Context, amountVal
 }
 
 // CreateNewCustomPlainTextDataTable returns transaction data table from imported data table
-func CreateNewCustomPlainTextDataTable(dataTable datatable.BasicDataTable, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, timeFormat string, timezoneFormat string, amountDecimalSeparator string, amountDigitGroupingSymbol string) *customPlainTextDataTable {
+func CreateNewCustomPlainTextDataTable(dataTable datatable.BasicDataTable, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, timeFormat string, timeOnlyFormat string, timezoneFormat string, amountDecimalSeparator string, amountDigitGroupingSymbol string) *customPlainTextDataTable {
 	timeFormatIncludeTimezone := strings.Contains(timeFormat, "z") || strings.Contains(timeFormat, "Z")
 
 	return &customPlainTextDataTable{
@@ -250,6 +308,7 @@ func CreateNewCustomPlainTextDataTable(dataTable datatable.BasicDataTable, colum
 		columnIndexMapping:         columnIndexMapping,
 		transactionTypeNameMapping: transactionTypeNameMapping,
 		timeFormat:                 getDateTimeFormat(timeFormat),
+		timeOnlyFormat:             timeOnlyFormat,
 		timezoneFormat:             timezoneFormat,
 		timeFormatIncludeTimezone:  timeFormatIncludeTimezone,
 		amountDecimalSeparator:     amountDecimalSeparator,

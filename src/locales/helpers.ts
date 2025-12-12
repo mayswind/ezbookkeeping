@@ -412,6 +412,36 @@ export function useI18n() {
             };
         }
 
+        // Handle errors with context (e.g., account currency invalid with currency code and row index)
+        if (error.context && error.errorMessage === 'account currency is invalid') {
+            const currency = error.context['currency'] as string;
+            const rowIndex = error.context['rowIndex'] as number;
+            const parameters: LocalizedErrorParameter[] = [];
+
+            if (currency) {
+                parameters.push({
+                    key: 'currency',
+                    localized: false,
+                    value: currency
+                });
+            }
+
+            if (rowIndex !== undefined) {
+                parameters.push({
+                    key: 'rowIndex',
+                    localized: false,
+                    value: String(rowIndex)
+                });
+            }
+
+            if (parameters.length > 0) {
+                return {
+                    message: `error.${error.errorMessage}`,
+                    parameters: parameters
+                };
+            }
+        }
+
         if (error.errorCode !== KnownErrorCode.ValidatorError) {
             return {
                 message: `error.${error.errorMessage}`

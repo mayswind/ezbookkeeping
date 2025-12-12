@@ -426,6 +426,8 @@
                                                     </v-list>
                                                 </v-menu>
                                             </th>
+                                            <th class="transaction-table-column-merchant text-no-wrap">{{ tt('Merchant') }}</th>
+                                            <th class="transaction-table-column-project text-no-wrap">{{ tt('Project') }}</th>
                                             <th class="transaction-table-column-tags text-no-wrap" v-if="showTagInTransactionListPage">
                                                 <v-menu ref="tagFilterMenu" class="transaction-tag-menu"
                                                         eager location="bottom" max-height="500"
@@ -503,7 +505,7 @@
 
                                         <tbody v-if="loading && (!transactions || !transactions.length || transactions.length < 1)">
                                         <tr :key="itemIdx" v-for="itemIdx in skeletonData">
-                                            <td class="px-0" :colspan="showTagInTransactionListPage ? 11 : 10">
+                                            <td class="px-0" :colspan="showTagInTransactionListPage ? 13 : 12">
                                                 <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
                                             </td>
                                         </tr>
@@ -511,7 +513,7 @@
 
                                         <tbody v-if="!loading && (!transactions || !transactions.length || transactions.length < 1)">
                                         <tr>
-                                            <td :colspan="showTagInTransactionListPage ? 11 : 10">{{ tt('No transaction data') }}</td>
+                                            <td :colspan="showTagInTransactionListPage ? 13 : 12">{{ tt('No transaction data') }}</td>
                                         </tr>
                                         </tbody>
 
@@ -520,7 +522,7 @@
                                                v-for="(transaction, idx) in transactions">
                                             <tr class="transaction-list-row-date no-hover text-sm"
                                                 v-if="pageType === TransactionListPageType.List.type && (idx === 0 || (idx > 0 && (transaction.gregorianCalendarYearDashMonthDashDay !== transactions[idx - 1]!.gregorianCalendarYearDashMonthDashDay)))">
-                                                <td :colspan="showTagInTransactionListPage ? 11 : 10" class="font-weight-bold">
+                                                <td :colspan="showTagInTransactionListPage ? 13 : 12" class="font-weight-bold">
                                                     <div class="d-flex align-center">
                                                         <span>{{ getDisplayLongDate(transaction) }}</span>
                                                         <v-chip class="ms-1" color="default" size="x-small"
@@ -570,6 +572,12 @@
                                                 </td>
                                                 <td class="transaction-table-column-discount text-right">
                                                     <span v-if="transaction.discount && transaction.sourceAccount">{{ formatAmountToLocalizedNumeralsWithCurrency(transaction.discount, transaction.sourceAccount?.currency) }}</span>
+                                                </td>
+                                                <td class="transaction-table-column-merchant text-truncate">
+                                                    {{ transaction.merchant }}
+                                                </td>
+                                                <td class="transaction-table-column-project text-truncate">
+                                                    <span v-if="transaction.projectId && allProjects[transaction.projectId]">{{ allProjects[transaction.projectId]?.name }}</span>
                                                 </td>
                                                 <td class="transaction-table-column-account">
                                                     <div class="d-flex align-center">
@@ -802,6 +810,7 @@ const {
     allAvailableCategoriesCount,
     allTransactionTags,
     allAvailableTagsCount,
+    allProjects,
     query,
     queryMinTime,
     queryMaxTime,

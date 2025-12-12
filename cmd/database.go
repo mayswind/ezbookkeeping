@@ -157,5 +157,13 @@ func updateAllDatabaseTablesStructure(c *core.CliContext) error {
 
 	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] user external auth table maintained successfully")
 
+	err = datastore.Container.UserDataStore.SyncStructs(new(models.Project))
+
+	if err != nil {
+		return err
+	}
+
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] project table maintained successfully")
+
 	return nil
 }

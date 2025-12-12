@@ -1091,6 +1091,11 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 		Amount:            transactionModifyReq.SourceAmount,
 		HideAmount:        transactionModifyReq.HideAmount,
 		Comment:           transactionModifyReq.Comment,
+		Name:              transactionModifyReq.Name,
+		Fee:               transactionModifyReq.Fee,
+		Discount:          transactionModifyReq.Discount,
+		Merchant:          transactionModifyReq.Merchant,
+		ProjectId:         transactionModifyReq.ProjectId,
 	}
 
 	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
@@ -1114,6 +1119,11 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 		newTransaction.Comment == transaction.Comment &&
 		newTransaction.GeoLongitude == transaction.GeoLongitude &&
 		newTransaction.GeoLatitude == transaction.GeoLatitude &&
+		newTransaction.Name == transaction.Name &&
+		newTransaction.Fee == transaction.Fee &&
+		newTransaction.Discount == transaction.Discount &&
+		newTransaction.Merchant == transaction.Merchant &&
+		newTransaction.ProjectId == transaction.ProjectId &&
 		utils.Int64SliceEquals(tagIds, transactionTagIds) &&
 		utils.Int64SliceEquals(pictureIds, transactionPictureIds) {
 		return nil, errs.ErrNothingWillBeUpdated
@@ -1466,6 +1476,13 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 			return nil, errs.ErrImportFileTransactionTimeFormatInvalid
 		}
 
+		timeOnlyFormats := form.Value["timeOnlyFormat"]
+		timeOnlyFormat := ""
+
+		if len(timeOnlyFormats) > 0 {
+			timeOnlyFormat = timeOnlyFormats[0]
+		}
+
 		timezoneFormats := form.Value["timezoneFormat"]
 		timezoneFormat := ""
 
@@ -1508,7 +1525,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 			transactionTagSeparator = transactionTagSeparators[0]
 		}
 
-		dataImporter, err = converters.CreateNewDelimiterSeparatedValuesDataImporter(fileType, fileEncoding, columnIndexMapping, transactionTypeNameMapping, hasHeaderLine, timeFormats[0], timezoneFormat, amountDecimalSeparator, amountDigitGroupingSymbol, geoLocationSeparator, geoLocationOrder, transactionTagSeparator)
+		dataImporter, err = converters.CreateNewDelimiterSeparatedValuesDataImporter(fileType, fileEncoding, columnIndexMapping, transactionTypeNameMapping, hasHeaderLine, timeFormats[0], timeOnlyFormat, timezoneFormat, amountDecimalSeparator, amountDigitGroupingSymbol, geoLocationSeparator, geoLocationOrder, transactionTagSeparator)
 	} else {
 		dataImporter, err = converters.GetTransactionDataImporter(fileType)
 	}
@@ -1590,11 +1607,84 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 
 	tagMap := a.transactionTags.GetVisibleTagNameMapByList(tags)
 
-	parsedTransactions, _, _, _, _, _, err := dataImporter.ParseImportedData(c, user, fileData, utcOffset, additionalOptions, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
+	parsedTransactions, newAccounts, newSubExpenseCategories, newSubIncomeCategories, newSubTransferCategories, newTags, newCurrencies, err := dataImporter.ParseImportedData(c, user, fileData, utcOffset, additionalOptions, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 
 	if err != nil {
 		log.Errorf(c, "[transactions.TransactionParseImportFileHandler] failed to parse imported data for user \"uid:%d\", because %s", user.Uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	// Auto-create new accounts with default type "Asset" (Cash)
+	if len(newAccounts) > 0 {
+		_, err = a.accounts.CreateAccountsBatch(c, user.Uid, newAccounts)
+
+		if err != nil {
+			log.Errorf(c, "[transactions.TransactionParseImportFileHandler] failed to create new accounts for user \"uid:%d\", because %s", user.Uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		log.Infof(c, "[transactions.TransactionParseImportFileHandler] user \"uid:%d\" has auto-created %d new accounts", user.Uid, len(newAccounts))
+	}
+
+	// Auto-create new categories with auto-created parent categories
+	if len(newSubExpenseCategories) > 0 || len(newSubIncomeCategories) > 0 || len(newSubTransferCategories) > 0 {
+		newCategoriesMap := make(map[*models.TransactionCategory][]*models.TransactionCategory)
+
+		// Process expense categories
+		expenseParentCategory := a.createAutoImportParentCategory(user.Uid, models.CATEGORY_TYPE_EXPENSE)
+		if len(newSubExpenseCategories) > 0 {
+			newCategoriesMap[nil] = append(newCategoriesMap[nil], expenseParentCategory)
+			newCategoriesMap[expenseParentCategory] = newSubExpenseCategories
+		}
+
+		// Process income categories
+		incomeParentCategory := a.createAutoImportParentCategory(user.Uid, models.CATEGORY_TYPE_INCOME)
+		if len(newSubIncomeCategories) > 0 {
+			newCategoriesMap[nil] = append(newCategoriesMap[nil], incomeParentCategory)
+			newCategoriesMap[incomeParentCategory] = newSubIncomeCategories
+		}
+
+		// Process transfer categories
+		transferParentCategory := a.createAutoImportParentCategory(user.Uid, models.CATEGORY_TYPE_TRANSFER)
+		if len(newSubTransferCategories) > 0 {
+			newCategoriesMap[nil] = append(newCategoriesMap[nil], transferParentCategory)
+			newCategoriesMap[transferParentCategory] = newSubTransferCategories
+		}
+
+		createdCategories, err := a.transactionCategories.CreateCategories(c, user.Uid, newCategoriesMap)
+
+		if err != nil {
+			log.Errorf(c, "[transactions.TransactionParseImportFileHandler] failed to create new categories for user \"uid:%d\", because %s", user.Uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		// Update categoryId in parsed transactions
+		categoryIdMap := make(map[int64]int64)
+		for _, category := range createdCategories {
+			if category.ParentCategoryId != 0 {
+				categoryIdMap[category.CategoryId] = category.CategoryId
+			}
+		}
+
+		for _, transaction := range parsedTransactions {
+			if newId, exists := categoryIdMap[transaction.CategoryId]; exists {
+				transaction.CategoryId = newId
+			}
+		}
+
+		log.Infof(c, "[transactions.TransactionParseImportFileHandler] user \"uid:%d\" has auto-created %d new categories", user.Uid, len(createdCategories))
+	}
+
+	// Auto-create new tags
+	if len(newTags) > 0 {
+		err = a.transactionTags.CreateTags(c, user.Uid, newTags, true)
+
+		if err != nil {
+			log.Errorf(c, "[transactions.TransactionParseImportFileHandler] failed to create new tags for user \"uid:%d\", because %s", user.Uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		log.Infof(c, "[transactions.TransactionParseImportFileHandler] user \"uid:%d\" has auto-created %d new tags", user.Uid, len(newTags))
 	}
 
 	parsedTransactionRespsList := parsedTransactions.ToImportTransactionResponseList()
@@ -1604,8 +1694,13 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 	}
 
 	parsedTransactionResps := &models.ImportTransactionResponsePageWrapper{
-		Items:      parsedTransactionRespsList,
-		TotalCount: int64(len(parsedTransactionRespsList)),
+		Items:         parsedTransactionRespsList,
+		TotalCount:    int64(len(parsedTransactionRespsList)),
+		NewCurrencies: newCurrencies,
+	}
+
+	if len(newCurrencies) > 0 {
+		log.Infof(c, "[transactions.TransactionParseImportFileHandler] user \"uid:%d\" has auto-created %d new currencies: %v", user.Uid, len(newCurrencies), newCurrencies)
 	}
 
 	return parsedTransactionResps, nil
@@ -1963,6 +2058,11 @@ func (a *TransactionsApi) createNewTransactionModel(uid int64, transactionCreate
 		Amount:            transactionCreateReq.SourceAmount,
 		HideAmount:        transactionCreateReq.HideAmount,
 		Comment:           transactionCreateReq.Comment,
+		Name:              transactionCreateReq.Name,
+		Fee:               transactionCreateReq.Fee,
+		Discount:          transactionCreateReq.Discount,
+		Merchant:          transactionCreateReq.Merchant,
+		ProjectId:         transactionCreateReq.ProjectId,
 		CreatedIp:         clientIp,
 	}
 
@@ -1977,4 +2077,22 @@ func (a *TransactionsApi) createNewTransactionModel(uid int64, transactionCreate
 	}
 
 	return transaction
+}
+
+func (a *TransactionsApi) createAutoImportParentCategory(uid int64, categoryType models.TransactionCategoryType) *models.TransactionCategory {
+	categoryName := "Auto Import"
+
+	if categoryType == models.CATEGORY_TYPE_EXPENSE {
+		categoryName = "Auto Import (Expense)"
+	} else if categoryType == models.CATEGORY_TYPE_INCOME {
+		categoryName = "Auto Import (Income)"
+	} else if categoryType == models.CATEGORY_TYPE_TRANSFER {
+		categoryName = "Auto Import (Transfer)"
+	}
+
+	return &models.TransactionCategory{
+		Uid:  uid,
+		Name: categoryName,
+		Type: categoryType,
+	}
 }

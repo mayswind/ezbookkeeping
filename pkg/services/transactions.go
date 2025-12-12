@@ -988,6 +988,26 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 			updateCols = append(updateCols, "geo_latitude")
 		}
 
+		if transaction.Name != oldTransaction.Name {
+			updateCols = append(updateCols, "name")
+		}
+
+		if transaction.Fee != oldTransaction.Fee {
+			updateCols = append(updateCols, "fee")
+		}
+
+		if transaction.Discount != oldTransaction.Discount {
+			updateCols = append(updateCols, "discount")
+		}
+
+		if transaction.Merchant != oldTransaction.Merchant {
+			updateCols = append(updateCols, "merchant")
+		}
+
+		if transaction.ProjectId != oldTransaction.ProjectId {
+			updateCols = append(updateCols, "project_id")
+		}
+
 		// Get and verify tags
 		err = s.isTagsValid(sess, transaction, transactionTagIndexes, addTagIds)
 

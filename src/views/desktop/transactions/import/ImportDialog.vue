@@ -652,6 +652,7 @@ function parseData(): void {
         let transactionTypeMapping: Record<string, TransactionType> | undefined = undefined;
         let hasHeaderLine: boolean | undefined = undefined;
         let timeFormat: string | undefined = undefined;
+        let timeOnlyFormat: string | undefined = undefined;
         let timezoneFormat: string | undefined = undefined;
         let amountDecimalSeparator: string | undefined = undefined;
         let amountDigitGroupingSymbol: string | undefined = undefined;
@@ -670,6 +671,7 @@ function parseData(): void {
             transactionTypeMapping = defineColumnResult.transactionTypeMapping;
             hasHeaderLine = defineColumnResult.includeHeader;
             timeFormat = defineColumnResult.timeFormat;
+            timeOnlyFormat = defineColumnResult.timeOnlyFormat;
             timezoneFormat = defineColumnResult.timezoneFormat;
             amountDecimalSeparator = defineColumnResult.amountDecimalSeparator;
             amountDigitGroupingSymbol = defineColumnResult.amountDigitGroupingSymbol;
@@ -699,6 +701,7 @@ function parseData(): void {
             transactionTypeMapping: transactionTypeMapping,
             hasHeaderLine: hasHeaderLine,
             timeFormat: timeFormat,
+            timeOnlyFormat: timeOnlyFormat,
             timezoneFormat: timezoneFormat,
             amountDecimalSeparator: amountDecimalSeparator,
             amountDigitGroupingSymbol: amountDigitGroupingSymbol,
@@ -726,6 +729,15 @@ function parseData(): void {
             importTransactions.value = parsedTransactions;
             currentStep.value = 'checkData';
             submitting.value = false;
+
+            // Show notification if new currencies were auto-created
+            if (response.newCurrencies && response.newCurrencies.length > 0) {
+                const currenciesList = response.newCurrencies.join(', ');
+                snackbar.value?.showMessage('import.autoCreatedCurrencies', {
+                    count: response.newCurrencies.length,
+                    currencies: currenciesList
+                });
+            }
         }).catch(error => {
             submitting.value = false;
 

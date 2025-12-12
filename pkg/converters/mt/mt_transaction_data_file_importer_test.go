@@ -21,7 +21,7 @@ func TestMT940TransactionDataFileParseImportedData_MinimumValidData(t *testing.T
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, _, err := importer.ParseImportedData(context, user, []byte(
 		`{1:F01TESTBANK123456789}{2:I940TESTBANK}{4:
 		:20:123456789
 		:25:12345678
@@ -79,7 +79,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionValidAmountAn
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`{1:F01TESTBANK123456789}{2:I940TESTBANK}{4:
 		:20:123456789
 		:25:12345678
@@ -110,7 +110,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionInvalidAmount
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`{1:F01TESTBANK123456789}{2:I940TESTBANK}{4:
 		:20:123456789
 		:25:12345678
@@ -121,7 +121,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionInvalidAmount
 		-}`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidMT940File.Message)
 
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		`{1:F01TESTBANK123456789}{2:I940TESTBANK}{4:
 		:20:123456789
 		:25:12345678
@@ -142,7 +142,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionType(t *testi
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`{1:F01TESTBANK123456789}{2:I940TESTBANK}{4:
 		:20:123456789
 		:25:12345678
@@ -176,7 +176,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseDescription(t *testing.T
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	allNewTransactions, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`{1:F01TESTBANK123456789}{2:I940TESTBANK}{4:
 		:20:123456789
 		:25:12345678
@@ -204,7 +204,7 @@ func TestMT940TransactionDataFileParseImportedData_MissingRequiredField(t *testi
 	}
 
 	// Missing opening balance and closing balance
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+	_, _, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		`{1:F01TESTBANK123456789}{2:I940TESTBANK}{4:
 		:20:123456789
 		:28C:123/1

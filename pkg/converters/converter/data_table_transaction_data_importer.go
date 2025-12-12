@@ -29,16 +29,16 @@ type DataTableTransactionDataImporter struct {
 }
 
 // ParseImportedData returns the imported transaction data
-func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, user *models.User, dataTable datatable.TransactionDataTable, defaultTimezoneOffset int16, additionalOptions TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
+func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, user *models.User, dataTable datatable.TransactionDataTable, defaultTimezoneOffset int16, additionalOptions TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, []string, error) {
 	if dataTable.TransactionRowCount() < 1 {
 		log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] cannot parse import data for user \"uid:%d\", because data table row count is less 1", user.Uid)
-		return nil, nil, nil, nil, nil, nil, errs.ErrNotFoundTransactionDataInFile
+		return nil, nil, nil, nil, nil, nil, nil, errs.ErrNotFoundTransactionDataInFile
 	}
 
 	nameDbTypeMap, err := c.buildTransactionTypeNameDbTypeMap()
 
 	if err != nil {
-		return nil, nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, nil, err
 	}
 
 	if !dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME) ||
@@ -48,7 +48,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 		!dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_AMOUNT) ||
 		!dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME) {
 		log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] cannot parse import data for user \"uid:%d\", because missing essential columns in header row", user.Uid)
-		return nil, nil, nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow
+		return nil, nil, nil, nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow
 	}
 
 	if accountMap == nil {
@@ -77,6 +77,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 	allNewSubIncomeCategories := make([]*models.TransactionCategory, 0)
 	allNewSubTransferCategories := make([]*models.TransactionCategory, 0)
 	allNewTags := make([]*models.TransactionTag, 0)
+	newCurrenciesMap := make(map[string]bool)
 
 	dataRowIterator := dataTable.TransactionRowIterator()
 	dataRowIndex := 0
@@ -87,7 +88,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 
 		if err != nil {
 			log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] cannot parse data row \"index:%d\" for user \"uid:%d\", because %s", dataRowIndex, user.Uid, err.Error())
-			return nil, nil, nil, nil, nil, nil, err
+			return nil, nil, nil, nil, nil, nil, nil, err
 		}
 
 		if !dataRow.IsValid() {
@@ -102,7 +103,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 
 			if err != nil {
 				log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] cannot parse time zone \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE), dataRowIndex, user.Uid, err.Error())
-				return nil, nil, nil, nil, nil, nil, errs.ErrTransactionTimeZoneInvalid
+				return nil, nil, nil, nil, nil, nil, nil, errs.ErrTransactionTimeZoneInvalid
 			}
 
 			timezoneOffset = utils.GetTimezoneOffsetMinutes(transactionTimezone)
@@ -112,14 +113,14 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 
 		if err != nil {
 			log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] cannot parse time \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME), dataRowIndex, user.Uid, err.Error())
-			return nil, nil, nil, nil, nil, nil, errs.ErrTransactionTimeInvalid
+			return nil, nil, nil, nil, nil, nil, nil, errs.ErrTransactionTimeInvalid
 		}
 
 		transactionDbType, err := c.getTransactionDbType(nameDbTypeMap, dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE))
 
 		if err != nil {
 			log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] cannot parse transaction type \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE), dataRowIndex, user.Uid, err.Error())
-			return nil, nil, nil, nil, nil, nil, errs.Or(err, errs.ErrTransactionTypeInvalid)
+			return nil, nil, nil, nil, nil, nil, nil, errs.Or(err, errs.ErrTransactionTypeInvalid)
 		}
 
 		categoryId := int64(0)
@@ -131,7 +132,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 
 			if err != nil {
 				log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] cannot parse transaction category type in data row \"index:%d\" for user \"uid:%d\", because %s", dataRowIndex, user.Uid, err.Error())
-				return nil, nil, nil, nil, nil, nil, errs.Or(err, errs.ErrTransactionTypeInvalid)
+				return nil, nil, nil, nil, nil, nil, nil, errs.Or(err, errs.ErrTransactionTypeInvalid)
 			}
 
 			categoryName = dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_CATEGORY)
@@ -192,8 +193,11 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 			accountCurrency = dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY)
 
 			if _, ok := validators.AllCurrencyNames[accountCurrency]; !ok {
-				log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] account currency \"%s\" is not supported in data row \"index:%d\" for user \"uid:%d\"", accountCurrency, dataRowIndex, user.Uid)
-				return nil, nil, nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
+				// Auto-create new currency instead of returning error
+				if !newCurrenciesMap[accountCurrency] {
+					newCurrenciesMap[accountCurrency] = true
+					log.Infof(ctx, "[data_table_transaction_data_importer.ParseImportedData] auto-created new currency \"%s\" in data row \"index:%d\" for user \"uid:%d\"", accountCurrency, dataRowIndex, user.Uid)
+				}
 			}
 		}
 
@@ -207,8 +211,8 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 
 		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY) && dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY) != "" {
 			if account.Name != "" && account.Currency != accountCurrency {
-				log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] currency \"%s\" in data row \"index:%d\" not equals currency \"%s\" of the account for user \"uid:%d\"", accountCurrency, dataRowIndex, account.Currency, user.Uid)
-				return nil, nil, nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
+				// If account already exists with different currency, use the existing account's currency
+				accountCurrency = account.Currency
 			}
 		} else if exists {
 			accountCurrency = account.Currency
@@ -218,7 +222,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 
 		if err != nil {
 			log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] cannot parse acmount \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_AMOUNT), dataRowIndex, user.Uid, err.Error())
-			return nil, nil, nil, nil, nil, nil, errs.ErrAmountInvalid
+			return nil, nil, nil, nil, nil, nil, nil, errs.ErrAmountInvalid
 		}
 
 		relatedAccountId := int64(0)
@@ -234,8 +238,11 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 				account2Currency = dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY)
 
 				if _, ok := validators.AllCurrencyNames[account2Currency]; !ok {
-					log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] account2 currency \"%s\" is not supported in data row \"index:%d\" for user \"uid:%d\"", account2Currency, dataRowIndex, user.Uid)
-					return nil, nil, nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
+					// Auto-create new currency instead of returning error
+					if !newCurrenciesMap[account2Currency] {
+						newCurrenciesMap[account2Currency] = true
+						log.Infof(ctx, "[data_table_transaction_data_importer.ParseImportedData] auto-created new currency \"%s\" in data row \"index:%d\" for user \"uid:%d\"", account2Currency, dataRowIndex, user.Uid)
+					}
 				}
 			}
 
@@ -249,8 +256,8 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 
 			if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY) && dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY) != "" {
 				if account2.Name != "" && account2.Currency != account2Currency {
-					log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] currency \"%s\" in data row \"index:%d\" not equals currency \"%s\" of the account2 for user \"uid:%d\"", account2Currency, dataRowIndex, account2.Currency, user.Uid)
-					return nil, nil, nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
+					// If account already exists with different currency, use the existing account's currency
+					account2Currency = account2.Currency
 				}
 			} else if exists {
 				account2Currency = account2.Currency
@@ -263,7 +270,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 
 				if err != nil {
 					log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] cannot parse acmount2 \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT), dataRowIndex, user.Uid, err.Error())
-					return nil, nil, nil, nil, nil, nil, errs.ErrAmountInvalid
+					return nil, nil, nil, nil, nil, nil, nil, errs.ErrAmountInvalid
 				}
 			} else if transactionDbType == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
 				relatedAccountAmount = amount
@@ -281,14 +288,14 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 
 				if err != nil {
 					log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] cannot parse geographic location \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_GEOGRAPHIC_LOCATION), dataRowIndex, user.Uid, err.Error())
-					return nil, nil, nil, nil, nil, nil, errs.ErrGeographicLocationInvalid
+					return nil, nil, nil, nil, nil, nil, nil, errs.ErrGeographicLocationInvalid
 				}
 
 				geoLocationSecondItem, err := utils.StringToFloat64(geoLocationItems[1])
 
 				if err != nil {
 					log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] cannot parse geographic location \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_GEOGRAPHIC_LOCATION), dataRowIndex, user.Uid, err.Error())
-					return nil, nil, nil, nil, nil, nil, errs.ErrGeographicLocationInvalid
+					return nil, nil, nil, nil, nil, nil, nil, errs.ErrGeographicLocationInvalid
 				}
 
 				if c.geoLocationOrder == TRANSACTION_GEO_LOCATION_ORDER_LONGITUDE_LATITUDE {
@@ -367,6 +374,63 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 			description = dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_PAYEE)
 		}
 
+		transactionName := ""
+
+		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_NAME) {
+			transactionName = dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_NAME)
+		}
+
+		fee := int64(0)
+
+		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_FEE) {
+			feeValue := dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_FEE)
+
+			if feeValue != "" {
+				fee, err = utils.ParseAmount(feeValue)
+
+				if err != nil {
+					log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] cannot parse fee \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", feeValue, dataRowIndex, user.Uid, err.Error())
+					return nil, nil, nil, nil, nil, nil, nil, errs.ErrAmountInvalid
+				}
+			}
+		}
+
+		discount := int64(0)
+
+		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_DISCOUNT) {
+			discountValue := dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_DISCOUNT)
+
+			if discountValue != "" {
+				discount, err = utils.ParseAmount(discountValue)
+
+				if err != nil {
+					log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] cannot parse discount \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", discountValue, dataRowIndex, user.Uid, err.Error())
+					return nil, nil, nil, nil, nil, nil, nil, errs.ErrAmountInvalid
+				}
+			}
+		}
+
+		merchantName := ""
+
+		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_MERCHANT_NAME) {
+			merchantName = dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_MERCHANT_NAME)
+		}
+
+		projectId := int64(0)
+
+		if dataTable.HasColumn(datatable.TRANSACTION_DATA_TABLE_PROJECT_ID) {
+			projectIdValue := dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_PROJECT_ID)
+
+			if projectIdValue != "" {
+				projectId, err = utils.StringToInt64(projectIdValue)
+
+				if err != nil {
+					log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] cannot parse project id \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", projectIdValue, dataRowIndex, user.Uid, err.Error())
+					return nil, nil, nil, nil, nil, nil, nil, errs.ErrProjectIdInvalid
+				}
+			}
+		}
+
 		transaction := &models.ImportTransaction{
 			Transaction: &models.Transaction{
 				Uid:                  user.Uid,
@@ -382,6 +446,11 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 				Comment:              description,
 				GeoLongitude:         geoLongitude,
 				GeoLatitude:          geoLatitude,
+				Name:                 transactionName,
+				Fee:                  fee,
+				Discount:             discount,
+				Merchant:             merchantName,
+				ProjectId:            projectId,
 				CreatedIp:            "127.0.0.1",
 			},
 			TagIds:                             tagIds,
@@ -398,12 +467,19 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 
 	if len(allNewTransactions) < 1 {
 		log.Errorf(ctx, "[data_table_transaction_data_importer.ParseImportedData] no transaction data parsed for \"uid:%d\"", user.Uid)
-		return nil, nil, nil, nil, nil, nil, errs.ErrNotFoundTransactionDataInFile
+		return nil, nil, nil, nil, nil, nil, nil, errs.ErrNotFoundTransactionDataInFile
 	}
 
 	sort.Sort(allNewTransactions)
 
-	return allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, nil
+	// Convert newCurrenciesMap to slice
+	newCurrencies := make([]string, 0, len(newCurrenciesMap))
+	for currency := range newCurrenciesMap {
+		newCurrencies = append(newCurrencies, currency)
+	}
+	sort.Strings(newCurrencies)
+
+	return allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, newCurrencies, nil
 }
 
 func (c *DataTableTransactionDataImporter) buildTransactionTypeNameDbTypeMap() (map[string]models.TransactionDbType, error) {
@@ -509,6 +585,8 @@ func (c *DataTableTransactionDataImporter) createNewAccountModel(uid int64, acco
 	return &models.Account{
 		Uid:      uid,
 		Name:     accountName,
+		Category: models.ACCOUNT_CATEGORY_CASH, // Default to asset type (Cash)
+		Type:     models.ACCOUNT_TYPE_SINGLE_ACCOUNT,
 		Currency: currency,
 	}
 }

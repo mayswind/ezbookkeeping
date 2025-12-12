@@ -101,6 +101,43 @@
                     </v-menu>
                 </v-btn>
                 <v-btn class="ms-2" color="secondary" density="compact" variant="outlined"
+                       :disabled="!parsedFileDataColumnMapping || !parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTimeOnly)">
+                    <span>{{ tt('Time Only Format') }}</span>
+                    <span class="ms-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTimeOnly)">({{ parsedFileDataColumnMapping.timeOnlyFormat || 'HH:mm:ss' }})</span>
+                    <v-menu eager activator="parent" location="bottom" max-height="500">
+                        <v-list>
+                            <v-list-item key="HH:mm:ss"
+                                         :append-icon="parsedFileDataColumnMapping.timeOnlyFormat === 'HH:mm:ss' || (!parsedFileDataColumnMapping.timeOnlyFormat && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTimeOnly)) ? mdiCheck : undefined"
+                                         @click="parsedFileDataColumnMapping.timeOnlyFormat = 'HH:mm:ss'">
+                                <v-list-item-title class="cursor-pointer">
+                                    HH:mm:ss
+                                </v-list-item-title>
+                            </v-list-item>
+                            <v-list-item key="HH:mm"
+                                         :append-icon="parsedFileDataColumnMapping.timeOnlyFormat === 'HH:mm' ? mdiCheck : undefined"
+                                         @click="parsedFileDataColumnMapping.timeOnlyFormat = 'HH:mm'">
+                                <v-list-item-title class="cursor-pointer">
+                                    HH:mm
+                                </v-list-item-title>
+                            </v-list-item>
+                            <v-list-item key="hh:mm:ss A"
+                                         :append-icon="parsedFileDataColumnMapping.timeOnlyFormat === 'hh:mm:ss A' ? mdiCheck : undefined"
+                                         @click="parsedFileDataColumnMapping.timeOnlyFormat = 'hh:mm:ss A'">
+                                <v-list-item-title class="cursor-pointer">
+                                    hh:mm:ss A
+                                </v-list-item-title>
+                            </v-list-item>
+                            <v-list-item key="hh:mm A"
+                                         :append-icon="parsedFileDataColumnMapping.timeOnlyFormat === 'hh:mm A' ? mdiCheck : undefined"
+                                         @click="parsedFileDataColumnMapping.timeOnlyFormat = 'hh:mm A'">
+                                <v-list-item-title class="cursor-pointer">
+                                    hh:mm A
+                                </v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </v-btn>
+                <v-btn class="ms-2" color="secondary" density="compact" variant="outlined"
                        v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTimezone)">
                     <span>{{ tt('Timezone Format') }}</span>
                     <span class="ms-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTimezone)">({{ KnownDateTimezoneFormat.valueOf(parsedFileDataColumnMapping.timezoneFormat || parsedFileAutoDetectedTimezoneFormat || '')?.name || tt('Unknown') }})</span>
@@ -265,6 +302,7 @@ interface ImportTransactionDefineColumnResult {
     columnMapping: Record<number, number>;
     transactionTypeMapping: Record<string, TransactionType>;
     timeFormat: string | undefined;
+    timeOnlyFormat: string | undefined;
     timezoneFormat: string | undefined;
     amountDecimalSeparator: string | undefined;
     amountDigitGroupingSymbol: string | undefined;
@@ -452,16 +490,24 @@ function generateResult(): ImportTransactionDefineColumnResult | undefined {
     const tagSeparator: string = parsedFileDataColumnMapping.value.tagSeparator;
 
     let timeFormat: string | undefined = parsedFileDataColumnMapping.value.timeFormat;
+    let timeOnlyFormat: string | undefined = parsedFileDataColumnMapping.value.timeOnlyFormat;
     let timezoneFormat: string | undefined = parsedFileDataColumnMapping.value.timezoneFormat;
     let amountFormat: string | undefined = parsedFileDataColumnMapping.value.amountFormat;
     let amountDecimalSeparator: string | undefined = undefined;
     let amountDigitGroupingSymbol: string | undefined = undefined;
 
+    const hasTimeOnlyColumn = isNumber(columnMapping[ImportTransactionColumnType.TransactionTimeOnly.type]);
+    const hasTimeColumn = isNumber(columnMapping[ImportTransactionColumnType.TransactionTime.type]);
+
+    if (!hasTimeColumn && !hasTimeOnlyColumn) {
+        snackbar.value?.showError('Missing transaction time column mapping');
+        return undefined;
+    }
+
     if (!columnMapping
-        || !isNumber(columnMapping[ImportTransactionColumnType.TransactionTime.type])
         || !isNumber(columnMapping[ImportTransactionColumnType.TransactionType.type])
         || !isNumber(columnMapping[ImportTransactionColumnType.Amount.type])) {
-        snackbar.value?.showError('Missing transaction time, transaction type, or amount column mapping');
+        snackbar.value?.showError('Missing transaction type or amount column mapping');
         return undefined;
     }
 
@@ -472,6 +518,11 @@ function generateResult(): ImportTransactionDefineColumnResult | undefined {
 
     if (!parsedFileDataColumnMapping.value.timeFormat) {
         timeFormat = parsedFileAutoDetectedTimeFormat.value;
+    }
+
+    if (!parsedFileDataColumnMapping.value.timeOnlyFormat && hasTimeOnlyColumn) {
+        // Auto-detect time only format if not set
+        timeOnlyFormat = 'HH:mm:ss'; // Default format
     }
 
     if (!parsedFileDataColumnMapping.value.timezoneFormat) {
@@ -506,6 +557,7 @@ function generateResult(): ImportTransactionDefineColumnResult | undefined {
         columnMapping: columnMapping,
         transactionTypeMapping: transactionTypeMapping,
         timeFormat: timeFormat,
+        timeOnlyFormat: timeOnlyFormat,
         timezoneFormat: timezoneFormat,
         amountDecimalSeparator: amountDecimalSeparator,
         amountDigitGroupingSymbol: amountDigitGroupingSymbol,

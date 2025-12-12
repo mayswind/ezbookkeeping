@@ -21,6 +21,12 @@ export class ImportTransactionColumnType implements TypeAndName {
     public static readonly GeographicLocation = new ImportTransactionColumnType(12, 'Geographic Location');
     public static readonly Tags = new ImportTransactionColumnType(13, 'Tags');
     public static readonly Description = new ImportTransactionColumnType(14, 'Description');
+    public static readonly Name = new ImportTransactionColumnType(15, 'Transaction Name');
+    public static readonly Fee = new ImportTransactionColumnType(16, 'Fee');
+    public static readonly Discount = new ImportTransactionColumnType(17, 'Discount');
+    public static readonly Merchant = new ImportTransactionColumnType(18, 'Merchant');
+    public static readonly TransactionTimeOnly = new ImportTransactionColumnType(20, 'Transaction Time (Time Only)');
+    public static readonly Project = new ImportTransactionColumnType(103, 'Project');
 
     public readonly type: number;
     public readonly name: string;
@@ -41,6 +47,7 @@ export class ImportTransactionDataMapping {
     private static readonly JSON_ROOT_FIELD = 'ezBookkeepingImportTransactionDataMapping';
     private static readonly DEFAULT_INCLUDE_HEADER = true;
     private static readonly DEFAULT_TIME_FORMAT = '';
+    private static readonly DEFAULT_TIME_ONLY_FORMAT = '';
     private static readonly DEFAULT_TIMEZONE_FORMAT = '';
     private static readonly DEFAULT_AMOUNT_FORMAT = '';
     private static readonly DEFAULT_GEO_LOCATION_SEPARATOR = ' ';
@@ -51,6 +58,7 @@ export class ImportTransactionDataMapping {
     public dataColumnMapping: Record<number, number>;
     public transactionTypeMapping: Record<string, TransactionType>;
     public timeFormat: string;
+    public timeOnlyFormat: string;
     public timezoneFormat: string;
     public amountFormat: string;
     public geoLocationSeparator: string;
@@ -61,6 +69,7 @@ export class ImportTransactionDataMapping {
                         dataColumnMapping: Record<number, number>,
                         transactionTypeMapping: Record<string, TransactionType>,
                         timeFormat: string,
+                        timeOnlyFormat: string,
                         timezoneFormat: string,
                         amountFormat: string,
                         geoLocationSeparator: string,
@@ -70,6 +79,7 @@ export class ImportTransactionDataMapping {
         this.dataColumnMapping = dataColumnMapping;
         this.transactionTypeMapping = transactionTypeMapping;
         this.timeFormat = timeFormat;
+        this.timeOnlyFormat = timeOnlyFormat;
         this.timezoneFormat = timezoneFormat;
         this.amountFormat = amountFormat;
         this.geoLocationSeparator = geoLocationSeparator;
@@ -281,6 +291,7 @@ export class ImportTransactionDataMapping {
         this.dataColumnMapping = {};
         this.transactionTypeMapping = {};
         this.timeFormat = ImportTransactionDataMapping.DEFAULT_TIME_FORMAT;
+        this.timeOnlyFormat = ImportTransactionDataMapping.DEFAULT_TIME_ONLY_FORMAT;
         this.timezoneFormat = ImportTransactionDataMapping.DEFAULT_TIMEZONE_FORMAT;
         this.amountFormat = ImportTransactionDataMapping.DEFAULT_AMOUNT_FORMAT;
         this.geoLocationSeparator = ImportTransactionDataMapping.DEFAULT_GEO_LOCATION_SEPARATOR;
@@ -295,6 +306,7 @@ export class ImportTransactionDataMapping {
                 dataColumnMapping: this.dataColumnMapping,
                 transactionTypeMapping: this.transactionTypeMapping,
                 timeFormat: this.timeFormat,
+                timeOnlyFormat: this.timeOnlyFormat,
                 timezoneFormat: this.timezoneFormat,
                 amountFormat: this.amountFormat,
                 geoLocationSeparator: this.geoLocationSeparator,
@@ -310,6 +322,7 @@ export class ImportTransactionDataMapping {
             {},
             {},
             ImportTransactionDataMapping.DEFAULT_TIME_FORMAT,
+            ImportTransactionDataMapping.DEFAULT_TIME_ONLY_FORMAT,
             ImportTransactionDataMapping.DEFAULT_TIMEZONE_FORMAT,
             ImportTransactionDataMapping.DEFAULT_AMOUNT_FORMAT,
             ImportTransactionDataMapping.DEFAULT_GEO_LOCATION_SEPARATOR,
@@ -332,6 +345,7 @@ export class ImportTransactionDataMapping {
                 root.dataColumnMapping ?? {},
                 root.transactionTypeMapping ?? {},
                 root.timeFormat ?? ImportTransactionDataMapping.DEFAULT_TIME_FORMAT,
+                root.timeOnlyFormat ?? ImportTransactionDataMapping.DEFAULT_TIME_ONLY_FORMAT,
                 root.timezoneFormat ?? ImportTransactionDataMapping.DEFAULT_TIMEZONE_FORMAT,
                 root.amountFormat ?? ImportTransactionDataMapping.DEFAULT_AMOUNT_FORMAT,
                 root.geoLocationSeparator ?? ImportTransactionDataMapping.DEFAULT_GEO_LOCATION_SEPARATOR,

@@ -25,7 +25,7 @@ func TestFeideeMymoneyElecloudTransactionDataXlsxImporterParseImportedData_Minim
 	testdata, err := os.ReadFile("../../../testdata/feidee_mymoney_elecloud_test_file.xlsx")
 	assert.Nil(t, err)
 
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, testdata, 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, _, err := importer.ParseImportedData(context, user, testdata, 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 7, len(allNewTransactions))

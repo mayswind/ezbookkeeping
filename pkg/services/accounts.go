@@ -981,3 +981,55 @@ func (s *AccountService) GetAccountOrSubAccountIdsByAccountName(accounts []*mode
 
 	return accountIds
 }
+
+// CreateAccountsBatch saves multiple new account models to database for import
+func (s *AccountService) CreateAccountsBatch(c core.Context, uid int64, accounts []*models.Account) ([]*models.Account, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	if len(accounts) < 1 {
+		return accounts, nil
+	}
+
+	needAccountUuidCount := uint16(len(accounts))
+	accountUuids := s.GenerateUuids(uuid.UUID_TYPE_ACCOUNT, needAccountUuidCount)
+
+	if len(accountUuids) < int(needAccountUuidCount) {
+		return nil, errs.ErrSystemIsBusy
+	}
+
+	now := time.Now().Unix()
+
+	for i := 0; i < len(accounts); i++ {
+		accounts[i].AccountId = accountUuids[i]
+		accounts[i].Uid = uid
+		accounts[i].Deleted = false
+		accounts[i].ParentAccountId = models.LevelOneAccountParentId
+		accounts[i].DisplayOrder = int32(i + 1)
+		accounts[i].Icon = 0
+		accounts[i].Color = "000000"
+		accounts[i].Balance = 0
+		accounts[i].CreatedUnixTime = now
+		accounts[i].UpdatedUnixTime = now
+	}
+
+	err := s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+		for i := 0; i < len(accounts); i++ {
+			account := accounts[i]
+			_, err := sess.Insert(account)
+
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return accounts, nil
+}

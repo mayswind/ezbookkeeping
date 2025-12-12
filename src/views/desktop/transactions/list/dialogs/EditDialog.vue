@@ -322,6 +322,82 @@
                                         </template>
                                     </v-select>
                                 </v-col>
+                                <v-col cols="12" md="6" v-if="type === TransactionEditPageType.Transaction && transaction.type !== TransactionType.ModifyBalance">
+                                    <v-text-field
+                                        type="text"
+                                        persistent-placeholder
+                                        :readonly="mode === TransactionEditPageMode.View"
+                                        :disabled="loading || submitting"
+                                        :label="tt('Name')"
+                                        :placeholder="tt('Transaction name (optional)')"
+                                        v-model="transaction.name"
+                                    />
+                                </v-col>
+                                <v-col cols="12" md="6" v-if="type === TransactionEditPageType.Transaction && transaction.type !== TransactionType.ModifyBalance">
+                                    <v-text-field
+                                        type="text"
+                                        persistent-placeholder
+                                        :readonly="mode === TransactionEditPageMode.View"
+                                        :disabled="loading || submitting"
+                                        :label="tt('Merchant')"
+                                        :placeholder="tt('Merchant name (optional)')"
+                                        v-model="transaction.merchant"
+                                    />
+                                </v-col>
+                                <v-col cols="12" md="6" v-if="type === TransactionEditPageType.Transaction && transaction.type !== TransactionType.ModifyBalance">
+                                    <amount-input
+                                                  :currency="sourceAccountCurrency"
+                                                  :show-currency="true"
+                                                  :readonly="mode === TransactionEditPageMode.View"
+                                                  :disabled="loading || submitting"
+                                                  :persistent-placeholder="true"
+                                                  :label="tt('Fee')"
+                                                  :placeholder="tt('Fee')"
+                                                  :enable-formula="mode !== TransactionEditPageMode.View"
+                                                  v-model="transaction.fee"/>
+                                </v-col>
+                                <v-col cols="12" md="6" v-if="type === TransactionEditPageType.Transaction && transaction.type !== TransactionType.ModifyBalance">
+                                    <amount-input
+                                                  :currency="sourceAccountCurrency"
+                                                  :show-currency="true"
+                                                  :readonly="mode === TransactionEditPageMode.View"
+                                                  :disabled="loading || submitting"
+                                                  :persistent-placeholder="true"
+                                                  :label="tt('Discount')"
+                                                  :placeholder="tt('Discount')"
+                                                  :enable-formula="mode !== TransactionEditPageMode.View"
+                                                  v-model="transaction.discount"/>
+                                </v-col>
+                                <v-col cols="12" md="12" v-if="type === TransactionEditPageType.Transaction && transaction.type !== TransactionType.ModifyBalance">
+                                    <v-autocomplete
+                                        item-title="name"
+                                        item-value="id"
+                                        auto-select-first
+                                        persistent-placeholder
+                                        clearable
+                                        :readonly="mode === TransactionEditPageMode.View"
+                                        :disabled="loading || submitting"
+                                        :label="tt('Project')"
+                                        :placeholder="tt('None')"
+                                        :items="allProjects"
+                                        :no-data-text="tt('No available project')"
+                                        v-model="transaction.projectId"
+                                    >
+                                        <template #item="{ props, item }">
+                                            <v-list-item :value="item.value" v-bind="props" v-if="!item.raw.hidden">
+                                                <template #prepend>
+                                                    <v-badge dot inline :color="'#' + item.raw.color" />
+                                                </template>
+                                            </v-list-item>
+                                        </template>
+                                        <template #selection="{ item }">
+                                            <div class="d-flex align-center">
+                                                <v-badge dot inline :color="'#' + item.raw.color" class="me-2" />
+                                                <span>{{ item.title }}</span>
+                                            </div>
+                                        </template>
+                                    </v-autocomplete>
+                                </v-col>
                                 <v-col cols="12" md="12">
                                     <v-autocomplete
                                         item-title="name"
@@ -523,6 +599,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
+import { useProjectsStore } from '@/stores/project.ts';
 
 import type { Coordinate } from '@/core/coordinate.ts';
 import { CategoryType } from '@/core/category.ts';
@@ -652,6 +729,9 @@ const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
 const transactionsStore = useTransactionsStore();
 const transactionTemplatesStore = useTransactionTemplatesStore();
+const projectsStore = useProjectsStore();
+
+const allProjects = computed(() => projectsStore.allProjects);
 
 const map = useTemplateRef<MapViewType>('map');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
@@ -762,7 +842,8 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
     const promises: Promise<unknown>[] = [
         accountsStore.loadAllAccounts({ force: false }),
         transactionCategoriesStore.loadAllCategories({ force: false }),
-        transactionTagsStore.loadAllTags({ force: false })
+        transactionTagsStore.loadAllTags({ force: false }),
+        projectsStore.loadAllProjects({ force: false })
     ];
 
     if (props.type === TransactionEditPageType.Transaction) {

@@ -16,7 +16,7 @@
                 </f7-link>
             </f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
-                <f7-link icon-f7="search" @click="showSearchbar = true"></f7-link>
+                <f7-link icon-f7="search" @click="toggleSearchbar"></f7-link>
                 <f7-link icon-f7="plus" :class="{ 'disabled': !canAddTransaction }" @click="add"></f7-link>
             </f7-nav-right>
 
@@ -1298,6 +1298,18 @@ function changeTagFilter(tagFilter: string): void {
 
 function filterMultipleTags(): void {
     props.f7router.navigate('/settings/filter/tag?type=transactionListCurrent');
+}
+
+function toggleSearchbar(): void {
+    if (!showSearchbar.value) {
+        showSearchbar.value = true;
+    } else {
+        showSearchbar.value = false;
+
+        if (query.value.keyword) {
+            changeKeywordFilter('');
+        }
+    }
 }
 
 function changeKeywordFilter(keyword: string): void {

@@ -71,7 +71,7 @@ export class ImportTransaction implements ImportTransactionResponse {
             categoryId: this.categoryId,
             name: this.name,
             merchant: this.merchant,
-            projectId: this.projectId,
+            projectId: this.projectId || '0',
             fee: this.fee,
             discount: this.discount,
             time: this.time,

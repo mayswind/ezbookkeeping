@@ -85,31 +85,31 @@
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.45.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.46.0:LICENSE"
     },
     {
         "name": "Go Networking",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/net",
-        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.47.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.48.0:LICENSE"
     },
     {
         "name": "Go Text",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/text",
-        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.31.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.32.0:LICENSE"
     },
     {
         "name": "Go OAuth2",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/oauth2",
-        "licenseUrl": "https://cs.opensource.google/go/x/oauth2/+/refs/tags/v0.33.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/oauth2/+/refs/tags/v0.34.0:LICENSE"
     },
     {
         "name": "go-oidc",
         "copyright": "Copyright 2014 CoreOS, Inc",
         "url": "https://github.com/coreos/go-oidc",
-        "licenseUrl": "https://github.com/coreos/go-oidc/blob/v3.17.0/LICENSE"
+        "licenseUrl": "https://github.com/coreos/go-oidc/blob/v3.18.2/LICENSE"
     },
     {
         "name": "Gomail",
@@ -185,7 +185,7 @@
         "name": "vue-router",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/router",
-        "licenseUrl": "https://github.com/vuejs/router/blob/v4.6.3/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/router/blob/v4.6.4/LICENSE"
     },
     {
         "name": "vue-i18n",
@@ -197,7 +197,7 @@
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-now Vuetify, LLC",
         "url": "https://vuetifyjs.com",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.11.0/packages/vuetify/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.11.3/packages/vuetify/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -209,7 +209,7 @@
         "name": "Framework7",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.0.1/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.0.2/LICENSE"
     },
     {
         "name": "Framework7-vue",
@@ -263,7 +263,7 @@
         "name": "@vuepic/vue-datepicker",
         "copyright": "Copyright (c) 2021-present Vuepic",
         "url": "https://vue3datepicker.com/",
-        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v12.0.5/LICENSE"
+        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v12.1.0/LICENSE"
     },
     {
         "name": "axios",

@@ -59,7 +59,7 @@ func (s *ForgetPasswordService) SendPasswordResetEmail(c core.Context, user *mod
 	}
 
 	templateParams := map[string]any{
-		"AppName": s.CurrentConfig().AppName,
+		"AppName": localeTextItems.GlobalTextItems.AppName,
 		"ForgetPasswordMail": map[string]any{
 			"Title":               forgetPasswordTextItems.Title,
 			"Salutation":          fmt.Sprintf(forgetPasswordTextItems.SalutationFormat, user.Nickname),

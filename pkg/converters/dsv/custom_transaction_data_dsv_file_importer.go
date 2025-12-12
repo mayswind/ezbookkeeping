@@ -33,8 +33,8 @@ var supportedFileTypeSeparators = map[string]rune{
 var supportedFileEncodings = map[string]encoding.Encoding{
 	"utf-8":        unicode.UTF8,                                           // UTF-8
 	"utf-8-bom":    unicode.UTF8BOM,                                        // UTF-8 with BOM
-	"utf-16le":     unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM), // UTF-16 Little Endian
-	"utf-16be":     unicode.UTF16(unicode.BigEndian, unicode.IgnoreBOM),    // UTF-16 Big Endian
+	"utf-16le":     unicode.UTF16(unicode.LittleEndian, unicode.UseBOM),    // UTF-16 Little Endian
+	"utf-16be":     unicode.UTF16(unicode.BigEndian, unicode.UseBOM),       // UTF-16 Big Endian
 	"utf-16le-bom": unicode.UTF16(unicode.LittleEndian, unicode.ExpectBOM), // UTF-16 Little Endian with BOM
 	"utf-16be-bom": unicode.UTF16(unicode.BigEndian, unicode.ExpectBOM),    // UTF-16 Big Endian with BOM
 	"cp437":        charmap.CodePage437,                                    // OEM United States (CP-437)

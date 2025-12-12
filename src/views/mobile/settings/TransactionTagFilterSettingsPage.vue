@@ -1,12 +1,22 @@
 <template>
-    <f7-page @page:afterin="onPageAfterIn">
+    <f7-page with-subnavbar @page:beforein="onPageBeforeIn" @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title :title="tt(title)"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': !hasAnyAvailableTag }" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': !hasAnyVisibleTag }" @click="save"></f7-link>
+                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': !hasAnyAvailableTag }" @click="save"></f7-link>
             </f7-nav-right>
+
+            <f7-subnavbar :inner="false">
+                <f7-searchbar
+                    custom-searchs
+                    :value="filterContent"
+                    :placeholder="tt('Find tag')"
+                    :disable-button-text="tt('Cancel')"
+                    @change="filterContent = $event.target.value"
+                ></f7-searchbar>
+            </f7-subnavbar>
         </f7-navbar>
 
         <f7-block class="combination-list-wrapper margin-vertical skeleton-text" v-if="loading">
@@ -85,7 +95,7 @@
                                       :value="transactionTag.id"
                                       :key="transactionTag.id"
                                       :after="tt(filterTagIds[transactionTag.id] === TransactionTagFilterState.Include ? 'Included' : filterTagIds[transactionTag.id] === TransactionTagFilterState.Exclude ? 'Excluded' : 'Default')"
-                                      v-for="transactionTag in allTags"
+                                      v-for="transactionTag in allVisibleTags"
                                       v-show="showHidden || !transactionTag.hidden"
                                       @click="currentTransactionTagId = transactionTag.id">
                             <template #media>
@@ -101,10 +111,10 @@
             </f7-accordion-item>
         </f7-block>
 
-        <f7-popover class="tag-filter-state-popover-menu"
-                    v-model:opened="showTagFilterStatePopover">
+        <f7-popover class="tag-filter-state-popover-menu">
             <f7-list dividers>
-                <f7-list-item :title="state.displayName"
+                <f7-list-item link="#" no-chevron popover-close
+                              :title="state.displayName"
                               :class="{ 'list-item-selected': filterTagIds[currentTransactionTagId] === state.type }"
                               :key="state.type"
                               v-for="state in [
@@ -122,14 +132,9 @@
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
-                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllTagsState(false, TransactionTagFilterState.Include)">{{ tt('Set All to Included') }}</f7-actions-button>
-                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllTagsState(false, TransactionTagFilterState.Default)">{{ tt('Set All to Default') }}</f7-actions-button>
-                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllTagsState(false, TransactionTagFilterState.Exclude)">{{ tt('Set All to Excluded') }}</f7-actions-button>
-            </f7-actions-group>
-            <f7-actions-group>
-                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllTagsState(true, TransactionTagFilterState.Include)">{{ tt('Set All Visible Items to Included') }}</f7-actions-button>
-                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllTagsState(true, TransactionTagFilterState.Default)">{{ tt('Set All Visible Items to Default') }}</f7-actions-button>
-                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllTagsState(true, TransactionTagFilterState.Exclude)">{{ tt('Set All Visible Items to Excluded') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllTagsState(TransactionTagFilterState.Include)">{{ tt('Set All to Included') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllTagsState(TransactionTagFilterState.Default)">{{ tt('Set All to Default') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="setAllTagsState(TransactionTagFilterState.Exclude)">{{ tt('Set All to Excluded') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ tt('Show Hidden Transaction Tags') }}</f7-actions-button>
@@ -174,13 +179,14 @@ const { showToast, routeBackOnError } = useI18nUIComponents();
 const {
     loading,
     showHidden,
+    filterContent,
     filterTagIds,
     includeTagFilterType,
     excludeTagFilterType,
     includeTagsCount,
     excludeTagsCount,
     title,
-    allTags,
+    allVisibleTags,
     hasAnyAvailableTag,
     hasAnyVisibleTag,
     loadFilterTagIds,
@@ -191,7 +197,6 @@ const transactionTagsStore = useTransactionTagsStore();
 
 const loadingError = ref<unknown | null>(null);
 const currentTransactionTagId = ref<string>('');
-const showTagFilterStatePopover = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 
 const collapseStates = ref<Record<string, CollapseState>>({
@@ -222,16 +227,11 @@ function init(): void {
 
 function updateCurrentTransactionTagState(state: number): void {
     filterTagIds.value[currentTransactionTagId.value] = state;
-    showTagFilterStatePopover.value = false;
     currentTransactionTagId.value = '';
 }
 
-function setAllTagsState(onlyVisible: boolean, value: TransactionTagFilterState): void {
-    for (const tag of allTags.value) {
-        if (onlyVisible && !showHidden.value && tag.hidden) {
-            continue;
-        }
-
+function setAllTagsState(value: TransactionTagFilterState): void {
+    for (const tag of allVisibleTags.value) {
         filterTagIds.value[tag.id] = value;
     }
 }
@@ -239,6 +239,10 @@ function setAllTagsState(onlyVisible: boolean, value: TransactionTagFilterState)
 function save(): void {
     saveFilterTagIds();
     props.f7router.back();
+}
+
+function onPageBeforeIn(): void {
+    filterContent.value = '';
 }
 
 function onPageAfterIn(): void {

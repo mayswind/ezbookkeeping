@@ -621,6 +621,14 @@ html[dir="rtl"] .icon.las .badge.right-bottom-icon {
     background: #666
 }
 
+.toolbar-with-swipe-handler > .toolbar-inner {
+    > div.left,
+    > div.right,
+    > form.searchbar {
+        margin-top: var(--f7-typography-margin) !important;
+    }
+}
+
 /** list-item-with-multi-item for framework7 **/
 .list-item-with-multi-item .item-content,
 .list-item-with-multi-item .item-inner {

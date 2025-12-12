@@ -237,7 +237,7 @@
                        :prepend-icon="mdiClose" @click="close(false)"
                        v-if="currentStep !== 'finalResult'">{{ tt('Cancel') }}</v-btn>
                 <v-btn class="button-icon-with-direction" color="primary"
-                       :disabled="loading || submitting || (!isImportDataFromTextbox && !importFile) || (isImportDataFromTextbox && !importData)"
+                       :disabled="loading || submitting || (!isImportDataFromTextbox && !importFile) || (isImportDataFromTextbox && !importData) || (!isImportDataFromTextbox && allSupportedEncodings && fileEncoding === 'auto' && !autoDetectedFileEncoding)"
                        :append-icon="!submitting ? mdiArrowRight : undefined" @click="parseData"
                        v-if="currentStep === 'defineColumn' || currentStep === 'executeCustomScript' || currentStep === 'uploadFile'">
                     {{ tt('Next') }}
@@ -293,10 +293,12 @@ import {
     type LocalizedImportFileTypeSupportedEncodings,
     KnownFileType
 } from '@/core/file.ts';
+import { UTF_8 } from '@/consts/file.ts';
+
 import { ImportTransaction } from '@/models/imported_transaction.ts';
 
 import { isDefined, isNumber } from '@/lib/common.ts';
-import { findExtensionByType, isFileExtensionSupported } from '@/lib/file.ts';
+import { findExtensionByType, isFileExtensionSupported, detectFileEncoding } from '@/lib/file.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import logger from '@/lib/logger.ts';
 
@@ -330,7 +332,8 @@ const {
     joinMultiText,
     getCurrentNumeralSystemType,
     getAllSupportedImportFileCagtegoryAndTypes,
-    formatNumberToLocalizedNumerals
+    formatNumberToLocalizedNumerals,
+    getLocalizedFileEncodingName
 } = useI18n();
 
 const accountsStore = useAccountsStore();
@@ -377,7 +380,9 @@ const currentStep = ref<ImportTransactionDialogStep>('uploadFile');
 const importProcess = ref<number>(0);
 const fileType = ref<string>('ezbookkeeping');
 const fileSubType = ref<string>('ezbookkeeping_csv');
-const fileEncoding = ref<string>('utf-8');
+const fileEncoding = ref<string>('auto');
+const detectingFileEncoding = ref<boolean>(false);
+const autoDetectedFileEncoding = ref<string | undefined>(undefined);
 const processDSVMethod = ref<ImportDSVProcessMethod>(ImportDSVProcessMethod.ColumnMapping);
 const importFile = ref<File | null>(null);
 const importData = ref<string>('');
@@ -396,7 +401,39 @@ const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType(
 
 const allSupportedImportFileCategoryAndTypes = computed<LocalizedImportFileCategoryAndTypes[]>(() => getAllSupportedImportFileCagtegoryAndTypes());
 const allFileSubTypes = computed<LocalizedImportFileTypeSubType[] | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.subTypes);
-const allSupportedEncodings = computed<LocalizedImportFileTypeSupportedEncodings[] | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.supportedEncodings);
+const allSupportedEncodings = computed<LocalizedImportFileTypeSupportedEncodings[] | undefined>(() => {
+    const supportedEncodings = allSupportedImportFileTypesMap.value[fileType.value]?.supportedEncodings;
+
+    if (!supportedEncodings) {
+        return undefined;
+    }
+
+    const ret: LocalizedImportFileTypeSupportedEncodings[] = [];
+    let autoDetectDisplayName = tt('Auto detect');
+
+    if (importFile.value) {
+        if (detectingFileEncoding.value) {
+            autoDetectDisplayName += ` [${tt('Detecting...')}]`;
+        } else if (autoDetectedFileEncoding.value) {
+            autoDetectDisplayName += ` [${getLocalizedFileEncodingName(autoDetectedFileEncoding.value)}]`;
+        } else {
+            autoDetectDisplayName += ` [${tt('Unknown')}]`;
+        }
+    }
+
+    const autoDetectEncoding: LocalizedImportFileTypeSupportedEncodings = {
+        displayName: autoDetectDisplayName,
+        encoding: 'auto'
+    };
+
+    ret.push(autoDetectEncoding);
+
+    if (supportedEncodings && supportedEncodings.length) {
+        ret.push(...supportedEncodings);
+    }
+
+    return ret;
+});
 const isImportDataFromTextbox = computed<boolean>(() => allSupportedImportFileTypesMap.value[fileType.value]?.dataFromTextbox ?? false);
 const supportedAdditionalOptions = computed<ImportFileTypeSupportedAdditionalOptions | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.supportedAdditionalOptions);
 
@@ -508,7 +545,9 @@ function getDisplayCount(count: number): string {
 function open(): Promise<void> {
     fileType.value = 'ezbookkeeping';
     fileSubType.value = 'ezbookkeeping_csv';
-    fileEncoding.value = 'utf-8';
+    fileEncoding.value = 'auto';
+    detectingFileEncoding.value = false;
+    autoDetectedFileEncoding.value = undefined;
     processDSVMethod.value = ImportDSVProcessMethod.ColumnMapping;
     currentStep.value = 'uploadFile';
     importProcess.value = 0;
@@ -570,7 +609,21 @@ function setImportFile(event: Event): void {
     }
 
     importFile.value = el.files[0] as File;
+    detectingFileEncoding.value = false;
+    autoDetectedFileEncoding.value = undefined;
     el.value = '';
+
+    if (allSupportedEncodings.value) {
+        detectingFileEncoding.value = true;
+
+        detectFileEncoding(importFile.value).then(detectedEncoding => {
+            detectingFileEncoding.value = false;
+            autoDetectedFileEncoding.value = detectedEncoding;
+        }).catch(() => {
+            detectingFileEncoding.value = false;
+            autoDetectedFileEncoding.value = undefined;
+        });
+    }
 }
 
 function parseData(): void {
@@ -583,13 +636,24 @@ function parseData(): void {
     }
 
     if (allSupportedEncodings.value) {
-        encoding = fileEncoding.value;
+        if (fileEncoding.value === 'auto') {
+            encoding = autoDetectedFileEncoding.value;
+        } else {
+            encoding = fileEncoding.value;
+        }
     }
 
     if (!isImportDataFromTextbox.value) {
         if (!importFile.value) {
             snackbar.value?.showError('Please select a file to import');
             return;
+        }
+
+        if (allSupportedEncodings.value) {
+            if (fileEncoding.value === 'auto' && !autoDetectedFileEncoding.value) {
+                snackbar.value?.showError('Unable to detect the file encoding automatically. Please select the actual encoding.');
+                return;
+            }
         }
 
         uploadFile = importFile.value;
@@ -608,7 +672,7 @@ function parseData(): void {
             return;
         }
 
-        encoding = 'utf-8';
+        encoding = UTF_8;
     } else { // should not happen, but ts would check whether uploadFile has been assigned a value
         snackbar.value?.showMessage('An error occurred');
         return;

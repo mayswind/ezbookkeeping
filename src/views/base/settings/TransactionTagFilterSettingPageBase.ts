@@ -24,6 +24,7 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
 
     const loading = ref<boolean>(true);
     const showHidden = ref<boolean>(false);
+    const filterContent = ref<string>('');
     const filterTagIds = ref<Record<string, TransactionTagFilterState>>({});
     const includeTagFilterType = ref<number>(TransactionTagFilterType.HasAny.type);
     const excludeTagFilterType = ref<number>(TransactionTagFilterType.NotHasAny.type);
@@ -39,15 +40,23 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
         return 'Apply';
     });
 
-    const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
-    const hasAnyAvailableTag = computed<boolean>(() => transactionTagsStore.allAvailableTagsCount > 0);
-    const hasAnyVisibleTag = computed<boolean>(() => {
-        if (showHidden.value) {
-            return transactionTagsStore.allAvailableTagsCount > 0;
-        } else {
-            return transactionTagsStore.allVisibleTagsCount > 0;
+    const allVisibleTags = computed<TransactionTag[]>(() => {
+        const ret: TransactionTag[] = [];
+        const allTags = showHidden.value ? transactionTagsStore.allTransactionTags : transactionTagsStore.allVisibleTags;
+        const lowercaseFilterContent = filterContent.value ? filterContent.value.toLowerCase() : '';
+
+        for (const tag of allTags) {
+            if (lowercaseFilterContent && !tag.name.toLowerCase().includes(lowercaseFilterContent)) {
+                continue;
+            }
+
+            ret.push(tag);
         }
+
+        return ret;
     });
+    const hasAnyAvailableTag = computed<boolean>(() => transactionTagsStore.allAvailableTagsCount > 0);
+    const hasAnyVisibleTag = computed<boolean>(() => allVisibleTags.value.length > 0);
 
     function loadFilterTagIds(): boolean {
         let tagFilters: TransactionTagFilter[] = [];
@@ -142,6 +151,7 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
         // states
         loading,
         showHidden,
+        filterContent,
         filterTagIds,
         includeTagFilterType,
         excludeTagFilterType,
@@ -150,7 +160,7 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
         excludeTagsCount,
         title,
         applyText,
-        allTags,
+        allVisibleTags,
         hasAnyAvailableTag,
         hasAnyVisibleTag,
         // functions

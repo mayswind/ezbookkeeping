@@ -1,7 +1,7 @@
 <template>
     <f7-sheet swipe-to-close swipe-handler=".swipe-handler"
               style="height: auto" :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
-        <f7-toolbar>
+        <f7-toolbar class="toolbar-with-swipe-handler">
             <div class="swipe-handler"></div>
             <div class="left">
                 <f7-link sheet-close icon-f7="xmark"></f7-link>
@@ -10,7 +10,7 @@
                 <f7-button round fill icon-f7="checkmark_alt" @click="save"></f7-button>
             </div>
         </f7-toolbar>
-        <f7-page-content>
+        <f7-page-content class="margin-top">
             <div class="grid grid-cols-2 grid-gap">
                 <div>
                     <div class="schedule-frequency-type-container">

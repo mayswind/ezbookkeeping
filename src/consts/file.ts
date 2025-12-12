@@ -9,8 +9,10 @@ export const SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE: Record<string, string
     'zh-Hant': 'zh-Hans',
 };
 
+export const UTF_8 = 'utf-8';
+
 export const SUPPORTED_FILE_ENCODINGS: string[] = [
-    'utf-8', // UTF-8
+    UTF_8, // UTF-8
     'utf-8-bom', // UTF-8 with BOM
     'utf-16le', // UTF-16 Little Endian
     'utf-16be', // UTF-16 Big Endian
@@ -63,6 +65,37 @@ export const SUPPORTED_FILE_ENCODINGS: string[] = [
     'iso-2022-jp', // Japanese (ISO-2022-JP)
     'shift_jis', // Japanese (Shift_JIS)
 ];
+
+export const CHARDET_ENCODING_NAME_MAPPING: Record<string, string> = {
+    'UTF-8': UTF_8,
+    'UTF-16LE': 'utf-16le',
+    'UTF-16BE': 'utf-16be',
+    // 'UTF-32 LE': '', // not supported
+    // 'UTF-32 BE': '', // not supported
+    'ISO-2022-JP': 'iso-2022-jp',
+    // 'ISO-2022-KR': '', // not supported
+    // 'ISO-2022-CN': '', // not supported
+    'Shift_JIS': 'shift_jis',
+    'Big5': 'big5',
+    'EUC-JP': 'euc-jp',
+    'EUC-KR': 'euc-kr',
+    'GB18030': 'gb18030',
+    'ISO-8859-1': 'iso-8859-1',
+    'ISO-8859-2': 'iso-8859-2',
+    'ISO-8859-5': 'iso-8859-5',
+    'ISO-8859-6': 'iso-8859-6',
+    'ISO-8859-7': 'iso-8859-7',
+    'ISO-8859-8': 'iso-8859-8',
+    'ISO-8859-9': 'iso-8859-9',
+    'windows-1250': 'windows-1250',
+    'windows-1251': 'windows-1251',
+    'windows-1252': 'windows-1252',
+    'windows-1253': 'windows-1253',
+    'windows-1254': 'windows-1254',
+    'windows-1255': 'windows-1255',
+    'windows-1256': 'windows-1256',
+    'KOI8-R':'koi8r'
+};
 
 export const SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES: ImportFileCategoryAndTypes[] = [
     {

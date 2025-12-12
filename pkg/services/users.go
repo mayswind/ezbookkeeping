@@ -684,14 +684,14 @@ func (s *UserService) SendVerifyEmail(user *models.User, verifyEmailToken string
 	}
 
 	templateParams := map[string]any{
-		"AppName": s.CurrentConfig().AppName,
+		"AppName": localeTextItems.GlobalTextItems.AppName,
 		"VerifyEmail": map[string]any{
 			"Title":               verifyEmailTextItems.Title,
 			"Salutation":          fmt.Sprintf(verifyEmailTextItems.SalutationFormat, user.Nickname),
 			"DescriptionAboveBtn": verifyEmailTextItems.DescriptionAboveBtn,
 			"VerifyEmailUrl":      verifyEmailUrl,
 			"VerifyEmail":         verifyEmailTextItems.VerifyEmail,
-			"DescriptionBelowBtn": fmt.Sprintf(verifyEmailTextItems.DescriptionBelowBtnFormat, s.CurrentConfig().AppName, expireTimeInMinutes),
+			"DescriptionBelowBtn": fmt.Sprintf(verifyEmailTextItems.DescriptionBelowBtnFormat, localeTextItems.GlobalTextItems.AppName, expireTimeInMinutes),
 		},
 	}
 

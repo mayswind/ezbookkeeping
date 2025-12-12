@@ -2,12 +2,11 @@
     <f7-sheet swipe-to-close swipe-handler=".swipe-handler"
               :class="heightClass" :opened="show"
               @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
-        <f7-toolbar>
+        <f7-toolbar class="toolbar-with-swipe-handler">
             <div class="swipe-handler"></div>
             <div class="left">
                 <f7-link sheet-close icon-f7="xmark"></f7-link>
             </div>
-            <div class="right"></div>
         </f7-toolbar>
         <f7-page-content>
             <f7-block class="margin-vertical no-padding">
@@ -60,7 +59,7 @@ const heightClass = computed<string>(() => {
     } else if (allIconRows.value.length > 6) {
         return 'icon-selection-large-sheet';
     } else {
-        return '';
+        return 'icon-selection-default-sheet';
     }
 });
 
@@ -83,13 +82,24 @@ function onSheetClosed(): void {
 </script>
 
 <style>
+.icon-selection-default-sheet {
+    height: 310px;
+}
+
 @media (min-height: 630px) {
     .icon-selection-large-sheet {
-        height: 310px;
+        height: 370px;
     }
 
     .icon-selection-huge-sheet {
-        height: 400px;
+        height: 500px;
+    }
+}
+
+@media (max-height: 629px) {
+    .icon-selection-large-sheet,
+    .icon-selection-huge-sheet {
+        height: 320px;
     }
 }
 </style>

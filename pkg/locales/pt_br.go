@@ -5,6 +5,9 @@ import (
 )
 
 var ptBR = &LocaleTextItems{
+	GlobalTextItems: &GlobalTextItems{
+		AppName: "ezBookkeeping",
+	},
 	DefaultTypes: &DefaultTypes{
 		DecimalSeparator:    core.DECIMAL_SEPARATOR_COMMA,
 		DigitGroupingSymbol: core.DIGIT_GROUPING_SYMBOL_SPACE,

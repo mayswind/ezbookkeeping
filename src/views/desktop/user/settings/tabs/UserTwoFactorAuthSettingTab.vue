@@ -9,7 +9,7 @@
 
                 <v-card-text class="pb-0">
                     <v-skeleton-loader class="skeleton-no-margin pt-2 pb-5" type="text" style="width: 150px" :loading="true" v-if="loading"></v-skeleton-loader>
-                    <p class="text-body-1 font-weight-semibold" v-if="!loading && !new2FAQRCode">
+                    <p class="text-body-1" v-if="!loading && !new2FAQRCode">
                         {{ status === true ? tt('Two-factor authentication is already enabled.') : tt('Two-factor authentication is not enabled yet.') }}
                     </p>
                     <p class="text-body-1" v-if="!loading && new2FAQRCode">
@@ -110,6 +110,7 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useTwoFactorAuthStore } from '@/stores/twoFactorAuth.ts';
 
+import { KnownErrorCode } from '@/consts/api.ts';
 import { copyTextToClipboard } from '@/lib/ui/common.ts';
 
 import {
@@ -145,7 +146,10 @@ function init(): void {
     }).catch(error => {
         loading.value = false;
 
-        if (!error.processed) {
+        if (error.error && error.error.errorCode === KnownErrorCode.ApiNotFound) {
+            status.value = null;
+        } else if (!error.processed) {
+            status.value = null;
             snackbar.value?.showError(error);
         }
     });

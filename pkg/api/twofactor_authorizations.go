@@ -85,7 +85,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableRequestHandler(c *core.WebCo
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 
-	key, err := a.twoFactorAuthorizations.GenerateTwoFactorSecret(c, user)
+	key, err := a.twoFactorAuthorizations.GenerateTwoFactorSecret(c, user, c.GetClientLocale())
 
 	if err != nil {
 		log.Errorf(c, "[twofactor_authorizations.TwoFactorEnableRequestHandler] failed to generate two-factor secret, because %s", err.Error())

@@ -133,11 +133,13 @@ Currently available translations:
 | fr | Français | [@brieucdlf](https://github.com/brieucdlf) |
 | it | Italiano | [@waron97](https://github.com/waron97) |
 | ja | 日本語 | [@tkymmm](https://github.com/tkymmm) |
+| kn | ಕನ್ನಡ | [@Darshanbm05](https://github.com/Darshanbm05) |
 | ko | 한국어 | [@overworks](https://github.com/overworks) |
 | nl | Nederlands | [@automagic](https://github.com/automagics) |
 | pt-BR | Português (Brasil) | [@thecodergus](https://github.com/thecodergus) |
 | ru | Русский | [@artegoser](https://github.com/artegoser) |
 | th | ไทย | [@natthavat28](https://github.com/natthavat28) |
+| tr | Türkçe | [@aydnykn](https://github.com/aydnykn) |
 | uk | Українська | [@nktlitvinenko](https://github.com/nktlitvinenko) |
 | vi | Tiếng Việt | [@f97](https://github.com/f97) |
 | zh-Hans | 中文 (简体) | / |

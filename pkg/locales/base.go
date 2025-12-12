@@ -6,10 +6,16 @@ import (
 
 // LocaleTextItems represents all text items need to be translated
 type LocaleTextItems struct {
+	GlobalTextItems             *GlobalTextItems
 	DefaultTypes                *DefaultTypes
 	DataConverterTextItems      *DataConverterTextItems
 	VerifyEmailTextItems        *VerifyEmailTextItems
 	ForgetPasswordMailTextItems *ForgetPasswordMailTextItems
+}
+
+// GlobalTextItems represents global text items need to be translated
+type GlobalTextItems struct {
+	AppName string
 }
 
 // DefaultTypes represents default types for the language

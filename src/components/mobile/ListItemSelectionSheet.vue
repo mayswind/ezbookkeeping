@@ -2,14 +2,13 @@
     <f7-sheet swipe-to-close swipe-handler=".swipe-handler"
               :class="heightClass" :opened="show"
               @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
-        <f7-toolbar>
+        <f7-toolbar class="toolbar-with-swipe-handler">
             <div class="swipe-handler"></div>
             <div class="left">
                 <f7-link sheet-close icon-f7="xmark"></f7-link>
             </div>
-            <div class="right"></div>
         </f7-toolbar>
-        <f7-page-content>
+        <f7-page-content class="margin-top">
             <f7-list dividers class="no-margin-vertical">
                 <f7-list-item link="#" no-chevron
                               :title="ti((titleField ? (item as Record<string, unknown>)[titleField] : item) as string, !!titleI18n)"
@@ -71,7 +70,7 @@ const heightClass = computed<string>(() => {
     } else if (props.items.length > 6) {
         return 'list-item-selection-large-sheet';
     } else {
-        return '';
+        return 'list-item-selection-default-sheet';
     }
 });
 
@@ -127,13 +126,24 @@ function onSheetClosed(): void {
 </script>
 
 <style>
+.list-item-selection-default-sheet {
+    height: 310px;
+}
+
 @media (min-height: 630px) {
     .list-item-selection-large-sheet {
-        height: 310px;
+        height: 370px;
     }
 
     .list-item-selection-huge-sheet {
-        height: 400px;
+        height: 500px;
+    }
+}
+
+@media (max-height: 629px) {
+    .list-item-selection-large-sheet,
+    .list-item-selection-huge-sheet {
+        height: 320px;
     }
 }
 </style>

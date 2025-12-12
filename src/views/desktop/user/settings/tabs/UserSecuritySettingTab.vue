@@ -212,6 +212,8 @@ import { useUserExternalAuthStore } from '@/stores/userExternalAuth.ts';
 import { useTokensStore } from '@/stores/token.ts';
 
 import { itemAndIndex, reversedItemAndIndex } from '@/core/base.ts';
+import { KnownErrorCode } from '@/consts/api.ts';
+
 import { type UserExternalAuthInfoResponse } from '@/models/user_external_auth.ts';
 import { type TokenInfoResponse, SessionDeviceType, SessionInfo } from '@/models/token.ts';
 
@@ -440,7 +442,10 @@ function reloadExternalAuth(silent?: boolean): void {
     }).catch(error => {
         loadingExternalAuth.value = false;
 
-        if (!error.processed) {
+        if (error.error && error.error.errorCode === KnownErrorCode.ApiNotFound) {
+            externalAuths.value = [];
+        } else if (!error.processed) {
+            externalAuths.value = [];
             snackbar.value?.showError(error);
         }
     });

@@ -13,7 +13,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
-const mcpServerName = "ezBookkeeping-mcp"
+const mcpServerName = core.ApplicationName + "-mcp"
 
 // ModelContextProtocolAPI represents model context protocol api
 type ModelContextProtocolAPI struct {
@@ -102,7 +102,7 @@ func (a *ModelContextProtocolAPI) InitializeHandler(c *core.WebContext, jsonRPCR
 		},
 		ServerInfo: &mcp.MCPImplementation{
 			Name:    mcpServerName,
-			Title:   a.CurrentConfig().AppName,
+			Title:   core.ApplicationName,
 			Version: settings.Version,
 		},
 	}

@@ -5,6 +5,9 @@ import (
 )
 
 var vi = &LocaleTextItems{
+	GlobalTextItems: &GlobalTextItems{
+		AppName: "ezBookkeeping",
+	},
 	DefaultTypes: &DefaultTypes{
 		DecimalSeparator:    core.DECIMAL_SEPARATOR_COMMA,
 		DigitGroupingSymbol: core.DIGIT_GROUPING_SYMBOL_DOT,

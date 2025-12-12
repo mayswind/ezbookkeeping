@@ -119,13 +119,13 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         textDirection: 'ltr',
         content: th
     },
-    tr: {
-    name: 'Turkish',
-    displayName: 'Türkçe',
-    alternativeLanguageTag: 'tr-TR',
-    textDirection: 'ltr',
-    content: tr
-  },
+    'tr': {
+        name: 'Turkish',
+        displayName: 'Türkçe',
+        alternativeLanguageTag: 'tr-TR',
+        textDirection: 'ltr',
+        content: tr
+    },
     'uk': {
         name: 'Ukrainian',
         displayName: 'Українська',

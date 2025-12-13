@@ -84,7 +84,7 @@
                         <v-list rounded density="comfortable" class="pa-0">
                             <template :key="transactionTag.id"
                                       v-for="transactionTag in allVisibleTags">
-                                <v-list-item v-if="showHidden || !transactionTag.hidden">
+                                <v-list-item>
                                     <template #prepend>
                                         <v-badge class="right-bottom-icon" color="secondary"
                                                  location="bottom right" offset-x="2" offset-y="2" :icon="mdiEyeOffOutline"

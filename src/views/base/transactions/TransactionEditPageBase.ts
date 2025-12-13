@@ -110,9 +110,9 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
     const allTagsMap = computed<Record<string, TransactionTag>>(() => transactionTagsStore.allTransactionTagsMap);
     const firstVisibleAccountId = computed<string | undefined>(() => allVisibleAccounts.value && allVisibleAccounts.value[0] ? allVisibleAccounts.value[0].id : undefined);
 
-    const hasAvailableExpenseCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableExpenseCategories);
-    const hasAvailableIncomeCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableIncomeCategories);
-    const hasAvailableTransferCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableTransferCategories);
+    const hasVisibleExpenseCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleExpenseCategories);
+    const hasVisibleIncomeCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleIncomeCategories);
+    const hasVisibleTransferCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleTransferCategories);
 
     const canAddTransactionPicture = computed<boolean>(() => {
         if (type !== TransactionEditPageType.Transaction || (mode.value !== TransactionEditPageMode.Add && mode.value !== TransactionEditPageMode.Edit)) {
@@ -438,9 +438,9 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         allTags,
         allTagsMap,
         firstVisibleAccountId,
-        hasAvailableExpenseCategories,
-        hasAvailableIncomeCategories,
-        hasAvailableTransferCategories,
+        hasVisibleExpenseCategories,
+        hasVisibleIncomeCategories,
+        hasVisibleTransferCategories,
         canAddTransactionPicture,
         title,
         saveButtonTitle,

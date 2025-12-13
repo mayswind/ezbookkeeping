@@ -104,7 +104,7 @@
                                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                            secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                            secondary-hidden-field="hidden"
-                                                           :disabled="loading || !hasAvailableExpenseCategories"
+                                                           :disabled="loading || !hasVisibleExpenseCategories"
                                                            :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
                                                            :show-selection-primary-text="true"
                                                            :custom-selection-primary-text="getTransactionPrimaryCategoryName(newRule.targetId, allCategories[CategoryType.Expense])"
@@ -120,7 +120,7 @@
                                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                            secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                            secondary-hidden-field="hidden"
-                                                           :disabled="loading || !hasAvailableIncomeCategories"
+                                                           :disabled="loading || !hasVisibleIncomeCategories"
                                                            :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
                                                            :show-selection-primary-text="true"
                                                            :custom-selection-primary-text="getTransactionPrimaryCategoryName(newRule.targetId, allCategories[CategoryType.Income])"
@@ -136,7 +136,7 @@
                                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                            secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                            secondary-hidden-field="hidden"
-                                                           :disabled="loading || !hasAvailableTransferCategories"
+                                                           :disabled="loading || !hasVisibleTransferCategories"
                                                            :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
                                                            :show-selection-primary-text="true"
                                                            :custom-selection-primary-text="getTransactionPrimaryCategoryName(newRule.targetId, allCategories[CategoryType.Transfer])"
@@ -285,9 +285,9 @@ const allVisibleCategorizedAccounts = computed<CategorizedAccountWithDisplayBala
 const allCategories = computed<Record<number, TransactionCategory[]>>(() => transactionCategoriesStore.allTransactionCategories);
 const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
 
-const hasAvailableExpenseCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableExpenseCategories);
-const hasAvailableIncomeCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableIncomeCategories);
-const hasAvailableTransferCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableTransferCategories);
+const hasVisibleExpenseCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleExpenseCategories);
+const hasVisibleIncomeCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleIncomeCategories);
+const hasVisibleTransferCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleTransferCategories);
 
 const sourceItems = computed<NameValue[]>(() => {
     switch (newRule.value.dataType) {

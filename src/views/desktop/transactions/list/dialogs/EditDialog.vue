@@ -124,7 +124,7 @@
                                                   v-model="transaction.destinationAmount"/>
                                 </v-col>
                                 <v-col cols="12" md="12" v-if="transaction.type === TransactionType.Expense">
-                                    <v-tooltip :disabled="hasAvailableExpenseCategories" :text="hasAvailableExpenseCategories ? '' : tt('No secondary expense categories are available')">
+                                    <v-tooltip :disabled="hasVisibleExpenseCategories" :text="hasVisibleExpenseCategories ? '' : tt('No secondary expense categories are available')">
                                         <template v-slot:activator="{ props }">
                                             <div v-bind="props" class="d-block">
                                                 <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
@@ -134,7 +134,7 @@
                                                                    secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                                    secondary-hidden-field="hidden"
                                                                    :readonly="mode === TransactionEditPageMode.View"
-                                                                   :disabled="loading || submitting || !hasAvailableExpenseCategories"
+                                                                   :disabled="loading || submitting || !hasVisibleExpenseCategories"
                                                                    :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
                                                                    :show-selection-primary-text="true"
                                                                    :custom-selection-primary-text="getTransactionPrimaryCategoryName(transaction.expenseCategoryId, allCategories[CategoryType.Expense])"
@@ -148,7 +148,7 @@
                                     </v-tooltip>
                                 </v-col>
                                 <v-col cols="12" md="12" v-if="transaction.type === TransactionType.Income">
-                                    <v-tooltip :disabled="hasAvailableIncomeCategories" :text="hasAvailableIncomeCategories ? '' : tt('No secondary income categories are available')">
+                                    <v-tooltip :disabled="hasVisibleIncomeCategories" :text="hasVisibleIncomeCategories ? '' : tt('No secondary income categories are available')">
                                         <template v-slot:activator="{ props }">
                                             <div v-bind="props" class="d-block">
                                                 <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
@@ -158,7 +158,7 @@
                                                                    secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                                    secondary-hidden-field="hidden"
                                                                    :readonly="mode === TransactionEditPageMode.View"
-                                                                   :disabled="loading || submitting || !hasAvailableIncomeCategories"
+                                                                   :disabled="loading || submitting || !hasVisibleIncomeCategories"
                                                                    :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
                                                                    :show-selection-primary-text="true"
                                                                    :custom-selection-primary-text="getTransactionPrimaryCategoryName(transaction.incomeCategoryId, allCategories[CategoryType.Income])"
@@ -172,7 +172,7 @@
                                     </v-tooltip>
                                 </v-col>
                                 <v-col cols="12" md="12" v-if="transaction.type === TransactionType.Transfer">
-                                    <v-tooltip :disabled="hasAvailableTransferCategories" :text="hasAvailableTransferCategories ? '' : tt('No secondary transfer categories are available')">
+                                    <v-tooltip :disabled="hasVisibleTransferCategories" :text="hasVisibleTransferCategories ? '' : tt('No secondary transfer categories are available')">
                                         <template v-slot:activator="{ props }">
                                             <div v-bind="props" class="d-block">
                                                 <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
@@ -182,7 +182,7 @@
                                                                    secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                                    secondary-hidden-field="hidden"
                                                                    :readonly="mode === TransactionEditPageMode.View"
-                                                                   :disabled="loading || submitting || !hasAvailableTransferCategories"
+                                                                   :disabled="loading || submitting || !hasVisibleTransferCategories"
                                                                    :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
                                                                    :show-selection-primary-text="true"
                                                                    :custom-selection-primary-text="getTransactionPrimaryCategoryName(transaction.transferCategoryId, allCategories[CategoryType.Transfer])"
@@ -621,9 +621,9 @@ const {
     allTags,
     allTagsMap,
     firstVisibleAccountId,
-    hasAvailableExpenseCategories,
-    hasAvailableIncomeCategories,
-    hasAvailableTransferCategories,
+    hasVisibleExpenseCategories,
+    hasVisibleIncomeCategories,
+    hasVisibleTransferCategories,
     canAddTransactionPicture,
     title,
     saveButtonTitle,

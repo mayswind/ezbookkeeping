@@ -113,7 +113,7 @@
                                    secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                    secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                    secondary-hidden-field="hidden"
-                                   :disabled="!!disabled || !hasAvailableExpenseCategories"
+                                   :disabled="!!disabled || !hasVisibleExpenseCategories"
                                    :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
                                    :show-selection-primary-text="true"
                                    :custom-selection-primary-text="getTransactionPrimaryCategoryName(item.categoryId, allCategories[CategoryType.Expense])"
@@ -131,7 +131,7 @@
                                    secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                    secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                    secondary-hidden-field="hidden"
-                                   :disabled="!!disabled || !hasAvailableIncomeCategories"
+                                   :disabled="!!disabled || !hasVisibleIncomeCategories"
                                    :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
                                    :show-selection-primary-text="true"
                                    :custom-selection-primary-text="getTransactionPrimaryCategoryName(item.categoryId, allCategories[CategoryType.Income])"
@@ -149,7 +149,7 @@
                                    secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                    secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                    secondary-hidden-field="hidden"
-                                   :disabled="!!disabled || !hasAvailableTransferCategories"
+                                   :disabled="!!disabled || !hasVisibleTransferCategories"
                                    :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
                                    :show-selection-primary-text="true"
                                    :custom-selection-primary-text="getTransactionPrimaryCategoryName(item.categoryId, allCategories[CategoryType.Transfer])"
@@ -551,9 +551,9 @@ const allCategoriesMap = computed<Record<string, TransactionCategory>>(() => tra
 const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
 const allTagsMap = computed<Record<string, TransactionTag>>(() => transactionTagsStore.allTransactionTagsMap);
 
-const hasAvailableExpenseCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableExpenseCategories);
-const hasAvailableIncomeCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableIncomeCategories);
-const hasAvailableTransferCategories = computed<boolean>(() => transactionCategoriesStore.hasAvailableTransferCategories);
+const hasVisibleExpenseCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleExpenseCategories);
+const hasVisibleIncomeCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleIncomeCategories);
+const hasVisibleTransferCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleTransferCategories);
 
 const isEditing = computed<boolean>(() => !!editingTransaction.value);
 const canImport = computed<boolean>(() => selectedImportTransactionCount.value > 0 && selectedInvalidTransactionCount.value < 1);

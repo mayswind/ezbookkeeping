@@ -17,7 +17,7 @@ import {
 import {
     categoryTypeToTransactionType,
     isSubCategoryIdAvailable,
-    getFirstAvailableCategoryId,
+    getFirstVisibleCategoryId,
     getFirstAvailableSubCategoryId
 } from './category.ts';
 
@@ -66,7 +66,7 @@ export function setTransactionModelByTransaction(transaction: Transaction, trans
         }
 
         if (!transaction.expenseCategoryId) {
-            transaction.expenseCategoryId = getFirstAvailableCategoryId(allCategories[CategoryType.Expense]);
+            transaction.expenseCategoryId = getFirstVisibleCategoryId(allCategories[CategoryType.Expense]);
         }
     }
 
@@ -81,7 +81,7 @@ export function setTransactionModelByTransaction(transaction: Transaction, trans
         }
 
         if (!transaction.incomeCategoryId) {
-            transaction.incomeCategoryId = getFirstAvailableCategoryId(allCategories[CategoryType.Income]);
+            transaction.incomeCategoryId = getFirstVisibleCategoryId(allCategories[CategoryType.Income]);
         }
     }
 
@@ -96,7 +96,7 @@ export function setTransactionModelByTransaction(transaction: Transaction, trans
         }
 
         if (!transaction.transferCategoryId) {
-            transaction.transferCategoryId = getFirstAvailableCategoryId(allCategories[CategoryType.Transfer]);
+            transaction.transferCategoryId = getFirstVisibleCategoryId(allCategories[CategoryType.Transfer]);
         }
     }
 

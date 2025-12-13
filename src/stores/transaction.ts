@@ -61,7 +61,7 @@ import {
 } from '@/lib/datetime.ts';
 import { getAmountWithDecimalNumberCount } from '@/lib/numeral.ts';
 import { getCurrencyFraction } from '@/lib/currency.ts';
-import { getFirstAvailableCategoryId } from '@/lib/category.ts';
+import { getFirstVisibleCategoryId } from '@/lib/category.ts';
 import services, { type ApiResponsePromise } from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 
@@ -499,19 +499,19 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
         if (allCategories) {
             if (transaction.type === TransactionType.Expense) {
-                const defaultCategoryId = getFirstAvailableCategoryId(allCategories[CategoryType.Expense]);
+                const defaultCategoryId = getFirstVisibleCategoryId(allCategories[CategoryType.Expense]);
 
                 if (transaction.expenseCategoryId && transaction.expenseCategoryId !== '0' && transaction.expenseCategoryId !== defaultCategoryId && transaction.expenseCategoryId !== initCategoryId) {
                     return true;
                 }
             } else if (transaction.type === TransactionType.Income) {
-                const defaultCategoryId = getFirstAvailableCategoryId(allCategories[CategoryType.Income]);
+                const defaultCategoryId = getFirstVisibleCategoryId(allCategories[CategoryType.Income]);
 
                 if (transaction.incomeCategoryId && transaction.incomeCategoryId !== '0' && transaction.incomeCategoryId !== defaultCategoryId && transaction.incomeCategoryId !== initCategoryId) {
                     return true;
                 }
             } else if (transaction.type === TransactionType.Transfer) {
-                const defaultCategoryId = getFirstAvailableCategoryId(allCategories[CategoryType.Transfer]);
+                const defaultCategoryId = getFirstVisibleCategoryId(allCategories[CategoryType.Transfer]);
 
                 if (transaction.transferCategoryId && transaction.transferCategoryId !== '0' && transaction.transferCategoryId !== defaultCategoryId && transaction.transferCategoryId !== initCategoryId) {
                     return true;

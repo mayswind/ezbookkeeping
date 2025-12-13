@@ -1,8 +1,7 @@
-import { itemAndIndex, reversed, entries, keys, values } from '@/core/base.ts';
+import { reversed, keys, values } from '@/core/base.ts';
 import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import {
-    type TransactionCategoriesWithVisibleCount,
     type TransactionCategoryCreateRequest,
     type TransactionCategoryCreateWithSubCategories,
     TransactionCategory
@@ -133,17 +132,20 @@ export function getTransactionSecondaryCategoryName(categoryId: string | null | 
     return '';
 }
 
-export function allTransactionCategoriesWithVisibleCount(allTransactionCategories: Record<number, TransactionCategory[]>, allowCategoryTypes?: Record<number, boolean>): Record<number, TransactionCategoriesWithVisibleCount> {
-    const ret: Record<string, TransactionCategoriesWithVisibleCount> = {};
+export function filterTransactionCategories(allTransactionCategories: Record<number, TransactionCategory[]>, allowCategoryTypes?: Record<number, boolean>, allowCategoryName?: string, showHidden?: boolean): Record<number, TransactionCategory[]> {
+    const ret: Record<string, TransactionCategory[]> = {};
     const hasAllowCategoryTypes = allowCategoryTypes
         && (allowCategoryTypes[CategoryType.Income]
             || allowCategoryTypes[CategoryType.Expense]
             || allowCategoryTypes[CategoryType.Transfer]);
 
     const allCategoryTypes = [ CategoryType.Income, CategoryType.Expense, CategoryType.Transfer ];
+    const lowercaseFilterContent = allowCategoryName ? allowCategoryName.toLowerCase() : '';
 
     for (const categoryType of allCategoryTypes) {
-        if (!allTransactionCategories[categoryType]) {
+        const allCategories = allTransactionCategories[categoryType];
+
+        if (!allCategories || allCategories.length < 1) {
             continue;
         }
 
@@ -151,53 +153,41 @@ export function allTransactionCategoriesWithVisibleCount(allTransactionCategorie
             continue;
         }
 
-        const allCategories: TransactionCategory[] = allTransactionCategories[categoryType];
-        const allSubCategories: Record<string, TransactionCategory[]> = {};
-        const allVisibleSubCategoryCounts: Record<string, number> = {};
-        const allFirstVisibleSubCategoryIndexes: Record<string, number> = {};
-        let allVisibleCategoryCount = 0;
-        let firstVisibleCategoryIndex = -1;
+        const allFilteredCategories: TransactionCategory[] = [];
 
-        for (const [category, cagtegoryIndex] of itemAndIndex(allCategories)) {
-            if (!category.hidden) {
-                allVisibleCategoryCount++;
-
-                if (firstVisibleCategoryIndex === -1) {
-                    firstVisibleCategoryIndex = cagtegoryIndex;
-                }
+        for (const category of allCategories) {
+            if (!showHidden && category.hidden) {
+                continue;
             }
+
+            const categoryMatchesName = !lowercaseFilterContent || category.name.toLowerCase().includes(lowercaseFilterContent);
+            const filteredSubCategories: TransactionCategory[] = [];
 
             if (category.subCategories) {
-                let visibleSubCategoryCount = 0;
-                let firstVisibleSubCategoryIndex = -1;
-
-                for (const [subCategory, subCategoryIndex] of itemAndIndex(category.subCategories)) {
-                    if (!subCategory.hidden) {
-                        visibleSubCategoryCount++;
-
-                        if (firstVisibleSubCategoryIndex === -1) {
-                            firstVisibleSubCategoryIndex = subCategoryIndex;
-                        }
+                for (const subCategory of category.subCategories) {
+                    if (!showHidden && subCategory.hidden) {
+                        continue;
                     }
-                }
 
-                if (category.subCategories.length > 0) {
-                    allSubCategories[category.id] = category.subCategories;
-                    allVisibleSubCategoryCounts[category.id] = visibleSubCategoryCount;
-                    allFirstVisibleSubCategoryIndexes[category.id] = firstVisibleSubCategoryIndex;
+                    if (!categoryMatchesName && lowercaseFilterContent && !subCategory.name.toLowerCase().includes(lowercaseFilterContent)) {
+                        continue;
+                    }
+
+                    const filteredSubCategory = subCategory.clone();
+                    filteredSubCategories.push(filteredSubCategory);
                 }
             }
+
+            if (!categoryMatchesName && filteredSubCategories.length < 1) {
+                continue;
+            }
+
+            const filteredCategory = category.clone();
+            filteredCategory.subCategories = filteredSubCategories;
+            allFilteredCategories.push(filteredCategory);
         }
 
-        ret[`${categoryType}`] = {
-            type: categoryType,
-            allCategories: allCategories,
-            allVisibleCategoryCount: allVisibleCategoryCount,
-            firstVisibleCategoryIndex: firstVisibleCategoryIndex,
-            allSubCategories: allSubCategories,
-            allVisibleSubCategoryCounts: allVisibleSubCategoryCounts,
-            allFirstVisibleSubCategoryIndexes: allFirstVisibleSubCategoryIndexes
-        };
+        ret[`${categoryType}`] = allFilteredCategories;
     }
 
     return ret;
@@ -274,7 +264,7 @@ export function isSubCategoryIdAvailable(categories: TransactionCategory[], cate
     return false;
 }
 
-export function getFirstAvailableCategoryId(categories?: TransactionCategory[]): string {
+export function getFirstVisibleCategoryId(categories?: TransactionCategory[]): string {
     if (!categories || !categories.length) {
         return '';
     }
@@ -372,36 +362,6 @@ export function getLastShowingId(categories: TransactionCategory[], showHidden: 
     }
 
     return null;
-}
-
-export function containsAnyAvailableCategory(allTransactionCategories: Record<string, TransactionCategoriesWithVisibleCount>, showHidden: boolean): boolean {
-    for (const categoryType of values(allTransactionCategories)) {
-        if (showHidden) {
-            if (categoryType.allCategories && categoryType.allCategories.length > 0) {
-                return true;
-            }
-        } else {
-            if (categoryType.allVisibleCategoryCount > 0) {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-export function containsAvailableCategory(allTransactionCategories: Record<string, TransactionCategoriesWithVisibleCount>, showHidden: boolean): Record<number, boolean> {
-    const result: Record<number, boolean> = {};
-
-    for (const [type, categoryType] of entries(allTransactionCategories)) {
-        if (showHidden) {
-            result[parseInt(type)] = categoryType.allCategories && categoryType.allCategories.length > 0;
-        } else {
-            result[parseInt(type)] = categoryType.allVisibleCategoryCount > 0;
-        }
-    }
-
-    return result;
 }
 
 export function selectAllSubCategories(filterCategoryIds: Record<string, boolean>, value: boolean, category?: TransactionCategory): void {

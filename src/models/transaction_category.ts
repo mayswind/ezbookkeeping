@@ -81,6 +81,20 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
         this.visible = other.visible;
     }
 
+    public clone(): TransactionCategory {
+        return new TransactionCategory(
+            this.id,
+            this.name,
+            this.parentId,
+            this.type,
+            this.icon,
+            this.color,
+            this.comment,
+            this.displayOrder,
+            this.visible
+        );
+    }
+
     public toCreateRequest(clientSessionId: string): TransactionCategoryCreateRequest {
         return {
             name: this.name,
@@ -216,14 +230,4 @@ export interface TransactionCategoryInfoResponse {
     readonly displayOrder: number;
     readonly hidden: boolean;
     readonly subCategories?: TransactionCategoryInfoResponse[];
-}
-
-export interface TransactionCategoriesWithVisibleCount {
-    readonly type: number;
-    readonly allCategories: TransactionCategory[];
-    readonly allVisibleCategoryCount: number;
-    readonly firstVisibleCategoryIndex: number;
-    readonly allSubCategories: Record<string, TransactionCategory[]>;
-    readonly allVisibleSubCategoryCounts: Record<string, number>;
-    readonly allFirstVisibleSubCategoryIndexes: Record<string, number>;
 }

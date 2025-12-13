@@ -1,12 +1,22 @@
 <template>
-    <f7-page @page:afterin="onPageAfterIn">
+    <f7-page with-subnavbar @page:beforein="onPageBeforeIn" @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title :title="tt(title)"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': !hasAnyAvailableCategory }" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': !hasAnyVisibleCategory }" @click="save"></f7-link>
+                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': !hasAnyAvailableCategory }" @click="save"></f7-link>
             </f7-nav-right>
+
+            <f7-subnavbar :inner="false">
+                <f7-searchbar
+                    custom-searchs
+                    :value="filterContent"
+                    :placeholder="tt('Find category')"
+                    :disable-button-text="tt('Cancel')"
+                    @change="filterContent = $event.target.value"
+                ></f7-searchbar>
+            </f7-subnavbar>
         </f7-navbar>
 
         <div class="skeleton-text" v-if="loading">
@@ -49,38 +59,37 @@
         </div>
 
         <f7-block class="combination-list-wrapper margin-vertical"
-                  :key="categoryType.type"
-                  v-for="categoryType in allTransactionCategories"
+                  :key="categoryType"
+                  v-for="(categories, categoryType) in allVisibleTransactionCategories"
                   v-else-if="!loading">
-            <f7-accordion-item :opened="collapseStates[categoryType.type]!.opened"
-                               @accordion:open="collapseStates[categoryType.type]!.opened = true"
-                               @accordion:close="collapseStates[categoryType.type]!.opened = false">
+            <f7-accordion-item :opened="collapseStates[categoryType]!.opened"
+                               @accordion:open="collapseStates[categoryType]!.opened = true"
+                               @accordion:close="collapseStates[categoryType]!.opened = false">
                 <f7-block-title>
                     <f7-accordion-toggle>
                         <f7-list strong inset dividers
                                  class="combination-list-header"
-                                 :class="collapseStates[categoryType.type]!.opened ? 'combination-list-opened' : 'combination-list-closed'">
+                                 :class="collapseStates[categoryType]!.opened ? 'combination-list-opened' : 'combination-list-closed'">
                             <f7-list-item group-title>
-                                <small>{{ getCategoryTypeName(categoryType.type) }}</small>
-                                <f7-icon class="combination-list-chevron-icon" :f7="collapseStates[categoryType.type]!.opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
+                                <small>{{ getCategoryTypeName(parseInt(categoryType)) }}</small>
+                                <f7-icon class="combination-list-chevron-icon" :f7="collapseStates[categoryType]!.opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
                             </f7-list-item>
                         </f7-list>
                     </f7-accordion-toggle>
                 </f7-block-title>
-                <f7-accordion-content :style="{ height: collapseStates[categoryType.type]!.opened ? 'auto' : '' }">
-                    <f7-list strong inset dividers accordion-list class="combination-list-content" v-if="!hasAvailableCategory[categoryType.type]">
+                <f7-accordion-content :style="{ height: collapseStates[categoryType]!.opened ? 'auto' : '' }">
+                    <f7-list strong inset dividers accordion-list class="combination-list-content" v-if="!categories || !categories.length">
                         <f7-list-item :title="tt('No available category')"></f7-list-item>
                     </f7-list>
-                    <f7-list strong inset dividers accordion-list class="combination-list-content" v-else-if="hasAvailableCategory[categoryType.type]">
+                    <f7-list strong inset dividers accordion-list class="combination-list-content" v-else-if="categories && categories.length">
                         <f7-list-item checkbox
-                                      :class="{ 'has-child-list-item': (showHidden && categoryType.allSubCategories[category.id]) || categoryType.allVisibleSubCategoryCounts[category.id] }"
+                                      :class="{ 'has-child-list-item': category.subCategories && category.subCategories.length > 0 }"
                                       :title="category.name"
                                       :value="category.id"
                                       :checked="isSubCategoriesAllChecked(category, filterCategoryIds)"
                                       :indeterminate="isSubCategoriesHasButNotAllChecked(category, filterCategoryIds)"
                                       :key="category.id"
-                                      v-for="category in categoryType.allCategories"
-                                      v-show="showHidden || !category.hidden"
+                                      v-for="category in categories"
                                       @change="updateAllSubCategoriesSelected">
                             <template #media>
                                 <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color">
@@ -92,14 +101,13 @@
 
                             <template #root>
                                 <ul class="padding-inline-start"
-                                    v-if="(showHidden && categoryType.allSubCategories[category.id]) || categoryType.allVisibleSubCategoryCounts[category.id]">
+                                    v-if="category.subCategories && category.subCategories.length > 0">
                                     <f7-list-item checkbox
                                                   :title="subCategory.name"
                                                   :value="subCategory.id"
                                                   :checked="isCategoryChecked(subCategory, filterCategoryIds)"
                                                   :key="subCategory.id"
-                                                  v-for="subCategory in categoryType.allSubCategories[category.id]"
-                                                  v-show="showHidden || !subCategory.hidden"
+                                                  v-for="subCategory in category.subCategories"
                                                   @change="updateCategorySelected">
                                         <template #media>
                                             <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color">
@@ -122,9 +130,6 @@
                 <f7-actions-button :class="{ 'disabled': !hasAnyVisibleCategory }" @click="selectAllCategories">{{ tt('Select All') }}</f7-actions-button>
                 <f7-actions-button :class="{ 'disabled': !hasAnyVisibleCategory }" @click="selectNoneCategories">{{ tt('Select None') }}</f7-actions-button>
                 <f7-actions-button :class="{ 'disabled': !hasAnyVisibleCategory }" @click="selectInvertCategories">{{ tt('Invert Selection') }}</f7-actions-button>
-            </f7-actions-group>
-            <f7-actions-group>
-                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleCategory }" @click="selectAllVisibleCategories">{{ tt('Select All Visible') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ tt('Show Hidden Transaction Categories') }}</f7-actions-button>
@@ -154,7 +159,6 @@ import { CategoryType } from '@/core/category.ts';
 
 import {
     selectAllSubCategories,
-    selectAllVisible,
     selectAll,
     selectNone,
     selectInvert,
@@ -179,12 +183,13 @@ const { showToast, routeBackOnError } = useI18nUIComponents();
 const {
     loading,
     showHidden,
+    filterContent,
     filterCategoryIds,
     title,
-    allTransactionCategories,
+    allVisibleTransactionCategories,
+    allVisibleTransactionCategoryMap,
     hasAnyAvailableCategory,
     hasAnyVisibleCategory,
-    hasAvailableCategory,
     isCategoryChecked,
     getCategoryTypeName,
     loadFilterCategoryIds,
@@ -196,14 +201,14 @@ const transactionCategoriesStore = useTransactionCategoriesStore();
 const loadingError = ref<unknown | null>(null);
 const showMoreActionSheet = ref<boolean>(false);
 
-const collapseStates = ref<Record<number, CollapseState>>({
-    [CategoryType.Income]: {
+const collapseStates = ref<Record<string, CollapseState>>({
+    [CategoryType.Income.toString()]: {
         opened: true
     },
-    [CategoryType.Expense]: {
+    [CategoryType.Expense.toString()]: {
         opened: true
     },
-    [CategoryType.Transfer]: {
+    [CategoryType.Transfer.toString()]: {
         opened: true
     }
 });
@@ -231,7 +236,7 @@ function init(): void {
 function updateCategorySelected(e: Event): void {
     const target = e.target as HTMLInputElement;
     const categoryId = target.value;
-    const category = transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
+    const category = allVisibleTransactionCategoryMap.value[categoryId];
 
     if (!category) {
         return;
@@ -243,30 +248,30 @@ function updateCategorySelected(e: Event): void {
 function updateAllSubCategoriesSelected(e: Event): void {
     const target = e.target as HTMLInputElement;
     const categoryId = target.value;
-    const category = transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
+    const category = allVisibleTransactionCategoryMap.value[categoryId];
 
     selectAllSubCategories(filterCategoryIds.value, !target.checked, category);
 }
 
 function selectAllCategories(): void {
-    selectAll(filterCategoryIds.value, transactionCategoriesStore.allTransactionCategoriesMap);
+    selectAll(filterCategoryIds.value, allVisibleTransactionCategoryMap.value);
 }
 
 function selectNoneCategories(): void {
-    selectNone(filterCategoryIds.value, transactionCategoriesStore.allTransactionCategoriesMap);
+    selectNone(filterCategoryIds.value, allVisibleTransactionCategoryMap.value);
 }
 
 function selectInvertCategories(): void {
-    selectInvert(filterCategoryIds.value, transactionCategoriesStore.allTransactionCategoriesMap);
-}
-
-function selectAllVisibleCategories(): void {
-    selectAllVisible(filterCategoryIds.value, transactionCategoriesStore.allTransactionCategoriesMap);
+    selectInvert(filterCategoryIds.value, allVisibleTransactionCategoryMap.value);
 }
 
 function save(): void {
     saveFilterCategoryIds();
     props.f7router.back();
+}
+
+function onPageBeforeIn(): void {
+    filterContent.value = '';
 }
 
 function onPageAfterIn(): void {

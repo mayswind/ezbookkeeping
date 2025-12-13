@@ -97,18 +97,18 @@
                 class="list-item-with-header-and-title list-item-title-hide-overflow"
                 key="expenseCategorySelection"
                 link="#" no-chevron
-                :class="{ 'disabled': !hasAvailableExpenseCategories, 'readonly': mode === TransactionEditPageMode.View }"
+                :class="{ 'disabled': !hasVisibleExpenseCategories, 'readonly': mode === TransactionEditPageMode.View }"
                 :header="tt('Category')"
                 @click="showCategorySheet = true"
                 v-if="transaction.type === TransactionType.Expense"
             >
                 <template #title>
-                    <div class="list-item-custom-title" v-if="hasAvailableExpenseCategories">
+                    <div class="list-item-custom-title" v-if="hasVisibleExpenseCategories">
                         <span>{{ getTransactionPrimaryCategoryName(transaction.expenseCategoryId, allCategories[CategoryType.Expense]) }}</span>
                         <f7-icon class="category-separate-icon icon-with-direction" f7="chevron_right"></f7-icon>
                         <span>{{ getTransactionSecondaryCategoryName(transaction.expenseCategoryId, allCategories[CategoryType.Expense]) }}</span>
                     </div>
-                    <div class="list-item-custom-title" v-else-if="!hasAvailableExpenseCategories">
+                    <div class="list-item-custom-title" v-else-if="!hasVisibleExpenseCategories">
                         <span>{{ tt('None') }}</span>
                     </div>
                 </template>
@@ -129,18 +129,18 @@
                 class="list-item-with-header-and-title list-item-title-hide-overflow"
                 key="incomeCategorySelection"
                 link="#" no-chevron
-                :class="{ 'disabled': !hasAvailableIncomeCategories, 'readonly': mode === TransactionEditPageMode.View }"
+                :class="{ 'disabled': !hasVisibleIncomeCategories, 'readonly': mode === TransactionEditPageMode.View }"
                 :header="tt('Category')"
                 @click="showCategorySheet = true"
                 v-if="transaction.type === TransactionType.Income"
             >
                 <template #title>
-                    <div class="list-item-custom-title" v-if="hasAvailableIncomeCategories">
+                    <div class="list-item-custom-title" v-if="hasVisibleIncomeCategories">
                         <span>{{ getTransactionPrimaryCategoryName(transaction.incomeCategoryId, allCategories[CategoryType.Income]) }}</span>
                         <f7-icon class="category-separate-icon icon-with-direction" f7="chevron_right"></f7-icon>
                         <span>{{ getTransactionSecondaryCategoryName(transaction.incomeCategoryId, allCategories[CategoryType.Income]) }}</span>
                     </div>
-                    <div class="list-item-custom-title" v-else-if="!hasAvailableIncomeCategories">
+                    <div class="list-item-custom-title" v-else-if="!hasVisibleIncomeCategories">
                         <span>{{ tt('None') }}</span>
                     </div>
                 </template>
@@ -161,18 +161,18 @@
                 class="list-item-with-header-and-title list-item-title-hide-overflow"
                 key="transferCategorySelection"
                 link="#" no-chevron
-                :class="{ 'disabled': !hasAvailableTransferCategories, 'readonly': mode === TransactionEditPageMode.View }"
+                :class="{ 'disabled': !hasVisibleTransferCategories, 'readonly': mode === TransactionEditPageMode.View }"
                 :header="tt('Category')"
                 @click="showCategorySheet = true"
                 v-if="transaction.type === TransactionType.Transfer"
             >
                 <template #title>
-                    <div class="list-item-custom-title" v-if="hasAvailableTransferCategories">
+                    <div class="list-item-custom-title" v-if="hasVisibleTransferCategories">
                         <span>{{ getTransactionPrimaryCategoryName(transaction.transferCategoryId, allCategories[CategoryType.Transfer]) }}</span>
                         <f7-icon class="category-separate-icon icon-with-direction" f7="chevron_right"></f7-icon>
                         <span>{{ getTransactionSecondaryCategoryName(transaction.transferCategoryId, allCategories[CategoryType.Transfer]) }}</span>
                     </div>
-                    <div class="list-item-custom-title" v-else-if="!hasAvailableTransferCategories">
+                    <div class="list-item-custom-title" v-else-if="!hasVisibleTransferCategories">
                         <span>{{ tt('None') }}</span>
                     </div>
                 </template>
@@ -571,9 +571,9 @@ const {
     allTags,
     allTagsMap,
     firstVisibleAccountId,
-    hasAvailableExpenseCategories,
-    hasAvailableIncomeCategories,
-    hasAvailableTransferCategories,
+    hasVisibleExpenseCategories,
+    hasVisibleIncomeCategories,
+    hasVisibleTransferCategories,
     canAddTransactionPicture,
     title,
     saveButtonTitle,

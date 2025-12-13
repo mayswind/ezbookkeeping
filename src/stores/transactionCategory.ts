@@ -14,7 +14,7 @@ import {
 } from '@/models/transaction_category.ts';
 
 import { isEquals } from '@/lib/common.ts';
-import { getFirstAvailableCategoryId } from '@/lib/category.ts';
+import { getFirstVisibleCategoryId } from '@/lib/category.ts';
 import services, { type ApiResponsePromise } from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 
@@ -23,31 +23,55 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
     const allTransactionCategoriesMap = ref<Record<string, TransactionCategory>>({});
     const transactionCategoryListStateInvalid = ref<boolean>(true);
 
-    const hasAvailableExpenseCategories = computed<boolean>(() => {
+    const allAvailablePrimaryCategoriesCount = computed<number>(() => {
+        let count = 0;
+
+        for (const categories of values(allTransactionCategories.value)) {
+            count += categories.length;
+        }
+
+        return count;
+    });
+
+    const allAvailableSecondaryCategoriesCount = computed<number>(() => {
+        let count = 0;
+
+        for (const categories of values(allTransactionCategories.value)) {
+            for (const category of categories) {
+                if (category.subCategories) {
+                    count += category.subCategories.length;
+                }
+            }
+        }
+
+        return count;
+    });
+
+    const hasVisibleExpenseCategories = computed<boolean>(() => {
         if (!allTransactionCategories.value || !allTransactionCategories.value[CategoryType.Expense] || !allTransactionCategories.value[CategoryType.Expense].length) {
             return false;
         }
 
-        const firstAvailableCategoryId = getFirstAvailableCategoryId(allTransactionCategories.value[CategoryType.Expense]);
-        return firstAvailableCategoryId !== '';
+        const firstVisibleCategoryId = getFirstVisibleCategoryId(allTransactionCategories.value[CategoryType.Expense]);
+        return firstVisibleCategoryId !== '';
     });
 
-    const hasAvailableIncomeCategories = computed<boolean>(() => {
+    const hasVisibleIncomeCategories = computed<boolean>(() => {
         if (!allTransactionCategories.value || !allTransactionCategories.value[CategoryType.Income] || !allTransactionCategories.value[CategoryType.Income].length) {
             return false;
         }
 
-        const firstAvailableCategoryId = getFirstAvailableCategoryId(allTransactionCategories.value[CategoryType.Income]);
-        return firstAvailableCategoryId !== '';
+        const firstVisibleCategoryId = getFirstVisibleCategoryId(allTransactionCategories.value[CategoryType.Income]);
+        return firstVisibleCategoryId !== '';
     });
 
-    const hasAvailableTransferCategories = computed<boolean>(() => {
+    const hasVisibleTransferCategories = computed<boolean>(() => {
         if (!allTransactionCategories.value || !allTransactionCategories.value[CategoryType.Transfer] || !allTransactionCategories.value[CategoryType.Transfer].length) {
             return false;
         }
 
-        const firstAvailableCategoryId = getFirstAvailableCategoryId(allTransactionCategories.value[CategoryType.Transfer]);
-        return firstAvailableCategoryId !== '';
+        const firstVisibleCategoryId = getFirstVisibleCategoryId(allTransactionCategories.value[CategoryType.Transfer]);
+        return firstVisibleCategoryId !== '';
     });
 
     function loadTransactionCategoryList(allCategories: Record<number, TransactionCategory[]>): void {
@@ -548,9 +572,11 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         allTransactionCategoriesMap,
         transactionCategoryListStateInvalid,
         // computed states
-        hasAvailableExpenseCategories,
-        hasAvailableIncomeCategories,
-        hasAvailableTransferCategories,
+        allAvailablePrimaryCategoriesCount,
+        allAvailableSecondaryCategoriesCount,
+        hasVisibleExpenseCategories,
+        hasVisibleIncomeCategories,
+        hasVisibleTransferCategories,
         // functions
         updateTransactionCategoryListInvalidState,
         resetTransactionCategories,

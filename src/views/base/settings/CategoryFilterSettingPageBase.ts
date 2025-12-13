@@ -10,15 +10,13 @@ import { useOverviewStore } from '@/stores/overview.ts';
 
 import { keys, keysIfValueEquals, values } from '@/core/base.ts';
 import { CategoryType } from '@/core/category.ts';
-import type { TransactionCategory, TransactionCategoriesWithVisibleCount } from '@/models/transaction_category.ts';
+import type { TransactionCategory } from '@/models/transaction_category.ts';
 
 import {
     arrayItemToObjectField
 } from '@/lib/common.ts';
 import {
-    allTransactionCategoriesWithVisibleCount,
-    containsAnyAvailableCategory,
-    containsAvailableCategory,
+    filterTransactionCategories,
     selectAllSubCategories,
     isCategoryOrSubCategoriesAllChecked
 } from '@/lib/category.ts';
@@ -38,6 +36,7 @@ export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allo
 
     const loading = ref<boolean>(true);
     const showHidden = ref<boolean>(false);
+    const filterContent = ref<string>('');
     const filterCategoryIds = ref<Record<string, boolean>>({});
 
     const title = computed<string>(() => {
@@ -56,10 +55,34 @@ export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allo
         }
     });
 
-    const allTransactionCategories = computed<Record<string, TransactionCategoriesWithVisibleCount>>(() => allTransactionCategoriesWithVisibleCount(transactionCategoriesStore.allTransactionCategories, allowCategoryTypes));
-    const hasAnyAvailableCategory = computed<boolean>(() => containsAnyAvailableCategory(allTransactionCategories.value, true));
-    const hasAnyVisibleCategory = computed<boolean>(() => containsAnyAvailableCategory(allTransactionCategories.value, showHidden.value));
-    const hasAvailableCategory = computed<Record<number, boolean>>(() => containsAvailableCategory(allTransactionCategories.value, showHidden.value));
+    const allVisibleTransactionCategories = computed<Record<string, TransactionCategory[]>>(() => filterTransactionCategories(transactionCategoriesStore.allTransactionCategories, allowCategoryTypes, filterContent.value, showHidden.value));
+    const allVisibleTransactionCategoryMap = computed<Record<string, TransactionCategory>>(() => {
+        const categoryMap: Record<string, TransactionCategory> = {};
+
+        for (const categories of values(allVisibleTransactionCategories.value)) {
+            for (const category of categories) {
+                categoryMap[category.id] = category;
+
+                if (category.subCategories) {
+                    for (const subCategory of category.subCategories) {
+                        categoryMap[subCategory.id] = subCategory;
+                    }
+                }
+            }
+        }
+
+        return categoryMap;
+    });
+    const hasAnyAvailableCategory = computed<boolean>(() => transactionCategoriesStore.allAvailablePrimaryCategoriesCount > 0 || transactionCategoriesStore.allAvailableSecondaryCategoriesCount > 0);
+    const hasAnyVisibleCategory = computed<boolean>(() => {
+        for (const categories of values(allVisibleTransactionCategories.value)) {
+            if (categories.length > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    });
 
     function isCategoryChecked(category: TransactionCategory, filterCategoryIds: Record<string, boolean>): boolean {
         return !filterCategoryIds[category.id];
@@ -171,14 +194,15 @@ export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allo
         // states
         loading,
         showHidden,
+        filterContent,
         filterCategoryIds,
         // computed states
         title,
         applyText,
-        allTransactionCategories,
+        allVisibleTransactionCategories,
+        allVisibleTransactionCategoryMap,
         hasAnyAvailableCategory,
         hasAnyVisibleCategory,
-        hasAvailableCategory,
         // functions
         isCategoryChecked,
         getCategoryTypeName,

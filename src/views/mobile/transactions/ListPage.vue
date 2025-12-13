@@ -377,7 +377,7 @@
                               :class="getCategoryListItemCheckedClass(category, queryAllFilterCategoryIds)"
                               :key="category.id"
                               v-for="category in categories"
-                              v-show="!category.hidden || query.categoryIds === category.id || (allCategories[query.categoryIds] && allCategories[query.categoryIds]?.parentId === category.id)"
+                              v-show="!category.hidden || queryAllFilterCategoryIds[category.id] || allCategories[query.categoryIds]?.parentId === category.id || hasSubCategoryInQuery(category)"
                 >
                     <template #media>
                         <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
@@ -399,7 +399,7 @@
                                           :title="subCategory.name"
                                           :key="subCategory.id"
                                           v-for="subCategory in category.subCategories"
-                                          v-show="!subCategory.hidden || query.categoryIds === subCategory.id"
+                                          v-show="!subCategory.hidden || queryAllFilterCategoryIds[subCategory.id]"
                                           @click="changeCategoryFilter(subCategory.id)"
                             >
                                 <template #media>
@@ -448,7 +448,7 @@
                               :title="account.name"
                               :key="account.id"
                               v-for="account in allAccounts"
-                              v-show="(!account.hidden && (!allAccountsMap[account.parentId] || !allAccountsMap[account.parentId]!.hidden)) || query.accountIds === account.id"
+                              v-show="(!account.hidden && (!allAccountsMap[account.parentId] || !allAccountsMap[account.parentId]!.hidden)) || queryAllFilterAccountIds[account.id]"
                               @click="changeAccountFilter(account.id)"
                 >
                     <template #media>
@@ -712,6 +712,7 @@ const {
     transactionCalendarMinDate,
     transactionCalendarMaxDate,
     currentMonthTransactionData,
+    hasSubCategoryInQuery,
     canAddTransaction,
     getDisplayTime,
     getDisplayLongYearMonth,

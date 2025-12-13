@@ -270,6 +270,20 @@ export function useTransactionListPageBase() {
         return true;
     });
 
+    function hasSubCategoryInQuery(category: TransactionCategory): boolean {
+        if (!category.subCategories || !category.subCategories.length) {
+            return false;
+        }
+
+        for (const subCategory of category.subCategories) {
+            if (queryAllFilterCategoryIds.value[subCategory.id]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     function formatAmount(amount: number, hideAmount: boolean, currencyCode: string): string {
         if (hideAmount) {
             return formatAmountToLocalizedNumeralsWithCurrency(DISPLAY_HIDDEN_AMOUNT, currencyCode);
@@ -395,6 +409,7 @@ export function useTransactionListPageBase() {
         currentMonthTransactionData,
         canAddTransaction,
         // functions
+        hasSubCategoryInQuery,
         getDisplayTime,
         getDisplayLongDate,
         getDisplayLongYearMonth,

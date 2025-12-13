@@ -440,7 +440,8 @@ html[dir="rtl"] i.icon.icon-with-direction {
     font-weight: bold;
 }
 
-.list > ul > li.item-in-multiple-selection > .item-content > .item-inner > .item-title {
+.list > ul > li.item-in-multiple-selection > .item-content > .item-inner > .item-title,
+.list > ul > li.item-in-multiple-selection > .item-link > .item-content > .item-inner > .item-title {
     font-weight: bold;
 }
 

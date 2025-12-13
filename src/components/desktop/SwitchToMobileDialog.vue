@@ -1,15 +1,13 @@
 <template>
-    <v-dialog width="440" v-model="showState">
-        <v-card class="pa-2 pa-sm-4 pa-md-4">
+    <v-dialog width="420" v-model="showState">
+        <v-card class="pa-sm-1 pa-md-2">
             <template #title>
-                <div class="d-flex align-center justify-center">
-                    <h4 class="text-h4">{{ tt('Use on Mobile Device') }}</h4>
-                </div>
+                <h4 class="text-h4">{{ tt('Use on Mobile Device') }}</h4>
             </template>
             <template #subtitle>
-                <div class="text-body-1 text-center text-wrap mt-4">{{ tt('You can scan the QR code below on your mobile device.') }}</div>
+                <div class="text-body-1 text-wrap mt-4">{{ tt('You can scan the QR code below on your mobile device.') }}</div>
             </template>
-            <v-card-text class="mb-md-4">
+            <v-card-text>
                 <v-row>
                     <v-col cols="12" md="12">
                         <div class="w-100 d-flex justify-center">
@@ -18,8 +16,8 @@
                     </v-col>
                 </v-row>
             </v-card-text>
-            <v-card-text class="overflow-y-visible">
-                <div class="w-100 d-flex justify-center gap-4">
+            <v-card-text>
+                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
                     <v-btn :href="mobileVersionPath">{{ tt('Switch to Mobile Version') }}</v-btn>
                     <v-btn color="secondary" variant="tonal" @click="showState = false">{{ tt('Close') }}</v-btn>
                 </div>

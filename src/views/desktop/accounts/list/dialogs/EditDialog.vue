@@ -1,12 +1,13 @@
 <template>
     <v-dialog :width="account.type === AccountType.MultiSubAccounts.type ? 1000 : 800" :persistent="isAccountModified" v-model="showState">
-        <v-card class="pa-2 pa-sm-4 pa-md-8">
+        <v-card class="pa-sm-1 pa-md-2">
             <template #title>
                 <div class="d-flex align-center justify-center">
-                    <div class="d-flex w-100 align-center justify-center">
+                    <div class="d-flex align-center">
                         <h4 class="text-h4">{{ tt(title) }}</h4>
                         <v-progress-circular indeterminate size="22" class="ms-2" v-if="loading"></v-progress-circular>
                     </div>
+                    <v-spacer/>
                     <v-btn density="comfortable" color="default" variant="text" class="ms-2" :icon="true"
                            :disabled="loading || submitting || account.type !== AccountType.MultiSubAccounts.type">
                         <v-icon :icon="mdiDotsVertical" />
@@ -20,7 +21,7 @@
                     </v-btn>
                 </div>
             </template>
-            <v-card-text class="d-flex flex-column flex-md-row mt-md-4 pt-0">
+            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto">
                 <div class="mb-4" v-if="account.type === AccountType.MultiSubAccounts.type">
                     <v-tabs direction="vertical" :disabled="loading || submitting" v-model="currentAccountIndex">
                         <v-tab :value="-1">
@@ -167,8 +168,8 @@
                     </v-window-item>
                 </v-window>
             </v-card-text>
-            <v-card-text class="overflow-y-visible">
-                <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
+            <v-card-text>
+                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
                     <v-tooltip :disabled="!inputIsEmpty" :text="inputEmptyProblemMessage ? tt(inputEmptyProblemMessage) : ''">
                         <template v-slot:activator="{ props }">
                             <div v-bind="props" class="d-inline-block">

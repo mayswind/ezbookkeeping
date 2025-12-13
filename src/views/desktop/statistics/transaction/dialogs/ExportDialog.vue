@@ -1,11 +1,18 @@
 <template>
     <v-dialog width="1000" v-model="showState">
-        <v-card class="pa-2 pa-sm-4 pa-md-4">
+        <v-card class="pa-sm-1 pa-md-2">
             <template #title>
-                <div class="d-flex align-center justify-center">
-                    <div class="d-flex w-100 align-center justify-center">
-                        <h4 class="text-h4">{{ tt('Export Results') }}</h4>
-                    </div>
+                <div class="d-flex flex-wrap align-center justify-center">
+                    <h4 class="text-h4">{{ tt('Export Results') }}</h4>
+                    <v-spacer/>
+                    <v-switch class="bidirectional-switch ms-2 pt-1" color="secondary"
+                              :label="tt('Raw Data')"
+                              v-model="showRawData"
+                              @click="showRawData = !showRawData">
+                        <template #prepend>
+                            <span>{{ tt('Table') }}</span>
+                        </template>
+                    </v-switch>
                     <v-btn density="comfortable" color="default" variant="text" class="ms-2" :icon="true">
                         <v-icon :icon="mdiDotsVertical" />
                         <v-menu activator="parent">
@@ -29,24 +36,12 @@
                 </div>
             </template>
 
-            <v-card-text class="py-0 w-100 d-flex justify-center">
-                <v-switch class="bidirectional-switch" color="secondary"
-                          :label="tt('Raw Data')"
-                          v-model="showRawData"
-                          @click="showRawData = !showRawData">
-                    <template #prepend>
-                        <span>{{ tt('Table') }}</span>
-                    </template>
-                </v-switch>
-            </v-card-text>
-
-            <v-card-text class="my-md-4 w-100 d-flex justify-center">
+            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto" style="height: 485px">
                 <v-data-table
                     fixed-header
                     fixed-footer
                     multi-sort
                     density="compact"
-                    height="360"
                     :headers="dataTableHeaders"
                     :items="dataTableItems"
                     :hover="true"
@@ -55,14 +50,14 @@
                     :no-data-text="tt('No data')"
                     v-if="!showRawData"
                 ></v-data-table>
-                <div class="w-100 code-container" v-if="showRawData">
-                    <v-textarea class="w-100 always-cursor-text" style="height: 360px" :readonly="true"
+                <div class="w-100 h-100 code-container" v-if="showRawData">
+                    <v-textarea class="w-100 h-100 always-cursor-text" :readonly="true"
                                 :value="exportedData"></v-textarea>
                 </div>
             </v-card-text>
 
-            <v-card-text class="overflow-y-visible">
-                <div ref="buttonContainer" class="w-100 d-flex justify-center gap-4">
+            <v-card-text>
+                <div ref="buttonContainer" class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
                     <v-btn-group variant="tonal" density="comfortable">
                         <v-btn color="primary" :disabled="!exportedData" @click="copy">{{ tt('Copy') }}</v-btn>
                         <v-btn density="compact" color="primary" :disabled="!exportedData" :icon="true">

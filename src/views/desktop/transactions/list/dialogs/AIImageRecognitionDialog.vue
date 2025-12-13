@@ -1,20 +1,18 @@
 <template>
     <v-dialog width="800" :persistent="loading || recognizing || !!imageFile" v-model="showState" @paste="onPaste">
-        <v-card class="pa-2 pa-sm-4 pa-md-4">
+        <v-card class="pa-sm-1 pa-md-2">
             <template #title>
-                <div class="d-flex align-center justify-center">
-                    <h4 class="text-h4">{{ tt('AI Image Recognition') }}</h4>
-                </div>
+                <h4 class="text-h4">{{ tt('AI Image Recognition') }}</h4>
             </template>
 
-            <v-card-text class="d-flex justify-center w-100 my-md-4 pt-0">
-                <div class="w-100 border position-relative"
+            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto" style="height: 480px">
+                <div class="w-100 h-100 border position-relative"
                      @dragenter.prevent="onDragEnter"
                      @dragover.prevent
                      @dragleave.prevent="onDragLeave"
                      @drop.prevent="onDrop">
-                    <div class="d-flex w-100 fill-height justify-center align-center justify-content-center text-center px-4"
-                         :class="{ 'dropzone': true, 'dropzone-dragover': isDragOver }" style="height: 480px">
+                    <div class="d-flex w-100 h-100 justify-center align-center justify-content-center text-center px-4"
+                         :class="{ 'dropzone': true, 'dropzone-dragover': isDragOver }">
                         <div class="d-inline-flex flex-column" v-if="!loading && !imageFile && !isDragOver">
                             <h3 :class="{ 'pa-2': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }">{{ tt('You can drag and drop, paste or click to select a receipt or transaction image') }}</h3>
                             <span :class="{ 'pa-2': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }">{{ tt('Uploaded image and personal data will be sent to the large language model, please be aware of potential privacy risks.') }}</span>
@@ -23,17 +21,17 @@
                         <h3 class="pa-2" v-else-if="loading">{{ tt('Loading image...') }}</h3>
                         <h3 :class="{ 'pa-2': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }" v-else-if="recognizing">{{ tt('AI can make mistakes. Check important info.') }}</h3>
                     </div>
-                    <v-img height="480px" :class="{ 'cursor-pointer': !loading && !recognizing && !isDragOver }"
+                    <v-img :class="{ 'cursor-pointer': !loading && !recognizing && !isDragOver, 'h-100': true }"
                            :src="imageSrc" @click="showOpenImageDialog">
                         <template #placeholder>
-                            <div :class="{ 'w-100 fill-height': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }"></div>
+                            <div :class="{ 'w-100 h-100': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }"></div>
                         </template>
                     </v-img>
                 </div>
             </v-card-text>
 
-            <v-card-text class="overflow-y-visible">
-                <div ref="buttonContainer" class="w-100 d-flex justify-center gap-4">
+            <v-card-text>
+                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
                     <v-btn :disabled="loading || recognizing || !imageFile" @click="recognize">
                         {{ tt('Recognize') }}
                         <v-progress-circular indeterminate size="22" class="ms-2" v-if="recognizing"></v-progress-circular>

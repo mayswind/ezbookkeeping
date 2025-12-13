@@ -1,14 +1,14 @@
 <template>
     <v-dialog width="800" :persistent="isCategoryModified" v-model="showState">
-        <v-card class="pa-2 pa-sm-4 pa-md-8">
+        <v-card class="pa-sm-1 pa-md-2">
             <template #title>
-                <div class="d-flex align-center justify-center">
+                <div class="d-flex align-center">
                     <h4 class="text-h4">{{ tt(title) }}</h4>
                     <v-progress-circular indeterminate size="22" class="ms-2" v-if="loading"></v-progress-circular>
                 </div>
             </template>
-            <v-card-text class="pt-0">
-                <v-form class="mt-md-6">
+            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto">
+                <v-form class="w-100 mt-2">
                     <v-row>
                         <v-col cols="12" md="12">
                             <v-text-field
@@ -77,8 +77,8 @@
                     </v-row>
                 </v-form>
             </v-card-text>
-            <v-card-text class="overflow-y-visible">
-                <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
+            <v-card-text>
+                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
                     <v-tooltip :disabled="!inputIsEmpty" :text="inputEmptyProblemMessage ? tt(inputEmptyProblemMessage) : ''">
                         <template v-slot:activator="{ props }">
                             <div v-bind="props" class="d-inline-block">

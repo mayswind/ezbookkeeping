@@ -1,12 +1,13 @@
 <template>
     <v-dialog width="1000" :persistent="isTransactionModified" v-model="showState">
-        <v-card class="pa-2 pa-sm-4 pa-md-8">
+        <v-card class="pa-sm-1 pa-md-2">
             <template #title>
                 <div class="d-flex align-center justify-center">
-                    <div class="d-flex w-100 align-center justify-center">
+                    <div class="d-flex align-center">
                         <h4 class="text-h4">{{ tt(title) }}</h4>
                         <v-progress-circular indeterminate size="22" class="ms-2" v-if="loading"></v-progress-circular>
                     </div>
+                    <v-spacer/>
                     <v-btn density="comfortable" color="default" variant="text" class="ms-2" :icon="true"
                            :disabled="loading || submitting" v-if="mode !== TransactionEditPageMode.View && (activeTab === 'basicInfo' || (activeTab === 'map' && isSupportGetGeoLocationByClick()))">
                         <v-icon :icon="mdiDotsVertical" />
@@ -49,7 +50,7 @@
                     </v-btn>
                 </div>
             </template>
-            <v-card-text class="d-flex flex-column flex-md-row mt-md-4 pt-0">
+            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto">
                 <div class="mb-4">
                     <v-tabs class="v-tabs-pill" direction="vertical" :class="{ 'readonly': type === TransactionEditPageType.Transaction && mode !== TransactionEditPageMode.Add }"
                             :disabled="loading || submitting" v-model="transaction.type">
@@ -448,8 +449,8 @@
                     </v-window-item>
                 </v-window>
             </v-card-text>
-            <v-card-text class="overflow-y-visible">
-                <div class="w-100 d-flex justify-center flex-wrap mt-2 mt-sm-4 mt-md-6 gap-4">
+            <v-card-text>
+                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
                     <v-tooltip :disabled="!inputIsEmpty" :text="inputEmptyProblemMessage ? tt(inputEmptyProblemMessage) : ''">
                         <template v-slot:activator="{ props }">
                             <div v-bind="props" class="d-inline-block">
@@ -1260,48 +1261,36 @@ defineExpose({
 
 @media (min-height: 630px) {
     .transaction-edit-map-view {
-        height: 300px;
+        height: 390px;
     }
 
     @media (min-width: 960px) {
         .transaction-pictures {
-            min-height: 300px;
+            min-height: 414px;
         }
     }
 }
 
 @media (min-height: 700px) {
     .transaction-edit-map-view {
-        height: 350px;
+        height: 460px;
     }
 
     @media (min-width: 960px) {
         .transaction-pictures {
-            min-height: 350px;
+            min-height: 484px;
         }
     }
 }
 
-@media (min-height: 800px) {
+@media (min-height: 780px) {
     .transaction-edit-map-view {
-        height: 450px;
+        height: 538px;
     }
 
     @media (min-width: 960px) {
         .transaction-pictures {
-            min-height: 450px;
-        }
-    }
-}
-
-@media (min-height: 900px) {
-    .transaction-edit-map-view {
-        height: 550px;
-    }
-
-    @media (min-width: 960px) {
-        .transaction-pictures {
-            min-height: 550px;
+            min-height: 562px;
         }
     }
 }

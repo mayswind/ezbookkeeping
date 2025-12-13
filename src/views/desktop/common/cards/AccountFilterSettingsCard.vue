@@ -1,5 +1,5 @@
 <template>
-    <v-card :class="{ 'pa-2 pa-sm-4 pa-md-8': dialogMode }">
+    <v-card :class="{ 'pa-sm-1 pa-md-2': dialogMode }">
         <template #title>
             <div class="d-flex align-center justify-center" v-if="dialogMode">
                 <div class="w-100 text-center">
@@ -83,11 +83,11 @@
                                :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]"></v-skeleton-loader>
         </div>
 
-        <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-if="!loading && !hasAnyVisibleAccount">
+        <v-card-text v-if="!loading && !hasAnyVisibleAccount">
             <span class="text-body-1">{{ tt('No available account') }}</span>
         </v-card-text>
 
-        <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-else-if="!loading && hasAnyVisibleAccount">
+        <v-card-text :class="{ 'flex-grow-1 overflow-y-auto': dialogMode }" v-else-if="!loading && hasAnyVisibleAccount">
             <v-expansion-panels class="account-categories" multiple v-model="expandAccountCategories">
                 <v-expansion-panel :key="accountCategory.category"
                                    :value="accountCategory.category"
@@ -147,7 +147,7 @@
         </v-card-text>
 
         <v-card-text class="overflow-y-visible" v-if="dialogMode">
-            <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
+            <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
                 <v-btn :disabled="!hasAnyVisibleAccount" @click="save">{{ tt(applyText) }}</v-btn>
                 <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
             </div>

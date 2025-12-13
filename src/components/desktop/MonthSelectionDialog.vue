@@ -1,26 +1,24 @@
 <template>
     <v-dialog class="month-selection-dialog" width="640" :persistent="!!persistent" v-model="showState">
-        <v-card class="pa-2 pa-sm-4 pa-md-4">
+        <v-card class="pa-sm-1 pa-md-2">
             <template #title>
-                <div class="d-flex align-center justify-center">
-                    <h4 class="text-h4">{{ title }}</h4>
-                </div>
+                <h4 class="text-h4">{{ title }}</h4>
             </template>
             <template #subtitle>
-                <div class="text-body-1 text-center text-wrap mt-6">
-                    <p v-if="hint">{{ hint }}</p>
+                <div class="text-body-1 text-wrap mt-2" v-if="hint">
+                    <p>{{ hint }}</p>
                     <slot></slot>
                 </div>
             </template>
-            <v-card-text class="mb-md-4 w-100 d-flex justify-center">
+            <v-card-text class="w-100 d-flex justify-center">
                 <v-row class="match-height">
                     <v-col>
                         <month-picker :is-dark-mode="isDarkMode" v-model="monthValue"></month-picker>
                     </v-col>
                 </v-row>
             </v-card-text>
-            <v-card-text class="overflow-y-visible">
-                <div class="w-100 d-flex justify-center gap-4">
+            <v-card-text>
+                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
                     <v-btn :disabled="!monthValue" @click="confirm">{{ tt('OK') }}</v-btn>
                     <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
                 </div>

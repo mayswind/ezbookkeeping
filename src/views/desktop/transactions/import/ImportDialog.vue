@@ -1,9 +1,9 @@
 <template>
     <v-dialog :persistent="!!persistent" v-model="showState">
-        <v-card class="pa-6 pa-sm-10 pa-md-12">
+        <v-card class="pa-sm-1 pa-md-2">
             <template #title>
                 <div class="d-flex align-center justify-center">
-                    <div class="d-flex w-100 align-center justify-center">
+                    <div class="d-flex w-100 align-center">
                         <h4 class="text-h4">{{ tt('Import Transactions') }}</h4>
                         <v-progress-circular indeterminate size="22" class="ms-2" v-if="loading"></v-progress-circular>
                     </div>
@@ -79,182 +79,185 @@
                 </div>
             </template>
 
-            <div class="mt-4 cursor-default">
-                <steps-bar min-width="700" :clickable="false" :steps="allSteps" :current-step="currentStep" />
-            </div>
+            <v-card-text>
+                <div class="cursor-default">
+                    <steps-bar min-width="700" :clickable="false" :steps="allSteps" :current-step="currentStep" />
+                </div>
 
-            <v-window class="disable-tab-transition" v-model="currentStep">
-                <v-window-item value="uploadFile">
-                    <v-row>
-                        <v-col cols="12" md="12">
-                            <two-column-select primary-key-field="displayCategoryName"
-                                               primary-value-field="displayCategoryName"
-                                               primary-title-field="displayCategoryName"
-                                               primary-sub-items-field="fileTypes"
-                                               secondary-key-field="type"
-                                               secondary-value-field="type"
-                                               secondary-title-field="displayName"
-                                               :disabled="submitting"
-                                               :enable-filter="true"
-                                               :filter-placeholder="tt('Find file type')"
-                                               :filter-no-items-text="tt('No available file type')"
-                                               :label="tt('File Type')"
-                                               :placeholder="tt('File Type')"
-                                               :items="allSupportedImportFileCategoryAndTypes"
-                                               :auto-update-menu-position="true"
-                                               v-model="fileType">
-                            </two-column-select>
-                        </v-col>
+                <v-window class="disable-tab-transition" v-model="currentStep">
+                    <v-window-item value="uploadFile">
+                        <v-row class="pt-2">
+                            <v-col cols="12" md="12">
+                                <two-column-select primary-key-field="displayCategoryName"
+                                                   primary-value-field="displayCategoryName"
+                                                   primary-title-field="displayCategoryName"
+                                                   primary-sub-items-field="fileTypes"
+                                                   secondary-key-field="type"
+                                                   secondary-value-field="type"
+                                                   secondary-title-field="displayName"
+                                                   :disabled="submitting"
+                                                   :enable-filter="true"
+                                                   :filter-placeholder="tt('Find file type')"
+                                                   :filter-no-items-text="tt('No available file type')"
+                                                   :label="tt('File Type')"
+                                                   :placeholder="tt('File Type')"
+                                                   :items="allSupportedImportFileCategoryAndTypes"
+                                                   :auto-update-menu-position="true"
+                                                   v-model="fileType">
+                                </two-column-select>
+                            </v-col>
 
-                        <v-col cols="12" md="12" v-if="allFileSubTypes">
-                            <v-select
-                                item-title="displayName"
-                                item-value="type"
-                                :disabled="submitting"
-                                :label="tt('Format')"
-                                :placeholder="tt('Format')"
-                                :items="allFileSubTypes"
-                                v-model="fileSubType"
-                            />
-                        </v-col>
+                            <v-col cols="12" md="12" v-if="allFileSubTypes">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    :disabled="submitting"
+                                    :label="tt('Format')"
+                                    :placeholder="tt('Format')"
+                                    :items="allFileSubTypes"
+                                    v-model="fileSubType"
+                                />
+                            </v-col>
 
-                        <v-col cols="12" md="12" v-if="!isImportDataFromTextbox && allSupportedEncodings">
-                            <v-select
-                                item-title="displayName"
-                                item-value="encoding"
-                                :disabled="submitting"
-                                :label="tt('File Encoding')"
-                                :placeholder="tt('File Encoding')"
-                                :items="allSupportedEncodings"
-                                v-model="fileEncoding"
-                            />
-                        </v-col>
+                            <v-col cols="12" md="12" v-if="!isImportDataFromTextbox && allSupportedEncodings">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="encoding"
+                                    :disabled="submitting"
+                                    :label="tt('File Encoding')"
+                                    :placeholder="tt('File Encoding')"
+                                    :items="allSupportedEncodings"
+                                    v-model="fileEncoding"
+                                />
+                            </v-col>
 
-                        <v-col cols="12" md="12" v-if="fileType === 'dsv' || fileType === 'dsv_data'">
-                            <v-select
-                                item-title="displayName"
-                                item-value="type"
-                                :disabled="submitting"
-                                :label="tt('Handling Method')"
-                                :placeholder="tt('Handling Method')"
-                                :items="[
-                                    { displayName: tt('Column Mapping'), type: ImportDSVProcessMethod.ColumnMapping },
-                                    { displayName: tt('Custom Script'), type: ImportDSVProcessMethod.CustomScript }
-                                 ]"
-                                v-model="processDSVMethod"
-                            />
-                        </v-col>
+                            <v-col cols="12" md="12" v-if="fileType === 'dsv' || fileType === 'dsv_data'">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    :disabled="submitting"
+                                    :label="tt('Handling Method')"
+                                    :placeholder="tt('Handling Method')"
+                                    :items="[
+                                        { displayName: tt('Column Mapping'), type: ImportDSVProcessMethod.ColumnMapping },
+                                        { displayName: tt('Custom Script'), type: ImportDSVProcessMethod.CustomScript }
+                                     ]"
+                                    v-model="processDSVMethod"
+                                />
+                            </v-col>
 
-                        <v-col cols="12" md="12" v-if="supportedAdditionalOptions">
-                            <v-select
-                                :disabled="submitting"
-                                :label="tt('Additional Options')"
-                                :placeholder="tt('Additional Options')"
-                                v-model="fileType"
-                                v-model:menu="additionalOptionsMenuState"
-                            >
-                                <template #selection>
-                                    <span class="cursor-pointer">{{ displaySelectedAdditionalOptions }}</span>
-                                </template>
+                            <v-col cols="12" md="12" v-if="supportedAdditionalOptions">
+                                <v-select
+                                    :disabled="submitting"
+                                    :label="tt('Additional Options')"
+                                    :placeholder="tt('Additional Options')"
+                                    v-model="fileType"
+                                    v-model:menu="additionalOptionsMenuState"
+                                >
+                                    <template #selection>
+                                        <span class="cursor-pointer">{{ displaySelectedAdditionalOptions }}</span>
+                                    </template>
 
-                                <template #no-data>
-                                    <v-list class="py-0">
-                                        <template v-for="item in allSupportedAdditionalOptions">
-                                            <v-list-item :key="item.key"
-                                                         :append-icon="importAdditionalOptions[item.key] ? mdiCheck : undefined"
-                                                         @click="importAdditionalOptions[item.key] = !importAdditionalOptions[item.key]"
-                                                         v-if="isDefined(supportedAdditionalOptions[item.key])">{{ tt(item.name) }}</v-list-item>
-                                        </template>
-                                    </v-list>
-                                </template>
-                            </v-select>
-                        </v-col>
+                                    <template #no-data>
+                                        <v-list class="py-0">
+                                            <template v-for="item in allSupportedAdditionalOptions">
+                                                <v-list-item :key="item.key"
+                                                             :append-icon="importAdditionalOptions[item.key] ? mdiCheck : undefined"
+                                                             @click="importAdditionalOptions[item.key] = !importAdditionalOptions[item.key]"
+                                                             v-if="isDefined(supportedAdditionalOptions[item.key])">{{ tt(item.name) }}</v-list-item>
+                                            </template>
+                                        </v-list>
+                                    </template>
+                                </v-select>
+                            </v-col>
 
-                        <v-col cols="12" md="12" v-if="!isImportDataFromTextbox">
-                            <v-text-field
-                                readonly
-                                persistent-placeholder
-                                type="text"
-                                class="always-cursor-pointer"
-                                :disabled="submitting"
-                                :label="tt('Data File')"
-                                :placeholder="tt('format.misc.clickToSelectedFile', { extensions: supportedImportFileExtensions })"
-                                v-model="fileName"
-                                @click="showOpenFileDialog"
-                            />
-                        </v-col>
+                            <v-col cols="12" md="12" v-if="!isImportDataFromTextbox">
+                                <v-text-field
+                                    readonly
+                                    persistent-placeholder
+                                    type="text"
+                                    class="always-cursor-pointer"
+                                    :disabled="submitting"
+                                    :label="tt('Data File')"
+                                    :placeholder="tt('format.misc.clickToSelectedFile', { extensions: supportedImportFileExtensions })"
+                                    v-model="fileName"
+                                    @click="showOpenFileDialog"
+                                />
+                            </v-col>
 
-                        <v-col cols="12" md="12" v-if="isImportDataFromTextbox">
-                            <v-textarea
-                                type="text"
-                                persistent-placeholder
-                                rows="5"
-                                :disabled="submitting"
-                                :placeholder="tt('Data to import')"
-                                v-model="importData"
-                            />
-                        </v-col>
+                            <v-col cols="12" md="12" v-if="isImportDataFromTextbox">
+                                <v-textarea
+                                    type="text"
+                                    persistent-placeholder
+                                    rows="5"
+                                    :disabled="submitting"
+                                    :placeholder="tt('Data to import')"
+                                    v-model="importData"
+                                />
+                            </v-col>
 
-                        <v-col cols="12" md="12" class="mb-0 pb-0" v-if="exportFileGuideDocumentUrl">
-                            <a :href="exportFileGuideDocumentUrl" :class="{ 'disabled': submitting }" target="_blank">
-                                <v-icon :icon="mdiHelpCircleOutline" size="16" />
-                                <span class="ms-1" v-if="fileType === 'dsv' || fileType === 'dsv_data'">{{ tt('How to import this file?') }}</span>
-                                <span class="ms-1" v-if="fileType !== 'dsv' && fileType !== 'dsv_data'">{{ tt('How to export this file?') }}</span>
-                                <span class="ms-1" v-if="exportFileGuideDocumentLanguageName">[{{ exportFileGuideDocumentLanguageName }}]</span>
-                            </a>
-                        </v-col>
-                    </v-row>
-                </v-window-item>
-                <v-window-item value="defineColumn">
-                    <import-transaction-define-column-tab
-                        ref="importTransactionDefineColumnTab"
-                        :parsed-file-data="parsedFileData"
-                        :disabled="loading || submitting"
-                    />
-                </v-window-item>
-                <v-window-item value="executeCustomScript">
-                    <import-transaction-execute-custom-script-tab
-                        ref="importTransactionExecuteCustomScriptTab"
-                        :parsed-file-data="parsedFileData"
-                        :disabled="loading || submitting"
-                    />
-                </v-window-item>
-                <v-window-item value="checkData">
-                    <import-transaction-check-data-tab
-                        ref="importTransactionCheckDataTab"
-                        :import-transactions="importTransactions"
-                        :disabled="loading || submitting"
-                    />
-                </v-window-item>
-                <v-window-item value="finalResult">
-                    <h4 class="text-h4 mb-1">{{ tt('Data Import Completed') }}</h4>
-                    <p class="my-5">{{ tt('format.misc.importTransactionResult', { count: getDisplayCount(importedCount || 0) }) }}</p>
-                </v-window-item>
-            </v-window>
-
-            <div class="d-flex justify-sm-space-between gap-4 flex-wrap justify-center mt-10">
-                <v-btn color="secondary" variant="tonal" :disabled="loading || submitting"
-                       :prepend-icon="mdiClose" @click="close(false)"
-                       v-if="currentStep !== 'finalResult'">{{ tt('Cancel') }}</v-btn>
-                <v-btn class="button-icon-with-direction" color="primary"
-                       :disabled="loading || submitting || (!isImportDataFromTextbox && !importFile) || (isImportDataFromTextbox && !importData) || (!isImportDataFromTextbox && allSupportedEncodings && fileEncoding === 'auto' && !autoDetectedFileEncoding)"
-                       :append-icon="!submitting ? mdiArrowRight : undefined" @click="parseData"
-                       v-if="currentStep === 'defineColumn' || currentStep === 'executeCustomScript' || currentStep === 'uploadFile'">
-                    {{ tt('Next') }}
-                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
-                </v-btn>
-                <v-btn class="button-icon-with-direction" color="teal"
-                       :disabled="submitting || importTransactionCheckDataTab?.isEditing || !importTransactionCheckDataTab?.canImport"
-                       :append-icon="!submitting ? mdiArrowRight : undefined" @click="submit"
-                       v-if="currentStep === 'checkData'">
-                    {{ (submitting && importProcess > 0 ? tt('format.misc.importingTransactions', { process: formatNumberToLocalizedNumerals(importProcess, 2) }) : tt('Import')) }}
-                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
-                </v-btn>
-                <v-btn color="secondary" variant="tonal"
-                       :append-icon="mdiCheck"
-                       @click="close(true)"
-                       v-if="currentStep === 'finalResult'">{{ tt('Close') }}</v-btn>
-            </div>
+                            <v-col cols="12" md="12" v-if="exportFileGuideDocumentUrl">
+                                <a :href="exportFileGuideDocumentUrl" :class="{ 'disabled': submitting }" target="_blank">
+                                    <v-icon :icon="mdiHelpCircleOutline" size="16" />
+                                    <span class="ms-1" v-if="fileType === 'dsv' || fileType === 'dsv_data'">{{ tt('How to import this file?') }}</span>
+                                    <span class="ms-1" v-if="fileType !== 'dsv' && fileType !== 'dsv_data'">{{ tt('How to export this file?') }}</span>
+                                    <span class="ms-1" v-if="exportFileGuideDocumentLanguageName">[{{ exportFileGuideDocumentLanguageName }}]</span>
+                                </a>
+                            </v-col>
+                        </v-row>
+                    </v-window-item>
+                    <v-window-item value="defineColumn">
+                        <import-transaction-define-column-tab
+                            ref="importTransactionDefineColumnTab"
+                            :parsed-file-data="parsedFileData"
+                            :disabled="loading || submitting"
+                        />
+                    </v-window-item>
+                    <v-window-item value="executeCustomScript">
+                        <import-transaction-execute-custom-script-tab
+                            ref="importTransactionExecuteCustomScriptTab"
+                            :parsed-file-data="parsedFileData"
+                            :disabled="loading || submitting"
+                        />
+                    </v-window-item>
+                    <v-window-item value="checkData">
+                        <import-transaction-check-data-tab
+                            ref="importTransactionCheckDataTab"
+                            :import-transactions="importTransactions"
+                            :disabled="loading || submitting"
+                        />
+                    </v-window-item>
+                    <v-window-item value="finalResult">
+                        <h4 class="text-h4 mb-1">{{ tt('Data Import Completed') }}</h4>
+                        <p class="my-5">{{ tt('format.misc.importTransactionResult', { count: getDisplayCount(importedCount || 0) }) }}</p>
+                    </v-window-item>
+                </v-window>
+            </v-card-text>
+            <v-card-text>
+                <div class="d-flex justify-center justify-sm-space-between flex-wrap mt-sm-1 mt-md-2 gap-4">
+                    <v-btn color="secondary" variant="tonal" :disabled="loading || submitting"
+                           :prepend-icon="mdiClose" @click="close(false)"
+                           v-if="currentStep !== 'finalResult'">{{ tt('Cancel') }}</v-btn>
+                    <v-btn class="button-icon-with-direction" color="primary"
+                           :disabled="loading || submitting || (!isImportDataFromTextbox && !importFile) || (isImportDataFromTextbox && !importData) || (!isImportDataFromTextbox && allSupportedEncodings && fileEncoding === 'auto' && !autoDetectedFileEncoding)"
+                           :append-icon="!submitting ? mdiArrowRight : undefined" @click="parseData"
+                           v-if="currentStep === 'defineColumn' || currentStep === 'executeCustomScript' || currentStep === 'uploadFile'">
+                        {{ tt('Next') }}
+                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
+                    </v-btn>
+                    <v-btn class="button-icon-with-direction" color="teal"
+                           :disabled="submitting || importTransactionCheckDataTab?.isEditing || !importTransactionCheckDataTab?.canImport"
+                           :append-icon="!submitting ? mdiArrowRight : undefined" @click="submit"
+                           v-if="currentStep === 'checkData'">
+                        {{ (submitting && importProcess > 0 ? tt('format.misc.importingTransactions', { process: formatNumberToLocalizedNumerals(importProcess, 2) }) : tt('Import')) }}
+                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
+                    </v-btn>
+                    <v-btn color="secondary" variant="tonal"
+                           :append-icon="mdiCheck"
+                           @click="close(true)"
+                           v-if="currentStep === 'finalResult'">{{ tt('Close') }}</v-btn>
+                </div>
+            </v-card-text>
         </v-card>
     </v-dialog>
 

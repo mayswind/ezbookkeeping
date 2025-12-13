@@ -1,14 +1,12 @@
 <template>
     <v-dialog width="800" :persistent="submitting || (!!defaultCurrencyAmount && defaultCurrencyAmount !== 1) || currency !== defaultCurrency || (!!targetCurrencyAmount && targetCurrencyAmount !== 1)" v-model="showState">
-        <v-card class="pa-2 pa-sm-4 pa-md-4">
+        <v-card class="pa-sm-1 pa-md-2">
             <template #title>
-                <div class="d-flex align-center justify-center">
-                    <div class="d-flex w-100 align-center justify-center">
-                        <h4 class="text-h4">{{ tt('Update User Custom Exchange Rate') }}</h4>
-                    </div>
+                <div class="d-flex align-center">
+                    <h4 class="text-h4">{{ tt('Update User Custom Exchange Rate') }}</h4>
                 </div>
             </template>
-            <v-card-text class="my-md-4 w-100 d-flex justify-center">
+            <v-card-text class="d-flex flex-column flex-md-row mt-2">
                 <v-row>
                     <v-col cols="12" md="6">
                         <number-input :disabled="submitting"
@@ -26,7 +24,7 @@
                                          :placeholder="tt('Currency')"
                                          v-model="defaultCurrency" />
                     </v-col>
-                    <v-col cols="12" class="text-center my-2">
+                    <v-col cols="12" class="text-center">
                         <v-icon :icon="mdiSwapVertical" size="24" />
                     </v-col>
                     <v-col cols="12" md="6">
@@ -47,8 +45,8 @@
                     </v-col>
                 </v-row>
             </v-card-text>
-            <v-card-text class="overflow-y-visible">
-                <div class="w-100 d-flex justify-center gap-4">
+            <v-card-text>
+                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
                     <v-btn :disabled="submitting || !defaultCurrencyAmount || !currency || !targetCurrencyAmount" @click="confirm">
                         {{ tt('OK') }}
                         <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>

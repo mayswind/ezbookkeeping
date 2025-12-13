@@ -269,7 +269,7 @@ const chartOptions = computed<object>(() => {
 <style scoped>
 .account-balance-trends-chart-container {
     width: 100%;
-    height: 400px;
+    height: 418px;
     margin-top: 10px;
 }
 </style>

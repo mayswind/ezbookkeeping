@@ -1,10 +1,10 @@
 <template>
     <v-dialog width="1000" :persistent="loading || !!rules.length || !!newRule.targetId" v-model="showState">
-        <v-card class="pa-2 pa-sm-4 pa-md-4">
+        <v-card class="pa-sm-1 pa-md-2">
             <template #title>
-                <div class="d-flex align-center justify-center">
-                    <div class="d-flex w-100 align-center justify-center">
-                        <h4 class="text-h4">{{ tt('Batch Replace Categories / Accounts / Tags') }}</h4>
+                <div class="d-flex flex-wrap align-center justify-center">
+                    <div class="d-flex flex-wrap align-center">
+                        <h4 class="text-h4 text-wrap">{{ tt('Batch Replace Categories / Accounts / Tags') }}</h4>
                         <v-btn density="compact" color="default" variant="text" size="24"
                                class="ms-2" :icon="true" :disabled="loading"
                                :loading="loading" @click="reload">
@@ -15,6 +15,7 @@
                             <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                         </v-btn>
                     </div>
+                    <v-spacer/>
                     <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                            :icon="true" :disabled="loading">
                         <v-icon :icon="mdiDotsVertical" />
@@ -31,10 +32,10 @@
                     </v-btn>
                 </div>
             </template>
-            <v-card-text class="my-md-4 w-100 d-flex justify-center">
+            <v-card-text class="w-100 d-flex justify-center">
                 <v-row>
                     <v-col cols="12">
-                        <v-table fixed-header fixed-footer height="400" striped="even">
+                        <v-table density="comfortable" fixed-header fixed-footer height="400" striped="even">
                             <thead>
                                 <tr>
                                     <th class="text-left">{{ tt('Type') }}</th>
@@ -57,7 +58,7 @@
                             <tfoot>
                                 <tr style="background-color: rgb(var(--v-theme-surface))">
                                     <td>
-                                        <v-select class="w-100" density="compact" variant="outlined"
+                                        <v-select class="w-100" density="compact" variant="underlined"
                                                   item-title="name"
                                                   item-value="value"
                                                   :disabled="loading"
@@ -88,7 +89,7 @@
                                         />
                                     </td>
                                     <td>
-                                        <v-autocomplete class="w-100" density="compact" variant="outlined"
+                                        <v-autocomplete class="w-100" density="compact" variant="underlined"
                                                         item-title="name" item-value="value" persistent-placeholder
                                                         :disabled="loading" :items="sourceItems"
                                                         :no-data-text="noSourceItemText"
@@ -96,7 +97,7 @@
                                         </v-autocomplete>
                                     </td>
                                     <td>
-                                        <two-column-select density="compact" variant="outlined"
+                                        <two-column-select density="compact" variant="underlined"
                                                            primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                            primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
                                                            primary-hidden-field="hidden" primary-sub-items-field="subCategories"
@@ -112,7 +113,7 @@
                                                            v-model="newRule.targetId"
                                                            v-if="newRule.dataType === 'expenseCategory'">
                                         </two-column-select>
-                                        <two-column-select density="compact" variant="outlined"
+                                        <two-column-select density="compact" variant="underlined"
                                                            primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                            primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
                                                            primary-hidden-field="hidden" primary-sub-items-field="subCategories"
@@ -128,7 +129,7 @@
                                                            v-model="newRule.targetId"
                                                            v-if="newRule.dataType === 'incomeCategory'">
                                         </two-column-select>
-                                        <two-column-select density="compact" variant="outlined"
+                                        <two-column-select density="compact" variant="underlined"
                                                            primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                            primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
                                                            primary-hidden-field="hidden" primary-sub-items-field="subCategories"
@@ -144,7 +145,7 @@
                                                            v-model="newRule.targetId"
                                                            v-if="newRule.dataType === 'transferCategory'">
                                         </two-column-select>
-                                        <two-column-select density="compact" variant="outlined"
+                                        <two-column-select density="compact" variant="underlined"
                                                            primary-key-field="id" primary-value-field="category"
                                                            primary-title-field="name" primary-footer-field="displayBalance"
                                                            primary-icon-field="icon" primary-icon-type="account"
@@ -160,7 +161,7 @@
                                                            v-model="newRule.targetId"
                                                            v-if="newRule.dataType === 'account'">
                                         </two-column-select>
-                                        <v-autocomplete density="compact" variant="outlined"
+                                        <v-autocomplete density="compact" variant="underlined"
                                                         item-title="name" item-value="id"
                                                         persistent-placeholder chips
                                                         :disabled="loading" :items="allTags"
@@ -196,8 +197,8 @@
                     </v-col>
                 </v-row>
             </v-card-text>
-            <v-card-text class="overflow-y-visible">
-                <div class="w-100 d-flex justify-center gap-4">
+            <v-card-text>
+                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
                     <v-btn :disabled="loading" @click="confirm">{{ tt('OK') }}</v-btn>
                     <v-btn color="secondary" variant="tonal" :disabled="loading" @click="cancel">{{ tt('Cancel') }}</v-btn>
                 </div>

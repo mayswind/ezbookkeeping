@@ -1,17 +1,19 @@
 <template>
-    <v-card :class="{ 'pa-2 pa-sm-4 pa-md-8': dialogMode }">
+    <v-card :class="{ 'pa-sm-1 pa-md-2': dialogMode }">
         <template #title>
             <v-row>
                 <v-col cols="6">
-                    <div :class="{ 'text-h4': dialogMode }">
+                    <div :class="{ 'text-h4': dialogMode, 'text-wrap': true }">
                         {{ tt(title) }}
                     </div>
                 </v-col>
                 <v-col cols="6" class="d-flex align-center">
-                    <v-text-field eager ref="filterInput" density="compact"
+                    <v-spacer v-if="!dialogMode"/>
+                    <v-text-field density="compact" :disabled="loading || !hasAnyAvailableTag"
                                   :prepend-inner-icon="mdiMagnify"
                                   :placeholder="tt('Find tag')"
-                                  v-model="filterContent"></v-text-field>
+                                  v-model="filterContent"
+                                  v-if="dialogMode"></v-text-field>
                     <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                            :disabled="loading || !hasAnyAvailableTag" :icon="true">
                         <v-icon :icon="mdiDotsVertical" />
@@ -48,11 +50,11 @@
                                :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]"></v-skeleton-loader>
         </div>
 
-        <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-if="!loading && !hasAnyVisibleTag">
+        <v-card-text v-if="!loading && !hasAnyVisibleTag">
             <span class="text-body-1">{{ tt('No available tag') }}</span>
         </v-card-text>
 
-        <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-else-if="!loading && hasAnyVisibleTag">
+        <v-card-text :class="{ 'flex-grow-1 overflow-y-auto': dialogMode }" v-else-if="!loading && hasAnyVisibleTag">
             <div class="mb-4" v-if="includeTagsCount > 1">
                 <v-btn-toggle class="toggle-buttons" density="compact" variant="outlined"
                               mandatory="force" divided
@@ -111,7 +113,7 @@
         </v-card-text>
 
         <v-card-text class="overflow-y-visible" v-if="dialogMode">
-            <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
+            <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
                 <v-btn :disabled="!hasAnyAvailableTag" @click="save">{{ tt(applyText) }}</v-btn>
                 <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
             </div>

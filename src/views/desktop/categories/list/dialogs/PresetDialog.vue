@@ -1,12 +1,12 @@
 <template>
     <v-dialog width="800" :persistent="submitting" v-model="showState">
-        <v-card class="pa-2 pa-sm-4 pa-md-8">
+        <v-card class="pa-sm-1 pa-md-2">
             <template #title>
-                <div class="d-flex align-center justify-center">
+                <div class="d-flex align-center">
                     <h4 class="text-h4">{{ tt('Default Categories') }}</h4>
                 </div>
             </template>
-            <v-card-text class="preset-transaction-categories mt-sm-2 mt-md-4 pt-0">
+            <v-card-text class="preset-transaction-categories flex-grow-1 overflow-y-auto">
                 <template :key="categoryType" v-for="(categories, categoryType) in allPresetCategories">
                     <div class="d-flex align-center mb-1">
                         <h4>{{ getCategoryTypeName(parseInt(categoryType)) }}</h4>
@@ -39,8 +39,8 @@
                     </v-expansion-panels>
                 </template>
             </v-card-text>
-            <v-card-text class="overflow-y-visible">
-                <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
+            <v-card-text>
+                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
                     <v-btn :disabled="submitting" @click="save">
                         {{ tt('Save') }}
                         <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>

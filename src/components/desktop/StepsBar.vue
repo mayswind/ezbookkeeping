@@ -1,6 +1,6 @@
 <template>
     <div class="d-flex" :style="`min-width: ${minWidth}px`" v-if="minWidth"></div>
-    <v-slide-group class="slide-group-with-stepper mb-10 hidden-xs" show-arrows>
+    <v-slide-group class="slide-group-with-stepper mb-6 hidden-xs" show-arrows>
         <v-slide-group-item :key="idx" v-for="(step, idx) in steps">
             <div class="mx-1"
                  :class="{ 'slide-group-step-active': isStepActive(step), 'slide-group-step-completed': isStepCompleted(idx), 'cursor-pointer': isClickable }"

@@ -1,12 +1,10 @@
 <template>
     <v-dialog width="640" :persistent="true" v-model="showState">
-        <v-card class="pa-2 pa-sm-4 pa-md-4">
+        <v-card class="pa-sm-1 pa-md-2">
             <template #title>
-                <div class="d-flex align-center justify-center">
-                    <h4 class="text-h4 text-error text-wrap">{{ tt('Are you sure you want to unlink this login method?') }}</h4>
-                </div>
+                <h4 class="text-h4 text-error text-wrap">{{ tt('Are you sure you want to unlink this login method?') }}</h4>
             </template>
-            <v-card-text class="mb-md-4 w-100 d-flex justify-center">
+            <v-card-text class="w-100 d-flex justify-center">
                 <div class="w-100">
                     <v-text-field
                         autocomplete="current-password"
@@ -19,8 +17,8 @@
                     />
                 </div>
             </v-card-text>
-            <v-card-text class="overflow-y-visible">
-                <div class="w-100 d-flex justify-center gap-4">
+            <v-card-text>
+                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
                     <v-btn color="error" :disabled="!currentPassword || unlinking" @click="confirm">
                         {{ tt('Confirm') }}
                         <v-progress-circular indeterminate size="22" class="ms-2" v-if="unlinking"></v-progress-circular>

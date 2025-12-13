@@ -1253,6 +1253,7 @@ defineExpose({
 
 .transaction-edit-timezone.v-input input::placeholder {
     color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity)) !important;
+    opacity: unset;
 }
 
 .transaction-edit-map-view {

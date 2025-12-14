@@ -1,81 +1,48 @@
 <template>
     <v-card :class="{ 'pa-sm-1 pa-md-2': dialogMode }">
         <template #title>
-            <div class="d-flex align-center justify-center" v-if="dialogMode">
-                <div class="w-100 text-center">
-                    <h4 class="text-h4">{{ tt(title) }}</h4>
-                </div>
-                <v-btn density="comfortable" color="default" variant="text" class="ms-2"
-                       :disabled="loading || !hasAnyAvailableAccount" :icon="true">
-                    <v-icon :icon="mdiDotsVertical" />
-                    <v-menu activator="parent">
-                        <v-list>
-                            <v-list-item :prepend-icon="mdiSelectAll"
-                                         :title="tt('Select All')"
-                                         :disabled="!hasAnyVisibleAccount"
-                                         @click="selectAllAccounts"></v-list-item>
-                            <v-list-item :prepend-icon="mdiSelect"
-                                         :title="tt('Select None')"
-                                         :disabled="!hasAnyVisibleAccount"
-                                         @click="selectNoneAccounts"></v-list-item>
-                            <v-list-item :prepend-icon="mdiSelectInverse"
-                                         :title="tt('Invert Selection')"
-                                         :disabled="!hasAnyVisibleAccount"
-                                         @click="selectInvertAccounts"></v-list-item>
-                            <v-divider class="my-2" v-if="allowHiddenAccount"/>
-                            <v-list-item :prepend-icon="mdiSelectAll"
-                                         :title="tt('Select All Visible')"
-                                         :disabled="!hasAnyVisibleAccount"
-                                         @click="selectAllVisibleAccounts"
-                                         v-if="allowHiddenAccount"></v-list-item>
-                            <v-divider class="my-2" v-if="allowHiddenAccount"/>
-                            <v-list-item :prepend-icon="mdiEyeOutline"
-                                         :title="tt('Show Hidden Accounts')"
-                                         v-if="allowHiddenAccount && !showHidden" @click="showHidden = true"></v-list-item>
-                            <v-list-item :prepend-icon="mdiEyeOffOutline"
-                                         :title="tt('Hide Hidden Accounts')"
-                                         v-if="allowHiddenAccount && showHidden" @click="showHidden = false"></v-list-item>
-                        </v-list>
-                    </v-menu>
-                </v-btn>
-            </div>
-            <div class="d-flex align-center" v-else-if="!dialogMode">
-                <span>{{ tt(title) }}</span>
-                <v-spacer/>
-                <v-btn density="comfortable" color="default" variant="text" class="ms-2"
-                       :disabled="loading" :icon="true">
-                    <v-icon :icon="mdiDotsVertical" />
-                    <v-menu activator="parent">
-                        <v-list>
-                            <v-list-item :prepend-icon="mdiSelectAll"
-                                         :title="tt('Select All')"
-                                         :disabled="!hasAnyVisibleAccount"
-                                         @click="selectAllAccounts"></v-list-item>
-                            <v-list-item :prepend-icon="mdiSelect"
-                                         :title="tt('Select None')"
-                                         :disabled="!hasAnyVisibleAccount"
-                                         @click="selectNoneAccounts"></v-list-item>
-                            <v-list-item :prepend-icon="mdiSelectInverse"
-                                         :title="tt('Invert Selection')"
-                                         :disabled="!hasAnyVisibleAccount"
-                                         @click="selectInvertAccounts"></v-list-item>
-                            <v-divider class="my-2" v-if="allowHiddenAccount"/>
-                            <v-list-item :prepend-icon="mdiSelectAll"
-                                         :title="tt('Select All Visible')"
-                                         :disabled="!hasAnyVisibleAccount"
-                                         @click="selectAllVisibleAccounts"
-                                         v-if="allowHiddenAccount"></v-list-item>
-                            <v-divider class="my-2" v-if="allowHiddenAccount"/>
-                            <v-list-item :prepend-icon="mdiEyeOutline"
-                                         :title="tt('Show Hidden Accounts')"
-                                         v-if="allowHiddenAccount && !showHidden" @click="showHidden = true"></v-list-item>
-                            <v-list-item :prepend-icon="mdiEyeOffOutline"
-                                         :title="tt('Hide Hidden Accounts')"
-                                         v-if="allowHiddenAccount && showHidden" @click="showHidden = false"></v-list-item>
-                        </v-list>
-                    </v-menu>
-                </v-btn>
-            </div>
+            <v-row>
+                <v-col cols="6">
+                    <div :class="{ 'text-h4': dialogMode, 'text-wrap': true }">
+                        {{ tt(title) }}
+                    </div>
+                </v-col>
+                <v-col cols="6" class="d-flex align-center">
+                    <v-spacer v-if="!dialogMode"/>
+                    <v-text-field density="compact" :disabled="loading || !hasAnyAvailableAccount"
+                                  :prepend-inner-icon="mdiMagnify"
+                                  :placeholder="tt('Find account')"
+                                  v-model="filterContent"
+                                  v-if="dialogMode"></v-text-field>
+                    <v-btn density="comfortable" color="default" variant="text" class="ms-2"
+                           :disabled="loading || !hasAnyAvailableAccount" :icon="true">
+                        <v-icon :icon="mdiDotsVertical" />
+                        <v-menu activator="parent">
+                            <v-list>
+                                <v-list-item :prepend-icon="mdiSelectAll"
+                                             :title="tt('Select All')"
+                                             :disabled="!hasAnyVisibleAccount"
+                                             @click="selectAllAccounts"></v-list-item>
+                                <v-list-item :prepend-icon="mdiSelect"
+                                             :title="tt('Select None')"
+                                             :disabled="!hasAnyVisibleAccount"
+                                             @click="selectNoneAccounts"></v-list-item>
+                                <v-list-item :prepend-icon="mdiSelectInverse"
+                                             :title="tt('Invert Selection')"
+                                             :disabled="!hasAnyVisibleAccount"
+                                             @click="selectInvertAccounts"></v-list-item>
+                                <v-divider class="my-2" v-if="allowHiddenAccount"/>
+                                <v-list-item :prepend-icon="mdiEyeOutline"
+                                             :title="tt('Show Hidden Accounts')"
+                                             v-if="allowHiddenAccount && !showHidden" @click="showHidden = true"></v-list-item>
+                                <v-list-item :prepend-icon="mdiEyeOffOutline"
+                                             :title="tt('Hide Hidden Accounts')"
+                                             v-if="allowHiddenAccount && showHidden" @click="showHidden = false"></v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </v-btn>
+                </v-col>
+            </v-row>
         </template>
 
         <div v-if="loading">
@@ -92,18 +59,17 @@
                 <v-expansion-panel :key="accountCategory.category"
                                    :value="accountCategory.category"
                                    class="border"
-                                   v-for="accountCategory in allCategorizedAccounts"
-                                   v-show="showHidden || accountCategory.allVisibleAccountCount > 0">
+                                   v-for="accountCategory in allCategorizedAccounts">
                     <v-expansion-panel-title class="expand-panel-title-with-bg py-0">
                         <span class="ms-3">{{ tt(accountCategory.name) }}</span>
                     </v-expansion-panel-title>
                     <v-expansion-panel-text>
                         <v-list rounded density="comfortable" class="pa-0">
                             <template :key="account.id"
-                                      v-for="(account, idx) in accountCategory.allAccounts">
-                                <v-divider v-if="showHidden ? idx > 0 : (!account.hidden ? idx > accountCategory.firstVisibleAccountIndex : false)"/>
+                                      v-for="(account, idx) in accountCategory.accounts">
+                                <v-divider v-if="idx > 0"/>
 
-                                <v-list-item v-if="showHidden || !account.hidden">
+                                <v-list-item>
                                     <template #prepend>
                                         <v-checkbox :model-value="isAccountOrSubAccountsAllChecked(account, filterAccountIds)"
                                                     :indeterminate="isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds)"
@@ -117,13 +83,13 @@
                                     </template>
                                 </v-list-item>
 
-                                <v-divider v-if="(showHidden || !account.hidden) && account.type === AccountType.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])"/>
+                                <v-divider v-if="account.type === AccountType.MultiSubAccounts.type && account.subAccounts && account.subAccounts.length > 0"/>
 
                                 <v-list rounded density="comfortable" class="pa-0 ms-4"
-                                        v-if="(showHidden || !account.hidden) && account.type === AccountType.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])">
+                                        v-if="account.type === AccountType.MultiSubAccounts.type && account.subAccounts && account.subAccounts.length > 0">
                                     <template :key="subAccount.id"
-                                              v-for="(subAccount, subIdx) in accountCategory.allSubAccounts[account.id]">
-                                        <v-divider v-if="showHidden ? subIdx > 0 : (!subAccount.hidden ? subIdx > (accountCategory.allFirstVisibleSubAccountIndexes[account.id] as number) : false)"/>
+                                              v-for="(subAccount, subIdx) in account.subAccounts">
+                                        <v-divider v-if="subIdx > 0"/>
 
                                         <v-list-item v-if="showHidden || !subAccount.hidden">
                                             <template #prepend>
@@ -148,7 +114,7 @@
 
         <v-card-text class="overflow-y-visible" v-if="dialogMode">
             <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                <v-btn :disabled="!hasAnyVisibleAccount" @click="save">{{ tt(applyText) }}</v-btn>
+                <v-btn :disabled="!hasAnyAvailableAccount" @click="save">{{ tt(applyText) }}</v-btn>
                 <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
             </div>
         </v-card-text>
@@ -175,7 +141,6 @@ import type { Account } from '@/models/account.ts';
 
 import {
     selectAccountOrSubAccounts,
-    selectAllVisible,
     selectAll,
     selectNone,
     selectInvert,
@@ -184,6 +149,7 @@ import {
 } from '@/lib/account.ts';
 
 import {
+    mdiMagnify,
     mdiSelectAll,
     mdiSelect,
     mdiSelectInverse,
@@ -209,11 +175,13 @@ const { tt } = useI18n();
 const {
     loading,
     showHidden,
+    filterContent,
     filterAccountIds,
     title,
     applyText,
     allowHiddenAccount,
     allCategorizedAccounts,
+    allVisibleAccountMap,
     hasAnyAvailableAccount,
     hasAnyVisibleAccount,
     isAccountChecked,
@@ -262,7 +230,7 @@ function updateAccountSelected(account: Account, value: boolean | null): void {
 }
 
 function selectAllAccounts(): void {
-    selectAll(filterAccountIds.value, accountsStore.allAccountsMap, !allowHiddenAccount.value);
+    selectAll(filterAccountIds.value, allVisibleAccountMap.value);
 
     if (props.autoSave) {
         save();
@@ -270,7 +238,7 @@ function selectAllAccounts(): void {
 }
 
 function selectNoneAccounts(): void {
-    selectNone(filterAccountIds.value, accountsStore.allAccountsMap, !allowHiddenAccount.value);
+    selectNone(filterAccountIds.value, allVisibleAccountMap.value);
 
     if (props.autoSave) {
         save();
@@ -278,15 +246,7 @@ function selectNoneAccounts(): void {
 }
 
 function selectInvertAccounts(): void {
-    selectInvert(filterAccountIds.value, accountsStore.allAccountsMap, !allowHiddenAccount.value);
-
-    if (props.autoSave) {
-        save();
-    }
-}
-
-function selectAllVisibleAccounts(): void {
-    selectAllVisible(filterAccountIds.value, accountsStore.allAccountsMap);
+    selectInvert(filterAccountIds.value, allVisibleAccountMap.value);
 
     if (props.autoSave) {
         save();

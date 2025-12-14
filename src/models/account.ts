@@ -349,6 +349,27 @@ export class Account implements AccountInfoResponse {
         return subAccountCurrencies;
     }
 
+    public cloneSelf(): Account {
+        return new Account(
+            this.id,
+            this.name,
+            this.parentId,
+            this.category,
+            this.type,
+            this.icon,
+            this.color,
+            this.currency,
+            this.balance,
+            this.comment,
+            this.displayOrder,
+            this.visible,
+            this.balanceTime,
+            this.creditCardStatementDate,
+            this.isAsset,
+            this.isLiability
+        );
+    }
+
     public clone(): Account {
         return new Account(
             this.id,
@@ -656,18 +677,6 @@ export class CategorizedAccountWithDisplayBalance {
     public static of(categorizedAccount: CategorizedAccount, accounts: AccountWithDisplayBalance[], displayBalance: string): CategorizedAccountWithDisplayBalance {
         return new CategorizedAccountWithDisplayBalance(categorizedAccount.category, categorizedAccount.name, categorizedAccount.icon, accounts, displayBalance);
     }
-}
-
-export interface AccountCategoriesWithVisibleCount {
-    readonly category: number;
-    readonly name: string;
-    readonly icon: string;
-    readonly allAccounts: Account[];
-    readonly allVisibleAccountCount: number;
-    readonly firstVisibleAccountIndex: number;
-    readonly allSubAccounts: Record<string, Account[]>;
-    readonly allVisibleSubAccountCounts: Record<string, number>;
-    readonly allFirstVisibleSubAccountIndexes: Record<string, number>;
 }
 
 export interface AccountShowingIds {

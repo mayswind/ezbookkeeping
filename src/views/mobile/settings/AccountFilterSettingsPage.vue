@@ -1,12 +1,22 @@
 <template>
-    <f7-page @page:afterin="onPageAfterIn">
+    <f7-page with-subnavbar @page:beforein="onPageBeforeIn" @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title :title="tt(title)"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': !hasAnyAvailableAccount }" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': !hasAnyVisibleAccount }" @click="save"></f7-link>
+                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': !hasAnyAvailableAccount }" @click="save"></f7-link>
             </f7-nav-right>
+
+            <f7-subnavbar :inner="false">
+                <f7-searchbar
+                    custom-searchs
+                    :value="filterContent"
+                    :placeholder="tt('Find account')"
+                    :disable-button-text="tt('Cancel')"
+                    @change="filterContent = $event.target.value"
+                ></f7-searchbar>
+            </f7-subnavbar>
         </f7-navbar>
 
         <div class="skeleton-text" v-if="loading">
@@ -45,8 +55,7 @@
         <f7-block class="no-margin no-padding" v-show="!loading && hasAnyVisibleAccount">
             <f7-block class="combination-list-wrapper margin-vertical"
                       :key="accountCategory.category"
-                      v-for="accountCategory in allCategorizedAccounts"
-                      v-show="showHidden || accountCategory.allVisibleAccountCount > 0">
+                      v-for="accountCategory in allCategorizedAccounts">
                 <f7-accordion-item :opened="collapseStates[accountCategory.category]!.opened"
                                    @accordion:open="collapseStates[accountCategory.category]!.opened = true"
                                    @accordion:close="collapseStates[accountCategory.category]!.opened = false">
@@ -65,14 +74,13 @@
                     <f7-accordion-content :style="{ height: collapseStates[accountCategory.category]!.opened ? 'auto' : '' }">
                         <f7-list strong inset dividers accordion-list class="combination-list-content">
                             <f7-list-item checkbox
-                                          :class="{ 'has-child-list-item': account.type === AccountType.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id]) }"
+                                          :class="{ 'has-child-list-item': account.type === AccountType.MultiSubAccounts.type && account.subAccounts && account.subAccounts.length > 0 }"
                                           :title="account.name"
                                           :value="account.id"
                                           :checked="isAccountOrSubAccountsAllChecked(account, filterAccountIds)"
                                           :indeterminate="isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds)"
                                           :key="account.id"
-                                          v-for="account in accountCategory.allAccounts"
-                                          v-show="showHidden || !account.hidden"
+                                          v-for="account in accountCategory.accounts"
                                           @change="updateAccountOrSubAccountsSelected">
                                 <template #media>
                                     <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color">
@@ -84,14 +92,13 @@
 
                                 <template #root>
                                     <ul class="padding-inline-start"
-                                        v-if="account.type === AccountType.MultiSubAccounts.type && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])">
+                                        v-if="account.type === AccountType.MultiSubAccounts.type && account.subAccounts && account.subAccounts.length > 0">
                                         <f7-list-item checkbox
                                                       :title="subAccount.name"
                                                       :value="subAccount.id"
                                                       :checked="isAccountChecked(subAccount, filterAccountIds)"
                                                       :key="subAccount.id"
-                                                      v-for="subAccount in accountCategory.allSubAccounts[account.id]"
-                                                      v-show="showHidden || !subAccount.hidden"
+                                                      v-for="subAccount in account.subAccounts"
                                                       @change="updateAccountSelected">
                                             <template #media>
                                                 <ItemIcon icon-type="account" :icon-id="subAccount.icon" :color="subAccount.color">
@@ -115,9 +122,6 @@
                 <f7-actions-button :class="{ 'disabled': !hasAnyVisibleAccount }" @click="selectAllAccounts">{{ tt('Select All') }}</f7-actions-button>
                 <f7-actions-button :class="{ 'disabled': !hasAnyVisibleAccount }" @click="selectNoneAccounts">{{ tt('Select None') }}</f7-actions-button>
                 <f7-actions-button :class="{ 'disabled': !hasAnyVisibleAccount }" @click="selectInvertAccounts">{{ tt('Invert Selection') }}</f7-actions-button>
-            </f7-actions-group>
-            <f7-actions-group v-if="allowHiddenAccount">
-                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleAccount }" @click="selectAllVisibleAccounts">{{ tt('Select All Visible') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group v-if="allowHiddenAccount">
                 <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ tt('Show Hidden Accounts') }}</f7-actions-button>
@@ -146,7 +150,6 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import {
     selectAccountOrSubAccounts,
-    selectAllVisible,
     selectAll,
     selectNone,
     selectInvert,
@@ -171,10 +174,12 @@ const { showToast, routeBackOnError } = useI18nUIComponents();
 const {
     loading,
     showHidden,
+    filterContent,
     filterAccountIds,
     title,
     allowHiddenAccount,
     allCategorizedAccounts,
+    allVisibleAccountMap,
     hasAnyAvailableAccount,
     hasAnyVisibleAccount,
     isAccountChecked,
@@ -224,7 +229,7 @@ function init(): void {
 function updateAccountOrSubAccountsSelected(e: Event): void {
     const target = e.target as HTMLInputElement;
     const accountId = target.value;
-    const account = accountsStore.allAccountsMap[accountId];
+    const account = allVisibleAccountMap.value[accountId];
 
     if (!account) {
         return;
@@ -236,7 +241,7 @@ function updateAccountOrSubAccountsSelected(e: Event): void {
 function updateAccountSelected(e: Event): void {
     const target = e.target as HTMLInputElement;
     const accountId = target.value;
-    const account = accountsStore.allAccountsMap[accountId];
+    const account = allVisibleAccountMap.value[accountId];
 
     if (!account) {
         return;
@@ -246,24 +251,24 @@ function updateAccountSelected(e: Event): void {
 }
 
 function selectAllAccounts(): void {
-    selectAll(filterAccountIds.value, accountsStore.allAccountsMap, !allowHiddenAccount.value);
+    selectAll(filterAccountIds.value, allVisibleAccountMap.value);
 }
 
 function selectNoneAccounts(): void {
-    selectNone(filterAccountIds.value, accountsStore.allAccountsMap, !allowHiddenAccount.value);
+    selectNone(filterAccountIds.value, allVisibleAccountMap.value);
 }
 
 function selectInvertAccounts(): void {
-    selectInvert(filterAccountIds.value, accountsStore.allAccountsMap, !allowHiddenAccount.value);
-}
-
-function selectAllVisibleAccounts(): void {
-    selectAllVisible(filterAccountIds.value, accountsStore.allAccountsMap);
+    selectInvert(filterAccountIds.value, allVisibleAccountMap.value);
 }
 
 function save(): void {
     saveFilterAccountIds();
     props.f7router.back();
+}
+
+function onPageBeforeIn(): void {
+    filterContent.value = '';
 }
 
 function onPageAfterIn(): void {

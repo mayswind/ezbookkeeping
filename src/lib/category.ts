@@ -132,7 +132,7 @@ export function getTransactionSecondaryCategoryName(categoryId: string | null | 
     return '';
 }
 
-export function filterTransactionCategories(allTransactionCategories: Record<number, TransactionCategory[]>, allowCategoryTypes?: Record<number, boolean>, allowCategoryName?: string, showHidden?: boolean): Record<number, TransactionCategory[]> {
+export function filterTransactionCategories(allTransactionCategories: Record<number, TransactionCategory[]>, allowCategoryTypes?: Record<number, boolean>, allowCategoryName?: string, showHidden?: boolean): Record<string, TransactionCategory[]> {
     const ret: Record<string, TransactionCategory[]> = {};
     const hasAllowCategoryTypes = allowCategoryTypes
         && (allowCategoryTypes[CategoryType.Income]
@@ -371,24 +371,6 @@ export function selectAllSubCategories(filterCategoryIds: Record<string, boolean
 
     for (const subCategory of category.subCategories) {
         filterCategoryIds[subCategory.id] = value;
-    }
-}
-
-export function selectAllVisible(filterCategoryIds: Record<string, boolean>, allTransactionCategoriesMap: Record<string, TransactionCategory>): void {
-    for (const categoryId of keys(filterCategoryIds)) {
-        const category = allTransactionCategoriesMap[categoryId];
-
-        if (category) {
-            if (category.hidden) {
-                continue;
-            }
-
-            if (category.parentId && allTransactionCategoriesMap[category.parentId] && allTransactionCategoriesMap[category.parentId]!.hidden) {
-                continue;
-            }
-
-            filterCategoryIds[category.id] = false;
-        }
     }
 }
 

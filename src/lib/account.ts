@@ -245,26 +245,6 @@ export function selectAccountOrSubAccounts(filterAccountIds: Record<string, bool
     }
 }
 
-export function selectAllVisible(filterAccountIds: Record<string, boolean>, allAccountsMap: Record<string, Account>): void {
-    for (const accountId of keys(filterAccountIds)) {
-        const account = allAccountsMap[accountId];
-
-        if (account) {
-            if (account.hidden) {
-                continue;
-            }
-
-            if (account.parentId && allAccountsMap[account.parentId] && allAccountsMap[account.parentId]!.hidden) {
-                continue;
-            }
-
-            if (account.type === AccountType.SingleAccount.type) {
-                filterAccountIds[account.id] = false;
-            }
-        }
-    }
-}
-
 export function selectAll(filterAccountIds: Record<string, boolean>, allAccountsMap: Record<string, Account>): void {
     for (const accountId of keys(filterAccountIds)) {
         const account = allAccountsMap[accountId];

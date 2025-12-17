@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"sort"
 	"strings"
 
@@ -286,6 +287,88 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.WebContext) (any, 
 	}
 
 	return transactionResps, nil
+}
+
+// TransactionListAllHandler returns all transaction list of current user
+func (a *TransactionsApi) TransactionListAllHandler(c *core.WebContext) (any, *errs.Error) {
+	var transactionAllListReq models.TransactionAllListRequest
+	err := c.ShouldBindQuery(&transactionAllListReq)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionListAllHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	utcOffset, err := c.GetClientTimezoneOffset()
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionListAllHandler] cannot get client timezone offset, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Errorf(c, "[transactions.TransactionListAllHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	allAccountIds, err := a.accounts.GetAccountOrSubAccountIds(c, transactionAllListReq.AccountIds, uid)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionListAllHandler] get account error, because %s", err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	allCategoryIds, err := a.transactionCategories.GetCategoryOrSubCategoryIds(c, transactionAllListReq.CategoryIds, uid)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionListAllHandler] get transaction category error, because %s", err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	noTags := transactionAllListReq.TagFilter == models.TransactionNoTagFilterValue
+	var tagFilters []*models.TransactionTagFilter
+
+	if !noTags {
+		tagFilters, err = models.ParseTransactionTagFilter(transactionAllListReq.TagFilter)
+
+		if err != nil {
+			log.Warnf(c, "[transactions.TransactionListAllHandler] parse transaction tag filters error, because %s", err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+	}
+
+	maxTransactionTime := int64(math.MaxInt64)
+	minTransactionTime := int64(0)
+
+	if transactionAllListReq.EndTime > 0 {
+		maxTransactionTime = utils.GetMaxTransactionTimeFromUnixTime(transactionAllListReq.EndTime)
+	}
+
+	if transactionAllListReq.StartTime > 0 {
+		minTransactionTime = utils.GetMinTransactionTimeFromUnixTime(transactionAllListReq.StartTime)
+	}
+
+	allTransactions, err := a.transactions.GetAllSpecifiedTransactions(c, uid, maxTransactionTime, minTransactionTime, transactionAllListReq.Type, allCategoryIds, allAccountIds, tagFilters, noTags, transactionAllListReq.AmountFilter, transactionAllListReq.Keyword, pageCountForDataExport, true)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionListAllHandler] failed to get all transactions for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	transactionResult, err := a.getTransactionResponseListResult(c, user, allTransactions, utcOffset, transactionAllListReq.WithPictures, transactionAllListReq.TrimAccount, transactionAllListReq.TrimCategory, transactionAllListReq.TrimTag)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionListAllHandler] failed to assemble transaction result for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	return transactionResult, nil
 }
 
 // TransactionReconciliationStatementHandler returns transaction reconciliation statement list of current user

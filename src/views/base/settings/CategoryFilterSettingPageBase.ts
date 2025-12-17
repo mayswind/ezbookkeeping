@@ -21,9 +21,9 @@ import {
     isCategoryOrSubCategoriesAllChecked
 } from '@/lib/category.ts';
 
-export type CategoryFilterType = 'statisticsDefault' | 'statisticsCurrent' | 'homePageOverview' | 'transactionListCurrent';
+export type CategoryFilterType = 'statisticsDefault' | 'statisticsCurrent' | 'homePageOverview' | 'transactionListCurrent' | 'custom';
 
-export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allowCategoryTypesStr?: string) {
+export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allowCategoryTypesStr?: string, selectedCategoryIds?: string[]) {
     const { tt } = useI18n();
 
     const settingsStore = useSettingsStore();
@@ -111,6 +111,8 @@ export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allo
 
             if (type === 'transactionListCurrent' && transactionsStore.allFilterCategoryIdsCount > 0) {
                 allCategoryIds[category.id] = true;
+            } else if (type === 'custom') {
+                allCategoryIds[category.id] = true;
             } else {
                 allCategoryIds[category.id] = false;
             }
@@ -138,12 +140,28 @@ export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allo
 
             filterCategoryIds.value = allCategoryIds;
             return true;
+        } else if (type === 'custom') {
+            if (selectedCategoryIds) {
+                for (const categoryId of selectedCategoryIds) {
+                    const category = transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
+
+                    if (category && (!category.subCategories || !category.subCategories.length)) {
+                        allCategoryIds[category.id] = false;
+                    } else if (category) {
+                        selectAllSubCategories(allCategoryIds, false, category);
+                    }
+                }
+            }
+
+            filterCategoryIds.value = allCategoryIds;
+            return true;
         } else {
             return false;
         }
     }
 
-    function saveFilterCategoryIds(): boolean {
+    function saveFilterCategoryIds(): [boolean, string[]] {
+        const selectedCategoryIds: string[] = [];
         const filteredCategoryIds: Record<string, boolean> = {};
         let isAllSelected = true;
         let finalCategoryIds = '';
@@ -165,6 +183,7 @@ export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allo
                 }
 
                 finalCategoryIds += categoryId;
+                selectedCategoryIds.push(categoryId);
             }
         }
 
@@ -187,7 +206,7 @@ export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allo
             }
         }
 
-        return changed;
+        return [changed, selectedCategoryIds];
     }
 
     return {

@@ -597,6 +597,11 @@ export interface TransactionListInMonthByPageRequest {
     readonly keyword: string;
 }
 
+export interface TransactionAllListRequest {
+    readonly startTime: number;
+    readonly endTime: number;
+}
+
 export interface TransactionReconciliationStatementRequest {
     readonly accountId: string;
     readonly startTime: number;
@@ -946,6 +951,27 @@ export interface TransactionAssetTrendsAnalysisDataAmount extends Record<string,
     readonly month: number;
     readonly day: number;
     readonly totalAmount: number;
+}
+
+export interface TransactionInsightDataItem extends TransactionInfoResponse {
+    readonly id: string;
+    readonly time: number;
+    readonly utcOffset: number;
+    readonly type: number;
+    readonly primaryCategory: TransactionCategoryInfoResponse;
+    readonly primaryCategoryName: string;
+    readonly secondaryCategory: TransactionCategoryInfoResponse;
+    readonly secondaryCategoryName: string;
+    readonly sourceAccount: AccountInfoResponse;
+    readonly sourceAccountName: string;
+    readonly destinationAccount?: AccountInfoResponse;
+    readonly destinationAccountName?: string;
+    readonly sourceAmount: number;
+    readonly destinationAmount: number;
+    readonly hideAmount: boolean;
+    readonly tags: TransactionTagInfoResponse[];
+    readonly comment: string;
+    readonly geoLocation?: TransactionGeoLocationResponse;
 }
 
 export type TransactionAmountsResponse = PartialRecord<TransactionAmountsRequestType, TransactionAmountsResponseItem>;

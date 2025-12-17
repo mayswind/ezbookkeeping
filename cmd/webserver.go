@@ -383,6 +383,7 @@ func startWebServer(c *core.CliContext) error {
 			apiV1Route.GET("/transactions/count.json", bindApi(api.Transactions.TransactionCountHandler))
 			apiV1Route.GET("/transactions/list.json", bindApi(api.Transactions.TransactionListHandler))
 			apiV1Route.GET("/transactions/list/by_month.json", bindApi(api.Transactions.TransactionMonthListHandler))
+			apiV1Route.GET("/transactions/list/all.json", bindApi(api.Transactions.TransactionListAllHandler))
 			apiV1Route.GET("/transactions/reconciliation_statements.json", bindApi(api.Transactions.TransactionReconciliationStatementHandler))
 			apiV1Route.GET("/transactions/statistics.json", bindApi(api.Transactions.TransactionStatisticsHandler))
 			apiV1Route.GET("/transactions/statistics/trends.json", bindApi(api.Transactions.TransactionStatisticsTrendsHandler))

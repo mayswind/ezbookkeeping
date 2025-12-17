@@ -21,7 +21,7 @@ export function* reversedItemAndIndex<T>(arr: T[]): Iterable<[T, number]> {
     }
 }
 
-export function* entries<K extends string | number | symbol, V>(obj: Record<K, V>): Iterable<[string, V]> {
+export function* entries<K extends string | number | symbol, V>(obj: Record<K, V> | PartialRecord<K, V>): Iterable<[string, V]> {
     for (const key in obj) {
         if (!Object.prototype.hasOwnProperty.call(obj, key)) {
             continue;
@@ -31,7 +31,7 @@ export function* entries<K extends string | number | symbol, V>(obj: Record<K, V
     }
 }
 
-export function* keys<K extends string | number | symbol, V>(obj: Record<K, V>): Iterable<string> {
+export function* keys<K extends string | number | symbol, V>(obj: Record<K, V> | PartialRecord<K, V>): Iterable<string> {
     for (const key in obj) {
         if (!Object.prototype.hasOwnProperty.call(obj, key)) {
             continue;
@@ -41,7 +41,7 @@ export function* keys<K extends string | number | symbol, V>(obj: Record<K, V>):
     }
 }
 
-export function* keysIfValueEquals<K extends string | number | symbol, V>(obj: Record<K, V>, value: V): Iterable<string> {
+export function* keysIfValueEquals<K extends string | number | symbol, V>(obj: Record<K, V> | PartialRecord<K, V>, value: V): Iterable<string> {
     for (const key in obj) {
         if (!Object.prototype.hasOwnProperty.call(obj, key)) {
             continue;
@@ -55,7 +55,7 @@ export function* keysIfValueEquals<K extends string | number | symbol, V>(obj: R
     }
 }
 
-export function* values<K extends string | number | symbol, V>(obj: Record<K, V>): Iterable<V> {
+export function* values<K extends string | number | symbol, V>(obj: Record<K, V> | PartialRecord<K, V>): Iterable<V> {
     for (const key in obj) {
         if (!Object.prototype.hasOwnProperty.call(obj, key)) {
             continue;

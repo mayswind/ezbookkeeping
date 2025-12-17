@@ -10,6 +10,7 @@ import {
     DEFAULT_TREND_CHART_DATA_RANGE,
     DEFAULT_ASSET_TRENDS_CHART_DATA_RANGE
 } from './statistics.ts';
+import { DEFAULT_TRANSACTION_EXPLORE_DATE_RANGE } from './explore.ts';
 import { DEFAULT_CURRENCY_CODE } from '@/consts/currency.ts';
 
 export type ApplicationSettingKey = string;
@@ -49,6 +50,9 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     autoSaveTransactionDraft: string;
     autoGetCurrentGeoLocation: boolean;
     alwaysShowTransactionPicturesInMobileTransactionEditPage: boolean;
+    // Insights & Explore Page
+    insightsExploreDefaultDateRangeType: number;
+    timezoneUsedForInsightsExplorePage: number;
     // Account List Page
     totalAmountExcludeAccountIds: Record<string, boolean>;
     // Exchange Rates Data Page
@@ -111,6 +115,9 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     'autoSaveTransactionDraft': UserApplicationCloudSettingType.String,
     'autoGetCurrentGeoLocation': UserApplicationCloudSettingType.Boolean,
     'alwaysShowTransactionPicturesInMobileTransactionEditPage': UserApplicationCloudSettingType.Boolean,
+    // Insights & Explore Page
+    'insightsExploreDefaultDateRangeType': UserApplicationCloudSettingType.Number,
+    'timezoneUsedForInsightsExplorePage': UserApplicationCloudSettingType.Number,
     // Account List Page
     'totalAmountExcludeAccountIds': UserApplicationCloudSettingType.StringBooleanMap,
     // Exchange Rates Data Page
@@ -158,6 +165,9 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     autoSaveTransactionDraft: 'disabled',
     autoGetCurrentGeoLocation: false,
     alwaysShowTransactionPicturesInMobileTransactionEditPage: false,
+    // Insights & Explore Page
+    insightsExploreDefaultDateRangeType: DEFAULT_TRANSACTION_EXPLORE_DATE_RANGE.type,
+    timezoneUsedForInsightsExplorePage: TimezoneTypeForStatistics.Default.type,
     // Account List Page
     totalAmountExcludeAccountIds: {},
     // Exchange Rates Data Page

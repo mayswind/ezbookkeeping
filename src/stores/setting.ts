@@ -245,6 +245,19 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('alwaysShowTransactionPicturesInMobileTransactionEditPage', value);
     }
 
+    // Insights & Explore Page
+    function setInsightsExploreDefaultDateRangeType(value: number): void {
+        updateApplicationSettingsValue('insightsExploreDefaultDateRangeType', value);
+        appSettings.value.insightsExploreDefaultDateRangeType = value;
+        updateUserApplicationCloudSettingValue('insightsExploreDefaultDateRangeType', value);
+    }
+
+    function setTimezoneUsedForInsightsExplorePage(value: number): void {
+        updateApplicationSettingsValue('timezoneUsedForInsightsExplorePage', value);
+        appSettings.value.timezoneUsedForInsightsExplorePage = value;
+        updateUserApplicationCloudSettingValue('timezoneUsedForInsightsExplorePage', value);
+    }
+
     // Account List Page
     function setTotalAmountExcludeAccountIds(value: Record<string, boolean>): void {
         updateApplicationSettingsValue('totalAmountExcludeAccountIds', value);
@@ -467,6 +480,9 @@ export const useSettingsStore = defineStore('settings', () => {
         setAutoSaveTransactionDraft,
         setAutoGetCurrentGeoLocation,
         setAlwaysShowTransactionPicturesInMobileTransactionEditPage,
+        // -- Insights & Explore Page
+        setInsightsExploreDefaultDateRangeType,
+        setTimezoneUsedForInsightsExplorePage,
         // -- Account List Page
         setTotalAmountExcludeAccountIds,
         // -- Exchange Rates Data Page

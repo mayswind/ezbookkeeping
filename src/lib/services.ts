@@ -69,6 +69,7 @@ import type {
     TransactionImportRequest,
     TransactionListByMaxTimeRequest,
     TransactionListInMonthByPageRequest,
+    TransactionAllListRequest,
     TransactionInfoResponse,
     TransactionInfoPageWrapperResponse,
     TransactionInfoPageWrapperResponse2,
@@ -491,6 +492,9 @@ export default {
         const amountFilter = encodeURIComponent(req.amountFilter);
         const keyword = encodeURIComponent(req.keyword);
         return axios.get<ApiResponse<TransactionInfoPageWrapperResponse2>>(`v1/transactions/list/by_month.json?year=${req.year}&month=${req.month}&type=${req.type}&category_ids=${req.categoryIds}&account_ids=${req.accountIds}&tag_filter=${tagFilter}&amount_filter=${amountFilter}&keyword=${keyword}&trim_account=true&trim_category=true&trim_tag=true`);
+    },
+    getAllTransactions: (req: TransactionAllListRequest): ApiResponsePromise<TransactionInfoResponse[]> => {
+        return axios.get<ApiResponse<TransactionInfoResponse[]>>(`v1/transactions/list/all.json?trim_account=true&trim_category=true&trim_tag=true&start_time=${req.startTime}&end_time=${req.endTime}`);
     },
     getReconciliationStatements: (req: TransactionReconciliationStatementRequest): ApiResponsePromise<TransactionReconciliationStatementResponse> => {
         return axios.get<ApiResponse<TransactionReconciliationStatementResponse>>(`v1/transactions/reconciliation_statements.json?account_id=${req.accountId}&start_time=${req.startTime}&end_time=${req.endTime}`);

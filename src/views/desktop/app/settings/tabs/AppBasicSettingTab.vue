@@ -225,6 +225,40 @@
         </v-col>
 
         <v-col cols="12">
+            <v-card :title="tt('Insights & Explore Page')">
+                <v-form>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :label="tt('Default Date Range')"
+                                    :placeholder="tt('Default Date Range')"
+                                    :items="allInsightsExploreDefaultDateRanges"
+                                    v-model="insightsExploreDefaultDateRangeType"
+                                />
+                            </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :label="tt('Timezone Used for Date Range')"
+                                    :placeholder="tt('Timezone Used for Date Range')"
+                                    :items="allTimezoneTypesUsedForStatistics"
+                                    v-model="timezoneUsedForInsightsExplorePage"
+                                />
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-form>
+            </v-card>
+        </v-col>
+
+        <v-col cols="12">
             <v-card :title="tt('Account List Page')">
                 <v-form>
                     <v-card-text>
@@ -305,9 +339,11 @@ import { useAppSettingPageBase } from '@/views/base/settings/AppSettingsPageBase
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
+import { useExploresStore } from '@/stores/explore.ts';
 
 import type { LocalizedSwitchOption } from '@/core/base.ts';
 import { ThemeType } from '@/core/theme.ts';
+import { type LocalizedDateRange, DateRangeScene } from '@/core/datetime.ts';
 import { CategoryType } from '@/core/category.ts';
 
 import { getSystemTheme } from '@/lib/ui/common.ts';
@@ -316,7 +352,7 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 
 const theme = useTheme();
 
-const { tt, getAllEnableDisableOptions } = useI18n();
+const { tt, getAllEnableDisableOptions, getAllDateRanges } = useI18n();
 const {
     loadingAccounts,
     loadingTransactionCategories,
@@ -347,6 +383,7 @@ const {
 const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
+const exploresStore = useExploresStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
@@ -355,6 +392,7 @@ const showTransactionCategoriesIncludedInHomePageOverviewDialog = ref<boolean>(f
 const showAccountsIncludedInTotalDialog = ref<boolean>(false);
 
 const enableDisableOptions = computed<LocalizedSwitchOption[]>(() => getAllEnableDisableOptions());
+const allInsightsExploreDefaultDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.InsightsExplore, false));
 
 const currentTheme = computed<string>({
     get: () => settingsStore.appSettings.theme,
@@ -374,6 +412,19 @@ const currentTheme = computed<string>({
 const showAddTransactionButtonInDesktopNavbar = computed<boolean>({
     get: () => settingsStore.appSettings.showAddTransactionButtonInDesktopNavbar,
     set: (value) => settingsStore.setShowAddTransactionButtonInDesktopNavbar(value)
+});
+
+const insightsExploreDefaultDateRangeType = computed<number>({
+    get: () => settingsStore.appSettings.insightsExploreDefaultDateRangeType,
+    set: (value) => settingsStore.setInsightsExploreDefaultDateRangeType(value)
+});
+
+const timezoneUsedForInsightsExplorePage = computed<number>({
+    get: () => settingsStore.appSettings.timezoneUsedForInsightsExplorePage,
+    set: (value: number) => {
+        settingsStore.setTimezoneUsedForInsightsExplorePage(value);
+        exploresStore.updateTransactionExploreInvalidState(true);
+    }
 });
 
 function init(): void {

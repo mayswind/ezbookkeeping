@@ -162,12 +162,13 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 
 const props = defineProps<{
     type: AccountFilterType;
+    selectedAccountIds?: string[];
     dialogMode?: boolean;
     autoSave?: boolean;
 }>();
 
 const emit = defineEmits<{
-    (e: 'settings:change', changed: boolean): void;
+    (e: 'settings:change', changed: boolean, selectedAccountIds?: string[]): void;
 }>();
 
 const { tt } = useI18n();
@@ -187,7 +188,7 @@ const {
     isAccountChecked,
     loadFilterAccountIds,
     saveFilterAccountIds
-} = useAccountFilterSettingPageBase(props.type);
+} = useAccountFilterSettingPageBase(props.type, props.selectedAccountIds);
 
 const accountsStore = useAccountsStore();
 
@@ -254,8 +255,8 @@ function selectInvertAccounts(): void {
 }
 
 function save(): void {
-    const changed = saveFilterAccountIds();
-    emit('settings:change', changed);
+    const [changed, selectedAccountIds] = saveFilterAccountIds();
+    emit('settings:change', changed, selectedAccountIds);
 }
 
 function cancel(): void {

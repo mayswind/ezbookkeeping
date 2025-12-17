@@ -18,6 +18,8 @@ import TransactionListPage from '@/views/desktop/transactions/ListPage.vue';
 
 import StatisticsTransactionPage from '@/views/desktop/statistics/TransactionPage.vue';
 
+import InsightsExplorePage from '@/views/desktop/insights/ExplorePage.vue';
+
 import AccountListPage from '@/views/desktop/accounts/ListPage.vue';
 
 import TransactionCategoryListPage from '@/views/desktop/categories/ListPage.vue';
@@ -134,6 +136,18 @@ const router = createRouter({
                         initSortingType: route.query['sortingType'],
                         initTrendDateAggregationType: route.query['trendDateAggregationType'],
                         initAssetTrendsDateAggregationType: route.query['assetTrendsDateAggregationType']
+                    })
+                },
+                {
+                    path: '/insights/explore',
+                    component: InsightsExplorePage,
+                    beforeEnter: checkLogin,
+                    props: route => ({
+                        initId: route.query['id'],
+                        initActiveTab: route.query['activeTab'],
+                        initDateRangeType: route.query['dateRangeType'],
+                        initStartTime: route.query['startTime'],
+                        initEndTime: route.query['endTime']
                     })
                 },
                 {

@@ -160,13 +160,14 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 
 const props = defineProps<{
     type: CategoryFilterType;
+    selectedCategoryIds?: string[];
     dialogMode?: boolean;
     autoSave?: boolean;
     categoryTypes?: string;
 }>();
 
 const emit = defineEmits<{
-    (e: 'settings:change', changed: boolean): void;
+    (e: 'settings:change', changed: boolean, selectedCategoryIds?: string[]): void;
 }>();
 
 const { tt } = useI18n();
@@ -186,7 +187,7 @@ const {
     getCategoryTypeName,
     loadFilterCategoryIds,
     saveFilterCategoryIds
-} = useCategoryFilterSettingPageBase(props.type, props.categoryTypes);
+} = useCategoryFilterSettingPageBase(props.type, props.categoryTypes, props.selectedCategoryIds);
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
 
@@ -261,8 +262,8 @@ function selectInvertCategories(): void {
 }
 
 function save(): void {
-    const changed = saveFilterCategoryIds();
-    emit('settings:change', changed);
+    const [changed, selectedCategoryIds] = saveFilterCategoryIds();
+    emit('settings:change', changed, selectedCategoryIds);
 }
 
 function cancel(): void {

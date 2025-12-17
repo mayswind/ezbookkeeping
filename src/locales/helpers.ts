@@ -144,6 +144,11 @@ import {
 } from '@/core/statistics.ts';
 
 import {
+    TransactionExploreConditionField,
+    TransactionExploreConditionOperator
+} from '@/core/explore.ts';
+
+import {
     type LocalizedImportFileCategoryAndTypes,
     type LocalizedImportFileType,
     type LocalizedImportFileTypeSubType,
@@ -547,6 +552,19 @@ export function useI18n() {
             ret.push({
                 type: typeAndName.type,
                 displayName: t(typeAndName.name)
+            });
+        }
+
+        return ret;
+    }
+
+    function getLocalizedNameValue(nameValues: NameValue[]): NameValue[] {
+        const ret: NameValue[] = [];
+
+        for (const nameValue of nameValues) {
+            ret.push({
+                name: t(nameValue.name),
+                value: nameValue.value
             });
         }
 
@@ -2366,6 +2384,8 @@ export function useI18n() {
         getAllTransactionDefaultCategories,
         getAllDisplayExchangeRates,
         getAllSupportedImportFileCagtegoryAndTypes,
+        getAllTransactionExploreConditionFields: () => getLocalizedNameValue(TransactionExploreConditionField.values()),
+        getAllTransactionExploreConditionOperators: (operators?: TransactionExploreConditionOperator[]) => getLocalizedNameValue(operators ?? TransactionExploreConditionOperator.values()),
         // get localized info
         getLanguageInfo,
         getMonthShortName,

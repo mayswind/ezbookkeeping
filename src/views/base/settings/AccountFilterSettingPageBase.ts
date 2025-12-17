@@ -15,9 +15,9 @@ import {
     isAccountOrSubAccountsAllChecked
 } from '@/lib/account.ts';
 
-export type AccountFilterType = 'statisticsDefault' | 'statisticsCurrent' | 'homePageOverview' | 'transactionListCurrent' | 'accountListTotalAmount';
+export type AccountFilterType = 'statisticsDefault' | 'statisticsCurrent' | 'homePageOverview' | 'transactionListCurrent' | 'accountListTotalAmount' | 'custom';
 
-export function useAccountFilterSettingPageBase(type?: AccountFilterType) {
+export function useAccountFilterSettingPageBase(type?: AccountFilterType, selectedAccountIds?: string[]) {
     const settingsStore = useSettingsStore();
     const accountsStore = useAccountsStore();
     const transactionsStore = useTransactionsStore();
@@ -46,7 +46,7 @@ export function useAccountFilterSettingPageBase(type?: AccountFilterType) {
     });
 
     const allowHiddenAccount = computed<boolean>(() => {
-        return type === 'statisticsDefault' || type === 'statisticsCurrent' || type === 'homePageOverview' || type === 'transactionListCurrent';
+        return type === 'statisticsDefault' || type === 'statisticsCurrent' || type === 'homePageOverview' || type === 'transactionListCurrent' || type === 'custom';
     });
 
     const allCategorizedAccounts = computed<Record<number, CategorizedAccount>>(() => filterCategorizedAccounts(accountsStore.allCategorizedAccountsMap, filterContent.value, showHidden.value));
@@ -92,6 +92,8 @@ export function useAccountFilterSettingPageBase(type?: AccountFilterType) {
 
             if (type === 'transactionListCurrent' && transactionsStore.allFilterAccountIdsCount > 0) {
                 allAccountIds[account.id] = true;
+            } else if (type === 'custom') {
+                allAccountIds[account.id] = true;
             } else {
                 allAccountIds[account.id] = false;
             }
@@ -119,12 +121,26 @@ export function useAccountFilterSettingPageBase(type?: AccountFilterType) {
         } else if (type === 'accountListTotalAmount') {
             filterAccountIds.value = Object.assign(allAccountIds, settingsStore.appSettings.totalAmountExcludeAccountIds);
             return true;
+        } else if (type === 'custom') {
+            if (selectedAccountIds) {
+                for (const accountId of selectedAccountIds) {
+                    const account = accountsStore.allAccountsMap[accountId];
+
+                    if (account) {
+                        selectAccountOrSubAccounts(allAccountIds, account, false);
+                    }
+                }
+            }
+
+            filterAccountIds.value = allAccountIds;
+            return true;
         } else {
             return false;
         }
     }
 
-    function saveFilterAccountIds(): boolean {
+    function saveFilterAccountIds(): [boolean, string[]] {
+        const selectedAccountIds: string[] = [];
         const filteredAccountIds: Record<string, boolean> = {};
         let isAllSelected = true;
         let finalAccountIds = '';
@@ -150,6 +166,7 @@ export function useAccountFilterSettingPageBase(type?: AccountFilterType) {
                 }
 
                 finalAccountIds += accountId;
+                selectedAccountIds.push(accountId);
             }
         }
 
@@ -174,7 +191,7 @@ export function useAccountFilterSettingPageBase(type?: AccountFilterType) {
             settingsStore.setTotalAmountExcludeAccountIds(filteredAccountIds);
         }
 
-        return changed;
+        return [changed, selectedAccountIds];
     }
 
     return {

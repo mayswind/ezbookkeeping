@@ -51,6 +51,13 @@ export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingI
         ]
     },
     {
+        categoryName: 'Insights & Explore Page',
+        items: [
+            { settingKey: 'insightsExploreDefaultDateRangeType', settingName: 'Default Date Range', mobile: false, desktop: true },
+            { settingKey: 'timezoneUsedForInsightsExplorePage', settingName: 'Timezone Used for Date Range', mobile: false, desktop: true },
+        ]
+    },
+    {
         categoryName: 'Account List Page',
         items: [
             { settingKey: 'totalAmountExcludeAccountIds', settingName: 'Accounts Included in Total', mobile: true, desktop: true },

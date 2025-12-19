@@ -16,6 +16,7 @@
                     <span class="text-subtitle-1">{{ tt('Query') }} {{ `#${queryIndex + 1}` }}</span>
                     <v-spacer />
                     <v-switch class="bidirectional-switch ms-2" color="secondary"
+                              :disabled="!query.conditions || query.conditions.length < 1"
                               :label="tt('Expression')"
                               v-model="showExpression"
                               @click="showExpression = !showExpression">
@@ -40,7 +41,7 @@
                                 {{ tt('No conditions defined. All transactions will match.') }}
                             </div>
 
-                            <div v-if="!showExpression">
+                            <div v-else-if="query.conditions && query.conditions.length > 0 && !showExpression">
                                 <div :key="conditionIndex" v-for="(conditionWithRelation, conditionIndex) in query.conditions">
                                     <div class="d-flex align-center gap-2 mb-4">
                                         <v-select
@@ -268,7 +269,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-else-if="showExpression">
+                            <div v-else-if="query.conditions && query.conditions.length > 0 && showExpression">
                                 <div class="w-100 code-container">
                                     <v-textarea class="w-100 always-cursor-text mb-4" :readonly="true"
                                                 :value="getExpression(queryIndex)"></v-textarea>
@@ -592,7 +593,7 @@ function updateTransactionCategories(changed: boolean, selectedCategoryIds?: str
 function getExpression(queryIndex: number): string {
     const query = queries.value[queryIndex];
 
-    if (!query) {
+    if (!query || !query.conditions || query.conditions.length < 1) {
         return '';
     }
 

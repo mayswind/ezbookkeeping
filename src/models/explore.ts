@@ -105,6 +105,10 @@ export class TransactionExploreQuery {
     }
 
     public toExpression(allCategoriesMap: Record<string, TransactionCategory>, allAccountsMap: Record<string, Account>, allTagsMap: Record<string, TransactionTag>): string {
+        if (!this.conditions || this.conditions.length < 1) {
+            return '';
+        }
+
         const postfixExprTokens = this.getPostfixExprTokens();
         const stack: ExpressionNode[] = [];
 

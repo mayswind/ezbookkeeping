@@ -135,6 +135,16 @@ input[type=number] {
     color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
 }
 
+.text-field-truncate.v-text-field {
+    .v-input__control {
+        .v-field__field {
+            > input.v-field__input {
+                text-overflow: ellipsis !important;
+            }
+        }
+    }
+}
+
 .chart-pointer {
     display: inline-block;
     margin-inline-end: 5px;

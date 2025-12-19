@@ -43,7 +43,7 @@
 
                             <div v-else-if="query.conditions && query.conditions.length > 0 && !showExpression">
                                 <div :key="conditionIndex" v-for="(conditionWithRelation, conditionIndex) in query.conditions">
-                                    <div class="d-flex align-center gap-2 mb-4">
+                                    <div class="d-flex overflow-x-auto align-center gap-2 mb-4">
                                         <v-select
                                             disabled
                                             class="flex-0-0"
@@ -92,7 +92,7 @@
                                             v-model="conditionWithRelation.condition.operator"
                                         />
 
-                                        <div class="d-flex w-100 flex-1-1">
+                                        <div class="d-flex w-100 flex-1-1" style="min-width: 280px;">
                                             <v-select
                                                 multiple chips closable-chips
                                                 density="compact"
@@ -120,7 +120,7 @@
                                             </v-select>
 
                                             <v-text-field
-                                                class="always-cursor-pointer"
+                                                class="always-cursor-pointer text-field-truncate"
                                                 density="compact"
                                                 item-title="displayName"
                                                 item-value="type"
@@ -134,7 +134,7 @@
                                             />
 
                                             <v-text-field
-                                                class="always-cursor-pointer"
+                                                class="always-cursor-pointer text-field-truncate"
                                                 density="compact"
                                                 item-title="displayName"
                                                 item-value="type"
@@ -148,7 +148,7 @@
                                             />
 
                                             <v-text-field
-                                                class="always-cursor-pointer"
+                                                class="always-cursor-pointer text-field-truncate"
                                                 density="compact"
                                                 item-title="displayName"
                                                 item-value="type"

@@ -202,10 +202,15 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
+import { entries } from '@/core/base.ts';
 import { type NumeralSystem } from '@/core/numeral.ts';
 import { DateRange } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { type TransactionMonthlyIncomeAndExpenseData, LATEST_12MONTHS_TRANSACTION_AMOUNTS_REQUEST_TYPES } from '@/models/transaction.ts';
+import {
+    type TransactionAmountsRequestType,
+    type TransactionMonthlyIncomeAndExpenseData,
+    LATEST_12MONTHS_TRANSACTION_AMOUNTS_REQUEST_TYPES
+} from '@/models/transaction.ts';
 
 import { getUnixTimeBeforeUnixTime, getUnixTimeAfterUnixTime } from '@/lib/datetime.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
@@ -275,27 +280,25 @@ const monthlyIncomeAndExpenseData = computed<TransactionMonthlyIncomeAndExpenseD
         return data;
     }
 
-    LATEST_12MONTHS_TRANSACTION_AMOUNTS_REQUEST_TYPES.forEach(amountRequestType => {
-        if (!Object.prototype.hasOwnProperty.call(transactionOverview.value, amountRequestType)) {
-            return;
-        }
-
+    for (const [type, monthDiff] of entries(LATEST_12MONTHS_TRANSACTION_AMOUNTS_REQUEST_TYPES)) {
+        const amountRequestType = type as TransactionAmountsRequestType;
         const dateRange = overviewStore.transactionDataRange[amountRequestType];
 
         if (!dateRange) {
-            return;
+            continue;
         }
 
         const item = transactionOverview.value[amountRequestType];
 
         data.push({
             monthStartTime: dateRange.startTime,
+            monthsBeforeCurrentMonth: monthDiff,
             incomeAmount: item?.incomeAmount || 0,
             expenseAmount: item?.expenseAmount || 0,
             incompleteIncomeAmount: item ? item.incompleteIncomeAmount : true,
             incompleteExpenseAmount: item ? item.incompleteExpenseAmount : true
         });
-    });
+    }
 
     return data;
 });

@@ -264,6 +264,7 @@ export function useI18nUIComponents() {
 
         const confirmButton: Dialog.DialogButton = {
             text: tt('OK'),
+            strong: true,
             onClick: confirmCallback
         };
 
@@ -292,6 +293,7 @@ export function useI18nUIComponents() {
 
         const confirmButton: Dialog.DialogButton = {
             text: tt('OK'),
+            strong: true,
             onClick: (dialog, event) => {
                 if (confirmCallback) {
                     const inputValue = dialog.$el.find('.dialog-input').val();
@@ -351,6 +353,7 @@ export function useI18nUIComponents() {
 
         const confirmButton: Dialog.DialogButton = {
             text: tt('OK'),
+            strong: true,
             onClick: () => {
                 window.open(url, '_blank');
             }

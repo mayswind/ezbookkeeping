@@ -89,6 +89,10 @@ export function getTheme(): string {
     return getApplicationSettings().theme;
 }
 
+export function getTimeZone(): string {
+    return getApplicationSettings().timeZone;
+}
+
 export function isEnableApplicationLock(): boolean {
     return getApplicationSettings().applicationLock;
 }

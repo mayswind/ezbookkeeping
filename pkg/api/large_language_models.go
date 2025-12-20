@@ -47,14 +47,13 @@ func (a *LargeLanguageModelsApi) RecognizeReceiptImageHandler(c *core.WebContext
 		return nil, errs.ErrLargeLanguageModelProviderNotEnabled
 	}
 
-	utcOffset, err := c.GetClientTimezoneOffset()
+	clientTimezone, utcOffset, err := c.GetClientTimezone()
 
 	if err != nil {
-		log.Warnf(c, "[large_language_models.RecognizeReceiptImageHandler] cannot get client timezone offset, because %s", err.Error())
+		log.Warnf(c, "[large_language_models.RecognizeReceiptImageHandler] cannot get client timezone, because %s", err.Error())
 		return nil, errs.ErrClientTimezoneOffsetInvalid
 	}
 
-	timezone := time.FixedZone("Client Timezone", int(utcOffset)*60)
 	uid := c.GetCurrentUid()
 	user, err := a.users.GetUserById(c, uid)
 
@@ -197,7 +196,7 @@ func (a *LargeLanguageModelsApi) RecognizeReceiptImageHandler(c *core.WebContext
 	}
 
 	systemPromptParams := map[string]any{
-		"CurrentDateTime":          utils.FormatUnixTimeToLongDateTime(time.Now().Unix(), timezone),
+		"CurrentDateTime":          utils.FormatUnixTimeToLongDateTime(time.Now().Unix(), clientTimezone),
 		"AllExpenseCategoryNames":  strings.Join(expenseCategoryNames, "\n"),
 		"AllIncomeCategoryNames":   strings.Join(incomeCategoryNames, "\n"),
 		"AllTransferCategoryNames": strings.Join(transferCategoryNames, "\n"),

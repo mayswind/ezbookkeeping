@@ -4,6 +4,7 @@ import (
 	"net"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -24,6 +25,9 @@ const RemoteClientPortHeader = "X-Real-Port"
 
 // ClientTimezoneOffsetHeaderName represents the header name of client timezone offset
 const ClientTimezoneOffsetHeaderName = "X-Timezone-Offset"
+
+// ClientTimezoneNameHeaderName represents the header name of client timezone name
+const ClientTimezoneNameHeaderName = "X-Timezone-Name"
 
 const tokenHeaderName = "Authorization"
 const tokenHeaderValuePrefix = "bearer "
@@ -183,16 +187,24 @@ func (c *WebContext) GetClientLocale() string {
 	return value
 }
 
-// GetClientTimezoneOffset returns the client timezone offset
-func (c *WebContext) GetClientTimezoneOffset() (int16, error) {
-	value := c.GetHeader(ClientTimezoneOffsetHeaderName)
-	offset, err := strconv.Atoi(value)
+func (c *WebContext) GetClientTimezone() (*time.Location, int16, error) {
+	utcOffset, err := c.getClientTimezoneOffset()
 
 	if err != nil {
-		return 0, err
+		return nil, 0, err
 	}
 
-	return int16(offset), nil
+	timezoneName := c.getClientTimezoneName()
+
+	if timezoneName != "" {
+		location, err := time.LoadLocation(timezoneName)
+
+		if err == nil && location != nil {
+			return location, utcOffset, nil
+		}
+	}
+
+	return time.FixedZone("Client Fixed Timezone", int(utcOffset)*60), utcOffset, nil
 }
 
 // SetResponseError sets the response error
@@ -209,6 +221,25 @@ func (c *WebContext) GetResponseError() *errs.Error {
 	}
 
 	return err.(*errs.Error)
+}
+
+// GetClientTimezoneOffset returns the client timezone offset
+func (c *WebContext) getClientTimezoneOffset() (int16, error) {
+	value := c.GetHeader(ClientTimezoneOffsetHeaderName)
+	offset, err := strconv.Atoi(value)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return int16(offset), nil
+}
+
+// GetClientTimezoneName returns the client timezone name
+func (c *WebContext) getClientTimezoneName() string {
+	value := c.GetHeader(ClientTimezoneNameHeaderName)
+
+	return value
 }
 
 // WrapWebContext returns a context wrapped by this file

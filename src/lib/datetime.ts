@@ -521,6 +521,10 @@ export function getBrowserTimezoneOffsetMinutes(): number {
     return -new Date().getTimezoneOffset();
 }
 
+export function guessTimezoneName(): string {
+    return moment.tz.guess(true);
+}
+
 export function getLocalDatetimeFromUnixTime(unixTime: number): Date {
     return new Date(unixTime * 1000);
 }

@@ -302,13 +302,11 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 		return nil, "", errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	timezone := time.Local
-	utcOffset, err := c.GetClientTimezoneOffset()
+	timezone, _, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[data_managements.getExportedFileContent] cannot get client timezone offset, because %s", err.Error())
-	} else {
-		timezone = time.FixedZone("Client Timezone", int(utcOffset)*60)
+		timezone = time.Local
 	}
 
 	uid := c.GetCurrentUid()

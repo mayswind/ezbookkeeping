@@ -150,7 +150,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	utcOffset, err := c.GetClientTimezoneOffset()
+	_, utcOffset, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[accounts.AccountCreateHandler] cannot get client timezone offset, because %s", err.Error())
@@ -315,7 +315,7 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 		return nil, errs.ErrAccountIdInvalid
 	}
 
-	utcOffset, err := c.GetClientTimezoneOffset()
+	_, utcOffset, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[accounts.AccountModifyHandler] cannot get client timezone offset, because %s", err.Error())

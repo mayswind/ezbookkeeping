@@ -168,12 +168,18 @@ import {
     objectFieldWithValueToArrayItem
 } from './common.ts';
 import {
+    getTimeZone
+} from './settings.ts';
+import {
     getGoogleMapAPIKey,
     getBaiduMapAK,
     getAmapApplicationKey,
     getExchangeRatesRequestTimeout
 } from './server_settings.ts';
-import { getTimezoneOffsetMinutes } from './datetime.ts';
+import {
+    getTimezoneOffsetMinutes,
+    guessTimezoneName
+} from './datetime.ts';
 import { generateRandomUUID } from './misc.ts';
 import { getBasePath } from './web.ts';
 import logger from './logger.ts';
@@ -203,6 +209,14 @@ axios.interceptors.request.use((config: ApiRequestConfig) => {
     }
 
     config.headers['X-Timezone-Offset'] = getTimezoneOffsetMinutes();
+
+    let timezoneName = getTimeZone();
+
+    if (!timezoneName || timezoneName.trim().length < 1) {
+        timezoneName = guessTimezoneName();
+    }
+
+    config.headers['X-Timezone-Name'] = timezoneName;
 
     if (needBlockRequest && !config.ignoreBlocked) {
         return new Promise(resolve => {

@@ -198,12 +198,11 @@ func (s *TransactionService) GetAllTransactionsInOneAccountWithAccountBalanceByM
 }
 
 // GetAllAccountsDailyOpeningAndClosingBalance returns daily opening and closing balance of all accounts within time range
-func (s *TransactionService) GetAllAccountsDailyOpeningAndClosingBalance(c core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, utcOffset int16) (map[int32][]*models.TransactionWithAccountBalance, error) {
+func (s *TransactionService) GetAllAccountsDailyOpeningAndClosingBalance(c core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, clientTimezone *time.Location) (map[int32][]*models.TransactionWithAccountBalance, error) {
 	if maxTransactionTime <= 0 {
 		maxTransactionTime = utils.GetMaxTransactionTimeFromUnixTime(time.Now().Unix())
 	}
 
-	clientLocation := time.FixedZone("Client Timezone", int(utcOffset)*60)
 	var allTransactions []*models.Transaction
 
 	for maxTransactionTime > 0 {
@@ -260,7 +259,7 @@ func (s *TransactionService) GetAllAccountsDailyOpeningAndClosingBalance(c core.
 			continue
 		}
 
-		yearMonthDay := utils.FormatUnixTimeToNumericYearMonthDay(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime), clientLocation)
+		yearMonthDay := utils.FormatUnixTimeToNumericYearMonthDay(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime), clientTimezone)
 		groupKey := fmt.Sprintf("%d_%d", yearMonthDay, transaction.AccountId)
 		dailyAccountBalance, exists := accountDailyLastBalances[groupKey]
 
@@ -284,7 +283,7 @@ func (s *TransactionService) GetAllAccountsDailyOpeningAndClosingBalance(c core.
 		firstTransactionTime = minTransactionTime
 	}
 
-	firstYearMonthDay := utils.FormatUnixTimeToNumericYearMonthDay(utils.GetUnixTimeFromTransactionTime(firstTransactionTime), clientLocation)
+	firstYearMonthDay := utils.FormatUnixTimeToNumericYearMonthDay(utils.GetUnixTimeFromTransactionTime(firstTransactionTime), clientTimezone)
 
 	// fill in the opening balance for accounts that do not have transactions on the first day
 	for accountId, accumulatedBalance := range accumulatedBalancesBeforeStartTime {
@@ -1798,14 +1797,13 @@ func (s *TransactionService) GetRelatedTransferTransaction(originalTransaction *
 }
 
 // GetAccountsTotalIncomeAndExpense returns the every accounts total income and expense amount by specific date range
-func (s *TransactionService) GetAccountsTotalIncomeAndExpense(c core.Context, uid int64, startUnixTime int64, endUnixTime int64, excludeAccountIds []int64, excludeCategoryIds []int64, utcOffset int16, useTransactionTimezone bool) (map[int64]int64, map[int64]int64, error) {
+func (s *TransactionService) GetAccountsTotalIncomeAndExpense(c core.Context, uid int64, startUnixTime int64, endUnixTime int64, excludeAccountIds []int64, excludeCategoryIds []int64, utcOffset int16, clientTimezone *time.Location, useTransactionTimezone bool) (map[int64]int64, map[int64]int64, error) {
 	if uid <= 0 {
 		return nil, nil, errs.ErrUserIdInvalid
 	}
 
-	clientLocation := time.FixedZone("Client Timezone", int(utcOffset)*60)
-	startLocalDateTime := utils.FormatUnixTimeToNumericLocalDateTime(startUnixTime, clientLocation)
-	endLocalDateTime := utils.FormatUnixTimeToNumericLocalDateTime(endUnixTime, clientLocation)
+	startLocalDateTime := utils.FormatUnixTimeToNumericLocalDateTime(startUnixTime, clientTimezone)
+	endLocalDateTime := utils.FormatUnixTimeToNumericLocalDateTime(endUnixTime, clientTimezone)
 
 	startUnixTime = utils.GetMinUnixTimeWithSameLocalDateTime(startUnixTime, utcOffset)
 	endUnixTime = utils.GetMaxUnixTimeWithSameLocalDateTime(endUnixTime, utcOffset)
@@ -1889,7 +1887,7 @@ func (s *TransactionService) GetAccountsTotalIncomeAndExpense(c core.Context, ui
 
 	for i := 0; i < len(allTransactions); i++ {
 		transaction := allTransactions[i]
-		timeZone := clientLocation
+		timeZone := clientTimezone
 
 		if useTransactionTimezone {
 			timeZone = time.FixedZone("Transaction Timezone", int(transaction.TimezoneUtcOffset)*60)
@@ -1923,22 +1921,21 @@ func (s *TransactionService) GetAccountsTotalIncomeAndExpense(c core.Context, ui
 }
 
 // GetAccountsAndCategoriesTotalInflowAndOutflow returns the every accounts and categories total inflows and outflows amount by specific date range
-func (s *TransactionService) GetAccountsAndCategoriesTotalInflowAndOutflow(c core.Context, uid int64, startUnixTime int64, endUnixTime int64, tagFilters []*models.TransactionTagFilter, noTags bool, keyword string, utcOffset int16, useTransactionTimezone bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetAccountsAndCategoriesTotalInflowAndOutflow(c core.Context, uid int64, startUnixTime int64, endUnixTime int64, tagFilters []*models.TransactionTagFilter, noTags bool, keyword string, utcOffset int16, clientTimezone *time.Location, useTransactionTimezone bool) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
 
-	clientLocation := time.FixedZone("Client Timezone", int(utcOffset)*60)
 	var startLocalDateTime, endLocalDateTime, startTransactionTime, endTransactionTime int64
 
 	if startUnixTime > 0 {
-		startLocalDateTime = utils.FormatUnixTimeToNumericLocalDateTime(startUnixTime, clientLocation)
+		startLocalDateTime = utils.FormatUnixTimeToNumericLocalDateTime(startUnixTime, clientTimezone)
 		startUnixTime = utils.GetMinUnixTimeWithSameLocalDateTime(startUnixTime, utcOffset)
 		startTransactionTime = utils.GetMinTransactionTimeFromUnixTime(startUnixTime)
 	}
 
 	if endUnixTime > 0 {
-		endLocalDateTime = utils.FormatUnixTimeToNumericLocalDateTime(endUnixTime, clientLocation)
+		endLocalDateTime = utils.FormatUnixTimeToNumericLocalDateTime(endUnixTime, clientTimezone)
 		endUnixTime = utils.GetMaxUnixTimeWithSameLocalDateTime(endUnixTime, utcOffset)
 		endTransactionTime = utils.GetMaxTransactionTimeFromUnixTime(endUnixTime)
 	}
@@ -2001,7 +1998,7 @@ func (s *TransactionService) GetAccountsAndCategoriesTotalInflowAndOutflow(c cor
 
 	for i := 0; i < len(allTransactions); i++ {
 		transaction := allTransactions[i]
-		timeZone := clientLocation
+		timeZone := clientTimezone
 
 		if useTransactionTimezone {
 			timeZone = time.FixedZone("Transaction Timezone", int(transaction.TimezoneUtcOffset)*60)
@@ -2046,12 +2043,11 @@ func (s *TransactionService) GetAccountsAndCategoriesTotalInflowAndOutflow(c cor
 }
 
 // GetAccountsAndCategoriesMonthlyInflowAndOutflow returns the every accounts monthly inflows and outflows amount by specific date range
-func (s *TransactionService) GetAccountsAndCategoriesMonthlyInflowAndOutflow(c core.Context, uid int64, startYear int32, startMonth int32, endYear int32, endMonth int32, tagFilters []*models.TransactionTagFilter, noTags bool, keyword string, utcOffset int16, useTransactionTimezone bool) (map[int32][]*models.Transaction, error) {
+func (s *TransactionService) GetAccountsAndCategoriesMonthlyInflowAndOutflow(c core.Context, uid int64, startYear int32, startMonth int32, endYear int32, endMonth int32, tagFilters []*models.TransactionTagFilter, noTags bool, keyword string, clientTimezone *time.Location, useTransactionTimezone bool) (map[int32][]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
 
-	clientLocation := time.FixedZone("Client Timezone", int(utcOffset)*60)
 	var startTransactionTime, endTransactionTime int64
 	var err error
 
@@ -2132,7 +2128,7 @@ func (s *TransactionService) GetAccountsAndCategoriesMonthlyInflowAndOutflow(c c
 
 	for i := 0; i < len(allTransactions); i++ {
 		transaction := allTransactions[i]
-		timeZone := clientLocation
+		timeZone := clientTimezone
 
 		if useTransactionTimezone {
 			timeZone = time.FixedZone("Transaction Timezone", int(transaction.TimezoneUtcOffset)*60)

@@ -39,11 +39,18 @@
             <f7-list-item :title="tt('Text Size')" link="/settings/textsize"></f7-list-item>
 
             <f7-list-item
+                class="item-truncate-after-text"
                 link="#"
-                :title="tt('Timezone')"
-                :after="currentTimezoneName"
                 @click="showTimezonePopup = true"
             >
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Timezone') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    {{ currentTimezoneName }}
+                </template>
                 <list-item-selection-popup value-type="item"
                                            key-field="name" value-field="name"
                                            title-field="displayNameWithUtcOffset"

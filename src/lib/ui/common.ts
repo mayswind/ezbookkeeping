@@ -7,6 +7,59 @@ import { KnownFileType } from '@/core/file.ts';
 
 import logger from '../logger.ts';
 
+export function scrollToSelectedItem(parentEl: Element | null | undefined, containerSelector: string | null, scrollableListSelector: string | null, selectedItemSelector: string): void {
+    if (!parentEl) {
+        return;
+    }
+
+    const container = containerSelector ? parentEl.querySelector<HTMLElement>(containerSelector) : parentEl;
+
+    if (!container) {
+        return;
+    }
+
+    const scrollableList = scrollableListSelector ? parentEl.querySelector<HTMLElement>(scrollableListSelector) : parentEl;
+
+    if (!scrollableList) {
+        return;
+    }
+
+    const selectedItems = scrollableList.querySelectorAll<HTMLElement>(selectedItemSelector);
+
+    if (!selectedItems.length) {
+        return;
+    }
+
+    const containerHeight: number = container.clientHeight;
+
+    const firstSelectedItem: HTMLElement = selectedItems[0] as HTMLElement;
+    const lastSelectedItem: HTMLElement = selectedItems[selectedItems.length - 1] as HTMLElement;
+
+    const firstSelectedItemHeight: number = firstSelectedItem.offsetHeight;
+    const firstSelectedItemTop: number = firstSelectedItem.offsetTop;
+    const lastSelectedItemTop: number = lastSelectedItem.offsetTop;
+    const lastSelectedItemBottom: number = lastSelectedItem.offsetTop + lastSelectedItem.offsetHeight;
+
+    const middle: number = (firstSelectedItemTop + lastSelectedItemBottom) / 2;
+    let targetScrollTop: number = middle - containerHeight / 2;
+
+    if (containerSelector !== scrollableListSelector) {
+        const scrollableListStyle = window.getComputedStyle(scrollableList);
+        const paddingTop: number = parseFloat(scrollableListStyle.paddingTop) || 0;
+        targetScrollTop += paddingTop / 3 * 2;
+
+        if (selectedItems.length > 1 && lastSelectedItemTop - firstSelectedItemTop > containerHeight - firstSelectedItemHeight - paddingTop) {
+            targetScrollTop = firstSelectedItemTop;
+        }
+    } else {
+        if (selectedItems.length > 1 && lastSelectedItemTop - firstSelectedItemTop > containerHeight - firstSelectedItemHeight) {
+            targetScrollTop = firstSelectedItemTop;
+        }
+    }
+
+    scrollableList.scrollTop = Math.max(0, targetScrollTop);
+}
+
 export function getSystemTheme(): ThemeType {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         return ThemeType.Dark;

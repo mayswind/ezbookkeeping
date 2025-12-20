@@ -135,6 +135,8 @@ i.icon.la, i.icon.las, i.icon.lab {
 }
 
 .ios .popover-inner {
+    touch-action: inherit;
+
     > :not(.list) {
         display: none;
     }
@@ -222,10 +224,6 @@ i.icon.la, i.icon.las, i.icon.lab {
 
 .lang-popover-menu .popover-inner {
     max-height: 350px;
-
-    > .list {
-        overflow-y: auto;
-    }
 }
 
 .lang-popover-menu .popover-inner .item-title {

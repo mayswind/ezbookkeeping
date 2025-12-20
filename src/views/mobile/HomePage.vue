@@ -440,9 +440,6 @@ init();
 
 .template-popover-menu .popover-inner {
     max-height: 400px;
-
-    > .list {
-        overflow-y: auto;
-    }
+    overflow-y: auto;
 }
 </style>

@@ -75,7 +75,8 @@ import type { Sheet, Searchbar } from 'framework7/types';
 import { useI18n } from '@/locales/helpers.ts';
 import { type CommonTwoColumnListItemSelectionProps, useTwoColumnListItemSelectionBase } from '@/components/base/TwoColumnListItemSelectionBase.ts';
 
-import { type Framework7Dom, scrollToSelectedItem, scrollSheetToTop } from '@/lib/ui/mobile.ts';
+import { scrollToSelectedItem } from '@/lib/ui/common.ts';
+import { type Framework7Dom, scrollSheetToTop } from '@/lib/ui/mobile.ts';
 
 interface MobileTwoColumnListItemSelectionProps extends CommonTwoColumnListItemSelectionProps {
     show: boolean;
@@ -135,8 +136,8 @@ function onSearchBarFocus(): void {
 function onSheetOpen(event: { $el: Framework7Dom }): void {
     currentPrimaryValue.value = getCurrentPrimaryValueBySecondaryValue(props.modelValue);
     currentSecondaryValue.value = props.modelValue;
-    scrollToSelectedItem(event.$el, '.primary-list-container', 'li.primary-list-item-selected');
-    scrollToSelectedItem(event.$el, '.secondary-list-container', 'li.secondary-list-item-selected');
+    scrollToSelectedItem(event.$el[0], '.primary-list-container', '.primary-list-container', 'li.primary-list-item-selected');
+    scrollToSelectedItem(event.$el[0], '.secondary-list-container', '.secondary-list-container', 'li.secondary-list-item-selected');
 }
 
 function onSheetClosed(): void {

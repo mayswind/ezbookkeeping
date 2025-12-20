@@ -50,7 +50,7 @@ import type { ColorValue, ColorInfo } from '@/core/color.ts';
 
 import { arrayContainsFieldValue } from '@/lib/common.ts';
 import { getColorsInRows, getDisplayColor } from '@/lib/color.ts';
-import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';
+import { scrollToSelectedItem } from '@/lib/ui/common.ts';
 
 import {
     mdiSquareRounded,
@@ -90,7 +90,7 @@ function onMenuStateChanged(state: boolean): void {
     if (state) {
         nextTick(() => {
             if (dropdownMenu.value && dropdownMenu.value.parentElement) {
-                scrollToSelectedItem(dropdownMenu.value.parentElement, null, '.row-has-selected-item');
+                scrollToSelectedItem(dropdownMenu.value.parentElement, null, null, '.row-has-selected-item');
             }
         });
     }

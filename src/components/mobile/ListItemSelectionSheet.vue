@@ -36,7 +36,8 @@ import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-import { type Framework7Dom, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
+import { scrollToSelectedItem } from '@/lib/ui/common.ts';
+import { type Framework7Dom } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{
     modelValue: unknown;
@@ -117,7 +118,7 @@ function onItemClicked(item: unknown, index: number): void {
 
 function onSheetOpen(event: { $el: Framework7Dom }): void {
     currentValue.value = props.modelValue;
-    scrollToSelectedItem(event.$el, '.page-content', 'li.list-item-selected');
+    scrollToSelectedItem(event.$el[0], '.sheet-modal-inner', '.page-content', 'li.list-item-selected');
 }
 
 function onSheetClosed(): void {

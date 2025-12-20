@@ -711,8 +711,7 @@ import {
     transactionTypeToCategoryType
 } from '@/lib/category.ts';
 import { isDataExportingEnabled, isDataImportingEnabled, isTransactionFromAIImageRecognitionEnabled } from '@/lib/server_settings.ts';
-import { startDownloadFile } from '@/lib/ui/common.ts';
-import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';
+import { scrollToSelectedItem, startDownloadFile } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
 import {
@@ -1696,7 +1695,7 @@ function scrollTagMenuToSelectedItem(opened: boolean): void {
 
 function scrollMenuToSelectedItem(menu: VMenu | null): void {
     nextTick(() => {
-        scrollToSelectedItem(menu?.contentEl, 'div.v-list', 'div.v-list-item.list-item-selected');
+        scrollToSelectedItem(menu?.contentEl, 'div.v-list', 'div.v-list', 'div.v-list-item.list-item-selected');
     });
 }
 

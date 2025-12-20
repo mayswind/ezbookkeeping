@@ -48,7 +48,7 @@ import type { ColorValue } from '@/core/color.ts';
 import type { IconInfo, IconInfoWithId } from '@/core/icon.ts';
 import { arrayContainsFieldValue } from '@/lib/common.ts';
 import { getIconsInRows } from '@/lib/icon.ts';
-import { scrollToSelectedItem } from '@/lib/ui/desktop.ts';
+import { scrollToSelectedItem } from '@/lib/ui/common.ts';
 
 import {
     mdiCheck
@@ -89,7 +89,7 @@ function onMenuStateChanged(state: boolean): void {
     if (state) {
         nextTick(() => {
             if (dropdownMenu.value && dropdownMenu.value.parentElement) {
-                scrollToSelectedItem(dropdownMenu.value.parentElement, null, '.row-has-selected-item');
+                scrollToSelectedItem(dropdownMenu.value.parentElement, null, null, '.row-has-selected-item');
             }
         });
     }

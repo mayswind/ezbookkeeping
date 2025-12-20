@@ -339,7 +339,7 @@
                                @update:modelValue="changeCustomMonthDateFilter">
         </month-selection-sheet>
 
-        <f7-popover class="category-popover-menu" @popover:open="onPopoverOpen">
+        <f7-popover class="category-popover-menu" @popover:open="onCategoryPopoverOpen">
             <f7-list dividers accordion-list>
                 <f7-list-item link="#" no-chevron popover-close
                               :class="{ 'list-item-selected': !query.categoryIds }"
@@ -364,57 +364,55 @@
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoryIds && queryAllFilterCategoryIdsCount > 1"></f7-icon>
                     </template>
                 </f7-list-item>
-            </f7-list>
-            <f7-list dividers accordion-list
-                     class="no-margin-vertical"
-                     :key="categoryType"
-                     v-for="(categories, categoryType) in allPrimaryCategories"
-                     v-show="categories && categories.length"
-            >
-                <f7-list-item divider :title="getTransactionTypeName(categoryTypeToTransactionType(parseInt(categoryType)), 'Type')"></f7-list-item>
-                <f7-list-item accordion-item
-                              :title="category.name"
-                              :class="getCategoryListItemCheckedClass(category, queryAllFilterCategoryIds)"
-                              :key="category.id"
-                              v-for="category in categories"
-                              v-show="!category.hidden || queryAllFilterCategoryIds[category.id] || allCategories[query.categoryIds]?.parentId === category.id || hasSubCategoryInQuery(category)"
-                >
-                    <template #media>
-                        <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
+                <template :key="categoryType"
+                          v-for="(categories, categoryType) in allPrimaryCategories">
+                    <template v-if="categories && categories.length">
+                        <f7-list-item divider :title="getTransactionTypeName(categoryTypeToTransactionType(parseInt(categoryType)), 'Type')"></f7-list-item>
+                        <f7-list-item accordion-item
+                                      :title="category.name"
+                                      :class="getCategoryListItemCheckedClass(category, queryAllFilterCategoryIds)"
+                                      :key="category.id"
+                                      v-for="category in categories"
+                                      v-show="!category.hidden || queryAllFilterCategoryIds[category.id] || allCategories[query.categoryIds]?.parentId === category.id || hasSubCategoryInQuery(category)"
+                        >
+                            <template #media>
+                                <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
+                            </template>
+                            <f7-accordion-content>
+                                <f7-list dividers class="padding-inline-start">
+                                    <f7-list-item link="#" no-chevron popover-close
+                                                  :class="{ 'list-item-selected': query.categoryIds === category.id, 'item-in-multiple-selection': queryAllFilterCategoryIdsCount > 1 && queryAllFilterCategoryIds[category.id] }"
+                                                  :title="tt('All')" @click="changeCategoryFilter(category.id)">
+                                        <template #media>
+                                            <f7-icon f7="rectangle_grid_2x2"></f7-icon>
+                                        </template>
+                                        <template #after>
+                                            <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoryIds === category.id"></f7-icon>
+                                        </template>
+                                    </f7-list-item>
+                                    <f7-list-item link="#" no-chevron popover-close
+                                                  :class="{ 'list-item-selected': query.categoryIds === subCategory.id, 'item-in-multiple-selection': queryAllFilterCategoryIdsCount > 1 && queryAllFilterCategoryIds[subCategory.id] }"
+                                                  :title="subCategory.name"
+                                                  :key="subCategory.id"
+                                                  v-for="subCategory in category.subCategories"
+                                                  v-show="!subCategory.hidden || queryAllFilterCategoryIds[subCategory.id]"
+                                                  @click="changeCategoryFilter(subCategory.id)"
+                                    >
+                                        <template #media>
+                                            <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
+                                        </template>
+                                        <template #after>
+                                            <f7-icon class="list-item-checked-icon"
+                                                     f7="checkmark_alt"
+                                                     v-if="query.categoryIds === subCategory.id">
+                                            </f7-icon>
+                                        </template>
+                                    </f7-list-item>
+                                </f7-list>
+                            </f7-accordion-content>
+                        </f7-list-item>
                     </template>
-                    <f7-accordion-content>
-                        <f7-list dividers class="padding-inline-start">
-                            <f7-list-item link="#" no-chevron popover-close
-                                          :class="{ 'list-item-selected': query.categoryIds === category.id, 'item-in-multiple-selection': queryAllFilterCategoryIdsCount > 1 && queryAllFilterCategoryIds[category.id] }"
-                                          :title="tt('All')" @click="changeCategoryFilter(category.id)">
-                                <template #media>
-                                    <f7-icon f7="rectangle_grid_2x2"></f7-icon>
-                                </template>
-                                <template #after>
-                                    <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoryIds === category.id"></f7-icon>
-                                </template>
-                            </f7-list-item>
-                            <f7-list-item link="#" no-chevron popover-close
-                                          :class="{ 'list-item-selected': query.categoryIds === subCategory.id, 'item-in-multiple-selection': queryAllFilterCategoryIdsCount > 1 && queryAllFilterCategoryIds[subCategory.id] }"
-                                          :title="subCategory.name"
-                                          :key="subCategory.id"
-                                          v-for="subCategory in category.subCategories"
-                                          v-show="!subCategory.hidden || queryAllFilterCategoryIds[subCategory.id]"
-                                          @click="changeCategoryFilter(subCategory.id)"
-                            >
-                                <template #media>
-                                    <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
-                                </template>
-                                <template #after>
-                                    <f7-icon class="list-item-checked-icon"
-                                             f7="checkmark_alt"
-                                             v-if="query.categoryIds === subCategory.id">
-                                    </f7-icon>
-                                </template>
-                            </f7-list-item>
-                        </f7-list>
-                    </f7-accordion-content>
-                </f7-list-item>
+                </template>
             </f7-list>
         </f7-popover>
 
@@ -598,6 +596,7 @@ import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
 import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
+import { scrollToSelectedItem } from '@/lib/ui/common.ts';
 import {
     type Framework7Dom,
     useI18nUIComponents,
@@ -606,7 +605,6 @@ import {
     onSwipeoutDeleted,
     getElementActualHeights,
     getElementBoundingRect,
-    scrollToSelectedItem,
     onInfiniteScrolling
 } from '@/lib/ui/mobile.ts';
 import { TransactionListPageType, useTransactionListPageBase } from '@/views/base/transactions/TransactionListPageBase.ts';
@@ -1440,7 +1438,11 @@ function collapseTransactionMonthList(monthList: TransactionMonthList, collapse:
 }
 
 function onPopoverOpen(event: { $el: Framework7Dom }): void {
-    scrollToSelectedItem(event.$el, '.popover-inner', 'li.list-item-selected');
+    scrollToSelectedItem(event.$el[0], '.popover-inner', '.popover-inner', 'li.list-item-selected');
+}
+
+function onCategoryPopoverOpen(event: { $el: Framework7Dom }): void {
+    scrollToSelectedItem(event.$el[0], '.popover-inner', '.popover-inner', 'li.list-item-checked');
 }
 
 function onPageAfterIn(): void {
@@ -1604,10 +1606,7 @@ html[dir="rtl"] .list.transaction-info-list li.transaction-info .transaction-foo
 .account-popover-menu .popover-inner,
 .more-popover-menu .popover-inner {
     max-height: 400px;
-
-    > .list {
-        overflow-y: auto;
-    }
+    overflow-y: auto;
 }
 
 .transaction-calendar-container .dp__theme_light,

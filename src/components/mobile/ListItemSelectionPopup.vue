@@ -56,7 +56,8 @@ import type { Searchbar } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-import { type Framework7Dom, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
+import { scrollToSelectedItem } from '@/lib/ui/common.ts';
+import { type Framework7Dom } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{
     modelValue: unknown;
@@ -186,7 +187,7 @@ function onItemClicked(item: unknown, index: number): void {
 
 function onPopupOpen(event: { $el: Framework7Dom }): void {
     currentValue.value = props.modelValue;
-    scrollToSelectedItem(event.$el, '.page-content', 'li.list-item-selected', false);
+    scrollToSelectedItem(event.$el[0], '.popup > .page', '.page-content', 'li.list-item-selected');
 }
 
 function onPopupClosed(): void {

@@ -33,7 +33,8 @@ import { ref, computed } from 'vue';
 import type { IconInfo, IconInfoWithId } from '@/core/icon.ts';
 import { arrayContainsFieldValue } from '@/lib/common.ts';
 import { getIconsInRows } from '@/lib/icon.ts';
-import { type Framework7Dom, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
+import { scrollToSelectedItem } from '@/lib/ui/common.ts';
+import { type Framework7Dom } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{
     modelValue: string;
@@ -73,7 +74,7 @@ function hasSelectedIcon(row: IconInfoWithId[]): boolean {
 }
 
 function onSheetOpen(event: { $el: Framework7Dom }): void {
-    scrollToSelectedItem(event.$el, '.page-content', '.row-has-selected-item');
+    scrollToSelectedItem(event.$el[0], '.sheet-modal-inner', '.page-content', '.row-has-selected-item');
 }
 
 function onSheetClosed(): void {

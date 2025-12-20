@@ -76,7 +76,8 @@ import { itemAndIndex } from '@/core/base.ts';
 import { type WeekDayValue } from '@/core/datetime.ts';
 import { ScheduledTemplateFrequencyType } from '@/core/template.ts';
 import { sortNumbersArray } from '@/lib/common.ts';
-import { type Framework7Dom, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
+import { scrollToSelectedItem } from '@/lib/ui/common.ts';
+import { type Framework7Dom } from '@/lib/ui/mobile.ts';
 
 interface MobileScheduleFrequencySelectionProps extends CommonScheduleFrequencySelectionProps {
     show: boolean;
@@ -151,7 +152,7 @@ function close(): void {
 function onSheetOpen(event: { $el: Framework7Dom }): void {
     currentFrequencyType.value = props.type;
     currentFrequencyValue.value = getFrequencyValues(props.modelValue);
-    scrollToSelectedItem(event.$el, '.schedule-frequency-value-container', 'li.list-item-selected');
+    scrollToSelectedItem(event.$el[0], '.schedule-frequency-value-container', '.schedule-frequency-value-container', 'li.list-item-selected');
 }
 
 function onSheetClosed(): void {

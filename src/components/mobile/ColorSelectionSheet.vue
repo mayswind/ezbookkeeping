@@ -33,7 +33,8 @@ import { ref, computed } from 'vue';
 import type { ColorValue, ColorInfo } from '@/core/color.ts';
 import { arrayContainsFieldValue } from '@/lib/common.ts';
 import { getColorsInRows } from '@/lib/color.ts';
-import { type Framework7Dom, scrollToSelectedItem } from '@/lib/ui/mobile.ts';
+import { scrollToSelectedItem } from '@/lib/ui/common.ts';
+import { type Framework7Dom } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{
     modelValue: ColorValue;
@@ -63,7 +64,7 @@ function hasSelectedIcon(row: ColorInfo[]): boolean {
 
 function onSheetOpen(event: { $el: Framework7Dom }): void {
     currentValue.value = props.modelValue;
-    scrollToSelectedItem(event.$el, '.page-content', '.row-has-selected-item');
+    scrollToSelectedItem(event.$el[0], '.sheet-modal-inner', '.page-content', '.row-has-selected-item');
 }
 
 function onSheetClosed(): void {

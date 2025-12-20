@@ -102,7 +102,8 @@ import {
     getItemByKeyValue,
     getNameByKeyValue
 } from '@/lib/common.ts';
-import { type ComponentDensity, type InputVariant, setChildInputFocus, scrollToSelectedItem } from '@/lib/ui/desktop.ts';
+import { scrollToSelectedItem } from '@/lib/ui/common.ts';
+import { type ComponentDensity, type InputVariant, setChildInputFocus } from '@/lib/ui/desktop.ts';
 
 import {
     mdiChevronRight,
@@ -246,8 +247,8 @@ function onMenuStateChanged(state: boolean): void {
     if (state) {
         nextTick(() => {
             if (dropdownMenu.value && dropdownMenu.value.parentElement) {
-                scrollToSelectedItem(dropdownMenu.value.parentElement, '.primary-list-container', '.primary-list-item-selected');
-                scrollToSelectedItem(dropdownMenu.value.parentElement, '.secondary-list-container', '.secondary-list-item-selected');
+                scrollToSelectedItem(dropdownMenu.value.parentElement, '.primary-list-container', '.primary-list-container', '.primary-list-item-selected');
+                scrollToSelectedItem(dropdownMenu.value.parentElement, '.secondary-list-container', '.secondary-list-container', '.secondary-list-item-selected');
             }
         });
     }

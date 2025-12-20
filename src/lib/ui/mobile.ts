@@ -6,7 +6,6 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { TextDirection } from '@/core/text.ts';
 import { FontSize, FONT_SIZE_PREVIEW_CLASSNAME_PREFIX } from '@/core/font.ts';
-import { getNumberValue } from '../common.ts';
 import { isEnableAnimate } from '../settings.ts';
 
 export interface Framework7Dom {
@@ -146,51 +145,6 @@ export function getElementBoundingRect(selector: string): DOMRect | null {
 
     const el = elements[0];
     return el.getBoundingClientRect();
-}
-
-export function scrollToSelectedItem(parentEl: Framework7Dom, containerSelector: string, selectedItemSelector: string, hasBottomToolbar?: boolean): void {
-    if (!parentEl || !parentEl.length) {
-        return;
-    }
-
-    const container = parentEl.find(containerSelector);
-    const selectedItem = parentEl.find(selectedItemSelector);
-
-    if (!container.length || !selectedItem.length) {
-        return;
-    }
-
-    const containerPaddingTop = getNumberValue(container.css('padding-top'), 0) / 2;
-
-    let targetPos = selectedItem.offset().top - container.offset().top - containerPaddingTop
-        - (container.outerHeight() - selectedItem.outerHeight()) / 2;
-
-    if (selectedItem.length > 1) {
-        const firstSelectedItem = f7.$(selectedItem[0]);
-        const lastSelectedItem = f7.$(selectedItem[selectedItem.length - 1]);
-
-        const firstSelectedItemInTop = firstSelectedItem.offset().top - container.offset().top - containerPaddingTop;
-        const lastSelectedItemInTop = lastSelectedItem.offset().top - container.offset().top - containerPaddingTop;
-        const lastSelectedItemInBottom = lastSelectedItem.offset().top - container.offset().top - containerPaddingTop
-            - (container.outerHeight() - firstSelectedItem.outerHeight());
-
-        targetPos = (firstSelectedItemInTop + lastSelectedItemInBottom) / 2;
-
-        if (lastSelectedItemInTop - firstSelectedItemInTop > container.outerHeight()) {
-            targetPos = firstSelectedItemInTop;
-        }
-    }
-
-    if (targetPos <= 0) {
-        return;
-    }
-
-    if (hasBottomToolbar) {
-        const toolbarHeight = parentEl.find('.toolbar.toolbar-bottom').outerHeight() || 0;
-        targetPos += toolbarHeight / 2;
-    }
-
-    container.scrollTop(targetPos);
 }
 
 export function scrollSheetToTop(sheetElement: HTMLElement | undefined, windowNormalInnerHeight: number): void {

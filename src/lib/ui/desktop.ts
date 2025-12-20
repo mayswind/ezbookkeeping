@@ -39,15 +39,6 @@ export function getNavSideBarOuterHeight(element: HTMLElement | null): number {
     return totalHeight;
 }
 
-export function getCssValue(element: HTMLElement | null, name: string): string {
-    if (!element) {
-        return '0';
-    }
-
-    const computedStyle = window.getComputedStyle(element);
-    return computedStyle.getPropertyValue(name);
-}
-
 export function setChildInputFocus(parentEl: HTMLElement | undefined, childSelector: string): void {
     if (!parentEl) {
         return;
@@ -62,58 +53,4 @@ export function setChildInputFocus(parentEl: HTMLElement | undefined, childSelec
     const childInput = (childElement as HTMLInputElement);
     childInput.focus();
     childInput.select();
-}
-
-export function scrollToSelectedItem(parentEl: HTMLElement | null | undefined, containerSelector: string | null, selectedItemSelector: string): void {
-    if (!parentEl) {
-        return;
-    }
-
-    let container = parentEl;
-
-    if (containerSelector) {
-        const lists = parentEl.querySelectorAll(containerSelector);
-
-        if (!lists.length || !lists[0]) {
-            return;
-        }
-
-        container = lists[0] as HTMLElement;
-    }
-
-    const selectedItems = container.querySelectorAll(selectedItemSelector);
-
-    if (!selectedItems.length || !selectedItems[0]) {
-        return;
-    }
-
-    const selectedItem = selectedItems[0] as HTMLElement;
-    const containerOuterHeight = getOuterHeight(container);
-    const selectedItemOuterHeight = getOuterHeight(selectedItem);
-
-    let targetPos = selectedItem.offsetTop - container.offsetTop - parseInt(getCssValue(container, 'padding-top'), 10)
-        - (containerOuterHeight - selectedItemOuterHeight) / 2;
-
-    if (selectedItems.length > 1) {
-
-        const firstSelectedItem = selectedItems[0] as HTMLElement;
-        const lastSelectedItem = selectedItems[selectedItems.length - 1] as HTMLElement;
-
-        const firstSelectedItemInTop = firstSelectedItem.offsetTop - container.offsetTop - parseInt(getCssValue(container, 'padding-top'), 10);
-        const lastSelectedItemInTop = lastSelectedItem.offsetTop - container.offsetTop - parseInt(getCssValue(container, 'padding-top'), 10);
-        const lastSelectedItemInBottom = lastSelectedItem.offsetTop - container.offsetTop - parseInt(getCssValue(container, 'padding-top'), 10)
-            - (containerOuterHeight - selectedItemOuterHeight);
-
-        targetPos = (firstSelectedItemInTop + lastSelectedItemInBottom) / 2;
-
-        if (lastSelectedItemInTop - firstSelectedItemInTop > containerOuterHeight) {
-            targetPos = firstSelectedItemInTop;
-        }
-    }
-
-    if (targetPos <= 0) {
-        return;
-    }
-
-    container.scrollTop = targetPos;
 }

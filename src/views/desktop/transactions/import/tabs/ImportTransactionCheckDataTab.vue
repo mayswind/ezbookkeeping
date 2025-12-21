@@ -916,8 +916,8 @@ const importTransactionsTableHeight = computed<number | undefined>(() => {
 const importTransactionHeaders = computed<object[]>(() => {
     return [
         { value: 'valid', sortable: true, nowrap: true, width: 35 },
-        { value: 'time', title: tt('Transaction Time'), sortable: true, nowrap: true, maxWidth: 280 },
-        { value: 'type', title: tt('Type'), sortable: true, nowrap: true, maxWidth: 140 },
+        { value: 'time', title: tt('Transaction Time'), sortable: true, nowrap: true },
+        { value: 'type', title: tt('Type'), sortable: true, nowrap: true },
         { value: 'actualCategoryName', title: tt('Category'), sortable: true, nowrap: true },
         { value: 'sourceAmount', title: tt('Amount'), sortable: true, nowrap: true },
         { value: 'actualSourceAccountName', title: tt('Account'), sortable: true, nowrap: true },

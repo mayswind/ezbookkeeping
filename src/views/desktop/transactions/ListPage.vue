@@ -1763,9 +1763,21 @@ init(props);
     line-height: 1rem;
 }
 
-
 .transaction-list-datetime-range .transaction-list-datetime-range-text {
     color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity)) !important;
+}
+
+.v-table.transaction-table > .v-table__wrapper > table {
+    th:not(:last-child),
+    td:not(:last-child) {
+        width: auto !important;
+        white-space: nowrap;
+    }
+
+    th:last-child,
+    td:last-child {
+        width: 100% !important;
+    }
 }
 
 .v-table.transaction-table .transaction-list-row-date > td {
@@ -1773,32 +1785,23 @@ init(props);
 }
 
 .transaction-table .transaction-table-column-time {
-    width: 110px;
-    white-space: nowrap;
+    min-width: 110px;
 }
 
 .transaction-table .transaction-table-column-category {
-    width: 140px;
-    white-space: nowrap;
+    min-width: 140px;
 }
 
 .transaction-table .transaction-table-column-amount {
-    width: 120px;
-    white-space: nowrap;
+    min-width: 120px;
 }
 
 .transaction-table .transaction-table-column-account {
-    width: 160px;
-    white-space: nowrap;
+    min-width: 160px;
 }
 
 .transaction-table .transaction-table-column-tags {
-    width: 90px;
-    max-width: 300px;
-}
-
-.transaction-table-column-description {
-    max-width: 300px;
+    min-width: 90px;
 }
 
 .transaction-table .transaction-table-column-category .v-btn,

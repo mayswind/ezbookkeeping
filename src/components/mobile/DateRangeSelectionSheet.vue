@@ -45,13 +45,6 @@ import { type CommonDateRangeSelectionProps, useDateRangeSelectionBase } from '@
 
 import { useEnvironmentsStore } from '@/stores/environment.ts';
 
-import {
-    getLocalDatetimeFromUnixTime,
-    getDummyUnixTimeForLocalUsage,
-    getTimezoneOffsetMinutes,
-    getBrowserTimezoneOffsetMinutes
-} from '@/lib/datetime.ts';
-
 type DateTimePickerType = InstanceType<typeof DateTimePicker>;
 
 const props = defineProps<CommonDateRangeSelectionProps>();
@@ -62,7 +55,14 @@ const emit = defineEmits<{
 
 const { tt } = useI18n();
 const { showToast } = useI18nUIComponents();
-const { dateRange, beginDateTime, endDateTime, presetRanges, getFinalDateRange } = useDateRangeSelectionBase(props);
+const {
+    dateRange,
+    beginDateTime,
+    endDateTime,
+    presetRanges,
+    getLocalDatetimeFromSameDateTimeOfUnixTime,
+    getFinalDateRange
+} = useDateRangeSelectionBase(props);
 
 const environmentsStore = useEnvironmentsStore();
 
@@ -91,11 +91,11 @@ function cancel(): void {
 
 function onSheetOpen(): void {
     if (props.minTime) {
-        dateRange.value[0] = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(props.minTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+        dateRange.value[0] = getLocalDatetimeFromSameDateTimeOfUnixTime(props.minTime);
     }
 
     if (props.maxTime) {
-        dateRange.value[1] = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(props.maxTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+        dateRange.value[1] = getLocalDatetimeFromSameDateTimeOfUnixTime(props.maxTime);
     }
 
     window.dispatchEvent(new Event('resize')); // fix vue-datepicker preset max-width

@@ -51,10 +51,10 @@
                 </template>
                 <template #footer>
                     <div v-if="dateRange.isUserCustomRange && queryDateRangeType === dateRange.type && startTime && endTime">
-                        <span>{{ displayStartTime }}</span>
+                        <span>{{ displayStartDateTime }}</span>
                         <span>&nbsp;-&nbsp;</span>
                         <br/>
-                        <span>{{ displayEndTime }}</span>
+                        <span>{{ displayEndDateTime }}</span>
                     </div>
                 </template>
             </f7-list-item>
@@ -227,7 +227,7 @@
                                     <div class="transaction-footer display-flex justify-content-space-between">
                                         <div class="flex-shrink-0">
                                             <span>{{ getDisplayTime(item.transaction) }}</span>
-                                            <span v-if="item.transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ `(${getDisplayTimezone(item.transaction)})` }}</span>
+                                            <span style="margin-inline-start: 4px" v-if="!isSameAsDefaultTimezoneOffsetMinutes(item.transaction)">{{ `(${getDisplayTimezone(item.transaction)})` }}</span>
                                         </div>
                                         <div class="account-balance flex-shrink-1">
                                             <span>{{ isCurrentLiabilityAccount ? tt('Outstanding Balance') : tt('Balance') }}</span>
@@ -388,7 +388,6 @@ const {
     tt,
     getCurrentLanguageTextDirection,
     getAllDateRanges,
-    formatUnixTimeToLongDateTime,
     formatNumberToLocalizedNumerals
 } = useI18n();
 
@@ -402,7 +401,6 @@ const {
     firstDayOfWeek,
     fiscalYearStart,
     allDateAggregationTypes,
-    currentTimezoneOffsetMinutes,
     isCurrentLiabilityAccount,
     currentAccount,
     currentAccountCurrency,
@@ -416,6 +414,7 @@ const {
     setReconciliationStatements,
     getDisplayDate,
     getDisplayTime,
+    isSameAsDefaultTimezoneOffsetMinutes,
     getDisplayTimezone,
     getDisplaySourceAmount,
     getDisplayDestinationAmount,
@@ -446,8 +445,6 @@ const virtualDataItems = ref<ReconciliationStatementVirtualListData>({
 const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 const validQuery = computed(() => currentAccount.value && currentAccount.value.type === AccountType.SingleAccount.type);
 const allAvailableDateRanges = computed(() => getAllDateRanges(DateRangeScene.Normal, true, !!accountsStore.getAccountStatementDate(accountId.value)));
-const displayStartTime = computed<string>(() => formatUnixTimeToLongDateTime(startTime.value));
-const displayEndTime = computed<string>(() => formatUnixTimeToLongDateTime(endTime.value));
 
 const allReconciliationStatementVirtualListItems = computed<ReconciliationStatementVirtualListItem[]>(() => {
     const ret: ReconciliationStatementVirtualListItem[] = [];

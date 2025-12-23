@@ -41,7 +41,7 @@ import { DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numera
 
 import { type TransactionMonthlyIncomeAndExpenseData } from '@/models/transaction.ts';
 
-import { getUnixTimeBeforeUnixTime, getThisMonthFirstUnixTime } from '@/lib/datetime.ts';
+import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
 import { getExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 export interface MonthlyIncomeAndExpenseCardClickEvent {
@@ -64,7 +64,7 @@ const emit = defineEmits<{
 const {
     tt,
     getCurrentLanguageTextDirection,
-    formatUnixTimeToGregorianLikeShortMonth,
+    formatDateTimeToGregorianLikeShortMonth,
     formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
 
@@ -98,11 +98,9 @@ const chartOptions = computed<object>(() => {
     const expenseIncomeAmountColor = getExpenseAndIncomeAmountColor(userStore.currentUserExpenseAmountColor, userStore.currentUserIncomeAmountColor, props.isDarkMode);
 
     if (props.data) {
-        const currentMonthFirstUnixTime = getThisMonthFirstUnixTime();
-
         for (const item of props.data) {
-            const monthFirstUnixTime = getUnixTimeBeforeUnixTime(currentMonthFirstUnixTime, item.monthsBeforeCurrentMonth, 'months');
-            const monthShortName = formatUnixTimeToGregorianLikeShortMonth(monthFirstUnixTime);
+            const monthStartDateTime = parseDateTimeFromUnixTime(item.monthStartTime);
+            const monthShortName = formatDateTimeToGregorianLikeShortMonth(monthStartDateTime);
 
             monthNames.push(monthShortName);
             incomeAmounts.push(item.incomeAmount);

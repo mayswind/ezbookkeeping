@@ -5,6 +5,15 @@ import { useI18n } from '@/locales/helpers.ts';
 import { type NameValue } from '@/core/base.ts';
 import { NumeralSystem } from '@/core/numeral.ts';
 
+import {
+    getLocalDatetimeFromUnixTime,
+    getUnixTimeFromLocalDatetime,
+    getSameDateTimeWithBrowserTimezone,
+    getSameDateTimeWithTimezoneOffset,
+    parseDateTimeFromUnixTimeWithBrowserTimezone,
+    parseDateTimeFromUnixTimeWithTimezoneOffset
+} from '@/lib/datetime.ts';
+
 export interface TimePickerValue {
     value: string;
     itemsIndex: number;
@@ -29,6 +38,14 @@ export function useDateTimeSelectionBase() {
 
     const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
     const meridiemItems = computed<NameValue[]>(() => getAllMeridiemIndicators());
+
+    function getLocalDatetimeFromSameDateTimeOfUnixTime(unixTime: number, utcOffset: number): Date {
+        return getLocalDatetimeFromUnixTime(getSameDateTimeWithBrowserTimezone(parseDateTimeFromUnixTimeWithTimezoneOffset(unixTime, utcOffset)).getUnixTime());
+    }
+
+    function getUnixTimeFromSameDateTimeOfLocalDatetime(localDatetime: Date, utcOffset: number): number {
+        return getSameDateTimeWithTimezoneOffset(parseDateTimeFromUnixTimeWithBrowserTimezone(getUnixTimeFromLocalDatetime(localDatetime)), utcOffset).getUnixTime();
+    }
 
     function getDisplayTimeValue(value: number, forceTwoDigits: boolean): string {
         let textualValue = value.toString();
@@ -89,6 +106,8 @@ export function useDateTimeSelectionBase() {
         // computed
         meridiemItems,
         // functions
+        getLocalDatetimeFromSameDateTimeOfUnixTime,
+        getUnixTimeFromSameDateTimeOfLocalDatetime,
         getDisplayTimeValue,
         generateAllHours,
         generateAllMinutesOrSeconds

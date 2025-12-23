@@ -43,6 +43,7 @@ import {
     isNumber
 } from '@/lib/common.ts';
 import {
+    parseDateTimeFromUnixTime,
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
     getDateTypeByDateRange,
@@ -95,11 +96,11 @@ const theme = useTheme();
 const {
     tt,
     getCurrentLanguageTextDirection,
-    formatUnixTimeToShortDate,
-    formatUnixTimeToGregorianLikeShortYear,
-    formatUnixTimeToGregorianLikeShortYearMonth,
+    formatDateTimeToShortDate,
+    formatDateTimeToGregorianLikeShortYear,
+    formatDateTimeToGregorianLikeShortYearMonth,
     formatYearQuarterToGregorianLikeYearQuarter,
-    formatUnixTimeToGregorianLikeFiscalYear,
+    formatDateTimeToGregorianLikeFiscalYear,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
     formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
@@ -151,16 +152,18 @@ const allDisplayDateRanges = computed<string[]>(() => {
     const allDisplayDateRanges: string[] = [];
 
     for (const dateRange of allDateRanges.value) {
+        const minDateTime = parseDateTimeFromUnixTime(dateRange.minUnixTime);
+
         if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
-            allDisplayDateRanges.push(formatUnixTimeToGregorianLikeShortYear(dateRange.minUnixTime));
+            allDisplayDateRanges.push(formatDateTimeToGregorianLikeShortYear(minDateTime));
         } else if (props.dateAggregationType === ChartDateAggregationType.FiscalYear.type && 'year' in dateRange) {
-            allDisplayDateRanges.push(formatUnixTimeToGregorianLikeFiscalYear(dateRange.minUnixTime));
+            allDisplayDateRanges.push(formatDateTimeToGregorianLikeFiscalYear(minDateTime));
         } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type && 'quarter' in dateRange) {
             allDisplayDateRanges.push(formatYearQuarterToGregorianLikeYearQuarter(dateRange.year, dateRange.quarter));
         } else if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
-            allDisplayDateRanges.push(formatUnixTimeToGregorianLikeShortYearMonth(dateRange.minUnixTime));
+            allDisplayDateRanges.push(formatDateTimeToGregorianLikeShortYearMonth(minDateTime));
         } else if (props.dateAggregationType === ChartDateAggregationType.Day.type && props.chartMode === 'daily') {
-            allDisplayDateRanges.push(formatUnixTimeToShortDate(dateRange.minUnixTime));
+            allDisplayDateRanges.push(formatDateTimeToShortDate(minDateTime));
         }
     }
 

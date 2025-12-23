@@ -534,8 +534,8 @@
                                                 <td class="transaction-table-column-time">
                                                     <div class="d-flex flex-column">
                                                         <span>{{ getDisplayTime(transaction) }}</span>
-                                                        <span class="text-caption" v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimezone(transaction) }}</span>
-                                                        <v-tooltip activator="parent" v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimeInDefaultTimezone(transaction) }}</v-tooltip>
+                                                        <span class="text-caption" v-if="!isSameAsDefaultTimezoneOffsetMinutes(transaction)">{{ getDisplayTimezone(transaction) }}</span>
+                                                        <v-tooltip activator="parent" v-if="!isSameAsDefaultTimezoneOffsetMinutes(transaction)">{{ getDisplayTimeInDefaultTimezone(transaction) }}</v-tooltip>
                                                     </div>
                                                 </td>
                                                 <td class="transaction-table-column-category">
@@ -691,8 +691,6 @@ import {
 import {
     getCurrentUnixTime,
     parseDateTimeFromUnixTime,
-    getBrowserTimezoneOffsetMinutes,
-    getActualUnixTimeForStore,
     getDayFirstUnixTimeBySpecifiedUnixTime,
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
@@ -775,7 +773,6 @@ const {
     customMinDatetime,
     customMaxDatetime,
     currentCalendarDate,
-    currentTimezoneOffsetMinutes,
     firstDayOfWeek,
     fiscalYearStart,
     defaultCurrency,
@@ -809,6 +806,7 @@ const {
     transactionCalendarMaxDate,
     currentMonthTransactionData,
     hasSubCategoryInQuery,
+    isSameAsDefaultTimezoneOffsetMinutes,
     canAddTransaction,
     getDisplayTime,
     getDisplayLongDate,
@@ -1234,7 +1232,7 @@ function changePageType(type: number): void {
 function changeDateFilter(dateRange: TimeRangeAndDateType | number | null): void {
     if (dateRange === DateRange.Custom.type || (isObject(dateRange) && dateRange.dateType === DateRange.Custom.type && !dateRange.minTime && !dateRange.maxTime)) { // Custom
         if (!query.value.minTime || !query.value.maxTime) {
-            customMaxDatetime.value = getActualUnixTimeForStore(getCurrentUnixTime(), currentTimezoneOffsetMinutes.value, getBrowserTimezoneOffsetMinutes());
+            customMaxDatetime.value = getCurrentUnixTime();
             customMinDatetime.value = getDayFirstUnixTimeBySpecifiedUnixTime(customMaxDatetime.value);
         } else {
             customMaxDatetime.value = query.value.maxTime;

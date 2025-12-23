@@ -28,10 +28,11 @@ func (c *DataTableTransactionDataExporter) BuildExportedContent(ctx core.Context
 		}
 
 		dataRowMap := make(map[datatable.TransactionDataTableColumn]string, 15)
+		transactionUnixTime := utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime)
 		transactionTimeZone := time.FixedZone("Transaction Timezone", int(transaction.TimezoneUtcOffset)*60)
 
-		dataRowMap[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = utils.FormatUnixTimeToLongDateTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime), transactionTimeZone)
-		dataRowMap[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = utils.FormatTimezoneOffset(transactionTimeZone)
+		dataRowMap[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = utils.FormatUnixTimeToLongDateTime(transactionUnixTime, transactionTimeZone)
+		dataRowMap[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = utils.FormatTimezoneOffset(transactionUnixTime, transactionTimeZone)
 		dataRowMap[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = dataTableBuilder.ReplaceDelimiters(c.getDisplayTransactionTypeName(transaction.Type))
 		dataRowMap[datatable.TRANSACTION_DATA_TABLE_CATEGORY] = c.getExportedTransactionCategoryName(dataTableBuilder, transaction.CategoryId, categoryMap)
 		dataRowMap[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = c.getExportedTransactionSubCategoryName(dataTableBuilder, transaction.CategoryId, categoryMap)

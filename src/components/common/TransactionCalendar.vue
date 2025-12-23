@@ -38,14 +38,7 @@ import type { CalendarAlternateDate, TextualYearMonthDay, WeekDayValue } from '@
 import { INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
 
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
-import {
-    getTimezoneOffsetMinutes,
-    getBrowserTimezoneOffsetMinutes,
-    getUnixTimeFromLocalDatetime,
-    getActualUnixTimeForStore,
-    getYearMonthDayDateTime,
-    parseDateTimeFromUnixTime
-} from '@/lib/datetime.ts';
+import { getYearMonthDayDateTime } from '@/lib/datetime.ts';
 
 const props = defineProps<{
     modelValue: TextualYearMonthDay | '';
@@ -67,7 +60,7 @@ const emit = defineEmits<{
 const {
     getAllLongWeekdayNames,
     getAllShortWeekdayNames,
-    getCalendarDisplayDayOfMonthFromUnixTime,
+    getCalendarDisplayDayOfMonthFromDateTime,
     getCalendarAlternateDates,
     formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
@@ -105,8 +98,7 @@ const alternateDates = computed<Record<TextualYearMonthDay, string> | undefined>
 });
 
 function noTransactionInMonthDay(date: Date): boolean {
-    const dateTime = parseDateTimeFromUnixTime(getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(date), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
-    return !props.dailyTotalAmounts || !props.dailyTotalAmounts[dateTime.getGregorianCalendarDay()];
+    return !props.dailyTotalAmounts || !props.dailyTotalAmounts[date.getDate()];
 }
 
 function getDisplayMonthTotalAmount(amount: number, currency: string | false, symbol: string, incomplete: boolean): string {
@@ -115,7 +107,7 @@ function getDisplayMonthTotalAmount(amount: number, currency: string | false, sy
 }
 
 function getDisplayDay(date: Date): string {
-    return getCalendarDisplayDayOfMonthFromUnixTime(getYearMonthDayDateTime(date.getFullYear(), date.getMonth() + 1, date.getDate()).getUnixTime());
+    return getCalendarDisplayDayOfMonthFromDateTime(getYearMonthDayDateTime(date.getFullYear(), date.getMonth() + 1, date.getDate()));
 }
 </script>
 

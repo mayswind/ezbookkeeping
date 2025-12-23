@@ -250,7 +250,9 @@
                                         :readonly="mode === TransactionEditPageMode.View"
                                         :disabled="loading || submitting || (mode === TransactionEditPageMode.Edit && transaction.type === TransactionType.ModifyBalance)"
                                         :label="tt('Transaction Time')"
-                                        v-model="transaction.time"
+                                        :timezone-utc-offset="transaction.utcOffset"
+                                        :model-value="transaction.time"
+                                        @update:model-value="updateTransactionTime"
                                         @error="onShowDateTimeError" />
                                 </v-col>
                                 <v-col cols="12" md="6" v-if="type === TransactionEditPageType.Template && transaction instanceof TransactionTemplate && transaction.templateType === TemplateType.Schedule.type">
@@ -274,7 +276,8 @@
                                         :placeholder="!transaction.timeZone && transaction.timeZone !== '' ? `(${transactionDisplayTimezone}) ${transactionTimezoneTimeDifference}` : tt('Timezone')"
                                         :items="allTimezones"
                                         :no-data-text="tt('No results')"
-                                        v-model="transaction.timeZone"
+                                        :model-value="transaction.timeZone"
+                                        @update:model-value="updateTransactionTimezone"
                                     >
                                         <template #selection="{ item }">
                                             <span class="text-truncate" v-if="transaction.timeZone || transaction.timeZone === ''">
@@ -642,6 +645,8 @@ const {
     inputEmptyProblemMessage,
     inputIsEmpty,
     createNewTransactionModel,
+    updateTransactionTime,
+    updateTransactionTimezone,
     swapTransactionData,
     getTransactionPictureUrl
 } = useTransactionEditPageBase(props.type);
@@ -714,7 +719,7 @@ const isTransactionModified = computed<boolean>(() => {
     }
 });
 
-function setTransaction(newTransaction: Transaction | null, options: SetTransactionOptions, setContextData: boolean, convertContextTime: boolean): void {
+function setTransaction(newTransaction: Transaction | null, options: SetTransactionOptions, setContextData: boolean): void {
     setTransactionModelByTransaction(
         transaction.value,
         newTransaction,
@@ -735,8 +740,7 @@ function setTransaction(newTransaction: Transaction | null, options: SetTransact
             tagIds: options.tagIds,
             comment: options.comment
         },
-        setContextData,
-        convertContextTime
+        setContextData
     );
 }
 
@@ -758,7 +762,7 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
     initTagIds.value = options.tagIds;
 
     const newTransaction = createNewTransactionModel(options.type);
-    setTransaction(newTransaction, options, true, false);
+    setTransaction(newTransaction, options, true);
 
     const promises: Promise<unknown>[] = [
         accountsStore.loadAllAccounts({ force: false }),
@@ -769,7 +773,7 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
     if (props.type === TransactionEditPageType.Transaction) {
         if (options && options.id) {
             if (options.currentTransaction) {
-                setTransaction(options.currentTransaction, options, true, true);
+                setTransaction(options.currentTransaction, options, true);
             }
 
             mode.value = TransactionEditPageMode.View;
@@ -781,10 +785,10 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
             editId.value = null;
 
             if (options.template) {
-                setTransaction(options.template, options, false, false);
+                setTransaction(options.template, options, false);
                 addByTemplateId.value = options.template.id;
             } else if (!options.noTransactionDraft && (settingsStore.appSettings.autoSaveTransactionDraft === 'enabled' || settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') && transactionsStore.transactionDraft) {
-                setTransaction(Transaction.ofDraft(transactionsStore.transactionDraft), options, false, false);
+                setTransaction(Transaction.ofDraft(transactionsStore.transactionDraft), options, false);
             }
 
             if (settingsStore.appSettings.autoGetCurrentGeoLocation
@@ -809,7 +813,7 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
 
         if (options && options.id) {
             if (options.currentTemplate) {
-                setTransaction(options.currentTemplate, options, false, false);
+                setTransaction(options.currentTemplate, options, false);
                 (transaction.value as TransactionTemplate).fillFrom(options.currentTemplate);
             }
 
@@ -850,11 +854,11 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
 
         if (props.type === TransactionEditPageType.Transaction && options && options.id && responses[3] && responses[3] instanceof Transaction) {
             const transaction: Transaction = responses[3];
-            setTransaction(transaction, options, true, true);
+            setTransaction(transaction, options, true);
             originalTransactionEditable.value = transaction.editable;
         } else if (props.type === TransactionEditPageType.Template && options && options.id && responses[3] && responses[3] instanceof TransactionTemplate) {
             const template: TransactionTemplate = responses[3];
-            setTransaction(template, options, false, false);
+            setTransaction(template, options, false);
 
             if (!(transaction.value instanceof TransactionTemplate)) {
                 transaction.value = TransactionTemplate.createNewTransactionTemplate(transaction.value);
@@ -862,7 +866,7 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
 
             (transaction.value as TransactionTemplate).fillFrom(template);
         } else {
-            setTransaction(null, options, true, true);
+            setTransaction(null, options, true);
         }
 
         loading.value = false;
@@ -1003,7 +1007,7 @@ function duplicate(withTime?: boolean, withGeoLocation?: boolean): void {
     if (!withTime) {
         transaction.value.time = getCurrentUnixTime();
         transaction.value.timeZone = settingsStore.appSettings.timeZone;
-        transaction.value.utcOffset = getTimezoneOffsetMinutes(transaction.value.timeZone);
+        transaction.value.utcOffset = getTimezoneOffsetMinutes(transaction.value.time, transaction.value.timeZone);
     }
 
     if (!withGeoLocation) {

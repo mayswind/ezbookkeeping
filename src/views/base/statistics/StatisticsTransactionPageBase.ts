@@ -28,7 +28,11 @@ import type {
 } from '@/models/transaction.ts';
 
 import { limitText, findNameByType, findDisplayNameByType } from '@/lib/common.ts';
-import { getYearMonthFirstUnixTime, getYearMonthLastUnixTime } from '@/lib/datetime.ts';
+import {
+    parseDateTimeFromUnixTime,
+    getYearMonthFirstUnixTime,
+    getYearMonthLastUnixTime
+} from '@/lib/datetime.ts';
 import { getDisplayColor, getCategoryDisplayColor, getAccountDisplayColor } from '@/lib/color.ts';
 
 export function useStatisticsTransactionPageBase() {
@@ -37,8 +41,8 @@ export function useStatisticsTransactionPageBase() {
         getAllDateRanges,
         getAllStatisticsSortingTypes,
         getAllStatisticsDateAggregationTypes,
-        formatUnixTimeToLongDateTime,
-        formatUnixTimeToGregorianLikeLongYearMonth,
+        formatDateTimeToLongDateTime,
+        formatDateTimeToGregorianLikeLongYearMonth,
         formatDateRange,
         formatAmountToLocalizedNumeralsWithCurrency
     } = useI18n();
@@ -88,11 +92,11 @@ export function useStatisticsTransactionPageBase() {
 
     const queryStartTime = computed<string>(() => {
         if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
-            return formatUnixTimeToLongDateTime(query.value.categoricalChartStartTime);
+            return formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(query.value.categoricalChartStartTime));
         } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
-            return formatUnixTimeToGregorianLikeLongYearMonth(getYearMonthFirstUnixTime(query.value.trendChartStartYearMonth));
+            return formatDateTimeToGregorianLikeLongYearMonth(parseDateTimeFromUnixTime(getYearMonthFirstUnixTime(query.value.trendChartStartYearMonth)));
         } else if (analysisType.value === StatisticsAnalysisType.AssetTrends) {
-            return formatUnixTimeToLongDateTime(query.value.assetTrendsChartStartTime);
+            return formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(query.value.assetTrendsChartStartTime));
         } else {
             return '';
         }
@@ -100,11 +104,11 @@ export function useStatisticsTransactionPageBase() {
 
     const queryEndTime = computed<string>(() => {
         if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
-            return formatUnixTimeToLongDateTime(query.value.categoricalChartEndTime);
+            return formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(query.value.categoricalChartEndTime));
         } else if (analysisType.value === StatisticsAnalysisType.TrendAnalysis) {
-            return formatUnixTimeToGregorianLikeLongYearMonth(getYearMonthLastUnixTime(query.value.trendChartEndYearMonth));
+            return formatDateTimeToGregorianLikeLongYearMonth(parseDateTimeFromUnixTime(getYearMonthLastUnixTime(query.value.trendChartEndYearMonth)));
         } else if (analysisType.value === StatisticsAnalysisType.AssetTrends) {
-            return formatUnixTimeToLongDateTime(query.value.assetTrendsChartEndTime);
+            return formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(query.value.assetTrendsChartEndTime));
         } else {
             return '';
         }

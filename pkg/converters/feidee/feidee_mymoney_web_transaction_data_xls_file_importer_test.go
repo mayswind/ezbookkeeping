@@ -25,7 +25,7 @@ func TestFeideeMymoneyTransactionDataXlsImporterParseImportedData_MinimumValidDa
 	testdata, err := os.ReadFile("../../../testdata/feidee_mymoney_test_file.xls")
 	assert.Nil(t, err)
 
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, testdata, 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, testdata, time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 7, len(allNewTransactions))

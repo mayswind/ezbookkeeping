@@ -129,6 +129,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { findNameByValue } from '@/lib/common.ts';
+import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
 import { getClientDisplayVersion, getDesktopVersionPath } from '@/lib/version.ts';
 import { isUserScheduledTransactionEnabled } from '@/lib/server_settings.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
@@ -137,7 +138,7 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, formatUnixTimeToLongDate, initLocale } = useI18n();
+const { tt, formatDateTimeToLongDate, initLocale } = useI18n();
 const { showToast, showConfirm } = useI18nUIComponents();
 const { allThemes, allTimezones, timeZone, isAutoUpdateExchangeRatesData, showAccountBalance } = useAppSettingPageBase();
 
@@ -197,8 +198,12 @@ const isEnableAnimate = computed<boolean>({
 const isEnableApplicationLock = computed<boolean>(() => settingsStore.appSettings.applicationLock);
 
 const exchangeRatesLastUpdateDate = computed<string>(() => {
-    const exchangeRatesLastUpdateTime = exchangeRatesStore.exchangeRatesLastUpdateTime;
-    return exchangeRatesLastUpdateTime ? formatUnixTimeToLongDate(exchangeRatesLastUpdateTime) : '';
+    if (!exchangeRatesStore.exchangeRatesLastUpdateTime) {
+        return '';
+    }
+
+    const exchangeRatesLastUpdateTime = parseDateTimeFromUnixTime(exchangeRatesStore.exchangeRatesLastUpdateTime);
+    return formatDateTimeToLongDate(exchangeRatesLastUpdateTime);
 });
 
 function switchToDesktopVersion(): void {

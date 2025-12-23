@@ -2,6 +2,7 @@ package qif
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -43,7 +44,7 @@ func TestQIFTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) 
 			"D2024-09-05\n"+
 			"T0.06\n"+
 			"L[Test Account2]\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -138,7 +139,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseYearMonthDayDateFormatTime
 			"^\n"+
 			"D2024'9.5\n"+
 			"T-123.45\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -176,7 +177,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseMonthDayYearDateFormatTime
 			"^\n"+
 			"D9.5'2024\n"+
 			"T-123.45\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -214,7 +215,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseDayYearMonthDateFormatTime
 			"^\n"+
 			"D5'9.2024\n"+
 			"T-123.45\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -252,7 +253,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseShortYearMonthDayDateForma
 			"^\n"+
 			"D24'9.5\n"+
 			"T-123.45\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -278,7 +279,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseInvalidTime(t *testing.T) 
 		"!Type:Bank\n"+
 			"D2024 09 01\n"+
 			"T-123.45\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
 
@@ -295,7 +296,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseAmountWithThousandsSeparat
 		"!Type:Bank\n"+
 			"D2024-09-01\n"+
 			"T-123,456.78\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -317,7 +318,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseInvalidAmount(t *testing.T
 		"!Type:Bank\n"+
 			"D2024-09-01\n"+
 			"T-123 45\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }
 
@@ -334,7 +335,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseAccountType(t *testing.T) 
 		"!Type:Cash\n"+
 			"D2024-09-01\n"+
 			"T-123.45\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -347,7 +348,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseAccountType(t *testing.T) 
 		"!Type:CCard\n"+
 			"D2024-09-01\n"+
 			"T-123.45\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -360,7 +361,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseAccountType(t *testing.T) 
 		"!Type:Oth A\n"+
 			"D2024-09-01\n"+
 			"T-123.45\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -373,7 +374,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseAccountType(t *testing.T) 
 		"!Type:Oth L\n"+
 			"D2024-09-01\n"+
 			"T-123.45\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -399,7 +400,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseAccount(t *testing.T) {
 			"!Type:Bank\n"+
 			"D2024-09-01\n"+
 			"T-123.45\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -425,7 +426,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseAmountWithLeadingPlusSign(
 		"!Type:Bank\n"+
 			"D2024-09-01\n"+
 			"T+123.45\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -446,7 +447,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseSubCategory(t *testing.T) 
 			"D2024-09-01\n"+
 			"T-123.45\n"+
 			"LTest Category:Sub Category\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -477,7 +478,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 			"D2024-09-02\n"+
 			"T-234.56\n"+
 			"PTest2\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(allNewTransactions))
@@ -494,7 +495,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 			"D2024-09-02\n"+
 			"T-234.56\n"+
 			"PTest2\n"+
-			"^\n"), 0, converter.DefaultImporterOptions.WithPayeeAsDescription(), nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions.WithPayeeAsDescription(), nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(allNewTransactions))
@@ -516,7 +517,7 @@ func TestQIFTransactionDataFileParseImportedData_WithAdditionalOptions(t *testin
 			"D2024-09-01\n"+
 			"T-123.45\n"+
 			"PTest2\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -527,7 +528,7 @@ func TestQIFTransactionDataFileParseImportedData_WithAdditionalOptions(t *testin
 			"D2024-09-01\n"+
 			"T-123.45\n"+
 			"PTest2\n"+
-			"^\n"), 0, converter.DefaultImporterOptions.WithPayeeAsTag(), nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions.WithPayeeAsTag(), nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -548,13 +549,13 @@ func TestQIFTransactionDataFileParseImportedData_MissingRequiredFields(t *testin
 	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"!Type:Bank\n"+
 			"T-123.45\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingTransactionTime.Message)
 
 	// Missing Amount Field
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"!Type:Bank\n"+
 			"D2024-09-01\n"+
-			"^\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }

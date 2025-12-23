@@ -231,7 +231,7 @@ func (t *camtStatementTransactionDataRowIterator) parseTransaction(ctx core.Cont
 		}
 
 		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = utils.FormatUnixTimeToLongDateTime(dateTime.Unix(), dateTime.Location())
-		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = utils.FormatTimezoneOffset(dateTime.Location())
+		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = utils.FormatTimezoneOffset(dateTime.Unix(), dateTime.Location())
 	} else if entry.BookingDate != nil && entry.BookingDate.Date != "" {
 		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = fmt.Sprintf("%s 00:00:00", entry.BookingDate.Date)
 		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = datatable.TRANSACTION_DATA_TABLE_TIMEZONE_NOT_AVAILABLE

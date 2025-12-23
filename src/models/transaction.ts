@@ -226,11 +226,11 @@ export class Transaction implements TransactionInfoResponse {
         this._displayDayOfWeek = displayDayOfWeek;
     }
 
-    public toCreateRequest(clientSessionId: string, actualTime?: number): TransactionCreateRequest {
+    public toCreateRequest(clientSessionId: string): TransactionCreateRequest {
         return {
             type: this.type,
             categoryId: this.getCategoryId(),
-            time: actualTime ? actualTime : this.time,
+            time: this.time,
             utcOffset: this.utcOffset,
             sourceAccountId: this.sourceAccountId,
             destinationAccountId: this.type === TransactionType.Transfer ? this.destinationAccountId : '0',
@@ -245,7 +245,7 @@ export class Transaction implements TransactionInfoResponse {
         };
     }
 
-    public toModifyRequest(actualTime?: number): TransactionModifyRequest {
+    public toModifyRequest(): TransactionModifyRequest {
         let categoryId = this.getCategoryId();
 
         if (this.type === TransactionType.ModifyBalance) {
@@ -255,7 +255,7 @@ export class Transaction implements TransactionInfoResponse {
         return {
             id: this.id,
             categoryId: categoryId,
-            time: actualTime ? actualTime : this.time,
+            time: this.time,
             utcOffset: this.utcOffset,
             sourceAccountId: this.sourceAccountId,
             destinationAccountId: this.type === TransactionType.Transfer ? this.destinationAccountId : '0',
@@ -677,20 +677,20 @@ export const ALL_TRANSACTION_AMOUNTS_REQUEST_TYPE = [
 
 export type TransactionAmountsRequestType = typeof ALL_TRANSACTION_AMOUNTS_REQUEST_TYPE[number];
 
-export const LATEST_12MONTHS_TRANSACTION_AMOUNTS_REQUEST_TYPES: PartialRecord<TransactionAmountsRequestType, number> = {
-    'monthBeforeLast10Months': 11,
-    'monthBeforeLast9Months': 10,
-    'monthBeforeLast8Months': 9,
-    'monthBeforeLast7Months': 8,
-    'monthBeforeLast6Months': 7,
-    'monthBeforeLast5Months': 6,
-    'monthBeforeLast4Months': 5,
-    'monthBeforeLast3Months': 4,
-    'monthBeforeLast2Months': 3,
-    'monthBeforeLastMonth': 2,
-    'lastMonth': 1,
-    'thisMonth': 0
-};
+export const LATEST_12MONTHS_TRANSACTION_AMOUNTS_REQUEST_TYPES: TransactionAmountsRequestType[] = [
+    'monthBeforeLast10Months',
+    'monthBeforeLast9Months',
+    'monthBeforeLast8Months',
+    'monthBeforeLast7Months',
+    'monthBeforeLast6Months',
+    'monthBeforeLast5Months',
+    'monthBeforeLast4Months',
+    'monthBeforeLast3Months',
+    'monthBeforeLast2Months',
+    'monthBeforeLastMonth',
+    'lastMonth',
+    'thisMonth'
+];
 
 export interface TransactionAmountsRequestParams extends PartialRecord<TransactionAmountsRequestType, StartEndTime> {
     readonly useTransactionTimezone: boolean;
@@ -1009,7 +1009,6 @@ export interface TransactionOverviewResponseItem {
 
 export interface TransactionMonthlyIncomeAndExpenseData {
     readonly monthStartTime: number;
-    readonly monthsBeforeCurrentMonth: number;
     readonly incomeAmount: number;
     readonly expenseAmount: number;
     readonly incompleteIncomeAmount: boolean;

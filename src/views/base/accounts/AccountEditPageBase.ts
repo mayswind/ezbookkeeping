@@ -9,7 +9,13 @@ import { AccountCategory, AccountType } from '@/core/account.ts';
 import type { LocalizedAccountCategory } from '@/core/account.ts';
 import { Account } from '@/models/account.ts';
 
-import { getCurrentUnixTime } from '@/lib/datetime.ts';
+import { isDefined } from '@/lib/common.ts';
+import {
+    getTimezoneOffsetMinutes,
+    getSameDateTimeWithCurrentTimezone,
+    parseDateTimeFromUnixTimeWithBrowserTimezone,
+    getCurrentUnixTime
+} from '@/lib/datetime.ts';
 
 export interface DayAndDisplayName {
     readonly day: number;
@@ -25,7 +31,7 @@ export function useAccountEditPageBase() {
     const clientSessionId = ref<string>('');
     const loading = ref<boolean>(false);
     const submitting = ref<boolean>(false);
-    const account = ref<Account>(Account.createNewAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTime()));
+    const account = ref<Account>(Account.createNewAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTimeForNewAccount()));
     const subAccounts = ref<Account[]>([]);
 
     const title = computed<string>(() => {
@@ -89,6 +95,18 @@ export function useAccountEditPageBase() {
 
     const isAccountSupportCreditCardStatementDate = computed<boolean>(() => account.value && account.value.category === AccountCategory.CreditCard.type);
 
+    function getCurrentUnixTimeForNewAccount(): number {
+        return getSameDateTimeWithCurrentTimezone(parseDateTimeFromUnixTimeWithBrowserTimezone(getCurrentUnixTime())).getUnixTime();
+    }
+
+    function getDefaultTimezoneOffsetMinutes(account: Account): number {
+        if (!account.balanceTime) {
+            return 0;
+        }
+
+        return getTimezoneOffsetMinutes(account.balanceTime);
+    }
+
     function getAccountCreditCardStatementDate(statementDate?: number): string | null {
         for (const item of allAvailableMonthDays.value) {
             if (item.day === statementDate) {
@@ -97,6 +115,23 @@ export function useAccountEditPageBase() {
         }
 
         return null;
+    }
+
+    function updateAccountBalanceTime(account: Account, balanceTime: number): void {
+        if (!isDefined(account.balanceTime)) {
+            account.balanceTime = balanceTime;
+            return;
+        }
+
+        const oldUtcOffset = getTimezoneOffsetMinutes(account.balanceTime);
+        const newUtcOffset = getTimezoneOffsetMinutes(balanceTime);
+
+        if (oldUtcOffset === newUtcOffset) {
+            account.balanceTime = balanceTime;
+            return;
+        }
+
+        account.balanceTime = balanceTime - (newUtcOffset - oldUtcOffset) * 60;
     }
 
     function getInputEmptyProblemMessage(account: Account, isSubAccount: boolean): string | null {
@@ -122,7 +157,7 @@ export function useAccountEditPageBase() {
             return false;
         }
 
-        const subAccount = account.value.createNewSubAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTime());
+        const subAccount = account.value.createNewSubAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTimeForNewAccount());
         subAccounts.value.push(subAccount);
         return true;
     }
@@ -133,7 +168,7 @@ export function useAccountEditPageBase() {
 
         if (newAccount.subAccounts && newAccount.subAccounts.length > 0) {
             for (const oldSubAccount of newAccount.subAccounts) {
-                const subAccount: Account = account.value.createNewSubAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTime());
+                const subAccount: Account = account.value.createNewSubAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTimeForNewAccount());
                 subAccount.fillFrom(oldSubAccount);
 
                 subAccounts.value.push(subAccount);
@@ -163,7 +198,10 @@ export function useAccountEditPageBase() {
         allAvailableMonthDays,
         isAccountSupportCreditCardStatementDate,
         // functions
+        getCurrentUnixTimeForNewAccount,
+        getDefaultTimezoneOffsetMinutes,
         getAccountCreditCardStatementDate,
+        updateAccountBalanceTime,
         isNewAccount,
         addSubAccount,
         setAccount

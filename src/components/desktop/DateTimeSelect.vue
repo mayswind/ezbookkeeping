@@ -94,12 +94,9 @@ import {
 } from '@/core/datetime.ts';
 import {
     getHourIn12HourFormat,
-    getTimezoneOffsetMinutes,
-    getBrowserTimezoneOffsetMinutes,
     getLocalDatetimeFromUnixTime,
-    getUnixTimeFromLocalDatetime,
-    getActualUnixTimeForStore,
-    getDummyUnixTimeForLocalUsage,
+    getSameDateTimeWithBrowserTimezone,
+    parseDateTimeFromUnixTimeWithTimezoneOffset,
     parseDateTimeFromKnownDateTimeFormat,
     getAMOrPM,
     getCombinedDateAndTimeValues
@@ -108,6 +105,7 @@ import { setChildInputFocus } from '@/lib/ui/desktop.ts';
 
 const props = defineProps<{
     modelValue: number;
+    timezoneUtcOffset: number;
     disabled?: boolean;
     readonly?: boolean;
     label?: string;
@@ -124,7 +122,7 @@ const {
     getCurrentNumeralSystemType,
     parseDateTimeFromLongDateTime,
     parseDateTimeFromShortDateTime,
-    formatUnixTimeToLongDateTime
+    formatDateTimeToLongDateTime
 } = useI18n();
 
 const {
@@ -133,6 +131,8 @@ const {
     isMinuteTwoDigits,
     isSecondTwoDigits,
     isMeridiemIndicatorFirst,
+    getLocalDatetimeFromSameDateTimeOfUnixTime,
+    getUnixTimeFromSameDateTimeOfLocalDatetime,
     getDisplayTimeValue,
     generateAllHours,
     generateAllMinutesOrSeconds
@@ -147,10 +147,10 @@ const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType(
 
 const dateTime = computed<Date>({
     get: () => {
-        return getLocalDatetimeFromUnixTime(props.modelValue);
+        return getLocalDatetimeFromSameDateTimeOfUnixTime(props.modelValue, props.timezoneUtcOffset);
     },
     set: (value: Date) => {
-        const unixTime = getUnixTimeFromLocalDatetime(value);
+        const unixTime = getUnixTimeFromSameDateTimeOfLocalDatetime(value, props.timezoneUtcOffset);
 
         if (unixTime < 0) {
             emit('error', 'Date is too early');
@@ -161,7 +161,7 @@ const dateTime = computed<Date>({
     }
 });
 
-const displayTime = computed<string>(() => formatUnixTimeToLongDateTime(getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(dateTime.value), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())));
+const displayTime = computed<string>(() => formatDateTimeToLongDateTime(parseDateTimeFromUnixTimeWithTimezoneOffset(props.modelValue, props.timezoneUtcOffset)));
 
 const hourItems = computed<TimePickerValue[]>(() => generateAllHours(1, isHourTwoDigits.value));
 const minuteItems = computed<TimePickerValue[]>(() => generateAllMinutesOrSeconds(1, isMinuteTwoDigits.value));
@@ -252,7 +252,7 @@ function onPaste(event: ClipboardEvent): void {
         dt = parseDateTimeFromKnownDateTimeFormat(text, formats[0] as KnownDateTimeFormat);
 
         if (dt) {
-            dateTime.value = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(dt.getUnixTime(), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+            dateTime.value = getLocalDatetimeFromUnixTime(getSameDateTimeWithBrowserTimezone(dt).getUnixTime());
             return;
         }
     }
@@ -260,14 +260,14 @@ function onPaste(event: ClipboardEvent): void {
     dt = parseDateTimeFromLongDateTime(text);
 
     if (dt) {
-        dateTime.value = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(dt.getUnixTime(), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+        dateTime.value = getLocalDatetimeFromUnixTime(getSameDateTimeWithBrowserTimezone(dt).getUnixTime());
         return;
     }
 
     dt = parseDateTimeFromShortDateTime(text);
 
     if (dt) {
-        dateTime.value = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(dt.getUnixTime(), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+        dateTime.value = getLocalDatetimeFromUnixTime(getSameDateTimeWithBrowserTimezone(dt).getUnixTime());
         return;
     }
 

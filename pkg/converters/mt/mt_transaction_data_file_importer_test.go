@@ -2,6 +2,7 @@ package mt
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -32,7 +33,7 @@ func TestMT940TransactionDataFileParseImportedData_MinimumValidData(t *testing.T
 		:61:2506020603D234,56NTRFFOOBAR
 		:86:Transaction 2
 		:62F:C250601CNY123,45
-		-}`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		-}`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -92,7 +93,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionValidAmountAn
 		:61:250603C1,NTRFTEST
 		:86:Transaction 3
 		:62F:C250601CNY123,45
-		-}`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		-}`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(allNewTransactions))
@@ -118,7 +119,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionInvalidAmount
 		:60F:C250601CNY123,45
 		:61:2506010602C123 45NTRFTEST
 		:62F:C250601CNY123,45
-		-}`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		-}`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidMT940File.Message)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
@@ -129,7 +130,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionInvalidAmount
 		:60F:C250601CNY123,45
 		:61:2506010602C12.45NTRFTEST
 		:62F:C250601CNY123,45
-		-}`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		-}`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidMT940File.Message)
 }
 
@@ -157,7 +158,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseTransactionType(t *testi
 		:61:250604RD123,45NTRFTEST
 		:86:Transaction 4
 		:62F:C250601CNY123,45
-		-}`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		-}`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 4, len(allNewTransactions))
@@ -187,7 +188,7 @@ func TestMT940TransactionDataFileParseImportedData_ParseDescription(t *testing.T
 		Part 2
 		Part 3
 		:62F:C250601CNY123,45
-		-}`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		-}`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -210,6 +211,6 @@ func TestMT940TransactionDataFileParseImportedData_MissingRequiredField(t *testi
 		:28C:123/1
 		:61:250601C123,45NTRFTEST
 		:86:Transaction 1
-		-}`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		-}`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 }

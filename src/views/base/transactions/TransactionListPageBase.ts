@@ -23,13 +23,12 @@ import { type Transaction, TransactionTagFilter } from '@/models/transaction.ts'
 
 import {
     getUtcOffsetByUtcOffsetMinutes,
-    getTimezoneOffset,
     getTimezoneOffsetMinutes,
-    getBrowserTimezoneOffsetMinutes,
     getLocalDatetimeFromUnixTime,
-    getDummyUnixTimeForLocalUsage,
+    getSameDateTimeWithBrowserTimezone,
     getCurrentDateTime,
     parseDateTimeFromUnixTime,
+    parseDateTimeFromUnixTimeWithTimezoneOffset,
     getYearMonthFirstUnixTime,
     isDateRangeMatchOneMonth
 } from '@/lib/datetime.ts';
@@ -76,10 +75,10 @@ export function useTransactionListPageBase() {
         tt,
         getAllDateRanges,
         getCurrentNumeralSystemType,
-        formatUnixTimeToLongDateTime,
-        formatUnixTimeToLongDate,
-        formatUnixTimeToShortTime,
-        formatUnixTimeToGregorianLikeLongYearMonth,
+        formatDateTimeToLongDateTime,
+        formatDateTimeToLongDate,
+        formatDateTimeToShortTime,
+        formatDateTimeToGregorianLikeLongYearMonth,
         formatDateRange,
         formatAmountToLocalizedNumeralsWithCurrency
     } = useI18n();
@@ -98,7 +97,6 @@ export function useTransactionListPageBase() {
     const currentCalendarDate = ref<TextualYearMonthDay | ''>('');
 
     const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
-    const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
     const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
     const fiscalYearStart = computed<number>(() => userStore.currentUserFiscalYearStart);
     const defaultCurrency = computed<string>(() => getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(allAccountsMap.value, queryAllFilterAccountIds.value, userStore.currentUserDefaultCurrency));
@@ -161,8 +159,8 @@ export function useTransactionListPageBase() {
 
         return formatDateRange(query.value.dateType, query.value.minTime, query.value.maxTime);
     });
-    const queryMinTime = computed<string>(() => formatUnixTimeToLongDateTime(query.value.minTime));
-    const queryMaxTime = computed<string>(() => formatUnixTimeToLongDateTime(query.value.maxTime));
+    const queryMinTime = computed<string>(() => formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(query.value.minTime)));
+    const queryMaxTime = computed<string>(() => formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(query.value.maxTime)));
     const queryMonthlyData = computed<boolean>(() => isDateRangeMatchOneMonth(query.value.minTime, query.value.maxTime));
     const queryMonth = computed<Year0BasedMonth>(() => {
         if (!query.value.minTime || !query.value.maxTime) {
@@ -235,8 +233,8 @@ export function useTransactionListPageBase() {
         return displayAmount.join(' ~ ');
     });
 
-    const transactionCalendarMinDate = computed<Date>(() => getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(query.value.minTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())));
-    const transactionCalendarMaxDate = computed<Date>(() => getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(query.value.maxTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())));
+    const transactionCalendarMinDate = computed<Date>(() => getLocalDatetimeFromUnixTime(getSameDateTimeWithBrowserTimezone(parseDateTimeFromUnixTime(query.value.minTime)).getUnixTime()));
+    const transactionCalendarMaxDate = computed<Date>(() => getLocalDatetimeFromUnixTime(getSameDateTimeWithBrowserTimezone(parseDateTimeFromUnixTime(query.value.maxTime)).getUnixTime()));
 
     const currentMonthTransactionData = computed<TransactionMonthList | null>(() => {
         const allTransactions = transactionsStore.transactions;
@@ -284,6 +282,10 @@ export function useTransactionListPageBase() {
         return false;
     }
 
+    function isSameAsDefaultTimezoneOffsetMinutes(transaction: Transaction): boolean {
+        return transaction.utcOffset === getTimezoneOffsetMinutes(transaction.time);
+    }
+
     function formatAmount(amount: number, hideAmount: boolean, currencyCode: string): string {
         if (hideAmount) {
             return formatAmountToLocalizedNumeralsWithCurrency(DISPLAY_HIDDEN_AMOUNT, currencyCode);
@@ -293,15 +295,18 @@ export function useTransactionListPageBase() {
     }
 
     function getDisplayTime(transaction: Transaction): string {
-        return formatUnixTimeToShortTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value);
+        const dateTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transaction.utcOffset);
+        return formatDateTimeToShortTime(dateTime);
     }
 
     function getDisplayLongDate(transaction: Transaction): string {
-        return formatUnixTimeToLongDate(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value);
+        const dateTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transaction.utcOffset);
+        return formatDateTimeToLongDate(dateTime);
     }
 
     function getDisplayLongYearMonth(transactionMonthList: TransactionMonthList): string {
-        return formatUnixTimeToGregorianLikeLongYearMonth(getYearMonthFirstUnixTime(transactionMonthList.yearDashMonth));
+        const yearMonthDateTime = parseDateTimeFromUnixTime(getYearMonthFirstUnixTime(transactionMonthList.yearDashMonth));
+        return formatDateTimeToGregorianLikeLongYearMonth(yearMonthDateTime);
     }
 
     function getDisplayTimezone(transaction: Transaction): string {
@@ -310,8 +315,10 @@ export function useTransactionListPageBase() {
     }
 
     function getDisplayTimeInDefaultTimezone(transaction: Transaction): string {
-        const utcOffset = numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(getTimezoneOffset(settingsStore.appSettings.timeZone));
-        return `${formatUnixTimeToLongDateTime(transaction.time)} (UTC${utcOffset})`;
+        const timezoneOffsetMinutes = getTimezoneOffsetMinutes(transaction.time);
+        const dateTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, timezoneOffsetMinutes);
+        const utcOffset = numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(getUtcOffsetByUtcOffsetMinutes(timezoneOffsetMinutes));
+        return `${formatDateTimeToLongDateTime(dateTime)} (UTC${utcOffset})`;
     }
 
     function getDisplayAmount(transaction: Transaction): string {
@@ -372,7 +379,6 @@ export function useTransactionListPageBase() {
         customMaxDatetime,
         currentCalendarDate,
         // computed states
-        currentTimezoneOffsetMinutes,
         firstDayOfWeek,
         fiscalYearStart,
         defaultCurrency,
@@ -410,6 +416,7 @@ export function useTransactionListPageBase() {
         canAddTransaction,
         // functions
         hasSubCategoryInQuery,
+        isSameAsDefaultTimezoneOffsetMinutes,
         getDisplayTime,
         getDisplayLongDate,
         getDisplayLongYearMonth,

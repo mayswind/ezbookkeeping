@@ -124,8 +124,9 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
 
 import { TextDirection } from '@/core/text.ts';
+import { type DateTime } from '@/core/datetime.ts';
 import { FontSize } from '@/core/font.ts';
-import { parseDateTimeFromUnixTime, getCurrentUnixTime } from '@/lib/datetime.ts';
+import { getCurrentDateTime } from '@/lib/datetime.ts';
 import { setAppFontSize, getFontSizePreviewClassName } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{
@@ -136,23 +137,23 @@ const {
     tt,
     getCurrentLanguageTextDirection,
     getWeekdayShortName,
-    getCalendarDisplayDayOfMonthFromUnixTime,
-    formatUnixTimeToShortTime,
-    formatUnixTimeToGregorianLikeLongYearMonth,
+    getCalendarDisplayDayOfMonthFromDateTime,
+    formatDateTimeToShortTime,
+    formatDateTimeToGregorianLikeLongYearMonth,
     formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
 
 const settingsStore = useSettingsStore();
 
-const currentUnixTime = ref<number>(getCurrentUnixTime());
+const currentDateTime = ref<DateTime>(getCurrentDateTime());
 const fontSize = ref<number>(settingsStore.appSettings.fontSize);
 
 const textDirection = computed<string>(() => getCurrentLanguageTextDirection());
 const fontSizePreviewClassName = computed<string>(() => getFontSizePreviewClassName(fontSize.value));
-const currentLongYearMonth = computed<string>(() => formatUnixTimeToGregorianLikeLongYearMonth(currentUnixTime.value));
-const currentDayOfMonth = computed<string>(() => getCalendarDisplayDayOfMonthFromUnixTime(currentUnixTime.value));
-const currentDayOfWeek = computed<string>(() => getWeekdayShortName(parseDateTimeFromUnixTime(currentUnixTime.value).getWeekDay()));
-const currentShortTime = computed<string>(() => formatUnixTimeToShortTime(currentUnixTime.value));
+const currentLongYearMonth = computed<string>(() => formatDateTimeToGregorianLikeLongYearMonth(currentDateTime.value));
+const currentDayOfMonth = computed<string>(() => getCalendarDisplayDayOfMonthFromDateTime(currentDateTime.value));
+const currentDayOfWeek = computed<string>(() => getWeekdayShortName(currentDateTime.value.getWeekDay()));
+const currentShortTime = computed<string>(() => formatDateTimeToShortTime(currentDateTime.value));
 
 function getFontSizeName(): string {
     return '';

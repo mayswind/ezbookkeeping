@@ -9,6 +9,7 @@ import type { VersionInfo } from '@/core/version.ts';
 
 import type { LatestExchangeRateResponse } from '@/models/exchange_rate.ts';
 
+import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
 import { getMapProvider } from '@/lib/server_settings.ts';
 import { getMapWebsite } from '@/lib/map/index.ts';
 import { getLicense, getThirdPartyLicenses } from '@/lib/licenses.ts';
@@ -16,7 +17,7 @@ import { formatDisplayVersion, getClientDisplayVersion, getClientBuildTime } fro
 import { clearBrowserCaches } from '@/lib/ui/common.ts';
 
 export function useAboutPageBase() {
-    const { tt, formatUnixTimeToLongDateTime } = useI18n();
+    const { tt, formatDateTimeToLongDateTime } = useI18n();
 
     const systemsStore = useSystemsStore();
     const exchangeRatesStore = useExchangeRatesStore();
@@ -41,7 +42,8 @@ export function useAboutPageBase() {
             return time;
         }
 
-        return formatUnixTimeToLongDateTime(parseInt(time));
+        const buildDateTime = parseDateTimeFromUnixTime(parseInt(time));
+        return formatDateTimeToLongDateTime(buildDateTime);
     });
 
     const exchangeRatesData = computed<LatestExchangeRateResponse | undefined>(() => exchangeRatesStore.latestExchangeRates.data);

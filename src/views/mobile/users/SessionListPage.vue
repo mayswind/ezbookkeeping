@@ -58,6 +58,7 @@ import { TextDirection } from '@/core/text.ts';
 import { type TokenInfoResponse, SessionDeviceType, SessionInfo } from '@/models/token.ts';
 
 import { isEquals } from '@/lib/common.ts';
+import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
 import { parseSessionInfo } from '@/lib/session.ts';
 
 class MobilePageSessionInfo extends SessionInfo {
@@ -69,7 +70,7 @@ class MobilePageSessionInfo extends SessionInfo {
         super(sessionInfo.tokenId, sessionInfo.isCurrent, sessionInfo.deviceType, sessionInfo.deviceInfo, sessionInfo.deviceName, sessionInfo.lastSeen);
         this.domId = getTokenDomId(sessionInfo.tokenId);
         this.icon = getTokenIcon(sessionInfo.deviceType);
-        this.lastSeenDateTime = sessionInfo.lastSeen ? formatUnixTimeToLongDateTime(sessionInfo.lastSeen) : '-';
+        this.lastSeenDateTime = sessionInfo.lastSeen ? formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(sessionInfo.lastSeen)) : '-';
     }
 }
 
@@ -77,7 +78,12 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getCurrentLanguageTextDirection, formatUnixTimeToLongDateTime } = useI18n();
+const {
+    tt,
+    getCurrentLanguageTextDirection,
+    formatDateTimeToLongDateTime
+} = useI18n();
+
 const { showConfirm, showToast, routeBackOnError } = useI18nUIComponents();
 
 const tokensStore = useTokensStore();

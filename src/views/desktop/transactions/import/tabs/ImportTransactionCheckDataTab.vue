@@ -81,7 +81,7 @@
         <template #item.time="{ item }">
             <span>{{ getDisplayDateTime(item) }}</span>
             <v-chip class="ms-1" variant="flat" color="grey" size="x-small"
-                    v-if="item.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimezone(item) }}</v-chip>
+                    v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimezone(item) }}</v-chip>
         </template>
         <template #item.type="{ value }">
             <v-chip label color="secondary" variant="outlined" size="x-small" v-if="value === TransactionType.ModifyBalance">{{ tt('Modify Balance') }}</v-chip>
@@ -427,7 +427,9 @@ import {
 } from '@/lib/common.ts';
 import {
     getUtcOffsetByUtcOffsetMinutes,
-    getTimezoneOffsetMinutes
+    getTimezoneOffsetMinutes,
+    parseDateTimeFromUnixTime,
+    parseDateTimeFromUnixTimeWithTimezoneOffset
 } from '@/lib/datetime.ts';
 import { formatCoordinate } from '@/lib/coordinate.ts';
 import {
@@ -495,7 +497,7 @@ const props = defineProps<{
 const {
     tt,
     getCurrentNumeralSystemType,
-    formatUnixTimeToLongDateTime,
+    formatDateTimeToLongDateTime,
     formatAmountToLocalizedNumeralsWithCurrency,
     getCategorizedAccountsWithDisplayBalance
 } = useI18n();
@@ -536,7 +538,6 @@ const currentDescriptionFilterValue = ref<string | null>(null);
 
 const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 const showAccountBalance = computed<boolean>(() => settingsStore.appSettings.showAccountBalance);
-const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
 
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 const coordinateDisplayType = computed<number>(() => userStore.currentUserCoordinateDisplayType);
@@ -1129,8 +1130,8 @@ const displayFilterCustomDateRange = computed<string>(() => {
         return '';
     }
 
-    const minDisplayTime = formatUnixTimeToLongDateTime(filters.value.minDatetime);
-    const maxDisplayTime = formatUnixTimeToLongDateTime(filters.value.maxDatetime);
+    const minDisplayTime = formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(filters.value.minDatetime));
+    const maxDisplayTime = formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(filters.value.maxDatetime));
 
     return `${minDisplayTime} - ${maxDisplayTime}`
 });
@@ -1272,7 +1273,12 @@ function isTagValid(tagIds: string[], tagIndex: number): boolean {
 }
 
 function getDisplayDateTime(transaction: ImportTransaction): string {
-    return formatUnixTimeToLongDateTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value);
+    const dateTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transaction.utcOffset)
+    return formatDateTimeToLongDateTime(dateTime);
+}
+
+function isSameAsDefaultTimezoneOffsetMinutes(transaction: ImportTransaction): boolean {
+    return transaction.utcOffset === getTimezoneOffsetMinutes(transaction.time);
 }
 
 function getDisplayTimezone(transaction: ImportTransaction): string {

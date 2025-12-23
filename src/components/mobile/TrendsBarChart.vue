@@ -144,6 +144,7 @@ import {
     isNumber
 } from '@/lib/common.ts';
 import {
+    parseDateTimeFromUnixTime,
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
     getDateTypeByDateRange,
@@ -200,11 +201,11 @@ const emit = defineEmits<{
 
 const {
     tt,
-    formatUnixTimeToShortDate,
-    formatUnixTimeToGregorianLikeShortYear,
-    formatUnixTimeToGregorianLikeShortYearMonth,
+    formatDateTimeToShortDate,
+    formatDateTimeToGregorianLikeShortYear,
+    formatDateTimeToGregorianLikeShortYearMonth,
     formatYearQuarterToGregorianLikeYearQuarter,
-    formatUnixTimeToGregorianLikeFiscalYear,
+    formatDateTimeToGregorianLikeFiscalYear,
     formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
 
@@ -324,18 +325,19 @@ const allDisplayDataItems = computed<TrendsBarChartData>(() => {
             dateRangeKey = `${dateRange.year}-${dateRange.month}-${dateRange.day}`;
         }
 
+        const minDateTime = parseDateTimeFromUnixTime(dateRange.minUnixTime);
         let displayDateRange = '';
 
         if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
-            displayDateRange = formatUnixTimeToGregorianLikeShortYear(dateRange.minUnixTime);
+            displayDateRange = formatDateTimeToGregorianLikeShortYear(minDateTime);
         } else if (props.dateAggregationType === ChartDateAggregationType.FiscalYear.type) {
-            displayDateRange = formatUnixTimeToGregorianLikeFiscalYear(dateRange.minUnixTime);
+            displayDateRange = formatDateTimeToGregorianLikeFiscalYear(minDateTime);
         } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type && 'quarter' in dateRange) {
             displayDateRange = formatYearQuarterToGregorianLikeYearQuarter(dateRange.year, dateRange.quarter);
         } else if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
-            displayDateRange = formatUnixTimeToGregorianLikeShortYearMonth(dateRange.minUnixTime);
+            displayDateRange = formatDateTimeToGregorianLikeShortYearMonth(minDateTime);
         } else if (props.dateAggregationType === ChartDateAggregationType.Day.type && props.chartMode === 'daily') {
-            displayDateRange = formatUnixTimeToShortDate(dateRange.minUnixTime);
+            displayDateRange = formatDateTimeToShortDate(minDateTime);
         }
 
         const dataItems = allDateRangeItemsMap[dateRangeKey] || [];

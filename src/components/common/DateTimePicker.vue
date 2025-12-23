@@ -88,9 +88,9 @@ const {
     getCurrentNumeralSystemType,
     isLongDateMonthAfterYear,
     isLongTime24HourFormat,
-    getCalendarDisplayShortYearFromUnixTime,
-    getCalendarDisplayShortMonthFromUnixTime,
-    getCalendarDisplayDayOfMonthFromUnixTime,
+    getCalendarDisplayShortYearFromDateTime,
+    getCalendarDisplayShortMonthFromDateTime,
+    getCalendarDisplayDayOfMonthFromDateTime,
     getCalendarAlternateDate
 } = useI18n();
 
@@ -138,21 +138,21 @@ function switchView(viewType: MenuView): void {
 }
 
 function getDisplayYear(year: number): string {
-    return getCalendarDisplayShortYearFromUnixTime(getYearMonthDayDateTime(year, 1, 1).getUnixTime(), actualNumeralSystem.value);
+    return getCalendarDisplayShortYearFromDateTime(getYearMonthDayDateTime(year, 1, 1), actualNumeralSystem.value);
 }
 
 function getDisplayMonth(month: number): string {
     if (isArray(dateTime.value)) {
-        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value[0]!.getFullYear(), month + 1, 1).getUnixTime(), actualNumeralSystem.value);
+        return getCalendarDisplayShortMonthFromDateTime(getYearMonthDayDateTime(dateTime.value[0]!.getFullYear(), month + 1, 1), actualNumeralSystem.value);
     } else if (dateTime.value) {
-        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(dateTime.value.getFullYear(), month + 1, 1).getUnixTime(), actualNumeralSystem.value);
+        return getCalendarDisplayShortMonthFromDateTime(getYearMonthDayDateTime(dateTime.value.getFullYear(), month + 1, 1), actualNumeralSystem.value);
     } else {
-        return getCalendarDisplayShortMonthFromUnixTime(getYearMonthDayDateTime(new Date().getFullYear(), month + 1, 1).getUnixTime(), actualNumeralSystem.value);
+        return getCalendarDisplayShortMonthFromDateTime(getYearMonthDayDateTime(new Date().getFullYear(), month + 1, 1), actualNumeralSystem.value);
     }
 }
 
 function getDisplayDay(date: Date): string {
-    return getCalendarDisplayDayOfMonthFromUnixTime(getYearMonthDayDateTime(date.getFullYear(), date.getMonth() + 1, date.getDate()).getUnixTime(), actualNumeralSystem.value);
+    return getCalendarDisplayDayOfMonthFromDateTime(getYearMonthDayDateTime(date.getFullYear(), date.getMonth() + 1, date.getDate()), actualNumeralSystem.value);
 }
 
 defineExpose({

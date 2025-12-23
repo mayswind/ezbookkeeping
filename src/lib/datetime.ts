@@ -69,7 +69,31 @@ interface DateTimeFormatResult {
     hasNumeral?: boolean;
 }
 
-type DateTimeTokenFormatFunction = (d: MomentDateTime, options: DateTimeFormatOptions) => DateTimeFormatResult
+type DateTimeTokenFormatFunction = (d: MomentDateTime, options: DateTimeFormatOptions) => DateTimeFormatResult;
+
+const westernmostTimezoneUtcOffset: number = -720; // Etc/GMT+12 (UTC-12:00)
+const easternmostTimezoneUtcOffset: number = 840; // Pacific/Kiritimati (UTC+14:00)
+
+function getFixedTimezoneName(utcOffset: number): string {
+    return `Fixed/Timezone${utcOffset}`;
+}
+
+(function initFixedTimezone(): void {
+    for (let utcOffset = westernmostTimezoneUtcOffset; utcOffset <= easternmostTimezoneUtcOffset; utcOffset += 15) {
+        const timezoneName = getFixedTimezoneName(utcOffset);
+
+        if (moment.tz.zone(timezoneName)) {
+            continue;
+        }
+
+        moment.tz.add(moment.tz.pack({
+            name: timezoneName,
+            abbrs: [`FIX${utcOffset}`],
+            offsets: [-utcOffset],
+            untils: [0]
+        }));
+    }
+})();
 
 class MomentDateTime implements DateTime {
     private static readonly tokenFormatFuncs: Record<string, DateTimeTokenFormatFunction> = {
@@ -501,28 +525,29 @@ export function getUtcOffsetByUtcOffsetMinutes(utcOffsetMinutes: number): string
     }
 }
 
-export function getTimezoneOffset(timezone?: string): string {
-    return getUtcOffsetByUtcOffsetMinutes(getTimezoneOffsetMinutes(timezone));
+export function getTimezoneOffset(unixTime: number, timezone?: string): string {
+    return getUtcOffsetByUtcOffsetMinutes(getTimezoneOffsetMinutes(unixTime, timezone));
 }
 
-export function getTimezoneOffsetMinutes(timezone?: string): number {
+export function getTimezoneOffsetMinutes(unixTime: number, timezone?: string): number {
     if (timezone) {
-        return moment().tz(timezone).utcOffset();
+        return moment.unix(unixTime).tz(timezone).utcOffset();
     } else {
-        return moment().utcOffset();
+        return moment.unix(unixTime).utcOffset();
     }
 }
 
-export function getBrowserTimezoneOffset(): string {
-    return getUtcOffsetByUtcOffsetMinutes(getBrowserTimezoneOffsetMinutes());
+export function getBrowserTimezoneOffset(unixTime: number): string {
+    return getUtcOffsetByUtcOffsetMinutes(getBrowserTimezoneOffsetMinutes(unixTime));
 }
 
-export function getBrowserTimezoneOffsetMinutes(): number {
-    return -new Date().getTimezoneOffset();
+export function getBrowserTimezoneOffsetMinutes(unixTime: number): number {
+    const date = getLocalDatetimeFromUnixTime(getSameDateTimeWithBrowserTimezone(parseDateTimeFromUnixTime(unixTime)).getUnixTime());
+    return -date.getTimezoneOffset();
 }
 
-export function guessTimezoneName(): string {
-    return moment.tz.guess(true);
+export function getBrowserTimezoneName(): string {
+    return new Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
 export function getLocalDatetimeFromUnixTime(unixTime: number): Date {
@@ -533,12 +558,46 @@ export function getUnixTimeFromLocalDatetime(datetime: Date): number {
     return Math.floor(datetime.getTime() / 1000);
 }
 
-export function getActualUnixTimeForStore(unixTime: number, utcOffset: number, currentUtcOffset: number): number {
-    return unixTime - (utcOffset - currentUtcOffset) * 60;
+export function getSameDateTimeWithCurrentTimezone(dateTime: DateTime): DateTime {
+    const newDateTime = moment().set({
+        year: dateTime.getGregorianCalendarYear(),
+        month: dateTime.getGregorianCalendarMonth() - 1,
+        date: dateTime.getGregorianCalendarDay(),
+        hour: dateTime.getHour(),
+        minute: dateTime.getMinute(),
+        second: dateTime.getSecond(),
+        millisecond: 0
+    });
+
+    return MomentDateTime.of(newDateTime);
 }
 
-export function getDummyUnixTimeForLocalUsage(unixTime: number, utcOffset: number, currentUtcOffset: number): number {
-    return unixTime + (utcOffset - currentUtcOffset) * 60;
+export function getSameDateTimeWithBrowserTimezone(dateTime: DateTime): DateTime {
+    const newDateTime = moment().tz(getBrowserTimezoneName()).set({
+        year: dateTime.getGregorianCalendarYear(),
+        month: dateTime.getGregorianCalendarMonth() - 1,
+        date: dateTime.getGregorianCalendarDay(),
+        hour: dateTime.getHour(),
+        minute: dateTime.getMinute(),
+        second: dateTime.getSecond(),
+        millisecond: 0,
+    });
+
+    return MomentDateTime.of(newDateTime);
+}
+
+export function getSameDateTimeWithTimezoneOffset(dateTime: DateTime, utcOffset: number): DateTime {
+    const newDateTime = moment().tz(getFixedTimezoneName(utcOffset)).set({
+        year: dateTime.getGregorianCalendarYear(),
+        month: dateTime.getGregorianCalendarMonth() - 1,
+        date: dateTime.getGregorianCalendarDay(),
+        hour: dateTime.getHour(),
+        minute: dateTime.getMinute(),
+        second: dateTime.getSecond(),
+        millisecond: 0
+    });
+
+    return MomentDateTime.of(newDateTime);
 }
 
 export function getCurrentDateTime(): DateTime {
@@ -554,16 +613,16 @@ export function getYearMonthDayDateTime(year: number, month: number, day: number
     return MomentDateTime.of(date);
 }
 
-export function parseDateTimeFromUnixTime(unixTime: number, utcOffset?: number, currentUtcOffset?: number): DateTime {
-    if (isNumber(utcOffset)) {
-        if (!isNumber(currentUtcOffset)) {
-            currentUtcOffset = getTimezoneOffsetMinutes();
-        }
-
-        unixTime = getDummyUnixTimeForLocalUsage(unixTime, utcOffset, currentUtcOffset);
-    }
-
+export function parseDateTimeFromUnixTime(unixTime: number): DateTime {
     return MomentDateTime.of(moment.unix(unixTime));
+}
+
+export function parseDateTimeFromUnixTimeWithBrowserTimezone(unixTime: number): DateTime {
+    return MomentDateTime.of(moment.unix(unixTime).tz(getBrowserTimezoneName()));
+}
+
+export function parseDateTimeFromUnixTimeWithTimezoneOffset(unixTime: number, utcOffset: number): DateTime {
+    return MomentDateTime.of(moment.unix(unixTime).tz(getFixedTimezoneName(utcOffset)));
 }
 
 export function parseDateTimeFromKnownDateTimeFormat(dateTime: string, format: KnownDateTimeFormat): DateTime | undefined {
@@ -586,8 +645,12 @@ export function parseDateTimeFromString(dateTime: string, format: string): DateT
     return MomentDateTime.of(m);
 }
 
-export function formatUnixTime(unixTime: number, format: string, options: DateTimeFormatOptions, utcOffset?: number, currentUtcOffset?: number): string {
-    return parseDateTimeFromUnixTime(unixTime, utcOffset, currentUtcOffset).format(format, options);
+export function formatDateTime(dateTime: DateTime, format: string, options: DateTimeFormatOptions): string {
+    return dateTime.format(format, options);
+}
+
+export function formatUnixTime(unixTime: number, format: string, options: DateTimeFormatOptions): string {
+    return parseDateTimeFromUnixTime(unixTime).format(format, options);
 }
 
 export function formatCurrentTime(format: string, options: DateTimeFormatOptions): string {

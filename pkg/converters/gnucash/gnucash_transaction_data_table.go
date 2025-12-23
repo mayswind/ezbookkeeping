@@ -124,7 +124,7 @@ func (t *gnucashTransactionDataRowIterator) parseTransaction(ctx core.Context, u
 	}
 
 	data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = utils.FormatUnixTimeToLongDateTime(dateTime.Unix(), dateTime.Location())
-	data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = utils.FormatTimezoneOffset(dateTime.Location())
+	data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = utils.FormatTimezoneOffset(dateTime.Unix(), dateTime.Location())
 
 	if len(gnucashTransaction.Splits) == 2 {
 		splitData1 := gnucashTransaction.Splits[0]

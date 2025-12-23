@@ -17,12 +17,14 @@ import type {
     TransactionOverviewResponseItem
 } from '@/models/transaction.ts';
 
+import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
+
 export function useHomePageBase() {
     const {
-        formatUnixTimeToLongDate,
-        formatUnixTimeToLongMonthDay,
-        formatUnixTimeToGregorianLikeLongYear,
-        formatUnixTimeToGregorianLikeLongMonth,
+        formatDateTimeToLongDate,
+        formatDateTimeToLongMonthDay,
+        formatDateTimeToGregorianLikeLongYear,
+        formatDateTimeToGregorianLikeLongMonth,
         formatAmountToLocalizedNumeralsWithCurrency
     } = useI18n();
 
@@ -57,19 +59,19 @@ export function useHomePageBase() {
     const displayDateRange = computed<TransactionOverviewDisplayTime>(() => {
         return {
             today: {
-                displayTime: formatUnixTimeToLongDate(overviewStore.transactionDataRange.today.startTime),
+                displayTime: formatDateTimeToLongDate(parseDateTimeFromUnixTime(overviewStore.transactionDataRange.today.startTime)),
             },
             thisWeek: {
-                startTime: formatUnixTimeToLongMonthDay(overviewStore.transactionDataRange.thisWeek.startTime),
-                endTime: formatUnixTimeToLongMonthDay(overviewStore.transactionDataRange.thisWeek.endTime)
+                startTime: formatDateTimeToLongMonthDay(parseDateTimeFromUnixTime(overviewStore.transactionDataRange.thisWeek.startTime)),
+                endTime: formatDateTimeToLongMonthDay(parseDateTimeFromUnixTime(overviewStore.transactionDataRange.thisWeek.endTime))
             },
             thisMonth: {
-                displayTime: formatUnixTimeToGregorianLikeLongMonth(overviewStore.transactionDataRange.thisMonth.startTime),
-                startTime: formatUnixTimeToLongMonthDay(overviewStore.transactionDataRange.thisMonth.startTime),
-                endTime: formatUnixTimeToLongMonthDay(overviewStore.transactionDataRange.thisMonth.endTime)
+                displayTime: formatDateTimeToGregorianLikeLongMonth(parseDateTimeFromUnixTime(overviewStore.transactionDataRange.thisMonth.startTime)),
+                startTime: formatDateTimeToLongMonthDay(parseDateTimeFromUnixTime(overviewStore.transactionDataRange.thisMonth.startTime)),
+                endTime: formatDateTimeToLongMonthDay(parseDateTimeFromUnixTime(overviewStore.transactionDataRange.thisMonth.endTime))
             },
             thisYear: {
-                displayTime: formatUnixTimeToGregorianLikeLongYear(overviewStore.transactionDataRange.thisYear.startTime)
+                displayTime: formatDateTimeToGregorianLikeLongYear(parseDateTimeFromUnixTime(overviewStore.transactionDataRange.thisYear.startTime))
             }
         };
     });

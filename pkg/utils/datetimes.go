@@ -224,9 +224,14 @@ func ParseFromLongDateTimeToMaxUnixTime(t string) (time.Time, error) {
 	return time.ParseInLocation(longDateTimeFormat, t, timezone)
 }
 
-// ParseFromLongDateTime parses a formatted string in long date time format
-func ParseFromLongDateTime(t string, utcOffset int16) (time.Time, error) {
+// ParseFromLongDateTimeInFixedUtcOffset parses a formatted string in long date time format
+func ParseFromLongDateTimeInFixedUtcOffset(t string, utcOffset int16) (time.Time, error) {
 	timezone := time.FixedZone("Timezone", int(utcOffset)*60)
+	return time.ParseInLocation(longDateTimeFormat, t, timezone)
+}
+
+// ParseFromLongDateTimeInTimeZone parses a formatted string in long date time format
+func ParseFromLongDateTimeInTimeZone(t string, timezone *time.Location) (time.Time, error) {
 	return time.ParseInLocation(longDateTimeFormat, t, timezone)
 }
 
@@ -245,14 +250,14 @@ func ParseFromLongDateTimeWithTimezoneRFC3339Format(t string) (time.Time, error)
 	return time.Parse(longDateTimeWithTimezoneRFC3339Format, t)
 }
 
-// ParseFromLongDateTimeWithoutSecond parses a formatted string in long date time format (no second)
-func ParseFromLongDateTimeWithoutSecond(t string, utcOffset int16) (time.Time, error) {
+// ParseFromLongDateTimeWithoutSecondInFixedUtcOffset parses a formatted string in long date time format (no second) with fixed UTC offset
+func ParseFromLongDateTimeWithoutSecondInFixedUtcOffset(t string, utcOffset int16) (time.Time, error) {
 	timezone := time.FixedZone("Timezone", int(utcOffset)*60)
 	return time.ParseInLocation(longDateTimeWithoutSecondFormat, t, timezone)
 }
 
-// ParseFromShortDateTime parses a formatted string in short date time format
-func ParseFromShortDateTime(t string, utcOffset int16) (time.Time, error) {
+// ParseFromShortDateTimeInFixedUtcOffset parses a formatted string in short date time format with fixed UTC offset
+func ParseFromShortDateTimeInFixedUtcOffset(t string, utcOffset int16) (time.Time, error) {
 	timezone := time.FixedZone("Timezone", int(utcOffset)*60)
 	return time.ParseInLocation(shortDateTimeFormat, t, timezone)
 }
@@ -282,8 +287,8 @@ func IsUnixTimeEqualsYearAndMonth(unixTime int64, timezone *time.Location, year 
 }
 
 // GetTimezoneOffsetMinutes returns offset minutes according specified timezone
-func GetTimezoneOffsetMinutes(timezone *time.Location) int16 {
-	_, tzOffset := time.Now().In(timezone).Zone()
+func GetTimezoneOffsetMinutes(unixTime int64, timezone *time.Location) int16 {
+	_, tzOffset := parseFromUnixTime(unixTime).In(timezone).Zone()
 	tzMinuteOffset := int16(tzOffset / 60)
 
 	return tzMinuteOffset
@@ -298,8 +303,8 @@ func GetServerTimezoneOffsetMinutes() int16 {
 }
 
 // FormatTimezoneOffset returns "+/-HH:MM" format of timezone
-func FormatTimezoneOffset(timezone *time.Location) string {
-	tzMinutesOffset := GetTimezoneOffsetMinutes(timezone)
+func FormatTimezoneOffset(unixTime int64, timezone *time.Location) string {
+	tzMinutesOffset := GetTimezoneOffsetMinutes(unixTime, timezone)
 
 	sign := "+"
 	hourAbsOffset := tzMinutesOffset / 60

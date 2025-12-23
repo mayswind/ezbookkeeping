@@ -147,7 +147,7 @@ func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user
 		rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = utils.FormatUnixTimeToLongDateTime(dateTime.Unix(), dateTime.Location())
 
 		if t.transactionDataTable.timeFormatIncludeTimezone {
-			rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = utils.FormatTimezoneOffset(dateTime.Location())
+			rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = utils.FormatTimezoneOffset(dateTime.Unix(), dateTime.Location())
 		}
 	}
 

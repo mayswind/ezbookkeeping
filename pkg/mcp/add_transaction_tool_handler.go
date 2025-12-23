@@ -266,7 +266,7 @@ func (h *mcpAddTransactionToolHandler) createNewTransactionModel(uid int64, addT
 		Type:              transactionDbType,
 		CategoryId:        categoryId,
 		TransactionTime:   utils.GetMinTransactionTimeFromUnixTime(transactionTime.Unix()),
-		TimezoneUtcOffset: utils.GetTimezoneOffsetMinutes(transactionTime.Location()),
+		TimezoneUtcOffset: utils.GetTimezoneOffsetMinutes(transactionTime.Unix(), transactionTime.Location()),
 		AccountId:         sourceAccountId,
 		Amount:            amount,
 		HideAmount:        false,

@@ -43,13 +43,6 @@ import { type CommonDateRangeSelectionProps, useDateRangeSelectionBase } from '@
 
 import { ThemeType } from '@/core/theme.ts';
 
-import {
-    getLocalDatetimeFromUnixTime,
-    getDummyUnixTimeForLocalUsage,
-    getTimezoneOffsetMinutes,
-    getBrowserTimezoneOffsetMinutes
-} from '@/lib/datetime.ts';
-
 interface DesktopDateRangeSelectionProps extends CommonDateRangeSelectionProps {
     persistent?: boolean;
 }
@@ -64,7 +57,14 @@ const emit = defineEmits<{
 const theme = useTheme();
 
 const { tt } = useI18n();
-const { dateRange, beginDateTime, endDateTime, presetRanges, getFinalDateRange } = useDateRangeSelectionBase(props);
+const {
+    dateRange,
+    beginDateTime,
+    endDateTime,
+    presetRanges,
+    getLocalDatetimeFromSameDateTimeOfUnixTime,
+    getFinalDateRange
+} = useDateRangeSelectionBase(props);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 const showState = computed<boolean>({
@@ -94,13 +94,13 @@ function cancel(): void {
 
 watch(() => props.minTime, (newValue) => {
     if (newValue) {
-        dateRange.value[0] = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(newValue, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+        dateRange.value[0] = getLocalDatetimeFromSameDateTimeOfUnixTime(newValue);
     }
 });
 
 watch(() => props.maxTime, (newValue) => {
     if (newValue) {
-        dateRange.value[1] = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(newValue, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+        dateRange.value[1] = getLocalDatetimeFromSameDateTimeOfUnixTime(newValue);
     }
 });
 </script>

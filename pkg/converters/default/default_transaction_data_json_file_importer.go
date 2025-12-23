@@ -35,7 +35,7 @@ var (
 )
 
 // ParseImportedData returns the imported data by parsing the transaction json data
-func (c *defaultTransactionDataJsonImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, additionalOptions converter.TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
+func (c *defaultTransactionDataJsonImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezone *time.Location, additionalOptions converter.TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	var importRequest models.ImportTransactionRequest
 
 	if err := json.Unmarshal(data, &importRequest); err != nil {
@@ -55,7 +55,7 @@ func (c *defaultTransactionDataJsonImporter) ParseImportedData(ctx core.Context,
 		ezbookkeepingTagSeparator,
 	)
 
-	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, additionalOptions, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
+	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezone, additionalOptions, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }
 
 func (c *defaultTransactionDataJsonImporter) createNewDefaultTransactionDataTable(importRequest models.ImportTransactionRequest) (datatable.TransactionDataTable, error) {
@@ -75,10 +75,11 @@ func (c *defaultTransactionDataJsonImporter) createNewDefaultTransactionDataTabl
 		}
 
 		timezone := time.FixedZone("Transaction Timezone", utcOffset*60)
+		timezoneOffset := utils.FormatTimezoneOffset(time.Now().Unix(), timezone)
 
 		row := make(map[datatable.TransactionDataTableColumn]string, len(allJsonDataSupportedColumns))
 		row[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = transaction.Time
-		row[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = utils.FormatTimezoneOffset(timezone)
+		row[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = timezoneOffset
 		row[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = transaction.Type
 		row[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = transaction.CategoryName
 		row[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = transaction.SourceAccountName

@@ -302,11 +302,11 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 		return nil, "", errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	timezone, _, err := c.GetClientTimezone()
+	clientTimezone, _, err := c.GetClientTimezone()
 
 	if err != nil {
-		log.Warnf(c, "[data_managements.getExportedFileContent] cannot get client timezone offset, because %s", err.Error())
-		timezone = time.Local
+		log.Warnf(c, "[data_managements.getExportedFileContent] cannot get client timezone, because %s", err.Error())
+		clientTimezone = time.Local
 	}
 
 	uid := c.GetCurrentUid()
@@ -413,13 +413,13 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 		return nil, "", errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	fileName := a.getFileName(user, timezone, fileType)
+	fileName := a.getFileName(user, clientTimezone, fileType)
 
 	return result, fileName, nil
 }
 
-func (a *DataManagementsApi) getFileName(user *models.User, timezone *time.Location, fileExtension string) string {
-	currentTime := utils.FormatUnixTimeToLongDateTimeWithoutSecond(time.Now().Unix(), timezone)
+func (a *DataManagementsApi) getFileName(user *models.User, clientTimezone *time.Location, fileExtension string) string {
+	currentTime := utils.FormatUnixTimeToLongDateTimeWithoutSecond(time.Now().Unix(), clientTimezone)
 	currentTime = strings.Replace(currentTime, "-", "_", -1)
 	currentTime = strings.Replace(currentTime, " ", "_", -1)
 	currentTime = strings.Replace(currentTime, ":", "_", -1)

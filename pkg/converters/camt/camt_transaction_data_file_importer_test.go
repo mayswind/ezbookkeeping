@@ -2,6 +2,7 @@ package camt
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -65,7 +66,7 @@ func TestCamt053TransactionDataFileParseImportedData_MinimumValidData(t *testing
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -158,7 +159,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseValidTransactionTime(t
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(allNewTransactions))
@@ -197,7 +198,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseInvalidTransactionTime
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
@@ -220,7 +221,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseInvalidTransactionTime
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
@@ -243,7 +244,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseInvalidTransactionTime
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
@@ -266,7 +267,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseInvalidTransactionTime
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
 
@@ -315,7 +316,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseTransactionValidAmount
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(allNewTransactions))
@@ -366,7 +367,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseTransactionValidAmount
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(allNewTransactions))
@@ -404,7 +405,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseTransactionValidAmount
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -431,7 +432,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseTransactionValidAmount
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -468,7 +469,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseTransactionInvalidAmou
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
@@ -499,7 +500,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseTransactionInvalidAmou
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
@@ -530,7 +531,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseTransactionInvalidAmou
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }
 
@@ -573,7 +574,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseDescription(t *testing
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -608,7 +609,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseDescription(t *testing
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -635,7 +636,7 @@ func TestCamt053TransactionDataFileParseImportedData_ParseDescription(t *testing
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -665,7 +666,7 @@ func TestCamt053TransactionDataFileParseImportedData_MissingAccountNode(t *testi
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingAccountData.Message)
 }
 
@@ -695,7 +696,7 @@ func TestCamt053TransactionDataFileParseImportedData_MissingTransactionRequiredN
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingTransactionTime.Message)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
@@ -717,7 +718,7 @@ func TestCamt053TransactionDataFileParseImportedData_MissingTransactionRequiredN
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTypeInvalid.Message)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
@@ -739,7 +740,7 @@ func TestCamt053TransactionDataFileParseImportedData_MissingTransactionRequiredN
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
@@ -761,6 +762,6 @@ func TestCamt053TransactionDataFileParseImportedData_MissingTransactionRequiredN
 					</Ntry>
 				</Stmt>
 			</BkToCstmrStmt>
-		</Document>`), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 }

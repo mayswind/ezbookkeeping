@@ -2,6 +2,7 @@ package beancount
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -33,7 +34,7 @@ func TestBeancountTransactionDataFileParseImportedData_MinimumValidData(t *testi
 			"  Expenses:TestCategory2 1.00 CNY\n"+
 			"2024-09-04 *\n"+
 			"  Assets:TestAccount -0.05 CNY\n"+
-			"  Assets:TestAccount2 0.05 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"  Assets:TestAccount2 0.05 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -112,7 +113,7 @@ func TestBeancountTransactionDataFileParseImportedData_MinimumValidData2(t *test
 			"  Assets:TestAccount -1.00 CNY\n"+
 			"2024-09-04 *\n"+
 			"  Assets:TestAccount2 0.05 CNY\n"+
-			"  Assets:TestAccount -0.05 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"  Assets:TestAccount -0.05 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -182,7 +183,7 @@ func TestBeancountTransactionDataFileParseImportedData_ParseInvalidTime(t *testi
 	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"2024/09/01 *\n"+
 			"  Equity:Opening-Balances -123.45 CNY\n"+
-			"  Assets:TestAccount 123.45 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"  Assets:TestAccount 123.45 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
@@ -198,7 +199,7 @@ func TestBeancountTransactionDataFileParseImportedData_ParseValidCurrency(t *tes
 	allNewTransactions, allNewAccounts, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"2024-09-01 * \"Payee Name\" \"Hello\nWorld\"\n"+
 			"  Assets:TestAccount -0.12 USD\n"+
-			"  Assets:TestAccount2 0.84 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"  Assets:TestAccount2 0.84 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -234,13 +235,13 @@ func TestBeancountTransactionDataFileParseImportedData_ParseInvalidAmount(t *tes
 	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"2024-09-01 *\n"+
 			"  Equity:Opening-Balances -abc CNY\n"+
-			"  Assets:TestAccount abc CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"  Assets:TestAccount abc CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"2024-09-01 *\n"+
 			"  Equity:Opening-Balances -1/0 CNY\n"+
-			"  Assets:TestAccount 1/0 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"  Assets:TestAccount 1/0 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }
 
@@ -259,7 +260,7 @@ func TestBeancountTransactionDataFileParseImportedData_ParseDescription(t *testi
 			"  Assets:TestAccount 123.45 CNY\n"+
 			"2024-09-02 * \"Payee Name\" \"Hello\nWorld\"\n"+
 			"  Income:TestCategory -0.12 CNY\n"+
-			"  Assets:TestAccount 0.12 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"  Assets:TestAccount 0.12 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -281,25 +282,25 @@ func TestBeancountTransactionDataFileParseImportedData_InvalidTransaction(t *tes
 	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"2024-09-02 * \"Payee Name\" \"Hello\nWorld\"\n"+
 			"  Assets:TestAccount 0.11 CNY\n"+
-			"  Assets:TestAccount2 0.11 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"  Assets:TestAccount2 0.11 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidBeancountFile.Message)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"2024-09-02 * \"Payee Name\" \"Hello\nWorld\"\n"+
 			"  Expenses:TestCategory -0.11 CNY\n"+
-			"  Expenses:TestCategory2 0.11 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"  Expenses:TestCategory2 0.11 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrThereAreNotSupportedTransactionType.Message)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"2024-09-02 * \"Payee Name\" \"Hello\nWorld\"\n"+
 			"  Income:TestCategory -0.11 CNY\n"+
-			"  Income:TestCategory2 0.11 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"  Income:TestCategory2 0.11 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrThereAreNotSupportedTransactionType.Message)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"2024-09-02 * \"Payee Name\" \"Hello\nWorld\"\n"+
 			"  Equity:TestCategory -0.11 CNY\n"+
-			"  Equity:TestCategory2 0.11 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"  Equity:TestCategory2 0.11 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrThereAreNotSupportedTransactionType.Message)
 }
 
@@ -316,7 +317,7 @@ func TestBeancountTransactionDataFileParseImportedData_NotSupportedToParseSplitT
 		"2024-09-02 * \"Payee Name\" \"Hello\nWorld\"\n"+
 			"  Assets:TestAccount -0.23 CNY\n"+
 			"  Assets:TestAccount2 0.11 CNY\n"+
-			"  Assets:TestAccount3 0.12 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"  Assets:TestAccount3 0.12 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotSupportedSplitTransactions.Message)
 }
 
@@ -333,27 +334,27 @@ func TestBeancountTransactionDataFileParseImportedData_MissingTransactionRequire
 	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
 		"* \"narration\"\n"+
 			"  Equity:Opening-Balances -123.45 CNY\n"+
-			"  Assets:TestAccount 123.45 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"  Assets:TestAccount 123.45 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 
 	// Missing Account Name
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"2024-09-01 * \"narration\"\n"+
 			"  Equity:Opening-Balances -123.45 CNY\n"+
-			"   123.45 CNY\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"   123.45 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidBeancountFile.Message)
 
 	// Missing Amount
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"2024-09-01 * \"narration\"\n"+
 			"  Equity:Opening-Balances\n"+
-			"  Assets:TestAccount\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"  Assets:TestAccount\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidBeancountFile.Message)
 
 	// Missing Commodity
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
 		"2024-09-01 * \"narration\"\n"+
 			"  Equity:Opening-Balances -123.45\n"+
-			"  Assets:TestAccount 123.45\n"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"  Assets:TestAccount 123.45\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidBeancountFile.Message)
 }

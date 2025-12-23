@@ -149,7 +149,7 @@
                     <template #item.time="{ item }">
                         <span>{{ getDisplayDateTime(item) }}</span>
                         <v-chip class="ms-1" variant="flat" color="secondary" size="x-small"
-                                v-if="item.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimezone(item) }}</v-chip>
+                                v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimezone(item) }}</v-chip>
                     </template>
                     <template #item.type="{ item }">
                         <v-chip label variant="outlined" size="x-small"
@@ -323,7 +323,6 @@ const {
     startTime,
     endTime,
     reconciliationStatements,
-    currentTimezoneOffsetMinutes,
     fiscalYearStart,
     allChartTypes,
     allDateAggregationTypes,
@@ -341,6 +340,7 @@ const {
     setReconciliationStatements,
     getDisplayTransactionType,
     getDisplayDateTime,
+    isSameAsDefaultTimezoneOffsetMinutes,
     getDisplayTimezone,
     getDisplaySourceAmount,
     getDisplayDestinationAmount,

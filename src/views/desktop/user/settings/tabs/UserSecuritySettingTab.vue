@@ -218,6 +218,7 @@ import { type UserExternalAuthInfoResponse } from '@/models/user_external_auth.t
 import { type TokenInfoResponse, SessionDeviceType, SessionInfo } from '@/models/token.ts';
 
 import { isEquals } from '@/lib/common.ts';
+import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
 import { parseSessionInfo } from '@/lib/session.ts';
 import {
     isAPITokenEnabled,
@@ -253,7 +254,7 @@ class DesktopPageLinkedThirdPartyLogin {
         this.externalAuthType = externalAuthInfoResponse.externalAuthType;
         this.linked = externalAuthInfoResponse.linked;
         this.externalUsername = externalAuthInfoResponse.externalUsername ? externalAuthInfoResponse.externalUsername : '-';
-        this.createdAt = externalAuthInfoResponse.createdAt ? formatUnixTimeToLongDateTime(externalAuthInfoResponse.createdAt) : '-';
+        this.createdAt = externalAuthInfoResponse.createdAt ? formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(externalAuthInfoResponse.createdAt)) : '-';
 
         if (externalAuthInfoResponse.externalAuthCategory === 'oauth2') {
             this.displayName = getLocalizedOAuth2ProviderName(externalAuthInfoResponse.externalAuthType, getOIDCCustomDisplayNames());
@@ -277,7 +278,7 @@ class DesktopPageSessionInfo extends SessionInfo {
     public constructor(sessionInfo: SessionInfo) {
         super(sessionInfo.tokenId, sessionInfo.isCurrent, sessionInfo.deviceType, sessionInfo.deviceInfo, sessionInfo.deviceName, sessionInfo.lastSeen);
         this.icon = this.getTokenIcon(sessionInfo.deviceType);
-        this.lastSeenDateTime = sessionInfo.lastSeen ? formatUnixTimeToLongDateTime(sessionInfo.lastSeen) : '-';
+        this.lastSeenDateTime = sessionInfo.lastSeen ? formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(sessionInfo.lastSeen)) : '-';
     }
 
     private getTokenIcon(deviceType: SessionDeviceType): string {
@@ -306,7 +307,7 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 
 const {
     tt,
-    formatUnixTimeToLongDateTime,
+    formatDateTimeToLongDateTime,
     getLocalizedOAuth2ProviderName,
     setLanguage
 } = useI18n();

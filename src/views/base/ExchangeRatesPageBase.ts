@@ -12,9 +12,10 @@ import type {
 } from '@/models/exchange_rate.ts';
 
 import { getExchangedAmountByRate } from '@/lib/numeral.ts';
+import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
 
 export function useExchangeRatesPageBase() {
-    const { getAllDisplayExchangeRates, formatUnixTimeToLongDate, parseAmountFromWesternArabicNumerals } = useI18n();
+    const { getAllDisplayExchangeRates, formatDateTimeToLongDate, parseAmountFromWesternArabicNumerals } = useI18n();
 
     const userStore = useUserStore();
     const exchangeRatesStore = useExchangeRatesStore();
@@ -27,8 +28,12 @@ export function useExchangeRatesPageBase() {
     const isUserCustomExchangeRates = computed<boolean>(() => exchangeRatesStore.isUserCustomExchangeRates);
 
     const exchangeRatesDataUpdateTime = computed<string>(() => {
-        const exchangeRatesLastUpdateTime = exchangeRatesStore.exchangeRatesLastUpdateTime;
-        return exchangeRatesLastUpdateTime ? formatUnixTimeToLongDate(exchangeRatesLastUpdateTime) : '';
+        if (!exchangeRatesStore.exchangeRatesLastUpdateTime) {
+            return '';
+        }
+
+        const exchangeRatesLastUpdateTime = parseDateTimeFromUnixTime(exchangeRatesStore.exchangeRatesLastUpdateTime);
+        return formatDateTimeToLongDate(exchangeRatesLastUpdateTime);
     });
 
     const availableExchangeRates = computed<LocalizedLatestExchangeRate[]>(() => {

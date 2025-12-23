@@ -53,12 +53,7 @@ import {
     splitItemsToMap,
     countSplitItems
 } from '@/lib/common.ts';
-import {
-    getTimezoneOffsetMinutes,
-    getBrowserTimezoneOffsetMinutes,
-    getActualUnixTimeForStore,
-    parseDateTimeFromUnixTime
-} from '@/lib/datetime.ts';
+import { parseDateTimeFromUnixTimeWithTimezoneOffset } from '@/lib/datetime.ts';
 import { getAmountWithDecimalNumberCount } from '@/lib/numeral.ts';
 import { getCurrencyFraction } from '@/lib/currency.ts';
 import { getFirstVisibleCategoryId } from '@/lib/category.ts';
@@ -185,14 +180,13 @@ export const useTransactionsStore = defineStore('transactions', () => {
         }
 
         if (transactionPageWrapper.items && transactionPageWrapper.items.length) {
-            const currentUtcOffset = getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone);
             let currentMonthListIndex = -1;
             let currentMonthList: TransactionMonthList | null = null;
 
             for (const [item, index] of itemAndIndex(transactionPageWrapper.items)) {
-                fillTransactionObject(item, currentUtcOffset);
+                fillTransactionObject(item);
 
-                const transactionTime = parseDateTimeFromUnixTime(item.time, item.utcOffset, currentUtcOffset);
+                const transactionTime = parseDateTimeFromUnixTimeWithTimezoneOffset(item.time, item.utcOffset);
                 const transactionYear = transactionTime.getGregorianCalendarYear();
                 const transactionMonth = transactionTime.getGregorianCalendarMonth();
                 const transactionYearDashMonth = transactionTime.getGregorianCalendarYearDashMonth();
@@ -264,8 +258,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
     }
 
     function updateTransactionInTransactionList({ currentTransaction, defaultCurrency }: { currentTransaction: Transaction, defaultCurrency: string }): void {
-        const currentUtcOffset = getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone);
-        const transactionTime = parseDateTimeFromUnixTime(currentTransaction.time, currentTransaction.utcOffset, currentUtcOffset);
+        const transactionTime = parseDateTimeFromUnixTimeWithTimezoneOffset(currentTransaction.time, currentTransaction.utcOffset);
         const transactionYear = transactionTime.getGregorianCalendarYear();
         const transactionMonth = transactionTime.getGregorianCalendarMonth();
 
@@ -276,7 +269,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
             for (const [transaction, transactionIndex] of itemAndIndex(transactionMonthList.items)) {
                 if (transaction.id === currentTransaction.id) {
-                    fillTransactionObject(currentTransaction, currentUtcOffset);
+                    fillTransactionObject(currentTransaction);
 
                     if (transactionYear !== transactionMonthList.year ||
                         transactionMonth !== transactionMonthList.month ||
@@ -445,12 +438,12 @@ export const useTransactionsStore = defineStore('transactions', () => {
         }
     }
 
-    function fillTransactionObject(transaction: Transaction, currentUtcOffset: number): void {
+    function fillTransactionObject(transaction: Transaction): void {
         if (!transaction) {
             return;
         }
 
-        const transactionTime = parseDateTimeFromUnixTime(transaction.time, transaction.utcOffset, currentUtcOffset);
+        const transactionTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transaction.utcOffset);
         transaction.setDisplayDate(transactionTime.getGregorianCalendarYearDashMonthDashDay(), transactionTime.getGregorianCalendarDay(), transactionTime.getWeekDay());
 
         if (transaction.sourceAccountId) {
@@ -1026,7 +1019,6 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
     function saveTransaction({ transaction, defaultCurrency, isEdit, clientSessionId }: { transaction: Transaction, defaultCurrency: string, isEdit: boolean, clientSessionId: string }): Promise<Transaction> {
         return new Promise((resolve, reject) => {
-            const actualTime = getActualUnixTimeForStore(transaction.time, transaction.utcOffset, getBrowserTimezoneOffsetMinutes());
             let promise: ApiResponsePromise<TransactionInfoResponse>;
 
             if (transaction.type !== TransactionType.Expense &&
@@ -1041,9 +1033,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
             }
 
             if (!isEdit) {
-                promise = services.addTransaction(transaction.toCreateRequest(clientSessionId, actualTime));
+                promise = services.addTransaction(transaction.toCreateRequest(clientSessionId));
             } else {
-                promise = services.modifyTransaction(transaction.toModifyRequest(actualTime));
+                promise = services.modifyTransaction(transaction.toModifyRequest());
             }
 
             promise.then(response => {

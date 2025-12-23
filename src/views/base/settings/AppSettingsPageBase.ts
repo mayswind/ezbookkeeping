@@ -15,6 +15,7 @@ import { CategoryType } from '@/core/category.ts';
 import type { Account } from '@/models/account.ts';
 
 import { isObjectEmpty } from '@/lib/common.ts';
+import { getCurrentUnixTime } from '@/lib/datetime.ts';
 
 export function useAppSettingPageBase() {
     const { tt, getAllTimezones, getAllTimezoneTypesUsedForStatistics, getAllCurrencySortingTypes, setTimeZone } = useI18n();
@@ -37,7 +38,7 @@ export function useAppSettingPageBase() {
         ];
     });
 
-    const allTimezones = computed<LocalizedTimezoneInfo[]>(() => getAllTimezones(true));
+    const allTimezones = computed<LocalizedTimezoneInfo[]>(() => getAllTimezones(getCurrentUnixTime(), true));
     const allTimezoneTypesUsedForStatistics = computed<TypeAndDisplayName[]>(() => getAllTimezoneTypesUsedForStatistics());
     const allCurrencySortingTypes = computed<TypeAndDisplayName[]>(() => getAllCurrencySortingTypes());
 

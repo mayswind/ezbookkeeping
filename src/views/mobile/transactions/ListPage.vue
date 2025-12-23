@@ -205,7 +205,7 @@
                             <template #media>
                                 <div class="display-flex flex-direction-column transaction-date" :style="getTransactionDateStyle(transaction, idx > 0 ? transactionMonthList.items[idx - 1] : undefined)">
                                     <span class="transaction-day full-line flex-direction-column">
-                                        {{ getCalendarDisplayDayOfMonthFromUnixTime(transaction.time) }}
+                                        {{ transaction.gregorianCalendarDayOfMonth ? numeralSystem.formatNumber(transaction.gregorianCalendarDayOfMonth) : '' }}
                                     </span>
                                     <span class="transaction-day-of-week full-line flex-direction-column" v-if="transaction.displayDayOfWeek">
                                         {{ getWeekdayShortName(transaction.displayDayOfWeek) }}
@@ -265,7 +265,7 @@
                                             </div>
                                             <div class="transaction-footer">
                                                 <span>{{ getDisplayTime(transaction) }}</span>
-                                                <span v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ `(${getDisplayTimezone(transaction)})` }}</span>
+                                                <span v-if="!isSameAsDefaultTimezoneOffsetMinutes(transaction)">{{ `(${getDisplayTimezone(transaction)})` }}</span>
                                                 <span v-if="transaction.sourceAccount">·</span>
                                                 <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
                                                 <f7-icon class="transaction-account-arrow icon-with-direction" f7="arrow_right" v-if="transaction.sourceAccount && transaction.type === TransactionType.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id"></f7-icon>
@@ -624,7 +624,7 @@ import {
     DateRangeScene,
     DateRange
 } from '@/core/datetime.ts';
-import { AmountFilterType } from '@/core/numeral.ts';
+import { type NumeralSystem, AmountFilterType } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 import { type Transaction, TransactionTagFilter } from '@/models/transaction.ts';
@@ -637,8 +637,6 @@ import {
 import {
     getCurrentUnixTime,
     parseDateTimeFromUnixTime,
-    getBrowserTimezoneOffsetMinutes,
-    getActualUnixTimeForStore,
     getDayFirstUnixTimeBySpecifiedUnixTime,
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
@@ -664,8 +662,8 @@ const props = defineProps<{
 const {
     tt,
     getCurrentLanguageTextDirection,
-    getWeekdayShortName,
-    getCalendarDisplayDayOfMonthFromUnixTime
+    getCurrentNumeralSystemType,
+    getWeekdayShortName
 } = useI18n();
 
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
@@ -676,7 +674,6 @@ const {
     customMinDatetime,
     customMaxDatetime,
     currentCalendarDate,
-    currentTimezoneOffsetMinutes,
     firstDayOfWeek,
     fiscalYearStart,
     defaultCurrency,
@@ -711,6 +708,7 @@ const {
     transactionCalendarMaxDate,
     currentMonthTransactionData,
     hasSubCategoryInQuery,
+    isSameAsDefaultTimezoneOffsetMinutes,
     canAddTransaction,
     getDisplayTime,
     getDisplayLongYearMonth,
@@ -737,6 +735,7 @@ const showCustomMonthSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
 
 const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
+const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
 
 const transactions = computed<TransactionMonthList[]>(() => {
@@ -1057,7 +1056,7 @@ function changePageType(type: number): void {
 function changeDateFilter(dateType: number): void {
     if (dateType === DateRange.Custom.type) { // Custom
         if (!query.value.minTime || !query.value.maxTime) {
-            customMaxDatetime.value = getActualUnixTimeForStore(getCurrentUnixTime(), currentTimezoneOffsetMinutes.value, getBrowserTimezoneOffsetMinutes());
+            customMaxDatetime.value = getCurrentUnixTime();
             customMinDatetime.value = getDayFirstUnixTimeBySpecifiedUnixTime(customMaxDatetime.value);
         } else {
             customMaxDatetime.value = query.value.maxTime;

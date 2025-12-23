@@ -11,8 +11,7 @@ import {
     isNumber
 } from './common.ts';
 import {
-    getBrowserTimezoneOffsetMinutes,
-    getDummyUnixTimeForLocalUsage
+    getTimezoneOffsetMinutes
 } from './datetime.ts';
 import {
     categoryTypeToTransactionType,
@@ -33,9 +32,10 @@ export interface SetTransactionOptions {
     comment?: string;
 }
 
-export function setTransactionModelByTransaction(transaction: Transaction, transaction2: Transaction | null | undefined, allCategories: Record<number, TransactionCategory[]>, allCategoriesMap: Record<string, TransactionCategory>, allVisibleAccounts: Account[], allAccountsMap: Record<string, Account>, allTagsMap: Record<string, TransactionTag>, defaultAccountId: string, options: SetTransactionOptions, setContextData: boolean, convertContextTime: boolean): void {
+export function setTransactionModelByTransaction(transaction: Transaction, transaction2: Transaction | null | undefined, allCategories: Record<number, TransactionCategory[]>, allCategoriesMap: Record<string, TransactionCategory>, allVisibleAccounts: Account[], allAccountsMap: Record<string, Account>, allTagsMap: Record<string, TransactionTag>, defaultAccountId: string, options: SetTransactionOptions, setContextData: boolean): void {
     if (isDefined(options.time)) {
         transaction.time = options.time;
+        transaction.utcOffset = getTimezoneOffsetMinutes(transaction.time, transaction.timeZone);
     }
 
     if (!options.type && options.categoryId && options.categoryId !== '0' && allCategoriesMap[options.categoryId]) {
@@ -172,14 +172,9 @@ export function setTransactionModelByTransaction(transaction: Transaction, trans
         }
 
         if (setContextData) {
-            transaction.utcOffset = transaction2.utcOffset;
+            transaction.time = transaction2.time;
             transaction.timeZone = transaction2.timeZone;
-
-            if (convertContextTime) {
-                transaction.time = getDummyUnixTimeForLocalUsage(transaction2.time, transaction.utcOffset, getBrowserTimezoneOffsetMinutes());
-            } else {
-                transaction.time = transaction2.time;
-            }
+            transaction.utcOffset = transaction2.utcOffset;
         }
 
         transaction.sourceAccountId = transaction2.sourceAccountId;

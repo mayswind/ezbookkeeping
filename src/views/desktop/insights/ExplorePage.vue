@@ -151,9 +151,10 @@ import {
 } from '@/models/transaction.ts';
 
 import {
+    parseDateTimeFromUnixTime,
     getShiftedDateRangeAndDateType,
     getDateTypeByDateRange,
-    getDateRangeByDateType,
+    getDateRangeByDateType
 } from '@/lib/datetime.ts';
 
 import {
@@ -188,7 +189,7 @@ const {
     tt,
     getAllDateRanges,
     getCurrentNumeralSystemType,
-    formatUnixTimeToLongDateTime,
+    formatDateTimeToLongDateTime,
     formatDateRange
 } = useI18n();
 
@@ -221,8 +222,8 @@ const filteredTransactions = computed<TransactionInsightDataItem[]>(() => explor
 const allDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.InsightsExplore, true));
 const canShiftDateRange = computed<boolean>(() => query.value.dateRangeType !== DateRange.All.type);
 const displayQueryDateRangeName = computed<string>(() => formatDateRange(query.value.dateRangeType, query.value.startTime, query.value.endTime));
-const displayQueryStartTime = computed<string>(() => formatUnixTimeToLongDateTime(query.value.startTime));
-const displayQueryEndTime = computed<string>(() => formatUnixTimeToLongDateTime(query.value.endTime));
+const displayQueryStartTime = computed<string>(() => formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(query.value.startTime)));
+const displayQueryEndTime = computed<string>(() => formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(query.value.endTime)));
 
 const allTabs = computed<{ name: string, value: ExplorePageTabType }[]>(() => {
     return [

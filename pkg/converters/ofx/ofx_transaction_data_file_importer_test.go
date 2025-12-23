@@ -2,6 +2,7 @@ package ofx
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -77,7 +78,7 @@ func TestOFXTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) 
 			"      </CCSTMTRS>\n"+
 			"    </CCSTMTTRNRS>\n"+
 			"  </CREDITCARDMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -211,7 +212,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseAccountTo(t *testing.T) {
 			"      </CCSTMTRS>\n"+
 			"    </CCSTMTTRNRS>\n"+
 			"  </CREDITCARDMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -296,7 +297,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseValidTransactionTime(t *te
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -338,7 +339,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseInvalidTransactionTime(t *
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
@@ -360,7 +361,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseInvalidTransactionTime(t *
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
@@ -382,7 +383,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseInvalidTransactionTime(t *
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
@@ -404,7 +405,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseInvalidTransactionTime(t *
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
 
@@ -436,7 +437,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseAmount_CommaAsDecimalPoint
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -472,7 +473,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseInvalidAmount(t *testing.T
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }
 
@@ -505,7 +506,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseTransactionCurrency(t *tes
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -542,7 +543,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -568,7 +569,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -596,7 +597,7 @@ func TestOFXTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -629,7 +630,7 @@ func TestOFXTransactionDataFileParseImportedData_MissingAccountFromNode(t *testi
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingAccountData.Message)
 }
 
@@ -661,7 +662,7 @@ func TestOFXTransactionDataFileParseImportedData_MissingCurrencyNode(t *testing.
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 }
 
@@ -693,7 +694,7 @@ func TestOFXTransactionDataFileParseImportedData_MissingTransactionRequiredNode(
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingTransactionTime.Message)
 
 	// Missing Transaction Type Node
@@ -715,7 +716,7 @@ func TestOFXTransactionDataFileParseImportedData_MissingTransactionRequiredNode(
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTypeInvalid.Message)
 
 	// Missing Amount Node
@@ -737,6 +738,6 @@ func TestOFXTransactionDataFileParseImportedData_MissingTransactionRequiredNode(
 			"      </STMTRS>\n"+
 			"    </STMTTRNRS>\n"+
 			"  </BANKMSGSRSV1>\n"+
-			"</OFX>"), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+			"</OFX>"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }

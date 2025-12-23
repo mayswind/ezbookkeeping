@@ -7,6 +7,7 @@ import {
     getYear0BasedMonthObjectFromString,
     getYearMonthStringFromYear0BasedMonthObject,
     getCurrentUnixTime,
+    parseDateTimeFromUnixTime,
     getThisYearFirstUnixTime,
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime
@@ -49,7 +50,7 @@ function getMonthRangeFromProps(props: CommonMonthRangeSelectionProps): { minDat
 }
 
 export function useMonthRangeSelectionBase(props: CommonMonthRangeSelectionProps) {
-    const { formatUnixTimeToGregorianLikeLongYearMonth } = useI18n();
+    const { formatDateTimeToGregorianLikeLongYearMonth } = useI18n();
     const { minDate, maxDate } = getMonthRangeFromProps(props);
 
     const dateRange = ref<Year0BasedMonth[]>([
@@ -57,8 +58,8 @@ export function useMonthRangeSelectionBase(props: CommonMonthRangeSelectionProps
         maxDate
     ]);
 
-    const beginDateTime = computed<string>(() => formatUnixTimeToGregorianLikeLongYearMonth(getYearMonthFirstUnixTime(dateRange.value[0] as Year0BasedMonth)));
-    const endDateTime = computed<string>(() => formatUnixTimeToGregorianLikeLongYearMonth(getYearMonthLastUnixTime(dateRange.value[1] as Year0BasedMonth)));
+    const beginDateTime = computed<string>(() => formatDateTimeToGregorianLikeLongYearMonth(parseDateTimeFromUnixTime(getYearMonthFirstUnixTime(dateRange.value[0] as Year0BasedMonth))));
+    const endDateTime = computed<string>(() => formatDateTimeToGregorianLikeLongYearMonth(parseDateTimeFromUnixTime(getYearMonthLastUnixTime(dateRange.value[1] as Year0BasedMonth))));
 
     function getFinalMonthRange(): { minYearMonth: TextualYearMonth | '', maxYearMonth: TextualYearMonth | '' } | null {
         if (!dateRange.value[0] || !dateRange.value[1]) {

@@ -215,12 +215,33 @@ func TestParseFromLongDateTimeToMaxUnixTime(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
-func TestParseFromLongDateTime(t *testing.T) {
+func TestParseFromLongDateTimeInFixedUtcOffset(t *testing.T) {
 	expectedValue := int64(1617228083)
-	actualTime, err := ParseFromLongDateTime("2021-04-01 06:01:23", 480)
+	actualTime, err := ParseFromLongDateTimeInFixedUtcOffset("2021-04-01 06:01:23", 480)
 	assert.Equal(t, nil, err)
 
 	actualValue := actualTime.Unix()
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestParseFromLongDateTimeInTimeZone(t *testing.T) {
+	londonLocation, err := time.LoadLocation("Europe/London")
+	assert.Equal(t, nil, err)
+
+	// during standard time (UTC+0)
+	expectedValue := int64(1577858483)
+	actualTime, err := ParseFromLongDateTimeInTimeZone("2020-01-01 06:01:23", londonLocation)
+	assert.Equal(t, nil, err)
+
+	actualValue := actualTime.Unix()
+	assert.Equal(t, expectedValue, actualValue)
+
+	// during daylight saving time (UTC+1)
+	expectedValue = int64(1619845283)
+	actualTime, err = ParseFromLongDateTimeInTimeZone("2021-05-01 06:01:23", londonLocation)
+	assert.Equal(t, nil, err)
+
+	actualValue = actualTime.Unix()
 	assert.Equal(t, expectedValue, actualValue)
 }
 
@@ -251,18 +272,18 @@ func TestParseFromLongDateTimeWithTimezoneRFC3339Format(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
-func TestParseFromLongDateTimeWithoutSecond(t *testing.T) {
+func TestParseFromLongDateTimeWithoutSecondInFixedUtcOffset(t *testing.T) {
 	expectedValue := int64(1691947440)
-	actualTime, err := ParseFromLongDateTimeWithoutSecond("2023-08-13 17:24", 0)
+	actualTime, err := ParseFromLongDateTimeWithoutSecondInFixedUtcOffset("2023-08-13 17:24", 0)
 	assert.Equal(t, nil, err)
 
 	actualValue := actualTime.Unix()
 	assert.Equal(t, expectedValue, actualValue)
 }
 
-func TestParseFromShortDateTime(t *testing.T) {
+func TestParseFromShortDateTimeInFixedUtcOffset(t *testing.T) {
 	expectedValue := int64(1617228083)
-	actualTime, err := ParseFromShortDateTime("2021-4-1 6:1:23", 480)
+	actualTime, err := ParseFromShortDateTimeInFixedUtcOffset("2021-4-1 6:1:23", 480)
 	assert.Equal(t, nil, err)
 
 	actualValue := actualTime.Unix()
@@ -312,52 +333,82 @@ func TestIsUnixTimeEqualsYearAndMonth(t *testing.T) {
 	assert.Equal(t, false, actualValue)
 }
 
-func TestGetTimezoneOffsetMinutes(t *testing.T) {
+func TestGetTimezoneOffsetMinutes_FixedTimezone(t *testing.T) {
 	timezone := time.FixedZone("Test Timezone", 120*60)
 	expectedValue := int16(120)
-	actualValue := GetTimezoneOffsetMinutes(timezone)
+	actualValue := GetTimezoneOffsetMinutes(time.Now().Unix(), timezone)
 	assert.Equal(t, expectedValue, actualValue)
 
 	timezone = time.FixedZone("Test Timezone", 345*60)
 	expectedValue = int16(345)
-	actualValue = GetTimezoneOffsetMinutes(timezone)
+	actualValue = GetTimezoneOffsetMinutes(time.Now().Unix(), timezone)
 	assert.Equal(t, expectedValue, actualValue)
 
 	timezone = time.FixedZone("Test Timezone", -720*60)
 	expectedValue = int16(-720)
-	actualValue = GetTimezoneOffsetMinutes(timezone)
+	actualValue = GetTimezoneOffsetMinutes(time.Now().Unix(), timezone)
 	assert.Equal(t, expectedValue, actualValue)
 
 	timezone = time.FixedZone("Test Timezone", 0)
 	expectedValue = int16(0)
-	actualValue = GetTimezoneOffsetMinutes(timezone)
+	actualValue = GetTimezoneOffsetMinutes(time.Now().Unix(), timezone)
 	assert.Equal(t, expectedValue, actualValue)
 }
 
-func TestFormatTimezoneOffset(t *testing.T) {
+func TestGetTimezoneOffsetMinutes_TimezoneWithDST(t *testing.T) {
+	londonLocation, err := time.LoadLocation("Europe/London")
+	assert.Equal(t, nil, err)
+
+	// during standard time (UTC+0)
+	expectedValue := int16(0)
+	actualValue := GetTimezoneOffsetMinutes(1577858483, londonLocation) // 2020-01-01 06:01:23 +00:00
+	assert.Equal(t, expectedValue, actualValue)
+
+	// during daylight saving time (UTC+1)
+	expectedValue = int16(60)
+	actualValue = GetTimezoneOffsetMinutes(1619845283, londonLocation) // 2021-05-01 06:01:23 +01:00
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestFormatTimezoneOffset_FixedTimezone(t *testing.T) {
 	timezone := time.FixedZone("Test Timezone", 120*60)
 	expectedValue := "+02:00"
-	actualValue := FormatTimezoneOffset(timezone)
+	actualValue := FormatTimezoneOffset(time.Now().Unix(), timezone)
 	assert.Equal(t, expectedValue, actualValue)
 
 	timezone = time.FixedZone("Test Timezone", 345*60)
 	expectedValue = "+05:45"
-	actualValue = FormatTimezoneOffset(timezone)
+	actualValue = FormatTimezoneOffset(time.Now().Unix(), timezone)
 	assert.Equal(t, expectedValue, actualValue)
 
 	timezone = time.FixedZone("Test Timezone", -720*60)
 	expectedValue = "-12:00"
-	actualValue = FormatTimezoneOffset(timezone)
+	actualValue = FormatTimezoneOffset(time.Now().Unix(), timezone)
 	assert.Equal(t, expectedValue, actualValue)
 
 	timezone = time.FixedZone("Test Timezone", -150*60)
 	expectedValue = "-02:30"
-	actualValue = FormatTimezoneOffset(timezone)
+	actualValue = FormatTimezoneOffset(time.Now().Unix(), timezone)
 	assert.Equal(t, expectedValue, actualValue)
 
 	timezone = time.FixedZone("Test Timezone", 0)
 	expectedValue = "+00:00"
-	actualValue = FormatTimezoneOffset(timezone)
+	actualValue = FormatTimezoneOffset(time.Now().Unix(), timezone)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestFormatTimezoneOffset_TimezoneWithDST(t *testing.T) {
+	londonLocation, err := time.LoadLocation("Europe/London")
+	assert.Equal(t, nil, err)
+
+	// during standard time (UTC+0)
+	expectedValue := "+00:00"
+	actualValue := FormatTimezoneOffset(1577858483, londonLocation) // 2020-01-01 06:01:23 +00:00
+	assert.Equal(t, expectedValue, actualValue)
+
+	// during daylight saving time (UTC+1)
+	expectedValue = "+01:00"
+	actualValue = FormatTimezoneOffset(1619845283, londonLocation) // 2021-05-01 06:01:23 +01:00
 	assert.Equal(t, expectedValue, actualValue)
 }
 

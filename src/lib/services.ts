@@ -178,7 +178,8 @@ import {
 } from './server_settings.ts';
 import {
     getTimezoneOffsetMinutes,
-    guessTimezoneName
+    getBrowserTimezoneName,
+    getCurrentUnixTime
 } from './datetime.ts';
 import { generateRandomUUID } from './misc.ts';
 import { getBasePath } from './web.ts';
@@ -208,12 +209,12 @@ axios.interceptors.request.use((config: ApiRequestConfig) => {
         config.headers.Authorization = `Bearer ${token}`;
     }
 
-    config.headers['X-Timezone-Offset'] = getTimezoneOffsetMinutes();
+    config.headers['X-Timezone-Offset'] = getTimezoneOffsetMinutes(getCurrentUnixTime());
 
     let timezoneName = getTimeZone();
 
     if (!timezoneName || timezoneName.trim().length < 1) {
-        timezoneName = guessTimezoneName();
+        timezoneName = getBrowserTimezoneName();
     }
 
     config.headers['X-Timezone-Name'] = timezoneName;

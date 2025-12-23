@@ -17,6 +17,7 @@ import type { TransactionReconciliationStatementResponseItem } from '@/models/tr
 import { isArray } from '@/lib/common.ts';
 import { sumAmounts } from '@/lib/numeral.ts';
 import {
+    parseDateTimeFromUnixTime,
     getGregorianCalendarYearAndMonthFromUnixTime,
     getYearFirstUnixTimeBySpecifiedUnixTime,
     getQuarterFirstUnixTimeBySpecifiedUnixTime,
@@ -52,11 +53,11 @@ export interface CommonAccountBalanceTrendsChartProps {
 
 export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTrendsChartProps) {
     const {
-        formatUnixTimeToShortDate,
-        formatUnixTimeToGregorianLikeShortYear,
-        formatUnixTimeToGregorianLikeShortYearMonth,
-        formatUnixTimeToGregorianLikeYearQuarter,
-        formatUnixTimeToGregorianLikeFiscalYear
+        formatDateTimeToShortDate,
+        formatDateTimeToGregorianLikeShortYear,
+        formatDateTimeToGregorianLikeShortYearMonth,
+        formatDateTimeToGregorianLikeYearQuarter,
+        formatDateTimeToGregorianLikeFiscalYear
     } = useI18n();
 
     const dataDateRange = computed<AccountBalanceUnixTimeAndBalanceRange | null>(() => {
@@ -150,19 +151,20 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
 
         for (const dateRange of allDateRanges.value) {
             const dataItems = dayDataItemsMap[dateRange.minUnixTime];
+            const minDateTime = parseDateTimeFromUnixTime(dateRange.minUnixTime);
 
             let displayDate = '';
 
             if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
-                displayDate = formatUnixTimeToGregorianLikeShortYear(dateRange.minUnixTime);
+                displayDate = formatDateTimeToGregorianLikeShortYear(minDateTime);
             } else if (props.dateAggregationType === ChartDateAggregationType.FiscalYear.type) {
-                displayDate = formatUnixTimeToGregorianLikeFiscalYear(dateRange.minUnixTime);
+                displayDate = formatDateTimeToGregorianLikeFiscalYear(minDateTime);
             } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type) {
-                displayDate = formatUnixTimeToGregorianLikeYearQuarter(dateRange.minUnixTime);
+                displayDate = formatDateTimeToGregorianLikeYearQuarter(minDateTime);
             } else if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
-                displayDate = formatUnixTimeToGregorianLikeShortYearMonth(dateRange.minUnixTime);
+                displayDate = formatDateTimeToGregorianLikeShortYearMonth(minDateTime);
             } else if (props.dateAggregationType === ChartDateAggregationType.Day.type) {
-                displayDate = formatUnixTimeToShortDate(dateRange.minUnixTime);
+                displayDate = formatDateTimeToShortDate(minDateTime);
             } else {
                 return ret;
             }

@@ -54,7 +54,10 @@ import { KnownFileType } from '@/core/file.ts';
 import type { ImportTransactionRequest, ImportTransactionRequestItem } from '@/models/imported_transaction.ts';
 
 import { isDefined } from '@/lib/common.ts';
-import { getBrowserTimezoneOffsetMinutes } from '@/lib/datetime.ts';
+import {
+    getTimezoneOffsetMinutes,
+    getCurrentUnixTime
+} from '@/lib/datetime.ts';
 import {
     openTextFileContent,
     startDownloadFile
@@ -121,7 +124,7 @@ function parse(row, index) {
 
     return {
         time: row[0], // ${tt('sample.importTransactionCustomScript.fieldTimeDescription')}
-        utcOffset: '${getBrowserTimezoneOffsetMinutes()}', // ${tt('sample.importTransactionCustomScript.fieldUtcOffsetDescription')}
+        utcOffset: '${getTimezoneOffsetMinutes(getCurrentUnixTime())}', // ${tt('sample.importTransactionCustomScript.fieldUtcOffsetDescription')}
         type: TransactionType.Expense, // ${tt('sample.importTransactionCustomScript.fieldTypeDescription')}
         categoryName: row[4], // ${tt('sample.importTransactionCustomScript.fieldCategoryNameDescription')}
         sourceAccountName: row[5], // ${tt('sample.importTransactionCustomScript.fieldSourceAccountNameDescription')}

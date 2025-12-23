@@ -14,7 +14,7 @@
         <template #item.time="{ item }">
             <span>{{ getDisplayDateTime(item) }}</span>
             <v-chip class="ms-1" variant="flat" color="secondary" size="x-small"
-                    v-if="item.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimezone(item) }}</v-chip>
+                    v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimezone(item) }}</v-chip>
         </template>
         <template #item.type="{ item }">
             <v-chip label variant="outlined" size="x-small"
@@ -76,7 +76,6 @@ import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useExploresStore } from '@/stores/explore.ts';
 
@@ -89,7 +88,7 @@ import {
 import {
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffsetMinutes,
-    parseDateTimeFromUnixTime
+    parseDateTimeFromUnixTimeWithTimezoneOffset
 } from '@/lib/datetime.ts';
 
 import {
@@ -109,19 +108,17 @@ const emit = defineEmits<{
 
 const {
     tt,
-    formatUnixTimeToLongDateTime,
-    formatUnixTimeToGregorianDefaultDateTime,
+    formatDateTimeToLongDateTime,
+    formatDateTimeToGregorianDefaultDateTime,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
     formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
 
-const settingsStore = useSettingsStore();
 const userStore = useUserStore();
 const exploresStore = useExploresStore();
 
 const currentPage = ref<number>(1);
 
-const currentTimezoneOffsetMinutes = computed<number>(() => getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone));
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
 const filteredTransactions = computed<TransactionInsightDataItem[]>(() => exploresStore.filteredTransactions);
@@ -163,7 +160,12 @@ const dataTableHeaders = computed<object[]>(() => {
 });
 
 function getDisplayDateTime(transaction: TransactionInsightDataItem): string {
-    return formatUnixTimeToLongDateTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value);
+    const dateTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transaction.utcOffset);
+    return formatDateTimeToLongDateTime(dateTime);
+}
+
+function isSameAsDefaultTimezoneOffsetMinutes(transaction: TransactionInsightDataItem): boolean {
+    return transaction.utcOffset === getTimezoneOffsetMinutes(transaction.time);
 }
 
 function getDisplayTimezone(transaction: TransactionInsightDataItem): string {
@@ -234,7 +236,7 @@ function buildExportResults(): { headers: string[], data: string[][] } | undefin
         ],
         data: filteredTransactions.value
             .map(transaction => {
-                const transactionTime = parseDateTimeFromUnixTime(transaction.time, transaction.utcOffset, currentTimezoneOffsetMinutes.value).getUnixTime();
+                const transactionTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transaction.utcOffset);
                 const type = getDisplayTransactionType(transaction);
 
                 let categoryName = transaction.secondaryCategoryName;
@@ -254,7 +256,7 @@ function buildExportResults(): { headers: string[], data: string[][] } | undefin
                 const description = transaction.comment || '';
 
                 return [
-                    formatUnixTimeToGregorianDefaultDateTime(transactionTime),
+                    formatDateTimeToGregorianDefaultDateTime(transactionTime),
                     type,
                     categoryName,
                     displayAmount,

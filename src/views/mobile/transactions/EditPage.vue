@@ -251,8 +251,10 @@
                     </div>
                 </template>
                 <date-time-selection-sheet :init-mode="transactionDateTimeSheetMode"
+                                           :timezone-utc-offset="transaction.utcOffset"
+                                           :model-value="transaction.time"
                                            v-model:show="showTransactionDateTimeSheet"
-                                           v-model="transaction.time">
+                                           @update:model-value="updateTransactionTime">
                 </date-time-selection-sheet>
             </f7-list-item>
 
@@ -323,8 +325,9 @@
                                            :filter-placeholder="tt('Timezone')"
                                            :filter-no-items-text="tt('No results')"
                                            :items="allTimezones"
+                                           :model-value="transaction.timeZone"
                                            v-model:show="showTimezonePopup"
-                                           v-model="transaction.timeZone">
+                                           @update:model-value="updateTransactionTimezone">
                 </list-item-selection-popup>
             </f7-list-item>
 
@@ -512,10 +515,9 @@ import type { TransactionPictureInfoBasicResponse } from '@/models/transaction_p
 import { Transaction } from '@/models/transaction.ts';
 
 import {
-    getActualUnixTimeForStore,
-    getBrowserTimezoneOffsetMinutes,
     getTimezoneOffset,
-    getTimezoneOffsetMinutes
+    getTimezoneOffsetMinutes,
+    parseDateTimeFromUnixTimeWithTimezoneOffset
 } from '@/lib/datetime.ts';
 import { formatCoordinate } from '@/lib/coordinate.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
@@ -536,8 +538,8 @@ const {
     tt,
     getMultiMonthdayShortNames,
     getMultiWeekdayLongNames,
-    formatUnixTimeToLongDate,
-    formatUnixTimeToLongTime,
+    formatDateTimeToLongDate,
+    formatDateTimeToLongTime,
     formatGregorianTextualYearMonthDayToLongDate,
     parseAmountFromLocalizedNumerals
 } = useI18n();
@@ -589,6 +591,8 @@ const {
     geoLocationStatusInfo,
     inputEmptyProblemMessage,
     inputIsEmpty,
+    updateTransactionTime,
+    updateTransactionTimezone,
     swapTransactionData,
     getDisplayAmount,
     getTransactionPictureUrl
@@ -655,19 +659,23 @@ const destinationAmountClass = computed<Record<string, boolean>>(() => {
 
 const transactionDisplayDate = computed<string>(() => {
     if (mode.value !== TransactionEditPageMode.View || !showTimeInDefaultTimezone.value) {
-        return formatUnixTimeToLongDate(getActualUnixTimeForStore(transaction.value.time, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+        const dateTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.value.time, transaction.value.utcOffset);
+        return formatDateTimeToLongDate(dateTime);
     }
 
-    return formatUnixTimeToLongDate(getActualUnixTimeForStore(transaction.value.time, transaction.value.utcOffset, getBrowserTimezoneOffsetMinutes()));
+    const dateTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.value.time, getTimezoneOffsetMinutes(transaction.value.time));
+    return formatDateTimeToLongDate(dateTime);
 });
 
 const transactionDisplayTime = computed<string>(() => {
     if (mode.value !== TransactionEditPageMode.View || !showTimeInDefaultTimezone.value) {
-        return formatUnixTimeToLongTime(getActualUnixTimeForStore(transaction.value.time, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+        const dateTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.value.time, transaction.value.utcOffset);
+        return formatDateTimeToLongTime(dateTime);
     }
 
-    const utcOffset = numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(getTimezoneOffset(settingsStore.appSettings.timeZone));
-    return `${formatUnixTimeToLongTime(getActualUnixTimeForStore(transaction.value.time, transaction.value.utcOffset, getBrowserTimezoneOffsetMinutes()))} (UTC${utcOffset})`;
+    const dateTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.value.time, getTimezoneOffsetMinutes(transaction.value.time));
+    const utcOffset = numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(getTimezoneOffset(transaction.value.time));
+    return `${formatDateTimeToLongTime(dateTime)} (UTC${utcOffset})`;
 });
 
 const transactionDisplayTimezoneName = computed<string>(() => {
@@ -949,7 +957,6 @@ function init(): void {
                 tagIds: query['tagIds'],
                 comment: query['comment']
             },
-            pageTypeAndMode.type === TransactionEditPageType.Transaction && (mode.value === TransactionEditPageMode.Edit || mode.value === TransactionEditPageMode.View),
             pageTypeAndMode.type === TransactionEditPageType.Transaction && (mode.value === TransactionEditPageMode.Edit || mode.value === TransactionEditPageMode.View)
         );
 

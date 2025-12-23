@@ -1,16 +1,23 @@
 import { ref, computed } from 'vue';
 
-import { type TimeRangeAndDateType, type PresetDateRange, type UnixTimeRange, type WeekDayValue, DateRange } from '@/core/datetime.ts';
+import {
+    type DateTime,
+    type UnixTimeRange,
+    type TimeRangeAndDateType,
+    type PresetDateRange,
+    type WeekDayValue,
+    DateRange,
+} from '@/core/datetime.ts';
 
 import {
     getCurrentUnixTime,
     getLocalDatetimeFromUnixTime,
     getUnixTimeFromLocalDatetime,
     getTodayFirstUnixTime,
-    getDummyUnixTimeForLocalUsage,
-    getActualUnixTimeForStore,
-    getTimezoneOffsetMinutes,
-    getBrowserTimezoneOffsetMinutes,
+    getSameDateTimeWithCurrentTimezone,
+    getSameDateTimeWithBrowserTimezone,
+    parseDateTimeFromUnixTime,
+    parseDateTimeFromUnixTimeWithBrowserTimezone,
     getDateRangeByDateType
 } from '@/lib/datetime.ts';
 
@@ -45,23 +52,21 @@ function getDateRangeFromProps(props: CommonDateRangeSelectionProps): { minDate:
 }
 
 export function useDateRangeSelectionBase(props: CommonDateRangeSelectionProps) {
-    const { tt, formatUnixTimeToLongDateTime } = useI18n();
+    const { tt, formatDateTimeToLongDateTime } = useI18n();
     const userStore = useUserStore();
     const { minDate, maxDate } = getDateRangeFromProps(props);
 
     const dateRange = ref<Date[]>([
-        getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(minDate, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())),
-        getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(maxDate, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()))
+        getLocalDatetimeFromSameDateTimeOfUnixTime(minDate),
+        getLocalDatetimeFromSameDateTimeOfUnixTime(maxDate)
     ]);
 
     const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
     const beginDateTime = computed<string>(() => {
-        const actualBeginUnixTime = getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(dateRange.value[0] as Date), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
-        return formatUnixTimeToLongDateTime(actualBeginUnixTime);
+        return formatDateTimeToLongDateTime(getDateTimeFromSameDateTimeOfLocalDatetime(dateRange.value[0] as Date));
     });
     const endDateTime = computed<string>(() => {
-        const actualEndUnixTime = getActualUnixTimeForStore(getUnixTimeFromLocalDatetime(dateRange.value[1] as Date), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
-        return formatUnixTimeToLongDateTime(actualEndUnixTime);
+        return formatDateTimeToLongDateTime(getDateTimeFromSameDateTimeOfLocalDatetime(dateRange.value[1] as Date));
     });
     const presetRanges = computed<PresetDateRange[]>(() => {
         const presetRanges:PresetDateRange[] = [];
@@ -82,14 +87,22 @@ export function useDateRangeSelectionBase(props: CommonDateRangeSelectionProps) 
             presetRanges.push({
                 label: tt(dateRangeType.name),
                 value: [
-                    getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(dateRange.minTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())),
-                    getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(dateRange.maxTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()))
+                    getLocalDatetimeFromSameDateTimeOfUnixTime(dateRange.minTime),
+                    getLocalDatetimeFromSameDateTimeOfUnixTime(dateRange.maxTime)
                 ]
             });
         });
 
         return presetRanges;
     });
+
+    function getLocalDatetimeFromSameDateTimeOfUnixTime(unixTime: number): Date {
+        return getLocalDatetimeFromUnixTime(getSameDateTimeWithBrowserTimezone(parseDateTimeFromUnixTime(unixTime)).getUnixTime());
+    }
+
+    function getDateTimeFromSameDateTimeOfLocalDatetime(localDatetime: Date): DateTime {
+        return getSameDateTimeWithCurrentTimezone(parseDateTimeFromUnixTimeWithBrowserTimezone(getUnixTimeFromLocalDatetime(localDatetime)));
+    }
 
     function getFinalDateRange(): UnixTimeRange | null {
         if (!dateRange.value[0] || !dateRange.value[1]) {
@@ -99,15 +112,12 @@ export function useDateRangeSelectionBase(props: CommonDateRangeSelectionProps) 
         const currentMinDate = dateRange.value[0];
         const currentMaxDate = dateRange.value[1];
 
-        let minUnixTime = getUnixTimeFromLocalDatetime(currentMinDate);
-        let maxUnixTime = getUnixTimeFromLocalDatetime(currentMaxDate);
+        const minUnixTime = getDateTimeFromSameDateTimeOfLocalDatetime(currentMinDate).getUnixTime();
+        const maxUnixTime = getDateTimeFromSameDateTimeOfLocalDatetime(currentMaxDate).getUnixTime();
 
         if (minUnixTime < 0 || maxUnixTime < 0) {
             throw new Error('Date is too early');
         }
-
-        minUnixTime = getActualUnixTimeForStore(minUnixTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
-        maxUnixTime = getActualUnixTimeForStore(maxUnixTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
 
         return {
             minUnixTime,
@@ -123,6 +133,8 @@ export function useDateRangeSelectionBase(props: CommonDateRangeSelectionProps) 
         endDateTime,
         presetRanges,
         // functions
+        getLocalDatetimeFromSameDateTimeOfUnixTime,
+        getDateTimeFromSameDateTimeOfLocalDatetime,
         getFinalDateRange
     };
 }

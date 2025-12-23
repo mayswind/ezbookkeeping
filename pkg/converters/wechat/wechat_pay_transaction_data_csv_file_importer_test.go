@@ -32,7 +32,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_MinimumValidData(t *testing.T
 		"2024-09-01 12:34:56,商户消费,支出,￥123.45,支付成功\n" +
 		"2024-09-01 23:59:59,零钱充值,/,￥0.05,充值完成\n" +
 		"2024-09-02 23:59:59,零钱提现,/,￥0.03,提现已到账\n"
-	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := importer.ParseImportedData(context, user, []byte(data), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 4, len(allNewTransactions))
@@ -109,7 +109,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseRefundTransaction(t *tes
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
 		"交易时间,交易类型,收/支,金额(元),当前状态\n" +
 		"2024-09-01 01:23:45,xxx-退款,收入,￥0.12,已全额退款\n"
-	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, int64(1234567890), allNewTransactions[0].Uid)
@@ -136,7 +136,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
 		"交易时间,交易类型,收/支,金额(元),当前状态\n" +
 		"2024-09-01T01:23:45,二维码收款,收入,￥0.12,已收钱\n"
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
 	data2 := "微信支付账单明细,,,,\n" +
@@ -146,7 +146,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
 		"交易时间,交易类型,收/支,金额(元),当前状态\n" +
 		"09/01/2024 12:34:56,二维码收款,收入,￥0.12,已收钱\n"
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
 
@@ -166,7 +166,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseInvalidType(t *testing.T
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
 		"交易时间,交易类型,收/支,金额(元),当前状态\n" +
 		"2024-09-01T01:23:45,xxx,,￥0.12,支付成功\n"
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
@@ -186,7 +186,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseInvalidAmount(t *testing
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
 		"交易时间,交易类型,收/支,金额(元),当前状态\n" +
 		"2024-09-01 01:23:45,二维码收款,收入,￥,已收钱\n"
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }
 
@@ -207,7 +207,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
 		"交易时间,交易类型,收/支,金额(元),支付方式,当前状态\n" +
 		"2024-09-01 01:23:45,二维码收款,收入,￥0.12,/,已收钱\n"
-	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -223,7 +223,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T
 		"2024-09-01 01:23:45,xxx-退款,收入,￥0.12,test,已全额退款\n"
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -239,7 +239,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T
 		"2024-09-01 23:59:59,零钱充值,/,￥0.05,test,充值完成\n"
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data3), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data3), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -256,7 +256,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T
 		"2024-09-02 23:59:59,零钱提现,/,￥0.03,test,提现已到账\n"
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data4), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data4), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -273,7 +273,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T
 		"2024-09-03 23:59:59,信用卡还款,/,￥0.01,零钱,支付成功\n"
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data5), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data5), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -297,7 +297,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseDescription(t *testing.T
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
 		"交易时间,交易类型,收/支,金额(元),当前状态,备注\n" +
 		"2024-09-01 01:23:45,二维码收款,收入,￥0.12,已收钱,\"/\"\n"
-	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -310,7 +310,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseDescription(t *testing.T
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
 		"交易时间,交易类型,商品,收/支,金额(元),当前状态,备注\n" +
 		"2024-09-01 01:23:45,二维码收款,Test,收入,￥0.12,已收钱,\"foo\"\"bar,\ntest\"\n"
-	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "foo\"bar,\ntest", allNewTransactions[0].Comment)
 
@@ -321,7 +321,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseDescription(t *testing.T
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
 		"交易时间,交易类型,商品,收/支,金额(元),当前状态,备注\n" +
 		"2024-09-01 01:23:45,二维码收款,Test,收入,￥0.12,已收钱,\"\"\n"
-	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data3), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data3), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "Test", allNewTransactions[0].Comment)
 }
@@ -342,7 +342,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_SkipUnknownTransferTransactio
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
 		"交易时间,交易类型,收/支,金额(元),当前状态\n" +
 		"2024-09-01 23:59:59,/,/,￥0.05,充值完成\n"
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
@@ -357,10 +357,10 @@ func TestWeChatPayCsvFileImporterParseImportedData_MissingFileHeader(t *testing.
 
 	data := "交易时间,交易类型,收/支,金额(元),当前状态\n" +
 		"2024-09-01 01:23:45,二维码收款,收入,￥0.12,已收钱\n"
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidFileHeader.Message)
 
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(""), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(""), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidFileHeader.Message)
 }
 
@@ -381,7 +381,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_MissingRequiredColumn(t *test
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
 		"交易类型,收/支,金额(元),当前状态\n" +
 		"二维码收款,收入,￥0.12,已收钱\n"
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data1), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Category Column
@@ -392,7 +392,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_MissingRequiredColumn(t *test
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
 		"交易时间,收/支,金额(元),当前状态\n" +
 		"2024-09-01 01:23:45,收入,￥0.12,已收钱\n"
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data2), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Type Column
@@ -403,7 +403,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_MissingRequiredColumn(t *test
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
 		"交易时间,交易类型,金额(元),当前状态\n" +
 		"2024-09-01 01:23:45,二维码收款,￥0.12,已收钱\n"
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data3), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data3), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Amount Column
@@ -414,7 +414,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_MissingRequiredColumn(t *test
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
 		"交易时间,交易类型,收/支,当前状态\n" +
 		"2024-09-01 01:23:45,二维码收款,收入,已收钱\n"
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data4), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data4), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Status Column
@@ -425,7 +425,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_MissingRequiredColumn(t *test
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
 		"交易时间,交易类型,收/支,金额(元)\n" +
 		"2024-09-01 01:23:45,二维码收款,收入,￥0.12\n"
-	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data5), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data5), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 }
 
@@ -444,6 +444,6 @@ func TestWeChatPayCsvFileImporterParseImportedData_NoTransactionData(t *testing.
 		",,,,\n" +
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
 		"交易时间,交易类型,收/支,金额(元),当前状态\n"
-	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), 0, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }

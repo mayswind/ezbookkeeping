@@ -212,6 +212,22 @@ export class TransactionExploreQuery {
         return finalTokens;
     }
 
+    public clone(): TransactionExploreQuery {
+        const clonedConditions: TransactionExploreConditionWithRelation[] = [];
+
+        for (const condition of this.conditions) {
+            const clonedCondition = TransactionExploreConditionWithRelation.parse(condition.toJsonObject());
+
+            if (!clonedCondition) {
+                continue;
+            }
+
+            clonedConditions.push(clonedCondition);
+        }
+
+        return new TransactionExploreQuery(this.name, clonedConditions);
+    }
+
     public toJson(): string {
         return JSON.stringify({
             name: this.name,

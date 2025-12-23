@@ -1,31 +1,66 @@
 <template>
     <v-card-text class="pt-0">
         <div class="d-flex gap-2">
-            <v-btn color="primary" variant="outlined"
-                   :disabled="loading"
+            <v-btn color="default" variant="outlined"
+                   :disabled="loading || !!editingQuery"
                    @click="addQuery">{{ tt('Add Query') }}</v-btn>
             <v-spacer />
             <v-btn color="secondary" variant="tonal"
-                   :disabled="loading || queries.length < 1"
+                   :disabled="loading || !!editingQuery || queries.length < 1"
                    @click="clearAllQueries">{{ tt('Clear All') }}</v-btn>
         </div>
 
         <div :key="queryIndex" v-for="(query, queryIndex) in queries">
             <v-card class="mt-4" variant="outlined">
                 <v-card-title class="d-flex align-center py-2 px-4">
-                    <span class="text-subtitle-1">{{ tt('Query') }} {{ `#${queryIndex + 1}` }}</span>
+                    <span class="text-subtitle-1" v-if="editingQuery !== query">{{ query.name || `${tt('Query')} #${queryIndex + 1}` }}</span>
+                    <div class="query-name-edit" v-if="editingQuery === query">
+                        <v-text-field type="text" density="compact" variant="underlined"
+                                      :disabled="loading"
+                                      :placeholder="`${tt('Query')} #${queryIndex + 1}`"
+                                      v-model="editingQueryName"
+                                      @keyup.enter="updateQueryName(query)" />
+                    </div>
+                    <v-btn class="ms-2" density="compact" color="primary" variant="text" size="small"
+                           :icon="true" :disabled="loading"
+                           @click="updateQueryName(query)"
+                           v-if="editingQuery === query">
+                        <v-icon :icon="mdiCheck" size="18" />
+                        <v-tooltip activator="parent">{{ tt('Update') }}</v-tooltip>
+                    </v-btn>
+                    <v-btn class="ms-2" density="compact" color="default" variant="text" size="small"
+                           :icon="true" :disabled="loading"
+                           @click="cancelUpdateQueryName"
+                           v-if="editingQuery === query">
+                        <v-icon :icon="mdiClose" size="18" />
+                        <v-tooltip activator="parent">{{ tt('Cancel') }}</v-tooltip>
+                    </v-btn>
+                    <v-btn class="ms-2" density="compact" color="default" variant="text" size="small"
+                           :icon="true" :disabled="loading || !!editingQuery"
+                           @click="editingQueryName = query.name; editingQuery = query"
+                           v-if="!editingQuery || editingQuery !== query">
+                        <v-icon :icon="mdiPencilOutline" size="18" />
+                        <v-tooltip activator="parent">{{ tt('Modify Query Name') }}</v-tooltip>
+                    </v-btn>
+                    <v-btn class="ms-2" density="compact" color="default" variant="text" size="small"
+                           :icon="true" :disabled="loading || !!editingQuery"
+                           @click="duplicateQuery(query)"
+                           v-if="!editingQuery || editingQuery !== query">
+                        <v-icon :icon="mdiContentCopy" size="18" />
+                        <v-tooltip activator="parent">{{ tt('Duplicate') }}</v-tooltip>
+                    </v-btn>
                     <v-spacer />
                     <v-switch class="bidirectional-switch ms-2" color="secondary"
-                              :disabled="!query.conditions || query.conditions.length < 1"
+                              :disabled="loading || !!editingQuery || !query.conditions || query.conditions.length < 1"
                               :label="tt('Expression')"
-                              v-model="showExpression"
-                              @click="showExpression = !showExpression">
+                              v-model="showExpression[queryIndex]"
+                              @click="showExpression[queryIndex] = !showExpression[queryIndex]">
                         <template #prepend>
                             <span>{{ tt('Editor') }}</span>
                         </template>
                     </v-switch>
                     <v-btn class="ms-2" density="compact" color="default" variant="text" size="small"
-                           :icon="true" :disabled="loading || queries.length < 1"
+                           :icon="true" :disabled="loading || !!editingQuery || queries.length < 1"
                            @click="removeQuery(queryIndex)">
                         <v-icon :icon="mdiClose" size="18" />
                         <v-tooltip activator="parent">{{ tt('Remove Query') }}</v-tooltip>
@@ -41,7 +76,7 @@
                                 {{ tt('No conditions defined. All transactions will match.') }}
                             </div>
 
-                            <div v-else-if="query.conditions && query.conditions.length > 0 && !showExpression">
+                            <div v-else-if="query.conditions && query.conditions.length > 0 && !showExpression[queryIndex]">
                                 <div :key="conditionIndex" v-for="(conditionWithRelation, conditionIndex) in query.conditions">
                                     <div class="d-flex overflow-x-auto align-center gap-2 mb-4">
                                         <v-select
@@ -62,7 +97,7 @@
                                             density="compact"
                                             item-title="displayName"
                                             item-value="value"
-                                            :disabled="loading"
+                                            :disabled="loading || !!editingQuery"
                                             :items="[
                                                 { value: TransactionExploreConditionRelation.And, displayName: tt('AND') },
                                                 { value: TransactionExploreConditionRelation.Or, displayName: tt('OR') }
@@ -76,7 +111,7 @@
                                             density="compact"
                                             item-title="name"
                                             item-value="value"
-                                            :disabled="loading"
+                                            :disabled="loading || !!editingQuery"
                                             :items="allTransactionExploreConditionFields"
                                             @update:model-value="updateConditionField(queryIndex, conditionIndex, TransactionExploreConditionField.valueOf($event))"
                                             v-model="conditionWithRelation.condition.field"
@@ -87,7 +122,7 @@
                                             density="compact"
                                             item-title="name"
                                             item-value="value"
-                                            :disabled="loading"
+                                            :disabled="loading || !!editingQuery"
                                             :items="getAllTransactionExploreConditionOperators(conditionWithRelation.getSupportedOperators())"
                                             v-model="conditionWithRelation.condition.operator"
                                         />
@@ -98,7 +133,7 @@
                                                 density="compact"
                                                 item-title="displayName"
                                                 item-value="type"
-                                                :disabled="loading"
+                                                :disabled="loading || !!editingQuery"
                                                 :placeholder="tt('None')"
                                                 :items="[
                                                     { type: TransactionType.Expense, displayName: tt('Expense') },
@@ -126,7 +161,7 @@
                                                 item-value="type"
                                                 persistent-placeholder
                                                 :readonly="true"
-                                                :disabled="loading || !hasAnyTransactionCategory"
+                                                :disabled="loading || !!editingQuery || !hasAnyTransactionCategory"
                                                 :placeholder="tt('None')"
                                                 :model-value="getFilteredTransactionCategoriesDisplayContent(arrayItemToObjectField(conditionWithRelation.condition.value as string[], true))"
                                                 @click="currentCondition = conditionWithRelation.condition; showFilterTransactionCategoriesDialog = true"
@@ -140,7 +175,7 @@
                                                 item-value="type"
                                                 persistent-placeholder
                                                 :readonly="true"
-                                                :disabled="loading || !hasAnyAccount"
+                                                :disabled="loading || !!editingQuery || !hasAnyAccount"
                                                 :placeholder="tt('None')"
                                                 :model-value="getFilteredAccountsDisplayContent(arrayItemToObjectField(conditionWithRelation.condition.value as string[], true))"
                                                 @click="currentCondition = conditionWithRelation.condition; showFilterSourceAccountsDialog = true"
@@ -154,7 +189,7 @@
                                                 item-value="type"
                                                 persistent-placeholder
                                                 :readonly="true"
-                                                :disabled="loading || !hasAnyAccount"
+                                                :disabled="loading || !!editingQuery || !hasAnyAccount"
                                                 :placeholder="tt('None')"
                                                 :model-value="getFilteredAccountsDisplayContent(arrayItemToObjectField(conditionWithRelation.condition.value as string[], true))"
                                                 @click="currentCondition = conditionWithRelation.condition; showFilterDestinationAccountsDialog = true"
@@ -166,7 +201,7 @@
                                                             conditionWithRelation.condition.field === TransactionExploreConditionField.DestinationAmount.value">
                                                 <amount-input density="compact"
                                                               :currency="defaultCurrency"
-                                                              :disabled="loading"
+                                                              :disabled="loading || !!editingQuery"
                                                               v-model="conditionWithRelation.condition.value[0]"
                                                 />
                                                 <span class="ms-2 me-2"
@@ -174,7 +209,7 @@
                                                             conditionWithRelation.condition.operator === TransactionExploreConditionOperator.NotBetween.value">~</span>
                                                 <amount-input density="compact"
                                                               :currency="defaultCurrency"
-                                                              :disabled="loading"
+                                                              :disabled="loading || !!editingQuery"
                                                               v-model="conditionWithRelation.condition.value[1]"
                                                               v-if="conditionWithRelation.condition.operator === TransactionExploreConditionOperator.Between.value ||
                                                                     conditionWithRelation.condition.operator === TransactionExploreConditionOperator.NotBetween.value"
@@ -200,7 +235,7 @@
                                                     multiple
                                                     chips
                                                     closable-chips
-                                                    :disabled="loading"
+                                                    :disabled="loading || !!editingQuery"
                                                     :placeholder="tt('None')"
                                                     :items="allTags"
                                                     v-model="conditionWithRelation.condition.value"
@@ -250,7 +285,7 @@
                                             />
 
                                             <v-text-field density="compact"
-                                                          :disabled="loading"
+                                                          :disabled="loading || !!editingQuery"
                                                           :placeholder="tt('None')"
                                                           v-model="conditionWithRelation.condition.value"
                                                           v-else-if="conditionWithRelation.condition.field === TransactionExploreConditionField.Description.value &&
@@ -261,7 +296,7 @@
                                         <v-btn color="default" density="compact"
                                                variant="text" size="small"
                                                :icon="true"
-                                               :disabled="loading"
+                                               :disabled="loading || !!editingQuery"
                                                @click="removeCondition(queryIndex, conditionIndex)">
                                             <v-icon :icon="mdiClose" size="18" />
                                             <v-tooltip activator="parent">{{ tt('Remove Condition') }}</v-tooltip>
@@ -269,7 +304,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-else-if="query.conditions && query.conditions.length > 0 && showExpression">
+                            <div v-else-if="query.conditions && query.conditions.length > 0 && showExpression[queryIndex]">
                                 <div class="w-100 code-container">
                                     <v-textarea class="w-100 always-cursor-text mb-4" :readonly="true"
                                                 :value="getExpression(queryIndex)"></v-textarea>
@@ -279,7 +314,7 @@
                             <v-btn color="primary" density="comfortable"
                                    variant="text" size="small"
                                    :prepend-icon="mdiPlus"
-                                   :disabled="loading || showExpression"
+                                   :disabled="loading || !!editingQuery || showExpression[queryIndex]"
                                    @click="addCondition(queryIndex)">
                                 {{ tt('Add Condition') }}
                             </v-btn>
@@ -334,7 +369,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useExploresStore } from '@/stores/explore.ts';
 
-import { type NameValue, values } from '@/core/base.ts';
+import { type NameValue, entries, values } from '@/core/base.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import {
@@ -362,6 +397,9 @@ import logger from '@/lib/logger.ts';
 
 import {
     mdiPlus,
+    mdiPencilOutline,
+    mdiContentCopy,
+    mdiCheck,
     mdiClose,
     mdiPound
 } from '@mdi/js';
@@ -390,11 +428,13 @@ const exploresStore = useExploresStore();
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const currentCondition = ref<TransactionExploreCondition | undefined>(undefined);
-const showExpression = ref<boolean>(false);
+const showExpression = ref<Record<number, boolean>>({});
 const showFilterSourceAccountsDialog = ref<boolean>(false);
 const showFilterDestinationAccountsDialog = ref<boolean>(false);
 const showFilterTransactionCategoriesDialog = ref<boolean>(false);
 const tagSearchContent = ref<string>('');
+const editingQuery = ref<TransactionExploreQuery | undefined>(undefined);
+const editingQueryName = ref<string>('');
 
 const queries = computed<TransactionExploreQuery[]>(() => exploresStore.transactionExploreFilter.query);
 
@@ -492,10 +532,39 @@ function addQuery(): void {
     queries.value.push(TransactionExploreQuery.create());
 }
 
+function updateQueryName(query: TransactionExploreQuery): void {
+    query.name = editingQueryName.value;
+    editingQuery.value = undefined;
+    editingQueryName.value = '';
+}
+
+function cancelUpdateQueryName(): void {
+    editingQuery.value = undefined;
+    editingQueryName.value = '';
+}
+
+function duplicateQuery(query: TransactionExploreQuery): void {
+    queries.value.push(query.clone());
+}
+
 function removeQuery(queryIndex: number): void {
     if (queries.value.length > 0) {
         queries.value.splice(queryIndex, 1);
     }
+
+    const newShowExpression: Record<number, boolean> = {};
+
+    for (const [key, state] of entries(showExpression.value)) {
+        const index = parseInt(key);
+
+        if (queryIndex > index) {
+            newShowExpression[index] = state;
+        } else if (queryIndex < index) {
+            newShowExpression[index - 1] = state;
+        }
+    }
+
+    showExpression.value = newShowExpression;
 
     if (queries.value.length < 1) {
         queries.value.push(TransactionExploreQuery.create());
@@ -610,3 +679,18 @@ if (queries.value.length === 0) {
     queries.value.push(TransactionExploreQuery.create());
 }
 </script>
+
+<style>
+.query-name-edit {
+    width: 200px;
+    height: 36px;
+
+    > .v-text-field {
+        .v-field__input {
+            margin-top: -2px;
+            margin-bottom: -3px;
+            padding-top: 0;
+        }
+    }
+}
+</style>

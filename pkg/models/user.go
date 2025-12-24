@@ -242,14 +242,14 @@ func (u *User) CanEditTransactionByTransactionTime(transactionTime int64, client
 	transactionUnixTime := utils.GetUnixTimeFromTransactionTime(transactionTime)
 
 	if u.TransactionEditScope == TRANSACTION_EDIT_SCOPE_LAST_24H_OR_LATER {
-		return transactionUnixTime >= now.Unix()-24*60*60
+		return transactionUnixTime >= now.Add(-24*time.Hour).Unix()
 	}
 
 	clientNow := now.In(clientTimezone)
-	clientTodayFirstUnixTime := clientNow.Unix() - int64(clientNow.Hour()*60*60+clientNow.Minute()*60+clientNow.Second())
+	clientTodayStartTime := utils.GetStartOfDay(clientNow)
 
 	if u.TransactionEditScope == TRANSACTION_EDIT_SCOPE_TODAY_OR_LATER {
-		return transactionUnixTime >= clientTodayFirstUnixTime
+		return transactionUnixTime >= clientTodayStartTime.Unix()
 	} else if u.TransactionEditScope == TRANSACTION_EDIT_SCOPE_THIS_WEEK_OR_LATER {
 		dayOfWeek := int(now.Weekday()) - int(u.FirstDayOfWeek)
 
@@ -257,14 +257,14 @@ func (u *User) CanEditTransactionByTransactionTime(transactionTime int64, client
 			dayOfWeek += 7
 		}
 
-		clientWeekFirstUnixTime := clientTodayFirstUnixTime - int64(dayOfWeek*24*60*60)
-		return transactionUnixTime >= clientWeekFirstUnixTime
+		clientWeekStartTime := clientTodayStartTime.AddDate(0, 0, -dayOfWeek)
+		return transactionUnixTime >= clientWeekStartTime.Unix()
 	} else if u.TransactionEditScope == TRANSACTION_EDIT_SCOPE_THIS_MONTH_OR_LATER {
-		clientMonthFirstUnixTime := clientTodayFirstUnixTime - int64((now.Day()-1)*24*60*60)
-		return transactionUnixTime >= clientMonthFirstUnixTime
+		clientMonthStartTime := clientTodayStartTime.AddDate(0, 0, -(now.Day() - 1))
+		return transactionUnixTime >= clientMonthStartTime.Unix()
 	} else if u.TransactionEditScope == TRANSACTION_EDIT_SCOPE_THIS_YEAR_OR_LATER {
-		clientYearFirstUnixTime := clientTodayFirstUnixTime - int64((now.YearDay()-1)*24*60*60)
-		return transactionUnixTime >= clientYearFirstUnixTime
+		clientYearStartTime := clientTodayStartTime.AddDate(0, 0, -(now.YearDay() - 1))
+		return transactionUnixTime >= clientYearStartTime.Unix()
 	}
 
 	return false

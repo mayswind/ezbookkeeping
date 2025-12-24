@@ -516,6 +516,16 @@ func TestGetTransactionTimeRangeByYearMonth(t *testing.T) {
 	assert.Equal(t, expectedMaxValue, actualMaxValue)
 }
 
+func TestGetStartOfDay(t *testing.T) {
+	expectedValue := int64(1617148800) // 2021-03-31 00:00:00 UTC
+	actualValue := GetStartOfDay(time.Unix(1617228083, 0).In(time.UTC))
+	assert.Equal(t, expectedValue, actualValue.Unix())
+
+	expectedValue = int64(1617206400) // 2021-04-01 00:00:00 UTC+8
+	actualValue = GetStartOfDay(time.Unix(1617228083, 0).In(time.FixedZone("Test Timezone", 28800)))
+	assert.Equal(t, expectedValue, actualValue.Unix())
+}
+
 func TestParseFromUnixTime(t *testing.T) {
 	expectedValue := int64(1617228083)
 	actualTime := parseFromUnixTime(expectedValue)

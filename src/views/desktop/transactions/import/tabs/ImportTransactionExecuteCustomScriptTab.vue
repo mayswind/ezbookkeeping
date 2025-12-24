@@ -47,16 +47,26 @@ import { ref, computed, useTemplateRef, onMounted, onUnmounted } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import { useSettingsStore } from '@/stores/setting.ts';
+
 import type { NameNumeralValue } from '@/core/base.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
+import { KnownDateTimeFormat } from '@/core/datetime.ts';
 import { KnownFileType } from '@/core/file.ts';
 
 import type { ImportTransactionRequest, ImportTransactionRequestItem } from '@/models/imported_transaction.ts';
 
-import { isDefined } from '@/lib/common.ts';
+import {
+    isDefined,
+    isObject,
+    isString
+} from '@/lib/common.ts';
 import {
     getTimezoneOffsetMinutes,
-    getCurrentUnixTime
+    getBrowserTimezoneName,
+    getCurrentUnixTime,
+    parseDateTimeFromKnownDateTimeFormat,
+    parseDateTimeFromString
 } from '@/lib/datetime.ts';
 import {
     openTextFileContent,
@@ -95,7 +105,13 @@ const props = defineProps<{
     disabled?: boolean;
 }>();
 
-const { tt, getCurrentNumeralSystemType } = useI18n();
+const {
+    tt,
+    getCurrentNumeralSystemType,
+    formatDateTimeToGregorianDefaultDateTime
+} = useI18n();
+
+const settingsStore = useSettingsStore();
 
 const sandbox = useTemplateRef<HTMLIFrameElement>('sandbox');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
@@ -107,6 +123,7 @@ const executingScript = ref<boolean>(false);
 const executionError = ref<string>('');
 const previewCount = ref<number>(10);
 
+const currentTimezoneName = computed<string>(() => settingsStore.appSettings.timeZone || getBrowserTimezoneName());
 const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 const previewCounts = computed<NameNumeralValue[]>(() => getTablePageOptions(previewResult.value?.length));
 
@@ -123,17 +140,28 @@ function parse(row, index) {
     }
 
     return {
-        time: row[0], // ${tt('sample.importTransactionCustomScript.fieldTimeDescription')}
-        utcOffset: '${getTimezoneOffsetMinutes(getCurrentUnixTime())}', // ${tt('sample.importTransactionCustomScript.fieldUtcOffsetDescription')}
-        type: TransactionType.Expense, // ${tt('sample.importTransactionCustomScript.fieldTypeDescription')}
-        categoryName: row[4], // ${tt('sample.importTransactionCustomScript.fieldCategoryNameDescription')}
-        sourceAccountName: row[5], // ${tt('sample.importTransactionCustomScript.fieldSourceAccountNameDescription')}
-        destinationAccountName: row[8], // ${tt('sample.importTransactionCustomScript.fieldDestinationAccountNameDescription')}
-        sourceAmount: row[7], // ${tt('sample.importTransactionCustomScript.fieldSourceAmountDescription')}
-        destinationAmount: row[10], // ${tt('sample.importTransactionCustomScript.fieldDestinationAmountDescription')}
-        geoLocation: undefined, // ${tt('sample.importTransactionCustomScript.fieldGeoLocationDescription')}
-        tagNames: '', // ${tt('sample.importTransactionCustomScript.fieldTagNamesDescription')}
-        description: row[13] // ${tt('sample.importTransactionCustomScript.fieldCommentDescription')}
+        // ${tt('sample.importTransactionCustomScript.fieldTimeDescription')}
+        time: row[0],
+        // ${tt('sample.importTransactionCustomScript.fieldUtcOffsetDescription')}
+        utcOffset: ${currentTimezoneName.value ? 'parseUtcOffset(\'' + currentTimezoneName.value + '\')' : '\'' + getTimezoneOffsetMinutes(getCurrentUnixTime()) + '\''},
+        // ${tt('sample.importTransactionCustomScript.fieldTypeDescription')}
+        type: TransactionType.Expense,
+        // ${tt('sample.importTransactionCustomScript.fieldCategoryNameDescription')}
+        categoryName: row[4],
+        // ${tt('sample.importTransactionCustomScript.fieldSourceAccountNameDescription')}
+        sourceAccountName: row[5],
+        // ${tt('sample.importTransactionCustomScript.fieldDestinationAccountNameDescription')}
+        destinationAccountName: row[8],
+        // ${tt('sample.importTransactionCustomScript.fieldSourceAmountDescription')}
+        sourceAmount: row[7],
+        // ${tt('sample.importTransactionCustomScript.fieldDestinationAmountDescription')}
+        destinationAmount: row[10],
+        // ${tt('sample.importTransactionCustomScript.fieldGeoLocationDescription')}
+        geoLocation: undefined,
+        // ${tt('sample.importTransactionCustomScript.fieldTagNamesDescription')}
+        tagNames: '',
+        // ${tt('sample.importTransactionCustomScript.fieldCommentDescription')}
+        description: row[13]
     };
 }`);
 
@@ -202,6 +230,19 @@ function reloadSandbox(): void {
                     Income: 'Income',
                     Expense: 'Expense',
                     Transfer: 'Transfer'
+                };
+
+                window.parseDateTime = function(dateTime, format) {
+                    return {
+                        dateTime: dateTime,
+                        format: format
+                    };
+                };
+
+                window.parseUtcOffset = function(timezoneName) {
+                    return {
+                        name: timezoneName
+                    };
                 };
 
                 window.addEventListener('message', function (event) {
@@ -308,20 +349,65 @@ function onMessage(event: MessageEvent<SandboxResponse>): void {
     if (data.knownError) {
         snackbar.value?.showError(data.knownError);
         previewResult.value = undefined;
-        executionError.value = tt(data.knownError);
+        executionError.value = `// ${tt(data.knownError)}`;
     } else if (data.error) {
         logger.error('Failed to execute custom script: ' + data.error);
         snackbar.value?.showError('Failed to execute custom script');
         previewResult.value = undefined;
-        executionError.value = data.error;
+        executionError.value = `// ${data.error}`;
     } else if (data.result) {
         const originalResult = JSON.parse(data.result) as Record<string, unknown>[];
         const finalResult: ImportTransactionRequestItem[] = [];
 
         for (const item of originalResult) {
+            let time: string = '';
+            let unixTime: number | undefined = undefined;
+            let utcOffset: string = '';
+
+            if (isString(item['time'])) {
+                time = String(item['time']);
+                const dateTime = parseDateTimeFromKnownDateTimeFormat(time, KnownDateTimeFormat.DefaultDateTime);
+
+                if (dateTime && KnownDateTimeFormat.DefaultDateTime.isValid(time)) {
+                    unixTime = dateTime.getUnixTime();
+                }
+            } else if (isObject(item['time']) && isDefined((item['time'] as Record<string, unknown>)['dateTime']) && isDefined((item['time'] as Record<string, unknown>)['format'])) {
+                const originalDateTime = String((item['time'] as Record<string, unknown>)['dateTime']);
+                const format = String((item['time'] as Record<string, unknown>)['format']);
+                const dateTime = parseDateTimeFromString(originalDateTime, format);
+
+                if (dateTime) {
+                    time = formatDateTimeToGregorianDefaultDateTime(dateTime);
+                    unixTime = dateTime.getUnixTime();
+                }
+
+                if (!isDefined(unixTime)) {
+                    logger.error('Failed to parse time "' + originalDateTime + '" with custom format "' + format + '"');
+                    snackbar.value?.showError('Failed to parse time');
+                    previewResult.value = undefined;
+                    executionError.value = `// ${tt('Failed to parse time')} "${originalDateTime}"`;
+                    return;
+                }
+            }
+
+            if (!isDefined(unixTime)) {
+                logger.error('Failed to parse time "' + item['time'] + '"');
+                snackbar.value?.showError('Failed to parse time');
+                previewResult.value = undefined;
+                executionError.value = `// ${tt('Failed to parse time')} "${item['time']}"`;
+                return;
+            }
+
+            if (isString(item['utcOffset'])) {
+                utcOffset = String(item['utcOffset']);
+            } else if (isObject(item['utcOffset']) && isDefined((item['utcOffset'] as Record<string, unknown>)['name'])) {
+                const timezoneName = String((item['utcOffset'] as Record<string, unknown>)['name']);
+                utcOffset = getTimezoneOffsetMinutes(unixTime, timezoneName).toString(10);
+            }
+
             const finalItem: ImportTransactionRequestItem = {
-                time: (isDefined(item['time'])) ? String(item['time']) : '',
-                utcOffset: (isDefined(item['utcOffset'])) ? String(item['utcOffset']) : '',
+                time: time,
+                utcOffset: utcOffset,
                 type: (isDefined(item['type'])) ? String(item['type']) : '',
                 categoryName: (isDefined(item['categoryName']) && item['categoryName'] !== '') ? String(item['categoryName']) : undefined,
                 sourceAccountName: (isDefined(item['sourceAccountName']) && item['sourceAccountName'] !== '') ? String(item['sourceAccountName']) : undefined,

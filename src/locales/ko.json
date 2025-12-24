@@ -1937,6 +1937,7 @@
     "Time Format": "시간 형식",
     "Transaction Type Mapping": "거래 유형 매핑",
     "Timezone Format": "시간대 형식",
+    "IANA Time Zone Name": "IANA Time Zone Name",
     "Amount Format": "금액 형식",
     "Geographic Location Separator": "지리적 위치 구분 기호",
     "Transaction Tags Separator": "거래 태그 구분 기호",

@@ -1937,6 +1937,7 @@
     "Time Format": "Формат часу",
     "Transaction Type Mapping": "Відповідність типів транзакцій",
     "Timezone Format": "Формат часового поясу",
+    "IANA Time Zone Name": "IANA Time Zone Name",
     "Amount Format": "Формат суми",
     "Geographic Location Separator": "Роздільник геолокацій",
     "Transaction Tags Separator": "Роздільник тегів транзакцій",

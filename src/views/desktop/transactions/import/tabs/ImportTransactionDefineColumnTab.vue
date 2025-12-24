@@ -85,8 +85,7 @@
                                          @click="parsedFileDataColumnMapping.timeFormat = ''">
                                 <v-list-item-title class="cursor-pointer">
                                     <span>{{ tt('Auto detect') }}</span>
-                                    <span class="ms-1" v-if="parsedFileAutoDetectedTimeFormat">({{ parsedFileAutoDetectedTimeFormat }})</span>
-                                    <span class="ms-1" v-if="!parsedFileAutoDetectedTimeFormat">({{ tt('Unknown') }})</span>
+                                    <span class="ms-1" v-if="parsedFileAutoDetectedTimeFormat">({{ parsedFileAutoDetectedTimeFormat || tt('Unknown') }})</span>
                                 </v-list-item-title>
                             </v-list-item>
                             <v-list-item :key="dateTimeFormat.format"
@@ -103,7 +102,7 @@
                 <v-btn class="ms-2" color="secondary" density="compact" variant="outlined"
                        v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTimezone)">
                     <span>{{ tt('Timezone Format') }}</span>
-                    <span class="ms-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTimezone)">({{ KnownDateTimezoneFormat.valueOf(parsedFileDataColumnMapping.timezoneFormat || parsedFileAutoDetectedTimezoneFormat || '')?.name || tt('Unknown') }})</span>
+                    <span class="ms-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionTimezone)">({{ displayFileCurrentTimezoneFormat }})</span>
                     <v-menu eager activator="parent" location="bottom" max-height="500">
                         <v-list>
                             <v-list-item key="auto"
@@ -111,8 +110,7 @@
                                          @click="parsedFileDataColumnMapping.timezoneFormat = ''">
                                 <v-list-item-title class="cursor-pointer">
                                     <span>{{ tt('Auto detect') }}</span>
-                                    <span class="ms-1" v-if="parsedFileAutoDetectedTimezoneFormat && KnownDateTimezoneFormat.valueOf(parsedFileAutoDetectedTimezoneFormat || '')">({{ KnownDateTimezoneFormat.valueOf(parsedFileAutoDetectedTimezoneFormat || '')?.name }})</span>
-                                    <span class="ms-1" v-if="!parsedFileAutoDetectedTimezoneFormat || !KnownDateTimezoneFormat.valueOf(parsedFileAutoDetectedTimezoneFormat || '')">({{ tt('Unknown') }})</span>
+                                    <span class="ms-1">({{ displayFileAutoDetectedTimezoneFormat }})</span>
                                 </v-list-item-title>
                             </v-list-item>
                             <v-list-item :key="timezoneFormat.value"
@@ -120,7 +118,7 @@
                                          v-for="timezoneFormat in KnownDateTimezoneFormat.values()"
                                          @click="parsedFileDataColumnMapping.timezoneFormat = timezoneFormat.value">
                                 <v-list-item-title class="cursor-pointer">
-                                    {{ timezoneFormat.name }}
+                                    {{ ti(timezoneFormat.name, timezoneFormat.nameSupportedI18n) }}
                                 </v-list-item-title>
                             </v-list-item>
                         </v-list>
@@ -137,8 +135,7 @@
                                          @click="parsedFileDataColumnMapping.amountFormat = ''">
                                 <v-list-item-title class="cursor-pointer">
                                     <span>{{ tt('Auto detect') }}</span>
-                                    <span class="ms-1" v-if="parsedFileAutoDetectedAmountFormat && KnownAmountFormat.valueOf(parsedFileAutoDetectedAmountFormat || '')">({{ KnownAmountFormat.valueOf(parsedFileAutoDetectedAmountFormat || '')?.format }})</span>
-                                    <span class="ms-1" v-if="!parsedFileAutoDetectedAmountFormat || !KnownAmountFormat.valueOf(parsedFileAutoDetectedAmountFormat || '')">({{ tt('Unknown') }})</span>
+                                    <span class="ms-1">({{ displayFileAutoDetectedAmountFormat }})</span>
                                 </v-list-item-title>
                             </v-list-item>
                             <v-list-item :key="amountFormat.type"
@@ -287,6 +284,7 @@ const props = defineProps<{
 
 const {
     tt,
+    ti,
     getCurrentNumeralSystemType,
     getAllImportTransactionColumnTypes
 } = useI18n();
@@ -407,6 +405,48 @@ const parsedFileValidMappedTransactionTypes = computed<Record<string, Transactio
 const parsedFileAutoDetectedTimeFormat = computed<string | undefined>(() => parsedFileDataColumnMapping.value.parseFileAutoDetectedTimeFormat(props.parsedFileData));
 const parsedFileAutoDetectedTimezoneFormat = computed<string | undefined>(() => parsedFileDataColumnMapping.value.parseFileAutoDetectedTimezoneFormat(props.parsedFileData));
 const parsedFileAutoDetectedAmountFormat = computed<string | undefined>(() => parsedFileDataColumnMapping.value.parseFileAutoDetectedAmountFormat(props.parsedFileData));
+
+const displayFileCurrentTimezoneFormat = computed<string>(() => {
+    const format = parsedFileDataColumnMapping.value.timezoneFormat || parsedFileAutoDetectedTimezoneFormat.value || '';
+
+    if (format) {
+        const knownFormat = KnownDateTimezoneFormat.valueOf(format);
+
+        if (knownFormat) {
+            return ti(knownFormat.name, knownFormat.nameSupportedI18n);
+        }
+    }
+
+    return tt('Unknown');
+});
+
+const displayFileAutoDetectedTimezoneFormat = computed<string>(() => {
+    const format = parsedFileAutoDetectedTimezoneFormat.value;
+
+    if (format) {
+        const knownFormat = KnownDateTimezoneFormat.valueOf(format);
+
+        if (knownFormat) {
+            return ti(knownFormat.name, knownFormat.nameSupportedI18n);
+        }
+    }
+
+    return tt('Unknown');
+});
+
+const displayFileAutoDetectedAmountFormat = computed<string>(() => {
+    const format = parsedFileAutoDetectedAmountFormat.value;
+
+    if (format) {
+        const knownFormat = KnownAmountFormat.valueOf(format);
+
+        if (knownFormat) {
+            return knownFormat.format;
+        }
+    }
+
+    return tt('Unknown');
+});
 
 function getDisplayCount(count: number): string {
     return numeralSystem.value.formatNumber(count);

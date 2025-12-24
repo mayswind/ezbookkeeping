@@ -107,6 +107,7 @@ func (t *customPlainTextDataRowIterator) Next(ctx core.Context, user *models.Use
 
 func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user *models.User, row datatable.BasicDataTableRow) (map[datatable.TransactionDataTableColumn]string, bool, error) {
 	rowData := make(map[datatable.TransactionDataTableColumn]string, len(t.transactionDataTable.columnIndexMapping))
+	var transactionTime *time.Time = nil
 
 	for column, columnIndex := range t.transactionDataTable.columnIndexMapping {
 		if columnIndex < 0 || columnIndex >= row.ColumnCount() {
@@ -144,6 +145,7 @@ func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user
 			return nil, false, errs.ErrTransactionTimeInvalid
 		}
 
+		transactionTime = &dateTime
 		rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = utils.FormatUnixTimeToLongDateTime(dateTime.Unix(), dateTime.Location())
 
 		if t.transactionDataTable.timeFormatIncludeTimezone {
@@ -164,6 +166,19 @@ func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user
 
 			timezone = timezone[:3] + ":" + timezone[3:]
 			rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = timezone
+		} else if t.transactionDataTable.timezoneFormat == "zzz" { // IANA Timezone Name
+			timezoneName := rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE]
+			timezone, err := time.LoadLocation(timezoneName)
+
+			if err != nil {
+				return nil, false, errs.ErrTransactionTimeZoneInvalid
+			}
+
+			if transactionTime == nil {
+				return nil, false, errs.ErrTransactionTimeInvalid
+			}
+
+			rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = utils.FormatTimezoneOffset(transactionTime.Unix(), timezone)
 		} else {
 			return nil, false, errs.ErrImportFileTransactionTimezoneFormatInvalid
 		}

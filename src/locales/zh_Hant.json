@@ -1938,6 +1938,7 @@
     "Amount Format": "金額格式",
     "Transaction Type Mapping": "交易類型對應",
     "Timezone Format": "時區格式",
+    "IANA Time Zone Name": "IANA 時區名稱",
     "Geographic Location Separator": "地理位置分隔符號",
     "Transaction Tags Separator": "交易標籤分隔符號",
     "Lines Per Page": "每頁行數",

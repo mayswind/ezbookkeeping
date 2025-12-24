@@ -17,15 +17,18 @@ export class KnownDateTimezoneFormat implements NameValue {
     private static readonly allInstances: KnownDateTimezoneFormat[] = [];
     private static readonly allInstancesByValue: Record<string, KnownDateTimezoneFormat> = {};
 
-    public static readonly HHColonMM = new KnownDateTimezoneFormat('±HH:mm', 'Z', /^[+-]?([0-1][0-9]|2[0-3]):[0-5][0-9]$/);
-    public static readonly HHMM = new KnownDateTimezoneFormat('±HHmm', 'ZZ', /^[+-]?([0-1][0-9]|2[0-3])[0-5][0-9]$/);
+    public static readonly HHColonMM = new KnownDateTimezoneFormat('±HH:mm', false, 'Z', /^[+-]?([0-1][0-9]|2[0-3]):[0-5][0-9]$/);
+    public static readonly HHMM = new KnownDateTimezoneFormat('±HHmm', false, 'ZZ', /^[+-]?([0-1][0-9]|2[0-3])[0-5][0-9]$/);
+    public static readonly IANAName = new KnownDateTimezoneFormat('IANA Time Zone Name', true, 'zzz', /^[A-Za-z_]+\/[A-Za-z_]+(\/[A-Za-z_]+)?$/);
 
     public readonly name: string;
+    public readonly nameSupportedI18n: boolean;
     public readonly value: string;
     private readonly regex: RegExp;
 
-    private constructor(name: string, value: string, regex: RegExp) {
+    private constructor(name: string, nameSupportedI18n: boolean, value: string, regex: RegExp) {
         this.name = name;
+        this.nameSupportedI18n = nameSupportedI18n;
         this.value = value;
         this.regex = regex;
 

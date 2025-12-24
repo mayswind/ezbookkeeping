@@ -1,6 +1,6 @@
 <template>
-    <v-card-text class="pt-0">
-        <div class="d-flex gap-2">
+    <v-card-subtitle class="px-5">
+        <div class="title-and-toolbar d-flex">
             <v-btn color="default" variant="outlined"
                    :disabled="loading || !!editingQuery"
                    @click="addQuery">{{ tt('Add Query') }}</v-btn>
@@ -9,7 +9,8 @@
                    :disabled="loading || !!editingQuery || queries.length < 1"
                    @click="clearAllQueries">{{ tt('Clear All') }}</v-btn>
         </div>
-
+    </v-card-subtitle>
+    <v-card-text class="pt-0">
         <div :key="queryIndex" v-for="(query, queryIndex) in queries">
             <v-card class="mt-4" variant="outlined">
                 <v-card-title class="d-flex align-center py-2 px-4">

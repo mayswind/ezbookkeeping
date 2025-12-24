@@ -1,5 +1,6 @@
 import moment from 'moment-timezone';
 import { type unitOfTime } from 'moment/moment';
+import 'moment-timezone/moment-timezone-utils';
 
 import jalaali, { type JalaaliDateObject } from 'jalaali-js';
 

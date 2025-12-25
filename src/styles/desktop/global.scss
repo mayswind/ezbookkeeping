@@ -83,6 +83,7 @@ input[type=number] {
     background-color: var(--v-expand-panel-title-bg);
 }
 
+.card-title-with-bg > .v-card-title,
 .card-title-with-bg > .v-card-item {
     background-color: var(--v-card-title-bg);
 }

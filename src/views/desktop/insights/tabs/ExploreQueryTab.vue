@@ -12,10 +12,11 @@
     </v-card-subtitle>
     <v-card-text class="pt-0">
         <div :key="queryIndex" v-for="(query, queryIndex) in queries">
-            <v-card class="mt-4" variant="outlined">
-                <v-card-title class="d-flex align-center py-2 px-4">
-                    <span class="text-subtitle-1" v-if="editingQuery !== query">{{ query.name || `${tt('Query')} #${queryIndex + 1}` }}</span>
-                    <div class="query-name-edit" v-if="editingQuery === query">
+            <v-card border class="card-title-with-bg mt-4">
+                <v-card-title class="d-flex align-center py-2 px-5">
+                    <v-icon :icon="mdiTextBoxSearchOutline" size="20" />
+                    <span class="text-subtitle-1 ms-2" v-if="editingQuery !== query">{{ query.name || `${tt('Query')} #${queryIndex + 1}` }}</span>
+                    <div class="query-name-edit ms-2" v-if="editingQuery === query">
                         <v-text-field type="text" density="compact" variant="underlined"
                                       :disabled="loading"
                                       :placeholder="`${tt('Query')} #${queryIndex + 1}`"
@@ -312,8 +313,7 @@
                                 </div>
                             </div>
 
-                            <v-btn color="primary" density="comfortable"
-                                   variant="text" size="small"
+                            <v-btn class="px-2" density="comfortable" color="primary" variant="text" size="small"
                                    :prepend-icon="mdiPlus"
                                    :disabled="loading || !!editingQuery || showExpression[queryIndex]"
                                    @click="addCondition(queryIndex)">
@@ -397,6 +397,7 @@ import {
 import logger from '@/lib/logger.ts';
 
 import {
+    mdiTextBoxSearchOutline,
     mdiPlus,
     mdiPencilOutline,
     mdiContentCopy,

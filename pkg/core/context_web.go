@@ -188,20 +188,21 @@ func (c *WebContext) GetClientLocale() string {
 }
 
 func (c *WebContext) GetClientTimezone() (*time.Location, int16, error) {
-	utcOffset, err := c.getClientTimezoneOffset()
-
-	if err != nil {
-		return nil, 0, err
-	}
-
 	timezoneName := c.getClientTimezoneName()
 
 	if timezoneName != "" {
 		location, err := time.LoadLocation(timezoneName)
 
 		if err == nil && location != nil {
-			return location, utcOffset, nil
+			_, tzOffset := time.Now().In(location).Zone()
+			return location, int16(tzOffset / 60), nil
 		}
+	}
+
+	utcOffset, err := c.getClientTimezoneOffset()
+
+	if err != nil {
+		return nil, 0, err
 	}
 
 	return time.FixedZone("Client Fixed Timezone", int(utcOffset)*60), utcOffset, nil

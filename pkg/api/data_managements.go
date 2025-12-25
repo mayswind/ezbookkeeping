@@ -302,7 +302,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 		return nil, "", errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	clientTimezone, _, err := c.GetClientTimezone()
+	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[data_managements.getExportedFileContent] cannot get client timezone, because %s", err.Error())

@@ -121,7 +121,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.WebContext) (any, *errs
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	clientTimezone, _, err := c.GetClientTimezone()
+	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionListHandler] cannot get client timezone, because %s", err.Error())
@@ -224,7 +224,7 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.WebContext) (any, 
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	clientTimezone, _, err := c.GetClientTimezone()
+	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionMonthListHandler] cannot get client timezone, because %s", err.Error())
@@ -300,7 +300,7 @@ func (a *TransactionsApi) TransactionListAllHandler(c *core.WebContext) (any, *e
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	clientTimezone, _, err := c.GetClientTimezone()
+	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionListAllHandler] cannot get client timezone, because %s", err.Error())
@@ -382,7 +382,7 @@ func (a *TransactionsApi) TransactionReconciliationStatementHandler(c *core.WebC
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	clientTimezone, _, err := c.GetClientTimezone()
+	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionReconciliationStatementHandler] cannot get client timezone, because %s", err.Error())
@@ -490,7 +490,7 @@ func (a *TransactionsApi) TransactionStatisticsHandler(c *core.WebContext) (any,
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	clientTimezone, utfOffset, err := c.GetClientTimezone()
+	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionStatisticsHandler] cannot get client timezone, because %s", err.Error())
@@ -510,7 +510,7 @@ func (a *TransactionsApi) TransactionStatisticsHandler(c *core.WebContext) (any,
 	}
 
 	uid := c.GetCurrentUid()
-	totalAmounts, err := a.transactions.GetAccountsAndCategoriesTotalInflowAndOutflow(c, uid, statisticReq.StartTime, statisticReq.EndTime, tagFilters, noTags, statisticReq.Keyword, utfOffset, clientTimezone, statisticReq.UseTransactionTimezone)
+	totalAmounts, err := a.transactions.GetAccountsAndCategoriesTotalInflowAndOutflow(c, uid, statisticReq.StartTime, statisticReq.EndTime, tagFilters, noTags, statisticReq.Keyword, clientTimezone, statisticReq.UseTransactionTimezone)
 
 	if err != nil {
 		log.Errorf(c, "[transactions.TransactionStatisticsHandler] failed to get accounts and categories total income and expense for user \"uid:%d\", because %s", uid, err.Error())
@@ -551,7 +551,7 @@ func (a *TransactionsApi) TransactionStatisticsTrendsHandler(c *core.WebContext)
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	clientTimezone, _, err := c.GetClientTimezone()
+	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionStatisticsTrendsHandler] cannot get client timezone, because %s", err.Error())
@@ -626,7 +626,7 @@ func (a *TransactionsApi) TransactionStatisticsAssetTrendsHandler(c *core.WebCon
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	clientTimezone, _, err := c.GetClientTimezone()
+	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionStatisticsAssetTrendsHandler] cannot get client timezone, because %s", err.Error())
@@ -727,7 +727,7 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.WebContext) (any, *e
 		}
 	}
 
-	clientTimezone, utfOffset, err := c.GetClientTimezone()
+	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionAmountsHandler] cannot get client timezone, because %s", err.Error())
@@ -749,7 +749,7 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.WebContext) (any, *e
 	for i := 0; i < len(requestItems); i++ {
 		requestItem := requestItems[i]
 
-		incomeAmounts, expenseAmounts, err := a.transactions.GetAccountsTotalIncomeAndExpense(c, uid, requestItem.StartTime, requestItem.EndTime, excludeAccountIds, excludeCategoryIds, utfOffset, clientTimezone, transactionAmountsReq.UseTransactionTimezone)
+		incomeAmounts, expenseAmounts, err := a.transactions.GetAccountsTotalIncomeAndExpense(c, uid, requestItem.StartTime, requestItem.EndTime, excludeAccountIds, excludeCategoryIds, clientTimezone, transactionAmountsReq.UseTransactionTimezone)
 
 		if err != nil {
 			log.Errorf(c, "[transactions.TransactionAmountsHandler] failed to get transaction amounts item for user \"uid:%d\", because %s", uid, err.Error())
@@ -830,7 +830,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.WebContext) (any, *errs.
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	clientTimezone, _, err := c.GetClientTimezone()
+	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionGetHandler] cannot get client timezone, because %s", err.Error())
@@ -960,7 +960,7 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.WebContext) (any, *er
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	clientTimezone, _, err := c.GetClientTimezone()
+	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionCreateHandler] cannot get client timezone, because %s", err.Error())
@@ -1097,7 +1097,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	clientTimezone, _, err := c.GetClientTimezone()
+	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionModifyHandler] cannot get client timezone, because %s", err.Error())
@@ -1354,7 +1354,7 @@ func (a *TransactionsApi) TransactionDeleteHandler(c *core.WebContext) (any, *er
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	clientTimezone, _, err := c.GetClientTimezone()
+	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionDeleteHandler] cannot get client timezone, because %s", err.Error())
@@ -1488,7 +1488,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 		return nil, errs.ErrParameterInvalid
 	}
 
-	clientTimezone, _, err := c.GetClientTimezone()
+	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionParseImportFileHandler] cannot get client timezone, because %s", err.Error())
@@ -1719,7 +1719,7 @@ func (a *TransactionsApi) TransactionImportHandler(c *core.WebContext) (any, *er
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	clientTimezone, _, err := c.GetClientTimezone()
+	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionImportHandler] cannot get client timezone, because %s", err.Error())

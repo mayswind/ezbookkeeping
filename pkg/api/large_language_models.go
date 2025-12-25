@@ -47,7 +47,7 @@ func (a *LargeLanguageModelsApi) RecognizeReceiptImageHandler(c *core.WebContext
 		return nil, errs.ErrLargeLanguageModelProviderNotEnabled
 	}
 
-	clientTimezone, _, err := c.GetClientTimezone()
+	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
 		log.Warnf(c, "[large_language_models.RecognizeReceiptImageHandler] cannot get client timezone, because %s", err.Error())

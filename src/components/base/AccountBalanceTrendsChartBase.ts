@@ -178,11 +178,17 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
                     return data1.time - data2.time;
                 });
 
+                const allDataItemsSortedByClosingBalance = Array.from(dataItems)
+                    .sort(function (data1: TransactionReconciliationStatementResponseItem, data2: TransactionReconciliationStatementResponseItem) {
+                        return data1.accountClosingBalance - data2.accountClosingBalance;
+                    }
+                );
+
                 const openingBalance = dataItems[0]!.accountOpeningBalance;
                 const closingBalance = dataItems[dataItems.length - 1]!.accountClosingBalance;
                 const minimumBalance = Math.min(...dataItems.map(item => item.accountClosingBalance));
                 const maximumBalance = Math.max(...dataItems.map(item => item.accountClosingBalance));
-                const medianBalance = dataItems[Math.floor(dataItems.length / 2)]!.accountClosingBalance;
+                const medianBalance = allDataItemsSortedByClosingBalance[Math.floor(allDataItemsSortedByClosingBalance.length / 2)]!.accountClosingBalance;
                 const averageBalance = Math.trunc(sumAmounts(dataItems.map(item => item.accountClosingBalance)) / dataItems.length);
 
                 if (props.account.isAsset) {

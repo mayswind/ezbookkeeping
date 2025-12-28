@@ -31,6 +31,7 @@ export interface CommonPieChartProps {
     colorField?: string;
     hiddenField?: string;
     minValidPercent?: number;
+    amountValue?: boolean;
     defaultCurrency?: string;
     showValue?: boolean;
     showPercent?: boolean;
@@ -74,7 +75,7 @@ export function usePieChartBase(props: CommonPieChartProps) {
                 };
 
                 finalItem.displayPercent = formatPercentToLocalizedNumerals(finalItem.percent, 2, '&lt;0.01');
-                finalItem.displayValue = formatAmountToLocalizedNumeralsWithCurrency(finalItem.value, props.defaultCurrency);
+                finalItem.displayValue = props.amountValue ? formatAmountToLocalizedNumeralsWithCurrency(finalItem.value, props.defaultCurrency) : finalItem.value.toString();
 
                 validItems.push(finalItem);
             }

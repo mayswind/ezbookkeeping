@@ -78,7 +78,7 @@
                                     <v-spacer/>
                                     <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                                            :disabled="loading" :icon="true"
-                                           v-if="activeTab !== 'query'">
+                                           v-if="activeTab === 'table' || activeTab === 'chart'">
                                         <v-icon :icon="mdiDotsVertical" />
                                         <v-menu activator="parent">
                                             <v-list>
@@ -102,7 +102,8 @@
                                                             v-model:count-per-page="countPerPage" />
                                 </v-window-item>
                                 <v-window-item value="chart">
-
+                                    <explore-chart-tab ref="exploreChartTab"
+                                                       :loading="loading" />
                                 </v-window-item>
                             </v-window>
                         </v-card>
@@ -127,6 +128,7 @@
 <script setup lang="ts">
 import ExploreQueryTab from '@/views/desktop/insights/tabs/ExploreQueryTab.vue';
 import ExploreDataTableTab from '@/views/desktop/insights/tabs/ExploreDataTableTab.vue';
+import ExploreChartTab from '@/views/desktop/insights/tabs/ExploreChartTab.vue';
 import ExportDialog from '@/views/desktop/statistics/transaction/dialogs/ExportDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
@@ -180,6 +182,7 @@ const props = defineProps<InsightsExploreProps>();
 type ExplorePageTabType = 'query' | 'table' | 'chart';
 type SnackBarType = InstanceType<typeof SnackBar>;
 type ExploreDataTableTabType = InstanceType<typeof ExploreDataTableTab>;
+type ExploreChartTabType = InstanceType<typeof ExploreChartTab>;
 type ExportDialogType = InstanceType<typeof ExportDialog>;
 
 const router = useRouter();
@@ -201,6 +204,7 @@ const exploresStore = useExploresStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const exploreDataTableTab = useTemplateRef<ExploreDataTableTabType>('exploreDataTableTab');
+const exploreChartTab = useTemplateRef<ExploreChartTabType>('exploreChartTab');
 const exportDialog = useTemplateRef<ExportDialogType>('exportDialog');
 
 const loading = ref<boolean>(true);
@@ -234,6 +238,10 @@ const allTabs = computed<{ name: string, value: ExplorePageTabType }[]>(() => {
         {
             name: tt('Data Table'),
             value: 'table'
+        },
+        {
+            name: tt('Chart'),
+            value: 'chart'
         }
     ];
 });
@@ -332,6 +340,12 @@ function reload(force: boolean): Promise<unknown> | null {
 function exportResults(): void {
     if (activeTab.value === 'table' && filteredTransactions.value) {
         const results = exploreDataTableTab.value?.buildExportResults();
+
+        if (results) {
+            exportDialog.value?.open(results);
+        }
+    } else if (activeTab.value === 'chart') {
+        const results = exploreChartTab.value?.buildExportResults();
 
         if (results) {
             exportDialog.value?.open(results);

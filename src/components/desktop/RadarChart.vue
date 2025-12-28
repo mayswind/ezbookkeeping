@@ -38,6 +38,7 @@ const props = defineProps<{
     colorField?: string;
     hiddenField?: string;
     minValidPercent?: number;
+    amountValue?: boolean;
     defaultCurrency?: string;
     showValue?: boolean;
     showPercent?: boolean;
@@ -81,7 +82,7 @@ const radarData = computed<RadarChartData>(() => {
 
                 const finalPercent = (isNumber(percent) && percent >= 0) ? percent : (value / totalValidValue * 100);
                 const displayPercent = formatPercentToLocalizedNumerals(finalPercent, 2, '&lt;0.01');
-                const displayValue = formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency);
+                const displayValue = props.amountValue ? formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency) : value.toString();
 
                 indicators.push({
                     name: name,

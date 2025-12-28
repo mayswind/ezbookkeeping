@@ -86,6 +86,7 @@
                     :show-center-text="true"
                     :show-selected-item-info="true"
                     :enable-click-item="true"
+                    :amount-value="true"
                     :default-currency="defaultCurrency"
                     class="statistics-pie-chart"
                     name-field="name"

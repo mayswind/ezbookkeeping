@@ -15,11 +15,11 @@
             <v-card border class="card-title-with-bg mt-4">
                 <v-card-title class="d-flex align-center py-2 px-5">
                     <v-icon :icon="mdiTextBoxSearchOutline" size="20" />
-                    <span class="query-name text-subtitle-1 ms-2" v-if="editingQuery !== query">{{ query.name || `${tt('Query')} #${queryIndex + 1}` }}</span>
+                    <span class="query-name text-subtitle-1 ms-2" v-if="editingQuery !== query">{{ query.name || tt('format.misc.queryIndex', { index: queryIndex + 1 }) }}</span>
                     <div class="query-name-edit ms-2" v-if="editingQuery === query">
                         <v-text-field autofocus type="text" density="compact" variant="underlined"
                                       :disabled="loading"
-                                      :placeholder="`${tt('Query')} #${queryIndex + 1}`"
+                                      :placeholder="tt('format.misc.queryIndex', { index: queryIndex + 1 })"
                                       v-text-field-auto-width="{ minWidth: 20, maxWidth: 300, auxSpanId: `query-name-aux-span-${queryIndex + 1}` }"
                                       v-model="editingQueryName"
                                       @keyup.esc="cancelUpdateQueryName"

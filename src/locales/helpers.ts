@@ -144,7 +144,10 @@ import {
 
 import {
     TransactionExploreConditionField,
-    TransactionExploreConditionOperator
+    TransactionExploreConditionOperator,
+    TransactionExploreDataDimension,
+    TransactionExploreValueMetric,
+    TransactionExploreChartType
 } from '@/core/explore.ts';
 
 import {
@@ -2378,6 +2381,9 @@ export function useI18n() {
         getAllSupportedImportFileCagtegoryAndTypes,
         getAllTransactionExploreConditionFields: () => getLocalizedNameValue(TransactionExploreConditionField.values()),
         getAllTransactionExploreConditionOperators: (operators?: TransactionExploreConditionOperator[]) => getLocalizedNameValue(operators ?? TransactionExploreConditionOperator.values()),
+        getAllTransactionExploreDataDimensions: (operators?: TransactionExploreDataDimension[]) => getLocalizedNameValue(operators ?? TransactionExploreDataDimension.values()),
+        getAllTransactionExploreValueMetrics: (operators?: TransactionExploreValueMetric[]) => getLocalizedNameValue(operators ?? TransactionExploreValueMetric.values()),
+        getAllTransactionExploreChartTypes: (operators?: TransactionExploreChartType[]) => getLocalizedNameValue(operators ?? TransactionExploreChartType.values()),
         // get localized info
         getLanguageInfo,
         getMonthShortName,

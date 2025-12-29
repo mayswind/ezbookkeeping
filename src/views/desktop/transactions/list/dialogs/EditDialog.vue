@@ -141,6 +141,8 @@
                                                                    :custom-selection-secondary-text="getTransactionSecondaryCategoryName(transaction.expenseCategoryId, allCategories[CategoryType.Expense])"
                                                                    :label="tt('Category')" :placeholder="tt('Category')"
                                                                    :items="allCategories[CategoryType.Expense] || []"
+                                                                   :show-add-new="true"
+                                                                   @addNewOption="(e:string | null) => openAddCategory(e, CategoryType.Expense)"
                                                                    v-model="transaction.expenseCategoryId">
                                                 </two-column-select>
                                             </div>
@@ -165,6 +167,8 @@
                                                                    :custom-selection-secondary-text="getTransactionSecondaryCategoryName(transaction.incomeCategoryId, allCategories[CategoryType.Income])"
                                                                    :label="tt('Category')" :placeholder="tt('Category')"
                                                                    :items="allCategories[CategoryType.Income] || []"
+                                                                   :show-add-new="true"
+                                                                   @addNewOption="(e:string | null) => openAddCategory(e, CategoryType.Income)"
                                                                    v-model="transaction.incomeCategoryId">
                                                 </two-column-select>
                                             </div>
@@ -189,6 +193,8 @@
                                                                    :custom-selection-secondary-text="getTransactionSecondaryCategoryName(transaction.transferCategoryId, allCategories[CategoryType.Transfer])"
                                                                    :label="tt('Category')" :placeholder="tt('Category')"
                                                                    :items="allCategories[CategoryType.Transfer] || []"
+                                                                   :show-add-new="true"
+                                                                   @addNewOption="(e:string | null) => openAddCategory(e, CategoryType.Transfer)"
                                                                    v-model="transaction.transferCategoryId">
                                                 </two-column-select>
                                             </div>
@@ -502,6 +508,7 @@
 
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
+    <edit-dialog ref="editDialog" />
     <input ref="pictureInput" type="file" style="display: none" :accept="SUPPORTED_IMAGE_EXTENSIONS" @change="uploadPicture($event)" />
 </template>
 
@@ -509,6 +516,7 @@
 import MapView from '@/components/common/MapView.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
+import EditDialog from '@/views/desktop/categories/list/dialogs/EditDialog.vue';
 
 import { ref, computed, useTemplateRef, watch, nextTick } from 'vue';
 
@@ -590,6 +598,7 @@ interface TransactionEditResponse {
 type MapViewType = InstanceType<typeof MapView>;
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
+type EditDialogType = InstanceType<typeof EditDialog>;
 
 const props = defineProps<{
     type: TransactionEditPageType;
@@ -663,6 +672,7 @@ const map = useTemplateRef<MapViewType>('map');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const pictureInput = useTemplateRef<HTMLInputElement>('pictureInput');
+const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
 const showState = ref<boolean>(false);
 const activeTab = ref<string>('basicInfo');
@@ -1087,6 +1097,39 @@ function cancel(): void {
     } else {
         doClose();
     }
+}
+
+function openAddCategory(parentId: string | null, category: CategoryType): void {
+    const primaryCategoryId = parentId ?? '0';
+    let categoryColor, categoryIcon;
+
+    if (primaryCategoryId != '0') {
+        const allFilteredCategories = allCategories.value[category];
+        const parentCategory = allFilteredCategories?.find(parentCat => parentCat.id === parentId);
+        
+        categoryColor = parentCategory?.color;
+        categoryIcon = parentCategory?.icon;
+    }
+
+    editDialog.value?.open({
+        type: category,
+        parentId: primaryCategoryId,
+        color: categoryColor,
+        icon: categoryIcon
+    }).then(result => {
+        if (result && result.message) {
+            snackbar.value?.showMessage(result.message);
+        }
+
+        if (primaryCategoryId === '0') {
+            const brandNewCategory = allCategories.value[category]!.slice(-1)[0];
+            openAddCategory(brandNewCategory!.id, category);
+        }
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
 }
 
 function updateGeoLocation(forceUpdate: boolean): void {

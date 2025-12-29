@@ -60,6 +60,14 @@
                                 <div class="list-item-footer text-truncate" v-if="primaryFooterField">{{ primaryFooterField ? ti(item[primaryFooterField] as string, !!primaryFooterI18n) : '' }}</div>
                             </template>
                         </v-list-item>
+                        <v-list-item v-if="showAddNew" @click="emit('addNewOption', null)">
+                            <template #prepend>
+                                <v-icon :icon="mdiPlusCircle" size="28" />
+                            </template>
+                            <template #title>
+                                <div>{{ tt('New') }}</div>
+                            </template>
+                        </v-list-item>
                     </v-list>
                 </div>
                 <div class="secondary-list-container">
@@ -79,6 +87,14 @@
                                 <div class="list-item-header text-truncate" v-if="secondaryHeaderField">{{ secondaryHeaderField ? ti(subItem[secondaryHeaderField] as string, !!secondaryHeaderI18n) : '' }}</div>
                                 <div class="text-truncate">{{ ti(secondaryTitleField ? subItem[secondaryTitleField] as string : '', !!secondaryTitleI18n) }}</div>
                                 <div class="list-item-footer text-truncate" v-if="secondaryFooterField">{{ secondaryFooterField ? ti(subItem[secondaryFooterField] as string, !!secondaryFooterI18n) : '' }}</div>
+                            </template>
+                        </v-list-item>
+                        <v-list-item v-if="showAddNew" @click="emit('addNewOption', currentPrimaryValue as string)">
+                            <template #prepend>
+                                <v-icon :icon="mdiPlusCircle" size="28" />
+                            </template>
+                            <template #title>
+                                <div>{{ tt('New') }}</div>
                             </template>
                         </v-list-item>
                     </v-list>
@@ -107,7 +123,8 @@ import { type ComponentDensity, type InputVariant, setChildInputFocus } from '@/
 
 import {
     mdiChevronRight,
-    mdiMagnify
+    mdiMagnify,
+    mdiPlusCircle
 } from '@mdi/js';
 
 interface DesktopTwoColumnListItemSelectionProps extends CommonTwoColumnListItemSelectionProps {
@@ -122,12 +139,14 @@ interface DesktopTwoColumnListItemSelectionProps extends CommonTwoColumnListItem
     customSelectionSecondaryText?: string;
     noItemText?: string;
     autoUpdateMenuPosition?: boolean;
+    showAddNew?: boolean
 }
 
 const props = defineProps<DesktopTwoColumnListItemSelectionProps>();
 
 const emit = defineEmits<{
     (e: 'update:modelValue', value: unknown): void;
+    (e: 'addNewOption', parentId: string | null): void;
 }>();
 
 const { tt, ti } = useI18n();

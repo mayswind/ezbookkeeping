@@ -12,6 +12,7 @@ import type { LatestExchangeRateResponse } from '@/models/exchange_rate.ts';
 import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
 import { getMapProvider } from '@/lib/server_settings.ts';
 import { getMapWebsite } from '@/lib/map/index.ts';
+import { getContributors } from '@/lib/contributors.ts';
 import { getLicense, getThirdPartyLicenses } from '@/lib/licenses.ts';
 import { formatDisplayVersion, getClientDisplayVersion, getClientBuildTime } from '@/lib/version.ts';
 import { clearBrowserCaches } from '@/lib/ui/common.ts';
@@ -55,6 +56,7 @@ export function useAboutPageBase() {
     });
     const mapProviderWebsite = computed<string>(() => getMapWebsite());
 
+    const contributors = computed<ContributorInfo>(() => getContributors());
     const licenseLines = computed<string[]>(() => getLicense().replace(/\r/g, '').split('\n'));
     const thirdPartyLicenses = computed<LicenseInfo[]>(() => getThirdPartyLicenses());
 
@@ -83,6 +85,7 @@ export function useAboutPageBase() {
         isUserCustomExchangeRates,
         mapProviderName,
         mapProviderWebsite,
+        contributors,
         licenseLines,
         thirdPartyLicenses,
         // functions

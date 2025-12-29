@@ -49,10 +49,66 @@
                     </p>
                     <hr/>
                     <p>
-                        <span>ezBookkeeping also contains additional third party software and illustration.</span><br/>
-                        <span>All the third party software/illustration included or linked is redistributed under the terms and conditions of their original licenses.</span>
+                        <span>ezBookkeeping's codebase and localization translation rely on contributions from the community. The following people have contributed to ezBookkeeping:</span>
                     </p>
-                    <p></p>
+                    <div>
+                        <strong>Project Maintainer</strong>
+                        <div class="margin-top-half">
+                            <f7-link target="_blank" @click="openExternalUrl('https://github.com/mayswind')">@mayswind</f7-link>
+                        </div>
+                    </div>
+                    <p class="margin-top">
+                        <strong>Code Contributors</strong>
+                    </p>
+                    <table class="contributors-table">
+                        <thead>
+                        <tr>
+                            <th>Contributor</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr :key="index" v-for="(contributor, index) in contributors.code">
+                            <td>
+                                <f7-link target="_blank" @click="openExternalUrl(`https://github.com/${contributor}`)">
+                                    @{{ contributor }}
+                                </f7-link>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p class="margin-top">
+                        <strong>Translation Contributors</strong>
+                    </p>
+                    <table class="contributors-table">
+                        <thead>
+                        <tr>
+                            <th>Tag</th>
+                            <th>Language</th>
+                            <th>Contributors</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr :key="languageTag"
+                            v-for="(languageContributors, languageTag) in contributors.translators"
+                            v-show="!!getLanguageInfo(languageTag)?.displayName">
+                            <td>{{ languageTag }}</td>
+                            <td>{{ getLanguageInfo(languageTag)?.displayName }}</td>
+                            <td>
+                                <template :key="contributor" v-for="(contributor, index) in languageContributors">
+                                    <f7-link target="_blank" @click="openExternalUrl(`https://github.com/${contributor}`)">
+                                        @{{ contributor }}
+                                    </f7-link>
+                                    <span v-if="index < languageContributors.length - 1">, </span>
+                                </template>
+                                <span v-if="!languageContributors || languageContributors.length < 1">/</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p class="margin-top margin-bottom">
+                        <span>ezBookkeeping also contains additional third party software and illustration.</span><br/>
+                        <span>All the third party software / illustration included or linked is redistributed under the terms and conditions of their original licenses.</span>
+                    </p>
                     <p :key="license.name" v-for="license in thirdPartyLicenses">
                         <strong>{{ license.name }}</strong>
                         <br v-if="license.copyright"/><span v-if="license.copyright">{{ license.copyright }}</span>
@@ -81,7 +137,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
 import { useAboutPageBase } from '@/views/base/AboutPageBase.ts';
 
-const { tt } = useI18n();
+const { tt, getLanguageInfo } = useI18n();
 const { showAlert, openExternalUrl } = useI18nUIComponents();
 const {
     clientVersion,
@@ -92,6 +148,7 @@ const {
     isUserCustomExchangeRates,
     mapProviderName,
     mapProviderWebsite,
+    contributors,
     licenseLines,
     thirdPartyLicenses,
     refreshBrowserCache,
@@ -127,5 +184,26 @@ init();
 
 .license-content {
     font-size: var(--ebk-license-content-font-size);
+}
+
+.contributors-table {
+    border-collapse: collapse;
+
+    > thead > tr {
+        > th:not(:first-child) {
+            padding-inline-start: 10px;
+        }
+
+        > th:not(:last-child) {
+            padding-inline-end: 10px;
+        }
+    }
+
+    > thead > tr > th,
+    > tbody > tr > td {
+        padding: 4px 8px;
+        border: 1px solid var(--f7-list-item-border-color);
+        text-align: start;
+    }
 }
 </style>

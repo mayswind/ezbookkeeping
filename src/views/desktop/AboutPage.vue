@@ -110,12 +110,69 @@
                                     {{ line }}
                                 </span>
                             </p>
-                            <v-divider/><br/>
+                            <v-divider/>
+                            <br/>
                             <p>
-                                <span>ezBookkeeping also contains additional third party software and illustration.</span><br/>
-                                <span>All the third party software/illustration included or linked is redistributed under the terms and conditions of their original licenses.</span>
+                                <span>ezBookkeeping's codebase and localization translation rely on contributions from the community. The following people have contributed to ezBookkeeping:</span>
                             </p>
-                            <p></p>
+                            <div>
+                                <strong>Project Maintainer</strong>
+                                <div class="mt-2">
+                                    <a target="_blank" href="https://github.com/mayswind">@mayswind</a>
+                                </div>
+                            </div>
+                            <p class="mt-4">
+                                <strong>Code Contributors</strong>
+                            </p>
+                            <table class="contributors-table">
+                                <thead>
+                                <tr>
+                                    <th>Contributor</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr :key="index" v-for="(contributor, index) in contributors.code">
+                                    <td>
+                                        <a target="_blank" :href="`https://github.com/${contributor}`">
+                                            @{{ contributor }}
+                                        </a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <p class="mt-4">
+                                <strong>Translation Contributors</strong>
+                            </p>
+                            <table class="contributors-table">
+                                <thead>
+                                <tr>
+                                    <th>Tag</th>
+                                    <th>Language</th>
+                                    <th>Contributors</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr :key="languageTag"
+                                    v-for="(languageContributors, languageTag) in contributors.translators"
+                                    v-show="!!getLanguageInfo(languageTag)?.displayName">
+                                    <td>{{ languageTag }}</td>
+                                    <td>{{ getLanguageInfo(languageTag)?.displayName }}</td>
+                                    <td>
+                                        <template :key="contributor" v-for="(contributor, index) in languageContributors">
+                                            <a target="_blank" :href="`https://github.com/${contributor}`">
+                                                @{{ contributor }}
+                                            </a>
+                                            <span v-if="index < languageContributors.length - 1">, </span>
+                                        </template>
+                                        <span v-if="!languageContributors || languageContributors.length < 1">/</span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <p class="mt-4 mb-4">
+                                <span>ezBookkeeping also contains additional third party software and illustration.</span><br/>
+                                <span>All the third party software / illustration included or linked is redistributed under the terms and conditions of their original licenses.</span>
+                            </p>
                             <p :key="license.name" v-for="license in thirdPartyLicenses">
                                 <strong>{{ license.name }}</strong>
                                 <br v-if="license.copyright"/><span v-if="license.copyright">{{ license.copyright }}</span>
@@ -139,7 +196,7 @@ import {
     mdiWebRefresh
 } from '@mdi/js';
 
-const { tt } = useI18n();
+const { tt, getLanguageInfo } = useI18n();
 const {
     clientVersion,
     clientVersionMatchServerVersion,
@@ -148,6 +205,7 @@ const {
     isUserCustomExchangeRates,
     mapProviderName,
     mapProviderWebsite,
+    contributors,
     licenseLines,
     thirdPartyLicenses,
     refreshBrowserCache,
@@ -156,3 +214,26 @@ const {
 
 init();
 </script>
+
+<style>
+.contributors-table {
+    border-collapse: collapse;
+
+    > thead > tr {
+        > th:not(:first-child) {
+            padding-inline-start: 10px;
+        }
+
+        > th:not(:last-child) {
+            padding-inline-end: 10px;
+        }
+    }
+
+    > thead > tr > th,
+    > tbody > tr > td {
+        padding: 4px 8px;
+        border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+        text-align: start;
+    }
+}
+</style>

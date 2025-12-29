@@ -259,11 +259,11 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesedInfo): stri
     // convert the name to formatted date time if needed
     if (dimessionType === TransactionExploreDataDimension.DateTime.value) {
         displayName = formatDateTimeToShortDateTime(parseDateTimeFromUnixTime(parseInt(name)));
-    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByDay.value) {
+    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByYearMonthDay.value) {
         displayName = formatDateTimeToShortDate(parseDateTimeFromUnixTime(parseInt(name)));
-    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByMonth.value) {
+    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByYearMonth.value) {
         displayName = formatDateTimeToGregorianLikeShortYearMonth(parseDateTimeFromUnixTime(parseInt(name)));
-    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByQuarter.value) {
+    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByYearQuarter.value) {
         displayName = formatDateTimeToGregorianLikeYearQuarter(parseDateTimeFromUnixTime(parseInt(name)));
     } else if (dimessionType === TransactionExploreDataDimension.DateTimeByYear.value) {
         displayName = formatDateTimeToGregorianLikeShortYear(parseDateTimeFromUnixTime(parseInt(name)));

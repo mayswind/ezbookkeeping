@@ -156,7 +156,7 @@ export const useExploresStore = defineStore('explores', () => {
                 categoryId: unixTime,
                 categoryIdType: TransactionExploreDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.DateTimeByDay) {
+        } else if (dimension === TransactionExploreDataDimension.DateTimeByYearMonthDay) {
             const unixTime = getDayFirstUnixTimeBySpecifiedUnixTime(transaction.time).toString(10);
 
             return {
@@ -164,7 +164,7 @@ export const useExploresStore = defineStore('explores', () => {
                 categoryId: unixTime,
                 categoryIdType: TransactionExploreDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.DateTimeByMonth) {
+        } else if (dimension === TransactionExploreDataDimension.DateTimeByYearMonth) {
             const unixTime = getMonthFirstUnixTimeBySpecifiedUnixTime(transaction.time).toString(10);
 
             return {
@@ -172,7 +172,7 @@ export const useExploresStore = defineStore('explores', () => {
                 categoryId: unixTime,
                 categoryIdType: TransactionExploreDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.DateTimeByQuarter) {
+        } else if (dimension === TransactionExploreDataDimension.DateTimeByYearQuarter) {
             const unixTime = getQuarterFirstUnixTimeBySpecifiedUnixTime(transaction.time).toString(10);
 
             return {

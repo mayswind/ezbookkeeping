@@ -135,7 +135,7 @@ Currently available translations:
 | ja | 日本語 | [@tkymmm](https://github.com/tkymmm) |
 | kn | ಕನ್ನಡ | [@Darshanbm05](https://github.com/Darshanbm05) |
 | ko | 한국어 | [@overworks](https://github.com/overworks) |
-| nl | Nederlands | [@automagic](https://github.com/automagics) |
+| nl | Nederlands | [@automagics](https://github.com/automagics) |
 | pt-BR | Português (Brasil) | [@thecodergus](https://github.com/thecodergus) |
 | ru | Русский | [@artegoser](https://github.com/artegoser) |
 | th | ไทย | [@natthavat28](https://github.com/natthavat28) |

@@ -112,6 +112,13 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         textDirection: 'ltr',
         content: ru
     },
+    'sl': {
+        name: 'Slovenian',
+        displayName: 'Slovenščina',
+        alternativeLanguageTag: 'sl-SI',
+        textDirection: 'ltr',
+        content: sl
+    },	
     'th': {
         name: 'Thai',
         displayName: 'ภาษาไทย',

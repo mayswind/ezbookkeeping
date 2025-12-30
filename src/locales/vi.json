@@ -97,10 +97,7 @@
             "hh_mm_a": "hh:mm A"
         },
         "yearQuarter": {
-            "q1": "Quý 1 năm {year}",
-            "q2": "Quý 2 năm {year}",
-            "q3": "Quý 3 năm {year}",
-            "q4": "Quý 4 năm {year}"
+            "content": "{quarter} năm {year}"
         },
         "fiscalYear": {
             "StartYYYY_EndYYYY": "FY {StartYYYY}-{EndYYYY}",
@@ -282,6 +279,12 @@
             "29": "Ngày 29",
             "30": "Ngày 30",
             "31": "Ngày 31"
+        },
+        "quarter": {
+            "q1": "Quý 1",
+            "q2": "Quý 2",
+            "q3": "Quý 3",
+            "q4": "Quý 4"
         }
     },
     "granularity": {

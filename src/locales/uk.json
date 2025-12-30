@@ -97,10 +97,7 @@
             "hh_mm_a": "hh:mm A"
         },
         "yearQuarter": {
-            "q1": "1 квартал {year} р.",
-            "q2": "2 квартал {year} р.",
-            "q3": "3 квартал {year} р.",
-            "q4": "4 квартал {year} р."
+            "content": "{quarter} {year} р."
         },
         "fiscalYear": {
             "StartYYYY_EndYYYY": "{StartYYYY}-{EndYYYY} фінансовий рік",
@@ -282,6 +279,12 @@
             "29": "29-й",
             "30": "30-й",
             "31": "31-й"
+        },
+        "quarter": {
+            "q1": "1 квартал",
+            "q2": "2 квартал",
+            "q3": "3 квартал",
+            "q4": "4 квартал"
         }
     },
     "granularity": {

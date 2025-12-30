@@ -97,10 +97,7 @@
             "hh_mm_a": "hh:mm A"
         },
         "yearQuarter": {
-            "q1": "T1 {year}",
-            "q2": "T2 {year}",
-            "q3": "T3 {year}",
-            "q4": "T4 {year}"
+            "content": "{quarter} {year}"
         },
         "fiscalYear": {
             "StartYYYY_EndYYYY": "AF {StartYYYY}-{EndYYYY}",
@@ -282,6 +279,12 @@
             "29": "29",
             "30": "30",
             "31": "31"
+        },
+        "quarter": {
+            "q1": "T1",
+            "q2": "T2",
+            "q3": "T3",
+            "q4": "T4"
         }
     },
     "granularity": {

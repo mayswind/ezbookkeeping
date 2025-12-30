@@ -97,10 +97,7 @@
             "hh_mm_a": "hh:mm A"
         },
         "yearQuarter": {
-            "q1": "{year}年第1四半期",
-            "q2": "{year}年第2四半期",
-            "q3": "{year}年第3四半期",
-            "q4": "{year}年第4四半期"
+            "content": "{year}年{quarter}"
         },
         "fiscalYear": {
             "StartYYYY_EndYYYY": "{StartYYYY}-{EndYYYY}年度",
@@ -282,6 +279,12 @@
             "29": "29",
             "30": "30",
             "31": "31"
+        },
+        "quarter": {
+            "q1": "第1四半期",
+            "q2": "第2四半期",
+            "q3": "第3四半期",
+            "q4": "第4四半期"
         }
     },
     "granularity": {

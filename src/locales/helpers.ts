@@ -785,10 +785,12 @@ export function useI18n() {
     }
 
     function formatYearQuarter(year: string, quarter: number): string {
-        if (1 <= quarter && quarter <= 4) {
-            return t('format.yearQuarter.q' + quarter, {
+        const quarterName = getQuarterName(quarter);
+
+        if (quarterName) {
+            return t('format.yearQuarter.content', {
                 year: year,
-                quarter: quarter
+                quarter: getQuarterName(quarter)
             });
         } else {
             return '';
@@ -1588,6 +1590,14 @@ export function useI18n() {
 
     function getWeekdayLongName(weekDay: WeekDay): string {
         return t(`datetime.${weekDay.name}.long`);
+    }
+
+    function getQuarterName(quarter: number): string {
+        if (1 <= quarter && quarter <= 4) {
+            return t('datetime.quarter.q' + quarter);
+        } else {
+            return '';
+        }
     }
 
     function getMultiMonthdayShortNames(monthDays: number[]): string {
@@ -2392,6 +2402,7 @@ export function useI18n() {
         getMonthdayShortName,
         getWeekdayShortName,
         getWeekdayLongName,
+        getQuarterName,
         getMultiMonthdayShortNames,
         getMultiWeekdayLongNames,
         getAllLocalizedDigits,

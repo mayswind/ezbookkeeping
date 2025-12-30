@@ -137,6 +137,7 @@ import {
 } from '@/stores/explore.ts';
 
 import { type NameValue } from '@/core/base.ts';
+import { Month, WeekDay } from '@/core/datetime.ts';
 import {
     TransactionExploreChartTypeValue,
     TransactionExploreChartType,
@@ -174,6 +175,10 @@ const {
     getAllTransactionExploreDataDimensions,
     getAllTransactionExploreValueMetrics,
     getAllTransactionExploreChartTypes,
+    getMonthLongName,
+    getMonthdayShortName,
+    getWeekdayLongName,
+    getQuarterName,
     formatDateTimeToShortDateTime,
     formatDateTimeToShortDate,
     formatDateTimeToGregorianLikeShortYear,
@@ -269,6 +274,16 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesedInfo): stri
         displayName = formatDateTimeToGregorianLikeShortYear(parseDateTimeFromUnixTime(parseInt(name)));
     } else if (dimessionType === TransactionExploreDataDimension.DateTimeByFiscalYear.value) {
         displayName = formatDateTimeToGregorianLikeFiscalYear(parseDateTimeFromUnixTime(parseInt(name)));
+    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByDayOfWeek.value) {
+        const weekDay = WeekDay.parse(name);
+        displayName = weekDay ? getWeekdayLongName(weekDay) : tt('Unknown');
+    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByDayOfMonth.value) {
+        displayName = getMonthdayShortName(parseInt(name));
+    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByMonthOfYear.value) {
+        const month = Month.valueOf(parseInt(name));
+        displayName = month ? getMonthLongName(month.name) : tt('Unknown');
+    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByQuarterOfYear.value) {
+        displayName = getQuarterName(parseInt(name));
     }
 
     if (dimessionType === TransactionExploreDataDimension.SourceAmount.value

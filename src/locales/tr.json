@@ -97,10 +97,7 @@
             "hh_mm_a": "hh:mm A"
         },
         "yearQuarter": {
-            "q1": "{year} 1. çeyrek",
-            "q2": "{year} 2. çeyrek",
-            "q3": "{year} 3. çeyrek",
-            "q4": "{year} 4. çeyrek"
+            "content": "{year} {quarter}"
         },
         "fiscalYear": {
             "StartYYYY_EndYYYY": "{StartYYYY}-{EndYYYY} mali yılı",
@@ -282,6 +279,12 @@
             "29": "29.",
             "30": "30.",
             "31": "31."
+        },
+        "quarter": {
+            "q1": "1. çeyrek",
+            "q2": "2. çeyrek",
+            "q3": "3. çeyrek",
+            "q4": "4. çeyrek"
         }
     },
     "granularity": {

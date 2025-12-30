@@ -205,6 +205,10 @@ export class TransactionExploreDataDimension implements NameValue {
     public static readonly DateTimeByYearQuarter = new TransactionExploreDataDimension('Transaction Year-Quarter', TransactionExploreDataDimensionType.DateTimeByYearQuarter);
     public static readonly DateTimeByYear = new TransactionExploreDataDimension('Transaction Year', TransactionExploreDataDimensionType.DateTimeByYear);
     public static readonly DateTimeByFiscalYear = new TransactionExploreDataDimension('Transaction Fiscal Year', TransactionExploreDataDimensionType.DateTimeByFiscalYear);
+    public static readonly DateTimeByDayOfWeek = new TransactionExploreDataDimension('Transaction Day of Week', TransactionExploreDataDimensionType.DateTimeByDayOfWeek);
+    public static readonly DateTimeByDayOfMonth = new TransactionExploreDataDimension('Transaction Day of Month', TransactionExploreDataDimensionType.DateTimeByDayOfMonth);
+    public static readonly DateTimeByMonthOfYear = new TransactionExploreDataDimension('Transaction Month of Year', TransactionExploreDataDimensionType.DateTimeByMonthOfYear);
+    public static readonly DateTimeByQuarterOfYear = new TransactionExploreDataDimension('Transaction Quarter of Year', TransactionExploreDataDimensionType.DateTimeByQuarterOfYear);
     public static readonly TransactionType = new TransactionExploreDataDimension('Transaction Type', TransactionExploreDataDimensionType.TransactionType);
     public static readonly SourceAccount = new TransactionExploreDataDimension('Source Account', TransactionExploreDataDimensionType.SourceAccount);
     public static readonly SourceAccountCategory = new TransactionExploreDataDimension('Source Account Category', TransactionExploreDataDimensionType.SourceAccountCategory);

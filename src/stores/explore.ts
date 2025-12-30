@@ -42,6 +42,8 @@ import {
     isEquals,
 } from '@/lib/common.ts';
 import {
+    parseDateTimeFromUnixTime,
+    parseDateTimeFromUnixTimeWithTimezoneOffset,
     getYearFirstUnixTimeBySpecifiedUnixTime,
     getQuarterFirstUnixTimeBySpecifiedUnixTime,
     getMonthFirstUnixTimeBySpecifiedUnixTime,
@@ -201,6 +203,38 @@ export const useExploresStore = defineStore('explores', () => {
             return {
                 categoryName: unixTime,
                 categoryId: unixTime,
+                categoryIdType: TransactionExploreDimensionType.Other
+            };
+        } else if (dimension === TransactionExploreDataDimension.DateTimeByDayOfWeek) {
+            const dateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
+
+            return {
+                categoryName: dateTime.getWeekDay().name,
+                categoryId: dateTime.getWeekDay().type.toString(10),
+                categoryIdType: TransactionExploreDimensionType.Other
+            };
+        } else if (dimension === TransactionExploreDataDimension.DateTimeByDayOfMonth) {
+            const dateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
+
+            return {
+                categoryName: dateTime.getGregorianCalendarDay().toString(10),
+                categoryId: dateTime.getGregorianCalendarDay().toString(10),
+                categoryIdType: TransactionExploreDimensionType.Other
+            };
+        } else if (dimension === TransactionExploreDataDimension.DateTimeByMonthOfYear) {
+            const dateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
+
+            return {
+                categoryName: dateTime.getGregorianCalendarMonth().toString(10),
+                categoryId: dateTime.getGregorianCalendarMonth().toString(10),
+                categoryIdType: TransactionExploreDimensionType.Other
+            };
+        } else if (dimension === TransactionExploreDataDimension.DateTimeByQuarterOfYear) {
+            const dateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
+
+            return {
+                categoryName: dateTime.getGregorianCalendarQuarter().toString(10),
+                categoryId: dateTime.getGregorianCalendarQuarter().toString(10),
                 categoryIdType: TransactionExploreDimensionType.Other
             };
         } else if (dimension === TransactionExploreDataDimension.TransactionType) {

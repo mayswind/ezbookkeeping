@@ -138,6 +138,7 @@ Currently available translations:
 | nl | Nederlands | [@automagics](https://github.com/automagics) |
 | pt-BR | Português (Brasil) | [@thecodergus](https://github.com/thecodergus) |
 | ru | Русский | [@artegoser](https://github.com/artegoser) |
+| sl | Slovenščina | [@thehijacker](https://github.com/thehijacker) |
 | th | ไทย | [@natthavat28](https://github.com/natthavat28) |
 | tr | Türkçe | [@aydnykn](https://github.com/aydnykn) |
 | uk | Українська | [@nktlitvinenko](https://github.com/nktlitvinenko) |

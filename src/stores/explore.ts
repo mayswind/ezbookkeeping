@@ -11,6 +11,7 @@ import { useExchangeRatesStore } from './exchangeRates.ts';
 import { itemAndIndex, values } from '@/core/base.ts';
 import { AmountFilterType } from '@/core/numeral.ts';
 import { DateRangeScene, DateRange } from '@/core/datetime.ts';
+import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { AccountCategory } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import {
@@ -122,6 +123,12 @@ export const useExploresStore = defineStore('explores', () => {
     const exchangeRatesStore = useExchangeRatesStore();
 
     function getDataCategoryInfo(dimension: TransactionExploreDataDimension, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): CategoriedInfo {
+        let transactionTimeUtfOffset: number | undefined = undefined;
+
+        if (settingsStore.appSettings.timezoneUsedForInsightsExplorePage === TimezoneTypeForStatistics.TransactionTimezone.type) {
+            transactionTimeUtfOffset = transaction.utcOffset;
+        }
+
         if (dimension === TransactionExploreDataDimension.None) {
             const valueMetric = TransactionExploreValueMetric.valueOf(transactionExploreFilter.value.valueMetric);
             return {
@@ -157,7 +164,7 @@ export const useExploresStore = defineStore('explores', () => {
                 categoryIdType: TransactionExploreDimensionType.Other
             };
         } else if (dimension === TransactionExploreDataDimension.DateTimeByYearMonthDay) {
-            const unixTime = getDayFirstUnixTimeBySpecifiedUnixTime(transaction.time).toString(10);
+            const unixTime = getDayFirstUnixTimeBySpecifiedUnixTime(transaction.time, transactionTimeUtfOffset).toString(10);
 
             return {
                 categoryName: unixTime,
@@ -165,7 +172,7 @@ export const useExploresStore = defineStore('explores', () => {
                 categoryIdType: TransactionExploreDimensionType.Other
             };
         } else if (dimension === TransactionExploreDataDimension.DateTimeByYearMonth) {
-            const unixTime = getMonthFirstUnixTimeBySpecifiedUnixTime(transaction.time).toString(10);
+            const unixTime = getMonthFirstUnixTimeBySpecifiedUnixTime(transaction.time, transactionTimeUtfOffset).toString(10);
 
             return {
                 categoryName: unixTime,
@@ -173,7 +180,7 @@ export const useExploresStore = defineStore('explores', () => {
                 categoryIdType: TransactionExploreDimensionType.Other
             };
         } else if (dimension === TransactionExploreDataDimension.DateTimeByYearQuarter) {
-            const unixTime = getQuarterFirstUnixTimeBySpecifiedUnixTime(transaction.time).toString(10);
+            const unixTime = getQuarterFirstUnixTimeBySpecifiedUnixTime(transaction.time, transactionTimeUtfOffset).toString(10);
 
             return {
                 categoryName: unixTime,
@@ -181,7 +188,7 @@ export const useExploresStore = defineStore('explores', () => {
                 categoryIdType: TransactionExploreDimensionType.Other
             };
         } else if (dimension === TransactionExploreDataDimension.DateTimeByYear) {
-            const unixTime = getYearFirstUnixTimeBySpecifiedUnixTime(transaction.time).toString(10);
+            const unixTime = getYearFirstUnixTimeBySpecifiedUnixTime(transaction.time, transactionTimeUtfOffset).toString(10);
 
             return {
                 categoryName: unixTime,
@@ -189,7 +196,7 @@ export const useExploresStore = defineStore('explores', () => {
                 categoryIdType: TransactionExploreDimensionType.Other
             };
         } else if (dimension === TransactionExploreDataDimension.DateTimeByFiscalYear) {
-            const unixTime = getFiscalYearStartUnixTime(transaction.time, userStore.currentUserFiscalYearStart).toString(10);
+            const unixTime = getFiscalYearStartUnixTime(transaction.time, userStore.currentUserFiscalYearStart, transactionTimeUtfOffset).toString(10);
 
             return {
                 categoryName: unixTime,

@@ -152,19 +152,18 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr :key="languageTag"
-                                    v-for="(languageContributors, languageTag) in contributors.translators"
-                                    v-show="!!getLanguageInfo(languageTag)?.displayName">
-                                    <td>{{ languageTag }}</td>
-                                    <td>{{ getLanguageInfo(languageTag)?.displayName }}</td>
+                                <tr :key="lang.languageTag" v-for="lang in allLanguages">
+                                    <td>{{ lang.languageTag }}</td>
+                                    <td>{{ lang.nativeDisplayName }}</td>
                                     <td>
-                                        <template :key="contributor" v-for="(contributor, index) in languageContributors">
+                                        <template :key="contributor"
+                                                  v-for="(contributor, index) in contributors.translators[lang.languageTag] ?? []">
+                                            <span v-if="index > 0">, </span>
                                             <a target="_blank" :href="`https://github.com/${contributor}`">
                                                 @{{ contributor }}
                                             </a>
-                                            <span v-if="index < languageContributors.length - 1">, </span>
                                         </template>
-                                        <span v-if="!languageContributors || languageContributors.length < 1">/</span>
+                                        <span v-if="!contributors.translators[lang.languageTag] || !contributors.translators[lang.languageTag]?.length">/</span>
                                     </td>
                                 </tr>
                                 </tbody>
@@ -189,6 +188,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
+import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 import { useAboutPageBase } from '@/views/base/AboutPageBase.ts';
 
@@ -196,7 +198,7 @@ import {
     mdiWebRefresh
 } from '@mdi/js';
 
-const { tt, getLanguageInfo } = useI18n();
+const { tt, getAllLanguageOptions } = useI18n();
 const {
     clientVersion,
     clientVersionMatchServerVersion,
@@ -211,6 +213,9 @@ const {
     refreshBrowserCache,
     init
 } = useAboutPageBase();
+
+
+const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
 
 init();
 </script>

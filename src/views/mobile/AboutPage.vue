@@ -88,19 +88,18 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr :key="languageTag"
-                            v-for="(languageContributors, languageTag) in contributors.translators"
-                            v-show="!!getLanguageInfo(languageTag)?.displayName">
-                            <td>{{ languageTag }}</td>
-                            <td>{{ getLanguageInfo(languageTag)?.displayName }}</td>
+                        <tr :key="lang.languageTag" v-for="lang in allLanguages">
+                            <td>{{ lang.languageTag }}</td>
+                            <td>{{ lang.nativeDisplayName }}</td>
                             <td>
-                                <template :key="contributor" v-for="(contributor, index) in languageContributors">
+                                <template :key="contributor"
+                                          v-for="(contributor, index) in contributors.translators[lang.languageTag] ?? []">
+                                    <span v-if="index > 0">, </span>
                                     <f7-link target="_blank" @click="openExternalUrl(`https://github.com/${contributor}`)">
                                         @{{ contributor }}
                                     </f7-link>
-                                    <span v-if="index < languageContributors.length - 1">, </span>
                                 </template>
-                                <span v-if="!languageContributors || languageContributors.length < 1">/</span>
+                                <span v-if="!contributors.translators[lang.languageTag] || !contributors.translators[lang.languageTag]?.length">/</span>
                             </td>
                         </tr>
                         </tbody>
@@ -133,11 +132,12 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 
+import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
 import { useAboutPageBase } from '@/views/base/AboutPageBase.ts';
 
-const { tt, getLanguageInfo } = useI18n();
+const { tt, getAllLanguageOptions } = useI18n();
 const { showAlert, openExternalUrl } = useI18nUIComponents();
 const {
     clientVersion,
@@ -157,6 +157,8 @@ const {
 
 const showRefreshBrowserCacheSheet = ref<boolean>(false);
 const versionClickCount = ref<number>(0);
+
+const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
 const forceShowRefreshBrowserCacheMenu = computed<boolean>(() => versionClickCount.value >= 5);
 
 function showVersion(): void {

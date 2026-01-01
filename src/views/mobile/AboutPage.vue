@@ -16,7 +16,7 @@
             <f7-list-item :title="tt('Build Time')" :after="clientBuildTime" v-if="clientBuildTime"></f7-list-item>
             <f7-list-item :title="tt('Official Website')" link="#" @click="openExternalUrl('https://github.com/mayswind/ezbookkeeping')"></f7-list-item>
             <f7-list-item :title="tt('Report Issue')" link="#" @click="openExternalUrl('https://github.com/mayswind/ezbookkeeping/issues')"></f7-list-item>
-            <f7-list-item :title="tt('Getting help')" link="#" @click="openExternalUrl('https://ezbookkeeping.mayswind.net')"></f7-list-item>
+            <f7-list-item :title="tt('Getting help')" link="#" popup-open=".document-popup"></f7-list-item>
             <f7-list-item :title="tt('License')" link="#" popup-open=".license-popup"></f7-list-item>
         </f7-list>
 
@@ -118,6 +118,23 @@
             </f7-page>
         </f7-popup>
 
+        <f7-popup push swipe-to-close swipe-handler=".swipe-handler" class="document-popup" @popup:open="onDocumentPopupOpen">
+            <f7-page>
+                <f7-navbar>
+                    <div class="swipe-handler"></div>
+                    <f7-nav-left>
+                        <f7-link popup-close icon-f7="xmark"></f7-link>
+                    </f7-nav-left>
+                    <f7-nav-title class="license-title">{{ tt('Documentation') }}</f7-nav-title>
+                    <f7-nav-right class="navbar-compact-icons">
+                        <f7-link icon-f7="globe" @click="openExternalUrl(documentIframe?.src || documentUrl)"></f7-link>
+                    </f7-nav-right>
+                </f7-navbar>
+                <iframe ref="documentIframe" class="document-iframe" src="about:blank" :style="documentLoading ? 'display: none' : ''"></iframe>
+                <f7-preloader class="document-preloader" size="36" v-if="documentLoading"></f7-preloader>
+            </f7-page>
+        </f7-popup>
+
         <f7-actions close-by-outside-click close-on-escape :opened="showRefreshBrowserCacheSheet" @actions:closed="showRefreshBrowserCacheSheet = false">
             <f7-actions-group>
                 <f7-actions-button @click="refreshBrowserCache">{{ tt('Refresh Browser Cache') }}</f7-actions-button>
@@ -130,14 +147,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, useTemplateRef, onMounted } from 'vue';
 
 import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
 import { useAboutPageBase } from '@/views/base/AboutPageBase.ts';
 
-const { tt, getAllLanguageOptions } = useI18n();
+const { tt, getCurrentLanguageTag, getAllLanguageOptions } = useI18n();
 const { showAlert, openExternalUrl } = useI18nUIComponents();
 const {
     clientVersion,
@@ -155,11 +172,22 @@ const {
     init
 } = useAboutPageBase();
 
+const documentIframe = useTemplateRef<HTMLIFrameElement>('documentIframe');
+
 const showRefreshBrowserCacheSheet = ref<boolean>(false);
 const versionClickCount = ref<number>(0);
+const documentLoading = ref<boolean>(true);
 
 const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
 const forceShowRefreshBrowserCacheMenu = computed<boolean>(() => versionClickCount.value >= 5);
+
+const documentUrl = computed<string>(() => {
+    if (getCurrentLanguageTag() === 'zh-Hans' || getCurrentLanguageTag() === 'zh-Hant') {
+        return 'https://ezbookkeeping.mayswind.net/zh_Hans/faq/';
+    } else {
+        return 'https://ezbookkeeping.mayswind.net/faq/';
+    }
+});
 
 function showVersion(): void {
     let versionMessage = `${tt('Frontend Version')}: ${clientVersion}`;
@@ -175,6 +203,23 @@ function showVersion(): void {
     }
 }
 
+function onDocumentPopupOpen(): void {
+    documentLoading.value = true;
+
+    if (documentIframe.value) {
+        documentIframe.value.src = documentUrl.value;
+    }
+}
+
+onMounted(() => {
+    if (documentIframe.value) {
+        documentIframe.value.onload = () => {
+            documentLoading.value = false;
+            documentIframe.value?.contentWindow?.scrollTo(0, 0);
+        };
+    }
+});
+
 init();
 </script>
 
@@ -186,6 +231,19 @@ init();
 
 .license-content {
     font-size: var(--ebk-license-content-font-size);
+}
+
+.document-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.document-preloader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .contributors-table {

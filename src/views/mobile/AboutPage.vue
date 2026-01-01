@@ -111,8 +111,8 @@
                     <p :key="licenseInfo.name" v-for="licenseInfo in thirdPartyLicenses">
                         <strong>{{ licenseInfo.name }}</strong>
                         <br v-if="licenseInfo.copyright"/><span v-if="licenseInfo.copyright">{{ licenseInfo.copyright }}</span>
-                        <br v-if="licenseInfo.url"/><span class="work-break-all" v-if="licenseInfo.url">{{ licenseInfo.url }}</span>
                         <br v-if="licenseInfo.licenseUrl"/><span class="work-break-all" v-if="licenseInfo.licenseUrl">{{ licenseInfo.license || 'License' }}: {{ licenseInfo.licenseUrl }}</span>
+                        <br v-if="licenseInfo.url"/><span class="work-break-all" v-if="licenseInfo.url">{{ licenseInfo.url }}</span>
                     </p>
                 </f7-block>
             </f7-page>

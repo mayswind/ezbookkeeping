@@ -175,9 +175,9 @@
                             <p :key="licenseInfo.name" v-for="licenseInfo in thirdPartyLicenses">
                                 <strong>{{ licenseInfo.name }}</strong>
                                 <br v-if="licenseInfo.copyright"/><span v-if="licenseInfo.copyright">{{ licenseInfo.copyright }}</span>
-                                <br v-if="licenseInfo.url"/><a class="work-break-all" target="_blank" :href="licenseInfo.url" v-if="licenseInfo.url">{{ licenseInfo.url }}</a>
                                 <br v-if="licenseInfo.licenseUrl"/><span class="work-break-all" v-if="licenseInfo.licenseUrl">{{ licenseInfo.license || 'License' }}: </span>
                                 <a target="_blank" :href="licenseInfo.licenseUrl">{{ licenseInfo.licenseUrl }}</a>
+                                <br v-if="licenseInfo.url"/><a class="work-break-all" target="_blank" :href="licenseInfo.url" v-if="licenseInfo.url">{{ licenseInfo.url }}</a>
                             </p>
                         </v-col>
                     </v-row>

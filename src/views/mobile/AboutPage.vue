@@ -108,11 +108,11 @@
                         <span>ezBookkeeping also contains additional third party software and illustration.</span><br/>
                         <span>All the third party software / illustration included or linked is redistributed under the terms and conditions of their original licenses.</span>
                     </p>
-                    <p :key="license.name" v-for="license in thirdPartyLicenses">
-                        <strong>{{ license.name }}</strong>
-                        <br v-if="license.copyright"/><span v-if="license.copyright">{{ license.copyright }}</span>
-                        <br v-if="license.url"/><span class="work-break-all" v-if="license.url">{{ license.url }}</span>
-                        <br v-if="license.licenseUrl"/><span class="work-break-all" v-if="license.licenseUrl">License: {{ license.licenseUrl }}</span>
+                    <p :key="licenseInfo.name" v-for="licenseInfo in thirdPartyLicenses">
+                        <strong>{{ licenseInfo.name }}</strong>
+                        <br v-if="licenseInfo.copyright"/><span v-if="licenseInfo.copyright">{{ licenseInfo.copyright }}</span>
+                        <br v-if="licenseInfo.url"/><span class="work-break-all" v-if="licenseInfo.url">{{ licenseInfo.url }}</span>
+                        <br v-if="licenseInfo.licenseUrl"/><span class="work-break-all" v-if="licenseInfo.licenseUrl">{{ licenseInfo.license || 'License' }}: {{ licenseInfo.licenseUrl }}</span>
                     </p>
                 </f7-block>
             </f7-page>

@@ -15,6 +15,7 @@ declare interface LicenseInfo {
     name: string;
     copyright?: string;
     url?: string;
+    license?: string;
     licenseUrl?: string;
 }
 

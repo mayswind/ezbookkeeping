@@ -7,6 +7,7 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
+import type { NumeralSystem } from '@/core/numeral.ts';
 import type { WeekDayValue } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { TransactionType } from '@/core/transaction.ts';
@@ -36,6 +37,7 @@ export function useReconciliationStatementPageBase() {
         getAllAccountBalanceTrendChartTypes,
         getAllStatisticsDateAggregationTypesWithShortName,
         getAllTimezoneTypesUsedForStatistics,
+        getCurrentNumeralSystemType,
         formatDateTimeToLongDateTime,
         formatDateTimeToLongDate,
         formatDateTimeToShortTime,
@@ -55,6 +57,7 @@ export function useReconciliationStatementPageBase() {
     const chartDataDateAggregationType = ref<number>(ChartDateAggregationType.Day.type);
     const timezoneUsedForDateRange = ref<number>(TimezoneTypeForStatistics.ApplicationTimezone.type);
 
+    const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
     const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
     const fiscalYearStart = computed<number>(() => userStore.currentUserFiscalYearStart);
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
@@ -186,6 +189,13 @@ export function useReconciliationStatementPageBase() {
 
     function getDisplayTimezone(transaction: TransactionReconciliationStatementResponseItemWithInfo): string {
         return `UTC${getUtcOffsetByUtcOffsetMinutes(transaction.utcOffset)}`;
+    }
+
+    function getDisplayTimeInDefaultTimezone(transaction: TransactionReconciliationStatementResponseItemWithInfo): string {
+        const timezoneOffsetMinutes = getTimezoneOffsetMinutes(transaction.time);
+        const dateTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, timezoneOffsetMinutes);
+        const utcOffset = numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(getUtcOffsetByUtcOffsetMinutes(timezoneOffsetMinutes));
+        return `${formatDateTimeToLongDateTime(dateTime)} (UTC${utcOffset})`;
     }
 
     function getDisplaySourceAmount(transaction: TransactionReconciliationStatementResponseItemWithInfo): string {
@@ -320,6 +330,7 @@ export function useReconciliationStatementPageBase() {
         getDisplayTime,
         isSameAsDefaultTimezoneOffsetMinutes,
         getDisplayTimezone,
+        getDisplayTimeInDefaultTimezone,
         getDisplaySourceAmount,
         getDisplayDestinationAmount,
         getDisplayAccountBalance,

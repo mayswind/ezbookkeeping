@@ -158,6 +158,7 @@
                         <span>{{ getDisplayDateTime(item) }}</span>
                         <v-chip class="ms-1" variant="flat" color="secondary" size="x-small"
                                 v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimezone(item) }}</v-chip>
+                        <v-tooltip activator="parent" v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimeInDefaultTimezone(item) }}</v-tooltip>
                     </template>
                     <template #item.type="{ item }">
                         <v-chip label variant="outlined" size="x-small"
@@ -358,6 +359,7 @@ const {
     getDisplayDateTime,
     isSameAsDefaultTimezoneOffsetMinutes,
     getDisplayTimezone,
+    getDisplayTimeInDefaultTimezone,
     getDisplaySourceAmount,
     getDisplayDestinationAmount,
     getDisplayAccountBalance,

@@ -225,7 +225,7 @@
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="tt('Insights & Explore Page')">
+            <v-card :title="tt('Insights Explorer Page')">
                 <v-form>
                     <v-card-text>
                         <v-row>
@@ -236,8 +236,8 @@
                                     persistent-placeholder
                                     :label="tt('Default Date Range')"
                                     :placeholder="tt('Default Date Range')"
-                                    :items="allInsightsExploreDefaultDateRanges"
-                                    v-model="insightsExploreDefaultDateRangeType"
+                                    :items="allInsightsExplorerDefaultDateRanges"
+                                    v-model="insightsExplorerDefaultDateRangeType"
                                 />
                             </v-col>
 
@@ -249,7 +249,7 @@
                                     :label="tt('Timezone Used for Date Range')"
                                     :placeholder="tt('Timezone Used for Date Range')"
                                     :items="allTimezoneTypesUsedForStatistics"
-                                    v-model="timezoneUsedForInsightsExplorePage"
+                                    v-model="timezoneUsedForInsightsExplorerPage"
                                 />
                             </v-col>
                         </v-row>
@@ -339,7 +339,7 @@ import { useAppSettingPageBase } from '@/views/base/settings/AppSettingsPageBase
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
-import { useExploresStore } from '@/stores/explore.ts';
+import { useExplorersStore } from '@/stores/explorer.ts';
 
 import type { LocalizedSwitchOption } from '@/core/base.ts';
 import { ThemeType } from '@/core/theme.ts';
@@ -383,7 +383,7 @@ const {
 const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
-const exploresStore = useExploresStore();
+const explorersStore = useExplorersStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
@@ -392,7 +392,7 @@ const showTransactionCategoriesIncludedInHomePageOverviewDialog = ref<boolean>(f
 const showAccountsIncludedInTotalDialog = ref<boolean>(false);
 
 const enableDisableOptions = computed<LocalizedSwitchOption[]>(() => getAllEnableDisableOptions());
-const allInsightsExploreDefaultDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.InsightsExplore, false));
+const allInsightsExplorerDefaultDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.InsightsExplorer, false));
 
 const currentTheme = computed<string>({
     get: () => settingsStore.appSettings.theme,
@@ -414,16 +414,16 @@ const showAddTransactionButtonInDesktopNavbar = computed<boolean>({
     set: (value) => settingsStore.setShowAddTransactionButtonInDesktopNavbar(value)
 });
 
-const insightsExploreDefaultDateRangeType = computed<number>({
-    get: () => settingsStore.appSettings.insightsExploreDefaultDateRangeType,
-    set: (value) => settingsStore.setInsightsExploreDefaultDateRangeType(value)
+const insightsExplorerDefaultDateRangeType = computed<number>({
+    get: () => settingsStore.appSettings.insightsExplorerDefaultDateRangeType,
+    set: (value) => settingsStore.setInsightsExplorerDefaultDateRangeType(value)
 });
 
-const timezoneUsedForInsightsExplorePage = computed<number>({
-    get: () => settingsStore.appSettings.timezoneUsedForInsightsExplorePage,
+const timezoneUsedForInsightsExplorerPage = computed<number>({
+    get: () => settingsStore.appSettings.timezoneUsedForInsightsExplorerPage,
     set: (value: number) => {
-        settingsStore.setTimezoneUsedForInsightsExplorePage(value);
-        exploresStore.updateTransactionExploreInvalidState(true);
+        settingsStore.setTimezoneUsedForInsightsExplorerPage(value);
+        explorersStore.updateTransactionExplorerInvalidState(true);
     }
 });
 

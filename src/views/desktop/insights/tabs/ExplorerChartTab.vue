@@ -11,9 +11,9 @@
                         density="compact"
                         :disabled="loading"
                         :label="tt('Chart Type')"
-                        :items="allTransactionExploreChartTypes"
+                        :items="allTransactionExplorerChartTypes"
                         :model-value="currentChartType"
-                        @update:model-value="updateChartType($event as TransactionExploreChartTypeValue)"
+                        @update:model-value="updateChartType($event as TransactionExplorerChartTypeValue)"
                     />
                     <v-select
                         class="flex-0-0"
@@ -23,9 +23,9 @@
                         density="compact"
                         :disabled="loading"
                         :label="tt('Axis / Category')"
-                        :items="allTransactionExploreDataDimensions"
+                        :items="allTransactionExplorerDataDimensions"
                         :model-value="currentCategoryDimension"
-                        @update:model-value="updateCategoryDimension($event as TransactionExploreDataDimensionType)"
+                        @update:model-value="updateCategoryDimension($event as TransactionExplorerDataDimensionType)"
                     />
                     <v-select
                         class="flex-0-0"
@@ -33,14 +33,14 @@
                         item-title="name"
                         item-value="value"
                         density="compact"
-                        :disabled="loading || !TransactionExploreChartType.valueOf(currentChartType)?.seriesDimensionRequired"
+                        :disabled="loading || !TransactionExplorerChartType.valueOf(currentChartType)?.seriesDimensionRequired"
                         :label="tt('Series')"
-                        :items="allTransactionExploreDataDimensions"
-                        :model-value="TransactionExploreChartType.valueOf(currentChartType)?.seriesDimensionRequired ? currentSeriesDimension : TransactionExploreDataDimension.None.value"
-                        @update:model-value="updateSeriesDimension($event as TransactionExploreDataDimensionType)"
+                        :items="allTransactionExplorerDataDimensions"
+                        :model-value="TransactionExplorerChartType.valueOf(currentChartType)?.seriesDimensionRequired ? currentSeriesDimension : TransactionExplorerDataDimension.None.value"
+                        @update:model-value="updateSeriesDimension($event as TransactionExplorerDataDimensionType)"
                     >
                         <template #item="{ props, item }">
-                            <v-list-item :disabled="item.value === currentCategoryDimension && item.value !== TransactionExploreDataDimension.SeriesDimensionDefault.value" v-bind="props">
+                            <v-list-item :disabled="item.value === currentCategoryDimension && item.value !== TransactionExplorerDataDimension.SeriesDimensionDefault.value" v-bind="props">
                                 <template #title>
                                     <div class="text-truncate">{{ item.raw.name }}</div>
                                 </template>
@@ -55,16 +55,16 @@
                         density="compact"
                         :disabled="loading"
                         :label="tt('Value Metric')"
-                        :items="allTransactionExploreValueMetrics"
+                        :items="allTransactionExplorerValueMetrics"
                         :model-value="currentValueMetric"
-                        @update:model-value="updateValueMetric($event as TransactionExploreValueMetricType)"
+                        @update:model-value="updateValueMetric($event as TransactionExplorerValueMetricType)"
                     />
                     <v-spacer class="flex-1-1"/>
                 </div>
             </v-col>
         </v-row>
     </v-card-text>
-    <v-card-text :class="{ 'readonly': loading }" v-if="currentChartType === TransactionExploreChartType.Pie.value">
+    <v-card-text :class="{ 'readonly': loading }" v-if="currentChartType === TransactionExplorerChartType.Pie.value">
         <pie-chart
             :items="[
                 {id: '1', name: '---', value: 60, color: '7c7c7f'},
@@ -79,12 +79,12 @@
             v-if="loading"
         />
         <pie-chart
-            :items="categoryDimensionTransactionExploreData && categoryDimensionTransactionExploreData.length ? categoryDimensionTransactionExploreData : []"
+            :items="categoryDimensionTransactionExplorerData && categoryDimensionTransactionExplorerData.length ? categoryDimensionTransactionExplorerData : []"
             :min-valid-percent="0.0001"
             :show-value="true"
             :show-percent="true"
             :enable-click-item="true"
-            :amount-value="exploresStore.transactionExploreFilter.valueMetric !== TransactionExploreValueMetric.TransactionCount.value"
+            :amount-value="explorersStore.transactionExplorerFilter.valueMetric !== TransactionExplorerValueMetric.TransactionCount.value"
             :default-currency="defaultCurrency"
             id-field="categoryId"
             name-field="categoryDisplayName"
@@ -93,7 +93,7 @@
             @click="onClickPieChartItem"
         />
     </v-card-text>
-    <v-card-text :class="{ 'readonly': loading }" v-if="currentChartType === TransactionExploreChartType.Radar.value">
+    <v-card-text :class="{ 'readonly': loading }" v-if="currentChartType === TransactionExplorerChartType.Radar.value">
         <radar-chart
             :items="[
                 {name: '---', value: 10},
@@ -109,11 +109,11 @@
             v-if="loading"
         />
         <radar-chart
-            :items="categoryDimensionTransactionExploreData && categoryDimensionTransactionExploreData.length ? categoryDimensionTransactionExploreData : []"
+            :items="categoryDimensionTransactionExplorerData && categoryDimensionTransactionExplorerData.length ? categoryDimensionTransactionExplorerData : []"
             :min-valid-percent="0.0001"
             :show-value="true"
             :show-percent="true"
-            :amount-value="exploresStore.transactionExploreFilter.valueMetric !== TransactionExploreValueMetric.TransactionCount.value"
+            :amount-value="explorersStore.transactionExplorerFilter.valueMetric !== TransactionExplorerValueMetric.TransactionCount.value"
             :default-currency="defaultCurrency"
             name-field="categoryDisplayName"
             value-field="value"
@@ -132,20 +132,20 @@ import { useUserStore } from '@/stores/user.ts';
 import {
     type CategoriedInfo,
     type SeriesedInfo,
-    TransactionExploreDimensionType,
-    useExploresStore
-} from '@/stores/explore.ts';
+    TransactionExplorerDimensionType,
+    useExplorersStore
+} from '@/stores/explorer.ts';
 
 import { type NameValue } from '@/core/base.ts';
 import { Month, WeekDay } from '@/core/datetime.ts';
 import {
-    TransactionExploreChartTypeValue,
-    TransactionExploreChartType,
-    TransactionExploreDataDimensionType,
-    TransactionExploreDataDimension,
-    TransactionExploreValueMetricType,
-    TransactionExploreValueMetric
-} from '@/core/explore.ts';
+    TransactionExplorerChartTypeValue,
+    TransactionExplorerChartType,
+    TransactionExplorerDataDimensionType,
+    TransactionExplorerDataDimension,
+    TransactionExplorerValueMetricType,
+    TransactionExplorerValueMetric
+} from '@/core/explorer.ts';
 
 import {
     isDefined
@@ -155,26 +155,26 @@ import {
     parseDateTimeFromUnixTime
 } from '@/lib/datetime.ts';
 
-interface InsightsExploreDataTableTabProps {
+interface InsightsExplorerDataTableTabProps {
     loading?: boolean;
 }
 
 interface CategoryDimensionData {
     categoryDisplayName: string;
     categoryId: string;
-    categoryIdType: TransactionExploreDimensionType;
+    categoryIdType: TransactionExplorerDimensionType;
     value: number;
 }
 
-defineProps<InsightsExploreDataTableTabProps>();
+defineProps<InsightsExplorerDataTableTabProps>();
 
 const router = useRouter();
 
 const {
     tt,
-    getAllTransactionExploreDataDimensions,
-    getAllTransactionExploreValueMetrics,
-    getAllTransactionExploreChartTypes,
+    getAllTransactionExplorerDataDimensions,
+    getAllTransactionExplorerValueMetrics,
+    getAllTransactionExplorerChartTypes,
     getMonthLongName,
     getMonthdayShortName,
     getWeekdayLongName,
@@ -190,31 +190,31 @@ const {
 } = useI18n();
 
 const userStore = useUserStore();
-const exploresStore = useExploresStore();
+const explorersStore = useExplorersStore();
 
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
-const allTransactionExploreDataDimensions = computed<NameValue[]>(() => getAllTransactionExploreDataDimensions());
-const allTransactionExploreValueMetrics = computed<NameValue[]>(() => getAllTransactionExploreValueMetrics());
-const allTransactionExploreChartTypes = computed<NameValue[]>(() => getAllTransactionExploreChartTypes());
+const allTransactionExplorerDataDimensions = computed<NameValue[]>(() => getAllTransactionExplorerDataDimensions());
+const allTransactionExplorerValueMetrics = computed<NameValue[]>(() => getAllTransactionExplorerValueMetrics());
+const allTransactionExplorerChartTypes = computed<NameValue[]>(() => getAllTransactionExplorerChartTypes());
 
-const currentCategoryDimension = computed<TransactionExploreDataDimensionType>(() => exploresStore.transactionExploreFilter.categoryDimension);
-const currentSeriesDimension = computed<TransactionExploreDataDimensionType>(() => exploresStore.transactionExploreFilter.seriesDimension);
-const currentValueMetric = computed<TransactionExploreValueMetricType>(() => exploresStore.transactionExploreFilter.valueMetric);
-const currentChartType = computed<TransactionExploreChartTypeValue>(() => exploresStore.transactionExploreFilter.chartType);
+const currentCategoryDimension = computed<TransactionExplorerDataDimensionType>(() => explorersStore.transactionExplorerFilter.categoryDimension);
+const currentSeriesDimension = computed<TransactionExplorerDataDimensionType>(() => explorersStore.transactionExplorerFilter.seriesDimension);
+const currentValueMetric = computed<TransactionExplorerValueMetricType>(() => explorersStore.transactionExplorerFilter.valueMetric);
+const currentChartType = computed<TransactionExplorerChartTypeValue>(() => explorersStore.transactionExplorerFilter.chartType);
 
-const categoryDimensionTransactionExploreData = computed<CategoryDimensionData[]>(() => {
-    if (currentChartType.value !== TransactionExploreChartType.Pie.value && currentChartType.value !== TransactionExploreChartType.Radar.value) {
+const categoryDimensionTransactionExplorerData = computed<CategoryDimensionData[]>(() => {
+    if (currentChartType.value !== TransactionExplorerChartType.Pie.value && currentChartType.value !== TransactionExplorerChartType.Radar.value) {
         return [];
     }
 
-    if (!exploresStore.categoriedTransactionExploreData || !exploresStore.categoriedTransactionExploreData.length) {
+    if (!explorersStore.categoriedTransactionExplorerData || !explorersStore.categoriedTransactionExplorerData.length) {
         return [];
     }
 
     const result: CategoryDimensionData[] = [];
 
-    for (const categoriedData of exploresStore.categoriedTransactionExploreData) {
+    for (const categoriedData of explorersStore.categoriedTransactionExplorerData) {
         const data = categoriedData.data[0];
 
         if (!isDefined(data)) {
@@ -238,18 +238,18 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesedInfo): stri
     let name: string = '';
     let needI18n: boolean | undefined = false;
     let i18nParameters: Record<string, unknown> | undefined = undefined;
-    let dimessionType: TransactionExploreDataDimensionType = TransactionExploreDataDimension.None.value;
+    let dimessionType: TransactionExplorerDataDimensionType = TransactionExplorerDataDimension.None.value;
 
     if ('categoryName' in info) {
         name = info.categoryName;
         needI18n = info.categoryNameNeedI18n;
         i18nParameters = info.categoryNameI18nParameters;
-        dimessionType = exploresStore.transactionExploreFilter.categoryDimension;
+        dimessionType = explorersStore.transactionExplorerFilter.categoryDimension;
     } else if ('seriesName' in info) {
         name = info.seriesName;
         needI18n = info.seriesNameNeedI18n;
         i18nParameters = info.seriesNameI18nParameters;
-        dimessionType = exploresStore.transactionExploreFilter.seriesDimension;
+        dimessionType = explorersStore.transactionExplorerFilter.seriesDimension;
     }
 
     let displayName: string = name;
@@ -262,32 +262,32 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesedInfo): stri
     }
 
     // convert the name to formatted date time if needed
-    if (dimessionType === TransactionExploreDataDimension.DateTime.value) {
+    if (dimessionType === TransactionExplorerDataDimension.DateTime.value) {
         displayName = formatDateTimeToShortDateTime(parseDateTimeFromUnixTime(parseInt(name)));
-    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByYearMonthDay.value) {
+    } else if (dimessionType === TransactionExplorerDataDimension.DateTimeByYearMonthDay.value) {
         displayName = formatDateTimeToShortDate(parseDateTimeFromUnixTime(parseInt(name)));
-    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByYearMonth.value) {
+    } else if (dimessionType === TransactionExplorerDataDimension.DateTimeByYearMonth.value) {
         displayName = formatDateTimeToGregorianLikeShortYearMonth(parseDateTimeFromUnixTime(parseInt(name)));
-    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByYearQuarter.value) {
+    } else if (dimessionType === TransactionExplorerDataDimension.DateTimeByYearQuarter.value) {
         displayName = formatDateTimeToGregorianLikeYearQuarter(parseDateTimeFromUnixTime(parseInt(name)));
-    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByYear.value) {
+    } else if (dimessionType === TransactionExplorerDataDimension.DateTimeByYear.value) {
         displayName = formatDateTimeToGregorianLikeShortYear(parseDateTimeFromUnixTime(parseInt(name)));
-    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByFiscalYear.value) {
+    } else if (dimessionType === TransactionExplorerDataDimension.DateTimeByFiscalYear.value) {
         displayName = formatDateTimeToGregorianLikeFiscalYear(parseDateTimeFromUnixTime(parseInt(name)));
-    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByDayOfWeek.value) {
+    } else if (dimessionType === TransactionExplorerDataDimension.DateTimeByDayOfWeek.value) {
         const weekDay = WeekDay.parse(name);
         displayName = weekDay ? getWeekdayLongName(weekDay) : tt('Unknown');
-    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByDayOfMonth.value) {
+    } else if (dimessionType === TransactionExplorerDataDimension.DateTimeByDayOfMonth.value) {
         displayName = getMonthdayShortName(parseInt(name));
-    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByMonthOfYear.value) {
+    } else if (dimessionType === TransactionExplorerDataDimension.DateTimeByMonthOfYear.value) {
         const month = Month.valueOf(parseInt(name));
         displayName = month ? getMonthLongName(month.name) : tt('Unknown');
-    } else if (dimessionType === TransactionExploreDataDimension.DateTimeByQuarterOfYear.value) {
+    } else if (dimessionType === TransactionExplorerDataDimension.DateTimeByQuarterOfYear.value) {
         displayName = getQuarterName(parseInt(name));
     }
 
-    if (dimessionType === TransactionExploreDataDimension.SourceAmount.value
-        || dimessionType === TransactionExploreDataDimension.DestinationAmount.value) {
+    if (dimessionType === TransactionExplorerDataDimension.SourceAmount.value
+        || dimessionType === TransactionExplorerDataDimension.DestinationAmount.value) {
         if (name !== '' && name !== 'none' && Number.isFinite(parseInt(name))) {
             displayName = formatAmountToLocalizedNumerals(parseInt(name));
         }
@@ -296,26 +296,26 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesedInfo): stri
     return displayName;
 }
 
-function updateCategoryDimension(categoryDimension: TransactionExploreDataDimensionType): void {
-    exploresStore.updateTransactionExploreFilter({
+function updateCategoryDimension(categoryDimension: TransactionExplorerDataDimensionType): void {
+    explorersStore.updateTransactionExplorerFilter({
         categoryDimension: categoryDimension,
     });
 }
 
-function updateSeriesDimension(seriesDimension: TransactionExploreDataDimensionType): void {
-    exploresStore.updateTransactionExploreFilter({
+function updateSeriesDimension(seriesDimension: TransactionExplorerDataDimensionType): void {
+    explorersStore.updateTransactionExplorerFilter({
         seriesDimension: seriesDimension,
     });
 }
 
-function updateValueMetric(valueMetric: TransactionExploreValueMetricType): void {
-    exploresStore.updateTransactionExploreFilter({
+function updateValueMetric(valueMetric: TransactionExplorerValueMetricType): void {
+    explorersStore.updateTransactionExplorerFilter({
         valueMetric: valueMetric,
     });
 }
 
-function updateChartType(chartType: TransactionExploreChartTypeValue): void {
-    exploresStore.updateTransactionExploreFilter({
+function updateChartType(chartType: TransactionExplorerChartTypeValue): void {
+    explorersStore.updateTransactionExplorerFilter({
         chartType: chartType,
     });
 }
@@ -326,7 +326,7 @@ function onClickPieChartItem(item: Record<string, unknown>): void {
     }
 
     const data = (item as unknown) as CategoryDimensionData;
-    const params: string = exploresStore.getTransactionListPageParams(data.categoryIdType, data.categoryId);
+    const params: string = explorersStore.getTransactionListPageParams(data.categoryIdType, data.categoryId);
 
     if (params) {
         router.push(`/transaction/list?${params}`);
@@ -334,15 +334,15 @@ function onClickPieChartItem(item: Record<string, unknown>): void {
 }
 
 function buildExportResults(): { headers: string[], data: string[][] } | undefined {
-    if (currentChartType.value === TransactionExploreChartType.Pie.value || currentChartType.value === TransactionExploreChartType.Radar.value) {
-        const valueMetric = TransactionExploreValueMetric.valueOf(exploresStore.transactionExploreFilter.valueMetric);
+    if (currentChartType.value === TransactionExplorerChartType.Pie.value || currentChartType.value === TransactionExplorerChartType.Radar.value) {
+        const valueMetric = TransactionExplorerValueMetric.valueOf(explorersStore.transactionExplorerFilter.valueMetric);
 
         return {
             headers: [
                 tt('Name'),
                 tt(valueMetric?.name ?? 'Unknown')
             ],
-            data: categoryDimensionTransactionExploreData.value.map(data => [
+            data: categoryDimensionTransactionExplorerData.value.map(data => [
                 data.categoryDisplayName,
                 valueMetric?.isAmount ? formatAmountToWesternArabicNumeralsWithoutDigitGrouping(data.value) : data.value.toString(10)
             ])

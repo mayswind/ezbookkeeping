@@ -245,17 +245,17 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('alwaysShowTransactionPicturesInMobileTransactionEditPage', value);
     }
 
-    // Insights & Explore Page
-    function setInsightsExploreDefaultDateRangeType(value: number): void {
-        updateApplicationSettingsValue('insightsExploreDefaultDateRangeType', value);
-        appSettings.value.insightsExploreDefaultDateRangeType = value;
-        updateUserApplicationCloudSettingValue('insightsExploreDefaultDateRangeType', value);
+    // Insights Explorer Page
+    function setInsightsExplorerDefaultDateRangeType(value: number): void {
+        updateApplicationSettingsValue('insightsExplorerDefaultDateRangeType', value);
+        appSettings.value.insightsExplorerDefaultDateRangeType = value;
+        updateUserApplicationCloudSettingValue('insightsExplorerDefaultDateRangeType', value);
     }
 
-    function setTimezoneUsedForInsightsExplorePage(value: number): void {
-        updateApplicationSettingsValue('timezoneUsedForInsightsExplorePage', value);
-        appSettings.value.timezoneUsedForInsightsExplorePage = value;
-        updateUserApplicationCloudSettingValue('timezoneUsedForInsightsExplorePage', value);
+    function setTimezoneUsedForInsightsExplorerPage(value: number): void {
+        updateApplicationSettingsValue('timezoneUsedForInsightsExplorerPage', value);
+        appSettings.value.timezoneUsedForInsightsExplorerPage = value;
+        updateUserApplicationCloudSettingValue('timezoneUsedForInsightsExplorerPage', value);
     }
 
     // Account List Page
@@ -480,9 +480,9 @@ export const useSettingsStore = defineStore('settings', () => {
         setAutoSaveTransactionDraft,
         setAutoGetCurrentGeoLocation,
         setAlwaysShowTransactionPicturesInMobileTransactionEditPage,
-        // -- Insights & Explore Page
-        setInsightsExploreDefaultDateRangeType,
-        setTimezoneUsedForInsightsExplorePage,
+        // -- Insights Explorer Page
+        setInsightsExplorerDefaultDateRangeType,
+        setTimezoneUsedForInsightsExplorerPage,
         // -- Account List Page
         setTotalAmountExcludeAccountIds,
         // -- Exchange Rates Data Page

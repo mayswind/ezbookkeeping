@@ -4,7 +4,7 @@
         fixed-footer
         multi-sort
         item-value="index"
-        :class="{ 'insights-explore-table': true, 'text-sm': true, 'disabled': loading, 'loading-skeleton': loading }"
+        :class="{ 'insights-explorer-table': true, 'text-sm': true, 'disabled': loading, 'loading-skeleton': loading }"
         :headers="dataTableHeaders"
         :items="filteredTransactions"
         :hover="true"
@@ -77,7 +77,7 @@ import { ref, computed } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useUserStore } from '@/stores/user.ts';
-import { useExploresStore } from '@/stores/explore.ts';
+import { useExplorersStore } from '@/stores/explorer.ts';
 
 import { TransactionType } from '@/core/transaction.ts';
 
@@ -96,12 +96,12 @@ import {
     mdiPencilBoxOutline
 } from '@mdi/js';
 
-interface InsightsExploreDataTableTabProps {
+interface InsightsExplorerDataTableTabProps {
     loading?: boolean;
     countPerPage: number;
 }
 
-const props = defineProps<InsightsExploreDataTableTabProps>();
+const props = defineProps<InsightsExplorerDataTableTabProps>();
 const emit = defineEmits<{
     (e: 'update:countPerPage', value: number): void;
 }>();
@@ -115,13 +115,13 @@ const {
 } = useI18n();
 
 const userStore = useUserStore();
-const exploresStore = useExploresStore();
+const explorersStore = useExplorersStore();
 
 const currentPage = ref<number>(1);
 
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
-const filteredTransactions = computed<TransactionInsightDataItem[]>(() => exploresStore.filteredTransactions);
+const filteredTransactions = computed<TransactionInsightDataItem[]>(() => explorersStore.filteredTransactions);
 
 const itemsPerPage = computed<number>({
     get: () => props.countPerPage,
@@ -274,7 +274,7 @@ defineExpose({
 </script>
 
 <style>
-.v-table.insights-explore-table > .v-table__wrapper > table {
+.v-table.insights-explorer-table > .v-table__wrapper > table {
     th:not(:last-child),
     td:not(:last-child) {
         width: auto !important;
@@ -287,7 +287,7 @@ defineExpose({
     }
 }
 
-.v-table.insights-explore-table.loading-skeleton tr.v-data-table-rows-no-data > td {
+.v-table.insights-explorer-table.loading-skeleton tr.v-data-table-rows-no-data > td {
     padding: 0;
 }
 </style>

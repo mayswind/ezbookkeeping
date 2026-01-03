@@ -18,7 +18,7 @@ import TransactionListPage from '@/views/desktop/transactions/ListPage.vue';
 
 import StatisticsTransactionPage from '@/views/desktop/statistics/TransactionPage.vue';
 
-import InsightsExplorePage from '@/views/desktop/insights/ExplorePage.vue';
+import InsightsExplorerPage from '@/views/desktop/insights/ExplorerPage.vue';
 
 import AccountListPage from '@/views/desktop/accounts/ListPage.vue';
 
@@ -139,8 +139,8 @@ const router = createRouter({
                     })
                 },
                 {
-                    path: '/insights/explore',
-                    component: InsightsExplorePage,
+                    path: '/insights/explorer',
+                    component: InsightsExplorerPage,
                     beforeEnter: checkLogin,
                     props: route => ({
                         initId: route.query['id'],

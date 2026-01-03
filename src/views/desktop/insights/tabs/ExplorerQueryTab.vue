@@ -91,8 +91,8 @@
                                             density="compact"
                                             item-title="displayName"
                                             item-value="value"
-                                            :items="[{ value: TransactionExploreConditionRelation.First, displayName: tt('WHERE') }]"
-                                            :model-value="TransactionExploreConditionRelation.First"
+                                            :items="[{ value: TransactionExplorerConditionRelation.First, displayName: tt('WHERE') }]"
+                                            :model-value="TransactionExplorerConditionRelation.First"
                                             v-if="conditionIndex < 1"
                                         />
 
@@ -104,8 +104,8 @@
                                             item-value="value"
                                             :disabled="loading || !!editingQuery"
                                             :items="[
-                                                { value: TransactionExploreConditionRelation.And, displayName: tt('AND') },
-                                                { value: TransactionExploreConditionRelation.Or, displayName: tt('OR') }
+                                                { value: TransactionExplorerConditionRelation.And, displayName: tt('AND') },
+                                                { value: TransactionExplorerConditionRelation.Or, displayName: tt('OR') }
                                             ]"
                                             v-model="conditionWithRelation.relation"
                                             v-else-if="conditionIndex >= 1"
@@ -117,8 +117,8 @@
                                             item-title="name"
                                             item-value="value"
                                             :disabled="loading || !!editingQuery"
-                                            :items="allTransactionExploreConditionFields"
-                                            @update:model-value="updateConditionField(queryIndex, conditionIndex, TransactionExploreConditionField.valueOf($event))"
+                                            :items="allTransactionExplorerConditionFields"
+                                            @update:model-value="updateConditionField(queryIndex, conditionIndex, TransactionExplorerConditionField.valueOf($event))"
                                             v-model="conditionWithRelation.condition.field"
                                         />
 
@@ -128,7 +128,7 @@
                                             item-title="name"
                                             item-value="value"
                                             :disabled="loading || !!editingQuery"
-                                            :items="getAllTransactionExploreConditionOperators(conditionWithRelation.getSupportedOperators())"
+                                            :items="getAllTransactionExplorerConditionOperators(conditionWithRelation.getSupportedOperators())"
                                             v-model="conditionWithRelation.condition.operator"
                                         />
 
@@ -146,7 +146,7 @@
                                                     { type: TransactionType.Transfer, displayName: tt('Transfer') }
                                                 ]"
                                                 v-model="conditionWithRelation.condition.value"
-                                                v-if="conditionWithRelation.condition.field === TransactionExploreConditionField.TransactionType.value"
+                                                v-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionType.value"
                                             >
                                                 <template #item="{ props, item }">
                                                     <v-list-item :value="item.value" v-bind="props">
@@ -170,7 +170,7 @@
                                                 :placeholder="tt('None')"
                                                 :model-value="getFilteredTransactionCategoriesDisplayContent(arrayItemToObjectField(conditionWithRelation.condition.value as string[], true))"
                                                 @click="currentCondition = conditionWithRelation.condition; showFilterTransactionCategoriesDialog = true"
-                                                v-else-if="conditionWithRelation.condition.field === TransactionExploreConditionField.TransactionCategory.value"
+                                                v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionCategory.value"
                                             />
 
                                             <v-text-field
@@ -184,7 +184,7 @@
                                                 :placeholder="tt('None')"
                                                 :model-value="getFilteredAccountsDisplayContent(arrayItemToObjectField(conditionWithRelation.condition.value as string[], true))"
                                                 @click="currentCondition = conditionWithRelation.condition; showFilterSourceAccountsDialog = true"
-                                                v-else-if="conditionWithRelation.condition.field === TransactionExploreConditionField.SourceAccount.value"
+                                                v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.SourceAccount.value"
                                             />
 
                                             <v-text-field
@@ -198,37 +198,37 @@
                                                 :placeholder="tt('None')"
                                                 :model-value="getFilteredAccountsDisplayContent(arrayItemToObjectField(conditionWithRelation.condition.value as string[], true))"
                                                 @click="currentCondition = conditionWithRelation.condition; showFilterDestinationAccountsDialog = true"
-                                                v-else-if="conditionWithRelation.condition.field === TransactionExploreConditionField.DestinationAccount.value"
+                                                v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.DestinationAccount.value"
                                             />
 
                                             <div class="d-flex w-100 align-center gap-2"
-                                                 v-else-if="conditionWithRelation.condition.field === TransactionExploreConditionField.SourceAmount.value ||
-                                                            conditionWithRelation.condition.field === TransactionExploreConditionField.DestinationAmount.value">
+                                                 v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.SourceAmount.value ||
+                                                            conditionWithRelation.condition.field === TransactionExplorerConditionField.DestinationAmount.value">
                                                 <amount-input density="compact"
                                                               :currency="defaultCurrency"
                                                               :disabled="loading || !!editingQuery"
                                                               v-model="conditionWithRelation.condition.value[0]"
                                                 />
                                                 <span class="ms-2 me-2"
-                                                      v-if="conditionWithRelation.condition.operator === TransactionExploreConditionOperator.Between.value ||
-                                                            conditionWithRelation.condition.operator === TransactionExploreConditionOperator.NotBetween.value">~</span>
+                                                      v-if="conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.Between.value ||
+                                                            conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.NotBetween.value">~</span>
                                                 <amount-input density="compact"
                                                               :currency="defaultCurrency"
                                                               :disabled="loading || !!editingQuery"
                                                               v-model="conditionWithRelation.condition.value[1]"
-                                                              v-if="conditionWithRelation.condition.operator === TransactionExploreConditionOperator.Between.value ||
-                                                                    conditionWithRelation.condition.operator === TransactionExploreConditionOperator.NotBetween.value"
+                                                              v-if="conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.Between.value ||
+                                                                    conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.NotBetween.value"
                                                 />
                                             </div>
 
-                                            <div class="d-flex w-100" v-else-if="conditionWithRelation.condition.field === TransactionExploreConditionField.TransactionTag.value">
+                                            <div class="d-flex w-100" v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionTag.value">
                                                 <v-text-field
                                                     disabled
                                                     persistent-placeholder
                                                     density="compact"
                                                     :placeholder="tt('None')"
-                                                    v-if="conditionWithRelation.condition.field === TransactionExploreConditionField.TransactionTag.value &&
-                                                         (conditionWithRelation.condition.operator === TransactionExploreConditionOperator.IsEmpty.value || conditionWithRelation.condition.operator === TransactionExploreConditionOperator.IsNotEmpty.value)"
+                                                    v-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionTag.value &&
+                                                         (conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.IsEmpty.value || conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.IsNotEmpty.value)"
                                                 />
 
                                                 <v-autocomplete
@@ -245,7 +245,7 @@
                                                     :items="allTags"
                                                     v-model="conditionWithRelation.condition.value"
                                                     v-model:search="tagSearchContent"
-                                                    v-else-if="conditionWithRelation.condition.operator !== TransactionExploreConditionOperator.IsEmpty.value && conditionWithRelation.condition.operator !== TransactionExploreConditionOperator.IsNotEmpty.value"
+                                                    v-else-if="conditionWithRelation.condition.operator !== TransactionExplorerConditionOperator.IsEmpty.value && conditionWithRelation.condition.operator !== TransactionExplorerConditionOperator.IsNotEmpty.value"
                                                 >
                                                     <template #chip="{ props, item }">
                                                         <v-chip :prepend-icon="mdiPound" :text="item.title" v-bind="props"/>
@@ -285,16 +285,16 @@
 
                                             <v-text-field disabled density="compact"
                                                           :placeholder="tt('None')"
-                                                          v-else-if="conditionWithRelation.condition.field === TransactionExploreConditionField.Description.value &&
-                                                                     conditionWithRelation.condition.operator === TransactionExploreConditionOperator.IsEmpty.value || conditionWithRelation.condition.operator === TransactionExploreConditionOperator.IsNotEmpty.value"
+                                                          v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.Description.value &&
+                                                                     conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.IsEmpty.value || conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.IsNotEmpty.value"
                                             />
 
                                             <v-text-field density="compact"
                                                           :disabled="loading || !!editingQuery"
                                                           :placeholder="tt('None')"
                                                           v-model="conditionWithRelation.condition.value"
-                                                          v-else-if="conditionWithRelation.condition.field === TransactionExploreConditionField.Description.value &&
-                                                                     conditionWithRelation.condition.operator !== TransactionExploreConditionOperator.IsEmpty.value && conditionWithRelation.condition.operator !== TransactionExploreConditionOperator.IsNotEmpty.value"
+                                                          v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.Description.value &&
+                                                                     conditionWithRelation.condition.operator !== TransactionExplorerConditionOperator.IsEmpty.value && conditionWithRelation.condition.operator !== TransactionExplorerConditionOperator.IsNotEmpty.value"
                                             />
                                         </div>
 
@@ -371,25 +371,25 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
-import { useExploresStore } from '@/stores/explore.ts';
+import { useExplorersStore } from '@/stores/explorer.ts';
 
 import { type NameValue, entries, values } from '@/core/base.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import {
-    TransactionExploreConditionRelation,
-    TransactionExploreConditionField,
-    TransactionExploreConditionOperator
-} from '@/core/explore.ts';
+    TransactionExplorerConditionRelation,
+    TransactionExplorerConditionField,
+    TransactionExplorerConditionOperator
+} from '@/core/explorer.ts';
 
 import {
     type TransactionTag
 } from '@/models/transaction_tag.ts';
 
 import {
-    type TransactionExploreCondition,
-    TransactionExploreQuery
-} from '@/models/explore.ts';
+    type TransactionExplorerCondition,
+    TransactionExplorerQuery
+} from '@/models/explorer.ts';
 
 import {
     isArray,
@@ -409,46 +409,46 @@ import {
     mdiPound
 } from '@mdi/js';
 
-interface ExploreQueryTabProps {
+interface ExplorerQueryTabProps {
     loading?: boolean;
 }
 
 type SnackBarType = InstanceType<typeof SnackBar>;
 
-const props = defineProps<ExploreQueryTabProps>();
+const props = defineProps<ExplorerQueryTabProps>();
 
 const {
     tt,
     joinMultiText,
-    getAllTransactionExploreConditionFields,
-    getAllTransactionExploreConditionOperators
+    getAllTransactionExplorerConditionFields,
+    getAllTransactionExplorerConditionOperators
 } = useI18n();
 
 const userStore = useUserStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
-const exploresStore = useExploresStore();
+const explorersStore = useExplorersStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
-const currentCondition = ref<TransactionExploreCondition | undefined>(undefined);
+const currentCondition = ref<TransactionExplorerCondition | undefined>(undefined);
 const showExpression = ref<Record<number, boolean>>({});
 const showFilterSourceAccountsDialog = ref<boolean>(false);
 const showFilterDestinationAccountsDialog = ref<boolean>(false);
 const showFilterTransactionCategoriesDialog = ref<boolean>(false);
 const tagSearchContent = ref<string>('');
-const editingQuery = ref<TransactionExploreQuery | undefined>(undefined);
+const editingQuery = ref<TransactionExplorerQuery | undefined>(undefined);
 const editingQueryName = ref<string>('');
 
-const queries = computed<TransactionExploreQuery[]>(() => exploresStore.transactionExploreFilter.query);
+const queries = computed<TransactionExplorerQuery[]>(() => explorersStore.transactionExplorerFilter.query);
 
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 const hasAnyAccount = computed<boolean>(() => accountsStore.allPlainAccounts.length > 0);
 const hasAnyTransactionCategory = computed<boolean>(() => !isObjectEmpty(transactionCategoriesStore.allTransactionCategoriesMap));
 const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
 
-const allTransactionExploreConditionFields = computed<NameValue[]>(() => getAllTransactionExploreConditionFields());
+const allTransactionExplorerConditionFields = computed<NameValue[]>(() => getAllTransactionExplorerConditionFields());
 
 const isAllFilteredTagHidden = computed<boolean>(() => {
     const lowerCaseTagSearchContent = tagSearchContent.value.toLowerCase();
@@ -534,10 +534,10 @@ function getFilteredTransactionCategoriesDisplayContent(filterTransactionCategor
 }
 
 function addQuery(): void {
-    queries.value.push(TransactionExploreQuery.create());
+    queries.value.push(TransactionExplorerQuery.create());
 }
 
-function updateQueryName(query: TransactionExploreQuery): void {
+function updateQueryName(query: TransactionExplorerQuery): void {
     query.name = editingQueryName.value;
     editingQuery.value = undefined;
     editingQueryName.value = '';
@@ -548,7 +548,7 @@ function cancelUpdateQueryName(): void {
     editingQueryName.value = '';
 }
 
-function duplicateQuery(query: TransactionExploreQuery): void {
+function duplicateQuery(query: TransactionExplorerQuery): void {
     queries.value.push(query.clone());
 }
 
@@ -572,13 +572,13 @@ function removeQuery(queryIndex: number): void {
     showExpression.value = newShowExpression;
 
     if (queries.value.length < 1) {
-        queries.value.push(TransactionExploreQuery.create());
+        queries.value.push(TransactionExplorerQuery.create());
     }
 }
 
 function clearAllQueries(): void {
     queries.value.length = 0;
-    queries.value.push(TransactionExploreQuery.create());
+    queries.value.push(TransactionExplorerQuery.create());
 }
 
 function addCondition(queryIndex: number): void {
@@ -588,7 +588,7 @@ function addCondition(queryIndex: number): void {
         return;
     }
 
-    const newCondition = query.addNewCondition(TransactionExploreConditionField.TransactionType, query.conditions.length < 1);
+    const newCondition = query.addNewCondition(TransactionExplorerConditionField.TransactionType, query.conditions.length < 1);
     query.conditions.push(newCondition);
 }
 
@@ -605,12 +605,12 @@ function removeCondition(queryIndex: number, conditionIndex: number): void {
         const newFirstCondition = query.conditions[0];
 
         if (newFirstCondition) {
-            newFirstCondition.relation = TransactionExploreConditionRelation.First;
+            newFirstCondition.relation = TransactionExplorerConditionRelation.First;
         }
     }
 }
 
-function updateConditionField(queryIndex: number, conditionIndex: number, newField: TransactionExploreConditionField | undefined): void {
+function updateConditionField(queryIndex: number, conditionIndex: number, newField: TransactionExplorerConditionField | undefined): void {
     if (!newField) {
         return;
     }
@@ -632,7 +632,7 @@ function updateConditionField(queryIndex: number, conditionIndex: number, newFie
 }
 
 function updateSourceAccount(changed: boolean, selectedAccountIds?: string[]): void {
-    if (!changed || !currentCondition.value || currentCondition.value.field !== TransactionExploreConditionField.SourceAccount.value) {
+    if (!changed || !currentCondition.value || currentCondition.value.field !== TransactionExplorerConditionField.SourceAccount.value) {
         showFilterSourceAccountsDialog.value = false;
         return;
     }
@@ -643,7 +643,7 @@ function updateSourceAccount(changed: boolean, selectedAccountIds?: string[]): v
 }
 
 function updateDestinationAccount(changed: boolean, selectedAccountIds?: string[]): void {
-    if (!changed || !currentCondition.value || currentCondition.value.field !== TransactionExploreConditionField.DestinationAccount.value) {
+    if (!changed || !currentCondition.value || currentCondition.value.field !== TransactionExplorerConditionField.DestinationAccount.value) {
         showFilterDestinationAccountsDialog.value = false;
         return;
     }
@@ -654,7 +654,7 @@ function updateDestinationAccount(changed: boolean, selectedAccountIds?: string[
 }
 
 function updateTransactionCategories(changed: boolean, selectedCategoryIds?: string[]): void {
-    if (!changed || !currentCondition.value || currentCondition.value.field !== TransactionExploreConditionField.TransactionCategory.value) {
+    if (!changed || !currentCondition.value || currentCondition.value.field !== TransactionExplorerConditionField.TransactionCategory.value) {
         showFilterTransactionCategoriesDialog.value = false;
         return;
     }
@@ -674,14 +674,14 @@ function getExpression(queryIndex: number): string {
     try {
         return query.toExpression(transactionCategoriesStore.allTransactionCategoriesMap, accountsStore.allAccountsMap, transactionTagsStore.allTransactionTagsMap);
     } catch (ex) {
-        logger.error('failed to generate expression for explore query#' + queryIndex, ex);
+        logger.error('failed to generate expression for explorer query#' + queryIndex, ex);
         snackbar.value?.showError(tt('Failed to generate expression'));
         return tt('Failed to generate expression');
     }
 }
 
 if (queries.value.length === 0) {
-    queries.value.push(TransactionExploreQuery.create());
+    queries.value.push(TransactionExplorerQuery.create());
 }
 </script>
 

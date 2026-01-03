@@ -45,9 +45,9 @@
                     </router-link>
                 </li>
                 <li class="nav-link">
-                    <router-link to="/insights/explore">
+                    <router-link to="/insights/explorer">
                         <v-icon class="nav-item-icon" :icon="mdiCompassOutline"/>
-                        <span class="nav-item-title">{{ tt('Insights & Explore') }}</span>
+                        <span class="nav-item-title">{{ tt('Insights Explorer') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-section-title">

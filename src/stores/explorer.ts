@@ -15,14 +15,14 @@ import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { AccountCategory } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import {
-    TransactionExploreChartTypeValue,
-    TransactionExploreChartType,
-    TransactionExploreDataDimensionType,
-    TransactionExploreDataDimension,
-    TransactionExploreValueMetricType,
-    TransactionExploreValueMetric,
-    DEFAULT_TRANSACTION_EXPLORE_DATE_RANGE
-} from '@/core/explore.ts';
+    TransactionExplorerChartTypeValue,
+    TransactionExplorerChartType,
+    TransactionExplorerDataDimensionType,
+    TransactionExplorerDataDimension,
+    TransactionExplorerValueMetricType,
+    TransactionExplorerValueMetric,
+    DEFAULT_TRANSACTION_EXPLORER_DATE_RANGE
+} from '@/core/explorer.ts';
 
 import { type Account } from '@/models/account.ts';
 import { type TransactionCategory } from '@/models/transaction_category.ts';
@@ -32,8 +32,8 @@ import {
     type TransactionInsightDataItem
 } from '@/models/transaction.ts';
 import {
-    TransactionExploreQuery
-} from '@/models/explore.ts';
+    TransactionExplorerQuery
+} from '@/models/explorer.ts';
 
 import {
     isDefined,
@@ -54,7 +54,7 @@ import {
 import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 
-export enum TransactionExploreDimensionType {
+export enum TransactionExplorerDimensionType {
     TransactionType = 'transactionType',
     Category = 'category',
     Account = 'account',
@@ -62,26 +62,26 @@ export enum TransactionExploreDimensionType {
     Other = 'other'
 }
 
-export interface TransactionExplorePartialFilter {
+export interface TransactionExplorerPartialFilter {
     dateRangeType?: number;
     startTime?: number;
     endTime?: number;
     queryId?: string;
-    chartType?: TransactionExploreChartTypeValue;
-    categoryDimension?: TransactionExploreDataDimensionType;
-    seriesDimension?: TransactionExploreDataDimensionType;
-    valueMetric?: TransactionExploreValueMetricType;
+    chartType?: TransactionExplorerChartTypeValue;
+    categoryDimension?: TransactionExplorerDataDimensionType;
+    seriesDimension?: TransactionExplorerDataDimensionType;
+    valueMetric?: TransactionExplorerValueMetricType;
 }
 
-export interface TransactionExploreFilter extends TransactionExplorePartialFilter {
+export interface TransactionExplorerFilter extends TransactionExplorerPartialFilter {
     dateRangeType: number;
     startTime: number;
     endTime: number;
-    query: TransactionExploreQuery[];
-    chartType: TransactionExploreChartTypeValue;
-    categoryDimension: TransactionExploreDataDimensionType;
-    seriesDimension: TransactionExploreDataDimensionType;
-    valueMetric: TransactionExploreValueMetricType;
+    query: TransactionExplorerQuery[];
+    chartType: TransactionExplorerChartTypeValue;
+    categoryDimension: TransactionExplorerDataDimensionType;
+    seriesDimension: TransactionExplorerDataDimensionType;
+    valueMetric: TransactionExplorerValueMetricType;
 }
 
 export interface CategoriedInfo {
@@ -89,15 +89,15 @@ export interface CategoriedInfo {
     categoryNameNeedI18n?: boolean;
     categoryNameI18nParameters?: Record<string, string>;
     categoryId: string;
-    categoryIdType: TransactionExploreDimensionType;
+    categoryIdType: TransactionExplorerDimensionType;
 }
 
 export interface CategoriedTransactions extends CategoriedInfo {
     trasactions: Record<string, SeriesedTransactions>;
 }
 
-export interface CategoriedTransactionExploreData extends CategoriedInfo {
-    data: CategoriedTransactionExploreDataItem[];
+export interface CategoriedTransactionExplorerData extends CategoriedInfo {
+    data: CategoriedTransactionExplorerDataItem[];
 }
 
 export interface SeriesedInfo {
@@ -105,18 +105,18 @@ export interface SeriesedInfo {
     seriesNameNeedI18n?: boolean;
     seriesNameI18nParameters?: Record<string, string>;
     seriesId: string;
-    seriesIdType: TransactionExploreDimensionType;
+    seriesIdType: TransactionExplorerDimensionType;
 }
 
 export interface SeriesedTransactions extends SeriesedInfo {
     trasactions: TransactionInsightDataItem[];
 }
 
-export interface CategoriedTransactionExploreDataItem extends SeriesedInfo {
+export interface CategoriedTransactionExplorerDataItem extends SeriesedInfo {
     value: number;
 }
 
-export const useExploresStore = defineStore('explores', () => {
+export const useExplorersStore = defineStore('explorers', () => {
     const settingsStore = useSettingsStore();
     const userStore = useUserStore();
     const accountsStore = useAccountsStore();
@@ -124,27 +124,27 @@ export const useExploresStore = defineStore('explores', () => {
     const transactionTagsStore = useTransactionTagsStore();
     const exchangeRatesStore = useExchangeRatesStore();
 
-    function getDataCategoryInfo(dimension: TransactionExploreDataDimension, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): CategoriedInfo {
+    function getDataCategoryInfo(dimension: TransactionExplorerDataDimension, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): CategoriedInfo {
         let transactionTimeUtfOffset: number | undefined = undefined;
 
-        if (settingsStore.appSettings.timezoneUsedForInsightsExplorePage === TimezoneTypeForStatistics.TransactionTimezone.type) {
+        if (settingsStore.appSettings.timezoneUsedForInsightsExplorerPage === TimezoneTypeForStatistics.TransactionTimezone.type) {
             transactionTimeUtfOffset = transaction.utcOffset;
         }
 
-        if (dimension === TransactionExploreDataDimension.None) {
-            const valueMetric = TransactionExploreValueMetric.valueOf(transactionExploreFilter.value.valueMetric);
+        if (dimension === TransactionExplorerDataDimension.None) {
+            const valueMetric = TransactionExplorerValueMetric.valueOf(transactionExplorerFilter.value.valueMetric);
             return {
                 categoryName: valueMetric?.name ?? 'Unknown',
                 categoryNameNeedI18n: true,
                 categoryId: 'none',
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.Query) {
+        } else if (dimension === TransactionExplorerDataDimension.Query) {
             if (queryName) {
                 return {
                     categoryName: queryName,
                     categoryId: (queryIndex + 1).toString(10),
-                    categoryIdType: TransactionExploreDimensionType.Other
+                    categoryIdType: TransactionExplorerDimensionType.Other
                 };
             } else {
                 return {
@@ -154,90 +154,90 @@ export const useExploresStore = defineStore('explores', () => {
                         index: (queryIndex + 1).toString(10)
                     },
                     categoryId: (queryIndex + 1).toString(10),
-                    categoryIdType: TransactionExploreDimensionType.Other
+                    categoryIdType: TransactionExplorerDimensionType.Other
                 };
             }
-        } else if (dimension === TransactionExploreDataDimension.DateTime) {
+        } else if (dimension === TransactionExplorerDataDimension.DateTime) {
             const unixTime = transaction.time.toString(10);
 
             return {
                 categoryName: unixTime,
                 categoryId: unixTime,
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.DateTimeByYearMonthDay) {
+        } else if (dimension === TransactionExplorerDataDimension.DateTimeByYearMonthDay) {
             const unixTime = getDayFirstUnixTimeBySpecifiedUnixTime(transaction.time, transactionTimeUtfOffset).toString(10);
 
             return {
                 categoryName: unixTime,
                 categoryId: unixTime,
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.DateTimeByYearMonth) {
+        } else if (dimension === TransactionExplorerDataDimension.DateTimeByYearMonth) {
             const unixTime = getMonthFirstUnixTimeBySpecifiedUnixTime(transaction.time, transactionTimeUtfOffset).toString(10);
 
             return {
                 categoryName: unixTime,
                 categoryId: unixTime,
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.DateTimeByYearQuarter) {
+        } else if (dimension === TransactionExplorerDataDimension.DateTimeByYearQuarter) {
             const unixTime = getQuarterFirstUnixTimeBySpecifiedUnixTime(transaction.time, transactionTimeUtfOffset).toString(10);
 
             return {
                 categoryName: unixTime,
                 categoryId: unixTime,
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.DateTimeByYear) {
+        } else if (dimension === TransactionExplorerDataDimension.DateTimeByYear) {
             const unixTime = getYearFirstUnixTimeBySpecifiedUnixTime(transaction.time, transactionTimeUtfOffset).toString(10);
 
             return {
                 categoryName: unixTime,
                 categoryId: unixTime,
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.DateTimeByFiscalYear) {
+        } else if (dimension === TransactionExplorerDataDimension.DateTimeByFiscalYear) {
             const unixTime = getFiscalYearStartUnixTime(transaction.time, userStore.currentUserFiscalYearStart, transactionTimeUtfOffset).toString(10);
 
             return {
                 categoryName: unixTime,
                 categoryId: unixTime,
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.DateTimeByDayOfWeek) {
+        } else if (dimension === TransactionExplorerDataDimension.DateTimeByDayOfWeek) {
             const dateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
 
             return {
                 categoryName: dateTime.getWeekDay().name,
                 categoryId: dateTime.getWeekDay().type.toString(10),
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.DateTimeByDayOfMonth) {
+        } else if (dimension === TransactionExplorerDataDimension.DateTimeByDayOfMonth) {
             const dateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
 
             return {
                 categoryName: dateTime.getGregorianCalendarDay().toString(10),
                 categoryId: dateTime.getGregorianCalendarDay().toString(10),
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.DateTimeByMonthOfYear) {
+        } else if (dimension === TransactionExplorerDataDimension.DateTimeByMonthOfYear) {
             const dateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
 
             return {
                 categoryName: dateTime.getGregorianCalendarMonth().toString(10),
                 categoryId: dateTime.getGregorianCalendarMonth().toString(10),
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.DateTimeByQuarterOfYear) {
+        } else if (dimension === TransactionExplorerDataDimension.DateTimeByQuarterOfYear) {
             const dateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
 
             return {
                 categoryName: dateTime.getGregorianCalendarQuarter().toString(10),
                 categoryId: dateTime.getGregorianCalendarQuarter().toString(10),
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.TransactionType) {
+        } else if (dimension === TransactionExplorerDataDimension.TransactionType) {
             let transactionTypeName = 'Unknown';
 
             if (transaction.type === TransactionType.ModifyBalance) {
@@ -254,89 +254,89 @@ export const useExploresStore = defineStore('explores', () => {
                 categoryName: transactionTypeName,
                 categoryNameNeedI18n: true,
                 categoryId: transaction.type.toString(10),
-                categoryIdType: TransactionExploreDimensionType.TransactionType
+                categoryIdType: TransactionExplorerDimensionType.TransactionType
             };
-        } else if (dimension === TransactionExploreDataDimension.SourceAccount) {
+        } else if (dimension === TransactionExplorerDataDimension.SourceAccount) {
             return {
                 categoryName: transaction.sourceAccountName || 'Unknown',
                 categoryNameNeedI18n: !transaction.sourceAccountName,
                 categoryId: transaction.sourceAccountId || 'unknown',
-                categoryIdType: TransactionExploreDimensionType.Account
+                categoryIdType: TransactionExplorerDimensionType.Account
             };
-        } else if (dimension === TransactionExploreDataDimension.SourceAccountCategory) {
+        } else if (dimension === TransactionExplorerDataDimension.SourceAccountCategory) {
             const accountCategory = AccountCategory.valueOf(transaction.sourceAccount.category);
 
             return {
                 categoryName: accountCategory?.name || 'Unknown',
                 categoryNameNeedI18n: true,
                 categoryId: accountCategory?.type.toString(10) || 'unknown',
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.SourceAccountCurrency) {
+        } else if (dimension === TransactionExplorerDataDimension.SourceAccountCurrency) {
             return {
                 categoryName: transaction.sourceAccount.currency || 'Unknown',
                 categoryNameNeedI18n: !transaction.sourceAccount.currency,
                 categoryId: transaction.sourceAccount.currency || 'unknown',
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
-        }  else if (dimension === TransactionExploreDataDimension.DestinationAccount) {
+        }  else if (dimension === TransactionExplorerDataDimension.DestinationAccount) {
             return {
                 categoryName: transaction.type === TransactionType.Transfer ? (transaction.destinationAccountName || 'Unknown') : 'None',
                 categoryNameNeedI18n: transaction.type !== TransactionType.Transfer || !transaction.destinationAccountName,
                 categoryId: transaction.type === TransactionType.Transfer ? (transaction.destinationAccountId || 'unknown') : 'none',
-                categoryIdType: TransactionExploreDimensionType.Account
+                categoryIdType: TransactionExplorerDimensionType.Account
             };
-        } else if (dimension === TransactionExploreDataDimension.DestinationAccountCategory) {
+        } else if (dimension === TransactionExplorerDataDimension.DestinationAccountCategory) {
             const accountCategory = transaction.type === TransactionType.Transfer && transaction.destinationAccount ? AccountCategory.valueOf(transaction.destinationAccount.category) : undefined;
 
             return {
                 categoryName: transaction.type === TransactionType.Transfer ? (accountCategory?.name || 'Unknown') : 'None',
                 categoryNameNeedI18n: true,
                 categoryId: transaction.type === TransactionType.Transfer ? (accountCategory?.name || 'unknown') : 'none',
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.DestinationAccountCurrency) {
+        } else if (dimension === TransactionExplorerDataDimension.DestinationAccountCurrency) {
             return {
                 categoryName: transaction.type === TransactionType.Transfer ? (transaction.destinationAccount?.currency || 'Unknown') : 'None',
                 categoryNameNeedI18n: transaction.type !== TransactionType.Transfer || !transaction.destinationAccount?.currency,
                 categoryId: transaction.type === TransactionType.Transfer ? (transaction.destinationAccount?.currency || 'unknown') : 'none',
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
-        } else if (dimension === TransactionExploreDataDimension.PrimaryCategory) {
+        } else if (dimension === TransactionExplorerDataDimension.PrimaryCategory) {
             return {
                 categoryName: transaction.primaryCategory.name,
                 categoryId: transaction.primaryCategory.id,
-                categoryIdType: TransactionExploreDimensionType.Category
+                categoryIdType: TransactionExplorerDimensionType.Category
             };
-        } else if (dimension === TransactionExploreDataDimension.SecondaryCategory) {
+        } else if (dimension === TransactionExplorerDataDimension.SecondaryCategory) {
             return {
                 categoryName: transaction.secondaryCategory.name,
                 categoryId: transaction.categoryId,
-                categoryIdType: TransactionExploreDimensionType.Category
+                categoryIdType: TransactionExplorerDimensionType.Category
             };
-        } else if (dimension === TransactionExploreDataDimension.SourceAmount) {
+        } else if (dimension === TransactionExplorerDataDimension.SourceAmount) {
             return {
                 categoryName: transaction.sourceAmount.toString(10),
                 categoryId: transaction.sourceAmount.toString(10),
-                categoryIdType: TransactionExploreDimensionType.Amount
+                categoryIdType: TransactionExplorerDimensionType.Amount
             };
-        } else if (dimension === TransactionExploreDataDimension.DestinationAmount) {
+        } else if (dimension === TransactionExplorerDataDimension.DestinationAmount) {
             return {
                 categoryName: transaction.type === TransactionType.Transfer ? transaction.destinationAmount.toString(10) : 'None',
                 categoryNameNeedI18n: transaction.type !== TransactionType.Transfer,
                 categoryId: transaction.type === TransactionType.Transfer ? transaction.destinationAmount.toString(10) : 'none',
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
         } else {
             return {
                 categoryName: '',
                 categoryId: '',
-                categoryIdType: TransactionExploreDimensionType.Other
+                categoryIdType: TransactionExplorerDimensionType.Other
             };
         }
     }
 
-    function addTransactionToCategoriedDataMap(categoriedDataMap: Record<string, CategoriedTransactions>, categoryDimension: TransactionExploreDataDimension, seriesDemension: TransactionExploreDataDimension, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): void {
+    function addTransactionToCategoriedDataMap(categoriedDataMap: Record<string, CategoriedTransactions>, categoryDimension: TransactionExplorerDataDimension, seriesDemension: TransactionExplorerDataDimension, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): void {
         const categoriedInfo = getDataCategoryInfo(categoryDimension, queryName, queryIndex, transaction);
         let categoriedData = categoriedDataMap[categoriedInfo.categoryId];
 
@@ -370,28 +370,28 @@ export const useExploresStore = defineStore('explores', () => {
         seriesedData.trasactions.push(transaction);
     }
 
-    const transactionExploreFilter = ref<TransactionExploreFilter>({
-        dateRangeType: DEFAULT_TRANSACTION_EXPLORE_DATE_RANGE.type,
+    const transactionExplorerFilter = ref<TransactionExplorerFilter>({
+        dateRangeType: DEFAULT_TRANSACTION_EXPLORER_DATE_RANGE.type,
         startTime: 0,
         endTime: 0,
         query: [],
-        categoryDimension: TransactionExploreDataDimension.CategoryDimensionDefault.value,
-        seriesDimension: TransactionExploreDataDimension.SeriesDimensionDefault.value,
-        valueMetric: TransactionExploreValueMetric.Default.value,
-        chartType: TransactionExploreChartType.Default.value
+        categoryDimension: TransactionExplorerDataDimension.CategoryDimensionDefault.value,
+        seriesDimension: TransactionExplorerDataDimension.SeriesDimensionDefault.value,
+        valueMetric: TransactionExplorerValueMetric.Default.value,
+        chartType: TransactionExplorerChartType.Default.value
     });
 
-    const transactionExploreAllData = ref<TransactionInfoResponse[]>([]);
-    const transactionExploreStateInvalid = ref<boolean>(true);
+    const transactionExplorerAllData = ref<TransactionInfoResponse[]>([]);
+    const transactionExplorerStateInvalid = ref<boolean>(true);
 
     const allTransactions = computed<TransactionInsightDataItem[]>(() => {
-        if (!transactionExploreAllData.value || transactionExploreAllData.value.length < 1) {
+        if (!transactionExplorerAllData.value || transactionExplorerAllData.value.length < 1) {
             return [];
         }
 
         const result: TransactionInsightDataItem[] = [];
 
-        for (const transaction of transactionExploreAllData.value) {
+        for (const transaction of transactionExplorerAllData.value) {
             const sourceAccount: Account | undefined = accountsStore.allAccountsMap[transaction.sourceAccountId];
 
             if (!sourceAccount) {
@@ -463,14 +463,14 @@ export const useExploresStore = defineStore('explores', () => {
             return [];
         }
 
-        if (!transactionExploreFilter.value.query || transactionExploreFilter.value.query.length < 1) {
+        if (!transactionExplorerFilter.value.query || transactionExplorerFilter.value.query.length < 1) {
             return allTransactions.value;
         }
 
         const result: TransactionInsightDataItem[] = [];
 
         for (const transaction of allTransactions.value) {
-            for (const query of transactionExploreFilter.value.query) {
+            for (const query of transactionExplorerFilter.value.query) {
                 if (query.match(transaction)) {
                     result.push(transaction);
                     break;
@@ -486,9 +486,9 @@ export const useExploresStore = defineStore('explores', () => {
             return {};
         }
 
-        const chartType = TransactionExploreChartType.valueOf(transactionExploreFilter.value.chartType);
-        const categoryDimension = TransactionExploreDataDimension.valueOf(transactionExploreFilter.value.categoryDimension);
-        const seriesDimension = chartType?.seriesDimensionRequired ? TransactionExploreDataDimension.valueOf(transactionExploreFilter.value.seriesDimension) : TransactionExploreDataDimension.SeriesDimensionDefault;
+        const chartType = TransactionExplorerChartType.valueOf(transactionExplorerFilter.value.chartType);
+        const categoryDimension = TransactionExplorerDataDimension.valueOf(transactionExplorerFilter.value.categoryDimension);
+        const seriesDimension = chartType?.seriesDimensionRequired ? TransactionExplorerDataDimension.valueOf(transactionExplorerFilter.value.seriesDimension) : TransactionExplorerDataDimension.SeriesDimensionDefault;
 
         if (!chartType || !categoryDimension || !seriesDimension) {
             return {};
@@ -497,16 +497,16 @@ export const useExploresStore = defineStore('explores', () => {
         const categoriedDataMap: Record<string, CategoriedTransactions> = {};
 
         for (const transaction of allTransactions.value) {
-            if (!transactionExploreFilter.value.query || transactionExploreFilter.value.query.length < 1) {
+            if (!transactionExplorerFilter.value.query || transactionExplorerFilter.value.query.length < 1) {
                 addTransactionToCategoriedDataMap(categoriedDataMap, categoryDimension, seriesDimension, '', 0, transaction);
                 continue;
             }
 
-            for (const [query, index] of itemAndIndex(transactionExploreFilter.value.query)) {
+            for (const [query, index] of itemAndIndex(transactionExplorerFilter.value.query)) {
                 if (query.match(transaction)) {
                     addTransactionToCategoriedDataMap(categoriedDataMap, categoryDimension, seriesDimension, query.name, index, transaction);
 
-                    if (categoryDimension !== TransactionExploreDataDimension.Query) {
+                    if (categoryDimension !== TransactionExplorerDataDimension.Query) {
                         break;
                     }
                 }
@@ -516,30 +516,30 @@ export const useExploresStore = defineStore('explores', () => {
         return categoriedDataMap;
     });
 
-    const categoriedTransactionExploreData = computed<CategoriedTransactionExploreData[]>(() => {
+    const categoriedTransactionExplorerData = computed<CategoriedTransactionExplorerData[]>(() => {
         if (!allTransactions.value || allTransactions.value.length < 1) {
             return [];
         }
 
-        const chartType = TransactionExploreChartType.valueOf(transactionExploreFilter.value.chartType);
-        const categoryDimension = TransactionExploreDataDimension.valueOf(transactionExploreFilter.value.categoryDimension);
-        const seriesDimension = chartType?.seriesDimensionRequired ? TransactionExploreDataDimension.valueOf(transactionExploreFilter.value.seriesDimension) : TransactionExploreDataDimension.SeriesDimensionDefault;
-        const valueMetric = TransactionExploreValueMetric.valueOf(transactionExploreFilter.value.valueMetric);
+        const chartType = TransactionExplorerChartType.valueOf(transactionExplorerFilter.value.chartType);
+        const categoryDimension = TransactionExplorerDataDimension.valueOf(transactionExplorerFilter.value.categoryDimension);
+        const seriesDimension = chartType?.seriesDimensionRequired ? TransactionExplorerDataDimension.valueOf(transactionExplorerFilter.value.seriesDimension) : TransactionExplorerDataDimension.SeriesDimensionDefault;
+        const valueMetric = TransactionExplorerValueMetric.valueOf(transactionExplorerFilter.value.valueMetric);
 
         if (!chartType || !categoryDimension || !seriesDimension || !valueMetric) {
             return [];
         }
 
         const defaultCurrency = userStore.currentUserDefaultCurrency;
-        const result: CategoriedTransactionExploreData[] = [];
+        const result: CategoriedTransactionExplorerData[] = [];
         const categoriedDataMap = categoriedTransactions.value;
 
         for (const categoriedTransactions of values(categoriedDataMap)) {
-            const dataItems: CategoriedTransactionExploreDataItem[] = [];
+            const dataItems: CategoriedTransactionExplorerDataItem[] = [];
             let allSeriesedTransactions: Record<string, SeriesedTransactions> = categoriedTransactions.trasactions;
 
             // merge all series into one for pie/radar chart
-            if (chartType === TransactionExploreChartType.Pie || chartType === TransactionExploreChartType.Radar) {
+            if (chartType === TransactionExplorerChartType.Pie || chartType === TransactionExplorerChartType.Radar) {
                 const transactions: TransactionInsightDataItem[] = [];
 
                 for (const seriesedTransactions of values(categoriedTransactions.trasactions)) {
@@ -551,7 +551,7 @@ export const useExploresStore = defineStore('explores', () => {
                     seriesName: valueMetric?.name ?? 'Unknown',
                     seriesNameNeedI18n: true,
                     seriesId: 'none',
-                    seriesIdType: TransactionExploreDimensionType.Other,
+                    seriesIdType: TransactionExplorerDimensionType.Other,
                     trasactions: transactions
                 };
             }
@@ -589,22 +589,22 @@ export const useExploresStore = defineStore('explores', () => {
 
                 let value: number = 0;
 
-                if (valueMetric === TransactionExploreValueMetric.TransactionCount) {
+                if (valueMetric === TransactionExplorerValueMetric.TransactionCount) {
                     value = allSourceAmountsInDefaultCurrency.length;
-                } else if (valueMetric === TransactionExploreValueMetric.SourceAmountSum) {
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountSum) {
                     value = totalSourceAmountSumInDefaultCurrency;
-                } else if (valueMetric === TransactionExploreValueMetric.SourceAmountAverage) {
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountAverage) {
                     value = allSourceAmountsInDefaultCurrency.length > 0 ? Math.trunc(totalSourceAmountSumInDefaultCurrency / allSourceAmountsInDefaultCurrency.length) : 0;
-                } else if (valueMetric === TransactionExploreValueMetric.SourceAmountMedian) {
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMedian) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
                         allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
                         value = allSourceAmountsInDefaultCurrency[Math.floor(allSourceAmountsInDefaultCurrency.length / 2)] as number;
                     } else {
                         value = 0;
                     }
-                } else if (valueMetric === TransactionExploreValueMetric.SourceAmountMinimum) {
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMinimum) {
                     value = minimumSourceAmountInDefaultCurrency === Number.MAX_SAFE_INTEGER ? 0 : minimumSourceAmountInDefaultCurrency;
-                } else if (valueMetric === TransactionExploreValueMetric.SourceAmountMaximum) {
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMaximum) {
                     value = maximumSourceAmountInDefaultCurrency === Number.MIN_SAFE_INTEGER ? 0 : maximumSourceAmountInDefaultCurrency;
                 }
 
@@ -631,150 +631,150 @@ export const useExploresStore = defineStore('explores', () => {
         return result;
     });
 
-    function updateTransactionExploreInvalidState(invalidState: boolean): void {
-        transactionExploreStateInvalid.value = invalidState;
+    function updateTransactionExplorerInvalidState(invalidState: boolean): void {
+        transactionExplorerStateInvalid.value = invalidState;
     }
 
-    function resetTransactionExplores(): void {
-        transactionExploreFilter.value.dateRangeType = DEFAULT_TRANSACTION_EXPLORE_DATE_RANGE.type;
-        transactionExploreFilter.value.startTime = 0;
-        transactionExploreFilter.value.endTime = 0;
-        transactionExploreFilter.value.query = [];
-        transactionExploreFilter.value.chartType = TransactionExploreChartType.Default.value;
-        transactionExploreFilter.value.categoryDimension = TransactionExploreDataDimension.CategoryDimensionDefault.value;
-        transactionExploreFilter.value.seriesDimension = TransactionExploreDataDimension.SeriesDimensionDefault.value;
-        transactionExploreFilter.value.valueMetric = TransactionExploreValueMetric.Default.value;
-        transactionExploreAllData.value = [];
-        transactionExploreStateInvalid.value = true;
+    function resetTransactionExplorers(): void {
+        transactionExplorerFilter.value.dateRangeType = DEFAULT_TRANSACTION_EXPLORER_DATE_RANGE.type;
+        transactionExplorerFilter.value.startTime = 0;
+        transactionExplorerFilter.value.endTime = 0;
+        transactionExplorerFilter.value.query = [];
+        transactionExplorerFilter.value.chartType = TransactionExplorerChartType.Default.value;
+        transactionExplorerFilter.value.categoryDimension = TransactionExplorerDataDimension.CategoryDimensionDefault.value;
+        transactionExplorerFilter.value.seriesDimension = TransactionExplorerDataDimension.SeriesDimensionDefault.value;
+        transactionExplorerFilter.value.valueMetric = TransactionExplorerValueMetric.Default.value;
+        transactionExplorerAllData.value = [];
+        transactionExplorerStateInvalid.value = true;
     }
 
-    function initTransactionExploreFilter(filter?: TransactionExplorePartialFilter, resetQuery?: boolean): void {
+    function initTransactionExplorerFilter(filter?: TransactionExplorerPartialFilter, resetQuery?: boolean): void {
         if (filter && isInteger(filter.dateRangeType)) {
-            transactionExploreFilter.value.dateRangeType = filter.dateRangeType;
+            transactionExplorerFilter.value.dateRangeType = filter.dateRangeType;
         } else {
-            transactionExploreFilter.value.dateRangeType = settingsStore.appSettings.insightsExploreDefaultDateRangeType;
+            transactionExplorerFilter.value.dateRangeType = settingsStore.appSettings.insightsExplorerDefaultDateRangeType;
         }
 
         let dateRangeTypeValid = true;
 
-        if (!DateRange.isAvailableForScene(transactionExploreFilter.value.dateRangeType, DateRangeScene.InsightsExplore)) {
-            transactionExploreFilter.value.dateRangeType = DEFAULT_TRANSACTION_EXPLORE_DATE_RANGE.type;
+        if (!DateRange.isAvailableForScene(transactionExplorerFilter.value.dateRangeType, DateRangeScene.InsightsExplorer)) {
+            transactionExplorerFilter.value.dateRangeType = DEFAULT_TRANSACTION_EXPLORER_DATE_RANGE.type;
             dateRangeTypeValid = false;
         }
 
-        if (dateRangeTypeValid && transactionExploreFilter.value.dateRangeType === DateRange.Custom.type) {
+        if (dateRangeTypeValid && transactionExplorerFilter.value.dateRangeType === DateRange.Custom.type) {
             if (filter && isInteger(filter.startTime)) {
-                transactionExploreFilter.value.startTime = filter.startTime;
+                transactionExplorerFilter.value.startTime = filter.startTime;
             } else {
-                transactionExploreFilter.value.startTime = 0;
+                transactionExplorerFilter.value.startTime = 0;
             }
 
             if (filter && isInteger(filter.endTime)) {
-                transactionExploreFilter.value.endTime = filter.endTime;
+                transactionExplorerFilter.value.endTime = filter.endTime;
             } else {
-                transactionExploreFilter.value.endTime = 0;
+                transactionExplorerFilter.value.endTime = 0;
             }
         } else {
-            const dateRange = getDateRangeByDateType(transactionExploreFilter.value.dateRangeType, userStore.currentUserFirstDayOfWeek, userStore.currentUserFiscalYearStart);
+            const dateRange = getDateRangeByDateType(transactionExplorerFilter.value.dateRangeType, userStore.currentUserFirstDayOfWeek, userStore.currentUserFiscalYearStart);
 
             if (dateRange) {
-                transactionExploreFilter.value.dateRangeType = dateRange.dateType;
-                transactionExploreFilter.value.startTime = dateRange.minTime;
-                transactionExploreFilter.value.endTime = dateRange.maxTime;
+                transactionExplorerFilter.value.dateRangeType = dateRange.dateType;
+                transactionExplorerFilter.value.startTime = dateRange.minTime;
+                transactionExplorerFilter.value.endTime = dateRange.maxTime;
             }
         }
 
         if (resetQuery) {
-            transactionExploreFilter.value.query = [];
-            transactionExploreFilter.value.chartType = TransactionExploreChartType.Default.value;
-            transactionExploreFilter.value.categoryDimension = TransactionExploreDataDimension.CategoryDimensionDefault.value;
-            transactionExploreFilter.value.seriesDimension = TransactionExploreDataDimension.SeriesDimensionDefault.value;
-            transactionExploreFilter.value.valueMetric = TransactionExploreValueMetric.Default.value;
+            transactionExplorerFilter.value.query = [];
+            transactionExplorerFilter.value.chartType = TransactionExplorerChartType.Default.value;
+            transactionExplorerFilter.value.categoryDimension = TransactionExplorerDataDimension.CategoryDimensionDefault.value;
+            transactionExplorerFilter.value.seriesDimension = TransactionExplorerDataDimension.SeriesDimensionDefault.value;
+            transactionExplorerFilter.value.valueMetric = TransactionExplorerValueMetric.Default.value;
         }
     }
 
-    function updateTransactionExploreFilter(filter: TransactionExplorePartialFilter): boolean {
+    function updateTransactionExplorerFilter(filter: TransactionExplorerPartialFilter): boolean {
         let changed = false;
 
-        if (filter && isInteger(filter.dateRangeType) && transactionExploreFilter.value.dateRangeType !== filter.dateRangeType) {
-            transactionExploreFilter.value.dateRangeType = filter.dateRangeType;
+        if (filter && isInteger(filter.dateRangeType) && transactionExplorerFilter.value.dateRangeType !== filter.dateRangeType) {
+            transactionExplorerFilter.value.dateRangeType = filter.dateRangeType;
             changed = true;
         }
 
-        if (filter && isInteger(filter.startTime) && transactionExploreFilter.value.startTime !== filter.startTime) {
-            transactionExploreFilter.value.startTime = filter.startTime;
+        if (filter && isInteger(filter.startTime) && transactionExplorerFilter.value.startTime !== filter.startTime) {
+            transactionExplorerFilter.value.startTime = filter.startTime;
             changed = true;
         }
 
-        if (filter && isInteger(filter.endTime) && transactionExploreFilter.value.endTime !== filter.endTime) {
-            transactionExploreFilter.value.endTime = filter.endTime;
+        if (filter && isInteger(filter.endTime) && transactionExplorerFilter.value.endTime !== filter.endTime) {
+            transactionExplorerFilter.value.endTime = filter.endTime;
             changed = true;
         }
 
-        if (filter && isDefined(filter.chartType) && transactionExploreFilter.value.chartType !== filter.chartType) {
-            transactionExploreFilter.value.chartType = filter.chartType;
+        if (filter && isDefined(filter.chartType) && transactionExplorerFilter.value.chartType !== filter.chartType) {
+            transactionExplorerFilter.value.chartType = filter.chartType;
             changed = true;
         }
 
-        if (filter && isDefined(filter.categoryDimension) && transactionExploreFilter.value.categoryDimension !== filter.categoryDimension) {
-            transactionExploreFilter.value.categoryDimension = filter.categoryDimension;
+        if (filter && isDefined(filter.categoryDimension) && transactionExplorerFilter.value.categoryDimension !== filter.categoryDimension) {
+            transactionExplorerFilter.value.categoryDimension = filter.categoryDimension;
             changed = true;
         }
 
-        if (filter && isDefined(filter.seriesDimension) && transactionExploreFilter.value.seriesDimension !== filter.seriesDimension) {
-            transactionExploreFilter.value.seriesDimension = filter.seriesDimension;
+        if (filter && isDefined(filter.seriesDimension) && transactionExplorerFilter.value.seriesDimension !== filter.seriesDimension) {
+            transactionExplorerFilter.value.seriesDimension = filter.seriesDimension;
             changed = true;
         }
 
-        if (filter && isDefined(filter.valueMetric) && transactionExploreFilter.value.valueMetric !== filter.valueMetric) {
-            transactionExploreFilter.value.valueMetric = filter.valueMetric;
+        if (filter && isDefined(filter.valueMetric) && transactionExplorerFilter.value.valueMetric !== filter.valueMetric) {
+            transactionExplorerFilter.value.valueMetric = filter.valueMetric;
             changed = true;
         }
 
-        if (transactionExploreFilter.value.seriesDimension === transactionExploreFilter.value.categoryDimension && transactionExploreFilter.value.seriesDimension !== TransactionExploreDataDimension.SeriesDimensionDefault.value) {
-            transactionExploreFilter.value.seriesDimension = TransactionExploreDataDimension.SeriesDimensionDefault.value;
+        if (transactionExplorerFilter.value.seriesDimension === transactionExplorerFilter.value.categoryDimension && transactionExplorerFilter.value.seriesDimension !== TransactionExplorerDataDimension.SeriesDimensionDefault.value) {
+            transactionExplorerFilter.value.seriesDimension = TransactionExplorerDataDimension.SeriesDimensionDefault.value;
             changed = true;
         }
 
         return changed;
     }
 
-    function getTransactionExplorePageParams(currentExploreId: string, activeTab: string): string {
+    function getTransactionExplorerPageParams(currentExplorationId: string, activeTab: string): string {
         const querys: string[] = [];
 
-        if (currentExploreId) {
-            querys.push('id=' + currentExploreId);
+        if (currentExplorationId) {
+            querys.push('id=' + currentExplorationId);
         }
 
         if (activeTab) {
             querys.push('activeTab=' + activeTab);
         }
 
-        querys.push('dateRangeType=' + transactionExploreFilter.value.dateRangeType);
-        querys.push('startTime=' + transactionExploreFilter.value.startTime);
-        querys.push('endTime=' + transactionExploreFilter.value.endTime);
+        querys.push('dateRangeType=' + transactionExplorerFilter.value.dateRangeType);
+        querys.push('startTime=' + transactionExplorerFilter.value.startTime);
+        querys.push('endTime=' + transactionExplorerFilter.value.endTime);
 
         return querys.join('&');
     }
 
-    function getTransactionListPageParams(dimensionType: TransactionExploreDimensionType, itemId: string): string {
+    function getTransactionListPageParams(dimensionType: TransactionExplorerDimensionType, itemId: string): string {
         const querys: string[] = [];
 
-        if (dimensionType === TransactionExploreDimensionType.TransactionType) {
+        if (dimensionType === TransactionExplorerDimensionType.TransactionType) {
             querys.push(`type=${itemId}`);
-        } else if (dimensionType === TransactionExploreDimensionType.Account) {
+        } else if (dimensionType === TransactionExplorerDimensionType.Account) {
             querys.push(`accountIds=${itemId}`);
-        } else if (dimensionType === TransactionExploreDimensionType.Category) {
+        } else if (dimensionType === TransactionExplorerDimensionType.Category) {
             querys.push(`categoryIds=${itemId}`);
-        } else if (dimensionType === TransactionExploreDimensionType.Amount) {
+        } else if (dimensionType === TransactionExplorerDimensionType.Amount) {
             querys.push(`amountFilter=${encodeURIComponent(AmountFilterType.EqualTo.toTextualFilter(parseInt(itemId)))}`);
         } else {
             return '';
         }
 
-        querys.push('dateType=' + transactionExploreFilter.value.dateRangeType);
-        querys.push('minTime=' + transactionExploreFilter.value.startTime);
-        querys.push('maxTime=' + transactionExploreFilter.value.endTime);
+        querys.push('dateType=' + transactionExplorerFilter.value.dateRangeType);
+        querys.push('minTime=' + transactionExplorerFilter.value.startTime);
+        querys.push('maxTime=' + transactionExplorerFilter.value.endTime);
 
         return querys.join('&');
     }
@@ -782,8 +782,8 @@ export const useExploresStore = defineStore('explores', () => {
     function loadAllTransactions({ force }: { force: boolean }): Promise<TransactionInfoResponse[]> {
         return new Promise((resolve, reject) => {
             services.getAllTransactions({
-                startTime: transactionExploreFilter.value.startTime,
-                endTime: transactionExploreFilter.value.endTime
+                startTime: transactionExplorerFilter.value.startTime,
+                endTime: transactionExplorerFilter.value.endTime
             }).then(response => {
                 const data = response.data;
 
@@ -792,16 +792,16 @@ export const useExploresStore = defineStore('explores', () => {
                     return;
                 }
 
-                if (transactionExploreStateInvalid.value) {
-                    updateTransactionExploreInvalidState(false);
+                if (transactionExplorerStateInvalid.value) {
+                    updateTransactionExplorerInvalidState(false);
                 }
 
-                if (force && data.result && isEquals(transactionExploreAllData.value, data.result)) {
+                if (force && data.result && isEquals(transactionExplorerAllData.value, data.result)) {
                     reject({ message: 'Data is up to date', isUpToDate: true });
                     return;
                 }
 
-                transactionExploreAllData.value = data.result;
+                transactionExplorerAllData.value = data.result;
 
                 resolve(data.result);
             }).catch(error => {
@@ -820,17 +820,17 @@ export const useExploresStore = defineStore('explores', () => {
 
     return {
         // states
-        transactionExploreFilter,
-        transactionExploreStateInvalid,
+        transactionExplorerFilter: transactionExplorerFilter,
+        transactionExplorerStateInvalid,
         // computed
         filteredTransactions,
-        categoriedTransactionExploreData,
+        categoriedTransactionExplorerData,
         // functions
-        updateTransactionExploreInvalidState,
-        resetTransactionExplores,
-        initTransactionExploreFilter,
-        updateTransactionExploreFilter,
-        getTransactionExplorePageParams,
+        updateTransactionExplorerInvalidState,
+        resetTransactionExplorers,
+        initTransactionExplorerFilter,
+        updateTransactionExplorerFilter,
+        getTransactionExplorerPageParams,
         getTransactionListPageParams,
         loadAllTransactions
     };

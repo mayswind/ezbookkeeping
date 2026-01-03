@@ -143,12 +143,12 @@ import {
 } from '@/core/statistics.ts';
 
 import {
-    TransactionExploreConditionField,
-    TransactionExploreConditionOperator,
-    TransactionExploreDataDimension,
-    TransactionExploreValueMetric,
-    TransactionExploreChartType
-} from '@/core/explore.ts';
+    TransactionExplorerConditionField,
+    TransactionExplorerConditionOperator,
+    TransactionExplorerDataDimension,
+    TransactionExplorerValueMetric,
+    TransactionExplorerChartType
+} from '@/core/explorer.ts';
 
 import {
     type LocalizedImportFileCategoryAndTypes,
@@ -2389,11 +2389,11 @@ export function useI18n() {
         getAllTransactionDefaultCategories,
         getAllDisplayExchangeRates,
         getAllSupportedImportFileCagtegoryAndTypes,
-        getAllTransactionExploreConditionFields: () => getLocalizedNameValue(TransactionExploreConditionField.values()),
-        getAllTransactionExploreConditionOperators: (operators?: TransactionExploreConditionOperator[]) => getLocalizedNameValue(operators ?? TransactionExploreConditionOperator.values()),
-        getAllTransactionExploreDataDimensions: (operators?: TransactionExploreDataDimension[]) => getLocalizedNameValue(operators ?? TransactionExploreDataDimension.values()),
-        getAllTransactionExploreValueMetrics: (operators?: TransactionExploreValueMetric[]) => getLocalizedNameValue(operators ?? TransactionExploreValueMetric.values()),
-        getAllTransactionExploreChartTypes: (operators?: TransactionExploreChartType[]) => getLocalizedNameValue(operators ?? TransactionExploreChartType.values()),
+        getAllTransactionExplorerConditionFields: () => getLocalizedNameValue(TransactionExplorerConditionField.values()),
+        getAllTransactionExplorerConditionOperators: (operators?: TransactionExplorerConditionOperator[]) => getLocalizedNameValue(operators ?? TransactionExplorerConditionOperator.values()),
+        getAllTransactionExplorerDataDimensions: (operators?: TransactionExplorerDataDimension[]) => getLocalizedNameValue(operators ?? TransactionExplorerDataDimension.values()),
+        getAllTransactionExplorerValueMetrics: (operators?: TransactionExplorerValueMetric[]) => getLocalizedNameValue(operators ?? TransactionExplorerValueMetric.values()),
+        getAllTransactionExplorerChartTypes: (operators?: TransactionExplorerChartType[]) => getLocalizedNameValue(operators ?? TransactionExplorerChartType.values()),
         // get localized info
         getLanguageInfo,
         getMonthShortName,

@@ -221,6 +221,11 @@
                                                 />
                                             </div>
 
+                                            <v-text-field disabled density="compact"
+                                                          :placeholder="tt('None')"
+                                                          v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.GeoLocation.value"
+                                            />
+
                                             <div class="d-flex w-100" v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionTag.value">
                                                 <v-text-field
                                                     disabled
@@ -282,6 +287,11 @@
                                                     </template>
                                                 </v-autocomplete>
                                             </div>
+
+                                            <v-text-field disabled density="compact"
+                                                          :placeholder="tt('None')"
+                                                          v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.Pictures.value"
+                                            />
 
                                             <v-text-field disabled density="compact"
                                                           :placeholder="tt('None')"

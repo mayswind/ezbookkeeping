@@ -21,7 +21,9 @@ export enum TransactionExplorerConditionFieldType {
     DestinationAccount = 'destinationAccount',
     SourceAmount = 'sourceAmount',
     DestinationAmount = 'destinationAmount',
+    GeoLocation = 'geoLocation',
     TransactionTag = 'transactionTag',
+    Pictures = 'pictures',
     Description = 'description'
 }
 
@@ -35,7 +37,9 @@ export class TransactionExplorerConditionField implements NameValue {
     public static readonly DestinationAccount = new TransactionExplorerConditionField('Destination Account', TransactionExplorerConditionFieldType.DestinationAccount);
     public static readonly SourceAmount = new TransactionExplorerConditionField('Amount', TransactionExplorerConditionFieldType.SourceAmount);
     public static readonly DestinationAmount = new TransactionExplorerConditionField('Transfer In Amount', TransactionExplorerConditionFieldType.DestinationAmount);
+    public static readonly GeoLocation = new TransactionExplorerConditionField('Geographic Location', TransactionExplorerConditionFieldType.GeoLocation);
     public static readonly TransactionTag = new TransactionExplorerConditionField('Tags', TransactionExplorerConditionFieldType.TransactionTag);
+    public static readonly Pictures = new TransactionExplorerConditionField('Pictures', TransactionExplorerConditionFieldType.Pictures);
     public static readonly Description = new TransactionExplorerConditionField('Description', TransactionExplorerConditionFieldType.Description);
 
     public readonly name: string;

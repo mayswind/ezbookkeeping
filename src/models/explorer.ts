@@ -51,8 +51,14 @@ export class TransactionExplorerQuery {
             case TransactionExplorerConditionField.DestinationAmount:
                 condition = new TransactionExplorerDestinationAmountCondition(TransactionExplorerConditionOperatorType.Between, [0, 0]);
                 break;
+            case TransactionExplorerConditionField.GeoLocation:
+                condition = new TransactionExplorerGeoLocationCondition(TransactionExplorerConditionOperatorType.IsNotEmpty, []);
+                break;
             case TransactionExplorerConditionField.TransactionTag:
                 condition = new TransactionExplorerTransactionTagCondition(TransactionExplorerConditionOperatorType.HasAny, []);
+                break;
+            case TransactionExplorerConditionField.Pictures:
+                condition = new TransactionExplorerPicturesCondition(TransactionExplorerConditionOperatorType.IsNotEmpty, []);
                 break;
             case TransactionExplorerConditionField.Description:
                 condition = new TransactionExplorerDescriptionCondition(TransactionExplorerConditionOperatorType.Contains, '');
@@ -302,8 +308,14 @@ export class TransactionExplorerConditionWithRelation {
             case TransactionExplorerConditionField.DestinationAmount.value:
                 operatorTypes = TransactionExplorerDestinationAmountCondition.supportedOperators;
                 break;
+            case TransactionExplorerConditionField.GeoLocation.value:
+                operatorTypes = TransactionExplorerGeoLocationCondition.supportedOperators;
+                break;
             case TransactionExplorerConditionField.TransactionTag.value:
                 operatorTypes = TransactionExplorerTransactionTagCondition.supportedOperators;
+                break;
+            case TransactionExplorerConditionField.Pictures.value:
+                operatorTypes = TransactionExplorerPicturesCondition.supportedOperators;
                 break;
             case TransactionExplorerConditionField.Description.value:
                 operatorTypes = TransactionExplorerDescriptionCondition.supportedOperators;
@@ -385,9 +397,19 @@ export class TransactionExplorerConditionWithRelation {
                     condition = new TransactionExplorerDestinationAmountCondition(conditionOperator as AmountConditionOperator, conditionValue as [number, number]);
                 }
                 break;
+            case TransactionExplorerConditionField.GeoLocation.value:
+                if (TransactionExplorerGeoLocationCondition.supportedOperators[conditionOperator] && Array.isArray(conditionValue)) {
+                    condition = new TransactionExplorerGeoLocationCondition(conditionOperator as GeoLocationConditionOperator, conditionValue as string[]);
+                }
+                break;
             case TransactionExplorerConditionField.TransactionTag.value:
                 if (TransactionExplorerTransactionTagCondition.supportedOperators[conditionOperator] && Array.isArray(conditionValue)) {
                     condition = new TransactionExplorerTransactionTagCondition(conditionOperator as TransactionTagConditionOperator, conditionValue as string[]);
+                }
+                break;
+            case TransactionExplorerConditionField.Pictures.value:
+                if (TransactionExplorerPicturesCondition.supportedOperators[conditionOperator] && Array.isArray(conditionValue)) {
+                    condition = new TransactionExplorerPicturesCondition(conditionOperator as PicturesConditionOperator, conditionValue as string[]);
                 }
                 break;
             case TransactionExplorerConditionField.Description.value:
@@ -690,6 +712,53 @@ export class TransactionExplorerDestinationAmountCondition extends AbstractTrans
     }
 }
 
+type GeoLocationConditionOperator = TransactionExplorerConditionOperatorType.IsEmpty |
+    TransactionExplorerConditionOperatorType.IsNotEmpty;
+
+export class TransactionExplorerGeoLocationCondition implements TransactionExplorerCondition<TransactionExplorerConditionFieldType.GeoLocation, string[]> {
+    public static readonly supportedOperators: PartialRecord<TransactionExplorerConditionOperatorType, true> = {
+        [TransactionExplorerConditionOperatorType.IsEmpty]: true,
+        [TransactionExplorerConditionOperatorType.IsNotEmpty]: true
+    };
+
+    public readonly field = TransactionExplorerConditionFieldType.GeoLocation;
+    public readonly operator: GeoLocationConditionOperator = TransactionExplorerConditionOperatorType.IsNotEmpty;
+    public value: string[];
+
+    constructor(operator: GeoLocationConditionOperator, value: string[]) {
+        this.operator = operator;
+        this.value = value;
+    }
+
+    public getValueForStore(): string[] {
+        if (this.operator === TransactionExplorerConditionOperatorType.IsEmpty || this.operator === TransactionExplorerConditionOperatorType.IsNotEmpty) {
+            return [];
+        }
+
+        return [];
+    }
+
+    public match(transaction: TransactionInsightDataItem): boolean {
+        if (this.operator === TransactionExplorerConditionOperatorType.IsEmpty) {
+            return !transaction.geoLocation;
+        } else if (this.operator === TransactionExplorerConditionOperatorType.IsNotEmpty) {
+            return !!transaction.geoLocation;
+        }
+
+        return false;
+    }
+
+    public toExpression(): string {
+        if (this.operator === TransactionExplorerConditionOperatorType.IsEmpty) {
+            return `geo_location IS EMPTY`;
+        } else if (this.operator === TransactionExplorerConditionOperatorType.IsNotEmpty) {
+            return `geo_location IS NOT EMPTY`;
+        }
+
+        return '';
+    }
+}
+
 type TransactionTagConditionOperator = TransactionExplorerConditionOperatorType.IsEmpty |
     TransactionExplorerConditionOperatorType.IsNotEmpty |
     TransactionExplorerConditionOperatorType.Equals |
@@ -822,6 +891,53 @@ export class TransactionExplorerTransactionTagCondition implements TransactionEx
         } else {
             return '';
         }
+    }
+}
+
+type PicturesConditionOperator = TransactionExplorerConditionOperatorType.IsEmpty |
+    TransactionExplorerConditionOperatorType.IsNotEmpty;
+
+export class TransactionExplorerPicturesCondition implements TransactionExplorerCondition<TransactionExplorerConditionFieldType.Pictures, string[]> {
+    public static readonly supportedOperators: PartialRecord<TransactionExplorerConditionOperatorType, true> = {
+        [TransactionExplorerConditionOperatorType.IsEmpty]: true,
+        [TransactionExplorerConditionOperatorType.IsNotEmpty]: true
+    };
+
+    public readonly field = TransactionExplorerConditionFieldType.Pictures;
+    public readonly operator: PicturesConditionOperator = TransactionExplorerConditionOperatorType.IsNotEmpty;
+    public value: string[];
+
+    constructor(operator: PicturesConditionOperator, value: string[]) {
+        this.operator = operator;
+        this.value = value;
+    }
+
+    public getValueForStore(): string[] {
+        if (this.operator === TransactionExplorerConditionOperatorType.IsEmpty || this.operator === TransactionExplorerConditionOperatorType.IsNotEmpty) {
+            return [];
+        }
+
+        return [];
+    }
+
+    public match(transaction: TransactionInsightDataItem): boolean {
+        if (this.operator === TransactionExplorerConditionOperatorType.IsEmpty) {
+            return !transaction.pictures || transaction.pictures.length < 1;
+        } else if (this.operator === TransactionExplorerConditionOperatorType.IsNotEmpty) {
+            return !!transaction.pictures && transaction.pictures.length > 0;
+        }
+
+        return false;
+    }
+
+    public toExpression(): string {
+        if (this.operator === TransactionExplorerConditionOperatorType.IsEmpty) {
+            return `pictures IS EMPTY`;
+        } else if (this.operator === TransactionExplorerConditionOperatorType.IsNotEmpty) {
+            return `pictures IS NOT EMPTY`;
+        }
+
+        return '';
     }
 }
 

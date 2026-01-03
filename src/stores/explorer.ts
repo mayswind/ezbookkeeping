@@ -857,7 +857,8 @@ export const useExplorersStore = defineStore('explorers', () => {
         return new Promise((resolve, reject) => {
             services.getAllTransactions({
                 startTime: transactionExplorerFilter.value.startTime,
-                endTime: transactionExplorerFilter.value.endTime
+                endTime: transactionExplorerFilter.value.endTime,
+                withPictures: true
             }).then(response => {
                 const data = response.data;
 

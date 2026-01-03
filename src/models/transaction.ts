@@ -600,6 +600,7 @@ export interface TransactionListInMonthByPageRequest {
 export interface TransactionAllListRequest {
     readonly startTime: number;
     readonly endTime: number;
+    readonly withPictures?: boolean;
 }
 
 export interface TransactionReconciliationStatementRequest {

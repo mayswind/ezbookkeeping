@@ -59,6 +59,18 @@
                         :model-value="currentValueMetric"
                         @update:model-value="updateValueMetric($event as TransactionExplorerValueMetricType)"
                     />
+                    <v-select
+                        class="flex-0-0"
+                        min-width="150"
+                        item-title="displayName"
+                        item-value="type"
+                        density="compact"
+                        :disabled="loading"
+                        :label="tt('Sort Order')"
+                        :items="allTransactionExplorerChartSortingTypes"
+                        :model-value="currentChartSortingType"
+                        @update:model-value="updateChartSortingType($event)"
+                    />
                     <v-spacer class="flex-1-1"/>
                 </div>
             </v-col>
@@ -85,9 +97,9 @@
             :enable-click-item="true"
             :amount-value="explorersStore.transactionExplorerFilter.valueMetric !== TransactionExplorerValueMetric.TransactionCount.value"
             :default-currency="defaultCurrency"
-            id-field="categoryId"
-            name-field="categoryDisplayName"
-            value-field="value"
+            id-field="id"
+            name-field="name"
+            value-field="totalAmount"
             v-else-if="!loading"
             @click="onClickPieChartItem"
         />
@@ -114,8 +126,8 @@
             :show-percent="true"
             :amount-value="explorersStore.transactionExplorerFilter.valueMetric !== TransactionExplorerValueMetric.TransactionCount.value"
             :default-currency="defaultCurrency"
-            name-field="categoryDisplayName"
-            value-field="value"
+            name-field="name"
+            value-field="totalAmount"
             v-else-if="!loading"
         />
     </v-card-text>
@@ -135,7 +147,7 @@ import {
     useExplorersStore
 } from '@/stores/explorer.ts';
 
-import { type NameValue } from '@/core/base.ts';
+import { type NameValue, type TypeAndDisplayName } from '@/core/base.ts';
 import { Month, WeekDay } from '@/core/datetime.ts';
 import {
     TransactionExplorerChartTypeValue,
@@ -146,23 +158,22 @@ import {
     TransactionExplorerValueMetric
 } from '@/core/explorer.ts';
 
-import {
-    isDefined
-} from '@/lib/common.ts';
+import { type SortableTransactionStatisticDataItem } from '@/models/transaction.ts';
 
-import {
-    parseDateTimeFromString
-} from '@/lib/datetime.ts';
+import { isDefined } from '@/lib/common.ts';
+import { parseDateTimeFromString } from '@/lib/datetime.ts';
+import { sortStatisticsItems } from '@/lib/statistics.ts';
 
 interface InsightsExplorerDataTableTabProps {
     loading?: boolean;
 }
 
-interface CategoryDimensionData {
-    categoryDisplayName: string;
-    categoryId: string;
-    categoryIdType: TransactionExplorerDimensionType;
-    value: number;
+interface CategoryDimensionData extends SortableTransactionStatisticDataItem {
+    id: string;
+    dimension: TransactionExplorerDimensionType;
+    name: string;
+    displayOrders: number[];
+    totalAmount: number;
 }
 
 defineProps<InsightsExplorerDataTableTabProps>();
@@ -171,6 +182,7 @@ const router = useRouter();
 
 const {
     tt,
+    getAllStatisticsSortingTypes,
     getAllTransactionExplorerDataDimensions,
     getAllTransactionExplorerValueMetrics,
     getAllTransactionExplorerChartTypes,
@@ -196,11 +208,13 @@ const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurre
 const allTransactionExplorerDataDimensions = computed<NameValue[]>(() => getAllTransactionExplorerDataDimensions());
 const allTransactionExplorerValueMetrics = computed<NameValue[]>(() => getAllTransactionExplorerValueMetrics());
 const allTransactionExplorerChartTypes = computed<NameValue[]>(() => getAllTransactionExplorerChartTypes());
+const allTransactionExplorerChartSortingTypes = computed<TypeAndDisplayName[]>(() => getAllStatisticsSortingTypes());
 
 const currentCategoryDimension = computed<TransactionExplorerDataDimensionType>(() => explorersStore.transactionExplorerFilter.categoryDimension);
 const currentSeriesDimension = computed<TransactionExplorerDataDimensionType>(() => explorersStore.transactionExplorerFilter.seriesDimension);
 const currentValueMetric = computed<TransactionExplorerValueMetricType>(() => explorersStore.transactionExplorerFilter.valueMetric);
 const currentChartType = computed<TransactionExplorerChartTypeValue>(() => explorersStore.transactionExplorerFilter.chartType);
+const currentChartSortingType = computed<number>(() => explorersStore.transactionExplorerFilter.chartSortingType);
 
 const categoryDimensionTransactionExplorerData = computed<CategoryDimensionData[]>(() => {
     if (currentChartType.value !== TransactionExplorerChartType.Pie.value && currentChartType.value !== TransactionExplorerChartType.Radar.value) {
@@ -223,12 +237,15 @@ const categoryDimensionTransactionExplorerData = computed<CategoryDimensionData[
         const displayName = getCategoriedDataDisplayName(categoriedData);
 
         result.push({
-            categoryDisplayName: displayName,
-            categoryId: categoriedData.categoryId,
-            categoryIdType: categoriedData.categoryIdType,
-            value: data.value
+            id: categoriedData.categoryId,
+            dimension: categoriedData.categoryIdType,
+            name: displayName,
+            displayOrders: categoriedData.categoryDisplayOrders,
+            totalAmount: data.value
         });
     }
+
+    sortStatisticsItems(result, explorersStore.transactionExplorerFilter.chartSortingType);
 
     return result;
 });
@@ -306,6 +323,12 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesedInfo): stri
     return displayName;
 }
 
+function updateChartType(chartType: TransactionExplorerChartTypeValue): void {
+    explorersStore.updateTransactionExplorerFilter({
+        chartType: chartType,
+    });
+}
+
 function updateCategoryDimension(categoryDimension: TransactionExplorerDataDimensionType): void {
     explorersStore.updateTransactionExplorerFilter({
         categoryDimension: categoryDimension,
@@ -324,19 +347,19 @@ function updateValueMetric(valueMetric: TransactionExplorerValueMetricType): voi
     });
 }
 
-function updateChartType(chartType: TransactionExplorerChartTypeValue): void {
+function updateChartSortingType(sortingType: number): void {
     explorersStore.updateTransactionExplorerFilter({
-        chartType: chartType,
+        chartSortingType: sortingType,
     });
 }
 
 function onClickPieChartItem(item: Record<string, unknown>): void {
-    if (!item || !('categoryId' in item) || !('categoryIdType' in item)) {
+    if (!item || !('id' in item) || !('dimension' in item)) {
         return;
     }
 
     const data = (item as unknown) as CategoryDimensionData;
-    const params: string = explorersStore.getTransactionListPageParams(data.categoryIdType, data.categoryId);
+    const params: string = explorersStore.getTransactionListPageParams(data.dimension, data.id);
 
     if (params) {
         router.push(`/transaction/list?${params}`);
@@ -353,8 +376,8 @@ function buildExportResults(): { headers: string[], data: string[][] } | undefin
                 tt(valueMetric?.name ?? 'Unknown')
             ],
             data: categoryDimensionTransactionExplorerData.value.map(data => [
-                data.categoryDisplayName,
-                valueMetric?.isAmount ? formatAmountToWesternArabicNumeralsWithoutDigitGrouping(data.value) : data.value.toString(10)
+                data.name,
+                valueMetric?.isAmount ? formatAmountToWesternArabicNumeralsWithoutDigitGrouping(data.totalAmount) : data.totalAmount.toString(10)
             ])
         };
     } else {

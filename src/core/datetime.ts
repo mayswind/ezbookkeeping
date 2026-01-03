@@ -291,6 +291,10 @@ export class WeekDay implements TypeAndName {
         WeekDay.allInstancesByName[name] = this;
     }
 
+    public getDisplayOrder(firstDayOfWeek: WeekDayValue): number {
+        return (this.type - firstDayOfWeek + 7) % 7;
+    }
+
     public static values(): WeekDay[] {
         return WeekDay.allInstances;
     }

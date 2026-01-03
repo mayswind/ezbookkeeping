@@ -252,6 +252,12 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('insightsExplorerDefaultDateRangeType', value);
     }
 
+    function setShowTagInInsightsExplorerPage(value: boolean): void {
+        updateApplicationSettingsValue('showTagInInsightsExplorerPage', value);
+        appSettings.value.showTagInInsightsExplorerPage = value;
+        updateUserApplicationCloudSettingValue('showTagInInsightsExplorerPage', value);
+    }
+
     // Account List Page
     function setTotalAmountExcludeAccountIds(value: Record<string, boolean>): void {
         updateApplicationSettingsValue('totalAmountExcludeAccountIds', value);
@@ -476,6 +482,7 @@ export const useSettingsStore = defineStore('settings', () => {
         setAlwaysShowTransactionPicturesInMobileTransactionEditPage,
         // -- Insights Explorer Page
         setInsightsExplorerDefaultDateRangeType,
+        setShowTagInInsightsExplorerPage,
         // -- Account List Page
         setTotalAmountExcludeAccountIds,
         // -- Exchange Rates Data Page

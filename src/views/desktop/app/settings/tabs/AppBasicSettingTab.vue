@@ -240,6 +240,17 @@
                                     v-model="insightsExplorerDefaultDateRangeType"
                                 />
                             </v-col>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="value"
+                                    persistent-placeholder
+                                    :label="tt('Show Transaction Tag')"
+                                    :placeholder="tt('Show Transaction Tag')"
+                                    :items="enableDisableOptions"
+                                    v-model="showTagInInsightsExplorerPage"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-form>
@@ -403,6 +414,11 @@ const showAddTransactionButtonInDesktopNavbar = computed<boolean>({
 const insightsExplorerDefaultDateRangeType = computed<number>({
     get: () => settingsStore.appSettings.insightsExplorerDefaultDateRangeType,
     set: (value) => settingsStore.setInsightsExplorerDefaultDateRangeType(value)
+});
+
+const showTagInInsightsExplorerPage = computed<boolean>({
+    get: () => settingsStore.appSettings.showTagInInsightsExplorerPage,
+    set: (value) => settingsStore.setShowTagInInsightsExplorerPage(value)
 });
 
 function init(): void {

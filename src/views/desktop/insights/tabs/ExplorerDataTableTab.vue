@@ -49,6 +49,17 @@
                 <span v-if="item.type === TransactionType.Transfer && item.destinationAccount">{{ item.destinationAccount?.name }}</span>
             </div>
         </template>
+        <template #item.tags="{ item }">
+            <div class="d-flex">
+                <v-chip class="transaction-tag" size="small"
+                        :key="tag.id" :prepend-icon="mdiPound"
+                        :text="tag.name"
+                        v-for="tag in item.tags"/>
+                <v-chip class="transaction-tag" size="small"
+                        :text="tt('None')"
+                        v-if="!item.tagIds || !item.tagIds.length"/>
+            </div>
+        </template>
         <template #no-data>
             <div v-if="loading && (!filteredTransactions || filteredTransactions.length < 1)">
                 <div class="ms-1" style="padding-top: 3px; padding-bottom: 3px" :key="itemIdx" v-for="itemIdx in skeletonData">
@@ -77,6 +88,7 @@ import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useExplorersStore } from '@/stores/explorer.ts';
 
@@ -87,6 +99,8 @@ import {
     type TransactionInsightDataItem
 } from '@/models/transaction.ts';
 
+import { replaceAll } from '@/lib/common.ts';
+
 import {
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffsetMinutes,
@@ -95,7 +109,8 @@ import {
 
 import {
     mdiArrowRight,
-    mdiPencilBoxOutline
+    mdiPencilBoxOutline,
+    mdiPound
 } from '@mdi/js';
 
 interface InsightsExplorerDataTableTabProps {
@@ -117,6 +132,7 @@ const {
     formatAmountToLocalizedNumeralsWithCurrency
 } = useI18n();
 
+const settingsStore = useSettingsStore();
 const userStore = useUserStore();
 const explorersStore = useExplorersStore();
 
@@ -159,6 +175,11 @@ const dataTableHeaders = computed<object[]>(() => {
     headers.push({ key: 'secondaryCategoryName', value: 'secondaryCategoryName', title: tt('Category'), sortable: true, nowrap: true });
     headers.push({ key: 'sourceAmount', value: 'sourceAmount', title: tt('Amount'), sortable: true, nowrap: true });
     headers.push({ key: 'sourceAccountName', value: 'sourceAccountName', title: tt('Account'), sortable: true, nowrap: true });
+
+    if (settingsStore.appSettings.showTagInInsightsExplorerPage) {
+        headers.push({ key: 'tags', value: 'tags', title: tt('Tags'), sortable: true, nowrap: true });
+    }
+
     headers.push({ key: 'comment', value: 'comment', title: tt('Description'), sortable: true, nowrap: true });
     return headers;
 });
@@ -236,15 +257,24 @@ function buildExportResults(): { headers: string[], data: string[][] } | undefin
         return undefined;
     }
 
+    const includeTags = settingsStore.appSettings.showTagInInsightsExplorerPage;
+
+    const headers = [
+        tt('Transaction Time'),
+        tt('Type'),
+        tt('Category'),
+        tt('Amount'),
+        tt('Account')
+    ];
+
+    if (includeTags) {
+        headers.push(tt('Tags'));
+    }
+
+    headers.push(tt('Description'));
+
     return {
-        headers: [
-            tt('Transaction Time'),
-            tt('Type'),
-            tt('Category'),
-            tt('Amount'),
-            tt('Account'),
-            tt('Description')
-        ],
+        headers: headers,
         data: filteredTransactions.value
             .map(transaction => {
                 const transactionTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transaction.utcOffset);
@@ -266,14 +296,22 @@ function buildExportResults(): { headers: string[], data: string[][] } | undefin
 
                 const description = transaction.comment || '';
 
-                return [
+                const data = [
                     formatDateTimeToGregorianDefaultDateTime(transactionTime),
                     type,
                     categoryName,
                     displayAmount,
-                    displayAccountName,
-                    description
+                    displayAccountName
                 ];
+
+                if (includeTags) {
+                    const tags = transaction.tags && transaction.tags.length ? transaction.tags.map(tag => replaceAll(tag.name, ';', ' ')).join(';') : tt('None');
+                    data.push(tags);
+                }
+
+                data.push(description);
+
+                return data;
             }
         )
     };
@@ -300,5 +338,18 @@ defineExpose({
 
 .v-table.insights-explorer-table.loading-skeleton tr.v-data-table-rows-no-data > td {
     padding: 0;
+}
+
+.v-table.insights-explorer-table .v-chip.transaction-tag {
+    margin-inline-end: 4px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.v-table.insights-explorer-table .v-chip.transaction-tag > .v-chip__content {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>

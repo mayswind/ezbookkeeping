@@ -55,7 +55,7 @@ func TestExchangeRatesApiLatestExchangeRateHandler_CzechNationalBankDataSource(t
 	assert.Equal(t, "CZK", exchangeRateResponse.BaseCurrency)
 
 	supportedCurrencyCodes := []string{"AED", "AFN", "ALL", "AMD", "AOA", "ARS", "AUD", "AWG", "AZN",
-		"BAM", "BBD", "BDT", "BGN", "BHD", "BIF", "BMD", "BND", "BOB", "BRL", "BSD", "BTN", "BWP", "BYN", "BZD",
+		"BAM", "BBD", "BDT", "BHD", "BIF", "BMD", "BND", "BOB", "BRL", "BSD", "BTN", "BWP", "BYN", "BZD",
 		"CAD", "CDF", "CHF", "CLP", "CNY", "COP", "CRC", "CUP", "CVE", "DJF", "DKK", "DOP", "DZD",
 		"EGP", "ERN", "ETB", "EUR", "FJD", "FKP", "GBP", "GEL", "GHS", "GIP", "GMD", "GNF", "GTQ", "GYD",
 		"HKD", "HNL", "HTG", "HUF", "IDR", "ILS", "INR", "IQD", "IRR", "ISK", "JMD", "JOD", "JPY",
@@ -79,7 +79,7 @@ func TestExchangeRatesApiLatestExchangeRateHandler_DanmarksNationalbankDataSourc
 
 	assert.Equal(t, "DKK", exchangeRateResponse.BaseCurrency)
 
-	supportedCurrencyCodes := []string{"AUD", "BGN", "BRL", "CAD", "CHF", "CNY", "CZK", "EUR", "GBP", "HKD", "HUF",
+	supportedCurrencyCodes := []string{"AUD", "BRL", "CAD", "CHF", "CNY", "CZK", "EUR", "GBP", "HKD", "HUF",
 		"IDR", "ILS", "INR", "ISK", "JPY", "KRW", "MXN", "MYR", "NOK", "NZD", "PHP", "PLN", "RON", "SEK", "SGD",
 		"THB", "TRY", "USD", "ZAR"}
 
@@ -95,7 +95,7 @@ func TestExchangeRatesApiLatestExchangeRateHandler_EuroCentralBankDataSource(t *
 
 	assert.Equal(t, "EUR", exchangeRateResponse.BaseCurrency)
 
-	supportedCurrencyCodes := []string{"AUD", "BGN", "BRL", "CAD", "CHF", "CNY", "CZK", "DKK", "GBP", "HKD", "HUF",
+	supportedCurrencyCodes := []string{"AUD", "BRL", "CAD", "CHF", "CNY", "CZK", "DKK", "GBP", "HKD", "HUF",
 		"IDR", "ILS", "INR", "ISK", "JPY", "KRW", "MXN", "MYR", "NOK", "NZD", "PHP", "PLN", "RON", "SEK", "SGD",
 		"THB", "TRY", "USD", "ZAR"}
 
@@ -192,7 +192,7 @@ func TestExchangeRatesApiLatestExchangeRateHandler_NationalBankOfPolandDataSourc
 	assert.Equal(t, "PLN", exchangeRateResponse.BaseCurrency)
 
 	supportedCurrencyCodes := []string{"AED", "AFN", "ALL", "AMD", "AOA", "ARS", "AUD", "AWG", "AZN",
-		"BAM", "BBD", "BDT", "BGN", "BHD", "BIF", "BND", "BOB", "BRL", "BSD", "BWP", "BYN", "BZD",
+		"BAM", "BBD", "BDT", "BHD", "BIF", "BND", "BOB", "BRL", "BSD", "BWP", "BYN", "BZD",
 		"CAD", "CDF", "CHF", "CLP", "CNY", "COP", "CRC", "CUP", "CVE", "CZK",
 		"DJF", "DKK", "DOP", "DZD", "EGP", "ERN", "ETB", "EUR", "FJD",
 		"GBP", "GEL", "GHS", "GIP", "GMD", "GNF", "GTQ", "GYD",

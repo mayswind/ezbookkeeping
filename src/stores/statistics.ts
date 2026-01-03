@@ -772,7 +772,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
             // fill in missing days with last known balance
             for (let i = 1; i <= missingDays; i++) {
                 const missingStatisticResponseItems: TransactionStatisticResponseItem[] = [];
-                const dateTime: DateTime = lastAssetTrendItemDate.getDateTimeAfterDays(i);
+                const dateTime: DateTime = lastAssetTrendItemDate.add(i, 'days');
 
                 for (const item of values(lastAssetTrendItemMap)) {
                     const statisticResponseItem: TransactionStatisticResponseItem = {

@@ -44,6 +44,14 @@
                                              :title="dateAggregationType.displayName"
                                              @click="chartDataDateAggregationType = dateAggregationType.type"
                                              v-for="dateAggregationType in allDateAggregationTypes"></v-list-item>
+                                <v-divider class="my-2"/>
+                                <v-list-subheader :title="tt('Timezone Used for Date Range')"/>
+                                <v-list-item :key="timezoneType.type" :value="timezoneType.type"
+                                             :prepend-icon="timezoneTypeIconMap[timezoneType.type]"
+                                             :append-icon="timezoneUsedForDateRange === timezoneType.type ? mdiCheck : undefined"
+                                             :title="timezoneType.displayName"
+                                             v-for="timezoneType in allTimezoneTypesUsedForDateRange"
+                                             @click="timezoneUsedForDateRange = timezoneType.type"></v-list-item>
                             </v-list>
                         </v-menu>
                     </v-btn>
@@ -227,6 +235,7 @@
                     <account-balance-trends-chart
                         :type="chartType"
                         :date-aggregation-type="chartDataDateAggregationType"
+                        :timezone-used-for-date-range="timezoneUsedForDateRange"
                         :fiscal-year-start="fiscalYearStart"
                         :items="[]"
                         :legend-name="isCurrentLiabilityAccount ? tt('Account Outstanding Balance') : tt('Account Balance')"
@@ -238,6 +247,7 @@
                     <account-balance-trends-chart
                         :type="chartType"
                         :date-aggregation-type="chartDataDateAggregationType"
+                        :timezone-used-for-date-range="timezoneUsedForDateRange"
                         :fiscal-year-start="fiscalYearStart"
                         :items="reconciliationStatements?.transactions"
                         :legend-name="isCurrentLiabilityAccount ? tt('Account Outstanding Balance') : tt('Account Balance')"
@@ -280,6 +290,7 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 
 import type { NameNumeralValue } from '@/core/base.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
+import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { AccountBalanceTrendChartType, ChartDateAggregationType } from '@/core/statistics.ts';
 import { KnownFileType } from '@/core/file.ts';
@@ -300,6 +311,8 @@ import {
     mdiChartWaterfall,
     mdiCalendarTodayOutline,
     mdiCalendarMonthOutline,
+    mdiHomeClockOutline,
+    mdiInvoiceTextClockOutline,
     mdiLayersTripleOutline,
     mdiInvoiceTextPlusOutline,
     mdiInvoiceTextEditOutline,
@@ -323,9 +336,12 @@ const {
     startTime,
     endTime,
     reconciliationStatements,
+    chartDataDateAggregationType,
+    timezoneUsedForDateRange,
     fiscalYearStart,
     allChartTypes,
     allDateAggregationTypes,
+    allTimezoneTypesUsedForDateRange,
     currentAccount,
     currentAccountCurrency,
     isCurrentLiabilityAccount,
@@ -366,6 +382,11 @@ const chartDataDateAggregationTypeIconMap = {
     [ChartDateAggregationType.FiscalYear.type]: mdiLayersTripleOutline,
 };
 
+const timezoneTypeIconMap = {
+    [TimezoneTypeForStatistics.ApplicationTimezone.type]: mdiHomeClockOutline,
+    [TimezoneTypeForStatistics.TransactionTimezone.type]: mdiInvoiceTextClockOutline
+};
+
 const amountInputDialog = useTemplateRef<AmountInputDialogType>('amountInputDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
@@ -376,7 +397,6 @@ const currentPage = ref<number>(1);
 const countPerPage = ref<number>(10);
 const showAccountBalanceTrendsCharts = ref<boolean>(false);
 const chartType = ref<number>(AccountBalanceTrendChartType.Default.type);
-const chartDataDateAggregationType = ref<number>(ChartDateAggregationType.Day.type);
 
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
@@ -462,6 +482,7 @@ function open(options: { accountId: string, startTime: number, endTime: number }
     showAccountBalanceTrendsCharts.value = false;
     chartType.value = AccountBalanceTrendChartType.Default.type;
     chartDataDateAggregationType.value = ChartDateAggregationType.Day.type;
+    timezoneUsedForDateRange.value = TimezoneTypeForStatistics.ApplicationTimezone.type;
     showState.value = true;
     loading.value = true;
 

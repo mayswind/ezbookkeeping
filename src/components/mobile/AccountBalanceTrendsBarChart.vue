@@ -20,7 +20,7 @@
     </f7-list>
 
     <f7-list class="margin-top-half" media-list virtual-list :virtual-list-params="{ items: allVirtualListItems, renderExternal, height: 'auto' }"
-             :key="`account-balance-trends-${dateAggregationType}`"
+             :key="`account-balance-trends-${dateAggregationType}-${timezoneUsedForDateRange}`"
              v-else-if="!loading && allVirtualListItems && allVirtualListItems.length > 0">
         <ul>
             <f7-list-item class="account-balance-trends-list-item"

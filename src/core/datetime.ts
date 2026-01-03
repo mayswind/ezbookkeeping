@@ -2,6 +2,18 @@ import type { TypeAndName, TypeAndDisplayName } from '@/core/base.ts';
 import type { CalendarType, ChineseCalendarLocaleData, PersianCalendarLocaleData } from '@/core/calendar.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
 
+export type DateTimeUnit = 'years' | 'months' | 'days' | 'hours' | 'minutes' | 'seconds';
+
+export interface DateTimeSetObject {
+    year?: number;
+    month?: number;
+    dayOfMonth?: number;
+    hour?: number;
+    minute?: number;
+    second?: number;
+    millisecond?: number;
+}
+
 export interface DateTime {
     getUnixTime(): number;
     getLocalizedCalendarYear(options: DateTimeFormatOptions): string;
@@ -28,7 +40,11 @@ export interface DateTime {
     getSecond(): number;
     getDisplayAMPM(options: DateTimeFormatOptions): string;
     getTimezoneUtcOffsetMinutes(): number;
-    getDateTimeAfterDays(day: number): DateTime;
+    setTimezoneByUtcOffsetMinutes(offsetMinutes: number): DateTime;
+    setTimezoneByIANATimeZoneName(zoneName: string): DateTime;
+    add(amount: number, unit: DateTimeUnit): DateTime;
+    subtract(amount: number, unit: DateTimeUnit): DateTime;
+    set(value: DateTimeSetObject): DateTime;
     toGregorianCalendarYearMonthDay(): YearMonthDay;
     toGregorianCalendarYear0BasedMonth(): Year0BasedMonth;
     format(format: string, options: DateTimeFormatOptions): string;

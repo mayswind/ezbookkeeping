@@ -108,8 +108,9 @@
                                 </v-window-item>
                                 <v-window-item value="table">
                                     <explorer-data-table-tab ref="explorerDataTableTab"
-                                                            :loading="loading"
-                                                            v-model:count-per-page="countPerPage" />
+                                                             :loading="loading"
+                                                             v-model:count-per-page="countPerPage"
+                                                             @click:transaction="onShowTransaction" />
                                 </v-window-item>
                                 <v-window-item value="chart">
                                     <explorer-chart-tab ref="explorerChartTab"
@@ -130,6 +131,7 @@
                                  @dateRange:change="setCustomDateFilter"
                                  @error="onShowDateRangeError" />
 
+    <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
     <export-dialog ref="exportDialog" />
 
     <snack-bar ref="snackbar" />
@@ -139,6 +141,7 @@
 import ExplorerQueryTab from '@/views/desktop/insights/tabs/ExplorerQueryTab.vue';
 import ExplorerDataTableTab from '@/views/desktop/insights/tabs/ExplorerDataTableTab.vue';
 import ExplorerChartTab from '@/views/desktop/insights/tabs/ExplorerChartTab.vue';
+import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
 import ExportDialog from '@/views/desktop/statistics/transaction/dialogs/ExportDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
@@ -147,6 +150,7 @@ import { useRouter, onBeforeRouteUpdate } from 'vue-router';
 import { useDisplay } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
+import { TransactionEditPageType } from '@/views/base/transactions/TransactionEditPageBase.ts';
 
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
@@ -160,7 +164,8 @@ import { type WeekDayValue, type LocalizedDateRange, DateRangeScene, DateRange }
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 
 import {
-    type TransactionInsightDataItem
+    type TransactionInsightDataItem,
+    Transaction
 } from '@/models/transaction.ts';
 
 import {
@@ -196,6 +201,7 @@ type ExplorerPageTabType = 'query' | 'table' | 'chart';
 type SnackBarType = InstanceType<typeof SnackBar>;
 type ExplorerDataTableTabType = InstanceType<typeof ExplorerDataTableTab>;
 type ExplorerChartTabType = InstanceType<typeof ExplorerChartTab>;
+type EditDialogType = InstanceType<typeof EditDialog>;
 type ExportDialogType = InstanceType<typeof ExportDialog>;
 
 const router = useRouter();
@@ -225,6 +231,7 @@ const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const explorerDataTableTab = useTemplateRef<ExplorerDataTableTabType>('explorerDataTableTab');
 const explorerChartTab = useTemplateRef<ExplorerChartTabType>('explorerChartTab');
 const exportDialog = useTemplateRef<ExportDialogType>('exportDialog');
+const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
 const loading = ref<boolean>(true);
 const initing = ref<boolean>(true);
@@ -446,6 +453,23 @@ function shiftDateRange(scale: number): void {
         explorersStore.updateTransactionExplorerInvalidState(true);
         router.push(getFilterLinkUrl());
     }
+}
+
+function onShowTransaction(transaction: TransactionInsightDataItem): void {
+    editDialog.value?.open({
+        id: transaction.id,
+        currentTransaction: Transaction.of(transaction)
+    }).then(result => {
+        if (result && result.message) {
+            snackbar.value?.showMessage(result.message);
+        }
+
+        reload(false);
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
 }
 
 function onShowDateRangeError(message: string): void {

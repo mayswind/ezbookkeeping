@@ -7,6 +7,7 @@ import { useAccountsStore } from './account.ts';
 import { useTransactionCategoriesStore } from './transactionCategory.ts';
 import { useOverviewStore } from './overview.ts';
 import { useStatisticsStore } from './statistics.ts';
+import { useExplorersStore } from '@/stores/explorer.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { type BeforeResolveFunction, itemAndIndex, entries, keys } from '@/core/base.ts';
@@ -108,6 +109,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
     const transactionCategoriesStore = useTransactionCategoriesStore();
     const overviewStore = useOverviewStore();
     const statisticsStore = useStatisticsStore();
+    const explorersStore = useExplorersStore();
     const exchangeRatesStore = useExchangeRatesStore();
 
     const transactionDraft = ref<TransactionDraft | null>(getUserTransactionDraft());
@@ -1078,6 +1080,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     statisticsStore.updateTransactionStatisticsInvalidState(true);
                 }
 
+                if (!explorersStore.transactionExplorerStateInvalid) {
+                    explorersStore.updateTransactionExplorerInvalidState(true);
+                }
+
                 resolve(transaction);
             }).catch(error => {
                 logger.error('failed to save transaction', error);
@@ -1125,6 +1131,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
                 if (!statisticsStore.transactionStatisticsStateInvalid) {
                     statisticsStore.updateTransactionStatisticsInvalidState(true);
+                }
+
+                if (!explorersStore.transactionExplorerStateInvalid) {
+                    explorersStore.updateTransactionExplorerInvalidState(true);
                 }
 
                 resolve(data.result);
@@ -1182,6 +1192,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
                 if (!statisticsStore.transactionStatisticsStateInvalid) {
                     statisticsStore.updateTransactionStatisticsInvalidState(true);
+                }
+
+                if (!explorersStore.transactionExplorerStateInvalid) {
+                    explorersStore.updateTransactionExplorerInvalidState(true);
                 }
 
                 resolve(data.result);

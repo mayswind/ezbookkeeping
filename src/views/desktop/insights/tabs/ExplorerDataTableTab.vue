@@ -60,6 +60,12 @@
                         v-if="!item.tagIds || !item.tagIds.length"/>
             </div>
         </template>
+        <template #item.operation="{ item }">
+            <v-btn density="compact" variant="text" color="default" :disabled="loading"
+                   @click="showTransaction(item)">
+                {{ tt('View') }}
+            </v-btn>
+        </template>
         <template #no-data>
             <div v-if="loading && (!filteredTransactions || filteredTransactions.length < 1)">
                 <div class="ms-1" style="padding-top: 3px; padding-bottom: 3px" :key="itemIdx" v-for="itemIdx in skeletonData">
@@ -120,6 +126,7 @@ interface InsightsExplorerDataTableTabProps {
 
 const props = defineProps<InsightsExplorerDataTableTabProps>();
 const emit = defineEmits<{
+    (e: 'click:transaction', value: TransactionInsightDataItem): void;
     (e: 'update:countPerPage', value: number): void;
 }>();
 
@@ -181,6 +188,7 @@ const dataTableHeaders = computed<object[]>(() => {
     }
 
     headers.push({ key: 'comment', value: 'comment', title: tt('Description'), sortable: true, nowrap: true });
+    headers.push({ key: 'operation', title: tt('Operation'), sortable: false, nowrap: true, align: 'center' });
     return headers;
 });
 
@@ -250,6 +258,10 @@ function getDisplayDestinationAmount(transaction: TransactionInsightDataItem): s
     }
 
     return formatAmountToLocalizedNumeralsWithCurrency(transaction.destinationAmount, currency);
+}
+
+function showTransaction(transaction: TransactionInsightDataItem): void {
+    emit('click:transaction', transaction);
 }
 
 function buildExportResults(): { headers: string[], data: string[][] } | undefined {
@@ -324,14 +336,14 @@ defineExpose({
 
 <style>
 .v-table.insights-explorer-table > .v-table__wrapper > table {
-    th:not(:last-child),
-    td:not(:last-child) {
+    th:not(:nth-last-child(2)),
+    td:not(:nth-last-child(2)) {
         width: auto !important;
         white-space: nowrap;
     }
 
-    th:last-child,
-    td:last-child {
+    th:nth-last-child(2),
+    td:nth-last-child(2) {
         width: 100% !important;
     }
 }

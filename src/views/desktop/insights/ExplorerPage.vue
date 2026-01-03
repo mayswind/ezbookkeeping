@@ -77,15 +77,25 @@
                                     </v-btn>
                                     <v-spacer/>
                                     <v-btn density="comfortable" color="default" variant="text" class="ms-2"
-                                           :disabled="loading" :icon="true"
-                                           v-if="activeTab === 'table' || activeTab === 'chart'">
+                                           :disabled="loading" :icon="true">
                                         <v-icon :icon="mdiDotsVertical" />
                                         <v-menu activator="parent">
                                             <v-list>
+                                                <v-list-subheader :title="tt('Timezone Used for Date Range')"
+                                                                  v-if="activeTab === 'query'"/>
+                                                <template v-if="activeTab === 'query'">
+                                                    <v-list-item :key="timezoneType.type" :value="timezoneType.type"
+                                                                 :prepend-icon="timezoneTypeIconMap[timezoneType.type]"
+                                                                 :append-icon="(query.timezoneUsedForDateRange === timezoneType.type ? mdiCheck : undefined)"
+                                                                 :title="timezoneType.displayName"
+                                                                 v-for="timezoneType in allTimezoneTypesUsedForDateRange"
+                                                                 @click="updateTimezoneUsedForDateRange(timezoneType.type)"></v-list-item>
+                                                </template>
                                                 <v-list-item :prepend-icon="mdiExport"
                                                              :title="tt('Export Results')"
                                                              :disabled="loading || !filteredTransactions || filteredTransactions.length < 1"
-                                                             @click="exportResults"></v-list-item>
+                                                             @click="exportResults"
+                                                             v-if="activeTab === 'table' || activeTab === 'chart'"></v-list-item>
                                             </v-list>
                                         </v-menu>
                                     </v-btn>
@@ -144,9 +154,10 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { type TransactionExplorerPartialFilter, type TransactionExplorerFilter, useExplorersStore } from '@/stores/explorer.ts';
 
-import type { NameNumeralValue } from '@/core/base.ts';
+import type { NameNumeralValue, TypeAndDisplayName } from '@/core/base.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
 import { type WeekDayValue, type LocalizedDateRange, DateRangeScene, DateRange } from '@/core/datetime.ts';
+import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 
 import {
     type TransactionInsightDataItem
@@ -166,6 +177,8 @@ import {
     mdiCheck,
     mdiRefresh,
     mdiDotsVertical,
+    mdiHomeClockOutline,
+    mdiInvoiceTextClockOutline,
     mdiExport
 } from '@mdi/js';
 
@@ -191,6 +204,7 @@ const display = useDisplay();
 const {
     tt,
     getAllDateRanges,
+    getAllTimezoneTypesUsedForStatistics,
     getCurrentNumeralSystemType,
     formatDateTimeToLongDateTime,
     formatDateRange
@@ -201,6 +215,11 @@ const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
 const explorersStore = useExplorersStore();
+
+const timezoneTypeIconMap = {
+    [TimezoneTypeForStatistics.ApplicationTimezone.type]: mdiHomeClockOutline,
+    [TimezoneTypeForStatistics.TransactionTimezone.type]: mdiInvoiceTextClockOutline
+};
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const explorerDataTableTab = useTemplateRef<ExplorerDataTableTabType>('explorerDataTableTab');
@@ -224,6 +243,7 @@ const query = computed<TransactionExplorerFilter>(() => explorersStore.transacti
 const filteredTransactions = computed<TransactionInsightDataItem[]>(() => explorersStore.filteredTransactions);
 
 const allDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.InsightsExplorer, true));
+const allTimezoneTypesUsedForDateRange = computed<TypeAndDisplayName[]>(() => getAllTimezoneTypesUsedForStatistics());
 const canShiftDateRange = computed<boolean>(() => query.value.dateRangeType !== DateRange.All.type);
 const displayQueryDateRangeName = computed<string>(() => formatDateRange(query.value.dateRangeType, query.value.startTime, query.value.endTime));
 const displayQueryStartTime = computed<string>(() => formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(query.value.startTime)));
@@ -334,6 +354,12 @@ function reload(force: boolean): Promise<unknown> | null {
         if (!error.processed) {
             snackbar.value?.showError(error);
         }
+    });
+}
+
+function updateTimezoneUsedForDateRange(timezoneType: number): void {
+    explorersStore.updateTransactionExplorerFilter({
+        timezoneUsedForDateRange: timezoneType
     });
 }
 

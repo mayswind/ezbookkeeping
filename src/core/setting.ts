@@ -52,7 +52,6 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     alwaysShowTransactionPicturesInMobileTransactionEditPage: boolean;
     // Insights Explorer Page
     insightsExplorerDefaultDateRangeType: number;
-    timezoneUsedForInsightsExplorerPage: number;
     // Account List Page
     totalAmountExcludeAccountIds: Record<string, boolean>;
     // Exchange Rates Data Page
@@ -117,7 +116,6 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     'alwaysShowTransactionPicturesInMobileTransactionEditPage': UserApplicationCloudSettingType.Boolean,
     // Insights Explorer Page
     'insightsExplorerDefaultDateRangeType': UserApplicationCloudSettingType.Number,
-    'timezoneUsedForInsightsExplorerPage': UserApplicationCloudSettingType.Number,
     // Account List Page
     'totalAmountExcludeAccountIds': UserApplicationCloudSettingType.StringBooleanMap,
     // Exchange Rates Data Page
@@ -167,7 +165,6 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     alwaysShowTransactionPicturesInMobileTransactionEditPage: false,
     // Insights Explorer Page
     insightsExplorerDefaultDateRangeType: DEFAULT_TRANSACTION_EXPLORER_DATE_RANGE.type,
-    timezoneUsedForInsightsExplorerPage: TimezoneTypeForStatistics.Default.type,
     // Account List Page
     totalAmountExcludeAccountIds: {},
     // Exchange Rates Data Page

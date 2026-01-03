@@ -252,12 +252,6 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('insightsExplorerDefaultDateRangeType', value);
     }
 
-    function setTimezoneUsedForInsightsExplorerPage(value: number): void {
-        updateApplicationSettingsValue('timezoneUsedForInsightsExplorerPage', value);
-        appSettings.value.timezoneUsedForInsightsExplorerPage = value;
-        updateUserApplicationCloudSettingValue('timezoneUsedForInsightsExplorerPage', value);
-    }
-
     // Account List Page
     function setTotalAmountExcludeAccountIds(value: Record<string, boolean>): void {
         updateApplicationSettingsValue('totalAmountExcludeAccountIds', value);
@@ -482,7 +476,6 @@ export const useSettingsStore = defineStore('settings', () => {
         setAlwaysShowTransactionPicturesInMobileTransactionEditPage,
         // -- Insights Explorer Page
         setInsightsExplorerDefaultDateRangeType,
-        setTimezoneUsedForInsightsExplorerPage,
         // -- Account List Page
         setTotalAmountExcludeAccountIds,
         // -- Exchange Rates Data Page

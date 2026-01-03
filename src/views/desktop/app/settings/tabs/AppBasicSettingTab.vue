@@ -240,18 +240,6 @@
                                     v-model="insightsExplorerDefaultDateRangeType"
                                 />
                             </v-col>
-
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Timezone Used for Date Range')"
-                                    :placeholder="tt('Timezone Used for Date Range')"
-                                    :items="allTimezoneTypesUsedForStatistics"
-                                    v-model="timezoneUsedForInsightsExplorerPage"
-                                />
-                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-form>
@@ -339,7 +327,6 @@ import { useAppSettingPageBase } from '@/views/base/settings/AppSettingsPageBase
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
-import { useExplorersStore } from '@/stores/explorer.ts';
 
 import type { LocalizedSwitchOption } from '@/core/base.ts';
 import { ThemeType } from '@/core/theme.ts';
@@ -383,7 +370,6 @@ const {
 const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
-const explorersStore = useExplorersStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
@@ -417,14 +403,6 @@ const showAddTransactionButtonInDesktopNavbar = computed<boolean>({
 const insightsExplorerDefaultDateRangeType = computed<number>({
     get: () => settingsStore.appSettings.insightsExplorerDefaultDateRangeType,
     set: (value) => settingsStore.setInsightsExplorerDefaultDateRangeType(value)
-});
-
-const timezoneUsedForInsightsExplorerPage = computed<number>({
-    get: () => settingsStore.appSettings.timezoneUsedForInsightsExplorerPage,
-    set: (value: number) => {
-        settingsStore.setTimezoneUsedForInsightsExplorerPage(value);
-        explorersStore.updateTransactionExplorerInvalidState(true);
-    }
 });
 
 function init(): void {

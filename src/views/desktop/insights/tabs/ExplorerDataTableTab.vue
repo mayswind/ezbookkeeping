@@ -15,6 +15,7 @@
             <span>{{ getDisplayDateTime(item) }}</span>
             <v-chip class="ms-1" variant="flat" color="secondary" size="x-small"
                     v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimezone(item) }}</v-chip>
+            <v-tooltip activator="parent" v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimeInDefaultTimezone(item) }}</v-tooltip>
         </template>
         <template #item.type="{ item }">
             <v-chip label variant="outlined" size="x-small"
@@ -79,6 +80,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useExplorersStore } from '@/stores/explorer.ts';
 
+import type { NumeralSystem } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
 
 import {
@@ -108,6 +110,7 @@ const emit = defineEmits<{
 
 const {
     tt,
+    getCurrentNumeralSystemType,
     formatDateTimeToLongDateTime,
     formatDateTimeToGregorianDefaultDateTime,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
@@ -119,6 +122,7 @@ const explorersStore = useExplorersStore();
 
 const currentPage = ref<number>(1);
 
+const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
 const filteredTransactions = computed<TransactionInsightDataItem[]>(() => explorersStore.filteredTransactions);
@@ -170,6 +174,13 @@ function isSameAsDefaultTimezoneOffsetMinutes(transaction: TransactionInsightDat
 
 function getDisplayTimezone(transaction: TransactionInsightDataItem): string {
     return `UTC${getUtcOffsetByUtcOffsetMinutes(transaction.utcOffset)}`;
+}
+
+function getDisplayTimeInDefaultTimezone(transaction: TransactionInsightDataItem): string {
+    const timezoneOffsetMinutes = getTimezoneOffsetMinutes(transaction.time);
+    const dateTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, timezoneOffsetMinutes);
+    const utcOffset = numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(getUtcOffsetByUtcOffsetMinutes(timezoneOffsetMinutes));
+    return `${formatDateTimeToLongDateTime(dateTime)} (UTC${utcOffset})`;
 }
 
 function getDisplayTransactionType(transaction: TransactionInsightDataItem): string {

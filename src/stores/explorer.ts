@@ -44,17 +44,18 @@ import {
 import {
     parseDateTimeFromUnixTime,
     parseDateTimeFromUnixTimeWithTimezoneOffset,
-    getYearFirstUnixTimeBySpecifiedUnixTime,
-    getQuarterFirstUnixTimeBySpecifiedUnixTime,
-    getMonthFirstUnixTimeBySpecifiedUnixTime,
-    getDayFirstUnixTimeBySpecifiedUnixTime,
     getDateRangeByDateType,
-    getFiscalYearStartUnixTime
+    getFiscalYearFromUnixTime
 } from '@/lib/datetime.ts';
 import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 
 export enum TransactionExplorerDimensionType {
+    DateTime = 'YYYY-MM-DD HH:mm:ss',
+    YearMonthDay = 'YYYY-MM-DD',
+    YearMonth = 'YYYY-MM',
+    YearQuarter = 'YYYY-Q',
+    Year = 'YYYY',
     TransactionType = 'transactionType',
     Category = 'category',
     Account = 'account',
@@ -67,6 +68,7 @@ export interface TransactionExplorerPartialFilter {
     startTime?: number;
     endTime?: number;
     queryId?: string;
+    timezoneUsedForDateRange?: number;
     chartType?: TransactionExplorerChartTypeValue;
     categoryDimension?: TransactionExplorerDataDimensionType;
     seriesDimension?: TransactionExplorerDataDimensionType;
@@ -78,6 +80,7 @@ export interface TransactionExplorerFilter extends TransactionExplorerPartialFil
     startTime: number;
     endTime: number;
     query: TransactionExplorerQuery[];
+    timezoneUsedForDateRange: number;
     chartType: TransactionExplorerChartTypeValue;
     categoryDimension: TransactionExplorerDataDimensionType;
     seriesDimension: TransactionExplorerDataDimensionType;
@@ -124,10 +127,10 @@ export const useExplorersStore = defineStore('explorers', () => {
     const transactionTagsStore = useTransactionTagsStore();
     const exchangeRatesStore = useExchangeRatesStore();
 
-    function getDataCategoryInfo(dimension: TransactionExplorerDataDimension, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): CategoriedInfo {
+    function getDataCategoryInfo(timezoneUsedForDateRange: number, dimension: TransactionExplorerDataDimension, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): CategoriedInfo {
         let transactionTimeUtfOffset: number | undefined = undefined;
 
-        if (settingsStore.appSettings.timezoneUsedForInsightsExplorerPage === TimezoneTypeForStatistics.TransactionTimezone.type) {
+        if (timezoneUsedForDateRange === TimezoneTypeForStatistics.TransactionTimezone.type) {
             transactionTimeUtfOffset = transaction.utcOffset;
         }
 
@@ -158,52 +161,56 @@ export const useExplorersStore = defineStore('explorers', () => {
                 };
             }
         } else if (dimension === TransactionExplorerDataDimension.DateTime) {
-            const unixTime = transaction.time.toString(10);
+            const dateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
+            const textualDateTime = `${dateTime.getGregorianCalendarYearDashMonthDashDay()} ${dateTime.getHour().toString(10).padStart(2, '0')}:${dateTime.getMinute().toString(10).padStart(2, '0')}:${dateTime.getSecond().toString(10).padStart(2, '0')}`;
 
             return {
-                categoryName: unixTime,
-                categoryId: unixTime,
-                categoryIdType: TransactionExplorerDimensionType.Other
+                categoryName: textualDateTime,
+                categoryId: textualDateTime,
+                categoryIdType: TransactionExplorerDimensionType.DateTime
             };
         } else if (dimension === TransactionExplorerDataDimension.DateTimeByYearMonthDay) {
-            const unixTime = getDayFirstUnixTimeBySpecifiedUnixTime(transaction.time, transactionTimeUtfOffset).toString(10);
+            const dateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
+            const yearMonthDay = dateTime.getGregorianCalendarYearDashMonthDashDay();
 
             return {
-                categoryName: unixTime,
-                categoryId: unixTime,
-                categoryIdType: TransactionExplorerDimensionType.Other
+                categoryName: yearMonthDay,
+                categoryId: yearMonthDay,
+                categoryIdType: TransactionExplorerDimensionType.YearMonthDay
             };
         } else if (dimension === TransactionExplorerDataDimension.DateTimeByYearMonth) {
-            const unixTime = getMonthFirstUnixTimeBySpecifiedUnixTime(transaction.time, transactionTimeUtfOffset).toString(10);
+            const dateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
+            const yearMonth = dateTime.getGregorianCalendarYearDashMonth();
 
             return {
-                categoryName: unixTime,
-                categoryId: unixTime,
-                categoryIdType: TransactionExplorerDimensionType.Other
+                categoryName: yearMonth,
+                categoryId: yearMonth,
+                categoryIdType: TransactionExplorerDimensionType.YearMonth
             };
         } else if (dimension === TransactionExplorerDataDimension.DateTimeByYearQuarter) {
-            const unixTime = getQuarterFirstUnixTimeBySpecifiedUnixTime(transaction.time, transactionTimeUtfOffset).toString(10);
+            const dateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
+            const yearQuarter = `${dateTime.getGregorianCalendarYear().toString(10)}-${dateTime.getGregorianCalendarQuarter().toString(10)}`;
 
             return {
-                categoryName: unixTime,
-                categoryId: unixTime,
-                categoryIdType: TransactionExplorerDimensionType.Other
+                categoryName: yearQuarter,
+                categoryId: yearQuarter,
+                categoryIdType: TransactionExplorerDimensionType.YearQuarter
             };
         } else if (dimension === TransactionExplorerDataDimension.DateTimeByYear) {
-            const unixTime = getYearFirstUnixTimeBySpecifiedUnixTime(transaction.time, transactionTimeUtfOffset).toString(10);
+            const dateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
 
             return {
-                categoryName: unixTime,
-                categoryId: unixTime,
-                categoryIdType: TransactionExplorerDimensionType.Other
+                categoryName: dateTime.getGregorianCalendarYear().toString(10),
+                categoryId: dateTime.getGregorianCalendarYear().toString(10),
+                categoryIdType: TransactionExplorerDimensionType.Year
             };
         } else if (dimension === TransactionExplorerDataDimension.DateTimeByFiscalYear) {
-            const unixTime = getFiscalYearStartUnixTime(transaction.time, userStore.currentUserFiscalYearStart, transactionTimeUtfOffset).toString(10);
+            const fiscalYear = getFiscalYearFromUnixTime(transaction.time, userStore.currentUserFiscalYearStart, transactionTimeUtfOffset).toString(10);
 
             return {
-                categoryName: unixTime,
-                categoryId: unixTime,
-                categoryIdType: TransactionExplorerDimensionType.Other
+                categoryName: fiscalYear,
+                categoryId: fiscalYear,
+                categoryIdType: TransactionExplorerDimensionType.Year
             };
         } else if (dimension === TransactionExplorerDataDimension.DateTimeByDayOfWeek) {
             const dateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
@@ -336,8 +343,8 @@ export const useExplorersStore = defineStore('explorers', () => {
         }
     }
 
-    function addTransactionToCategoriedDataMap(categoriedDataMap: Record<string, CategoriedTransactions>, categoryDimension: TransactionExplorerDataDimension, seriesDemension: TransactionExplorerDataDimension, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): void {
-        const categoriedInfo = getDataCategoryInfo(categoryDimension, queryName, queryIndex, transaction);
+    function addTransactionToCategoriedDataMap(timezoneUsedForDateRange: number, categoriedDataMap: Record<string, CategoriedTransactions>, categoryDimension: TransactionExplorerDataDimension, seriesDemension: TransactionExplorerDataDimension, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): void {
+        const categoriedInfo = getDataCategoryInfo(timezoneUsedForDateRange, categoryDimension, queryName, queryIndex, transaction);
         let categoriedData = categoriedDataMap[categoriedInfo.categoryId];
 
         if (!categoriedData) {
@@ -352,7 +359,7 @@ export const useExplorersStore = defineStore('explorers', () => {
             categoriedDataMap[categoriedInfo.categoryId] = categoriedData;
         }
 
-        const seriesedInfo = getDataCategoryInfo(seriesDemension, queryName, queryIndex, transaction);
+        const seriesedInfo = getDataCategoryInfo(timezoneUsedForDateRange, seriesDemension, queryName, queryIndex, transaction);
         let seriesedData = categoriedData.trasactions[seriesedInfo.categoryId];
 
         if (!seriesedData) {
@@ -375,10 +382,11 @@ export const useExplorersStore = defineStore('explorers', () => {
         startTime: 0,
         endTime: 0,
         query: [],
+        timezoneUsedForDateRange: TimezoneTypeForStatistics.Default.type,
+        chartType: TransactionExplorerChartType.Default.value,
         categoryDimension: TransactionExplorerDataDimension.CategoryDimensionDefault.value,
         seriesDimension: TransactionExplorerDataDimension.SeriesDimensionDefault.value,
-        valueMetric: TransactionExplorerValueMetric.Default.value,
-        chartType: TransactionExplorerChartType.Default.value
+        valueMetric: TransactionExplorerValueMetric.Default.value
     });
 
     const transactionExplorerAllData = ref<TransactionInfoResponse[]>([]);
@@ -498,13 +506,13 @@ export const useExplorersStore = defineStore('explorers', () => {
 
         for (const transaction of allTransactions.value) {
             if (!transactionExplorerFilter.value.query || transactionExplorerFilter.value.query.length < 1) {
-                addTransactionToCategoriedDataMap(categoriedDataMap, categoryDimension, seriesDimension, '', 0, transaction);
+                addTransactionToCategoriedDataMap(transactionExplorerFilter.value.timezoneUsedForDateRange, categoriedDataMap, categoryDimension, seriesDimension, '', 0, transaction);
                 continue;
             }
 
             for (const [query, index] of itemAndIndex(transactionExplorerFilter.value.query)) {
                 if (query.match(transaction)) {
-                    addTransactionToCategoriedDataMap(categoriedDataMap, categoryDimension, seriesDimension, query.name, index, transaction);
+                    addTransactionToCategoriedDataMap(transactionExplorerFilter.value.timezoneUsedForDateRange, categoriedDataMap, categoryDimension, seriesDimension, query.name, index, transaction);
 
                     if (categoryDimension !== TransactionExplorerDataDimension.Query) {
                         break;
@@ -640,6 +648,7 @@ export const useExplorersStore = defineStore('explorers', () => {
         transactionExplorerFilter.value.startTime = 0;
         transactionExplorerFilter.value.endTime = 0;
         transactionExplorerFilter.value.query = [];
+        transactionExplorerFilter.value.timezoneUsedForDateRange = TimezoneTypeForStatistics.Default.type;
         transactionExplorerFilter.value.chartType = TransactionExplorerChartType.Default.value;
         transactionExplorerFilter.value.categoryDimension = TransactionExplorerDataDimension.CategoryDimensionDefault.value;
         transactionExplorerFilter.value.seriesDimension = TransactionExplorerDataDimension.SeriesDimensionDefault.value;
@@ -686,6 +695,7 @@ export const useExplorersStore = defineStore('explorers', () => {
 
         if (resetQuery) {
             transactionExplorerFilter.value.query = [];
+            transactionExplorerFilter.value.timezoneUsedForDateRange = TimezoneTypeForStatistics.Default.type;
             transactionExplorerFilter.value.chartType = TransactionExplorerChartType.Default.value;
             transactionExplorerFilter.value.categoryDimension = TransactionExplorerDataDimension.CategoryDimensionDefault.value;
             transactionExplorerFilter.value.seriesDimension = TransactionExplorerDataDimension.SeriesDimensionDefault.value;
@@ -708,6 +718,11 @@ export const useExplorersStore = defineStore('explorers', () => {
 
         if (filter && isInteger(filter.endTime) && transactionExplorerFilter.value.endTime !== filter.endTime) {
             transactionExplorerFilter.value.endTime = filter.endTime;
+            changed = true;
+        }
+
+        if (filter && isDefined(filter.timezoneUsedForDateRange) && transactionExplorerFilter.value.timezoneUsedForDateRange !== filter.timezoneUsedForDateRange) {
+            transactionExplorerFilter.value.timezoneUsedForDateRange = filter.timezoneUsedForDateRange;
             changed = true;
         }
 

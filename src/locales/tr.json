@@ -2019,6 +2019,7 @@
     "Batch Convert Transfer Transaction to Income Transaction": "Transfer İşlemini Toplu Olarak Gelir İşlemine Dönüştür",
     "Batch Convert Selected Amounts to Positive Values": "Seçili Tutarları Toplu Olarak Pozitif Değere Dönüştür",
     "Batch Convert Selected Amounts to Negative Values": "Seçili Tutarları Toplu Olarak Negatif Değere Dönüştür",
+    "Clear All Filters": "Clear All Filters",
     "Invalid Category": "Geçersiz Kategori",
     "Target Category": "Hedef Kategori",
     "Default Expense Category": "Varsayılan Gider Kategorisi",

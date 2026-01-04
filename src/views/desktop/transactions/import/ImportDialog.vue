@@ -45,7 +45,7 @@
                             <v-list>
                                 <template :key="groupIndex" v-for="(group, groupIndex) in importTransactionCheckDataTab.filterMenus">
                                     <v-divider class="my-2" v-if="groupIndex > 0" />
-                                    <v-list-subheader :title="group.title" />
+                                    <v-list-subheader :title="group.title" v-if="group.title" />
                                     <v-list-item :key="`menu_${groupIndex}_${index}`"
                                                  :prepend-icon="menu.prependIcon"
                                                  :title="menu.title"

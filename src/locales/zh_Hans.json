@@ -2019,6 +2019,7 @@
     "Batch Convert Transfer Transaction to Income Transaction": "批量转换转账交易为收入交易",
     "Batch Convert Selected Amounts to Positive Values": "批量转换选中的金额为正值",
     "Batch Convert Selected Amounts to Negative Values": "批量转换选中的金额为负值",
+    "Clear All Filters": "清除所有过滤条件",
     "Invalid Category": "无效分类",
     "Target Category": "目标分类",
     "Default Expense Category": "默认支出分类",

@@ -452,6 +452,7 @@ import {
     mdiAlertOutline,
     mdiPound,
     mdiTextBoxEditOutline,
+    mdiFilterOffOutline,
     mdiShapePlusOutline,
     mdiPencilBoxMultipleOutline,
     mdiNumericPositive1,
@@ -475,7 +476,7 @@ interface ImportTransactionCheckDataFilter {
 }
 
 interface ImportTransactionCheckDataMenuGroup {
-    title: string;
+    title?: string;
     items: ImportTransactionCheckDataMenu[];
 }
 
@@ -560,6 +561,32 @@ const isEditing = computed<boolean>(() => !!editingTransaction.value);
 const canImport = computed<boolean>(() => selectedImportTransactionCount.value > 0 && selectedInvalidTransactionCount.value < 1);
 
 const filterMenus = computed<ImportTransactionCheckDataMenuGroup[]>(() => [
+    {
+        items: [
+            {
+                title: tt('Clear All Filters'),
+                prependIcon: mdiFilterOffOutline,
+                disabled: filters.value.minDatetime === null
+                    && filters.value.maxDatetime === null
+                    && filters.value.transactionType === null
+                    && filters.value.category === null
+                    && filters.value.amount === null
+                    && filters.value.account === null
+                    && filters.value.tag === null
+                    && filters.value.description === null,
+                onClick: () => {
+                    filters.value.minDatetime = null;
+                    filters.value.maxDatetime = null;
+                    filters.value.transactionType = null;
+                    filters.value.category = null;
+                    filters.value.amount = null;
+                    filters.value.account = null;
+                    filters.value.tag = null;
+                    filters.value.description = null;
+                }
+            }
+        ]
+    },
     {
         title: tt('Date Range'),
         items: [

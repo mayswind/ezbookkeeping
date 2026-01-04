@@ -277,6 +277,17 @@
                                     @click="showAccountsIncludedInTotalDialog = true"
                                 />
                             </v-col>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="value"
+                                    persistent-placeholder
+                                    :label="tt('Hide Categories Without Accounts')"
+                                    :placeholder="tt('Hide Categories Without Accounts')"
+                                    :items="enableDisableOptions"
+                                    v-model="hideCategoriesWithoutAccounts"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-form>
@@ -419,6 +430,11 @@ const insightsExplorerDefaultDateRangeType = computed<number>({
 const showTagInInsightsExplorerPage = computed<boolean>({
     get: () => settingsStore.appSettings.showTagInInsightsExplorerPage,
     set: (value) => settingsStore.setShowTagInInsightsExplorerPage(value)
+});
+
+const hideCategoriesWithoutAccounts = computed<boolean>({
+    get: () => settingsStore.appSettings.hideCategoriesWithoutAccounts,
+    set: (value) => settingsStore.setHideCategoriesWithoutAccounts(value)
 });
 
 function init(): void {

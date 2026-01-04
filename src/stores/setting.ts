@@ -265,6 +265,12 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('totalAmountExcludeAccountIds', value);
     }
 
+    function setHideCategoriesWithoutAccounts(value: boolean): void {
+        updateApplicationSettingsValue('hideCategoriesWithoutAccounts', value);
+        appSettings.value.hideCategoriesWithoutAccounts = value;
+        updateUserApplicationCloudSettingValue('hideCategoriesWithoutAccounts', value);
+    }
+
     // Exchange Rates Data Page
     function setCurrencySortByInExchangeRatesPage(value: number): void {
         updateApplicationSettingsValue('currencySortByInExchangeRatesPage', value);
@@ -485,6 +491,7 @@ export const useSettingsStore = defineStore('settings', () => {
         setShowTagInInsightsExplorerPage,
         // -- Account List Page
         setTotalAmountExcludeAccountIds,
+        setHideCategoriesWithoutAccounts,
         // -- Exchange Rates Data Page
         setCurrencySortByInExchangeRatesPage,
         // -- Statistics Settings

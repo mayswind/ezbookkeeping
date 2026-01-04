@@ -1,12 +1,15 @@
 <template>
     <f7-page :ptr="!sortable && !hasEditingTag" @ptr:refresh="reload" @page:afterin="onPageAfterIn">
         <f7-navbar>
-            <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-left :back-link="tt('Back')" v-if="!sortable"></f7-nav-left>
+            <f7-nav-left v-else-if="sortable">
+                <f7-link icon-f7="xmark" :class="{ 'disabled': displayOrderSaving }" @click="cancelSort"></f7-link>
+            </f7-nav-left>
             <f7-nav-title :title="tt('Transaction Tags')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
-                <f7-link icon-f7="ellipsis" :class="{ 'disabled': hasEditingTag || !tags.length }" v-if="!sortable" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link icon-f7="ellipsis" :class="{ 'disabled': hasEditingTag || !tags.length || sortable }" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link icon-f7="plus" :class="{ 'disabled': hasEditingTag }" v-if="!sortable" @click="add"></f7-link>
-                <f7-link :text="tt('Done')" :class="{ 'disabled': displayOrderSaving || hasEditingTag }" v-else-if="sortable" @click="saveSortResult"></f7-link>
+                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': displayOrderSaving || !displayOrderModified || hasEditingTag }" @click="saveSortResult" v-else-if="sortable"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -366,6 +369,35 @@ function saveSortResult(): void {
     showLoading();
 
     transactionTagsStore.updateTagDisplayOrders().then(() => {
+        displayOrderSaving.value = false;
+        hideLoading();
+
+        showHidden.value = false;
+        sortable.value = false;
+        displayOrderModified.value = false;
+    }).catch(error => {
+        displayOrderSaving.value = false;
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function cancelSort(): void {
+    if (!displayOrderModified.value) {
+        showHidden.value = false;
+        sortable.value = false;
+        return;
+    }
+
+    displayOrderSaving.value = true;
+    showLoading();
+
+    transactionTagsStore.loadAllTags({
+        force: false
+    }).then(() => {
         displayOrderSaving.value = false;
         hideLoading();
 

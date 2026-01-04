@@ -1,12 +1,15 @@
 <template>
     <f7-page :ptr="!sortable" @ptr:refresh="reload" @page:afterin="onPageAfterIn">
         <f7-navbar>
-            <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-left :back-link="tt('Back')" v-if="!sortable"></f7-nav-left>
+            <f7-nav-left v-else-if="sortable">
+                <f7-link icon-f7="xmark" :class="{ 'disabled': displayOrderSaving }" @click="cancelSort"></f7-link>
+            </f7-nav-left>
             <f7-nav-title :title="tt('Account List')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
-                <f7-link icon-f7="ellipsis" :class="{ 'disabled': !allAccountCount }" v-if="!sortable" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link icon-f7="ellipsis" :class="{ 'disabled': !allAccountCount || sortable }" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link icon-f7="plus" href="/account/add" v-if="!sortable"></f7-link>
-                <f7-link :text="tt('Done')" :class="{ 'disabled': displayOrderSaving }" @click="saveSortResult" v-else-if="sortable"></f7-link>
+                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': displayOrderSaving || !displayOrderModified }" @click="saveSortResult" v-else-if="sortable"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -489,6 +492,35 @@ function saveSortResult(): void {
     showLoading();
 
     accountsStore.updateAccountDisplayOrders().then(() => {
+        displayOrderSaving.value = false;
+        hideLoading();
+
+        showHidden.value = false;
+        sortable.value = false;
+        displayOrderModified.value = false;
+    }).catch(error => {
+        displayOrderSaving.value = false;
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function cancelSort(): void {
+    if (!displayOrderModified.value) {
+        showHidden.value = false;
+        sortable.value = false;
+        return;
+    }
+
+    displayOrderSaving.value = true;
+    showLoading();
+
+    accountsStore.loadAllAccounts({
+        force: false
+    }).then(() => {
         displayOrderSaving.value = false;
         hideLoading();
 

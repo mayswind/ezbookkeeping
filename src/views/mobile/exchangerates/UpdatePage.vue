@@ -4,8 +4,9 @@
             <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title :title="tt('Update User Custom Exchange Rate')"></f7-nav-title>
             <f7-nav-right>
-                <f7-link :class="{ 'disabled': submitting || !defaultCurrencyAmount || !currency || !targetCurrencyAmount }"
-                         :text="tt('Update')" @click="confirm"></f7-link>
+                <f7-link icon-f7="checkmark_alt"
+                         :class="{ 'disabled': submitting || !defaultCurrencyAmount || !currency || !targetCurrencyAmount }"
+                         @click="confirm"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 

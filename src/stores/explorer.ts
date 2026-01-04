@@ -296,23 +296,25 @@ export const useExplorersStore = defineStore('explorers', () => {
             };
         } else if (dimension === TransactionExplorerDataDimension.SourceAccount) {
             const primaryAccount = accountsStore.allAccountsMap[transaction.sourceAccount.parentId] ?? transaction.sourceAccount;
+            const primaryAccountCategoryDisplayOrder: number = settingsStore.accountCategoryDisplayOrders[primaryAccount.category] || Number.MAX_SAFE_INTEGER;
 
             return {
                 categoryName: transaction.sourceAccountName || 'Unknown',
                 categoryNameNeedI18n: !transaction.sourceAccountName,
                 categoryId: transaction.sourceAccountId || 'unknown',
                 categoryIdType: TransactionExplorerDimensionType.Account,
-                categoryDisplayOrders: [primaryAccount.category, primaryAccount.displayOrder, transaction.sourceAccount.displayOrder]
+                categoryDisplayOrders: [primaryAccountCategoryDisplayOrder, primaryAccount.displayOrder, transaction.sourceAccount.displayOrder]
             };
         } else if (dimension === TransactionExplorerDataDimension.SourceAccountCategory) {
             const accountCategory = AccountCategory.valueOf(transaction.sourceAccount.category);
+            const accountCategoryDisplayOrder: number = settingsStore.accountCategoryDisplayOrders[accountCategory?.type ?? 0] || Number.MAX_SAFE_INTEGER;
 
             return {
                 categoryName: accountCategory?.name || 'Unknown',
                 categoryNameNeedI18n: true,
                 categoryId: accountCategory?.type.toString(10) || 'unknown',
                 categoryIdType: TransactionExplorerDimensionType.Other,
-                categoryDisplayOrders: [accountCategory ? accountCategory.type : 0]
+                categoryDisplayOrders: [accountCategoryDisplayOrder]
             };
         } else if (dimension === TransactionExplorerDataDimension.SourceAccountCurrency) {
             return {
@@ -324,23 +326,25 @@ export const useExplorersStore = defineStore('explorers', () => {
             };
         }  else if (dimension === TransactionExplorerDataDimension.DestinationAccount) {
             const primaryAccount = accountsStore.allAccountsMap[transaction.destinationAccount?.parentId ?? ''] ?? transaction.destinationAccount;
+            const primaryAccountCategoryDisplayOrder: number = settingsStore.accountCategoryDisplayOrders[primaryAccount?.category || 0] || Number.MAX_SAFE_INTEGER;
 
             return {
                 categoryName: transaction.type === TransactionType.Transfer ? (transaction.destinationAccountName || 'Unknown') : 'None',
                 categoryNameNeedI18n: transaction.type !== TransactionType.Transfer || !transaction.destinationAccountName,
                 categoryId: transaction.type === TransactionType.Transfer ? (transaction.destinationAccountId || 'unknown') : 'none',
                 categoryIdType: TransactionExplorerDimensionType.Account,
-                categoryDisplayOrders: transaction.type === TransactionType.Transfer && primaryAccount && transaction.destinationAccount ? [primaryAccount.category, primaryAccount.displayOrder, transaction.destinationAccount.displayOrder] : [0]
+                categoryDisplayOrders: transaction.type === TransactionType.Transfer && primaryAccount && transaction.destinationAccount ? [primaryAccountCategoryDisplayOrder, primaryAccount.displayOrder, transaction.destinationAccount.displayOrder] : [0]
             };
         } else if (dimension === TransactionExplorerDataDimension.DestinationAccountCategory) {
             const accountCategory = transaction.type === TransactionType.Transfer && transaction.destinationAccount ? AccountCategory.valueOf(transaction.destinationAccount.category) : undefined;
+            const accountCategoryDisplayOrder: number = settingsStore.accountCategoryDisplayOrders[accountCategory?.type ?? 0] || Number.MAX_SAFE_INTEGER;
 
             return {
                 categoryName: transaction.type === TransactionType.Transfer ? (accountCategory?.name || 'Unknown') : 'None',
                 categoryNameNeedI18n: true,
                 categoryId: transaction.type === TransactionType.Transfer ? (accountCategory?.name || 'unknown') : 'none',
                 categoryIdType: TransactionExplorerDimensionType.Other,
-                categoryDisplayOrders: transaction.type === TransactionType.Transfer ? [accountCategory?.type || 0] : [0]
+                categoryDisplayOrders: transaction.type === TransactionType.Transfer ? [accountCategoryDisplayOrder] : [0]
             };
         } else if (dimension === TransactionExplorerDataDimension.DestinationAccountCurrency) {
             return {

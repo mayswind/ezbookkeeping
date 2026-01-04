@@ -68,7 +68,7 @@ export function useUserProfilePageBase() {
 
     const allAccounts = computed<Account[]>(() => accountsStore.allPlainAccounts);
     const allVisibleAccounts = computed<Account[]>(() => accountsStore.allVisiblePlainAccounts);
-    const allVisibleCategorizedAccounts = computed<CategorizedAccount[]>(() => getCategorizedAccounts(allVisibleAccounts.value));
+    const allVisibleCategorizedAccounts = computed<CategorizedAccount[]>(() => getCategorizedAccounts(allVisibleAccounts.value, settingsStore.appSettings.accountCategoryOrders));
     const allWeekDays = computed<TypeAndDisplayName[]>(() => getAllWeekDays());
     const allCalendarDisplayTypes = computed<TypeAndDisplayName[]>(() => getAllCalendarDisplayTypes());
     const allDateDisplayTypes = computed<TypeAndDisplayName[]>(() => getAllDateDisplayTypes());

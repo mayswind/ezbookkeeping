@@ -19,9 +19,10 @@ export function useMoveAllTransactionsPageBase() {
     const toAccountName = ref<string>('');
 
     const showAccountBalance = computed<boolean>(() => settingsStore.appSettings.showAccountBalance);
+    const customAccountCategoryOrder = computed<string>(() => settingsStore.appSettings.accountCategoryOrders);
     const allAccounts = computed<Account[]>(() => accountsStore.allPlainAccounts);
     const allVisibleAccounts = computed<Account[]>(() => accountsStore.allVisiblePlainAccounts);
-    const allVisibleCategorizedAccounts = computed<CategorizedAccountWithDisplayBalance[]>(() => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts.value, showAccountBalance.value));
+    const allVisibleCategorizedAccounts = computed<CategorizedAccountWithDisplayBalance[]>(() => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts.value, showAccountBalance.value, customAccountCategoryOrder.value));
 
     const displayToAccountName = computed<string>(() => {
         if (!toAccountId.value) {

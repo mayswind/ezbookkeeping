@@ -284,6 +284,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 totalExpense += item.amountInDefaultCurrency;
             }
 
+            const primaryAccountCategoryDisplayOrder = settingsStore.accountCategoryDisplayOrders[item.primaryAccount.category] || Number.MAX_SAFE_INTEGER;
             const incomeByAccountKey = `${TransactionCategoricalOverviewAnalysisDataItemType.IncomeByAccount}:${item.account.id}`;
             const expenseByAccountKey = `${TransactionCategoricalOverviewAnalysisDataItemType.ExpenseByAccount}:${item.account.id}`;
             let incomeByAccountItem: TransactionCategoricalOverviewAnalysisDataItem | undefined = allDataItemsMap[incomeByAccountKey];
@@ -294,7 +295,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                     item.account.id,
                     item.account.name,
                     TransactionCategoricalOverviewAnalysisDataItemType.IncomeByAccount,
-                    [item.primaryAccount.category, item.primaryAccount.displayOrder, item.account.displayOrder],
+                    [primaryAccountCategoryDisplayOrder, item.primaryAccount.displayOrder, item.account.displayOrder],
                     item.primaryAccount.hidden || item.account.hidden);
                 allDataItemsMap[incomeByAccountKey] = incomeByAccountItem;
                 allIncomeByAccountDataItems.push(incomeByAccountItem);
@@ -305,7 +306,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                     item.account.id,
                     item.account.name,
                     TransactionCategoricalOverviewAnalysisDataItemType.ExpenseByAccount,
-                    [item.primaryAccount.category, item.primaryAccount.displayOrder, item.account.displayOrder],
+                    [primaryAccountCategoryDisplayOrder, item.primaryAccount.displayOrder, item.account.displayOrder],
                     item.primaryAccount.hidden || item.account.hidden);
                 allDataItemsMap[expenseByAccountKey] = expenseByAccountItem;
                 allExpenseByAccountDataItems.push(expenseByAccountItem);
@@ -404,11 +405,12 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 let transferToAccountItem: TransactionCategoricalOverviewAnalysisDataItem | undefined = allDataItemsMap[transferToAccountKey];
 
                 if (!transferToAccountItem) {
+                    const relatedPrimaryAccountCategoryDisplayOrder = settingsStore.accountCategoryDisplayOrders[item.relatedPrimaryAccount.category] || Number.MAX_SAFE_INTEGER;
                     transferToAccountItem = createNewTransactionCategoricalOverviewAnalysisDataItem(
                         item.relatedAccount.id,
                         item.relatedAccount.name,
                         TransactionCategoricalOverviewAnalysisDataItemType.ExpenseByAccount,
-                        [item.relatedPrimaryAccount.category, item.relatedPrimaryAccount.displayOrder, item.relatedAccount.displayOrder],
+                        [relatedPrimaryAccountCategoryDisplayOrder, item.relatedPrimaryAccount.displayOrder, item.relatedAccount.displayOrder],
                         item.relatedPrimaryAccount.hidden || item.relatedAccount.hidden);
                     allDataItemsMap[transferToAccountKey] = transferToAccountItem;
                     allExpenseByAccountDataItems.push(transferToAccountItem);
@@ -543,6 +545,8 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 primaryAccount = account;
             }
 
+            const primaryAccountCategoryDisplayOrder = settingsStore.accountCategoryDisplayOrders[primaryAccount.category] || Number.MAX_SAFE_INTEGER;
+
             let amount = account.balance;
 
             if (account.currency !== userStore.currentUserDefaultCurrency) {
@@ -566,7 +570,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 icon: account.icon || DEFAULT_ACCOUNT_ICON.icon,
                 color: account.color || DEFAULT_ACCOUNT_COLOR,
                 hidden: primaryAccount.hidden || account.hidden,
-                displayOrders: [primaryAccount.category, primaryAccount.displayOrder, account.displayOrder],
+                displayOrders: [primaryAccountCategoryDisplayOrder, primaryAccount.displayOrder, account.displayOrder],
                 totalAmount: amount
             };
 
@@ -888,6 +892,8 @@ export const useStatisticsStore = defineStore('statistics', () => {
                     if (data) {
                         data.totalAmount += amount;
                     } else {
+                        const primaryAccountCategoryDisplayOrder = settingsStore.accountCategoryDisplayOrders[item.primaryAccount.category] || Number.MAX_SAFE_INTEGER;
+
                         data = {
                             name: item.account.name,
                             type: 'account',
@@ -895,7 +901,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                             icon: item.account.icon || DEFAULT_ACCOUNT_ICON.icon,
                             color: item.account.color || DEFAULT_ACCOUNT_COLOR,
                             hidden: item.primaryAccount.hidden || item.account.hidden,
-                            displayOrders: [item.primaryAccount.category, item.primaryAccount.displayOrder, item.account.displayOrder],
+                            displayOrders: [primaryAccountCategoryDisplayOrder, item.primaryAccount.displayOrder, item.account.displayOrder],
                             totalAmount: amount,
                             items: []
                         };
@@ -1131,6 +1137,8 @@ export const useStatisticsStore = defineStore('statistics', () => {
                     if (data) {
                         data.totalAmount += item.amountInDefaultCurrency;
                     } else {
+                        const primaryAccountCategoryDisplayOrder = settingsStore.accountCategoryDisplayOrders[item.primaryAccount.category] || Number.MAX_SAFE_INTEGER;
+
                         data = {
                             name: item.account.name,
                             type: 'account',
@@ -1138,7 +1146,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                             icon: item.account.icon || DEFAULT_ACCOUNT_ICON.icon,
                             color: item.account.color || DEFAULT_ACCOUNT_COLOR,
                             hidden: item.primaryAccount.hidden || item.account.hidden,
-                            displayOrders: [item.primaryAccount.category, item.primaryAccount.displayOrder, item.account.displayOrder],
+                            displayOrders: [primaryAccountCategoryDisplayOrder, item.primaryAccount.displayOrder, item.account.displayOrder],
                             totalAmount: item.amountInDefaultCurrency
                         };
                     }

@@ -181,6 +181,7 @@ const {
     title,
     applyText,
     allowHiddenAccount,
+    customAccountCategoryOrder,
     allCategorizedAccounts,
     allVisibleAccountMap,
     hasAnyAvailableAccount,
@@ -194,7 +195,7 @@ const accountsStore = useAccountsStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
-const expandAccountCategories = ref<number[]>(AccountCategory.values().map(category => category.type));
+const expandAccountCategories = ref<number[]>(AccountCategory.values(customAccountCategoryOrder.value).map(category => category.type));
 
 function init(): void {
     accountsStore.loadAllAccounts({

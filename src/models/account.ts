@@ -2,7 +2,6 @@ import type { HiddenAmount, NumberWithSuffix } from '@/core/numeral.ts';
 import type { ColorValue } from '@/core/color.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import { PARENT_ACCOUNT_CURRENCY_PLACEHOLDER } from '@/consts/currency.ts';
-import { DEFAULT_ACCOUNT_ICON_ID } from '@/consts/icon.ts';
 import { DEFAULT_ACCOUNT_COLOR } from '@/consts/color.ts';
 
 export class Account implements AccountInfoResponse {
@@ -410,14 +409,14 @@ export class Account implements AccountInfoResponse {
         );
     }
 
-    public static createNewAccount(currency: string, balanceTime: number): Account {
+    public static createNewAccount(accountCategory: AccountCategory, currency: string, balanceTime: number): Account {
         return new Account(
             '', // id
             '', // name
             '', // parentId
-            AccountCategory.Cash.type, // category
+            accountCategory.type, // category
             AccountType.SingleAccount.type, // type
-            DEFAULT_ACCOUNT_ICON_ID, // icon
+            accountCategory.defaultAccountIconId, // icon
             DEFAULT_ACCOUNT_COLOR, // color
             currency, // currency
             0, // balance
@@ -481,25 +480,25 @@ export class Account implements AccountInfoResponse {
         return clonedAccounts;
     }
 
-    public static sortAccounts(accounts: Account[], allAccountsMap?: Record<string, Account>): Account[] {
+    public static sortAccounts(accounts: Account[], accountCategoryDisplayOrders: Record<number, number>, allAccountsMap?: Record<string, Account>): Account[] {
         if (!accounts || !accounts.length) {
             return accounts;
         }
 
         return accounts.sort(function (account1, account2) {
             if (account1.category !== account2.category) {
-                const account1Category = AccountCategory.valueOf(account1.category);
-                const account2Category = AccountCategory.valueOf(account2.category);
+                const account1CategoryDisplayOrder = accountCategoryDisplayOrders[account1.category];
+                const account2CategoryDisplayOrder = accountCategoryDisplayOrders[account2.category];
 
-                if (!account1Category) {
+                if (!account1CategoryDisplayOrder) {
                     return 1;
                 }
 
-                if (!account2Category) {
+                if (!account2CategoryDisplayOrder) {
                     return -1;
                 }
 
-                return account1Category.displayOrder - account2Category.displayOrder;
+                return account1CategoryDisplayOrder - account2CategoryDisplayOrder;
             }
 
             if (account1.parentId === account2.parentId) {

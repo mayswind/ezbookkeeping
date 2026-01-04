@@ -31,7 +31,7 @@
                         <v-tabs show-arrows class="account-category-tabs my-4" direction="vertical"
                                 :disabled="loading" v-model="activeAccountCategoryType">
                             <v-tab class="tab-text-truncate" :key="accountCategory.type" :value="accountCategory.type"
-                                   v-for="accountCategory in AccountCategory.values()"
+                                   v-for="accountCategory in AccountCategory.values(customAccountCategoryOrder)"
                                    v-show="!hideAccountCategoriesWithoutAccounts || (allCategorizedAccountsMap[accountCategory.type] && allCategorizedAccountsMap[accountCategory.type]!.accounts.length > 0)">
                                 <ItemIcon icon-type="account" :icon-id="accountCategory.defaultAccountIconId" />
                                 <div class="d-flex flex-column text-truncate ms-2">
@@ -372,6 +372,8 @@ const {
     showHidden,
     displayOrderModified,
     showAccountBalance,
+    customAccountCategoryOrder,
+    defaultAccountCategory,
     firstDayOfWeek,
     fiscalYearStart,
     allAccounts,
@@ -394,7 +396,7 @@ const reconciliationStatementDialog = useTemplateRef<ReconciliationStatementDial
 const moveAllTransactionsDialog = useTemplateRef<MoveAllTransactionsDialogType>('moveAllTransactionsDialog');
 const clearAllTransactionsDialog = useTemplateRef<ClearAllTransactionsDialogType>('clearAllTransactionsDialog');
 
-const activeAccountCategoryType = ref<number>(AccountCategory.Default.type);
+const activeAccountCategoryType = ref<number>(defaultAccountCategory.value.type);
 const activeTab = ref<string>('accountPage');
 const activeSubAccount = ref<Record<string, string>>({});
 const accountToShowReconciliationStatement = ref<Account | null>(null);

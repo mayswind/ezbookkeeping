@@ -2,6 +2,7 @@ import { ref, computed, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
@@ -25,13 +26,16 @@ export interface DayAndDisplayName {
 export function useAccountEditPageBase() {
     const { tt, getAllAccountCategories, getAllAccountTypes, getMonthdayShortName } = useI18n();
 
+    const settingsStore = useSettingsStore();
     const userStore = useUserStore();
+
+    const defaultAccountCategory = AccountCategory.values(settingsStore.appSettings.accountCategoryOrders)[0] ?? AccountCategory.Default;
 
     const editAccountId = ref<string | null>(null);
     const clientSessionId = ref<string>('');
     const loading = ref<boolean>(false);
     const submitting = ref<boolean>(false);
-    const account = ref<Account>(Account.createNewAccount(userStore.currentUserDefaultCurrency, getCurrentUnixTimeForNewAccount()));
+    const account = ref<Account>(Account.createNewAccount(defaultAccountCategory, userStore.currentUserDefaultCurrency, getCurrentUnixTimeForNewAccount()));
     const subAccounts = ref<Account[]>([]);
 
     const title = computed<string>(() => {
@@ -72,7 +76,8 @@ export function useAccountEditPageBase() {
 
     const inputIsEmpty = computed<boolean>(() => !!inputEmptyProblemMessage.value);
 
-    const allAccountCategories = computed<LocalizedAccountCategory[]>(() => getAllAccountCategories());
+    const customAccountCategoryOrder = computed<string>(() => settingsStore.appSettings.accountCategoryOrders);
+    const allAccountCategories = computed<LocalizedAccountCategory[]>(() => getAllAccountCategories(customAccountCategoryOrder.value));
     const allAccountTypes = computed<TypeAndDisplayName[]>(() => getAllAccountTypes());
 
     const allAvailableMonthDays = computed<DayAndDisplayName[]>(() => {
@@ -181,6 +186,8 @@ export function useAccountEditPageBase() {
     });
 
     return {
+        // constants
+        defaultAccountCategory,
         // states
         editAccountId,
         clientSessionId,

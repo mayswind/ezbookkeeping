@@ -8,7 +8,7 @@ import { useAccountsStore } from '@/stores/account.ts';
 
 import type { HiddenAmount, NumberWithSuffix } from '@/core/numeral.ts';
 import type { WeekDayValue } from '@/core/datetime.ts';
-import { type AccountCategory, AccountType } from '@/core/account.ts';
+import { AccountCategory, AccountType } from '@/core/account.ts';
 import type { Account, CategorizedAccount } from '@/models/account.ts';
 
 import { isObject, isNumber, isString } from '@/lib/common.ts';
@@ -28,6 +28,9 @@ export function useAccountListPageBase() {
         get: () => settingsStore.appSettings.showAccountBalance,
         set: (value) => settingsStore.setShowAccountBalance(value)
     });
+
+    const customAccountCategoryOrder = computed<string>(() => settingsStore.appSettings.accountCategoryOrders);
+    const defaultAccountCategory = computed<AccountCategory>(() => AccountCategory.values(customAccountCategoryOrder.value)[0] ?? AccountCategory.Default);
 
     const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
     const fiscalYearStart = computed<number>(() => userStore.currentUserFiscalYearStart);
@@ -90,6 +93,8 @@ export function useAccountListPageBase() {
         displayOrderModified,
         // computed states
         showAccountBalance,
+        customAccountCategoryOrder,
+        defaultAccountCategory,
         firstDayOfWeek,
         fiscalYearStart,
         defaultCurrency,

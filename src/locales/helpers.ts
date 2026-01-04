@@ -1349,9 +1349,9 @@ export function useI18n() {
         return ret;
     }
 
-    function getAllAccountCategories(): LocalizedAccountCategory[] {
+    function getAllAccountCategories(customAccountCategoryOrder: string): LocalizedAccountCategory[] {
         const ret: LocalizedAccountCategory[] = [];
-        const allCategories = AccountCategory.values();
+        const allCategories = AccountCategory.values(customAccountCategoryOrder);
 
         for (const accountCategory of allCategories) {
             ret.push({
@@ -2094,10 +2094,10 @@ export function useI18n() {
         return getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyUnit, currencyName, isPlural);
     }
 
-    function getCategorizedAccountsWithDisplayBalance(allVisibleAccounts: Account[], showAccountBalance: boolean): CategorizedAccountWithDisplayBalance[] {
+    function getCategorizedAccountsWithDisplayBalance(allVisibleAccounts: Account[], showAccountBalance: boolean, customAccountCategoryOrder: string): CategorizedAccountWithDisplayBalance[] {
         const ret: CategorizedAccountWithDisplayBalance[] = [];
         const defaultCurrency = userStore.currentUserDefaultCurrency;
-        const allCategories = AccountCategory.values();
+        const allCategories = AccountCategory.values(customAccountCategoryOrder);
         const categorizedAccounts: Record<number, CategorizedAccount> = getCategorizedAccountsMap(Account.cloneAccounts(allVisibleAccounts));
 
         for (const category of allCategories) {
@@ -2128,7 +2128,8 @@ export function useI18n() {
             let finalTotalBalance = '';
 
             if (showAccountBalance) {
-                const accountsBalance = getAllFilteredAccountsBalance(categorizedAccounts, account => account.category === accountCategory.category);
+                const accountsBalance = getAllFilteredAccountsBalance(categorizedAccounts, customAccountCategoryOrder,
+                        account => account.category === accountCategory.category);
                 let totalBalance = 0;
                 let hasUnCalculatedAmount = false;
 

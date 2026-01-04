@@ -153,6 +153,18 @@
                     <div v-else-if="!loadingAccounts">{{ accountsIncludedInTotalDisplayContent }}</div>
                 </template>
             </f7-list-item>
+            <f7-list-item
+                class="item-truncate-after-text"
+                link="/settings/account_category_display_order">
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Account Category Order') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    <div>{{ accountCategorysDisplayOrderContent }}</div>
+                </template>
+            </f7-list-item>
         </f7-list>
 
         <f7-block-title>{{ tt('Exchange Rates Data Page') }}</f7-block-title>
@@ -221,6 +233,7 @@ const {
     currencySortByInExchangeRatesPage,
     accountsIncludedInHomePageOverviewDisplayContent,
     accountsIncludedInTotalDisplayContent,
+    accountCategorysDisplayOrderContent,
     transactionCategoriesIncludedInHomePageOverviewDisplayContent
 } = useAppSettingPageBase();
 

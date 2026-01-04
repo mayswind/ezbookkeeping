@@ -48,7 +48,7 @@ export const useAccountsStore = defineStore('accounts', () => {
             }
         }
 
-        return Account.sortAccounts(allAccountsList, allAccountsMap.value);
+        return Account.sortAccounts(allAccountsList, settingsStore.accountCategoryDisplayOrders, allAccountsMap.value);
     });
 
     const allMixedPlainAccounts = computed<Account[]>(() => {
@@ -68,7 +68,7 @@ export const useAccountsStore = defineStore('accounts', () => {
             }
         }
 
-        return Account.sortAccounts(allAccountsList, allAccountsMap.value);
+        return Account.sortAccounts(allAccountsList, settingsStore.accountCategoryDisplayOrders, allAccountsMap.value);
     });
 
     const allVisiblePlainAccounts = computed<Account[]>(() => {
@@ -95,7 +95,7 @@ export const useAccountsStore = defineStore('accounts', () => {
             }
         }
 
-        return Account.sortAccounts(allVisibleAccounts, allAccountsMap.value);
+        return Account.sortAccounts(allVisibleAccounts, settingsStore.accountCategoryDisplayOrders, allAccountsMap.value);
     });
 
     const allAvailableAccountsCount = computed<number>(() => {
@@ -148,8 +148,10 @@ export const useAccountsStore = defineStore('accounts', () => {
         if (newAccountCategory) {
             for (const [account, index] of itemAndIndex(allAccounts.value)) {
                 const accountCategory = AccountCategory.valueOf(account.category);
+                const accountCategoryDisplayOrder = settingsStore.accountCategoryDisplayOrders[accountCategory?.type ?? 0] || Number.MAX_SAFE_INTEGER;
+                const newAccountCategoryDisplayOrder = settingsStore.accountCategoryDisplayOrders[newAccountCategory.type] || Number.MAX_SAFE_INTEGER;
 
-                if (accountCategory && accountCategory.displayOrder > newAccountCategory.displayOrder) {
+                if (accountCategory && accountCategoryDisplayOrder > newAccountCategoryDisplayOrder) {
                     insertIndexToAllList = index;
                     break;
                 }
@@ -457,8 +459,8 @@ export const useAccountsStore = defineStore('accounts', () => {
             return DISPLAY_HIDDEN_AMOUNT;
         }
 
-        const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, account =>
-            !(account.type === AccountType.SingleAccount.type && settingsStore.appSettings.totalAmountExcludeAccountIds[account.id])
+        const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, settingsStore.appSettings.accountCategoryOrders,
+                account => !(account.type === AccountType.SingleAccount.type && settingsStore.appSettings.totalAmountExcludeAccountIds[account.id])
         );
         let netAssets = 0;
         let hasUnCalculatedAmount = false;
@@ -493,8 +495,8 @@ export const useAccountsStore = defineStore('accounts', () => {
             return DISPLAY_HIDDEN_AMOUNT;
         }
 
-        const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, account =>
-            (account.isAsset || false) && !(account.type === AccountType.SingleAccount.type && settingsStore.appSettings.totalAmountExcludeAccountIds[account.id])
+        const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, settingsStore.appSettings.accountCategoryOrders,
+                account => (account.isAsset || false) && !(account.type === AccountType.SingleAccount.type && settingsStore.appSettings.totalAmountExcludeAccountIds[account.id])
         );
         let totalAssets = 0;
         let hasUnCalculatedAmount = false;
@@ -529,8 +531,8 @@ export const useAccountsStore = defineStore('accounts', () => {
             return DISPLAY_HIDDEN_AMOUNT;
         }
 
-        const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, account =>
-            (account.isLiability || false) && !(account.type === AccountType.SingleAccount.type && settingsStore.appSettings.totalAmountExcludeAccountIds[account.id])
+        const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, settingsStore.appSettings.accountCategoryOrders,
+                account => (account.isLiability || false) && !(account.type === AccountType.SingleAccount.type && settingsStore.appSettings.totalAmountExcludeAccountIds[account.id])
         );
         let totalLiabilities = 0;
         let hasUnCalculatedAmount = false;
@@ -565,7 +567,8 @@ export const useAccountsStore = defineStore('accounts', () => {
             return DISPLAY_HIDDEN_AMOUNT;
         }
 
-        const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, account => account.category === accountCategory.type);
+        const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, settingsStore.appSettings.accountCategoryOrders,
+                account => account.category === accountCategory.type);
         let totalBalance = 0;
         let hasUnCalculatedAmount = false;
 
@@ -775,7 +778,7 @@ export const useAccountsStore = defineStore('accounts', () => {
                     updateAccountListInvalidState(false);
                 }
 
-                const accounts = Account.sortAccounts(Account.ofMulti(data.result));
+                const accounts = Account.sortAccounts(Account.ofMulti(data.result), settingsStore.accountCategoryDisplayOrders);
 
                 if (force && data.result && isEquals(allAccounts.value, accounts)) {
                     reject({ message: 'Account list is up to date', isUpToDate: true });

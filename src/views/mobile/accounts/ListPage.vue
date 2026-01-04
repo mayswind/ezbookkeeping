@@ -68,7 +68,7 @@
         </f7-list>
 
         <div :key="accountCategory.type"
-             v-for="accountCategory in AccountCategory.values()"
+             v-for="accountCategory in AccountCategory.values(customAccountCategoryOrder)"
              v-show="!loading && ((showHidden && hasAccount(accountCategory, false)) || hasAccount(accountCategory, true))">
             <f7-list strong inset dividers sortable class="list-has-group-title account-list margin-vertical"
                      :sortable-enabled="sortable"
@@ -246,6 +246,7 @@ const {
     showHidden,
     displayOrderModified,
     showAccountBalance,
+    customAccountCategoryOrder,
     allCategorizedAccountsMap,
     allAccountCount,
     netAssets,

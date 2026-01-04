@@ -178,6 +178,7 @@ const {
     filterAccountIds,
     title,
     allowHiddenAccount,
+    customAccountCategoryOrder,
     allCategorizedAccounts,
     allVisibleAccountMap,
     hasAnyAvailableAccount,
@@ -195,7 +196,7 @@ const showMoreActionSheet = ref<boolean>(false);
 
 function getCollapseStates(): Record<number, CollapseState> {
     const collapseStates: Record<number, CollapseState> = {};
-    const allCategories = AccountCategory.values();
+    const allCategories = AccountCategory.values(customAccountCategoryOrder.value);
 
     for (const accountCategory of allCategories) {
         collapseStates[accountCategory.type] = {

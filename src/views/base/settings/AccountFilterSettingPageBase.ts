@@ -7,7 +7,7 @@ import { useStatisticsStore } from '@/stores/statistics.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
 import { keys, keysIfValueEquals, values } from '@/core/base.ts';
-import type {Account, CategorizedAccount} from '@/models/account.ts';
+import type { Account, CategorizedAccount } from '@/models/account.ts';
 
 import {
     filterCategorizedAccounts,
@@ -49,11 +49,12 @@ export function useAccountFilterSettingPageBase(type?: AccountFilterType, select
         return type === 'statisticsDefault' || type === 'statisticsCurrent' || type === 'homePageOverview' || type === 'transactionListCurrent' || type === 'custom';
     });
 
-    const allCategorizedAccounts = computed<Record<number, CategorizedAccount>>(() => filterCategorizedAccounts(accountsStore.allCategorizedAccountsMap, filterContent.value, showHidden.value));
+    const customAccountCategoryOrder = computed<string>(() => settingsStore.appSettings.accountCategoryOrders);
+    const allCategorizedAccounts = computed<CategorizedAccount[]>(() => filterCategorizedAccounts(accountsStore.allCategorizedAccountsMap, customAccountCategoryOrder.value, filterContent.value, showHidden.value));
     const allVisibleAccountMap = computed<Record<string, Account>>(() => {
         const accountMap: Record<string, Account> = {};
 
-        for (const accountCategory of values(allCategorizedAccounts.value)) {
+        for (const accountCategory of allCategorizedAccounts.value) {
             for (const account of accountCategory.accounts) {
                 accountMap[account.id] = account;
 
@@ -69,7 +70,7 @@ export function useAccountFilterSettingPageBase(type?: AccountFilterType, select
     });
     const hasAnyAvailableAccount = computed<boolean>(() => accountsStore.allAvailableAccountsCount > 0);
     const hasAnyVisibleAccount = computed<boolean>(() => {
-        for (const accountCategory of values(allCategorizedAccounts.value)) {
+        for (const accountCategory of allCategorizedAccounts.value) {
             if (accountCategory.accounts.length > 0) {
                 return true;
             }
@@ -204,6 +205,7 @@ export function useAccountFilterSettingPageBase(type?: AccountFilterType, select
         title,
         applyText,
         allowHiddenAccount,
+        customAccountCategoryOrder,
         allCategorizedAccounts,
         allVisibleAccountMap,
         hasAnyAvailableAccount,

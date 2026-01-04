@@ -1,4 +1,4 @@
-import type { TypeAndName, TypeAndDisplayName } from './base.ts';
+import { type TypeAndName, type TypeAndDisplayName, itemAndIndex } from './base.ts';
 
 export class AccountType implements TypeAndName {
     private static readonly allInstances: AccountType[] = [];
@@ -38,15 +38,15 @@ export class AccountCategory implements TypeAndName {
     public static readonly Default = AccountCategory.Cash;
 
     public readonly type: number;
-    public readonly displayOrder: number;
+    public readonly defaultDisplayOrder: number;
     public readonly name: string;
     public readonly isAsset: boolean;
     public readonly isLiability: boolean
     public readonly defaultAccountIconId: string;
 
-    private constructor(type: number, displayOrder: number, name: string, isAsset: boolean, isLiability: boolean, defaultAccountIconId: string) {
+    private constructor(type: number, defaultDisplayOrder: number, name: string, isAsset: boolean, isLiability: boolean, defaultAccountIconId: string) {
         this.type = type;
-        this.displayOrder = displayOrder;
+        this.defaultDisplayOrder = defaultDisplayOrder;
         this.name = name;
         this.isAsset = isAsset;
         this.isLiability = isLiability;
@@ -56,8 +56,41 @@ export class AccountCategory implements TypeAndName {
         AccountCategory.allInstancesByType[type] = this;
     }
 
-    public static values(): AccountCategory[] {
-        return AccountCategory.allInstances;
+    public static values(customAccountCategoryOrder?: string): AccountCategory[] {
+        if (!customAccountCategoryOrder) {
+            return [...AccountCategory.allInstances];
+        }
+
+        const typeOrders: string[] = customAccountCategoryOrder.split(',');
+        const orderedCategories: AccountCategory[] = [];
+        const addedTypes: Record<string, boolean> = {};
+
+        for (const type of typeOrders) {
+            const category = AccountCategory.valueOf(parseInt(type.trim()));
+
+            if (category) {
+                orderedCategories.push(category);
+                addedTypes[type] = true;
+            }
+        }
+
+        for (const category of AccountCategory.allInstances) {
+            if (!addedTypes[category.type]) {
+                orderedCategories.push(category);
+            }
+        }
+
+        return orderedCategories;
+    }
+
+    public static allDisplayOrders(customAccountCategoryOrder: string): Record<number, number> {
+        const displayOrders: Record<number, number> = {};
+
+        for (const [category, index] of itemAndIndex(AccountCategory.values(customAccountCategoryOrder))) {
+            displayOrders[category.type] = index + 1;
+        }
+
+        return displayOrders;
     }
 
     public static valueOf(type: number): AccountCategory | undefined {

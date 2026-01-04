@@ -279,9 +279,10 @@ let resolveFunc: ((response: BatchReplaceAllTypesDialogResponse) => void) | null
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
 const showAccountBalance = computed<boolean>(() => settingsStore.appSettings.showAccountBalance);
+const customAccountCategoryOrder = computed<string>(() => settingsStore.appSettings.accountCategoryOrders);
 const allAccounts = computed<Account[]>(() => accountsStore.allPlainAccounts);
 const allVisibleAccounts = computed<Account[]>(() => accountsStore.allVisiblePlainAccounts);
-const allVisibleCategorizedAccounts = computed<CategorizedAccountWithDisplayBalance[]>(() => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts.value, showAccountBalance.value));
+const allVisibleCategorizedAccounts = computed<CategorizedAccountWithDisplayBalance[]>(() => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts.value, showAccountBalance.value, customAccountCategoryOrder.value));
 const allCategories = computed<Record<number, TransactionCategory[]>>(() => transactionCategoriesStore.allTransactionCategories);
 const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
 

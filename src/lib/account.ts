@@ -31,9 +31,9 @@ export function getCategorizedAccountsMap(allAccounts: Account[]): Record<number
     return ret;
 }
 
-export function getCategorizedAccounts(allAccounts: Account[]): CategorizedAccount[] {
+export function getCategorizedAccounts(allAccounts: Account[], customAccountCategoryOrder: string): CategorizedAccount[] {
     const ret: CategorizedAccount[] = [];
-    const allCategories = AccountCategory.values();
+    const allCategories = AccountCategory.values(customAccountCategoryOrder);
     const categorizedAccounts = getCategorizedAccountsMap(allAccounts);
 
     for (const category of allCategories) {
@@ -71,9 +71,9 @@ export function getAccountMapByName(allAccounts: Account[]): Record<string, Acco
     return ret;
 }
 
-export function filterCategorizedAccounts(categorizedAccountsMap: Record<number, CategorizedAccount>, allowAccountName?: string, showHidden?: boolean): Record<number, CategorizedAccount> {
-    const ret: Record<number, CategorizedAccount> = {};
-    const allCategories = AccountCategory.values();
+export function filterCategorizedAccounts(categorizedAccountsMap: Record<number, CategorizedAccount>, customAccountCategoryOrder: string, allowAccountName?: string, showHidden?: boolean): CategorizedAccount[] {
+    const ret: CategorizedAccount[] = [];
+    const allCategories = AccountCategory.values(customAccountCategoryOrder);
     const lowercaseFilterContent = allowAccountName ? allowAccountName.toLowerCase() : '';
 
     for (const accountCategory of allCategories) {
@@ -122,20 +122,20 @@ export function filterCategorizedAccounts(categorizedAccountsMap: Record<number,
         }
 
         if (allFilteredAccounts.length > 0) {
-            ret[accountCategory.type] = {
+            ret.push({
                 category: categorizedAccount.category,
                 name: categorizedAccount.name,
                 icon: categorizedAccount.icon,
                 accounts: allFilteredAccounts
-            };
+            });
         }
     }
 
     return ret;
 }
 
-export function getAllFilteredAccountsBalance(categorizedAccounts: Record<number, CategorizedAccount>, accountFilter: (account: Account) => boolean): AccountBalance[] {
-    const allAccountCategories = AccountCategory.values();
+export function getAllFilteredAccountsBalance(categorizedAccounts: Record<number, CategorizedAccount>, customAccountCategoryOrder: string, accountFilter: (account: Account) => boolean): AccountBalance[] {
+    const allAccountCategories = AccountCategory.values(customAccountCategoryOrder);
     const ret: AccountBalance[] = [];
 
     for (const accountCategory of allAccountCategories) {

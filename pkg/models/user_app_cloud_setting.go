@@ -34,6 +34,7 @@ var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationClo
 	"showTagInInsightsExplorerPage":        USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	// Account List Page
 	"totalAmountExcludeAccountIds":  USER_APPLICATION_CLOUD_SETTING_TYPE_STRING_BOOLEAN_MAP,
+	"accountCategoryOrders":         USER_APPLICATION_CLOUD_SETTING_TYPE_STRING,
 	"hideCategoriesWithoutAccounts": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	// Exchange Rates Data Page
 	"currencySortByInExchangeRatesPage": USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,

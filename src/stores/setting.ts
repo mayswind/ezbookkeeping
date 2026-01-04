@@ -250,6 +250,27 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('alwaysShowTransactionPicturesInMobileTransactionEditPage', value);
     }
 
+    // Import Transaction Dialog
+    function setRememberLastSelectedFileTypeInImportTransactionDialog(value: boolean): void {
+        updateApplicationSettingsValue('rememberLastSelectedFileTypeInImportTransactionDialog', value);
+        appSettings.value.rememberLastSelectedFileTypeInImportTransactionDialog = value;
+        updateUserApplicationCloudSettingValue('rememberLastSelectedFileTypeInImportTransactionDialog', value);
+
+        if (!value) {
+            setLastSelectedFileTypeInImportTransactionDialog('');
+        }
+    }
+
+    function setLastSelectedFileTypeInImportTransactionDialog(value: string): void {
+        if (!appSettings.value.rememberLastSelectedFileTypeInImportTransactionDialog) {
+            value = '';
+        }
+
+        updateApplicationSettingsValue('lastSelectedFileTypeInImportTransactionDialog', value);
+        appSettings.value.lastSelectedFileTypeInImportTransactionDialog = value;
+        updateUserApplicationCloudSettingValue('lastSelectedFileTypeInImportTransactionDialog', value);
+    }
+
     // Insights Explorer Page
     function setInsightsExplorerDefaultDateRangeType(value: number): void {
         updateApplicationSettingsValue('insightsExplorerDefaultDateRangeType', value);
@@ -498,6 +519,9 @@ export const useSettingsStore = defineStore('settings', () => {
         setAutoSaveTransactionDraft,
         setAutoGetCurrentGeoLocation,
         setAlwaysShowTransactionPicturesInMobileTransactionEditPage,
+        // -- Import Transaction Dialog
+        setRememberLastSelectedFileTypeInImportTransactionDialog,
+        setLastSelectedFileTypeInImportTransactionDialog,
         // -- Insights Explorer Page
         setInsightsExplorerDefaultDateRangeType,
         setShowTagInInsightsExplorerPage,

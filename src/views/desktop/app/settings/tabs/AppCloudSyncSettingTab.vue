@@ -82,7 +82,7 @@
                                                     <template #prepend>
                                                         <v-checkbox :disabled="loading || enabling || disabling"
                                                                     :model-value="enabledApplicationCloudSettings[settingItem.settingKey]"
-                                                                    @update:model-value="enabledApplicationCloudSettings[settingItem.settingKey] = !!$event">
+                                                                    @update:model-value="updateSettingSelected(settingItem, !!$event)">
                                                             <template #label>
                                                                 <span>{{ tt(settingItem.settingName) }}</span>
                                                                 <v-icon class="ms-2 me-0" start size="16" :icon="mdiCellphone" v-if="settingItem.mobile"/>
@@ -159,6 +159,7 @@ const {
     isAllSettingsSelected,
     hasSettingSelectedButNotAllChecked,
     updateSettingsSelected,
+    updateSettingSelected,
     selectAllSettings,
     selectNoneSettings,
     selectInvertSettings,

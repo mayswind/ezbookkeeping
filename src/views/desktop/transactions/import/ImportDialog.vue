@@ -278,6 +278,7 @@ import { ref, computed, useTemplateRef, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
@@ -339,6 +340,7 @@ const {
     getLocalizedFileEncodingName
 } = useI18n();
 
+const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
@@ -545,9 +547,52 @@ function getDisplayCount(count: number): string {
     return numeralSystem.value.formatNumber(count);
 }
 
+function loadInitFileTypeFromSettings(): void {
+    if (!settingsStore.appSettings.lastSelectedFileTypeInImportTransactionDialog) {
+        return;
+    }
+
+    const lastSelectedFileTypes = settingsStore.appSettings.lastSelectedFileTypeInImportTransactionDialog.split('|');
+    const lastSelectedFileType = lastSelectedFileTypes[0];
+
+    if (!lastSelectedFileType || !allSupportedImportFileTypesMap.value[lastSelectedFileType]) {
+        return;
+    }
+
+    fileType.value = lastSelectedFileType;
+
+    const fileSubTypes = allSupportedImportFileTypesMap.value[lastSelectedFileType].subTypes;
+
+    if (!fileSubTypes || fileSubTypes.length < 1) {
+        return;
+    }
+
+    const lastSelectedFileSubType = lastSelectedFileTypes[1];
+
+    if (lastSelectedFileSubType) {
+        for (const subType of fileSubTypes) {
+            if (subType.type === lastSelectedFileSubType) {
+                fileSubType.value = lastSelectedFileSubType;
+                return;
+            }
+        }
+    }
+
+    const firstFileSubType = fileSubTypes[0];
+
+    if (firstFileSubType) {
+        fileSubType.value = firstFileSubType.type;
+    }
+}
+
 function open(): Promise<void> {
     fileType.value = 'ezbookkeeping';
     fileSubType.value = 'ezbookkeeping_csv';
+
+    if (settingsStore.appSettings.rememberLastSelectedFileTypeInImportTransactionDialog && settingsStore.appSettings.lastSelectedFileTypeInImportTransactionDialog) {
+        loadInitFileTypeFromSettings();
+    }
+
     fileEncoding.value = 'auto';
     detectingFileEncoding.value = false;
     autoDetectedFileEncoding.value = undefined;
@@ -912,9 +957,13 @@ function close(completed: boolean): void {
     showState.value = false;
 }
 
-watch(fileType, () => {
+watch(fileType, (newValue) => {
     if (allFileSubTypes.value && allFileSubTypes.value.length) {
         fileSubType.value = allFileSubTypes.value[0]!.type;
+    } else {
+        if (settingsStore.appSettings.rememberLastSelectedFileTypeInImportTransactionDialog) {
+            settingsStore.setLastSelectedFileTypeInImportTransactionDialog(`${newValue}|`);
+        }
     }
 
     importFile.value = null;
@@ -924,6 +973,10 @@ watch(fileType, () => {
 });
 
 watch(fileSubType, (newValue) => {
+    if (settingsStore.appSettings.rememberLastSelectedFileTypeInImportTransactionDialog) {
+        settingsStore.setLastSelectedFileTypeInImportTransactionDialog(`${fileType.value}|${newValue}`);
+    }
+
     let supportedExtensions: string | undefined = findExtensionByType(allFileSubTypes.value, newValue);
 
     if (!supportedExtensions) {

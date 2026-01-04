@@ -50,6 +50,9 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     autoSaveTransactionDraft: string;
     autoGetCurrentGeoLocation: boolean;
     alwaysShowTransactionPicturesInMobileTransactionEditPage: boolean;
+    // Import Transaction Dialog
+    rememberLastSelectedFileTypeInImportTransactionDialog: boolean;
+    lastSelectedFileTypeInImportTransactionDialog: string;
     // Insights Explorer Page
     insightsExplorerDefaultDateRangeType: number;
     showTagInInsightsExplorerPage: boolean;
@@ -117,6 +120,9 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     'autoSaveTransactionDraft': UserApplicationCloudSettingType.String,
     'autoGetCurrentGeoLocation': UserApplicationCloudSettingType.Boolean,
     'alwaysShowTransactionPicturesInMobileTransactionEditPage': UserApplicationCloudSettingType.Boolean,
+    // Import Transaction Dialog
+    'rememberLastSelectedFileTypeInImportTransactionDialog': UserApplicationCloudSettingType.Boolean,
+    'lastSelectedFileTypeInImportTransactionDialog': UserApplicationCloudSettingType.String,
     // Insights Explorer Page
     'insightsExplorerDefaultDateRangeType': UserApplicationCloudSettingType.Number,
     'showTagInInsightsExplorerPage': UserApplicationCloudSettingType.Boolean,
@@ -169,6 +175,9 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     autoSaveTransactionDraft: 'disabled',
     autoGetCurrentGeoLocation: false,
     alwaysShowTransactionPicturesInMobileTransactionEditPage: false,
+    // Import Transaction Dialog
+    rememberLastSelectedFileTypeInImportTransactionDialog: true,
+    lastSelectedFileTypeInImportTransactionDialog: '',
     // Insights Explorer Page
     insightsExplorerDefaultDateRangeType: DEFAULT_TRANSACTION_EXPLORER_DATE_RANGE.type,
     showTagInInsightsExplorerPage: true,

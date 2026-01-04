@@ -13,6 +13,7 @@ export interface CategorizedApplicationCloudSettingItems {
 
 export interface ApplicationCloudSettingItem {
     readonly settingKey: string;
+    readonly relatedSettingKeys?: string[];
     readonly settingName: string;
     readonly mobile: boolean;
     readonly desktop: boolean;
@@ -48,6 +49,12 @@ export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingI
             { settingKey: 'autoSaveTransactionDraft', settingName: 'Automatically Save Draft', mobile: true, desktop: true },
             { settingKey: 'autoGetCurrentGeoLocation', settingName: 'Automatically Add Geolocation', mobile: true, desktop: true },
             { settingKey: 'alwaysShowTransactionPicturesInMobileTransactionEditPage', settingName: 'Always Show Transaction Pictures', mobile: true, desktop: false }
+        ]
+    },
+    {
+        categoryName: 'Import Transaction Dialog',
+        items: [
+            { settingKey: 'rememberLastSelectedFileTypeInImportTransactionDialog', relatedSettingKeys: ['lastSelectedFileTypeInImportTransactionDialog'], settingName: 'Remember Last Selected File Type', mobile: false, desktop: true }
         ]
     },
     {
@@ -161,6 +168,22 @@ export function useAppCloudSyncBase() {
     function updateSettingsSelected(categorizedItems: CategorizedApplicationCloudSettingItems, value: boolean): void {
         for (const item of categorizedItems.items) {
             enabledApplicationCloudSettings.value[item.settingKey] = value;
+
+            if (item.relatedSettingKeys) {
+                for (const relatedKey of item.relatedSettingKeys) {
+                    enabledApplicationCloudSettings.value[relatedKey] = value;
+                }
+            }
+        }
+    }
+
+    function updateSettingSelected(settingItem: ApplicationCloudSettingItem, value: boolean): void {
+        enabledApplicationCloudSettings.value[settingItem.settingKey] = value;
+
+        if (settingItem.relatedSettingKeys) {
+            for (const relatedKey of settingItem.relatedSettingKeys) {
+                enabledApplicationCloudSettings.value[relatedKey] = value;
+            }
         }
     }
 
@@ -168,6 +191,12 @@ export function useAppCloudSyncBase() {
         for (const categorizedItems of ALL_APPLICATION_CLOUD_SETTINGS) {
             for (const item of categorizedItems.items) {
                 enabledApplicationCloudSettings.value[item.settingKey] = true;
+
+                if (item.relatedSettingKeys) {
+                    for (const relatedKey of item.relatedSettingKeys) {
+                        enabledApplicationCloudSettings.value[relatedKey] = true;
+                    }
+                }
             }
         }
     }
@@ -176,6 +205,12 @@ export function useAppCloudSyncBase() {
         for (const categorizedItems of ALL_APPLICATION_CLOUD_SETTINGS) {
             for (const item of categorizedItems.items) {
                 enabledApplicationCloudSettings.value[item.settingKey] = false;
+
+                if (item.relatedSettingKeys) {
+                    for (const relatedKey of item.relatedSettingKeys) {
+                        enabledApplicationCloudSettings.value[relatedKey] = false;
+                    }
+                }
             }
         }
     }
@@ -183,7 +218,14 @@ export function useAppCloudSyncBase() {
     function selectInvertSettings(): void {
         for (const categorizedItems of ALL_APPLICATION_CLOUD_SETTINGS) {
             for (const item of categorizedItems.items) {
-                enabledApplicationCloudSettings.value[item.settingKey] = !enabledApplicationCloudSettings.value[item.settingKey];
+                const newValue = !enabledApplicationCloudSettings.value[item.settingKey];
+                enabledApplicationCloudSettings.value[item.settingKey] = newValue;
+
+                if (item.relatedSettingKeys) {
+                    for (const relatedKey of item.relatedSettingKeys) {
+                        enabledApplicationCloudSettings.value[relatedKey] = newValue;
+                    }
+                }
             }
         }
     }
@@ -219,6 +261,7 @@ export function useAppCloudSyncBase() {
         isAllSettingsSelected,
         hasSettingSelectedButNotAllChecked,
         updateSettingsSelected,
+        updateSettingSelected,
         selectAllSettings,
         selectNoneSettings,
         selectInvertSettings,

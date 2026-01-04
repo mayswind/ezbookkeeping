@@ -2188,6 +2188,8 @@
     "Show Confirmation Every Time": "每次提示确认",
     "Automatically Add Geolocation": "自动添加地理位置",
     "Always Show Transaction Pictures": "总是显示交易图片",
+    "Import Transaction Dialog": "导入交易对话框",
+    "Remember Last Selected File Type": "记住上次选择的文件类型",
     "Insights Explorer Page": "洞察探索页面",
     "Account List Page": "账户列表页面",
     "Accounts Included in Total": "计入总金额的账户",

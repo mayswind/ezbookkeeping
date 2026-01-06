@@ -5,24 +5,22 @@
                 <v-layout>
                     <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
                         <div class="mx-6 my-4">
-                            <btn-vertical-group :disabled="loading" :buttons="allTabs" v-model="activeTab" />
+                            <btn-vertical-group :disabled="loading || updating" :buttons="allTabs" v-model="activeTab" />
                         </div>
                         <v-divider />
-                        <div class="mx-6 mt-4" v-if="activeTab === 'table'">
-                            <span class="text-subtitle-2">{{ tt('Transactions Per Page') }}</span>
-                            <v-select class="mt-2" density="compact"
-                                      item-title="name"
-                                      item-value="value"
-                                      :disabled="loading"
-                                      :items="allPageCounts"
-                                      v-model="countPerPage"
-                            />
-                        </div>
                         <v-tabs show-arrows class="my-4" direction="vertical"
-                                :disabled="loading" v-model="currentExplorationId">
-                            <v-tab class="tab-text-truncate" key="new" value="">
-                                <span class="text-truncate">{{ tt('New Exploration') }}</span>
+                                :disabled="loading || updating" :model-value="currentExplorer.id">
+                            <v-tab class="tab-text-truncate" key="new" value="" @click="createNewExplorer">
+                                <span class="text-truncate">{{ tt('New Explorer') }}</span>
                             </v-tab>
+                            <v-tab class="tab-text-truncate" :key="explorer.id" :value="explorer.id"
+                                   v-for="explorer in allExplorers"
+                                   @click="loadExplorer(explorer.id)">
+                                <span class="text-truncate">{{ explorer.name || tt('Untitled Explorer') }}</span>
+                            </v-tab>
+<!--                            <v-btn class="text-left justify-start" variant="text" color="default" :rounded="false">-->
+<!--                                <span class="ps-2">{{ tt('More Explorer') }}</span>-->
+<!--                            </v-btn>-->
                         </v-tabs>
                     </v-navigation-drawer>
                     <v-main>
@@ -36,23 +34,23 @@
                                     <span>{{ tt('Insights Explorer') }}</span>
                                     <v-btn-group class="ms-4" color="default" density="comfortable" variant="outlined" divided>
                                         <v-btn class="button-icon-with-direction" :icon="mdiArrowLeft"
-                                               :disabled="loading || !canShiftDateRange"
+                                               :disabled="loading || updating || !canShiftDateRange"
                                                @click="shiftDateRange(-1)"/>
                                         <v-menu location="bottom" max-height="500">
                                             <template #activator="{ props }">
-                                                <v-btn :disabled="loading"
+                                                <v-btn :disabled="loading || updating"
                                                        v-bind="props">{{ displayQueryDateRangeName }}</v-btn>
                                             </template>
-                                            <v-list :selected="[query.dateRangeType]">
+                                            <v-list :selected="[currentFilter.dateRangeType]">
                                                 <v-list-item :key="dateRange.type" :value="dateRange.type"
-                                                             :append-icon="(query.dateRangeType === dateRange.type ? mdiCheck : undefined)"
+                                                             :append-icon="(currentFilter.dateRangeType === dateRange.type ? mdiCheck : undefined)"
                                                              v-for="dateRange in allDateRanges">
                                                     <v-list-item-title class="cursor-pointer"
                                                                        @click="setDateFilter(dateRange.type)">
                                                         <div class="d-flex align-center">
                                                             <span>{{ dateRange.displayName }}</span>
                                                         </div>
-                                                        <div class="statistics-custom-datetime-range smaller" v-if="dateRange.isUserCustomRange && query.dateRangeType === dateRange.type && !!query.startTime && !!query.endTime">
+                                                        <div class="statistics-custom-datetime-range smaller" v-if="dateRange.isUserCustomRange && currentFilter.dateRangeType === dateRange.type && !!currentFilter.startTime && !!currentFilter.endTime">
                                                             <span>{{ displayQueryStartTime }}</span>
                                                             <span>&nbsp;-&nbsp;</span>
                                                             <br/>
@@ -63,12 +61,12 @@
                                             </v-list>
                                         </v-menu>
                                         <v-btn class="button-icon-with-direction" :icon="mdiArrowRight"
-                                               :disabled="loading || !canShiftDateRange"
+                                               :disabled="loading || updating || !canShiftDateRange"
                                                @click="shiftDateRange(1)"/>
                                     </v-btn-group>
 
                                     <v-btn density="compact" color="default" variant="text" size="24"
-                                           class="ms-2" :icon="true" :loading="loading" @click="reload(true)">
+                                           class="ms-2" :icon="true" :loading="loading" :disabled="updating" @click="reload(true)">
                                         <template #loader>
                                             <v-progress-circular indeterminate size="20"/>
                                         </template>
@@ -76,8 +74,28 @@
                                         <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                                     </v-btn>
                                     <v-spacer/>
+                                    <v-btn class="ms-3" color="default" variant="outlined"
+                                           :disabled="loading || updating" @click="saveExplorer(false)">
+                                        {{ tt('Save Explorer') }}
+                                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="updating"></v-progress-circular>
+                                        <v-menu activator="parent" :open-on-hover="true">
+                                            <v-list>
+                                                <v-list-item :prepend-icon="mdiContentSaveOutline" @click="saveExplorer(true)">
+                                                    <v-list-item-title>{{ tt('Save As New Explorer') }}</v-list-item-title>
+                                                </v-list-item>
+                                                <v-divider class="my-2" v-if="currentExplorer.id" />
+                                                <v-list-item :prepend-icon="mdiPencilOutline" @click="setExplorerName" v-if="currentExplorer.id">
+                                                    <v-list-item-title>{{ tt('Rename Explorer') }}</v-list-item-title>
+                                                </v-list-item>
+                                                <v-divider class="my-2" v-if="currentExplorer.id" />
+                                                <v-list-item :prepend-icon="mdiDeleteOutline" @click="removeExplorer" v-if="currentExplorer.id">
+                                                    <v-list-item-title>{{ tt('Delete Explorer') }}</v-list-item-title>
+                                                </v-list-item>
+                                            </v-list>
+                                        </v-menu>
+                                    </v-btn>
                                     <v-btn density="comfortable" color="default" variant="text" class="ms-2"
-                                           :disabled="loading" :icon="true">
+                                           :disabled="loading || updating" :icon="true">
                                         <v-icon :icon="mdiDotsVertical" />
                                         <v-menu activator="parent">
                                             <v-list>
@@ -86,14 +104,14 @@
                                                 <template v-if="activeTab === 'query'">
                                                     <v-list-item :key="timezoneType.type" :value="timezoneType.type"
                                                                  :prepend-icon="timezoneTypeIconMap[timezoneType.type]"
-                                                                 :append-icon="(query.timezoneUsedForDateRange === timezoneType.type ? mdiCheck : undefined)"
+                                                                 :append-icon="(currentExplorer.timezoneUsedForDateRange === timezoneType.type ? mdiCheck : undefined)"
                                                                  :title="timezoneType.displayName"
                                                                  v-for="timezoneType in allTimezoneTypesUsedForDateRange"
-                                                                 @click="updateTimezoneUsedForDateRange(timezoneType.type)"></v-list-item>
+                                                                 @click="currentExplorer.timezoneUsedForDateRange = timezoneType.type"></v-list-item>
                                                 </template>
                                                 <v-list-item :prepend-icon="mdiExport"
                                                              :title="tt('Export Results')"
-                                                             :disabled="loading || !filteredTransactions || filteredTransactions.length < 1"
+                                                             :disabled="loading || updating || !filteredTransactions || filteredTransactions.length < 1"
                                                              @click="exportResults"
                                                              v-if="activeTab === 'table' || activeTab === 'chart'"></v-list-item>
                                             </v-list>
@@ -104,17 +122,16 @@
 
                             <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
                                 <v-window-item value="query">
-                                    <explorer-query-tab :loading="loading" />
+                                    <explorer-query-tab :loading="loading" :disabled="loading || updating" />
                                 </v-window-item>
                                 <v-window-item value="table">
                                     <explorer-data-table-tab ref="explorerDataTableTab"
-                                                             :loading="loading"
-                                                             v-model:count-per-page="countPerPage"
+                                                             :loading="loading" :disabled="loading || updating"
                                                              @click:transaction="onShowTransaction" />
                                 </v-window-item>
                                 <v-window-item value="chart">
                                     <explorer-chart-tab ref="explorerChartTab"
-                                                       :loading="loading" />
+                                                       :loading="loading" :disabled="loading || updating" />
                                 </v-window-item>
                             </v-window>
                         </v-card>
@@ -125,25 +142,29 @@
     </v-row>
 
     <date-range-selection-dialog :title="tt('Custom Date Range')"
-                                 :min-time="query.startTime"
-                                 :max-time="query.endTime"
+                                 :min-time="currentFilter.startTime"
+                                 :max-time="currentFilter.endTime"
                                  v-model:show="showCustomDateRangeDialog"
                                  @dateRange:change="setCustomDateFilter"
                                  @error="onShowDateRangeError" />
 
+    <explorer-rename-dialog ref="explorerRenameDialog" />
     <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
     <export-dialog ref="exportDialog" />
 
+    <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
+import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
 import ExplorerQueryTab from '@/views/desktop/insights/tabs/ExplorerQueryTab.vue';
 import ExplorerDataTableTab from '@/views/desktop/insights/tabs/ExplorerDataTableTab.vue';
 import ExplorerChartTab from '@/views/desktop/insights/tabs/ExplorerChartTab.vue';
+import ExplorerRenameDialog from '@/views/desktop/insights/dialogs/ExplorerRenameDialog.vue';
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
 import ExportDialog from '@/views/desktop/statistics/transaction/dialogs/ExportDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
 import { useRouter, onBeforeRouteUpdate } from 'vue-router';
@@ -158,15 +179,12 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { type TransactionExplorerPartialFilter, type TransactionExplorerFilter, useExplorersStore } from '@/stores/explorer.ts';
 
-import type { NameNumeralValue, TypeAndDisplayName } from '@/core/base.ts';
-import type { NumeralSystem } from '@/core/numeral.ts';
+import type { TypeAndDisplayName } from '@/core/base.ts';
 import { type WeekDayValue, type LocalizedDateRange, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 
-import {
-    type TransactionInsightDataItem,
-    Transaction
-} from '@/models/transaction.ts';
+import { type TransactionInsightDataItem, Transaction } from '@/models/transaction.ts';
+import { type InsightsExplorerBasicInfo, InsightsExplorer } from '@/models/explorer.ts';
 
 import {
     parseDateTimeFromUnixTime,
@@ -175,6 +193,8 @@ import {
     getDateRangeByDateType
 } from '@/lib/datetime.ts';
 
+import { generateRandomUUID } from '@/lib/misc.ts';
+
 import {
     mdiMenu,
     mdiArrowLeft,
@@ -182,6 +202,9 @@ import {
     mdiCheck,
     mdiRefresh,
     mdiDotsVertical,
+    mdiContentSaveOutline,
+    mdiPencilOutline,
+    mdiDeleteOutline,
     mdiHomeClockOutline,
     mdiInvoiceTextClockOutline,
     mdiExport
@@ -198,9 +221,12 @@ interface InsightsExplorerProps {
 const props = defineProps<InsightsExplorerProps>();
 
 type ExplorerPageTabType = 'query' | 'table' | 'chart';
+
+type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type ExplorerDataTableTabType = InstanceType<typeof ExplorerDataTableTab>;
 type ExplorerChartTabType = InstanceType<typeof ExplorerChartTab>;
+type ExplorerRenameDialogType = InstanceType<typeof ExplorerRenameDialog>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 type ExportDialogType = InstanceType<typeof ExportDialog>;
 
@@ -211,7 +237,6 @@ const {
     tt,
     getAllDateRanges,
     getAllTimezoneTypesUsedForStatistics,
-    getCurrentNumeralSystemType,
     formatDateTimeToLongDateTime,
     formatDateRange
 } = useI18n();
@@ -227,34 +252,37 @@ const timezoneTypeIconMap = {
     [TimezoneTypeForStatistics.TransactionTimezone.type]: mdiInvoiceTextClockOutline
 };
 
+const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const explorerDataTableTab = useTemplateRef<ExplorerDataTableTabType>('explorerDataTableTab');
 const explorerChartTab = useTemplateRef<ExplorerChartTabType>('explorerChartTab');
+const explorerRenameDialog = useTemplateRef<ExplorerRenameDialogType>('explorerRenameDialog');
 const exportDialog = useTemplateRef<ExportDialogType>('exportDialog');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
 const loading = ref<boolean>(true);
 const initing = ref<boolean>(true);
+const updating = ref<boolean>(false);
+const clientSessionId = ref<string>('');
 const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
 const showNav = ref<boolean>(display.mdAndUp.value);
 const activeTab = ref<ExplorerPageTabType>('query');
-const currentExplorationId = ref<string>('');
-const countPerPage = ref<number>(15);
 const showCustomDateRangeDialog = ref<boolean>(false);
 
 const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
 const fiscalYearStart = computed<number>(() => userStore.currentUserFiscalYearStart);
-const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 
-const query = computed<TransactionExplorerFilter>(() => explorersStore.transactionExplorerFilter);
+const allExplorers = computed<InsightsExplorerBasicInfo[]>(() => explorersStore.allInsightsExplorerBasicInfos.slice(0, 15));
+const currentFilter = computed<TransactionExplorerFilter>(() => explorersStore.transactionExplorerFilter);
+const currentExplorer = computed<InsightsExplorer>(() => explorersStore.currentInsightsExplorer);
 const filteredTransactions = computed<TransactionInsightDataItem[]>(() => explorersStore.filteredTransactions);
 
 const allDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.InsightsExplorer, true));
 const allTimezoneTypesUsedForDateRange = computed<TypeAndDisplayName[]>(() => getAllTimezoneTypesUsedForStatistics());
-const canShiftDateRange = computed<boolean>(() => query.value.dateRangeType !== DateRange.All.type);
-const displayQueryDateRangeName = computed<string>(() => formatDateRange(query.value.dateRangeType, query.value.startTime, query.value.endTime));
-const displayQueryStartTime = computed<string>(() => formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(query.value.startTime)));
-const displayQueryEndTime = computed<string>(() => formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(query.value.endTime)));
+const canShiftDateRange = computed<boolean>(() => currentFilter.value.dateRangeType !== DateRange.All.type);
+const displayQueryDateRangeName = computed<string>(() => formatDateRange(currentFilter.value.dateRangeType, currentFilter.value.startTime, currentFilter.value.endTime));
+const displayQueryStartTime = computed<string>(() => formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(currentFilter.value.startTime)));
+const displayQueryEndTime = computed<string>(() => formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(currentFilter.value.endTime)));
 
 const allTabs = computed<{ name: string, value: ExplorerPageTabType }[]>(() => {
     return [
@@ -273,24 +301,13 @@ const allTabs = computed<{ name: string, value: ExplorerPageTabType }[]>(() => {
     ];
 });
 
-const allPageCounts = computed<NameNumeralValue[]>(() => {
-    const pageCounts: NameNumeralValue[] = [];
-    const availableCountPerPage: number[] = [ 5, 10, 15, 20, 25, 30, 50 ];
-
-    for (const count of availableCountPerPage) {
-        pageCounts.push({ value: count, name: numeralSystem.value.formatNumber(count) });
-    }
-
-    pageCounts.push({ value: -1, name: tt('All') });
-
-    return pageCounts;
-});
-
 function getFilterLinkUrl(): string {
-    return `/insights/explorer?${explorersStore.getTransactionExplorerPageParams(currentExplorationId.value, activeTab.value)}`;
+    return `/insights/explorer?${explorersStore.getTransactionExplorerPageParams(currentExplorer.value.id, activeTab.value)}`;
 }
 
 function init(initProps: InsightsExplorerProps): void {
+    clientSessionId.value = generateRandomUUID();
+
     const filter: TransactionExplorerPartialFilter = {
         dateRangeType: initProps.initDateRangeType ? parseInt(initProps.initDateRangeType) : undefined,
         startTime: initProps.initStartTime ? parseInt(initProps.initStartTime) : undefined,
@@ -299,11 +316,11 @@ function init(initProps: InsightsExplorerProps): void {
 
     let needReload = false;
 
-    if (filter.dateRangeType !== query.value.dateRangeType) {
+    if (filter.dateRangeType !== currentFilter.value.dateRangeType) {
         needReload = true;
     } else if (filter.dateRangeType === DateRange.Custom.type) {
-        if (filter.startTime !== query.value.startTime
-            || filter.endTime !== query.value.endTime) {
+        if (filter.startTime !== currentFilter.value.startTime
+            || filter.endTime !== currentFilter.value.endTime) {
             needReload = true;
         }
     }
@@ -311,7 +328,6 @@ function init(initProps: InsightsExplorerProps): void {
     if (initProps.initActiveTab === 'query' || initProps.initActiveTab === 'table' || initProps.initActiveTab === 'chart') {
         if (initProps.initActiveTab !== activeTab.value) {
             activeTab.value = initProps.initActiveTab;
-            needReload = true;
         }
     } else {
         activeTab.value = 'query';
@@ -319,7 +335,15 @@ function init(initProps: InsightsExplorerProps): void {
 
     explorersStore.initTransactionExplorerFilter(filter);
 
-    if (!needReload && !explorersStore.transactionExplorerStateInvalid) {
+    if (initProps.initId) {
+        if (explorersStore.currentInsightsExplorer.id !== initProps.initId) {
+            loadExplorer(initProps.initId);
+        }
+    } else {
+        explorersStore.updateCurrentInsightsExplorer(InsightsExplorer.createNewExplorer());
+    }
+
+    if (!needReload && !explorersStore.transactionExplorerStateInvalid && !explorersStore.insightsExplorerListStateInvalid) {
         loading.value = false;
         initing.value = false;
         return;
@@ -328,7 +352,8 @@ function init(initProps: InsightsExplorerProps): void {
     Promise.all([
         accountsStore.loadAllAccounts({ force: false }),
         transactionCategoriesStore.loadAllCategories({ force: false }),
-        transactionTagsStore.loadAllTags({ force: false })
+        transactionTagsStore.loadAllTags({ force: false }),
+        explorersStore.loadAllInsightsExplorerBasicInfos({ force: false })
     ]).then(() => {
         return explorersStore.loadAllTransactions({ force: false });
     }).then(() => {
@@ -364,9 +389,100 @@ function reload(force: boolean): Promise<unknown> | null {
     });
 }
 
-function updateTimezoneUsedForDateRange(timezoneType: number): void {
-    explorersStore.updateTransactionExplorerFilter({
-        timezoneUsedForDateRange: timezoneType
+function createNewExplorer(): void {
+    if (!currentExplorer.value.id) {
+        return;
+    }
+
+    explorersStore.updateCurrentInsightsExplorer(InsightsExplorer.createNewExplorer());
+    router.push(getFilterLinkUrl());
+}
+
+function loadExplorer(explorerId: string): void {
+    if (currentExplorer.value.id === explorerId) {
+        return;
+    }
+
+    loading.value = true;
+
+    explorersStore.getInsightsExplorer({
+        explorerId: explorerId
+    }).then(explorer => {
+        explorersStore.updateCurrentInsightsExplorer(explorer);
+        loading.value = false;
+        router.push(getFilterLinkUrl());
+    }).catch(error => {
+        loading.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function saveExplorer(saveAs?: boolean): void {
+    if (saveAs || !currentExplorer.value.name) {
+        explorerRenameDialog.value?.open(currentExplorer.value.name || '').then((newName: string) => {
+            currentExplorer.value.name = newName;
+            doSaveExplorer(saveAs);
+        })
+    } else {
+        doSaveExplorer(saveAs);
+    }
+}
+
+function doSaveExplorer(saveAs?: boolean): Promise<unknown> {
+    const oldExplorerId = currentExplorer.value.id;
+
+    updating.value = true;
+
+    return explorersStore.saveInsightsExplorer({
+        explorer: currentExplorer.value,
+        saveAs: saveAs,
+        clientSessionId: clientSessionId.value
+    }).then(newExplorer => {
+        updating.value = false;
+        clientSessionId.value = generateRandomUUID();
+        explorersStore.updateCurrentInsightsExplorer(newExplorer);
+
+        if (oldExplorerId !== newExplorer.id) {
+            router.push(getFilterLinkUrl());
+        }
+    }).catch(error => {
+        updating.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function setExplorerName(): void {
+    explorerRenameDialog.value?.open(currentExplorer.value.name || '').then((newName: string) => {
+        currentExplorer.value.name = newName;
+    });
+}
+
+function removeExplorer(): void {
+    if (!currentExplorer.value.id) {
+        return;
+    }
+
+    confirmDialog.value?.open('Are you sure you want to delete this explorer?').then(() => {
+        updating.value = true;
+
+        explorersStore.deleteInsightsExplorer({
+            explorer: currentExplorer.value
+        }).then(() => {
+            updating.value = false;
+            createNewExplorer();
+        }).catch(error => {
+            updating.value = false;
+
+            if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+        });
     });
 }
 
@@ -390,7 +506,7 @@ function setDateFilter(dateType: number): void {
     if (dateType === DateRange.Custom.type) { // Custom
         showCustomDateRangeDialog.value = true;
         return;
-    } else if (query.value.dateRangeType === dateType) {
+    } else if (currentFilter.value.dateRangeType === dateType) {
         return;
     }
 
@@ -436,11 +552,11 @@ function setCustomDateFilter(startTime: number, endTime: number): void {
 }
 
 function shiftDateRange(scale: number): void {
-    if (query.value.dateRangeType === DateRange.All.type) {
+    if (currentFilter.value.dateRangeType === DateRange.All.type) {
         return;
     }
 
-    const newDateRange = getShiftedDateRangeAndDateType(query.value.startTime, query.value.endTime, scale, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.Normal);
+    const newDateRange = getShiftedDateRangeAndDateType(currentFilter.value.startTime, currentFilter.value.endTime, scale, firstDayOfWeek.value, fiscalYearStart.value, DateRangeScene.Normal);
 
     const changed = explorersStore.updateTransactionExplorerFilter({
         dateRangeType: newDateRange.dateType,

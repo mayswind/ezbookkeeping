@@ -9,11 +9,11 @@
                         item-title="name"
                         item-value="value"
                         density="compact"
-                        :disabled="loading"
+                        :disabled="loading || disabled"
                         :label="tt('Chart Type')"
                         :items="allTransactionExplorerChartTypes"
-                        :model-value="currentChartType"
-                        @update:model-value="updateChartType($event as TransactionExplorerChartTypeValue)"
+                        :model-value="currentExplorer.chartType"
+                        @update:model-value="currentExplorer.chartType = $event as TransactionExplorerChartTypeValue"
                     />
                     <v-select
                         class="flex-0-0"
@@ -21,11 +21,11 @@
                         item-title="name"
                         item-value="value"
                         density="compact"
-                        :disabled="loading"
+                        :disabled="loading || disabled"
                         :label="tt('Axis / Category')"
                         :items="allTransactionExplorerDataDimensions"
-                        :model-value="currentCategoryDimension"
-                        @update:model-value="updateCategoryDimension($event as TransactionExplorerDataDimensionType)"
+                        :model-value="currentExplorer.categoryDimension"
+                        @update:model-value="currentExplorer.categoryDimension = $event as TransactionExplorerDataDimensionType"
                     />
                     <v-select
                         class="flex-0-0"
@@ -33,14 +33,14 @@
                         item-title="name"
                         item-value="value"
                         density="compact"
-                        :disabled="loading || !TransactionExplorerChartType.valueOf(currentChartType)?.seriesDimensionRequired"
+                        :disabled="loading || disabled || !TransactionExplorerChartType.valueOf(currentExplorer.chartType)?.seriesDimensionRequired"
                         :label="tt('Series')"
                         :items="allTransactionExplorerDataDimensions"
-                        :model-value="TransactionExplorerChartType.valueOf(currentChartType)?.seriesDimensionRequired ? currentSeriesDimension : TransactionExplorerDataDimension.None.value"
-                        @update:model-value="updateSeriesDimension($event as TransactionExplorerDataDimensionType)"
+                        :model-value="TransactionExplorerChartType.valueOf(currentExplorer.chartType)?.seriesDimensionRequired ? currentExplorer.seriesDimension : TransactionExplorerDataDimension.None.value"
+                        @update:model-value="currentExplorer.seriesDimension = $event as TransactionExplorerDataDimensionType"
                     >
                         <template #item="{ props, item }">
-                            <v-list-item :disabled="item.value === currentCategoryDimension && item.value !== TransactionExplorerDataDimension.SeriesDimensionDefault.value" v-bind="props">
+                            <v-list-item :disabled="item.value === currentExplorer.categoryDimension && item.value !== TransactionExplorerDataDimension.SeriesDimensionDefault.value" v-bind="props">
                                 <template #title>
                                     <div class="text-truncate">{{ item.raw.name }}</div>
                                 </template>
@@ -53,11 +53,11 @@
                         item-title="name"
                         item-value="value"
                         density="compact"
-                        :disabled="loading"
+                        :disabled="loading || disabled"
                         :label="tt('Value Metric')"
                         :items="allTransactionExplorerValueMetrics"
-                        :model-value="currentValueMetric"
-                        @update:model-value="updateValueMetric($event as TransactionExplorerValueMetricType)"
+                        :model-value="currentExplorer.valueMetric"
+                        @update:model-value="currentExplorer.valueMetric = $event as TransactionExplorerValueMetricType"
                     />
                     <v-select
                         class="flex-0-0"
@@ -65,18 +65,18 @@
                         item-title="displayName"
                         item-value="type"
                         density="compact"
-                        :disabled="loading"
+                        :disabled="loading || disabled"
                         :label="tt('Sort Order')"
                         :items="allTransactionExplorerChartSortingTypes"
-                        :model-value="currentChartSortingType"
-                        @update:model-value="updateChartSortingType($event)"
+                        :model-value="currentExplorer.chartSortingType"
+                        @update:model-value="currentExplorer.chartSortingType = $event"
                     />
                     <v-spacer class="flex-1-1"/>
                 </div>
             </v-col>
         </v-row>
     </v-card-text>
-    <v-card-text :class="{ 'readonly': loading }" v-if="currentChartType === TransactionExplorerChartType.Pie.value">
+    <v-card-text :class="{ 'readonly': loading }" v-if="currentExplorer.chartType === TransactionExplorerChartType.Pie.value">
         <pie-chart
             :items="[
                 {id: '1', name: '---', value: 60, color: '7c7c7f'},
@@ -95,7 +95,7 @@
             :show-value="true"
             :show-percent="true"
             :enable-click-item="true"
-            :amount-value="explorersStore.transactionExplorerFilter.valueMetric !== TransactionExplorerValueMetric.TransactionCount.value"
+            :amount-value="currentExplorer.valueMetric !== TransactionExplorerValueMetric.TransactionCount.value"
             :default-currency="defaultCurrency"
             id-field="id"
             name-field="name"
@@ -104,7 +104,7 @@
             @click="onClickPieChartItem"
         />
     </v-card-text>
-    <v-card-text :class="{ 'readonly': loading }" v-if="currentChartType === TransactionExplorerChartType.Radar.value">
+    <v-card-text :class="{ 'readonly': loading }" v-if="currentExplorer.chartType === TransactionExplorerChartType.Radar.value">
         <radar-chart
             :items="[
                 {name: '---', value: 10},
@@ -124,7 +124,7 @@
             :min-valid-percent="0.0001"
             :show-value="true"
             :show-percent="true"
-            :amount-value="explorersStore.transactionExplorerFilter.valueMetric !== TransactionExplorerValueMetric.TransactionCount.value"
+            :amount-value="currentExplorer.valueMetric !== TransactionExplorerValueMetric.TransactionCount.value"
             :default-currency="defaultCurrency"
             name-field="name"
             value-field="totalAmount"
@@ -159,6 +159,7 @@ import {
 } from '@/core/explorer.ts';
 
 import { type SortableTransactionStatisticDataItem } from '@/models/transaction.ts';
+import type { InsightsExplorer } from '@/models/explorer.ts';
 
 import { isDefined } from '@/lib/common.ts';
 import { parseDateTimeFromString } from '@/lib/datetime.ts';
@@ -166,6 +167,7 @@ import { sortStatisticsItems } from '@/lib/statistics.ts';
 
 interface InsightsExplorerDataTableTabProps {
     loading?: boolean;
+    disabled?: boolean;
 }
 
 interface CategoryDimensionData extends SortableTransactionStatisticDataItem {
@@ -210,14 +212,10 @@ const allTransactionExplorerValueMetrics = computed<NameValue[]>(() => getAllTra
 const allTransactionExplorerChartTypes = computed<NameValue[]>(() => getAllTransactionExplorerChartTypes());
 const allTransactionExplorerChartSortingTypes = computed<TypeAndDisplayName[]>(() => getAllStatisticsSortingTypes());
 
-const currentCategoryDimension = computed<TransactionExplorerDataDimensionType>(() => explorersStore.transactionExplorerFilter.categoryDimension);
-const currentSeriesDimension = computed<TransactionExplorerDataDimensionType>(() => explorersStore.transactionExplorerFilter.seriesDimension);
-const currentValueMetric = computed<TransactionExplorerValueMetricType>(() => explorersStore.transactionExplorerFilter.valueMetric);
-const currentChartType = computed<TransactionExplorerChartTypeValue>(() => explorersStore.transactionExplorerFilter.chartType);
-const currentChartSortingType = computed<number>(() => explorersStore.transactionExplorerFilter.chartSortingType);
+const currentExplorer = computed<InsightsExplorer>(() => explorersStore.currentInsightsExplorer);
 
 const categoryDimensionTransactionExplorerData = computed<CategoryDimensionData[]>(() => {
-    if (currentChartType.value !== TransactionExplorerChartType.Pie.value && currentChartType.value !== TransactionExplorerChartType.Radar.value) {
+    if (currentExplorer.value.chartType !== TransactionExplorerChartType.Pie.value && currentExplorer.value.chartType !== TransactionExplorerChartType.Radar.value) {
         return [];
     }
 
@@ -245,7 +243,7 @@ const categoryDimensionTransactionExplorerData = computed<CategoryDimensionData[
         });
     }
 
-    sortStatisticsItems(result, explorersStore.transactionExplorerFilter.chartSortingType);
+    sortStatisticsItems(result, currentExplorer.value.chartSortingType);
 
     return result;
 });
@@ -262,13 +260,13 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesedInfo): stri
         needI18n = info.categoryNameNeedI18n;
         i18nParameters = info.categoryNameI18nParameters;
         dimessionType = info.categoryIdType;
-        dimession = explorersStore.transactionExplorerFilter.categoryDimension;
+        dimession = currentExplorer.value.categoryDimension;
     } else if ('seriesName' in info) {
         name = info.seriesName;
         needI18n = info.seriesNameNeedI18n;
         i18nParameters = info.seriesNameI18nParameters;
         dimessionType = info.seriesIdType;
-        dimession = explorersStore.transactionExplorerFilter.seriesDimension;
+        dimession = currentExplorer.value.seriesDimension;
     }
 
     let displayName: string = name;
@@ -323,36 +321,6 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesedInfo): stri
     return displayName;
 }
 
-function updateChartType(chartType: TransactionExplorerChartTypeValue): void {
-    explorersStore.updateTransactionExplorerFilter({
-        chartType: chartType,
-    });
-}
-
-function updateCategoryDimension(categoryDimension: TransactionExplorerDataDimensionType): void {
-    explorersStore.updateTransactionExplorerFilter({
-        categoryDimension: categoryDimension,
-    });
-}
-
-function updateSeriesDimension(seriesDimension: TransactionExplorerDataDimensionType): void {
-    explorersStore.updateTransactionExplorerFilter({
-        seriesDimension: seriesDimension,
-    });
-}
-
-function updateValueMetric(valueMetric: TransactionExplorerValueMetricType): void {
-    explorersStore.updateTransactionExplorerFilter({
-        valueMetric: valueMetric,
-    });
-}
-
-function updateChartSortingType(sortingType: number): void {
-    explorersStore.updateTransactionExplorerFilter({
-        chartSortingType: sortingType,
-    });
-}
-
 function onClickPieChartItem(item: Record<string, unknown>): void {
     if (!item || !('id' in item) || !('dimension' in item)) {
         return;
@@ -367,8 +335,8 @@ function onClickPieChartItem(item: Record<string, unknown>): void {
 }
 
 function buildExportResults(): { headers: string[], data: string[][] } | undefined {
-    if (currentChartType.value === TransactionExplorerChartType.Pie.value || currentChartType.value === TransactionExplorerChartType.Radar.value) {
-        const valueMetric = TransactionExplorerValueMetric.valueOf(explorersStore.transactionExplorerFilter.valueMetric);
+    if (currentExplorer.value.chartType === TransactionExplorerChartType.Pie.value || currentExplorer.value.chartType === TransactionExplorerChartType.Radar.value) {
+        const valueMetric = TransactionExplorerValueMetric.valueOf(currentExplorer.value.valueMetric);
 
         return {
             headers: [

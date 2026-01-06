@@ -1,14 +1,33 @@
 <template>
+    <v-card-text class="px-5 py-0 mb-4">
+        <v-row>
+            <v-col cols="12">
+                <div class="d-flex overflow-x-auto align-center gap-2 pt-2">
+                    <v-select
+                        class="flex-0-0"
+                        min-width="150"
+                        item-title="name"
+                        item-value="value"
+                        density="compact"
+                        :disabled="loading || disabled"
+                        :label="tt('Transactions Per Page')"
+                        :items="allPageCounts"
+                        v-model="countPerPage"
+                    />
+                </div>
+            </v-col>
+        </v-row>
+    </v-card-text>
     <v-data-table
         fixed-header
         fixed-footer
         multi-sort
         item-value="index"
-        :class="{ 'insights-explorer-table': true, 'text-sm': true, 'disabled': loading, 'loading-skeleton': loading }"
+        :class="{ 'insights-explorer-table': true, 'text-sm': true, 'disabled': loading || disabled, 'loading-skeleton': loading }"
         :headers="dataTableHeaders"
         :items="filteredTransactions"
         :hover="true"
-        v-model:items-per-page="itemsPerPage"
+        v-model:items-per-page="countPerPage"
         v-model:page="currentPage"
     >
         <template #item.time="{ item }">
@@ -61,7 +80,7 @@
             </div>
         </template>
         <template #item.operation="{ item }">
-            <v-btn density="compact" variant="text" color="default" :disabled="loading"
+            <v-btn density="compact" variant="text" color="default" :disabled="loading || disabled"
                    @click="showTransaction(item)">
                 {{ tt('View') }}
             </v-btn>
@@ -78,7 +97,7 @@
         </template>
         <template #bottom>
             <div class="title-and-toolbar d-flex align-center justify-center text-no-wrap mt-2 mb-4">
-                <pagination-buttons :disabled="loading"
+                <pagination-buttons :disabled="loading || disabled"
                                     :totalPageCount="totalPageCount"
                                     v-model="currentPage">
                 </pagination-buttons>
@@ -98,6 +117,7 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useExplorersStore } from '@/stores/explorer.ts';
 
+import type { NameNumeralValue } from '@/core/base.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
 
@@ -121,13 +141,13 @@ import {
 
 interface InsightsExplorerDataTableTabProps {
     loading?: boolean;
-    countPerPage: number;
+    disabled?: boolean;
 }
 
-const props = defineProps<InsightsExplorerDataTableTabProps>();
+defineProps<InsightsExplorerDataTableTabProps>();
+
 const emit = defineEmits<{
     (e: 'click:transaction', value: TransactionInsightDataItem): void;
-    (e: 'update:countPerPage', value: number): void;
 }>();
 
 const {
@@ -144,21 +164,30 @@ const userStore = useUserStore();
 const explorersStore = useExplorersStore();
 
 const currentPage = ref<number>(1);
+const countPerPage = ref<number>(15);
 
 const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
 const filteredTransactions = computed<TransactionInsightDataItem[]>(() => explorersStore.filteredTransactions);
 
-const itemsPerPage = computed<number>({
-    get: () => props.countPerPage,
-    set: (value: number) => emit('update:countPerPage', value)
-})
+const allPageCounts = computed<NameNumeralValue[]>(() => {
+    const pageCounts: NameNumeralValue[] = [];
+    const availableCountPerPage: number[] = [ 5, 10, 15, 20, 25, 30, 50 ];
+
+    for (const count of availableCountPerPage) {
+        pageCounts.push({ value: count, name: numeralSystem.value.formatNumber(count) });
+    }
+
+    pageCounts.push({ value: -1, name: tt('All') });
+
+    return pageCounts;
+});
 
 const skeletonData = computed<number[]>(() => {
     const data: number[] = [];
 
-    for (let i = 0; i < itemsPerPage.value; i++) {
+    for (let i = 0; i < countPerPage.value; i++) {
         data.push(i);
     }
 
@@ -171,7 +200,7 @@ const totalPageCount = computed<number>(() => {
     }
 
     const count = filteredTransactions.value.length;
-    return Math.ceil(count / itemsPerPage.value);
+    return Math.ceil(count / countPerPage.value);
 });
 
 const dataTableHeaders = computed<object[]>(() => {

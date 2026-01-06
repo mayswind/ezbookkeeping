@@ -2,11 +2,11 @@
     <v-card-subtitle class="px-5">
         <div class="title-and-toolbar d-flex">
             <v-btn color="default" variant="outlined"
-                   :disabled="loading || !!editingQuery"
+                   :disabled="loading || disabled || !!editingQuery"
                    @click="addQuery">{{ tt('Add Query') }}</v-btn>
             <v-spacer />
             <v-btn color="secondary" variant="tonal"
-                   :disabled="loading || !!editingQuery || queries.length < 1"
+                   :disabled="loading || disabled || !!editingQuery || queries.length < 1"
                    @click="clearAllQueries">{{ tt('Clear All') }}</v-btn>
         </div>
     </v-card-subtitle>
@@ -18,7 +18,7 @@
                     <span class="query-name text-subtitle-1 ms-2" v-if="editingQuery !== query">{{ query.name || tt('format.misc.queryIndex', { index: queryIndex + 1 }) }}</span>
                     <div class="query-name-edit ms-2" v-if="editingQuery === query">
                         <v-text-field autofocus type="text" density="compact" variant="underlined"
-                                      :disabled="loading"
+                                      :disabled="loading || disabled"
                                       :placeholder="tt('format.misc.queryIndex', { index: queryIndex + 1 })"
                                       v-text-field-auto-width="{ minWidth: 20, maxWidth: 300, auxSpanId: `query-name-aux-span-${queryIndex + 1}` }"
                                       v-model="editingQueryName"
@@ -27,28 +27,28 @@
                         <span :id="`query-name-aux-span-${queryIndex + 1}`" />
                     </div>
                     <v-btn class="ms-2" density="compact" color="primary" variant="text" size="small"
-                           :icon="true" :disabled="loading"
+                           :icon="true" :disabled="loading || disabled"
                            @click="updateQueryName(query)"
                            v-if="editingQuery === query">
                         <v-icon :icon="mdiCheck" size="18" />
                         <v-tooltip activator="parent">{{ tt('Update') }}</v-tooltip>
                     </v-btn>
                     <v-btn class="ms-2" density="compact" color="default" variant="text" size="small"
-                           :icon="true" :disabled="loading"
+                           :icon="true" :disabled="loading || disabled"
                            @click="cancelUpdateQueryName"
                            v-if="editingQuery === query">
                         <v-icon :icon="mdiClose" size="18" />
                         <v-tooltip activator="parent">{{ tt('Cancel') }}</v-tooltip>
                     </v-btn>
                     <v-btn class="ms-2" density="compact" color="default" variant="text" size="small"
-                           :icon="true" :disabled="loading || !!editingQuery"
+                           :icon="true" :disabled="loading || disabled || !!editingQuery"
                            @click="editingQueryName = query.name; editingQuery = query"
                            v-if="!editingQuery || editingQuery !== query">
                         <v-icon :icon="mdiPencilOutline" size="18" />
                         <v-tooltip activator="parent">{{ tt('Modify Query Name') }}</v-tooltip>
                     </v-btn>
                     <v-btn class="ms-2" density="compact" color="default" variant="text" size="small"
-                           :icon="true" :disabled="loading || !!editingQuery"
+                           :icon="true" :disabled="loading || disabled || !!editingQuery"
                            @click="duplicateQuery(query)"
                            v-if="!editingQuery || editingQuery !== query">
                         <v-icon :icon="mdiContentCopy" size="18" />
@@ -56,7 +56,7 @@
                     </v-btn>
                     <v-spacer />
                     <v-switch class="bidirectional-switch ms-2" color="secondary"
-                              :disabled="loading || !!editingQuery || !query.conditions || query.conditions.length < 1"
+                              :disabled="loading || disabled || !!editingQuery || !query.conditions || query.conditions.length < 1"
                               :label="tt('Expression')"
                               v-model="showExpression[queryIndex]"
                               @click="showExpression[queryIndex] = !showExpression[queryIndex]">
@@ -65,7 +65,7 @@
                         </template>
                     </v-switch>
                     <v-btn class="ms-2" density="compact" color="default" variant="text" size="small"
-                           :icon="true" :disabled="loading || !!editingQuery || queries.length < 1"
+                           :icon="true" :disabled="loading || disabled || !!editingQuery || queries.length < 1"
                            @click="removeQuery(queryIndex)">
                         <v-icon :icon="mdiClose" size="18" />
                         <v-tooltip activator="parent">{{ tt('Remove Query') }}</v-tooltip>
@@ -102,7 +102,7 @@
                                             density="compact"
                                             item-title="displayName"
                                             item-value="value"
-                                            :disabled="loading || !!editingQuery"
+                                            :disabled="loading || disabled || !!editingQuery"
                                             :items="[
                                                 { value: TransactionExplorerConditionRelation.And, displayName: tt('AND') },
                                                 { value: TransactionExplorerConditionRelation.Or, displayName: tt('OR') }
@@ -116,7 +116,7 @@
                                             density="compact"
                                             item-title="name"
                                             item-value="value"
-                                            :disabled="loading || !!editingQuery"
+                                            :disabled="loading || disabled || !!editingQuery"
                                             :items="allTransactionExplorerConditionFields"
                                             @update:model-value="updateConditionField(queryIndex, conditionIndex, TransactionExplorerConditionField.valueOf($event))"
                                             v-model="conditionWithRelation.condition.field"
@@ -127,7 +127,7 @@
                                             density="compact"
                                             item-title="name"
                                             item-value="value"
-                                            :disabled="loading || !!editingQuery"
+                                            :disabled="loading || disabled || !!editingQuery"
                                             :items="getAllTransactionExplorerConditionOperators(conditionWithRelation.getSupportedOperators())"
                                             v-model="conditionWithRelation.condition.operator"
                                         />
@@ -138,7 +138,7 @@
                                                 density="compact"
                                                 item-title="displayName"
                                                 item-value="type"
-                                                :disabled="loading || !!editingQuery"
+                                                :disabled="loading || disabled || !!editingQuery"
                                                 :placeholder="tt('None')"
                                                 :items="[
                                                     { type: TransactionType.Expense, displayName: tt('Expense') },
@@ -166,7 +166,7 @@
                                                 item-value="type"
                                                 persistent-placeholder
                                                 :readonly="true"
-                                                :disabled="loading || !!editingQuery || !hasAnyTransactionCategory"
+                                                :disabled="loading || disabled || !!editingQuery || !hasAnyTransactionCategory"
                                                 :placeholder="tt('None')"
                                                 :model-value="getFilteredTransactionCategoriesDisplayContent(arrayItemToObjectField(conditionWithRelation.condition.value as string[], true))"
                                                 @click="currentCondition = conditionWithRelation.condition; showFilterTransactionCategoriesDialog = true"
@@ -180,7 +180,7 @@
                                                 item-value="type"
                                                 persistent-placeholder
                                                 :readonly="true"
-                                                :disabled="loading || !!editingQuery || !hasAnyAccount"
+                                                :disabled="loading || disabled || !!editingQuery || !hasAnyAccount"
                                                 :placeholder="tt('None')"
                                                 :model-value="getFilteredAccountsDisplayContent(arrayItemToObjectField(conditionWithRelation.condition.value as string[], true))"
                                                 @click="currentCondition = conditionWithRelation.condition; showFilterSourceAccountsDialog = true"
@@ -194,7 +194,7 @@
                                                 item-value="type"
                                                 persistent-placeholder
                                                 :readonly="true"
-                                                :disabled="loading || !!editingQuery || !hasAnyAccount"
+                                                :disabled="loading || disabled || !!editingQuery || !hasAnyAccount"
                                                 :placeholder="tt('None')"
                                                 :model-value="getFilteredAccountsDisplayContent(arrayItemToObjectField(conditionWithRelation.condition.value as string[], true))"
                                                 @click="currentCondition = conditionWithRelation.condition; showFilterDestinationAccountsDialog = true"
@@ -206,7 +206,7 @@
                                                             conditionWithRelation.condition.field === TransactionExplorerConditionField.DestinationAmount.value">
                                                 <amount-input density="compact"
                                                               :currency="defaultCurrency"
-                                                              :disabled="loading || !!editingQuery"
+                                                              :disabled="loading || disabled || !!editingQuery"
                                                               v-model="conditionWithRelation.condition.value[0]"
                                                 />
                                                 <span class="ms-2 me-2"
@@ -214,7 +214,7 @@
                                                             conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.NotBetween.value">~</span>
                                                 <amount-input density="compact"
                                                               :currency="defaultCurrency"
-                                                              :disabled="loading || !!editingQuery"
+                                                              :disabled="loading || disabled || !!editingQuery"
                                                               v-model="conditionWithRelation.condition.value[1]"
                                                               v-if="conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.Between.value ||
                                                                     conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.NotBetween.value"
@@ -245,7 +245,7 @@
                                                     multiple
                                                     chips
                                                     closable-chips
-                                                    :disabled="loading || !!editingQuery"
+                                                    :disabled="loading || disabled || !!editingQuery"
                                                     :placeholder="tt('None')"
                                                     :items="allTags"
                                                     v-model="conditionWithRelation.condition.value"
@@ -300,7 +300,7 @@
                                             />
 
                                             <v-text-field density="compact"
-                                                          :disabled="loading || !!editingQuery"
+                                                          :disabled="loading || disabled || !!editingQuery"
                                                           :placeholder="tt('None')"
                                                           v-model="conditionWithRelation.condition.value"
                                                           v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.Description.value &&
@@ -311,7 +311,7 @@
                                         <v-btn color="default" density="compact"
                                                variant="text" size="small"
                                                :icon="true"
-                                               :disabled="loading || !!editingQuery"
+                                               :disabled="loading || disabled || !!editingQuery"
                                                @click="removeCondition(queryIndex, conditionIndex)">
                                             <v-icon :icon="mdiClose" size="18" />
                                             <v-tooltip activator="parent">{{ tt('Remove Condition') }}</v-tooltip>
@@ -328,7 +328,7 @@
 
                             <v-btn class="px-2" density="comfortable" color="primary" variant="text" size="small"
                                    :prepend-icon="mdiPlus"
-                                   :disabled="loading || !!editingQuery || showExpression[queryIndex]"
+                                   :disabled="loading || disabled || !!editingQuery || showExpression[queryIndex]"
                                    @click="addCondition(queryIndex)">
                                 {{ tt('Add Condition') }}
                             </v-btn>
@@ -421,6 +421,7 @@ import {
 
 interface ExplorerQueryTabProps {
     loading?: boolean;
+    disabled?: boolean;
 }
 
 type SnackBarType = InstanceType<typeof SnackBar>;
@@ -451,7 +452,7 @@ const tagSearchContent = ref<string>('');
 const editingQuery = ref<TransactionExplorerQuery | undefined>(undefined);
 const editingQueryName = ref<string>('');
 
-const queries = computed<TransactionExplorerQuery[]>(() => explorersStore.transactionExplorerFilter.query);
+const queries = computed<TransactionExplorerQuery[]>(() => explorersStore.currentInsightsExplorer.queries);
 
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 const hasAnyAccount = computed<boolean>(() => accountsStore.allPlainAccounts.length > 0);

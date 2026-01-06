@@ -118,6 +118,14 @@ import type {
     TransactionTemplateInfoResponse
 } from '@/models/transaction_template.ts';
 import type {
+    InsightsExplorerCreateRequest,
+    InsightsExplorerModifyRequest,
+    InsightsExplorerHideRequest,
+    InsightsExplorerMoveRequest,
+    InsightsExplorerDeleteRequest,
+    InsightsExplorerInfoResponse,
+} from '@/models/explorer.ts';
+import type {
     TokenGenerateAPIRequest,
     TokenGenerateMCPRequest,
     TokenRevokeRequest,
@@ -741,6 +749,27 @@ export default {
     },
     deleteTransactionTemplate: (req: TransactionTemplateDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transaction/templates/delete.json', req);
+    },
+    getAllInsightsExplorers: (): ApiResponsePromise<InsightsExplorerInfoResponse[]> => {
+        return axios.get<ApiResponse<InsightsExplorerInfoResponse[]>>('v1/insights/explorers/list.json');
+    },
+    getInsightsExplorer: ({ id }: { id: string }): ApiResponsePromise<InsightsExplorerInfoResponse> => {
+        return axios.get<ApiResponse<InsightsExplorerInfoResponse>>('v1/insights/explorers/get.json?id=' + id);
+    },
+    addInsightsExplorer: (req: InsightsExplorerCreateRequest): ApiResponsePromise<InsightsExplorerInfoResponse> => {
+        return axios.post<ApiResponse<InsightsExplorerInfoResponse>>('v1/insights/explorers/add.json', req);
+    },
+    modifyInsightsExplorer: (req: InsightsExplorerModifyRequest): ApiResponsePromise<InsightsExplorerInfoResponse> => {
+        return axios.post<ApiResponse<InsightsExplorerInfoResponse>>('v1/insights/explorers/modify.json', req);
+    },
+    hideInsightsExplorer: (req: InsightsExplorerHideRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/insights/explorers/hide.json', req);
+    },
+    moveInsightsExplorer: (req: InsightsExplorerMoveRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/insights/explorers/move.json', req);
+    },
+    deleteInsightsExplorer: (req: InsightsExplorerDeleteRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/insights/explorers/delete.json', req);
     },
     recognizeReceiptImage: ({ imageFile, cancelableUuid }: { imageFile: File, cancelableUuid?: string }): ApiResponsePromise<RecognizedReceiptImageResponse> => {
         return axios.postForm<ApiResponse<RecognizedReceiptImageResponse>>('v1/llm/transactions/recognize_receipt_image.json', {

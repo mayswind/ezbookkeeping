@@ -1,19 +1,251 @@
 import { type PartialRecord, itemAndIndex, keysIfValueEquals } from '@/core/base.ts';
+import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
+import { ChartSortingType } from '@/core/statistics.ts';
 import {
     TransactionExplorerConditionRelation,
     TransactionExplorerConditionRelationPriority,
     TransactionExplorerConditionFieldType,
     TransactionExplorerConditionField,
     TransactionExplorerConditionOperatorType,
-    TransactionExplorerConditionOperator
+    TransactionExplorerConditionOperator,
+    TransactionExplorerChartTypeValue,
+    TransactionExplorerChartType,
+    TransactionExplorerDataDimensionType,
+    TransactionExplorerDataDimension,
+    TransactionExplorerValueMetricType,
+    TransactionExplorerValueMetric
 } from '@/core/explorer.ts';
 
 import { Account } from '@/models/account.ts';
 import { TransactionCategory } from '@/models/transaction_category.ts';
 import { TransactionTag } from '@/models/transaction_tag.ts';
 import { type TransactionInsightDataItem } from '@/models/transaction.ts';
+
+export class InsightsExplorerBasicInfo implements InsightsExplorerInfoResponse {
+    public id: string;
+    public name: string;
+    public displayOrder: number;
+    public hidden: boolean;
+    public data: Record<string, string | number | string[]> = {};
+
+    private constructor(id: string, name: string, displayOrder: number, hidden: boolean) {
+        this.id = id;
+        this.name = name;
+        this.displayOrder = displayOrder;
+        this.hidden = hidden;
+    }
+
+    public static of(explorerResponse: InsightsExplorerInfoResponse): InsightsExplorerBasicInfo {
+        return new InsightsExplorerBasicInfo(
+            explorerResponse.id,
+            explorerResponse.name,
+            explorerResponse.displayOrder,
+            explorerResponse.hidden
+        );
+    }
+
+    public static ofMulti(explorerResponses: InsightsExplorerInfoResponse[]): InsightsExplorerBasicInfo[] {
+        const explorers: InsightsExplorerBasicInfo[] = [];
+
+        for (const explorerResponse of explorerResponses) {
+            explorers.push(InsightsExplorerBasicInfo.of(explorerResponse));
+        }
+
+        return explorers;
+    }
+}
+
+export class InsightsExplorer implements InsightsExplorerInfoResponse {
+    public id: string;
+    public name: string;
+    public displayOrder: number;
+    public hidden: boolean;
+    public queries: TransactionExplorerQuery[];
+    public timezoneUsedForDateRange: number;
+    public chartType: TransactionExplorerChartTypeValue;
+    public categoryDimension: TransactionExplorerDataDimensionType;
+    public seriesDimension: TransactionExplorerDataDimensionType;
+    public valueMetric: TransactionExplorerValueMetricType;
+    public chartSortingType: number;
+
+    public static readonly Default: InsightsExplorer = new InsightsExplorer(
+        '',
+        '',
+        0,
+        false,
+        [],
+        TimezoneTypeForStatistics.Default.type,
+        TransactionExplorerChartType.Default.value,
+        TransactionExplorerDataDimension.CategoryDimensionDefault.value,
+        TransactionExplorerDataDimension.SeriesDimensionDefault.value,
+        TransactionExplorerValueMetric.Default.value,
+        ChartSortingType.Default.type
+    );
+
+    private constructor(id: string, name: string, displayOrder: number, hidden: boolean, queries: TransactionExplorerQuery[], timezoneUsedForDateRange: number, chartType: TransactionExplorerChartTypeValue, categoryDimension: TransactionExplorerDataDimensionType, seriesDimension: TransactionExplorerDataDimensionType, valueMetric: TransactionExplorerValueMetricType, chartSortingType: number) {
+        this.id = id;
+        this.name = name;
+        this.displayOrder = displayOrder;
+        this.hidden = hidden;
+        this.queries = queries;
+        this.timezoneUsedForDateRange = timezoneUsedForDateRange;
+        this.chartType = chartType;
+        this.categoryDimension = categoryDimension;
+        this.seriesDimension = seriesDimension;
+        this.valueMetric = valueMetric;
+        this.chartSortingType = chartSortingType;
+    }
+
+    public get data(): Record<string, string | number | string[]> {
+        return {
+            queries: this.queries.map(q => q.toJson()),
+            timezoneUsedForDateRange: this.timezoneUsedForDateRange,
+            chartType: this.chartType,
+            categoryDimension: this.categoryDimension,
+            seriesDimension: this.seriesDimension,
+            valueMetric: this.valueMetric,
+            chartSortingType: this.chartSortingType
+        };
+    }
+
+    public toCreateRequest(clientSessionId: string): InsightsExplorerCreateRequest {
+        return {
+            name: this.name,
+            data: this.data,
+            clientSessionId: clientSessionId
+        };
+    }
+
+    public toModifyRequest(): InsightsExplorerModifyRequest {
+        return {
+            id: this.id,
+            name: this.name,
+            data: this.data,
+            hidden: this.hidden
+        };
+    }
+
+    public static of(explorerResponse: InsightsExplorerInfoResponse): InsightsExplorer {
+        const data = explorerResponse.data;
+        const queries: TransactionExplorerQuery[] = [];
+        let timezoneUsedForDateRange = InsightsExplorer.Default.timezoneUsedForDateRange;
+        let chartType = InsightsExplorer.Default.chartType;
+        let categoryDimension = InsightsExplorer.Default.categoryDimension;
+        let seriesDimension = InsightsExplorer.Default.seriesDimension;
+        let valueMetric = InsightsExplorer.Default.valueMetric;
+        let chartSortingType = InsightsExplorer.Default.chartSortingType;
+
+        if (data) {
+            if (Array.isArray(data['queries'])) {
+                const textualQueries = data['queries'] as string[];
+
+                for (const textualQuery of textualQueries) {
+                    const query = TransactionExplorerQuery.parse(textualQuery);
+
+                    if (query) {
+                        queries.push(query);
+                    }
+                }
+            }
+
+            if (typeof data['timezoneUsedForDateRange'] === 'number') {
+                timezoneUsedForDateRange = data['timezoneUsedForDateRange'] as number;
+            }
+
+            if (typeof data['chartType'] === 'string') {
+                chartType = data['chartType'] as TransactionExplorerChartTypeValue;
+            }
+
+            if (typeof data['categoryDimension'] === 'string') {
+                categoryDimension = data['categoryDimension'] as TransactionExplorerDataDimensionType;
+            }
+
+            if (typeof data['seriesDimension'] === 'string') {
+                seriesDimension = data['seriesDimension'] as TransactionExplorerDataDimensionType;
+            }
+
+            if (typeof data['valueMetric'] === 'string') {
+                valueMetric = data['valueMetric'] as TransactionExplorerValueMetricType;
+            }
+
+            if (typeof data['chartSortingType'] === 'number') {
+                chartSortingType = data['chartSortingType'] as number;
+            }
+        }
+
+        return new InsightsExplorer(
+            explorerResponse.id,
+            explorerResponse.name,
+            explorerResponse.displayOrder,
+            explorerResponse.hidden,
+            queries,
+            timezoneUsedForDateRange,
+            chartType,
+            categoryDimension,
+            seriesDimension,
+            valueMetric,
+            chartSortingType
+        );
+    }
+
+    public static createNewExplorer(name?: string): InsightsExplorer {
+        return new InsightsExplorer(
+            '',
+            name || '',
+            0,
+            false,
+            [TransactionExplorerQuery.create()],
+            InsightsExplorer.Default.timezoneUsedForDateRange,
+            InsightsExplorer.Default.chartType,
+            InsightsExplorer.Default.categoryDimension,
+            InsightsExplorer.Default.seriesDimension,
+            InsightsExplorer.Default.valueMetric,
+            InsightsExplorer.Default.chartSortingType
+        );
+    }
+}
+
+export interface InsightsExplorerCreateRequest {
+    readonly name: string;
+    readonly data: Record<string, string | number | string[]>;
+    readonly clientSessionId?: string;
+}
+
+export interface InsightsExplorerModifyRequest {
+    readonly id: string;
+    readonly name: string;
+    readonly data: Record<string, string | number | string[]>;
+    readonly hidden: boolean;
+    readonly clientSessionId?: string;
+}
+
+export interface InsightsExplorerHideRequest {
+    readonly id: string;
+    readonly hidden: boolean;
+}
+
+export interface InsightsExplorerMoveRequest {
+    readonly newDisplayOrders: InsightsExplorerNewDisplayOrderRequest[];
+}
+
+export interface InsightsExplorerNewDisplayOrderRequest {
+    readonly id: string;
+    readonly displayOrder: number;
+}
+
+export interface InsightsExplorerDeleteRequest {
+    readonly id: string;
+}
+
+export interface InsightsExplorerInfoResponse {
+    readonly id: string;
+    readonly name: string;
+    readonly displayOrder: number;
+    readonly hidden: boolean;
+    readonly data: Record<string, string | number | string[]>;
+}
 
 interface ExpressionNode {
     textualExpression: string;

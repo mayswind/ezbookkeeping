@@ -48,6 +48,7 @@ import {
     getDateRangeByDateType,
     getFiscalYearFromUnixTime
 } from '@/lib/datetime.ts';
+import { generateRandomUUID } from '@/lib/misc.ts';
 import services, { type ApiResponsePromise } from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 
@@ -473,7 +474,7 @@ export const useExplorersStore = defineStore('explorers', () => {
 
     const allInsightsExplorerBasicInfos = ref<InsightsExplorerBasicInfo[]>([]);
     const allInsightsExplorerBasicInfosMap = ref<Record<string, InsightsExplorerBasicInfo>>({});
-    const currentInsightsExplorer = ref<InsightsExplorer>(InsightsExplorer.createNewExplorer());
+    const currentInsightsExplorer = ref<InsightsExplorer>(InsightsExplorer.createNewExplorer(generateRandomUUID()));
     const insightsExplorerListStateInvalid = ref<boolean>(true);
 
     const allTransactions = computed<TransactionInsightDataItem[]>(() => {
@@ -743,7 +744,7 @@ export const useExplorersStore = defineStore('explorers', () => {
         transactionExplorerFilter.value.startTime = 0;
         transactionExplorerFilter.value.endTime = 0;
         transactionExplorerAllData.value = [];
-        currentInsightsExplorer.value = InsightsExplorer.createNewExplorer();
+        currentInsightsExplorer.value = InsightsExplorer.createNewExplorer(generateRandomUUID());
         transactionExplorerStateInvalid.value = true;
     }
 
@@ -784,7 +785,7 @@ export const useExplorersStore = defineStore('explorers', () => {
         }
 
         if (resetQuery) {
-            currentInsightsExplorer.value = InsightsExplorer.createNewExplorer();
+            currentInsightsExplorer.value = InsightsExplorer.createNewExplorer(generateRandomUUID());
         }
     }
 

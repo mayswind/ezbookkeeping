@@ -340,7 +340,7 @@ function init(initProps: InsightsExplorerProps): void {
             loadExplorer(initProps.initId);
         }
     } else {
-        explorersStore.updateCurrentInsightsExplorer(InsightsExplorer.createNewExplorer());
+        explorersStore.updateCurrentInsightsExplorer(InsightsExplorer.createNewExplorer(generateRandomUUID()));
     }
 
     if (!needReload && !explorersStore.transactionExplorerStateInvalid && !explorersStore.insightsExplorerListStateInvalid) {
@@ -394,7 +394,7 @@ function createNewExplorer(): void {
         return;
     }
 
-    explorersStore.updateCurrentInsightsExplorer(InsightsExplorer.createNewExplorer());
+    explorersStore.updateCurrentInsightsExplorer(InsightsExplorer.createNewExplorer(generateRandomUUID()));
     router.push(getFilterLinkUrl());
 }
 

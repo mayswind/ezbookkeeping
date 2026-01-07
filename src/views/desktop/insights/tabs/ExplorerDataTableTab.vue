@@ -10,6 +10,17 @@
                         item-value="value"
                         density="compact"
                         :disabled="loading || disabled"
+                        :label="tt('Data Source')"
+                        :items="allDataTableQuerySources"
+                        v-model="currentExplorer.datatableQuerySource"
+                    />
+                    <v-select
+                        class="flex-0-0"
+                        min-width="150"
+                        item-title="name"
+                        item-value="value"
+                        density="compact"
+                        :disabled="loading || disabled"
                         :label="tt('Transactions Per Page')"
                         :items="allPageCounts"
                         v-model="currentExplorer.countPerPage"
@@ -117,7 +128,7 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useExplorersStore } from '@/stores/explorer.ts';
 
-import type { NameNumeralValue } from '@/core/base.ts';
+import { type NameValue, type NameNumeralValue, itemAndIndex } from '@/core/base.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
 
@@ -169,7 +180,32 @@ const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurre
 
 const currentExplorer = computed<InsightsExplorer>(() => explorersStore.currentInsightsExplorer);
 
-const filteredTransactions = computed<TransactionInsightDataItem[]>(() => explorersStore.filteredTransactions);
+const filteredTransactions = computed<TransactionInsightDataItem[]>(() => explorersStore.filteredTransactionsInDataTable);
+
+const allDataTableQuerySources = computed<NameValue[]>(() => {
+    const sources: NameValue[] = [];
+
+    sources.push({
+        name: tt('All Queries'),
+        value: ''
+    });
+
+    for (const [query, index] of itemAndIndex(currentExplorer.value.queries)) {
+        if (query.name) {
+            sources.push({
+                name: query.name,
+                value: query.id
+            });
+        } else {
+            sources.push({
+                name: tt('format.misc.queryIndex', { index: index + 1 }),
+                value: query.id
+            });
+        }
+    }
+
+    return sources;
+});
 
 const allPageCounts = computed<NameNumeralValue[]>(() => {
     const pageCounts: NameNumeralValue[] = [];

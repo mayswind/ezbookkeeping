@@ -103,7 +103,7 @@
                                                 </template>
                                                 <v-list-item :prepend-icon="mdiExport"
                                                              :title="tt('Export Results')"
-                                                             :disabled="loading || updating || !filteredTransactions || filteredTransactions.length < 1"
+                                                             :disabled="loading || updating || (activeTab === 'table' && (!filteredTransactionsInDataTable || filteredTransactionsInDataTable.length < 1))"
                                                              @click="exportResults"
                                                              v-if="activeTab === 'table' || activeTab === 'chart'"></v-list-item>
                                                 <v-divider class="my-2" v-if="currentExplorer.id" />
@@ -309,7 +309,7 @@ const allExplorers = computed<InsightsExplorerBasicInfo[]>(() => {
 });
 const currentFilter = computed<TransactionExplorerFilter>(() => explorersStore.transactionExplorerFilter);
 const currentExplorer = computed<InsightsExplorer>(() => explorersStore.currentInsightsExplorer);
-const filteredTransactions = computed<TransactionInsightDataItem[]>(() => explorersStore.filteredTransactions);
+const filteredTransactionsInDataTable = computed<TransactionInsightDataItem[]>(() => explorersStore.filteredTransactionsInDataTable);
 
 const allDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.InsightsExplorer, true));
 const allTimezoneTypesUsedForDateRange = computed<TypeAndDisplayName[]>(() => getAllTimezoneTypesUsedForStatistics());
@@ -539,7 +539,7 @@ function removeExplorer(): void {
 }
 
 function exportResults(): void {
-    if (activeTab.value === 'table' && filteredTransactions.value) {
+    if (activeTab.value === 'table' && filteredTransactionsInDataTable.value) {
         const results = explorerDataTableTab.value?.buildExportResults();
 
         if (results) {

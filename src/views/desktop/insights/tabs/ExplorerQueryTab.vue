@@ -72,7 +72,7 @@
                         </v-switch>
                         <v-btn class="ms-2" density="compact" color="default" variant="text" size="small"
                                :icon="true" :disabled="loading || disabled || !!editingQuery || queries.length < 1 || (queries.length === 1 && (!element.conditions || element.conditions.length < 1))"
-                               @click="removeQuery(index)">
+                               @click="removeQuery(element, index)">
                             <v-icon :icon="mdiClose" size="18" />
                             <v-tooltip activator="parent">{{ tt('Remove Query') }}</v-tooltip>
                         </v-btn>
@@ -388,7 +388,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useExplorersStore } from '@/stores/explorer.ts';
 
-import { type NameValue, entries, values } from '@/core/base.ts';
+import { type NameValue, values } from '@/core/base.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import {
@@ -576,24 +576,14 @@ function duplicateQuery(query: TransactionExplorerQuery): void {
     queries.value.push(query.clone(generateRandomUUID()));
 }
 
-function removeQuery(queryIndex: number): void {
+function removeQuery(query: TransactionExplorerQuery, queryIndex: number): void {
     if (queries.value.length > 0) {
         queries.value.splice(queryIndex, 1);
     }
 
-    const newShowExpression: Record<number, boolean> = {};
-
-    for (const [key, state] of entries(showExpression.value)) {
-        const index = parseInt(key);
-
-        if (queryIndex > index) {
-            newShowExpression[index] = state;
-        } else if (queryIndex < index) {
-            newShowExpression[index - 1] = state;
-        }
+    if (explorersStore.currentInsightsExplorer.datatableQuerySource === query.id) {
+        explorersStore.currentInsightsExplorer.datatableQuerySource = '';
     }
-
-    showExpression.value = newShowExpression;
 
     if (queries.value.length < 1) {
         queries.value.push(TransactionExplorerQuery.create(generateRandomUUID()));

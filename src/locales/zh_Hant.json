@@ -1745,6 +1745,8 @@
     "Editor": "編輯器",
     "Expression": "表達式",
     "Failed to generate expression": "產生表達式失敗",
+    "Data Source": "資料來源",
+    "All Queries": "所有查詢",
     "Axis / Category": "軸 / 類別",
     "Series": "系列",
     "Transaction Date": "交易日期",

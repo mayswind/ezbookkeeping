@@ -1745,6 +1745,8 @@
     "Editor": "Urednik",
     "Expression": "Izraz",
     "Failed to generate expression": "Izraza ni bilo mogoče ustvariti",
+    "Data Source": "Data Source",
+    "All Queries": "All Queries",
     "Axis / Category": "Os / Kategorija",
     "Series": "Serije",
     "Transaction Date": "Datum transakcije",

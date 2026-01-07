@@ -1745,6 +1745,8 @@
     "Editor": "Editor",
     "Expression": "Expression",
     "Failed to generate expression": "Failed to generate expression",
+    "Data Source": "Data Source",
+    "All Queries": "All Queries",
     "Axis / Category": "Axis / Category",
     "Series": "Series",
     "Transaction Date": "Transaction Date",

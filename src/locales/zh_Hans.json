@@ -1745,6 +1745,8 @@
     "Editor": "编辑器",
     "Expression": "表达式",
     "Failed to generate expression": "生成表达式失败",
+    "Data Source": "数据源",
+    "All Queries": "所有查询",
     "Axis / Category": "轴 / 分类",
     "Series": "系列",
     "Transaction Date": "交易日期",

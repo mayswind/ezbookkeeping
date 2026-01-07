@@ -551,7 +551,7 @@ export const useExplorersStore = defineStore('explorers', () => {
         return result;
     });
 
-    const filteredTransactions = computed<TransactionInsightDataItem[]>(() => {
+    const filteredTransactionsInDataTable = computed<TransactionInsightDataItem[]>(() => {
         if (!allTransactions.value || allTransactions.value.length < 1) {
             return [];
         }
@@ -564,6 +564,10 @@ export const useExplorersStore = defineStore('explorers', () => {
 
         for (const transaction of allTransactions.value) {
             for (const query of currentInsightsExplorer.value.queries) {
+                if (currentInsightsExplorer.value.datatableQuerySource && currentInsightsExplorer.value.datatableQuerySource !== query.id) {
+                    continue;
+                }
+
                 if (query.match(transaction)) {
                     result.push(transaction);
                     break;
@@ -1165,7 +1169,7 @@ export const useExplorersStore = defineStore('explorers', () => {
         currentInsightsExplorer,
         insightsExplorerListStateInvalid,
         // computed
-        filteredTransactions,
+        filteredTransactionsInDataTable,
         categoriedTransactionExplorerData,
         // functions
         updateTransactionExplorerInvalidState,

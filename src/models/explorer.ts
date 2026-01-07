@@ -64,6 +64,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
     public hidden: boolean;
     public queries: TransactionExplorerQuery[];
     public timezoneUsedForDateRange: number;
+    public datatableQuerySource: string;
     public countPerPage: number;
     public chartType: TransactionExplorerChartTypeValue;
     public categoryDimension: TransactionExplorerDataDimensionType;
@@ -78,6 +79,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         false,
         [],
         TimezoneTypeForStatistics.Default.type,
+        '',
         15,
         TransactionExplorerChartType.Default.value,
         TransactionExplorerDataDimension.CategoryDimensionDefault.value,
@@ -86,13 +88,14 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         ChartSortingType.Default.type
     );
 
-    private constructor(id: string, name: string, displayOrder: number, hidden: boolean, queries: TransactionExplorerQuery[], timezoneUsedForDateRange: number, countPerPage: number, chartType: TransactionExplorerChartTypeValue, categoryDimension: TransactionExplorerDataDimensionType, seriesDimension: TransactionExplorerDataDimensionType, valueMetric: TransactionExplorerValueMetricType, chartSortingType: number) {
+    private constructor(id: string, name: string, displayOrder: number, hidden: boolean, queries: TransactionExplorerQuery[], timezoneUsedForDateRange: number, datatableQuerySource: string, countPerPage: number, chartType: TransactionExplorerChartTypeValue, categoryDimension: TransactionExplorerDataDimensionType, seriesDimension: TransactionExplorerDataDimensionType, valueMetric: TransactionExplorerValueMetricType, chartSortingType: number) {
         this.id = id;
         this.name = name;
         this.displayOrder = displayOrder;
         this.hidden = hidden;
         this.queries = queries;
         this.timezoneUsedForDateRange = timezoneUsedForDateRange;
+        this.datatableQuerySource = datatableQuerySource;
         this.countPerPage = countPerPage;
         this.chartType = chartType;
         this.categoryDimension = categoryDimension;
@@ -105,6 +108,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         return {
             queries: this.queries.map(q => q.toJsonObject()),
             timezoneUsedForDateRange: this.timezoneUsedForDateRange,
+            datatableQuerySource: this.datatableQuerySource,
             countPerPage: this.countPerPage,
             chartType: this.chartType,
             categoryDimension: this.categoryDimension,
@@ -135,28 +139,22 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         const data = explorerResponse.data;
         const queries: TransactionExplorerQuery[] = [];
         let timezoneUsedForDateRange = InsightsExplorer.Default.timezoneUsedForDateRange;
+        let datatableQuerySource = InsightsExplorer.Default.datatableQuerySource;
         let countPerPage = InsightsExplorer.Default.countPerPage;
         let chartType = InsightsExplorer.Default.chartType;
         let categoryDimension = InsightsExplorer.Default.categoryDimension;
         let seriesDimension = InsightsExplorer.Default.seriesDimension;
         let valueMetric = InsightsExplorer.Default.valueMetric;
         let chartSortingType = InsightsExplorer.Default.chartSortingType;
+        let hasDatatableQuerySource = false;
 
         if (data) {
-            if (Array.isArray(data['queries'])) {
-                const queryItems = data['queries'] as object[];
-
-                for (const queryItem of queryItems) {
-                    const query = TransactionExplorerQuery.parse(queryItem);
-
-                    if (query) {
-                        queries.push(query);
-                    }
-                }
-            }
-
             if (typeof data['timezoneUsedForDateRange'] === 'number') {
                 timezoneUsedForDateRange = data['timezoneUsedForDateRange'] as number;
+            }
+
+            if (typeof data['datatableQuerySource'] === 'string') {
+                datatableQuerySource = data['datatableQuerySource'] as string;
             }
 
             if (typeof data['countPerPage'] === 'number') {
@@ -182,6 +180,26 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
             if (typeof data['chartSortingType'] === 'number') {
                 chartSortingType = data['chartSortingType'] as number;
             }
+
+            if (Array.isArray(data['queries'])) {
+                const queryItems = data['queries'] as object[];
+
+                for (const queryItem of queryItems) {
+                    const query = TransactionExplorerQuery.parse(queryItem);
+
+                    if (query) {
+                        queries.push(query);
+                    }
+
+                    if (query && query.id === datatableQuerySource) {
+                        hasDatatableQuerySource = true;
+                    }
+                }
+            }
+
+            if (!hasDatatableQuerySource) {
+                datatableQuerySource = '';
+            }
         }
 
         return new InsightsExplorer(
@@ -191,6 +209,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
             explorerResponse.hidden,
             queries,
             timezoneUsedForDateRange,
+            datatableQuerySource,
             countPerPage,
             chartType,
             categoryDimension,
@@ -208,6 +227,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
             false,
             [TransactionExplorerQuery.create(newQueryId)],
             InsightsExplorer.Default.timezoneUsedForDateRange,
+            InsightsExplorer.Default.datatableQuerySource,
             InsightsExplorer.Default.countPerPage,
             InsightsExplorer.Default.chartType,
             InsightsExplorer.Default.categoryDimension,

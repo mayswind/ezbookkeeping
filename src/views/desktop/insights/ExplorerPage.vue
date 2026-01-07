@@ -85,6 +85,10 @@
                                                 <v-list-item @click="saveExplorer(true)">
                                                     <v-list-item-title>{{ tt('Save As New Explorer') }}</v-list-item-title>
                                                 </v-list-item>
+                                                <v-list-item @click="loadExplorer(currentExplorer.id, true)"
+                                                             v-if="currentExplorer.id">
+                                                    <v-list-item-title>{{ tt('Restore to Last Saved') }}</v-list-item-title>
+                                                </v-list-item>
                                             </v-list>
                                         </v-menu>
                                     </v-btn>
@@ -306,7 +310,19 @@ const allExplorers = computed<InsightsExplorerBasicInfo[]>(() => {
             ret.pop();
         }
 
-        ret.push(InsightsExplorerBasicInfo.of(currentExplorer.value));
+        let foundCurrentExplorer = false;
+
+        for (const explorer of explorersStore.allInsightsExplorerBasicInfos) {
+            if (explorer.id === currentExplorer.value.id) {
+                ret.push(explorer);
+                foundCurrentExplorer = true;
+                break;
+            }
+        }
+
+        if (!foundCurrentExplorer) {
+            ret.push(InsightsExplorerBasicInfo.of(currentExplorer.value));
+        }
     }
 
     return ret;
@@ -438,8 +454,8 @@ function createNewExplorer(): void {
     router.push(getFilterLinkUrl());
 }
 
-function loadExplorer(explorerId: string): void {
-    if (currentExplorer.value.id === explorerId) {
+function loadExplorer(explorerId: string, force?: boolean): void {
+    if (!force && currentExplorer.value.id === explorerId) {
         return;
     }
 

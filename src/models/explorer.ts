@@ -64,6 +64,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
     public hidden: boolean;
     public queries: TransactionExplorerQuery[];
     public timezoneUsedForDateRange: number;
+    public countPerPage: number;
     public chartType: TransactionExplorerChartTypeValue;
     public categoryDimension: TransactionExplorerDataDimensionType;
     public seriesDimension: TransactionExplorerDataDimensionType;
@@ -77,6 +78,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         false,
         [],
         TimezoneTypeForStatistics.Default.type,
+        15,
         TransactionExplorerChartType.Default.value,
         TransactionExplorerDataDimension.CategoryDimensionDefault.value,
         TransactionExplorerDataDimension.SeriesDimensionDefault.value,
@@ -84,13 +86,14 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         ChartSortingType.Default.type
     );
 
-    private constructor(id: string, name: string, displayOrder: number, hidden: boolean, queries: TransactionExplorerQuery[], timezoneUsedForDateRange: number, chartType: TransactionExplorerChartTypeValue, categoryDimension: TransactionExplorerDataDimensionType, seriesDimension: TransactionExplorerDataDimensionType, valueMetric: TransactionExplorerValueMetricType, chartSortingType: number) {
+    private constructor(id: string, name: string, displayOrder: number, hidden: boolean, queries: TransactionExplorerQuery[], timezoneUsedForDateRange: number, countPerPage: number, chartType: TransactionExplorerChartTypeValue, categoryDimension: TransactionExplorerDataDimensionType, seriesDimension: TransactionExplorerDataDimensionType, valueMetric: TransactionExplorerValueMetricType, chartSortingType: number) {
         this.id = id;
         this.name = name;
         this.displayOrder = displayOrder;
         this.hidden = hidden;
         this.queries = queries;
         this.timezoneUsedForDateRange = timezoneUsedForDateRange;
+        this.countPerPage = countPerPage;
         this.chartType = chartType;
         this.categoryDimension = categoryDimension;
         this.seriesDimension = seriesDimension;
@@ -102,6 +105,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         return {
             queries: this.queries.map(q => q.toJsonObject()),
             timezoneUsedForDateRange: this.timezoneUsedForDateRange,
+            countPerPage: this.countPerPage,
             chartType: this.chartType,
             categoryDimension: this.categoryDimension,
             seriesDimension: this.seriesDimension,
@@ -131,6 +135,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         const data = explorerResponse.data;
         const queries: TransactionExplorerQuery[] = [];
         let timezoneUsedForDateRange = InsightsExplorer.Default.timezoneUsedForDateRange;
+        let countPerPage = InsightsExplorer.Default.countPerPage;
         let chartType = InsightsExplorer.Default.chartType;
         let categoryDimension = InsightsExplorer.Default.categoryDimension;
         let seriesDimension = InsightsExplorer.Default.seriesDimension;
@@ -152,6 +157,10 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
 
             if (typeof data['timezoneUsedForDateRange'] === 'number') {
                 timezoneUsedForDateRange = data['timezoneUsedForDateRange'] as number;
+            }
+
+            if (typeof data['countPerPage'] === 'number') {
+                countPerPage = data['countPerPage'] as number;
             }
 
             if (typeof data['chartType'] === 'string') {
@@ -182,6 +191,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
             explorerResponse.hidden,
             queries,
             timezoneUsedForDateRange,
+            countPerPage,
             chartType,
             categoryDimension,
             seriesDimension,
@@ -198,6 +208,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
             false,
             [TransactionExplorerQuery.create(newQueryId)],
             InsightsExplorer.Default.timezoneUsedForDateRange,
+            InsightsExplorer.Default.countPerPage,
             InsightsExplorer.Default.chartType,
             InsightsExplorer.Default.categoryDimension,
             InsightsExplorer.Default.seriesDimension,

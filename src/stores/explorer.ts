@@ -1099,6 +1099,7 @@ export const useExplorersStore = defineStore('explorers', () => {
                     return;
                 }
 
+                explorer.hidden = hidden;
                 updateExplorerVisibilityInInsightsExplorerList({ explorer: explorer, hidden });
 
                 resolve(data.result);

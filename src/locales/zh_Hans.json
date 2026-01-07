@@ -1718,6 +1718,8 @@
     "Save Explorer": "保存探索",
     "Save As New Explorer": "另存为新的探索",
     "Rename Explorer": "重命名探索",
+    "Hide Explorer": "隐藏探索",
+    "Unhide Explorer": "取消隐藏探索",
     "Delete Explorer": "删除探索",
     "Explorer Name": "探索名称",
     "Add Query": "添加查询",

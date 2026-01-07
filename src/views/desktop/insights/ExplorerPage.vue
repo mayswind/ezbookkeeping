@@ -80,16 +80,8 @@
                                         <v-progress-circular indeterminate size="22" class="ms-2" v-if="updating"></v-progress-circular>
                                         <v-menu activator="parent" :open-on-hover="true">
                                             <v-list>
-                                                <v-list-item :prepend-icon="mdiContentSaveOutline" @click="saveExplorer(true)">
+                                                <v-list-item @click="saveExplorer(true)">
                                                     <v-list-item-title>{{ tt('Save As New Explorer') }}</v-list-item-title>
-                                                </v-list-item>
-                                                <v-divider class="my-2" v-if="currentExplorer.id" />
-                                                <v-list-item :prepend-icon="mdiPencilOutline" @click="setExplorerName" v-if="currentExplorer.id">
-                                                    <v-list-item-title>{{ tt('Rename Explorer') }}</v-list-item-title>
-                                                </v-list-item>
-                                                <v-divider class="my-2" v-if="currentExplorer.id" />
-                                                <v-list-item :prepend-icon="mdiDeleteOutline" @click="removeExplorer" v-if="currentExplorer.id">
-                                                    <v-list-item-title>{{ tt('Delete Explorer') }}</v-list-item-title>
                                                 </v-list-item>
                                             </v-list>
                                         </v-menu>
@@ -114,6 +106,19 @@
                                                              :disabled="loading || updating || !filteredTransactions || filteredTransactions.length < 1"
                                                              @click="exportResults"
                                                              v-if="activeTab === 'table' || activeTab === 'chart'"></v-list-item>
+                                                <v-divider class="my-2" v-if="currentExplorer.id" />
+                                                <v-list-item :prepend-icon="mdiPencilOutline" @click="setExplorerName" v-if="currentExplorer.id">
+                                                    <v-list-item-title>{{ tt('Rename Explorer') }}</v-list-item-title>
+                                                </v-list-item>
+                                                <v-list-item :prepend-icon="mdiEyeOffOutline" @click="hideExplorer(true)" v-if="currentExplorer.id && !currentExplorer.hidden">
+                                                    <v-list-item-title>{{ tt('Hide Explorer') }}</v-list-item-title>
+                                                </v-list-item>
+                                                <v-list-item :prepend-icon="mdiEyeOutline" @click="hideExplorer(false)" v-if="currentExplorer.id && currentExplorer.hidden">
+                                                    <v-list-item-title>{{ tt('Unhide Explorer') }}</v-list-item-title>
+                                                </v-list-item>
+                                                <v-list-item :prepend-icon="mdiDeleteOutline" @click="removeExplorer" v-if="currentExplorer.id">
+                                                    <v-list-item-title>{{ tt('Delete Explorer') }}</v-list-item-title>
+                                                </v-list-item>
                                             </v-list>
                                         </v-menu>
                                     </v-btn>
@@ -131,7 +136,7 @@
                                 </v-window-item>
                                 <v-window-item value="chart">
                                     <explorer-chart-tab ref="explorerChartTab"
-                                                       :loading="loading" :disabled="loading || updating" />
+                                                        :loading="loading" :disabled="loading || updating" />
                                 </v-window-item>
                             </v-window>
                         </v-card>
@@ -184,7 +189,7 @@ import { type WeekDayValue, type LocalizedDateRange, DateRangeScene, DateRange }
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 
 import { type TransactionInsightDataItem, Transaction } from '@/models/transaction.ts';
-import { type InsightsExplorerBasicInfo, InsightsExplorer } from '@/models/explorer.ts';
+import { InsightsExplorerBasicInfo, InsightsExplorer } from '@/models/explorer.ts';
 
 import {
     parseDateTimeFromUnixTime,
@@ -202,8 +207,9 @@ import {
     mdiCheck,
     mdiRefresh,
     mdiDotsVertical,
-    mdiContentSaveOutline,
     mdiPencilOutline,
+    mdiEyeOutline,
+    mdiEyeOffOutline,
     mdiDeleteOutline,
     mdiHomeClockOutline,
     mdiInvoiceTextClockOutline,
@@ -272,7 +278,35 @@ const showCustomDateRangeDialog = ref<boolean>(false);
 const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
 const fiscalYearStart = computed<number>(() => userStore.currentUserFiscalYearStart);
 
-const allExplorers = computed<InsightsExplorerBasicInfo[]>(() => explorersStore.allInsightsExplorerBasicInfos.slice(0, 15));
+const allExplorers = computed<InsightsExplorerBasicInfo[]>(() => {
+    const maximumExplorersToShow = 14;
+    const ret: InsightsExplorerBasicInfo[] = [];
+    let hasCurrentExplorer = false;
+
+    for (const explorer of explorersStore.allInsightsExplorerBasicInfos) {
+        if (ret.length >= maximumExplorersToShow) {
+            break;
+        }
+
+        if (!explorer.hidden || (explorer.id && explorer.id === currentExplorer.value.id)) {
+            ret.push(explorer);
+
+            if (explorer.id && explorer.id === currentExplorer.value.id) {
+                hasCurrentExplorer = true;
+            }
+        }
+    }
+
+    if (!hasCurrentExplorer && currentExplorer.value && currentExplorer.value.id) {
+        if (ret.length >= maximumExplorersToShow) {
+            ret.pop();
+        }
+
+        ret.push(InsightsExplorerBasicInfo.of(currentExplorer.value));
+    }
+
+    return ret;
+});
 const currentFilter = computed<TransactionExplorerFilter>(() => explorersStore.transactionExplorerFilter);
 const currentExplorer = computed<InsightsExplorer>(() => explorersStore.currentInsightsExplorer);
 const filteredTransactions = computed<TransactionInsightDataItem[]>(() => explorersStore.filteredTransactions);
@@ -460,6 +494,24 @@ function doSaveExplorer(saveAs?: boolean): Promise<unknown> {
 function setExplorerName(): void {
     explorerRenameDialog.value?.open(currentExplorer.value.name || '').then((newName: string) => {
         currentExplorer.value.name = newName;
+    });
+}
+
+function hideExplorer(hidden: boolean): void {
+    updating.value = true;
+
+    explorersStore.hideInsightsExplorer({
+        explorer: currentExplorer.value,
+        hidden: hidden
+    }).then(() => {
+        updating.value = false;
+        currentExplorer.value.hidden = hidden;
+    }).catch(error => {
+        updating.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
     });
 }
 

@@ -17,6 +17,7 @@ export const AMAP_JAVASCRIPT_URL: string = 'https://webapi.amap.com/maps?v=2.0';
 export enum KnownErrorCode {
     ApiNotFound = 100001,
     ValidatorError = 200000,
+    NothingWillBeUpdated = 200004,
     UserEmailNotVerified = 201020,
     TwoFactorAuthorizationPasscodeEmpty = 203005,
     TransactionCannotCreateInThisTime = 205017,

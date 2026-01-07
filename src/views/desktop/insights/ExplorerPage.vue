@@ -74,7 +74,9 @@
                                         <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                                     </v-btn>
                                     <v-spacer/>
-                                    <v-btn class="ms-3" color="default" variant="outlined"
+                                    <v-btn class="ms-3"
+                                           :color="isCurrentExplorerModified ? 'primary' : 'default'"
+                                           :variant="isCurrentExplorerModified ? 'elevated' : 'outlined'"
                                            :disabled="loading || updating" @click="saveExplorer(false)">
                                         {{ tt('Save Explorer') }}
                                         <v-progress-circular indeterminate size="22" class="ms-2" v-if="updating"></v-progress-circular>
@@ -171,7 +173,7 @@ import ExplorerRenameDialog from '@/views/desktop/insights/dialogs/ExplorerRenam
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
 import ExportDialog from '@/views/desktop/statistics/transaction/dialogs/ExportDialog.vue';
 
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import { ref, computed, useTemplateRef, watch, nextTick } from 'vue';
 import { useRouter, onBeforeRouteUpdate } from 'vue-router';
 import { useDisplay } from 'vuetify';
 
@@ -187,6 +189,7 @@ import { type TransactionExplorerPartialFilter, type TransactionExplorerFilter, 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { type WeekDayValue, type LocalizedDateRange, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
+import { KnownErrorCode } from '@/consts/api.ts';
 
 import { type TransactionInsightDataItem, Transaction } from '@/models/transaction.ts';
 import { InsightsExplorerBasicInfo, InsightsExplorer } from '@/models/explorer.ts';
@@ -270,6 +273,7 @@ const loading = ref<boolean>(true);
 const initing = ref<boolean>(true);
 const updating = ref<boolean>(false);
 const clientSessionId = ref<string>('');
+const isCurrentExplorerModified = ref<boolean>(false);
 const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
 const showNav = ref<boolean>(display.mdAndUp.value);
 const activeTab = ref<ExplorerPageTabType>('query');
@@ -375,6 +379,7 @@ function init(initProps: InsightsExplorerProps): void {
         }
     } else {
         explorersStore.updateCurrentInsightsExplorer(InsightsExplorer.createNewExplorer(generateRandomUUID()));
+        isCurrentExplorerModified.value = true;
     }
 
     if (!needReload && !explorersStore.transactionExplorerStateInvalid && !explorersStore.insightsExplorerListStateInvalid) {
@@ -429,6 +434,7 @@ function createNewExplorer(): void {
     }
 
     explorersStore.updateCurrentInsightsExplorer(InsightsExplorer.createNewExplorer(generateRandomUUID()));
+    isCurrentExplorerModified.value = true;
     router.push(getFilterLinkUrl());
 }
 
@@ -443,6 +449,11 @@ function loadExplorer(explorerId: string): void {
         explorerId: explorerId
     }).then(explorer => {
         explorersStore.updateCurrentInsightsExplorer(explorer);
+
+        nextTick(() => {
+            isCurrentExplorerModified.value = false;
+        });
+
         loading.value = false;
         router.push(getFilterLinkUrl());
     }).catch(error => {
@@ -479,6 +490,10 @@ function doSaveExplorer(saveAs?: boolean): Promise<unknown> {
         clientSessionId.value = generateRandomUUID();
         explorersStore.updateCurrentInsightsExplorer(newExplorer);
 
+        nextTick(() => {
+            isCurrentExplorerModified.value = false;
+        });
+
         if (oldExplorerId !== newExplorer.id) {
             router.push(getFilterLinkUrl());
         }
@@ -487,6 +502,12 @@ function doSaveExplorer(saveAs?: boolean): Promise<unknown> {
 
         if (!error.processed) {
             snackbar.value?.showError(error);
+
+            if (error.error && error.error.errorCode === KnownErrorCode.NothingWillBeUpdated) {
+                nextTick(() => {
+                    isCurrentExplorerModified.value = false;
+                });
+            }
         }
     });
 }
@@ -506,6 +527,10 @@ function hideExplorer(hidden: boolean): void {
     }).then(() => {
         updating.value = false;
         currentExplorer.value.hidden = hidden;
+
+        nextTick(() => {
+            isCurrentExplorerModified.value = false;
+        });
     }).catch(error => {
         updating.value = false;
 
@@ -668,6 +693,16 @@ watch(() => display.mdAndUp.value, (newValue) => {
 
 watch(activeTab, () => {
     router.push(getFilterLinkUrl());
+});
+
+watch(currentExplorer, () => {
+    if (initing.value || loading.value) {
+        return;
+    }
+
+    isCurrentExplorerModified.value = true;
+}, {
+    deep: true
 });
 
 init(props);

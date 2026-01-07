@@ -456,7 +456,7 @@ function loadExplorer(explorerId: string): void {
 
 function saveExplorer(saveAs?: boolean): void {
     if (saveAs || !currentExplorer.value.name) {
-        explorerRenameDialog.value?.open(currentExplorer.value.name || '').then((newName: string) => {
+        explorerRenameDialog.value?.open(currentExplorer.value.name || '', tt('Set Explorer Name')).then((newName: string) => {
             currentExplorer.value.name = newName;
             doSaveExplorer(saveAs);
         })

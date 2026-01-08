@@ -88,7 +88,11 @@
                     <v-card-text>
                         <v-row>
                             <v-col cols="12">
-                                <div class="text-center py-4" v-if="!element.conditions || element.conditions.length < 1">
+                                <div class="text-center pt-5 pb-6" v-if="loading">
+                                    <v-skeleton-loader class="skeleton-no-margin ms-3" type="text" :loading="true"></v-skeleton-loader>
+                                </div>
+
+                                <div class="text-center py-4" v-else-if="!loading && !element.conditions || element.conditions.length < 1">
                                     {{ tt('No conditions defined. All transactions will match.') }}
                                 </div>
 

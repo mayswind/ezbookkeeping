@@ -2,10 +2,11 @@
     <v-dialog max-width="500" :persistent="oldExplorerName !== newExplorerName" v-model="showState">
         <v-card class="pa-sm-1 pa-md-2">
             <template #title>
-                <h4 class="text-h4 text-wrap">{{ tt('Rename Explorer') }}</h4>
+                <h4 class="text-h4 text-wrap">{{ dialogTitle || tt('Rename Explorer') }}</h4>
             </template>
             <v-card-text class="w-100 d-flex justify-center">
                 <v-text-field persistent-placeholder
+                              :autofocus="true"
                               :label="tt('Explorer Name')"
                               :placeholder="tt('Explorer Name')"
                               v-model="newExplorerName"/>
@@ -35,11 +36,13 @@ let resolveFunc: ((name: string) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
 const showState = ref<boolean>(false);
+const dialogTitle = ref<string | undefined>(undefined);
 const oldExplorerName = ref<string>('');
 const newExplorerName = ref<string>('');
 
-function open(currentExplorerName: string): Promise<string> {
+function open(currentExplorerName: string, title?: string): Promise<string> {
     showState.value = true;
+    dialogTitle.value = title;
     oldExplorerName.value = currentExplorerName;
     newExplorerName.value = currentExplorerName;
 

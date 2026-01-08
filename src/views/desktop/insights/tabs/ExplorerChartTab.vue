@@ -12,8 +12,7 @@
                         :disabled="loading || disabled"
                         :label="tt('Chart Type')"
                         :items="allTransactionExplorerChartTypes"
-                        :model-value="currentExplorer.chartType"
-                        @update:model-value="currentExplorer.chartType = $event as TransactionExplorerChartTypeValue"
+                        v-model="currentExplorer.chartType"
                     />
                     <v-select
                         class="flex-0-0"
@@ -24,8 +23,7 @@
                         :disabled="loading || disabled"
                         :label="tt('Axis / Category')"
                         :items="allTransactionExplorerDataDimensions"
-                        :model-value="currentExplorer.categoryDimension"
-                        @update:model-value="currentExplorer.categoryDimension = $event as TransactionExplorerDataDimensionType"
+                        v-model="currentExplorer.categoryDimension"
                     />
                     <v-select
                         class="flex-0-0"
@@ -56,8 +54,7 @@
                         :disabled="loading || disabled"
                         :label="tt('Value Metric')"
                         :items="allTransactionExplorerValueMetrics"
-                        :model-value="currentExplorer.valueMetric"
-                        @update:model-value="currentExplorer.valueMetric = $event as TransactionExplorerValueMetricType"
+                        v-model="currentExplorer.valueMetric"
                     />
                     <v-select
                         class="flex-0-0"
@@ -68,8 +65,7 @@
                         :disabled="loading || disabled"
                         :label="tt('Sort Order')"
                         :items="allTransactionExplorerChartSortingTypes"
-                        :model-value="currentExplorer.chartSortingType"
-                        @update:model-value="currentExplorer.chartSortingType = $event"
+                        v-model="currentExplorer.chartSortingType"
                     />
                     <v-spacer class="flex-1-1"/>
                 </div>
@@ -150,11 +146,9 @@ import {
 import { type NameValue, type TypeAndDisplayName } from '@/core/base.ts';
 import { Month, WeekDay } from '@/core/datetime.ts';
 import {
-    TransactionExplorerChartTypeValue,
     TransactionExplorerChartType,
     TransactionExplorerDataDimensionType,
     TransactionExplorerDataDimension,
-    TransactionExplorerValueMetricType,
     TransactionExplorerValueMetric
 } from '@/core/explorer.ts';
 

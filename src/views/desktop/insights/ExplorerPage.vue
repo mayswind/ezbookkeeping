@@ -74,22 +74,20 @@
                                         <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                                     </v-btn>
                                     <v-spacer/>
-                                    <v-btn class="ms-3" color="default" variant="outlined"
+                                    <v-btn class="ms-3"
+                                           :color="isCurrentExplorerModified ? 'primary' : 'default'"
+                                           :variant="isCurrentExplorerModified ? 'elevated' : 'outlined'"
                                            :disabled="loading || updating" @click="saveExplorer(false)">
                                         {{ tt('Save Explorer') }}
                                         <v-progress-circular indeterminate size="22" class="ms-2" v-if="updating"></v-progress-circular>
                                         <v-menu activator="parent" :open-on-hover="true">
                                             <v-list>
-                                                <v-list-item :prepend-icon="mdiContentSaveOutline" @click="saveExplorer(true)">
+                                                <v-list-item @click="saveExplorer(true)">
                                                     <v-list-item-title>{{ tt('Save As New Explorer') }}</v-list-item-title>
                                                 </v-list-item>
-                                                <v-divider class="my-2" v-if="currentExplorer.id" />
-                                                <v-list-item :prepend-icon="mdiPencilOutline" @click="setExplorerName" v-if="currentExplorer.id">
-                                                    <v-list-item-title>{{ tt('Rename Explorer') }}</v-list-item-title>
-                                                </v-list-item>
-                                                <v-divider class="my-2" v-if="currentExplorer.id" />
-                                                <v-list-item :prepend-icon="mdiDeleteOutline" @click="removeExplorer" v-if="currentExplorer.id">
-                                                    <v-list-item-title>{{ tt('Delete Explorer') }}</v-list-item-title>
+                                                <v-list-item @click="loadExplorer(currentExplorer.id, true)"
+                                                             v-if="currentExplorer.id">
+                                                    <v-list-item-title>{{ tt('Restore to Last Saved') }}</v-list-item-title>
                                                 </v-list-item>
                                             </v-list>
                                         </v-menu>
@@ -111,9 +109,22 @@
                                                 </template>
                                                 <v-list-item :prepend-icon="mdiExport"
                                                              :title="tt('Export Results')"
-                                                             :disabled="loading || updating || !filteredTransactions || filteredTransactions.length < 1"
+                                                             :disabled="loading || updating || (activeTab === 'table' && (!filteredTransactionsInDataTable || filteredTransactionsInDataTable.length < 1))"
                                                              @click="exportResults"
                                                              v-if="activeTab === 'table' || activeTab === 'chart'"></v-list-item>
+                                                <v-divider class="my-2" v-if="currentExplorer.id" />
+                                                <v-list-item :prepend-icon="mdiPencilOutline" @click="setExplorerName" v-if="currentExplorer.id">
+                                                    <v-list-item-title>{{ tt('Rename Explorer') }}</v-list-item-title>
+                                                </v-list-item>
+                                                <v-list-item :prepend-icon="mdiEyeOffOutline" @click="hideExplorer(true)" v-if="currentExplorer.id && !currentExplorer.hidden">
+                                                    <v-list-item-title>{{ tt('Hide Explorer') }}</v-list-item-title>
+                                                </v-list-item>
+                                                <v-list-item :prepend-icon="mdiEyeOutline" @click="hideExplorer(false)" v-if="currentExplorer.id && currentExplorer.hidden">
+                                                    <v-list-item-title>{{ tt('Unhide Explorer') }}</v-list-item-title>
+                                                </v-list-item>
+                                                <v-list-item :prepend-icon="mdiDeleteOutline" @click="removeExplorer" v-if="currentExplorer.id">
+                                                    <v-list-item-title>{{ tt('Delete Explorer') }}</v-list-item-title>
+                                                </v-list-item>
                                             </v-list>
                                         </v-menu>
                                     </v-btn>
@@ -131,7 +142,7 @@
                                 </v-window-item>
                                 <v-window-item value="chart">
                                     <explorer-chart-tab ref="explorerChartTab"
-                                                       :loading="loading" :disabled="loading || updating" />
+                                                        :loading="loading" :disabled="loading || updating" />
                                 </v-window-item>
                             </v-window>
                         </v-card>
@@ -166,7 +177,7 @@ import ExplorerRenameDialog from '@/views/desktop/insights/dialogs/ExplorerRenam
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
 import ExportDialog from '@/views/desktop/statistics/transaction/dialogs/ExportDialog.vue';
 
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import { ref, computed, useTemplateRef, watch, nextTick } from 'vue';
 import { useRouter, onBeforeRouteUpdate } from 'vue-router';
 import { useDisplay } from 'vuetify';
 
@@ -182,9 +193,10 @@ import { type TransactionExplorerPartialFilter, type TransactionExplorerFilter, 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { type WeekDayValue, type LocalizedDateRange, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
+import { KnownErrorCode } from '@/consts/api.ts';
 
 import { type TransactionInsightDataItem, Transaction } from '@/models/transaction.ts';
-import { type InsightsExplorerBasicInfo, InsightsExplorer } from '@/models/explorer.ts';
+import { InsightsExplorerBasicInfo, InsightsExplorer } from '@/models/explorer.ts';
 
 import {
     parseDateTimeFromUnixTime,
@@ -202,8 +214,9 @@ import {
     mdiCheck,
     mdiRefresh,
     mdiDotsVertical,
-    mdiContentSaveOutline,
     mdiPencilOutline,
+    mdiEyeOutline,
+    mdiEyeOffOutline,
     mdiDeleteOutline,
     mdiHomeClockOutline,
     mdiInvoiceTextClockOutline,
@@ -264,6 +277,7 @@ const loading = ref<boolean>(true);
 const initing = ref<boolean>(true);
 const updating = ref<boolean>(false);
 const clientSessionId = ref<string>('');
+const isCurrentExplorerModified = ref<boolean>(false);
 const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
 const showNav = ref<boolean>(display.mdAndUp.value);
 const activeTab = ref<ExplorerPageTabType>('query');
@@ -272,10 +286,50 @@ const showCustomDateRangeDialog = ref<boolean>(false);
 const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
 const fiscalYearStart = computed<number>(() => userStore.currentUserFiscalYearStart);
 
-const allExplorers = computed<InsightsExplorerBasicInfo[]>(() => explorersStore.allInsightsExplorerBasicInfos.slice(0, 15));
+const allExplorers = computed<InsightsExplorerBasicInfo[]>(() => {
+    const maximumExplorersToShow = 14;
+    const ret: InsightsExplorerBasicInfo[] = [];
+    let hasCurrentExplorer = false;
+
+    for (const explorer of explorersStore.allInsightsExplorerBasicInfos) {
+        if (ret.length >= maximumExplorersToShow) {
+            break;
+        }
+
+        if (!explorer.hidden || (explorer.id && explorer.id === currentExplorer.value.id)) {
+            ret.push(explorer);
+
+            if (explorer.id && explorer.id === currentExplorer.value.id) {
+                hasCurrentExplorer = true;
+            }
+        }
+    }
+
+    if (!hasCurrentExplorer && currentExplorer.value && currentExplorer.value.id) {
+        if (ret.length >= maximumExplorersToShow) {
+            ret.pop();
+        }
+
+        let foundCurrentExplorer = false;
+
+        for (const explorer of explorersStore.allInsightsExplorerBasicInfos) {
+            if (explorer.id === currentExplorer.value.id) {
+                ret.push(explorer);
+                foundCurrentExplorer = true;
+                break;
+            }
+        }
+
+        if (!foundCurrentExplorer) {
+            ret.push(InsightsExplorerBasicInfo.of(currentExplorer.value));
+        }
+    }
+
+    return ret;
+});
 const currentFilter = computed<TransactionExplorerFilter>(() => explorersStore.transactionExplorerFilter);
 const currentExplorer = computed<InsightsExplorer>(() => explorersStore.currentInsightsExplorer);
-const filteredTransactions = computed<TransactionInsightDataItem[]>(() => explorersStore.filteredTransactions);
+const filteredTransactionsInDataTable = computed<TransactionInsightDataItem[]>(() => explorersStore.filteredTransactionsInDataTable);
 
 const allDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.InsightsExplorer, true));
 const allTimezoneTypesUsedForDateRange = computed<TypeAndDisplayName[]>(() => getAllTimezoneTypesUsedForStatistics());
@@ -340,7 +394,8 @@ function init(initProps: InsightsExplorerProps): void {
             loadExplorer(initProps.initId);
         }
     } else {
-        explorersStore.updateCurrentInsightsExplorer(InsightsExplorer.createNewExplorer());
+        explorersStore.updateCurrentInsightsExplorer(InsightsExplorer.createNewExplorer(generateRandomUUID()));
+        isCurrentExplorerModified.value = true;
     }
 
     if (!needReload && !explorersStore.transactionExplorerStateInvalid && !explorersStore.insightsExplorerListStateInvalid) {
@@ -394,12 +449,13 @@ function createNewExplorer(): void {
         return;
     }
 
-    explorersStore.updateCurrentInsightsExplorer(InsightsExplorer.createNewExplorer());
+    explorersStore.updateCurrentInsightsExplorer(InsightsExplorer.createNewExplorer(generateRandomUUID()));
+    isCurrentExplorerModified.value = true;
     router.push(getFilterLinkUrl());
 }
 
-function loadExplorer(explorerId: string): void {
-    if (currentExplorer.value.id === explorerId) {
+function loadExplorer(explorerId: string, force?: boolean): void {
+    if (!force && currentExplorer.value.id === explorerId) {
         return;
     }
 
@@ -409,6 +465,11 @@ function loadExplorer(explorerId: string): void {
         explorerId: explorerId
     }).then(explorer => {
         explorersStore.updateCurrentInsightsExplorer(explorer);
+
+        nextTick(() => {
+            isCurrentExplorerModified.value = false;
+        });
+
         loading.value = false;
         router.push(getFilterLinkUrl());
     }).catch(error => {
@@ -422,7 +483,7 @@ function loadExplorer(explorerId: string): void {
 
 function saveExplorer(saveAs?: boolean): void {
     if (saveAs || !currentExplorer.value.name) {
-        explorerRenameDialog.value?.open(currentExplorer.value.name || '').then((newName: string) => {
+        explorerRenameDialog.value?.open(currentExplorer.value.name || '', tt('Set Explorer Name')).then((newName: string) => {
             currentExplorer.value.name = newName;
             doSaveExplorer(saveAs);
         })
@@ -445,6 +506,10 @@ function doSaveExplorer(saveAs?: boolean): Promise<unknown> {
         clientSessionId.value = generateRandomUUID();
         explorersStore.updateCurrentInsightsExplorer(newExplorer);
 
+        nextTick(() => {
+            isCurrentExplorerModified.value = false;
+        });
+
         if (oldExplorerId !== newExplorer.id) {
             router.push(getFilterLinkUrl());
         }
@@ -453,6 +518,12 @@ function doSaveExplorer(saveAs?: boolean): Promise<unknown> {
 
         if (!error.processed) {
             snackbar.value?.showError(error);
+
+            if (error.error && error.error.errorCode === KnownErrorCode.NothingWillBeUpdated) {
+                nextTick(() => {
+                    isCurrentExplorerModified.value = false;
+                });
+            }
         }
     });
 }
@@ -460,6 +531,28 @@ function doSaveExplorer(saveAs?: boolean): Promise<unknown> {
 function setExplorerName(): void {
     explorerRenameDialog.value?.open(currentExplorer.value.name || '').then((newName: string) => {
         currentExplorer.value.name = newName;
+    });
+}
+
+function hideExplorer(hidden: boolean): void {
+    updating.value = true;
+
+    explorersStore.hideInsightsExplorer({
+        explorer: currentExplorer.value,
+        hidden: hidden
+    }).then(() => {
+        updating.value = false;
+        currentExplorer.value.hidden = hidden;
+
+        nextTick(() => {
+            isCurrentExplorerModified.value = false;
+        });
+    }).catch(error => {
+        updating.value = false;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
     });
 }
 
@@ -487,7 +580,7 @@ function removeExplorer(): void {
 }
 
 function exportResults(): void {
-    if (activeTab.value === 'table' && filteredTransactions.value) {
+    if (activeTab.value === 'table' && filteredTransactionsInDataTable.value) {
         const results = explorerDataTableTab.value?.buildExportResults();
 
         if (results) {
@@ -616,6 +709,16 @@ watch(() => display.mdAndUp.value, (newValue) => {
 
 watch(activeTab, () => {
     router.push(getFilterLinkUrl());
+});
+
+watch(currentExplorer, () => {
+    if (initing.value || loading.value) {
+        return;
+    }
+
+    isCurrentExplorerModified.value = true;
+}, {
+    deep: true
 });
 
 init(props);

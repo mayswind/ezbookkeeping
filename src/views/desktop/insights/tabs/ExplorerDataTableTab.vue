@@ -10,9 +10,20 @@
                         item-value="value"
                         density="compact"
                         :disabled="loading || disabled"
+                        :label="tt('Data Source')"
+                        :items="allDataTableQuerySources"
+                        v-model="currentExplorer.datatableQuerySource"
+                    />
+                    <v-select
+                        class="flex-0-0"
+                        min-width="150"
+                        item-title="name"
+                        item-value="value"
+                        density="compact"
+                        :disabled="loading || disabled"
                         :label="tt('Transactions Per Page')"
                         :items="allPageCounts"
-                        v-model="countPerPage"
+                        v-model="currentExplorer.countPerPage"
                     />
                 </div>
             </v-col>
@@ -27,7 +38,7 @@
         :headers="dataTableHeaders"
         :items="filteredTransactions"
         :hover="true"
-        v-model:items-per-page="countPerPage"
+        v-model:items-per-page="currentExplorer.countPerPage"
         v-model:page="currentPage"
     >
         <template #item.time="{ item }">
@@ -117,13 +128,12 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useExplorersStore } from '@/stores/explorer.ts';
 
-import type { NameNumeralValue } from '@/core/base.ts';
+import { type NameValue, type NameNumeralValue, itemAndIndex } from '@/core/base.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
 
-import {
-    type TransactionInsightDataItem
-} from '@/models/transaction.ts';
+import type { TransactionInsightDataItem } from '@/models/transaction.ts';
+import type { InsightsExplorer} from '@/models/explorer.ts';
 
 import { replaceAll } from '@/lib/common.ts';
 
@@ -164,12 +174,38 @@ const userStore = useUserStore();
 const explorersStore = useExplorersStore();
 
 const currentPage = ref<number>(1);
-const countPerPage = ref<number>(15);
 
 const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
-const filteredTransactions = computed<TransactionInsightDataItem[]>(() => explorersStore.filteredTransactions);
+const currentExplorer = computed<InsightsExplorer>(() => explorersStore.currentInsightsExplorer);
+
+const filteredTransactions = computed<TransactionInsightDataItem[]>(() => explorersStore.filteredTransactionsInDataTable);
+
+const allDataTableQuerySources = computed<NameValue[]>(() => {
+    const sources: NameValue[] = [];
+
+    sources.push({
+        name: tt('All Queries'),
+        value: ''
+    });
+
+    for (const [query, index] of itemAndIndex(currentExplorer.value.queries)) {
+        if (query.name) {
+            sources.push({
+                name: query.name,
+                value: query.id
+            });
+        } else {
+            sources.push({
+                name: tt('format.misc.queryIndex', { index: index + 1 }),
+                value: query.id
+            });
+        }
+    }
+
+    return sources;
+});
 
 const allPageCounts = computed<NameNumeralValue[]>(() => {
     const pageCounts: NameNumeralValue[] = [];
@@ -187,7 +223,7 @@ const allPageCounts = computed<NameNumeralValue[]>(() => {
 const skeletonData = computed<number[]>(() => {
     const data: number[] = [];
 
-    for (let i = 0; i < countPerPage.value; i++) {
+    for (let i = 0; i < currentExplorer.value.countPerPage; i++) {
         data.push(i);
     }
 
@@ -200,7 +236,7 @@ const totalPageCount = computed<number>(() => {
     }
 
     const count = filteredTransactions.value.length;
-    return Math.ceil(count / countPerPage.value);
+    return Math.ceil(count / currentExplorer.value.countPerPage);
 });
 
 const dataTableHeaders = computed<object[]>(() => {

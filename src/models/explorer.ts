@@ -28,7 +28,7 @@ export class InsightsExplorerBasicInfo implements InsightsExplorerInfoResponse {
     public name: string;
     public displayOrder: number;
     public hidden: boolean;
-    public data: Record<string, string | number | string[]> = {};
+    public data: Record<string, string | number | object[]> = {};
 
     private constructor(id: string, name: string, displayOrder: number, hidden: boolean) {
         this.id = id;
@@ -64,6 +64,8 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
     public hidden: boolean;
     public queries: TransactionExplorerQuery[];
     public timezoneUsedForDateRange: number;
+    public datatableQuerySource: string;
+    public countPerPage: number;
     public chartType: TransactionExplorerChartTypeValue;
     public categoryDimension: TransactionExplorerDataDimensionType;
     public seriesDimension: TransactionExplorerDataDimensionType;
@@ -77,6 +79,8 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         false,
         [],
         TimezoneTypeForStatistics.Default.type,
+        '',
+        15,
         TransactionExplorerChartType.Default.value,
         TransactionExplorerDataDimension.CategoryDimensionDefault.value,
         TransactionExplorerDataDimension.SeriesDimensionDefault.value,
@@ -84,13 +88,15 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         ChartSortingType.Default.type
     );
 
-    private constructor(id: string, name: string, displayOrder: number, hidden: boolean, queries: TransactionExplorerQuery[], timezoneUsedForDateRange: number, chartType: TransactionExplorerChartTypeValue, categoryDimension: TransactionExplorerDataDimensionType, seriesDimension: TransactionExplorerDataDimensionType, valueMetric: TransactionExplorerValueMetricType, chartSortingType: number) {
+    private constructor(id: string, name: string, displayOrder: number, hidden: boolean, queries: TransactionExplorerQuery[], timezoneUsedForDateRange: number, datatableQuerySource: string, countPerPage: number, chartType: TransactionExplorerChartTypeValue, categoryDimension: TransactionExplorerDataDimensionType, seriesDimension: TransactionExplorerDataDimensionType, valueMetric: TransactionExplorerValueMetricType, chartSortingType: number) {
         this.id = id;
         this.name = name;
         this.displayOrder = displayOrder;
         this.hidden = hidden;
         this.queries = queries;
         this.timezoneUsedForDateRange = timezoneUsedForDateRange;
+        this.datatableQuerySource = datatableQuerySource;
+        this.countPerPage = countPerPage;
         this.chartType = chartType;
         this.categoryDimension = categoryDimension;
         this.seriesDimension = seriesDimension;
@@ -98,10 +104,12 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         this.chartSortingType = chartSortingType;
     }
 
-    public get data(): Record<string, string | number | string[]> {
+    public get data(): Record<string, string | number | object[]> {
         return {
-            queries: this.queries.map(q => q.toJson()),
+            queries: this.queries.map(q => q.toJsonObject()),
             timezoneUsedForDateRange: this.timezoneUsedForDateRange,
+            datatableQuerySource: this.datatableQuerySource,
+            countPerPage: this.countPerPage,
             chartType: this.chartType,
             categoryDimension: this.categoryDimension,
             seriesDimension: this.seriesDimension,
@@ -131,27 +139,26 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         const data = explorerResponse.data;
         const queries: TransactionExplorerQuery[] = [];
         let timezoneUsedForDateRange = InsightsExplorer.Default.timezoneUsedForDateRange;
+        let datatableQuerySource = InsightsExplorer.Default.datatableQuerySource;
+        let countPerPage = InsightsExplorer.Default.countPerPage;
         let chartType = InsightsExplorer.Default.chartType;
         let categoryDimension = InsightsExplorer.Default.categoryDimension;
         let seriesDimension = InsightsExplorer.Default.seriesDimension;
         let valueMetric = InsightsExplorer.Default.valueMetric;
         let chartSortingType = InsightsExplorer.Default.chartSortingType;
+        let hasDatatableQuerySource = false;
 
         if (data) {
-            if (Array.isArray(data['queries'])) {
-                const textualQueries = data['queries'] as string[];
-
-                for (const textualQuery of textualQueries) {
-                    const query = TransactionExplorerQuery.parse(textualQuery);
-
-                    if (query) {
-                        queries.push(query);
-                    }
-                }
-            }
-
             if (typeof data['timezoneUsedForDateRange'] === 'number') {
                 timezoneUsedForDateRange = data['timezoneUsedForDateRange'] as number;
+            }
+
+            if (typeof data['datatableQuerySource'] === 'string') {
+                datatableQuerySource = data['datatableQuerySource'] as string;
+            }
+
+            if (typeof data['countPerPage'] === 'number') {
+                countPerPage = data['countPerPage'] as number;
             }
 
             if (typeof data['chartType'] === 'string') {
@@ -173,6 +180,26 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
             if (typeof data['chartSortingType'] === 'number') {
                 chartSortingType = data['chartSortingType'] as number;
             }
+
+            if (Array.isArray(data['queries'])) {
+                const queryItems = data['queries'] as object[];
+
+                for (const queryItem of queryItems) {
+                    const query = TransactionExplorerQuery.parse(queryItem);
+
+                    if (query) {
+                        queries.push(query);
+                    }
+
+                    if (query && query.id === datatableQuerySource) {
+                        hasDatatableQuerySource = true;
+                    }
+                }
+            }
+
+            if (!hasDatatableQuerySource) {
+                datatableQuerySource = '';
+            }
         }
 
         return new InsightsExplorer(
@@ -182,6 +209,8 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
             explorerResponse.hidden,
             queries,
             timezoneUsedForDateRange,
+            datatableQuerySource,
+            countPerPage,
             chartType,
             categoryDimension,
             seriesDimension,
@@ -190,14 +219,16 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         );
     }
 
-    public static createNewExplorer(name?: string): InsightsExplorer {
+    public static createNewExplorer(newQueryId: string): InsightsExplorer {
         return new InsightsExplorer(
             '',
-            name || '',
+            '',
             0,
             false,
-            [TransactionExplorerQuery.create()],
+            [TransactionExplorerQuery.create(newQueryId)],
             InsightsExplorer.Default.timezoneUsedForDateRange,
+            InsightsExplorer.Default.datatableQuerySource,
+            InsightsExplorer.Default.countPerPage,
             InsightsExplorer.Default.chartType,
             InsightsExplorer.Default.categoryDimension,
             InsightsExplorer.Default.seriesDimension,
@@ -209,14 +240,14 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
 
 export interface InsightsExplorerCreateRequest {
     readonly name: string;
-    readonly data: Record<string, string | number | string[]>;
+    readonly data: Record<string, string | number | object[]>;
     readonly clientSessionId?: string;
 }
 
 export interface InsightsExplorerModifyRequest {
     readonly id: string;
     readonly name: string;
-    readonly data: Record<string, string | number | string[]>;
+    readonly data: Record<string, string | number | object[]>;
     readonly hidden: boolean;
     readonly clientSessionId?: string;
 }
@@ -244,7 +275,7 @@ export interface InsightsExplorerInfoResponse {
     readonly name: string;
     readonly displayOrder: number;
     readonly hidden: boolean;
-    readonly data: Record<string, string | number | string[]>;
+    readonly data: Record<string, string | number | object[]>;
 }
 
 interface ExpressionNode {
@@ -253,10 +284,12 @@ interface ExpressionNode {
 }
 
 export class TransactionExplorerQuery {
+    public id: string;
     public name: string;
     public conditions: TransactionExplorerConditionWithRelation[];
 
-    private constructor(name: string, conditions: TransactionExplorerConditionWithRelation[]) {
+    private constructor(id: string, name: string, conditions: TransactionExplorerConditionWithRelation[]) {
+        this.id = id;
         this.name = name;
         this.conditions = conditions;
     }
@@ -450,7 +483,7 @@ export class TransactionExplorerQuery {
         return finalTokens;
     }
 
-    public clone(): TransactionExplorerQuery {
+    public clone(newId: string): TransactionExplorerQuery {
         const clonedConditions: TransactionExplorerConditionWithRelation[] = [];
 
         for (const condition of this.conditions) {
@@ -463,29 +496,35 @@ export class TransactionExplorerQuery {
             clonedConditions.push(clonedCondition);
         }
 
-        return new TransactionExplorerQuery(this.name, clonedConditions);
+        return new TransactionExplorerQuery(newId, this.name, clonedConditions);
     }
 
-    public toJson(): string {
-        return JSON.stringify({
+    public toJsonObject(): object {
+        return {
+            id: this.id,
             name: this.name,
             conditions: this.conditions.map(condition => condition.toJsonObject())
-        });
+        };
     }
 
-    public static create(): TransactionExplorerQuery {
-        return new TransactionExplorerQuery("", []);
+    public static create(id: string): TransactionExplorerQuery {
+        return new TransactionExplorerQuery(id, "", []);
     }
 
-    public static parse(json: string): TransactionExplorerQuery | null {
-        const parsed = JSON.parse(json);
-        const nameFieldValue = parsed['name'] as unknown;
-        const conditionsFieldValue = parsed['conditions'] as unknown;
-
-        if (typeof nameFieldValue !== 'string' || !Array.isArray(conditionsFieldValue)) {
+    public static parse(obj: object): TransactionExplorerQuery | null {
+        if (!('id' in obj) || !('name' in obj) || !('conditions' in obj)) {
             return null;
         }
 
+        const idFieldValue = obj['id'] as unknown;
+        const nameFieldValue = obj['name'] as unknown;
+        const conditionsFieldValue = obj['conditions'] as unknown;
+
+        if (typeof idFieldValue !== 'string' || typeof nameFieldValue !== 'string' || !Array.isArray(conditionsFieldValue)) {
+            return null;
+        }
+
+        const id: string = idFieldValue;
         const name: string = nameFieldValue;
         const conditions: TransactionExplorerConditionWithRelation[] = [];
 
@@ -505,7 +544,7 @@ export class TransactionExplorerQuery {
             conditions.push(condition);
         }
 
-        return new TransactionExplorerQuery(name, conditions);
+        return new TransactionExplorerQuery(id, name, conditions);
     }
 }
 

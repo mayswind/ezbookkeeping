@@ -16,7 +16,7 @@ import type { LocalizedTimezoneInfo } from '@/core/timezone.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { TemplateType } from '@/core/template.ts';
 import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
-import { TRANSACTION_MAX_PICTURE_COUNT, TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
+import { TRANSACTION_MAX_PICTURE_COUNT } from '@/consts/transaction.ts';
 
 import { Account, type CategorizedAccountWithDisplayBalance } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
@@ -26,18 +26,12 @@ import { Transaction } from '@/models/transaction.ts';
 import { TransactionTemplate } from '@/models/transaction_template.ts';
 
 import {
-    isArray,
-    isNumber
+    isArray
 } from '@/lib/common.ts';
 
 import {
-    getExchangedAmountByRate,
-    getAmountWithDecimalNumberCount
+    getExchangedAmountByRate
 } from '@/lib/numeral.ts';
-
-import {
-    getCurrencyFraction
-} from '@/lib/currency.ts';
 
 import {
     getUtcOffsetByUtcOffsetMinutes,
@@ -437,11 +431,6 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
             return;
         }
 
-        // Only recalculate if accounts actually changed
-        if (newSourceAccountId === oldSourceAccountId && newDestinationAccountId === oldDestinationAccountId) {
-            return;
-        }
-
         // Only recalculate if accounts actually changed (skip initial watch call)
         if (oldSourceAccountId !== undefined && oldDestinationAccountId !== undefined) {
             if (newSourceAccountId === oldSourceAccountId && newDestinationAccountId === oldDestinationAccountId) {
@@ -449,33 +438,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
             }
         }
 
-        const sourceAccount = allAccountsMap.value[transaction.value.sourceAccountId];
-        const destinationAccount = allAccountsMap.value[transaction.value.destinationAccountId];
-
-        if (!sourceAccount || !destinationAccount) {
-            return;
-        }
-
-        // Recalculate destination amount based on source amount and exchange rate
-        if (sourceAccount.currency !== destinationAccount.currency) {
-            const exchangedAmount = exchangeRatesStore.getExchangedAmount(transaction.value.sourceAmount, sourceAccount.currency, destinationAccount.currency);
-
-            if (isNumber(exchangedAmount)) {
-                const decimalNumberCount = getCurrencyFraction(destinationAccount.currency);
-                let newDestinationAmount = Math.trunc(exchangedAmount);
-
-                if (isNumber(decimalNumberCount)) {
-                    newDestinationAmount = getAmountWithDecimalNumberCount(newDestinationAmount, decimalNumberCount);
-                }
-
-                if (TRANSACTION_MIN_AMOUNT <= newDestinationAmount && newDestinationAmount <= TRANSACTION_MAX_AMOUNT) {
-                    transaction.value.destinationAmount = newDestinationAmount;
-                }
-            }
-        } else {
-            // Same currency, just copy the source amount
-            transaction.value.destinationAmount = transaction.value.sourceAmount;
-        }
+        transactionsStore.setTransactionSuitableDestinationAmount(transaction.value, transaction.value.sourceAmount, transaction.value.sourceAmount, oldSourceAccountId as string, oldDestinationAccountId as string);
     });
 
     return {

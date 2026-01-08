@@ -26,7 +26,8 @@ import { Transaction } from '@/models/transaction.ts';
 import { TransactionTemplate } from '@/models/transaction_template.ts';
 
 import {
-    isArray
+    isArray,
+    isDefined
 } from '@/lib/common.ts';
 
 import {
@@ -432,7 +433,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         }
 
         // Only recalculate if accounts actually changed (skip initial watch call)
-        if (oldSourceAccountId !== undefined && oldDestinationAccountId !== undefined) {
+        if (isDefined(oldSourceAccountId) && isDefined(oldDestinationAccountId)) {
             if (newSourceAccountId === oldSourceAccountId && newDestinationAccountId === oldDestinationAccountId) {
                 return;
             }

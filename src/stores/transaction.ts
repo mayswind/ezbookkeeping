@@ -556,34 +556,48 @@ export const useTransactionsStore = defineStore('transactions', () => {
         clearUserTransactionDraft();
     }
 
-    function setTransactionSuitableDestinationAmount(transaction: Transaction, oldValue: number, newValue: number): void {
+    function setTransactionSuitableDestinationAmount(transaction: Transaction, oldSourceAmount: number, newSourceAmount: number, oldSourceAccountId?: string, oldDestinationAccountId?: string): void {
         if (transaction.type === TransactionType.Expense || transaction.type === TransactionType.Income) {
-            transaction.destinationAmount = newValue;
+            transaction.destinationAmount = newSourceAmount;
         } else if (transaction.type === TransactionType.Transfer) {
             const sourceAccount = accountsStore.allAccountsMap[transaction.sourceAccountId];
             const destinationAccount = accountsStore.allAccountsMap[transaction.destinationAccountId];
 
-            if (sourceAccount && destinationAccount && sourceAccount.currency !== destinationAccount.currency) {
-                const decimalNumberCount = getCurrencyFraction(destinationAccount.currency);
-                const exchangedOldValue = exchangeRatesStore.getExchangedAmount(oldValue, sourceAccount.currency, destinationAccount.currency);
-                const exchangedNewValue = exchangeRatesStore.getExchangedAmount(newValue, sourceAccount.currency, destinationAccount.currency);
+            if (!sourceAccount || !destinationAccount) {
+                return;
+            }
+
+            const oldSourceAccount = oldSourceAccountId ? accountsStore.allAccountsMap[oldSourceAccountId] : sourceAccount;
+            const oldDestinationAccount = oldDestinationAccountId ? accountsStore.allAccountsMap[oldDestinationAccountId] : destinationAccount;
+
+            let oldValueToCompare = oldSourceAmount;
+            let newValueToSet = newSourceAmount;
+
+            if (oldSourceAccount && oldDestinationAccount && oldSourceAccount.currency !== oldDestinationAccount.currency) {
+                const decimalNumberCount = getCurrencyFraction(oldDestinationAccount.currency);
+                const exchangedOldValue = exchangeRatesStore.getExchangedAmount(oldSourceAmount, oldSourceAccount.currency, oldDestinationAccount.currency);
 
                 if (isNumber(decimalNumberCount) && isNumber(exchangedOldValue)) {
-                    oldValue = Math.trunc(exchangedOldValue);
-                    oldValue = getAmountWithDecimalNumberCount(oldValue, decimalNumberCount);
+                    oldValueToCompare = Math.trunc(exchangedOldValue);
+                    oldValueToCompare = getAmountWithDecimalNumberCount(oldValueToCompare, decimalNumberCount);
                 }
+            }
+
+            if (sourceAccount.currency !== destinationAccount.currency) {
+                const decimalNumberCount = getCurrencyFraction(destinationAccount.currency);
+                const exchangedNewValue = exchangeRatesStore.getExchangedAmount(newSourceAmount, sourceAccount.currency, destinationAccount.currency);
 
                 if (isNumber(decimalNumberCount) && isNumber(exchangedNewValue)) {
-                    newValue = Math.trunc(exchangedNewValue);
-                    newValue = getAmountWithDecimalNumberCount(newValue, decimalNumberCount);
+                    newValueToSet = Math.trunc(exchangedNewValue);
+                    newValueToSet = getAmountWithDecimalNumberCount(newValueToSet, decimalNumberCount);
                 } else {
                     return;
                 }
             }
 
-            if ((!sourceAccount || !destinationAccount || transaction.destinationAmount === oldValue || transaction.destinationAmount === 0) &&
-                (TRANSACTION_MIN_AMOUNT <= newValue && newValue <= TRANSACTION_MAX_AMOUNT)) {
-                transaction.destinationAmount = newValue;
+            if ((transaction.destinationAmount === oldValueToCompare || transaction.destinationAmount === 0) &&
+                (TRANSACTION_MIN_AMOUNT <= newValueToSet && newValueToSet <= TRANSACTION_MAX_AMOUNT)) {
+                transaction.destinationAmount = newValueToSet;
             }
         }
     }

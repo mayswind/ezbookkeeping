@@ -24,7 +24,7 @@ type MCPQueryTransactionsRequest struct {
 	Keyword               string `json:"keyword,omitempty" jsonschema_description:"Keyword to search in transaction description (optional)"`
 	Count                 int32  `json:"count,omitempty" jsonschema:"default=100" jsonschema_description:"Maximum number of results to return (default: 100)"`
 	Page                  int32  `json:"page,omitempty" jsonschema:"default=1" jsonschema_description:"Page number for pagination (default: 1)"`
-	ResponseFields        string `json:"response_fields,omitempty" jsonschema_description:"Comma-separated list of fields to include in the response (optional, leave empty for all fields, available fields: time, currency, category_name, account_name, comment)"`
+	ResponseFields        string `json:"response_fields,omitempty" jsonschema_description:"Comma-separated list of optional fields to include in the response (optional, leave empty for all fields, available fields: time, currency, category_name, account_name, comment)"`
 }
 
 // MCPQueryTransactionsResponse represents the response structure for querying transactions

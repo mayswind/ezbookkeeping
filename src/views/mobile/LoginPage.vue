@@ -17,7 +17,7 @@
                 :disabled="loggingInByPassword || loggingInByOAuth2"
                 :label="tt('Username')"
                 :placeholder="tt('Your username or email')"
-                v-model:value="username"
+                v-model:value.trim="username"
                 @input="tempToken = ''"
             ></f7-list-input>
             <f7-list-input

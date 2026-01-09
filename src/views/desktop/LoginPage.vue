@@ -39,7 +39,7 @@
                                             :disabled="show2faInput || loggingInByPassword || loggingInByOAuth2 || verifying"
                                             :label="tt('Username')"
                                             :placeholder="tt('Your username or email')"
-                                            v-model="username"
+                                            v-model.trim="username"
                                             @input="tempToken = ''"
                                             @keyup.enter="passwordInput?.focus()"
                                         />

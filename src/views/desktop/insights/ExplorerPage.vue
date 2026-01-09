@@ -8,7 +8,7 @@
                             <btn-vertical-group :disabled="loading || updating" :buttons="allTabs" v-model="activeTab" />
                         </div>
                         <v-divider />
-                        <v-tabs show-arrows class="my-4" direction="vertical"
+                        <v-tabs show-arrows class="my-4" direction="vertical" :key="currentExplorer.id"
                                 :disabled="loading || updating" :model-value="currentExplorer.id">
                             <v-tab class="tab-text-truncate" key="new" value="" @click="createNewExplorer">
                                 <span class="text-truncate">{{ tt('New Explorer') }}</span>

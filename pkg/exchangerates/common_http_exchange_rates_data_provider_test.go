@@ -24,7 +24,7 @@ func TestExchangeRatesApiLatestExchangeRateHandler_ReserveBankOfAustraliaDataSou
 	assert.Equal(t, "AUD", exchangeRateResponse.BaseCurrency)
 
 	supportedCurrencyCodes := []string{"CAD", "CHF", "CNY", "EUR", "GBP", "HKD", "IDR", "INR", "JPY", "KRW",
-		"MYR", "NZD", "PHP", "SGD", "THB", "TWD", "USD", "VND"}
+		"MYR", "NZD", "PGK", "PHP", "SGD", "THB", "TWD", "USD", "VND"}
 
 	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
 }

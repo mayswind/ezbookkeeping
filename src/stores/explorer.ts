@@ -444,9 +444,9 @@ export const useExplorersStore = defineStore('explorers', () => {
         allInsightsExplorerBasicInfos.value.splice(to, 0, allInsightsExplorerBasicInfos.value.splice(from, 1)[0] as InsightsExplorer);
     }
 
-    function updateExplorerVisibilityInInsightsExplorerList({ explorer, hidden }: { explorer: InsightsExplorerBasicInfo, hidden: boolean }): void {
-        if (allInsightsExplorerBasicInfosMap.value[explorer.id]) {
-            allInsightsExplorerBasicInfosMap.value[explorer.id]!.hidden = hidden;
+    function updateExplorerVisibilityInInsightsExplorerList({ explorerId, hidden }: { explorerId: string, hidden: boolean }): void {
+        if (allInsightsExplorerBasicInfosMap.value[explorerId]) {
+            allInsightsExplorerBasicInfosMap.value[explorerId]!.hidden = hidden;
         }
     }
 
@@ -748,8 +748,11 @@ export const useExplorersStore = defineStore('explorers', () => {
         transactionExplorerFilter.value.startTime = 0;
         transactionExplorerFilter.value.endTime = 0;
         transactionExplorerAllData.value = [];
+        allInsightsExplorerBasicInfos.value = [];
+        allInsightsExplorerBasicInfosMap.value = {};
         currentInsightsExplorer.value = InsightsExplorer.createNewExplorer(generateRandomUUID());
         transactionExplorerStateInvalid.value = true;
+        insightsExplorerListStateInvalid.value = true;
     }
 
     function initTransactionExplorerFilter(filter?: TransactionExplorerPartialFilter, resetQuery?: boolean): void {
@@ -1086,7 +1089,7 @@ export const useExplorersStore = defineStore('explorers', () => {
         });
     }
 
-    function hideInsightsExplorer({ explorer, hidden }: { explorer: InsightsExplorer, hidden: boolean }): Promise<boolean> {
+    function hideInsightsExplorer({ explorer, hidden }: { explorer: InsightsExplorer | InsightsExplorerBasicInfo, hidden: boolean }): Promise<boolean> {
         return new Promise((resolve, reject) => {
             services.hideInsightsExplorer({
                 id: explorer.id,
@@ -1104,7 +1107,7 @@ export const useExplorersStore = defineStore('explorers', () => {
                 }
 
                 explorer.hidden = hidden;
-                updateExplorerVisibilityInInsightsExplorerList({ explorer: explorer, hidden });
+                updateExplorerVisibilityInInsightsExplorerList({ explorerId: explorer.id, hidden });
 
                 resolve(data.result);
             }).catch(error => {

@@ -508,7 +508,7 @@ export class TransactionExplorerQuery {
     }
 
     public static create(id: string): TransactionExplorerQuery {
-        return new TransactionExplorerQuery(id, "", []);
+        return new TransactionExplorerQuery(id, '', []);
     }
 
     public static parse(obj: object): TransactionExplorerQuery | null {

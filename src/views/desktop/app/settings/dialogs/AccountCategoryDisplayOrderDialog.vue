@@ -38,9 +38,9 @@
                                         <v-spacer/>
 
                                         <span class="ms-2">
-                                        <v-icon class="drag-handle" :icon="mdiDrag"/>
-                                        <v-tooltip activator="parent">{{ tt('Drag to Reorder') }}</v-tooltip>
-                                    </span>
+                                            <v-icon class="drag-handle" :icon="mdiDrag"/>
+                                            <v-tooltip activator="parent">{{ tt('Drag to Reorder') }}</v-tooltip>
+                                        </span>
                                     </div>
                                 </td>
                             </tr>

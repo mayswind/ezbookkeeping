@@ -14,13 +14,16 @@
                                 <span class="text-truncate">{{ tt('New Explorer') }}</span>
                             </v-tab>
                             <v-tab class="tab-text-truncate" :key="explorer.id" :value="explorer.id"
+                                   :disabled="loading || updating"
                                    v-for="explorer in allExplorers"
                                    @click="loadExplorer(explorer.id)">
                                 <span class="text-truncate">{{ explorer.name || tt('Untitled Explorer') }}</span>
                             </v-tab>
-<!--                            <v-btn class="text-left justify-start" variant="text" color="default" :rounded="false">-->
-<!--                                <span class="ps-2">{{ tt('More Explorer') }}</span>-->
-<!--                            </v-btn>-->
+                            <v-btn class="text-left justify-start" variant="text" color="default"
+                                   :disabled="loading || updating || !allExplorers || allExplorers.length < 1" :rounded="false"
+                                   @click="showAllExplorers">
+                                <span class="ps-2">{{ tt('More Explorer') }}</span>
+                            </v-btn>
                         </v-tabs>
                     </v-navigation-drawer>
                     <v-main>
@@ -85,8 +88,7 @@
                                                 <v-list-item @click="saveExplorer(true)">
                                                     <v-list-item-title>{{ tt('Save As New Explorer') }}</v-list-item-title>
                                                 </v-list-item>
-                                                <v-list-item @click="loadExplorer(currentExplorer.id, true)"
-                                                             v-if="currentExplorer.id">
+                                                <v-list-item @click="restoreExplorer()" v-if="currentExplorer.id">
                                                     <v-list-item-title>{{ tt('Restore to Last Saved') }}</v-list-item-title>
                                                 </v-list-item>
                                             </v-list>
@@ -159,6 +161,7 @@
                                  @dateRange:change="setCustomDateFilter"
                                  @error="onShowDateRangeError" />
 
+    <explorer-list-dialog ref="explorerListDialog" />
     <explorer-rename-dialog ref="explorerRenameDialog" />
     <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
     <export-dialog ref="exportDialog" />
@@ -173,6 +176,7 @@ import SnackBar from '@/components/desktop/SnackBar.vue';
 import ExplorerQueryTab from '@/views/desktop/insights/tabs/ExplorerQueryTab.vue';
 import ExplorerDataTableTab from '@/views/desktop/insights/tabs/ExplorerDataTableTab.vue';
 import ExplorerChartTab from '@/views/desktop/insights/tabs/ExplorerChartTab.vue';
+import ExplorerListDialog from '@/views/desktop/insights/dialogs/ExplorerListDialog.vue';
 import ExplorerRenameDialog from '@/views/desktop/insights/dialogs/ExplorerRenameDialog.vue';
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
 import ExportDialog from '@/views/desktop/statistics/transaction/dialogs/ExportDialog.vue';
@@ -239,6 +243,7 @@ type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type ExplorerDataTableTabType = InstanceType<typeof ExplorerDataTableTab>;
 type ExplorerChartTabType = InstanceType<typeof ExplorerChartTab>;
+type ExplorerListDialogType = InstanceType<typeof ExplorerListDialog>;
 type ExplorerRenameDialogType = InstanceType<typeof ExplorerRenameDialog>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 type ExportDialogType = InstanceType<typeof ExportDialog>;
@@ -269,6 +274,7 @@ const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const explorerDataTableTab = useTemplateRef<ExplorerDataTableTabType>('explorerDataTableTab');
 const explorerChartTab = useTemplateRef<ExplorerChartTabType>('explorerChartTab');
+const explorerListDialog = useTemplateRef<ExplorerListDialogType>('explorerListDialog');
 const explorerRenameDialog = useTemplateRef<ExplorerRenameDialogType>('explorerRenameDialog');
 const exportDialog = useTemplateRef<ExportDialogType>('exportDialog');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
@@ -391,7 +397,7 @@ function init(initProps: InsightsExplorerProps): void {
 
     if (initProps.initId) {
         if (explorersStore.currentInsightsExplorer.id !== initProps.initId) {
-            loadExplorer(initProps.initId);
+            needReload = true;
         }
     } else {
         explorersStore.updateCurrentInsightsExplorer(InsightsExplorer.createNewExplorer(generateRandomUUID()));
@@ -410,7 +416,19 @@ function init(initProps: InsightsExplorerProps): void {
         transactionTagsStore.loadAllTags({ force: false }),
         explorersStore.loadAllInsightsExplorerBasicInfos({ force: false })
     ]).then(() => {
-        return explorersStore.loadAllTransactions({ force: false });
+        const promises: Promise<unknown>[] = [
+            explorersStore.loadAllTransactions({ force: false })
+        ];
+
+        if (initProps.initId && explorersStore.currentInsightsExplorer.id !== initProps.initId) {
+            const loadExplorerPromise = loadExplorer(initProps.initId, false, true);
+
+            if (loadExplorerPromise) {
+                promises.push(loadExplorerPromise);
+            }
+        }
+
+        return Promise.all(promises);
     }).then(() => {
         loading.value = false;
         initing.value = false;
@@ -454,14 +472,16 @@ function createNewExplorer(): void {
     router.push(getFilterLinkUrl());
 }
 
-function loadExplorer(explorerId: string, force?: boolean): void {
-    if (!force && currentExplorer.value.id === explorerId) {
-        return;
+function loadExplorer(explorerId: string, force?: boolean, init?: boolean): Promise<unknown> | null {
+    if (!force && currentExplorer.value && currentExplorer.value.id === explorerId) {
+        return null;
     }
 
-    loading.value = true;
+    if (!init) {
+        loading.value = true;
+    }
 
-    explorersStore.getInsightsExplorer({
+    return explorersStore.getInsightsExplorer({
         explorerId: explorerId
     }).then(explorer => {
         explorersStore.updateCurrentInsightsExplorer(explorer);
@@ -470,13 +490,38 @@ function loadExplorer(explorerId: string, force?: boolean): void {
             isCurrentExplorerModified.value = false;
         });
 
-        loading.value = false;
+        if (!init) {
+            loading.value = false;
+        }
+
         router.push(getFilterLinkUrl());
     }).catch(error => {
-        loading.value = false;
+        if (!init) {
+            loading.value = false;
+        }
 
         if (!error.processed) {
             snackbar.value?.showError(error);
+        }
+    });
+}
+
+function showAllExplorers(): void {
+    explorerListDialog.value?.open().then((selectedExplorer: InsightsExplorerBasicInfo) => {
+        if (selectedExplorer) {
+            loadExplorer(selectedExplorer.id);
+        }
+    }).catch(() => {
+        if (explorersStore.insightsExplorerListStateInvalid) {
+            loading.value = true;
+
+            explorersStore.loadAllInsightsExplorerBasicInfos({
+                force: false
+            }).then(() => {
+                loading.value = false;
+            }).catch(() => {
+                loading.value = false;
+            });
         }
     });
 }
@@ -525,6 +570,16 @@ function doSaveExplorer(saveAs?: boolean): Promise<unknown> {
                 });
             }
         }
+    });
+}
+
+function restoreExplorer(): void {
+    if (!currentExplorer.value.id) {
+        return;
+    }
+
+    confirmDialog.value?.open('Are you sure you want to restore to last saved state? All unsaved changes will be lost.').then(() => {
+        loadExplorer(currentExplorer.value.id, true);
     });
 }
 

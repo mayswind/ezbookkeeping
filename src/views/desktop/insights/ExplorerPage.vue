@@ -763,6 +763,10 @@ watch(() => display.mdAndUp.value, (newValue) => {
 });
 
 watch(activeTab, () => {
+    if (initing.value || loading.value) {
+        return;
+    }
+
     router.push(getFilterLinkUrl());
 });
 

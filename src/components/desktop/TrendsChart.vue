@@ -1,5 +1,5 @@
 <template>
-    <axis-chart ref="axisChart" values-field="values"
+    <axis-chart class="trends-chart-container" ref="axisChart" values-field="values"
                 :skeleton="skeleton" :type="chartDisplayType" :stacked="stacked" :sorting-type="sortingType"
                 :show-value="showValue"
                 :show-total-amount-in-tooltip="showTotalAmountInTooltip" :total-name-in-tooltip="tt('Total Amount')"
@@ -289,3 +289,17 @@ defineExpose({
     exportData
 })
 </script>
+
+<style scoped>
+.trends-chart-container {
+    width: 100%;
+    height: 720px;
+    margin-top: 10px;
+}
+
+@media (min-width: 600px) {
+    .trends-chart-container {
+        height: 790px;
+    }
+}
+</style>

@@ -146,6 +146,13 @@ export class TransactionExplorerChartType implements NameValue {
 
     public static readonly Pie = new TransactionExplorerChartType('Pie Chart', TransactionExplorerChartTypeValue.Pie, false);
     public static readonly Radar = new TransactionExplorerChartType('Radar Chart', TransactionExplorerChartTypeValue.Radar, false);
+    public static readonly ColumnStacked = new TransactionExplorerChartType('Column Chart (Stacked)', TransactionExplorerChartTypeValue.ColumnStacked, true);
+    public static readonly Column100PercentStacked = new TransactionExplorerChartType('Column Chart (100% Stacked)', TransactionExplorerChartTypeValue.Column100PercentStacked, true);
+    public static readonly ColumnGrouped = new TransactionExplorerChartType('Column Chart (Grouped)', TransactionExplorerChartTypeValue.ColumnGrouped, true);
+    public static readonly LineGrouped = new TransactionExplorerChartType('Line Chart (Grouped)', TransactionExplorerChartTypeValue.LineGrouped, true);
+    public static readonly AreaStacked = new TransactionExplorerChartType('Area Chart (Stacked)', TransactionExplorerChartTypeValue.AreaStacked, true);
+    public static readonly Area100PercentStacked = new TransactionExplorerChartType('Area Chart (100% Stacked)', TransactionExplorerChartTypeValue.Area100PercentStacked, true);
+    public static readonly BubbleGrouped = new TransactionExplorerChartType('Bubble Chart (Grouped)', TransactionExplorerChartTypeValue.BubbleGrouped, true);
 
     public static readonly Default = TransactionExplorerChartType.Pie;
 

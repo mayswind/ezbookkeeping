@@ -87,14 +87,14 @@ export interface CategoriedInfo {
 }
 
 export interface CategoriedTransactions extends CategoriedInfo {
-    trasactions: Record<string, SeriesedTransactions>;
+    trasactions: Record<string, SeriesTransactions>;
 }
 
 export interface CategoriedTransactionExplorerData extends CategoriedInfo {
     data: CategoriedTransactionExplorerDataItem[];
 }
 
-export interface SeriesedInfo {
+export interface SeriesInfo {
     seriesName: string;
     seriesNameNeedI18n?: boolean;
     seriesNameI18nParameters?: Record<string, string>;
@@ -103,11 +103,11 @@ export interface SeriesedInfo {
     seriesDisplayOrders: number[];
 }
 
-export interface SeriesedTransactions extends SeriesedInfo {
+export interface SeriesTransactions extends SeriesInfo {
     trasactions: TransactionInsightDataItem[];
 }
 
-export interface CategoriedTransactionExplorerDataItem extends SeriesedInfo {
+export interface CategoriedTransactionExplorerDataItem extends SeriesInfo {
     value: number;
 }
 
@@ -396,23 +396,23 @@ export const useExplorersStore = defineStore('explorers', () => {
             categoriedDataMap[categoriedInfo.categoryId] = categoriedData;
         }
 
-        const seriesedInfo = getDataCategoryInfo(timezoneUsedForDateRange, seriesDemension, queryName, queryIndex, transaction);
-        let seriesedData = categoriedData.trasactions[seriesedInfo.categoryId];
+        const seriesInfo = getDataCategoryInfo(timezoneUsedForDateRange, seriesDemension, queryName, queryIndex, transaction);
+        let seriesData = categoriedData.trasactions[seriesInfo.categoryId];
 
-        if (!seriesedData) {
-            seriesedData = {
-                seriesName: seriesedInfo.categoryName,
-                seriesNameNeedI18n: seriesedInfo.categoryNameNeedI18n,
-                seriesNameI18nParameters: seriesedInfo.categoryNameI18nParameters,
-                seriesId: seriesedInfo.categoryId,
-                seriesIdType: seriesedInfo.categoryIdType,
-                seriesDisplayOrders: seriesedInfo.categoryDisplayOrders,
+        if (!seriesData) {
+            seriesData = {
+                seriesName: seriesInfo.categoryName,
+                seriesNameNeedI18n: seriesInfo.categoryNameNeedI18n,
+                seriesNameI18nParameters: seriesInfo.categoryNameI18nParameters,
+                seriesId: seriesInfo.categoryId,
+                seriesIdType: seriesInfo.categoryIdType,
+                seriesDisplayOrders: seriesInfo.categoryDisplayOrders,
                 trasactions: []
             };
-            categoriedData.trasactions[seriesedInfo.categoryId] = seriesedData;
+            categoriedData.trasactions[seriesInfo.categoryId] = seriesData;
         }
 
-        seriesedData.trasactions.push(transaction);
+        seriesData.trasactions.push(transaction);
     }
 
     function loadInsightsExplorerList(explorers: InsightsExplorerBasicInfo[]): void {
@@ -633,18 +633,17 @@ export const useExplorersStore = defineStore('explorers', () => {
 
         for (const categoriedTransactions of values(categoriedDataMap)) {
             const dataItems: CategoriedTransactionExplorerDataItem[] = [];
-            let allSeriesedTransactions: Record<string, SeriesedTransactions> = categoriedTransactions.trasactions;
+            let allSeriesTransactions: Record<string, SeriesTransactions> = categoriedTransactions.trasactions;
 
-            // merge all series into one for pie/radar chart
-            if (chartType === TransactionExplorerChartType.Pie || chartType === TransactionExplorerChartType.Radar) {
+            if (!chartType.seriesDimensionRequired) {
                 const transactions: TransactionInsightDataItem[] = [];
 
-                for (const seriesedTransactions of values(categoriedTransactions.trasactions)) {
-                    transactions.push(...seriesedTransactions.trasactions);
+                for (const seriesTransactions of values(categoriedTransactions.trasactions)) {
+                    transactions.push(...seriesTransactions.trasactions);
                 }
 
-                allSeriesedTransactions = {};
-                allSeriesedTransactions['none'] = {
+                allSeriesTransactions = {};
+                allSeriesTransactions['none'] = {
                     seriesName: valueMetric?.name ?? 'Unknown',
                     seriesNameNeedI18n: true,
                     seriesId: 'none',
@@ -654,13 +653,13 @@ export const useExplorersStore = defineStore('explorers', () => {
                 };
             }
 
-            for (const seriesedTransactions of values(allSeriesedTransactions)) {
+            for (const seriesTransactions of values(allSeriesTransactions)) {
                 const allSourceAmountsInDefaultCurrency: number[] = [];
                 let totalSourceAmountSumInDefaultCurrency: number = 0;
                 let minimumSourceAmountInDefaultCurrency: number = Number.MAX_SAFE_INTEGER;
                 let maximumSourceAmountInDefaultCurrency: number = Number.MIN_SAFE_INTEGER;
 
-                for (const transaction of seriesedTransactions.trasactions) {
+                for (const transaction of seriesTransactions.trasactions) {
                     let amountInDefaultCurrency: number = transaction.sourceAmount;
 
                     if (transaction.sourceAccount.currency !== defaultCurrency) {
@@ -707,12 +706,12 @@ export const useExplorersStore = defineStore('explorers', () => {
                 }
 
                 dataItems.push({
-                    seriesName: seriesedTransactions.seriesName,
-                    seriesNameNeedI18n: seriesedTransactions.seriesNameNeedI18n,
-                    seriesNameI18nParameters: seriesedTransactions.seriesNameI18nParameters,
-                    seriesId: seriesedTransactions.seriesId,
-                    seriesIdType: seriesedTransactions.seriesIdType,
-                    seriesDisplayOrders: seriesedTransactions.seriesDisplayOrders,
+                    seriesName: seriesTransactions.seriesName,
+                    seriesNameNeedI18n: seriesTransactions.seriesNameNeedI18n,
+                    seriesNameI18nParameters: seriesTransactions.seriesNameI18nParameters,
+                    seriesId: seriesTransactions.seriesId,
+                    seriesIdType: seriesTransactions.seriesIdType,
+                    seriesDisplayOrders: seriesTransactions.seriesDisplayOrders,
                     value: value
                 });
             }

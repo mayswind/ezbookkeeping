@@ -23,7 +23,8 @@
                         :disabled="loading || disabled"
                         :label="tt('Axis / Category')"
                         :items="allTransactionExplorerDataDimensions"
-                        v-model="currentExplorer.categoryDimension"
+                        :model-value="currentExplorer.categoryDimension"
+                        @update:model-value="updateCategoryDimensionType"
                     />
                     <v-select
                         class="flex-0-0"
@@ -83,7 +84,6 @@
             id-field="id"
             name-field="name"
             value-field="value"
-            color-field="color"
             v-if="loading"
         />
         <pie-chart
@@ -100,7 +100,7 @@
             @click="onClickPieChartItem"
         />
     </v-card-text>
-    <v-card-text :class="{ 'readonly': loading }" v-if="currentExplorer.chartType === TransactionExplorerChartType.Radar.value">
+    <v-card-text :class="{ 'readonly': loading }" v-else-if="currentExplorer.chartType === TransactionExplorerChartType.Radar.value">
         <radar-chart
             :items="[
                 {name: '---', value: 10},
@@ -127,10 +127,47 @@
             v-else-if="!loading"
         />
     </v-card-text>
+    <v-card-text :class="{ 'readonly': loading }" v-else-if="TransactionExplorerChartType.valueOf(currentExplorer.chartType)?.seriesDimensionRequired && axisChartDisplayType">
+        <axis-chart
+            :skeleton="true"
+            :type="axisChartDisplayType"
+            :sorting-type="currentExplorer.chartSortingType"
+            :all-category-names="[]"
+            :items="[]"
+            category-type-name=""
+            name-field="name"
+            values-field="values"
+            v-if="loading"
+        />
+        <axis-chart
+            ref="axisChart"
+            :type="axisChartDisplayType"
+            :stacked="axisChartStacked"
+            :one-hundred-percent-stacked="axisChart100PercentStacked"
+            :sorting-type="currentExplorer.chartSortingType"
+            :show-value="true"
+            :show-total-amount-in-tooltip="true"
+            :total-name-in-tooltip="currentExplorer.valueMetric === TransactionExplorerValueMetric.TransactionCount.value ? tt('Total Transactions') : tt('Total Amount')"
+            :category-type-name="currentTransactionExplorerCategoryDimensionName"
+            :all-category-names="categoriedNamesSortedByDisplayOrder"
+            :items="seriesDimensionTransactionExplorerData"
+            :amount-value="currentExplorer.valueMetric !== TransactionExplorerValueMetric.TransactionCount.value"
+            :default-currency="defaultCurrency"
+            :enable-click-item="true"
+            id-field="id"
+            name-field="name"
+            values-field="categoryValues"
+            display-orders-field="displayOrders"
+            @click="onClickTrendChartItem"
+            v-else-if="!loading"
+        />
+    </v-card-text>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import AxisChart, { type AxisChartDisplayType } from '@/components/desktop/AxisChart.vue';
+
+import { computed, useTemplateRef } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -138,13 +175,16 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useUserStore } from '@/stores/user.ts';
 import {
     type CategoriedInfo,
-    type SeriesedInfo,
+    type CategoriedTransactionExplorerData,
+    type SeriesInfo,
+    type CategoriedTransactionExplorerDataItem,
     TransactionExplorerDimensionType,
     useExplorersStore
 } from '@/stores/explorer.ts';
 
 import { type NameValue, type TypeAndDisplayName } from '@/core/base.ts';
 import { Month, WeekDay } from '@/core/datetime.ts';
+import { ChartSortingType } from '@/core/statistics.ts';
 import {
     TransactionExplorerChartType,
     TransactionExplorerDataDimensionType,
@@ -155,9 +195,11 @@ import {
 import { type SortableTransactionStatisticDataItem } from '@/models/transaction.ts';
 import type { InsightsExplorer } from '@/models/explorer.ts';
 
-import { isDefined } from '@/lib/common.ts';
+import { isDefined, findNameByValue } from '@/lib/common.ts';
 import { parseDateTimeFromString } from '@/lib/datetime.ts';
 import { sortStatisticsItems } from '@/lib/statistics.ts';
+
+type AxisChartType = InstanceType<typeof AxisChart>;
 
 interface InsightsExplorerDataTableTabProps {
     loading?: boolean;
@@ -169,6 +211,22 @@ interface CategoryDimensionData extends SortableTransactionStatisticDataItem {
     dimension: TransactionExplorerDimensionType;
     name: string;
     displayOrders: number[];
+    totalAmount: number;
+}
+
+interface SortableCategoriedTransactionExplorerDataItem extends SortableTransactionStatisticDataItem {
+    name: string;
+    displayOrders: number[];
+    totalAmount: number;
+    originalItem: CategoriedTransactionExplorerData;
+}
+
+interface SeriesDimensionData extends SortableTransactionStatisticDataItem, Record<string, unknown> {
+    id: string;
+    dimension: TransactionExplorerDimensionType;
+    name: string;
+    displayOrders: number[];
+    categoryValues: number[];
     totalAmount: number;
 }
 
@@ -199,12 +257,15 @@ const {
 const userStore = useUserStore();
 const explorersStore = useExplorersStore();
 
+const axisChart = useTemplateRef<AxisChartType>('axisChart');
+
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
 const allTransactionExplorerDataDimensions = computed<NameValue[]>(() => getAllTransactionExplorerDataDimensions());
 const allTransactionExplorerValueMetrics = computed<NameValue[]>(() => getAllTransactionExplorerValueMetrics());
 const allTransactionExplorerChartTypes = computed<NameValue[]>(() => getAllTransactionExplorerChartTypes());
 const allTransactionExplorerChartSortingTypes = computed<TypeAndDisplayName[]>(() => getAllStatisticsSortingTypes());
+const currentTransactionExplorerCategoryDimensionName = computed<string>(() => findNameByValue(allTransactionExplorerDataDimensions.value, currentExplorer.value.categoryDimension) ?? tt('Unknown'));
 
 const currentExplorer = computed<InsightsExplorer>(() => explorersStore.currentInsightsExplorer);
 
@@ -242,7 +303,128 @@ const categoryDimensionTransactionExplorerData = computed<CategoryDimensionData[
     return result;
 });
 
-function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesedInfo): string {
+const categoriedDataSortedByDisplayOrder = computed<SortableCategoriedTransactionExplorerDataItem[]>(() => {
+    if (!explorersStore.categoriedTransactionExplorerData || !explorersStore.categoriedTransactionExplorerData.length) {
+        return [];
+    }
+
+    const result: SortableCategoriedTransactionExplorerDataItem[] = [];
+
+    for (const categoriedData of explorersStore.categoriedTransactionExplorerData) {
+        result.push({
+            name: getCategoriedDataDisplayName(categoriedData),
+            displayOrders: categoriedData.categoryDisplayOrders,
+            totalAmount: 0,
+            originalItem: categoriedData
+        });
+    }
+
+    sortStatisticsItems(result, ChartSortingType.DisplayOrder.type);
+
+    return result;
+});
+
+const categoriedNamesSortedByDisplayOrder = computed<string[]>(() => {
+    if (!categoriedDataSortedByDisplayOrder.value || !categoriedDataSortedByDisplayOrder.value.length) {
+        return [];
+    }
+
+    const result: string[] = [];
+
+    for (const categoriedData of categoriedDataSortedByDisplayOrder.value) {
+        result.push(categoriedData.name);
+    }
+
+    return result;
+});
+
+const seriesDimensionTransactionExplorerData = computed<SeriesDimensionData[]>(() => {
+    if (!TransactionExplorerChartType.valueOf(currentExplorer.value.chartType)?.seriesDimensionRequired) {
+        return [];
+    }
+
+    if (!explorersStore.categoriedTransactionExplorerData || !explorersStore.categoriedTransactionExplorerData.length) {
+        return [];
+    }
+
+    const result: SeriesDimensionData[] = [];
+    const seriesDimensionDataMap: Record<string, SeriesDimensionData> = {};
+
+    for (const categoriedData of explorersStore.categoriedTransactionExplorerData) {
+        for (const seriesData of categoriedData.data) {
+            const displayName = getCategoriedDataDisplayName(seriesData);
+            let seriesDimensionData: SeriesDimensionData | undefined = seriesDimensionDataMap[seriesData.seriesId];
+
+            if (!seriesDimensionData) {
+                seriesDimensionData = {
+                    id: seriesData.seriesId,
+                    dimension: seriesData.seriesIdType,
+                    name: displayName,
+                    displayOrders: seriesData.seriesDisplayOrders,
+                    categoryValues: [],
+                    totalAmount: 0
+                };
+
+                seriesDimensionDataMap[seriesData.seriesId] = seriesDimensionData;
+                result.push(seriesDimensionData);
+            }
+        }
+    }
+
+    for (const categoriedData of categoriedDataSortedByDisplayOrder.value) {
+        const seriesDataMap: Record<string, CategoriedTransactionExplorerDataItem> = {};
+
+        for (const seriesData of categoriedData.originalItem.data) {
+            seriesDataMap[seriesData.seriesId] = seriesData;
+        }
+
+        for (const seriesDimensionData of result) {
+            const seriesData = seriesDataMap[seriesDimensionData.id];
+
+            if (isDefined(seriesData)) {
+                seriesDimensionData.categoryValues.push(seriesData.value);
+                seriesDimensionData.totalAmount += seriesData.value;
+            } else {
+                seriesDimensionData.categoryValues.push(0);
+            }
+        }
+    }
+
+    sortStatisticsItems(result, currentExplorer.value.chartSortingType);
+
+    return result;
+});
+
+const axisChartDisplayType = computed<AxisChartDisplayType | undefined>(() => {
+    if (currentExplorer.value.chartType === TransactionExplorerChartType.ColumnStacked.value
+        || currentExplorer.value.chartType === TransactionExplorerChartType.Column100PercentStacked.value
+        || currentExplorer.value.chartType === TransactionExplorerChartType.ColumnGrouped.value) {
+        return 'column';
+    } else if (currentExplorer.value.chartType === TransactionExplorerChartType.LineGrouped.value) {
+        return 'line';
+    } else if (currentExplorer.value.chartType === TransactionExplorerChartType.AreaStacked.value
+        || currentExplorer.value.chartType === TransactionExplorerChartType.Area100PercentStacked.value) {
+        return 'area';
+    } else if (currentExplorer.value.chartType === TransactionExplorerChartType.BubbleGrouped.value) {
+        return 'bubble';
+    } else {
+        return undefined;
+    }
+});
+
+const axisChartStacked = computed<boolean>(() => {
+    return (currentExplorer.value.chartType === TransactionExplorerChartType.ColumnStacked.value
+        || currentExplorer.value.chartType === TransactionExplorerChartType.Column100PercentStacked.value
+        || currentExplorer.value.chartType === TransactionExplorerChartType.AreaStacked.value
+        || currentExplorer.value.chartType === TransactionExplorerChartType.Area100PercentStacked.value);
+});
+
+const axisChart100PercentStacked = computed<boolean>(() => {
+    return (currentExplorer.value.chartType === TransactionExplorerChartType.Column100PercentStacked.value
+        || currentExplorer.value.chartType === TransactionExplorerChartType.Area100PercentStacked.value);
+});
+
+function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesInfo): string {
     let name: string = '';
     let needI18n: boolean | undefined = false;
     let i18nParameters: Record<string, unknown> | undefined = undefined;
@@ -315,6 +497,16 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesedInfo): stri
     return displayName;
 }
 
+function updateCategoryDimensionType(dimensionType: TransactionExplorerDataDimensionType): void {
+    if (currentExplorer.value.categoryDimension !== dimensionType) {
+        currentExplorer.value.categoryDimension = dimensionType;
+    }
+
+    if (currentExplorer.value.seriesDimension === currentExplorer.value.categoryDimension) {
+        currentExplorer.value.seriesDimension = TransactionExplorerDataDimension.None.value;
+    }
+}
+
 function onClickPieChartItem(item: Record<string, unknown>): void {
     if (!item || !('id' in item) || !('dimension' in item)) {
         return;
@@ -325,6 +517,18 @@ function onClickPieChartItem(item: Record<string, unknown>): void {
 
     if (params) {
         router.push(`/transaction/list?${params}`);
+    }
+}
+
+function onClickTrendChartItem(itemId: string, categoryIndex: number): void {
+    const categoryData = categoriedDataSortedByDisplayOrder.value[categoryIndex];
+
+    if (categoryData) {
+        const params: string = explorersStore.getTransactionListPageParams(categoryData.originalItem.categoryIdType, categoryData.originalItem.categoryId);
+
+        if (params && categoryData.originalItem.categoryId !== 'none' && categoryData.originalItem.categoryId !== 'unknown') {
+            router.push(`/transaction/list?${params}`);
+        }
     }
 }
 
@@ -342,6 +546,8 @@ function buildExportResults(): { headers: string[], data: string[][] } | undefin
                 valueMetric?.isAmount ? formatAmountToWesternArabicNumeralsWithoutDigitGrouping(data.totalAmount) : data.totalAmount.toString(10)
             ])
         };
+    } else if (TransactionExplorerChartType.valueOf(currentExplorer.value.chartType)?.seriesDimensionRequired && axisChartDisplayType.value) {
+        return axisChart.value?.exportData();
     } else {
         return undefined;
     }

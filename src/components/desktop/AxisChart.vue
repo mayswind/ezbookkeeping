@@ -1,5 +1,5 @@
 <template>
-    <v-chart autoresize class="axis-chart-container" :class="{ 'transition-in': skeleton }" :option="chartOptions"
+    <v-chart autoresize :class="finalClass" :option="chartOptions"
              @click="clickItem" @legendselectchanged="onLegendSelectChanged" />
 </template>
 
@@ -24,7 +24,7 @@ import { isArray } from '@/lib/common.ts';
 import { getDisplayColor } from '@/lib/color.ts';
 import { sortStatisticsItems } from '@/lib/statistics.ts';
 
-export type AxisChartDisplayType = 'area' | 'column' | 'bubble';
+export type AxisChartDisplayType = 'line' | 'area' | 'column' | 'bubble';
 
 interface AxisChartDataItem {
     id: string;
@@ -49,9 +49,11 @@ interface AxisChartTooltipItem extends SortableTransactionStatisticDataItem {
 }
 
 const props = defineProps<{
+    class?: string;
     skeleton?: boolean;
     type: AxisChartDisplayType;
     stacked?: boolean;
+    oneHundredPercentStacked?: boolean;
     sortingType: number;
     showValue?: boolean;
     showTotalAmountInTooltip?: boolean;
@@ -72,7 +74,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'click', itemId: string, categoryIndex: number): void;
+    (e: 'click', itemId: string, categoryIndex: number, item: Record<string, unknown>): void;
 }>();
 
 const theme = useTheme();
@@ -81,13 +83,29 @@ const {
     tt,
     getCurrentLanguageTextDirection,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
-    formatAmountToLocalizedNumeralsWithCurrency
+    formatAmountToLocalizedNumeralsWithCurrency,
+    formatPercentToLocalizedNumerals
 } = useI18n();
 
 const selectedLegends = ref<Record<string, boolean>>({});
 
 const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const finalClass = computed<string>(() => {
+    let finalClass = '';
+
+    if (props.skeleton) {
+        finalClass += 'transition-in';
+    }
+
+    if (props.class) {
+        finalClass += ` ${props.class}`;
+    } else {
+        finalClass += ' axis-chart-container';
+    }
+
+    return finalClass;
+});
 
 const itemsMap = computed<Record<string, Record<string, unknown>>>(() => {
     const map: Record<string, Record<string, unknown>> = {};
@@ -125,7 +143,8 @@ const itemsMap = computed<Record<string, Record<string, unknown>>>(() => {
 
 const allSeries = computed<AxisChartDataItem[]>(() => {
     const allSeries: AxisChartDataItem[] = [];
-    let maxAmount: number = 0;
+    const categoryTotalAmount: Record<number, number> = {};
+    let maxAmountOfAllData: number = 0;
 
     for (const item of props.items) {
         if (props.hiddenField && item[props.hiddenField]) {
@@ -138,11 +157,32 @@ const allSeries = computed<AxisChartDataItem[]>(() => {
 
         const allAmounts: number[] = item[props.valuesField] as number[];
 
-        if (props.type === 'bubble') {
-            for (const amount of allAmounts) {
-                if (amount > maxAmount) {
-                    maxAmount = amount;
-                }
+        for (const [amount, categoryIndex] of itemAndIndex(allAmounts)) {
+            let totalAmount: number = categoryTotalAmount[categoryIndex] ?? 0;
+            totalAmount += amount;
+            categoryTotalAmount[categoryIndex] = totalAmount;
+
+            if (amount > maxAmountOfAllData) {
+                maxAmountOfAllData = amount;
+            }
+        }
+    }
+
+    for (const item of props.items) {
+        if (props.hiddenField && item[props.hiddenField]) {
+            continue;
+        }
+
+        if (!isArray(item[props.valuesField])) {
+            continue;
+        }
+
+        const allAmounts: number[] = item[props.valuesField] as number[];
+
+        if (props.oneHundredPercentStacked) {
+            for (const [amount, categoryIndex] of itemAndIndex(allAmounts)) {
+                const totalAmount: number = categoryTotalAmount[categoryIndex] ?? 0;
+                allAmounts[categoryIndex] = totalAmount !== 0 ? amount * 100.0 / totalAmount : 0;
             }
         }
 
@@ -164,14 +204,16 @@ const allSeries = computed<AxisChartDataItem[]>(() => {
             finalItem.stack = item[props.idField] as string;
         }
 
-        if (props.type === 'area') {
+        if (props.type === 'line') {
+            finalItem.areaStyle = undefined;
+        } else if (props.type === 'area') {
             finalItem.areaStyle = {};
         } else if (props.type === 'column') {
             finalItem.type = 'bar';
         } else if (props.type === 'bubble') {
             finalItem.type = 'scatter';
             finalItem.symbolSize = (data: number): number => {
-                return Math.sqrt(data) / Math.sqrt(maxAmount) * 80 + 5;
+                return Math.sqrt(data) / Math.sqrt(maxAmountOfAllData) * 80 + 5;
             }
         }
 
@@ -202,8 +244,8 @@ const yAxisWidth = computed<number>(() => {
         }
     }
 
-    const maxValueText = props.amountValue ? formatAmountToLocalizedNumeralsWithCurrency(maxValue, props.defaultCurrency) : maxValue.toString();
-    const minValueText = props.amountValue ? formatAmountToLocalizedNumeralsWithCurrency(minValue, props.defaultCurrency) : minValue.toString();
+    const maxValueText = getDisplayValue(maxValue);
+    const minValueText = getDisplayValue(minValue);
     const maxLengthText = maxValueText.length > minValueText.length ? maxValueText : minValueText;
 
     const canvas = document.createElement('canvas');
@@ -268,7 +310,7 @@ const chartOptions = computed<object>(() => {
 
                 for (const item of displayItems) {
                     if (displayItems.length === 1 || item.totalAmount !== 0) {
-                        const value = props.amountValue ? formatAmountToLocalizedNumeralsWithCurrency(item.totalAmount, props.defaultCurrency) : item.totalAmount.toString();
+                        const value = getDisplayValue(item.totalAmount);
                         tooltip += '<div><span class="chart-pointer" style="background-color: ' + item.color + '"></span>';
                         tooltip += `<span>${item.name}</span><span class="ms-5" style="float: inline-end">${value}</span><br/>`;
                         tooltip += '</div>';
@@ -276,8 +318,8 @@ const chartOptions = computed<object>(() => {
                     }
                 }
 
-                if (props.showTotalAmountInTooltip) {
-                    const displayTotalAmount = props.amountValue ? formatAmountToLocalizedNumeralsWithCurrency(totalAmount, props.defaultCurrency) : totalAmount.toString();
+                if (props.showTotalAmountInTooltip && !props.oneHundredPercentStacked) {
+                    const displayTotalAmount = getDisplayValue(totalAmount);
                     tooltip = (actualDisplayItemCount > 0 ? '<div style="border-bottom: ' + (isDarkMode.value ? '#eee' : '#333') + ' dashed 1px">' : '<div></div>')
                         + '<span class="chart-pointer" style="background-color: ' + (isDarkMode.value ? '#eee' : '#333') + '"></span>'
                         + `<span>${props.totalNameInTooltip}</span><span class="ms-5" style="float: inline-end">${displayTotalAmount}</span><br/>`
@@ -322,16 +364,18 @@ const chartOptions = computed<object>(() => {
         yAxis: [
             {
                 type: 'value',
+                min: props.oneHundredPercentStacked ? 0 : undefined,
+                max: props.oneHundredPercentStacked ? 100 : undefined,
                 axisLabel: {
                     color: isDarkMode.value ? '#888' : '#666',
                     formatter: (value: string) => {
-                        return props.amountValue ? formatAmountToLocalizedNumeralsWithCurrency(parseInt(value), props.defaultCurrency): value;
+                        return getDisplayValue(parseInt(value));
                     }
                 },
                 axisPointer: {
                     label: {
                         formatter: (params: CallbackDataParams) => {
-                            return props.amountValue ? formatAmountToLocalizedNumeralsWithCurrency(Math.trunc(params.value as number), props.defaultCurrency) : params.value;
+                            return getDisplayValue(Math.trunc(params.value as number));
                         }
                     }
                 },
@@ -350,6 +394,18 @@ function getItemName(name: string): string {
     return props.translateName ? tt(name) : name;
 }
 
+function getDisplayValue(value: number): string {
+    if (props.oneHundredPercentStacked) {
+        return formatPercentToLocalizedNumerals(value, 2, '&lt;0.01');
+    }
+
+    if (props.amountValue) {
+        return formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency);
+    }
+
+    return value.toString();
+}
+
 function clickItem(e: ECElementEvent): void {
     if (!props.enableClickItem || e.componentType !== 'series') {
         return;
@@ -364,7 +420,7 @@ function clickItem(e: ECElementEvent): void {
         return;
     }
 
-    emit('click', itemId, e.dataIndex);
+    emit('click', itemId, e.dataIndex, item);
 }
 
 function exportData(): { headers: string[], data: string[][] } {
@@ -404,13 +460,13 @@ defineExpose({
 <style scoped>
 .axis-chart-container {
     width: 100%;
-    height: 720px;
+    height: 560px;
     margin-top: 10px;
 }
 
 @media (min-width: 600px) {
     .axis-chart-container {
-        height: 790px;
+        height: 630px;
     }
 }
 </style>

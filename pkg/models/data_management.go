@@ -18,6 +18,7 @@ type DataStatisticsResponse struct {
 	TotalTransactionTagCount       int64 `json:"totalTransactionTagCount,string"`
 	TotalTransactionCount          int64 `json:"totalTransactionCount,string"`
 	TotalTransactionPictureCount   int64 `json:"totalTransactionPictureCount,string"`
+	TotalInsightsExplorerCount     int64 `json:"totalInsightsExplorerCount,string"`
 	TotalTransactionTemplateCount  int64 `json:"totalTransactionTemplateCount,string"`
 	TotalScheduledTransactionCount int64 `json:"totalScheduledTransactionCount,string"`
 }

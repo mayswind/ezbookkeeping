@@ -26,6 +26,18 @@
                                 color: 'info-darken-1'
                             },
                             {
+                                title: 'Transaction Pictures',
+                                count: displayDataStatistics ? displayDataStatistics.totalTransactionPictureCount : '-',
+                                icon: mdiImage,
+                                color: 'error-darken-1'
+                            },
+                            {
+                                title: 'Insights Explorers',
+                                count: displayDataStatistics ? displayDataStatistics.totalInsightsExplorerCount : '-',
+                                icon: mdiCompassOutline,
+                                color: 'warning'
+                            },
+                            {
                                 title: 'Accounts',
                                 count: displayDataStatistics ? displayDataStatistics.totalAccountCount : '-',
                                 icon: mdiCreditCardOutline,
@@ -42,12 +54,6 @@
                                 count: displayDataStatistics ? displayDataStatistics.totalTransactionTagCount : '-',
                                 icon: mdiTagOutline,
                                 color: 'grey'
-                            },
-                            {
-                                title: 'Transaction Pictures',
-                                count: displayDataStatistics ? displayDataStatistics.totalTransactionPictureCount : '-',
-                                icon: mdiImage,
-                                color: 'error-darken-1'
                             },
                             {
                                 title: 'Transaction Templates',
@@ -182,10 +188,11 @@ import {
     mdiRefresh,
     mdiListBoxOutline,
     mdiCreditCardOutline,
+    mdiImage,
+    mdiCompassOutline,
     mdiViewDashboardOutline,
     mdiTagOutline,
     mdiClipboardTextOutline,
-    mdiImage,
     mdiClipboardTextClockOutline,
     mdiAlert
 } from '@mdi/js';

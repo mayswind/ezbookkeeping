@@ -101,6 +101,13 @@ func (a *DataManagementsApi) DataStatisticsHandler(c *core.WebContext) (any, *er
 		return nil, errs.ErrOperationFailed
 	}
 
+	totalInsightsExplorerCount, err := a.insightsExploreres.GetTotalInsightsExplorersCountByUid(c, uid)
+
+	if err != nil {
+		log.Errorf(c, "[data_managements.DataStatisticsHandler] failed to get total insights explorer count for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
 	totalTransactionTemplateCount, err := a.templates.GetTotalNormalTemplateCountByUid(c, uid)
 
 	if err != nil {
@@ -121,6 +128,7 @@ func (a *DataManagementsApi) DataStatisticsHandler(c *core.WebContext) (any, *er
 		TotalTransactionTagCount:       totalTransactionTagCount,
 		TotalTransactionCount:          totalTransactionCount,
 		TotalTransactionPictureCount:   totalTransactionPictureCount,
+		TotalInsightsExplorerCount:     totalInsightsExplorerCount,
 		TotalTransactionTemplateCount:  totalTransactionTemplateCount,
 		TotalScheduledTransactionCount: totalScheduledTransactionCount,
 	}

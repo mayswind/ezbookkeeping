@@ -30,6 +30,17 @@ var (
 	}
 )
 
+// GetTotalInsightsExplorersCountByUid returns total insights explorers count of user
+func (s *InsightsExplorerService) GetTotalInsightsExplorersCountByUid(c core.Context, uid int64) (int64, error) {
+	if uid <= 0 {
+		return 0, errs.ErrUserIdInvalid
+	}
+
+	count, err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).Count(&models.InsightsExplorer{})
+
+	return count, err
+}
+
 // GetAllInsightsExplorerNamesByUid returns all insights explorer models of user without data
 func (s *InsightsExplorerService) GetAllInsightsExplorerNamesByUid(c core.Context, uid int64) ([]*models.InsightsExplorer, error) {
 	if uid <= 0 {

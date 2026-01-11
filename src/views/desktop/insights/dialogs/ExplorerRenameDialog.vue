@@ -9,7 +9,8 @@
                               :autofocus="true"
                               :label="tt('Explorer Name')"
                               :placeholder="tt('Explorer Name')"
-                              v-model="newExplorerName"/>
+                              v-model="newExplorerName"
+                              @keyup.enter="save" />
             </v-card-text>
             <v-card-text>
                 <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
@@ -53,6 +54,10 @@ function open(currentExplorerName: string, title?: string): Promise<string> {
 }
 
 function save(): void {
+    if (!newExplorerName.value || oldExplorerName.value === newExplorerName.value) {
+        return;
+    }
+
     resolveFunc?.(newExplorerName.value);
     showState.value = false;
 }

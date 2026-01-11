@@ -1,7 +1,11 @@
 import { computed, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { type CommonNumberInputProps, useCommonNumberInputBase } from '@/components/base/CommonNumberInputBase.ts';
+import {
+    type CommonNumberInputProps,
+    type CommonNumberInputEmits,
+    useCommonNumberInputBase
+} from '@/components/base/CommonNumberInputBase.ts';
 
 import { isDefined, isNumber, replaceAll, removeAll } from '@/lib/common.ts';
 import { NumeralSystem } from '@/core/numeral.ts';
@@ -12,11 +16,9 @@ export interface NumberInputProps extends CommonNumberInputProps {
     maxDecimalCount?: number;
 }
 
-export interface NumberInputEmits {
-    (e: 'update:modelValue', value: number): void;
-}
+export type NumberInputEmits = CommonNumberInputEmits;
 
-export function useNumberInputBase(props: NumberInputProps, emit: NumberInputEmits) {
+export function useNumberInputBase(props: NumberInputProps, emit: CommonNumberInputEmits) {
     const {
         getCurrentNumeralSystemType,
         getCurrentDecimalSeparator,
@@ -27,7 +29,7 @@ export function useNumberInputBase(props: NumberInputProps, emit: NumberInputEmi
         currentValue,
         onKeyUpDown,
         onPaste
-    } = useCommonNumberInputBase(props, props.maxDecimalCount ?? -1, getFormattedValue(props.modelValue), parseNumber, getFormattedValue, getValidFormattedValue);
+    } = useCommonNumberInputBase(props, emit, props.maxDecimalCount ?? -1, getFormattedValue(props.modelValue), parseNumber, getFormattedValue, getValidFormattedValue);
 
     const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 

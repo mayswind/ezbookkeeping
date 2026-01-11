@@ -10,11 +10,13 @@
                     <v-row>
                         <v-col cols="12">
                             <amount-input :persistent-placeholder="true"
+                                          :autofocus="true"
                                           :currency="dialogOptions?.currency"
                                           :show-currency="!!dialogOptions?.currency"
                                           :label="inputLabelContent"
                                           :placeholder="inputPlaceholderContent"
-                                          v-model="amount" />
+                                          v-model="amount"
+                                          @enter="confirm" />
                         </v-col>
                     </v-row>
                 </v-form>

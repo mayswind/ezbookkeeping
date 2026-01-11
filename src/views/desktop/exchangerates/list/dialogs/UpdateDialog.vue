@@ -9,14 +9,16 @@
             <v-card-text class="d-flex flex-column flex-md-row mt-2">
                 <v-row>
                     <v-col cols="12" md="6">
-                        <number-input :disabled="submitting"
+                        <number-input :autofocus="true"
+                                      :disabled="submitting"
                                       :label="tt('Amount')"
                                       :placeholder="tt('Amount')"
                                       :persistent-placeholder="true"
                                       :min-value="USER_CUSTOM_EXCHANGE_RATE_MIN_VALUE"
                                       :max-value="USER_CUSTOM_EXCHANGE_RATE_MAX_VALUE"
                                       :max-decimal-count="4"
-                                      v-model="defaultCurrencyAmount"/>
+                                      v-model="defaultCurrencyAmount"
+                                      @keyup.enter="targetAmountInput?.focus()" />
                     </v-col>
                     <v-col cols="12" md="6">
                         <currency-select :disabled="true"
@@ -28,14 +30,15 @@
                         <v-icon :icon="mdiSwapVertical" size="24" />
                     </v-col>
                     <v-col cols="12" md="6">
-                        <number-input :disabled="submitting"
+                        <number-input ref="targetAmountInput" :disabled="submitting"
                                       :label="tt('Amount')"
                                       :placeholder="tt('Amount')"
                                       :persistent-placeholder="true"
                                       :min-value="USER_CUSTOM_EXCHANGE_RATE_MIN_VALUE"
                                       :max-value="USER_CUSTOM_EXCHANGE_RATE_MAX_VALUE"
                                       :max-decimal-count="4"
-                                      v-model="targetCurrencyAmount"/>
+                                      v-model="targetCurrencyAmount"
+                                      @keyup.enter="confirm" />
                     </v-col>
                     <v-col cols="12" md="6">
                         <currency-select :disabled="submitting"
@@ -61,6 +64,7 @@
 </template>
 
 <script setup lang="ts">
+import NumberInput from '@/components/desktop/NumberInput.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { ref, useTemplateRef } from 'vue';
@@ -83,6 +87,7 @@ interface UserCustomExchangeRateUpdateResponse {
     message: string;
 }
 
+type NumberInputType = InstanceType<typeof NumberInput>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 
 defineProps<{
@@ -101,6 +106,7 @@ const defaultCurrencyAmount = ref<number>(1);
 const currency = ref<string>(userStore.currentUserDefaultCurrency);
 const targetCurrencyAmount = ref<number>(1);
 
+const targetAmountInput = useTemplateRef<NumberInputType>('targetAmountInput');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 let resolveFunc: ((response: UserCustomExchangeRateUpdateResponse) => void) | null = null;
@@ -119,6 +125,10 @@ function open(): Promise<UserCustomExchangeRateUpdateResponse> {
 }
 
 function confirm(): void {
+    if (submitting.value || !defaultCurrencyAmount.value || !currency.value || !targetCurrencyAmount.value) {
+        return;
+    }
+
     submitting.value = true;
 
     exchangeRatesStore.updateUserCustomExchangeRate({

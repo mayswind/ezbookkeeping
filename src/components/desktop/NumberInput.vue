@@ -1,5 +1,5 @@
 <template>
-    <v-text-field type="text" :class="extraClass" :density="density" :readonly="!!readonly" :disabled="!!disabled"
+    <v-text-field ref="textInput" type="text" :class="extraClass" :density="density" :readonly="!!readonly" :disabled="!!disabled"
                   :label="label" :placeholder="placeholder"
                   :persistent-placeholder="!!persistentPlaceholder"
                   v-model="currentValue"
@@ -8,7 +8,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { VTextField } from 'vuetify/components/VTextField';
+
+import { computed, useTemplateRef } from 'vue';
 
 import { type NumberInputProps, type NumberInputEmits, useNumberInputBase } from '@/components/base/NumberInputBase.ts';
 
@@ -29,7 +31,17 @@ const {
     onPaste
 } = useNumberInputBase(props, emit);
 
+const textInput = useTemplateRef<VTextField>('textInput');
+
 const extraClass = computed<string>(() => {
     return props.class || '';
+});
+
+function focus(): void {
+    textInput.value?.focus();
+}
+
+defineExpose({
+    focus
 });
 </script>

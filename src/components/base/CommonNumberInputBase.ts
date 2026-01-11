@@ -15,11 +15,16 @@ export interface CommonNumberInputProps {
     modelValue: number;
 }
 
+export interface CommonNumberInputEmits {
+    (e: 'update:modelValue', value: number): void;
+    (e: 'enter'): void;
+}
+
 export type ParseNumberFunction = (value: string) => number;
 export type FormatNumberFunction = (value: number) => string;
 export type GetValidFormattedValueFunction = (value: number, textualValue: string, hasDecimalSeparator: boolean) => string;
 
-export function useCommonNumberInputBase(props: CommonNumberInputProps, maxDecimalCount: number, initValue: string, parseNumber: ParseNumberFunction, formatNumber: FormatNumberFunction, getValidFormattedValue: GetValidFormattedValueFunction) {
+export function useCommonNumberInputBase(props: CommonNumberInputProps, emit: CommonNumberInputEmits, maxDecimalCount: number, initValue: string, parseNumber: ParseNumberFunction, formatNumber: FormatNumberFunction, getValidFormattedValue: GetValidFormattedValueFunction) {
     const {
         getCurrentNumeralSystemType,
         getCurrentDecimalSeparator,
@@ -39,6 +44,12 @@ export function useCommonNumberInputBase(props: CommonNumberInputProps, maxDecim
         }
 
         if (props.readonly || props.disabled) {
+            e.preventDefault();
+            return;
+        }
+
+        if (e.key === 'Enter') {
+            emit('enter');
             e.preventDefault();
             return;
         }

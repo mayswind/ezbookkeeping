@@ -13,6 +13,7 @@ import (
 
 const alipayTransactionDataStatusSuccessName = "交易成功"
 const alipayTransactionDataStatusPaymentSuccessName = "支付成功"
+const alipayTransactionDataStatusPendingGoodsReceiptConfirmationName = "等待确认收货"
 const alipayTransactionDataStatusRepaymentSuccessName = "还款成功"
 const alipayTransactionDataStatusClosedName = "交易关闭"
 const alipayTransactionDataStatusRefundSuccessName = "退款成功"
@@ -46,6 +47,7 @@ func (p *alipayTransactionDataRowParser) Parse(ctx core.Context, user *models.Us
 
 	if dataRow.GetData(p.columns.statusColumnName) != alipayTransactionDataStatusSuccessName &&
 		dataRow.GetData(p.columns.statusColumnName) != alipayTransactionDataStatusPaymentSuccessName &&
+		dataRow.GetData(p.columns.statusColumnName) != alipayTransactionDataStatusPendingGoodsReceiptConfirmationName &&
 		dataRow.GetData(p.columns.statusColumnName) != alipayTransactionDataStatusRepaymentSuccessName &&
 		dataRow.GetData(p.columns.statusColumnName) != alipayTransactionDataStatusClosedName &&
 		dataRow.GetData(p.columns.statusColumnName) != alipayTransactionDataStatusRefundSuccessName &&

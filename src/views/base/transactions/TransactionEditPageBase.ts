@@ -26,7 +26,8 @@ import { Transaction } from '@/models/transaction.ts';
 import { TransactionTemplate } from '@/models/transaction_template.ts';
 
 import {
-    isArray
+    isArray,
+    isDefined
 } from '@/lib/common.ts';
 
 import {
@@ -420,6 +421,26 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         if (transaction.value.type === TransactionType.Expense || transaction.value.type === TransactionType.Income) {
             transaction.value.sourceAmount = newValue;
         }
+    });
+
+    // Watch for account changes and recalculate destination amount for transfers
+    watch(() => [transaction.value.sourceAccountId, transaction.value.destinationAccountId], ([newSourceAccountId, newDestinationAccountId], [oldSourceAccountId, oldDestinationAccountId]) => {
+        if (mode.value === TransactionEditPageMode.View || loading.value) {
+            return;
+        }
+
+        if (transaction.value.type !== TransactionType.Transfer) {
+            return;
+        }
+
+        // Only recalculate if accounts actually changed (skip initial watch call)
+        if (isDefined(oldSourceAccountId) && isDefined(oldDestinationAccountId)) {
+            if (newSourceAccountId === oldSourceAccountId && newDestinationAccountId === oldDestinationAccountId) {
+                return;
+            }
+        }
+
+        transactionsStore.setTransactionSuitableDestinationAmount(transaction.value, transaction.value.sourceAmount, transaction.value.sourceAmount, oldSourceAccountId as string, oldDestinationAccountId as string);
     });
 
     return {

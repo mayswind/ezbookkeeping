@@ -5,6 +5,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"strings"
+	"sync"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -25,6 +26,8 @@ const tianDiTuMapAnnotationUrlFormat = "https://t0.tianditu.gov.cn/cva_w/wmts?SE
 // MapImageProxy represents map image proxy
 type MapImageProxy struct {
 	ApiUsingConfig
+	mutex     sync.Mutex
+	transport *http.Transport
 }
 
 // Initialize a map image proxy singleton instance
@@ -35,6 +38,18 @@ var (
 		},
 	}
 )
+
+func (p *MapImageProxy) initializeHttpTransport() {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	if p.transport != nil {
+		return
+	}
+
+	p.transport = http.DefaultTransport.(*http.Transport).Clone()
+	httpclient.SetProxyUrl(p.transport, p.CurrentConfig().MapProxy)
+}
 
 // MapTileImageProxyHandler returns map tile image
 func (p *MapImageProxy) MapTileImageProxyHandler(c *core.WebContext) (*httputil.ReverseProxy, *errs.Error) {
@@ -109,8 +124,9 @@ func (p *MapImageProxy) mapImageProxyHandler(c *core.WebContext, fn func(c *core
 		return nil, err
 	}
 
-	transport := http.DefaultTransport.(*http.Transport).Clone()
-	httpclient.SetProxyUrl(transport, p.CurrentConfig().MapProxy)
+	if p.transport == nil {
+		p.initializeHttpTransport()
+	}
 
 	director := func(req *http.Request) {
 		imageRawUrl := targetUrl
@@ -126,7 +142,7 @@ func (p *MapImageProxy) mapImageProxyHandler(c *core.WebContext, fn func(c *core
 	}
 
 	return &httputil.ReverseProxy{
-		Transport: transport,
+		Transport: p.transport,
 		Director:  director,
 	}, nil
 }

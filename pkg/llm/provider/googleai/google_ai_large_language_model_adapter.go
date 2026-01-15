@@ -159,8 +159,8 @@ func (p *GoogleAILargeLanguageModelAdapter) buildJsonRequestBody(c core.Context,
 }
 
 // NewGoogleAILargeLanguageModelProvider creates a new Google AI large language model provider instance
-func NewGoogleAILargeLanguageModelProvider(llmConfig *settings.LLMConfig) provider.LargeLanguageModelProvider {
-	return common.NewCommonHttpLargeLanguageModelProvider(llmConfig, &GoogleAILargeLanguageModelAdapter{
+func NewGoogleAILargeLanguageModelProvider(llmConfig *settings.LLMConfig, enableResponseLog bool) provider.LargeLanguageModelProvider {
+	return common.NewCommonHttpLargeLanguageModelProvider(llmConfig, enableResponseLog, &GoogleAILargeLanguageModelAdapter{
 		GoogleAIAPIKey:  llmConfig.GoogleAIAPIKey,
 		GoogleAIModelID: llmConfig.GoogleAIModelID,
 	})

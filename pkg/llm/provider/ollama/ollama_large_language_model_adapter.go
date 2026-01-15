@@ -158,8 +158,8 @@ func (p *OllamaLargeLanguageModelAdapter) getOllamaRequestUrl() string {
 }
 
 // NewOllamaLargeLanguageModelProvider creates a new Ollama large language model provider instance
-func NewOllamaLargeLanguageModelProvider(llmConfig *settings.LLMConfig) provider.LargeLanguageModelProvider {
-	return common.NewCommonHttpLargeLanguageModelProvider(llmConfig, &OllamaLargeLanguageModelAdapter{
+func NewOllamaLargeLanguageModelProvider(llmConfig *settings.LLMConfig, enableResponseLog bool) provider.LargeLanguageModelProvider {
+	return common.NewCommonHttpLargeLanguageModelProvider(llmConfig, enableResponseLog, &OllamaLargeLanguageModelAdapter{
 		OllamaServerURL: llmConfig.OllamaServerURL,
 		OllamaModelID:   llmConfig.OllamaModelID,
 	})

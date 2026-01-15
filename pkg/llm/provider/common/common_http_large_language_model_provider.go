@@ -7,11 +7,11 @@ import (
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/httpclient"
 	"github.com/mayswind/ezbookkeeping/pkg/llm/data"
 	"github.com/mayswind/ezbookkeeping/pkg/llm/provider"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // HttpLargeLanguageModelAdapter defines the structure of http large language model adapter
@@ -57,6 +57,10 @@ func (p *CommonHttpLargeLanguageModelProvider) getTextualResponse(c core.Context
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
+	httpRequest = httpRequest.WithContext(httpclient.CustomHttpResponseLog(c, func(data []byte) {
+		log.Debugf(c, "[common_http_large_language_model_provider.getTextualResponse] response is %s", data)
+	}))
+
 	resp, err := p.httpClient.Do(httpRequest)
 
 	if err != nil {
@@ -67,8 +71,6 @@ func (p *CommonHttpLargeLanguageModelProvider) getTextualResponse(c core.Context
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 
-	log.Debugf(c, "[common_http_large_language_model_provider.getTextualResponse] response is %s", body)
-
 	if resp.StatusCode != 200 {
 		log.Errorf(c, "[common_http_large_language_model_provider.getTextualResponse] failed to get large language model api response for user \"uid:%d\", because response code is %d", uid, resp.StatusCode)
 		return nil, errs.ErrFailedToRequestRemoteApi
@@ -78,9 +80,9 @@ func (p *CommonHttpLargeLanguageModelProvider) getTextualResponse(c core.Context
 }
 
 // NewCommonHttpLargeLanguageModelProvider creates a http adapter based large language model provider instance
-func NewCommonHttpLargeLanguageModelProvider(llmConfig *settings.LLMConfig, adapter HttpLargeLanguageModelAdapter) *CommonHttpLargeLanguageModelProvider {
+func NewCommonHttpLargeLanguageModelProvider(llmConfig *settings.LLMConfig, enableResponseLog bool, adapter HttpLargeLanguageModelAdapter) *CommonHttpLargeLanguageModelProvider {
 	return &CommonHttpLargeLanguageModelProvider{
 		adapter:    adapter,
-		httpClient: utils.NewHttpClient(llmConfig.LargeLanguageModelAPIRequestTimeout, llmConfig.LargeLanguageModelAPIProxy, llmConfig.LargeLanguageModelAPISkipTLSVerify, settings.GetUserAgent()),
+		httpClient: httpclient.NewHttpClient(llmConfig.LargeLanguageModelAPIRequestTimeout, llmConfig.LargeLanguageModelAPIProxy, llmConfig.LargeLanguageModelAPISkipTLSVerify, settings.GetUserAgent(), enableResponseLog),
 	}
 }

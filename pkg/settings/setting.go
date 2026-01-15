@@ -305,6 +305,7 @@ type Config struct {
 	EnableConsoleLog bool
 	EnableFileLog    bool
 
+	EnableDebugLog     bool
 	LogLevel           Level
 	FileLogPath        string
 	RequestFileLogPath string
@@ -757,6 +758,12 @@ func loadLogConfiguration(config *Config, configFile *ini.File, sectionName stri
 		config.LogLevel != LOGLEVEL_WARN &&
 		config.LogLevel != LOGLEVEL_ERROR {
 		return errs.ErrInvalidLogLevel
+	}
+
+	if config.LogLevel == LOGLEVEL_DEBUG {
+		config.EnableDebugLog = true
+	} else {
+		config.EnableDebugLog = false
 	}
 
 	if config.EnableFileLog {

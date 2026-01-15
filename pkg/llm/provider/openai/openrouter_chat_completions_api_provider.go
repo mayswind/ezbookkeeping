@@ -38,8 +38,8 @@ func (p *OpenRouterChatCompletionsAPIProvider) GetModelID() string {
 }
 
 // NewOpenRouterLargeLanguageModelProvider creates a new OpenRouter large language model provider instance
-func NewOpenRouterLargeLanguageModelProvider(llmConfig *settings.LLMConfig) provider.LargeLanguageModelProvider {
-	return newCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter(llmConfig, &OpenRouterChatCompletionsAPIProvider{
+func NewOpenRouterLargeLanguageModelProvider(llmConfig *settings.LLMConfig, enableResponseLog bool) provider.LargeLanguageModelProvider {
+	return newCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter(llmConfig, enableResponseLog, &OpenRouterChatCompletionsAPIProvider{
 		OpenRouterAPIKey:  llmConfig.OpenRouterAPIKey,
 		OpenRouterModelID: llmConfig.OpenRouterModelID,
 	})

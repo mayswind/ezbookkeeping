@@ -11,6 +11,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/auth/oauth2/provider"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/httpclient"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
@@ -92,7 +93,9 @@ func (p *OIDCProvider) GetUserInfo(c core.Context, oauth2Token *oauth2.Token) (*
 	nickName := claims.Name
 
 	if userName == "" || email == "" || nickName == "" {
-		userInfo, err := p.oidcProvider.UserInfo(c, oauth2.StaticTokenSource(oauth2Token))
+		userInfo, err := p.oidcProvider.UserInfo(httpclient.CustomHttpResponseLog(c, func(data []byte) {
+			log.Debugf(c, "[oidc_provider.GetUserInfo] response is %s", data)
+		}), oauth2.StaticTokenSource(oauth2Token))
 
 		if err != nil {
 			log.Errorf(c, "[oidc_provider.GetUserInfo] failed to get user info, because %s", err.Error())

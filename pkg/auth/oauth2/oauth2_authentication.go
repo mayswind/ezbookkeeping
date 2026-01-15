@@ -13,8 +13,8 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/auth/oauth2/provider/oidc"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/httpclient"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // OAuth2Container contains the current OAuth 2.0 authentication provider
@@ -67,7 +67,7 @@ func InitializeOAuth2Provider(config *settings.Config) error {
 
 	Container.current = oauth2Provider
 	Container.usePKCE = config.OAuth2UsePKCE
-	Container.oauth2HttpClient = utils.NewHttpClient(config.OAuth2RequestTimeout, config.OAuth2Proxy, config.OAuth2SkipTLSVerify, settings.GetUserAgent())
+	Container.oauth2HttpClient = httpclient.NewHttpClient(config.OAuth2RequestTimeout, config.OAuth2Proxy, config.OAuth2SkipTLSVerify, settings.GetUserAgent(), config.EnableDebugLog)
 	Container.externalUserAuthType = externalUserAuthType
 
 	return nil

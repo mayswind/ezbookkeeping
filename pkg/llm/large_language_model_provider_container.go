@@ -26,7 +26,7 @@ func InitializeLargeLanguageModelProvider(config *settings.Config) error {
 	var err error = nil
 
 	if config.ReceiptImageRecognitionLLMConfig != nil {
-		Container.receiptImageRecognitionCurrentProvider, err = initializeLargeLanguageModelProvider(config.ReceiptImageRecognitionLLMConfig)
+		Container.receiptImageRecognitionCurrentProvider, err = initializeLargeLanguageModelProvider(config.ReceiptImageRecognitionLLMConfig, config.EnableDebugLog)
 
 		if err != nil {
 			return err
@@ -36,17 +36,17 @@ func InitializeLargeLanguageModelProvider(config *settings.Config) error {
 	return nil
 }
 
-func initializeLargeLanguageModelProvider(llmConfig *settings.LLMConfig) (provider.LargeLanguageModelProvider, error) {
+func initializeLargeLanguageModelProvider(llmConfig *settings.LLMConfig, enableResponseLog bool) (provider.LargeLanguageModelProvider, error) {
 	if llmConfig.LLMProvider == settings.OpenAILLMProvider {
-		return openai.NewOpenAILargeLanguageModelProvider(llmConfig), nil
+		return openai.NewOpenAILargeLanguageModelProvider(llmConfig, enableResponseLog), nil
 	} else if llmConfig.LLMProvider == settings.OpenAICompatibleLLMProvider {
-		return openai.NewOpenAICompatibleLargeLanguageModelProvider(llmConfig), nil
+		return openai.NewOpenAICompatibleLargeLanguageModelProvider(llmConfig, enableResponseLog), nil
 	} else if llmConfig.LLMProvider == settings.OpenRouterLLMProvider {
-		return openai.NewOpenRouterLargeLanguageModelProvider(llmConfig), nil
+		return openai.NewOpenRouterLargeLanguageModelProvider(llmConfig, enableResponseLog), nil
 	} else if llmConfig.LLMProvider == settings.OllamaLLMProvider {
-		return ollama.NewOllamaLargeLanguageModelProvider(llmConfig), nil
+		return ollama.NewOllamaLargeLanguageModelProvider(llmConfig, enableResponseLog), nil
 	} else if llmConfig.LLMProvider == settings.GoogleAILLMProvider {
-		return googleai.NewGoogleAILargeLanguageModelProvider(llmConfig), nil
+		return googleai.NewGoogleAILargeLanguageModelProvider(llmConfig, enableResponseLog), nil
 	} else if llmConfig.LLMProvider == "" {
 		return nil, nil
 	}

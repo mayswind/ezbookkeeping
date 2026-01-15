@@ -7,10 +7,10 @@ import (
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/httpclient"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // HttpExchangeRatesDataSource defines the structure of http exchange rates data source
@@ -41,6 +41,10 @@ func (e *CommonHttpExchangeRatesDataProvider) GetLatestExchangeRates(c core.Cont
 
 	for i := 0; i < len(requests); i++ {
 		req := requests[i]
+		req = req.WithContext(httpclient.CustomHttpResponseLog(c, func(data []byte) {
+			log.Debugf(c, "[common_http_exchange_rates_data_provider.GetLatestExchangeRates] response#%d is %s", i, data)
+		}))
+
 		resp, err := e.httpClient.Do(req)
 
 		if err != nil {
@@ -50,8 +54,6 @@ func (e *CommonHttpExchangeRatesDataProvider) GetLatestExchangeRates(c core.Cont
 
 		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
-
-		log.Debugf(c, "[common_http_exchange_rates_data_provider.GetLatestExchangeRates] response#%d is %s", i, body)
 
 		if resp.StatusCode != 200 {
 			log.Errorf(c, "[common_http_exchange_rates_data_provider.GetLatestExchangeRates] failed to get latest exchange rate data response for user \"uid:%d\", because response code is %d", uid, resp.StatusCode)
@@ -106,6 +108,6 @@ func (e *CommonHttpExchangeRatesDataProvider) GetLatestExchangeRates(c core.Cont
 func newCommonHttpExchangeRatesDataProvider(config *settings.Config, dataSource HttpExchangeRatesDataSource) *CommonHttpExchangeRatesDataProvider {
 	return &CommonHttpExchangeRatesDataProvider{
 		dataSource: dataSource,
-		httpClient: utils.NewHttpClient(config.ExchangeRatesRequestTimeout, config.ExchangeRatesProxy, config.ExchangeRatesSkipTLSVerify, settings.GetUserAgent()),
+		httpClient: httpclient.NewHttpClient(config.ExchangeRatesRequestTimeout, config.ExchangeRatesProxy, config.ExchangeRatesSkipTLSVerify, settings.GetUserAgent(), config.EnableDebugLog),
 	}
 }

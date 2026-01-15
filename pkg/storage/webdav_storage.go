@@ -9,9 +9,9 @@ import (
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/httpclient"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // WebDAVObjectStorage represents WebDAV object storage
@@ -26,7 +26,7 @@ func NewWebDAVObjectStorage(config *settings.Config, pathPrefix string) (*WebDAV
 	webDavConfig := config.WebDAVConfig
 
 	storage := &WebDAVObjectStorage{
-		httpClient:   utils.NewHttpClient(webDavConfig.RequestTimeout, webDavConfig.Proxy, webDavConfig.SkipTLSVerify, settings.GetUserAgent()),
+		httpClient:   httpclient.NewHttpClient(webDavConfig.RequestTimeout, webDavConfig.Proxy, webDavConfig.SkipTLSVerify, settings.GetUserAgent(), false),
 		webDavConfig: webDavConfig,
 		rootPath:     webDavConfig.RootPath,
 	}

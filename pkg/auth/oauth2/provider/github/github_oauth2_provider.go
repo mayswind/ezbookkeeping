@@ -11,6 +11,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/auth/oauth2/provider"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/httpclient"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
@@ -61,6 +62,11 @@ func (p *GithubOAuth2Provider) GetUserInfo(c core.Context, oauth2Token *oauth2.T
 	}
 
 	oauth2Client := oauth2.NewClient(c, oauth2.StaticTokenSource(oauth2Token))
+
+	req = req.WithContext(httpclient.CustomHttpResponseLog(c, func(data []byte) {
+		log.Debugf(c, "[github_oauth2_provider.GetUserInfo] user profile response is %s", data)
+	}))
+
 	resp, err := oauth2Client.Do(req)
 
 	if err != nil {
@@ -70,8 +76,6 @@ func (p *GithubOAuth2Provider) GetUserInfo(c core.Context, oauth2Token *oauth2.T
 
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
-
-	log.Debugf(c, "[github_oauth2_provider.GetUserInfo] user profile response is %s", body)
 
 	if resp.StatusCode != 200 {
 		log.Errorf(c, "[github_oauth2_provider.GetUserInfo] failed to get user info response, because response code is %d", resp.StatusCode)
@@ -92,6 +96,10 @@ func (p *GithubOAuth2Provider) GetUserInfo(c core.Context, oauth2Token *oauth2.T
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
+	req = req.WithContext(httpclient.CustomHttpResponseLog(c, func(data []byte) {
+		log.Debugf(c, "[github_oauth2_provider.GetUserInfo] user emails response is %s", data)
+	}))
+
 	resp, err = oauth2Client.Do(req)
 
 	if err != nil {
@@ -101,8 +109,6 @@ func (p *GithubOAuth2Provider) GetUserInfo(c core.Context, oauth2Token *oauth2.T
 
 	defer resp.Body.Close()
 	body, err = io.ReadAll(resp.Body)
-
-	log.Debugf(c, "[github_oauth2_provider.GetUserInfo] user emails response is %s", body)
 
 	if resp.StatusCode != 200 {
 		log.Errorf(c, "[github_oauth2_provider.GetUserInfo] failed to get user emails response, because response code is %d", resp.StatusCode)

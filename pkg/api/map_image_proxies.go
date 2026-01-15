@@ -8,8 +8,8 @@ import (
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/httpclient"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 const openStreetMapTileImageUrlFormat = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"                                                                                                                              // https://tile.openstreetmap.org/{z}/{x}/{y}.png
@@ -110,7 +110,7 @@ func (p *MapImageProxy) mapImageProxyHandler(c *core.WebContext, fn func(c *core
 	}
 
 	transport := http.DefaultTransport.(*http.Transport).Clone()
-	utils.SetProxyUrl(transport, p.CurrentConfig().MapProxy)
+	httpclient.SetProxyUrl(transport, p.CurrentConfig().MapProxy)
 
 	director := func(req *http.Request) {
 		imageRawUrl := targetUrl

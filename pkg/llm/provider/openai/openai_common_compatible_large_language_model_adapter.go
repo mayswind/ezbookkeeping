@@ -213,8 +213,8 @@ func (p *CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter) buildJsonReque
 	return requestBodyBytes, nil
 }
 
-func newCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter(llmConfig *settings.LLMConfig, apiProvider OpenAIChatCompletionsAPIProvider) provider.LargeLanguageModelProvider {
-	return common.NewCommonHttpLargeLanguageModelProvider(llmConfig, &CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter{
+func newCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter(llmConfig *settings.LLMConfig, enableResponseLog bool, apiProvider OpenAIChatCompletionsAPIProvider) provider.LargeLanguageModelProvider {
+	return common.NewCommonHttpLargeLanguageModelProvider(llmConfig, enableResponseLog, &CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter{
 		apiProvider: apiProvider,
 	})
 }

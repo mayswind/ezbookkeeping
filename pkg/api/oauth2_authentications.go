@@ -208,9 +208,20 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 		return a.redirectToFailedCallbackPage(c, errs.ErrCannotRetrieveUserInfo)
 	}
 
-	if oauth2UserInfo.UserName == "" || oauth2UserInfo.Email == "" {
-		log.Errorf(c, "[oauth2_authentications.CallbackHandler] invalid oauth 2.0 user info, userName: %s, email: %s", oauth2UserInfo.UserName, oauth2UserInfo.Email)
-		return a.redirectToFailedCallbackPage(c, errs.ErrCannotRetrieveUserInfo)
+	log.Infof(c, "[oauth2_authentications.CallbackHandler] oauth 2.0 user info, userName: %s, email: %s", oauth2UserInfo.UserName, oauth2UserInfo.Email)
+
+	if oauth2UserInfo.UserName == "" && oauth2UserInfo.Email == "" {
+		return a.redirectToFailedCallbackPage(c, errs.ErrOAuth2UserNameAndEmailEmpty)
+	}
+
+	if a.CurrentConfig().OAuth2UserIdentifier == settings.OAuth2UserIdentifierEmail && oauth2UserInfo.Email == "" {
+		log.Errorf(c, "[oauth2_authentications.CallbackHandler] invalid oauth 2.0 user info, email is empty")
+		return a.redirectToFailedCallbackPage(c, errs.ErrOAuth2EmailEmpty)
+	}
+
+	if a.CurrentConfig().OAuth2UserIdentifier == settings.OAuth2UserIdentifierUsername && oauth2UserInfo.UserName == "" {
+		log.Errorf(c, "[oauth2_authentications.CallbackHandler] invalid oauth 2.0 user info, userName is empty")
+		return a.redirectToFailedCallbackPage(c, errs.ErrOAuth2UserNameEmpty)
 	}
 
 	userExternalAuthType := oauth2.GetExternalUserAuthType()
@@ -221,7 +232,7 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 	} else if a.CurrentConfig().OAuth2UserIdentifier == settings.OAuth2UserIdentifierUsername {
 		userExternalAuth, err = a.userExternalAuths.GetUserExternalAuthByExternalUserName(c, oauth2UserInfo.UserName, userExternalAuthType)
 	} else {
-		userExternalAuth, err = a.userExternalAuths.GetUserExternalAuthByExternalEmail(c, oauth2UserInfo.Email, userExternalAuthType)
+		return a.redirectToFailedCallbackPage(c, errs.ErrNotSupported)
 	}
 
 	if err != nil && !errors.Is(err, errs.ErrUserExternalAuthNotFound) {
@@ -257,7 +268,7 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 			} else if a.CurrentConfig().OAuth2UserIdentifier == settings.OAuth2UserIdentifierUsername {
 				user, err = a.users.GetUserByUsername(c, oauth2UserInfo.UserName)
 			} else {
-				user, err = a.users.GetUserByEmail(c, oauth2UserInfo.Email)
+				err = errs.ErrNotSupported
 			}
 
 			if err != nil && !errors.Is(err, errs.ErrUserNotFound) {
@@ -267,6 +278,14 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 		}
 
 		if user == nil && a.CurrentConfig().EnableUserRegister && a.CurrentConfig().OAuth2AutoRegister {
+			if oauth2UserInfo.UserName == "" {
+				return a.redirectToFailedCallbackPage(c, errs.ErrOAuth2UserNameEmptyCannotRegister)
+			}
+
+			if oauth2UserInfo.Email == "" {
+				return a.redirectToFailedCallbackPage(c, errs.ErrOAuth2EmailEmptyCannotRegister)
+			}
+
 			userName := strings.TrimSpace(oauth2UserInfo.UserName)
 			email := strings.TrimSpace(oauth2UserInfo.Email)
 			nickName := strings.TrimSpace(oauth2UserInfo.NickName)

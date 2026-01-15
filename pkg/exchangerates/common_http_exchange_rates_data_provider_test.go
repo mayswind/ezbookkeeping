@@ -234,7 +234,7 @@ func TestExchangeRatesApiLatestExchangeRateHandler_BankOfRussiaDataSource(t *tes
 
 	assert.Equal(t, "RUB", exchangeRateResponse.BaseCurrency)
 
-	supportedCurrencyCodes := []string{"AED", "AMD", "AUD", "AZN", "BDT", "BGN", "BHD", "BOB", "BRL", "BYN",
+	supportedCurrencyCodes := []string{"AED", "AMD", "AUD", "AZN", "BDT", "BHD", "BOB", "BRL", "BYN",
 		"CAD", "CHF", "CNY", "CUP", "CZK", "DKK", "DZD", "EGP", "ETB", "EUR", "GBP", "GEL", "HKD", "HUF",
 		"IDR", "INR", "IRR", "JPY", "KGS", "KRW", "KZT", "MDL", "MMK", "MNT", "NGN", "NOK", "NZD",
 		"OMR", "PLN", "QAR", "RON", "RSD", "SAR", "SEK", "SGD", "THB", "TJS", "TMT", "TRY",

@@ -37,7 +37,6 @@ const props = defineProps<{
     percentField?: string;
     colorField?: string;
     hiddenField?: string;
-    minValidPercent?: number;
     amountValue?: boolean;
     defaultCurrency?: string;
     showValue?: boolean;
@@ -74,14 +73,13 @@ const radarData = computed<RadarChartData>(() => {
             const value = item[props.valueField];
             const percent = props.percentField ? item[props.percentField] : -1;
 
-            if (isNumber(value) && value > 0 &&
-                (!props.hiddenField || !item[props.hiddenField]) &&
-                (!props.minValidPercent || value / totalValidValue > props.minValidPercent)) {
+            if (isNumber(value) &&
+                (!props.hiddenField || !item[props.hiddenField])) {
                 const name = item[props.nameField] as string;
                 const color = getDisplayColor((props.colorField && item[props.colorField]) ? item[props.colorField] as ColorValue : DEFAULT_CHART_COLORS[indicators.length % DEFAULT_CHART_COLORS.length]);
 
-                const finalPercent = (isNumber(percent) && percent >= 0) ? percent : (value / totalValidValue * 100);
-                const displayPercent = formatPercentToLocalizedNumerals(finalPercent, 2, '&lt;0.01');
+                const finalPercent = (isNumber(percent) && percent >= 0) ? percent : (value > 0 ? value / totalValidValue * 100 : 0);
+                const displayPercent = formatPercentToLocalizedNumerals(finalPercent, 2, '<0.01');
                 const displayValue = props.amountValue ? formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency) : value.toString();
 
                 indicators.push({
@@ -90,16 +88,19 @@ const radarData = computed<RadarChartData>(() => {
                     color: isDarkMode.value ? '#ccc' : '#333'
                 });
 
-                values.push(value);
+                values.push(value > 0 ? value : 0);
 
                 tooltip += '<div><span class="chart-pointer" style="background-color: ' + color + '"></span>';
                 tooltip += `<span>${name}</span>`;
 
-                if (props.showValue && props.showPercent) {
+                const showValue = props.showValue;
+                const showPercent = props.showPercent && value > 0;
+
+                if (showValue && showPercent) {
                     tooltip += `<span class="ms-1" style="float: inline-end">(${displayPercent})</span><span class="ms-5" style="float: inline-end">${displayValue}</span>`;
-                } else if (props.showValue && !props.showPercent) {
+                } else if (showValue && !showPercent) {
                     tooltip += `<span class="ms-5" style="float: inline-end">${displayValue}</span>`;
-                } else if (!props.showValue && props.showPercent) {
+                } else if (!showValue && showPercent) {
                     tooltip += `<span class="ms-5" style="float: inline-end">${displayPercent}</span>`;
                 }
 

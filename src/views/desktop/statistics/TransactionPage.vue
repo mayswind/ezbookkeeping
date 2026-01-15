@@ -263,7 +263,6 @@
                                         />
                                         <pie-chart
                                             :items="categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length ? categoricalAnalysisData.items : []"
-                                            :min-valid-percent="0.0001"
                                             :show-value="showAmountInChart"
                                             :show-percent="showPercentInCategoricalChart"
                                             :enable-click-item="true"
@@ -316,7 +315,7 @@
                                                         <div class="d-flex flex-column ms-2">
                                                             <div class="d-flex">
                                                                 <span>{{ item.name }}</span>
-                                                                <small class="statistics-percent" v-if="showPercentInCategoricalChart && item.percent >= 0">{{ formatPercentToLocalizedNumerals(item.percent, 2, '&lt;0.01') }}</small>
+                                                                <small class="statistics-percent" v-if="showPercentInCategoricalChart && item.percent >= 0 && item.totalAmount >= 0">{{ formatPercentToLocalizedNumerals(item.percent, 2, '<0.01') }}</small>
                                                                 <v-spacer/>
                                                                 <span class="statistics-amount">{{ getDisplayAmount(item.totalAmount, defaultCurrency) }}</span>
                                                             </div>
@@ -351,7 +350,6 @@
                                         />
                                         <radar-chart
                                             :items="categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length ? categoricalAnalysisData.items : []"
-                                            :min-valid-percent="0.0001"
                                             :show-value="showAmountInChart"
                                             :show-percent="showPercentInCategoricalChart"
                                             :amount-value="true"

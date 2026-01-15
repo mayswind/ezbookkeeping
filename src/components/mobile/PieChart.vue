@@ -3,18 +3,19 @@
         <svg class="pie-chart" :viewBox="`${-diameter} ${-diameter} ${diameter * 2} ${diameter * 2}`">
             <circle class="pie-chart-background" cx="0" cy="0" :r="diameter"></circle>
 
-            <circle class="pie-chart-item"
-                    fill="transparent"
-                    cx="0" cy="0"
-                    :r="diameter / 2"
-                    :stroke="item.color"
-                    :stroke-width="diameter"
-                    :stroke-dasharray="getItemStrokeDash(item)"
-                    :stroke-dashoffset="getItemDashOffset(item, validItems, itemCommonDashOffset)"
-                    :key="idx"
-                    v-for="(item, idx) in validItems"
-                    @click="switchSelectedIndex(idx)">
-            </circle>
+            <template :key="idx" v-for="(item, idx) in validItems">
+                <circle class="pie-chart-item"
+                        fill="transparent"
+                        cx="0" cy="0"
+                        :r="diameter / 2"
+                        :stroke="item.color"
+                        :stroke-width="diameter"
+                        :stroke-dasharray="getItemStrokeDash(item)"
+                        :stroke-dashoffset="getItemDashOffset(item, validItems, itemCommonDashOffset)"
+                        @click="switchSelectedIndex(idx)"
+                        v-if="item.actualValue > 0 && item.paintPercent > minPaintPercent">
+                </circle>
+            </template>
 
             <circle class="pie-chart-text-background"
                     cx="0" cy="0"
@@ -44,7 +45,7 @@
                 </f7-link>
 
                 <div class="pie-chart-toolbox-info">
-                    <p v-if="showPercent && selectedItem">
+                    <p v-if="showPercent && selectedItem && selectedItem.actualValue >= 0">
                         <f7-chip class="chip-placeholder" outline v-if="skeleton">
                             <span class="skeleton-text">Percent</span>
                         </f7-chip>
@@ -53,7 +54,7 @@
                                  :style="getColorStyle(selectedItem?.color, '--f7-chip-outline-border-color')"
                                  v-else-if="!skeleton"></f7-chip>
                     </p>
-                    <p v-else-if="showPercent && (!validItems || !validItems.length)">
+                    <p v-else-if="showPercent && (!validItems || !validItems.length || !selectedItem || selectedItem.actualValue < 0)">
                         <f7-chip outline text="---"></f7-chip>
                     </p>
                     <f7-link class="pie-chart-selected-item-info" :no-link-class="!enableClickItem" v-if="selectedItem" @click="clickItem(selectedItem)">
@@ -99,6 +100,7 @@ const emit = defineEmits<{
 const { tt } = useI18n();
 const { selectedIndex, validItems } = usePieChartBase(props);
 
+const minPaintPercent = 0.0001; // 0.01%
 const diameter: number = 100;
 const circumference: number = diameter * Math.PI;
 
@@ -106,7 +108,9 @@ const totalValidValue = computed<number>(() => {
     let totalValidValue = 0;
 
     for (const item of validItems.value) {
-        totalValidValue += item.value;
+        if (item.actualValue > 0 && item.paintPercent > minPaintPercent) {
+            totalValidValue += item.value;
+        }
     }
 
     return totalValidValue;
@@ -122,11 +126,17 @@ const itemCommonDashOffset = computed<number>(() => {
     for (let i = 0; i < Math.min(selectedIndex.value + 1, validItems.value.length); i++) {
         const item = validItems.value[i] as CommonPieChartDataItem;
 
-        if (item.actualPercent > 0) {
+        if (item.actualValue > 0 && item.paintPercent > minPaintPercent) {
             if (i === selectedIndex.value) {
-                offset += -circumference * (1 - item.actualPercent) / 2;
+                offset += -circumference * (1 - item.paintPercent) / 2;
             } else {
-                offset += -circumference * (1 - item.actualPercent);
+                offset += -circumference * (1 - item.paintPercent);
+            }
+        } else {
+            if (i === selectedIndex.value) {
+                offset += -circumference / 2;
+            } else {
+                offset += -circumference;
             }
         }
     }
@@ -147,7 +157,7 @@ function getColorStyle(color: ColorStyleValue, additionalFieldName?: string): Re
 }
 
 function getItemStrokeDash(item: CommonPieChartDataItem): string {
-    const length = item.actualPercent * circumference;
+    const length = item.paintPercent * circumference;
     return `${length} ${circumference - length}`;
 }
 
@@ -159,7 +169,7 @@ function getItemDashOffset(item: CommonPieChartDataItem, items: CommonPieChartDa
             break;
         }
 
-        allPreviousPercent += curItem.actualPercent;
+        allPreviousPercent += curItem.paintPercent > 0 ? curItem.paintPercent : 0;
     }
 
     if (offset) {

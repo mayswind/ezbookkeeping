@@ -80,7 +80,6 @@
                 ></pie-chart>
                 <pie-chart
                     :items="categoricalAnalysisData.items"
-                    :min-valid-percent="0.0001"
                     :show-value="showAmountInChart"
                     :show-percent="showPercentInCategoricalChart"
                     :show-center-text="true"
@@ -183,7 +182,7 @@
                         <template #title>
                             <div class="statistics-list-item-text">
                                 <span>{{ item.name }}</span>
-                                <small class="statistics-percent" v-if="showPercentInCategoricalChart && item.percent >= 0">{{ formatPercentToLocalizedNumerals(item.percent, 2, '&lt;0.01') }}</small>
+                                <small class="statistics-percent" v-if="showPercentInCategoricalChart && item.percent >= 0 && item.totalAmount >= 0">{{ formatPercentToLocalizedNumerals(item.percent, 2, '<0.01') }}</small>
                             </div>
                         </template>
 

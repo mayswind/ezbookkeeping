@@ -142,11 +142,14 @@ const chartOptions = computed<object>(() => {
                     tooltip += `<div class="d-inline-flex">${name}</div><br/>`;
                 }
 
-                if (props.showValue && props.showPercent) {
+                const showValue = props.showValue;
+                const showPercent = props.showPercent && params.value && (params.value as number) > 0;
+
+                if (showValue && showPercent) {
                     tooltip += `<div class="d-inline-flex"><span>${value}</span><span class="ms-1">(${percent})</span></div>`;
-                } else if (props.showValue && !props.showPercent) {
+                } else if (showValue && !showPercent) {
                     tooltip += `<div class="d-inline-flex">${value}</div>`;
-                } else if (!props.showValue && props.showPercent) {
+                } else if (!showValue && showPercent) {
                     tooltip += `<div class="d-inline-flex">${percent}</div>`;
                 }
 

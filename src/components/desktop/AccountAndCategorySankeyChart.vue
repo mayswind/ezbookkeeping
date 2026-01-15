@@ -267,7 +267,7 @@ const chartOptions = computed<object>(() => {
                     }
 
                     if (isNumber(dataItem.percent) && dataItem.percent > 0) {
-                        const displayPercent = formatPercentToLocalizedNumerals(dataItem.percent, 2, '&lt;0.01');
+                        const displayPercent = formatPercentToLocalizedNumerals(dataItem.percent, 2, '<0.01');
                         tooltip += `<span class="ms-1" style="float: inline-end">(${displayPercent})</span>`;
                     }
 

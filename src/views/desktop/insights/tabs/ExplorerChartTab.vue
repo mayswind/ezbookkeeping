@@ -117,7 +117,6 @@
         />
         <radar-chart
             :items="categoryDimensionTransactionExplorerData && categoryDimensionTransactionExplorerData.length ? categoryDimensionTransactionExplorerData : []"
-            :min-valid-percent="0.0001"
             :show-value="true"
             :show-percent="true"
             :amount-value="currentExplorer.valueMetric !== TransactionExplorerValueMetric.TransactionCount.value"

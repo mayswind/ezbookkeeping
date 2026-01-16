@@ -63,8 +63,7 @@
                                 <td>
                                     <div class="d-flex align-center">
                                         <div class="d-flex align-center">
-                                            <span :class="loading || updating ? '' : 'cursor-pointer'"
-                                                  @click="switchToExplorer(element)">{{ element.name }}</span>
+                                            <span>{{ element.name }}</span>
                                         </div>
 
                                         <v-spacer/>
@@ -131,8 +130,7 @@ const { tt } = useI18n();
 
 const explorersStore = useExplorersStore();
 
-let resolveFunc: ((explorer: InsightsExplorerBasicInfo) => void) | null = null;
-let rejectFunc: ((reason?: unknown) => void) | null = null;
+let resolveFunc: (() => void) | null = null;
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
@@ -155,7 +153,7 @@ const noAvailableExplorer = computed<boolean>(() => {
     return true;
 });
 
-function open(): Promise<InsightsExplorerBasicInfo> {
+function open(): Promise<void> {
     showHidden.value = false;
     showState.value = true;
     loading.value = true;
@@ -173,9 +171,8 @@ function open(): Promise<InsightsExplorerBasicInfo> {
         }
     });
 
-    return new Promise<InsightsExplorerBasicInfo>((resolve, reject) => {
+    return new Promise<void>((resolve) => {
         resolveFunc = resolve;
-        rejectFunc = reject;
     });
 }
 
@@ -241,21 +238,12 @@ function saveDisplayOrder(): void {
     });
 }
 
-function switchToExplorer(explorer: InsightsExplorerBasicInfo): void {
-    if (loading.value || updating.value) {
-        return;
-    }
-
-    resolveFunc?.(explorer);
-    showState.value = false;
-}
-
 function close(): void {
     if (loading.value || updating.value) {
         return;
     }
 
-    rejectFunc?.();
+    resolveFunc?.();
     showState.value = false;
 }
 

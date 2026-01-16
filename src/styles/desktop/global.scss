@@ -423,6 +423,17 @@ html[dir="rtl"] .v-img.img-with-direction > img {
     }
 }
 
+.scrollable-vertical-tabs.v-tabs {
+    .v-slide-group__prev,
+    .v-slide-group__next {
+        max-height: 16px;
+    }
+
+    &:not(:has(.v-slide-group__prev)) {
+        margin-top: 16px;
+    }
+}
+
 body .v-tabs:not(.v-tabs-pill) {
     &.v-tabs--vertical {
         border-right: inherit;

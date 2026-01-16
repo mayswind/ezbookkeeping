@@ -8,8 +8,13 @@
                             <btn-vertical-group :disabled="loading || updating" :buttons="allTabs" v-model="activeTab" />
                         </div>
                         <v-divider />
-                        <v-tabs show-arrows class="my-4" direction="vertical" :key="currentExplorer.id"
-                                :disabled="loading || updating" :model-value="currentExplorer.id">
+                        <v-tabs show-arrows
+                                class="scrollable-vertical-tabs"
+                                style="max-height: calc(100% - 150px)"
+                                direction="vertical"
+                                :prev-icon="mdiMenuUp" :next-icon="mdiMenuDown"
+                                :key="currentExplorer.id" :disabled="loading || updating"
+                                :model-value="currentExplorer.id">
                             <v-tab class="tab-text-truncate" key="new" value="" @click="createNewExplorer">
                                 <span class="text-truncate">{{ tt('New Explorer') }}</span>
                             </v-tab>
@@ -19,11 +24,10 @@
                                    @click="loadExplorer(explorer.id)">
                                 <span class="text-truncate">{{ explorer.name || tt('Untitled Explorer') }}</span>
                             </v-tab>
-                            <v-btn class="text-left justify-start" variant="text" color="default"
-                                   :disabled="loading || updating || !allExplorers || allExplorers.length < 1" :rounded="false"
-                                   @click="showAllExplorers">
-                                <span class="ps-2">{{ tt('More Explorer') }}</span>
-                            </v-btn>
+                            <template v-if="loading && (!allExplorers || allExplorers.length < 1)">
+                                <v-skeleton-loader class="skeleton-no-margin mx-5 mt-4 mb-3" type="text"
+                                                   :key="itemIdx" :loading="true" v-for="itemIdx in [ 1, 2, 3, 4, 5 ]"></v-skeleton-loader>
+                            </template>
                         </v-tabs>
                     </v-navigation-drawer>
                     <v-main>
@@ -127,6 +131,11 @@
                                                 <v-list-item :prepend-icon="mdiDeleteOutline" @click="removeExplorer" v-if="currentExplorer.id">
                                                     <v-list-item-title>{{ tt('Delete Explorer') }}</v-list-item-title>
                                                 </v-list-item>
+                                                <v-divider class="my-2"/>
+                                                <v-list-item :prepend-icon="mdiSort"
+                                                             :disabled="!allExplorers || allExplorers.length < 2"
+                                                             :title="tt('Change Explorer Display Order')"
+                                                             @click="showChangeExplorerDisplayOrderDialog"></v-list-item>
                                             </v-list>
                                         </v-menu>
                                     </v-btn>
@@ -215,6 +224,8 @@ import {
     mdiMenu,
     mdiArrowLeft,
     mdiArrowRight,
+    mdiMenuUp,
+    mdiMenuDown,
     mdiCheck,
     mdiRefresh,
     mdiDotsVertical,
@@ -222,6 +233,7 @@ import {
     mdiEyeOutline,
     mdiEyeOffOutline,
     mdiDeleteOutline,
+    mdiSort,
     mdiHomeClockOutline,
     mdiInvoiceTextClockOutline,
     mdiExport
@@ -293,15 +305,10 @@ const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDa
 const fiscalYearStart = computed<number>(() => userStore.currentUserFiscalYearStart);
 
 const allExplorers = computed<InsightsExplorerBasicInfo[]>(() => {
-    const maximumExplorersToShow = 14;
     const ret: InsightsExplorerBasicInfo[] = [];
     let hasCurrentExplorer = false;
 
     for (const explorer of explorersStore.allInsightsExplorerBasicInfos) {
-        if (ret.length >= maximumExplorersToShow) {
-            break;
-        }
-
         if (!explorer.hidden || (explorer.id && explorer.id === currentExplorer.value.id)) {
             ret.push(explorer);
 
@@ -312,23 +319,7 @@ const allExplorers = computed<InsightsExplorerBasicInfo[]>(() => {
     }
 
     if (!hasCurrentExplorer && currentExplorer.value && currentExplorer.value.id) {
-        if (ret.length >= maximumExplorersToShow) {
-            ret.pop();
-        }
-
-        let foundCurrentExplorer = false;
-
-        for (const explorer of explorersStore.allInsightsExplorerBasicInfos) {
-            if (explorer.id === currentExplorer.value.id) {
-                ret.push(explorer);
-                foundCurrentExplorer = true;
-                break;
-            }
-        }
-
-        if (!foundCurrentExplorer) {
-            ret.push(InsightsExplorerBasicInfo.of(currentExplorer.value));
-        }
+        ret.push(InsightsExplorerBasicInfo.of(currentExplorer.value));
     }
 
     return ret;
@@ -506,12 +497,8 @@ function loadExplorer(explorerId: string, force?: boolean, init?: boolean): Prom
     });
 }
 
-function showAllExplorers(): void {
-    explorerListDialog.value?.open().then((selectedExplorer: InsightsExplorerBasicInfo) => {
-        if (selectedExplorer) {
-            loadExplorer(selectedExplorer.id);
-        }
-    }).catch(() => {
+function showChangeExplorerDisplayOrderDialog(): void {
+    explorerListDialog.value?.open().then(() => {
         if (explorersStore.insightsExplorerListStateInvalid) {
             loading.value = true;
 

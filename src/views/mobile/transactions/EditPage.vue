@@ -367,7 +367,7 @@
                 <template #footer>
                     <f7-block class="margin-top-half no-padding no-margin" v-if="transaction.tagIds && transaction.tagIds.length">
                         <f7-chip media-text-color="var(--f7-chip-text-color)" class="transaction-edit-tag"
-                                 :text="getTagName(tagId)"
+                                 :text="allTagsMap[tagId]?.name ?? ''"
                                  :key="tagId"
                                  v-for="tagId in transaction.tagIds">
                             <template #media>
@@ -570,7 +570,6 @@ const {
     allVisibleCategorizedAccounts,
     allCategories,
     allCategoriesMap,
-    allTags,
     allTagsMap,
     firstVisibleAccountId,
     hasVisibleExpenseCategories,
@@ -826,16 +825,6 @@ function getFontClassByAmount(amount: number): string {
     } else {
         return 'ebk-large-amount';
     }
-}
-
-function getTagName(tagId: string): string {
-    for (const tag of allTags.value) {
-        if (tag.id === tagId) {
-            return tag.name;
-        }
-    }
-
-    return '';
 }
 
 function init(): void {

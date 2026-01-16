@@ -558,24 +558,31 @@
                     </template>
                 </f7-list-item>
 
-                <f7-list-item link="#" no-chevron popover-close
-                              :title="transactionTag.name"
-                              :class="{ 'list-item-selected': queryAllFilterTagIdsCount === 1 && isDefined(queryAllFilterTagIds[transactionTag.id]), 'item-in-multiple-selection': queryAllFilterTagIdsCount > 1 && isDefined(queryAllFilterTagIds[transactionTag.id]) }"
-                              :key="transactionTag.id"
-                              v-for="transactionTag in allTransactionTags"
-                              v-show="!transactionTag.hidden || isDefined(queryAllFilterTagIds[transactionTag.id])"
-                              @click="changeTagFilter(TransactionTagFilter.of(transactionTag.id).toTextualTagFilter())"
-                >
-                    <template #before-title>
-                        <f7-icon class="transaction-tag-name transaction-tag-icon" f7="number"></f7-icon>
-                    </template>
-                    <template #after>
-                        <f7-icon class="list-item-checked-icon"
-                                 :f7="queryAllFilterTagIds[transactionTag.id] === true ? 'checkmark_alt' : (queryAllFilterTagIds[transactionTag.id] === false ? 'multiply' : undefined)"
-                                 v-if="isDefined(queryAllFilterTagIds[transactionTag.id])">
-                        </f7-icon>
-                    </template>
-                </f7-list-item>
+                <template :key="transactionTagGroup.id"
+                          v-for="transactionTagGroup in allTransactionTagGroupsWithDefault">
+                    <f7-list-item group-title class="transaction-tag-group" v-if="allTransactionTagsByGroup[transactionTagGroup.id] && allTransactionTagsByGroup[transactionTagGroup.id]?.length && hasVisibleTagsInTagGroup(transactionTagGroup)">
+                        <small>{{ transactionTagGroup.name }}</small>
+                    </f7-list-item>
+
+                    <f7-list-item link="#" no-chevron popover-close
+                                  :title="transactionTag.name"
+                                  :class="{ 'list-item-selected': queryAllFilterTagIdsCount === 1 && isDefined(queryAllFilterTagIds[transactionTag.id]), 'item-in-multiple-selection': queryAllFilterTagIdsCount > 1 && isDefined(queryAllFilterTagIds[transactionTag.id]) }"
+                                  :key="transactionTag.id"
+                                  v-for="transactionTag in (allTransactionTagsByGroup[transactionTagGroup.id] ?? [])"
+                                  v-show="!transactionTag.hidden || isDefined(queryAllFilterTagIds[transactionTag.id])"
+                                  @click="changeTagFilter(TransactionTagFilter.of(transactionTag.id).toTextualTagFilter())"
+                    >
+                        <template #before-title>
+                            <f7-icon class="transaction-tag-name transaction-tag-icon" f7="number"></f7-icon>
+                        </template>
+                        <template #after>
+                            <f7-icon class="list-item-checked-icon"
+                                     :f7="queryAllFilterTagIds[transactionTag.id] === true ? 'checkmark_alt' : (queryAllFilterTagIds[transactionTag.id] === false ? 'multiply' : undefined)"
+                                     v-if="isDefined(queryAllFilterTagIds[transactionTag.id])">
+                            </f7-icon>
+                        </template>
+                    </f7-list-item>
+                </template>
             </f7-list>
         </f7-popover>
 
@@ -686,6 +693,8 @@ const {
     allCategories,
     allPrimaryCategories,
     allAvailableCategoriesCount,
+    allTransactionTagGroupsWithDefault,
+    allTransactionTagsByGroup,
     allTransactionTags,
     allAvailableTagsCount,
     displayPageTypeName,
@@ -708,6 +717,7 @@ const {
     transactionCalendarMaxDate,
     currentMonthTransactionData,
     hasSubCategoryInQuery,
+    hasVisibleTagsInTagGroup,
     isSameAsDefaultTimezoneOffsetMinutes,
     canAddTransaction,
     getDisplayTime,
@@ -1606,6 +1616,15 @@ html[dir="rtl"] .list.transaction-info-list li.transaction-info .transaction-foo
 .more-popover-menu .popover-inner {
     max-height: 400px;
     overflow-y: auto;
+}
+
+.more-popover-menu .transaction-tag-group {
+    background-color: inherit;
+
+    > small {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
 
 .transaction-calendar-container .dp__theme_light,

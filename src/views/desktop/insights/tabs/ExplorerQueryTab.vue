@@ -251,56 +251,12 @@
                                                              (conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.IsEmpty.value || conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.IsNotEmpty.value)"
                                                     />
 
-                                                    <v-autocomplete
+                                                    <transaction-tag-auto-complete
                                                         density="compact"
-                                                        item-title="name"
-                                                        item-value="id"
-                                                        auto-select-first
-                                                        persistent-placeholder
-                                                        multiple
-                                                        chips
-                                                        closable-chips
                                                         :disabled="loading || disabled || !!editingQuery"
-                                                        :placeholder="tt('None')"
-                                                        :items="allTags"
                                                         v-model="conditionWithRelation.condition.value"
-                                                        v-model:search="tagSearchContent"
                                                         v-else-if="conditionWithRelation.condition.operator !== TransactionExplorerConditionOperator.IsEmpty.value && conditionWithRelation.condition.operator !== TransactionExplorerConditionOperator.IsNotEmpty.value"
-                                                    >
-                                                        <template #chip="{ props, item }">
-                                                            <v-chip :prepend-icon="mdiPound" :text="item.title" v-bind="props"/>
-                                                        </template>
-
-                                                        <template #item="{ props, item }">
-                                                            <v-list-item :value="item.value" v-bind="props" v-if="!item.raw.hidden">
-                                                                <template #title>
-                                                                    <v-list-item-title>
-                                                                        <div class="d-flex align-center">
-                                                                            <v-icon size="20" start :icon="mdiPound"/>
-                                                                            <span>{{ item.title }}</span>
-                                                                        </div>
-                                                                    </v-list-item-title>
-                                                                </template>
-                                                            </v-list-item>
-                                                            <v-list-item :disabled="true" v-bind="props"
-                                                                         v-if="item.raw.hidden && item.raw.name.toLowerCase().indexOf(tagSearchContent.toLowerCase()) >= 0 && isAllFilteredTagHidden">
-                                                                <template #title>
-                                                                    <v-list-item-title>
-                                                                        <div class="d-flex align-center">
-                                                                            <v-icon size="20" start :icon="mdiPound"/>
-                                                                            <span>{{ item.title }}</span>
-                                                                        </div>
-                                                                    </v-list-item-title>
-                                                                </template>
-                                                            </v-list-item>
-                                                        </template>
-
-                                                        <template #no-data>
-                                                            <v-list class="py-0">
-                                                                <v-list-item>{{ tt('No available tag') }}</v-list-item>
-                                                            </v-list>
-                                                        </template>
-                                                    </v-autocomplete>
+                                                    />
                                                 </div>
 
                                                 <v-text-field disabled density="compact"
@@ -402,10 +358,6 @@ import {
 } from '@/core/explorer.ts';
 
 import {
-    type TransactionTag
-} from '@/models/transaction_tag.ts';
-
-import {
     type TransactionExplorerCondition,
     TransactionExplorerQuery
 } from '@/models/explorer.ts';
@@ -427,8 +379,7 @@ import {
     mdiContentCopy,
     mdiCheck,
     mdiClose,
-    mdiDrag,
-    mdiPound
+    mdiDrag
 } from '@mdi/js';
 
 interface ExplorerQueryTabProps {
@@ -460,7 +411,6 @@ const showExpression = ref<Record<string, boolean>>({});
 const showFilterSourceAccountsDialog = ref<boolean>(false);
 const showFilterDestinationAccountsDialog = ref<boolean>(false);
 const showFilterTransactionCategoriesDialog = ref<boolean>(false);
-const tagSearchContent = ref<string>('');
 const editingQuery = ref<TransactionExplorerQuery | undefined>(undefined);
 const editingQueryName = ref<string>('');
 
@@ -474,26 +424,8 @@ const queries = computed<TransactionExplorerQuery[]>({
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 const hasAnyAccount = computed<boolean>(() => accountsStore.allPlainAccounts.length > 0);
 const hasAnyTransactionCategory = computed<boolean>(() => !isObjectEmpty(transactionCategoriesStore.allTransactionCategoriesMap));
-const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
 
 const allTransactionExplorerConditionFields = computed<NameValue[]>(() => getAllTransactionExplorerConditionFields());
-
-const isAllFilteredTagHidden = computed<boolean>(() => {
-    const lowerCaseTagSearchContent = tagSearchContent.value.toLowerCase();
-    let hiddenCount = 0;
-
-    for (const tag of allTags.value) {
-        if (!lowerCaseTagSearchContent || tag.name.toLowerCase().indexOf(lowerCaseTagSearchContent) >= 0) {
-            if (!tag.hidden) {
-                return false;
-            }
-
-            hiddenCount++;
-        }
-    }
-
-    return hiddenCount > 0;
-});
 
 function getFilteredAccountsDisplayContent(filterAccountIds?: Record<string, boolean>): string {
     if ((props.loading && !hasAnyAccount.value) || !accountsStore.allVisiblePlainAccounts || !accountsStore.allVisiblePlainAccounts.length) {

@@ -5,13 +5,34 @@
             <f7-nav-left v-else-if="sortable">
                 <f7-link icon-f7="xmark" :class="{ 'disabled': displayOrderSaving }" @click="cancelSort"></f7-link>
             </f7-nav-left>
-            <f7-nav-title :title="tt('Transaction Tags')"></f7-nav-title>
+            <f7-nav-title>
+                <f7-link popover-open=".tag-group-popover-menu" :class="{ 'disabled': sortable || hasEditingTag }">
+                    <span style="color: var(--f7-text-color)">{{ displayTagGroupName }}</span>
+                    <f7-icon class="page-title-bar-icon" color="gray" style="opacity: 0.5" f7="chevron_down_circle_fill"></f7-icon>
+                </f7-link>
+            </f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': hasEditingTag || !tags.length || sortable }" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link icon-f7="plus" :class="{ 'disabled': hasEditingTag }" v-if="!sortable" @click="add"></f7-link>
                 <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': displayOrderSaving || !displayOrderModified || hasEditingTag }" @click="saveSortResult" v-else-if="sortable"></f7-link>
             </f7-nav-right>
         </f7-navbar>
+
+        <f7-popover class="tag-group-popover-menu"
+                    @popover:open="scrollPopoverToSelectedItem">
+            <f7-list dividers>
+                <f7-list-item link="#" no-chevron popover-close
+                              :title="tagGroup.name"
+                              :class="{ 'list-item-selected': activeTagGroupId === tagGroup.id }"
+                              :key="tagGroup.id"
+                              v-for="tagGroup in allTagGroupsWithDefault"
+                              @click="switchTagGroup(tagGroup.id)">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="activeTagGroupId === tagGroup.id"></f7-icon>
+                    </template>
+                </f7-list-item>
+            </f7-list>
+        </f7-popover>
 
         <f7-list strong inset dividers class="tag-item-list margin-top skeleton-text" v-if="loading">
             <f7-list-item :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
@@ -155,18 +176,17 @@ import { ref, computed } from 'vue';
 import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { useI18nUIComponents, showLoading, hideLoading, onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
+import { type Framework7Dom, useI18nUIComponents, showLoading, hideLoading, onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
+import { useTagListPageBase } from '@/views/base/tags/TagListPageBase.ts';
 
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
 import { TextDirection } from '@/core/text.ts';
+
 import { TransactionTag } from '@/models/transaction_tag.ts';
 
-import {
-    isNoAvailableTag,
-    getFirstShowingId,
-    getLastShowingId
-} from '@/lib/tag.ts';
+import { scrollToSelectedItem } from '@/lib/ui/common.ts';
+import { getFirstShowingId, getLastShowingId } from '@/lib/tag.ts';
 
 const props = defineProps<{
     f7router: Router.Router;
@@ -175,34 +195,40 @@ const props = defineProps<{
 const { tt, getCurrentLanguageTextDirection } = useI18n();
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
+const {
+    activeTagGroupId,
+    newTag,
+    editingTag,
+    loading,
+    showHidden,
+    displayOrderModified,
+    allTagGroupsWithDefault,
+    tags,
+    noAvailableTag,
+    hasEditingTag,
+    isTagModified,
+    switchTagGroup,
+    add,
+    edit
+} = useTagListPageBase();
+
 const transactionTagsStore = useTransactionTagsStore();
 
-const newTag = ref<TransactionTag | null>(null);
-const editingTag = ref<TransactionTag>(TransactionTag.createNewTag());
-const loading = ref<boolean>(true);
 const loadingError = ref<unknown | null>(null);
-const showHidden = ref<boolean>(false);
 const sortable = ref<boolean>(false);
 const tagToDelete = ref<TransactionTag | null>(null);
 const showMoreActionSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
-const displayOrderModified = ref<boolean>(false);
 const displayOrderSaving = ref<boolean>(false);
 
 const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
-const tags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
 const firstShowingId = computed<string | null>(() => getFirstShowingId(tags.value, showHidden.value));
 const lastShowingId = computed<string | null>(() => getLastShowingId(tags.value, showHidden.value));
-const noAvailableTag = computed<boolean>(() => isNoAvailableTag(tags.value, showHidden.value));
-const hasEditingTag = computed<boolean>(() => !!(newTag.value || (editingTag.value.id && editingTag.value.id !== '')));
 
-function isTagModified(tag: TransactionTag): boolean {
-    if (tag.id) {
-        return editingTag.value.name !== '' && editingTag.value.name !== tag.name;
-    } else {
-        return tag.name !== '';
-    }
-}
+const displayTagGroupName = computed<string>(() => {
+    const tagGroup = transactionTagsStore.allTransactionTagGroupsMap[activeTagGroupId.value];
+    return tagGroup ? tagGroup.name : tt('Default Group');
+});
 
 function getTagDomId(tag: TransactionTag): string {
     return 'tag_' + tag.id;
@@ -256,15 +282,6 @@ function reload(done?: () => void): void {
             showToast(error.message || error);
         }
     });
-}
-
-function add(): void {
-    newTag.value = TransactionTag.createNewTag();
-}
-
-function edit(tag: TransactionTag): void {
-    editingTag.value.id = tag.id;
-    editingTag.value.name = tag.name;
 }
 
 function save(tag: TransactionTag): void {
@@ -368,7 +385,7 @@ function saveSortResult(): void {
     displayOrderSaving.value = true;
     showLoading();
 
-    transactionTagsStore.updateTagDisplayOrders().then(() => {
+    transactionTagsStore.updateTagDisplayOrders(activeTagGroupId.value).then(() => {
         displayOrderSaving.value = false;
         hideLoading();
 
@@ -438,6 +455,10 @@ function onSort(event: { el: { id: string }, from: number, to: number }): void {
     });
 }
 
+function scrollPopoverToSelectedItem(event: { $el: Framework7Dom }): void {
+    scrollToSelectedItem(event.$el[0], '.popover-inner', '.popover-inner', 'li.list-item-selected');
+}
+
 function onPageAfterIn(): void {
     if (transactionTagsStore.transactionTagListStateInvalid && !loading.value) {
         reload();
@@ -457,5 +478,10 @@ init();
 .transaction-tag-list-item-content {
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.tag-group-popover-menu .popover-inner {
+    max-height: 440px;
+    overflow-y: auto;
 }
 </style>

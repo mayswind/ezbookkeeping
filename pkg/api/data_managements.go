@@ -28,6 +28,7 @@ type DataManagementsApi struct {
 	transactions            *services.TransactionService
 	categories              *services.TransactionCategoryService
 	tags                    *services.TransactionTagService
+	tagGroups               *services.TransactionTagGroupService
 	pictures                *services.TransactionPictureService
 	templates               *services.TransactionTemplateService
 	userCustomExchangeRates *services.UserCustomExchangeRatesService
@@ -46,6 +47,7 @@ var (
 		transactions:            services.Transactions,
 		categories:              services.TransactionCategories,
 		tags:                    services.TransactionTags,
+		tagGroups:               services.TransactionTagGroups,
 		pictures:                services.TransactionPictures,
 		templates:               services.TransactionTemplates,
 		userCustomExchangeRates: services.UserCustomExchangeRates,
@@ -190,6 +192,13 @@ func (a *DataManagementsApi) ClearAllDataHandler(c *core.WebContext) (any, *errs
 
 	if err != nil {
 		log.Errorf(c, "[data_managements.ClearAllDataHandler] failed to delete all transaction tags, because %s", err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	err = a.tagGroups.DeleteAllTagGroups(c, uid)
+
+	if err != nil {
+		log.Errorf(c, "[data_managements.ClearAllDataHandler] failed to delete all transaction tag groups, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 

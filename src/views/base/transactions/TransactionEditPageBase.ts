@@ -109,7 +109,6 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
     const allVisibleCategorizedAccounts = computed<CategorizedAccountWithDisplayBalance[]>(() => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts.value, showAccountBalance.value, customAccountCategoryOrder.value));
     const allCategories = computed<Record<number, TransactionCategory[]>>(() => transactionCategoriesStore.allTransactionCategories);
     const allCategoriesMap = computed<Record<string, TransactionCategory>>(() => transactionCategoriesStore.allTransactionCategoriesMap);
-    const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
     const allTagsMap = computed<Record<string, TransactionTag>>(() => transactionTagsStore.allTransactionTagsMap);
     const firstVisibleAccountId = computed<string | undefined>(() => allVisibleAccounts.value && allVisibleAccounts.value[0] ? allVisibleAccounts.value[0].id : undefined);
 
@@ -452,7 +451,6 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         allVisibleCategorizedAccounts,
         allCategories,
         allCategoriesMap,
-        allTags,
         allTagsMap,
         firstVisibleAccountId,
         hasVisibleExpenseCategories,

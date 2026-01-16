@@ -101,13 +101,13 @@ func (s *TransactionTagService) GetTagsByTagIds(c core.Context, uid int64, tagId
 }
 
 // GetMaxDisplayOrder returns the max display order
-func (s *TransactionTagService) GetMaxDisplayOrder(c core.Context, uid int64) (int32, error) {
+func (s *TransactionTagService) GetMaxDisplayOrder(c core.Context, uid int64, tagGroupId int64) (int32, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
 
 	tag := &models.TransactionTag{}
-	has, err := s.UserDataDB(uid).NewSession(c).Cols("uid", "deleted", "display_order").Where("uid=? AND deleted=?", uid, false).OrderBy("display_order desc").Limit(1).Get(tag)
+	has, err := s.UserDataDB(uid).NewSession(c).Cols("uid", "deleted", "display_order").Where("uid=? AND deleted=? AND tag_group_id=?", uid, false, tagGroupId).OrderBy("display_order desc").Limit(1).Get(tag)
 
 	if err != nil {
 		return 0, err
@@ -294,23 +294,25 @@ func (s *TransactionTagService) CreateTags(c core.Context, uid int64, tags []*mo
 }
 
 // ModifyTag saves an existed transaction tag model to database
-func (s *TransactionTagService) ModifyTag(c core.Context, tag *models.TransactionTag) error {
+func (s *TransactionTagService) ModifyTag(c core.Context, tag *models.TransactionTag, tagNameChanged bool) error {
 	if tag.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
 
-	exists, err := s.ExistsTagName(c, tag.Uid, tag.Name)
+	if tagNameChanged {
+		exists, err := s.ExistsTagName(c, tag.Uid, tag.Name)
 
-	if err != nil {
-		return err
-	} else if exists {
-		return errs.ErrTransactionTagNameAlreadyExists
+		if err != nil {
+			return err
+		} else if exists {
+			return errs.ErrTransactionTagNameAlreadyExists
+		}
 	}
 
 	tag.UpdatedUnixTime = time.Now().Unix()
 
 	return s.UserDataDB(tag.Uid).DoTransaction(c, func(sess *xorm.Session) error {
-		updatedRows, err := sess.ID(tag.TagId).Cols("name", "updated_unix_time").Where("uid=? AND deleted=?", tag.Uid, false).Update(tag)
+		updatedRows, err := sess.ID(tag.TagId).Cols("name", "tag_group_id", "display_order", "updated_unix_time").Where("uid=? AND deleted=?", tag.Uid, false).Update(tag)
 
 		if err != nil {
 			return err

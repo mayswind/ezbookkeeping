@@ -78,7 +78,7 @@ func (a *TransactionTagsApi) TagCreateHandler(c *core.WebContext) (any, *errs.Er
 
 	uid := c.GetCurrentUid()
 
-	maxOrderId, err := a.tags.GetMaxDisplayOrder(c, uid)
+	maxOrderId, err := a.tags.GetMaxDisplayOrder(c, uid, tagCreateReq.GroupId)
 
 	if err != nil {
 		log.Errorf(c, "[transaction_tags.TagCreateHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
@@ -111,9 +111,16 @@ func (a *TransactionTagsApi) TagCreateBatchHandler(c *core.WebContext) (any, *er
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
+	for i := 0; i < len(tagCreateBatchReq.Tags); i++ {
+		if tagCreateBatchReq.Tags[i].GroupId != tagCreateBatchReq.GroupId {
+			log.Warnf(c, "[transaction_tags.TagCreateBatchHandler] the group id \"%d\" of tag#%d is inconsistent with the batch group id \"%d\"", tagCreateBatchReq.Tags[i].GroupId, i, tagCreateBatchReq.GroupId)
+			return nil, errs.ErrTransactionTagGroupIdInvalid
+		}
+	}
+
 	uid := c.GetCurrentUid()
 
-	maxOrderId, err := a.tags.GetMaxDisplayOrder(c, uid)
+	maxOrderId, err := a.tags.GetMaxDisplayOrder(c, uid, tagCreateBatchReq.GroupId)
 
 	if err != nil {
 		log.Errorf(c, "[transaction_tags.TagCreateBatchHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
@@ -161,16 +168,31 @@ func (a *TransactionTagsApi) TagModifyHandler(c *core.WebContext) (any, *errs.Er
 	}
 
 	newTag := &models.TransactionTag{
-		TagId: tag.TagId,
-		Uid:   uid,
-		Name:  tagModifyReq.Name,
+		TagId:        tag.TagId,
+		Uid:          uid,
+		Name:         tagModifyReq.Name,
+		TagGroupId:   tagModifyReq.GroupId,
+		DisplayOrder: tag.DisplayOrder,
 	}
 
-	if newTag.Name == tag.Name {
+	tagNameChanged := newTag.Name != tag.Name
+
+	if !tagNameChanged && newTag.TagGroupId == tag.TagGroupId {
 		return nil, errs.ErrNothingWillBeUpdated
 	}
 
-	err = a.tags.ModifyTag(c, newTag)
+	if newTag.TagGroupId != tag.TagGroupId {
+		maxOrderId, err := a.tags.GetMaxDisplayOrder(c, uid, newTag.TagGroupId)
+
+		if err != nil {
+			log.Errorf(c, "[transaction_tags.TagModifyHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		newTag.DisplayOrder = maxOrderId + 1
+	}
+
+	err = a.tags.ModifyTag(c, newTag, tagNameChanged)
 
 	if err != nil {
 		log.Errorf(c, "[transaction_tags.TagModifyHandler] failed to update tag \"id:%d\" for user \"uid:%d\", because %s", tagModifyReq.Id, uid, err.Error())
@@ -180,6 +202,8 @@ func (a *TransactionTagsApi) TagModifyHandler(c *core.WebContext) (any, *errs.Er
 	log.Infof(c, "[transaction_tags.TagModifyHandler] user \"uid:%d\" has updated tag \"id:%d\" successfully", uid, tagModifyReq.Id)
 
 	tag.Name = newTag.Name
+	tag.TagGroupId = newTag.TagGroupId
+	tag.DisplayOrder = newTag.DisplayOrder
 	tagResp := tag.ToTransactionTagInfoResponse()
 
 	return tagResp, nil
@@ -268,6 +292,7 @@ func (a *TransactionTagsApi) createNewTagModel(uid int64, tagCreateReq *models.T
 	return &models.TransactionTag{
 		Uid:          uid,
 		Name:         tagCreateReq.Name,
+		TagGroupId:   tagCreateReq.GroupId,
 		DisplayOrder: order,
 	}
 }
@@ -278,6 +303,7 @@ func (a *TransactionTagsApi) createNewTagModels(uid int64, tagCreateBatchReq *mo
 	for i := 0; i < len(tagCreateBatchReq.Tags); i++ {
 		tagCreateReq := tagCreateBatchReq.Tags[i]
 		tag := a.createNewTagModel(uid, tagCreateReq, order+int32(i))
+		tag.TagGroupId = tagCreateBatchReq.GroupId
 		tags[i] = tag
 	}
 

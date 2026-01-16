@@ -3,10 +3,11 @@ package models
 // TransactionTag represents transaction tag data stored in database
 type TransactionTag struct {
 	TagId           int64  `xorm:"PK"`
-	Uid             int64  `xorm:"INDEX(IDX_tag_uid_deleted_order) NOT NULL"`
-	Deleted         bool   `xorm:"INDEX(IDX_tag_uid_deleted_order) NOT NULL"`
+	Uid             int64  `xorm:"INDEX(IDX_tag_uid_deleted_group_order) NOT NULL"`
+	Deleted         bool   `xorm:"INDEX(IDX_tag_uid_deleted_group_order) NOT NULL"`
+	TagGroupId      int64  `xorm:"INDEX(IDX_tag_uid_deleted_group_order) NOT NULL"`
 	Name            string `xorm:"VARCHAR(64) NOT NULL"`
-	DisplayOrder    int32  `xorm:"INDEX(IDX_tag_uid_deleted_order) NOT NULL"`
+	DisplayOrder    int32  `xorm:"INDEX(IDX_tag_uid_deleted_group_order) NOT NULL"`
 	Hidden          bool   `xorm:"NOT NULL"`
 	CreatedUnixTime int64
 	UpdatedUnixTime int64
@@ -20,19 +21,22 @@ type TransactionTagGetRequest struct {
 
 // TransactionTagCreateRequest represents all parameters of transaction tag creation request
 type TransactionTagCreateRequest struct {
-	Name string `json:"name" binding:"required,notBlank,max=64"`
+	GroupId int64  `json:"groupId,string"`
+	Name    string `json:"name" binding:"required,notBlank,max=64"`
 }
 
 // TransactionTagCreateBatchRequest represents all parameters of transaction tag batch creation request
 type TransactionTagCreateBatchRequest struct {
 	Tags       []*TransactionTagCreateRequest `json:"tags" binding:"required"`
+	GroupId    int64                          `json:"groupId,string"`
 	SkipExists bool                           `json:"skipExists"`
 }
 
 // TransactionTagModifyRequest represents all parameters of transaction tag modification request
 type TransactionTagModifyRequest struct {
-	Id   int64  `json:"id,string" binding:"required,min=1"`
-	Name string `json:"name" binding:"required,notBlank,max=64"`
+	Id      int64  `json:"id,string" binding:"required,min=1"`
+	GroupId int64  `json:"groupId,string"`
+	Name    string `json:"name" binding:"required,notBlank,max=64"`
 }
 
 // TransactionTagHideRequest represents all parameters of transaction tag hiding request
@@ -61,6 +65,7 @@ type TransactionTagDeleteRequest struct {
 type TransactionTagInfoResponse struct {
 	Id           int64  `json:"id,string"`
 	Name         string `json:"name"`
+	TagGroupId   int64  `json:"groupId,string"`
 	DisplayOrder int32  `json:"displayOrder"`
 	Hidden       bool   `json:"hidden"`
 }
@@ -71,6 +76,7 @@ func (t *TransactionTag) FillFromOtherTag(tag *TransactionTag) {
 	t.Uid = tag.Uid
 	t.Deleted = tag.Deleted
 	t.Name = tag.Name
+	t.TagGroupId = tag.TagGroupId
 	t.DisplayOrder = tag.DisplayOrder
 	t.Hidden = tag.Hidden
 	t.CreatedUnixTime = tag.CreatedUnixTime
@@ -83,6 +89,7 @@ func (t *TransactionTag) ToTransactionTagInfoResponse() *TransactionTagInfoRespo
 	return &TransactionTagInfoResponse{
 		Id:           t.TagId,
 		Name:         t.Name,
+		TagGroupId:   t.TagGroupId,
 		DisplayOrder: t.DisplayOrder,
 		Hidden:       t.Hidden,
 	}
@@ -103,5 +110,9 @@ func (s TransactionTagInfoResponseSlice) Swap(i, j int) {
 
 // Less reports whether the first item is less than the second one
 func (s TransactionTagInfoResponseSlice) Less(i, j int) bool {
+	if s[i].TagGroupId != s[j].TagGroupId {
+		return s[i].TagGroupId < s[j].TagGroupId
+	}
+
 	return s[i].DisplayOrder < s[j].DisplayOrder
 }

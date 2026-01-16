@@ -49,53 +49,46 @@
             <f7-list-item :title="tt('No available tag')"></f7-list-item>
         </f7-list>
 
-        <f7-block class="combination-list-wrapper margin-vertical" key="default" v-show="!loading && hasAnyVisibleTag">
-            <f7-list class="margin-top-half margin-bottom" strong inset dividers v-if="includeTagsCount > 1">
-                <f7-list-item radio
-                              :title="tt(filterType.name)"
-                              :key="filterType.type"
-                              :value="filterType.type"
-                              :checked="includeTagFilterType === filterType.type"
-                              v-for="filterType in [TransactionTagFilterType.HasAny, TransactionTagFilterType.HasAll]"
-                              @change="includeTagFilterType = filterType.type">
-                </f7-list-item>
-            </f7-list>
-
-            <f7-list class="margin-top-half margin-bottom" strong inset dividers v-if="excludeTagsCount > 1">
-                <f7-list-item radio
-                              :title="tt(filterType.name)"
-                              :key="filterType.type"
-                              :value="filterType.type"
-                              :checked="excludeTagFilterType === filterType.type"
-                              v-for="filterType in [TransactionTagFilterType.NotHasAny, TransactionTagFilterType.NotHasAll]"
-                              @change="excludeTagFilterType = filterType.type">
-                </f7-list-item>
-            </f7-list>
-
-            <f7-accordion-item :opened="collapseStates['default']!.opened"
-                               @accordion:open="collapseStates['default']!.opened = true"
-                               @accordion:close="collapseStates['default']!.opened = false">
+        <f7-block class="combination-list-wrapper margin-vertical"
+                  :key="tagGroup.id" v-for="tagGroup in allTagGroupsWithDefault"
+                  v-show="!loading && hasAnyVisibleTag">
+            <f7-accordion-item :opened="collapseStates[tagGroup.id]?.opened ?? true"
+                               @accordion:open="collapseStates[tagGroup.id]!.opened = true"
+                               @accordion:close="collapseStates[tagGroup.id]!.opened = false"
+                               v-if="allVisibleTags[tagGroup.id] && allVisibleTags[tagGroup.id]!.length > 0">
                 <f7-block-title>
                     <f7-accordion-toggle>
                         <f7-list strong inset dividers
                                  class="combination-list-header"
-                                 :class="collapseStates['default']!.opened ? 'combination-list-opened' : 'combination-list-closed'">
+                                 :class="collapseStates[tagGroup.id]?.opened ? 'combination-list-opened' : 'combination-list-closed'">
                             <f7-list-item group-title>
-                                <small>{{ tt('Tags') }}</small>
-                                <f7-icon class="combination-list-chevron-icon" :f7="collapseStates['default']!.opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
+                                <small class="tag-group-title">{{ tagGroup.name }}</small>
+                                <f7-icon class="combination-list-chevron-icon" :f7="collapseStates[tagGroup.id]?.opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
                             </f7-list-item>
                         </f7-list>
                     </f7-accordion-toggle>
                 </f7-block-title>
-                <f7-accordion-content :style="{ height: collapseStates['default']!.opened ? 'auto' : '' }">
+                <f7-accordion-content :style="{ height: collapseStates[tagGroup.id]?.opened ? 'auto' : '' }">
                     <f7-list strong inset dividers accordion-list class="combination-list-content">
+                        <f7-list-item link="#"
+                                      popover-open=".tag-filter-include-type-popover-menu"
+                                      :title="tt(TransactionTagFilterType.parse(groupTagFilterTypesMap[tagGroup.id]?.includeType as number)?.name as string)"
+                                      @click="currentTransactionTagGroupId = tagGroup.id"
+                                      v-if="groupTagFilterTypesMap[tagGroup.id] && groupTagFilterStateCountMap[tagGroup.id] && groupTagFilterStateCountMap[tagGroup.id]![TransactionTagFilterState.Include] && groupTagFilterStateCountMap[tagGroup.id]![TransactionTagFilterState.Include] > 1 && TransactionTagFilterType.parse(groupTagFilterTypesMap[tagGroup.id]?.includeType as number)">
+                        </f7-list-item>
+                        <f7-list-item link="#"
+                                      popover-open=".tag-filter-exclude-type-popover-menu"
+                                      :title="tt(TransactionTagFilterType.parse(groupTagFilterTypesMap[tagGroup.id]?.excludeType as number)?.name as string)"
+                                      @click="currentTransactionTagGroupId = tagGroup.id"
+                                      v-if="groupTagFilterTypesMap[tagGroup.id] && groupTagFilterStateCountMap[tagGroup.id] && groupTagFilterStateCountMap[tagGroup.id]![TransactionTagFilterState.Exclude] && groupTagFilterStateCountMap[tagGroup.id]![TransactionTagFilterState.Exclude] > 1 && TransactionTagFilterType.parse(groupTagFilterTypesMap[tagGroup.id]?.excludeType as number)">
+                        </f7-list-item>
                         <f7-list-item link="#"
                                       popover-open=".tag-filter-state-popover-menu"
                                       :title="transactionTag.name"
                                       :value="transactionTag.id"
                                       :key="transactionTag.id"
-                                      :after="tt(filterTagIds[transactionTag.id] === TransactionTagFilterState.Include ? 'Included' : filterTagIds[transactionTag.id] === TransactionTagFilterState.Exclude ? 'Excluded' : 'Default')"
-                                      v-for="transactionTag in allVisibleTags"
+                                      :after="tt(tagFilterStateMap[transactionTag.id] === TransactionTagFilterState.Include ? 'Included' : tagFilterStateMap[transactionTag.id] === TransactionTagFilterState.Exclude ? 'Excluded' : 'Default')"
+                                      v-for="transactionTag in allVisibleTags[tagGroup.id]"
                                       v-show="showHidden || !transactionTag.hidden"
                                       @click="currentTransactionTagId = transactionTag.id">
                             <template #media>
@@ -111,11 +104,41 @@
             </f7-accordion-item>
         </f7-block>
 
+        <f7-popover class="tag-filter-include-type-popover-menu">
+            <f7-list dividers>
+                <f7-list-item link="#" no-chevron popover-close
+                              :title="tt(filterType.name)"
+                              :class="{ 'list-item-selected': groupTagFilterTypesMap[currentTransactionTagGroupId]?.includeType === filterType.type }"
+                              :key="filterType.type"
+                              v-for="filterType in [TransactionTagFilterType.HasAny, TransactionTagFilterType.HasAll]"
+                              @click="updateTransactionTagGroupIncludeType(filterType)">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="groupTagFilterTypesMap[currentTransactionTagGroupId]?.includeType === filterType.type"></f7-icon>
+                    </template>
+                </f7-list-item>
+            </f7-list>
+        </f7-popover>
+
+        <f7-popover class="tag-filter-exclude-type-popover-menu">
+            <f7-list dividers>
+                <f7-list-item link="#" no-chevron popover-close
+                              :title="tt(filterType.name)"
+                              :class="{ 'list-item-selected': groupTagFilterTypesMap[currentTransactionTagGroupId]?.excludeType === filterType.type }"
+                              :key="filterType.type"
+                              v-for="filterType in [TransactionTagFilterType.NotHasAny, TransactionTagFilterType.NotHasAll]"
+                              @click="updateTransactionTagGroupExcludeType(filterType)">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="groupTagFilterTypesMap[currentTransactionTagGroupId]?.excludeType === filterType.type"></f7-icon>
+                    </template>
+                </f7-list-item>
+            </f7-list>
+        </f7-popover>
+
         <f7-popover class="tag-filter-state-popover-menu">
             <f7-list dividers>
                 <f7-list-item link="#" no-chevron popover-close
                               :title="state.displayName"
-                              :class="{ 'list-item-selected': filterTagIds[currentTransactionTagId] === state.type }"
+                              :class="{ 'list-item-selected': tagFilterStateMap[currentTransactionTagId] === state.type }"
                               :key="state.type"
                               v-for="state in [
                                   { type: TransactionTagFilterState.Include, displayName: tt('Included') },
@@ -124,7 +147,7 @@
                               ]"
                               @click="updateCurrentTransactionTagState(state.type)">
                     <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="filterTagIds[currentTransactionTagId] === state.type"></f7-icon>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="tagFilterStateMap[currentTransactionTagId] === state.type"></f7-icon>
                     </template>
                 </f7-list-item>
             </f7-list>
@@ -160,6 +183,7 @@ import {
 
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
+import { values } from '@/core/base.ts';
 import { TransactionTagFilterType } from '@/core/transaction.ts';
 
 interface CollapseState {
@@ -180,13 +204,13 @@ const {
     loading,
     showHidden,
     filterContent,
-    filterTagIds,
-    includeTagFilterType,
-    excludeTagFilterType,
-    includeTagsCount,
-    excludeTagsCount,
+    tagFilterStateMap,
+    groupTagFilterTypesMap,
     title,
+    groupTagFilterStateCountMap,
+    allTagGroupsWithDefault,
     allVisibleTags,
+    allVisibleTagGroupIds,
     hasAnyAvailableTag,
     hasAnyVisibleTag,
     loadFilterTagIds,
@@ -196,20 +220,30 @@ const {
 const transactionTagsStore = useTransactionTagsStore();
 
 const loadingError = ref<unknown | null>(null);
+const currentTransactionTagGroupId = ref<string>('');
 const currentTransactionTagId = ref<string>('');
 const showMoreActionSheet = ref<boolean>(false);
 
-const collapseStates = ref<Record<string, CollapseState>>({
-    default: {
-        opened: true
+const collapseStates = ref<Record<string, CollapseState>>(getInitCollapseState(allVisibleTagGroupIds.value));
+
+function getInitCollapseState(tagGroupIds: string[]): Record<string, CollapseState> {
+    const states: Record<string, CollapseState> = {};
+
+    for (const tagGroupId of tagGroupIds) {
+        states[tagGroupId] = {
+            opened: true
+        };
     }
-});
+
+    return states;
+}
 
 function init(): void {
     transactionTagsStore.loadAllTags({
         force: false
     }).then(() => {
         loading.value = false;
+        collapseStates.value = getInitCollapseState(allVisibleTagGroupIds.value);
 
         if (!loadFilterTagIds()) {
             showToast('Parameter Invalid');
@@ -225,14 +259,36 @@ function init(): void {
     });
 }
 
+function updateTransactionTagGroupIncludeType(filterType: TransactionTagFilterType): void {
+    const tagFilterTypes = groupTagFilterTypesMap.value[currentTransactionTagGroupId.value];
+
+    if (!tagFilterTypes) {
+        return;
+    }
+
+    tagFilterTypes.includeType = filterType.type;
+}
+
+function updateTransactionTagGroupExcludeType(filterType: TransactionTagFilterType): void {
+    const tagFilterTypes = groupTagFilterTypesMap.value[currentTransactionTagGroupId.value];
+
+    if (!tagFilterTypes) {
+        return;
+    }
+
+    tagFilterTypes.excludeType = filterType.type;
+}
+
 function updateCurrentTransactionTagState(state: number): void {
-    filterTagIds.value[currentTransactionTagId.value] = state;
+    tagFilterStateMap.value[currentTransactionTagId.value] = state;
     currentTransactionTagId.value = '';
 }
 
 function setAllTagsState(value: TransactionTagFilterState): void {
-    for (const tag of allVisibleTags.value) {
-        filterTagIds.value[tag.id] = value;
+    for (const tags of values(allVisibleTags.value)) {
+        for (const tag of tags) {
+            tagFilterStateMap.value[tag.id] = value;
+        }
     }
 }
 
@@ -251,3 +307,10 @@ function onPageAfterIn(): void {
 
 init();
 </script>
+
+<style>
+.tag-group-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>

@@ -171,22 +171,24 @@
                                  @error="onShowDateRangeError" />
 
     <explorer-list-dialog ref="explorerListDialog" />
-    <explorer-rename-dialog ref="explorerRenameDialog" />
     <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
     <export-dialog ref="exportDialog" />
 
+    <rename-dialog ref="renameDialog"
+                   :default-title="tt('Rename Explorer')"
+                   :label="tt('Explorer Name')" :placeholder="tt('Explorer Name')" />
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
+import RenameDialog from '@/components/desktop/RenameDialog.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import ExplorerQueryTab from '@/views/desktop/insights/tabs/ExplorerQueryTab.vue';
 import ExplorerDataTableTab from '@/views/desktop/insights/tabs/ExplorerDataTableTab.vue';
 import ExplorerChartTab from '@/views/desktop/insights/tabs/ExplorerChartTab.vue';
 import ExplorerListDialog from '@/views/desktop/insights/dialogs/ExplorerListDialog.vue';
-import ExplorerRenameDialog from '@/views/desktop/insights/dialogs/ExplorerRenameDialog.vue';
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
 import ExportDialog from '@/views/desktop/statistics/transaction/dialogs/ExportDialog.vue';
 
@@ -251,12 +253,12 @@ const props = defineProps<InsightsExplorerProps>();
 
 type ExplorerPageTabType = 'query' | 'table' | 'chart';
 
+type RenameDialogType = InstanceType<typeof RenameDialog>;
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type ExplorerDataTableTabType = InstanceType<typeof ExplorerDataTableTab>;
 type ExplorerChartTabType = InstanceType<typeof ExplorerChartTab>;
 type ExplorerListDialogType = InstanceType<typeof ExplorerListDialog>;
-type ExplorerRenameDialogType = InstanceType<typeof ExplorerRenameDialog>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 type ExportDialogType = InstanceType<typeof ExportDialog>;
 
@@ -282,12 +284,12 @@ const timezoneTypeIconMap = {
     [TimezoneTypeForStatistics.TransactionTimezone.type]: mdiInvoiceTextClockOutline
 };
 
+const renameDialog = useTemplateRef<RenameDialogType>('renameDialog');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const explorerDataTableTab = useTemplateRef<ExplorerDataTableTabType>('explorerDataTableTab');
 const explorerChartTab = useTemplateRef<ExplorerChartTabType>('explorerChartTab');
 const explorerListDialog = useTemplateRef<ExplorerListDialogType>('explorerListDialog');
-const explorerRenameDialog = useTemplateRef<ExplorerRenameDialogType>('explorerRenameDialog');
 const exportDialog = useTemplateRef<ExportDialogType>('exportDialog');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
@@ -515,7 +517,7 @@ function showChangeExplorerDisplayOrderDialog(): void {
 
 function saveExplorer(saveAs?: boolean): void {
     if (saveAs || !currentExplorer.value.name) {
-        explorerRenameDialog.value?.open(currentExplorer.value.name || '', tt('Set Explorer Name')).then((newName: string) => {
+        renameDialog.value?.open(currentExplorer.value.name || '', tt('Set Explorer Name')).then((newName: string) => {
             currentExplorer.value.name = newName;
             doSaveExplorer(saveAs);
         })
@@ -571,7 +573,7 @@ function restoreExplorer(): void {
 }
 
 function setExplorerName(): void {
-    explorerRenameDialog.value?.open(currentExplorer.value.name || '').then((newName: string) => {
+    renameDialog.value?.open(currentExplorer.value.name || '').then((newName: string) => {
         currentExplorer.value.name = newName;
     });
 }

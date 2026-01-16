@@ -101,6 +101,13 @@ import type {
     TransactionPictureInfoBasicResponse
 } from '@/models/transaction_picture_info.ts';
 import type {
+    TransactionTagGroupCreateRequest,
+    TransactionTagGroupModifyRequest,
+    TransactionTagGroupMoveRequest,
+    TransactionTagGroupDeleteRequest,
+    TransactionTagGroupInfoResponse
+} from '@/models/transaction_tag_group.ts';
+import type {
     TransactionTagCreateRequest,
     TransactionTagCreateBatchRequest,
     TransactionTagModifyRequest,
@@ -704,6 +711,24 @@ export default {
     },
     deleteTransactionCategory: (req: TransactionCategoryDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transaction/categories/delete.json', req);
+    },
+    getAllTransactionTagGroups: (): ApiResponsePromise<TransactionTagGroupInfoResponse[]> => {
+        return axios.get<ApiResponse<TransactionTagInfoResponse[]>>('v1/transaction/tags/groups/list.json');
+    },
+    getTransactionTagGroup: ({ id }: { id: string }): ApiResponsePromise<TransactionTagGroupInfoResponse> => {
+        return axios.get<ApiResponse<TransactionTagInfoResponse>>('v1/transaction/tags/groups/get.json?id=' + id);
+    },
+    addTransactionTagGroup: (req: TransactionTagGroupCreateRequest): ApiResponsePromise<TransactionTagGroupInfoResponse> => {
+        return axios.post<ApiResponse<TransactionTagInfoResponse>>('v1/transaction/tags/groups/add.json', req);
+    },
+    modifyTransactionTagGroup: (req: TransactionTagGroupModifyRequest): ApiResponsePromise<TransactionTagGroupInfoResponse> => {
+        return axios.post<ApiResponse<TransactionTagInfoResponse>>('v1/transaction/tags/groups/modify.json', req);
+    },
+    moveTransactionTagGroup: (req: TransactionTagGroupMoveRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/transaction/tags/groups/move.json', req);
+    },
+    deleteTransactionTagGroup: (req: TransactionTagGroupDeleteRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/transaction/tags/groups/delete.json', req);
     },
     getAllTransactionTags: (): ApiResponsePromise<TransactionTagInfoResponse[]> => {
         return axios.get<ApiResponse<TransactionTagInfoResponse[]>>('v1/transaction/tags/list.json');

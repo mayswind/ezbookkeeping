@@ -15,9 +15,11 @@ import { type TextualYearMonthDay, type Year0BasedMonth, type LocalizedDateRange
 import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
+import { DEFAULT_TAG_GROUP_ID } from '@/consts/tag.ts';
 
 import type { Account } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
+import { TransactionTagGroup } from '@/models/transaction_tag_group.ts';
 import type { TransactionTag } from '@/models/transaction_tag.ts';
 import { type Transaction, TransactionTagFilter } from '@/models/transaction.ts';
 
@@ -136,8 +138,16 @@ export function useTransactionListPageBase() {
         }
 
         return totalCount;
-
     });
+    const allTransactionTagGroupsWithDefault = computed<TransactionTagGroup[]>(() => {
+        const allGroups: TransactionTagGroup[] = [];
+        const defaultGroup = TransactionTagGroup.createNewTagGroup(tt('Default Group'));
+        defaultGroup.id = DEFAULT_TAG_GROUP_ID;
+        allGroups.push(defaultGroup);
+        allGroups.push(...transactionTagsStore.allTransactionTagGroups);
+        return allGroups;
+    });
+    const allTransactionTagsByGroup = computed<Record<string, TransactionTag[]>>(() => transactionTagsStore.allTransactionTagsByGroupMap);
     const allTransactionTags = computed<Record<string, TransactionTag>>(() => transactionTagsStore.allTransactionTagsMap);
     const allAvailableTagsCount = computed<number>(() => transactionTagsStore.allAvailableTagsCount);
 
@@ -282,6 +292,22 @@ export function useTransactionListPageBase() {
         return false;
     }
 
+    function hasVisibleTagsInTagGroup(tagGroup: TransactionTagGroup): boolean {
+        const tagsInGroup = allTransactionTagsByGroup.value[tagGroup.id];
+
+        if (!tagsInGroup || !tagsInGroup.length) {
+            return false;
+        }
+
+        for (const tag of tagsInGroup) {
+            if (!tag.hidden || queryAllFilterTagIds.value[tag.id]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     function isSameAsDefaultTimezoneOffsetMinutes(transaction: Transaction): boolean {
         return transaction.utcOffset === getTimezoneOffsetMinutes(transaction.time);
     }
@@ -391,6 +417,8 @@ export function useTransactionListPageBase() {
         allCategories,
         allPrimaryCategories,
         allAvailableCategoriesCount,
+        allTransactionTagGroupsWithDefault,
+        allTransactionTagsByGroup,
         allTransactionTags,
         allAvailableTagsCount,
         displayPageTypeName,
@@ -416,6 +444,7 @@ export function useTransactionListPageBase() {
         canAddTransaction,
         // functions
         hasSubCategoryInQuery,
+        hasVisibleTagsInTagGroup,
         isSameAsDefaultTimezoneOffsetMinutes,
         getDisplayTime,
         getDisplayLongDate,

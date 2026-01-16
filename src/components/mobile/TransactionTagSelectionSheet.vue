@@ -8,43 +8,55 @@
                 <f7-link sheet-close icon-f7="xmark"></f7-link>
             </div>
             <f7-searchbar ref="searchbar" custom-searchs
-                          :value="filterContent"
+                          :value="tagSearchContent"
                           :placeholder="tt('Find tag')"
                           :disable-button="false"
                           v-if="enableFilter"
-                          @input="filterContent = $event.target.value"
+                          @input="tagSearchContent = $event.target.value"
                           @focus="onSearchBarFocus">
             </f7-searchbar>
             <div class="right">
                 <f7-button round fill icon-f7="checkmark_alt" @click="save"
-                           v-if="allTags && allTags.length && !noAvailableTag"></f7-button>
+                           v-if="filteredTagsWithGroupHeader && filteredTagsWithGroupHeader.length > 0"></f7-button>
                 <f7-link icon-f7="plus" :class="{'disabled': newTag}" @click="addNewTag"
-                         v-if="!allTags || !allTags.length || noAvailableTag"></f7-link>
+                         v-if="!filteredTagsWithGroupHeader || filteredTagsWithGroupHeader.length < 1"></f7-link>
             </div>
         </f7-toolbar>
         <f7-page-content :class="'margin-top ' + heightClass">
-            <f7-list class="no-margin-top no-margin-bottom" v-if="(!allTags || !allTags.length || noAvailableTag) && !newTag">
+            <f7-list class="no-margin-top no-margin-bottom" v-if="(!filteredTagsWithGroupHeader || filteredTagsWithGroupHeader.length < 1) && !newTag">
                 <f7-list-item :title="tt('No available tag')"></f7-list-item>
             </f7-list>
-            <f7-list dividers class="no-margin-top no-margin-bottom tag-selection-list" v-else-if="(allTags && allTags.length && !noAvailableTag) || newTag">
-                <f7-list-item checkbox
-                              :class="isChecked(tag.id) ? 'list-item-selected' : ''"
-                              :value="tag.id"
-                              :checked="isChecked(tag.id)"
-                              :key="tag.id"
-                              v-for="tag in allTags"
-                              @change="changeTagSelection">
-                    <template #title>
-                        <f7-block class="no-padding no-margin">
+            <f7-list dividers class="no-margin-top no-margin-bottom tag-selection-list" v-else-if="(filteredTagsWithGroupHeader && filteredTagsWithGroupHeader.length > 0) || newTag">
+                <template :key="(tag instanceof TransactionTag) ? tag.id : `${tag.type}-${index}-${tag.title}`"
+                          v-for="(tag, index) in filteredTagsWithGroupHeader">
+                    <f7-list-item group-title v-if="!(tag instanceof TransactionTag)">
+                        <div class="tag-selection-list-item">
+                            {{ tag.title }}
+                        </div>
+                    </f7-list-item>
+                    <f7-list-item checkbox
+                                  :class="{ 'list-item-selected': selectedTagIds[tag.id], 'disabled': tag.hidden && !selectedTagIds[tag.id] }"
+                                  :value="tag.id"
+                                  :checked="selectedTagIds[tag.id]"
+                                  :key="tag.id"
+                                  v-else-if="tag instanceof TransactionTag"
+                                  @change="changeTagSelection">
+                        <template #media>
+                            <f7-icon class="transaction-tag-icon" f7="number">
+                                <f7-badge color="gray" class="right-bottom-icon" v-if="tag.hidden">
+                                    <f7-icon f7="eye_slash_fill"></f7-icon>
+                                </f7-badge>
+                            </f7-icon>
+                        </template>
+                        <template #title>
                             <div class="display-flex">
-                                <f7-icon class="transaction-tag-icon" f7="number"></f7-icon>
                                 <div class="tag-selection-list-item list-item-valign-middle padding-inline-start-half">
                                     {{ tag.name }}
                                 </div>
                             </div>
-                        </f7-block>
-                    </template>
-                </f7-list-item>
+                        </template>
+                    </f7-list-item>
+                </template>
                 <f7-list-item link="#" no-chevron
                               :title="tt('Add new tag')"
                               v-if="allowAddNewTag && !newTag"
@@ -85,11 +97,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 import type { Sheet, Searchbar } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
+import { type CommonTransactionTagSelectionProps, useTransactionTagSelectionBase } from '@/components/base/TransactionTagSelectionBase.ts';
 
 import { TransactionTag } from '@/models/transaction_tag.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
@@ -97,12 +110,12 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { scrollToSelectedItem } from '@/lib/ui/common.ts';
 import { type Framework7Dom, scrollSheetToTop } from '@/lib/ui/mobile.ts';
 
-const props = defineProps<{
-    modelValue: string[];
-    allowAddNewTag?: boolean;
+interface MobileransactionTagSelectionProps extends CommonTransactionTagSelectionProps {
     enableFilter?: boolean;
     show: boolean;
-}>();
+}
+
+const props = defineProps<MobileransactionTagSelectionProps>();
 
 const emit = defineEmits<{
     (e: 'update:modelValue', value: string[]): void;
@@ -112,81 +125,49 @@ const emit = defineEmits<{
 const { tt } = useI18n();
 const { showToast } = useI18nUIComponents();
 
+const {
+    clonedModelValue,
+    tagSearchContent,
+    selectedTagIds,
+    filteredTagsWithGroupHeader
+} = useTransactionTagSelectionBase(props, true);
+
 const transactionTagsStore = useTransactionTagsStore();
 
 const sheet = useTemplateRef<Sheet.Sheet>('sheet');
 const searchbar = useTemplateRef<Searchbar.Searchbar>('searchbar');
 
-const filterContent = ref<string>('');
-const selectedItemIds = ref<string[]>(Array.from(props.modelValue));
 const newTag = ref<TransactionTag | null>(null);
 const heightClass = ref<string>(getHeightClass());
 
-const allTags = computed<TransactionTag[]>(() => {
-    const finalTags: TransactionTag[] = [];
-
-    for (const tag of transactionTagsStore.allTransactionTags) {
-        if (tag.hidden && !isChecked(tag.id)) {
-            continue;
-        }
-
-        if (!props.enableFilter || !filterContent.value) {
-            finalTags.push(tag);
-            continue;
-        }
-
-        if (tag.name.toLowerCase().indexOf(filterContent.value.toLowerCase()) >= 0) {
-            finalTags.push(tag);
-        }
-    }
-
-    return finalTags;
-});
-
-const noAvailableTag = computed<boolean>(() => {
-    if (transactionTagsStore.allTransactionTags) {
-        for (const transactionTag of transactionTagsStore.allTransactionTags) {
-            if (!transactionTag.hidden) {
-                return false;
-            }
-        }
-    }
-
-    return true;
-});
-
 function getHeightClass(): string {
-    if (transactionTagsStore.allTransactionTags && transactionTagsStore.allVisibleTagsCount > 6) {
+    if (filteredTagsWithGroupHeader.value.length > 6) {
         return 'tag-selection-huge-sheet';
-    } else if (transactionTagsStore.allTransactionTags && transactionTagsStore.allVisibleTagsCount > 3) {
+    } else if (filteredTagsWithGroupHeader.value.length > 3) {
         return 'tag-selection-large-sheet';
     } else {
         return 'tag-selection-default-sheet';
     }
 }
 
-function isChecked(itemId: string): boolean {
-    return selectedItemIds.value.indexOf(itemId) >= 0;
-}
-
 function changeTagSelection(e: Event): void {
     const target = e.target as HTMLInputElement;
     const tagId = target.value;
-    const index = selectedItemIds.value.indexOf(tagId);
+    const index = clonedModelValue.value.indexOf(tagId);
 
     if (target.checked) {
         if (index < 0) {
-            selectedItemIds.value.push(tagId);
+            clonedModelValue.value.push(tagId);
         }
     } else {
         if (index >= 0) {
-            selectedItemIds.value.splice(index, 1);
+            clonedModelValue.value.splice(index, 1);
         }
     }
 }
 
 function save(): void {
-    emit('update:modelValue', selectedItemIds.value);
+    emit('update:modelValue', clonedModelValue.value);
     emit('update:show', false);
 }
 
@@ -208,7 +189,7 @@ function saveNewTag(): void {
         newTag.value = null;
 
         if (tag && tag.id) {
-            selectedItemIds.value.push(tag.id);
+            clonedModelValue.value.push(tag.id);
         }
     }).catch(error => {
         hideLoading();
@@ -228,14 +209,14 @@ function onSearchBarFocus(): void {
 }
 
 function onSheetOpen(event: { $el: Framework7Dom }): void {
-    selectedItemIds.value = Array.from(props.modelValue);
+    clonedModelValue.value = Array.from(props.modelValue);
     newTag.value = null;
     scrollToSelectedItem(event.$el[0], '.sheet-modal-inner', '.page-content', 'li.list-item-selected');
 }
 
 function onSheetClosed(): void {
     emit('update:show', false);
-    filterContent.value = '';
+    tagSearchContent.value = '';
     searchbar.value?.clear();
 }
 </script>
@@ -260,6 +241,12 @@ function onSheetClosed(): void {
     .tag-selection-huge-sheet {
         height: 320px;
     }
+}
+
+.tag-selection-list.list.list-dividers li.list-group-title:first-child,
+.tag-selection-list.list.list-dividers li.list-group-title.actual-first-child {
+    margin-top: 10px;
+    border-radius: inherit;
 }
 
 .tag-selection-list.list .item-media + .item-inner {

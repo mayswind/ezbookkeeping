@@ -259,15 +259,17 @@
 
                                                         <template :key="categoryType"
                                                                   v-for="(categories, categoryType) in allPrimaryCategories">
+                                                            <v-divider />
+
                                                             <v-list-item density="compact" v-show="categories && categories.length">
                                                                 <v-list-item-title>
                                                                     <span class="text-sm">{{ getTransactionTypeName(categoryTypeToTransactionType(parseInt(categoryType)), 'Type') }}</span>
                                                                 </v-list-item-title>
                                                             </v-list-item>
 
-                                                            <v-list-group :key="category.id" v-for="category in categories">
+                                                            <v-list-group :key="category.id" v-for="(category, index) in categories">
                                                                 <template #activator="{ props }" v-if="!category.hidden || queryAllFilterCategoryIds[category.id] || allCategories[query.categoryIds]?.parentId === category.id || hasSubCategoryInQuery(category)">
-                                                                    <v-divider />
+                                                                    <v-divider v-if="index > 0" />
                                                                     <v-list-item class="text-sm" density="compact"
                                                                                  :class="getCategoryListItemCheckedClass(category, queryAllFilterCategoryIds)"
                                                                                  v-bind="props">
@@ -474,24 +476,33 @@
                                                             </v-list-item-title>
                                                         </v-list-item>
 
-                                                        <v-divider v-if="query.tagFilter && query.tagFilter !== TransactionTagFilter.TransactionNoTagFilterValue" />
+                                                        <template :key="transactionTagGroup.id"
+                                                                  v-for="transactionTagGroup in allTransactionTagGroupsWithDefault">
+                                                            <v-divider v-if="allTransactionTagsByGroup[transactionTagGroup.id] && allTransactionTagsByGroup[transactionTagGroup.id]?.length && hasVisibleTagsInTagGroup(transactionTagGroup)" />
 
-                                                        <template :key="transactionTag.id"
-                                                                  v-for="transactionTag in allTransactionTags">
-                                                            <v-divider v-if="!transactionTag.hidden || isDefined(queryAllFilterTagIds[transactionTag.id])" />
-                                                            <v-list-item class="text-sm" density="compact"
-                                                                         :value="transactionTag.id"
-                                                                         :class="{ 'list-item-selected': queryAllFilterTagIdsCount === 1 && isDefined(queryAllFilterTagIds[transactionTag.id]), 'item-in-multiple-selection': queryAllFilterTagIdsCount > 1 && isDefined(queryAllFilterTagIds[transactionTag.id]) }"
-                                                                         :append-icon="(queryAllFilterTagIds[transactionTag.id] === true ? mdiCheck : (queryAllFilterTagIds[transactionTag.id] === false ? mdiClose : undefined))"
-                                                                         v-if="!transactionTag.hidden || isDefined(queryAllFilterTagIds[transactionTag.id])">
-                                                                <v-list-item-title class="cursor-pointer"
-                                                                                   @click="changeTagFilter(TransactionTagFilter.of(transactionTag.id).toTextualTagFilter())">
-                                                                    <div class="d-flex align-center">
-                                                                        <v-icon size="24" :icon="mdiPound"/>
-                                                                        <span class="text-sm ms-3">{{ transactionTag.name }}</span>
-                                                                    </div>
+                                                            <v-list-item density="compact" v-if="allTransactionTagsByGroup[transactionTagGroup.id] && allTransactionTagsByGroup[transactionTagGroup.id]?.length && hasVisibleTagsInTagGroup(transactionTagGroup)">
+                                                                <v-list-item-title>
+                                                                    <span class="text-sm">{{ transactionTagGroup.name }}</span>
                                                                 </v-list-item-title>
                                                             </v-list-item>
+
+                                                            <template :key="transactionTag.id"
+                                                                      v-for="(transactionTag, index) in (allTransactionTagsByGroup[transactionTagGroup.id] ?? [])">
+                                                                <v-divider v-if="index > 0 && (!transactionTag.hidden || isDefined(queryAllFilterTagIds[transactionTag.id]))" />
+                                                                <v-list-item class="text-sm" density="compact"
+                                                                             :value="transactionTag.id"
+                                                                             :class="{ 'list-item-selected': queryAllFilterTagIdsCount === 1 && isDefined(queryAllFilterTagIds[transactionTag.id]), 'item-in-multiple-selection': queryAllFilterTagIdsCount > 1 && isDefined(queryAllFilterTagIds[transactionTag.id]) }"
+                                                                             :append-icon="(queryAllFilterTagIds[transactionTag.id] === true ? mdiCheck : (queryAllFilterTagIds[transactionTag.id] === false ? mdiClose : undefined))"
+                                                                             v-if="!transactionTag.hidden || isDefined(queryAllFilterTagIds[transactionTag.id])">
+                                                                    <v-list-item-title class="cursor-pointer"
+                                                                                       @click="changeTagFilter(TransactionTagFilter.of(transactionTag.id).toTextualTagFilter())">
+                                                                        <div class="d-flex align-center">
+                                                                            <v-icon size="24" :icon="mdiPound"/>
+                                                                            <span class="text-sm ms-3">{{ transactionTag.name }}</span>
+                                                                        </div>
+                                                                    </v-list-item-title>
+                                                                </v-list-item>
+                                                            </template>
                                                         </template>
                                                     </v-list>
                                                 </v-menu>
@@ -785,6 +796,8 @@ const {
     allCategories,
     allPrimaryCategories,
     allAvailableCategoriesCount,
+    allTransactionTagGroupsWithDefault,
+    allTransactionTagsByGroup,
     allTransactionTags,
     allAvailableTagsCount,
     query,
@@ -806,6 +819,7 @@ const {
     transactionCalendarMaxDate,
     currentMonthTransactionData,
     hasSubCategoryInQuery,
+    hasVisibleTagsInTagGroup,
     isSameAsDefaultTimezoneOffsetMinutes,
     canAddTransaction,
     getDisplayTime,

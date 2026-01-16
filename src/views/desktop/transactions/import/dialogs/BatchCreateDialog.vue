@@ -78,6 +78,7 @@ import { type NameValue, values } from '@/core/base.ts';
 import { CategoryType } from '@/core/category.ts';
 import { AUTOMATICALLY_CREATED_CATEGORY_ICON_ID } from '@/consts/icon.ts';
 import { DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
+import { DEFAULT_TAG_GROUP_ID } from '@/consts/tag.ts';
 
 import { type TransactionCategoryCreateRequest, type TransactionCategoryCreateWithSubCategories, TransactionCategory } from '@/models/transaction_category.ts';
 import { type TransactionTagCreateRequest, TransactionTag } from '@/models/transaction_tag.ts';
@@ -284,12 +285,13 @@ function confirm(): void {
         const submitTags: TransactionTagCreateRequest[] = [];
 
         for (const item of selectedNames.value) {
-            const tag: TransactionTag = TransactionTag.createNewTag(item);
+            const tag: TransactionTag = TransactionTag.createNewTag(item, DEFAULT_TAG_GROUP_ID);
             submitTags.push(tag.toCreateRequest());
         }
 
         transactionTagsStore.addTags({
             tags: submitTags,
+            groupId: DEFAULT_TAG_GROUP_ID,
             skipExists: true
         }).then(response => {
             transactionTagsStore.loadAllTags({ force: false }).then(() => {

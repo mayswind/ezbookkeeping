@@ -327,57 +327,14 @@
                                     </v-select>
                                 </v-col>
                                 <v-col cols="12" md="12">
-                                    <v-autocomplete
-                                        item-title="name"
-                                        item-value="id"
-                                        auto-select-first
-                                        persistent-placeholder
-                                        multiple
-                                        chips
-                                        :closable-chips="mode !== TransactionEditPageMode.View"
+                                    <transaction-tag-auto-complete
                                         :readonly="mode === TransactionEditPageMode.View"
                                         :disabled="loading || submitting"
-                                        :label="tt('Tags')"
-                                        :placeholder="tt('None')"
-                                        :items="allTags"
+                                        :show-label="true"
+                                        :allow-add-new-tag="true"
                                         v-model="transaction.tagIds"
-                                        v-model:search="tagSearchContent"
-                                    >
-                                        <template #chip="{ props, item }">
-                                            <v-chip :prepend-icon="mdiPound" :text="item.title" v-bind="props"/>
-                                        </template>
-
-                                        <template #item="{ props, item }">
-                                            <v-list-item :value="item.value" v-bind="props" v-if="!item.raw.hidden">
-                                                <template #title>
-                                                    <v-list-item-title>
-                                                        <div class="d-flex align-center">
-                                                            <v-icon size="20" start :icon="mdiPound"/>
-                                                            <span>{{ item.title }}</span>
-                                                        </div>
-                                                    </v-list-item-title>
-                                                </template>
-                                            </v-list-item>
-                                            <v-list-item :disabled="true" v-bind="props"
-                                                         v-if="item.raw.hidden && item.raw.name.toLowerCase().indexOf(tagSearchContent.toLowerCase()) >= 0 && isAllFilteredTagHidden">
-                                                <template #title>
-                                                    <v-list-item-title>
-                                                        <div class="d-flex align-center">
-                                                            <v-icon size="20" start :icon="mdiPound"/>
-                                                            <span>{{ item.title }}</span>
-                                                        </div>
-                                                    </v-list-item-title>
-                                                </template>
-                                            </v-list-item>
-                                        </template>
-
-                                        <template #no-data>
-                                            <v-list class="py-0">
-                                                <v-list-item v-if="tagSearchContent" @click="saveNewTag(tagSearchContent)">{{ tt('format.misc.addNewTag', { tag: tagSearchContent }) }}</v-list-item>
-                                                <v-list-item v-else-if="!tagSearchContent">{{ tt('No available tag') }}</v-list-item>
-                                            </v-list>
-                                        </template>
-                                    </v-autocomplete>
+                                        @tag:saving="onSavingTag"
+                                    />
                                 </v-col>
                                 <v-col cols="12" md="12">
                                     <v-textarea
@@ -535,7 +492,6 @@ import { TemplateType, ScheduledTemplateFrequencyType } from '@/core/template.ts
 import { KnownErrorCode } from '@/consts/api.ts';
 import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
 
-import { TransactionTag } from '@/models/transaction_tag.ts';
 import { TransactionTemplate } from '@/models/transaction_template.ts';
 import type { TransactionPictureInfoBasicResponse } from '@/models/transaction_picture_info.ts';
 import { Transaction } from '@/models/transaction.ts';
@@ -567,7 +523,6 @@ import {
     mdiSwapHorizontal,
     mdiMapMarkerOutline,
     mdiCheck,
-    mdiPound,
     mdiMenuDown,
     mdiImagePlusOutline,
     mdiTrashCanOutline,
@@ -621,7 +576,6 @@ const {
     allVisibleCategorizedAccounts,
     allCategories,
     allCategoriesMap,
-    allTags,
     allTagsMap,
     firstVisibleAccountId,
     hasVisibleExpenseCategories,
@@ -669,7 +623,6 @@ const activeTab = ref<string>('basicInfo');
 const originalTransactionEditable = ref<boolean>(false);
 const noTransactionDraft = ref<boolean>(false);
 const geoMenuState = ref<boolean>(false);
-const tagSearchContent = ref<string>('');
 const removingPictureId = ref<string>('');
 
 const initAmount = ref<number | undefined>(undefined);
@@ -692,22 +645,7 @@ const sourceAmountColor = computed<string | undefined>(() => {
     return undefined;
 });
 
-const isAllFilteredTagHidden = computed<boolean>(() => {
-    const lowerCaseTagSearchContent = tagSearchContent.value.toLowerCase();
-    let hiddenCount = 0;
 
-    for (const tag of allTags.value) {
-        if (!lowerCaseTagSearchContent || tag.name.toLowerCase().indexOf(lowerCaseTagSearchContent) >= 0) {
-            if (!tag.hidden) {
-                return false;
-            }
-
-            hiddenCount++;
-        }
-    }
-
-    return hiddenCount > 0;
-});
 
 const isTransactionModified = computed<boolean>(() => {
     if (mode.value === TransactionEditPageMode.Add) {
@@ -1141,26 +1079,6 @@ function clearGeoLocation(): void {
     transaction.value.removeGeoLocation();
 }
 
-function saveNewTag(tagName: string): void {
-    submitting.value = true;
-
-    transactionTagsStore.saveTag({
-        tag: TransactionTag.createNewTag(tagName)
-    }).then(tag => {
-        submitting.value = false;
-
-        if (tag && tag.id) {
-            transaction.value.tagIds.push(tag.id);
-        }
-    }).catch(error => {
-        submitting.value = false;
-
-        if (!error.processed) {
-            snackbar.value?.showError(error);
-        }
-    });
-}
-
 function showOpenPictureDialog(): void {
     if (!canAddTransactionPicture.value || submitting.value) {
         return;
@@ -1229,6 +1147,10 @@ function viewOrRemovePicture(pictureInfo: TransactionPictureInfoBasicResponse): 
             submitting.value = false;
         });
     });
+}
+
+function onSavingTag(state: boolean): void {
+    submitting.value = state;
 }
 
 function onShowDateTimeError(error: string): void {

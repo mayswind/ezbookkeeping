@@ -84,6 +84,7 @@
             id-field="id"
             name-field="name"
             value-field="value"
+            color-field="color"
             v-if="loading"
         />
         <pie-chart

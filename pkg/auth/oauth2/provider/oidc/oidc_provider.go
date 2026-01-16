@@ -19,6 +19,7 @@ import (
 // OIDCClaims represents OIDC claims
 type OIDCClaims struct {
 	PreferredUserName string `json:"preferred_username"`
+	UserName          string `json:"username"`
 	Name              string `json:"name"`
 	Email             string `json:"email"`
 }
@@ -111,6 +112,10 @@ func (p *OIDCProvider) GetUserInfo(c core.Context, oauth2Token *oauth2.Token) (*
 
 		if userName == "" {
 			userName = claims.PreferredUserName
+		}
+
+		if userName == "" {
+			userName = claims.UserName
 		}
 
 		if email == "" {

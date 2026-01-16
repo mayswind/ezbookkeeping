@@ -1805,7 +1805,7 @@ export function useI18n() {
     function formatDateTimeToGregorianLikeYearQuarter(dateTime: DateTime): string {
         const gregorianLikeCalendarType = getGregorianLikeCalendarType();
         const dateTimeFormatOptions = getDateTimeFormatOptions({ calendarType: gregorianLikeCalendarType });
-        const year = dateTime.getLocalizedCalendarYear(dateTimeFormatOptions);
+        const year = formatDateTime(dateTime, getLocalizedShortYearFormat(), dateTimeFormatOptions);
         const quarter = dateTime.getLocalizedCalendarQuarter(dateTimeFormatOptions);
         return formatYearQuarter(year, quarter);
     }

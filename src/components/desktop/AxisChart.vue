@@ -84,6 +84,7 @@ const {
     getCurrentLanguageTextDirection,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
     formatAmountToLocalizedNumeralsWithCurrency,
+    formatNumberToLocalizedNumerals,
     formatPercentToLocalizedNumerals
 } = useI18n();
 
@@ -403,7 +404,7 @@ function getDisplayValue(value: number): string {
         return formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency);
     }
 
-    return value.toString();
+    return formatNumberToLocalizedNumerals(value);
 }
 
 function clickItem(e: ECElementEvent): void {

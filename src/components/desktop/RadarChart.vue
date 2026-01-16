@@ -45,7 +45,11 @@ const props = defineProps<{
 
 const theme = useTheme();
 
-const { formatAmountToLocalizedNumeralsWithCurrency, formatPercentToLocalizedNumerals } = useI18n();
+const {
+    formatAmountToLocalizedNumeralsWithCurrency,
+    formatNumberToLocalizedNumerals,
+    formatPercentToLocalizedNumerals
+} = useI18n();
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 
@@ -80,7 +84,7 @@ const radarData = computed<RadarChartData>(() => {
 
                 const finalPercent = (isNumber(percent) && percent >= 0) ? percent : (value > 0 ? value / totalValidValue * 100 : 0);
                 const displayPercent = formatPercentToLocalizedNumerals(finalPercent, 2, '<0.01');
-                const displayValue = props.amountValue ? formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency) : value.toString();
+                const displayValue = props.amountValue ? formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency) : formatNumberToLocalizedNumerals(value);
 
                 indicators.push({
                     name: name,

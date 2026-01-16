@@ -399,7 +399,7 @@ function init(initProps: InsightsExplorerProps): void {
         if (explorersStore.currentInsightsExplorer.id !== initProps.initId) {
             needReload = true;
         }
-    } else {
+    } else if (!initProps.initId && !initProps.initActiveTab && !initProps.initDateRangeType && !initProps.initStartTime && !initProps.initEndTime) { // first time open the page
         explorersStore.updateCurrentInsightsExplorer(InsightsExplorer.createNewExplorer(generateRandomUUID()));
         isCurrentExplorerModified.value = true;
     }

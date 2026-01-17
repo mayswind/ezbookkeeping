@@ -26,9 +26,9 @@
                                    @click="switchTagGroup(tagGroup.id)">
                                 <span class="text-truncate">{{ tagGroup.name }}</span>
                             </v-tab>
-                            <template v-if="loading && (!allTagGroupsWithDefault || allTagGroupsWithDefault.length < 1)">
+                            <template v-if="loading && (!allTagGroupsWithDefault || allTagGroupsWithDefault.length < 2)">
                                 <v-skeleton-loader class="skeleton-no-margin mx-5 mt-4 mb-3" type="text"
-                                                   :key="itemIdx" :loading="true" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]"></v-skeleton-loader>
+                                                   :key="itemIdx" :loading="true" v-for="itemIdx in [ 1, 2, 3, 4, 5 ]"></v-skeleton-loader>
                             </template>
                         </v-tabs>
                     </v-navigation-drawer>
@@ -72,6 +72,7 @@
                                                             <v-list-item-title>{{ tt('Rename Tag Group') }}</v-list-item-title>
                                                         </v-list-item>
                                                         <v-list-item :prepend-icon="mdiDeleteOutline"
+                                                                     :disabled="tags && tags.length > 0"
                                                                      @click="removeTagGroup"
                                                                      v-if="activeTagGroupId && activeTagGroupId !== DEFAULT_TAG_GROUP_ID">
                                                             <v-list-item-title>{{ tt('Delete Tag Group') }}</v-list-item-title>
@@ -108,7 +109,7 @@
                                         </thead>
 
                                         <tbody v-if="loading && noAvailableTag && !newTag">
-                                        <tr :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
+                                        <tr :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4, 5 ]">
                                             <td class="px-0">
                                                 <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
                                             </td>

@@ -511,14 +511,14 @@ function removeTagGroup(): void {
         }).then(() => {
             updating.value = false;
 
-            if (transactionTagsStore.allTransactionTagGroups[currentTagGroupIndex]) {
-                const newActiveTagGroup = transactionTagsStore.allTransactionTagGroups[currentTagGroupIndex];
-                activeTagGroupId.value = newActiveTagGroup ? newActiveTagGroup.id : '';
-            } else if (transactionTagsStore.allTransactionTagGroups[currentTagGroupIndex - 1]) {
-                const newActiveTagGroup = transactionTagsStore.allTransactionTagGroups[currentTagGroupIndex - 1];
-                activeTagGroupId.value = newActiveTagGroup ? newActiveTagGroup.id : '';
+            if (allTagGroupsWithDefault.value[currentTagGroupIndex]) {
+                const newActiveTagGroup = allTagGroupsWithDefault.value[currentTagGroupIndex];
+                activeTagGroupId.value = newActiveTagGroup ? newActiveTagGroup.id : DEFAULT_TAG_GROUP_ID;
+            } else if (allTagGroupsWithDefault.value[currentTagGroupIndex - 1]) {
+                const newActiveTagGroup = allTagGroupsWithDefault.value[currentTagGroupIndex - 1];
+                activeTagGroupId.value = newActiveTagGroup ? newActiveTagGroup.id : DEFAULT_TAG_GROUP_ID;
             } else {
-                activeTagGroupId.value = '';
+                activeTagGroupId.value = DEFAULT_TAG_GROUP_ID;
             }
         }).catch(error => {
             updating.value = false;

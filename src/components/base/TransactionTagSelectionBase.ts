@@ -12,6 +12,8 @@ import { TransactionTag } from '@/models/transaction_tag.ts';
 export type TransactionTagWithGroupHeader = TransactionTag | {
     type: 'subheader';
     title: string;
+} | {
+    type: 'addbutton';
 }
 
 export interface CommonTransactionTagSelectionProps {
@@ -19,7 +21,7 @@ export interface CommonTransactionTagSelectionProps {
     allowAddNewTag?: boolean;
 }
 
-export function useTransactionTagSelectionBase(props: CommonTransactionTagSelectionProps, useClonedModelValue?: boolean) {
+export function useTransactionTagSelectionBase(props: CommonTransactionTagSelectionProps, supportAddButtonInList: boolean, useClonedModelValue?: boolean) {
     const { tt } = useI18n();
 
     const transactionTagsStore = useTransactionTagsStore();
@@ -93,6 +95,7 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
     function getTagsWithGroupHeader(tagFilterFn: (tag: TransactionTag) => boolean): TransactionTagWithGroupHeader[] {
         const result: TransactionTagWithGroupHeader[] = [];
         const tagsInDefaultGroup = transactionTagsStore.allTransactionTagsByGroupMap[DEFAULT_TAG_GROUP_ID];
+        let addButtonAdded = false;
 
         if (tagsInDefaultGroup && tagsInDefaultGroup.length > 0) {
             const visibleTags = tagsInDefaultGroup.filter(tag => tagFilterFn(tag));
@@ -104,6 +107,13 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
                 });
 
                 result.push(...visibleTags);
+
+                if (supportAddButtonInList && props.allowAddNewTag && !addButtonAdded) {
+                    result.push({
+                        type: 'addbutton'
+                    });
+                    addButtonAdded = true;
+                }
             }
         }
 
@@ -124,6 +134,12 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
 
                 result.push(...visibleTags);
             }
+        }
+
+        if (supportAddButtonInList && props.allowAddNewTag && !addButtonAdded) {
+            result.push({
+                type: 'addbutton'
+            });
         }
 
         return result;

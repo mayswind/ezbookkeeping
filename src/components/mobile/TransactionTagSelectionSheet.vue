@@ -27,13 +27,49 @@
                 <f7-list-item :title="tt('No available tag')"></f7-list-item>
             </f7-list>
             <f7-list dividers class="no-margin-top no-margin-bottom tag-selection-list" v-else-if="(filteredTagsWithGroupHeader && filteredTagsWithGroupHeader.length > 0) || newTag">
-                <template :key="(tag instanceof TransactionTag) ? tag.id : `${tag.type}-${index}-${tag.title}`"
+                <template :key="(tag instanceof TransactionTag) ? tag.id : (tag.type === 'subheader' ? `${tag.type}-${index}-${tag.title}` : `${tag.type}-${index}`)"
                           v-for="(tag, index) in filteredTagsWithGroupHeader">
-                    <f7-list-item group-title v-if="!(tag instanceof TransactionTag)">
+                    <f7-list-item group-title v-if="!(tag instanceof TransactionTag) && tag.type === 'subheader'">
                         <div class="tag-selection-list-item">
                             {{ tag.title }}
                         </div>
                     </f7-list-item>
+                    <template v-if="!(tag instanceof TransactionTag) && tag.type === 'addbutton'">
+                        <f7-list-item link="#" no-chevron
+                                      :title="tt('Add new tag')"
+                                      v-if="allowAddNewTag && !newTag"
+                                      @click="addNewTag()">
+                        </f7-list-item>
+                        <f7-list-item class="editing-list-item" checkbox indeterminate disabled v-if="allowAddNewTag && newTag">
+                            <template #media>
+                                <f7-icon class="transaction-tag-icon" f7="number"></f7-icon>
+                            </template>
+                            <template #title>
+                                <div class="display-flex">
+                                    <f7-input class="list-title-input padding-inline-start-half"
+                                              type="text"
+                                              :placeholder="tt('Tag Title')"
+                                              v-model:value="newTag.name"
+                                              @keyup.enter="saveNewTag()">
+                                    </f7-input>
+                                </div>
+                            </template>
+                            <template #after>
+                                <f7-button :class="{ 'no-padding': true, 'disabled': !newTag || !newTag.name }"
+                                           raised fill
+                                           icon-f7="checkmark_alt"
+                                           color="blue"
+                                           @click="saveNewTag()">
+                                </f7-button>
+                                <f7-button class="no-padding margin-inline-start-half"
+                                           raised fill
+                                           icon-f7="xmark"
+                                           color="gray"
+                                           @click="cancelSaveNewTag()">
+                                </f7-button>
+                            </template>
+                        </f7-list-item>
+                    </template>
                     <f7-list-item checkbox
                                   :class="{ 'list-item-selected': selectedTagIds[tag.id], 'disabled': tag.hidden && !selectedTagIds[tag.id] }"
                                   :value="tag.id"
@@ -57,40 +93,6 @@
                         </template>
                     </f7-list-item>
                 </template>
-                <f7-list-item link="#" no-chevron
-                              :title="tt('Add new tag')"
-                              v-if="allowAddNewTag && !newTag"
-                              @click="addNewTag()">
-                </f7-list-item>
-                <f7-list-item class="editing-list-item" checkbox indeterminate disabled v-if="allowAddNewTag && newTag">
-                    <template #media>
-                        <f7-icon class="transaction-tag-icon" f7="number"></f7-icon>
-                    </template>
-                    <template #title>
-                        <div class="display-flex">
-                            <f7-input class="list-title-input padding-inline-start-half"
-                                      type="text"
-                                      :placeholder="tt('Tag Title')"
-                                      v-model:value="newTag.name"
-                                      @keyup.enter="saveNewTag()">
-                            </f7-input>
-                        </div>
-                    </template>
-                    <template #after>
-                        <f7-button :class="{ 'no-padding': true, 'disabled': !newTag || !newTag.name }"
-                                   raised fill
-                                   icon-f7="checkmark_alt"
-                                   color="blue"
-                                   @click="saveNewTag()">
-                        </f7-button>
-                        <f7-button class="no-padding margin-inline-start-half"
-                                   raised fill
-                                   icon-f7="xmark"
-                                   color="gray"
-                                   @click="cancelSaveNewTag()">
-                        </f7-button>
-                    </template>
-                </f7-list-item>
             </f7-list>
         </f7-page-content>
     </f7-sheet>
@@ -104,8 +106,9 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
 import { type CommonTransactionTagSelectionProps, useTransactionTagSelectionBase } from '@/components/base/TransactionTagSelectionBase.ts';
 
-import { TransactionTag } from '@/models/transaction_tag.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
+
+import { TransactionTag } from '@/models/transaction_tag.ts';
 
 import { scrollToSelectedItem } from '@/lib/ui/common.ts';
 import { type Framework7Dom, scrollSheetToTop } from '@/lib/ui/mobile.ts';
@@ -130,7 +133,7 @@ const {
     tagSearchContent,
     selectedTagIds,
     filteredTagsWithGroupHeader
-} = useTransactionTagSelectionBase(props, true);
+} = useTransactionTagSelectionBase(props, true, true);
 
 const transactionTagsStore = useTransactionTagsStore();
 

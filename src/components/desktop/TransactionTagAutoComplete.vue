@@ -100,7 +100,7 @@ const { tt } = useI18n();
 const {
     tagSearchContent,
     allTagsWithGroupHeader
-} = useTransactionTagSelectionBase(props);
+} = useTransactionTagSelectionBase(props, false);
 
 const transactionTagsStore = useTransactionTagsStore();
 

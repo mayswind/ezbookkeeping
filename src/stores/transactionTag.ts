@@ -512,7 +512,7 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
         });
     }
 
-    function saveTag({ tag }: { tag: TransactionTag }): Promise<TransactionTag> {
+    function saveTag({ tag, beforeResolve }: { tag: TransactionTag, beforeResolve?: BeforeResolveFunction }): Promise<TransactionTag> {
         const oldTagGroupId = allTransactionTagsMap.value[tag.id]?.groupId;
 
         return new Promise((resolve, reject) => {
@@ -538,10 +538,20 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
 
                 const transactionTag = TransactionTag.of(data.result);
 
-                if (!tag.id) {
-                    addTagToTransactionTagList(transactionTag);
+                if (beforeResolve) {
+                    beforeResolve(() => {
+                        if (!tag.id) {
+                            addTagToTransactionTagList(transactionTag);
+                        } else {
+                            updateTagInTransactionTagList(transactionTag, oldTagGroupId);
+                        }
+                    });
                 } else {
-                    updateTagInTransactionTagList(transactionTag, oldTagGroupId);
+                    if (!tag.id) {
+                        addTagToTransactionTagList(transactionTag);
+                    } else {
+                        updateTagInTransactionTagList(transactionTag, oldTagGroupId);
+                    }
                 }
 
                 resolve(transactionTag);

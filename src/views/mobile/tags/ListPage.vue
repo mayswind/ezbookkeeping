@@ -110,6 +110,7 @@
                 <f7-swipeout-actions :left="textDirection === TextDirection.RTL"
                                      :right="textDirection === TextDirection.LTR"
                                      v-if="!sortable && editingTag.id !== tag.id">
+                    <f7-swipeout-button color="primary" close :text="tt('Move')" @click="moveTagToGroup(tag)"></f7-swipeout-button>
                     <f7-swipeout-button color="orange" close :text="tt('Edit')" @click="edit(tag)"></f7-swipeout-button>
                     <f7-swipeout-button color="red" class="padding-horizontal" @click="remove(tag, false)">
                         <f7-icon f7="trash"></f7-icon>
@@ -147,6 +148,34 @@
                 </template>
             </f7-list-item>
         </f7-list>
+
+        <f7-popup push :close-on-escape="false" :opened="showMoveTagPopup"
+                  @popup:closed="showMoveTagPopup = false">
+            <f7-page>
+                <f7-navbar>
+                    <f7-nav-left>
+                        <f7-link popup-close icon-f7="xmark"></f7-link>
+                    </f7-nav-left>
+                    <f7-nav-title :title="tt('Move to...')"></f7-nav-title>
+                    <f7-nav-right>
+                        <f7-link icon-f7="checkmark_alt"
+                                 :class="{ 'disabled': !tagToMove || !moveToTagGroupId }"
+                                 @click="moveTagToGroup(tagToMove, moveToTagGroupId)"></f7-link>
+                    </f7-nav-right>
+                </f7-navbar>
+                <f7-list strong inset dividers class="margin-vertical">
+                    <template :key="tagGroup.id" v-for="tagGroup in allTagGroupsWithDefault">
+                        <f7-list-item checkbox
+                                      :title="tagGroup.name"
+                                      :value="tagGroup.id"
+                                      :checked="moveToTagGroupId === tagGroup.id"
+                                      :key="tagGroup.id"
+                                      @change="updateTagGroupSelected"
+                                      v-if="tagToMove?.groupId !== tagGroup.id"></f7-list-item>
+                    </template>
+                </f7-list>
+            </f7-page>
+        </f7-popup>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
@@ -216,7 +245,10 @@ const transactionTagsStore = useTransactionTagsStore();
 
 const loadingError = ref<unknown | null>(null);
 const sortable = ref<boolean>(false);
+const moveToTagGroupId = ref<string | undefined>(undefined);
+const tagToMove = ref<TransactionTag | null>(null);
 const tagToDelete = ref<TransactionTag | null>(null);
+const showMoveTagPopup = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 const showDeleteActionSheet = ref<boolean>(false);
 const displayOrderSaving = ref<boolean>(false);
@@ -331,6 +363,53 @@ function hide(tag: TransactionTag, hidden: boolean): void {
             showToast(error.message || error);
         }
     });
+}
+
+function moveTagToGroup(tag: TransactionTag | null, targetTagGroupId?: string): void {
+    if (!tag) {
+        showAlert('An error occurred');
+        return;
+    }
+
+    if (!targetTagGroupId) {
+        moveToTagGroupId.value = undefined;
+        tagToMove.value = tag;
+        showMoveTagPopup.value = true;
+        return;
+    }
+
+    showMoveTagPopup.value = false;
+    tagToMove.value = null;
+    moveToTagGroupId.value = undefined;
+    showLoading();
+
+    const newTag = tag.clone();
+    newTag.groupId = targetTagGroupId;
+
+    transactionTagsStore.saveTag({
+        tag: newTag,
+        beforeResolve: (done) => {
+            onSwipeoutDeleted(getTagDomId(tag), done);
+        }
+    }).then(() => {
+        hideLoading();
+    }).catch(error => {
+        hideLoading();
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function updateTagGroupSelected(e: Event): void {
+    const target = e.target as HTMLInputElement;
+
+    if (target.checked) {
+        moveToTagGroupId.value = target.value;
+    } else {
+        moveToTagGroupId.value = undefined;
+    }
 }
 
 function remove(tag: TransactionTag | null, confirm: boolean): void {

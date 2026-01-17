@@ -4,7 +4,7 @@
             <template #title>
                 <div class="d-flex align-center justify-center">
                     <div class="d-flex align-center">
-                        <h4 class="text-h4">{{ tt('All Explorers') }}</h4>
+                        <h4 class="text-h4">{{ tt('Change Explorer Display Order') }}</h4>
                         <v-btn class="ms-3" color="primary" variant="tonal"
                                :disabled="loading || updating" @click="saveDisplayOrder"
                                v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>

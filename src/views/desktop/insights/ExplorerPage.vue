@@ -170,7 +170,7 @@
                                  @dateRange:change="setCustomDateFilter"
                                  @error="onShowDateRangeError" />
 
-    <explorer-list-dialog ref="explorerListDialog" />
+    <explorer-change-display-order-dialog ref="explorerChangeDisplayOrderDialog" />
     <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
     <export-dialog ref="exportDialog" />
 
@@ -188,7 +188,7 @@ import SnackBar from '@/components/desktop/SnackBar.vue';
 import ExplorerQueryTab from '@/views/desktop/insights/tabs/ExplorerQueryTab.vue';
 import ExplorerDataTableTab from '@/views/desktop/insights/tabs/ExplorerDataTableTab.vue';
 import ExplorerChartTab from '@/views/desktop/insights/tabs/ExplorerChartTab.vue';
-import ExplorerListDialog from '@/views/desktop/insights/dialogs/ExplorerListDialog.vue';
+import ExplorerChangeDisplayOrderDialog from '@/views/desktop/insights/dialogs/ExplorerChangeDisplayOrderDialog.vue';
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
 import ExportDialog from '@/views/desktop/statistics/transaction/dialogs/ExportDialog.vue';
 
@@ -258,7 +258,7 @@ type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type ExplorerDataTableTabType = InstanceType<typeof ExplorerDataTableTab>;
 type ExplorerChartTabType = InstanceType<typeof ExplorerChartTab>;
-type ExplorerListDialogType = InstanceType<typeof ExplorerListDialog>;
+type ExplorerChangeDisplayOrderDialogType = InstanceType<typeof ExplorerChangeDisplayOrderDialog>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 type ExportDialogType = InstanceType<typeof ExportDialog>;
 
@@ -289,7 +289,7 @@ const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const explorerDataTableTab = useTemplateRef<ExplorerDataTableTabType>('explorerDataTableTab');
 const explorerChartTab = useTemplateRef<ExplorerChartTabType>('explorerChartTab');
-const explorerListDialog = useTemplateRef<ExplorerListDialogType>('explorerListDialog');
+const explorerChangeDisplayOrderDialog = useTemplateRef<ExplorerChangeDisplayOrderDialogType>('explorerChangeDisplayOrderDialog');
 const exportDialog = useTemplateRef<ExportDialogType>('exportDialog');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
@@ -500,7 +500,7 @@ function loadExplorer(explorerId: string, force?: boolean, init?: boolean): Prom
 }
 
 function showChangeExplorerDisplayOrderDialog(): void {
-    explorerListDialog.value?.open().then(() => {
+    explorerChangeDisplayOrderDialog.value?.open().then(() => {
         if (explorersStore.insightsExplorerListStateInvalid) {
             loading.value = true;
 

@@ -5,7 +5,7 @@ type TransactionTag struct {
 	TagId           int64  `xorm:"PK"`
 	Uid             int64  `xorm:"INDEX(IDX_tag_uid_deleted_group_order) NOT NULL"`
 	Deleted         bool   `xorm:"INDEX(IDX_tag_uid_deleted_group_order) NOT NULL"`
-	TagGroupId      int64  `xorm:"INDEX(IDX_tag_uid_deleted_group_order) NOT NULL"`
+	TagGroupId      int64  `xorm:"INDEX(IDX_tag_uid_deleted_group_order) NOT NULL DEFAULT 0"`
 	Name            string `xorm:"VARCHAR(64) NOT NULL"`
 	DisplayOrder    int32  `xorm:"INDEX(IDX_tag_uid_deleted_group_order) NOT NULL"`
 	Hidden          bool   `xorm:"NOT NULL"`

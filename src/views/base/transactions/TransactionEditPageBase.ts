@@ -439,7 +439,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
             }
         }
 
-        transactionsStore.setTransactionSuitableDestinationAmount(transaction.value, transaction.value.sourceAmount, transaction.value.sourceAmount, oldSourceAccountId as string, oldDestinationAccountId as string);
+        transactionsStore.setTransactionSuitableDestinationAmount(transaction.value, transaction.value.sourceAmount, transaction.value.sourceAmount, oldSourceAccountId, oldDestinationAccountId);
     });
 
     return {

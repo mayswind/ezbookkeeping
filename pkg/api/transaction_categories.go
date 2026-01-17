@@ -214,6 +214,7 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.WebContext) (an
 		Uid:              uid,
 		ParentCategoryId: categoryModifyReq.ParentId,
 		Name:             categoryModifyReq.Name,
+		DisplayOrder:     category.DisplayOrder,
 		Icon:             categoryModifyReq.Icon,
 		Color:            categoryModifyReq.Color,
 		Comment:          categoryModifyReq.Comment,
@@ -259,6 +260,15 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.WebContext) (an
 		if toPrimaryCategory.ParentCategoryId != models.LevelOneTransactionCategoryParentId {
 			return nil, errs.Or(err, errs.ErrNotAllowUseSecondaryTransactionAsPrimaryCategory)
 		}
+
+		maxOrderId, err := a.categories.GetMaxSubCategoryDisplayOrder(c, uid, category.Type, newCategory.ParentCategoryId)
+
+		if err != nil {
+			log.Errorf(c, "[transaction_categories.CategoryModifyHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		newCategory.DisplayOrder = maxOrderId + 1
 	}
 
 	err = a.categories.ModifyCategory(c, newCategory)
@@ -271,7 +281,6 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.WebContext) (an
 	log.Infof(c, "[transaction_categories.CategoryModifyHandler] user \"uid:%d\" has updated category \"id:%d\" successfully", uid, categoryModifyReq.Id)
 
 	newCategory.Type = category.Type
-	newCategory.DisplayOrder = category.DisplayOrder
 	categoryResp := newCategory.ToTransactionCategoryInfoResponse()
 
 	return categoryResp, nil

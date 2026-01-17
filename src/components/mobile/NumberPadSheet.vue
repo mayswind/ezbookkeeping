@@ -6,9 +6,17 @@
             <div class="margin-top padding-horizontal" v-if="hint">
                 <span>{{ hint }}</span>
             </div>
-            <div class="numpad-values" @click="paste">
-                <span class="numpad-value" :class="currentDisplayNumClass">{{ currentDisplay }}</span>
+            <div class="numpad-values" @click="onDisplayValueClick">
+                <span id="numpad-value" class="numpad-value" :class="currentDisplayNumClass">{{ currentDisplay }}</span>
             </div>
+
+            <f7-popover class="numpad-paste-popover" target-el="#numpad-value"
+                        v-model:opened="showPastePopover">
+                <f7-list class="numpad-paste-popover-context-menu-list">
+                    <f7-list-item link="#" no-chevron :title="tt('Paste')" @click="paste"></f7-list-item>
+                </f7-list>
+            </f7-popover>
+
             <div class="numpad-buttons">
                 <f7-button class="numpad-button numpad-button-num" @click="inputNum(7)">
                     <span class="numpad-button-text numpad-button-text-normal">{{ digits[7] }}</span>
@@ -111,7 +119,8 @@ const isSupportClipboard = !!navigator.clipboard;
 const previousValue = ref<string>('');
 const currentSymbol = ref<string>('');
 const currentValue = ref<string>(getInitedStringValue(props.modelValue, props.flipNegative));
-const pasteingAmount = ref<boolean>(false);
+const pastingAmount = ref<boolean>(false);
+const showPastePopover = ref<boolean>(false);
 
 const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 
@@ -317,15 +326,17 @@ function clear(): void {
 }
 
 function paste(): void {
-    if (!isiOS() || !isSupportClipboard || pasteingAmount.value) {
-        pasteingAmount.value = false;
+    showPastePopover.value = false;
+
+    if (pastingAmount.value) {
+        pastingAmount.value = false;
         return;
     }
 
-    pasteingAmount.value = true;
+    pastingAmount.value = true;
 
     navigator.clipboard.readText().then(text => {
-        pasteingAmount.value = false;
+        pastingAmount.value = false;
 
         if (!text) {
             return;
@@ -354,6 +365,7 @@ function paste(): void {
 
         currentValue.value = getStringValue(parsedAmount, false);
     }).catch(error => {
+        pastingAmount.value = false;
         logger.error('failed to read clipboard text', error);
     });
 }
@@ -429,6 +441,18 @@ function onSheetOpen(): void {
 
 function onSheetClosed(): void {
     close();
+}
+
+function onDisplayValueClick(): void {
+    if (!isSupportClipboard) {
+        return;
+    }
+
+    if (isiOS()) {
+        paste();
+    } else {
+        showPastePopover.value = true;
+    }
 }
 
 watch(() => props.flipNegative, (newValue) => {
@@ -518,5 +542,33 @@ watch(() => props.flipNegative, (newValue) => {
 
 .numpad-button-text-confirm {
     font-size: var(--ebk-numpad-confirm-button-font-size);
+}
+
+.numpad-paste-popover.popover {
+    width: auto;
+
+    .numpad-paste-popover-context-menu-list.list {
+        :first-child li:first-child a {
+            &.active-state {
+                border-radius: unset;
+            }
+
+            > .item-content {
+                min-height: var(--ebk-popover-context-menu-min-height);
+
+                > .item-inner {
+                    min-height: var(--ebk-popover-context-menu-min-height);
+                    padding-top: var(--ebk-popover-context-menu-vertical-padding);
+                    padding-bottom: var(--ebk-popover-context-menu-vertical-padding);
+                    padding-left: var(--ebk-popover-context-menu-left-padding);
+                    padding-right: var(--ebk-popover-context-menu-right-padding);
+
+                    > .item-title {
+                        font-size: var(--ebk-popover-context-menu-button-font-size);
+                    }
+                }
+            }
+        }
+    }
 }
 </style>

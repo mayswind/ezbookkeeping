@@ -1,9 +1,9 @@
 <template>
     <f7-page @page:afterin="onPageAfterIn">
         <f7-navbar>
-            <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-left :class="{ 'disabled': loading }" :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title :title="tt('Settings Sync')"></f7-nav-title>
-            <f7-nav-right>
+            <f7-nav-right :class="{ 'disabled': loading }">
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': loading || enabling || disabling }" @click="showMoreActionSheet = true"></f7-link>
             </f7-nav-right>
         </f7-navbar>

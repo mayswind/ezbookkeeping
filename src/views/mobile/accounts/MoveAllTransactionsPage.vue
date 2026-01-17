@@ -1,9 +1,9 @@
 <template>
     <f7-page @page:afterin="onPageAfterIn">
         <f7-navbar>
-            <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-left :class="{ 'disabled': loading }" :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title :title="tt('Move All Transactions')"></f7-nav-title>
-            <f7-nav-right>
+            <f7-nav-right :class="{ 'disabled': loading }">
                 <f7-link icon-f7="checkmark_alt"
                          :class="{ 'disabled': !fromAccount || !toAccountId || fromAccount?.id === toAccountId || !toAccountName || !isToAccountNameValid || moving }"
                          @click="confirm"></f7-link>

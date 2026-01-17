@@ -1,6 +1,6 @@
 <template>
     <f7-page ptr @ptr:refresh="reload" @page:afterin="onPageAfterIn">
-        <f7-navbar :title="tt('Transaction Categories')" :back-link="tt('Back')"></f7-navbar>
+        <f7-navbar :class="{ 'disabled': loading }" :back-link="tt('Back')" :title="tt('Transaction Categories')"></f7-navbar>
 
         <f7-list strong inset dividers class="margin-top skeleton-text" v-if="loading">
             <f7-list-item title="Expense" link="#"></f7-list-item>

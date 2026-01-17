@@ -1,14 +1,14 @@
 <template>
     <f7-page ptr @ptr:refresh="reload" @page:afterin="onPageAfterIn">
         <f7-navbar>
-            <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-left :class="{ 'disabled': loading }" :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title>
-                <f7-link popover-open=".chart-data-type-popover-menu">
+                <f7-link popover-open=".chart-data-type-popover-menu" :class="{ 'disabled': loading }">
                     <span class="statistics-page-title">{{ queryChartDataTypeName }}</span>
                     <f7-icon class="page-title-bar-icon" color="gray" style="opacity: 0.5" f7="chevron_down_circle_fill"></f7-icon>
                 </f7-link>
             </f7-nav-title>
-            <f7-nav-right>
+            <f7-nav-right :class="{ 'disabled': loading }">
                 <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
             </f7-nav-right>
         </f7-navbar>
@@ -62,7 +62,7 @@
             <f7-card-header class="no-border display-block">
                 <div :class="{ 'statistics-chart-header': true, 'full-line': true, 'text-align-right': textDirection === TextDirection.LTR, 'text-align-left': textDirection === TextDirection.RTL}">
                     <span style="margin-inline-end: 4px;">{{ tt('Sort by') }}</span>
-                    <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ querySortingTypeName }}</f7-link>
+                    <f7-link href="#" popover-open=".sorting-type-popover-menu" :class="{ 'disabled': loading }">{{ querySortingTypeName }}</f7-link>
                 </div>
             </f7-card-header>
             <f7-card-content class="pie-chart-container" style="margin-top: -6px" :padding="false">
@@ -289,7 +289,7 @@
             </f7-list>
         </f7-popover>
 
-        <f7-toolbar tabbar bottom class="toolbar-item-auto-size">
+        <f7-toolbar tabbar bottom :class="{ 'toolbar-item-auto-size': true, 'disabled': loading }">
             <f7-link :class="{ 'disabled': reloading || !canShiftDateRange }" @click="shiftDateRange(-1)">
                 <f7-icon class="icon-with-direction" f7="arrow_left_square"></f7-icon>
             </f7-link>

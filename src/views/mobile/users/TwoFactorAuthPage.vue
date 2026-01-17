@@ -1,6 +1,6 @@
 <template>
     <f7-page @page:afterin="onPageAfterIn">
-        <f7-navbar :title="tt('Two-Factor Authentication')" :back-link="tt('Back')"></f7-navbar>
+        <f7-navbar :class="{ 'disabled': loading }" :title="tt('Two-Factor Authentication')" :back-link="tt('Back')"></f7-navbar>
 
         <f7-list strong inset dividers class="margin-top skeleton-text" v-if="loading">
             <f7-list-item title="Status" after="Unknown"></f7-list-item>

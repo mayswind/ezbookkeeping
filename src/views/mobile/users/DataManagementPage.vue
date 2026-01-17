@@ -1,6 +1,6 @@
 <template>
     <f7-page @page:afterin="onPageAfterIn">
-        <f7-navbar :title="tt('Data Management')" :back-link="tt('Back')"></f7-navbar>
+        <f7-navbar :class="{ 'disabled': loading }" :back-link="tt('Back')" :title="tt('Data Management')"></f7-navbar>
 
         <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
             <f7-list-item title="Transactions" after="Count"></f7-list-item>

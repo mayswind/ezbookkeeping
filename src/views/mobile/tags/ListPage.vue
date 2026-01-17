@@ -12,7 +12,7 @@
                 </f7-link>
             </f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
-                <f7-link icon-f7="ellipsis" :class="{ 'disabled': hasEditingTag || !tags.length || sortable }" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link icon-f7="ellipsis" :class="{ 'disabled': hasEditingTag || sortable }" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link icon-f7="plus" :class="{ 'disabled': hasEditingTag }" v-if="!sortable" @click="add"></f7-link>
                 <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': displayOrderSaving || !displayOrderModified || hasEditingTag }" @click="saveSortResult" v-else-if="sortable"></f7-link>
             </f7-nav-right>
@@ -179,6 +179,17 @@
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
+                <f7-actions-button @click="addTagGroup">{{ tt('Add Tag Group') }}</f7-actions-button>
+                <f7-actions-button @click="renameTagGroup"
+                                   v-if="activeTagGroupId && activeTagGroupId !== DEFAULT_TAG_GROUP_ID">{{ tt('Rename Tag Group') }}</f7-actions-button>
+                <f7-actions-button color="red" :class="{ 'disabled': tags && tags.length > 0 }"
+                                   @click="removeTagGroup"
+                                   v-if="activeTagGroupId && activeTagGroupId !== DEFAULT_TAG_GROUP_ID">{{ tt('Delete Tag Group') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button @click="changeTagGroupDisplayOrder">{{ tt('Change Group Display Order') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
                 <f7-actions-button @click="setSortable()">{{ tt('Sort') }}</f7-actions-button>
                 <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ tt('Show Hidden Transaction Tags') }}</f7-actions-button>
                 <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ tt('Hide Hidden Transaction Tags') }}</f7-actions-button>
@@ -211,7 +222,9 @@ import { useTagListPageBase } from '@/views/base/tags/TagListPageBase.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
 import { TextDirection } from '@/core/text.ts';
+import { DEFAULT_TAG_GROUP_ID } from '@/consts/tag.ts';
 
+import { TransactionTagGroup } from '@/models/transaction_tag_group.ts';
 import { TransactionTag } from '@/models/transaction_tag.ts';
 
 import { scrollToSelectedItem } from '@/lib/ui/common.ts';
@@ -222,7 +235,7 @@ const props = defineProps<{
 }>();
 
 const { tt, getCurrentLanguageTextDirection } = useI18n();
-const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
+const { showAlert, showConfirm, showPrompt, showToast, routeBackOnError } = useI18nUIComponents();
 
 const {
     activeTagGroupId,
@@ -508,6 +521,94 @@ function cancelSort(): void {
             showToast(error.message || error);
         }
     });
+}
+
+function addTagGroup(): void {
+    showPrompt(tt('New Tag Group Name'), '', (value: string) => {
+        showLoading();
+
+        transactionTagsStore.saveTagGroup({
+            tagGroup: TransactionTagGroup.createNewTagGroup(value)
+        }).then(tagGroup => {
+            hideLoading();
+            activeTagGroupId.value = tagGroup.id;
+        }).catch(error => {
+            hideLoading();
+
+            if (!error.processed) {
+                showToast(error.message || error);
+            }
+        });
+    });
+}
+
+function renameTagGroup(): void {
+    const tagGroup = transactionTagsStore.allTransactionTagGroupsMap[activeTagGroupId.value];
+
+    if (!tagGroup) {
+        showToast('Unable to rename this tag group');
+        return;
+    }
+
+    showPrompt(tt('Rename Tag Group'), tagGroup.name || '', (value: string) => {
+        showLoading();
+
+        const newTagGroup = tagGroup.clone();
+        newTagGroup.name = value;
+
+        transactionTagsStore.saveTagGroup({
+            tagGroup: newTagGroup
+        }).then(() => {
+            hideLoading();
+        }).catch(error => {
+            hideLoading();
+
+            if (!error.processed) {
+                showToast(error.message || error);
+            }
+        });
+    });
+}
+
+function removeTagGroup(): void {
+    const tagGroup = transactionTagsStore.allTransactionTagGroupsMap[activeTagGroupId.value];
+
+    if (!tagGroup) {
+        showToast('Unable to delete this tag group');
+        return;
+    }
+
+    const currentTagGroupIndex = allTagGroupsWithDefault.value.findIndex(group => group.id === tagGroup.id);
+
+    showConfirm('Are you sure you want to delete this tag group?', () => {
+        showLoading();
+
+        transactionTagsStore.deleteTagGroup({
+            tagGroup: tagGroup
+        }).then(() => {
+            hideLoading();
+
+            if (allTagGroupsWithDefault.value[currentTagGroupIndex]) {
+                const newActiveTagGroup = allTagGroupsWithDefault.value[currentTagGroupIndex];
+                activeTagGroupId.value = newActiveTagGroup ? newActiveTagGroup.id : DEFAULT_TAG_GROUP_ID;
+            } else if (allTagGroupsWithDefault.value[currentTagGroupIndex - 1]) {
+                const newActiveTagGroup = allTagGroupsWithDefault.value[currentTagGroupIndex - 1];
+                activeTagGroupId.value = newActiveTagGroup ? newActiveTagGroup.id : DEFAULT_TAG_GROUP_ID;
+            } else {
+                activeTagGroupId.value = DEFAULT_TAG_GROUP_ID;
+            }
+        }).catch(error => {
+            hideLoading();
+
+            if (!error.processed) {
+                showToast(error.message || error);
+            }
+        });
+    });
+}
+
+function changeTagGroupDisplayOrder(): void {
+    props.f7router.navigate('/tag/group/list');
 }
 
 function onSort(event: { el: { id: string }, from: number, to: number }): void {

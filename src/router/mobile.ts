@@ -44,6 +44,7 @@ import CategoryEditPage from '@/views/mobile/categories/EditPage.vue';
 import CategoryPresetPage from '@/views/mobile/categories/PresetPage.vue';
 
 import TagListPage from '@/views/mobile/tags/ListPage.vue';
+import TagGroupListPage from '@/views/mobile/tags/GroupListPage.vue';
 
 import TemplateListPage from '@/views/mobile/templates/ListPage.vue';
 
@@ -322,6 +323,11 @@ const routes: Router.RouteParameters[] = [
     {
         path: '/tag/list',
         async: asyncResolve(TagListPage),
+        beforeEnter: [checkLogin]
+    },
+    {
+        path: '/tag/group/list',
+        async: asyncResolve(TagGroupListPage),
         beforeEnter: [checkLogin]
     },
     {

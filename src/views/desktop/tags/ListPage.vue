@@ -437,8 +437,9 @@ function addTagGroup(): void {
 
         transactionTagsStore.saveTagGroup({
             tagGroup: TransactionTagGroup.createNewTagGroup(newName)
-        }).then(() => {
+        }).then(tagGroup => {
             updating.value = false;
+            activeTagGroupId.value = tagGroup.id;
         }).catch(error => {
             updating.value = false;
 

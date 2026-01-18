@@ -6,7 +6,7 @@
                 <f7-link icon-f7="xmark" :class="{ 'disabled': displayOrderSaving }" @click="cancelSort"></f7-link>
             </f7-nav-left>
             <f7-nav-title>
-                <f7-link popover-open=".tag-group-popover-menu" :class="{ 'disabled': loading || sortable || hasEditingTag }">
+                <f7-link popover-open=".tag-group-popover-menu" :class="{ 'disabled': loading || sortable || displayOrderModified || hasEditingTag }">
                     <span style="color: var(--f7-text-color)">{{ displayTagGroupName }}</span>
                     <f7-icon class="page-title-bar-icon" color="gray" style="opacity: 0.5" f7="chevron_down_circle_fill"></f7-icon>
                 </f7-link>

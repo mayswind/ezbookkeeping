@@ -20,7 +20,7 @@
                                 direction="vertical"
                                 :prev-icon="mdiMenuUp" :next-icon="mdiMenuDown"
                                 :disabled="loading || updating" v-model="activeTagGroupId">
-                            <v-tab class="tab-text-truncate" :disabled="loading || updating || hasEditingTag"
+                            <v-tab class="tab-text-truncate" :disabled="loading || updating || displayOrderModified || hasEditingTag"
                                    :key="tagGroup.id" :value="tagGroup.id"
                                    v-for="tagGroup in allTagGroupsWithDefault"
                                    @click="switchTagGroup(tagGroup.id)">

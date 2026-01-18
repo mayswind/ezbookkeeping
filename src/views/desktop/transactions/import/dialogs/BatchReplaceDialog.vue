@@ -168,7 +168,7 @@
                             :disabled="loading || removeTag"
                             :label="tt('Target Tag')"
                             :placeholder="tt('Target Tag')"
-                            :items="allTags"
+                            :items="allTagsWithGroupHeader"
                             :no-data-text="tt('No available tag')"
                             v-model="targetItem"
                         >
@@ -176,8 +176,12 @@
                                 <v-chip :prepend-icon="mdiPound" :text="item.title" v-bind="props"/>
                             </template>
 
+                            <template #subheader="{ props }">
+                                <v-list-subheader>{{ props['title'] }}</v-list-subheader>
+                            </template>
+
                             <template #item="{ props, item }">
-                                <v-list-item :value="item.value" v-bind="props" v-if="!item.raw.hidden">
+                                <v-list-item :value="item.value" v-bind="props" v-if="item.raw instanceof TransactionTag && !item.raw.hidden">
                                     <template #title>
                                         <v-list-item-title>
                                             <div class="d-flex align-center">
@@ -214,6 +218,7 @@ import SnackBar from '@/components/desktop/SnackBar.vue';
 import { ref, computed, useTemplateRef, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
+import { useTransactionTagSelectionBase } from '@/components/base/TransactionTagSelectionBase.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
@@ -224,7 +229,7 @@ import type { NameValue } from '@/core/base.ts';
 import { CategoryType } from '@/core/category.ts';
 import { Account, type CategorizedAccountWithDisplayBalance } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
-import type { TransactionTag } from '@/models/transaction_tag.ts';
+import { TransactionTag } from '@/models/transaction_tag.ts';
 
 import {
     getTransactionPrimaryCategoryName,
@@ -247,6 +252,8 @@ interface BatchReplaceDialogResponse {
 }
 
 const { tt, getCategorizedAccountsWithDisplayBalance } = useI18n();
+
+const { allTagsWithGroupHeader } = useTransactionTagSelectionBase({ modelValue: [] }, false);
 
 const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
@@ -274,7 +281,6 @@ const allAccounts = computed<Account[]>(() => accountsStore.allPlainAccounts);
 const allVisibleAccounts = computed<Account[]>(() => accountsStore.allVisiblePlainAccounts);
 const allVisibleCategorizedAccounts = computed<CategorizedAccountWithDisplayBalance[]>(() => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts.value, showAccountBalance.value, customAccountCategoryOrder.value));
 const allCategories = computed<Record<number, TransactionCategory[]>>(() => transactionCategoriesStore.allTransactionCategories);
-const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
 
 const hasVisibleExpenseCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleExpenseCategories);
 const hasVisibleIncomeCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleIncomeCategories);

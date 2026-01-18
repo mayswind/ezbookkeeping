@@ -164,7 +164,7 @@
                                         <v-autocomplete density="compact" variant="underlined"
                                                         item-title="name" item-value="id"
                                                         persistent-placeholder chips
-                                                        :disabled="loading" :items="allTags"
+                                                        :disabled="loading" :items="allTagsWithGroupHeader"
                                                         :no-data-text="tt('No available tag')"
                                                         v-model="newRule.targetId"
                                                         v-if="newRule.dataType == 'tag'">
@@ -172,8 +172,12 @@
                                                 <v-chip :prepend-icon="mdiPound" :text="item.title" v-bind="props" v-if="newRule.targetId"/>
                                             </template>
 
+                                            <template #subheader="{ props }">
+                                                <v-list-subheader>{{ props['title'] }}</v-list-subheader>
+                                            </template>
+
                                             <template #item="{ props, item }">
-                                                <v-list-item :value="item.value" v-bind="props" v-if="!item.raw.hidden">
+                                                <v-list-item :value="item.value" v-bind="props" v-if="item.raw instanceof TransactionTag && !item.raw.hidden">
                                                     <template #title>
                                                         <v-list-item-title>
                                                             <div class="d-flex align-center">
@@ -215,6 +219,7 @@ import SnackBar from '@/components/desktop/SnackBar.vue';
 import { ref, computed, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
+import { useTransactionTagSelectionBase } from '@/components/base/TransactionTagSelectionBase.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
@@ -228,7 +233,7 @@ import { KnownFileType } from '@/core/file.ts';
 
 import { Account, type CategorizedAccountWithDisplayBalance } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
-import type { TransactionTag } from '@/models/transaction_tag.ts';
+import { TransactionTag } from '@/models/transaction_tag.ts';
 
 import {
     getTransactionPrimaryCategoryName,
@@ -257,6 +262,8 @@ interface BatchReplaceAllTypesDialogResponse {
 
 const { tt, getCategorizedAccountsWithDisplayBalance } = useI18n();
 
+const { allTagsWithGroupHeader } = useTransactionTagSelectionBase({ modelValue: [] }, false);
+
 const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
@@ -284,7 +291,7 @@ const allAccounts = computed<Account[]>(() => accountsStore.allPlainAccounts);
 const allVisibleAccounts = computed<Account[]>(() => accountsStore.allVisiblePlainAccounts);
 const allVisibleCategorizedAccounts = computed<CategorizedAccountWithDisplayBalance[]>(() => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts.value, showAccountBalance.value, customAccountCategoryOrder.value));
 const allCategories = computed<Record<number, TransactionCategory[]>>(() => transactionCategoriesStore.allTransactionCategories);
-const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
+const allTagsMap = computed<Record<string, TransactionTag>>(() => transactionTagsStore.allTransactionTagsMap);
 
 const hasVisibleExpenseCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleExpenseCategories);
 const hasVisibleIncomeCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleIncomeCategories);
@@ -352,13 +359,7 @@ function getRuleTargetValueDisplayName(rule: ImportTransactionReplaceRule): stri
         case 'account':
             return getAccountDisplayName(rule.targetId);
         case 'tag':
-            for (const tag of allTags.value) {
-                if (tag.id === rule.targetId) {
-                    return tag.name;
-                }
-            }
-
-            return '';
+            return allTagsMap.value[rule.targetId]?.name ?? '';
         default:
             return '';
     }

@@ -265,7 +265,7 @@
                     density="compact" variant="plain"
                     :disabled="!!disabled"
                     :placeholder="tt('None')"
-                    :items="allTags"
+                    :items="allTagsWithGroupHeader"
                     :no-data-text="tt('No available tag')"
                     v-model="editingTags"
                 >
@@ -277,8 +277,12 @@
                                 v-bind="props"/>
                     </template>
 
+                    <template #subheader="{ props }">
+                        <v-list-subheader>{{ props['title'] }}</v-list-subheader>
+                    </template>
+
                     <template #item="{ props, item }">
-                        <v-list-item :value="item.value" v-bind="props" v-if="!item.raw.hidden">
+                        <v-list-item :value="item.value" v-bind="props" v-if="item.raw instanceof TransactionTag && !item.raw.hidden">
                             <template #title>
                                 <v-list-item-title>
                                     <div class="d-flex align-center">
@@ -403,6 +407,7 @@ import BatchCreateDialog, { type BatchCreateDialogDataType } from '../dialogs/Ba
 import { ref, computed, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
+import { useTransactionTagSelectionBase } from '@/components/base/TransactionTagSelectionBase.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
@@ -417,7 +422,7 @@ import { TransactionType } from '@/core/transaction.ts';
 
 import { Account, type CategorizedAccountWithDisplayBalance } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
-import type { TransactionTag } from '@/models/transaction_tag.ts';
+import { TransactionTag } from '@/models/transaction_tag.ts';
 import { ImportTransaction } from '@/models/imported_transaction.ts';
 
 import {
@@ -503,6 +508,8 @@ const {
     getCategorizedAccountsWithDisplayBalance
 } = useI18n();
 
+const { allTagsWithGroupHeader } = useTransactionTagSelectionBase({ modelValue: [] }, false);
+
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
 const accountsStore = useAccountsStore();
@@ -551,7 +558,6 @@ const allAccountsMap = computed<Record<string, Account>>(() => accountsStore.all
 const allAccountsMapByName = computed<Record<string, Account>>(() => getAccountMapByName(accountsStore.allAccounts));
 const allCategories = computed<Record<number, TransactionCategory[]>>(() => transactionCategoriesStore.allTransactionCategories);
 const allCategoriesMap = computed<Record<string, TransactionCategory>>(() => transactionCategoriesStore.allTransactionCategoriesMap);
-const allTags = computed<TransactionTag[]>(() => transactionTagsStore.allTransactionTags);
 const allTagsMap = computed<Record<string, TransactionTag>>(() => transactionTagsStore.allTransactionTagsMap);
 
 const hasVisibleExpenseCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleExpenseCategories);

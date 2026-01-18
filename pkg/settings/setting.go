@@ -20,6 +20,7 @@ const (
 	ebkConfigItemValueEnvNamePrefix    = "EBK"
 	ebkConfigItemFilePathEnvNamePrefix = "EBKCFP"
 	defaultConfigPath                  = "/conf/ezbookkeeping.ini"
+	defaultRootUrl                     = "%(protocol)s://%(domain)s:%(http_port)s/"
 	defaultStaticRootPath              = "public"
 )
 
@@ -627,7 +628,10 @@ func loadServerConfiguration(config *Config, configFile *ini.File, sectionName s
 	}
 
 	config.Domain = getConfigItemStringValue(configFile, sectionName, "domain", defaultDomain)
-	config.RootUrl = getConfigItemStringValue(configFile, sectionName, "root_url", fmt.Sprintf("%s://%s:%d/", string(config.Protocol), config.Domain, config.HttpPort))
+	config.RootUrl = getConfigItemStringValue(configFile, sectionName, "root_url", defaultRootUrl)
+	config.RootUrl = strings.ReplaceAll(config.RootUrl, "%(protocol)s", string(config.Protocol))
+	config.RootUrl = strings.ReplaceAll(config.RootUrl, "%(domain)s", config.Domain)
+	config.RootUrl = strings.ReplaceAll(config.RootUrl, "%(http_port)s", strconv.Itoa(int(config.HttpPort)))
 
 	if config.RootUrl[len(config.RootUrl)-1] != '/' {
 		config.RootUrl += "/"
@@ -1259,7 +1263,7 @@ func getConfigItemIsSet(configFile *ini.File, sectionName string, itemName strin
 		return false
 	}
 
-	return section.Key(itemName).String() != ""
+	return section.Key(itemName).Value() != ""
 }
 
 func getConfigItemStringValue(configFile *ini.File, sectionName string, itemName string, defaultValue ...string) string {
@@ -1270,11 +1274,13 @@ func getConfigItemStringValue(configFile *ini.File, sectionName string, itemName
 	}
 
 	section := configFile.Section(sectionName)
+	key := section.Key(itemName)
+	value := key.Value()
 
-	if len(defaultValue) > 0 {
-		return section.Key(itemName).MustString(defaultValue[0])
+	if len(value) == 0 && len(defaultValue) > 0 {
+		return defaultValue[0]
 	} else {
-		return section.Key(itemName).String()
+		return value
 	}
 }
 
@@ -1290,7 +1296,7 @@ func getConfigItemUint8Value(configFile *ini.File, sectionName string, itemName 
 	}
 
 	section := configFile.Section(sectionName)
-	value, err := strconv.ParseUint(section.Key(itemName).String(), 10, 8)
+	value, err := strconv.ParseUint(section.Key(itemName).Value(), 10, 8)
 
 	if err == nil {
 		return uint8(value)
@@ -1311,7 +1317,7 @@ func getConfigItemUint16Value(configFile *ini.File, sectionName string, itemName
 	}
 
 	section := configFile.Section(sectionName)
-	value, err := strconv.ParseUint(section.Key(itemName).String(), 10, 16)
+	value, err := strconv.ParseUint(section.Key(itemName).Value(), 10, 16)
 
 	if err == nil {
 		return uint16(value)
@@ -1332,7 +1338,7 @@ func getConfigItemUint32Value(configFile *ini.File, sectionName string, itemName
 	}
 
 	section := configFile.Section(sectionName)
-	value, err := strconv.ParseUint(section.Key(itemName).String(), 10, 32)
+	value, err := strconv.ParseUint(section.Key(itemName).Value(), 10, 32)
 
 	if err == nil {
 		return uint32(value)
@@ -1353,7 +1359,13 @@ func getConfigItemBoolValue(configFile *ini.File, sectionName string, itemName s
 	}
 
 	section := configFile.Section(sectionName)
-	return section.Key(itemName).MustBool(defaultValue)
+	value, err := strconv.ParseBool(section.Key(itemName).Value())
+
+	if err == nil {
+		return value
+	}
+
+	return defaultValue
 }
 
 func getConfigItemValueFromEnvironment(sectionName string, itemName string) string {

@@ -606,16 +606,9 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
 
     function changeTagDisplayOrder({ tagId, from, to }: { tagId: string, from: number, to: number }): Promise<void> {
         return new Promise((resolve, reject) => {
-            let currentTag: TransactionTag | null = null;
+            const currentTag = allTransactionTagsMap.value[tagId];
 
-            for (const transactionTag of allTransactionTags.value) {
-                if (transactionTag.id === tagId) {
-                    currentTag = transactionTag;
-                    break;
-                }
-            }
-
-            if (!currentTag || !allTransactionTags.value[to]) {
+            if (!currentTag || !allTransactionTagsByGroupMap.value[currentTag.groupId] || !allTransactionTagsByGroupMap.value[currentTag.groupId]![to]) {
                 reject({ message: 'Unable to move tag' });
                 return;
             }

@@ -365,7 +365,8 @@ function paste(): void {
 
         currentValue.value = getStringValue(parsedAmount, false);
     }).catch(error => {
-        pastingAmount.value = false;
+        // Do not set pastingAmount to false here
+        // In iOS, system will show the paste context menu, if user click outside, the paste action should not be triggered again
         logger.error('failed to read clipboard text', error);
     });
 }

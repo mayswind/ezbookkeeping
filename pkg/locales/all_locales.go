@@ -41,7 +41,10 @@ var AllLanguages = map[string]*LocaleInfo{
 	},
     "sl": {
 		Content: sl,
-	},	
+	},
+	"ta": {
+		Content: ta,
+	},
 	"th": {
 		Content: th,
 	},

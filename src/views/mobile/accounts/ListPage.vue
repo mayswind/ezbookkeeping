@@ -411,7 +411,7 @@ function clearAllTransactions(password: string): void {
         hideLoading();
 
         showInputPasswordSheetForClearAllTransactions.value = false;
-        showToast('All transactions in this account has been cleared');
+        showToast('All transactions in this account have been cleared');
     }).catch(error => {
         clearingData.value = false;
         hideLoading();

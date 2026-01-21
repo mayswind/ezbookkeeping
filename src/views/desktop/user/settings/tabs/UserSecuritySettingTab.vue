@@ -63,11 +63,11 @@
             </v-card>
         </v-col>
 
-        <v-col cols="12" v-if="isOAuth2Enabled() && (loadingExternalAuth || (thirdPartyLogins && thirdPartyLogins.length))">
+        <v-col cols="12" v-if="isOAuth2Enabled() && (loadingExternalAuth || (thirdPartyLoginList && thirdPartyLoginList.length))">
             <v-card :class="{ 'disabled': loadingExternalAuth }">
                 <template #title>
                     <div class="d-flex align-center">
-                        <span>{{ tt('Third-Party Logins') }}</span>
+                        <span>{{ tt('Third-Party Login') }}</span>
                         <v-btn density="compact" color="default" variant="text" size="24"
                                class="ms-2" :icon="true" :loading="loadingExternalAuth" @click="reloadExternalAuth(false)">
                             <template #loader>
@@ -97,7 +97,7 @@
                     </tr>
 
                     <tr :key="thirdPartyLogin.externalAuthType"
-                        v-for="thirdPartyLogin in thirdPartyLogins">
+                        v-for="thirdPartyLogin in thirdPartyLoginList">
                         <td class="text-sm">
                             <v-icon start :icon="thirdPartyLogin.icon"/>
                             {{ thirdPartyLogin.displayName }}
@@ -337,18 +337,18 @@ const oauth2ClientSessionId = ref<string>(generateRandomUUID());
 
 const oauth2LinkUrl = computed<string>(() => rootStore.generateOAuth2LinkUrl('desktop', oauth2ClientSessionId.value));
 
-const thirdPartyLogins = computed<DesktopPageLinkedThirdPartyLogin[]>(() => {
-    const logins: DesktopPageLinkedThirdPartyLogin[] = [];
+const thirdPartyLoginList = computed<DesktopPageLinkedThirdPartyLogin[]>(() => {
+    const ret: DesktopPageLinkedThirdPartyLogin[] = [];
 
     if (!externalAuths.value) {
-        return logins;
+        return ret;
     }
 
     for (const externalAuth of externalAuths.value) {
-        logins.push(new DesktopPageLinkedThirdPartyLogin(externalAuth));
+        ret.push(new DesktopPageLinkedThirdPartyLogin(externalAuth));
     }
 
-    return logins;
+    return ret;
 });
 
 const sessions = computed<DesktopPageSessionInfo[]>(() => {
@@ -432,9 +432,9 @@ function reloadExternalAuth(silent?: boolean): void {
     userExternalAuthStore.getExternalAuths().then(response => {
         if (!silent) {
             if (isEquals(externalAuths.value, response)) {
-                snackbar.value?.showMessage('Third-party logins list is up to date');
+                snackbar.value?.showMessage('Third-party login list is up to date');
             } else {
-                snackbar.value?.showMessage('Third-party logins list has been updated');
+                snackbar.value?.showMessage('Third-party login list has been updated');
             }
         }
 

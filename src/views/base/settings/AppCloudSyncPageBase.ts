@@ -40,7 +40,7 @@ export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingI
         items: [
             { settingKey: 'itemsCountInTransactionListPage', settingName: 'Transactions Per Page', mobile: false, desktop: true },
             { settingKey: 'showTotalAmountInTransactionListPage', settingName: 'Show Monthly Total Amount', mobile: true, desktop: true },
-            { settingKey: 'showTagInTransactionListPage', settingName: 'Show Transaction Tag', mobile: true, desktop: true }
+            { settingKey: 'showTagInTransactionListPage', settingName: 'Show Transaction Tags', mobile: true, desktop: true }
         ]
     },
     {
@@ -61,7 +61,7 @@ export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingI
         categoryName: 'Insights Explorer Page',
         items: [
             { settingKey: 'insightsExplorerDefaultDateRangeType', settingName: 'Default Date Range', mobile: false, desktop: true },
-            { settingKey: 'showTagInInsightsExplorerPage', settingName: 'Show Transaction Tag', mobile: false, desktop: true }
+            { settingKey: 'showTagInInsightsExplorerPage', settingName: 'Show Transaction Tags', mobile: false, desktop: true }
         ]
     },
     {

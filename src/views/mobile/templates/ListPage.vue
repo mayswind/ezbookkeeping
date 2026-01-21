@@ -24,7 +24,7 @@
 
         <f7-list strong inset dividers class="margin-top" v-if="!loading && noAvailableTemplate">
             <f7-list-item :title="tt('No available template')"
-                          :footer="tt('Once you add templates, you can long press the Add button on the home page to quickly add a new transaction')"
+                          :footer="tt('Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction')"
                           v-if="templateType === TemplateType.Normal.type"></f7-list-item>
             <f7-list-item :title="tt('No available scheduled transactions')" v-else-if="templateType === TemplateType.Schedule.type"></f7-list-item>
             <f7-list-item :title="tt('No available template')" v-else></f7-list-item>

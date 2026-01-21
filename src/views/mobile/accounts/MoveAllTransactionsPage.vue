@@ -147,7 +147,7 @@ function confirm(): void {
         moving.value = false;
         hideLoading();
 
-        showToast('All transactions in this account has been moved.');
+        showToast('All transactions in this account have been moved.');
         router.back();
     }).catch(error => {
         moving.value = false;

@@ -550,7 +550,7 @@ function showReconciliationStatementCustomDateRangeDialog(account: Account, date
 
 function moveAllTransactions(account: Account): void {
     moveAllTransactionsDialog.value?.open(account).then(() => {
-        snackbar.value?.showMessage('All transactions in this account has been moved.');
+        snackbar.value?.showMessage('All transactions in this account have been moved.');
 
         if (accountsStore.accountListStateInvalid && !loading.value) {
             reload(false);
@@ -560,7 +560,7 @@ function moveAllTransactions(account: Account): void {
 
 function clearAllTransactions(account: Account): void {
     clearAllTransactionsDialog.value?.open(account).then(() => {
-        snackbar.value?.showMessage('All transactions in this account has been cleared');
+        snackbar.value?.showMessage('All transactions in this account have been cleared');
 
         if (accountsStore.accountListStateInvalid && !loading.value) {
             reload(false);

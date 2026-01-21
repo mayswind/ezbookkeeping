@@ -82,7 +82,7 @@
             </f7-list-item>
             <f7-list-item>
                 <template #after-title>
-                    {{ tt('Show Transaction Tag') }}
+                    {{ tt('Show Transaction Tags') }}
                 </template>
                 <template #after>
                     <f7-toggle :checked="showTagInTransactionListPage" @toggle:change="showTagInTransactionListPage = $event"></f7-toggle>

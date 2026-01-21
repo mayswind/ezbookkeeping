@@ -178,8 +178,8 @@
                                     item-title="displayName"
                                     item-value="value"
                                     persistent-placeholder
-                                    :label="tt('Show Transaction Tag')"
-                                    :placeholder="tt('Show Transaction Tag')"
+                                    :label="tt('Show Transaction Tags')"
+                                    :placeholder="tt('Show Transaction Tags')"
                                     :items="enableDisableOptions"
                                     v-model="showTagInTransactionListPage"
                                 />
@@ -267,8 +267,8 @@
                                     item-title="displayName"
                                     item-value="value"
                                     persistent-placeholder
-                                    :label="tt('Show Transaction Tag')"
-                                    :placeholder="tt('Show Transaction Tag')"
+                                    :label="tt('Show Transaction Tags')"
+                                    :placeholder="tt('Show Transaction Tags')"
                                     :items="enableDisableOptions"
                                     v-model="showTagInInsightsExplorerPage"
                                 />

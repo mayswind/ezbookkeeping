@@ -46,7 +46,7 @@ export function useAppSettingPageBase() {
         return [
             { name: tt('Disabled'), value: 'disabled' },
             { name: tt('Enabled'), value: 'enabled' },
-            { name: tt('Show Confirmation Every Time'), value: 'confirmation' }
+            { name: tt('Always Show Confirmation'), value: 'confirmation' }
         ];
     });
 

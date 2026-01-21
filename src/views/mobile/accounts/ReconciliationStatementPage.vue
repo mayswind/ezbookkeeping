@@ -323,7 +323,7 @@
         <number-pad-sheet :min-value="TRANSACTION_MIN_AMOUNT"
                           :max-value="TRANSACTION_MAX_AMOUNT"
                           :currency="currentAccountCurrency"
-                          :hint="tt('Please enter the new closing balance for the account')"
+                          :hint="tt('Please enter the new closing balance for this account')"
                           v-model:show="showNewClosingBalanceSheet"
                           v-model="newClosingBalance"
                           @update:model-value="updateClosingBalance"

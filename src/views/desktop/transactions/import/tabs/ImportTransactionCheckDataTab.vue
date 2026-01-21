@@ -49,15 +49,15 @@
                                      @click="selectInvert"></v-list-item>
                         <v-divider class="my-2"/>
                         <v-list-item :prepend-icon="mdiSelectAll"
-                                     :title="tt('Select All in This Page')"
+                                     :title="tt('Select All on This Page')"
                                      :disabled="!!disabled"
                                      @click="selectAllInThisPage"></v-list-item>
                         <v-list-item :prepend-icon="mdiSelect"
-                                     :title="tt('Select None in This Page')"
+                                     :title="tt('Select None on This Page')"
                                      :disabled="!!disabled"
                                      @click="selectNoneInThisPage"></v-list-item>
                         <v-list-item :prepend-icon="mdiSelectInverse"
-                                     :title="tt('Invert Selection in This Page')"
+                                     :title="tt('Invert Selection on This Page')"
                                      :disabled="!!disabled"
                                      @click="selectInvertInThisPage"></v-list-item>
                     </v-list>

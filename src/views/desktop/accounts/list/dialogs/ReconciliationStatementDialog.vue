@@ -565,7 +565,7 @@ function updateClosingBalance(): void {
     }
 
     amountInputDialog.value?.open({
-        text: 'Please enter the new closing balance for the account',
+        text: 'Please enter the new closing balance for this account',
         inputLabel: 'Closing Balance',
         inputPlaceholder: 'Closing Balance',
         currency: currentAccountCurrency.value,

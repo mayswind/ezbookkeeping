@@ -6,7 +6,7 @@
     },
     "language": {
         "German": "ஜெர்மன்",
-        "English": "ஆங்கிலம் (English)",
+        "English": "ஆங்கிலம்",
         "Spanish": "ஸ்பானிஷ்",
         "French": "பிரெஞ்சு",
         "Italian": "இத்தாலியன்",
@@ -38,7 +38,7 @@
         "numeralSystem": "WesternArabicNumerals",
         "decimalSeparator": "Dot",
         "digitGroupingSymbol": "Comma",
-        "digitGrouping": "ThousandsSeparator",
+        "digitGrouping": "IndianNumberGrouping",
         "currencyDisplayType": "SymbolBeforeAmount"
     },
     "format": {

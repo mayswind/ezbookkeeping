@@ -1507,7 +1507,6 @@
     "Semicolon": "Punto y coma",
     "Tab": "Tabulación",
     "Vertical Bar": "Barra Vertical",
-    "Slash": "Slash",
     "All Types": "Todos los Tipos",
     "More": "Más",
     "All": "Todo",
@@ -2538,4 +2537,3 @@
     "Numeric Overflow": "Desbordamiento Numérico",
     "Click to close": "Haz clic para cerrar"
 }
-

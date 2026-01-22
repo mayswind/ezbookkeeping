@@ -274,13 +274,7 @@ export function useReconciliationStatementPageBase() {
                 displayAccountBalance = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.accountClosingBalance);
             }
 
-            let description = transaction.comment || '';
-
-            if (fileType === KnownFileType.CSV) {
-                description = replaceAll(description, ',', ' ');
-            } else if (fileType === KnownFileType.TSV) {
-                description = replaceAll(description, '\t', ' ');
-            }
+            const description = replaceAll(transaction.comment || '', separator, ' ');
 
             return [
                 formatDateTimeToGregorianDefaultDateTime(transactionTime),

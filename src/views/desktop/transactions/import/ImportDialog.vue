@@ -960,10 +960,16 @@ function close(completed: boolean): void {
 }
 
 watch(fileType, (newValue) => {
-    if (allFileSubTypes.value && allFileSubTypes.value.length) {
-        fileSubType.value = allFileSubTypes.value[0]!.type;
+    const subFileTypes = allSupportedImportFileTypesMap.value[newValue]?.subTypes;
+
+    if (subFileTypes && subFileTypes.length) {
+        if (fileSubType.value !== subFileTypes[0]!.type) {
+            fileSubType.value = subFileTypes[0]!.type;
+        } else if (settingsStore.appSettings.rememberLastSelectedFileTypeInImportTransactionDialog && !loading.value) {
+            settingsStore.setLastSelectedFileTypeInImportTransactionDialog(`${newValue}|${fileSubType.value}`);
+        }
     } else {
-        if (settingsStore.appSettings.rememberLastSelectedFileTypeInImportTransactionDialog) {
+        if (settingsStore.appSettings.rememberLastSelectedFileTypeInImportTransactionDialog && !loading.value) {
             settingsStore.setLastSelectedFileTypeInImportTransactionDialog(`${newValue}|`);
         }
     }
@@ -975,7 +981,7 @@ watch(fileType, (newValue) => {
 });
 
 watch(fileSubType, (newValue) => {
-    if (settingsStore.appSettings.rememberLastSelectedFileTypeInImportTransactionDialog) {
+    if (settingsStore.appSettings.rememberLastSelectedFileTypeInImportTransactionDialog && !loading.value) {
         settingsStore.setLastSelectedFileTypeInImportTransactionDialog(`${fileType.value}|${newValue}`);
     }
 

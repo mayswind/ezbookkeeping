@@ -149,7 +149,8 @@
         "exportReconciliationStatementsFileName": "ezBookkeeping_{nickname}_對帳單",
         "defaultImportDataMappingFileName": "ezBookkeeping_匯入資料對應檔案",
         "defaultImportHandlingScript": "ezBookkeeping_匯入處理腳本",
-        "defaultImportReplaceRuleFileName": "ezBookkeeping_匯入替換規則檔案"
+        "defaultImportReplaceRuleFileName": "ezBookkeeping_匯入替換規則檔案",
+        "defaultImportCheckResultFileName": "ezBookkeeping_匯入檢查結果"
     },
     "calendar": {
         "Gregorian": "公曆",

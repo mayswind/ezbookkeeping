@@ -149,7 +149,8 @@
         "exportReconciliationStatementsFileName": "ezBookkeeping_{nickname}_对账单",
         "defaultImportDataMappingFileName": "ezBookkeeping_导入数据映射文件",
         "defaultImportHandlingScript": "ezBookkeeping_导入处理脚本",
-        "defaultImportReplaceRuleFileName": "ezBookkeeping_导入替换规则文件"
+        "defaultImportReplaceRuleFileName": "ezBookkeeping_导入替换规则文件",
+        "defaultImportCheckResultFileName": "ezBookkeeping_导入检查结果"
     },
     "calendar": {
         "Gregorian": "公历",

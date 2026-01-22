@@ -149,7 +149,8 @@
         "exportReconciliationStatementsFileName": "ezBookkeeping_{nickname}_reconciliation_statements",
         "defaultImportDataMappingFileName": "ezBookkeeping_import_data_mapping",
         "defaultImportHandlingScript": "ezBookkeeping_handling_script",
-        "defaultImportReplaceRuleFileName": "ezBookkeeping_import_replace_rule"
+        "defaultImportReplaceRuleFileName": "ezBookkeeping_import_replace_rule",
+        "defaultImportCheckResultFileName": "ezBookkeeping_import_check_result"
     },
     "calendar": {
         "Gregorian": "ಗ್ರೆಗೋರಿಯನ್",

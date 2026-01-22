@@ -149,7 +149,8 @@
         "exportReconciliationStatementsFileName": "ezBookkeeping_{nickname}_mutabakat_ekstreleri",
         "defaultImportDataMappingFileName": "ezBookkeeping_ice_aktarim_eslemesi",
         "defaultImportHandlingScript": "ezBookkeeping_isleme_betigi",
-        "defaultImportReplaceRuleFileName": "ezBookkeeping_ice_aktarim_degistirme_kurali"
+        "defaultImportReplaceRuleFileName": "ezBookkeeping_ice_aktarim_degistirme_kurali",
+        "defaultImportCheckResultFileName": "ezBookkeeping_import_check_result"
     },
     "calendar": {
         "Gregorian": "Miladi",

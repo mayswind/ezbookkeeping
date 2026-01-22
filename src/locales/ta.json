@@ -2292,6 +2292,7 @@
     "File Format": "கோப்பு வடிவம்",
     "CSV (Comma-separated values) File": "CSV (காற்புள்ளி-தனிப்பட்ட மதிப்புகள்) கோப்பு",
     "TSV (Tab-separated values) File": "TSV (தாவல்-தனிப்பட்ட மதிப்புகள்) கோப்பு",
+    "SSV (Semicolon-separated values) File": "SSV (Semicolon-separated values) File",
     "Export to CSV (Comma-separated values) File": "CSV (காற்புள்ளி-தனிப்பட்ட மதிப்புகள்) கோப்பு‌க்கு ஏற்றுமதி செய்",
     "Export to TSV (Tab-separated values) File": "TSV (தாவல்-தனிப்பட்ட மதிப்புகள்) கோப்பு‌க்கு ஏற்றுமதி செய்",
     "Markdown File": "Markdown கோப்பு",

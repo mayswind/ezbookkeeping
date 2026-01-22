@@ -2292,6 +2292,7 @@
     "File Format": "File Format",
     "CSV (Comma-separated values) File": "CSV (Kommagetrennte Werte) Datei",
     "TSV (Tab-separated values) File": "TSV (Tabulatorgetrennte Werte) Datei",
+    "SSV (Semicolon-separated values) File": "SSV (Semicolon-separated values) File",
     "Export to CSV (Comma-separated values) File": "Export to CSV (Comma-separated values) File",
     "Export to TSV (Tab-separated values) File": "Export to TSV (Tab-separated values) File",
     "Markdown File": "Markdown File",

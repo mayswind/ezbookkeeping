@@ -17,10 +17,12 @@ import (
 func TestIsDelimiterSeparatedValuesFileType(t *testing.T) {
 	assert.True(t, IsDelimiterSeparatedValuesFileType("custom_csv"))
 	assert.True(t, IsDelimiterSeparatedValuesFileType("custom_tsv"))
+	assert.True(t, IsDelimiterSeparatedValuesFileType("custom_ssv"))
 
 	assert.False(t, IsDelimiterSeparatedValuesFileType("dsv"))
 	assert.False(t, IsDelimiterSeparatedValuesFileType("csv"))
 	assert.False(t, IsDelimiterSeparatedValuesFileType("tsv"))
+	assert.False(t, IsDelimiterSeparatedValuesFileType("ssv"))
 }
 
 func TestCustomTransactionDataDsvFileParser_ParseDsvFileLines(t *testing.T) {
@@ -52,6 +54,26 @@ func TestCustomTransactionDataDsvFileParser_ParseDsvFileLines(t *testing.T) {
 	allLines, err = importer.ParseDsvFileLines(context, []byte(
 		"2024-09-01 12:34:56\tE\t1.00\n"+
 			"2024-09-01 23:59:59\tT\t0.05"))
+	assert.Nil(t, err)
+
+	assert.Equal(t, 2, len(allLines))
+
+	assert.Equal(t, 3, len(allLines[0]))
+	assert.Equal(t, "2024-09-01 12:34:56", allLines[0][0])
+	assert.Equal(t, "E", allLines[0][1])
+	assert.Equal(t, "1.00", allLines[0][2])
+
+	assert.Equal(t, 3, len(allLines[1]))
+	assert.Equal(t, "2024-09-01 23:59:59", allLines[1][0])
+	assert.Equal(t, "T", allLines[1][1])
+	assert.Equal(t, "0.05", allLines[1][2])
+
+	importer, err = CreateNewCustomTransactionDataDsvFileParser("custom_ssv", "utf-8")
+	assert.Nil(t, err)
+
+	allLines, err = importer.ParseDsvFileLines(context, []byte(
+		"2024-09-01 12:34:56;E;1.00\n"+
+			"2024-09-01 23:59:59;T;0.05"))
 	assert.Nil(t, err)
 
 	assert.Equal(t, 2, len(allLines))

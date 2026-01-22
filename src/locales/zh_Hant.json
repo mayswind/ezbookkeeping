@@ -2292,6 +2292,7 @@
     "File Format": "檔案格式",
     "CSV (Comma-separated values) File": "CSV (逗號分隔的值) 檔案",
     "TSV (Tab-separated values) File": "TSV (定位點分隔的值) 檔案",
+    "SSV (Semicolon-separated values) File": "SSV (分號分隔的值) 檔案",
     "Export to CSV (Comma-separated values) File": "匯出為 CSV (逗號分隔的值) 檔案",
     "Export to TSV (Tab-separated values) File": "匯出為 TSV (定位點分隔的值) 檔案",
     "Markdown File": "Markdown 檔案",

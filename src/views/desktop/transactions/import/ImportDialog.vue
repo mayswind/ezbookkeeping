@@ -715,6 +715,8 @@ function parseData(): void {
             uploadFile = KnownFileType.CSV.createFile(importData.value, 'import');
         } else if (type === 'custom_tsv') {
             uploadFile = KnownFileType.TSV.createFile(importData.value, 'import');
+        } else if (type === 'custom_ssv') {
+            uploadFile = KnownFileType.TXT.createFile(importData.value, 'import');
         } else {
             snackbar.value?.showError('Parameter Invalid');
             return;

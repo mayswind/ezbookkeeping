@@ -2292,6 +2292,7 @@
     "File Format": "รูปแบบไฟล์",
     "CSV (Comma-separated values) File": "ไฟล์ CSV (คั่นด้วยเครื่องหมายจุลภาค)",
     "TSV (Tab-separated values) File": "ไฟล์ TSV (คั่นด้วยแท็บ)",
+    "SSV (Semicolon-separated values) File": "SSV (Semicolon-separated values) File",
     "Export to CSV (Comma-separated values) File": "ส่งออกเป็นไฟล์ CSV (คั่นด้วยเครื่องหมายจุลภาค)",
     "Export to TSV (Tab-separated values) File": "ส่งออกเป็นไฟล์ TSV (คั่นด้วยแท็บ)",
     "Markdown File": "ไฟล์ Markdown",

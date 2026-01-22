@@ -29,6 +29,7 @@ import (
 var supportedFileTypeSeparators = map[string]rune{
 	"custom_csv": ',',
 	"custom_tsv": '\t',
+	"custom_ssv": ';',
 }
 
 var supportedFileEncodings = map[string]encoding.Encoding{

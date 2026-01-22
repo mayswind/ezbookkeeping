@@ -2292,6 +2292,7 @@
     "File Format": "파일 형식",
     "CSV (Comma-separated values) File": "CSV (쉼표로 구분된 값) 파일",
     "TSV (Tab-separated values) File": "TSV (탭으로 구분된 값) 파일",
+    "SSV (Semicolon-separated values) File": "SSV (Semicolon-separated values) File",
     "Export to CSV (Comma-separated values) File": "CSV (쉼표로 구분된 값) 파일로 내보내기",
     "Export to TSV (Tab-separated values) File": "TSV (탭으로 구분된 값) 파일로 내보내기",
     "Markdown File": "Markdown 파일",

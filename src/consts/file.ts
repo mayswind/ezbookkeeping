@@ -141,6 +141,11 @@ export const SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES: ImportFileCategoryAndType
                         type: 'custom_tsv',
                         name: 'TSV (Tab-separated values) File',
                         extensions: '.tsv,.txt',
+                    },
+                    {
+                        type: 'custom_ssv',
+                        name: 'SSV (Semicolon-separated values) File',
+                        extensions: '.txt',
                     }
                 ],
                 supportedEncodings: SUPPORTED_FILE_ENCODINGS,
@@ -163,6 +168,11 @@ export const SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES: ImportFileCategoryAndType
                         type: 'custom_tsv',
                         name: 'TSV (Tab-separated values) File',
                         extensions: '.tsv,.txt',
+                    },
+                    {
+                        type: 'custom_ssv',
+                        name: 'SSV (Semicolon-separated values) File',
+                        extensions: '.txt',
                     }
                 ],
                 dataFromTextbox: true,

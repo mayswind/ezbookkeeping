@@ -2292,6 +2292,7 @@
     "File Format": "Dosya Formatı",
     "CSV (Comma-separated values) File": "CSV (Virgülle ayrılmış değerler) Dosyası",
     "TSV (Tab-separated values) File": "TSV (Sekmeyle ayrılmış değerler) Dosyası",
+    "SSV (Semicolon-separated values) File": "SSV (Semicolon-separated values) File",
     "Export to CSV (Comma-separated values) File": "CSV (Virgülle ayrılmış değerler) Dosyasına Dışa Aktar",
     "Export to TSV (Tab-separated values) File": "TSV (Sekmeyle ayrılmış değerler) Dosyasına Dışa Aktar",
     "Markdown File": "Markdown Dosyası",

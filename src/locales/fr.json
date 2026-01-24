@@ -1952,6 +1952,7 @@
     "Unsupported Map Provider": "Fournisseur de cartes non pris en charge",
     "Please refresh the page and try again. If the error persists, ensure that the server's map settings are correctly configured.": "Veuillez actualiser la page et réessayer. Si l'erreur persiste, assurez-vous que les paramètres de carte du serveur sont correctement configurés.",
     "Import Transactions": "Importer des transactions",
+    "Refresh Accounts, Categories and Tags": "Refresh Accounts, Categories and Tags",
     "Upload File": "Télécharger un fichier",
     "Upload Transaction Data File": "Télécharger un fichier de données de transaction",
     "Define Column": "Définir les colonnes",

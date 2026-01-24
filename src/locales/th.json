@@ -1952,6 +1952,7 @@
     "Unsupported Map Provider": "ผู้ให้บริการแผนที่ไม่รองรับ",
     "Please refresh the page and try again. If the error persists, ensure that the server's map settings are correctly configured.": "กรุณารีเฟรชหน้าและลองอีกครั้ง หากเกิดข้อผิดพลาดซ้ำ ตรวจสอบการตั้งค่าแผนที่บนเซิร์ฟเวอร์ให้ถูกต้อง",
     "Import Transactions": "นำเข้าธุรกรรม",
+    "Refresh Accounts, Categories and Tags": "Refresh Accounts, Categories and Tags",
     "Upload File": "อัปโหลดไฟล์",
     "Upload Transaction Data File": "อัปโหลดไฟล์ข้อมูลธุรกรรม",
     "Define Column": "กำหนดคอลัมน์",

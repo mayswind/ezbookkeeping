@@ -1952,6 +1952,7 @@
     "Unsupported Map Provider": "Niet-ondersteunde kaartprovider",
     "Please refresh the page and try again. If the error persists, ensure that the server's map settings are correctly configured.": "Vernieuw de pagina en probeer het opnieuw. Blijft de fout optreden, controleer dan of de kaartinstellingen op de server correct zijn geconfigureerd.",
     "Import Transactions": "Transacties importeren",
+    "Refresh Accounts, Categories and Tags": "Refresh Accounts, Categories and Tags",
     "Upload File": "Bestand uploaden",
     "Upload Transaction Data File": "Bestand met transactiegegevens uploaden",
     "Define Column": "Kolommen definiëren",

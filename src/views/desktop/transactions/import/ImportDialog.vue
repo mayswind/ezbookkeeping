@@ -5,7 +5,18 @@
                 <div class="d-flex align-center justify-center">
                     <div class="d-flex w-100 align-center">
                         <h4 class="text-h4">{{ tt('Import Transactions') }}</h4>
-                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="loading"></v-progress-circular>
+                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="currentStep !== 'checkData' && loading"></v-progress-circular>
+                        <v-btn density="compact" color="default" variant="text" size="24"
+                               class="ms-2" :icon="true" :disabled="loading"
+                               :loading="loading"
+                               v-if="currentStep === 'checkData'"
+                               @click="reloadBasisData">
+                            <template #loader>
+                                <v-progress-circular indeterminate size="20"/>
+                            </template>
+                            <v-icon :icon="mdiRefresh" size="24" />
+                            <v-tooltip activator="parent">{{ tt('Refresh Accounts, Categories and Tags') }}</v-tooltip>
+                        </v-btn>
                     </div>
                     <v-btn density="comfortable" color="default" variant="text" class="ms-2"
                            :icon="true" :disabled="loading || submitting"
@@ -307,6 +318,7 @@ import { generateRandomUUID } from '@/lib/misc.ts';
 import logger from '@/lib/logger.ts';
 
 import {
+    mdiRefresh,
     mdiFilterOutline,
     mdiCheck,
     mdiDotsVertical,
@@ -672,6 +684,46 @@ function setImportFile(event: Event): void {
             autoDetectedFileEncoding.value = undefined;
         });
     }
+}
+
+function reloadBasisData(): void {
+    loading.value = true;
+
+    Promise.allSettled([
+        accountsStore.loadAllAccounts({ force: true }),
+        transactionCategoriesStore.loadAllCategories({ force: true }),
+        transactionTagsStore.loadAllTags({ force: true })
+    ]).then(results => {
+        loading.value = false;
+
+        const isAllUpToDate = results.length === 3
+            && results[0].status === 'rejected' && results[0].reason?.isUpToDate
+            && results[1].status === 'rejected' && results[1].reason?.isUpToDate
+            && results[2].status === 'rejected' && results[2].reason?.isUpToDate;
+
+        // show info if all up to date
+        if (isAllUpToDate) {
+            snackbar.value?.showMessage('Data is up to date');
+            return;
+        }
+
+        // show error if any
+        for (const result of results) {
+            if (result.status === 'rejected' && !result.reason?.isUpToDate) {
+                snackbar.value?.showError(result.reason);
+                return;
+            }
+        }
+
+        // show info if one of them updated
+        for (const result of results) {
+            if (result.status === 'fulfilled') {
+                snackbar.value?.showMessage('Data has been updated');
+                importTransactionCheckDataTab.value?.updateAllTransactionsIsValid();
+                return;
+            }
+        }
+    });
 }
 
 function parseData(): void {

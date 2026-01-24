@@ -1952,6 +1952,7 @@
     "Unsupported Map Provider": "Desteklenmeyen Harita Sağlayıcısı",
     "Please refresh the page and try again. If the error persists, ensure that the server's map settings are correctly configured.": "Lütfen sayfayı yenileyin ve tekrar deneyin. Hata devam ederse, sunucunun harita ayarlarının doğru yapılandırıldığından emin olun.",
     "Import Transactions": "İşlemleri İçe Aktar",
+    "Refresh Accounts, Categories and Tags": "Refresh Accounts, Categories and Tags",
     "Upload File": "Dosya Yükle",
     "Upload Transaction Data File": "İşlem Veri Dosyası Yükle",
     "Define Column": "Sütun Tanımla",

@@ -1952,6 +1952,7 @@
     "Unsupported Map Provider": "サポートされていないマッププロバイダーです",
     "Please refresh the page and try again. If the error persists, ensure that the server's map settings are correctly configured.": "ページを更新してもう一度やり直してください。エラーが続く場合はサーバーのマップ設定が正しく構成されていることを確認してください。",
     "Import Transactions": "取引をインポート",
+    "Refresh Accounts, Categories and Tags": "Refresh Accounts, Categories and Tags",
     "Upload File": "ファイルをアップロード",
     "Upload Transaction Data File": "取引データファイルをアップロードします",
     "Define Column": "列の定義",

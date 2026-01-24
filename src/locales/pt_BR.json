@@ -1952,6 +1952,7 @@
     "Unsupported Map Provider": "Provedor de Mapa Não Suportado",
     "Please refresh the page and try again. If the error persists, ensure that the server's map settings are correctly configured.": "Por favor, atualize a página e tente novamente. Se o erro persistir, verifique se as configurações de mapa do servidor estão corretamente configuradas.",
     "Import Transactions": "Importar Transações",
+    "Refresh Accounts, Categories and Tags": "Refresh Accounts, Categories and Tags",
     "Upload File": "Enviar Arquivo",
     "Upload Transaction Data File": "Enviar Arquivo de Dados de Transação",
     "Define Column": "Definir Coluna",

@@ -1952,6 +1952,7 @@
     "Unsupported Map Provider": "Неподдерживаемый поставщик карт",
     "Please refresh the page and try again. If the error persists, ensure that the server's map settings are correctly configured.": "Пожалуйста, обновите страницу и попробуйте снова. Если ошибка сохраняется, убедитесь, что настройки карты на сервере настроены правильно.",
     "Import Transactions": "Импорт транзакций",
+    "Refresh Accounts, Categories and Tags": "Refresh Accounts, Categories and Tags",
     "Upload File": "Загрузить файл",
     "Upload Transaction Data File": "Загрузить файл данных транзакций",
     "Define Column": "Define Column",

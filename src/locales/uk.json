@@ -1952,6 +1952,7 @@
     "Unsupported Map Provider": "Непідтримуваний провайдер карт",
     "Please refresh the page and try again. If the error persists, ensure that the server's map settings are correctly configured.": "Оновіть сторінку та спробуйте ще раз. Якщо помилка не зникає, перевірте налаштування мап на сервері.",
     "Import Transactions": "Імпортувати транзакції",
+    "Refresh Accounts, Categories and Tags": "Refresh Accounts, Categories and Tags",
     "Upload File": "Завантажити файл",
     "Upload Transaction Data File": "Завантажити файл з даними транзакцій",
     "Define Column": "Визначити стовпець",

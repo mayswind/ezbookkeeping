@@ -1952,6 +1952,7 @@
     "Unsupported Map Provider": "Nhà cung cấp bản đồ không được hỗ trợ",
     "Please refresh the page and try again. If the error persists, ensure that the server's map settings are correctly configured.": "Vui lòng làm mới trang và thử lại. Nếu lỗi vẫn tiếp diễn, hãy đảm bảo rằng cài đặt bản đồ của máy chủ được định cấu hình chính xác.",
     "Import Transactions": "Nhập giao dịch",
+    "Refresh Accounts, Categories and Tags": "Refresh Accounts, Categories and Tags",
     "Upload File": "Tải lên tệp",
     "Upload Transaction Data File": "Tải lên tệp dữ liệu giao dịch",
     "Define Column": "Define Column",

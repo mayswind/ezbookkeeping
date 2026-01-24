@@ -1634,14 +1634,43 @@ function updateTransactionData(transaction: ImportTransaction): void {
 
     if (transaction.categoryId && allCategoriesMap.value[transaction.categoryId]) {
         transaction.actualCategoryName = allCategoriesMap.value[transaction.categoryId]!.name;
+    } else {
+        if (transaction.type !== TransactionType.ModifyBalance) {
+            transaction.valid = false;
+        }
     }
 
     if (transaction.sourceAccountId && allAccountsMap.value[transaction.sourceAccountId]) {
         transaction.actualSourceAccountName = allAccountsMap.value[transaction.sourceAccountId]!.name;
+    } else {
+        transaction.valid = false;
     }
 
     if (transaction.destinationAccountId && allAccountsMap.value[transaction.destinationAccountId]) {
         transaction.actualDestinationAccountName = allAccountsMap.value[transaction.destinationAccountId]!.name;
+    } else {
+        if (transaction.type === TransactionType.Transfer) {
+            transaction.valid = false;
+        }
+    }
+
+    if (transaction.tagIds && transaction.tagIds.length) {
+        for (const tagId of transaction.tagIds) {
+            if (!tagId || !allTagsMap.value[tagId]) {
+                transaction.valid = false;
+                break;
+            }
+        }
+    }
+}
+
+function updateAllTransactionsIsValid(): void {
+    if (!props.importTransactions || props.importTransactions.length < 1) {
+        return;
+    }
+
+    for (const importTransaction of props.importTransactions) {
+        updateTransactionData(importTransaction);
     }
 }
 
@@ -2227,6 +2256,7 @@ defineExpose({
     toolMenus,
     isEditing,
     canImport,
+    updateAllTransactionsIsValid,
     reset,
     setCountPerPage
 });

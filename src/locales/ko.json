@@ -1952,6 +1952,7 @@
     "Unsupported Map Provider": "지원되지 않는 지도 제공업체",
     "Please refresh the page and try again. If the error persists, ensure that the server's map settings are correctly configured.": "페이지를 새로 고치고 다시 시도하십시오. 오류가 지속되면 서버의 지도 설정이 올바르게 구성되었는지 확인하십시오.",
     "Import Transactions": "거래 가져오기",
+    "Refresh Accounts, Categories and Tags": "Refresh Accounts, Categories and Tags",
     "Upload File": "파일 업로드",
     "Upload Transaction Data File": "거래 데이터 파일 업로드",
     "Define Column": "열 정의",

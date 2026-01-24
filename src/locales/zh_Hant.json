@@ -1952,6 +1952,7 @@
     "Unsupported Map Provider": "不支援的地圖提供者",
     "Please refresh the page and try again. If the error persists, ensure that the server's map settings are correctly configured.": "請重新載入頁面並重試。如果仍然顯示錯誤，請確保正確設定了伺服器地圖設定。",
     "Import Transactions": "匯入交易",
+    "Refresh Accounts, Categories and Tags": "重新載入帳戶、分類和標籤",
     "Upload File": "上傳檔案",
     "Upload Transaction Data File": "上傳交易資料檔案",
     "Define Column": "定義欄位",

@@ -182,7 +182,7 @@
                                                                    :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                    :prepend-icon="mdiFolderMoveOutline"
                                                                    :loading="tagMoving[element.id]"
-                                                                   :disabled="loading || updating"
+                                                                   :disabled="loading || updating || allTagGroupsWithDefault.length < 2"
                                                                    v-if="editingTag.id !== element.id">
                                                                 <template #loader>
                                                                     <v-progress-circular indeterminate size="20" width="2"/>

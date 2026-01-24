@@ -110,7 +110,7 @@
                 <f7-swipeout-actions :left="textDirection === TextDirection.RTL"
                                      :right="textDirection === TextDirection.LTR"
                                      v-if="!sortable && editingTag.id !== tag.id">
-                    <f7-swipeout-button color="primary" close :text="tt('Move')" @click="moveTagToGroup(tag)"></f7-swipeout-button>
+                    <f7-swipeout-button color="primary" close :class="{ 'disabled': allTagGroupsWithDefault.length < 2 }" :text="tt('Move')" @click="moveTagToGroup(tag)"></f7-swipeout-button>
                     <f7-swipeout-button color="orange" close :text="tt('Edit')" @click="edit(tag)"></f7-swipeout-button>
                     <f7-swipeout-button color="red" class="padding-horizontal" @click="remove(tag, false)">
                         <f7-icon f7="trash"></f7-icon>
@@ -163,7 +163,12 @@
                                  @click="moveTagToGroup(tagToMove, moveToTagGroupId)"></f7-link>
                     </f7-nav-right>
                 </f7-navbar>
-                <f7-list strong inset dividers class="margin-vertical">
+
+                <f7-list strong inset dividers class="margin-top" v-if="!loading && allTagGroupsWithDefault.length < 2">
+                    <f7-list-item :title="tt('No available tag group')"></f7-list-item>
+                </f7-list>
+
+                <f7-list strong inset dividers class="margin-vertical" v-if="allTagGroupsWithDefault.length >= 2">
                     <template :key="tagGroup.id" v-for="tagGroup in allTagGroupsWithDefault">
                         <f7-list-item checkbox
                                       :title="tagGroup.name"

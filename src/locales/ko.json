@@ -11,9 +11,9 @@
         "French": "프랑스어",
         "Italian": "이탈리아어",
         "Japanese": "일본어",
-        "Dutch": "네덜란드어",
         "Kannada": "칸나다어",
         "Korean": "한국어",
+        "Dutch": "네덜란드어",
         "Portuguese (Brazil)": "포르투갈어 (브라질)",
         "Russian": "러시아어",
         "Slovenian": "슬로베니아어",
@@ -1056,7 +1056,7 @@
         "custom": "사용자 정의"
     },
     "error": {
-        "system error": " 시스템 오류",
+        "system error": "시스템 오류",
         "api not found": "API를 요청하지 못했습니다",
         "not implemented": "구현되지 않음",
         "system is busy": "시스템이 바쁩니다",
@@ -2531,7 +2531,7 @@
     "Official Website": "공식 웹사이트",
     "Report Issue": "문제 보고",
     "Getting help": "도움 받기",
-    "Documentation": " 문서",
+    "Documentation": "문서",
     "License": "라이선스",
     "Are you sure you want to open this link?": "이 링크를 열겠습니까?",
     "An error occurred": "오류가 발생했습니다.",

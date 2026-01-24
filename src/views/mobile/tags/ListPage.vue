@@ -191,7 +191,7 @@
                                    @click="removeTagGroup"
                                    v-if="activeTagGroupId && activeTagGroupId !== DEFAULT_TAG_GROUP_ID">{{ tt('Delete Tag Group') }}</f7-actions-button>
             </f7-actions-group>
-            <f7-actions-group>
+            <f7-actions-group v-if="allTagGroupsWithDefault.length >= 2">
                 <f7-actions-button @click="changeTagGroupDisplayOrder">{{ tt('Change Group Display Order') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>

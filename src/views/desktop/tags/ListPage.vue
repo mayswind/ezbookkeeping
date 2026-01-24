@@ -77,10 +77,11 @@
                                                                      v-if="activeTagGroupId && activeTagGroupId !== DEFAULT_TAG_GROUP_ID">
                                                             <v-list-item-title>{{ tt('Delete Tag Group') }}</v-list-item-title>
                                                         </v-list-item>
-                                                        <v-divider class="my-2"/>
+                                                        <v-divider class="my-2" v-if="allTagGroupsWithDefault.length >= 2"/>
                                                         <v-list-item :prepend-icon="mdiSort"
                                                                      :disabled="!allTagGroupsWithDefault || allTagGroupsWithDefault.length < 2"
                                                                      :title="tt('Change Group Display Order')"
+                                                                     v-if="allTagGroupsWithDefault.length >= 2"
                                                                      @click="showChangeGroupDisplayOrderDialog"></v-list-item>
                                                         <v-divider class="my-2"/>
                                                         <v-list-item :prepend-icon="mdiEyeOutline"

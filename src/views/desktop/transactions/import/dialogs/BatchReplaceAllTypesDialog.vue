@@ -392,17 +392,38 @@ function open(options: { expenseCategoryNames: NameValue[], incomeCategoryNames:
 function reload(): void {
     loading.value = true;
 
-    Promise.all([
+    Promise.allSettled([
         accountsStore.loadAllAccounts({ force: true }),
         transactionCategoriesStore.loadAllCategories({ force: true }),
         transactionTagsStore.loadAllTags({ force: true })
-    ]).then(() => {
-        loading.value = false;
-    }).catch(error => {
+    ]).then(results => {
         loading.value = false;
 
-        if (!error.processed) {
-            snackbar.value?.showError(error);
+        const isAllUpToDate = results.length === 3
+            && results[0].status === 'rejected' && results[0].reason?.isUpToDate
+            && results[1].status === 'rejected' && results[1].reason?.isUpToDate
+            && results[2].status === 'rejected' && results[2].reason?.isUpToDate;
+
+        // show info if all up to date
+        if (isAllUpToDate) {
+            snackbar.value?.showMessage('Data is up to date');
+            return;
+        }
+
+        // show error if any
+        for (const result of results) {
+            if (result.status === 'rejected' && !result.reason?.isUpToDate) {
+                snackbar.value?.showError(result.reason);
+                return;
+            }
+        }
+
+        // show info if one of them updated
+        for (const result of results) {
+            if (result.status === 'fulfilled') {
+                snackbar.value?.showMessage('Data has been updated');
+                return;
+            }
         }
     });
 }

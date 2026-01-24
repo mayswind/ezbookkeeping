@@ -432,6 +432,7 @@ oauth2ClientSessionId.value = generateRandomUUID();
 .login-divider > .item-content {
     width: 100%;
     min-height: 0;
+    white-space: nowrap;
 
     > .item-inner {
         padding-top: 0;

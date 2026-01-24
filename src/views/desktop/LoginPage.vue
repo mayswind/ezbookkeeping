@@ -108,7 +108,7 @@
                                             <v-progress-circular indeterminate size="22" class="ms-2" v-if="loggingInByPassword"></v-progress-circular>
                                         </v-btn>
 
-                                        <v-col cols="12" class="d-flex align-center px-0" v-if="isInternalAuthEnabled() && isOAuth2Enabled()">
+                                        <v-col cols="12" class="d-flex align-center px-0 text-no-wrap" v-if="isInternalAuthEnabled() && isOAuth2Enabled()">
                                             <v-divider class="me-3" />
                                             {{ tt('or') }}
                                             <v-divider class="ms-3" />

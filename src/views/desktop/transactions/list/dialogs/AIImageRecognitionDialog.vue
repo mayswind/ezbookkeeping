@@ -12,14 +12,14 @@
                      @dragleave.prevent="onDragLeave"
                      @drop.prevent="onDrop">
                     <div class="d-flex w-100 h-100 justify-center align-center justify-content-center text-center px-4"
-                         :class="{ 'dropzone': true, 'dropzone-dragover': isDragOver }">
+                         :class="{ 'dropzone': true, 'dropzone-dark': isDarkMode, 'dropzone-blurry-bg': loading || isDragOver || recognizing, 'dropzone-dragover': isDragOver }">
                         <div class="d-inline-flex flex-column" v-if="!loading && !imageFile && !isDragOver">
-                            <h3 :class="{ 'pa-2': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }">{{ tt('You can drag and drop, paste or click to select a receipt or transaction image') }}</h3>
-                            <span :class="{ 'pa-2': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }">{{ tt('Uploaded image and personal data will be sent to the large language model, please be aware of potential privacy risks.') }}</span>
+                            <h3 class="pa-2">{{ tt('You can drag and drop, paste or click to select a receipt or transaction image') }}</h3>
+                            <span class="pa-2">{{ tt('Uploaded image and personal data will be sent to the large language model, please be aware of potential privacy risks.') }}</span>
                         </div>
-                        <h3 :class="{ 'pa-2': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }" v-else-if="!loading && isDragOver">{{ tt('Release to load image') }}</h3>
+                        <h3 class="pa-2" v-else-if="!loading && isDragOver">{{ tt('Release to load image') }}</h3>
                         <h3 class="pa-2" v-else-if="loading">{{ tt('Loading image...') }}</h3>
-                        <h3 :class="{ 'pa-2': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }" v-else-if="recognizing">{{ tt('AI can make mistakes. Check important info.') }}</h3>
+                        <h3 class="pa-2" v-else-if="recognizing">{{ tt('AI can make mistakes. Check important info.') }}</h3>
                     </div>
                     <v-img :class="{ 'cursor-pointer': !loading && !recognizing && !isDragOver, 'h-100': true }"
                            :src="imageSrc" @click="showOpenImageDialog">
@@ -262,6 +262,24 @@ defineExpose({
     pointer-events: none;
     border-radius: 8px;
     z-index: 10;
+
+    h3, span {
+        color: rgb(var(--v-theme-on-grey-200)) !important;
+        text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+    }
+
+    &.dropzone-dark {
+        h3, span {
+            color: rgb(var(--v-theme-on-grey-100)) !important;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+        }
+    }
+}
+
+.dropzone-blurry-bg {
+    /* stylelint-disable property-no-vendor-prefix */
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
 }
 
 .dropzone-dragover {

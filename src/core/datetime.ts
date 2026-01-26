@@ -352,19 +352,36 @@ export class KnownDateTimeFormat {
     public static readonly DefaultDateTimeWithTimezone = new KnownDateTimeFormat('YYYY-MM-DD HH:mm:ssZ', /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](Z|[+-](0[0-9]|1[0-4]):[0-5][0-9])$/);
     public static readonly DefaultDateTimeWithoutSecond = new KnownDateTimeFormat('YYYY-MM-DD HH:mm', /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) ([0-1][0-9]|2[0-3]):[0-5][0-9]$/);
     public static readonly DefaultDate = new KnownDateTimeFormat('YYYY-MM-DD', /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/);
+
     public static readonly RFC3339 = new KnownDateTimeFormat('YYYY-MM-DDTHH:mm:ssZ', /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](Z|[+-](0[0-9]|1[0-4]):[0-5][0-9])$/);
+
     public static readonly YYYYMMDDSlashWithTime = new KnownDateTimeFormat('YYYY/MM/DD HH:mm:ss', /^\d{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[1-2][0-9]|3[0-1]) ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/);
-    public static readonly MMDDYYSlashWithTime = new KnownDateTimeFormat('MM/DD/YYYY HH:mm:ss', /^(0[1-9]|1[0-2])\/(0[1-9]|[1-2][0-9]|3[0-1])\/\d{4} ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/);
-    public static readonly DDMMYYSlashWithTime = new KnownDateTimeFormat('DD/MM/YYYY HH:mm:ss', /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4} ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/);
+    public static readonly MMDDYYYYSlashWithTime = new KnownDateTimeFormat('MM/DD/YYYY HH:mm:ss', /^(0[1-9]|1[0-2])\/(0[1-9]|[1-2][0-9]|3[0-1])\/\d{4} ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/);
+    public static readonly DDMMYYYYSlashWithTime = new KnownDateTimeFormat('DD/MM/YYYY HH:mm:ss', /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4} ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/);
+
     public static readonly YYYYMMDDDotWithTime = new KnownDateTimeFormat('YYYY.MM.DD HH:mm:ss', /^\d{4}\.(0[1-9]|1[0-2])\.(0[1-9]|[1-2][0-9]|3[0-1]) ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/);
-    public static readonly MMDDYYDotWithTime = new KnownDateTimeFormat('MM.DD.YYYY HH:mm:ss', /^(0[1-9]|1[0-2])\.(0[1-9]|[1-2][0-9]|3[0-1])\.\d{4} ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/);
-    public static readonly DDMMYYDotWithTime = new KnownDateTimeFormat('DD.MM.YYYY HH:mm:ss', /^(0[1-9]|[1-2][0-9]|3[0-1])\.(0[1-9]|1[0-2])\.\d{4} ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/);
+    public static readonly MMDDYYYYDotWithTime = new KnownDateTimeFormat('MM.DD.YYYY HH:mm:ss', /^(0[1-9]|1[0-2])\.(0[1-9]|[1-2][0-9]|3[0-1])\.\d{4} ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/);
+    public static readonly DDMMYYYYDotWithTime = new KnownDateTimeFormat('DD.MM.YYYY HH:mm:ss', /^(0[1-9]|[1-2][0-9]|3[0-1])\.(0[1-9]|1[0-2])\.\d{4} ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/);
+
+    public static readonly MMDDYYYYDash = new KnownDateTimeFormat('MM-DD-YYYY', /^(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])-\d{4}$/);
+    public static readonly DDMMYYYYDash = new KnownDateTimeFormat('DD-MM-YYYY', /^(0[1-9]|[1-2][0-9]|3[0-1])-(0[1-9]|1[0-2])-\d{4}$/);
+
     public static readonly YYYYMMDDSlash = new KnownDateTimeFormat('YYYY/MM/DD', /^\d{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[1-2][0-9]|3[0-1])$/);
-    public static readonly MMDDYYSlash = new KnownDateTimeFormat('MM/DD/YYYY', /^(0[1-9]|1[0-2])\/(0[1-9]|[1-2][0-9]|3[0-1])\/\d{4}$/);
-    public static readonly DDMMYYSlash = new KnownDateTimeFormat('DD/MM/YYYY', /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/);
+    public static readonly MMDDYYYYSlash = new KnownDateTimeFormat('MM/DD/YYYY', /^(0[1-9]|1[0-2])\/(0[1-9]|[1-2][0-9]|3[0-1])\/\d{4}$/);
+    public static readonly DDMMYYYYSlash = new KnownDateTimeFormat('DD/MM/YYYY', /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/);
+
+    public static readonly YYYYMDSlash = new KnownDateTimeFormat('YYYY/M/D', /^\d{4}\/([1-9]|1[0-2])\/([1-9]|[1-2][0-9]|3[0-1])$/);
+    public static readonly MDYYYYSlash = new KnownDateTimeFormat('M/D/YYYY', /^([1-9]|1[0-2])\/([1-9]|[1-2][0-9]|3[0-1])\/\d{4}$/);
+    public static readonly DMYYYYSlash = new KnownDateTimeFormat('D/M/YYYY', /^([1-9]|[1-2][0-9]|3[0-1])\/([1-9]|1[0-2])\/\d{4}$/);
+
     public static readonly YYYYMMDDDot = new KnownDateTimeFormat('YYYY.MM.DD', /^\d{4}\.(0[1-9]|1[0-2])\.(0[1-9]|[1-2][0-9]|3[0-1])$/);
-    public static readonly MMDDYYDot = new KnownDateTimeFormat('MM.DD.YYYY', /^(0[1-9]|1[0-2])\.(0[1-9]|[1-2][0-9]|3[0-1])\.\d{4}$/);
-    public static readonly DDMMYYDot = new KnownDateTimeFormat('DD.MM.YYYY', /^(0[1-9]|[1-2][0-9]|3[0-1])\.(0[1-9]|1[0-2])\.\d{4}$/);
+    public static readonly MMDDYYYYDot = new KnownDateTimeFormat('MM.DD.YYYY', /^(0[1-9]|1[0-2])\.(0[1-9]|[1-2][0-9]|3[0-1])\.\d{4}$/);
+    public static readonly DDMMYYYYDot = new KnownDateTimeFormat('DD.MM.YYYY', /^(0[1-9]|[1-2][0-9]|3[0-1])\.(0[1-9]|1[0-2])\.\d{4}$/);
+
+    public static readonly YYYYMDDot = new KnownDateTimeFormat('YYYY.M.D', /^\d{4}\.([1-9]|1[0-2])\.([1-9]|[1-2][0-9]|3[0-1])$/);
+    public static readonly MDYYYYDot = new KnownDateTimeFormat('M.D.YYYY', /^([1-9]|1[0-2])\.([1-9]|[1-2][0-9]|3[0-1])\.\d{4}$/);
+    public static readonly DMYYYYDot = new KnownDateTimeFormat('D.M.YYYY', /^([1-9]|[1-2][0-9]|3[0-1])\.([1-9]|1[0-2])\.\d{4}$/);
+
     public static readonly YYYYMMDD = new KnownDateTimeFormat('YYYYMMDD', /^\d{4}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$/);
 
     public readonly format: string;

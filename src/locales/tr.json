@@ -31,10 +31,10 @@
         "fiscalYearFormat": "EndYYYY",
         "calendarDisplayType": "Gregorian",
         "dateDisplayType": "Gregorian",
-        "longDateFormat": "DDMMYYYY",
-        "shortDateFormat": "DDMMYYYY",
-        "longTimeFormat": "HHMMSS",
-        "shortTimeFormat": "HHMM",
+        "longDateFormat": "DayMonthYear",
+        "shortDateFormat": "DayMonthYear",
+        "longTimeFormat": "HourMinuteSecond",
+        "shortTimeFormat": "HourMinute",
         "numeralSystem": "WesternArabicNumerals",
         "decimalSeparator": "Comma",
         "digitGroupingSymbol": "Dot",
@@ -43,59 +43,59 @@
     },
     "format": {
         "longDate": {
-            "yyyy_mm_dd": "YYYY MMMM DD",
-            "mm_dd_yyyy": "MMMM D YYYY",
-            "dd_mm_yyyy": "D MMMM YYYY"
+            "YearMonthDay": "YYYY MMMM DD",
+            "MonthDayYear": "MMMM D YYYY",
+            "DayMonthYear": "D MMMM YYYY"
         },
         "shortDate": {
-            "yyyy_mm_dd": "YYYY-MM-DD",
-            "mm_dd_yyyy": "MM/DD/YYYY",
-            "dd_mm_yyyy": "DD.MM.YYYY"
+            "YearMonthDay": "YYYY-MM-DD",
+            "MonthDayYear": "MM/DD/YYYY",
+            "DayMonthYear": "DD.MM.YYYY"
         },
         "longYear": {
-            "yyyy_mm_dd": "YYYY",
-            "mm_dd_yyyy": "YYYY",
-            "dd_mm_yyyy": "YYYY"
+            "YearMonthDay": "YYYY",
+            "MonthDayYear": "YYYY",
+            "DayMonthYear": "YYYY"
         },
         "shortYear": {
-            "yyyy_mm_dd": "YYYY",
-            "mm_dd_yyyy": "YYYY",
-            "dd_mm_yyyy": "YYYY"
+            "YearMonthDay": "YYYY",
+            "MonthDayYear": "YYYY",
+            "DayMonthYear": "YYYY"
         },
         "longYearMonth": {
-            "yyyy_mm_dd": "YYYY MMMM",
-            "mm_dd_yyyy": "MMMM YYYY",
-            "dd_mm_yyyy": "MMMM YYYY"
+            "YearMonthDay": "YYYY MMMM",
+            "MonthDayYear": "MMMM YYYY",
+            "DayMonthYear": "MMMM YYYY"
         },
         "shortYearMonth": {
-            "yyyy_mm_dd": "YYYY-MM",
-            "mm_dd_yyyy": "MMM YYYY",
-            "dd_mm_yyyy": "MMM YYYY"
+            "YearMonthDay": "YYYY-MM",
+            "MonthDayYear": "MMM YYYY",
+            "DayMonthYear": "MMM YYYY"
         },
         "longMonthDay": {
-            "yyyy_mm_dd": "MMMM DD",
-            "mm_dd_yyyy": "D MMMM",
-            "dd_mm_yyyy": "D MMMM"
+            "YearMonthDay": "MMMM DD",
+            "MonthDayYear": "D MMMM",
+            "DayMonthYear": "D MMMM"
         },
         "shortMonthDay": {
-            "yyyy_mm_dd": "MM-DD",
-            "mm_dd_yyyy": "MM/DD",
-            "dd_mm_yyyy": "DD.MM"
+            "YearMonthDay": "MM-DD",
+            "MonthDayYear": "MM/DD",
+            "DayMonthYear": "DD.MM"
         },
         "shortDay": {
-            "yyyy_mm_dd": "D",
-            "mm_dd_yyyy": "D",
-            "dd_mm_yyyy": "D"
+            "YearMonthDay": "D",
+            "MonthDayYear": "D",
+            "DayMonthYear": "D"
         },
         "longTime": {
-            "hh_mm_ss": "HH:mm:ss",
-            "a_hh_mm_ss": "A hh:mm:ss",
-            "hh_mm_ss_a": "hh:mm:ss A"
+            "HourMinuteSecond": "HH:mm:ss",
+            "MeridiemIndicatorHourMinuteSecond": "A hh:mm:ss",
+            "HourMinuteSecondMeridiemIndicator": "hh:mm:ss A"
         },
         "shortTime": {
-            "hh_mm": "HH:mm",
-            "a_hh_mm": "A hh:mm",
-            "hh_mm_a": "hh:mm A"
+            "HourMinute": "HH:mm",
+            "MeridiemIndicatorHourMinute": "A hh:mm",
+            "HourMinuteMeridiemIndicator": "hh:mm A"
         },
         "yearQuarter": {
             "content": "{year} {quarter}"

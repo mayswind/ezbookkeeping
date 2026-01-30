@@ -355,32 +355,30 @@ export enum DateFormatOrder {
 
 export interface DateFormat {
     readonly type: number;
-    readonly key: string;
+    readonly typeName: string;
     readonly order: DateFormatOrder;
 }
 
-type DateFormatTypeName = 'YYYYMMDD' | 'MMDDYYYY' | 'DDMMYYYY';
+type DateFormatTypeName = 'YearMonthDay' | 'MonthDayYear' | 'DayMonthYear';
 
 export class LongDateFormat implements DateFormat {
     private static readonly allInstances: LongDateFormat[] = [];
     private static readonly allInstancesByType: Record<number, LongDateFormat> = {};
     private static readonly allInstancesByTypeName: Record<string, LongDateFormat> = {};
 
-    public static readonly YYYYMMDD = new LongDateFormat(1, 'YYYYMMDD', 'yyyy_mm_dd', DateFormatOrder.YMD);
-    public static readonly MMDDYYYY = new LongDateFormat(2, 'MMDDYYYY', 'mm_dd_yyyy', DateFormatOrder.MDY);
-    public static readonly DDMMYYYY = new LongDateFormat(3, 'DDMMYYYY', 'dd_mm_yyyy', DateFormatOrder.DMY);
+    public static readonly YearMonthDay = new LongDateFormat(1, 'YearMonthDay', DateFormatOrder.YMD);
+    public static readonly MonthDayYear = new LongDateFormat(2, 'MonthDayYear', DateFormatOrder.MDY);
+    public static readonly DayMonthYear = new LongDateFormat(3, 'DayMonthYear', DateFormatOrder.DMY);
 
-    public static readonly Default = LongDateFormat.YYYYMMDD;
+    public static readonly Default = LongDateFormat.YearMonthDay;
 
     public readonly type: number;
     public readonly typeName: string;
-    public readonly key: string;
     public readonly order: DateFormatOrder;
 
-    private constructor(type: number, typeName: DateFormatTypeName, key: string, order: DateFormatOrder) {
+    private constructor(type: number, typeName: DateFormatTypeName, order: DateFormatOrder) {
         this.type = type;
         this.typeName = typeName;
-        this.key = key;
         this.order = order;
 
         LongDateFormat.allInstances.push(this);
@@ -406,21 +404,19 @@ export class ShortDateFormat implements DateFormat {
     private static readonly allInstancesByType: Record<number, ShortDateFormat> = {};
     private static readonly allInstancesByTypeName: Record<string, ShortDateFormat> = {};
 
-    public static readonly YYYYMMDD = new ShortDateFormat(1, 'YYYYMMDD', 'yyyy_mm_dd', DateFormatOrder.YMD);
-    public static readonly MMDDYYYY = new ShortDateFormat(2, 'MMDDYYYY', 'mm_dd_yyyy', DateFormatOrder.MDY);
-    public static readonly DDMMYYYY = new ShortDateFormat(3, 'DDMMYYYY', 'dd_mm_yyyy', DateFormatOrder.DMY);
+    public static readonly YearMonthDay = new ShortDateFormat(1, 'YearMonthDay', DateFormatOrder.YMD);
+    public static readonly MonthDayYear = new ShortDateFormat(2, 'MonthDayYear', DateFormatOrder.MDY);
+    public static readonly DayMonthYear = new ShortDateFormat(3, 'DayMonthYear', DateFormatOrder.DMY);
 
-    public static readonly Default = ShortDateFormat.YYYYMMDD;
+    public static readonly Default = ShortDateFormat.YearMonthDay;
 
     public readonly type: number;
     public readonly typeName: string;
-    public readonly key: string;
     public readonly order: DateFormatOrder;
 
-    private constructor(type: number, typeName: DateFormatTypeName, key: string, order: DateFormatOrder) {
+    private constructor(type: number, typeName: DateFormatTypeName, order: DateFormatOrder) {
         this.type = type;
         this.typeName = typeName;
-        this.key = key;
         this.order = order;
 
         ShortDateFormat.allInstances.push(this);
@@ -443,34 +439,32 @@ export class ShortDateFormat implements DateFormat {
 
 export interface TimeFormat {
     readonly type: number;
-    readonly key: string;
+    readonly typeName: string;
     readonly is24HourFormat: boolean;
     readonly isMeridiemIndicatorFirst: boolean | null;
 }
 
-export type LongTimeFormatTypeName = 'HHMMSS' | 'AHHMMSS' | 'HHMMSSA';
+export type LongTimeFormatTypeName = 'HourMinuteSecond' | 'MeridiemIndicatorHourMinuteSecond' | 'HourMinuteSecondMeridiemIndicator';
 
 export class LongTimeFormat implements TimeFormat {
     private static readonly allInstances: LongTimeFormat[] = [];
     private static readonly allInstancesByType: Record<number, LongTimeFormat> = {};
     private static readonly allInstancesByTypeName: Record<string, LongTimeFormat> = {};
 
-    public static readonly HHMMSS = new LongTimeFormat(1, 'HHMMSS', 'hh_mm_ss', true, null);
-    public static readonly AHHMMSS = new LongTimeFormat(2, 'AHHMMSS', 'a_hh_mm_ss', false, true);
-    public static readonly HHMMSSA = new LongTimeFormat(3, 'HHMMSSA', 'hh_mm_ss_a', false, false);
+    public static readonly HourMinuteSecond = new LongTimeFormat(1, 'HourMinuteSecond', true, null);
+    public static readonly MeridiemIndicatorHourMinuteSecond = new LongTimeFormat(2, 'MeridiemIndicatorHourMinuteSecond', false, true);
+    public static readonly HourMinuteSecondMeridiemIndicator = new LongTimeFormat(3, 'HourMinuteSecondMeridiemIndicator', false, false);
 
-    public static readonly Default = LongTimeFormat.HHMMSS;
+    public static readonly Default = LongTimeFormat.HourMinuteSecond;
 
     public readonly type: number;
     public readonly typeName: string;
-    public readonly key: string;
     public readonly is24HourFormat: boolean;
     public readonly isMeridiemIndicatorFirst: boolean | null;
 
-    private constructor(type: number, typeName: LongTimeFormatTypeName, key: string, is24HourFormat: boolean, isMeridiemIndicatorFirst: boolean | null) {
+    private constructor(type: number, typeName: LongTimeFormatTypeName, is24HourFormat: boolean, isMeridiemIndicatorFirst: boolean | null) {
         this.type = type;
         this.typeName = typeName;
-        this.key = key;
         this.is24HourFormat = is24HourFormat;
         this.isMeridiemIndicatorFirst = isMeridiemIndicatorFirst;
 
@@ -492,29 +486,27 @@ export class LongTimeFormat implements TimeFormat {
     }
 }
 
-export type ShortTimeFormatTypeName = 'HHMM' | 'AHHMM' | 'HHMMA';
+export type ShortTimeFormatTypeName = 'HourMinute' | 'MeridiemIndicatorHourMinute' | 'HourMinuteMeridiemIndicator';
 
 export class ShortTimeFormat implements TimeFormat {
     private static readonly allInstances: ShortTimeFormat[] = [];
     private static readonly allInstancesByType: Record<number, ShortTimeFormat> = {};
     private static readonly allInstancesByTypeName: Record<string, ShortTimeFormat> = {};
 
-    public static readonly HHMM = new ShortTimeFormat(1, 'HHMM', 'hh_mm', true, null);
-    public static readonly AHHMM = new ShortTimeFormat(2, 'AHHMM', 'a_hh_mm', false, true);
-    public static readonly HHMMA = new ShortTimeFormat(3, 'HHMMA', 'hh_mm_a', false, false);
+    public static readonly HourMinute = new ShortTimeFormat(1, 'HourMinute', true, null);
+    public static readonly MeridiemIndicatorHourMinute = new ShortTimeFormat(2, 'MeridiemIndicatorHourMinute', false, true);
+    public static readonly HourMinuteMeridiemIndicator = new ShortTimeFormat(3, 'HourMinuteMeridiemIndicator', false, false);
 
-    public static readonly Default = ShortTimeFormat.HHMM;
+    public static readonly Default = ShortTimeFormat.HourMinute;
 
     public readonly type: number;
     public readonly typeName: string;
-    public readonly key: string;
     public readonly is24HourFormat: boolean;
     public readonly isMeridiemIndicatorFirst: boolean | null;
 
-    private constructor(type: number, typeName: ShortTimeFormatTypeName, key: string, is24HourFormat: boolean, isMeridiemIndicatorFirst: boolean | null) {
+    private constructor(type: number, typeName: ShortTimeFormatTypeName, is24HourFormat: boolean, isMeridiemIndicatorFirst: boolean | null) {
         this.type = type;
         this.typeName = typeName;
-        this.key = key;
         this.is24HourFormat = is24HourFormat;
         this.isMeridiemIndicatorFirst = isMeridiemIndicatorFirst;
 

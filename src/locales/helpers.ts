@@ -662,7 +662,7 @@ export function useI18n() {
 
     function getLocalizedDateTimeFormat<T extends DateFormat | TimeFormat>(type: string, allFormatMap: Record<string, T>, allFormatArray: T[], formatTypeValue: number, languageDefaultTypeNameKey: string, systemDefaultFormatType: T): string {
         const formatType = getLocalizedDateTimeType(allFormatMap, allFormatArray, formatTypeValue, languageDefaultTypeNameKey, systemDefaultFormatType);
-        return t(`format.${type}.${formatType.key}`);
+        return t(`format.${type}.${formatType.typeName}`);
     }
 
     function getLocalizedLongDateFormat(): string {
@@ -1079,7 +1079,7 @@ export function useI18n() {
         });
 
         for (const formatType of allFormatArray) {
-            const format = t(`format.${type}.${formatType.key}`);
+            const format = t(`format.${type}.${formatType.typeName}`);
 
             ret.push({
                 type: formatType.type,

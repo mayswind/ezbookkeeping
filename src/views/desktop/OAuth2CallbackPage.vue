@@ -108,9 +108,10 @@
 </template>
 
 <script setup lang="ts">
+import { VTextField } from 'vuetify/components/VTextField';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useTheme } from 'vuetify';
 
@@ -164,6 +165,7 @@ const {
     doAfterLogin
 } = useLoginPageBase('desktop');
 
+const passcodeInput = useTemplateRef<VTextField>('passcodeInput');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const passcode = ref<string>('');
@@ -225,6 +227,14 @@ function verifyAndLogin(): void  {
             return;
         } else if (error.error && error.error.errorCode === KnownErrorCode.TwoFactorAuthorizationPasscodeEmpty) {
             show2faInput.value = true;
+
+            nextTick(() => {
+                if (passcodeInput.value) {
+                    passcodeInput.value.focus();
+                    passcodeInput.value.select();
+                }
+            });
+
             return;
         }
 

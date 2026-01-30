@@ -107,6 +107,11 @@
                                             {{ tt('Log In') }}
                                             <v-progress-circular indeterminate size="22" class="ms-2" v-if="loggingInByPassword"></v-progress-circular>
                                         </v-btn>
+                                        <v-btn block :disabled="twoFAInputIsEmpty || loggingInByPassword || loggingInByOAuth2 || verifying"
+                                               @click="verify" v-else-if="isInternalAuthEnabled() && show2faInput">
+                                            {{ tt('Continue') }}
+                                            <v-progress-circular indeterminate size="22" class="ms-2" v-if="verifying"></v-progress-circular>
+                                        </v-btn>
 
                                         <v-col cols="12" class="d-flex align-center px-0 text-no-wrap" v-if="isInternalAuthEnabled() && isOAuth2Enabled()">
                                             <v-divider class="me-3" />
@@ -114,15 +119,10 @@
                                             <v-divider class="ms-3" />
                                         </v-col>
 
-                                        <v-btn block :disabled="loggingInByPassword || loggingInByOAuth2 || verifying" :href="oauth2LoginUrl"
+                                        <v-btn block :disabled="show2faInput || loggingInByPassword || loggingInByOAuth2 || verifying" :href="oauth2LoginUrl"
                                                @click="loggingInByOAuth2 = true" v-if="isOAuth2Enabled()">
                                             {{ oauth2LoginDisplayName }}
                                             <v-progress-circular indeterminate size="22" class="ms-2" v-if="loggingInByOAuth2"></v-progress-circular>
-                                        </v-btn>
-                                        <v-btn block :disabled="twoFAInputIsEmpty || loggingInByPassword || loggingInByOAuth2 || verifying"
-                                               @click="verify" v-else-if="show2faInput">
-                                            {{ tt('Continue') }}
-                                            <v-progress-circular indeterminate size="22" class="ms-2" v-if="verifying"></v-progress-circular>
                                         </v-btn>
                                     </v-col>
 

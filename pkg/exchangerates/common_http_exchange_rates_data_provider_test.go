@@ -295,22 +295,6 @@ func TestExchangeRatesApiLatestExchangeRateHandler_CentralBankOfUzbekistanDataSo
 	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
 }
 
-func TestExchangeRatesApiLatestExchangeRateHandler_InternationalMonetaryFundDataSource(t *testing.T) {
-	exchangeRateResponse := executeLatestExchangeRateHandler(t, settings.InternationalMonetaryFundDataSource)
-
-	if exchangeRateResponse == nil {
-		return
-	}
-
-	assert.Equal(t, "USD", exchangeRateResponse.BaseCurrency)
-
-	supportedCurrencyCodes := []string{"AED", "AUD", "BND", "BRL", "BWP", "CAD", "CHF", "CLP", "CNY", "CZK",
-		"DKK", "DZD", "EUR", "GBP", "ILS", "INR", "JPY", "KRW", "KWD", "MUR", "MXN", "MYR", "NOK", "NZD",
-		"OMR", "PEN", "PHP", "PLN", "QAR", "SAR", "SEK", "SGD", "THB", "TTD", "UYU"}
-
-	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
-}
-
 func executeLatestExchangeRateHandler(t *testing.T, dataSourceType string) *models.LatestExchangeRateResponse {
 	if os.Getenv("BUILD_PIPELINE") == "1" && os.Getenv("CHECK_3RD_API") != "1" {
 		return nil

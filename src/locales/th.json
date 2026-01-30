@@ -1981,6 +1981,7 @@
     "Month-day-year format": "รูปแบบ เดือน-วัน-ปี",
     "Day-month-year format": "รูปแบบ วัน-เดือน-ปี",
     "Intuit Interchange Format (IIF) File": "ไฟล์ Intuit Interchange Format (IIF)",
+    "Camt.052 Bank to Customer Statement File": "ไฟล์ Camt.052 รายงานธนาคารถึงลูกค้า",
     "Camt.053 Bank to Customer Statement File": "ไฟล์ Camt.053 รายงานธนาคารถึงลูกค้า",
     "MT940 Consumer Statement Message File": "ไฟล์ MT940 ข้อความรายการลูกค้า",
     "Delimiter-separated Values (DSV) File": "ไฟล์ DSV (ค่าแยกด้วยตัวคั่น)",

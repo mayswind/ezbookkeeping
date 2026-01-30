@@ -52,6 +52,8 @@ func GetTransactionDataImporter(fileType string) (converter.TransactionDataImpor
 		return qif.QifDayMonthYearTransactionDataImporter, nil
 	} else if fileType == "iif" {
 		return iif.IifTransactionDataFileImporter, nil
+	} else if fileType == "camt052" {
+		return camt.Camt052TransactionDataImporter, nil
 	} else if fileType == "camt053" {
 		return camt.Camt053TransactionDataImporter, nil
 	} else if fileType == "mt940" {

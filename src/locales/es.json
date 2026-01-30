@@ -1981,6 +1981,7 @@
     "Month-day-year format": "Formato mes-día-año",
     "Day-month-year format": "Formato día-mes-año",
     "Intuit Interchange Format (IIF) File": "Archivo IIF (Intuit Interchange Format)",
+    "Camt.052 Bank to Customer Statement File": "Extracto Camt.052 (Extracto de cuenta del cliente)",
     "Camt.053 Bank to Customer Statement File": "Extracto Camt.053 (Extracto de cuenta del cliente)",
     "MT940 Consumer Statement Message File": "Extracto MT940 (Extracto de cuenta del cliente)",
     "Delimiter-separated Values (DSV) File": "Archivo DSV (valores separados por delimirtadores)",

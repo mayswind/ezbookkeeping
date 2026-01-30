@@ -9,9 +9,18 @@ const (
 	CAMT_INDICATOR_DEBIT  camtCreditDebitIndicator = "DBIT"
 )
 
+type camt052File struct {
+	XMLName                     xml.Name                         `xml:"Document"`
+	BankToCustomerAccountReport *camtBankToCustomerAccountReport `xml:"BkToCstmrAcctRpt"`
+}
+
 type camt053File struct {
 	XMLName                 xml.Name                     `xml:"Document"`
 	BankToCustomerStatement *camtBankToCustomerStatement `xml:"BkToCstmrStmt"`
+}
+
+type camtBankToCustomerAccountReport struct {
+	Statements []*camtStatement `xml:"Rpt"`
 }
 
 type camtBankToCustomerStatement struct {

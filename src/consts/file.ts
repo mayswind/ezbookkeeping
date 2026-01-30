@@ -230,6 +230,11 @@ export const SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES: ImportFileCategoryAndType
         categoryName: 'General Bank Statement Format',
         fileTypes: [
             {
+                type: 'camt052',
+                name: 'Camt.052 Bank to Customer Statement File',
+                extensions: '.xml'
+            },
+            {
                 type: 'camt053',
                 name: 'Camt.053 Bank to Customer Statement File',
                 extensions: '.xml'

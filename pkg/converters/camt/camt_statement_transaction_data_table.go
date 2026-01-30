@@ -303,12 +303,12 @@ func (t *camtStatementTransactionDataRowIterator) parseTransaction(ctx core.Cont
 	return data, nil
 }
 
-func createNewCamtStatementTransactionDataTable(file *camt053File) (*camtStatementTransactionDataTable, error) {
-	if file == nil || file.BankToCustomerStatement == nil || len(file.BankToCustomerStatement.Statements) == 0 {
+func createNewCamtStatementTransactionDataTable(camtStatements []*camtStatement) (*camtStatementTransactionDataTable, error) {
+	if len(camtStatements) == 0 {
 		return nil, errs.ErrNotFoundTransactionDataInFile
 	}
 
 	return &camtStatementTransactionDataTable{
-		allStatements: file.BankToCustomerStatement.Statements,
+		allStatements: camtStatements,
 	}, nil
 }

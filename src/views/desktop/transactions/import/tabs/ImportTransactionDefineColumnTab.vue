@@ -230,7 +230,7 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { type NameValue, type NameNumeralValue, type TypeAndDisplayName, itemAndIndex, entries } from '@/core/base.ts';
 import { type NumeralSystem, KnownAmountFormat } from '@/core/numeral.ts';
-import { KnownDateTimeFormat } from '@/core/datetime.ts';
+import { type DateFormatOrder, KnownDateTimeFormat } from '@/core/datetime.ts';
 import { KnownDateTimezoneFormat } from '@/core/timezone.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { ImportTransactionColumnType, ImportTransactionDataMapping } from '@/core/import_transaction.ts';
@@ -286,6 +286,8 @@ const {
     tt,
     ti,
     getCurrentNumeralSystemType,
+    getLongDateFormatOrder,
+    getShortDateFormatOrder,
     getAllImportTransactionColumnTypes
 } = useI18n();
 
@@ -296,6 +298,8 @@ const countPerPage = ref<number>(10);
 const parsedFileDataColumnMapping = ref<ImportTransactionDataMapping>(ImportTransactionDataMapping.createEmpty());
 
 const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
+const longDateFormatOrder = computed<DateFormatOrder>(() => getLongDateFormatOrder());
+const shortDateFormatOrder = computed<DateFormatOrder>(() => getShortDateFormatOrder());
 const allImportTransactionColumnTypes = computed<TypeAndDisplayName[]>(() => getAllImportTransactionColumnTypes());
 
 const menus = computed<ImportTransactionDefineColumnMenu[]>(() => [
@@ -402,7 +406,7 @@ const parsedFileLinesTablePageOptions = computed<NameNumeralValue[]>(() => getTa
 
 const parsedFileAllTransactionTypes = computed<string[]>(() => parsedFileDataColumnMapping.value.parseFileAllTransactionTypes(props.parsedFileData));
 const parsedFileValidMappedTransactionTypes = computed<Record<string, TransactionType>>(() => parsedFileDataColumnMapping.value.parseFileValidMappedTransactionTypes(props.parsedFileData));
-const parsedFileAutoDetectedTimeFormat = computed<string | undefined>(() => parsedFileDataColumnMapping.value.parseFileAutoDetectedTimeFormat(props.parsedFileData));
+const parsedFileAutoDetectedTimeFormat = computed<string | undefined>(() => parsedFileDataColumnMapping.value.parseFileAutoDetectedTimeFormat(props.parsedFileData, longDateFormatOrder.value, shortDateFormatOrder.value));
 const parsedFileAutoDetectedTimezoneFormat = computed<string | undefined>(() => parsedFileDataColumnMapping.value.parseFileAutoDetectedTimezoneFormat(props.parsedFileData));
 const parsedFileAutoDetectedAmountFormat = computed<string | undefined>(() => parsedFileDataColumnMapping.value.parseFileAutoDetectedAmountFormat(props.parsedFileData));
 

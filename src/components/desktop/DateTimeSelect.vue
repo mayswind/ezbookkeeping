@@ -89,6 +89,7 @@ import { ThemeType } from '@/core/theme.ts';
 import { NumeralSystem } from '@/core/numeral.ts';
 import {
     type DateTime,
+    type DateFormatOrder,
     MeridiemIndicator,
     KnownDateTimeFormat
 } from '@/core/datetime.ts';
@@ -120,6 +121,8 @@ const theme = useTheme();
 const {
     tt,
     getCurrentNumeralSystemType,
+    getLongDateFormatOrder,
+    getShortDateFormatOrder,
     parseDateTimeFromLongDateTime,
     parseDateTimeFromShortDateTime,
     formatDateTimeToLongDateTime
@@ -144,6 +147,8 @@ const secondInput = useTemplateRef<VAutocomplete>('secondInput');
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
+const longDateFormatOrder = computed<DateFormatOrder>(() => getLongDateFormatOrder());
+const shortDateFormatOrder = computed<DateFormatOrder>(() => getShortDateFormatOrder());
 
 const dateTime = computed<Date>({
     get: () => {
@@ -245,10 +250,10 @@ function onPaste(event: ClipboardEvent): void {
 
     text = text.trim();
 
-    const formats = KnownDateTimeFormat.detect(text);
+    const formats = KnownDateTimeFormat.detect(text, longDateFormatOrder.value, shortDateFormatOrder.value);
     let dt: DateTime | undefined = undefined;
 
-    if (formats && formats.length === 1) {
+    if (formats && (formats.length === 1 || (formats.length > 1 && formats[0]!.type === longDateFormatOrder.value && formats[0]!.type === shortDateFormatOrder.value))) {
         dt = parseDateTimeFromKnownDateTimeFormat(text, formats[0] as KnownDateTimeFormat);
 
         if (dt) {

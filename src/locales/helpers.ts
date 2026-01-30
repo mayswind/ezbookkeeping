@@ -61,6 +61,7 @@ import {
     ShortDateFormat,
     LongTimeFormat,
     ShortTimeFormat,
+    DateFormatOrder,
     DateRange,
     DateRangeScene,
     LANGUAGE_DEFAULT_DATE_TIME_FORMAT_VALUE
@@ -1760,12 +1761,22 @@ export function useI18n() {
         return t(`currency.name.${currencyCode}`);
     }
 
+    function getLongDateFormatOrder(): DateFormatOrder {
+        return getLocalizedDateTimeType(LongDateFormat.all(), LongDateFormat.values(), userStore.currentUserLongDateFormat, 'longDateFormat', LongDateFormat.Default).order;
+    }
+
+    function getShortDateFormatOrder(): DateFormatOrder {
+        return getLocalizedDateTimeType(ShortDateFormat.all(), ShortDateFormat.values(), userStore.currentUserShortDateFormat, 'shortDateFormat', ShortDateFormat.Default).order;
+    }
+
     function isLongDateMonthAfterYear(): boolean {
-        return getLocalizedDateTimeType(LongDateFormat.all(), LongDateFormat.values(), userStore.currentUserLongDateFormat, 'longDateFormat', LongDateFormat.Default).isMonthAfterYear;
+        const order: DateFormatOrder = getLongDateFormatOrder();
+        return order === DateFormatOrder.YMD;
     }
 
     function isShortDateMonthAfterYear(): boolean {
-        return getLocalizedDateTimeType(ShortDateFormat.all(), ShortDateFormat.values(), userStore.currentUserShortDateFormat, 'shortDateFormat', ShortDateFormat.Default).isMonthAfterYear;
+        const order: DateFormatOrder = getShortDateFormatOrder();
+        return order === DateFormatOrder.YMD;
     }
 
     function isLongTime24HourFormat(): boolean {
@@ -2422,6 +2433,8 @@ export function useI18n() {
         getCurrentDigitGroupingType,
         getCurrentFiscalYearFormatType,
         getCurrencyName,
+        getLongDateFormatOrder,
+        getShortDateFormatOrder,
         isLongDateMonthAfterYear,
         isShortDateMonthAfterYear,
         isLongTime24HourFormat,

@@ -1,6 +1,6 @@
 import { type TypeAndName, type TypeAndDisplayName, entries, keys } from './base.ts';
 import { KnownAmountFormat } from './numeral.ts';
-import { KnownDateTimeFormat } from './datetime.ts';
+import { type DateFormatOrder, KnownDateTimeFormat } from './datetime.ts';
 import { KnownDateTimezoneFormat } from './timezone.ts';
 import { TransactionType } from './transaction.ts';
 
@@ -165,7 +165,7 @@ export class ImportTransactionDataMapping {
         return result;
     }
 
-    public parseFileAutoDetectedTimeFormat(fileData: string[][] | undefined): string | undefined {
+    public parseFileAutoDetectedTimeFormat(fileData: string[][] | undefined, longDateTimeFormatOrder: DateFormatOrder, shortDateTimeFormatOrder: DateFormatOrder): string | undefined {
         if (!fileData || !fileData.length || !this.isColumnMappingSet(ImportTransactionColumnType.TransactionTime)) {
             return undefined;
         }
@@ -193,7 +193,7 @@ export class ImportTransactionDataMapping {
             }
         }
 
-        const detectedFormats = KnownDateTimeFormat.detectMulti(allDateTimes);
+        const detectedFormats = KnownDateTimeFormat.detectMulti(allDateTimes, longDateTimeFormatOrder, shortDateTimeFormatOrder);
 
         if (!detectedFormats || !detectedFormats.length || detectedFormats.length > 1) {
             return undefined;

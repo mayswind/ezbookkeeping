@@ -6,6 +6,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/llm/data"
 	"github.com/mayswind/ezbookkeeping/pkg/llm/provider"
 	"github.com/mayswind/ezbookkeeping/pkg/llm/provider/googleai"
+	"github.com/mayswind/ezbookkeeping/pkg/llm/provider/lmstudio"
 	"github.com/mayswind/ezbookkeeping/pkg/llm/provider/ollama"
 	"github.com/mayswind/ezbookkeeping/pkg/llm/provider/openai"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
@@ -45,6 +46,8 @@ func initializeLargeLanguageModelProvider(llmConfig *settings.LLMConfig, enableR
 		return openai.NewOpenRouterLargeLanguageModelProvider(llmConfig, enableResponseLog), nil
 	} else if llmConfig.LLMProvider == settings.OllamaLLMProvider {
 		return ollama.NewOllamaLargeLanguageModelProvider(llmConfig, enableResponseLog), nil
+	} else if llmConfig.LLMProvider == settings.LMStudioLLMProvider {
+		return lmstudio.NewLMStudioLargeLanguageModelProvider(llmConfig, enableResponseLog), nil
 	} else if llmConfig.LLMProvider == settings.GoogleAILLMProvider {
 		return googleai.NewGoogleAILargeLanguageModelProvider(llmConfig, enableResponseLog), nil
 	} else if llmConfig.LLMProvider == "" {

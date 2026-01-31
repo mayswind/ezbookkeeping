@@ -73,6 +73,7 @@ const (
 	OpenAICompatibleLLMProvider string = "openai_compatible"
 	OpenRouterLLMProvider       string = "openrouter"
 	OllamaLLMProvider           string = "ollama"
+	LMStudioLLMProvider         string = "lm_studio"
 	GoogleAILLMProvider         string = "google_ai"
 )
 
@@ -248,6 +249,9 @@ type LLMConfig struct {
 	OpenRouterModelID                   string
 	OllamaServerURL                     string
 	OllamaModelID                       string
+	LMStudioServerURL                   string
+	LMStudioToken                       string
+	LMStudioModelID                     string
 	GoogleAIAPIKey                      string
 	GoogleAIModelID                     string
 	LargeLanguageModelAPIRequestTimeout uint32
@@ -864,6 +868,8 @@ func loadLLMConfiguration(configFile *ini.File, sectionName string) (*LLMConfig,
 		llmConfig.LLMProvider = OpenRouterLLMProvider
 	} else if llmProvider == OllamaLLMProvider {
 		llmConfig.LLMProvider = OllamaLLMProvider
+	} else if llmProvider == LMStudioLLMProvider {
+		llmConfig.LLMProvider = LMStudioLLMProvider
 	} else if llmProvider == GoogleAILLMProvider {
 		llmConfig.LLMProvider = GoogleAILLMProvider
 	} else {
@@ -882,6 +888,10 @@ func loadLLMConfiguration(configFile *ini.File, sectionName string) (*LLMConfig,
 
 	llmConfig.OllamaServerURL = getConfigItemStringValue(configFile, sectionName, "ollama_server_url")
 	llmConfig.OllamaModelID = getConfigItemStringValue(configFile, sectionName, "ollama_model_id")
+
+	llmConfig.LMStudioServerURL = getConfigItemStringValue(configFile, sectionName, "lm_studio_server_url")
+	llmConfig.LMStudioToken = getConfigItemStringValue(configFile, sectionName, "lm_studio_token")
+	llmConfig.LMStudioModelID = getConfigItemStringValue(configFile, sectionName, "lm_studio_model_id")
 
 	llmConfig.GoogleAIAPIKey = getConfigItemStringValue(configFile, sectionName, "google_ai_api_key")
 	llmConfig.GoogleAIModelID = getConfigItemStringValue(configFile, sectionName, "google_ai_model_id")

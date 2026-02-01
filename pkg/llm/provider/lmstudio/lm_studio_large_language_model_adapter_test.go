@@ -27,7 +27,7 @@ func TestLMStudioLargeLanguageModelAdapter_buildJsonRequestBody_TextualUserPromp
 	err = json.Unmarshal(bodyBytes, &body)
 	assert.Nil(t, err)
 
-	assert.Equal(t, "{\"model\":\"test\",\"system_prompt\":\"You are a helpful assistant.\",\"input\":[{\"type\":\"text\",\"content\":\"Hello, how are you?\"}]}", string(bodyBytes))
+	assert.Equal(t, "{\"model\":\"test\",\"stream\":false,\"system_prompt\":\"You are a helpful assistant.\",\"input\":[{\"type\":\"text\",\"content\":\"Hello, how are you?\"}]}", string(bodyBytes))
 }
 
 func TestLMStudioLargeLanguageModelAdapter_buildJsonRequestBody_ImageUserPrompt(t *testing.T) {
@@ -49,7 +49,7 @@ func TestLMStudioLargeLanguageModelAdapter_buildJsonRequestBody_ImageUserPrompt(
 	err = json.Unmarshal(bodyBytes, &body)
 	assert.Nil(t, err)
 
-	assert.Equal(t, "{\"model\":\"test\",\"system_prompt\":\"What's in this image?\",\"input\":[{\"type\":\"image\",\"data_url\":\"data:image/png;base64,ZmFrZWRhdGE=\"}]}", string(bodyBytes))
+	assert.Equal(t, "{\"model\":\"test\",\"stream\":false,\"system_prompt\":\"What's in this image?\",\"input\":[{\"type\":\"image\",\"data_url\":\"data:image/png;base64,ZmFrZWRhdGE=\"}]}", string(bodyBytes))
 }
 
 func TestLMStudioLargeLanguageModelAdapter_ParseTextualResponse_ValidJsonResponse(t *testing.T) {

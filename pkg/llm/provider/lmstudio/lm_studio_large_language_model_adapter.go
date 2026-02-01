@@ -28,6 +28,7 @@ type LMStudioLargeLanguageModelAdapter struct {
 // LMStudioChatRequest defines the structure of LM Studio chat request
 type LMStudioChatRequest struct {
 	Model        string                      `json:"model"`
+	Stream       bool                        `json:"stream"`
 	SystemPrompt string                      `json:"system_prompt,omitempty"`
 	Input        []*LMStudioChatRequestInput `json:"input"`
 }
@@ -100,8 +101,9 @@ func (p *LMStudioLargeLanguageModelAdapter) buildJsonRequestBody(c core.Context,
 	}
 
 	chatRequest := &LMStudioChatRequest{
-		Model: p.LMStudioModelID,
-		Input: make([]*LMStudioChatRequestInput, 0, 1),
+		Model:  p.LMStudioModelID,
+		Stream: request.Stream,
+		Input:  make([]*LMStudioChatRequestInput, 0, 1),
 	}
 
 	if request.SystemPrompt != "" {

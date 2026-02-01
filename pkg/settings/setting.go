@@ -69,12 +69,14 @@ const (
 )
 
 const (
-	OpenAILLMProvider           string = "openai"
-	OpenAICompatibleLLMProvider string = "openai_compatible"
-	OpenRouterLLMProvider       string = "openrouter"
-	OllamaLLMProvider           string = "ollama"
-	LMStudioLLMProvider         string = "lm_studio"
-	GoogleAILLMProvider         string = "google_ai"
+	OpenAILLMProvider              string = "openai"
+	OpenAICompatibleLLMProvider    string = "openai_compatible"
+	AnthropicLLMProvider           string = "anthropic"
+	AnthropicCompatibleLLMProvider string = "anthropic_compatible"
+	OpenRouterLLMProvider          string = "openrouter"
+	OllamaLLMProvider              string = "ollama"
+	LMStudioLLMProvider            string = "lm_studio"
+	GoogleAILLMProvider            string = "google_ai"
 )
 
 // Uuid generator types
@@ -162,8 +164,9 @@ const (
 
 	defaultWebDAVRequestTimeout uint32 = 10000 // 10 seconds
 
-	defaultAIRecognitionPictureMaxSize         uint32 = 10485760 // 10MB
-	defaultLargeLanguageModelAPIRequestTimeout uint32 = 60000    // 60 seconds
+	defaultAIRecognitionPictureMaxSize                 uint32 = 10485760 // 10MB
+	defaultAnthropicLargeLanguageModelAPIMaximumTokens uint32 = 1024
+	defaultLargeLanguageModelAPIRequestTimeout         uint32 = 60000 // 60 seconds
 
 	defaultInMemoryDuplicateCheckerCleanupInterval uint32 = 60  // 1 minutes
 	defaultDuplicateSubmissionsInterval            uint32 = 300 // 5 minutes
@@ -245,6 +248,14 @@ type LLMConfig struct {
 	OpenAICompatibleBaseURL             string
 	OpenAICompatibleAPIKey              string
 	OpenAICompatibleModelID             string
+	AnthropicAPIKey                     string
+	AnthropicModelID                    string
+	AnthropicMaxTokens                  uint32
+	AnthropicCompatibleBaseURL          string
+	AnthropicCompatibleAPIVersion       string
+	AnthropicCompatibleAPIKey           string
+	AnthropicCompatibleModelID          string
+	AnthropicCompatibleMaxTokens        uint32
 	OpenRouterAPIKey                    string
 	OpenRouterModelID                   string
 	OllamaServerURL                     string
@@ -864,6 +875,10 @@ func loadLLMConfiguration(configFile *ini.File, sectionName string) (*LLMConfig,
 		llmConfig.LLMProvider = OpenAILLMProvider
 	} else if llmProvider == OpenAICompatibleLLMProvider {
 		llmConfig.LLMProvider = OpenAICompatibleLLMProvider
+	} else if llmProvider == AnthropicLLMProvider {
+		llmConfig.LLMProvider = AnthropicLLMProvider
+	} else if llmProvider == AnthropicCompatibleLLMProvider {
+		llmConfig.LLMProvider = AnthropicCompatibleLLMProvider
 	} else if llmProvider == OpenRouterLLMProvider {
 		llmConfig.LLMProvider = OpenRouterLLMProvider
 	} else if llmProvider == OllamaLLMProvider {
@@ -882,6 +897,16 @@ func loadLLMConfiguration(configFile *ini.File, sectionName string) (*LLMConfig,
 	llmConfig.OpenAICompatibleBaseURL = getConfigItemStringValue(configFile, sectionName, "openai_compatible_base_url")
 	llmConfig.OpenAICompatibleAPIKey = getConfigItemStringValue(configFile, sectionName, "openai_compatible_api_key")
 	llmConfig.OpenAICompatibleModelID = getConfigItemStringValue(configFile, sectionName, "openai_compatible_model_id")
+
+	llmConfig.AnthropicAPIKey = getConfigItemStringValue(configFile, sectionName, "anthropic_api_key")
+	llmConfig.AnthropicModelID = getConfigItemStringValue(configFile, sectionName, "anthropic_model_id")
+	llmConfig.AnthropicMaxTokens = getConfigItemUint32Value(configFile, sectionName, "anthropic_max_tokens", defaultAnthropicLargeLanguageModelAPIMaximumTokens)
+
+	llmConfig.AnthropicCompatibleBaseURL = getConfigItemStringValue(configFile, sectionName, "anthropic_compatible_base_url")
+	llmConfig.AnthropicCompatibleAPIVersion = getConfigItemStringValue(configFile, sectionName, "anthropic_compatible_api_version")
+	llmConfig.AnthropicCompatibleAPIKey = getConfigItemStringValue(configFile, sectionName, "anthropic_compatible_api_key")
+	llmConfig.AnthropicCompatibleModelID = getConfigItemStringValue(configFile, sectionName, "anthropic_compatible_model_id")
+	llmConfig.AnthropicCompatibleMaxTokens = getConfigItemUint32Value(configFile, sectionName, "anthropic_compatible_max_tokens", defaultAnthropicLargeLanguageModelAPIMaximumTokens)
 
 	llmConfig.OpenRouterAPIKey = getConfigItemStringValue(configFile, sectionName, "openrouter_api_key")
 	llmConfig.OpenRouterModelID = getConfigItemStringValue(configFile, sectionName, "openrouter_model_id")

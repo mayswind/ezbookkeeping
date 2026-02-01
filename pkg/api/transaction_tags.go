@@ -12,13 +12,15 @@ import (
 
 // TransactionTagsApi represents transaction tag api
 type TransactionTagsApi struct {
-	tags *services.TransactionTagService
+	tags      *services.TransactionTagService
+	tagGroups *services.TransactionTagGroupService
 }
 
 // Initialize a transaction tag api singleton instance
 var (
 	TransactionTags = &TransactionTagsApi{
-		tags: services.TransactionTags,
+		tags:      services.TransactionTags,
+		tagGroups: services.TransactionTagGroups,
 	}
 )
 
@@ -78,6 +80,20 @@ func (a *TransactionTagsApi) TagCreateHandler(c *core.WebContext) (any, *errs.Er
 
 	uid := c.GetCurrentUid()
 
+	if tagCreateReq.GroupId > 0 {
+		tagGroup, err := a.tagGroups.GetTagGroupByTagGroupId(c, uid, tagCreateReq.GroupId)
+
+		if err != nil {
+			log.Errorf(c, "[transaction_tags.TagCreateHandler] failed to get tag group \"id:%d\" for user \"uid:%d\", because %s", tagCreateReq.GroupId, uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		if tagGroup == nil {
+			log.Warnf(c, "[transaction_tags.TagCreateHandler] the tag group \"id:%d\" does not exist for user \"uid:%d\"", tagCreateReq.GroupId, uid)
+			return nil, errs.ErrTransactionTagGroupNotFound
+		}
+	}
+
 	maxOrderId, err := a.tags.GetMaxDisplayOrder(c, uid, tagCreateReq.GroupId)
 
 	if err != nil {
@@ -119,6 +135,20 @@ func (a *TransactionTagsApi) TagCreateBatchHandler(c *core.WebContext) (any, *er
 	}
 
 	uid := c.GetCurrentUid()
+
+	if tagCreateBatchReq.GroupId > 0 {
+		tagGroup, err := a.tagGroups.GetTagGroupByTagGroupId(c, uid, tagCreateBatchReq.GroupId)
+
+		if err != nil {
+			log.Errorf(c, "[transaction_tags.TagCreateBatchHandler] failed to get tag group \"id:%d\" for user \"uid:%d\", because %s", tagCreateBatchReq.GroupId, uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		if tagGroup == nil {
+			log.Warnf(c, "[transaction_tags.TagCreateBatchHandler] the tag group \"id:%d\" does not exist for user \"uid:%d\"", tagCreateBatchReq.GroupId, uid)
+			return nil, errs.ErrTransactionTagGroupNotFound
+		}
+	}
 
 	maxOrderId, err := a.tags.GetMaxDisplayOrder(c, uid, tagCreateBatchReq.GroupId)
 
@@ -165,6 +195,20 @@ func (a *TransactionTagsApi) TagModifyHandler(c *core.WebContext) (any, *errs.Er
 	if err != nil {
 		log.Errorf(c, "[transaction_tags.TagModifyHandler] failed to get tag \"id:%d\" for user \"uid:%d\", because %s", tagModifyReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	if tagModifyReq.GroupId != tag.TagGroupId && tagModifyReq.GroupId > 0 {
+		tagGroup, err := a.tagGroups.GetTagGroupByTagGroupId(c, uid, tagModifyReq.GroupId)
+
+		if err != nil {
+			log.Errorf(c, "[transaction_tags.TagModifyHandler] failed to get tag group \"id:%d\" for user \"uid:%d\", because %s", tagModifyReq.GroupId, uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		if tagGroup == nil {
+			log.Warnf(c, "[transaction_tags.TagModifyHandler] the tag group \"id:%d\" does not exist for user \"uid:%d\"", tagModifyReq.GroupId, uid)
+			return nil, errs.ErrTransactionTagGroupNotFound
+		}
 	}
 
 	newTag := &models.TransactionTag{

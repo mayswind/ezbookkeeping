@@ -470,6 +470,23 @@ API_CONFIGS='[
       "  ]",
       "}"
     ]
+  },
+  {
+    "Name": "server-version",
+    "Description": "Get ezBookkeeping server version information",
+    "Method": "GET",
+    "Path": "systems/version.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [],
+    "OptionalParams": [],
+    "ParamTypes": {},
+    "ParamDescriptions": {},
+    "ResponseStructure": [
+      "{",
+      "  \"version\": \"string (Server version)\",",
+      "  \"commitHash\": \"string (Git commit hash)\"",
+      "}"
+    ]
   }
 ]'
 
@@ -593,10 +610,10 @@ Examples:
     ebktools.sh list
 
     # Show help for a specific command
-    ebktools.sh help transactions-add
+    ebktools.sh help server-version
 
-    # Call accounts-list API
-    ebktools.sh accounts-list
+    # Call server-version API
+    ebktools.sh server-version
 
     # Call API with timezone name
     ebktools.sh --tz-name ${example_timezone_name} transactions-list --count 10

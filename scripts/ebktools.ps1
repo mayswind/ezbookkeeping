@@ -485,6 +485,23 @@ $API_CONFIGS = @(
             "}"
         )
     }
+    @{
+        Name = "server-version"
+        Description = "Get ezBookkeeping server version information"
+        Method = "GET"
+        Path = "systems/version.json"
+        RequiresTimezone = $false
+        RequiredParams = @()
+        OptionalParams = @()
+        ParamTypes = @{}
+        ParamDescriptions = @{}
+        ResponseStructure = @(
+            "{"
+            "  `"version`": `"string (Server version)`","
+            "  `"commitHash`": `"string (Git commit hash)`""
+            "}"
+        )
+    }
 )
 
 # Reference: https://github.com/unicode-org/cldr/blob/main/common/supplemental/windowsZones.xml
@@ -837,10 +854,10 @@ function Show-Help {
     Write-Host "    ebktools.ps1 list"
     Write-Host ""
     Write-Host "    # Show help for a specific command"
-    Write-Host "    ebktools.ps1 help transactions-add"
+    Write-Host "    ebktools.ps1 help server-version"
     Write-Host ""
-    Write-Host "    # Call accounts-list API"
-    Write-Host "    ebktools.ps1 accounts-list"
+    Write-Host "    # Call server-version API"
+    Write-Host "    ebktools.ps1 server-version"
     Write-Host ""
     Write-Host "    # Call API with timezone name"
     Write-Host "    ebktools.ps1 -tzName $exampleTimezoneName transactions-list -count 10"

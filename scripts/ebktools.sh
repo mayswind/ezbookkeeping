@@ -445,6 +445,31 @@ API_CONFIGS='[
       "  \"editable\": \"boolean (Whether the transaction is editable)\"",
       "}"
     ]
+  },
+  {
+    "Name": "exchangerates-latest",
+    "Description": "Get latest exchange rates",
+    "Method": "GET",
+    "Path": "exchange_rates/latest.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [],
+    "OptionalParams": [],
+    "ParamTypes": {},
+    "ParamDescriptions": {},
+    "ResponseStructure": [
+      "{",
+      "  \"dataSource\": \"string (Exchange rate data source name)\",",
+      "  \"referenceUrl\": \"string (Exchange rate data reference URL)\",",
+      "  \"updateTime\": \"integer (Exchange rate data update unix time)\",",
+      "  \"baseCurrency\": \"string (Base currency code)\",",
+      "  \"exchangeRates\": [",
+      "    {",
+      "      \"currency\": \"string (Currency code)\",",
+      "      \"rate\": \"string (Exchange rate, 1 unit of base currency equals to how many units of this currency)\"",
+      "    }",
+      "  ]",
+      "}"
+    ]
   }
 ]'
 

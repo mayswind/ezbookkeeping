@@ -66,7 +66,7 @@ API_CONFIGS='[
       "    \"icon\": \"string (Account icon ID)\",",
       "    \"color\": \"string (Account icon color, hex color code RRGGBB)\",",
       "    \"currency\": \"string (Account currency code)\",",
-      "    \"balance\": \"integer (Account balance, supports up to two decimals. For example, a value of \\"1234\\" represents an amount of \\"12.34\\")\",",
+      "    \"balance\": \"integer (Account balance, supports up to two decimals. For example, a value of '"'"'1234'"'"' represents an amount of '"'"'12.34'"'"')\",",
       "    \"comment\": \"string (Account description)\",",
       "    \"creditCardStatementDate\": \"integer (The statement date of the credit card account)\",",
       "    \"displayOrder\": \"integer (The display order of the account)\",",
@@ -240,8 +240,10 @@ API_CONFIGS='[
     "ResponseStructure": [
       "{",
       "  \"id\": \"string (Transaction tag ID)\",",
-      "  \"name\": \"string\",",
-      "  ...",
+      "  \"name\": \"string (Transaction tag name)\",",
+      "  \"groupId\": \"string (Transaction tag group ID)\",",
+      "  \"displayOrder\": \"integer (The display order of the transaction tag)\",",
+      "  \"hidden\": \"boolean (Whether the transaction tag is hidden)\"",
       "}"
     ]
   },
@@ -302,8 +304,8 @@ API_CONFIGS='[
       "      \"sourceAccount\": \"object (Source account object)\",",
       "      \"destinationAccountId\": \"string (Destination account ID)\",",
       "      \"destinationAccount\": \"object (Destination account object)\",",
-      "      \"sourceAmount\": \"integer (Source amount, supports up to two decimals. For example, a value of 1234 represents an amount of 12.34)\",",
-      "      \"destinationAmount\": \"integer (Destination amount, supports up to two decimals. For example, a value of 1234 represents an amount of 12.34)\",",
+      "      \"sourceAmount\": \"integer (Source amount, supports up to two decimals. For example, a value of '"'"'1234'"'"' represents an amount of '"'"'12.34'"'"')\",",
+      "      \"destinationAmount\": \"integer (Destination amount, supports up to two decimals. For example, a value of '"'"'1234'"'"' represents an amount of '"'"'12.34'"'"')\",",
       "      \"hideAmount\": \"boolean (Whether to hide the amount)\",",
       "      \"tagIds\": [\"each string representing a transaction tag ID\"],",
       "      \"tags\": [\"each object representing a transaction tag object\"],",
@@ -313,7 +315,7 @@ API_CONFIGS='[
       "      \"editable\": \"boolean (Whether the transaction is editable)\"",
       "    }",
       "  ],",
-      "  \"nextTimeSequenceId\": \"integer (The next cursor `max_time` parameter when requesting older data)\",",
+      "  \"nextTimeSequenceId\": \"integer (The next cursor '"'"'max_time'"'"' parameter when requesting older data)\",",
       "  \"totalCount\": \"integer (The total count of transactions)\"",
       "}"
     ]
@@ -368,8 +370,8 @@ API_CONFIGS='[
       "    \"sourceAccount\": \"object (Source account object)\",",
       "    \"destinationAccountId\": \"string (Destination account ID)\",",
       "    \"destinationAccount\": \"object (Destination account object)\",",
-      "    \"sourceAmount\": \"integer (Source amount, supports up to two decimals. For example, a value of 1234 represents an amount of 12.34)\",",
-      "    \"destinationAmount\": \"integer (Destination amount, supports up to two decimals. For example, a value of 1234 represents an amount of 12.34)\",",
+      "    \"sourceAmount\": \"integer (Source amount, supports up to two decimals. For example, a value of '"'"'1234'"'"' represents an amount of '"'"'12.34'"'"')\",",
+      "    \"destinationAmount\": \"integer (Destination amount, supports up to two decimals. For example, a value of '"'"'1234'"'"' represents an amount of '"'"'12.34'"'"')\",",
       "    \"hideAmount\": \"boolean (Whether to hide the amount)\",",
       "    \"tagIds\": [\"each string representing a transaction tag ID\"],",
       "    \"tags\": [\"each object representing a transaction tag object\"],",
@@ -479,13 +481,26 @@ get_system_timezone_name() {
         readlink /etc/localtime | sed 's|.*/zoneinfo/||'
     elif command -v timedatectl > /dev/null 2>&1; then
         timedatectl | grep "Time zone" | awk '{print $3}'
+    fi
+}
+
+get_example_timezone_name() {
+    tz_name="$(get_system_timezone_name)"
+
+    if [ -n "$tz_name" ]; then
+        echo "$tz_name"
     else
         echo "Asia/Shanghai"
     fi
 }
 
 get_system_timezone_offset() {
-    offset_str="$(date +%z 2>/dev/null || echo "+0800")"
+    offset_str="$(date +%z 2>/dev/null)"
+
+    if [ -z "$offset_str" ]; then
+        return
+    fi
+
     sign="${offset_str%????}"
     hours="${offset_str#?}"
     hours="${hours%??}"
@@ -504,14 +519,24 @@ get_system_timezone_offset() {
     fi
 }
 
+get_example_timezone_offset() {
+    tz_offset="$(get_system_timezone_offset)"
+
+    if [ -n "$tz_offset" ]; then
+        echo "$tz_offset"
+    else
+        echo "480"
+    fi
+}
+
 parse_api_config() {
     api_name="$1"
     echo "$API_CONFIGS" | jq -r --arg name "$api_name" '.[] | select(.Name == $name)'
 }
 
 show_help() {
-    tz_name="$(get_system_timezone_name)"
-    tz_offset="$(get_system_timezone_offset)"
+    example_timezone_name="$(get_example_timezone_name)"
+    example_timezone_offset="$(get_example_timezone_offset)"
 
     cat <<-EOF
 ezBookkeeping API Tools
@@ -521,13 +546,13 @@ A command-line tool for calling ezBookkeeping APIs
 Usage:
     ebktools.sh [--tz-name <name>] [--tz-offset <offset>] <command> [command-options]
 
-Global Options:
-    --tz-name <name>            The IANA timezone name, for example, for Beijing Time it is 'Asia/Shanghai'.
-    --tz-offset <offset>        The offset in minutes of the current timezone from UTC. For example, for Beijing Time which is UTC+8, the value is '480'. If both are provided, '--tz-name' takes precedence.
-
 Environment Variables (Required):
     EBKTOOL_SERVER_BASEURL      ezBookkeeping server base URL (e.g., http://localhost:8080)
     EBKTOOL_TOKEN               ezBookkeeping API token
+
+Global Options:
+    --tz-name <name>            The IANA timezone name of current timezone. For example, for Beijing Time it is 'Asia/Shanghai'.
+    --tz-offset <offset>        The offset in minutes of the current timezone from UTC. For example, for Beijing Time which is UTC+8, the value is '480'. If both '--tz-name' and '--tz-offset' are set, '--tz-name' takes priority. If neither is set, the current system time zone is used by default.
 
 Commands:
     list                        List all available API commands
@@ -549,10 +574,10 @@ Examples:
     ebktools.sh accounts-list
 
     # Call API with timezone name
-    ebktools.sh --tz-name ${tz_name} transactions-list --count 10
+    ebktools.sh --tz-name ${example_timezone_name} transactions-list --count 10
 
     # Call API with timezone offset
-    ebktools.sh --tz-offset ${tz_offset} transactions-list --count 10
+    ebktools.sh --tz-offset ${example_timezone_offset} transactions-list --count 10
 EOF
 }
 
@@ -583,12 +608,14 @@ show_command_help() {
     desc="$(echo "$config" | jq -r '.Description')"
     method="$(echo "$config" | jq -r '.Method')"
     path="$(echo "$config" | jq -r '.Path')"
+    requires_timezone="$(echo "$config" | jq -r '.RequiresTimezone // false')"
     response_struct="$(echo "$config" | jq -r '.ResponseStructure')"
 
     echo "Command: $name"
     echo "Description: $desc"
     echo "Method: $method"
     echo "Path: $path"
+    echo "Require current time zone: $([ "$requires_timezone" = "true" ] && echo Yes || echo No)"
     echo ""
 
     required_count="$(echo "$config" | jq '.RequiredParams | length')"
@@ -622,10 +649,14 @@ show_command_help() {
     fi
 
     echo "Example:"
-    requires_timezone="$(echo "$config" | jq -r '.RequiresTimezone // false')"
-    if [ "$requires_timezone" = "true" ]; then
-        tz_name="$(get_system_timezone_name)"
-        echo "  ebktools.sh --tz-name ${tz_name} $name"
+    current_tz_name="$(get_system_timezone_name)"
+    current_tz_offset="$(get_system_timezone_offset)"
+    if [ "$requires_timezone" = "true" ] && [ -n "$current_tz_name" ]; then
+        echo "  ebktools.sh --tz-name ${current_tz_name} $name"
+    elif [ "$requires_timezone" = "true" ] && [ -n "$current_tz_offset" ]; then
+        echo "  ebktools.sh --tz-offset ${current_tz_offset} $name"
+    elif [ "$requires_timezone" = "true" ]; then
+        echo "  ebktools.sh --tz-name <name> $name"
     else
         echo "  ebktools.sh $name"
     fi
@@ -649,26 +680,36 @@ call_api() {
 
     if [ -z "$serverBaseUrl" ]; then
         echo_red "Error: Environment variable 'EBKTOOL_SERVER_BASEURL' is not set."
-        echo "Please set it to your API server base URL (e.g., http://localhost:8080)"
+        echo "Please set it to your ezBookkeeping server base URL (e.g., http://localhost:8080)"
         exit 1
     fi
 
     if [ -z "$authToken" ]; then
         echo_red "Error: Environment variable 'EBKTOOL_TOKEN' is not set."
-        echo "Please set it to your authentication token."
+        echo "Please set it to your API token."
         exit 1
     fi
 
     requires_timezone="$(echo "$config" | jq -r '.RequiresTimezone // false')"
-    if [ "$requires_timezone" = "true" ] && [ -z "$TIMEZONE_NAME" ] && [ -z "$TIMEZONE_OFFSET" ]; then
-        tz_name="$(get_system_timezone_name)"
-        tz_offset="$(get_system_timezone_offset)"
+    current_tz_name="$(get_system_timezone_name)"
+    current_tz_offset="$(get_system_timezone_offset)"
+
+    if [ -n "$TIMEZONE_NAME" ]; then
+        current_tz_name="$TIMEZONE_NAME"
+    fi
+
+    if [ -n "$TIMEZONE_OFFSET" ]; then
+        current_tz_name=""
+        current_tz_offset="$TIMEZONE_OFFSET"
+    fi
+
+    if [ "$requires_timezone" = "true" ] && [ -z "$current_tz_name" ] && [ -z "$current_tz_offset" ]; then
         echo_red "Error: Command '$command_name' requires timezone information."
         echo "Please provide either '--tz-name' or '--tz-offset' parameter."
         echo ""
         echo "Examples:"
-        echo "  ebktools.sh --tz-name ${tz_name} $command_name ..."
-        echo "  ebktools.sh --tz-offset ${tz_offset} $command_name ..."
+        echo "  ebktools.sh --tz-name <name> $command_name ..."
+        echo "  ebktools.sh --tz-offset <offset> $command_name ..."
         exit 1
     fi
 
@@ -800,10 +841,10 @@ call_api() {
     url="${serverBaseUrl}/api/v1/${path}"
     timezone_headers=""
 
-    if [ -n "$TIMEZONE_NAME" ]; then
-        timezone_headers="X-Timezone-Name: $TIMEZONE_NAME"
-    elif [ -n "$TIMEZONE_OFFSET" ]; then
-        timezone_headers="X-Timezone-Offset: $TIMEZONE_OFFSET"
+    if [ -n "$current_tz_name" ]; then
+        timezone_headers="X-Timezone-Name: $current_tz_name"
+    elif [ -n "$current_tz_offset" ]; then
+        timezone_headers="X-Timezone-Offset: $current_tz_offset"
     fi
 
     if [ "$method" = "POST" ]; then
@@ -812,32 +853,32 @@ call_api() {
 
         if [ "$json_params" != "{}" ]; then
             if [ -n "$timezone_headers" ]; then
-                response=$(curl -s -X "POST" \
+                response="$(curl -s -X "POST" \
                     -H "Authorization: Bearer $EBKTOOL_TOKEN" \
                     -H "Content-Type: application/json" \
                     -H "$timezone_headers" \
                     -d "$json_params" \
-                    "$url")
+                    "$url")"
                 curl_exit_code=$?
             else
-                response=$(curl -s -X "POST" \
+                response="$(curl -s -X "POST" \
                     -H "Authorization: Bearer $EBKTOOL_TOKEN" \
                     -H "Content-Type: application/json" \
                     -d "$json_params" \
-                    "$url")
+                    "$url")"
                 curl_exit_code=$?
             fi
         else
             if [ -n "$timezone_headers" ]; then
-                response=$(curl -s -X "POST" \
+                response="$(curl -s -X "POST" \
                     -H "Authorization: Bearer $EBKTOOL_TOKEN" \
                     -H "$timezone_headers" \
-                    "$url")
+                    "$url")"
                 curl_exit_code=$?
             else
-                response=$(curl -s -X "POST" \
+                response="$(curl -s -X "POST" \
                     -H "Authorization: Bearer $EBKTOOL_TOKEN" \
-                    "$url")
+                    "$url")"
                 curl_exit_code=$?
             fi
         fi
@@ -850,14 +891,14 @@ call_api() {
         echo ""
 
         if [ -n "$timezone_headers" ]; then
-            response=$(curl -s -X "$method" \
+            response="$(curl -s -X "$method" \
                 -H "Authorization: Bearer $EBKTOOL_TOKEN" \
                 -H "$timezone_headers" \
-                "$url")
+                "$url")"
         else
-            response=$(curl -s -X "$method" \
+            response="$(curl -s -X "$method" \
                 -H "Authorization: Bearer $EBKTOOL_TOKEN" \
-                "$url")
+                "$url")"
         fi
         curl_exit_code=$?
     fi
@@ -867,22 +908,22 @@ call_api() {
         exit 1
     fi
 
-    success=$(echo "$response" | jq -r '.success // "null"')
+    success=$(printf "%s\n" "$response" | jq -r '.success // "null"')
 
     if [ "$success" = "true" ]; then
         echo "Response Result:"
-        result=$(echo "$response" | jq '.result // "null"')
+        result=$(printf "%s\n" "$response" | jq '.result // "null"')
         if [ "$result" != "null" ]; then
-            echo "$response" | jq '.result'
+            printf "%s\n" "$response" | jq '.result'
         else
             echo "Success: true (No result data)"
         fi
     elif [ "$success" = "false" ]; then
         echo "Raw Response:"
-        echo "$response" | jq '.'
+        printf "%s\n" "$response" | jq '.'
     else
         echo "Raw Response:"
-        echo "$response" | jq '.'
+        printf "%s\n" "$response" | jq '.'
     fi
 }
 

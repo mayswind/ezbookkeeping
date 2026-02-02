@@ -78,9 +78,9 @@ $API_CONFIGS = @(
             "    `"category`": `"integer (Account category, 1: Cash, 2: Checking Account, 3: Credit Card, 4: Virtual Account, 5: Debt Account, 6: Receivables, 7: Investment Account, 8: Savings Account, 9: Certificate of Deposit)`","
             "    `"type`": `"integer (Account type, 1: Single Account, 2: Multiple Sub-accounts)`","
             "    `"icon`": `"string (Account icon ID)`","
-            "    `"color`": `"string (Account icon color, Hex color code RRGGBB)`","
+            "    `"color`": `"string (Account icon color, hex color code RRGGBB)`","
             "    `"currency`": `"string (Account currency code)`","
-            "    `"balance`": `"integer (Account balance, supports up to two decimals. For example, a value of `"1234`" represents an amount of `"12.34`")`","
+            "    `"balance`": `"integer (Account balance, supports up to two decimals. For example, a value of '1234' represents an amount of '12.34')`","
             "    `"comment`": `"string (Account description)`","
             "    `"creditCardStatementDate`": `"integer (The statement date of the credit card account)`","
             "    `"displayOrder`": `"integer (The display order of the account)`","
@@ -254,8 +254,10 @@ $API_CONFIGS = @(
         ResponseStructure = @(
             "{"
             "  `"id`": `"string (Transaction tag ID)`","
-            "  `"name`": `"string`","
-            "  ..."
+            "  `"name`": `"string (Transaction tag name)`","
+            "  `"groupId`": `"string (Transaction tag group ID)`","
+            "  `"displayOrder`": `"integer (The display order of the transaction tag)`","
+            "  `"hidden`": `"boolean (Whether the transaction tag is hidden)`""
             "}"
         )
     }
@@ -316,8 +318,8 @@ $API_CONFIGS = @(
             "      `"sourceAccount`": `"object (Source account object)`","
             "      `"destinationAccountId`": `"string (Destination account ID)`","
             "      `"destinationAccount`": `"object (Destination account object)`","
-            "      `"sourceAmount`": `"integer (Source amount, supports up to two decimals. For example, a value of 1234 represents an amount of 12.34)`","
-            "      `"destinationAmount`": `"integer (Destination amount, supports up to two decimals. For example, a value of 1234 represents an amount of 12.34)`","
+            "      `"sourceAmount`": `"integer (Source amount, supports up to two decimals. For example, a value of '1234' represents an amount of '12.34')`","
+            "      `"destinationAmount`": `"integer (Destination amount, supports up to two decimals. For example, a value of '1234' represents an amount of '12.34')`","
             "      `"hideAmount`": `"boolean (Whether to hide the amount)`","
             "      `"tagIds`": [`"each string representing a transaction tag ID`"],"
             "      `"tags`": [`"each object representing a transaction tag object`"],"
@@ -327,7 +329,7 @@ $API_CONFIGS = @(
             "      `"editable`": `"boolean (Whether the transaction is editable)`""
             "    }"
             "  ],"
-            "  `"nextTimeSequenceId`": `"integer (The next cursor ``max_time`` parameter when requesting older data)`","
+            "  `"nextTimeSequenceId`": `"integer (The next cursor 'max_time' parameter when requesting older data)`","
             "  `"totalCount`": `"integer (The total count of transactions)`""
             "}"
         )
@@ -382,8 +384,8 @@ $API_CONFIGS = @(
             "    `"sourceAccount`": `"object (Source account object)`","
             "    `"destinationAccountId`": `"string (Destination account ID)`","
             "    `"destinationAccount`": `"object (Destination account object)`","
-            "    `"sourceAmount`": `"integer (Source amount, supports up to two decimals. For example, a value of 1234 represents an amount of 12.34)`","
-            "    `"destinationAmount`": `"integer (Destination amount, supports up to two decimals. For example, a value of 1234 represents an amount of 12.34)`","
+            "    `"sourceAmount`": `"integer (Source amount, supports up to two decimals. For example, a value of '1234' represents an amount of '12.34')`","
+            "    `"destinationAmount`": `"integer (Destination amount, supports up to two decimals. For example, a value of '1234' represents an amount of '12.34')`","
             "    `"hideAmount`": `"boolean (Whether to hide the amount)`","
             "    `"tagIds`": [`"each string representing a transaction tag ID`"],"
             "    `"tags`": [`"each object representing a transaction tag object`"],"
@@ -460,7 +462,7 @@ $API_CONFIGS = @(
     }
 )
 
-# Reference: https://raw.githubusercontent.com/unicode-org/cldr/main/common/supplemental/windowsZones.xml
+# Reference: https://github.com/unicode-org/cldr/blob/main/common/supplemental/windowsZones.xml
 $TIMEZONE_IANA_NAMES = @{
     "Dateline Standard Time" = "Etc/GMT+12"
     "UTC-11" = "Etc/GMT+11"
@@ -473,7 +475,7 @@ $TIMEZONE_IANA_NAMES = @{
     "UTC-08" = "Etc/GMT+8"
     "Pacific Standard Time" = "America/Los_Angeles"
     "US Mountain Standard Time" = "America/Phoenix"
-    "Mountain Standard Time (Mexico)" = "America/Chihuahua"
+    "Mountain Standard Time (Mexico)" = "America/Mazatlan"
     "Mountain Standard Time" = "America/Denver"
     "Yukon Standard Time" = "America/Whitehorse"
     "Central America Standard Time" = "America/Guatemala"
@@ -732,17 +734,37 @@ function Get-SystemTimezoneName {
     } catch {
         # Do Nothing
     }
-    return "Asia/Shanghai"
+    return $null
+}
+
+function Get-ExampleTimezoneName {
+    $name = Get-SystemTimezoneName
+
+    if ($null -ne $name) {
+        return "$name"
+    } else {
+        return "Asia/Shanghai"
+    }
 }
 
 function Get-SystemTimezoneOffset {
     try {
         $offset = [System.TimeZoneInfo]::Local.BaseUtcOffset
-        return [int]$offset.TotalMinutes
+        return [string]$offset.TotalMinutes.ToString()
     } catch {
         # Do Nothing
     }
-    return 480
+    return $null
+}
+
+function Get-ExampleTimezoneOffset {
+    $offset = Get-SystemTimezoneOffset
+
+    if ($null -ne $offset) {
+        return "$offset"
+    } else {
+        return "480"
+    }
 }
 
 function Get-ApiConfig {
@@ -758,8 +780,8 @@ function Get-ApiConfig {
 }
 
 function Show-Help {
-    $tzName = Get-SystemTimezoneName
-    $tzOffset = Get-SystemTimezoneOffset
+    $exampleTimezoneName = Get-ExampleTimezoneName
+    $exampleTimezoneOffset = Get-ExampleTimezoneOffset
 
     Write-Host "ezBookkeeping API Tools"
     Write-Host ""
@@ -768,13 +790,13 @@ function Show-Help {
     Write-Host "Usage:"
     Write-Host "    ebktools.ps1 [-tzName <name>] [-tzOffset <offset>] <command> [command-options]"
     Write-Host ""
-    Write-Host "Global Options:"
-    Write-Host "    -tzName <name>              The IANA timezone name, for example, for Beijing Time it is 'Asia/Shanghai'."
-    Write-Host "    -tzOffset <offset>          The offset in minutes of the current timezone from UTC. For example, for Beijing Time which is UTC+8, the value is '480'. If both are provided, '-tzName' takes precedence."
-    Write-Host ""
     Write-Host "Environment Variables (Required):"
     Write-Host "    EBKTOOL_SERVER_BASEURL      ezBookkeeping server base URL (e.g., http://localhost:8080)"
     Write-Host "    EBKTOOL_TOKEN               ezBookkeeping API token"
+    Write-Host ""
+    Write-Host "Global Options:"
+    Write-Host "    -tzName <name>              The IANA timezone name of current timezone. For example, for Beijing Time it is 'Asia/Shanghai'."
+    Write-Host "    -tzOffset <offset>          The offset in minutes of the current timezone from UTC. For example, for Beijing Time which is UTC+8, the value is '480'. If both '-tzName' and '-tzOffset' are set, '-tzName' takes priority. If neither is set, the current system time zone is used by default."
     Write-Host ""
     Write-Host "Commands:"
     Write-Host "    list                        List all available API commands"
@@ -796,10 +818,10 @@ function Show-Help {
     Write-Host "    ebktools.ps1 accounts-list"
     Write-Host ""
     Write-Host "    # Call API with timezone name"
-    Write-Host "    ebktools.ps1 -tzName $tzName transactions-list -count 10"
+    Write-Host "    ebktools.ps1 -tzName $exampleTimezoneName transactions-list -count 10"
     Write-Host ""
     Write-Host "    # Call API with timezone offset"
-    Write-Host "    ebktools.ps1 -tzOffset $tzOffset transactions-list -count 10"
+    Write-Host "    ebktools.ps1 -tzOffset $exampleTimezoneOffset transactions-list -count 10"
 }
 
 function Show-CommandList {
@@ -831,6 +853,7 @@ function Show-CommandHelp {
     Write-Host "Description: $($config.Description)"
     Write-Host "Method: $($config.Method)"
     Write-Host "Path: $($config.Path)"
+    Write-Host ("Require current time zone: " + ($(if ($config.RequiresTimezone) { 'Yes' } else { 'No' })))
     Write-Host ""
 
     if ($config.RequiredParams.Count -gt 0) {
@@ -860,9 +883,14 @@ function Show-CommandHelp {
     }
 
     Write-Host "Example:"
-    if ($config.RequiresTimezone) {
-        $tzName = Get-SystemTimezoneName
-        Write-Host "  ebktools.ps1 -tzName $tzName $($config.Name)"
+    $currentTzName = Get-SystemTimezoneName
+    $currentTzOffset = Get-SystemTimezoneOffset
+    if ($config.RequiresTimezone -and $null -ne $currentTzName) {
+        Write-Host "  ebktools.ps1 -tzName $currentTzName $($config.Name)"
+    } elseif ($config.RequiresTimezone -and $null -ne $currentTzOffset) {
+        Write-Host "  ebktools.ps1 -tzOffset $currentTzOffset $($config.Name)"
+    } elseif ($config.RequiresTimezone) {
+        Write-Host "  ebktools.ps1 -tzName <name> $($config.Name)"
     } else {
         Write-Host "  ebktools.ps1 $($config.Name)"
     }
@@ -969,25 +997,35 @@ function Invoke-Api {
 
     if (-not $serverBaseUrl) {
         Write-Red "Error: Environment variable 'EBKTOOL_SERVER_BASEURL' is not set."
-        Write-Host "Please set it to your API server base URL (e.g., http://localhost:8080)"
+        Write-Host "Please set it to your ezBookkeeping server base URL (e.g., http://localhost:8080)"
         exit 1
     }
 
     if (-not $authToken) {
         Write-Red "Error: Environment variable 'EBKTOOL_TOKEN' is not set."
-        Write-Host "Please set it to your authentication token."
+        Write-Host "Please set it to your API token."
         exit 1
     }
 
-    if ($config.RequiresTimezone -and -not $script:tzName -and -not $script:tzOffset) {
-        $tzName = Get-SystemTimezoneName
-        $tzOffset = Get-SystemTimezoneOffset
+    $currentTimezoneName = Get-SystemTimezoneName
+    $currentTimezoneOffset = Get-SystemTimezoneOffset
+
+    if ($script:tzName -ne $null -and $script:tzName -ne "") {
+        $currentTimezoneName = $script:tzName
+    }
+
+    if ($script:tzOffset -ne $null -and $script:tzOffset -ne "") {
+        $currentTimezoneName = ""
+        $currentTimezoneOffset = $script:tzOffset
+    }
+
+    if ($config.RequiresTimezone -and -not $currentTimezoneName -and -not $currentTimezoneOffset) {
         Write-Red "Error: Command '$commandName' requires timezone information."
         Write-Host "Please provide either '-tzName' or '-tzOffset' parameter."
         Write-Host ""
         Write-Host "Examples:"
-        Write-Host "  ebktools.ps1 -tzName $tzName $commandName ..."
-        Write-Host "  ebktools.ps1 -tzOffset $tzOffset $commandName ..."
+        Write-Host "  ebktools.ps1 -tzName <name> $commandName ..."
+        Write-Host "  ebktools.ps1 -tzOffset <offset> $commandName ..."
         exit 1
     }
 
@@ -1016,10 +1054,10 @@ function Invoke-Api {
             "Authorization" = "Bearer $authToken"
         }
 
-        if ($script:tzName) {
-            $headers["X-Timezone-Name"] = $script:tzName
-        } elseif ($script:tzOffset) {
-            $headers["X-Timezone-Offset"] = $script:tzOffset
+        if ($currentTimezoneName) {
+            $headers["X-Timezone-Name"] = $currentTimezoneName
+        } elseif ($currentTimezoneOffset) {
+            $headers["X-Timezone-Offset"] = $currentTimezoneOffset
         }
 
         if ($config.Method -eq "POST") {

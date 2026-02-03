@@ -263,7 +263,7 @@ $API_CONFIGS = @(
     }
     @{
         Name = "transactions-list"
-        Description = "Get transactions list"
+        Description = "Get transactions list with pagination"
         Method = "GET"
         Path = "transactions/list.json"
         RequiresTimezone = $true

@@ -12,6 +12,7 @@ BUILD_UNIXTIME="${BUILD_UNIXTIME}"
 BUILD_DATE="${BUILD_DATE}"
 PACKAGE_FILENAME=""
 DOCKER_TAG=""
+DOCKER_PLATFORM=""
 
 echo_red() {
     printf '\033[31m%s\033[0m\n' "$1"
@@ -44,6 +45,7 @@ Options:
     -r, --release           Build release (The script will use environment variable "RELEASE_BUILD" to detect whether this is release building by default)
     -o, --output <filename> Package file name (For "package" type only)
     -t, --tag               Docker tag (For "docker" type only)
+    -p, --platform <platform> Docker platform (For "docker" type only, e.g., linux/arm/v7, linux/arm64, linux/arm/v8)
     --no-lint               Do not execute lint check before building
     --no-test               Do not execute unit testing before building (You can use environment variable "SKIP_TESTS" to skip specified tests)
     -h, --help              Show help
@@ -67,6 +69,10 @@ parse_args() {
                 ;;
             --tag | -t)
                 DOCKER_TAG="$2"
+                shift
+                ;;
+            --platform | -p)
+                DOCKER_PLATFORM="$2"
                 shift
                 ;;
             --no-lint)
@@ -255,8 +261,16 @@ build_docker() {
     fi
 
     echo "Building docker image \"$docker_tag\" ($RELEASE_TYPE)..."
+    if [ -n "$DOCKER_PLATFORM" ]; then
+        echo "Target platform: $DOCKER_PLATFORM"
+    fi
 
-    docker build . -t "$docker_tag" --build-arg RELEASE_BUILD=$RELEASE
+    docker_build_args="--build-arg RELEASE_BUILD=$RELEASE"
+    if [ -n "$DOCKER_PLATFORM" ]; then
+        docker_build_args="$docker_build_args --platform $DOCKER_PLATFORM"
+    fi
+
+    docker build . -t "$docker_tag" $docker_build_args
 }
 
 main() {

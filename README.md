@@ -139,7 +139,7 @@ Currently available translations:
 | ko | 한국어 | [@overworks](https://github.com/overworks) |
 | nl | Nederlands | [@automagics](https://github.com/automagics) |
 | pt-BR | Português (Brasil) | [@thecodergus](https://github.com/thecodergus) |
-| ru | Русский | [@artegoser](https://github.com/artegoser) |
+| ru | Русский | [@artegoser](https://github.com/artegoser), [@dshemin](https://github.com/dshemin) |
 | sl | Slovenščina | [@thehijacker](https://github.com/thehijacker) |
 | ta | தமிழ் | [@hhharsha36](https://github.com/hhharsha36) |
 | th | ไทย | [@natthavat28](https://github.com/natthavat28) |

@@ -203,7 +203,7 @@
         "copyright": "Copyright (c) 2018-present, Yuxi (Evan) You and Vue contributors",
         "url": "https://github.com/vuejs/core",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.25/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.27/LICENSE"
     },
     {
         "name": "Pinia",
@@ -217,21 +217,21 @@
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/router",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/vuejs/router/blob/v4.6.4/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/router/blob/v5.0.2/LICENSE"
     },
     {
         "name": "vue-i18n",
         "copyright": "Copyright (c) 2016 kazuya kawaguchi",
         "url": "https://github.com/intlify/vue-i18n-next",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v11.2.2/LICENSE"
+        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v11.2.8/LICENSE"
     },
     {
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-now Vuetify, LLC",
         "url": "https://vuetifyjs.com",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.11.3/packages/vuetify/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.11.8/packages/vuetify/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -273,7 +273,7 @@
         "copyright": "Copyright (c) 2019 Vladimir Kharlampidi",
         "url": "https://swiperjs.com",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/nolimits4web/swiper/blob/v12.0.3/LICENSE"
+        "licenseUrl": "https://github.com/nolimits4web/swiper/blob/v12.1.0/LICENSE"
     },
     {
         "name": "Skeleton Elements",
@@ -315,7 +315,7 @@
         "copyright": "Copyright (c) 2014-present Matt Zabriskie & Collaborators",
         "url": "https://axios-http.com",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/axios/axios/blob/v1.13.2/LICENSE"
+        "licenseUrl": "https://github.com/axios/axios/blob/v1.13.4/LICENSE"
     },
     {
         "name": "Moment.js",

@@ -39,35 +39,35 @@
         "copyright": "Copyright (c) 2014 Simon Eskildsen",
         "url": "https://github.com/sirupsen/logrus",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/sirupsen/logrus/blob/v1.9.3/LICENSE"
+        "licenseUrl": "https://github.com/sirupsen/logrus/blob/v1.9.4/LICENSE"
     },
     {
         "name": "cli",
         "copyright": "Copyright (c) 2023 urfave/cli maintainers",
         "url": "https://github.com/urfave/cli",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/urfave/cli/blob/v3.6.1/LICENSE"
+        "licenseUrl": "https://github.com/urfave/cli/blob/v3.6.2/LICENSE"
     },
     {
         "name": "INI",
         "copyright": "Copyright 2014 Unknwon",
         "url": "https://gopkg.in/ini.v1",
         "license": "Apache License 2.0",
-        "licenseUrl": "https://github.com/go-ini/ini/blob/v1.67.0/LICENSE"
+        "licenseUrl": "https://github.com/go-ini/ini/blob/v1.67.1/LICENSE"
     },
     {
         "name": "Package validator",
         "copyright": "Copyright (c) 2015 Dean Karn",
         "url": "https://github.com/go-playground/validator",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.28.0/LICENSE"
+        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.30.1/LICENSE"
     },
     {
         "name": "jwt-go",
         "copyright": "Copyright (c) 2012 Dave Grijalva, Copyright (c) 2021 golang-jwt maintainers",
         "url": "https://github.com/golang-jwt/jwt",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/v5.3.0/LICENSE"
+        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/v5.3.1/LICENSE"
     },
     {
         "name": "otp",
@@ -83,38 +83,38 @@
     },
     {
         "name": "pq",
-        "copyright": "Copyright (c) 2011-2013, 'pq' Contributors Portions Copyright (C) 2011 Blake Mizerany",
+        "copyright": "Copyright (c) 2011-2013, 'pq' Contributors. Portions Copyright (c) 2011 Blake Mizerany",
         "url": "https://github.com/lib/pq",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/lib/pq/blob/v1.10.9/LICENSE.md"
+        "licenseUrl": "https://github.com/lib/pq/blob/v1.11.1/LICENSE"
     },
     {
         "name": "go-sqlite3",
         "copyright": "Copyright (c) 2014 Yasuhiro Matsumoto",
         "url": "https://github.com/mattn/go-sqlite3",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.32/LICENSE"
+        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.33/LICENSE"
     },
     {
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
         "license": "BSD 3-Clause \"New\" or \"Revised\" License",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.46.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.47.0:LICENSE"
     },
     {
         "name": "Go Networking",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/net",
         "license": "BSD 3-Clause \"New\" or \"Revised\" License",
-        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.48.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.49.0:LICENSE"
     },
     {
         "name": "Go Text",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/text",
         "license": "BSD 3-Clause \"New\" or \"Revised\" License",
-        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.32.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.33.0:LICENSE"
     },
     {
         "name": "Go OAuth2",
@@ -142,14 +142,14 @@
         "copyright": "MinIO Cloud Storage, (C) 2014-2020 MinIO, Inc.",
         "url": "https://github.com/minio/minio-go",
         "license": "Apache License 2.0",
-        "licenseUrl": "https://github.com/minio/minio-go/blob/v7.0.97/LICENSE"
+        "licenseUrl": "https://github.com/minio/minio-go/blob/v7.0.98/LICENSE"
     },
     {
         "name": "gocron",
         "copyright": "Copyright (c) 2014, 辣椒面",
         "url": "https://github.com/go-co-op/gocron",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.18.2/LICENSE"
+        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.19.1/LICENSE"
     },
     {
         "name": "barcode",

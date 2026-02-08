@@ -21,9 +21,9 @@ Live Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-demo.
 - **Open Source & Self-Hosted**
     - Built for privacy and control
 - **Lightweight & Fast**
-    - Optimized for performance, runs smoothly even on low-resource environments
+    - Minimal resource usage, runs smoothly even on low-resource devices
 - **Easy Installation**
-    - Docker-ready
+    - Docker support
     - Supports SQLite, MySQL, PostgreSQL
     - Cross-platform (Windows, macOS, Linux)
     - Works on x86, amd64, ARM architectures
@@ -33,24 +33,26 @@ Live Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-demo.
     - Dark mode
 - **AI-Powered Features**
     - Receipt image recognition
-    - Supports MCP (Model Context Protocol) for AI integration
+    - MCP (Model Context Protocol) support for AI integration
+    - API command-line script tools for AI integration
 - **Powerful Bookkeeping**
     - Two-level accounts and categories
-    - Attach images to transactions
+    - Image attachments for transactions
     - Location tracking with maps
-    - Recurring transactions
-    - Advanced filtering, search, visualization, and analysis
-- **Localization & Globalization**
+    - Scheduled transactions
+    - Advanced filtering, search, visualization and analysis
+- **Localization & Internationalization**
     - Multi-language and multi-currency support
-    - Automatic exchange rates
-    - Multi-timezone awareness
-    - Custom formats for dates, numbers, and currencies
+    - Multiple exchange rate sources with automatic updates
+    - Multi-timezone support
+    - Custom formats for dates, numbers and currencies
 - **Security**
     - Two-factor authentication (2FA)
+    - OIDC external authentication
     - Login rate limiting
     - Application lock (PIN code / WebAuthn)
-- **Data Import/Export**
-    - Supports CSV, OFX, QFX, QIF, IIF, Camt.052, Camt.053, MT940, GnuCash, Firefly III, Beancount, and more
+- **Data Import & Export**
+    - Supports CSV, OFX, QFX, QIF, IIF, Camt.052, Camt.053, MT940, GnuCash, Firefly III, Beancount and more
 
 For a full list of features, visit the [Full Feature List](https://ezbookkeeping.mayswind.net/comparison/).
 

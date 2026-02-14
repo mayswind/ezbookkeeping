@@ -1,11 +1,5 @@
 package settings
 
-import (
-	"fmt"
-
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-)
-
 // ConfigContainer contains the current setting config
 type ConfigContainer struct {
 	current *Config
@@ -13,10 +7,7 @@ type ConfigContainer struct {
 
 // Initialize a config container singleton instance
 var (
-	Version    string
-	CommitHash string
-	BuildTime  string
-	Container  = &ConfigContainer{}
+	Container = &ConfigContainer{}
 )
 
 // SetCurrentConfig sets the current config by a given config
@@ -27,12 +18,4 @@ func SetCurrentConfig(config *Config) {
 // GetCurrentConfig returns the current config
 func (c *ConfigContainer) GetCurrentConfig() *Config {
 	return c.current
-}
-
-func GetUserAgent() string {
-	if Version == "" {
-		return core.ApplicationName
-	}
-
-	return fmt.Sprintf("%s/%s", core.ApplicationName, Version)
 }

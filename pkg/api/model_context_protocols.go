@@ -103,7 +103,7 @@ func (a *ModelContextProtocolAPI) InitializeHandler(c *core.WebContext, jsonRPCR
 		ServerInfo: &mcp.MCPImplementation{
 			Name:    mcpServerName,
 			Title:   core.ApplicationName,
-			Version: settings.Version,
+			Version: core.Version,
 		},
 	}
 

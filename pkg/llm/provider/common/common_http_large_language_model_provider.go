@@ -83,6 +83,6 @@ func (p *CommonHttpLargeLanguageModelProvider) getTextualResponse(c core.Context
 func NewCommonHttpLargeLanguageModelProvider(llmConfig *settings.LLMConfig, enableResponseLog bool, adapter HttpLargeLanguageModelAdapter) *CommonHttpLargeLanguageModelProvider {
 	return &CommonHttpLargeLanguageModelProvider{
 		adapter:    adapter,
-		httpClient: httpclient.NewHttpClient(llmConfig.LargeLanguageModelAPIRequestTimeout, llmConfig.LargeLanguageModelAPIProxy, llmConfig.LargeLanguageModelAPISkipTLSVerify, settings.GetUserAgent(), enableResponseLog),
+		httpClient: httpclient.NewHttpClient(llmConfig.LargeLanguageModelAPIRequestTimeout, llmConfig.LargeLanguageModelAPIProxy, llmConfig.LargeLanguageModelAPISkipTLSVerify, core.GetOutgoingUserAgent(), enableResponseLog),
 	}
 }

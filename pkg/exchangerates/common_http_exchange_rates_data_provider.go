@@ -108,6 +108,6 @@ func (e *CommonHttpExchangeRatesDataProvider) GetLatestExchangeRates(c core.Cont
 func newCommonHttpExchangeRatesDataProvider(config *settings.Config, dataSource HttpExchangeRatesDataSource) *CommonHttpExchangeRatesDataProvider {
 	return &CommonHttpExchangeRatesDataProvider{
 		dataSource: dataSource,
-		httpClient: httpclient.NewHttpClient(config.ExchangeRatesRequestTimeout, config.ExchangeRatesProxy, config.ExchangeRatesSkipTLSVerify, settings.GetUserAgent(), config.EnableDebugLog),
+		httpClient: httpclient.NewHttpClient(config.ExchangeRatesRequestTimeout, config.ExchangeRatesProxy, config.ExchangeRatesSkipTLSVerify, core.GetOutgoingUserAgent(), config.EnableDebugLog),
 	}
 }

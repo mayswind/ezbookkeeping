@@ -67,7 +67,7 @@ func InitializeOAuth2Provider(config *settings.Config) error {
 
 	Container.current = oauth2Provider
 	Container.usePKCE = config.OAuth2UsePKCE
-	Container.oauth2HttpClient = httpclient.NewHttpClient(config.OAuth2RequestTimeout, config.OAuth2Proxy, config.OAuth2SkipTLSVerify, settings.GetUserAgent(), config.EnableDebugLog)
+	Container.oauth2HttpClient = httpclient.NewHttpClient(config.OAuth2RequestTimeout, config.OAuth2Proxy, config.OAuth2SkipTLSVerify, core.GetOutgoingUserAgent(), config.EnableDebugLog)
 	Container.externalUserAuthType = externalUserAuthType
 
 	return nil

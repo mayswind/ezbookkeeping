@@ -3,7 +3,6 @@ package api
 import (
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 // SystemsApi represents system api
@@ -18,11 +17,11 @@ var (
 func (a *SystemsApi) VersionHandler(c *core.WebContext) (any, *errs.Error) {
 	result := make(map[string]string)
 
-	result["version"] = settings.Version
-	result["commitHash"] = settings.CommitHash
+	result["version"] = core.Version
+	result["commitHash"] = core.CommitHash
 
-	if settings.BuildTime != "" {
-		result["buildTime"] = settings.BuildTime
+	if core.BuildTime != "" {
+		result["buildTime"] = core.BuildTime
 	}
 
 	return result, nil

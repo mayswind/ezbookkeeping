@@ -10,7 +10,7 @@ import (
 	"github.com/urfave/cli/v3"
 
 	"github.com/mayswind/ezbookkeeping/cmd"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
@@ -26,9 +26,9 @@ var (
 )
 
 func main() {
-	settings.Version = Version
-	settings.CommitHash = CommitHash
-	settings.BuildTime = BuildUnixTime
+	core.Version = Version
+	core.CommitHash = CommitHash
+	core.BuildTime = BuildUnixTime
 
 	cmd := &cli.Command{
 		Name:    "ezBookkeeping",

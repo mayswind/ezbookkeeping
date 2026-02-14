@@ -6,6 +6,15 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+// TokenUserAgentCreatedViaCli is the user agent of token created via cli
+const TokenUserAgentCreatedViaCli = ApplicationName + " Cli"
+
+// TokenUserAgentForAPI is the user agent for API token
+const TokenUserAgentForAPI = ApplicationName + " API"
+
+// TokenUserAgentForMCP is the user agent for MCP token
+const TokenUserAgentForMCP = ApplicationName + " MCP"
+
 // TokenType represents token type
 type TokenType byte
 

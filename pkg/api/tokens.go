@@ -69,10 +69,10 @@ func (a *TokensApi) TokenListHandler(c *core.WebContext) (any, *errs.Error) {
 			tokenResp.IsCurrent = true
 		}
 
-		if token.TokenType == core.USER_TOKEN_TYPE_API && token.UserAgent != services.TokenUserAgentCreatedViaCli {
-			tokenResp.UserAgent = services.TokenUserAgentForAPI
-		} else if token.TokenType == core.USER_TOKEN_TYPE_MCP && token.UserAgent != services.TokenUserAgentCreatedViaCli {
-			tokenResp.UserAgent = services.TokenUserAgentForMCP
+		if token.TokenType == core.USER_TOKEN_TYPE_API && token.UserAgent != core.TokenUserAgentCreatedViaCli {
+			tokenResp.UserAgent = core.TokenUserAgentForAPI
+		} else if token.TokenType == core.USER_TOKEN_TYPE_MCP && token.UserAgent != core.TokenUserAgentCreatedViaCli {
+			tokenResp.UserAgent = core.TokenUserAgentForMCP
 		}
 
 		tokenResps[i] = tokenResp

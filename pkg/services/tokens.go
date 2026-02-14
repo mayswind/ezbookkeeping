@@ -20,15 +20,6 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
-// TokenUserAgentCreatedViaCli is the user agent of token created via cli
-const TokenUserAgentCreatedViaCli = core.ApplicationName + " Cli"
-
-// TokenUserAgentForAPI is the user agent for API token
-const TokenUserAgentForAPI = core.ApplicationName + " API"
-
-// TokenUserAgentForMCP is the user agent for MCP token
-const TokenUserAgentForMCP = core.ApplicationName + " MCP"
-
 const tokenMaxExpiredAtUnixTime = int64(253402300799) // 9999-12-31 23:59:59 UTC
 
 // TokenService represents user token service
@@ -140,7 +131,7 @@ func (s *TokenService) CreateAPITokenViaCli(c *core.CliContext, user *models.Use
 		tokenExpiredTimeDuration = time.Unix(tokenMaxExpiredAtUnixTime, 0).Sub(time.Now())
 	}
 
-	token, _, tokenRecord, err := s.createToken(c, user, core.USER_TOKEN_TYPE_API, TokenUserAgentCreatedViaCli, "", tokenExpiredTimeDuration)
+	token, _, tokenRecord, err := s.createToken(c, user, core.USER_TOKEN_TYPE_API, core.TokenUserAgentCreatedViaCli, "", tokenExpiredTimeDuration)
 	return token, tokenRecord, err
 }
 
@@ -168,7 +159,7 @@ func (s *TokenService) CreateMCPTokenViaCli(c *core.CliContext, user *models.Use
 		tokenExpiredTimeDuration = time.Unix(tokenMaxExpiredAtUnixTime, 0).Sub(time.Now())
 	}
 
-	token, _, tokenRecord, err := s.createToken(c, user, core.USER_TOKEN_TYPE_MCP, TokenUserAgentCreatedViaCli, "", tokenExpiredTimeDuration)
+	token, _, tokenRecord, err := s.createToken(c, user, core.USER_TOKEN_TYPE_MCP, core.TokenUserAgentCreatedViaCli, "", tokenExpiredTimeDuration)
 	return token, tokenRecord, err
 }
 

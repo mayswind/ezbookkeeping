@@ -245,14 +245,14 @@
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.0.2/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.0.3/LICENSE"
     },
     {
         "name": "Framework7-vue",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/vue/",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.0.1/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.0.3/LICENSE"
     },
     {
         "name": "Framework7-icons",

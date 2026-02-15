@@ -135,8 +135,6 @@ i.icon.la, i.icon.las, i.icon.lab {
 }
 
 .ios .popover-inner {
-    touch-action: inherit;
-
     > :not(.list) {
         display: none;
     }

@@ -13,6 +13,9 @@ param(
     [Parameter(Mandatory=$false)]
     [string]$tzOffset = "",
 
+    [Parameter(Mandatory=$false)]
+    [switch]$rawResponse = $false,
+
     [Parameter(ValueFromRemainingArguments=$true)]
     [string[]]$CommandArgs
 )
@@ -40,6 +43,10 @@ $API_CONFIGS = @(
             "  }"
             "]"
         )
+        PrettyResponse = @{
+            Type = "simple_array_to_markdown_table"
+            Columns = @("tokenId", "tokenType", "userAgent", "lastSeen", "isCurrent")
+        }
     }
     @{
         Name = "tokens-revoke"
@@ -74,7 +81,7 @@ $API_CONFIGS = @(
             "  {"
             "    `"id`": `"string (Account ID)`","
             "    `"name`": `"string (Account name)`","
-            "    `"parentId`": `"string (Parent account ID)`","
+            "    `"parentId`": `"string (Parent account ID, 0 for primary account)`","
             "    `"category`": `"integer (Account category, 1: Cash, 2: Checking Account, 3: Credit Card, 4: Virtual Account, 5: Debt Account, 6: Receivables, 7: Investment Account, 8: Savings Account, 9: Certificate of Deposit)`","
             "    `"type`": `"integer (Account type, 1: Single Account, 2: Multiple Sub-accounts)`","
             "    `"icon`": `"string (Account icon ID)`","
@@ -91,6 +98,11 @@ $API_CONFIGS = @(
             "  }"
             "]"
         )
+        PrettyResponse = @{
+            Type = "hierarchical_array_to_markdown_table"
+            Columns = @("category", "type", "parentId", "id", "name", "currency", "balance", "hidden", "comment")
+            ChildKey = "subAccounts"
+        }
     }
     @{
         Name = "accounts-add"
@@ -161,8 +173,8 @@ $API_CONFIGS = @(
             "    {"
             "      `"id`": `"string (Transaction category ID)`","
             "      `"name`": `"string (Transaction category name)`","
-            "      `"parentId`": `"string (Parent transaction category ID)`","
-            "      `"type`": `"integer (Transaction category type)`","
+            "      `"parentId`": `"string (Parent transaction category ID, 0 for primary category)`","
+            "      `"type`": `"integer (Transaction category type, 1: Income, 2: Expense, 3: Transfer)`","
             "      `"icon`": `"string (Transaction category icon ID)`","
             "      `"color`": `"string (Transaction category icon color, hex color code RRGGBB)`","
             "      `"comment`": `"string (Transaction category description)`","
@@ -173,6 +185,11 @@ $API_CONFIGS = @(
             "  ]"
             "}"
         )
+        PrettyResponse = @{
+            Type = "hierarchical_object_to_markdown_table"
+            Columns = @("type", "parentId", "id", "name", "hidden", "comment")
+            ChildKey = "subCategories"
+        }
     }
     @{
         Name = "transaction-categories-add"
@@ -234,6 +251,10 @@ $API_CONFIGS = @(
             "  }"
             "]"
         )
+        PrettyResponse = @{
+            Type = "simple_array_to_markdown_table"
+            Columns = @("groupId", "id", "name", "hidden")
+        }
     }
     @{
         Name = "transaction-tags-add"
@@ -333,6 +354,15 @@ $API_CONFIGS = @(
             "  `"totalCount`": `"integer (The total count of transactions)`""
             "}"
         )
+        PrettyResponse = @{
+            Type = "nested_array_to_markdown_table"
+            Columns = @("id", "type", "time", "utcOffset", "categoryId", "sourceAccountId", "sourceAmount", "destinationAccountId", "destinationAmount", "tagIds", "geoLocation", "comment")
+            DataPath = "items"
+            Metadata = @(
+                @{ Field = "totalCount"; Label = "Total Count" },
+                @{ Field = "nextTimeSequenceId"; Label = "Next Time Sequence ID" }
+            )
+        }
     }
     @{
         Name = "transactions-list-all"
@@ -396,6 +426,10 @@ $API_CONFIGS = @(
             "  }"
             "]"
         )
+        PrettyResponse = @{
+            Type = "simple_array_to_markdown_table"
+            Columns = @("id", "type", "time", "utcOffset", "categoryId", "sourceAccountId", "sourceAmount", "destinationAccountId", "destinationAmount", "tagIds", "geoLocation", "comment")
+        }
     }
     @{
         Name = "transactions-add"
@@ -422,12 +456,12 @@ $API_CONFIGS = @(
         }
         ParamDescriptions = @{
             "type" = "integer (Transaction type, 1: Balance Modification, 2: Income, 3: Expense, 4: Transfer)"
-            "categoryId" = "string (Transaction category ID)"
+            "categoryId" = "string (Transaction category ID, supports secondary category)"
             "time" = "integer (Transaction unix time)"
             "utcOffset" = "integer (Transaction time zone offset minutes)"
-            "sourceAccountId" = "string (Source account ID)"
+            "sourceAccountId" = "string (Source account ID, supports account without sub-accounts or sub-account)"
             "sourceAmount" = "integer (Source amount, supports up to two decimals. For example, a value of `"1234`" represents an amount of `"12.34`")"
-            "destinationAccountId" = "string (Destination account ID)"
+            "destinationAccountId" = "string (Destination account ID, supports account without sub-accounts or sub-account)"
             "destinationAmount" = "integer (Destination amount, supports up to two decimals. For example, a value of `"1234`" represents an amount of `"12.34`")"
             "hideAmount" = "boolean (Whether to hide amount)"
             "tagIds" = "string (Transaction tag IDs, separated by comma, e.g. `"tagid1,tagid2`")"
@@ -484,6 +518,16 @@ $API_CONFIGS = @(
             "  ]"
             "}"
         )
+        PrettyResponse = @{
+            Type = "nested_array_to_markdown_table"
+            Columns = @("currency", "rate")
+            DataPath = "exchangeRates"
+            Metadata = @(
+                @{ Field = "dataSource"; Label = "Data Source" },
+                @{ Field = "baseCurrency"; Label = "Base Currency" },
+                @{ Field = "updateTime"; Label = "Update Time" }
+            )
+        }
     }
     @{
         Name = "server-version"
@@ -821,6 +865,211 @@ function Get-ApiConfig {
     return $null
 }
 
+function Get-PrettyResponseConfig {
+    param([string]$commandName)
+
+    foreach ($config in $API_CONFIGS) {
+        if ($config.Name -eq $commandName) {
+            return $config.PrettyResponse
+        }
+    }
+
+    return $null
+}
+
+function Flatten-HierarchicalData {
+    param(
+        [Parameter(Mandatory=$true)]
+        $Data,
+        [string]$ChildKey
+    )
+
+    $result = @()
+    $items = @()
+
+    if ($Data -is [Array]) {
+        $items = $Data
+    } elseif ($Data -is [PSCustomObject] -or $Data -is [Hashtable]) {
+        foreach ($prop in $Data.PSObject.Properties) {
+            if ($prop.Value -is [Array]) {
+                $items += $prop.Value
+            }
+        }
+    }
+
+    foreach ($item in $items) {
+        $parent = @{}
+        foreach ($prop in $item.PSObject.Properties) {
+            if ($prop.Name -ne $ChildKey) {
+                $parent[$prop.Name] = $prop.Value
+            }
+        }
+        $result += [PSCustomObject]$parent
+
+        if ($item.PSObject.Properties[$ChildKey] -and $item.$ChildKey) {
+            foreach ($child in $item.$ChildKey) {
+                $result += $child
+            }
+        }
+    }
+
+    return $result
+}
+
+function Write-Markdown-Table {
+    param(
+        [Parameter(Mandatory=$true)]
+        $Data,
+        [string[]]$Columns
+    )
+
+    if (-not $Data -or ($Data -is [Array] -and $Data.Count -eq 0)) {
+        Write-Host "No data to display"
+        return
+    }
+
+    if (-not $Columns -or $Columns.Count -eq 0) {
+        $Data | ConvertTo-Json -Depth 10 -Compress | Format-Json
+        return
+    }
+
+    $tableData = @()
+
+    if ($Data -is [Array]) {
+        foreach ($item in $Data) {
+            $row = [ordered]@{}
+            foreach ($col in $Columns) {
+                if ($item.PSObject.Properties[$col]) {
+                    $value = $item.$col
+                    if ($value -is [bool]) {
+                        $row[$col] = $value.ToString().ToLower()
+                    } elseif ($value -is [string] -and $value -eq "") {
+                        $row[$col] = ""
+                    } elseif ($value -is [string]) {
+                        $row[$col] = $value -replace "`r", "\n" -replace "`n", "\n"
+                    } elseif ($value -is [Array] -and $value.Count -eq 0) {
+                        $row[$col] = "[]"
+                    } elseif ($value -is [Array] -or $value -is [PSCustomObject] -or $value -is [Hashtable]) {
+                        $row[$col] = ($value | ConvertTo-Json -Depth 10 -Compress)
+                    } elseif ($null -eq $value) {
+                        $row[$col] = "-"
+                    } else {
+                        $row[$col] = $value
+                    }
+                } else {
+                    $row[$col] = "-"
+                }
+            }
+            $tableData += [PSCustomObject]$row
+        }
+    } else {
+        $row = [ordered]@{}
+        foreach ($col in $Columns) {
+            if ($Data.PSObject.Properties[$col]) {
+                $value = $Data.$col
+                if ($value -is [bool]) {
+                    $row[$col] = $value.ToString().ToLower()
+                } elseif ($value -is [string] -and $value -eq "") {
+                    $row[$col] = ""
+                } elseif ($value -is [string]) {
+                    $row[$col] = $value -replace "`r", "\n" -replace "`n", "\n"
+                } elseif ($value -is [Array] -and $value.Count -eq 0) {
+                    $row[$col] = "[]"
+                } elseif ($value -is [Array] -or $value -is [PSCustomObject] -or $value -is [Hashtable]) {
+                    $row[$col] = ($value | ConvertTo-Json -Depth 10 -Compress)
+                } elseif ($null -eq $value) {
+                    $row[$col] = "-"
+                } else {
+                    $row[$col] = $value
+                }
+            } else {
+                $row[$col] = "-"
+            }
+        }
+        $tableData += [PSCustomObject]$row
+    }
+
+    if ($tableData.Count -gt 0) {
+        $header = "| " + (($Columns -join " | ")) + " |"
+        Write-Host $header
+
+        $separator = "| " + ((1..$Columns.Count | ForEach-Object { "---" }) -join " | ") + " |"
+        Write-Host $separator
+
+        foreach ($item in $tableData) {
+            $values = @()
+            foreach ($col in $Columns) {
+                $values += $item.$col
+            }
+            $row = "| " + (($values -join " | ")) + " |"
+            Write-Host $row
+        }
+    }
+}
+
+function Write-Result {
+    param(
+        [string]$CommandName,
+        $ResultData,
+        [bool]$RawResponse = $false
+    )
+
+    if ($RawResponse) {
+        $ResultData | ConvertTo-Json -Depth 10 -Compress | Format-Json
+        return
+    }
+
+    $prettyConfig = Get-PrettyResponseConfig -commandName $CommandName
+
+    if (-not $prettyConfig) {
+        $ResultData | ConvertTo-Json -Depth 10 -Compress | Format-Json
+        return
+    }
+
+    $displayType = $prettyConfig.Type
+    $columns = $prettyConfig.Columns
+
+    switch ($displayType) {
+        "simple_array_to_markdown_table" {
+            Write-Markdown-Table -Data $ResultData -Columns $columns
+        }
+        "hierarchical_array_to_markdown_table" {
+            $childKey = $prettyConfig.ChildKey
+            $flattened = Flatten-HierarchicalData -Data $ResultData -ChildKey $childKey
+            Write-Markdown-Table -Data $flattened -Columns $columns
+        }
+        "hierarchical_object_to_markdown_table" {
+            $childKey = $prettyConfig.ChildKey
+            $flattened = Flatten-HierarchicalData -Data $ResultData -ChildKey $childKey
+            Write-Markdown-Table -Data $flattened -Columns $columns
+        }
+        "nested_array_to_markdown_table" {
+            $dataPath = $prettyConfig.DataPath
+            if ($dataPath) {
+                $nestedData = $ResultData.$dataPath
+            } else {
+                $nestedData = $ResultData
+            }
+
+            if ($prettyConfig.Metadata) {
+                foreach ($meta in $prettyConfig.Metadata) {
+                    $value = $ResultData.($meta.Field)
+                    if ($null -ne $value) {
+                        Write-Host "$($meta.Label): $value"
+                    }
+                }
+
+                Write-Host ""
+            }
+
+            Write-Markdown-Table -Data $nestedData -Columns $columns
+        }
+        default {
+            $ResultData | ConvertTo-Json -Depth 10 -Compress | Format-Json
+        }
+    }
+}
+
 function Show-Help {
     $exampleTimezoneName = Get-ExampleTimezoneName
     $exampleTimezoneOffset = Get-ExampleTimezoneOffset
@@ -830,7 +1079,7 @@ function Show-Help {
     Write-Host "A command-line tool for calling ezBookkeeping APIs"
     Write-Host ""
     Write-Host "Usage:"
-    Write-Host "    ebktools.ps1 [-tzName <name>] [-tzOffset <offset>] <command> [command-options]"
+    Write-Host "    ebktools.ps1 [-tzName <name>] [-tzOffset <offset>] [-rawResponse] <command> [command-options]"
     Write-Host ""
     Write-Host "Environment Variables (Required):"
     Write-Host "    EBKTOOL_SERVER_BASEURL      ezBookkeeping server base URL (e.g., http://localhost:8080)"
@@ -839,6 +1088,7 @@ function Show-Help {
     Write-Host "Global Options:"
     Write-Host "    -tzName <name>              The IANA timezone name of current timezone. For example, for Beijing Time it is 'Asia/Shanghai'."
     Write-Host "    -tzOffset <offset>          The offset in minutes of the current timezone from UTC. For example, for Beijing Time which is UTC+8, the value is '480'. If both '-tzName' and '-tzOffset' are set, '-tzName' takes priority. If neither is set, the current system time zone is used by default."
+    Write-Host "    -rawResponse                Display the response in raw JSON format instead of formatted table."
     Write-Host ""
     Write-Host "Commands:"
     Write-Host "    list                        List all available API commands"
@@ -1133,8 +1383,7 @@ function Invoke-Api {
             if ($response.success -eq $true) {
                 Write-Host "Response Result:"
                 if ($response.PSObject.Properties.Name -contains "result") {
-                    $jsonOutput = ConvertTo-Json -Depth 10 -Compress $response.result | Format-Json
-                    Write-Host $jsonOutput
+                    Write-Result -CommandName $commandName -ResultData $response.result -RawResponse $script:rawResponse
                 } else {
                     Write-Host "Success: true (No result data)"
                 }

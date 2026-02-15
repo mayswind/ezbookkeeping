@@ -25,7 +25,11 @@ API_CONFIGS='[
       "    \"isCurrent\": \"boolean (Whether the session is current)\"",
       "  }",
       "]"
-    ]
+    ],
+    "PrettyResponse": {
+      "Type": "simple_array_to_markdown_table",
+      "Columns": ["tokenId", "tokenType", "userAgent", "lastSeen", "isCurrent"]
+    }
   },
   {
     "Name": "tokens-revoke",
@@ -60,7 +64,7 @@ API_CONFIGS='[
       "  {",
       "    \"id\": \"string (Account ID)\",",
       "    \"name\": \"string (Account name)\",",
-      "    \"parentId\": \"string (Parent account ID)\",",
+      "    \"parentId\": \"string (Parent account ID, 0 for primary account)\",",
       "    \"category\": \"integer (Account category, 1: Cash, 2: Checking Account, 3: Credit Card, 4: Virtual Account, 5: Debt Account, 6: Receivables, 7: Investment Account, 8: Savings Account, 9: Certificate of Deposit)\",",
       "    \"type\": \"integer (Account type, 1: Single Account, 2: Multiple Sub-accounts)\",",
       "    \"icon\": \"string (Account icon ID)\",",
@@ -76,7 +80,12 @@ API_CONFIGS='[
       "    \"subAccounts\": [\"each sub-account object like an account object\"]",
       "  }",
       "]"
-    ]
+    ],
+    "PrettyResponse": {
+      "Type": "hierarchical_array_to_markdown_table",
+      "Columns": ["category", "type", "parentId", "id", "name", "currency", "balance", "hidden", "comment"],
+      "ChildKey": "subAccounts"
+    }
   },
   {
     "Name": "accounts-add",
@@ -147,8 +156,8 @@ API_CONFIGS='[
       "    {",
       "      \"id\": \"string (Transaction category ID)\",",
       "      \"name\": \"string (Transaction category name)\",",
-      "      \"parentId\": \"string (Parent transaction category ID)\",",
-      "      \"type\": \"integer (Transaction category type)\",",
+      "      \"parentId\": \"string (Parent transaction category ID, 0 for primary category)\",",
+      "      \"type\": \"integer (Transaction category type, 1: Income, 2: Expense, 3: Transfer)\",",
       "      \"icon\": \"string (Transaction category icon ID)\",",
       "      \"color\": \"string (Transaction category icon color, hex color code RRGGBB)\",",
       "      \"comment\": \"string (Transaction category description)\",",
@@ -158,7 +167,12 @@ API_CONFIGS='[
       "    }",
       "  ]",
       "}"
-    ]
+    ],
+    "PrettyResponse": {
+      "Type": "hierarchical_object_to_markdown_table",
+      "Columns": ["type", "parentId", "id", "name", "hidden", "comment"],
+      "ChildKey": "subCategories"
+    }
   },
   {
     "Name": "transaction-categories-add",
@@ -219,7 +233,11 @@ API_CONFIGS='[
       "    \"hidden\": \"boolean (Whether the transaction tag is hidden)\"",
       "  }",
       "]"
-    ]
+    ],
+    "PrettyResponse": {
+      "Type": "simple_array_to_markdown_table",
+      "Columns": ["groupId", "id", "name", "hidden"]
+    }
   },
   {
     "Name": "transaction-tags-add",
@@ -318,7 +336,16 @@ API_CONFIGS='[
       "  \"nextTimeSequenceId\": \"integer (The next cursor '"'"'max_time'"'"' parameter when requesting older data)\",",
       "  \"totalCount\": \"integer (The total count of transactions)\"",
       "}"
-    ]
+    ],
+    "PrettyResponse": {
+      "Type": "nested_array_to_markdown_table",
+      "Columns": ["id", "type", "time", "utcOffset", "categoryId", "sourceAccountId", "sourceAmount", "destinationAccountId", "destinationAmount", "tagIds", "geoLocation", "comment"],
+      "DataPath": ".items",
+      "Metadata": [
+        {"Field": "totalCount", "Label": "Total Count"},
+        {"Field": "nextTimeSequenceId", "Label": "Next Time Sequence ID"}
+      ]
+    }
   },
   {
     "Name": "transactions-list-all",
@@ -381,7 +408,11 @@ API_CONFIGS='[
       "    \"editable\": \"boolean (Whether the transaction is editable)\"",
       "  }",
       "]"
-    ]
+    ],
+    "PrettyResponse": {
+      "Type": "simple_array_to_markdown_table",
+      "Columns": ["id", "type", "time", "utcOffset", "categoryId", "sourceAccountId", "sourceAmount", "destinationAccountId", "destinationAmount", "tagIds", "geoLocation", "comment"]
+    }
   },
   {
     "Name": "transactions-add",
@@ -408,12 +439,12 @@ API_CONFIGS='[
     },
     "ParamDescriptions": {
       "type": "integer (Transaction type, 1: Balance Modification, 2: Income, 3: Expense, 4: Transfer)",
-      "categoryId": "string (Transaction category ID)",
+      "categoryId": "string (Transaction category ID, supports secondary category)",
       "time": "integer (Transaction unix time)",
       "utcOffset": "integer (Transaction time zone offset minutes)",
-      "sourceAccountId": "string (Source account ID)",
+      "sourceAccountId": "string (Source account ID, supports account without sub-accounts or sub-account)",
       "sourceAmount": "integer (Source amount, supports up to two decimals. For example, a value of \\"1234\\" represents an amount of \\"12.34\\")",
-      "destinationAccountId": "string (Destination account ID)",
+      "destinationAccountId": "string (Destination account ID, supports account without sub-accounts or sub-account)",
       "destinationAmount": "integer (Destination amount, supports up to two decimals. For example, a value of \\"1234\\" represents an amount of \\"12.34\\")",
       "hideAmount": "boolean (Whether to hide amount)",
       "tagIds": "string (Transaction tag IDs, separated by comma, e.g. \"tagid1,tagid2\")",
@@ -469,7 +500,17 @@ API_CONFIGS='[
       "    }",
       "  ]",
       "}"
-    ]
+    ],
+    "PrettyResponse": {
+      "Type": "nested_array_to_markdown_table",
+      "Columns": ["currency", "rate"],
+      "DataPath": ".exchangeRates",
+      "Metadata": [
+        {"Field": "dataSource", "Label": "Data Source"},
+        {"Field": "baseCurrency", "Label": "Base Currency"},
+        {"Field": "updateTime", "Label": "Update Time"}
+      ]
+    }
   },
   {
     "Name": "server-version",
@@ -492,6 +533,7 @@ API_CONFIGS='[
 
 TIMEZONE_NAME=""
 TIMEZONE_OFFSET=""
+RAW_RESPONSE="false"
 
 echo_red() {
     printf '\033[31m%s\033[0m\n' "$1"
@@ -576,6 +618,119 @@ parse_api_config() {
     echo "$API_CONFIGS" | jq -r --arg name "$api_name" '.[] | select(.Name == $name)'
 }
 
+get_pretty_response_config() {
+    command_name="$1"
+    echo "$API_CONFIGS" | jq -r --arg name "$command_name" '.[] | select(.Name == $name) | .PrettyResponse // null'
+}
+
+flatten_hierarchical_data() {
+    data="$1"
+    child_key="$2"
+
+    printf "%s\n" "$data" | jq -r --arg childKey "$child_key" '
+        if type == "array" then
+            [.[] | . as $parent | [$parent | del(.[$childKey])] + (.[$childKey] // [])]
+        elif type == "object" then
+            [.[] | .[] | . as $parent | [$parent | del(.[$childKey])] + (.[$childKey] // [])]
+        else
+            []
+        end | flatten
+    '
+}
+
+print_markdown_table() {
+    data="$1"
+    columns="$2"
+
+    if [ -z "$data" ] || [ "$data" = "null" ] || [ "$data" = "[]" ]; then
+        echo "No data to display"
+        return
+    fi
+
+    cols_array="$columns"
+
+    if [ -z "$cols_array" ] || [ "$cols_array" = "null" ]; then
+        printf "%s\n" "$data" | jq '.'
+        return
+    fi
+
+    header="$(echo "$cols_array" | jq -r 'join(" | ")')"
+    separator="$(echo "$cols_array" | jq -r '[.[] | "---"] | join(" | ")')"
+
+    rows="$(printf "%s\n" "$data" | jq -r --argjson cols "$cols_array" '
+        if type == "array" then
+            .[] | [$cols[] as $col | .[$col] | if . == null then "-" elif type == "string" then gsub("\r"; "\\r") | gsub("\n"; "\\n") else tostring end] | join(" | ")
+        else
+            [$cols[] as $col | .[$col] | if . == null then "-" elif type == "string" then gsub("\r"; "\\r") | gsub("\n"; "\\n") else tostring end] | join(" | ")
+        end
+    ' 2>/dev/null)"
+
+    if [ -z "$rows" ]; then
+        printf "%s\n" "$data" | jq '.'
+        return
+    fi
+
+    echo "| $header |"
+    echo "| $separator |"
+    printf "%s\n" "$rows" | while IFS= read -r row; do
+        printf "%s\n" "| $row |"
+    done
+}
+
+print_result() {
+    command_name="$1"
+    result_data="$2"
+
+    if [ "$RAW_RESPONSE" = "true" ]; then
+        printf "%s\n" "$result_data" | jq '.'
+        return
+    fi
+
+    pretty_config="$(get_pretty_response_config "$command_name")"
+
+    if [ -z "$pretty_config" ] || [ "$pretty_config" = "null" ]; then
+        printf "%s\n" "$result_data" | jq '.'
+        return
+    fi
+
+    display_type="$(echo "$pretty_config" | jq -r '.Type')"
+    columns="$(echo "$pretty_config" | jq -c '.Columns')"
+
+    case "$display_type" in
+        simple_array_to_markdown_table)
+            print_markdown_table "$result_data" "$columns"
+            ;;
+        hierarchical_array_to_markdown_table)
+            child_key="$(echo "$pretty_config" | jq -r '.ChildKey')"
+            flattened="$(flatten_hierarchical_data "$result_data" "$child_key")"
+            print_markdown_table "$flattened" "$columns"
+            ;;
+        hierarchical_object_to_markdown_table)
+            child_key="$(echo "$pretty_config" | jq -r '.ChildKey')"
+            flattened="$(flatten_hierarchical_data "$result_data" "$child_key")"
+            print_markdown_table "$flattened" "$columns"
+            ;;
+        nested_array_to_markdown_table)
+            data_path="$(echo "$pretty_config" | jq -r '.DataPath // "."')"
+            nested_data="$(printf "%s\n" "$result_data" | jq -r "$data_path")"
+
+            metadata="$(echo "$pretty_config" | jq -r '.Metadata // null')"
+            if [ -n "$metadata" ] && [ "$metadata" != "null" ]; then
+                echo "$metadata" | jq -r --arg result "$result_data" '
+                    ($result | fromjson) as $data |
+                    .[] | select($data[.Field] != null) | "\(.Label): \($data[.Field])"
+                '
+                echo ""
+            fi
+
+            print_markdown_table "$nested_data" "$columns"
+            ;;
+        *)
+            printf "%s\n" "$result_data" | jq '.'
+            ;;
+    esac
+}
+
 show_help() {
     example_timezone_name="$(get_example_timezone_name)"
     example_timezone_offset="$(get_example_timezone_offset)"
@@ -586,7 +741,7 @@ ezBookkeeping API Tools
 A command-line tool for calling ezBookkeeping APIs
 
 Usage:
-    ebktools.sh [--tz-name <name>] [--tz-offset <offset>] <command> [command-options]
+    ebktools.sh [--tz-name <name>] [--tz-offset <offset>] [--raw-response] <command> [command-options]
 
 Environment Variables (Required):
     EBKTOOL_SERVER_BASEURL      ezBookkeeping server base URL (e.g., http://localhost:8080)
@@ -595,6 +750,7 @@ Environment Variables (Required):
 Global Options:
     --tz-name <name>            The IANA timezone name of current timezone. For example, for Beijing Time it is 'Asia/Shanghai'.
     --tz-offset <offset>        The offset in minutes of the current timezone from UTC. For example, for Beijing Time which is UTC+8, the value is '480'. If both '--tz-name' and '--tz-offset' are set, '--tz-name' takes priority. If neither is set, the current system time zone is used by default.
+    --raw-response              Display the response in raw JSON format instead of formatted table.
 
 Commands:
     list                        List all available API commands
@@ -956,7 +1112,7 @@ call_api() {
         echo "Response Result:"
         result=$(printf "%s\n" "$response" | jq '.result // "null"')
         if [ "$result" != "null" ]; then
-            printf "%s\n" "$response" | jq '.result'
+            print_result "$command_name" "$result"
         else
             echo "Success: true (No result data)"
         fi
@@ -991,6 +1147,10 @@ main() {
                 fi
                 TIMEZONE_OFFSET="$2"
                 shift 2
+                ;;
+            --raw-response)
+                RAW_RESPONSE="true"
+                shift
                 ;;
             --help | -h)
                 show_help

@@ -321,7 +321,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
             }
         }
 
-        if (type === 'template' && transaction.value instanceof TransactionTemplate) {
+        if (type === TransactionEditPageType.Template && transaction.value instanceof TransactionTemplate) {
             if (!transaction.value.name) {
                 return 'Template name cannot be blank';
             }

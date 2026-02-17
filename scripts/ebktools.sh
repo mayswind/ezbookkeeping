@@ -531,6 +531,8 @@ API_CONFIGS='[
   }
 ]'
 
+EBKTOOL_SERVER_BASEURL="${EBKTOOL_SERVER_BASEURL}"
+EBKTOOL_TOKEN="${EBKTOOL_TOKEN}"
 TIMEZONE_NAME=""
 TIMEZONE_OFFSET=""
 RAW_RESPONSE="false"
@@ -551,6 +553,74 @@ check_dependency() {
             exit 127
         fi
     done
+}
+
+load_env_file() {
+    env_file="$1"
+
+    if [ ! -f "$env_file" ]; then
+        return 1
+    fi
+
+    while IFS= read -r line || [ -n "$line" ]; do
+        case "$line" in
+            ''|'#'*) continue ;;
+        esac
+
+        line="$(echo "$line" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+
+        if ! echo "$line" | grep -q '='; then
+            continue
+        fi
+
+        key="$(echo "$line" | cut -d'=' -f1)"
+        value="$(echo "$line" | cut -d'=' -f2-)"
+        value="$(echo "$value" | sed -e 's/^["'"'"']//' -e 's/["'"'"']$//')"
+
+        case "$key" in
+            EBKTOOL_SERVER_BASEURL|EBKTOOL_TOKEN)
+                eval "$key=\"\$value\""
+                ;;
+        esac
+    done < "$env_file"
+
+    return 0
+}
+
+load_env_from_paths() {
+    if [ -n "$EBKTOOL_SERVER_BASEURL" ] && [ -n "$EBKTOOL_TOKEN" ]; then
+        return 0
+    fi
+
+    current_dir="$(pwd)"
+    parent_dir="$(dirname "$current_dir")"
+    home_dir="$HOME"
+
+    if [ -z "$EBKTOOL_SERVER_BASEURL" ] || [ -z "$EBKTOOL_TOKEN" ]; then
+        if load_env_file "$current_dir/.env"; then
+            if [ -n "$EBKTOOL_SERVER_BASEURL" ] && [ -n "$EBKTOOL_TOKEN" ]; then
+                return 0
+            fi
+        fi
+    fi
+
+    if [ -z "$EBKTOOL_SERVER_BASEURL" ] || [ -z "$EBKTOOL_TOKEN" ]; then
+        if load_env_file "$parent_dir/.env"; then
+            if [ -n "$EBKTOOL_SERVER_BASEURL" ] && [ -n "$EBKTOOL_TOKEN" ]; then
+                return 0
+            fi
+        fi
+    fi
+
+    if [ -z "$EBKTOOL_SERVER_BASEURL" ] || [ -z "$EBKTOOL_TOKEN" ]; then
+        if load_env_file "$home_dir/.env"; then
+            if [ -n "$EBKTOOL_SERVER_BASEURL" ] && [ -n "$EBKTOOL_TOKEN" ]; then
+                return 0
+            fi
+        fi
+    fi
+
+    return 0
 }
 
 url_encode() {
@@ -746,6 +816,8 @@ Usage:
 Environment Variables (Required):
     EBKTOOL_SERVER_BASEURL      ezBookkeeping server base URL (e.g., http://localhost:8080)
     EBKTOOL_TOKEN               ezBookkeeping API token
+
+    You can also set the above environment variables in a .env file located in the current directory, parent directory or home directory.
 
 Global Options:
     --tz-name <name>            The IANA timezone name of current timezone. For example, for Beijing Time it is 'Asia/Shanghai'.
@@ -1127,6 +1199,8 @@ call_api() {
 
 main() {
     check_dependency "grep sed awk date curl jq"
+
+    load_env_from_paths
 
     COMMAND=""
 

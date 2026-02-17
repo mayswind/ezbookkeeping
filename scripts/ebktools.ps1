@@ -20,6 +20,9 @@ param(
     [string[]]$CommandArgs
 )
 
+$script:EBKTOOL_SERVER_BASEURL = $env:EBKTOOL_SERVER_BASEURL
+$script:EBKTOOL_TOKEN = $env:EBKTOOL_TOKEN
+
 # API Configuration Structure
 $API_CONFIGS = @(
     @{
@@ -699,6 +702,87 @@ function Write-Yellow($msg) {
     Write-Host $msg -ForegroundColor Yellow
 }
 
+function Import-DotEnvFile {
+    param(
+        [string]$Path
+    )
+
+    if (-not (Test-Path -Path $Path -PathType Leaf)) {
+        return $false
+    }
+
+    try {
+        Get-Content -Path $Path -ErrorAction Stop | ForEach-Object {
+            $line = $_.Trim()
+
+            if ([string]::IsNullOrWhiteSpace($line) -or $line.StartsWith('#')) {
+                return
+            }
+
+            if ($line -match '^([^=]+)=(.*)$') {
+                $key = $matches[1].Trim()
+                $value = $matches[2].Trim()
+
+                if ($value -match '^["''](.*)["'']$') {
+                    $value = $matches[1]
+                }
+
+                if ($key -eq 'EBKTOOL_SERVER_BASEURL' -or $key -eq 'EBKTOOL_TOKEN') {
+                    Set-Variable -Name $key -Value $value -Scope Script -Force
+                }
+            }
+        }
+        return $true
+    } catch {
+        return $false
+    }
+}
+
+function Initialize-EnvironmentVariables {
+    if ($script:EBKTOOL_SERVER_BASEURL -and $script:EBKTOOL_TOKEN) {
+        return
+    }
+
+    $currentDir = Get-Location
+    $parentDir = Split-Path -Path $currentDir -Parent
+    $homeDir = if ($IsWindows -or $env:OS -match 'Windows') {
+        $env:USERPROFILE
+    } else {
+        $env:HOME
+    }
+
+    if (-not $script:EBKTOOL_SERVER_BASEURL -or -not $script:EBKTOOL_TOKEN) {
+        $envPath = Join-Path -Path $currentDir -ChildPath '.env'
+        if (Import-DotEnvFile -Path $envPath) {
+            if ($script:EBKTOOL_SERVER_BASEURL -and $script:EBKTOOL_TOKEN) {
+                return
+            }
+        }
+    }
+
+    if (-not $script:EBKTOOL_SERVER_BASEURL -or -not $script:EBKTOOL_TOKEN) {
+        if ($parentDir) {
+            $envPath = Join-Path -Path $parentDir -ChildPath '.env'
+            if (Import-DotEnvFile -Path $envPath) {
+                if ($script:EBKTOOL_SERVER_BASEURL -and $script:EBKTOOL_TOKEN) {
+                    return
+                }
+            }
+        }
+    }
+
+    if (-not $script:EBKTOOL_SERVER_BASEURL -or -not $script:EBKTOOL_TOKEN) {
+        if ($homeDir) {
+            $envPath = Join-Path -Path $homeDir -ChildPath '.env'
+            if (Import-DotEnvFile -Path $envPath) {
+                if ($script:EBKTOOL_SERVER_BASEURL -and $script:EBKTOOL_TOKEN) {
+                    return
+                }
+            }
+        }
+    }
+}
+
 function Url-Encode {
     param([string]$text)
     return [System.Uri]::EscapeDataString($text)
@@ -1085,6 +1169,8 @@ function Show-Help {
     Write-Host "    EBKTOOL_SERVER_BASEURL      ezBookkeeping server base URL (e.g., http://localhost:8080)"
     Write-Host "    EBKTOOL_TOKEN               ezBookkeeping API token"
     Write-Host ""
+    Write-Host "    You can also set the above environment variables in a .env file located in the current directory, parent directory or home directory."
+    Write-Host ""
     Write-Host "Global Options:"
     Write-Host "    -tzName <name>              The IANA timezone name of current timezone. For example, for Beijing Time it is 'Asia/Shanghai'."
     Write-Host "    -tzOffset <offset>          The offset in minutes of the current timezone from UTC. For example, for Beijing Time which is UTC+8, the value is '480'. If both '-tzName' and '-tzOffset' are set, '-tzName' takes priority. If neither is set, the current system time zone is used by default."
@@ -1284,8 +1370,8 @@ function Invoke-Api {
         exit 1
     }
 
-    $serverBaseUrl = $env:EBKTOOL_SERVER_BASEURL
-    $authToken = $env:EBKTOOL_TOKEN
+    $serverBaseUrl = $script:EBKTOOL_SERVER_BASEURL
+    $authToken = $script:EBKTOOL_TOKEN
 
     if (-not $serverBaseUrl) {
         Write-Red "Error: Environment variable 'EBKTOOL_SERVER_BASEURL' is not set."
@@ -1416,6 +1502,8 @@ function Invoke-Api {
 }
 
 function Main {
+    Initialize-EnvironmentVariables
+
     if ($Command -eq "list") {
         Show-CommandList
         exit 0

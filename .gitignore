@@ -152,6 +152,10 @@ dist/
 ezbookkeeping
 package/
 
+# Environment variable files
+.env
+**/.env
+
 # Other directories
 data/
 storage/

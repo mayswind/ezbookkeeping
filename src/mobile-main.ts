@@ -26,6 +26,7 @@ import Framework7Toggle from 'framework7/components/toggle';
 import Framework7Range from 'framework7/components/range';
 import Framework7Grid from 'framework7/components/grid';
 import Framework7Picker from 'framework7/components/picker';
+import Framework7Fab from 'framework7/components/fab';
 import Framework7InfiniteScroll from 'framework7/components/infinite-scroll';
 import Framework7PullToRefresh from 'framework7/components/pull-to-refresh';
 import Framework7Searchbar from 'framework7/components/searchbar';
@@ -119,6 +120,7 @@ Framework7.use([
     Framework7Range,
     Framework7Grid,
     Framework7Picker,
+    Framework7Fab,
     Framework7InfiniteScroll,
     Framework7PullToRefresh,
     Framework7Searchbar,

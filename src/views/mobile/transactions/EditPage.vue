@@ -469,11 +469,12 @@
             </f7-actions-group>
         </f7-actions>
 
-        <f7-toolbar tabbar bottom v-if="mode !== TransactionEditPageMode.View">
-            <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" @click="save">
-                <span class="tabbar-primary-link">{{ tt(saveButtonTitle) }}</span>
-            </f7-link>
-        </f7-toolbar>
+        <template #fixed>
+            <f7-fab position="right-bottom" :class="{ 'disabled': inputIsEmpty || submitting }"
+                    :text="tt(saveButtonTitle)"
+                    @click="save" v-if="mode !== TransactionEditPageMode.View">
+            </f7-fab>
+        </template>
 
         <f7-photo-browser ref="pictureBrowser" type="popup" navbar-of-text="/"
                           :navbar-show-count="true" :exposition="false"

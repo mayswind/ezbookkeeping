@@ -48,7 +48,7 @@
             </f7-list>
         </f7-popover>
 
-        <f7-toolbar tabbar bottom class="toolbar-item-auto-size transaction-list-toolbar">
+        <f7-toolbar tabbar bottom class="compact-tabbar toolbar-item-auto-size transaction-list-toolbar">
             <f7-link :class="{ 'disabled': loading || query.dateType === DateRange.All.type }" @click="shiftDateRange(query.minTime, query.maxTime, -1)">
                 <f7-icon class="icon-with-direction" f7="arrow_left_square"></f7-icon>
             </f7-link>

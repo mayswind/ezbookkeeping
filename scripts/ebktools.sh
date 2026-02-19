@@ -113,8 +113,8 @@ API_CONFIGS='[
       "type": "integer (Account type, 1: Single Account, 2: Multiple Sub-accounts)",
       "icon": "string (Account icon ID)",
       "color": "string (Account icon color, hex color code RRGGBB)",
-      "currency": "string (Account currency code, ISO 4217 code, \\"---\\" for the parent account)",
-      "balance": "integer (Account balance, supports up to two decimals. For example, a value of \\"1234\\" represents an amount of \\"12.34\\". Liability account should set to negative amount)",
+      "currency": "string (Account currency code, ISO 4217 code, '"'"'---'"'"' for the parent account)",
+      "balance": "integer (Account balance, supports up to two decimals. For example, a value of '"'"'1234'"'"' represents an amount of '"'"'12.34'"'"'. Liability account should set to negative amount)",
       "balanceTime": "integer (The unix time when the account balance is the set value. This field is required when balance is set)",
       "comment": "string (Account description)",
       "creditCardStatementDate": "integer (The statement date of the credit card account)"
@@ -443,14 +443,14 @@ API_CONFIGS='[
       "time": "integer (Transaction unix time)",
       "utcOffset": "integer (Transaction time zone offset minutes)",
       "sourceAccountId": "string (Source account ID, supports account without sub-accounts or sub-account)",
-      "sourceAmount": "integer (Source amount, supports up to two decimals. For example, a value of \\"1234\\" represents an amount of \\"12.34\\")",
+      "sourceAmount": "integer (Source amount, supports up to two decimals. For example, a value of '"'"'1234'"'"' represents an amount of '"'"'12.34'"'"')",
       "destinationAccountId": "string (Destination account ID, supports account without sub-accounts or sub-account)",
-      "destinationAmount": "integer (Destination amount, supports up to two decimals. For example, a value of \\"1234\\" represents an amount of \\"12.34\\")",
+      "destinationAmount": "integer (Destination amount, supports up to two decimals. For example, a value of '"'"'1234'"'"' represents an amount of '"'"'12.34'"'"')",
       "hideAmount": "boolean (Whether to hide amount)",
-      "tagIds": "string (Transaction tag IDs, separated by comma, e.g. \"tagid1,tagid2\")",
-      "pictureIds": "string (Transaction picture IDs, separated by comma, e.g. \"picid1,picid2\")",
+      "tagIds": "string (Transaction tag IDs, separated by comma, e.g. '"'"'tagid1,tagid2'"'"')",
+      "pictureIds": "string (Transaction picture IDs, separated by comma, e.g. '"'"'picid1,picid2'"'"')",
       "comment": "string (Transaction description)",
-      "geoLocation": "string (Transaction geographic location, format: longitude,latitude, e.g. \"116.33,39.93\")"
+      "geoLocation": "string (Transaction geographic location, format: longitude,latitude, e.g. '"'"'116.33,39.93'"'"')"
     },
     "ResponseStructure": [
       "{",

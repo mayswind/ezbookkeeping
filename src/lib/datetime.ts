@@ -815,7 +815,9 @@ export function getThisMonthLastUnixTime(): number {
 }
 
 export function getThisMonthSpecifiedDayFirstUnixTime(date: number): number {
-    return moment().set({ date: date, hour: 0, minute: 0, second: 0, millisecond: 0 }).unix();
+    const now = moment();
+    const clampedDate = Math.min(date, now.daysInMonth());
+    return now.set({ date: clampedDate, hour: 0, minute: 0, second: 0, millisecond: 0 }).unix();
 }
 
 export function getThisMonthSpecifiedDayLastUnixTime(date: number): number {

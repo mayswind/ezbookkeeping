@@ -104,7 +104,7 @@ type AccountCreateRequest struct {
 	Balance                 int64                   `json:"balance"`
 	BalanceTime             int64                   `json:"balanceTime"`
 	Comment                 string                  `json:"comment" binding:"max=255"`
-	CreditCardStatementDate int                     `json:"creditCardStatementDate" binding:"min=0,max=28"`
+	CreditCardStatementDate int                     `json:"creditCardStatementDate" binding:"min=0,max=31"`
 	SubAccounts             []*AccountCreateRequest `json:"subAccounts" binding:"omitempty"`
 	ClientSessionId         string                  `json:"clientSessionId"`
 }
@@ -120,7 +120,7 @@ type AccountModifyRequest struct {
 	Balance                 *int64                  `json:"balance" binding:"omitempty"`
 	BalanceTime             *int64                  `json:"balanceTime" binding:"omitempty"`
 	Comment                 string                  `json:"comment" binding:"max=255"`
-	CreditCardStatementDate int                     `json:"creditCardStatementDate" binding:"min=0,max=28"`
+	CreditCardStatementDate int                     `json:"creditCardStatementDate" binding:"min=0,max=31"`
 	Hidden                  bool                    `json:"hidden"`
 	SubAccounts             []*AccountModifyRequest `json:"subAccounts" binding:"omitempty"`
 	ClientSessionId         string                  `json:"clientSessionId"`

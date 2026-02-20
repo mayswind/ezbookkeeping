@@ -88,7 +88,7 @@ export function useAccountEditPageBase() {
             displayName: tt('Not set'),
         });
 
-        for (let i = 1; i <= 28; i++) {
+        for (let i = 1; i <= 31; i++) {
             allAvailableDays.push({
                 day: i,
                 displayName: getMonthdayShortName(i),

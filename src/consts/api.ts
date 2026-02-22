@@ -78,7 +78,7 @@ export const SPECIFIED_API_NOT_FOUND_ERRORS: Record<string, SpecifiedApiError> =
     '/api/v1/users/2fa/recovery/regenerate.json': {
         message: 'Two-factor authentication is disabled'
     },
-    '/api/v1/transactions/parse_dsv_file.json': {
+    '/api/v1/transactions/parse_custom_file.json': {
         message: 'Transaction importing is disabled'
     },
     '/api/v1/transactions/parse_import.json': {

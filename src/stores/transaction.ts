@@ -1260,9 +1260,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
         services.cancelRequest(cancelableUuid);
     }
 
-    function parseImportDsvFile({ fileType, fileEncoding, importFile }: { fileType: string, fileEncoding?: string, importFile: File }): Promise<string[][]> {
+    function parseImportCustomFile({ fileType, fileEncoding, importFile }: { fileType: string, fileEncoding?: string, importFile: File }): Promise<string[][]> {
         return new Promise((resolve, reject) => {
-            services.parseImportDsvFile({ fileType, fileEncoding, importFile }).then(response => {
+            services.parseImportCustomFile({ fileType, fileEncoding, importFile }).then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
@@ -1476,7 +1476,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         deleteTransaction,
         recognizeReceiptImage,
         cancelRecognizeReceiptImage,
-        parseImportDsvFile,
+        parseImportCustomFile,
         parseImportTransaction,
         importTransactions,
         getImportTransactionsProcess,

@@ -1974,6 +1974,8 @@
     "Other Finance App File Format": "其他金融應用程式檔案格式",
     "ezbookkeeping Data Export File": "ezbookkeeping 資料匯出檔案",
     "Excel Workbook File": "Excel 工作簿檔案",
+    "Excel Workbook File (.xlsx)": "Excel 工作簿檔案 (.xlsx)",
+    "Excel 97-2003 Workbook File (.xls)": "Excel 97-2003 工作簿檔案 (.xls)",
     "Open Financial Exchange (OFX) File": "開放式金融交換 (OFX) 檔案",
     "Quicken Financial Exchange (QFX) File": "Quicken Financial Exchange (QFX) 檔案",
     "Quicken Interchange Format (QIF) File": "Quicken Interchange Format (QIF) 檔案",

@@ -1974,6 +1974,8 @@
     "Other Finance App File Format": "Otro Formato de Archivo de Aplicación Financiera",
     "ezbookkeeping Data Export File": "Datos exportados de ezBookkeeping",
     "Excel Workbook File": "Archivo Excel",
+    "Excel Workbook File (.xlsx)": "Excel Workbook File (.xlsx)",
+    "Excel 97-2003 Workbook File (.xls)": "Excel 97-2003 Workbook File (.xls)",
     "Open Financial Exchange (OFX) File": "Archivo OFX (Open Financial Exchange)",
     "Quicken Financial Exchange (QFX) File": "Archivo QFX (Quicken Financial Exchange)",
     "Quicken Interchange Format (QIF) File": "Archivo QIF (Quicken Interchange Format)",

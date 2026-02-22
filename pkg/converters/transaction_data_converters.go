@@ -5,9 +5,9 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/converters/beancount"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/camt"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/custom"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/default"
-	"github.com/mayswind/ezbookkeeping/pkg/converters/dsv"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/feidee"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/fireflyIII"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/gnucash"
@@ -85,17 +85,29 @@ func GetTransactionDataImporter(fileType string) (converter.TransactionDataImpor
 	}
 }
 
-// IsCustomDelimiterSeparatedValuesFileType returns whether the file type is the delimiter-separated values file type
-func IsCustomDelimiterSeparatedValuesFileType(fileType string) bool {
-	return dsv.IsDelimiterSeparatedValuesFileType(fileType)
+// IsCustomFileFormatFileType returns whether the file type is the custom file format
+func IsCustomFileFormatFileType(fileType string) bool {
+	return custom.IsDelimiterSeparatedValuesFileType(fileType) || custom.IsCustomExcelFileType(fileType)
 }
 
-// CreateNewDelimiterSeparatedValuesDataParser returns a new delimiter-separated values data parser according to the file type and encoding
-func CreateNewDelimiterSeparatedValuesDataParser(fileType string, fileEncoding string) (dsv.CustomTransactionDataDsvFileParser, error) {
-	return dsv.CreateNewCustomTransactionDataDsvFileParser(fileType, fileEncoding)
+// CreateNewCustomFileFormatTransactionDataParser returns a new custom transaction data parser according to the file type and encoding
+func CreateNewCustomFileFormatTransactionDataParser(fileType string, fileEncoding string) (custom.CustomTransactionDataParser, error) {
+	if custom.IsDelimiterSeparatedValuesFileType(fileType) {
+		return custom.CreateNewCustomTransactionDataDsvFileParser(fileType, fileEncoding)
+	} else if custom.IsCustomExcelFileType(fileType) {
+		return custom.CreateNewCustomTransactionDataExcelFileParser(fileType)
+	} else {
+		return nil, errs.ErrImportFileTypeNotSupported
+	}
 }
 
-// CreateNewDelimiterSeparatedValuesDataImporter returns a new delimiter-separated values data importer according to the file type and encoding
-func CreateNewDelimiterSeparatedValuesDataImporter(fileType string, fileEncoding string, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, hasHeaderLine bool, timeFormat string, timezoneFormat string, amountDecimalSeparator string, amountDigitGroupingSymbol string, geoLocationSeparator string, geoLocationOrder string, transactionTagSeparator string) (converter.TransactionDataImporter, error) {
-	return dsv.CreateNewCustomTransactionDataDsvFileImporter(fileType, fileEncoding, columnIndexMapping, transactionTypeNameMapping, hasHeaderLine, timeFormat, timezoneFormat, amountDecimalSeparator, amountDigitGroupingSymbol, geoLocationSeparator, geoLocationOrder, transactionTagSeparator)
+// CreateNewCustomTransactionDataImporter returns a new custom transaction data importer according to the file type and encoding
+func CreateNewCustomTransactionDataImporter(fileType string, fileEncoding string, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, hasHeaderLine bool, timeFormat string, timezoneFormat string, amountDecimalSeparator string, amountDigitGroupingSymbol string, geoLocationSeparator string, geoLocationOrder string, transactionTagSeparator string) (converter.TransactionDataImporter, error) {
+	if custom.IsDelimiterSeparatedValuesFileType(fileType) {
+		return custom.CreateNewCustomTransactionDataDsvFileImporter(fileType, fileEncoding, columnIndexMapping, transactionTypeNameMapping, hasHeaderLine, timeFormat, timezoneFormat, amountDecimalSeparator, amountDigitGroupingSymbol, geoLocationSeparator, geoLocationOrder, transactionTagSeparator)
+	} else if custom.IsCustomExcelFileType(fileType) {
+		return custom.CreateNewCustomTransactionDataExcelFileImporter(fileType, columnIndexMapping, transactionTypeNameMapping, hasHeaderLine, timeFormat, timezoneFormat, amountDecimalSeparator, amountDigitGroupingSymbol, geoLocationSeparator, geoLocationOrder, transactionTagSeparator)
+	} else {
+		return nil, errs.ErrImportFileTypeNotSupported
+	}
 }

@@ -617,8 +617,8 @@ export default {
     deleteTransaction: (req: TransactionDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transactions/delete.json', req);
     },
-    parseImportDsvFile: ({ fileType, fileEncoding, importFile }: { fileType: string, fileEncoding?: string, importFile: File }): ApiResponsePromise<string[][]> => {
-        return axios.postForm<ApiResponse<string[][]>>('v1/transactions/parse_dsv_file.json', {
+    parseImportCustomFile: ({ fileType, fileEncoding, importFile }: { fileType: string, fileEncoding?: string, importFile: File }): ApiResponsePromise<string[][]> => {
+        return axios.postForm<ApiResponse<string[][]>>('v1/transactions/parse_custom_file.json', {
             fileType: fileType,
             fileEncoding: fileEncoding,
             file: importFile

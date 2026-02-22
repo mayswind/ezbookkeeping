@@ -1401,13 +1401,13 @@ func (a *TransactionsApi) TransactionDeleteHandler(c *core.WebContext) (any, *er
 	return true, nil
 }
 
-// TransactionParseImportDsvFileDataHandler returns the parsed file data by request parameters for current user
-func (a *TransactionsApi) TransactionParseImportDsvFileDataHandler(c *core.WebContext) (any, *errs.Error) {
+// TransactionParseImportCustomFileDataHandler returns the parsed file data by request parameters for current user
+func (a *TransactionsApi) TransactionParseImportCustomFileDataHandler(c *core.WebContext) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
 	form, err := c.MultipartForm()
 
 	if err != nil {
-		log.Errorf(c, "[transactions.TransactionParseImportDsvFileDataHandler] failed to get multi-part form data for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionParseImportCustomFileDataHandler] failed to get multi-part form data for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrParameterInvalid
 	}
 
@@ -1419,18 +1419,18 @@ func (a *TransactionsApi) TransactionParseImportDsvFileDataHandler(c *core.WebCo
 
 	fileType := fileTypes[0]
 
-	if !converters.IsCustomDelimiterSeparatedValuesFileType(fileType) {
+	if !converters.IsCustomFileFormatFileType(fileType) {
 		return nil, errs.Or(err, errs.ErrImportFileTypeNotSupported)
 	}
 
 	fileEncodings := form.Value["fileEncoding"]
+	fileEncoding := ""
 
-	if len(fileEncodings) < 1 || fileEncodings[0] == "" {
-		return nil, errs.ErrImportFileEncodingIsEmpty
+	if len(fileEncodings) > 0 {
+		fileEncoding = fileEncodings[0]
 	}
 
-	fileEncoding := fileEncodings[0]
-	dataParser, err := converters.CreateNewDelimiterSeparatedValuesDataParser(fileType, fileEncoding)
+	dataParser, err := converters.CreateNewCustomFileFormatTransactionDataParser(fileType, fileEncoding)
 
 	if err != nil {
 		return nil, errs.Or(err, errs.ErrImportFileTypeNotSupported)
@@ -1439,24 +1439,24 @@ func (a *TransactionsApi) TransactionParseImportDsvFileDataHandler(c *core.WebCo
 	importFiles := form.File["file"]
 
 	if len(importFiles) < 1 {
-		log.Warnf(c, "[transactions.TransactionParseImportDsvFileDataHandler] there is no import file in request for user \"uid:%d\"", uid)
+		log.Warnf(c, "[transactions.TransactionParseImportCustomFileDataHandler] there is no import file in request for user \"uid:%d\"", uid)
 		return nil, errs.ErrNoFilesUpload
 	}
 
 	if importFiles[0].Size < 1 {
-		log.Warnf(c, "[transactions.TransactionParseImportDsvFileDataHandler] the size of import file in request is zero for user \"uid:%d\"", uid)
+		log.Warnf(c, "[transactions.TransactionParseImportCustomFileDataHandler] the size of import file in request is zero for user \"uid:%d\"", uid)
 		return nil, errs.ErrUploadedFileEmpty
 	}
 
 	if importFiles[0].Size > int64(a.CurrentConfig().MaxImportFileSize) {
-		log.Warnf(c, "[transactions.TransactionParseImportDsvFileDataHandler] the upload file size \"%d\" exceeds the maximum size \"%d\" of import file for user \"uid:%d\"", importFiles[0].Size, a.CurrentConfig().MaxImportFileSize, uid)
+		log.Warnf(c, "[transactions.TransactionParseImportCustomFileDataHandler] the upload file size \"%d\" exceeds the maximum size \"%d\" of import file for user \"uid:%d\"", importFiles[0].Size, a.CurrentConfig().MaxImportFileSize, uid)
 		return nil, errs.ErrExceedMaxUploadFileSize
 	}
 
 	importFile, err := importFiles[0].Open()
 
 	if err != nil {
-		log.Errorf(c, "[transactions.TransactionParseImportDsvFileDataHandler] failed to get import file from request for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionParseImportCustomFileDataHandler] failed to get import file from request for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrOperationFailed
 	}
 
@@ -1464,14 +1464,14 @@ func (a *TransactionsApi) TransactionParseImportDsvFileDataHandler(c *core.WebCo
 	fileData, err := io.ReadAll(importFile)
 
 	if err != nil {
-		log.Errorf(c, "[transactions.TransactionParseImportDsvFileDataHandler] failed to read import file data for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionParseImportCustomFileDataHandler] failed to read import file data for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	allLines, err := dataParser.ParseDsvFileLines(c, fileData)
+	allLines, err := dataParser.ParseDataLines(c, fileData)
 
 	if err != nil {
-		log.Errorf(c, "[transactions.TransactionParseImportDsvFileDataHandler] failed to parse import file data for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionParseImportCustomFileDataHandler] failed to parse import file data for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -1514,14 +1514,13 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 
 	var dataImporter converter.TransactionDataImporter
 
-	if converters.IsCustomDelimiterSeparatedValuesFileType(fileType) {
+	if converters.IsCustomFileFormatFileType(fileType) {
 		fileEncodings := form.Value["fileEncoding"]
+		fileEncoding := ""
 
-		if len(fileEncodings) < 1 || fileEncodings[0] == "" {
-			return nil, errs.ErrImportFileEncodingIsEmpty
+		if len(fileEncodings) > 0 {
+			fileEncoding = fileEncodings[0]
 		}
-
-		fileEncoding := fileEncodings[0]
 
 		columnMappings := form.Value["columnMapping"]
 
@@ -1606,7 +1605,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 			transactionTagSeparator = transactionTagSeparators[0]
 		}
 
-		dataImporter, err = converters.CreateNewDelimiterSeparatedValuesDataImporter(fileType, fileEncoding, columnIndexMapping, transactionTypeNameMapping, hasHeaderLine, timeFormats[0], timezoneFormat, amountDecimalSeparator, amountDigitGroupingSymbol, geoLocationSeparator, geoLocationOrder, transactionTagSeparator)
+		dataImporter, err = converters.CreateNewCustomTransactionDataImporter(fileType, fileEncoding, columnIndexMapping, transactionTypeNameMapping, hasHeaderLine, timeFormats[0], timezoneFormat, amountDecimalSeparator, amountDigitGroupingSymbol, geoLocationSeparator, geoLocationOrder, transactionTagSeparator)
 	} else {
 		dataImporter, err = converters.GetTransactionDataImporter(fileType)
 	}

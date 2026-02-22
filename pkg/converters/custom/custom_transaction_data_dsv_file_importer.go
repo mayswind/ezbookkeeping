@@ -1,4 +1,4 @@
-package dsv
+package custom
 
 import (
 	"bytes"
@@ -94,10 +94,6 @@ var customTransactionTypeNameMapping = map[models.TransactionType]string{
 	models.TRANSACTION_TYPE_TRANSFER:       utils.IntToString(int(models.TRANSACTION_TYPE_TRANSFER)),
 }
 
-type CustomTransactionDataDsvFileParser interface {
-	ParseDsvFileLines(ctx core.Context, data []byte) ([][]string, error)
-}
-
 // customTransactionDataDsvFileImporter defines the structure of custom dsv importer for transaction data
 type customTransactionDataDsvFileImporter struct {
 	fileEncoding               encoding.Encoding
@@ -114,8 +110,8 @@ type customTransactionDataDsvFileImporter struct {
 	transactionTagSeparator    string
 }
 
-// ParseDsvFileLines returns the parsed file lines for specified the dsv file data
-func (c *customTransactionDataDsvFileImporter) ParseDsvFileLines(ctx core.Context, data []byte) ([][]string, error) {
+// ParseDataLines returns the parsed file lines for specified the dsv file data
+func (c *customTransactionDataDsvFileImporter) ParseDataLines(ctx core.Context, data []byte) ([][]string, error) {
 	reader := transform.NewReader(bytes.NewReader(data), c.fileEncoding.NewDecoder())
 	csvReader := csv.NewReader(reader)
 	csvReader.Comma = c.separator
@@ -131,7 +127,7 @@ func (c *customTransactionDataDsvFileImporter) ParseDsvFileLines(ctx core.Contex
 		}
 
 		if err != nil {
-			log.Errorf(ctx, "[custom_transaction_data_dsv_file_importer.ParseDsvFileLines] cannot parse dsv data, because %s", err.Error())
+			log.Errorf(ctx, "[custom_transaction_data_dsv_file_importer.ParseDataLines] cannot parse dsv data, because %s", err.Error())
 			return nil, errs.ErrInvalidCSVFile
 		}
 
@@ -151,7 +147,7 @@ func (c *customTransactionDataDsvFileImporter) ParseDsvFileLines(ctx core.Contex
 
 // ParseImportedData returns the imported data by parsing the custom transaction dsv data
 func (c *customTransactionDataDsvFileImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezone *time.Location, additionalOptions converter.TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
-	allLines, err := c.ParseDsvFileLines(ctx, data)
+	allLines, err := c.ParseDataLines(ctx, data)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
@@ -170,12 +166,16 @@ func IsDelimiterSeparatedValuesFileType(fileType string) bool {
 	return exists
 }
 
-// CreateNewCustomTransactionDataDsvFileParser returns a new custom dsv parser for transaction data
-func CreateNewCustomTransactionDataDsvFileParser(fileType string, fileEncoding string) (CustomTransactionDataDsvFileParser, error) {
+// CreateNewCustomTransactionDataDsvFileParser returns a new custom transaction data parser
+func CreateNewCustomTransactionDataDsvFileParser(fileType string, fileEncoding string) (CustomTransactionDataParser, error) {
 	separator, exists := supportedFileTypeSeparators[fileType]
 
 	if !exists {
 		return nil, errs.ErrImportFileTypeNotSupported
+	}
+
+	if fileEncoding == "" {
+		return nil, errs.ErrImportFileEncodingIsEmpty
 	}
 
 	enc, exists := supportedFileEncodings[fileEncoding]
@@ -196,6 +196,10 @@ func CreateNewCustomTransactionDataDsvFileImporter(fileType string, fileEncoding
 
 	if !exists {
 		return nil, errs.ErrImportFileTypeNotSupported
+	}
+
+	if fileEncoding == "" {
+		return nil, errs.ErrImportFileEncodingIsEmpty
 	}
 
 	enc, exists := supportedFileEncodings[fileEncoding]

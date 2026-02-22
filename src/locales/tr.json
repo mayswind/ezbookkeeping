@@ -1974,6 +1974,8 @@
     "Other Finance App File Format": "Diğer Finans Uygulaması Dosya Formatı",
     "ezbookkeeping Data Export File": "ezBookkeeping Veri Dışa Aktarım Dosyası",
     "Excel Workbook File": "Excel Çalışma Kitabı Dosyası",
+    "Excel Workbook File (.xlsx)": "Excel Workbook File (.xlsx)",
+    "Excel 97-2003 Workbook File (.xls)": "Excel 97-2003 Workbook File (.xls)",
     "Open Financial Exchange (OFX) File": "Open Financial Exchange (OFX) Dosyası",
     "Quicken Financial Exchange (QFX) File": "Quicken Financial Exchange (QFX) Dosyası",
     "Quicken Interchange Format (QIF) File": "Quicken Interchange Format (QIF) Dosyası",

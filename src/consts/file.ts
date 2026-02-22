@@ -180,7 +180,28 @@ export const SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES: ImportFileCategoryAndType
                     supportMultiLanguages: true,
                     anchor: 'how-to-import-delimiter-separated-values-dsv-file-or-data'
                 }
-            }
+            },
+            {
+                type: 'excel',
+                name: 'Excel Workbook File',
+                extensions: '.xlsx,.xls',
+                subTypes: [
+                    {
+                        type: 'custom_xlsx',
+                        name: 'Excel Workbook File (.xlsx)',
+                        extensions: '.xlsx',
+                    },
+                    {
+                        type: 'custom_xls',
+                        name: 'Excel 97-2003 Workbook File (.xls)',
+                        extensions: '.xls',
+                    }
+                ],
+                document: {
+                    supportMultiLanguages: true,
+                    anchor: 'how-to-import-delimiter-separated-values-dsv-file-or-data'
+                }
+            },
         ]
     },
     {

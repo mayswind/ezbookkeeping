@@ -570,6 +570,9 @@ export class KnownDateTimeFormat {
 
     public static readonly YYYYMMDD = new KnownDateTimeFormat('YYYYMMDD', DateFormatOrder.YMD, /^\d{4}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$/);
 
+    public static readonly MMDDYYDash = new KnownDateTimeFormat('MM-DD-YY', DateFormatOrder.MDY, /^(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])-\d{2}$/);
+    public static readonly MMDDYYSlash = new KnownDateTimeFormat('MM/DD/YY', DateFormatOrder.MDY, /^(0[1-9]|1[0-2])\/(0[1-9]|[1-2][0-9]|3[0-1])\/\d{2}$/);
+
     public readonly format: string;
     public readonly type: DateFormatOrder;
     private readonly regex: RegExp;

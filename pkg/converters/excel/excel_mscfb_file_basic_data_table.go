@@ -86,7 +86,7 @@ func (t *ExcelMSCFBFileBasicDataTable) DataRowIterator() datatable.BasicDataTabl
 // ColumnCount returns the total count of column in this data row
 func (r *ExcelMSCFBFileBasicDataTableRow) ColumnCount() int {
 	row := r.sheet.Row(r.rowIndex)
-	return row.LastCol() + 1
+	return row.LastCol()
 }
 
 // GetData returns the data in the specified column index
@@ -195,7 +195,10 @@ func CreateNewExcelMSCFBFileBasicDataTable(data []byte, hasTitleLine bool) (data
 		}
 
 		if i == 0 {
-			for j := 0; j <= row.LastCol(); j++ {
+			// row.LastCol() returns "colMac" in the "Row" struct, that is an unsigned integer that specifies the one-based index of the last column.
+			// But row.FirstCol() returns "colMic" in the "Row" struct, that is an unsigned integer that specifies the zero-based index of the first column.
+			// Reference: https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-xls/4aab09eb-49ed-4d01-a3b1-1d726247d3c2
+			for j := 0; j < row.LastCol(); j++ {
 				headerItem := row.Col(j)
 
 				if headerItem == "" {
@@ -205,7 +208,7 @@ func CreateNewExcelMSCFBFileBasicDataTable(data []byte, hasTitleLine bool) (data
 				firstRowItems = append(firstRowItems, headerItem)
 			}
 		} else {
-			for j := 0; j <= min(row.LastCol(), len(firstRowItems)-1); j++ {
+			for j := 0; j < min(row.LastCol(), len(firstRowItems)); j++ {
 				headerItem := row.Col(j)
 
 				if headerItem != firstRowItems[j] {

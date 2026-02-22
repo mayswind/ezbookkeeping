@@ -300,10 +300,10 @@ func TestExcelMSCFBFileBasicDataRowColumnCount(t *testing.T) {
 	iterator := datatable.DataRowIterator()
 
 	row1 := iterator.Next()
-	assert.EqualValues(t, 4, row1.ColumnCount())
+	assert.EqualValues(t, 3, row1.ColumnCount())
 
 	row2 := iterator.Next()
-	assert.EqualValues(t, 4, row2.ColumnCount())
+	assert.EqualValues(t, 3, row2.ColumnCount())
 }
 
 func TestExcelMSCFBFileBasicDataRowGetData(t *testing.T) {

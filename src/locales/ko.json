@@ -1428,8 +1428,8 @@
             "fieldCategoryNameDescription": "[선택] 카테고리 이름",
             "fieldSourceAccountNameDescription": "[선택] 출처 계좌 이름",
             "fieldDestinationAccountNameDescription": "[선택] 대상 계좌 이름 (전송 유형 전용)",
-            "fieldSourceAmountDescription": "[필수] 출처 금액",
-            "fieldDestinationAmountDescription": "[선택] 대상 금액 (전송 유형 전용)",
+            "fieldSourceAmountDescription": "[required] Source amount (including two decimal places expressed without a decimal separator, for example '12345' represents 123.45)",
+            "fieldDestinationAmountDescription": "[optional] Destination amount (for transfer type only, format is the same as the source amount)",
             "fieldGeoLocationDescription": "[선택] 지리적 위치, 형식: '경도 위도', 예: '116.3912972 39.9057136'",
             "fieldTagNamesDescription": "[선택] 쉼표로 구분된 태그 이름, 예: 'tag1;tag2;tag3'",
             "fieldCommentDescription": "[선택] 설명"

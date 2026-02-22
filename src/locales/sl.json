@@ -1428,8 +1428,8 @@
             "fieldCategoryNameDescription": "[neobvezno] Ime kategorije",
             "fieldSourceAccountNameDescription": "[neobvezno] Ime izvornega računa",
             "fieldDestinationAccountNameDescription": "[neobvezno] Ime ciljnega računa (samo za prenose)",
-            "fieldSourceAmountDescription": "[obvezno] Izvorni znesek",
-            "fieldDestinationAmountDescription": "[neobvezno] Ciljni znesek (samo za prenose)",
+            "fieldSourceAmountDescription": "[required] Source amount (including two decimal places expressed without a decimal separator, for example '12345' represents 123.45)",
+            "fieldDestinationAmountDescription": "[optional] Destination amount (for transfer type only, format is the same as the source amount)",
             "fieldGeoLocationDescription": "[neobvezno] Geografska lokacija, format: 'dolžina širina', npr. '116.3912972 39.9057136'",
             "fieldTagNamesDescription": "[neobvezno] Imena oznak, ločena z vejico, npr. 'oznaka1;oznaka2;oznaka3'",
             "fieldCommentDescription": "[neobvezno] Opis"

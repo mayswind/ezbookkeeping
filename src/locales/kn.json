@@ -1428,8 +1428,8 @@
             "fieldCategoryNameDescription": "[ಐಚ್ಛಿಕ] ವರ್ಗದ ಹೆಸರು",
             "fieldSourceAccountNameDescription": "[ಐಚ್ಛಿಕ] ಮೂಲ ಖಾತೆಯ ಹೆಸರು",
             "fieldDestinationAccountNameDescription": "[ಐಚ್ಛಿಕ] ಗಮ್ಯ ಖಾತೆಯ ಹೆಸರು (ಹಸ್ತಾಂತರ ಪ್ರಕಾರಕ್ಕೆ ಮಾತ್ರ)",
-            "fieldSourceAmountDescription": "[ಅಗತ್ಯ] ಮೂಲ ಮೊತ್ತ",
-            "fieldDestinationAmountDescription": "[ಐಚ್ಛಿಕ] ಗಮ್ಯ ಮೊತ್ತ (ಹಸ್ತಾಂತರ ಪ್ರಕಾರಕ್ಕೆ ಮಾತ್ರ)",
+            "fieldSourceAmountDescription": "[required] Source amount (including two decimal places expressed without a decimal separator, for example '12345' represents 123.45)",
+            "fieldDestinationAmountDescription": "[optional] Destination amount (for transfer type only, format is the same as the source amount)",
             "fieldGeoLocationDescription": "[ಐಚ್ಛಿಕ] ಭೌಗೋಳಿಕ ಸ್ಥಳ, ಸ್ವರೂಪ: 'ದೀಕ್ಷಾಂಶ ಅಕ್ಷಾಂಶ', ಉದಾ: '116.3912972 39.9057136'",
             "fieldTagNamesDescription": "[ಐಚ್ಛಿಕ] ಟ್ಯಾಗ್‌ಗಳ ಹೆಸರುಗಳು, ಸೆಮಿಕೋಲನ್ ಬೇರ್ಪಡಿಸಿದವು, ಉದಾ: 'tag1;tag2;tag3'",
             "fieldCommentDescription": "[ಐಚ್ಛಿಕ] ವಿವರಣೆ"

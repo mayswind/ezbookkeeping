@@ -1428,8 +1428,8 @@
             "fieldCategoryNameDescription": "[optional] Category name",
             "fieldSourceAccountNameDescription": "[optional] Source account name",
             "fieldDestinationAccountNameDescription": "[optional] Destination account name (for transfer type only)",
-            "fieldSourceAmountDescription": "[required] Source amount",
-            "fieldDestinationAmountDescription": "[optional] Destination amount (for transfer type only)",
+            "fieldSourceAmountDescription": "[required] Source amount (including two decimal places expressed without a decimal separator, for example '12345' represents 123.45)",
+            "fieldDestinationAmountDescription": "[optional] Destination amount (for transfer type only, format is the same as the source amount)",
             "fieldGeoLocationDescription": "[optional] Geolocation, format: 'longitude latitude', e.g. '116.3912972 39.9057136'",
             "fieldTagNamesDescription": "[optional] Comma separated tag names, e.g. 'tag1;tag2;tag3'",
             "fieldCommentDescription": "[optional] Description"

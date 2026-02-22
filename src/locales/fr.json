@@ -1428,8 +1428,8 @@
             "fieldCategoryNameDescription": "[optionnel] Nom de catégorie",
             "fieldSourceAccountNameDescription": "[optionnel] Nom du compte source",
             "fieldDestinationAccountNameDescription": "[optionnel] Nom du compte de destination (uniquement pour le type de virement)",
-            "fieldSourceAmountDescription": "[requis] Montant source",
-            "fieldDestinationAmountDescription": "[optionnel] Montant de destination (uniquement pour le type de virement)",
+            "fieldSourceAmountDescription": "[required] Source amount (including two decimal places expressed without a decimal separator, for example '12345' represents 123.45)",
+            "fieldDestinationAmountDescription": "[optional] Destination amount (for transfer type only, format is the same as the source amount)",
             "fieldGeoLocationDescription": "[optionnel] Géolocalisation, format : 'longitude latitude', par ex. '116.3912972 39.9057136'",
             "fieldTagNamesDescription": "[optionnel] Noms d'étiquettes séparés par des virgules, par ex. 'étiquette1;étiquette2;étiquette3'",
             "fieldCommentDescription": "[optionnel] Description"

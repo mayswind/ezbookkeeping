@@ -1428,8 +1428,8 @@
             "fieldCategoryNameDescription": "[விருப்பமானது] வகையின் பெயர்",
             "fieldSourceAccountNameDescription": "[விருப்பமானது] மூல கணக்கின் பெயர்",
             "fieldDestinationAccountNameDescription": "[விருப்பமானது] இலக்கு கணக்கின் பெயர் (பரிமாற்றம் வகைக்கு மட்டுமே)",
-            "fieldSourceAmountDescription": "[தேவை] மூல தொகை",
-            "fieldDestinationAmountDescription": "[விருப்பமானது] இலக்கு தொகை (பரிமாற்றம் வகைக்கு மட்டுமே)",
+            "fieldSourceAmountDescription": "[required] Source amount (including two decimal places expressed without a decimal separator, for example '12345' represents 123.45)",
+            "fieldDestinationAmountDescription": "[optional] Destination amount (for transfer type only, format is the same as the source amount)",
             "fieldGeoLocationDescription": "[விருப்பமானது] புவியியல் இருப்பிடம், வடிவம்: 'தீர்க்கரேகை அட்சரேகை', எ.கா.: '116.3912972 39.9057136'",
             "fieldTagNamesDescription": "[விருப்பமானது] குறிச்சொல்‌களின் பெயர்கள், அரைப்புள்ளியால் பிரிக்கப்பட்டது, எ.கா.: 'tag1;tag2;tag3'",
             "fieldCommentDescription": "[விருப்பமானது] விளக்கம்"

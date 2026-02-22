@@ -1428,8 +1428,8 @@
             "fieldCategoryNameDescription": "[可选] 分类名称",
             "fieldSourceAccountNameDescription": "[可选] 来源账户名称",
             "fieldDestinationAccountNameDescription": "[可选] 目标账户名称 (仅用于转账类型)",
-            "fieldSourceAmountDescription": "[必填] 来源金额",
-            "fieldDestinationAmountDescription": "[可选] 目标金额 (仅用于转账类型)",
+            "fieldSourceAmountDescription": "[必填] 来源金额（包含2位小数，但不包含小数点，例如：'12345' 表示 123.45 元)",
+            "fieldDestinationAmountDescription": "[可选] 目标金额 (仅用于转账类型，格式同来源金额)",
             "fieldGeoLocationDescription": "[可选] 地理位置，格式：'经度 纬度'，例如：'116.3912972 39.9057136'",
             "fieldTagNamesDescription": "[可选] 以分号分隔的标签名称，例如：'标签1;标签2;标签3'",
             "fieldCommentDescription": "[可选] 描述"

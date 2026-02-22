@@ -1428,8 +1428,8 @@
             "fieldCategoryNameDescription": "[isteğe bağlı] Kategori adı",
             "fieldSourceAccountNameDescription": "[isteğe bağlı] Kaynak hesap adı",
             "fieldDestinationAccountNameDescription": "[isteğe bağlı] Hedef hesap adı (sadece transfer türü için)",
-            "fieldSourceAmountDescription": "[zorunlu] Kaynak tutarı",
-            "fieldDestinationAmountDescription": "[isteğe bağlı] Hedef tutarı (sadece transfer türü için)",
+            "fieldSourceAmountDescription": "[required] Source amount (including two decimal places expressed without a decimal separator, for example '12345' represents 123.45)",
+            "fieldDestinationAmountDescription": "[optional] Destination amount (for transfer type only, format is the same as the source amount)",
             "fieldGeoLocationDescription": "[isteğe bağlı] Coğrafi konum, format: 'boylam enlem', örn. '116.3912972 39.9057136'",
             "fieldTagNamesDescription": "[isteğe bağlı] Virgülle ayrılmış etiket adları, örn. 'etiket1;etiket2;etiket3'",
             "fieldCommentDescription": "[isteğe bağlı] Açıklama"

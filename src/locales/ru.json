@@ -1428,8 +1428,8 @@
             "fieldCategoryNameDescription": "[опционально] Название категории",
             "fieldSourceAccountNameDescription": "[опционально] Название исходного счёта",
             "fieldDestinationAccountNameDescription": "[опционально] Название целевого счёта (только для переводов)",
-            "fieldSourceAmountDescription": "[опционально] Исходная сумма",
-            "fieldDestinationAmountDescription": "[опционально] Целевая сумма (только для переводов)",
+            "fieldSourceAmountDescription": "[required] Source amount (including two decimal places expressed without a decimal separator, for example '12345' represents 123.45)",
+            "fieldDestinationAmountDescription": "[optional] Destination amount (for transfer type only, format is the same as the source amount)",
             "fieldGeoLocationDescription": "[опционально] Локация, формат: 'долгота широта', например '116.3912972 39.9057136'",
             "fieldTagNamesDescription": "[опционально] Имена тегов, разделённые точкой с запятой, например 'tag1;tag2;tag3'",
             "fieldCommentDescription": "[опционально] Описание"

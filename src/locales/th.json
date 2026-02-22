@@ -1428,8 +1428,8 @@
             "fieldCategoryNameDescription": "[ไม่จำเป็น] ชื่อหมวดหมู่",
             "fieldSourceAccountNameDescription": "[ไม่จำเป็น] ชื่อบัญชีต้นทาง",
             "fieldDestinationAccountNameDescription": "[ไม่จำเป็น] ชื่อบัญชีปลายทาง (สำหรับประเภทโอนเท่านั้น)",
-            "fieldSourceAmountDescription": "[จำเป็น] จำนวนเงินต้นทาง",
-            "fieldDestinationAmountDescription": "[ไม่จำเป็น] จำนวนเงินปลายทาง (สำหรับประเภทโอนเท่านั้น)",
+            "fieldSourceAmountDescription": "[required] Source amount (including two decimal places expressed without a decimal separator, for example '12345' represents 123.45)",
+            "fieldDestinationAmountDescription": "[optional] Destination amount (for transfer type only, format is the same as the source amount)",
             "fieldGeoLocationDescription": "[ไม่จำเป็น] ตำแหน่งทางภูมิศาสตร์, รูปแบบ: 'ลองจิจูด ละติจูด', เช่น '116.3912972 39.9057136'",
             "fieldTagNamesDescription": "[ไม่จำเป็น] ชื่อแท็กคั่นด้วยเครื่องหมายจุลภาค, เช่น 'tag1;tag2;tag3'",
             "fieldCommentDescription": "[ไม่จำเป็น] คำอธิบาย"

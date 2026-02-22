@@ -1428,8 +1428,8 @@
             "fieldCategoryNameDescription": "[可選] 分類名稱",
             "fieldSourceAccountNameDescription": "[可選] 來源帳戶名稱",
             "fieldDestinationAccountNameDescription": "[可選] 目標帳戶名稱 (僅用於轉帳類型)",
-            "fieldSourceAmountDescription": "[必填] 來源金額",
-            "fieldDestinationAmountDescription": "[可選] 目標金額 (僅用於轉帳類型)",
+            "fieldSourceAmountDescription": "[必填] 來源金額 (包含2位小數，但不包含小數點，例如：'12345' 表示 123.45 元)",
+            "fieldDestinationAmountDescription": "[可選] 目標金額 (僅用於轉帳類型, 格式同來源金額)",
             "fieldGeoLocationDescription": "[可選] 地理位置，格式：'經度 緯度'，例如：'116.3912972 39.9057136'",
             "fieldTagNamesDescription": "[可選] 以分號分隔的標籤名稱，例如：'標籤1;標籤2;標籤3'",
             "fieldCommentDescription": "[可選] 描述"

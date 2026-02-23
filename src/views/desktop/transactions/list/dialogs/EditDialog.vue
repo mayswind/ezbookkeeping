@@ -1212,12 +1212,12 @@ defineExpose({
 
 @media (min-height: 780px) {
     .transaction-edit-map-view {
-        height: 538px;
+        height: 537px;
     }
 
     @media (min-width: 960px) {
         .transaction-pictures {
-            min-height: 562px;
+            min-height: 561px;
         }
     }
 }

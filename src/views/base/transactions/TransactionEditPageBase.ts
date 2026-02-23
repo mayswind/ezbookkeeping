@@ -42,6 +42,11 @@ import {
     getCurrentUnixTime
 } from '@/lib/datetime.ts';
 
+import {
+    type SetTransactionOptions,
+    setTransactionModelByTransaction
+} from '@/lib/transaction.ts';
+
 export enum TransactionEditPageType {
     Transaction = 'transaction',
     Template = 'template'
@@ -365,6 +370,31 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         return newTransaction;
     }
 
+    function setTransactionModel(newTransaction: Transaction | null, options: SetTransactionOptions | undefined, setContextData: boolean): void {
+        setTransactionModelByTransaction(
+            transaction.value,
+            newTransaction,
+            allCategories.value,
+            allCategoriesMap.value,
+            allVisibleAccounts.value,
+            allAccountsMap.value,
+            allTagsMap.value,
+            defaultAccountId.value,
+            {
+                time: options?.time,
+                type: options?.type,
+                categoryId: options?.categoryId,
+                accountId: options?.accountId,
+                destinationAccountId: options?.destinationAccountId,
+                amount: options?.amount,
+                destinationAmount: options?.destinationAmount,
+                tagIds: options?.tagIds,
+                comment: options?.comment
+            },
+            setContextData
+        );
+    }
+
     function updateTransactionTime(newTime: number): void {
         transaction.value.time = newTime;
         updateTransactionTimezone(transaction.value.timeZone ?? '');
@@ -502,6 +532,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         inputIsEmpty,
         // functions
         createNewTransactionModel,
+        setTransactionModel,
         updateTransactionTime,
         updateTransactionTimezone,
         swapTransactionData,

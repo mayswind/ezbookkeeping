@@ -506,7 +506,7 @@ import {
     getTransactionPrimaryCategoryName,
     getTransactionSecondaryCategoryName
 } from '@/lib/category.ts';
-import { type SetTransactionOptions, setTransactionModelByTransaction } from '@/lib/transaction.ts';
+import { type SetTransactionOptions } from '@/lib/transaction.ts';
 import {
     isTransactionPicturesEnabled,
     getMapProvider
@@ -568,15 +568,11 @@ const {
     setGeoLocationByClickMap,
     transaction,
     defaultCurrency,
-    defaultAccountId,
     coordinateDisplayType,
     allTimezones,
     allVisibleAccounts,
-    allAccountsMap,
     allVisibleCategorizedAccounts,
     allCategories,
-    allCategoriesMap,
-    allTagsMap,
     firstVisibleAccountId,
     hasVisibleExpenseCategories,
     hasVisibleIncomeCategories,
@@ -599,6 +595,7 @@ const {
     inputEmptyProblemMessage,
     inputIsEmpty,
     createNewTransactionModel,
+    setTransactionModel,
     updateTransactionTime,
     updateTransactionTimezone,
     swapTransactionData,
@@ -625,10 +622,7 @@ const noTransactionDraft = ref<boolean>(false);
 const geoMenuState = ref<boolean>(false);
 const removingPictureId = ref<string>('');
 
-const initAmount = ref<number | undefined>(undefined);
-const initCategoryId = ref<string | undefined>(undefined);
-const initAccountId = ref<string | undefined>(undefined);
-const initTagIds = ref<string | undefined>(undefined);
+const initOptions = ref<TransactionEditOptions | undefined>(undefined);
 
 let resolveFunc: ((response?: TransactionEditResponse) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
@@ -645,42 +639,15 @@ const sourceAmountColor = computed<string | undefined>(() => {
     return undefined;
 });
 
-
-
 const isTransactionModified = computed<boolean>(() => {
     if (mode.value === TransactionEditPageMode.Add) {
-        return transactionsStore.isTransactionDraftModified(transaction.value, initAmount.value, initCategoryId.value, initAccountId.value, initTagIds.value, firstVisibleAccountId.value);
+        return transactionsStore.isTransactionDraftModified(transaction.value, initOptions.value?.amount, initOptions.value?.categoryId, initOptions.value?.accountId, initOptions.value?.tagIds, firstVisibleAccountId.value);
     } else if (mode.value === TransactionEditPageMode.Edit) {
         return true;
     } else {
         return false;
     }
 });
-
-function setTransaction(newTransaction: Transaction | null, options: SetTransactionOptions, setContextData: boolean): void {
-    setTransactionModelByTransaction(
-        transaction.value,
-        newTransaction,
-        allCategories.value,
-        allCategoriesMap.value,
-        allVisibleAccounts.value,
-        allAccountsMap.value,
-        allTagsMap.value,
-        defaultAccountId.value,
-        {
-            time: options.time,
-            type: options.type,
-            categoryId: options.categoryId,
-            accountId: options.accountId,
-            destinationAccountId: options.destinationAccountId,
-            amount: options.amount,
-            destinationAmount: options.destinationAmount,
-            tagIds: options.tagIds,
-            comment: options.comment
-        },
-        setContextData
-    );
-}
 
 function open(options: TransactionEditOptions): Promise<TransactionEditResponse | undefined> {
     addByTemplateId.value = null;
@@ -694,13 +661,10 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
     originalTransactionEditable.value = false;
     noTransactionDraft.value = options.noTransactionDraft || false;
 
-    initAmount.value = options.amount;
-    initCategoryId.value = options.categoryId;
-    initAccountId.value = options.accountId;
-    initTagIds.value = options.tagIds;
+    initOptions.value = options;
 
     const newTransaction = createNewTransactionModel(options.type);
-    setTransaction(newTransaction, options, true);
+    setTransactionModel(newTransaction, options, true);
 
     const promises: Promise<unknown>[] = [
         accountsStore.loadAllAccounts({ force: false }),
@@ -711,7 +675,7 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
     if (props.type === TransactionEditPageType.Transaction) {
         if (options && options.id) {
             if (options.currentTransaction) {
-                setTransaction(options.currentTransaction, options, true);
+                setTransactionModel(options.currentTransaction, options, true);
             }
 
             mode.value = TransactionEditPageMode.View;
@@ -723,10 +687,10 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
             editId.value = null;
 
             if (options.template) {
-                setTransaction(options.template, options, false);
+                setTransactionModel(options.template, options, false);
                 addByTemplateId.value = options.template.id;
             } else if (!options.noTransactionDraft && (settingsStore.appSettings.autoSaveTransactionDraft === 'enabled' || settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') && transactionsStore.transactionDraft) {
-                setTransaction(Transaction.ofDraft(transactionsStore.transactionDraft), options, false);
+                setTransactionModel(Transaction.ofDraft(transactionsStore.transactionDraft), options, false);
             }
 
             if (settingsStore.appSettings.autoGetCurrentGeoLocation
@@ -751,7 +715,7 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
 
         if (options && options.id) {
             if (options.currentTemplate) {
-                setTransaction(options.currentTemplate, options, false);
+                setTransactionModel(options.currentTemplate, options, false);
                 (transaction.value as TransactionTemplate).fillFrom(options.currentTemplate);
             }
 
@@ -792,11 +756,11 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
 
         if (props.type === TransactionEditPageType.Transaction && options && options.id && responses[3] && responses[3] instanceof Transaction) {
             const transaction: Transaction = responses[3];
-            setTransaction(transaction, options, true);
+            setTransactionModel(transaction, options, true);
             originalTransactionEditable.value = transaction.editable;
         } else if (props.type === TransactionEditPageType.Template && options && options.id && responses[3] && responses[3] instanceof TransactionTemplate) {
             const template: TransactionTemplate = responses[3];
-            setTransaction(template, options, false);
+            setTransactionModel(template, options, false);
 
             if (!(transaction.value instanceof TransactionTemplate)) {
                 transaction.value = TransactionTemplate.createNewTransactionTemplate(transaction.value);
@@ -804,7 +768,7 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
 
             (transaction.value as TransactionTemplate).fillFrom(template);
         } else {
-            setTransaction(null, options, true);
+            setTransactionModel(null, options, true);
         }
 
         loading.value = false;
@@ -1007,9 +971,9 @@ function cancel(): void {
     }
 
     if (settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') {
-        if (transactionsStore.isTransactionDraftModified(transaction.value, initAmount.value, initCategoryId.value, initAccountId.value, initTagIds.value, firstVisibleAccountId.value)) {
+        if (transactionsStore.isTransactionDraftModified(transaction.value, initOptions.value?.amount, initOptions.value?.categoryId, initOptions.value?.accountId, initOptions.value?.tagIds, firstVisibleAccountId.value)) {
             confirmDialog.value?.open('Do you want to save this transaction draft?').then(() => {
-                transactionsStore.saveTransactionDraft(transaction.value, initAmount.value, initCategoryId.value, initAccountId.value, initTagIds.value, firstVisibleAccountId.value);
+                transactionsStore.saveTransactionDraft(transaction.value, initOptions.value?.amount, initOptions.value?.categoryId, initOptions.value?.accountId, initOptions.value?.tagIds, firstVisibleAccountId.value);
                 doClose();
             }).catch(() => {
                 transactionsStore.clearTransactionDraft();
@@ -1020,7 +984,7 @@ function cancel(): void {
             doClose();
         }
     } else if (settingsStore.appSettings.autoSaveTransactionDraft === 'enabled') {
-        transactionsStore.saveTransactionDraft(transaction.value, initAmount.value, initCategoryId.value, initAccountId.value, initTagIds.value, firstVisibleAccountId.value);
+        transactionsStore.saveTransactionDraft(transaction.value, initOptions.value?.amount, initOptions.value?.categoryId, initOptions.value?.accountId, initOptions.value?.tagIds, firstVisibleAccountId.value);
         doClose();
     } else {
         doClose();

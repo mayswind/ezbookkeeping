@@ -523,7 +523,6 @@ import {
 import { formatCoordinate } from '@/lib/coordinate.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import { getTransactionPrimaryCategoryName, getTransactionSecondaryCategoryName } from '@/lib/category.ts';
-import { setTransactionModelByTransaction } from '@/lib/transaction.ts';
 import { getMapProvider, isTransactionPicturesEnabled } from '@/lib/server_settings.ts';
 import logger from '@/lib/logger.ts';
 
@@ -562,15 +561,12 @@ const {
     numeralSystem,
     currentTimezoneOffsetMinutes,
     defaultCurrency,
-    defaultAccountId,
     firstDayOfWeek,
     coordinateDisplayType,
     allTimezones,
     allVisibleAccounts,
-    allAccountsMap,
     allVisibleCategorizedAccounts,
     allCategories,
-    allCategoriesMap,
     allTagsMap,
     firstVisibleAccountId,
     hasVisibleExpenseCategories,
@@ -591,6 +587,7 @@ const {
     geoLocationStatusInfo,
     inputEmptyProblemMessage,
     inputIsEmpty,
+    setTransactionModel,
     updateTransactionTime,
     updateTransactionTimezone,
     swapTransactionData,
@@ -927,15 +924,8 @@ function init(): void {
             }
         }
 
-        setTransactionModelByTransaction(
-            transaction.value,
+        setTransactionModel(
             fromTransaction,
-            allCategories.value,
-            allCategoriesMap.value,
-            allVisibleAccounts.value,
-            allAccountsMap.value,
-            allTagsMap.value,
-            defaultAccountId.value,
             {
                 time: query['time'] ? parseInt(query['time']) : undefined,
                 type: queryType,

@@ -1,4 +1,4 @@
-import type { TypeAndName } from './base.ts';
+import type { TypeAndName, TypeAndNameWithAlternativeName } from './base.ts';
 import { DateRange } from '@/core/datetime.ts';
 
 export enum StatisticsAnalysisType {
@@ -193,24 +193,24 @@ export class ChartDataType implements TypeAndName {
     }
 }
 
-export class ChartSortingType implements TypeAndName {
+export class ChartSortingType implements TypeAndNameWithAlternativeName {
     private static readonly allInstances: ChartSortingType[] = [];
     private static readonly allInstancesByType: Record<number, ChartSortingType> = {};
 
-    public static readonly Amount = new ChartSortingType(0, 'Amount', 'Sort by Amount');
-    public static readonly DisplayOrder = new ChartSortingType(1, 'Display Order', 'Sort by Display Order');
-    public static readonly Name = new ChartSortingType(2, 'Name', 'Sort by Name');
+    public static readonly Amount = new ChartSortingType(0, 'Amount', 'Value');
+    public static readonly DisplayOrder = new ChartSortingType(1, 'Display Order');
+    public static readonly Name = new ChartSortingType(2, 'Name');
 
     public static readonly Default = ChartSortingType.Amount;
 
     public readonly type: number;
     public readonly name: string;
-    public readonly fullName: string;
+    public readonly alternativeName?: string;
 
-    private constructor(type: number, name: string, fullName: string) {
+    private constructor(type: number, name: string, alternativeName?: string) {
         this.type = type;
         this.name = name;
-        this.fullName = fullName;
+        this.alternativeName = alternativeName;
 
         ChartSortingType.allInstances.push(this);
         ChartSortingType.allInstancesByType[type] = this;

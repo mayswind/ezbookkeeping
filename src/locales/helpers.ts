@@ -1,7 +1,13 @@
 import { useI18n as useVueI18n } from 'vue-i18n';
 import moment from 'moment-timezone';
 
-import type { NameValue, TypeAndName, TypeAndDisplayName, LocalizedSwitchOption } from '@/core/base.ts';
+import {
+    type NameValue,
+    type TypeAndName,
+    type TypeAndNameWithAlternativeName,
+    type TypeAndDisplayName,
+    type LocalizedSwitchOption
+} from '@/core/base.ts';
 
 import {
     type LanguageInfo,
@@ -550,13 +556,19 @@ export function useI18n() {
         return ret;
     }
 
-    function getLocalizedDisplayNameAndType(typeAndNames: TypeAndName[]): TypeAndDisplayName[] {
+    function getLocalizedDisplayNameAndType(typeAndNames: TypeAndName[] | TypeAndNameWithAlternativeName[], useAlternativeName?: boolean): TypeAndDisplayName[] {
         const ret: TypeAndDisplayName[] = [];
 
         for (const typeAndName of typeAndNames) {
+            let name: string = typeAndName.name;
+
+            if (useAlternativeName && 'alternativeName' in typeAndName && typeAndName.alternativeName) {
+                name = typeAndName.alternativeName;
+            }
+
             ret.push({
                 type: typeAndName.type,
-                displayName: t(typeAndName.name)
+                displayName: t(name)
             });
         }
 
@@ -2392,7 +2404,7 @@ export function useI18n() {
         getAllTrendChartTypes: () => getLocalizedDisplayNameAndType(TrendChartType.values()),
         getAllAccountBalanceTrendChartTypes: () => getLocalizedDisplayNameAndType(AccountBalanceTrendChartType.values()),
         getAllStatisticsChartDataTypes: (analysisType: StatisticsAnalysisType, withDesktopOnlyChart?: boolean) => getLocalizedDisplayNameAndType(ChartDataType.values(analysisType, withDesktopOnlyChart)),
-        getAllStatisticsSortingTypes: () => getLocalizedDisplayNameAndType(ChartSortingType.values()),
+        getAllStatisticsSortingTypes: (useAlternativeName?: boolean) => getLocalizedDisplayNameAndType(ChartSortingType.values(), useAlternativeName),
         getAllStatisticsDateAggregationTypes: (analysisType: StatisticsAnalysisType) => getLocalizedChartDateAggregationTypeAndDisplayName(analysisType, true),
         getAllStatisticsDateAggregationTypesWithShortName: (analysisType: StatisticsAnalysisType) => getLocalizedChartDateAggregationTypeAndDisplayName(analysisType, false),
         getAllTransactionEditScopeTypes: () => getLocalizedDisplayNameAndType(TransactionEditScopeType.values()),

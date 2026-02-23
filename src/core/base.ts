@@ -85,6 +85,10 @@ export interface TypeAndName {
     readonly name: string;
 }
 
+export interface TypeAndNameWithAlternativeName extends TypeAndName {
+    readonly alternativeName?: string;
+}
+
 export interface TypeAndDisplayName {
     readonly type: number;
     readonly displayName: string;

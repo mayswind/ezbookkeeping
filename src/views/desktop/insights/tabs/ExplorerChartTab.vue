@@ -184,7 +184,7 @@ import {
 
 import { type NameValue, type TypeAndDisplayName } from '@/core/base.ts';
 import { Month, WeekDay } from '@/core/datetime.ts';
-import { ChartSortingType } from '@/core/statistics.ts';
+import { ChartSortingType, ExportMermaidChartType } from '@/core/statistics.ts';
 import {
     TransactionExplorerChartType,
     TransactionExplorerDataDimensionType,
@@ -532,9 +532,14 @@ function onClickTrendChartItem(itemId: string, categoryIndex: number): void {
     }
 }
 
-function buildExportResults(): { headers: string[], data: string[][] } | undefined {
+function buildExportResults(): { headers: string[], data: string[][], supportedMermaidCharts?: ExportMermaidChartType[] } | undefined {
     if (currentExplorer.value.chartType === TransactionExplorerChartType.Pie.value || currentExplorer.value.chartType === TransactionExplorerChartType.Radar.value) {
         const valueMetric = TransactionExplorerValueMetric.valueOf(currentExplorer.value.valueMetric);
+        let supportedMermaidCharts: ExportMermaidChartType[] | undefined = undefined;
+
+        if (currentExplorer.value.chartType === TransactionExplorerChartType.Pie.value) {
+            supportedMermaidCharts = [ ExportMermaidChartType.PieChart ];
+        }
 
         return {
             headers: [
@@ -544,10 +549,42 @@ function buildExportResults(): { headers: string[], data: string[][] } | undefin
             data: categoryDimensionTransactionExplorerData.value.map(data => [
                 data.name,
                 valueMetric?.isAmount ? formatAmountToWesternArabicNumeralsWithoutDigitGrouping(data.totalAmount) : data.totalAmount.toString(10)
-            ])
+            ]),
+            supportedMermaidCharts: supportedMermaidCharts
         };
     } else if (TransactionExplorerChartType.valueOf(currentExplorer.value.chartType)?.seriesDimensionRequired && axisChartDisplayType.value) {
-        return axisChart.value?.exportData();
+        const results = axisChart.value?.exportData();
+
+        if (!results) {
+            return undefined;
+        }
+
+        let supportedMermaidCharts: ExportMermaidChartType[] | undefined = undefined;
+
+        if (results.headers.length === 2 &&
+            (
+                currentExplorer.value.chartType === TransactionExplorerChartType.ColumnStacked.value ||
+                currentExplorer.value.chartType === TransactionExplorerChartType.Column100PercentStacked.value ||
+                currentExplorer.value.chartType === TransactionExplorerChartType.ColumnGrouped.value
+            )
+        ) {
+            supportedMermaidCharts = [ ExportMermaidChartType.XYChartBar ];
+        } else if (results.headers.length === 2 &&
+            (
+                currentExplorer.value.chartType === TransactionExplorerChartType.AreaStacked.value ||
+                currentExplorer.value.chartType === TransactionExplorerChartType.Area100PercentStacked.value
+            )
+        ) {
+            supportedMermaidCharts = [ ExportMermaidChartType.XYChartLine ];
+        } else if (currentExplorer.value.chartType === TransactionExplorerChartType.LineGrouped.value) {
+            supportedMermaidCharts = [ ExportMermaidChartType.XYChartLine ];
+        }
+
+        return {
+            headers: results.headers,
+            data: results.data,
+            supportedMermaidCharts: supportedMermaidCharts
+        };
     } else {
         return undefined;
     }

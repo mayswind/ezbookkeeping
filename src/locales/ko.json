@@ -2300,6 +2300,8 @@
     "Export to TSV (Tab-separated values) File": "TSV (탭으로 구분된 값) 파일로 내보내기",
     "Export to SSV (Semicolon-separated values) File": "Export to SSV (Semicolon-separated values) File",
     "Markdown File": "Markdown 파일",
+    "Mermaid (Pie Chart)": "Mermaid (Pie Chart)",
+    "Mermaid (XY Chart)": "Mermaid (XY Chart)",
     "Clear User Data": "사용자 데이터 지우기",
     "Clear All Transactions": "모든 거래 지우기",
     "Clear All Data": "모든 데이터 지우기",

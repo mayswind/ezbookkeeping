@@ -2300,6 +2300,8 @@
     "Export to TSV (Tab-separated values) File": "TSV (Sekmeyle ayrılmış değerler) Dosyasına Dışa Aktar",
     "Export to SSV (Semicolon-separated values) File": "Export to SSV (Semicolon-separated values) File",
     "Markdown File": "Markdown Dosyası",
+    "Mermaid (Pie Chart)": "Mermaid (Pie Chart)",
+    "Mermaid (XY Chart)": "Mermaid (XY Chart)",
     "Clear User Data": "Kullanıcı Verilerini Temizle",
     "Clear All Transactions": "Tüm İşlemleri Temizle",
     "Clear All Data": "Tüm Verileri Temizle",

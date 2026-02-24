@@ -285,6 +285,12 @@ export class ChartDateAggregationType {
     }
 }
 
+export enum ExportMermaidChartType {
+    PieChart = 'pieChart',
+    XYChartBar = 'xyChartBar',
+    XYChartLine = 'xyChartLine'
+}
+
 export const DEFAULT_CATEGORICAL_CHART_DATA_RANGE: DateRange = DateRange.ThisMonth;
 export const DEFAULT_TREND_CHART_DATA_RANGE: DateRange = DateRange.ThisYear;
 export const DEFAULT_ASSET_TRENDS_CHART_DATA_RANGE: DateRange = DateRange.ThisYear;

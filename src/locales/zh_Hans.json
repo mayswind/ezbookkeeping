@@ -2300,6 +2300,8 @@
     "Export to TSV (Tab-separated values) File": "导出到 TSV (制表符分隔的值) 文件",
     "Export to SSV (Semicolon-separated values) File": "导出到 SSV (分号分隔的值) 文件",
     "Markdown File": "Markdown 文件",
+    "Mermaid (Pie Chart)": "Mermaid (饼图)",
+    "Mermaid (XY Chart)": "Mermaid (XY图)",
     "Clear User Data": "清除用户数据",
     "Clear All Transactions": "清除所有交易",
     "Clear All Data": "清除所有数据",

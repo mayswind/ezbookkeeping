@@ -2300,6 +2300,8 @@
     "Export to TSV (Tab-separated values) File": "Экспорт в файл TSV (значения, разделенные табуляцией)",
     "Export to SSV (Semicolon-separated values) File": "Export to SSV (Semicolon-separated values) File",
     "Markdown File": "Файл Markdown",
+    "Mermaid (Pie Chart)": "Mermaid (Pie Chart)",
+    "Mermaid (XY Chart)": "Mermaid (XY Chart)",
     "Clear User Data": "Очистить данные пользователя",
     "Clear All Transactions": "Отчистить все транзакции",
     "Clear All Data": "Отчистить все данные",

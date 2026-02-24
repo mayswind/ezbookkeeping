@@ -2300,6 +2300,8 @@
     "Export to TSV (Tab-separated values) File": "ส่งออกเป็นไฟล์ TSV (คั่นด้วยแท็บ)",
     "Export to SSV (Semicolon-separated values) File": "Export to SSV (Semicolon-separated values) File",
     "Markdown File": "ไฟล์ Markdown",
+    "Mermaid (Pie Chart)": "Mermaid (Pie Chart)",
+    "Mermaid (XY Chart)": "Mermaid (XY Chart)",
     "Clear User Data": "ลบข้อมูลผู้ใช้",
     "Clear All Transactions": "ลบรายการทั้งหมด",
     "Clear All Data": "ลบข้อมูลทั้งหมด",

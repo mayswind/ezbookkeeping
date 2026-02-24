@@ -85,6 +85,7 @@ const {
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
     formatAmountToLocalizedNumeralsWithCurrency,
     formatNumberToLocalizedNumerals,
+    formatNumberToWesternArabicNumerals,
     formatPercentToLocalizedNumerals
 } = useI18n();
 
@@ -439,7 +440,13 @@ function exportData(): { headers: string[], data: string[][] } {
     for (const [categoryName, index] of itemAndIndex(props.allCategoryNames)) {
         const row: string[] = [];
         row.push(categoryName);
-        row.push(...allSeries.value.map(item => formatAmountToWesternArabicNumeralsWithoutDigitGrouping(item.data[index] ?? 0)));
+        row.push(...allSeries.value.map(item => {
+            if (props.oneHundredPercentStacked) {
+                return formatNumberToWesternArabicNumerals(item.data[index] ?? 0);
+            } else {
+                return formatAmountToWesternArabicNumeralsWithoutDigitGrouping(item.data[index] ?? 0);
+            }
+        }));
         data.push(row);
     }
 

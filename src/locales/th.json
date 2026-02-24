@@ -2298,6 +2298,7 @@
     "SSV (Semicolon-separated values) File": "SSV (Semicolon-separated values) File",
     "Export to CSV (Comma-separated values) File": "ส่งออกเป็นไฟล์ CSV (คั่นด้วยเครื่องหมายจุลภาค)",
     "Export to TSV (Tab-separated values) File": "ส่งออกเป็นไฟล์ TSV (คั่นด้วยแท็บ)",
+    "Export to SSV (Semicolon-separated values) File": "Export to SSV (Semicolon-separated values) File",
     "Markdown File": "ไฟล์ Markdown",
     "Clear User Data": "ลบข้อมูลผู้ใช้",
     "Clear All Transactions": "ลบรายการทั้งหมด",

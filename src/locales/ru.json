@@ -2298,6 +2298,7 @@
     "SSV (Semicolon-separated values) File": "SSV (Значения, разделенные точкой с запятой) File",
     "Export to CSV (Comma-separated values) File": "Экспорт в файл CSV (значения, разделенные запятыми)",
     "Export to TSV (Tab-separated values) File": "Экспорт в файл TSV (значения, разделенные табуляцией)",
+    "Export to SSV (Semicolon-separated values) File": "Export to SSV (Semicolon-separated values) File",
     "Markdown File": "Файл Markdown",
     "Clear User Data": "Очистить данные пользователя",
     "Clear All Transactions": "Отчистить все транзакции",

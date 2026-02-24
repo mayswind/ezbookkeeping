@@ -2298,6 +2298,7 @@
     "SSV (Semicolon-separated values) File": "SSV (Semicolon-separated values) File",
     "Export to CSV (Comma-separated values) File": "Exporteren naar CSV-bestand (komma-gescheiden waarden)",
     "Export to TSV (Tab-separated values) File": "Exporteren naar TSV-bestand (tab-gescheiden waarden)",
+    "Export to SSV (Semicolon-separated values) File": "Export to SSV (Semicolon-separated values) File",
     "Markdown File": "Markdown-bestand",
     "Clear User Data": "Gebruikersgegevens wissen",
     "Clear All Transactions": "Clear All Transactions",

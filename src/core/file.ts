@@ -4,6 +4,7 @@ export class KnownFileType {
     public static readonly JSON = new KnownFileType('json', 'application/json');
     public static readonly CSV = new KnownFileType('csv', 'text/csv');
     public static readonly TSV = new KnownFileType('tsv', 'text/tab-separated-values');
+    public static readonly SSV = new KnownFileType('txt', 'text/plain');
     public static readonly TXT = new KnownFileType('txt', 'text/plain');
     public static readonly MARKDOWN = new KnownFileType('md', 'text/markdown');
     public static readonly JS = new KnownFileType('js', 'application/javascript');

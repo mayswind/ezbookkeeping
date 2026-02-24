@@ -2298,6 +2298,7 @@
     "SSV (Semicolon-separated values) File": "SSV (分號分隔的值) 檔案",
     "Export to CSV (Comma-separated values) File": "匯出為 CSV (逗號分隔的值) 檔案",
     "Export to TSV (Tab-separated values) File": "匯出為 TSV (定位點分隔的值) 檔案",
+    "Export to SSV (Semicolon-separated values) File": "匯出為 SSV (分號分隔的值) 檔案",
     "Markdown File": "Markdown 檔案",
     "Clear User Data": "清除使用者資料",
     "Clear All Transactions": "清除所有交易",

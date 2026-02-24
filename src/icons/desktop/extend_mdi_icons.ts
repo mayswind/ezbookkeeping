@@ -1,0 +1,1 @@
+export const extendMdiSemicolon: string = 'M15.6,2.4H8V10H15.6V6.6Z M5.6,12.4H15.56V18.368L12.368,21.752 H8.4L11.576,18.368H8V12.4Z';

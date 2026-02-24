@@ -234,6 +234,8 @@ export function useReconciliationStatementPageBase() {
 
         if (fileType === KnownFileType.TSV) {
             separator = '\t';
+        } else if (fileType === KnownFileType.SSV) {
+            separator = ';';
         }
 
         const accountBalanceName = isCurrentLiabilityAccount.value ? 'Account Outstanding Balance' : 'Account Balance';
@@ -252,9 +254,9 @@ export function useReconciliationStatementPageBase() {
         const rows = transactions.map(transaction => {
             const transactionTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transaction.utcOffset);
             const type = getDisplayTransactionType(transaction);
-            let categoryName = transaction.categoryName;
+            let categoryName = replaceAll(transaction.categoryName, separator, ' ');
             let displayAmount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.sourceAmount);
-            let displayAccountName = transaction.sourceAccountName;
+            let displayAccountName = replaceAll(transaction.sourceAccountName, separator, ' ');
 
             if (transaction.type === TransactionType.ModifyBalance) {
                 categoryName = tt('Modify Balance');
@@ -263,7 +265,7 @@ export function useReconciliationStatementPageBase() {
             }
 
             if (transaction.type === TransactionType.Transfer && transaction.destinationAccount) {
-                displayAccountName = displayAccountName + ' → ' + (transaction.destinationAccount?.name || '');
+                displayAccountName = replaceAll(displayAccountName + ' → ' + (transaction.destinationAccount?.name || ''), separator, ' ');
             }
 
             let displayAccountBalance = '';

@@ -2298,6 +2298,7 @@
     "SSV (Semicolon-separated values) File": "SSV (Semicolon-separated values) File",
     "Export to CSV (Comma-separated values) File": "Exportar a archivo CSV (Valores Separados por Comas)",
     "Export to TSV (Tab-separated values) File": "Exportar a archivo TSV (Valores Separados por Tabulaciones)",
+    "Export to SSV (Semicolon-separated values) File": "Export to SSV (Semicolon-separated values) File",
     "Markdown File": "Archivo Markdown",
     "Clear User Data": "Borrar Datos de Usuario",
     "Clear All Transactions": "Eliminar Todas las Transacciones",

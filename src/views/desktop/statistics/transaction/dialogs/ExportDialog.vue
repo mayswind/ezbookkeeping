@@ -26,6 +26,10 @@
                                              :append-icon="fileFormat === KnownFileType.TSV.extension ? mdiCheck : undefined"
                                              :title="tt('TSV (Tab-separated values) File')"
                                              @click="fileFormat = KnownFileType.TSV.extension"></v-list-item>
+                                <v-list-item :prepend-icon="extendMdiSemicolon"
+                                             :append-icon="fileFormat === KnownFileType.SSV.extension ? mdiCheck : undefined"
+                                             :title="tt('SSV (Semicolon-separated values) File')"
+                                             @click="fileFormat = KnownFileType.SSV.extension"></v-list-item>
                                 <v-list-item :prepend-icon="mdiLanguageMarkdownOutline"
                                              :append-icon="fileFormat === KnownFileType.MARKDOWN.extension ? mdiCheck : undefined"
                                              :title="tt('Markdown File')"
@@ -92,6 +96,9 @@ import { replaceAll } from '@/lib/common.ts';
 import { copyTextToClipboard, startDownloadFile } from '@/lib/ui/common.ts';
 
 import {
+    extendMdiSemicolon
+} from '@/icons/desktop/extend_mdi_icons.ts';
+import {
     mdiDotsVertical,
     mdiCheck,
     mdiComma,
@@ -152,11 +159,13 @@ const dataTableItems = computed<object[]>(() => {
 const exportedData = computed<string>(() => {
     let ret = '';
 
-    if (fileFormat.value === KnownFileType.CSV.extension || fileFormat.value === KnownFileType.TSV.extension) {
+    if (fileFormat.value === KnownFileType.CSV.extension || fileFormat.value === KnownFileType.TSV.extension || fileFormat.value === KnownFileType.SSV.extension) {
         let separator = ',';
 
         if (fileFormat.value === KnownFileType.TSV.extension) {
             separator = '\t';
+        } else if (fileFormat.value === KnownFileType.SSV.extension) {
+            separator = ';';
         }
 
         if (headers.value.length > 0) {

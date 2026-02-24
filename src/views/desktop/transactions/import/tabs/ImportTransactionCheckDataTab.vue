@@ -450,6 +450,9 @@ import {
 import { startDownloadFile } from '@/lib/ui/common.ts';
 
 import {
+    extendMdiSemicolon
+} from '@/icons/desktop/extend_mdi_icons.ts';
+import {
     mdiCheck,
     mdiArrowRight,
     mdiSelectAll,
@@ -956,6 +959,12 @@ const toolMenus = computed<ImportTransactionCheckDataMenu[]>(() => [
         title: tt('Export to TSV (Tab-separated values) File'),
         disabled: isEditing.value || selectedImportTransactionCount.value < 1,
         onClick: () => exportData(KnownFileType.TSV)
+    },
+    {
+        prependIcon: extendMdiSemicolon,
+        title: tt('Export to SSV (Semicolon-separated values) File'),
+        disabled: isEditing.value || selectedImportTransactionCount.value < 1,
+        onClick: () => exportData(KnownFileType.SSV)
     }
 ]);
 
@@ -2147,9 +2156,13 @@ function exportData(fileType: KnownFileType): void {
     }
 
     let separator = ',';
+    let tagSeparator = ';';
 
     if (fileType === KnownFileType.TSV) {
         separator = '\t';
+    } else if (fileType === KnownFileType.SSV) {
+        separator = ';';
+        tagSeparator = ',';
     }
 
     const header = [
@@ -2203,7 +2216,7 @@ function exportData(fileType: KnownFileType): void {
 
                 if (tagName) {
                     tagName = replaceAll(tagName, separator, ' ');
-                    tagName = replaceAll(tagName, ';', ' ');
+                    tagName = replaceAll(tagName, tagSeparator, ' ');
                     tagNames.push(tagName);
                 }
             }
@@ -2221,7 +2234,7 @@ function exportData(fileType: KnownFileType): void {
             relatedAccountCurrency ?? '',
             relatedAmount ?? '',
             geographicLocation,
-            tagNames.join(';'),
+            tagNames.join(tagSeparator),
             replaceAll(transaction.comment || '', separator, ' ')
         ].join(separator);
     });

@@ -161,7 +161,7 @@
                 >
                     <template #item.time="{ item }">
                         <span>{{ getDisplayDateTime(item) }}</span>
-                        <v-chip class="ms-1" variant="flat" color="secondary" size="x-small"
+                        <v-chip class="ms-1" variant="flat" color="grey" size="x-small"
                                 v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimezone(item) }}</v-chip>
                         <v-tooltip activator="parent" v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimeInDefaultTimezone(item) }}</v-tooltip>
                     </template>

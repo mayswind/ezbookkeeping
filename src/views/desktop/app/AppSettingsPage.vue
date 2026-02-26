@@ -17,6 +17,10 @@
                 <v-icon size="20" start :icon="mdiCloudOutline"/>
                 {{ tt('Settings Sync') }}
             </v-tab>
+            <v-tab value="browserCacheSetting" @click="pushRouter('browserCacheSetting')">
+                <v-icon size="20" start :icon="mdiDatabaseClockOutline"/>
+                {{ tt('Browser Cache Management') }}
+            </v-tab>
         </v-tabs>
 
         <v-window class="mt-4 disable-tab-transition" v-model="activeTab">
@@ -35,6 +39,10 @@
             <v-window-item value="cloudSyncSetting">
                 <app-cloud-sync-setting-tab/>
             </v-window-item>
+
+            <v-window-item value="browserCacheSetting">
+                <app-browser-cache-setting-tab/>
+            </v-window-item>
         </v-window>
     </div>
 </template>
@@ -44,6 +52,7 @@ import AppBasicSettingTab from './settings/tabs/AppBasicSettingTab.vue';
 import AppLockSettingTab from './settings/tabs/AppLockSettingTab.vue';
 import AppStatisticsSettingTab from './settings/tabs/AppStatisticsSettingTab.vue';
 import AppCloudSyncSettingTab from './settings/tabs/AppCloudSyncSettingTab.vue';
+import AppBrowserCacheSettingTab from './settings/tabs/AppBrowserCacheSettingTab.vue';
 
 import { ref } from 'vue';
 import { useRouter, onBeforeRouteUpdate } from 'vue-router';
@@ -54,7 +63,8 @@ import {
     mdiCogOutline,
     mdiLockOpenOutline,
     mdiChartPieOutline,
-    mdiCloudOutline
+    mdiCloudOutline,
+    mdiDatabaseClockOutline
 } from '@mdi/js';
 
 const props = defineProps<{
@@ -69,7 +79,8 @@ const ALL_TABS: string[] = [
     'basicSetting',
     'applicationLockSetting',
     'statisticsSetting',
-    'cloudSyncSetting'
+    'cloudSyncSetting',
+    'browserCacheSetting'
 ];
 
 const activeTab = ref<string>((() => {

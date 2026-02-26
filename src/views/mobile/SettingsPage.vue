@@ -108,6 +108,7 @@
                 </template>
             </f7-list-item>
 
+            <f7-list-item :title="tt('Browser Cache Management')" link="/settings/browser_caches"></f7-list-item>
             <f7-list-item link="#" no-chevron :title="tt('Switch to Desktop Version')" @click="switchToDesktopVersion"></f7-list-item>
 
             <f7-list-item :title="tt('About')" link="/about" :after="version"></f7-list-item>

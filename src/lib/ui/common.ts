@@ -245,38 +245,3 @@ export function compressJpgImage(file: File, maxWidth: number, maxHeight: number
         reader.readAsDataURL(file);
     });
 }
-
-export function clearBrowserCaches(): Promise<void> {
-    if (!window.caches) {
-        logger.error('caches API is not supported in this browser');
-        return Promise.reject();
-    }
-
-    return new Promise((resolve, reject) => {
-        window.caches.keys().then(cacheNames => {
-            const promises = [];
-
-            for (const cacheName of cacheNames) {
-                promises.push(window.caches.delete(cacheName).then(success => {
-                    if (success) {
-                        logger.info(`cache "${cacheName}" cleared successfully`);
-                        return Promise.resolve(cacheName);
-                    } else {
-                        logger.warn(`failed to clear cache "${cacheName}"`);
-                        return Promise.reject(cacheName);
-                    }
-                }));
-            }
-
-            Promise.all(promises).then(() => {
-                logger.info("all caches cleared successfully");
-                resolve();
-            }).catch(() => {
-                resolve();
-            });
-        }).catch(error => {
-            logger.warn("failed to clear cache", error);
-            reject(error);
-        });
-    });
-}

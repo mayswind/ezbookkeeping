@@ -15,7 +15,7 @@ import { getMapWebsite } from '@/lib/map/index.ts';
 import { getContributors } from '@/lib/contributors.ts';
 import { getLicense, getThirdPartyLicenses } from '@/lib/licenses.ts';
 import { formatDisplayVersion, getClientDisplayVersion, getClientBuildTime } from '@/lib/version.ts';
-import { clearBrowserCaches } from '@/lib/ui/common.ts';
+import { clearAllBrowserCaches } from '@/lib/cache.ts';
 
 export function useAboutPageBase() {
     const { tt, formatDateTimeToLongDateTime } = useI18n();
@@ -61,7 +61,7 @@ export function useAboutPageBase() {
     const thirdPartyLicenses = computed<LicenseInfo[]>(() => getThirdPartyLicenses());
 
     function refreshBrowserCache(): void {
-        clearBrowserCaches().then(() => {
+        clearAllBrowserCaches().then(() => {
             location.reload();
         });
     }

@@ -23,6 +23,7 @@ import TextSizeSettingsPage from '@/views/mobile/settings/TextSizeSettingsPage.v
 import PageSettingsPage from '@/views/mobile/settings/PageSettingsPage.vue';
 import AccountCategoryDisplayOrderSettingsPage from '@/views/mobile/settings/AccountCategoryDisplayOrderSettingsPage.vue';
 import ApplicationCloudSyncSettingsPage from '@/views/mobile/settings/ApplicationCloudSyncSettingsPage.vue';
+import BrowserCacheSettingPage from '@/views/mobile/settings/BrowserCacheSettingPage.vue';
 import AccountFilterSettingsPage from '@/views/mobile/settings/AccountFilterSettingsPage.vue';
 import CategoryFilterSettingsPage from '@/views/mobile/settings/CategoryFilterSettingsPage.vue';
 import TransactionTagFilterSettingsPage from '@/views/mobile/settings/TransactionTagFilterSettingsPage.vue';
@@ -248,6 +249,11 @@ const routes: Router.RouteParameters[] = [
     {
         path: '/settings/sync',
         async: asyncResolve(ApplicationCloudSyncSettingsPage),
+        beforeEnter: [checkLogin]
+    },
+    {
+        path: '/settings/browser_caches',
+        async: asyncResolve(BrowserCacheSettingPage),
         beforeEnter: [checkLogin]
     },
     {

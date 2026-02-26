@@ -33,6 +33,10 @@ function getExchangeRatesFromLocalStorage(): LatestExchangeRates {
     return JSON.parse(storageData) as LatestExchangeRates;
 }
 
+function getExchangeRatesRawDataFromLocalStorage(): string | null {
+    return localStorage.getItem(exchangeRatesLocalStorageKey);
+}
+
 function setExchangeRatesToLocalStorage(value: LatestExchangeRates): void {
     const storageData = JSON.stringify(value);
     localStorage.setItem(exchangeRatesLocalStorageKey, storageData);
@@ -119,6 +123,16 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
         if (changed) {
             setExchangeRatesToLocalStorage(latestExchangeRates.value);
         }
+    }
+
+    function getExchangeRatesCacheSize(): number {
+        const storageData = getExchangeRatesRawDataFromLocalStorage();
+
+        if (!storageData) {
+            return 0;
+        }
+
+        return new Blob([storageData]).size;
     }
 
     function resetLatestExchangeRates(): void {
@@ -283,6 +297,7 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
         exchangeRatesLastUpdateTime,
         latestExchangeRateMap,
         // functions
+        getExchangeRatesCacheSize,
         resetLatestExchangeRates,
         getLatestExchangeRates,
         updateUserCustomExchangeRate,

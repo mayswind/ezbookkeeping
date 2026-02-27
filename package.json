@@ -47,7 +47,7 @@
     "vue-router": "^5.0.2",
     "vue3-perfect-scrollbar": "^2.0.0",
     "vuedraggable": "^4.1.0",
-    "vuetify": "^3.11.8"
+    "vuetify": "^4.0.0"
   },
   "devDependencies": {
     "@jest/globals": "^30.2.0",
@@ -75,7 +75,7 @@
     "vite": "^7.3.1",
     "vite-plugin-checker": "^0.12.0",
     "vite-plugin-pwa": "^1.2.0",
-    "vite-plugin-vuetify": "^2.1.3",
+    "vite-plugin-vuetify": "^3.0.0",
     "vue-tsc": "^3.2.4"
   },
   "browserslist": [

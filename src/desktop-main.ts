@@ -45,7 +45,7 @@ import { VTextField } from 'vuetify/components/VTextField';
 import { VToolbar } from 'vuetify/components/VToolbar';
 import { VTooltip } from 'vuetify/components/VTooltip';
 import { VWindow, VWindowItem } from 'vuetify/components/VWindow';
-import type { LocaleInstance } from 'vuetify/lib/framework.d.ts';
+import type { LocaleInstance } from 'vuetify';
 
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg';
 import 'vuetify/styles';

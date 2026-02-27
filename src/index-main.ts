@@ -1,11 +1,11 @@
-import uaParser from 'ua-parser-js';
+import { UAParser } from 'ua-parser-js';
 
 function isMobileDevice(): boolean {
     if (!navigator.userAgent) {
         return false;
     }
 
-    const uaParseRet = uaParser(navigator.userAgent);
+    const uaParseRet = new UAParser(navigator.userAgent).getResult();
 
     if (!uaParseRet || !uaParseRet.device) {
         return false;

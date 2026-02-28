@@ -831,6 +831,12 @@ export default {
     generateQrCodeUrl: (qrCodeName: string): string => {
         return `${getBasePath()}${BASE_QRCODE_PATH}/${qrCodeName}.png`;
     },
+    getMapProxyTileImageAndAnnotationImageUrlPatterns(): string[] {
+        return [
+            `.*${BASE_PROXY_URL_PATH}/map/tile/[^/]+/[^/]+/[^/]+\\.png\\?provider=[^&]+.*$`,
+            `.*${BASE_PROXY_URL_PATH}/map/annotation/[^/]+/[^/]+/[^/]+\\.png\\?provider=[^&]+.*$`
+        ];
+    },
     generateMapProxyTileImageUrl: (mapProvider: string, language: string): string => {
         const token = getCurrentToken();
         let url = `${getBasePath()}${BASE_PROXY_URL_PATH}/map/tile/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;

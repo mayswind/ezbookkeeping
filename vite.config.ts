@@ -112,10 +112,11 @@ export default defineConfig(() => {
                 vueTsc: true
             }),
             VitePWA({
-                filename: 'sw.js',
-                manifestFilename: 'manifest.json',
-                strategies: 'generateSW',
+                strategies: 'injectManifest',
+                srcDir: './',
+                filename: 'sw.ts',
                 injectRegister: false,
+                manifestFilename: 'manifest.json',
                 manifest: {
                     name: 'ezBookkeeping',
                     short_name: 'ezBookkeeping',
@@ -140,7 +141,7 @@ export default defineConfig(() => {
                         }
                     ]
                 },
-                workbox: {
+                injectManifest: {
                     globDirectory: 'dist/',
                     globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,gif,tiff,bmp,ttf,woff,woff2,svg,eot}'],
                     globIgnores: [
@@ -156,43 +157,7 @@ export default defineConfig(() => {
                         'css/*.css',
                         'js/*.js'
                     ],
-                    runtimeCaching: [
-                        {
-                            urlPattern: /.*\/(mobile|mobile\/|desktop|desktop\/)$/,
-                            handler: 'NetworkFirst'
-                        },
-                        {
-                            urlPattern: /.*\/(mobile|mobile\/)#!\//,
-                            handler: 'NetworkFirst'
-                        },
-                        {
-                            urlPattern: /.*\/(desktop|desktop\/)#\//,
-                            handler: 'NetworkFirst'
-                        },
-                        {
-                            urlPattern: /.*\/(index\.html|mobile\.html|desktop\.html)/,
-                            handler: 'NetworkFirst'
-                        },
-                        {
-                            urlPattern: /.*\/img\/desktop\/.*\.(png|jpg|jpeg|gif|tiff|bmp|svg)/,
-                            handler: 'StaleWhileRevalidate'
-                        },
-                        {
-                            urlPattern: /.*\/fonts\/.*\.(eot|ttf|svg|woff)/,
-                            handler: 'CacheFirst'
-                        },
-                        {
-                            urlPattern: /.*\/css\/.*\.css/,
-                            handler: 'CacheFirst'
-                        },
-                        {
-                            urlPattern: /.*\/js\/.*\.js/,
-                            handler: 'CacheFirst'
-                        }
-                    ],
-                    navigateFallback: '',
-                    skipWaiting: true,
-                    clientsClaim: true
+                    maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
                 }
             })
         ],

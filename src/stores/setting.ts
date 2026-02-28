@@ -310,6 +310,12 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('currencySortByInExchangeRatesPage', value);
     }
 
+    // Browser Cache Settings
+    function setMapCacheExpiration(value: number): void {
+        updateApplicationSettingsValue('mapCacheExpiration', value);
+        appSettings.value.mapCacheExpiration = value;
+    }
+
     // Statistics Settings
     function setStatisticsDefaultChartDataType(value: number): void {
         updateApplicationSettingsSubValue('statistics', 'defaultChartDataType', value);
@@ -531,6 +537,8 @@ export const useSettingsStore = defineStore('settings', () => {
         setHideCategoriesWithoutAccounts,
         // -- Exchange Rates Data Page
         setCurrencySortByInExchangeRatesPage,
+        // -- Browser Cache Settings
+        setMapCacheExpiration,
         // -- Statistics Settings
         setStatisticsDefaultChartDataType,
         setStatisticsDefaultTimezoneType,

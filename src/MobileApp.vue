@@ -26,6 +26,7 @@ import { isProduction } from '@/lib/version.ts';
 import { getTheme, isEnableSwipeBack, isEnableAnimate } from '@/lib/settings.ts';
 import { initMapProvider } from '@/lib/map/index.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
+import { updateMapCacheExpiration } from '@/lib/cache.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 import { isiOSHomeScreenMode, isModalShowing, setAppFontSize } from '@/lib/ui/mobile.ts';
 
@@ -180,6 +181,16 @@ onMounted(() => {
         const languageInfo = getCurrentLanguageInfo();
         initMapProvider(languageInfo?.alternativeLanguageTag);
     });
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
+        });
+
+        if (navigator.serviceWorker.controller) {
+            updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
+        }
+    }
 });
 
 watch(currentNotificationContent, (newValue) => {

@@ -1,5 +1,11 @@
-import { keys, keysIfValueEquals, values } from '@/core/base.ts';
-import type { NameValue, TypeAndName, TypeAndDisplayName} from '@/core/base.ts';
+import {
+    type GenericNameValue,
+    type TypeAndName,
+    type TypeAndDisplayName,
+    keys,
+    keysIfValueEquals,
+    values
+} from '@/core/base.ts';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function isFunction(val: unknown): val is Function {
@@ -285,7 +291,7 @@ export function getItemByKeyValue<T>(src: Record<string, T>[] | Record<string, R
     return null;
 }
 
-export function findNameByValue(items: NameValue[], value: string): string | null {
+export function findNameByValue<T>(items: GenericNameValue<T>[], value: T): string | null {
     for (const item of items) {
         if (item.value === value) {
             return item.name;

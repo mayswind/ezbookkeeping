@@ -1,5 +1,6 @@
 import type {
-    BrowserCacheStatistics
+    BrowserCacheStatistics,
+    SWMapCacheConfig
 } from '@/core/cache.ts';
 
 import {
@@ -7,10 +8,14 @@ import {
     SW_RUNTIME_CACHE_NAME_PREFIX,
     SW_ASSETS_CACHE_NAME,
     SW_CODE_CACHE_NAME,
-    SW_MAP_CACHE_NAME
+    SW_MAP_CACHE_NAME,
+    SW_MESSAGE_TYPE_UPDATE_MAP_CACHE_CONFIG,
+    SW_MESSAGE_TYPE_UPDATE_MAP_CACHE_CONFIG_RESPONSE,
+    MAP_CACHE_MAX_ENTRIES
 } from '@/consts/cache.ts';
 
 import { isFunction, isObject, isNumber } from './common.ts';
+import services from './services.ts';
 import logger from './logger.ts';
 
 function findFirstCacheName(prefix: string): Promise<string> {
@@ -113,6 +118,63 @@ export function loadBrowserCacheStatistics(): Promise<BrowserCacheStatistics> {
     });
 }
 
+export function updateMapCacheExpiration(expireSeconds: number): Promise<void> {
+    const config: SWMapCacheConfig = {
+        enabled: expireSeconds >= 0,
+        patterns: services.getMapProxyTileImageAndAnnotationImageUrlPatterns(),
+        maxEntries: MAP_CACHE_MAX_ENTRIES,
+        maxAgeMilliseconds: expireSeconds * 1000
+    };
+
+    return new Promise((resolve, reject) => {
+        if (!navigator.serviceWorker || !navigator.serviceWorker.controller) {
+            reject(new Error('Service worker is not supported or not active'));
+            return;
+        }
+
+        const controller = navigator.serviceWorker.controller;
+
+        navigator.serviceWorker.ready.then(() => {
+            const messageChannel = new MessageChannel();
+
+            messageChannel.port1.onmessage = (event) => {
+                if (event.data && event.data.type === SW_MESSAGE_TYPE_UPDATE_MAP_CACHE_CONFIG_RESPONSE) {
+                    logger.info('Map cache config updated successfully in service worker: ' + JSON.stringify(event.data.payload));
+                    resolve();
+                } else {
+                    logger.error('cannot update map cache config, invalid response from service worker', event);
+                    reject(new Error('Invalid response from service worker'));
+                }
+            };
+
+            controller.postMessage({
+                type: SW_MESSAGE_TYPE_UPDATE_MAP_CACHE_CONFIG,
+                payload: config
+            }, [messageChannel.port2]);
+        }).catch(error => {
+            logger.error('failed to update map cache config', error);
+            reject(error);
+        });
+    });
+}
+
+export function clearMapDataCache(): Promise<void> {
+    if (!window.caches) {
+        logger.error('caches API is not supported in this browser');
+        return Promise.reject();
+    }
+
+    return window.caches.delete(SW_MAP_CACHE_NAME).then(success => {
+        if (success) {
+            logger.info(`cache "${SW_MAP_CACHE_NAME}" cleared successfully`);
+        } else {
+            logger.warn(`failed to clear cache "${SW_MAP_CACHE_NAME}"`);
+        }
+    }).catch(error => {
+        logger.error(`failed to clear cache "${SW_MAP_CACHE_NAME}"`, error);
+    });
+}
+
 export function clearAllBrowserCaches(): Promise<void> {
     if (!window.caches) {
         logger.error('caches API is not supported in this browser');
@@ -142,7 +204,7 @@ export function clearAllBrowserCaches(): Promise<void> {
                 resolve();
             });
         }).catch(error => {
-            logger.warn("failed to clear cache", error);
+            logger.error("failed to clear cache", error);
             reject(error);
         });
     });

@@ -1,12 +1,12 @@
 <template>
     <v-row>
-        <v-col cols="12">
-            <v-card :class="{ 'disabled': loadingCacheStatistics }">
+        <v-col cols="12" v-if="isSupportedFileCache">
+            <v-card :class="{ 'disabled': loading }">
                 <template #title>
                     <div class="d-flex align-center">
                         <span>{{ tt('File Cache') }}</span>
                         <v-btn density="compact" color="default" variant="text" size="24"
-                               class="ms-2" :icon="true" :loading="loadingCacheStatistics" @click="reloadCacheStatistics()">
+                               class="ms-2" :icon="true" :loading="loading" @click="loadCacheStatistics()">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
@@ -16,14 +16,10 @@
                     </div>
                 </template>
 
-                <v-card-text class="mt-1" v-if="loadingCacheStatistics">
+                <v-card-text class="d-flex align-end" style="height: 3rem">
                     <span class="text-body-1">{{ tt('Used storage') }}</span>
-                    <v-skeleton-loader class="d-inline-block skeleton-no-margin ml-1 pt-1 pb-1" type="text" style="width: 100px; height: 24px" :loading="true" v-if="loadingCacheStatistics"></v-skeleton-loader>
-                </v-card-text>
-
-                <v-card-text v-else-if="!loadingCacheStatistics">
-                    <span class="text-body-1">{{ tt('Used storage') }}</span>
-                    <span class="text-xl ml-1" v-if="!loadingCacheStatistics">{{ fileCacheStatistics ? formatVolumeToLocalizedNumerals(fileCacheStatistics.totalCacheSize, 2) : '-' }}</span>
+                    <v-skeleton-loader class="d-inline-block skeleton-no-margin ms-1 pt-1 pb-1" type="text" style="width: 100px" :loading="true" v-if="loading"></v-skeleton-loader>
+                    <span class="text-xl ms-1" v-if="!loading">{{ fileCacheStatistics ? formatVolumeToLocalizedNumerals(fileCacheStatistics.totalCacheSize, 2) : '-' }}</span>
                 </v-card-text>
 
                 <v-card-text>
@@ -63,8 +59,8 @@
 
                                 <div class="d-flex flex-column">
                                     <span class="text-caption">{{ tt(item.title) }}</span>
-                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-2" type="text" style="width: 100px" :loading="true" v-if="loadingCacheStatistics"></v-skeleton-loader>
-                                    <span class="text-xl" v-if="!loadingCacheStatistics">{{ item.count }}</span>
+                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-2" type="text" style="width: 100px" :loading="true" v-if="loading"></v-skeleton-loader>
+                                    <span class="text-xl" v-if="!loading">{{ item.count }}</span>
                                 </div>
                             </div>
                         </v-col>
@@ -72,9 +68,13 @@
                 </v-card-text>
 
                 <v-card-text class="mt-2">
-                    <v-btn color="gray" variant="tonal"
-                           :disabled="loadingCacheStatistics || !fileCacheStatistics"  @click="clearFileCache()">
-                        {{ tt('Clear File Cache') }}
+                    <v-btn color="secondary" variant="tonal"
+                           :disabled="loading || !isSupportedFileCache || !fileCacheStatistics" @click="clearMapCache()">
+                        {{ tt('Clear Map Data Cache') }}
+                    </v-btn>
+                    <v-btn class="ms-2" color="secondary" variant="tonal"
+                           :disabled="loading || !isSupportedFileCache || !fileCacheStatistics" @click="clearAllFileCache()">
+                        {{ tt('Clear All File Cache') }}
                     </v-btn>
                 </v-card-text>
             </v-card>
@@ -90,29 +90,49 @@
 
                 <v-card-text>
                     <span class="text-body-1">{{ tt('Used storage') }}</span>
-                    <span class="text-xl ml-1">{{ formatVolumeToLocalizedNumerals(exchangeRatesCacheSize ?? 0, 2) }}</span>
+                    <span class="text-xl ms-1">{{ formatVolumeToLocalizedNumerals(exchangeRatesCacheSize ?? 0, 2) }}</span>
                 </v-card-text>
+            </v-card>
+        </v-col>
+
+        <v-col cols="12">
+            <v-card :title="tt('Cache Expiration Time')">
+                <v-form>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" sm="6" v-if="getMapProvider()">
+                                <v-select
+                                    item-title="name"
+                                    item-value="value"
+                                    persistent-placeholder
+                                    :disabled="loading || !isSupportedFileCache || !fileCacheStatistics || isMapProviderUseExternalSDK() || !isMapDataFetchProxyEnabled()"
+                                    :label="tt('Cache Expiration for Map Data')"
+                                    :placeholder="tt('Cache Expiration for Map Data')"
+                                    :items="allMapCacheExpirationOptions"
+                                    v-model="mapCacheExpiration"
+                                />
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-form>
             </v-card>
         </v-col>
     </v-row>
 
     <confirm-dialog ref="confirmDialog"/>
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { ref, useTemplateRef } from 'vue';
+import { useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
+import { useAppBrowserCacheSettingPageBase } from '@/views/base/settings/AppBrowserCacheSettingPageBase.ts';
 
-import { type BrowserCacheStatistics } from '@/core/cache.ts';
-
-import { loadBrowserCacheStatistics, clearAllBrowserCaches } from '@/lib/cache.ts';
+import { isMapProviderUseExternalSDK } from '@/lib/map/index.ts';
+import { getMapProvider, isMapDataFetchProxyEnabled } from '@/lib/server_settings.ts';
 
 import {
     mdiRefresh,
@@ -123,39 +143,41 @@ import {
 } from '@mdi/js';
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
-type SnackBarType = InstanceType<typeof SnackBar>;
 
-const { tt, formatVolumeToLocalizedNumerals } = useI18n();
+const {
+    tt,
+    formatVolumeToLocalizedNumerals
+} = useI18n();
 
-const exchangeRatesStore = useExchangeRatesStore();
+const {
+    isSupportedFileCache,
+    loading,
+    fileCacheStatistics,
+    exchangeRatesCacheSize,
+    allMapCacheExpirationOptions,
+    mapCacheExpiration,
+    loadCacheStatistics,
+    clearMapDataCache,
+    clearAllBrowserCaches
+} = useAppBrowserCacheSettingPageBase();
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
-const loadingCacheStatistics = ref<boolean>(true);
-const fileCacheStatistics = ref<BrowserCacheStatistics | undefined>(undefined);
-const exchangeRatesCacheSize = ref<number | undefined>(undefined);
-
-function reloadCacheStatistics(): void {
-    loadingCacheStatistics.value = true;
-
-    loadBrowserCacheStatistics().then(statistics => {
-        fileCacheStatistics.value = statistics;
-        exchangeRatesCacheSize.value = exchangeRatesStore.getExchangeRatesCacheSize();
-        loadingCacheStatistics.value = false;
-    }).catch(() => {
-        loadingCacheStatistics.value = false;
-        snackbar.value?.showError('Failed to load browser cache statistics');
+function clearMapCache(): void {
+    confirmDialog.value?.open('Are you sure you want to clear map data cache?').then(() => {
+        clearMapDataCache().then(() => {
+            loadCacheStatistics();
+        });
     });
 }
 
-function clearFileCache(): void {
-    confirmDialog.value?.open('Are you sure you want to clear file cache?').then(() => {
+function clearAllFileCache(): void {
+    confirmDialog.value?.open('Are you sure you want to clear all file cache?').then(() => {
         clearAllBrowserCaches().then(() => {
             location.reload();
         });
     });
 }
 
-reloadCacheStatistics();
+loadCacheStatistics();
 </script>

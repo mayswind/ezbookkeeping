@@ -27,6 +27,20 @@ export function initMapProvider(language?: string): void {
     }
 }
 
+export function isMapProviderUseExternalSDK(): boolean {
+    const mapProviderType = getMapProvider();
+
+    if (mapProviderType === 'googlemap') {
+        return true;
+    } else if (mapProviderType === 'baidumap') {
+        return true;
+    } else if (mapProviderType === 'amap') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 export function getMapWebsite(): string {
     return mapProvider?.getWebsite() || '';
 }

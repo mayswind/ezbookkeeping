@@ -5,3 +5,10 @@ export interface BrowserCacheStatistics {
     readonly mapCacheSize: number;
     readonly othersCacheSize: number;
 }
+
+export interface SWMapCacheConfig {
+    enabled: boolean;
+    patterns: string[];
+    maxEntries: number;
+    maxAgeMilliseconds: number;
+}

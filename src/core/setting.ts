@@ -62,6 +62,8 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     hideCategoriesWithoutAccounts: boolean;
     // Exchange Rates Data Page
     currencySortByInExchangeRatesPage: number;
+    // Browser Cache Settings
+    mapCacheExpiration: number,
     // Statistics Settings
     statistics: {
         defaultChartDataType: number;
@@ -187,6 +189,8 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     hideCategoriesWithoutAccounts: false,
     // Exchange Rates Data Page
     currencySortByInExchangeRatesPage: CurrencySortingType.Default.type,
+    // Browser Cache Settings
+    mapCacheExpiration: -1,
     // Statistics Settings
     statistics: {
         defaultChartDataType: ChartDataType.Default.type,

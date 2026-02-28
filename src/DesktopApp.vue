@@ -34,6 +34,7 @@ import { ThemeType } from '@/core/theme.ts';
 import { isProduction } from '@/lib/version.ts';
 import { initMapProvider } from '@/lib/map/index.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
+import { updateMapCacheExpiration } from '@/lib/cache.ts';
 import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 const { tt, getCurrentLanguageInfo, setLanguage, initLocale } = useI18n();
@@ -77,6 +78,16 @@ onMounted(() => {
         const languageInfo = getCurrentLanguageInfo();
         initMapProvider(languageInfo?.alternativeLanguageTag);
     });
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
+        });
+
+        if (navigator.serviceWorker.controller) {
+            updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
+        }
+    }
 });
 
 watch(currentNotificationContent, (newValue) => {

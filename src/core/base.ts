@@ -65,12 +65,17 @@ export function* values<K extends string | number | symbol, V>(obj: Record<K, V>
     }
 }
 
-export interface NameValue {
+export interface GenericNameValue<T> {
+    readonly name: string;
+    readonly value: T;
+}
+
+export interface NameValue extends GenericNameValue<string> {
     readonly name: string;
     readonly value: string;
 }
 
-export interface NameNumeralValue {
+export interface NameNumeralValue extends GenericNameValue<number> {
     readonly name: string;
     readonly value: number;
 }

@@ -44,16 +44,9 @@ async function getCacheTotalSize(cacheName: string): Promise<number> {
         try {
             const response = await cache.match(request);
 
-            if (response && response.headers) {
-                const contentLength = response.headers.get('content-length');
-
-                if (contentLength) {
-                    const size = parseInt(contentLength, 10);
-
-                    if (Number.isFinite(size)) {
-                        totalSize += size;
-                    }
-                }
+            if (response) {
+                const blob = await response.clone().blob();
+                totalSize += blob.size;
             }
         } catch (ex) {
             logger.warn(`failed to get size for request ${request.url} in cache ${cacheName}`, ex);

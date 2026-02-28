@@ -316,6 +316,11 @@ export const useSettingsStore = defineStore('settings', () => {
         appSettings.value.mapCacheExpiration = value;
     }
 
+    function setExchangeRatesDataCacheExpiration(value: number): void {
+        updateApplicationSettingsValue('exchangeRatesDataCacheExpiration', value);
+        appSettings.value.exchangeRatesDataCacheExpiration = value;
+    }
+
     // Statistics Settings
     function setStatisticsDefaultChartDataType(value: number): void {
         updateApplicationSettingsSubValue('statistics', 'defaultChartDataType', value);
@@ -539,6 +544,7 @@ export const useSettingsStore = defineStore('settings', () => {
         setCurrencySortByInExchangeRatesPage,
         // -- Browser Cache Settings
         setMapCacheExpiration,
+        setExchangeRatesDataCacheExpiration,
         // -- Statistics Settings
         setStatisticsDefaultChartDataType,
         setStatisticsDefaultTimezoneType,

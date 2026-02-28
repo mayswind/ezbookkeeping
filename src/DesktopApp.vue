@@ -114,6 +114,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', fun
 
 let localeDefaultSettings = initLocale(userStore.currentUserLanguage, settingsStore.appSettings.timeZone);
 settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+exchangeRatesStore.removeExpiredExchangeRates(true);
 
 setExpenseAndIncomeAmountColor(userStore.currentUserExpenseAmountColor, userStore.currentUserIncomeAmountColor);
 

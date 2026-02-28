@@ -92,6 +92,13 @@
                     <span class="text-body-1">{{ tt('Used storage') }}</span>
                     <span class="text-xl ms-1">{{ formatVolumeToLocalizedNumerals(exchangeRatesCacheSize ?? 0, 2) }}</span>
                 </v-card-text>
+
+                <v-card-text class="mt-2">
+                    <v-btn color="secondary" variant="tonal"
+                           :disabled="loading || !exchangeRatesCacheSize" @click="clearExchangeRatesCache()">
+                        {{ tt('Clear Exchange Rates Data Cache') }}
+                    </v-btn>
+                </v-card-text>
             </v-card>
         </v-col>
 
@@ -110,6 +117,18 @@
                                     :placeholder="tt('Cache Expiration for Map Data')"
                                     :items="allMapCacheExpirationOptions"
                                     v-model="mapCacheExpiration"
+                                />
+                            </v-col>
+                            <v-col cols="12" sm="6">
+                                <v-select
+                                    item-title="name"
+                                    item-value="value"
+                                    persistent-placeholder
+                                    :disabled="loading"
+                                    :label="tt('Cache Expiration for Exchange Rates Data')"
+                                    :placeholder="tt('Cache Expiration for Exchange Rates Data')"
+                                    :items="allExchangeRatesDataCacheExpirationOptions"
+                                    v-model="exchangeRatesDataCacheExpiration"
                                 />
                             </v-col>
                         </v-row>
@@ -155,10 +174,13 @@ const {
     fileCacheStatistics,
     exchangeRatesCacheSize,
     allMapCacheExpirationOptions,
+    allExchangeRatesDataCacheExpirationOptions,
     mapCacheExpiration,
+    exchangeRatesDataCacheExpiration,
     loadCacheStatistics,
     clearMapDataCache,
-    clearAllBrowserCaches
+    clearAllBrowserCaches,
+    clearExchangeRatesDataCache
 } = useAppBrowserCacheSettingPageBase();
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
@@ -176,6 +198,12 @@ function clearAllFileCache(): void {
         clearAllBrowserCaches().then(() => {
             location.reload();
         });
+    });
+}
+
+function clearExchangeRatesCache(): void {
+    confirmDialog.value?.open('Are you sure you want to clear exchange rates data cache?').then(() => {
+        clearExchangeRatesDataCache();
     });
 }
 

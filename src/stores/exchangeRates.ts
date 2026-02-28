@@ -1,6 +1,8 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 
+import { useSettingsStore } from './setting.ts';
+
 import { type BeforeResolveFunction, itemAndIndex } from '@/core/base.ts';
 
 import type {
@@ -47,7 +49,11 @@ function clearExchangeRatesFromLocalStorage(): void {
 }
 
 export const useExchangeRatesStore = defineStore('exchangeRates', () => {
+    const settingsStore = useSettingsStore();
+
     const latestExchangeRates = ref<LatestExchangeRates>(getExchangeRatesFromLocalStorage());
+
+    const exchangeRatesDataCacheEnabled = computed<boolean>(() => settingsStore.appSettings.exchangeRatesDataCacheExpiration >= 0);
 
     const isUserCustomExchangeRates = computed((): boolean => {
         if (!latestExchangeRates.value || !latestExchangeRates.value.data) {
@@ -99,7 +105,7 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
 
         latestExchangeRates.value.data.updateTime = updateTime;
 
-        if (changed) {
+        if (exchangeRatesDataCacheEnabled.value && changed) {
             setExchangeRatesToLocalStorage(latestExchangeRates.value);
         }
     }
@@ -120,7 +126,7 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
             }
         }
 
-        if (changed) {
+        if (exchangeRatesDataCacheEnabled.value && changed) {
             setExchangeRatesToLocalStorage(latestExchangeRates.value);
         }
     }
@@ -133,6 +139,29 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
         }
 
         return new Blob([storageData]).size;
+    }
+
+    function removeExpiredExchangeRates(removeDataInStore?: boolean): void {
+        if (settingsStore.appSettings.exchangeRatesDataCacheExpiration > 0) {
+            const currentExchangeRateData = latestExchangeRates.value;
+            const now = getCurrentUnixTime();
+
+            if (currentExchangeRateData && currentExchangeRateData.time) {
+                if (now - currentExchangeRateData.time >= settingsStore.appSettings.exchangeRatesDataCacheExpiration) {
+                    if (removeDataInStore) {
+                        resetLatestExchangeRates();
+                    } else {
+                        clearExchangeRatesFromLocalStorage();
+                    }
+                }
+            }
+        } else if (settingsStore.appSettings.exchangeRatesDataCacheExpiration < 0) { // Disable Cache
+            if (removeDataInStore) {
+                resetLatestExchangeRates();
+            } else {
+                clearExchangeRatesFromLocalStorage();
+            }
+        }
     }
 
     function resetLatestExchangeRates(): void {
@@ -172,11 +201,13 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
                     return;
                 }
 
-                latestExchangeRates.value = {
-                    time: now,
-                    data: data.result
-                };
-                setExchangeRatesToLocalStorage(latestExchangeRates.value);
+                if (exchangeRatesDataCacheEnabled.value) {
+                    latestExchangeRates.value = {
+                        time: now,
+                        data: data.result
+                    };
+                    setExchangeRatesToLocalStorage(latestExchangeRates.value);
+                }
 
                 resolve(data.result);
             }).catch(error => {
@@ -298,6 +329,7 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
         latestExchangeRateMap,
         // functions
         getExchangeRatesCacheSize,
+        removeExpiredExchangeRates,
         resetLatestExchangeRates,
         getLatestExchangeRates,
         updateUserCustomExchangeRate,

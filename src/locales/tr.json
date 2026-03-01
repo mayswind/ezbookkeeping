@@ -1353,11 +1353,8 @@
     },
     "encoding": {
         "utf-8": "UTF-8",
-        "utf-8-bom": "BOM ile UTF-8",
         "utf-16le": "UTF-16 Little Endian",
         "utf-16be": "UTF-16 Big Endian",
-        "utf-16le-bom": "BOM ile UTF-16 Little Endian",
-        "utf-16be-bom": "BOM ile UTF-16 Big Endian",
         "cp437": "OEM Birleşik Devletler (CP-437)",
         "cp863": "OEM Kanada Fransızcası (CP-863)",
         "cp037": "IBM EBCDIC ABD/Kanada (CP-037)",

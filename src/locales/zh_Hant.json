@@ -1353,11 +1353,8 @@
     },
     "encoding": {
         "utf-8": "UTF-8",
-        "utf-8-bom": "UTF-8 帶簽名",
         "utf-16le": "UTF-16 Little Endian",
         "utf-16be": "UTF-16 Big Endian",
-        "utf-16le-bom": "UTF-16 Little Endian 帶簽名",
-        "utf-16be-bom": "UTF-16 Big Endian 帶簽名",
         "cp437": "OEM 美國 (CP-437)",
         "cp863": "OEM 加拿大法語 (CP-863)",
         "cp037": "IBM EBCDIC 美國/加拿大 (CP-037)",

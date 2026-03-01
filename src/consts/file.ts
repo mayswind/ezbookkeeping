@@ -13,11 +13,8 @@ export const UTF_8 = 'utf-8';
 
 export const SUPPORTED_FILE_ENCODINGS: string[] = [
     UTF_8, // UTF-8
-    'utf-8-bom', // UTF-8 with BOM
     'utf-16le', // UTF-16 Little Endian
     'utf-16be', // UTF-16 Big Endian
-    'utf-16le-bom', // UTF-16 Little Endian with BOM
-    'utf-16be-bom', // UTF-16 Big Endian with BOM
     'cp437', // OEM United States (CP-437)
     'cp863', // OEM Canadian French (CP-863)
     'cp037', // IBM EBCDIC US/Canada (CP-037)

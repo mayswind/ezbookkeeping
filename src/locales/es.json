@@ -1353,11 +1353,8 @@
     },
     "encoding": {
         "utf-8": "UTF-8",
-        "utf-8-bom": "UTF-8 con BOM",
         "utf-16le": "UTF-16 Little Endian",
         "utf-16be": "UTF-16 Big Endian",
-        "utf-16le-bom": "UTF-16 Little Endian con BOM",
-        "utf-16be-bom": "UTF-16 Big Endian con BOM",
         "cp437": "OEM United States (CP-437)",
         "cp863": "OEM Canadian French (CP-863)",
         "cp037": "IBM EBCDIC US/Canada (CP-037)",

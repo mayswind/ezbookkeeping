@@ -186,7 +186,7 @@
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
-                <f7-actions-button @click="setSortable()">{{ tt('Sort') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': maxCategoryAccountCount < 2 }" @click="setSortable()">{{ tt('Sort') }}</f7-actions-button>
                 <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ tt('Show Hidden Accounts') }}</f7-actions-button>
                 <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ tt('Hide Hidden Accounts') }}</f7-actions-button>
             </f7-actions-group>
@@ -252,6 +252,7 @@ const {
     customAccountCategoryOrder,
     allCategorizedAccountsMap,
     allAccountCount,
+    maxCategoryAccountCount,
     netAssets,
     totalAssets,
     totalLiabilities,

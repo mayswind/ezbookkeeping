@@ -39,6 +39,7 @@ export function useAccountListPageBase() {
     const allAccounts = computed<Account[]>(() => accountsStore.allAccounts);
     const allCategorizedAccountsMap = computed<Record<number, CategorizedAccount>>(() => accountsStore.allCategorizedAccountsMap);
     const allAccountCount = computed<number>(() => accountsStore.allAvailableAccountsCount);
+    const maxCategoryAccountCount = computed<number>(() => accountsStore.maxCategoryAccountCount);
 
     const netAssets = computed<string>(() => {
         const netAssets: number | HiddenAmount | NumberWithSuffix = accountsStore.getNetAssets(showAccountBalance.value);
@@ -101,6 +102,7 @@ export function useAccountListPageBase() {
         allAccounts,
         allCategorizedAccountsMap,
         allAccountCount,
+        maxCategoryAccountCount,
         netAssets,
         totalAssets,
         totalLiabilities,

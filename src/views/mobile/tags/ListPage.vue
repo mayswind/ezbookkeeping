@@ -194,10 +194,10 @@
             <f7-actions-group v-if="allTagGroupsWithDefault.length >= 2">
                 <f7-actions-button @click="changeTagGroupDisplayOrder">{{ tt('Change Group Display Order') }}</f7-actions-button>
             </f7-actions-group>
-            <f7-actions-group v-if="tags.length > 1">
-                <f7-actions-button @click="setSortable()">{{ tt('Sort') }}</f7-actions-button>
-                <f7-actions-button @click="sortByName(false)">{{ tt('Sort by Name (A to Z)') }}</f7-actions-button>
-                <f7-actions-button @click="sortByName(true)">{{ tt('Sort by Name (Z to A)') }}</f7-actions-button>
+            <f7-actions-group>
+                <f7-actions-button :class="{ 'disabled': !tags || tags.length < 2 }" @click="setSortable()">{{ tt('Sort') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !tags || tags.length < 2 }" @click="sortByName(false)">{{ tt('Sort by Name (A to Z)') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !tags || tags.length < 2 }" @click="sortByName(true)">{{ tt('Sort by Name (Z to A)') }}</f7-actions-button>
                 <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ tt('Show Hidden Transaction Tags') }}</f7-actions-button>
                 <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ tt('Hide Hidden Transaction Tags') }}</f7-actions-button>
             </f7-actions-group>

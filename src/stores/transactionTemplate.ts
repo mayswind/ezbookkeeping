@@ -334,11 +334,13 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
                     return;
                 }
 
-                if (!isDefined(transactionTemplateListStatesInvalid.value[templateType]) || transactionTemplateListStatesInvalid.value[templateType]) {
-                    updateTransactionTemplateListInvalidState(templateType, false);
-                }
+                loadAllTemplates({ templateType: templateType, force: false }).finally(() => {
+                    if (!isDefined(transactionTemplateListStatesInvalid.value[templateType]) || transactionTemplateListStatesInvalid.value[templateType]) {
+                        updateTransactionTemplateListInvalidState(templateType, false);
+                    }
 
-                resolve(data.result);
+                    resolve(data.result);
+                });
             }).catch(error => {
                 logger.error('failed to save templates display order', error);
 

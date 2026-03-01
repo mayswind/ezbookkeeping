@@ -509,11 +509,13 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
                     return;
                 }
 
-                if (transactionTagGroupListStateInvalid.value) {
-                    updateTransactionTagGroupListInvalidState(false);
-                }
+                loadAllTagGroups({ force: false }).finally(() => {
+                    if (transactionTagGroupListStateInvalid.value) {
+                        updateTransactionTagGroupListInvalidState(false);
+                    }
 
-                resolve(data.result);
+                    resolve(data.result);
+                });
             }).catch(error => {
                 logger.error('failed to save tag groups display order', error);
 
@@ -705,11 +707,13 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
                     return;
                 }
 
-                if (transactionTagListStateInvalid.value) {
-                    updateTransactionTagListInvalidState(false);
-                }
+                loadAllTags({ force: false }).finally(() => {
+                    if (transactionTagListStateInvalid.value) {
+                        updateTransactionTagListInvalidState(false);
+                    }
 
-                resolve(data.result);
+                    resolve(data.result);
+                });
             }).catch(error => {
                 logger.error('failed to save tags display order', error);
 

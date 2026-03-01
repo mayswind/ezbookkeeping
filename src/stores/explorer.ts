@@ -1069,11 +1069,13 @@ export const useExplorersStore = defineStore('explorers', () => {
                     return;
                 }
 
-                if (insightsExplorerListStateInvalid.value) {
-                    updateInsightsExplorerListInvalidState(false);
-                }
+                loadAllInsightsExplorerBasicInfos({ force: false }).finally(() => {
+                    if (insightsExplorerListStateInvalid.value) {
+                        updateInsightsExplorerListInvalidState(false);
+                    }
 
-                resolve(data.result);
+                    resolve(data.result);
+                });
             }).catch(error => {
                 logger.error('failed to save explorers display order', error);
 

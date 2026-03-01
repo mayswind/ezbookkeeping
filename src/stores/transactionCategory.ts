@@ -473,11 +473,13 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                     return;
                 }
 
-                if (transactionCategoryListStateInvalid.value) {
-                    updateTransactionCategoryListInvalidState(false);
-                }
+                loadAllCategories({ force: false }).finally(() => {
+                    if (transactionCategoryListStateInvalid.value) {
+                        updateTransactionCategoryListInvalidState(false);
+                    }
 
-                resolve(data.result);
+                    resolve(data.result);
+                });
             }).catch(error => {
                 logger.error('failed to save categories display order', error);
 

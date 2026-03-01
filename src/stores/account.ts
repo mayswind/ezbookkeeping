@@ -934,11 +934,13 @@ export const useAccountsStore = defineStore('accounts', () => {
                     return;
                 }
 
-                if (accountListStateInvalid.value) {
-                    updateAccountListInvalidState(false);
-                }
+                loadAllAccounts({ force: false }).finally(() => {
+                    if (accountListStateInvalid.value) {
+                        updateAccountListInvalidState(false);
+                    }
 
-                resolve(data.result);
+                    resolve(data.result);
+                });
             }).catch(error => {
                 logger.error('failed to save accounts display order', error);
 

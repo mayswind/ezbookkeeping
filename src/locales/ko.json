@@ -1496,6 +1496,8 @@
     "Delete": "삭제",
     "Duplicate": "복제",
     "Sort": "정렬",
+    "Sort by Name (A to Z)": "Sort by Name (A to Z)",
+    "Sort by Name (Z to A)": "Sort by Name (Z to A)",
     "Date": "날짜",
     "Time": "시간",
     "Color": "색상",

@@ -1496,6 +1496,8 @@
     "Delete": "刪除",
     "Duplicate": "複製",
     "Sort": "排序",
+    "Sort by Name (A to Z)": "依名稱排序（正序）",
+    "Sort by Name (Z to A)": "依名稱排序（倒序）",
     "Date": "日期",
     "Time": "時間",
     "Color": "顏色",

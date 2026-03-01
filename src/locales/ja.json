@@ -1496,6 +1496,8 @@
     "Delete": "削除",
     "Duplicate": "複製",
     "Sort": "並べ替え",
+    "Sort by Name (A to Z)": "Sort by Name (A to Z)",
+    "Sort by Name (Z to A)": "Sort by Name (Z to A)",
     "Date": "日付",
     "Time": "時間",
     "Color": "色",

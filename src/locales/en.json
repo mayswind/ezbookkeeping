@@ -1496,6 +1496,8 @@
     "Delete": "Delete",
     "Duplicate": "Duplicate",
     "Sort": "Sort",
+    "Sort by Name (A to Z)": "Sort by Name (A to Z)",
+    "Sort by Name (Z to A)": "Sort by Name (Z to A)",
     "Date": "Date",
     "Time": "Time",
     "Color": "Color",
